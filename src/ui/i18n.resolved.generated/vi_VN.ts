@@ -1994,6 +1994,9 @@ export const vi_VN: EnTranslations = {
         "takeParcelsFirst": "Hãy lấy bưu kiện ra trước khi bỏ lá thư."
       }
     },
+    "noticeboard": {
+      "empty": "Nothing seems posted."
+    },
     "bank": {
       "title": "Ngân Hàng",
       "subtitle": "Két Sắt Mạ Vàng",
@@ -5571,6 +5574,7 @@ export const vi_VN: EnTranslations = {
     "reconnectingNow": "Mất kết nối. Đang kết nối lại ngay bây giờ... (thử {attempt}/{maxAttempts})",
     "slowConnection": "Quá trình này mất nhiều thời gian hơn bình thường. Kiểm tra kết nối internet của bạn.",
     "connectionRejected": "Máy chủ đã đóng kết nối.",
+    "incompatibleWorldVersion": "Game and server versions are incompatible. Reload or update, then try again.",
     "realmFull": "Thế giới này đang đầy người chơi. Vui lòng thử lại sau vài phút.",
     "tooManyConnections": "Có quá nhiều kết nối đến thế giới này từ mạng của bạn. Vui lòng đóng bớt cửa sổ trò chơi hoặc thử lại sau vài phút.",
     "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
@@ -11781,6 +11785,7 @@ export const vi_VN: EnTranslations = {
     "delveRiteShrineCandleInteract": "Miếu Nến: Nhấn F để chạm vào",
     "delveRiteShrineReedInteract": "Miếu Lau Sậy: Nhấn F để chạm vào",
     "delveRiteShrineSkullInteract": "Miếu Đầu Lâu: Nhấn F để chạm vào",
-    "mailboxName": "Hòm Thư"
+    "mailboxName": "Hòm Thư",
+    "noticeboardName": "Notice Board"
   }
 };

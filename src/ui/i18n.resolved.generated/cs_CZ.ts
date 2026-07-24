@@ -1994,6 +1994,9 @@ export const cs_CZ: EnTranslations = {
         "takeParcelsFirst": "Před zahozením dopisu nejdřív vyzvedni balíky."
       }
     },
+    "noticeboard": {
+      "empty": "Nothing seems posted."
+    },
     "bank": {
       "title": "Banka",
       "subtitle": "Pozlacená truhlice",
@@ -5571,6 +5574,7 @@ export const cs_CZ: EnTranslations = {
     "reconnectingNow": "Spojení ztraceno. Nyní se znovu připojuje... (pokus {attempt}/{maxAttempts})",
     "slowConnection": "Trvá to déle než obvykle. Zkontrolujte připojení k internetu.",
     "connectionRejected": "Server ukončil připojení.",
+    "incompatibleWorldVersion": "Game and server versions are incompatible. Reload or update, then try again.",
     "realmFull": "Tento svět je momentálně plný. Zkus to prosím znovu za několik minut.",
     "tooManyConnections": "Z tvé sítě se k tomuto světu připojuje příliš mnoho spojení. Zavři nadbytečná herní okna nebo to zkus znovu za několik minut.",
     "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
@@ -11781,6 +11785,7 @@ export const cs_CZ: EnTranslations = {
     "delveRiteShrineCandleInteract": "Svíčková svatyně: stiskni F a dotkni se jí",
     "delveRiteShrineReedInteract": "Rákosová svatyně: stiskni F a dotkni se jí",
     "delveRiteShrineSkullInteract": "Lebková svatyně: stiskni F a dotkni se jí",
-    "mailboxName": "Poštovní schránka"
+    "mailboxName": "Poštovní schránka",
+    "noticeboardName": "Notice Board"
   }
 };

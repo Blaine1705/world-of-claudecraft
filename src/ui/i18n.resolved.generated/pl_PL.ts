@@ -1994,6 +1994,9 @@ export const pl_PL: EnTranslations = {
         "takeParcelsFirst": "Wyjmij paczki, zanim wyrzucisz list."
       }
     },
+    "noticeboard": {
+      "empty": "Nothing seems posted."
+    },
     "bank": {
       "title": "Bank",
       "subtitle": "Złocona Szkatuła",
@@ -5571,6 +5574,7 @@ export const pl_PL: EnTranslations = {
     "reconnectingNow": "Połączenie utracone. Łączę się teraz ponownie... (próba {attempt}/{maxAttempts})",
     "slowConnection": "To trwa dłużej niż zwykle. Sprawdź swoje połączenie internetowe.",
     "connectionRejected": "Serwer zamknął połączenie.",
+    "incompatibleWorldVersion": "Game and server versions are incompatible. Reload or update, then try again.",
     "realmFull": "Ten świat jest teraz pełny. Spróbuj ponownie za kilka minut.",
     "tooManyConnections": "Z twojej sieci pochodzi zbyt wiele połączeń do tego świata. Zamknij dodatkowe okna gry lub spróbuj ponownie za kilka minut.",
     "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
@@ -11781,6 +11785,7 @@ export const pl_PL: EnTranslations = {
     "delveRiteShrineCandleInteract": "Kapliczka Świecy: Naciśnij F, aby jej dotknąć",
     "delveRiteShrineReedInteract": "Kapliczka Trzciny: Naciśnij F, aby jej dotknąć",
     "delveRiteShrineSkullInteract": "Kapliczka Czaszki: Naciśnij F, aby jej dotknąć",
-    "mailboxName": "Skrzynka pocztowa"
+    "mailboxName": "Skrzynka pocztowa",
+    "noticeboardName": "Notice Board"
   }
 };

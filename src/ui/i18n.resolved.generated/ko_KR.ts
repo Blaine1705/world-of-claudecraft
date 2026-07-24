@@ -1994,6 +1994,9 @@ export const ko_KR: EnTranslations = {
         "takeParcelsFirst": "편지를 버리기 전에 소포를 먼저 꺼내세요."
       }
     },
+    "noticeboard": {
+      "empty": "게시된 내용이 없는 것 같습니다."
+    },
     "bank": {
       "title": "은행",
       "subtitle": "도금 금고",
@@ -5571,6 +5574,7 @@ export const ko_KR: EnTranslations = {
     "reconnectingNow": "연결이 끊어졌습니다. 지금 다시 연결하는 중...(시도 {attempt}/{maxAttempts})",
     "slowConnection": "로딩이 평소보다 오래 걸리고 있습니다. 인터넷 연결을 확인하세요.",
     "connectionRejected": "서버가 연결을 종료했습니다.",
+    "incompatibleWorldVersion": "게임과 서버 버전이 호환되지 않습니다. 새로고침하거나 업데이트한 후 다시 시도하세요.",
     "realmFull": "이 월드는 현재 포화 상태입니다. 몇 분 후에 다시 시도해 주세요.",
     "tooManyConnections": "사용 중인 네트워크에서 이 월드로 연결이 너무 많습니다. 추가 게임 창을 닫거나 몇 분 후에 다시 시도해 주세요.",
     "messageRateExceeded": "행동을 너무 빠르게 전송하여 연결이 끊어졌습니다. 잠시 기다렸다가 다시 로그인해 주세요.",
@@ -11781,6 +11785,7 @@ export const ko_KR: EnTranslations = {
     "delveRiteShrineCandleInteract": "촛불 제단: F를 눌러 만지기",
     "delveRiteShrineReedInteract": "갈대 제단: F를 눌러 만지기",
     "delveRiteShrineSkullInteract": "해골 제단: F를 눌러 만지기",
-    "mailboxName": "우편함"
+    "mailboxName": "우편함",
+    "noticeboardName": "게시판"
   }
 };

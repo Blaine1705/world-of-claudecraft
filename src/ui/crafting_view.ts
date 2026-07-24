@@ -20,7 +20,7 @@ import { isCommissionEligible } from '../sim/professions/commission';
 import { holdsSelfSignedInstance, requiredReagentCountFor } from '../sim/professions/crafting';
 import { type StationType, stationsOfType, stationTypeForCraft } from '../sim/professions/stations';
 import { MINIMAL_TIER_MULTIPLIER, REDUCED_TIER_MULTIPLIER } from '../sim/professions/wheel';
-import type { InvSlot, ItemDef } from '../sim/types';
+import type { InvSlot, ItemDef, StationDef } from '../sim/types';
 import { isRecipeKnownForViewer } from './hud/vendor/train_view';
 
 export interface RecipeDefLike {
@@ -328,7 +328,10 @@ export interface CraftLearnHint {
  * static content plus the viewer's mirrored known set (both hosts carry
  * knownRecipes on cprof, so no new IWorld member is needed).
  */
-export function craftLearnHints(knownRecipes: readonly string[]): Map<string, CraftLearnHint> {
+export function craftLearnHints(
+  knownRecipes: readonly string[],
+  stations: readonly StationDef[],
+): Map<string, CraftLearnHint> {
   const known = new Set(knownRecipes);
   const hints = new Map<string, CraftLearnHint>();
   for (const recipe of ALL_RECIPES) {
@@ -337,7 +340,7 @@ export function craftLearnHints(knownRecipes: readonly string[]): Map<string, Cr
     if (isRecipeKnownForViewer(recipe, known)) continue;
     const stationType = stationTypeForCraft(recipe.professionId);
     if (!stationType) continue;
-    const station = stationsOfType(stationType)[0];
+    const station = stationsOfType(stations, stationType)[0];
     if (!station) continue;
     hints.set(recipe.professionId, { stationType, masterNpcId: station.masterNpcId });
   }

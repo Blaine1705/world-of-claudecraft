@@ -1994,6 +1994,9 @@ export const zh_CN: EnTranslations = {
         "takeParcelsFirst": "请先取出包裹再丢弃信件。"
       }
     },
+    "noticeboard": {
+      "empty": "看起来没有张贴任何内容。"
+    },
     "bank": {
       "title": "银行",
       "subtitle": "镀金保险箱",
@@ -5571,6 +5574,7 @@ export const zh_CN: EnTranslations = {
     "reconnectingNow": "连接已断开，正在立即重新连接...（第 {attempt}/{maxAttempts} 次尝试）",
     "slowConnection": "加载时间比平时长。请检查您的网络连接。",
     "connectionRejected": "服务器关闭了连接。",
+    "incompatibleWorldVersion": "游戏与服务器版本不兼容。请刷新或更新后重试。",
     "realmFull": "当前服务器已满，请稍后几分钟再试。",
     "tooManyConnections": "您的网络向该服务器发起的连接过多。请关闭多余的游戏窗口，或稍后几分钟再试。",
     "messageRateExceeded": "由于发送操作过快，您已断开连接。请稍等片刻后重新登录。",
@@ -11781,6 +11785,7 @@ export const zh_CN: EnTranslations = {
     "delveRiteShrineCandleInteract": "烛火神龛：按 F 触碰",
     "delveRiteShrineReedInteract": "芦苇神龛：按 F 触碰",
     "delveRiteShrineSkullInteract": "骷髅神龛：按 F 触碰",
-    "mailboxName": "邮箱"
+    "mailboxName": "邮箱",
+    "noticeboardName": "告示板"
   }
 };

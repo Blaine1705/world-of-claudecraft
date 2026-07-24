@@ -1994,6 +1994,9 @@ export const it_IT: EnTranslations = {
         "takeParcelsFirst": "Ritira i pacchi prima di scartare la lettera."
       }
     },
+    "noticeboard": {
+      "empty": "Nothing seems posted."
+    },
     "bank": {
       "title": "Banca",
       "subtitle": "Il Forziere Dorato",
@@ -5571,6 +5574,7 @@ export const it_IT: EnTranslations = {
     "reconnectingNow": "Connessione persa. Ci stiamo ricollegando ora... (tentativo {attempt}/{maxAttempts})",
     "slowConnection": "L'operazione sta richiedendo più tempo del solito. Controlla la tua connessione Internet.",
     "connectionRejected": "Il server ha chiuso la connessione.",
+    "incompatibleWorldVersion": "Game and server versions are incompatible. Reload or update, then try again.",
     "realmFull": "Questo mondo e al completo in questo momento. Riprova tra qualche minuto.",
     "tooManyConnections": "Troppe connessioni a questo mondo provengono dalla tua rete. Chiudi le finestre di gioco extra o riprova tra qualche minuto.",
     "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
@@ -11781,6 +11785,7 @@ export const it_IT: EnTranslations = {
     "delveRiteShrineCandleInteract": "Santuario della Candela: premi F per toccarlo",
     "delveRiteShrineReedInteract": "Santuario delle Canne: premi F per toccarlo",
     "delveRiteShrineSkullInteract": "Santuario del Teschio: premi F per toccarlo",
-    "mailboxName": "Cassetta postale"
+    "mailboxName": "Cassetta postale",
+    "noticeboardName": "Notice Board"
   }
 };

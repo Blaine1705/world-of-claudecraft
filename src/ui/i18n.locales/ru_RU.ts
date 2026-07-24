@@ -1501,6 +1501,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'loading.slowConnection':
     'Загрузка занимает больше времени, чем обычно. Проверьте подключение к интернету.',
   'loading.connectionRejected': 'Сервер закрыл соединение.',
+  'loading.incompatibleWorldVersion':
+    'Версии игры и сервера несовместимы. Перезагрузите или обновите игру, затем повторите попытку.',
   'loading.realmFull':
     'Этот мир сейчас переполнен. Пожалуйста, попробуйте снова через несколько минут.',
   'loading.tooManyConnections':
@@ -7155,6 +7157,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_tier': 'Достигните более высокого ранга, чтобы получить это.',
   'apiError.discord.swag_points': 'Недостаточно очков.',
   'hudChrome.mailbox.title': 'Почтовый ящик',
+  'hudChrome.noticeboard.empty': 'Похоже, здесь ничего не опубликовано.',
   'hudChrome.mailbox.subtitle': 'Вороновая почта',
   'hudChrome.mailbox.close': 'Закрыть почтовый ящик',
   'hudChrome.mailbox.tabInbox': 'Входящие',
@@ -7200,6 +7203,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'Этого письма больше нет в вашем ящике.',
   'hudChrome.mailbox.result.takeParcelsFirst': 'Сначала заберите посылки, затем удаляйте письмо.',
   'worldContent.mailboxName': 'Почтовый ящик',
+  'worldContent.noticeboardName': 'Доска объявлений',
   'entities.letters.ravenpost_welcome.sender': 'Вороновая почта',
   'entities.letters.ravenpost_welcome.subject': 'Теперь вороны летают и для вас',
   'entities.letters.ravenpost_welcome.body':

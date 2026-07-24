@@ -1994,6 +1994,9 @@ export const nl_NL: EnTranslations = {
         "takeParcelsFirst": "Haal de pakketten eruit voordat je de brief weggooit."
       }
     },
+    "noticeboard": {
+      "empty": "Nothing seems posted."
+    },
     "bank": {
       "title": "Bank",
       "subtitle": "De Vergulde Geldkist",
@@ -5571,6 +5574,7 @@ export const nl_NL: EnTranslations = {
     "reconnectingNow": "Verbinding verbroken. Er wordt nu opnieuw verbinding gemaakt... (poging {attempt}/{maxAttempts})",
     "slowConnection": "Dit duurt langer dan normaal. Controleer uw internetverbinding.",
     "connectionRejected": "De server heeft de verbinding gesloten.",
+    "incompatibleWorldVersion": "Game and server versions are incompatible. Reload or update, then try again.",
     "realmFull": "Deze wereld is op dit moment vol. Probeer het over een paar minuten opnieuw.",
     "tooManyConnections": "Er komen te veel verbindingen naar deze wereld vanuit jouw netwerk. Sluit extra spelvensters of probeer het over een paar minuten opnieuw.",
     "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
@@ -11781,6 +11785,7 @@ export const nl_NL: EnTranslations = {
     "delveRiteShrineCandleInteract": "Kaarsenschrijn: druk op F om het aan te raken",
     "delveRiteShrineReedInteract": "Rietschrijn: druk op F om het aan te raken",
     "delveRiteShrineSkullInteract": "Schedelschrijn: druk op F om het aan te raken",
-    "mailboxName": "Brievenbus"
+    "mailboxName": "Brievenbus",
+    "noticeboardName": "Notice Board"
   }
 };

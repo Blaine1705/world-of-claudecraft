@@ -1994,6 +1994,9 @@ export const sv_SE: EnTranslations = {
         "takeParcelsFirst": "Ta ut paketen innan du kastar brevet."
       }
     },
+    "noticeboard": {
+      "empty": "Nothing seems posted."
+    },
     "bank": {
       "title": "Bank",
       "subtitle": "Förgyllda kassakistan",
@@ -5571,6 +5574,7 @@ export const sv_SE: EnTranslations = {
     "reconnectingNow": "Anslutning förlorad. Återansluter nu... (försök {attempt}/{maxAttempts})",
     "slowConnection": "Detta tar längre tid än vanligt. Kontrollera din internetanslutning.",
     "connectionRejected": "Servern stängde anslutningen.",
+    "incompatibleWorldVersion": "Game and server versions are incompatible. Reload or update, then try again.",
     "realmFull": "Denna värld är full just nu. Försök igen om några minuter.",
     "tooManyConnections": "För många anslutningar till denna värld kommer från ditt nätverk. Stäng extra spelfönster eller försök igen om några minuter.",
     "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
@@ -11781,6 +11785,7 @@ export const sv_SE: EnTranslations = {
     "delveRiteShrineCandleInteract": "Ljushelgedom: Tryck på F för att röra vid den",
     "delveRiteShrineReedInteract": "Vasshelgedom: Tryck på F för att röra vid den",
     "delveRiteShrineSkullInteract": "Skallhelgedom: Tryck på F för att röra vid den",
-    "mailboxName": "Brevlåda"
+    "mailboxName": "Brevlåda",
+    "noticeboardName": "Notice Board"
   }
 };

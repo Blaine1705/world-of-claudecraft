@@ -1420,6 +1420,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'loading.reconnectingNow': '连接已断开，正在立即重新连接...（第 {attempt}/{maxAttempts} 次尝试）',
   'loading.slowConnection': '加载时间比平时长。请检查您的网络连接。',
   'loading.connectionRejected': '服务器关闭了连接。',
+  'loading.incompatibleWorldVersion': '游戏与服务器版本不兼容。请刷新或更新后重试。',
   'loading.realmFull': '当前服务器已满，请稍后几分钟再试。',
   'loading.tooManyConnections':
     '您的网络向该服务器发起的连接过多。请关闭多余的游戏窗口，或稍后几分钟再试。',
@@ -6691,6 +6692,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_tier': '达到更高段位即可领取。',
   'apiError.discord.swag_points': '积分不足。',
   'hudChrome.mailbox.title': '邮箱',
+  'hudChrome.noticeboard.empty': '看起来没有张贴任何内容。',
   'hudChrome.mailbox.subtitle': '渡鸦邮驿',
   'hudChrome.mailbox.close': '关闭邮箱',
   'hudChrome.mailbox.tabInbox': '收件箱',
@@ -6735,6 +6737,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': '那封信已不在你的邮箱里。',
   'hudChrome.mailbox.result.takeParcelsFirst': '请先取出包裹再丢弃信件。',
   'worldContent.mailboxName': '邮箱',
+  'worldContent.noticeboardName': '告示板',
   'entities.letters.ravenpost_welcome.sender': '渡鸦邮驿',
   'entities.letters.ravenpost_welcome.subject': '渡鸦如今为你飞翔',
   'entities.letters.ravenpost_welcome.body':

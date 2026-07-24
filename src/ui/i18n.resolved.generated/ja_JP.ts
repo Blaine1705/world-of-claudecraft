@@ -1994,6 +1994,9 @@ export const ja_JP: EnTranslations = {
         "takeParcelsFirst": "手紙を捨てる前に小包を取り出してください。"
       }
     },
+    "noticeboard": {
+      "empty": "何も貼られていないようだ。"
+    },
     "bank": {
       "title": "銀行",
       "subtitle": "金張りの金庫",
@@ -5571,6 +5574,7 @@ export const ja_JP: EnTranslations = {
     "reconnectingNow": "サーバーとの接続が切断されました。今すぐ再接続しています...（試行 {attempt}/{maxAttempts}）",
     "slowConnection": "読み込みに時間がかかっています。インターネット接続を確認してください。",
     "connectionRejected": "サーバーが接続を閉じました。",
+    "incompatibleWorldVersion": "ゲームとサーバーのバージョンに互換性がありません。再読み込みまたはアップデートしてから、もう一度お試しください。",
     "realmFull": "このワールドは現在満員です。数分後にもう一度お試しください。",
     "tooManyConnections": "お使いのネットワークからこのワールドへの接続が多すぎます。余分なゲームウィンドウを閉じるか、数分後にもう一度お試しください。",
     "messageRateExceeded": "操作の送信が速すぎたため、切断されました。しばらく待ってから再度ログインしてください。",
@@ -11781,6 +11785,7 @@ export const ja_JP: EnTranslations = {
     "delveRiteShrineCandleInteract": "蝋燭の祠：Fで触れる",
     "delveRiteShrineReedInteract": "葦の祠：Fで触れる",
     "delveRiteShrineSkullInteract": "髑髏の祠：Fで触れる",
-    "mailboxName": "メールボックス"
+    "mailboxName": "メールボックス",
+    "noticeboardName": "掲示板"
   }
 };

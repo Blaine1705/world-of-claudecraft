@@ -1120,6 +1120,7 @@ export const SUN_DIR = SUN_ANCHOR.clone().normalize();
 export interface SurfaceMatOpts {
   color?: number;
   map?: THREE.Texture;
+  vertexColors?: boolean;
   normalMap?: THREE.Texture;
   /** PBR roughness map (high/ultra only; ignored on the Lambert tier) */
   roughnessMap?: THREE.Texture;
@@ -1176,6 +1177,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
     ? new THREE.MeshStandardMaterial({
         color: opts.color ?? 0xffffff,
         map: opts.map ?? null,
+        vertexColors: opts.vertexColors ?? false,
         normalMap: opts.normalMap ?? null,
         roughnessMap: opts.roughnessMap ?? null,
         aoMap: opts.aoMap ?? null,
@@ -1189,6 +1191,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
     : new THREE.MeshLambertMaterial({
         color: opts.color ?? 0xffffff,
         map: opts.map ?? null,
+        vertexColors: opts.vertexColors ?? false,
         flatShading: opts.flatShading ?? false,
         emissive: opts.emissive ?? 0x000000,
         emissiveIntensity: opts.emissiveIntensity ?? 1,
