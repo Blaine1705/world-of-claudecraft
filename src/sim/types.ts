@@ -3187,6 +3187,11 @@ export type SimEvent = { pid?: number } & (
   // level past the cap (milestone unlocks ride the deedUnlocked event since
   // the milestone unification; the legacy milestoneUnlocked emit is gone)
   | { type: 'virtualLevelUp'; level: number }
+  // Cosmetic prestige (prestige(), src/sim/progression/xp.ts): fired alongside
+  // the 'log' chat line so the client can repaint an already-open character
+  // sheet's prestige rank without waiting for an unrelated repaint trigger
+  // (closing/reopening the window). Text-free: the chat line is the 'log' event.
+  | { type: 'prestige'; rank: number }
   // Book of Deeds unlock (always personal: emitted with pid). Carries the deed
   // ID only, never English text; `retro` marks the on-join back-credit pass so
   // the client can batch those into one summary line instead of banner spam.

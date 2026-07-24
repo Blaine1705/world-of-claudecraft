@@ -1460,7 +1460,9 @@ export const zh_TW: EnTranslations = {
         "gills": "魚鰓",
         "claw": "爪",
         "horn": "角",
-        "tusk": "獠牙"
+        "tusk": "獠牙",
+        "meat": "Meat",
+        "cloth": "布"
       }
     },
     "townFocus": {
@@ -6065,7 +6067,8 @@ export const zh_TW: EnTranslations = {
       "death": "{name}死亡。",
       "auraGain": "你獲得了 {name}。",
       "auraFade": "{name}從你身上消失。",
-      "auraAfflicted": "{target}受到了 {name} 影響。"
+      "auraAfflicted": "{target}受到了 {name} 影響。",
+      "auraGainOther": "{target}獲得了 {name}。"
     },
     "system": {
       "playerDeath": "你已經死亡。",

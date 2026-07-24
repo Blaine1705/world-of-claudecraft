@@ -754,6 +754,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.claw': '爪',
   'hudChrome.corpseHarvest.components.horn': '角',
   'hudChrome.corpseHarvest.components.tusk': '獠牙',
+  'hudChrome.corpseHarvest.components.cloth': '布',
   'hudChrome.townFocus.title': '城鎮專注',
   'hudChrome.townFocus.hint':
     '專注點會在每種材料的基礎產出上疊加加成。未專注的材料保持基礎產出不變。',
@@ -1807,6 +1808,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.combat.auraGain': '你獲得了 {name}。',
   'hud.combat.auraFade': '{name}從你身上消失。',
   'hud.combat.auraAfflicted': '{target}受到了 {name} 影響。',
+  'hud.combat.auraGainOther': '{target}獲得了 {name}。',
   'hud.system.playerDeath': '你已經死亡。',
   'hud.system.respawn': '你再次感到精力恢復、身體完整。',
   'hud.system.ignoringChat': '已封鎖來自 {name} 的聊天。',

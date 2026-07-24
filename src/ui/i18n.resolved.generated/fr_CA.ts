@@ -1460,7 +1460,9 @@ export const fr_CA: EnTranslations = {
         "gills": "Branchies",
         "claw": "Griffe",
         "horn": "Corne",
-        "tusk": "Défense"
+        "tusk": "Défense",
+        "meat": "Meat",
+        "cloth": "Cloth"
       }
     },
     "townFocus": {
@@ -6065,7 +6067,8 @@ export const fr_CA: EnTranslations = {
       "death": "{name} meurt.",
       "auraGain": "Vous gagnez {name}.",
       "auraFade": "{name} se dissipe de vous.",
-      "auraAfflicted": "{target} est affecté par {name}."
+      "auraAfflicted": "{target} est affecté par {name}.",
+      "auraGainOther": "{target} gains {name}."
     },
     "system": {
       "playerDeath": "Vous êtes mort.",

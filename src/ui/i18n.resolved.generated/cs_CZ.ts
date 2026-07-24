@@ -1460,7 +1460,9 @@ export const cs_CZ: EnTranslations = {
         "gills": "Žábry",
         "claw": "Dráp",
         "horn": "Roh",
-        "tusk": "Kly"
+        "tusk": "Kly",
+        "meat": "Meat",
+        "cloth": "Cloth"
       }
     },
     "townFocus": {
@@ -6065,7 +6067,8 @@ export const cs_CZ: EnTranslations = {
       "death": "{name} umírá.",
       "auraGain": "Získáváš {name}.",
       "auraFade": "{name} z tebe mizí.",
-      "auraAfflicted": "{target} je zasažen(a) efektem {name}."
+      "auraAfflicted": "{target} je zasažen(a) efektem {name}.",
+      "auraGainOther": "{target} gains {name}."
     },
     "system": {
       "playerDeath": "Zemřel(a) jsi.",

@@ -10,6 +10,9 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hud.combat.auraGainOther",
+    "hudChrome.corpseHarvest.components.cloth",
+    "hudChrome.corpseHarvest.components.meat",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -45,6 +48,9 @@ export const pending: Record<string, readonly string[]> = {
     "loading.messageRateExceeded"
   ],
   "es_ES": [
+    "hud.combat.auraGainOther",
+    "hudChrome.corpseHarvest.components.cloth",
+    "hudChrome.corpseHarvest.components.meat",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -80,6 +86,9 @@ export const pending: Record<string, readonly string[]> = {
     "loading.messageRateExceeded"
   ],
   "fr_FR": [
+    "hud.combat.auraGainOther",
+    "hudChrome.corpseHarvest.components.cloth",
+    "hudChrome.corpseHarvest.components.meat",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -115,6 +124,9 @@ export const pending: Record<string, readonly string[]> = {
     "loading.messageRateExceeded"
   ],
   "fr_CA": [
+    "hud.combat.auraGainOther",
+    "hudChrome.corpseHarvest.components.cloth",
+    "hudChrome.corpseHarvest.components.meat",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -151,6 +163,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "hud.combat.auraGainOther",
+    "hudChrome.corpseHarvest.components.cloth",
+    "hudChrome.corpseHarvest.components.meat",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -186,6 +201,9 @@ export const pending: Record<string, readonly string[]> = {
     "loading.messageRateExceeded"
   ],
   "de_DE": [
+    "hud.combat.auraGainOther",
+    "hudChrome.corpseHarvest.components.cloth",
+    "hudChrome.corpseHarvest.components.meat",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -220,11 +238,22 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unbind.noSpace",
     "loading.messageRateExceeded"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.corpseHarvest.components.meat"
+  ],
+  "zh_TW": [
+    "hudChrome.corpseHarvest.components.meat"
+  ],
+  "ko_KR": [
+    "hudChrome.corpseHarvest.components.meat"
+  ],
+  "ja_JP": [
+    "hudChrome.corpseHarvest.components.meat"
+  ],
   "pt_BR": [
+    "hud.combat.auraGainOther",
+    "hudChrome.corpseHarvest.components.cloth",
+    "hudChrome.corpseHarvest.components.meat",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -259,8 +288,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unbind.noSpace",
     "loading.messageRateExceeded"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.corpseHarvest.components.meat"
+  ],
   "cs_CZ": [
+    "hud.combat.auraGainOther",
+    "hudChrome.corpseHarvest.components.cloth",
+    "hudChrome.corpseHarvest.components.meat",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -296,6 +330,9 @@ export const pending: Record<string, readonly string[]> = {
     "loading.messageRateExceeded"
   ],
   "nl_NL": [
+    "hud.combat.auraGainOther",
+    "hudChrome.corpseHarvest.components.cloth",
+    "hudChrome.corpseHarvest.components.meat",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -331,6 +368,9 @@ export const pending: Record<string, readonly string[]> = {
     "loading.messageRateExceeded"
   ],
   "pl_PL": [
+    "hud.combat.auraGainOther",
+    "hudChrome.corpseHarvest.components.cloth",
+    "hudChrome.corpseHarvest.components.meat",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -366,6 +406,9 @@ export const pending: Record<string, readonly string[]> = {
     "loading.messageRateExceeded"
   ],
   "id_ID": [
+    "hud.combat.auraGainOther",
+    "hudChrome.corpseHarvest.components.cloth",
+    "hudChrome.corpseHarvest.components.meat",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -401,6 +444,9 @@ export const pending: Record<string, readonly string[]> = {
     "loading.messageRateExceeded"
   ],
   "tr_TR": [
+    "hud.combat.auraGainOther",
+    "hudChrome.corpseHarvest.components.cloth",
+    "hudChrome.corpseHarvest.components.meat",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -436,6 +482,9 @@ export const pending: Record<string, readonly string[]> = {
     "loading.messageRateExceeded"
   ],
   "sv_SE": [
+    "hud.combat.auraGainOther",
+    "hudChrome.corpseHarvest.components.cloth",
+    "hudChrome.corpseHarvest.components.meat",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -471,6 +520,9 @@ export const pending: Record<string, readonly string[]> = {
     "loading.messageRateExceeded"
   ],
   "vi_VN": [
+    "hud.combat.auraGainOther",
+    "hudChrome.corpseHarvest.components.cloth",
+    "hudChrome.corpseHarvest.components.meat",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",
@@ -506,6 +558,9 @@ export const pending: Record<string, readonly string[]> = {
     "loading.messageRateExceeded"
   ],
   "da_DK": [
+    "hud.combat.auraGainOther",
+    "hudChrome.corpseHarvest.components.cloth",
+    "hudChrome.corpseHarvest.components.meat",
     "hudChrome.crafting.noBagSpace",
     "hudChrome.enchanting.disenchantNoSpace",
     "hudChrome.enchanting.enchantNoSpace",

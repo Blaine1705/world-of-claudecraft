@@ -779,6 +779,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.claw': 'Коготь',
   'hudChrome.corpseHarvest.components.horn': 'Рог',
   'hudChrome.corpseHarvest.components.tusk': 'Бивень',
+  'hudChrome.corpseHarvest.components.cloth': 'Ткань',
   'hudChrome.townFocus.title': 'Фокус города',
   'hudChrome.townFocus.hint':
     'Очки фокуса добавляют бонус поверх базового выхода каждого компонента. Компоненты без фокуса остаются на базовом уровне.',
@@ -1910,6 +1911,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.combat.auraGain': 'Вы получаете {name}.',
   'hud.combat.auraFade': '{name} спадает с вас.',
   'hud.combat.auraAfflicted': '{target} поражен эффектом {name}.',
+  'hud.combat.auraGainOther': '{target} получает {name}.',
   'hud.system.playerDeath': 'Вы погибли.',
   'hud.system.respawn': 'Вы снова чувствуете себя отдохнувшим и целым.',
   'hud.system.ignoringChat': 'Чат от {name} игнорируется.',

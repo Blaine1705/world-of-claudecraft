@@ -1416,6 +1416,8 @@ export const hudChromeStrings = {
       claw: 'Claw',
       horn: 'Horn',
       tusk: 'Tusk',
+      meat: 'Meat',
+      cloth: 'Cloth',
     },
   },
   // #1143: persistent town focus allocation panel. Reuses the corpseHarvest
