@@ -1994,6 +1994,9 @@ export const id_ID: EnTranslations = {
         "takeParcelsFirst": "Keluarkan bingkisannya dulu sebelum membuang surat itu."
       }
     },
+    "noticeboard": {
+      "empty": "Nothing seems posted."
+    },
     "bank": {
       "title": "Bank",
       "subtitle": "Brankas Bersepuh Emas",
@@ -5571,6 +5574,7 @@ export const id_ID: EnTranslations = {
     "reconnectingNow": "Koneksi terputus. Hubungkan kembali sekarang... (coba {attempt}/{maxAttempts})",
     "slowConnection": "Ini memakan waktu lebih lama dari biasanya. Periksa koneksi internet Anda.",
     "connectionRejected": "Server menutup koneksi.",
+    "incompatibleWorldVersion": "Game and server versions are incompatible. Reload or update, then try again.",
     "realmFull": "Dunia ini sedang penuh. Coba lagi dalam beberapa menit.",
     "tooManyConnections": "Terlalu banyak koneksi ke dunia ini dari jaringanmu. Tutup jendela permainan ekstra atau coba lagi dalam beberapa menit.",
     "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
@@ -11781,6 +11785,7 @@ export const id_ID: EnTranslations = {
     "delveRiteShrineCandleInteract": "Altar Lilin: Tekan F untuk menyentuhnya",
     "delveRiteShrineReedInteract": "Altar Buluh: Tekan F untuk menyentuhnya",
     "delveRiteShrineSkullInteract": "Altar Tengkorak: Tekan F untuk menyentuhnya",
-    "mailboxName": "Kotak Surat"
+    "mailboxName": "Kotak Surat",
+    "noticeboardName": "Notice Board"
   }
 };

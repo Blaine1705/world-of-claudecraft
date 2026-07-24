@@ -1477,6 +1477,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '연결이 끊어졌습니다. 지금 다시 연결하는 중...(시도 {attempt}/{maxAttempts})',
   'loading.slowConnection': '로딩이 평소보다 오래 걸리고 있습니다. 인터넷 연결을 확인하세요.',
   'loading.connectionRejected': '서버가 연결을 종료했습니다.',
+  'loading.incompatibleWorldVersion':
+    '게임과 서버 버전이 호환되지 않습니다. 새로고침하거나 업데이트한 후 다시 시도하세요.',
   'loading.realmFull': '이 월드는 현재 포화 상태입니다. 몇 분 후에 다시 시도해 주세요.',
   'loading.tooManyConnections':
     '사용 중인 네트워크에서 이 월드로 연결이 너무 많습니다. 추가 게임 창을 닫거나 몇 분 후에 다시 시도해 주세요.',
@@ -7018,6 +7020,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_tier': '이 보상을 받으려면 더 높은 등급에 도달하세요.',
   'apiError.discord.swag_points': '포인트가 부족합니다.',
   'hudChrome.mailbox.title': '우편함',
+  'hudChrome.noticeboard.empty': '게시된 내용이 없는 것 같습니다.',
   'hudChrome.mailbox.subtitle': '레이븐포스트',
   'hudChrome.mailbox.close': '우편함 닫기',
   'hudChrome.mailbox.tabInbox': '받은 편지함',
@@ -7064,6 +7067,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': '그 편지는 더 이상 우편함에 없습니다.',
   'hudChrome.mailbox.result.takeParcelsFirst': '편지를 버리기 전에 소포를 먼저 꺼내세요.',
   'worldContent.mailboxName': '우편함',
+  'worldContent.noticeboardName': '게시판',
   'entities.letters.ravenpost_welcome.sender': '레이븐포스트',
   'entities.letters.ravenpost_welcome.subject': '이제 까마귀가 당신을 위해 날아갑니다',
   'entities.letters.ravenpost_welcome.body':

@@ -1994,6 +1994,9 @@ export const tr_TR: EnTranslations = {
         "takeParcelsFirst": "Mektubu atmadan önce paketleri çıkar."
       }
     },
+    "noticeboard": {
+      "empty": "Nothing seems posted."
+    },
     "bank": {
       "title": "Banka",
       "subtitle": "Yaldızlı Kasa",
@@ -5571,6 +5574,7 @@ export const tr_TR: EnTranslations = {
     "reconnectingNow": "Bağlantı kesildi. Şimdi yeniden bağlanılıyor... ({attempt}/{maxAttempts}'yi deneyin)",
     "slowConnection": "Bu normalden daha uzun sürüyor. İnternet bağlantınızı kontrol edin.",
     "connectionRejected": "Sunucu bağlantıyı kapattı.",
+    "incompatibleWorldVersion": "Game and server versions are incompatible. Reload or update, then try again.",
     "realmFull": "Bu dünya şu an dolu. Lütfen birkaç dakika sonra tekrar dene.",
     "tooManyConnections": "Ağından bu dünyaya çok fazla bağlantı geliyor. Lütfen fazladan oyun pencerelerini kapat ya da birkaç dakika sonra tekrar dene.",
     "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
@@ -11781,6 +11785,7 @@ export const tr_TR: EnTranslations = {
     "delveRiteShrineCandleInteract": "Mum Sunağı: Dokunmak için F'ye bas",
     "delveRiteShrineReedInteract": "Saz Sunağı: Dokunmak için F'ye bas",
     "delveRiteShrineSkullInteract": "Kafatası Sunağı: Dokunmak için F'ye bas",
-    "mailboxName": "Posta Kutusu"
+    "mailboxName": "Posta Kutusu",
+    "noticeboardName": "Notice Board"
   }
 };

@@ -7127,8 +7127,9 @@ export class Hud {
       // craft regardless.
       if (
         $('#crafting-window').style.display === 'flex' &&
-        stationTypesSignature(inRangeStationTypes(sim.player.pos, sim.activeMobileStationCraft)) !==
-          this.lastCraftingStationSig
+        stationTypesSignature(
+          inRangeStationTypes(sim.stationPlacements, sim.player.pos, sim.activeMobileStationCraft),
+        ) !== this.lastCraftingStationSig
       )
         this.renderCrafting();
     }
@@ -9400,6 +9401,18 @@ export class Hud {
           // Keyboard/sim interact at a banker NPC: open the bank window.
           this.openBank();
           break;
+        case 'noticeboard':
+          // The board has no posted content yet. The structured private event
+          // keeps this feedback localized and identical offline and online.
+          // Mobile keeps the chat log collapsed during normal play, so mirror
+          // the durable/live-announced log line into the shared transient
+          // banner instead of making a successful interaction look inert.
+          {
+            const message = t('hudChrome.noticeboard.empty');
+            this.showBanner(message);
+            this.log(message, '#c8b98f');
+          }
+          break;
         case 'mailArrived': {
           // Player names splice verbatim; authored letters carry their
           // letterId, so the sender localizes through the entity dictionary
@@ -11483,6 +11496,7 @@ export class Hud {
       $('#train-window'),
       entityDisplayName(npc),
       buildTrainView(npc.templateId, {
+        stations: this.sim.stationPlacements,
         knownRecipes: identity.knownRecipes,
         craftSkills: identity.craftSkills,
         copper: this.sim.copper,
@@ -11664,6 +11678,7 @@ export class Hud {
     // the own active mobile station), computed once per repaint, so the row
     // disable mirrors the deny exactly. The server re-validates on craft.
     const inRangeStations = inRangeStationTypes(
+      this.sim.stationPlacements,
       this.sim.player.pos,
       this.sim.activeMobileStationCraft,
     );
@@ -11724,7 +11739,7 @@ export class Hud {
       buildProfessionIdentityView(this.sim.craftingIdentity),
       // Per-section "learnable at a master" hints: crafts with unlearned
       // trainer recipes, off the same mirrored knownRecipes set (both hosts).
-      craftLearnHints(this.sim.craftingIdentity.knownRecipes),
+      craftLearnHints(this.sim.craftingIdentity.knownRecipes, this.sim.stationPlacements),
     );
   }
 

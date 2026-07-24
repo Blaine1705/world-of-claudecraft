@@ -1994,6 +1994,9 @@ export const es: EnTranslations = {
         "takeParcelsFirst": "Saca los paquetes antes de desechar la carta."
       }
     },
+    "noticeboard": {
+      "empty": "Nothing seems posted."
+    },
     "bank": {
       "title": "Banco",
       "subtitle": "El Arca Dorada",
@@ -5571,6 +5574,7 @@ export const es: EnTranslations = {
     "reconnectingNow": "Conexión perdida. Reconectando ahora... (intento {attempt}/{maxAttempts})",
     "slowConnection": "Esto está tardando más de lo habitual. Verifique su conexión a Internet.",
     "connectionRejected": "El servidor cerró la conexión.",
+    "incompatibleWorldVersion": "Game and server versions are incompatible. Reload or update, then try again.",
     "realmFull": "Este mundo esta lleno en este momento. Por favor, intentalo de nuevo en unos minutos.",
     "tooManyConnections": "Hay demasiadas conexiones a este mundo desde tu red. Cierra ventanas adicionales del juego o intentalo de nuevo en unos minutos.",
     "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
@@ -11781,6 +11785,7 @@ export const es: EnTranslations = {
     "delveRiteShrineCandleInteract": "Santuario de la Vela: pulsa F para tocarlo",
     "delveRiteShrineReedInteract": "Santuario del Junco: pulsa F para tocarlo",
     "delveRiteShrineSkullInteract": "Santuario de la Calavera: pulsa F para tocarlo",
-    "mailboxName": "Buzón"
+    "mailboxName": "Buzón",
+    "noticeboardName": "Notice Board"
   }
 };

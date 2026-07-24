@@ -1994,6 +1994,9 @@ export const fr_CA: EnTranslations = {
         "takeParcelsFirst": "Retirez les colis avant de jeter la lettre."
       }
     },
+    "noticeboard": {
+      "empty": "Nothing seems posted."
+    },
     "bank": {
       "title": "Banque",
       "subtitle": "Le Coffre doré",
@@ -5571,6 +5574,7 @@ export const fr_CA: EnTranslations = {
     "reconnectingNow": "Connexion perdue. Reconnexion maintenant... (tentative {attempt}/{maxAttempts})",
     "slowConnection": "Cela prend plus de temps que d'habitude. Vérifiez votre connexion Internet.",
     "connectionRejected": "Le serveur a fermé la connexion.",
+    "incompatibleWorldVersion": "Game and server versions are incompatible. Reload or update, then try again.",
     "realmFull": "Ce monde est complet en ce moment. Veuillez réessayer dans quelques minutes.",
     "tooManyConnections": "Trop de connexions à ce monde proviennent de votre réseau. Veuillez fermer les fenêtres de jeu superflues ou réessayer dans quelques minutes.",
     "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
@@ -11781,6 +11785,7 @@ export const fr_CA: EnTranslations = {
     "delveRiteShrineCandleInteract": "Autel de la chandelle : appuyez sur F pour la toucher",
     "delveRiteShrineReedInteract": "Autel du roseau : appuyez sur F pour le toucher",
     "delveRiteShrineSkullInteract": "Autel du crâne : appuyez sur F pour le toucher",
-    "mailboxName": "Boîte aux lettres"
+    "mailboxName": "Boîte aux lettres",
+    "noticeboardName": "Notice Board"
   }
 };

@@ -1994,6 +1994,9 @@ export const da_DK: EnTranslations = {
         "takeParcelsFirst": "Tag pakkerne ud, før du kasserer brevet."
       }
     },
+    "noticeboard": {
+      "empty": "Nothing seems posted."
+    },
     "bank": {
       "title": "Bank",
       "subtitle": "Det Forgyldte Pengeskrin",
@@ -5571,6 +5574,7 @@ export const da_DK: EnTranslations = {
     "reconnectingNow": "Forbindelse mistet. Genopretter forbindelse nu... (forsøg {attempt}/{maxAttempts})",
     "slowConnection": "Dette tager længere tid end normalt. Tjek din internetforbindelse.",
     "connectionRejected": "Serveren lukkede forbindelsen.",
+    "incompatibleWorldVersion": "Game and server versions are incompatible. Reload or update, then try again.",
     "realmFull": "Denne verden er fuld i øjeblikket. Prøv igen om et par minutter.",
     "tooManyConnections": "Der kommer for mange forbindelser til denne verden fra dit netværk. Luk ekstra spilvinduer, eller prøv igen om et par minutter.",
     "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
@@ -11781,6 +11785,7 @@ export const da_DK: EnTranslations = {
     "delveRiteShrineCandleInteract": "Kerteskrin: Tryk på F for at røre det",
     "delveRiteShrineReedInteract": "Sivskrin: Tryk på F for at røre det",
     "delveRiteShrineSkullInteract": "Kranieskrin: Tryk på F for at røre det",
-    "mailboxName": "Postkasse"
+    "mailboxName": "Postkasse",
+    "noticeboardName": "Notice Board"
   }
 };

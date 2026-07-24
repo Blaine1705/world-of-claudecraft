@@ -42,14 +42,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.noticeboard.empty",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
+    "loading.incompatibleWorldVersion",
     "loading.messageRateExceeded",
     "perfNudge.dismiss",
     "perfNudge.hardwareAccelerationDesktop",
     "perfNudge.hardwareAccelerationWeb",
-    "perfNudge.integratedGpu"
+    "perfNudge.integratedGpu",
+    "worldContent.noticeboardName"
   ],
   "es_ES": [
     "hud.combat.auraGainOther",
@@ -84,14 +87,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.noticeboard.empty",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
+    "loading.incompatibleWorldVersion",
     "loading.messageRateExceeded",
     "perfNudge.dismiss",
     "perfNudge.hardwareAccelerationDesktop",
     "perfNudge.hardwareAccelerationWeb",
-    "perfNudge.integratedGpu"
+    "perfNudge.integratedGpu",
+    "worldContent.noticeboardName"
   ],
   "fr_FR": [
     "hud.combat.auraGainOther",
@@ -126,14 +132,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.noticeboard.empty",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
+    "loading.incompatibleWorldVersion",
     "loading.messageRateExceeded",
     "perfNudge.dismiss",
     "perfNudge.hardwareAccelerationDesktop",
     "perfNudge.hardwareAccelerationWeb",
-    "perfNudge.integratedGpu"
+    "perfNudge.integratedGpu",
+    "worldContent.noticeboardName"
   ],
   "fr_CA": [
     "hud.combat.auraGainOther",
@@ -168,14 +177,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.noticeboard.empty",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
+    "loading.incompatibleWorldVersion",
     "loading.messageRateExceeded",
     "perfNudge.dismiss",
     "perfNudge.hardwareAccelerationDesktop",
     "perfNudge.hardwareAccelerationWeb",
-    "perfNudge.integratedGpu"
+    "perfNudge.integratedGpu",
+    "worldContent.noticeboardName"
   ],
   "en_CA": [],
   "it_IT": [
@@ -211,14 +223,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.noticeboard.empty",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
+    "loading.incompatibleWorldVersion",
     "loading.messageRateExceeded",
     "perfNudge.dismiss",
     "perfNudge.hardwareAccelerationDesktop",
     "perfNudge.hardwareAccelerationWeb",
-    "perfNudge.integratedGpu"
+    "perfNudge.integratedGpu",
+    "worldContent.noticeboardName"
   ],
   "de_DE": [
     "hud.combat.auraGainOther",
@@ -253,14 +268,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.noticeboard.empty",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
+    "loading.incompatibleWorldVersion",
     "loading.messageRateExceeded",
     "perfNudge.dismiss",
     "perfNudge.hardwareAccelerationDesktop",
     "perfNudge.hardwareAccelerationWeb",
-    "perfNudge.integratedGpu"
+    "perfNudge.integratedGpu",
+    "worldContent.noticeboardName"
   ],
   "zh_CN": [
     "hudChrome.corpseHarvest.components.meat"
@@ -307,14 +325,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.noticeboard.empty",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
+    "loading.incompatibleWorldVersion",
     "loading.messageRateExceeded",
     "perfNudge.dismiss",
     "perfNudge.hardwareAccelerationDesktop",
     "perfNudge.hardwareAccelerationWeb",
-    "perfNudge.integratedGpu"
+    "perfNudge.integratedGpu",
+    "worldContent.noticeboardName"
   ],
   "ru_RU": [
     "hudChrome.corpseHarvest.components.meat"
@@ -352,14 +373,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.noticeboard.empty",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
+    "loading.incompatibleWorldVersion",
     "loading.messageRateExceeded",
     "perfNudge.dismiss",
     "perfNudge.hardwareAccelerationDesktop",
     "perfNudge.hardwareAccelerationWeb",
-    "perfNudge.integratedGpu"
+    "perfNudge.integratedGpu",
+    "worldContent.noticeboardName"
   ],
   "nl_NL": [
     "hud.combat.auraGainOther",
@@ -394,14 +418,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.noticeboard.empty",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
+    "loading.incompatibleWorldVersion",
     "loading.messageRateExceeded",
     "perfNudge.dismiss",
     "perfNudge.hardwareAccelerationDesktop",
     "perfNudge.hardwareAccelerationWeb",
-    "perfNudge.integratedGpu"
+    "perfNudge.integratedGpu",
+    "worldContent.noticeboardName"
   ],
   "pl_PL": [
     "hud.combat.auraGainOther",
@@ -436,14 +463,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.noticeboard.empty",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
+    "loading.incompatibleWorldVersion",
     "loading.messageRateExceeded",
     "perfNudge.dismiss",
     "perfNudge.hardwareAccelerationDesktop",
     "perfNudge.hardwareAccelerationWeb",
-    "perfNudge.integratedGpu"
+    "perfNudge.integratedGpu",
+    "worldContent.noticeboardName"
   ],
   "id_ID": [
     "hud.combat.auraGainOther",
@@ -478,14 +508,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.noticeboard.empty",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
+    "loading.incompatibleWorldVersion",
     "loading.messageRateExceeded",
     "perfNudge.dismiss",
     "perfNudge.hardwareAccelerationDesktop",
     "perfNudge.hardwareAccelerationWeb",
-    "perfNudge.integratedGpu"
+    "perfNudge.integratedGpu",
+    "worldContent.noticeboardName"
   ],
   "tr_TR": [
     "hud.combat.auraGainOther",
@@ -520,14 +553,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.noticeboard.empty",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
+    "loading.incompatibleWorldVersion",
     "loading.messageRateExceeded",
     "perfNudge.dismiss",
     "perfNudge.hardwareAccelerationDesktop",
     "perfNudge.hardwareAccelerationWeb",
-    "perfNudge.integratedGpu"
+    "perfNudge.integratedGpu",
+    "worldContent.noticeboardName"
   ],
   "sv_SE": [
     "hud.combat.auraGainOther",
@@ -562,14 +598,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.noticeboard.empty",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
+    "loading.incompatibleWorldVersion",
     "loading.messageRateExceeded",
     "perfNudge.dismiss",
     "perfNudge.hardwareAccelerationDesktop",
     "perfNudge.hardwareAccelerationWeb",
-    "perfNudge.integratedGpu"
+    "perfNudge.integratedGpu",
+    "worldContent.noticeboardName"
   ],
   "vi_VN": [
     "hud.combat.auraGainOther",
@@ -604,14 +643,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.noticeboard.empty",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
+    "loading.incompatibleWorldVersion",
     "loading.messageRateExceeded",
     "perfNudge.dismiss",
     "perfNudge.hardwareAccelerationDesktop",
     "perfNudge.hardwareAccelerationWeb",
-    "perfNudge.integratedGpu"
+    "perfNudge.integratedGpu",
+    "worldContent.noticeboardName"
   ],
   "da_DK": [
     "hud.combat.auraGainOther",
@@ -646,13 +688,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.herbalism",
     "hudChrome.gathering.toolTooltip.use.logging",
     "hudChrome.gathering.toolTooltip.use.mining",
+    "hudChrome.noticeboard.empty",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
     "hudChrome.unbind.noSpace",
+    "loading.incompatibleWorldVersion",
     "loading.messageRateExceeded",
     "perfNudge.dismiss",
     "perfNudge.hardwareAccelerationDesktop",
     "perfNudge.hardwareAccelerationWeb",
-    "perfNudge.integratedGpu"
+    "perfNudge.integratedGpu",
+    "worldContent.noticeboardName"
   ]
 };

@@ -1994,6 +1994,9 @@ export const de_DE: EnTranslations = {
         "takeParcelsFirst": "Entnimm erst die Pakete, bevor du den Brief verwirfst."
       }
     },
+    "noticeboard": {
+      "empty": "Nothing seems posted."
+    },
     "bank": {
       "title": "Bank",
       "subtitle": "Die Vergoldete Schatulle",
@@ -5571,6 +5574,7 @@ export const de_DE: EnTranslations = {
     "reconnectingNow": "Verbindung verloren. Jetzt wird die Verbindung wiederhergestellt... (Versuch {attempt}/{maxAttempts})",
     "slowConnection": "Das dauert länger als gewöhnlich. Überprüfen Sie Ihre Internetverbindung.",
     "connectionRejected": "Der Server hat die Verbindung geschlossen.",
+    "incompatibleWorldVersion": "Game and server versions are incompatible. Reload or update, then try again.",
     "realmFull": "Diese Welt ist derzeit voll. Bitte versuche es in wenigen Minuten erneut.",
     "tooManyConnections": "Zu viele Verbindungen zu dieser Welt kommen von deinem Netzwerk. Bitte schliesse zusatzliche Spielfenster oder versuche es in wenigen Minuten erneut.",
     "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
@@ -11781,6 +11785,7 @@ export const de_DE: EnTranslations = {
     "delveRiteShrineCandleInteract": "Kerzenschrein: Drücke F, um ihn zu berühren",
     "delveRiteShrineReedInteract": "Schilfschrein: Drücke F, um ihn zu berühren",
     "delveRiteShrineSkullInteract": "Schädelschrein: Drücke F, um ihn zu berühren",
-    "mailboxName": "Briefkasten"
+    "mailboxName": "Briefkasten",
+    "noticeboardName": "Notice Board"
   }
 };

@@ -2100,6 +2100,9 @@ export const hudChromeStrings = {
       takeParcelsFirst: 'Take the parcels out before discarding the letter.',
     },
   },
+  noticeboard: {
+    empty: 'Nothing seems posted.',
+  },
   // The bank window (the Gilded Strongbox): a pooled deposit box shown while standing
   // at a banker NPC. Plain click withdraws a stack; shift-click withdraws a partial
   // amount; the footer buys 6-slot expansion blocks. The withdraw-quantity and

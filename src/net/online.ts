@@ -25,7 +25,14 @@ import {
 import { resolveSportKit } from '../sim/content/vale_cup';
 import { resolveActiveWeaponSkin, withWeaponSkinApplied } from '../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
-import { ALL_RECIPES, abilitiesKnownAt, CLASSES, NPCS, resolveDelveShopOffers } from '../sim/data';
+import {
+  ALL_RECIPES,
+  abilitiesKnownAt,
+  CLASSES,
+  NPCS,
+  resolveDelveShopOffers,
+  STATIONS,
+} from '../sim/data';
 import { deadTargetSelectable } from '../sim/dead_target';
 import { freshDeedStats } from '../sim/deeds';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
@@ -97,6 +104,8 @@ import {
   type LockpickView,
   type MailInfo,
   type MarketInfo,
+  ONLINE_WORLD_AUTH_TYPE,
+  ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
   type OverheadEmoteId,
   type PartyInfo,
   type PlayerProfessionsView,
@@ -219,14 +228,14 @@ export function buildWebSocketAuthMessage(
   characterId: number,
   clientSeed = '',
 ): {
-  t: 'auth';
+  t: typeof ONLINE_WORLD_AUTH_TYPE;
   token: string;
   character: number;
   clientSeed: string;
   timerWire: typeof STABLE_TIMER_WIRE_VERSION;
 } {
   return {
-    t: 'auth',
+    t: ONLINE_WORLD_AUTH_TYPE,
     token,
     character: characterId,
     clientSeed,
@@ -1060,6 +1069,12 @@ const ACTION_BAR_SAVE_DEBOUNCE_MS = 1500;
 const RECONNECT_BASE_DELAY_MS = 1_000;
 const RECONNECT_MAX_DELAY_MS = 15_000;
 const RECONNECT_MAX_ATTEMPTS = 40;
+// A pre-layout-gate server accepts only `t:'auth'`, so it rejects our current
+// discriminator with this otherwise-generic literal. During a handshake only,
+// turn that legacy response into the same actionable reason a current server
+// emits for an old client. Never reinterpret an error on an established session.
+const LEGACY_WORLD_AUTH_REQUIRED_ERROR = 'authentication required';
+const INCOMPATIBLE_WORLD_VERSION_ERROR = ONLINE_WORLD_INCOMPATIBLE_MESSAGE;
 // ...but only for entities last seen near/beyond the interest boundary, where
 // that churn happens. A close-range disappearance is intentional (an enemy going
 // stealth) and must hide at once, so anything nearer than this drops immediately.
@@ -1425,6 +1440,9 @@ export class ClientWorld implements IWorld {
   // tier plus combo recipes) ships with the client bundle like every other
   // content table, so this needs no wire round-trip. See src/world_api/professions.ts.
   recipeList: readonly RecipeDef[] = ALL_RECIPES;
+  // Online realms always use the version-pinned built-in static layout; no
+  // snapshot field is needed for authored station markers.
+  readonly stationPlacements = STATIONS;
   // Craft-result surface (#1127), mirrored from the server's `craftResult`
   // event (applyEvent below). Null until this session's first craft attempt.
   lastCraftResult: CraftResultView | null = null;
@@ -1980,6 +1998,7 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'error') {
+      const wasConnected = this.connected;
       this.connected = false;
       // Mid-reconnect, 'character already in world' is the transient window
       // where the server has not yet noticed the old socket died (a
@@ -2004,8 +2023,12 @@ export class ClientWorld implements IWorld {
       }
       // any other server rejection (kick, moderation, takeover, failed auth)
       // ends the session for good: no auto-reconnect
+      const rejection =
+        !wasConnected && msg.error === LEGACY_WORLD_AUTH_REQUIRED_ERROR
+          ? INCOMPATIBLE_WORLD_VERSION_ERROR
+          : msg.error;
       this.endSession();
-      this.onDisconnect?.(msg.error ?? 'rejected by server');
+      this.onDisconnect?.(rejection ?? 'rejected by server');
       return;
     }
     if (msg.t === 'events') {

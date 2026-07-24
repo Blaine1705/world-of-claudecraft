@@ -1994,6 +1994,9 @@ export const en_XA: EnTranslations = {
         "takeParcelsFirst": "[Ţáķé ţĥé þáŕçéļš óúţ ƀéƒóŕé ðíšçáŕðíñĝ ţĥé ļéţţéŕ.]"
       }
     },
+    "noticeboard": {
+      "empty": "[Ñóţĥíñĝ šééɱš þóšţéð.]"
+    },
     "bank": {
       "title": "[Ɓáñķ]",
       "subtitle": "[Ţĥé Ĝíļðéð Šţŕóñĝƀóẋ]",
@@ -5571,6 +5574,7 @@ export const en_XA: EnTranslations = {
     "reconnectingNow": "[Çóññéçţíóñ ļóšţ. Ŕéçóññéçţíñĝ ñóŵ... (áţţéɱþţ {attempt}/{maxAttempts})]",
     "slowConnection": "[Ţĥíš íš ţáķíñĝ ļóñĝéŕ ţĥáñ úšúáļ. Çĥéçķ ýóúŕ íñţéŕñéţ çóññéçţíóñ.]",
     "connectionRejected": "[Ţĥé šéŕʋéŕ çļóšéð ţĥé çóññéçţíóñ.]",
+    "incompatibleWorldVersion": "[Ĝáɱé áñð šéŕʋéŕ ʋéŕšíóñš áŕé íñçóɱþáţíƀļé. Ŕéļóáð óŕ úþðáţé, ţĥéñ ţŕý áĝáíñ.]",
     "realmFull": "[Ţĥíš ŵóŕļð íš ƒúļļ ŕíĝĥţ ñóŵ. Þļéášé ţŕý áĝáíñ íñ á ƒéŵ ɱíñúţéš.]",
     "tooManyConnections": "[Ţóó ɱáñý çóññéçţíóñš ţó ţĥíš ŵóŕļð áŕé çóɱíñĝ ƒŕóɱ ýóúŕ ñéţŵóŕķ. Þļéášé çļóšé éẋţŕá ĝáɱé ŵíñðóŵš óŕ ţŕý áĝáíñ íñ á ƒéŵ ɱíñúţéš.]",
     "messageRateExceeded": "[Ýóú ŵéŕé ðíšçóññéçţéð ƒóŕ šéñðíñĝ áçţíóñš ţóó ɋúíçķļý. Þļéášé ŵáíţ á ɱóɱéñţ áñð ļóĝ ƀáçķ íñ.]",
@@ -11781,6 +11785,7 @@ export const en_XA: EnTranslations = {
     "delveRiteShrineCandleInteract": "[Çáñðļé Šĥŕíñé: Þŕéšš Ƒ ţó ţóúçĥ íţ]",
     "delveRiteShrineReedInteract": "[Ŕééð Šĥŕíñé: Þŕéšš Ƒ ţó ţóúçĥ íţ]",
     "delveRiteShrineSkullInteract": "[Šķúļļ Šĥŕíñé: Þŕéšš Ƒ ţó ţóúçĥ íţ]",
-    "mailboxName": "[Ɱáíļƀóẋ]"
+    "mailboxName": "[Ɱáíļƀóẋ]",
+    "noticeboardName": "[Ñóţíçé Ɓóáŕð]"
   }
 };

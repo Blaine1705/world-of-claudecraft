@@ -1485,6 +1485,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'loading.slowConnection':
     '読み込みに時間がかかっています。インターネット接続を確認してください。',
   'loading.connectionRejected': 'サーバーが接続を閉じました。',
+  'loading.incompatibleWorldVersion':
+    'ゲームとサーバーのバージョンに互換性がありません。再読み込みまたはアップデートしてから、もう一度お試しください。',
   'loading.realmFull': 'このワールドは現在満員です。数分後にもう一度お試しください。',
   'loading.tooManyConnections':
     'お使いのネットワークからこのワールドへの接続が多すぎます。余分なゲームウィンドウを閉じるか、数分後にもう一度お試しください。',
@@ -7040,6 +7042,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_tier': 'これを受け取るにはより高いランクが必要です。',
   'apiError.discord.swag_points': 'ポイントが足りません。',
   'hudChrome.mailbox.title': 'メールボックス',
+  'hudChrome.noticeboard.empty': '何も貼られていないようだ。',
   'hudChrome.mailbox.subtitle': 'レイヴンポスト',
   'hudChrome.mailbox.close': 'メールボックスを閉じる',
   'hudChrome.mailbox.tabInbox': '受信箱',
@@ -7085,6 +7088,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': 'その手紙はもうメールボックスにありません。',
   'hudChrome.mailbox.result.takeParcelsFirst': '手紙を捨てる前に小包を取り出してください。',
   'worldContent.mailboxName': 'メールボックス',
+  'worldContent.noticeboardName': '掲示板',
   'entities.letters.ravenpost_welcome.sender': 'レイヴンポスト',
   'entities.letters.ravenpost_welcome.subject': 'ワタリガラスはあなたのために飛ぶ',
   'entities.letters.ravenpost_welcome.body':

@@ -1994,6 +1994,9 @@ export const en: EnTranslations = {
         "takeParcelsFirst": "Take the parcels out before discarding the letter."
       }
     },
+    "noticeboard": {
+      "empty": "Nothing seems posted."
+    },
     "bank": {
       "title": "Bank",
       "subtitle": "The Gilded Strongbox",
@@ -5571,6 +5574,7 @@ export const en: EnTranslations = {
     "reconnectingNow": "Connection lost. Reconnecting now... (attempt {attempt}/{maxAttempts})",
     "slowConnection": "This is taking longer than usual. Check your internet connection.",
     "connectionRejected": "The server closed the connection.",
+    "incompatibleWorldVersion": "Game and server versions are incompatible. Reload or update, then try again.",
     "realmFull": "This world is full right now. Please try again in a few minutes.",
     "tooManyConnections": "Too many connections to this world are coming from your network. Please close extra game windows or try again in a few minutes.",
     "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
@@ -11781,6 +11785,7 @@ export const en: EnTranslations = {
     "delveRiteShrineCandleInteract": "Candle Shrine: Press F to touch it",
     "delveRiteShrineReedInteract": "Reed Shrine: Press F to touch it",
     "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it",
-    "mailboxName": "Mailbox"
+    "mailboxName": "Mailbox",
+    "noticeboardName": "Notice Board"
   }
 };

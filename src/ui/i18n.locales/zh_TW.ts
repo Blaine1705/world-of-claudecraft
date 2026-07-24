@@ -1421,6 +1421,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'loading.reconnectingNow': '連線已中斷，正在重新連線...（第 {attempt}/{maxAttempts} 次嘗試）',
   'loading.slowConnection': '載入時間比平常長。請檢查您的網路連線。',
   'loading.connectionRejected': '伺服器已關閉連線。',
+  'loading.incompatibleWorldVersion': '遊戲與伺服器版本不相容。請重新整理或更新後再試一次。',
   'loading.realmFull': '這個世界目前已滿，請於幾分鐘後再試。',
   'loading.tooManyConnections':
     '您的網路對這個世界建立的連線過多。請關閉多餘的遊戲視窗，或於幾分鐘後再試。',
@@ -6692,6 +6693,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.discord.swag_tier': '達到更高階級才能領取此項目。',
   'apiError.discord.swag_points': '點數不足。',
   'hudChrome.mailbox.title': '郵箱',
+  'hudChrome.noticeboard.empty': '看起來沒有張貼任何內容。',
   'hudChrome.mailbox.subtitle': '渡鴉郵驛',
   'hudChrome.mailbox.close': '關閉郵箱',
   'hudChrome.mailbox.tabInbox': '收件匣',
@@ -6736,6 +6738,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.letterGone': '那封信已不在你的郵箱裡。',
   'hudChrome.mailbox.result.takeParcelsFirst': '請先取出包裹再丟棄信件。',
   'worldContent.mailboxName': '郵箱',
+  'worldContent.noticeboardName': '告示板',
   'entities.letters.ravenpost_welcome.sender': '渡鴉郵驛',
   'entities.letters.ravenpost_welcome.subject': '渡鴉如今為你飛翔',
   'entities.letters.ravenpost_welcome.body':
