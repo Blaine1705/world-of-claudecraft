@@ -24,10 +24,21 @@
 // imports, no Math.random/Date.now, host-agnostic so it runs offline, on the
 // server, and in the headless RL env unchanged.
 
-import { adjacentCrafts, CRAFT_RING, oppositeCraft } from '../content/professions';
+import {
+  adjacentCrafts,
+  CRAFT_RING,
+  craftMaxSkillFor,
+  oppositeCraft,
+} from '../content/professions';
 import { COMBO_RECIPES } from '../content/recipes';
 import type { SimContext } from '../sim_context';
-import { type CraftSkills, tierCapability, tierForSkill, tierProgressMultiplier } from './wheel';
+import {
+  type CraftSkills,
+  skillInCraft,
+  tierCapability,
+  tierForSkill,
+  tierProgressMultiplier,
+} from './wheel';
 
 /** A character's active-archetype progression, persisted in CharacterState. */
 export interface ArchetypeState {
@@ -363,7 +374,14 @@ export function archetypeCeilingFor(
  *  advances in the first place", wheel.ts). Below or at the ceiling, the
  *  ordinary four-state curve (full at/above raw capability, reduced one tier
  *  under, minimal two under, zero three-plus under) applies off raw
- *  capability. */
+ *  capability. At the craft's enforced content cap (craftMaxSkillFor) the
+ *  multiplier is 0 outright: gainCraftSkill's clamp already made the applied
+ *  gain zero there, and folding that arm in here keeps the window label (and
+ *  the learning-coupled character-XP grant that scales by this curve) honest
+ *  at the cap. This matters because the four-state curve alone can never
+ *  reach gray for a skillReq-75-plus recipe (gray needs capability tier
+ *  recipeTier+3, i.e. skill past the 125 cap), so without the cap arm a
+ *  maxed craft would read a nonzero gain state forever. */
 export function craftSkillGainMultiplier(
   skills: CraftSkills,
   activeArchetype: string | null,
@@ -372,6 +390,7 @@ export function craftSkillGainMultiplier(
   hobbyCraft: string | null,
   skillReq: number,
 ): number {
+  if (skillInCraft(skills, craftId) >= craftMaxSkillFor(craftId)) return 0;
   const ceilingTier = archetypeCeilingFor(activeArchetype, pairedMajor, craftId, hobbyCraft);
   const recipeTier = tierForSkill(skillReq);
   return recipeTier > ceilingTier
