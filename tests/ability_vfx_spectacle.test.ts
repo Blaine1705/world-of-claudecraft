@@ -252,13 +252,12 @@ describe('sequencer applies the crescendo boosts at the spawn seams', () => {
     step(seqGush, gush.host, 0.3);
     const baseBlood = base.bursts.find((b) => b.kind === 'blood');
     const gushBlood = gush.bursts.find((b) => b.kind === 'blood');
-    expect(baseBlood).toBeDefined();
-    expect(gushBlood).toBeDefined();
+    if (!baseBlood || !gushBlood) throw new Error('expected blood bursts on both sides');
     // the multiplier rides the same crescendo-scaled baseline count (each
     // side rounds independently, so allow the rounding seam)
-    expect(Math.abs(gushBlood!.count - baseBlood!.count * 2.2)).toBeLessThanOrEqual(1.2);
-    expect(gushBlood!.power).toBeGreaterThan(baseBlood!.power);
-    expect(gushBlood!.power).toBeLessThanOrEqual(baseBlood!.power * 1.35 + 1e-9);
+    expect(Math.abs(gushBlood.count - baseBlood.count * 2.2)).toBeLessThanOrEqual(1.2);
+    expect(gushBlood.power).toBeGreaterThan(baseBlood.power);
+    expect(gushBlood.power).toBeLessThanOrEqual(baseBlood.power * 1.35 + 1e-9);
   });
 
   it("cc style 'dust' flings the grit cone and still arms the wander stars", () => {

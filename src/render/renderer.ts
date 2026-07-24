@@ -47,10 +47,10 @@ import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink
 import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import {
+  type CharacterWeaponAura,
   characterRecklessnessActive,
   characterSoulRendActive,
   characterWeaponAuraInto,
-  type CharacterWeaponAura,
 } from './character_effects';
 import {
   type AnimState,
