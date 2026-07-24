@@ -387,6 +387,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'warspirit_cadence',
       'stormsurge',
       'lifespring_weapon',
+      'unleash_weapon',
       'healing_wave',
       'tidecall',
       'ancestor_return',
@@ -4104,6 +4105,23 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'imbue', bonus: 0, duration: 1800 }],
     description:
       'Imbue your weapon for 30 min. Mending Waters and Tidecall add 20% more healing to Mending Current.',
+  },
+  unleash_weapon: {
+    id: 'unleash_weapon',
+    name: 'Unleash Weapon',
+    class: 'shaman',
+    specs: ['restoration'],
+    learnLevel: 14,
+    cost: 35,
+    castTime: 0,
+    cooldown: 15,
+    range: 30,
+    school: 'nature',
+    requiresTarget: true,
+    targetType: 'friendly',
+    effects: [],
+    description:
+      'Consume your Mending Current on a friendly target and heal them immediately for 125% of its remaining healing. For 8 sec, the next hit is reduced by 50% of the health actually restored.',
   },
   // Restoration Shaman signature, granted only by the Spiritmend spec.
   chain_heal: {

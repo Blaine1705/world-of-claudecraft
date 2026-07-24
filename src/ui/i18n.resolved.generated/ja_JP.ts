@@ -7492,6 +7492,10 @@ export const ja_JP: EnTranslations = {
         "name": "命泉の武器",
         "description": "武器に生命の水を宿し、癒しの水流への蓄積量を20%増加させます。"
       },
+      "unleash_weapon": {
+        "name": "Unleash Weapon",
+        "description": "Consume your Mending Current on a friendly target and heal them immediately for 125% of its remaining healing. For 8 sec, the next hit is reduced by 50% of the health actually restored."
+      },
       "primal_exaltation": {
         "name": "原初の高揚",
         "description": "専門分野の力を12秒間解放し、通常のローテーションを強化します。（シャーマンのタレント）"

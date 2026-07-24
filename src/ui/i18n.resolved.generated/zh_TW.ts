@@ -7492,6 +7492,10 @@ export const zh_TW: EnTranslations = {
         "name": "活泉武器",
         "description": "為武器灌注生命之水，使癒合水流的注入量提高20%。"
       },
+      "unleash_weapon": {
+        "name": "Unleash Weapon",
+        "description": "Consume your Mending Current on a friendly target and heal them immediately for 125% of its remaining healing. For 8 sec, the next hit is reduced by 50% of the health actually restored."
+      },
       "primal_exaltation": {
         "name": "原初昇華",
         "description": "解放你的專精力量，持續12秒，強化其常規循環。（薩滿祭司天賦）"

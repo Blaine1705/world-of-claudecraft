@@ -311,16 +311,17 @@ Galeheart and Stonebound stay next to each other. The player always chooses the 
 | ---: | --- |
 | 1 | Mending Waters |
 | 2 | Tidecall |
-| 3 | Cascading Mend |
-| 4 | Ancestors' Return |
-| 5 | Thunder Ward |
-| 6 | Shadewolf |
-| 7 | Earthen Jolt |
-| 8 | Rime Jolt |
-| 9 | Cinder Jolt |
-| 10 | Arc Bolt |
-| 11 | Lifespring Weapon |
-| 12 | Storm Chorus |
+| 3 | Unleash Weapon |
+| 4 | Cascading Mend |
+| 5 | Ancestors' Return |
+| 6 | Thunder Ward |
+| 7 | Shadewolf |
+| 8 | Earthen Jolt |
+| 9 | Rime Jolt |
+| 10 | Cinder Jolt |
+| 11 | Arc Bolt |
+| 12 | Lifespring Weapon |
+| 13 | Storm Chorus |
 
 ## Priest level 20 bars
 

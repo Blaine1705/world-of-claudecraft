@@ -99,6 +99,7 @@ import { packCommandError } from './hunter_packlord';
 import { cancelRecedingShell, noteHunterFocusSpend } from './hunter_shared';
 import { hasDeadGroupMember, isMassResurrectionAbility } from './mass_resurrection';
 import { hasTithefiendTarget } from './priest/vespers';
+import { mendingCurrent } from './shaman_spiritmend';
 import { onShamanManaSpent, shamanCastTimeMultiplier, shamanManaCost } from './shaman_talents';
 import { onStormcastConsumed, STORMCAST_CHEAP_ID, STORMCAST_ID } from './shaman_warspirit';
 import {
@@ -906,6 +907,10 @@ export function castAbility(
       ctx.error(p.id, error);
       return;
     }
+  }
+  if (ability.id === 'unleash_weapon' && (!target || !mendingCurrent(target, p.id))) {
+    ctx.error(p.id, 'That ability is not ready yet.');
+    return;
   }
   // Hard Bargain cannot spend the caster's last health. Reject it before GCD,
   // cost, cooldown, and cast-completion proc hooks so a failed conversion cannot

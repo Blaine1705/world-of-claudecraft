@@ -80,7 +80,7 @@ import {
   priestOnVigilTriggered,
 } from './priest/talents';
 import { vespersEchoDamage, vespersOnEntityDeath } from './priest/vespers';
-import { clearSpiritmendCurrents } from './shaman_spiritmend';
+import { clearSpiritmendCurrents, UNLEASH_WEAPON_GUARD_ID } from './shaman_spiritmend';
 import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
@@ -410,6 +410,10 @@ export function dealDamage(
       a.value -= soaked;
       amount -= soaked;
       totalAbsorbed += soaked;
+      // Unleash Weapon protects against one damage event only. Any unused
+      // protection falls away after that hit instead of behaving like a
+      // conventional multi-hit absorb shield.
+      if (a.id === UNLEASH_WEAPON_GUARD_ID) a.value = 0;
       if (a.value <= 0) {
         target.auras.splice(i, 1);
         ctx.emit({ type: 'aura', targetId: target.id, name: a.name, gained: false });

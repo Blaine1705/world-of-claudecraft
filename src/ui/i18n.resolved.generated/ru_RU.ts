@@ -7492,6 +7492,10 @@ export const ru_RU: EnTranslations = {
         "name": "Оружие живого источника",
         "description": "Наполняет оружие живой водой, увеличивая накопление Потока исцеления на 20%."
       },
+      "unleash_weapon": {
+        "name": "Unleash Weapon",
+        "description": "Consume your Mending Current on a friendly target and heal them immediately for 125% of its remaining healing. For 8 sec, the next hit is reduced by 50% of the health actually restored."
+      },
       "primal_exaltation": {
         "name": "Первозданное возвышение",
         "description": "На 12 сек. высвобождает силу вашей специализации, усиливая ее обычную ротацию. (Талант шамана)"

@@ -2665,6 +2665,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   warspirit_cadence: r('storm', 'steel', ['fist', { p: 'sword', ...BR }], ['motion', 'arcs']),
   stormsurge: r('storm', 'sky', ['lightning', { p: 'sunburst', ...BR }], ['glow', 'sparkle']),
   lifespring_weapon: r('nature', 'leafGreen', ['droplet', { p: 'heart', ...BR }], ['sparkle']),
+  unleash_weapon: r('nature', 'sky', ['sword', { p: 'droplet', ...BR }], ['arcs', 'glow']),
   tidecall: r('nature', 'sky', ['sunburst', { p: 'droplet', ...BR }], ['arcs']),
   stoneward: r('earth', 'earthBrown', ['shield', { p: 'gem', ...TR }], ['crack', 'glow']),
   primal_exaltation: r('storm', 'gold', ['sunburst', { p: 'lightning', ...BR }], ['glow', 'arcs']),

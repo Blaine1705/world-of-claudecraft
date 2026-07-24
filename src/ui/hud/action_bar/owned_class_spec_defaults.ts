@@ -98,6 +98,7 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
     restoration: [
       'healing_wave',
       'tidecall',
+      'unleash_weapon',
       'chain_heal',
       'ancestor_return',
       'lightning_shield',

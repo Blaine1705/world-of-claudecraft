@@ -7492,6 +7492,10 @@ export const ko_KR: EnTranslations = {
         "name": "생명의 샘 무기",
         "description": "무기에 생명의 물을 불어넣어 치유의 물결 저장량을 20% 늘립니다."
       },
+      "unleash_weapon": {
+        "name": "Unleash Weapon",
+        "description": "Consume your Mending Current on a friendly target and heal them immediately for 125% of its remaining healing. For 8 sec, the next hit is reduced by 50% of the health actually restored."
+      },
       "primal_exaltation": {
         "name": "원시적 승천",
         "description": "12초 동안 전문화의 힘을 해방해 기본 순환을 강화합니다. (주술사 특성)"

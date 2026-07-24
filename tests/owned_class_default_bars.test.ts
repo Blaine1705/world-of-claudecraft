@@ -120,6 +120,7 @@ const EXPECTED = {
   'shaman/restoration': [
     'healing_wave',
     'tidecall',
+    'unleash_weapon',
     'chain_heal',
     'ancestor_return',
     'lightning_shield',

@@ -1141,6 +1141,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Lifespring Weapon"
       },
       {
+        "id": "unleash_weapon",
+        "name": "Unleash Weapon"
+      },
+      {
         "id": "healing_wave",
         "name": "Mending Waters"
       },

@@ -7492,6 +7492,10 @@ export const fr_CA: EnTranslations = {
         "name": "Lifespring Weapon",
         "description": "Imbue your weapon for 30 min. Mending Waters and Tidecall add 20% more healing to Mending Current."
       },
+      "unleash_weapon": {
+        "name": "Unleash Weapon",
+        "description": "Consume your Mending Current on a friendly target and heal them immediately for 125% of its remaining healing. For 8 sec, the next hit is reduced by 50% of the health actually restored."
+      },
       "primal_exaltation": {
         "name": "Primal Exaltation",
         "description": "For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)"

@@ -1563,6 +1563,8 @@ export type TranslationKeyFlat =
   | 'entities.abilities.typhoon.name'
   | 'entities.abilities.unleash_beast.description'
   | 'entities.abilities.unleash_beast.name'
+  | 'entities.abilities.unleash_weapon.description'
+  | 'entities.abilities.unleash_weapon.name'
   | 'entities.abilities.vanish.description'
   | 'entities.abilities.vanish.name'
   | 'entities.abilities.veilstep.description'

@@ -305,6 +305,8 @@ Do not overwrite a player-customized bar.
 - [ ] Preserve the liked Mending Current loop.
 - [ ] Confirm Mending Waters creates an owned current on the healed ally.
 - [ ] Confirm Tidecall immediately heals and enlarges that current.
+- [x] Add Unleash Weapon as a 15-second single-target current consume with a tested one-hit guard.
+- [ ] PBE-tune Unleash Weapon's 125% burst and 50% effective-healing guard.
 - [ ] Confirm Cascading Mend consumes every owned current on every ally it reaches.
 - [ ] Keep another Shaman's currents separate.
 - [ ] Test the normal heal when an ally has no prepared current.
