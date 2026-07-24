@@ -2651,6 +2651,9 @@ export const hudChromeStrings = {
     stateKnown: 'Known',
     stateTeachable: 'Available',
     stateLocked: 'Locked',
+    // The in-flight state label on a teachable row whose learn command has
+    // been sent but not yet answered (issue #2342).
+    statePending: 'Learning',
     // The locked-row requirement line: {craft} is the localized craft name,
     // {skill} the flat skill threshold of the recipe's tier.
     requirement: 'Taught at {craft} {skill}',

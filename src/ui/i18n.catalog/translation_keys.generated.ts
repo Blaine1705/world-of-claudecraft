@@ -6503,6 +6503,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.training.requirement'
   | 'hudChrome.training.stateKnown'
   | 'hudChrome.training.stateLocked'
+  | 'hudChrome.training.statePending'
   | 'hudChrome.training.stateTeachable'
   | 'hudChrome.training.tierUnmet'
   | 'hudChrome.training.title'

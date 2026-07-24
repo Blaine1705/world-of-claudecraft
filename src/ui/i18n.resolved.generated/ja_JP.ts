@@ -2382,6 +2382,7 @@ export const ja_JP: EnTranslations = {
       "stateKnown": "習得済み",
       "stateTeachable": "習得可能",
       "stateLocked": "未開放",
+      "statePending": "Learning",
       "requirement": "{craft} {skill} で伝授",
       "trainAria": "{fee}で{name}を習得",
       "dialogOption": "訓練",

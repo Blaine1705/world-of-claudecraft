@@ -79,7 +79,13 @@ export function renderTrainWindow(
     }
 
     const name = rowName(row);
-    const stateLabel = t(STATE_LABEL_KEY[row.state]);
+    // A pending teachable row (learn in flight, issue #2342) swaps its state
+    // label to the in-flight text; every other row keeps its tri-state label.
+    const stateLabel = t(
+      row.state === 'teachable' && row.pending
+        ? 'hudChrome.training.statePending'
+        : STATE_LABEL_KEY[row.state],
+    );
     const stateHtml = `<span class="train-state">${esc(stateLabel)}</span>`;
     // The result icon sits in the crafting card's quality-glow socket (the
     // shared .crafting-recipe-socket family, size-varied by the window CSS).
@@ -91,7 +97,9 @@ export function renderTrainWindow(
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'vendor-item train-row train-teachable';
-      button.disabled = !row.affordable;
+      // Disabled while the learn is in flight: the first click's feedback,
+      // and the reason a rapid second click can never re-send the command.
+      button.disabled = row.pending === true || !row.affordable;
       const fee = feeLabel(row);
       button.setAttribute('aria-label', t('hudChrome.training.trainAria', { name, fee }));
       // An affordable fee renders as the gold-gradient action chip; an

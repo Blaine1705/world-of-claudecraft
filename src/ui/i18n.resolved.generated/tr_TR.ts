@@ -2382,6 +2382,7 @@ export const tr_TR: EnTranslations = {
       "stateKnown": "Bilinen",
       "stateTeachable": "Mevcut",
       "stateLocked": "Kilitli",
+      "statePending": "Learning",
       "requirement": "{craft} {skill}'da okudu",
       "trainAria": "{fee} için {name}'yi öğrenin",
       "dialogOption": "Eğitim",

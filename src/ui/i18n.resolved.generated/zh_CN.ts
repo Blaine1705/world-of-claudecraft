@@ -2382,6 +2382,7 @@ export const zh_CN: EnTranslations = {
       "stateKnown": "已学会",
       "stateTeachable": "可学习",
       "stateLocked": "未解锁",
+      "statePending": "Learning",
       "requirement": "需要{craft}达到 {skill} 后传授",
       "trainAria": "花费{fee}学习{name}",
       "dialogOption": "训练",

@@ -2382,6 +2382,7 @@ export const ko_KR: EnTranslations = {
       "stateKnown": "습득함",
       "stateTeachable": "습득 가능",
       "stateLocked": "잠김",
+      "statePending": "Learning",
       "requirement": "{craft} {skill}에서 전수",
       "trainAria": "{fee}(으)로 {name} 습득",
       "dialogOption": "훈련",

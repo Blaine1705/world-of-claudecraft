@@ -2382,6 +2382,7 @@ export const id_ID: EnTranslations = {
       "stateKnown": "Diketahui",
       "stateTeachable": "Tersedia",
       "stateLocked": "Terkunci",
+      "statePending": "Learning",
       "requirement": "Diajarkan di {craft} {skill}",
       "trainAria": "Pelajari {name} untuk {fee}",
       "dialogOption": "Pelatihan",

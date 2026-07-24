@@ -2382,6 +2382,7 @@ export const nl_NL: EnTranslations = {
       "stateKnown": "Bekend",
       "stateTeachable": "Beschikbaar",
       "stateLocked": "Vergrendeld",
+      "statePending": "Learning",
       "requirement": "Geleerd bij {craft} {skill}",
       "trainAria": "Leer {name} voor {fee}",
       "dialogOption": "Opleiding",

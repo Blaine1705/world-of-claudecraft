@@ -2382,6 +2382,7 @@ export const fr_FR: EnTranslations = {
       "stateKnown": "Connu",
       "stateTeachable": "Disponible",
       "stateLocked": "Verrouillé",
+      "statePending": "Learning",
       "requirement": "Enseigné à {craft} {skill}",
       "trainAria": "Apprenez {name} pour {fee}",
       "dialogOption": "Formation",

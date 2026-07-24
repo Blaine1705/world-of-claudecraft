@@ -9,25 +9,65 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.training.statePending"
+  ],
+  "es_ES": [
+    "hudChrome.training.statePending"
+  ],
+  "fr_FR": [
+    "hudChrome.training.statePending"
+  ],
+  "fr_CA": [
+    "hudChrome.training.statePending"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.training.statePending"
+  ],
+  "de_DE": [
+    "hudChrome.training.statePending"
+  ],
+  "zh_CN": [
+    "hudChrome.training.statePending"
+  ],
+  "zh_TW": [
+    "hudChrome.training.statePending"
+  ],
+  "ko_KR": [
+    "hudChrome.training.statePending"
+  ],
+  "ja_JP": [
+    "hudChrome.training.statePending"
+  ],
+  "pt_BR": [
+    "hudChrome.training.statePending"
+  ],
+  "ru_RU": [
+    "hudChrome.training.statePending"
+  ],
+  "cs_CZ": [
+    "hudChrome.training.statePending"
+  ],
+  "nl_NL": [
+    "hudChrome.training.statePending"
+  ],
+  "pl_PL": [
+    "hudChrome.training.statePending"
+  ],
+  "id_ID": [
+    "hudChrome.training.statePending"
+  ],
+  "tr_TR": [
+    "hudChrome.training.statePending"
+  ],
+  "sv_SE": [
+    "hudChrome.training.statePending"
+  ],
+  "vi_VN": [
+    "hudChrome.training.statePending"
+  ],
+  "da_DK": [
+    "hudChrome.training.statePending"
+  ]
 };

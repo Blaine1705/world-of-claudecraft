@@ -2382,6 +2382,7 @@ export const en_XA: EnTranslations = {
       "stateKnown": "[Ķñóŵñ]",
       "stateTeachable": "[Áʋáíļáƀļé]",
       "stateLocked": "[Ļóçķéð]",
+      "statePending": "[Ļéáŕñíñĝ]",
       "requirement": "[Ţáúĝĥţ áţ {craft} {skill}]",
       "trainAria": "[Ļéáŕñ {name} ƒóŕ {fee}]",
       "dialogOption": "[Ţŕáíñíñĝ]",

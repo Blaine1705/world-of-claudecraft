@@ -2382,6 +2382,7 @@ export const cs_CZ: EnTranslations = {
       "stateKnown": "Známé",
       "stateTeachable": "K dispozici",
       "stateLocked": "Zamčeno",
+      "statePending": "Learning",
       "requirement": "Vyučováno na {craft} {skill}",
       "trainAria": "Naučit se {name} za {fee}",
       "dialogOption": "Výcvik",
