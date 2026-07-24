@@ -8430,11 +8430,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '任何人都可以把武器或护甲按品质回收成普通材料，无需附魔技能。',
   'guide.profPages.ench.bonusFmt': '+{value}{stat}',
   'guide.profPages.gatherIntro.mining':
-    '采矿从世界的岩层中直接提取矿石：Eastbrook Vale产铜矿，Mirefen Marsh产铁矿，Thornpeak Heights产锇矿，为锻造类行业供料。从1级起向所有人开放，无任何门槛，以独立计数器追踪，上限为100。',
+    '采矿从世界的岩层中直接提取矿石：东溪谷产铜矿，泥沼湿地产铁矿，荆峰高地产锇矿，为锻造类行业供料。从1级起向所有人开放：只需背包里备有一把采矿镐，任意主城均售20铜。以独立计数器追踪，上限为100。',
   'guide.profPages.gatherIntro.logging':
-    '伐木在三大区域的林地中砍伐木材：Eastbrook Vale产铁皮木，Mirefen Marsh产梣木，Thornpeak Heights产高松，为武器柄材、法杖与工程学工作台供料。从1级起向所有人开放，以独立计数器追踪，上限为100。',
+    '伐木在三大区域的林地中砍伐木材：东溪谷产铁皮木，泥沼湿地产梣木，荆峰高地产高松，为武器柄材、法杖与工程学工作台供料。从1级起向所有人开放，只需背包里备有一把伐木斧（任意主城20铜），以独立计数器追踪，上限为100。',
   'guide.profPages.gatherIntro.herbalism':
-    '草药学采集野生植物：Eastbrook Vale产润光叶，Mirefen Marsh产金叶，Thornpeak Heights产日瓣草，为药坊类行业持续供应叶茎原料。从1级起向所有人开放，以独立计数器追踪，上限为100。',
+    '草药学采集野生植物：东溪谷产润光叶，泥沼湿地产金叶，荆峰高地产日瓣草，为药坊类行业持续供应叶茎原料。从1级起向所有人开放，只需背包里备有一把草药镰（任意主城20铜），以独立计数器追踪，上限为100。',
   'guide.profPages.gatherIntro.fishing':
     '钓鱼通过咬钩与收线的节奏，在每个区域的开阔水面垂钓，上限为200。',
   'guide.profPages.rhythmHeading': '采集节奏',
@@ -8446,7 +8446,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.nodesNote':
     '节点的位置、阶级、所需工具与产出；每个节点在你采集后{respawn}秒才会为你本人刷新。',
   'guide.profPages.toolsHeading': '工具',
-  'guide.profPages.toolsNote': '工具阶梯与确切的商人售价；4阶与5阶工具只能制作，无法购买。',
+  'guide.profPages.toolsNote':
+    '每一处节点都需要背包里备有对应行业的工具，1阶节点也不例外：没有采矿镐就采不到矿石，没有鱼竿就钓不上鱼。商人阶梯覆盖1到3阶，各主城均有备货；工具只需放在背包里即可，没有装备栏位，也没有耐久，因此每件都是一次性购置。门槛只看阶级：工具的品质颜色纯属外观。\n\n商人阶梯之上还有两件制作工具，4阶与5阶，由工程师在工坊打造，任何NPC都不出售。目前没有任何节点需要3阶以上的工具，因此它们眼下的价值在于速度：顶级工具能把低阶节点的采集读条压到时间下限；等更高阶的地界开放时，它们便是入场券。',
   'guide.profPages.toolCrafted': '制作获得（{craft}）',
   'guide.profPages.toolVendor': '{name}（{hub}）',
   'guide.profPages.toolUnavailable': '无出售',
@@ -8668,4 +8669,5 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.enchanting.marketHeading': '附魔副本、出处与市场',
   'guide.profPages.craftProse.enchanting.marketBody':
     '施加附魔消耗背包中未装备的一件副本加材料，交还一件独立的附魔副本；穿上它，加成永远跟随。一件一附魔：附魔副本不能再附魔也不能分解，出售、丢弃与分解都优先取用普通副本，成品不会被误吞；完全相同的附魔副本还能叠放。杰作与附魔是朋友：杰作完全可附魔，附魔叠加在杰作加成与署名之上互不干扰；署名杰作配Greater附魔是工艺品的极致，仍按设计低于团本战利品。世界市场只经手无标记的普通货，附魔与署名件都面对面交易；材料才是可上市的一半：粉尘、精华与碎片自由挂单，挂单免费，成交才抽5%。',
+  'hudChrome.corpseHarvest.components.meat': '兽肉',
 };
