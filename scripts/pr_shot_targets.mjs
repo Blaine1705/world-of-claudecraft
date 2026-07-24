@@ -437,6 +437,112 @@ export const TARGETS = [
     },
   },
   {
+    key: 'gather-tool-tooltip',
+    label: 'Bag tooltip: gathering implement kind/requirement/use/bonus lines (#2343)',
+    when: ['ui/gather_tool_tooltip', 'professions/tools'],
+    // Grant the implements, open bags, focus one cell: the new tooltip lines
+    // (kind, required-to, use, speed or bite/reel/band bonuses) read in one
+    // frame. Full-frame shot: the tooltip renders beside the bags window.
+    variants: [
+      { key: 'pick', hover: 'Iron Mining Pick' },
+      { key: 'rod', hover: 'Ironreel Fishing Rod' },
+    ],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const sim = window.__game?.sim;
+        try {
+          sim?.addItem?.('iron_mining_pick', 1);
+          sim?.addItem?.('ironreel_fishing_rod', 1);
+        } catch {}
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      let open = await pollForSize(page, '#bags');
+      if (!open) {
+        await page.evaluate(() => window.__game?.hud?.toggleBags?.());
+        open = await pollForSize(page, '#bags');
+      }
+      if (!open) return {};
+      await page.evaluate((name) => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.opacity = '0';
+        // Real focus fires attachTooltip's focusin arm (keyboard-nav path), a
+        // sturdier trigger than synthetic mouseenter under headless.
+        const cell = Array.from(document.querySelectorAll('#bags button')).find((b) =>
+          b.getAttribute('aria-label')?.includes(name),
+        );
+        cell?.scrollIntoView({ block: 'center' });
+        cell?.focus();
+      }, variant?.hover ?? 'Iron Mining Pick');
+      await pollForSize(page, '#tooltip');
+      await wait(300);
+      return {};
+    },
+  },
+  {
+    key: 'gather-node-hover-tooltip',
+    label: 'World hover: gather-node requirement line, tier 1 included (#2343)',
+    when: ['ui/gather_node_tooltip', 'ui/gathering_view', 'professions/gathering'],
+    // Teleport onto the starter ore vein and sweep the REAL mouse over it: the
+    // hover tooltip only paints through the live pointermove raycast, so the
+    // sweep proves the actual path. Toolless shows the red requires-a-pick
+    // line; tooled shows it neutral.
+    variants: [{ key: 'toolless' }, { key: 'tooled', tooled: true }],
+    async capture(page, variant) {
+      await page.evaluate((tooled) => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.opacity = '0';
+        const sim = window.__game?.sim;
+        try {
+          // The vein sits inside the Copper Dig mob camp: silence the camp
+          // FIRST (the test-suite despawnMobs idiom) or the level-1 subject
+          // dies mid-hover, then teleport beside ore_eastbrook_1 at (-70,-53).
+          for (const e of sim?.entities?.values?.() ?? []) {
+            if (e.kind !== 'mob') continue;
+            e.dead = true;
+            e.hp = 0;
+            e.aiState = 'dead';
+            e.respawnTimer = 9999;
+            e.corpseTimer = 9999;
+            e.inCombat = false;
+          }
+          sim?.chat?.('/dev tp -70 -52');
+          if (tooled) sim?.addItem?.('copper_mining_pick', 1);
+        } catch {}
+      }, Boolean(variant?.tooled));
+      await wait(800); // let the teleport settle and the camera follow
+      const vp = page.viewport() ?? { width: 1280, height: 720 };
+      let shown = false;
+      // The vein sits at the player's feet after the teleport, so sweep the
+      // lower-center screen region; each stop outwaits the 120ms pick
+      // throttle, and the x range stays off the right-edge icon column.
+      outer: for (const dy of [60, 100, 140, 20, 180, -20]) {
+        for (const dx of [0, -60, 60, -120, 120]) {
+          await page.mouse.move(vp.width / 2 + dx, vp.height / 2 + dy);
+          await wait(170);
+          const visible = await page.evaluate(() => {
+            const tip = document.getElementById('tooltip');
+            return !!tip && getComputedStyle(tip).display !== 'none' && tip.offsetWidth > 0;
+          });
+          if (visible) {
+            shown = true;
+            break outer;
+          }
+        }
+      }
+      // No honest hover, no shot: never fake the tooltip into the DOM.
+      if (!shown) throw new Error('node hover tooltip never appeared through the live raycast');
+      await wait(200);
+      return {};
+    },
+  },
+  {
     key: 'masterwork-tooltip',
     label: 'Bag tooltip: masterwork seal, enchanted marker, makers mark',
     when: ['ui/item_instance_tooltip', 'ui/painter_host', 'ui/bank_view'],
