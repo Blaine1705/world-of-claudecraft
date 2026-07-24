@@ -136,14 +136,14 @@ the level-20 character cap (gray for skillReq 75+ would need capability
 past the 125 cap), so the skill journey is the dimension that makes every
 recipe's lifetime character-XP contribution finite: craft skill is
 additive-only and hard-capped, so a recipe that no longer teaches pays
-nothing, and a vendor-fed recipe cannot be an unbounded stationary XP farm
-(the Kilnscale Mantle report; pinned end to end by
-`tests/professions_craft_xp.test.ts`, the boundedness sweep included).
+nothing, and a vendor-fed recipe's character XP stays bounded like every
+other's (pinned end to end by `tests/professions_craft_xp.test.ts`, the
+boundedness sweep included).
 Gathering XP (`gatherActionXp`) deliberately keeps the plain level band:
 nodes cannot be vendor-fed, harvesting is movement- and respawn-paced like
 mob grinding, and it stays a post-launch watch rather than a coupling.
 
-The economy invariant carries a discount-aware arm for the same report:
+The economy invariant carries a discount-aware arm as well:
 the listed-count "no recipe vendors above its input value" rule prices the
 naive craft, but a specialized crafter consumes discounted counts (the
 `requiredReagentCountFor` composition), so a fully-vendor-fed recipe can

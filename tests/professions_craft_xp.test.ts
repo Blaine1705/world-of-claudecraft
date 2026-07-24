@@ -3,10 +3,10 @@
 // applied post-clamp gainCraftSkill delta). A craft that teaches nothing,
 // whether gray by tier, above the archetype ceiling, or at the craft's
 // enforced 125 content cap, pays zero character XP, exactly as it already
-// pays zero skill. This closes the vendor-fed stationary XP farm (the
-// Kilnscale Mantle report): a level-20 recipe never grays by CHARACTER
-// level at the level-20 cap, so the green/gray falloff alone could not
-// bound it; the skill journey is the missing, finite dimension.
+// pays zero skill. This keeps craft XP bounded for every recipe: a
+// level-20 recipe never grays by CHARACTER level at the level-20 cap, so
+// the green/gray falloff alone could not bound it; the skill journey is
+// the missing, finite dimension.
 import { describe, expect, it } from 'vitest';
 import { craftMaxSkillFor } from '../src/sim/content/professions';
 import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
@@ -58,8 +58,8 @@ function grantMantleMats(sim: Sim, pid: number) {
   grantItem(sim, 'smithing_flux', 5, pid);
 }
 
-describe('learning-coupled craft XP: the vendor-fed farm closes', () => {
-  it('the at-cap capstone loop grants zero XP once armorcrafting is maxed (the live exploit)', () => {
+describe('learning-coupled craft XP: taught-nothing crafts pay nothing', () => {
+  it('the capstone grants zero XP once armorcrafting is maxed (the at-cap boundary)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     sim.setPlayerLevel(20);
@@ -86,7 +86,7 @@ describe('learning-coupled craft XP: the vendor-fed farm closes', () => {
     expect(meta.lifetimeXp).toBe(before);
     expect(meta.craftSkills.armorcrafting).toBe(125);
 
-    // And it stays zero on repeat: the farm has no tail.
+    // And it stays zero on repeat: the bound holds craft after craft.
     grantMantleMats(sim, pid);
     const second = resolveCraft((sim as any).ctx, pid, MANTLE.id);
     expect(second.ok).toBe(true);
@@ -117,7 +117,7 @@ describe('learning-coupled craft XP: the vendor-fed farm closes', () => {
   });
 
   it('a pre-attunement character gains neither skill nor XP from the capstone (ceiling arm)', () => {
-    // The level-1 AFK alt from the report: no archetype, so the tier-3
+    // A fresh level-1 character: no archetype, so the tier-3
     // mantle sits above the rare ceiling and must teach (and pay) nothing.
     const sim = makeSim();
     const pid = sim.playerId;

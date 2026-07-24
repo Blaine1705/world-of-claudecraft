@@ -85,7 +85,7 @@ describe('THE ECONOMY INVARIANT', () => {
   // function the sim charges). For a recipe whose every reagent is
   // NPC-vendor-stocked the whole loop is pure gold with infinite supply, so
   // the output must vendor strictly below the CHEAPEST achievable input or
-  // the loop prints copper at zero risk (the Kilnscale Mantle sat exactly
+  // the loop is gold-positive (the Kilnscale Mantle sat exactly
   // here: listed 520 vs output 470, but specialized consumption is 5 ore +
   // 4 flux = 380, and with a self-signed ore 4 + 3 = 300). Self-signed is
   // assumed held for EVERY reagent: stricter than reality for unsignable
