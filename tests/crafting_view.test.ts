@@ -467,18 +467,20 @@ describe('buildCraftingView difficulty and skillReq', () => {
     // a tier-3 recipe's minimal state only ever existed at the cap itself).
     expect(difficultyFor(150, { cooking: 124.5 })).toBe('full');
     expect(difficultyFor(75, { cooking: 124.5 })).toBe('reduced');
-    // Online pre-sync (empty skills mirror, identity not yet synced) the cap
-    // arm deliberately cannot fire: the label rides the ordinary curve until
-    // the first cprof snapshot lands, the same pre-existing transient every
-    // difficulty state has.
+    // Online pre-sync the skills mirror is EMPTY, and empty must never read
+    // as capped: with the majors identity the label rides the ordinary curve
+    // (full at capability 0) until the first cprof snapshot lands, the same
+    // pre-existing transient every difficulty state has. (With a NULL
+    // pre-sync identity the rare-ceiling arm reads 'none' for skillReq 75+
+    // on its own, so the majors identity is what isolates the cap arm here.)
     expect(
       difficultyFor(
         75,
         {},
         {
           synced: false,
-          activeArchetype: null,
-          pairedMajor: null,
+          activeArchetype: 'cooking',
+          pairedMajor: 'alchemy',
           hobbyCraft: null,
         },
       ),
