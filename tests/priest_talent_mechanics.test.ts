@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { doctrineConvertDamage, placeDoctrineLink } from '../src/sim/combat/priest/doctrine';
 import {
-  priestAfterAbility,
-  priestOnAuraEnded,
   priestOnGroupHeal,
   priestOnShieldConsumed,
   priestOnVigilTriggered,
@@ -69,11 +67,16 @@ function aura(input: Partial<Aura> & Pick<Aura, 'id' | 'name' | 'kind' | 'source
   } as Aura;
 }
 
+function advance(sim: Sim, seconds: number): void {
+  for (let tick = 0; tick < seconds * 20; tick++) sim.tick();
+}
+
 describe('Priest v0.29 talent mechanics', () => {
   it('resolves each level 5 movement choice onto the intended existing action', () => {
     const shelter = priest('discipline', { 5: 'pri_r5_improved_renew' });
     const ally = addAlly(shelter.sim, 'Sheltered');
-    priestAfterAbility(shelter.ctx, shelter.p, 'power_word_shield', ally);
+    shelter.sim.targetEntity(ally.id);
+    shelter.sim.castAbility('power_word_shield');
     expect(ally.auras.find((effect) => effect.id === 'priest_sheltering_step')?.value).toBe(1.4);
 
     const unbound = priest('discipline', { 5: 'pri_r5_searing_light' });
@@ -81,25 +84,47 @@ describe('Priest v0.29 talent mechanics', () => {
       aura({ id: 'test_root', name: 'Test Root', kind: 'root', sourceId: 999 }),
       aura({ id: 'test_slow', name: 'Test Slow', kind: 'slow', sourceId: 999 }),
     );
-    priestAfterAbility(unbound.ctx, unbound.p, 'veilstep', null);
+    unbound.sim.castAbility('veilstep');
     expect(unbound.p.auras.some((effect) => effect.kind === 'root' || effect.kind === 'slow')).toBe(
       false,
     );
     expect(unbound.p.auras.find((effect) => effect.id === 'priest_veil_unbound')?.value).toBe(1.5);
 
     const procession = priest('discipline', { 5: 'pri_r5_twisted_faith' });
-    priestAfterAbility(procession.ctx, procession.p, 'veilstep', null);
+    procession.sim.castAbility('veilstep');
     expect(procession.p.auras.some((effect) => effect.kind === 'processional_grace')).toBe(true);
   });
 
   it('pins all level 8 defensive values in the resolved proc engine', () => {
     const last = priest('discipline', { 8: 'pri_r17_desperate_prayer' });
     expect(last.sim.resolvedAbility('desperate_prayer')).not.toBeNull();
+    last.p.hp = Math.floor(last.p.maxHp * 0.5);
+    const beforePrayer = last.p.hp;
+    last.sim.castAbility('desperate_prayer');
+    expect(last.p.hp - beforePrayer).toBe(Math.round(last.p.maxHp * 0.3));
 
     const shattered = priest('discipline', { 8: 'pri_r8_improved_shield' });
     expect(
       shattered.ctx.playerMods(playerMeta(shattered.ctx, shattered.p)).procs[0].responses,
     ).toEqual([{ kind: 'heal', amountPctMaxHp: 0.12 }]);
+    shattered.p.hp = Math.floor(shattered.p.maxHp * 0.5);
+    shattered.sim.targetEntity(shattered.p.id);
+    shattered.sim.castAbility('power_word_shield');
+    const shield = shattered.p.auras.find((effect) => effect.id === 'power_word_shield');
+    if (!shield) throw new Error('missing Psalm of Warding');
+    shattered.sim.drainEvents();
+    shattered.sim.dealDamage(
+      null,
+      shattered.p,
+      shield.value + 10,
+      false,
+      'shadow',
+      'Test Hit',
+      'hit',
+    );
+    expect(shattered.sim.drainEvents()).toContainEqual(
+      expect.objectContaining({ type: 'heal2', ability: 'Shattered Psalm' }),
+    );
 
     const wounded = priest('discipline', { 8: 'pri_r17_inner_fire' });
     const proc = wounded.ctx.playerMods(playerMeta(wounded.ctx, wounded.p)).procs[0];
@@ -107,26 +132,48 @@ describe('Priest v0.29 talent mechanics', () => {
     expect(proc.responses).toEqual([
       { kind: 'absorb', amountPctMaxHp: 0.15, duration: 10, name: 'Wounded Halo' },
     ]);
+    wounded.sim.dealDamage(
+      null,
+      wounded.p,
+      Math.ceil(wounded.p.maxHp * 0.16),
+      false,
+      'shadow',
+      'Test Hit',
+      'hit',
+    );
+    expect(wounded.p.auras).toContainEqual(
+      expect.objectContaining({
+        id: 'pri_inner_fire',
+        kind: 'absorb',
+        value: Math.round(wounded.p.maxHp * 0.15),
+      }),
+    );
   });
 
   it('runs all level 11 control outcomes, including per-enemy Binding Psalm ICD', () => {
     const hush = priest('discipline', { 11: 'pri_r8_silence' });
-    expect(hush.sim.resolvedAbility('silence')?.cooldown).toBe(30);
+    const silenced = addMob(hush.sim, 9929);
+    silenced.castingAbility = 'fireball';
+    silenced.castRemaining = 3;
+    hush.sim.targetEntity(silenced.id);
+    hush.sim.castAbility('silence');
+    advance(hush.sim, 1);
+    expect(silenced.auras).toContainEqual(
+      expect.objectContaining({ id: 'silence_silence', kind: 'silence', duration: 4 }),
+    );
 
     const lingering = priest('discipline', { 11: 'pri_r8_psychic_scream' });
     expect(lingering.sim.resolvedAbility('psychic_scream')?.cooldown).toBeCloseTo(21);
-    const feared = addMob(lingering.sim, 9930);
-    priestOnAuraEnded(
-      lingering.ctx,
-      feared,
-      aura({
+    const feared = addMob(lingering.sim, 9930, 3);
+    lingering.sim.castAbility('psychic_scream');
+    expect(feared.auras).toContainEqual(
+      expect.objectContaining({
         id: 'fear_incap',
         name: 'Terror Canticle',
         kind: 'incapacitate',
-        sourceId: lingering.p.id,
-        school: 'shadow',
       }),
     );
+    advance(lingering.sim, 4.1);
     expect(
       feared.auras.some((effect) => effect.id === 'priest_lingering_dread' && effect.value === 0.5),
     ).toBe(true);
@@ -134,13 +181,26 @@ describe('Priest v0.29 talent mechanics', () => {
     const binding = priest('discipline', { 11: 'pri_r11_vampiric_embrace' });
     const owner = addAlly(binding.sim, 'Shield Owner');
     const attacker = addMob(binding.sim, 9931);
-    const shield = aura({
-      id: 'power_word_shield',
-      name: 'Psalm of Warding',
-      kind: 'absorb',
-      sourceId: binding.p.id,
-    });
-    priestOnShieldConsumed(binding.ctx, binding.p, shield, owner, attacker);
+    binding.sim.targetEntity(owner.id);
+    binding.sim.castAbility('power_word_shield');
+    const shield = owner.auras.find((effect) => effect.id === 'power_word_shield');
+    if (!shield) throw new Error('missing Binding Psalm shield');
+    binding.sim.dealDamage(
+      attacker,
+      owner,
+      shield.value + 10,
+      false,
+      'physical',
+      'Test Hit',
+      'hit',
+    );
+    expect(attacker.auras).toContainEqual(
+      expect.objectContaining({
+        id: `binding_psalm_${binding.p.id}`,
+        kind: 'root',
+        remaining: 2,
+      }),
+    );
     priestOnShieldConsumed(binding.ctx, binding.p, shield, owner, attacker);
     expect(
       attacker.auras.filter((effect) => effect.id === `binding_psalm_${binding.p.id}`),
@@ -150,19 +210,32 @@ describe('Priest v0.29 talent mechanics', () => {
 
   it('pins Stilled Mind, Measured Faith, and the Doctrine Living Covenant rider', () => {
     const stilled = priest('discipline', { 14: 'pri_r11_inner_focus' });
-    expect(stilled.sim.resolvedAbility('inner_focus')?.effects).toEqual([
-      { type: 'selfBuff', kind: 'next_cast_free', value: 1, duration: 60 },
-      { type: 'selfBuff', kind: 'cast_shield', value: 1, duration: 60 },
-    ]);
+    stilled.sim.castAbility('inner_focus');
+    expect(
+      stilled.p.auras
+        .filter((effect) => effect.id.startsWith('inner_focus'))
+        .map((effect) => effect.kind)
+        .sort(),
+    ).toEqual(['cast_shield', 'next_cast_free']);
 
     const measured = priest('discipline', { 14: 'pri_r11_meditation' });
-    const measuredProc = measured.ctx.playerMods(playerMeta(measured.ctx, measured.p)).procs[0];
-    expect(measuredProc.trigger).toMatchObject({ on: 'castNth', n: 3 });
-    expect(measuredProc.responses[0]).toMatchObject({
-      kind: 'empowerNext',
-      costPct: 0.5,
-      duration: 10,
-    });
+    measured.sim.targetEntity(measured.p.id);
+    for (let cast = 0; cast < 3; cast++) {
+      measured.sim.castAbility('renew');
+      advance(measured.sim, 2);
+    }
+    expect(measured.p.auras).toContainEqual(
+      expect.objectContaining({
+        id: 'pri_measured_faith',
+        kind: 'next_cast_cheap',
+        value: 0.5,
+        duration: 10,
+      }),
+    );
+    const beforeDiscountedCast = measured.p.resource;
+    measured.sim.castAbility('renew');
+    expect(beforeDiscountedCast - measured.p.resource).toBe(38);
+    expect(measured.p.auras.some((effect) => effect.id === 'pri_measured_faith')).toBe(false);
 
     const living = priest('discipline', { 14: 'pri_r14_pain_and_suffering' });
     const ally = addAlly(living.sim, 'Living Link');
@@ -194,6 +267,42 @@ describe('Priest v0.29 talent mechanics', () => {
     ]);
     expect(ABILITIES.choir_of_deliverance.channel).toEqual({ duration: 6, ticks: 3 });
     expect(ABILITIES.choir_of_deliverance.cooldown).toBe(180);
+  });
+
+  it('routes all three level 17 prayers through their real cast paths', () => {
+    const { sim } = priest('discipline', { 17: 'pri_r17_anointing' });
+    const ally = addAlly(sim, 'Anointed Ally');
+    sim.targetEntity(ally.id);
+
+    sim.castAbility('power_infusion');
+
+    expect(
+      ally.auras
+        .filter((effect) => effect.name === 'Anointing')
+        .map((effect) => effect.kind)
+        .sort(),
+    ).toEqual(['buff_dmg_done', 'buff_heal_done', 'buff_spellhaste']);
+
+    const aegis = priest('discipline', { 17: 'pri_r17_martyrs_aegis' });
+    const protectedAlly = addAlly(aegis.sim, 'Protected Ally');
+    aegis.sim.targetEntity(protectedAlly.id);
+    aegis.sim.castAbility('martyrs_aegis');
+    expect(protectedAlly.auras).toContainEqual(
+      expect.objectContaining({
+        id: 'martyrs_aegis',
+        kind: 'shield_wall',
+        value: 0.4,
+        remaining: 8,
+      }),
+    );
+
+    const choir = priest('holy', { 17: 'pri_r17_choir_of_deliverance' });
+    const woundedAlly = addAlly(choir.sim, 'Choir Ally');
+    woundedAlly.hp = Math.floor(woundedAlly.maxHp * 0.5);
+    const before = woundedAlly.hp;
+    choir.sim.castAbility('choir_of_deliverance');
+    advance(choir.sim, 6.5);
+    expect(woundedAlly.hp).toBeGreaterThan(before);
   });
 
   it('applies Twin Covenant to Doctrine, Benison charges, and Vespers links', () => {

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { meleeSwing } from '../src/sim/combat/auto_attack';
 import { iceFloesAuraForAbility } from '../src/sim/combat/empower_next';
 import {
   consumeMendingCurrent,
@@ -8,9 +9,7 @@ import {
 } from '../src/sim/combat/shaman_spiritmend';
 import {
   applyPrimalExaltation,
-  applyStoneward,
   FLOW_STATE_READY_ID,
-  onGhostWolfEntered,
   onShamanCastCompleted,
   onShamanDamageTaken,
   onShamanManaSpent,
@@ -66,8 +65,12 @@ function hostile(sim: Sim, player: Entity, id = 92_904): Entity {
   });
   target.hostile = true;
   target.hp = target.maxHp = 100_000;
-  sim.entities.set(target.id, target);
+  (sim as unknown as { addEntity(entity: Entity): void }).addEntity(target);
   return target;
+}
+
+function advance(sim: Sim, seconds: number): void {
+  for (let tick = 0; tick < seconds * 20; tick++) sim.tick();
 }
 
 describe('Shaman v0.29 talent grid', () => {
@@ -119,7 +122,8 @@ describe('Shaman v0.29 talent grid', () => {
   it('Stoneward owns one six-charge ally shield and heals through its ICD', () => {
     const { sim, player, ally } = shaman({ 8: SHAMAN_TALENT_IDS.stoneward });
     ally.hp = Math.round(ally.maxHp * 0.5);
-    applyStoneward(sim.ctx, player, ally);
+    sim.targetEntity(ally.id, player.id);
+    sim.castAbility('stoneward', player.id);
     const ward = ally.auras.find((aura) => aura.id === 'shaman_stoneward');
     expect(ward?.charges).toBe(6);
     expect(ward?.duration).toBe(60);
@@ -131,11 +135,75 @@ describe('Shaman v0.29 talent grid', () => {
     expect(ward?.charges).toBe(5);
   });
 
+  it('routes every control choice through its real cast path', () => {
+    const fault = shaman({ 11: SHAMAN_TALENT_IDS.faultRebuke });
+    const faultTarget = hostile(fault.sim, fault.player, 92_911);
+    faultTarget.castingAbility = 'fireball';
+    faultTarget.castRemaining = 3;
+    fault.sim.targetEntity(faultTarget.id, fault.player.id);
+    fault.sim.castAbility('earth_shock', fault.player.id);
+    advance(fault.sim, 1);
+    expect(faultTarget.castingAbility).toBeNull();
+    expect(faultTarget.auras).toContainEqual(
+      expect.objectContaining({ id: 'earth_shock_lockout', kind: 'lockout' }),
+    );
+
+    const rime = shaman({ 11: SHAMAN_TALENT_IDS.rimeLock });
+    const rimeTarget = hostile(rime.sim, rime.player, 92_912);
+    rime.sim.targetEntity(rimeTarget.id, rime.player.id);
+    rime.sim.castAbility('frost_shock', rime.player.id);
+    advance(rime.sim, 1);
+    expect(rimeTarget.auras).toContainEqual(
+      expect.objectContaining({ id: 'frost_shock_root', kind: 'root' }),
+    );
+
+    const gripping = shaman({ 11: SHAMAN_TALENT_IDS.grippingEarth });
+    const grippingTarget = hostile(gripping.sim, gripping.player, 92_913);
+    gripping.sim.castAbility('earthbind', gripping.player.id, {
+      x: grippingTarget.pos.x,
+      z: grippingTarget.pos.z,
+    });
+    expect(grippingTarget.auras).toContainEqual(
+      expect.objectContaining({ id: 'earthbind_root', kind: 'root', remaining: 2 }),
+    );
+    advance(gripping.sim, 2.1);
+    expect(grippingTarget.auras).toContainEqual(
+      expect.objectContaining({ id: 'earthbind_slow', kind: 'slow', value: 0.6 }),
+    );
+  });
+
   it('Primal Exaltation creates the shared twelve-second throughput window', () => {
     const { sim, player } = shaman({ 17: SHAMAN_TALENT_IDS.primalExaltation });
-    applyPrimalExaltation(sim.ctx, player);
+    sim.castAbility('primal_exaltation', player.id);
     const aura = player.auras.find((candidate) => candidate.id === 'shaman_primal_exaltation');
     expect(aura?.duration).toBe(12);
+  });
+
+  it('routes every level 17 choice through its real activation path', () => {
+    const primal = shaman({ 17: SHAMAN_TALENT_IDS.primalExaltation });
+    primal.sim.castAbility('primal_exaltation', primal.player.id);
+    expect(primal.player.auras).toContainEqual(
+      expect.objectContaining({ id: 'shaman_primal_exaltation', remaining: 12 }),
+    );
+
+    const grace = shaman({ 17: SHAMAN_TALENT_IDS.wayfarerGrace });
+    grace.sim.castAbility('ghost_wolf', grace.player.id);
+    advance(grace.sim, 3.25);
+    grace.sim.castAbility('ghost_wolf', grace.player.id);
+    expect(grace.player.auras).toContainEqual(
+      expect.objectContaining({ id: 'shaman_wayfarer_grace', kind: 'ice_floes', remaining: 8 }),
+    );
+
+    const bulwark = shaman({ 17: SHAMAN_TALENT_IDS.ancestralBulwark });
+    bulwark.sim.castAbility('lightning_shield', bulwark.player.id);
+    expect(bulwark.player.auras).toContainEqual(
+      expect.objectContaining({
+        id: 'shaman_ancestral_bulwark',
+        kind: 'buff_dr',
+        value: 0.4,
+        remaining: 6,
+      }),
+    );
   });
 
   it('implements all three movement choices without a new action', () => {
@@ -150,12 +218,13 @@ describe('Shaman v0.29 talent grid', () => {
       sourceId: 999,
       school: 'frost',
     });
-    onGhostWolfEntered(wolf.sim.ctx, wolf.player);
+    wolf.sim.castAbility('ghost_wolf', wolf.player.id);
     expect(wolf.player.auras.some((aura) => aura.kind === 'slow')).toBe(false);
     expect(wolf.sim.resolvedAbility('ghost_wolf', wolf.player.id)?.castTime).toBe(0);
 
     const winds = shaman({ 5: SHAMAN_TALENT_IDS.gatheringWinds });
-    onGhostWolfEntered(winds.sim.ctx, winds.player);
+    winds.sim.castAbility('ghost_wolf', winds.player.id);
+    advance(winds.sim, 3);
     expect(winds.player.auras.find((aura) => aura.id === 'shaman_gathering_winds')).toMatchObject({
       kind: 'buff_speed',
       value: 1.6,
@@ -164,7 +233,9 @@ describe('Shaman v0.29 talent grid', () => {
     expect(winds.player.auras.some((aura) => aura.id === 'shaman_gathering_winds_icd')).toBe(true);
 
     const flowing = shaman({ 5: SHAMAN_TALENT_IDS.flowingElements });
-    onShamanCastCompleted(flowing.sim.ctx, flowing.player, 'frost_shock');
+    const target = hostile(flowing.sim, flowing.player);
+    flowing.sim.targetEntity(target.id, flowing.player.id);
+    flowing.sim.castAbility('frost_shock', flowing.player.id);
     expect(
       flowing.player.auras.find((aura) => aura.id === 'shaman_flowing_elements'),
     ).toMatchObject({
@@ -189,6 +260,44 @@ describe('Shaman v0.29 talent grid', () => {
     expect(shamanManaCost(flow.sim.ctx, flow.player, 65)).toBe(25);
     onShamanManaSpent(flow.sim.ctx, flow.player, 25);
     expect(flow.player.auras.some((aura) => aura.id === FLOW_STATE_READY_ID)).toBe(false);
+  });
+
+  it('routes both reactive level 8 defenses through real damage', () => {
+    const warded = shaman({ 8: SHAMAN_TALENT_IDS.wardedElements });
+    warded.sim.castAbility('lightning_shield', warded.player.id);
+    const attacker = hostile(warded.sim, warded.player, 92_908);
+    for (
+      let attempt = 0;
+      attempt < 10 && !warded.player.auras.some((aura) => aura.id === 'shaman_warded_elements');
+      attempt++
+    ) {
+      meleeSwing(warded.sim.ctx, attacker, warded.player, 0, null, {
+        cannotBeDodged: true,
+      });
+    }
+    expect(warded.player.auras).toContainEqual(
+      expect.objectContaining({
+        id: 'shaman_warded_elements',
+        kind: 'buff_dr',
+        value: 0.1,
+        remaining: 3,
+      }),
+    );
+
+    const mending = shaman({ 8: SHAMAN_TALENT_IDS.ancestralMending });
+    mending.player.hp = Math.floor(mending.player.maxHp * 0.5);
+    mending.sim.dealDamage(
+      null,
+      mending.player,
+      Math.ceil(mending.player.maxHp * 0.16),
+      false,
+      'shadow',
+      'Test Hit',
+      'hit',
+    );
+    expect(mending.sim.drainEvents()).toContainEqual(
+      expect.objectContaining({ type: 'heal2', ability: 'Ancestral Mending' }),
+    );
   });
 
   it('spends a ready Flow State on an eligible action even when the discount makes it free', () => {

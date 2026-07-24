@@ -330,6 +330,7 @@ export function runEffects(
 
   if (ability.requiresAuraKind) consumeAuraKind(ctx, p, ability.requiresAuraKind);
 
+  let targetBuffIndex = 0;
   for (const eff of res.effects) {
     switch (eff.type) {
       case 'temporalHourglass': {
@@ -1141,9 +1142,12 @@ export function runEffects(
       case 'drainTick':
         break; // handled per channel tick
       case 'buffTarget': {
+        const auraId =
+          targetBuffIndex === 0 ? ability.id : `${ability.id}_${eff.kind}_${targetBuffIndex}`;
+        targetBuffIndex += 1;
         const applyBuff = (e: Entity) =>
           ctx.applyAura(e, {
-            id: ability.id,
+            id: auraId,
             name: ability.name,
             kind: eff.kind,
             remaining: eff.duration,
