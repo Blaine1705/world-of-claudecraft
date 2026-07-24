@@ -148,7 +148,10 @@ describe('evaluateCrowdRun composer-tier draw sanity', () => {
   });
 
   it('passes at the first draw count above the fullscreen floor', () => {
-    const v = evaluateCrowdRun({ samples: [crowdSample({ tier: 'high', calls: 2 })], minFps: null });
+    const v = evaluateCrowdRun({
+      samples: [crowdSample({ tier: 'high', calls: 2 })],
+      minFps: null,
+    });
     expect(v.ok).toBe(true);
   });
 

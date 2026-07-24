@@ -232,10 +232,18 @@ describe('bare client integration through the real onMessage path', () => {
     expect(client.entities.get(2)?.name).toBe('Bud');
   });
 
-  it('reads the raw gap BEFORE applySnapshot moves lastSnapAt so a stall gap survives', () => {
+  it('reads the raw gap BEFORE applySnapshot moves lastSnapAt so a stall gap survives', async () => {
     // applySnapshot sets lastSnapAt = now; if the raw-gap read moved below the
     // apply call, every recorded gap would collapse to about zero and the
     // stall outliers (the whole point of the raw ring) would vanish.
+    //
+    // performance.now() starts near ZERO in a fresh vitest worker, and the
+    // recorder reads lastSnapAt <= 0 as the no-prior-snapshot sentinel, so the
+    // 900 ms rewind below must stay positive: wait out the process's first
+    // 901 ms when a warm-cache full-suite worker reaches this file that fast
+    // (a real full-suite failure mode, not a theoretical one).
+    const needed = 901 - performance.now();
+    if (needed > 0) await new Promise((resolve) => setTimeout(resolve, needed));
     const client = bareClient(1);
     const internals = client as unknown as { onMessage(raw: string): void };
     (client as any).lastSnapAt = performance.now() - 900;

@@ -127,8 +127,9 @@ function readBaselineSkipRateFloor(): number {
 
 // The DURABLE, RUN-LENGTH-INDEPENDENT anchor: the elision-bypass write COUNT
 // (`hudHotDomWrites`). Unlike the skip RATIO (skipped / total), this does not move with the
-// frame count, so it is the same on desktop, mobile, and every re-run (the baseline pins it
-// at 153, the post-extraction steady state, byte-identical across profiles). A collapse
+// frame count. The establishing-write floor differs by viewport (the touch HUD builds more
+// per-frame elements) and jitters by a write or two run to run, so the committed anchor is a
+// single canonical row covering the WORST viewport plus that jitter as headroom. A collapse
 // of write-elision makes it BALLOON toward the frame count; a healthy run holds it. This is the
 // signal ARM 3 gates on instead of the frame-count-dependent ratio. The baseline records it as
 // the canonical table row `| hudHotDomWrites | <count> | ...`; this parses THAT row specifically
@@ -776,11 +777,12 @@ tourDescribe(
     // ELISION-COLLAPSE GATE (every viewport). The regression signal is the elision-BYPASS
     // COUNT (`hudHotDomWrites`): the writes that bypassed the cache. It is run-length-
     // INDEPENDENT - a longer tour adds only SKIPS, never new bypass writes once state is
-    // steady - so it is the same on desktop, mobile, and every re-run (the baseline pins it
-    // at 153). The skip RATIO (skipped / total) is a DERIVED quantity whose denominator is
-    // the total frame count, which jitters with software-WebGL fps + machine load: a clean
-    // re-run measured desktop 0.959 vs the recorded 0.962 with hudHotDomWrites IDENTICALLY
-    // 152 (elision intact, pure ratio noise), so the ratio is NOT a safe cross-run hard gate.
+    // steady - so the committed anchor is a single canonical row covering the WORST viewport
+    // (the touch HUD establishes more elements than desktop) plus a write or two of run
+    // jitter; a collapse balloons the count toward the frame count, far past that headroom.
+    // The skip RATIO (skipped / total) is a DERIVED quantity whose denominator is
+    // the total frame count, which jitters with fps + machine load run to run, so the
+    // ratio is NOT a safe cross-run hard gate.
     // We gate the COUNT (closes the mobile gap the old desktop-only ratio gate left open);
     // the ratio stays in the perf_tour console for human context. ARM 2's ratio floor is
     // safe because its fake-DOM loop has a FIXED denominator.

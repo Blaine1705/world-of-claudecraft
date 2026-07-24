@@ -7648,9 +7648,12 @@
   #perf-nudge {
     position: fixed;
     /* Same safe-area handling as #gpu-notice: clear of a notch on mobile
-       shells, zero everywhere else; 112px clears both toast slots above. */
+       shells, zero everywhere else; 112px clears both toast slots above.
+       Unlike the pre-game portrait sibling, this toast surfaces IN-GAME,
+       where web mobile is landscape-only, so the right edge also clears a
+       rotated notch / rounded corner. */
     top: calc(var(--spacing-md) + 112px + env(safe-area-inset-top, 0px));
-    right: var(--spacing-md);
+    right: calc(var(--spacing-md) + env(safe-area-inset-right, 0px));
     z-index: 260;
     display: flex;
     align-items: center;

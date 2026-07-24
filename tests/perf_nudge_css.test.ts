@@ -26,7 +26,7 @@ describe('performance nudge toast CSS', () => {
     // 112px clears the update-toast slot (56px) plus the gpu-notice slot, so
     // the three toasts can never overlap even if all were visible.
     expect(shell).toContain(
-      '#perf-nudge { position: fixed; top: calc(var(--spacing-md) + 112px + env(safe-area-inset-top, 0px)); right: var(--spacing-md); z-index: 260;',
+      '#perf-nudge { position: fixed; top: calc(var(--spacing-md) + 112px + env(safe-area-inset-top, 0px)); right: calc(var(--spacing-md) + env(safe-area-inset-right, 0px)); z-index: 260;',
     );
   });
 

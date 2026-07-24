@@ -125,7 +125,11 @@ class Bot {
         `char create failed for ${this.i}: ${JSON.stringify(char.body).slice(0, 120)}`,
       );
     await new Promise((resolve, reject) => {
-      this.ws = new WebSocket(`${WS_BASE}/ws`);
+      // Same per-bot XFF on the WS upgrade as on REST: the per-IP hard WS cap
+      // (MAX_WS_PER_IP_HARD, default 20) would otherwise refuse every socket past
+      // 20 and cap the crowd, surfacing as join timeouts. Loopback-trusted, the
+      // same trick server_load_jitter.mjs uses for its fleet.
+      this.ws = new WebSocket(`${WS_BASE}/ws`, { headers: { 'X-Forwarded-For': xff } });
       const to = setTimeout(() => reject(new Error('join timeout')), 12000);
       this.ws.on('open', () =>
         this.ws.send(JSON.stringify({ t: 'auth', token: this.token, character: this.charId })),
