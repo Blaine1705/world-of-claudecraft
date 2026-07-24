@@ -1934,7 +1934,7 @@ export const ABILITY_VFX_SPECS: Record<string, AbilityVfxSpec> = {
   entangling_roots: { c: '#8cd07a', p: 'nature', pw: 0.75, db: 1, sm: 1, li: 0.3, lg: 4, a: 'cc' },
   bear_form: { c: '#9a6a3a', p: 'nature', pw: 0.75, rg: 1.4, db: 1, sm: 1, lg: 2, a: 'buff' },
   bear_charge: { c: '#dfe6ee', p: 'physical', sp: 14, rg: 1.5, db: 1, sm: 1, li: 0.6, a: 'dash' },
-  maul: { c: '#dfe6ee', p: 'physical', sp: 10, rg: 1.8, db: 1, sm: 1, li: 0.4, a: 'strike' },
+  maul: { c: '#dfe6ee', p: 'physical', sp: 10, rg: 1.1, db: 1, li: 0.4, a: 'strike' },
   growl: {
     c: '#ff5f45',
     p: 'physical',
@@ -1961,7 +1961,7 @@ export const ABILITY_VFX_SPECS: Record<string, AbilityVfxSpec> = {
   cat_form: { c: '#8fa3c8', p: 'moon', pw: 0.7, lg: 2, a: 'buff' },
   prowl: { c: '#26303f', p: 'moon', pw: 0.5, lg: 2, a: 'buff' },
   rake: { c: '#d41f2e', p: 'blood', pw: 0.9, sp: 8, bl: 1, li: 0.4, lg: 4, a: 'strike' },
-  claw: { c: '#dfe6ee', p: 'physical', pw: 0.85, sp: 14, li: 0.3, a: 'strike' },
+  claw: { c: '#dfe6ee', p: 'physical', pw: 0.85, sp: 8, li: 0.3, a: 'strike' },
   regrowth: { c: '#8cd07a', p: 'nature', pw: 0.9, sp: 12, vr: 1, lg: 3.5, a: 'heal' },
   ferocious_bite: {
     c: '#d41f2e',
@@ -1993,7 +1993,8 @@ export const ABILITY_VFX_SPECS: Record<string, AbilityVfxSpec> = {
     p: 'moon',
     pw: 1.5,
     sp: 40,
-    rg: 1,
+    rg: 1.6,
+    vr: 1,
     db: 1,
     sm: 1,
     li: 0.5,
@@ -2076,7 +2077,7 @@ export const ABILITY_VFX_SPECS: Record<string, AbilityVfxSpec> = {
   },
   rip: { c: '#d41f2e', p: 'blood', pw: 1.1, sp: 8, vr: 1, bl: 1, li: 0.5, lg: 4, a: 'dot' },
   hurricane: {
-    c: '#8fd0ff',
+    c: '#b6c0a8',
     p: 'storm',
     pw: 1.2,
     sp: 22,
@@ -2140,7 +2141,7 @@ export const ABILITY_VFX_SPECS: Record<string, AbilityVfxSpec> = {
   },
   swiftmend: { c: '#8fe86a', p: 'nature', pw: 1.1, sp: 20, vr: 1, li: 1.5, lg: 2, a: 'heal' },
   typhoon: {
-    c: '#a8d890',
+    c: '#6fc8e8',
     p: 'nature',
     pw: 1.15,
     sp: 0,
