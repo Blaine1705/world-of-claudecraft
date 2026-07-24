@@ -74,7 +74,7 @@ describe('Warspirit engine', () => {
     ).toBe(true);
   });
 
-  it('guarantees Stormsurge after four failed chances', () => {
+  it('guarantees Stormsurge on the fourth chance after three misses', () => {
     const { sim, shaman } = setup();
     sim.rng.next = () => 0.99;
 
