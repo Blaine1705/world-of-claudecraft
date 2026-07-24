@@ -87,7 +87,7 @@ describe('THE ECONOMY INVARIANT', () => {
   // the output must vendor strictly below the CHEAPEST achievable input or
   // the loop prints copper at zero risk (the Kilnscale Mantle sat exactly
   // here: listed 520 vs output 470, but specialized consumption is 5 ore +
-  // 4 flux = 420, and with a self-signed ore 4 + 3 = 300). Self-signed is
+  // 4 flux = 380, and with a self-signed ore 4 + 3 = 300). Self-signed is
   // assumed held for EVERY reagent: stricter than reality for unsignable
   // vendor staples, which is the safe direction for an invariant.
   function vendorStockedIds(): ReadonlySet<string> {
@@ -110,8 +110,20 @@ describe('THE ECONOMY INVARIANT', () => {
 
   it('every fully-vendor-fed recipe vendors strictly below its cheapest achievable input', () => {
     const stocked = vendorStockedIds();
+    // Copper-loop membership needs BOTH facts: stocked by some NPC AND
+    // carrying a copper buyValue (the FURY honor vendor's priceHonor stock
+    // is in NPCS too; honor-priced goods have no copper basis and must
+    // never classify a recipe into this arm).
     const vendorFed = ALL_RECIPES.filter((recipe) =>
-      recipe.reagents.every((reagent) => stocked.has(reagent.itemId)),
+      recipe.reagents.every((reagent) => {
+        const def = ITEMS[reagent.itemId];
+        return (
+          stocked.has(reagent.itemId) &&
+          !!def &&
+          typeof def.buyValue === 'number' &&
+          def.buyValue > 0
+        );
+      }),
     );
     // Membership pin: the vendor-fed set is exactly these six loops. A new
     // recipe (or a new vendor row) that makes another recipe fully
@@ -132,6 +144,12 @@ describe('THE ECONOMY INVARIANT', () => {
           `input ${minAchievableInputValue(recipe)} (specialized + self-signed)`,
       ).toBeLessThan(minAchievableInputValue(recipe));
     }
+    // Pin the mantle's tight bound to its literal: the protective threshold
+    // depends on the specialization discount actually firing inside
+    // requiredReagentCountFor. Self-sign alone would give 6*60 + 4*20 = 440,
+    // so without this pin a discount regression would silently widen the
+    // bound and let a 300-to-440 re-price slip through green.
+    expect(minAchievableInputValue(recipeById('recipe_sootscale_mantle')!)).toBe(300);
   });
 
   it('(a) every legacy member predates trainer acquisition (in PRE_TRAINING_RECIPE_IDS)', () => {
