@@ -124,6 +124,25 @@ the single load-time reader of PRE-reset skill values and must keep running
 before `applyMasteryReset`. Tool effects/charges/recharge stay PARKED as
 dormant pure modules in `tools.ts`: do not wire, do not delete.
 
+Character XP from crafting is LEARNING XP: the level-banded curve
+(`craftActionXp`, `src/sim/professions/profession_xp.ts`) scaled at the
+grant site (`resolveCraftForRecipe`, `src/sim/professions/crafting.ts`) by
+the skill the craft actually taught, the applied post-clamp
+`gainCraftSkill` delta. The shared `craftSkillGainMultiplier` also returns
+0 outright at the craft's content cap, which keeps the crafting window's
+difficulty label, the skill grant, and the XP grant in lockstep. The
+character-level green/gray falloff alone cannot bound a level-20 recipe at
+the level-20 character cap (gray for skillReq 75+ would need capability
+past the 125 cap), so the skill journey is the dimension that makes every
+recipe's lifetime character-XP contribution finite: craft skill is
+additive-only and hard-capped, so a recipe that no longer teaches pays
+nothing, and a vendor-fed recipe cannot be an unbounded stationary XP farm
+(the Kilnscale Mantle report; pinned end to end by
+`tests/professions_craft_xp.test.ts`, the boundedness sweep included).
+Gathering XP (`gatherActionXp`) deliberately keeps the plain level band:
+nodes cannot be vendor-fed, harvesting is movement- and respawn-paced like
+mob grinding, and it stays a post-launch watch rather than a coupling.
+
 ### Provenance and instance stacking
 Two slots merge only when itemId matches AND the instance payload is
 byte-equal (`canStackInstancePayloads`,
