@@ -85,6 +85,9 @@ function liveSetup() {
   moveTo(internals, sa.pid, node.pos.x, node.pos.z);
   moveTo(internals, sb.pid, 300, 0);
   moveTo(internals, sc.pid, 0, 340);
+  // #2343: every node harvest needs the matching-profession tool in bags
+  // (addItem draws no rng; its loot event drains with the settle tick below).
+  server.sim.addItem('copper_mining_pick', 1, sa.pid);
   // One tick settles the join and re-indexes the spatial grid (the
   // corpse_harvest_sim idiom), then drop the join-time traffic.
   server.sim.tick();
@@ -146,7 +149,10 @@ describe('gather events over the live server (Professions 2.0)', () => {
     // respawn noise interleaves with the hunted stream.
     let hitEvents: SimEvent[] | null = null;
     for (let i = 0; i < 3000 && !hitEvents; i++) {
+      // The wipe removes the #2343 tool too; re-add it by direct push (event-
+      // and draw-free) so every iteration passes the tool gate.
       meta.inventory.length = 0;
+      meta.inventory.push({ itemId: 'copper_mining_pick', count: 1 });
       delete meta.nodeHarvestReadyAt[NODE_ID];
       expect(server.sim.harvestNode(NODE_ID, sa.pid)).toBe(true);
       completeCastNow(server, sa.pid);

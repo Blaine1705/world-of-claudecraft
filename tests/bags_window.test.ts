@@ -13,7 +13,10 @@ const components = readFileSync(new URL('../src/styles/components.css', import.m
 
 describe('bags_window: no magic values', () => {
   it('carries no literal hex color in TS (quality color comes from QUALITY_COLOR + a token)', () => {
-    const hex = painter.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [];
+    // Issue references in comments (#2343) match the hex shape, so the scan
+    // runs on comment-stripped source: a hex COLOR only matters in live code.
+    const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    const hex = code.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [];
     expect(hex, `hex colors must move to tokens: ${hex.join(', ')}`).toEqual([]);
   });
 
