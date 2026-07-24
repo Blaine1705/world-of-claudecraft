@@ -10,6 +10,7 @@
 import { describe, expect, it } from 'vitest';
 import { craftMaxSkillFor } from '../src/sim/content/professions';
 import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
+import { craftSkillGainMultiplier } from '../src/sim/professions/archetype';
 import { resolveCraft, resolveCraftForRecipe } from '../src/sim/professions/crafting';
 import { stationsOfType } from '../src/sim/professions/stations';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
@@ -69,11 +70,18 @@ describe('learning-coupled craft XP: the vendor-fed farm closes', () => {
     grantMantleMats(sim, pid);
     const before = meta.lifetimeXp;
 
+    const throttleBefore = meta.craftThrottle.count;
+
     const first = resolveCraft((sim as any).ctx, pid, MANTLE.id);
 
-    // The craft itself still works: item granted, materials consumed.
+    // The craft itself still works: item granted, materials consumed, the
+    // shared action throttle still spent (at skill 125 the specialization
+    // discount reduces the listed 7 ore + 5 flux to 5 + 4).
     expect(first.ok).toBe(true);
     expect(sim.countItem('sootscale_mantle', pid)).toBe(1);
+    expect(sim.countItem('thorium_ore', pid)).toBe(2);
+    expect(sim.countItem('smithing_flux', pid)).toBe(1);
+    expect(meta.craftThrottle.count).toBe(throttleBefore + 1);
     // But it taught nothing, so it pays nothing: no lifetime XP, no skill.
     expect(meta.lifetimeXp).toBe(before);
     expect(meta.craftSkills.armorcrafting).toBe(125);
@@ -261,12 +269,65 @@ describe('every recipe stops paying XP at its craft cap (boundedness)', () => {
         grantItem(sim, reagent.itemId, reagent.count, pid);
       }
       const before = meta.lifetimeXp;
+      const skillBefore = meta.craftSkills[recipe.professionId];
 
       const result = resolveCraft((sim as any).ctx, pid, recipe.id);
 
       expect(result.ok).toBe(true);
       expect(meta.lifetimeXp).toBe(before);
-      expect(meta.craftSkills[recipe.professionId]).toBe(cap);
+      // Drift-proof: the skill must not MOVE across the craft (comparing to
+      // the captured pre-craft value, not to craftMaxSkillFor again, so a
+      // clamp bug cannot cancel out of both operands).
+      expect(meta.craftSkills[recipe.professionId]).toBe(skillBefore);
     });
   }
+});
+
+// Direct sim-side pin on the shared multiplier's content-cap arm: the
+// grant-site tests above cannot distinguish the cap arm from
+// gainCraftSkill's own clamp (at cap the applied delta is zero either
+// way), so the arm's own contract is pinned here, mirroring the
+// crafting_view label pin from the UI side.
+describe('craftSkillGainMultiplier content-cap arm', () => {
+  it('returns 0 at the 125 cap and the ordinary band just under it', () => {
+    const skills = { armorcrafting: 125 };
+    expect(
+      craftSkillGainMultiplier(
+        skills,
+        'armorcrafting',
+        'weaponcrafting',
+        'armorcrafting',
+        null,
+        75,
+      ),
+    ).toBe(0);
+    expect(
+      craftSkillGainMultiplier(
+        skills,
+        'armorcrafting',
+        'weaponcrafting',
+        'armorcrafting',
+        null,
+        150,
+      ),
+    ).toBe(0);
+    const under = { armorcrafting: 124.5 };
+    expect(
+      craftSkillGainMultiplier(under, 'armorcrafting', 'weaponcrafting', 'armorcrafting', null, 75),
+    ).toBe(0.5);
+    expect(
+      craftSkillGainMultiplier(
+        under,
+        'armorcrafting',
+        'weaponcrafting',
+        'armorcrafting',
+        null,
+        150,
+      ),
+    ).toBe(1);
+  });
+
+  it('stays total over an unknown craft id (no cap arm, no throw)', () => {
+    expect(craftSkillGainMultiplier({}, null, null, 'blacksmithing', null, 0)).toBe(1);
+  });
 });
