@@ -1460,7 +1460,9 @@ export const da_DK: EnTranslations = {
         "gills": "Gæller",
         "claw": "Klo",
         "horn": "Horn",
-        "tusk": "Stødtand"
+        "tusk": "Stødtand",
+        "meat": "Meat",
+        "cloth": "Cloth"
       }
     },
     "townFocus": {

@@ -1460,7 +1460,9 @@ export const sv_SE: EnTranslations = {
         "gills": "Gälar",
         "claw": "Klo",
         "horn": "Horn",
-        "tusk": "Bete"
+        "tusk": "Bete",
+        "meat": "Meat",
+        "cloth": "Cloth"
       }
     },
     "townFocus": {

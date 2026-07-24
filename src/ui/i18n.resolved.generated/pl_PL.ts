@@ -1460,7 +1460,9 @@ export const pl_PL: EnTranslations = {
         "gills": "Skrzela",
         "claw": "Pazur",
         "horn": "Róg",
-        "tusk": "Cios"
+        "tusk": "Cios",
+        "meat": "Meat",
+        "cloth": "Cloth"
       }
     },
     "townFocus": {

@@ -1460,7 +1460,9 @@ export const zh_CN: EnTranslations = {
         "gills": "鱼鳃",
         "claw": "爪",
         "horn": "角",
-        "tusk": "獠牙"
+        "tusk": "獠牙",
+        "meat": "Meat",
+        "cloth": "布"
       }
     },
     "townFocus": {

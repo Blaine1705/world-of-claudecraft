@@ -1460,7 +1460,9 @@ export const tr_TR: EnTranslations = {
         "gills": "Solungaç",
         "claw": "Pençe",
         "horn": "Boynuz",
-        "tusk": "Azı Dişi"
+        "tusk": "Azı Dişi",
+        "meat": "Meat",
+        "cloth": "Cloth"
       }
     },
     "townFocus": {
