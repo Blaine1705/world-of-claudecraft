@@ -79,6 +79,7 @@ import {
 import { isAtSowfield } from '../src/sim/vale_cup_layout';
 import {
   type BankBonusSource,
+  COMMAND_NAMES,
   type CommandName,
   type DungeonFinderBoard,
   isOverheadEmoteId,
@@ -177,9 +178,17 @@ import {
   ModerationService,
 } from './moderation_service';
 import {
+  classifyMsgLane,
+  consumeLaneToken,
+  createMsgLanes,
+  type MsgLane,
+  type MsgLaneState,
+} from './msg_lanes';
+import {
   consumeInboundFrame,
   createMsgRateBucket,
   type MsgRateBucketState,
+  tallyDrop,
 } from './msg_rate_limit';
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { nextRaidResetMs } from './raid_reset';
@@ -493,6 +502,12 @@ const HEAVY_SELF_REFRESH_TICKS = 40; // ~2 s backstop; staggered per session so 
 // duel. The dungeon/delve entries are door-proximity-gated anyway (a prisoner
 // can never stand at a door), listed here as explicit policy. Leave/abort
 // commands stay allowed.
+// Runtime membership for the dispatched command vocabulary (the CommandName
+// union as data). The command-lane check consults it so a KNOWN command draws
+// its lane token before the switch, while an unknown cmd draws in the default
+// arm AFTER its protocol-anomaly observation (R5: lane drops must never mute
+// the anomaly channel).
+const KNOWN_COMMANDS: ReadonlySet<string> = new Set(COMMAND_NAMES);
 const JAILED_BLOCKED_COMMANDS = new Set<string>([
   'arena_queue',
   'vcup_queue',
@@ -638,6 +653,10 @@ export interface ClientSession {
   // cast, cmd, ...), separate from the chat-only bucket above, so a client
   // flooding non-chat frames is throttled/kicked instead of processed unconditionally.
   msgRate: MsgRateBucketState;
+  // Post-parse per-class lanes (movement / command / chat) beside the global
+  // bucket above, so one class can never starve another; lane drops tally
+  // into msgRate's abuse window (R6).
+  msgLanes: MsgLaneState;
   chatMutedUntil: number | null;
   chatMuteReason: string;
   // Hard-word enforcement strike count driving the mute ladder. Account-scoped:
@@ -2747,6 +2766,7 @@ export class GameServer {
       chatRateViolations: 0,
       chatCooldownUntil: 0,
       msgRate: createMsgRateBucket(Date.now() / 1000),
+      msgLanes: createMsgLanes(Date.now() / 1000),
       chatMutedUntil: meta.mutedUntil ? new Date(meta.mutedUntil).getTime() : null,
       chatMuteReason: meta.reason ?? '',
       chatStrikes: meta.chatStrikes ?? 0,
@@ -3869,6 +3889,18 @@ export class GameServer {
     return String(record.cmd ?? record.t ?? 'unknown');
   }
 
+  /** Draw a post-parse lane token (R5). On a drop the frame is discarded,
+   *  never queued, and the drop tallies into the same per-second abuse window
+   *  as the pre-parse gate (R6), so a sustained lane flood reaches the kick
+   *  verdict through the identical path. Returns whether to keep processing. */
+  private consumeLane(session: ClientSession, lane: MsgLane, nowSec: number): boolean {
+    if (consumeLaneToken(session.msgLanes, lane, nowSec) === 'allow') return true;
+    if (tallyDrop(session.msgRate, nowSec) === 'kick') {
+      void this.kickSession(session, 'rejected by server', 'moderation action');
+    }
+    return false;
+  }
+
   private dispatchMessage(
     session: ClientSession,
     rawMsg: unknown,
@@ -3885,6 +3917,9 @@ export class GameServer {
         raw,
         receivedAtMs,
       );
+      // Garbage draws a command-lane token AFTER its anomaly observation (R5):
+      // the lane bounds sub-ceiling garbage without muting the anomaly channel.
+      this.consumeLane(session, 'command', receivedAtMs / 1000);
       return;
     }
     const msg = rawMsg as ClientMessage;
@@ -3898,6 +3933,11 @@ export class GameServer {
       return;
     }
     if (msg.t === 'input') {
+      // The movement lane verdicts at the top of the arm, before the sim
+      // moveInput assignment and before observeInput (R5): a dropped movement
+      // frame reaches neither the sim nor the detector, which is FP-safe
+      // because input_absence only counts input frames toward ACTIVE time.
+      if (!this.consumeLane(session, 'movement', receivedAtMs / 1000)) return;
       if (session.spectating) return;
       const meta = sim.meta(pid);
       const e = sim.entities.get(pid);
@@ -3924,6 +3964,8 @@ export class GameServer {
         raw,
         receivedAtMs,
       );
+      // Same rule as non_object above: anomaly first, then the command lane.
+      this.consumeLane(session, 'command', receivedAtMs / 1000);
       return;
     }
     if (session.spectating) {
@@ -3942,6 +3984,18 @@ export class GameServer {
       receivedAtMs,
       msg,
     );
+    // The command lane verdicts AFTER observeCommand (R5, observe-then-drop):
+    // the detector keeps seeing the traffic shape even when the handler never
+    // runs. Chat draws from its own lane beside consumeChatToken; telemetry
+    // and challengeResponse are exempt; an unknown cmd draws in the default
+    // arm below, after its protocol-anomaly observation.
+    if (
+      classifyMsgLane(msg) === 'command' &&
+      KNOWN_COMMANDS.has(String(msg.cmd)) &&
+      !this.consumeLane(session, 'command', receivedAtMs / 1000)
+    ) {
+      return;
+    }
     // W0b command-schema lockstep: cast the untyped wire token to the shared
     // CommandName union so tsc proves every `case` label below is a member of
     // COMMAND_NAMES (a typo or out-of-table token is a compile error) and that
@@ -4307,6 +4361,12 @@ export class GameServer {
         // never be shadowed by a player command.
         if (this.handleChatFilterCommand(session, text)) break;
         if (this.isChatMuted(session)) break;
+        // The chat lane is a pre-guard CO-LOCATED with the ladder, not at the
+        // case entry (R5): the moderation router and the ignore/block/filter
+        // management above stay unthrottled, and because the lane is more
+        // generous than the ladder, the ladder's cooldown messaging still
+        // fires on the subset the lane passes.
+        if (!this.consumeLane(session, 'chat', receivedAtMs / 1000)) break;
         if (!this.consumeChatToken(session)) break;
         const whoMatch = /^\/who(?:\s+([\s\S]+))?$/i.exec(text);
         if (whoMatch) {
@@ -5147,6 +5207,9 @@ export class GameServer {
           raw,
           receivedAtMs,
         );
+        // Unknown cmds draw their command-lane token here, AFTER the anomaly
+        // observation (R5), so the lane never mutes the anomaly channel.
+        this.consumeLane(session, 'command', receivedAtMs / 1000);
       }
     }
   }

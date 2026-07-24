@@ -43,6 +43,14 @@ import {
 } from '../../server/http/server_timeouts';
 import { DEFAULT_JSON_BODY_MAX_BYTES } from '../../server/http_util';
 import {
+  MSG_LANE_CHAT_BURST,
+  MSG_LANE_CHAT_REFILL_PER_SECOND,
+  MSG_LANE_COMMAND_BURST,
+  MSG_LANE_COMMAND_REFILL_PER_SECOND,
+  MSG_LANE_MOVEMENT_BURST,
+  MSG_LANE_MOVEMENT_REFILL_PER_SECOND,
+} from '../../server/msg_lanes';
+import {
   MSG_ABUSE_KICK_SECONDS,
   MSG_ABUSE_SECOND_DROP_FLOOR,
   MSG_ABUSE_WINDOW_SECONDS,
@@ -313,6 +321,15 @@ describe('byte caps + page sizes hold their literal values', () => {
     expect(MSG_ABUSE_KICK_SECONDS).toBe(5);
     expect(MSG_ABUSE_SECOND_DROP_FLOOR).toBe(30);
     expect(DESKTOP_LOGIN_TTL_MS).toBe(300_000); // 5 min
+  });
+
+  it('inbound lane constants', () => {
+    expect(MSG_LANE_MOVEMENT_REFILL_PER_SECOND).toBe(90);
+    expect(MSG_LANE_MOVEMENT_BURST).toBe(120);
+    expect(MSG_LANE_COMMAND_REFILL_PER_SECOND).toBe(30);
+    expect(MSG_LANE_COMMAND_BURST).toBe(60);
+    expect(MSG_LANE_CHAT_REFILL_PER_SECOND).toBe(4);
+    expect(MSG_LANE_CHAT_BURST).toBe(8);
   });
 });
 

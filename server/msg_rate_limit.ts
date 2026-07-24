@@ -111,8 +111,11 @@ export function consumeInboundFrame(
 }
 
 // Per-second drop accounting: drops of every cause tally into the current
-// one-second bucket, and the allow path never touches this state.
-function tallyDrop(state: MsgRateBucketState, nowSec: number): 'drop' | 'kick' {
+// one-second bucket, and the allow path never touches this state. Exported
+// for the post-parse lanes (server/msg_lanes.ts): R6 says drops of EVERY
+// cause, gate and lane alike, share this one window, so a lane flood
+// accumulates abusive seconds through the identical verdict path.
+export function tallyDrop(state: MsgRateBucketState, nowSec: number): 'drop' | 'kick' {
   // Clamp the accounting second monotonic, mirroring the refill's
   // negative-elapsed clamp: a backwards clock step must not re-open an older
   // second, which could push a duplicate ring entry.
