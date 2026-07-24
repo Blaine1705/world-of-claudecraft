@@ -9007,6 +9007,15 @@ export class Hud {
           audio.levelUp();
           break;
         }
+        case 'prestige': {
+          // Keep the character sheet's prestige rank live if the sheet is open
+          // (mirrors the 'honor' case above): the chat/log line already
+          // announced the rank via the accompanying 'log' event, this just
+          // repaints an already-open sheet instead of leaving it stale until
+          // some unrelated trigger closes/reopens it.
+          this.renderCharIfOpen();
+          break;
+        }
         case 'deedUnlocked': {
           deedUnlocks.push(ev);
           break;
