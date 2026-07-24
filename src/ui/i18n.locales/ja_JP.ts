@@ -1887,6 +1887,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.combat.auraGain': '{name}を得ました。',
   'hud.combat.auraFade': '{name}が自分から消えました。',
   'hud.combat.auraAfflicted': '{target}は{name}を受けています。',
+  'hud.combat.auraGainOther': '{target}は{name}を得ました。',
   'hud.system.playerDeath': '死亡しました。',
   'hud.system.respawn': '再び休まり、完全な状態になりました。',
   'hud.system.ignoringChat': '{name}のチャットを無視します。',

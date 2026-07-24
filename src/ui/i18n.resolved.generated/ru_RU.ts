@@ -6066,7 +6066,8 @@ export const ru_RU: EnTranslations = {
       "death": "{name} умирает.",
       "auraGain": "Вы получаете {name}.",
       "auraFade": "{name} спадает с вас.",
-      "auraAfflicted": "{target} поражен эффектом {name}."
+      "auraAfflicted": "{target} поражен эффектом {name}.",
+      "auraGainOther": "{target} получает {name}."
     },
     "system": {
       "playerDeath": "Вы погибли.",

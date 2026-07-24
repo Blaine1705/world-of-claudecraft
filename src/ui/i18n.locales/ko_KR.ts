@@ -1873,6 +1873,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.combat.auraGain': '{name} 효과를 얻었습니다.',
   'hud.combat.auraFade': '{name} 효과가 사라졌습니다.',
   'hud.combat.auraAfflicted': '{target}이 {name} 효과에 걸렸습니다.',
+  'hud.combat.auraGainOther': '{target}이 {name} 효과를 얻었습니다.',
   'hud.system.playerDeath': '사망했습니다.',
   'hud.system.respawn': '다시 온전하고 편안한 상태가 되었습니다.',
   'hud.system.ignoringChat': '{name}의 채팅을 차단합니다.',

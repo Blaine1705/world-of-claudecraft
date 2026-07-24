@@ -6066,7 +6066,8 @@ export const fr_FR: EnTranslations = {
       "death": "{name} meurt.",
       "auraGain": "Vous gagnez {name}.",
       "auraFade": "{name} se dissipe de vous.",
-      "auraAfflicted": "{target} est affecté par {name}."
+      "auraAfflicted": "{target} est affecté par {name}.",
+      "auraGainOther": "{target} gains {name}."
     },
     "system": {
       "playerDeath": "Vous êtes mort.",

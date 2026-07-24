@@ -6066,7 +6066,8 @@ export const en_XA: EnTranslations = {
       "death": "[{name} ðíéš.]",
       "auraGain": "[Ýóú ĝáíñ {name}.]",
       "auraFade": "[{name} ƒáðéš ƒŕóɱ ýóú.]",
-      "auraAfflicted": "[{target} íš áƒƒļíçţéð ƀý {name}.]"
+      "auraAfflicted": "[{target} íš áƒƒļíçţéð ƀý {name}.]",
+      "auraGainOther": "[{target} ĝáíñš {name}.]"
     },
     "system": {
       "playerDeath": "[Ýóú ĥáʋé ðíéð.]",

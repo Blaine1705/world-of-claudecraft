@@ -6066,7 +6066,8 @@ export const id_ID: EnTranslations = {
       "death": "{name} tewas.",
       "auraGain": "Kamu memperoleh {name}.",
       "auraFade": "{name} memudar darimu.",
-      "auraAfflicted": "{target} terkena {name}."
+      "auraAfflicted": "{target} terkena {name}.",
+      "auraGainOther": "{target} gains {name}."
     },
     "system": {
       "playerDeath": "Kamu telah tewas.",

@@ -4499,6 +4499,7 @@ export type TranslationKeyFlat =
   | 'hud.combat.auraAfflicted'
   | 'hud.combat.auraFade'
   | 'hud.combat.auraGain'
+  | 'hud.combat.auraGainOther'
   | 'hud.combat.cannotMove'
   | 'hud.combat.damageDone'
   | 'hud.combat.damageDoneCrit'

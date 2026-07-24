@@ -125,6 +125,7 @@ import {
 import { ArenaWindow } from './arena_window';
 import { auraDisplayNameFromSource } from './aura_display_name';
 import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
+import { auraGainLogKeyFor, findAuraForGainEvent } from './aura_gain_log';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, createAurasView } from './auras_view';
 import { attachAvatarFallback } from './avatar_fallback';
@@ -10310,8 +10311,12 @@ export class Hud {
               '#d8a0d8',
             );
           } else if (tgt && ev.gained) {
+            const matched = findAuraForGainEvent(tgt.auras, ev.name, ev.auraKind);
             this.combatLog(
-              t('hud.combat.auraAfflicted', { target: entityDisplayName(tgt), name: auraName }),
+              t(auraGainLogKeyFor(matched, ev.auraKind), {
+                target: entityDisplayName(tgt),
+                name: auraName,
+              }),
               '#d8a0d8',
             );
           }

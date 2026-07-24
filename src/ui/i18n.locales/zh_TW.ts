@@ -1807,6 +1807,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.combat.auraGain': '你獲得了 {name}。',
   'hud.combat.auraFade': '{name}從你身上消失。',
   'hud.combat.auraAfflicted': '{target}受到了 {name} 影響。',
+  'hud.combat.auraGainOther': '{target}獲得了 {name}。',
   'hud.system.playerDeath': '你已經死亡。',
   'hud.system.respawn': '你再次感到精力恢復、身體完整。',
   'hud.system.ignoringChat': '已封鎖來自 {name} 的聊天。',
