@@ -1270,6 +1270,20 @@ export class ArchetypeSequencer {
             return 10;
           });
           host.countPrimitive(slot.abilityId, 1);
+          // An earthbound charge tears up the ground it crosses: dusty puffs
+          // kicked along the gallop, not just at the landing. Gated on an
+          // earthy dash (physical debris kit - Onrush, Bruin Charge, Heroic
+          // Leap) so airy/arcane blinks stay clean.
+          if (spec.impact?.debris && spec.palette === 'physical' && slot.tier === 0) {
+            const puffs = 4;
+            for (let k = 1; k <= puffs; k++) {
+              const u = k / (puffs + 1);
+              const px = from.x + (to.x - from.x) * u;
+              const pz = from.z + (to.z - from.z) * u;
+              host.burstAt(px, host.groundYAt(px, pz) + 0.15, pz, 0xbfa980, 6, 0.7, 'smoke');
+            }
+            host.countPrimitive(slot.abilityId, 1);
+          }
         }
         slot.ccStars = Math.max(slot.ccStars, 0.9);
         break;
