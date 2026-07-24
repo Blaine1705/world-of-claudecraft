@@ -2397,6 +2397,7 @@ export const da_DK: EnTranslations = {
       },
       "throttled": "Du laver ting for hurtigt. Vent et øjeblik, og prøv igen.",
       "recipeNotLearned": "Du har ikke lært den opskrift endnu.",
+      "noBagSpace": "You do not have room for the crafted item.",
       "skillReqLine": "Kræver {craft} {skill}",
       "difficultyFull": "Fuld færdighedsforøgelse",
       "difficultyReduced": "Reduceret færdighedsforøgelse",
@@ -2448,6 +2449,9 @@ export const da_DK: EnTranslations = {
       "enchantWrongSlot": "Den fortryllelse kan ikke anvendes på den genstand.",
       "enchantUnknown": "Den fortryllelse eksisterer ikke.",
       "enchantInsufficient": "Du har ikke materialerne til den fortryllelse.",
+      "disenchantNoSpace": "You do not have room for the arcane materials.",
+      "salvageNoSpace": "You do not have room for the salvaged materials.",
+      "enchantNoSpace": "You do not have room for the enchanted item.",
       "disenchantConfirmTitle": "Affortrylle {item}?",
       "disenchantConfirmBody": "Dette ødelægger {item} og giver arkan materiale. Dette kan ikke fortrydes.",
       "disenchantConfirmBodySpecial": "Dette ødelægger et særligt eksemplar af {item} (signeret, mesterværk eller fortryllet) og giver arkan materiale. Dette kan ikke fortrydes.",
@@ -2497,7 +2501,8 @@ export const da_DK: EnTranslations = {
       "notEligible": "Den genstand kan ikke aflæses.",
       "notBound": "Den genstand er ikke bundet.",
       "cannotAfford": "Du har ikke råd til aflæsningsgebyret.",
-      "outOfRange": "Du skal være ved en håndværksstation for at aflæse."
+      "outOfRange": "Du skal være ved en håndværksstation for at aflæse.",
+      "noSpace": "You do not have room for the unbound copy."
     },
     "finder": {
       "title": "Fangekældersfinder",

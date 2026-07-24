@@ -7945,6 +7945,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.comboRequirementUnmet': '你没有达到该配方所需组合的两项制造技能等级。',
   'hudChrome.crafting.throttled': '你制作得太快了，请稍等片刻后再试。',
   'hudChrome.crafting.recipeNotLearned': '你还没有学会这个配方。',
+  'hudChrome.crafting.noBagSpace': '背包空间不足，无法存放制作的物品。',
   // Professions 2.0 (M16 non-Latin fills).
   'hudChrome.crafting.attunementReturnCost':
     '若你离开这个组合，日后想要重归需要完成 {cost} 项补偿任务。',
@@ -9441,6 +9442,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.enchantWrongSlot': '该附魔无法施加于那件物品。',
   'hudChrome.enchanting.enchantUnknown': '该附魔不存在。',
   'hudChrome.enchanting.enchantInsufficient': '你没有该附魔所需的材料。',
+  'hudChrome.enchanting.disenchantNoSpace': '背包空间不足，无法存放奥术材料。',
+  'hudChrome.enchanting.salvageNoSpace': '背包空间不足，无法存放拆解出的材料。',
+  'hudChrome.enchanting.enchantNoSpace': '背包空间不足，无法存放附魔后的物品。',
   'hudChrome.enchanting.disenchantConfirmTitle': '分解{item}？',
   'hudChrome.enchanting.disenchantConfirmBody': '这会摧毁{item}并产出奥术材料。此操作无法撤销。',
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
@@ -9639,6 +9643,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.notBound': '该物品未绑定。',
   'hudChrome.unbind.cannotAfford': '你付不起解绑费用。',
   'hudChrome.unbind.outOfRange': '你必须站在工作台旁才能解绑。',
+  'hudChrome.unbind.noSpace': '背包空间不足，无法存放解绑后的物品。',
   // Professions 2.0 wiki arm: the professions hub rewrite and the
   // /wiki/professions detail pages (M16 non-Latin fills, added with the keys).
   'guide.professions.ringHeading': '制作之轮',

@@ -2397,6 +2397,7 @@ export const pt_BR: EnTranslations = {
       },
       "throttled": "Você está criando rápido demais. Espere um momento e tente de novo.",
       "recipeNotLearned": "Você ainda não aprendeu essa receita.",
+      "noBagSpace": "You do not have room for the crafted item.",
       "skillReqLine": "Requer {craft} {skill}",
       "difficultyFull": "Ganho total de habilidade",
       "difficultyReduced": "Ganho de habilidade reduzido",
@@ -2448,6 +2449,9 @@ export const pt_BR: EnTranslations = {
       "enchantWrongSlot": "Esse encantamento não pode ser aplicado a esse item.",
       "enchantUnknown": "Esse encantamento não existe.",
       "enchantInsufficient": "Você não tem os materiais para esse encantamento.",
+      "disenchantNoSpace": "You do not have room for the arcane materials.",
+      "salvageNoSpace": "You do not have room for the salvaged materials.",
+      "enchantNoSpace": "You do not have room for the enchanted item.",
       "disenchantConfirmTitle": "Desencantar {item}?",
       "disenchantConfirmBody": "Isso destrói {item} e produz materiais arcanos. Não pode ser desfeito.",
       "disenchantConfirmBodySpecial": "Isso destrói uma cópia especial de {item} (assinada, obra-prima ou encantada) e produz materiais arcanos. Não pode ser desfeito.",
@@ -2497,7 +2501,8 @@ export const pt_BR: EnTranslations = {
       "notEligible": "Esse item não pode ser desvinculado.",
       "notBound": "Esse item não está vinculado.",
       "cannotAfford": "Você não pode pagar a taxa de desvincular.",
-      "outOfRange": "Você deve estar em uma bancada de artesanato para desvincular."
+      "outOfRange": "Você deve estar em uma bancada de artesanato para desvincular.",
+      "noSpace": "You do not have room for the unbound copy."
     },
     "finder": {
       "title": "Localizador de Masmorras",

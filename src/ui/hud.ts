@@ -9539,7 +9539,9 @@ export class Hud {
                           ? 'hudChrome.crafting.throttled'
                           : ev.reason === 'recipe_not_learned'
                             ? 'hudChrome.crafting.recipeNotLearned'
-                            : 'hudChrome.crafting.insufficientMaterials',
+                            : ev.reason === 'no_bag_space'
+                              ? 'hudChrome.crafting.noBagSpace'
+                              : 'hudChrome.crafting.insufficientMaterials',
                   ),
               '#ff6b6b',
             );
@@ -9625,7 +9627,9 @@ export class Hud {
                     ? 'hudChrome.unbind.notBound'
                     : ev.reason === 'unbind_cannot_afford'
                       ? 'hudChrome.unbind.cannotAfford'
-                      : 'hudChrome.unbind.outOfRange',
+                      : ev.reason === 'unbind_no_space'
+                        ? 'hudChrome.unbind.noSpace'
+                        : 'hudChrome.unbind.outOfRange',
               ),
               '#ff6b6b',
             );

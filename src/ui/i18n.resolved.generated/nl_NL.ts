@@ -2397,6 +2397,7 @@ export const nl_NL: EnTranslations = {
       },
       "throttled": "Je maakt te snel. Wacht even en probeer het opnieuw.",
       "recipeNotLearned": "Je hebt dat recept nog niet geleerd.",
+      "noBagSpace": "You do not have room for the crafted item.",
       "skillReqLine": "Vereist {craft} {skill}",
       "difficultyFull": "Volledige vaardigheidswinst",
       "difficultyReduced": "Verminderde vaardigheidswinst",
@@ -2448,6 +2449,9 @@ export const nl_NL: EnTranslations = {
       "enchantWrongSlot": "Die betovering kan niet op dat voorwerp worden aangebracht.",
       "enchantUnknown": "Die betovering bestaat niet.",
       "enchantInsufficient": "Je hebt de materialen niet voor die betovering.",
+      "disenchantNoSpace": "You do not have room for the arcane materials.",
+      "salvageNoSpace": "You do not have room for the salvaged materials.",
+      "enchantNoSpace": "You do not have room for the enchanted item.",
       "disenchantConfirmTitle": "{item} onbetoveren?",
       "disenchantConfirmBody": "Dit vernietigt {item} en levert arcanematerialen op. Dit kan niet ongedaan worden gemaakt.",
       "disenchantConfirmBodySpecial": "Dit vernietigt een speciaal exemplaar van {item} (gesigneerd, meesterwerk of betoverd) en levert arcanematerialen op. Dit kan niet ongedaan worden gemaakt.",
@@ -2497,7 +2501,8 @@ export const nl_NL: EnTranslations = {
       "notEligible": "Dat voorwerp kan niet worden ontbonden.",
       "notBound": "Dat voorwerp is niet gebonden.",
       "cannotAfford": "Je kunt de ontbindingskosten niet betalen.",
-      "outOfRange": "Je moet bij een ambachtsstation zijn om te ontbinden."
+      "outOfRange": "Je moet bij een ambachtsstation zijn om te ontbinden.",
+      "noSpace": "You do not have room for the unbound copy."
     },
     "finder": {
       "title": "Kerkerzoekmachine",
