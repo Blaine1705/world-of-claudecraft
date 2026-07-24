@@ -1,4 +1,4 @@
-// Per-copy item-instance tooltip lines (Professions 2.0 Phase 6): the
+// Per-copy item-instance tooltip lines (Professions 2.0): the
 // ItemInstancePayload additions the item tooltip composes around its def-driven
 // card, as pure string builders so every instance variant is Node-testable.
 // Composition order in the tooltip: badge lines (masterwork seal, enchanted
@@ -14,6 +14,8 @@ import type { ItemDef, ItemInstancePayload, Stats } from '../sim/types';
 import { esc } from './esc';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
+import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
+import { svgIcon } from './ui_icons';
 
 const ITEM_STAT_LABEL_KEYS: Partial<Record<keyof Stats, TranslationKey>> = {
   armor: 'itemUi.stats.armor',
@@ -40,8 +42,8 @@ export function itemNumber(value: number, fractionDigits = 0): string {
   });
 }
 
-/** The WORN-slot tooltip payload (Professions 2.0 Phase 14b): exactly the
- *  fields the public eqi wire carries (signer/enchant/rolled, the Phase 12d
+/** The WORN-slot tooltip payload (Professions 2.0): exactly the
+ *  fields the public eqi wire carries (signer/enchant/rolled, the
  *  worn-identity trim), so the offline paperdoll and the online mirror
  *  render identical worn tooltips. Online, equippedInstances is decoded from
  *  the stripped eqi allowlist and never carries bindOnTrade/boundTo/charges;
@@ -60,11 +62,11 @@ export function wornTooltipInstance(
   return worn;
 }
 
-/** The Maker's Bond lines (Professions 2.0 Phase 14b), rendered in the def
+/** The Maker's Bond lines (Professions 2.0), rendered in the def
  *  soulbound line's gold beside it: a commissioned-but-unbound piece warns it
  *  binds to its first trade recipient, a bound piece states the lock. Scoped
  *  to the commission-eligible equipment kinds ONLY (commission.ts), so the
- *  Phase 13 bind-on-trade reagents (kind 'junk') keep their line-free
+ *  bind-on-trade reagents (kind 'junk') keep their line-free
  *  tooltips. The bound line deliberately names NO one: boundTo is an entity
  *  id, not a stable cross-session identity, so a name lookup (or a "you"
  *  compare) could silently lie after a relog; presence alone is the fact the
@@ -76,10 +78,10 @@ export function instanceBindingLines(
 ): string {
   if (!instance || !isCommissionEligibleKind(kind)) return '';
   if (instance.boundTo !== undefined) {
-    return `<div class="tt-sub" style="color:#ffd100">${esc(t('hudChrome.crafting.commissionBound'))}</div>`;
+    return `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.crafting.commissionBound'))}</div>`;
   }
   if (instance.bindOnTrade === true) {
-    return `<div class="tt-sub" style="color:#ffd100">${esc(t('hudChrome.crafting.commissionUnbound'))}</div>`;
+    return `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.crafting.commissionUnbound'))}</div>`;
   }
   return '';
 }
@@ -92,7 +94,7 @@ export function instanceBadgeLines(instance?: ItemInstancePayload): string {
   if (!instance) return '';
   let html = '';
   if (instance.rolled?.masterwork) {
-    html += `<div class="tt-sub" style="color:#ffd100">${esc(t('hudChrome.crafting.masterworkSeal'))}</div>`;
+    html += `<div class="tt-sub tt-masterwork-seal" style="color:var(--gold)"><img class="tt-masterwork-seal-icon" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false"><span>${esc(t('hudChrome.crafting.masterworkSeal'))}</span></div>`;
   }
   if (isEnchantedInstance(instance)) {
     html += `<div class="tt-sub" style="color:${QUALITY_COLOR.uncommon}">${esc(t('hudChrome.crafting.enchantedLine'))}</div>`;
@@ -117,7 +119,7 @@ export function instanceBonusStatLines(instance?: ItemInstancePayload): string {
 }
 
 /** Whether a signed copy of this item KIND reads as a gathered material
- *  (Professions 2.0 Phase 12d). Every signable gathered item (node materials,
+ *  (Professions 2.0). Every signable gathered item (node materials,
  *  corpse components, Pristine specimens) is kind 'junk', while every crafted
  *  recipe output lands on the equip/consume kinds (weapon, armor, food,
  *  potion, elixir, tool, bag), so the signed universe partitions cleanly on
@@ -129,7 +131,7 @@ export function isGatheredProvenanceKind(kind: ItemDef['kind'] | undefined): boo
 }
 
 /** The classic "Crafted by X" flavor line for a signed copy, or "Gathered by
- *  X" when the item's kind marks it as a gathered material (Phase 12d). No
+ *  X" when the item's kind marks it as a gathered material. No
  *  payload change: the same eqi signer field feeds both wordings. Legacy
  *  signed instances (signer without the masterwork flag) render the mark
  *  alone. */
@@ -138,10 +140,12 @@ export function instanceMakersMarkLine(
   kind?: ItemDef['kind'],
 ): string {
   if (!instance?.signer) return '';
-  const key = isGatheredProvenanceKind(kind)
-    ? 'hudChrome.crafting.gatheredBy'
-    : 'hudChrome.crafting.makersMark';
-  return `<div class="tt-sub" style="color:${QUALITY_COLOR.uncommon}">${esc(
-    t(key, { name: instance.signer }),
-  )}</div>`;
+  if (isGatheredProvenanceKind(kind)) {
+    return `<div class="tt-sub" style="color:${QUALITY_COLOR.uncommon}">${esc(
+      t('hudChrome.crafting.gatheredBy', { name: instance.signer }),
+    )}</div>`;
+  }
+  return `<div class="tt-sub tt-makers-mark" style="color:${QUALITY_COLOR.uncommon}">${svgIcon('makers-mark', { cls: 'tt-makers-mark-icon' })}<span>${esc(
+    t('hudChrome.crafting.makersMark', { name: instance.signer }),
+  )}</span></div>`;
 }

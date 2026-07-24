@@ -140,6 +140,7 @@ const UI_PURE_CORES = [
   'src/ui/compass.ts',
   'src/ui/coords.ts',
   'src/ui/hud/quest/quest_tracker.ts',
+  'src/ui/hud/quest/prof_intro_hint_core.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/stat_tooltip_view.ts',
@@ -244,6 +245,9 @@ const UI_PURE_CORES = [
 // water_core (the shore-depth sample shared by build + editor setLevel) follow
 // the same contract for the map editor's realtime terrain/water edits.
 const RENDER_PURE_CORES = [
+  'src/render/camera_boom_core.ts',
+  'src/render/camera_director_core.ts',
+  'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/stations_core.ts',

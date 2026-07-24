@@ -37,7 +37,7 @@ const QUALITY_ORDER: readonly NonNullable<ItemDef['quality']>[] = [
 // new item ids, same rationale content/recipes.ts documents for the same
 // reason (avoids expanding the positional item-name arrays in
 // src/ui/i18n.catalog/items.ts for this issue).
-const SALVAGE_MATERIAL_BY_QUALITY: Readonly<Record<string, string>> = {
+export const SALVAGE_MATERIAL_BY_QUALITY: Readonly<Record<string, string>> = {
   common: 'bone_fragments',
   uncommon: 'linen_scrap',
   rare: 'spider_leg',
@@ -92,7 +92,7 @@ export function resolveSalvage(ctx: SimContext, pid: number, itemId: string): Sa
   if (!isSalvageable(def)) return { ok: false, itemId, reason: 'not_salvageable' };
   if (ctx.countItem(itemId, pid) < 1) return { ok: false, itemId, reason: 'not_held' };
   const meta = ctx.players.get(pid);
-  // Phase 12c shared action throttle (action_throttle.ts): salvage draws
+  // Shared action throttle (action_throttle.ts): salvage draws
   // from the same 10-per-60s budget as crafting, checked (no side effect
   // beyond the window's own natural rollover) before anything is consumed.
   if (meta && !withinActionThrottle(meta, ctx.time)) {
@@ -102,7 +102,13 @@ export function resolveSalvage(ctx: SimContext, pid: number, itemId: string): Sa
   const materialItemId = SALVAGE_MATERIAL_BY_QUALITY[def.quality ?? 'common'] ?? 'bone_fragments';
   const count = salvageYield(def, ctx.rng);
   ctx.addItem(materialItemId, count, pid);
-  if (meta) recordAction(meta);
+  if (meta) {
+    recordAction(meta);
+    // The lifetime salvage counter (soc_first_salvage /
+    // soc_salvage_50). Bumped strictly AFTER the single salvageYield rng
+    // draw above; the bump itself draws nothing.
+    ctx.bumpDeedStat(meta, 'salvagesPerformed', 1);
+  }
   return { ok: true, itemId, materialItemId, count };
 }
 

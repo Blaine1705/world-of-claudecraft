@@ -1,4 +1,4 @@
-// Pins the per-copy instance tooltip lines (Professions 2.0 Phase 6): every
+// Pins the per-copy instance tooltip lines (Professions 2.0): every
 // ItemInstancePayload variant renders its exact line set, so a regression in
 // any arm (seal, enchanted marker, bonus stats, maker's mark, the legacy
 // shapes) fails a decisive assertion. The module is the pure string-builder
@@ -21,6 +21,7 @@ import {
   itemStatName,
   wornTooltipInstance,
 } from '../src/ui/item_instance_tooltip';
+import { svgIcon } from '../src/ui/ui_icons';
 
 describe('item_instance_tooltip', () => {
   it('masterwork copy gets the gold seal and no enchanted marker', () => {
@@ -29,7 +30,10 @@ describe('item_instance_tooltip', () => {
       rolled: { masterwork: true, stats: { str: 2 } },
     });
     expect(html).toContain('Masterwork');
-    expect(html).toContain('#ffd100');
+    expect(html).toContain('color:var(--gold)');
+    expect(html).toContain('class="tt-masterwork-seal-icon"');
+    expect(html).toContain('src="/ui/professions/masterwork_seal.webp"');
+    expect(html).toContain('alt="" aria-hidden="true"');
     expect(html).not.toContain('Enchanted');
   });
 
@@ -87,18 +91,32 @@ describe('item_instance_tooltip', () => {
     expect(instanceMakersMarkLine(undefined)).toBe('');
   });
 
-  it('a gathered-kind signed copy reads Gathered by, a crafted-kind keeps Crafted by (Phase 12d)', () => {
+  it('a gathered-kind signed copy reads Gathered by, a crafted-kind keeps Crafted by', () => {
     // Both arms of the kind split, against real defs from each family.
     expect(ITEMS.copper_ore.kind).toBe('junk');
     const gathered = instanceMakersMarkLine({ signer: 'Anna' }, ITEMS.copper_ore.kind);
     expect(gathered).toContain('Gathered by Anna');
     expect(gathered).not.toContain('Crafted by');
+    expect(gathered).not.toContain('makers-mark');
     expect(ITEMS.ironedge_longsword.kind).toBe('weapon');
     const crafted = instanceMakersMarkLine({ signer: 'Anna' }, ITEMS.ironedge_longsword.kind);
     expect(crafted).toContain('Crafted by Anna');
     expect(crafted).not.toContain('Gathered by');
+    expect(crafted).toContain('tt-makers-mark-icon');
+    expect(crafted).toContain('aria-hidden="true"');
     // No kind at all (a caller without the def) stays the crafted wording.
     expect(instanceMakersMarkLine({ signer: 'Anna' })).toContain('Crafted by Anna');
+  });
+
+  it("uses the exact project-owned maker's-mark stroke as a decorative currentColor glyph", () => {
+    const glyph = svgIcon('makers-mark');
+    expect(glyph).toContain('viewBox="0 0 512 512"');
+    expect(glyph).toContain(
+      'd="M82 390C126 341 151 273 157 204C162 156 213 139 249 168C284 196 274 247 236 262C204 274 177 253 178 220C204 276 258 326 323 340C364 349 397 329 426 296C393 365 315 400 231 382C171 369 122 363 82 390"',
+    );
+    expect(glyph).toContain('fill="none" stroke="currentColor" stroke-width="46"');
+    expect(glyph).toContain('stroke-linecap="round" stroke-linejoin="round"');
+    expect(glyph).toContain('aria-hidden="true"');
   });
 
   it('itemNumber pins fraction digits and itemStatName capitalizes unknown keys', () => {
@@ -108,15 +126,15 @@ describe('item_instance_tooltip', () => {
   });
 });
 
-// The Maker's Bond lines (Professions 2.0 Phase 14b): commission tooltip copy
+// The Maker's Bond lines (Professions 2.0): commission tooltip copy
 // is scoped to the commission-eligible equipment kinds and renders in the def
 // soulbound line's gold. The bound line names NO one (boundTo is an entity
 // id, not a stable cross-session identity), so there is no name arm to pin.
-describe('instanceBindingLines (Phase 14b commission lines)', () => {
+describe('instanceBindingLines (commission lines)', () => {
   it('an armed-unbound equipment copy warns it binds to the first recipient', () => {
     const html = instanceBindingLines({ bindOnTrade: true }, 'weapon');
     expect(html).toContain('Commission piece: binds to the first recipient');
-    expect(html).toContain('#ffd100');
+    expect(html).toContain('color:var(--gold)');
   });
 
   it('a bound equipment copy states the lock (and never the unbound warning)', () => {
@@ -133,7 +151,7 @@ describe('instanceBindingLines (Phase 14b commission lines)', () => {
     );
   });
 
-  it('the Phase 13 reagent shape (junk kind) renders NOTHING: reagent tooltips stay line-free', () => {
+  it('the bound-reagent shape (junk kind) renders NOTHING: reagent tooltips stay line-free', () => {
     expect(instanceBindingLines({ bindOnTrade: true }, 'junk')).toBe('');
     expect(instanceBindingLines({ bindOnTrade: true, boundTo: 999 }, 'junk')).toBe('');
   });
@@ -145,7 +163,7 @@ describe('instanceBindingLines (Phase 14b commission lines)', () => {
   });
 });
 
-// The worn-slot projection (Phase 14b): the paperdoll renders exactly the
+// The worn-slot projection: the paperdoll renders exactly the
 // public eqi allowlist (signer/enchant/rolled) in BOTH hosts, so the offline
 // full payload can never show the bond lines on worn gear that the online
 // eqi-trimmed mirror lacks. char_window.ts is pinned to route through it.
@@ -184,7 +202,7 @@ describe('wornTooltipInstance (the eqi-mirror worn projection)', () => {
   });
 });
 
-// The Phase 12d provenance partition: the signed universe splits cleanly on
+// The provenance partition: the signed universe splits cleanly on
 // item KIND. Every signable gathered item (corpse components, Pristine
 // specimens, the zone node materials) is kind 'junk'; every crafted recipe
 // output lands on a non-junk kind. If either side ever drifts (a junk-kind
@@ -192,7 +210,7 @@ describe('wornTooltipInstance (the eqi-mirror worn projection)', () => {
 // signed copies silently flips, so both sides are pinned against the live
 // content tables. Fish are out of scope by construction: they share kind
 // 'food' with crafted meals but fishing never signs a catch.
-describe('isGatheredProvenanceKind partition over the live content (Phase 12d)', () => {
+describe('isGatheredProvenanceKind partition over the live content', () => {
   it('every signable gathered item id resolves to a gathered-kind def', () => {
     const gatheredIds = [
       ...Object.values(HARVEST_COMPONENT_ITEMS),
@@ -230,9 +248,10 @@ import { readFileSync } from 'node:fs';
 
 describe('hud.itemTooltip composition order (source pins)', () => {
   const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+  const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
   const badges = hud.indexOf('instanceBadgeLines(instance)');
   const bonus = hud.indexOf('instanceBonusStatLines(instance)');
-  // The mark line takes the def's kind too (Phase 12d): the gathered-vs-crafted
+  // The mark line takes the def's kind too: the gathered-vs-crafted
   // wording split resolves from item.kind at the one composition site.
   const mark = hud.indexOf('instanceMakersMarkLine(instance, item.kind)');
   const soulbound = hud.indexOf("t('hudChrome.itemSoulbound')");
@@ -253,5 +272,14 @@ describe('hud.itemTooltip composition order (source pins)', () => {
     expect(bonus).toBeGreaterThan(badges);
     expect(mark).toBeGreaterThan(bonus);
     expect(mark).toBeGreaterThan(setBlock);
+  });
+
+  it('sizes the authored marks at their manifest live sizes and follows tooltip scaling', () => {
+    expect(hudCss).toMatch(
+      /#tooltip \.tt-masterwork-seal-icon[\s\S]*?width: calc\(20px \* var\(--tooltip-scale, 1\)\)/,
+    );
+    expect(hudCss).toMatch(
+      /#tooltip \.tt-makers-mark-icon[\s\S]*?width: calc\(16px \* var\(--tooltip-scale, 1\)\)/,
+    );
   });
 });

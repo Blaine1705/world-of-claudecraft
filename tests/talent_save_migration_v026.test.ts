@@ -34,7 +34,7 @@ describe('talent production save migrations', () => {
       class: 'warrior',
       note: 'Pinned representative stable-Warrior JSONB save; contains no account or player PII.',
     });
-    // Re-pinned for Phase 14: the fixture's active questLog ids became the
+    // Re-pinned: the fixture's active questLog ids became the
     // real q_spiders/q_wolves because the load arm now prunes unknown active
     // quest ids (tests/quest_log_normalization.test.ts owns that contract).
     expect(createHash('sha256').update(fixtureBytes).digest('hex')).toBe(
@@ -151,7 +151,7 @@ describe('talent production save migrations', () => {
     expect(first.bank).toEqual(fixture.state.bank);
     expect(first.equipment).toEqual(fixture.state.equipment);
     // The fixture's active questLog ids are REAL quests (q_spiders, q_wolves):
-    // since Phase 14 the load arm prunes unknown active quest ids
+    // the load arm prunes unknown active quest ids
     // (tests/quest_log_normalization.test.ts), while questsDone keeps its
     // synthetic q_fixture_done, pinning that done-history survives unknown ids.
     expect(first.questLog).toEqual(fixture.state.questLog);

@@ -58,6 +58,7 @@ import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { BagItemDrag, ItemDragState } from './item_drag_state';
 import { resolveDropTargetAt } from './item_drop_hit_test';
 import type { PainterHostPresentation } from './painter_host';
+import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
 import { tSim } from './sim_i18n';
 import { bindTouchItemDrag } from './touch_item_drag';
 import { svgIcon } from './ui_icons';
@@ -179,7 +180,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  window owns the paperdoll drop (and its refusals); this is the touch arm's way
    *  in, since a finger release has no drop event to land on that window. */
   dropOnEquipSlot(itemId: string, slot: EquipSlot): void;
-  /** Open the Phase 13 bag-item action menu (Disenchant / Salvage / Apply Enchant)
+  /** Open the bag-item action menu (Disenchant / Salvage / Apply Enchant)
    *  for a stack at a viewport point. `runDefault` runs the exact classic
    *  left-click action for the clicked slot, so the menu's first row stays
    *  byte-identical to a plain click. */
@@ -515,24 +516,33 @@ export class BagsWindow {
       this.bindBagCellDrop(row, cell);
       const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
       const itemName = itemDisplayName(item);
+      const isMasterwork = s.instance?.rolled?.masterwork === true;
       row.style.setProperty('--bag-slot-quality', qColor);
       // An instanced stack's accessible name carries the per-copy flag the
       // aria-hidden corner marker shows sighted players (the review's a11y
-      // arm); plain stacks keep the pre-12d label.
+      // arm); plain stacks keep the plain label.
+      const itemAriaKey = isMasterwork
+        ? 'hudChrome.bags.itemAriaMasterwork'
+        : s.instance
+          ? 'hudChrome.bags.itemAriaInstanced'
+          : 'itemUi.bags.itemAria';
       row.setAttribute(
         'aria-label',
-        t(s.instance ? 'hudChrome.bags.itemAriaInstanced' : 'itemUi.bags.itemAria', {
+        t(itemAriaKey, {
           item: itemName,
           count: formatNumber(s.count, { maximumFractionDigits: 0 }),
         }),
       );
-      // The instanced-slot corner marker (Professions 2.0 Phase 12d): every
-      // per-copy stack (signed / enchanted / masterwork) shows a static corner
-      // tab on the cell itself, desktop and touch alike (no hover needed; the
-      // long-press tooltip stays the detail surface). Composes WITH the count
-      // badge: an instanced stack with count > 1 renders both.
-      const instanceMark = s.instance ? '<span class="bi-instance" aria-hidden="true"></span>' : '';
-      row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      // The instanced-slot corner marker (Professions 2.0): a plain
+      // signed/enchanted copy keeps the static tab, while a masterwork replaces
+      // it with the authored seal (never both). Either treatment composes with
+      // the count badge and stays visible without hover on desktop and touch.
+      const instanceMark =
+        s.instance && !isMasterwork ? '<span class="bi-instance" aria-hidden="true"></span>' : '';
+      const masterworkSeal = isMasterwork
+        ? `<img class="bi-masterwork-seal" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false">`
+        : '';
+      row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}${masterworkSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       row.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the stack (its
         // tooltip is already shown) instead of running its action (use / sell /
@@ -553,7 +563,7 @@ export class BagsWindow {
           this.deps.insertItemChatLink(s.itemId);
           return;
         }
-        // Touch has no right-click, so a tap on an item with a Phase 13 action
+        // Touch has no right-click, so a tap on an item with an action
         // (Disenchant / Salvage / Apply Enchant) opens the action menu instead of
         // running the classic action directly; the menu's first row is that
         // classic action, so nothing is lost. A plain item taps straight through,
@@ -588,7 +598,7 @@ export class BagsWindow {
           return;
         }
         ev.preventDefault();
-        // An item with a Phase 13 action (Disenchant / Salvage / Apply Enchant)
+        // An item with an action (Disenchant / Salvage / Apply Enchant)
         // opens the action menu, whose FIRST row is the classic left-click action
         // so that binding survives. Every other item keeps today's behavior
         // byte-identical: right-click runs the SAME action as left-click (use /
@@ -906,7 +916,7 @@ export class BagsWindow {
     };
   }
 
-  // Whether the Phase 13 action menu should open for this item. Offered ONLY in
+  // Whether the action menu should open for this item. Offered ONLY in
   // the plain-use default mode (never trade / mail / market / vendor / bank /
   // pet-feed, whose own click owns the slot), mirroring bagDestroyAction's
   // transactional-mode gate, and only when the item has an eligible action.
