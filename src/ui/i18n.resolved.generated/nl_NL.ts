@@ -5094,6 +5094,7 @@ export const nl_NL: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Houdervoordelen zijn actief. Verbind de app wanneer je moet ondertekenen of uitgeven.",
     "extensionHelp": "Om hier een portemonnee te zien, houd je een browserextensie voor portemonnees zoals Solflare Wallet actief.",
     "mobileAppHelp": "Kies Phantom of Solflare. Je portemonnee-app vraagt om goedkeuring. Houd dit spel open en keer ernaar terug wanneer je klaar bent.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Portemonneeverbindingen zijn nog niet beschikbaar in de beginscherm-app. Open World of ClaudeCraft in Safari of Chrome om Phantom of Solflare te gebruiken.",
     "openAppTitle": "Doorgaan in {wallet}",
     "openAppHelp": "Open {wallet} om dit verzoek te bekijken. Houd dit speltabblad open terwijl de portemonnee-app actief is.",

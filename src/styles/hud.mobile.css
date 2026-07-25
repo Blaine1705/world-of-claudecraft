@@ -1404,6 +1404,52 @@
   body.mobile-touch #daily-rewards-button {
     display: none !important;
   }
+  /* Seeker promotes the existing mobile reward action out of More and into the
+     shortcut grid directly below Chat. Keep the same element/listener and show
+     only the established desktop chest artwork. */
+  body.mobile-touch.seeker-wallet-enabled #mobile-combat-controls {
+    column-gap: 12px;
+    row-gap: 8px;
+  }
+  body.mobile-touch.seeker-wallet-enabled #mobile-combat-controls #mobile-daily-rewards {
+    grid-column: 1;
+    grid-row: 2;
+    position: static;
+    display: flex !important;
+    width: 58px;
+    height: 54px;
+    min-width: 58px;
+    min-height: 54px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: url("/ui/daily-rewards/treasure_chest.webp") center / 48px 48px no-repeat;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  body.mobile-touch.seeker-wallet-enabled
+    #mobile-combat-controls
+    #mobile-daily-rewards
+    :is(.ui-icon, .mobile-label) {
+    display: none !important;
+  }
+  body.mobile-touch.seeker-wallet-enabled
+    #mobile-combat-controls
+    #mobile-daily-rewards:active {
+    transform: scale(0.92);
+  }
+  body.mobile-touch.seeker-wallet-enabled
+    #mobile-combat-controls
+    #mobile-daily-rewards:focus-visible {
+    border-radius: 8px;
+    outline: 2px solid var(--gold, #ffd65a);
+    outline-offset: 2px;
+  }
   /* Idle-fade (mobile_chrome_fade.ts arms .mobile-chrome-idle on body after a
      stretch of no touch): recedes the low-frequency chrome (the top-left
      Chat/Social/More trio and the daily-chest rail), instantly restored on

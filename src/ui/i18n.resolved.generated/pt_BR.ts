@@ -5094,6 +5094,7 @@ export const pt_BR: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "As vantagens de titular estão ativas. Conecte o app quando precisar assinar ou gastar.",
     "extensionHelp": "Para ver uma carteira aqui, mantenha ativa uma extensão de carteira do navegador, como a Solflare Wallet.",
     "mobileAppHelp": "Escolha Phantom ou Solflare. Seu app de carteira pedirá aprovação. Mantenha o jogo aberto e retorne a ele quando terminar.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "As conexões de carteira ainda não estão disponíveis no aplicativo da Tela Inicial. Abra o World of ClaudeCraft no Safari ou Chrome para usar Phantom ou Solflare.",
     "openAppTitle": "Continuar em {wallet}",
     "openAppHelp": "Abra {wallet} para revisar esta solicitação. Mantenha esta aba do jogo aberta enquanto o app da carteira estiver ativo.",

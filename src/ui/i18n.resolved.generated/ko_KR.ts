@@ -5094,6 +5094,7 @@ export const ko_KR: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "보유자 혜택이 활성화되었습니다. 서명이나 지출이 필요할 때 앱을 연결하세요.",
     "extensionHelp": "여기에 지갑이 표시되려면 Solflare Wallet 같은 브라우저 지갑 확장 프로그램이 활성화되어 있어야 합니다.",
     "mobileAppHelp": "Phantom 또는 Solflare를 선택하세요. 지갑 앱에서 승인을 요청합니다. 게임을 열어 둔 채 완료 후 돌아오세요.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "홈 화면 앱에서는 아직 지갑 연결을 사용할 수 없습니다. Phantom 또는 Solflare를 사용하려면 Safari나 Chrome에서 World of ClaudeCraft를 여세요.",
     "openAppTitle": "{wallet}에서 계속",
     "openAppHelp": "{wallet}을 열어 이 요청을 확인하세요. 지갑 앱을 사용하는 동안 이 게임 탭을 열어 두세요.",

@@ -5094,6 +5094,7 @@ export const zh_TW: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "持有者特權已啟用。需要簽名或花費時請連接應用程式。",
     "extensionHelp": "若要在此處看到錢包，請保持 Solflare Wallet 等瀏覽器錢包擴充功能處於啟用狀態。",
     "mobileAppHelp": "選擇 Phantom 或 Solflare。錢包應用程式會要求核准。請保持遊戲開啟，完成後返回遊戲。",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "主畫面應用程式目前尚不支援連接錢包。若要使用 Phantom 或 Solflare，請在 Safari 或 Chrome 中開啟 World of ClaudeCraft。",
     "openAppTitle": "在 {wallet} 中繼續",
     "openAppHelp": "開啟 {wallet} 檢視此請求。錢包應用程式啟用時，請保持此遊戲分頁開啟。",

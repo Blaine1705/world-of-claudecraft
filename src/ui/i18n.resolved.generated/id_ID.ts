@@ -5094,6 +5094,7 @@ export const id_ID: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Manfaat pemegang aktif. Hubungkan aplikasi saat Anda perlu menandatangani atau membelanjakan.",
     "extensionHelp": "Agar dompet tampil di sini, biarkan ekstensi dompet peramban seperti Solflare Wallet tetap aktif.",
     "mobileAppHelp": "Pilih Phantom atau Solflare. Aplikasi dompetmu akan meminta persetujuan. Jaga permainan ini tetap terbuka dan kembali ke sana saat selesai.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Koneksi dompet belum tersedia di aplikasi Layar Utama. Buka World of ClaudeCraft di Safari atau Chrome untuk menggunakan Phantom atau Solflare.",
     "openAppTitle": "Lanjutkan di {wallet}",
     "openAppHelp": "Buka {wallet} untuk meninjau permintaan ini. Jaga tab permainan ini tetap terbuka saat aplikasi dompet aktif.",

@@ -1,6 +1,7 @@
 import type { IncomingMessage } from 'node:http';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  androidAppIntegrityAllowed,
   createNativeAttestationChallenge,
   nativeAttestationRequired,
   verifyNativeAttestation,
@@ -82,5 +83,16 @@ describe('native attestation', () => {
     await expect(
       verifyNativeAttestationChallenge(request, appleProof, 'apple'),
     ).resolves.toBeNull();
+  });
+
+  it('accepts a non-Play Seeker build only with an explicitly trusted certificate', () => {
+    const dappStoreVerdict = {
+      appRecognitionVerdict: 'UNRECOGNIZED_VERSION',
+      certificateSha256Digest: ['release-cert'],
+    };
+    expect(androidAppIntegrityAllowed(dappStoreVerdict, ['release-cert'], true)).toBe(true);
+    expect(androidAppIntegrityAllowed(dappStoreVerdict, [], true)).toBe(false);
+    expect(androidAppIntegrityAllowed(dappStoreVerdict, ['attacker-cert'], true)).toBe(false);
+    expect(androidAppIntegrityAllowed(dappStoreVerdict, ['release-cert'], false)).toBe(false);
   });
 });

@@ -5094,6 +5094,7 @@ export const sv_SE: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Innehavarförmåner är aktiva. Anslut appen när du behöver signera eller spendera.",
     "extensionHelp": "För att se en plånbok här, håll ett webbläsartillägg för plånböcker som Solflare Wallet aktivt.",
     "mobileAppHelp": "Välj Phantom eller Solflare. Din plånboksapp ber om godkännande. Håll det här spelet öppet och återgå till det när du är klar.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Plånboksanslutningar är ännu inte tillgängliga i hemskärmsappen. Öppna World of ClaudeCraft i Safari eller Chrome för att använda Phantom eller Solflare.",
     "openAppTitle": "Fortsätt i {wallet}",
     "openAppHelp": "Öppna {wallet} för att granska denna begäran. Håll denna spelflik öppen medan plånboksappen är aktiv.",

@@ -5094,6 +5094,7 @@ export const en: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Holder perks are active. Connect the app when you need to sign or spend.",
     "extensionHelp": "Choose an installed browser wallet, or open Reown AppKit for Phantom, Solflare, Backpack, and more.",
     "mobileAppHelp": "Choose Phantom or Solflare. Your wallet app will ask for approval. Keep this game open and return to it when finished.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Wallet connections are not available in the Home Screen app yet. Open World of ClaudeCraft in Safari or Chrome to use Phantom or Solflare.",
     "openAppTitle": "Continue in {wallet}",
     "openAppHelp": "Open {wallet} to review this request. Keep this game tab open while the wallet app is active.",

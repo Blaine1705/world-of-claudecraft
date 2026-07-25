@@ -5094,6 +5094,7 @@ export const ja_JP: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "ホルダー特典が有効です。署名や支払いが必要なときはアプリを接続してください。",
     "extensionHelp": "ここにウォレットを表示するには、Solflare Wallet などのブラウザ用ウォレット拡張機能を有効にしておいてください。",
     "mobileAppHelp": "Phantom または Solflare を選択してください。ウォレットアプリで承認を求められます。ゲームを開いたままにし、完了後に戻ってください。",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "ホーム画面アプリでは、まだウォレットに接続できません。Phantom または Solflare を使用するには、Safari か Chrome で World of ClaudeCraft を開いてください。",
     "openAppTitle": "{wallet} で続行",
     "openAppHelp": "{wallet} を開いてこのリクエストを確認してください。ウォレットアプリの使用中も、このゲームタブを開いたままにしてください。",

@@ -5094,6 +5094,7 @@ export const de_DE: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Inhaberboni sind aktiv. Verbindet die App, wenn Ihr unterschreiben oder ausgeben müsst.",
     "extensionHelp": "Damit hier eine Wallet erscheint, halte eine Browser-Wallet-Erweiterung wie Solflare Wallet aktiv.",
     "mobileAppHelp": "Wähle Phantom oder Solflare. Deine Wallet-App wird um Genehmigung bitten. Halte dieses Spiel geöffnet und kehre zu ihm zurück, wenn du fertig bist.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Wallet-Verbindungen sind in der Startbildschirm-App noch nicht verfügbar. Öffne World of ClaudeCraft in Safari oder Chrome, um Phantom oder Solflare zu nutzen.",
     "openAppTitle": "Weiter in {wallet}",
     "openAppHelp": "Öffne {wallet}, um diese Anfrage zu prüfen. Halte diesen Spieltab geöffnet, während die Wallet-App aktiv ist.",

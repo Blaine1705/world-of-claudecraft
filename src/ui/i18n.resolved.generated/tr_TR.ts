@@ -5094,6 +5094,7 @@ export const tr_TR: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Sahip ayrıcalıkları etkin. İmzalamanız veya harcamanız gerektiğinde uygulamayı bağlayın.",
     "extensionHelp": "Burada bir cüzdan görmek için Solflare Wallet gibi bir tarayıcı cüzdan uzantısını etkin tutun.",
     "mobileAppHelp": "Phantom veya Solflare'i seç. Cüzdan uygulan onay isteyecek. Bu oyunu açık bırak ve bittiğinde geri dön.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Ana Ekran uygulamasında cüzdan bağlantıları henüz mevcut değil. Phantom veya Solflare kullanmak için World of ClaudeCraft'ı Safari veya Chrome'da aç.",
     "openAppTitle": "{wallet}'da devam et",
     "openAppHelp": "Bu isteği incelemek için {wallet}'u aç. Cüzdan uygulaması etkinken bu oyun sekmesini açık bırak.",

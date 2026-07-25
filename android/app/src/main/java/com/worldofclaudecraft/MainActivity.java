@@ -11,6 +11,7 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(NativeAttestationPlugin.class);
         registerPlugin(NativeAppUpdatePlugin.class);
+        registerPlugin(NativeSolanaMobilePlugin.class);
         super.onCreate(savedInstanceState);
         enterImmersiveMode();
     }

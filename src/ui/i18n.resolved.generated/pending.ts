@@ -13,111 +13,131 @@ export const pending: Record<string, readonly string[]> = {
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ],
   "es_ES": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ],
   "fr_FR": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ],
   "fr_CA": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ],
   "en_CA": [],
   "it_IT": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ],
   "de_DE": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ],
   "zh_CN": [
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ],
   "zh_TW": [
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ],
   "ko_KR": [
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ],
   "ja_JP": [
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ],
   "pt_BR": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ],
   "ru_RU": [
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ],
   "cs_CZ": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ],
   "nl_NL": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ],
   "pl_PL": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ],
   "id_ID": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ],
   "tr_TR": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ],
   "sv_SE": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ],
   "vi_VN": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ],
   "da_DK": [
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "itemUi.vendor.buyStackAria",
+    "wallet.seekerAppHelp"
   ]
 };

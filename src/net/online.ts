@@ -859,6 +859,16 @@ export class Api {
     await this.delete('/api/wallet/link', {});
   }
 
+  async seekerEntitlement(): Promise<boolean> {
+    const data = await this.get('/api/seeker/entitlement');
+    return data.entitled === true;
+  }
+
+  async claimSeekerEntitlement(nativeAttestation: unknown): Promise<boolean> {
+    const data = await this.post('/api/seeker/entitlement', { nativeAttestation });
+    return data.entitled === true;
+  }
+
   // ── Discord link/login + status ────────────────────────────────────────────
   // Returns the discord.com authorize URL the browser navigates to (login = new
   // session, link = attach to the current account).

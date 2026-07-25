@@ -5094,6 +5094,7 @@ export const vi_VN: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Đặc quyền chủ sở hữu đang hoạt động. Kết nối ứng dụng khi bạn cần ký hoặc chi tiêu.",
     "extensionHelp": "Để thấy ví ở đây, hãy giữ một tiện ích ví trình duyệt như Solflare Wallet đang hoạt động.",
     "mobileAppHelp": "Hãy chọn Phantom hoặc Solflare. Ứng dụng ví của bạn sẽ yêu cầu phê duyệt. Giữ trò chơi này mở và quay lại khi hoàn thành.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Kết nối ví chưa có sẵn trong ứng dụng Màn hình chính. Hãy mở World of ClaudeCraft trong Safari hoặc Chrome để sử dụng Phantom hoặc Solflare.",
     "openAppTitle": "Tiếp tục trong {wallet}",
     "openAppHelp": "Hãy mở {wallet} để xem xét yêu cầu này. Giữ tab trò chơi này mở trong khi ứng dụng ví đang hoạt động.",

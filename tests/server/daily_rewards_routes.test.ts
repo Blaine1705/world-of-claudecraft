@@ -16,8 +16,8 @@
 // ladder serves, so every body, the lenient Number(...)||limit decode, and mark-payout's
 // validation prose are byte-identical. There is NO withBody anywhere (spin reads no body;
 // mark-payout self-reads via the core's un-caught readBody, the
-// dailyRewardsOpsBodyValidationRemap deviation) and NO rate limiter on any of the eight
-// (legacy has none; the spin throttle decision is the two-tier rate limiter's).
+// dailyRewardsOpsBodyValidationRemap deviation). Native Seeker spin requests use the shared
+// handler's IP-and-account ownership-RPC limiter; web requests retain the legacy behavior.
 //
 // This file pins the ROUTE LAYER. The existing tests/daily_rewards_table.test.ts covers the
 // DailyRewardService internals against a hand-written FakeDailyRewardDb; here the service
@@ -421,9 +421,12 @@ describe('daily-rewards route table', () => {
     }
   });
 
-  it('mounts exactly one middleware on every route, with no body schema (no withBody)', () => {
+  it('adds Seeker verification admission only to spin, with no body schema (no withBody)', () => {
     for (const r of routes) {
-      expect(Array.isArray(r.middleware) && r.middleware.length === 1, r.path).toBe(true);
+      const expectedMiddlewareCount =
+        r.method === 'POST' && r.path === '/api/daily-rewards/spin' ? 2 : 1;
+      expect(Array.isArray(r.middleware) && r.middleware.length === expectedMiddlewareCount, r.path)
+        .toBe(true);
       expect(r.schema, r.path).toBeUndefined();
     }
   });

@@ -5094,6 +5094,7 @@ export const ru_RU: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Привилегии держателя активны. Подключайте приложение, когда нужно подписать или потратить.",
     "extensionHelp": "Чтобы кошелек появился здесь, держите активным браузерное расширение кошелька, например Solflare Wallet.",
     "mobileAppHelp": "Выберите Phantom или Solflare. Приложение кошелька запросит подтверждение. Не закрывайте игру и вернитесь в нее после завершения.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Подключение кошелька пока недоступно в приложении с главного экрана. Для Phantom или Solflare откройте World of ClaudeCraft в Safari или Chrome.",
     "openAppTitle": "Продолжить в {wallet}",
     "openAppHelp": "Откройте {wallet}, чтобы проверить этот запрос. Не закрывайте вкладку с игрой, пока открыто приложение кошелька.",

@@ -8851,6 +8851,7 @@ export type TranslationKeyFlat =
   | 'wallet.openAppHelp'
   | 'wallet.openAppTitle'
   | 'wallet.preparingAppButton'
+  | 'wallet.seekerAppHelp'
   | 'wallet.signOut'
   | 'wallet.signOutAria'
   | 'wallet.signOutTitle'

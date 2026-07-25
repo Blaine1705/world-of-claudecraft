@@ -5094,6 +5094,7 @@ export const da_DK: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Ejerfordele er aktive. Forbind appen, når du har brug for at underskrive eller bruge midler.",
     "extensionHelp": "For at se en pung her skal du holde en browser-pungudvidelse som Solflare Wallet aktiv.",
     "mobileAppHelp": "Vælg Phantom eller Solflare. Din pung-app beder om godkendelse. Hold dette spil åbent og vend tilbage, når du er færdig.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Pungforbindelser er endnu ikke tilgængelige i startskærmsappen. Åbn World of ClaudeCraft i Safari eller Chrome for at bruge Phantom eller Solflare.",
     "openAppTitle": "Fortsæt i {wallet}",
     "openAppHelp": "Åbn {wallet} for at gennemgå denne anmodning. Hold denne spil-fane åben, mens pung-appen er aktiv.",

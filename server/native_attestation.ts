@@ -64,6 +64,25 @@ function normalizeBase64Url(value: unknown): string {
     : '';
 }
 
+export function androidAppIntegrityAllowed(
+  appIntegrity: Record<string, unknown> | undefined,
+  expectedCerts: readonly string[],
+  allowExpectedNonPlayBuild: boolean,
+): boolean {
+  const appVerdict = appIntegrity?.appRecognitionVerdict;
+  if (
+    appVerdict !== 'PLAY_RECOGNIZED' &&
+    !(allowExpectedNonPlayBuild && appVerdict === 'UNRECOGNIZED_VERSION')
+  ) {
+    return false;
+  }
+  const verdictCerts = Array.isArray(appIntegrity?.certificateSha256Digest)
+    ? appIntegrity.certificateSha256Digest.filter((s): s is string => typeof s === 'string')
+    : [];
+  if (allowExpectedNonPlayBuild && expectedCerts.length === 0) return false;
+  return expectedCerts.length === 0 || expectedCerts.some((cert) => verdictCerts.includes(cert));
+}
+
 export function nativeAttestationRequired(env: NodeJS.ProcessEnv = process.env): boolean {
   const v = String(env.NATIVE_ATTESTATION_REQUIRED ?? '').toLowerCase();
   if (v === '1' || v === 'true') return true;
@@ -144,7 +163,7 @@ export async function verifyNativeAttestationChallenge(
   if (nativeAttestationRequired()) {
     const valid =
       src.platform === 'android'
-        ? await verifyAndroidIntegrity(src.token, challenge)
+        ? await verifyAndroidIntegrity(src.token, challenge, expectedAction === 'seeker')
         : src.platform === 'ios'
           ? await verifyAppleDeviceCheck(src.token, src.challengeId)
           : false;
@@ -202,7 +221,11 @@ async function googleAccessToken(): Promise<string | null> {
   return googleTokenCache.accessToken;
 }
 
-async function verifyAndroidIntegrity(token: string, challenge: NativeChallenge): Promise<boolean> {
+async function verifyAndroidIntegrity(
+  token: string,
+  challenge: NativeChallenge,
+  allowExpectedNonPlayBuild = false,
+): Promise<boolean> {
   const accessToken = await googleAccessToken();
   const packageName = process.env.GOOGLE_PLAY_INTEGRITY_PACKAGE_NAME || DEFAULT_PACKAGE_NAME;
   if (!accessToken) return false;
@@ -231,17 +254,11 @@ async function verifyAndroidIntegrity(token: string, challenge: NativeChallenge)
   if (normalizedVerdictNonce !== normalizedExpectedNonce) return false;
   if (requestDetails?.requestPackageName !== packageName) return false;
   if (appIntegrity?.packageName !== packageName) return false;
-  if (appIntegrity?.appRecognitionVerdict !== 'PLAY_RECOGNIZED') return false;
-  const verdictCerts = Array.isArray(appIntegrity?.certificateSha256Digest)
-    ? appIntegrity.certificateSha256Digest.filter((s): s is string => typeof s === 'string')
-    : [];
   const certs = String(process.env.GOOGLE_PLAY_INTEGRITY_CERT_DIGESTS ?? '')
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
-  if (certs.length > 0) {
-    if (!certs.some((cert) => verdictCerts.includes(cert))) return false;
-  }
+  if (!androidAppIntegrityAllowed(appIntegrity, certs, allowExpectedNonPlayBuild)) return false;
   const requiredDevice =
     process.env.GOOGLE_PLAY_INTEGRITY_DEVICE_VERDICT || 'MEETS_DEVICE_INTEGRITY';
   const deviceVerdicts = Array.isArray(deviceIntegrity?.deviceRecognitionVerdict)

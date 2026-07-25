@@ -5094,6 +5094,7 @@ export const cs_CZ: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Výhody držitele jsou aktivní. Připoj aplikaci, až budeš potřebovat podepisovat nebo utrácet.",
     "extensionHelp": "Aby se tu peněženka zobrazila, nech aktivní rozšíření prohlížeče, například Solflare Wallet.",
     "mobileAppHelp": "Zvol Phantom nebo Solflare. Tvoje aplikace peněženky požádá o schválení. Nechej tuto hru otevřenou a po dokončení se do ní vrať.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Připojení peněženky není zatím v aplikaci z domovské obrazovky dostupné. Otevři World of ClaudeCraft v Safari nebo Chrome pro použití Phantom nebo Solflare.",
     "openAppTitle": "Pokračovat v {wallet}",
     "openAppHelp": "Otevři {wallet} pro kontrolu tohoto požadavku. Nechej tuto záložku hry otevřenou, zatímco je aplikace peněženky aktivní.",
