@@ -15,7 +15,7 @@ import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import { QUESTS } from '../src/sim/data';
 import { acceptQuest, computeQuestState, turnInQuest } from '../src/sim/quests/quest_commands';
 import { Sim } from '../src/sim/sim';
-import type { Entity, QuestProgress } from '../src/sim/types';
+import { ALL_CLASSES, type Entity, type PlayerClass, type QuestProgress } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 const FINAL_QUEST = 'q_rite_of_redemption';
@@ -56,7 +56,7 @@ describe('paladin Divine Tome: recall_the_fallen is quest-gated, not trained', (
 describe('paladin Divine Tome: the chain is class-locked and ordered', () => {
   const empty = new Map<string, QuestProgress>();
 
-  function state(questId: string, done: Set<string>, level: number, cls: 'paladin' | 'warrior') {
+  function state(questId: string, done: Set<string>, level: number, cls: PlayerClass) {
     return computeQuestState(questId, empty, done, level, undefined, undefined, cls);
   }
 
@@ -106,6 +106,41 @@ describe('paladin Divine Tome: the chain is class-locked and ordered', () => {
     expect(state(FINAL_QUEST, afterStep1, 5, 'paladin')).toBe('unavailable'); // level gate
     expect(state(FINAL_QUEST, afterStep1, 6, 'paladin')).toBe('available');
     expect(state(FINAL_QUEST, afterStep1, 6, 'warrior')).toBe('unavailable'); // class gate
+  });
+
+  // The two cases above check the gate against the warrior. This one closes it
+  // against the whole roster, so adding a class (or widening requiredClass by
+  // accident) cannot quietly open a paladin-only chain to someone else.
+  it('is unavailable to every other class, and to a class-less caller', () => {
+    const others: PlayerClass[] = [
+      'warrior',
+      'hunter',
+      'rogue',
+      'priest',
+      'shaman',
+      'mage',
+      'warlock',
+      'druid',
+    ];
+    expect(others).toHaveLength(ALL_CLASSES.length - 1);
+    expect(others).not.toContain('paladin');
+
+    const step1Ready = new Set(['q_bones']);
+    const riteReady = new Set(['q_bones', 'q_divine_tome']);
+    // Every prerequisite satisfied, so class is the ONLY gate left standing.
+    expect(state('q_divine_tome', step1Ready, 6, 'paladin')).toBe('available');
+    expect(state(FINAL_QUEST, riteReady, 6, 'paladin')).toBe('available');
+
+    for (const cls of others) {
+      expect(state('q_divine_tome', step1Ready, 6, cls), `q_divine_tome for ${cls}`).toBe(
+        'unavailable',
+      );
+      expect(state(FINAL_QUEST, riteReady, 6, cls), `${FINAL_QUEST} for ${cls}`).toBe('unavailable');
+    }
+
+    // Fails closed: a caller that cannot say who it is gets nothing.
+    expect(computeQuestState('q_divine_tome', empty, step1Ready, 6, undefined)).toBe('unavailable');
+    expect(computeQuestState(FINAL_QUEST, empty, riteReady, 6, undefined)).toBe('unavailable');
   });
 
   it('both quests are paladin-locked and the rite follows the Vale step', () => {
