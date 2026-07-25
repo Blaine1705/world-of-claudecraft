@@ -100,6 +100,12 @@ function serverInv(server: GameServer, pid: number): InvSlot[] {
   return meta.inventory;
 }
 
+function simInv(sim: Sim, pid: number): InvSlot[] {
+  const meta = (sim as unknown as { players: Map<number, PlayerMeta> }).players.get(pid);
+  if (!meta) throw new Error(`no meta for pid ${pid}`);
+  return meta.inventory;
+}
+
 function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
   const c: any = Object.create(ClientWorld.prototype);
   c.cfg = { seed: 20061, playerClass };
@@ -212,6 +218,58 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
 });
 
 describe('online end-to-end (live GameServer, wire commands + self-deltas)', () => {
+  it('disenchants the selected duplicate slot and preserves a masterwork copy with the same item id', () => {
+    const sim = new Sim({ seed: 314, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    sim.ctx.addItemInstance(
+      COMMON_WEAPON,
+      { rolled: { masterwork: true, stats: { str: 2 } } },
+      pid,
+    );
+    sim.ctx.addItemInstance(COMMON_WEAPON, { signer: 'SelectedPlainCopy' }, pid);
+    const starting = simInv(sim, pid).filter((slot) => slot.itemId === COMMON_WEAPON);
+    expect(starting.map((slot) => slot.instance)).toEqual([
+      { rolled: { masterwork: true, stats: { str: 2 } } },
+      { signer: 'SelectedPlainCopy' },
+    ]);
+    const selectedIndex = simInv(sim, pid).findIndex(
+      (slot) => slot.itemId === COMMON_WEAPON && slot.instance?.signer,
+    );
+
+    sim.disenchantItem(COMMON_WEAPON, pid, selectedIndex);
+
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    const remaining = simInv(sim, pid).filter((slot) => slot.itemId === COMMON_WEAPON);
+    expect(remaining).toHaveLength(1);
+    expect(remaining[0].instance).toEqual({ rolled: { masterwork: true, stats: { str: 2 } } });
+  });
+
+  it('the server honors the selected duplicate slot for disenchant_item', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const st = joinServer(server, fc, 711, 'QaSlot');
+    placeAt(server, st.pid, { x: 0, z: 150 });
+    server.sim.ctx.addItemInstance(
+      COMMON_WEAPON,
+      { rolled: { masterwork: true, stats: { str: 2 } } },
+      st.pid,
+    );
+    server.sim.ctx.addItemInstance(COMMON_WEAPON, { signer: 'SelectedPlainCopy' }, st.pid);
+    const selectedIndex = serverInv(server, st.pid).findIndex(
+      (slot) => slot.itemId === COMMON_WEAPON && slot.instance?.signer,
+    );
+
+    cmd(server, st, { cmd: 'disenchant_item', item: COMMON_WEAPON, slot: selectedIndex });
+    routeTick(server);
+
+    const dencEvents = eventsFor(fc.sent, 'disenchantResult');
+    expect(dencEvents).toHaveLength(1);
+    expect(dencEvents[0]).toMatchObject({ ok: true, itemId: COMMON_WEAPON, pid: st.pid });
+    const remaining = serverInv(server, st.pid).filter((slot) => slot.itemId === COMMON_WEAPON);
+    expect(remaining).toHaveLength(1);
+    expect(remaining[0].instance).toEqual({ rolled: { masterwork: true, stats: { str: 2 } } });
+  });
+
   it('resolves the three commands server-side and mirrors denc/ench/salv into a real ClientWorld', () => {
     const server = new GameServer();
     const fc = fakeWs();

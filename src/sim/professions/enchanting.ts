@@ -288,6 +288,22 @@ export interface DisenchantResult {
   reason?: 'unknown_item' | 'not_disenchantable' | 'not_held' | 'throttled' | 'no_bag_space';
 }
 
+function consumeSelectedInventorySlot(
+  inventory: InvSlot[],
+  itemId: string,
+  slotIndex: number | undefined,
+): ItemInstancePayload | undefined | null {
+  if (slotIndex === undefined) return undefined;
+  if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= inventory.length) return null;
+  const slot = inventory[slotIndex];
+  if (slot.itemId !== itemId || slot.count < 1) return null;
+  const instance =
+    slot.instance && slot.count > 1 ? cloneItemInstancePayload(slot.instance) : slot.instance;
+  slot.count -= 1;
+  if (slot.count <= 0) inventory.splice(slotIndex, 1);
+  return instance;
+}
+
 /** Resolve one disenchant attempt: denies (no side effect) if the item id is
  *  unknown, ineligible, or the player holds no copy of it at all. Consumes
  *  exactly one held copy on success, preferring the least special first: a
@@ -299,7 +315,12 @@ export interface DisenchantResult {
  *  an enchant, but disenchant destroys the item anyway, so gating on it here
  *  only denied a held item with a wrong "not held" message). Grants the
  *  rolled arcane material yield. */
-export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string): DisenchantResult {
+export function resolveDisenchant(
+  ctx: SimContext,
+  pid: number,
+  itemId: string,
+  slotIndex?: number,
+): DisenchantResult {
   const def = ITEMS[itemId];
   if (!def) return { ok: false, itemId, reason: 'unknown_item' };
   if (!isDisenchantable(def)) return { ok: false, itemId, reason: 'not_disenchantable' };
@@ -326,7 +347,10 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
   // arm above; a granted roll can never exceed what was checked.
   if (meta) {
     const scratch = meta.inventory.map((s) => ({ ...s }));
-    consumeOneScratch(scratch, itemId, isEnchantedInstance);
+    if (consumeSelectedInventorySlot(scratch, itemId, slotIndex) === null) {
+      return { ok: false, itemId, reason: 'not_held' };
+    }
+    if (slotIndex === undefined) consumeOneScratch(scratch, itemId, isEnchantedInstance);
     const adds: InvSlot[] = isRarePlus
       ? [{ itemId: materialItemId, count: 1 }]
       : [{ itemId: materialItemId, count: maxDisenchantYield(def) }];
@@ -346,8 +370,15 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
   // the #2340 fix: with only enchanted copies left, take the highest-index
   // one (removeItem order; the UI confirm predicate in
   // src/ui/bag_item_context_menu.ts mirrors this victim choice).
-  if (ctx.countEnchantableItem(itemId, pid) >= 1) ctx.removeEnchantableItem(itemId, 1, pid);
-  else ctx.removeItem(itemId, 1, pid);
+  const selected = meta
+    ? consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex)
+    : undefined;
+  if (selected === null) return { ok: false, itemId, reason: 'not_held' };
+  if (slotIndex !== undefined && meta) ctx.onInventoryChangedForQuests(meta);
+  if (slotIndex === undefined) {
+    if (ctx.countEnchantableItem(itemId, pid) >= 1) ctx.removeEnchantableItem(itemId, 1, pid);
+    else ctx.removeItem(itemId, 1, pid);
+  }
   // Yield model: sub-rare (common/uncommon) stays byte-identical to
   // today, a single rng draw (disenchantYield's +0/+1 bonus) over a rolled
   // count of the universal ladder material, and NO secondary. Rare+ shifts to a
@@ -392,10 +423,15 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
  *  exactly: resolves the caller's own player entity via ctx.resolve, then
  *  delegates to resolveDisenchant. Runs on the deterministic tick the
  *  command arrives on, never off-tick. */
-export function disenchantItem(ctx: SimContext, itemId: string, pid?: number): DisenchantResult {
+export function disenchantItem(
+  ctx: SimContext,
+  itemId: string,
+  pid?: number,
+  slotIndex?: number,
+): DisenchantResult {
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, itemId, reason: 'unknown_item' };
-  return resolveDisenchant(ctx, r.meta.entityId, itemId);
+  return resolveDisenchant(ctx, r.meta.entityId, itemId, slotIndex);
 }
 
 export interface ApplyEnchantResult {

@@ -216,6 +216,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   openItemActionMenu(
     def: ItemDef,
     itemId: string,
+    slotIndex: number,
     x: number,
     y: number,
     runDefault: () => void,
@@ -1035,7 +1036,8 @@ export class BagsWindow {
     const rect = (ev.currentTarget as HTMLElement | null)?.getBoundingClientRect();
     const x = ev.clientX || rect?.left || 0;
     const y = ev.clientY || rect?.top || 0;
-    this.deps.openItemActionMenu(item, s.itemId, x, y, () => this.runBagAction(item, s, ev));
+    const index = bagStackIndex(this.deps.world().inventory, s);
+    this.deps.openItemActionMenu(item, s.itemId, index, x, y, () => this.runBagAction(item, s, ev));
   }
 
   private sellBagItem(slot: InvSlot, ev: MouseEvent): void {

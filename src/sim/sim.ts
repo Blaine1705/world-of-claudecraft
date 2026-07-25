@@ -7277,8 +7277,14 @@ export class Sim {
 
   // Enchanting profession commands (IWorldProfessions): same thin-
   // delegate/stash-result/emit shape as salvageItem/craftItem above.
-  disenchantItem(itemId: string, pid?: number): void {
-    const result = disenchantItemImpl(this.ctx, itemId, pid);
+  disenchantItem(
+    itemId: string,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): void {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const targetSlotIndex = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const result = disenchantItemImpl(this.ctx, itemId, pid, targetSlotIndex);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastDisenchantResult = result;
     this.emit({

@@ -3699,8 +3699,8 @@ export class Hud {
     isTouchHud: () => document.body.classList.contains('mobile-touch'),
     markEquipDropTargets: (itemId) => this.charWindow.markDropTargets(itemId),
     dropOnEquipSlot: (itemId, slot) => this.charWindow.dropOnEquipSlot(itemId, slot),
-    openItemActionMenu: (def, itemId, x, y, runDefault) =>
-      this.bagItemActionMenu.open(def, itemId, x, y, runDefault),
+    openItemActionMenu: (def, itemId, slotIndex, x, y, runDefault) =>
+      this.bagItemActionMenu.open(def, itemId, slotIndex, x, y, runDefault),
   });
   // Bag-item action menu (Professions 2.0): the right-click / touch
   // menu that surfaces Disenchant / Salvage / Apply Enchant on a bag stack.
