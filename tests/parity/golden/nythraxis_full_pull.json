@@ -5579,8 +5579,8 @@
       "tick": 386,
       "time": 19.3,
       "nextId": 428,
-      "state": "fcf3b1fc",
-      "events": "1ebbcffb",
+      "state": "9c409468",
+      "events": "b225592b",
       "rng": {
         "draws": 1851,
         "digest": "2a71fcbf"
@@ -5714,6 +5714,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
+              "kills": 2,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -5725,6 +5726,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "feat_era_cap",
               ""
@@ -5778,7 +5783,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 60,
+          "renown": 65,
           "talents": {
             "rows": {}
           },
@@ -5805,6 +5810,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
+              "kills": 2,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -5816,6 +5822,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "feat_era_cap",
               ""
@@ -5869,7 +5879,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 60,
+          "renown": 65,
           "talents": {
             "rows": {}
           },
@@ -5897,6 +5907,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
+              "kills": 2,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -5908,6 +5919,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "feat_era_cap",
               ""
@@ -5961,7 +5976,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 60,
+          "renown": 65,
           "talents": {
             "rows": {}
           },
@@ -5989,6 +6004,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
+              "kills": 2,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -6000,6 +6016,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "feat_era_cap",
               ""
@@ -6053,7 +6073,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 60,
+          "renown": 65,
           "talents": {
             "rows": {}
           },
@@ -6709,7 +6729,7 @@
       "tick": 390,
       "time": 19.5,
       "nextId": 428,
-      "state": "a5a383bb",
+      "state": "3538656b",
       "events": "9ee00894",
       "rng": {
         "draws": 1862,
@@ -6720,7 +6740,7 @@
       "tick": 400,
       "time": 20,
       "nextId": 428,
-      "state": "0b2bf06b",
+      "state": "4251b6db",
       "events": "59aacef7",
       "rng": {
         "draws": 1918,
@@ -6731,7 +6751,7 @@
       "tick": 410,
       "time": 20.5,
       "nextId": 428,
-      "state": "03ae7b78",
+      "state": "3eb7fcc4",
       "events": "59aacef7",
       "rng": {
         "draws": 1948,
@@ -6742,7 +6762,7 @@
       "tick": 420,
       "time": 21,
       "nextId": 428,
-      "state": "fa34358a",
+      "state": "10afb506",
       "events": "59aacef7",
       "rng": {
         "draws": 1998,
@@ -6753,7 +6773,7 @@
       "tick": 430,
       "time": 21.5,
       "nextId": 428,
-      "state": "8a10e65a",
+      "state": "b3ee6f16",
       "events": "59aacef7",
       "rng": {
         "draws": 2060,
@@ -6764,7 +6784,7 @@
       "tick": 440,
       "time": 22,
       "nextId": 428,
-      "state": "f48ce67a",
+      "state": "f401bf36",
       "events": "59aacef7",
       "rng": {
         "draws": 2111,
@@ -6775,7 +6795,7 @@
       "tick": 450,
       "time": 22.5,
       "nextId": 428,
-      "state": "09b74d4a",
+      "state": "3e5455c6",
       "events": "59aacef7",
       "rng": {
         "draws": 2170,
@@ -6786,7 +6806,7 @@
       "tick": 460,
       "time": 23,
       "nextId": 428,
-      "state": "54595a7e",
+      "state": "43cd5c3a",
       "events": "59aacef7",
       "rng": {
         "draws": 2202,
@@ -6797,7 +6817,7 @@
       "tick": 470,
       "time": 23.5,
       "nextId": 428,
-      "state": "4726c4c1",
+      "state": "dddc8591",
       "events": "59aacef7",
       "rng": {
         "draws": 2244,
@@ -6808,7 +6828,7 @@
       "tick": 480,
       "time": 24,
       "nextId": 428,
-      "state": "6fe0d1f9",
+      "state": "e56aa369",
       "events": "59aacef7",
       "rng": {
         "draws": 2301,
@@ -6819,7 +6839,7 @@
       "tick": 490,
       "time": 24.5,
       "nextId": 428,
-      "state": "a6752f70",
+      "state": "a9b709bc",
       "events": "89d01f58",
       "rng": {
         "draws": 2357,
@@ -6830,7 +6850,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 428,
-      "state": "bfb088b1",
+      "state": "6912e6c1",
       "events": "741638a5",
       "rng": {
         "draws": 2407,
@@ -6841,7 +6861,7 @@
       "tick": 506,
       "time": 25.3,
       "nextId": 428,
-      "state": "a9c4bafa",
+      "state": "60e35bb6",
       "events": "741638a5",
       "rng": {
         "draws": 2429,
@@ -6976,6 +6996,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
+              "kills": 2,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -6987,6 +7008,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "feat_era_cap",
               ""
@@ -7040,7 +7065,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 60,
+          "renown": 65,
           "talents": {
             "rows": {}
           },
@@ -7067,6 +7092,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
+              "kills": 2,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -7078,6 +7104,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "feat_era_cap",
               ""
@@ -7131,7 +7161,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 60,
+          "renown": 65,
           "talents": {
             "rows": {}
           },
@@ -7159,6 +7189,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
+              "kills": 2,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -7170,6 +7201,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "feat_era_cap",
               ""
@@ -7223,7 +7258,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 60,
+          "renown": 65,
           "talents": {
             "rows": {}
           },
@@ -7251,6 +7286,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
+              "kills": 2,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -7262,6 +7298,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "feat_era_cap",
               ""
@@ -7315,7 +7355,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 60,
+          "renown": 65,
           "talents": {
             "rows": {}
           },
@@ -7982,7 +8022,7 @@
       "tick": 510,
       "time": 25.5,
       "nextId": 428,
-      "state": "c3be68d1",
+      "state": "9eaecce1",
       "events": "741638a5",
       "rng": {
         "draws": 2447,
@@ -7993,7 +8033,7 @@
       "tick": 520,
       "time": 26,
       "nextId": 428,
-      "state": "6d66e99c",
+      "state": "86d02e88",
       "events": "741638a5",
       "rng": {
         "draws": 2486,
@@ -8004,7 +8044,7 @@
       "tick": 530,
       "time": 26.5,
       "nextId": 428,
-      "state": "488ddc2a",
+      "state": "3f69c5a6",
       "events": "741638a5",
       "rng": {
         "draws": 2555,
@@ -8015,7 +8055,7 @@
       "tick": 540,
       "time": 27,
       "nextId": 428,
-      "state": "207cb7cb",
+      "state": "1f91283b",
       "events": "741638a5",
       "rng": {
         "draws": 2601,
@@ -8026,7 +8066,7 @@
       "tick": 550,
       "time": 27.5,
       "nextId": 428,
-      "state": "dfcc6c7b",
+      "state": "72572a2b",
       "events": "741638a5",
       "rng": {
         "draws": 2633,
@@ -8037,7 +8077,7 @@
       "tick": 560,
       "time": 28,
       "nextId": 428,
-      "state": "6572dd66",
+      "state": "c149d082",
       "events": "741638a5",
       "rng": {
         "draws": 2670,
@@ -8048,7 +8088,7 @@
       "tick": 570,
       "time": 28.5,
       "nextId": 428,
-      "state": "71a0e26a",
+      "state": "2978cae6",
       "events": "741638a5",
       "rng": {
         "draws": 2715,
@@ -8059,7 +8099,7 @@
       "tick": 580,
       "time": 29,
       "nextId": 428,
-      "state": "306f6175",
+      "state": "ae035675",
       "events": "741638a5",
       "rng": {
         "draws": 2782,
@@ -8070,7 +8110,7 @@
       "tick": 590,
       "time": 29.5,
       "nextId": 428,
-      "state": "dbae9e9b",
+      "state": "267a74cb",
       "events": "aad79240",
       "rng": {
         "draws": 2837,
@@ -8081,7 +8121,7 @@
       "tick": 600,
       "time": 30,
       "nextId": 428,
-      "state": "a2587cc5",
+      "state": "19b71985",
       "events": "8ee47204",
       "rng": {
         "draws": 2889,
@@ -8092,7 +8132,7 @@
       "tick": 610,
       "time": 30.5,
       "nextId": 428,
-      "state": "e3260498",
+      "state": "288ed564",
       "events": "741638a5",
       "rng": {
         "draws": 2940,
@@ -8103,7 +8143,7 @@
       "tick": 620,
       "time": 31,
       "nextId": 428,
-      "state": "b489bf99",
+      "state": "8f0d1609",
       "events": "741638a5",
       "rng": {
         "draws": 2994,
@@ -8114,7 +8154,7 @@
       "tick": 627,
       "time": 31.35,
       "nextId": 428,
-      "state": "4d4e0172",
+      "state": "6fbcb52e",
       "events": "4c932e6f",
       "rng": {
         "draws": 3019,
@@ -8249,6 +8289,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
+              "kills": 2,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -8260,6 +8301,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "feat_era_cap",
               ""
@@ -8313,7 +8358,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 60,
+          "renown": 65,
           "talents": {
             "rows": {}
           },
@@ -8340,6 +8385,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
+              "kills": 2,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -8351,6 +8397,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "feat_era_cap",
               ""
@@ -8404,7 +8454,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 60,
+          "renown": 65,
           "talents": {
             "rows": {}
           },
@@ -8432,6 +8482,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
+              "kills": 2,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -8443,6 +8494,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "feat_era_cap",
               ""
@@ -8496,7 +8551,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 60,
+          "renown": 65,
           "talents": {
             "rows": {}
           },
@@ -8524,6 +8579,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
+              "kills": 2,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -8535,6 +8591,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "feat_era_cap",
               ""
@@ -8588,7 +8648,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 60,
+          "renown": 65,
           "talents": {
             "rows": {}
           },
@@ -9256,7 +9316,7 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 428,
-      "state": "5464e636",
+      "state": "5e36ba2e",
       "events": "90b86b6a",
       "rng": {
         "draws": 3027,
@@ -9413,6 +9473,7 @@
           "deedStats": {
             "counters": {
               "dungeonFinalBossKills": 1,
+              "kills": 3,
               "partiesJoined": 1
             },
             "dungeonClears": {
@@ -9426,6 +9487,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "dgn_nythraxis",
               ""
@@ -9497,7 +9562,7 @@
             ]
           ],
           "recipesGrandfathered": true,
-          "renown": 120,
+          "renown": 125,
           "talents": {
             "rows": {}
           },
@@ -9525,6 +9590,7 @@
           "deedStats": {
             "counters": {
               "dungeonFinalBossKills": 1,
+              "kills": 3,
               "partiesJoined": 1
             },
             "dungeonClears": {
@@ -9538,6 +9604,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "dgn_nythraxis",
               ""
@@ -9609,7 +9679,7 @@
             ]
           ],
           "recipesGrandfathered": true,
-          "renown": 120,
+          "renown": 125,
           "talents": {
             "rows": {}
           },
@@ -9638,6 +9708,7 @@
           "deedStats": {
             "counters": {
               "dungeonFinalBossKills": 1,
+              "kills": 3,
               "partiesJoined": 1
             },
             "dungeonClears": {
@@ -9651,6 +9722,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "dgn_nythraxis",
               ""
@@ -9722,7 +9797,7 @@
             ]
           ],
           "recipesGrandfathered": true,
-          "renown": 120,
+          "renown": 125,
           "talents": {
             "rows": {}
           },
@@ -9751,6 +9826,7 @@
           "deedStats": {
             "counters": {
               "dungeonFinalBossKills": 1,
+              "kills": 3,
               "partiesJoined": 1
             },
             "dungeonClears": {
@@ -9764,6 +9840,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "dgn_nythraxis",
               ""
@@ -9835,7 +9915,7 @@
             ]
           ],
           "recipesGrandfathered": true,
-          "renown": 120,
+          "renown": 125,
           "talents": {
             "rows": {}
           },
@@ -10520,7 +10600,7 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 428,
-      "state": "fa709958",
+      "state": "1231bdd8",
       "events": "741638a5",
       "rng": {
         "draws": 3040,
@@ -10531,7 +10611,7 @@
       "tick": 640,
       "time": 32,
       "nextId": 428,
-      "state": "ba3993c8",
+      "state": "50402e48",
       "events": "741638a5",
       "rng": {
         "draws": 3082,
@@ -10542,7 +10622,7 @@
       "tick": 650,
       "time": 32.5,
       "nextId": 428,
-      "state": "335b01e4",
+      "state": "74415a64",
       "events": "741638a5",
       "rng": {
         "draws": 3134,
@@ -10553,7 +10633,7 @@
       "tick": 660,
       "time": 33,
       "nextId": 428,
-      "state": "79d3c7b0",
+      "state": "a029ba10",
       "events": "741638a5",
       "rng": {
         "draws": 3177,
@@ -10564,7 +10644,7 @@
       "tick": 670,
       "time": 33.5,
       "nextId": 428,
-      "state": "66077d58",
+      "state": "fcdae1d8",
       "events": "741638a5",
       "rng": {
         "draws": 3231,
@@ -10575,7 +10655,7 @@
       "tick": 680,
       "time": 34,
       "nextId": 428,
-      "state": "21d55208",
+      "state": "23d14f88",
       "events": "741638a5",
       "rng": {
         "draws": 3281,
@@ -10586,7 +10666,7 @@
       "tick": 688,
       "time": 34.4,
       "nextId": 428,
-      "state": "1224c02e",
+      "state": "247bf986",
       "events": "e3560676",
       "rng": {
         "draws": 3303,
@@ -10743,6 +10823,7 @@
           "deedStats": {
             "counters": {
               "dungeonFinalBossKills": 1,
+              "kills": 3,
               "partiesJoined": 1
             },
             "dungeonClears": {
@@ -10756,6 +10837,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "dgn_nythraxis",
               ""
@@ -10827,7 +10912,7 @@
             ]
           ],
           "recipesGrandfathered": true,
-          "renown": 120,
+          "renown": 125,
           "talents": {
             "rows": {}
           },
@@ -10855,6 +10940,7 @@
           "deedStats": {
             "counters": {
               "dungeonFinalBossKills": 1,
+              "kills": 3,
               "partiesJoined": 1
             },
             "dungeonClears": {
@@ -10868,6 +10954,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "dgn_nythraxis",
               ""
@@ -10939,7 +11029,7 @@
             ]
           ],
           "recipesGrandfathered": true,
-          "renown": 120,
+          "renown": 125,
           "talents": {
             "rows": {}
           },
@@ -10968,6 +11058,7 @@
           "deedStats": {
             "counters": {
               "dungeonFinalBossKills": 1,
+              "kills": 3,
               "partiesJoined": 1
             },
             "dungeonClears": {
@@ -10981,6 +11072,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "dgn_nythraxis",
               ""
@@ -11052,7 +11147,7 @@
             ]
           ],
           "recipesGrandfathered": true,
-          "renown": 120,
+          "renown": 125,
           "talents": {
             "rows": {}
           },
@@ -11081,6 +11176,7 @@
           "deedStats": {
             "counters": {
               "dungeonFinalBossKills": 1,
+              "kills": 3,
               "partiesJoined": 1
             },
             "dungeonClears": {
@@ -11094,6 +11190,10 @@
             ]
           },
           "deedsEarned": [
+            [
+              "cmb_first_blood",
+              ""
+            ],
             [
               "dgn_nythraxis",
               ""
@@ -11165,7 +11265,7 @@
             ]
           ],
           "recipesGrandfathered": true,
-          "renown": 120,
+          "renown": 125,
           "talents": {
             "rows": {}
           },
