@@ -301,6 +301,7 @@ import {
 } from './hud/action_bar/hotbar';
 import {
   clampMobilePage,
+  mobileActionSourceSlotCount,
   mobilePageCount,
   nextMobilePage,
   sourceSlotForMobileButton,
@@ -5223,12 +5224,12 @@ export class Hud {
     if (!this.actionBarController.syncActiveForm()) return;
     this.dragAction = null;
     this.clearMobileHotbarDrag();
-    this.mobileActionPage = clampMobilePage(this.mobileActionPage);
+    this.mobileActionPage = this.currentMobileActionPage();
   }
 
   private syncSlotMap(): void {
     this.actionBarController.syncKnownAbilities();
-    this.mobileActionPage = clampMobilePage(this.mobileActionPage);
+    this.mobileActionPage = this.currentMobileActionPage();
   }
 
   private attackSlotIsAttack(): boolean {
@@ -5620,6 +5621,27 @@ export class Hud {
     }
   }
 
+  private mobileActionSourceSlotCount(): number {
+    return mobileActionSourceSlotCount({
+      secondary: Boolean(this.optionsHooks?.settings.get('showSecondaryActionBar')),
+      third: Boolean(this.optionsHooks?.settings.get('showThirdActionBar')),
+    });
+  }
+
+  private mobileActionPageCount(): number {
+    return mobilePageCount(this.mobileActionSourceSlotCount());
+  }
+
+  private currentMobileActionPage(): number {
+    const page = clampMobilePage(this.mobileActionPage, this.mobileActionPageCount());
+    this.mobileActionPage = page;
+    return page;
+  }
+
+  private mobileSourceSlotForButton(buttonIndex: number): number {
+    return sourceSlotForMobileButton(this.currentMobileActionPage(), buttonIndex);
+  }
+
   // Advance the mobile action ring to its next page. Mutates mobileActionPage
   // ONLY: the ring descriptor's per-slot closures (built once in buildActionBar)
   // resolve sourceSlotForMobileButton(mobileActionPage, i) fresh every tick, so no
@@ -5627,7 +5649,7 @@ export class Hud {
   // state lives on hotbarActions + sim, not on the view). The next update() call
   // repaints the ring from the new page.
   private cycleMobileActionPage(): void {
-    this.mobileActionPage = nextMobilePage(this.mobileActionPage);
+    this.mobileActionPage = nextMobilePage(this.mobileActionPage, this.mobileActionPageCount());
   }
 
   private flashActionSlot(barSlot: number): void {
@@ -5642,7 +5664,7 @@ export class Hud {
       return;
     }
     for (let i = 0; i < this.mobileRingSlotBtns.length; i++) {
-      if (sourceSlotForMobileButton(this.mobileActionPage, i) === barSlot) {
+      if (this.mobileSourceSlotForButton(i) === barSlot) {
         this.flashActionButton(this.mobileRingSlotBtns[i]);
         return;
       }
@@ -6075,7 +6097,7 @@ export class Hud {
       attackBtn.blur();
     });
     slotBtns.forEach((btn, i) => {
-      this.bindEmpoweredActionHold(btn, () => sourceSlotForMobileButton(this.mobileActionPage, i));
+      this.bindEmpoweredActionHold(btn, () => this.mobileSourceSlotForButton(i));
       bindTouchTap(btn, () => {
         // A tap that ends a long-press drag (even one released back on its own
         // slot, a cancel) must not also cast: bindMobileRingDrag arms this flag
@@ -6088,7 +6110,7 @@ export class Hud {
         this.peekGuard.consume();
         this.hideTooltip();
         audio.click();
-        this.castSlot(sourceSlotForMobileButton(this.mobileActionPage, i));
+        this.castSlot(this.mobileSourceSlotForButton(i));
         btn.blur();
       });
       this.bindMobileRingDrag(btn, i);
@@ -6123,10 +6145,9 @@ export class Hud {
           ...Array.from({ length: 5 }, (_, i) => ({
             slotIndex: i + 1,
             isAttack: () => false,
-            hasAction: () =>
-              this.actionForSlot(sourceSlotForMobileButton(this.mobileActionPage, i)) !== null,
-            ability: () => this.abilityForSlot(sourceSlotForMobileButton(this.mobileActionPage, i)),
-            item: () => this.itemForSlot(sourceSlotForMobileButton(this.mobileActionPage, i)),
+            hasAction: () => this.actionForSlot(this.mobileSourceSlotForButton(i)) !== null,
+            ability: () => this.abilityForSlot(this.mobileSourceSlotForButton(i)),
+            item: () => this.itemForSlot(this.mobileSourceSlotForButton(i)),
             keybindLabel: () => '',
           })),
         ],
@@ -6438,7 +6459,7 @@ export class Hud {
   private bindMobileRingDrag(btn: HTMLButtonElement, ringIndex: number): void {
     btn.addEventListener('pointerdown', (e) => {
       if (!document.body.classList.contains('mobile-touch') || e.pointerType !== 'touch') return;
-      const sourceSlot = sourceSlotForMobileButton(this.mobileActionPage, ringIndex);
+      const sourceSlot = this.mobileSourceSlotForButton(ringIndex);
       if (this.empoweredAbilityIdForSlot(sourceSlot)) return;
       if (!this.actionForSlot(sourceSlot)) return;
       this.clearMobileHotbarDrag();
@@ -6481,9 +6502,7 @@ export class Hud {
       e.preventDefault();
       const targetRingIndex = this.mobileRingSlotFromPoint(e.clientX, e.clientY);
       const targetIndex =
-        targetRingIndex !== null
-          ? sourceSlotForMobileButton(this.mobileActionPage, targetRingIndex) - 1
-          : null;
+        targetRingIndex !== null ? this.mobileSourceSlotForButton(targetRingIndex) - 1 : null;
       drag.targetIndex = targetIndex;
       this.clearActionDropTargets();
       const targetBtn = targetRingIndex !== null ? this.mobileRingSlotBtns[targetRingIndex] : null;
@@ -7502,14 +7521,17 @@ export class Hud {
     // stay undefined when the ring DOM never got built, e.g. an older cached
     // template). Reuses the exact same world snapshot as the desktop bar.
     if (this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter) {
+      const mobileActionPage = this.currentMobileActionPage();
+      const mobileActionSourceSlotCount = this.mobileActionSourceSlotCount();
       this.mobileActionRingPainter.paint(
         this.mobileActionRingView.tick({
           player: abPlayer,
           target: target ?? null,
           inventory: sim.inventory,
         }),
-        this.mobileActionPage,
-        mobilePageCount(),
+        mobileActionPage,
+        mobilePageCount(mobileActionSourceSlotCount),
+        mobileActionSourceSlotCount,
         this.attackSlotIsAttack(),
       );
     }
