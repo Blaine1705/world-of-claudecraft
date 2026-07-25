@@ -6220,6 +6220,7 @@ export const es_ES: EnTranslations = {
       "arenaJoin": "Te unes a la cola del Coliseo Cinéreo. Espera a un oponente digno...",
       "arenaLeave": "Sales de la cola del Coliseo Cinéreo.",
       "arenaSands": "Pisas las arenas del Coliseo Cinéreo.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "Has solicitado comerciar con {name}.",
       "tradeOpened": "Ventana de comercio abierta.",
       "tradeComplete": "Comercio completado.",
@@ -6388,6 +6389,11 @@ export const es_ES: EnTranslations = {
       "playerLevelClassTitle": "{name} - Nv {level} {className}",
       "noChallengers": "Aún no hay retadores clasificados - sé el primero.",
       "matchInProgress": "Combate en curso contra {name}.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Salir de la cola",
       "searching": "Buscando oponente... ({count} en cola)",
       "enterQueue": "Entrar en la cola",

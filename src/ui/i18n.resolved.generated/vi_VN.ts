@@ -6220,6 +6220,7 @@ export const vi_VN: EnTranslations = {
       "arenaJoin": "Bạn gia nhập hàng đợi Ashen Coliseum. Hãy chờ một đối thủ xứng tầm...",
       "arenaLeave": "Bạn rời khỏi hàng đợi Ashen Coliseum.",
       "arenaSands": "Bạn bước lên bãi cát của Ashen Coliseum.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "Bạn đã yêu cầu giao dịch với {name}.",
       "tradeOpened": "Đã mở cửa sổ giao dịch.",
       "tradeComplete": "Giao dịch hoàn tất.",
@@ -6388,6 +6389,11 @@ export const vi_VN: EnTranslations = {
       "playerLevelClassTitle": "{name} - Cấp {level} {className}",
       "noChallengers": "Chưa có ai được xếp hạng - hãy là người đầu tiên.",
       "matchInProgress": "Trận đấu đang diễn ra với {name}.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Rời Hàng Chờ",
       "searching": "Đang tìm đối thủ... ({count} người trong hàng chờ)",
       "enterQueue": "Vào Hàng Chờ",

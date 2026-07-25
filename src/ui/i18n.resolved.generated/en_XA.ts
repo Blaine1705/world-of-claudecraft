@@ -6220,6 +6220,7 @@ export const en_XA: EnTranslations = {
       "arenaJoin": "[Ýóú ĵóíñ ţĥé Ášĥéñ Çóļíšéúɱ ɋúéúé. Šţáñð ƀý ƒóŕ á ŵóŕţĥý óþþóñéñţ...]",
       "arenaLeave": "[Ýóú ļéáʋé ţĥé Ášĥéñ Çóļíšéúɱ ɋúéúé.]",
       "arenaSands": "[Ýóú šţéþ óñţó ţĥé šáñðš óƒ ţĥé Ášĥéñ Çóļíšéúɱ.]",
+      "arenaSandsDrowned": "[Ýóú šţéþ óñţó ţĥé ƒļóóðéð šţóñéš óƒ ţĥé Ðŕóŵñéð Çóúŕţ.]",
       "tradeRequestSent": "[Ýóú ĥáʋé ŕéɋúéšţéð ţó ţŕáðé ŵíţĥ {name}.]",
       "tradeOpened": "[Ţŕáðé ŵíñðóŵ óþéñéð.]",
       "tradeComplete": "[Ţŕáðé çóɱþļéţé.]",
@@ -6388,6 +6389,11 @@ export const en_XA: EnTranslations = {
       "playerLevelClassTitle": "[{name} - Ļʋ {level} {className}]",
       "noChallengers": "[Ñó çĥáļļéñĝéŕš ŕáñķéð ýéţ - ƀé ţĥé ƒíŕšţ.]",
       "matchInProgress": "[Ɱáţçĥ íñ þŕóĝŕéšš ʋš {name}.]",
+      "mapName": "[Ɱáþ: {name}]",
+      "map": {
+        "coliseum": "[Ášĥéñ Çóļíšéúɱ]",
+        "drownedCourt": "[Ţĥé Ðŕóŵñéð Çóúŕţ]"
+      },
       "leaveQueue": "[Ļéáʋé Ɋúéúé]",
       "searching": "[Šéáŕçĥíñĝ ƒóŕ áñ óþþóñéñţ... ({count} íñ ɋúéúé)]",
       "enterQueue": "[Éñţéŕ ţĥé Ɋúéúé]",

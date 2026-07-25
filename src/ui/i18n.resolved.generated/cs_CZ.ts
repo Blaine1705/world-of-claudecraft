@@ -6220,6 +6220,7 @@ export const cs_CZ: EnTranslations = {
       "arenaJoin": "Připojuješ se do fronty Popelavého kolosea. Vyčkej na důstojného protivníka...",
       "arenaLeave": "Opouštíš frontu Popelavého kolosea.",
       "arenaSands": "Vstupuješ do písku Popelavého kolosea.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "Požádal(a) jsi {name} o obchod.",
       "tradeOpened": "Obchodní okno otevřeno.",
       "tradeComplete": "Obchod dokončen.",
@@ -6388,6 +6389,11 @@ export const cs_CZ: EnTranslations = {
       "playerLevelClassTitle": "{name} - úr. {level} {className}",
       "noChallengers": "Zatím není v žebříčku žádný vyzyvatel - buď první.",
       "matchInProgress": "Probíhá zápas proti {name}.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Opustit frontu",
       "searching": "Hledá se protivník... ({count} ve frontě)",
       "enterQueue": "Vstoupit do fronty",

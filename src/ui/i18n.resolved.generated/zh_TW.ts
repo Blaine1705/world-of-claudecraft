@@ -6220,6 +6220,7 @@ export const zh_TW: EnTranslations = {
       "arenaJoin": "你加入了灰燼競技場佇列。等待一位值得一戰的對手...",
       "arenaLeave": "你離開了灰燼競技場佇列。",
       "arenaSands": "你踏上了灰燼競技場的沙地。",
+      "arenaSandsDrowned": "你踏上了沉沒王庭的水淹石地。",
       "tradeRequestSent": "你已請求與 {name} 交易。",
       "tradeOpened": "交易視窗已開啟。",
       "tradeComplete": "交易完成。",
@@ -6388,6 +6389,11 @@ export const zh_TW: EnTranslations = {
       "playerLevelClassTitle": "{name} - {level} 級 {className}",
       "noChallengers": "還沒有已排名的挑戰者 - 成為第一個。",
       "matchInProgress": "正在對戰 {name}。",
+      "mapName": "地圖：{name}",
+      "map": {
+        "coliseum": "灰燼競技場",
+        "drownedCourt": "沉沒王庭"
+      },
       "leaveQueue": "離開佇列",
       "searching": "正在尋找對手...（佇列中 {count} 人）",
       "enterQueue": "加入佇列",

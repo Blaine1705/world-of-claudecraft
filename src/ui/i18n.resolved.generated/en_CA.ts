@@ -6220,6 +6220,7 @@ export const en_CA: EnTranslations = {
       "arenaJoin": "You join the Ashen Coliseum queue. Stand by for a worthy opponent...",
       "arenaLeave": "You leave the Ashen Coliseum queue.",
       "arenaSands": "You step onto the sands of the Ashen Coliseum.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "You have requested to trade with {name}.",
       "tradeOpened": "Trade window opened.",
       "tradeComplete": "Trade complete.",
@@ -6388,6 +6389,11 @@ export const en_CA: EnTranslations = {
       "playerLevelClassTitle": "{name} - Lv {level} {className}",
       "noChallengers": "No challengers ranked yet - be the first.",
       "matchInProgress": "Match in progress vs {name}.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Leave Queue",
       "searching": "Searching for an opponent... ({count} in queue)",
       "enterQueue": "Enter the Queue",

@@ -6220,6 +6220,7 @@ export const ru_RU: EnTranslations = {
       "arenaJoin": "Вы вступаете в очередь Пепельного Колизея. Ожидайте достойного соперника...",
       "arenaLeave": "Вы покидаете очередь Пепельного Колизея.",
       "arenaSands": "Вы выходите на песок Пепельного Колизея.",
+      "arenaSandsDrowned": "Вы ступаете на затопленные камни Затонувшего Двора.",
       "tradeRequestSent": "Вы запросили обмен с {name}.",
       "tradeOpened": "Окно обмена открыто.",
       "tradeComplete": "Обмен завершен.",
@@ -6388,6 +6389,11 @@ export const ru_RU: EnTranslations = {
       "playerLevelClassTitle": "{name} - ур. {level} {className}",
       "noChallengers": "Рейтинговых претендентов пока нет - станьте первым.",
       "matchInProgress": "Бой идет против {name}.",
+      "mapName": "Карта: {name}",
+      "map": {
+        "coliseum": "Пепельный Колизей",
+        "drownedCourt": "Затонувший Двор"
+      },
       "leaveQueue": "Покинуть очередь",
       "searching": "Поиск соперника... ({count} в очереди)",
       "enterQueue": "Встать в очередь",

@@ -6220,6 +6220,7 @@ export const ko_KR: EnTranslations = {
       "arenaJoin": "잿빛 원형경기장 대기열에 들어갔습니다. 훌륭한 상대를 기다리세요...",
       "arenaLeave": "잿빛 원형경기장 대기열에서 나왔습니다.",
       "arenaSands": "잿빛 원형경기장의 모래 위에 섰습니다.",
+      "arenaSandsDrowned": "수몰된 궁정의 물에 잠긴 돌바닥에 들어섰습니다.",
       "tradeRequestSent": "{name}님에게 거래를 요청했습니다.",
       "tradeOpened": "거래 창이 열렸습니다.",
       "tradeComplete": "거래 완료.",
@@ -6388,6 +6389,11 @@ export const ko_KR: EnTranslations = {
       "playerLevelClassTitle": "{name} - {level}레벨 {className}",
       "noChallengers": "아직 순위에 오른 도전자가 없습니다 - 첫 번째가 되세요.",
       "matchInProgress": "{name}님과 경기 진행 중.",
+      "mapName": "맵: {name}",
+      "map": {
+        "coliseum": "잿빛 원형경기장",
+        "drownedCourt": "수몰된 궁정"
+      },
       "leaveQueue": "대기열 나가기",
       "searching": "상대 찾는 중... (대기열 {count}명)",
       "enterQueue": "대기열 참가",

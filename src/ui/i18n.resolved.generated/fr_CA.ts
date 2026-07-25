@@ -6220,6 +6220,7 @@ export const fr_CA: EnTranslations = {
       "arenaJoin": "Vous rejoignez la file du Colisée cendré. Attendez un adversaire digne...",
       "arenaLeave": "Vous quittez la file du Colisée cendré.",
       "arenaSands": "Vous foulez le sable du Colisée cendré.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "Vous avez demandé un échange avec {name}.",
       "tradeOpened": "Fenêtre d'échange ouverte.",
       "tradeComplete": "Échange terminé.",
@@ -6388,6 +6389,11 @@ export const fr_CA: EnTranslations = {
       "playerLevelClassTitle": "{name} - Niv. {level} {className}",
       "noChallengers": "Aucun prétendant classé pour l'instant - soyez le premier.",
       "matchInProgress": "Match en cours contre {name}.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Quitter la file",
       "searching": "Recherche d'un adversaire... ({count} en file)",
       "enterQueue": "Entrer en file",

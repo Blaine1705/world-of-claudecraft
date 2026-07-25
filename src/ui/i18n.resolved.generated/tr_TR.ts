@@ -6220,6 +6220,7 @@ export const tr_TR: EnTranslations = {
       "arenaJoin": "Kül Koliseumu sırasına katıldın. Layık bir rakip için bekle...",
       "arenaLeave": "Kül Koliseumu sırasından ayrıldın.",
       "arenaSands": "Kül Koliseumu'nun kumlarına adım atıyorsun.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "{name} ile takas yapmak için istek gönderdin.",
       "tradeOpened": "Takas penceresi açıldı.",
       "tradeComplete": "Takas tamamlandı.",
@@ -6388,6 +6389,11 @@ export const tr_TR: EnTranslations = {
       "playerLevelClassTitle": "{name} - Sv {level} {className}",
       "noChallengers": "Henüz sıralanmış meydan okuyan yok - ilk sen ol.",
       "matchInProgress": "{name} ile maç sürüyor.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Sıradan Çık",
       "searching": "Bir rakip aranıyor... (sırada {count})",
       "enterQueue": "Sıraya Gir",

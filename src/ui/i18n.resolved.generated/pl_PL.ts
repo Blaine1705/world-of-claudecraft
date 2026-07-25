@@ -6220,6 +6220,7 @@ export const pl_PL: EnTranslations = {
       "arenaJoin": "Dołączasz do kolejki Popielnego Koloseum. Czekaj na godnego przeciwnika...",
       "arenaLeave": "Opuszczasz kolejkę Popielnego Koloseum.",
       "arenaSands": "Wkraczasz na piaski Popielnego Koloseum.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "Poprosiłeś {name} o wymianę.",
       "tradeOpened": "Otwarto okno wymiany.",
       "tradeComplete": "Wymiana zakończona.",
@@ -6388,6 +6389,11 @@ export const pl_PL: EnTranslations = {
       "playerLevelClassTitle": "{name} - poz. {level} {className}",
       "noChallengers": "Nikt jeszcze nie wszedł do rankingu - bądź pierwszy.",
       "matchInProgress": "Pojedynek w toku przeciwko {name}.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Opuść kolejkę",
       "searching": "Szukanie przeciwnika... ({count} w kolejce)",
       "enterQueue": "Dołącz do kolejki",

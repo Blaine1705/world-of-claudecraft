@@ -6220,6 +6220,7 @@ export const it_IT: EnTranslations = {
       "arenaJoin": "Ti unisci alla coda del Colosseo Cinereo. Attendi un avversario degno...",
       "arenaLeave": "Esci dalla coda del Colosseo Cinereo.",
       "arenaSands": "Metti piede sulle sabbie del Colosseo Cinereo.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "Hai richiesto uno scambio con {name}.",
       "tradeOpened": "Finestra di scambio aperta.",
       "tradeComplete": "Scambio completato.",
@@ -6388,6 +6389,11 @@ export const it_IT: EnTranslations = {
       "playerLevelClassTitle": "{name} - Liv {level} {className}",
       "noChallengers": "Nessun contendente in classifica - sii il primo.",
       "matchInProgress": "Incontro in corso contro {name}.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Lascia coda",
       "searching": "Ricerca avversario... ({count} in coda)",
       "enterQueue": "Entra in coda",
