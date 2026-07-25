@@ -46,7 +46,7 @@ function arm(sim: TestSim): void {
 }
 
 function hit(sim: TestSim, from: Entity, amount: number): void {
-  (sim as unknown as { ctx: { dealDamage(...args: unknown[]) : void } }).ctx.dealDamage(
+  (sim as unknown as { ctx: { dealDamage(...args: unknown[]): void } }).ctx.dealDamage(
     from,
     sim.player,
     amount,

@@ -221,7 +221,7 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     const direct = sim.events.find(
       (event) => event.type === 'damage' && event.ability === res.def.name,
     );
-    if (!direct || direct.type !== 'damage') throw new Error('missing direct Fell Shot damage');
+    if (direct?.type !== 'damage') throw new Error('missing direct Fell Shot damage');
     const dot = target.auras.find(
       (aura) => aura.kind === 'dot' && aura.id === 'arcane_shot' && aura.sourceId === player.id,
     );
@@ -255,7 +255,7 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
       const event = sim.events.find(
         (candidate) => candidate.type === 'damage' && candidate.ability === res.def.name,
       );
-      if (!event || event.type !== 'damage') throw new Error('missing Gloom Bolt damage');
+      if (event?.type !== 'damage') throw new Error('missing Gloom Bolt damage');
       return event.amount;
     };
 

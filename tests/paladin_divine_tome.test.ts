@@ -135,7 +135,9 @@ describe('paladin Divine Tome: the chain is class-locked and ordered', () => {
       expect(state('q_divine_tome', step1Ready, 6, cls), `q_divine_tome for ${cls}`).toBe(
         'unavailable',
       );
-      expect(state(FINAL_QUEST, riteReady, 6, cls), `${FINAL_QUEST} for ${cls}`).toBe('unavailable');
+      expect(state(FINAL_QUEST, riteReady, 6, cls), `${FINAL_QUEST} for ${cls}`).toBe(
+        'unavailable',
+      );
     }
 
     // Fails closed: a caller that cannot say who it is gets nothing.

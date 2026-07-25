@@ -351,7 +351,7 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     });
   });
 
-  it('lights Mending Light and Dawn\'s Embrace, and only those, while Radiant Resonance is worn', () => {
+  it("lights Mending Light and Dawn's Embrace, and only those, while Radiant Resonance is worn", () => {
     const view = createActionBarView(
       descriptor(
         slot(1, {

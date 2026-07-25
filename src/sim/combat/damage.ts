@@ -29,6 +29,7 @@ import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
+import { grantAbilityDevotion } from '../paladin_devotion';
 import { pvpDamageMultiplier } from '../pvp';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
@@ -65,7 +66,6 @@ import {
   igniteOnCrit,
   PERSONAL_BARRIER_IDS,
 } from './fire_mage';
-import { grantAbilityDevotion } from '../paladin_devotion';
 import { cleanupPaladinAegis } from './paladin_aegis';
 import { stripBeaconOfLight } from './paladin_beacon';
 import { protectionConsecrationDamageReduction } from './paladin_consecration';

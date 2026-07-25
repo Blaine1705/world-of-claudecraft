@@ -16,7 +16,5 @@ export function riteAnswersTheWholeGroup(
   spec: string | null | undefined,
   level: number,
 ): boolean {
-  return (
-    abilityId === RITE_OF_MANY_ABILITY_ID && spec === 'holy' && level >= RITE_OF_MANY_LEVEL
-  );
+  return abilityId === RITE_OF_MANY_ABILITY_ID && spec === 'holy' && level >= RITE_OF_MANY_LEVEL;
 }

@@ -64,7 +64,9 @@ function riteOffers(sim: AnySim, at: Entity): Set<number> {
 
 describe('Rite of many: the predicate', () => {
   it('answers for the group only as Holy, only from level 16', () => {
-    expect(riteAnswersTheWholeGroup(RITE_OF_MANY_ABILITY_ID, 'holy', RITE_OF_MANY_LEVEL)).toBe(true);
+    expect(riteAnswersTheWholeGroup(RITE_OF_MANY_ABILITY_ID, 'holy', RITE_OF_MANY_LEVEL)).toBe(
+      true,
+    );
     expect(riteAnswersTheWholeGroup(RITE_OF_MANY_ABILITY_ID, 'holy', 20)).toBe(true);
   });
 
