@@ -1259,6 +1259,56 @@ describe('boss loot and encounter resets', () => {
     expect(thralls()).toBe(0);
   });
 
+  it('does not summon more Varkas Boneguards after Marrowlord Varkas dies', () => {
+    const sim = makeSim();
+    const internals = sim as unknown as {
+      addEntity(e: Entity): void;
+      dealDamage(
+        source: Entity,
+        target: Entity,
+        amount: number,
+        crit: boolean,
+        school: string,
+        ability: string | null,
+        kind: 'hit',
+        noRage?: boolean,
+      ): void;
+      updateBossMechanics(mob: Entity): void;
+    };
+    const varkas = createMob(990103, MOBS.marrowlord_varkas, 19, { x: 0, y: 0, z: 0 });
+    internals.addEntity(varkas);
+    teleportTo(sim, 2, 0);
+    sim.player.maxHp = 100000;
+    sim.player.hp = sim.player.maxHp;
+    varkas.inCombat = true;
+    varkas.aggroTargetId = sim.player.id;
+    varkas.hp = Math.floor(varkas.maxHp * 0.65);
+    internals.updateBossMechanics(varkas);
+
+    const boneguards = () =>
+      [...sim.entities.values()].filter((e) => e.templateId === 'varkas_boneguard');
+    expect(boneguards()).toHaveLength(2);
+    expect(varkas.firedSummons).toBe(1);
+
+    internals.dealDamage(
+      sim.player,
+      varkas,
+      varkas.hp + 1,
+      false,
+      'physical',
+      'Test Strike',
+      'hit',
+      true,
+    );
+    expect(varkas.dead).toBe(true);
+
+    internals.updateBossMechanics(varkas);
+    for (let i = 0; i < 5; i++) sim.tick();
+
+    expect(boneguards()).toHaveLength(2);
+    expect(varkas.firedSummons).toBe(1);
+  });
+
   it('leaveDungeon outdoors is a no-op (no crypt-door fallback teleport)', () => {
     const sim = makeSim();
     const p = sim.player;

@@ -6332,6 +6332,7 @@ export class Sim {
   // every tick while the boss is in combat; thresholds fire once per pull
   // and reset on evade/respawn.
   private updateBossMechanics(mob: Entity): void {
+    if (mob.dead || mob.hp <= 0) return;
     const tmpl = MOBS[mob.templateId];
     if (
       !tmpl ||
