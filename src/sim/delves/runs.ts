@@ -1272,6 +1272,17 @@ export function startDelveRaiseDeadChannel(
   return true;
 }
 
+// Evade/wipe reset: an in-flight Raise Dead channel is DelveRun-level state
+// (not an Entity field), so the generic resetEvadingMob (mob/locomotion.ts)
+// cannot reach it directly. If the boss going home mid-channel is the one who
+// started it, drop it: mirrors the manual grave-interrupt cancel in
+// delveInteract below, so a stale channel never outlives the reset and spawns
+// unowned adds a few seconds after the pull was supposed to have ended.
+export function clearDelveRaiseDeadChannel(ctx: SimContext, boss: Entity): void {
+  const run = delveRunForMob(ctx, boss.id);
+  if (run?.raiseDeadChannel?.bossId === boss.id) run.raiseDeadChannel = null;
+}
+
 // ----- interact + reward delivery --------------------------------------------
 
 export function delveInteract(ctx: SimContext, objectId: number, pid?: number): boolean {
