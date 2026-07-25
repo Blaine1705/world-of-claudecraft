@@ -4408,6 +4408,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorRecoveryHint':
     '每組代碼僅能使用一次。請將它們存放在安全的地方：如果你遺失了驗證器應用程式，這是唯一能重新登入的方式。',
   'hudChrome.account.twoFactorDownloadCodes': '下載代碼',
+  'hudChrome.account.recoveryCodesFileHeader': '{brand} 復原碼',
+  'hudChrome.account.recoveryCodesFileAccount': '帳號：{username}',
+  'hudChrome.account.recoveryCodesFileHint': '如果你無法存取驗證器應用程式，每組代碼僅能使用一次。',
+  'hudChrome.account.recoveryCodesFileWarn': '請將此檔案存放在安全且私密的地方。',
   'hudChrome.account.twoFactorDone': '完成',
   'hudChrome.account.twoFactorDisableHint': '請輸入密碼以關閉雙重驗證。你的復原碼將會作廢。',
   'hudChrome.account.twoFactorDisableBtn': '關閉雙重驗證',

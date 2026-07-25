@@ -1348,6 +1348,13 @@ export const hudChromeStrings = {
     twoFactorRecoveryHint:
       'Each code works once. Store them somewhere safe: they are the only way back in if you lose your authenticator app.',
     twoFactorDownloadCodes: 'Download Codes',
+    // Recovery-codes download file (plain text): formatRecoveryCodesFile in
+    // src/ui/two_factor_setup.ts builds the downloadable file from these.
+    recoveryCodesFileHeader: '{brand} recovery codes',
+    recoveryCodesFileAccount: 'Account: {username}',
+    recoveryCodesFileHint:
+      'Each code can be used once if you lose access to your authenticator app.',
+    recoveryCodesFileWarn: 'Keep this file somewhere safe and private.',
     twoFactorDone: 'Done',
     twoFactorDisableHint:
       'Enter your password to turn two-factor off. Your recovery codes will be discarded.',

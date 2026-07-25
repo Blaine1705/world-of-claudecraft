@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.account.recoveryCodesFileAccount",
+    "hudChrome.account.recoveryCodesFileHeader",
+    "hudChrome.account.recoveryCodesFileHint",
+    "hudChrome.account.recoveryCodesFileWarn"
+  ],
+  "es_ES": [
+    "hudChrome.account.recoveryCodesFileAccount",
+    "hudChrome.account.recoveryCodesFileHeader",
+    "hudChrome.account.recoveryCodesFileHint",
+    "hudChrome.account.recoveryCodesFileWarn"
+  ],
+  "fr_FR": [
+    "hudChrome.account.recoveryCodesFileAccount",
+    "hudChrome.account.recoveryCodesFileHeader",
+    "hudChrome.account.recoveryCodesFileHint",
+    "hudChrome.account.recoveryCodesFileWarn"
+  ],
+  "fr_CA": [
+    "hudChrome.account.recoveryCodesFileAccount",
+    "hudChrome.account.recoveryCodesFileHeader",
+    "hudChrome.account.recoveryCodesFileHint",
+    "hudChrome.account.recoveryCodesFileWarn"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.account.recoveryCodesFileAccount",
+    "hudChrome.account.recoveryCodesFileHeader",
+    "hudChrome.account.recoveryCodesFileHint",
+    "hudChrome.account.recoveryCodesFileWarn"
+  ],
+  "de_DE": [
+    "hudChrome.account.recoveryCodesFileAccount",
+    "hudChrome.account.recoveryCodesFileHeader",
+    "hudChrome.account.recoveryCodesFileHint",
+    "hudChrome.account.recoveryCodesFileWarn"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.account.recoveryCodesFileAccount",
+    "hudChrome.account.recoveryCodesFileHeader",
+    "hudChrome.account.recoveryCodesFileHint",
+    "hudChrome.account.recoveryCodesFileWarn"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.account.recoveryCodesFileAccount",
+    "hudChrome.account.recoveryCodesFileHeader",
+    "hudChrome.account.recoveryCodesFileHint",
+    "hudChrome.account.recoveryCodesFileWarn"
+  ],
+  "nl_NL": [
+    "hudChrome.account.recoveryCodesFileAccount",
+    "hudChrome.account.recoveryCodesFileHeader",
+    "hudChrome.account.recoveryCodesFileHint",
+    "hudChrome.account.recoveryCodesFileWarn"
+  ],
+  "pl_PL": [
+    "hudChrome.account.recoveryCodesFileAccount",
+    "hudChrome.account.recoveryCodesFileHeader",
+    "hudChrome.account.recoveryCodesFileHint",
+    "hudChrome.account.recoveryCodesFileWarn"
+  ],
+  "id_ID": [
+    "hudChrome.account.recoveryCodesFileAccount",
+    "hudChrome.account.recoveryCodesFileHeader",
+    "hudChrome.account.recoveryCodesFileHint",
+    "hudChrome.account.recoveryCodesFileWarn"
+  ],
+  "tr_TR": [
+    "hudChrome.account.recoveryCodesFileAccount",
+    "hudChrome.account.recoveryCodesFileHeader",
+    "hudChrome.account.recoveryCodesFileHint",
+    "hudChrome.account.recoveryCodesFileWarn"
+  ],
+  "sv_SE": [
+    "hudChrome.account.recoveryCodesFileAccount",
+    "hudChrome.account.recoveryCodesFileHeader",
+    "hudChrome.account.recoveryCodesFileHint",
+    "hudChrome.account.recoveryCodesFileWarn"
+  ],
+  "vi_VN": [
+    "hudChrome.account.recoveryCodesFileAccount",
+    "hudChrome.account.recoveryCodesFileHeader",
+    "hudChrome.account.recoveryCodesFileHint",
+    "hudChrome.account.recoveryCodesFileWarn"
+  ],
+  "da_DK": [
+    "hudChrome.account.recoveryCodesFileAccount",
+    "hudChrome.account.recoveryCodesFileHeader",
+    "hudChrome.account.recoveryCodesFileHint",
+    "hudChrome.account.recoveryCodesFileWarn"
+  ]
 };

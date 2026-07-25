@@ -1,10 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { t } from '../src/ui/i18n';
 import {
-  formatSecretGroups,
-  normalizeAuthCodeInput,
-  isCompleteTotpCode,
   classifyAuthCode,
   formatRecoveryCodesFile,
+  formatSecretGroups,
+  isCompleteTotpCode,
+  normalizeAuthCodeInput,
 } from '../src/ui/two_factor_setup';
 
 describe('formatSecretGroups', () => {
@@ -52,5 +53,15 @@ describe('formatRecoveryCodesFile', () => {
     expect(blob).toContain('Account: Aelwyn');
     expect(blob).toContain('01. aaaa-bbbb');
     expect(blob).toContain('02. cccc-dddd');
+  });
+
+  it('builds the header, account line, and hint/warn prose from t(), not raw literals', () => {
+    const blob = formatRecoveryCodesFile(['aaaa-bbbb'], 'Aelwyn');
+    expect(blob).toContain(
+      t('hudChrome.account.recoveryCodesFileHeader', { brand: 'World of ClaudeCraft' }),
+    );
+    expect(blob).toContain(t('hudChrome.account.recoveryCodesFileAccount', { username: 'Aelwyn' }));
+    expect(blob).toContain(t('hudChrome.account.recoveryCodesFileHint'));
+    expect(blob).toContain(t('hudChrome.account.recoveryCodesFileWarn'));
   });
 });
