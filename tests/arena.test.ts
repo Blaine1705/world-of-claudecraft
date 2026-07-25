@@ -778,25 +778,28 @@ describe('arena: enclosing walls', () => {
       const xLimit = DUNGEON_WALL_X - DUNGEON_WALL_HW - PLAYER_BODY_RADIUS;
       const zMinLimit = ARENA_LAYOUT.zMin + DUNGEON_WALL_HW + PLAYER_BODY_RADIUS;
       const zMaxLimit = ARENA_LAYOUT.zMax - DUNGEON_WALL_HW - PLAYER_BODY_RADIUS;
+      // Sweep lanes are obstacle-free rows/columns of the layout (z-6 dodges
+      // the approach screens and posts; x+18 runs outside every pillar/stub)
+      // so each sweep exercises the WALL collider, not interior cover.
       const cases = [
         {
-          from: { x: o.x, z: o.z - 14 },
-          to: { x: o.x - DUNGEON_WALL_X - 10, z: o.z - 14 },
+          from: { x: o.x, z: o.z - 6 },
+          to: { x: o.x - DUNGEON_WALL_X - 10, z: o.z - 6 },
           inside: (x: number, _z: number) => x >= o.x - xLimit - 1e-6,
         },
         {
-          from: { x: o.x, z: o.z - 14 },
-          to: { x: o.x + DUNGEON_WALL_X + 10, z: o.z - 14 },
+          from: { x: o.x, z: o.z - 6 },
+          to: { x: o.x + DUNGEON_WALL_X + 10, z: o.z - 6 },
           inside: (x: number, _z: number) => x <= o.x + xLimit + 1e-6,
         },
         {
-          from: { x: o.x + 5, z: o.z + 2 },
-          to: { x: o.x + 5, z: o.z + ARENA_LAYOUT.zMin - 10 },
+          from: { x: o.x + 18, z: o.z + 2 },
+          to: { x: o.x + 18, z: o.z + ARENA_LAYOUT.zMin - 10 },
           inside: (_x: number, z: number) => z >= o.z + zMinLimit - 1e-6,
         },
         {
-          from: { x: o.x + 5, z: o.z + 2 },
-          to: { x: o.x + 5, z: o.z + ARENA_LAYOUT.zMax + 10 },
+          from: { x: o.x + 18, z: o.z + 2 },
+          to: { x: o.x + 18, z: o.z + ARENA_LAYOUT.zMax + 10 },
           inside: (_x: number, z: number) => z <= o.z + zMaxLimit + 1e-6,
         },
       ];
@@ -859,6 +862,26 @@ describe('arena: enclosing walls', () => {
     const startHp = target.hp;
     for (let i = 0; i < 20 * 3; i++) sim.tick();
     // stays toggled on (mirrors the ranged LOS gate) but never lands a swing
+    expect(target.hp).toBe(startHp);
+  });
+
+  it('melee auto-attack cannot land through an approach screen', () => {
+    const { sim, a, b } = queueDuo();
+    startBout(sim);
+    const target = sim.entities.get(b)!;
+    const slot = sim.arenaMatchFor(a)!.slot ?? 0;
+    const o = arenaOrigin(slot);
+    // fighters on opposite faces of the west spawn-A approach screen, within
+    // MELEE_RANGE of each other but with the screen's full height between.
+    const screen = ARENA_LAYOUT.stubs.find((s) => s.x === -5 && s.z === -10)!;
+    expect(screen).toBeTruthy();
+    teleport(sim, a, o.x + screen.x, o.z + screen.z - screen.hd - 1.2);
+    teleport(sim, b, o.x + screen.x, o.z + screen.z + screen.hd + 1.2);
+    face(sim, a, b);
+    sim.targetEntity(b, a);
+    sim.startAutoAttack(a);
+    const startHp = target.hp;
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
     expect(target.hp).toBe(startHp);
   });
 });
