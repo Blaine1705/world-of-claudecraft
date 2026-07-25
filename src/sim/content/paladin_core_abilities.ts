@@ -535,7 +535,7 @@ const protection: AbilityDef[] = [
     name: 'Sunward Disc',
     class: 'paladin',
     specs: ['protection'],
-    learnLevel: 12,
+    learnLevel: 10,
     cost: 25,
     castTime: 0,
     cooldown: 10,

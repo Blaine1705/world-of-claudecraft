@@ -307,8 +307,21 @@ describe('modifier bake and known-ability resolution', () => {
     expect(prot.stats).toMatchObject({ armorPct: 0.1, staPct: 0.4, armorFromStrPct: 0.7 });
   });
 
+  // The paladin is the one class that does NOT hand its signature over at spec
+  // choice. Its overhauled kit authors its own progression (the paladinBaseKitGrant
+  // branch in abilitiesKnownAt keeps these levels authoritative instead of letting
+  // the generic signature grant reveal them early), so specializing is the promise
+  // and the signature is the payoff a few levels later. Pinned by level rather than
+  // skipped, so drifting one of them still reddens.
+  const PALADIN_SIGNATURE_LEVELS: Record<string, number> = {
+    holy: 8, // Mercy Lance
+    protection: 10, // Sunward Disc
+    retribution: 8, // Final Edict
+  };
+
   it('makes every spec signature known at the first unlock level', () => {
     for (const cls of ALL_CLASSES) {
+      if (cls === 'paladin') continue;
       for (const spec of requiredTalents(cls).specs) {
         const known = abilitiesKnownAt(
           cls,
@@ -320,6 +333,34 @@ describe('modifier bake and known-ability resolution', () => {
           `${cls}:${spec.id}:${spec.signature}`,
         ).toBe(true);
       }
+    }
+  });
+
+  it('gives the paladin its signatures at its own authored levels, not at spec choice', () => {
+    for (const spec of requiredTalents('paladin').specs) {
+      const level = PALADIN_SIGNATURE_LEVELS[spec.id];
+      expect(level, `paladin:${spec.id} has no pinned signature level`).toBeDefined();
+      expect(level).toBeGreaterThan(FIRST_TALENT_LEVEL);
+
+      const knownAtSpecChoice = abilitiesKnownAt(
+        'paladin',
+        FIRST_TALENT_LEVEL,
+        computeTalentModifiers('paladin', allocation(spec.id), FIRST_TALENT_LEVEL),
+      );
+      expect(
+        knownAtSpecChoice.some((ability) => ability.def.id === spec.signature),
+        `paladin:${spec.id}:${spec.signature} must not arrive at spec choice`,
+      ).toBe(false);
+
+      const knownAtLevel = abilitiesKnownAt(
+        'paladin',
+        level,
+        computeTalentModifiers('paladin', allocation(spec.id), level),
+      );
+      expect(
+        knownAtLevel.some((ability) => ability.def.id === spec.signature),
+        `paladin:${spec.id}:${spec.signature} at level ${level}`,
+      ).toBe(true);
     }
   });
 
