@@ -374,11 +374,37 @@ describe('async balance reads repaint the FOOTER, not the whole window', () => {
 
   it('the wallet UI change listener repaints only the money row', () => {
     expect(hud).toMatch(/onWalletUiChange\(\(\) => \{[^}]*this\.bagsWindow\.refreshMoneyRow\(\);/);
+    // ONLY. A toMatch on the new call says nothing about the old one: re-adding
+    // `this.renderBags();` on the next line satisfies every affirmative pin here
+    // while restoring the exact teardown this block is named after. Scoped to the
+    // block, not the file, because ~7 other sites call renderBags() legitimately.
+    expect(hud).not.toMatch(/onWalletUiChange\(\(\) => \{[^}]*this\.renderBags\(\);/);
   });
 
   it('the Claudium balance resolve repaints only the money row', () => {
     expect(hud).toMatch(
       /this\.setClaudiumLauncherBalance\(balance\);[^}]*this\.bagsWindow\.refreshMoneyRow\(\);/,
+    );
+    expect(hud).not.toMatch(
+      /this\.setClaudiumLauncherBalance\(balance\);[^}]*this\.renderBags\(\);/,
+    );
+  });
+
+  it('leaves the pending flag as the re-entry guard, reset only in the finally arm', () => {
+    // The repaint re-enters claudiumLauncherHtml() -> refreshClaudiumLauncherBalance(),
+    // so something has to stop a self-feeding balance read. That something is
+    // claudiumLauncherBalancePending, which is still true inside .then because
+    // .finally has not run: the 30s throttle re-stamp is a second line of defense,
+    // not the first. Move the reset into .then (before the repaint) and the loop is
+    // live again with every behavior test still green, so pin WHERE it is cleared.
+    expect(hud).toMatch(
+      /\.finally\(\(\) => \{\s*if \(seq === this\.claudiumLauncherBalanceSeq\) \{\s*this\.claudiumLauncherBalancePending = false;/,
+    );
+    const resets = hud.match(/this\.claudiumLauncherBalancePending = false;/g) ?? [];
+    expect(resets).toHaveLength(2); // the finally arm + the attachClaudium re-arm
+    // And the early-return that consumes it still guards the whole read.
+    expect(hud).toMatch(
+      /if \(!this\.claudiumHooks \|\| this\.claudiumLauncherBalancePending\) return;/,
     );
   });
 

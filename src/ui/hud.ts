@@ -4295,8 +4295,10 @@ export class Hud {
         // balance read's own schedule with no user action behind it, so a full
         // renderBags() here would tear the window down under a player who is
         // mid-drag, hovering a tooltip, or typing in bag search. Re-entry is not a
-        // risk: the repaint calls claudiumLauncherHtml again, but the 30s throttle
-        // was just re-stamped by setClaudiumLauncherBalance above.
+        // risk: the repaint does call claudiumLauncherHtml again, but
+        // claudiumLauncherBalancePending is still true here (.finally has not run),
+        // so the nested read returns before it ever consults the 30s throttle. The
+        // throttle re-stamp above is the second line of defense, not the first.
         if (bagsWindowShown($('#bags').style.display)) this.bagsWindow.refreshMoneyRow();
       })
       .catch(() => {
@@ -12003,8 +12005,10 @@ export class Hud {
     // Dock the char-sheet pairing when its companion opens (the touch cluster).
     this.syncCharBagsPairing();
     audio.bagOpen();
-    // Pull a fresh on-chain $WOC balance for the footer; the async result
-    // re-renders the bag via the onWalletUiChange listener wired in the ctor.
+    // Pull a fresh on-chain $WOC balance for the footer; the async result repaints
+    // the footer (not the whole bag) via the onWalletUiChange listener wired in the
+    // ctor. The display is set to 'flex' above precisely so that listener's
+    // bagsWindowShown gate sees an open window when the balance lands.
     this.optionsHooks?.refreshWocBalance();
   }
 
