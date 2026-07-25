@@ -351,6 +351,40 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     });
   });
 
+  it('lights Mending Light and Dawn\'s Embrace, and only those, while Radiant Resonance is worn', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, {
+          ability: ability('holy_light', { cost: 65, cooldown: 0, castTime: 2.5 }),
+        }),
+        slot(2, {
+          ability: ability('dawns_embrace', { cost: 46, cooldown: 0, castTime: 2.5 }),
+        }),
+        // Same spec, same bar, not empowered by this proc: the glow must not
+        // spill onto every heal the paladin happens to have slotted.
+        slot(3, {
+          ability: ability('radiant_chorus', { cost: 55, cooldown: 12 }),
+        }),
+        slot(4, {
+          ability: ability('mercy_lance', { cost: 20, cooldown: 0, castTime: 1.75 }),
+        }),
+      ),
+      fakeDeps(),
+    );
+
+    const withoutProc = view.tick(world({ auras: [] })).slots;
+    expect(withoutProc[0]).toMatchObject({ procGlow: false, empowered: false });
+    expect(withoutProc[1]).toMatchObject({ procGlow: false, empowered: false });
+
+    const slots = view.tick(
+      world({ auras: [{ kind: 'paladin_radiant_resonance' as AuraKind, value: 0.5 }] }),
+    ).slots;
+    expect(slots[0]).toMatchObject({ procGlow: true, empowered: true });
+    expect(slots[1]).toMatchObject({ procGlow: true, empowered: true });
+    expect(slots[2]).toMatchObject({ procGlow: false, empowered: false });
+    expect(slots[3]).toMatchObject({ procGlow: false, empowered: false });
+  });
+
   it("shows Dawn's Wrath as one stored Hammer cast without exposing its running cooldown", () => {
     const view = createActionBarView(
       descriptor(

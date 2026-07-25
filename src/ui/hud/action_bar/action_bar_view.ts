@@ -27,6 +27,7 @@
 import { freeCostAuraActive } from '../../../sim/combat/empower_next';
 import { frostProcGlowActive } from '../../../sim/combat/frost_mage';
 import { dawnsWrathHammerActive } from '../../../sim/combat/paladin_dawns_wrath';
+import { radiantResonanceAbilityGlowActive } from '../../../sim/combat/paladin_radiant_resonance';
 import {
   solarReprisalAbilityGlowActive,
   solarReprisalBypassesCooldown,
@@ -558,10 +559,14 @@ export function createActionBarView(
           (player.paladinDevotion?.ascensionRemaining ?? 0) > 0;
         const ascensionEmpowered =
           divineAscensionActive && isAscensionEmpoweredAbility(player.paladinSpec ?? null, def.id);
+        // Radiant Chorus's proc: Mending Light turns instant and Dawn's Embrace
+        // halves its cost, so both light up while Radiant Resonance is worn.
+        const radiantResonanceActive = radiantResonanceAbilityGlowActive(player, def.id);
         slot.procGlow =
           freeByProc ||
           dawnsWrathActive ||
           solarReprisalActive ||
+          radiantResonanceActive ||
           windowGlow ||
           frostProcGlowActive(player.auras ?? [], def.id) ||
           sunVerdictAbilityGlowActive(target?.auras, player.id, def.id) ||
@@ -570,6 +575,7 @@ export function createActionBarView(
           hasEmpoweringAura(player.auras, ability) ||
           dawnsWrathActive ||
           solarReprisalActive ||
+          radiantResonanceActive ||
           ascensionEmpowered;
         slot.ascensionSpender = ascensionEmpowered;
         slot.ascensionCostLabel = ascensionEmpowered ? deps.formatCount(-1) : '';

@@ -6,8 +6,32 @@ export const RADIANT_RESONANCE_DURATION = 10;
 export const RADIANT_RESONANCE_DAWN_CAST_TIME = 1.5;
 export const RADIANT_RESONANCE_DAWN_COST_MULTIPLIER = 0.5;
 
+// The two abilities Radiant Resonance empowers: Mending Light becomes instant
+// (consumeNextCastInstant) and Dawn's Embrace costs half and casts in 1.5 sec
+// (nextCastCheapMultiplier / radiantResonanceCastTime).
+export const RADIANT_RESONANCE_CONSUMERS: ReadonlySet<string> = new Set([
+  'holy_light',
+  'dawns_embrace',
+]);
+
+interface RadiantResonanceAuraOwner {
+  auras: readonly { kind: string }[];
+}
+
 export function hasRadiantResonance(entity: Entity): boolean {
   return entity.auras.some((aura) => aura.kind === RADIANT_RESONANCE_KIND);
+}
+
+// The action bar's read: the same predicate the combat path uses, so the slot can
+// never glow for an ability the proc would not actually empower (and vice versa).
+export function radiantResonanceAbilityGlowActive(
+  owner: RadiantResonanceAuraOwner,
+  abilityId: string,
+): boolean {
+  return (
+    RADIANT_RESONANCE_CONSUMERS.has(abilityId) &&
+    owner.auras.some((aura) => aura.kind === RADIANT_RESONANCE_KIND)
+  );
 }
 
 export function reserveRadiantResonance(entity: Entity, abilityId: string): void {
