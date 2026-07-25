@@ -38,14 +38,14 @@ export const ru_RU: EnTranslations = {
     "filterLabel": "Фильтр команд",
     "filterPlaceholder": "Поиск в этой категории",
     "noMatches": "Нет подходящих команд.",
-    "itemSearchPlaceholder": "Search by name or id",
-    "itemResultsAria": "Matching items",
-    "itemNoMatches": "No items match.",
-    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
-    "itemChosen": "Selected: {name}",
-    "itemUnknown": "No item has that id.",
-    "itemHeroicTag": "Heroic",
-    "kitCurrentSpec": "Current spec",
+    "itemSearchPlaceholder": "Поиск по названию или идентификатору",
+    "itemResultsAria": "Подходящие предметы",
+    "itemNoMatches": "Нет подходящих предметов.",
+    "itemMore": "Показано {shown} из {total}. Продолжайте вводить, чтобы сузить список.",
+    "itemChosen": "Выбрано: {name}",
+    "itemUnknown": "Нет предмета с таким идентификатором.",
+    "itemHeroicTag": "Героический",
+    "kitCurrentSpec": "Текущая специализация",
     "serverRequirement": "Для серверных читов всё ещё требуется ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Выберите допустимые значения перед запуском этой команды.",
     "sent": "Отправлено: {command}",
@@ -64,7 +64,7 @@ export const ru_RU: EnTranslations = {
       "dungeon": "Подземелье",
       "difficulty": "Сложность",
       "name": "Имя",
-      "spec": "Spec"
+      "spec": "Специализация"
     },
     "difficulty": {
       "normal": "Обычная",
@@ -124,8 +124,8 @@ export const ru_RU: EnTranslations = {
         "description": "Добавить предмет в инвентарь игрока."
       },
       "kit": {
-        "label": "Equip fresh-20 kit",
-        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
+        "label": "Экипировать комплект свежего 20 уровня",
+        "description": "Надеть комплект уровня 20 (до Sanctum) для выбранной специализации, сначала сумки. Только снаряжение."
       },
       "gold": {
         "label": "Добавить золото",
@@ -2465,7 +2465,7 @@ export const ru_RU: EnTranslations = {
       "targetTitle": "Выберите предмет для зачарования",
       "noEnchants": "Нет чар, использующих этот реагент.",
       "noTargets": "Нет подходящего предмета для зачарования.",
-      "wornTag": "Worn ({slot})",
+      "wornTag": "Надето ({slot})",
       "tier": {
         "base": "Базовые чары",
         "runed": "Рунные чары",

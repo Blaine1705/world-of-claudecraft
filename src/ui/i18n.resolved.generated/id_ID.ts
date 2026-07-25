@@ -38,14 +38,14 @@ export const id_ID: EnTranslations = {
     "filterLabel": "Saring perintah",
     "filterPlaceholder": "Cari dalam kategori ini",
     "noMatches": "Tidak ada perintah yang cocok.",
-    "itemSearchPlaceholder": "Search by name or id",
-    "itemResultsAria": "Matching items",
-    "itemNoMatches": "No items match.",
-    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
-    "itemChosen": "Selected: {name}",
-    "itemUnknown": "No item has that id.",
-    "itemHeroicTag": "Heroic",
-    "kitCurrentSpec": "Current spec",
+    "itemSearchPlaceholder": "Cari berdasarkan nama atau id",
+    "itemResultsAria": "Barang yang cocok",
+    "itemNoMatches": "Tidak ada barang yang cocok.",
+    "itemMore": "Menampilkan {shown} dari {total}. Terus mengetik untuk mempersempit.",
+    "itemChosen": "Dipilih: {name}",
+    "itemUnknown": "Tidak ada barang dengan id itu.",
+    "itemHeroicTag": "Heroik",
+    "kitCurrentSpec": "Spesialisasi saat ini",
     "serverRequirement": "Perintah curang server tetap memerlukan ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Pilih nilai yang valid sebelum menjalankan perintah ini.",
     "sent": "Terkirim: {command}",
@@ -64,7 +64,7 @@ export const id_ID: EnTranslations = {
       "dungeon": "Dungeon",
       "difficulty": "Tingkat kesulitan",
       "name": "Nama",
-      "spec": "Spec"
+      "spec": "Spesialisasi"
     },
     "difficulty": {
       "normal": "Normal",
@@ -124,8 +124,8 @@ export const id_ID: EnTranslations = {
         "description": "Tambahkan barang ke inventaris pemain."
       },
       "kit": {
-        "label": "Equip fresh-20 kit",
-        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
+        "label": "Kenakan kit level 20 baru",
+        "description": "Kenakan preset level 20 pra-Sanktum untuk sebuah spesialisasi, tas dahulu. Hanya perlengkapan."
       },
       "gold": {
         "label": "Tambah emas",
@@ -1062,7 +1062,7 @@ export const id_ID: EnTranslations = {
       "walkByAutoloot": "Jarah Otomatis Sambil Lewat",
       "groundReticle": "Retikel bidik darat",
       "mouseoverCast": "Rapal Saat Menyorot Bingkai Kelompok",
-      "stickyTarget": "Keep Target on Ground Click",
+      "stickyTarget": "Pertahankan Sasaran Saat Klik Tanah",
       "showItemLevel": "Tampilkan Level Item",
       "itemLevelLine": "Level Item {level}",
       "itemScoreLine": "Skor {score}",
@@ -1543,8 +1543,8 @@ export const id_ID: EnTranslations = {
       "dragDestroyHint": "Seret ke dunia untuk menghancurkan",
       "reorderNeedsRecent": "Hapus filter dan urutkan berdasarkan Terbaru untuk mengatur ulang tasmu",
       "itemAriaInstanced": "{item}, jumlah {count}, salinan bermerek pembuat",
-      "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
-      "itemAriaBound": "{item}, quantity {count}, bound copy",
+      "itemAriaEnchanted": "{item}, jumlah {count}, salinan dimantrai",
+      "itemAriaBound": "{item}, jumlah {count}, salinan terikat",
       "itemAriaMasterwork": "{item}, jumlah {count}, karya master",
       "filterGroupAria": "Saring tas menurut kategori",
       "filterAll": "Semua",
@@ -1770,18 +1770,18 @@ export const id_ID: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Membutuhkan Level {level}",
-      "statEnchanted": "+{value} {stat} (Enchanted)",
-      "enchantedFallback": "Enchanted"
+      "statEnchanted": "+{value} {stat} (Dimantrai)",
+      "enchantedFallback": "Dimantrai"
     },
     "materialHint": {
-      "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
-      "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
-      "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
-      "resonantThread": "Enchanting reagent. Disenchanted from rare and better cloth armor.",
-      "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
-      "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
-      "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
-      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
+      "arcaneDust": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan umum dan tak biasa.",
+      "arcaneEssence": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan langka.",
+      "arcaneShard": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan epik dan legendaris.",
+      "resonantThread": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan zirah kain langka atau lebih baik.",
+      "resonantHide": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan zirah kulit langka atau lebih baik.",
+      "resonantLinks": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan zirah rantai langka atau lebih baik.",
+      "resonantSteel": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan senjata jarak dekat langka atau lebih baik.",
+      "resonantTimber": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan staf, tongkat sihir, busur, dan busur silang langka atau lebih baik."
     },
     "discord": {
       "title": "Discord",
@@ -2023,8 +2023,8 @@ export const id_ID: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "World Market collection waiting",
-      "tip": "Gold or items are waiting for you at the Merchant."
+      "aria": "Pengambilan Pasar Dunia menanti",
+      "tip": "Emas atau barang menantimu di Sang Pedagang."
     },
     "noticeboard": {
       "empty": "Sepertinya tidak ada yang ditempel."
@@ -2147,15 +2147,15 @@ export const id_ID: EnTranslations = {
       "hideOffline": "Sembunyikan yang luring",
       "hideOfflineTitle": "Sembunyikan anggota serikat yang sedang luring",
       "billboard": {
-        "label": "Guild Billboard",
-        "empty": "Nothing on the billboard yet.",
-        "setBy": "Set by {name}",
-        "save": "Save",
-        "placeholder": "Write a message for the guild",
-        "inputLabel": "Guild billboard message",
+        "label": "Papan Pengumuman Serikat",
+        "empty": "Belum ada apa pun di papan pengumuman.",
+        "setBy": "Ditetapkan oleh {name}",
+        "save": "Simpan",
+        "placeholder": "Tulis pesan untuk serikat",
+        "inputLabel": "Pesan papan pengumuman serikat",
         "result": {
-          "set": "The guild billboard was updated.",
-          "notOfficer": "Only officers and the Guild Master may edit the billboard."
+          "set": "Papan pengumuman serikat telah diperbarui.",
+          "notOfficer": "Hanya perwira dan Pemimpin Serikat yang boleh mengedit papan pengumuman."
         }
       }
     },
@@ -2465,25 +2465,25 @@ export const id_ID: EnTranslations = {
       "targetTitle": "Pilih barang untuk dimantrai",
       "noEnchants": "Tidak ada mantrai yang menggunakan reagen ini.",
       "noTargets": "Tidak ada barang yang memenuhi syarat untuk dimantrai.",
-      "wornTag": "Worn ({slot})",
+      "wornTag": "Dipakai ({slot})",
       "tier": {
-        "base": "Base Enchants",
-        "runed": "Runed Enchants",
-        "greater": "Greater Enchants"
+        "base": "Mantra Dasar",
+        "runed": "Mantra Bersura",
+        "greater": "Mantra Unggul"
       },
-      "yieldHeader": "Expected materials:",
+      "yieldHeader": "Bahan yang diharapkan:",
       "yieldLineExact": "{count} {item}",
-      "yieldLineRange": "{min} to {max} {item}",
-      "alreadyEnchanted": "That item is already enchanted.",
-      "sameEnchant": "That item already has that enchant.",
-      "replaceTag": "Replaces {enchant}",
-      "sameEnchantTag": "Already applied",
-      "replaceConfirmTitle": "Replace the enchant on {item}?",
-      "replaceConfirmBody": "This replaces {old} on {item} with {new}.",
-      "replaceConfirmNoRefund": "The old enchant is destroyed. Its materials are not refunded. This cannot be undone.",
-      "replaceConfirmCost": "Cost: {cost}",
+      "yieldLineRange": "{min} hingga {max} {item}",
+      "alreadyEnchanted": "Barang itu sudah dimantrai.",
+      "sameEnchant": "Barang itu sudah memiliki mantra itu.",
+      "replaceTag": "Menggantikan {enchant}",
+      "sameEnchantTag": "Sudah diterapkan",
+      "replaceConfirmTitle": "Ganti mantra pada {item}?",
+      "replaceConfirmBody": "Ini mengganti {old} pada {item} dengan {new}.",
+      "replaceConfirmNoRefund": "Mantra lama dihancurkan. Bahannya tidak dikembalikan. Tindakan ini tidak dapat dibatalkan.",
+      "replaceConfirmCost": "Biaya: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
-      "replaceConfirmAccept": "Replace"
+      "replaceConfirmAccept": "Ganti"
     },
     "training": {
       "title": "Pelatihan: {name}",
@@ -6243,7 +6243,7 @@ export const id_ID: EnTranslations = {
       "arenaJoin": "Kamu bergabung ke antrean Ashen Coliseum. Bersiaplah untuk lawan yang setara...",
       "arenaLeave": "Kamu meninggalkan antrean Ashen Coliseum.",
       "arenaSands": "Kamu melangkah ke atas pasir Ashen Coliseum.",
-      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
+      "arenaSandsDrowned": "Kamu melangkah ke atas bebatuan tergenang di Istana Tenggelam.",
       "tradeRequestSent": "Kamu telah meminta untuk berdagang dengan {name}.",
       "tradeOpened": "Jendela perdagangan dibuka.",
       "tradeComplete": "Perdagangan selesai.",
@@ -6404,7 +6404,7 @@ export const id_ID: EnTranslations = {
       "cancel": "Batal"
     },
     "arena": {
-      "title": "Ashen Coliseum",
+      "title": "Koloseum Berabu",
       "subtitle": "Berperingkat 1v1",
       "close": "Tutup arena",
       "offlineNote": "Ashen Coliseum adalah arena 1v1 berperingkat untuk dunia langsung. Mainkan secara daring untuk masuk antrean dan menaiki tangga peringkat.",
@@ -6412,10 +6412,10 @@ export const id_ID: EnTranslations = {
       "playerLevelClassTitle": "{name} - Lv {level} {className}",
       "noChallengers": "Belum ada penantang berperingkat - jadilah yang pertama.",
       "matchInProgress": "Pertandingan berlangsung melawan {name}.",
-      "mapName": "Map: {name}",
+      "mapName": "Peta: {name}",
       "map": {
-        "coliseum": "Ashen Coliseum",
-        "drownedCourt": "The Drowned Court"
+        "coliseum": "Koloseum Berabu",
+        "drownedCourt": "Istana Tenggelam"
       },
       "leaveQueue": "Tinggalkan Antrean",
       "searching": "Mencari lawan... ({count} dalam antrean)",
@@ -6720,15 +6720,15 @@ export const id_ID: EnTranslations = {
       "filterTypeOther": "Lainnya",
       "filterArmorType": "Jenis zirah",
       "filterArmorAll": "Semua zirah",
-      "filterArmorSlot": "Armor slot",
-      "filterArmorClassAll": "All armor types",
-      "armorCloth": "Cloth",
-      "armorLeather": "Leather",
-      "armorMail": "Mail",
+      "filterArmorSlot": "Slot zirah",
+      "filterArmorClassAll": "Semua jenis zirah",
+      "armorCloth": "Kain",
+      "armorLeather": "Kulit",
+      "armorMail": "Rantai",
       "filterWeaponType": "Jenis senjata",
       "filterWeaponAll": "Semua senjata",
-      "filterPrimaryStat": "Primary stat",
-      "filterPrimaryStatAll": "Any primary stat",
+      "filterPrimaryStat": "Stat utama",
+      "filterPrimaryStatAll": "Stat utama apa pun",
       "filterRarity": "Kelangkaan",
       "filterRarityAll": "Semua kelangkaan",
       "weaponSword": "Pedang",

@@ -38,14 +38,14 @@ export const nl_NL: EnTranslations = {
     "filterLabel": "Opdrachten filteren",
     "filterPlaceholder": "Deze categorie doorzoeken",
     "noMatches": "Geen overeenkomende opdrachten.",
-    "itemSearchPlaceholder": "Search by name or id",
-    "itemResultsAria": "Matching items",
-    "itemNoMatches": "No items match.",
-    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
-    "itemChosen": "Selected: {name}",
-    "itemUnknown": "No item has that id.",
-    "itemHeroicTag": "Heroic",
-    "kitCurrentSpec": "Current spec",
+    "itemSearchPlaceholder": "Zoeken op naam of id",
+    "itemResultsAria": "Overeenkomende voorwerpen",
+    "itemNoMatches": "Geen overeenkomende voorwerpen.",
+    "itemMore": "{shown} van {total} getoond. Blijf typen om te verfijnen.",
+    "itemChosen": "Geselecteerd: {name}",
+    "itemUnknown": "Geen voorwerp heeft dat id.",
+    "itemHeroicTag": "Heroïsch",
+    "kitCurrentSpec": "Huidige spec",
     "serverRequirement": "Servercheats vereisen nog steeds ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Kies geldige waarden voordat je deze opdracht uitvoert.",
     "sent": "Verzonden: {command}",
@@ -124,8 +124,8 @@ export const nl_NL: EnTranslations = {
         "description": "Voeg een voorwerp toe aan de inventaris van de speler."
       },
       "kit": {
-        "label": "Equip fresh-20 kit",
-        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
+        "label": "Kit voor vers niveau 20 uitrusten",
+        "description": "Rust de niveau-20-set van vóór het Heiligdom uit voor een spec, eerst de tassen. Alleen uitrusting."
       },
       "gold": {
         "label": "Goud toevoegen",
@@ -1062,7 +1062,7 @@ export const nl_NL: EnTranslations = {
       "walkByAutoloot": "Buit oprapen in het voorbijgaan",
       "groundReticle": "Grondrichtkruis",
       "mouseoverCast": "Mouseover-bezwering op groepsframes",
-      "stickyTarget": "Keep Target on Ground Click",
+      "stickyTarget": "Doel behouden bij klikken op de grond",
       "showItemLevel": "Itemniveau tonen",
       "itemLevelLine": "Itemniveau {level}",
       "itemScoreLine": "Score {score}",
@@ -1543,8 +1543,8 @@ export const nl_NL: EnTranslations = {
       "dragDestroyHint": "Sleep naar buiten in de wereld om te vernietigen",
       "reorderNeedsRecent": "Verwijder het filter en sorteer op Recent om je tassen opnieuw te rangschikken",
       "itemAriaInstanced": "{item}, aantal {count}, door maker gemerkt exemplaar",
-      "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
-      "itemAriaBound": "{item}, quantity {count}, bound copy",
+      "itemAriaEnchanted": "{item}, aantal {count}, betoverd exemplaar",
+      "itemAriaBound": "{item}, aantal {count}, gebonden exemplaar",
       "itemAriaMasterwork": "{item}, hoeveelheid {count}, meesterwerk",
       "filterGroupAria": "Tassen filteren op categorie",
       "filterAll": "Alle",
@@ -1770,18 +1770,18 @@ export const nl_NL: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Vereist niveau {level}",
-      "statEnchanted": "+{value} {stat} (Enchanted)",
-      "enchantedFallback": "Enchanted"
+      "statEnchanted": "+{value} {stat} (Betoverd)",
+      "enchantedFallback": "Betoverd"
     },
     "materialHint": {
-      "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
-      "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
-      "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
-      "resonantThread": "Enchanting reagent. Disenchanted from rare and better cloth armor.",
-      "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
-      "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
-      "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
-      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
+      "arcaneDust": "Betoveringsreagens. Verkregen door het onbetoveren van gewone en ongewone uitrusting.",
+      "arcaneEssence": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame uitrusting.",
+      "arcaneShard": "Betoveringsreagens. Verkregen door het onbetoveren van epische en legendarische uitrusting.",
+      "resonantThread": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere stofwapenrusting.",
+      "resonantHide": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere leerwapenrusting.",
+      "resonantLinks": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere maliënwapenrusting.",
+      "resonantSteel": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere meleewapens.",
+      "resonantTimber": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere staven, stokken, bogen en kruisbogen."
     },
     "discord": {
       "title": "Discord",
@@ -2023,8 +2023,8 @@ export const nl_NL: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "World Market collection waiting",
-      "tip": "Gold or items are waiting for you at the Merchant."
+      "aria": "Ophaling wacht bij de Wereldmarkt",
+      "tip": "Goud of voorwerpen wachten op je bij de Koopman."
     },
     "noticeboard": {
       "empty": "Er lijkt niets opgehangen te zijn."
@@ -2147,15 +2147,15 @@ export const nl_NL: EnTranslations = {
       "hideOffline": "Offline verbergen",
       "hideOfflineTitle": "Offline gildeleden verbergen",
       "billboard": {
-        "label": "Guild Billboard",
-        "empty": "Nothing on the billboard yet.",
-        "setBy": "Set by {name}",
-        "save": "Save",
-        "placeholder": "Write a message for the guild",
-        "inputLabel": "Guild billboard message",
+        "label": "Gildeprikbord",
+        "empty": "Nog niets op het prikbord.",
+        "setBy": "Geplaatst door {name}",
+        "save": "Opslaan",
+        "placeholder": "Schrijf een bericht voor de gilde",
+        "inputLabel": "Bericht voor het gildeprikbord",
         "result": {
-          "set": "The guild billboard was updated.",
-          "notOfficer": "Only officers and the Guild Master may edit the billboard."
+          "set": "Het gildeprikbord is bijgewerkt.",
+          "notOfficer": "Alleen officieren en de Gildemeester mogen het prikbord bewerken."
         }
       }
     },
@@ -2465,25 +2465,25 @@ export const nl_NL: EnTranslations = {
       "targetTitle": "Kies een voorwerp om te betoveren",
       "noEnchants": "Geen betovering gebruikt dit reagens.",
       "noTargets": "Geen geschikt voorwerp om te betoveren.",
-      "wornTag": "Worn ({slot})",
+      "wornTag": "Gedragen ({slot})",
       "tier": {
-        "base": "Base Enchants",
-        "runed": "Runed Enchants",
-        "greater": "Greater Enchants"
+        "base": "Basisbetoveringen",
+        "runed": "Gerunede betoveringen",
+        "greater": "Grotere betoveringen"
       },
-      "yieldHeader": "Expected materials:",
+      "yieldHeader": "Verwachte materialen:",
       "yieldLineExact": "{count} {item}",
-      "yieldLineRange": "{min} to {max} {item}",
-      "alreadyEnchanted": "That item is already enchanted.",
-      "sameEnchant": "That item already has that enchant.",
-      "replaceTag": "Replaces {enchant}",
-      "sameEnchantTag": "Already applied",
-      "replaceConfirmTitle": "Replace the enchant on {item}?",
-      "replaceConfirmBody": "This replaces {old} on {item} with {new}.",
-      "replaceConfirmNoRefund": "The old enchant is destroyed. Its materials are not refunded. This cannot be undone.",
-      "replaceConfirmCost": "Cost: {cost}",
+      "yieldLineRange": "{min} tot {max} {item}",
+      "alreadyEnchanted": "Dat voorwerp is al betoverd.",
+      "sameEnchant": "Dat voorwerp heeft die betovering al.",
+      "replaceTag": "Vervangt {enchant}",
+      "sameEnchantTag": "Al toegepast",
+      "replaceConfirmTitle": "Betovering op {item} vervangen?",
+      "replaceConfirmBody": "Dit vervangt {old} op {item} door {new}.",
+      "replaceConfirmNoRefund": "De oude betovering wordt vernietigd. De materialen worden niet teruggegeven. Dit kan niet ongedaan worden gemaakt.",
+      "replaceConfirmCost": "Kosten: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
-      "replaceConfirmAccept": "Replace"
+      "replaceConfirmAccept": "Vervangen"
     },
     "training": {
       "title": "Opleiding: {name}",
@@ -6243,7 +6243,7 @@ export const nl_NL: EnTranslations = {
       "arenaJoin": "Je sluit je aan bij de wachtrij van het Ashen Coliseum. Wacht op een waardige tegenstander...",
       "arenaLeave": "Je verlaat de wachtrij van het Ashen Coliseum.",
       "arenaSands": "Je betreedt het zand van het Ashen Coliseum.",
-      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
+      "arenaSandsDrowned": "Je betreedt de overspoelde stenen van het Verdronken Hof.",
       "tradeRequestSent": "Je hebt verzocht om met {name} te ruilen.",
       "tradeOpened": "Ruilvenster geopend.",
       "tradeComplete": "Ruil voltooid.",
@@ -6412,10 +6412,10 @@ export const nl_NL: EnTranslations = {
       "playerLevelClassTitle": "{name} - Nv {level} {className}",
       "noChallengers": "Nog geen uitdagers gerangschikt - wees de eerste.",
       "matchInProgress": "Wedstrijd bezig tegen {name}.",
-      "mapName": "Map: {name}",
+      "mapName": "Kaart: {name}",
       "map": {
-        "coliseum": "Ashen Coliseum",
-        "drownedCourt": "The Drowned Court"
+        "coliseum": "Asgrauwe Colosseum",
+        "drownedCourt": "Het Verdronken Hof"
       },
       "leaveQueue": "Wachtrij Verlaten",
       "searching": "Op zoek naar een tegenstander... ({count} in wachtrij)",
@@ -6720,15 +6720,15 @@ export const nl_NL: EnTranslations = {
       "filterTypeOther": "Overig",
       "filterArmorType": "Pantsertype",
       "filterArmorAll": "Alle pantsers",
-      "filterArmorSlot": "Armor slot",
-      "filterArmorClassAll": "All armor types",
-      "armorCloth": "Cloth",
-      "armorLeather": "Leather",
-      "armorMail": "Mail",
+      "filterArmorSlot": "Pantserslot",
+      "filterArmorClassAll": "Alle pantsertypes",
+      "armorCloth": "Stof",
+      "armorLeather": "Leer",
+      "armorMail": "Maliën",
       "filterWeaponType": "Wapentype",
       "filterWeaponAll": "Alle wapens",
-      "filterPrimaryStat": "Primary stat",
-      "filterPrimaryStatAll": "Any primary stat",
+      "filterPrimaryStat": "Primaire eigenschap",
+      "filterPrimaryStatAll": "Elke eigenschap",
       "filterRarity": "Zeldzaamheid",
       "filterRarityAll": "Alle zeldzaamheden",
       "weaponSword": "Zwaarden",

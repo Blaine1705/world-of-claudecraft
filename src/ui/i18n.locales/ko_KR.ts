@@ -9135,4 +9135,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.itemAriaEnchanted': '{item}, 수량 {count}, 마법부여된 사본',
   'hudChrome.bags.itemAriaBound': '{item}, 수량 {count}, 귀속된 사본',
   'hudChrome.itemTooltip.enchantedFallback': '마법부여됨',
+  'devCommand.actions.kit.description':
+    '특성에 맞는 성소 입장 전 20레벨 사전 설정 장비를 가방부터 착용합니다. 장비만 해당됩니다.',
+  'devCommand.actions.kit.label': '20레벨 초기 장비 세트 착용',
+  'devCommand.fields.spec': '전문화',
+  'devCommand.itemChosen': '선택됨: {name}',
+  'devCommand.itemHeroicTag': '영웅',
+  'devCommand.itemMore': '{total}개 중 {shown}개 표시 중입니다. 계속 입력해 범위를 좁히세요.',
+  'devCommand.itemNoMatches': '일치하는 아이템이 없습니다.',
+  'devCommand.itemResultsAria': '일치하는 아이템',
+  'devCommand.itemSearchPlaceholder': '이름 또는 ID로 검색',
+  'devCommand.itemUnknown': '해당 ID를 가진 아이템이 없습니다.',
+  'devCommand.kitCurrentSpec': '현재 전문화',
+  'hudChrome.enchanting.wornTag': '착용 중 ({slot})',
 };

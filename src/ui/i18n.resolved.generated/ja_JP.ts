@@ -38,14 +38,14 @@ export const ja_JP: EnTranslations = {
     "filterLabel": "コマンドを絞り込む",
     "filterPlaceholder": "このカテゴリを検索",
     "noMatches": "一致するコマンドはありません。",
-    "itemSearchPlaceholder": "Search by name or id",
-    "itemResultsAria": "Matching items",
-    "itemNoMatches": "No items match.",
-    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
-    "itemChosen": "Selected: {name}",
-    "itemUnknown": "No item has that id.",
-    "itemHeroicTag": "Heroic",
-    "kitCurrentSpec": "Current spec",
+    "itemSearchPlaceholder": "名前またはIDで検索",
+    "itemResultsAria": "一致するアイテム",
+    "itemNoMatches": "一致するアイテムはありません。",
+    "itemMore": "{total}件中{shown}件を表示。続けて入力すると絞り込まれます。",
+    "itemChosen": "選択中: {name}",
+    "itemUnknown": "そのIDのアイテムはありません。",
+    "itemHeroicTag": "ヒロイック",
+    "kitCurrentSpec": "現在のスペック",
     "serverRequirement": "サーバーのチート機能には引き続き ALLOW_DEV_COMMANDS=1 が必要です。",
     "invalidValues": "実行する前に有効な値を選択してください。",
     "sent": "送信済み：{command}",
@@ -64,7 +64,7 @@ export const ja_JP: EnTranslations = {
       "dungeon": "ダンジョン",
       "difficulty": "難易度",
       "name": "名前",
-      "spec": "Spec"
+      "spec": "スペック"
     },
     "difficulty": {
       "normal": "ノーマル",
@@ -124,8 +124,8 @@ export const ja_JP: EnTranslations = {
         "description": "プレイヤーのインベントリにアイテムを追加します。"
       },
       "kit": {
-        "label": "Equip fresh-20 kit",
-        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
+        "label": "新規20キットを装備",
+        "description": "指定したスペック向けのSanctum以前レベル20プリセットを装備します (バッグを先に)。装備品のみです。"
       },
       "gold": {
         "label": "ゴールドを追加",
@@ -2465,7 +2465,7 @@ export const ja_JP: EnTranslations = {
       "targetTitle": "エンチャントするアイテムを選択",
       "noEnchants": "この素材を使うエンチャントはありません。",
       "noTargets": "エンチャントできるアイテムがありません。",
-      "wornTag": "Worn ({slot})",
+      "wornTag": "装備中 ({slot})",
       "tier": {
         "base": "基本エンチャント",
         "runed": "ルーンエンチャント",

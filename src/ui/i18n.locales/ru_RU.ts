@@ -9319,4 +9319,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.itemAriaEnchanted': '{item}, количество {count}, зачарованный экземпляр',
   'hudChrome.bags.itemAriaBound': '{item}, количество {count}, привязанный экземпляр',
   'hudChrome.itemTooltip.enchantedFallback': 'Зачаровано',
+  'devCommand.actions.kit.description':
+    'Надеть комплект уровня 20 (до Sanctum) для выбранной специализации, сначала сумки. Только снаряжение.',
+  'devCommand.actions.kit.label': 'Экипировать комплект свежего 20 уровня',
+  'devCommand.fields.spec': 'Специализация',
+  'devCommand.itemChosen': 'Выбрано: {name}',
+  'devCommand.itemHeroicTag': 'Героический',
+  'devCommand.itemMore': 'Показано {shown} из {total}. Продолжайте вводить, чтобы сузить список.',
+  'devCommand.itemNoMatches': 'Нет подходящих предметов.',
+  'devCommand.itemResultsAria': 'Подходящие предметы',
+  'devCommand.itemSearchPlaceholder': 'Поиск по названию или идентификатору',
+  'devCommand.itemUnknown': 'Нет предмета с таким идентификатором.',
+  'devCommand.kitCurrentSpec': 'Текущая специализация',
+  'hudChrome.enchanting.wornTag': 'Надето ({slot})',
 };

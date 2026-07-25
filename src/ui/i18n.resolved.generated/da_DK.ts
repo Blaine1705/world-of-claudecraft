@@ -38,14 +38,14 @@ export const da_DK: EnTranslations = {
     "filterLabel": "Filtrér kommandoer",
     "filterPlaceholder": "Søg i denne kategori",
     "noMatches": "Ingen matchende kommandoer.",
-    "itemSearchPlaceholder": "Search by name or id",
-    "itemResultsAria": "Matching items",
-    "itemNoMatches": "No items match.",
-    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
-    "itemChosen": "Selected: {name}",
-    "itemUnknown": "No item has that id.",
-    "itemHeroicTag": "Heroic",
-    "kitCurrentSpec": "Current spec",
+    "itemSearchPlaceholder": "Søg efter navn eller id",
+    "itemResultsAria": "Matchende genstande",
+    "itemNoMatches": "Ingen genstande matcher.",
+    "itemMore": "Viser {shown} af {total}. Bliv ved med at skrive for at indsnævre søgningen.",
+    "itemChosen": "Valgt: {name}",
+    "itemUnknown": "Ingen genstand har det id.",
+    "itemHeroicTag": "Heroisk",
+    "kitCurrentSpec": "Nuværende specialisering",
     "serverRequirement": "Serverfusk kræver stadig ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Vælg gyldige værdier, før du kører kommandoen.",
     "sent": "Sendt: {command}",
@@ -64,7 +64,7 @@ export const da_DK: EnTranslations = {
       "dungeon": "Fangekælder",
       "difficulty": "Sværhedsgrad",
       "name": "Navn",
-      "spec": "Spec"
+      "spec": "Specialisering"
     },
     "difficulty": {
       "normal": "Normal",
@@ -124,8 +124,8 @@ export const da_DK: EnTranslations = {
         "description": "Føj en genstand til spillerens inventar."
       },
       "kit": {
-        "label": "Equip fresh-20 kit",
-        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
+        "label": "Udrust frisk 20-sæt",
+        "description": "Ifør den forudindstillede niveau 20-opsætning fra før Sanctum til en specialisering, tasker først. Kun udstyr."
       },
       "gold": {
         "label": "Tilføj guld",
@@ -1062,7 +1062,7 @@ export const da_DK: EnTranslations = {
       "walkByAutoloot": "Auto-plyndring i forbifarten",
       "groundReticle": "Jordsigte-retikel",
       "mouseoverCast": "Museover-kast på grupperammer",
-      "stickyTarget": "Keep Target on Ground Click",
+      "stickyTarget": "Bevar mål ved jordklik",
       "showItemLevel": "Vis genstandsniveau",
       "itemLevelLine": "Genstandsniveau {level}",
       "itemScoreLine": "Score {score}",
@@ -1543,8 +1543,8 @@ export const da_DK: EnTranslations = {
       "dragDestroyHint": "Træk ud i verden for at ødelægge",
       "reorderNeedsRecent": "Ryd filteret og sortér efter Seneste for at omarrangere dine tasker",
       "itemAriaInstanced": "{item}, antal {count}, signeret kopi",
-      "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
-      "itemAriaBound": "{item}, quantity {count}, bound copy",
+      "itemAriaEnchanted": "{item}, antal {count}, fortryllet kopi",
+      "itemAriaBound": "{item}, antal {count}, bundet kopi",
       "itemAriaMasterwork": "{item}, antal {count}, mesterværk",
       "filterGroupAria": "Filtrér tasker efter kategori",
       "filterAll": "Alle",
@@ -1770,18 +1770,18 @@ export const da_DK: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Kræver niveau {level}",
-      "statEnchanted": "+{value} {stat} (Enchanted)",
-      "enchantedFallback": "Enchanted"
+      "statEnchanted": "+{value} {stat} (Fortryllet)",
+      "enchantedFallback": "Fortryllet"
     },
     "materialHint": {
-      "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
-      "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
-      "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
-      "resonantThread": "Enchanting reagent. Disenchanted from rare and better cloth armor.",
-      "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
-      "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
-      "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
-      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
+      "arcaneDust": "Fortryllelsesreagens. Fås ved affortryllelse af almindeligt og ualmindeligt udstyr.",
+      "arcaneEssence": "Fortryllelsesreagens. Fås ved affortryllelse af sjældent udstyr.",
+      "arcaneShard": "Fortryllelsesreagens. Fås ved affortryllelse af episk og legendarisk udstyr.",
+      "resonantThread": "Fortryllelsesreagens. Fås ved affortryllelse af stofrustning af sjælden kvalitet eller bedre.",
+      "resonantHide": "Fortryllelsesreagens. Fås ved affortryllelse af læderrustning af sjælden kvalitet eller bedre.",
+      "resonantLinks": "Fortryllelsesreagens. Fås ved affortryllelse af ringbrynje af sjælden kvalitet eller bedre.",
+      "resonantSteel": "Fortryllelsesreagens. Fås ved affortryllelse af nærkampsvåben af sjælden kvalitet eller bedre.",
+      "resonantTimber": "Fortryllelsesreagens. Fås ved affortryllelse af stave, tryllestave, buer og armbrøster af sjælden kvalitet eller bedre."
     },
     "discord": {
       "title": "Discord",
@@ -2023,8 +2023,8 @@ export const da_DK: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "World Market collection waiting",
-      "tip": "Gold or items are waiting for you at the Merchant."
+      "aria": "Afhentning fra Verdensmarkedet venter",
+      "tip": "Guld eller genstande venter på dig hos Købmanden."
     },
     "noticeboard": {
       "empty": "Der ser ikke ud til at være slået noget op."
@@ -2147,15 +2147,15 @@ export const da_DK: EnTranslations = {
       "hideOffline": "Skjul offline",
       "hideOfflineTitle": "Skjul offline gildemedlemmer",
       "billboard": {
-        "label": "Guild Billboard",
-        "empty": "Nothing on the billboard yet.",
-        "setBy": "Set by {name}",
-        "save": "Save",
-        "placeholder": "Write a message for the guild",
-        "inputLabel": "Guild billboard message",
+        "label": "Laugsopslagstavle",
+        "empty": "Der er intet på opslagstavlen endnu.",
+        "setBy": "Sat af {name}",
+        "save": "Gem",
+        "placeholder": "Skriv en besked til lauget",
+        "inputLabel": "Besked til laugsopslagstavlen",
         "result": {
-          "set": "The guild billboard was updated.",
-          "notOfficer": "Only officers and the Guild Master may edit the billboard."
+          "set": "Laugsopslagstavlen blev opdateret.",
+          "notOfficer": "Kun officerer og lavsmesteren kan redigere opslagstavlen."
         }
       }
     },
@@ -2465,25 +2465,25 @@ export const da_DK: EnTranslations = {
       "targetTitle": "Vælg en genstand at fortryle",
       "noEnchants": "Ingen fortryllelse bruger dette reagens.",
       "noTargets": "Ingen berettiget genstand at fortryle.",
-      "wornTag": "Worn ({slot})",
+      "wornTag": "Båret ({slot})",
       "tier": {
-        "base": "Base Enchants",
-        "runed": "Runed Enchants",
-        "greater": "Greater Enchants"
+        "base": "Basisfortryllelser",
+        "runed": "Runede Fortryllelser",
+        "greater": "Større Fortryllelser"
       },
-      "yieldHeader": "Expected materials:",
+      "yieldHeader": "Forventede materialer:",
       "yieldLineExact": "{count} {item}",
-      "yieldLineRange": "{min} to {max} {item}",
-      "alreadyEnchanted": "That item is already enchanted.",
-      "sameEnchant": "That item already has that enchant.",
-      "replaceTag": "Replaces {enchant}",
-      "sameEnchantTag": "Already applied",
-      "replaceConfirmTitle": "Replace the enchant on {item}?",
-      "replaceConfirmBody": "This replaces {old} on {item} with {new}.",
-      "replaceConfirmNoRefund": "The old enchant is destroyed. Its materials are not refunded. This cannot be undone.",
-      "replaceConfirmCost": "Cost: {cost}",
+      "yieldLineRange": "{min} til {max} {item}",
+      "alreadyEnchanted": "Den genstand er allerede fortryllet.",
+      "sameEnchant": "Den genstand har allerede den fortryllelse.",
+      "replaceTag": "Erstatter {enchant}",
+      "sameEnchantTag": "Allerede anvendt",
+      "replaceConfirmTitle": "Erstat fortryllelsen på {item}?",
+      "replaceConfirmBody": "Dette erstatter {old} på {item} med {new}.",
+      "replaceConfirmNoRefund": "Den gamle fortryllelse ødelægges. Dens materialer refunderes ikke. Dette kan ikke fortrydes.",
+      "replaceConfirmCost": "Pris: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
-      "replaceConfirmAccept": "Replace"
+      "replaceConfirmAccept": "Erstat"
     },
     "training": {
       "title": "Træning: {name}",
@@ -6243,7 +6243,7 @@ export const da_DK: EnTranslations = {
       "arenaJoin": "Du tilslutter dig køen til Ashen Coliseum. Vent på en værdig modstander...",
       "arenaLeave": "Du forlader køen til Ashen Coliseum.",
       "arenaSands": "Du træder ud på sandet i Ashen Coliseum.",
-      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
+      "arenaSandsDrowned": "Du træder ud på de oversvømmede sten i Den Druknede Gård.",
       "tradeRequestSent": "Du har anmodet om at handle med {name}.",
       "tradeOpened": "Handelsvindue åbnet.",
       "tradeComplete": "Handel fuldført.",
@@ -6412,10 +6412,10 @@ export const da_DK: EnTranslations = {
       "playerLevelClassTitle": "{name} - Niv {level} {className}",
       "noChallengers": "Ingen udfordrere rangeret endnu - vær den første.",
       "matchInProgress": "Kamp i gang mod {name}.",
-      "mapName": "Map: {name}",
+      "mapName": "Kort: {name}",
       "map": {
-        "coliseum": "Ashen Coliseum",
-        "drownedCourt": "The Drowned Court"
+        "coliseum": "Askegrå Colosseum",
+        "drownedCourt": "Den Druknede Gård"
       },
       "leaveQueue": "Forlad Køen",
       "searching": "Søger efter en modstander... ({count} i kø)",
@@ -6720,15 +6720,15 @@ export const da_DK: EnTranslations = {
       "filterTypeOther": "Andet",
       "filterArmorType": "Rustningstype",
       "filterArmorAll": "Al rustning",
-      "filterArmorSlot": "Armor slot",
-      "filterArmorClassAll": "All armor types",
-      "armorCloth": "Cloth",
-      "armorLeather": "Leather",
-      "armorMail": "Mail",
+      "filterArmorSlot": "Rustningsplads",
+      "filterArmorClassAll": "Alle rustningstyper",
+      "armorCloth": "Stof",
+      "armorLeather": "Læder",
+      "armorMail": "Ringbrynje",
       "filterWeaponType": "Våbentype",
       "filterWeaponAll": "Alle våben",
-      "filterPrimaryStat": "Primary stat",
-      "filterPrimaryStatAll": "Any primary stat",
+      "filterPrimaryStat": "Primær statistik",
+      "filterPrimaryStatAll": "Alle primære statistikker",
       "filterRarity": "Sjældenhed",
       "filterRarityAll": "Alle sjældenheder",
       "weaponSword": "Sværd",

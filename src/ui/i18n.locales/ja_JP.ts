@@ -9149,4 +9149,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.itemAriaEnchanted': '{item}、数量 {count}、エンチャント済みの品',
   'hudChrome.bags.itemAriaBound': '{item}、数量 {count}、バインド済みの品',
   'hudChrome.itemTooltip.enchantedFallback': 'エンチャント済み',
+  'devCommand.actions.kit.description':
+    '指定したスペック向けのSanctum以前レベル20プリセットを装備します (バッグを先に)。装備品のみです。',
+  'devCommand.actions.kit.label': '新規20キットを装備',
+  'devCommand.fields.spec': 'スペック',
+  'devCommand.itemChosen': '選択中: {name}',
+  'devCommand.itemHeroicTag': 'ヒロイック',
+  'devCommand.itemMore': '{total}件中{shown}件を表示。続けて入力すると絞り込まれます。',
+  'devCommand.itemNoMatches': '一致するアイテムはありません。',
+  'devCommand.itemResultsAria': '一致するアイテム',
+  'devCommand.itemSearchPlaceholder': '名前またはIDで検索',
+  'devCommand.itemUnknown': 'そのIDのアイテムはありません。',
+  'devCommand.kitCurrentSpec': '現在のスペック',
+  'hudChrome.enchanting.wornTag': '装備中 ({slot})',
 };

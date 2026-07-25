@@ -38,14 +38,14 @@ export const es: EnTranslations = {
     "filterLabel": "Filtrar comandos",
     "filterPlaceholder": "Buscar en esta categoría",
     "noMatches": "No hay comandos coincidentes.",
-    "itemSearchPlaceholder": "Search by name or id",
-    "itemResultsAria": "Matching items",
-    "itemNoMatches": "No items match.",
-    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
-    "itemChosen": "Selected: {name}",
-    "itemUnknown": "No item has that id.",
-    "itemHeroicTag": "Heroic",
-    "kitCurrentSpec": "Current spec",
+    "itemSearchPlaceholder": "Buscar por nombre o id",
+    "itemResultsAria": "Objetos coincidentes",
+    "itemNoMatches": "No hay objetos coincidentes.",
+    "itemMore": "Mostrando {shown} de {total}. Sigue escribiendo para acotar.",
+    "itemChosen": "Seleccionado: {name}",
+    "itemUnknown": "Ningún objeto tiene ese id.",
+    "itemHeroicTag": "Heroico",
+    "kitCurrentSpec": "Especialización actual",
     "serverRequirement": "Los trucos del servidor siguen requiriendo ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Elige valores válidos antes de ejecutar este comando.",
     "sent": "Enviado: {command}",
@@ -64,7 +64,7 @@ export const es: EnTranslations = {
       "dungeon": "Mazmorra",
       "difficulty": "Dificultad",
       "name": "Nombre",
-      "spec": "Spec"
+      "spec": "Especialización"
     },
     "difficulty": {
       "normal": "Normal",
@@ -124,8 +124,8 @@ export const es: EnTranslations = {
         "description": "Añade un objeto al inventario del jugador."
       },
       "kit": {
-        "label": "Equip fresh-20 kit",
-        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
+        "label": "Equipar kit de nivel 20 nuevo",
+        "description": "Equipa el kit preestablecido de nivel 20 previo al Santuario para una especialización, primero las bolsas. Solo equipo."
       },
       "gold": {
         "label": "Añadir oro",
@@ -1062,7 +1062,7 @@ export const es: EnTranslations = {
       "walkByAutoloot": "Saqueo automático al pasar",
       "groundReticle": "Retícula de objetivo terrestre",
       "mouseoverCast": "Lanzar al pasar el cursor sobre los marcos de grupo",
-      "stickyTarget": "Keep Target on Ground Click",
+      "stickyTarget": "Mantener objetivo al hacer clic en el suelo",
       "showItemLevel": "Mostrar nivel de objeto",
       "itemLevelLine": "Nivel de objeto {level}",
       "itemScoreLine": "Puntuación {score}",
@@ -1543,8 +1543,8 @@ export const es: EnTranslations = {
       "dragDestroyHint": "Arrastra fuera del inventario para destruir",
       "reorderNeedsRecent": "Limpia el filtro y ordena por Reciente para reorganizar tus bolsas",
       "itemAriaInstanced": "{item}, cantidad {count}, copia marcada por el creador",
-      "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
-      "itemAriaBound": "{item}, quantity {count}, bound copy",
+      "itemAriaEnchanted": "{item}, cantidad {count}, copia encantada",
+      "itemAriaBound": "{item}, cantidad {count}, copia vinculada",
       "itemAriaMasterwork": "{item}, cantidad {count}, obra maestra",
       "filterGroupAria": "Filtrar bolsas por categoría",
       "filterAll": "Todos",
@@ -1770,18 +1770,18 @@ export const es: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Requiere nivel {level}",
-      "statEnchanted": "+{value} {stat} (Enchanted)",
-      "enchantedFallback": "Enchanted"
+      "statEnchanted": "+{value} {stat} (Encantado)",
+      "enchantedFallback": "Encantado"
     },
     "materialHint": {
-      "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
-      "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
-      "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
-      "resonantThread": "Enchanting reagent. Disenchanted from rare and better cloth armor.",
-      "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
-      "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
-      "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
-      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
+      "arcaneDust": "Reactivo de encantamiento. Se obtiene desencantando equipo común y poco común.",
+      "arcaneEssence": "Reactivo de encantamiento. Se obtiene desencantando equipo raro.",
+      "arcaneShard": "Reactivo de encantamiento. Se obtiene desencantando equipo épico y legendario.",
+      "resonantThread": "Reactivo de encantamiento. Se obtiene desencantando armadura de tela rara o mejor.",
+      "resonantHide": "Reactivo de encantamiento. Se obtiene desencantando armadura de cuero rara o mejor.",
+      "resonantLinks": "Reactivo de encantamiento. Se obtiene desencantando armadura de malla rara o mejor.",
+      "resonantSteel": "Reactivo de encantamiento. Se obtiene desencantando armas de cuerpo a cuerpo raras o mejores.",
+      "resonantTimber": "Reactivo de encantamiento. Se obtiene desencantando bastones, varitas, arcos y ballestas raros o mejores."
     },
     "discord": {
       "title": "Discord",
@@ -2023,8 +2023,8 @@ export const es: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "World Market collection waiting",
-      "tip": "Gold or items are waiting for you at the Merchant."
+      "aria": "Recogida pendiente en el Mercado Mundial",
+      "tip": "Oro u objetos te esperan en el Mercader."
     },
     "noticeboard": {
       "empty": "Parece que no hay nada publicado."
@@ -2147,15 +2147,15 @@ export const es: EnTranslations = {
       "hideOffline": "Ocultar desconectados",
       "hideOfflineTitle": "Ocultar miembros desconectados de la hermandad",
       "billboard": {
-        "label": "Guild Billboard",
-        "empty": "Nothing on the billboard yet.",
-        "setBy": "Set by {name}",
-        "save": "Save",
-        "placeholder": "Write a message for the guild",
-        "inputLabel": "Guild billboard message",
+        "label": "Tablón de la Hermandad",
+        "empty": "Aún no hay nada publicado en el tablón.",
+        "setBy": "Fijado por {name}",
+        "save": "Guardar",
+        "placeholder": "Escribe un mensaje para la hermandad",
+        "inputLabel": "Mensaje del tablón de la hermandad",
         "result": {
-          "set": "The guild billboard was updated.",
-          "notOfficer": "Only officers and the Guild Master may edit the billboard."
+          "set": "Tablón de la hermandad actualizado.",
+          "notOfficer": "Solo los oficiales y el maestro de hermandad pueden editar el tablón."
         }
       }
     },
@@ -2465,25 +2465,25 @@ export const es: EnTranslations = {
       "targetTitle": "Elige un objeto para encantar",
       "noEnchants": "Ningún encantamiento usa este reactivo.",
       "noTargets": "No hay ningún objeto elegible para encantar.",
-      "wornTag": "Worn ({slot})",
+      "wornTag": "Equipado ({slot})",
       "tier": {
-        "base": "Base Enchants",
-        "runed": "Runed Enchants",
-        "greater": "Greater Enchants"
+        "base": "Encantamientos base",
+        "runed": "Encantamientos Rúnicos",
+        "greater": "Encantamientos Mayores"
       },
-      "yieldHeader": "Expected materials:",
+      "yieldHeader": "Materiales esperados:",
       "yieldLineExact": "{count} {item}",
-      "yieldLineRange": "{min} to {max} {item}",
-      "alreadyEnchanted": "That item is already enchanted.",
-      "sameEnchant": "That item already has that enchant.",
-      "replaceTag": "Replaces {enchant}",
-      "sameEnchantTag": "Already applied",
-      "replaceConfirmTitle": "Replace the enchant on {item}?",
-      "replaceConfirmBody": "This replaces {old} on {item} with {new}.",
-      "replaceConfirmNoRefund": "The old enchant is destroyed. Its materials are not refunded. This cannot be undone.",
-      "replaceConfirmCost": "Cost: {cost}",
+      "yieldLineRange": "{min} a {max} {item}",
+      "alreadyEnchanted": "Ese objeto ya está encantado.",
+      "sameEnchant": "Ese objeto ya tiene ese encantamiento.",
+      "replaceTag": "Reemplaza {enchant}",
+      "sameEnchantTag": "Ya aplicado",
+      "replaceConfirmTitle": "¿Reemplazar el encantamiento de {item}?",
+      "replaceConfirmBody": "Esto reemplaza {old} en {item} por {new}.",
+      "replaceConfirmNoRefund": "El encantamiento antiguo se destruye. Sus materiales no se reembolsan. No se puede deshacer.",
+      "replaceConfirmCost": "Coste: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
-      "replaceConfirmAccept": "Replace"
+      "replaceConfirmAccept": "Reemplazar"
     },
     "training": {
       "title": "Formación: {name}",
@@ -6243,7 +6243,7 @@ export const es: EnTranslations = {
       "arenaJoin": "Te unes a la cola del Coliseo Cinéreo. Espera a un oponente digno...",
       "arenaLeave": "Sales de la cola del Coliseo Cinéreo.",
       "arenaSands": "Pisas las arenas del Coliseo Cinéreo.",
-      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
+      "arenaSandsDrowned": "Pisas las piedras anegadas de la Corte Ahogada.",
       "tradeRequestSent": "Has solicitado comerciar con {name}.",
       "tradeOpened": "Ventana de comercio abierta.",
       "tradeComplete": "Comercio completado.",
@@ -6412,10 +6412,10 @@ export const es: EnTranslations = {
       "playerLevelClassTitle": "{name} - Nv {level} {className}",
       "noChallengers": "Aún no hay retadores clasificados - sé el primero.",
       "matchInProgress": "Combate en curso contra {name}.",
-      "mapName": "Map: {name}",
+      "mapName": "Mapa: {name}",
       "map": {
-        "coliseum": "Ashen Coliseum",
-        "drownedCourt": "The Drowned Court"
+        "coliseum": "Coliseo Cinéreo",
+        "drownedCourt": "La Corte Ahogada"
       },
       "leaveQueue": "Salir de la cola",
       "searching": "Buscando oponente... ({count} en cola)",
@@ -6720,15 +6720,15 @@ export const es: EnTranslations = {
       "filterTypeOther": "Otros",
       "filterArmorType": "Tipo de armadura",
       "filterArmorAll": "Toda la armadura",
-      "filterArmorSlot": "Armor slot",
-      "filterArmorClassAll": "All armor types",
-      "armorCloth": "Cloth",
-      "armorLeather": "Leather",
-      "armorMail": "Mail",
+      "filterArmorSlot": "Ranura de armadura",
+      "filterArmorClassAll": "Todos los tipos de armadura",
+      "armorCloth": "Tela",
+      "armorLeather": "Cuero",
+      "armorMail": "Malla",
       "filterWeaponType": "Tipo de arma",
       "filterWeaponAll": "Todas las armas",
-      "filterPrimaryStat": "Primary stat",
-      "filterPrimaryStatAll": "Any primary stat",
+      "filterPrimaryStat": "Estadística principal",
+      "filterPrimaryStatAll": "Cualquier estadística principal",
       "filterRarity": "Rareza",
       "filterRarityAll": "Todas las rarezas",
       "weaponSword": "Espadas",
