@@ -49,7 +49,8 @@ const COMMON_WEAPON = 'eastbrook_arming_sword';
 const RARE_WEAPON = 'moggers_copper_cudgel';
 const RARE_PRIMARY = 'arcane_essence';
 const RARE_SECONDARY = 'resonant_steel';
-// enchant_weapon_might: itemSlot 'mainhand', reagents 5x arcane_dust, str +5.
+// enchant_weapon_might: itemSlot 'mainhand', reagents 5x arcane_dust, str +2
+// (the magnitude is pinned to that literal in enchants_magnitude_invariants).
 const WEAPON_ENCHANT = 'enchant_weapon_might';
 // A helmet enchant, used to exercise the wrong_slot deny on the weapon above.
 const HELMET_ENCHANT = 'enchant_helmet_fortitude';
@@ -142,7 +143,7 @@ describe('offline Sim enchanting commands: stash + single pid-scoped emit', () =
     sim.addItem(COMMON_WEAPON, 1, pid);
     sim.addItem(DUST, 5, pid);
     sim.drainEvents();
-    sim.applyEnchant(COMMON_WEAPON, WEAPON_ENCHANT, undefined, pid);
+    sim.applyEnchant(COMMON_WEAPON, WEAPON_ENCHANT, undefined, undefined, pid);
     const ench = eventsOfType(sim.drainEvents(), 'enchantResult');
     expect(ench).toHaveLength(1);
     if (ench[0].type !== 'enchantResult') throw new Error('expected enchantResult');
@@ -175,7 +176,7 @@ describe('offline Sim enchanting commands: stash + single pid-scoped emit', () =
     sim.addItem(COMMON_WEAPON, 1, pid);
     sim.addItem(DUST, 5, pid);
     sim.drainEvents();
-    sim.applyEnchant(COMMON_WEAPON, HELMET_ENCHANT, undefined, pid);
+    sim.applyEnchant(COMMON_WEAPON, HELMET_ENCHANT, undefined, undefined, pid);
     const wrongSlot = eventsOfType(sim.drainEvents(), 'enchantResult')[0];
     if (wrongSlot?.type !== 'enchantResult') throw new Error('expected enchantResult');
     expect(wrongSlot.ok).toBe(false);
@@ -190,7 +191,7 @@ describe('offline Sim enchanting commands: stash + single pid-scoped emit', () =
     const pid2 = sim2.playerId;
     sim2.addItem(COMMON_WEAPON, 1, pid2);
     sim2.drainEvents();
-    sim2.applyEnchant(COMMON_WEAPON, WEAPON_ENCHANT, undefined, pid2);
+    sim2.applyEnchant(COMMON_WEAPON, WEAPON_ENCHANT, undefined, undefined, pid2);
     const shortMats = eventsOfType(sim2.drainEvents(), 'enchantResult')[0];
     if (shortMats?.type !== 'enchantResult') throw new Error('expected enchantResult');
     expect(shortMats.reason).toBe('insufficient_materials');
@@ -212,7 +213,7 @@ describe('offline Sim enchanting commands: replay + throttle safety', () => {
       const run = () => {
         if (kind === 'salvage') sim.salvageItem(COMMON_WEAPON, pid);
         else if (kind === 'disenchant') sim.disenchantItem(COMMON_WEAPON, pid);
-        else sim.applyEnchant(COMMON_WEAPON, WEAPON_ENCHANT, undefined, pid);
+        else sim.applyEnchant(COMMON_WEAPON, WEAPON_ENCHANT, undefined, undefined, pid);
       };
 
       run();
@@ -236,8 +237,10 @@ describe('offline Sim enchanting commands: replay + throttle safety', () => {
 
       sim.drainEvents();
       run();
-      // The second command finds nothing to act on: exactly one not_held deny,
-      // no second destruction or grant.
+      // The second command finds nothing to act on: exactly one deny, no
+      // second destruction or grant. salvage/disenchant destroyed the copy, so
+      // theirs is not_held; the enchant replay finds the copy still present
+      // but already enchanted, and names that real cause (#2415).
       const second =
         kind === 'salvage'
           ? sim.lastSalvageResult
@@ -245,7 +248,7 @@ describe('offline Sim enchanting commands: replay + throttle safety', () => {
             ? sim.lastDisenchantResult
             : sim.lastEnchantResult;
       expect(second?.ok, kind).toBe(false);
-      expect(second?.reason, kind).toBe('not_held');
+      expect(second?.reason, kind).toBe(kind === 'enchant' ? 'already_enchanted' : 'not_held');
     }
   });
 
@@ -450,6 +453,148 @@ describe('enchanting commands over the live GameServer wire (event + delta routi
     const client = bareClient(st.pid);
     (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot(snap);
     expect(client.lastEnchantResult).toEqual(stash);
+  });
+
+  it('apply_enchant with confirm: true replaces over the wire and the replaced payload mirrors back (#2415)', () => {
+    const AGILITY = 'enchant_weapon_agility';
+    const server = new GameServer();
+    const fc = fakeWs();
+    const st = joinServer(server, fc, 409, 'Repl');
+    placeAt(server, st.pid, FIELD_POS);
+    server.sim.ctx.addItemInstance(
+      COMMON_WEAPON,
+      { signer: 'Tester', enchant: WEAPON_ENCHANT, rolled: { stats: { str: 2 } } },
+      st.pid,
+    );
+    server.sim.addItem(DUST, 5, st.pid);
+
+    cmd(server, st, {
+      cmd: 'apply_enchant',
+      item: COMMON_WEAPON,
+      enchant: AGILITY,
+      confirm: true,
+    });
+    routeTick(server);
+
+    const ench = eventsFor(fc.sent, 'enchantResult');
+    expect(ench).toHaveLength(1);
+    if (ench[0].type !== 'enchantResult') throw new Error('expected enchantResult');
+    expect(ench[0].ok).toBe(true);
+    expect(ench[0].enchantId).toBe(AGILITY);
+
+    // Server-side truth: the enchant layer swapped, the signer rode through.
+    const slot = metaOf(server, st.pid).inventory.find((s) => s.itemId === COMMON_WEAPON);
+    expect(slot?.instance?.enchant).toBe(AGILITY);
+    expect(slot?.instance?.rolled?.stats).toEqual({ agi: 2 });
+    expect(slot?.instance?.signer).toBe('Tester');
+
+    // The replaced payload converges into a real ClientWorld's inventory
+    // mirror (enchantResult is a HEAVY_SELF_EVENTS member, so the self inv
+    // re-diffs even though the replace minted through the loot path).
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    if (!snap) throw new Error('no snapshot');
+    const client = bareClient(st.pid);
+    (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot(snap);
+    const mirrored = client.inventory.find((s) => s.itemId === COMMON_WEAPON);
+    expect(mirrored?.instance?.enchant).toBe(AGILITY);
+    expect(mirrored?.instance?.signer).toBe('Tester');
+  });
+
+  it('the dispatch confirm guard is a STRICT boolean check: a truthy non-boolean reads as unconfirmed', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const st = joinServer(server, fc, 410, 'Strict');
+    placeAt(server, st.pid, FIELD_POS);
+    server.sim.ctx.addItemInstance(
+      COMMON_WEAPON,
+      { enchant: WEAPON_ENCHANT, rolled: { stats: { str: 2 } } },
+      st.pid,
+    );
+    server.sim.addItem(DUST, 5, st.pid);
+
+    // The house dispatch rule (`msg.confirm === true`): anything else is the
+    // unconfirmed path, which denies with the dedicated honest reason and
+    // consumes nothing. Two truthy non-booleans, so neither the string nor
+    // the number arm of a loosened check can slip through.
+    for (const confirm of ['yes', 1] as const) {
+      cmd(server, st, {
+        cmd: 'apply_enchant',
+        item: COMMON_WEAPON,
+        enchant: 'enchant_weapon_agility',
+        confirm,
+      });
+      routeTick(server);
+    }
+    const ench = eventsFor(fc.sent, 'enchantResult');
+    expect(ench).toHaveLength(2);
+    for (const ev of ench) {
+      if (ev.type !== 'enchantResult') throw new Error('expected enchantResult');
+      expect(ev.ok).toBe(false);
+      expect(ev.reason).toBe('already_enchanted');
+    }
+    const slot = metaOf(server, st.pid).inventory.find((s) => s.itemId === COMMON_WEAPON);
+    expect(slot?.instance?.enchant).toBe(WEAPON_ENCHANT);
+    expect(server.sim.countItem(DUST, st.pid)).toBe(5);
+  });
+
+  it('a confirmed WORN replace over the wire swaps in place and the eqi mirror carries the new payload', () => {
+    const AGILITY = 'enchant_weapon_agility';
+    const server = new GameServer();
+    const fc = fakeWs();
+    const fcWatch = fakeWs();
+    const st = joinServer(server, fc, 411, 'WornRepl');
+    const watch = joinServer(server, fcWatch, 412, 'WornWatch');
+    placeAt(server, st.pid, FIELD_POS);
+    placeAt(server, watch.pid, FIELD_POS);
+    // Wear an enchanted, signed copy through the real equip path, then
+    // confirm-replace it over the live dispatch.
+    server.sim.ctx.addItemInstance(
+      COMMON_WEAPON,
+      { signer: 'Tester', enchant: AGILITY, rolled: { stats: { agi: 2 } } },
+      st.pid,
+    );
+    server.sim.equipItemToSlot(COMMON_WEAPON, 'mainhand', st.pid);
+    server.sim.addItem(DUST, 5, st.pid);
+
+    cmd(server, st, {
+      cmd: 'apply_enchant',
+      item: COMMON_WEAPON,
+      enchant: WEAPON_ENCHANT,
+      slot: 'mainhand',
+      confirm: true,
+    });
+    routeTick(server);
+
+    const ench = eventsFor(fc.sent, 'enchantResult');
+    expect(ench).toHaveLength(1);
+    if (ench[0].type !== 'enchantResult') throw new Error('expected enchantResult');
+    expect(ench[0].ok).toBe(true);
+    expect(ench[0].enchantId).toBe(WEAPON_ENCHANT);
+
+    // Server truth: replaced in place, signer intact, reagents spent.
+    const meta = metaOf(server, st.pid);
+    expect(meta.equipmentInstance.mainhand?.enchant).toBe(WEAPON_ENCHANT);
+    expect(meta.equipmentInstance.mainhand?.rolled?.stats).toEqual({ str: 2 });
+    expect(meta.equipmentInstance.mainhand?.signer).toBe('Tester');
+    expect(server.sim.countItem(DUST, st.pid)).toBe(0);
+
+    // The eqi identity mirror re-diffs for an ONLOOKER: the watcher's full
+    // record for the wearer carries the replaced payload (allowlisted fields
+    // only: signer/enchant/rolled, never the lock flags), proving the
+    // identity JSON diff fired on the in-place swap, and a real ClientWorld
+    // decodes it onto the wearer's equippedInstances.
+    fcWatch.sent.length = 0;
+    broadcast(server);
+    const snap = lastSnap(fcWatch.sent) as unknown as { ents: Record<string, any>[] } | null;
+    if (!snap) throw new Error('no snapshot');
+    const record = snap.ents.find((r) => r.id === st.pid);
+    expect(record?.eqi).toEqual({
+      mainhand: { signer: 'Tester', enchant: WEAPON_ENCHANT, rolled: { stats: { str: 2 } } },
+    });
+    const client = bareClient(watch.pid);
+    (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot(snap);
+    expect(client.entities.get(st.pid)?.equippedInstances.mainhand?.enchant).toBe(WEAPON_ENCHANT);
   });
 
   it('apply_enchant with a worn slot enchants in place and the eqi mirror carries it', () => {
@@ -758,6 +903,9 @@ describe('ClientWorld enchanting members are live (send + event mirror)', () => 
       client.disenchantItem('sword_x');
       client.applyEnchant('sword_x', 'ench_y');
       client.applyEnchant('sword_x', 'ench_y', 'offhand');
+      client.applyEnchant('sword_x', 'ench_y', undefined, true);
+      client.applyEnchant('sword_x', 'ench_y', 'offhand', true);
+      client.applyEnchant('sword_x', 'ench_y', undefined, false);
       client.salvageItem('sword_z');
       expect(sent).toEqual([
         { t: 'cmd', cmd: 'disenchant_item', item: 'sword_x' },
@@ -766,6 +914,19 @@ describe('ClientWorld enchanting members are live (send + event mirror)', () => 
         { t: 'cmd', cmd: 'apply_enchant', item: 'sword_x', enchant: 'ench_y' },
         // The worn arm rides the SAME command with the optional slot appended.
         { t: 'cmd', cmd: 'apply_enchant', item: 'sword_x', enchant: 'ench_y', slot: 'offhand' },
+        // #2415: the confirm flag rides ONLY when exactly true (the craftItem
+        // commission idiom), on both the bagged and worn forms...
+        { t: 'cmd', cmd: 'apply_enchant', item: 'sword_x', enchant: 'ench_y', confirm: true },
+        {
+          t: 'cmd',
+          cmd: 'apply_enchant',
+          item: 'sword_x',
+          enchant: 'ench_y',
+          slot: 'offhand',
+          confirm: true,
+        },
+        // ...and an explicit false sends the pre-feature form, byte-identical.
+        { t: 'cmd', cmd: 'apply_enchant', item: 'sword_x', enchant: 'ench_y' },
         { t: 'cmd', cmd: 'salvage_item', item: 'sword_z' },
       ]);
     } finally {

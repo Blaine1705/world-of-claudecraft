@@ -3829,7 +3829,11 @@ export type SimEvent = { pid?: number } & (
         | 'not_held'
         | 'insufficient_materials'
         | 'throttled'
-        | 'no_bag_space';
+        | 'no_bag_space'
+        // #2415: already-enchanted target without the confirmReplace flag,
+        // and the identical-enchant-id re-apply denied on every arm.
+        | 'already_enchanted'
+        | 'same_enchant';
     }
   | {
       type: 'salvageResult';

@@ -7,10 +7,26 @@
 // (types.ts ItemInstancePayload.rolled.stats), so it survives equip/unequip
 // (src/sim/items.ts) and stays a distinct good, separate from a plain copy of
 // the same item id. sellItem/discardItem/trade's drop arm now prefer a
-// fungible copy over this one (items.ts removePreferFungible), but market
-// listing, mail, and trade do not yet carry the instance payload end to end
-// (#1165-style gap): a fully "tradeable good" is a known follow-up, not yet
-// true here.
+// fungible copy over this one (items.ts removePreferFungible), and trade
+// carries the payload end to end (#2049); market listing and mail still do
+// not (#1165-style gap): a fully "tradeable good" there is a known follow-up,
+// not yet true here.
+//
+// Replacing an enchant (#2415): an already-enchanted copy is never silently
+// overwritten, but it is not locked forever either. The apply command carries
+// an explicit confirmReplace flag; with it set, the one-step replace arm
+// destroys the old enchant outright (no material refund: disenchanting is the
+// material faucet and enchanting the sink) and applies the new one
+// surgically: only the enchant layer changes, the signer, masterwork stats,
+// and boundTo/bindOnTrade flags carry through byte-identical
+// (replacedEnchantPayloadFor below). Without the flag the deny is the
+// dedicated already_enchanted reason, on both the bagged and the worn arm.
+// WITH the flag, re-applying the identical enchant id denies as same_enchant
+// on both arms, because its accept would be pure reagent loss with zero state
+// change. The order matters and is deliberate: the flag check precedes the id
+// compare, so an unconfirmed same-id apply reads already_enchanted, not
+// same_enchant. Replacement is just an apply: same shared action throttle, no
+// extra fee or skill gate.
 //
 // Layered on top of, not a replacement for, the existing everyone-can-salvage
 // system (./salvage.ts, issue #1300): salvage still yields the same generic
@@ -126,6 +142,52 @@ export function isEnchantedInstance(instance: ItemInstancePayload): boolean {
   return (
     instance.enchant !== undefined || (!!instance.rolled?.stats && !instance.rolled.masterwork)
   );
+}
+
+/** The pinned replace-victim choice (#2415): the HIGHEST-index bagged copy of
+ *  `itemId` that is already enchanted, matching the end-first walk every other
+ *  remover in this repo uses (removeItem, removeEnchantableItem, and the
+ *  #2340 disenchant fallback). The apply command is item-id-keyed, so when two
+ *  enchanted copies of one item id carry different enchants, this pin is what
+ *  decides the victim; the UI confirm dialog names the enchant of exactly this
+ *  copy (src/ui/enchant_apply_view.ts enchantTargets builds its replace rows
+ *  from this same function), so what the player confirms is what the sim
+ *  destroys. The pin re-resolves when the command lands, which is the accepted
+ *  trade of an id-keyed command with no per-copy token: an enchanted copy of
+ *  the same item id ARRIVING at a higher index between dialog and accept
+ *  moves the pin onto the newcomer. The loss stays the actor's own (no dupe,
+ *  no cross-player reach) and the window is one confirm click; carrying a
+ *  confirmed-enchant token on the wire was ruled out as not worth the surface.
+ *  Returns -1 when no enchanted copy is held. */
+export function replaceVictimIndex(inventory: readonly InvSlot[], itemId: string): number {
+  for (let i = inventory.length - 1; i >= 0; i--) {
+    const s = inventory[i];
+    if (s.itemId === itemId && s.instance && isEnchantedInstance(s.instance)) return i;
+  }
+  return -1;
+}
+
+/** Remove ONE unit of the pinned replace victim from `inventory` and return
+ *  its payload. ONE walk shared by the live removal and the #2350 scratch
+ *  capacity model (both call this exact function on their own slot array), so
+ *  the modeled victim can never drift from the consumed one (the #2139 rule).
+ *  Clone-on-survival, same contract as removeEnchantableItem: the caller
+ *  transforms the returned payload, so a surviving stack's shared payload is
+ *  never aliased out (gear is stack-cap 1 today, so the slot never survives in
+ *  practice; the rule is kept for the contract, not the current content).
+ *  Returns undefined when no enchanted copy is held. */
+export function consumeEnchantedVictim(
+  inventory: InvSlot[],
+  itemId: string,
+): ItemInstancePayload | undefined {
+  const i = replaceVictimIndex(inventory, itemId);
+  if (i < 0) return undefined;
+  const s = inventory[i];
+  const survives = s.count > 1;
+  const payload = survives && s.instance ? cloneItemInstancePayload(s.instance) : s.instance;
+  s.count -= 1;
+  if (s.count <= 0) inventory.splice(i, 1);
+  return payload;
 }
 
 /** Eligible for disenchant: same eligibility as plain salvage (an equippable
@@ -347,7 +409,13 @@ export interface ApplyEnchantResult {
     | 'not_held'
     | 'insufficient_materials'
     | 'throttled'
-    | 'no_bag_space';
+    | 'no_bag_space'
+    // #2415: the target copy is already enchanted and the command carried no
+    // confirmReplace flag (the honest deny that replaced the misleading
+    // not_held), and the identical-enchant-id re-apply, denied on every arm
+    // because its accept would be pure reagent loss with zero state change.
+    | 'already_enchanted'
+    | 'same_enchant';
 }
 
 /** The exact instance payload an apply-enchant mints from the copy it
@@ -379,6 +447,72 @@ export function enchantedPayloadFor(
   return merged;
 }
 
+/** The exact payload the #2415 replace arm mints from an already-enchanted
+ *  victim: the victim cloned, the OLD enchant peeled off surgically, and the
+ *  new one applied on top, so only the enchant layer changes: the signer,
+ *  rolled.masterwork, legacy rolled.quality, boundTo, and bindOnTrade all ride
+ *  through the clone byte-identical.
+ *
+ *  Marker copies (victim.enchant set): the old bonus is SUBTRACTED per stat,
+ *  exact because enchant magnitudes are frozen post-launch
+ *  (content/enchants.ts), and a key that reaches zero is DELETED rather than
+ *  kept at 0: item_instance_merge.ts's structural equality treats a present
+ *  zero-valued key as distinct from an absent one, so residue would stop the
+ *  replaced copy comparing equal to a fresh same-enchant peer. The <= 0 arm
+ *  also swallows a corrupt over-large baked value gracefully instead of
+ *  minting a negative stat.
+ *
+ *  One accepted asymmetry in that prune: a masterwork bake can itself contain
+ *  a ZERO-valued key (item_budget.ts normalizePrimaryStats writes out[k] =
+ *  base, and base floors to 0 when the exact share rounds down and the
+ *  leftover pass does not reach that axis). Bake {str:1, agi:0} plus an
+ *  agility enchant is {str:1, agi:2}; replacing it with a strength enchant
+ *  subtracts agi to 0 and PRUNES the key, giving {str:3}, while a fresh peer
+ *  off the same bake keeps {str:3, agi:0}. Stat-identical (a zero contributes
+ *  nothing to recalcPlayerStats), but structurallyEqual counts present-0 as
+ *  distinct from absent, so those two copies would not stack. Accepted: gear
+ *  is stack-cap 1, so no stack exists to lose, and preserving the zero would
+ *  cost the far more common zero-residue case its clean peer equality.
+ *  Legacy pre-marker copies (bare rolled.stats, no
+ *  masterwork): rolled.stats is replaced WHOLESALE, exact because applyEnchant
+ *  was the only writer of rolled.stats before the masterwork model, so on
+ *  such a copy the whole map IS the old enchant. Standing caution: that
+ *  sole-writer premise is what keeps the wipe safe, so any future system that
+ *  writes rolled.stats WITHOUT setting rolled.masterwork would hand its stats
+ *  to this arm for deletion (and to isEnchantedInstance for misclassification)
+ *  and must use the masterwork flag or a new marker instead.
+ *
+ *  Callers must resolve and validate the old enchant id BEFORE calling (the
+ *  same_enchant deny, and the defensive unknown-old-id deny): this function
+ *  assumes a marker id resolves. Shared by both replace arms' success paths
+ *  and the bagged arm's #2350 capacity gate, so the modeled grant never
+ *  drifts from the minted one. */
+export function replacedEnchantPayloadFor(
+  victim: ItemInstancePayload,
+  next: EnchantDef,
+): ItemInstancePayload {
+  const merged = cloneItemInstancePayload(victim);
+  const old = victim.enchant !== undefined ? ENCHANTS[victim.enchant] : undefined;
+  // Legacy arm: no marker means the whole stats map is the old enchant.
+  const stats: Record<string, number> =
+    victim.enchant !== undefined ? { ...merged.rolled?.stats } : {};
+  if (old) {
+    for (const [stat, value] of Object.entries(old.statBonus)) {
+      if (value === undefined) continue;
+      const remain = (stats[stat] ?? 0) - value;
+      if (remain > 0) stats[stat] = remain;
+      else delete stats[stat];
+    }
+  }
+  for (const [stat, value] of Object.entries(next.statBonus)) {
+    if (value === undefined) continue;
+    stats[stat] = (stats[stat] ?? 0) + value;
+  }
+  merged.rolled = { ...merged.rolled, stats };
+  merged.enchant = next.id;
+  return merged;
+}
+
 /** Resolve one apply-enchant attempt against the copy WORN in `slot`, enchanting
  *  it in place (the classic behavior: no unequip / enchant / re-equip dance).
  *  Every gate mirrors the bagged arm below one for one: the enchant must target
@@ -399,6 +533,7 @@ function resolveApplyEnchantWorn(
   itemId: string,
   enchant: EnchantDef,
   slot: EquipSlot,
+  confirmReplace?: boolean,
 ): ApplyEnchantResult {
   const enchantId = enchant.id;
   const r = ctx.resolve(pid);
@@ -412,11 +547,34 @@ function resolveApplyEnchantWorn(
   }
   // An ABSENT payload is a plain worn copy, which is enchantable (exactly like
   // a plain fungible bagged copy). A payload that isEnchantedInstance reads as
-  // already enchanted and denies, so double-enchant stays blocked identically on
-  // both arms; a signed or masterwork payload is neither, and stays eligible.
+  // already enchanted: without the explicit confirmReplace flag that denies
+  // with the dedicated already_enchanted reason (#2415: the honest message,
+  // not the old misleading not_held), and WITH it the worn copy is replaced in
+  // place. A signed or masterwork payload is neither, and stays eligible for
+  // the plain arm; the slot discriminator means the player named this exact
+  // copy, so the flag never has to pick a victim here.
   const worn = meta.equipmentInstance?.[slot];
-  if (worn && isEnchantedInstance(worn)) {
-    return { ok: false, itemId, enchantId, reason: 'not_held' };
+  const replacing = worn !== undefined && isEnchantedInstance(worn);
+  if (replacing) {
+    // Strict boolean-true, the same house rule the dispatch and the bagged
+    // arm apply: the resolver is the authoritative re-validation layer, so a
+    // truthy non-boolean from any future non-WS caller must read as
+    // unconfirmed here too, never as consent to destroy.
+    if (confirmReplace !== true) {
+      return { ok: false, itemId, enchantId, reason: 'already_enchanted' };
+    }
+    // Re-applying the identical enchant id is denied outright rather than
+    // confirmed: its accept would be pure reagent loss with zero state change.
+    if (worn.enchant === enchantId) {
+      return { ok: false, itemId, enchantId, reason: 'same_enchant' };
+    }
+    // Defensive, unreachable on honest data (enchant ids are frozen
+    // content-as-code): a marker id that no longer resolves cannot be
+    // subtracted exactly, so the copy stays refused instead of stacking the
+    // old bonus under the new one. Only a hand-edited save can get here.
+    if (worn.enchant !== undefined && !ENCHANTS[worn.enchant]) {
+      return { ok: false, itemId, enchantId, reason: 'already_enchanted' };
+    }
   }
   for (const reagent of enchant.reagents) {
     if (ctx.countItem(reagent.itemId, pid) < reagent.count) {
@@ -435,7 +593,12 @@ function resolveApplyEnchantWorn(
   // land in the inventory.
   for (const reagent of enchant.reagents) ctx.removeItem(reagent.itemId, reagent.count, pid);
   meta.equipmentInstance ??= {};
-  meta.equipmentInstance[slot] = enchantedPayloadFor(worn, enchant);
+  meta.equipmentInstance[slot] = replacing
+    ? // The replace mint: old enchant peeled off exactly, new one applied,
+      // every other payload layer byte-identical. The old enchant is destroyed
+      // outright, no material refund (#2415 ruling).
+      replacedEnchantPayloadFor(worn, enchant)
+    : enchantedPayloadFor(worn, enchant);
   // Make the stat pipeline see it: recalcPlayerStats reads the per-slot
   // rolled.stats off equipmentInstance (entity.ts), which is the same read
   // items.ts equipItem re-bakes after moving a payload into that map, so an
@@ -445,6 +608,114 @@ function resolveApplyEnchantWorn(
   // picks up on the next snapshot: no extra dirty-marking is needed.
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   // Same skill gain as the bagged arm: the applied enchant's reagent-derived tier.
+  grantEnchantingSkill(ctx, meta, enchantGainTier(enchant));
+  return { ok: true, itemId, enchantId };
+}
+
+/** The #2415 bagged replace arm: resolve one CONFIRMED apply onto the pinned
+ *  already-enchanted victim copy of `itemId` (replaceVictimIndex: the
+ *  highest-index enchanted copy, the same end-first order every remover in
+ *  this repo walks). Reached only from resolveApplyEnchant below, which has
+ *  already cleared the shared unknown_item/unknown_enchant/wrong_slot gates,
+ *  proven an enchanted copy is held, and seen the explicit confirmReplace
+ *  flag. Gate order mirrors the plain arm one for one: target validity
+ *  (same_enchant, plus the defensive unknown-old-marker refuse), reagents
+ *  all-or-nothing, the shared action throttle, then the #2350 capacity gate,
+ *  every deny side-effect-free. The gate and the live removal share ONE
+ *  victim walk (consumeEnchantedVictim) and ONE mint transform
+ *  (replacedEnchantPayloadFor), so neither can drift from what is actually
+ *  consumed and granted (#2139). The old enchant is destroyed outright, no
+ *  material refund; signer, masterwork stats, and boundTo/bindOnTrade carry
+ *  through byte-identical; the skill gain and throttle stamp are exactly the
+ *  plain apply's (replacement is just an apply: off-wheel, no fee ladder). */
+function resolveReplaceEnchantBagged(
+  ctx: SimContext,
+  pid: number,
+  itemId: string,
+  enchant: EnchantDef,
+): ApplyEnchantResult {
+  const enchantId = enchant.id;
+  // ctx.resolve, NOT ctx.players.get: this arm splices meta.inventory directly
+  // (consumeEnchantedVictim) but mints through ctx.addItemInstance, which
+  // no-ops unless resolve finds BOTH the meta and the entity. Guarding on the
+  // meta alone would let a meta-without-entity state destroy the victim and
+  // mint nothing. The plain arm cannot lose that way (its removal and its mint
+  // both fail through the same resolve), and the worn arm already resolves;
+  // this makes the third arm match. Unreachable on the shipped path, but
+  // resolveApplyEnchant is exported and called with a raw pid by tests and any
+  // future host.
+  const meta = ctx.resolve(pid)?.meta;
+  const victimIdx = meta ? replaceVictimIndex(meta.inventory, itemId) : -1;
+  const victim = meta && victimIdx >= 0 ? meta.inventory[victimIdx].instance : undefined;
+  // Unreachable (the caller proved an enchanted copy is held), kept as the
+  // honest deny for a torn intermediate state rather than a crash.
+  if (!meta || !victim) return { ok: false, itemId, enchantId, reason: 'not_held' };
+  // Re-applying the identical enchant id is denied outright rather than
+  // confirmed: its accept would be pure reagent loss with zero state change.
+  // A legacy pre-marker victim has no id to compare, so it never denies here.
+  if (victim.enchant === enchantId) {
+    return { ok: false, itemId, enchantId, reason: 'same_enchant' };
+  }
+  // Defensive, unreachable on honest data (enchant ids are frozen
+  // content-as-code): a marker id that no longer resolves cannot be
+  // subtracted exactly, so the copy stays refused instead of stacking the old
+  // bonus under the new one. Only a hand-edited save can get here.
+  if (victim.enchant !== undefined && !ENCHANTS[victim.enchant]) {
+    return { ok: false, itemId, enchantId, reason: 'already_enchanted' };
+  }
+  for (const reagent of enchant.reagents) {
+    if (ctx.countItem(reagent.itemId, pid) < reagent.count) {
+      return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
+    }
+  }
+  // Shared action throttle (action_throttle.ts): the same 10-per-60s budget
+  // every enchanting arm draws from, checked before anything is consumed.
+  if (!withinActionThrottle(meta, ctx.time)) {
+    return { ok: false, itemId, enchantId, reason: 'throttled' };
+  }
+  // #2350 capacity gate. Replacement is nearly always net-neutral (one copy
+  // out, one copy in, reagents only leave), but not provably: the victim can
+  // sit in a surviving multi-unit stack (identical enchanted copies merged),
+  // in which case the replaced copy needs its own home. Model the removals
+  // with the SAME walks the live path runs below and pre-fit the SAME mint.
+  const scratch = meta.inventory.map((s) => ({ ...s }));
+  // The `?? victim` arm is unreachable (scratch is a content-identical copy of
+  // the array the peek above found the victim in) and deliberately kept as the
+  // safe direction: were it ever taken, the gate would model the mint without
+  // modeling the removal, which under-counts free space and denies MORE.
+  const scratchVictim = consumeEnchantedVictim(scratch, itemId) ?? victim;
+  for (const reagent of enchant.reagents) removeStacked(scratch, reagent.itemId, reagent.count);
+  if (
+    countFit(
+      scratch,
+      bagCapacity(meta.bags),
+      itemId,
+      1,
+      replacedEnchantPayloadFor(scratchVictim, enchant),
+    ) < 1
+  ) {
+    return { ok: false, itemId, enchantId, reason: 'no_bag_space' };
+  }
+  const consumed = consumeEnchantedVictim(meta.inventory, itemId);
+  // Deny rather than mint when nothing was consumed. Note what this does and
+  // does NOT cover: consumeEnchantedVictim returns undefined ONLY from its
+  // no-victim-found arm, which is before it touches the array, so today this
+  // is a clean pre-mutation bail. It is NOT a guard against a future helper
+  // that mutates and then returns undefined: that shape would already have
+  // destroyed the copy by the time we get here, and this return would skip the
+  // mint, losing the item rather than duping it. Any such change has to keep
+  // the removal and the mint atomic here, not lean on this line.
+  if (!consumed) return { ok: false, itemId, enchantId, reason: 'not_held' };
+  ctx.onInventoryChangedForQuests(meta);
+  for (const reagent of enchant.reagents) ctx.removeItem(reagent.itemId, reagent.count, pid);
+  // silent, exactly like the plain apply mint below: the enchantResult event
+  // fires its own dedicated cue (audio.enchant in src/game/audio.ts), so the
+  // generic loot ding would otherwise stack on top of it for every replace.
+  ctx.addItemInstance(itemId, replacedEnchantPayloadFor(consumed, enchant), pid, 1, {
+    silent: true,
+  });
+  // Quality-tiered gain: the applied enchant's reagent-derived tier, exactly
+  // like the plain arms (also stamps the shared throttle).
   grantEnchantingSkill(ctx, meta, enchantGainTier(enchant));
   return { ok: true, itemId, enchantId };
 }
@@ -472,13 +743,33 @@ function resolveApplyEnchantWorn(
  *  `slot` selects the WORN arm instead (resolveApplyEnchantWorn above): the copy
  *  equipped in that exact equipment slot is enchanted in place, so worn gear
  *  needs no unequip / enchant / re-equip round trip. Omitted, this resolves
- *  against the bags exactly as before. */
+ *  against the bags exactly as before.
+ *
+ *  `confirmReplace` (#2415) is the explicit consent that unlocks replacing an
+ *  EXISTING enchant: with it set and an already-enchanted copy held (worn, or
+ *  the pinned bagged victim), the old enchant is destroyed and the new one
+ *  applied surgically (resolveReplaceEnchantBagged / the worn replace arm).
+ *  Without it, an enchanted-only target denies with the dedicated
+ *  already_enchanted reason, never a silent overwrite. The flag is inert when
+ *  an unenchanted eligible copy exists and no enchanted one does: consent to
+ *  destroy is meaningless when nothing would be destroyed, so the plain arm
+ *  proceeds (this also keeps a confirmed command race-safe when the enchanted
+ *  copy left the bags between dialog and accept: it falls back to a deny or a
+ *  destroy-nothing apply, never a surprise overwrite of a different copy).
+ *  The converse is NOT symmetric and is deliberate: when BOTH an enchanted and
+ *  an unenchanted copy of the item id are held, the flag still routes to the
+ *  replace arm, so a confirmed command destroys the enchant rather than
+ *  quietly spending the free copy. The player asked for this specific copy in
+ *  the picker (the replace row is the only sender of the flag), and silently
+ *  redirecting a confirmed destroy onto a different copy would be the bigger
+ *  surprise. */
 export function resolveApplyEnchant(
   ctx: SimContext,
   pid: number,
   itemId: string,
   enchantId: string,
   slot?: EquipSlot,
+  confirmReplace?: boolean,
 ): ApplyEnchantResult {
   const itemDef = ITEMS[itemId];
   if (!itemDef) return { ok: false, itemId, enchantId, reason: 'unknown_item' };
@@ -490,9 +781,24 @@ export function resolveApplyEnchant(
   if (itemDef.slot !== enchant.itemSlot) {
     return { ok: false, itemId, enchantId, reason: 'wrong_slot' };
   }
-  if (slot) return resolveApplyEnchantWorn(ctx, pid, itemId, enchant, slot);
-  if (ctx.countEnchantableItem(itemId, pid) < 1) {
-    return { ok: false, itemId, enchantId, reason: 'not_held' };
+  if (slot) return resolveApplyEnchantWorn(ctx, pid, itemId, enchant, slot, confirmReplace);
+  // The bagged eligibility split (#2415): countItem sees every bagged copy,
+  // countEnchantableItem only the not-yet-enchanted ones, so the difference
+  // is the enchanted holding. Confirmed replace targets that holding; the
+  // no-flag deny names the real cause (already_enchanted vs not_held) instead
+  // of collapsing both into the old misleading not_held.
+  const enchantableHeld = ctx.countEnchantableItem(itemId, pid);
+  const enchantedHeld = ctx.countItem(itemId, pid) - enchantableHeld;
+  if (confirmReplace === true && enchantedHeld >= 1) {
+    return resolveReplaceEnchantBagged(ctx, pid, itemId, enchant);
+  }
+  if (enchantableHeld < 1) {
+    return {
+      ok: false,
+      itemId,
+      enchantId,
+      reason: enchantedHeld >= 1 ? 'already_enchanted' : 'not_held',
+    };
   }
   for (const reagent of enchant.reagents) {
     if (ctx.countItem(reagent.itemId, pid) < reagent.count) {
@@ -541,15 +847,18 @@ export function resolveApplyEnchant(
 }
 
 /** Command entry point, same shape as disenchantItem/salvageItem above.
- *  `slot`, when present, names the WORN equipment slot to enchant in place. */
+ *  `slot`, when present, names the WORN equipment slot to enchant in place;
+ *  `confirmReplace` is the #2415 explicit consent to replace an existing
+ *  enchant (see resolveApplyEnchant). */
 export function applyEnchant(
   ctx: SimContext,
   itemId: string,
   enchantId: string,
   pid?: number,
   slot?: EquipSlot,
+  confirmReplace?: boolean,
 ): ApplyEnchantResult {
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, itemId, enchantId, reason: 'unknown_item' };
-  return resolveApplyEnchant(ctx, r.meta.entityId, itemId, enchantId, slot);
+  return resolveApplyEnchant(ctx, r.meta.entityId, itemId, enchantId, slot, confirmReplace);
 }

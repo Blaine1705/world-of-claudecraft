@@ -4323,14 +4323,27 @@ export class GameServer {
           // when it names a real equipment key, the same untrusted-input rule the
           // 'equip' case above applies to its aimed slot; anything else falls back
           // to undefined, which is the bagged arm. The sim then re-validates that
-          // the named slot is actually wearing this item id and that the worn copy
-          // is not already enchanted.
+          // the named slot is actually wearing this item id and, without the
+          // confirm flag below, that the worn copy is not already enchanted.
           const worn =
             typeof msg.slot === 'string' &&
             (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
               ? (msg.slot as EquipSlot)
               : undefined;
-          sim.applyEnchant(msg.item, msg.enchant, worn, pid);
+          // `confirm` (#2415): the explicit consent to replace an existing
+          // enchant. A strict boolean-true check (the dispatch type-guard
+          // rule, the craft_item `commission` precedent); anything else reads
+          // as false. The sim re-validates the target and picks the pinned
+          // victim itself, so nothing here trusts client data: the flag can
+          // only ever unlock the dedicated replace arm, never aim it.
+          // Note the two tokens are independent: an unrecognized `slot` falls
+          // back to undefined ABOVE, so a hand-crafted {slot: bogus, confirm:
+          // true} becomes a confirmed BAGGED replace rather than being
+          // rejected. Harmless by construction (the victim is still the sim's
+          // own pin over the SENDER's inventory, so the worst case is that
+          // sender destroying one of their own enchants), and an honest client
+          // never emits an invalid slot.
+          sim.applyEnchant(msg.item, msg.enchant, worn, msg.confirm === true, pid);
         }
         break;
       case 'salvage_item':
