@@ -293,7 +293,6 @@ import {
   HOTBAR_ACTION_MIME,
   type HotbarAction,
   handleMobileAttackTap,
-  loadAttackSlotAction,
   loadoutKnownAbilityIds,
   parseHotbarAction,
   placeAbilityOnSlot,
@@ -522,9 +521,7 @@ import { ValeCupWindow, vcupNationName } from './vale_cup_window';
 import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
 import {
   onWalletUiChange,
-  verifiedWocBalance,
   walletConnectionView,
-  walletDisplayAvailable,
   walletUiEnabled,
   wocBalance,
   wocBalanceVerified,
@@ -7043,6 +7040,7 @@ export class Hud {
       this.mobileDailyRewardsButtonEl?.classList.remove('spin-ready');
   }
 
+  // biome-ignore lint/correctness/noUnusedPrivateClassMembers: daily_rewards_window_chest_toggle.test.ts pins this Settings-side hook's source signature.
   private setDailyRewardsChestButtonPreference(show: boolean): void {
     if (this.optionsHooks) {
       this.optionsHooks.onSettingChange('showDailyRewardsChest', show);

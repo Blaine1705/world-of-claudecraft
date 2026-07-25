@@ -159,6 +159,7 @@ interface ClientWireAura {
   emp?: Aura['empowerAbilities'];
   src?: number;
   ub?: 1;
+  bt?: 1;
 }
 
 // ---------------------------------------------------------------------------
@@ -364,6 +365,7 @@ export class Api {
     }
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: untyped REST envelope, shaped per call site
   private async post(path: string, body: unknown, base = this.base): Promise<any> {
     const res = await fetch(apiUrl(path, base), {
       method: 'POST',
@@ -378,6 +380,7 @@ export class Api {
     return data;
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: untyped REST envelope, shaped per call site
   private async get(path: string): Promise<any> {
     const res = await fetch(apiUrl(path, this.base), {
       headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
@@ -387,6 +390,7 @@ export class Api {
     return data;
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: untyped REST envelope, shaped per call site
   private async delete(path: string, body: unknown): Promise<any> {
     const res = await fetch(apiUrl(path, this.base), {
       method: 'DELETE',
@@ -1794,9 +1798,12 @@ export class ClientWorld implements IWorld {
     return out;
   }
 
-  setMoveInput(input: unknown, facing?: unknown): void {
+  setMoveInput(input: unknown, ...rest: [facing?: unknown]): void {
     Object.assign(this.moveInput, sanitizeMoveInput(input));
-    if (arguments.length > 1) this.setMouselookFacing(facing);
+    // rest.length preserves the 1-vs-2-argument dispatch (an explicit
+    // undefined facing still counts as provided, matching the old
+    // arguments.length check)
+    if (rest.length > 0) this.setMouselookFacing(rest[0]);
   }
 
   setMouselookFacing(facing: unknown): void {
@@ -1955,6 +1962,7 @@ export class ClientWorld implements IWorld {
   }
 
   private onMessage(raw: string): void {
+    // biome-ignore lint/suspicious/noExplicitAny: raw ws frame, narrowed by t-dispatch below
     let msg: any;
     const parseStart = performance.now();
     try {
@@ -2273,6 +2281,7 @@ export class ClientWorld implements IWorld {
     }
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: server wire snapshot, field-validated as read
   private applySnapshot(snap: any): void {
     const now = performance.now();
     if (typeof this.spectating === 'string' && typeof snap.self?.id === 'number') {
@@ -2368,6 +2377,7 @@ export class ClientWorld implements IWorld {
       return typeof aura.rem === 'number' && Number.isFinite(aura.rem) ? aura.rem : 0;
     };
 
+    // biome-ignore lint/suspicious/noExplicitAny: entity wire delta, field-validated as read
     const applyWire = (w: any): Entity | null => {
       let e = this.entities.get(w.id);
       // identity fields ride only in "full" records: first sight and changes
@@ -2605,6 +2615,10 @@ export class ClientWorld implements IWorld {
             // (auras_view ownFirst). An old server omits it; 0 matches no player id.
             rec.sourceId = a.src ?? 0;
             rec.unbreakableControl = a.ub === 1 ? true : undefined;
+            // Presence-only mirror of the sim's break threshold (Lingering
+            // Dread): 1 stands in for the live soak value, which never rides
+            // the wire; the victim-worn dread band only keys on presence.
+            rec.breakThreshold = a.bt === 1 ? 1 : undefined;
           }
         } else {
           e.auras = wireAuras.map((a) => ({
@@ -2623,6 +2637,7 @@ export class ClientWorld implements IWorld {
             charges: a.charges,
             empowerAbilities: a.emp,
             unbreakableControl: a.ub === 1 ? true : undefined,
+            breakThreshold: a.bt === 1 ? 1 : undefined,
           }));
         }
       }

@@ -38,6 +38,9 @@ import { attachAvatarFallback } from '../ui/avatar_fallback';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
+import { AbilityVfx, AbilityVfxFx } from './ability_vfx';
+import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
+import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
@@ -60,9 +63,10 @@ import {
   stepLandingDetector,
 } from './camera_feel_core';
 import {
+  type CharacterWeaponAura,
   characterRecklessnessActive,
-  characterSanguineAuraActive,
   characterSoulRendActive,
+  characterWeaponAuraInto,
 } from './character_effects';
 import {
   type AnimState,
@@ -1149,10 +1153,21 @@ export class Renderer {
   // gate a freshly-streamed view's draw on readiness instead of stalling the frame.
   private asyncCompileSupported = false;
   vfx: Vfx;
+  // Per-ability spell VFX subsystem: the spec-driven painter plus the pooled
+  // primitive engine (ribbons, shock rings, decals, windup orbs, buff orbits;
+  // see src/render/ability_vfx/).
+  private abilityVfx: AbilityVfx;
+  private abilityVfxFx: AbilityVfxFx;
   private lightPulses: LightPulses;
   // Flash a pooled talent-moment point light at an entity's feet (see
   // light_pulses.ts); bound once in the constructor over the views map.
-  private pulseAt: (id: number, school: string, intensity: number, duration: number) => void;
+  private pulseAt: (
+    id: number,
+    school: string,
+    intensity: number,
+    duration: number,
+    range?: number,
+  ) => void;
   private frozenOrbFx!: FrozenOrbFx;
   private mageGroundFx!: MageGroundFx;
   private ringOfFrostVisuals!: RingOfFrostVisuals;
@@ -1161,6 +1176,7 @@ export class Renderer {
     theme: 'frost',
     value: 0,
   };
+  private readonly weaponAuraScratch: CharacterWeaponAura = { color: 0, tip: false };
   private glacialFrontVisual!: GlacialFrontVisual;
   private fishingBobbers!: FishingBobberVisual;
   private weather: Weather;
@@ -1441,7 +1457,8 @@ export class Renderer {
     const sunCanvas = (core: boolean): THREE.CanvasTexture => {
       const c = document.createElement('canvas');
       c.width = c.height = 128;
-      const ctx = c.getContext('2d')!;
+      const ctx = c.getContext('2d');
+      if (!ctx) throw new Error('2D canvas context unavailable');
       const g = ctx.createRadialGradient(64, 64, 2, 64, 64, 64);
       if (core) {
         g.addColorStop(0, 'rgba(255,252,238,1)');
@@ -1485,7 +1502,8 @@ export class Renderer {
       const shaft = document.createElement('canvas');
       shaft.width = 64;
       shaft.height = 256;
-      const sctx = shaft.getContext('2d')!;
+      const sctx = shaft.getContext('2d');
+      if (!sctx) throw new Error('2D canvas context unavailable');
       const gh = sctx.createLinearGradient(0, 0, 0, 256);
       gh.addColorStop(0, 'rgba(255,240,200,0)');
       gh.addColorStop(0.45, 'rgba(255,240,200,0.55)');
@@ -1807,18 +1825,113 @@ export class Renderer {
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
-    this.vfx = new Vfx(this.scene, (id, frac) => {
+    const vfxAnchor = (id: number, frac: number) => {
       const v = this.views.get(id);
       if (!v) return null;
       const e = this.sim.entities.get(id);
       const h = v.height * (e?.scale ?? 1) * frac;
       return new THREE.Vector3(v.group.position.x, v.group.position.y + h, v.group.position.z);
-    });
+    };
+    this.vfx = new Vfx(this.scene, vfxAnchor);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
-    this.pulseAt = (id, school, intensity, duration) => {
+    this.abilityVfxFx = new AbilityVfxFx(this.scene, this.camera, vfxAnchor, (x, z) =>
+      groundHeight(x, z, this.sim.cfg.seed),
+    );
+    this.abilityVfxFx.setViewportScale(
+      this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(),
+      60,
+    );
+    this.abilityVfx = new AbilityVfx({
+      vfx: this.vfx,
+      fx: this.abilityVfxFx,
+      anchor: vfxAnchor,
+      spawnAoeRing: (x, z, radius, school, colorHex) =>
+        this.spawnAoeRing(x, z, radius, school, colorHex),
+      triggerAttack: (id, abilityId) => this.triggerAttack(id, abilityId),
+      lightPulse: (id, school, intensity, duration, range) =>
+        this.pulseAt(id, school, intensity, duration, range),
+      setAuraGlow: (id, colorHex, intensity) => {
+        const v = this.views.get(id);
+        if (v) this.activeVisual(v)?.setAuraGlow(colorHex, intensity);
+      },
+      playShoutAnim: (id) => {
+        const v = this.views.get(id);
+        const vis = v ? this.activeVisual(v) : null;
+        if (vis && !vis.isMidOneShot) vis.playEmote('cheer', 1);
+      },
+      isMob: (id) => this.sim.entities.get(id)?.kind === 'mob',
+      castingAbilityOf: (id) => this.sim.entities.get(id)?.castingAbility ?? null,
+      isMidOneShot: (id) => {
+        const v = this.views.get(id);
+        return v ? !!this.activeVisual(v)?.isMidOneShot : false;
+      },
+      localPlayerId: () => this.sim.player.id,
+      hasGestureClip: (id, abilityId) => {
+        const v = this.views.get(id);
+        const vis = v ? this.activeVisual(v) : null;
+        return vis ? vis.hasAttackClipOverride(abilityId) : false;
+      },
+      isInstantAbility: (abilityId) => {
+        const def = ABILITIES[abilityId];
+        return !def || (def.castTime <= 0 && !def.channel && !def.empowerStages);
+      },
+      // heavy VFX moments (fissures, gavel verdicts, finisher crits) ride the
+      // Fiesta trauma accumulator; the fx engine has already applied distance
+      // falloff and its rolling anti-spam budget
+      addShake: (amount) => this.addShake(amount),
+      // contact-frame hitstop: only THAT rig's animation clock slows (the
+      // world, sim, and every other character keep running); the visual
+      // guards against stacking
+      animHold: (id, scale, dur) => {
+        const v = this.views.get(id);
+        if (v) this.activeVisual(v)?.holdFrame(scale, dur);
+      },
+      // caster windup lean, fed per frame by the staged ceremony
+      bodyLean: (id, amount) => {
+        const v = this.views.get(id);
+        if (v) this.activeVisual(v)?.setWindupLean(amount);
+      },
+      // screen feedback (crit flash, finisher ripples): composer-gated like
+      // bloom, skipped for reduced-motion players
+      screenFlash: (strength) => {
+        if (this.post && !this.reducedMotion()) this.post.screenFlash(strength);
+      },
+      screenImpact: (x, y, z, strength) => this.screenImpactAt(x, y, z, strength),
+      // per-ability procedural audio (release whooshes, palette impact
+      // identities, zone pulses, crit stings) rides the injected spatial
+      // audio sink; offline/headless hosts without one stay silent
+      abilityAudio: (kind, palette, power, x, y, z, opts) =>
+        this.audioSink?.abilityAudio?.(kind, palette, power, x, y, z, opts),
+    });
+    // Dev-only ability VFX probe surface (scripts/ability_vfx_probe.mjs):
+    // self-installs onto window.__game once main.ts has assembled it, so the
+    // probe wiring lives entirely inside the subsystem it measures and the
+    // production bundle carries none of it.
+    if (import.meta.env.DEV && typeof window !== 'undefined') {
+      const install = () => {
+        const g = (window as unknown as { __game?: Record<string, unknown> }).__game;
+        if (!g) {
+          setTimeout(install, 250);
+          return;
+        }
+        if (!g.abilityVfxStats) {
+          g.abilityVfxStats = () => this.abilityVfxStats();
+          g.abilityVfxGlow = (id: number) => this.abilityVfxGlow(id);
+          g.abilityVfxGroundAuras = (id: number) => this.abilityVfxGroundAuras(id);
+          g.abilityVfxAttackCount = () => this.abilityVfxAttackCount();
+          g.abilityVfxProbe = {
+            specs: ABILITY_VFX_SPECS,
+            fullSpecs: ABILITY_VFX_FULL_SPECS,
+            abilities: ABILITIES,
+          };
+        }
+      };
+      setTimeout(install, 250);
+    }
+    this.pulseAt = (id, school, intensity, duration, range) => {
       const v = this.views.get(id);
       if (!v) return;
-      this.lightPulses.pulse(v.group.position, school, intensity, duration);
+      this.lightPulses.pulse(v.group.position, school, intensity, duration, range);
     };
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
@@ -1901,6 +2014,7 @@ export class Renderer {
     }
     const devicePxHeight = this.webgl.domElement.clientHeight * this.webgl.getPixelRatio();
     this.vfx.setViewportScale(devicePxHeight, 60);
+    this.abilityVfxFx.setViewportScale(devicePxHeight, 60);
     // Weapon-skin VFX point sprites size against the device-pixel height too:
     // future rigs read the module value, live rigs re-scale in place.
     setWeaponVfxViewportHeight(devicePxHeight);
@@ -1999,6 +2113,7 @@ export class Renderer {
     this.foliage.setGrassQuality(state.levels.grass);
     this.foliage.setModelQuality(state.levels.foliage);
     this.vfx.setQuality(state.levels.vfx);
+    this.abilityVfx.setQuality(state.levels.vfx);
     this.effectivePointLights = Math.max(1, Math.round(GFX.maxPointLights * state.levels.lighting));
     if (Math.abs(previousScale - this.effectiveRenderScale) >= 0.001) this.applyResolution();
   }
@@ -2588,6 +2703,7 @@ export class Renderer {
     );
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.vfx.update(dt);
+    this.abilityVfx.update(dt);
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
@@ -2844,6 +2960,26 @@ export class Renderer {
         place(visual.root);
       }
     }
+    // One EXTRA rig per class wearing the ability-VFX aura glow: setAuraGlow's
+    // on-edge swaps the rig materials for private clones, and on the tinted
+    // player rigs that clone links a NEW program. Without this seed the FIRST
+    // spec'd cast of a session compiles it synchronously mid-frame - the
+    // measured 'mage' program link landing inside the player's own cast
+    // moment (e.g. mid Solemn Prayer cast bar). Seeding glow-lit copies here
+    // puts the clone materials in front of programs.compile while the base
+    // rigs above still carry the un-glowed originals; the group is removed in
+    // the prewarm finally, but the linked programs stay cached for the
+    // session.
+    for (const cls of ALL_CLASSES) {
+      if (performance.now() >= deadline) return { group, visualCount: idx };
+      const color = CLASSES[cls]?.color ?? 0xffffff;
+      const entity = this.prewarmEntity('player', cls, color, 1, 0, -11_500 - idx);
+      const visual = createCharacterVisual(entity);
+      if (!visual) continue;
+      visual.root.visible = true;
+      visual.setAuraGlow(0xffffff, 0.02);
+      place(visual.root);
+    }
     return { group, visualCount: idx };
   }
 
@@ -2910,6 +3046,15 @@ export class Renderer {
     for (const mat of mats) {
       const textureMat = mat as TextureBackedMaterial;
       for (const key of textureKeys) this.prewarmTexture(textureMat[key]);
+      // ShaderMaterials (ability-vfx pools, custom fx) hold their textures in
+      // uniforms, invisible to the standard-key walk above.
+      const shaderMat = mat as THREE.ShaderMaterial;
+      if (shaderMat.isShaderMaterial) {
+        for (const uniform of Object.values(shaderMat.uniforms)) {
+          const value = uniform?.value as { isTexture?: boolean } | null | undefined;
+          if (value?.isTexture) this.prewarmTexture(value as THREE.Texture);
+        }
+      }
     }
   }
 
@@ -3048,7 +3193,6 @@ export class Renderer {
       maxViewsHigh: VIEW_PREWARM_MAX_VIEWS_HIGH,
       maxViewsConstrained: VIEW_PREWARM_MAX_VIEWS_CONSTRAINED,
     });
-    const constrainedPrewarm = policy.minimalManifest;
     const maxMs = Math.max(0, options.maxMs ?? policy.maxMs);
     const started = performance.now();
     const deadline = started + maxMs;
@@ -3352,6 +3496,28 @@ export class Renderer {
         detail: () => `bursts=${vfxPrewarmBursts}`,
       },
       {
+        // Spawn one of every pooled ability-VFX primitive (rings, decals,
+        // pillar, shell, slash ribbon, overlay sprite). The pools build their
+        // meshes visible=false, so neither the render passes nor
+        // programs.compile ever see their ShaderMaterials — the first spec'd
+        // cast in the open world used to link them synchronously. The spawns
+        // also bind the per-style decal textures, so the texture re-walk below
+        // uploads the whole canvas set now. abilityVfxFx.clear() in the
+        // finally block hides everything again.
+        id: 'vfx.ability-primitives',
+        category: 'vfx',
+        priority: 62,
+        required: false,
+        run: () => {
+          this.abilityVfxFx.prewarmSpawn(p.pos.x, p.pos.y, p.pos.z - 5, p.id);
+          this.scene.traverse((child) => {
+            const renderable = child as RenderableDiagnosticObject;
+            if (renderable.userData.renderCategory !== 'vfx' || !renderable.material) return;
+            this.prewarmMaterialTextures(renderable.material);
+          });
+        },
+      },
+      {
         id: 'world.initial-frame',
         category: 'world',
         priority: 70,
@@ -3498,6 +3664,7 @@ export class Renderer {
       }
     } finally {
       this.vfx.clear();
+      this.abilityVfxFx.clear();
       if (doorPrewarmGroup) this.scene.remove(doorPrewarmGroup);
       if (interiorPrewarmGroup) this.scene.remove(interiorPrewarmGroup);
       if (entityPrewarmGroup) this.scene.remove(entityPrewarmGroup);
@@ -3569,6 +3736,18 @@ export class Renderer {
   handleEvent(ev: SimEvent): void {
     switch (ev.type) {
       case 'spellfx': {
+        // Goad: the warrior audibly swears at the victim - a grawlix bark over
+        // the caster's head, riding the completion cue every client receives,
+        // so other players see the taunt too. Before the claim: the painter
+        // owns the wave/sequence, the bubble is this renderer's own read.
+        // Pure symbols, so it is i18n-exempt (CLAUDE.md: emojis/symbols need
+        // no t() entry) - it must read as swearing in every locale.
+        if (ev.fx === 'selfCast' && ev.ability === 'taunt') {
+          this.showChatBubble(ev.sourceId, '$@#%&*!', false, 1.8);
+        }
+        // Spec-driven per-ability visuals claim the event first; unknown
+        // ability/fx falls through to the generic school-colored arms below.
+        if (this.abilityVfx.handleSpellfx(ev)) break;
         if (ev.fx === 'blinkStep') {
           // A teleport step (Flickerstep / Shadowstep): reset the cached self
           // position so the body snaps to the authoritative destination. A
@@ -3698,6 +3877,14 @@ export class Renderer {
         break;
       }
       case 'spellfxAt': {
+        // Spec-driven ground-cast visuals claim the point-anchored cues first
+        // (aimed 'nova'/'burst' landings and 'tick' zone pulses). The painter
+        // deliberately never claims meteorFall/snowZone/runeCircle/orb: those
+        // four are stateful lifetime visuals (a ball timed to its landing,
+        // snowfall over the zone's whole life, a persistent inscription, the
+        // roaming orb) that its one-shot sequences would read worse than, so
+        // their dedicated arms below stay authoritative.
+        if (this.abilityVfx.handleSpellfxAt(ev)) break;
         // The Frozen Orb flight, animated locally from its three moments:
         // 'release' starts the drift, 'halt'/'resume' freeze and restart it at
         // the server's real coordinates when the orb latches onto an enemy.
@@ -3773,6 +3960,8 @@ export class Renderer {
           this.triggerHit(ev.targetId);
           if (ev.school === 'physical') this.vfx.meleeSpark(ev.targetId, ev.crit);
         }
+        // spec-driven per-ability impact accent (no-op for unknown abilities)
+        this.abilityVfx.onDamage(ev);
         break;
       }
       case 'heal2':
@@ -4024,6 +4213,19 @@ export class Renderer {
     punchCameraFov(this.camFeel, degrees);
   }
 
+  // Ability-VFX screen feedback (spec.screenFx finishers / big novas): a
+  // world-anchored radial distortion ripple plus a faint flash on the post
+  // chain. Composer-gated like bloom (the low tier renders direct and pays
+  // nothing) and skipped entirely for reduced-motion players.
+  private screenImpactAt(x: number, y: number, z: number, strength: number): void {
+    if (!this.post || this.reducedMotion()) return;
+    this.post.screenRipple(x, y, z, strength);
+    // spectacle calibration: the finisher pop reads brighter (still well under
+    // the pass's 0.4 clamp and the ~3-frame decay, a pop, never a strobe)
+    this.post.screenFlash(0.12 * strength);
+  }
+
+
   // A golden pillar bursts up off a fighter who just locked in an augment.
   fiestaAugmentBurst(entityId: number): void {
     this.vfx.levelUpPillar(entityId);
@@ -4169,14 +4371,14 @@ export class Renderer {
       body = built.body;
       portal = built.portal;
       height = 4.6;
-      objectMesh = body!;
+      objectMesh = built.body;
     } else if (e.kind === 'object' && e.templateId === 'mailbox') {
       // Ravenpost pillar: bespoke procedural prop (no sparkle; the unread-mail
       // votive in the group is the per-viewer beacon, toggled in sync()).
       const built = buildMailboxPillar(e.id);
       body = built.group;
       height = built.height;
-      objectMesh = body!;
+      objectMesh = built.group;
     } else if (e.kind === 'object' && e.templateId === 'noticeboard_eastbrook') {
       // The civic board is itself the readable interaction landmark. Keep the
       // complete GLB on every tier and avoid the generic loot sparkle.
@@ -4191,7 +4393,7 @@ export class Renderer {
       const built = buildDelveInteractable(e.templateId, e.id);
       body = built.group;
       height = built.height;
-      objectMesh = body!;
+      objectMesh = built.group;
       // Pressure plates are flush to the floor, no sparkle clutter overhead.
       if (
         e.templateId !== 'delve_pressure_plate' &&
@@ -4231,7 +4433,7 @@ export class Renderer {
         height = built.height;
         objectPoolKey = null;
       }
-      objectMesh = body!;
+      objectMesh = body;
       if (!this.sparkleMat) {
         this.sparkleMat = new THREE.SpriteMaterial({
           map: sparkleTexture(),
@@ -4320,11 +4522,15 @@ export class Renderer {
       if (!isQuestVision) visual.clickProxy.userData.entityId = e.id;
       clickTarget = visual.clickProxy;
     } else {
-      group.add(body!);
-      body?.traverse((o) => {
-        o.userData.entityId = e.id;
-      });
-      clickTarget = body!;
+      // every object branch above built a body; the bare group is a benign
+      // fallback for the (unreachable) no-body case
+      if (body) {
+        group.add(body);
+        body.traverse((o) => {
+          o.userData.entityId = e.id;
+        });
+      }
+      clickTarget = body ?? group;
     }
     group.scale.setScalar(e.scale);
     group.position.set(e.pos.x, e.pos.y, e.pos.z);
@@ -4642,10 +4848,32 @@ export class Renderer {
     else this.lightOwnerGroups.delete(v.group);
   }
 
+  // Dev probe surface (scripts/ability_vfx_probe.mjs via window.__game):
+  // per-ability claim/primitive counters from the ability VFX painter, the
+  // live body-glow intensity of an entity, and the one-shot swing counter.
+  abilityVfxStats(): Record<string, { claimed: number; primitives: number }> {
+    return this.abilityVfx.statsSnapshot();
+  }
+
+  abilityVfxGlow(entityId: number): number {
+    return this.abilityVfx.glowIntensityOf(entityId);
+  }
+
+  abilityVfxGroundAuras(entityId: number): number {
+    return this.abilityVfx.groundAuraCountOf(entityId);
+  }
+
+  abilityVfxAttackCount(): number {
+    return this.attackTriggerCount;
+  }
+
+  private attackTriggerCount = 0;
+
   triggerAttack(entityId: number, abilityId?: string): void {
     const v = this.views.get(entityId);
     const visual = v ? this.activeVisual(v) : null;
     if (!visual) return;
+    this.attackTriggerCount++;
     if (isSpinAttackAbility(abilityId)) visual.playWhirl();
     else visual.playAttack(abilityId);
   }
@@ -5537,7 +5765,8 @@ export class Renderer {
         v.visual.setWeaponSkin(e.weaponSkinId);
         this.reconcileViewLights(v);
       }
-      v.visual.setWeaponAura(characterSanguineAuraActive(e));
+      const weaponAura = characterWeaponAuraInto(e, this.weaponAuraScratch);
+      v.visual.setWeaponAura(weaponAura ? weaponAura.color : null, weaponAura?.tip ?? false);
 
       // live sheathe toggle (Z key): the sim's weaponStowed bit moves held
       // props between the hands and the on-back pose (self or a peer)
@@ -5597,13 +5826,19 @@ export class Renderer {
               : travel && v.travelVisual
                 ? v.travelVisual
                 : v.visual;
+      const stealthGhost = shouldRenderStealthGhost(this.sim.playerId, e);
       const ghost =
         ghostWolf ||
-        shouldRenderStealthGhost(this.sim.playerId, e) ||
+        stealthGhost ||
         e.templateId.startsWith('vision_') ||
         e.ghost || // a released player spirit renders translucent (the ghost run)
         e.templateId === 'spirit_healer'; // the graveyard angel is an ethereal figure
-      active.setGhost(ghost);
+      // Duskveil/Smokestep wear the denser stealth fade; every spirit read
+      // (ghost run, ghost wolf, visions, the graveyard angel) keeps the thin
+      // ethereal one. A dead stealther is a spirit first.
+      const ghostStyle =
+        stealthGhost && !ghostWolf && !e.ghost ? ('stealth' as const) : ('spirit' as const);
+      active.setGhost(ghost, ghostStyle);
       active.setSoulRend(characterSoulRendActive(e));
       // Shadowform tints the base priest rig shadow-purple (no rig swap). Moonkin Form and
       // Metamorphosis reuse the same tint treatment (a bright violet, and a dark fel demon);
@@ -5911,6 +6146,9 @@ export class Renderer {
         }
       }
 
+      // per-ability windup orb + buff-orbit bands (spec-driven; no-op for
+      // entities with no spec'd cast or aura)
+      this.abilityVfx.syncEntity(e);
       if (st.casting) {
         this.vfx.castSparkle(
           e.id,
@@ -5918,8 +6156,10 @@ export class Renderer {
             ? 'frost'
             : e.castingAbility === 'demon_heal'
               ? 'shadow'
-              : (ABILITIES[e.castingAbility!]?.school ?? 'arcane'),
+              : (ABILITIES[e.castingAbility ?? '']?.school ?? 'arcane'),
           dt,
+          // per-ability spec color when the casting ability has one
+          this.abilityVfx.sparkleColorFor(e.castingAbility),
         );
       }
       if (e.auras.some((a) => a.id === 'nythraxis_soul_rend')) {
@@ -6131,6 +6371,7 @@ export class Renderer {
     );
     worldStart = markWorldPhase('water', worldStart);
     this.vfx.update(dt);
+    this.abilityVfx.update(dt);
     this.frozenOrbFx.update(dt);
     this.mageGroundFx.update(dt);
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
@@ -6278,8 +6519,12 @@ export class Renderer {
       this.camera.position.y += shakeY;
       this.shakeTrauma = Math.max(0, this.shakeTrauma - dt * 1.8);
     }
-    if (this.post) this.post.render();
-    else this.webgl.render(this.scene, this.camera);
+    if (this.post) {
+      // screen-fx pass state (ripple re-projection, flash decay) advances
+      // with the camera finalized for this frame
+      this.post.updateScreenFx(dt);
+      this.post.render();
+    } else this.webgl.render(this.scene, this.camera);
     if (shakeX !== 0 || shakeY !== 0) {
       this.camera.position.x -= shakeX;
       this.camera.position.y -= shakeY;
@@ -6873,8 +7118,14 @@ export class Renderer {
   }
 
   // Hang a speech bubble over an entity's head; it follows the entity and
-  // fades out after a few seconds (longer for longer messages).
-  showChatBubble(entityId: number, text: string, style?: boolean | ChatBubbleStyle): void {
+  // fades out after a few seconds (longer for longer messages), or after the
+  // caller's explicit ttl (short reaction barks like Goad's grawlix).
+  showChatBubble(
+    entityId: number,
+    text: string,
+    style?: boolean | ChatBubbleStyle,
+    ttlSec?: number,
+  ): void {
     // Back-compat: the older 3-arg call passes a bare `yell` boolean; the chat
     // gate passes a full descriptor (the party channel tint).
     const s: ChatBubbleStyle = typeof style === 'boolean' ? { yell: style } : (style ?? {});
@@ -6895,7 +7146,7 @@ export class Renderer {
     b.el.style.borderColor = s.border ?? '';
     // wall-clock ttl: sim/render time can run slower than real time under
     // frame-delta clamping, which would keep bubbles up too long
-    b.until = performance.now() + 1000 * Math.min(10, 3.5 + text.length * 0.045);
+    b.until = performance.now() + 1000 * (ttlSec ?? Math.min(10, 3.5 + text.length * 0.045));
   }
 
   private updateChatBubbles(): void {

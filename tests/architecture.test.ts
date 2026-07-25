@@ -255,6 +255,7 @@ const UI_PURE_CORES = [
 // water_core (the shore-depth sample shared by build + editor setLevel) follow
 // the same contract for the map editor's realtime terrain/water edits.
 const RENDER_PURE_CORES = [
+  'src/render/ability_vfx_core.ts',
   'src/render/arena_water_band_core.ts',
   'src/render/camera_boom_core.ts',
   'src/render/camera_director_core.ts',
