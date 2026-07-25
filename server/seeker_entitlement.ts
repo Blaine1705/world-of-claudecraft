@@ -1,5 +1,11 @@
-import { accountAndScopeForToken, moderationStatusForAccount, walletForAccount } from './db';
 import type * as http from 'node:http';
+import { accountAndScopeForToken, moderationStatusForAccount, walletForAccount } from './db';
+import { ctxAccountId } from './http/context';
+import { type BearerActiveGuardDb, createActiveGuard } from './http/middleware/bearer_active_guard';
+import { rateLimit, WALLET_LINK_POLICY } from './http/middleware/rate_limit';
+import type { Ctx, Middleware, RouteDef } from './http/types';
+import { json, readBody } from './http_util';
+import { verifyNativeAttestationChallenge } from './native_attestation';
 import {
   claimSeekerEntitlement,
   hasSeekerEntitlement,
@@ -10,12 +16,6 @@ import {
   createSeekerOwnershipVerifier,
   type SeekerOwnershipVerifier,
 } from './seeker_ownership_verifier';
-import { ctxAccountId } from './http/context';
-import { type BearerActiveGuardDb, createActiveGuard } from './http/middleware/bearer_active_guard';
-import { rateLimit, WALLET_LINK_POLICY } from './http/middleware/rate_limit';
-import type { Ctx, Middleware, RouteDef } from './http/types';
-import { json, readBody } from './http_util';
-import { verifyNativeAttestationChallenge } from './native_attestation';
 import { isNativeAppRequest } from './web_login_guard';
 
 interface SeekerEntitlementRuntime {
@@ -74,7 +74,10 @@ const activeGuard = createActiveGuard(() => guardDbOverride ?? makeGuardDb());
 
 const nativeOnly: Middleware = async (ctx, next) => {
   if (!isNativeAppRequest(ctx.req)) {
-    json(ctx.res, 403, { error: 'Seeker entitlement is available only in the native app' });
+    json(ctx.res, 403, {
+      error: 'Seeker entitlement is available only in the native app',
+      code: 'seeker.native_only',
+    });
     return;
   }
   await next();
@@ -106,7 +109,10 @@ export async function handleSeekerEntitlementClaim(
   accountId: number,
 ): Promise<void> {
   if (!isNativeAppRequest(req)) {
-    json(res, 403, { error: 'Seeker entitlement is available only in the native app' });
+    json(res, 403, {
+      error: 'Seeker entitlement is available only in the native app',
+      code: 'seeker.native_only',
+    });
     return;
   }
   const body = await readBody(req);
@@ -116,17 +122,26 @@ export async function handleSeekerEntitlementClaim(
     'seeker',
   );
   if (!attestation) {
-    json(res, 403, { error: 'native attestation failed' });
+    json(res, 403, {
+      error: 'native attestation failed',
+      code: 'seeker.attestation_failed',
+    });
     return;
   }
   const wallet = await runtime.walletForAccount(accountId);
   if (!wallet) {
-    json(res, 409, { error: 'link and verify a wallet first' });
+    json(res, 409, {
+      error: 'link and verify a wallet first',
+      code: 'seeker.wallet_required',
+    });
     return;
   }
   const token = await runtime.findSeekerGenesisToken(wallet.pubkey);
   if (!token) {
-    json(res, 403, { error: 'verified Seeker Genesis Token required' });
+    json(res, 403, {
+      error: 'verified Seeker Genesis Token required',
+      code: 'seeker.genesis_token_required',
+    });
     return;
   }
   const result = await runtime.claimSeekerEntitlement({
@@ -137,7 +152,10 @@ export async function handleSeekerEntitlementClaim(
     verificationSlot: token.slot,
   });
   if (result === 'conflict') {
-    json(res, 409, { error: 'Seeker Genesis Token was already claimed' });
+    json(res, 409, {
+      error: 'Seeker Genesis Token was already claimed',
+      code: 'seeker.genesis_token_claimed',
+    });
     return;
   }
   json(res, 200, { entitled: true });

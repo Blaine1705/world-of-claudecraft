@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
 import type * as http from 'node:http';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { FakeRes, makeReq } from './helpers';
 
 vi.mock('../../server/db', () => ({
@@ -69,6 +69,10 @@ describe('Seeker entitlement claim', () => {
       42,
     );
     expect(webRes.statusCode).toBe(403);
+    expect(JSON.parse(webRes.body)).toEqual({
+      error: 'Seeker entitlement is available only in the native app',
+      code: 'seeker.native_only',
+    });
 
     setSeekerEntitlementRuntimeForTests({
       verifyNativeAttestationChallenge: vi.fn().mockResolvedValue(null),
@@ -85,6 +89,56 @@ describe('Seeker entitlement claim', () => {
       42,
     );
     expect(invalidRes.statusCode).toBe(403);
+    expect(JSON.parse(invalidRes.body)).toEqual({
+      error: 'native attestation failed',
+      code: 'seeker.attestation_failed',
+    });
+
+    setSeekerEntitlementRuntimeForTests({
+      verifyNativeAttestationChallenge: vi.fn().mockResolvedValue({ nonce: 'nonce' }),
+      walletForAccount: vi.fn().mockResolvedValue(null),
+    });
+    const walletRes = new FakeRes();
+    await handleSeekerEntitlementClaim(
+      makeReq({
+        method: 'POST',
+        url: '/api/seeker/entitlement',
+        headers: nativeHeaders,
+        body: { nativeAttestation: {} },
+      }),
+      walletRes as unknown as http.ServerResponse,
+      42,
+    );
+    expect(walletRes.statusCode).toBe(409);
+    expect(JSON.parse(walletRes.body)).toEqual({
+      error: 'link and verify a wallet first',
+      code: 'seeker.wallet_required',
+    });
+
+    setSeekerEntitlementRuntimeForTests({
+      verifyNativeAttestationChallenge: vi.fn().mockResolvedValue({ nonce: 'nonce' }),
+      walletForAccount: vi.fn().mockResolvedValue({
+        pubkey: 'wallet',
+        linked_at: '2026-01-01T00:00:00Z',
+      }),
+      findSeekerGenesisToken: vi.fn().mockResolvedValue(null),
+    });
+    const tokenRes = new FakeRes();
+    await handleSeekerEntitlementClaim(
+      makeReq({
+        method: 'POST',
+        url: '/api/seeker/entitlement',
+        headers: nativeHeaders,
+        body: { nativeAttestation: {} },
+      }),
+      tokenRes as unknown as http.ServerResponse,
+      42,
+    );
+    expect(tokenRes.statusCode).toBe(403);
+    expect(JSON.parse(tokenRes.body)).toEqual({
+      error: 'verified Seeker Genesis Token required',
+      code: 'seeker.genesis_token_required',
+    });
 
     setSeekerEntitlementRuntimeForTests({
       verifyNativeAttestationChallenge: vi.fn().mockResolvedValue({ nonce: 'nonce' }),
@@ -107,6 +161,10 @@ describe('Seeker entitlement claim', () => {
       42,
     );
     expect(conflictRes.statusCode).toBe(409);
+    expect(JSON.parse(conflictRes.body)).toEqual({
+      error: 'Seeker Genesis Token was already claimed',
+      code: 'seeker.genesis_token_claimed',
+    });
   });
 
   it('rechecks current SGT ownership before a native daily spin', async () => {

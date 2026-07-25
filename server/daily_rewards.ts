@@ -23,15 +23,10 @@ import {
 } from './daily_rewards_db';
 import { buildSeedKey, runSeedOnce } from './daily_rewards_seed_gate';
 import { accountAndScopeForToken, moderationStatusForAccount, walletForAccount } from './db';
-import { hasSeekerEntitlement } from './seeker_entitlement_db';
-import { verifyCurrentSeekerEntitlement } from './seeker_entitlement';
 import { ctxAccountId } from './http/context';
 import { HttpError } from './http/errors';
 import { createActiveGuard } from './http/middleware/bearer_active_guard';
-import {
-  rateLimit,
-  SEEKER_SPIN_VERIFY_POLICY,
-} from './http/middleware/rate_limit';
+import { rateLimit, SEEKER_SPIN_VERIFY_POLICY } from './http/middleware/rate_limit';
 import {
   DAILY_REWARD_SECRET_ENV,
   DAILY_REWARD_SECRET_HEADER,
@@ -39,8 +34,10 @@ import {
 } from './http/middleware/require_internal_secret';
 import type { Ctx, Middleware, RouteDef } from './http/types';
 import { json, readBody } from './http_util';
-import { REALM } from './realm';
 import { requestIp } from './ratelimit';
+import { REALM } from './realm';
+import { verifyCurrentSeekerEntitlement } from './seeker_entitlement';
+import { hasSeekerEntitlement } from './seeker_entitlement_db';
 import { isNativeAppRequest } from './web_login_guard';
 import { cachedWocBalance } from './woc_balance';
 
@@ -1504,9 +1501,7 @@ export async function handleDailyRewardApi(
 ): Promise<void> {
   const url = new URL(req.url ?? '/', 'http://localhost');
   const nativeSpin =
-    isNativeAppRequest(req) &&
-    req.method === 'POST' &&
-    url.pathname === '/api/daily-rewards/spin';
+    isNativeAppRequest(req) && req.method === 'POST' && url.pathname === '/api/daily-rewards/spin';
   if (
     nativeSpin &&
     !globallyAdmittedSeekerSpins.has(req) &&
@@ -1514,17 +1509,17 @@ export async function handleDailyRewardApi(
   ) {
     return;
   }
-  if (
-    isNativeAppRequest(req) &&
-    !(await dailyRewardGuardDb().hasSeekerEntitlement(accountId))
-  ) {
-    return json(res, 403, { error: 'verified Seeker entitlement required' });
+  if (isNativeAppRequest(req) && !(await dailyRewardGuardDb().hasSeekerEntitlement(accountId))) {
+    return json(res, 403, {
+      error: 'verified Seeker entitlement required',
+      code: 'seeker.entitlement_required',
+    });
   }
-  if (
-    nativeSpin &&
-    !(await verifyCurrentSeekerEntitlement(accountId))
-  ) {
-    return json(res, 403, { error: 'current Seeker Genesis Token ownership required' });
+  if (nativeSpin && !(await verifyCurrentSeekerEntitlement(accountId))) {
+    return json(res, 403, {
+      error: 'current Seeker Genesis Token ownership required',
+      code: 'seeker.current_ownership_required',
+    });
   }
   if (req.method === 'GET' && url.pathname === '/api/daily-rewards') {
     return json(res, 200, await dailyRewardService.status(accountId));

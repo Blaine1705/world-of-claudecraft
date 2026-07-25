@@ -6321,10 +6321,7 @@
     body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-main {
       display: contents;
     }
-    body.mobile-touch.seeker-wallet-enabled
-      #charselect-panel
-      .cs-wallet-group
-      > .cs-wallet-label {
+    body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-group > .cs-wallet-label {
       grid-column: 1;
       grid-row: 1;
       align-self: center;
@@ -6356,7 +6353,8 @@
       gap: 6px;
     }
     body.mobile-touch.seeker-wallet-enabled #charselect-panel :is(.wallet-cta, .wallet-mini) {
-      min-height: 36px;
+      min-width: 40px;
+      min-height: 40px;
       padding: 5px 8px;
       font-size: 11px;
     }

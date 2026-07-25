@@ -10,6 +10,13 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.wallet_required",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -17,6 +24,13 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.seekerAppHelp"
   ],
   "es_ES": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.wallet_required",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -24,6 +38,13 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.seekerAppHelp"
   ],
   "fr_FR": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.wallet_required",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -31,6 +52,13 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.seekerAppHelp"
   ],
   "fr_CA": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.wallet_required",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -39,6 +67,13 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.wallet_required",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -46,6 +81,13 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.seekerAppHelp"
   ],
   "de_DE": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.wallet_required",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -54,25 +96,28 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "zh_CN": [
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria",
-    "wallet.seekerAppHelp"
+    "itemUi.vendor.buyStackAria"
   ],
   "zh_TW": [
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria",
-    "wallet.seekerAppHelp"
+    "itemUi.vendor.buyStackAria"
   ],
   "ko_KR": [
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria",
-    "wallet.seekerAppHelp"
+    "itemUi.vendor.buyStackAria"
   ],
   "ja_JP": [
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria",
-    "wallet.seekerAppHelp"
+    "itemUi.vendor.buyStackAria"
   ],
   "pt_BR": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.wallet_required",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -81,10 +126,16 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [
     "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria",
-    "wallet.seekerAppHelp"
+    "itemUi.vendor.buyStackAria"
   ],
   "cs_CZ": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.wallet_required",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -92,6 +143,13 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.seekerAppHelp"
   ],
   "nl_NL": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.wallet_required",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -99,6 +157,13 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.seekerAppHelp"
   ],
   "pl_PL": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.wallet_required",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -106,6 +171,13 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.seekerAppHelp"
   ],
   "id_ID": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.wallet_required",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -113,6 +185,13 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.seekerAppHelp"
   ],
   "tr_TR": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.wallet_required",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -120,6 +199,13 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.seekerAppHelp"
   ],
   "sv_SE": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.wallet_required",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -127,6 +213,13 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.seekerAppHelp"
   ],
   "vi_VN": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.wallet_required",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",
@@ -134,6 +227,13 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.seekerAppHelp"
   ],
   "da_DK": [
+    "apiError.seeker.attestation_failed",
+    "apiError.seeker.current_ownership_required",
+    "apiError.seeker.entitlement_required",
+    "apiError.seeker.genesis_token_claimed",
+    "apiError.seeker.genesis_token_required",
+    "apiError.seeker.native_only",
+    "apiError.seeker.wallet_required",
     "hud.prompts.guildInviteCancelled",
     "hud.prompts.guildRenamed",
     "itemUi.vendor.buyStack",

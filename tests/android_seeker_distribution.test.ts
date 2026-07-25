@@ -32,9 +32,7 @@ describe('Android Seeker distribution boundary', () => {
     expect(plugin).toContain('BuildConfig.SOLANA_MOBILE_DISTRIBUTION == "solana-dapp-store"');
     expect(plugin).toContain('Build.MODEL.equals("Seeker", ignoreCase = true)');
     expect(plugin).toContain('Build.BRAND.equals("solanamobile", ignoreCase = true)');
-    expect(plugin).toContain(
-      'Build.MANUFACTURER.equals("Solana Mobile Inc.", ignoreCase = true)',
-    );
+    expect(plugin).toContain('Build.MANUFACTURER.equals("Solana Mobile Inc.", ignoreCase = true)');
     expect(plugin).toContain('result.put("mwaAvailable", solanaMobileAllowed())');
     expect(plugin).toContain(
       'BuildConfig.SOLANA_MOBILE_DISTRIBUTION == "solana-dapp-store" && isSeeker()',
@@ -51,9 +49,7 @@ describe('Android Seeker distribution boundary', () => {
     expect(main).toContain("settings.set('browserEffects', seekerDefaults.browserEffects)");
     expect(main).toContain("settings.set('weather', seekerDefaults.weather)");
     expect(main).toContain('seekerDefaults?.graphicsPreset ?? null');
-    expect(hudCss).toContain(
-      'body.native-app:not(.seeker-wallet-enabled) .cs-wallet',
-    );
+    expect(hudCss).toContain('body.native-app:not(.seeker-wallet-enabled) .cs-wallet');
     expect(shellCss).toContain(
       'body.mobile-touch:not(.seeker-wallet-enabled) #charselect-panel .cs-wallet',
     );
@@ -95,5 +91,8 @@ describe('Android Seeker distribution boundary', () => {
       'body.mobile-touch.seeker-wallet-enabled #charselect-panel .cs-wallet-main',
     );
     expect(shellCss).toContain('display: contents;');
+    expect(shellCss).toMatch(
+      /body\.mobile-touch\.seeker-wallet-enabled #charselect-panel :is\(\.wallet-cta, \.wallet-mini\) \{[\s\S]*?min-width: 40px;[\s\S]*?min-height: 40px;/,
+    );
   });
 });
