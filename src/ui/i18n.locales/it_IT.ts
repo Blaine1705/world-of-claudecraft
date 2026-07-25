@@ -4072,7 +4072,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Aumenta del 60% la minaccia generata dai tuoi danni Sacri per 30 min. Il cardine del paladino difensore.',
   'entities.abilities.retribution_aura.name': 'Aura della Rivalsa',
   'entities.abilities.retribution_aura.description':
-    'Ti avvolge in energia sacra per 30 min, infliggendo 5 danni Sacri a ogni nemico che ti colpisce in mischia.',
+    'Avvolge te e il tuo gruppo in energia sacra fino alla morte o alla sostituzione. I nemici che colpiscono in mischia un alleato interessato subiscono {buff} danni Sacri, e gli alleati interessati infliggono {buff} danni Sacri aggiuntivi con gli attacchi automatici.',
   'entities.abilities.tame_beast.name': 'Vincolo Selvaggio',
   'entities.abilities.tame_beast.description':
     'Inizia ad addomesticare una bestia come compagna. Deve essere del tuo livello o inferiore e non élite. Il tuo famiglio ti segue, attacca i tuoi nemici e mantiene la propria minaccia. Puoi avere un solo famiglio alla volta.',

@@ -2815,7 +2815,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.renew.description': 'Läker målet för {damage} under 15 sek.',
   'entities.abilities.renew.name': 'Dröjande nåd',
   'entities.abilities.retribution_aura.description':
-    'Omger dig med helig energi i 30 min och tillfogar 5 helig skada till varje fiende som slår dig i närstrid.',
+    'Omger dig och din grupp med helig energi till döden eller tills den ersätts. Fiender som träffar en påverkad allierad i närstrid tar {buff} helig skada, och påverkade allierade gör {buff} extra helig skada med automatiska attacker.',
   'entities.abilities.retribution_aura.name': 'Vedergällningsaura',
   'entities.abilities.revive_pet.description':
     'Lappar ihop ditt husdjur. Om det lever återställer det totalt {overTime} hälsa under 12 sek. med läkning var 3:e sek. Om det är dött återupplivas det med 35 % hälsa.',

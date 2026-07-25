@@ -4107,7 +4107,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Erhöht die durch euren Heiligschaden erzeugte Bedrohung 30 Min. lang um 60%. Der Grundpfeiler des Tank-Paladins.',
   'entities.abilities.retribution_aura.name': 'Aura der Vergeltung',
   'entities.abilities.retribution_aura.description':
-    'Umgibt Euch 30 Min. lang mit heiliger Energie und fügt jedem Gegner, der Euch im Nahkampf trifft, 5 Heiligschaden zu.',
+    'Umgibt Euch und Eure Gruppe mit heiliger Energie bis zum Tod oder zur Ersetzung. Gegner, die einen betroffenen Verbündeten im Nahkampf treffen, erleiden {buff} Heiligschaden, und betroffene Verbündete verursachen mit Autoangriffen {buff} zusätzlichen Heiligschaden.',
   'entities.abilities.tame_beast.name': 'Wildband',
   'entities.abilities.tame_beast.description':
     'Beginnt, ein Wildtier als Begleiter zu zähmen. Es muss eure Stufe oder niedriger haben und darf kein Elitegegner sein. Euer Begleiter folgt euch, greift eure Gegner an und hält eigene Bedrohung. Ihr könnt nur einen Begleiter zugleich haben.',

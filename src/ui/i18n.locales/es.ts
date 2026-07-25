@@ -3950,7 +3950,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Aumenta un 60% la amenaza generada por tu daño Sagrado durante 30 min. La piedra angular del paladín tanque.',
   'entities.abilities.retribution_aura.name': 'Aura de Represalia',
   'entities.abilities.retribution_aura.description':
-    'Te rodea de energía sagrada durante 30 min y causa 5 de daño Sagrado a cualquier enemigo que te golpee cuerpo a cuerpo.',
+    'Te rodea a ti y a tu grupo de energía sagrada hasta la muerte o su reemplazo. Los enemigos que golpeen cuerpo a cuerpo a un aliado afectado reciben {buff} de daño Sagrado, y los aliados afectados infligen {buff} de daño Sagrado adicional con sus ataques automáticos.',
   'entities.abilities.tame_beast.name': 'Vínculo Salvaje',
   'entities.abilities.tame_beast.description':
     'Comienza a domesticar una bestia para que sea tu compañera. Debe ser de tu nivel o inferior y no ser élite. Tu mascota te sigue, ataca a tus enemigos y genera su propia amenaza. Solo puedes tener una mascota a la vez.',

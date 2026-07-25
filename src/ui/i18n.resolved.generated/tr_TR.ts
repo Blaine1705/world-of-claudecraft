@@ -7282,7 +7282,7 @@ export const tr_TR: EnTranslations = {
       },
       "retribution_aura": {
         "name": "Karşılık Aurası",
-        "description": "Seni 30 dakika boyunca kutsal enerjiyle sarar; yakın dövüşte sana vuran her düşmana 5 Kutsal hasar verir."
+        "description": "Seni ve grubunu ölüme ya da değiştirilene kadar kutsal enerjiyle sarar. Etkilenen bir müttefike yakın dövüşte vuran düşmanlar {buff} Kutsal hasar alır ve etkilenen müttefikler otomatik saldırılarıyla {buff} ek Kutsal hasar verir."
       },
       "tame_beast": {
         "name": "Yaban Bağı",

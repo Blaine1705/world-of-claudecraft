@@ -7282,7 +7282,7 @@ export const ja_JP: EnTranslations = {
       },
       "retribution_aura": {
         "name": "報復のオーラ",
-        "description": "30分間、聖なる力で身を包み、近接攻撃をしてきた敵に5の神聖ダメージを与えます。"
+        "description": "死亡または置き換えられるまで、自身とパーティを聖なる力で包む。効果を受けた味方を近接攻撃した敵は{buff}の神聖ダメージを受け、効果を受けた味方の通常攻撃は{buff}の神聖ダメージを追加で与える。"
       },
       "tame_beast": {
         "name": "野生の絆",

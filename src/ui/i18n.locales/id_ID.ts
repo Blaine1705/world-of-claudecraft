@@ -2971,7 +2971,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.renew.description': 'Menyembuhkan target sebesar {damage} selama 15 detik.',
   'entities.abilities.renew.name': 'Rahmat Berlanjut',
   'entities.abilities.retribution_aura.description':
-    'Menyelimuti dirimu dengan energi suci selama 30 menit, memberikan 5 kerusakan Suci kepada musuh mana pun yang menyerangmu dari jarak dekat.',
+    'Menyelimuti dirimu dan kelompokmu dengan energi suci hingga mati atau digantikan. Musuh yang menyerang sekutu terpengaruh dari jarak dekat menerima {buff} kerusakan Suci, dan sekutu terpengaruh memberikan {buff} kerusakan Suci tambahan dengan serangan otomatis.',
   'entities.abilities.retribution_aura.name': 'Aura Ganjaran',
   'entities.abilities.revive_pet.description':
     'Mengobati peliharaanmu. Jika masih hidup, memulihkan total {overTime} kesehatan selama 12 detik dengan pemulihan setiap 3 detik. Jika mati, menghidupkannya kembali dengan 35% kesehatan.',

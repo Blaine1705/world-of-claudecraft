@@ -7282,7 +7282,7 @@ export const nl_NL: EnTranslations = {
       },
       "retribution_aura": {
         "name": "Aura van Vergelding",
-        "description": "Omhult je 30 min lang met heilige energie en brengt 5 Heilige schade toe aan elke vijand die je in het melee aanvalt."
+        "description": "Omhult jou en je groep met heilige energie tot de dood of vervanging. Vijanden die een beïnvloede bondgenoot in melee raken, krijgen {buff} Heilige schade, en beïnvloede bondgenoten doen {buff} extra Heilige schade met automatische aanvallen."
       },
       "tame_beast": {
         "name": "Wildband",

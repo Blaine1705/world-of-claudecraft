@@ -2823,7 +2823,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.renew.description': 'Helbreder målet for {damage} over 15 sek.',
   'entities.abilities.renew.name': 'Dvælende Nåde',
   'entities.abilities.retribution_aura.description':
-    'Omgiver dig med hellig energi i 30 min og tilføjer 5 Hellig skade til enhver fjende, der rammer dig i nærkamp.',
+    'Omgiver dig og din gruppe med hellig energi indtil død eller udskiftning. Fjender, der rammer en påvirket allieret i nærkamp, tager {buff} Hellig skade, og påvirkede allierede giver {buff} ekstra Hellig skade med automatiske angreb.',
   'entities.abilities.retribution_aura.name': 'Gengældelsens Aura',
   'entities.abilities.revive_pet.description':
     'Lapper dit kæledyr sammen. Hvis det lever, genopretter det i alt {overTime} helbred over 12 sek. med helbredelse hvert 3. sek. Hvis det er dødt, genopliver det med 35 % helbred.',

@@ -7282,7 +7282,7 @@ export const zh_TW: EnTranslations = {
       },
       "retribution_aura": {
         "name": "報償光環",
-        "description": "以神聖能量環繞自身，持續 30 分鐘，對任何近戰攻擊你的敵人造成 5 點神聖傷害。"
+        "description": "以神聖能量環繞你和你的隊伍，直到死亡或被替換。近戰攻擊受影響隊友的敵人受到 {buff} 點神聖傷害，受影響的隊友的普通攻擊額外造成 {buff} 點神聖傷害。"
       },
       "tame_beast": {
         "name": "野性繫絆",

@@ -7282,7 +7282,7 @@ export const cs_CZ: EnTranslations = {
       },
       "retribution_aura": {
         "name": "Aura odplaty",
-        "description": "Obklopí tě svatou energií na 30 min a způsobí 5 svatého poškození každému nepříteli, který tě zasáhne na blízko."
+        "description": "Obklopí tebe i tvou skupinu svatou energií až do smrti nebo nahrazení. Nepřátelé, kteří na blízko zasáhnou zasaženého spojence, utrpí {buff} svatého poškození a zasažení spojenci způsobí automatickými útoky {buff} svatého poškození navíc."
       },
       "tame_beast": {
         "name": "Pouto divočiny",

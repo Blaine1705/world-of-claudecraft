@@ -2982,7 +2982,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.renew.description': 'Leczy cel o {damage} w ciągu 15 sek.',
   'entities.abilities.renew.name': 'Trwająca łaska',
   'entities.abilities.retribution_aura.description':
-    'Otacza cię świętą energią na 30 min, zadając 5 obrażeń od Świętości każdemu wrogowi, który zaatakuje cię wręcz.',
+    'Otacza ciebie i twoją drużynę świętą energią aż do śmierci lub zastąpienia. Wrogowie, którzy zaatakują wręcz objętego sojusznika, otrzymują {buff} obrażeń od Świętości, a objęci sojusznicy zadają {buff} dodatkowych obrażeń od Świętości atakami automatycznymi.',
   'entities.abilities.retribution_aura.name': 'Aura odpłaty',
   'entities.abilities.revive_pet.description':
     'Opatruje twojego zwierzaka. Jeśli żyje, przywraca mu łącznie {overTime} pkt. zdrowia przez 12 sek., co 3 sek. Jeśli nie żyje, wskrzesza go z 35% zdrowia.',

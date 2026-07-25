@@ -7282,7 +7282,7 @@ export const id_ID: EnTranslations = {
       },
       "retribution_aura": {
         "name": "Aura Ganjaran",
-        "description": "Menyelimuti dirimu dengan energi suci selama 30 menit, memberikan 5 kerusakan Suci kepada musuh mana pun yang menyerangmu dari jarak dekat."
+        "description": "Menyelimuti dirimu dan kelompokmu dengan energi suci hingga mati atau digantikan. Musuh yang menyerang sekutu terpengaruh dari jarak dekat menerima {buff} kerusakan Suci, dan sekutu terpengaruh memberikan {buff} kerusakan Suci tambahan dengan serangan otomatis."
       },
       "tame_beast": {
         "name": "Ikatan Liar",

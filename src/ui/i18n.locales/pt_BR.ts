@@ -4037,7 +4037,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Aumenta a ameaça gerada pelo seu dano Sagrado em 60% por 30 min. A base do paladino tanque.',
   'entities.abilities.retribution_aura.name': 'Aura de Represália',
   'entities.abilities.retribution_aura.description':
-    'Envolve você em energia sagrada por 30 min, causando 5 de dano Sagrado a qualquer inimigo que o atinja corpo a corpo.',
+    'Envolve você e seu grupo em energia sagrada até a morte ou substituição. Inimigos que atingirem um aliado afetado corpo a corpo sofrem {buff} de dano Sagrado, e aliados afetados causam {buff} de dano Sagrado adicional com ataques automáticos.',
   'entities.abilities.tame_beast.name': 'Elo Selvagem',
   'entities.abilities.tame_beast.description':
     'Começa a domar uma fera para ser sua companheira. Ela deve ser do seu nível ou menor e não pode ser elite. Seu ajudante segue você, ataca seus inimigos e mantém a própria ameaça. Você pode ter um ajudante por vez.',

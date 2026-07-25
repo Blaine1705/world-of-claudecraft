@@ -3177,6 +3177,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'holy',
     requiresTarget: false,
     exclusiveGroup: 'paladin_devotion',
+    // Ranked from level 7. The reflect is a FLAT value: it takes no spell power,
+    // no attack power and no level coefficient, and no talent touches it, so a
+    // single authored number is the aura's whole lifetime. At 5 it read as real
+    // pressure at 7 and as rounding error by 20, next to a kit that hits for 95 to
+    // 115. The ranks keep it worth the aura slot all the way up; Sacred Concord
+    // still triples whichever rank is live.
     effects: [
       {
         type: 'buffTarget',
@@ -3187,8 +3193,40 @@ export const ABILITIES: Record<string, AbilityDef> = {
         party: true,
       },
     ],
+    ranks: [
+      {
+        rank: 2,
+        level: 13,
+        cost: 0,
+        effects: [
+          {
+            type: 'buffTarget',
+            kind: 'thorns',
+            value: 12,
+            duration: 0,
+            permanent: true,
+            party: true,
+          },
+        ],
+      },
+      {
+        rank: 3,
+        level: 18,
+        cost: 0,
+        effects: [
+          {
+            type: 'buffTarget',
+            kind: 'thorns',
+            value: 22,
+            duration: 0,
+            permanent: true,
+            party: true,
+          },
+        ],
+      },
+    ],
     description:
-      'Surrounds you and your party with holy energy until death or replacement. Enemies that strike an affected ally in melee take 5 Holy damage, and affected allies deal 5 additional Holy damage with auto-attacks.',
+      'Surrounds you and your party with holy energy until death or replacement. Enemies that strike an affected ally in melee take $b Holy damage, and affected allies deal $b additional Holy damage with auto-attacks.',
   },
 
   // ====================== HUNTER ======================

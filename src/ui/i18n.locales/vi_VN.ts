@@ -3036,7 +3036,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.renew.description': 'Trị liệu cho mục tiêu {damage} trong 15 giây.',
   'entities.abilities.renew.name': 'Ân Điển Vương Vấn',
   'entities.abilities.retribution_aura.description':
-    'Bao bọc bạn trong năng lượng thánh thiện trong 30 phút, gây 5 sát thương Thánh cho bất kỳ kẻ địch nào đánh cận chiến bạn.',
+    'Bao bọc bạn và nhóm của bạn trong năng lượng thánh cho đến khi chết hoặc bị thay thế. Kẻ địch đánh cận chiến một đồng minh chịu ảnh hưởng sẽ nhận {buff} sát thương Thánh, và đồng minh chịu ảnh hưởng gây thêm {buff} sát thương Thánh bằng đòn đánh tự động.',
   'entities.abilities.retribution_aura.name': 'Hào Quang Báo Đền',
   'entities.abilities.revive_pet.description':
     'Băng bó cho thú cưng. Nếu còn sống, thú cưng hồi tổng cộng {overTime} máu trong 12 giây, mỗi 3 giây hồi một lần. Nếu đã chết, thú cưng được hồi sinh với 35% máu.',

@@ -3072,7 +3072,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.renew.description': 'Geneest het doelwit voor {damage} gedurende 15 sec.',
   'entities.abilities.renew.name': 'Aanhoudende Genade',
   'entities.abilities.retribution_aura.description':
-    'Omhult je 30 min lang met heilige energie en brengt 5 Heilige schade toe aan elke vijand die je in het melee aanvalt.',
+    'Omhult jou en je groep met heilige energie tot de dood of vervanging. Vijanden die een beïnvloede bondgenoot in melee raken, krijgen {buff} Heilige schade, en beïnvloede bondgenoten doen {buff} extra Heilige schade met automatische aanvallen.',
   'entities.abilities.retribution_aura.name': 'Aura van Vergelding',
   'entities.abilities.revive_pet.description':
     'Lapt je huisdier op. Als het leeft, herstelt het in totaal {overTime} gezondheid gedurende 12 sec., met elke 3 sec. een tik. Als het dood is, wordt het met 35% gezondheid tot leven gewekt.',

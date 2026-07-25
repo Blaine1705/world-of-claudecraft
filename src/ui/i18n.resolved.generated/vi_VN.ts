@@ -7282,7 +7282,7 @@ export const vi_VN: EnTranslations = {
       },
       "retribution_aura": {
         "name": "Hào Quang Báo Đền",
-        "description": "Bao bọc bạn trong năng lượng thánh thiện trong 30 phút, gây 5 sát thương Thánh cho bất kỳ kẻ địch nào đánh cận chiến bạn."
+        "description": "Bao bọc bạn và nhóm của bạn trong năng lượng thánh cho đến khi chết hoặc bị thay thế. Kẻ địch đánh cận chiến một đồng minh chịu ảnh hưởng sẽ nhận {buff} sát thương Thánh, và đồng minh chịu ảnh hưởng gây thêm {buff} sát thương Thánh bằng đòn đánh tự động."
       },
       "tame_beast": {
         "name": "Kết Giao Hoang Dã",

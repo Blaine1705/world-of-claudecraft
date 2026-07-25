@@ -2773,7 +2773,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '30分間、あなたの神聖ダメージが生成する脅威が60%増加します。タンク役パラディンの要です。',
   'entities.abilities.retribution_aura.name': '報復のオーラ',
   'entities.abilities.retribution_aura.description':
-    '30分間、聖なる力で身を包み、近接攻撃をしてきた敵に5の神聖ダメージを与えます。',
+    '死亡または置き換えられるまで、自身とパーティを聖なる力で包む。効果を受けた味方を近接攻撃した敵は{buff}の神聖ダメージを受け、効果を受けた味方の通常攻撃は{buff}の神聖ダメージを追加で与える。',
   'entities.abilities.tame_beast.name': '野生の絆',
   'entities.abilities.tame_beast.description':
     '獣を仲間にするための調教を始めます。獣はあなたのレベル以下で、エリートであってはなりません。ペットはあなたに従い、敵を攻撃し、独自の脅威を保ちます。同時に連れられるペットは1体だけです。',

@@ -4519,7 +4519,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Augmente de 60% la menace générée par vos dégâts Sacrés pendant 30 min. La pierre angulaire du paladin tank.',
   'entities.abilities.retribution_aura.name': 'Aura de représailles',
   'entities.abilities.retribution_aura.description':
-    "Vous entoure d'énergie sacrée pendant 30 min, infligeant 5 points de dégâts Sacrés à tout ennemi qui vous frappe en mêlée.",
+    "Vous entoure, vous et votre groupe, d'énergie sacrée jusqu'à la mort ou au remplacement. Les ennemis qui frappent un allié affecté en mêlée subissent {buff} points de dégâts Sacrés, et les alliés affectés infligent {buff} points de dégâts Sacrés supplémentaires avec leurs attaques automatiques.",
   'entities.abilities.tame_beast.name': 'Lien sauvage',
   'entities.abilities.tame_beast.description':
     "Commence à apprivoiser une bête pour en faire votre compagnon. Elle doit être de votre niveau ou moins et ne pas être élite. Votre familier vous suit, attaque vos ennemis et génère sa propre menace. Vous ne pouvez avoir qu'un familier à la fois.",

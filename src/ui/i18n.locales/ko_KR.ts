@@ -2754,7 +2754,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '30분 동안 자신의 신성 피해가 생성하는 위협 수준이 60%만큼 증가합니다. 방어 성기사의 핵심입니다.',
   'entities.abilities.retribution_aura.name': '응보의 오라',
   'entities.abilities.retribution_aura.description':
-    '30분 동안 신성한 기운으로 자신을 감싸 근접 공격으로 자신을 타격하는 모든 적에게 5의 신성 피해를 입힙니다.',
+    '죽거나 교체될 때까지 자신과 파티를 신성한 기운으로 감쌉니다. 효과를 받는 아군을 근접 공격한 적은 {buff}의 신성 피해를 입고, 효과를 받는 아군의 자동 공격은 {buff}의 신성 피해를 추가로 입힙니다.',
   'entities.abilities.tame_beast.name': '야생의 결속',
   'entities.abilities.tame_beast.description':
     '야수를 길들여 동료로 삼기 시작합니다. 야수는 자신의 레벨 이하이며 정예가 아니어야 합니다. 소환수는 주인을 따르고 적을 공격하며 자체 위협 수준을 유지합니다. 한 번에 하나의 소환수만 둘 수 있습니다.',

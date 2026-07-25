@@ -5059,7 +5059,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.renew.description': 'Vyléčí cíl za {damage} během 15 s.',
   'entities.abilities.renew.name': 'Přetrvávající milost',
   'entities.abilities.retribution_aura.description':
-    'Obklopí tě svatou energií na 30 min a způsobí 5 svatého poškození každému nepříteli, který tě zasáhne na blízko.',
+    'Obklopí tebe i tvou skupinu svatou energií až do smrti nebo nahrazení. Nepřátelé, kteří na blízko zasáhnou zasaženého spojence, utrpí {buff} svatého poškození a zasažení spojenci způsobí automatickými útoky {buff} svatého poškození navíc.',
   'entities.abilities.retribution_aura.name': 'Aura odplaty',
   'entities.abilities.revive_pet.description':
     'Ošetří tvého mazlíčka. Pokud žije, obnoví mu celkem {overTime} zdraví během 12 s v intervalech po 3 s. Pokud je mrtvý, oživí ho s 35 % zdraví.',

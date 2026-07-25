@@ -2657,7 +2657,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '使你的神圣伤害产生的威胁值提高 60%，持续 30 分钟。防护圣骑士的核心技能。',
   'entities.abilities.retribution_aura.name': '报偿光环',
   'entities.abilities.retribution_aura.description':
-    '以神圣能量环绕自身，持续 30 分钟，对任何近战攻击你的敌人造成 5 点神圣伤害。',
+    '以神圣能量环绕你和你的队伍，直到死亡或被替换。近战攻击受影响队友的敌人受到 {buff} 点神圣伤害，受影响的队友的普通攻击额外造成 {buff} 点神圣伤害。',
   'entities.abilities.tame_beast.name': '野性羁绊',
   'entities.abilities.tame_beast.description':
     '开始驯服一只野兽作为你的伙伴。它必须不高于你的等级，且不能是精英。你的宠物会跟随你、攻击敌人，并保持自己的威胁值。同一时间只能拥有一只宠物。',

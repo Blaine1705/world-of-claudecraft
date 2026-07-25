@@ -7282,7 +7282,7 @@ export const sv_SE: EnTranslations = {
       },
       "retribution_aura": {
         "name": "Vedergällningsaura",
-        "description": "Omger dig med helig energi i 30 min och tillfogar 5 helig skada till varje fiende som slår dig i närstrid."
+        "description": "Omger dig och din grupp med helig energi till döden eller tills den ersätts. Fiender som träffar en påverkad allierad i närstrid tar {buff} helig skada, och påverkade allierade gör {buff} extra helig skada med automatiska attacker."
       },
       "tame_beast": {
         "name": "Vildband",

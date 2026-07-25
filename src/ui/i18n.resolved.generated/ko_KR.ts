@@ -7282,7 +7282,7 @@ export const ko_KR: EnTranslations = {
       },
       "retribution_aura": {
         "name": "응보의 오라",
-        "description": "30분 동안 신성한 기운으로 자신을 감싸 근접 공격으로 자신을 타격하는 모든 적에게 5의 신성 피해를 입힙니다."
+        "description": "죽거나 교체될 때까지 자신과 파티를 신성한 기운으로 감쌉니다. 효과를 받는 아군을 근접 공격한 적은 {buff}의 신성 피해를 입고, 효과를 받는 아군의 자동 공격은 {buff}의 신성 피해를 추가로 입힙니다."
       },
       "tame_beast": {
         "name": "야생의 결속",

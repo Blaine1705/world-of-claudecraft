@@ -7282,7 +7282,7 @@ export const da_DK: EnTranslations = {
       },
       "retribution_aura": {
         "name": "Gengældelsens Aura",
-        "description": "Omgiver dig med hellig energi i 30 min og tilføjer 5 Hellig skade til enhver fjende, der rammer dig i nærkamp."
+        "description": "Omgiver dig og din gruppe med hellig energi indtil død eller udskiftning. Fjender, der rammer en påvirket allieret i nærkamp, tager {buff} Hellig skade, og påvirkede allierede giver {buff} ekstra Hellig skade med automatiske angreb."
       },
       "tame_beast": {
         "name": "Vildbånd",

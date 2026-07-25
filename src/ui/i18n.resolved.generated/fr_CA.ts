@@ -7282,7 +7282,7 @@ export const fr_CA: EnTranslations = {
       },
       "retribution_aura": {
         "name": "Aura de représailles",
-        "description": "Vous entoure d'énergie sacrée pendant 30 min, infligeant 5 points de dégâts Sacrés à tout ennemi qui vous frappe en mêlée."
+        "description": "Vous entoure, vous et votre groupe, d'énergie sacrée jusqu'à la mort ou au remplacement. Les ennemis qui frappent un allié affecté en mêlée subissent {buff} points de dégâts Sacrés, et les alliés affectés infligent {buff} points de dégâts Sacrés supplémentaires avec leurs attaques automatiques."
       },
       "tame_beast": {
         "name": "Lien sauvage",

@@ -7282,7 +7282,7 @@ export const es: EnTranslations = {
       },
       "retribution_aura": {
         "name": "Aura de Represalia",
-        "description": "Te rodea de energía sagrada durante 30 min y causa 5 de daño Sagrado a cualquier enemigo que te golpee cuerpo a cuerpo."
+        "description": "Te rodea a ti y a tu grupo de energía sagrada hasta la muerte o su reemplazo. Los enemigos que golpeen cuerpo a cuerpo a un aliado afectado reciben {buff} de daño Sagrado, y los aliados afectados infligen {buff} de daño Sagrado adicional con sus ataques automáticos."
       },
       "tame_beast": {
         "name": "Vínculo Salvaje",

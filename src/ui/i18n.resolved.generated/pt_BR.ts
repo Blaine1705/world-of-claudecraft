@@ -7282,7 +7282,7 @@ export const pt_BR: EnTranslations = {
       },
       "retribution_aura": {
         "name": "Aura de Represália",
-        "description": "Envolve você em energia sagrada por 30 min, causando 5 de dano Sagrado a qualquer inimigo que o atinja corpo a corpo."
+        "description": "Envolve você e seu grupo em energia sagrada até a morte ou substituição. Inimigos que atingirem um aliado afetado corpo a corpo sofrem {buff} de dano Sagrado, e aliados afetados causam {buff} de dano Sagrado adicional com ataques automáticos."
       },
       "tame_beast": {
         "name": "Elo Selvagem",

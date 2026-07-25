@@ -292,11 +292,13 @@ describe('Paladin support abilities', () => {
         party: true,
       },
     ]);
+    // Rank 3 at level 20: the reflect is a flat number that no stat scales, so it
+    // ranks up (5 at 7, 12 at 13, 22 at 18) instead of staying at its level-7 value.
     expect(resolve(paladin, 'retribution_aura').effects).toEqual([
       {
         type: 'buffTarget',
         kind: 'thorns',
-        value: 5,
+        value: 22,
         duration: 0,
         permanent: true,
         party: true,

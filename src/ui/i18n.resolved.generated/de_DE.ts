@@ -7282,7 +7282,7 @@ export const de_DE: EnTranslations = {
       },
       "retribution_aura": {
         "name": "Aura der Vergeltung",
-        "description": "Umgibt Euch 30 Min. lang mit heiliger Energie und fügt jedem Gegner, der Euch im Nahkampf trifft, 5 Heiligschaden zu."
+        "description": "Umgibt Euch und Eure Gruppe mit heiliger Energie bis zum Tod oder zur Ersetzung. Gegner, die einen betroffenen Verbündeten im Nahkampf treffen, erleiden {buff} Heiligschaden, und betroffene Verbündete verursachen mit Autoangriffen {buff} zusätzlichen Heiligschaden."
       },
       "tame_beast": {
         "name": "Wildband",

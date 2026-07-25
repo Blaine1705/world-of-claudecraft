@@ -1170,7 +1170,7 @@ const classAbilityNamesEn = {
       [
         'retribution_aura',
         'Requital Aura',
-        'Surrounds you and your party with holy energy until death or replacement. Enemies that strike an affected ally in melee take 5 Holy damage, and affected allies deal 5 additional Holy damage with auto-attacks.',
+        'Surrounds you and your party with holy energy until death or replacement. Enemies that strike an affected ally in melee take {buff} Holy damage, and affected allies deal {buff} additional Holy damage with auto-attacks.',
       ],
       [
         'tame_beast',

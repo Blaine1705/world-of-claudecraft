@@ -7282,7 +7282,7 @@ export const pl_PL: EnTranslations = {
       },
       "retribution_aura": {
         "name": "Aura odpłaty",
-        "description": "Otacza cię świętą energią na 30 min, zadając 5 obrażeń od Świętości każdemu wrogowi, który zaatakuje cię wręcz."
+        "description": "Otacza ciebie i twoją drużynę świętą energią aż do śmierci lub zastąpienia. Wrogowie, którzy zaatakują wręcz objętego sojusznika, otrzymują {buff} obrażeń od Świętości, a objęci sojusznicy zadają {buff} dodatkowych obrażeń od Świętości atakami automatycznymi."
       },
       "tame_beast": {
         "name": "Dzika więź",

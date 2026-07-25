@@ -7282,7 +7282,7 @@ export const it_IT: EnTranslations = {
       },
       "retribution_aura": {
         "name": "Aura della Rivalsa",
-        "description": "Ti avvolge in energia sacra per 30 min, infliggendo 5 danni Sacri a ogni nemico che ti colpisce in mischia."
+        "description": "Avvolge te e il tuo gruppo in energia sacra fino alla morte o alla sostituzione. I nemici che colpiscono in mischia un alleato interessato subiscono {buff} danni Sacri, e gli alleati interessati infliggono {buff} danni Sacri aggiuntivi con gli attacchi automatici."
       },
       "tame_beast": {
         "name": "Vincolo Selvaggio",
