@@ -4377,7 +4377,7 @@ export class Renderer {
       const built = buildMailboxPillar(e.id);
       body = built.group;
       height = built.height;
-      objectMesh = built.group;
+      objectMesh = body!;
     } else if (e.kind === 'object' && e.templateId === 'noticeboard_eastbrook') {
       // The civic board is itself the readable interaction landmark. Keep the
       // complete GLB on every tier and avoid the generic loot sparkle.
