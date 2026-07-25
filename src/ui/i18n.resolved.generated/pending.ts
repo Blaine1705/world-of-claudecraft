@@ -10,6 +10,8 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -21,6 +23,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "es_ES": [
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -32,6 +36,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "fr_FR": [
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -43,6 +49,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "fr_CA": [
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -55,6 +63,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -66,6 +76,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "de_DE": [
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -81,6 +93,8 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -93,6 +107,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -104,6 +120,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "nl_NL": [
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -115,6 +133,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "pl_PL": [
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -126,6 +146,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "id_ID": [
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -137,6 +159,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "tr_TR": [
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -148,6 +172,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "sv_SE": [
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -159,6 +185,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "vi_VN": [
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -170,6 +198,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "da_DK": [
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
