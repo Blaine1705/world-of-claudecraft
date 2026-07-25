@@ -198,10 +198,12 @@
       </div>
       <div class="uf-buffs" id="tf-debuffs"></div>
       <!-- Target of Target (showTargetOfTarget option): the classic mini-frame showing
-           who the current target is targeting. A #target-frame child so it inherits the
-           target's children-zoom and hides with the whole frame when there is no target;
-           its own unit_frame painter toggles it flex/none when the target-of-target is
-           known/unknown. Portrait + name + hp bar only (no resource/cast/debuffs). -->
+           who the current target is targeting. A #target-frame child that hides with the
+           whole frame when there is no target; hud.css anchors it BESIDE the frame's
+           right edge (the below-frame band belongs to the #tf-debuffs strip) and
+           compounds the target frame scale into its own mini zoom. Its own unit_frame
+           painter toggles it flex/none when the target-of-target is known/unknown.
+           Portrait + name + hp bar only (no resource/cast/debuffs). -->
       <div id="totarget-frame" class="unitframe totarget" role="group" data-i18n-aria="hudChrome.unitFrame.targetOfTargetLabel" aria-label="Mark's Mark">
         <div class="portrait-wrap">
           <div class="portrait"><canvas id="totf-portrait" width="54" height="54"></canvas></div>
@@ -238,6 +240,10 @@
         <!-- Ravenpost envelope: visible while unread letters wait (role=status so
              arrivals are announced; reading them still requires a mailbox). -->
         <div id="mail-indicator" role="status" hidden data-icon="mail"><span class="mail-indicator-count">0</span></div>
+        <!-- World Market coin: visible while sale proceeds or returned items wait at
+             the Merchant; opens the market window when standing at the Merchant, and
+             is informational only (the tooltip) anywhere else. -->
+        <button id="market-indicator" type="button" hidden data-icon="market" aria-live="polite" data-i18n-title="hudChrome.marketIndicator.tip" data-i18n-aria="hudChrome.marketIndicator.aria" title="Gold or items are waiting for you at the Merchant." aria-label="World Market collection waiting"></button>
       </div>
       <div id="minimap-clock" data-i18n-title="hudChrome.widgets.clockTitle" title="Local time — click to toggle 12/24-hour">--:--</div>
       <div id="minimap-coords" data-i18n-title="hudChrome.widgets.worldCoordinates" data-i18n-aria="hudChrome.widgets.coordinates" title="Your current world coordinates" aria-label="Coordinates">0, 0</div>
