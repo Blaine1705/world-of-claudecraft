@@ -1209,6 +1209,14 @@ describe('the vendor buyback-plain wash is closed', () => {
     return { bindOnTrade: true, boundTo: pid };
   }
 
+  // An UNBOUND masterwork/signed payload, the shape crafting.ts mints for a
+  // self-use masterwork proc (professions/crafting.ts resolveCraftForRecipe):
+  // signer plus rolled.masterwork/stats, no boundTo (only a commissioned
+  // craft arms bindOnTrade, and this is deliberately not one).
+  function masterworkPayload(): ItemInstancePayload {
+    return { signer: 'Ayla', rolled: { masterwork: true, stats: { strength: 5 } } };
+  }
+
   it('a bound-only holding is refused: no payout, no buyback row, payload intact', () => {
     const { sim, pid } = vendorSetup();
     setCopper(sim, pid, 0);
@@ -1273,6 +1281,56 @@ describe('the vendor buyback-plain wash is closed', () => {
     const back = slotsOf(sim, pid, SWORD);
     expect(back).toHaveLength(1);
     expect(back[0].instance).toBeUndefined();
+  });
+
+  it('selling an unbound masterwork/signed copy and buying it back restores its payload', () => {
+    // #2207 sibling gap: sellItem's only instanced guard is boundTo, so an
+    // UNBOUND self-crafted masterwork piece sells normally, but until this
+    // fix buyBackItem always re-granted a plain generic copy, permanently
+    // stripping the masterwork stats and signer attribution.
+    const { sim, pid } = vendorSetup();
+    setCopper(sim, pid, 0);
+    sim.ctx.addItemInstance(SWORD, masterworkPayload(), pid);
+    sim.drainEvents();
+    sim.sellItem(SWORD, 1, pid);
+    expect(errorTexts(sim.drainEvents())).toHaveLength(0);
+    expect(copperOf(sim, pid)).toBe(ITEMS[SWORD].sellValue!);
+    expect(slotsOf(sim, pid, SWORD)).toHaveLength(0);
+    sim.buyBackItem(SWORD, pid);
+    expect(errorTexts(sim.drainEvents())).toHaveLength(0);
+    expect(copperOf(sim, pid)).toBe(0);
+    const back = slotsOf(sim, pid, SWORD);
+    expect(back).toHaveLength(1);
+    expect(back[0].instance).toEqual(masterworkPayload());
+  });
+
+  it('a mixed plain + masterwork sale keeps distinct buyback rows: neither payload merges into the other', () => {
+    // Guards the merge-by-itemId trap: recordVendorBuyback must not blindly
+    // bump a count across differently-instanced (or plain vs instanced)
+    // rows, or a buyback could return the wrong copy's payload.
+    const { sim, pid } = vendorSetup();
+    setCopper(sim, pid, 0);
+    sim.addItem(SWORD, 1, pid);
+    sim.ctx.addItemInstance(SWORD, masterworkPayload(), pid);
+    sim.drainEvents();
+    sim.sellItem(SWORD, 2, pid);
+    expect(errorTexts(sim.drainEvents())).toHaveLength(0);
+    expect(copperOf(sim, pid)).toBe(ITEMS[SWORD].sellValue! * 2);
+    const rows = sim.players.get(pid)!.vendorBuyback.filter((s) => s.itemId === SWORD);
+    expect(rows).toHaveLength(2);
+    expect(rows.reduce((sum, r) => sum + r.count, 0)).toBe(2);
+
+    // Buy both back; one copy must come back plain and the other must come
+    // back carrying the exact masterwork payload, regardless of row order.
+    sim.buyBackItem(SWORD, pid);
+    sim.buyBackItem(SWORD, pid);
+    expect(errorTexts(sim.drainEvents())).toHaveLength(0);
+    const back = slotsOf(sim, pid, SWORD);
+    const plainCopies = back.filter((s) => s.instance === undefined);
+    const masterworkCopies = back.filter((s) => s.instance !== undefined);
+    expect(plainCopies.reduce((sum, s) => sum + s.count, 0)).toBe(1);
+    expect(masterworkCopies.reduce((sum, s) => sum + s.count, 0)).toBe(1);
+    expect(masterworkCopies[0]?.instance).toEqual(masterworkPayload());
   });
 
   it('the full wash probe is impossible end to end: sell denied, then buyback denied', () => {

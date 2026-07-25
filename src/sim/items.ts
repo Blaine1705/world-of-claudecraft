@@ -30,6 +30,7 @@ import {
 } from './equipment_rules';
 import { formatMoney } from './format_money';
 import { moveStackToCell } from './inventory_order';
+import { canStackInstancePayloads } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import { useGatherToolItem } from './professions/gathering';
@@ -566,14 +567,34 @@ function vendorInRange(ctx: SimContext, p: Entity): boolean {
   );
 }
 
-function recordVendorBuyback(meta: PlayerMeta, itemId: string, count: number): void {
-  const existingIndex = meta.vendorBuyback.findIndex((s) => s.itemId === itemId);
+// `instance` carries the payload of the sold copies (absent for a plain
+// fungible sale). A row is a merge target only when its stored payload
+// matches under canStackInstancePayloads, exactly the identical-payload
+// stacking rule addStacked/addItemInstance already apply everywhere else in
+// bags: a plain sale never merges into an instanced row, and a differently
+// signed/rolled instanced sale never merges into another one, so a buyback
+// can never pair the wrong count with the wrong payload. The stored payload
+// is a deep clone: the caller's instance is never aliased into the buyback
+// list.
+function recordVendorBuyback(
+  meta: PlayerMeta,
+  itemId: string,
+  count: number,
+  instance?: ItemInstancePayload,
+): void {
+  const existingIndex = meta.vendorBuyback.findIndex(
+    (s) => s.itemId === itemId && canStackInstancePayloads(s.instance, instance),
+  );
   if (existingIndex >= 0) {
     const [existing] = meta.vendorBuyback.splice(existingIndex, 1);
     existing.count += count;
     meta.vendorBuyback.unshift(existing);
   } else {
-    meta.vendorBuyback.unshift({ itemId, count });
+    meta.vendorBuyback.unshift({
+      itemId,
+      count,
+      ...(instance && { instance: cloneItemInstancePayload(instance) }),
+    });
   }
   while (meta.vendorBuyback.length > VENDOR_BUYBACK_LIMIT) meta.vendorBuyback.pop();
 }
@@ -629,14 +650,23 @@ export function sellItem(ctx: SimContext, itemId: string, count = 1, pid?: numbe
   // above already guarantees enough unbound copies, but removePreferFungible's
   // highest-index-first instanced walk must still spare a bound copy sitting
   // above an unbound instanced one.
-  removePreferFungible(
+  //
+  // removePreferFungible reports exactly which consumed units carried an
+  // instance payload (masterwork/signed pieces, #1165): a plain sale (the
+  // common case) records a single plain buyback row, while any instanced
+  // units get their own per-unit rows so buyback can restore the exact
+  // payload sold instead of silently minting a generic copy (the #2207
+  // sibling gap social/trade.ts's grantOffer fix left open, see its comment).
+  const consumedInstances = removePreferFungible(
     ctx,
     itemId,
     sellableCount,
     meta.entityId,
     (instance) => instance.boundTo !== undefined,
   );
-  recordVendorBuyback(meta, itemId, sellableCount);
+  const plainSoldCount = sellableCount - consumedInstances.length;
+  if (plainSoldCount > 0) recordVendorBuyback(meta, itemId, plainSoldCount);
+  for (const instance of consumedInstances) recordVendorBuyback(meta, itemId, 1, instance);
   const payout = def.sellValue * sellableCount;
   meta.copper += payout;
   ctx.emit({ type: 'vendor', action: 'sell', itemId, pid: meta.entityId });
@@ -756,12 +786,17 @@ export function buyBackItem(ctx: SimContext, itemId: string, pid?: number): void
     return;
   }
   meta.copper -= def.sellValue;
+  const instance = slot.instance;
   slot.count -= 1;
   if (slot.count <= 0) meta.vendorBuyback = meta.vendorBuyback.filter((s) => s !== slot);
-  addItemSilent(itemId, 1, meta);
+  // A row recorded with an instance payload (a masterwork/signed piece sold
+  // unbound, #2207 sibling gap) re-grants that exact payload instead of a
+  // generic plain copy; addStacked deep-clones it into the new/topped-up
+  // inventory slot, so the buyback row's own copy is never aliased.
+  addItemSilent(itemId, 1, meta, instance);
   // The silent add bypasses the inventory hub, so credit the discovery
   // ledger here (an acquisition like any other; the mark is idempotent).
-  ctx.markItemDiscovered(meta, itemId);
+  ctx.markItemDiscovered(meta, itemId, instance?.rolled?.quality);
   ctx.onInventoryChangedForQuests(meta);
   ctx.emit({ type: 'vendor', action: 'buyback', itemId, pid: meta.entityId });
   ctx.emit({
@@ -771,6 +806,11 @@ export function buyBackItem(ctx: SimContext, itemId: string, pid?: number): void
   });
 }
 
-function addItemSilent(itemId: string, count: number, meta: PlayerMeta): void {
-  addStacked(meta.inventory, itemId, count);
+function addItemSilent(
+  itemId: string,
+  count: number,
+  meta: PlayerMeta,
+  instance?: ItemInstancePayload,
+): void {
+  addStacked(meta.inventory, itemId, count, instance);
 }
