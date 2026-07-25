@@ -8,7 +8,12 @@ const outDir = resolve('mediawiki/seed');
 const tmpDir = resolve('tmp/mediawiki-seed');
 const sourcePath = resolve(tmpDir, 'seed-source.ts');
 const bundlePath = resolve(tmpDir, 'seed-source.mjs');
-const outputPath = resolve(outDir, 'pages.xml');
+// MEDIAWIKI_SEED_OUT lets a caller build the seed somewhere else (the visibility
+// test rebuilds into a temp dir so it can check the GENERATOR without requiring
+// the committed deploy artifact to be regenerated in every content PR).
+const outputPath = process.env.MEDIAWIKI_SEED_OUT
+  ? resolve(process.env.MEDIAWIKI_SEED_OUT)
+  : resolve(outDir, 'pages.xml');
 const execFileAsync = promisify(execFile);
 
 await mkdir(tmpDir, { recursive: true });
