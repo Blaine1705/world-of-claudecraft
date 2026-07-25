@@ -81,9 +81,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.valkyrs_calling.name': '瓦尔基里的召唤',
   'entities.abilities.valkyrs_calling.description':
     '升上空中，在飞向敌人期间免疫伤害。2 秒后降临目标区域，造成 {damage} 点神圣伤害并产生 1 点虔诚。升华会使冲击伤害提高 50% 并消耗 1 次充能。',
-  'entities.abilities.faithforged_guard.name': '信仰铸卫',
+  'entities.abilities.faithforged_guard.name': '圣光之债',
   'entities.abilities.faithforged_guard.description':
-    '以护盾环绕自身，在 8 秒内吸收 {damage} 点伤害。升华使护盾吸收量提高 50%。',
+    '在 8 秒内，你受到的下一次敌人攻击将被回敬：至多抵消 {buff} 点伤害，并以等量神圣伤害返还给攻击者，同时你获得 1 点虔诚。只回敬一次攻击。升华使可回敬的数值提高 50%。',
   'entities.abilities.mercy_lance.name': '慈悲圣枪',
   'entities.abilities.mercy_lance.description':
     '对一名敌人造成 {damage} 点神圣伤害，并在造成伤害时产生 1 点虔诚。升华期间消耗 1 次充能，使其必定暴击。',

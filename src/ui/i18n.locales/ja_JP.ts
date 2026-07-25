@@ -89,9 +89,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.valkyrs_calling.name': 'ヴァルキュリアの召命',
   'entities.abilities.valkyrs_calling.description':
     '空へ昇り、敵へ飛行する間はダメージを受けなくなる。2秒後、対象地点へ降下して{damage}の神聖ダメージを与え、献身を1生成する。昇天中は着地ダメージが50%増加し、チャージを1消費する。',
-  'entities.abilities.faithforged_guard.name': '信仰鍛造の守り',
+  'entities.abilities.faithforged_guard.name': '聖光の負債',
   'entities.abilities.faithforged_guard.description':
-    '8秒間、{damage}ダメージを吸収する盾で自身を包む。昇天中は盾の吸収量が50%増加する。',
+    '8秒間、次に受ける敵の攻撃に報いる。最大{buff}のダメージを打ち消し、同量を神聖ダメージとして攻撃者に返し、信仰を1得る。報いるのは1撃のみ。昇天は報いられる量を50%増加させる。',
   'entities.abilities.mercy_lance.name': '慈悲の槍',
   'entities.abilities.mercy_lance.description':
     '敵1体に{damage}の神聖ダメージを与え、命中時に献身を1生成する。昇天中はチャージを1消費し、必ずクリティカルヒットになる。',

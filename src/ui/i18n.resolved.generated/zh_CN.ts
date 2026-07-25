@@ -7181,8 +7181,8 @@ export const zh_CN: EnTranslations = {
         "description": "升上空中，在飞向敌人期间免疫伤害。2 秒后降临目标区域，造成 {damage} 点神圣伤害并产生 1 点虔诚。升华会使冲击伤害提高 50% 并消耗 1 次充能。"
       },
       "faithforged_guard": {
-        "name": "信仰铸卫",
-        "description": "以护盾环绕自身，在 8 秒内吸收 {damage} 点伤害。升华使护盾吸收量提高 50%。"
+        "name": "圣光之债",
+        "description": "在 8 秒内，你受到的下一次敌人攻击将被回敬：至多抵消 {buff} 点伤害，并以等量神圣伤害返还给攻击者，同时你获得 1 点虔诚。只回敬一次攻击。升华使可回敬的数值提高 50%。"
       },
       "mercy_lance": {
         "name": "慈悲圣枪",
