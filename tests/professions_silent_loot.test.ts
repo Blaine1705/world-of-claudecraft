@@ -338,6 +338,96 @@ describe('professions grants suppress BOTH generic hub feedbacks', () => {
   // carries both flags, the once-ever Codfather quest catch carries neither.
 });
 
+describe('the craft output arms each stand their hub line down', () => {
+  // resolveCraftForRecipe branches four ways on the output (masterwork proc,
+  // signable single, commissioned, plain), and the multi-output sweep above
+  // only ever reaches the PLAIN arm, because every resultCount > 1 recipe in
+  // content is food or an elixir. So the other arms were unpinned by behavior.
+  // Each case below asserts which arm it took before asserting the flags, or
+  // it would silently drift onto the plain arm and pin nothing new.
+  const lootAfterCraft = (sim: Sim) => lootEvents(sim.tick());
+
+  it('a SIGNABLE single-output craft (rare-or-better def) stands both down', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error('missing player meta');
+    meta.knownRecipes.add('recipe_thorium_mining_pick');
+    meta.craftSkills.toolworks = 75;
+    sim.addItem('thorium_ore', 4, pid);
+    sim.addItem('mithril_mining_pick', 1, pid);
+    placeAtStationFor(sim, pid, 'toolworks');
+    sim.tick(); // drain the (loud) reagent grants
+    sim.craftItem('recipe_thorium_mining_pick', false, pid);
+    expect(sim.lastCraftResult?.ok, sim.lastCraftResult?.reason).toBe(true);
+    // The arm identity: a rare def at resultCount 1 mints ONE signed instance,
+    // and not via the masterwork branch.
+    expect(sim.lastCraftResult?.masterwork).toBeFalsy();
+    expect(sim.lastCraftResult?.count).toBe(1);
+    const events = lootAfterCraft(sim);
+    expect(events).toHaveLength(1);
+    expect(events[0].silent).toBe(true);
+    expect(events[0].callerLogs).toBe(true);
+  });
+
+  it('a COMMISSIONED craft stands both down on every armed copy', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error('missing player meta');
+    meta.knownRecipes.add('recipe_eastbrook_arming_sword');
+    sim.addItem('wolf_fang', 2, pid);
+    sim.addItem('bone_fragments', 4, pid);
+    sim.addItem('smithing_flux', 6, pid);
+    sim.tick();
+    sim.craftItem('recipe_eastbrook_arming_sword', true, pid);
+    expect(sim.lastCraftResult?.ok, sim.lastCraftResult?.reason).toBe(true);
+    // The arm identity: commission forces the instance path even for a
+    // sub-rare output a plain grant would leave fungible.
+    expect(sim.lastCraftResult?.commission).toBe(true);
+    const events = lootAfterCraft(sim);
+    expect(events.length).toBeGreaterThan(0);
+    for (const ev of events) {
+      expect(ev.silent).toBe(true);
+      expect(ev.callerLogs).toBe(true);
+    }
+  });
+
+  it('a MASTERWORK proc stands both down on the baked instance', () => {
+    // Seed 20 with tailoring at skill 200 is the hunted proc window
+    // tests/professions_masterwork.test.ts uses: the second successful
+    // vestments craft procs. Reused rather than re-hunted so the two files
+    // cannot disagree about which craft is the masterwork one.
+    const sim = new Sim({ seed: 20, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    sim.acceptArchetypeQuest('tailoring');
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error('missing player meta');
+    meta.craftSkills.tailoring = 200;
+    for (let i = 0; i < 12; i++) sim.addItem('linen_scrap', 1, pid);
+    for (let i = 0; i < 6; i++) sim.addItem('spider_leg', 1, pid);
+    for (let i = 0; i < 9; i++) sim.addItem('homespun_cloth', 1, pid);
+    for (let i = 0; i < 15; i++) sim.addItem('spool_of_thread', 1, pid);
+    sim.tick();
+    sim.craftItem('recipe_eastbrook_ritual_vestments', false, pid);
+    sim.tick();
+    sim.craftItem('recipe_eastbrook_ritual_vestments', false, pid);
+    expect(sim.lastCraftResult?.ok, sim.lastCraftResult?.reason).toBe(true);
+    // The arm identity, and the whole point of the case.
+    expect(sim.lastCraftResult?.masterwork).toBe(true);
+    const events = lootAfterCraft(sim);
+    expect(events).toHaveLength(1);
+    expect(events[0].silent).toBe(true);
+    expect(events[0].callerLogs).toBe(true);
+  });
+
+  // The two remaining arms (a masterwork proc or a commission on a
+  // resultCount > 1 recipe) are unreachable with today's content: all four
+  // multi-output recipes are food or elixirs, which bake no bonus stats and
+  // are not commission-eligible. They stay defensive, covered by the
+  // call-site sweep below rather than by a case that cannot be driven.
+});
+
 describe('every professions grant site is accounted for (#2430)', () => {
   // The behavioral pins above cover the flows someone thought to drive. The
   // gap this closes is the one that actually shipped: the Maker's Bond unbind

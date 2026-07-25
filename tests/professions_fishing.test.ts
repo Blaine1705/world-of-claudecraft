@@ -1011,6 +1011,12 @@ describe('landed-catch grant flags (pin 11)', () => {
     expect(loot[0].callerLogs).toBe(true);
     // The event still CARRIES its text: only the client elides the line.
     expect(loot[0].text).toContain('You receive:');
+    // Exactly ONE fish. Sim.addItem only appends " xN" past one unit, so the
+    // absent suffix is the count. This is what makes catchLine the one
+    // grant-line family that needs no quantity variant; a multi-fish catch
+    // would have to add one, or the count would go unreported now that the
+    // hub line no longer prints it (#2430).
+    expect(loot[0].text).not.toMatch(/ x\d+\.$/);
   });
 
   it('a no-bite cast grants nothing at all (no loot event to flag)', () => {

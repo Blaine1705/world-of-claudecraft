@@ -28,6 +28,7 @@ import { ITEMS } from '../src/sim/data';
 import type { SimEvent } from '../src/sim/types';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import { Hud } from '../src/ui/hud';
+import { QUALITY_COLOR } from '../src/ui/icons';
 
 const PLAYER_ID = 7;
 // Real content ids so the item links resolve through the same ITEMS table the
@@ -35,6 +36,16 @@ const PLAYER_ID = 7;
 const SWORD = 'eastbrook_arming_sword';
 const DUST = 'arcane_dust';
 const ORE = 'copper_ore';
+const RARE_WEAPON = 'moggers_copper_cudgel'; // rare, so link color varies from SWORD's
+
+// jsdom normalizes an assigned hex to rgb(), so a raw QUALITY_COLOR hex never
+// compares equal to what style.color reads back. Round-trip the expectation
+// through the same element property instead of hand-writing the rgb() form.
+const cssColor = (hex: string): string => {
+  const probe = document.createElement('span');
+  probe.style.color = hex;
+  return probe.style.color;
+};
 
 interface GrantLineHarness {
   sim: {
@@ -415,6 +426,12 @@ describe('non-profession grants are untouched', () => {
     ]);
     expect(lines(hud)).toHaveLength(0);
     expect(hud.lootRolls.closeForItem).toHaveBeenCalledTimes(1);
+    // The OTHER half of flag independence, and the arm that a source-text
+    // "the conditions are not merged" pin cannot prove: this event owns the
+    // LINE without owning the CUE, so the ding must still fire. Merging the
+    // two guards into `if (!(ev.silent || ev.callerLogs))` is behaviorally the
+    // regression those pins exist to stop, and it passes them; it fails here.
+    expect(audio.lootItem).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -440,6 +457,40 @@ describe('the grant line renders a real, clickable item link', () => {
     expect(link?.textContent).toBe(`[${itemDisplayName(ITEMS[ORE])}]`);
     // Focusable, so the link is reachable without a pointer.
     expect((link as HTMLElement).tabIndex).toBe(0);
+    // Quality-colored. This is load-bearing for the CRAFT family in
+    // particular: its line keeps a flat loot-green and delegates the output's
+    // quality entirely to the link, so if the link ever stopped painting from
+    // the item def the craft line would lose the quality signal outright.
+    expect((link as HTMLElement).style.color).toBe(cssColor(QUALITY_COLOR.common));
+  });
+
+  it('the craft line paints its quality through the link, and the tier actually varies', () => {
+    // The craft arm logs flat '#7fdc4f' by design and lets the item link carry
+    // the quality, so the link IS the craft line's only quality signal. Two
+    // different tiers, because a single common-quality case would also pass if
+    // the link painted everything white.
+    const craftedLinkColor = (itemId: string): string => {
+      const hud = makeHud();
+      hud.handleEvents([
+        professionGrant(itemId, 1),
+        {
+          type: 'craftResult',
+          pid: PLAYER_ID,
+          ok: true,
+          recipeId: 'recipe_x',
+          itemId,
+          count: 1,
+        } as SimEvent,
+      ]);
+      const link = hud.chatLogEl.querySelector('span.chat-item-link') as HTMLElement;
+      expect(link).not.toBeNull();
+      return link.style.color;
+    };
+    expect(ITEMS[SWORD].quality ?? 'common').toBe('common');
+    expect(ITEMS[RARE_WEAPON].quality).toBe('rare');
+    expect(craftedLinkColor(SWORD)).toBe(cssColor(QUALITY_COLOR.common));
+    expect(craftedLinkColor(RARE_WEAPON)).toBe(cssColor(QUALITY_COLOR.rare));
+    expect(craftedLinkColor(SWORD)).not.toBe(craftedLinkColor(RARE_WEAPON));
   });
 
   it('a disenchant line renders BOTH operands as links', () => {
