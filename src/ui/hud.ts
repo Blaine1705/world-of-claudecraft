@@ -1763,7 +1763,10 @@ export class Hud {
     // re-render the bag footer (and re-composite an open player card) when the
     // connected wallet's $WOC balance changes
     onWalletUiChange(() => {
-      if ($('#bags').style.display !== 'none') this.renderBags();
+      // Footer-only, as this comment always claimed: the balance lands asynchronously
+      // with no user action behind it, so a full rebuild would drop the bag-search
+      // caret and strand a hovered tooltip. Cold-load-safe gate (#1538) too.
+      if (bagsWindowShown($('#bags').style.display)) this.bagsWindow.refreshMoneyRow();
       this.playerCard.refresh();
       this.claudiumWindow.onWalletChanged();
     });
@@ -4308,7 +4311,15 @@ export class Hud {
       .then((balance) => {
         if (seq !== this.claudiumLauncherBalanceSeq) return;
         this.setClaudiumLauncherBalance(balance);
-        if ($('#bags').style.display !== 'none') this.renderBags();
+        // Footer-only, and on the cold-load-safe gate (#1538). This resolves on the
+        // balance read's own schedule with no user action behind it, so a full
+        // renderBags() here would tear the window down under a player who is
+        // mid-drag, hovering a tooltip, or typing in bag search. Re-entry is not a
+        // risk: the repaint does call claudiumLauncherHtml again, but
+        // claudiumLauncherBalancePending is still true here (.finally has not run),
+        // so the nested read returns before it ever consults the 30s throttle. The
+        // throttle re-stamp above is the second line of defense, not the first.
+        if (bagsWindowShown($('#bags').style.display)) this.bagsWindow.refreshMoneyRow();
       })
       .catch(() => {
         if (seq !== this.claudiumLauncherBalanceSeq) return;
@@ -12080,8 +12091,10 @@ export class Hud {
     // Dock the char-sheet pairing when its companion opens (the touch cluster).
     this.syncCharBagsPairing();
     audio.bagOpen();
-    // Pull a fresh on-chain $WOC balance for the footer; the async result
-    // re-renders the bag via the onWalletUiChange listener wired in the ctor.
+    // Pull a fresh on-chain $WOC balance for the footer; the async result repaints
+    // the footer (not the whole bag) via the onWalletUiChange listener wired in the
+    // ctor. The display is set to 'flex' above precisely so that listener's
+    // bagsWindowShown gate sees an open window when the balance lands.
     this.optionsHooks?.refreshWocBalance();
   }
 

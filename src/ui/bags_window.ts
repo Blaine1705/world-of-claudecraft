@@ -270,8 +270,17 @@ export class BagsWindow {
     this.refreshMoneyRow();
   }
 
-  /** Rewrite ONLY the .money footer in place, re-binding its two launchers. Shared by
-   *  the full render() and the purse probe, so the latch arms on both. */
+  /** Rewrite ONLY the .money footer in place, re-binding its two launchers. Every
+   *  paint path runs through here (the full render(), the purse probe, and the async
+   *  $WOC / Claudium balance reads), so the latch arms on all of them.
+   *
+   *  Deliberately does NOT restore focus across the rewrite, unlike the
+   *  deeds/professions refocus family. Two reasons, both settled on PR #2377: the
+   *  footer's launchers are BUTTONs, and input.ts leaves a focused button's Enter
+   *  default alone on the chat edge, so parking focus back on one makes the player's
+   *  next Enter open chat AND re-fire the button; and #bags is non-modal and absent
+   *  from isModalOpen(), so canUseGameKeys() stays true and Tab is swallowed by
+   *  target-nearest, which means keyboard focus never lands in here to begin with. */
   private paintMoneyRow(row: HTMLElement, copper: number): void {
     row.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.claudiumLauncherHtml()}${this.deps.moneyHtml(copper)}`;
     row.querySelector('[data-claudium-launcher]')?.addEventListener('click', () => {
@@ -285,8 +294,11 @@ export class BagsWindow {
 
   /** The narrow repaint: find the existing footer and re-paint it. A window that has
    *  never been rendered has no .money row yet, so this is a no-op rather than a
-   *  partial paint. */
-  private refreshMoneyRow(): void {
+   *  partial paint. Public because the async $WOC / Claudium balance reads land on
+   *  their own schedule and need the same footer-only treatment: before this they
+   *  called the HUD's full renderBags() from a promise resolve, which tore the window
+   *  down under a player who had not touched anything. */
+  refreshMoneyRow(): void {
     const row = this.deps.root().querySelector('.money') as HTMLElement | null;
     if (!row) return;
     this.paintMoneyRow(row, this.deps.world().copper);
