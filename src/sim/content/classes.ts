@@ -6439,7 +6439,12 @@ function scaleEffect(
 // mods stack on top and also tune cost / cast time / cooldown.
 function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
   const am = mods.abilities[entry.def.id];
-  const physical = entry.def.school === 'physical';
+  // The melee bucket also covers hunter's ranged-AP shots regardless of magic school:
+  // `scalesWith: 'ranged'` is exclusively set on hunter abilities (arcane_shot, serpent_sting,
+  // and wyvern_sting are non-physical), so this widening cannot reach any other class's
+  // melee/spell split. Without it, Marksmanship's Iron Aim ("ranged ability damage") silently
+  // never applied to Arcane Shot, the spec's arcane-school nuke.
+  const physical = entry.def.school === 'physical' || entry.def.scalesWith === 'ranged';
   const globalDmg = physical ? mods.global.meleeDmgPct : mods.global.spellDmgPct;
   const dmgMult = 1 + globalDmg + (am?.dmgPct ?? 0);
   const healMult = 1 + mods.global.healPct + (am?.dmgPct ?? 0);
