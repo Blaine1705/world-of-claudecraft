@@ -940,6 +940,7 @@ describe('admin api auth', () => {
       expiresAt,
     });
     expect(fakeGame.disconnectAccount).toHaveBeenCalledWith(9, 'This account is suspended.');
+    expect(revokeTokensExcept).toHaveBeenCalledWith(9, null);
   });
 
   it('bans and disconnects an account', async () => {
@@ -968,6 +969,7 @@ describe('admin api auth', () => {
       expiresAt: undefined,
     });
     expect(fakeGame.disconnectAccount).toHaveBeenCalledWith(9, 'This account has been banned.');
+    expect(revokeTokensExcept).toHaveBeenCalledWith(9, null);
   });
 
   it('mutes account chat and sends a live warning without disconnecting', async () => {
@@ -1025,6 +1027,7 @@ describe('admin api auth', () => {
       expiresAt: undefined,
     });
     expect(fakeGame.disconnectAccount).not.toHaveBeenCalled();
+    expect(revokeTokensExcept).not.toHaveBeenCalled();
   });
 
   it('unsuspends without disconnecting the account', async () => {
@@ -1054,6 +1057,7 @@ describe('admin api auth', () => {
     });
     expect(fakeGame.disconnectAccount).not.toHaveBeenCalled();
     expect(accountMailTarget).not.toHaveBeenCalled();
+    expect(revokeTokensExcept).not.toHaveBeenCalled();
   });
 
   it('rejects suspending or banning admin accounts', async () => {

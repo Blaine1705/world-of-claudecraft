@@ -476,6 +476,12 @@ export async function handleAdminApi(
         if (action === 'suspend' || action === 'ban') {
           const statusText =
             action === 'ban' ? 'This account has been banned.' : 'This account is suspended.';
+          // Every device is signed out here too, mirroring the reset-password arm
+          // above: revoke all tokens then disconnect the live socket (revocation
+          // alone leaves an already-open connection intact). Otherwise a token
+          // issued before the sanction stays valid in auth_tokens and regains
+          // access with no re-authentication once the sanction is lifted or expires.
+          await revokeTokensExcept(targetAccountId, null);
           game.disconnectAccount(targetAccountId, statusText);
           // Notify the affected account of the moderation action. Best-effort and
           // fully isolated: a mail-target lookup or send failure must never turn a
@@ -1657,6 +1663,12 @@ async function moderateActionHandler(ctx: Ctx): Promise<void> {
     if (action === 'suspend' || action === 'ban') {
       const statusText =
         action === 'ban' ? 'This account has been banned.' : 'This account is suspended.';
+      // Every device is signed out here too, mirroring resetPasswordHandler: revoke
+      // all tokens then disconnect the live socket (revocation alone leaves an
+      // already-open connection intact). Otherwise a token issued before the
+      // sanction stays valid in auth_tokens and regains access with no
+      // re-authentication the moment the sanction is lifted or expires.
+      await adminDb().revokeTokensExcept(targetAccountId, null);
       rt.disconnectAccount(targetAccountId, statusText);
       // Notify the affected account of the moderation action. Best-effort and fully
       // isolated: a mail-target lookup or send failure must never turn a successful
