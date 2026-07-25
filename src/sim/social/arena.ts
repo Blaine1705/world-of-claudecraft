@@ -4,6 +4,9 @@
 // order, the matchmaking guard loops, the ~28-field fighter reset, and the
 // player-facing emit literals are preserved EXACTLY (the parity gate's full-state
 // trace + rng draw-order log proves it).
+// Post-move sanctioned deviation: readyArenaFighter's targetId reset is
+// conditional at the countdown-end call site (keepValidTargetPids); see the
+// comment at that field.
 //
 // Arena/duel state stays on Sim and is reached through SimContext live views
 // (`arenaMatches` from E1; `arenaQueue1v1`/`arenaQueue2v2`/`arenaQueueFiesta`/
@@ -575,7 +578,9 @@ export function updateArena(ctx: SimContext): void {
       if (match.timer <= 0) {
         match.state = 'active';
         match.timer = 0;
-        for (const e of fighters) readyArenaFighter(ctx, e, { clearPrep: false });
+        const matchPids = arenaAllPids(match);
+        for (const e of fighters)
+          readyArenaFighter(ctx, e, { clearPrep: false, keepValidTargetPids: matchPids });
         for (const mPid of arenaAllPids(match)) {
           ctx.emit({
             type: 'log',
@@ -904,7 +909,11 @@ export function resetForArena(ctx: SimContext, e: Entity): void {
   readyArenaFighter(ctx, e, { clearPrep: true });
 }
 
-export function readyArenaFighter(ctx: SimContext, e: Entity, opts: { clearPrep: boolean }): void {
+export function readyArenaFighter(
+  ctx: SimContext,
+  e: Entity,
+  opts: { clearPrep: boolean; keepValidTargetPids?: readonly number[] },
+): void {
   e.dead = false;
   if (opts.clearPrep) {
     // Arena is a clean competitive slate: unlike the overworld/delve death paths it
@@ -920,7 +929,16 @@ export function readyArenaFighter(ctx: SimContext, e: Entity, opts: { clearPrep:
     recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   e.hp = e.maxHp;
   e.resource = e.resourceType === 'mana' ? e.maxResource : e.resourceType === 'energy' ? 100 : 0;
-  e.targetId = null;
+  // Target retention is a separate concern from clearPrep (clean slate vs
+  // fight-start top-off): only the countdown-end call site passes
+  // keepValidTargetPids, so a selection made during prep survives the gates
+  // opening iff it points at a current fighter of this match. Every other
+  // reset (match creation, Fiesta/Yumi respawns) still clears the selection.
+  // Retention is by player pid only (a Protect Yumi cat familiar is
+  // deliberately out of scope), and a kept target can never be dead: every
+  // kept pid is a fighter revived by this same countdown-end loop.
+  e.targetId =
+    e.targetId !== null && opts.keepValidTargetPids?.includes(e.targetId) ? e.targetId : null;
   e.autoAttack = false;
   // Drop any held movement intent so a fighter placed/respawned into the arena does
   // not drift from a stale forward/back flag with no key held (issue 1651); bots
