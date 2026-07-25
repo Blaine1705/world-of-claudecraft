@@ -6962,6 +6962,14 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
           {
             "name": "Forgemistress Darva",
             "hub": "Eastbrook"
+          },
+          {
+            "name": "Provisioner Hale",
+            "hub": "Fenbridge"
+          },
+          {
+            "name": "Quartermaster Bree",
+            "hub": "Highwatch"
           }
         ]
       },
@@ -6978,6 +6986,14 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
           {
             "name": "Forgemistress Darva",
             "hub": "Eastbrook"
+          },
+          {
+            "name": "Provisioner Hale",
+            "hub": "Fenbridge"
+          },
+          {
+            "name": "Quartermaster Bree",
+            "hub": "Highwatch"
           }
         ]
       },
@@ -6994,6 +7010,10 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
           {
             "name": "Forgemistress Darva",
             "hub": "Eastbrook"
+          },
+          {
+            "name": "Quartermaster Bree",
+            "hub": "Highwatch"
           }
         ]
       },
@@ -7083,6 +7103,14 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
           {
             "name": "Tinker Gizzel",
             "hub": "Eastbrook"
+          },
+          {
+            "name": "Provisioner Hale",
+            "hub": "Fenbridge"
+          },
+          {
+            "name": "Quartermaster Bree",
+            "hub": "Highwatch"
           }
         ]
       },
@@ -7099,6 +7127,14 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
           {
             "name": "Tinker Gizzel",
             "hub": "Eastbrook"
+          },
+          {
+            "name": "Provisioner Hale",
+            "hub": "Fenbridge"
+          },
+          {
+            "name": "Quartermaster Bree",
+            "hub": "Highwatch"
           }
         ]
       },
@@ -7115,6 +7151,10 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
           {
             "name": "Tinker Gizzel",
             "hub": "Eastbrook"
+          },
+          {
+            "name": "Quartermaster Bree",
+            "hub": "Highwatch"
           }
         ]
       },
@@ -7204,6 +7244,14 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
           {
             "name": "Weaver Ottilie",
             "hub": "Eastbrook"
+          },
+          {
+            "name": "Provisioner Hale",
+            "hub": "Fenbridge"
+          },
+          {
+            "name": "Quartermaster Bree",
+            "hub": "Highwatch"
           }
         ]
       },
@@ -7220,6 +7268,14 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
           {
             "name": "Tinker Gizzel",
             "hub": "Eastbrook"
+          },
+          {
+            "name": "Provisioner Hale",
+            "hub": "Fenbridge"
+          },
+          {
+            "name": "Quartermaster Bree",
+            "hub": "Highwatch"
           }
         ]
       },
@@ -7236,6 +7292,10 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
           {
             "name": "Tinker Gizzel",
             "hub": "Eastbrook"
+          },
+          {
+            "name": "Quartermaster Bree",
+            "hub": "Highwatch"
           }
         ]
       },
