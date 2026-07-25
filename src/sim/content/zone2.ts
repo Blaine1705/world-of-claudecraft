@@ -2192,6 +2192,18 @@ export const ZONE2_PROPS: ZonePropsDef = {
     { x: -28, z: 494, rot: -0.7, scale: 1 },
     { x: -3, z: 505, rot: 2.9, scale: 1.3 },
   ],
+  marshReeds: [
+    // Placed around deepfen shallows
+    [-82, 334],
+    [-85, 337],
+    [-97, 344],
+    [-112, 338],
+    [-74, 316],
+    [-77, 295],
+    [-94, 287],
+    [-103, 248],
+    [-123, 274],
+  ],
   crates: [
     [14, 468],
     [18, 471],

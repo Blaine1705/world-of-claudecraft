@@ -197,6 +197,12 @@
    "type": "static",
    "maxTex": 512,
    "simplify": 0.5
+  },
+  {
+   "src": "tmp/reeds.glb",
+   "out": "models/foliage/reeds.glb",
+   "type": "static",
+   "maxTex": 512
   }
  ]
 }

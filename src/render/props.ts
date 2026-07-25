@@ -103,6 +103,7 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   columnBroken: { url: '/models/props/column_broken.glb', kit: 'nature' },
   statueHead: { url: '/models/props/statue_head.glb', kit: 'nature' },
   statueBlock: { url: '/models/props/statue_block.glb', kit: 'nature' },
+  marshReeds: { url: '/models/foliage/reeds.glb', kit: 'nature' },
   dockPlatform: { url: '/models/props/dock_platform.glb', kit: 'pirate' },
   rowboat: { url: '/models/props/rowboat.glb', kit: 'pirate' },
   graveRound: { url: '/models/props/gravestone_round.glb', kit: 'grave' },
@@ -157,6 +158,7 @@ const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
   'rowboat',
   'graveRound',
   'timberPillar',
+  'marshReeds',
   'crateWooden',
   'barrel',
   'delveEntrance2', // delve entrance portal, a landmark, so keep it on low gfx too
@@ -998,6 +1000,24 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     group.add(shadowed(g));
     registerHideable(g, circleFootprint(t.x, t.z, 1.5 * t.scale, y + 3.4 * t.scale, 3.0 * t.scale));
   }
+
+  // ---- reeds: marsh vegetation along shallow water edge (Deepfen Shallows) ---
+  getActiveWorldContent().props.marshReeds.forEach(([x, z], i) => {
+    const kind: PropKey = 'marshReeds';
+    const s = 3.0 + propRand(x, z, i + 5) * 0.6;
+    const y = ground(x, z);
+    const g = new THREE.Group();
+    addParts(g, kind, {
+      scale: s,
+      euler: new THREE.Euler(
+        (propRand(x, z, 10 + i) - 0.5) * 0.08,
+        propRand(x, z, 12 + i) * Math.PI * 2,
+        (propRand(x, z, 11 + i) - 0.5) * 0.08,
+      ),
+    });
+    g.position.set(x, y - 0.05, z);
+    group.add(shadowed(g));
+  });
 
   // ---- crates: camp clutter (wooden crate / barrel mix), hideable ----------
   getActiveWorldContent().props.crates.forEach(([x, z], i) => {
