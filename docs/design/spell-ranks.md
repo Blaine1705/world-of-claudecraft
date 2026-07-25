@@ -160,7 +160,7 @@ pinned by `tests/paladin_progression.test.ts`; the current design is
 | `exorcism` | 14 | 55 | inst, 15cd, 30yd | directDamage 46–56 (holy nuke; undead-only restriction omitted — no such flag) |
 | `consecration` | 18 | 60 | inst, 8cd | aoeDamage 28–34, radius 8 (caster-centered) |
 
-**Sanity** — Recalculate against the current specialization kits; the removed Verdict payload no longer contributes damage from the Seal.
+**Sanity**: recalculate against the current specialization kits; the removed Verdict payload no longer contributes damage from the Seal.
 
 ---
 
