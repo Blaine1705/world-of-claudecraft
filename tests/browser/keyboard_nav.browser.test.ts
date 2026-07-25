@@ -13,7 +13,11 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { TalentAllocation, TalentRowLevel } from '../../src/sim/content/talents';
-import { MARKET_BAG_SIZE_FILTERS, type MarketQuery } from '../../src/sim/market_query';
+import {
+  MARKET_BAG_SIZE_FILTERS,
+  MARKET_ITEM_TYPE_FILTERS,
+  type MarketQuery,
+} from '../../src/sim/market_query';
 import { FocusManager } from '../../src/ui/focus_manager';
 import { MarketWindow } from '../../src/ui/market_window';
 import { TalentsWindow } from '../../src/ui/talents_window';
@@ -448,6 +452,15 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
   it('browses bags by capacity, with no armor-class or primary-stat menu', () => {
     const queries: MarketQuery[] = [];
     const root = openMarket(queries);
+
+    // Every filter option in the shared vocabulary reaches the menu, in order. A value
+    // added to MARKET_ITEM_TYPE_FILTERS that never renders would be as unbrowsable as
+    // bags were, and the sim-side never-assertion cannot see the menu.
+    expect(
+      Array.from(
+        itemTypeMenu(root).querySelectorAll<HTMLElement>('[data-market-filter-option]'),
+      ).map((option) => option.dataset.marketFilterOption),
+    ).toEqual([...MARKET_ITEM_TYPE_FILTERS]);
 
     pickItemType(root, 'bag');
     expect(root.querySelector('[data-market-filter-menu="armorClass"]')).toBeNull();

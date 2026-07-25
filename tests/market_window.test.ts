@@ -264,31 +264,43 @@ describe('market_window: behavior preserved through the core', () => {
     expect(painter).toContain("t('itemUi.market.filterValueAria', { label, value: current })");
   });
 
-  // Issue #2189. Same source-discipline caveat as above: the rendered menus are asserted
-  // for real in tests/browser/keyboard_nav.browser.test.ts, but the GATE that decides
-  // which menus exist is a one-line predicate, and swapping it back to the shared
-  // `hasSubtype` is invisible to any assertion that only looks at armor or weapons.
-  // Comments are stripped so prose in this painter cannot satisfy a pin.
-  it('gives bags their own category and capacity menu, with no dead primary-stat menu', () => {
+  // Issue #2189. WHICH menus each item type shows is decided in the pure core and pinned
+  // behaviorally in tests/market_view.test.ts (marketFilterMenus); the rendered DOM is
+  // driven in tests/browser/keyboard_nav.browser.test.ts. What is left for a source pin
+  // is exactly the thing neither can see: that the painter DELEGATES instead of
+  // re-deriving the gate inline, which would pass both of those suites while drifting
+  // from the tested core. Comments are stripped so prose cannot satisfy a pin.
+  it('delegates the per-item-type menu shape to the view core instead of re-deriving it', () => {
     const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
-    expect(code, 'the capacity options come from the shared catalog-derived list').toContain(
-      'MARKET_BAG_SIZE_FILTERS',
+    expect(code).toContain('marketFilterMenus(this.itemTypeFilter)');
+    expect(code).toMatch(/\(menus\.subtype\s*\?\s*this\.renderMarketFilterMenu\(\s*'subtype'/);
+    expect(code).toMatch(
+      /\(menus\.armorClass\s*\?\s*this\.renderMarketFilterMenu\(\s*'armorClass'/,
     );
+    expect(code).toMatch(
+      /\(menus\.primaryStat\s*\?\s*this\.renderMarketFilterMenu\(\s*'primaryStat'/,
+    );
+    // No inline gate may survive alongside the delegation, or the core stops being the
+    // single source of truth for the menu shape.
+    expect(code, 'the menu shape must not be re-derived on the painter').not.toMatch(
+      /itemTypeFilter === 'bag'\s*\|\||\|\|\s*this\.itemTypeFilter === 'bag'/,
+    );
+    // The bag labels are i18n dispatch, which a pure core may not do, so they stay here.
     expect(code).toContain("t('itemUi.market.filterTypeBag')");
     expect(code).toContain("t('itemUi.market.filterBagSize')");
     expect(code).toContain("t('itemUi.market.filterBagAll')");
     // Capacity option labels reuse the bag tooltip template, already translated in every
     // locale, instead of minting a new per-size string.
     expect(code).toContain("t('itemUi.tooltip.bagSlots'");
-    // Bags carry no str/agi/int and itemMatchesPrimaryStat ignores the filter outside
-    // armor/weapon, so the stat menu must hang off its own predicate, not the subtype one.
-    expect(code).toMatch(/\(hasPrimaryStat\s*\?\s*this\.renderMarketFilterMenu\(\s*'primaryStat'/);
-    const statGate = code.match(/const hasPrimaryStat =([^;]*);/)?.[1] ?? '';
-    expect(statGate, 'hasPrimaryStat must be a real gate, not an alias').toContain("'armor'");
-    expect(statGate).toContain("'weapon'");
-    expect(statGate, 'bags must not raise the primary-stat menu').not.toContain("'bag'");
-    const subtypeGate = code.match(/const hasSubtype =([^;]*);/)?.[1] ?? '';
-    expect(subtypeGate, 'bags must raise the capacity menu').toContain("'bag'");
+  });
+
+  // MKT_MENU_PREFERRED_HEIGHT drives the runtime open-up/clamp decision and must agree
+  // with the stylesheet's static cap, or the two disagree about where a menu ends. The
+  // bag capacity menu is the first new consumer of that pair since it was introduced.
+  it('keeps the dropdown menu height in the painter and the stylesheet in agreement', () => {
+    const preferred = painter.match(/const MKT_MENU_PREFERRED_HEIGHT = (\d+);/)?.[1];
+    expect(preferred, 'MKT_MENU_PREFERRED_HEIGHT must exist').toBeTruthy();
+    expect(componentsCss).toContain(`max-height: ${preferred}px`);
   });
 
   it('preserves the buy / list / cancel / collect dispatch and money formatting', () => {

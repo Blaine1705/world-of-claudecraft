@@ -209,8 +209,11 @@ function itemMatchesSubtype(item: ItemDef, query: MarketQuery): boolean {
   if (query.itemType === 'weapon') return item.kind === 'weapon' && weaponFamily(item) === subtype;
   // Bag capacity is exact, and the option values ARE the catalog's bagSlots numbers, so
   // this compares against content rather than a hardcoded ladder. A subtype left over
-  // from another item type simply matches nothing, exactly as it does for armor/weapon.
-  if (query.itemType === 'bag') return item.kind === 'bag' && `${item.bagSlots ?? 0}` === subtype;
+  // from another item type parses to NaN and matches nothing, exactly as a mismatched
+  // slot or weapon family does above. Compared as numbers: this runs per listing per
+  // browse, and stringifying the item's capacity would allocate on every one.
+  if (query.itemType === 'bag')
+    return item.kind === 'bag' && (item.bagSlots ?? 0) === Number(subtype);
   return true;
 }
 

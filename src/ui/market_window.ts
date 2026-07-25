@@ -25,12 +25,9 @@ import { formatMoney as formatLocalizedMoney, formatNumber, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import {
   MARKET_ARMOR_CLASS_FILTERS,
-  MARKET_ARMOR_TYPE_FILTERS,
-  MARKET_BAG_SIZE_FILTERS,
   MARKET_ITEM_TYPE_FILTERS,
   MARKET_PRIMARY_STAT_FILTERS,
   MARKET_RARITY_FILTERS,
-  MARKET_WEAPON_TYPE_FILTERS,
   type MarketArmorClassFilter,
   type MarketItemTypeFilter,
   type MarketPrimaryStatFilter,
@@ -48,6 +45,7 @@ import {
   type MarketSellMeta,
   type MarketTab,
   marketCollectBadgeCount,
+  marketFilterMenus,
 } from './market_view';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
@@ -746,13 +744,6 @@ export class MarketWindow {
     return t('itemUi.market.filterRarityAll');
   }
 
-  private marketSubtypeOptions(): readonly MarketSubtypeFilter[] {
-    if (this.itemTypeFilter === 'armor') return MARKET_ARMOR_TYPE_FILTERS;
-    if (this.itemTypeFilter === 'weapon') return MARKET_WEAPON_TYPE_FILTERS;
-    if (this.itemTypeFilter === 'bag') return MARKET_BAG_SIZE_FILTERS;
-    return ['all'];
-  }
-
   private marketSubtypeLabel(): string {
     if (this.itemTypeFilter === 'bag') return t('itemUi.market.filterBagSize');
     return t(
@@ -824,14 +815,9 @@ export class MarketWindow {
 
   private renderMarketFilters(): string {
     if (this.tab !== 'browse') return '';
-    const hasSubtype =
-      this.itemTypeFilter === 'armor' ||
-      this.itemTypeFilter === 'weapon' ||
-      this.itemTypeFilter === 'bag';
-    // Bags carry no str/agi/int, and itemMatchesPrimaryStat ignores the filter outside
-    // armor/weapon, so the primary-stat menu stays gated on gear: rendering it for bags
-    // would be a live-looking control that can never narrow anything.
-    const hasPrimaryStat = this.itemTypeFilter === 'armor' || this.itemTypeFilter === 'weapon';
+    // WHICH secondary menus this item type shows is a pure function of the type, so it
+    // is decided in the view core and merely painted here.
+    const menus = marketFilterMenus(this.itemTypeFilter);
     return (
       `<div class="mkt-filters" role="group" aria-label="${esc(t('itemUi.market.filters'))}">` +
       this.renderMarketFilterMenu(
@@ -841,16 +827,16 @@ export class MarketWindow {
         MARKET_ITEM_TYPE_FILTERS,
         (filter) => this.marketItemTypeLabel(filter as MarketItemTypeFilter),
       ) +
-      (hasSubtype
+      (menus.subtype
         ? this.renderMarketFilterMenu(
             'subtype',
             this.marketSubtypeLabel(),
             this.subtypeFilter,
-            this.marketSubtypeOptions(),
+            menus.subtype,
             (filter) => this.marketSubtypeOptionLabel(filter as MarketSubtypeFilter),
           )
         : '') +
-      (this.itemTypeFilter === 'armor'
+      (menus.armorClass
         ? this.renderMarketFilterMenu(
             'armorClass',
             t('itemUi.market.filterArmorType'),
@@ -859,7 +845,7 @@ export class MarketWindow {
             (filter) => this.marketArmorClassLabel(filter as MarketArmorClassFilter),
           )
         : '') +
-      (hasPrimaryStat
+      (menus.primaryStat
         ? this.renderMarketFilterMenu(
             'primaryStat',
             t('itemUi.market.filterPrimaryStat'),

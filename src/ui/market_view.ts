@@ -21,7 +21,15 @@
 import { ITEMS } from '../sim/data';
 import type { ItemDef } from '../sim/types';
 import type { MarketInfo, MarketListingView } from '../world_api';
-import { MARKET_PAGE_SIZE, type MarketFilters } from './market_filters';
+import {
+  MARKET_ARMOR_TYPE_FILTERS,
+  MARKET_BAG_SIZE_FILTERS,
+  MARKET_PAGE_SIZE,
+  MARKET_WEAPON_TYPE_FILTERS,
+  type MarketFilters,
+  type MarketItemTypeFilter,
+  type MarketSubtypeFilter,
+} from './market_filters';
 
 export type MarketTab = 'browse' | 'sell' | 'collect';
 
@@ -231,6 +239,36 @@ export function buildMarketView(input: MarketViewInput): MarketView {
  * The count of items waiting to be collected, for the Collect tab's badge. The
  * proceeds purse counts as one, plus each returned stack.
  */
+/** Which secondary browse menus an item type shows, and the subtype menu's options. */
+export interface MarketFilterMenus {
+  /** The subtype menu's option list, or null when this type has no subtype axis. */
+  subtype: readonly MarketSubtypeFilter[] | null;
+  /** True when the armor-class (cloth / leather / mail) menu applies. */
+  armorClass: boolean;
+  /** True when the primary-stat menu applies. */
+  primaryStat: boolean;
+}
+
+/**
+ * Which secondary menus an item type can actually narrow by.
+ *
+ * Bags get a capacity menu but NOT a primary-stat menu: bags carry no str/agi/int
+ * and `itemMatchesPrimaryStat` ignores the filter outside armor/weapon, so a stat
+ * menu on bags would be a live-looking control that can never change the result.
+ * Lives here, not on the painter, because the decision is pure: it is a function of
+ * the item type alone, so a Node test drives it directly instead of grepping the
+ * painter's source for the gate.
+ */
+export function marketFilterMenus(itemType: MarketItemTypeFilter): MarketFilterMenus {
+  if (itemType === 'armor')
+    return { subtype: MARKET_ARMOR_TYPE_FILTERS, armorClass: true, primaryStat: true };
+  if (itemType === 'weapon')
+    return { subtype: MARKET_WEAPON_TYPE_FILTERS, armorClass: false, primaryStat: true };
+  if (itemType === 'bag')
+    return { subtype: MARKET_BAG_SIZE_FILTERS, armorClass: false, primaryStat: false };
+  return { subtype: null, armorClass: false, primaryStat: false };
+}
+
 export function marketCollectBadgeCount(info: MarketInfo | null): number {
   if (!info) return 0;
   return (info.collectionCopper > 0 ? 1 : 0) + info.collectionItems.length;
