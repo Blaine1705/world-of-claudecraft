@@ -579,6 +579,21 @@ export function removePlayerFromLootRolls(ctx: SimContext, pid: number): void {
   }
 }
 
+// A kick or a voluntary leave does not disconnect the player (unlike
+// removePlayerFromLootRolls above), so an existing roll's candidacy is left
+// untouched, exactly as it already is when a candidate simply regroups into a
+// different party mid-roll: only curate-phase ASSIGN AUTHORITY is scoped to
+// current party membership. Revoke it immediately on departure so a kicked or
+// departed master looter can never resolve/assign a roll for a group they are
+// no longer in, converting the roll to a normal need/greed prompt for the same
+// candidates, exactly like the uncurated 5-minute timeout fallback in
+// resolveLootRoll above.
+export function revokeMasterLooterAuthority(ctx: SimContext, pid: number): void {
+  for (const roll of ctx.pendingLootRolls.values()) {
+    if (roll.masterLooter === pid) convertMasterRollToNeedGreed(ctx, roll, roll.candidates);
+  }
+}
+
 // The master looter's curate-then-roll choice. `targetPids` is the set of
 // eligible players the looter checked: exactly one grants the item directly (the
 // classic assign), two or more open a need/greed roll for just that subset. Only

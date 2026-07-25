@@ -122,6 +122,63 @@ describe('master loot', () => {
     });
   });
 
+  it('revokes assign authority when the party leader kicks the master looter mid-roll', () => {
+    const sim = makeSim();
+    const { a, b, mob } = partyOnCorpse(sim, PREMIUM);
+    const c = sim.addPlayer('rogue', 'Cara');
+    sim.partyInvite(c, a);
+    sim.partyAccept(c);
+    teleportTo(sim, 21, 21, c);
+    sim.setPartyLootMaster(true, b, 'uncommon', a); // b (not the leader) is master looter
+    sim.lootCorpse(mob.id, a);
+    const rollId = sim.events.find((e) => e.type === 'masterLoot')?.rollId;
+    if (rollId === undefined) throw new Error('expected master loot prompt');
+
+    sim.events.length = 0;
+    sim.partyKick(b, a); // leader kicks the master looter while the roll is still open
+
+    // The kicked looter must lose assignment authority immediately: a
+    // self-assign must NOT grant the item.
+    sim.assignMasterLoot(rollId, [b], b);
+    expect(sim.countItem(PREMIUM, b)).toBe(0);
+
+    // The roll falls back to a normal need/greed roll (same as the uncurated
+    // 5-minute timeout path) instead of staying a curate-phase prompt only the
+    // ex-looter could resolve.
+    expect(sim.activeLootRolls(a).map((p) => p.rollId)).toContain(rollId);
+    expect(sim.activeLootRolls(c).map((p) => p.rollId)).toContain(rollId);
+
+    // The kicked ex-looter is still an ordinary candidate (leaving a party does
+    // not retroactively strip existing roll candidacy, matching the "re-groups
+    // mid-roll" contract elsewhere), but now has to roll fairly like anyone
+    // else: no more self-assign shortcut.
+    sim.submitLootRoll(rollId, 'need', a);
+    sim.submitLootRoll(rollId, 'pass', b);
+    sim.submitLootRoll(rollId, 'pass', c);
+    expect(sim.countItem(PREMIUM, a)).toBe(1);
+    expect(sim.countItem(PREMIUM, b)).toBe(0);
+  });
+
+  it('revokes assign authority when the master looter voluntarily leaves the party mid-roll', () => {
+    const sim = makeSim();
+    const { a, b, mob } = partyOnCorpse(sim, PREMIUM);
+    sim.setPartyLootMaster(true, b, 'uncommon', a); // b (not the leader) is master looter
+    sim.lootCorpse(mob.id, a);
+    const rollId = sim.events.find((e) => e.type === 'masterLoot')?.rollId;
+    if (rollId === undefined) throw new Error('expected master loot prompt');
+
+    sim.events.length = 0;
+    sim.partyLeave(b); // the master looter leaves on their own, still connected
+
+    sim.assignMasterLoot(rollId, [b], b);
+    expect(sim.countItem(PREMIUM, b)).toBe(0);
+    expect(sim.activeLootRolls(a).map((p) => p.rollId)).toContain(rollId);
+
+    sim.submitLootRoll(rollId, 'need', a);
+    sim.submitLootRoll(rollId, 'pass', b);
+    expect(sim.countItem(PREMIUM, a)).toBe(1);
+  });
+
   it('rejects assignment from anyone other than the master looter', () => {
     const sim = makeSim();
     const { a, b, mob } = partyOnCorpse(sim, PREMIUM);

@@ -16,6 +16,7 @@
 // render/ui/game/net, no Math.random/Date.now), so it runs unchanged in Node, the
 // browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
+import { revokeMasterLooterAuthority } from '../loot/loot_roll';
 import { effectiveMasterLooter } from '../loot_master';
 import type { Party } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -526,6 +527,11 @@ export class PartyMachine {
   removeFromParty(pid: number, verb: string): void {
     const party = this.partyOf(pid);
     if (!party) return;
+    // Revoke any pending master-loot curate-phase assign authority the departing
+    // pid holds: a kick or a voluntary leave must not let a former member keep
+    // resolving/assigning a roll for a group they are no longer in, even though
+    // they stay connected (see revokeMasterLooterAuthority).
+    revokeMasterLooterAuthority(this.ctx, pid);
     const beforeLooter = effectiveMasterLooter(
       party.lootStrategies.master,
       party.leader,
