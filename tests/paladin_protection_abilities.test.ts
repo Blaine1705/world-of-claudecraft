@@ -39,13 +39,18 @@ function makeProtection(): TestSim {
 // Devotion count that any extra impact would inflate.
 function stageInField(sim: TestSim): void {
   for (const [id, entity] of [...sim.entities]) {
-    if (entity.kind !== 'player') sim.entities.delete(id);
+    if (entity.kind === 'player') continue;
+    // Drop it from the spatial index too: grid.refresh() only re-indexes what it
+    // is handed, so a plain entities.delete() leaves the mob in its old cell and
+    // hostilesInRadius keeps returning a ghost that outranks the real targets.
+    sim.grid.remove(entity);
+    sim.entities.delete(id);
   }
   sim.player.pos.x = OPEN_GROUND.x;
   sim.player.pos.z = OPEN_GROUND.z;
   sim.player.pos.y = groundHeight(OPEN_GROUND.x, OPEN_GROUND.z, sim.cfg.seed);
   sim.player.prevPos = { ...sim.player.pos };
-  sim.grid.refresh(sim.entities.values());
+  sim.grid.update(sim.player);
   sim.playerGrid.update(sim.player);
 }
 
@@ -259,6 +264,7 @@ describe('Paladin Protection abilities', () => {
 
   it('pulls two enemies with Oath Chain during Ascension', () => {
     const sim = makeProtection();
+    stageInField(sim);
     const first = targetAt(sim, 24);
     const second = targetAt(sim, 20, 1);
     const third = targetAt(sim, 24, -4);
