@@ -143,6 +143,58 @@ describe('the World Market — the Merchant', () => {
     ]);
   });
 
+  // Issue #2189: the authoritative browse is the path a real player hits, so the bag
+  // category is pinned here too, not only against the pure predicate.
+  it('applies the bag category and its capacity subtype to the authoritative browse result', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    const book = sim.market.marketListings;
+    book.length = 0;
+    for (const [id, itemId] of [
+      [1, 'linen_pouch'],
+      [2, 'gravewoven_bag'],
+      [3, 'bone_fragments'],
+      [4, 'recruit_tunic'],
+    ] as const) {
+      book.push({
+        id,
+        sellerKey: 'house',
+        sellerName: 'Merchant',
+        itemId,
+        count: 1,
+        price: 100,
+        expiresAt: Number.POSITIVE_INFINITY,
+        house: true,
+      });
+    }
+
+    // The browse sorts by display name, so "Gravewoven Bag" leads "Linen Pouch".
+    sim.marketSearch(q('', { itemType: 'bag' }), viewer);
+    expect(sim.marketInfoFor(viewer)?.listings.map((listing) => listing.itemId)).toEqual([
+      'gravewoven_bag',
+      'linen_pouch',
+    ]);
+
+    // gravewoven_bag is the 12-slot bag; the 6-slot Linen Pouch must drop out.
+    sim.marketSearch(q('', { itemType: 'bag', subtype: '12' }), viewer);
+    expect(sim.marketInfoFor(viewer)?.listings.map((listing) => listing.itemId)).toEqual([
+      'gravewoven_bag',
+    ]);
+  });
+
+  it('keeps the Merchant standing stock stocked with the vendor bags', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    // A fresh world must not answer the new Bags category with an empty list.
+    sim.marketSearch(q('', { itemType: 'bag' }), viewer);
+    expect(sim.marketInfoFor(viewer)?.listings.map((listing) => listing.itemId)).toEqual([
+      'linen_pouch',
+      'travelers_knapsack',
+    ]);
+  });
+
   it('paginates other sellers server-side, keeping the viewer own listings on every page', () => {
     const sim = makeWorld();
     const viewer = sim.addPlayer('warrior', 'Viewer');

@@ -16,7 +16,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantedYield",
     "hudChrome.enchanting.disenchantedYieldQty",
     "hudChrome.enchanting.salvagedYield",
-    "hudChrome.enchanting.salvagedYieldQty"
+    "hudChrome.enchanting.salvagedYieldQty",
+    "itemUi.market.filterBagAll",
+    "itemUi.market.filterBagSize",
+    "itemUi.market.filterTypeBag"
   ],
   "es_ES": [
     "hudChrome.crafting.craftedToastQty",
@@ -25,7 +28,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantedYield",
     "hudChrome.enchanting.disenchantedYieldQty",
     "hudChrome.enchanting.salvagedYield",
-    "hudChrome.enchanting.salvagedYieldQty"
+    "hudChrome.enchanting.salvagedYieldQty",
+    "itemUi.market.filterBagAll",
+    "itemUi.market.filterBagSize",
+    "itemUi.market.filterTypeBag"
   ],
   "fr_FR": [
     "hudChrome.crafting.craftedToastQty",
@@ -34,7 +40,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantedYield",
     "hudChrome.enchanting.disenchantedYieldQty",
     "hudChrome.enchanting.salvagedYield",
-    "hudChrome.enchanting.salvagedYieldQty"
+    "hudChrome.enchanting.salvagedYieldQty",
+    "itemUi.market.filterBagAll",
+    "itemUi.market.filterBagSize",
+    "itemUi.market.filterTypeBag"
   ],
   "fr_CA": [
     "hudChrome.crafting.craftedToastQty",
@@ -43,7 +52,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantedYield",
     "hudChrome.enchanting.disenchantedYieldQty",
     "hudChrome.enchanting.salvagedYield",
-    "hudChrome.enchanting.salvagedYieldQty"
+    "hudChrome.enchanting.salvagedYieldQty",
+    "itemUi.market.filterBagAll",
+    "itemUi.market.filterBagSize",
+    "itemUi.market.filterTypeBag"
   ],
   "en_CA": [],
   "it_IT": [
@@ -53,7 +65,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantedYield",
     "hudChrome.enchanting.disenchantedYieldQty",
     "hudChrome.enchanting.salvagedYield",
-    "hudChrome.enchanting.salvagedYieldQty"
+    "hudChrome.enchanting.salvagedYieldQty",
+    "itemUi.market.filterBagAll",
+    "itemUi.market.filterBagSize",
+    "itemUi.market.filterTypeBag"
   ],
   "de_DE": [
     "hudChrome.crafting.craftedToastQty",
@@ -62,7 +77,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantedYield",
     "hudChrome.enchanting.disenchantedYieldQty",
     "hudChrome.enchanting.salvagedYield",
-    "hudChrome.enchanting.salvagedYieldQty"
+    "hudChrome.enchanting.salvagedYieldQty",
+    "itemUi.market.filterBagAll",
+    "itemUi.market.filterBagSize",
+    "itemUi.market.filterTypeBag"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -75,7 +93,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantedYield",
     "hudChrome.enchanting.disenchantedYieldQty",
     "hudChrome.enchanting.salvagedYield",
-    "hudChrome.enchanting.salvagedYieldQty"
+    "hudChrome.enchanting.salvagedYieldQty",
+    "itemUi.market.filterBagAll",
+    "itemUi.market.filterBagSize",
+    "itemUi.market.filterTypeBag"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -85,7 +106,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantedYield",
     "hudChrome.enchanting.disenchantedYieldQty",
     "hudChrome.enchanting.salvagedYield",
-    "hudChrome.enchanting.salvagedYieldQty"
+    "hudChrome.enchanting.salvagedYieldQty",
+    "itemUi.market.filterBagAll",
+    "itemUi.market.filterBagSize",
+    "itemUi.market.filterTypeBag"
   ],
   "nl_NL": [
     "hudChrome.crafting.craftedToastQty",
@@ -94,7 +118,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantedYield",
     "hudChrome.enchanting.disenchantedYieldQty",
     "hudChrome.enchanting.salvagedYield",
-    "hudChrome.enchanting.salvagedYieldQty"
+    "hudChrome.enchanting.salvagedYieldQty",
+    "itemUi.market.filterBagAll",
+    "itemUi.market.filterBagSize",
+    "itemUi.market.filterTypeBag"
   ],
   "pl_PL": [
     "hudChrome.crafting.craftedToastQty",
@@ -103,7 +130,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantedYield",
     "hudChrome.enchanting.disenchantedYieldQty",
     "hudChrome.enchanting.salvagedYield",
-    "hudChrome.enchanting.salvagedYieldQty"
+    "hudChrome.enchanting.salvagedYieldQty",
+    "itemUi.market.filterBagAll",
+    "itemUi.market.filterBagSize",
+    "itemUi.market.filterTypeBag"
   ],
   "id_ID": [
     "hudChrome.crafting.craftedToastQty",
@@ -112,7 +142,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantedYield",
     "hudChrome.enchanting.disenchantedYieldQty",
     "hudChrome.enchanting.salvagedYield",
-    "hudChrome.enchanting.salvagedYieldQty"
+    "hudChrome.enchanting.salvagedYieldQty",
+    "itemUi.market.filterBagAll",
+    "itemUi.market.filterBagSize",
+    "itemUi.market.filterTypeBag"
   ],
   "tr_TR": [
     "hudChrome.crafting.craftedToastQty",
@@ -121,7 +154,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantedYield",
     "hudChrome.enchanting.disenchantedYieldQty",
     "hudChrome.enchanting.salvagedYield",
-    "hudChrome.enchanting.salvagedYieldQty"
+    "hudChrome.enchanting.salvagedYieldQty",
+    "itemUi.market.filterBagAll",
+    "itemUi.market.filterBagSize",
+    "itemUi.market.filterTypeBag"
   ],
   "sv_SE": [
     "hudChrome.crafting.craftedToastQty",
@@ -130,7 +166,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantedYield",
     "hudChrome.enchanting.disenchantedYieldQty",
     "hudChrome.enchanting.salvagedYield",
-    "hudChrome.enchanting.salvagedYieldQty"
+    "hudChrome.enchanting.salvagedYieldQty",
+    "itemUi.market.filterBagAll",
+    "itemUi.market.filterBagSize",
+    "itemUi.market.filterTypeBag"
   ],
   "vi_VN": [
     "hudChrome.crafting.craftedToastQty",
@@ -139,7 +178,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantedYield",
     "hudChrome.enchanting.disenchantedYieldQty",
     "hudChrome.enchanting.salvagedYield",
-    "hudChrome.enchanting.salvagedYieldQty"
+    "hudChrome.enchanting.salvagedYieldQty",
+    "itemUi.market.filterBagAll",
+    "itemUi.market.filterBagSize",
+    "itemUi.market.filterTypeBag"
   ],
   "da_DK": [
     "hudChrome.crafting.craftedToastQty",
@@ -148,6 +190,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.disenchantedYield",
     "hudChrome.enchanting.disenchantedYieldQty",
     "hudChrome.enchanting.salvagedYield",
-    "hudChrome.enchanting.salvagedYieldQty"
+    "hudChrome.enchanting.salvagedYieldQty",
+    "itemUi.market.filterBagAll",
+    "itemUi.market.filterBagSize",
+    "itemUi.market.filterTypeBag"
   ]
 };

@@ -189,6 +189,10 @@ export class Market {
       { itemId: 'sturdy_belt', count: 1, price: 1700 },
       { itemId: 'silk_sash', count: 1, price: 1700 },
       { itemId: 'roughspun_gloves', count: 1, price: 1500 },
+      // The two vendor-sold bags, at their vendor price, so the Bags filter is never
+      // empty on a fresh world. The four drop-only bags stay player-listed goods.
+      { itemId: 'linen_pouch', count: 1, price: 250 },
+      { itemId: 'travelers_knapsack', count: 1, price: 2000 },
       // Crossroads Outfitters — eight pieces kept in standing stock
       { itemId: 'tradesman_hatchet', count: 1, price: 2300 },
       { itemId: 'drovers_staff', count: 1, price: 2500 },

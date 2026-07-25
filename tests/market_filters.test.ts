@@ -4,11 +4,16 @@ import { type MarketQuery, marketItemMatches, sanitizeMarketQuery } from '../src
 import {
   MARKET_ARMOR_CLASS_FILTERS,
   MARKET_ARMOR_TYPE_FILTERS,
+  MARKET_BAG_SIZE_FILTERS,
   MARKET_ITEM_TYPE_FILTERS,
   MARKET_PRIMARY_STAT_FILTERS,
   MARKET_RARITY_FILTERS,
   MARKET_WEAPON_TYPE_FILTERS,
 } from '../src/ui/market_filters';
+
+// Every bag the content catalog ships, resolved from the merged ITEMS table rather
+// than a hand-listed set, so a bag added later is covered by these cases for free.
+const CATALOG_BAG_IDS = Object.keys(ITEMS).filter((id) => ITEMS[id]?.kind === 'bag');
 
 // A full browse query with sensible defaults; a case varies only what it cares about.
 function q(over: Partial<MarketQuery> = {}): MarketQuery {
@@ -48,6 +53,7 @@ describe('World Market filters', () => {
       'all',
       'weapon',
       'armor',
+      'bag',
       'consumable',
       'material',
       'cosmetic',
@@ -113,6 +119,71 @@ describe('World Market filters', () => {
       'simple_fishing_pole',
       'bone_fragments',
     ]);
+  });
+
+  // Issue #2189: bags matched no item-type option at all (the 'material' arm is
+  // junk|tool, the 'other' arm is quest), so the only way to find one was to know
+  // its exact name and type it into the search box.
+  it('browses bags as their own category, and never as materials, cosmetics or Other', () => {
+    const mixed = ['linen_pouch', 'mistcallers_duffel', 'bone_fragments', 'simple_fishing_pole'];
+    expect(filterIds(mixed, { itemType: 'bag' })).toEqual(['linen_pouch', 'mistcallers_duffel']);
+    expect(filterIds(mixed, { itemType: 'material' })).toEqual([
+      'bone_fragments',
+      'simple_fishing_pole',
+    ]);
+    expect(filterIds(mixed, { itemType: 'other' })).toEqual([]);
+    expect(filterIds(mixed, { itemType: 'cosmetic' })).toEqual([]);
+    expect(filterIds(mixed, { itemType: 'armor' })).toEqual([]);
+  });
+
+  // The guard that would have caught #2189 the day the bag kind was authored: an
+  // item nothing but 'All' can reach is invisible to a player who does not already
+  // know its name. Fails for a future ItemKind with no arm, which tsc cannot see.
+  it('leaves no catalog item reachable only through the All filter', () => {
+    const buckets = MARKET_ITEM_TYPE_FILTERS.filter((f) => f !== 'all');
+    const orphans = Object.keys(ITEMS).filter(
+      (id) => !buckets.some((itemType) => marketItemMatches(id, q({ itemType }))),
+    );
+    expect(orphans, `items no browse category can reach: ${orphans.join(', ')}`).toEqual([]);
+    // Non-vacuity: the sweep is worthless if the catalog or the bucket list is empty.
+    expect(Object.keys(ITEMS).length).toBeGreaterThan(100);
+    expect(buckets.length).toBe(MARKET_ITEM_TYPE_FILTERS.length - 1);
+    expect(CATALOG_BAG_IDS.length).toBeGreaterThanOrEqual(6);
+  });
+
+  it('derives the bag-size options from the catalog, not from a hardcoded ladder', () => {
+    const catalogSizes = [...new Set(CATALOG_BAG_IDS.map((id) => ITEMS[id]?.bagSlots ?? 0))].sort(
+      (a, b) => a - b,
+    );
+    expect(catalogSizes.length).toBeGreaterThan(1);
+    expect(MARKET_BAG_SIZE_FILTERS[0]).toBe('all');
+    // Every capacity the content ships is offered, exactly once, in ascending order:
+    // authoring a bag with a new bagSlots value must add its option with no code edit.
+    expect(MARKET_BAG_SIZE_FILTERS.slice(1)).toEqual(catalogSizes.map((slots) => `${slots}`));
+  });
+
+  it('narrows bags by exact capacity, and every catalog bag is reachable by one size', () => {
+    for (const id of CATALOG_BAG_IDS) {
+      const slots = ITEMS[id]?.bagSlots ?? 0;
+      const own = MARKET_BAG_SIZE_FILTERS.filter(
+        (subtype) => subtype !== 'all' && marketItemMatches(id, q({ itemType: 'bag', subtype })),
+      );
+      expect(own, `${id} (${slots} slots) must match exactly its own size option`).toEqual([
+        `${slots}`,
+      ]);
+    }
+    // And the size only narrows: 'all' keeps every bag in the list.
+    expect(filterIds(CATALOG_BAG_IDS, { itemType: 'bag', subtype: 'all' })).toEqual(
+      CATALOG_BAG_IDS,
+    );
+  });
+
+  it('keeps a bag type and bag size through wire sanitization instead of falling back', () => {
+    expect(sanitizeMarketQuery({ itemType: 'bag' }).itemType).toBe('bag');
+    const size = MARKET_BAG_SIZE_FILTERS[1];
+    expect(sanitizeMarketQuery({ itemType: 'bag', subtype: size }).subtype).toBe(size);
+    // A capacity no bag ships is not an option, so it must not survive the wire.
+    expect(sanitizeMarketQuery({ itemType: 'bag', subtype: '9999' }).subtype).toBe('all');
   });
 
   it('matches rarities by the game quality names', () => {

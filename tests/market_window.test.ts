@@ -264,6 +264,33 @@ describe('market_window: behavior preserved through the core', () => {
     expect(painter).toContain("t('itemUi.market.filterValueAria', { label, value: current })");
   });
 
+  // Issue #2189. Same source-discipline caveat as above: the rendered menus are asserted
+  // for real in tests/browser/keyboard_nav.browser.test.ts, but the GATE that decides
+  // which menus exist is a one-line predicate, and swapping it back to the shared
+  // `hasSubtype` is invisible to any assertion that only looks at armor or weapons.
+  // Comments are stripped so prose in this painter cannot satisfy a pin.
+  it('gives bags their own category and capacity menu, with no dead primary-stat menu', () => {
+    const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
+    expect(code, 'the capacity options come from the shared catalog-derived list').toContain(
+      'MARKET_BAG_SIZE_FILTERS',
+    );
+    expect(code).toContain("t('itemUi.market.filterTypeBag')");
+    expect(code).toContain("t('itemUi.market.filterBagSize')");
+    expect(code).toContain("t('itemUi.market.filterBagAll')");
+    // Capacity option labels reuse the bag tooltip template, already translated in every
+    // locale, instead of minting a new per-size string.
+    expect(code).toContain("t('itemUi.tooltip.bagSlots'");
+    // Bags carry no str/agi/int and itemMatchesPrimaryStat ignores the filter outside
+    // armor/weapon, so the stat menu must hang off its own predicate, not the subtype one.
+    expect(code).toMatch(/\(hasPrimaryStat\s*\?\s*this\.renderMarketFilterMenu\(\s*'primaryStat'/);
+    const statGate = code.match(/const hasPrimaryStat =([^;]*);/)?.[1] ?? '';
+    expect(statGate, 'hasPrimaryStat must be a real gate, not an alias').toContain("'armor'");
+    expect(statGate).toContain("'weapon'");
+    expect(statGate, 'bags must not raise the primary-stat menu').not.toContain("'bag'");
+    const subtypeGate = code.match(/const hasSubtype =([^;]*);/)?.[1] ?? '';
+    expect(subtypeGate, 'bags must raise the capacity menu').toContain("'bag'");
+  });
+
   it('preserves the buy / list / cancel / collect dispatch and money formatting', () => {
     expect(painter).toContain('.marketBuy(l.id)');
     expect(painter).toContain('.marketCancel(l.id)');

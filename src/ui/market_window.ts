@@ -26,6 +26,7 @@ import { QUALITY_COLOR } from './icons';
 import {
   MARKET_ARMOR_CLASS_FILTERS,
   MARKET_ARMOR_TYPE_FILTERS,
+  MARKET_BAG_SIZE_FILTERS,
   MARKET_ITEM_TYPE_FILTERS,
   MARKET_PRIMARY_STAT_FILTERS,
   MARKET_RARITY_FILTERS,
@@ -727,6 +728,7 @@ export class MarketWindow {
   private marketItemTypeLabel(filter: MarketItemTypeFilter): string {
     if (filter === 'weapon') return t('itemUi.market.filterTypeWeapon');
     if (filter === 'armor') return t('itemUi.market.filterTypeArmor');
+    if (filter === 'bag') return t('itemUi.market.filterTypeBag');
     if (filter === 'consumable') return t('itemUi.market.filterTypeConsumable');
     if (filter === 'material') return t('itemUi.market.filterTypeMaterial');
     if (filter === 'cosmetic') return t('itemUi.market.filterTypeCosmetic');
@@ -747,10 +749,12 @@ export class MarketWindow {
   private marketSubtypeOptions(): readonly MarketSubtypeFilter[] {
     if (this.itemTypeFilter === 'armor') return MARKET_ARMOR_TYPE_FILTERS;
     if (this.itemTypeFilter === 'weapon') return MARKET_WEAPON_TYPE_FILTERS;
+    if (this.itemTypeFilter === 'bag') return MARKET_BAG_SIZE_FILTERS;
     return ['all'];
   }
 
   private marketSubtypeLabel(): string {
+    if (this.itemTypeFilter === 'bag') return t('itemUi.market.filterBagSize');
     return t(
       this.itemTypeFilter === 'armor'
         ? 'itemUi.market.filterArmorSlot'
@@ -773,6 +777,14 @@ export class MarketWindow {
   }
 
   private marketSubtypeOptionLabel(filter: MarketSubtypeFilter): string {
+    // Bags first: their option values are capacities, so they must not fall through to
+    // the weapon-family chain below, whose tail labels anything unmatched "Other weapons".
+    if (this.itemTypeFilter === 'bag')
+      return filter === 'all'
+        ? t('itemUi.market.filterBagAll')
+        : t('itemUi.tooltip.bagSlots', {
+            slots: formatNumber(Number(filter), { maximumFractionDigits: 0 }),
+          });
     if (filter === 'all')
       return t(
         this.itemTypeFilter === 'armor'
@@ -812,7 +824,14 @@ export class MarketWindow {
 
   private renderMarketFilters(): string {
     if (this.tab !== 'browse') return '';
-    const hasSubtype = this.itemTypeFilter === 'armor' || this.itemTypeFilter === 'weapon';
+    const hasSubtype =
+      this.itemTypeFilter === 'armor' ||
+      this.itemTypeFilter === 'weapon' ||
+      this.itemTypeFilter === 'bag';
+    // Bags carry no str/agi/int, and itemMatchesPrimaryStat ignores the filter outside
+    // armor/weapon, so the primary-stat menu stays gated on gear: rendering it for bags
+    // would be a live-looking control that can never narrow anything.
+    const hasPrimaryStat = this.itemTypeFilter === 'armor' || this.itemTypeFilter === 'weapon';
     return (
       `<div class="mkt-filters" role="group" aria-label="${esc(t('itemUi.market.filters'))}">` +
       this.renderMarketFilterMenu(
@@ -840,7 +859,7 @@ export class MarketWindow {
             (filter) => this.marketArmorClassLabel(filter as MarketArmorClassFilter),
           )
         : '') +
-      (hasSubtype
+      (hasPrimaryStat
         ? this.renderMarketFilterMenu(
             'primaryStat',
             t('itemUi.market.filterPrimaryStat'),
