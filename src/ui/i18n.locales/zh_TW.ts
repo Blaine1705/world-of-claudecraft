@@ -8721,4 +8721,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.itemAriaEnchanted': '{item}，數量 {count}，已附魔的副本',
   'hudChrome.bags.itemAriaBound': '{item}，數量 {count}，已綁定的副本',
   'hudChrome.itemTooltip.enchantedFallback': '已附魔',
+  'devCommand.actions.kit.description':
+    '為指定專精穿上聖所前的20級預設裝備，優先裝備背包。僅限裝備。',
+  'devCommand.actions.kit.label': '裝備新手20級套裝',
+  'devCommand.fields.spec': '專精',
+  'devCommand.itemChosen': '已選擇：{name}',
+  'devCommand.itemHeroicTag': '英雄',
+  'devCommand.itemMore': '顯示 {total} 個相符項目中的 {shown} 個。請繼續輸入以縮小範圍。',
+  'devCommand.itemNoMatches': '沒有符合的物品。',
+  'devCommand.itemResultsAria': '符合的物品',
+  'devCommand.itemSearchPlaceholder': '依名稱或 ID 搜尋',
+  'devCommand.itemUnknown': '沒有該 ID 的物品。',
+  'devCommand.kitCurrentSpec': '目前專精',
+  'hudChrome.enchanting.wornTag': '已裝備（{slot}）',
 };

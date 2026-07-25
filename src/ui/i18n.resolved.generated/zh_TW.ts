@@ -38,14 +38,14 @@ export const zh_TW: EnTranslations = {
     "filterLabel": "篩選指令",
     "filterPlaceholder": "搜尋此類別",
     "noMatches": "沒有符合的指令。",
-    "itemSearchPlaceholder": "Search by name or id",
-    "itemResultsAria": "Matching items",
-    "itemNoMatches": "No items match.",
-    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
-    "itemChosen": "Selected: {name}",
-    "itemUnknown": "No item has that id.",
-    "itemHeroicTag": "Heroic",
-    "kitCurrentSpec": "Current spec",
+    "itemSearchPlaceholder": "依名稱或 ID 搜尋",
+    "itemResultsAria": "符合的物品",
+    "itemNoMatches": "沒有符合的物品。",
+    "itemMore": "顯示 {total} 個相符項目中的 {shown} 個。請繼續輸入以縮小範圍。",
+    "itemChosen": "已選擇：{name}",
+    "itemUnknown": "沒有該 ID 的物品。",
+    "itemHeroicTag": "英雄",
+    "kitCurrentSpec": "目前專精",
     "serverRequirement": "伺服器作弊功能仍需 ALLOW_DEV_COMMANDS=1。",
     "invalidValues": "執行此指令前請選擇有效值。",
     "sent": "已傳送：{command}",
@@ -64,7 +64,7 @@ export const zh_TW: EnTranslations = {
       "dungeon": "地城",
       "difficulty": "難度",
       "name": "名稱",
-      "spec": "Spec"
+      "spec": "專精"
     },
     "difficulty": {
       "normal": "普通",
@@ -124,8 +124,8 @@ export const zh_TW: EnTranslations = {
         "description": "將一件物品加入玩家物品欄。"
       },
       "kit": {
-        "label": "Equip fresh-20 kit",
-        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
+        "label": "裝備新手20級套裝",
+        "description": "為指定專精穿上聖所前的20級預設裝備，優先裝備背包。僅限裝備。"
       },
       "gold": {
         "label": "新增金幣",
@@ -2465,7 +2465,7 @@ export const zh_TW: EnTranslations = {
       "targetTitle": "選擇要附魔的物品",
       "noEnchants": "沒有附魔會用到此材料。",
       "noTargets": "沒有可附魔的合適物品。",
-      "wornTag": "Worn ({slot})",
+      "wornTag": "已裝備（{slot}）",
       "tier": {
         "base": "基礎附魔",
         "runed": "符文附魔",

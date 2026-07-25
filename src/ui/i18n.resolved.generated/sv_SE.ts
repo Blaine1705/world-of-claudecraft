@@ -38,14 +38,14 @@ export const sv_SE: EnTranslations = {
     "filterLabel": "Filtrera kommandon",
     "filterPlaceholder": "Sök i den här kategorin",
     "noMatches": "Inga matchande kommandon.",
-    "itemSearchPlaceholder": "Search by name or id",
-    "itemResultsAria": "Matching items",
-    "itemNoMatches": "No items match.",
-    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
-    "itemChosen": "Selected: {name}",
-    "itemUnknown": "No item has that id.",
-    "itemHeroicTag": "Heroic",
-    "kitCurrentSpec": "Current spec",
+    "itemSearchPlaceholder": "Sök efter namn eller id",
+    "itemResultsAria": "Matchande föremål",
+    "itemNoMatches": "Inga föremål matchar.",
+    "itemMore": "Visar {shown} av {total}. Fortsätt skriva för att smalna av urvalet.",
+    "itemChosen": "Vald: {name}",
+    "itemUnknown": "Inget föremål har detta id.",
+    "itemHeroicTag": "Heroisk",
+    "kitCurrentSpec": "Aktuell specialisering",
     "serverRequirement": "Serverfusk kräver fortfarande ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Välj giltiga värden innan du kör kommandot.",
     "sent": "Skickat: {command}",
@@ -64,7 +64,7 @@ export const sv_SE: EnTranslations = {
       "dungeon": "Fängelsehåla",
       "difficulty": "Svårighetsgrad",
       "name": "Namn",
-      "spec": "Spec"
+      "spec": "Specialisering"
     },
     "difficulty": {
       "normal": "Normal",
@@ -124,8 +124,8 @@ export const sv_SE: EnTranslations = {
         "description": "Lägg till ett föremål i spelarens inventarium."
       },
       "kit": {
-        "label": "Equip fresh-20 kit",
-        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
+        "label": "Utrusta nivå 20-kit",
+        "description": "Ta på nivå 20-förvalet före Sanctum för en specialisering, väskor först. Endast utrustning."
       },
       "gold": {
         "label": "Lägg till guld",
@@ -1062,7 +1062,7 @@ export const sv_SE: EnTranslations = {
       "walkByAutoloot": "Automatisk plundring i förbifarten",
       "groundReticle": "Markriktmedel",
       "mouseoverCast": "Kasta via muspekaren på gruppramarna",
-      "stickyTarget": "Keep Target on Ground Click",
+      "stickyTarget": "Behåll mål vid markklick",
       "showItemLevel": "Visa föremålsnivå",
       "itemLevelLine": "Föremålsnivå {level}",
       "itemScoreLine": "Poäng {score}",
@@ -1543,8 +1543,8 @@ export const sv_SE: EnTranslations = {
       "dragDestroyHint": "Dra ut i världen för att förstöra",
       "reorderNeedsRecent": "Rensa filtret och sortera efter Nyliga för att ordna om dina väskor",
       "itemAriaInstanced": "{item}, antal {count}, tillverkarmärkt kopia",
-      "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
-      "itemAriaBound": "{item}, quantity {count}, bound copy",
+      "itemAriaEnchanted": "{item}, antal {count}, förtrollad kopia",
+      "itemAriaBound": "{item}, antal {count}, bunden kopia",
       "itemAriaMasterwork": "{item}, antal {count}, mästerverk",
       "filterGroupAria": "Filtrera väskor efter kategori",
       "filterAll": "Alla",
@@ -1770,18 +1770,18 @@ export const sv_SE: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Kräver nivå {level}",
-      "statEnchanted": "+{value} {stat} (Enchanted)",
-      "enchantedFallback": "Enchanted"
+      "statEnchanted": "+{value} {stat} (Förtrollad)",
+      "enchantedFallback": "Förtrollad"
     },
     "materialHint": {
-      "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
-      "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
-      "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
-      "resonantThread": "Enchanting reagent. Disenchanted from rare and better cloth armor.",
-      "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
-      "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
-      "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
-      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
+      "arcaneDust": "Förtrollningsreagens. Fås genom avförtrollning av vanlig och ovanlig utrustning.",
+      "arcaneEssence": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt utrustning.",
+      "arcaneShard": "Förtrollningsreagens. Fås genom avförtrollning av episk och legendarisk utrustning.",
+      "resonantThread": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre tygrustning.",
+      "resonantHide": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre läderrustning.",
+      "resonantLinks": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre ringbrynja.",
+      "resonantSteel": "Förtrollningsreagens. Fås genom avförtrollning av sällsynta eller bättre närstridsvapen.",
+      "resonantTimber": "Förtrollningsreagens. Fås genom avförtrollning av sällsynta eller bättre stavar, trollstavar, bågar och armborst."
     },
     "discord": {
       "title": "Discord",
@@ -2023,8 +2023,8 @@ export const sv_SE: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "World Market collection waiting",
-      "tip": "Gold or items are waiting for you at the Merchant."
+      "aria": "Hämtning väntar vid Världsmarknaden",
+      "tip": "Guld eller föremål väntar på dig hos Köpmannen."
     },
     "noticeboard": {
       "empty": "Inget verkar vara uppsatt."
@@ -2147,15 +2147,15 @@ export const sv_SE: EnTranslations = {
       "hideOffline": "Dölj frånkopplade",
       "hideOfflineTitle": "Dölj frånkopplade gillesmedlemmar",
       "billboard": {
-        "label": "Guild Billboard",
-        "empty": "Nothing on the billboard yet.",
-        "setBy": "Set by {name}",
-        "save": "Save",
-        "placeholder": "Write a message for the guild",
-        "inputLabel": "Guild billboard message",
+        "label": "Gillets anslagstavla",
+        "empty": "Inget på anslagstavlan än.",
+        "setBy": "Skriven av {name}",
+        "save": "Spara",
+        "placeholder": "Skriv ett meddelande till gillet",
+        "inputLabel": "Meddelande på gillets anslagstavla",
         "result": {
-          "set": "The guild billboard was updated.",
-          "notOfficer": "Only officers and the Guild Master may edit the billboard."
+          "set": "Gillets anslagstavla har uppdaterats.",
+          "notOfficer": "Endast officerare och Gillesmästaren får redigera anslagstavlan."
         }
       }
     },
@@ -2465,25 +2465,25 @@ export const sv_SE: EnTranslations = {
       "targetTitle": "Välj ett föremål att förtrylla",
       "noEnchants": "Inget förtrollning använder det reagnset.",
       "noTargets": "Inget behörigt föremål att förtrylla.",
-      "wornTag": "Worn ({slot})",
+      "wornTag": "Buren ({slot})",
       "tier": {
-        "base": "Base Enchants",
-        "runed": "Runed Enchants",
-        "greater": "Greater Enchants"
+        "base": "Basförtrollningar",
+        "runed": "Runristade förtrollningar",
+        "greater": "Högre förtrollningar"
       },
-      "yieldHeader": "Expected materials:",
+      "yieldHeader": "Förväntade material:",
       "yieldLineExact": "{count} {item}",
-      "yieldLineRange": "{min} to {max} {item}",
-      "alreadyEnchanted": "That item is already enchanted.",
-      "sameEnchant": "That item already has that enchant.",
-      "replaceTag": "Replaces {enchant}",
-      "sameEnchantTag": "Already applied",
-      "replaceConfirmTitle": "Replace the enchant on {item}?",
-      "replaceConfirmBody": "This replaces {old} on {item} with {new}.",
-      "replaceConfirmNoRefund": "The old enchant is destroyed. Its materials are not refunded. This cannot be undone.",
-      "replaceConfirmCost": "Cost: {cost}",
+      "yieldLineRange": "{min} till {max} {item}",
+      "alreadyEnchanted": "Det föremålet är redan förtrollat.",
+      "sameEnchant": "Det föremålet har redan den förtrollningen.",
+      "replaceTag": "Ersätter {enchant}",
+      "sameEnchantTag": "Redan applicerad",
+      "replaceConfirmTitle": "Ersätt förtrollningen på {item}?",
+      "replaceConfirmBody": "Detta ersätter {old} på {item} med {new}.",
+      "replaceConfirmNoRefund": "Den gamla förtrollningen förstörs. Dess material återbetalas inte. Det kan inte ångras.",
+      "replaceConfirmCost": "Kostnad: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
-      "replaceConfirmAccept": "Replace"
+      "replaceConfirmAccept": "Ersätt"
     },
     "training": {
       "title": "Utbildning: {name}",
@@ -6243,7 +6243,7 @@ export const sv_SE: EnTranslations = {
       "arenaJoin": "Du går med i kön till Askgrå kolosseum. Vänta på en värdig motståndare...",
       "arenaLeave": "Du lämnar kön till Askgrå kolosseum.",
       "arenaSands": "Du kliver ut på sanden i Askgrå kolosseum.",
-      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
+      "arenaSandsDrowned": "Du kliver ut på de översvämmade stenarna i Det dränkta hovet.",
       "tradeRequestSent": "Du har begärt att handla med {name}.",
       "tradeOpened": "Handelsfönster öppnat.",
       "tradeComplete": "Handeln slutförd.",
@@ -6412,10 +6412,10 @@ export const sv_SE: EnTranslations = {
       "playerLevelClassTitle": "{name} - Nivå {level} {className}",
       "noChallengers": "Inga utmanare rankade än - var den första.",
       "matchInProgress": "Match pågår mot {name}.",
-      "mapName": "Map: {name}",
+      "mapName": "Karta: {name}",
       "map": {
-        "coliseum": "Ashen Coliseum",
-        "drownedCourt": "The Drowned Court"
+        "coliseum": "Askgrå kolosseum",
+        "drownedCourt": "Det dränkta hovet"
       },
       "leaveQueue": "Lämna kön",
       "searching": "Söker efter en motståndare... ({count} i kön)",
@@ -6720,15 +6720,15 @@ export const sv_SE: EnTranslations = {
       "filterTypeOther": "Övrigt",
       "filterArmorType": "Rustningstyp",
       "filterArmorAll": "All rustning",
-      "filterArmorSlot": "Armor slot",
-      "filterArmorClassAll": "All armor types",
-      "armorCloth": "Cloth",
-      "armorLeather": "Leather",
-      "armorMail": "Mail",
+      "filterArmorSlot": "Rustningsplats",
+      "filterArmorClassAll": "Alla rustningstyper",
+      "armorCloth": "Tyg",
+      "armorLeather": "Läder",
+      "armorMail": "Ringbrynja",
       "filterWeaponType": "Vapentyp",
       "filterWeaponAll": "Alla vapen",
-      "filterPrimaryStat": "Primary stat",
-      "filterPrimaryStatAll": "Any primary stat",
+      "filterPrimaryStat": "Primärt attribut",
+      "filterPrimaryStatAll": "Alla primära attribut",
       "filterRarity": "Sällsynthet",
       "filterRarityAll": "Alla sällsyntheter",
       "weaponSword": "Svärd",

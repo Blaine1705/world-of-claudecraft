@@ -38,14 +38,14 @@ export const vi_VN: EnTranslations = {
     "filterLabel": "Lọc lệnh",
     "filterPlaceholder": "Tìm trong danh mục này",
     "noMatches": "Không có lệnh phù hợp.",
-    "itemSearchPlaceholder": "Search by name or id",
-    "itemResultsAria": "Matching items",
-    "itemNoMatches": "No items match.",
-    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
-    "itemChosen": "Selected: {name}",
-    "itemUnknown": "No item has that id.",
-    "itemHeroicTag": "Heroic",
-    "kitCurrentSpec": "Current spec",
+    "itemSearchPlaceholder": "Tìm theo tên hoặc mã",
+    "itemResultsAria": "Các vật phẩm khớp",
+    "itemNoMatches": "Không có vật phẩm nào khớp.",
+    "itemMore": "Hiển thị {shown} trong {total}. Tiếp tục gõ để thu hẹp.",
+    "itemChosen": "Đã chọn: {name}",
+    "itemUnknown": "Không có vật phẩm nào có mã đó.",
+    "itemHeroicTag": "Anh Hùng",
+    "kitCurrentSpec": "Chuyên Môn Hiện Tại",
     "serverRequirement": "Lệnh gian lận phía máy chủ vẫn cần ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Hãy chọn giá trị hợp lệ trước khi chạy lệnh này.",
     "sent": "Đã gửi: {command}",
@@ -64,7 +64,7 @@ export const vi_VN: EnTranslations = {
       "dungeon": "Hầm Ngục",
       "difficulty": "Độ Khó",
       "name": "Tên",
-      "spec": "Spec"
+      "spec": "Chuyên Môn"
     },
     "difficulty": {
       "normal": "Thường",
@@ -124,8 +124,8 @@ export const vi_VN: EnTranslations = {
         "description": "Thêm một vật phẩm vào túi đồ của người chơi."
       },
       "kit": {
-        "label": "Equip fresh-20 kit",
-        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
+        "label": "Trang bị bộ đồ cấp 20 mới",
+        "description": "Mặc bộ trang bị mẫu cấp 20 trước Thánh Đường cho một hệ phái, ưu tiên vào túi đồ. Chỉ trang bị."
       },
       "gold": {
         "label": "Thêm vàng",
@@ -1062,7 +1062,7 @@ export const vi_VN: EnTranslations = {
       "walkByAutoloot": "Tự Nhặt Đồ Khi Đi Ngang",
       "groundReticle": "Vòng ngắm mục tiêu mặt đất",
       "mouseoverCast": "Thi Triển Khi Rê Chuột Trên Khung Tổ Đội",
-      "stickyTarget": "Keep Target on Ground Click",
+      "stickyTarget": "Giữ Mục Tiêu Khi Nhấp Đất",
       "showItemLevel": "Hiển Thị Cấp Vật Phẩm",
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",
@@ -1543,8 +1543,8 @@ export const vi_VN: EnTranslations = {
       "dragDestroyHint": "Kéo ra ngoài thế giới để hủy bỏ",
       "reorderNeedsRecent": "Xóa bộ lọc và sắp xếp theo Gần Đây để sắp xếp lại túi đồ",
       "itemAriaInstanced": "{item}, số lượng {count}, bản có dấu thợ",
-      "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
-      "itemAriaBound": "{item}, quantity {count}, bound copy",
+      "itemAriaEnchanted": "{item}, số lượng {count}, bản đã pháp khắc",
+      "itemAriaBound": "{item}, số lượng {count}, bản sao ràng buộc",
       "itemAriaMasterwork": "{item}, số lượng {count}, kiệt tác",
       "filterGroupAria": "Lọc túi đồ theo danh mục",
       "filterAll": "Tất cả",
@@ -1770,18 +1770,18 @@ export const vi_VN: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Yêu cầu Cấp {level}",
-      "statEnchanted": "+{value} {stat} (Enchanted)",
-      "enchantedFallback": "Enchanted"
+      "statEnchanted": "+{value} {stat} (Đã Pháp Khắc)",
+      "enchantedFallback": "Đã Pháp Khắc"
     },
     "materialHint": {
-      "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
-      "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
-      "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
-      "resonantThread": "Enchanting reagent. Disenchanted from rare and better cloth armor.",
-      "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
-      "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
-      "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
-      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
+      "arcaneDust": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị phổ thông và khác thường.",
+      "arcaneEssence": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị hiếm.",
+      "arcaneShard": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị sử thi và huyền thoại.",
+      "resonantThread": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc giáp vải hiếm trở lên.",
+      "resonantHide": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc giáp da hiếm trở lên.",
+      "resonantLinks": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc giáp lưới hiếm trở lên.",
+      "resonantSteel": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc vũ khí cận chiến hiếm trở lên.",
+      "resonantTimber": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trượng, đũa phép, cung, và nỏ hiếm trở lên."
     },
     "discord": {
       "title": "Discord",
@@ -2023,8 +2023,8 @@ export const vi_VN: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "World Market collection waiting",
-      "tip": "Gold or items are waiting for you at the Merchant."
+      "aria": "Có hàng chờ thu tại Chợ Thế Giới",
+      "tip": "Vàng hoặc vật phẩm đang chờ bạn tại Thương Nhân."
     },
     "noticeboard": {
       "empty": "Có vẻ như chưa có gì được dán lên."
@@ -2147,15 +2147,15 @@ export const vi_VN: EnTranslations = {
       "hideOffline": "Ẩn ngoại tuyến",
       "hideOfflineTitle": "Ẩn thành viên bang hội ngoại tuyến",
       "billboard": {
-        "label": "Guild Billboard",
-        "empty": "Nothing on the billboard yet.",
-        "setBy": "Set by {name}",
-        "save": "Save",
-        "placeholder": "Write a message for the guild",
-        "inputLabel": "Guild billboard message",
+        "label": "Bảng Tin Bang Hội",
+        "empty": "Bảng tin chưa có gì được dán lên.",
+        "setBy": "Đặt bởi {name}",
+        "save": "Lưu",
+        "placeholder": "Viết tin nhắn cho bang hội",
+        "inputLabel": "Tin nhắn bảng tin bang hội",
         "result": {
-          "set": "The guild billboard was updated.",
-          "notOfficer": "Only officers and the Guild Master may edit the billboard."
+          "set": "Bảng tin bang hội đã được cập nhật.",
+          "notOfficer": "Chỉ sĩ quan và Hội Chủ mới có thể chỉnh sửa bảng tin."
         }
       }
     },
@@ -2465,25 +2465,25 @@ export const vi_VN: EnTranslations = {
       "targetTitle": "Chọn vật phẩm để pháp khắc",
       "noEnchants": "Không có phép khắc nào dùng nguyên liệu này.",
       "noTargets": "Không có vật phẩm nào hợp lệ để pháp khắc.",
-      "wornTag": "Worn ({slot})",
+      "wornTag": "Đang Trang Bị ({slot})",
       "tier": {
-        "base": "Base Enchants",
-        "runed": "Runed Enchants",
-        "greater": "Greater Enchants"
+        "base": "Pháp Khắc Cơ Bản",
+        "runed": "Pháp Khắc Phù Văn",
+        "greater": "Pháp Khắc Cao Cấp"
       },
-      "yieldHeader": "Expected materials:",
+      "yieldHeader": "Nguyên liệu dự kiến:",
       "yieldLineExact": "{count} {item}",
-      "yieldLineRange": "{min} to {max} {item}",
-      "alreadyEnchanted": "That item is already enchanted.",
-      "sameEnchant": "That item already has that enchant.",
-      "replaceTag": "Replaces {enchant}",
-      "sameEnchantTag": "Already applied",
-      "replaceConfirmTitle": "Replace the enchant on {item}?",
-      "replaceConfirmBody": "This replaces {old} on {item} with {new}.",
-      "replaceConfirmNoRefund": "The old enchant is destroyed. Its materials are not refunded. This cannot be undone.",
-      "replaceConfirmCost": "Cost: {cost}",
+      "yieldLineRange": "{min} đến {max} {item}",
+      "alreadyEnchanted": "Vật phẩm đó đã được pháp khắc rồi.",
+      "sameEnchant": "Vật phẩm đó đã có phép khắc đó rồi.",
+      "replaceTag": "Thay Thế {enchant}",
+      "sameEnchantTag": "Đã Áp Dụng",
+      "replaceConfirmTitle": "Thay Thế Pháp Khắc Trên {item}?",
+      "replaceConfirmBody": "Thao tác này thay thế {old} trên {item} bằng {new}.",
+      "replaceConfirmNoRefund": "Pháp khắc cũ sẽ bị phá hủy. Nguyên liệu của nó sẽ không được hoàn lại. Không thể hoàn tác.",
+      "replaceConfirmCost": "Chi phí: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
-      "replaceConfirmAccept": "Replace"
+      "replaceConfirmAccept": "Thay Thế"
     },
     "training": {
       "title": "Đào tạo: {name}",
@@ -6243,7 +6243,7 @@ export const vi_VN: EnTranslations = {
       "arenaJoin": "Bạn gia nhập hàng đợi Ashen Coliseum. Hãy chờ một đối thủ xứng tầm...",
       "arenaLeave": "Bạn rời khỏi hàng đợi Ashen Coliseum.",
       "arenaSands": "Bạn bước lên bãi cát của Ashen Coliseum.",
-      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
+      "arenaSandsDrowned": "Bạn bước lên nền đá ngập nước của Quảng Trường Chết Chìm.",
       "tradeRequestSent": "Bạn đã yêu cầu giao dịch với {name}.",
       "tradeOpened": "Đã mở cửa sổ giao dịch.",
       "tradeComplete": "Giao dịch hoàn tất.",
@@ -6412,10 +6412,10 @@ export const vi_VN: EnTranslations = {
       "playerLevelClassTitle": "{name} - Cấp {level} {className}",
       "noChallengers": "Chưa có ai được xếp hạng - hãy là người đầu tiên.",
       "matchInProgress": "Trận đấu đang diễn ra với {name}.",
-      "mapName": "Map: {name}",
+      "mapName": "Bản Đồ: {name}",
       "map": {
-        "coliseum": "Ashen Coliseum",
-        "drownedCourt": "The Drowned Court"
+        "coliseum": "Đấu Trường Tro Tàn",
+        "drownedCourt": "Quảng Trường Chết Chìm"
       },
       "leaveQueue": "Rời Hàng Chờ",
       "searching": "Đang tìm đối thủ... ({count} người trong hàng chờ)",
@@ -6720,15 +6720,15 @@ export const vi_VN: EnTranslations = {
       "filterTypeOther": "Khác",
       "filterArmorType": "Loại giáp",
       "filterArmorAll": "Tất cả giáp",
-      "filterArmorSlot": "Armor slot",
-      "filterArmorClassAll": "All armor types",
-      "armorCloth": "Cloth",
-      "armorLeather": "Leather",
-      "armorMail": "Mail",
+      "filterArmorSlot": "Ô giáp",
+      "filterArmorClassAll": "Tất cả loại giáp",
+      "armorCloth": "Vải",
+      "armorLeather": "Da",
+      "armorMail": "Giáp Lưới",
       "filterWeaponType": "Loại vũ khí",
       "filterWeaponAll": "Tất cả vũ khí",
-      "filterPrimaryStat": "Primary stat",
-      "filterPrimaryStatAll": "Any primary stat",
+      "filterPrimaryStat": "Chỉ số chính",
+      "filterPrimaryStatAll": "Bất kỳ chỉ số chính nào",
       "filterRarity": "Độ hiếm",
       "filterRarityAll": "Tất cả độ hiếm",
       "weaponSword": "Kiếm",

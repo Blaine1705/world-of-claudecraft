@@ -38,14 +38,14 @@ export const cs_CZ: EnTranslations = {
     "filterLabel": "Filtrovat příkazy",
     "filterPlaceholder": "Prohledat tuto kategorii",
     "noMatches": "Žádné odpovídající příkazy.",
-    "itemSearchPlaceholder": "Search by name or id",
-    "itemResultsAria": "Matching items",
-    "itemNoMatches": "No items match.",
-    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
-    "itemChosen": "Selected: {name}",
-    "itemUnknown": "No item has that id.",
-    "itemHeroicTag": "Heroic",
-    "kitCurrentSpec": "Current spec",
+    "itemSearchPlaceholder": "Hledat podle jména nebo id",
+    "itemResultsAria": "Odpovídající předměty",
+    "itemNoMatches": "Žádné odpovídající předměty.",
+    "itemMore": "Zobrazeno {shown} z {total}. Pokračuj v psaní pro zúžení výběru.",
+    "itemChosen": "Vybráno: {name}",
+    "itemUnknown": "Žádný předmět nemá toto id.",
+    "itemHeroicTag": "Hrdinské",
+    "kitCurrentSpec": "Aktuální specializace",
     "serverRequirement": "Serverové cheaty stále vyžadují ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Před spuštěním tohoto příkazu vyber platné hodnoty.",
     "sent": "Odesláno: {command}",
@@ -64,7 +64,7 @@ export const cs_CZ: EnTranslations = {
       "dungeon": "Dungeon",
       "difficulty": "Obtížnost",
       "name": "Jméno",
-      "spec": "Spec"
+      "spec": "Specializace"
     },
     "difficulty": {
       "normal": "Normální",
@@ -124,8 +124,8 @@ export const cs_CZ: EnTranslations = {
         "description": "Přidej předmět do hráčova inventáře."
       },
       "kit": {
-        "label": "Equip fresh-20 kit",
-        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
+        "label": "Vybavit sadu na 20. úroveň",
+        "description": "Obleč přednastavenou sadu na 20. úroveň před Svatyní pro danou specializaci, nejprve batohy. Pouze výbava."
       },
       "gold": {
         "label": "Přidat zlato",
@@ -1062,7 +1062,7 @@ export const cs_CZ: EnTranslations = {
       "walkByAutoloot": "Automatická kořist při průchodu",
       "groundReticle": "Zaměřovací kruh na zemi",
       "mouseoverCast": "Sesílání najetím myší na rámech skupiny",
-      "stickyTarget": "Keep Target on Ground Click",
+      "stickyTarget": "Zachovat cíl při kliknutí na zem",
       "showItemLevel": "Zobrazit úroveň předmětu",
       "itemLevelLine": "Úroveň předmětu {level}",
       "itemScoreLine": "Skóre {score}",
@@ -1543,8 +1543,8 @@ export const cs_CZ: EnTranslations = {
       "dragDestroyHint": "Přetáhni do světa a předmět bude zničen",
       "reorderNeedsRecent": "Zruš filtr a seřaď podle Nedávných, chceš-li přeuspořádat batohy",
       "itemAriaInstanced": "{item}, množství {count}, kopie s výrobcovou značkou",
-      "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
-      "itemAriaBound": "{item}, quantity {count}, bound copy",
+      "itemAriaEnchanted": "{item}, množství {count}, okouzlená kopie",
+      "itemAriaBound": "{item}, množství {count}, vázaná kopie",
       "itemAriaMasterwork": "{item}, množství {count}, mistrovské dílo",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
@@ -1770,18 +1770,18 @@ export const cs_CZ: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Vyžaduje úroveň {level}",
-      "statEnchanted": "+{value} {stat} (Enchanted)",
-      "enchantedFallback": "Enchanted"
+      "statEnchanted": "+{value} {stat} (okouzleno)",
+      "enchantedFallback": "Okouzlený"
     },
     "materialHint": {
-      "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
-      "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
-      "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
-      "resonantThread": "Enchanting reagent. Disenchanted from rare and better cloth armor.",
-      "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
-      "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
-      "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
-      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
+      "arcaneDust": "Reagencie k okouzlení. Získává se rozzačarováním běžné a neobvyklé výbavy.",
+      "arcaneEssence": "Reagencie k okouzlení. Získává se rozzačarováním vzácné výbavy.",
+      "arcaneShard": "Reagencie k okouzlení. Získává se rozzačarováním epické a legendární výbavy.",
+      "resonantThread": "Reagencie k okouzlení. Získává se rozzačarováním látkového brnění vzácné kvality a lepšího.",
+      "resonantHide": "Reagencie k okouzlení. Získává se rozzačarováním koženého brnění vzácné kvality a lepšího.",
+      "resonantLinks": "Reagencie k okouzlení. Získává se rozzačarováním kroužkového brnění vzácné kvality a lepšího.",
+      "resonantSteel": "Reagencie k okouzlení. Získává se rozzačarováním zbraní na blízko vzácné kvality a lepších.",
+      "resonantTimber": "Reagencie k okouzlení. Získává se rozzačarováním holí, hůlek, luků a kuší vzácné kvality a lepších."
     },
     "discord": {
       "title": "Discord",
@@ -2023,8 +2023,8 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "World Market collection waiting",
-      "tip": "Gold or items are waiting for you at the Merchant."
+      "aria": "Čeká vyzvednutí ze Světového trhu",
+      "tip": "U Obchodníka na tebe čekají zlato nebo předměty."
     },
     "noticeboard": {
       "empty": "Zdá se, že tu nic nevisí."
@@ -2147,15 +2147,15 @@ export const cs_CZ: EnTranslations = {
       "hideOffline": "Skrýt offline",
       "hideOfflineTitle": "Skrýt offline hráče",
       "billboard": {
-        "label": "Guild Billboard",
-        "empty": "Nothing on the billboard yet.",
-        "setBy": "Set by {name}",
-        "save": "Save",
-        "placeholder": "Write a message for the guild",
-        "inputLabel": "Guild billboard message",
+        "label": "Cechovní nástěnka",
+        "empty": "Na nástěnce zatím nic není.",
+        "setBy": "Nastaveno {name}",
+        "save": "Uložit",
+        "placeholder": "Napiš zprávu pro cech",
+        "inputLabel": "Zpráva na cechovní nástěnku",
         "result": {
-          "set": "The guild billboard was updated.",
-          "notOfficer": "Only officers and the Guild Master may edit the billboard."
+          "set": "Cechovní nástěnka byla aktualizována.",
+          "notOfficer": "Nástěnku mohou upravovat pouze důstojníci a mistr cechu."
         }
       }
     },
@@ -2465,25 +2465,25 @@ export const cs_CZ: EnTranslations = {
       "targetTitle": "Vybrat předmět",
       "noEnchants": "Žádné okouzlení nepoužívá tuto reagencii.",
       "noTargets": "Žádný způsobilý předmět k okouzlení.",
-      "wornTag": "Worn ({slot})",
+      "wornTag": "Vybaveno ({slot})",
       "tier": {
-        "base": "Base Enchants",
-        "runed": "Runed Enchants",
-        "greater": "Greater Enchants"
+        "base": "Základní okouzlení",
+        "runed": "Runové okouzlení",
+        "greater": "Velké okouzlení"
       },
-      "yieldHeader": "Expected materials:",
+      "yieldHeader": "Očekávané materiály:",
       "yieldLineExact": "{count} {item}",
-      "yieldLineRange": "{min} to {max} {item}",
-      "alreadyEnchanted": "That item is already enchanted.",
-      "sameEnchant": "That item already has that enchant.",
-      "replaceTag": "Replaces {enchant}",
-      "sameEnchantTag": "Already applied",
-      "replaceConfirmTitle": "Replace the enchant on {item}?",
-      "replaceConfirmBody": "This replaces {old} on {item} with {new}.",
-      "replaceConfirmNoRefund": "The old enchant is destroyed. Its materials are not refunded. This cannot be undone.",
-      "replaceConfirmCost": "Cost: {cost}",
+      "yieldLineRange": "{min} až {max} {item}",
+      "alreadyEnchanted": "Tento předmět je již okouzlený.",
+      "sameEnchant": "Tento předmět už má toto okouzlení.",
+      "replaceTag": "Nahradí {enchant}",
+      "sameEnchantTag": "Již aplikováno",
+      "replaceConfirmTitle": "Nahradit okouzlení na {item}?",
+      "replaceConfirmBody": "Tímto nahradíš {old} na {item} za {new}.",
+      "replaceConfirmNoRefund": "Staré okouzlení bude zničeno. Materiály se nevrací. Tuto akci nelze vrátit.",
+      "replaceConfirmCost": "Cena: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
-      "replaceConfirmAccept": "Replace"
+      "replaceConfirmAccept": "Nahradit"
     },
     "training": {
       "title": "Školení: {name}",
@@ -6243,7 +6243,7 @@ export const cs_CZ: EnTranslations = {
       "arenaJoin": "Připojuješ se do fronty Popelavého kolosea. Vyčkej na důstojného protivníka...",
       "arenaLeave": "Opouštíš frontu Popelavého kolosea.",
       "arenaSands": "Vstupuješ do písku Popelavého kolosea.",
-      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
+      "arenaSandsDrowned": "Vstupuješ na zatopené kameny Utopeného dvora.",
       "tradeRequestSent": "Požádal(a) jsi {name} o obchod.",
       "tradeOpened": "Obchodní okno otevřeno.",
       "tradeComplete": "Obchod dokončen.",
@@ -6412,10 +6412,10 @@ export const cs_CZ: EnTranslations = {
       "playerLevelClassTitle": "{name} - úr. {level} {className}",
       "noChallengers": "Zatím není v žebříčku žádný vyzyvatel - buď první.",
       "matchInProgress": "Probíhá zápas proti {name}.",
-      "mapName": "Map: {name}",
+      "mapName": "Mapa: {name}",
       "map": {
-        "coliseum": "Ashen Coliseum",
-        "drownedCourt": "The Drowned Court"
+        "coliseum": "Popelavé koloseum",
+        "drownedCourt": "Utopený dvůr"
       },
       "leaveQueue": "Opustit frontu",
       "searching": "Hledá se protivník... ({count} ve frontě)",
@@ -6720,15 +6720,15 @@ export const cs_CZ: EnTranslations = {
       "filterTypeOther": "Ostatní",
       "filterArmorType": "Typ brnění",
       "filterArmorAll": "Všechno brnění",
-      "filterArmorSlot": "Armor slot",
-      "filterArmorClassAll": "All armor types",
-      "armorCloth": "Cloth",
-      "armorLeather": "Leather",
-      "armorMail": "Mail",
+      "filterArmorSlot": "Slot brnění",
+      "filterArmorClassAll": "Všechny typy brnění",
+      "armorCloth": "Látka",
+      "armorLeather": "Kůže",
+      "armorMail": "Kroužková zbroj",
       "filterWeaponType": "Typ zbraně",
       "filterWeaponAll": "Všechny zbraně",
-      "filterPrimaryStat": "Primary stat",
-      "filterPrimaryStatAll": "Any primary stat",
+      "filterPrimaryStat": "Hlavní atribut",
+      "filterPrimaryStatAll": "Libovolný hlavní atribut",
       "filterRarity": "Vzácnost",
       "filterRarityAll": "Všechny vzácnosti",
       "weaponSword": "Meče",

@@ -9215,4 +9215,80 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'perfNudge.integratedGpu':
     "Oyun, tümleşik (güç tasarruflu) GPU üzerinde çalışıyor. Bu bilgisayarda bir oyun ekran kartı da varsa, Windows'ta Ayarlar > Sistem > Ekran > Grafikler bölümünden tarayıcınızı “Yüksek performans” olarak ayarlayın, ardından tarayıcıyı yeniden başlatın. Masaüstü uygulaması oyun ekran kartını otomatik olarak seçer.",
   'worldContent.noticeboardName': 'İlan Tahtası',
+  'hud.arena.map.coliseum': 'Kül Kolezyumu',
+  'hud.arena.map.drownedCourt': 'Boğulmuş Avlu',
+  'hud.arena.mapName': 'Harita: {name}',
+  'hud.logs.arenaSandsDrowned': "Boğulmuş Avlu'nun su basmış taşlarına adım atıyorsun.",
+  'itemUi.market.armorCloth': 'Kumaş',
+  'itemUi.market.armorLeather': 'Deri',
+  'itemUi.market.armorMail': 'Zincir',
+  'itemUi.market.filterArmorClassAll': 'Tüm zırh türleri',
+  'itemUi.market.filterArmorSlot': 'Zırh yuvası',
+  'itemUi.market.filterPrimaryStat': 'Birincil nitelik',
+  'itemUi.market.filterPrimaryStatAll': 'Herhangi bir birincil nitelik',
+  'itemUi.market.filterValueAria': '{label}: {value}',
+  'devCommand.actions.kit.description':
+    'Uzmanlık için Sanctum öncesi 20. seviye setini kuşandır, önce çantalara. Yalnızca teçhizat.',
+  'devCommand.actions.kit.label': 'Taze 20 takımını kuşan',
+  'devCommand.fields.spec': 'Uzmanlık',
+  'devCommand.itemChosen': 'Seçildi: {name}',
+  'devCommand.itemHeroicTag': 'Kahramanca',
+  'devCommand.itemMore':
+    '{total} sonuçtan {shown} tanesi gösteriliyor. Daraltmak için yazmaya devam edin.',
+  'devCommand.itemNoMatches': 'Eşleşen öğe yok.',
+  'devCommand.itemResultsAria': 'Eşleşen öğeler',
+  'devCommand.itemSearchPlaceholder': 'Ada veya kimliğe göre ara',
+  'devCommand.itemUnknown': 'O kimliğe sahip öğe yok.',
+  'devCommand.kitCurrentSpec': 'Mevcut uzmanlık',
+  'hudChrome.bags.itemAriaBound': '{item}, adet {count}, bağlı kopya',
+  'hudChrome.bags.itemAriaEnchanted': '{item}, adet {count}, büyülü kopya',
+  'hudChrome.enchanting.tier.base': 'Temel Büyüler',
+  'hudChrome.enchanting.tier.greater': 'Daha İyi Büyüler',
+  'hudChrome.enchanting.tier.runed': 'Runlu Büyüler',
+  'hudChrome.enchanting.wornTag': 'Kuşanılı ({slot})',
+  'hudChrome.enchanting.yieldHeader': 'Beklenen malzemeler:',
+  'hudChrome.enchanting.yieldLineExact': '{count} {item}',
+  'hudChrome.enchanting.yieldLineRange': '{min} ile {max} arası {item}',
+  'hudChrome.itemTooltip.enchantedFallback': 'Büyülü',
+  'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Büyülü)',
+  'hudChrome.marketIndicator.aria': 'Dünya Pazarı toplaması bekliyor',
+  'hudChrome.marketIndicator.tip': "Tüccar'da senin için bekleyen altın ya da eşyalar var.",
+  'hudChrome.materialHint.arcaneDust':
+    'Sıradan ve az bulunur eşyalardan büyü bozularak elde edilen büyü malzemesi.',
+  'hudChrome.materialHint.arcaneEssence':
+    'Nadir eşyalardan büyü bozularak elde edilen büyü malzemesi.',
+  'hudChrome.materialHint.arcaneShard':
+    'Destansı ve efsanevi eşyalardan büyü bozularak elde edilen büyü malzemesi.',
+  'hudChrome.materialHint.resonantHide':
+    'Nadir ve üstü deri zırhlardan büyü bozularak elde edilen büyü malzemesi.',
+  'hudChrome.materialHint.resonantLinks':
+    'Nadir ve üstü zincir zırhlardan büyü bozularak elde edilen büyü malzemesi.',
+  'hudChrome.materialHint.resonantSteel':
+    'Nadir ve üstü yakın dövüş silahlarından büyü bozularak elde edilen büyü malzemesi.',
+  'hudChrome.materialHint.resonantThread':
+    'Nadir ve üstü kumaş zırhlardan büyü bozularak elde edilen büyü malzemesi.',
+  'hudChrome.materialHint.resonantTimber':
+    'Nadir ve üstü asa, değnek, yay ve arbaletlerden büyü bozularak elde edilen büyü malzemesi.',
+  'hudChrome.options.stickyTarget': 'Yere Tıklayınca Hedefi Koru',
+  'hudChrome.social.billboard.empty': 'Panoda henüz bir şey yok.',
+  'hudChrome.social.billboard.inputLabel': 'Lonca panosu mesajı',
+  'hudChrome.social.billboard.label': 'Lonca Panosu',
+  'hudChrome.social.billboard.placeholder': 'Lonca için bir mesaj yaz',
+  'hudChrome.social.billboard.result.notOfficer':
+    'Panoyu yalnızca subaylar ve Lonca Üstadı düzenleyebilir.',
+  'hudChrome.social.billboard.result.set': 'Lonca panosu güncellendi.',
+  'hudChrome.social.billboard.save': 'Kaydet',
+  'hudChrome.social.billboard.setBy': 'Ayarlayan: {name}',
+  'hudChrome.enchanting.alreadyEnchanted': 'O eşya zaten büyülü.',
+  'hudChrome.enchanting.replaceConfirmAccept': 'Değiştir',
+  'hudChrome.enchanting.replaceConfirmBody':
+    '{item} üzerindeki {old} büyüsü {new} ile değiştirilir.',
+  'hudChrome.enchanting.replaceConfirmCost': 'Maliyet: {cost}',
+  'hudChrome.enchanting.replaceConfirmCostItem': '{name} x{count}',
+  'hudChrome.enchanting.replaceConfirmNoRefund':
+    'Eski büyü yok edilir. Malzemeleri iade edilmez. Bu geri alınamaz.',
+  'hudChrome.enchanting.replaceConfirmTitle': '{item} üzerindeki büyü değiştirilsin mi?',
+  'hudChrome.enchanting.replaceTag': '{enchant} yerine geçer',
+  'hudChrome.enchanting.sameEnchant': 'O eşyada zaten bu büyü var.',
+  'hudChrome.enchanting.sameEnchantTag': 'Zaten uygulandı',
 };

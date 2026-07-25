@@ -38,14 +38,14 @@ export const ko_KR: EnTranslations = {
     "filterLabel": "명령어 필터",
     "filterPlaceholder": "이 범주 검색",
     "noMatches": "일치하는 명령어가 없습니다.",
-    "itemSearchPlaceholder": "Search by name or id",
-    "itemResultsAria": "Matching items",
-    "itemNoMatches": "No items match.",
-    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
-    "itemChosen": "Selected: {name}",
-    "itemUnknown": "No item has that id.",
-    "itemHeroicTag": "Heroic",
-    "kitCurrentSpec": "Current spec",
+    "itemSearchPlaceholder": "이름 또는 ID로 검색",
+    "itemResultsAria": "일치하는 아이템",
+    "itemNoMatches": "일치하는 아이템이 없습니다.",
+    "itemMore": "{total}개 중 {shown}개 표시 중입니다. 계속 입력해 범위를 좁히세요.",
+    "itemChosen": "선택됨: {name}",
+    "itemUnknown": "해당 ID를 가진 아이템이 없습니다.",
+    "itemHeroicTag": "영웅",
+    "kitCurrentSpec": "현재 전문화",
     "serverRequirement": "서버 치트 기능에는 여전히 ALLOW_DEV_COMMANDS=1이 필요합니다.",
     "invalidValues": "명령을 실행하기 전에 올바른 값을 선택하세요.",
     "sent": "전송됨: {command}",
@@ -64,7 +64,7 @@ export const ko_KR: EnTranslations = {
       "dungeon": "던전",
       "difficulty": "난이도",
       "name": "이름",
-      "spec": "Spec"
+      "spec": "전문화"
     },
     "difficulty": {
       "normal": "일반",
@@ -124,8 +124,8 @@ export const ko_KR: EnTranslations = {
         "description": "플레이어 소지품에 아이템을 추가합니다."
       },
       "kit": {
-        "label": "Equip fresh-20 kit",
-        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
+        "label": "20레벨 초기 장비 세트 착용",
+        "description": "특성에 맞는 성소 입장 전 20레벨 사전 설정 장비를 가방부터 착용합니다. 장비만 해당됩니다."
       },
       "gold": {
         "label": "골드 추가",
@@ -2465,7 +2465,7 @@ export const ko_KR: EnTranslations = {
       "targetTitle": "마법부여할 아이템을 선택하세요",
       "noEnchants": "이 재료를 사용하는 마법부여가 없습니다.",
       "noTargets": "마법부여할 수 있는 아이템이 없습니다.",
-      "wornTag": "Worn ({slot})",
+      "wornTag": "착용 중 ({slot})",
       "tier": {
         "base": "기본 마법부여",
         "runed": "룬 마법부여",
