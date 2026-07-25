@@ -120,6 +120,7 @@ import {
 } from './game/spawn_cinematic';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
+import { seekerFirstRunSettings } from './game/seeker_first_run_settings';
 import { resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
@@ -1064,7 +1065,19 @@ async function startGame(
   // An explicit player choice is never overridden: a recognized device is marked applied on its
   // first boot so it never re-detects, and an inconclusive device returns null so it never
   // overwrites a stored preset.
-  const autoPreset = firstRunGraphicsPreset(settings.get('graphicsDefaultApplied'));
+  const deviceDefaultAlreadyApplied = settings.get('graphicsDefaultApplied');
+  const seekerDefaults = seekerFirstRunSettings(
+    deviceDefaultAlreadyApplied,
+    NATIVE_APP && (await walletCapabilityReady),
+  );
+  if (seekerDefaults) {
+    settings.set('browserEffects', seekerDefaults.browserEffects);
+    settings.set('weather', seekerDefaults.weather);
+  }
+  const autoPreset = firstRunGraphicsPreset(
+    deviceDefaultAlreadyApplied,
+    seekerDefaults?.graphicsPreset ?? null,
+  );
   if (autoPreset !== null) {
     settings.set('graphicsPreset', autoPreset);
     settings.set('graphicsDefaultApplied', true);

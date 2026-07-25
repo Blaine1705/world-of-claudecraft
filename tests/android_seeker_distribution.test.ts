@@ -46,6 +46,11 @@ describe('Android Seeker distribution boundary', () => {
     expect(main).toContain(
       "document.body.classList.toggle('seeker-wallet-enabled', NATIVE_APP && WALLET_ENABLED)",
     );
+    expect(main).toContain('const seekerDefaults = seekerFirstRunSettings(');
+    expect(main).toContain('NATIVE_APP && (await walletCapabilityReady),');
+    expect(main).toContain("settings.set('browserEffects', seekerDefaults.browserEffects)");
+    expect(main).toContain("settings.set('weather', seekerDefaults.weather)");
+    expect(main).toContain('seekerDefaults?.graphicsPreset ?? null');
     expect(hudCss).toContain(
       'body.native-app:not(.seeker-wallet-enabled) .cs-wallet',
     );

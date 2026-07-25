@@ -1349,10 +1349,22 @@ export function resolveDefaultGraphicsPreset(hints: GfxRuntimeHints): number {
  * inconclusive device resolves to MEDIUM and returns null: it stays on the medium default and is
  * re-detected on later boots, so once its GPU becomes identifiable it can still settle on its true
  * tier instead of being pinned to medium forever (the marker is set only for a CONCLUSIVE result).
+ * A native host may provide a bounded first-run preset when it has a stronger device identity than
+ * browser hints. The same marker gate ensures that preference never overwrites a player choice.
  * Pure aside from one memoized GPU probe; never reads the FPS governor.
  */
-export function firstRunGraphicsPreset(defaultAlreadyApplied: boolean): number | null {
+export function firstRunGraphicsPreset(
+  defaultAlreadyApplied: boolean,
+  hostFirstRunPreset: number | null = null,
+): number | null {
   if (defaultAlreadyApplied) return null;
+  if (
+    hostFirstRunPreset !== null &&
+    hostFirstRunPreset >= PRESET_LOW &&
+    hostFirstRunPreset <= PRESET_ULTRA
+  ) {
+    return hostFirstRunPreset;
+  }
   const detected = resolveDefaultGraphicsPreset(runtimeHints());
   return detected === PRESET_MEDIUM ? null : detected;
 }
