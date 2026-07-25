@@ -78,13 +78,35 @@ const common: AbilityDef[] = [
     school: 'holy',
     projectile: true,
     requiresTarget: true,
+    // Ranked from level 3. The rank 3 numbers are the tuned end state; ranks 1 and
+    // 2 walk up to them, because a free 7 sec nuke that also refunds mana and heals
+    // has to sit UNDER its level peers on raw damage, and the old flat 95-115 was
+    // roughly double the best level 5 nuke in the game.
     effects: [
       {
         type: 'directDamage',
-        min: 95,
-        max: 115,
+        min: 30,
+        max: 38,
         restoreMana: 70,
         selfHealDamageFrac: 0.5,
+      },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 8,
+        cost: 0,
+        effects: [
+          { type: 'directDamage', min: 58, max: 70, restoreMana: 70, selfHealDamageFrac: 0.5 },
+        ],
+      },
+      {
+        rank: 3,
+        level: 14,
+        cost: 0,
+        effects: [
+          { type: 'directDamage', min: 95, max: 115, restoreMana: 70, selfHealDamageFrac: 0.5 },
+        ],
       },
     ],
     description:
@@ -224,7 +246,24 @@ const retribution: AbilityDef[] = [
     range: 0,
     school: 'physical',
     requiresTarget: true,
-    effects: [{ type: 'weaponStrike', bonus: 52, weaponMult: 1.4 }],
+    // Ranked from level 8. Crusader Strike, the class filler, carries +24 at level
+    // 10, so a flat +52 two levels earlier made the spec's opener outscale every
+    // peer strike in the game. The rank 3 value is the tuned end state.
+    effects: [{ type: 'weaponStrike', bonus: 20, weaponMult: 1.4 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 13,
+        cost: 25,
+        effects: [{ type: 'weaponStrike', bonus: 34, weaponMult: 1.4 }],
+      },
+      {
+        rank: 3,
+        level: 17,
+        cost: 25,
+        effects: [{ type: 'weaponStrike', bonus: 52, weaponMult: 1.4 }],
+      },
+    ],
     description:
       "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Holy explosion around you.",
   },
@@ -661,15 +700,52 @@ const protection: AbilityDef[] = [
     school: 'holy',
     requiresTarget: false,
     threat: { mult: 3 },
+    // Ranked from level 5. Nine ticks of the rank 3 numbers is ~225 damage in an
+    // area, against ~50 for a single-target nuke of that level, so the early ranks
+    // carry the ground control and threat while the damage arrives later.
     effects: [
       {
         type: 'groundAoE',
-        min: 22,
-        max: 28,
+        min: 9,
+        max: 12,
         radius: 6,
         duration: 9,
         interval: 1,
         devotionOnFirstHit: 1,
+      },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 11,
+        cost: 35,
+        effects: [
+          {
+            type: 'groundAoE',
+            min: 15,
+            max: 19,
+            radius: 6,
+            duration: 9,
+            interval: 1,
+            devotionOnFirstHit: 1,
+          },
+        ],
+      },
+      {
+        rank: 3,
+        level: 16,
+        cost: 35,
+        effects: [
+          {
+            type: 'groundAoE',
+            min: 22,
+            max: 28,
+            radius: 6,
+            duration: 9,
+            interval: 1,
+            devotionOnFirstHit: 1,
+          },
+        ],
       },
     ],
     description:

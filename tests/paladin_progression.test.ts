@@ -112,4 +112,36 @@ describe('Paladin final progression', () => {
       expect(ABILITIES, id).not.toHaveProperty(id);
     }
   });
+
+  // The three early-damage curves. Each ability is learned well before its power
+  // peaks, so the opening rank has to sit near its level peers rather than at the
+  // level-20 value: a flat rank 1 is what made all three outscale the rest of the
+  // game at levels 3 to 8. Pinned as a curve, ascending and ending on the tuned
+  // end state, so a future edit cannot quietly flatten it back.
+  it('ramps the early damage curves instead of opening at full power', () => {
+    const curves: Record<string, { levels: number[]; opening: number; peak: number }> = {
+      hammer_of_grace: { levels: [3, 8, 14], opening: 30, peak: 95 },
+      consecration: { levels: [5, 11, 16], opening: 9, peak: 22 },
+      final_edict: { levels: [8, 13, 17], opening: 20, peak: 52 },
+    };
+    for (const [id, curve] of Object.entries(curves)) {
+      const def = ABILITIES[id];
+      const ranks = def.ranks ?? [];
+      expect(ranks, `${id} must be ranked`).toHaveLength(2);
+      expect([def.learnLevel, ...ranks.map((r) => r.level)], `${id} rank levels`).toEqual(
+        curve.levels,
+      );
+
+      const power = (effects: readonly { type: string }[]): number => {
+        const e = effects[0] as { min?: number; bonus?: number };
+        return e.min ?? e.bonus ?? 0;
+      };
+      const values = [power(def.effects), ...ranks.map((r) => power(r.effects))];
+      expect(values[0], `${id} opening rank`).toBe(curve.opening);
+      expect(values[values.length - 1], `${id} peak rank`).toBe(curve.peak);
+      for (let i = 1; i < values.length; i++) {
+        expect(values[i], `${id} rank ${i + 1} climbs`).toBeGreaterThan(values[i - 1]);
+      }
+    }
+  });
 });
