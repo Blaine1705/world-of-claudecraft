@@ -570,6 +570,5 @@ export class PartyMachine {
       }
     }
     this.announceLooterShift(party, beforeLooter);
-    if (party.raid) this.normalizeRaidGroups(party);
   }
 }
