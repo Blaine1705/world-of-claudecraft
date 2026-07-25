@@ -137,6 +137,22 @@ export function canGrantItemInstance(
   return countFit(inventory, capacity, itemId, 1, instance) >= 1;
 }
 
+/** How many of a `count`-unit instanced grant actually fit: the same
+ *  countFit room model canGrantItemInstance boolean-gates, surfaced as a
+ *  number. A signed-grant call site that owns a rolled quantity larger than
+ *  one (the corpse-harvest signed grant, mirroring the node-harvest signed
+ *  grant's own countFit call) uses this to size its addItemInstance call
+ *  instead of truncating an available multi-unit fit down to one. */
+export function fitForItemInstance(
+  inventory: readonly InvSlot[],
+  capacity: number,
+  itemId: string,
+  count: number,
+  instance: ItemInstancePayload,
+): number {
+  return countFit(inventory, capacity, itemId, count, instance);
+}
+
 /** True when all `count` copies fit. */
 export function canAddItem(
   inventory: readonly InvSlot[],
