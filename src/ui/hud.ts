@@ -158,6 +158,7 @@ import { CombatAnnouncer } from './combat_announcer';
 import {
   auraApplyCue,
   castCueForAbility,
+  consumeHealCue,
   impactCueForDamage,
   type MobVoiceAction,
   mobVoiceActionForDamage,
@@ -8705,6 +8706,12 @@ export class Hud {
       case 'heal2': {
         const tgt = sim.entities.get(ev.targetId);
         if (!tgt) return;
+        // A potion/eat/drink heal (items.ts / combat/auras.ts) plays its own
+        // dedicated cue instead of the generic heal_impact; consumeHealCue
+        // returns null for every other heal source (leech, second wind,
+        // companion heals, ...), which falls through to heal_impact unchanged.
+        const cue = ev.type === 'heal' ? consumeHealCue(ev) : null;
+        if (ev.type === 'heal' && ev.source && !cue) return; // eat/drink tick, not a sound tick
         // A HoT tick fires this every couple seconds for its whole duration; the
         // one-shot application cue (Sim.applyAura) now covers the "heal landed"
         // moment instead, so ticks stay silent. Frenzied Regeneration is fully
@@ -8719,7 +8726,7 @@ export class Hud {
         const isHot = ev.type === 'heal2' && ev.hot === true;
         const isFrenziedRegen = ev.type === 'heal2' && ev.abilityId === 'frenzied_regeneration';
         if (isHot ? !isFrenziedRegen : isFrenziedRegen) return;
-        this.combat('heal_impact', tgt.pos.x, tgt.pos.y, tgt.pos.z, 1.0, { cooldown: 0.1 });
+        this.combat(cue ?? 'heal_impact', tgt.pos.x, tgt.pos.y, tgt.pos.z, 1.0, { cooldown: 0.1 });
         return;
       }
       case 'aura': {

@@ -2711,6 +2711,7 @@ export class Sim {
         hpPer2s: 0,
         manaPer2s: 0,
         remaining: 1_000_000,
+        ticksElapsed: 0,
       };
     }
     mage.cascadeDevStats = {
@@ -2808,6 +2809,7 @@ export class Sim {
         hpPer2s: 0,
         manaPer2s: 0,
         remaining: 1_000_000,
+        ticksElapsed: 0,
       };
     }
     this.devSandboxIds = [dummy.id, ...botIds];

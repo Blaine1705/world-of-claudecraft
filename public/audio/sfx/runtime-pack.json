@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "5798eb841886f4f1b5a2d198c99dde892c498113e1eeea51e832043407c2596b",
-  "catalogHash": "5c9556de3566fa3ca9cdfa4c10b378e99b1a1374b5eaf2a415dde741c5ebb75f",
+  "bundleId": "589b200f6d01f494f775ea85fe10a60b49a0e1de3d47930b4dc505de5a9dfa74",
+  "catalogHash": "6ac7a8dfa12e88c88febb2bb607212d72150c25b540d94457c63e7ed49ef311d",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -2702,6 +2702,42 @@
         }
       ],
       "gain": 2.06538,
+      "playbackRate": 1
+    },
+    "player_drink_potion": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/player_drink_potion.mp3?v=81279812acbc",
+          "bytes": 25747,
+          "sha256": "81279812acbcb81d244a177ff4472448a637c2b00e4e780f958f189e02a593d8"
+        }
+      ],
+      "gain": 2.851018,
+      "playbackRate": 1
+    },
+    "player_drink_water": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/player_drink_water.mp3?v=30e18c28470a",
+          "bytes": 40794,
+          "sha256": "30e18c28470a9e6cad36ecd2b30a69cc286ce11a9e6e07ee978c5dc499cc4a4a"
+        }
+      ],
+      "gain": 1.396368,
+      "playbackRate": 1
+    },
+    "player_eat_food": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/player_eat_food.mp3?v=ed2f6038b642",
+          "bytes": 52705,
+          "sha256": "ed2f6038b6425bebf160a3fd6ed1cb90dd7724a2f4b846bfa4208ba753986a88"
+        }
+      ],
+      "gain": 1.396368,
       "playbackRate": 1
     },
     "player_hurt": {
