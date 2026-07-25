@@ -35,7 +35,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "25261e3e",
+      "state": "a4a54903",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -135,9 +135,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -168,7 +168,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "6f11b6fd",
+      "state": "5c7ff884",
       "events": "272a5fc3",
       "rng": {
         "draws": 0,
@@ -278,9 +278,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -311,7 +311,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "f8c20a2c",
+      "state": "5d18712d",
       "events": "06b9a8d4",
       "rng": {
         "draws": 0,
@@ -428,9 +428,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -461,7 +461,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "519bb091",
+      "state": "3317f910",
       "events": "8f85fef2",
       "rng": {
         "draws": 0,
@@ -578,9 +578,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -611,7 +611,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "9917fdc7",
+      "state": "658df7fe",
       "events": "bf94628f",
       "rng": {
         "draws": 0,
@@ -731,9 +731,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -764,8 +764,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "aa7a9b2b",
-      "events": "0b73c759",
+      "state": "3338ea7a",
+      "events": "27de8907",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -896,9 +896,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -930,8 +930,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "291a4cb6",
-      "events": "ca3553aa",
+      "state": "85fd0f55",
+      "events": "b09a31f0",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1058,9 +1058,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
@@ -1092,7 +1092,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "217f2650",
+      "state": "dac0fc65",
       "events": "43b4f665",
       "rng": {
         "draws": 0,
@@ -1188,7 +1188,7 @@
             },
             {
               "duration": 900,
-              "id": "elixir_elixir_of_the_bear",
+              "id": "elixir_buff_sta",
               "kind": "buff_sta",
               "name": "Might of the Bear",
               "remaining": 900,
@@ -1231,9 +1231,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
@@ -1265,7 +1265,184 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "85025fc9",
+      "state": "f9d420c2",
+      "events": "2bc9656f",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "quaffed-second-elixir",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "copper": 710,
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "cryptbone_helm",
+              "eastbrook_buckler",
+              "elixir_of_the_bear",
+              "elixir_of_the_serpent",
+              "minor_healing_potion",
+              "recruit_tunic",
+              "roadwardens_helm",
+              "spring_water",
+              "worn_sword"
+            ],
+            "visited": [
+              "quality:rare"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 818,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 9,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 4,
+              "itemId": "spring_water"
+            },
+            {
+              "count": 1,
+              "itemId": "cryptbone_helm"
+            },
+            {
+              "count": 1,
+              "itemId": "roadwardens_helm"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "selectedMount": "valorsteed",
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 818
+            },
+            {
+              "duration": 900,
+              "id": "elixir_buff_sta",
+              "kind": "buff_sta",
+              "name": "Might of the Serpent",
+              "remaining": 900,
+              "school": "nature",
+              "sourceId": 818,
+              "value": 12
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "drinking": {
+            "itemId": "spring_water",
+            "kind": "drink",
+            "manaPer2s": 8,
+            "remaining": 18
+          },
+          "eating": {
+            "hpPer2s": 7,
+            "itemId": "baked_bread",
+            "kind": "food",
+            "remaining": 18
+          },
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 220,
+          "id": 818,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 220,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -5.125851,
+            "y": 1.5,
+            "z": 0.812357
+          },
+          "potionCooldownUntil": 120,
+          "resourceType": "rage",
+          "sitting": true,
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 35,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 819,
+      "state": "f46c862d",
       "events": "8110d3da",
       "rng": {
         "draws": 0,
@@ -1299,12 +1476,16 @@
               "cryptbone_helm",
               "eastbrook_buckler",
               "elixir_of_the_bear",
+              "elixir_of_the_serpent",
               "minor_healing_potion",
               "recruit_tunic",
               "roadwardens_helm",
               "spring_water",
               "wolf_fang",
               "worn_sword"
+            ],
+            "visited": [
+              "quality:rare"
             ]
           },
           "delveClears": {},
@@ -1366,9 +1547,9 @@
             },
             {
               "duration": 900,
-              "id": "elixir_elixir_of_the_bear",
+              "id": "elixir_buff_sta",
               "kind": "buff_sta",
-              "name": "Might of the Bear",
+              "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
               "sourceId": 818,
@@ -1409,9 +1590,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
@@ -1443,7 +1624,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "9576f030",
+      "state": "8e051ebc",
       "events": "eae28c18",
       "rng": {
         "draws": 0,
@@ -1477,12 +1658,16 @@
               "cryptbone_helm",
               "eastbrook_buckler",
               "elixir_of_the_bear",
+              "elixir_of_the_serpent",
               "minor_healing_potion",
               "recruit_tunic",
               "roadwardens_helm",
               "spring_water",
               "wolf_fang",
               "worn_sword"
+            ],
+            "visited": [
+              "quality:rare"
             ]
           },
           "delveClears": {},
@@ -1550,9 +1735,9 @@
             },
             {
               "duration": 900,
-              "id": "elixir_elixir_of_the_bear",
+              "id": "elixir_buff_sta",
               "kind": "buff_sta",
-              "name": "Might of the Bear",
+              "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
               "sourceId": 818,
@@ -1593,9 +1778,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
@@ -1627,7 +1812,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "829b0495",
+      "state": "ece32f8f",
       "events": "1f4d6a99",
       "rng": {
         "draws": 0,
@@ -1662,12 +1847,16 @@
               "cryptbone_helm",
               "eastbrook_buckler",
               "elixir_of_the_bear",
+              "elixir_of_the_serpent",
               "minor_healing_potion",
               "recruit_tunic",
               "roadwardens_helm",
               "spring_water",
               "wolf_fang",
               "worn_sword"
+            ],
+            "visited": [
+              "quality:rare"
             ]
           },
           "delveClears": {},
@@ -1739,9 +1928,9 @@
             },
             {
               "duration": 900,
-              "id": "elixir_elixir_of_the_bear",
+              "id": "elixir_buff_sta",
               "kind": "buff_sta",
-              "name": "Might of the Bear",
+              "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
               "sourceId": 818,
@@ -1782,9 +1971,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
@@ -1816,7 +2005,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "3060ea38",
+      "state": "3ac830cc",
       "events": "b94ebc4d",
       "rng": {
         "draws": 0,
@@ -1851,12 +2040,16 @@
               "cryptbone_helm",
               "eastbrook_buckler",
               "elixir_of_the_bear",
+              "elixir_of_the_serpent",
               "minor_healing_potion",
               "recruit_tunic",
               "roadwardens_helm",
               "spring_water",
               "wolf_fang",
               "worn_sword"
+            ],
+            "visited": [
+              "quality:rare"
             ]
           },
           "delveClears": {},
@@ -1924,9 +2117,9 @@
             },
             {
               "duration": 900,
-              "id": "elixir_elixir_of_the_bear",
+              "id": "elixir_buff_sta",
               "kind": "buff_sta",
-              "name": "Might of the Bear",
+              "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
               "sourceId": 818,
@@ -1967,9 +2160,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",
@@ -2001,7 +2194,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 819,
-      "state": "3060ea38",
+      "state": "3ac830cc",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2036,12 +2229,16 @@
               "cryptbone_helm",
               "eastbrook_buckler",
               "elixir_of_the_bear",
+              "elixir_of_the_serpent",
               "minor_healing_potion",
               "recruit_tunic",
               "roadwardens_helm",
               "spring_water",
               "wolf_fang",
               "worn_sword"
+            ],
+            "visited": [
+              "quality:rare"
             ]
           },
           "delveClears": {},
@@ -2109,9 +2306,9 @@
             },
             {
               "duration": 900,
-              "id": "elixir_elixir_of_the_bear",
+              "id": "elixir_buff_sta",
               "kind": "buff_sta",
-              "name": "Might of the Bear",
+              "name": "Might of the Serpent",
               "remaining": 900,
               "school": "nature",
               "sourceId": 818,
@@ -2152,9 +2349,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": -3.662525,
+            "x": -5.125851,
             "y": 1.5,
-            "z": 1.540014
+            "z": 0.812357
           },
           "potionCooldownUntil": 120,
           "resourceType": "rage",

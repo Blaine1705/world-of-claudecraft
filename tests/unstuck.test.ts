@@ -527,7 +527,14 @@ describe('unstuck area identity', () => {
     sim.grid.update(ownerPlayer);
     sim.playerGrid.update(ownerPlayer);
 
-    expect(sim.instanceInfoAt(widePoint)).toBeNull();
+    // instanceInfoAt shares the CLAIM envelope (not the narrower generic 120-yard
+    // rectangle) since the v0.30.0 raid-room widening, so the side wings resolve to
+    // this instance for the raid gates built on it too, and still to this slot rather
+    // than the arena slot 500 yards away.
+    expect(sim.instanceInfoAt(widePoint)).toMatchObject({
+      slot: claim.slot,
+      dungeonId: 'nythraxis_boss_arena',
+    });
     expect(sim.instanceClaimIdAt(widePoint)).toBe(claim.exitId);
     expect(unstuckLocationAt(sim.ctx, owner, widePoint)?.area).toMatchObject({
       kind: 'dungeon',
@@ -544,6 +551,8 @@ describe('unstuck area identity', () => {
 
     const outside = sim.groundPos(origin.x + 270, origin.z + 96);
     expect(sim.instanceClaimIdAt(outside)).toBeNull();
+    // The widened envelope still has an edge: past it neither lookup resolves.
+    expect(sim.instanceInfoAt(outside)).toBeNull();
     expect(unstuckLocationAt(sim.ctx, owner, outside)).toBeNull();
 
     // The side-wing tomb is a real collider outside the generic 120-yard

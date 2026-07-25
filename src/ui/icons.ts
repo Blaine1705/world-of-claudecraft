@@ -3980,11 +3980,13 @@ export function abilityImageUrl(id: string): string | null {
 }
 
 // Item ids with committed painted art under /ui/items/<id>.webp (curated from the CraftPix
-// resource/consumable and armor/equipment packs, plus project-owned profession materials;
-// provenance + license in public/ui/items/mapping.json). Served for kind 'item' (bags,
-// tooltips, loot, vendor, the /wiki guide). Covers everything except weapons, which keep
-// their rendered-model thumbnails via WEAPON_ICON_DIR; items not listed fall through to the
-// procedural ITEM_RECIPES below.
+// resource/consumable and armor/equipment packs, the project-owned profession materials, and
+// the generated icon rebrand batches; provenance + license in public/ui/items/mapping.json).
+// Served for kind 'item' (bags, tooltips, loot, vendor, the /wiki guide). Every real non-weapon
+// item must ship a WebP: the derive loop below adds every non-weapon ITEMS id, so a new item
+// without art reds the gate instead of regressing to the procedural compositor. Weapons keep
+// their rendered-model thumbnails via WEAPON_ICON_DIR; procedural item recipes remain available
+// only for UI fallbacks and development-time unknown ids.
 // For armor the icon is purely cosmetic (rarity colour still comes from item.quality), and the
 // flashier icons are reserved for higher-rarity pieces. WebP only, like the skill icons. Add
 // art via `npm run assets:items`, then list the item id here. Guarded by tests/item_icons.test.ts.
@@ -4318,6 +4320,13 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'reins_thunderstrut_gobbler',
 ]);
 
+// The grouped literals above preserve the curated catalog's provenance history. Derive the
+// complete runtime set from live content so a newly added non-weapon item immediately enters the
+// filesystem and provenance gates instead of silently regressing to a procedural placeholder.
+for (const item of Object.values(ITEMS)) {
+  if (item.kind !== 'weapon') ITEM_IMAGE_IDS.add(item.id);
+}
+
 // UI-only icon ids that ship painted art under /ui/items/<id>.webp but are NOT ITEMS
 // records. `backpack` is the implicit 16-slot bag the bag bar draws first: it can never be
 // looted, equipped, or unequipped, so it has no item def. Kept apart from ITEM_IMAGE_IDS so
@@ -4325,8 +4334,130 @@ export const ITEM_IMAGE_IDS = new Set<string>([
 // real, non-weapon item; both sets are served by itemImageUrl and gated on committed art.
 export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 
+// Items whose painted art has not been commissioned yet. The derivation above deliberately
+// enters EVERY non-weapon item into ITEM_IMAGE_IDS, which is what keeps the filesystem and
+// provenance gates honest, but an id listed here has no committed .webp behind it yet, so
+// itemImageUrl declines it and iconDataUrl composes the procedural recipe instead of pointing
+// an <img> at a file that 404s. Same shape as the i18n `pending` model: the debt is
+// enumerated rather than silent, and it shrinks as art lands.
+//
+// These are the zone and Rift items added by the procedural-dungeons work, which predates the
+// every-item-ships-painted-art rule (v0.30.0, #2301). tests/item_icons.test.ts holds the line
+// from BOTH sides: a stale entry (art committed but still listed) fails, and a NEW item with no
+// art that is NOT listed here still fails. Do not add to this list to silence that failure;
+// commission the art.
+export const ITEM_ART_PENDING = new Set<string>([
+  // amberfall.ts
+  'amberfall_sap_bucket',
+  'gilded_sap_clot',
+  'mantle_of_the_meredark',
+  'mere_ferry_lantern',
+  'orchard_sapbinder_grips',
+  // drakelands.ts
+  'ashbone_war_brand',
+  'cinderwalk_treads',
+  'emberwing_scale',
+  'mawscale_pauldrons',
+  'scorched_supply_crate',
+  'wyrmwatch_warning_banner',
+  // evergarden.ts
+  'evergarden_bloom_clipping',
+  'evergarden_statue_rubbing',
+  'fountain_court_mantle',
+  'hedgewick_shears',
+  'hedgewick_tool_cart',
+  'shearkeeper_gloves',
+  // farshore.ts
+  'breakscarred_steel',
+  'farshore_salt_moss',
+  'gullhaven_watchbell',
+  'mantle_of_the_unbroken_shore',
+  'saltforged_grips',
+  // frostveil.ts
+  'aurora_mote',
+  'frostmane_mantle',
+  'hearth_ember_cache',
+  'hearthlined_treads',
+  'sprung_trap',
+  'thick_winter_pelt',
+  // galecrest.ts
+  'galecrest_ram_wool',
+  'shear_storm_lantern',
+  'wickspun_treads',
+  'wreck_wardens_mantle',
+  'wreckfield_flotsam_crate',
+  // items.ts
+  'riding_training',
+  // nightbloom.ts
+  'barrow_grave_offering',
+  'barrowshade_mantle',
+  'gloamfield_nightbloom',
+  'moonfleece_mitts',
+  'moonfleece_tuft',
+  'vigil_star_chart',
+  // palmreach.ts
+  'canopy_silk_hank',
+  'pearlwake_cargo_crate',
+  'saltwalker_sandals',
+  'sunken_idol_mantle',
+  'sunken_offering_bowl',
+  // realm.ts
+  'duskwisp_essence',
+  'elder_bark',
+  'gleaming_antler',
+  'gleamstag_charm',
+  'guardian_core',
+  'hollow_sealstone',
+  'monument_court',
+  'monument_north',
+  'monument_overlook',
+  'nightweave_tunic',
+  'spore_heart',
+  'starfall_shard',
+  'veilcloth_robe',
+  'wardens_oathband',
+  'wardens_seal',
+  'wardplate_cuirass',
+  'wisp_mote',
+  // rift/items.ts
+  'abyssal_loop',
+  'abysswrought_band',
+  'bonelord_mantle',
+  'broodmother_carapace',
+  'emberforge_gauntlets',
+  'emberforged_bulwark',
+  'graskbreaker_girdle',
+  'heart_of_the_rift',
+  'pactbound_vestments',
+  'rift_essence',
+  'rift_gem_azure',
+  'rift_gem_crimson',
+  'rift_gem_verdant',
+  'riftbound_band_of_guile',
+  'riftbound_band_of_insight',
+  'riftbound_band_of_might',
+  'stormscale_treads',
+  'stormsunder_hood',
+  'voidscar_handwraps',
+  'voidweave_mantle',
+  // willowfen.ts
+  'bridgemere_toll_chest',
+  'eelskin_mudwaders',
+  'fenway_mooring_line',
+  'lilybed_mantle',
+  'plump_fen_eel',
+  'wisplight_globe',
+  // wraithwood.ts
+  'gallowmere_grave_candle',
+  'gravebound_silk_wraps',
+  'mantle_of_the_unhorsed',
+  'silkbound_remains',
+  'widowsilk_skein',
+]);
+
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
 export function itemImageUrl(id: string): string | null {
+  if (ITEM_ART_PENDING.has(id)) return null;
   return ITEM_IMAGE_IDS.has(id) || UI_ITEM_IMAGE_IDS.has(id) ? `${ITEM_ICON_DIR}/${id}.webp` : null;
 }
 

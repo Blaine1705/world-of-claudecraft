@@ -143,8 +143,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 820,
-      "state": "ab348129",
-      "events": "119546f5",
+      "state": "75f22145",
+      "events": "4bcd64d3",
       "rng": {
         "draws": 10,
         "digest": "992dbcb5"
@@ -154,8 +154,8 @@
       "tick": 40,
       "time": 2,
       "nextId": 820,
-      "state": "1fb18c17",
-      "events": "ff8f7537",
+      "state": "bdfcc401",
+      "events": "5de9dd8b",
       "rng": {
         "draws": 19,
         "digest": "fc8ed6e6"
@@ -165,7 +165,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 820,
-      "state": "be871b77",
+      "state": "3d604703",
       "events": "906ce8ac",
       "rng": {
         "draws": 152,
@@ -176,7 +176,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 820,
-      "state": "8d94dc15",
+      "state": "1ea3f089",
       "events": "741638a5",
       "rng": {
         "draws": 236,
@@ -200,7 +200,7 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 110,
+            "damageDealt": 120,
             "damageTaken": 8
           },
           "craftSkills": {},
@@ -208,7 +208,7 @@
           "deedStats": {
             "counters": {
               "crits": 1,
-              "damageDealt": 110
+              "damageDealt": 120
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -342,7 +342,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 8890,
+          "hp": 8880,
           "id": 819,
           "inCombat": true,
           "kind": "mob",
@@ -379,7 +379,7 @@
           "threat": [
             [
               814,
-              111
+              121
             ]
           ],
           "weapon": {

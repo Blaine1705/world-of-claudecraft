@@ -3,7 +3,7 @@
 // shard is tests/sim.test.ts.
 import { describe, expect, it } from 'vitest';
 import { GROUND_PICKUP_LINES } from '../src/sim/content/ground_pickup_lines';
-import { DEEPFEN_SHALLOWS_LAKE, GROUND_OBJECTS, ITEMS, LAKE, NPCS } from '../src/sim/data';
+import { DEEPFEN_SHALLOWS_LAKE, GROUND_OBJECTS, ITEMS, LAKE, NPCS, QUESTS } from '../src/sim/data';
 import { ACTIONS, applyAction, encodeObs, obsSize } from '../src/sim/obs';
 import { completeFishing } from '../src/sim/professions/fishing';
 import { Sim } from '../src/sim/sim';
@@ -783,7 +783,9 @@ describe('quests', () => {
 
   it('collect quest tracks inventory and consumes items on turn-in', () => {
     const sim = makeSim('warrior');
-    teleportTo(sim, -7, 1);
+    const giver = NPCS[QUESTS.q_boars.giverNpcId];
+    if (!giver) throw new Error('q_boars giver fixture missing');
+    teleportTo(sim, giver.pos.x, giver.pos.z);
     sim.interact();
     expect(sim.questState('q_boars')).toBe('active');
     sim.addItem('boar_hide', 5);

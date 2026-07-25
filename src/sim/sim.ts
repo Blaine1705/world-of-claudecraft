@@ -95,6 +95,7 @@ import { rewindHealAmount } from './combat/rewind';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
 import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
 import { isSpellResisted } from './combat/spell_resist';
+import { isCritImmuneTank } from './combat/tank_crit_immunity';
 import { warriorMeleeDefense } from './combat/warrior_hit_table';
 import { ensureWarriorStance } from './combat/warrior_stances';
 // A3: the augment/power-up content helpers used by the Fiesta match logic
@@ -189,6 +190,7 @@ import * as runsMod from './delves/runs';
 import { CASCADE_SCENARIO } from './dev/cascade_playtest';
 import { despawnMobsForDev } from './dev_commands';
 import { projectOutsideDungeonDoors } from './dungeon_door_clearance';
+import { arenaMapForSlot } from './dungeon_layout';
 import * as nythraxis from './encounters/nythraxis';
 // A3: ARENA_SPAWNS_A_2v2/B_2v2 (read only by the moved fiestaRevive) now live with
 // social/fiesta.ts. The dungeon-wall consts (DUNGEON_WALL_HW/X) are now read only by
@@ -544,6 +546,7 @@ import { isStunDrCategory } from './stun_dr';
 import { Targeting } from './targeting';
 import {
   addThreat,
+  SUMMONED_ADD_THREAT_SEED,
   TAUNT_FORCE_SECONDS,
   threatEntries,
   threatModifier,
@@ -559,6 +562,7 @@ import {
   type AuraKind,
   angleTo,
   armorReduction,
+  assertCanonicalEastbrookNoticeboardDef,
   type CrowdControlDrCategory,
   type CrowdControlDrState,
   cloneInvSlot,
@@ -598,6 +602,7 @@ import {
   type MountRaceSession,
   type MountTrainingSession,
   type MoveInput,
+  type NoticeboardDef,
   type OverheadEmoteId,
   PARTY_XP_RANGE,
   type PendingResurrection,
@@ -626,6 +631,7 @@ import {
   virtualLevel,
   type WeaponSkinLoadout,
   type WeaponSkinType,
+  type WorldContent,
   xpToReachLevel,
 } from './types';
 import * as weaponStowMod from './weapon_stow';
@@ -1615,6 +1621,14 @@ export class Sim {
   // built-in world); everything else is defaulted to a concrete value below.
   cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap'>> &
     Pick<SimConfig, 'world' | 'perfLap'>;
+  /**
+   * The authored world this simulation owns. The active registry is a host/render
+   * seam and may be swapped by an editor after construction; gameplay services,
+   * future joins, and spirit release must remain bound to this Sim's world.
+   */
+  private readonly worldContent: WorldContent;
+  /** Validated active-world noticeboards captured for this Sim at construction. */
+  readonly noticeboardDefinitions: readonly NoticeboardDef[];
   rng: Rng;
   time = 0;
   tickCount = 0;
@@ -1842,6 +1856,13 @@ export class Sim {
       perfLap: cfg.perfLap,
       idleMobTickRadius: cfg.idleMobTickRadius ?? 0,
     };
+    const activeWorldContent = getActiveWorldContent();
+    this.worldContent = cfg.world ?? activeWorldContent;
+    const activeNoticeboardDefinitions = activeWorldContent.services?.noticeboards ?? [];
+    for (const definition of activeNoticeboardDefinitions) {
+      assertCanonicalEastbrookNoticeboardDef(definition);
+    }
+    this.noticeboardDefinitions = Object.freeze([...activeNoticeboardDefinitions]);
     this.rng = new Rng(cfg.seed);
     // Live server opt-in (worldBossAtBoot): the first world-boss rise is due
     // immediately instead of one interval out, so a freshly (re)started realm
@@ -1898,7 +1919,7 @@ export class Sim {
     // fields (zones, camps, roads, terrainEdits, biomePaint, waterLevel) are
     // identical, or spawns and geometry silently fork. Placements MAY differ
     // (render-only ownership; the editor viewport strips them from cfg.world).
-    const worldContent = this.cfg.world ?? getActiveWorldContent();
+    const worldContent = this.worldContent;
 
     // NPCs — nudged out of buildings and deep water if their data position is bad
     for (const npcDef of Object.values(worldContent.npcs)) {
@@ -1981,7 +2002,7 @@ export class Sim {
 
     // Ravenpost mailboxes: one interactable raven pillar per town (draws no
     // rng; findSafePos is deterministic, so the camp draws above are unmoved).
-    for (const boxDef of MAILBOXES) {
+    for (const boxDef of worldContent.services?.mailboxes ?? []) {
       const safe = this.findSafePos(boxDef.x, boxDef.z, waterLevel() + 0.6);
       const box = createGroundObject(this.nextId++, '', 'Mailbox', this.groundPos(safe.x, safe.z));
       box.templateId = 'mailbox';
@@ -2043,7 +2064,7 @@ export class Sim {
     // Spirit Healers (the angels): one hovering at every overworld graveyard.
     // Per-instance dungeon/raid healers spawn on claim (instances/dungeons.ts).
     // createNpc draws no rng, so world-gen determinism is preserved.
-    spawnOverworldSpiritHealers(this.ctx);
+    spawnOverworldSpiritHealers(this.ctx, worldContent.services?.graveyards ?? []);
 
     // Groundskeeper Bram at the Sowfield gate (Vale Cup). Placed through the
     // SAME findSafePos path as the generic NPC loop above, but under a RESERVED
@@ -2051,10 +2072,10 @@ export class Sim {
     // loop), so world-gen determinism AND the parity goldens' pinned id
     // sequence are both preserved. See social/vale_cup.ts VALE_CUP_BRAM_ID.
     {
-      const bramDef = NPCS.groundskeeper_bram;
+      const bramDef = worldContent.npcs.groundskeeper_bram;
       if (bramDef) {
         const safe = this.findSafePos(bramDef.pos.x, bramDef.pos.z, waterLevel() + 0.6);
-        valeCupMod.spawnGroundskeeper(this.ctx, safe);
+        valeCupMod.spawnGroundskeeper(this.ctx, bramDef, safe);
       }
     }
 
@@ -2156,6 +2177,29 @@ export class Sim {
         seqResetAt: -Infinity,
         bossDeathZones: [],
       });
+    }
+
+    // Noticeboard collision reads the active WorldContent registry, so spawn
+    // must use that same authority even when cfg.world differs. This prevents
+    // a cfg-only board entity without its active static collider, or the reverse.
+    // Authored high-range ids consume neither nextId nor rng, preserving the
+    // established roster and every prior deterministic draw.
+    for (const boardDef of this.noticeboardDefinitions) {
+      if (this.entities.has(boardDef.entityId)) {
+        throw new Error(`Duplicate noticeboard entity id: ${boardDef.entityId}`);
+      }
+      const board = createGroundObject(
+        boardDef.entityId,
+        '',
+        boardDef.name,
+        this.groundPos(boardDef.x, boardDef.z),
+      );
+      board.templateId = boardDef.templateId;
+      board.objectItemId = null;
+      board.lootable = true;
+      board.facing = boardDef.rotation;
+      board.prevFacing = boardDef.rotation;
+      this.addEntity(board);
     }
 
     if (!cfg.noPlayer) {
@@ -2321,8 +2365,15 @@ export class Sim {
     } else if (savedPos && savedPos.x > DUNGEON_X_THRESHOLD) {
       const dungeon = dungeonAt(savedPos.x) ?? DUNGEON_LIST[0];
       savedPos = { x: dungeon.doorPos.x, z: dungeon.doorPos.z - 4 };
+    } else if (savedPos) {
+      // Authored towns can grow across release boundaries. A living character
+      // saved on what used to be open overworld ground must not resume trapped
+      // inside a newly added solid prop. Preserve valid shoreline and swimming
+      // saves: migration is collision-only and uses the real player body radius,
+      // while instance/delve exits above retain their established behavior.
+      savedPos = this.findSafePos(savedPos.x, savedPos.z, -Infinity, PLAYER_BODY_RADIUS);
     }
-    const playerStart = (this.cfg.world ?? getActiveWorldContent()).playerStart;
+    const playerStart = this.worldContent.playerStart;
     const startPos = savedPos
       ? this.groundPos(savedPos.x, savedPos.z)
       : this.groundPos(playerStart.x, playerStart.z);
@@ -2775,7 +2826,12 @@ export class Sim {
       player.prevPos = { ...player.pos };
       this.rebucket(player);
       player.dead = true;
-      releasePlayerSpirit(this.ctx, player.id);
+      releasePlayerSpirit(
+        this.ctx,
+        player.id,
+        this.worldContent.services?.graveyards ?? [],
+        this.worldContent.playerStart,
+      );
     }
     if (savedState?.pet) this.restorePet(player, savedState.pet);
     // One-time Ravenpost welcome (doubles as the service announcement for
@@ -2907,6 +2963,7 @@ export class Sim {
         hpPer2s: 0,
         manaPer2s: 0,
         remaining: 1_000_000,
+        ticksElapsed: 0,
       };
     }
     mage.cascadeDevStats = {
@@ -3004,6 +3061,7 @@ export class Sim {
         hpPer2s: 0,
         manaPer2s: 0,
         remaining: 1_000_000,
+        ticksElapsed: 0,
       };
     }
     this.devSandboxIds = [dummy.id, ...botIds];
@@ -3801,6 +3859,7 @@ export class Sim {
   dailyRewards(): Promise<DailyRewardStatus> {
     const day = '1970-01-01';
     return Promise.resolve({
+      enabled: true,
       day,
       resetAt: '1970-01-02T00:00:00.000Z',
       prizePoolUsd: 0,
@@ -3934,11 +3993,19 @@ export class Sim {
 
   // Deterministic outward spiral to the nearest spot that is on dry-enough
   // ground and not inside a building/prop. Keeps NPCs out of houses and lakes.
-  findSafePos(x: number, z: number, minHeight: number): { x: number; z: number } {
+  findSafePos(x: number, z: number, minHeight: number, bodyRadius = 0.6): { x: number; z: number } {
     const seed = this.cfg.seed;
     const ok = (px: number, pz: number): boolean => {
       if (groundHeight(px, pz, seed) < minHeight) return false;
-      const res = resolvePosition(seed, px, pz, 0.6, false, undefined, this.riftCollisionToken);
+      const res = resolvePosition(
+        seed,
+        px,
+        pz,
+        bodyRadius,
+        false,
+        undefined,
+        this.riftCollisionToken,
+      );
       return Math.abs(res.x - px) < 1e-4 && Math.abs(res.z - pz) < 1e-4;
     };
     if (ok(x, z)) return { x, z };
@@ -3997,6 +4064,9 @@ export class Sim {
       },
       get players() {
         return sim.players;
+      },
+      get stationPlacements() {
+        return sim.stationPlacements;
       },
       get primaryId() {
         return sim.primaryId;
@@ -4486,9 +4556,12 @@ export class Sim {
       // reach-ins delegate to delves/runs via their Sim method body.
       partyMembersForKey: (key) => sim.partyMembersForKey(key),
       grantXp: (amount, meta, opts) => sim.grantXp(amount, meta, opts),
-      addItem: (itemId, count, pid) => sim.addItem(itemId, count, pid),
-      addItemInstance: (itemId, instance, pid, count) =>
-        sim.addItemInstance(itemId, instance, pid, count),
+      addItem: (itemId, count, pid, opts) => sim.addItem(itemId, count, pid, opts),
+      equipBag: (itemId, socket, pid) => sim.equipBag(itemId, socket, pid),
+      equipItem: (itemId, pid) => sim.equipItem(itemId, pid),
+      unequipItem: (slot, pid) => sim.unequipItem(slot, pid),
+      addItemInstance: (itemId, instance, pid, count, opts) =>
+        sim.addItemInstance(itemId, instance, pid, count, opts),
       // L2's World Market escrow (marketList) also consumes removeItem; it is bound once
       // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.
       spawnBossAdds: (boss, mobId, count) => sim.spawnBossAdds(boss, mobId, count),
@@ -4896,7 +4969,7 @@ export class Sim {
         // positive transition needs a dirty mark (a resting player must not
         // stay perpetually dirty for the tick-tail evaluator).
         const wasUnrested = meta.restedXp === 0;
-        updateRested(p, meta);
+        updateRested(p, meta, this.worldContent.props.buildings);
         if (wasUnrested && meta.restedXp > 0) deedsMod.markDeedsDirty(this.ctx, p.id);
         if (meta.pendingGatherGrants.length > 0) {
           drainGatheringGrants(meta);
@@ -5787,13 +5860,39 @@ export class Sim {
     )
       return;
     for (const existing of replacementConflicts) {
-      this.applyNonPlayerStatAura(target, target.auras[existing], -1);
+      const displaced = target.auras[existing];
+      this.applyNonPlayerStatAura(target, displaced, -1);
       target.auras.splice(existing, 1);
+      // A same-id replacement that swaps in a DIFFERENT display name (a
+      // same-stat elixir overwriting another brand) would otherwise vanish
+      // from the buff bar with no combat-log trace: emit the fade the client
+      // cannot infer. Same-name refreshes stay silent, exactly as before.
+      if (displaced.name !== aura.name)
+        this.emit({ type: 'aura', targetId: target.id, name: displaced.name, gained: false });
     }
     target.auras.push(aura);
     if (aura.kind === 'stealth') target.stealthed = true; // keep the cache live without waiting for updateAuras
     this.applyNonPlayerStatAura(target, aura, 1);
     this.emit({ type: 'aura', targetId: target.id, name: aura.name, gained: true });
+    if (aura.kind === 'hot') {
+      // A HoT's periodic ticks (combat/auras.ts) no longer carry the sound: the
+      // client plays a single heal_impact right here, at the moment it lands,
+      // instead of once per tick for the whole duration. amount:0 keeps this
+      // sound-only (FCT/combat log/heal meters/heal-glow VFX all gate on
+      // amount > 0 or crit, so this never double-counts real ticks). Confirmed
+      // in-game on Priest and Druid, Frenzied Regeneration included (see the
+      // hud.ts heal2 case for the one exception this feeds into).
+      this.emit({
+        type: 'heal2',
+        sourceId: aura.sourceId,
+        targetId: target.id,
+        amount: 0,
+        crit: false,
+        ability: aura.name,
+        abilityId: aura.id,
+        cueOnly: true,
+      });
+    }
     const source = this.entities.get(aura.sourceId);
     this.refreshMobLeashFromAction(source ?? null, target);
     if (target.kind === 'player') {
@@ -6509,7 +6608,10 @@ export class Sim {
     let dmg =
       this.rng.range(mob.weapon.min, mob.weapon.max) +
       (this.effectiveAttackPower(mob) / 14) * mob.weapon.speed;
-    const crit = this.rng.chance(0.05);
+    // Tank crit immunity: the 5% roll is still DRAWN (stream position), a
+    // committed tank just never suffers it (combat/tank_crit_immunity.ts).
+    const critRoll = this.rng.chance(0.05);
+    const crit = critRoll && !isCritImmuneTank(target, this.players.get(target.id));
     if (crit) dmg *= 2;
     const enrage = MOBS[mob.templateId]?.enrage;
     if (mob.enraged && enrage) dmg *= enrage.dmgMult;
@@ -7146,7 +7248,12 @@ export class Sim {
         // Same seeding aggroMob does on a normal pull: the leash measures from the
         // eruption point until a hostile player action refreshes it.
         add.leashAnchor = { ...add.pos };
-        addThreat(add, victim.id, 1);
+        // A REAL tank lead, not a token point: healing threat on the tank splits
+        // to every mob aware of him, so a 1-point seed sent every summon wave at
+        // the healer (one add swing one-shots a cloth pool). 750 covers roughly
+        // ten seconds of normal healing; sustained DPS focus can still rip an
+        // add loose, and taunt or tank threat answers it.
+        addThreat(add, victim.id, SUMMONED_ADD_THREAT_SEED);
       }
       // Book of Deeds kill-order tasks track every add this attempt summoned.
       deedsMod.onBossAddsSummonedForDeeds(this.ctx, boss, [add.id]);
@@ -7210,7 +7317,14 @@ export class Sim {
   // this hub always lands, so an async award (loot roll, master loot, delve
   // rewards) can't destroy items. Capacity is enforced by canAddItem pre-checks
   // at the command boundaries instead.
-  addItem(itemId: string, count: number, pid?: number): void {
+  // opts.silent suppresses only the client's default loot audio cue for this
+  // grant (the "You receive:" text line still prints); a caller with its own
+  // dedicated cue for the same grant (gathering/crafting/enchanting) sets
+  // this so the generic ding doesn't stack on top of it. Professions 2.0's
+  // later phases add new grant sites here (Phase 4 rare-event jackpot yields,
+  // Phase 13's disenchant UI wiring): pass { silent: true } from those too,
+  // or the new grants will double-ding the same way the original ones did.
+  addItem(itemId: string, count: number, pid?: number, opts?: { silent?: boolean }): void {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta } = r;
@@ -7224,6 +7338,11 @@ export class Sim {
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
       text: `You receive: ${def?.name ?? itemId}${count > 1 ? ' x' + count : ''}.`,
       pid: meta.entityId,
+      // Conditional, not `silent: opts?.silent`: writing the key even as
+      // `undefined` on every grant moved every loot event's parity digest
+      // (the canonicalizer keeps `undefined` keys, tests/parity/trace.ts),
+      // dragging goldens with no professions content into every regen.
+      ...(opts?.silent ? { silent: true } : {}),
     });
     this.ctx.onInventoryChangedForQuests(meta);
     if (
@@ -7243,7 +7362,14 @@ export class Sim {
   // grant (a rare-event windfall) emits ONE loot line with the xN suffix
   // instead of one line and cue per unit; discovery and quest hooks fire once
   // per grant, matching addItem's per-call semantics.
-  addItemInstance(itemId: string, instance: ItemInstancePayload, pid?: number, count = 1): void {
+  // opts.silent: see addItem's matching param above, same contract.
+  addItemInstance(
+    itemId: string,
+    instance: ItemInstancePayload,
+    pid?: number,
+    count = 1,
+    opts?: { silent?: boolean },
+  ): void {
     const r = this.resolve(pid);
     if (!r) return;
     if (count < 1) return;
@@ -7275,6 +7401,8 @@ export class Sim {
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
       text: `You receive: ${def?.name ?? itemId}${count > 1 ? ' x' + count : ''}.`,
       pid: meta.entityId,
+      // Conditional, see the matching comment in addItem above.
+      ...(opts?.silent ? { silent: true } : {}),
     });
     this.ctx.onInventoryChangedForQuests(meta);
   }
@@ -7492,6 +7620,11 @@ export class Sim {
     return ALL_RECIPES;
   }
 
+  /** Static crafting-station anchors from this Sim's authored world bundle. */
+  get stationPlacements() {
+    return this.worldContent.services?.stations ?? [];
+  }
+
   // Common-tier crafting command (#1127): a thin delegate onto
   // src/sim/professions/crafting.ts, resolved on the deterministic tick the
   // command arrives on, same as harvestNode/buyItem/useItem above. Stashes
@@ -7567,7 +7700,7 @@ export class Sim {
   trainRecipe(recipeId: string, pid?: number): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;
-    const result = resolveTrain(r.meta, r.e.pos, recipeId);
+    const result = resolveTrain(this.stationPlacements, r.meta, r.e.pos, recipeId);
     if (result.ok) {
       r.meta.copper -= result.fee;
       acquireRecipeImpl(this.ctx, r.meta.entityId, recipeId, 'trainer');
@@ -7710,8 +7843,20 @@ export class Sim {
     return this.players.get(pid)?.lastDisenchantResult ?? null;
   }
 
-  applyEnchant(itemId: string, enchantId: string, pid?: number): void {
-    const result = applyEnchantImpl(this.ctx, itemId, enchantId, pid);
+  // `slot`, when present, targets the copy WORN in that equipment slot (the
+  // in-place enchant arm), and `confirmReplace` (#2415) is the explicit
+  // consent to replace an existing enchant; both precede `pid` here because
+  // the IWorldProfessions signature is applyEnchant(itemId, enchantId, slot?,
+  // confirmReplace?) and the trailing pid is the offline/server-side extra
+  // (the craftItem (recipeId, commission?, pid?) precedent).
+  applyEnchant(
+    itemId: string,
+    enchantId: string,
+    slot?: EquipSlot,
+    confirmReplace?: boolean,
+    pid?: number,
+  ): void {
+    const result = applyEnchantImpl(this.ctx, itemId, enchantId, pid, slot, confirmReplace);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastEnchantResult = result;
     this.emit({
@@ -7784,7 +7929,7 @@ export class Sim {
   }
 
   pickUpObject(objId: number, pid?: number): boolean {
-    return interaction.pickUpObject(this.ctx, objId, pid);
+    return interaction.pickUpObject(this.ctx, objId, pid, this.noticeboardDefinitions);
   }
 
   townFocusFor(pid: number): Record<string, number> {
@@ -7822,7 +7967,7 @@ export class Sim {
   }
 
   interact(pid?: number): void {
-    interaction.interact(this.ctx, pid);
+    interaction.interact(this.ctx, pid, this.noticeboardDefinitions);
   }
 
   private isQuestInteractionEntity(e: Entity): boolean {
@@ -7954,7 +8099,12 @@ export class Sim {
   // Player death/respawn lives in entity_roster.ts (E1, merged E2). Thin delegate
   // keeps the public IWorld surface (`sim.releaseSpirit`) resolving unchanged.
   releaseSpirit(pid?: number): void {
-    releasePlayerSpirit(this.ctx, pid);
+    releasePlayerSpirit(
+      this.ctx,
+      pid,
+      this.worldContent.services?.graveyards ?? [],
+      this.worldContent.playerStart,
+    );
   }
 
   // Ghost resurrection (src/sim/spirit.ts): run the spirit back to its corpse to
@@ -8392,6 +8542,7 @@ export class Sim {
   guildDisband(): void {}
   guildEventCreate(_day: string, _hour: number | null, _title: string, _note: string): void {}
   guildEventRemove(_eventId: number): void {}
+  guildSetMotd(_text: string): void {}
   searchCharacters(_query: string): Promise<import('../world_api').CharacterSearchResult[]> {
     return Promise.resolve([]);
   }
@@ -8677,6 +8828,10 @@ export class Sim {
   // -------------------------------------------------------------------------
 
   fiestaBotPids: number[] = [];
+  // Per-bot stuck-recovery steering state (fiesta_bots.ts advanceBotSteer):
+  // session-only, never serialized, cleared by stopFiestaPractice and on any
+  // tick a bot is not actively fighting.
+  fiestaBotSteer = new Map<number, fiestaBotsMod.BotSteer>();
 
   fiestaPracticeActive(): boolean {
     return fiestaBotsMod.fiestaPracticeActive(this);
@@ -8859,6 +9014,10 @@ export class Sim {
           matchInfo = {
             format: match.format,
             state: match.state,
+            // Yumi bouts hold a MAZE slot (a different pool whose numbers
+            // collide with pit slots), so parity would be meaningless there:
+            // they report the documented default instead.
+            map: match.yumi ? 'coliseum' : arenaMapForSlot(match.slot).id,
             oppName: enemies.map((e) => e.name).join(' & '),
             oppClass: primary.cls,
             oppLevel: primary.level,
@@ -9028,6 +9187,12 @@ export class Sim {
 
   marketInfoFor(pid: number): import('../world_api').MarketInfo | null {
     return this.market.marketInfoFor(pid);
+  }
+
+  // The always-streamed collect-indicator bit (the mailUnreadFor pattern):
+  // server/game.ts ships it on every snapshot as `mktU`.
+  marketCollectPendingFor(pid: number): boolean {
+    return this.market.collectPendingFor(pid);
   }
 
   serializeMarket(): MarketSave {
@@ -9345,6 +9510,10 @@ export class Sim {
 
   get marketInfo(): import('../world_api').MarketInfo | null {
     return this.primaryId === -1 ? null : this.marketInfoFor(this.primaryId);
+  }
+
+  get marketCollectPending(): boolean {
+    return this.primaryId === -1 ? false : this.marketCollectPendingFor(this.primaryId);
   }
 
   get mailInfo(): import('../world_api').MailInfo | null {

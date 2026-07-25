@@ -5,6 +5,7 @@ import { BUILTIN_WORLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { dist2d, type WorldContent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { placePlayerInOpenField } from './helpers/open_field';
 
 export function makeSim(cls: 'warrior' | 'mage' | 'rogue' = 'warrior', seed = 42) {
   return new Sim({ seed, playerClass: cls, autoEquip: true });
@@ -129,6 +130,7 @@ export function despawnMobs(sim: Sim) {
 }
 
 export function forwardDistance(sim: Sim, ticks = 60): number {
+  placePlayerInOpenField(sim);
   const start = { ...sim.player.pos };
   sim.moveInput.forward = true;
   for (let i = 0; i < ticks; i++) sim.tick();

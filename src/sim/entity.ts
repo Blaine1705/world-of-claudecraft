@@ -140,6 +140,10 @@ function baseEntity(id: number, pos: Vec3): Entity {
     bigCastTimer: 0,
     deathZoneCastTimer: 0,
     deathZoneStrikeTimer: 0,
+    infernoTimer: 0,
+    infernoRemaining: 0,
+    infernoPulsesFired: 0,
+    infernoGatesFired: 0,
     yelledEngage: false,
     stoneskinTimer: 0,
     terrifyTimer: 0,
@@ -446,7 +450,10 @@ export function recalcPlayerStats(
   s.agi = Math.max(0, s.agi);
   s.armor += s.agi * 2;
   if (bearForm) {
-    s.armor = Math.round(s.armor * 1.9);
+    // 2.3x (2026-07 tank parity, was 1.9x): leather peaks ~1700-2100 armor
+    // vs the warrior's 2861, so the form multiplier fakes the missing plate
+    // tier, the Dire Bear logic.
+    s.armor = Math.round(s.armor * 2.3);
     bonusAp += 15 + Math.round(s.agi * 1.5);
   }
   if (catForm) {
@@ -723,6 +730,7 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   // Telegraph the lethal zone casts the same way: one full interval before first fire.
   if (template.deathZoneCast) e.deathZoneCastTimer = template.deathZoneCast.every;
   if (template.deathZoneStrike) e.deathZoneStrikeTimer = template.deathZoneStrike.every;
+  if (template.infernoChannel) e.infernoTimer = template.infernoChannel.every;
   // Telegraph the first Rally the same way: one full interval after engage.
   if (template.rally) e.rallyTimer = template.rally.every;
   // Telegraph the first War Cadence the same way: one full interval after engage.

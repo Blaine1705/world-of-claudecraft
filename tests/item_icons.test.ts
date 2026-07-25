@@ -1,9 +1,18 @@
+import { createHash } from 'node:crypto';
 import { closeSync, existsSync, openSync, readdirSync, readFileSync, readSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import { ITEM_IMAGE_IDS, iconDataUrl, itemImageUrl, UI_ITEM_IMAGE_IDS } from '../src/ui/icons';
+import {
+  ITEM_ART_PENDING,
+  ITEM_IMAGE_IDS,
+  iconDataUrl,
+  itemImageUrl,
+  UI_ITEM_IMAGE_IDS,
+} from '../src/ui/icons';
+import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 
 // Gate for the committed WebP item icons (mirror of tests/skill_icons.test.ts). Art under
 // public/ui/items/<id>.webp is the source of truth (WebP only), served by itemImageUrl for
@@ -17,6 +26,8 @@ import { ITEM_IMAGE_IDS, iconDataUrl, itemImageUrl, UI_ITEM_IMAGE_IDS } from '..
 //      and every UI pseudo-item id is deliberately NOT an item (the two sets stay disjoint);
 //   E) the whole bag family (the 5 equippable bags + the implicit backpack) is image-backed,
 //      so the bag bar never mixes painted art with a procedural fallback.
+//   H) every real non-weapon item is image-backed, so the legacy procedural compositor is
+//      reserved for UI fallbacks and future development only.
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicDir = path.join(repoRoot, 'public');
 const itemsDir = path.join(publicDir, 'ui/items');
@@ -136,8 +147,15 @@ type Mapping = {
     itemId: string;
     name: string;
     sourcePack: string;
-    sourceFile: string;
+    sourceFile?: string;
     license?: string;
+  }[];
+  generatedBatches?: {
+    source: string;
+    license: string;
+    styleReference: string;
+    commonPrompt: string;
+    itemIds: string[];
   }[];
 };
 const mapping = (): Mapping =>
@@ -148,16 +166,53 @@ describe('item webp icons', () => {
     expect(ITEM_IMAGE_IDS.size).toBeGreaterThan(0);
   });
 
-  it('A) every image-backed item id resolves to a committed, valid .webp', () => {
+  it('A) every image-backed item id resolves to a committed, decodable .webp', async () => {
     const broken: string[] = [];
     for (const id of [...ITEM_IMAGE_IDS, ...UI_ITEM_IMAGE_IDS]) {
+      if (ITEM_ART_PENDING.has(id)) continue; // covered by A2/A3 below
       const url = itemImageUrl(id);
       expect(url, `${id} must resolve to a webp url`).toMatch(/^\/ui\/items\/.+\.webp$/);
       const file = path.join(publicDir, (url as string).replace(/^\//, ''));
       if (!existsSync(file)) broken.push(`${id} -> ${url} (missing file)`);
       else if (!isValidWebp(file)) broken.push(`${id} -> ${url} (not a valid webp)`);
+      else {
+        try {
+          await sharp(file).raw().toBuffer();
+        } catch {
+          broken.push(`${id} -> ${url} (webp payload cannot be decoded)`);
+        }
+      }
     }
     expect(broken).toEqual([]);
+  });
+
+  // A2/A3 keep the pending list from becoming a dumping ground. Guard A skips those ids, so
+  // without these two arms an item could be parked here forever, or a NEW artless item could
+  // be added to the list to silence a real failure.
+  it('A2) every art-pending id is a real, non-weapon item that genuinely has no art yet', () => {
+    const stale: string[] = [];
+    for (const id of ITEM_ART_PENDING) {
+      const def = (ITEMS as Record<string, { kind?: string }>)[id];
+      if (!def) stale.push(`${id} (no such item: drop it from ITEM_ART_PENDING)`);
+      else if (def.kind === 'weapon') stale.push(`${id} (weapon: never belongs in the item set)`);
+      else if (existsSync(path.join(itemsDir, `${id}.webp`))) {
+        stale.push(`${id} (art IS committed now: remove it from ITEM_ART_PENDING)`);
+      }
+    }
+    expect(stale, 'ITEM_ART_PENDING must shrink as art lands, and never outlive its items').toEqual(
+      [],
+    );
+  });
+
+  it('A3) a pending id serves the drawn icon instead of a url pointing at a missing file', () => {
+    // The whole point of the pending list: itemImageUrl declines, so iconDataUrl composes the
+    // procedural recipe rather than handing an <img> a 404. Asserted on the real surface the
+    // bag bar, tooltips, loot and the vendor call.
+    for (const id of ITEM_ART_PENDING) {
+      expect(itemImageUrl(id), `${id} must not resolve to uncommitted art`).toBeNull();
+    }
+    // And the inverse: an id with committed art must still win the static url.
+    expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });
 
   it('B) commits only webp art (+ mapping.json) under public/ui/items', () => {
@@ -240,7 +295,13 @@ describe('item webp icons', () => {
   it('F) every committed icon has a provenance entry in mapping.json, and vice versa', () => {
     const m = mapping();
     const files = webpFiles().map((f) => path.basename(f, '.webp'));
-    const listed = m.entries.map((e) => e.itemId);
+    const curated = m.entries.map((e) => e.itemId);
+    const generated = (m.generatedBatches ?? []).flatMap((batch) => batch.itemIds);
+    const listed = [...curated, ...generated];
+    expect(
+      listed.filter((id, index) => listed.indexOf(id) !== index),
+      'an icon must have exactly one provenance owner',
+    ).toEqual([]);
     expect(
       files.filter((id) => !listed.includes(id)),
       'art without provenance: add its entry (source + license) to mapping.json',
@@ -249,6 +310,17 @@ describe('item webp icons', () => {
       listed.filter((id) => !files.includes(id)),
       'mapping.json lists art that is not committed: drop the stale entry',
     ).toEqual([]);
+    for (const entry of m.entries) {
+      expect(entry.name, `${entry.itemId} must name its source asset`).toBeTruthy();
+      expect(entry.sourcePack, `${entry.itemId} must identify its source pack`).toBeTruthy();
+    }
+    expect(m.generatedBatches, 'generated art must retain its batch provenance').not.toEqual([]);
+    for (const batch of m.generatedBatches ?? []) {
+      expect(batch.source).toBeTruthy();
+      expect(batch.license).toContain('project asset');
+      expect(batch.styleReference).toBeTruthy();
+      expect(batch.commonPrompt).toBeTruthy();
+    }
     // The bag family is project-owned art, so each of its entries overrides the file-level
     // CraftPix license. A bag icon silently inheriting the pack license would misattribute it.
     for (const id of [...BAG_IDS, 'backpack']) {
@@ -328,5 +400,53 @@ describe('item webp icons', () => {
         wrong.push(`${path.basename(file)} (${width}x${height})`);
     }
     expect(wrong, 'run `npm run assets:items`; item art is served at one fixed square').toEqual([]);
+  });
+
+  it('H) every non-weapon item resolves to committed painted art', () => {
+    const expected = Object.values(ITEMS)
+      .filter((item) => item.kind !== 'weapon')
+      .map((item) => item.id)
+      .sort();
+    expect(
+      [...ITEM_IMAGE_IDS].sort(),
+      'non-weapon items must never fall back to the legacy procedural compositor',
+    ).toEqual(expected);
+    for (const id of expected) {
+      // Art-pending ids deliberately serve the drawn recipe instead (A2/A3 gate the list, and
+      // iconDataUrl would need a DOM canvas here anyway). Every other item must serve its WebP.
+      if (ITEM_ART_PENDING.has(id)) continue;
+      expect(iconDataUrl('item', id), `${id} must serve its committed WebP`).toBe(
+        `/ui/items/${id}.webp`,
+      );
+    }
+  });
+
+  it('I) every item icon has distinct committed artwork', () => {
+    const byHash = new Map<string, string[]>();
+    for (const file of webpFiles()) {
+      const hash = createHash('sha256').update(readFileSync(file)).digest('hex');
+      const ids = byHash.get(hash) ?? [];
+      ids.push(path.basename(file, '.webp'));
+      byHash.set(hash, ids);
+    }
+    expect(
+      [...byHash.values()].filter((ids) => ids.length > 1),
+      'different item ids must not ship byte-identical placeholder art',
+    ).toEqual([]);
+  });
+
+  it('J) mapped weapons keep their rendered model thumbnails', () => {
+    const weaponIds = new Set(
+      Object.values(ITEMS)
+        .filter((item) => item.kind === 'weapon')
+        .map((item) => item.id),
+    );
+    const strayMappings = Object.keys(ITEM_WEAPON_VARIANTS).filter((id) => !weaponIds.has(id));
+    expect(strayMappings, 'thumbnail mappings must only target real weapons').toEqual([]);
+    for (const id of Object.keys(ITEM_WEAPON_VARIANTS)) {
+      expect(iconDataUrl('item', id), `${id} must keep its rendered weapon thumbnail`).toBe(
+        `/ui/weapons/${ITEM_WEAPON_VARIANTS[id]}.jpg`,
+      );
+    }
   });
 });

@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 822,
-      "state": "05716bd4",
+      "state": "b4de2cfe",
       "events": "58f3bc7c",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 822,
-      "state": "c16c0b51",
+      "state": "17cb8893",
       "events": "037e19f5",
       "rng": {
         "draws": 60,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 822,
-      "state": "52cfc58f",
+      "state": "39e9cd2d",
       "events": "6500788d",
       "rng": {
         "draws": 238,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 822,
-      "state": "78c8e9bc",
+      "state": "e01164e6",
       "events": "fffe57b9",
       "rng": {
         "draws": 464,
@@ -74,7 +74,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 822,
-      "state": "03a7c167",
+      "state": "e1de5515",
       "events": "e7f55103",
       "rng": {
         "draws": 738,
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 822,
-      "state": "08cbdf78",
+      "state": "4b1270f2",
       "events": "741638a5",
       "rng": {
         "draws": 1021,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 822,
-      "state": "4d8eca95",
+      "state": "4d736a93",
       "events": "08dab0b0",
       "rng": {
         "draws": 1158,
@@ -426,7 +426,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 103593,
-            "z": -1264
+            "z": -1268
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -473,7 +473,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 103607,
-            "z": -1264
+            "z": -1268
           },
           "potionCooldownUntil": -1,
           "resource": 1581,
@@ -530,7 +530,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 103593,
-            "z": -1232
+            "z": -1228
           },
           "potionCooldownUntil": -1,
           "resource": 100,
@@ -580,7 +580,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 103607,
-            "z": -1232
+            "z": -1228
           },
           "potionCooldownUntil": -1,
           "rangedPower": 188,

@@ -70,6 +70,7 @@ import {
   type OptionsControl,
   type OptionsPanelId,
   type OptionsSettingsSource,
+  optionsControlKeys,
   type SliderControl,
   type SliderFmt,
   sliderDispatchValue,
@@ -773,19 +774,23 @@ export class OptionsWindow {
     return body;
   }
 
-  private settingsViewFooter(): void {
+  // `controls` is the sub-view's own declarative control list (as built for
+  // this render pass): Reset to Defaults scopes to exactly the setting keys
+  // that view renders (issue 2341), rather than wiping the whole GameSettings
+  // object. NoteControl/MusicToggleControl carry no key and are filtered out
+  // by optionsControlKeys.
+  private settingsViewFooter(controls: OptionsControl[]): void {
     const el = this.deps.root();
+    const keys = optionsControlKeys(controls) as (keyof GameSettings)[];
     const reset = document.createElement('button');
     reset.className = 'btn';
     reset.textContent = t('hud.options.resetToDefaults');
     reset.addEventListener('click', () => {
       audio.click();
-      this.deps.options()?.settings.reset();
-      // re-apply every setting to its subsystem, then redraw the view
-      const all = this.deps.options()?.settings.all();
-      if (all)
-        for (const k of Object.keys(all) as (keyof GameSettings)[])
-          this.deps.options()?.onSettingChange(k, all[k]);
+      const hooks = this.deps.options();
+      hooks?.settings.reset(keys);
+      // re-apply only this view's settings to their subsystem, then redraw
+      for (const k of keys) hooks?.onSettingChange(k, hooks.settings.get(k));
       this.render();
     });
     const back = document.createElement('button');
@@ -804,13 +809,13 @@ export class OptionsWindow {
   private renderGraphics(): void {
     const hooks = this.deps.options();
     const body = this.settingsViewShell(t('hud.options.graphics'));
-    if (hooks) {
-      const controls = buildGraphicsControls(this.settingsSource(hooks), {
-        touch: useTouchInterface(),
-        nativeShell: isNativeAppShell(),
-      });
-      this.applyControls(body, controls, hooks, () => this.renderGraphics());
-    }
+    const controls = hooks
+      ? buildGraphicsControls(this.settingsSource(hooks), {
+          touch: useTouchInterface(),
+          nativeShell: isNativeAppShell(),
+        })
+      : [];
+    if (hooks) this.applyControls(body, controls, hooks, () => this.renderGraphics());
     const el = this.deps.root();
     const note = document.createElement('div');
     note.className = 'set-note';
@@ -828,7 +833,7 @@ export class OptionsWindow {
       location.reload();
     });
     el.append(reloadNote, reload);
-    this.settingsViewFooter();
+    this.settingsViewFooter(controls);
   }
 
   // -------------------------------------------------------------------------
@@ -838,11 +843,9 @@ export class OptionsWindow {
   private renderAudio(): void {
     const hooks = this.deps.options();
     const body = this.settingsViewShell(t('hud.options.audio'));
-    if (hooks)
-      this.applyControls(body, buildAudioControls(this.settingsSource(hooks)), hooks, () =>
-        this.renderAudio(),
-      );
-    this.settingsViewFooter();
+    const controls = hooks ? buildAudioControls(this.settingsSource(hooks)) : [];
+    if (hooks) this.applyControls(body, controls, hooks, () => this.renderAudio());
+    this.settingsViewFooter(controls);
   }
 
   // -------------------------------------------------------------------------
@@ -1410,10 +1413,8 @@ export class OptionsWindow {
   private renderController(): void {
     const hooks = this.deps.options();
     const body = this.settingsViewShell(t('hudChrome.controller.title'));
-    if (hooks)
-      this.applyControls(body, buildControllerControls(this.settingsSource(hooks)), hooks, () =>
-        this.renderController(),
-      );
+    const controls = hooks ? buildControllerControls(this.settingsSource(hooks)) : [];
+    if (hooks) this.applyControls(body, controls, hooks, () => this.renderController());
 
     const note = document.createElement('div');
     note.className = 'set-note';
@@ -1463,7 +1464,7 @@ export class OptionsWindow {
       });
       body.appendChild(reset);
     }
-    this.settingsViewFooter();
+    this.settingsViewFooter(controls);
   }
 
   // -------------------------------------------------------------------------

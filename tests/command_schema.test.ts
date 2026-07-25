@@ -32,8 +32,8 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // (disenchant_item, apply_enchant, salvage_item), unbind_item (the
 // Maker's Bond unbind service), and the Rift + mounts surface (rift and
 // forge commands, learn_riding, mount selection).
-const EXPECTED_SEND_COUNT = 173;
-const EXPECTED_DISPATCH_COUNT = 184;
+const EXPECTED_SEND_COUNT = 174;
+const EXPECTED_DISPATCH_COUNT = 185;
 const EXPECTED_DISPATCH_ONLY_COUNT = 11;
 
 // The chat sub-channel routing switch (server/game.ts `switch

@@ -1,6 +1,16 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { chunkIntersectsRegion, normalTexelBounds } from '../src/render/terrain_region_core';
-import { shoreDepthAt } from '../src/render/water_core';
+import {
+  advanceWaterSchedule,
+  shoreDepthAt,
+  snapWaterFieldOrigin,
+  WATER_FIELD_CELL_SIZE,
+  WATER_MAX_STEPS_PER_FRAME,
+  WATER_SCHEDULE_SLEEP,
+  WATER_SCHEDULE_WAKE,
+  waterFieldNeedsReanchor,
+  waterFieldPlan,
+} from '../src/render/water_core';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { terrainHeight, WATER_LEVEL, waterLevel } from '../src/sim/world';
 
@@ -118,6 +128,88 @@ describe('normalTexelBounds (macro normal partial rebake)', () => {
     const b = normalTexelBounds(-10, 5, 5, 8, 0, 0, W, D, TEX_W, TEX_H, 1);
     expect(b).not.toBeNull();
     expect(b?.i0).toBe(0);
+  });
+});
+
+describe('camera-anchored wave field plan', () => {
+  it('bounds the field allocation and step rate by graphics tier', () => {
+    expect(waterFieldPlan('medium')).toEqual({
+      resolution: 64,
+      cellSize: WATER_FIELD_CELL_SIZE,
+      size: 64 * WATER_FIELD_CELL_SIZE,
+      stepHz: 20,
+    });
+    expect(waterFieldPlan('high')).toEqual({
+      resolution: 96,
+      cellSize: WATER_FIELD_CELL_SIZE,
+      size: 96 * WATER_FIELD_CELL_SIZE,
+      stepHz: 24,
+    });
+    expect(waterFieldPlan('ultra').resolution).toBe(128);
+    expect(waterFieldPlan('ultra').stepHz).toBe(30);
+    expect(waterFieldPlan('low').resolution).toBe(48);
+    expect(waterFieldPlan('low').stepHz).toBe(15);
+  });
+
+  it('keeps the world-space cell size fixed across tiers, so only coverage scales', () => {
+    for (const tier of ['low', 'medium', 'high', 'ultra'] as const) {
+      const plan = waterFieldPlan(tier);
+      expect(plan.cellSize).toBe(WATER_FIELD_CELL_SIZE);
+      expect(plan.size).toBeCloseTo(plan.resolution * plan.cellSize, 10);
+    }
+  });
+
+  it('snaps the field origin to the texel lattice so a re-anchor never resamples', () => {
+    // Any snapped origin is an exact multiple of the cell size: that is what
+    // makes the scroll pass an integer texel shift instead of a blur.
+    for (const value of [0, 0.34, -0.34, 12.7, -103.2]) {
+      const snapped = snapWaterFieldOrigin(value, 0.7);
+      expect(Math.abs(snapped / 0.7 - Math.round(snapped / 0.7))).toBeLessThan(1e-9);
+      expect(Math.abs(snapped - value)).toBeLessThanOrEqual(0.35 + 1e-9);
+    }
+  });
+
+  it('re-anchors only once the camera leaves the hysteresis band', () => {
+    const size = 64;
+    // Dead centre and small drifts hold the anchor (no scroll pass per frame).
+    expect(waterFieldNeedsReanchor(0, 0, 0, 0, size)).toBe(false);
+    expect(waterFieldNeedsReanchor(9, 0, 0, 0, size)).toBe(false);
+    // Past 30% of the half-size (9.6 yd here) on either axis, it re-centres.
+    expect(waterFieldNeedsReanchor(10, 0, 0, 0, size)).toBe(true);
+    expect(waterFieldNeedsReanchor(0, -10, 0, 0, size)).toBe(true);
+  });
+
+  it('drops hidden impulses without extending the wake and sleeps on schedule', () => {
+    const state = {
+      active: true,
+      pendingCount: 4,
+      accumulator: 0.03,
+      awakeUntil: 6,
+      stepSeconds: 1 / 30,
+    };
+    expect(advanceWaterSchedule(state, false, 5, 0.1)).toBe(0);
+    expect(state.pendingCount).toBe(0);
+    expect(state.accumulator).toBe(0);
+    expect(state.awakeUntil).toBe(6);
+    expect(advanceWaterSchedule(state, false, 6, 0.1)).toBe(WATER_SCHEDULE_SLEEP);
+  });
+
+  it('wakes once and caps hitch catch-up to two fixed steps', () => {
+    const stepSeconds = 1 / 24;
+    const state = {
+      active: false,
+      pendingCount: 1,
+      accumulator: 0,
+      awakeUntil: 0,
+      stepSeconds,
+    };
+    expect(advanceWaterSchedule(state, true, 10, 1)).toBe(WATER_SCHEDULE_WAKE);
+    expect(state.active).toBe(true);
+    expect(state.awakeUntil).toBe(16);
+    expect(state.accumulator).toBe(stepSeconds * WATER_MAX_STEPS_PER_FRAME);
+    state.pendingCount = 0;
+    state.accumulator = 0;
+    expect(advanceWaterSchedule(state, true, 16, 0.01)).toBe(WATER_SCHEDULE_SLEEP);
   });
 });
 

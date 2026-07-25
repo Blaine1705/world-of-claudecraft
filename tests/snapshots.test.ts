@@ -25,6 +25,7 @@ vi.mock('../server/db', () => ({
 
 import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
+import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
@@ -600,6 +601,70 @@ describe('corpse harvest claim over the wire', () => {
     mob.harvestClaimedBy = null;
     (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(mob)] });
     expect(client.entities.get(mob.id)!.harvestClaimedBy).toBeNull();
+  });
+});
+
+// Loot owner-lock lapse (FFA) over the wire. The rights-aware corpse picker
+// (src/game/corpse_loot_availability.ts) reads mob.lootFfaTimer; offline the
+// Sim entity carries the real countdown, so online the LAPSE must ride the
+// sparse terse key `ffa` or a stranger's aged-out corpse stays unofferable
+// forever (the old hardcoded Infinity mirror). Same pin shape as the hcb suite
+// above: the REAL server emit into the REAL client mirror.
+describe('loot FFA lapse over the wire', () => {
+  const TAPPER = 42;
+
+  function strangerCorpse(id: number, lootFfaTimer: number): ReturnType<typeof createMob> {
+    const template = MOBS.forest_wolf;
+    const mob = createMob(id, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.tappedById = TAPPER;
+    // claimed: keeps the harvest arm closed so canOpen isolates loot rights
+    mob.harvestClaimedBy = TAPPER;
+    mob.lootFfaTimer = lootFfaTimer;
+    mob.loot = { copper: 10, items: [{ itemId: 'wolf_fang', count: 1 }] };
+    return mob;
+  }
+
+  it('a fresh owner-locked corpse stays sparse (no ffa key) and unofferable to a stranger', () => {
+    const w = wireEntity(strangerCorpse(9101, 60));
+    // Absent, not `ffa: 0`: a still-locked corpse's record must be byte-unchanged
+    // by this feature, so the per-entity delta cache keeps eliding it.
+    expect(w).not.toHaveProperty('ffa');
+
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', ents: [w] });
+    const mirrored = client.entities.get(9101)!;
+    expect(mirrored.lootFfaTimer).toBe(Infinity);
+    expect(corpseLootAvailability(mirrored, 1).canOpen).toBe(false);
+  });
+
+  it('the lapse rides ffa:1, mirrors as lapsed, and reopens the picker for a stranger', () => {
+    const w = wireEntity(strangerCorpse(9102, 0));
+    expect(w.ffa).toBe(1);
+
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', ents: [w] });
+    const mirrored = client.entities.get(9102)!;
+    expect(corpseLootAvailability(mirrored, 1).canOpen).toBe(true);
+    expect(corpseLootAvailability(mirrored, 1).hasLoot).toBe(true);
+  });
+
+  it('a record without the flag resets a stale mirrored lapse (respawn reuses the id)', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(strangerCorpse(9103, 0))] });
+    expect(corpseLootAvailability(client.entities.get(9103)!, 1).canOpen).toBe(true);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(strangerCorpse(9103, 60))] });
+    expect(client.entities.get(9103)!.lootFfaTimer).toBe(Infinity);
+    expect(corpseLootAvailability(client.entities.get(9103)!, 1).canOpen).toBe(false);
+  });
+
+  it('never emits ffa for a non-lootable entity even with a lapsed timer', () => {
+    const template = MOBS.forest_wolf;
+    const alive = createMob(9104, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    alive.lootFfaTimer = 0;
+    expect(wireEntity(alive)).not.toHaveProperty('ffa');
   });
 });
 
@@ -3100,6 +3165,7 @@ const ALL_DELTA_KEYS = [
   'market',
   'marks',
   'milestones',
+  'mktU',
   'mntLesson',
   'mntOwn',
   'mntRace',
@@ -3169,6 +3235,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   market: 'marketInfo',
   marks: 'markers',
   milestones: 'unlockedMilestones',
+  mktU: 'marketCollectPending',
   mntLesson: 'mountLessonActive',
   mntOwn: 'ownedMounts',
   mntRace: 'mountRaceView',
@@ -3242,6 +3309,9 @@ function dirtyEveryDeltaField(): {
   (sim as any).targeting.partyMarkers.set(party.id, new Map([[mp, 3]]));
   const merchant = sim.entities.get(sim.market.merchantIds[0]);
   if (merchant) merchant.pos = { ...p.pos };
+  // `mktU`: credit a pending collection so the collect-indicator bit is 1 (the
+  // name key merges into the canonical seller key on first read).
+  (sim.market as any).marketCollections.set(meta.name, { copper: 95, items: [] });
   // `mail`: mailInfoFor is null unless near a mailbox, so relocate one onto the
   // player. `mailU` is already non-zero: every fresh character got the one-time
   // Ravenpost welcome letter (delay 0) at join.
@@ -3605,6 +3675,7 @@ describe('full self-state snapshot delta fixture', () => {
     expect((client.duelInfo as any)?.state).toBe('countdown'); // duel -> duelInfo
     expect(client.arenaInfo).not.toBeNull(); // arena -> arenaInfo
     expect(client.marketInfo).not.toBeNull(); // market -> marketInfo
+    expect(client.marketCollectPending).toBe(true); // mktU -> marketCollectPending (truthy bit)
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
     expect(client.activeLootRolls().map((r) => r.rollId)).toEqual([1]); // lroll -> lootRollPrompts
@@ -3857,9 +3928,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 61 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(61);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(61);
+  it('ALL_DELTA_KEYS contains exactly 62 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(62);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(62);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -3878,9 +3949,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
     expect(scraped.has('vcupb')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
-    // The v0.30 base-merge union: the release's 55 plus the Rift + mounts and
-    // worn-instance keys (einst, mntRtd and the rift snapshot fragments).
-    expect(scraped.size).toBe(61);
+    // The v0.31 base-merge union: the release's 56 (incl. the market-collect
+    // key mktU) plus the Rift + mounts and worn-instance keys (einst, mntRtd
+    // and the rift snapshot fragments).
+    expect(scraped.size).toBe(62);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

@@ -68,6 +68,7 @@ const GATED_DRIVER_KEYS = new Set([
   'desperateHeal',
   'deathZoneCast',
   'deathZoneStrike',
+  'infernoChannel',
 ]);
 
 export function riftMechanicSuppressed(mob: Entity, key: string): boolean {

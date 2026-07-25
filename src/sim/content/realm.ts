@@ -1079,7 +1079,9 @@ export const REALM_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 22, max: 35, speed: 2.9 },
     stats: { int: 7, sta: 2 },
     sellValue: 950,
-    requiredClass: ['mage', 'priest', 'warlock', 'druid'],
+    // Every staff carries the full caster proficiency group (shaman and paladin
+    // included), the rule tests/equipment_proficiency.test.ts pins.
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   // --- finale reward ---
   wardens_oathband: {
