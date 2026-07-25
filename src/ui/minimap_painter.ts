@@ -72,9 +72,26 @@ const PLAYER_ARROW_BASE_Y = 5.5;
 
 // NPC quest glyph typography (byte-faithful to `'bold 11px Georgia'` + the inline
 // fillText offset mx - 2, my + 3, drawn with the default textAlign/textBaseline).
+//
+// The glyphs draw from a tiny per-(glyph, color) sprite cache, never a per-marker
+// fillText: assigning ctx.font re-parses the font string and fillText re-rasterizes
+// the glyph on every call (~0.5ms each on a GPU canvas), which made a quest-hub
+// redraw with ~17 NPC markers cost ~8.6ms of its ~9ms, a visible hitch at the 10Hz
+// cadence. The sprite draws the glyph ONCE at the same font, then each redraw is a
+// plain drawImage blit. Positioning stays byte-faithful: the sprite records where
+// the fillText origin sits inside it, and the blit subtracts that origin so the
+// glyph's left edge / alphabetic baseline land exactly where the inline
+// `fillText(glyph, mx - 2, my + 3)` put them.
 const NPC_GLYPH_FONT = 'bold 11px Georgia';
 const NPC_GLYPH_OFFSET_X = 2;
 const NPC_GLYPH_OFFSET_Y = 3;
+// Sprite geometry: the fillText origin inside the sprite canvas. 11px Georgia bold
+// ascends at most ~11px above the alphabetic baseline and the glyph set ('?', '!',
+// '•') has no descenders, so a 16x16 canvas with the baseline at y=12 and the left
+// edge at x=2 contains every glyph with margin.
+const NPC_GLYPH_SPRITE_SIZE = 16;
+const NPC_GLYPH_SPRITE_ORIGIN_X = 2;
+const NPC_GLYPH_SPRITE_BASELINE_Y = 12;
 
 // Corpse marker (ghost run): a compact procedural skull, drawn from canvas
 // primitives (cranium + jaw in the corpse color, eye sockets and a nasal notch
@@ -161,6 +178,10 @@ export class MinimapPainter {
   // The Protect Yumi maze wall cache (built on first in-maze redraw; the fixed
   // competitive layout never changes, so one raster serves the session).
   private mazeBg: HTMLCanvasElement | null = null;
+  // Per-(glyph, color) NPC glyph sprites (see the NPC_GLYPH_* header): at most a
+  // few entries (three glyphs, one resolved token color per session), each a 16x16
+  // canvas, so the map never needs eviction.
+  private readonly glyphSprites = new Map<string, HTMLCanvasElement>();
 
   constructor(
     private readonly writers: PainterHostWriters,
@@ -291,6 +312,26 @@ export class MinimapPainter {
     return canvas;
   }
 
+  // Rasterize (once) and return the sprite for an NPC quest glyph in `color`; the
+  // per-redraw draw is then a plain drawImage. Keyed on glyph + the resolved color
+  // string so a future theme/contrast cache bust naturally re-rasterizes.
+  private npcGlyphSprite(glyph: string, color: string): HTMLCanvasElement {
+    const key = `${glyph}|${color}`;
+    const cached = this.glyphSprites.get(key);
+    if (cached) return cached;
+    const sprite = document.createElement('canvas');
+    sprite.width = NPC_GLYPH_SPRITE_SIZE;
+    sprite.height = NPC_GLYPH_SPRITE_SIZE;
+    const sctx = sprite.getContext('2d');
+    if (sctx) {
+      sctx.fillStyle = color;
+      sctx.font = NPC_GLYPH_FONT;
+      sctx.fillText(glyph, NPC_GLYPH_SPRITE_ORIGIN_X, NPC_GLYPH_SPRITE_BASELINE_Y);
+    }
+    this.glyphSprites.set(key, sprite);
+    return sprite;
+  }
+
   private drawMarkers(
     ctx: CanvasRenderingContext2D,
     markers: readonly MinimapMarker[],
@@ -308,9 +349,13 @@ export class MinimapPainter {
           ctx.stroke();
           break;
         case 'npc':
-          ctx.fillStyle = colors.npcQuest;
-          ctx.font = NPC_GLYPH_FONT;
-          ctx.fillText(m.glyph, m.mx - NPC_GLYPH_OFFSET_X, m.my + NPC_GLYPH_OFFSET_Y);
+          // Blit the cached glyph sprite so its internal fillText origin lands on
+          // the inline site's (mx - 2, my + 3) anchor exactly.
+          ctx.drawImage(
+            this.npcGlyphSprite(m.glyph, colors.npcQuest),
+            m.mx - NPC_GLYPH_OFFSET_X - NPC_GLYPH_SPRITE_ORIGIN_X,
+            m.my + NPC_GLYPH_OFFSET_Y - NPC_GLYPH_SPRITE_BASELINE_Y,
+          );
           break;
         case 'portal':
           ctx.fillStyle = colors.portal;

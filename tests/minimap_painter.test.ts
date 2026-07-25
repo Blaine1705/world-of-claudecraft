@@ -91,3 +91,32 @@ describe('minimap_painter: cached background + ~10Hz cadence preserved', () => {
     expect(code).toContain('this.writers.setText(zoneLabelEl');
   });
 });
+
+describe('minimap_painter: NPC glyphs draw from the sprite cache, never per-marker fillText', () => {
+  // Profiled on a 60-player quest-hub crowd: ~17 per-redraw fillText calls (each
+  // re-assigning ctx.font) cost ~8.6ms of the ~9ms redraw, a visible hitch at the
+  // 10Hz cadence. The glyph rasterizes once into a per-(glyph, color) sprite and
+  // each redraw blits it. These pins keep the per-marker loop fillText-free.
+  const drawMarkersBody = code.slice(code.indexOf('private drawMarkers('));
+
+  it('keeps fillText and ctx.font assignment out of the per-marker draw loop', () => {
+    expect(drawMarkersBody).not.toContain('fillText');
+    expect(drawMarkersBody).not.toContain('ctx.font');
+  });
+
+  it('caches glyph sprites keyed by glyph + resolved color and blits them', () => {
+    expect(code).toContain('glyphSprites');
+    expect(code).toContain('${glyph}|${color}');
+    expect(drawMarkersBody).toContain('this.npcGlyphSprite(m.glyph, colors.npcQuest)');
+    expect(drawMarkersBody).toContain('ctx.drawImage(');
+  });
+
+  it('rasterizes the sprite with the byte-faithful glyph font, set once in the builder', () => {
+    const builder = code.slice(
+      code.indexOf('private npcGlyphSprite('),
+      code.indexOf('private drawMarkers('),
+    );
+    expect(builder).toContain('NPC_GLYPH_FONT');
+    expect(builder).toContain('fillText');
+  });
+});
