@@ -4,12 +4,23 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { grantDevotion } from '../src/sim/paladin_devotion';
 import { Sim } from '../src/sim/sim';
+import { groundHeight } from '../src/sim/world';
 import type { Entity, SimEvent } from '../src/sim/types';
 
 type TestSim = Sim & {
   nextId: number;
   addEntity(entity: Entity): void;
 };
+
+// Staging ground for the Protection kit. The default spawn sits in the Eastbrook
+// plaza, whose v0.30.0 building layout blocks line of sight past ~20 yd out of it
+// in every direction, while Oath Chain and Sunward Disc need a clear lane to 27 yd
+// and Bastion Sweep needs an unobstructed arc all round. This field west of town
+// is flat (so no target slides or snaps, which the no-displacement pins require)
+// and probed clear over a 24-point short ring plus the +z lane. The y comes from
+// the terrain rather than the plaza's platform height, so targetAt() spawns mobs
+// already grounded.
+const OPEN_GROUND = { x: -60, z: -2 } as const;
 
 function makeProtection(): TestSim {
   const sim = new Sim({ seed: 7171, playerClass: 'paladin', autoEquip: true }) as TestSim;
@@ -19,6 +30,23 @@ function makeProtection(): TestSim {
   sim.equipItem('eastbrook_buckler');
   sim.player.resource = sim.player.maxResource;
   return sim;
+}
+
+// Move the staging area out of town, for the tests that need range. Everything
+// short-ranged stays on the plaza, whose geometry those pins were written
+// against. The ambient wildlife is cleared first: out in the field it would sit
+// inside Consecration and the Sunward chain, and the absorb cases pin an exact
+// Devotion count that any extra impact would inflate.
+function stageInField(sim: TestSim): void {
+  for (const [id, entity] of [...sim.entities]) {
+    if (entity.kind !== 'player') sim.entities.delete(id);
+  }
+  sim.player.pos.x = OPEN_GROUND.x;
+  sim.player.pos.z = OPEN_GROUND.z;
+  sim.player.pos.y = groundHeight(OPEN_GROUND.x, OPEN_GROUND.z, sim.cfg.seed);
+  sim.player.prevPos = { ...sim.player.pos };
+  sim.grid.refresh(sim.entities.values());
+  sim.playerGrid.update(sim.player);
 }
 
 function targetAt(sim: TestSim, distance: number, xOffset = 0): Entity {
@@ -159,11 +187,7 @@ describe('Paladin Protection abilities', () => {
 
   it('Oath Chain makes a distant enemy travel toward the Paladin before slowing it', () => {
     const sim = makeProtection();
-    sim.player.pos.x = 0;
-    sim.player.pos.z = 24;
-    sim.player.prevPos = { ...sim.player.pos };
-    sim.grid.update(sim.player);
-    sim.playerGrid.update(sim.player);
+    stageInField(sim);
     const target = targetAt(sim, 24);
     root(target);
     sim.player.facing = 0;
@@ -195,11 +219,7 @@ describe('Paladin Protection abilities', () => {
 
   it('pulls a slow-immune enemy over time without applying the final slow', () => {
     const sim = makeProtection();
-    sim.player.pos.x = 0;
-    sim.player.pos.z = 24;
-    sim.player.prevPos = { ...sim.player.pos };
-    sim.grid.update(sim.player);
-    sim.playerGrid.update(sim.player);
+    stageInField(sim);
     const target = targetAt(sim, 18);
     target.slowImmune = true;
     root(target);
@@ -219,11 +239,7 @@ describe('Paladin Protection abilities', () => {
 
   it('reindexes an Oath Chain target while it travels instead of teleporting for an immediate sweep', () => {
     const sim = makeProtection();
-    sim.player.pos.x = 0;
-    sim.player.pos.z = 24;
-    sim.player.prevPos = { ...sim.player.pos };
-    sim.grid.update(sim.player);
-    sim.playerGrid.update(sim.player);
+    stageInField(sim);
     const target = targetAt(sim, 24);
     sim.targetEntity(target.id);
 
@@ -321,6 +337,7 @@ describe('Paladin Protection abilities', () => {
 
   it('Sunward Disc damages on arrival, chains locally from each hit, and grants 1 Devotion per impact', () => {
     const sim = makeProtection();
+    stageInField(sim);
     sim.addItem('eastbrook_buckler', 1);
     sim.equipItem('eastbrook_buckler');
     const nearCaster = targetAt(sim, 2);
@@ -382,6 +399,7 @@ describe('Paladin Protection abilities', () => {
 
   it('keeps Sunward ricochets local when the primary impact is lethal', () => {
     const sim = makeProtection();
+    stageInField(sim);
     sim.addItem('eastbrook_buckler', 1);
     sim.equipItem('eastbrook_buckler');
     const nearCaster = targetAt(sim, 2);
