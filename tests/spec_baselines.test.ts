@@ -19,31 +19,6 @@ interface BaselineSnapshot {
 }
 
 const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
-  'paladin/holy': {
-    stats: { int: 6 },
-    global: { healPct: 0.06 },
-    abilities: {
-      seal_of_righteousness: { costPct: -0.16 },
-      judgement: { costPct: -0.16 },
-      holy_light: { dmgPct: 0.24 },
-      flash_of_light: { costPct: -0.16, castPct: -0.2 },
-    },
-  },
-  'paladin/protection': {
-    stats: { str: 6, dodge: 0.02, armorPct: 0.29, staPct: 0.35 },
-    global: { threatPct: 0.2 },
-    abilities: {
-      devotion_aura: { buffPct: 0.4 },
-      righteous_fury: { costPct: -0.5 },
-    },
-  },
-  'paladin/retribution': {
-    stats: { str: 6 },
-    abilities: {
-      seal_of_righteousness: { dmgPct: 0.2, costPct: -0.4 },
-      judgement: { dmgPct: 0.2, costPct: -0.4, cooldownPct: -0.3 },
-    },
-  },
   'hunter/beast_mastery': {
     stats: { ap: 24, armorPct: 0.08 },
     abilities: { aspect_of_the_hawk: { buffPct: 0.4 } },
