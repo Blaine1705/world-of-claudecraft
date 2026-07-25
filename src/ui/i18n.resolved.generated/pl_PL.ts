@@ -2452,6 +2452,7 @@ export const pl_PL: EnTranslations = {
       "targetTitle": "Wybierz przedmiot do zaklinania",
       "noEnchants": "Brak zaklinania używającego tego składnika.",
       "noTargets": "Brak kwalifikującego się przedmiotu do zaklinania.",
+      "wornTag": "Worn ({slot})",
       "tier": {
         "base": "Base Enchants",
         "runed": "Runed Enchants",

@@ -2452,6 +2452,7 @@ export const es: EnTranslations = {
       "targetTitle": "Elige un objeto para encantar",
       "noEnchants": "Ningún encantamiento usa este reactivo.",
       "noTargets": "No hay ningún objeto elegible para encantar.",
+      "wornTag": "Worn ({slot})",
       "tier": {
         "base": "Base Enchants",
         "runed": "Runed Enchants",

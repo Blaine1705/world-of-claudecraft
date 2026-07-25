@@ -2452,6 +2452,7 @@ export const ja_JP: EnTranslations = {
       "targetTitle": "エンチャントするアイテムを選択",
       "noEnchants": "この素材を使うエンチャントはありません。",
       "noTargets": "エンチャントできるアイテムがありません。",
+      "wornTag": "Worn ({slot})",
       "tier": {
         "base": "基本エンチャント",
         "runed": "ルーンエンチャント",

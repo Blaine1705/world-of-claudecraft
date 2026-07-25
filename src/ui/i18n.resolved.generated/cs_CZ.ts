@@ -2452,6 +2452,7 @@ export const cs_CZ: EnTranslations = {
       "targetTitle": "Vybrat předmět",
       "noEnchants": "Žádné okouzlení nepoužívá tuto reagencii.",
       "noTargets": "Žádný způsobilý předmět k okouzlení.",
+      "wornTag": "Worn ({slot})",
       "tier": {
         "base": "Base Enchants",
         "runed": "Runed Enchants",

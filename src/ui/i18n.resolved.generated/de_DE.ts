@@ -2452,6 +2452,7 @@ export const de_DE: EnTranslations = {
       "targetTitle": "Wähle einen Gegenstand zum Verzaubern",
       "noEnchants": "Keine Verzauberung verwendet dieses Reagenz.",
       "noTargets": "Kein geeigneter Gegenstand zum Verzaubern.",
+      "wornTag": "Worn ({slot})",
       "tier": {
         "base": "Base Enchants",
         "runed": "Runed Enchants",

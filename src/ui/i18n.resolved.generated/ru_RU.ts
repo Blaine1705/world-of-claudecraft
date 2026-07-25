@@ -2452,6 +2452,7 @@ export const ru_RU: EnTranslations = {
       "targetTitle": "Выберите предмет для зачарования",
       "noEnchants": "Нет чар, использующих этот реагент.",
       "noTargets": "Нет подходящего предмета для зачарования.",
+      "wornTag": "Worn ({slot})",
       "tier": {
         "base": "Базовые чары",
         "runed": "Рунные чары",

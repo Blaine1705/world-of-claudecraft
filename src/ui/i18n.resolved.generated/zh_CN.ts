@@ -2452,6 +2452,7 @@ export const zh_CN: EnTranslations = {
       "targetTitle": "选择要附魔的物品",
       "noEnchants": "没有附魔会用到这种材料。",
       "noTargets": "没有可供附魔的物品。",
+      "wornTag": "Worn ({slot})",
       "tier": {
         "base": "基础附魔",
         "runed": "符文附魔",

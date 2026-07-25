@@ -2452,6 +2452,7 @@ export const ko_KR: EnTranslations = {
       "targetTitle": "마법부여할 아이템을 선택하세요",
       "noEnchants": "이 재료를 사용하는 마법부여가 없습니다.",
       "noTargets": "마법부여할 수 있는 아이템이 없습니다.",
+      "wornTag": "Worn ({slot})",
       "tier": {
         "base": "기본 마법부여",
         "runed": "룬 마법부여",

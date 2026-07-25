@@ -2768,6 +2768,13 @@ export const hudChromeStrings = {
     targetTitle: 'Choose an item to enchant',
     noEnchants: 'No enchant uses this reagent.',
     noTargets: 'No eligible item to enchant.',
+    // The tag on a WORN target row in the Apply Enchant picker: worn gear is
+    // enchanted in place, so it lists alongside the bagged copies and needs to
+    // say which equipment slot it is on ({slot} resolves through the shared
+    // itemUi.slots labels, so Main Hand and Off Hand separate a dual-wielded
+    // pair). Both rings share the one "Finger" label there, which is fine: two
+    // eligible identical rings take the same enchant either way.
+    wornTag: 'Worn ({slot})',
     // The Apply Enchant picker's three section headers, in ladder order. The
     // tier is derived from the reagents alone (enchant_apply_view.ts
     // enchantTier), so these headers name the same ladder content/enchants.ts

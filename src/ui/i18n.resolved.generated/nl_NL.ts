@@ -2452,6 +2452,7 @@ export const nl_NL: EnTranslations = {
       "targetTitle": "Kies een voorwerp om te betoveren",
       "noEnchants": "Geen betovering gebruikt dit reagens.",
       "noTargets": "Geen geschikt voorwerp om te betoveren.",
+      "wornTag": "Worn ({slot})",
       "tier": {
         "base": "Base Enchants",
         "runed": "Runed Enchants",

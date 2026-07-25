@@ -31,15 +31,39 @@ function defFor(quality: NonNullable<ItemDef['quality']>): ItemDef {
   return found;
 }
 
-function harness(innerHeight: number, inventory: InvSlot[] = [{ itemId: DUST, count: 99 }]) {
+/** The world surface the picker reads. The worn-target step needs the paperdoll
+ *  and the self entity mirror on top of the inventory, so the second harness
+ *  argument accepts either a bare inventory (the common case) or this record. */
+interface WorldStub {
+  inventory?: InvSlot[];
+  equipment?: Record<string, string>;
+  equippedInstances?: Record<string, unknown>;
+}
+
+function harness(innerHeight: number, stubOrInventory: WorldStub | InvSlot[] = {}) {
+  const stub: WorldStub = Array.isArray(stubOrInventory)
+    ? { inventory: stubOrInventory }
+    : stubOrInventory;
   Object.defineProperty(window, 'innerHeight', { value: innerHeight, configurable: true });
   const el = document.createElement('div');
   document.body.append(el);
   const placed: { reserveRight: number; reserveBottom: number }[] = [];
+  const applied: { itemId: string; enchantId: string; slot?: string }[] = [];
   const confirms: { title: string; body: string; ok: string }[] = [];
   let activate: ((act: string) => void) | null = null;
+  // The self entity mirror carries equippedInstances in both worlds, which is
+  // where the painter reads the worn payloads from.
+  const world = {
+    inventory: stub.inventory ?? [{ itemId: DUST, count: 99 }],
+    equipment: stub.equipment ?? {},
+    playerId: 1,
+    entities: new Map([[1, { equippedInstances: stub.equippedInstances ?? {} }]]),
+    applyEnchant: (itemId: string, enchantId: string, slot?: string) => {
+      applied.push({ itemId, enchantId, slot });
+    },
+  };
   const menu = new BagItemActionMenu({
-    world: () => ({ inventory }) as unknown as IWorld,
+    world: () => world as unknown as IWorld,
     ctxMenu: {
       element: () => el,
       place: (_el, _x, _y, reserveRight, reserveBottom) => {
@@ -63,12 +87,38 @@ function harness(innerHeight: number, inventory: InvSlot[] = [{ itemId: DUST, co
     if (!activate) throw new Error('bind never called');
     activate('applyEnchant');
   };
+  // Step three: drill from the reagent menu into one enchant's target step.
+  const openTargets = (enchantId: string) => {
+    openPicker();
+    if (!activate) throw new Error('bind never called');
+    activate(`enchant:${enchantId}`);
+  };
+  const rows = () =>
+    [...el.querySelectorAll('.ctx-item')].map((row) => ({
+      act: row.getAttribute('data-act'),
+      text: row.textContent ?? '',
+    }));
+  const click = (act: string) => {
+    if (!activate) throw new Error('bind never called');
+    activate(act);
+  };
   const runAction = (itemId: string, act: string) => {
     openFor(itemId);
     if (!activate) throw new Error('bind never called');
     activate(act);
   };
-  return { el, placed, confirms, openPlain, openPicker, runAction };
+  return {
+    el,
+    placed,
+    applied,
+    confirms,
+    openPlain,
+    openPicker,
+    openTargets,
+    rows,
+    click,
+    runAction,
+  };
 }
 
 describe('BagItemActionMenu.paint placement reserves', () => {
@@ -266,5 +316,71 @@ describe('disenchant confirm: expected-yield preview', () => {
     expect(h.confirms).toHaveLength(1);
     expect(h.confirms[0].body).not.toContain('\n');
     expect(h.confirms[0].body).not.toContain('Expected materials');
+  });
+});
+
+// The target step lists BOTH families: bagged copies and worn ones (worn gear
+// is enchanted in place). A worn row carries its equipment slot in its label
+// AND in its dispatch, which is what separates a dual-wielded pair.
+describe('BagItemActionMenu target step: worn rows', () => {
+  const SWORD = 'eastbrook_arming_sword'; // def slot 'mainhand'
+  const WEAPON_ENCHANT = 'enchant_weapon_might';
+
+  it('lists a worn copy alongside the bagged ones, tagged with its slot', () => {
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        { itemId: SWORD, count: 1 },
+      ],
+      equipment: { mainhand: SWORD },
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    const acts = h.rows().map((row) => row.act);
+    // The worn target and the bagged one are BOTH offered; the worn row leads.
+    expect(acts).toEqual(['worn:mainhand', `target:${SWORD}`]);
+    // slotName is stubbed to the raw slot key in this harness, so the tag shows
+    // the localized "Worn (...)" wrapper around it.
+    expect(h.rows()[0].text).toContain('Worn (mainhand)');
+    expect(h.rows()[1].text).not.toContain('Worn');
+  });
+
+  it('dispatches the WORN row with its slot and the BAGGED row without one', () => {
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        { itemId: SWORD, count: 1 },
+      ],
+      equipment: { mainhand: SWORD },
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    h.click('worn:mainhand');
+    expect(h.applied).toEqual([{ itemId: SWORD, enchantId: WEAPON_ENCHANT, slot: 'mainhand' }]);
+
+    h.openTargets(WEAPON_ENCHANT);
+    h.click(`target:${SWORD}`);
+    // The bagged arm sends no slot at all: byte-identical to the pre-feature call.
+    expect(h.applied[1]).toEqual({ itemId: SWORD, enchantId: WEAPON_ENCHANT, slot: undefined });
+  });
+
+  it('lists both hands separately, each dispatching its own slot', () => {
+    const h = harness(768, {
+      inventory: [{ itemId: DUST, count: 99 }],
+      equipment: { mainhand: SWORD, offhand: SWORD },
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    expect(h.rows().map((row) => row.act)).toEqual(['worn:mainhand', 'worn:offhand']);
+    h.click('worn:offhand');
+    expect(h.applied).toEqual([{ itemId: SWORD, enchantId: WEAPON_ENCHANT, slot: 'offhand' }]);
+  });
+
+  it('omits an already-enchanted worn copy and falls back to the empty state', () => {
+    const h = harness(768, {
+      inventory: [{ itemId: DUST, count: 99 }],
+      equipment: { mainhand: SWORD },
+      equippedInstances: { mainhand: { enchant: WEAPON_ENCHANT } },
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    // No selectable row survives, so the picker shows only the inert empty line.
+    expect(h.rows().map((row) => row.act)).toEqual([null]);
   });
 });

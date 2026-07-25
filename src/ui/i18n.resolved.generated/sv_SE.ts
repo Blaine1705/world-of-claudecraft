@@ -2452,6 +2452,7 @@ export const sv_SE: EnTranslations = {
       "targetTitle": "Välj ett föremål att förtrylla",
       "noEnchants": "Inget förtrollning använder det reagnset.",
       "noTargets": "Inget behörigt föremål att förtrylla.",
+      "wornTag": "Worn ({slot})",
       "tier": {
         "base": "Base Enchants",
         "runed": "Runed Enchants",

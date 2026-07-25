@@ -609,6 +609,15 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   // mirror goes stale until the staggered refresh. Also refreshes the purse
   // for the fee debit.
   'unbindResult',
+  // Apply-enchant, for the same reason as unbindResult above: the WORN arm
+  // (src/sim/professions/enchanting.ts resolveApplyEnchantWorn) enchants in
+  // place, so it only REMOVES reagents and emits no loot event. Without this the
+  // enchant itself would show at once (it rides the `eqi` identity diff, which
+  // recalcPlayerStats rebuilds) while the spent reagents lingered in the bag
+  // mirror until the staggered refresh, and re-opening the picker could still
+  // offer an enchant the player can no longer afford. The bagged arm's loot
+  // event already covered it; this makes both arms explicit.
+  'enchantResult',
 ]);
 
 // How often to re-broadcast online players' $WOC holder-tier flair. Each wallet
@@ -4296,15 +4305,30 @@ export class GameServer {
       // resolvers re-validate ownership/eligibility/throttle (nothing trusted
       // from the client); the outcome reaches this client as the pid-scoped
       // disenchantResult/enchantResult/salvageResult event plus the denc/ench/salv
-      // self-delta. A successful action emits a `loot` event (a HEAVY_SELF_EVENTS
-      // member) via the inventory hub, so the self inventory refreshes exactly like
-      // a craft; no explicit dirty-marking is needed here.
+      // self-delta. A successful disenchant/salvage, and a bagged apply, emit a
+      // `loot` event (a HEAVY_SELF_EVENTS member) via the inventory hub, so the self
+      // inventory refreshes exactly like a craft; no explicit dirty-marking is needed
+      // here. The WORN apply arm mints nothing and so emits no loot event, which is
+      // why `enchantResult` is itself a HEAVY_SELF_EVENTS member (the unbindResult
+      // precedent): otherwise the spent reagents would linger in the bag mirror.
       case 'disenchant_item':
         if (typeof msg.item === 'string') sim.disenchantItem(msg.item, pid);
         break;
       case 'apply_enchant':
-        if (typeof msg.item === 'string' && typeof msg.enchant === 'string')
-          sim.applyEnchant(msg.item, msg.enchant, pid);
+        if (typeof msg.item === 'string' && typeof msg.enchant === 'string') {
+          // The optional worn target (the in-place enchant arm) is accepted only
+          // when it names a real equipment key, the same untrusted-input rule the
+          // 'equip' case above applies to its aimed slot; anything else falls back
+          // to undefined, which is the bagged arm. The sim then re-validates that
+          // the named slot is actually wearing this item id and that the worn copy
+          // is not already enchanted.
+          const worn =
+            typeof msg.slot === 'string' &&
+            (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
+              ? (msg.slot as EquipSlot)
+              : undefined;
+          sim.applyEnchant(msg.item, msg.enchant, worn, pid);
+        }
         break;
       case 'salvage_item':
         if (typeof msg.item === 'string') sim.salvageItem(msg.item, pid);

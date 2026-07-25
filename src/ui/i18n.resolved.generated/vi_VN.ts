@@ -2452,6 +2452,7 @@ export const vi_VN: EnTranslations = {
       "targetTitle": "Chọn vật phẩm để pháp khắc",
       "noEnchants": "Không có phép khắc nào dùng nguyên liệu này.",
       "noTargets": "Không có vật phẩm nào hợp lệ để pháp khắc.",
+      "wornTag": "Worn ({slot})",
       "tier": {
         "base": "Base Enchants",
         "runed": "Runed Enchants",

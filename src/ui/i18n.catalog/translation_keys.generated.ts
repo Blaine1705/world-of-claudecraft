@@ -5847,6 +5847,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.enchanting.tier.base'
   | 'hudChrome.enchanting.tier.greater'
   | 'hudChrome.enchanting.tier.runed'
+  | 'hudChrome.enchanting.wornTag'
   | 'hudChrome.enchanting.yieldHeader'
   | 'hudChrome.enchanting.yieldLineExact'
   | 'hudChrome.enchanting.yieldLineRange'

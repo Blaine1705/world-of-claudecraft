@@ -2452,6 +2452,7 @@ export const fr_CA: EnTranslations = {
       "targetTitle": "Choisissez un objet à enchanter",
       "noEnchants": "Aucun enchantement n'utilise ce réactif.",
       "noTargets": "Aucun objet éligible à enchanter.",
+      "wornTag": "Worn ({slot})",
       "tier": {
         "base": "Base Enchants",
         "runed": "Runed Enchants",

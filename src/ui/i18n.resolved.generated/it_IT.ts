@@ -2452,6 +2452,7 @@ export const it_IT: EnTranslations = {
       "targetTitle": "Scegli un oggetto da incantare",
       "noEnchants": "Nessun incantesimo utilizza questo reagente.",
       "noTargets": "Nessun oggetto idoneo da incantare.",
+      "wornTag": "Worn ({slot})",
       "tier": {
         "base": "Base Enchants",
         "runed": "Runed Enchants",

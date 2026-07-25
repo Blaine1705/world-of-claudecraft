@@ -2452,6 +2452,7 @@ export const id_ID: EnTranslations = {
       "targetTitle": "Pilih barang untuk dimantrai",
       "noEnchants": "Tidak ada mantrai yang menggunakan reagen ini.",
       "noTargets": "Tidak ada barang yang memenuhi syarat untuk dimantrai.",
+      "wornTag": "Worn ({slot})",
       "tier": {
         "base": "Base Enchants",
         "runed": "Runed Enchants",
