@@ -4776,10 +4776,19 @@ export class GameServer {
                   ? 'yumi5'
                   : '1v1';
         sim.arenaQueueJoin(pid, fmt);
+        // ARENA_WIRE_HZ throttles the `arena` self key to once per 10s (the
+        // #940 perf fix for the uncached arenaLadder() sort), so without this
+        // the Arena window would keep showing the stale Queue button for up to
+        // 10s after the player just clicked it. Force the next snapshot to
+        // carry fresh arenaInfo, same reset used at the spectate transitions.
+        session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
         break;
       }
       case 'arena_leave':
         sim.arenaQueueLeave(pid);
+        // Same staleness fix as arena_queue above: surface the cleared queue
+        // state immediately instead of on the next throttled tick.
+        session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
         break;
       case 'arena_augment': {
         if (typeof msg.augment === 'string' && msg.augment.length <= 64)
@@ -6511,6 +6520,11 @@ export class GameServer {
               // a sim-driven change to a heavy self field (loot, level-up, quest
               // credit, ...) refreshes those fields on the next snapshot
               if (HEAVY_SELF_EVENTS.has(ev.type)) session.selfHeavyDirty = true;
+              // A match concluding (win, loss, draw, or forfeit) changes rating
+              // and standings on the throttled `arena` self key (ARENA_WIRE_HZ):
+              // force it fresh next snapshot instead of leaving the Arena
+              // window showing the pre-match rating for up to 10s.
+              if (ev.type === 'arenaEnd') session.lastArenaWireTick = -ARENA_WIRE_INTERVAL_TICKS;
               // remember the last person to whisper us, for /r reply (the
               // recipient copy of a whisper has no `to`; the sender echo does)
               if (
