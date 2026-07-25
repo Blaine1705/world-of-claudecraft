@@ -649,7 +649,9 @@ const protection: AbilityDef[] = [
     name: 'Holy Ground',
     class: 'paladin',
     specs: ['protection', 'retribution'],
-    learnLevel: 9,
+    // Both melee specs get it the moment they specialize: Faithwarden needs its
+    // ground threat from the first pull, and Dawnreaver its opener.
+    learnLevel: 5,
     cost: 35,
     castTime: 0,
     cooldown: 12,
