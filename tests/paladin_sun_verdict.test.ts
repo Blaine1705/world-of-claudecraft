@@ -60,7 +60,7 @@ describe('Verdict of the Sun God', () => {
     expect(resolve(sim, 'sun_gods_verdict').def).toMatchObject({
       name: 'Verdict of the Sun God',
       specs: ['retribution'],
-      learnLevel: 20,
+      learnLevel: 17,
       cooldown: 60,
       range: 30,
       requiresTarget: true,

@@ -988,7 +988,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': 'Dödfrost',
   'entities.abilities.desperate_prayer.name': 'Sista bön',
   'entities.abilities.deterrence.name': 'Borstvakt',
-  'entities.abilities.divine_shield.name': 'Ljusvärn',
   'entities.abilities.earthbind.name': 'Gripande jord',
   'entities.abilities.evocation.name': 'Eterbrunn',
   'entities.abilities.frenzied_regeneration.name': 'Vild läkning',
@@ -996,7 +995,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': 'Vålnadsslag',
   'entities.abilities.hammer_of_wrath.name': 'Klingande hammare',
   'entities.abilities.healing_stream.name': 'Källbrunn',
-  'entities.abilities.holy_wrath.name': 'Helgonvrede',
   'entities.abilities.howl_of_terror.name': 'Skräckyl',
   'entities.abilities.ice_block.name': 'Kall kista',
   'entities.abilities.inner_focus.name': 'Stillat sinne',
@@ -1011,9 +1009,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.name': 'Skuggkliv',
   'entities.abilities.silence.name': 'Tystnad',
   'entities.abilities.tranquility.name': 'Gläntsång',
-  'entities.abilities.cleansing_verdict.name': 'Renande Domslut',
-  'entities.abilities.cleansing_verdict.description':
-    'Rensar bort en skadlig magisk effekt från ett vänligt mål och helar det med Helig magi för {damage}.',
   'entities.abilities.smoke_screen.name': 'Rökridå',
   'entities.abilities.smoke_screen.description':
     'Du försvinner i ett rökmoln, vilket ökar din chans att undvika med 30 % i 8 sek.',
@@ -8374,9 +8369,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.revenge':
     'Träffar fiender framför dig och kan bli kostnadsfri efter en undvikning eller parering.',
   'guide.abilityHook.hamstring': 'Hämmar en fiendes rörelse så att den inte kan fly.',
-  'entities.abilities.aura_surge.name': 'Gryningsrikoschett',
-  'entities.abilities.aura_surge.description':
-    'Slungar en gryningssmidd sköld för {damage} Helig skada, tystar huvudmålet i 2 sek. och studsar sedan till upp till 2 ytterligare fiender inom 10 meter för 75% skada per studs. (Paladintalang)',
   'entities.abilities.aspect_of_the_wild.description':
     'Inspirerar allierade inom 30 m med vild kraft och ökar deras attackkraft med 45 och attackhastighet med 5 % i 5 min. (jägartalang)',
   'entities.abilities.avatar.name': 'Avatar',
@@ -8410,8 +8402,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Helar dig omedelbart för {damage}. (prästtalang)',
   'entities.abilities.deterrence.description':
     'Ökar din chans att undvika med 50 procentenheter i 10 sek. (jägartalang)',
-  'entities.abilities.divine_shield.description':
-    'Skyddar dig med helig kraft och absorberar 900 skada i 8 sek. (paladintalang)',
   'entities.abilities.earthbind.description':
     'Binder fiender i närheten till marken och rotar dem i 2 sek. (schamantalang)',
   'entities.abilities.evocation.description': 'Restaura mana rápidamente. (magikertalang)',
@@ -8425,8 +8415,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Slungar en helig hammare mot en sårad fiende och ger {damage} Helig skada. Kan bara användas under 20 % hälsa. (paladintalang)',
   'entities.abilities.healing_stream.description':
     'Återställer 120 hälsa hos ett allierat mål under 12 sek. (schamantalang)',
-  'entities.abilities.holy_wrath.description':
-    'Släpper lös helig kraft och ger {damage} skada till fiender i närheten. (paladintalang)',
   'entities.abilities.howl_of_terror.description':
     'Skrämmer fiender i närheten i upp till 3 sek. Skada kan bryta effekten. (häxmästartalang)',
   'entities.abilities.ice_block.description':

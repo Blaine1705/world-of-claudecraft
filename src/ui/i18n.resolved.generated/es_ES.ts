@@ -7073,7 +7073,7 @@ export const es_ES: EnTranslations = {
       },
       "guardian_covenant": {
         "name": "Guardian Covenant",
-        "description": "Protects an ally, reducing their damage taken by 20% for 8 sec."
+        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
       },
       "solar_step": {
         "name": "Solar Step",
@@ -7551,10 +7551,6 @@ export const es_ES: EnTranslations = {
         "name": "Choque Sagrado",
         "description": "Sacude a un objetivo amistoso con energía Sagrada y lo sana por {damage}. (habilidad distintiva de Sagrado)"
       },
-      "aura_surge": {
-        "name": "Rebote del Alba",
-        "description": "Lanza un escudo forjado al alba que inflige {damage} de daño Sagrado, silencia al objetivo principal durante 2 s y rebota hasta en 2 enemigos adicionales en un radio de 10 m, infligiendo un 75% de daño por rebote. (talento de Paladín)"
-      },
       "holy_shield": {
         "name": "Escudo Sagrado",
         "description": "Te protege con poder Sagrado durante 10 s, aumenta la armadura en 90 y golpea a los atacantes cuerpo a cuerpo con 12 de daño Sagrado. (habilidad distintiva de Protección)"
@@ -7811,10 +7807,6 @@ export const es_ES: EnTranslations = {
         "name": "Descarga de Ruina",
         "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Fuego. (talento de Brujo)"
       },
-      "cleansing_verdict": {
-        "name": "Veredicto Purificador",
-        "description": "Purga un efecto mágico perjudicial de un objetivo amistoso y lo sana con {damage} de magia Sagrada."
-      },
       "cloak_of_shadows": {
         "name": "Capa Sombría",
         "description": "Te envuelve en sombras y absorbe 420 de daño durante 5 s. (talento de Pícaro)"
@@ -7847,10 +7839,6 @@ export const es_ES: EnTranslations = {
         "name": "Guardia de Zarzas",
         "description": "Aumenta tu probabilidad de esquivar en 50 puntos porcentuales durante 10 s. (talento de Cazador)"
       },
-      "divine_shield": {
-        "name": "Resguardo de Luz",
-        "description": "Te protege con poder sagrado y absorbe 900 de daño durante 8 s. (talento de Paladín)"
-      },
       "earthbind": {
         "name": "Tierra Prensora",
         "description": "Ata a la tierra a los enemigos cercanos y los inmoviliza durante 2 s. (talento de Chamán)"
@@ -7878,10 +7866,6 @@ export const es_ES: EnTranslations = {
       "healing_stream": {
         "name": "Manantial",
         "description": "Restaura 120 de salud a un objetivo aliado durante 12 s. (talento de Chamán)"
-      },
-      "holy_wrath": {
-        "name": "Ira del Santo",
-        "description": "Desata poder sagrado e inflige {damage} de daño a los enemigos cercanos. (talento de Paladín)"
       },
       "howl_of_terror": {
         "name": "Aullido Pavoroso",

@@ -602,10 +602,6 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Hushbrand"
       },
       {
-        "id": "guardian_covenant",
-        "name": "Guardian Covenant"
-      },
-      {
         "id": "solar_step",
         "name": "Solar Step"
       },
@@ -636,6 +632,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "hammer_of_wrath",
         "name": "Hammer of Wrath"
+      },
+      {
+        "id": "guardian_covenant",
+        "name": "Guardian Covenant"
       },
       {
         "id": "avenging_wrath",

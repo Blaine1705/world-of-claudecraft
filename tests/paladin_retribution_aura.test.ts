@@ -40,10 +40,10 @@ function connectMobSwings(sim: Sim, mob: Entity, target: Entity, n: number) {
 }
 
 describe('paladin Retribution Aura', () => {
-  it('is a holy, zero-cost permanent party aura learned at level 16', () => {
-    const def = ABILITIES['retribution_aura'];
+  it('is a holy, zero-cost permanent party aura learned at level 7', () => {
+    const def = ABILITIES.retribution_aura;
     expect(def.class).toBe('paladin');
-    expect(def.learnLevel).toBe(16);
+    expect(def.learnLevel).toBe(7);
     expect(def.cost).toBe(0);
     expect(def.school).toBe('holy');
     expect(def.effects[0]).toMatchObject({
@@ -52,7 +52,7 @@ describe('paladin Retribution Aura', () => {
       party: true,
       permanent: true,
     });
-    expect(CLASSES['paladin'].abilities).toContain('retribution_aura');
+    expect(CLASSES.paladin.abilities).toContain('retribution_aura');
   });
 
   it('reflects flat Holy damage onto a melee attacker while active', () => {

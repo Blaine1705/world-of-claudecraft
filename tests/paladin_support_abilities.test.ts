@@ -79,26 +79,70 @@ function aura(
 }
 
 describe('Paladin support abilities', () => {
-  it('applies Guardian Covenant to an ally and exposes its physical wing visual', () => {
+  it('applies Guardian Covenant to both a targeted ally and the Retribution paladin', () => {
     const sim = new Sim({ seed: 159, playerClass: 'paladin', autoEquip: true });
     sim.setPlayerLevel(20);
-    sim.setSpec('holy');
+    sim.setSpec('retribution');
     const allyId = sim.addPlayer('priest', 'Guardian Ally');
     sim.setPlayerLevel(20, allyId);
     const ally = sim.entities.get(allyId);
     if (!ally) throw new Error('missing Guardian Covenant ally');
 
-    run(sim, ally, resolve(sim, 'guardian_covenant'));
+    sim.castAbilityOn('guardian_covenant', allyId);
 
-    expect(ally.auras).toContainEqual(
+    const covenantAura = expect.objectContaining({
+      id: 'guardian_covenant',
+      kind: 'buff_dr',
+      value: 0.2,
+      remaining: 8,
+    });
+    expect(ally.auras).toContainEqual(covenantAura);
+    expect(sim.player.auras).toContainEqual(covenantAura);
+    expect(characterPaladinWingsActive(ally)).toBe(true);
+    expect(characterPaladinWingsActive(sim.player)).toBe(true);
+  });
+
+  it('self-casts Guardian Covenant when no friendly target is selected', () => {
+    const sim = new Sim({ seed: 160, playerClass: 'paladin', autoEquip: true });
+    sim.setPlayerLevel(12);
+    sim.setSpec('retribution');
+    const hostile = hostileNear(sim);
+    sim.targetEntity(hostile.id);
+
+    sim.castAbility('guardian_covenant');
+
+    const covenantAuras = sim.player.auras.filter(({ id }) => id === 'guardian_covenant');
+    expect(covenantAuras).toEqual([
       expect.objectContaining({
-        id: 'guardian_covenant',
         kind: 'buff_dr',
         value: 0.2,
         remaining: 8,
       }),
-    );
-    expect(characterPaladinWingsActive(ally)).toBe(true);
+    ]);
+  });
+
+  it('empowers both Guardian Covenant recipients during a real Ascension cast', () => {
+    const sim = new Sim({ seed: 161, playerClass: 'paladin', autoEquip: true });
+    sim.setPlayerLevel(20);
+    sim.setSpec('retribution');
+    const allyId = sim.addPlayer('priest', 'Ascended Guardian Ally');
+    sim.setPlayerLevel(20, allyId);
+    const ally = sim.entities.get(allyId);
+    if (!ally) throw new Error('missing Ascended Guardian Covenant ally');
+    grantDevotion(sim.player, 20);
+    expect(activateDivineAscension(sim.player)).toBe(true);
+
+    sim.castAbilityOn('guardian_covenant', allyId);
+
+    const empoweredAura = expect.objectContaining({
+      id: 'guardian_covenant',
+      kind: 'buff_dr',
+      value: 0.3,
+      remaining: 8,
+    });
+    expect(ally.auras).toContainEqual(empoweredAura);
+    expect(sim.player.auras).toContainEqual(empoweredAura);
+    expect(sim.player.paladinDevotion?.ascensionCharges).toBe(4);
   });
 
   it('exposes the restored support kit with the requested values and gates', () => {
@@ -135,7 +179,7 @@ describe('Paladin support abilities', () => {
     expect(ABILITIES.righteous_fury.hiddenFromPlayer).not.toBe(true);
     expect(ABILITIES.consecration).toMatchObject({
       name: 'Holy Ground',
-      learnLevel: 10,
+      learnLevel: 9,
       cooldown: 12,
       specs: ['protection', 'retribution'],
     });
@@ -144,6 +188,13 @@ describe('Paladin support abilities', () => {
       name: 'Requital Aura',
     });
     expect(ABILITIES.retribution_aura.hiddenFromPlayer).not.toBe(true);
+    expect(ABILITIES.guardian_covenant).toMatchObject({
+      name: 'Guardian Covenant',
+      learnLevel: 12,
+      specs: ['retribution'],
+      requiresTarget: true,
+      targetType: 'friendly',
+    });
 
     const mods = (spec: 'protection' | 'holy' | 'retribution') =>
       computeTalentModifiers('paladin', { spec, ranks: {}, choices: {} }, 20);
@@ -160,10 +211,10 @@ describe('Paladin support abilities', () => {
     expect(known('protection')).toEqual(
       expect.arrayContaining([...tankOnly, 'righteous_fury', 'consecration', 'hushbrand']),
     );
-    expect(known('retribution')).toEqual(expect.arrayContaining(['consecration', 'hushbrand']));
-    expect(known('holy')).toEqual(
-      expect.arrayContaining(['guardian_covenant', 'solar_step', 'solar_invocation']),
+    expect(known('retribution')).toEqual(
+      expect.arrayContaining(['consecration', 'hushbrand', 'guardian_covenant']),
     );
+    expect(known('holy')).toEqual(expect.arrayContaining(['solar_step', 'solar_invocation']));
     for (const id of [...tankOnly, 'righteous_fury', 'consecration', 'hushbrand']) {
       expect(known('holy')).not.toContain(id);
     }
@@ -172,8 +223,9 @@ describe('Paladin support abilities', () => {
     }
     for (const id of ['guardian_covenant', 'solar_invocation']) {
       expect(known('protection')).not.toContain(id);
-      expect(known('retribution')).not.toContain(id);
     }
+    expect(known('holy')).not.toContain('guardian_covenant');
+    expect(known('retribution')).not.toContain('solar_invocation');
     expect(known('protection')).toContain('solar_step');
     expect(known('retribution')).toContain('solar_step');
     expect(known('protection')).toContain('avenging_wrath');

@@ -7073,7 +7073,7 @@ export const nl_NL: EnTranslations = {
       },
       "guardian_covenant": {
         "name": "Guardian Covenant",
-        "description": "Protects an ally, reducing their damage taken by 20% for 8 sec."
+        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
       },
       "solar_step": {
         "name": "Solar Step",
@@ -7551,10 +7551,6 @@ export const nl_NL: EnTranslations = {
         "name": "Heilige schok",
         "description": "Schokt een bevriend doelwit met Heilige energie en geneest het voor {damage}. (Heilig signatuur)"
       },
-      "aura_surge": {
-        "name": "Dageraadskets",
-        "description": "Slingert een bij dageraad gesmeed schild voor {damage} Heilige schade, legt het hoofddoel 2 sec. het zwijgen op en stuitert daarna naar maximaal 2 extra vijanden binnen 10 meter voor 75% schade per stuiter. (Paladijntalent)"
-      },
       "holy_shield": {
         "name": "Heilig schild",
         "description": "Beschermt je 10 sec met Heilige kracht, verhoogt pantser met 90 en raakt melee-aanvallers voor 12 Heilige schade. (Bescherming signatuur)"
@@ -7811,10 +7807,6 @@ export const nl_NL: EnTranslations = {
         "name": "Ruinenschicht",
         "description": "Slingert een chaotische vuurstraal die {damage} Vuurschade toebrengt. (tovenaarstalent)"
       },
-      "cleansing_verdict": {
-        "name": "Zuiverend Vonnis",
-        "description": "Verwijdert een schadelijk magisch effect van een bevriend doelwit en geneest het met Heilige magie voor {damage}."
-      },
       "cloak_of_shadows": {
         "name": "Schaduwmantel",
         "description": "Hult je in schaduwen en absorbeert 420 schade gedurende 5 sec. (schurkentalent)"
@@ -7847,10 +7839,6 @@ export const nl_NL: EnTranslations = {
         "name": "Borstelwacht",
         "description": "Verhoogt je ontwijkingskans met 50 procentpunten gedurende 10 sec. (jagertalent)"
       },
-      "divine_shield": {
-        "name": "Lichtwacht",
-        "description": "Beschermt je met heilige kracht en absorbeert 900 schade gedurende 8 sec. (paladijntalent)"
-      },
       "earthbind": {
         "name": "Grijpende aarde",
         "description": "Bindt nabije vijanden aan de aarde en wortelt ze 2 sec. (sjamaantalent)"
@@ -7878,10 +7866,6 @@ export const nl_NL: EnTranslations = {
       "healing_stream": {
         "name": "Bronwel",
         "description": "Herstelt 120 gezondheid van een bevriend doelwit gedurende 12 sec. (sjamaantalent)"
-      },
-      "holy_wrath": {
-        "name": "Heiligenwoede",
-        "description": "Ontketent heilige kracht en brengt nabije vijanden {damage} schade toe. (paladijntalent)"
       },
       "howl_of_terror": {
         "name": "Huiveringwekkende huil",

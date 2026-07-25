@@ -1081,7 +1081,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': 'Doodsvorst',
   'entities.abilities.desperate_prayer.name': 'Laatste gebed',
   'entities.abilities.deterrence.name': 'Borstelwacht',
-  'entities.abilities.divine_shield.name': 'Lichtwacht',
   'entities.abilities.earthbind.name': 'Grijpende aarde',
   'entities.abilities.evocation.name': 'Etherbron',
   'entities.abilities.frenzied_regeneration.name': 'Wilde genezing',
@@ -1089,7 +1088,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': 'Spookslag',
   'entities.abilities.hammer_of_wrath.name': 'Klinkende hamer',
   'entities.abilities.healing_stream.name': 'Bronwel',
-  'entities.abilities.holy_wrath.name': 'Heiligenwoede',
   'entities.abilities.howl_of_terror.name': 'Huiveringwekkende huil',
   'entities.abilities.ice_block.name': 'Koude kist',
   'entities.abilities.inner_focus.name': 'Gestilde geest',
@@ -1104,9 +1102,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.name': 'Schaduwglip',
   'entities.abilities.silence.name': 'Stilte',
   'entities.abilities.tranquility.name': 'Woudlied',
-  'entities.abilities.cleansing_verdict.name': 'Zuiverend Vonnis',
-  'entities.abilities.cleansing_verdict.description':
-    'Verwijdert een schadelijk magisch effect van een bevriend doelwit en geneest het met Heilige magie voor {damage}.',
   'entities.abilities.smoke_screen.name': 'Rookgordijn',
   'entities.abilities.smoke_screen.description':
     'Je verdwijnt in een rookwolk, waardoor je ontwijkingskans 8 sec. lang met 30% toeneemt.',
@@ -8600,9 +8595,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Raakt vijanden voor je en kan gratis worden na een ontwijking of parering.',
   'guide.abilityHook.hamstring':
     'Belemmert de beweging van een vijand zodat die niet kan ontsnappen.',
-  'entities.abilities.aura_surge.name': 'Dageraadskets',
-  'entities.abilities.aura_surge.description':
-    'Slingert een bij dageraad gesmeed schild voor {damage} Heilige schade, legt het hoofddoel 2 sec. het zwijgen op en stuitert daarna naar maximaal 2 extra vijanden binnen 10 meter voor 75% schade per stuiter. (Paladijntalent)',
   'entities.abilities.aspect_of_the_wild.description':
     'Inspireert bondgenoten binnen 30 m met wilde kracht en verhoogt hun aanvalskracht met 45 en aanvalssnelheid met 5% gedurende 5 min. (jagertalent)',
   'entities.abilities.avatar.name': 'Avatar',
@@ -8637,8 +8629,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Geneest je direct voor {damage}. (priestertalent)',
   'entities.abilities.deterrence.description':
     'Verhoogt je ontwijkingskans met 50 procentpunten gedurende 10 sec. (jagertalent)',
-  'entities.abilities.divine_shield.description':
-    'Beschermt je met heilige kracht en absorbeert 900 schade gedurende 8 sec. (paladijntalent)',
   'entities.abilities.earthbind.description':
     'Bindt nabije vijanden aan de aarde en wortelt ze 2 sec. (sjamaantalent)',
   'entities.abilities.evocation.description': 'Restaura mana rápidamente. (magiertalent)',
@@ -8652,8 +8642,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Slingert een heilige hamer naar een gewonde vijand en brengt {damage} Heilige schade toe. Alleen bruikbaar onder 20% gezondheid. (paladijntalent)',
   'entities.abilities.healing_stream.description':
     'Herstelt 120 gezondheid van een bevriend doelwit gedurende 12 sec. (sjamaantalent)',
-  'entities.abilities.holy_wrath.description':
-    'Ontketent heilige kracht en brengt nabije vijanden {damage} schade toe. (paladijntalent)',
   'entities.abilities.howl_of_terror.description':
     'Jaagt nabije vijanden tot 3 sec. angst aan. Schade kan het effect verbreken. (tovenaarstalent)',
   'entities.abilities.ice_block.description':

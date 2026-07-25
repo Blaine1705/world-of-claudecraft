@@ -81,16 +81,16 @@ const CLASS_PLAN = {
     spec: 'retribution',
     name: 'Rowpal',
     rows: {
-      5: 'pal_r5_pilgrims_light', // Pilgrim's Light (Mending Light while moving)
-      8: 'pal_r8_twin_gavels', // Twin Gavels (Sundering Gavel stores 2 uses)
-      11: 'pal_r11_ardent_renewal', // Ardent Renewal (heavy hit self-heal)
-      14: 'pal_r14_lightward', // Lightward (grant divine_shield)
-      17: 'pal_r17_wrathwing', // Wrathwing (grant avenging_wrath)
-      20: 'pal_r20_tolling_hammer', // Tolling Hammer (grant hammer_of_wrath)
+      5: 'pal_r5_radiant_stride',
+      8: 'pal_r8_enduring_protection',
+      11: 'pal_r11_fist_of_justice',
+      14: 'pal_r14_zeal',
+      17: 'pal_r17_extended_dawn',
+      20: 'pal_r20_aura_mastery',
     },
-    moment: 'avenging_wrath',
+    moment: 'aura_mastery',
     momentIsSelfBuff: true,
-    momentFallbacks: ['divine_shield', 'divine_protection'],
+    momentFallbacks: ['avenging_wrath', 'divine_protection'],
   },
   mage: {
     spec: 'frost',

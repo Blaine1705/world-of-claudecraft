@@ -938,7 +938,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': 'Escarcha Muerta',
   'entities.abilities.desperate_prayer.name': 'Última Plegaria',
   'entities.abilities.deterrence.name': 'Guardia de Zarzas',
-  'entities.abilities.divine_shield.name': 'Resguardo de Luz',
   'entities.abilities.earthbind.name': 'Tierra Prensora',
   'entities.abilities.evocation.name': 'Pozo de Éter',
   'entities.abilities.frenzied_regeneration.name': 'Remiendo Salvaje',
@@ -946,7 +945,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': 'Golpe Espectral',
   'entities.abilities.hammer_of_wrath.name': 'Martillo Tañoso',
   'entities.abilities.healing_stream.name': 'Manantial',
-  'entities.abilities.holy_wrath.name': 'Ira del Santo',
   'entities.abilities.howl_of_terror.name': 'Aullido Pavoroso',
   'entities.abilities.ice_block.name': 'Ataúd Helado',
   'entities.abilities.inner_focus.name': 'Mente Serena',
@@ -961,9 +959,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.name': 'Paso Sombrío',
   'entities.abilities.silence.name': 'Silencio',
   'entities.abilities.tranquility.name': 'Canto del Claro',
-  'entities.abilities.cleansing_verdict.name': 'Veredicto Purificador',
-  'entities.abilities.cleansing_verdict.description':
-    'Purga un efecto mágico perjudicial de un objetivo amistoso y lo sana con {damage} de magia Sagrada.',
   'entities.abilities.smoke_screen.name': 'Cortina de Humo',
   'entities.abilities.smoke_screen.description':
     'Desapareces en una nube de humo, lo que aumenta tu probabilidad de esquivar un 30% durante 8 s.',
@@ -8524,9 +8519,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_echo.name': 'Eco temporal',
   'entities.abilities.temporal_echo.description':
     'Marca a un aliado con el eco de un momento más sano y repara {damage} de salud al instante. Durante {duration} s, parte del daño Arcano que infliges se canaliza de vuelta a través del eco para curarlo.',
-  'entities.abilities.aura_surge.name': 'Rebote del Alba',
-  'entities.abilities.aura_surge.description':
-    'Lanza un escudo forjado al alba que inflige {damage} de daño Sagrado, silencia al objetivo principal durante 2 s y rebota hasta en 2 enemigos adicionales en un radio de 10 m, infligiendo un 75% de daño por rebote. (talento de Paladín)',
   'entities.abilities.perfect_moment.name': 'Momento perfecto',
   'entities.abilities.perfect_moment.description':
     'Obtienes al instante 4 cargas Arcanas y durante 10 s los Dardos de éter no las consumen. (Cronomancia)',
@@ -8564,8 +8556,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Te sana al instante por {damage}. (talento de Sacerdote)',
   'entities.abilities.deterrence.description':
     'Aumenta tu probabilidad de esquivar en 50 puntos porcentuales durante 10 s. (talento de Cazador)',
-  'entities.abilities.divine_shield.description':
-    'Te protege con poder sagrado y absorbe 900 de daño durante 8 s. (talento de Paladín)',
   'entities.abilities.earthbind.description':
     'Ata a la tierra a los enemigos cercanos y los inmoviliza durante 2 s. (talento de Chamán)',
   'entities.abilities.evocation.description':
@@ -8580,8 +8570,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Lanza un martillo sagrado contra un enemigo herido e inflige {damage} de daño Sagrado. Solo se puede usar por debajo del 20% de salud. (talento de Paladín)',
   'entities.abilities.healing_stream.description':
     'Restaura 120 de salud a un objetivo aliado durante 12 s. (talento de Chamán)',
-  'entities.abilities.holy_wrath.description':
-    'Desata poder sagrado e inflige {damage} de daño a los enemigos cercanos. (talento de Paladín)',
   'entities.abilities.howl_of_terror.description':
     'Aterroriza a los enemigos cercanos hasta 3 s. El daño puede romper el efecto. (talento de Brujo)',
   'entities.abilities.ice_block.description':

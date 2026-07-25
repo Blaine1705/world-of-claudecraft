@@ -13,6 +13,134 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.paladin.devotion': '虔诚',
+  'hudChrome.paladin.devotionValue': '虔诚值 {value}/{max}',
+  'hudChrome.paladin.devotionAscensionCharges': '虔诚值 {value}/{max}。升华充能：{charges}。',
+  'hudChrome.paladin.devotionAscensionLast': '虔诚值 {value}/{max}。升华的最后一次充能。',
+  'hudChrome.paladin.ascensionLastAnnouncement': '升华的最后一次充能',
+  'hudChrome.paladin.ascensionSpenderAria': '动作栏第 {slot} 格：{ability}。消耗一次升华充能。',
+  'hudChrome.auraEffect.radiantResonance':
+    '你的下一次治愈之光将瞬发，或下一次黎明之拥的法力消耗降低 {pct}%，施法时间缩短至 {castTime} 秒',
+  'hudChrome.auraEffect.solarReprisal':
+    '你的下一次向阳飞盾不消耗法力、无视冷却时间且伤害提高 {pct}%；恩典之锤无视冷却时间并为你恢复相当于伤害量 100% 的生命值；或使治愈之光变为瞬发',
+  'guide.abilityHook.hammer_of_wrath': '从远处处决一名受伤的敌人，或在圣翼激活时处决任意敌人。',
+  'guide.abilityHook.avenging_wrath':
+    '获得 10 点虔诚，并在接下来的十五秒内使技能产生的虔诚值翻倍。',
+  'guide.abilityHook.bastion_sweep': '用盾牌横扫一群敌人，夺取仇恨并积累虔诚。',
+  'guide.abilityHook.oath_chain': '将远处的敌人拉入队伍并减缓其逃离速度。',
+  'guide.abilityHook.veilbound_march': '穿过敌群并留下印记，削弱其对你造成的伤害并牢牢锁定仇恨。',
+  'guide.abilityHook.holy_shield': '消耗虔诚，获得主动格挡时段、吸收护盾和仇恨脉冲。',
+  'guide.abilityHook.consecration': '以持续的神圣伤害和仇恨占据周围地面。',
+  'guide.abilityHook.hammer_of_justice': '以短暂而可靠的昏迷阻止一名敌人。',
+  'guide.abilityHook.lay_on_hands': '在盟友濒临倒下时为其恢复大量生命值。',
+  'hud.errors.notEnoughDevotion': '虔诚值不足！',
+  'abilityUi.resources.devotion': '虔诚',
+  'entities.abilities.divine_ascension.name': '神圣升华',
+  'entities.abilities.divine_ascension.description':
+    '消耗 20 点虔诚，获得 5 次升华充能，最多持续 45 秒。标记的技能会消耗一次充能并获得额外效果。',
+  'entities.abilities.aura_mastery.name': '神圣协律',
+  'entities.abilities.aura_mastery.description':
+    '持续 8 秒，强化小队中所有激活的虔诚光环和报偿光环。壁垒虔诚使伤害降低 15%；报偿造成 15 点神圣伤害。多次使用只会刷新效果，不会叠加。',
+  'entities.abilities.devotion_ward.name': '壁垒虔诚',
+  'entities.abilities.devotion_ward.description':
+    '使你和小队成员受到的伤害降低 5%，持续至死亡或被替换。只有此光环与报偿光环会彼此替换；辉光、黎明和恩典虔诚可以共存。',
+  'entities.abilities.hammer_of_grace.name': '恩典之锤',
+  'entities.abilities.hammer_of_grace.description':
+    '立即向 20 米内的敌人掷出圣锤，造成 {damage} 点伤害，恢复 70 点法力，为自己恢复相当于伤害量 50% 的生命值，并在造成伤害时产生 1 点虔诚。烈阳反击会使恩典之锤无视冷却时间，并为你恢复相当于伤害量 100% 的生命值。',
+  'entities.abilities.hushbrand.name': '寂静烙印',
+  'entities.abilities.hushbrand.description': '打断施法，并使目标在 4 秒内无法施放该系法术。',
+  'entities.abilities.solar_step.name': '烈阳步',
+  'entities.abilities.solar_step.description': '使你的移动速度提高 150%，持续 2 秒。',
+  'entities.abilities.solar_invocation.name': '烈阳祈唤',
+  'entities.abilities.solar_invocation.description':
+    '立即为一名盟友恢复 {damage} 点生命值，或对一名敌人造成中等神圣伤害。任一用途都会产生 1 点虔诚。升华期间，治疗施法还会治疗目标 10 米内的友方玩家，治疗量为原来的一半。',
+  'entities.abilities.radiant_devotion.name': '辉光虔诚',
+  'entities.abilities.radiant_devotion.description':
+    '使你和小队成员的法术强度提高 20 点，持续 30 分钟。会替换你自己的黎明或恩典虔诚，但可与其他圣骑士的虔诚共存。',
+  'entities.abilities.dawn_devotion.name': '黎明虔诚',
+  'entities.abilities.dawn_devotion.description':
+    '使你和小队成员的攻击强度提高 40 点，持续 30 分钟。会替换你自己的辉光或恩典虔诚，但可与其他圣骑士的虔诚及战士的战吼共存。',
+  'entities.abilities.grace_devotion.name': '恩典虔诚',
+  'entities.abilities.grace_devotion.description':
+    '你和小队成员每 5 秒恢复 15 点法力，且法力消耗降低 3%，持续 30 分钟。会替换你自己的辉光或黎明虔诚，但可与其他圣骑士的虔诚共存。',
+  'entities.abilities.recall_the_fallen.name': '唤回逝者',
+  'entities.abilities.recall_the_fallen.description':
+    '使一名死亡的小队成员复活，并恢复 35% 的生命值和法力值。',
+  'entities.abilities.beacon_of_light.name': '圣光道标',
+  'entities.abilities.beacon_of_light.description':
+    '将一名小队成员标记为你的圣光道标。你对 60 米内另一名小队成员造成的有效直接治疗，有 50% 也会治疗道标目标。范围治疗和周期性治疗不会传递。持续至你或目标死亡。',
+  'entities.abilities.final_edict.name': '终末敕令',
+  'entities.abilities.final_edict.description':
+    '发动一次沉重的武器攻击，并在造成伤害时产生 1 点虔诚。命中后使黎明坠击的剩余冷却时间缩短 2 秒。成功的自动攻击和终末敕令命中有 15% 几率获得持续 8 秒的黎明之怒。升华还会在你周围释放神圣爆炸。',
+  'entities.abilities.dawnfall.name': '黎明坠击',
+  'entities.abilities.dawnfall.description':
+    '对附近敌人造成 {damage} 点神圣伤害并产生 1 点虔诚。命中至少一个敌人会使终末敕令的剩余冷却时间缩短 2 秒。升华会提高其伤害和作用半径。',
+  'entities.abilities.sun_gods_verdict.name': '太阳神裁决',
+  'entities.abilities.sun_gods_verdict.description':
+    '以太阳神裁决审判一名敌人，持续 30 秒。终末敕令和黎明坠击成功命中时会刻下一层印记。施加第三层印记的技能决定判决：终末敕令对罪人释放毁灭性伤害；黎明坠击引爆裁决，对附近敌人造成伤害并使其昏迷 1.5 秒。',
+  'entities.abilities.valkyrs_calling.name': '瓦尔基里的召唤',
+  'entities.abilities.valkyrs_calling.description':
+    '升上空中，在飞向敌人期间免疫伤害。2 秒后降临目标区域，造成 {damage} 点神圣伤害并产生 1 点虔诚。升华会使冲击伤害提高 50% 并消耗 1 次充能。',
+  'entities.abilities.faithforged_guard.name': '信仰铸卫',
+  'entities.abilities.faithforged_guard.description':
+    '以护盾环绕自身，在 8 秒内吸收 {damage} 点伤害。升华使护盾吸收量提高 50%。',
+  'entities.abilities.mercy_lance.name': '慈悲圣枪',
+  'entities.abilities.mercy_lance.description':
+    '对一名敌人造成 {damage} 点神圣伤害，并在造成伤害时产生 1 点虔诚。升华期间消耗 1 次充能，使其必定暴击。',
+  'entities.abilities.sacred_form.name': '神圣形态',
+  'entities.abilities.sacred_form.description':
+    '进入持续至死亡的神圣状态，使治疗效果提高 10%、法术暴击几率提高 5%，产生的仇恨降低 50%。仅限黎明愈者。',
+  'entities.abilities.dawns_embrace.name': '黎明之拥',
+  'entities.abilities.dawns_embrace.description':
+    '施放一次强力治疗并产生 1 点虔诚。辉光共鸣使其法力消耗降低 50%，施法时间缩短至 1.5 秒。升华使其变为瞬发，且治疗量提高 35%。',
+  'entities.abilities.radiant_chorus.name': '辉光圣歌',
+  'entities.abilities.radiant_chorus.description':
+    '为附近盟友恢复 {damage} 点生命值并产生 1 点虔诚。有效治疗至少 2 名盟友会获得辉光共鸣：你的下一次治愈之光将瞬发，或下一次黎明之拥的法力消耗降低 50%，施法时间缩短至 1.5 秒。升华会提高辉光圣歌的治疗量和作用半径。',
+  'entities.abilities.life_covenant.name': '生命契约',
+  'entities.abilities.life_covenant.description':
+    '使一名盟友受到的伤害降低 40%，持续 6 秒。升华期间还会给予一个可吸收 120 点伤害的护盾，且不消耗充能。',
+  'entities.abilities.aegis_first_dawn.name': '初曙圣盾',
+  'entities.abilities.aegis_first_dawn.description':
+    '引导 5 秒，创造一个半径 10 米的神圣穹顶。穹顶内的盟友每秒受到治疗，且受到的伤害降低 50%。完成引导时释放最终治疗，并使移动速度提高 30%，持续 4 秒。',
+  'entities.abilities.vowkeeper_strike.name': '守誓者打击',
+  'entities.abilities.vowkeeper_strike.description':
+    '发动高仇恨攻击并产生 1 点虔诚。成功命中有 20% 几率获得持续 8 秒的烈阳反击；每次成功格挡有 25% 几率触发。烈阳反击会强化你的下一次向阳飞盾、恩典之锤或治愈之光。升华还会给予一个小型吸收护盾。',
+  'entities.abilities.bastion_rite.name': '壁垒仪式',
+  'entities.abilities.bastion_rite.description':
+    '使受到的物理伤害降低 20%，格挡几率提高 20%，持续 6 秒。升华将持续时间延长至 10 秒。',
+  'entities.abilities.sunward_disc.name': '向阳飞盾',
+  'entities.abilities.sunward_disc.description':
+    '需要盾牌。掷出一面辉光飞盾，命中后在附近敌人之间弹射。每次造成伤害都会产生 1 点虔诚。烈阳反击使向阳飞盾不消耗法力、无视冷却时间且伤害提高 20%。升华会强化 5 次弹射。',
+  'entities.abilities.sacred_challenge.name': '神圣挑衅',
+  'entities.abilities.sacred_challenge.description':
+    '迫使一名敌人攻击你。升华期间还会使你受到的所有伤害降低 15%，持续 4 秒，且不消耗充能。',
+  'entities.abilities.bastion_sweep.name': '壁垒横扫',
+  'entities.abilities.bastion_sweep.description':
+    '用装备的盾牌横扫前方 180 度范围内的敌人，造成 {damage} 点高仇恨神圣伤害并产生 1 点虔诚。升华使伤害提高 30%，半径扩大至 8 米。',
+  'entities.abilities.oath_chain.name': '誓约锁链',
+  'entities.abilities.oath_chain.description':
+    '立即用神圣锁链束缚一名远处敌人。敌人以每秒 18 米的速度向你移动，直至距离 3 米，随后移动速度降低 50%，持续 4 秒。升华期间还会束缚附近的第二名敌人。',
+  'entities.abilities.veilbound_march.name': '帷幕行军',
+  'entities.abilities.veilbound_march.description':
+    '进入灵体状态 4 秒，移动速度提高 40%，护甲提高 30%，并免疫定身、减速和位移。你穿过的敌人会获得持续 6 秒的帷幕印记，每秒受到神圣伤害，对你造成的伤害降低 20%，并对你产生额外仇恨。第一个印记会产生 1 点虔诚。行军结束时，附近带有印记的敌人会受到最终爆发伤害。升华使爆发伤害提高 50%，并将他们轻微拉向你。',
+  'entities.abilities.veilbound_mark.name': '帷幕印记',
+  'entities.abilities.veilbound_mark.description':
+    '每秒受到神圣伤害，对施加印记的圣骑士造成的伤害降低 20%，并对该圣骑士产生额外仇恨。',
+  'entities.quests.q_divine_tome.title': '缚晓圣典',
+  'entities.quests.q_divine_tome.text':
+    '圣光在你体内并非静默不语，{playerName}。我看着你让亡者安息，也相信你已经准备好学习极少有圣骑士能够掌握的仪式：唤回仪式，以此将逝去的灵魂召回人世。仪式经文记载在我保管的缚晓圣典中，但只要躁动的亡者仍在这片土地上游荡，书本便带不来祝福。再让 6 具躁动骸骨归于尘土，我便开始教你。',
+  'entities.quests.q_divine_tome.completion':
+    '礼拜堂庭院终于安静下来。你已经可以学习经文了，{playerName}，但唤回仪式不能在温暖的礼拜堂中吟诵。必须前往生死帷幕薄弱之处。我会把圣典带到北方的泥沼沼泽。到那里来找我，我们将完成这场仪式。',
+  'entities.quests.q_divine_tome.objectives.0.label': '让躁动骸骨安息',
+  'entities.quests.q_rite_of_redemption.title': '唤回仪式',
+  'entities.quests.q_rite_of_redemption.text':
+    '你果然跟随我进入了沼泽，{playerName}。很好。缚晓圣典就在这里，而这片积水之地正适合吟诵其中的经文：没有哪里比亡者不肯长眠之处更接近生死之间的帷幕。但那些溺亡者会在吟诵中途把你的声音拖入水底。先清理出适合仪式的地方：让 8 名溺亡死者安息，然后我们一同将此地圣化。',
+  'entities.quests.q_rite_of_redemption.completion':
+    '跪下，{playerName}，大声念出经文。就是这样。你感觉到了吗？你手中的圣光不再只能治愈生者，也能召回已经离世的人。请明智地使用它。将灵魂召回一场毫无希望的战斗是残忍，而非仁慈。起身吧，救赎者。',
+  'entities.quests.q_rite_of_redemption.objectives.0.label': '让溺亡死者安息',
+  'entities.abilities.guardian_covenant.name': '守护契约',
+  'entities.abilities.guardian_covenant.description':
+    '保护一名友方目标和你自己，使受到的伤害降低20%，持续8秒。未选中友方目标时，默认对你自己施放。',
   'hudChrome.crafting.identity.ceilingRare': '稀有品质上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -138,9 +266,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.name': '战鼓',
   'entities.abilities.chain_lightning.name': '叉状闪电',
   'entities.abilities.chaos_bolt.name': '毁灭箭',
-  'entities.abilities.cleansing_verdict.name': '净化裁决',
-  'entities.abilities.cleansing_verdict.description':
-    '净化一个友方目标身上的有害魔法效果，并为其恢复{damage}点生命值。',
   'entities.abilities.cloak_of_shadows.name': '暗影斗篷',
   'entities.abilities.cone_of_cold.name': '寒霜横扫',
   'entities.abilities.curse_of_exhaustion.name': '铅沉妖咒',
@@ -148,7 +273,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': '死霜',
   'entities.abilities.desperate_prayer.name': '最后祈祷',
   'entities.abilities.deterrence.name': '鬃刺守卫',
-  'entities.abilities.divine_shield.name': '圣光守护',
   'entities.abilities.earthbind.name': '攫握大地',
   'entities.abilities.evocation.name': '以太之井',
   'entities.abilities.frenzied_regeneration.name': '野性愈合',
@@ -156,7 +280,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': '幽魂打击',
   'entities.abilities.hammer_of_wrath.name': '鸣钟之锤',
   'entities.abilities.healing_stream.name': '泉涌',
-  'entities.abilities.holy_wrath.name': '圣徒之怒',
   'entities.abilities.howl_of_terror.name': '恐惧嚎叫',
   'entities.abilities.ice_block.name': '寒冰棺',
   'entities.abilities.inner_focus.name': '静心',
@@ -7527,9 +7650,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_echo.name': '时光回响',
   'entities.abilities.temporal_echo.description':
     '以更健康时刻的回响标记一名盟友，立即恢复{damage}点生命值。{duration}秒内，你造成的奥术伤害有一部分会通过回响转化为对其的治疗。',
-  'entities.abilities.aura_surge.name': '曙光弹射',
-  'entities.abilities.aura_surge.description':
-    '掷出曙光铸造的盾牌，造成{damage}点神圣伤害并使首要目标沉默2秒，随后弹射至10码内最多2个额外敌人，每次弹射造成75%伤害。（圣骑士天赋）',
   'entities.abilities.aspect_of_the_wild.description':
     '以野性力量激励30码内的盟友，使其攻击强度提高45、攻击速度提高5%，持续5分钟。（猎人天赋）',
   'entities.abilities.avenging_wrath.description':
@@ -7553,8 +7673,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.desperate_prayer.description': '立即为你恢复{damage}点生命值。（牧师天赋）',
   'entities.abilities.deterrence.description':
     '使你的躲闪几率提高50个百分点，持续10秒。（猎人天赋）',
-  'entities.abilities.divine_shield.description':
-    '以神圣之力保护你，在8秒内吸收900点伤害。（圣骑士天赋）',
   'entities.abilities.earthbind.description': '将附近的敌人束缚于大地，使其定身2秒。（萨满天赋）',
   'entities.abilities.evocation.description': '快速恢复法力。（法师天赋）',
   'entities.abilities.frenzied_regeneration.description':
@@ -7567,8 +7685,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '向受伤的敌人投掷神圣之锤，造成{damage}点神圣伤害。只能对生命值低于20%的目标使用。（圣骑士天赋）',
   'entities.abilities.healing_stream.description':
     '在12秒内为一个友方目标恢复120点生命值。（萨满天赋）',
-  'entities.abilities.holy_wrath.description':
-    '释放神圣之力，对附近的敌人造成{damage}点伤害。（圣骑士天赋）',
   'entities.abilities.howl_of_terror.description':
     '使附近的敌人恐惧，最多持续3秒。受到伤害可能打破该效果。（术士天赋）',
   'entities.abilities.ice_block.description':

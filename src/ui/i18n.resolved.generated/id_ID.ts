@@ -7073,7 +7073,7 @@ export const id_ID: EnTranslations = {
       },
       "guardian_covenant": {
         "name": "Guardian Covenant",
-        "description": "Protects an ally, reducing their damage taken by 20% for 8 sec."
+        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
       },
       "solar_step": {
         "name": "Solar Step",
@@ -7551,10 +7551,6 @@ export const id_ID: EnTranslations = {
         "name": "Kejutan Suci",
         "description": "Mengejutkan target kawan dengan energi Suci dan memulihkannya sebesar {damage}. (ciri khas Suci)"
       },
-      "aura_surge": {
-        "name": "Pantulan Fajar",
-        "description": "Melempar perisai tempa fajar yang menghasilkan {damage} kerusakan Suci, membungkam target utama selama 2 detik, lalu memantul ke hingga 2 musuh lain dalam jarak 10 yard dengan 75% kerusakan tiap pantulan. (talenta Paladin)"
-      },
       "holy_shield": {
         "name": "Perisai Suci",
         "description": "Melindungimu dengan kekuatan Suci selama 10 dtk, meningkatkan zirah sebesar 90, dan menghantam penyerang jarak dekat dengan 12 kerusakan Suci. (ciri khas Perlindungan)"
@@ -7811,10 +7807,6 @@ export const id_ID: EnTranslations = {
         "name": "Baut Reruntuhan",
         "description": "Melontarkan panah api kacau yang menghasilkan {damage} kerusakan Api. (talenta Warlock)"
       },
-      "cleansing_verdict": {
-        "name": "Vonis Pemurnian",
-        "description": "Menghapus efek sihir berbahaya dari target sekutu dan menyembuhkannya sebesar {damage} dengan sihir Suci."
-      },
       "cloak_of_shadows": {
         "name": "Jubah Bayang",
         "description": "Menyelimutimu dengan bayangan dan menyerap 420 kerusakan selama 5 detik. (talenta Rogue)"
@@ -7847,10 +7839,6 @@ export const id_ID: EnTranslations = {
         "name": "Penjaga Duri",
         "description": "Meningkatkan peluang menghindarmu sebesar 50 poin persentase selama 10 detik. (talenta Hunter)"
       },
-      "divine_shield": {
-        "name": "Pelindung Cahaya",
-        "description": "Melindungimu dengan kekuatan suci dan menyerap 900 kerusakan selama 8 detik. (talenta Paladin)"
-      },
       "earthbind": {
         "name": "Bumi Mencengkeram",
         "description": "Mengikat musuh di dekatnya ke tanah dan mengakarkan mereka selama 2 detik. (talenta Shaman)"
@@ -7878,10 +7866,6 @@ export const id_ID: EnTranslations = {
       "healing_stream": {
         "name": "Mata Air",
         "description": "Memulihkan 120 nyawa target sekutu selama 12 detik. (talenta Shaman)"
-      },
-      "holy_wrath": {
-        "name": "Murka Santo",
-        "description": "Melepaskan kekuatan suci dan menghasilkan {damage} kerusakan kepada musuh di dekatnya. (talenta Paladin)"
       },
       "howl_of_terror": {
         "name": "Lolongan Ngeri",

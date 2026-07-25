@@ -7073,7 +7073,7 @@ export const pt_BR: EnTranslations = {
       },
       "guardian_covenant": {
         "name": "Guardian Covenant",
-        "description": "Protects an ally, reducing their damage taken by 20% for 8 sec."
+        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
       },
       "solar_step": {
         "name": "Solar Step",
@@ -7551,10 +7551,6 @@ export const pt_BR: EnTranslations = {
         "name": "Choque Sagrado",
         "description": "Choca um alvo aliado com energia Sagrada, curando-o em {damage}. (assinatura Sagrado)"
       },
-      "aura_surge": {
-        "name": "Ricochete da Alvorada",
-        "description": "Arremessa um escudo forjado ao alvorecer que causa {damage} de dano Sagrado, silencia o alvo principal por 2 s e ricocheteia em até 2 inimigos adicionais num raio de 10 m, causando 75% de dano por ricochete. (talento de Paladino)"
-      },
       "holy_shield": {
         "name": "Escudo Sagrado",
         "description": "Protege você com poder Sagrado por 10 s, aumentando a armadura em 90 e atingindo atacantes corpo a corpo com 12 de dano Sagrado. (assinatura Proteção)"
@@ -7811,10 +7807,6 @@ export const pt_BR: EnTranslations = {
         "name": "Seta da Ruína",
         "description": "Arremessa um raio de fogo caótico que causa {damage} de dano de Fogo. (talento de Bruxo)"
       },
-      "cleansing_verdict": {
-        "name": "Veredito Purificador",
-        "description": "Expurga um efeito mágico nocivo de um alvo aliado e o cura em {damage} com magia Sagrada."
-      },
       "cloak_of_shadows": {
         "name": "Manto Sombrio",
         "description": "Envolve você em sombras, absorvendo 420 de dano por 5 s. (talento de Ladino)"
@@ -7847,10 +7839,6 @@ export const pt_BR: EnTranslations = {
         "name": "Guarda Espinhosa",
         "description": "Aumenta sua chance de esquiva em 50 pontos percentuais por 10 s. (talento de Caçador)"
       },
-      "divine_shield": {
-        "name": "Guarda de Luz",
-        "description": "Protege você com poder sagrado, absorvendo 900 de dano por 8 s. (talento de Paladino)"
-      },
       "earthbind": {
         "name": "Terra Agarradora",
         "description": "Prende os inimigos próximos à terra, enraizando-os por 2 s. (talento de Xamã)"
@@ -7878,10 +7866,6 @@ export const pt_BR: EnTranslations = {
       "healing_stream": {
         "name": "Fonte Viva",
         "description": "Restaura 120 de vida de um alvo aliado ao longo de 12 s. (talento de Xamã)"
-      },
-      "holy_wrath": {
-        "name": "Ira do Santo",
-        "description": "Libera poder sagrado, causando {damage} de dano aos inimigos próximos. (talento de Paladino)"
       },
       "howl_of_terror": {
         "name": "Uivo de Terror",

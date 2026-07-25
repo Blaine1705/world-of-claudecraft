@@ -7073,7 +7073,7 @@ export const de_DE: EnTranslations = {
       },
       "guardian_covenant": {
         "name": "Guardian Covenant",
-        "description": "Protects an ally, reducing their damage taken by 20% for 8 sec."
+        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
       },
       "solar_step": {
         "name": "Solar Step",
@@ -7551,10 +7551,6 @@ export const de_DE: EnTranslations = {
         "name": "Heiliger Schock",
         "description": "Schockt ein freundliches Ziel mit Heiliger Energie und heilt es um {damage}. (Heilig-Signatur)"
       },
-      "aura_surge": {
-        "name": "Dämmerprall",
-        "description": "Schleudert einen dämmergeschmiedeten Schild für {damage} Heiligschaden, bringt das Primärziel 2 Sek. zum Schweigen und springt dann auf bis zu 2 weitere Gegner innerhalb von 10 Metern über, wobei jeder Sprung 75% Schaden verursacht. (Paladintalent)"
-      },
       "holy_shield": {
         "name": "Heiliger Schild",
         "description": "Schützt Euch 10 Sek. lang mit Heiliger Macht, erhöht die Rüstung um 90 und trifft Nahkampfangreifer mit 12 Heiligschaden. (Schutz-Signatur)"
@@ -7811,10 +7807,6 @@ export const de_DE: EnTranslations = {
         "name": "Verderbensblitz",
         "description": "Schleudert einen chaotischen Feuerblitz, der {damage} Feuerschaden verursacht. (Hexenmeistertalent)"
       },
-      "cleansing_verdict": {
-        "name": "Läuterndes Urteil",
-        "description": "Entfernt einen schädlichen magischen Effekt von einem verbündeten Ziel und heilt es mit heiliger Magie um {damage}."
-      },
       "cloak_of_shadows": {
         "name": "Schattenmantel",
         "description": "Hüllt Euch in Schatten und absorbiert 5 Sek. lang 420 Schaden. (Schurkentalent)"
@@ -7847,10 +7839,6 @@ export const de_DE: EnTranslations = {
         "name": "Borstenwacht",
         "description": "Erhöht Eure Ausweichchance 10 Sek. lang um 50 Prozentpunkte. (Jägertalent)"
       },
-      "divine_shield": {
-        "name": "Lichtwacht",
-        "description": "Schützt Euch mit heiliger Macht, die 8 Sek. lang 900 Schaden absorbiert. (Paladintalent)"
-      },
       "earthbind": {
         "name": "Greifende Erde",
         "description": "Bindet Gegner in der Nähe an die Erde und macht sie 2 Sek. lang bewegungsunfähig. (Schamanentalent)"
@@ -7878,10 +7866,6 @@ export const de_DE: EnTranslations = {
       "healing_stream": {
         "name": "Quellbrunnen",
         "description": "Stellt bei einem verbündeten Ziel im Verlauf von 12 Sek. 120 Gesundheit wieder her. (Schamanentalent)"
-      },
-      "holy_wrath": {
-        "name": "Heiligenzorn",
-        "description": "Entfesselt heilige Macht und fügt Gegnern in der Nähe {damage} Schaden zu. (Paladintalent)"
       },
       "howl_of_terror": {
         "name": "Schreckensheulen",

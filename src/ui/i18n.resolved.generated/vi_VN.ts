@@ -7073,7 +7073,7 @@ export const vi_VN: EnTranslations = {
       },
       "guardian_covenant": {
         "name": "Guardian Covenant",
-        "description": "Protects an ally, reducing their damage taken by 20% for 8 sec."
+        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
       },
       "solar_step": {
         "name": "Solar Step",
@@ -7551,10 +7551,6 @@ export const vi_VN: EnTranslations = {
         "name": "Sốc Thánh",
         "description": "Gây sốc một mục tiêu đồng minh bằng năng lượng Thánh, hồi cho họ {damage}. (dấu ấn Thánh)"
       },
-      "aura_surge": {
-        "name": "Khiên Dội Bình Minh",
-        "description": "Ném một tấm khiên rèn từ bình minh gây {damage} sát thương Thánh, khiến mục tiêu chính câm lặng trong 2 giây, rồi dội sang tối đa 2 kẻ địch khác trong phạm vi 10 mét, gây 75% sát thương mỗi lần dội. (thiên phú Paladin)"
-      },
       "holy_shield": {
         "name": "Khiên Thánh",
         "description": "Bảo vệ bạn bằng sức mạnh Thánh trong 10 giây, tăng giáp thêm 90 và đánh kẻ tấn công cận chiến gây 12 sát thương Thánh. (dấu ấn Bảo Hộ)"
@@ -7811,10 +7807,6 @@ export const vi_VN: EnTranslations = {
         "name": "Tia Hủy Diệt",
         "description": "Phóng một luồng lửa hỗn loạn gây {damage} sát thương Lửa. (thiên phú Warlock)"
       },
-      "cleansing_verdict": {
-        "name": "Phán Quyết Thanh Tẩy",
-        "description": "Xóa một hiệu ứng phép thuật có hại khỏi mục tiêu đồng minh và hồi cho họ {damage} máu bằng phép Thánh."
-      },
       "cloak_of_shadows": {
         "name": "Áo Choàng Bóng",
         "description": "Bao phủ bạn trong bóng tối, hấp thụ 420 sát thương trong 5 giây. (thiên phú Đạo tặc)"
@@ -7847,10 +7839,6 @@ export const vi_VN: EnTranslations = {
         "name": "Hộ Vệ Gai",
         "description": "Tăng 50 điểm phần trăm khả năng né tránh của bạn trong 10 giây. (thiên phú Thợ săn)"
       },
-      "divine_shield": {
-        "name": "Hộ Vệ Ánh Sáng",
-        "description": "Bảo vệ bạn bằng sức mạnh thần thánh, hấp thụ 900 sát thương trong 8 giây. (thiên phú Paladin)"
-      },
       "earthbind": {
         "name": "Đất Níu Giữ",
         "description": "Trói kẻ địch ở gần xuống đất trong 2 giây. (thiên phú Shaman)"
@@ -7878,10 +7866,6 @@ export const vi_VN: EnTranslations = {
       "healing_stream": {
         "name": "Giếng Suối",
         "description": "Hồi 120 máu cho một mục tiêu đồng minh trong 12 giây. (thiên phú Shaman)"
-      },
-      "holy_wrath": {
-        "name": "Cơn Giận Thánh",
-        "description": "Giải phóng sức mạnh thần thánh, gây {damage} sát thương lên kẻ địch ở gần. (thiên phú Paladin)"
       },
       "howl_of_terror": {
         "name": "Tiếng Hú Kinh Hoàng",

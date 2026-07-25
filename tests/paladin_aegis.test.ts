@@ -47,7 +47,7 @@ describe('Aegis of the First Dawn', () => {
     expect(ABILITIES.aegis_first_dawn).toMatchObject({
       name: 'Aegis of the First Dawn',
       specs: ['holy'],
-      learnLevel: 20,
+      learnLevel: 18,
       cost: 150,
       cooldown: 180,
       castTime: 0,

@@ -84,7 +84,7 @@ describe('Talents V2 dispel and steal primitives', () => {
     sim.ctx.applyAura(ally, aura(sim.player, 'physical_bleed', 'dot', 4, 'physical'));
     expect(ally.stats.int).toBe(baseInt - 5);
 
-    runAbilityEffect(sim, ally, 'cleansing_verdict');
+    runAbilityEffect(sim, ally, 'voidfeast');
 
     expect(ally.auras.some((entry) => entry.id === 'magic_int_drain')).toBe(false);
     expect(ally.auras.some((entry) => entry.id === 'physical_bleed')).toBe(true);
@@ -316,7 +316,7 @@ describe('Talents V2 movement and control primitives', () => {
     const ally = paladin.entities.get(allyId);
     if (!ally || paladin.player.id !== casterId) throw new Error('missing dispel rig entities');
     ally.auras.push(unbreakableControl(paladin.player, 'scripted_silence', 'silence', 'shadow'));
-    runAbilityEffect(paladin, ally, 'cleansing_verdict');
+    runAbilityEffect(paladin, ally, 'voidfeast');
     expect(ally.auras.some((entry) => entry.id === 'scripted_silence')).toBe(true);
   });
 });

@@ -56,9 +56,6 @@ describe('paladin Devotion core', () => {
     expect(devotionGainForAbility(null, 'holy_light')).toBe(1);
     expect(devotionGainForAbility(null, 'flash_of_light')).toBe(1);
     expect(devotionGainForAbility(null, 'lay_on_hands')).toBe(1);
-    expect(devotionGainForAbility(null, 'cleansing_verdict')).toBe(1);
-    expect(devotionGainForAbility(null, 'holy_wrath')).toBe(1);
-    expect(devotionGainForAbility(null, 'aura_surge')).toBe(1);
   });
 
   it('blocks all Devotion while Ascension is active', () => {
@@ -134,8 +131,9 @@ describe('paladin Devotion core', () => {
       ),
     ).toBe(true);
     expect(devotionGainForAbility('retribution', 'faithforged_guard')).toBe(0);
-    expect(isAscensionEmpoweredAbility('holy', 'guardian_covenant')).toBe(true);
+    expect(isAscensionEmpoweredAbility('holy', 'guardian_covenant')).toBe(false);
     expect(isAscensionEmpoweredAbility('protection', 'guardian_covenant')).toBe(false);
+    expect(isAscensionEmpoweredAbility('retribution', 'guardian_covenant')).toBe(true);
     expect(isAscensionEmpoweredAbility('retribution', 'avenging_wrath')).toBe(false);
     expect(isAscensionEmpoweredAbility('holy', 'holy_light')).toBe(false);
   });

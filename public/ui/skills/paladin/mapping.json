@@ -308,27 +308,6 @@
       "confidence": "high"
     },
     {
-      "abilityId": "cleansing_verdict",
-      "name": "Cleansing Verdict",
-      "sourceFile": "OpenAI image generation, original project artwork",
-      "output": "cleansing_verdict.webp",
-      "confidence": "high"
-    },
-    {
-      "abilityId": "holy_wrath",
-      "name": "Saint's Ire",
-      "sourceFile": "OpenAI image generation, original project artwork",
-      "output": "holy_wrath.webp",
-      "confidence": "high"
-    },
-    {
-      "abilityId": "divine_shield",
-      "name": "Lightward",
-      "sourceFile": "OpenAI image generation, original project artwork",
-      "output": "divine_shield.webp",
-      "confidence": "high"
-    },
-    {
       "abilityId": "avenging_wrath",
       "name": "Avenging Wrath",
       "sourceFile": "OpenAI image generation, original project artwork",
@@ -375,13 +354,6 @@
       "name": "Sacred Concord",
       "sourceFile": "OpenAI image generation, original project artwork",
       "output": "aura_mastery.webp",
-      "confidence": "high"
-    },
-    {
-      "abilityId": "aura_surge",
-      "name": "Dawnward Ricochet",
-      "sourceFile": "OpenAI image generation, original project artwork",
-      "output": "aura_surge.webp",
       "confidence": "high"
     },
     {

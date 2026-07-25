@@ -1941,7 +1941,7 @@ Headless training environment, Codex/Claude agent culture, and anti-bot roadmap.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="9657">== Articles ==
+      <text xml:space="preserve" bytes="9244">== Articles ==
 * [[Adder&apos;s Bite (Ability)]]
 * [[Aegis of the First Dawn (Ability)]]
 * [[Aether Darts (Ability)]]
@@ -1955,7 +1955,6 @@ Headless training environment, Codex/Claude agent culture, and anti-bot roadmap.
 * [[Arc Bolt (Ability)]]
 * [[Armor Breach (Ability)]]
 * [[Armor Shear (Ability)]]
-* [[Aura Mastery (Ability)]]
 * [[Avatar (Ability)]]
 * [[Avenging Wrath (Ability)]]
 * [[Bastion Devotion (Ability)]]
@@ -1993,7 +1992,6 @@ Headless training environment, Codex/Claude agent culture, and anti-bot roadmap.
 * [[Cinderbolt (Ability)]]
 * [[Cinderfall (Ability)]]
 * [[Claw (Ability)]]
-* [[Cleansing Verdict (Ability)]]
 * [[Cleaving Blows (Ability)]]
 * [[Cold Coffin (Ability)]]
 * [[Collective Reversal (Ability)]]
@@ -2005,13 +2003,11 @@ Headless training environment, Codex/Claude agent culture, and anti-bot roadmap.
 * [[Courser&apos;s Guise (Ability)]]
 * [[Craven Roar (Ability)]]
 * [[Craven Thrust (Ability)]]
-* [[Crusader Strike (Ability)]]
 * [[Cutthroat Tempo (Ability)]]
 * [[Dash (Ability)]]
 * [[Dawn Devotion (Ability)]]
 * [[Dawn&apos;s Embrace (Ability)]]
 * [[Dawnfall (Ability)]]
-* [[Dawnward Ricochet (Ability)]]
 * [[Deadfrost (Ability)]]
 * [[Defiant Bellow (Ability)]]
 * [[Diabolical Twinstrike (Ability)]]
@@ -2084,7 +2080,6 @@ Headless training environment, Codex/Claude agent culture, and anti-bot roadmap.
 * [[Hobbling Cut (Ability)]]
 * [[Holy Ground (Ability)]]
 * [[Holy Nova (Ability)]]
-* [[Holy Shock (Ability)]]
 * [[Hoof It (Ability)]]
 * [[Hot Streak (Ability)]]
 * [[Hourglass of Suspension (Ability)]]
@@ -2109,8 +2104,6 @@ Headless training environment, Codex/Claude agent culture, and anti-bot roadmap.
 * [[Leaden Venom (Ability)]]
 * [[Life Covenant (Ability)]]
 * [[Lifesap (Ability)]]
-* [[Lightmend (Ability)]]
-* [[Lightward (Ability)]]
 * [[Lingering Grace (Ability)]]
 * [[Litany of Resolve (Ability)]]
 * [[Litany of Woe (Ability)]]
@@ -2135,8 +2128,6 @@ Headless training environment, Codex/Claude agent culture, and anti-bot roadmap.
 * [[Morrowlash (Ability)]]
 * [[Oakhide (Ability)]]
 * [[Oath Chain (Ability)]]
-* [[Oath of Iron (Ability)]]
-* [[Oathbrand (Ability)]]
 * [[Onrush (Ability)]]
 * [[Overload (Ability)]]
 * [[Pass (Ability)]]
@@ -2169,7 +2160,6 @@ Headless training environment, Codex/Claude agent culture, and anti-bot roadmap.
 * [[Red Ribbon (Ability)]]
 * [[Redhand (Ability)]]
 * [[Release Companion (Ability)]]
-* [[Reproach (Ability)]]
 * [[Requital Aura (Ability)]]
 * [[Revenge (Ability)]]
 * [[Rewind (Ability)]]
@@ -2179,14 +2169,11 @@ Headless training environment, Codex/Claude agent culture, and anti-bot roadmap.
 * [[Rimelance (Ability)]]
 * [[Ring of Frost (Ability)]]
 * [[Rip (Ability)]]
-* [[Rite of Expulsion (Ability)]]
 * [[Ruinbolt (Ability)]]
 * [[Rune of Power (Ability)]]
-* [[Sacred Bulwark (Ability)]]
+* [[Sacred Concord (Ability)]]
 * [[Sacred Form (Ability)]]
 * [[Sacred Goad (Ability)]]
-* [[Sacred Goad (Ability) (2)]]
-* [[Saint&apos;s Ire (Ability)]]
 * [[Sanguine Aura (Ability)]]
 * [[Sap (Ability)]]
 * [[Savage Mending (Ability)]]
@@ -2217,7 +2204,6 @@ Headless training environment, Codex/Claude agent culture, and anti-bot roadmap.
 * [[Springwell (Ability)]]
 * [[Stalk (Ability)]]
 * [[Startle Shot (Ability)]]
-* [[Steadfast Aura (Ability)]]
 * [[Stilled Mind (Ability)]]
 * [[Stinging Swarm (Ability)]]
 * [[Stoke (Ability)]]
@@ -2820,7 +2806,7 @@ Rogue starts with Rusty Dagger and uses energy.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2393">== Overview ==
+      <text xml:space="preserve" bytes="2061">== Overview ==
 Paladin starts with Training Mace and uses mana.
 
 == Stats ==
@@ -2846,21 +2832,13 @@ Paladin starts with Training Mace and uses mana.
 |}
 
 == Abilities ==
-* [[Oathbrand (Ability)|Oathbrand]]
 * [[Mending Light (Ability)|Mending Light]]
-* [[Oath of Iron (Ability)|Oath of Iron]]
 * [[Ward of Faith (Ability)|Ward of Faith]]
 * [[Sundering Gavel (Ability)|Sundering Gavel]]
 * [[Last Rite (Ability)|Last Rite]]
-* [[Lightmend (Ability)|Lightmend]]
-* [[Rite of Expulsion (Ability)|Rite of Expulsion]]
 * [[Holy Ground (Ability)|Holy Ground]]
 * [[Burning Oath (Ability)|Burning Oath]]
-* [[Reproach (Ability)|Reproach]]
-* [[Sacred Bulwark (Ability)|Sacred Bulwark]]
-* [[Holy Shock (Ability)|Holy Shock]]
 * [[Hallowed Wall (Ability)|Hallowed Wall]]
-* [[Crusader Strike (Ability)|Crusader Strike]]
 * [[Divine Ascension (Ability)|Divine Ascension]]
 * [[Bastion Devotion (Ability)|Bastion Devotion]]
 * [[Radiant Devotion (Ability)|Radiant Devotion]]
@@ -2869,7 +2847,6 @@ Paladin starts with Training Mace and uses mana.
 * [[Requital Aura (Ability)|Requital Aura]]
 * [[Hammer of Grace (Ability)|Hammer of Grace]]
 * [[Hushbrand (Ability)|Hushbrand]]
-* [[Guardian Covenant (Ability)|Guardian Covenant]]
 * [[Solar Step (Ability)|Solar Step]]
 * [[Solar Invocation (Ability)|Solar Invocation]]
 * [[Recall the Fallen (Ability)|Recall the Fallen]]
@@ -2878,6 +2855,7 @@ Paladin starts with Training Mace and uses mana.
 * [[Dawnfall (Ability)|Dawnfall]]
 * [[Faithforged Guard (Ability)|Faithforged Guard]]
 * [[Hammer of Wrath (Ability)|Hammer of Wrath]]
+* [[Guardian Covenant (Ability)|Guardian Covenant]]
 * [[Avenging Wrath (Ability)|Avenging Wrath]]
 * [[Verdict of the Sun God (Ability)|Verdict of the Sun God]]
 * [[Valkyr&apos;s Calling (Ability)|Valkyr&apos;s Calling]]
@@ -50048,7 +50026,7 @@ Consume 20 Devotion to gain 5 Ascension charges for up to 45 sec. Marked abiliti
   </page>
 
   <page>
-    <title>Aura Mastery (Ability)</title>
+    <title>Sacred Concord (Ability)</title>
     <ns>0</ns>
     <id>976</id>
     <revision>
@@ -50112,7 +50090,7 @@ Reduce damage taken by you and party members by 5% until death or replacement. O
 | [[Paladin]]
 |-
 ! Learn level
-| 2
+| 4
 |-
 ! Cost
 | 30
@@ -50156,7 +50134,7 @@ Instantly hurl a holy hammer at an enemy within 20 m for $d, restoring 70 mana, 
 | [[Paladin]]
 |-
 ! Learn level
-| 4
+| 3
 |-
 ! Cost
 | 0
@@ -50190,7 +50168,7 @@ Instantly hurl a holy hammer at an enemy within 20 m for $d, restoring 70 mana, 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="338">== Description ==
+      <text xml:space="preserve" bytes="339">== Description ==
 Interrupts spellcasting and prevents spells from that school for 4 sec.
 
 == Facts ==
@@ -50200,7 +50178,7 @@ Interrupts spellcasting and prevents spells from that school for 4 sec.
 | [[Paladin]]
 |-
 ! Learn level
-| 4
+| 10
 |-
 ! Cost
 | 0
@@ -50234,8 +50212,8 @@ Interrupts spellcasting and prevents spells from that school for 4 sec.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="329">== Description ==
-Protects an ally, reducing their damage taken by 20% for 8 sec.
+      <text xml:space="preserve" bytes="411">== Description ==
+Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -50244,7 +50222,7 @@ Protects an ally, reducing their damage taken by 20% for 8 sec.
 | [[Paladin]]
 |-
 ! Learn level
-| 8
+| 12
 |-
 ! Cost
 | 35
@@ -50261,6 +50239,7 @@ Protects an ally, reducing their damage taken by 20% for 8 sec.
 
 == Base effects ==
 * buffTarget
+* selfBuff
 [[Category:Abilities]]
 [[Category:Paladin]]
 </text>
@@ -50288,7 +50267,7 @@ Increase your movement speed by 150% for 2 sec.
 | [[Paladin]]
 |-
 ! Learn level
-| 5
+| 8
 |-
 ! Cost
 | 20
@@ -50322,7 +50301,7 @@ Increase your movement speed by 150% for 2 sec.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="482">== Description ==
+      <text xml:space="preserve" bytes="481">== Description ==
 Instantly heal an ally for $d or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much.
 
 == Facts ==
@@ -50332,7 +50311,7 @@ Instantly heal an ally for $d or deal moderate Holy damage to an enemy. Either u
 | [[Paladin]]
 |-
 ! Learn level
-| 12
+| 9
 |-
 ! Cost
 | 80
@@ -50455,7 +50434,7 @@ Mark one group member as your Beacon of Light. 50% of your effective direct heal
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="428">== Description ==
+      <text xml:space="preserve" bytes="429">== Description ==
 Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion, but coexists with Devotions from other Paladins.
 
 == Facts ==
@@ -50465,7 +50444,7 @@ Increase the spell power of you and party members by 20 for 30 min. Replaces you
 | [[Paladin]]
 |-
 ! Learn level
-| 8
+| 10
 |-
 ! Cost
 | 35
@@ -50499,7 +50478,7 @@ Increase the spell power of you and party members by 20 for 30 min. Replaces you
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="457">== Description ==
+      <text xml:space="preserve" bytes="456">== Description ==
 Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion, but coexists with Devotions from other Paladins and with Warrior shouts.
 
 == Facts ==
@@ -50509,7 +50488,7 @@ Increase the attack power of you and party members by 40 for 30 min. Replaces yo
 | [[Paladin]]
 |-
 ! Learn level
-| 10
+| 5
 |-
 ! Cost
 | 35
@@ -50543,7 +50522,7 @@ Increase the attack power of you and party members by 40 for 30 min. Replaces yo
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="446">== Description ==
+      <text xml:space="preserve" bytes="445">== Description ==
 You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min. Replaces your own Radiant or Dawn Devotion, but coexists with Devotions from other Paladins.
 
 == Facts ==
@@ -50553,7 +50532,7 @@ You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 mi
 | [[Paladin]]
 |-
 ! Learn level
-| 12
+| 8
 |-
 ! Cost
 | 35
@@ -50587,8 +50566,8 @@ You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 mi
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="482">== Description ==
-Deliver a crushing weapon strike and generate 1 Devotion. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn&apos;s Wrath for 8 sec. Ascension also releases a Holy explosion around you.
+      <text xml:space="preserve" bytes="568">== Description ==
+Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall&apos;s remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn&apos;s Wrath for 8 sec. Ascension also releases a Holy explosion around you.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -50597,7 +50576,7 @@ Deliver a crushing weapon strike and generate 1 Devotion. Successful auto-attack
 | [[Paladin]]
 |-
 ! Learn level
-| 1
+| 8
 |-
 ! Cost
 | 25
@@ -50631,8 +50610,8 @@ Deliver a crushing weapon strike and generate 1 Devotion. Successful auto-attack
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="375">== Description ==
-Deal $d Holy damage to nearby enemies and generate 1 Devotion. Ascension increases its damage and radius.
+      <text xml:space="preserve" bytes="454">== Description ==
+Deal $d Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict&apos;s remaining cooldown by 2 sec. Ascension increases its damage and radius.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -50641,7 +50620,7 @@ Deal $d Holy damage to nearby enemies and generate 1 Devotion. Ascension increas
 | [[Paladin]]
 |-
 ! Learn level
-| 5
+| 12
 |-
 ! Cost
 | 35
@@ -50685,7 +50664,7 @@ Surround yourself with a shield that absorbs $d damage for 8 sec. Ascension incr
 | [[Paladin]]
 |-
 ! Learn level
-| 7
+| 9
 |-
 ! Cost
 | 20
@@ -50719,7 +50698,7 @@ Surround yourself with a shield that absorbs $d damage for 8 sec. Ascension incr
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="552">== Description ==
+      <text xml:space="preserve" bytes="553">== Description ==
 Hurl a holy hammer for $d damage and generate 1 Devotion. Usable below 20% health, or during Divine Ascension or Avenging Wrath. Dawn&apos;s Wrath grants an additional cast against any target that ignores its current cooldown and deals 20% more damage. Ascension increases its damage by 30%.
 
 == Facts ==
@@ -50729,7 +50708,7 @@ Hurl a holy hammer for $d damage and generate 1 Devotion. Usable below 20% healt
 | [[Paladin]]
 |-
 ! Learn level
-| 9
+| 14
 |-
 ! Cost
 | 0
@@ -50763,8 +50742,8 @@ Hurl a holy hammer for $d damage and generate 1 Devotion. Usable below 20% healt
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="526">== Description ==
-Unfurl physical wings of golden holy power, gaining 10 Devotion and doubling Devotion generated by your abilities for 15 sec. Also increases damage and healing done by 20%. Retribution: enables Hammer of Wrath against any target.
+      <text xml:space="preserve" bytes="525">== Description ==
+Unfurl physical wings of golden holy power, gaining 10 Devotion and doubling Devotion generated by your abilities for 15 sec. Also increases damage and healing done by 20%. Dawnreaver: enables Hammer of Wrath against any target.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -50773,7 +50752,7 @@ Unfurl physical wings of golden holy power, gaining 10 Devotion and doubling Dev
 | [[Paladin]]
 |-
 ! Learn level
-| 11
+| 14
 |-
 ! Cost
 | 0
@@ -50819,7 +50798,7 @@ Judge an enemy beneath the Verdict of the Sun God for 30 sec. Final Edict and Da
 | [[Paladin]]
 |-
 ! Learn level
-| 20
+| 17
 |-
 ! Cost
 | 0
@@ -50897,8 +50876,8 @@ Ascend into the air, becoming immune to damage as you fly toward the enemy. Afte
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="406">== Description ==
-Enter a sacred state until death, increasing healing by 10%, spell critical chance by 5%, and reducing threat generated by 50%. Holy only.
+      <text xml:space="preserve" bytes="411">== Description ==
+Enter a sacred state until death, increasing healing by 10%, spell critical chance by 5%, and reducing threat generated by 50%. Sunmender only.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -50907,7 +50886,7 @@ Enter a sacred state until death, increasing healing by 10%, spell critical chan
 | [[Paladin]]
 |-
 ! Learn level
-| 2
+| 5
 |-
 ! Cost
 | 30
@@ -50951,7 +50930,7 @@ Deal $d Holy damage to an enemy and generate 1 Devotion when it deals damage. Du
 | [[Paladin]]
 |-
 ! Learn level
-| 4
+| 8
 |-
 ! Cost
 | 20
@@ -50985,7 +50964,7 @@ Deal $d Holy damage to an enemy and generate 1 Devotion when it deals damage. Du
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="441">== Description ==
+      <text xml:space="preserve" bytes="442">== Description ==
 Deliver a powerful heal and generate 1 Devotion. Radiant Resonance reduces its mana cost by 50% and cast time to 1.5 sec. Ascension makes it instant and increases its healing by 35%.
 
 == Facts ==
@@ -50995,7 +50974,7 @@ Deliver a powerful heal and generate 1 Devotion. Radiant Resonance reduces its m
 | [[Paladin]]
 |-
 ! Learn level
-| 3
+| 13
 |-
 ! Cost
 | 90
@@ -51029,7 +51008,7 @@ Deliver a powerful heal and generate 1 Devotion. Radiant Resonance reduces its m
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="543">== Description ==
+      <text xml:space="preserve" bytes="544">== Description ==
 Heal nearby allies for $d and generate 1 Devotion. Effectively healing at least 2 allies grants Radiant Resonance: your next Mending Light is instant, or your next Dawn&apos;s Embrace costs 50% less mana and casts in 1.5 sec. Ascension increases Radiant Chorus healing and radius.
 
 == Facts ==
@@ -51039,7 +51018,7 @@ Heal nearby allies for $d and generate 1 Devotion. Effectively healing at least 
 | [[Paladin]]
 |-
 ! Learn level
-| 5
+| 14
 |-
 ! Cost
 | 60
@@ -51073,7 +51052,7 @@ Heal nearby allies for $d and generate 1 Devotion. Effectively healing at least 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="392">== Description ==
+      <text xml:space="preserve" bytes="393">== Description ==
 Reduce an ally&apos;s damage taken by 40% for 6 sec. During Ascension it also grants a 120-point shield without consuming a charge.
 
 == Facts ==
@@ -51083,7 +51062,7 @@ Reduce an ally&apos;s damage taken by 40% for 6 sec. During Ascension it also gr
 | [[Paladin]]
 |-
 ! Learn level
-| 7
+| 10
 |-
 ! Cost
 | 40
@@ -51127,7 +51106,7 @@ Channel for 5 sec, creating a 10 meter holy dome. Allies inside are healed every
 | [[Paladin]]
 |-
 ! Learn level
-| 20
+| 18
 |-
 ! Cost
 | 150
@@ -51171,7 +51150,7 @@ Become ethereal for 4 sec, gaining 40% movement speed and 30% armor and becoming
 | [[Paladin]]
 |-
 ! Learn level
-| 13
+| 18
 |-
 ! Cost
 | 0
@@ -51215,7 +51194,7 @@ Strike with high threat and generate 1 Devotion. A successful strike has a 20% c
 | [[Paladin]]
 |-
 ! Learn level
-| 1
+| 5
 |-
 ! Cost
 | 0
@@ -51259,7 +51238,7 @@ Reduce physical damage taken by 20% and increase block chance by 20% for 6 sec. 
 | [[Paladin]]
 |-
 ! Learn level
-| 3
+| 7
 |-
 ! Cost
 | 20
@@ -51294,7 +51273,7 @@ Reduce physical damage taken by 20% and increase block chance by 20% for 6 sec. 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="542">== Description ==
+      <text xml:space="preserve" bytes="543">== Description ==
 Requires a shield. Hurl a radiant disc that strikes and then bounces between nearby enemies. Each damaging impact generates 1 Devotion. Solar Reprisal makes Sunward Disc cost no mana, ignore its cooldown, and deal 20% more damage. Ascension empowers 5 bounces.
 
 == Facts ==
@@ -51304,7 +51283,7 @@ Requires a shield. Hurl a radiant disc that strikes and then bounces between nea
 | [[Paladin]]
 |-
 ! Learn level
-| 5
+| 12
 |-
 ! Cost
 | 25
@@ -51383,7 +51362,7 @@ Compel an enemy to attack you. During Ascension it also reduces all damage recei
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="452">== Description ==
+      <text xml:space="preserve" bytes="453">== Description ==
 Sweep your equipped shield through enemies in a 180 degree frontal arc for $d Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m.
 
 == Facts ==
@@ -51393,7 +51372,7 @@ Sweep your equipped shield through enemies in a 180 degree frontal arc for $d Ho
 | [[Paladin]]
 |-
 ! Learn level
-| 7
+| 11
 |-
 ! Cost
 | 0
@@ -51427,7 +51406,7 @@ Sweep your equipped shield through enemies in a 180 degree frontal arc for $d Ho
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="412">== Description ==
+      <text xml:space="preserve" bytes="413">== Description ==
 Gain 30% block and an absorb shield for 8 sec, releasing a pulse of threat. Ascension strengthens and extends the defense.
 
 == Facts ==
@@ -51437,7 +51416,7 @@ Gain 30% block and an absorb shield for 8 sec, releasing a pulse of threat. Asce
 | [[Paladin]]
 |-
 ! Learn level
-| 7
+| 13
 |-
 ! Cost
 | 0
@@ -51473,7 +51452,7 @@ Gain 30% block and an absorb shield for 8 sec, releasing a pulse of threat. Asce
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="468">== Description ==
+      <text xml:space="preserve" bytes="469">== Description ==
 Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy.
 
 == Facts ==
@@ -51483,7 +51462,7 @@ Instantly bind a distant enemy with a sacred chain. The enemy travels toward you
 | [[Paladin]]
 |-
 ! Learn level
-| 9
+| 14
 |-
 ! Cost
 | 0
@@ -51517,8 +51496,8 @@ Instantly bind a distant enemy with a sacred chain. The enemy travels toward you
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="503">== Description ==
-Consecrate the ground beneath you for 9 sec, dealing $d Holy damage with high threat every second. The first impact generates 1 Devotion. Protection Paladins take 5% less damage while standing inside. Ascension increases its damage.
+      <text xml:space="preserve" bytes="495">== Description ==
+Consecrate the ground beneath you for 9 sec, dealing $d Holy damage with high threat every second. The first impact generates 1 Devotion. Faithwardens take 5% less damage while standing inside. Ascension increases its damage.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -51527,7 +51506,7 @@ Consecrate the ground beneath you for 9 sec, dealing $d Holy damage with high th
 | [[Paladin]]
 |-
 ! Learn level
-| 10
+| 9
 |-
 ! Cost
 | 35
@@ -56057,65 +56036,11 @@ Tosses dirt into the target&apos;s eyes, causing it to wander disoriented for 8 
   </page>
 
   <page>
-    <title>Oathbrand (Ability)</title>
+    <title>Mending Light (Ability)</title>
     <ns>0</ns>
     <id>1106</id>
     <revision>
       <id>1106</id>
-      <timestamp>2026-06-15T23:47:51Z</timestamp>
-      <contributor><username>WikiAdmin</username><id>1</id></contributor>
-      <comment>Seed World of Claudecraft wiki content</comment>
-      <model>wikitext</model>
-      <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="486">== Description ==
-Fills you with Holy power for 30 sec, causing each of your melee swings to deal $d additional Holy damage.
-
-== Facts ==
-{| class=&quot;wikitable article-facts&quot;
-|-
-! Class
-| [[Paladin]]
-|-
-! Learn level
-| 1
-|-
-! Cost
-| 25
-|-
-! Cooldown
-| 0s
-|-
-! Range
-| Melee/self
-|-
-! School
-| holy
-|}
-
-== Base effects ==
-* imbue
-
-== Ranks ==
-{| class=&quot;wikitable article-facts&quot;
-|-
-! Rank 2
-| Level 10, cost 35
-|-
-! Rank 3
-| Level 16, cost 50
-|}
-[[Category:Abilities]]
-[[Category:Paladin]]
-</text>
-    </revision>
-  </page>
-
-  <page>
-    <title>Mending Light (Ability)</title>
-    <ns>0</ns>
-    <id>1107</id>
-    <revision>
-      <id>1107</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -56168,99 +56093,11 @@ Quickly heals a friendly target for $d. Restoring health generates 1 Devotion, e
   </page>
 
   <page>
-    <title>Steadfast Aura (Ability)</title>
-    <ns>0</ns>
-    <id>1108</id>
-    <revision>
-      <id>1108</id>
-      <timestamp>2026-06-15T23:47:51Z</timestamp>
-      <contributor><username>WikiAdmin</username><id>1</id></contributor>
-      <comment>Seed World of Claudecraft wiki content</comment>
-      <model>wikitext</model>
-      <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="328">== Description ==
-Increases the armor of all party members by $b% for 30 min.
-
-== Facts ==
-{| class=&quot;wikitable article-facts&quot;
-|-
-! Class
-| [[Paladin]]
-|-
-! Learn level
-| 1
-|-
-! Cost
-| 0
-|-
-! Cooldown
-| 0s
-|-
-! Range
-| Melee/self
-|-
-! School
-| holy
-|}
-
-== Base effects ==
-* buffTarget
-[[Category:Abilities]]
-[[Category:Paladin]]
-</text>
-    </revision>
-  </page>
-
-  <page>
-    <title>Oath of Iron (Ability)</title>
-    <ns>0</ns>
-    <id>1109</id>
-    <revision>
-      <id>1109</id>
-      <timestamp>2026-06-15T23:47:51Z</timestamp>
-      <contributor><username>WikiAdmin</username><id>1</id></contributor>
-      <comment>Seed World of Claudecraft wiki content</comment>
-      <model>wikitext</model>
-      <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="351">== Description ==
-Blesses the party, increasing the attack power of all party members by $b% for 30 min.
-
-== Facts ==
-{| class=&quot;wikitable article-facts&quot;
-|-
-! Class
-| [[Paladin]]
-|-
-! Learn level
-| 4
-|-
-! Cost
-| 25
-|-
-! Cooldown
-| 0s
-|-
-! Range
-| 30 yd
-|-
-! School
-| holy
-|}
-
-== Base effects ==
-* buffTarget
-[[Category:Abilities]]
-[[Category:Paladin]]
-</text>
-    </revision>
-  </page>
-
-  <page>
     <title>Ward of Faith (Ability)</title>
     <ns>0</ns>
-    <id>1110</id>
+    <id>1107</id>
     <revision>
-      <id>1110</id>
+      <id>1107</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -56307,55 +56144,11 @@ A holy shield absorbs $d damage for 10 sec.
   </page>
 
   <page>
-    <title>Sacred Bulwark (Ability)</title>
-    <ns>0</ns>
-    <id>1111</id>
-    <revision>
-      <id>1111</id>
-      <timestamp>2026-06-15T23:47:51Z</timestamp>
-      <contributor><username>WikiAdmin</username><id>1</id></contributor>
-      <comment>Seed World of Claudecraft wiki content</comment>
-      <model>wikitext</model>
-      <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="369">== Description ==
-For $t sec, the next enemy hit that would kill you is denied, restoring you to 35% health instead.
-
-== Facts ==
-{| class=&quot;wikitable article-facts&quot;
-|-
-! Class
-| [[Paladin]]
-|-
-! Learn level
-| 20
-|-
-! Cost
-| 15
-|-
-! Cooldown
-| 180s
-|-
-! Range
-| Melee/self
-|-
-! School
-| holy
-|}
-
-== Base effects ==
-* selfBuff
-[[Category:Abilities]]
-[[Category:Paladin]]
-</text>
-    </revision>
-  </page>
-
-  <page>
     <title>Sundering Gavel (Ability)</title>
     <ns>0</ns>
-    <id>1112</id>
+    <id>1108</id>
     <revision>
-      <id>1112</id>
+      <id>1108</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -56371,7 +56164,7 @@ Stuns the target for $t sec.
 | [[Paladin]]
 |-
 ! Learn level
-| 8
+| 2
 |-
 ! Cost
 | 30
@@ -56397,15 +56190,15 @@ Stuns the target for $t sec.
   <page>
     <title>Last Rite (Ability)</title>
     <ns>0</ns>
-    <id>1113</id>
+    <id>1109</id>
     <revision>
-      <id>1113</id>
+      <id>1109</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="455">== Description ==
+      <text xml:space="preserve" bytes="456">== Description ==
 A massive surge of healing: restores $d health and generates 1 Devotion when it restores health. 10 min cooldown.
 
 == Facts ==
@@ -56415,7 +56208,7 @@ A massive surge of healing: restores $d health and generates 1 Devotion when it 
 | [[Paladin]]
 |-
 ! Learn level
-| 8
+| 12
 |-
 ! Cost
 | 0
@@ -56446,106 +56239,18 @@ A massive surge of healing: restores $d health and generates 1 Devotion when it 
   </page>
 
   <page>
-    <title>Sacred Goad (Ability) (2)</title>
+    <title>Burning Oath (Ability)</title>
     <ns>0</ns>
-    <id>1114</id>
+    <id>1110</id>
     <revision>
-      <id>1114</id>
+      <id>1110</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="371">== Description ==
-Goads the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.
-
-== Facts ==
-{| class=&quot;wikitable article-facts&quot;
-|-
-! Class
-| [[Paladin]]
-|-
-! Learn level
-| 10
-|-
-! Cost
-| 0
-|-
-! Cooldown
-| 10s
-|-
-! Range
-| 30 yd
-|-
-! School
-| holy
-|}
-
-== Base effects ==
-* taunt
-[[Category:Abilities]]
-[[Category:Paladin]]
-</text>
-    </revision>
-  </page>
-
-  <page>
-    <title>Lightmend (Ability)</title>
-    <ns>0</ns>
-    <id>1115</id>
-    <revision>
-      <id>1115</id>
-      <timestamp>2026-06-15T23:47:51Z</timestamp>
-      <contributor><username>WikiAdmin</username><id>1</id></contributor>
-      <comment>Seed World of Claudecraft wiki content</comment>
-      <model>wikitext</model>
-      <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="400">== Description ==
-A quick, efficient burst of Light that heals a friendly target for $d. Restoring health generates 1 Devotion, even without a specialization.
-
-== Facts ==
-{| class=&quot;wikitable article-facts&quot;
-|-
-! Class
-| [[Paladin]]
-|-
-! Learn level
-| 12
-|-
-! Cost
-| 35
-|-
-! Cooldown
-| 0s
-|-
-! Range
-| 30 yd
-|-
-! School
-| holy
-|}
-
-== Base effects ==
-* heal
-[[Category:Abilities]]
-[[Category:Paladin]]
-</text>
-    </revision>
-  </page>
-
-  <page>
-    <title>Rite of Expulsion (Ability)</title>
-    <ns>0</ns>
-    <id>1116</id>
-    <revision>
-      <id>1116</id>
-      <timestamp>2026-06-15T23:47:51Z</timestamp>
-      <contributor><username>WikiAdmin</username><id>1</id></contributor>
-      <comment>Seed World of Claudecraft wiki content</comment>
-      <model>wikitext</model>
-      <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="328">== Description ==
-Banishes the wicked with Holy wrath, causing $d Holy damage.
+      <text xml:space="preserve" bytes="342">== Description ==
+Passively increases the threat generated by your Holy damage by 60%. Faithwarden only.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -56555,50 +56260,6 @@ Banishes the wicked with Holy wrath, causing $d Holy damage.
 |-
 ! Learn level
 | 5
-|-
-! Cost
-| 55
-|-
-! Cooldown
-| 15s
-|-
-! Range
-| 30 yd
-|-
-! School
-| holy
-|}
-
-== Base effects ==
-* directDamage
-[[Category:Abilities]]
-[[Category:Paladin]]
-</text>
-    </revision>
-  </page>
-
-  <page>
-    <title>Burning Oath (Ability)</title>
-    <ns>0</ns>
-    <id>1117</id>
-    <revision>
-      <id>1117</id>
-      <timestamp>2026-06-15T23:47:51Z</timestamp>
-      <contributor><username>WikiAdmin</username><id>1</id></contributor>
-      <comment>Seed World of Claudecraft wiki content</comment>
-      <model>wikitext</model>
-      <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="342">== Description ==
-Passively increases the threat generated by your Holy damage by 60%. Protection only.
-
-== Facts ==
-{| class=&quot;wikitable article-facts&quot;
-|-
-! Class
-| [[Paladin]]
-|-
-! Learn level
-| 16
 |-
 ! Cost
 | 0
@@ -56623,15 +56284,15 @@ Passively increases the threat generated by your Holy damage by 60%. Protection 
   <page>
     <title>Requital Aura (Ability)</title>
     <ns>0</ns>
-    <id>1118</id>
+    <id>1111</id>
     <revision>
-      <id>1118</id>
+      <id>1111</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="478">== Description ==
+      <text xml:space="preserve" bytes="477">== Description ==
 Surrounds you and your party with holy energy until death or replacement. Enemies that strike an affected ally in melee take 5 Holy damage, and affected allies deal 5 additional Holy damage with auto-attacks.
 
 == Facts ==
@@ -56641,7 +56302,7 @@ Surrounds you and your party with holy energy until death or replacement. Enemie
 | [[Paladin]]
 |-
 ! Learn level
-| 16
+| 7
 |-
 ! Cost
 | 0
@@ -56667,9 +56328,9 @@ Surrounds you and your party with holy energy until death or replacement. Enemie
   <page>
     <title>Wildbond (Ability)</title>
     <ns>0</ns>
-    <id>1119</id>
+    <id>1112</id>
     <revision>
-      <id>1119</id>
+      <id>1112</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -56711,9 +56372,9 @@ Begins taming a beast to be your companion. It must be your level or lower and n
   <page>
     <title>Release Companion (Ability)</title>
     <ns>0</ns>
-    <id>1120</id>
+    <id>1113</id>
     <revision>
-      <id>1120</id>
+      <id>1113</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -56755,9 +56416,9 @@ Releases your pet back to the wild.
   <page>
     <title>Patch Up (Ability)</title>
     <ns>0</ns>
-    <id>1121</id>
+    <id>1114</id>
     <revision>
-      <id>1121</id>
+      <id>1114</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -56799,9 +56460,9 @@ Patch up your companion, restoring 240 health over 12 sec if it is alive. If it 
   <page>
     <title>Gutting Strike (Ability)</title>
     <ns>0</ns>
-    <id>1122</id>
+    <id>1115</id>
     <revision>
-      <id>1122</id>
+      <id>1115</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -56856,9 +56517,9 @@ A strong melee attack that increases damage by $d. Activates on your next swing.
   <page>
     <title>Harrier&apos;s Guise (Ability)</title>
     <ns>0</ns>
-    <id>1123</id>
+    <id>1116</id>
     <revision>
-      <id>1123</id>
+      <id>1116</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -56910,9 +56571,9 @@ Take on the aspect of the hawk, increasing attack power by $b for 30 min.
   <page>
     <title>Venom Barb (Ability)</title>
     <ns>0</ns>
-    <id>1124</id>
+    <id>1117</id>
     <revision>
-      <id>1124</id>
+      <id>1117</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -56964,9 +56625,9 @@ Stings the target, dealing $d Nature damage over 15 sec.
   <page>
     <title>Fell Shot (Ability)</title>
     <ns>0</ns>
-    <id>1125</id>
+    <id>1118</id>
     <revision>
-      <id>1125</id>
+      <id>1118</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57018,9 +56679,9 @@ An instant shot that deals $d Arcane damage.
   <page>
     <title>Rattling Shot (Ability)</title>
     <ns>0</ns>
-    <id>1126</id>
+    <id>1119</id>
     <revision>
-      <id>1126</id>
+      <id>1119</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57063,9 +56724,9 @@ Dazes the target for $d damage, slowing movement by 50% for 4 sec.
   <page>
     <title>Counterfang (Ability)</title>
     <ns>0</ns>
-    <id>1127</id>
+    <id>1120</id>
     <revision>
-      <id>1127</id>
+      <id>1120</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57114,9 +56775,9 @@ Counterattack after the target dodges for weapon damage plus $d. Cannot be dodge
   <page>
     <title>Fettering Slash (Ability)</title>
     <ns>0</ns>
-    <id>1128</id>
+    <id>1121</id>
     <revision>
-      <id>1128</id>
+      <id>1121</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57159,9 +56820,9 @@ Inflicts a wound for $d damage, slowing the enemy by 40% for 10 sec.
   <page>
     <title>Marten&apos;s Guise (Ability)</title>
     <ns>0</ns>
-    <id>1129</id>
+    <id>1122</id>
     <revision>
-      <id>1129</id>
+      <id>1122</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57203,9 +56864,9 @@ Take on the aspect of the monkey, increasing your dodge chance by 8% for 30 min.
   <page>
     <title>Courser&apos;s Guise (Ability)</title>
     <ns>0</ns>
-    <id>1130</id>
+    <id>1123</id>
     <revision>
-      <id>1130</id>
+      <id>1123</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57247,9 +56908,9 @@ Take on the aspect of the cheetah, increasing movement speed by 30% for 30 min.
   <page>
     <title>Long Draw (Ability)</title>
     <ns>0</ns>
-    <id>1131</id>
+    <id>1124</id>
     <revision>
-      <id>1131</id>
+      <id>1124</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57291,9 +56952,9 @@ A carefully aimed shot that deals $d damage.
   <page>
     <title>Fevered Draw (Ability)</title>
     <ns>0</ns>
-    <id>1132</id>
+    <id>1125</id>
     <revision>
-      <id>1132</id>
+      <id>1125</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57335,9 +56996,9 @@ Increases your attack speed by 40% for 15 sec.
   <page>
     <title>Smite (Ability)</title>
     <ns>0</ns>
-    <id>1133</id>
+    <id>1126</id>
     <revision>
-      <id>1133</id>
+      <id>1126</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57392,9 +57053,9 @@ Smites the enemy for $d Holy damage.
   <page>
     <title>Whispered Prayer (Ability)</title>
     <ns>0</ns>
-    <id>1134</id>
+    <id>1127</id>
     <revision>
-      <id>1134</id>
+      <id>1127</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57446,9 +57107,9 @@ Heals a friendly target for $d.
   <page>
     <title>Litany of Resolve (Ability)</title>
     <ns>0</ns>
-    <id>1135</id>
+    <id>1128</id>
     <revision>
-      <id>1135</id>
+      <id>1128</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57490,9 +57151,9 @@ Increases the Stamina of all party members by $b% for 30 min.
   <page>
     <title>Dirge of Decay (Ability)</title>
     <ns>0</ns>
-    <id>1136</id>
+    <id>1129</id>
     <revision>
-      <id>1136</id>
+      <id>1129</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57544,9 +57205,9 @@ A word of darkness causes $d Shadow damage over 18 sec.
   <page>
     <title>Psalm of Warding (Ability)</title>
     <ns>0</ns>
-    <id>1137</id>
+    <id>1130</id>
     <revision>
-      <id>1137</id>
+      <id>1130</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57598,9 +57259,9 @@ Shields the target, absorbing $d damage for 30 sec.
   <page>
     <title>Lingering Grace (Ability)</title>
     <ns>0</ns>
-    <id>1138</id>
+    <id>1131</id>
     <revision>
-      <id>1138</id>
+      <id>1131</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57652,9 +57313,9 @@ Heals the target for $d over 15 sec.
   <page>
     <title>Mindfracture (Ability)</title>
     <ns>0</ns>
-    <id>1139</id>
+    <id>1132</id>
     <revision>
-      <id>1139</id>
+      <id>1132</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57706,9 +57367,9 @@ Blasts the target&apos;s mind for $d Shadow damage.
   <page>
     <title>Solemn Prayer (Ability)</title>
     <ns>0</ns>
-    <id>1140</id>
+    <id>1133</id>
     <revision>
-      <id>1140</id>
+      <id>1133</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57757,9 +57418,9 @@ A slow but powerful prayer that heals a friendly target for $d.
   <page>
     <title>Litany of Woe (Ability)</title>
     <ns>0</ns>
-    <id>1141</id>
+    <id>1134</id>
     <revision>
-      <id>1141</id>
+      <id>1134</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57801,9 +57462,9 @@ Assaults the target&apos;s mind with Shadow energy, causing $d Shadow damage eac
   <page>
     <title>Urgent Prayer (Ability)</title>
     <ns>0</ns>
-    <id>1142</id>
+    <id>1135</id>
     <revision>
-      <id>1142</id>
+      <id>1135</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57845,9 +57506,9 @@ A fast prayer that heals a friendly target for $d.
   <page>
     <title>Arc Bolt (Ability)</title>
     <ns>0</ns>
-    <id>1143</id>
+    <id>1136</id>
     <revision>
-      <id>1143</id>
+      <id>1136</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57902,9 +57563,9 @@ Hurls a bolt of lightning for $d Nature damage.
   <page>
     <title>Stonebound Weapon (Ability)</title>
     <ns>0</ns>
-    <id>1144</id>
+    <id>1137</id>
     <revision>
-      <id>1144</id>
+      <id>1137</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -57956,9 +57617,9 @@ Imbues your weapon with the fury of stone: each swing deals $d additional damage
   <page>
     <title>Chain Heal (Ability)</title>
     <ns>0</ns>
-    <id>1145</id>
+    <id>1138</id>
     <revision>
-      <id>1145</id>
+      <id>1138</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58000,9 +57661,9 @@ Heals a friendly target for 120 to 145, then jumps to up to 2 additional nearby 
   <page>
     <title>Mending Waters (Ability)</title>
     <ns>0</ns>
-    <id>1146</id>
+    <id>1139</id>
     <revision>
-      <id>1146</id>
+      <id>1139</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58057,9 +57718,9 @@ Heals a friendly target for $d.
   <page>
     <title>Earthen Jolt (Ability)</title>
     <ns>0</ns>
-    <id>1147</id>
+    <id>1140</id>
     <revision>
-      <id>1147</id>
+      <id>1140</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58111,9 +57772,9 @@ Instantly shocks the target with concussive force for $d Nature damage.
   <page>
     <title>Thunder Ward (Ability)</title>
     <ns>0</ns>
-    <id>1148</id>
+    <id>1141</id>
     <revision>
-      <id>1148</id>
+      <id>1141</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58165,9 +57826,9 @@ Surrounds you with crackling lightning: melee attackers take $b Nature damage, u
   <page>
     <title>Cinder Jolt (Ability)</title>
     <ns>0</ns>
-    <id>1149</id>
+    <id>1142</id>
     <revision>
-      <id>1149</id>
+      <id>1142</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58217,9 +57878,9 @@ Sears the target with fire for $d damage plus $o over 12 sec.
   <page>
     <title>Pyrebrand Weapon (Ability)</title>
     <ns>0</ns>
-    <id>1150</id>
+    <id>1143</id>
     <revision>
-      <id>1150</id>
+      <id>1143</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58268,9 +57929,9 @@ Imbues your weapon with elemental fire: each swing deals $d additional Fire dama
   <page>
     <title>Rime Jolt (Ability)</title>
     <ns>0</ns>
-    <id>1151</id>
+    <id>1144</id>
     <revision>
-      <id>1151</id>
+      <id>1144</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58313,9 +57974,9 @@ Instantly shocks the target with frost for $d Frost damage and slows its movemen
   <page>
     <title>Rimebound Weapon (Ability)</title>
     <ns>0</ns>
-    <id>1152</id>
+    <id>1145</id>
     <revision>
-      <id>1152</id>
+      <id>1145</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58364,9 +58025,9 @@ Imbues your weapon with biting frost: each swing deals $d additional damage for 
   <page>
     <title>Shadewolf (Ability)</title>
     <ns>0</ns>
-    <id>1153</id>
+    <id>1146</id>
     <revision>
-      <id>1153</id>
+      <id>1146</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58408,9 +58069,9 @@ Turns you into a Shadewolf, increasing movement speed by 40%. Cast again to retu
   <page>
     <title>Ancestral Strike (Ability)</title>
     <ns>0</ns>
-    <id>1154</id>
+    <id>1147</id>
     <revision>
-      <id>1154</id>
+      <id>1147</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58452,9 +58113,9 @@ Channels the storm through your weapon, instantly striking for weapon damage plu
   <page>
     <title>Gloom Bolt (Ability)</title>
     <ns>0</ns>
-    <id>1155</id>
+    <id>1148</id>
     <revision>
-      <id>1155</id>
+      <id>1148</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58509,9 +58170,9 @@ Sends a shadowy bolt at the enemy for $d Shadow damage.
   <page>
     <title>Fiendhide (Ability)</title>
     <ns>0</ns>
-    <id>1156</id>
+    <id>1149</id>
     <revision>
-      <id>1156</id>
+      <id>1149</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58563,9 +58224,9 @@ Demonic skin increases your armor by $b for 30 min.
   <page>
     <title>Burning Pact (Ability)</title>
     <ns>0</ns>
-    <id>1157</id>
+    <id>1150</id>
     <revision>
-      <id>1157</id>
+      <id>1150</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58618,9 +58279,9 @@ Burns the enemy for $d Fire damage and an additional $o over 15 sec.
   <page>
     <title>Blackrot (Ability)</title>
     <ns>0</ns>
-    <id>1158</id>
+    <id>1151</id>
     <revision>
-      <id>1158</id>
+      <id>1151</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58672,9 +58333,9 @@ Corrupts the target, causing $d Shadow damage over 18 sec.
   <page>
     <title>Hard Bargain (Ability)</title>
     <ns>0</ns>
-    <id>1159</id>
+    <id>1152</id>
     <revision>
-      <id>1159</id>
+      <id>1152</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58726,9 +58387,9 @@ Converts $d health into $d mana.
   <page>
     <title>Hex of Anguish (Ability)</title>
     <ns>0</ns>
-    <id>1160</id>
+    <id>1153</id>
     <revision>
-      <id>1160</id>
+      <id>1153</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58780,9 +58441,9 @@ Curses the target with agony: $d Shadow damage over 24 sec.
   <page>
     <title>Consume (Ability)</title>
     <ns>0</ns>
-    <id>1161</id>
+    <id>1154</id>
     <revision>
-      <id>1161</id>
+      <id>1154</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58834,9 +58495,9 @@ Drains the target&apos;s life, transferring $d health to you each second for 5 s
   <page>
     <title>Harrow (Ability)</title>
     <ns>0</ns>
-    <id>1162</id>
+    <id>1155</id>
     <revision>
-      <id>1162</id>
+      <id>1155</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58878,9 +58539,9 @@ Strikes terror into the enemy, leaving it cowering for up to 8 sec. Any damage b
   <page>
     <title>Sear (Ability)</title>
     <ns>0</ns>
-    <id>1163</id>
+    <id>1156</id>
     <revision>
-      <id>1163</id>
+      <id>1156</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58922,9 +58583,9 @@ Sears the enemy with agonizing fire for $d Fire damage. Quick to cast.
   <page>
     <title>Duskfire (Ability)</title>
     <ns>0</ns>
-    <id>1164</id>
+    <id>1157</id>
     <revision>
-      <id>1164</id>
+      <id>1157</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -58966,9 +58627,9 @@ Instantly blasts the target with searing shadow for $d Shadow damage.
   <page>
     <title>Summon Emberkin (Ability)</title>
     <ns>0</ns>
-    <id>1165</id>
+    <id>1158</id>
     <revision>
-      <id>1165</id>
+      <id>1158</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59010,9 +58671,9 @@ Summons an Emberkin under the command of the Warlock. The Emberkin hurls Ashbolt
   <page>
     <title>Summon Gloomshade (Ability)</title>
     <ns>0</ns>
-    <id>1166</id>
+    <id>1159</id>
     <revision>
-      <id>1166</id>
+      <id>1159</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59054,9 +58715,9 @@ Summons a Gloomshade under the command of the Warlock. The Gloomshade is a sturd
   <page>
     <title>Summon Duskborn (Ability)</title>
     <ns>0</ns>
-    <id>1167</id>
+    <id>1160</id>
     <revision>
-      <id>1167</id>
+      <id>1160</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59098,9 +58759,9 @@ Summons a Duskborn under the command of the Warlock. The Duskborn is a fragile d
   <page>
     <title>Summon Spellhound (Ability)</title>
     <ns>0</ns>
-    <id>1168</id>
+    <id>1161</id>
     <revision>
-      <id>1168</id>
+      <id>1161</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59142,9 +58803,9 @@ Summons a Spellhound under the command of the Warlock. The Spellhound harries en
   <page>
     <title>Summon Warfiend (Ability)</title>
     <ns>0</ns>
-    <id>1169</id>
+    <id>1162</id>
     <revision>
-      <id>1169</id>
+      <id>1162</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59186,9 +58847,9 @@ Summons a Warfiend under the command of the Warlock. The Warfiend is a durable m
   <page>
     <title>Summon Pyre Colossus (Ability)</title>
     <ns>0</ns>
-    <id>1170</id>
+    <id>1163</id>
     <revision>
-      <id>1170</id>
+      <id>1163</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59230,9 +58891,9 @@ Binds a Pyre Colossus to your will — a hulking juggernaut with crushing melee 
   <page>
     <title>Summon Wraithborn (Ability)</title>
     <ns>0</ns>
-    <id>1171</id>
+    <id>1164</id>
     <revision>
-      <id>1171</id>
+      <id>1164</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59274,9 +58935,9 @@ Binds a Wraithborn to your will — an elite demon that rains heavy Shadow damag
   <page>
     <title>Wildbolt (Ability)</title>
     <ns>0</ns>
-    <id>1172</id>
+    <id>1165</id>
     <revision>
-      <id>1172</id>
+      <id>1165</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59331,9 +58992,9 @@ Hurls a bolt of nature energy for $d Nature damage.
   <page>
     <title>Wildmend (Ability)</title>
     <ns>0</ns>
-    <id>1173</id>
+    <id>1166</id>
     <revision>
-      <id>1173</id>
+      <id>1166</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59388,9 +59049,9 @@ Heals a friendly target for $d.
   <page>
     <title>Wildward (Ability)</title>
     <ns>0</ns>
-    <id>1174</id>
+    <id>1167</id>
     <revision>
-      <id>1174</id>
+      <id>1167</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59432,9 +59093,9 @@ Places the Wildward on the party, increasing all attributes of all party members
   <page>
     <title>Lunar Tempest (Ability)</title>
     <ns>0</ns>
-    <id>1175</id>
+    <id>1168</id>
     <revision>
-      <id>1175</id>
+      <id>1168</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59487,9 +59148,9 @@ Burns the enemy with moonfire for $d Arcane damage plus damage over time.
   <page>
     <title>Wildbloom (Ability)</title>
     <ns>0</ns>
-    <id>1176</id>
+    <id>1169</id>
     <revision>
-      <id>1176</id>
+      <id>1169</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59544,9 +59205,9 @@ Heals the target for $d over 12 sec.
   <page>
     <title>Briarguard (Ability)</title>
     <ns>0</ns>
-    <id>1177</id>
+    <id>1170</id>
     <revision>
-      <id>1177</id>
+      <id>1170</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59598,9 +59259,9 @@ Thorns sprout from the target: melee attackers take $b Nature damage.
   <page>
     <title>Gripping Roots (Ability)</title>
     <ns>0</ns>
-    <id>1178</id>
+    <id>1171</id>
     <revision>
-      <id>1178</id>
+      <id>1171</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59649,9 +59310,9 @@ Roots the target in place for up to 12 sec.
   <page>
     <title>Bruin Form (Ability)</title>
     <ns>0</ns>
-    <id>1179</id>
+    <id>1172</id>
     <revision>
-      <id>1179</id>
+      <id>1172</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59693,9 +59354,9 @@ Shapeshift into a bear: armor +90%, greatly increased attack power, your attacks
   <page>
     <title>Bruin Rush (Ability)</title>
     <ns>0</ns>
-    <id>1180</id>
+    <id>1173</id>
     <revision>
-      <id>1180</id>
+      <id>1173</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59738,9 +59399,9 @@ Rush an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range. Bruin
   <page>
     <title>Bonecrush (Ability)</title>
     <ns>0</ns>
-    <id>1181</id>
+    <id>1174</id>
     <revision>
-      <id>1181</id>
+      <id>1174</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59789,9 +59450,9 @@ A mauling attack that increases melee damage by $d and causes a high amount of t
   <page>
     <title>Menace (Ability)</title>
     <ns>0</ns>
-    <id>1182</id>
+    <id>1175</id>
     <revision>
-      <id>1182</id>
+      <id>1175</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59833,9 +59494,9 @@ Menaces the target: your threat rises to match its most hated enemy and it is co
   <page>
     <title>Craven Roar (Ability)</title>
     <ns>0</ns>
-    <id>1183</id>
+    <id>1176</id>
     <revision>
-      <id>1183</id>
+      <id>1176</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59884,9 +59545,9 @@ Demoralizes nearby enemies, reducing their attack power by 20 for 20 sec. Bruin 
   <page>
     <title>Wolf Form (Ability)</title>
     <ns>0</ns>
-    <id>1184</id>
+    <id>1177</id>
     <revision>
-      <id>1184</id>
+      <id>1177</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59928,9 +59589,9 @@ Shapeshift into a wolf: agility rises with your level, attack power +8 plus 2 pe
   <page>
     <title>Stalk (Ability)</title>
     <ns>0</ns>
-    <id>1185</id>
+    <id>1178</id>
     <revision>
-      <id>1185</id>
+      <id>1178</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -59972,9 +59633,9 @@ Enter stealth while in Wolf Form, moving 50% slower. Cannot be used in combat.
   <page>
     <title>Flense (Ability)</title>
     <ns>0</ns>
-    <id>1186</id>
+    <id>1179</id>
     <revision>
-      <id>1186</id>
+      <id>1179</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60024,9 +59685,9 @@ A stealth opener that rakes the enemy for weapon damage plus $d and causes bleed
   <page>
     <title>Claw (Ability)</title>
     <ns>0</ns>
-    <id>1187</id>
+    <id>1180</id>
     <revision>
-      <id>1187</id>
+      <id>1180</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60075,9 +59736,9 @@ Claw the enemy for weapon damage plus $d. Awards 1 combo point. Wolf Form only.
   <page>
     <title>Gorebite (Ability)</title>
     <ns>0</ns>
-    <id>1188</id>
+    <id>1181</id>
     <revision>
-      <id>1188</id>
+      <id>1181</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60119,9 +59780,9 @@ Finishing move that causes $d. Wolf Form only.
   <page>
     <title>Sweeping Claws (Ability)</title>
     <ns>0</ns>
-    <id>1189</id>
+    <id>1182</id>
     <revision>
-      <id>1189</id>
+      <id>1182</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60163,9 +59824,9 @@ Sweep your claws through nearby enemies for $d damage. Causes extra threat. Brui
   <page>
     <title>Second Bloom (Ability)</title>
     <ns>0</ns>
-    <id>1190</id>
+    <id>1183</id>
     <revision>
-      <id>1190</id>
+      <id>1183</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60208,9 +59869,9 @@ Heals a friendly target for $d and an additional amount over 21 sec.
   <page>
     <title>Oakhide (Ability)</title>
     <ns>0</ns>
-    <id>1191</id>
+    <id>1184</id>
     <revision>
-      <id>1191</id>
+      <id>1184</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60252,9 +59913,9 @@ Your skin hardens like bark, increasing armor by 150 for 15 sec.
   <page>
     <title>Primal Reflexes (Ability)</title>
     <ns>0</ns>
-    <id>1192</id>
+    <id>1185</id>
     <revision>
-      <id>1192</id>
+      <id>1185</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60296,9 +59957,9 @@ Your instincts sharpen, increasing your chance to dodge by 50% for 6 sec.
   <page>
     <title>Skyfall (Ability)</title>
     <ns>0</ns>
-    <id>1193</id>
+    <id>1186</id>
     <revision>
-      <id>1193</id>
+      <id>1186</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60340,9 +60001,9 @@ Calls down a bolt of stellar fire, causing $d Arcane damage.
   <page>
     <title>Fleet Form (Ability)</title>
     <ns>0</ns>
-    <id>1194</id>
+    <id>1187</id>
     <revision>
-      <id>1194</id>
+      <id>1187</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60384,9 +60045,9 @@ Instantly shift into a swift travel form, increasing movement speed by 40%. You 
   <page>
     <title>Stoke (Ability)</title>
     <ns>0</ns>
-    <id>1195</id>
+    <id>1188</id>
     <revision>
-      <id>1195</id>
+      <id>1188</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60428,9 +60089,9 @@ Generates 20 rage instantly. Bruin Form only.
   <page>
     <title>Concuss (Ability)</title>
     <ns>0</ns>
-    <id>1196</id>
+    <id>1189</id>
     <revision>
-      <id>1196</id>
+      <id>1189</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60472,9 +60133,9 @@ Stuns the target for 2 sec. Bruin Form only.
   <page>
     <title>Witchlight (Ability)</title>
     <ns>0</ns>
-    <id>1197</id>
+    <id>1190</id>
     <revision>
-      <id>1197</id>
+      <id>1190</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60516,9 +60177,9 @@ Decreases the target&apos;s armor by $d% for 40 sec. Does not stack with Armor S
   <page>
     <title>Slumber (Ability)</title>
     <ns>0</ns>
-    <id>1198</id>
+    <id>1191</id>
     <revision>
-      <id>1198</id>
+      <id>1191</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60560,9 +60221,9 @@ Forces the target into a deep sleep for up to 8 sec. Any damage will awaken it.
   <page>
     <title>Dash (Ability)</title>
     <ns>0</ns>
-    <id>1199</id>
+    <id>1192</id>
     <revision>
-      <id>1199</id>
+      <id>1192</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60604,9 +60265,9 @@ Sprint forward, increasing movement speed by 50% for 15 sec. Wolf Form only.
   <page>
     <title>Slinkstrike (Ability)</title>
     <ns>0</ns>
-    <id>1200</id>
+    <id>1193</id>
     <revision>
-      <id>1200</id>
+      <id>1193</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60648,9 +60309,9 @@ A stealth opener that stuns the target for 2 sec. Awards 1 combo point. Wolf For
   <page>
     <title>Stinging Swarm (Ability)</title>
     <ns>0</ns>
-    <id>1201</id>
+    <id>1194</id>
     <revision>
-      <id>1201</id>
+      <id>1194</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60692,9 +60353,9 @@ The enemy is swarmed by insects, taking $d Nature damage over 12 sec.
   <page>
     <title>Wolfsblood (Ability)</title>
     <ns>0</ns>
-    <id>1202</id>
+    <id>1195</id>
     <revision>
-      <id>1202</id>
+      <id>1195</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60736,9 +60397,9 @@ Increases attack power by $b for $t sec. Wolf Form only.
   <page>
     <title>Rip (Ability)</title>
     <ns>0</ns>
-    <id>1203</id>
+    <id>1196</id>
     <revision>
-      <id>1203</id>
+      <id>1196</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60780,9 +60441,9 @@ Finishing move that causes $d Bleed damage over 12 sec. Consumes combo points. W
   <page>
     <title>Maiming Strike (Ability)</title>
     <ns>0</ns>
-    <id>1204</id>
+    <id>1197</id>
     <revision>
-      <id>1204</id>
+      <id>1197</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60826,9 +60487,9 @@ A vicious strike dealing weapon damage plus $d and reducing healing the target r
   <page>
     <title>Bloodletting (Ability)</title>
     <ns>0</ns>
-    <id>1205</id>
+    <id>1198</id>
     <revision>
-      <id>1205</id>
+      <id>1198</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60873,9 +60534,9 @@ Instantly attack in a blood frenzy for $d, healing you for 3% of your maximum he
   <page>
     <title>Shieldcrack (Ability)</title>
     <ns>0</ns>
-    <id>1206</id>
+    <id>1199</id>
     <revision>
-      <id>1206</id>
+      <id>1199</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60918,9 +60579,9 @@ Slam the target with your shield for $d and massive threat, generating 15 rage. 
   <page>
     <title>Bladed Gyre (Ability)</title>
     <ns>0</ns>
-    <id>1207</id>
+    <id>1200</id>
     <revision>
-      <id>1207</id>
+      <id>1200</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -60963,9 +60624,9 @@ Spin in a deadly arc, striking all nearby enemies for $d at no rage cost. Your n
   <page>
     <title>Seething Fury (Ability)</title>
     <ns>0</ns>
-    <id>1208</id>
+    <id>1201</id>
     <revision>
-      <id>1208</id>
+      <id>1201</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61007,9 +60668,9 @@ Enter a berserker rage, generating 20 rage. (Warrior talent)
   <page>
     <title>Jawcrack (Ability)</title>
     <ns>0</ns>
-    <id>1209</id>
+    <id>1202</id>
     <revision>
-      <id>1209</id>
+      <id>1202</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61051,9 +60712,9 @@ Interrupts spellcasting, preventing any spell in that school from being cast for
   <page>
     <title>Heroic Leap (Ability)</title>
     <ns>0</ns>
-    <id>1210</id>
+    <id>1203</id>
     <revision>
-      <id>1210</id>
+      <id>1203</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61095,9 +60756,9 @@ Leap to the target area, dealing $d damage to nearby enemies on landing.
   <page>
     <title>Valor Roar (Ability)</title>
     <ns>0</ns>
-    <id>1211</id>
+    <id>1204</id>
     <revision>
-      <id>1211</id>
+      <id>1204</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61139,9 +60800,9 @@ Lets loose a valorous roar, granting you and party members within 40 yards 20% a
   <page>
     <title>Storm Bolt (Ability)</title>
     <ns>0</ns>
-    <id>1212</id>
+    <id>1205</id>
     <revision>
-      <id>1212</id>
+      <id>1205</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61184,9 +60845,9 @@ Hurl your weapon at the target for $d, stunning it for 3 sec.
   <page>
     <title>Intimidating Shout (Ability)</title>
     <ns>0</ns>
-    <id>1213</id>
+    <id>1206</id>
     <revision>
-      <id>1213</id>
+      <id>1206</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61228,9 +60889,9 @@ A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for
   <page>
     <title>Bladestorm (Ability)</title>
     <ns>0</ns>
-    <id>1214</id>
+    <id>1207</id>
     <revision>
-      <id>1214</id>
+      <id>1207</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61272,9 +60933,9 @@ Become a whirling storm of steel, striking all enemies within 6 yards for $d eve
   <page>
     <title>Victory Rush (Ability)</title>
     <ns>0</ns>
-    <id>1215</id>
+    <id>1208</id>
     <revision>
-      <id>1215</id>
+      <id>1208</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61317,9 +60978,9 @@ Strike for weapon damage plus $d and heal 20% of your maximum health. Only usabl
   <page>
     <title>Piercing Howl (Ability)</title>
     <ns>0</ns>
-    <id>1216</id>
+    <id>1209</id>
     <revision>
-      <id>1216</id>
+      <id>1209</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61361,9 +61022,9 @@ A piercing shout that slows all enemies within 15 yards by 50% for 8 sec.
   <page>
     <title>Die by the Sword (Ability)</title>
     <ns>0</ns>
-    <id>1217</id>
+    <id>1210</id>
     <revision>
-      <id>1217</id>
+      <id>1210</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61405,9 +61066,9 @@ Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attack
   <page>
     <title>Recklessness (Ability)</title>
     <ns>0</ns>
-    <id>1218</id>
+    <id>1211</id>
     <revision>
-      <id>1218</id>
+      <id>1211</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61449,9 +61110,9 @@ Enrage: your rage generation increases by 50% and your critical strike chance by
   <page>
     <title>Avatar (Ability)</title>
     <ns>0</ns>
-    <id>1219</id>
+    <id>1212</id>
     <revision>
-      <id>1219</id>
+      <id>1212</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61494,9 +61155,9 @@ Transform into a colossus for 20 sec, breaking enemy control effects on you (bos
   <page>
     <title>Sanguine Aura (Ability)</title>
     <ns>0</ns>
-    <id>1220</id>
+    <id>1213</id>
     <revision>
-      <id>1220</id>
+      <id>1213</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61536,55 +61197,11 @@ Imbue your weapon with the blood of your foes: you and your melee allies gain 10
   </page>
 
   <page>
-    <title>Crusader Strike (Ability)</title>
-    <ns>0</ns>
-    <id>1221</id>
-    <revision>
-      <id>1221</id>
-      <timestamp>2026-06-15T23:47:51Z</timestamp>
-      <contributor><username>WikiAdmin</username><id>1</id></contributor>
-      <comment>Seed World of Claudecraft wiki content</comment>
-      <model>wikitext</model>
-      <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="347">== Description ==
-Strikes the target for weapon damage plus $d Holy damage. (Paladin talent)
-
-== Facts ==
-{| class=&quot;wikitable article-facts&quot;
-|-
-! Class
-| [[Paladin]]
-|-
-! Learn level
-| 10
-|-
-! Cost
-| 30
-|-
-! Cooldown
-| 4s
-|-
-! Range
-| Melee/self
-|-
-! School
-| holy
-|}
-
-== Base effects ==
-* weaponStrike
-[[Category:Abilities]]
-[[Category:Paladin]]
-</text>
-    </revision>
-  </page>
-
-  <page>
     <title>Dread Aspect (Ability)</title>
     <ns>0</ns>
-    <id>1222</id>
+    <id>1214</id>
     <revision>
-      <id>1222</id>
+      <id>1214</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61628,56 +61245,11 @@ Transform into a monstrous demon for 20 sec, increasing your spell damage by 20%
   </page>
 
   <page>
-    <title>Holy Shock (Ability)</title>
-    <ns>0</ns>
-    <id>1223</id>
-    <revision>
-      <id>1223</id>
-      <timestamp>2026-06-15T23:47:51Z</timestamp>
-      <contributor><username>WikiAdmin</username><id>1</id></contributor>
-      <comment>Seed World of Claudecraft wiki content</comment>
-      <model>wikitext</model>
-      <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="379">== Description ==
-Shocks a friendly target with Holy energy to heal them, or an enemy for $d Holy damage. (Holy signature)
-
-== Facts ==
-{| class=&quot;wikitable article-facts&quot;
-|-
-! Class
-| [[Paladin]]
-|-
-! Learn level
-| 10
-|-
-! Cost
-| 55
-|-
-! Cooldown
-| 8s
-|-
-! Range
-| 30 yd
-|-
-! School
-| holy
-|}
-
-== Base effects ==
-* heal
-* directDamage
-[[Category:Abilities]]
-[[Category:Paladin]]
-</text>
-    </revision>
-  </page>
-
-  <page>
     <title>Howling Rage (Ability)</title>
     <ns>0</ns>
-    <id>1224</id>
+    <id>1215</id>
     <revision>
-      <id>1224</id>
+      <id>1215</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61720,9 +61292,9 @@ Sends you into a bestial rage, increasing your attack power by 20% and your pet 
   <page>
     <title>Sureflight Aura (Ability)</title>
     <ns>0</ns>
-    <id>1225</id>
+    <id>1216</id>
     <revision>
-      <id>1225</id>
+      <id>1216</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61764,9 +61336,9 @@ Inspires nearby allies, increasing attack power by 10% for 30 min. (Marksmanship
   <page>
     <title>Wyvern Sting (Ability)</title>
     <ns>0</ns>
-    <id>1226</id>
+    <id>1217</id>
     <revision>
-      <id>1226</id>
+      <id>1217</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61808,9 +61380,9 @@ Stings the enemy from range, incapacitating it for up to 4 sec. Any damage break
   <page>
     <title>Aether Surge (Ability) (2)</title>
     <ns>0</ns>
-    <id>1227</id>
+    <id>1218</id>
     <revision>
-      <id>1227</id>
+      <id>1218</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61853,9 +61425,9 @@ Increases spell damage by 20% and spell haste by 10% for 10 sec. (Arcane signatu
   <page>
     <title>Phoenix Trance (Ability)</title>
     <ns>0</ns>
-    <id>1228</id>
+    <id>1219</id>
     <revision>
-      <id>1228</id>
+      <id>1219</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61897,9 +61469,9 @@ Combust: for 10 sec your Fire spells always critically strike, including bolts a
   <page>
     <title>Frostsweep (Ability)</title>
     <ns>0</ns>
-    <id>1229</id>
+    <id>1220</id>
     <revision>
-      <id>1229</id>
+      <id>1220</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61941,9 +61513,9 @@ Blasts nearby enemies with frost for $d Frost damage. (Frost signature)
   <page>
     <title>Icy Veins (Ability)</title>
     <ns>0</ns>
-    <id>1230</id>
+    <id>1221</id>
     <revision>
-      <id>1230</id>
+      <id>1221</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -61986,9 +61558,9 @@ Increases spell haste by 30% and prevents cast interruption and pushback for 10 
   <page>
     <title>Killer&apos;s Calm (Ability)</title>
     <ns>0</ns>
-    <id>1231</id>
+    <id>1222</id>
     <revision>
-      <id>1231</id>
+      <id>1222</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62030,9 +61602,9 @@ Focuses your killing intent so your next attack is a critical strike. (Assassina
   <page>
     <title>Mirrored Blades (Ability)</title>
     <ns>0</ns>
-    <id>1232</id>
+    <id>1223</id>
     <revision>
-      <id>1232</id>
+      <id>1223</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62074,9 +61646,9 @@ Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat
   <page>
     <title>Red Ribbon (Ability)</title>
     <ns>0</ns>
-    <id>1233</id>
+    <id>1224</id>
     <revision>
-      <id>1233</id>
+      <id>1224</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62120,9 +61692,9 @@ Strikes the enemy for weapon damage plus $d, causes bleeding damage over 12 sec,
   <page>
     <title>Anointing (Ability)</title>
     <ns>0</ns>
-    <id>1234</id>
+    <id>1225</id>
     <revision>
-      <id>1234</id>
+      <id>1225</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62164,9 +61736,9 @@ Infuses a friendly target with power, increasing spell haste by 20% for 15 sec. 
   <page>
     <title>Holy Nova (Ability)</title>
     <ns>0</ns>
-    <id>1235</id>
+    <id>1226</id>
     <revision>
-      <id>1235</id>
+      <id>1226</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62209,9 +61781,9 @@ Causes an explosion of Mending Light, healing nearby allies for $d and damaging 
   <page>
     <title>Gloamveil (Ability)</title>
     <ns>0</ns>
-    <id>1236</id>
+    <id>1227</id>
     <revision>
-      <id>1236</id>
+      <id>1227</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62253,9 +61825,9 @@ Assume a Gloamveil, empowering shadow magic until you shift back. Cast again to 
   <page>
     <title>Primal Mastery (Ability)</title>
     <ns>0</ns>
-    <id>1237</id>
+    <id>1228</id>
     <revision>
-      <id>1237</id>
+      <id>1228</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62297,9 +61869,9 @@ Calls on primal mastery, making your next spell instant. (Elemental signature)
   <page>
     <title>Veinleech (Ability)</title>
     <ns>0</ns>
-    <id>1238</id>
+    <id>1229</id>
     <revision>
-      <id>1238</id>
+      <id>1229</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62341,9 +61913,9 @@ Siphons life from the enemy, causing $d Shadow damage over 30 sec and healing yo
   <page>
     <title>Conflagrate (Ability)</title>
     <ns>0</ns>
-    <id>1239</id>
+    <id>1230</id>
     <revision>
-      <id>1239</id>
+      <id>1230</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62385,9 +61957,9 @@ Consumes your Burning Pact on the enemy to ignite them for $d Fire damage. (Dest
   <page>
     <title>Moonwing Form (Ability)</title>
     <ns>0</ns>
-    <id>1240</id>
+    <id>1231</id>
     <revision>
-      <id>1240</id>
+      <id>1231</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62429,9 +62001,9 @@ Shapeshift into a fearsome Moonkin, increasing your spell damage by 20% and your
   <page>
     <title>Primal Surge (Ability)</title>
     <ns>0</ns>
-    <id>1241</id>
+    <id>1232</id>
     <revision>
-      <id>1241</id>
+      <id>1232</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62473,9 +62045,9 @@ Unleash a primal surge. In Wolf Form, Energy regeneration is increased by 100% f
   <page>
     <title>Swiftmend (Ability)</title>
     <ns>0</ns>
-    <id>1242</id>
+    <id>1233</id>
     <revision>
-      <id>1242</id>
+      <id>1233</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62517,9 +62089,9 @@ Consumes a heal-over-time effect on a friendly target to heal them for $d. (Rest
   <page>
     <title>Boot (Ability)</title>
     <ns>0</ns>
-    <id>1243</id>
+    <id>1234</id>
     <revision>
-      <id>1243</id>
+      <id>1234</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62561,9 +62133,9 @@ Interrupts the target&apos;s spellcast and prevents casting from that school for
   <page>
     <title>Flickerstep (Ability)</title>
     <ns>0</ns>
-    <id>1244</id>
+    <id>1235</id>
     <revision>
-      <id>1244</id>
+      <id>1235</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62605,9 +62177,9 @@ Teleports you 15 yd forward and breaks roots. (Mage talent)
   <page>
     <title>Hushing Shot (Ability)</title>
     <ns>0</ns>
-    <id>1245</id>
+    <id>1236</id>
     <revision>
-      <id>1245</id>
+      <id>1236</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62649,9 +62221,9 @@ Interrupts spellcasting and prevents any spell in that school from being cast fo
   <page>
     <title>Spellbreak (Ability)</title>
     <ns>0</ns>
-    <id>1246</id>
+    <id>1237</id>
     <revision>
-      <id>1246</id>
+      <id>1237</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62693,9 +62265,9 @@ Counters enemy spellcasting, preventing any spell in that school from being cast
   <page>
     <title>Deadfrost (Ability)</title>
     <ns>0</ns>
-    <id>1247</id>
+    <id>1238</id>
     <revision>
-      <id>1247</id>
+      <id>1238</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62738,9 +62310,9 @@ Deep freezes the target, dealing $d Frost damage and stunning it for 4 sec. (Mag
   <page>
     <title>Aetherwell (Ability)</title>
     <ns>0</ns>
-    <id>1248</id>
+    <id>1239</id>
     <revision>
-      <id>1248</id>
+      <id>1239</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62783,9 +62355,9 @@ Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stack
   <page>
     <title>Cold Coffin (Ability)</title>
     <ns>0</ns>
-    <id>1249</id>
+    <id>1240</id>
     <revision>
-      <id>1249</id>
+      <id>1240</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62828,9 +62400,9 @@ Encases you in solid ice for 8 sec, becoming immune to all damage and effects an
   <page>
     <title>Patch Up (Ability) (2)</title>
     <ns>0</ns>
-    <id>1250</id>
+    <id>1241</id>
     <revision>
-      <id>1250</id>
+      <id>1241</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62872,9 +62444,9 @@ Heals a friendly target for $d over 15 sec. (Hunter talent)
   <page>
     <title>Meteor (Ability)</title>
     <ns>0</ns>
-    <id>1251</id>
+    <id>1242</id>
     <revision>
-      <id>1251</id>
+      <id>1242</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62916,9 +62488,9 @@ Calls a meteor down on the target area: after a 2 sec fall it deals 90 to 120 Fi
   <page>
     <title>Racing Mind (Ability)</title>
     <ns>0</ns>
-    <id>1252</id>
+    <id>1243</id>
     <revision>
-      <id>1252</id>
+      <id>1243</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -62960,9 +62532,9 @@ Makes your next spell with a cast time instant. Lasts 60 sec. (Mage talent)
   <page>
     <title>Ice Floes (Ability)</title>
     <ns>0</ns>
-    <id>1253</id>
+    <id>1244</id>
     <revision>
-      <id>1253</id>
+      <id>1244</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -63004,9 +62576,9 @@ Your next two spells with a cast time can be cast while moving. Lasts 15 sec. (M
   <page>
     <title>Greater Invisibility (Ability)</title>
     <ns>0</ns>
-    <id>1254</id>
+    <id>1245</id>
     <revision>
-      <id>1254</id>
+      <id>1245</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -63048,9 +62620,9 @@ Vanish for 20 sec: removes 2 damage-over-time effects and you take 90% less dama
   <page>
     <title>Ring of Frost (Ability)</title>
     <ns>0</ns>
-    <id>1255</id>
+    <id>1246</id>
     <revision>
-      <id>1255</id>
+      <id>1246</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -63092,9 +62664,9 @@ Summons a ring for 10 sec. Enemies crossing its perimeter are frozen for 4 sec. 
   <page>
     <title>Winter&apos;s Recall (Ability)</title>
     <ns>0</ns>
-    <id>1256</id>
+    <id>1247</id>
     <revision>
-      <id>1256</id>
+      <id>1247</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -63136,9 +62708,9 @@ Finishes the cooldown on Flickerstep, Frostveil, and Greater Invisibility. (Mage
   <page>
     <title>Mass Barrier (Ability)</title>
     <ns>0</ns>
-    <id>1257</id>
+    <id>1248</id>
     <revision>
-      <id>1257</id>
+      <id>1248</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -63180,9 +62752,9 @@ Shields you and up to 4 nearby allies within 30 yd, each absorbing 130 damage fo
   <page>
     <title>Overload (Ability)</title>
     <ns>0</ns>
-    <id>1258</id>
+    <id>1249</id>
     <revision>
-      <id>1258</id>
+      <id>1249</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -63224,9 +62796,9 @@ Your next spell is amplified by 40% but costs 50% more mana. Lasts 10 sec. (Mage
   <page>
     <title>Power Echo (Ability)</title>
     <ns>0</ns>
-    <id>1259</id>
+    <id>1250</id>
     <revision>
-      <id>1259</id>
+      <id>1250</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -63268,9 +62840,9 @@ Your next direct spell repeats at 50% power on the same target. Lasts 10 sec. (M
   <page>
     <title>Rune of Power (Ability)</title>
     <ns>0</ns>
-    <id>1260</id>
+    <id>1251</id>
     <revision>
-      <id>1260</id>
+      <id>1251</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -63312,9 +62884,9 @@ Inscribe a rune of power at your feet for 15 sec: allies standing within 8 yd de
   <page>
     <title>Blazing Barrier (Ability)</title>
     <ns>0</ns>
-    <id>1261</id>
+    <id>1252</id>
     <revision>
-      <id>1261</id>
+      <id>1252</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -63366,9 +62938,9 @@ Wreathe yourself in flame, absorbing $d damage for 60 sec. (Fire)
   <page>
     <title>Ignition (Ability)</title>
     <ns>0</ns>
-    <id>1262</id>
+    <id>1253</id>
     <revision>
-      <id>1262</id>
+      <id>1253</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -63409,9 +62981,9 @@ Passive: your spell critical strikes burn the target for 40% of the damage dealt
   <page>
     <title>Hot Streak (Ability)</title>
     <ns>0</ns>
-    <id>1263</id>
+    <id>1254</id>
     <revision>
-      <id>1263</id>
+      <id>1254</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -63452,9 +63024,9 @@ Passive: two critical strikes in a row with your Fire spells (Cinderbolt, Cinder
   <page>
     <title>Summon Water Elemental (Ability)</title>
     <ns>0</ns>
-    <id>1264</id>
+    <id>1255</id>
     <revision>
-      <id>1264</id>
+      <id>1255</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -63494,55 +63066,11 @@ Summon a Water Elemental to fight beside you, hurling Waterbolts at your target 
   </page>
 
   <page>
-    <title>Reproach (Ability)</title>
-    <ns>0</ns>
-    <id>1265</id>
-    <revision>
-      <id>1265</id>
-      <timestamp>2026-06-15T23:47:51Z</timestamp>
-      <contributor><username>WikiAdmin</username><id>1</id></contributor>
-      <comment>Seed World of Claudecraft wiki content</comment>
-      <model>wikitext</model>
-      <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="380">== Description ==
-Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Paladin talent)
-
-== Facts ==
-{| class=&quot;wikitable article-facts&quot;
-|-
-! Class
-| [[Paladin]]
-|-
-! Learn level
-| 10
-|-
-! Cost
-| 20
-|-
-! Cooldown
-| 12s
-|-
-! Range
-| Melee/self
-|-
-! School
-| physical
-|}
-
-== Base effects ==
-* interrupt
-[[Category:Abilities]]
-[[Category:Paladin]]
-</text>
-    </revision>
-  </page>
-
-  <page>
     <title>Headbutt (Ability)</title>
     <ns>0</ns>
-    <id>1266</id>
+    <id>1256</id>
     <revision>
-      <id>1266</id>
+      <id>1256</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -63584,9 +63112,9 @@ Interrupts spellcasting and prevents any spell in that school from being cast fo
   <page>
     <title>Gag Order (Ability)</title>
     <ns>0</ns>
-    <id>1267</id>
+    <id>1257</id>
     <revision>
-      <id>1267</id>
+      <id>1257</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -63626,189 +63154,11 @@ Interrupts spellcasting and prevents any spell in that school from being cast fo
   </page>
 
   <page>
-    <title>Cleansing Verdict (Ability)</title>
-    <ns>0</ns>
-    <id>1268</id>
-    <revision>
-      <id>1268</id>
-      <timestamp>2026-06-15T23:47:51Z</timestamp>
-      <contributor><username>WikiAdmin</username><id>1</id></contributor>
-      <comment>Seed World of Claudecraft wiki content</comment>
-      <model>wikitext</model>
-      <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="348">== Description ==
-Purges a harmful magic effect from a friendly target and heals them for $d Holy.
-
-== Facts ==
-{| class=&quot;wikitable article-facts&quot;
-|-
-! Class
-| [[Paladin]]
-|-
-! Learn level
-| 8
-|-
-! Cost
-| 25
-|-
-! Cooldown
-| 8s
-|-
-! Range
-| 30 yd
-|-
-! School
-| holy
-|}
-
-== Base effects ==
-* dispel
-* heal
-[[Category:Abilities]]
-[[Category:Paladin]]
-</text>
-    </revision>
-  </page>
-
-  <page>
-    <title>Saint&apos;s Ire (Ability)</title>
-    <ns>0</ns>
-    <id>1269</id>
-    <revision>
-      <id>1269</id>
-      <timestamp>2026-06-15T23:47:51Z</timestamp>
-      <contributor><username>WikiAdmin</username><id>1</id></contributor>
-      <comment>Seed World of Claudecraft wiki content</comment>
-      <model>wikitext</model>
-      <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="341">== Description ==
-Unleashes holy power, damaging nearby enemies for $d. (Paladin talent)
-
-== Facts ==
-{| class=&quot;wikitable article-facts&quot;
-|-
-! Class
-| [[Paladin]]
-|-
-! Learn level
-| 10
-|-
-! Cost
-| 85
-|-
-! Cooldown
-| 20s
-|-
-! Range
-| Melee/self
-|-
-! School
-| holy
-|}
-
-== Base effects ==
-* aoeDamage
-[[Category:Abilities]]
-[[Category:Paladin]]
-</text>
-    </revision>
-  </page>
-
-  <page>
-    <title>Lightward (Ability)</title>
-    <ns>0</ns>
-    <id>1270</id>
-    <revision>
-      <id>1270</id>
-      <timestamp>2026-06-15T23:47:51Z</timestamp>
-      <contributor><username>WikiAdmin</username><id>1</id></contributor>
-      <comment>Seed World of Claudecraft wiki content</comment>
-      <model>wikitext</model>
-      <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="346">== Description ==
-Shields you with holy power, absorbing 900 damage for 8 sec. (Paladin talent)
-
-== Facts ==
-{| class=&quot;wikitable article-facts&quot;
-|-
-! Class
-| [[Paladin]]
-|-
-! Learn level
-| 10
-|-
-! Cost
-| 35
-|-
-! Cooldown
-| 300s
-|-
-! Range
-| Melee/self
-|-
-! School
-| holy
-|}
-
-== Base effects ==
-* absorb
-[[Category:Abilities]]
-[[Category:Paladin]]
-</text>
-    </revision>
-  </page>
-
-  <page>
-    <title>Dawnward Ricochet (Ability)</title>
-    <ns>0</ns>
-    <id>1271</id>
-    <revision>
-      <id>1271</id>
-      <timestamp>2026-06-15T23:47:51Z</timestamp>
-      <contributor><username>WikiAdmin</username><id>1</id></contributor>
-      <comment>Seed World of Claudecraft wiki content</comment>
-      <model>wikitext</model>
-      <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="461">== Description ==
-Hurl a dawnforged shield for $d Holy damage and silence the primary target for 2 sec. It bounces to up to 2 additional enemies within 10 yd for 75% damage per bounce. (Paladin talent)
-
-== Facts ==
-{| class=&quot;wikitable article-facts&quot;
-|-
-! Class
-| [[Paladin]]
-|-
-! Learn level
-| 20
-|-
-! Cost
-| 55
-|-
-! Cooldown
-| 20s
-|-
-! Range
-| 30 yd
-|-
-! School
-| holy
-|}
-
-== Base effects ==
-* chainDamage
-* silence
-[[Category:Abilities]]
-[[Category:Paladin]]
-</text>
-    </revision>
-  </page>
-
-  <page>
     <title>Startle Shot (Ability)</title>
     <ns>0</ns>
-    <id>1272</id>
+    <id>1258</id>
     <revision>
-      <id>1272</id>
+      <id>1258</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -63850,9 +63200,9 @@ A wild shot that disorients the target for $t sec. Any damage breaks the effect.
   <page>
     <title>Rime Snare (Ability)</title>
     <ns>0</ns>
-    <id>1273</id>
+    <id>1259</id>
     <revision>
-      <id>1273</id>
+      <id>1259</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -63894,9 +63244,9 @@ Places a frost trap at your feet that arms after 1.5 sec. The first enemy to tou
   <page>
     <title>Splitshot (Ability)</title>
     <ns>0</ns>
-    <id>1274</id>
+    <id>1260</id>
     <revision>
-      <id>1274</id>
+      <id>1260</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -63938,9 +63288,9 @@ Loose a spread at the target area, dealing $d Physical damage to enemies within 
   <page>
     <title>Bristleguard (Ability)</title>
     <ns>0</ns>
-    <id>1275</id>
+    <id>1261</id>
     <revision>
-      <id>1275</id>
+      <id>1261</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -63983,9 +63333,9 @@ Increases your dodge chance by 25 percentage points and reduces all damage taken
   <page>
     <title>Wildfang Rally (Ability)</title>
     <ns>0</ns>
-    <id>1276</id>
+    <id>1262</id>
     <revision>
-      <id>1276</id>
+      <id>1262</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64028,9 +63378,9 @@ Inspires allies within 30 yd with wild strength, increasing attack power by 45 a
   <page>
     <title>Smoke Screen (Ability)</title>
     <ns>0</ns>
-    <id>1277</id>
+    <id>1263</id>
     <revision>
-      <id>1277</id>
+      <id>1263</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64072,9 +63422,9 @@ Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec.
   <page>
     <title>Contingency (Ability)</title>
     <ns>0</ns>
-    <id>1278</id>
+    <id>1264</id>
     <revision>
-      <id>1278</id>
+      <id>1264</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64116,9 +63466,9 @@ Finishes the cooldown on Swift Heels, Ghostfoot, and Smokestep. (Rogue talent)
   <page>
     <title>Wraith Strike (Ability)</title>
     <ns>0</ns>
-    <id>1279</id>
+    <id>1265</id>
     <revision>
-      <id>1279</id>
+      <id>1265</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64161,9 +63511,9 @@ Strikes the enemy for weapon damage plus $d and briefly increases dodge. Awards 
   <page>
     <title>Shadecloak (Ability)</title>
     <ns>0</ns>
-    <id>1280</id>
+    <id>1266</id>
     <revision>
-      <id>1280</id>
+      <id>1266</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64205,9 +63555,9 @@ Wraps you in shadows, absorbing 420 damage for 5 sec. (Rogue talent)
   <page>
     <title>Shadeslip (Ability)</title>
     <ns>0</ns>
-    <id>1281</id>
+    <id>1267</id>
     <revision>
-      <id>1281</id>
+      <id>1267</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64249,9 +63599,9 @@ Steps through the shadows toward your target without breaking Duskveil. (Rogue t
   <page>
     <title>Hushword (Ability)</title>
     <ns>0</ns>
-    <id>1282</id>
+    <id>1268</id>
     <revision>
-      <id>1282</id>
+      <id>1268</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64293,9 +63643,9 @@ Silences the target for 4 sec. (Priest talent)
   <page>
     <title>Terror Canticle (Ability)</title>
     <ns>0</ns>
-    <id>1283</id>
+    <id>1269</id>
     <revision>
-      <id>1283</id>
+      <id>1269</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64337,9 +63687,9 @@ Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest t
   <page>
     <title>Stilled Mind (Ability)</title>
     <ns>0</ns>
-    <id>1284</id>
+    <id>1270</id>
     <revision>
-      <id>1284</id>
+      <id>1270</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64381,9 +63731,9 @@ Makes your next spell free. Lasts 60 sec. (Priest talent)
   <page>
     <title>Last Prayer (Ability)</title>
     <ns>0</ns>
-    <id>1285</id>
+    <id>1271</id>
     <revision>
-      <id>1285</id>
+      <id>1271</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64425,9 +63775,9 @@ Instantly heals you for $d. (Priest talent)
   <page>
     <title>Choirmend (Ability)</title>
     <ns>0</ns>
-    <id>1286</id>
+    <id>1272</id>
     <revision>
-      <id>1286</id>
+      <id>1272</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64469,9 +63819,9 @@ Heals nearby allies for $d. (Priest talent)
   <page>
     <title>Thoughtburn (Ability)</title>
     <ns>0</ns>
-    <id>1287</id>
+    <id>1273</id>
     <revision>
-      <id>1287</id>
+      <id>1273</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64513,9 +63863,9 @@ Channels shadow energy at the target area, damaging nearby enemies each second f
   <page>
     <title>Springwell (Ability)</title>
     <ns>0</ns>
-    <id>1288</id>
+    <id>1274</id>
     <revision>
-      <id>1288</id>
+      <id>1274</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64557,9 +63907,9 @@ Restores 120 health to a friendly target over 12 sec. (Shaman talent)
   <page>
     <title>Skybranch (Ability)</title>
     <ns>0</ns>
-    <id>1289</id>
+    <id>1275</id>
     <revision>
-      <id>1289</id>
+      <id>1275</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64601,9 +63951,9 @@ Hurls lightning at the target area, damaging nearby enemies for $d. (Shaman tale
   <page>
     <title>Gripping Earth (Ability)</title>
     <ns>0</ns>
-    <id>1290</id>
+    <id>1276</id>
     <revision>
-      <id>1290</id>
+      <id>1276</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64645,9 +63995,9 @@ Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)
   <page>
     <title>Storm Chorus (Ability)</title>
     <ns>0</ns>
-    <id>1291</id>
+    <id>1277</id>
     <revision>
-      <id>1291</id>
+      <id>1277</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64689,9 +64039,9 @@ Whips your group or raid into a frenzy, increasing attack, casting, and channeli
   <page>
     <title>Spellsteal (Ability)</title>
     <ns>0</ns>
-    <id>1292</id>
+    <id>1278</id>
     <revision>
-      <id>1292</id>
+      <id>1278</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64733,9 +64083,9 @@ Steals a beneficial magic effect from an enemy, transferring it to yourself.
   <page>
     <title>Voidfeast (Ability)</title>
     <ns>0</ns>
-    <id>1293</id>
+    <id>1279</id>
     <revision>
-      <id>1293</id>
+      <id>1279</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64777,9 +64127,9 @@ Devours a magic effect (a beneficial one from an enemy, or a harmful one from an
   <page>
     <title>Dread Chorus (Ability)</title>
     <ns>0</ns>
-    <id>1294</id>
+    <id>1280</id>
     <revision>
-      <id>1294</id>
+      <id>1280</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64821,9 +64171,9 @@ Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock 
   <page>
     <title>Leaden Hex (Ability)</title>
     <ns>0</ns>
-    <id>1295</id>
+    <id>1281</id>
     <revision>
-      <id>1295</id>
+      <id>1281</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64865,9 +64215,9 @@ Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)
   <page>
     <title>Morrowlash (Ability)</title>
     <ns>0</ns>
-    <id>1296</id>
+    <id>1282</id>
     <revision>
-      <id>1296</id>
+      <id>1282</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64910,9 +64260,9 @@ Strikes the enemy for $d Shadow damage, then horrifies them for 3 sec. (Warlock 
   <page>
     <title>Ruinbolt (Ability)</title>
     <ns>0</ns>
-    <id>1297</id>
+    <id>1283</id>
     <revision>
-      <id>1297</id>
+      <id>1283</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64954,9 +64304,9 @@ Hurls a bolt of chaotic fire for $d Fire damage. (Warlock talent)
   <page>
     <title>Typhoon (Ability)</title>
     <ns>0</ns>
-    <id>1298</id>
+    <id>1284</id>
     <revision>
-      <id>1298</id>
+      <id>1284</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -64998,9 +64348,9 @@ A blast of wind knocks back all enemies within 8 yd and dazes them, slowing thei
   <page>
     <title>Lifesap (Ability)</title>
     <ns>0</ns>
-    <id>1299</id>
+    <id>1285</id>
     <revision>
-      <id>1299</id>
+      <id>1285</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -65042,9 +64392,9 @@ Living sap wells up in you for 10 sec, restoring 20 of your current resource in 
   <page>
     <title>Savage Mending (Ability)</title>
     <ns>0</ns>
-    <id>1300</id>
+    <id>1286</id>
     <revision>
-      <id>1300</id>
+      <id>1286</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -65086,9 +64436,9 @@ Restores 180 health over 10 sec. Bruin Form only. (Druid talent)
   <page>
     <title>Red Haze (Ability)</title>
     <ns>0</ns>
-    <id>1301</id>
+    <id>1287</id>
     <revision>
-      <id>1301</id>
+      <id>1287</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -65130,9 +64480,9 @@ Increases attack power by 70 for 15 sec. (Druid talent)
   <page>
     <title>Gladesong (Ability)</title>
     <ns>0</ns>
-    <id>1302</id>
+    <id>1288</id>
     <revision>
-      <id>1302</id>
+      <id>1288</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -65174,9 +64524,9 @@ Channels restorative energy for 4 sec, healing allies within 30 yd for 42 to 52 
   <page>
     <title>Kick (Ability)</title>
     <ns>0</ns>
-    <id>1303</id>
+    <id>1289</id>
     <revision>
-      <id>1303</id>
+      <id>1289</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -65218,9 +64568,9 @@ Knock the ball along the ground toward the aim point.
   <page>
     <title>Big Boot (Ability)</title>
     <ns>0</ns>
-    <id>1304</id>
+    <id>1290</id>
     <revision>
-      <id>1304</id>
+      <id>1290</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -65262,9 +64612,9 @@ A long lofted boot toward the aim point. The crowd loves it.
   <page>
     <title>Hoof It (Ability)</title>
     <ns>0</ns>
-    <id>1305</id>
+    <id>1291</id>
     <revision>
-      <id>1305</id>
+      <id>1291</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -65306,9 +64656,9 @@ Hammer the ball low and hard up the field.
   <page>
     <title>Long Punt (Ability)</title>
     <ns>0</ns>
-    <id>1306</id>
+    <id>1292</id>
     <revision>
-      <id>1306</id>
+      <id>1292</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -65350,9 +64700,9 @@ A keeper&apos;s punt, high and far.
   <page>
     <title>Shoot (Ability)</title>
     <ns>0</ns>
-    <id>1307</id>
+    <id>1293</id>
     <revision>
-      <id>1307</id>
+      <id>1293</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -65394,9 +64744,9 @@ Hold to build power, release to shoot at goal. Too much power sails over.
   <page>
     <title>Pass (Ability)</title>
     <ns>0</ns>
-    <id>1308</id>
+    <id>1294</id>
     <revision>
-      <id>1308</id>
+      <id>1294</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -65438,9 +64788,9 @@ Roll a firm pass to your targeted teammate, leading their run.
   <page>
     <title>Feint (Ability)</title>
     <ns>0</ns>
-    <id>1309</id>
+    <id>1295</id>
     <revision>
-      <id>1309</id>
+      <id>1295</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -65482,9 +64832,9 @@ A quick sidestep burst toward the aim point.
   <page>
     <title>Dive (Ability)</title>
     <ns>0</ns>
-    <id>1310</id>
+    <id>1296</id>
     <revision>
-      <id>1310</id>
+      <id>1296</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -65526,9 +64876,9 @@ Fling yourself toward the aim point. A crossing ball sticks to you.
   <page>
     <title>Shoulder (Ability)</title>
     <ns>0</ns>
-    <id>1311</id>
+    <id>1297</id>
     <revision>
-      <id>1311</id>
+      <id>1297</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -65571,9 +64921,9 @@ A fair harvest-truce shoulder. Sends them tumbling off the ball.
   <page>
     <title>Fresh Legs (Ability)</title>
     <ns>0</ns>
-    <id>1312</id>
+    <id>1298</id>
     <revision>
-      <id>1312</id>
+      <id>1298</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
@@ -65615,15 +64965,15 @@ Find your legs: move 50% faster for 4 sec.
   <page>
     <title>All Pages</title>
     <ns>0</ns>
-    <id>1313</id>
+    <id>1299</id>
     <revision>
-      <id>1313</id>
+      <id>1299</id>
       <timestamp>2026-06-15T23:47:51Z</timestamp>
       <contributor><username>WikiAdmin</username><id>1</id></contributor>
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="34315">== Complete index ==
+      <text xml:space="preserve" bytes="33902">== Complete index ==
 * [[A Different Pastime]]
 * [[A Recipe Worth Keeping]]
 * [[A Trade for Every Hand]]
@@ -65672,7 +65022,6 @@ Find your legs: move 50% faster for 4 sec.
 * [[Ashwood Log]]
 * [[Ashwood Smoked Eel]]
 * [[Auctioneer Voss (NPC)]]
-* [[Aura Mastery (Ability)]]
 * [[Avatar (Ability)]]
 * [[Avenging Wrath (Ability)]]
 * [[Back on the Stove]]
@@ -65811,7 +65160,6 @@ Find your legs: move 50% faster for 4 sec.
 * [[Cinderweave Slippers]]
 * [[Classes]]
 * [[Claw (Ability)]]
-* [[Cleansing Verdict (Ability)]]
 * [[Cleaving Blows (Ability)]]
 * [[Cloaks for the Watch]]
 * [[Cold Coffin (Ability)]]
@@ -65862,7 +65210,6 @@ Find your legs: move 50% faster for 4 sec.
 * [[Crimson Amber]]
 * [[Crossroads Saber]]
 * [[Crumbled Spaulders]]
-* [[Crusader Strike (Ability)]]
 * [[Crypt Keystone Lower]]
 * [[Crypt Keystone Upper]]
 * [[Crypt Keystone]]
@@ -65880,7 +65227,6 @@ Find your legs: move 50% faster for 4 sec.
 * [[Dawn Devotion (Ability)]]
 * [[Dawn&apos;s Embrace (Ability)]]
 * [[Dawnfall (Ability)]]
-* [[Dawnward Ricochet (Ability)]]
 * [[Deacon Varric (Mob)]]
 * [[Deacon Voss (Mob)]]
 * [[Deacon&apos;s Cleaver]]
@@ -66169,7 +65515,6 @@ Find your legs: move 50% faster for 4 sec.
 * [[Hollowbound Legguards]]
 * [[Holy Ground (Ability)]]
 * [[Holy Nova (Ability)]]
-* [[Holy Shock (Ability)]]
 * [[Homespun Cloth]]
 * [[Homespun Hood]]
 * [[Homespun Mitts]]
@@ -66241,8 +65586,6 @@ Find your legs: move 50% faster for 4 sec.
 * [[Life Covenant (Ability)]]
 * [[Lifesap (Ability)]]
 * [[Light on the Water]]
-* [[Lightmend (Ability)]]
-* [[Lightward (Ability)]]
 * [[Linen Pouch]]
 * [[Linen Scrap]]
 * [[Lingering Grace (Ability)]]
@@ -66383,10 +65726,8 @@ Find your legs: move 50% faster for 4 sec.
 * [[Nythraxis, Scourge of Thornpeak (Mob)]]
 * [[Oakhide (Ability)]]
 * [[Oath Chain (Ability)]]
-* [[Oath of Iron (Ability)]]
 * [[Oath of the Round Table]]
 * [[Oathbound Greaves]]
-* [[Oathbrand (Ability)]]
 * [[Ogre Bonecharm Staff]]
 * [[Ogre Toe Ring]]
 * [[Ogre War Totem]]
@@ -66491,7 +65832,6 @@ Find your legs: move 50% faster for 4 sec.
 * [[Release Companion (Ability)]]
 * [[Reliquant&apos;s Drowned Cowl]]
 * [[Reliquary Guard Hauberk]]
-* [[Reproach (Ability)]]
 * [[Requital Aura (Ability)]]
 * [[Resonant Hide]]
 * [[Resonant Links]]
@@ -66514,7 +65854,6 @@ Find your legs: move 50% faster for 4 sec.
 * [[Rip (Ability)]]
 * [[Riptide Dirk]]
 * [[Risen Royal Guard (Mob)]]
-* [[Rite of Expulsion (Ability)]]
 * [[Ritual Circle]]
 * [[Ritual Phylactery]]
 * [[Riveted Copper Girdle]]
@@ -66536,11 +65875,9 @@ Find your legs: move 50% faster for 4 sec.
 * [[Sableweb Menace]]
 * [[Sableweb Silk Gland]]
 * [[Sableweb Slippers]]
-* [[Sacred Bulwark (Ability)]]
+* [[Sacred Concord (Ability)]]
 * [[Sacred Form (Ability)]]
-* [[Sacred Goad (Ability) (2)]]
 * [[Sacred Goad (Ability)]]
-* [[Saint&apos;s Ire (Ability)]]
 * [[Saintless Effigy (Mob)]]
 * [[Salted Jerky]]
 * [[Sanctum Boneguard (Mob)]]
@@ -66654,7 +65991,6 @@ Find your legs: move 50% faster for 4 sec.
 * [[Stalk (Ability)]]
 * [[Stalkers on the Ridge]]
 * [[Startle Shot (Ability)]]
-* [[Steadfast Aura (Ability)]]
 * [[Steel Orange]]
 * [[Stilled Mind (Ability)]]
 * [[Stinging Swarm (Ability)]]

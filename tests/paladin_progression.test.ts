@@ -1,0 +1,115 @@
+import { describe, expect, it } from 'vitest';
+import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
+import { computeTalentModifiers } from '../src/sim/content/talents';
+
+type PaladinSpec = 'holy' | 'protection' | 'retribution';
+
+const GENERAL_LEVELS = {
+  holy_light: 1,
+  divine_ascension: 1,
+  hammer_of_justice: 2,
+  hammer_of_grace: 3,
+  devotion_ward: 4,
+  dawn_devotion: 5,
+  divine_protection: 6,
+  recall_the_fallen: 6,
+  retribution_aura: 7,
+  grace_devotion: 8,
+  solar_step: 8,
+  radiant_devotion: 10,
+  lay_on_hands: 12,
+  avenging_wrath: 14,
+} as const;
+
+const SPEC_LEVELS = {
+  holy: {
+    sacred_form: 5,
+    mercy_lance: 8,
+    solar_invocation: 9,
+    life_covenant: 10,
+    dawns_embrace: 13,
+    radiant_chorus: 14,
+    beacon_of_light: 16,
+    aegis_first_dawn: 18,
+  },
+  protection: {
+    vowkeeper_strike: 5,
+    righteous_fury: 5,
+    sacred_challenge: 6,
+    bastion_rite: 7,
+    consecration: 9,
+    hushbrand: 10,
+    bastion_sweep: 11,
+    sunward_disc: 12,
+    holy_shield: 13,
+    oath_chain: 14,
+    veilbound_march: 18,
+  },
+  retribution: {
+    final_edict: 8,
+    faithforged_guard: 9,
+    consecration: 9,
+    hushbrand: 10,
+    dawnfall: 12,
+    guardian_covenant: 12,
+    valkyrs_calling: 13,
+    hammer_of_wrath: 14,
+    sun_gods_verdict: 17,
+  },
+} as const satisfies Record<PaladinSpec, Record<string, number>>;
+
+const QUESTS_DONE = new Set(['q_rite_of_redemption']);
+
+function knownAt(spec: PaladinSpec, level: number): string[] {
+  const mods = computeTalentModifiers('paladin', { spec, ranks: {}, choices: {} }, level);
+  return abilitiesKnownAt('paladin', level, mods, QUESTS_DONE).map(({ def }) => def.id);
+}
+
+function knownWithoutSpec(level: number): string[] {
+  const mods = computeTalentModifiers('paladin', { spec: null, ranks: {}, choices: {} }, level);
+  return abilitiesKnownAt('paladin', level, mods, QUESTS_DONE).map(({ def }) => def.id);
+}
+
+describe('Paladin final progression', () => {
+  it('pins every visible general and specialization learn level', () => {
+    for (const [id, level] of Object.entries(GENERAL_LEVELS)) {
+      expect(ABILITIES[id].learnLevel, id).toBe(level);
+      expect(ABILITIES[id].specs, id).toBeUndefined();
+    }
+    for (const [spec, levels] of Object.entries(SPEC_LEVELS)) {
+      for (const [id, level] of Object.entries(levels)) {
+        expect(ABILITIES[id].learnLevel, `${spec}:${id}`).toBe(level);
+        expect(ABILITIES[id].specs, `${spec}:${id}`).toContain(spec);
+      }
+    }
+  });
+
+  it('unlocks every level-gated ability at its exact boundary', () => {
+    for (const spec of Object.keys(SPEC_LEVELS) as PaladinSpec[]) {
+      const levels = { ...GENERAL_LEVELS, ...SPEC_LEVELS[spec] };
+      for (const [id, level] of Object.entries(levels)) {
+        expect(knownAt(spec, level), `${spec}:${id} at ${level}`).toContain(id);
+        if (level > 1) {
+          expect(knownAt(spec, level - 1), `${spec}:${id} before ${level}`).not.toContain(id);
+        }
+      }
+    }
+  });
+
+  it('exposes an exact level-20 kit for each specialization', () => {
+    for (const spec of Object.keys(SPEC_LEVELS) as PaladinSpec[]) {
+      const expected = [...Object.keys(GENERAL_LEVELS), ...Object.keys(SPEC_LEVELS[spec])].sort();
+      expect(knownAt(spec, 20).sort(), spec).toEqual(expected);
+    }
+  });
+
+  it('exposes only the general kit before a specialization is selected', () => {
+    expect(knownWithoutSpec(20).sort()).toEqual(Object.keys(GENERAL_LEVELS).sort());
+  });
+
+  it('does not export removed Paladin talent abilities', () => {
+    for (const id of ['cleansing_verdict', 'holy_wrath', 'divine_shield', 'aura_surge']) {
+      expect(ABILITIES, id).not.toHaveProperty(id);
+    }
+  });
+});

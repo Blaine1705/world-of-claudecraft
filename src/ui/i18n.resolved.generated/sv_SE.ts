@@ -7073,7 +7073,7 @@ export const sv_SE: EnTranslations = {
       },
       "guardian_covenant": {
         "name": "Guardian Covenant",
-        "description": "Protects an ally, reducing their damage taken by 20% for 8 sec."
+        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
       },
       "solar_step": {
         "name": "Solar Step",
@@ -7551,10 +7551,6 @@ export const sv_SE: EnTranslations = {
         "name": "Helig chock",
         "description": "Chockar ett vänligt mål med helig energi och läker det för {damage}. (Helig signatur)"
       },
-      "aura_surge": {
-        "name": "Gryningsrikoschett",
-        "description": "Slungar en gryningssmidd sköld för {damage} Helig skada, tystar huvudmålet i 2 sek. och studsar sedan till upp till 2 ytterligare fiender inom 10 meter för 75% skada per studs. (Paladintalang)"
-      },
       "holy_shield": {
         "name": "Helig sköld",
         "description": "Skyddar dig med helig kraft i 10 sek, ökar rustning med 90 och slår närstridsangripare för 12 helig skada. (Skyddssignatur)"
@@ -7811,10 +7807,6 @@ export const sv_SE: EnTranslations = {
         "name": "Fördärvsbult",
         "description": "Slungar en kaotisk eldblixt som ger {damage} Eldskada. (häxmästartalang)"
       },
-      "cleansing_verdict": {
-        "name": "Renande Domslut",
-        "description": "Rensar bort en skadlig magisk effekt från ett vänligt mål och helar det med Helig magi för {damage}."
-      },
       "cloak_of_shadows": {
         "name": "Skuggmantel",
         "description": "Sveper in dig i skuggor och absorberar 420 skada i 5 sek. (skurktalang)"
@@ -7847,10 +7839,6 @@ export const sv_SE: EnTranslations = {
         "name": "Borstvakt",
         "description": "Ökar din chans att undvika med 50 procentenheter i 10 sek. (jägartalang)"
       },
-      "divine_shield": {
-        "name": "Ljusvärn",
-        "description": "Skyddar dig med helig kraft och absorberar 900 skada i 8 sek. (paladintalang)"
-      },
       "earthbind": {
         "name": "Gripande jord",
         "description": "Binder fiender i närheten till marken och rotar dem i 2 sek. (schamantalang)"
@@ -7878,10 +7866,6 @@ export const sv_SE: EnTranslations = {
       "healing_stream": {
         "name": "Källbrunn",
         "description": "Återställer 120 hälsa hos ett allierat mål under 12 sek. (schamantalang)"
-      },
-      "holy_wrath": {
-        "name": "Helgonvrede",
-        "description": "Släpper lös helig kraft och ger {damage} skada till fiender i närheten. (paladintalang)"
       },
       "howl_of_terror": {
         "name": "Skräckyl",

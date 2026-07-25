@@ -18,13 +18,7 @@ export type PaladinSpec = 'holy' | 'protection' | 'retribution';
 export type AscensionImpactKind = 'healing' | 'defensive' | 'offensive' | 'area';
 
 const ASCENSION_ABILITIES: Readonly<Record<PaladinSpec, ReadonlySet<string>>> = {
-  holy: new Set([
-    'mercy_lance',
-    'dawns_embrace',
-    'radiant_chorus',
-    'solar_invocation',
-    'guardian_covenant',
-  ]),
+  holy: new Set(['mercy_lance', 'dawns_embrace', 'radiant_chorus', 'solar_invocation']),
   protection: new Set([
     'vowkeeper_strike',
     'bastion_rite',
@@ -40,6 +34,7 @@ const ASCENSION_ABILITIES: Readonly<Record<PaladinSpec, ReadonlySet<string>>> = 
     'dawnfall',
     'faithforged_guard',
     'hammer_of_wrath',
+    'guardian_covenant',
     'valkyrs_calling',
   ]),
 };
@@ -71,9 +66,6 @@ const COMMON_DIRECT_DEVOTION_ABILITIES: ReadonlySet<string> = new Set([
   'exorcism',
   'crusader_strike',
   'holy_shock',
-  'cleansing_verdict',
-  'holy_wrath',
-  'aura_surge',
 ]);
 
 function state(e: Entity): NonNullable<Entity['paladinDevotion']> | null {
@@ -310,7 +302,9 @@ export function resolveAscensionAbility(
         }
         return effect;
       case 'guardian_covenant':
-        return effect.type === 'buffTarget' ? { ...effect, value: 0.3 } : effect;
+        return effect.type === 'buffTarget' || effect.type === 'selfBuff'
+          ? { ...effect, value: 0.3 }
+          : effect;
       case 'oath_chain':
         return effect.type === 'pullTarget' ? { ...effect, maxTargets: 2 } : effect;
       case 'veilbound_march':

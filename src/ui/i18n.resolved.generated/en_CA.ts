@@ -7073,7 +7073,7 @@ export const en_CA: EnTranslations = {
       },
       "guardian_covenant": {
         "name": "Guardian Covenant",
-        "description": "Protects an ally, reducing their damage taken by 20% for 8 sec."
+        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
       },
       "solar_step": {
         "name": "Solar Step",
@@ -7551,10 +7551,6 @@ export const en_CA: EnTranslations = {
         "name": "Holy Shock",
         "description": "Shocks a friendly target with Holy energy to heal them, or an enemy for {damage} Holy damage. (Holy signature)"
       },
-      "aura_surge": {
-        "name": "Dawnward Ricochet",
-        "description": "Hurl a dawnforged shield for {damage} Holy damage and silence the primary target for 2 sec. It bounces to up to 2 additional enemies within 10 yd for 75% damage per bounce. (Paladin talent)"
-      },
       "holy_shield": {
         "name": "Hallowed Wall",
         "description": "Gain 30% block and an absorb shield for 8 sec, releasing a pulse of threat. Ascension strengthens and extends the defense."
@@ -7811,10 +7807,6 @@ export const en_CA: EnTranslations = {
         "name": "Ruinbolt",
         "description": "Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)"
       },
-      "cleansing_verdict": {
-        "name": "Cleansing Verdict",
-        "description": "Purges a harmful magic effect from a friendly target and heals them for {damage} Holy."
-      },
       "cloak_of_shadows": {
         "name": "Shadecloak",
         "description": "Wraps you in shadows, absorbing 420 damage for 5 sec. (Rogue talent)"
@@ -7847,10 +7839,6 @@ export const en_CA: EnTranslations = {
         "name": "Bristleguard",
         "description": "Increases your dodge chance by 25 percentage points and reduces all damage taken by 30% for 10 sec. (Hunter talent)"
       },
-      "divine_shield": {
-        "name": "Lightward",
-        "description": "Shields you with holy power, absorbing 900 damage for 8 sec. (Paladin talent)"
-      },
       "earthbind": {
         "name": "Gripping Earth",
         "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
@@ -7878,10 +7866,6 @@ export const en_CA: EnTranslations = {
       "healing_stream": {
         "name": "Springwell",
         "description": "Restores 120 health to a friendly target over 12 sec. (Shaman talent)"
-      },
-      "holy_wrath": {
-        "name": "Saint's Ire",
-        "description": "Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)"
       },
       "howl_of_terror": {
         "name": "Dread Chorus",

@@ -7073,7 +7073,7 @@ export const it_IT: EnTranslations = {
       },
       "guardian_covenant": {
         "name": "Guardian Covenant",
-        "description": "Protects an ally, reducing their damage taken by 20% for 8 sec."
+        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
       },
       "solar_step": {
         "name": "Solar Step",
@@ -7551,10 +7551,6 @@ export const it_IT: EnTranslations = {
         "name": "Shock Sacro",
         "description": "Colpisce un bersaglio alleato con energia Sacra, curandolo di {damage}. (firma Sacro)"
       },
-      "aura_surge": {
-        "name": "Rimbalzo dell'Alba",
-        "description": "Scaglia uno scudo forgiato all'alba che infligge {damage} danni Sacri, silenzia il bersaglio principale per 2 sec. e rimbalza su un massimo di 2 nemici aggiuntivi entro 10 metri, infliggendo il 75% dei danni per rimbalzo. (talento del Paladino)"
-      },
       "holy_shield": {
         "name": "Scudo Sacro",
         "description": "Ti protegge con potere Sacro per 10 s, aumentando l’armatura di 90 e colpendo gli assalitori in mischia per 12 danni Sacri. (firma Protezione)"
@@ -7811,10 +7807,6 @@ export const it_IT: EnTranslations = {
         "name": "Dardo della Rovina",
         "description": "Scaglia un dardo di fuoco caotico che infligge {damage} danni da Fuoco. (talento dello Stregone)"
       },
-      "cleansing_verdict": {
-        "name": "Verdetto Purificante",
-        "description": "Dissipa un effetto magico dannoso da un bersaglio alleato e lo cura di {damage} con magia Sacra."
-      },
       "cloak_of_shadows": {
         "name": "Manto d’Ombra",
         "description": "Ti avvolge nelle ombre, assorbendo 420 danni per 5 sec. (talento del Ladro)"
@@ -7847,10 +7839,6 @@ export const it_IT: EnTranslations = {
         "name": "Guardia Ispida",
         "description": "Aumenta la tua probabilità di schivata di 50 punti percentuali per 10 sec. (talento del Cacciatore)"
       },
-      "divine_shield": {
-        "name": "Custodia di Luce",
-        "description": "Ti protegge con il potere sacro, assorbendo 900 danni per 8 sec. (talento del Paladino)"
-      },
       "earthbind": {
         "name": "Terra Avvinghiante",
         "description": "Lega alla terra i nemici vicini, immobilizzandoli per 2 sec. (talento dello Sciamano)"
@@ -7878,10 +7866,6 @@ export const it_IT: EnTranslations = {
       "healing_stream": {
         "name": "Fonte Viva",
         "description": "Ripristina 120 salute a un bersaglio alleato in 12 sec. (talento dello Sciamano)"
-      },
-      "holy_wrath": {
-        "name": "Ira del Santo",
-        "description": "Scatena il potere sacro, infliggendo {damage} danni ai nemici vicini. (talento del Paladino)"
       },
       "howl_of_terror": {
         "name": "Ululato del Terrore",

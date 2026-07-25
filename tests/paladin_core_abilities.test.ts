@@ -61,7 +61,7 @@ describe('Paladin core abilities', () => {
   it('uses the requested Paladin caster timings and offensive Mercy Lance contract', () => {
     expect(ABILITIES.holy_light.castTime).toBe(1.5);
     expect(ABILITIES.mercy_lance).toMatchObject({
-      learnLevel: 4,
+      learnLevel: 8,
       castTime: 1.75,
       cooldown: 0,
       targetType: 'enemy',
@@ -415,10 +415,6 @@ describe('Paladin core abilities', () => {
         friendlyTargetOnly: true,
       },
     ]);
-    expect(resolve(holy, 'guardian_covenant').effects).toEqual([
-      { type: 'buffTarget', kind: 'buff_dr', value: 0.3, duration: 8 },
-    ]);
-
     const protection = new Sim({ seed: 43, playerClass: 'paladin', autoEquip: true });
     protection.setPlayerLevel(20);
     protection.setSpec('protection');
@@ -497,6 +493,10 @@ describe('Paladin core abilities', () => {
     ]);
     expect(resolve(retribution, 'hammer_of_wrath').effects).toEqual([
       { type: 'directDamage', min: 234, max: 281 },
+    ]);
+    expect(resolve(retribution, 'guardian_covenant').effects).toEqual([
+      { type: 'buffTarget', kind: 'buff_dr', value: 0.3, duration: 8 },
+      { type: 'selfBuff', kind: 'buff_dr', value: 0.3, duration: 8 },
     ]);
   });
 

@@ -955,7 +955,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': 'Embun Mati',
   'entities.abilities.desperate_prayer.name': 'Doa Terakhir',
   'entities.abilities.deterrence.name': 'Penjaga Duri',
-  'entities.abilities.divine_shield.name': 'Pelindung Cahaya',
   'entities.abilities.earthbind.name': 'Bumi Mencengkeram',
   'entities.abilities.evocation.name': 'Sumur Eter',
   'entities.abilities.frenzied_regeneration.name': 'Pemulihan Liar',
@@ -963,7 +962,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': 'Serangan Arwah',
   'entities.abilities.hammer_of_wrath.name': 'Palu Berdentang',
   'entities.abilities.healing_stream.name': 'Mata Air',
-  'entities.abilities.holy_wrath.name': 'Murka Santo',
   'entities.abilities.howl_of_terror.name': 'Lolongan Ngeri',
   'entities.abilities.ice_block.name': 'Peti Es',
   'entities.abilities.inner_focus.name': 'Pikiran Hening',
@@ -978,9 +976,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.name': 'Selip Bayang',
   'entities.abilities.silence.name': 'Senyap',
   'entities.abilities.tranquility.name': 'Lagu Rimba',
-  'entities.abilities.cleansing_verdict.name': 'Vonis Pemurnian',
-  'entities.abilities.cleansing_verdict.description':
-    'Menghapus efek sihir berbahaya dari target sekutu dan menyembuhkannya sebesar {damage} dengan sihir Suci.',
   'entities.abilities.smoke_screen.name': 'Tabir Asap',
   'entities.abilities.smoke_screen.description':
     'Kamu menghilang ke dalam kepulan asap, meningkatkan peluang menghindar sebesar 30% selama 8 dtk.',
@@ -8518,9 +8513,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.revenge':
     'Menyapu musuh di depanmu dan dapat menjadi gratis setelah menghindar atau menangkis.',
   'guide.abilityHook.hamstring': 'Melumpuhkan gerakan musuh agar tidak dapat melarikan diri.',
-  'entities.abilities.aura_surge.name': 'Pantulan Fajar',
-  'entities.abilities.aura_surge.description':
-    'Melempar perisai tempa fajar yang menghasilkan {damage} kerusakan Suci, membungkam target utama selama 2 detik, lalu memantul ke hingga 2 musuh lain dalam jarak 10 yard dengan 75% kerusakan tiap pantulan. (talenta Paladin)',
   'entities.abilities.aspect_of_the_wild.description':
     'Mengilhami sekutu dalam jarak 30 m dengan kekuatan liar, meningkatkan daya serang mereka sebesar 45 dan kecepatan serangan sebesar 5% selama 5 menit. (talenta Hunter)',
   'entities.abilities.avatar.name': 'Avatar',
@@ -8555,8 +8547,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Langsung memulihkan {damage} nyawamu. (talenta Priest)',
   'entities.abilities.deterrence.description':
     'Meningkatkan peluang menghindarmu sebesar 50 poin persentase selama 10 detik. (talenta Hunter)',
-  'entities.abilities.divine_shield.description':
-    'Melindungimu dengan kekuatan suci dan menyerap 900 kerusakan selama 8 detik. (talenta Paladin)',
   'entities.abilities.earthbind.description':
     'Mengikat musuh di dekatnya ke tanah dan mengakarkan mereka selama 2 detik. (talenta Shaman)',
   'entities.abilities.evocation.description': 'Restaura mana rápidamente. (talenta mage)',
@@ -8570,8 +8560,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Melempar palu suci kepada musuh yang terluka dan menghasilkan {damage} kerusakan Suci. Hanya dapat digunakan di bawah 20% nyawa. (talenta Paladin)',
   'entities.abilities.healing_stream.description':
     'Memulihkan 120 nyawa target sekutu selama 12 detik. (talenta Shaman)',
-  'entities.abilities.holy_wrath.description':
-    'Melepaskan kekuatan suci dan menghasilkan {damage} kerusakan kepada musuh di dekatnya. (talenta Paladin)',
   'entities.abilities.howl_of_terror.description':
     'Membuat musuh di dekatnya ketakutan hingga 3 detik. Kerusakan dapat membatalkan efek ini. (talenta Warlock)',
   'entities.abilities.ice_block.description':

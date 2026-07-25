@@ -256,10 +256,6 @@ describe('paladin redesign', () => {
     expect(p.auras.some((a) => a.kind === 'buff_spellhaste' && a.value === 0.15)).toBe(true);
   });
 
-  // The #1756 choice pass redesigned aura_surge from the Radiant Swell armor
-  // buff into Dawnward Ricochet (chain damage + silence); the new behavior is
-  // pinned end to end in talent_retained_semantics_v026.test.ts.
-
   it('replay determinism: the proc-heavy priest run is bit-identical', () => {
     const run = () => {
       const { sim, p } = rig('priest', 20, { 5: 'pri_r5_searing_light', 17: 'pri_r17_inner_fire' });

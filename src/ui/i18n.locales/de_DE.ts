@@ -1047,7 +1047,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': 'Totenfrost',
   'entities.abilities.desperate_prayer.name': 'Letztes Gebet',
   'entities.abilities.deterrence.name': 'Borstenwacht',
-  'entities.abilities.divine_shield.name': 'Lichtwacht',
   'entities.abilities.earthbind.name': 'Greifende Erde',
   'entities.abilities.evocation.name': 'Ätherbrunnen',
   'entities.abilities.frenzied_regeneration.name': 'Wilde Heilung',
@@ -1055,7 +1054,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': 'Geisterschlag',
   'entities.abilities.hammer_of_wrath.name': 'Läutender Hammer',
   'entities.abilities.healing_stream.name': 'Quellbrunnen',
-  'entities.abilities.holy_wrath.name': 'Heiligenzorn',
   'entities.abilities.howl_of_terror.name': 'Schreckensheulen',
   'entities.abilities.ice_block.name': 'Kalter Sarg',
   'entities.abilities.inner_focus.name': 'Stiller Geist',
@@ -1070,9 +1068,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.name': 'Schattengleiten',
   'entities.abilities.silence.name': 'Stille',
   'entities.abilities.tranquility.name': 'Hainlied',
-  'entities.abilities.cleansing_verdict.name': 'Läuterndes Urteil',
-  'entities.abilities.cleansing_verdict.description':
-    'Entfernt einen schädlichen magischen Effekt von einem verbündeten Ziel und heilt es mit heiliger Magie um {damage}.',
   'entities.abilities.smoke_screen.name': 'Rauchvorhang',
   'entities.abilities.smoke_screen.description':
     'Ihr verschwindet in einer Rauchwolke, wodurch sich Eure Ausweichchance 8 Sek. lang um 30 % erhöht.',
@@ -8582,9 +8577,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'game.talents.choicesTab': 'Entscheidungen',
   'game.talents.rowUnlockToast': 'Neue Talentwahl verfügbar!',
   'game.talents.rowUnlocks': 'Wird auf Stufe {level} freigeschaltet',
-  'entities.abilities.aura_surge.name': 'Dämmerprall',
-  'entities.abilities.aura_surge.description':
-    'Schleudert einen dämmergeschmiedeten Schild für {damage} Heiligschaden, bringt das Primärziel 2 Sek. zum Schweigen und springt dann auf bis zu 2 weitere Gegner innerhalb von 10 Metern über, wobei jeder Sprung 75% Schaden verursacht. (Paladintalent)',
   'entities.abilities.aspect_of_the_wild.description':
     'Inspiriert Verbündete im Umkreis von 30 m mit wilder Kraft und erhöht ihre Angriffskraft 5 Min. lang um 45 und ihr Angriffstempo um 5 %. (Jägertalent)',
   'entities.abilities.avatar.name': 'Avatar',
@@ -8619,8 +8611,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Heilt Euch sofort um {damage}. (Priestertalent)',
   'entities.abilities.deterrence.description':
     'Erhöht Eure Ausweichchance 10 Sek. lang um 50 Prozentpunkte. (Jägertalent)',
-  'entities.abilities.divine_shield.description':
-    'Schützt Euch mit heiliger Macht, die 8 Sek. lang 900 Schaden absorbiert. (Paladintalent)',
   'entities.abilities.earthbind.description':
     'Bindet Gegner in der Nähe an die Erde und macht sie 2 Sek. lang bewegungsunfähig. (Schamanentalent)',
   'entities.abilities.evocation.description': 'Restaura Mana rápidamente. (Magier-Talent)',
@@ -8634,8 +8624,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Schleudert einen heiligen Hammer auf einen verwundeten Gegner und verursacht {damage} Heiligschaden. Nur unter 20 % Gesundheit einsetzbar. (Paladintalent)',
   'entities.abilities.healing_stream.description':
     'Stellt bei einem verbündeten Ziel im Verlauf von 12 Sek. 120 Gesundheit wieder her. (Schamanentalent)',
-  'entities.abilities.holy_wrath.description':
-    'Entfesselt heilige Macht und fügt Gegnern in der Nähe {damage} Schaden zu. (Paladintalent)',
   'entities.abilities.howl_of_terror.description':
     'Versetzt Gegner in der Nähe bis zu 3 Sek. lang in Furcht. Schaden kann den Effekt aufheben. (Hexenmeistertalent)',
   'entities.abilities.ice_block.description':

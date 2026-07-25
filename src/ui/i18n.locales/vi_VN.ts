@@ -973,7 +973,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': 'Băng Chết',
   'entities.abilities.desperate_prayer.name': 'Lời Cầu Cuối',
   'entities.abilities.deterrence.name': 'Hộ Vệ Gai',
-  'entities.abilities.divine_shield.name': 'Hộ Vệ Ánh Sáng',
   'entities.abilities.earthbind.name': 'Đất Níu Giữ',
   'entities.abilities.evocation.name': 'Giếng Ête',
   'entities.abilities.frenzied_regeneration.name': 'Hồi Phục Hoang Dã',
@@ -981,7 +980,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': 'Đòn Ma Ảnh',
   'entities.abilities.hammer_of_wrath.name': 'Búa Ngân Chuông',
   'entities.abilities.healing_stream.name': 'Giếng Suối',
-  'entities.abilities.holy_wrath.name': 'Cơn Giận Thánh',
   'entities.abilities.howl_of_terror.name': 'Tiếng Hú Kinh Hoàng',
   'entities.abilities.ice_block.name': 'Quan Tài Lạnh',
   'entities.abilities.inner_focus.name': 'Tâm Trí Tĩnh',
@@ -996,9 +994,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.name': 'Trượt Bóng',
   'entities.abilities.silence.name': 'Câm Lặng',
   'entities.abilities.tranquility.name': 'Khúc Ca Rừng Thưa',
-  'entities.abilities.cleansing_verdict.name': 'Phán Quyết Thanh Tẩy',
-  'entities.abilities.cleansing_verdict.description':
-    'Xóa một hiệu ứng phép thuật có hại khỏi mục tiêu đồng minh và hồi cho họ {damage} máu bằng phép Thánh.',
   'entities.abilities.smoke_screen.name': 'Màn Khói',
   'entities.abilities.smoke_screen.description':
     'Bạn biến mất trong đám khói, tăng 30% khả năng né tránh trong 8 giây.',
@@ -8466,9 +8461,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.revenge':
     'Quét trúng kẻ địch phía trước và có thể không tốn tài nguyên sau khi né hoặc đỡ đòn.',
   'guide.abilityHook.hamstring': 'Cản trở di chuyển của kẻ địch để chúng không thể chạy thoát.',
-  'entities.abilities.aura_surge.name': 'Khiên Dội Bình Minh',
-  'entities.abilities.aura_surge.description':
-    'Ném một tấm khiên rèn từ bình minh gây {damage} sát thương Thánh, khiến mục tiêu chính câm lặng trong 2 giây, rồi dội sang tối đa 2 kẻ địch khác trong phạm vi 10 mét, gây 75% sát thương mỗi lần dội. (thiên phú Paladin)',
   'entities.abilities.aspect_of_the_wild.description':
     'Truyền sức mạnh hoang dã cho đồng minh trong phạm vi 30 m, tăng 45 sức mạnh công kích và 5% tốc độ đánh của họ trong 5 phút. (thiên phú Thợ săn)',
   'entities.abilities.avatar.name': 'Hóa Thân',
@@ -8503,8 +8495,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Hồi ngay {damage} máu cho bạn. (thiên phú Tu sĩ)',
   'entities.abilities.deterrence.description':
     'Tăng 50 điểm phần trăm khả năng né tránh của bạn trong 10 giây. (thiên phú Thợ săn)',
-  'entities.abilities.divine_shield.description':
-    'Bảo vệ bạn bằng sức mạnh thần thánh, hấp thụ 900 sát thương trong 8 giây. (thiên phú Paladin)',
   'entities.abilities.earthbind.description':
     'Trói kẻ địch ở gần xuống đất trong 2 giây. (thiên phú Shaman)',
   'entities.abilities.evocation.description': 'Restaura mana rápidamente. (thiên phú pháp sư)',
@@ -8518,8 +8508,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Ném búa thần thánh vào kẻ địch bị thương, gây {damage} sát thương Thánh. Chỉ dùng được khi còn dưới 20% máu. (thiên phú Paladin)',
   'entities.abilities.healing_stream.description':
     'Hồi 120 máu cho một mục tiêu đồng minh trong 12 giây. (thiên phú Shaman)',
-  'entities.abilities.holy_wrath.description':
-    'Giải phóng sức mạnh thần thánh, gây {damage} sát thương lên kẻ địch ở gần. (thiên phú Paladin)',
   'entities.abilities.howl_of_terror.description':
     'Khiến kẻ địch ở gần sợ hãi trong tối đa 3 giây. Sát thương có thể phá hiệu ứng. (thiên phú Warlock)',
   'entities.abilities.ice_block.description':

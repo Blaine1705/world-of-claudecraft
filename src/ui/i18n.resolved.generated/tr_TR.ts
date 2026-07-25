@@ -7073,7 +7073,7 @@ export const tr_TR: EnTranslations = {
       },
       "guardian_covenant": {
         "name": "Guardian Covenant",
-        "description": "Protects an ally, reducing their damage taken by 20% for 8 sec."
+        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
       },
       "solar_step": {
         "name": "Solar Step",
@@ -7551,10 +7551,6 @@ export const tr_TR: EnTranslations = {
         "name": "Kutsal Şok",
         "description": "Dost bir hedefi Kutsal enerjiyle sarsar ve onu {damage} kadar iyileştirir. (Kutsal imza)"
       },
-      "aura_surge": {
-        "name": "Şafak Sekmesi",
-        "description": "Şafakta dövülmüş bir kalkan fırlatarak {damage} Kutsal hasar verir, ana hedefi 2 sn susturur ve ardından 10 metre içindeki en fazla 2 ek düşmana sekerek her sekmede %75 hasar verir. (Paladin yeteneği)"
-      },
       "holy_shield": {
         "name": "Kutsal Kalkan",
         "description": "Seni 10 sn boyunca Kutsal güçle korur, zırhı 90 artırır ve yakın dövüş saldırganlarına 12 Kutsal hasar verir. (Koruma imzası)"
@@ -7811,10 +7807,6 @@ export const tr_TR: EnTranslations = {
         "name": "Yıkım Oku",
         "description": "{damage} Ateş hasarı veren kaotik bir ateş oku fırlatır. (Karabüyücü yeteneği)"
       },
-      "cleansing_verdict": {
-        "name": "Arındırıcı Hüküm",
-        "description": "Dost bir hedeften zararlı bir büyü etkisini kaldırır ve onu {damage} Kutsal iyileştirir."
-      },
       "cloak_of_shadows": {
         "name": "Gölge Pelerini",
         "description": "Seni gölgelerle sarar ve 5 sn. boyunca 420 hasar soğurur. (Haydut yeteneği)"
@@ -7847,10 +7839,6 @@ export const tr_TR: EnTranslations = {
         "name": "Diken Muhafızı",
         "description": "Kaçınma şansını 10 sn. boyunca 50 yüzde puan artırır. (Avcı yeteneği)"
       },
-      "divine_shield": {
-        "name": "Işık Siperi",
-        "description": "Seni kutsal güçle korur ve 8 sn. boyunca 900 hasar soğurur. (Paladin yeteneği)"
-      },
       "earthbind": {
         "name": "Kavrayan Toprak",
         "description": "Yakındaki düşmanları toprağa bağlar ve 2 sn. boyunca kökler. (Şaman yeteneği)"
@@ -7878,10 +7866,6 @@ export const tr_TR: EnTranslations = {
       "healing_stream": {
         "name": "Kaynak Kuyusu",
         "description": "Bir müttefik hedefe 12 sn. boyunca 120 sağlık yeniler. (Şaman yeteneği)"
-      },
-      "holy_wrath": {
-        "name": "Aziz Hiddeti",
-        "description": "Kutsal güç salarak yakındaki düşmanlara {damage} hasar verir. (Paladin yeteneği)"
       },
       "howl_of_terror": {
         "name": "Dehşet Uluması",

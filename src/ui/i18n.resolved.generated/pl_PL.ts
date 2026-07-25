@@ -7073,7 +7073,7 @@ export const pl_PL: EnTranslations = {
       },
       "guardian_covenant": {
         "name": "Guardian Covenant",
-        "description": "Protects an ally, reducing their damage taken by 20% for 8 sec."
+        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
       },
       "solar_step": {
         "name": "Solar Step",
@@ -7551,10 +7551,6 @@ export const pl_PL: EnTranslations = {
         "name": "Święty wstrząs",
         "description": "Razisz przyjazny cel Świętą energią, lecząc go za {damage}. (specjalizacja Świętość)"
       },
-      "aura_surge": {
-        "name": "Rykoszet świtu",
-        "description": "Rzuca wykutą o świcie tarczę, zadając {damage} obrażeń od Świętości i uciszając główny cel na 2 sek., po czym odbija się do maksymalnie 2 kolejnych wrogów w promieniu 10 metrów, zadając 75% obrażeń przy każdym odbiciu. (talent Paladyna)"
-      },
       "holy_shield": {
         "name": "Święta tarcza",
         "description": "Osłaniasz się Świętą mocą na 10 sek., zwiększając pancerz o 90 i rażąc napastników w zwarciu za 12 obrażeń Świętych. (specjalizacja Ochrona)"
@@ -7811,10 +7807,6 @@ export const pl_PL: EnTranslations = {
         "name": "Pocisk Ruiny",
         "description": "Ciska pocisk chaotycznego ognia, który zadaje {damage} obrażeń od Ognia. (talent Czarnoksiężnika)"
       },
-      "cleansing_verdict": {
-        "name": "Oczyszczający Wyrok",
-        "description": "Usuwa szkodliwy efekt magiczny z przyjaznego celu i leczy go świętą magią za {damage}."
-      },
       "cloak_of_shadows": {
         "name": "Cieniopłaszcz",
         "description": "Otacza cię cieniami i pochłania 420 obrażeń przez 5 sek. (talent Łotrzyka)"
@@ -7847,10 +7839,6 @@ export const pl_PL: EnTranslations = {
         "name": "Kolczasta Straż",
         "description": "Zwiększa twoją szansę na unik o 50 punktów procentowych na 10 sek. (talent Łowcy)"
       },
-      "divine_shield": {
-        "name": "Straż Światła",
-        "description": "Osłania cię świętą mocą, pochłaniając 900 obrażeń przez 8 sek. (talent Paladyna)"
-      },
       "earthbind": {
         "name": "Chwytająca Ziemia",
         "description": "Przywiązuje pobliskich wrogów do ziemi i unieruchamia ich na 2 sek. (talent Szamana)"
@@ -7878,10 +7866,6 @@ export const pl_PL: EnTranslations = {
       "healing_stream": {
         "name": "Źródlisko",
         "description": "Przywraca sojuszniczemu celowi 120 zdrowia przez 12 sek. (talent Szamana)"
-      },
-      "holy_wrath": {
-        "name": "Gniew Świętego",
-        "description": "Wyzwala świętą moc, zadając pobliskim wrogom {damage} obrażeń. (talent Paladyna)"
       },
       "howl_of_terror": {
         "name": "Wycie Grozy",

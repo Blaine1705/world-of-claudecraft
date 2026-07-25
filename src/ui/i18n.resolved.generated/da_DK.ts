@@ -7073,7 +7073,7 @@ export const da_DK: EnTranslations = {
       },
       "guardian_covenant": {
         "name": "Guardian Covenant",
-        "description": "Protects an ally, reducing their damage taken by 20% for 8 sec."
+        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
       },
       "solar_step": {
         "name": "Solar Step",
@@ -7551,10 +7551,6 @@ export const da_DK: EnTranslations = {
         "name": "Hellig chok",
         "description": "Chokerer et venligt mål med hellig energi og helbreder det for {damage}. (Hellig signatur)"
       },
-      "aura_surge": {
-        "name": "Daggryets rikochet",
-        "description": "Kaster et daggrysmedet skjold for {damage} Hellig skade, bringer det primære mål til tavshed i 2 sek. og hopper derefter til op til 2 yderligere fjender inden for 10 meter for 75% skade pr. hop. (Paladintalent)"
-      },
       "holy_shield": {
         "name": "Hellig skjold",
         "description": "Beskytter dig med hellig kraft i 10 sek, øger rustning med 90 og rammer nærkampsangribere for 12 hellig skade. (Beskyttelsessignatur)"
@@ -7811,10 +7807,6 @@ export const da_DK: EnTranslations = {
         "name": "Ruinbolt",
         "description": "Kaster en kaotisk ildkugle, der giver {damage} Ildskade. (troldmandstalent)"
       },
-      "cleansing_verdict": {
-        "name": "Rensende Dom",
-        "description": "Fjerner en skadelig magisk effekt fra et venligt mål og helbreder det med Hellig magi for {damage}."
-      },
       "cloak_of_shadows": {
         "name": "Skyggekappe",
         "description": "Indhyller dig i skygger og absorberer 420 skade i 5 sek. (slyngeltalent)"
@@ -7847,10 +7839,6 @@ export const da_DK: EnTranslations = {
         "name": "Børsteværn",
         "description": "Øger din undvigelseschance med 50 procentpoint i 10 sek. (jægertalent)"
       },
-      "divine_shield": {
-        "name": "Lysværn",
-        "description": "Beskytter dig med hellig kraft og absorberer 900 skade i 8 sek. (paladintalent)"
-      },
       "earthbind": {
         "name": "Gribende jord",
         "description": "Binder fjender i nærheden til jorden og forankrer dem i 2 sek. (shamantalent)"
@@ -7878,10 +7866,6 @@ export const da_DK: EnTranslations = {
       "healing_stream": {
         "name": "Kildebrønd",
         "description": "Genopretter 120 helbred hos et allieret mål over 12 sek. (shamantalent)"
-      },
-      "holy_wrath": {
-        "name": "Helgenvrede",
-        "description": "Udløser hellig kraft og giver {damage} skade til fjender i nærheden. (paladintalent)"
       },
       "howl_of_terror": {
         "name": "Rædselshyl",

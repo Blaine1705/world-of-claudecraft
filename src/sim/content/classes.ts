@@ -288,7 +288,6 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'retribution_aura',
       'hammer_of_grace',
       'hushbrand',
-      'guardian_covenant',
       'solar_step',
       'solar_invocation',
       'recall_the_fallen',
@@ -297,6 +296,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'dawnfall',
       'faithforged_guard',
       'hammer_of_wrath',
+      'guardian_covenant',
       'avenging_wrath',
       'sun_gods_verdict',
       'valkyrs_calling',
@@ -3062,7 +3062,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'hammer_of_justice',
     name: 'Sundering Gavel',
     class: 'paladin',
-    learnLevel: 8,
+    learnLevel: 2,
     cost: 30,
     castTime: 0,
     cooldown: 60,
@@ -3076,7 +3076,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'lay_on_hands',
     name: 'Last Rite',
     class: 'paladin',
-    learnLevel: 8,
+    learnLevel: 12,
     cost: 0,
     castTime: 0,
     cooldown: 600,
@@ -3140,7 +3140,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'righteous_fury',
     name: 'Burning Oath',
     class: 'paladin',
-    learnLevel: 16,
+    learnLevel: 5,
     specs: ['protection'],
     cost: 0,
     castTime: 0,
@@ -3157,7 +3157,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'retribution_aura',
     name: 'Requital Aura',
     class: 'paladin',
-    learnLevel: 16,
+    learnLevel: 7,
     cost: 0,
     castTime: 0,
     cooldown: 0,
@@ -6476,7 +6476,12 @@ export function abilitiesKnownAt(
     // official spellbook deliberately hides.
     if (def.hiddenFromPlayer) continue;
     const granted = grantIds.has(id) || !baseIds.includes(id);
-    if (!granted && def.learnLevel > level) continue; // class kit is level-gated; grants bypass it
+    // Paladin specialization signatures also live in its authored class kit.
+    // Keep their requested progression levels authoritative instead of letting
+    // the generic signature grant reveal Mercy Lance, Final Edict, or Sunward
+    // Disc early. Row-granted actives remain grants and still bypass level gates.
+    const paladinBaseKitGrant = cls === 'paladin' && baseIds.includes(id);
+    if ((!granted || paladinBaseKitGrant) && def.learnLevel > level) continue;
     // Quest-gated kit: a quest-locked ability stays hidden until its unlocking
     // quest is in questsDone (paladin's recall_the_fallen <- q_rite_of_redemption).
     // Grants bypass entirely (already scoped). Learned permanently: questsDone is

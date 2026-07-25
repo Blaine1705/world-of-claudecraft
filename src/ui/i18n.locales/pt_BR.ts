@@ -1049,7 +1049,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': 'Geada Morta',
   'entities.abilities.desperate_prayer.name': 'Última Prece',
   'entities.abilities.deterrence.name': 'Guarda Espinhosa',
-  'entities.abilities.divine_shield.name': 'Guarda de Luz',
   'entities.abilities.earthbind.name': 'Terra Agarradora',
   'entities.abilities.evocation.name': 'Poço Etéreo',
   'entities.abilities.frenzied_regeneration.name': 'Remendo Selvagem',
@@ -1057,7 +1056,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': 'Golpe Espectral',
   'entities.abilities.hammer_of_wrath.name': 'Martelo Badalante',
   'entities.abilities.healing_stream.name': 'Fonte Viva',
-  'entities.abilities.holy_wrath.name': 'Ira do Santo',
   'entities.abilities.howl_of_terror.name': 'Uivo de Terror',
   'entities.abilities.ice_block.name': 'Caixão Frio',
   'entities.abilities.inner_focus.name': 'Mente Serena',
@@ -1072,9 +1070,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.name': 'Passo Sombrio',
   'entities.abilities.silence.name': 'Silêncio',
   'entities.abilities.tranquility.name': 'Canto do Bosque',
-  'entities.abilities.cleansing_verdict.name': 'Veredito Purificador',
-  'entities.abilities.cleansing_verdict.description':
-    'Expurga um efeito mágico nocivo de um alvo aliado e o cura em {damage} com magia Sagrada.',
   'entities.abilities.smoke_screen.name': 'Cortina de Fumaça',
   'entities.abilities.smoke_screen.description':
     'Você desaparece numa nuvem de fumaça, aumentando em 30% sua chance de esquiva por 8 s.',
@@ -8471,9 +8466,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'game.talents.choicesTab': 'Escolhas',
   'game.talents.rowUnlockToast': 'Nova escolha de talento disponível!',
   'game.talents.rowUnlocks': 'Desbloqueia no nível {level}',
-  'entities.abilities.aura_surge.name': 'Ricochete da Alvorada',
-  'entities.abilities.aura_surge.description':
-    'Arremessa um escudo forjado ao alvorecer que causa {damage} de dano Sagrado, silencia o alvo principal por 2 s e ricocheteia em até 2 inimigos adicionais num raio de 10 m, causando 75% de dano por ricochete. (talento de Paladino)',
   'entities.abilities.aspect_of_the_wild.description':
     'Inspira os aliados num raio de 30 m com força selvagem, aumentando o poder de ataque deles em 45 e a velocidade de ataque em 5% por 5 min. (talento de Caçador)',
   'entities.abilities.avatar.name': 'Avatar',
@@ -8508,8 +8500,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Cura você instantaneamente em {damage}. (talento de Sacerdote)',
   'entities.abilities.deterrence.description':
     'Aumenta sua chance de esquiva em 50 pontos percentuais por 10 s. (talento de Caçador)',
-  'entities.abilities.divine_shield.description':
-    'Protege você com poder sagrado, absorvendo 900 de dano por 8 s. (talento de Paladino)',
   'entities.abilities.earthbind.description':
     'Prende os inimigos próximos à terra, enraizando-os por 2 s. (talento de Xamã)',
   'entities.abilities.evocation.description': 'Restaura mana rápidamente. (talento de mago)',
@@ -8523,8 +8513,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Arremessa um martelo sagrado contra um inimigo ferido, causando {damage} de dano Sagrado. Só pode ser usado abaixo de 20% de vida. (talento de Paladino)',
   'entities.abilities.healing_stream.description':
     'Restaura 120 de vida de um alvo aliado ao longo de 12 s. (talento de Xamã)',
-  'entities.abilities.holy_wrath.description':
-    'Libera poder sagrado, causando {damage} de dano aos inimigos próximos. (talento de Paladino)',
   'entities.abilities.howl_of_terror.description':
     'Amedronta os inimigos próximos por até 3 s. O dano pode interromper o efeito. (talento de Bruxo)',
   'entities.abilities.ice_block.description':

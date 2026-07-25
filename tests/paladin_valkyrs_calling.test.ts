@@ -104,7 +104,7 @@ describe("Paladin Retribution: Valkyr's Calling", () => {
       class: 'paladin',
       specs: ['retribution'],
       learnLevel: 13,
-      cooldown: 180,
+      cooldown: 60,
       range: 20,
       requiresTarget: true,
     });

@@ -125,6 +125,11 @@
 
 ## PALADIN
 
+The Paladin tables in this section preserve the pre-v0.30 rank plan as decision history. They
+are not the current player kit. Current learn levels are authored in `src/sim/content/` and
+pinned by `tests/paladin_progression.test.ts`; the current design is
+`docs/design/paladin-devotion-core.md`.
+
 | Ability | Rank | Learn | Cost | Cast | Effect values |
 |---|---|---|---|---|---|
 | seal_of_righteousness | 1 | 1 | 25 | inst | imbue +4/swing |
@@ -371,7 +376,7 @@
 | Warrior | execute@14, slam@16, cleave@18 | wire existing `requiresTargetHpBelow` |
 | Mage | personal barrier@5 (R2@12, R3@18), arcane_explosion@14, scorch@16, pyroblast@20 | none |
 | Rogue | kidney_shot@14, ambush@16, adrenaline_rush@20 | **finisherStun effect (the only new effect type)** |
-| Paladin | flash_of_light@12, exorcism@14, consecration@18 | none |
+| Paladin | Superseded by the v0.30 progression in `paladin-devotion-core.md` | n/a |
 | Hunter | aspect_of_the_cheetah@14, aimed_shot@16, rapid_fire@20 | none |
 | Priest | heal@14 (R2@20), mind_flay@16, flash_heal@20 | none (drainTick healFrac 0) |
 | Shaman | frost_shock@14, ghost_wolf@16, stormstrike@20, frostbrand_weapon@12 (R2@20) | none (imbue reuse) |

@@ -993,7 +993,7 @@ const classAbilityNamesEn = {
       [
         'guardian_covenant',
         'Guardian Covenant',
-        'Protects an ally, reducing their damage taken by 20% for 8 sec.',
+        'Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected.',
       ],
       ['solar_step', 'Solar Step', 'Increase your movement speed by 150% for 2 sec.'],
       [
@@ -1496,11 +1496,6 @@ const classAbilityNamesEn = {
         'Shocks a friendly target with Holy energy to heal them, or an enemy for {damage} Holy damage. (Holy signature)',
       ],
       [
-        'aura_surge',
-        'Dawnward Ricochet',
-        'Hurl a dawnforged shield for {damage} Holy damage and silence the primary target for 2 sec. It bounces to up to 2 additional enemies within 10 yd for 75% damage per bounce. (Paladin talent)',
-      ],
-      [
         'holy_shield',
         'Hallowed Wall',
         'Gain 30% block and an absorb shield for 8 sec, releasing a pulse of threat. Ascension strengthens and extends the defense.',
@@ -1813,11 +1808,6 @@ const classAbilityNamesEn = {
         'Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)',
       ],
       [
-        'cleansing_verdict',
-        'Cleansing Verdict',
-        'Purges a harmful magic effect from a friendly target and heals them for {damage} Holy.',
-      ],
-      [
         'cloak_of_shadows',
         'Shadecloak',
         'Wraps you in shadows, absorbing 420 damage for 5 sec. (Rogue talent)',
@@ -1854,11 +1844,6 @@ const classAbilityNamesEn = {
         'Increases your dodge chance by 25 percentage points and reduces all damage taken by 30% for 10 sec. (Hunter talent)',
       ],
       [
-        'divine_shield',
-        'Lightward',
-        'Shields you with holy power, absorbing 900 damage for 8 sec. (Paladin talent)',
-      ],
-      [
         'earthbind',
         'Gripping Earth',
         'Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)',
@@ -1892,11 +1877,6 @@ const classAbilityNamesEn = {
         'healing_stream',
         'Springwell',
         'Restores 120 health to a friendly target over 12 sec. (Shaman talent)',
-      ],
-      [
-        'holy_wrath',
-        "Saint's Ire",
-        'Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)',
       ],
       [
         'howl_of_terror',

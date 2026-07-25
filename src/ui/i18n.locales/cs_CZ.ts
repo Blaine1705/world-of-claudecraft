@@ -952,7 +952,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': 'Mrtvý mráz',
   'entities.abilities.desperate_prayer.name': 'Poslední modlitba',
   'entities.abilities.deterrence.name': 'Štětinová stráž',
-  'entities.abilities.divine_shield.name': 'Světelný štít',
   'entities.abilities.earthbind.name': 'Svírající země',
   'entities.abilities.evocation.name': 'Éterická studna',
   'entities.abilities.frenzied_regeneration.name': 'Divoké zacelení',
@@ -960,7 +959,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': 'Přízračný úder',
   'entities.abilities.hammer_of_wrath.name': 'Zvonící kladivo',
   'entities.abilities.healing_stream.name': 'Pramenná studna',
-  'entities.abilities.holy_wrath.name': 'Hněv světce',
   'entities.abilities.howl_of_terror.name': 'Děsivé zavytí',
   'entities.abilities.ice_block.name': 'Ledová rakev',
   'entities.abilities.inner_focus.name': 'Ztišená mysl',
@@ -975,9 +973,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.name': 'Stínový skluz',
   'entities.abilities.silence.name': 'Umlčení',
   'entities.abilities.tranquility.name': 'Píseň háje',
-  'entities.abilities.cleansing_verdict.name': 'Očistný rozsudek',
-  'entities.abilities.cleansing_verdict.description':
-    'Odstraní škodlivý magický účinek ze spojeneckého cíle a vyléčí jej svatou magií za {damage}.',
   'entities.abilities.smoke_screen.name': 'Kouřová clona',
   'entities.abilities.smoke_screen.description':
     'Zmizíte v oblaku kouře a na 8 s zvýšíte svou šanci na úhyb o 30 %.',
@@ -5600,8 +5595,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Okamžitě vás vyléčí o {damage}. (kněžský talent)',
   'entities.abilities.deterrence.description':
     'Na 10 s zvýší vaši šanci na úhyb o 50 procentních bodů. (lovecký talent)',
-  'entities.abilities.divine_shield.description':
-    'Ochrání vás svatou mocí, která po dobu 8 s absorbuje 900 bodů poškození. (paladinský talent)',
   'entities.abilities.earthbind.description':
     'Připoutá blízké nepřátele k zemi a na 2 s je zakoření. (šamanský talent)',
   'entities.abilities.evocation.description': 'Restaura manu rápidamente. (mágovský talent)',
@@ -5615,8 +5608,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Vrhne svaté kladivo na zraněného nepřítele za {damage} bodů Svatého poškození. Lze použít pouze pod 20 % zdraví. (paladinský talent)',
   'entities.abilities.healing_stream.description':
     'Během 12 s obnoví spojeneckému cíli 120 bodů zdraví. (šamanský talent)',
-  'entities.abilities.holy_wrath.description':
-    'Uvolní svatou moc a způsobí blízkým nepřátelům {damage} bodů poškození. (paladinský talent)',
   'entities.abilities.howl_of_terror.description':
     'Vyděsí blízké nepřátele až na 3 s. Poškození může účinek zrušit. (černokněžnický talent)',
   'entities.abilities.ice_block.description':
@@ -7665,9 +7656,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.metamorphosis.name': 'Děsivý zjev',
   'entities.abilities.metamorphosis.description':
     'Na 20 s se proměníš v děsivého démona, zvýšíš svoje poškození kouzly o 20 % a rychlost sesílání o 20 %. Tvůj démon způsobuje o 50 % více poškození a sesílá o 20 % rychleji. (klíčová schopnost Démonologie)',
-  'entities.abilities.aura_surge.name': 'Úsvitový odraz',
-  'entities.abilities.aura_surge.description':
-    'Vrhne úsvitem kovaný štít za {damage} bodů Svatého poškození, umlčí hlavní cíl na 2 sek. a poté se odrazí až ke 2 dalším nepřátelům do 10 yardů; každý odraz způsobí 75% poškození. (Paladinský talent)',
   'entities.abilities.holy_shock.name': 'Svatý otřes',
   'entities.abilities.holy_shock.description':
     'Zasáhne spojenecký cíl svatou energií a vyléčí ho, nebo způsobí nepříteli {damage} svatého poškození. (klíčová schopnost Svaté magie)',

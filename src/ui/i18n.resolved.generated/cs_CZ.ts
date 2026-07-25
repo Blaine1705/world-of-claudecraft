@@ -7073,7 +7073,7 @@ export const cs_CZ: EnTranslations = {
       },
       "guardian_covenant": {
         "name": "Guardian Covenant",
-        "description": "Protects an ally, reducing their damage taken by 20% for 8 sec."
+        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
       },
       "solar_step": {
         "name": "Solar Step",
@@ -7551,10 +7551,6 @@ export const cs_CZ: EnTranslations = {
         "name": "Svatý otřes",
         "description": "Zasáhne spojenecký cíl svatou energií a vyléčí ho, nebo způsobí nepříteli {damage} svatého poškození. (klíčová schopnost Svaté magie)"
       },
-      "aura_surge": {
-        "name": "Úsvitový odraz",
-        "description": "Vrhne úsvitem kovaný štít za {damage} bodů Svatého poškození, umlčí hlavní cíl na 2 sek. a poté se odrazí až ke 2 dalším nepřátelům do 10 yardů; každý odraz způsobí 75% poškození. (Paladinský talent)"
-      },
       "holy_shield": {
         "name": "Posvěcená hradba",
         "description": "Vrhne na nepřítele zářivou záštitu, způsobí mu svaté poškození a odrazí se ke 2 blízkým nepřátelům. (klíčová schopnost Ochrany)"
@@ -7811,10 +7807,6 @@ export const cs_CZ: EnTranslations = {
         "name": "Zkázný šíp",
         "description": "Vrhne střelu chaotického ohně, která způsobí {damage} bodů ohnivého poškození. (černokněžnický talent)"
       },
-      "cleansing_verdict": {
-        "name": "Očistný rozsudek",
-        "description": "Odstraní škodlivý magický účinek ze spojeneckého cíle a vyléčí jej svatou magií za {damage}."
-      },
       "cloak_of_shadows": {
         "name": "Stínoplášť",
         "description": "Zahalí vás do stínů a po dobu 5 s absorbuje 420 bodů poškození. (lotrovský talent)"
@@ -7847,10 +7839,6 @@ export const cs_CZ: EnTranslations = {
         "name": "Štětinová stráž",
         "description": "Na 10 s zvýší vaši šanci na úhyb o 50 procentních bodů. (lovecký talent)"
       },
-      "divine_shield": {
-        "name": "Světelný štít",
-        "description": "Ochrání vás svatou mocí, která po dobu 8 s absorbuje 900 bodů poškození. (paladinský talent)"
-      },
       "earthbind": {
         "name": "Svírající země",
         "description": "Připoutá blízké nepřátele k zemi a na 2 s je zakoření. (šamanský talent)"
@@ -7878,10 +7866,6 @@ export const cs_CZ: EnTranslations = {
       "healing_stream": {
         "name": "Pramenná studna",
         "description": "Během 12 s obnoví spojeneckému cíli 120 bodů zdraví. (šamanský talent)"
-      },
-      "holy_wrath": {
-        "name": "Hněv světce",
-        "description": "Uvolní svatou moc a způsobí blízkým nepřátelům {damage} bodů poškození. (paladinský talent)"
       },
       "howl_of_terror": {
         "name": "Děsivé zavytí",

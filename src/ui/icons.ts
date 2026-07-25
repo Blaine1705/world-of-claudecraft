@@ -2982,12 +2982,8 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   avatar: r('earth', 'earthBrown', ['helm', { p: 'fist', ...BR }], ['crack', 'glow']),
   sanguine_aura: r('blood', 'blood', ['droplet', { p: 'heart', ...TL }], ['arcs', 'glow']),
   // paladin
-  cleansing_verdict: r('holy', 'gold', ['sunburst'], ['glow']),
-  holy_wrath: r('holy', 'holyGold', ['sunburst', { p: 'cross', ...BR }], ['arcs']),
-  divine_shield: r('holy', 'gold', ['shield', { p: 'cross', ...BR }], ['glow']),
   avenging_wrath: r('holy', 'gold', ['wing', { p: 'sunburst', ...BR }], ['glow']),
   hammer_of_wrath: r('holy', 'holyGold', ['mace', { p: 'lightning', ...BR }], ['glow']),
-  aura_surge: r('holy', 'holyGold', ['shield', { p: 'sunburst', ...BR }], ['motion', 'glow']),
   bastion_sweep: r('holy', 'gold', ['shield', { p: 'claw_slash', ...BR }], ['arcs', 'motion']),
   oath_chain: r('holy', 'holyGold', ['tendrils', { p: 'hand', ...BR }], ['motion', 'glow']),
   veilbound_march: r(
@@ -3836,12 +3832,8 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'holy_shock',
   'holy_shield',
   'rebuke',
-  'cleansing_verdict',
-  'holy_wrath',
-  'divine_shield',
   'avenging_wrath',
   'hammer_of_wrath',
-  'aura_surge',
   // hunter (CraftPix premium "RPG Archer skill icons" pack). The archer pack is
   // arrows/bows/traps only — the beast/aspect-animal abilities (aspect_of_the_hawk,
   // aspect_of_the_monkey, tame_beast, dismiss_pet, revive_pet) have no fitting art

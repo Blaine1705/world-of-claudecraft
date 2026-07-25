@@ -72,7 +72,7 @@ describe('Veilbound March', () => {
     expect(ability).toMatchObject({
       id: 'veilbound_march',
       specs: ['protection'],
-      learnLevel: 13,
+      learnLevel: 18,
       cost: 0,
       cooldown: 75,
       castTime: 0,

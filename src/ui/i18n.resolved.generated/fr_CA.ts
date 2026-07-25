@@ -7073,7 +7073,7 @@ export const fr_CA: EnTranslations = {
       },
       "guardian_covenant": {
         "name": "Guardian Covenant",
-        "description": "Protects an ally, reducing their damage taken by 20% for 8 sec."
+        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
       },
       "solar_step": {
         "name": "Solar Step",
@@ -7551,10 +7551,6 @@ export const fr_CA: EnTranslations = {
         "name": "Horion sacré",
         "description": "Frappe une cible alliée avec de l’énergie sacrée et lui rend {damage} points de vie. (signature Sacré)"
       },
-      "aura_surge": {
-        "name": "Ricochet de l'aube",
-        "description": "Projette un bouclier forgé à l'aube qui inflige {damage} dégâts sacrés, réduit la cible principale au silence pendant 2 s, puis rebondit sur jusqu'à 2 ennemis supplémentaires à moins de 10 m, infligeant 75 % des dégâts par rebond. (talent de Paladin)"
-      },
       "holy_shield": {
         "name": "Bouclier sacré",
         "description": "Vous protège avec une puissance sacrée pendant 10 s, augmente l’armure de 90 et frappe les attaquants en mêlée pour 12 points de dégâts du Sacré. (signature Protection)"
@@ -7811,10 +7807,6 @@ export const fr_CA: EnTranslations = {
         "name": "Trait de ruine",
         "description": "Projette un trait de feu chaotique qui inflige {damage} points de dégâts de Feu. (talent de Démoniste)"
       },
-      "cleansing_verdict": {
-        "name": "Verdict purificateur",
-        "description": "Dissipe un effet magique néfaste sur une cible alliée et lui rend {damage} points de vie par la magie du Sacré."
-      },
       "cloak_of_shadows": {
         "name": "Cape d’ombre",
         "description": "Vous enveloppe d'ombres et absorbe 420 points de dégâts pendant 5 s. (talent de Voleur)"
@@ -7847,10 +7839,6 @@ export const fr_CA: EnTranslations = {
         "name": "Garde-hérissée",
         "description": "Augmente vos chances d'esquiver de 50 points de pourcentage pendant 10 s. (talent de Chasseur)"
       },
-      "divine_shield": {
-        "name": "Garde-lumière",
-        "description": "Vous protège par la puissance sacrée, absorbant 900 points de dégâts pendant 8 s. (talent de Paladin)"
-      },
       "earthbind": {
         "name": "Terre agrippante",
         "description": "Lie les ennemis proches à la terre et les immobilise pendant 2 s. (talent de Chaman)"
@@ -7878,10 +7866,6 @@ export const fr_CA: EnTranslations = {
       "healing_stream": {
         "name": "Puits de source",
         "description": "Rend 120 points de vie à une cible alliée en 12 s. (talent de Chaman)"
-      },
-      "holy_wrath": {
-        "name": "Courroux du saint",
-        "description": "Libère une puissance sacrée et inflige {damage} points de dégâts aux ennemis proches. (talent de Paladin)"
       },
       "howl_of_terror": {
         "name": "Hurlement d’effroi",
