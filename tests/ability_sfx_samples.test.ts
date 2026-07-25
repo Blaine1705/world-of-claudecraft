@@ -1,12 +1,11 @@
-// The ElevenLabs ability sample pack seam (src/game/ability_sfx_samples.ts):
-// per-take normalization math, cached beef-bus saturation curves, strict
-// round-robin take selection (no consecutive repeats), and — against the
-// shipped pack JSON itself — that every id the router references (release
-// families, motif foley, palette impact identities, spec-authored bespoke
-// samples, spirit models) actually exists in
-// public/audio/sfx/ability_sfx_pack.json.
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+// The ability sample seam (src/game/ability_sfx_samples.ts): per-take
+// normalization math, cached beef-bus saturation curves, and strict
+// round-robin take selection (no consecutive repeats).
+//
+// No sampled pack ships yet, so the "does the shipped pack carry every routed
+// id" coverage suite is deliberately absent: it belongs with the pack, in the
+// change that lands the takes as conformed MP3s through scripts/sfx/. The
+// routing tables themselves are still pinned below.
 import { describe, expect, it } from 'vitest';
 import {
   AbilitySfxSamples,
@@ -16,15 +15,6 @@ import {
   RELEASE_FAMILY,
   SPIRIT_VOICE,
 } from '../src/game/ability_sfx_samples';
-import { ABILITY_VFX_FULL_SPECS } from '../src/render/ability_vfx_full_specs';
-
-const packIds = new Set(
-  Object.keys(
-    JSON.parse(
-      readFileSync(join(__dirname, '../public/audio/sfx/ability_sfx_pack.json'), 'utf8'),
-    ) as Record<string, unknown>,
-  ),
-);
 
 describe('per-take peak normalization (gallery loadPack)', () => {
   it('pulls takes toward the 0.8 target peak', () => {
@@ -100,60 +90,18 @@ describe('round-robin take selection (gallery sample())', () => {
   });
 });
 
-describe('the shipped pack covers every routed id', () => {
-  it('carries a release recording for all 12 palette families', () => {
+describe('the routing tables the sampled layer will bind to', () => {
+  it('maps a release family for all 12 palettes', () => {
     expect(Object.keys(RELEASE_FAMILY)).toHaveLength(12);
     for (const family of Object.values(RELEASE_FAMILY)) {
-      expect(packIds.has(`rel_${family}`), `rel_${family}`).toBe(true);
+      expect(family, 'release family id').toMatch(/^[a-z_]+$/);
     }
   });
 
-  it('carries an impact identity for all 12 palettes', () => {
-    for (const palette of Object.keys(RELEASE_FAMILY)) {
-      expect(packIds.has(`imp_${palette}`), `imp_${palette}`).toBe(true);
-    }
-  });
-
-  it('carries every motif foley recording the router maps to', () => {
-    for (const id of Object.values(MOTIF_SAMPLE)) {
-      expect(packIds.has(id), id).toBe(true);
-    }
-  });
-
-  it('carries every spec-authored bespoke impact sample', () => {
-    for (const [abilityId, spec] of Object.entries(ABILITY_VFX_FULL_SPECS)) {
-      const bespoke = spec.impact?.sample;
-      if (bespoke) expect(packIds.has(bespoke), `${abilityId}: ${bespoke}`).toBe(true);
-    }
-  });
-
-  it('carries a call for every spec-authored spirit model (spider stays mute)', () => {
-    // 'spider' is the one authored model without a recording — it degrades
-    // silently by design; anything else missing is a routing regression.
-    const knownMute = new Set(['spider']);
-    for (const [abilityId, spec] of Object.entries(ABILITY_VFX_FULL_SPECS)) {
-      const model = spec.spirit?.model;
-      if (model && !knownMute.has(model)) {
-        expect(packIds.has(`spirit_${model}`), `${abilityId}: spirit_${model}`).toBe(true);
-      }
-    }
-  });
-
-  it('carries the shout, dash, portal, poof, whoosh, heal, and buff ids', () => {
-    for (const id of [
-      'shout_war',
-      'dash',
-      'portal',
-      'poof',
-      'whoosh_blade',
-      'whoosh_heavy',
-      'heal_holy',
-      'heal_nature',
-      'buff_raise',
-      'buff_morph',
-      'buff_veil',
-    ]) {
-      expect(packIds.has(id), id).toBe(true);
+  it('maps every motif to a snake_case foley id', () => {
+    expect(Object.keys(MOTIF_SAMPLE).length).toBeGreaterThan(0);
+    for (const [motif, id] of Object.entries(MOTIF_SAMPLE)) {
+      expect(id, motif).toMatch(/^[a-z0-9_]+$/);
     }
   });
 

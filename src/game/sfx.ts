@@ -191,14 +191,12 @@ class Sfx {
         });
       }
       void this.preloadStartup();
-      // ElevenLabs ability sample pack (ability_sfx_samples.ts): lazy and
-      // deferred past the world-enter burst. The procedural ability layer
-      // carries every moment until the pack lands, then keeps playing
-      // underneath it as the sub-weight/crit-sting layer (gallery hybrid).
-      const packCtx = this.ctx;
-      if (typeof window !== 'undefined' && packCtx) {
-        window.setTimeout(() => void abilitySfxSamples.load(packCtx), 1500);
-      }
+      // No sampled ability pack ships yet: the ability layer is fully
+      // procedural (the gallery recipes below). The AbilitySfxSamples seam
+      // stays wired and simply reports empty, so every samplePlay falls
+      // through to synthesis. Restoring the sampled layer means shipping the
+      // takes as conformed MP3s through scripts/sfx/ (docs/design/sound_effects.md)
+      // and calling abilitySfxSamples.load() here again.
     } catch {
       this.ctx = null;
     }

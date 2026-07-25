@@ -3193,6 +3193,7 @@ export class Renderer {
       maxViewsHigh: VIEW_PREWARM_MAX_VIEWS_HIGH,
       maxViewsConstrained: VIEW_PREWARM_MAX_VIEWS_CONSTRAINED,
     });
+    const constrainedPrewarm = policy.minimalManifest;
     const maxMs = Math.max(0, options.maxMs ?? policy.maxMs);
     const started = performance.now();
     const deadline = started + maxMs;

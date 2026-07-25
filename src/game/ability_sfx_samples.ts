@@ -1,16 +1,22 @@
-// ElevenLabs-generated ability sample pack (public/audio/sfx/ability_sfx_pack.json,
-// the gallery's sfx_pack.json shipped in-game). The JSON maps sound id ->
-// base64 mp3 takes; this module fetches and decodes it LAZILY after world
-// entry, peak-normalizes every take at decode, and serves strict round-robin
-// takes plus the gallery's BEEF BUS per-voice chain (tanh saturation drive +
-// low-shelf body + presence bite, drive-compensated). The procedural synth
-// layer in src/game/sfx.ts keeps playing until (and unless) this pack arrives,
-// then stays underneath it as the sub-weight/crit-sting layer — the exact
-// hybrid model Tony A/B-approved in the gallery (arc_bolt_preview.js Sfx).
+// The ability sample seam: routing tables (release families, motif foley,
+// spirit voices, per-ability overrides), per-take peak normalization, and the
+// gallery's BEEF BUS per-voice chain (tanh saturation drive + low-shelf body +
+// presence bite, drive-compensated). The procedural synth layer in
+// src/game/sfx.ts plays every ability moment; a sampled pack, when one ships,
+// layers on top of it with synthesis staying underneath as the
+// sub-weight/crit-sting layer (the hybrid model approved in the gallery,
+// arc_bolt_preview.js Sfx).
+//
+// NO SAMPLED PACK SHIPS TODAY. `load()` below is intentionally never called:
+// the takes must first land as individually conformed MP3s through the
+// scripts/sfx/ pipeline (docs/design/sound_effects.md; npm run sfx:check gates
+// loudness, bitrate and true peak, and the SFX Studio owns preview/mastering).
+// Until then `has()` is empty, every samplePlay falls through to synthesis, and
+// nothing fetches. Re-enable by restoring the load() call in sfx.ts init().
 
-/** Where the pack ships from (vite public/ in dev, static hosting in prod —
+/** Where a pack would ship from (vite public/ in dev, static hosting in prod:
  *  the same origin-relative path convention as every clip url in
- *  sfx_manifest.generated.ts). */
+ *  sfx_manifest.generated.ts). Unused until a conformed pack lands. */
 export const ABILITY_SFX_PACK_URL = '/audio/sfx/ability_sfx_pack.json';
 
 /** Release whoosh families: 12 palettes fold onto the 8 recorded rel_ ids
