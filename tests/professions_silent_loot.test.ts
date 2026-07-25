@@ -1,3 +1,5 @@
+import { readdirSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { GATHER_NODES, STATIONS } from '../src/sim/data';
@@ -334,4 +336,84 @@ describe('professions grants suppress BOTH generic hub feedbacks', () => {
   // flags (pin 11)"), which owns the Vale/Deepfen shore probes and the
   // codfather quest fixture this contract needs on both arms: the landed catch
   // carries both flags, the once-ever Codfather quest catch carries neither.
+});
+
+describe('every professions grant site is accounted for (#2430)', () => {
+  // The behavioral pins above cover the flows someone thought to drive. The
+  // gap this closes is the one that actually shipped: the Maker's Bond unbind
+  // peel in commission.ts was a professions grant with its own result line,
+  // and NOTHING enumerated the call sites, so it sat unflagged through the
+  // whole sweep. This walks the directory instead, so a NEW grant site added
+  // by a later phase has to make a deliberate choice rather than inherit the
+  // old double-log by omission.
+  const dir = path.resolve(process.cwd(), 'src/sim/professions');
+
+  // Sites that deliberately carry NEITHER flag, keyed by a stable substring of
+  // the call itself. A grant belongs here ONLY when no result event follows it,
+  // because eliding the hub line for it would make the grant invisible.
+  const NO_RESULT_EVENT_GRANTS = [
+    // fishing.ts: the once-ever Codfather quest catch returns before the
+    // fishingResult emit, so the hub line and ding are its only feedback.
+    'THE_CODFATHER_ITEM_ID',
+  ];
+
+  /** Every ctx.addItem / ctx.addItemInstance call in `source`, each as the full
+   *  call text (paren-balanced, so a multi-line opts object is included). */
+  const grantCalls = (source: string): string[] => {
+    const calls: string[] = [];
+    const re = /\bctx\.addItem(?:Instance)?\(/g;
+    let m = re.exec(source);
+    while (m) {
+      let depth = 0;
+      let end = m.index + m[0].length - 1;
+      for (; end < source.length; end++) {
+        if (source[end] === '(') depth++;
+        else if (source[end] === ')' && --depth === 0) break;
+      }
+      calls.push(source.slice(m.index, end + 1));
+      m = re.exec(source);
+    }
+    return calls;
+  };
+
+  const sites = readdirSync(dir)
+    .filter((f) => f.endsWith('.ts'))
+    .flatMap((file) =>
+      grantCalls(readFileSync(path.join(dir, file), 'utf8')).map((call) => ({ file, call })),
+    );
+
+  it('the scanner actually finds the grant sites (never passes vacuously)', () => {
+    // A regex that stopped matching would make the sweep below green while
+    // checking nothing, so bind both the count and the shape.
+    expect(sites.length).toBeGreaterThanOrEqual(13);
+    expect(sites.some((s) => s.file === 'commission.ts')).toBe(true);
+    expect(sites.some((s) => s.call.includes('callerLogs: true'))).toBe(true);
+    // The balanced-paren walk must capture the whole call, opts object and all,
+    // or every site would read as unflagged and the exclusion list would have
+    // to grow to hide it.
+    expect(sites.find((s) => s.file === 'salvage.ts')?.call).toContain('callerLogs: true');
+  });
+
+  it('every grant either stands its hub line down or is a named no-result-event grant', () => {
+    const unaccounted = sites.filter(
+      (s) =>
+        !s.call.includes('callerLogs: true') &&
+        !NO_RESULT_EVENT_GRANTS.some((marker) => s.call.includes(marker)),
+    );
+    expect(
+      unaccounted.map((s) => `${s.file}: ${s.call.replace(/\s+/g, ' ')}`),
+      'a professions grant that neither sets callerLogs nor is a documented no-result-event grant',
+    ).toEqual([]);
+  });
+
+  it('the exclusion list has no stale entries', () => {
+    // A marker whose call went away (renamed, deleted) would silently widen
+    // the allowance for whatever call text happens to contain it next.
+    for (const marker of NO_RESULT_EVENT_GRANTS) {
+      expect(
+        sites.filter((s) => s.call.includes(marker)),
+        `exclusion marker ${marker} matches no grant call`,
+      ).toHaveLength(1);
+    }
+  });
 });

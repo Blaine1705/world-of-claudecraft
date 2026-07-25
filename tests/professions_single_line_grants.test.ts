@@ -53,6 +53,7 @@ interface GrantLineHarness {
   chatAnnouncer: { push: ReturnType<typeof vi.fn> };
   prevCraftSkills: Record<string, number> | null;
   craftTierUpDrains: number;
+  openUnbindNpcId: number | null;
   renderBags: ReturnType<typeof vi.fn>;
   renderCrafting: ReturnType<typeof vi.fn>;
   showError: ReturnType<typeof vi.fn>;
@@ -75,6 +76,9 @@ function makeHud(): GrantLineHarness {
   hud.chatAnnouncer = { push: vi.fn() };
   hud.prevCraftSkills = null;
   hud.craftTierUpDrains = 0;
+  // null so the unbindResult arm's service-row refresh short-circuits before
+  // it reaches $('#unbind-window'), which this harness does not mount.
+  hud.openUnbindNpcId = null;
   hud.renderBags = vi.fn();
   hud.renderCrafting = vi.fn();
   hud.showError = vi.fn();
@@ -295,6 +299,55 @@ describe('one profession action prints exactly one grant line', () => {
     expect(lines(hud)).toEqual([
       `You salvage [${itemDisplayName(ITEMS[SWORD])}] into [${itemDisplayName(ITEMS[DUST])}] x3.`,
     ]);
+  });
+
+  it('unbinding one copy out of a stack prints the unbind line only', () => {
+    // The sweep's last grant site (commission.ts unbindItem). A bound stack of
+    // byte-equal copies is SPLIT: one copy is peeled off and re-granted through
+    // the hub, so the player was told they received an item they already held,
+    // stacked on top of the unbind line. A single-copy unbind clears in place
+    // and never reaches the hub, so only the stacked arm ever double-logged.
+    const hud = makeHud();
+    hud.handleEvents([
+      {
+        type: 'loot',
+        text: `You receive: ${ITEMS[SWORD]?.name}.`,
+        pid: PLAYER_ID,
+        callerLogs: true,
+      } as SimEvent,
+      { type: 'unbindResult', pid: PLAYER_ID, ok: true, itemId: SWORD, fee: 2500 } as SimEvent,
+    ]);
+    const rendered = lines(hud);
+    expect(rendered).toHaveLength(1);
+    expect(rendered[0]).not.toContain('You receive');
+    expect(rendered[0]).toContain(itemDisplayName(ITEMS[SWORD]));
+    // The cue is deliberately NOT stood down for this one: unbind has no
+    // dedicated cue of its own, so the grant sets callerLogs without silent.
+    expect(audio.lootItem).toHaveBeenCalledTimes(1);
+    // The peel still moved items, so the bag mirror still repaints.
+    expect(hud.renderBags).toHaveBeenCalled();
+  });
+
+  it('a yield-free disenchant success renders no dangling empty operand', () => {
+    // The fallback contract spans two files: enchanting_view picks the
+    // yield-free key when materialItemId is absent, and hud.ts independently
+    // substitutes an empty {material}. If the selector ever returned a Yield
+    // key for a material-less success the player would read "You disenchant
+    // [Sword] into ." This drives the arm end to end so the two halves cannot
+    // drift apart silently.
+    const hud = makeHud();
+    hud.handleEvents([
+      { type: 'disenchantResult', pid: PLAYER_ID, ok: true, itemId: SWORD } as SimEvent,
+    ]);
+    expect(lines(hud)).toEqual([`You disenchant [${itemDisplayName(ITEMS[SWORD])}].`]);
+  });
+
+  it('a yield-free salvage success renders no dangling empty operand either', () => {
+    const hud = makeHud();
+    hud.handleEvents([
+      { type: 'salvageResult', pid: PLAYER_ID, ok: true, itemId: SWORD } as SimEvent,
+    ]);
+    expect(lines(hud)).toEqual([`You salvage [${itemDisplayName(ITEMS[SWORD])}].`]);
   });
 
   it('applying an enchant never says the player received an item they already held', () => {
