@@ -330,8 +330,12 @@ describe('Eastbrook authored gameplay data integration', () => {
       'weaver_ottilie',
       'tinker_gizzel',
     ]);
+    // Reminted for the paladin-only Dawnbound Tome chain, which hangs q_divine_tome
+    // off Brother Aldric. The payload covers everything but pos/facing, so a quest
+    // added to a town NPC moves it; the placement assertions below still pin every
+    // position independently.
     expect(createHash('sha256').update(JSON.stringify(stableTownNpcPayload())).digest('hex')).toBe(
-      '92c37779f6a29982ec3541169d995fc4365c9696a9b7a0e2fd32713094073db1',
+      '27b35a76d532376f830cbca47122f39723a7ce616be32f5084d6d9917def27ab',
     );
     expect(ZONE1_TOWN_NPC_IDS).toHaveLength(15);
     for (const id of ZONE1_TOWN_NPC_IDS) {
