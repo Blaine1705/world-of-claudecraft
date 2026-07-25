@@ -90,6 +90,15 @@ const proceduralByItem = new Map<string, THREE.Group>();
 /** Test-only window into the preload asset set (mirrors delve_props.ts). */
 export const questObjectPreloadInternalsForTest = { questObjectUrl: QUEST_OBJECT_URLS };
 
+/** Test-only cache reset, so a determinism test can force two independent builds. */
+export const questObjectCacheInternalsForTest = {
+  resetProceduralCaches: () => {
+    preparedByItem.clear();
+    proceduralByItem.clear();
+    measuredHeightByItem.clear();
+  },
+};
+
 if (typeof window !== 'undefined') {
   const urls = [...new Set(Object.values(QUEST_OBJECT_URLS))];
   for (const url of urls) {
@@ -348,10 +357,12 @@ function buildRoyalSealTemplate(): THREE.Group {
   const bookWidth = 0.92;
   const bookDepth = 0.68;
   const bookHeight = 0.32;
+  const coverThickness = 0.05;
 
-  // Page block, slightly inset from the covers so the gilt cover edge reads.
+  // Page block between the top and bottom covers, inset on width/depth so the
+  // gilt cover edge reads at the fore-edge and sides.
   const pages = new THREE.Mesh(
-    new THREE.BoxGeometry(bookWidth * 0.94, bookHeight * 0.62, bookDepth * 0.94),
+    new THREE.BoxGeometry(bookWidth * 0.94, bookHeight - coverThickness * 2, bookDepth * 0.94),
     pageMat,
   );
   pages.position.y = bookHeight * 0.5;
@@ -359,16 +370,20 @@ function buildRoyalSealTemplate(): THREE.Group {
   pages.receiveShadow = true;
   root.add(pages);
 
-  // Front and back covers.
-  for (const dz of [-1, 1]) {
-    const cover = new THREE.Mesh(new THREE.BoxGeometry(bookWidth, bookHeight, 0.05), coverMat);
-    cover.position.set(0, bookHeight * 0.5, dz * (bookDepth * 0.5 - 0.025));
+  // Top and bottom covers: thin horizontal slabs spanning the full footprint,
+  // closing the book so it reads as a closed tome rather than an open tray.
+  for (const dy of [coverThickness * 0.5, bookHeight - coverThickness * 0.5]) {
+    const cover = new THREE.Mesh(
+      new THREE.BoxGeometry(bookWidth, coverThickness, bookDepth),
+      coverMat,
+    );
+    cover.position.set(0, dy, 0);
     cover.castShadow = true;
     cover.receiveShadow = true;
     root.add(cover);
   }
 
-  // Spine, running along the -X edge.
+  // Spine, running along the -X edge, connecting the top and bottom covers.
   const spine = new THREE.Mesh(new THREE.BoxGeometry(0.06, bookHeight, bookDepth), coverMat);
   spine.position.set(-bookWidth * 0.5 + 0.03, bookHeight * 0.5, 0);
   spine.castShadow = true;
@@ -442,16 +457,38 @@ function buildRoyalSealTemplate(): THREE.Group {
   return root;
 }
 
-const PROCEDURAL_ITEM_IDS = new Set(['crypt_ritual_circle', 'royal_seal']);
+// Procedural builders for items that have no GLB and never will. Keyed the
+// same way `prepareItem` looks them up, so adding a third no-GLB id here
+// automatically routes past the `supply_crate` fallback instead of silently
+// resolving to an invisible `null` template.
+const PROCEDURAL_NO_URL_BUILDERS: Record<string, () => THREE.Group> = {
+  royal_seal: buildRoyalSealTemplate,
+};
+
+const PROCEDURAL_ITEM_IDS = new Set([
+  'crypt_ritual_circle',
+  ...Object.keys(PROCEDURAL_NO_URL_BUILDERS),
+]);
+
+/**
+ * Measured post-normalization height (`Box3.max.y`) for items whose model is
+ * wider/deeper than it is tall, since `normalizeRoot` scales by the largest
+ * dimension: for those the nameplate/VFX anchor must come from the actual
+ * geometry, not the `QUEST_OBJECT_HEIGHTS` scale target (see the
+ * `RITUAL_CIRCLE_FOOTPRINT` comment above for the same trap on a flat prop).
+ */
+const measuredHeightByItem = new Map<string, number>();
 
 function prepareItem(itemId: string): THREE.Group | null {
   const cached = preparedByItem.get(itemId);
   if (cached) return cached;
   const url = QUEST_OBJECT_URLS[itemId];
   if (!url) {
-    if (itemId !== 'royal_seal') return null;
-    const template = buildRoyalSealTemplate();
-    normalizeRoot(template, QUEST_OBJECT_HEIGHTS.royal_seal ?? TARGET_HEIGHT);
+    const build = PROCEDURAL_NO_URL_BUILDERS[itemId];
+    if (!build) return null;
+    const template = build();
+    const measuredHeight = normalizeRoot(template, QUEST_OBJECT_HEIGHTS[itemId] ?? TARGET_HEIGHT);
+    measuredHeightByItem.set(itemId, measuredHeight);
     preparedByItem.set(itemId, template);
     return template;
   }
@@ -488,7 +525,10 @@ export function buildGroundQuestObject(
     const model = template.clone(true);
     group.add(model);
     group.rotation.y = (entityId % 7) * 0.45;
-    return { group, height: QUEST_OBJECT_HEIGHTS[key] ?? TARGET_HEIGHT };
+    return {
+      group,
+      height: measuredHeightByItem.get(key) ?? QUEST_OBJECT_HEIGHTS[key] ?? TARGET_HEIGHT,
+    };
   }
   group.rotation.y = (entityId % 7) * 0.45;
   return { group, height: TARGET_HEIGHT };
