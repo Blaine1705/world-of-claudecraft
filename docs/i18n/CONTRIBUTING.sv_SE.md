@@ -131,9 +131,9 @@ känna till:
    git switch -c feature/<short-slug> origin/release/vX.Y.Z
    ```
 
-   När detta skrivs är den nyaste `release/v0.30.0`, men kontrollera alltid i
-   stället för att kopiera det namnet. Grenar heter `feature/<short-slug>` eller
-   `fix/<short-slug>`.
+   Kör alltid den uppslagningen i stället för att kopiera ett versionsnummer ur
+   den här guiden: release-grenar byts ut ofta, och den nyaste flyttas med varje
+   release. Grenar heter `feature/<short-slug>` eller `fix/<short-slug>`.
 2. **Gör fokuserade commits.** Mindre, fristående ändringar är lättare att granska
    och slå samman än stora.
 3. **Lägg till eller uppdatera tester** för all funktionalitet du ändrar i

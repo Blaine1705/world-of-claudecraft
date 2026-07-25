@@ -137,8 +137,9 @@ le binaire `tsc`. À savoir :
    git switch -c feature/<short-slug> origin/release/vX.Y.Z
    ```
 
-   Au moment d'écrire ces lignes, la plus récente est `release/v0.30.0`, mais
-   vérifiez toujours plutôt que de recopier ce nom. Les branches sont
+   Exécutez toujours cette recherche plutôt que de recopier un numéro de version
+   tiré de ce guide : les branches de version se renouvellent souvent, et la plus
+   récente change à chaque livraison. Les branches sont nommées
    `feature/<short-slug>` ou `fix/<short-slug>`.
 2. **Faites des commits ciblés.** Des changements plus petits et autonomes sont
    plus faciles à réviser et à fusionner que les gros.

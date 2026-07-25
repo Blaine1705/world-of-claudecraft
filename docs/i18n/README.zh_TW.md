@@ -388,7 +388,7 @@ node scripts/crypt_raid.mjs     # five bots clear the Hollow Crypt (ALLOW_DEV_CO
 
 歡迎各式各樣的貢獻：程式碼、翻譯、錯誤回報與文件。先從 [CONTRIBUTING.zh_TW.md](CONTRIBUTING.zh_TW.md) 開始進行設定，閱讀[行為準則](../../CODE_OF_CONDUCT.md)，並在回報漏洞前查看 [SECURITY.md](../../SECURITY.md)。新來的嗎？找找標記為 [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue) 的議題，開一個[議題](https://github.com/levy-street/world-of-claudecraft/issues/new/choose)，或在 [Discord](https://discord.com/invite/worldofclaudecraft) 上打聲招呼。
 
-目前的發布版本是 **v0.29.1**，而活躍開發在最新的 `release/vX.Y.Z` 分支上進行，目前是 **`release/v0.30.0`**。請從那個發布分支開出你的分支，並讓你的拉取請求以它為目標。切勿從 `main` 開分支或以它為目標，`main` 只會在某個版本正式發布時才接收該發布分支。
+活躍開發在最新的 `release/vX.Y.Z` 分支上進行。請自行查出那一條，不要憑臆測，然後從它開出你的分支，並讓你的拉取請求以它為目標。切勿從 `main` 開分支或以它為目標，`main` 只會在某個版本正式發布時才接收該發布分支。[CONTRIBUTING.md](CONTRIBUTING.zh_TW.md) 附有一行指令，可以找出目前最新的那一條。
 
 ## 授權
 

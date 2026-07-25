@@ -131,8 +131,9 @@ API, mens `@typescript/native` leverer `tsc`-binæren. Ting, du bør vide:
    git switch -c feature/<short-slug> origin/release/vX.Y.Z
    ```
 
-   På skrivetidspunktet er den nyeste `release/v0.30.0`, men tjek altid selv i
-   stedet for at kopiere det navn. Branches hedder `feature/<short-slug>` eller
+   Kør altid det opslag i stedet for at kopiere et versionsnummer fra denne
+   vejledning: release-branches udskiftes ofte, og den nyeste flytter sig med
+   hver udgivelse. Branches hedder `feature/<short-slug>` eller
    `fix/<short-slug>`.
 2. **Lav fokuserede commits.** Mindre, selvstændige ændringer er nemmere at
    gennemgå og merge end store.

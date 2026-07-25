@@ -394,7 +394,7 @@ node scripts/crypt_raid.mjs     # five bots clear the Hollow Crypt (ALLOW_DEV_CO
 
 Приветствуется вклад любого рода: код, переводы, баг-репорты и документация. Начните с [CONTRIBUTING.ru_RU.md](CONTRIBUTING.ru_RU.md) для настройки, прочитайте [Кодекс поведения](../../CODE_OF_CONDUCT.md) и проверьте [SECURITY.md](../../SECURITY.md) перед сообщением об уязвимости. Впервые здесь? Ищите issue с меткой [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), откройте [issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose) или поздоровайтесь в [Discord](https://discord.com/invite/worldofclaudecraft).
 
-Текущий релиз — **v0.29.1**, а активная разработка идёт в последней ветке `release/vX.Y.Z`, сейчас это **`release/v0.30.0`**. Ответвляйтесь от этой релизной ветки и направляйте в неё свой pull request. Никогда не ответвляйтесь от `main` и не направляйте изменения туда: `main` получает релизную ветку только тогда, когда эта версия выходит.
+Активная разработка идёт в самой новой ветке `release/vX.Y.Z`. Узнайте её имя, а не предполагайте его, затем ответвитесь от неё и направьте в неё свой pull request. Никогда не ответвляйтесь от `main` и не направляйте изменения туда: `main` получает релизную ветку только тогда, когда эта версия выходит. В [CONTRIBUTING.md](CONTRIBUTING.ru_RU.md) есть однострочная команда, которая находит текущую.
 
 ## Лицензия
 

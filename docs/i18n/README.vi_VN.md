@@ -393,7 +393,7 @@ Mọi chuỗi hiển thị với người chơi đều phân giải qua `t()`, v
 
 Mọi kiểu đóng góp đều được hoan nghênh: mã, bản dịch, báo cáo lỗi, và tài liệu. Hãy bắt đầu với [CONTRIBUTING.md](CONTRIBUTING.vi_VN.md) để thiết lập, đọc [Quy tắc ứng xử](../../CODE_OF_CONDUCT.md), và xem [SECURITY.md](../../SECURITY.md) trước khi báo cáo một lỗ hổng. Mới ở đây? Hãy tìm các issue được gắn nhãn [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), mở một [issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose), hoặc chào một tiếng trên [Discord](https://discord.com/invite/worldofclaudecraft).
 
-Bản phát hành hiện tại là **v0.29.1**, và việc phát triển đang diễn ra trên nhánh `release/vX.Y.Z` mới nhất, hiện là **`release/v0.30.0`**. Hãy tạo nhánh từ nhánh phát hành đó và nhắm pull request của bạn vào đó. Đừng bao giờ tạo nhánh từ hay nhắm vào `main`, nhánh chỉ nhận một nhánh phát hành khi phiên bản đó xuất xưởng.
+Việc phát triển đang diễn ra trên nhánh `release/vX.Y.Z` mới nhất. Hãy tra cứu nhánh đó thay vì phỏng đoán, rồi tạo nhánh từ nó và nhắm pull request của bạn vào đó. Đừng bao giờ tạo nhánh từ hay nhắm vào `main`, nhánh chỉ nhận một nhánh phát hành khi phiên bản đó xuất xưởng. [CONTRIBUTING.md](CONTRIBUTING.vi_VN.md) có câu lệnh một dòng giúp tìm ra nhánh hiện tại.
 
 ## Giấy phép
 

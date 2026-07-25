@@ -132,9 +132,10 @@ phân giải sang JS API của TypeScript 6 (thông qua lớp bọc
    git switch -c feature/<short-slug> origin/release/vX.Y.Z
    ```
 
-   Tại thời điểm viết tài liệu này, nhánh mới nhất là `release/v0.30.0`, nhưng hãy
-   luôn kiểm tra thay vì sao chép cái tên đó. Các nhánh được đặt tên
-   `feature/<short-slug>` hoặc `fix/<short-slug>`.
+   Hãy luôn chạy lượt tra cứu đó thay vì sao chép một số hiệu phiên bản từ hướng
+   dẫn này: các nhánh release luân chuyển thường xuyên, và nhánh mới nhất thay đổi
+   theo mỗi lần phát hành. Các nhánh được đặt tên `feature/<short-slug>` hoặc
+   `fix/<short-slug>`.
 2. **Thực hiện các commit tập trung.** Những thay đổi nhỏ, độc lập sẽ dễ review và
    merge hơn những thay đổi lớn.
 3. **Thêm hoặc cập nhật kiểm thử** cho bất kỳ hành vi nào bạn thay đổi trong

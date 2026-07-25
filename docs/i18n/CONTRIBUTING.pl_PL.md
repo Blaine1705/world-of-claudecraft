@@ -130,8 +130,9 @@ natomiast `@typescript/native` dostarcza binarkę `tsc`. Warto wiedzieć:
    git switch -c feature/<short-slug> origin/release/vX.Y.Z
    ```
 
-   W chwili pisania najnowsza to `release/v0.30.0`, ale zawsze sprawdzaj, zamiast
-   kopiować tę nazwę. Gałęzie nazywamy `feature/<short-slug>` lub `fix/<short-slug>`.
+   Zawsze wykonuj to sprawdzenie, zamiast kopiować numer wersji z tego przewodnika:
+   gałęzie wydań zmieniają się często, a najnowsza przesuwa się z każdym wydaniem.
+   Gałęzie nazywamy `feature/<short-slug>` lub `fix/<short-slug>`.
 2. **Twórz skupione commity.** Mniejsze, samodzielne zmiany są łatwiejsze do
    przejrzenia i scalenia niż duże.
 3. **Dodaj lub zaktualizuj testy** dla każdego zachowania, które zmieniasz w

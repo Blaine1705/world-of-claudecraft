@@ -126,8 +126,9 @@ místo desítek sekund. Instalace používá oficiální dvojitý alias: balíč
    git switch -c feature/<short-slug> origin/release/vX.Y.Z
    ```
 
-   V době psaní je nejnovější `release/v0.30.0`, ale vždycky to raději ověř, než abys
-   ten název opsal. Větve se jmenují `feature/<short-slug>` nebo `fix/<short-slug>`.
+   Vždycky si to vyhledání spusť, místo abys opisoval číslo verze z této příručky:
+   release větve se střídají často a ta nejnovější se s každým vydáním posouvá.
+   Větve se jmenují `feature/<short-slug>` nebo `fix/<short-slug>`.
 2. **Dělej soustředěné commity.** Menší, samostatné změny se posuzují a slučují
    snáz než velké.
 3. **Přidej nebo aktualizuj testy** ke každému chování, které měníš v `src/sim/`

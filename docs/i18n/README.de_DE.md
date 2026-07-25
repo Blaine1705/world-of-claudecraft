@@ -393,7 +393,7 @@ Jede für Spieler sichtbare Zeichenkette wird über `t()` aufgelöst, und das Sp
 
 Beiträge jeder Art sind willkommen: Code, Übersetzungen, Fehlerberichte und Dokumentation. Beginne mit [CONTRIBUTING.de_DE.md](CONTRIBUTING.de_DE.md) für die Einrichtung, lies den [Verhaltenskodex](../../CODE_OF_CONDUCT.md) und prüfe [SECURITY.md](../../SECURITY.md), bevor du eine Schwachstelle meldest. Neu hier? Halte Ausschau nach Issues mit dem Label [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), öffne ein [Issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose) oder sag Hallo auf [Discord](https://discord.com/invite/worldofclaudecraft).
 
-Das aktuelle Release ist **v0.29.1**, und die aktive Entwicklung läuft auf dem neuesten `release/vX.Y.Z`-Branch, derzeit **`release/v0.30.0`**. Zweige von diesem Release-Branch ab und richte deinen Pull Request darauf aus. Zweige niemals von `main` ab und richte auch nichts darauf aus; `main` erhält einen Release-Branch erst, wenn diese Version erscheint.
+Die aktive Entwicklung läuft auf dem neuesten `release/vX.Y.Z`-Branch. Schlage ihn nach, statt ihn anzunehmen, zweige dann davon ab und richte deinen Pull Request darauf aus. Zweige niemals von `main` ab und richte auch nichts darauf aus; `main` erhält einen Release-Branch erst, wenn diese Version erscheint. [CONTRIBUTING.md](CONTRIBUTING.de_DE.md) enthält den einzeiligen Befehl, der den aktuellen findet.
 
 ## Lizenz
 

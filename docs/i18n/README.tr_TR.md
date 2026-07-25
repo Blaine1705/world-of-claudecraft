@@ -393,7 +393,7 @@ Her oyuncuya görünür dize `t()` üzerinden çözülür ve oyun **22 yerel aya
 
 Her türlü katkı memnuniyetle karşılanır: kod, çeviriler, hata raporları ve belgeler. Kurulum için [CONTRIBUTING.md](CONTRIBUTING.tr_TR.md) ile başla, [Davranış Kuralları](../../CODE_OF_CONDUCT.md)'nı oku ve bir güvenlik açığı bildirmeden önce [SECURITY.md](../../SECURITY.md)'yi kontrol et. Burada yeni misin? [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue) etiketli sorunlara bak, bir [sorun](https://github.com/levy-street/world-of-claudecraft/issues/new/choose) aç veya [Discord](https://discord.com/invite/worldofclaudecraft)'da merhaba de.
 
-Güncel sürüm **v0.29.1** ve aktif geliştirme en son `release/vX.Y.Z` dalında, şu anda **`release/v0.30.0`** üzerinde yürüyor. O sürüm dalından dallan ve pull request'ini oraya yönelt. Asla `main` dalından dallanma veya onu hedefleme; `main` yalnızca o sürüm yayımlandığında bir sürüm dalı alır.
+Aktif geliştirme en yeni `release/vX.Y.Z` dalında yürüyor. Varsaymak yerine hangisi olduğuna bak, sonra ondan dallan ve pull request'ini oraya yönelt. Asla `main` dalından dallanma veya onu hedefleme; `main` yalnızca o sürüm yayımlandığında bir sürüm dalı alır. [CONTRIBUTING.md](CONTRIBUTING.tr_TR.md), güncel olanı bulan tek satırlık komutu içerir.
 
 ## Lisans
 

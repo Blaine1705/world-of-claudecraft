@@ -389,7 +389,7 @@ node scripts/crypt_raid.mjs     # five bots clear the Hollow Crypt (ALLOW_DEV_CO
 
 我们欢迎各种形式的贡献：代码、翻译、错误报告和文档。先从 [CONTRIBUTING.zh_CN.md](CONTRIBUTING.zh_CN.md) 了解环境搭建，阅读[行为准则](../../CODE_OF_CONDUCT.md)，并在报告漏洞前查看 [SECURITY.md](../../SECURITY.md)。新来的？可以找带 [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue) 标签的议题，开一个[议题](https://github.com/levy-street/world-of-claudecraft/issues/new/choose)，或者来 [Discord](https://discord.com/invite/worldofclaudecraft) 打个招呼。
 
-当前发布版本是 **v0.29.1**，活跃开发在最新的 `release/vX.Y.Z` 分支上进行，目前是 **`release/v0.30.0`**。请从那个发布分支拉出新分支，并把你的拉取请求指向它。切勿从 `main` 拉出分支或以 `main` 为目标，它只有在某个版本正式发布时才会收到对应的发布分支。
+活跃开发在最新的 `release/vX.Y.Z` 分支上进行。请自己核对它是哪一个，而不是想当然，然后从它拉出新分支，并把你的拉取请求指向它。切勿从 `main` 拉出分支或以 `main` 为目标，它只有在某个版本正式发布时才会收到对应的发布分支。[CONTRIBUTING.md](CONTRIBUTING.zh_CN.md) 里有一行命令，可以找出当前最新的那一个。
 
 ## 许可
 

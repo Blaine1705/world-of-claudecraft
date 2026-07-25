@@ -394,7 +394,7 @@ Setiap string yang terlihat pemain diselesaikan melalui `t()`, dan game ini diki
 
 Kontribusi dalam segala bentuk disambut: kode, terjemahan, laporan bug, dan dokumentasi. Mulai dengan [CONTRIBUTING.id_ID.md](CONTRIBUTING.id_ID.md) untuk penyiapan, baca [Kode Etik](../../CODE_OF_CONDUCT.md), dan periksa [SECURITY.md](../../SECURITY.md) sebelum melaporkan kerentanan. Baru di sini? Cari issue berlabel [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), buka sebuah [issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose), atau sapa kami di [Discord](https://discord.com/invite/worldofclaudecraft).
 
-Rilis saat ini adalah **v0.29.1**, dan pengembangan aktif berjalan di branch `release/vX.Y.Z` terbaru, saat ini **`release/v0.30.0`**. Buat branch dari branch rilis itu dan targetkan branch itu dengan pull request Anda. Jangan pernah membuat branch dari atau menargetkan `main`, yang hanya menerima sebuah branch rilis ketika versi tersebut dikirim.
+Pengembangan aktif berjalan di branch `release/vX.Y.Z` terbaru. Cari tahu branch itu alih-alih menebaknya, lalu buat branch darinya dan targetkan branch itu dengan pull request Anda. Jangan pernah membuat branch dari atau menargetkan `main`, yang hanya menerima sebuah branch rilis ketika versi tersebut dikirim. [CONTRIBUTING.md](CONTRIBUTING.id_ID.md) memuat perintah satu baris yang menemukan branch rilis saat ini.
 
 ## Lisensi
 

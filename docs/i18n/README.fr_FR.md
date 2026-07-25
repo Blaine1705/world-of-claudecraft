@@ -395,7 +395,7 @@ Chaque chaîne visible par le joueur est résolue via `t()`, et le jeu est livr�
 
 Les contributions de toute sorte sont les bienvenues : code, traductions, rapports de bugs et documentation. Commencez par [CONTRIBUTING.md](CONTRIBUTING.fr_FR.md) pour la mise en place, lisez le [Code de conduite](../../CODE_OF_CONDUCT.md), et consultez [SECURITY.md](../../SECURITY.md) avant de signaler une vulnérabilité. Nouveau ici ? Cherchez les tickets étiquetés [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), ouvrez un [ticket](https://github.com/levy-street/world-of-claudecraft/issues/new/choose), ou venez dire bonjour sur [Discord](https://discord.com/invite/worldofclaudecraft).
 
-La version actuelle est **v0.29.1**, et le développement actif se fait sur la dernière branche `release/vX.Y.Z`, actuellement **`release/v0.30.0`**. Créez votre branche à partir de cette branche de version et ciblez-la avec votre pull request. Ne créez jamais de branche depuis `main` et ne la ciblez jamais : `main` ne reçoit une branche de version que lorsque celle-ci est publiée.
+Le développement actif se fait sur la branche `release/vX.Y.Z` la plus récente. Recherchez-la plutôt que de la supposer, puis créez votre branche à partir d'elle et ciblez-la avec votre pull request. Ne créez jamais de branche depuis `main` et ne la ciblez jamais : `main` ne reçoit une branche de version qu'une fois cette version publiée. [CONTRIBUTING.md](CONTRIBUTING.fr_FR.md) contient la commande d'une seule ligne qui trouve la branche en vigueur.
 
 ## Licence
 

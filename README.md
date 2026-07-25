@@ -384,7 +384,7 @@ Every player-visible string resolves through `t()`, and the game ships in **22 l
 
 Contributions of every kind are welcome: code, translations, bug reports, and documentation. Start with [CONTRIBUTING.md](CONTRIBUTING.md) for setup, read the [Code of Conduct](CODE_OF_CONDUCT.md), and check [SECURITY.md](SECURITY.md) before reporting a vulnerability. New here? Look for issues labeled [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), open an [issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose), or say hello on [Discord](https://discord.com/invite/worldofclaudecraft).
 
-The current release is **v0.29.1**, and active development runs on the latest `release/vX.Y.Z` branch, currently **`release/v0.30.0`**. Branch from that release branch and target it with your pull request. Never branch from or target `main`, which only receives a release branch when that version ships.
+Active development runs on the newest `release/vX.Y.Z` branch. Look it up rather than assuming, then branch from it and target it with your pull request. Never branch from or target `main`, which only receives a release branch once that version ships. [CONTRIBUTING.md](CONTRIBUTING.md) has the one-line command that finds the current one.
 
 ## License
 

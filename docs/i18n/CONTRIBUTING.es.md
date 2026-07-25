@@ -133,8 +133,9 @@ Cosas que conviene saber:
    git switch -c feature/<short-slug> origin/release/vX.Y.Z
    ```
 
-   Al momento de escribir esto la más nueva es `release/v0.30.0`, pero verifícalo
-   siempre en lugar de copiar ese nombre. Las ramas son `feature/<short-slug>` o
+   Ejecuta siempre esa búsqueda en lugar de copiar un número de versión de esta
+   guía: las ramas de lanzamiento se renuevan seguido, y la más nueva cambia con
+   cada lanzamiento. Las ramas se nombran `feature/<short-slug>` o
    `fix/<short-slug>`.
 2. **Haz commits enfocados.** Los cambios más pequeños y autocontenidos son más
    fáciles de revisar y fusionar que los grandes.

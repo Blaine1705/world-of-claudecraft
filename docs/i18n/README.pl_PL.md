@@ -395,7 +395,7 @@ Każdy widoczny dla gracza ciąg jest rozstrzygany przez `t()`, a gra jest dosta
 
 Mile widziane są wszelkiego rodzaju wkłady: kod, tłumaczenia, zgłoszenia błędów i dokumentacja. Zacznij od [CONTRIBUTING.pl_PL.md](CONTRIBUTING.pl_PL.md) po konfigurację, przeczytaj [Kodeks postępowania](../../CODE_OF_CONDUCT.md) i sprawdź [SECURITY.md](../../SECURITY.md) przed zgłoszeniem podatności. Nowy tutaj? Poszukaj zgłoszeń oznaczonych [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), otwórz [zgłoszenie](https://github.com/levy-street/world-of-claudecraft/issues/new/choose) lub przywitaj się na [Discordzie](https://discord.com/invite/worldofclaudecraft).
 
-Aktualne wydanie to **v0.29.1**, a aktywny rozwój toczy się na najnowszej gałęzi `release/vX.Y.Z`, obecnie **`release/v0.30.0`**. Odbijaj gałąź od tej gałęzi wydania i to ją wskazuj jako cel pull requesta. Nigdy nie odbijaj od `main` ani nie celuj w `main`, który dostaje gałąź wydania dopiero wtedy, gdy dana wersja wychodzi.
+Aktywny rozwój toczy się na najnowszej gałęzi `release/vX.Y.Z`. Sprawdź, która to jest, zamiast zgadywać, a potem odbij od niej gałąź i to ją wskazuj jako cel pull requesta. Nigdy nie odbijaj od `main` ani nie celuj w `main`, który dostaje gałąź wydania dopiero wtedy, gdy dana wersja wychodzi. [CONTRIBUTING.md](CONTRIBUTING.pl_PL.md) zawiera jednolinijkowe polecenie, które znajduje bieżącą gałąź.
 
 ## Licencja
 

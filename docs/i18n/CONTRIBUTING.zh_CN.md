@@ -77,7 +77,7 @@ npm run dev          # in another terminal; the client proxies to the server
    git switch -c feature/<short-slug> origin/release/vX.Y.Z
    ```
 
-   写下这份文档时最新的是 `release/v0.30.0`，但请始终自己核对一遍，而不是照抄这个名字。分支命名是 `feature/<short-slug>` 或 `fix/<short-slug>`。
+   请始终自己跑一遍这条查找命令，而不是从这份指南里照抄某个版本号：发布分支更替频繁，最新的那一个会随着每次发布而变化。分支命名是 `feature/<short-slug>` 或 `fix/<short-slug>`。
 2. **提交要聚焦。** 较小、自成一体的改动比大块的改动更容易审查和合并。
 3. **为改动补充或更新测试**，凡是你改动了 `src/sim/` 或 `server/` 中的行为。
 4. **保持玩家可见文本可翻译。** 请看[本地化](#localization)和[翻译游戏](#translating-the-game)。

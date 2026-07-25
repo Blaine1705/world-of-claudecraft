@@ -77,7 +77,7 @@ npm run dev          # in another terminal; the client proxies to the server
    git switch -c feature/<short-slug> origin/release/vX.Y.Z
    ```
 
-   この文書を書いている時点での最新は `release/v0.30.0` ですが、その名前をそのまま写すのではなく、必ず自分で確認してください。ブランチ名は `feature/<short-slug>` または `fix/<short-slug>` です。
+   このガイドからバージョン番号をそのまま写すのではなく、必ずこの確認を実行してください。リリースブランチは頻繁に入れ替わり、最新のものはリリースのたびに移り変わります。ブランチ名は `feature/<short-slug>` または `fix/<short-slug>` です。
 2. **コミットは目的を絞ったものに。** 小さく、ひとまとまりになった変更は、大きなものよりもレビューやマージがしやすくなります。
 3. **テストを追加または更新します。** `src/sim/` や `server/` で挙動を変えたときは、必ずテストも合わせて用意してください。
 4. **プレイヤーに見える文字列は翻訳可能に保ちます。** [ローカライズ](#localization)と[ゲームの翻訳](#translating-the-game)を参照してください。

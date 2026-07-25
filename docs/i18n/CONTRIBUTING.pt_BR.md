@@ -134,9 +134,9 @@ enquanto o `@typescript/native` fornece o binário `tsc`. Pontos importantes:
    git switch -c feature/<short-slug> origin/release/vX.Y.Z
    ```
 
-   No momento em que este texto foi escrito, o mais novo é `release/v0.30.0`, mas
-   sempre verifique em vez de copiar esse nome. Os branches são
-   `feature/<short-slug>` ou `fix/<short-slug>`.
+   Sempre execute essa consulta em vez de copiar um número de versão deste guia:
+   os branches de release se renovam com frequência, e o mais novo muda a cada
+   release. Os branches são nomeados `feature/<short-slug>` ou `fix/<short-slug>`.
 2. **Faça commits focados.** Alterações menores e autocontidas são mais fáceis de
    revisar e integrar do que as grandes.
 3. **Adicione ou atualize testes** para qualquer comportamento que você mudar em

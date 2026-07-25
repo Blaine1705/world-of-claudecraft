@@ -392,7 +392,7 @@ Varje spelarsynlig sträng löses genom `t()`, och spelet levereras i **22 lokal
 
 Bidrag av alla slag är välkomna: kod, översättningar, buggrapporter och dokumentation. Börja med [CONTRIBUTING.md](CONTRIBUTING.sv_SE.md) för installation, läs [uppförandekoden](../../CODE_OF_CONDUCT.md), och kolla [SECURITY.md](../../SECURITY.md) innan du rapporterar en sårbarhet. Ny här? Leta efter issues märkta [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), öppna en [issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose), eller säg hej på [Discord](https://discord.com/invite/worldofclaudecraft).
 
-Den aktuella releasen är **v0.29.1**, och aktiv utveckling sker på den senaste `release/vX.Y.Z`-grenen, för närvarande **`release/v0.30.0`**. Förgrena dig från den release-grenen och rikta din pull request mot den. Förgrena aldrig från och rikta aldrig mot `main`, som bara tar emot en release-gren när den versionen levereras.
+Aktiv utveckling sker på den nyaste `release/vX.Y.Z`-grenen. Ta reda på vilken det är i stället för att anta, och förgrena dig sedan från den och rikta din pull request mot den. Förgrena aldrig från och rikta aldrig mot `main`, som bara tar emot en release-gren när den versionen levereras. [CONTRIBUTING.md](CONTRIBUTING.sv_SE.md) har enradskommandot som hittar den aktuella.
 
 ## Licens
 

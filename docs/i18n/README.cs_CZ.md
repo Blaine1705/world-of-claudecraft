@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../../LICENSE)
-[![Version](https://img.shields.io/badge/version-0.29.1-blue)](../../package.json)
+[![Version](https://img.shields.io/badge/version-0.30.0-blue)](../../package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.cs_CZ.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -392,7 +392,7 @@ Každý řetězec viditelný pro hráče se rozřeší přes `t()` a hra vycház
 
 Příspěvky všeho druhu jsou vítané: kód, překlady, hlášení chyb i dokumentace. Začni s [CONTRIBUTING.cs_CZ.md](CONTRIBUTING.cs_CZ.md) kvůli nastavení, přečti si [Kodex chování](../../CODE_OF_CONDUCT.md) a než nahlásíš zranitelnost, projdi si [SECURITY.md](../../SECURITY.md). Jsi tu nový? Poohlédni se po issues se štítkem [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), otevři [issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose) nebo pozdrav na [Discordu](https://discord.com/invite/worldofclaudecraft).
 
-Aktuální vydání je **v0.29.1** a aktivní vývoj běží na nejnovější větvi `release/vX.Y.Z`, momentálně **`release/v0.30.0`**. Odděl svou větev z této release větve a na ni miř svůj pull request. Nikdy nevětvi z `main` ani na něj nemiř, ta dostane release větev až ve chvíli, kdy daná verze vyjde.
+Aktivní vývoj běží na nejnovější větvi `release/vX.Y.Z`. Nedomýšlej si ji, radši si ji vyhledej, pak se z ní odděl a na ni miř svůj pull request. Nikdy nevětvi z `main` ani na něj nemiř, ta dostane release větev až ve chvíli, kdy daná verze vyjde. [CONTRIBUTING.md](CONTRIBUTING.cs_CZ.md) obsahuje jednořádkový příkaz, který tu aktuální najde.
 
 ## Licence
 

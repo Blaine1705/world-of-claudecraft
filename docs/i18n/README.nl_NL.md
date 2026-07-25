@@ -393,7 +393,7 @@ Elke voor de speler zichtbare string wordt opgelost via `t()`, en de game wordt 
 
 Bijdragen van elke soort zijn welkom: code, vertalingen, bugrapporten en documentatie. Begin met [CONTRIBUTING.nl_NL.md](CONTRIBUTING.nl_NL.md) voor de setup, lees de [Code of Conduct](../../CODE_OF_CONDUCT.md), en bekijk [SECURITY.md](../../SECURITY.md) voordat je een kwetsbaarheid meldt. Nieuw hier? Zoek naar issues met het label [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), open een [issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose), of zeg hallo op [Discord](https://discord.com/invite/worldofclaudecraft).
 
-De huidige release is **v0.29.1**, en de actieve ontwikkeling loopt op de nieuwste `release/vX.Y.Z`-branch, momenteel **`release/v0.30.0`**. Vertak vanaf die release-branch en richt je pull request daarop. Vertak nooit vanaf `main` en richt er nooit op; die krijgt pas een release-branch wanneer die versie uitkomt.
+De actieve ontwikkeling loopt op de nieuwste `release/vX.Y.Z`-branch. Zoek die op in plaats van ervan uit te gaan, vertak er vervolgens vanaf en richt je pull request daarop. Vertak nooit vanaf `main` en richt er nooit op; die krijgt pas een release-branch wanneer die versie uitkomt. [CONTRIBUTING.md](CONTRIBUTING.nl_NL.md) bevat het commando van één regel dat de huidige vindt.
 
 ## Licentie
 

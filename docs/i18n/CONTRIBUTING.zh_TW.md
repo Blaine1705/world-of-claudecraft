@@ -78,7 +78,7 @@ npm run dev          # in another terminal; the client proxies to the server
    git switch -c feature/<short-slug> origin/release/vX.Y.Z
    ```
 
-   撰寫本文時最新的是 `release/v0.30.0`，但請務必自行確認，不要直接照抄這個名稱。分支命名為 `feature/<short-slug>` 或 `fix/<short-slug>`。
+   請務必實際執行上面的查詢，不要從本指南裡照抄某個版本號：release 分支更替頻繁，最新的那一條會隨著每次發布而變動。分支命名為 `feature/<short-slug>` 或 `fix/<short-slug>`。
 2. **做出聚焦的 commit。** 小而獨立的修改比起大幅變動，更容易審查與合併。
 3. 對於你在 `src/sim/` 或 `server/` 中改動的任何行為，**新增或更新測試**。
 4. **讓玩家可見的文字保持可翻譯。** 請參考[在地化](#localization)與[翻譯遊戲](#translating-the-game)。

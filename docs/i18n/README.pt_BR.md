@@ -393,7 +393,7 @@ Toda string visível ao jogador é resolvida através de `t()`, e o jogo é dist
 
 Contribuições de todo tipo são bem-vindas: código, traduções, relatórios de bug e documentação. Comece pelo [CONTRIBUTING.md](CONTRIBUTING.pt_BR.md) para a configuração, leia o [Código de Conduta](../../CODE_OF_CONDUCT.md) e confira o [SECURITY.md](../../SECURITY.md) antes de relatar uma vulnerabilidade. Novo por aqui? Procure issues marcadas com [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), abra uma [issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose) ou diga olá no [Discord](https://discord.com/invite/worldofclaudecraft).
 
-A release atual é a **v0.29.1**, e o desenvolvimento ativo acontece no branch `release/vX.Y.Z` mais recente, hoje o **`release/v0.30.0`**. Crie seu branch a partir desse branch de release e aponte seu pull request para ele. Nunca crie um branch a partir do `main` nem aponte para ele, já que o `main` só recebe um branch de release quando aquela versão é publicada.
+O desenvolvimento ativo acontece no branch `release/vX.Y.Z` mais recente. Consulte qual é ele em vez de supor, e então crie seu branch a partir dele e aponte seu pull request para ele. Nunca crie um branch a partir do `main` nem aponte para ele, já que o `main` só recebe um branch de release quando aquela versão é publicada. O [CONTRIBUTING.md](CONTRIBUTING.pt_BR.md) traz o comando de uma linha que encontra o atual.
 
 ## Licença
 

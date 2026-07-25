@@ -134,9 +134,9 @@ Bilinmesi gerekenler:
    git switch -c feature/<short-slug> origin/release/vX.Y.Z
    ```
 
-   Bu satırların yazıldığı sırada en yenisi `release/v0.30.0`, ama bu adı
-   kopyalamak yerine her zaman kontrol edin. Dallar `feature/<short-slug>` veya
-   `fix/<short-slug>` biçimindedir.
+   Bir sürüm numarasını bu rehberden kopyalamak yerine bu aramayı her zaman
+   çalıştırın: sürüm dalları sık sık değişir ve en yenisi her sürümle birlikte
+   ilerler. Dallar `feature/<short-slug>` veya `fix/<short-slug>` biçimindedir.
 2. **Odaklı commit'ler yapın.** Daha küçük, kendi içinde bütünlüklü
    değişiklikleri incelemek ve birleştirmek büyük olanlardan daha kolaydır.
 3. `src/sim/` veya `server/` içinde değiştirdiğiniz her davranış için **test

@@ -123,8 +123,9 @@ the TypeScript 6 JS API (via the `@typescript/typescript6` wrapper) because
    git switch -c feature/<short-slug> origin/release/vX.Y.Z
    ```
 
-   At the time of writing the newest is `release/v0.30.0`, but always check rather
-   than copying that name. Branches are `feature/<short-slug>` or `fix/<short-slug>`.
+   Always run that lookup rather than copying a version number out of this guide:
+   release branches turn over often, and the newest one moves with every release.
+   Branches are named `feature/<short-slug>` or `fix/<short-slug>`.
 2. **Make focused commits.** Smaller, self-contained changes are easier to review
    and merge than large ones.
 3. **Add or update tests** for any behavior you change in `src/sim/` or `server/`.

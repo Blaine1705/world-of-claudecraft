@@ -132,9 +132,9 @@ gebruikt, terwijl `@typescript/native` het `tsc`-binary levert. Dingen om te wet
    git switch -c feature/<short-slug> origin/release/vX.Y.Z
    ```
 
-   Op het moment van schrijven is de nieuwste `release/v0.30.0`, maar controleer dat
-   altijd in plaats van die naam te kopiëren. Branches heten `feature/<short-slug>`
-   of `fix/<short-slug>`.
+   Voer die zoekopdracht altijd uit in plaats van een versienummer uit deze gids te
+   kopiëren: release-branches wisselen vaak, en de nieuwste schuift met elke release
+   mee. Branches heten `feature/<short-slug>` of `fix/<short-slug>`.
 2. **Maak gerichte commits.** Kleinere, op zichzelf staande wijzigingen zijn
    gemakkelijker te reviewen en te mergen dan grote.
 3. **Voeg tests toe of werk ze bij** voor elk gedrag dat je wijzigt in `src/sim/`

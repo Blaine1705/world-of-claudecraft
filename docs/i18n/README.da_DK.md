@@ -392,7 +392,7 @@ Hver spiller-synlig streng resolver gennem `t()`, og spillet leveres på **22 sp
 
 Bidrag af enhver art er velkomne: kode, oversættelser, fejlrapporter, og dokumentation. Start med [CONTRIBUTING.md](CONTRIBUTING.da_DK.md) for opsætning, læs [Code of Conduct](../../CODE_OF_CONDUCT.md), og tjek [SECURITY.md](../../SECURITY.md) før du rapporterer en sårbarhed. Ny her? Kig efter issues mærket [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), åbn et [issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose), eller sig hej på [Discord](https://discord.com/invite/worldofclaudecraft).
 
-Den aktuelle udgivelse er **v0.29.1**, og den aktive udvikling foregår på den seneste `release/vX.Y.Z`-branch, i øjeblikket **`release/v0.30.0`**. Forgren fra den release-branch og ret din pull request mod den. Forgren aldrig fra `main` og ret aldrig mod den, da den kun modtager en release-branch når den version udkommer.
+Den aktive udvikling foregår på den nyeste `release/vX.Y.Z`-branch. Slå den op i stedet for at antage, og forgren så fra den og ret din pull request mod den. Forgren aldrig fra `main` og ret aldrig mod den, da den kun modtager en release-branch når den version udkommer. [CONTRIBUTING.md](CONTRIBUTING.da_DK.md) indeholder den ene kommandolinje, der finder den aktuelle.
 
 ## Licens
 

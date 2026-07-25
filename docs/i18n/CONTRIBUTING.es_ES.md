@@ -134,9 +134,9 @@ binario `tsc`. Cosas que conviene saber:
    git switch -c feature/<short-slug> origin/release/vX.Y.Z
    ```
 
-   En el momento de escribir esto la más nueva es `release/v0.30.0`, pero compruébalo
-   siempre en lugar de copiar ese nombre. Las ramas son `feature/<short-slug>` o
-   `fix/<short-slug>`.
+   Ejecuta siempre esa búsqueda en lugar de copiar un número de versión de esta guía:
+   las ramas de versión se renuevan a menudo, y la más nueva cambia con cada
+   lanzamiento. Las ramas se llaman `feature/<short-slug>` o `fix/<short-slug>`.
 2. **Haz commits enfocados.** Los cambios pequeños y autocontenidos son más fáciles
    de revisar y fusionar que los grandes.
 3. **Añade o actualiza pruebas** para cualquier comportamiento que modifiques en

@@ -139,9 +139,9 @@ wissen:
    git switch -c feature/<short-slug> origin/release/vX.Y.Z
    ```
 
-   Zum Zeitpunkt der Erstellung ist `release/v0.30.0` der neueste, prüfe das aber
-   immer, statt diesen Namen zu übernehmen. Branches heißen `feature/<short-slug>`
-   oder `fix/<short-slug>`.
+   Führe diese Suche immer aus, statt eine Versionsnummer aus diesem Leitfaden zu
+   übernehmen: Release-Branches wechseln häufig, und der neueste verschiebt sich mit
+   jedem Release. Branches heißen `feature/<short-slug>` oder `fix/<short-slug>`.
 2. **Mach fokussierte Commits.** Kleinere, in sich abgeschlossene Änderungen lassen
    sich leichter prüfen und zusammenführen als große.
 3. **Ergänze oder aktualisiere Tests** für jedes Verhalten, das du in `src/sim/`

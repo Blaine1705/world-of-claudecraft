@@ -370,7 +370,7 @@ node scripts/crypt_raid.mjs     # five bots clear the Hollow Crypt (ALLOW_DEV_CO
 
 あらゆる種類の貢献を歓迎します。コード、翻訳、バグ報告、ドキュメント。まずはセットアップについて [CONTRIBUTING.ja_JP.md](CONTRIBUTING.ja_JP.md) から始め、[行動規範](../../CODE_OF_CONDUCT.md) を読み、脆弱性を報告する前に [SECURITY.md](../../SECURITY.md) を確認してください。初めてですか? [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue) のラベルが付いた issue を探すか、[issue](https://github.com/levy-street/world-of-claudecraft/issues/new/choose) を立てるか、[Discord](https://discord.com/invite/worldofclaudecraft) で挨拶してください。
 
-現在のリリースは **v0.29.1** で、活発な開発は最新の `release/vX.Y.Z` ブランチ、現在は **`release/v0.30.0`** で進みます。そのリリースブランチから分岐し、プルリクエストもそこに向けてください。`main` から分岐したり `main` を対象にしたりは決してしないでください。`main` はそのバージョンが出荷されたときにリリースブランチを受け取るだけです。
+活発な開発は最新の `release/vX.Y.Z` ブランチで進みます。決め打ちにせず自分で確認したうえで、そのブランチから分岐し、プルリクエストもそこに向けてください。`main` から分岐したり `main` を対象にしたりは決してしないでください。`main` はそのバージョンが出荷されたときにリリースブランチを受け取るだけです。現在のブランチを見つける一行のコマンドは [CONTRIBUTING.md](CONTRIBUTING.ja_JP.md) にあります。
 
 ## ライセンス
 

@@ -126,9 +126,9 @@ API로 해석되고, `tsc` 바이너리는 `@typescript/native`가 제공합니�
    git switch -c feature/<short-slug> origin/release/vX.Y.Z
    ```
 
-   이 글을 쓰는 시점의 최신 브랜치는 `release/v0.30.0`이지만, 이름을 그대로
-   옮겨 적지 말고 항상 직접 확인하세요. 브랜치 이름은 `feature/<short-slug>` 또는
-   `fix/<short-slug>` 형식입니다.
+   이 안내서에서 버전 번호를 그대로 옮겨 적지 말고 항상 이 조회를 직접 실행하세요.
+   릴리스 브랜치는 자주 교체되며, 가장 최신 브랜치는 릴리스마다 바뀝니다. 브랜치
+   이름은 `feature/<short-slug>` 또는 `fix/<short-slug>` 형식입니다.
 2. **집중된 커밋을 만드세요.** 작고 독립적인 변경이 큰 변경보다 리뷰하고 병합하기
    쉽습니다.
 3. **`src/sim/`이나 `server/`에서 동작을 바꿨다면 테스트를 추가하거나 갱신하세요.**

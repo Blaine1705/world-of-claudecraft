@@ -392,7 +392,7 @@ core.hooksPath .githooks`로 클론을 공유 훅에 연결해 두면, 무엇이
 
 모든 종류의 기여를 환영합니다: 코드, 번역, 버그 신고, 문서. 설정은 [CONTRIBUTING.ko_KR.md](CONTRIBUTING.ko_KR.md)로 시작하고, [행동 강령](../../CODE_OF_CONDUCT.md)을 읽으며, 취약점을 신고하기 전에 [SECURITY.md](../../SECURITY.md)를 확인하세요. 여기가 처음이신가요? [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue) 라벨이 붙은 이슈를 찾거나, [이슈](https://github.com/levy-street/world-of-claudecraft/issues/new/choose)를 열거나, [Discord](https://discord.com/invite/worldofclaudecraft)에서 인사를 건네세요.
 
-현재 릴리스는 **v0.29.1**이고, 활발한 개발은 최신 `release/vX.Y.Z` 브랜치, 현재는 **`release/v0.30.0`**에서 진행됩니다. 그 릴리스 브랜치에서 분기하고 풀 리퀘스트도 그쪽을 대상으로 하세요. 릴리스 브랜치가 출시될 때만 병합되는 `main`에서 분기하거나 `main`을 대상으로 하지 마세요.
+활발한 개발은 가장 최신 `release/vX.Y.Z` 브랜치에서 진행됩니다. 짐작하지 말고 직접 확인한 다음, 그 브랜치에서 분기하고 풀 리퀘스트도 그쪽을 대상으로 하세요. 릴리스 브랜치가 출시될 때만 병합되는 `main`에서 분기하거나 `main`을 대상으로 하지 마세요. 현재 브랜치를 찾아 주는 한 줄 명령은 [CONTRIBUTING.md](CONTRIBUTING.ko_KR.md)에 있습니다.
 
 ## 라이선스
 

@@ -393,7 +393,7 @@ Cada cadena visible para el jugador se resuelve a través de `t()`, y el juego s
 
 Las contribuciones de todo tipo son bienvenidas: código, traducciones, informes de errores y documentación. Empieza con [CONTRIBUTING.md](CONTRIBUTING.es_ES.md) para la configuración, lee el [Código de conducta](../../CODE_OF_CONDUCT.md) y consulta [SECURITY.md](../../SECURITY.md) antes de informar de una vulnerabilidad. ¿Nuevo por aquí? Busca incidencias etiquetadas como [`good first issue`](https://github.com/levy-street/world-of-claudecraft/labels/good%20first%20issue), abre una [incidencia](https://github.com/levy-street/world-of-claudecraft/issues/new/choose) o saluda en [Discord](https://discord.com/invite/worldofclaudecraft).
 
-La versión actual es la **v0.29.1**, y el desarrollo activo transcurre en la última rama `release/vX.Y.Z`, ahora mismo **`release/v0.30.0`**. Crea tu rama a partir de esa rama de versión y dirige ahí tu pull request. Nunca ramifiques desde `main` ni lo pongas como destino, ya que solo recibe una rama de versión cuando esa versión se publica.
+El desarrollo activo transcurre en la rama `release/vX.Y.Z` más reciente. Búscala en lugar de darla por supuesta, crea tu rama a partir de ella y dirige ahí tu pull request. Nunca ramifiques desde `main` ni lo pongas como destino, ya que solo recibe una rama de versión cuando esa versión se publica. [CONTRIBUTING.md](CONTRIBUTING.es_ES.md) tiene el comando de una línea que encuentra la actual.
 
 ## Licencia
 

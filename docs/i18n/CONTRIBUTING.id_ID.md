@@ -135,9 +135,9 @@ beberapa detik, bukan puluhan detik. Instalasinya memakai alias ganda resmi: pak
    git switch -c feature/<short-slug> origin/release/vX.Y.Z
    ```
 
-   Saat tulisan ini dibuat, yang terbaru adalah `release/v0.30.0`, tetapi selalu
-   periksa alih-alih menyalin nama itu. Branch diberi nama `feature/<short-slug>`
-   atau `fix/<short-slug>`.
+   Selalu jalankan pencarian itu alih-alih menyalin nomor versi dari panduan ini:
+   branch rilis berganti cukup sering, dan yang terbaru bergeser setiap kali ada
+   rilis. Branch diberi nama `feature/<short-slug>` atau `fix/<short-slug>`.
 2. **Buat commit yang terfokus.** Perubahan yang lebih kecil dan mandiri lebih
    mudah ditinjau dan digabungkan daripada yang besar.
 3. **Tambahkan atau perbarui tes** untuk perilaku apa pun yang kamu ubah di
