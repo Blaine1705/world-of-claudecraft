@@ -97,8 +97,12 @@ export const TARGETS = [
         key: 'paladin-desktop',
         charClass: 'paladin',
         charName: 'Dawnward',
-        abilityId: 'sacred_bulwark',
-        nearbyAbilityId: 'divine_protection',
+        // Faithwarden's authored defensives. Sacred Bulwark is retired kit
+        // (PALADIN_LEGACY_ABILITY_IDS), and the replacements are spec-gated, so
+        // the recipe specializes before it resolves them.
+        spec: 'protection',
+        abilityId: 'holy_shield',
+        nearbyAbilityId: 'bastion_rite',
       },
       {
         key: 'druid-desktop',
@@ -111,8 +115,9 @@ export const TARGETS = [
         key: 'paladin-mobile',
         charClass: 'paladin',
         charName: 'Sunward',
-        abilityId: 'sacred_bulwark',
-        nearbyAbilityId: 'divine_protection',
+        spec: 'protection',
+        abilityId: 'holy_shield',
+        nearbyAbilityId: 'bastion_rite',
         mobile: true,
       },
     ],
@@ -130,6 +135,7 @@ export const TARGETS = [
         const player = sim?.player;
         if (!sim || !player) return { known: false };
         sim.setPlayerLevel?.(20, player.id);
+        if (shot.spec) sim.setSpec?.(shot.spec);
         player.gm = true;
         player.resource = player.maxResource;
         const resolved = sim.resolvedAbility?.(shot.abilityId);
