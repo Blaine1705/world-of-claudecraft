@@ -1048,8 +1048,8 @@ const classAbilityNamesEn = {
       ],
       [
         'faithforged_guard',
-        'Faithforged Guard',
-        'Surround yourself with a shield that absorbs {damage} damage for 8 sec. Ascension increases the shield by 50%.',
+        'Reckoning',
+        'For 8 sec, the next enemy hit against you is answered: up to {damage} damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered. Ascension raises the amount it can answer by 50%.',
       ],
       [
         'mercy_lance',

@@ -283,9 +283,11 @@ export function resolveAscensionAbility(
         return effect.type === 'groundAoE'
           ? { ...effect, ...scaleRange(effect.min, effect.max, 1.3) }
           : effect;
+      // Reckoning: Ascension raises the cap it can answer, so the empowered blow
+      // denies more AND returns more (the return equals what was soaked).
       case 'faithforged_guard':
-        return effect.type === 'absorb'
-          ? { ...effect, amount: Math.round(effect.amount * 1.5) }
+        return effect.type === 'selfBuff' && effect.kind === 'paladin_reckoning'
+          ? { ...effect, value: Math.round(effect.value * 1.5) }
           : effect;
       case 'bastion_rite':
         return effect.type === 'selfBuff' ? { ...effect, duration: 10 } : effect;

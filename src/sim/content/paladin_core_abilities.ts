@@ -285,21 +285,29 @@ const retribution: AbilityDef[] = [
       "Deal $d Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict's remaining cooldown by 2 sec. Ascension increases its damage and radius.",
   },
   {
+    // Reckoning keeps the `faithforged_guard` id on purpose: the id is what saved
+    // action bars, the icon mapping and persisted layouts point at, so renaming it
+    // would silently blank a slot for anyone who had the old shield bound.
+    //
+    // It used to be a second absorb shield, which Ward of Faith already is (and
+    // out-scales at rank 2: 110 over 10 sec on a 60 sec cooldown against 140 over
+    // 8 on 75). Now it answers ONE blow instead of soaking a budget, which is the
+    // one thing Dawnreaver's kit had nothing of: a defensive that pays out.
     id: 'faithforged_guard',
-    name: 'Faithforged Guard',
+    name: 'Reckoning',
     class: 'paladin',
     specs: ['retribution'],
     learnLevel: 9,
     cost: 20,
     castTime: 0,
-    cooldown: 75,
+    cooldown: 60,
     range: 0,
     school: 'holy',
     requiresTarget: false,
     offGcd: true,
-    effects: [{ type: 'absorb', amount: 140, duration: 8 }],
+    effects: [{ type: 'selfBuff', kind: 'paladin_reckoning', value: 140, duration: 8 }],
     description:
-      'Surround yourself with a shield that absorbs $d damage for 8 sec. Ascension increases the shield by 50%.',
+      'For 8 sec, the next enemy hit against you is answered: up to $d damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered.',
   },
   {
     id: 'hammer_of_wrath',

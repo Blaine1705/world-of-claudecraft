@@ -365,6 +365,7 @@ export type AuraKind =
   | 'next_execute_free'
   | 'next_cast_cheap'
   | 'paladin_radiant_resonance'
+  | 'paladin_reckoning'
   | 'paladin_solar_reprisal'
   | 'paladin_dawns_wrath'
   // Lifesap (druid): flat resource restored on each classic 2-sec regen tick,

@@ -7181,8 +7181,8 @@ export const vi_VN: EnTranslations = {
         "description": "Ascend into the air, becoming immune to damage as you fly toward the enemy. After 2 sec, descend upon the target area for {damage} Holy damage and generate 1 Devotion. Ascension increases the impact damage by 50% and consumes 1 charge."
       },
       "faithforged_guard": {
-        "name": "Faithforged Guard",
-        "description": "Surround yourself with a shield that absorbs {damage} damage for 8 sec. Ascension increases the shield by 50%."
+        "name": "Reckoning",
+        "description": "For 8 sec, the next enemy hit against you is answered: up to {damage} damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered. Ascension raises the amount it can answer by 50%."
       },
       "mercy_lance": {
         "name": "Mercy Lance",
