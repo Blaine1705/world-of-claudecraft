@@ -241,7 +241,7 @@ import {
   gatherRareTierFor,
   gatherToolNoNodeKey,
 } from './gathering_view';
-import { craftedLineKey, gatherLineKey, grantItemToken } from './grant_line_view';
+import { craftedLineKey, gatherLineKey, grantItemToken, grantQtyText } from './grant_line_view';
 import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
 import {
   handleShiftClearContextMenu,
@@ -9184,7 +9184,7 @@ export class Hud {
             this.log(
               t(craftedLineKey(ev.count), {
                 name: grantItemToken(ev.itemId),
-                qty: formatNumber(ev.count ?? 1, { maximumFractionDigits: 0 }),
+                qty: grantQtyText(ev.count),
               }),
               '#7fdc4f',
             );
@@ -9372,7 +9372,7 @@ export class Hud {
           this.log(
             t(gatherLineKey(ev.qty), {
               name: grantItemToken(ev.itemId),
-              qty: formatNumber(ev.qty, { maximumFractionDigits: 0 }),
+              qty: grantQtyText(ev.qty),
             }),
             QUALITY_COLOR[ev.rarity],
           );
@@ -9426,7 +9426,7 @@ export class Hud {
               t(toast.key, {
                 item: grantItemToken(ev.itemId),
                 material: ev.materialItemId ? grantItemToken(ev.materialItemId) : '',
-                qty: formatNumber(ev.count ?? 1, { maximumFractionDigits: 0 }),
+                qty: grantQtyText(ev.count),
               }),
               '#7fdc4f',
             );
@@ -9435,7 +9435,7 @@ export class Hud {
               this.log(
                 t(secondary, {
                   material: grantItemToken(ev.secondaryItemId),
-                  qty: formatNumber(ev.secondaryCount ?? 1, { maximumFractionDigits: 0 }),
+                  qty: grantQtyText(ev.secondaryCount),
                 }),
                 '#7fdc4f',
               );
@@ -9454,7 +9454,7 @@ export class Hud {
               t(toast.key, {
                 item: grantItemToken(ev.itemId),
                 material: ev.materialItemId ? grantItemToken(ev.materialItemId) : '',
-                qty: formatNumber(ev.count ?? 1, { maximumFractionDigits: 0 }),
+                qty: grantQtyText(ev.count),
               }),
               '#7fdc4f',
             );

@@ -12,6 +12,7 @@ import {
   craftedLineKey,
   gatherLineKey,
   grantItemToken,
+  grantQtyText,
   isMultiUnitGrant,
 } from '../src/ui/grant_line_view';
 import { parseChatSegments } from '../src/ui/hud/quest/quest_link';
@@ -62,6 +63,30 @@ describe('grantItemToken', () => {
       delete ITEMS[oddId];
       expect(Object.keys(ITEMS)).toEqual(originalIds);
     }
+  });
+});
+
+describe('grantQtyText', () => {
+  // The {qty} value every grant line splices. It lives here rather than being
+  // respelled at each hud.ts event arm (five of them), so the one-unit default
+  // and the digit options cannot diverge between families.
+  it('defaults an absent count to one unit', () => {
+    // craftResult.count and disenchantResult.secondaryCount are both optional
+    // on the wire; an arm that dropped the default would render a bare "x".
+    expect(grantQtyText(undefined)).toBe('1');
+  });
+
+  it('renders a plain localized integer, never a decimal or a unit suffix', () => {
+    expect(grantQtyText(1)).toBe('1');
+    expect(grantQtyText(5)).toBe('5');
+    expect(grantQtyText(12)).toBe('12');
+  });
+
+  it('drops a fractional part rather than printing one into a chat line', () => {
+    // No grant path produces a fraction today; the option is what guarantees a
+    // future one cannot print "x2.5" into the log.
+    expect(grantQtyText(2.4)).toBe('2');
+    expect(grantQtyText(2.6)).toBe('3');
   });
 });
 

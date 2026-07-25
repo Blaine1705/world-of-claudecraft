@@ -12,35 +12,44 @@
 // profession's own line the ONLY line for the grant, so it has to carry
 // everything the hub line used to: the item, its quantity, and a link to it.
 //
-// This module owns the two decisions that gives the HUD, so the event arms in
-// hud.ts stay thin and both are unit-testable in Node:
+// This module owns the three decisions that gives the HUD, so the event arms in
+// hud.ts stay thin and all three are unit-testable in Node:
 //  - grantItemToken: the chat token for a granted item (the name-free
 //    [[i:id]] link the chat log renders as a clickable, quality-colored
 //    [Name], with a plain-text fallback for an id the client cannot resolve).
+//  - grantQtyText: the localized {qty} value, one-unit default included.
 //  - the yield-key selectors: which catalog key one result event renders,
 //    picking the quantity-bearing variant only for a multi-unit grant.
+//
+// The grouping axis here is deliberately GRANT LINES, not profession: the
+// gather and craft selectors live beside grantItemToken/grantQtyText rather
+// than in gathering_view.ts / crafting_view.ts (which own the DENY and picker
+// key families for those professions) precisely because the thing that has to
+// stay consistent is what one grant line looks like across all six flows.
+// enchanting_view.ts is the one exception, and only because it already owned
+// the event -> key + sink mapping for those three commands before #2430; it
+// consumes isMultiUnitGrant from here so the families cannot diverge.
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
 import { ITEMS } from '../sim/data';
 import { itemDisplayName } from './entity_i18n';
-import { encodeItemLink } from './hud/quest/quest_link';
+import { encodeItemLink, isLinkableId } from './hud/quest/quest_link';
+import { formatNumber } from './i18n';
 import type { TranslationKey } from './i18n.catalog';
-
-// The chat-link parser (hud/quest/quest_link.ts CHAT_LINK_RE) only recognizes
-// [A-Za-z0-9_]+ ids; a token it cannot parse would print to the player as the
-// literal "[[i:...]]" source text, so anything else falls back to plain text.
-const LINKABLE_ITEM_ID = /^[A-Za-z0-9_]+$/;
 
 /** The chat token for one granted item: the name-free `[[i:id]]` link when the
  *  client can resolve it (the chat log renders it as a clickable, tooltipped,
- *  quality-colored `[Name]`), otherwise the plain localized name. An id absent
- *  from ITEMS (content drift between client and server) degrades to the raw id
+ *  quality-colored `[Name]`), otherwise the plain localized name. An id the
+ *  chat-link parser cannot match would reach the player as literal "[[i:...]]"
+ *  source text, so `isLinkableId` (which lives beside that parser's own regex,
+ *  never restated here) picks the plain-name path for it. An id absent from
+ *  ITEMS (content drift between client and server) degrades to the raw id
  *  rather than the renderer's bare `[?]`, so the line still names something. */
 export function grantItemToken(itemId: string): string {
   const item = ITEMS[itemId];
   if (!item) return itemId;
-  return LINKABLE_ITEM_ID.test(itemId) ? encodeItemLink(itemId) : itemDisplayName(item);
+  return isLinkableId(itemId) ? encodeItemLink(itemId) : itemDisplayName(item);
 }
 
 /** True when a grant of `count` units should render the quantity-bearing line
@@ -48,6 +57,14 @@ export function grantItemToken(itemId: string): string {
  *  " xN"-only-past-one rule (Sim.addItem). */
 export function isMultiUnitGrant(count: number | undefined): boolean {
   return (count ?? 1) > 1;
+}
+
+/** The `{qty}` value a grant line splices: the localized integer, with an
+ *  absent count reading as one unit. Owned here rather than restated at each
+ *  event arm so every family agrees on the default and on the digit options;
+ *  an arm that forgot the default would render a bare "x". */
+export function grantQtyText(count: number | undefined): string {
+  return formatNumber(count ?? 1, { maximumFractionDigits: 0 });
 }
 
 /** The gather line for one harvest: the quantity variant only past one unit. */

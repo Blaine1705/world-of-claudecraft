@@ -2336,7 +2336,10 @@ export const hudChromeStrings = {
     // Reel-in feedback line (Professions 2.0), rendered from the
     // id-based fishingResult SimEvent. Like gatherLine above, the sole line
     // for a landed catch and worded apart from both the loot family and the
-    // gather family.
+    // gather family. The ONE grant-line family with no Qty sibling, and only
+    // because a catch is always exactly one fish (professions/fishing.ts grants
+    // `caught` with count 1). A multi-fish catch would need the variant added
+    // here, or the count would go unreported now that the hub line is gone.
     catchLine: 'You reel in: {name}',
     // Bite minigame lines (Professions 2.0), rendered from the
     // text-free personal fishingBite / fishingGotAway SimEvents. biteLine
