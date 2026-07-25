@@ -729,10 +729,10 @@ describe('Input pointer lock', () => {
     expect(input.camYaw).toBeCloseTo(yaw - 2 * 0.0045);
   });
 
-  it('starts camera drag by hold duration even with small pointer movement', () => {
+  it('requests pointer lock before a duration-started right drag rotates', () => {
     let now = 1000;
     vi.spyOn(performance, 'now').mockImplementation(() => now);
-    const { input, canvasListeners, windowListeners } = makeInput();
+    const { canvas, input, canvasListeners, windowListeners } = makeInput();
     const yaw = input.camYaw;
 
     canvasListeners.get('mousedown')!({
@@ -741,11 +741,21 @@ describe('Input pointer lock', () => {
       preventDefault: vi.fn(),
     });
     now += 150;
+    windowListeners.get('mousemove')!({ movementX: 0, movementY: 0 });
+    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+
     windowListeners.get('mousemove')!({ movementX: 1, movementY: 0 });
     expect(input.isCameraDragActive()).toBe(true);
     expect(input.camYaw).toBe(yaw);
+    expect(input.debugState()).toMatchObject({
+      rightDown: true,
+      cameraDragActive: true,
+      pointerLocked: false,
+    });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
 
     windowListeners.get('mousemove')!({ movementX: 2, movementY: 0 });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
     expect(input.camYaw).toBeCloseTo(yaw - 2 * 0.0045);
   });
 

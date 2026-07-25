@@ -798,6 +798,11 @@ export class Input {
     this.canvas.requestPointerLock?.();
   }
 
+  private activateCameraDrag(): void {
+    this.cameraDragActive = true;
+    this.maybeEngageDragPointerLock();
+  }
+
   private isBrowserFullscreen(): boolean {
     const doc = document as FullscreenDocument;
     return !!(document.fullscreenElement ?? doc.webkitFullscreenElement);
@@ -1114,15 +1119,17 @@ export class Input {
       isGecko: this.isGeckoEngine,
       devicePixelRatio: typeof window !== 'undefined' ? window.devicePixelRatio : 1,
     });
-    if (mx === 0 && my === 0) return;
+    if (mx === 0 && my === 0) {
+      if (this.cameraDragActive) this.maybeEngageDragPointerLock();
+      return;
+    }
     const heldMs = this.pressDurationMs();
     if (this.downButton === this.clickMoveMouseButton && heldMs <= DEFAULT_CLICK_PICK_MAX_MS)
       return;
     this.dragDistance += Math.abs(mx) + Math.abs(my);
     if (!this.cameraDragActive) {
       if (this.dragDistance < CAMERA_DRAG_START_DISTANCE && heldMs < CAMERA_DRAG_START_MS) return;
-      this.cameraDragActive = true;
-      this.maybeEngageDragPointerLock();
+      this.activateCameraDrag();
       this.noteIntent('look');
       this.updateCursor();
       return;
