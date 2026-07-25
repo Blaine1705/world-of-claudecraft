@@ -3085,7 +3085,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'lay_on_hands',
     name: 'Last Rite',
     class: 'paladin',
-    learnLevel: 12,
+    // Level 8 so the row-8 pick that upgrades it (Steady Hands) has something to
+    // upgrade the moment it is taken.
+    learnLevel: 8,
     cost: 0,
     castTime: 0,
     cooldown: 600,

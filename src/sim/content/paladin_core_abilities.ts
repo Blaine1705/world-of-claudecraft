@@ -131,7 +131,9 @@ const common: AbilityDef[] = [
     id: 'solar_step',
     name: 'Solar Step',
     class: 'paladin',
-    learnLevel: 8,
+    // Level 5 so the row-5 pick that upgrades it (Steadfast Step) has something
+    // to upgrade the moment it is taken.
+    learnLevel: 5,
     cost: 20,
     castTime: 0,
     cooldown: 30,
