@@ -7,7 +7,7 @@
 // `visible` forever at intensity 0: Three bakes numPointLights into every lit
 // material's program cache key and counts a light iff `visible` (intensity is
 // irrelevant), so toggling visibility on the first pulse would synchronously
-// recompile ALL lit materials mid-combat — the same constant-count invariant
+// recompile ALL lit materials mid-combat, the same constant-count invariant
 // the renderer's budgetFireLights keeps for campfires. The pool is built in
 // the renderer constructor before prewarmInitialScene, so the constant-count
 // program variant compiles once during boot.

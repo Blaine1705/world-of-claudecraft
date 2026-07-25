@@ -38,7 +38,7 @@ export interface AbilityAudioOpts {
   archetype?: string;
   /** Authored buff apply style ('raise' | 'morph' | 'veil'). */
   buffStyle?: string;
-  /** Spec-authored bespoke sample id (impact.sample) — wins over the palette
+  /** Spec-authored bespoke sample id (impact.sample), wins over the palette
    *  identity when the sample pack carries it. */
   sample?: string;
   /** The spirit creature model ('spirit') or motif name ('motif'). */

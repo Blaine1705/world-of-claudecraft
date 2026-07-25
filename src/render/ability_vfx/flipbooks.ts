@@ -5,7 +5,7 @@ import { FLIPBOOK_GRID, FLIPBOOK_STYLES, type FlipbookStyle, flipbookSheet } fro
 // updateFlipbooks (arc_bolt_preview.js): one additive quad stepping an 8x8
 // per-school explosion sheet over its life, cross-fading adjacent frames in
 // the shader. The hero of every big impact (fireball, pyroblast, meteor,
-// execute) — tier-0-only spectacle, fired by the sequencer's impact hook.
+// execute), tier-0-only spectacle, fired by the sequencer's impact hook.
 // Fixed slot pool: one shared unit plane, one material clone per slot at
 // construction; a spawn only rebinds the style's cached sheet uniform.
 

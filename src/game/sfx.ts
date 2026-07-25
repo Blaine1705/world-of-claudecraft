@@ -880,7 +880,7 @@ class Sfx {
   // Ported from the approved gallery's synth engine (arc_bolt_preview.js Sfx
   // class): the 12 palette impact identities, the release whoosh, a sub-weight
   // layer scaled by ability power, the crit sting, soft zone-pulse thuds, and
-  // gentle heal/buff chimes. Synthesis recipes only — the gallery's recorded
+  // gentle heal/buff chimes. Synthesis recipes only, the gallery's recorded
   // sample pack is a separate licensing decision and is deliberately NOT here.
   // Each event is one voice: a gain -> panner chain into the master with every
   // oscillator/noise primitive scheduled inside it, drawn from its own small
@@ -890,7 +890,7 @@ class Sfx {
 
   /** One per-ability audio moment at a world position. `kind`:
    *  release = the cast lets go (at the caster); impact = the hit lands (at
-   *  the impact point — a ground zone booms AT the zone); pulse = one soft
+   *  the impact point, a ground zone booms AT the zone); pulse = one soft
    *  zone re-hit; crit = the sting layered over a critical impact; spirit =
    *  a creature apparition calls at spawn; motif = set-piece foley.
    *  Gentle archetypes (heal/buff/cc) chime instead of booming and skip the
@@ -899,7 +899,7 @@ class Sfx {
    *  Once the ElevenLabs sample pack has loaded (ability_sfx_samples.ts) the
    *  recordings carry each identity and the synth recipes stay underneath as
    *  sub weight / crit sting / finisher toll (the gallery hybrid); until
-   *  then — and for any id the pack misses — the synth recipes are the read. */
+   *  then, and for any id the pack misses, the synth recipes are the read. */
   abilityAudio(
     kind: 'windup' | 'release' | 'impact' | 'pulse' | 'crit' | 'spirit' | 'motif',
     palette: string,
@@ -925,7 +925,7 @@ class Sfx {
     const gentle = arch === 'heal' || arch === 'buff' || arch === 'cc';
     if (kind === 'release' && gentle) return; // their impact chime is the read
     const now = ctx.currentTime;
-    // per-(kind, palette) cooldown — spirit calls and motif foley key on
+    // per-(kind, palette) cooldown, spirit calls and motif foley key on
     // their own name instead: a volley or AoE multi-hit plays once, not
     // as a machine-gun of identical transients
     const cdKey =
@@ -1012,7 +1012,7 @@ class Sfx {
    *  (mirrors gallery Sfx.sample(): round-robin take, per-take normalization
    *  gain, tanh saturation + low-shelf body + presence bite with drive
    *  compensation, optional octave-down subOct double, `soft` top-shave for
-   *  screechy voices). Returns false — scheduling nothing — when the pack,
+   *  screechy voices). Returns false, scheduling nothing, when the pack,
    *  the id, or the context isn't ready, so callers fall back to the synth
    *  recipe. Rides the caller's ABILITY_VOICES accounting via abilityEnd. */
   private samplePlay(
@@ -1257,7 +1257,7 @@ class Sfx {
     this.abilityImpact(out, t, palette, power, lite, finisher);
   }
 
-  /** A creature apparition calls at spawn. Sampled only — apparitions had no
+  /** A creature apparition calls at spawn. Sampled only, apparitions had no
    *  procedural voice, so this stays silent until the pack has loaded. The
    *  screechers sit back in the mix behind the soft top-shave; the growlers
    *  stay forward (gallery spirit / SPIRIT_VOICE). */

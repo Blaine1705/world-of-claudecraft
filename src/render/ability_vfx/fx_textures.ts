@@ -238,7 +238,7 @@ function crackTexture(): THREE.CanvasTexture {
 
 // Scorched sunburst: broken radiating burn streaks over a mottled soot annulus
 // (the gallery 'char' ground residue, recut for the pool's single additive
-// decal path — structure carries the burnt read, uColor the school).
+// decal path, structure carries the burnt read, uColor the school).
 function charTexture(): THREE.CanvasTexture {
   return makeCanvas(256, (g, s) => {
     const c = s / 2;

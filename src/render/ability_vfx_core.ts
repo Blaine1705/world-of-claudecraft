@@ -10,7 +10,7 @@
 //   burstCount in [4, 60] after the (0.4 + 0.6 * quality) scale; tier 2 <= 6
 //   burstPower in (0, 1.6]
 //   ringScale >= 0 (0 = no ring); tier 2 drops the ring entirely (tier 1
-//   keeps it — the area telegraph is actionable, not decoration)
+//   keeps it, the area telegraph is actionable, not decoration)
 
 // Compact per-ability visual spec (key legend in ability_vfx_specs.ts header):
 // c=color p=palette pw=power sp=sparks rg=ringScale vr=vRing db=debris
@@ -333,12 +333,12 @@ export function planImpact(
 // Rolling-second spam guard. Pure math with injected time (nowSec in seconds).
 // It exists to keep raid crowds sane, never to strip a solo player's rotation,
 // so it holds two independent windows:
-//   Cast window — at most GLOBAL_CAP planned casts per rolling second across
+//   Cast window, at most GLOBAL_CAP planned casts per rolling second across
 //   all casters and CASTER_CAP per caster run at full fidelity; the next band
 //   runs reduced (tier 1) and past double either cap everything is color-only
 //   (tier 2). Only a cast-claiming event charges it (via admit); follow-through
 //   visuals of the same cast read the tier with peek, which never records.
-//   Accent window — landed-hit accents, auto-attack polish, and zone-pulse
+//   Accent window, landed-hit accents, auto-attack polish, and zone-pulse
 //   re-hits share a flat ACCENT_CAP per rolling second (admitAccent) and never
 //   consume a cast slot, so a normal rotation of casts + its own hits + autos
 //   stays tier 0 indefinitely.
@@ -356,7 +356,7 @@ const CASTER_RING = ABILITY_VFX_CASTER_CAP * 2;
 const PRUNE_ABOVE = 64;
 
 // The local player's own casts are the LAST thing degraded: under spam they
-// read one tier better (still bounded by the same global window — tier 2 spam
+// read one tier better (still bounded by the same global window, tier 2 spam
 // leaves them reduced, never exempt).
 export function localCasterTier(tier: 0 | 1 | 2): 0 | 1 | 2 {
   return tier > 0 ? ((tier - 1) as 0 | 1) : 0;

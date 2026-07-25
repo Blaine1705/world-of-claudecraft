@@ -1,7 +1,7 @@
 // Per-entity character visual: a SkeletonUtils clone of a manifest asset with
 // its own AnimationMixer, a clip-driven state machine fed by renderer-derived
 // state, a baked static idle-pose far LOD, and a shadow-only proxy for the
-// mid-distance band. All geometry/materials are shared caches — dispose()
+// mid-distance band. All geometry/materials are shared caches, dispose()
 // only releases mixer bindings.
 import * as THREE from 'three';
 import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
@@ -100,7 +100,7 @@ const STOW_ARM_LIFT_RAD = -0.85;
 const HIT_REACT_COOLDOWN = 0.9;
 
 // Contact-frame hitstop (gallery melee "bite": timeScale ~0.07 for ~0.11s at
-// contact). Only THIS rig's animation clock slows — the world, the sim, and
+// contact). Only THIS rig's animation clock slows, the world, the sim, and
 // every other character keep running, so it is multiplayer-safe by
 // construction. After a hold ends, a short refractory swallows re-triggers so
 // a fast swing chain cannot smear the rig into slow motion.
@@ -112,7 +112,7 @@ const LEAN_FEED_S = 0.12;
 const LEAN_RECOIL_S = 0.14;
 const LEAN_MAX_RAD = 0.12;
 
-// Lie_Idle already lays the rig flat — a touch of extra pitch reads as a
+// Lie_Idle already lays the rig flat, a touch of extra pitch reads as a
 // surface glide; clip-less rigs (creatures) get the full procedural prone
 const SWIM_PITCH_CLIP = 0.35;
 const SWIM_PITCH_PROCEDURAL = 1.18;
@@ -143,7 +143,7 @@ const METAMORPH_TINT = new THREE.Color(0x4f2170);
  *  ghost wolf, the graveyard angel); 'stealth' is the denser Duskveil fade. */
 export type GhostStyle = 'spirit' | 'stealth';
 
-// shared invisible click capsule — raycaster ignores `visible`, render doesn't
+// shared invisible click capsule, raycaster ignores `visible`, render doesn't
 let clickGeoSingleton: THREE.CylinderGeometry | null = null;
 function clickGeo(): THREE.CylinderGeometry {
   if (!clickGeoSingleton) {
@@ -226,7 +226,7 @@ function tipFadedWeaponGeometry(
 export class CharacterVisual {
   /** add to the entity group; pivot at feet, faces +Z; renderer applies e.scale */
   readonly root = new THREE.Group();
-  /** unscaled world-unit height — nameplate anchor = height * e.scale + 0.5 */
+  /** unscaled world-unit height, nameplate anchor = height * e.scale + 0.5 */
   readonly height: number;
   /** invisible capsule for picking (userData.entityId set by the renderer) */
   readonly clickProxy: THREE.Mesh;
@@ -418,7 +418,7 @@ export class CharacterVisual {
       }
     }
 
-    // capsule from measured body extents — long/wide creatures (wolves,
+    // capsule from measured body extents, long/wide creatures (wolves,
     // dragons) were nearly unclickable with a height-derived sliver
     const r = prep.clickRadius;
     this.clickRadius = r;
@@ -459,7 +459,7 @@ export class CharacterVisual {
       this.endStowGesture();
     }
 
-    // death is a level sim-side — edge-trigger the clip locally
+    // death is a level sim-side, edge-trigger the clip locally
     if (s.dead && !this.wasDead) this.enterDeath();
     else if (!s.dead && this.wasDead) this.revive();
     this.wasDead = s.dead;
@@ -523,7 +523,7 @@ export class CharacterVisual {
     this.poseWrap.position.y =
       this.swimBlend * (SWIM_RISE + Math.sin(this.swimBobTime * 2 + this.bobPhase) * 0.08);
 
-    // distant corpses show the static idle far mesh — tip it over
+    // distant corpses show the static idle far mesh, tip it over
     if (this.farMesh?.visible) {
       if (s.dead) {
         this.farMesh.rotation.z = Math.PI / 2;
@@ -651,7 +651,7 @@ export class CharacterVisual {
 
   /** Contact-frame hitstop: hold THIS rig's animation at `scale` speed for
    *  `dur` seconds (the melee "bite"; also the struck target's flinch-freeze).
-   *  Overlapping requests merge — longest duration, slowest scale — and the
+   *  Overlapping requests merge, longest duration, slowest scale, and the
    *  post-hold refractory swallows rapid re-triggers, so stacking strikes can
    *  never chain the rig into visible slow motion. */
   holdFrame(scale: number, dur: number): void {
@@ -669,7 +669,7 @@ export class CharacterVisual {
   /** Feed the cast-windup lean for this frame (anticipation): the body eases
    *  toward `amount` rad of backward pitch while fed each frame; once feeding
    *  stops (the release moment) the spring snaps through a small forward
-   *  recoil back to neutral. Rig-group rotation only — no bone surgery. */
+   *  recoil back to neutral. Rig-group rotation only, no bone surgery. */
   setWindupLean(amount: number): void {
     if (this.deadLock) return;
     this.leanTarget = -Math.min(LEAN_MAX_RAD, Math.max(0, amount));
@@ -747,7 +747,7 @@ export class CharacterVisual {
   }
 
   // -------------------------------------------------------------------------
-  // LOD / shadow plumbing (memoized — called every frame by the renderer)
+  // LOD / shadow plumbing (memoized, called every frame by the renderer)
   // -------------------------------------------------------------------------
 
   setShadow(on: boolean): void {
@@ -856,14 +856,14 @@ export class CharacterVisual {
     this.applySkinMaterials(skinIndex);
     // If the alternate atlas for this skin has not finished loading yet,
     // skinTexture() returned null and the body is showing the embedded default.
-    // Load it on demand and re-apply once it arrives — but only if this is still
+    // Load it on demand and re-apply once it arrives, but only if this is still
     // the requested skin (a newer setSkin must win). Without this, a freshly
     // selected skin stayed on the default until a relog warmed the atlas cache.
     const pending = ensureSkinTexture(this.key, skinIndex);
     if (pending) {
       void pending
         .then(() => {
-          // Bail if the model was disposed while the atlas was loading — applying
+          // Bail if the model was disposed while the atlas was loading, applying
           // materials to a torn-down model is wasted work (and re-snapshots a stale
           // material map). Also guard that this is still the requested skin.
           if (!this.disposed && this.skinIndex === skinIndex) this.applySkinMaterials(skinIndex);
@@ -897,8 +897,7 @@ export class CharacterVisual {
   }
 
   /** Swap the held mainhand weapon model at runtime (gear equip/unequip); no-op if
-   *  unchanged or if this class keeps a fixed weapon (hunter crossbow, mobs/NPCs —
-   *  no VisualDef.weaponSlot). Mirrors setSkin: re-attach the prop, re-run the
+   *  unchanged or if this class keeps a fixed weapon (hunter crossbow, mobs/NPCs,    *  no VisualDef.weaponSlot). Mirrors setSkin: re-attach the prop, re-run the
    *  shared material pass, re-snapshot the original-material map, then re-apply any
    *  active ghost/soul-rend overlay. Cheap (one prop clone) and keeps the mixer/
    *  animation state, unlike a full visual rebuild. */
@@ -1312,7 +1311,7 @@ export class CharacterVisual {
     this.mixer.uncacheRoot(this.model);
     this.root.removeFromParent();
     // SkeletonUtils.clone gives each instance exclusive Skeletons whose GPU
-    // bone textures the renderer allocates lazily — release them here or
+    // bone textures the renderer allocates lazily, release them here or
     // online interest churn strands one per despawned entity. Geometries and
     // materials remain shared per-asset caches and are never disposed.
     const skeletons = new Set<THREE.Skeleton>();

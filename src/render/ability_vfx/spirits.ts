@@ -5,7 +5,7 @@ import { ABILITY_VFX_FULL_SPECS } from '../ability_vfx_full_specs';
 import { loadGltf } from '../assets/loader';
 
 // Spirit apparitions (the gallery's spawnSpirit/updateSpirits): ghost-tinted
-// creature GLBs playing a short choreographed path — a druid's spectral bear
+// creature GLBs playing a short choreographed path, a druid's spectral bear
 // lunging through the strike, Polymorph's startled sheep, Ghost Wolf's lap
 // around the shaman, a voidwalker looming out of its summoning portal.
 //
@@ -45,7 +45,7 @@ const SPIRIT_URLS: Record<string, string> = {
 };
 
 // Canonical species heights (world units): normalization must keep the food
-// chain readable — the bull dwarfs the fox, the bear dwarfs everyone.
+// chain readable, the bull dwarfs the fox, the bear dwarfs everyone.
 const SPIRIT_HEIGHT: Record<string, number> = {
   fox: 0.8,
   sheep: 1.1,
@@ -101,7 +101,7 @@ export type SpiritAtKind = 'caster' | 'target' | 'portal';
 
 const SPIRIT_PATH_SET = new Set<string>(['rise', 'lunge', 'pounce', 'circle', 'swoop']);
 
-// Resolve an authored path name ('rise' on unknown/absent — the calm default).
+// Resolve an authored path name ('rise' on unknown/absent, the calm default).
 export function asSpiritPath(v: string | null | undefined): SpiritPath {
   return v != null && SPIRIT_PATH_SET.has(v) ? (v as SpiritPath) : 'rise';
 }
@@ -294,7 +294,7 @@ export class SpiritApparitions {
       mesh.renderOrder = 9; // ghosts draw over their overlap; they're apparitions
     });
     // Measure the SKINNED body (like prepareVisual): raw geometry bounds lie
-    // badly for rigged creatures — armature node scales carry the real size.
+    // badly for rigged creatures, armature node scales carry the real size.
     root.updateMatrixWorld(true);
     bbScratch.makeEmpty();
     root.traverse((o) => {
@@ -363,7 +363,7 @@ export class SpiritApparitions {
 
   // Attach the cached puppet to a free slot. Returns false (skipping
   // silently) when the model is still loading, both slots run, or the puppet
-  // is already on stage — a spirit never pops in late.
+  // is already on stage, a spirit never pops in late.
   spawn(o: SpiritSpawnOpts): boolean {
     const puppet = this.puppets.get(o.model);
     if (!puppet) {

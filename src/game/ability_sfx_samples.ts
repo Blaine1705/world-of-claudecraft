@@ -115,7 +115,7 @@ export function normalizeTakeGain(peak: number): number {
 
 // Cached soft-saturation transfer curves (gallery _beefCurve): crunch without
 // fizz. Keyed on the quantized drive amount so the handful of distinct beef
-// levels share Float32Arrays across every voice — zero steady-state allocs.
+// levels share Float32Arrays across every voice, zero steady-state allocs.
 const beefCurves = new Map<number, Float32Array<ArrayBuffer>>();
 
 export function beefCurve(amount: number): Float32Array<ArrayBuffer> {
@@ -241,7 +241,7 @@ export class AbilitySfxSamples {
     return this.samples.size;
   }
 
-  /** Total takes handed out to voices — the dev probe's "a cast actually
+  /** Total takes handed out to voices, the dev probe's "a cast actually
    *  routed to a sampled voice" signal. */
   served(): number {
     return this.servedCount;
@@ -273,7 +273,7 @@ export class AbilitySfxSamples {
   /** Fetch + decode the pack. Lazy and non-blocking: takes decode serially
    *  with a macrotask yield between ids so the ~118-take pack never stalls
    *  the main thread; until this resolves the procedural layer carries every
-   *  ability moment. Idempotent — repeat calls are no-ops. */
+   *  ability moment. Idempotent, repeat calls are no-ops. */
   async load(ctx: BaseAudioContext): Promise<void> {
     if (this.stateValue !== 'idle') return;
     if (typeof fetch !== 'function' || typeof atob !== 'function') {
@@ -307,7 +307,7 @@ export class AbilitySfxSamples {
           this.samples.set(id, { bufs, gains, next: Math.floor(Math.random() * bufs.length) });
         }
         // yield between ids: decode work happens off-thread but the b64 ->
-        // bytes walk and buffer folds are main-thread — spread them out
+        // bytes walk and buffer folds are main-thread, spread them out
         await new Promise((resolve) => setTimeout(resolve, 0));
       }
       this.stateValue = this.samples.size > 0 ? 'loaded' : 'unavailable';

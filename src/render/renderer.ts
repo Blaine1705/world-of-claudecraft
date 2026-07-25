@@ -267,7 +267,7 @@ const VIEW_PREWARM_MAX_MS = 12000;
 const VIEW_PREWARM_MAX_MS_CONSTRAINED = 5000;
 const PREWARM_COMPILE_MAX_MS_CONSTRAINED = 2500;
 // Shader linking is the whole point of the prewarm: if it doesn't finish, the
-// first in-world frame that needs a program compiles it synchronously — the
+// first in-world frame that needs a program compiles it synchronously, the
 // multi-hundred-ms (up to ~1.7s) freeze players feel when new model types
 // appear. So the compile step gets its own budget (it normally drains in <~100ms
 // with KHR_parallel_shader_compile) rather than racing the leftover view-build
@@ -295,7 +295,7 @@ const PERSISTENT_PORTAL_VIEW_PREWARM_LIMIT = 16;
 // rigs further than this stop casting articulated shadows (~7 draws each) and
 // hand off to a single-draw static-pose shadow proxy (the merged far-LOD mesh
 // with a colorWrite-off material) so mid-ground NPCs keep their grounding for
-// ~1/7 the cost — the pose freeze is invisible in a shadow blob this far out
+// ~1/7 the cost, the pose freeze is invisible in a shadow blob this far out
 const ENTITY_SHADOW_RANGE_SQ = 25 * 25;
 const ENTITY_PROXY_SHADOW_RANGE_SQ = 62 * 62;
 // loot sparkles further than this are hidden (sub-pixel, real draw cost)
@@ -316,7 +316,7 @@ const AIRBORNE_EPS = 0.4;
 // Beyond this (squared) an entity's footsteps/movement are inaudible, so we skip
 // the surface sample + dispatch entirely. Kept under the engine's own cutoff (46u).
 const SFX_MOVE_RANGE_SQ = 42 * 42;
-// Stride length (world units travelled) between footfalls — longer at a run.
+// Stride length (world units travelled) between footfalls, longer at a run.
 const FOOT_STRIDE_WALK = 0.95;
 const FOOT_STRIDE_RUN = 1.55;
 const SWIM_STRIDE = 2.4;
@@ -369,7 +369,7 @@ const SELF_RENDER_SNAP_DIST_SQ = 6 * 6;
 // takes over from the lead-smoothing path (gone in ~0.3 s, no camera step).
 const SELF_MOTION_HANDOFF_RATE = 15;
 const SUN_HALO_OPACITY = 0.35; // bloom now supplies most of the halo
-// lighting rig (high/ultra) — IBL supplies ambient, sun carries the key
+// lighting rig (high/ultra), IBL supplies ambient, sun carries the key
 const HEMI_INTENSITY = 0.45;
 const SUN_INTENSITY = 2.8;
 const ENV_INTENSITY = 0.5;
@@ -377,8 +377,7 @@ const ENV_INTENSITY = 0.5;
 // (env at 0.15 still lit rigs sky-blue against the pitch-dark crypt)
 const DUNGEON_SUN_INTENSITY = 0.3;
 const DUNGEON_ENV_INTENSITY = 0.05;
-// raw HDRI PMREMs integrate the real sun the dome shader clamps away —
-// rescale so ambient matches the dome-capture look (see lookdev-hookup.md)
+// raw HDRI PMREMs integrate the real sun the dome shader clamps away, // rescale so ambient matches the dome-capture look (see lookdev-hookup.md)
 const IBL_RAW_SCALE = 0.55;
 const DUNGEON_HEMI_INTENSITY = 0.22; // floor of readability — bosses crushed to black at 0.14
 // character rim glow scales up underground so silhouettes split from the murk
@@ -658,7 +657,7 @@ export interface EntityView {
   offhandItemId: string | null; // last-rendered shield/second weapon, independent of mainhand skins
   weaponSkinId: string | null; // last-rendered weapon-skin cosmetic, diffed for live skin swaps
   weaponStowed: boolean; // last-rendered sheathe state (Z key), diffed for live stow toggles
-  /** unscaled height — nameplate/vfx anchor reads height * e.scale */
+  /** unscaled height, nameplate/vfx anchor reads height * e.scale */
   height: number;
   /** last-applied entity scale (group.scale); diffed each frame for live size buffs */
   liveScale: number;
@@ -1285,7 +1284,7 @@ export class Renderer {
     this.scene.matrixAutoUpdate = false;
     this.ambientPointSources = buildWorldAmbientSources(this.sim.cfg.seed);
     // No default-framebuffer MSAA on any tier: high/ultra get AA from the
-    // composer's MSAA HalfFloat target, low is meant to run without AA — and
+    // composer's MSAA HalfFloat target, low is meant to run without AA, and
     // requesting it here would hit software GL (the autodetect can only run
     // after the context exists) with the most expensive setting there is.
     this.webgl = new THREE.WebGLRenderer({
@@ -1373,7 +1372,7 @@ export class Renderer {
       LOW_GFX ? 520 : 470,
     );
 
-    // sky dome — follows the camera so the world strip never outruns it.
+    // sky dome, follows the camera so the world strip never outruns it.
     // High tier: shader gradient + sun glow with biome-aware horizon tints;
     // low keeps the legacy canvas-gradient dome.
     this.skyView = buildSky(LOW_GFX, SUN_ANCHOR);
@@ -1665,7 +1664,7 @@ export class Renderer {
     this.flames.push(...stationProps.flames);
     this.fireLights.push(...stationProps.fireLights);
 
-    // selection ring — a classic target reticle: a base ring plus four
+    // selection ring, a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
     // frame (see drapeRingLocalY / sync) so it stays legible on slopes instead
     // of sinking into the uphill ground; the ticks keep the classic spin on a
@@ -2883,10 +2882,10 @@ export class Renderer {
     // Common mobs spawn in packs → pool several copies per template (this also
     // compiles their shaders).
     for (const templateId of PREWARM_MOB_TEMPLATE_IDS) build(templateId, PREWARM_MOB_POOL_COPIES);
-    // Then every remaining mob whose visual MODEL hasn't been built yet — one copy,
+    // Then every remaining mob whose visual MODEL hasn't been built yet, one copy,
     // so its shader program is compiled at load and never hitches in-world. Mobs that
     // share a family model are built only once. NOT deadline-gated: the distinct-model
-    // set is small (deduped by visualKeyFor) and is the whole point of this pass — a
+    // set is small (deduped by visualKeyFor) and is the whole point of this pass, a
     // skipped model is a guaranteed in-world compile stall (real-GPU walk profiling
     // caught a beast model linking ~4 programs / ~240ms when first seen north of spawn
     // because the shared build deadline cut this loop off). The deadline still bounds
@@ -2904,7 +2903,7 @@ export class Renderer {
     return group;
   }
 
-  // Every NPC visual MODEL once (NPCs were not prewarmed at all — entering a zone hub
+  // Every NPC visual MODEL once (NPCs were not prewarmed at all, entering a zone hub
   // compiled their shaders live). Most NPCs share a handful of models (npc_knight,
   // npc_mage, ...), so dedup by model key (visualKeyFor) builds each only once.
   private buildNpcPrewarmGroup(deadline: number): THREE.Group {
@@ -3197,8 +3196,8 @@ export class Renderer {
     const maxMs = Math.max(0, options.maxMs ?? policy.maxMs);
     const started = performance.now();
     const deadline = started + maxMs;
-    // Stop the archetype-build steps early so the later entries — crucially
-    // programs.compile — still START before `deadline` (runEntry skips anything
+    // Stop the archetype-build steps early so the later entries, crucially
+    // programs.compile, still START before `deadline` (runEntry skips anything
     // that begins past it). Compiling is what kills the in-world freeze.
     const buildDeadline = deadline - PREWARM_BUILD_RESERVE_MS;
     const manifestEntries: RendererPrewarmManifestEntryStats[] = [];
@@ -3384,7 +3383,7 @@ export class Renderer {
       },
       {
         // Players are the #1 shader-compile trigger in a crowd, so build their
-        // archetypes first (before the long mob tail) — guaranteed within budget.
+        // archetypes first (before the long mob tail), guaranteed within budget.
         id: 'entities.player-archetypes',
         category: 'entities',
         priority: 34,
@@ -3500,7 +3499,7 @@ export class Renderer {
         // Spawn one of every pooled ability-VFX primitive (rings, decals,
         // pillar, shell, slash ribbon, overlay sprite). The pools build their
         // meshes visible=false, so neither the render passes nor
-        // programs.compile ever see their ShaderMaterials — the first spec'd
+        // programs.compile ever see their ShaderMaterials, the first spec'd
         // cast in the open world used to link them synchronously. The spawns
         // also bind the per-style decal textures, so the texture re-walk below
         // uploads the whole canvas set now. abilityVfxFx.clear() in the
@@ -3537,7 +3536,7 @@ export class Renderer {
           const compileStart = performance.now();
           // Use a dedicated budget, not `deadline - now`: linking every program now is
           // exactly what prevents the in-world freeze, so a near-empty leftover budget
-          // must not cut it short (the old bug — the async compile timed out and the
+          // must not cut it short (the old bug, the async compile timed out and the
           // programs linked synchronously on first sight instead).
           // Constrained (phone WebKit) without KHR_parallel_shader_compile: BOTH arms
           // below are one multi-second synchronous main-thread block (compileAsync
@@ -4517,7 +4516,7 @@ export class Renderer {
 
     let clickTarget: THREE.Object3D;
     if (visual) {
-      // raycasting skinned meshes is expensive — pick against the invisible
+      // raycasting skinned meshes is expensive, pick against the invisible
       // capsule proxy instead (three's raycaster ignores `visible`)
       if (!isQuestVision) visual.clickProxy.userData.entityId = e.id;
       clickTarget = visual.clickProxy;
@@ -5142,7 +5141,7 @@ export class Renderer {
         fog.near = 12;
         fog.far = 78;
       } else if (desired === 'nythraxis') {
-        // the raid arena is huge (±230) — push the murk back so ~50yd reads
+        // the raid arena is huge (±230), push the murk back so ~50yd reads
         // clear (linear-fog midpoint (near+far)/2 = 50), not the old ~30
         fog.color.setHex(0x020106);
         fog.near = 20;
@@ -5180,7 +5179,7 @@ export class Renderer {
       }
       // interiors must not leak daylight: drop sun + sky ambient + IBL
       // underground so the torch point lights own the scene; restore outside.
-      // The rim glow cranks up instead — silhouettes must split from the murk.
+      // The rim glow cranks up instead, silhouettes must split from the murk.
       if (!this.lowGfx) {
         const mazeNight = desired === 'yumiMaze';
         const underground =
@@ -5257,7 +5256,7 @@ export class Renderer {
     if (idx >= 0) this.clickTargets.splice(idx, 1);
     if (v.visual) {
       // Character geometry/materials are shared per-asset caches and must
-      // survive interest churn — dispose only per-instance mixer bindings.
+      // survive interest churn, dispose only per-instance mixer bindings.
       if (v.visualPoolKey) this.storePooledVisual(v.visualPoolKey, v.visual);
       else v.visual.dispose();
       v.sheepVisual?.dispose();
@@ -5483,7 +5482,7 @@ export class Renderer {
     for (const [id, v] of this.views) {
       const e = sim.entities.get(id);
       if (!e) continue;
-      // form swaps (polymorph sheep, druid forms) — computed up front because
+      // form swaps (polymorph sheep, druid forms), computed up front because
       // the shadow gates below must not run the base rig's proxy under a form.
       // One pass over the aura list instead of six .some() scans per entity per
       // frame; the flag combination below preserves the original precedence.
@@ -5549,7 +5548,7 @@ export class Renderer {
       if (id !== p.id) {
         // Per-frame visibility uses the same create/destroy hysteresis as view
         // retention (above) so a rig hovering right at the draw edge
-        // doesn't toggle visible/invisible every frame — that hard cutoff is the
+        // doesn't toggle visible/invisible every frame, that hard cutoff is the
         // actual on-screen boundary flicker. group.visible carries last frame's
         // state: once shown, keep it until past the 96yd destroy radius (where
         // the view is torn down anyway); while hidden, show only within 80yd.
@@ -5583,8 +5582,7 @@ export class Renderer {
           v.visual.setProxyShadow(
             !wantShadow && inProxyBand && !polyed && !bear && !cat && !travel && !fireballForm,
           );
-          // sheep/forms keep articulated shadows through the whole proxy band —
-          // a frozen humanoid proxy silhouette would be wrong under a form
+          // sheep/forms keep articulated shadows through the whole proxy band,           // a frozen humanoid proxy silhouette would be wrong under a form
           const wantFormShadow = wantShadow || inProxyBand;
           v.sheepVisual?.setShadow(wantFormShadow);
           v.bearVisual?.setShadow(wantFormShadow);
@@ -5738,13 +5736,13 @@ export class Renderer {
         charOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
       }
 
-      // live skin swap — appearance changed (in-game changer or a multiplayer peer)
+      // live skin swap, appearance changed (in-game changer or a multiplayer peer)
       if (e.skin !== v.skin) {
         v.skin = e.skin;
         v.visual.setSkin(e.skin);
       }
 
-      // live held-weapon swap — equipped mainhand changed (self equip or a peer's
+      // live held-weapon swap, equipped mainhand changed (self equip or a peer's
       // gear update); setWeapon no-ops on classes with a fixed weapon (hunter)
       if (e.mainhandItemId !== v.mainhandItemId) {
         v.mainhandItemId = e.mainhandItemId;
@@ -5896,7 +5894,7 @@ export class Renderer {
       const visuallyDead = isVisuallyDead(e) && !e.ghost;
       // `onGround` is authoritative offline but is never sent in online snapshots
       // (ClientWorld defaults it to true), so for players fall back to deriving the
-      // airborne state from foot height vs terrain — keeps the jump pose working in
+      // airborne state from foot height vs terrain, keeps the jump pose working in
       // both worlds without a wire change. Gated to players (only they jump) to keep
       // the extra groundHeight sample off the hot path for mobs/NPCs.
       // The local player uses the predictor's kernel onGround when it is active:
@@ -5971,7 +5969,7 @@ export class Renderer {
             );
           }
         } else {
-          // standing still — prime the accumulator so the first step after moving
+          // standing still, prime the accumulator so the first step after moving
           // lands promptly rather than after a full stride of travel.
           v.stepAccum = FOOT_STRIDE_WALK * 0.6;
         }
@@ -6695,7 +6693,7 @@ export class Renderer {
   private updateGodRays(): void {
     if (this.godRays.length === 0) return;
     const outdoor = this.fogState === 'outdoor';
-    // azimuth-only alignment — the chase cam always pitches down while the
+    // azimuth-only alignment, the chase cam always pitches down while the
     // sun sits high, so a full 3D dot product would never light the shafts
     this.camera.getWorldDirection(this.tmpV);
     this.tmpV.y = 0;
@@ -7107,7 +7105,7 @@ export class Renderer {
             : biome === 'marsh'
               ? 'rain'
               : null;
-      // Only at the water's edge / in it — sampled at the player, so a loose
+      // Only at the water's edge / in it, sampled at the player, so a loose
       // threshold made the loop bleed across the low marsh from far off.
       const nearWater = !inDungeon && groundHeight(px, pz, seed) < waterLevelAt(px, pz) + 0.4;
       // Sowfield crowd bed: murmurs near the ground, swells while a match is
@@ -7166,8 +7164,7 @@ export class Renderer {
         continue;
       }
       // culled rigs (beyond ENTITY_DRAW_RANGE) stop updating group.position,
-      // so a yell from 80–100u away would hang frozen over empty terrain —
-      // fall back to the live entity position when the rig isn't being drawn
+      // so a yell from 80 to 100u away would hang frozen over empty terrain,       // fall back to the live entity position when the rig isn't being drawn
       if (v.group.visible) this.tmpV.copy(v.group.position);
       else this.tmpV.set(e.pos.x, e.pos.y, e.pos.z);
       this.tmpV.y += v.height * e.scale + 1.0;
@@ -7188,7 +7185,7 @@ export class Renderer {
   }
 
   // Click-to-move (#95): where a screen click meets the ground. Intersects a
-  // horizontal plane at the player's foot height — robust on the gentle terrain
+  // horizontal plane at the player's foot height, robust on the gentle terrain
   // here and far cheaper than raycasting the terrain mesh.
   groundPoint(clientX: number, clientY: number, planeY: number): { x: number; z: number } | null {
     const ndc = new THREE.Vector2(
@@ -7271,7 +7268,7 @@ export class Renderer {
   // character within a small screen radius when nothing was hit directly.
   pickSloppy(clientX: number, clientY: number): number | null {
     // Forgiving assist: nothing under the ray, so snap to the nearest
-    // targetable character within a small screen radius — chibi proportions
+    // targetable character within a small screen radius, chibi proportions
     // and melee scrums (often hidden behind the player's own model) make
     // precise capsule clicks fiddly. Objects (doors/loot) still need a
     // direct hit; the local player never competes for the click.
