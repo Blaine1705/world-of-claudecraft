@@ -401,6 +401,12 @@
     width: 22px;
     height: 22px;
   }
+  /* Painted launcher art reads larger than the glyph it replaces (see the .ui-icon-art
+     note in base.css). The button box and the caption below it are unchanged. */
+  body.mobile-touch .mobile-btn .ui-icon-art {
+    width: 27px;
+    height: 27px;
+  }
   body.mobile-touch #mobile-more {
     position: static;
     z-index: 19;
@@ -1174,6 +1180,15 @@
   }
   body.mobile-touch #mobile-extra-controls .mobile-btn .ui-icon {
     flex: 0 0 18px;
+  }
+  /* The tray pill is a fixed 40px row with the caption beside the icon, so the painted art
+     gets a smaller bump than on the bottom bar: enough to read, not enough to crowd the
+     label out of a 4-column grid. Both the basis and the box are set, since the row is a
+     flex container where flex-basis, not width, decides the inline size. */
+  body.mobile-touch #mobile-extra-controls .mobile-btn .ui-icon-art {
+    flex: 0 0 22px;
+    width: 22px;
+    height: 22px;
   }
   /* A toggle tray button (e.g. Nameplates) glows gold while its feature is on. */
   body.mobile-touch #mobile-extra-controls .mobile-btn.active {
