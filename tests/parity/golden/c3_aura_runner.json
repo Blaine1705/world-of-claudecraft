@@ -435,8 +435,8 @@
       "tick": 40,
       "time": 2,
       "nextId": 417,
-      "state": "67f1f21d",
-      "events": "6a74195e",
+      "state": "4fbfef93",
+      "events": "af3d9806",
       "rng": {
         "draws": 2,
         "digest": "a0fe8174"
@@ -446,7 +446,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 417,
-      "state": "e835c3ee",
+      "state": "1dd37848",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -457,7 +457,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 417,
-      "state": "bb3fc59c",
+      "state": "23be65c2",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -468,7 +468,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 417,
-      "state": "1858d311",
+      "state": "4edd6787",
       "events": "741638a5",
       "rng": {
         "draws": 62,
@@ -479,7 +479,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 417,
-      "state": "e605ba1e",
+      "state": "5f4a1950",
       "events": "741638a5",
       "rng": {
         "draws": 78,
@@ -490,7 +490,7 @@
       "tick": 62,
       "time": 3.1,
       "nextId": 417,
-      "state": "71a2af97",
+      "state": "e99db7b9",
       "events": "741638a5",
       "rng": {
         "draws": 85,
@@ -608,13 +608,15 @@
             "itemId": "parity_drink",
             "kind": "drink",
             "manaPer2s": 50,
-            "remaining": 4
+            "remaining": 4,
+            "ticksElapsed": 1
           },
           "eating": {
             "hpPer2s": 90,
             "itemId": "parity_food",
             "kind": "food",
-            "remaining": 4
+            "remaining": 4,
+            "ticksElapsed": 1
           },
           "fallStartY": 1.5,
           "fiveSecondRule": 102,
