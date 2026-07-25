@@ -1019,7 +1019,7 @@ const classAbilityNamesEn = {
       [
         'recall_the_fallen',
         'Recall the Fallen',
-        'Returns a dead group member to life with 35% health and mana.',
+        'Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group.',
       ],
       [
         'beacon_of_light',

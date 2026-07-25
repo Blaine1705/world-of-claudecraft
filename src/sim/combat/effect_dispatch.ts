@@ -107,6 +107,7 @@ import { pullPaladinTargets, pulsePaladinThreat } from './paladin_control';
 import { triggerPaladinDawnRhythm } from './paladin_dawn_rhythm';
 import { tryGrantDawnsWrath } from './paladin_dawns_wrath';
 import { grantRadiantResonance } from './paladin_radiant_resonance';
+import { riteAnswersTheWholeGroup } from './paladin_rite_of_many';
 import { tryGrantSolarReprisal } from './paladin_solar_reprisal';
 import {
   advanceSunGodVerdict,
@@ -789,6 +790,20 @@ export function runEffects(
         // (resolved upstream as a dead party/raid member), no resurrection sickness.
         const ally = target;
         if (!ally?.dead) break;
+        // A Sunmender's rite answers for the whole group from level 16 (see
+        // combat/paladin_rite_of_many.ts). Same button, same cast, same body to
+        // begin it over: only who stands up afterwards changes.
+        if (riteAnswersTheWholeGroup(ability.id, mods.spec, p.level)) {
+          resurrectDeadGroupMembers(ctx, p, eff.hpFrac);
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: ally.id,
+            school: 'holy',
+            fx: 'temporalGlyph',
+          });
+          break;
+        }
         offerResurrection(ctx, p, ally, eff.hpFrac);
         ctx.emit({
           type: 'spellfx',

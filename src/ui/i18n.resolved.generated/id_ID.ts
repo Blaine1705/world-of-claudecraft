@@ -7158,7 +7158,7 @@ export const id_ID: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Recall the Fallen",
-        "description": "Returns a dead group member to life with 35% health and mana."
+        "description": "Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group."
       },
       "beacon_of_light": {
         "name": "Beacon of Light",

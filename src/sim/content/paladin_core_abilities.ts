@@ -208,7 +208,8 @@ const common: AbilityDef[] = [
     partyOnlyTarget: true,
     requiresOutOfCombat: true,
     effects: [{ type: 'resurrectAlly', hpFrac: 0.35 }],
-    description: 'Returns a dead group member to life with 35% health and mana.',
+    description:
+      'Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group.',
   },
   {
     id: 'beacon_of_light',
