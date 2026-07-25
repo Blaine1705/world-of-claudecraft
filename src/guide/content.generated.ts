@@ -370,6 +370,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Jawcrack"
       },
       {
+        "id": "berserker_rage",
+        "name": "Seething Fury"
+      },
+      {
         "id": "execute",
         "name": "Early Grave"
       },
@@ -1858,7 +1862,8 @@ export const GUIDE_DRUID_FORMS: GuideDruidForm[] = [
   {
     "id": "form_travel",
     "model": "form_travel",
-    "still": "/guide-stills/form_travel.webp"
+    "tint": "#bfe39a",
+    "still": "/guide-stills/form_travel__bfe39a.webp"
   }
 ];
 
@@ -8911,9 +8916,10 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "tintStrength": 0.35
   },
   "form_travel": {
-    "url": "models/creatures/chicken_cow.glb",
+    "url": "models/creatures/stag.glb",
     "idle": "Idle",
-    "height": 2.3
+    "height": 2,
+    "tintStrength": 0.28
   },
   "mob_demon": {
     "url": "models/creatures/demonalt.glb",
