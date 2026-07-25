@@ -179,7 +179,8 @@ describe('Paladin support abilities', () => {
     expect(ABILITIES.righteous_fury.hiddenFromPlayer).not.toBe(true);
     expect(ABILITIES.consecration).toMatchObject({
       name: 'Holy Ground',
-      learnLevel: 9,
+      // Taught at specialization, so both melee specs open with their ground kit.
+      learnLevel: 5,
       cooldown: 12,
       specs: ['protection', 'retribution'],
     });
