@@ -327,6 +327,81 @@ describe('Vale Cup: parallel private practice', () => {
   });
 });
 
+// Regression: the Ashen Coliseum arena and the Vale Cup boarball pitch used to
+// have no idea about each other, so a player mid rated Vale Cup match (or just
+// waiting in either queue) could be pulled straight into the other system.
+describe('Vale Cup <-> Arena: mutual queue exclusion', () => {
+  it('rejects an Arena queue join while seated in a live rated Vale Cup match', () => {
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Ada', 0, -40);
+    const b = addAt(sim, 'mage', 'Bo', 4, -40);
+    const match = startBout(sim, a, b);
+    sim.drainEvents();
+    sim.arenaQueueJoin(a);
+    expect(errorsOf(sim.drainEvents())).toContain('You are already in an arena match.');
+    expect(sim.arenaQueue1v1).not.toContain(a);
+    expect(sim.arenaMatches.has(a)).toBe(false);
+    // Untouched: still seated in the Vale Cup match, not benched or teleported.
+    expect(match.teamA.includes(a) || match.teamB.includes(a)).toBe(true);
+    expect(match.benched.has(a)).toBe(false);
+  });
+
+  it('rejects an Arena queue join while merely waiting in a Vale Cup bracket queue', () => {
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Ada', 0, -40);
+    sim.vcupQueueJoin(1, 'vale', 'allrounder', false, a); // alone: waits, not yet matched
+    expect(sim.vcup.queues[1].some((u) => u.pids.includes(a))).toBe(true);
+    sim.drainEvents();
+    sim.arenaQueueJoin(a);
+    expect(errorsOf(sim.drainEvents())).toContain('You are already in an arena match.');
+    expect(sim.arenaQueue1v1).not.toContain(a);
+  });
+
+  it('rejects a Vale Cup queue join while merely waiting in the Arena queue', () => {
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Ada', 0, -40);
+    sim.arenaQueueJoin(a); // alone: waits, not yet matched
+    expect(sim.arenaQueue1v1).toContain(a);
+    sim.drainEvents();
+    sim.vcupQueueJoin(1, 'vale', 'allrounder', false, a);
+    expect(errorsOf(sim.drainEvents())).toContain('You are already in an arena match.');
+    expect(sim.vcup.queues[1].some((u) => u.pids.includes(a))).toBe(false);
+  });
+
+  it('rejects an Arena 2v2 party queue when one member waits in a Vale Cup queue', () => {
+    const sim = makeWorld();
+    const leader = addAt(sim, 'warrior', 'Leader', 0, -40);
+    const member = addAt(sim, 'paladin', 'Member', 3, -40);
+    sim.vcupQueueJoin(1, 'vale', 'allrounder', false, member); // solo: waits
+    sim.partyInvite(member, leader);
+    sim.partyAccept(member);
+    sim.drainEvents();
+    sim.arenaQueueJoin(leader, '2v2');
+    expect(errorsOf(sim.drainEvents())).toContain('Member is already in an arena match.');
+    expect(sim.arenaQueue2v2.length).toBe(0);
+  });
+
+  it('defense in depth: the Arena 1v1 prune drops a queued player who is also Vale Cup seated', () => {
+    // matchmakeArena1v1 re-checks vcupSeatedOrQueued on every prune pass, the
+    // same defense-in-depth pattern it already applies to the dungeon-instance
+    // and dead checks (both already validated at join time too). Isolate that
+    // specific check here by seating `a` onto an UNRELATED live match's roster
+    // directly, without moving their entity, so the pre-existing "walked into
+    // an instance" x-threshold arm cannot be what drops them from the queue.
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Ada', 0, -40);
+    const c = addAt(sim, 'mage', 'Cee', 10, -40);
+    const d = addAt(sim, 'rogue', 'Dee', 14, -40);
+    sim.arenaQueueJoin(a);
+    expect(sim.arenaQueue1v1).toContain(a);
+    const match = startBout(sim, c, d); // an unrelated live rated Vale Cup match
+    expect(sim.arenaQueue1v1).toContain(a); // untouched by the unrelated match
+    match.teamA.push(a);
+    sim.tick(); // matchmakeArena1v1's prune re-checks vcupSeatedOrQueued
+    expect(sim.arenaQueue1v1).not.toContain(a);
+  });
+});
+
 describe('Vale Cup: guild banners and the guild leaderboard', () => {
   // Force the live match to a decisive team-A win and tear it down.
   function decideForA(sim: Sim) {
