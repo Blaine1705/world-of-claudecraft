@@ -1,4 +1,4 @@
-// Reckoning (Dawnreaver, ability id `faithforged_guard`): the paladin's offensive
+// Debt of Light (Dawnreaver, ability id `faithforged_guard`): the paladin's offensive
 // defensive. It is armed BEFORE the blow lands and answers exactly ONE incoming
 // hit: that hit is soaked up to a cap, the soaked amount is returned to the
 // attacker as Holy damage, and the paladin banks 1 Devotion.
@@ -14,24 +14,24 @@
 // safely.
 import type { Entity } from '../types';
 
-export const RECKONING_KIND = 'paladin_reckoning' as const;
-export const RECKONING_DEVOTION = 1;
-export const RECKONING_ABILITY_ID = 'faithforged_guard';
+export const DEBT_OF_LIGHT_KIND = 'paladin_debt_of_light' as const;
+export const DEBT_OF_LIGHT_DEVOTION = 1;
+export const DEBT_OF_LIGHT_ABILITY_ID = 'faithforged_guard';
 
-export interface ReckoningAnswer {
+export interface DebtOfLightAnswer {
   /** Damage removed from the incoming hit, and the Holy damage owed back. */
   soaked: number;
 }
 
-export function reckoningAura(entity: Entity): Entity['auras'][number] | null {
+export function debtOfLightAura(entity: Entity): Entity['auras'][number] | null {
   for (const aura of entity.auras) {
-    if (aura.kind === RECKONING_KIND) return aura;
+    if (aura.kind === DEBT_OF_LIGHT_KIND) return aura;
   }
   return null;
 }
 
 /**
- * What an armed Reckoning does to one incoming hit, or null when nothing happens
+ * What an armed Debt of Light does to one incoming hit, or null when nothing happens
  * so the caller can skip every side effect in a single branch.
  *
  * Answered only when there IS an attacker other than the paladin: falling damage,
@@ -39,11 +39,11 @@ export function reckoningAura(entity: Entity): Entity['auras'][number] | null {
  * nothing to answer. The soak is capped by the aura's value; the return equals
  * what was ACTUALLY soaked, never the cap.
  */
-export function answerReckoning(
+export function answerDebtOfLight(
   cap: number,
   incoming: number,
   hasAttacker: boolean,
-): ReckoningAnswer | null {
+): DebtOfLightAnswer | null {
   if (!hasAttacker || incoming <= 0 || cap <= 0) return null;
   return { soaked: Math.min(cap, incoming) };
 }

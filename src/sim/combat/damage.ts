@@ -70,10 +70,10 @@ import { cleanupPaladinAegis } from './paladin_aegis';
 import { stripBeaconOfLight } from './paladin_beacon';
 import { protectionConsecrationDamageReduction } from './paladin_consecration';
 import {
-  answerReckoning,
-  RECKONING_DEVOTION,
-  reckoningAura,
-} from './paladin_reckoning';
+  answerDebtOfLight,
+  DEBT_OF_LIGHT_DEVOTION,
+  debtOfLightAura,
+} from './paladin_debt_of_light';
 import { stripSunGodVerdicts } from './paladin_sun_verdict';
 import { stripPaladinDevotionsFromSource } from './paladin_support';
 import { masteredPaladinAuraValue } from './paladin_talents';
@@ -401,28 +401,28 @@ export function dealDamage(
   // tick carries crit=false so it can never re-ignite itself. Draws no rng.
   igniteOnCrit(ctx, source, target, amount, crit, school, ability);
 
-  // Reckoning answers BEFORE the generic shields: it is a deliberately armed
+  // Debt of Light answers BEFORE the generic shields: it is a deliberately armed
   // single-hit answer, so it must be the thing that eats the blow the paladin
   // armed it for rather than whatever passive absorb happens to be worn. Its
   // return hit is queued and dealt after the incoming damage resolves, so the
   // attacker's own defenses apply to it normally and it can never recurse (the
   // aura is gone by then).
-  let reckoningReturn: { attacker: Entity; amount: number } | null = null;
+  let debtReturn: { attacker: Entity; amount: number } | null = null;
 
   // absorb shields soak damage first
   let totalAbsorbed = 0;
   if (amount > 0) {
-    const armed = reckoningAura(target);
+    const armed = debtOfLightAura(target);
     if (armed) {
-      const answer = answerReckoning(armed.value, amount, !!source && source.id !== target.id);
+      const answer = answerDebtOfLight(armed.value, amount, !!source && source.id !== target.id);
       if (answer && source) {
         amount -= answer.soaked;
         totalAbsorbed += answer.soaked;
         target.auras.splice(target.auras.indexOf(armed), 1);
         ctx.emit({ type: 'aura', targetId: target.id, name: armed.name, gained: false });
-        if (target.kind === 'player') grantAbilityDevotion(target, RECKONING_DEVOTION);
+        if (target.kind === 'player') grantAbilityDevotion(target, DEBT_OF_LIGHT_DEVOTION);
         if (answer.soaked > 0 && !source.dead) {
-          reckoningReturn = { attacker: source, amount: answer.soaked };
+          debtReturn = { attacker: source, amount: answer.soaked };
         }
       }
     }
@@ -944,20 +944,20 @@ export function dealDamage(
   }
   reflectSpellWard(ctx, source, target, amount, kind, school);
 
-  // Reckoning's answer, once the incoming hit has fully resolved: the share of
+  // Debt of Light's answer, once the incoming hit has fully resolved: the share of
   // what was soaked goes back to the attacker as Holy damage. The aura was
   // already removed when the blow was answered, so this can neither re-arm nor
   // recurse, and noRage keeps the return from feeding the paladin's own meters
   // a second time.
-  if (reckoningReturn && !reckoningReturn.attacker.dead && reckoningReturn.amount > 0) {
+  if (debtReturn && !debtReturn.attacker.dead && debtReturn.amount > 0) {
     dealDamage(
       ctx,
       target,
-      reckoningReturn.attacker,
-      reckoningReturn.amount,
+      debtReturn.attacker,
+      debtReturn.amount,
       false,
       'holy',
-      'Reckoning',
+      'Debt of Light',
       'hit',
       true,
     );

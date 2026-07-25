@@ -1941,7 +1941,7 @@ Headless training environment, Codex/Claude agent culture, and anti-bot roadmap.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="9244">== Articles ==
+      <text xml:space="preserve" bytes="9240">== Articles ==
 * [[Adder&apos;s Bite (Ability)]]
 * [[Aegis of the First Dawn (Ability)]]
 * [[Aether Darts (Ability)]]
@@ -2009,6 +2009,7 @@ Headless training environment, Codex/Claude agent culture, and anti-bot roadmap.
 * [[Dawn&apos;s Embrace (Ability)]]
 * [[Dawnfall (Ability)]]
 * [[Deadfrost (Ability)]]
+* [[Debt of Light (Ability)]]
 * [[Defiant Bellow (Ability)]]
 * [[Diabolical Twinstrike (Ability)]]
 * [[Die by the Sword (Ability)]]
@@ -2029,7 +2030,6 @@ Headless training environment, Codex/Claude agent culture, and anti-bot roadmap.
 * [[Ember Form (Ability)]]
 * [[Emboldening Roar (Ability)]]
 * [[Eye Jab (Ability)]]
-* [[Faithforged Guard (Ability)]]
 * [[Faultline (Ability)]]
 * [[Feint (Ability)]]
 * [[Fell Shot (Ability)]]
@@ -2806,7 +2806,7 @@ Rogue starts with Rusty Dagger and uses energy.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="2061">== Overview ==
+      <text xml:space="preserve" bytes="2053">== Overview ==
 Paladin starts with Training Mace and uses mana.
 
 == Stats ==
@@ -2853,7 +2853,7 @@ Paladin starts with Training Mace and uses mana.
 * [[Beacon of Light (Ability)|Beacon of Light]]
 * [[Final Edict (Ability)|Final Edict]]
 * [[Dawnfall (Ability)|Dawnfall]]
-* [[Faithforged Guard (Ability)|Faithforged Guard]]
+* [[Debt of Light (Ability)|Debt of Light]]
 * [[Hammer of Wrath (Ability)|Hammer of Wrath]]
 * [[Guardian Covenant (Ability)|Guardian Covenant]]
 * [[Avenging Wrath (Ability)|Avenging Wrath]]
@@ -3469,7 +3469,7 @@ Nythraxis Raid Arena is a private party instance with 1 source-defined spawns.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="320">== Greeting ==
+      <text xml:space="preserve" bytes="351">== Greeting ==
 Welcome to the World Market, $C. Buy from every adventurer in the realm — or set out your own wares and let coin find you.
 
 == Facts ==
@@ -3479,7 +3479,7 @@ Welcome to the World Market, $C. Buy from every adventurer in the realm — or s
 | Keeper of the World Market
 |-
 ! Position
-| 0, 9.5
+| -4.376409317062264, 7.967830304040863
 |-
 ! Quest count
 | 0
@@ -3503,7 +3503,7 @@ Welcome to the World Market, $C. Buy from every adventurer in the realm — or s
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="353">== Greeting ==
+      <text xml:space="preserve" bytes="357">== Greeting ==
 Keep your blade close, $C. The Vale is not what it was.
 
 == Facts ==
@@ -3513,7 +3513,7 @@ Keep your blade close, $C. The Vale is not what it was.
 | Town Marshal
 |-
 ! Position
-| 4, 6
+| 4.5, 5.5
 |-
 ! Quest count
 | 5
@@ -3544,7 +3544,7 @@ Keep your blade close, $C. The Vale is not what it was.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="742">== Greeting ==
+      <text xml:space="preserve" bytes="774">== Greeting ==
 Fresh bread, clean water, fair prices. What can I get you?
 
 == Facts ==
@@ -3554,7 +3554,7 @@ Fresh bread, clean water, fair prices. What can I get you?
 | Provisioner
 |-
 ! Position
-| -7, 3
+| -7.125851435200138, 0.812357418766734
 |-
 ! Quest count
 | 2
@@ -3603,7 +3603,7 @@ Fresh bread, clean water, fair prices. What can I get you?
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="257">== Greeting ==
+      <text xml:space="preserve" bytes="288">== Greeting ==
 Careful where you step in the eastern woods, friend.
 
 == Facts ==
@@ -3613,7 +3613,7 @@ Careful where you step in the eastern woods, friend.
 | Herbalist
 |-
 ! Position
-| 11, -3
+| 2.8431593444121797, 9.717148252611294
 |-
 ! Quest count
 | 1
@@ -3640,7 +3640,7 @@ Careful where you step in the eastern woods, friend.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="501">== Greeting ==
+      <text xml:space="preserve" bytes="532">== Greeting ==
 The Light keep you. Even the dead find no rest here of late.
 
 == Facts ==
@@ -3650,7 +3650,7 @@ The Light keep you. Even the dead find no rest here of late.
 | Priest of the Vale
 |-
 ! Position
-| -14, -10
+| -16.59147045515334, -1.3973000209293893
 |-
 ! Quest count
 | 10
@@ -3686,7 +3686,7 @@ The Light keep you. Even the dead find no rest here of late.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="603">== Greeting ==
+      <text xml:space="preserve" bytes="633">== Greeting ==
 Mind the sparks, $C. Good steel is the difference between a scar and a grave.
 
 == Facts ==
@@ -3696,7 +3696,7 @@ Mind the sparks, $C. Good steel is the difference between a scar and a grave.
 | Armorer &amp; Weaponsmith
 |-
 ! Position
-| 7, 16.5
+| 5.617914034868791, 15.074687401746273
 |-
 ! Quest count
 | 1
@@ -3746,7 +3746,7 @@ Blrb-glub— sorry, been listening to those fish-men too long.
 | Old Salt
 |-
 ! Position
-| -16, 6
+| -22, 4
 |-
 ! Quest count
 | 1
@@ -3776,7 +3776,7 @@ Blrb-glub— sorry, been listening to those fish-men too long.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="289">== Greeting ==
+      <text xml:space="preserve" bytes="290">== Greeting ==
 Whole dig&apos;s crawling with those dirt-caked vermin!
 
 == Facts ==
@@ -3786,7 +3786,7 @@ Whole dig&apos;s crawling with those dirt-caked vermin!
 | Mine Foreman
 |-
 ! Position
-| -4, -14
+| -8, -9.5
 |-
 ! Quest count
 | 2
@@ -3814,7 +3814,7 @@ Whole dig&apos;s crawling with those dirt-caked vermin!
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="250">== Greeting ==
+      <text xml:space="preserve" bytes="282">== Greeting ==
 Welcome to the Gilded Strongbox. Your goods rest safe behind our locks.
 
 == Facts ==
@@ -3824,7 +3824,7 @@ Welcome to the Gilded Strongbox. Your goods rest safe behind our locks.
 | The Gilded Strongbox
 |-
 ! Position
-| 13, 8
+| 14.156943251329539, 8.685223202016726
 |-
 ! Quest count
 | 0
@@ -3848,7 +3848,7 @@ Welcome to the Gilded Strongbox. Your goods rest safe behind our locks.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="245">== Greeting ==
+      <text xml:space="preserve" bytes="247">== Greeting ==
 Care for a Card Duel? Best of three, winner takes the bragging rights.
 
 == Facts ==
@@ -3858,7 +3858,7 @@ Care for a Card Duel? Best of three, winner takes the bragging rights.
 | Dealer of Chance
 |-
 ! Position
-| 13, 2
+| 10.5, 1
 |-
 ! Quest count
 | 0
@@ -3916,7 +3916,7 @@ The truce holds at the Sowfield, $C: boots and shoulders only. Care to play for 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="281">== Greeting ==
+      <text xml:space="preserve" bytes="282">== Greeting ==
 Every deed worth doing is worth writing down twice, $N: once for the ledger and once for the fireside.
 
 == Facts ==
@@ -3926,7 +3926,7 @@ Every deed worth doing is worth writing down twice, $N: once for the ledger and 
 | The Vale Chronicle
 |-
 ! Position
-| 15, -16
+| 0, -14.5
 |-
 ! Quest count
 | 0
@@ -3950,7 +3950,7 @@ Every deed worth doing is worth writing down twice, $N: once for the ledger and 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="473">== Greeting ==
+      <text xml:space="preserve" bytes="506">== Greeting ==
 The forge answers to me, $C. Bring good ore and it will answer to you too.
 
 == Facts ==
@@ -3960,7 +3960,7 @@ The forge answers to me, $C. Bring good ore and it will answer to you too.
 | Master of the Forge
 |-
 ! Position
-| 5, 15
+| 1.7573530626642033, 16.121620532318982
 |-
 ! Quest count
 | 3
@@ -3996,7 +3996,7 @@ The forge answers to me, $C. Bring good ore and it will answer to you too.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="506">== Greeting ==
+      <text xml:space="preserve" bytes="537">== Greeting ==
 Nothing leaves my kitchens half-cooked, $C. Sit, eat, then get back out there.
 
 == Facts ==
@@ -4006,7 +4006,7 @@ Nothing leaves my kitchens half-cooked, $C. Sit, eat, then get back out there.
 | Master of the Kitchens
 |-
 ! Position
-| -12.5, 3
+| -12.780764037489869, 10.316661779002187
 |-
 ! Quest count
 | 3
@@ -4043,7 +4043,7 @@ Nothing leaves my kitchens half-cooked, $C. Sit, eat, then get back out there.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="461">== Greeting ==
+      <text xml:space="preserve" bytes="493">== Greeting ==
 Mind the threads, $C. A steady hand at the loom beats a strong one.
 
 == Facts ==
@@ -4053,7 +4053,7 @@ Mind the threads, $C. A steady hand at the loom beats a strong one.
 | Master of the Loom
 |-
 ! Position
-| -4, -9
+| -4.171032337012701, -18.01874944082567
 |-
 ! Quest count
 | 3
@@ -4089,7 +4089,7 @@ Mind the threads, $C. A steady hand at the loom beats a strong one.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="618">== Greeting ==
+      <text xml:space="preserve" bytes="648">== Greeting ==
 Springs, sprockets, and sharp edges, $C: the toolworks has whatever your hands lack.
 
 == Facts ==
@@ -4099,7 +4099,7 @@ Springs, sprockets, and sharp edges, $C: the toolworks has whatever your hands l
 | Master of the Toolworks
 |-
 ! Position
-| 9.5, -14
+| 6.999944260671105, -13.825962484617639
 |-
 ! Quest count
 | 3
@@ -4230,7 +4230,7 @@ The Light keep you above the water, $N. The dead in this fen do not sleep — th
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="736">== Greeting ==
+      <text xml:space="preserve" bytes="859">== Greeting ==
 Dry boots, dry bread, dry powder — at Fenbridge you get two of the three on a good day.
 
 == Facts ==
@@ -4270,6 +4270,12 @@ Dry boots, dry bread, dry powder — at Fenbridge you get two of the three on a 
 * [[Reedwoven Jerkin]]
 * [[Fenwalker Boots]]
 * [[Reedwoven Trousers]]
+* [[Copper Mining Pick]]
+* [[Iron Mining Pick]]
+* [[Handaxe]]
+* [[Felling Axe]]
+* [[Gathering Sickle]]
+* [[Bronze Sickle]]
 * [[Simple Fishing Pole]]
 [[Category:NPCs]]
 </text>
@@ -4647,7 +4653,7 @@ I tracked cultists through the fen at your side, and the trail led here. The pea
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="791">== Greeting ==
+      <text xml:space="preserve" bytes="984">== Greeting ==
 Wool, hardtack, and steel-shod boots — Highwatch runs on all three, and I am short of everything.
 
 == Facts ==
@@ -4683,6 +4689,15 @@ Wool, hardtack, and steel-shod boots — Highwatch runs on all three, and I am s
 * [[Prowlhide Jerkin]]
 * [[Cragwalker Boots]]
 * [[Windguard Leggings]]
+* [[Copper Mining Pick]]
+* [[Iron Mining Pick]]
+* [[Skysilver Mining Pick]]
+* [[Handaxe]]
+* [[Felling Axe]]
+* [[Ironbark Axe]]
+* [[Gathering Sickle]]
+* [[Bronze Sickle]]
+* [[Sheenleaf Sickle]]
 * [[Simple Fishing Pole]]
 * [[Osmium Ore]]
 * [[Glyphsteel Bar]]
@@ -5010,7 +5025,7 @@ The mere drinks the moonlight, $C, and gives back the drowned. I have watched th
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="1287">== Greeting ==
+      <text xml:space="preserve" bytes="1292">== Greeting ==
 The sands remember every victory. Spend your honor well.
 
 == Facts ==
@@ -5020,7 +5035,7 @@ The sands remember every victory. Spend your honor well.
 | Honor Quartermaster
 |-
 ! Position
-| -11, 1
+| -22.5, -7.5
 |-
 ! Quest count
 | 0
@@ -12795,7 +12810,7 @@ Grand Necromancer Velkhar is a level 20 humanoid.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="817">== Overview ==
+      <text xml:space="preserve" bytes="791">== Overview ==
 Korzul the Gravewyrm is a level 20 dragonkin.
 
 == Facts ==
@@ -12817,7 +12832,6 @@ Korzul the Gravewyrm is a level 20 dragonkin.
 == Mechanics ==
 * Boss
 * Elite
-* AoE: Necrotic Shockwave
 * Enrage below 30%
 
 == Loot ==
@@ -20128,7 +20142,7 @@ Kilnscale Mantle is a rare armor for shoulder.
 | shoulder
 |-
 ! Sell value
-| 4s 70c
+| 2s 80c
 |-
 ! Buy value
 | None
@@ -50124,7 +50138,7 @@ Reduce damage taken by you and party members by 5% until death or replacement. O
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="530">== Description ==
+      <text xml:space="preserve" bytes="642">== Description ==
 Instantly hurl a holy hammer at an enemy within 20 m for $d, restoring 70 mana, healing yourself for 50% of damage dealt, and generating 1 Devotion when it deals damage. Solar Reprisal lets Hammer of Grace ignore its cooldown and heal you for 100% of damage dealt.
 
 == Facts ==
@@ -50151,6 +50165,16 @@ Instantly hurl a holy hammer at an enemy within 20 m for $d, restoring 70 mana, 
 
 == Base effects ==
 * directDamage
+
+== Ranks ==
+{| class=&quot;wikitable article-facts&quot;
+|-
+! Rank 2
+| Level 8, cost 0
+|-
+! Rank 3
+| Level 14, cost 0
+|}
 [[Category:Abilities]]
 [[Category:Paladin]]
 </text>
@@ -50267,7 +50291,7 @@ Increase your movement speed by 150% for 2 sec.
 | [[Paladin]]
 |-
 ! Learn level
-| 8
+| 5
 |-
 ! Cost
 | 20
@@ -50346,8 +50370,8 @@ Instantly heal an ally for $d or deal moderate Holy damage to an enemy. Either u
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="329">== Description ==
-Returns a dead group member to life with 35% health and mana.
+      <text xml:space="preserve" bytes="416">== Description ==
+Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -50566,7 +50590,7 @@ You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 mi
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="568">== Description ==
+      <text xml:space="preserve" bytes="683">== Description ==
 Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall&apos;s remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn&apos;s Wrath for 8 sec. Ascension also releases a Holy explosion around you.
 
 == Facts ==
@@ -50593,6 +50617,16 @@ Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A
 
 == Base effects ==
 * weaponStrike
+
+== Ranks ==
+{| class=&quot;wikitable article-facts&quot;
+|-
+! Rank 2
+| Level 13, cost 25
+|-
+! Rank 3
+| Level 17, cost 25
+|}
 [[Category:Abilities]]
 [[Category:Paladin]]
 </text>
@@ -50644,7 +50678,7 @@ Deal $d Holy damage to nearby enemies and generate 1 Devotion. Hitting at least 
   </page>
 
   <page>
-    <title>Faithforged Guard (Ability)</title>
+    <title>Debt of Light (Ability)</title>
     <ns>0</ns>
     <id>990</id>
     <revision>
@@ -50654,8 +50688,8 @@ Deal $d Holy damage to nearby enemies and generate 1 Devotion. Hitting at least 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="371">== Description ==
-Surround yourself with a shield that absorbs $d damage for 8 sec. Ascension increases the shield by 50%.
+      <text xml:space="preserve" bytes="446">== Description ==
+For 8 sec, the next enemy hit against you is answered: up to $d damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -50670,7 +50704,7 @@ Surround yourself with a shield that absorbs $d damage for 8 sec. Ascension incr
 | 20
 |-
 ! Cooldown
-| 75s
+| 60s
 |-
 ! Range
 | Melee/self
@@ -50680,7 +50714,7 @@ Surround yourself with a shield that absorbs $d damage for 8 sec. Ascension incr
 |}
 
 == Base effects ==
-* absorb
+* selfBuff
 [[Category:Abilities]]
 [[Category:Paladin]]
 </text>
@@ -50832,7 +50866,7 @@ Judge an enemy beneath the Verdict of the Sun God for 30 sec. Final Edict and Da
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="501">== Description ==
+      <text xml:space="preserve" bytes="500">== Description ==
 Ascend into the air, becoming immune to damage as you fly toward the enemy. After 2 sec, descend upon the target area for $d Holy damage and generate 1 Devotion. Ascension increases the impact damage by 50% and consumes 1 charge.
 
 == Facts ==
@@ -50848,7 +50882,7 @@ Ascend into the air, becoming immune to damage as you fly toward the enemy. Afte
 | 50
 |-
 ! Cooldown
-| 180s
+| 60s
 |-
 ! Range
 | 20 yd
@@ -51283,7 +51317,7 @@ Requires a shield. Hurl a radiant disc that strikes and then bounces between nea
 | [[Paladin]]
 |-
 ! Learn level
-| 12
+| 10
 |-
 ! Cost
 | 25
@@ -51496,7 +51530,7 @@ Instantly bind a distant enemy with a sacred chain. The enemy travels toward you
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="495">== Description ==
+      <text xml:space="preserve" bytes="610">== Description ==
 Consecrate the ground beneath you for 9 sec, dealing $d Holy damage with high threat every second. The first impact generates 1 Devotion. Faithwardens take 5% less damage while standing inside. Ascension increases its damage.
 
 == Facts ==
@@ -51506,7 +51540,7 @@ Consecrate the ground beneath you for 9 sec, dealing $d Holy damage with high th
 | [[Paladin]]
 |-
 ! Learn level
-| 9
+| 5
 |-
 ! Cost
 | 35
@@ -51523,6 +51557,16 @@ Consecrate the ground beneath you for 9 sec, dealing $d Holy damage with high th
 
 == Base effects ==
 * groundAoE
+
+== Ranks ==
+{| class=&quot;wikitable article-facts&quot;
+|-
+! Rank 2
+| Level 11, cost 35
+|-
+! Rank 3
+| Level 16, cost 35
+|}
 [[Category:Abilities]]
 [[Category:Paladin]]
 </text>
@@ -53928,7 +53972,7 @@ Conjures 2 servings of bread, restoring health when eaten. Higher ranks conjure 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="421">== Description ==
+      <text xml:space="preserve" bytes="422">== Description ==
 Blasts the enemy for $d Fire damage. Instant.
 
 == Facts ==
@@ -53944,7 +53988,7 @@ Blasts the enemy for $d Fire damage. Instant.
 | 40
 |-
 ! Cooldown
-| 8s
+| 30s
 |-
 ! Range
 | 20 yd
@@ -56198,7 +56242,7 @@ Stuns the target for $t sec.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="456">== Description ==
+      <text xml:space="preserve" bytes="455">== Description ==
 A massive surge of healing: restores $d health and generates 1 Devotion when it restores health. 10 min cooldown.
 
 == Facts ==
@@ -56208,7 +56252,7 @@ A massive surge of healing: restores $d health and generates 1 Devotion when it 
 | [[Paladin]]
 |-
 ! Learn level
-| 12
+| 8
 |-
 ! Cost
 | 0
@@ -57061,7 +57105,7 @@ Smites the enemy for $d Holy damage.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="402">== Description ==
+      <text xml:space="preserve" bytes="434">== Description ==
 Heals a friendly target for $d.
 
 == Facts ==
@@ -57097,6 +57141,9 @@ Heals a friendly target for $d.
 |-
 ! Rank 3
 | Level 12, cost 65
+|-
+! Rank 4
+| Level 20, cost 85
 |}
 [[Category:Abilities]]
 [[Category:Priest]]
@@ -57213,7 +57260,7 @@ A word of darkness causes $d Shadow damage over 18 sec.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="426">== Description ==
+      <text xml:space="preserve" bytes="459">== Description ==
 Shields the target, absorbing $d damage for 30 sec.
 
 == Facts ==
@@ -57249,6 +57296,9 @@ Shields the target, absorbing $d damage for 30 sec.
 |-
 ! Rank 3
 | Level 18, cost 100
+|-
+! Rank 4
+| Level 20, cost 130
 |}
 [[Category:Abilities]]
 [[Category:Priest]]
@@ -57669,7 +57719,7 @@ Heals a friendly target for 120 to 145, then jumps to up to 2 additional nearby 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="436">== Description ==
+      <text xml:space="preserve" bytes="469">== Description ==
 Heals a friendly target for $d.
 
 == Facts ==
@@ -57708,6 +57758,9 @@ Heals a friendly target for $d.
 |-
 ! Rank 4
 | Level 18, cost 90
+|-
+! Rank 5
+| Level 20, cost 115
 |}
 [[Category:Abilities]]
 [[Category:Shaman]]
@@ -59318,8 +59371,8 @@ Roots the target in place for up to 12 sec.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="426">== Description ==
-Shapeshift into a bear: armor +90%, greatly increased attack power, your attacks build rage and generate 30% more threat. Cast again to return to caster form.
+      <text xml:space="preserve" bytes="427">== Description ==
+Shapeshift into a bear: armor +130%, greatly increased attack power, your attacks build rage and generate 30% more threat. Cast again to return to caster form.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -59832,7 +59885,7 @@ Sweep your claws through nearby enemies for $d damage. Causes extra threat. Brui
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="332">== Description ==
+      <text xml:space="preserve" bytes="415">== Description ==
 Heals a friendly target for $d and an additional amount over 21 sec.
 
 == Facts ==
@@ -59860,6 +59913,13 @@ Heals a friendly target for $d and an additional amount over 21 sec.
 == Base effects ==
 * heal
 * hot
+
+== Ranks ==
+{| class=&quot;wikitable article-facts&quot;
+|-
+! Rank 2
+| Level 20, cost 72
+|}
 [[Category:Abilities]]
 [[Category:Druid]]
 </text>
@@ -61433,8 +61493,8 @@ Increases spell damage by 20% and spell haste by 10% for 10 sec. (Arcane signatu
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="450">== Description ==
-Combust: for 10 sec your Fire spells always critically strike, including bolts already in flight. Off the global cooldown. These crits build Hot Streak like any other. (Fire signature)
+      <text xml:space="preserve" bytes="518">== Description ==
+Combust: for 10 sec your Fire spells always critically strike, including bolts already in flight. Off the global cooldown. These crits build Hot Streak like any other, and casting it finishes the Cinderfall charge currently recharging. (Fire signature)
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
@@ -61744,7 +61804,7 @@ Infuses a friendly target with power, increasing spell haste by 20% for 15 sec. 
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="390">== Description ==
+      <text xml:space="preserve" bytes="473">== Description ==
 Causes an explosion of Mending Light, healing nearby allies for $d and damaging nearby enemies. (Holy signature)
 
 == Facts ==
@@ -61772,6 +61832,13 @@ Causes an explosion of Mending Light, healing nearby allies for $d and damaging 
 == Base effects ==
 * aoeHeal
 * aoeDamage
+
+== Ranks ==
+{| class=&quot;wikitable article-facts&quot;
+|-
+! Rank 2
+| Level 20, cost 90
+|}
 [[Category:Abilities]]
 [[Category:Priest]]
 </text>
@@ -63783,7 +63850,7 @@ Instantly heals you for $d. (Priest talent)
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="310">== Description ==
+      <text xml:space="preserve" bytes="394">== Description ==
 Heals nearby allies for $d. (Priest talent)
 
 == Facts ==
@@ -63810,6 +63877,13 @@ Heals nearby allies for $d. (Priest talent)
 
 == Base effects ==
 * aoeHeal
+
+== Ranks ==
+{| class=&quot;wikitable article-facts&quot;
+|-
+! Rank 2
+| Level 20, cost 170
+|}
 [[Category:Abilities]]
 [[Category:Priest]]
 </text>
@@ -64973,7 +65047,7 @@ Find your legs: move 50% faster for 4 sec.
       <comment>Seed World of Claudecraft wiki content</comment>
       <model>wikitext</model>
       <format>text/x-wiki</format>
-      <text xml:space="preserve" bytes="33902">== Complete index ==
+      <text xml:space="preserve" bytes="33898">== Complete index ==
 * [[A Different Pastime]]
 * [[A Recipe Worth Keeping]]
 * [[A Trade for Every Hand]]
@@ -65235,6 +65309,7 @@ Find your legs: move 50% faster for 4 sec.
 * [[Deathless Greatblade]]
 * [[Deathless Warguard Legmail]]
 * [[Deathstalker Voss (Mob)]]
+* [[Debt of Light (Ability)]]
 * [[Deepfen Pearl]]
 * [[Deepfen Snapper (Mob)]]
 * [[Deepfen Spearjaw (Mob)]]
@@ -65326,7 +65401,6 @@ Find your legs: move 50% faster for 4 sec.
 * [[Embroidered Mantle]]
 * [[Eye Jab (Ability)]]
 * [[FURY (NPC)]]
-* [[Faithforged Guard (Ability)]]
 * [[Fallen Captain Aldren (Mob)]]
 * [[Fang of Korzul (2)]]
 * [[Fang of Korzul]]

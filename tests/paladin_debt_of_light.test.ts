@@ -1,14 +1,14 @@
-// Reckoning (Dawnreaver, ability id `faithforged_guard`): arms for 8 sec and
+// Debt of Light (Dawnreaver, ability id `faithforged_guard`): arms for 8 sec and
 // answers exactly ONE incoming hit, denying up to its cap and returning what it
 // denied to the attacker as Holy damage, plus 1 Devotion.
 //
-// Two layers are pinned: the leaf arithmetic (combat/paladin_reckoning.ts) and
+// Two layers are pinned: the leaf arithmetic (combat/paladin_debt_of_light.ts) and
 // the live path through dealDamage, because the interesting rules (one hit only,
 // return equals what was SOAKED rather than the cap or the raw blow, no charge
 // burned without an attacker) only hold if both agree.
 
 import { describe, expect, it } from 'vitest';
-import { answerReckoning, RECKONING_KIND } from '../src/sim/combat/paladin_reckoning';
+import { answerDebtOfLight, DEBT_OF_LIGHT_KIND } from '../src/sim/combat/paladin_debt_of_light';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -42,7 +42,7 @@ function attacker(sim: TestSim): Entity {
 
 function arm(sim: TestSim): void {
   sim.castAbility('faithforged_guard');
-  expect(sim.player.auras.some((a) => a.kind === RECKONING_KIND)).toBe(true);
+  expect(sim.player.auras.some((a) => a.kind === DEBT_OF_LIGHT_KIND)).toBe(true);
 }
 
 function hit(sim: TestSim, from: Entity, amount: number): void {
@@ -57,20 +57,20 @@ function hit(sim: TestSim, from: Entity, amount: number): void {
   );
 }
 
-describe('Reckoning: the arithmetic', () => {
+describe('Debt of Light: the arithmetic', () => {
   it('denies up to the cap and owes back exactly what it denied', () => {
-    expect(answerReckoning(CAP, 90, true)).toEqual({ soaked: 90 });
-    expect(answerReckoning(CAP, 400, true)).toEqual({ soaked: CAP });
+    expect(answerDebtOfLight(CAP, 90, true)).toEqual({ soaked: 90 });
+    expect(answerDebtOfLight(CAP, 400, true)).toEqual({ soaked: CAP });
   });
 
   it('answers nothing without an attacker, without damage, or without a cap', () => {
-    expect(answerReckoning(CAP, 90, false)).toBeNull();
-    expect(answerReckoning(CAP, 0, true)).toBeNull();
-    expect(answerReckoning(0, 90, true)).toBeNull();
+    expect(answerDebtOfLight(CAP, 90, false)).toBeNull();
+    expect(answerDebtOfLight(CAP, 0, true)).toBeNull();
+    expect(answerDebtOfLight(0, 90, true)).toBeNull();
   });
 });
 
-describe('Reckoning: the live path', () => {
+describe('Debt of Light: the live path', () => {
   it('denies the blow, returns it to the attacker, and banks 1 Devotion', () => {
     const sim = makeRetribution();
     const wolf = attacker(sim);
@@ -86,7 +86,7 @@ describe('Reckoning: the live path', () => {
     // ...and the same 90 went back to the wolf.
     expect(wolfHpBefore - wolf.hp).toBe(90);
     expect(sim.player.paladinDevotion?.value).toBe(devotionBefore + 1);
-    expect(sim.player.auras.some((a) => a.kind === RECKONING_KIND)).toBe(false);
+    expect(sim.player.auras.some((a) => a.kind === DEBT_OF_LIGHT_KIND)).toBe(false);
   });
 
   it('caps what it denies, so an oversized blow still lands the remainder', () => {
@@ -137,6 +137,6 @@ describe('Reckoning: the live path', () => {
     );
 
     expect(sim.player.maxHp - sim.player.hp).toBe(40);
-    expect(sim.player.auras.some((a) => a.kind === RECKONING_KIND)).toBe(true);
+    expect(sim.player.auras.some((a) => a.kind === DEBT_OF_LIGHT_KIND)).toBe(true);
   });
 });

@@ -627,7 +627,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "faithforged_guard",
-        "name": "Reckoning"
+        "name": "Debt of Light"
       },
       {
         "id": "hammer_of_wrath",

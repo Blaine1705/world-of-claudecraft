@@ -489,7 +489,7 @@ describe('Paladin core abilities', () => {
       { type: 'aoeDamage', min: 99, max: 126, radius: 10, softCap: 5 },
     ]);
     expect(resolve(retribution, 'faithforged_guard').effects).toEqual([
-      { type: 'selfBuff', kind: 'paladin_reckoning', value: 210, duration: 8 },
+      { type: 'selfBuff', kind: 'paladin_debt_of_light', value: 210, duration: 8 },
     ]);
     expect(resolve(retribution, 'hammer_of_wrath').effects).toEqual([
       { type: 'directDamage', min: 234, max: 281 },
