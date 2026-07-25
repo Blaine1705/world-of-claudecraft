@@ -34,7 +34,8 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
       (a) => a.def.id === 'retribution_aura',
     );
     const baseThorns = base?.effects.find((e) => e.type === 'buffTarget' && e.kind === 'thorns');
-    expect(baseThorns && 'value' in baseThorns ? baseThorns.value : null).toBe(5);
+    // Rank 3 at level 20 (the aura ranks 5 -> 12 -> 22 at levels 7, 13 and 18).
+    expect(baseThorns && 'value' in baseThorns ? baseThorns.value : null).toBe(22);
 
     const retMods = computeTalentModifiers(
       'paladin',
@@ -45,8 +46,8 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
       (a) => a.def.id === 'retribution_aura',
     );
     const retThorns = ret?.effects.find((e) => e.type === 'buffTarget' && e.kind === 'thorns');
-    // 5 * 1.2 (ret meleeDmgPct 0.2) = 6, not 5 (the pre-fix regression left it at 5).
-    expect(retThorns && 'value' in retThorns ? retThorns.value : null).toBe(6);
+    // 22 * 1.2 (ret meleeDmgPct 0.2) = 26, not 22 (the pre-fix regression left it unscaled).
+    expect(retThorns && 'value' in retThorns ? retThorns.value : null).toBe(26);
   });
 
   it('Resolve Unbroken strengthens its stat buff via buffPct, not the buff-exempt dmgPct', () => {
