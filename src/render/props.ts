@@ -103,7 +103,7 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   columnBroken: { url: '/models/props/column_broken.glb', kit: 'nature' },
   statueHead: { url: '/models/props/statue_head.glb', kit: 'nature' },
   statueBlock: { url: '/models/props/statue_block.glb', kit: 'nature' },
-  marshReeds: { url: '/models/foliage/reeds.glb', kit: 'nature' },
+  marshReeds: { url: '/models/props/reeds.glb', kit: 'nature' },
   dockPlatform: { url: '/models/props/dock_platform.glb', kit: 'pirate' },
   rowboat: { url: '/models/props/rowboat.glb', kit: 'pirate' },
   graveRound: { url: '/models/props/gravestone_round.glb', kit: 'grave' },
@@ -1001,9 +1001,15 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     registerHideable(g, circleFootprint(t.x, t.z, 1.5 * t.scale, y + 3.4 * t.scale, 3.0 * t.scale));
   }
 
-  // ---- reeds: marsh vegetation along shallow water edge (Deepfen Shallows) ---
+  // ---- reeds: marsh vegetation along the shallow water edge, hideable -------
+  // A clump stands ~3 yards tall and carries no collider, so the player walks
+  // straight into it and the third-person boom ends up inside an opaque blob.
+  // registerHideable ghosts it only while the eye-to-camera segment crosses the
+  // footprint (walking up to it leaves it fully visible) and keeps it casting a
+  // shadow, the same treatment tents, crates and trees already get.
   getActiveWorldContent().props.marshReeds.forEach(([x, z], i) => {
     const kind: PropKey = 'marshReeds';
+    const a = propAsset(kind);
     const s = 3.0 + propRand(x, z, i + 5) * 0.6;
     const y = ground(x, z);
     const g = new THREE.Group();
@@ -1017,6 +1023,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     });
     g.position.set(x, y - 0.05, z);
     group.add(shadowed(g));
+    const r = (Math.max(a.size.x, a.size.z) / 2) * s;
+    registerHideable(g, circleFootprint(x, z, r, y + a.size.y * s, r * 2));
   });
 
   // ---- crates: camp clutter (wooden crate / barrel mix), hideable ----------
