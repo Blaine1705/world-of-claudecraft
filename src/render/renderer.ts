@@ -154,6 +154,7 @@ import {
   nameplateScreenTransform,
 } from './nameplate_projection';
 import { facingAlpha, remoteEntityAlpha } from './net_interp_core';
+import { buildEastbrookNoticeboard } from './noticeboard';
 import {
   PALADIN_AEGIS_DOME_RADIUS,
   type PaladinAegisVisual,
@@ -186,7 +187,6 @@ import {
   type PaladinSunVerdictVisual,
   syncPaladinSunVerdictVisual,
 } from './paladin_sun_verdict_visual';
-import { buildEastbrookNoticeboard } from './noticeboard';
 import { resolveDirectPickEntityId } from './pick_resolution';
 import { PlacedAssetsView } from './placed_assets';
 import {

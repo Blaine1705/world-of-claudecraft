@@ -4,8 +4,8 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { grantDevotion } from '../src/sim/paladin_devotion';
 import { Sim } from '../src/sim/sim';
-import { groundHeight } from '../src/sim/world';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
 
 type TestSim = Sim & {
   nextId: number;
