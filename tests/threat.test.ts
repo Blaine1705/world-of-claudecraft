@@ -715,6 +715,54 @@ describe('rogue stealth', () => {
     expect(sim.player.auras.some((a) => a.id === 'stealth' && a.kind === 'stealth')).toBe(true);
     expect(sim.player.auras.some((a) => a.id === 'sprint' && a.kind === 'buff_speed')).toBe(true);
   });
+
+  it('Vanish drops hostile focus and leaves combat immediately', () => {
+    const sim = makeSim('rogue');
+    sim.setPlayerLevel(20);
+    const wolf = nearestMob(sim, 'forest_wolf');
+    wolf.level = sim.player.level;
+    beefUp(wolf);
+    wolf.wanderTarget = null;
+    teleport(sim, sim.player, wolf.pos.x + 3, wolf.pos.z);
+
+    hit(sim, sim.player, wolf, 30);
+    expect(sim.player.inCombat).toBe(true);
+    expect(wolf.threat.has(sim.player.id)).toBe(true);
+    expect(wolf.aggroTargetId).toBe(sim.player.id);
+
+    sim.castAbility('vanish');
+    expect(sim.player.auras.some((a) => a.id === 'vanish' && a.kind === 'stealth')).toBe(true);
+    expect(sim.player.inCombat).toBe(false);
+    expect(sim.player.combatTimer).toBeGreaterThanOrEqual(5);
+    expect(wolf.threat.has(sim.player.id)).toBe(false);
+    expect(wolf.aggroTargetId).not.toBe(sim.player.id);
+
+    sim.tick();
+    expect(sim.player.inCombat).toBe(false);
+  });
+
+  it('Smokestep allows out-of-combat rogue actions after escaping', () => {
+    const sim = makeSim('rogue');
+    sim.setPlayerLevel(20);
+    const wolf = nearestMob(sim, 'forest_wolf');
+    wolf.level = sim.player.level;
+    beefUp(wolf);
+    wolf.wanderTarget = null;
+    teleport(sim, sim.player, wolf.pos.x + 3, wolf.pos.z);
+
+    hit(sim, sim.player, wolf, 30);
+    sim.castAbility('vanish');
+    expect(sim.player.inCombat).toBe(false);
+    expect(sim.player.auras.some((a) => a.name === 'Smokestep' && a.kind === 'stealth')).toBe(true);
+
+    sim.targetEntity(wolf.id);
+    sim.player.resource = sim.player.maxResource;
+    sim.castAbility('sap');
+    const events = sim.tick();
+    expect(events.some((e) => e.type === 'error' && /combat/.test(e.text))).toBe(false);
+    expect(wolf.auras.some((a) => a.kind === 'incapacitate')).toBe(true);
+    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
+  });
 });
 
 describe('hunter pets', () => {
