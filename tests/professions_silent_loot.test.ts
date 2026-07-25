@@ -302,6 +302,34 @@ describe('professions grants suppress BOTH generic hub feedbacks', () => {
     expect(events[0].callerLogs).toBe(true);
   });
 
+  it('a rare+ disenchant flags its TYPED SECONDARY grants too, one per unit', () => {
+    // The worst case #2430 called out: resolveDisenchant grants the typed
+    // bind-on-trade secondary in a loop of ONE unit per call, so an epic yield
+    // used to print four lines for one action. The case above cannot see this
+    // arm at all (a common sword is sub-rare, so no secondary is rolled), which
+    // left the highest-count call site the only one unpinned at sim level.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    // A rare weapon: typedSecondaryFor resolves resonant_steel for it, so the
+    // yield is a primary PLUS at least one secondary.
+    sim.addItem('moggers_copper_cudgel', 1, pid);
+    sim.tick(); // drain the (loud) weapon grant before isolating the disenchant
+    sim.disenchantItem('moggers_copper_cudgel', pid);
+    const result = sim.lastDisenchantResult;
+    expect(result?.ok).toBe(true);
+    expect(result?.secondaryItemId).toBeTruthy();
+    expect(result?.secondaryCount).toBeGreaterThan(0);
+    const events = lootEvents(sim.tick());
+    // One event for the primary plus one PER SECONDARY UNIT: the count is the
+    // point, since every one of them has to stand down or the extra units
+    // print extra lines.
+    expect(events.length).toBe(1 + (result?.secondaryCount ?? 0));
+    for (const ev of events) {
+      expect(ev.silent).toBe(true);
+      expect(ev.callerLogs).toBe(true);
+    }
+  });
+
   // FISHING lives in tests/professions_fishing.test.ts ("landed-catch grant
   // flags (pin 11)"), which owns the Vale/Deepfen shore probes and the
   // codfather quest fixture this contract needs on both arms: the landed catch
