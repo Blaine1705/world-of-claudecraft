@@ -739,14 +739,20 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
     const def = ITEMS[itemId]!;
     // Skip-aware removal: a spared bound slot sharing this itemId must never
     // be the slot the removal walk consumes (plain removeItem cannot skip).
-    removePreferFungible(
+    // Mirrors sellItem's instance-preserving record: the sweep can catch an
+    // unbound instanced poor-quality copy (e.g. a signed junk drop) just as
+    // easily as a single sellItem sale, so it must not silently wash its
+    // payload the way a plain-only recordVendorBuyback call would.
+    const consumedInstances = removePreferFungible(
       ctx,
       itemId,
       count,
       meta.entityId,
       (instance) => instance.boundTo !== undefined,
     );
-    recordVendorBuyback(meta, itemId, count);
+    const plainCount = count - consumedInstances.length;
+    if (plainCount > 0) recordVendorBuyback(meta, itemId, plainCount);
+    for (const instance of consumedInstances) recordVendorBuyback(meta, itemId, 1, instance);
     total += def.sellValue * count;
     soldCount += count;
   }
@@ -759,12 +765,23 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
   });
 }
 
-export function buyBackItem(ctx: SimContext, itemId: string, pid?: number): void {
+// `index` addresses the exact row the client clicked (its position in
+// meta.vendorBuyback, mirrored to the client verbatim as VendorView.buyback[].index).
+// Rows with the same itemId are no longer interchangeable once an instanced
+// (masterwork/signed) sale and a plain sale can coexist: the buyback list is
+// keyed by canStackInstancePayloads (recordVendorBuyback), so a plain
+// itemId-only lookup could silently redeem the wrong copy (a signed row when
+// the player clicked the plain one, or vice versa). A missing/stale index
+// (older client message, or the row moved under a concurrent action) falls
+// back to the first itemId match, same as before.
+export function buyBackItem(ctx: SimContext, itemId: string, index?: number, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
-  const slot = meta.vendorBuyback.find((s) => s.itemId === itemId);
+  const indexed = index !== undefined ? meta.vendorBuyback[index] : undefined;
+  const slot =
+    indexed?.itemId === itemId ? indexed : meta.vendorBuyback.find((s) => s.itemId === itemId);
   if (!def || !slot || slot.count <= 0) {
     ctx.error(meta.entityId, 'That item is not available for buyback.');
     return;

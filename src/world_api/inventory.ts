@@ -32,5 +32,8 @@ export interface IWorldInventory {
   // Sell every gray (poor-quality) item in the bags at once while a vendor is open.
   // Quest items and anything flagged noVendorSell are left untouched.
   sellAllJunk(): void;
-  buyBackItem(itemId: string): void;
+  // `index` addresses the exact row in vendorBuyback the player clicked
+  // (VendorView.buyback[].index); rows can share an itemId with different
+  // instance payloads, so the index disambiguates which copy comes back.
+  buyBackItem(itemId: string, index?: number): void;
 }

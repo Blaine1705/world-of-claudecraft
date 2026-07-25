@@ -1052,9 +1052,10 @@ export function seedItemDiscovery(ctx: SimContext, meta: PlayerMeta): void {
     if (bagId) markItemDiscovered(ctx, meta, bagId);
   }
   for (const slot of meta.vendorBuyback) {
-    // Buyback entries persist bare {itemId, count} today, but the rolled
-    // quality rides along like the sibling loops so a future instance payload
-    // cannot silently under-credit quality-first discoveries.
+    // Buyback entries can carry an instance payload (masterwork/signed sales,
+    // #2398); the rolled quality rides along like the sibling loops so
+    // quality-first discovery credit is never under-counted for a row that
+    // preserved its instance.
     markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality);
   }
 }

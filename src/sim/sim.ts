@@ -7002,8 +7002,8 @@ export class Sim {
     items.sellAllJunk(this.ctx, pid);
   }
 
-  buyBackItem(itemId: string, pid?: number): void {
-    items.buyBackItem(this.ctx, itemId, pid);
+  buyBackItem(itemId: string, index?: number, pid?: number): void {
+    items.buyBackItem(this.ctx, itemId, index, pid);
   }
 
   // Gather-node harvest (#1121): a thin delegate onto

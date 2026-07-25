@@ -1031,7 +1031,7 @@ describe('food, drink, vendor', () => {
     teleportTo(sim2, wilkes2.pos.x + 2, wilkes2.pos.z);
 
     expect(sim2.meta(pid2)?.vendorBuyback).toEqual([{ itemId: 'apprentice_staff', count: 1 }]);
-    sim2.buyBackItem('apprentice_staff', pid2);
+    sim2.buyBackItem('apprentice_staff', undefined, pid2);
     expect(sim2.countItem('apprentice_staff', pid2)).toBe(1);
     expect(sim2.meta(pid2)?.vendorBuyback).toEqual([]);
   });
