@@ -160,7 +160,9 @@ describe('standardized percent raid buffs', () => {
     const sim = makeWorld();
     const pal = sim.addPlayer('paladin', 'Pal');
     const ally = sim.addPlayer('warrior', 'War');
-    sim.setPlayerLevel(2, pal);
+    // Bastion Devotion is the level 4 aura of the overhauled kit, so the caster
+    // has to be past that to know it at all.
+    sim.setPlayerLevel(4, pal);
     formParty(sim, pal, [ally]);
     const armorBefore = sim.entities.get(ally)!.stats.armor;
     ready(sim, pal);
