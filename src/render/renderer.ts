@@ -4226,7 +4226,6 @@ export class Renderer {
     this.post.screenFlash(0.12 * strength);
   }
 
-
   // A golden pillar bursts up off a fighter who just locked in an augment.
   fiestaAugmentBurst(entityId: number): void {
     this.vfx.levelUpPillar(entityId);
