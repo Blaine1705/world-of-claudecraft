@@ -5135,6 +5135,28 @@
   #ctx-menu .ctx-item-meta .ctx-reagent.unsat {
     color: var(--color-text-error);
   }
+  /* The DESTRUCTIVE meta sub-line in the Apply Enchant target picker: a row
+     whose activation will destroy an existing enchant ("Replaces X") must not
+     render in the same muted style as the purely informational Worn / Not
+     enchanted tags beside it. Same warning token as the reagent shortfall
+     above, never a literal hex, and redundant by construction: the tag names
+     the doomed enchant in words, and the row still confirm-gates. The leading
+     rule is what carries the weight at 11px, where a tint alone is thin. */
+  #ctx-menu .ctx-item-meta.ctx-item-danger {
+    color: var(--color-text-error);
+    border-inline-start: 2px solid var(--color-text-error);
+    padding-inline-start: 6px;
+  }
+  /* The forced palette replaces every author color, so the warning tint stops
+     carrying the distinction. Restore a NON-COLOR cue (the #tf-name.hostile
+     precedent) and stamp the rule in a system color so the row still reads as
+     the heavier one. */
+  @media (forced-colors: active) {
+    #ctx-menu .ctx-item-meta.ctx-item-danger {
+      border-inline-start-color: CanvasText;
+      text-decoration: underline;
+    }
+  }
   /* What the enchant actually DOES, inline on the row above the meta line: the
      picker also lives on touch, where there is no hover to reveal it. Green,
      matching the item tooltip's own bonus stat lines (the same

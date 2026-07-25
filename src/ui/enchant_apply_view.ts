@@ -9,8 +9,10 @@
 // place and needs no unequip / re-equip round trip. Not-yet-enchanted copies
 // are plain targets; already-enchanted copies surface as FLAGGED replace rows
 // (#2415) whose activation is confirm-gated by the thin consumer, each
-// carrying what the confirm dialog must name (the doomed enchant id, or a
-// legacy victim's raw stats). The enchant content is static
+// carrying what the confirm dialog must name: the doomed enchant id (or a
+// legacy victim's raw stats), plus what the swap does NOT destroy
+// (preservedReplaceTraits, #2421) and whether the row shares its item name with
+// a plain twin (mixedHolding, #2421). The enchant content is static
 // (content/enchants.ts, identical in both worlds), so both steps are a plain
 // read of world.inventory; no wire round trip. enchant_apply_view never
 // decides an outcome: world.applyEnchant does, server-authoritative.
@@ -199,6 +201,73 @@ export function enchantSectionsForReagent(
   return sections;
 }
 
+/** One per-copy fact that SURVIVES a replace untouched (#2421). The sim's
+ *  replace payload (professions/enchanting.ts replacedEnchantPayloadFor) clones
+ *  the victim and rewrites only `rolled.stats` and the `enchant` marker, so
+ *  every other ItemInstancePayload field rides through byte-identical. The
+ *  confirm dialog states these because the likeliest user of that dialog is
+ *  holding a signed masterwork piece and cannot otherwise tell whether their
+ *  signature and masterwork bonus survive the swap. */
+export type EnchantPreservedTrait = 'signer' | 'masterwork' | 'bond';
+
+/** The localized label key for one preserved trait: its first render sink, the
+ *  enchantNameKey contract. `bond` deliberately covers BOTH bind states with
+ *  one label: an armed lock and an applied one are the same Maker's Bond, and
+ *  this dialog states what the swap leaves alone, not which state the bond is
+ *  currently in (the item tooltip's commissionBound / commissionUnbound lines
+ *  own that). One label also keeps the confirm speaking the commission
+ *  vocabulary the tooltip and the unbind window already use, instead of
+ *  surfacing the raw ItemInstancePayload field names as player copy. */
+const PRESERVED_TRAIT_KEYS: Record<EnchantPreservedTrait, TranslationKey> = {
+  signer: 'hudChrome.enchanting.replaceConfirmKeepsSigner',
+  masterwork: 'hudChrome.enchanting.replaceConfirmKeepsMasterwork',
+  bond: 'hudChrome.enchanting.replaceConfirmKeepsBond',
+};
+
+/** Every trait, in the order preservedReplaceTraits emits them. Exported so a
+ *  test can sweep the real union instead of hand-copying it and silently
+ *  missing a member added later. */
+export const ENCHANT_PRESERVED_TRAITS: readonly EnchantPreservedTrait[] = [
+  'signer',
+  'masterwork',
+  'bond',
+];
+
+export function preservedTraitKey(trait: EnchantPreservedTrait): TranslationKey {
+  return PRESERVED_TRAIT_KEYS[trait];
+}
+
+/** Which of the surviving facts `victim` ACTUALLY carries, in one fixed order
+ *  (signature, masterwork, bond), so a plain victim is never told its signature
+ *  is safe. Either bind field reports the one `bond` trait: `bindOnTrade` arms
+ *  the lock and `boundTo` is the lock applied, and the swap leaves both alone,
+ *  so the dialog has one thing to say either way.
+ *
+ *  `wireTrimmed` marks a victim read off the WORN mirror. The public `eqi` wire
+ *  carries signer/enchant/rolled ONLY (server/game.ts data minimization, the
+ *  same trim wornTooltipInstance applies), so an online client cannot see a worn
+ *  copy's boundTo/bindOnTrade while the offline Sim holds the full payload.
+ *  Dropping the bond on that arm is what keeps the two hosts saying the same
+ *  thing; the bond is a bag-surface fact by construction, and the item tooltip
+ *  already goes silent about it on worn gear for exactly this reason.
+ *
+ *  ACCEPTED CONSEQUENCE: the bond DOES survive a worn replace (the sim clones
+ *  the payload whole), so this arm under-states rather than lying. Saying more
+ *  would need boundTo/bindOnTrade on the eqi wire, which is a server data-
+ *  minimization change well outside a picker fix; the trim is pinned by
+ *  tests/enchant_apply_view.test.ts so widening the wire re-opens this. */
+export function preservedReplaceTraits(
+  victim: ItemInstancePayload,
+  wireTrimmed = false,
+): EnchantPreservedTrait[] {
+  const traits: EnchantPreservedTrait[] = [];
+  if (victim.signer !== undefined) traits.push('signer');
+  if (victim.rolled?.masterwork === true) traits.push('masterwork');
+  if (wireTrimmed) return traits;
+  if (victim.boundTo !== undefined || victim.bindOnTrade === true) traits.push('bond');
+  return traits;
+}
+
 /** The replace facts one flagged target row carries (#2415), everything the
  *  confirm dialog needs to name what is being destroyed BEFORE the command is
  *  sent. Marker victims carry the doomed enchant's id; LEGACY pre-marker
@@ -213,6 +282,11 @@ export interface EnchantReplaceTargetInfo {
   /** The picked enchant is already on the victim: the row paints DISABLED (a
    *  confirm whose accept the sim denies same_enchant is never offered). */
   sameEnchant: boolean;
+  /** What the swap does NOT destroy (#2421), in preservedReplaceTraits order.
+   *  ABSENT, never an empty array, when the victim carries none of them: the
+   *  thin consumer paints the kept line only when there is something true to
+   *  say. */
+  preserved?: EnchantPreservedTrait[];
 }
 
 /** The replace facts for one already-enchanted victim payload, or undefined
@@ -223,12 +297,24 @@ export interface EnchantReplaceTargetInfo {
 function replaceInfoFor(
   victim: ItemInstancePayload,
   enchantId: string,
+  wireTrimmed = false,
 ): EnchantReplaceTargetInfo | undefined {
+  const preserved = preservedReplaceTraits(victim, wireTrimmed);
   if (victim.enchant !== undefined) {
     if (!ENCHANTS[victim.enchant]) return undefined;
-    return { enchantId: victim.enchant, sameEnchant: victim.enchant === enchantId };
+    const info: EnchantReplaceTargetInfo = {
+      enchantId: victim.enchant,
+      sameEnchant: victim.enchant === enchantId,
+    };
+    if (preserved.length > 0) info.preserved = preserved;
+    return info;
   }
-  return { stats: { ...victim.rolled?.stats }, sameEnchant: false };
+  const info: EnchantReplaceTargetInfo = {
+    stats: { ...victim.rolled?.stats },
+    sameEnchant: false,
+  };
+  if (preserved.length > 0) info.preserved = preserved;
+  return info;
 }
 
 export interface EnchantTargetRow {
@@ -242,6 +328,23 @@ export interface EnchantTargetRow {
    *  replaceVictimIndex choice), so what the dialog names is exactly what a
    *  confirmed apply destroys. */
   replace?: EnchantReplaceTargetInfo;
+  /** Set on BOTH rows of a MIXED HOLDING (#2421): one item id held plain AND
+   *  already enchanted, the only case this function emits two rows for ONE item
+   *  id. ABSENT, never false, everywhere else. The thin consumer tags the plain
+   *  twin from this, so the pair is told apart by what each row SAYS rather than
+   *  by one of them having a sub-line and the other not, which is the whole of
+   *  the distinction a screen reader gets otherwise.
+   *
+   *  NOT a general duplicate-NAME flag, and deliberately not claimed as one:
+   *  itemDisplayName resolves a heroic variant to its base item's name
+   *  (entity_i18n, classic behavior), so a base and its heroic twin are two
+   *  DIFFERENT ids that still render one string. Keying on the rendered name
+   *  would need the name resolver in this core and a discriminator the picker
+   *  does not have today (the heroic mark lives on the tooltip's quality line),
+   *  so that collision predates this change and stays open; see the follow-up
+   *  issue. tests/enchant_apply_view.test.ts pins the limit so it cannot be
+   *  mistaken for coverage. */
+  mixedHolding?: true;
 }
 
 /** The distinct held items eligible as the enchant target: def slot matches the
@@ -280,6 +383,15 @@ export function enchantTargets(
     if (!replace) continue;
     rows.push({ itemId, count, replace });
   }
+  // Mark the mixed holdings (#2421) once both families are in, so the flag
+  // reflects the rows actually EMITTED: an enchanted copy the picker dropped
+  // (an unresolvable marker id) leaves its plain twin unambiguous and unmarked.
+  const mixed = new Set(
+    rows
+      .filter((row) => row.replace !== undefined && byItem.has(row.itemId))
+      .map((row) => row.itemId),
+  );
+  for (const row of rows) if (mixed.has(row.itemId)) row.mixedHolding = true;
   return rows;
 }
 
@@ -324,7 +436,11 @@ export function wornEnchantTargets(
     if (!def || def.slot !== enchant.itemSlot) continue;
     const instance = equippedInstances[slot];
     if (instance && isEnchantedInstance(instance)) {
-      const replace = replaceInfoFor(instance, enchantId);
+      // wireTrimmed: this arm reads the WORN mirror, whose online form is the
+      // stripped eqi allowlist (signer/enchant/rolled). See
+      // preservedReplaceTraits: claiming a bind state here would make the
+      // confirm dialog say different things offline and online.
+      const replace = replaceInfoFor(instance, enchantId, true);
       if (replace) rows.push({ itemId, slot, replace });
       continue;
     }
