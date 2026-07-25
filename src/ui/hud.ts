@@ -39,6 +39,7 @@ import { resolveActiveWeaponSkin } from '../sim/content/weapon_skin_rules';
 import type { ZoneDef } from '../sim/data';
 import {
   ABILITIES,
+  ALL_RECIPES,
   CLASSES,
   DELVE_LIST,
   DELVES,
@@ -234,6 +235,7 @@ import {
   buildGatheringProficiencyRows,
   gatherDeniedLineKey,
   gatherDowngradeLineKey,
+  gatherRareTierFor,
   gatherToolNoNodeKey,
 } from './gathering_view';
 import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
@@ -9142,13 +9144,18 @@ export class Hud {
             /^.+ was not assigned and is free for all\.$/.test(ev.text)
           )
             this.lootRolls.closeForItem(ev.text);
-          if (
-            ev.text.includes('loot') ||
-            ev.text.includes('Sold') ||
-            ev.text.includes('Bought back')
-          )
-            audio.coin();
-          else audio.lootItem();
+          // silent: a professions grant (gather/craft/enchant) with its own
+          // dedicated cue for this same grant sets this so the generic ding
+          // doesn't stack on top of it; the text line above still prints.
+          if (!ev.silent) {
+            if (
+              ev.text.includes('loot') ||
+              ev.text.includes('Sold') ||
+              ev.text.includes('Bought back')
+            )
+              audio.coin();
+            else audio.lootItem();
+          }
           if ($('#bags').style.display !== 'none') this.renderBags();
           break;
         }
@@ -9162,7 +9169,12 @@ export class Hud {
             const item = ITEMS[ev.itemId];
             const name = item ? itemDisplayName(item) : ev.itemId;
             this.log(t('hudChrome.crafting.craftedToast', { name }), '#7fdc4f');
-            audio.lootItem();
+            const recipe = ALL_RECIPES.find((r) => r.id === ev.recipeId);
+            audio.craftSuccess(recipe?.professionId ?? '');
+            // Masterwork layers alongside the family cue above, never replaces
+            // it: craftResult.masterwork mirrors the standalone 'masterwork'
+            // event (see src/sim/types.ts), so this one check covers both.
+            if (ev.masterwork) audio.masterwork();
           } else if (!ev.ok) {
             // station_required names WHICH station: no station field
             // rides the event, the type resolves from the recipe content
@@ -9325,12 +9337,14 @@ export class Hud {
         case 'gatherResult': {
           // Harvest feedback line (Professions 2.0), colored by rolled
           // material rarity. Identical on every graphics tier (player feedback
-          // is never profile-gated). The grant hub's own 'loot' event already
-          // prints the "You receive:" line and plays the loot cue, so this
-          // line uses distinct gather wording; the strike cue is
-          // the physical pick/axe/sickle impact of the completed gather cast,
-          // not a second loot notification, with a rare variant for a rare+
-          // material or a rare-event roll.
+          // is never profile-gated). The grant hub's own 'loot' event still
+          // prints the "You receive:" line (distinct gather wording here so
+          // the two lines never look like a duplicate), but the loot event is
+          // emitted silent for a gather grant (see gathering.ts harvestNode)
+          // specifically so it doesn't stack with the dedicated node-type cue
+          // below. The node-type impact always plays; a rare-or-better
+          // material roll (or any rare-event roll) layers one additional
+          // tiered stinger on top, never a replacement for the impact.
           const item = ITEMS[ev.itemId];
           const name = item ? itemDisplayName(item) : ev.itemId;
           this.log(
@@ -9342,14 +9356,9 @@ export class Hud {
               : t('hudChrome.gathering.gatherLine', { name }),
             QUALITY_COLOR[ev.rarity],
           );
-          if (
-            ev.rareEvent !== null ||
-            ev.rarity === 'rare' ||
-            ev.rarity === 'epic' ||
-            ev.rarity === 'legendary'
-          )
-            audio.gatherRare();
-          else audio.gatherStrike();
+          audio.gather(ev.nodeType);
+          const gatherRareTier = gatherRareTierFor(ev.rarity, ev.rareEvent);
+          if (gatherRareTier) audio.gatherRareTier(gatherRareTier);
           break;
         }
         case 'gatherDenied': {
@@ -9389,8 +9398,10 @@ export class Hud {
           const toast = disenchantResultToast(ev);
           const item = ITEMS[ev.itemId];
           const params = { item: item ? itemDisplayName(item) : ev.itemId };
-          if (toast.sink === 'log') this.log(t(toast.key, params), '#7fdc4f');
-          else this.showError(t(toast.key));
+          if (toast.sink === 'log') {
+            this.log(t(toast.key, params), '#7fdc4f');
+            audio.disenchant();
+          } else this.showError(t(toast.key));
           break;
         }
         case 'salvageResult': {
@@ -9399,8 +9410,10 @@ export class Hud {
           const toast = salvageResultToast(ev);
           const item = ITEMS[ev.itemId];
           const params = { item: item ? itemDisplayName(item) : ev.itemId };
-          if (toast.sink === 'log') this.log(t(toast.key, params), '#7fdc4f');
-          else this.showError(t(toast.key));
+          if (toast.sink === 'log') {
+            this.log(t(toast.key, params), '#7fdc4f');
+            audio.salvage();
+          } else this.showError(t(toast.key));
           break;
         }
         case 'enchantResult': {
@@ -9417,6 +9430,7 @@ export class Hud {
               }),
               '#7fdc4f',
             );
+            audio.enchant();
           } else {
             this.showError(t(toast.key));
           }
@@ -10413,10 +10427,12 @@ export class Hud {
           break;
         case 'castStart':
           // cast-loop SFX is spatial now (see playEventSfx); the profession
-          // casts (Professions 2.0) add a personal placeholder cue
-          // at cast start, feedback-gated like other notification cues.
+          // casts (Professions 2.0) add a personal cue at cast start,
+          // feedback-gated like other notification cues. Gathering's cue
+          // branches by node type (a pickaxe/axe/knife tool-out sound);
+          // ev.gatherNodeType is only set on a gather cast (see gathering.ts).
           if (ev.entityId === sim.playerId) {
-            if (ev.ability === GATHER_CAST_ID) audio.gatherCast();
+            if (ev.ability === GATHER_CAST_ID) audio.gatherCast(ev.gatherNodeType);
             else if (ev.ability === FISHING_CAST_ID) audio.fishCast();
           }
           break;
