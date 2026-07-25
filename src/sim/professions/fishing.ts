@@ -290,6 +290,15 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   // Book of Deeds: a real fish (never weeds or boots) from this zone's
   // waters feeds the per-zone first-cast mark.
   onFishCaughtForDeeds(ctx, meta, zoneAt(p.pos.z).id, caught);
+  // Character XP: fishing deliberately grants NONE, on every branch above and
+  // below. It is the only UNCAPPED gathering faucet (a catch needs no node and
+  // no per-player respawn timer), so at the per-action XP a world-node harvest
+  // pays it would be worth several times the XP per hour of every other
+  // gathering profession. The sim's five grantXp sites (mob kill, quest
+  // turn-in, delve clear, craft, and the node harvest in gathering.ts) do not
+  // include this file, and that absence is the design, not an oversight:
+  // fishing pays fishing proficiency and loot, never levels. Recorded in
+  // docs/design/professions-tuning-packet.md.
   // Fishing proficiency: a landed catch accrues the fractional
   // schedule amount (fishingCatchGain above, junk cut off past band 0) through
   // the shared gathering-grant queue, draining on the tick path exactly like a

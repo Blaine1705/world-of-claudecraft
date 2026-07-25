@@ -820,6 +820,14 @@ const PET_MODE_DESC_KEYS: Record<PetMode, TranslationKey> = {
   aggressive: 'hud.pet.aggressiveDesc',
 };
 type ItemQuality = NonNullable<ItemDef['quality']>;
+/** The visual language the shared #banner slot paints in. 'default' is the
+ *  bare gold celebration text every milestone has always used (level up, zone
+ *  crossing, craft masterwork, duel result). 'deed' is the Book of Deeds
+ *  plate: a framed, quieter parchment treatment, because a deed accomplishment
+ *  firing an identical gold banner to a real level-up is a documented cause of
+ *  players reading routine gathering progress as leveling
+ *  (docs/design/professions-tuning-packet.md, phase 0). */
+type BannerVariant = 'default' | 'deed';
 const ITEM_SLOT_LABEL_KEYS: Record<ItemSlot, TranslationKey> = {
   mainhand: 'itemUi.slots.mainhand',
   offhand: 'itemUi.slots.offhand',
@@ -10688,7 +10696,13 @@ export class Hud {
     }
     if (plan.bannerId !== null) {
       const bannerText = t('hudChrome.deeds.unlockedBanner', { name: deedName(plan.bannerId) });
-      this.showBanner(bannerText);
+      // The 'deed' variant, NOT the shared gold level-up treatment: an early
+      // character trips three or more deeds in its first five gathering
+      // actions, and an identical banner made those read as levels
+      // (docs/design/professions-tuning-packet.md, phase 0). Copy, lifetime
+      // and the announcer push below are untouched: this is presentation
+      // only, never information.
+      this.showBanner(bannerText, true, undefined, 'deed');
       // The banner div carries no live semantics and the chat log is
       // deliberately aria-live off, so the polite #combat-live region is what
       // a screen reader hears (the throttled self-note precedent above).
@@ -11420,7 +11434,12 @@ export class Hud {
     }
   }
 
-  showBanner(text: string, motion = true, decorativeIconUrl?: string): void {
+  showBanner(
+    text: string,
+    motion = true,
+    decorativeIconUrl?: string,
+    variant: BannerVariant = 'default',
+  ): void {
     const copy = document.createElement('span');
     copy.className = 'banner-copy';
     copy.textContent = text;
@@ -11433,6 +11452,10 @@ export class Hud {
       this.bannerEl.replaceChildren(copy);
     }
     this.bannerEl.classList.toggle('banner-with-art', Boolean(decorativeIconUrl));
+    // The banner is ONE reused element, so every variant class must be
+    // toggled off as well as on: the next unrelated banner through this slot
+    // would otherwise inherit the previous one's visual language.
+    this.bannerEl.classList.toggle('banner-deed', variant === 'deed');
     // Reduced-motion celebrations (craft plan.motion) show and hide the
     // banner without the fade transition: identical text and duration, no
     // animation. Motion-trimming only; information always survives.

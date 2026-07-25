@@ -239,11 +239,58 @@ describe('buildGatheringProficiencyRows', () => {
     const world = makeWorld({ proficiency: { mining: 12, logging: 4, herbalism: 0 } });
     const rows = buildGatheringProficiencyRows(world);
     expect(rows).toEqual([
-      { professionId: 'mining', value: 12, displayValue: 12 },
-      { professionId: 'logging', value: 4, displayValue: 4 },
-      { professionId: 'herbalism', value: 0, displayValue: 0 },
-      { professionId: 'fishing', value: 0, displayValue: 0 },
+      { professionId: 'mining', value: 12, displayValue: 12, maxSkill: 100 },
+      { professionId: 'logging', value: 4, displayValue: 4, maxSkill: 100 },
+      { professionId: 'herbalism', value: 0, displayValue: 0, maxSkill: 100 },
+      { professionId: 'fishing', value: 0, displayValue: 0, maxSkill: 200 },
     ]);
+  });
+
+  it('carries the per-profession content cap so a readout can render a denominator', () => {
+    // Phase 0 of the professions tuning packet: a bare integer that moves +1
+    // per harvest is what reads as a character level. Every row carries its
+    // own cap, and fishing's 200 is NOT the 100 the other three share, so a
+    // readout can never print one profession's bar against another's ceiling.
+    const rows = buildGatheringProficiencyRows(makeWorld({ proficiency: { mining: 12 } }));
+    expect(rows.map((r) => [r.professionId, r.maxSkill])).toEqual([
+      ['mining', 100],
+      ['logging', 100],
+      ['herbalism', 100],
+      ['fishing', 200],
+    ]);
+    for (const row of rows) {
+      expect(row.maxSkill).toBe(GATHERING_PROFESSIONS[row.professionId].maxSkill);
+    }
+  });
+
+  it('sources the cap from content, ignoring an absent or malformed wire maxSkill', () => {
+    // The cap comes from GATHERING_PROFESSIONS, not the per-row wire value,
+    // precisely so a missing or garbage skills row degrades to "0 / 100"
+    // rather than a nonsense "0 / 0" or "0 / undefined". mining carries a
+    // deliberately wrong wire cap and logging a zero one; herbalism and
+    // fishing carry no wire row at all.
+    const world = {
+      player: { pos: { x: 0, z: 0 } },
+      inventory: [],
+      nodeHarvestableByMe: () => true,
+      professionsState: {
+        skills: [
+          { professionId: 'mining', skill: 12, maxSkill: 7777 },
+          { professionId: 'logging', skill: 3, maxSkill: 0 },
+        ],
+      },
+    } as unknown as IWorld;
+    const rows = buildGatheringProficiencyRows(world);
+    expect(rows.map((r) => [r.professionId, r.maxSkill])).toEqual([
+      ['mining', 100],
+      ['logging', 100],
+      ['herbalism', 100],
+      ['fishing', 200],
+    ]);
+    // The values themselves still come off the wire, so the cap swap did not
+    // quietly detach the readout from the player's real proficiency.
+    expect(rows.find((r) => r.professionId === 'mining')?.displayValue).toBe(12);
+    expect(rows.find((r) => r.professionId === 'logging')?.displayValue).toBe(3);
   });
 
   it('display-floors a fractional proficiency, never rounding a threshold forward', () => {

@@ -158,6 +158,39 @@ describe('hud wiring', () => {
     expect(body.match(/audio\.achievement/g)?.length).toBe(1);
   });
 
+  it("paints the earned moment in the deed variant, not the level-up's gold banner", () => {
+    // Phase 0 of the professions tuning packet: a deed unlock used to fire the
+    // level-up's exact banner, and an early character trips several deeds in
+    // its first few gathering actions, so the two moments were unreadable
+    // apart. The variant is presentation only: same copy, same lifetime, and
+    // the announcer push stays (information is never gated on a visual).
+    const start = hud.indexOf('private handleDeedUnlocks(');
+    const body = hud.slice(start, hud.indexOf('log(text: string', start));
+    expect(body).toContain("this.showBanner(bannerText, true, undefined, 'deed');");
+    expect(body).toContain('this.combatAnnouncer.push(bannerText, performance.now());');
+  });
+
+  it('gives the deed banner its own plate in CSS, on desktop and touch', () => {
+    const hudCss = read('../src/styles/hud.css');
+    const hudMobileCss = read('../src/styles/hud.mobile.css');
+    const tokensCss = read('../src/styles/tokens.css');
+    // A framed plate in its own colour, never the bare --gold level-up text.
+    expect(hudCss).toMatch(/#banner\.banner-deed[\s\S]*?color:\s*var\(--color-deed-banner-text\)/);
+    expect(hudCss).toMatch(
+      /#banner\.banner-deed[\s\S]*?border:[^;]*var\(--color-deed-banner-border\)/,
+    );
+    expect(hudCss).toMatch(
+      /#banner\.banner-deed[\s\S]*?background:\s*var\(--color-deed-banner-bg\)/,
+    );
+    // Colours are tokens, never literals at the use site.
+    expect(tokensCss).toContain('--color-deed-banner-text:');
+    expect(tokensCss).toContain('--color-deed-banner-border:');
+    expect(tokensCss).toContain('--color-deed-banner-bg:');
+    // The plate is sized for touch in BOTH mobile blocks (the landscape media
+    // query restates the whole #banner block, so one rule would be won back).
+    expect(hudMobileCss.match(/body\.mobile-touch #banner\.banner-deed/g)?.length).toBe(2);
+  });
+
   it('announces the unlock and the retro summary through the polite #combat-live region', () => {
     // The banner div carries no live semantics and the chat log is aria-live
     // off, so BOTH earned-moment texts route through the throttled combat

@@ -16,6 +16,13 @@
   :root {
     --gold: #ffd100;
     --gold-dim: #c8a838;
+    /* The deed-unlock banner plate (#banner.banner-deed). Echoes the Book of
+       Deeds card and renown chip so the earned moment and the window that
+       records it read as one family, and so a deed can never be mistaken for
+       the bare --gold level-up banner they used to share. */
+    --color-deed-banner-text: #ffe27a;
+    --color-deed-banner-border: #b8902a;
+    --color-deed-banner-bg: rgb(26 21 12 / 92%);
     --border: #6f5a2a;
     /* --panel-base is the single themeable frame colour; --panel-bg derives the
        shipped gradient from it (overwritten wholesale by the theme system). */

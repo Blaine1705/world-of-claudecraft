@@ -159,7 +159,12 @@ interface CraftCelebrationHudHarness {
     masterworkItemId: string | null,
     tierUps: { craftId: string; toTier: number }[],
   ): void;
-  showBanner(text: string, motion?: boolean, decorativeIconUrl?: string): void;
+  showBanner(
+    text: string,
+    motion?: boolean,
+    decorativeIconUrl?: string,
+    variant?: 'default' | 'deed',
+  ): void;
 }
 
 function celebrationHud(): CraftCelebrationHudHarness {
@@ -214,6 +219,19 @@ describe('craft celebration HUD behavior', () => {
     expect(hud.bannerEl.querySelector('.banner-copy')?.textContent).toBe('Ordinary banner');
     expect(hud.bannerEl.classList.contains('banner-with-art')).toBe(false);
     expect(hud.bannerEl.classList.contains('banner-no-motion')).toBe(false);
+  });
+
+  it('clears a previous variant class so the shared slot never inherits it', () => {
+    // #banner is ONE reused element: a deed plate followed by an ordinary
+    // celebration must not leave the next banner wearing the deed language.
+    const hud = celebrationHud();
+
+    hud.showBanner('Deed accomplished: Old Salt', true, undefined, 'deed');
+    expect(hud.bannerEl.classList.contains('banner-deed')).toBe(true);
+
+    hud.showBanner('Level 12!');
+    expect(hud.bannerEl.classList.contains('banner-deed')).toBe(false);
+    expect(hud.bannerEl.querySelector('.banner-copy')?.textContent).toBe('Level 12!');
   });
 
   it('keeps the banner art sizing and no-motion presentation contracts in CSS', () => {

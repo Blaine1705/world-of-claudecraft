@@ -16,7 +16,11 @@
 // for a node is independent. This core never assumes otherwise: it always
 // re-resolves through the passed-in `world`, never caches across callers.
 
-import { GATHERING_PROFESSION_IDS, type GatheringProfessionId } from '../sim/content/professions';
+import {
+  GATHERING_PROFESSION_IDS,
+  GATHERING_PROFESSIONS,
+  type GatheringProfessionId,
+} from '../sim/content/professions';
 import { GATHER_NODES, ITEMS } from '../sim/data';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
 import { bestOwnedGatherToolTierOrNone, canGatherTier } from '../sim/professions/tools';
@@ -182,20 +186,33 @@ export function gatherRareTierFor(
  *  full granularity); `displayValue` floors it for readouts, the
  *  buildSkillBar convention (issue 2339): a fractional value never rounds a
  *  threshold forward, so 99.5 reads 99, not a fake crossed 100 while the
- *  100-proficiency deed is still locked. */
+ *  100-proficiency deed is still locked. `maxSkill` is the profession's
+ *  content cap, carried so every readout can render a DENOMINATOR: a bare
+ *  moving integer is what reads as a character level to a new player (see
+ *  docs/design/professions-tuning-packet.md, phase 0). */
 export interface GatheringProficiencyRow {
   professionId: GatheringProfessionId;
   value: number;
   displayValue: number;
+  maxSkill: number;
 }
 
 /** Builds the proficiency display rows from IWorldProfessions#professionsState,
- *  in the fixed profession order, defaulting an absent/malformed entry to 0. */
+ *  in the fixed profession order, defaulting an absent/malformed entry to 0.
+ *  The cap comes from the GATHERING_PROFESSIONS content table rather than the
+ *  per-row wire value: it is the same number (gatheringSkillsView projects it
+ *  from this very table) but it is total, so a missing or malformed skills row
+ *  can never produce a nonsense "12 / 0" denominator. */
 export function buildGatheringProficiencyRows(world: IWorld): GatheringProficiencyRow[] {
   const bySkill = new Map(world.professionsState.skills.map((s) => [s.professionId, s.skill]));
   return GATHERING_PROFESSION_IDS.map((professionId) => {
     const raw = bySkill.get(professionId);
     const value = typeof raw === 'number' && Number.isFinite(raw) ? Math.max(0, raw) : 0;
-    return { professionId, value, displayValue: Math.floor(value) };
+    return {
+      professionId,
+      value,
+      displayValue: Math.floor(value),
+      maxSkill: GATHERING_PROFESSIONS[professionId].maxSkill,
+    };
   });
 }

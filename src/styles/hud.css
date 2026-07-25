@@ -4475,6 +4475,28 @@
     object-fit: contain;
     filter: drop-shadow(var(--art-shadow-lg));
   }
+  /* The Book of Deeds variant (hud.ts showBanner variant='deed'). A deed
+     unlock used to fire this element with the level-up's exact colour, size
+     and lifetime, and since an early character trips several deeds inside its
+     first few gathering actions, that is a documented cause of players reading
+     routine gathering as leveling (docs/design/professions-tuning-packet.md,
+     phase 0). So the deed moment gets its OWN language: a framed parchment
+     plate in the Book of Deeds palette, at a quieter size, against the
+     level-up's bare oversized gold text. Copy and lifetime are untouched:
+     presentation only, never information. */
+  #banner.banner-deed {
+    color: var(--color-deed-banner-text);
+    font-size: 26px;
+    letter-spacing: 0.5px;
+    padding: 8px 22px;
+    border: 1px solid var(--color-deed-banner-border);
+    border-radius: 8px;
+    background: var(--color-deed-banner-bg);
+    box-shadow: 0 3px 14px #000000aa;
+    text-shadow:
+      0 0 10px #00000088,
+      1px 1px 4px #000;
+  }
   /* Reduced-motion celebrations (hud.ts showBanner motion=false): the banner
      appears and clears instantly, same text and duration, no fade. */
   #banner.banner-no-motion {

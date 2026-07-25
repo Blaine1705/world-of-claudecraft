@@ -274,6 +274,10 @@ export class CharWindow {
   // The "Gathering" section (issue 1124): one row per gathering profession, showing
   // the viewer's own proficiency points (IWorldProfessions#professionsState).
   // Data comes from the pure gathering_view.ts core; this painter only formats it.
+  // The value renders "12 / 100" through the SAME hudChrome.professions.skillValue
+  // key the professions window uses, never a bare integer: an unbounded number
+  // that ticks up +1 per harvest is what players read as a character level
+  // (docs/design/professions-tuning-packet.md, phase 0).
   private gatheringHtml(world: IWorld): string {
     const rows = buildGatheringProficiencyRows(world);
     const items = rows
@@ -284,7 +288,11 @@ export class CharWindow {
         const icon = imageUrl
           ? `<img class="char-gather-icon" src="${esc(imageUrl)}" alt="" draggable="false">`
           : '';
-        return `<span class="char-gather-row">${icon}<span>${esc(t(key))}: <b>${formatNumber(r.displayValue, { maximumFractionDigits: 0 })}</b></span></span>`;
+        const skillValue = t('hudChrome.professions.skillValue', {
+          skill: formatNumber(r.displayValue, { maximumFractionDigits: 0 }),
+          max: formatNumber(r.maxSkill, { maximumFractionDigits: 0 }),
+        });
+        return `<span class="char-gather-row">${icon}<span>${esc(t(key))}: <b>${esc(skillValue)}</b></span></span>`;
       })
       .join('');
     return `<div class="char-progression"><div class="cp-title">${esc(t('hudChrome.gathering.title'))}</div><div class="char-stats cp-stats">${items}</div></div>`;
