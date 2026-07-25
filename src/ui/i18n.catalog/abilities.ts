@@ -1049,7 +1049,7 @@ const classAbilityNamesEn = {
       [
         'faithforged_guard',
         'Debt of Light',
-        'For 8 sec, the next enemy hit against you is answered: up to {damage} damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered. Ascension raises the amount it can answer by 50%.',
+        'For 8 sec, the next enemy hit against you is answered: up to {buff} damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered. Ascension raises the amount it can answer by 50%.',
       ],
       [
         'mercy_lance',

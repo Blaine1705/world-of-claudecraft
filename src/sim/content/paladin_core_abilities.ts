@@ -308,7 +308,7 @@ const retribution: AbilityDef[] = [
     offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'paladin_debt_of_light', value: 140, duration: 8 }],
     description:
-      'For 8 sec, the next enemy hit against you is answered: up to $d damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered.',
+      'For 8 sec, the next enemy hit against you is answered: up to $b damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered.',
   },
   {
     id: 'hammer_of_wrath',

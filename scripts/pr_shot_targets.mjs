@@ -90,8 +90,11 @@ export const TARGETS = [
   },
   {
     key: 'tank-defensive-cds',
-    label: 'Tank defensive cooldowns',
-    when: ['tests/tank_defensive_cds.test.ts'],
+    // Widened past the tank when Dawnreaver grew a defensive of its own: the recipe
+    // is the same (learn it, arm it, shoot the spellbook row plus the armed slot),
+    // so the spec rides in as a variant rather than a copy of the capture body.
+    label: 'Defensive cooldowns',
+    when: ['tests/tank_defensive_cds.test.ts', 'combat/paladin_debt_of_light'],
     variants: [
       {
         key: 'paladin-desktop',
@@ -119,6 +122,15 @@ export const TARGETS = [
         abilityId: 'holy_shield',
         nearbyAbilityId: 'bastion_rite',
         mobile: true,
+      },
+      {
+        // Dawnreaver's Debt of Light: armed before the blow, answers one hit.
+        key: 'paladin-retribution-desktop',
+        charClass: 'paladin',
+        charName: 'Dawnreaver',
+        spec: 'retribution',
+        abilityId: 'faithforged_guard',
+        nearbyAbilityId: 'final_edict',
       },
     ],
     async capture(page, variant) {

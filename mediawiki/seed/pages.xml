@@ -50689,7 +50689,7 @@ Deal $d Holy damage to nearby enemies and generate 1 Devotion. Hitting at least 
       <model>wikitext</model>
       <format>text/x-wiki</format>
       <text xml:space="preserve" bytes="446">== Description ==
-For 8 sec, the next enemy hit against you is answered: up to $d damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered.
+For 8 sec, the next enemy hit against you is answered: up to $b damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered.
 
 == Facts ==
 {| class=&quot;wikitable article-facts&quot;
