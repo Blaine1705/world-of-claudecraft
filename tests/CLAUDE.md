@@ -84,8 +84,8 @@ use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
   brace silently discards all later CSS); re-run after touching `src/styles/` or entry inline styles.
 - Perf budgets: `hud_perf_budget` (baseline in `hud_perf_budget.baseline.md`), `render_budget`,
   `tests/server/perf_gate` + `tick_perf_capture`, `alloc_probe` (probe in `tests/util/`).
-  `hud_perf_budget` also owns the painter half of the `src/ui` classification, over BOTH
-  sanctioned painter names (`*_painter.ts` and `*_window.ts`): a painter is facet-routed
+  `hud_perf_budget` also owns the painter half of the `src/ui` classification, over all three
+  DOM-adapter names (`*_painter.ts`, `*_window.ts`, `*_controller.ts`): a painter is facet-routed
   (`HOT_PAINTERS`, no raw per-frame write and no forced-reflow read), canvas
   (`CANVAS_PAINTERS`, same scans plus an identity proof that it really draws on a 2D context),
   or cold, the registration-free default for a window (no forced-reflow read and no repeating

@@ -26,11 +26,11 @@ and performance rules.
 - Every player or server value interpolated into HTML passes through `esc()`.
 - Hot painters use the shared `PainterHost` writers. Do not create a second write
   cache inside a domain.
-- Of the three adapter names above, the painter gate (`tests/hud_perf_budget.test.ts`)
-  sweeps two: `*_painter.ts` and `*_window.ts`. A `*_controller.ts` holds neither the
-  forced-reflow nor the repeating-driver contract, and several make real layout reads
-  today (`chat_geometry_controller`, `chat_window_controller`, `fiesta_controller`). So
-  renaming a window to a controller drops both contracts while staying legal here: name
-  by role, and if a controller owns a per-frame paint path, give it a painter name.
+- All three adapter names above are swept by the painter gate
+  (`tests/hud_perf_budget.test.ts`). A `*_controller.ts` holds the same cold contract a
+  `*_window.ts` does: no forced-reflow layout read and no repeating driver of its own,
+  beyond a documented, counted allowance. Three carry one today
+  (`chat_geometry_controller`, `chat_window_controller`, `fiesta_controller`). Renaming
+  between the adapter names therefore sheds nothing, which is the point: name by role.
 - Domain tests import the owning module directly and assert behavior, not source
   line placement.

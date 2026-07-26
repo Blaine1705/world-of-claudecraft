@@ -206,11 +206,18 @@ const TOUR_MIN_FRAMES = readBaselineTourMinFrames();
 // ARM 1 - static write + layout-read rejection over every src/ui painter.
 // --------------------------------------------------------------------------
 
-// WHAT COUNTS AS A PAINTER HERE. src/ui/CLAUDE.md sanctions TWO painter filenames and
-// this gate sweeps both: `<name>_painter.ts` and `<name>_window.ts`. Matching only the
-// first is what left 35 window painters holding no raw-write contract and no
-// forced-reflow contract at all.
-const PAINTER_FILE_RE = /_(?:painter|window)\.ts$/;
+// WHAT COUNTS AS A PAINTER HERE. src/ui/CLAUDE.md sanctions TWO painter filenames and this
+// gate sweeps both: `<name>_painter.ts` and `<name>_window.ts`. Matching only the first is
+// what left 35 window painters holding no raw-write contract and no forced-reflow contract
+// at all.
+//
+// `_controller` is the THIRD name, and it is here for a reason worth naming: widening this
+// gate to windows made renaming a window to a controller the cheapest way out of it, which is
+// the CANVAS_PAINTERS parking hole one filename over. src/ui/hud/CLAUDE.md already lists
+// "controllers, windows, or painters" as the three DOM adapters of an extracted HUD domain,
+// so a controller holds the same cold contract a window does, and three of the fourteen
+// already make real layout reads. Closing it cost three allowance entries.
+const PAINTER_FILE_RE = /_(?:painter|window|controller)\.ts$/;
 
 // Every matcher below is a LABEL plus its own regex rather than a bare token string. The
 // label is what an allowance map is keyed by and what a failure names; the regex is what
@@ -273,8 +280,11 @@ const RAW_WRITES: ReadonlyArray<readonly [string, RegExp]> = [
 // exactly like `.offsetTop` does, and the cold bucket is where they live: the windows
 // preserve scroll position across a rebuild by reading it and writing it back. That pair is
 // legitimate and stable, so it is granted per file rather than banned, and the allowance is
-// what makes a THIRD read in the same file (the shape that turns a rebuild loop into
-// thrash) a conscious act. `.offsetParent` and `.innerText` are here too and are zero
+// what makes a THIRD access in the same file (the shape that turns a rebuild loop into
+// thrash) a conscious act. Read the granted numbers as ACCESSES, not as layout reads: the
+// matcher cannot tell `const t = el.scrollTop` from `el.scrollTop = t`, so roughly half of
+// each allowance is the harmless write-back. It works as a change detector either way, which
+// is what the budget is for. `.offsetParent` and `.innerText` are here too and are zero
 // everywhere today, which is the point of adding them before someone reaches for one.
 const FORCED_REFLOW_READS: ReadonlyArray<readonly [string, RegExp]> = [
   ['.offsetWidth', /\.offsetWidth\b/g],
@@ -292,14 +302,18 @@ const FORCED_REFLOW_READS: ReadonlyArray<readonly [string, RegExp]> = [
   ['.getBoundingClientRect', /\.getBoundingClientRect\b/g],
   ['.getClientRects', /\.getClientRects\b/g],
   ['getComputedStyle', /(?<![\w$])getComputedStyle\b/g],
-  // A PROXY token, and the only honest answer to this scan being per-file. `getUiScale`
+  // A PROXY token, and the only honest answer to this scan being per-file. It counts every
+  // REFERENCE rather than only a call, so the `import { getUiScale }` line counts too. That
+  // over-counts by exactly one per importing file, which is the safe direction and is what
+  // closes the aliasing escape (`const f = getUiScale; f()`), the same one the
+  // getComputedStyle arm had. `getUiScale`
   // (src/ui/ui_scale.ts) pays a getComputedStyle one hop away, which no per-file count can
   // see: party_below_target's comment already concedes the hop, and talents_window has the
   // same one undocumented. Counting the CALL puts both under the same budget as a direct
   // read. It generalizes: any shared helper later found to force layout is added here rather
   // than left invisible. It does not make the scan transitive, and nothing here claims it
   // does; a read moved into a NEW un-named helper is still out of reach.
-  ['getUiScale(', /(?<![\w$])getUiScale\s*\(/g],
+  ['getUiScale', /(?<![\w$])getUiScale\b/g],
 ];
 
 // The repeating DRIVERS a painter must not own without saying so. Every bucket takes this
@@ -311,17 +325,18 @@ const FORCED_REFLOW_READS: ReadonlyArray<readonly [string, RegExp]> = [
 // `requestAnimationFrame` and `requestIdleCallback` are per-frame drivers literally (zero
 // painters own one today, so the allowance is a hard zero); `setInterval` is the same shape
 // at a chosen cadence, so it is counted rather than banned and each documented allowance
-// records the interval it was granted for. Reached bare or off `window`, both forms count;
-// `clearInterval` / `cancelAnimationFrame` deliberately do not.
+// records the interval it was granted for. Every arm counts the NAME, not only a call, so
+// reached bare, off `window`, or bound to a local first (`const raf = requestAnimationFrame`)
+// all count; `clearInterval` / `cancelAnimationFrame` deliberately do not, being teardown.
 //
 // DELIBERATELY OUT, so the absence is a decision: a self-rescheduling `setTimeout`, which is
 // a repeating driver in every way that matters here. Every `setTimeout` in the tree today is
 // a one-shot or a debounce, so an arm would be pure noise; if a window ever grows a
 // `setTimeout` that re-arms itself, this list is where it belongs.
 const FRAME_DRIVERS: ReadonlyArray<readonly [string, RegExp]> = [
-  ['requestAnimationFrame', /(?<![\w$])requestAnimationFrame\s*\(/g],
-  ['requestIdleCallback', /(?<![\w$])requestIdleCallback\s*\(/g],
-  ['setInterval', /(?<![\w$])setInterval\s*\(/g],
+  ['requestAnimationFrame', /(?<![\w$])requestAnimationFrame\b/g],
+  ['requestIdleCallback', /(?<![\w$])requestIdleCallback\b/g],
+  ['setInterval', /(?<![\w$])setInterval\b/g],
 ];
 
 // The CANVAS_PAINTERS identity proof, which is what stops that list from being a
@@ -336,6 +351,12 @@ const FRAME_DRIVERS: ReadonlyArray<readonly [string, RegExp]> = [
 // an ordinary `rows.fill(0)` or `list.stroke` cannot match (`.fill(` and `.stroke(` are
 // deliberately absent for exactly that reason). The binding case is unit_portrait_painter,
 // the least canvas-heavy of the five, with one clearRect and two drawImage calls.
+//
+// A LIMIT worth stating rather than implying: most of these arms are used by no registered
+// canvas painter today, so a typo inside the alternation would be pinned faithfully and stay
+// dead. The disjunction is what makes that survivable, since any ONE live arm proves the
+// module draws, but it is the same class of hole the raw-write table had and it is not closed
+// here, only bounded.
 const CANVAS_CONTEXT_RE = /\b(?:Offscreen)?CanvasRenderingContext2D\b/;
 const CANVAS_DRAW_RE =
   /\.(?:beginPath|closePath|moveTo|lineTo|arcTo|ellipse|quadraticCurveTo|bezierCurveTo|fillRect|strokeRect|clearRect|fillText|strokeText|drawImage|createLinearGradient|createRadialGradient|createPattern|putImageData|getImageData|createImageData|measureText|setLineDash|roundRect)\s*\(/;
@@ -402,7 +423,7 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   {
     file: 'party_below_target_painter.ts',
     allow: {},
-    reflowAllow: { '.getBoundingClientRect': 5, 'getUiScale(': 2 },
+    reflowAllow: { '.getBoundingClientRect': 5, getUiScale: 3 },
   },
   // cold-path chrome wiring (click/roving-keyboard listeners), fired once per full
   // window render like the hand-rolled listeners it replaces, not a per-frame painter.
@@ -503,7 +524,7 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
 // That is a different gate in a different file, with its own blast radius: a source walk
 // over a coordinator this size leans entirely on its own anti-vacuity pins. Filed as a
 // follow-up rather than half-built here, because a declaration naming a handful of windows
-// when a third of the family qualifies would read as a complete classification and would
+// when roughly half the family qualifies would read as a complete classification and would
 // not be one.
 //
 // Cold needs NO registration, which is what makes it safe as a default: every window painter
@@ -543,6 +564,28 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // of one attempt, generation-guarded and cleared on stop. The fastest module-owned driver
   // in the bucket, and the reason setInterval is counted rather than banned.
   { file: 'hud/delve/lockpick_window.ts', reflowAllow: {}, driverAllow: { setInterval: 1 } },
+  // The three controllers with real layout reads. chat_geometry measures the chat box to
+  // clamp a drag or resize; chat_window fits the input and keeps the log pinned to the
+  // bottom; fiesta forces one reflow to restart a CSS animation, the same documented trick
+  // fct_painter uses.
+  {
+    file: 'hud/chat/chat_geometry_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 5 },
+    driverAllow: {},
+  },
+  {
+    file: 'hud/chat/chat_window_controller.ts',
+    reflowAllow: {
+      '.clientWidth': 1,
+      '.scrollWidth': 1,
+      '.scrollHeight': 1,
+      '.scrollTop': 1,
+      '.scrollLeft': 1,
+      '.getBoundingClientRect': 1,
+    },
+    driverAllow: {},
+  },
+  { file: 'hud/fiesta/fiesta_controller.ts', reflowAllow: { '.offsetWidth': 1 }, driverAllow: {} },
   { file: 'hud/vendor/heroic_vendor_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'hud/vendor/train_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'hud/vendor/unbind_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
@@ -568,7 +611,7 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
       '.getBoundingClientRect': 3,
       '.scrollHeight': 1,
       getComputedStyle: 1,
-      'getUiScale(': 1,
+      getUiScale: 2,
     },
     driverAllow: {},
   },
@@ -622,7 +665,7 @@ const SCANNED_FILES = new Set(SCANNED_PAINTERS.map((p) => p.file));
 // into the loosest bucket: it fails the completeness check below with the message that
 // tells you to classify it, which is the property this gate already had.
 const COLD_PAINTERS = ON_DISK_PAINTERS.filter(
-  (f) => f.endsWith('_window.ts') && !SCANNED_FILES.has(f),
+  (f) => (f.endsWith('_window.ts') || f.endsWith('_controller.ts')) && !SCANNED_FILES.has(f),
 );
 
 interface SweepResult {
@@ -776,6 +819,13 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     expect(COLD_PAINTERS).toContain('options_window.ts');
     expect(windows).not.toContain('map_window_painter.ts');
     expect(SCANNED_FILES.has('map_window_painter.ts')).toBe(true);
+    // The third adapter name is swept too, which is what stops a rename from shedding the
+    // cold contract. Without this the widening would be unpinned: PAINTER_FILE_RE could drop
+    // `controller` and every assertion in the cold sweeps would still pass over the windows.
+    const controllers = ON_DISK_PAINTERS.filter((f) => f.endsWith('_controller.ts'));
+    expect(controllers.length, 'the HUD controllers vanished from the sweep').toBeGreaterThan(10);
+    expect(controllers).toContain('hud/chat/chat_geometry_controller.ts');
+    expect(COLD_PAINTERS).toContain('hud/fiesta/fiesta_controller.ts');
   });
 
   // The cold contract. Swept as ONE test per matcher family over the whole bucket rather
@@ -890,13 +940,68 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
   // (The counted allowances need no separate staleness pin: they are matched EXACTLY, so a
   // granted read that is later deleted fails until the number comes back down.)
   it('registers each classified painter once, on disk, in exactly one bucket', () => {
+    const problems = registrationProblems(
+      new Set(ON_DISK_PAINTERS),
+      new Set(COLD_PAINTERS),
+      HOT_PAINTERS.map((p) => p.file),
+      CANVAS_PAINTERS.map((p) => p.file),
+      COLD_PAINTER_ALLOWANCES,
+    );
+    expect(
+      problems,
+      `each classified src/ui painter must exist and belong to exactly one bucket:\n${problems.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  // The positive control for the four predicates above, which all report zero on the real
+  // tree, so gutting any one of them keeps the suite green. Synthetic input, one planted
+  // violation per predicate.
+  it('the registration check reports each kind of bad entry', () => {
+    const onDisk = new Set(['a_window.ts', 'b_painter.ts', 'c_painter.ts', 'live_window.ts']);
+    const cold = new Set(['a_window.ts', 'live_window.ts']);
+    const problems = registrationProblems(
+      onDisk,
+      cold,
+      ['b_painter.ts', 'gone_painter.ts'],
+      ['b_painter.ts'],
+      [
+        { file: 'c_painter.ts', reflowAllow: {}, driverAllow: {} },
+        { file: 'live_window.ts', reflowAllow: { notAToken: 1 }, driverAllow: {} },
+      ],
+    );
+    expect(problems).toEqual([
+      'gone_painter.ts (HOT_PAINTERS: not an on-disk src/ui painter)',
+      'b_painter.ts (CANVAS_PAINTERS: classified twice)',
+      'c_painter.ts (COLD_PAINTER_ALLOWANCES: not a cold painter, so nothing reads it)',
+      'live_window.ts (reflowAllow: "notAToken" is not a matcher label, so nothing reads it)',
+    ]);
+    // ...and it stays silent on a well-formed set, so it is not simply always noisy.
+    expect(
+      registrationProblems(
+        onDisk,
+        cold,
+        ['b_painter.ts'],
+        ['c_painter.ts'],
+        [{ file: 'a_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} }],
+      ),
+    ).toEqual([]);
+  });
+});
+
+function registrationProblems(
+  onDisk: ReadonlySet<string>,
+  cold: ReadonlySet<string>,
+  hot: readonly string[],
+  canvas: readonly string[],
+  coldAllowances: ReadonlyArray<ColdPainter>,
+): string[] {
+  {
     const problems: string[] = [];
     const seen = new Set<string>();
-    const onDisk = new Set(ON_DISK_PAINTERS);
     for (const [name, files] of [
-      ['HOT_PAINTERS', HOT_PAINTERS.map((p) => p.file)],
-      ['CANVAS_PAINTERS', CANVAS_PAINTERS.map((p) => p.file)],
-      ['COLD_PAINTER_ALLOWANCES', COLD_PAINTER_ALLOWANCES.map((c) => c.file)],
+      ['HOT_PAINTERS', hot],
+      ['CANVAS_PAINTERS', canvas],
+      ['COLD_PAINTER_ALLOWANCES', coldAllowances.map((c) => c.file)],
     ] as const) {
       for (const file of files) {
         if (!onDisk.has(file)) problems.push(`${file} (${name}: not an on-disk src/ui painter)`);
@@ -906,8 +1011,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     }
     // A cold allowance for a file that is not cold would be an allowance for nothing: the
     // scanned buckets never consult driverAllow, so the entry would silently do nothing.
-    const cold = new Set(COLD_PAINTERS);
-    for (const { file } of COLD_PAINTER_ALLOWANCES) {
+    for (const { file } of coldAllowances) {
       if (onDisk.has(file) && !cold.has(file)) {
         problems.push(`${file} (COLD_PAINTER_ALLOWANCES: not a cold painter, so nothing reads it)`);
       }
@@ -922,18 +1026,19 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       reflowAllow: new Set(FORCED_REFLOW_READS.map(([label]) => label)),
       driverAllow: new Set(FRAME_DRIVERS.map(([label]) => label)),
     };
+    const byFile = new Map([...HOT_PAINTERS, ...CANVAS_PAINTERS].map((p) => [p.file, p]));
     const declared: ReadonlyArray<readonly [string, string, TokenAllowance]> = [
-      ...HOT_PAINTERS.flatMap((p) => [
-        ['allow', p.file, p.allow] as const,
-        ['reflowAllow', p.file, p.reflowAllow] as const,
-        ['driverAllow', p.file, p.driverAllow ?? {}] as const,
-      ]),
-      ...CANVAS_PAINTERS.flatMap((p) => [
-        ['allow', p.file, p.allow] as const,
-        ['reflowAllow', p.file, p.reflowAllow] as const,
-        ['driverAllow', p.file, p.driverAllow ?? {}] as const,
-      ]),
-      ...COLD_PAINTER_ALLOWANCES.flatMap((c) => [
+      ...[...hot, ...canvas].flatMap((f) => {
+        const p = byFile.get(f);
+        return p
+          ? [
+              ['allow', f, p.allow] as const,
+              ['reflowAllow', f, p.reflowAllow] as const,
+              ['driverAllow', f, p.driverAllow ?? {}] as const,
+            ]
+          : [];
+      }),
+      ...coldAllowances.flatMap((c) => [
         ['reflowAllow', c.file, c.reflowAllow] as const,
         ['driverAllow', c.file, c.driverAllow] as const,
       ]),
@@ -946,12 +1051,11 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
         }
       }
     }
-    expect(
-      problems,
-      `each classified src/ui painter must exist and belong to exactly one bucket:\n${problems.join('\n')}`,
-    ).toEqual([]);
-  });
+    return problems;
+  }
+}
 
+describe('hud_perf_budget ARM 1 (cont.): the matchers themselves', () => {
   // Teeth for the matchers this gate is built on. Every list is pinned BY IDENTITY as well
   // as by behavior, because a label-only pin lets an arm be swapped for a dead regex with
   // the whole suite green, and this gate shipped exactly that bug: `.getComputedStyle`
@@ -986,8 +1090,39 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     // Every driver arm in BOTH the bare and the member form, because the comment above
     // claims both count and the live tree only ever uses one of them per arm. The two
     // negatives are the calls that TEAR DOWN a driver, which must never be mistaken for one.
+    // Every FORCED_REFLOW arm too. Nine of the sixteen match nothing anywhere in the tree, so
+    // the counts cannot notice a dead one either; two of those nine (.offsetParent,
+    // .innerText) were added with no live use at all, which is precisely when an arm authored
+    // wrong on day one would be pinned faithfully and stay dead forever.
+    const reads = new Map(FORCED_REFLOW_READS);
+    const reflowFixtures: ReadonlyArray<readonly [string, string, string]> = [
+      ['.offsetWidth', 'const w = el.offsetWidth;', 'const w = el.offsetWidthCache;'],
+      ['.offsetHeight', 'const h = el.offsetHeight;', 'const h = box.offsetHeightOf;'],
+      ['.offsetTop', 'const t = el.offsetTop;', 'const t = box.offsetTopping;'],
+      ['.offsetLeft', 'const l = el.offsetLeft;', 'const l = box.offsetLeftish;'],
+      ['.offsetParent', 'const p = el.offsetParent;', 'const p = el.offsetParentNode;'],
+      ['.clientWidth', 'const w = el.clientWidth;', 'const w = el.clientWidths;'],
+      ['.clientHeight', 'const h = el.clientHeight;', 'const h = el.clientHeights;'],
+      ['.scrollWidth', 'const w = el.scrollWidth;', 'const w = el.scrollWidthOf;'],
+      ['.scrollHeight', 'const h = el.scrollHeight;', 'const h = el.scrollHeightOf;'],
+      ['.scrollTop', 'const t = el.scrollTop;', 'const t = el.scrollTopMost;'],
+      ['.scrollLeft', 'const l = el.scrollLeft;', 'const l = el.scrollLeftMost;'],
+      ['.innerText', 'const s = el.innerText;', 'const s = el.innerTextOf;'],
+      ['.getBoundingClientRect', 'el.getBoundingClientRect().top', 'el.getBoundingClientRects()'],
+      ['.getClientRects', 'el.getClientRects()[0]', 'el.getClientRectsOf()'],
+      ['getComputedStyle', 'getComputedStyle(root).width', 'cachedGetComputedStyle(root)'],
+      ['getUiScale', 'const s = getUiScale();', 'const s = getUiScaleFactor;'],
+    ];
+    for (const [label, positive, negative] of reflowFixtures) {
+      const re = reads.get(label);
+      expect(re, `the ${label} arm must exist`).toBeDefined();
+      if (!re) continue;
+      expect(countMatches(positive, re), `${label} must count: ${positive}`).toBe(1);
+      expect(countMatches(negative, re), `${label} must not count: ${negative}`).toBe(0);
+    }
+
     const drivers = new Map(FRAME_DRIVERS);
-    for (const [label, bare, member, negative] of [
+    const driverFixtures: ReadonlyArray<readonly [string, string, string, string]> = [
       [
         'requestAnimationFrame',
         'requestAnimationFrame(step);',
@@ -1006,7 +1141,8 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
         'this.poll = window.setInterval(fn, 15_000);',
         'clearInterval(this.poll);',
       ],
-    ] as const) {
+    ];
+    for (const [label, bare, member, negative] of driverFixtures) {
       const re = drivers.get(label);
       expect(re, `the ${label} arm must exist`).toBeDefined();
       if (!re) continue;
@@ -1015,10 +1151,17 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       expect(countMatches(negative, re), `${label} teardown: ${negative}`).toBe(0);
     }
     // The proxy token counts the CALL, not a definition or an import of the same name.
-    const uiScale = new Map(FORCED_REFLOW_READS).get('getUiScale(');
+    // The proxy token counts every REFERENCE, deliberately: an aliased call
+    // (`const f = getUiScale; f()`) is the same layout read as a direct one, and no
+    // call-shaped matcher can see it. The import line counting too is the price, one per
+    // importing file, paid in the allowance rather than in coverage.
+    const uiScale = new Map(FORCED_REFLOW_READS).get('getUiScale');
+    expect(uiScale, 'the getUiScale proxy arm must exist').toBeDefined();
     expect(uiScale && countMatches('const s = getUiScale();', uiScale)).toBe(1);
-    expect(uiScale && countMatches('import { getUiScale } from "./ui_scale";', uiScale)).toBe(0);
+    expect(uiScale && countMatches('const f = getUiScale;', uiScale)).toBe(1);
+    expect(uiScale && countMatches('import { getUiScale } from "./ui_scale";', uiScale)).toBe(1);
     expect(uiScale && countMatches('const cachedGetUiScale = memo(f);', uiScale)).toBe(0);
+    expect(uiScale && countMatches('const getUiScaleFactor = 2;', uiScale)).toBe(0);
 
     // The canvas identity proof: true of a real canvas painter, false of a real DOM module.
     // Each arm is fetched BY LABEL from the table the assertion loop reads, and checked
@@ -1046,10 +1189,16 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     // trimmed to a couple of arms and still pass, since a canvas painter that draws at all
     // usually draws several ways; only perf_graph_painter, which has neither fillText nor
     // drawImage, would notice, and one file is too thin a thread to hang the proof on.
-    expect(CANVAS_DRAW_RE.source).toBe(
-      '\\.(?:beginPath|closePath|moveTo|lineTo|arcTo|ellipse|quadraticCurveTo|bezierCurveTo|fillRect|strokeRect|clearRect|fillText|strokeText|drawImage|createLinearGradient|createRadialGradient|createPattern|putImageData|getImageData|createImageData|measureText|setLineDash|roundRect)\\s*\\(',
+    // Pinned as OBJECTS, not by .source: these two are consumed with `re.test(code)` in a loop
+    // over five files, so a stray /g flag would make every other call return false from a
+    // leftover lastIndex. That direction fails loudly rather than passing quietly, but a pin
+    // that cannot see flags is not pinning the thing that decides behavior.
+    expect(CANVAS_DRAW_RE).toEqual(
+      /\.(?:beginPath|closePath|moveTo|lineTo|arcTo|ellipse|quadraticCurveTo|bezierCurveTo|fillRect|strokeRect|clearRect|fillText|strokeText|drawImage|createLinearGradient|createRadialGradient|createPattern|putImageData|getImageData|createImageData|measureText|setLineDash|roundRect)\s*\(/,
     );
-    expect(CANVAS_CONTEXT_RE.source).toBe('\\b(?:Offscreen)?CanvasRenderingContext2D\\b');
+    expect(CANVAS_DRAW_RE.flags, 'a /g flag here would make re.test() stateful').toBe('');
+    expect(CANVAS_CONTEXT_RE).toEqual(/\b(?:Offscreen)?CanvasRenderingContext2D\b/);
+    expect(CANVAS_CONTEXT_RE.flags).toBe('');
     // bags_window is the control on purpose, since it is exactly the shape of module that
     // would be parked in CANVAS_PAINTERS to escape both gates.
     const control = painterSource('bags_window.ts');
@@ -1062,7 +1211,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     // per-file scans cannot notice if one of them goes dead: expected 0, actual 0, green.
     // Nothing but a fixture covers them.
     const writes = new Map(RAW_WRITES);
-    for (const [label, positive, negative] of [
+    const writeFixtures: ReadonlyArray<readonly [string, string, string]> = [
       ['.style', 'el.style.display = "none";', 'const styles = theme.styleSheet;'],
       ['.textContent', 'row.textContent = name;', 'const t = node.textContentCache;'],
       ['.classList', "btn.classList.toggle('on', x);", 'const c = el.classListName;'],
@@ -1083,13 +1232,27 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       // missing and both counted zero, which is the same shape of hole as a dead arm.
       ["['computed']", "el['setAttributeNS'](ns, 'x', v);", "el['setAttributeNSish']();"],
       ["['computed']", "el['insertAdjacentText']('beforeend', t);", "el['insertAdjacent']();"],
-    ] as const) {
+    ];
+    for (const [label, positive, negative] of writeFixtures) {
       const re = writes.get(label);
       expect(re, `the ${label} arm must exist`).toBeDefined();
       if (!re) continue;
       expect(countMatches(positive, re), `${label} must count: ${positive}`).toBe(1);
       expect(countMatches(negative, re), `${label} must not count: ${negative}`).toBe(0);
     }
+
+    // COVERAGE OF THE FIXTURE TABLES THEMSELVES, which is the hole all three loops share:
+    // each walks the FIXTURE list and looks the regex up by label, so an arm added to a family
+    // without a fixture is never visited and nothing says so. The identity pins below would
+    // still faithfully pin an arm that was authored wrong on day one and matched nothing ever.
+    // Pinning fixture labels against matcher labels is what makes "every arm is exercised"
+    // true rather than aspirational.
+    expect(writeFixtures.map(([label]) => label).filter((l) => l !== "['computed']")).toEqual(
+      labelsOf(RAW_WRITES).filter((l) => l !== "['computed']"),
+    );
+    expect(new Set(writeFixtures.map(([label]) => label))).toEqual(new Set(labelsOf(RAW_WRITES)));
+    expect(reflowFixtures.map(([label]) => label)).toEqual(labelsOf(FORCED_REFLOW_READS));
+    expect(driverFixtures.map(([label]) => label)).toEqual(labelsOf(FRAME_DRIVERS));
 
     // Identity pins. Each arm is wired in by the regex OBJECT, not by its label, so a
     // weakened or dead arm cannot be swapped in behind a label that still reads right. The
@@ -1133,12 +1296,12 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       ['.getBoundingClientRect', /\.getBoundingClientRect\b/g],
       ['.getClientRects', /\.getClientRects\b/g],
       ['getComputedStyle', /(?<![\w$])getComputedStyle\b/g],
-      ['getUiScale(', /(?<![\w$])getUiScale\s*\(/g],
+      ['getUiScale', /(?<![\w$])getUiScale\b/g],
     ]);
     expect(FRAME_DRIVERS).toEqual([
-      ['requestAnimationFrame', /(?<![\w$])requestAnimationFrame\s*\(/g],
-      ['requestIdleCallback', /(?<![\w$])requestIdleCallback\s*\(/g],
-      ['setInterval', /(?<![\w$])setInterval\s*\(/g],
+      ['requestAnimationFrame', /(?<![\w$])requestAnimationFrame\b/g],
+      ['requestIdleCallback', /(?<![\w$])requestIdleCallback\b/g],
+      ['setInterval', /(?<![\w$])setInterval\b/g],
     ]);
   });
 });

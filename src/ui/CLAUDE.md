@@ -96,8 +96,8 @@ Per-frame HUD code (anything reached from `Hud.update()`) holds these:
 - **The perf gate.** `scripts/perf_tour.mjs` (run per per-frame phase against the recorded
   baseline) asserts `frameP95 <= baseline` and a bounded AoE-burst FCT node count; each
   green-gate commit is TAGGED so a cumulative regression bisects. The STANDING vitest budget
-  is `tests/hud_perf_budget.test.ts`, split by host: it scans every painter under both
-  sanctioned names for raw writes AND forced-reflow layout reads
+  is `tests/hud_perf_budget.test.ts`, split by host: it scans every painter under all three
+  DOM-adapter names for raw writes AND forced-reflow layout reads
   (`offsetWidth`/`getBoundingClientRect`/`getComputedStyle`/..., the layout-thrash killer, and
   note that this tree calls `getComputedStyle` BARE, never as a member); drives the non-pooled
   painters through a `makeWriterFacet` loop
@@ -231,11 +231,13 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
     its cadence). A window that grows a genuinely per-frame write path moves into
     `HOT_PAINTERS` and takes the raw-write scan with it, keeping the driver scan, which every
     bucket runs.
-  Two limits, so neither reads as more than it is: the scans are per FILE, so a layout read
-  one hop away in a shared helper is invisible unless the helper is named as a proxy token
-  (`getUiScale` is; a new one would have to be added), and a third filename escapes the gate
-  entirely (`*_controller.ts` under `src/ui/hud/<domain>/`, and bare-named per-frame modules
-  like `vale_cup_hud.ts`), held only by the module sweep in `tests/architecture.test.ts`.
+  The gate sweeps all three DOM-adapter names, `*_painter.ts`, `*_window.ts` and
+  `*_controller.ts`, so renaming between them sheds no contract. Two limits remain, so neither
+  reads as more than it is: the scans are per FILE, so a layout read one hop away in a shared
+  helper is invisible unless the helper is named as a proxy token (`getUiScale` and
+  `getComputedStyle` are; a new one would have to be added), and a BARE-named per-frame module
+  (`vale_cup_hud.ts`, `dungeon_finder_proposal_popup.ts`) still escapes it entirely, held only
+  by the module sweep in `tests/architecture.test.ts`.
 - **Neither of the two?** A **painter-side helper**, and it is a LAST RESORT: if the DOM touch can
   live in the painter, it must. A helper is for logic a painter needs that cannot be a pure core
   (it has to touch the DOM) and is not itself a painter. Register it in `UI_PAINTER_HELPERS`
