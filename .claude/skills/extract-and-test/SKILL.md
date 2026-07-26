@@ -67,7 +67,11 @@ Do not invent a new architecture. Pick the seam that matches the work:
   `src/ui/hud/<domain>/` directory and exports through that domain's `index.ts`
   (domain modules never import the `Hud` class; they receive narrow dependency
   bags; see `src/ui/hud/CLAUDE.md`); a standalone component stays a flat
-  `src/ui/` sibling. Reuse a painter FAMILY before writing a bespoke one (a
+  `src/ui/` sibling. A `src/ui` module that can be NEITHER (it must touch the DOM,
+  and it is not a painter) is a painter-side helper and a LAST RESORT: register it
+  in `UI_PAINTER_HELPERS` for the hard contract, or in `UI_DOM_MODULES` if it owns
+  browser state, since the classification sweep in the same test file fails on an
+  unregistered module that reaches a host. Reuse a painter FAMILY before writing a bespoke one (a
   unit-style frame is a `UnitFramePainter`; an extra action bar is a new
   `ActionBarPainter(descriptor)`). Full recipe: `src/ui/CLAUDE.md` and
   `src/ui/hud/CLAUDE.md`.

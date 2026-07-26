@@ -802,11 +802,13 @@ describe('text_sprite_cache: stays a host-agnostic painter helper', () => {
   // document.createElement call, the deterministic-clock rule and the
   // no-literal-color rule against it.
   //
-  // What stays here is the ONE pin that sweep deliberately does not make. The
-  // sweep applies the shared pure-core import rule (no three, no render/game/net,
-  // no DOM-owning painter), which would happily allow a sibling ui import; this
+  // What stays here are the two pins that sweep deliberately does not make. It
+  // applies the shared pure-core import rule (no three, no render/game/net, no
+  // DOM-owning painter), which would happily allow a sibling ui import, while this
   // module imports NOTHING AT ALL, and staying that way is what lets a Vitest
-  // drive it through a fake document with no module graph behind it.
+  // drive it through a fake document with no module graph behind it. And it bounds
+  // `document` to createElement calls without bounding HOW MANY, while this module
+  // makes exactly one DOM call, which is the tighter thing worth keeping.
   const source = readFileSync(new URL('../src/ui/text_sprite_cache.ts', import.meta.url), 'utf8');
   const code = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
@@ -814,10 +816,11 @@ describe('text_sprite_cache: stays a host-agnostic painter helper', () => {
     expect(code.match(/^import\s/gm) ?? []).toEqual([]);
   });
 
-  // The sweep bounds document access to createElement calls; it does not pin WHICH
-  // element, and minting a canvas is the reason this helper is allowed near the
-  // DOM at all.
-  it('mints an offscreen canvas, the one DOM call it is allowed', () => {
+  // The sweep bounds document access to createElement calls; it pins neither WHICH
+  // element nor HOW MANY, and minting one offscreen canvas is the whole reason
+  // this helper is allowed near the DOM at all.
+  it('makes exactly one DOM call: the offscreen canvas it mints', () => {
+    expect(code.match(/document\b/g) ?? []).toEqual(['document']);
     expect(code).toContain("document.createElement('canvas')");
   });
 });

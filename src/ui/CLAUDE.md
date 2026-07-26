@@ -192,16 +192,20 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
   go through the `PainterHost` elided writers; it drives tokens / CSS vars, never a literal
   hex/px/color in TS (the per-painter no-magic-values source guard). Interpolated names pass
   through `esc()`; a pure extraction reuses existing `t()` keys and adds none.
-- **Neither of the two?** A module that cannot be a pure core (it has to touch the DOM) and is not
-  a painter is a **painter-side helper**: register it in `UI_PAINTER_HELPERS`
+- **Neither of the two?** A **painter-side helper**, and it is a LAST RESORT: if the DOM touch can
+  live in the painter, it must. A helper is for logic a painter needs that cannot be a pure core
+  (it has to touch the DOM) and is not itself a painter. Register it in `UI_PAINTER_HELPERS`
   (`tests/architecture.test.ts`) and it holds a hard contract: host-agnostic (no `window` /
-  `navigator` / `localStorage` / `getComputedStyle` / `requestAnimationFrame`), deterministic (no
-  `Date.now` / `performance.now` / `Math.random`), no literal hex/rgb color (the painter passes
-  RESOLVED tokens), and `document` ONLY to mint its own detached node via `createElement`, never to
-  reach the live tree. Exemplar: `text_sprite_cache.ts`. That sweep classifies EVERY other `src/ui`
-  module too: one that owns browser state is registered in `UI_DOM_MODULES`, and anything
-  unregistered must reach for no browser global at all. So a new module cannot escape both
-  completeness sweeps by being named neither `*_view`/`*_core` nor `*_painter`.
+  `navigator` / `localStorage` / `getComputedStyle` / `requestAnimationFrame` / `instanceof
+  HTMLElement`), deterministic (no `Date.now` / `performance.now` / `Math.random` / `new Date()`),
+  no literal hex/rgb color (the painter passes RESOLVED tokens), and `document` ONLY to mint its
+  own detached node via `createElement`. Exemplar: `text_sprite_cache.ts`. That sweep classifies
+  EVERY other `src/ui` module too: one that reaches a host (a browser global, a browser-only API,
+  the wall clock, an RNG) is registered in `UI_DOM_MODULES`, and anything unregistered must reach
+  no host at all. So a new module cannot escape both completeness sweeps by being named neither
+  `*_view`/`*_core` nor `*_painter`. Note where a `<name>_window.ts` painter lands: the painter
+  perf gate matches `*_painter.ts` only, so a window painter is classified by this sweep like any
+  other module and is registered in `UI_DOM_MODULES` once it touches `document`.
 - **For chrome:** satisfy the HUD-chrome WCAG 2.2 AA contract above; mark the window root with
   `markDialogRoot` (`src/ui/dialog_root.ts`): role=dialog + aria-modal + exactly ONE accessible
   name (labelledBy wins and clears aria-label), cold-path raw `setAttribute` BY DESIGN (not
