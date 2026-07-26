@@ -9294,4 +9294,17 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': '{enchant} yerine geçer',
   'hudChrome.enchanting.sameEnchant': 'O eşyada zaten bu büyü var.',
   'hudChrome.enchanting.sameEnchantTag': 'Zaten uygulandı',
+  'hudChrome.crafting.craftedToastQty': 'Hazırlandı: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': '{item} büyüsünü bozup {material} elde ettiniz.',
+  'hudChrome.enchanting.disenchantedYieldQty':
+    '{item} büyüsünü bozup {material} x{qty} elde ettiniz.',
+  'hudChrome.enchanting.disenchantedAlso': 'Ayrıca {material} elde ettiniz.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Ayrıca {material} x{qty} elde ettiniz.',
+  'hudChrome.enchanting.salvagedYield': '{item} parçalayıp {material} elde ettiniz.',
+  'hudChrome.enchanting.salvagedYieldQty': '{item} parçalayıp {material} x{qty} elde ettiniz.',
+  'hudChrome.enchanting.plainTag': 'Büyüsüz',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Korunan: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Yapımcı işareti',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Ustalık bonusu',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Komisyon bağı',
 };

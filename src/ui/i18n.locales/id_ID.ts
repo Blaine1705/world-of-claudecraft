@@ -9391,4 +9391,18 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Menggantikan {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Barang itu sudah memiliki mantra itu.',
   'hudChrome.enchanting.sameEnchantTag': 'Sudah diterapkan',
+  'hudChrome.crafting.craftedToastQty': 'Dibuat: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield':
+    'Kamu menghancurkan pemantraan {item} menjadi {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty':
+    'Kamu menghancurkan pemantraan {item} menjadi {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Kamu juga memulihkan {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Kamu juga memulihkan {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Kamu menyalvasi {item} menjadi {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Kamu menyalvasi {item} menjadi {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Belum dimantrai',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Dipertahankan: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Tanda pembuat',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Bonus mahakarya',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Ikatan komisi',
 };

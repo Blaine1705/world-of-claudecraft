@@ -9272,4 +9272,17 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Erstatter {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Den genstand har allerede den fortryllelse.',
   'hudChrome.enchanting.sameEnchantTag': 'Allerede anvendt',
+  'hudChrome.crafting.craftedToastQty': 'Udformet: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Du affortryller {item} til {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty':
+    'Du affortryller {item} til {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Du genvinder også {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Du genvinder også {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Du bjærger {item} til {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Du bjærger {item} til {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Ikke fortryllet',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Beholdes: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Skaberens mærke',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Mesterværksbonus',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Kommissionsbinding',
 };

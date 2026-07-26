@@ -9316,4 +9316,17 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Thay Thế {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Vật phẩm đó đã có phép khắc đó rồi.',
   'hudChrome.enchanting.sameEnchantTag': 'Đã Áp Dụng',
+  'hudChrome.crafting.craftedToastQty': 'Đã chế tác: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Bạn hủy pháp khắc {item} thành {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty':
+    'Bạn hủy pháp khắc {item} thành {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Bạn cũng thu hồi {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Bạn cũng thu hồi {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Bạn tháo dỡ {item} thành {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Bạn tháo dỡ {item} thành {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Chưa pháp khắc',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Giữ lại: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Dấu người chế tạo',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Thưởng tuyệt phẩm',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Ràng buộc ủy thác',
 };

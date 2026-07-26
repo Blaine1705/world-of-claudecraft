@@ -9452,4 +9452,17 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Reemplaza {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Ese objeto ya tiene ese encantamiento.',
   'hudChrome.enchanting.sameEnchantTag': 'Ya aplicado',
+  'hudChrome.crafting.craftedToastQty': 'Elaborado: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Desencantas {item} en {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty':
+    'Desencantas {item} en {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'También recuperas {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'También recuperas {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Desguazas {item} en {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Desguazas {item} en {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Sin encantar',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Conserva: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Marca del artesano',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Bonificación de obra maestra',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Vínculo de encargo',
 };

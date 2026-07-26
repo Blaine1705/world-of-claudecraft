@@ -9282,4 +9282,17 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Ersätter {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Det föremålet har redan den förtrollningen.',
   'hudChrome.enchanting.sameEnchantTag': 'Redan applicerad',
+  'hudChrome.crafting.craftedToastQty': 'Tillverkad: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Du avförtrollar {item} till {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty':
+    'Du avförtrollar {item} till {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Du återvinner också {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Du återvinner också {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Du bärgar {item} till {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Du bärgar {item} till {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Inte förtrollad',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Behålls: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Tillverkarens märke',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Mästerverksbonus',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Uppdragsbindning',
 };
