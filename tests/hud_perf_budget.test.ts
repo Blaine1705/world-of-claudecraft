@@ -804,7 +804,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
   // sanctioned painter name is swept too. If PAINTER_FILE_RE were narrowed back to
   // *_painter.ts the cold sweep below would silently run over an empty set and every one of
   // its assertions would pass while covering nothing.
-  it('sweeps every src/ui *_window.ts painter too (the second sanctioned painter name)', () => {
+  it('sweeps the other two DOM-adapter names too (*_window.ts and *_controller.ts)', () => {
     const windows = ON_DISK_PAINTERS.filter((f) => f.endsWith('_window.ts'));
     expect(windows.length, 'the window painters vanished from the sweep').toBeGreaterThan(30);
     expect(windows).toContain('hud/vendor/vendor_window.ts');
@@ -943,8 +943,8 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     const problems = registrationProblems(
       new Set(ON_DISK_PAINTERS),
       new Set(COLD_PAINTERS),
-      HOT_PAINTERS.map((p) => p.file),
-      CANVAS_PAINTERS.map((p) => p.file),
+      HOT_PAINTERS,
+      CANVAS_PAINTERS,
       COLD_PAINTER_ALLOWANCES,
     );
     expect(
@@ -962,8 +962,13 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     const problems = registrationProblems(
       onDisk,
       cold,
-      ['b_painter.ts', 'gone_painter.ts'],
-      ['b_painter.ts'],
+      // A bad allowance key on a SCANNED entry too, so BOTH halves of the key check are
+      // driven rather than only the cold one.
+      [
+        { file: 'b_painter.ts', allow: { offsetWidth: 1 }, reflowAllow: {}, driverAllow: {} },
+        { file: 'gone_painter.ts', allow: {}, reflowAllow: {}, driverAllow: {} },
+      ],
+      [{ file: 'b_painter.ts', allow: {}, reflowAllow: {}, driverAllow: {} }],
       [
         { file: 'c_painter.ts', reflowAllow: {}, driverAllow: {} },
         { file: 'live_window.ts', reflowAllow: { notAToken: 1 }, driverAllow: {} },
@@ -973,6 +978,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       'gone_painter.ts (HOT_PAINTERS: not an on-disk src/ui painter)',
       'b_painter.ts (CANVAS_PAINTERS: classified twice)',
       'c_painter.ts (COLD_PAINTER_ALLOWANCES: not a cold painter, so nothing reads it)',
+      'b_painter.ts (allow: "offsetWidth" is not a matcher label, so nothing reads it)',
       'live_window.ts (reflowAllow: "notAToken" is not a matcher label, so nothing reads it)',
     ]);
     // ...and it stays silent on a well-formed set, so it is not simply always noisy.
@@ -980,27 +986,32 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       registrationProblems(
         onDisk,
         cold,
-        ['b_painter.ts'],
-        ['c_painter.ts'],
+        [{ file: 'b_painter.ts', allow: { '.style': 1 }, reflowAllow: {}, driverAllow: {} }],
+        [{ file: 'c_painter.ts', allow: {}, reflowAllow: {}, driverAllow: {} }],
         [{ file: 'a_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} }],
       ),
     ).toEqual([]);
   });
 });
 
+// Takes every bucket as a PARAMETER, module constants included, so the positive control drives
+// the same code the real run does. Resolving the scanned allowances from the module constants
+// instead would leave the hot/canvas half of the key check unproven: a synthetic entry would
+// miss the lookup and contribute nothing, which is the same shape as the hole the extraction
+// closed, one branch over.
 function registrationProblems(
   onDisk: ReadonlySet<string>,
   cold: ReadonlySet<string>,
-  hot: readonly string[],
-  canvas: readonly string[],
+  hot: ReadonlyArray<ScannedPainter>,
+  canvas: ReadonlyArray<ScannedPainter>,
   coldAllowances: ReadonlyArray<ColdPainter>,
 ): string[] {
+  const problems: string[] = [];
   {
-    const problems: string[] = [];
     const seen = new Set<string>();
     for (const [name, files] of [
-      ['HOT_PAINTERS', hot],
-      ['CANVAS_PAINTERS', canvas],
+      ['HOT_PAINTERS', hot.map((p) => p.file)],
+      ['CANVAS_PAINTERS', canvas.map((p) => p.file)],
       ['COLD_PAINTER_ALLOWANCES', coldAllowances.map((c) => c.file)],
     ] as const) {
       for (const file of files) {
@@ -1026,18 +1037,12 @@ function registrationProblems(
       reflowAllow: new Set(FORCED_REFLOW_READS.map(([label]) => label)),
       driverAllow: new Set(FRAME_DRIVERS.map(([label]) => label)),
     };
-    const byFile = new Map([...HOT_PAINTERS, ...CANVAS_PAINTERS].map((p) => [p.file, p]));
     const declared: ReadonlyArray<readonly [string, string, TokenAllowance]> = [
-      ...[...hot, ...canvas].flatMap((f) => {
-        const p = byFile.get(f);
-        return p
-          ? [
-              ['allow', f, p.allow] as const,
-              ['reflowAllow', f, p.reflowAllow] as const,
-              ['driverAllow', f, p.driverAllow ?? {}] as const,
-            ]
-          : [];
-      }),
+      ...[...hot, ...canvas].flatMap((p) => [
+        ['allow', p.file, p.allow] as const,
+        ['reflowAllow', p.file, p.reflowAllow] as const,
+        ['driverAllow', p.file, p.driverAllow ?? {}] as const,
+      ]),
       ...coldAllowances.flatMap((c) => [
         ['reflowAllow', c.file, c.reflowAllow] as const,
         ['driverAllow', c.file, c.driverAllow] as const,
@@ -1066,6 +1071,8 @@ describe('hud_perf_budget ARM 1 (cont.): the matchers themselves', () => {
     expect(PAINTER_FILE_RE.test('unit_frame.ts')).toBe(false);
     expect(PAINTER_FILE_RE.test('options_view.ts')).toBe(false);
     expect(PAINTER_FILE_RE.test('map_window_painter.ts')).toBe(true);
+    expect(PAINTER_FILE_RE.test('chat_geometry_controller.ts')).toBe(true);
+    expect(PAINTER_FILE_RE.test('loot_roll_control.ts')).toBe(false);
 
     const reflow = new Map(FORCED_REFLOW_READS);
     const gcs = reflow.get('getComputedStyle');
