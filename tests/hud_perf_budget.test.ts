@@ -10,16 +10,21 @@
 //
 // THE ASSERTIONS ARE SPLIT BY HOST so each runs where it can actually be measured:
 //
-//   ARM 1 - STATIC SOURCE-SCAN (Node, runs in every `npm test`): the raw-write
-//     rejection. Every FACET-ROUTED HUD painter must route ALL per-frame writes through the
-//     PainterHost elided writers (setText/setDisplay/setTransform/setWidth +
-//     setStyleProp/toggleClass/setAttr); no raw .style/.textContent/.classList/
-//     .className/.setAttribute/.setProperty/.innerHTML beyond a DOCUMENTED build-time
-//     exception. This is the same per-painter check the per-frame painters
-//     used, consolidated; the canvas painters (cadence + cached tokens) and the
-//     render-cadence nameplate painter are NOT facet-routed and are excluded. A completeness
-//     check pairs the scanned list with the canvas-exclusion list so a NEW src/ui painter
-//     must be classified, never silently escaping the scan.
+//   ARM 1 - STATIC SOURCE-SCAN (Node, runs in every `npm test`): the raw-write and
+//     layout-read rejection, over every src/ui painter under BOTH names src/ui/CLAUDE.md
+//     sanctions (`*_painter.ts` and `*_window.ts`). Every FACET-ROUTED HUD painter must
+//     route ALL per-frame writes through the PainterHost elided writers
+//     (setText/setDisplay/setTransform/setWidth + setStyleProp/toggleClass/setAttr); no raw
+//     .style/.textContent/.classList/.className/.setAttribute/.setProperty/.innerHTML
+//     beyond a DOCUMENTED build-time exception. This is the same per-painter check the
+//     per-frame painters used, consolidated. The canvas painters (cadence + cached tokens)
+//     are not facet-routed and take the scan with their own counted exceptions plus an
+//     identity proof; the cold window painters are not per-frame at all and take the two
+//     halves of the contract that do not depend on cadence (no forced-reflow layout read,
+//     no per-frame driver). Completeness checks pair the buckets with what is on disk so a
+//     NEW src/ui painter cannot silently escape, whichever name it carries. (Render-resident
+//     painters under src/render, e.g. the cadence-throttled nameplate painter, are
+//     intentionally outside this HUD-painter file.)
 //
 //   ARM 2 - FAKE-DOM RUNTIME (Node, runs in every `npm test`): the skip-rate budget and
 //     the allocation budget. The repo has NO jsdom (the tiny-dependency invariant), so
@@ -286,6 +291,27 @@ const CANVAS_CONTEXT_RE = /\b(?:Offscreen)?CanvasRenderingContext2D\b/;
 const CANVAS_DRAW_RE =
   /\.(?:beginPath|closePath|moveTo|lineTo|arcTo|ellipse|quadraticCurveTo|bezierCurveTo|fillRect|strokeRect|clearRect|fillText|strokeText|drawImage|createLinearGradient|createRadialGradient|createPattern|putImageData|getImageData|createImageData|measureText|setLineDash|roundRect)\s*\(/;
 
+// Both arms drive ONE assertion site, from this table, so the proof cannot be halved by
+// pointing the second assertion at the first regex. Two canvas matchers both read right at
+// a glance, so the teeth test below discriminates them by fixture rather than by name.
+const CANVAS_IDENTITY: ReadonlyArray<readonly [string, RegExp, string]> = [
+  [
+    'names a 2D context type',
+    CANVAS_CONTEXT_RE,
+    'a CANVAS_PAINTERS entry must name a 2D context type (CanvasRenderingContext2D), whether it mints the context or takes one injected',
+  ],
+  [
+    'draws on a 2D context',
+    CANVAS_DRAW_RE,
+    "a CANVAS_PAINTERS entry must actually draw on a 2D context (fillText / drawImage / beginPath / ...). A module that only ANNOTATES a context is a DOM module wearing a painter's name: move it to UI_DOM_MODULES in tests/architecture.test.ts and rename it off *_painter.ts",
+  ],
+];
+
+// The two fixtures that tell the arms apart: source that names the type and draws nothing,
+// and source that draws and names no type. Each arm accepts exactly one of them.
+const CANVAS_TYPE_ONLY = 'export function paint(ctx: CanvasRenderingContext2D): void { return; }';
+const CANVAS_DRAW_ONLY = 'c.clearRect(0, 0, w, h); c.drawImage(sprite, x, y);';
+
 // One allowance map per matcher list, keyed by the labels above. Anything not listed must
 // be ZERO, and the count is EXACT in both directions, which is what keeps an allowance from
 // rotting: a granted read that is later deleted fails until the number comes back down.
@@ -534,14 +560,9 @@ describe('hud_perf_budget ARM 1: hot painters make no raw DOM write (Node, npm t
   for (const { file } of CANVAS_PAINTERS) {
     it(`${file} really is a canvas painter (the CANVAS_PAINTERS entry is earned)`, () => {
       const code = painterSource(file);
-      expect(
-        CANVAS_CONTEXT_RE.test(code),
-        `${file}: a CANVAS_PAINTERS entry must name a 2D context type (CanvasRenderingContext2D), whether it mints the context or takes one injected`,
-      ).toBe(true);
-      expect(
-        CANVAS_DRAW_RE.test(code),
-        `${file}: a CANVAS_PAINTERS entry must actually draw on a 2D context (fillText / drawImage / beginPath / ...). A module that only ANNOTATES a context is a DOM module wearing a painter's name: move it to UI_DOM_MODULES in tests/architecture.test.ts and rename it off *_painter.ts`,
-      ).toBe(true);
+      for (const [what, re, why] of CANVAS_IDENTITY) {
+        expect(re.test(code), `${file}: ${what}: ${why}`).toBe(true);
+      }
     });
   }
 
@@ -581,17 +602,32 @@ describe('hud_perf_budget ARM 1: hot painters make no raw DOM write (Node, npm t
   it('cold window painters make no forced-reflow layout read beyond a documented allowance', () => {
     const allowances = new Map(COLD_PAINTER_ALLOWANCES.map((c) => [c.file, c.reflowAllow]));
     const violations: string[] = [];
+    const scanned: string[] = [];
+    let observed = 0;
     for (const file of COLD_PAINTERS) {
       const code = painterSource(file);
       const allow = allowances.get(file) ?? {};
+      scanned.push(file);
       for (const [token, re] of FORCED_REFLOW_READS) {
         const expected = allow[token] ?? 0;
         const actual = countMatches(code, re);
+        observed += actual;
         if (actual !== expected) {
           violations.push(`${file}: ${token} appears ${actual}x, expected ${expected}`);
         }
       }
     }
+    // Non-vacuity for the sweep itself, not just for its bucket: a loop narrowed to an empty
+    // slice, or a painterSource() that silently returned nothing, would report zero
+    // violations over zero files and read as a clean bill of health.
+    expect(scanned, 'the cold reflow sweep visited a different set than the cold bucket').toEqual(
+      COLD_PAINTERS,
+    );
+    expect(scanned).toContain('talents_window.ts');
+    expect(
+      observed,
+      'the cold reflow sweep matched nothing at all: it read no real source',
+    ).toBeGreaterThan(0);
     expect(
       violations,
       `a layout read flushes pending style + layout every time it runs, so it is thrash on a window REDRAW just as much as on a frame. Hoist the read out of the loop, cache it behind the same invalidation key the redraw uses, or add a documented, counted entry to COLD_PAINTER_ALLOWANCES saying when it runs:\n${violations.join('\n')}`,
@@ -601,17 +637,32 @@ describe('hud_perf_budget ARM 1: hot painters make no raw DOM write (Node, npm t
   it('cold window painters drive no frame loop of their own', () => {
     const allowances = new Map(COLD_PAINTER_ALLOWANCES.map((c) => [c.file, c.driverAllow]));
     const violations: string[] = [];
+    const scanned: string[] = [];
+    let observed = 0;
     for (const file of COLD_PAINTERS) {
       const code = painterSource(file);
       const allow = allowances.get(file) ?? {};
+      scanned.push(file);
       for (const [token, re] of FRAME_DRIVERS) {
         const expected = allow[token] ?? 0;
         const actual = countMatches(code, re);
+        observed += actual;
         if (actual !== expected) {
           violations.push(`${file}: ${token} appears ${actual}x, expected ${expected}`);
         }
       }
     }
+    // Same non-vacuity guard as the reflow sweep: zero violations over zero files is not a
+    // pass. The positive control is the lockpick clock, the one repeating repaint the bucket
+    // grants, so a matcher that stopped seeing `window.setInterval(` fails here too.
+    expect(scanned, 'the cold driver sweep visited a different set than the cold bucket').toEqual(
+      COLD_PAINTERS,
+    );
+    expect(scanned).toContain('hud/delve/lockpick_window.ts');
+    expect(
+      observed,
+      'the cold driver sweep matched nothing at all: it read no real source, or the driver matchers went blind',
+    ).toBeGreaterThan(0);
     expect(
       violations,
       `a cold painter renders on open and on refresh because nothing calls it repeatedly; give it its own repeating callback and every raw write inside that callback becomes periodic. Either document the cadence with a counted COLD_PAINTER_ALLOWANCES entry, or, if the component really is per-frame now, move it to HOT_PAINTERS and route its writes through the PainterHost facet:\n${violations.join('\n')}`,
@@ -693,18 +744,25 @@ describe('hud_perf_budget ARM 1: hot painters make no raw DOM write (Node, npm t
     expect(interval && countMatches('clearInterval(this.poll);', interval)).toBe(0);
 
     // The canvas identity proof: true of a real canvas painter, false of a real DOM module.
-    // bags_window is the control on purpose, since it is exactly the shape of module that
-    // would be parked in CANVAS_PAINTERS to escape both gates.
-    expect(CANVAS_CONTEXT_RE.test('export function paint(ctx: CanvasRenderingContext2D) {}')).toBe(
-      true,
-    );
+    // Each arm is fetched BY LABEL from the table the assertion loop reads, and checked
+    // against the fixture only THAT arm may accept. Both arms are canvas matchers and both
+    // read right at a glance, so pointing the draw assertion at the type regex would halve
+    // the proof with everything green; here it flips two cases.
+    const identity = new Map(CANVAS_IDENTITY.map(([what, re]) => [what, re]));
+    const names = identity.get('names a 2D context type');
+    const draws = identity.get('draws on a 2D context');
+    expect(names && names.test(CANVAS_TYPE_ONLY)).toBe(true);
+    expect(draws && draws.test(CANVAS_TYPE_ONLY)).toBe(false);
+    expect(names && names.test(CANVAS_DRAW_ONLY)).toBe(false);
+    expect(draws && draws.test(CANVAS_DRAW_ONLY)).toBe(true);
     expect(CANVAS_CONTEXT_RE.test('const ctx = new AudioContext();')).toBe(false);
-    expect(CANVAS_DRAW_RE.test('ctx.drawImage(sprite, x, y);')).toBe(true);
     expect(CANVAS_DRAW_RE.test('ctx.fillText(label, 0, 0);')).toBe(true);
     // `.fill(` and `.stroke(` are deliberately OUT of the vocabulary: they collide with
     // Array.prototype.fill and with ordinary field names.
     expect(CANVAS_DRAW_RE.test('rows.fill(0);')).toBe(false);
     expect(CANVAS_DRAW_RE.test('this.bar.stroke();')).toBe(false);
+    // bags_window is the control on purpose, since it is exactly the shape of module that
+    // would be parked in CANVAS_PAINTERS to escape both gates.
     const control = painterSource('bags_window.ts');
     expect(CANVAS_CONTEXT_RE.test(control)).toBe(false);
     expect(CANVAS_DRAW_RE.test(control)).toBe(false);
