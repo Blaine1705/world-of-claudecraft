@@ -756,14 +756,32 @@ export interface FocusHarvestYield {
  * capacity gate (src/sim/interaction.ts), which must see exactly the set the
  * roll will yield WITHOUT drawing rng (a refused command must not shift the
  * world's draw order).
+ *
+ * The pick is a SET of families: a repeated tag counts ONCE, whatever the
+ * caller passed (#2474). `chosen` reaches here straight off the wire
+ * (server/game.ts forwards the client's `components` array after a type filter
+ * only), and a corpse is single-use, so a repeat that survived would let one
+ * hand-crafted frame farm the same family several times from one claim: two
+ * tier rolls, two grants, and on a rare-or-better roll two signed yields. The
+ * dedupe runs BEFORE either length test, so a repeat can neither reach the
+ * filter arm twice nor pad `chosen.length` past the spread threshold and pull
+ * in tags the caller never asked for. First occurrence wins (Set iteration is
+ * insertion-ordered), so tag ORDER is untouched: it is the order the yields,
+ * the grants and the harvestResult ledger entries land in (#2457). Same
+ * order-preserving idiom the picker's own view-core (`corpseHarvestView`)
+ * already applied to the tags it renders, which is why no shipped client can
+ * produce the repeat in the first place.
+ * `taggedComponents` needs no dedupe of its own; content uniqueness is pinned
+ * by tests/mob_component_tags.test.ts.
  */
 export function effectiveFocusComponents(
   taggedComponents: readonly string[],
   chosen: readonly string[],
 ): readonly string[] {
-  return chosen.length === 0 || chosen.length >= taggedComponents.length
+  const picked = [...new Set(chosen)];
+  return picked.length === 0 || picked.length >= taggedComponents.length
     ? taggedComponents
-    : chosen.filter((c) => taggedComponents.includes(c));
+    : picked.filter((c) => taggedComponents.includes(c));
 }
 
 /**
