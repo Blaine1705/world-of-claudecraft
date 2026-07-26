@@ -16,7 +16,13 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts). This region draws NO rng.
 
-import { addStacked, bagCapacity, bagsFullError, equipBag as equipBagCmd } from './bags';
+import {
+  addStacked,
+  bagCapacity,
+  bagsFullError,
+  canGrantItemInstance,
+  equipBag as equipBagCmd,
+} from './bags';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import {
@@ -817,7 +823,15 @@ export function buyBackItem(
     ctx.error(meta.entityId, 'Not enough money.');
     return;
   }
-  if (!ctx.canAddItem(itemId, 1, meta.entityId)) {
+  // A row's payload can top up an identical-payload stack that a plain add
+  // model would reject as full (canGrantItemInstance mirrors the countFit
+  // merge rule addStacked itself uses below, #2139-class gap): preflight the
+  // regrant with the row's own instance instead of always checking room for
+  // a generic plain copy.
+  const fits = slot.instance
+    ? canGrantItemInstance(meta.inventory, bagCapacity(meta.bags), itemId, slot.instance)
+    : ctx.canAddItem(itemId, 1, meta.entityId);
+  if (!fits) {
     bagsFullError(ctx, meta.entityId);
     return;
   }

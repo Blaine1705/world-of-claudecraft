@@ -35,6 +35,7 @@ vi.mock('../server/db', () => ({
 
 import { type ClientSession, GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
+import { bagCapacity } from '../src/sim/bags';
 import { STATION_RADIUS, STATIONS } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
@@ -1416,6 +1417,43 @@ describe('the vendor buyback-plain wash is closed', () => {
     const back = slotsOf(sim, pid, 'tangled_weed');
     expect(back).toHaveLength(1);
     expect(back[0].instance).toEqual(junkPayload);
+  });
+
+  it('a full bag with a same-payload partial stack still tops up on buyback (Rubsey review)', () => {
+    // Reviewer repro: buyBackItem preflighted with ctx.canAddItem, which
+    // models a plain add (a free slot or room in a PLAIN stack). The actual
+    // regrant is addItemSilent(itemId, 1, meta, instance), which only tops up
+    // an identical-payload stack (countFit's merge rule). With bags full of
+    // one-per-slot gear plus one partial signed stack, a plain capacity check
+    // sees zero free slots and wrongly rejects a buyback that would actually
+    // fit into that partial stack.
+    const { sim, pid } = vendorSetup();
+    setCopper(sim, pid, 0);
+    const meta = sim.players.get(pid)!;
+    const junkPayload: ItemInstancePayload = { signer: 'Ayla' };
+    sim.ctx.addItemInstance('tangled_weed', junkPayload, pid);
+    sim.drainEvents();
+    sim.sellItem('tangled_weed', 1, pid); // records the buyback row, bag now empty
+    setCopper(sim, pid, ITEMS.tangled_weed.sellValue!);
+    // Re-grant one copy so a same-payload partial stack sits in the bag
+    // (below its stack cap), then fill every remaining slot with one-per-slot
+    // gear so no free slot remains.
+    sim.ctx.addItemInstance('tangled_weed', junkPayload, pid);
+    const cap = bagCapacity(meta.bags);
+    const gearIds = Object.values(ITEMS)
+      .filter((d) => d.kind === 'weapon' || d.kind === 'armor')
+      .map((d) => d.id);
+    let i = 0;
+    while (meta.inventory.length < cap) {
+      sim.addItem(gearIds[i % gearIds.length], 1, pid);
+      i++;
+    }
+    sim.drainEvents();
+    sim.buyBackItem('tangled_weed', undefined, undefined, pid);
+    expect(errorTexts(sim.drainEvents())).toHaveLength(0);
+    const row = meta.inventory.find((s) => s.itemId === 'tangled_weed' && s.instance !== undefined);
+    expect(row?.count).toBe(2);
+    expect(row?.instance).toEqual(junkPayload);
   });
 
   it('the full wash probe is impossible end to end: sell denied, then buyback denied', () => {
