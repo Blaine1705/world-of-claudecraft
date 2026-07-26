@@ -2267,14 +2267,22 @@ export const TARGETS = [
       }
       if (variant?.mobile) {
         // The short landscape viewport cannot show the whole goods grid, and the
-        // picks sit below the consumables; scroll the first locked row into view
-        // so the frame carries a requirement line rather than the food rows.
-        await page.evaluate(() => {
-          const row =
-            document.querySelector('#vendor-window .vendor-locked') ??
-            document.querySelector('#vendor-window .vendor-item');
+        // picks sit well below the consumables, so the frame has to be scrolled
+        // to them. Anchor on the tool's NAME, not on the .vendor-locked class:
+        // that class does not exist on the base tree, so a class anchor silently
+        // fell back to the first row and shot the food while the after side
+        // showed the picks, which is a wrong-but-plausible pair rather than a
+        // failure. Matching by English display name is this file's shipped idiom
+        // for reaching a specific row (the gather-tool-tooltip target hovers
+        // 'Iron Mining Pick' the same way), and it resolves identically on both
+        // trees, which is the whole requirement for a comparable pair.
+        const anchored = await page.evaluate(() => {
+          const rows = [...document.querySelectorAll('#vendor-window .vendor-item')];
+          const row = rows.find((r) => (r.textContent ?? '').includes('Iron Mining Pick'));
           row?.scrollIntoView({ block: 'center' });
+          return Boolean(row);
         });
+        if (!anchored) throw new Error('no Iron Mining Pick row to anchor the mobile frame on');
         await wait(300);
       }
       return { clip: '#vendor-window' };
