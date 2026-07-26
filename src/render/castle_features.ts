@@ -272,11 +272,17 @@ export function buildCastleFeatures(): CastleFeaturesView {
     },
   ];
   const M = CASTLE.module;
+  // the wall body is DOUBLE-SKINNED: a row of modules on each face of the
+  // thicker walk strip, so both sides read as built stone and the gate
+  // modules pair into a short tunnel under the walk
+  const skinOff = CASTLE.wallTh / 2 - 0.85;
   const place = (run: WallRun, along: number, key: CastleKey, s = S): void => {
-    const x = run.axis === 'z' ? run.line : along;
-    const z = run.axis === 'z' ? along : run.line;
-    const rot = run.axis === 'z' ? Math.PI / 2 : 0;
-    put(key, { x, y: padY, z, rot, s });
+    for (const face of [-1, 1] as const) {
+      const x = run.axis === 'z' ? run.line + face * skinOff : along;
+      const z = run.axis === 'z' ? along : run.line + face * skinOff;
+      const rot = run.axis === 'z' ? Math.PI / 2 : 0;
+      put(key, { x, y: padY, z, rot, s });
+    }
   };
   for (const run of runs) {
     const count = Math.round((run.a1 - run.a0) / M);
@@ -511,11 +517,16 @@ export function buildCastleFeatures(): CastleFeaturesView {
   // the decorProps path) ----
   {
     const kx = 421;
-    const kz = 2003;
-    put('hexrTowerA', { x: kx - 5.5, y: wardY + 21, z: kz - 4.5, rot: 0.4, s: 5 });
-    put('hexrTowerA', { x: kx + 5.5, y: wardY + 24, z: kz + 4.5, rot: 2.2, s: 5 });
-    put('hexrTowerA', { x: kx, y: wardY + 29, z: kz, rot: 1.1, s: 5.5 });
-    put('kcasBannerRedTriple', { x: kx, y: wardY + 41, z: kz + 1.2, rot: Math.PI, s: 1.6 });
+    const kz = 2001.5;
+    // the side turrets tuck INTO the keep's upper mass (small offsets, low
+    // seats) so they read as corbelled bartizans, not floating drums; a
+    // stone corbel block bridges each one into the keep body
+    put('hexrTowerA', { x: kx - 3.2, y: wardY + 16.5, z: kz - 2.6, rot: 0.4, s: 4.4 });
+    put('hexrTowerA', { x: kx + 3.2, y: wardY + 18.5, z: kz + 2.6, rot: 2.2, s: 4.4 });
+    put('hexrTowerA', { x: kx, y: wardY + 25, z: kz, rot: 1.1, s: 5.2 });
+    slab(kx - 3.2, kz - 2.6, 3.4, 3.4, wardY + 17.2, 2.4, slabMat);
+    slab(kx + 3.2, kz + 2.6, 3.4, 3.4, wardY + 19.2, 2.4, slabMat);
+    put('kcasBannerRedTriple', { x: kx, y: wardY + 36.5, z: kz + 1.2, rot: Math.PI, s: 1.6 });
   }
 
   // ---- gate dressing ----
@@ -722,17 +733,9 @@ export function buildCastleFeatures(): CastleFeaturesView {
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     group.add(mesh);
-    if (rmp.h0 <= padY + 0.1) {
-      const fx = rmp.axis === 'x' ? rmp.a0 - 1.2 : (rmp.b0 + rmp.b1) / 2;
-      const fz = rmp.axis === 'x' ? (rmp.b0 + rmp.b1) / 2 : rmp.a0 - 1.2;
-      put('kcasStairsWide', {
-        x: fx,
-        y: padY,
-        z: fz,
-        rot: rmp.axis === 'x' ? -Math.PI / 2 : Math.PI,
-        s: 0.62,
-      });
-    }
+    // no foot tread pieces: the stairs module is wider than the flight
+    // bands and its treads fought the wedge's own slope; the solid pier
+    // reads as the stair
   }
 
   // ---- the bailey court: a tiled plaza south of the ward steps, torches

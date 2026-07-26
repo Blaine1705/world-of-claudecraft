@@ -7,7 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { CASTLE, CASTLE_GATES, castleLift } from '../src/sim/castle_layout';
+import { CASTLE, CASTLE_BUILDINGS, CASTLE_GATES, castleLift } from '../src/sim/castle_layout';
 import { Sim } from '../src/sim/sim';
 import { groundHeight } from '../src/sim/world';
 import { EMPTY_TEST_WORLD } from './sim_shared';
@@ -190,12 +190,17 @@ describe('the Last Keep castle grounds', () => {
     }
   });
 
-  it('the keep door spot and its leave-drop are open terrace ground', () => {
-    // doorPos in content/dungeons.ts, and the leave teleport at z - 4
-    for (const z of [2016.5, 2012.5]) {
-      expect(castleLift(413.5, z)).toBe(0);
-      expect(Math.abs(groundHeight(413.5, z, SEED) - CASTLE.ward.h)).toBeLessThan(0.1);
+  it('the keep door spot and its leave-drop are open terrace ground on the keep axis', () => {
+    // doorPos in content/dungeons.ts sits on the keep's own door axis
+    // (x 421); the leave teleport lands at z - 4, just clear of the keep's
+    // decor collider (r 8.5 at 421,2001.5)
+    for (const z of [2014.5, 2010.5]) {
+      expect(castleLift(421, z)).toBe(0);
+      expect(Math.abs(groundHeight(421, z, SEED) - CASTLE.ward.h)).toBeLessThan(0.1);
     }
+    const keep = CASTLE_BUILDINGS.find((b) => b.key === 'hexrCastle');
+    if (!keep) throw new Error('no keep');
+    expect(Math.hypot(421 - keep.x, 2010.5 - keep.z)).toBeGreaterThan(keep.r + 0.4);
   });
 
   it('the doorway module keeps a separable door leaf (the open-arch filter depends on it)', () => {

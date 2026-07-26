@@ -20,8 +20,9 @@ export const CASTLE = {
   // the graded grounds (terrain levels to the local pad target; the skirt
   // blends out to the waste; the west reach carries the barbican forecourt)
   pad: { x0: 334, x1: 452, z0: 1980, z1: 2085, h: 6 },
-  // the inner ward: the keep's raised terrace
-  ward: { x0: 398, x1: 433.4, z0: 1991.4, z1: 2018, h: 8.6 },
+  // the inner ward: the keep's raised terrace (z0 sits back far enough
+  // that the alley flight lane clears the thicker near wall)
+  ward: { x0: 398, x1: 433.4, z0: 1992.6, z1: 2018, h: 8.6 },
   // the curtain wall square: wall centerlines
   wx0: 360,
   wx1: 436.8,
@@ -29,8 +30,9 @@ export const CASTLE = {
   wz1: 2071.8,
   /** wall module length (KayKit wall is 4 units at scale 1.75) */
   module: 7,
-  /** wall thickness: the lift plateau strip (the walkable wall-walk width) */
-  wallTh: 2.4,
+  /** wall thickness: the lift plateau strip (the walkable wall-walk width;
+   *  the render skins BOTH faces with wall modules at this thickness) */
+  wallTh: 3.0,
   /** the wall-walk's ABSOLUTE height (walls stand on the bailey pad) */
   walkAbs: 13,
   /** the tall southeast watchtower chamber's ABSOLUTE floor height */
@@ -144,10 +146,12 @@ export interface CastleRamp {
   h1: number;
 }
 export const CASTLE_RAMPS: readonly CastleRamp[] = [
-  // west flight: bailey floor up the inner face to the west walk...
-  { axis: 'z', b0: 361.0, b1: 363.6, a0: 2040, a1: 2058.6, h0: 6, h1: CASTLE.walkAbs },
+  // west flight: bailey floor up the inner face to the west walk (the band
+  // tucks 0.3 INTO the thicker wall strip so no low sliver opens between
+  // flight and walk; the wall's own max() simply wins over that edge)
+  { axis: 'z', b0: 361.2, b1: 364.0, a0: 2040, a1: 2058.6, h0: 6, h1: CASTLE.walkAbs },
   // ...and its flat landing, bridging the flight top onto the SW bastion
-  { axis: 'z', b0: 361.0, b1: 363.6, a0: 2058.6, a1: 2069, h0: CASTLE.walkAbs, h1: CASTLE.walkAbs },
+  { axis: 'z', b0: 361.2, b1: 364.0, a0: 2058.6, a1: 2069, h0: CASTLE.walkAbs, h1: CASTLE.walkAbs },
   // the alley flight: squeezed between the north wall and the ward's
   // retaining edge, climbing east to the NE walk. The band runs THROUGH the
   // ward's retaining blend (the overlap rule above): stopping at the rect line
@@ -194,12 +198,39 @@ export interface CastleBuilding {
   scale: number;
   r: number;
   h: number;
+  /** stands on the ward terrace (placement checks use this, not the key) */
+  ward?: boolean;
+  /** part of the composed keep mass: allowed to touch its complex mates */
+  keepComplex?: boolean;
 }
 export const CASTLE_BUILDINGS: readonly CastleBuilding[] = [
-  // THE WARD: the keep (its door, the Last Keep interior, faces +z toward
-  // the ward steps) and the great hall at its side
-  { key: 'hexrCastle', x: 421, z: 2003, rot: 0, scale: 9, r: 8.5, h: 34 },
-  { key: 'hexrTownhall', x: 405, z: 2006.5, rot: 0, scale: 7, r: 5.8, h: 15 },
+  // THE WARD: the keep composed with a barracks hall wing so its base
+  // reads as one larger palace mass (the pieces deliberately touch); the
+  // keep's own door faces +z, straight down the ward toward the portal
+  {
+    key: 'hexrCastle',
+    x: 421,
+    z: 2001.5,
+    rot: 0,
+    scale: 9,
+    r: 8.5,
+    h: 34,
+    ward: true,
+    keepComplex: true,
+  },
+  {
+    key: 'hexrBarracks',
+    x: 409.5,
+    z: 2001.5,
+    rot: Math.PI / 2,
+    scale: 7.5,
+    r: 6,
+    h: 12.5,
+    ward: true,
+    keepComplex: true,
+  },
+  // the great hall, moved down into the bailey to free the terrace
+  { key: 'hexrTownhall', x: 390, z: 2016, rot: 0, scale: 7, r: 5.8, h: 15 },
   // THE BAILEY, northwest military quarter: catapult tower, archery range,
   // and the servants' house
   { key: 'hexrTowerCatapult', x: 367, z: 1995, rot: Math.PI / 2, scale: 7, r: 4, h: 14 },
