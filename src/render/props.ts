@@ -322,6 +322,8 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   kcasBedroll: { url: '/models/dungeon/bed_floor.glb', kit: 'kcas' },
   kcasChair: { url: '/models/dungeon/chair.glb', kit: 'kcas' },
   kcasStool: { url: '/models/dungeon/stool.glb', kit: 'kcas' },
+  kcasStoolRound: { url: '/models/dungeon/stool_round.glb', kit: 'kcas' },
+  kcasChest: { url: '/models/dungeon/chest.glb', kit: 'kcas' },
   kcasTableRoundSmall: { url: '/models/dungeon/table_round_small.glb', kit: 'kcas' },
   kcasTableRoundMedium: { url: '/models/dungeon/table_round_medium.glb', kit: 'kcas' },
   // NOTE: the laid feast table (table_long_tablecloth_decorated_a) is already

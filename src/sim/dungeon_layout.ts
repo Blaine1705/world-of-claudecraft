@@ -530,7 +530,9 @@ export const LASTKEEP_DECOR: readonly AuthoredDecor[] = [
   // The chapel alone is candle-lit (its shrine and candle rows are dressing).
   keepBrazier(-40, 70),
   keepBrazier(-26, 82),
-  keepBrazier(-20.5, 80.6),
+  // west of the guest_west door axis (x -20.5): the door's 1.5yd clear
+  // lane through z 78..79.75 must stay collider-free
+  keepBrazier(-23, 80.6),
   keepBrazier(-11.3, 84.5),
   keepBrazier(22.5, 88.5),
   keepBrazier(-36, 59.8),
@@ -569,7 +571,8 @@ export const LASTKEEP_LAYOUT: DungeonLayout = {
   // The dais marker sits under the lifted throne-dais room: placeDais' platform
   // blocks and rim decor (drawn from y 0) are entirely buried inside the room's
   // solid riser, so the authored dais room IS the visible boss-stage geometry.
-  dais: { x: 0, z: 59, r: 4 },
+  // r 3 keeps the whole disc inside the room rect (z 56..62).
+  dais: { x: 0, z: 59, r: 3 },
   wallX: 42,
   endWallHw: 43,
   floorHalfX: 42,

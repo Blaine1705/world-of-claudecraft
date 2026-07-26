@@ -521,10 +521,12 @@ export function buildCastleFeatures(): CastleFeaturesView {
   // ---- gate dressing ----
   const gm = (CASTLE_GATES.main.a0 + CASTLE_GATES.main.a1) / 2;
   for (const side of [-1, 1] as const) {
+    // the pillar module is a full 7yd wall piece at this scale: its center
+    // stays far enough out that its ends clear the walkable gate span
     put('kcasWallPillar', {
       x: CASTLE.wx0,
       y: padY,
-      z: gm + side * (M / 2 + 1.3),
+      z: gm + side * (M / 2 + 2.4),
       rot: Math.PI / 2,
     });
     put('kcasBannerRedA', {
@@ -567,7 +569,9 @@ export function buildCastleFeatures(): CastleFeaturesView {
     for (let k = 0; k < n; k++) {
       const cz = b.z0 + 2 + k * 4;
       if (cz > CASTLE_GATES.outer.a0 - 2.2 && cz < CASTLE_GATES.outer.a1 + 2.2) {
-        put('kcasWallDoorway', { x: b.x, y: padY, z: om, rot: Math.PI / 2, s: 1 });
+        // the doorway stays ON its grid slot center so the wall run stays
+        // sealed; the walkable span is centered on the slot (castle_layout)
+        put('kcasWallDoorway', { x: b.x, y: padY, z: cz, rot: Math.PI / 2, s: 1 });
         continue;
       }
       put('kcasWall', { x: b.x, y: padY, z: cz, rot: Math.PI / 2, s: 1 });
@@ -621,26 +625,31 @@ export function buildCastleFeatures(): CastleFeaturesView {
     const g = GARDEN;
     const gs = 0.75; // wall piece: 1.5 long, 3 tall (tops at abs 9)
     const inGap = (v: number): boolean =>
-      g.gates.some((gap) => v > gap.a0 - 0.8 && v < gap.a1 + 0.8);
-    for (let cx = g.x0 + 0.75; cx <= g.x1 - 0.75; cx += 1.5) {
-      if (inGap(cx)) continue;
-      put('kcasWallHalf', { x: cx, y: padY, z: g.wallZ, rot: 0, s: gs });
+      g.gates.some((gap) => v > gap.a0 - 0.7 && v < gap.a1 + 0.7);
+    // south wall: fixed piece count with the last piece clamped flush to
+    // x1, so the render covers the whole lift span (73 is not a multiple
+    // of 1.5 and an open tail reads as an invisible wall)
+    {
+      const n = Math.ceil((g.x1 - g.x0) / 1.5);
+      for (let k = 0; k < n; k++) {
+        const cx = Math.min(g.x0 + 0.75 + k * 1.5, g.x1 - 0.75);
+        if (inGap(cx)) continue;
+        put('kcasWallHalf', { x: cx, y: padY, z: g.wallZ, rot: 0, s: gs });
+      }
     }
+    // end returns: start flush against the rendered curtain face and run
+    // to the south wall line
     for (const rx of [g.x0, g.x1]) {
-      for (let cz = CASTLE.wz1 + 2.4; cz <= g.wallZ - 0.7; cz += 1.5) {
+      const rz0 = CASTLE.wz1 + 1.6;
+      const n = Math.ceil((g.wallZ - rz0) / 1.5);
+      for (let k = 0; k < n; k++) {
+        const cz = Math.min(rz0 + 0.75 + k * 1.5, g.wallZ - 0.75);
         put('kcasWallHalf', { x: rx, y: padY, z: cz, rot: Math.PI / 2, s: gs });
       }
     }
+    // doorway dressing: torchlight only (the wall pillar module is a full
+    // 4yd wall piece and would visually seal the walkable gap)
     for (const gap of g.gates) {
-      for (const side of [-1, 1] as const) {
-        put('kcasWallPillar', {
-          x: side === -1 ? gap.a0 - 0.4 : gap.a1 + 0.4,
-          y: padY,
-          z: g.wallZ,
-          rot: 0,
-          s: 0.9,
-        });
-      }
       put('kcasTorch', {
         x: (gap.a0 + gap.a1) / 2 + 1.4,
         y: padY,

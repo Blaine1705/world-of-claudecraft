@@ -62,9 +62,10 @@ export const CASTLE_GATES = {
   postern: { a0: 407.6, a1: 410.2 },
   /** the east breach: the wall the drakes brought down, a rubble climb */
   breach: { a0: 2047.4, a1: 2054.4 },
-  /** the barbican's outer gate, aligned with the main gate on the road line
-   *  (the outer doorway renders at wall scale 1, so its opening is narrower) */
-  outer: { a0: 2028.9, a1: 2030.9 },
+  /** the barbican's outer gate on the road line: the doorway module sits on
+   *  its 4-unit grid slot (center 2030), and the walkable span keeps a
+   *  margin inside the arch's 2yd foot opening (2029 to 2031) */
+  outer: { a0: 2029.15, a1: 2030.85 },
 } as const;
 
 // The barbican: a low-walled forecourt in front of the main gate, its own
@@ -95,7 +96,10 @@ export const GARDEN = {
   hAbs: 9,
   th: 1.6,
   /** the two doorway gaps in the south wall (x spans) */
-  gates: [{ a0: 365, a1: 368.5 }],
+  gates: [
+    { a0: 365, a1: 368.5 },
+    { a0: 428, a1: 431.5 },
+  ],
 } as const;
 
 // Towers: four corner bastions (the SE is the tall watch) plus three
