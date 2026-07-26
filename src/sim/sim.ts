@@ -474,7 +474,7 @@ import {
   socketRiftGem as socketRiftGemImpl,
   upgradeRiftItem as upgradeRiftItemImpl,
 } from './rift/progression';
-import { riftHeroicTemplate, riftHeroicTuningFor, riftMechanicSuppressed } from './rift/ranks';
+import { riftMechanicSuppressed, riftRankTemplate, riftRankTuningFor } from './rift/ranks';
 import { generateRiftFloor } from './rift/rift_gen';
 import {
   riftLockpickAbort as riftLockpickAbortImpl,
@@ -7195,11 +7195,11 @@ export class Sim {
     // the wider 3.5yd ring beside the boss.
     const spawnRadius = MOBS[boss.templateId]?.worldBoss ? 1 : 3.5;
     // A rift boss's adds always match the dungeon: spawn at the BOSS's own
-    // level (the floor level, ~20s), never a roll of the template band, and on
-    // the heroic A/S ranks take the rift add tuning (rift/ranks.ts). The rank
-    // derives from the instance descriptor, so all hosts agree.
+    // level (the floor level, ~20s), never a roll of the template band, and at
+    // EVERY rank take the rift add tuning (rift/ranks.ts). The rank derives
+    // from the instance descriptor, so all hosts agree.
     const riftInst = isRiftPos(boss.pos.x) ? riftInstanceAtPos(this.ctx, boss.pos) : null;
-    const riftTuning = riftInst ? riftHeroicTuningFor(riftInst.baseLevel) : null;
+    const riftTuning = riftInst ? riftRankTuningFor(riftInst.baseLevel) : null;
     for (let k = 0; k < count; k++) {
       const ang = (k / count) * Math.PI * 2 + 0.7;
       const pos = this.groundPos(
@@ -7219,17 +7219,13 @@ export class Sim {
         },
       );
       let level = mobLevelForDungeonDifficulty(inst?.dungeonId ?? '', difficulty, rolledLevel);
-      if (riftInst) {
+      if (riftInst && riftTuning) {
         level = boss.level;
         // The add wave lands on top of the boss's own output, so BOTH its
         // auto-attack (via the template transform) and its mechanics (via
-        // mechanicDamageMult below) take the softer addDamageMultiplier.
-        if (riftTuning) {
-          addTemplate = riftHeroicTemplate(template, {
-            ...riftTuning,
-            damageMultiplier: riftTuning.addDamageMultiplier,
-          });
-        }
+        // mechanicDamageMult below) take the softer addDamageMultiplier, while
+        // its pool rides the trash health line: wave pressure, not extra bosses.
+        addTemplate = riftRankTemplate(template, riftTuning, 'add');
       }
       const add = createMob(this.nextId++, addTemplate, level, pos);
       applyDungeonMobTuning(add, inst?.dungeonId ?? '', difficulty, { summonedAdd: true });

@@ -8,10 +8,10 @@ import {
   WATER_MAX_STEPS_PER_FRAME,
   WATER_SCHEDULE_SLEEP,
   WATER_SCHEDULE_WAKE,
-  waterFieldNeedsReanchor,
   type WaterFieldPlan,
-  waterFieldPlan,
   type WaterScheduleState,
+  waterFieldNeedsReanchor,
+  waterFieldPlan,
 } from './water_core';
 
 const IMPULSE_CAPACITY = WATER_IMPULSE_CAPACITY;
