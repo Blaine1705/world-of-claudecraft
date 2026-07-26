@@ -98,6 +98,7 @@ function makeCtx() {
     get groundAoEs() {
       return groundAoEs;
     },
+    frozenOrbs: [],
     get dungeonDoorIds() {
       return dungeonDoorIds;
     },
@@ -111,6 +112,7 @@ function makeCtx() {
     get players() {
       return players;
     },
+    stationPlacements: [],
     get cfg() {
       return cfg;
     },
@@ -123,6 +125,7 @@ function makeCtx() {
     arenaQueueYumi5: [],
     yumiBusySlots: new Set(),
     yumiCatMatches: new Map(),
+    escortRuns: new Map(),
     matchmakeYumi: vi.fn(),
     updateYumiActive: vi.fn(),
     yumiPlayerDown: vi.fn(),
@@ -135,6 +138,7 @@ function makeCtx() {
     pendingMobRespawns: [],
     partyInvites: new Map(),
     readyChecks: new Map(),
+    pendingResurrections: new Map(),
     chatTokens: new Map(),
     channelSubs: new Map(),
     emit,
@@ -178,6 +182,7 @@ function makeCtx() {
     applyKnockback: vi.fn(() => 0),
     diminishedCrowdControlDuration: vi.fn(() => null),
     hostilesInRadius: vi.fn(() => []),
+    friendliesInRadius: vi.fn(() => []),
     breakStealth: vi.fn(),
     applyTaunt: vi.fn(),
     summonPet: vi.fn(),
@@ -194,6 +199,8 @@ function makeCtx() {
     dropPartyMarkers: vi.fn(),
     formDungeonFinderGroup: vi.fn(() => null),
     onMobKilledForQuests: vi.fn(),
+    onRecipeCraftedForQuests: vi.fn(),
+    onNodeGatheredForQuests: vi.fn(),
     onInventoryChangedForQuests: vi.fn(),
     checkQuestReady: vi.fn(),
     countItem: vi.fn(() => 0),
@@ -227,6 +234,8 @@ function makeCtx() {
     delveModuleEntry: vi.fn(() => ({ x: 0, y: 0, z: 0 })),
     failDelveRun: vi.fn(),
     duels: new Map(),
+    cardDuelQueue: [],
+    cardDuels: new Map(),
     pendingLootRolls: new Map(),
     nextLootRollId: 1,
     devCommands: false,
@@ -260,6 +269,7 @@ function makeCtx() {
     frenzyPackmates: vi.fn(),
     armDeathThroes: vi.fn(),
     refreshKnownAbilities: vi.fn(),
+    revalidateOffhandForSpec: vi.fn(),
     syncPetLevel: vi.fn(),
     moveToward: vi.fn(() => false),
     mobSwing: vi.fn(),
@@ -274,6 +284,7 @@ function makeCtx() {
     mobCanSwim: vi.fn(() => false),
     resolveMovePoint: vi.fn(() => ({ x: 0, z: 0 })),
     resolvePlayerMove: vi.fn(() => ({ x: 0, z: 0 })),
+    resolveMove: vi.fn(() => ({ x: 0, z: 0 })),
     updatePet: vi.fn(),
     isDelveCompanionMob: vi.fn(() => false),
     updateDelveCompanion: vi.fn(),
@@ -294,6 +305,9 @@ function makeCtx() {
     // delveDetectMult stubbed above (C1/M2/C3) - deduped here.
     partyMembersForKey: vi.fn(() => []),
     addItem: vi.fn(),
+    equipBag: vi.fn(),
+    equipItem: vi.fn(),
+    unequipItem: vi.fn(),
     addItemInstance: vi.fn(),
     // removeItem stubbed above (P1b inventory-hub helper) - deduped.
     spawnBossAdds: vi.fn(),
@@ -323,9 +337,11 @@ function makeCtx() {
     tameError: vi.fn(() => null),
     standUp: vi.fn(),
     breakGhostWolf: vi.fn(),
+    forceDismount: vi.fn(),
     startAutoAttack: vi.fn(),
     revivePet: vi.fn(),
     completeFishing: vi.fn(),
+    completeGatherCast: vi.fn(),
     applyDemonHealTick: vi.fn(),
     awardCombo: vi.fn(),
     meleeSwing: vi.fn(() => false),
@@ -340,6 +356,9 @@ function makeCtx() {
     setPlayerLevel: vi.fn(),
     notice: vi.fn(),
     spawnDevBot: vi.fn(),
+    spawnDevVendor: vi.fn(),
+    startCascadePlaytest: vi.fn(),
+    startDevSandbox: vi.fn(),
     seedDungeonFinderDev: vi.fn(() => ({ spawned: 0, note: 'ok' as const })),
     // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
     startFishing: vi.fn(),
@@ -356,6 +375,7 @@ function makeCtx() {
     // Ravenpost mail: the quest turn-in letter hook.
     queueQuestLetter: vi.fn(),
     mailHeroicMarks: vi.fn(),
+    mailAuthoredLetter: vi.fn(),
     applySetProcs: vi.fn(),
     // The Vale Cup sport-move arms.
     vcupBallKick: vi.fn(),

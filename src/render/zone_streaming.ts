@@ -16,11 +16,24 @@ export const MAX_OUTDOOR_FOG_FAR = 850;
 export const MIN_OUTDOOR_FOG_FAR = 45;
 export const UNPREPARED_ZONE_FOG_GUARD = 8;
 export const ZONE_STREAM_RECHECK_DISTANCE = 24;
+// GPU texture uploads are synchronous in WebGL. The loading-screen prewarm
+// covers only this immediate radius: enough for the first normal travel
+// transition without fetching the world's long tail of realm sky HDRIs.
+export const INITIAL_SKY_PREWARM_RADIUS = 240;
+// Camera-direction urgency, in world units, subtracted from a zone's rectangle
+// distance when it sits in the camera's projected forward direction (added
+// when behind). Pure nearest-first ordering let a marginally nearer sideways
+// zone (Farshore, 178 yd east of spawn) occupy the sequential prepare lane
+// for tens of seconds while the player walked into the next-nearest zone
+// (Mirefen, 182 yd north) unprepared - the walked-crossing blocking warmup.
+export const STREAM_FORWARD_BIAS = 64;
 
 interface Candidate {
   zone: ZoneDef;
   distanceSq: number;
   alignment: number;
+  /** Rectangle distance biased by the camera direction: lower prepares first. */
+  urgency: number;
   order: number;
 }
 
@@ -34,9 +47,12 @@ export function distanceSqToZone(zone: ZoneDef, x: number, z: number): number {
 }
 
 /**
- * Zones whose rectangles intersect a radial camera horizon, nearest first.
- * When distances tie, the zone in the camera's projected forward direction is
- * first so the terrain currently on screen wins the sequential build queue.
+ * Zones whose rectangles intersect a radial camera horizon, most urgent first.
+ * Urgency is the rectangle distance biased by STREAM_FORWARD_BIAS along the
+ * camera's projected forward direction, so the zone the player is heading
+ * into reaches the sequential prepare lane before a marginally nearer zone
+ * off to the side. Remaining ties break toward the forward direction, then
+ * world declaration order, so the terrain currently on screen wins.
  */
 export function zonesWithinStreamingHorizon(
   zones: readonly ZoneDef[],
@@ -65,11 +81,21 @@ export function zonesWithinStreamingHorizon(
     const dz = nearestZ - cameraZ;
     const distance = Math.sqrt(distanceSq);
     const alignment = distance > 0 ? (dx * fx + dz * fz) / distance : 1;
-    candidates.push({ zone, distanceSq, alignment, order });
+    candidates.push({
+      zone,
+      distanceSq,
+      alignment,
+      urgency: distance - alignment * STREAM_FORWARD_BIAS,
+      order,
+    });
   }
 
   candidates.sort(
-    (a, b) => a.distanceSq - b.distanceSq || b.alignment - a.alignment || a.order - b.order,
+    (a, b) =>
+      a.urgency - b.urgency ||
+      a.distanceSq - b.distanceSq ||
+      b.alignment - a.alignment ||
+      a.order - b.order,
   );
   return candidates.map((candidate) => candidate.zone);
 }

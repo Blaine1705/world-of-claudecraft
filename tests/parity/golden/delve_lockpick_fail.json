@@ -10,13 +10,13 @@
     "jammed chest (attemptAvailable=false) + surface exit opens"
   ],
   "draws": 3,
-  "drawDigest": "17aa56ca",
+  "drawDigest": "a3201520",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 685,
-      "state": "e849ac62",
+      "nextId": 833,
+      "state": "ec1cc3ed",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -53,10 +53,11 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 684,
+          "entityId": 828,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -69,10 +70,10 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "selectedMount": "valorsteed",
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -86,16 +87,24 @@
           "critChance": 0.0625,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
+          "dualWielding": true,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
-          "id": 684,
+          "id": 828,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
           "maxHp": 62,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -134,78 +143,78 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 695,
-      "state": "9262027e",
-      "events": "53d15a58",
+      "nextId": 844,
+      "state": "2b53764f",
+      "events": "5144db86",
       "rng": {
         "draws": 3,
-        "digest": "17aa56ca"
+        "digest": "a3201520"
       }
     },
     {
       "tick": 20,
       "time": 1,
-      "nextId": 695,
-      "state": "fa1ed4de",
-      "events": "5a18cf1b",
+      "nextId": 844,
+      "state": "aece85dd",
+      "events": "344c368f",
       "rng": {
         "draws": 3,
-        "digest": "17aa56ca"
+        "digest": "a3201520"
       }
     },
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 695,
-      "state": "7ff601e4",
+      "nextId": 844,
+      "state": "9432ef97",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "17aa56ca"
+        "digest": "a3201520"
       }
     },
     {
       "tick": 40,
       "time": 2,
-      "nextId": 695,
-      "state": "819b7f2e",
+      "nextId": 844,
+      "state": "e1e794f1",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "17aa56ca"
+        "digest": "a3201520"
       }
     },
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 695,
-      "state": "66000390",
+      "nextId": 844,
+      "state": "93a406af",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "17aa56ca"
+        "digest": "a3201520"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 695,
-      "state": "67505622",
+      "nextId": 844,
+      "state": "fc46108d",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "17aa56ca"
+        "digest": "a3201520"
       }
     },
     {
       "tick": 69,
       "time": 3.45,
-      "nextId": 696,
-      "state": "cf80bbe4",
-      "events": "b11809f3",
+      "nextId": 845,
+      "state": "afbb82e9",
+      "events": "2134634c",
       "rng": {
         "draws": 3,
-        "digest": "17aa56ca"
+        "digest": "a3201520"
       },
       "label": "lockpick-jammed",
       "players": [
@@ -263,10 +272,11 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 684,
+          "entityId": 828,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -280,11 +290,11 @@
           "lifetimeXp": 11398,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "renown": 25,
           "selectedMount": "valorsteed",
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "xp": 198
@@ -299,9 +309,10 @@
           "critChance": 0.0715,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
+          "dualWielding": true,
           "fiveSecondRule": 102.45,
           "hp": 50000,
-          "id": 684,
+          "id": 828,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -309,6 +320,13 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -351,7 +369,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 694,
+          "id": 843,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -384,23 +402,23 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 696,
-      "state": "7d446e54",
+      "nextId": 845,
+      "state": "9732c6eb",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "17aa56ca"
+        "digest": "a3201520"
       }
     },
     {
       "tick": 71,
       "time": 3.55,
-      "nextId": 696,
-      "state": "cfa4ccd0",
+      "nextId": 845,
+      "state": "b3d30381",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "17aa56ca"
+        "digest": "a3201520"
       },
       "label": "final",
       "players": [
@@ -458,10 +476,11 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 684,
+          "entityId": 828,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -475,11 +494,11 @@
           "lifetimeXp": 11398,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "renown": 25,
           "selectedMount": "valorsteed",
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {},
           "xp": 198
@@ -494,9 +513,10 @@
           "critChance": 0.0715,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
+          "dualWielding": true,
           "fiveSecondRule": 102.55,
           "hp": 50000,
-          "id": 684,
+          "id": 828,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -504,6 +524,13 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -546,7 +573,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 694,
+          "id": 843,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",

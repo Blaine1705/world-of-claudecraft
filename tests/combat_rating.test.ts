@@ -6,7 +6,10 @@ import { itemLevel } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
 import type { Entity, ItemDef } from '../src/sim/types';
 import {
+  CRIT_RATING_PER_PCT,
   critFractionFromRating,
+  HASTE_RATING_PER_PCT,
+  HIT_RATING_PER_PCT,
   hasteFractionFromRating,
   hitFractionFromRating,
   meleeMissChance,
@@ -28,9 +31,12 @@ function ent(partial: Partial<Entity>): Entity {
 }
 
 describe('combat ratings', () => {
-  it('converts haste, crit and hit ratings to fractions', () => {
-    expect(hasteFractionFromRating(150)).toBe(0.15);
-    expect(critFractionFromRating(20)).toBe(0.02);
+  it('halves haste and crit per point while preserving hit strength', () => {
+    expect(HASTE_RATING_PER_PCT).toBe(20);
+    expect(CRIT_RATING_PER_PCT).toBe(20);
+    expect(HIT_RATING_PER_PCT).toBe(10);
+    expect(hasteFractionFromRating(150)).toBe(0.075);
+    expect(critFractionFromRating(20)).toBe(0.01);
     expect(hitFractionFromRating(50)).toBe(0.05);
   });
 
@@ -58,10 +64,10 @@ describe('combat ratings', () => {
       expect(p.hasteRating).toBe(150);
       expect(p.critRating).toBe(20);
       expect(p.hitRating).toBe(200);
-      expect(p.meleeHaste).toBe(0.15);
-      expect(p.rangedHaste).toBe(0.15);
-      expect(p.spellHaste).toBe(0.15);
-      expect(p.critChance).toBeCloseTo(0.05 + p.stats.agi * 0.0005 + 0.02);
+      expect(p.meleeHaste).toBe(0.075);
+      expect(p.rangedHaste).toBe(0.075);
+      expect(p.spellHaste).toBe(0.075);
+      expect(p.critChance).toBeCloseTo(0.05 + p.stats.agi * 0.0005 + 0.01);
       expect(p.hitBonus).toBeCloseTo(0.2);
     } finally {
       delete ITEMS[itemId];
@@ -151,7 +157,7 @@ describe('combat-rating tier ladder', () => {
   it('every ilvl-31 heroic boss-set piece carries exactly one rating', async () => {
     const { HEROIC_ITEMS } = await import('../src/sim/content/heroic_loot');
     const pieces = Object.values(HEROIC_ITEMS).filter((item) => itemLevel(item) === 31);
-    expect(pieces).toHaveLength(24);
+    expect(pieces).toHaveLength(28);
     for (const item of pieces) {
       expect(ratingCount(item), item.id).toBe(1);
       expect(ratingValues(item), item.id).toEqual([item.weapon ? 50 : 40]);
@@ -182,9 +188,20 @@ describe('combat-rating tier ladder', () => {
       expect(ratingCount(item), item.id).toBe(0);
     }
 
+    // The 8 Nythraxis set pieces plus the 4 offhand-slot / two-hander epics
+    // (bonewrought_greatsword/bulwark, direfang_greatblade, wraithfire_orb) and
+    // the feral ladder's raid capstone (maul_of_the_scourged_wilds).
     const ilvl29 = allGear.filter((item) => itemLevel(item) === 29);
-    expect(ilvl29).toHaveLength(8);
+    expect(ilvl29).toHaveLength(13);
     for (const item of ilvl29) expect(ratingValues(item), item.id).toEqual([20]);
+
+    // ilvl-31: heroic five-man boss pieces (40 rating) + rift clear-time epics
+    // (armor pieces 40, ring 25). Every ilvl-31 gear piece carries exactly one rating.
+    const ilvl31 = allGear.filter((item) => itemLevel(item) === 31);
+    expect(ilvl31.length).toBeGreaterThan(0);
+    for (const item of ilvl31) {
+      expect(ratingCount(item), `${item.id} (ilvl 31) carries one rating`).toBe(1);
+    }
 
     const directHeroicRaidWeapons = new Set([
       'scepter_of_the_deathless_court',
@@ -198,7 +215,10 @@ describe('combat-rating tier ladder', () => {
         (ilvl === 37 && item.heroicOf !== undefined)
       );
     });
-    expect(heroicRaidGear).toHaveLength(13);
+    // 13 pre-existing pieces plus the 5 generated heroic raid variants of the
+    // normal-raid epics (greatsword, greatblade, bulwark, orb, and the feral
+    // ladder capstone maul_of_the_scourged_wilds).
+    expect(heroicRaidGear).toHaveLength(18);
     for (const item of heroicRaidGear) {
       const ilvl = itemLevel(item);
       const expectedPrimary = ilvl === 37 ? 70 : item.weapon ? 65 : 55;
@@ -207,6 +227,17 @@ describe('combat-rating tier ladder', () => {
         ratingValues(item).sort((a, b) => b - a),
         item.id,
       ).toEqual([expectedPrimary, expectedSecondary]);
+    }
+  });
+
+  it('heart_of_the_rift (ilvl-35 legendary) carries zero ratings by design', () => {
+    // The rift legendary neck is class-neutral and carries no combat ratings:
+    // its differentiation is a large multi-stat primary-stat block, not ratings.
+    // This is intentional (pinned here so a future tuner does not silently add one).
+    const legendary = ITEMS['heart_of_the_rift'];
+    expect(legendary, 'heart_of_the_rift must exist').toBeTruthy();
+    if (legendary) {
+      expect(ratingCount(legendary), 'rift legendary carries no ratings').toBe(0);
     }
   });
 

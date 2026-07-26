@@ -142,7 +142,7 @@ export interface FinderProposalPanelView {
 
 export interface FinderQueuePanelView {
   roles: FinderRoleOptionView[];
-  needsSpec: boolean; // level 10+ with no active spec: the finder is closed
+  needsSpec: boolean; // at or past the spec unlock with no active spec: the finder is closed
   inParty: boolean;
   isLeader: boolean; // solo counts as leader of self
   queuedActivities: string[]; // live selection while queued ([] otherwise)
@@ -290,6 +290,23 @@ function buildEncounters(activity: FinderActivity): FinderEncounterViewModel[] {
     });
   }
   return out;
+}
+
+/** All procedural item icons the catalogue can paint, derived through the same
+ *  encounter/heroic-loot path as the visible detail model. Main uses this as a
+ *  loading-screen priority list so selecting any activity never serializes a
+ *  cold 96px icon on the UI thread. */
+export function finderLootItemIds(): string[] {
+  const ids = new Set<string>();
+  for (const activity of FINDER_ACTIVITIES) {
+    for (const encounter of buildEncounters(activity)) {
+      for (const group of [...encounter.groups, ...encounter.heroicGroups]) {
+        for (const item of group.items) ids.add(item.itemId);
+      }
+      for (const item of encounter.singles) ids.add(item.itemId);
+    }
+  }
+  return [...ids];
 }
 
 function buildDetail(

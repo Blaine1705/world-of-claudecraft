@@ -124,6 +124,23 @@ describe('character visual manifest', () => {
     }
   });
 
+  it('gives the summoned Water Elemental its own untinted animated water body', async () => {
+    const key = visualKeyFor({ kind: 'mob', templateId: 'water_elemental' } as never);
+    expect(key).toBe('mob_water_elemental');
+
+    const visual = VISUALS[key];
+    expect(visual.url).toBe('models/creatures/water_elemental.glb');
+    expect(visual.tint).toBeUndefined();
+    expect(visual.clips.cast).toBe('Channel');
+    expect(visual.clips.attack).toEqual(['Cast']);
+
+    const animationNames = await glbAnimationNames(`public/${visual.url}`);
+    expect(animationNames.size).toBeGreaterThan(0);
+    expect(
+      [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
+    ).toEqual([]);
+  });
+
   it('points the Combat Mech manifest at animation clips baked into the GLB', async () => {
     const visual = VISUALS.player_mech;
     const animationNames = await glbAnimationNames(`public/${visual.url}`);
@@ -142,6 +159,38 @@ describe('character visual manifest', () => {
     expect(
       [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
     ).toEqual([]);
+  });
+
+  it('points the three Orkadia orcs at clips in their GLBs (including the synthesized Death/Hit)', async () => {
+    // The Tripo orc batch shipped no death or hit-react take; Death (a hips-driven
+    // topple that clamps flat) and Hit are synthesized onto the Mixamo skeleton by
+    // scripts/_add_orc_death_anim.mjs, so ORC_TRIPO can map death to a real 'Death'
+    // clip instead of aliasing the idle pose. Guard both the map and the assets.
+    for (const key of ['mob_orc_grunt', 'mob_orc_marauder', 'mob_orc_warlord'] as const) {
+      const visual = VISUALS[key];
+      expect(visual.clips.death, key).toBe('Death');
+      expect(visual.clips.hit, key).toEqual(['Hit']);
+      const animationNames = await glbAnimationNames(`public/${visual.url}`);
+      expect(animationNames.size, key).toBeGreaterThan(0);
+      expect(
+        [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
+        key,
+      ).toEqual([]);
+    }
+  });
+
+  it('points the training dummy manifest at clips present in the GLB, with cast/jump deliberately absent', async () => {
+    const visual = VISUALS.mob_training_dummy;
+    const animationNames = await glbAnimationNames(`public/${visual.url}`);
+
+    expect(animationNames.size).toBeGreaterThan(0);
+    expect(
+      [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
+    ).toEqual([]);
+    expect(visual.clips.cast).toBeUndefined();
+    expect(visual.clips.jump).toBeUndefined();
+    expect(animationNames.has('Cast')).toBe(false);
+    expect(animationNames.has('Jump')).toBe(false);
   });
 
   it('points the baked wolf visuals (form_cat, mob_wolf, greyjaw) at clips in their GLBs', async () => {

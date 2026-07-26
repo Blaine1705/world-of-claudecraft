@@ -20,6 +20,7 @@
 // optimism reconciled the moment a real snapshot lands and clears
 // `pendingQuestCommands` (see `ClientWorld.applySnapshot`); the server still
 // authoritatively resolves the turn-in itself.
+import type { ArchetypeState } from '../sim/professions/archetype';
 import { computeQuestState } from '../sim/sim';
 import type { QuestProgress, QuestState } from '../sim/types';
 
@@ -29,6 +30,9 @@ export function optimisticQuestState(
   questsDone: Set<string>,
   pendingQuestCommands: Map<string, 'accept' | 'turnin'>,
   playerLevel: number,
+  professionState?: ArchetypeState,
+  // The server-computed work-order cooldown set, mirrored via cprof.
+  withinCadence?: ReadonlySet<string>,
 ): QuestState {
   let effectiveDone = questsDone;
   if (pendingQuestCommands.size > 0) {
@@ -39,7 +43,14 @@ export function optimisticQuestState(
       }
     }
   }
-  const state = computeQuestState(questId, questLog, effectiveDone, playerLevel);
+  const state = computeQuestState(
+    questId,
+    questLog,
+    effectiveDone,
+    playerLevel,
+    professionState,
+    withinCadence,
+  );
   const pending = pendingQuestCommands.get(questId);
   if (
     (pending === 'accept' && state === 'available') ||

@@ -26,6 +26,10 @@ export interface BackgroundPrewarmHooks {
    * whole zone's batch at once.
    */
   compileChild: (child: unknown) => Promise<void>;
+  /** Upload one already-linked template in isolation. The caller performs a
+   *  real offscreen render with only this child visible, one idle slot after
+   *  compile, so geometry/textures do not accumulate into the final pass. */
+  warmChild?: (group: PrewarmGroupLike, child: unknown) => void;
   /** The synchronous warm pass; the groups are visible exactly for this call. */
   renderWarmPass: () => void;
 }
@@ -41,6 +45,15 @@ export async function runBackgroundPrewarm(
         for (const child of [...group.children]) {
           await hooks.idleSlot();
           await hooks.compileChild(child);
+          if (hooks.warmChild) {
+            await hooks.idleSlot();
+            group.visible = true;
+            try {
+              hooks.warmChild(group, child);
+            } finally {
+              group.visible = false;
+            }
+          }
         }
       }
       await hooks.idleSlot();

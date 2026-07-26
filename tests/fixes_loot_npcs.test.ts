@@ -511,6 +511,54 @@ describe('warrior charge', () => {
     sim.tick();
     expect(p.chargeTargetId).toBe(null);
   });
+
+  it('does not bill or arm charge through unbreakable encounter control', () => {
+    const { sim, p, wolf } = chargeSetup();
+    const rageBefore = p.resource;
+    p.auras.push({
+      id: 'scripted_root',
+      name: 'Scripted Root',
+      kind: 'root',
+      remaining: 10,
+      duration: 10,
+      value: 0,
+      sourceId: 9000,
+      school: 'shadow',
+      unbreakableControl: true,
+    });
+
+    sim.castAbility('charge');
+
+    expect(p.chargeTargetId).toBe(null);
+    expect(p.resource).toBe(rageBefore);
+    expect(p.cooldowns.has('charge')).toBe(false);
+    expect(wolf.auras.some((a) => a.kind === 'stun')).toBe(false);
+  });
+
+  it('stops an in-flight charge when unbreakable encounter control lands', () => {
+    const { sim, p } = chargeSetup();
+    sim.castAbility('charge');
+    sim.tick();
+    expect(p.chargeTargetId).not.toBe(null);
+    const heldAt = { ...p.pos };
+    p.auras.push({
+      id: 'scripted_stun',
+      name: 'Scripted Stun',
+      kind: 'stun',
+      remaining: 10,
+      duration: 10,
+      value: 0,
+      sourceId: 9000,
+      school: 'shadow',
+      unbreakableControl: true,
+    });
+
+    sim.tick();
+
+    expect(p.chargeTargetId).toBe(null);
+    expect(p.pos.x).toBeCloseTo(heldAt.x, 5);
+    expect(p.pos.z).toBeCloseTo(heldAt.z, 5);
+  });
 });
 
 describe('mob tap rights', () => {
@@ -588,7 +636,8 @@ describe('aoe damage vs armor', () => {
   // other spell in the game.
   function aoeSetup(ability: string) {
     const sim = makeSim('mage');
-    (sim as any).grantXp(99999); // level up far past Arcane Explosion (lvl 14)
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('arcane')).toBe(true);
     const p = sim.player;
     const wolf = [...sim.entities.values()].find(
       (e) => e.kind === 'mob' && e.templateId === 'forest_wolf' && !e.dead,
@@ -826,6 +875,27 @@ describe('spell visuals', () => {
 
     expect(p.castingAbility).toBe('fireball');
     expect(events.some((e) => e.type === 'castStart' && e.ability === 'fireball')).toBe(true);
+  });
+
+  it('a LOW prop (campfire) no longer blocks spell line of sight, buildings still do', () => {
+    const sim = makeSim('mage');
+    const seed = sim.cfg.seed;
+    // Straddle a world campfire: its collider sits on the ray (it still blocks
+    // MOVEMENT below), but its visual top (1.45) is under the eye line (1.6),
+    // so the cast sees straight over it.
+    const [cx, cz] = PROPS.campfires[0];
+    expect(isBlocked(seed, cx, cz, 0.5)).toBe(true); // movement still collides
+    expect(lineOfSightClear(seed, { x: cx - 3, z: cz }, { x: cx + 3, z: cz })).toBe(true);
+    // A building straddled through its center still blocks (top far above eyes).
+    const bldg = PROPS.buildings[0];
+    const bldgSpan = bldg.w + bldg.d;
+    expect(
+      lineOfSightClear(
+        seed,
+        { x: bldg.x - bldgSpan, z: bldg.z },
+        { x: bldg.x + bldgSpan, z: bldg.z },
+      ),
+    ).toBe(false);
   });
 
   it('a LOW fence no longer blocks spell line of sight, tall walls still do (#1668)', () => {

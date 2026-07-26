@@ -17,6 +17,7 @@
 
 import type {
   CampDef,
+  EscortDef,
   GroundObjectDef,
   ItemDef,
   MobTemplate,
@@ -53,6 +54,7 @@ export const FARSHORE_ZONE: ZoneDef = {
   ],
   welcome:
     "Cross the sandbar and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you.",
+  welcomeQuestId: 'q_fs_bell_at_the_landing',
 };
 
 export const FARSHORE_ROADS: { x: number; z: number }[][] = [
@@ -110,7 +112,7 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 8,
     moveSpeed: 8.5,
     aggroRadius: 12, // it knows only the way it came and the thing in front of it
-    loot: [],
+    loot: [{ itemId: 'farshore_salt_moss', chance: 0.6, questId: 'q_fs_moss_and_mending' }],
     scale: 0.85,
     color: 0x7a3fb0,
   },
@@ -128,7 +130,7 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 7,
     moveSpeed: 9,
     aggroRadius: 11, // the small ones come in numbers, and they come fast
-    loot: [],
+    loot: [{ itemId: 'breakscarred_steel', chance: 0.6, questId: 'q_fs_steel_for_the_redoubt' }],
     scale: 0.9,
     color: 0x5a4a78,
   },
@@ -169,6 +171,29 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     scale: 1.45,
     color: 0x8a2f6a,
   },
+  // Nell's husband (q_fs_bram_come_home), thrown back by the sea at the
+  // nets-break and holed up in his wrecked boat past the Landing's point.
+  // Escort-run escortee: non-hostile, never wanders (moveSpeed 0;
+  // src/sim/escort.ts drives all movement), never fights back. Sturdy enough
+  // to survive an ambush wave long enough for the escorting player to peel it.
+  fisher_bram: {
+    id: 'fisher_bram',
+    name: 'Fisher Bram',
+    minLevel: 5,
+    maxLevel: 5,
+    family: 'humanoid',
+    hpBase: 120,
+    hpPerLevel: 15,
+    dmgBase: 1,
+    dmgPerLevel: 0,
+    attackSpeed: 2.0,
+    armorPerLevel: 8,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1.0,
+    color: 0x4a6a8a,
+  },
 };
 
 // The defenders. Everyone left in Gullhaven knows what is happening and has
@@ -184,7 +209,12 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     pos: { x: 305, z: 66 },
     facing: 0,
     color: 0x8a4b2b,
-    questIds: [],
+    questIds: [
+      'q_fs_bell_at_the_landing',
+      'q_fs_hold_the_riftfields',
+      'q_fs_song_before_the_break',
+      'q_fs_the_great_break',
+    ],
     greeting:
       'The breaks do not care that Gullhaven is small, $C. We hold this shore, or there is no shore left to hold. Stand with us and I will not forget it.',
   },
@@ -195,7 +225,7 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     pos: { x: 372, z: 2 },
     facing: Math.PI,
     color: 0x3f5f8a,
-    questIds: [],
+    questIds: ['q_fs_song_before_the_break', 'q_fs_stalkers_off_the_light', 'q_fs_the_great_break'],
     greeting:
       'Every break sings before it opens, if you have the ear for it. I can hear three of them stirring on the island right now, and one of them is close.',
   },
@@ -206,7 +236,7 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     pos: { x: 298, z: 74 },
     facing: Math.PI / 2,
     color: 0x6b6b3a,
-    questIds: [],
+    questIds: ['q_fs_steel_for_the_redoubt'],
     greeting:
       'Steel and salt, $C, it is all I have left to hand out. Take it and make the breaks regret opening where I could reach them.',
   },
@@ -217,7 +247,7 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     pos: { x: 312, z: 78 },
     facing: -Math.PI / 2,
     color: 0x9a3b3b,
-    questIds: [],
+    questIds: ['q_fs_moss_and_mending'],
     greeting:
       'I have set more bones this one month than in ten years of mending fishing falls. The breaks do not leave much of what they take. Come back to me whole, if you can manage it.',
   },
@@ -228,7 +258,7 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     pos: { x: 252, z: 18 },
     facing: Math.PI / 2,
     color: 0x4a7b6b,
-    questIds: [],
+    questIds: ['q_fs_bell_at_the_landing', 'q_fs_the_three_bells'],
     greeting:
       'The bell is the only warning the breaks give us, $C. One toll for the fields, two for the cliffs, three when it is close enough that running will not help. Keep an ear on it, and it may keep you whole.',
   },
@@ -239,15 +269,254 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     pos: { x: 296, z: 80 },
     facing: 0,
     color: 0x5a7a9a,
-    questIds: [],
+    questIds: ['q_fs_bram_come_home'],
     greeting:
       'It opened right where the nets dry. Right there, where I stood every morning of my life. I do not go down to the shore anymore. I do not go much of anywhere anymore.',
   },
 };
 
-export const FARSHORE_QUESTS: Record<string, QuestDef> = {};
-export const FARSHORE_QUEST_ORDER: string[] = [];
-export const FARSHORE_ITEMS: Record<string, ItemDef> = {};
+export const FARSHORE_QUESTS: Record<string, QuestDef> = {
+  q_fs_bell_at_the_landing: {
+    id: 'q_fs_bell_at_the_landing',
+    name: 'The Bell at the Landing',
+    giverNpcId: 'bellkeeper_tam',
+    turnInNpcId: 'warden_coalfast',
+    text: 'You came over the Ferrywalk, $N? Then you are the first in a week, and the Warden will want to look you over. Gullhaven sits up the shore road, past the drying racks nobody tends anymore. Tell Warden Coalfast the causeway still stands, and that Tam has not rung a three-toll today. Yet.',
+    completionText:
+      'The causeway holds, and Tam still has breath enough to joke about the three-toll. Good. We are an island under siege, $N, and every pair of hands that crosses that sandbar is a pair the breaks must get through before they reach my people. Welcome to Gullhaven.',
+    objectives: [
+      {
+        type: 'interact',
+        targetNpcId: 'warden_coalfast',
+        count: 1,
+        label: 'Report to Warden Coalfast',
+      },
+    ],
+    xpReward: 150,
+    copperReward: 60,
+    itemRewards: {},
+    minLevel: 2,
+  },
+  q_fs_hold_the_riftfields: {
+    id: 'q_fs_hold_the_riftfields',
+    name: 'Hold the Riftfields',
+    giverNpcId: 'warden_coalfast',
+    turnInNpcId: 'warden_coalfast',
+    text: 'East of town the grain rows have gone to wrack, and the wretches that came through the Riftfields break now pick them clean. My people cannot tend a field they cannot stand in, $N. Cull ten of the wretches and give the farmers back their ground.',
+    completionText:
+      'Ten fewer, and the field hands are already arguing over who walks out first. It will not last, the breaks never rest long, but a town that eats is a town that holds.',
+    objectives: [
+      { type: 'kill', targetMobId: 'breach_wretch', count: 10, label: 'Breach Wretch slain' },
+    ],
+    xpReward: 400,
+    copperReward: 180,
+    itemRewards: {},
+    requiresQuest: 'q_fs_bell_at_the_landing',
+  },
+  q_fs_steel_for_the_redoubt: {
+    id: 'q_fs_steel_for_the_redoubt',
+    name: 'Steel for the Redoubt',
+    giverNpcId: 'quartermaster_edda',
+    turnInNpcId: 'quartermaster_edda',
+    text: 'Every blade I hand out is one the sea gave back or one I pried off the dead, $N. The wretches carry scrap through the breaks, hinges, hooks, broken sword-steel, magpie stuff, but it hammers out true. Bring me six pieces of their scavenged steel and the barricade line gets its teeth back.',
+    completionText:
+      'Salt-pitted and break-scarred, and it will hold an edge all the same. Here, I lined these grips myself. Steel for steel, $N: it is the only trade the Farshore runs these days.',
+    objectives: [
+      { type: 'collect', itemId: 'breakscarred_steel', count: 6, label: 'Break-Scarred Steel' },
+    ],
+    xpReward: 450,
+    copperReward: 200,
+    itemRewards: {
+      warrior: 'saltforged_grips',
+      mage: 'saltforged_grips',
+      rogue: 'saltforged_grips',
+    },
+    requiresQuest: 'q_fs_bell_at_the_landing',
+  },
+  q_fs_the_three_bells: {
+    id: 'q_fs_the_three_bells',
+    name: 'The Three Bells',
+    giverNpcId: 'bellkeeper_tam',
+    turnInNpcId: 'bellkeeper_tam',
+    text: 'Three watchbells stand the coast beyond my own: one on the Landing point, one on the south strand, one out by the Riftfields shore. If a rope has rotted or a clapper has been carried off, the town learns of a break when it is already in the streets. Walk the coast, $N, and ring each bell once, so I know it still has a voice.',
+    completionText:
+      'Three voices, three answers, carried clean over the water. Sleep in Gullhaven tonight, $N, and know that if a bell wakes you, it will be by my hand and in good time.',
+    objectives: [
+      {
+        type: 'interact',
+        targetObjectItemId: 'gullhaven_watchbell',
+        count: 3,
+        label: 'Watchbell rung',
+      },
+    ],
+    xpReward: 400,
+    copperReward: 180,
+    itemRewards: {},
+    requiresQuest: 'q_fs_bell_at_the_landing',
+  },
+  q_fs_song_before_the_break: {
+    id: 'q_fs_song_before_the_break',
+    name: 'The Song Before the Break',
+    giverNpcId: 'warden_coalfast',
+    turnInNpcId: 'riftwatch_ollun',
+    text: 'There is a man who hears the breaks before they open. Riftwatch Ollun: a scholar, or a madman, and lately I cannot afford the difference. He keeps his vigil at the Watch Meadow, up the road southeast of town. Find him, $N, and ask him what the island is about to do to us next.',
+    completionText:
+      'The Warden sent you? Good. That means the town has finally started listening. Now be still a moment, $N. There, under the wind, do you hear it? The cliffs are singing, and I do not like the tune.',
+    objectives: [
+      { type: 'interact', targetNpcId: 'riftwatch_ollun', count: 1, label: 'Find Riftwatch Ollun' },
+    ],
+    xpReward: 250,
+    copperReward: 100,
+    itemRewards: {},
+    requiresQuest: 'q_fs_hold_the_riftfields',
+    minLevel: 4,
+  },
+  q_fs_moss_and_mending: {
+    id: 'q_fs_moss_and_mending',
+    name: 'Moss and Mending',
+    giverNpcId: 'mender_saul',
+    turnInNpcId: 'mender_saul',
+    text: 'The salt moss that grows along the tideline is the best wound-packing I know, and the riftspawn have claimed every stretch of shore it grows on. They carry tufts of it snagged on their hides, of all things. Clear six of them off the east reaches, $N, and pull me four good handfuls of moss from what they have trampled through.',
+    completionText:
+      'Moss in one hand and a quieter shoreline in the other. You have restocked my whole surgery, $N. Do me the kindness of not becoming my next patient.',
+    objectives: [
+      { type: 'kill', targetMobId: 'riftspawn', count: 6, label: 'Riftspawn slain' },
+      { type: 'collect', itemId: 'farshore_salt_moss', count: 4, label: 'Farshore Salt Moss' },
+    ],
+    xpReward: 700,
+    copperReward: 350,
+    itemRewards: {},
+    requiresQuest: 'q_fs_bell_at_the_landing',
+    minLevel: 4,
+  },
+  q_fs_bram_come_home: {
+    id: 'q_fs_bram_come_home',
+    name: 'Bram Come Home',
+    giverNpcId: 'fisher_nell',
+    turnInNpcId: 'fisher_nell',
+    text: 'My Bram took the boat out the morning the nets-break opened, and the sea threw him back somewhere past the Landing point. I heard him three nights ago, $N, calling over the water, and I was too afraid to go. I am still too afraid. Please. His boat lies wrecked on the north shore. Walk him home to me.',
+    completionText:
+      'Bram! You brought him back to me whole, $N. We both wept and neither of us is ashamed. Whatever the breaks take from this island next, they do not get my family. Not anymore.',
+    objectives: [
+      {
+        type: 'escort',
+        escortId: 'esc_fs_bram',
+        count: 1,
+        label: 'Fisher Bram seen safely home to Gullhaven',
+      },
+    ],
+    xpReward: 800,
+    copperReward: 400,
+    itemRewards: {},
+    requiresQuest: 'q_fs_bell_at_the_landing',
+    minLevel: 5,
+  },
+  q_fs_stalkers_off_the_light: {
+    id: 'q_fs_stalkers_off_the_light',
+    name: 'Stalkers off the Light',
+    giverNpcId: 'riftwatch_ollun',
+    turnInNpcId: 'riftwatch_ollun',
+    text: 'The stalkers hunt the dark between the watchfires, and every night they circle my meadow a little closer. They are not mindless, $N, they are patient, and patience is the one thing I cannot outlast. Kill eight and push the dark back to the cliffs it came through.',
+    completionText:
+      'Eight nights of circling, ended in one. The fires burn steadier already, or perhaps that is only my hands. Either way the meadow is mine again, and I can hear the island think.',
+    objectives: [
+      { type: 'kill', targetMobId: 'void_stalker', count: 8, label: 'Void Stalker slain' },
+    ],
+    xpReward: 600,
+    copperReward: 300,
+    itemRewards: {},
+    requiresQuest: 'q_fs_song_before_the_break',
+    minLevel: 5,
+  },
+  q_fs_the_great_break: {
+    id: 'q_fs_the_great_break',
+    name: 'The Great Break',
+    giverNpcId: 'riftwatch_ollun',
+    turnInNpcId: 'warden_coalfast',
+    text: 'Every song this island sings ends on the same low note, and it comes from the Sundered Cliffs. Something came through the great break there, $N, something the cliffs themselves cracked open to admit, and it is still growing. If it walks north, no bell will matter. Take a friend, take two, and end it. Then tell Coalfast the tune has changed.',
+    completionText:
+      'Ollun sent word ahead: the singing stopped. My whole town heard the quiet, $N, and half of them wept at the sound of nothing at all. Wear this mantle. The Farshore does not forget who held its shore.',
+    objectives: [
+      {
+        type: 'kill',
+        targetMobId: 'sundered_horror',
+        count: 1,
+        label: 'The Sundered Horror slain',
+      },
+    ],
+    xpReward: 1100,
+    copperReward: 600,
+    itemRewards: {
+      warrior: 'mantle_of_the_unbroken_shore',
+      mage: 'mantle_of_the_unbroken_shore',
+      rogue: 'mantle_of_the_unbroken_shore',
+    },
+    requiresQuest: 'q_fs_stalkers_off_the_light',
+    minLevel: 6,
+    suggestedPlayers: 2,
+  },
+};
+
+// Level-braided presentation order (not strictly chain order), matching the
+// Veiled Hollow convention.
+export const FARSHORE_QUEST_ORDER: string[] = [
+  'q_fs_bell_at_the_landing',
+  'q_fs_hold_the_riftfields',
+  'q_fs_steel_for_the_redoubt',
+  'q_fs_the_three_bells',
+  'q_fs_song_before_the_break',
+  'q_fs_moss_and_mending',
+  'q_fs_bram_come_home',
+  'q_fs_stalkers_off_the_light',
+  'q_fs_the_great_break',
+];
+
+export const FARSHORE_ITEMS: Record<string, ItemDef> = {
+  // --- quest items ---
+  breakscarred_steel: {
+    id: 'breakscarred_steel',
+    name: 'Break-Scarred Steel',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_fs_steel_for_the_redoubt',
+  },
+  farshore_salt_moss: {
+    id: 'farshore_salt_moss',
+    name: 'Farshore Salt Moss',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_fs_moss_and_mending',
+  },
+  gullhaven_watchbell: {
+    id: 'gullhaven_watchbell',
+    name: 'Coastal Watchbell',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_fs_the_three_bells',
+    noVendorSell: true,
+  },
+  // --- quest rewards ---
+  saltforged_grips: {
+    id: 'saltforged_grips',
+    name: 'Saltforged Grips',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'gloves',
+    quality: 'uncommon',
+    stats: { armor: 18, sta: 2, str: 2 },
+    sellValue: 250,
+  },
+  mantle_of_the_unbroken_shore: {
+    id: 'mantle_of_the_unbroken_shore',
+    name: 'Mantle of the Unbroken Shore',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'shoulder',
+    quality: 'rare',
+    stats: { armor: 30, sta: 3, str: 2 },
+    sellValue: 600,
+  },
+};
 export const FARSHORE_CAMPS: CampDef[] = [
   // the break-spawned hold the island's fringe; the redoubt keeps the town
   { mobId: 'breach_wretch', center: { x: 430, z: 44 }, radius: 12, count: 4 }, // the Riftfields
@@ -258,7 +527,53 @@ export const FARSHORE_CAMPS: CampDef[] = [
   { mobId: 'void_stalker', center: { x: 462, z: 20 }, radius: 11, count: 2 }, // the east reach
   { mobId: 'sundered_horror', center: { x: 402, z: -78 }, radius: 6, count: 1 }, // the cliffs' great break
 ];
-export const FARSHORE_OBJECTS: GroundObjectDef[] = [];
+export const FARSHORE_OBJECTS: GroundObjectDef[] = [
+  {
+    itemId: 'gullhaven_watchbell',
+    name: 'Coastal Watchbell',
+    // Bellkeeper Tam's three coastal watchbells (q_fs_the_three_bells): the
+    // Landing point, the south strand below Gullhaven, the Riftfields shore.
+    positions: [
+      { x: 256, z: 0 },
+      { x: 318, z: 94 },
+      { x: 442, z: 64 },
+    ],
+  },
+];
+
+// Bram Come Home (q_fs_bram_come_home): Fisher Bram shelters in his wrecked
+// boat on the north shore past the Landing point and walks the shore road
+// home to Gullhaven, through the wretches that comb the wrack and the
+// stalkers that hunt the road at dusk. Waypoints hug the authored shore
+// roads above (the Landing -> Gullhaven leg).
+export const FARSHORE_ESCORTS: Record<string, EscortDef> = {
+  esc_fs_bram: {
+    id: 'esc_fs_bram',
+    npcMobId: 'fisher_bram',
+    questId: 'q_fs_bram_come_home',
+    // The wreck sits at the beach edge on the Landing point's north strand
+    // (landness ~0.37: on sand, above the waterline).
+    start: { x: 252, z: -8 },
+    waypoints: [
+      { x: 254, z: -4 },
+      { x: 252, z: 15 },
+      { x: 276, z: 42 },
+      { x: 298, z: 74 },
+    ],
+    moveSpeed: 4.5,
+    ambushes: [
+      { atWaypoint: 0, mobId: 'breach_wretch', count: 3 },
+      { atWaypoint: 2, mobId: 'void_stalker', count: 3 },
+    ],
+    creditRadius: 40,
+    respawnSeconds: 30,
+    startText:
+      'Nell sent you? Then she is alive, oh, thank the tide. Stay close, friend: the little ones comb this stretch of shore, and they are never alone.',
+    successText:
+      'Gullhaven! I can see our roof from here. Go on ahead, friend, I have a wife to hold.',
+    failText: 'Nell... I am sorry, love... I nearly made it home...',
+  },
+};
 
 export const FARSHORE_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),

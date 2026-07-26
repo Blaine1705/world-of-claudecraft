@@ -10,7 +10,7 @@ import type { PlayerCardData, PlayerCardStat } from './player_card';
 import type { CharacterStanding, ReferralInfo } from './player_card_share';
 
 export interface PlayerCardDataInput {
-  characterImage: string;
+  characterImage: PlayerCardData['characterImage'];
   referral: ReferralInfo | null;
   standing: CharacterStanding | null;
   balance: number | null;
@@ -67,7 +67,7 @@ export function buildPlayerCardData(world: IWorld, input: PlayerCardDataInput): 
     combatStats.push({ label: t('game.prestige.rank'), value: number(world.prestigeRank) });
   }
 
-  const slots: EquipSlot[] = ['mainhand', 'chest', 'legs', 'feet'];
+  const slots: EquipSlot[] = ['mainhand', 'offhand', 'chest', 'legs', 'feet'];
   const gear = slots.map((slot) => {
     const itemId = world.equipment[slot];
     const item = itemId ? ITEMS[itemId] : null;

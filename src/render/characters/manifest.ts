@@ -3,8 +3,9 @@
 // Pure data + dispatch — no three.js imports, no loading.
 
 import { MECH_CHROMAS, type MechChroma } from '../../sim/content/skins';
+import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
-import { MOBS } from '../../sim/data';
+import { ITEMS, MOBS } from '../../sim/data';
 import type { Entity, PlayerClass } from '../../sim/types';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
@@ -21,6 +22,10 @@ export interface ClipMap {
   run: string;
   /** one-shot swing clips, rotated per attack */
   attack: string[];
+  /** Optional per-ability swing or cast-gesture override. */
+  attackByAbility?: Record<string, string>;
+  /** Optional weapon-style override for plain auto attacks. */
+  attackByHand?: { twohand?: string; dualwield?: string };
   death: string;
   /** hit-react one-shots (optional — spider/raptor rigs have none) */
   hit?: string[];
@@ -68,10 +73,14 @@ export interface VisualDef {
   attach?: AttachDef[];
   /** Indices into `attach` whose model is replaced by the entity's equipped mainhand
    *  weapon (mapped via ITEM_WEAPON_VARIANTS). undefined/empty = the held weapon never
-   *  changes with gear (hunter keeps its crossbow; mobs/NPCs are fixed). Usually [0]
-   *  (the mainhand); the rogue lists [0, 1] so a dagger shows in BOTH hands. A fixed
-   *  offhand left off this list stays as authored (the warlock spellbook). */
+   *  changes with gear (hunter keeps its crossbow; mobs/NPCs are fixed). A fixed
+   *  offhand left off this list stays authored (the warlock spellbook); a live
+   *  equipped offhand uses `offhandSlot` below. */
   weaponSlots?: number[];
+  /** Index into `attach` replaced by the entity's actual equipped offhand. Kept
+   *  separate from `weaponSlots` so mainhand cosmetics cannot overwrite a live
+   *  shield or second weapon. */
+  offhandSlot?: number;
   /** material tint: explicit color, 'entity' (use e.color), or none */
   tint?: number | 'entity';
   /** lerp amount toward the tint (default 0.4) */
@@ -90,12 +99,20 @@ export interface VisualDef {
    *  flip the standalone weapon files carry). Node name as authored in the GLB;
    *  applied as a local-space rotation (radians) after the bind transform. */
   weaponFix?: { node: string; rotX?: number; rotY?: number; rotZ?: number }[];
+  /** Glowing ring parented behind the head bone (the priest's Light halo).
+   *  Value is the glow color; geometry/placement live in halo.ts. */
+  halo?: number;
+  /** Halo placement overrides, head-bone space (defaults in halo.ts): lift
+   *  above the bone and ring radius, for models whose headgear the default
+   *  ring would clip. */
+  haloUpOffset?: number;
+  haloRadius?: number;
 }
 
 /** The slice of a VisualDef that decides how held weapons attach (which bones, and
  *  which slots swap to the equipped item). Lets a cosmetic body adopt a different
  *  class's hand layout without cloning the whole def. */
-export type WeaponLayoutOverride = Pick<VisualDef, 'attach' | 'weaponSlots'>;
+export type WeaponLayoutOverride = Pick<VisualDef, 'attach' | 'weaponSlots' | 'offhandSlot'>;
 
 // ---------------------------------------------------------------------------
 // Clip sets per source rig family
@@ -213,6 +230,39 @@ const BIPED14: ClipMap = {
   death: 'Death',
 };
 
+// Tripo orc rig (Orkadia dungeon: black/blue/red orc GLBs). Ships Idle_Loop,
+// Walk_Loop, Sprint_Loop, Punch_Jab, Sword_Attack (Red also Sword_Idle). The
+// batch had no death or hit-react take, so `Death` (a hips-driven topple that
+// clamps flat) and `Hit` (a short spine/neck flinch) are synthesized onto the
+// shipped Mixamo skeleton by scripts/_add_orc_death_anim.mjs (the Stone Cantor
+// precedent, _add_cantor_hit_anim.mjs); re-run it if the GLBs are regenerated.
+// A real Tripo death retarget exists (scripts/reanim_orc_death.mjs artifacts
+// under tmp/asset_pipeline/reanim_orc_death_*_orc/), but it targets Tripo's
+// 41-joint biped rig (Hip/Waist/Pelvis/...) after a full re-rig, not the
+// shipped 22-joint mixamorig:* skeleton, scripts/graft_orc_death.mjs verifies
+// the mismatch and refuses to graft, so the synthesized clips remain.
+const ORC_TRIPO: ClipMap = {
+  idle: 'Idle_Loop',
+  walk: 'Walk_Loop',
+  run: 'Sprint_Loop',
+  attack: ['Sword_Attack', 'Punch_Jab'],
+  hit: ['Hit'],
+  death: 'Death',
+};
+
+// Orkadia specialist rig. These five creatures come through the current biped
+// pipeline, which retargets and bakes the complete game vocabulary directly.
+const TRIPO_BIPED_FULL_RIG: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack'],
+  hit: ['Hit'],
+  death: 'Death',
+  cast: 'Cast',
+  jump: 'Jump',
+};
+
 // 2023 enemy rig (goblin/giant)
 const ENEMY7: ClipMap = {
   idle: 'Idle',
@@ -240,6 +290,20 @@ const ENEMY_BITE: ClipMap = {
   run: 'Walk',
   attack: ['Bite_Front'],
   hit: ['HitRecieve'],
+  death: 'Death',
+};
+
+// Procedurally authored Water Elemental. Node transforms ripple its layered
+// translucent body and drive the hands through the Waterbolt casting motion.
+const WATER_ELEMENTAL: ClipMap = {
+  idle: 'Idle',
+  walk: 'Move',
+  run: 'Move',
+  // Waterbolt uses the short one-shot Cast attack; Water Jet holds this
+  // dedicated forward-arms loop for its full server-authoritative channel.
+  cast: 'Channel',
+  attack: ['Cast'],
+  hit: ['Hit'],
   death: 'Death',
 };
 
@@ -307,13 +371,56 @@ const CREATURES = 'models/creatures';
 const WEAPONS = 'models/weapons';
 const MOUNTS_DIR = 'models/mounts';
 
+const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
+  eastbrook_buckler: 'shield_round',
+  highwatch_wallshield: 'shield_square',
+  bonewrought_bulwark: 'shield_square',
+  pearlward_aegis: 'shield_round', // the first caster (int/spi) shield
+};
+
+function itemModelKey(
+  itemId: string | null | undefined,
+  extra: Readonly<Record<string, string>> = {},
+): string | null {
+  if (!itemId) return null;
+  const baseId = ITEMS[itemId]?.heroicOf;
+  return (
+    ITEM_WEAPON_VARIANTS[itemId] ??
+    extra[itemId] ??
+    (baseId ? (ITEM_WEAPON_VARIANTS[baseId] ?? extra[baseId]) : undefined) ??
+    null
+  );
+}
+
 /** GLB url for an equipped mainhand item's held weapon model, or null if the item
  *  has no mapped model (then the class default attach is kept). Mirrors the bag
  *  icon via the shared ITEM_WEAPON_VARIANTS map, so held weapon == inventory icon. */
 export function itemWeaponModelUrl(itemId: string | null | undefined): string | null {
-  if (!itemId) return null;
-  const key = ITEM_WEAPON_VARIANTS[itemId];
+  const key = itemModelKey(itemId);
   return key ? `${WEAPONS}/${key}.glb` : null;
+}
+
+/** GLB url for an actual equipped offhand. One-handed weapons reuse the shared
+ *  inventory/held-model map; shields use the narrow render-only table above. */
+export function itemOffhandModelUrl(itemId: string | null | undefined): string | null {
+  const key = itemModelKey(itemId, ITEM_OFFHAND_MODELS);
+  return key ? `${WEAPONS}/${key}.glb` : null;
+}
+
+/** GLB url the offhand slot should render: the active weapon skin's model when it
+ *  mirrors onto a matching-type offhand weapon (a rogue's second dagger
+ *  under a dagger skin), otherwise the equipped offhand item's own model. A shield,
+ *  held offhand (orb/tome), or different-type offhand weapon never mirrors, so it
+ *  keeps its item model; null when the offhand has no mapped model. The mirror
+ *  decision is the pure sim rule, so server and clients agree on both hands. */
+export function offhandModelUrl(
+  offhandItemId: string | null | undefined,
+  weaponSkinId: string | null | undefined,
+): string | null {
+  if (offhandMirrorsWeaponSkin(weaponSkinId, offhandItemId)) {
+    return weaponSkinModelUrl(weaponSkinId);
+  }
+  return itemOffhandModelUrl(offhandItemId);
 }
 
 /** Distinct held-weapon GLB urls (one per variant), for the boot preload sweep so
@@ -321,6 +428,10 @@ export function itemWeaponModelUrl(itemId: string | null | undefined): string | 
  *  an un-preloaded url). */
 export function itemWeaponModelUrls(): string[] {
   return [...new Set(Object.values(ITEM_WEAPON_VARIANTS).map((key) => `${WEAPONS}/${key}.glb`))];
+}
+
+function itemOffhandModelUrls(): string[] {
+  return [...new Set(Object.values(ITEM_OFFHAND_MODELS).map((key) => `${WEAPONS}/${key}.glb`))];
 }
 
 /** GLB url for a Season 1 Armory weapon-skin cosmetic, or null for no/unknown
@@ -490,20 +601,56 @@ export const VISUALS: Record<string, VisualDef> = {
   player_warrior: {
     url: `${PLAYERS}/knight.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    clips: {
+      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+      attackByHand: {
+        twohand: '2H_Melee_Attack_Chop',
+        dualwield: 'Dualwield_Melee_Attack_Chop',
+      },
+      attackByAbility: {
+        mortal_strike: '2H_Melee_Attack_Chop',
+        execute: '2H_Melee_Attack_Chop',
+        slam: '2H_Melee_Attack_Chop',
+        red_harvest: '2H_Melee_Attack_Chop',
+        breachmaker: '2H_Melee_Attack_Chop',
+        shield_slam: '2H_Melee_Attack_Chop',
+        raging_gale: 'Dualwield_Melee_Attack_Chop',
+        bloodthirst: 'Dualwield_Melee_Attack_Chop',
+        cleave: '1H_Melee_Attack_Chop',
+        thunder_clap: '1H_Melee_Attack_Chop',
+        faultline: '1H_Melee_Attack_Chop',
+        revenge: '1H_Melee_Attack_Chop',
+        heroic_strike: '1H_Melee_Attack_Slice_Diagonal',
+        overpower: '1H_Melee_Attack_Slice_Diagonal',
+        hamstring: '1H_Melee_Attack_Slice_Diagonal',
+        sanguine_aura: 'Spellcast_Raise',
+        raised_guard: 'Block',
+      },
+    },
     show: ['Knight_Helmet', 'Knight_Cape'], // v2 knight dropped the built-in Badge_Shield mesh
-    attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
+    attach: [
+      { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
+    ],
     weaponSlots: [0],
+    offhandSlot: 1,
   },
   player_paladin: {
     url: `${PLAYERS}/paladin.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    clips: {
+      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+      attackByHand: { twohand: '2H_Melee_Attack_Chop' },
+    },
     // dedicated paladin model (helmeted variant) — ships its own Cape + Helmet
     // meshes and texture, so no show-list/tint. Shield + paladin hammer arrive
     // in the weapons pass; the gripped axe holds the slot until then.
-    attach: [{ url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' }],
+    attach: [
+      { url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_square.glb`, bone: 'handslot.l' },
+    ],
     weaponSlots: [0],
+    offhandSlot: 1,
   },
   player_hunter: {
     url: `${PLAYERS}/ranger.glb`,
@@ -526,12 +673,25 @@ export const VISUALS: Record<string, VisualDef> = {
       { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.r' },
       { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.l' },
     ],
-    weaponSlots: [0, 1], // dual-wield: the equipped weapon shows in BOTH hands (mostly daggers)
+    weaponSlots: [0],
+    offhandSlot: 1,
   },
   player_priest: {
     url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
+    // The priest's Light: a warm golden halo ring above the crown. The mage
+    // model's pointed hat is canon here, and at the default lift the ring
+    // plane crosses the hat cone where it is wide, clipping through it; +0.15
+    // raises the plane to the cone tip, where the default-size ring clears it
+    // on every side (tuned by screenshot against the current mage.glb; a hat
+    // reshape in an asset update means re-tuning). Kept just below the hat's
+    // bounding-box top so portrait/turntable framing is unchanged for priests.
+    halo: 0xffd766,
+    haloUpOffset: 1.45,
+    // show is a no-op for the hat/cape: the current mage.glb rigs every
+    // accessory as a SkinnedMesh, and the allowlist filter (assets.ts) only
+    // hides non-skinned nodes, so the hat always renders. Sanctioned look.
     show: [],
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],
@@ -541,10 +701,17 @@ export const VISUALS: Record<string, VisualDef> = {
   player_shaman: {
     url: `${PLAYERS}/barbarian.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    clips: {
+      ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+      attackByHand: { twohand: '2H_Melee_Attack_Chop' },
+    },
     show: ['Barbarian_BearHat'], // v2 barbarian renamed Hat→BearHat and dropped the round shield mesh
-    attach: [{ url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' }],
+    attach: [
+      { url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_round.glb`, bone: 'handslot.l' },
+    ],
     weaponSlots: [0],
+    offhandSlot: 1,
     tint: 0x6f8fc9,
     tintStrength: 0.4,
   },
@@ -552,8 +719,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
-    // no Mage_Hat on players: the brim hides the whole body from the default
-    // chase-camera pitch (NPC mages keep theirs — they're seen from the side)
+    // The hat and cape render regardless of this list: the current mage.glb
+    // rigs every accessory as a SkinnedMesh, and the show allowlist
+    // (assets.ts) only hides non-skinned nodes. The hatted silhouette is the
+    // sanctioned mage look; listing Mage_Cape is inert but kept as intent.
     show: ['Mage_Cape'],
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],
@@ -835,6 +1004,29 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 2.1,
     clips: animal(['Attack_Headbutt', 'Attack_Kick']),
   },
+  // Training dummy: the immortal practice target (zone3.ts training_dummy,
+  // hpBase 999999, no drops). Custom Tripo humanoid auto-rigged onto the
+  // biped skeleton, KAYKIT_CLIP_PLAN vocabulary. The dummy never casts or
+  // jumps (sim's dummy handling holds it stationary and ability-less), so
+  // those two clips are stripped from the shipped GLB rather than carried as
+  // dead weight. It appears in exactly one hub (zone3.ts, count: 1, radius:
+  // 0), so it is lazy-preloaded rather than joining every client's eager
+  // boot set.
+  mob_training_dummy: {
+    url: `${CREATURES}/training_dummy.glb`,
+    height: 2.3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+    },
+    lazyPreload: true,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
   // Deepfen Spearjaw (The Drowned Litany): unused Quaternius raptor rig, a
   // toothy quadruped that reads far more like a swamp predator than the
   // generic wolf fallback (docs/prd/drowned-litany-asset-generation-plan.md).
@@ -897,6 +1089,108 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.2, // skin washes pink fast
   },
+  // Orkadia orc war-camp (Tripo GLBs). Low tint strength so each orc keeps its
+  // own baked black/blue/red identity; the mob `color` only nudges it.
+  mob_orc_grunt: {
+    url: `${CREATURES}/black_orc.glb`,
+    height: 2.3,
+    clips: ORC_TRIPO,
+    tint: 'entity',
+    tintStrength: 0.1,
+  },
+  mob_orc_marauder: {
+    url: `${CREATURES}/blue_orc.glb`,
+    height: 2.4,
+    clips: ORC_TRIPO,
+    tint: 'entity',
+    tintStrength: 0.1,
+  },
+  mob_orc_warlord: {
+    url: `${CREATURES}/red_orc.glb`,
+    height: 2.6,
+    clips: ORC_TRIPO,
+    tint: 'entity',
+    tintStrength: 0.1,
+  },
+  // Five bespoke Orkadia specialists, kept effectively untinted so their
+  // authored armor, warpaint, fel runes, and rank silhouettes remain distinct.
+  mob_orkadia_axethrower: {
+    url: `${CREATURES}/orkadia_axethrower.glb`,
+    height: 2.4,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.06,
+  },
+  mob_orkadia_fel_shaman: {
+    url: `${CREATURES}/orkadia_fel_shaman.glb`,
+    height: 2.4,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.06,
+  },
+  mob_orkadia_beast_handler: {
+    url: `${CREATURES}/orkadia_beast_handler.glb`,
+    height: 2.5,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.06,
+  },
+  mob_orkadia_siege_brute: {
+    url: `${CREATURES}/orkadia_siege_brute.glb`,
+    height: 2.9,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.04,
+  },
+  mob_orkadia_banner_captain: {
+    url: `${CREATURES}/orkadia_banner_captain.glb`,
+    height: 2.7,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.05,
+  },
+  // Five Wildheart troll silhouettes use the same complete biped vocabulary,
+  // but preserve their woven cloth, bone paint, feathers, and jungle palette.
+  mob_wildheart_stalker: {
+    url: `${CREATURES}/wildheart_stalker.glb`,
+    height: 2.5,
+    yaw: -Math.PI / 2,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.04,
+  },
+  mob_wildheart_ravager: {
+    url: `${CREATURES}/wildheart_ravager.glb`,
+    height: 2.7,
+    yaw: -Math.PI / 2,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.04,
+  },
+  mob_wildheart_hexcaller: {
+    url: `${CREATURES}/wildheart_hexcaller.glb`,
+    height: 2.5,
+    yaw: -Math.PI / 2,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.04,
+  },
+  mob_wildheart_beastmaster: {
+    url: `${CREATURES}/wildheart_beastmaster.glb`,
+    height: 3,
+    yaw: -Math.PI / 2,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.03,
+  },
+  mob_wildheart_high_priest: {
+    url: `${CREATURES}/wildheart_high_priest.glb`,
+    height: 3.2,
+    yaw: -Math.PI / 2,
+    clips: TRIPO_BIPED_FULL_RIG,
+    tint: 'entity',
+    tintStrength: 0.03,
+  },
   mob_elemental: {
     url: `${CREATURES}/golelingevolved.glb`,
     height: 2.2,
@@ -904,6 +1198,13 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: FLOATING,
     tint: 'entity',
     tintStrength: 0.4,
+  },
+  mob_water_elemental: {
+    url: `${CREATURES}/water_elemental.glb`,
+    height: 2.65,
+    hover: 0.12,
+    clips: WATER_ELEMENTAL,
+    attackTimeScale: 1.1,
   },
   mob_dragonkin: {
     url: `${CREATURES}/dragonevolved.glb`,
@@ -1357,6 +1658,20 @@ export const VISUALS: Record<string, VisualDef> = {
 // ---------------------------------------------------------------------------
 
 const MOB_KEYS: Record<string, string> = {
+  // Orkadia orc war-camp: each orc template renders its own Tripo GLB.
+  orkadia_grunt: 'mob_orc_grunt',
+  orkadia_marauder: 'mob_orc_marauder',
+  orkadia_warlord: 'mob_orc_warlord',
+  orkadia_axethrower: 'mob_orkadia_axethrower',
+  orkadia_fel_shaman: 'mob_orkadia_fel_shaman',
+  orkadia_beast_handler: 'mob_orkadia_beast_handler',
+  orkadia_siege_brute: 'mob_orkadia_siege_brute',
+  orkadia_banner_captain: 'mob_orkadia_banner_captain',
+  wildheart_stalker: 'mob_wildheart_stalker',
+  wildheart_ravager: 'mob_wildheart_ravager',
+  wildheart_hexcaller: 'mob_wildheart_hexcaller',
+  wildheart_beastmaster: 'mob_wildheart_beastmaster',
+  wildheart_high_priest: 'mob_wildheart_high_priest',
   // Ambient Highwatch stable horse: the Valorsteed mount model (mob_stable_horse
   // above) so it renders as an animated horse, not a humanoid.
   stable_horse: 'mob_stable_horse',
@@ -1366,7 +1681,9 @@ const MOB_KEYS: Record<string, string> = {
   // Protect Yumi objective cat: the dedicated Meshy familiar
   // (docs/prd/protect-yumi-assets.md item 1, delivered).
   yumi_cat: 'mob_yumi_cat',
+  training_dummy: 'mob_training_dummy',
   emberkin: 'mob_demon',
+  water_elemental: 'mob_water_elemental',
   gloomshade: 'mob_demon',
   duskborn: 'mob_demon',
   warlock_imp: 'mob_demon_flying',
@@ -1411,6 +1728,9 @@ const MOB_KEYS: Record<string, string> = {
   sanctum_boneguard: 'skel_warrior',
   nythraxis_scourge_of_thornpeak: 'skel_golem',
   nythraxis_skeleton_warrior: 'skel_warrior',
+  nythraxis_heroic_warrior_add: 'skel_warrior',
+  nythraxis_heroic_priest_add: 'skel_necromancer',
+  nythraxis_heroic_rogue_add: 'skel_rogue',
   brother_aldric_raid: 'npc_aldric',
   hollow_acolyte: 'skel_mage',
   sexton_marrow: 'skel_mage',
@@ -1429,9 +1749,6 @@ const MOB_KEYS: Record<string, string> = {
   // the "Spirit of X" adds reuse each character's crypt visual above. Without these
   // the ids fall through to FAMILY_KEYS.undead (skel_minion) and the whole court
   // renders as identical generic skeletons. See spawnNythraxisHeroicAdds.
-  nythraxis_heroic_warrior_add: 'skel_warrior', // Spirit of Aldren
-  nythraxis_heroic_priest_add: 'skel_necromancer', // Spirit of Malric
-  nythraxis_heroic_rogue_add: 'skel_rogue', // Spirit of Voss
   vision_aldren_warrior: 'player_warrior',
   vision_malric_mage: 'player_mage',
   vision_deathstalker_voss: 'player_rogue',
@@ -1452,6 +1769,9 @@ const MOB_KEYS: Record<string, string> = {
   duskwisp: 'mob_duskwisp',
   ice_wisp: 'mob_ghost',
   frostmane_yeti: 'mob_yeti',
+  // Frostveil quest pass: Wren renders as a tinted villager (escort NPC, mob-kind
+  // so the escort driver can walk her); the howlers ride the beast/wolf fallback.
+  apprentice_wren: 'npc_villager',
   sporeling_gatherer: 'mob_glub',
   corrupted_sporeling: 'mob_glub',
   mushroom_pixie: 'mob_mushroom_pixie',
@@ -1510,6 +1830,7 @@ const FAMILY_KEYS: Record<string, string> = {
 
 const NPC_KEYS: Record<string, string> = {
   bursar_fernando: 'npc_fernando',
+  card_master: 'npc_villager_robed',
   marshal_redbrook: 'npc_knight',
   warden_fenwick: 'npc_knight',
   captain_thessaly: 'npc_knight',
@@ -1539,6 +1860,17 @@ const NPC_KEYS: Record<string, string> = {
   provisioner_fenna: 'npc_villager',
   wardsmith_orun: 'npc_smith',
   archivist_tullo: 'npc_villager_robed',
+  // Professions 2.0 station masters: existing looks only (no new GLBs). The
+  // forge and toolworks masters wear the smith's work apron; the weaver and
+  // alchemist match the robed apothecary/herbalist look; the cook and tanner
+  // read as working townsfolk.
+  forgemistress_darva: 'npc_smith',
+  tinker_gizzel: 'npc_smith',
+  weaver_ottilie: 'npc_villager_robed',
+  alchemist_verane: 'npc_villager_robed',
+  cook_marlow: 'npc_villager',
+  tanner_hesk: 'npc_villager',
+  huntsman_deral: 'npc_scout',
 };
 
 export function visualKeyFor(e: Entity): string {
@@ -1565,8 +1897,13 @@ export function visualKeyFor(e: Entity): string {
  *  as a player entity's templateId, so this applies the same offline and online. */
 export function mechHeldWeaponOverride(cls: PlayerClass): WeaponLayoutOverride | null {
   const classDef = VISUALS[`player_${cls}`];
-  if (!classDef || (classDef.weaponSlots?.length ?? 0) < 2) return null;
-  return { attach: classDef.attach, weaponSlots: classDef.weaponSlots };
+  if (!classDef || ((classDef.weaponSlots?.length ?? 0) < 2 && classDef.offhandSlot === undefined))
+    return null;
+  return {
+    attach: classDef.attach,
+    weaponSlots: classDef.weaponSlots,
+    offhandSlot: classDef.offhandSlot,
+  };
 }
 
 /** Every glb the manifest can reference (for preloading). */
@@ -1581,6 +1918,7 @@ export function manifestUrls(): string[] {
   // Equipped-weapon models a player may swap to at runtime (any nearby player's
   // gear), so they are resolved-and-ready when setWeapon attaches them.
   for (const url of itemWeaponModelUrls()) urls.add(url);
+  for (const url of itemOffhandModelUrls()) urls.add(url);
   // Season 1 Armory weapon-skin models: also attachable on any nearby player at
   // any moment (account-wide cosmetics), so they preload with the same sweep.
   for (const url of weaponSkinModelUrls()) urls.add(url);

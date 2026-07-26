@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
-import { RIFT_ESSENCE_ITEM_ID, RIFT_GEM_IDS } from '../src/sim/content/rift/items';
-import { ZONES } from '../src/sim/data';
+import {
+  RIFT_ESSENCE_ITEM_ID,
+  RIFT_GEAR_ITEM_IDS,
+  RIFT_GEM_IDS,
+} from '../src/sim/content/rift/items';
+import { isRiftPos, ZONES } from '../src/sim/data';
 import {
   RIFT_MIN_LEVEL,
   RIFT_PORTAL_LIFETIME,
@@ -87,15 +91,19 @@ describe('rift ranks: zone mapping and tuning', () => {
     expect(riftTierForZone(nightbloom, 0.99)).toBe('S');
   });
 
-  it('rank tuning is monotonic: higher rank, higher baseLevel and more marks', () => {
+  it('rank tuning is monotonic in baseLevel and carries no mark currency', () => {
     const tiers = ['C', 'B', 'A', 'S'] as const;
     for (let i = 1; i < tiers.length; i++) {
       expect(RIFT_TIER_INFO[tiers[i]].baseLevel).toBeGreaterThan(
         RIFT_TIER_INFO[tiers[i - 1]].baseLevel,
       );
-      expect(RIFT_TIER_INFO[tiers[i]].marks).toBeGreaterThan(RIFT_TIER_INFO[tiers[i - 1]].marks);
     }
     expect(RIFT_TIER_INFO.C.baseLevel).toBe(20);
+    // Rifts pay NO Heroic Marks at any rank (maintainer decision): the tier
+    // table must not grow a marks field back.
+    for (const tier of tiers) {
+      expect(Object.keys(RIFT_TIER_INFO[tier]).sort()).toEqual(['baseLevel', 'color']);
+    }
   });
 });
 
@@ -207,7 +215,7 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
     return { inst, boss, portalInfo: p };
   }
 
-  it('boss kill seals the portal, announces it, and drops rank-scaled marks', () => {
+  it('boss kill seals the portal, announces it, and pays no Heroic Marks', () => {
     const sim = makeSim();
     sim.setPlayerLevel(RIFT_MIN_LEVEL);
     sim.utcDay = '2026-07-07';
@@ -225,34 +233,30 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
           e.text === `The ${portalInfo.tier}-rank rift in ${portalInfo.zoneName} has been sealed.`,
       ),
     ).toBe(true);
-    // Marks on the boss corpse, personal to the player, scaled by rank.
+    // NO Heroic Marks on the corpse at any rank: marks stay a heroic
+    // dungeon/raid currency (maintainer decision).
     const marks = (boss.loot?.items ?? []).filter((i) => i.itemId === HEROIC_MARK_ITEM_ID);
-    expect(marks.length).toBe(
-      RIFT_TIER_INFO[portalInfo.tier].marks + RIFT_TIER_INFO[portalInfo.tier].raceMarks,
-    );
-    expect(marks[0].personalFor).toEqual([sim.player.id]);
+    expect(marks).toEqual([]);
   });
 
-  it('the rank payout is daily-gated: a second same-rank clear pays nothing', () => {
+  it('a ranked clear never touches the heroic daily ledger or pays marks', () => {
     const sim = makeSim();
     sim.setPlayerLevel(RIFT_MIN_LEVEL);
     sim.utcDay = '2026-07-07';
     const meta = sim.players.get(sim.player.id)!;
     spawnDuePortal(sim);
-    const { boss, portalInfo } = runToBossKill(sim);
+    const { boss } = runToBossKill(sim);
     tickSeconds(sim, 1.2);
-    expect(meta.heroicDaily.marked.has(`rift_${portalInfo.tier}`)).toBe(true);
-    const firstMarks = (boss.loot?.items ?? []).filter(
-      (i) => i.itemId === HEROIC_MARK_ITEM_ID,
-    ).length;
-    expect(firstMarks).toBeGreaterThan(0);
+    // The heroic daily gate is dungeon/raid state: a rift clear never stamps it.
+    expect([...meta.heroicDaily.marked].some((k) => k.startsWith('rift_'))).toBe(false);
+    expect((boss.loot?.items ?? []).filter((i) => i.itemId === HEROIC_MARK_ITEM_ID)).toEqual([]);
     // A dev-portal run has no rank: never pays, never seals.
     sim.enterRift(4242, 15, sim.player.id);
     const inst2 = sim.riftInstances.find((i) => i.partyKey !== null && i.seed === 4242)!;
     expect(inst2.tier).toBeNull();
   });
 
-  it('/dev portal keeps its cosmetic rank but pays no Heroic Marks on clear', () => {
+  it('/dev portal run is real S difficulty but unranked: no Heroic Marks on clear', () => {
     const sim = makeSim();
     sim.setPlayerLevel(RIFT_MIN_LEVEL);
     sim.utcDay = '2026-07-07';
@@ -261,6 +265,9 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
       (entity) => entity.templateId === 'rift_portal' && entity.riftSeed === 5,
     )!;
     expect(portal.riftTier).toBe('S');
+    // The rank letter drives the difficulty (canonical S baseLevel), overriding
+    // the conflicting explicit 20.
+    expect(portal.riftBaseLevel).toBe(28);
 
     sim.player.pos = { ...portal.pos };
     sim.player.prevPos = { ...portal.pos };
@@ -279,5 +286,139 @@ describe('rift portals: sealing pays Heroic Marks by rank', () => {
     ).toBe(false);
     expect(rewardItems.some((item) => item.instance?.rift !== undefined)).toBe(false);
     expect(sim.players.get(sim.player.id)?.heroicDaily.marked.size).toBe(0);
+  });
+
+  it('natural ranked first-clear: boss corpse carries a personal riftbound ring, essence, and A/S gem', () => {
+    // This is the POSITIVE pin for addRiftProgressionLoot. The dev-portal negative
+    // (above) already pins the "no progression loot on unranked runs" path. This
+    // test confirms that the first ranked clear actually deposits ring + essence +
+    // gem personalFor the winning player on the boss corpse.
+    const sim = makeSim();
+    sim.setPlayerLevel(RIFT_MIN_LEVEL);
+    sim.utcDay = '2026-07-08';
+    // Force an A-rank portal (baseLevel 25) so the gem arm triggers.
+    spawnDuePortal(sim);
+    // If the spawned portal is not A or S, override to A via dev command.
+    const portal0 = sim.naturalRiftPortals[0];
+    if (!portal0 || (portal0.tier !== 'A' && portal0.tier !== 'S')) {
+      // Seed a new portal at the right rank via the dev command.
+      sim.chat('/dev portal 99 25 A', sim.player.id);
+      const portalEntity = [...sim.entities.values()].find(
+        (e) => e.templateId === 'rift_portal' && e.riftSeed === 99,
+      )!;
+      sim.player.pos = { ...portalEntity.pos };
+      sim.player.prevPos = { ...portalEntity.pos };
+    } else {
+      const portalEntity = sim.entities.get(portal0.id)!;
+      sim.player.pos = { ...portalEntity.pos };
+      sim.player.prevPos = { ...portalEntity.pos };
+    }
+    sim.tick();
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+    expect(inst, 'entered a rift').toBeDefined();
+
+    const boss = clearRiftToBossKill(sim, inst);
+    tickSeconds(sim, 1.2); // let the 1 Hz reward sweep fire
+    expect(inst.rewarded, 'rift marked rewarded').toBe(true);
+
+    const pid = sim.player.id;
+    const items = boss.loot?.items ?? [];
+
+    // Personal riftbound ring: personalFor the winner.
+    const ringItem = items.find(
+      (i) =>
+        (RIFT_GEAR_ITEM_IDS as readonly string[]).includes(i.itemId) &&
+        i.personalFor?.includes(pid),
+    );
+    expect(ringItem, 'riftbound ring is personal to the winner').toBeDefined();
+    expect(ringItem?.instance?.rift, 'ring has a rift instance payload').toBeDefined();
+
+    // Rift Essence: at least one personal essence drop.
+    const essenceItems = items.filter(
+      (i) => i.itemId === RIFT_ESSENCE_ITEM_ID && i.personalFor?.includes(pid),
+    );
+    expect(essenceItems.length, 'at least one essence dropped').toBeGreaterThanOrEqual(1);
+
+    // A/S gem: exactly one gem from the RIFT_GEM_IDS pool, personal to the winner.
+    const gemItem = items.find(
+      (i) => (RIFT_GEM_IDS as readonly string[]).includes(i.itemId) && i.personalFor?.includes(pid),
+    );
+    expect(gemItem, 'A/S gem is personal to the winner').toBeDefined();
+  });
+});
+
+describe('rift entry: death rules (anti-zerg + corpse retrieval)', () => {
+  const makeGhost = (e: Entity) => {
+    e.hp = 0;
+    e.dead = true;
+    e.ghost = true;
+  };
+
+  it('a dead player with no run in a rift cannot enter, throttled to one notice per window', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(RIFT_MIN_LEVEL);
+    makeGhost(sim.player);
+    sim.drainEvents();
+    let notices = 0;
+    // 40 ticks = 2s, inside the 4s denial window: exactly one notice.
+    for (let i = 0; i < 40; i++) {
+      sim.enterRift(41, 20, sim.player.id);
+      for (const ev of sim.tick()) {
+        if (JSON.stringify(ev).includes('You cannot enter a rift while dead.')) notices++;
+      }
+    }
+    expect(
+      sim.riftInstances.find((i) => i.partyKey !== null),
+      'no run allocated',
+    ).toBeUndefined();
+    expect(isRiftPos(sim.player.pos.x), 'ghost never teleported in').toBe(false);
+    expect(notices, 'denial throttled to one notice per window').toBe(1);
+  });
+
+  it('a ghost member is barred while the run is in combat, and re-enters once it settles', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(RIFT_MIN_LEVEL);
+    sim.enterRift(SEED, 20, sim.player.id);
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+    const mob = inst.mobIds
+      .map((id) => sim.entities.get(id))
+      .find((m): m is Entity => !!m && !m.dead)!;
+    mob.inCombat = true;
+    makeGhost(sim.player);
+    sim.player.pos = { x: inst.returnPos.x, y: 0, z: inst.returnPos.z };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.drainEvents();
+    sim.enterRift(SEED, 20, sim.player.id);
+    expect(isRiftPos(sim.player.pos.x), 'combat bars the ghost').toBe(false);
+    expect(JSON.stringify(sim.drainEvents()), 'the combat denial explains itself').toContain(
+      'Your party is still in combat.',
+    );
+    // The fight settles (wipe recovery): the corpse run is allowed.
+    mob.inCombat = false;
+    sim.enterRift(SEED, 20, sim.player.id);
+    expect(isRiftPos(sim.player.pos.x), 'out of combat the ghost re-enters').toBe(true);
+    expect(sim.player.dead, 'still a ghost: entry does not resurrect').toBe(true);
+  });
+
+  it('a ghost member re-enters a WON run for their corpse instead of forced rez sickness', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(RIFT_MIN_LEVEL);
+    sim.utcDay = '2026-07-09';
+    sim.enterRift(SEED, 20, sim.player.id);
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+    clearRiftToBossKill(sim, inst);
+    tickSeconds(sim, 1.2);
+    expect(inst.outcome, 'the run is decided').toBe('won');
+    sim.leaveRift(sim.player.id);
+    makeGhost(sim.player);
+    sim.player.pos = { x: inst.returnPos.x, y: 0, z: inst.returnPos.z };
+    sim.player.prevPos = { ...sim.player.pos };
+    const allocated = sim.riftInstances.filter((i) => i.partyKey !== null).length;
+    sim.enterRift(SEED, 20, sim.player.id);
+    expect(isRiftPos(sim.player.pos.x), 'the ghost walks back into the won run').toBe(true);
+    expect(
+      sim.riftInstances.filter((i) => i.partyKey !== null).length,
+      'no fresh run allocated',
+    ).toBe(allocated);
   });
 });

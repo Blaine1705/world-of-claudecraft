@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { BUILDING_COLLIDER_HEIGHTS } from '../sim/colliders';
+import { buildingCameraHeight } from '../sim/building_layout';
+import { mineMoundFootprint } from '../sim/colliders';
 import { MOUNT_RACE_JUMP_FIXTURES } from '../sim/content/mounts';
-import { getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
+import { BUILTIN_WORLD, getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
 import {
   DOCK_SECTION_LOCAL_Z,
   DOCK_SECTION_SURFACE_Y,
@@ -13,8 +14,15 @@ import {
 import { hash2 } from '../sim/rng';
 import type { BuildingDef } from '../sim/types';
 import { terrainHeight, WATER_LEVEL, waterLevel } from '../sim/world';
-import { loadGltf } from './assets/loader';
+import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { buildEastbrookGrandArmouryView } from './eastbrook_grand_armoury';
+import {
+  isEastbrookRebuildBuilding,
+  isEastbrookRebuildFence,
+  isEastbrookRebuildStall,
+  isEastbrookRebuildWell,
+} from './eastbrook_town';
 import { GFX, sharedUniforms, surfaceMat } from './gfx';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
@@ -508,6 +516,11 @@ function propAsset(key: PropKey): PropAsset {
   }
   const asset: PropAsset = { parts, size: box.getSize(new THREE.Vector3()) };
   extractCache.set(key, asset);
+  // The extracted float geometry and converted materials are now authoritative.
+  // Release the parsed scene's duplicate source buffers without disposing shared
+  // textures that the converted materials still reference.
+  loadedProps.delete(key);
+  releaseGltf(def.url);
   return asset;
 }
 
@@ -819,6 +832,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   const flames: THREE.Mesh[] = [];
   const windmillFans: THREE.Object3D[] = [];
   const fireLights: THREE.PointLight[] = [];
+  const activeContent = getActiveWorldContent();
+  const builtInWorld = activeContent === BUILTIN_WORLD;
 
   const ground = (x: number, z: number) => terrainHeight(x, z, seed);
 
@@ -953,11 +968,22 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     hollowMarket: 'kmedMarket',
   };
 
-  for (const b of getActiveWorldContent().props.buildings) {
+  for (const b of activeContent.props.buildings) {
     const key = b.x * 13.7 + b.z * 3.1;
     const y = ground(b.x, b.z);
-    // roof Y mirrors the camera collider height in colliders.ts
-    const roofY = y + (BUILDING_COLLIDER_HEIGHTS[b.kind] ?? 8.0);
+    const armoury = buildEastbrookGrandArmouryView(b, ground);
+    if (armoury) {
+      group.add(armoury.group);
+      registerHideable(
+        armoury.group,
+        obbFootprint(b.x, b.z, b.w / 2, b.d / 2, b.rot, armoury.cameraTopY),
+      );
+      continue;
+    }
+    if (builtInWorld && isEastbrookRebuildBuilding(b)) continue;
+    // roof Y mirrors the camera collider height: one definition in
+    // building_layout.ts, so render and collision can never drift apart
+    const roofY = y + buildingCameraHeight(b);
     if (b.kind === 'chapel') {
       // composed chapel: tall bell tower at the rear + squat stone entry hall
       // in front; the hall door lands on the footprint's +z edge.
@@ -1035,7 +1061,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   }
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
-  getActiveWorldContent().props.stalls.forEach((s, i) => {
+  activeContent.props.stalls.forEach((s, i) => {
+    if (builtInWorld && isEastbrookRebuildStall(s)) return;
     const key = s.x * 7.7 + s.z * 2.3;
     const g = new THREE.Group();
     const standKey: PropKey = i % 2 === 0 ? 'stand1' : 'stand2';
@@ -1059,7 +1086,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   });
 
   // ---- wells ---------------------------------------------------------------
-  for (const w of getActiveWorldContent().props.wells) {
+  for (const w of activeContent.props.wells) {
+    if (builtInWorld && isEastbrookRebuildWell(w)) continue;
     const g = new THREE.Group();
     const a = propAsset('well');
     addParts(g, 'well', { scale: [2.6 / a.size.x, 3.6 / a.size.y, 2.9 / a.size.z] });
@@ -1101,7 +1129,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   const STONE_MODULE_LEN = 1.155 * STONE_WALL_SCALE;
   const PALISADE_MODULE_LEN = 2.0; // authored length before scaling
   const PALISADE_SEG = 6.4; // target module length in the world
-  for (const f of getActiveWorldContent().props.fences) {
+  for (const f of activeContent.props.fences) {
+    if (builtInWorld && isEastbrookRebuildFence(f)) continue;
     const len = Math.hypot(f.x2 - f.x1, f.z2 - f.z1);
     const stone = f.kind === 'stone';
     const palisade = f.kind === 'palisade';
@@ -1188,8 +1217,12 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     flames.push(flame);
     noShadow.add(flame);
     const light = new THREE.PointLight(0xff8830, 12, 16, 2);
-    light.position.y = 1.2;
-    g.add(light);
+    // Root-level, world-positioned: the light must NOT live inside the hideable
+    // campfire group. A parent visibility toggle (fog cull / camera ghost) would
+    // change numPointLights and recompile every lit material mid-travel (the
+    // open-world shader-compile freeze). The fireLights budget owns its shine.
+    light.position.set(x, y + 1.2, z);
+    group.add(light);
     fireLights.push(light);
     g.position.set(x, y, z);
     group.add(shadowed(g));
@@ -1421,10 +1454,11 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     g.position.set(m.x, ground(m.x, m.z), m.z);
     g.rotation.y = m.rot;
     group.add(shadowed(g));
-    // mound circle behind the portal — same offset/radius as the collider
-    const mx = m.x - 3.4 * Math.sin(m.rot),
-      mz = m.z - 3.4 * Math.cos(m.rot);
-    registerHideable(g, circleFootprint(mx, mz, 5, ground(mx, mz) + 5.2));
+    // mound circle behind the portal, same offset/radius as the collider
+    // (src/sim/colliders.ts), via the shared mineMoundFootprint helper so the
+    // two can never drift apart again
+    const { x: mx, z: mz, r: moundRadius } = mineMoundFootprint(m);
+    registerHideable(g, circleFootprint(mx, mz, moundRadius, ground(mx, mz) + moundRadius + 0.2));
   }
 
   // ---- fishing docks: pirate-kit platforms, moored rowboat, stone hut ------
@@ -1521,7 +1555,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   // on the mouth side for both delves.
   const delvePortals: THREE.Mesh[] = [];
   for (const dm of getActiveWorldContent().props.delveMarkers ?? []) {
-    if (!loadedProps.has('delveEntrance2')) continue;
+    if (!loadedProps.has('delveEntrance2') && !extractCache.has('delveEntrance2')) continue;
     const isDrowned = dm.delveId === 'drowned_litany';
     // The portal mouth faces the hub the players approach from: Reliquary Hill's
     // town is north (+z) of its door, Mirefen Marsh's hub (z~300) is SOUTH (-z)
@@ -1841,13 +1875,17 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       eyeZ: number,
       fogFar: number,
     ): void {
-      for (const c of cullables) {
-        c.obj.visible = cullableVisible(c, camX, camZ, fogFar);
+      const fogFarSq = fogFar * fogFar;
+      for (let i = 0; i < cullables.length; i++) {
+        const c = cullables[i];
+        c.obj.visible = cullableVisible(c, camX, camZ, fogFar, fogFarSq);
       }
-      for (const h of hideables) {
+      for (let i = 0; i < hideables.length; i++) {
+        const h = hideables[i];
         const dx = camX - h.x,
           dz = camZ - h.z;
-        if (Math.hypot(dx, dz) - h.cull >= fogFar) {
+        const reach = fogFar + h.cull;
+        if (dx * dx + dz * dz >= reach * reach) {
           h.group.visible = false; // fully fogged: drop it (shadow is out of range too)
           continue;
         }
@@ -1862,7 +1900,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
         h.group.visible = true;
         if (hide !== h.hidden) {
           h.hidden = hide;
-          for (const m of h.mats) {
+          for (let j = 0; j < h.mats.length; j++) {
+            const m = h.mats[j];
             m.mat.colorWrite = !hide;
             m.mat.depthWrite = hide ? false : m.depthWrite;
           }
@@ -2064,12 +2103,21 @@ function cullableBounds(
   };
 }
 
-function cullableVisible(c: PropCullable, camX: number, camZ: number, fogFar: number): boolean {
+function cullableVisible(
+  c: PropCullable,
+  camX: number,
+  camZ: number,
+  fogFar: number,
+  fogFarSq: number,
+): boolean {
   const dx = camX < c.minX ? c.minX - camX : camX > c.maxX ? camX - c.maxX : 0;
   const dz = camZ < c.minZ ? c.minZ - camZ : camZ > c.maxZ ? camZ - c.maxZ : 0;
-  if (Math.hypot(dx, dz) < fogFar) return true;
+  if (dx * dx + dz * dz < fogFarSq) return true;
   if (c.hasBox) return false;
-  return Math.hypot(c.cx - camX, c.cz - camZ) - c.r < fogFar;
+  const centerDx = c.cx - camX;
+  const centerDz = c.cz - camZ;
+  const reach = fogFar + c.r;
+  return centerDx * centerDx + centerDz * centerDz < reach * reach;
 }
 
 // Bake every static prop mesh into world space and merge per

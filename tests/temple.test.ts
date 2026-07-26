@@ -161,6 +161,9 @@ describe('The Drowned Temple', () => {
     expect(QUESTS.q_silence_the_choir.requiresQuest).toBe('q_drowned_choir');
     expect(QUESTS.q_drowned_moon.requiresQuest).toBe('q_silence_the_choir');
     expect(QUESTS.q_drowned_moon.suggestedPlayers).toBe(5);
-    expect(QUESTS.q_drowned_moon.objectives[0].targetMobId).toBe('ysolei');
+    const objective = QUESTS.q_drowned_moon.objectives[0];
+    expect(objective.type).toBe('kill');
+    if (objective.type !== 'kill') throw new Error('q_drowned_moon must be a kill quest');
+    expect(objective.targetMobId).toBe('ysolei');
   });
 });

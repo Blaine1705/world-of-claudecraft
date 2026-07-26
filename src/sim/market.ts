@@ -25,9 +25,40 @@ const MARKET_RANGE = INTERACT_RANGE + 2; // you must stand at the Merchant to de
 // the /listings readout (still on Sim) reports the seller's count against this cap,
 // so it is the one const exported back to sim.ts; the rest are market-internal.
 export const MARKET_MAX_LISTINGS = 12; // active player listings per seller
+export const MARKET_HOUSE_STOCK = [
+  { itemId: 'roasted_boar', count: 5, price: 700 },
+  { itemId: 'spring_water', count: 5, price: 160 },
+  { itemId: 'oiled_boots', count: 1, price: 1900 },
+  { itemId: 'quilted_trousers', count: 1, price: 2400 },
+  { itemId: 'greyjaw_pelt_cloak', count: 1, price: 2900 },
+  // Quartermaster's Consignment - a standing line of practical travel gear.
+  { itemId: 'roadwardens_helm', count: 1, price: 2200 },
+  { itemId: 'wayfarers_hood', count: 1, price: 2000 },
+  { itemId: 'acolytes_circlet', count: 1, price: 2000 },
+  { itemId: 'reinforced_pauldrons', count: 1, price: 2400 },
+  { itemId: 'embroidered_mantle', count: 1, price: 1900 },
+  { itemId: 'sturdy_belt', count: 1, price: 1700 },
+  { itemId: 'silk_sash', count: 1, price: 1700 },
+  { itemId: 'roughspun_gloves', count: 1, price: 1500 },
+  // Crossroads Outfitters - eight pieces kept in standing stock.
+  { itemId: 'tradesman_hatchet', count: 1, price: 2300 },
+  { itemId: 'drovers_staff', count: 1, price: 2500 },
+  { itemId: 'caravan_warden_dirk', count: 1, price: 2400 },
+  { itemId: 'outrider_brigandine', count: 1, price: 2600 },
+  { itemId: 'caravan_quilted_vest', count: 1, price: 1800 },
+  { itemId: 'outrider_legguards', count: 1, price: 2100 },
+  { itemId: 'pilgrims_leggings', count: 1, price: 1700 },
+  { itemId: 'outrider_sabatons', count: 1, price: 1900 },
+] as const;
 const MARKET_MIN_PRICE = 1; // copper
-const MARKET_MAX_PRICE = 5_000_000; // 500g ceiling — guards against overflow / fat-finger
-const MARKET_CUT = 0.05; // the Merchant's cut on a completed sale (a gold sink)
+const MARKET_MAX_PRICE = 5_000_000; // 500g ceiling, guards against overflow / fat-finger
+// Exported for the wiki generator (scripts/wiki/build_content.mjs) and its
+// accuracy guard: the published cut percent derives from this one constant.
+export const MARKET_CUT = 0.05; // the Merchant's cut on a completed sale (a gold sink)
+// No listing deposit is charged today; the constant exists so the wiki reads
+// the sim's own number instead of hardcoding one, and so a future deposit
+// lever has a named home the published page tracks automatically.
+export const MARKET_LISTING_DEPOSIT_COPPER = 0;
 const MARKET_LISTING_DURATION = 48 * 3600; // sim-seconds an unsold listing lingers before returning
 const MARKET_WIRE_LIMIT = 120; // most listings shipped to one client at a time
 
@@ -168,32 +199,7 @@ export class Market {
   // The Merchant always keeps a little stock so the market is never empty —
   // standing consignments that never expire, never deplete, and pay no one.
   private seedHouseListings(): void {
-    const stock: { itemId: string; count: number; price: number }[] = [
-      { itemId: 'roasted_boar', count: 5, price: 700 },
-      { itemId: 'spring_water', count: 5, price: 160 },
-      { itemId: 'oiled_boots', count: 1, price: 1900 },
-      { itemId: 'quilted_trousers', count: 1, price: 2400 },
-      { itemId: 'greyjaw_pelt_cloak', count: 1, price: 2900 },
-      // Quartermaster's Consignment — a standing line of practical travel gear.
-      { itemId: 'roadwardens_helm', count: 1, price: 2200 },
-      { itemId: 'wayfarers_hood', count: 1, price: 2000 },
-      { itemId: 'acolytes_circlet', count: 1, price: 2000 },
-      { itemId: 'reinforced_pauldrons', count: 1, price: 2400 },
-      { itemId: 'embroidered_mantle', count: 1, price: 1900 },
-      { itemId: 'sturdy_belt', count: 1, price: 1700 },
-      { itemId: 'silk_sash', count: 1, price: 1700 },
-      { itemId: 'roughspun_gloves', count: 1, price: 1500 },
-      // Crossroads Outfitters — eight pieces kept in standing stock
-      { itemId: 'tradesman_hatchet', count: 1, price: 2300 },
-      { itemId: 'drovers_staff', count: 1, price: 2500 },
-      { itemId: 'caravan_warden_dirk', count: 1, price: 2400 },
-      { itemId: 'outrider_brigandine', count: 1, price: 2600 },
-      { itemId: 'caravan_quilted_vest', count: 1, price: 1800 },
-      { itemId: 'outrider_legguards', count: 1, price: 2100 },
-      { itemId: 'pilgrims_leggings', count: 1, price: 1700 },
-      { itemId: 'outrider_sabatons', count: 1, price: 1900 },
-    ];
-    for (const s of stock) {
+    for (const s of MARKET_HOUSE_STOCK) {
       if (!ITEMS[s.itemId]) continue;
       this.marketListings.push({
         id: this.nextListingId++,
@@ -444,6 +450,17 @@ export class Market {
         });
       }
     }
+  }
+
+  // Whether anything (sale gold or returned items) waits for this player at the
+  // Merchant. The always-streamed HUD indicator bit (the mailUnread pattern):
+  // unlike marketInfoFor it has NO proximity gate, so the minimap badge can
+  // light anywhere in the world; collection itself stays at the Merchant.
+  collectPendingFor(pid: number): boolean {
+    const meta = this.ctx.players.get(pid);
+    if (!meta) return false;
+    const col = this.collectionForSeller(meta);
+    return !!col && (col.copper > 0 || col.items.length > 0);
   }
 
   marketInfoFor(pid: number): import('../world_api').MarketInfo | null {

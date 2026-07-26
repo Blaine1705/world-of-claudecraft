@@ -2,94 +2,23 @@
 // the immutable character templates and generated-name policy; db.ts owns the
 // transaction that inserts them. The templates are built through public Sim APIs
 // so level, derived stats, equipment rules, bags, and persistence stay canonical.
+//
+// Gear: each template wears the TRUE best-in-slot PvE kit for its class's
+// primary role and carries every alternate role's kit in four best-in-game
+// bags, riding trained and Nythraxis-attuned, via the shared boost kit
+// (server/pbe_boost.ts applyBoostKitToPlayer). The original hand-curated
+// WARFARE (honor vendor) loadouts were retired 2026-07-22: their PvP-budgeted
+// stats are exactly what endgame PvE testers should not be wearing (the
+// S-raid playtest ran in them), and one shared kit source cannot drift.
 
 import { type CharacterState, Sim } from '../src/sim/sim';
-import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../src/sim/types';
+import { ALL_CLASSES, ALL_EQUIP_SLOTS, MAX_LEVEL, type PlayerClass } from '../src/sim/types';
 import { validCharName } from './auth';
+import { applyBoostKitToPlayer } from './pbe_boost';
 
 const TEMPLATE_SEED = 20061;
 const NAME_TOKEN_LENGTH = 8;
 export const GENERATED_NAME_ATTEMPTS = 32;
-const MAX_BAGS = 4;
-const MAX_BAG_ITEM_ID = 'mistcallers_duffel';
-
-const FURYFORGED_ARMOR = [
-  'furyforged_warhelm',
-  'furyforged_warspaulders',
-  'furyforged_warplate',
-  'furyforged_girdle',
-  'furyforged_legguards',
-  'furyforged_gauntlets',
-  'furyforged_sabatons',
-] as const;
-const STORMBOUND_ARMOR = [
-  'stormbound_crown',
-  'stormbound_spaulders',
-  'stormbound_hauberk',
-  'stormbound_waistguard',
-  'stormbound_legmail',
-  'stormbound_handguards',
-  'stormbound_greaves',
-] as const;
-const ASHSTALKER_ARMOR = [
-  'ashstalker_cowl',
-  'ashstalker_shoulderguards',
-  'ashstalker_harness',
-  'ashstalker_waistband',
-  'ashstalker_legguards',
-  'ashstalker_grips',
-  'ashstalker_treads',
-] as const;
-const CINDERWEAVE_ARMOR = [
-  'cinderweave_cowl',
-  'cinderweave_mantle',
-  'cinderweave_raiment',
-  'cinderweave_cord',
-  'cinderweave_legwraps',
-  'cinderweave_handwraps',
-  'cinderweave_slippers',
-] as const;
-
-const STRENGTH_LOADOUT = [
-  'final_argument_greatblade',
-  ...FURYFORGED_ARMOR,
-  'final_oath_medallion',
-  'iron_vow_band',
-  'unbroken_circle',
-] as const;
-const AGILITY_LOADOUT = [
-  'first_blood_razor',
-  ...ASHSTALKER_ARMOR,
-  'razorwind_torque',
-  'fleetblood_band',
-  'last_step_signet',
-] as const;
-const CASTER_LOADOUT = [
-  'emberglass_warstaff',
-  ...CINDERWEAVE_ARMOR,
-  'cinder_sigil_pendant',
-  'ashen_focus_ring',
-  'spellbreakers_seal',
-] as const;
-const SHAMAN_LOADOUT = [
-  'emberglass_warstaff',
-  ...STORMBOUND_ARMOR,
-  'cinder_sigil_pendant',
-  'ashen_focus_ring',
-  'spellbreakers_seal',
-] as const;
-
-const WARFARE_LOADOUTS: Record<PlayerClass, readonly string[]> = {
-  warrior: STRENGTH_LOADOUT,
-  paladin: STRENGTH_LOADOUT,
-  hunter: AGILITY_LOADOUT,
-  rogue: AGILITY_LOADOUT,
-  priest: CASTER_LOADOUT,
-  shaman: SHAMAN_LOADOUT,
-  mage: CASTER_LOADOUT,
-  warlock: CASTER_LOADOUT,
-  druid: AGILITY_LOADOUT,
-};
 
 export interface CommunityTestCharacter {
   readonly cls: PlayerClass;
@@ -119,13 +48,16 @@ function templateStates(): ReadonlyMap<PlayerClass, CharacterState> {
   for (const cls of ALL_CLASSES) {
     const pid = sim.addPlayer(cls, `${cls}template`);
     sim.setPlayerLevel(MAX_LEVEL, pid);
-    for (const itemId of WARFARE_LOADOUTS[cls]) {
-      sim.addItem(itemId, 1, pid);
-      sim.equipItem(itemId, pid);
-    }
-    for (let socket = 0; socket < MAX_BAGS; socket++) {
-      sim.addItem(MAX_BAG_ITEM_ID, 1, pid);
-      sim.equipBag(MAX_BAG_ITEM_ID, socket, pid);
+    // Remove starter gear before applying the kit. With live offhands and
+    // dual wielding, leaving it equipped can route the intended mainhand into
+    // the offhand or retain an obsolete shield beside a two-hander.
+    for (const slot of ALL_EQUIP_SLOTS) sim.unequipItem(slot, pid);
+    // The shared boost kit: bags, the primary role's true-BiS kit equipped,
+    // every alternate role's kit in the bags, riding, and the attunement. The
+    // kit-version stamp it writes also tells the world-join top-up these
+    // characters are already current.
+    if (!applyBoostKitToPlayer(sim, pid)) {
+      throw new Error(`boost kit did not apply to community test template for ${cls}`);
     }
     // Equipment can raise maximum health and mana, so refill through the same
     // authoritative level path after the final stat recalculation.

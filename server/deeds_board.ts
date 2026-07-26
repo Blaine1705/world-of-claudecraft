@@ -9,6 +9,13 @@
 // source of truth for Renown, so a rebalance needs no migration and the score can
 // only move when content or earns move.
 //
+// The board SCORES; it does not count. The SCORING SET (the distinct
+// renown-bearing deed ids per account) drives the score, the entry floor, and
+// the completion-time tie-break; zero-renown deeds sit outside it by design so
+// luck can never move a rank. The one player-facing completion count is the
+// shared predicate in src/sim/deeds_completion.ts (the Book of Deeds header and
+// the character sheet); this board displays no deed count.
+//
 // The aggregation trusts character_deeds.account_id as the owner of every row.
 // Character transfer between accounts does not exist today; a future transfer
 // feature must update or re-derive that column (see the character_deeds DDL
@@ -36,17 +43,14 @@ export interface DeedsBoardSourceRow {
  *  response entry is built from the display character and never carries it. */
 export interface RankedDeedsAccount {
   accountId: number;
-  /** Sum of renown over the counted set (distinct renown-bearing deed ids). */
+  /** Sum of renown over the scoring set (distinct renown-bearing deed ids). */
   renown: number;
-  /** Size of the counted set. Zero-renown deeds (feats, luck, dynamic metas)
-   *  are outside the counted set, so they appear in neither score nor count. */
-  deedCount: number;
-  /** When the account's current score was reached: max over the counted set of
+  /** When the account's current score was reached: max over the scoring set of
    *  each deed's EARLIEST earn (a re-earn on a second character adds no score,
    *  so it cannot move this either). Epoch ms. */
   completionTime: number;
   /** The account's face on the board: its highest-Renown character (the same
-   *  counted-set rule over that character's own rows), ties to the lowest id. */
+   *  scoring-set rule over that character's own rows), ties to the lowest id. */
   displayCharacterId: number;
 }
 
@@ -74,17 +78,17 @@ function earnedMs(earnedAt: Date | string): number {
 }
 
 interface AccountAgg {
-  /** Counted set: deed id -> the account's earliest earn of it (epoch ms). */
+  /** Scoring set: deed id -> the account's earliest earn of it (epoch ms). */
   deedFirstEarn: Map<string, number>;
-  /** Per character: its OWN counted set, for the display-character pick. */
+  /** Per character: its OWN scoring set, for the display-character pick. */
   charDeeds: Map<number, Set<string>>;
 }
 
 /**
  * Aggregate character_deeds rows into the ordered account ranking.
  *
- * Per account, the COUNTED SET is the distinct deed ids with renown > 0: a
- * deed earned by two characters of one account counts once (never SUM raw
+ * Per account, the SCORING SET is the distinct deed ids with renown > 0: a
+ * deed earned by two characters of one account scores once (never SUM raw
  * rows), and zero-renown deeds can neither score nor perturb the tie-break.
  * Ordering keys, in sequence: score descending; completionTime ascending
  * (score-then-earliest); accountId ascending as the final deterministic key.
@@ -144,7 +148,6 @@ export function computeDeedsBoard(
     ranked.push({
       accountId,
       renown,
-      deedCount: agg.deedFirstEarn.size,
       completionTime,
       displayCharacterId,
     });
@@ -194,7 +197,6 @@ export function buildDeedsBoardEntries(
       cls: display.class,
       level: display.level,
       renown: account.renown,
-      deedCount: account.deedCount,
       title: display.activeTitle,
     });
   }
@@ -203,9 +205,10 @@ export function buildDeedsBoardEntries(
 
 /**
  * The self row for an authenticated caller: their rank in the FULL ranked list
- * (pre-cap, so a rank past the exposed page depth still resolves) and the
- * ceil'd percentile. Null when the account is not on the board (below the
- * floor, delisted, or unranked).
+ * (pre-cap, so a rank past the exposed page depth still resolves), the ceil'd
+ * percentile, and the account's board-scored Renown so the line is
+ * self-verifiable against the Book of Deeds. Null when the account is not on
+ * the board (below the floor, delisted, or unranked).
  */
 export function deedsBoardSelf(
   ranked: readonly RankedDeedsAccount[],
@@ -214,5 +217,9 @@ export function deedsBoardSelf(
   const index = ranked.findIndex((a) => a.accountId === accountId);
   if (index === -1) return null;
   const rank = index + 1;
-  return { rank, topPercent: Math.ceil((rank / ranked.length) * 100) };
+  return {
+    rank,
+    topPercent: Math.ceil((rank / ranked.length) * 100),
+    renown: ranked[index].renown,
+  };
 }

@@ -19,12 +19,47 @@ describe('runBackgroundPrewarm', () => {
         compiled.push(child);
         seen.push(...groups.map((g) => g.visible));
       },
+      warmChild: () => {
+        seen.push(...groups.map((g) => g.visible));
+      },
       renderWarmPass: () => {},
     });
-    // One idle slot per child plus the trailing one, each with both groups hidden.
-    expect(seen.length).toBe((5 + 1 + 5) * 2);
-    expect(seen.every((visible) => visible === false)).toBe(true);
+    // Two idle slots per child (compile + isolated upload), plus the trailing
+    // one. A group is visible only inside its own synchronous upload callback.
+    expect(seen.filter(Boolean)).toHaveLength(5);
+    expect(groups.map((g) => g.visible)).toEqual([false, false]);
     expect(compiled).toEqual([0, 1, 0, 1, 2]);
+  });
+
+  it('spreads child uploads across idle slots before the final pass', async () => {
+    const groups = [group(2)];
+    const events: string[] = [];
+    await runBackgroundPrewarm(groups, {
+      supportsAsyncCompile: true,
+      idleSlot: async () => {
+        events.push('idle');
+      },
+      compileChild: async (child) => {
+        events.push(`compile:${child}`);
+      },
+      warmChild: (_group, child) => {
+        expect(groups[0].visible).toBe(true);
+        events.push(`upload:${child}`);
+      },
+      renderWarmPass: () => events.push('final'),
+    });
+    expect(events).toEqual([
+      'idle',
+      'compile:0',
+      'idle',
+      'upload:0',
+      'idle',
+      'compile:1',
+      'idle',
+      'upload:1',
+      'idle',
+      'final',
+    ]);
   });
 
   it('shows the groups only for the synchronous warm pass and hides them after', async () => {

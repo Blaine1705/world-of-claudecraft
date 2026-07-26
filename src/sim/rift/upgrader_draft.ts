@@ -5,7 +5,7 @@
 import { queryRiftMonsters, RIFT_MONSTER_BY_ID } from '../content/rift/monster_index';
 import { RIFT_THEMES } from '../content/rift/themes';
 import type { SimContext } from '../sim_context';
-import { generateRiftFloor, generateRiftPlan, isSetPieceSeed } from './rift_gen';
+import { generateRiftFloor, generateRiftPlan, isSetPieceRift } from './rift_gen';
 import type { RiftEvent, RiftUpgradeManifest } from './types';
 import { riftUpgradeHash, validateRiftUpgrade } from './upgrade';
 
@@ -71,7 +71,7 @@ export function buildRiftDungeonDraft(seed: number, baseLevel: number): RiftDung
     baseLevel: Math.round(baseLevel),
     name: plan.name,
     floorCount: plan.floorCount,
-    authored: isSetPieceSeed(seed),
+    authored: isSetPieceRift(seed, baseLevel),
     floors,
     monsterIndex: [...relevantMonsterIds]
       .map((id) => RIFT_MONSTER_BY_ID[id])

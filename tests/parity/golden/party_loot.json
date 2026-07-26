@@ -8,12 +8,12 @@
     "multi-player party"
   ],
   "draws": 2,
-  "drawDigest": "32ad0392",
+  "drawDigest": "029c49fa",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 684,
+      "nextId": 832,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -27,12 +27,12 @@
     {
       "tick": 3,
       "time": 0.15,
-      "nextId": 687,
-      "state": "e4840ed8",
-      "events": "be74f4bf",
+      "nextId": 835,
+      "state": "85dd312f",
+      "events": "2862db99",
       "rng": {
         "draws": 2,
-        "digest": "32ad0392"
+        "digest": "029c49fa"
       },
       "label": "final",
       "players": [
@@ -60,7 +60,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
-              "greyjaw_hide_boots",
+              "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
             ]
@@ -73,10 +73,11 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 684,
+          "entityId": 832,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -85,19 +86,15 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 1,
-              "itemId": "greyjaw_hide_boots"
             }
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "renown": 5,
           "selectedMount": "valorsteed",
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -127,6 +124,7 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
+              "greyjaw_hide_boots",
               "spring_water"
             ]
           },
@@ -138,7 +136,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 685,
+          "entityId": 833,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -154,15 +152,19 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 1,
+              "itemId": "greyjaw_hide_boots"
             }
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "renown": 5,
           "selectedMount": "valorsteed",
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -171,6 +173,19 @@
         {
           "aiState": "idle",
           "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3599.85,
+              "school": "physical",
+              "sourceId": 832
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 99.15,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -178,14 +193,15 @@
           "dodgeChance": 0.06,
           "fallStartY": 0.860353,
           "fiveSecondRule": 99.15,
-          "hp": 90,
-          "id": 684,
+          "hp": 100,
+          "id": 832,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 90,
+          "maxHp": 100,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -204,10 +220,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 20,
-            "armor": 110,
+            "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 22,
+            "sta": 23,
             "str": 23
           },
           "templateId": "warrior",
@@ -228,7 +244,7 @@
           "fallStartY": 0.639595,
           "fiveSecondRule": 99.15,
           "hp": 54,
-          "id": 685,
+          "id": 833,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -280,7 +296,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 54,
-          "id": 686,
+          "id": 834,
           "kind": "mob",
           "level": 2,
           "lootFfaTimer": "Infinity",
@@ -305,7 +321,7 @@
           "stats": {
             "armor": 10
           },
-          "tappedById": 684,
+          "tappedById": 832,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,

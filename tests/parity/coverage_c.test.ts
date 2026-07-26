@@ -291,4 +291,118 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(tankMeta.raidLockouts.has('nythraxis_boss_arena')).toBe(true);
     expect(chats.some((e) => e.text === 'Malric...')).toBe(true);
   }, 90_000);
+
+  it('warrior_row_capstones: double charge, thresholded fear, victory rush heal, bladestorm ticks', () => {
+    const rec = run('warrior_row_capstones');
+    const sim = rec.sim as any;
+    const pid = sim.playerId;
+    const ev = rec.allEvents as Ev[];
+    expect(rec.notes.chargeSpent).toBe(2);
+    expect(rec.notes.chargeRecharging).toBe(true);
+    const feared = entities(rec).find((e) =>
+      e.auras?.some((a: any) => a.id === 'fear_incap'),
+    ) as any;
+    expect(feared).toBeTruthy();
+    const fear = feared.auras.find((a: any) => a.id === 'fear_incap');
+    expect(fear.breaksOnDamage).toBe(true);
+    expect(fear.breakThreshold).toBeGreaterThan(0);
+    expect(ev.some((e) => (e.type === 'heal' || e.type === 'heal2') && e.targetId === pid)).toBe(
+      true,
+    );
+    expect(ev.some((e) => e.type === 'damage' && e.ability === 'Bladestorm')).toBe(true);
+  });
+
+  it('professions_craft: denial draws nothing, each craft draws once, and the vestments proc mints + surfaces a masterwork', () => {
+    const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'professions_craft')!);
+    const ev = rec.allEvents as Ev[];
+    const pid = rec.notes.pid as number;
+    const crafts = ev.filter((e) => e.type === 'craftResult');
+
+    expect(crafts.some((e) => e.ok === false && e.reason === 'insufficient_materials')).toBe(true);
+    expect(
+      crafts.some((e) => e.ok === true && e.quality === 'common' && e.masterwork === undefined),
+    ).toBe(true);
+
+    const mw = ev.find((e) => e.type === 'masterwork');
+    expect(mw, 'masterwork event did not fire (proc missed for the pinned seed)').toBeTruthy();
+    expect(mw!.recipeId).toBe('recipe_eastbrook_ritual_vestments');
+    expect(mw!.itemId).toBe('eastbrook_ritual_vestments');
+    expect(mw!.crafter).toBe(pid);
+    expect(mw!.pid).toBe(pid);
+    expect(
+      crafts.some(
+        (e) =>
+          e.ok === true &&
+          e.itemId === 'eastbrook_ritual_vestments' &&
+          e.quality === 'uncommon' &&
+          e.masterwork === true,
+      ),
+    ).toBe(true);
+
+    const meta = (rec.sim as any).players.get(pid);
+    const slots = meta.inventory.filter((s: any) => s.itemId === 'eastbrook_ritual_vestments');
+    expect(slots.length).toBe(1);
+    expect(slots[0].instance?.rolled?.masterwork).toBe(true);
+    expect(meta.lastMasterwork).toMatchObject({
+      recipeId: 'recipe_eastbrook_ritual_vestments',
+      itemId: 'eastbrook_ritual_vestments',
+      crafter: pid,
+    });
+    expect(trace.draws).toBe(3);
+  });
+
+  it('professions_gather: two draws per harvest, zero-draw denial, zone materials, and the hunted rare event fires', () => {
+    const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'professions_gather')!);
+    const ev = rec.allEvents as Ev[];
+    const pid = (rec.sim as any).playerId as number;
+    const meta = (rec.sim as any).players.get(pid);
+
+    const gathers = ev.filter((e) => e.type === 'gatherResult');
+    expect(gathers).toHaveLength(102);
+    expect(ev.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(false);
+
+    const phase1 = trace.frames.find((f) => f.label === 'harvest-ore-common-and-denial');
+    expect(phase1, 'missing the phase 1 frame').toBeTruthy();
+    expect(phase1!.rng.draws).toBe(2);
+    expect(
+      ev.some(
+        (e) => e.type === 'error' && e.text === 'This resource node has not respawned for you yet.',
+      ),
+    ).toBe(true);
+
+    expect(gathers[0].itemId).toBe('copper_ore');
+    expect(gathers[0].rarity).toBe('common');
+    const wood = gathers.find((e) => e.itemId === 'ironbark_log');
+    expect(wood, 'wood harvest missing').toBeTruthy();
+    expect(wood!.rarity).not.toBe('common');
+
+    const rare = ev.find((e) => e.type === 'gatherRareEvent');
+    expect(rare, 'rare event did not fire (hunted seed regressed)').toBeTruthy();
+    expect(rare!.finderPid).toBe(pid);
+    const flavorByType: Record<string, string> = {
+      ore: 'pristine_vein',
+      wood: 'ancient_heartwood',
+      herb: 'moonlit_bloom',
+    };
+    expect(rare!.flavor).toBe(flavorByType[rare!.nodeType]);
+    const rareGather = gathers.find((e) => e.rareEvent === rare!.flavor);
+    expect(rareGather, 'no gatherResult paired with the rare event').toBeTruthy();
+    const qtyByRarity: Record<string, number> = {
+      common: 1,
+      uncommon: 2,
+      rare: 2,
+      epic: 3,
+      legendary: 4,
+    };
+    expect(rareGather!.qty).toBe(qtyByRarity[rareGather!.rarity] * 5);
+    const signed = meta.inventory.filter(
+      (s: any) => s.itemId === rare!.itemId && s.instance?.signer === meta.name,
+    );
+    // Identical-payload stacking: the same-signer units merge into
+    // signed stacks, so count UNITS and pin that the merge actually collapsed
+    // them into far fewer slots than units (stack cap 20).
+    const signedUnits = signed.reduce((n: number, s: any) => n + s.count, 0);
+    expect(signedUnits).toBeGreaterThanOrEqual(rareGather!.qty);
+    expect(signed.length).toBeLessThanOrEqual(Math.ceil(signedUnits / 20));
+  });
 });

@@ -2,11 +2,19 @@
 // operations (upgrade, enchant, gems). Static ItemDefs remain the combat-safe
 // shell; all per-copy progression lives in ItemInstancePayload.
 
-import { RIFT_ESSENCE_ITEM_ID, RIFT_GEM_IDS, type RiftGemId } from '../content/rift/items';
+import {
+  RIFT_EPIC_ITEM_IDS,
+  RIFT_ESSENCE_ITEM_ID,
+  RIFT_GEM_IDS,
+  RIFT_LEGENDARY_ITEM_ID,
+  RIFT_RARE_ITEM_IDS,
+  type RiftGemId,
+} from '../content/rift/items';
 import { ITEMS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity, ItemInstancePayload, PlayerClass, RiftTier } from '../types';
+import { riftRankForBaseLevel } from './ranks';
 
 export const RIFT_ENCHANT_STATS = [
   'str',
@@ -161,6 +169,112 @@ export function createRiftGearInstance(
   };
   rebuildRolledStats(instance);
   return { itemId: shell.itemId, instance };
+}
+
+// Clear-time epic/legendary odds per rank. Economy rationale: these land ONLY
+// on a completed final-boss kill (never a static loot table), so a C farm can
+// never mint epics (it gets a guaranteed rare instead), and the cadence is
+// bound by the ranked portal spawns. B now guarantees one epic, matching the
+// heroic five-man floor for a rank that carries the same heroic stat transform.
+// A guarantees one epic; S guarantees one with a real shot at a second, plus
+// the game's one legendary chase roll.
+const RIFT_EPIC_CHANCE_B = 1.0; // guaranteed: B carries heroic stat transform
+const RIFT_SECOND_EPIC_CHANCE_S = 0.35;
+const RIFT_LEGENDARY_CHANCE_S = 0.04;
+
+// Clear-time coin bonuses by rank (added on top of the static boss coin, which
+// stays rank-invariant). C mirrors the normal-dungeon economy; B tastes a small
+// windfall; A matches the Korzul Heroic peak (50 000c); S holds at the same cap
+// (gear quality, mounts, and legendaries differentiate it from A, not raw coin).
+// Nythraxis pays 150 000c over 10 players = 15 000c per capita; S at 5 players
+// and 55 000c total = 11 000c per capita, modestly below the raid benchmark, which
+// is appropriate given the shorter portal format.
+// Named constants so balance tuning stays in one place.
+export const RIFT_COIN_BONUS_C = 10_000; // 10 000c: mirrors normal-dungeon economy
+export const RIFT_COIN_BONUS_B = 10_000; // 10 000c (10 silver)
+export const RIFT_COIN_BONUS_A = 35_000; // 35 000c (35 silver), matches Korzul Heroic
+export const RIFT_COIN_BONUS_S = 50_000; // 50 000c; +5 000c static boss coin = 55 000c total
+
+// Blue (rare) mount reins that roll on A or S clears. A 0.6% independent roll
+// picks one of these two at random; they are appended AFTER all gear draws so
+// the gear draw-order stays byte-identical to pre-mount builds.
+export const RIFT_BLUE_MOUNT_REINS = ['reins_aether_hover_cycle', 'reins_shadowjump_toad'] as const;
+export const RIFT_BLUE_MOUNT_CHANCE = 0.006; // 0.6% per A/S clear
+
+// Epic mount reins that roll on S clears only. 0.3% independent roll picks one
+// of the two at random; appended after the blue mount draw.
+export const RIFT_EPIC_MOUNT_REINS = [
+  'reins_stormfeather_griffin',
+  'reins_thunderstrut_gobbler',
+] as const;
+export const RIFT_EPIC_MOUNT_CHANCE = 0.003; // 0.3% per S clear
+
+/** Rank-gated gear payout on the winning clear: pushed onto the final boss's
+ * corpse as PLAIN drops, so the normal party loot rules (rolls) decide who
+ * takes them. Runs for every winning clear, ranked race or dev portal, with
+ * the rank derived from the descriptor baseLevel.
+ *
+ * Draw order (APPEND-ONLY; inserting before any existing draw breaks parity):
+ *   0. C: guaranteed rare from RIFT_RARE_ITEM_IDS pool (rng.int pick)
+ *   1. B: guaranteed epic gear (RIFT_EPIC_CHANCE_B = 1.0, preserves rng draw)
+ *   2. A/S: guaranteed first epic gear (rng.int pick)
+ *   3. S: optional second epic gear (RIFT_SECOND_EPIC_CHANCE_S)
+ *   4. S: optional legendary gear (RIFT_LEGENDARY_CHANCE_S)
+ *   5. A/S: optional blue mount (RIFT_BLUE_MOUNT_CHANCE + rng.int pick)
+ *   6. S: optional epic mount (RIFT_EPIC_MOUNT_CHANCE + rng.int pick)
+ *
+ * B/A/S draws are unaffected by the new C draw (C returns after draw 0).
+ */
+export function addRiftClearGearLoot(ctx: SimContext, boss: Entity, baseLevel: number): void {
+  const rank = riftRankForBaseLevel(baseLevel);
+  const loot = boss.loot ?? { copper: 0, items: [] };
+
+  // --- Draw 0: C-rank guaranteed rare + coin (normal-tier payout; exits here) ---
+  if (rank === 'C') {
+    const rare = RIFT_RARE_ITEM_IDS[ctx.rng.int(0, RIFT_RARE_ITEM_IDS.length - 1)];
+    loot.items.push({ itemId: rare, count: 1 });
+    loot.copper = (loot.copper ?? 0) + RIFT_COIN_BONUS_C;
+    boss.loot = loot;
+    boss.lootable = true;
+    return;
+  }
+
+  const epic = (): string => RIFT_EPIC_ITEM_IDS[ctx.rng.int(0, RIFT_EPIC_ITEM_IDS.length - 1)];
+
+  // --- Draws 1-4: clear-time gear (existing order preserved for parity) ---
+  if (rank === 'B') {
+    if (ctx.rng.chance(RIFT_EPIC_CHANCE_B)) loot.items.push({ itemId: epic(), count: 1 });
+  } else {
+    loot.items.push({ itemId: epic(), count: 1 });
+    if (rank === 'S') {
+      if (ctx.rng.chance(RIFT_SECOND_EPIC_CHANCE_S)) {
+        loot.items.push({ itemId: epic(), count: 1 });
+      }
+      if (ctx.rng.chance(RIFT_LEGENDARY_CHANCE_S)) {
+        loot.items.push({ itemId: RIFT_LEGENDARY_ITEM_ID, count: 1 });
+      }
+    }
+  }
+
+  // --- Draw 5: blue mount on A or S clears (APPENDED after all gear draws) ---
+  if ((rank === 'A' || rank === 'S') && ctx.rng.chance(RIFT_BLUE_MOUNT_CHANCE)) {
+    const reins = RIFT_BLUE_MOUNT_REINS[ctx.rng.int(0, RIFT_BLUE_MOUNT_REINS.length - 1)];
+    loot.items.push({ itemId: reins, count: 1 });
+  }
+
+  // --- Draw 6: epic mount on S clears only (APPENDED after blue mount draw) ---
+  if (rank === 'S' && ctx.rng.chance(RIFT_EPIC_MOUNT_CHANCE)) {
+    const reins = RIFT_EPIC_MOUNT_REINS[ctx.rng.int(0, RIFT_EPIC_MOUNT_REINS.length - 1)];
+    loot.items.push({ itemId: reins, count: 1 });
+  }
+
+  // --- Rank coin bonus (no rng; purely additive to the static boss coin) ---
+  const coinBonus =
+    rank === 'B' ? RIFT_COIN_BONUS_B : rank === 'A' ? RIFT_COIN_BONUS_A : RIFT_COIN_BONUS_S;
+  loot.copper = (loot.copper ?? 0) + coinBonus;
+
+  boss.loot = loot;
+  if (loot.items.length > 0 || loot.copper > 0) boss.lootable = true;
 }
 
 /** First-clear personal loot. Every winner gets a class-appropriate non-fungible

@@ -1,11 +1,15 @@
+import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
 import { MOUNT_KEYS, MOUNTS, TRAINING_MOUNT_KEY } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, ITEMS, MOBS, NPCS } from './data';
+import { applyDevKit } from './dev_kit';
 import { createGroundObject, createMob } from './entity';
 import { enterDungeon } from './instances/dungeons';
 import { mountItemId, mountOwned } from './mounts';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
+import { placeMobileStationForPlayer } from './professions/mobile_station';
 import { completeAllQuestsForDev } from './quests/dev_quest_commands';
+import { RIFT_RANK_BASE_LEVEL, riftRankForBaseLevel } from './rift/ranks';
 import { generateRiftPlan, isSetPieceSeed } from './rift/rift_gen';
 import type { SentChat } from './sim';
 import type { SimContext } from './sim_context';
@@ -200,6 +204,7 @@ export function handleDevChat(
       const maxGate = Math.max(...MOUNT_KEYS.map((key) => MOUNTS[key].level));
       const leveled = entity.level < maxGate;
       if (leveled) ctx.setPlayerLevel(maxGate, pid);
+      meta.ridingTrained = true;
       let granted = 0;
       for (const key of MOUNT_KEYS) {
         if (mountOwned(meta, key)) continue;
@@ -212,7 +217,7 @@ export function handleDevChat(
       emitDevLog(
         ctx,
         pid,
-        `[dev] Granted ${granted} mount reins (${MOUNT_KEYS.length} owned)${levelNote}. Press Z to ride.`,
+        `[dev] Granted ${granted} mount reins (${MOUNT_KEYS.length} owned)${levelNote}. Press Z to summon a mount.`,
       );
     }
     return null;
@@ -238,6 +243,37 @@ export function handleDevChat(
         `[dev] ${levelNote}100g added, teleported to the Highwatch Stables. Talk to Stablemaster Marla to begin the riding lesson.`,
       );
     }
+    return null;
+  }
+
+  // /dev kit [spec]: wear the fresh-level-20 preset for this character's class and
+  // the named spec (defaulting to the one currently specced). GEAR ONLY: level, spec
+  // and talents are deliberately untouched, so a tester can vary gear and level
+  // independently instead of the two being welded together.
+  const kitMatch = /^\/(?:dev\s+kit|devkit)(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (kitMatch) {
+    const meta = ctx.players.get(pid);
+    if (!meta) return null;
+    const spec = kitMatch[1] ?? meta.talents.spec;
+    if (!spec) {
+      ctx.error(pid, '[dev] No spec chosen; pass one, e.g. /dev kit fury.');
+      return null;
+    }
+    if (!devKitRole(meta.cls, spec)) {
+      const known = (DEV_KIT_ROLES[meta.cls] ?? []).map((role) => role.spec).join(', ');
+      ctx.error(pid, `[dev] '${spec}' is not a ${meta.cls} spec. Try: ${known}.`);
+      return null;
+    }
+    const applied = applyDevKit(ctx, meta.cls, spec, pid);
+    if (!applied) {
+      ctx.error(pid, `[dev] No kit for ${meta.cls} ${spec}.`);
+      return null;
+    }
+    emitDevLog(
+      ctx,
+      pid,
+      `[dev] Equipped the fresh-20 ${meta.cls} ${spec} kit: ${applied.slots} pieces and ${applied.bagsEquipped} bags.`,
+    );
     return null;
   }
 
@@ -287,6 +323,15 @@ export function handleDevChat(
     return null;
   }
 
+  if (/^\/(?:dev\s+vendor|devvendor)\s*$/i.test(raw)) {
+    const vendorId = ctx.spawnDevVendor(pid);
+    if (vendorId < 0) ctx.error(pid, '[dev] Could not spawn the test vendor.');
+    else {
+      emitDevLog(ctx, pid, '[dev] Spawned the Test Quartermaster (free epic gear) next to you.');
+    }
+    return null;
+  }
+
   const lfgMatch = /^\/(?:dev\s+lfg|devlfg)(?:\s+(\S+))?\s*$/i.exec(raw);
   if (lfgMatch) {
     const mode = (lfgMatch[1] ?? 'queue').toLowerCase();
@@ -308,6 +353,47 @@ export function handleDevChat(
 
   if (/^\/(?:dev\s+attune|devattune)\s*$/i.test(raw)) {
     completeAllQuestsForDev(ctx, pid);
+    return null;
+  }
+
+  const mobileStationMatch = /^\/(?:dev\s+mobilestation|devmobilestation)\s+(\S+)\s*$/i.exec(raw);
+  if (mobileStationMatch) {
+    // Places through the REAL specialization-gated path (mobile_station.ts),
+    // same as the wire command: the cheat saves the walk, not the gate.
+    const craftId = mobileStationMatch[1].toLowerCase();
+    const station = placeMobileStationForPlayer(ctx, craftId, pid);
+    if (!station) {
+      ctx.error(
+        pid,
+        `[dev] Could not place a mobile ${craftId} station (specialization required).`,
+      );
+    } else {
+      const minutes = Math.round((station.expiresAtTick - station.placedAtTick) / (20 * 60));
+      emitDevLog(ctx, pid, `[dev] Mobile ${craftId} station placed here for ${minutes} minutes.`);
+    }
+    return null;
+  }
+
+  if (/^\/(?:dev\s+cascade|devcascade)\s*$/i.test(raw)) {
+    // [dev] Controlled Cascada temporal playtest: a non-offensive training dummy plus
+    // raid allies at known distances, with a per-cast metrics readout. Dev realms only.
+    ctx.startCascadePlaytest(pid);
+    emitDevLog(
+      ctx,
+      pid,
+      '[dev] Cascade scenario ready: training dummy + raid allies (one beyond 15 yd). Target the center, cast Temporal Cascade, then hit the dummy with Arcane spells for the per-cast readout.',
+    );
+    return null;
+  }
+  if (/^\/(?:dev\s+sandbox|devsandbox)\s*$/i.test(raw)) {
+    // [dev] A generic practice scenario: a non-offensive training dummy plus a raid of
+    // regen-frozen friendly bots (10k pool) for testing any ability threat-free.
+    const allies = ctx.startDevSandbox(pid);
+    emitDevLog(
+      ctx,
+      pid,
+      `[dev] Sandbox ready: a training dummy plus ${allies} raid allies (10k HP, started low, regen frozen). Attack the dummy, then practice heals or AoE on the allies threat-free. Re-run /dev sandbox to reset.`,
+    );
     return null;
   }
 
@@ -345,10 +431,13 @@ export function handleDevChat(
 
   // [dev] Spawn a procedural rift portal in front of the player. Each invocation
   // rolls a fresh seed (so every portal opens a different, infinite dungeon) unless
-  // one is supplied for reproducibility. An optional rank letter forces the tier
-  // (colour + badge); omitted, a random rank is rolled so the portal always shows
-  // a coloured shimmer and its floating letter. A trailing kind token forces the
-  // DUNGEON TYPE: /dev portal [seed] [level] [C|B|A|S] [infernal|random].
+  // one is supplied for reproducibility. An optional rank letter selects the
+  // DIFFICULTY: it maps to that rank's canonical baseLevel (RIFT_RANK_BASE_LEVEL),
+  // overriding an explicit level, so what spawns inside always matches the badge.
+  // Without a letter, the badge derives from the (explicit or player) level via
+  // the same inversion every difficulty consumer uses; the badge can never lie.
+  // A trailing kind token forces the DUNGEON TYPE:
+  // /dev portal [seed] [level] [C|B|A|S] [infernal|random].
   //
   // The kind is not a wire field: it SEARCHES for a seed of the requested kind
   // (isSetPieceSeed is a pure function of the seed), so the descriptor stays
@@ -382,11 +471,11 @@ export function handleDevChat(
         });
       }
     }
-    const baseLevel = Math.max(1, Math.min(60, portalMatch[2] ? Number(portalMatch[2]) : e.level));
-    const TIERS: RiftTier[] = ['C', 'B', 'A', 'S'];
-    const tier: RiftTier = portalMatch[3]
-      ? (portalMatch[3].toUpperCase() as RiftTier)
-      : TIERS[ctx.rng.int(0, 3)];
+    const forcedTier = portalMatch[3] ? (portalMatch[3].toUpperCase() as RiftTier) : null;
+    const baseLevel = forcedTier
+      ? RIFT_RANK_BASE_LEVEL[forcedTier]
+      : Math.max(1, Math.min(60, portalMatch[2] ? Number(portalMatch[2]) : e.level));
+    const tier: RiftTier = forcedTier ?? riftRankForBaseLevel(Math.round(baseLevel));
     const d = 5;
     const px = e.pos.x + Math.sin(e.facing) * d;
     const pz = e.pos.z + Math.cos(e.facing) * d;
@@ -482,7 +571,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev gather, /dev bot, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev smite, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

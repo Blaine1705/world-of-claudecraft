@@ -162,10 +162,10 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the world catalog, mount cues, and all 27 UI cues in one 166-key inventory', () => {
+  it('keeps the release catalog, the 7 mount cues, and all 62 UI cues in one 217-key inventory', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(166);
-    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(27);
+    expect(keys.size).toBe(217);
+    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(62);
     for (const key of [
       'cast_lightning_bolt',
       'mob_mudfin_attack',
@@ -180,21 +180,22 @@ describe('buildManifest', () => {
       'wand_arcane',
       'wand_holy',
       'wand_shadow',
+      'player_eat_food',
+      'player_drink_water',
+      'player_drink_potion',
     ]) {
       expect(keys.has(key), key).toBe(true);
     }
     expect(keys.has('mob_murloc_attack')).toBe(false);
     expect(keys.has('mob_kobold_attack')).toBe(false);
-    // Every mob family (13, including reptile) now generates 4 actions
-    // (aggro/attack/death/hurt), not just 3, pin the count so a future
-    // family addition can't silently drop hurt coverage again. reptile is
-    // also the first family with a 5th, idle, action; idle stays optional
-    // per family (mob() only emits it when called with an idle prompt), so
-    // this is +1, not +13. Subfamily keys (mob_beast_wolf_*, etc.) never
-    // appear in the static catalog, they are purely filesystem-discovered.
+    // Every mob family (13, including reptile) now generates all 5 actions
+    // (aggro/attack/death/hurt/idle): pin the count so a future family
+    // addition can't silently drop coverage again. Subfamily keys
+    // (mob_beast_wolf_*, etc.) never appear in the static catalog, they are
+    // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
-    expect(mobFamilyKeys).toHaveLength(53); // 13 families x 4 actions, + 1 reptile idle
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(166);
+    expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(217);
   });
 });
 

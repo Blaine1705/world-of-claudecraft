@@ -74,6 +74,7 @@ export const WILLOWFEN_ZONE: ZoneDef = {
   ],
   welcome:
     'The fen hums with dragonflies and bees. Cross the bridge into Bridgemere and rest your feet awhile.',
+  welcomeQuestId: 'q_wf_across_the_fenway',
 };
 
 export const WILLOWFEN_ROADS: { x: number; z: number }[][] = [
@@ -125,7 +126,9 @@ export const WILLOWFEN_ROADS: { x: number; z: number }[][] = [
 // No portals: walked into over the Amberfen Steps.
 export const WILLOWFEN_PORTALS: PortalDef[] = [];
 
-// Quests and folk follow in a later pass.
+// The fen's inhabitants: bogtoads gnaw the mooring ropes, wisps drift the
+// pools at all hours, sprites tangle the eel nets, and the toad-king snores
+// on his islet out on the Drowsy Flats.
 export const WILLOWFEN_MOBS: Record<string, MobTemplate> = {
   bogtoad: {
     id: 'bogtoad',
@@ -141,7 +144,7 @@ export const WILLOWFEN_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 12,
     moveSpeed: 8,
     aggroRadius: 12,
-    loot: [],
+    loot: [{ itemId: 'plump_fen_eel', chance: 0.6, questId: 'q_wf_eels_for_the_smokehouse' }],
     scale: 1,
     color: 0x7aa848,
   },
@@ -178,7 +181,7 @@ export const WILLOWFEN_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 10,
     moveSpeed: 7.5,
     aggroRadius: 0, // pale lights adrift over the pools
-    loot: [],
+    loot: [{ itemId: 'wisplight_globe', chance: 0.65, questId: 'q_wf_wisplight_charms' }],
     scale: 0.7,
     color: 0xd0f2c8,
   },
@@ -201,10 +204,280 @@ export const WILLOWFEN_MOBS: Record<string, MobTemplate> = {
     color: 0xc8e0b8,
   },
 };
-export const WILLOWFEN_NPCS: Record<string, NpcDef> = {};
-export const WILLOWFEN_QUESTS: Record<string, QuestDef> = {};
-export const WILLOWFEN_QUEST_ORDER: string[] = [];
-export const WILLOWFEN_ITEMS: Record<string, ItemDef> = {};
+// The folk of the fen: a waykeeper watches the Amberfen Steps, the
+// bridgewright and an eel-netter hold Bridgemere, and the fen-witch keeps
+// her own company out at Willowweep. Sedge stands far from the hub on
+// purpose: the chain sends players out to find her.
+export const WILLOWFEN_NPCS: Record<string, NpcDef> = {
+  waykeeper_pell: {
+    id: 'waykeeper_pell',
+    name: 'Waykeeper Pell',
+    title: 'Keeper of the Amberfen Steps',
+    pos: { x: -377, z: 214 },
+    facing: 0.6,
+    color: 0xa8b878,
+    questIds: ['q_wf_across_the_fenway'],
+    greeting: 'Down the Steps and into the soft country. Mind where you plant your boots.',
+  },
+  bridgewright_alden: {
+    id: 'bridgewright_alden',
+    name: 'Bridgewright Alden',
+    title: 'Master of the Fenway',
+    pos: { x: -359, z: 354 },
+    facing: 2.9,
+    color: 0x8a6f4d,
+    questIds: [
+      'q_wf_across_the_fenway',
+      'q_wf_rope_chewers',
+      'q_wf_mind_the_moorings',
+      'q_wf_witch_of_willowweep',
+    ],
+    greeting: 'Every plank in this town is mine to keep, and the fen chews on all of them.',
+  },
+  netter_maris: {
+    id: 'netter_maris',
+    name: 'Netter Maris',
+    title: 'Eel-Netter of Bridgemere',
+    pos: { x: -354, z: 364 },
+    facing: -0.8,
+    color: 0x6f9aa0,
+    questIds: ['q_wf_eels_for_the_smokehouse', 'q_wf_toll_and_tangle'],
+    greeting: 'Smell that? Smoked eel. Half this town stands on stilts I bought with it.',
+  },
+  mother_sedge: {
+    id: 'mother_sedge',
+    name: 'Mother Sedge',
+    title: 'Fen-Witch of Willowweep',
+    pos: { x: -414, z: 446 },
+    facing: 1.2,
+    color: 0x7d8a5a,
+    questIds: ['q_wf_witch_of_willowweep', 'q_wf_wisplight_charms', 'q_wf_croakers_hush'],
+    greeting: 'The willows told me you were coming before your boots left the bridge.',
+  },
+};
+
+export const WILLOWFEN_QUESTS: Record<string, QuestDef> = {
+  q_wf_across_the_fenway: {
+    id: 'q_wf_across_the_fenway',
+    name: 'Across the Fenway',
+    giverNpcId: 'waykeeper_pell',
+    turnInNpcId: 'bridgewright_alden',
+    text: 'A gentle country, the Willowfen, but gentle is not the same as safe, $N. Follow the road north to the Fenway causeway and cross into Bridgemere. Tell Bridgewright Alden the Steps are open and the waycamp fire is lit.',
+    completionText:
+      'Pell keeps that fire burning through every fog the fen can breathe at her. If she says the Steps are open, they are open. Welcome to Bridgemere, $N. Watch your step on my planks and we will get along fine.',
+    objectives: [
+      {
+        type: 'interact',
+        targetNpcId: 'bridgewright_alden',
+        count: 1,
+        label: 'Report to Bridgewright Alden',
+      },
+    ],
+    xpReward: 2600,
+    copperReward: 950,
+    itemRewards: {},
+    minLevel: 18,
+  },
+  q_wf_rope_chewers: {
+    id: 'q_wf_rope_chewers',
+    name: 'The Rope-Chewers',
+    giverNpcId: 'bridgewright_alden',
+    turnInNpcId: 'bridgewright_alden',
+    text: 'Bogtoads, $N. They haul up out of the moat at night and chew through my mooring ropes like they were reed stems. Three skiffs went drifting last week, and one of them had my good winch aboard. Thin them out, ten of the fat things, and the boats stay where we tie them.',
+    completionText:
+      'Ten fewer sets of teeth in my moat. The skiffs sat their moorings all night for the first time in a month, $N. You have the thanks of every netter in town.',
+    objectives: [{ type: 'kill', targetMobId: 'bogtoad', count: 10, label: 'Bogtoad slain' }],
+    xpReward: 4600,
+    copperReward: 2200,
+    itemRewards: {},
+    requiresQuest: 'q_wf_across_the_fenway',
+  },
+  q_wf_mind_the_moorings: {
+    id: 'q_wf_mind_the_moorings',
+    name: 'Mind the Moorings',
+    giverNpcId: 'bridgewright_alden',
+    turnInNpcId: 'bridgewright_alden',
+    text: 'Good rope is dear out here, $N: every line the toads bite through is a week of eel-money gone. The cut ends are still lying along the moat shore where the boats slipped them. Walk the boardwalks and bring me back four lines, and I can splice them good as new.',
+    completionText:
+      'Look at that: clean bites, every one, but there is rope enough left to splice. You have saved me a month of coin and the netters a month of grumbling, $N.',
+    objectives: [
+      {
+        type: 'interact',
+        targetObjectItemId: 'fenway_mooring_line',
+        count: 4,
+        label: 'Cut Mooring Line recovered',
+      },
+    ],
+    xpReward: 4400,
+    copperReward: 2100,
+    itemRewards: {},
+    requiresQuest: 'q_wf_across_the_fenway',
+  },
+  q_wf_eels_for_the_smokehouse: {
+    id: 'q_wf_eels_for_the_smokehouse',
+    name: 'Eels for the Smokehouse',
+    giverNpcId: 'netter_maris',
+    turnInNpcId: 'netter_maris',
+    text: 'The bogtoads are not just eating my ropes, $N, they are eating my catch: they gulp the eels down whole, straight out of the traps. Cut six plump ones free of the greedy things before the meat spoils, and the smokehouse fires stay lit.',
+    completionText:
+      'Six good eels, barely bruised. The smokehouse will smell like money by morning. Here, these waders were mine when I was quicker: eelskin turns the wet like nothing else.',
+    objectives: [{ type: 'collect', itemId: 'plump_fen_eel', count: 6, label: 'Plump Fen Eel' }],
+    xpReward: 4400,
+    copperReward: 2200,
+    itemRewards: {
+      warrior: 'eelskin_mudwaders',
+      mage: 'eelskin_mudwaders',
+      rogue: 'eelskin_mudwaders',
+    },
+    requiresQuest: 'q_wf_across_the_fenway',
+  },
+  q_wf_toll_and_tangle: {
+    id: 'q_wf_toll_and_tangle',
+    name: 'Toll and Tangle',
+    giverNpcId: 'netter_maris',
+    turnInNpcId: 'netter_maris',
+    text: 'The willow sprites think it is a fine game to cut a ferry loose, $N, and last week the toll skiff went over on the east track with a season of bridge-toll aboard. The chests went down in the shallows and the sprites dance on the boardwalks like they own them. Drive off eight and haul up three toll-chests, and Bridgemere eats this winter.',
+    completionText:
+      'Three chests, and the coin still dry inside. The sprites will sulk in the withies for a week, $N, and the town owes you its winter bread.',
+    objectives: [
+      { type: 'kill', targetMobId: 'willow_sprite', count: 8, label: 'Willow Sprite driven off' },
+      {
+        type: 'interact',
+        targetObjectItemId: 'bridgemere_toll_chest',
+        count: 3,
+        label: 'Toll-Chest recovered',
+      },
+    ],
+    xpReward: 5400,
+    copperReward: 2800,
+    itemRewards: {},
+    requiresQuest: 'q_wf_eels_for_the_smokehouse',
+    minLevel: 19,
+  },
+  q_wf_witch_of_willowweep: {
+    id: 'q_wf_witch_of_willowweep',
+    name: 'The Witch of Willowweep',
+    giverNpcId: 'bridgewright_alden',
+    turnInNpcId: 'mother_sedge',
+    text: 'You have heard it by now, $N: the snore. Slow and heavy, out past the Drowsy Flats, like the fen itself turning over in its sleep. The toads, the sprites, the wisps burning at noon: it all started when that sound did. One soul might know what it is. Mother Sedge keeps a camp at Willowweep, west around the moat and down the far shore. Find her, and ask her what sleeps at the middle of my fen.',
+    completionText:
+      'Alden sent you all this way to ask about the snoring? Then the bridge-folk are finally listening. Sit down out of the damp, $N. That sound has a name, and a throat, and I have been waiting for someone fool enough to help me quiet it.',
+    objectives: [
+      { type: 'interact', targetNpcId: 'mother_sedge', count: 1, label: 'Find Mother Sedge' },
+    ],
+    xpReward: 2800,
+    copperReward: 1000,
+    itemRewards: {},
+    requiresQuest: 'q_wf_rope_chewers',
+    minLevel: 19,
+  },
+  q_wf_wisplight_charms: {
+    id: 'q_wf_wisplight_charms',
+    name: 'Wisplight Charms',
+    giverNpcId: 'mother_sedge',
+    turnInNpcId: 'mother_sedge',
+    text: "The wisps over the pools are the fen dreaming out loud, $N, and their light is the only thing that holds against the Croaker's lull. I weave it into willow charms: one round your neck and the snore cannot drag your eyelids down. Bring me six wisplight globes. The wisps will not fight you for them, which makes it a kindness or a theft, depending on how you carry it.",
+    completionText:
+      'Six globes, still warm with dreaming. Give me till moonrise and I will have charms woven for you and whoever is brave enough to stand beside you.',
+    objectives: [
+      { type: 'collect', itemId: 'wisplight_globe', count: 6, label: 'Wisplight Globe' },
+    ],
+    xpReward: 4800,
+    copperReward: 2400,
+    itemRewards: {},
+    requiresQuest: 'q_wf_witch_of_willowweep',
+  },
+  q_wf_croakers_hush: {
+    id: 'q_wf_croakers_hush',
+    name: "The Croaker's Hush",
+    giverNpcId: 'mother_sedge',
+    turnInNpcId: 'mother_sedge',
+    text: "Now you know the snorer's name, $N: the Drowsy Croaker, the old toad-king out on the Drowsy Flats. Every year his croak grows heavier, and every year more of the fen forgets to wake. The charms will keep your eyes open, but his bulk is another matter: bring a friend, and do not fight him in the water. Put the old king to a quieter sleep.",
+    completionText:
+      'Listen, $N. Nothing. The first true silence over this fen in thirty years, and half the town will not sleep tonight for the strangeness of it. The willows say thank you, in their way. Wear this, woven from his own lily-bed, and the fen will know you for a friend wherever the water reaches.',
+    objectives: [
+      { type: 'kill', targetMobId: 'drowsy_croaker', count: 1, label: 'The Drowsy Croaker slain' },
+    ],
+    xpReward: 6200,
+    copperReward: 3800,
+    itemRewards: {
+      warrior: 'lilybed_mantle',
+      mage: 'lilybed_mantle',
+      rogue: 'lilybed_mantle',
+    },
+    requiresQuest: 'q_wf_wisplight_charms',
+    minLevel: 20,
+    suggestedPlayers: 2,
+  },
+};
+
+// Level-braided presentation order (not strictly chain order), matching the
+// Veiled Hollow convention.
+export const WILLOWFEN_QUEST_ORDER: string[] = [
+  'q_wf_across_the_fenway',
+  'q_wf_rope_chewers',
+  'q_wf_eels_for_the_smokehouse',
+  'q_wf_mind_the_moorings',
+  'q_wf_witch_of_willowweep',
+  'q_wf_toll_and_tangle',
+  'q_wf_wisplight_charms',
+  'q_wf_croakers_hush',
+];
+
+export const WILLOWFEN_ITEMS: Record<string, ItemDef> = {
+  // --- quest items ---
+  plump_fen_eel: {
+    id: 'plump_fen_eel',
+    name: 'Plump Fen Eel',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_wf_eels_for_the_smokehouse',
+  },
+  wisplight_globe: {
+    id: 'wisplight_globe',
+    name: 'Wisplight Globe',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_wf_wisplight_charms',
+  },
+  fenway_mooring_line: {
+    id: 'fenway_mooring_line',
+    name: 'Cut Mooring Line',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_wf_mind_the_moorings',
+    noVendorSell: true,
+  },
+  bridgemere_toll_chest: {
+    id: 'bridgemere_toll_chest',
+    name: 'Sunken Toll-Chest',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_wf_toll_and_tangle',
+    noVendorSell: true,
+  },
+  // --- quest rewards ---
+  eelskin_mudwaders: {
+    id: 'eelskin_mudwaders',
+    name: 'Eelskin Mudwaders',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'feet',
+    quality: 'uncommon',
+    stats: { armor: 60, sta: 3, spi: 2 },
+    sellValue: 1000,
+  },
+  lilybed_mantle: {
+    id: 'lilybed_mantle',
+    name: 'Mantle of the Lily-Bed',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'shoulder',
+    quality: 'rare',
+    stats: { armor: 76, sta: 6, spi: 4 },
+    sellValue: 2400,
+  },
+};
 export const WILLOWFEN_CAMPS: CampDef[] = [
   { mobId: 'bogtoad', center: { x: -430, z: 270 }, radius: 10, count: 3 },
   { mobId: 'bogtoad', center: { x: -284, z: 316 }, radius: 10, count: 3 },
@@ -213,7 +486,41 @@ export const WILLOWFEN_CAMPS: CampDef[] = [
   { mobId: 'willow_sprite', center: { x: -316, z: 380 }, radius: 10, count: 2 },
   { mobId: 'drowsy_croaker', center: { x: -322, z: 496 }, radius: 5, count: 1 },
 ];
-export const WILLOWFEN_OBJECTS: GroundObjectDef[] = [];
+export const WILLOWFEN_OBJECTS: GroundObjectDef[] = [
+  {
+    itemId: 'fenway_mooring_line',
+    name: 'Cut Mooring Line',
+    // The chewed-through lines lie along the moat shore where the skiffs
+    // slipped them, ringing the Bridgemere boardwalks.
+    positions: [
+      { x: -348, z: 344 },
+      { x: -338, z: 340 },
+      { x: -372, z: 336 },
+      { x: -384, z: 346 },
+    ],
+  },
+  {
+    itemId: 'bridgemere_toll_chest',
+    name: 'Sunken Toll-Chest',
+    // Where the toll skiff went over: scattered along the east track toward
+    // the Drowsy Flats.
+    positions: [
+      { x: -324, z: 360 },
+      { x: -320, z: 398 },
+      { x: -326, z: 428 },
+    ],
+  },
+];
+
+// Quest-camp additions (extra bogtoads along the east track and the
+// Lilymoors edge for the rope-chewer cull). Kept separate from
+// WILLOWFEN_CAMPS and appended at the very END of the merged CAMPS array in
+// data.ts: camps draw world-gen rng in array order, so only a tail append
+// leaves every existing spawn untouched.
+export const WILLOWFEN_QUEST_CAMPS: CampDef[] = [
+  { mobId: 'bogtoad', center: { x: -334, z: 436 }, radius: 10, count: 3 },
+  { mobId: 'bogtoad', center: { x: -406, z: 288 }, radius: 10, count: 3 },
+];
 
 export const WILLOWFEN_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
@@ -238,7 +545,11 @@ export const WILLOWFEN_PROPS: ZonePropsDef = {
   ],
   campfires: [
     [-358, 366],
-    [-379, 212], // the Steps' waycamp
+    [-379, 212], // the Steps' waycamp (Waykeeper Pell's fire)
+    [-416, 449], // Mother Sedge's fire at Willowweep
+  ],
+  tents: [
+    { x: -411, z: 449, rot: 2.0, scale: 1 }, // Mother Sedge's camp at Willowweep
   ],
   // homesteads and watchtowers spread across the fen's dry rises, each on
   // probed level ground (KayKit blue set, matching Bridgemere's roofs)

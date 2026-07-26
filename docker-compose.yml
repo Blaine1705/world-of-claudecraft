@@ -27,6 +27,7 @@ services:
       args:
         # Build-time public client config inlined into the bundle (see .env.example).
         VITE_TURNSTILE_SITEKEY: ${VITE_TURNSTILE_SITEKEY:-}
+        VITE_REOWN_PROJECT_ID: ${VITE_REOWN_PROJECT_ID:-}
         VITE_WALLET_DISABLED: ${VITE_WALLET_DISABLED:-}
     container_name: eastbrook-game
     restart: unless-stopped
@@ -53,6 +54,10 @@ services:
       # Community test realms can opt in to a ready-made level-20 roster for
       # every newly created account. The production-safe default is disabled.
       PROVISION_TEST_ACCOUNTS: ${PROVISION_TEST_ACCOUNTS:-0}
+      # PBE only: boost registrations to a BiS roster and top existing
+      # characters up to the current BiS kit at world join (server/pbe_boost.ts).
+      # NEVER set in production. The production-safe default is disabled.
+      PBE_BOOST_ACCOUNTS: ${PBE_BOOST_ACCOUNTS:-}
       # Target the game server 302-redirects /wiki to when hit directly (not via the
       # reverse proxy). Public origin in prod; localhost fallback for local dev.
       WIKI_URL: ${WIKI_URL:-http://localhost:8080/wiki/index.php/Main_Page}
@@ -152,9 +157,10 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     # Exec form with a node one-liner, deliberately unlike the CMD-SHELL healthcheck
-    # the postgres service uses above: the runtime image is alpine and has no curl or
-    # wget, but it does ship node. The probe hits /livez and nothing else. /livez
-    # reports a WEDGED game loop, not merely a live process, so it catches the failure
+    # the postgres service uses above: the runtime image is a Debian slim base
+    # (node:26-slim) and has no curl or wget, but it does ship node. The probe hits
+    # /livez and nothing else. /livez reports a WEDGED game loop, not merely a live
+    # process, so it catches the failure
     # `restart: unless-stopped` cannot see (that policy only acts on process exit), and
     # it deliberately stays 200 while the server drains, so a graceful shutdown is never
     # misread as a wedge. /readyz flips to 503 while draining and would do exactly that.

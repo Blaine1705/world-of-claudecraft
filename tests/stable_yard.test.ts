@@ -103,6 +103,8 @@ describe('ambient stable horses', () => {
     }
   });
 
+  // 90s budget: this drives a long real-world tick run (7 to 8s locally) and
+  // has hit the 30s default under CI core contention.
   it('stays non-hostile, idle, and in the north pasture over a long run, and wanders', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', autoEquip: true });
     const hs = horses(sim);
@@ -132,7 +134,7 @@ describe('ambient stable horses', () => {
     }
     // They actually amble (the wander drew rng and moved a horse off its spawn).
     expect(maxDisplacement).toBeGreaterThan(1);
-  }, 30000);
+  }, 90_000);
 
   it('cannot be targeted as an enemy, attacked, or damaged by a player', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', autoEquip: true });

@@ -17,6 +17,8 @@ export interface GossipMenuContent {
   hasHeroicVendor: boolean;
   hasDelveBoard: boolean;
   hasVcup: boolean;
+  hasCardMaster: boolean;
+  hasTraining: boolean;
 }
 
 export function gossipMenuIsEmpty(content: GossipMenuContent): boolean {
@@ -27,6 +29,8 @@ export function gossipMenuIsEmpty(content: GossipMenuContent): boolean {
     !content.hasMarket &&
     !content.hasHeroicVendor &&
     !content.hasDelveBoard &&
-    !content.hasVcup
+    !content.hasVcup &&
+    !content.hasCardMaster &&
+    !content.hasTraining
   );
 }

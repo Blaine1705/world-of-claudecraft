@@ -368,6 +368,11 @@ const BIOME_TINT: Record<SkyKey, [number, number, number]> = {
 };
 
 const hdriStore: Partial<Record<SkyKey, THREE.DataTexture>> = {};
+// PMREM (IBL) prefilter source, always the 1k variant even on tiers whose dome
+// samples the 2k: the prefiltered env is blurred by the GGX chain anyway, and
+// a 2k source quadruples the CubeUV working-target size and blur cost, which
+// the zone streaming lane would otherwise pay inside live frames.
+const envHdriStore: Partial<Record<SkyKey, THREE.DataTexture>> = {};
 const backdropStore: Partial<Record<SkyKey, THREE.Texture>> = {};
 const skyAssetTasks = new Map<SkyKey, Promise<void>>();
 
@@ -376,21 +381,37 @@ export function ensureSkyBiomeAssets(biomes: readonly SkyKey[]): Promise<void> {
   const tasks = [...new Set(biomes)].map((biome) => {
     const existing = skyAssetTasks.get(biome);
     if (existing) return existing;
+    // Every shipped biome currently uses its HDRI as the sole sky source.
+    // Loading an 8k painted backdrop at strength 0 still made Three upload it
+    // on the first biome blend; marsh_backdrop.webp alone blocked the driver
+    // for 386-479ms during the walked-crossing profile. Keep the dormant path
+    // available for authored non-zero strengths without fetching dead assets.
+    const backdropTask =
+      BIOME_BACKDROP_STRENGTH[biome] > 0
+        ? loadTexture(BIOME_BACKDROP[biome], { srgb: true })
+            .then((tex) => {
+              tex.wrapS = THREE.RepeatWrapping;
+              tex.wrapT = THREE.ClampToEdgeWrapping;
+              const mips = !GFX.constrainedMemory;
+              tex.minFilter = mips ? THREE.LinearMipmapLinearFilter : THREE.LinearFilter;
+              tex.magFilter = THREE.LinearFilter;
+              tex.generateMipmaps = mips;
+              backdropStore[biome] = tex;
+            })
+            .catch(() => undefined)
+        : Promise.resolve();
     const task = Promise.all([
       loadHdr(BIOME_HDRI[biome]).then((tex) => {
         tex.wrapS = THREE.RepeatWrapping;
         hdriStore[biome] = tex;
       }),
-      loadTexture(BIOME_BACKDROP[biome], { srgb: true })
-        .then((tex) => {
-          tex.wrapS = THREE.RepeatWrapping;
-          tex.wrapT = THREE.ClampToEdgeWrapping;
-          tex.minFilter = THREE.LinearMipmapLinearFilter;
-          tex.magFilter = THREE.LinearFilter;
-          tex.generateMipmaps = true;
-          backdropStore[biome] = tex;
-        })
-        .catch(() => undefined),
+      // PMREM convolves this source immediately, so 512 equirect pixels retain
+      // reflection quality while reducing its CubeUV working targets by 4x.
+      // The visible dome remains 2k (1k on constrained tiers).
+      loadHdr(BIOME_HDRI_1K[biome], { maxWidth: 512 }).then((tex) => {
+        envHdriStore[biome] = tex;
+      }),
+      backdropTask,
     ]).then(() => undefined);
     skyAssetTasks.set(biome, task);
     return task;
@@ -419,6 +440,8 @@ export interface SkyView {
   setStars(starAmt: number, time: number): void;
   /** Raw equirect HDR (unclamped) for PMREM IBL; null on the low tier. */
   envTexture(biome: SkyKey): THREE.DataTexture | null;
+  /** Dome-sampled equirect (the visible sky), for prepare-lane GPU upload. */
+  domeTexture(biome: SkyKey): THREE.Texture | null;
   /** scene.environmentRotation.y that aligns the IBL sun with the dome's */
   envRotationY(biome: SkyKey): number;
   /** biome cross-fade state at a given camera z (from -> to by t in [0,1]) */
@@ -513,10 +536,15 @@ const SKY_FRAG = /* glsl */ `
   void main() {
     vec3 dir = normalize(vDir);
     vec3 c = mix(sampleSky(uSkyA, dir, uOffA, uTuneA, uLiftA), sampleSky(uSkyB, dir, uOffB, uTuneB, uLiftB), uMix);
-    vec3 backA = sampleBackdrop(uBackdropA, dir, uBackdropBiasA);
-    vec3 backB = sampleBackdrop(uBackdropB, dir, uBackdropBiasB);
-    vec3 backdrop = mix(backA, backB, uMix);
-    c = mix(c, backdrop, uBackdropStrength * mix(uBackdropAmtA, uBackdropAmtB, uMix));
+    // The shipped HDRI-only skies set this to zero. Guard the texture reads,
+    // not just their final mix, so disabled 8k panoramas cost no fragment
+    // bandwidth (and a future authored backdrop still uses the same path).
+    if (uBackdropStrength > 0.001) {
+      vec3 backA = sampleBackdrop(uBackdropA, dir, uBackdropBiasA);
+      vec3 backB = sampleBackdrop(uBackdropB, dir, uBackdropBiasB);
+      vec3 backdrop = mix(backA, backB, uMix);
+      c = mix(c, backdrop, uBackdropStrength * mix(uBackdropAmtA, uBackdropAmtB, uMix));
+    }
     c *= mix(uTintA, uTintB, uMix); // biome grade
     c *= uDayNight;                 // world day/night grade
     // The sun and moon discs are billboard sprites (see renderer.ts) so they stay
@@ -654,6 +682,7 @@ export function buildSky(
       setFog: () => {},
       setStars: () => {},
       envTexture: () => null,
+      domeTexture: () => null,
       envRotationY: () => 0,
       biomeAt: biomeBlendAt,
     };
@@ -745,6 +774,9 @@ export function buildSky(
       uniforms.uTime.value = time;
     },
     envTexture(biome: BiomeId): THREE.DataTexture | null {
+      return envHdriStore[biome] ?? hdriStore[biome] ?? null;
+    },
+    domeTexture(biome: BiomeId): THREE.Texture | null {
       return hdriStore[biome] ?? null;
     },
     envRotationY(biome: BiomeId): number {

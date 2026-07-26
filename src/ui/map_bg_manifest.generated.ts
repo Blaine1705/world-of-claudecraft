@@ -60,7 +60,7 @@ export const BAKED_MAP_BG = {
   "palmreach": {
     "w": 480,
     "h": 747,
-    "rowHash": "54c125e0"
+    "rowHash": "1a091822"
   },
   "evergarden": {
     "w": 480,
@@ -80,7 +80,7 @@ export const BAKED_MAP_BG = {
   "world_strip": {
     "w": 140,
     "h": 337,
-    "rowHash": "a933bd3c"
+    "rowHash": "5864f9ff"
   }
 },
 } as const;

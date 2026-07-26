@@ -6,7 +6,9 @@ import {
   configureCommunityTestAccounts,
   generatedTestCharacterName,
 } from '../server/community_test_accounts';
+import { BOOST_KIT_VERSION, bisKit, bisKitForRole, CLASS_ROLES } from '../server/pbe_boost';
 import { bagCapacity } from '../src/sim/bags';
+import { WARFARE_ITEMS } from '../src/sim/content/pvp_honor';
 import { ITEMS } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
 import { meetsLevelRequirement } from '../src/sim/item_level_req';
@@ -47,16 +49,18 @@ describe('community test character templates', () => {
       expect(validCharName(name)).toBe(true);
       expect(state.level).toBe(MAX_LEVEL);
       expect(state.lifetimeXp).toBeGreaterThanOrEqual(xpToReachLevel(MAX_LEVEL));
-      expect(Object.keys(state.equipment).sort()).toEqual([...EQUIP_SLOTS].sort());
+      // The worn set is exactly the class's primary BiS kit (a 2H class may
+      // legitimately leave the offhand empty).
+      expect(Object.keys(state.equipment).sort()).toEqual(Object.keys(bisKit(cls)).sort());
       expect(state.bags).toEqual(Array(4).fill('mistcallers_duffel'));
       expect(bagCapacity(state.bags ?? [])).toBe(72);
 
       for (const itemId of Object.values(state.equipment)) {
         const item = ITEMS[itemId];
         expect(item, `${cls} equipment ${itemId} must exist`).toBeDefined();
-        expect(item?.quality).toBe('epic');
-        expect(item?.sellValue).toBe(0);
-        expect(item?.soulbound).toBe(true);
+        // The score argmax may pick a heroic RARE over an epic (e.g. the
+        // shaman's heroic pearl greaves); quality is a sanity floor only.
+        expect(['rare', 'epic', 'legendary'], `${cls} ${itemId} quality`).toContain(item?.quality);
         if (!item) throw new Error(`missing equipment ${itemId}`);
         expect(canEquipItem(cls, item)).toBe(true);
         expect(meetsLevelRequirement(MAX_LEVEL, item)).toBe(true);
@@ -71,44 +75,32 @@ describe('community test character templates', () => {
     }
   });
 
-  it('uses the intended Warfare profile for each class', () => {
-    const byClass = Object.fromEntries(
-      buildCommunityTestCharacters(7).map((character) => [
-        character.cls,
-        character.state.equipment,
-      ]),
-    );
-
-    for (const cls of ['warrior', 'paladin'] as const) {
-      expect(byClass[cls].mainhand).toBe('final_argument_greatblade');
-      expect(byClass[cls].helmet).toBe('furyforged_warhelm');
-      expect(byClass[cls].neck).toBe('final_oath_medallion');
-      expect([byClass[cls].ring1, byClass[cls].ring2]).toEqual([
-        'iron_vow_band',
-        'unbroken_circle',
-      ]);
-    }
-    for (const cls of ['hunter', 'rogue', 'druid'] as const) {
-      expect(byClass[cls].mainhand).toBe('first_blood_razor');
-      expect(byClass[cls].helmet).toBe('ashstalker_cowl');
-      expect(byClass[cls].neck).toBe('razorwind_torque');
-      expect([byClass[cls].ring1, byClass[cls].ring2]).toEqual([
-        'fleetblood_band',
-        'last_step_signet',
-      ]);
-    }
-    expect(byClass.shaman.mainhand).toBe('emberglass_warstaff');
-    expect(byClass.shaman.helmet).toBe('stormbound_crown');
-    for (const cls of ['priest', 'mage', 'warlock'] as const) {
-      expect(byClass[cls].mainhand).toBe('emberglass_warstaff');
-      expect(byClass[cls].helmet).toBe('cinderweave_cowl');
-    }
-    for (const cls of ['priest', 'shaman', 'mage', 'warlock'] as const) {
-      expect(byClass[cls].neck).toBe('cinder_sigil_pendant');
-      expect([byClass[cls].ring1, byClass[cls].ring2]).toEqual([
-        'ashen_focus_ring',
-        'spellbreakers_seal',
-      ]);
+  it('wears the shared true-BiS boost kit, never WARFARE gear (2026-07-22 re-gear)', () => {
+    // The hand-curated WARFARE loadouts were retired: templates now wear the
+    // computed best-in-slot PvE kit from server/pbe_boost.ts, carry every
+    // alternate role's kit in the bags, and are stamped so the world-join
+    // top-up treats them as current.
+    for (const character of buildCommunityTestCharacters(7)) {
+      const kit = bisKit(character.cls);
+      for (const [slot, itemId] of Object.entries(kit)) {
+        expect(
+          character.state.equipment[slot as keyof typeof character.state.equipment],
+          `${character.cls} ${slot}`,
+        ).toBe(itemId);
+      }
+      for (const itemId of Object.values(character.state.equipment)) {
+        if (itemId) expect(itemId in WARFARE_ITEMS, `${character.cls} wears ${itemId}`).toBe(false);
+      }
+      expect(character.state.pbeBoostKit, `${character.cls} stamped`).toBe(BOOST_KIT_VERSION);
+      expect(character.state.ridingTrained, `${character.cls} riding`).toBe(true);
+      for (const role of CLASS_ROLES[character.cls].slice(1)) {
+        const altMain = bisKitForRole(character.cls, role).mainhand;
+        if (!altMain || Object.values(character.state.equipment).includes(altMain)) continue;
+        expect(
+          character.state.inventory.some((s) => s.itemId === altMain),
+          `${character.cls} carries the ${role.id} weapon`,
+        ).toBe(true);
+      }
     }
   });
 
@@ -119,6 +111,6 @@ describe('community test character templates', () => {
     first[0].state.equipment.mainhand = 'worn_sword';
 
     expect(second[0].state.inventory).not.toContainEqual({ itemId: 'linen_pouch', count: 1 });
-    expect(second[0].state.equipment.mainhand).toBe('final_argument_greatblade');
+    expect(second[0].state.equipment.mainhand).toBe(bisKit(second[0].cls).mainhand);
   });
 });

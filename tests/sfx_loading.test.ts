@@ -165,11 +165,24 @@ function internals(player: typeof sfx): SfxInternals {
   return player as unknown as SfxInternals;
 }
 
+// Mirrors sfx.ts's private assetCacheKey: variant 0 caches under the bare
+// key, every other variant under `${key}:${index}`.
+function assetCacheKeyForTest(key: string, variantIndex: number): string {
+  return variantIndex === 0 ? key : `${key}:${variantIndex}`;
+}
+
 function startWithStartupCached(): { player: typeof sfx; ctx: FakeAudioContext } {
   const player = makeSfx();
   const state = internals(player);
   for (const [key, entry] of Object.entries(SFX_CLIPS)) {
-    if (entry.preload === 'startup') state.buffers.set(key, BUFFER);
+    if (entry.preload !== 'startup') continue;
+    // Seed EVERY variant's cache key, not just the first: preloadStartup()
+    // eagerly loads every variant of every startup key, and a key with more
+    // than one take (most combat/movement/UI keys now do) would otherwise
+    // still trigger real fetches for its later variants during init().
+    entry.variants.forEach((_variant, index) => {
+      state.buffers.set(assetCacheKeyForTest(key, index), BUFFER);
+    });
   }
   player.init();
   return { player, ctx: last(FakeAudioContext.instances, 'audio context') };
@@ -515,6 +528,29 @@ describe('sampled SFX loading', () => {
 
     expect(ctx.sources).toHaveLength(1);
     expect(ctx.sources[0].started).toBe(true);
+  });
+
+  it('playUi enforces an explicit cooldown (opt-in only, no default), unlike playAt', () => {
+    const { player, ctx } = startWithStartupCached();
+    internals(player).buffers.set('ui_error', BUFFER);
+
+    // No cooldown requested: back-to-back calls both play, matching every
+    // pre-existing playUi call site's expectation (variant cycling, clicks).
+    player.playUi('ui_click', { jitter: false });
+    player.playUi('ui_click', { jitter: false });
+    expect(ctx.sources).toHaveLength(2);
+
+    // An explicit cooldown IS enforced: the real bug this closes had
+    // audio.error() pass { cooldown: 1.5 } to playUi, which silently ignored
+    // it entirely, so spamming a failed ability still spammed the sound.
+    ctx.sources.length = 0;
+    player.playUi('ui_error', { jitter: false, cooldown: 1.5 });
+    player.playUi('ui_error', { jitter: false, cooldown: 1.5 });
+    expect(ctx.sources).toHaveLength(1);
+
+    ctx.currentTime += 1.5;
+    player.playUi('ui_error', { jitter: false, cooldown: 1.5 });
+    expect(ctx.sources).toHaveLength(2);
   });
 
   it('no-repeat-randoms ordered runtime takes only when a one-shot source is accepted', () => {

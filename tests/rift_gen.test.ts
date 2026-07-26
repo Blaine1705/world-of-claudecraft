@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { Collider } from '../src/sim/colliders';
 import { RIFT_THEMES } from '../src/sim/content/rift/themes';
 import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
+import { polygonContainsPoint } from '../src/sim/geometry2d';
 import {
   generateRiftFloor,
   generateRiftPlan,
@@ -225,6 +226,60 @@ describe('rift generator: playability', () => {
   });
 });
 
+describe('rift generator: objectives are never inside (or hidden by) a wall', () => {
+  // Per-kind prop clearance radii mirroring the toClear margins the generator
+  // passes when it places each interactable (a rune monolith is fatter than a
+  // body). Every objective must clear every collider by its prop radius, and no
+  // layout may carry a phantom (illusion) wall, so collider clearance IS visual
+  // clearance: a rune can never render embedded in, or tucked behind, a wall.
+  // Per-kind prop clearance radii: the three values below match the explicit
+  // toClear margin the generator passes; the rest use the player body radius
+  // (BODY_R = 0.6) because they are placed on the always-clear spine or within
+  // the obstacle-free AISLE_HALF band (|x| <= 5.5) by construction.
+  const PROP_R: Record<string, number> = {
+    rune_pylon: 1.7,
+    seq_rune: 1.5,
+    treasure: 1.0,
+    // The kinds below are placed on the always-clear centre spine (x=0) or
+    // within the obstacle-free AISLE_HALF band (|x| <= 5.5) by construction,
+    // so BODY_R (0.6) is the correct clearance check at their placement point:
+    // their visual footprint may be wider (boulder dodecahedron r=1.1, switch
+    // cylinder r=1.3, ice_goal disc r=1.7) but they are never placed near a
+    // wall. infernal_orb is authored at a fixed altar position inside the
+    // always-open citadel hall; it only appears on set-piece seeds which are
+    // skipped by the seed loop below, but is listed here for completeness.
+    chest: 0.6,
+    descent: 0.6,
+    gate: 0.6,
+    switch: 0.6,
+    boulder: 0.6,
+    boulder_pad: 0.6,
+    ice_goal: 0.6,
+    infernal_orb: 0.6,
+  };
+
+  it('every interactable clears the walls by its prop radius, at every rank', () => {
+    for (const baseLevel of [20, 22, 25, 28]) {
+      for (let s = 0; s < 60; s++) {
+        if (isSetPieceSeed(s)) continue;
+        const n = riftFloorCount(s);
+        for (let f = 0; f < n; f++) {
+          const fl = generateRiftFloor(s, baseLevel, f);
+          const colliders = riftFloorColliders(s, baseLevel, f);
+          expect(fl.layout.illusionWalls ?? [], `phantom wall seed ${s} f${f}`).toHaveLength(0);
+          for (const ob of fl.objects) {
+            const r = PROP_R[ob.kind] ?? BODY_R;
+            expect(
+              clears(colliders, ob.x, ob.z, r),
+              `${ob.kind} seed ${s} f${f} base ${baseLevel} @${ob.x},${ob.z}`,
+            ).toBe(true);
+          }
+        }
+      }
+    }
+  });
+});
+
 describe('rift generator: balance', () => {
   it('floor level rises monotonically with depth and stays in band', () => {
     for (let s = 0; s < 60; s++) {
@@ -245,6 +300,66 @@ describe('rift generator: balance', () => {
       for (let f = 0; f < n; f++) {
         const fl = generateRiftFloor(s, 15, f);
         expect(fl.spawns.length).toBeGreaterThanOrEqual(fl.isBoss ? 3 : 4);
+      }
+    }
+  });
+});
+
+describe('rift runtime placements: exit portal and sealed cache are inside the room', () => {
+  // openExit() in runs.ts spawns two objects whose positions are computed at
+  // runtime (not by the generator): the rift exit portal and the Sealed Rift
+  // Cache. Their local positions mirror:
+  //   const chest = floor.objects.find(o => o.kind === 'chest');
+  //   const pos = chest ?? { x: 0, z: floor.layout.dais.z + 6 };
+  //   exit at (pos.x, pos.z), cache at (pos.x - 4, pos.z)
+  // Both must land inside the room polygon and clear every wall collider by
+  // at least BODY_R (0.6), across all procedural boss floors and all four
+  // rank base levels (20/22/25/28).
+
+  // Inline containment helper: polygon branch if shellPolygon is present
+  // (star-shaped room), rectangle branch otherwise. Matches the pattern from
+  // tests/rift_wall_solidity.test.ts.
+  function insideRoom(fl: ReturnType<typeof generateRiftFloor>, x: number, z: number): boolean {
+    const { layout } = fl;
+    if (layout.shellPolygon) {
+      return polygonContainsPoint(layout.shellPolygon, x, z);
+    }
+    const wx = layout.wallX ?? DUNGEON_WALL_X;
+    return Math.abs(x) < wx && z > layout.zMin && z < layout.zMax;
+  }
+
+  it('exit portal and sealed cache land inside the room at every rank', () => {
+    for (const baseLevel of [20, 22, 25, 28]) {
+      for (let s = 0; s < 60; s++) {
+        if (isSetPieceSeed(s)) continue;
+        const n = riftFloorCount(s);
+        const bossFloor = n - 1;
+        const fl = generateRiftFloor(s, baseLevel, bossFloor);
+        if (!fl.isBoss) continue; // defensive: boss is always last
+        const colliders = riftFloorColliders(s, baseLevel, bossFloor);
+        // Mirror the openExit position logic from runs.ts.
+        const chest = fl.objects.find((o) => o.kind === 'chest');
+        const pos = chest ?? { x: 0, z: fl.layout.dais.z + 6 };
+        const exitX = pos.x;
+        const exitZ = pos.z;
+        const cacheX = pos.x - 4;
+        const cacheZ = pos.z;
+        expect(
+          insideRoom(fl, exitX, exitZ),
+          `exit inside room seed ${s} base ${baseLevel} @${exitX},${exitZ}`,
+        ).toBe(true);
+        expect(
+          clears(colliders, exitX, exitZ),
+          `exit clears walls seed ${s} base ${baseLevel} @${exitX},${exitZ}`,
+        ).toBe(true);
+        expect(
+          insideRoom(fl, cacheX, cacheZ),
+          `cache inside room seed ${s} base ${baseLevel} @${cacheX},${cacheZ}`,
+        ).toBe(true);
+        expect(
+          clears(colliders, cacheX, cacheZ),
+          `cache clears walls seed ${s} base ${baseLevel} @${cacheX},${cacheZ}`,
+        ).toBe(true);
       }
     }
   });

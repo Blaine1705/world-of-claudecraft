@@ -1,3 +1,4 @@
+import { WEAPON_SKIN_LIST } from '../sim/content/weapon_skins';
 import type { PlayerClass, WeaponSkinType } from '../sim/types';
 import type { DailyRewardHistory, DailyRewardStatus, IWorld } from '../world_api';
 import { ArmoryInspect } from './armory_inspect';
@@ -8,12 +9,16 @@ import {
   weaponSkinCollectionLabel,
   weaponTypeLabel,
 } from './armory_labels';
-import { buildDailyRewardsView, type DailyRewardsView } from './daily_rewards_view';
+import {
+  buildDailyRewardsView,
+  type DailyRewardsView,
+  dailyRewardTaskDescription,
+} from './daily_rewards_view';
 import { markDialogRoot } from './dialog_root';
 import { tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { formatDateTime, formatNumber, t } from './i18n';
-import { portraitChipHtml } from './portrait_chip';
+import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { rovingTarget } from './roving_index';
 import { svgIcon } from './ui_icons';
 import {
@@ -86,6 +91,8 @@ export interface DailyRewardsWindowDeps {
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
   onVisibilityChange?(): void;
+  /** Fired once per actual close (not when already closed). */
+  onClose?(): void;
   onStatus?(status: DailyRewardStatus): void;
   onWalletConnect?(): void;
   storeEnabled?(): boolean;
@@ -137,6 +144,7 @@ export class DailyRewardsWindow {
 
   constructor(private readonly deps: DailyRewardsWindowDeps) {}
 
+  /** Whether the window is currently shown; lets the opener distinguish the toggle direction. */
   get isOpen(): boolean {
     return this.deps.root().style.display === 'block';
   }
@@ -149,6 +157,12 @@ export class DailyRewardsWindow {
       return;
     }
     void this.renderCurrent('open');
+  }
+
+  /** Prebuild the store's persistent Armory context while loading hides it. */
+  async prewarmArmoryPreview(): Promise<void> {
+    if (!this.storeEnabled()) return;
+    await this.ensureArmoryInspect().prewarm(WEAPON_SKIN_LIST.map((skin) => skin.id));
   }
 
   toggle(): void {
@@ -192,6 +206,7 @@ export class DailyRewardsWindow {
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
     this.deps.onVisibilityChange?.();
+    this.deps.onClose?.();
   }
 
   async render(focus: 'open' | null = null): Promise<void> {
@@ -203,6 +218,12 @@ export class DailyRewardsWindow {
     let history: DailyRewardHistory = { payouts: [] };
     try {
       status = await this.deps.world().dailyRewards();
+      if (status.enabled === false) {
+        if (!this.isOpen || seq !== this.renderSeq) return;
+        this.deps.onStatus?.(status);
+        this.paint(buildDailyRewardsView({ kind: 'status', status, history }));
+        return;
+      }
       history = await this.deps.world().dailyRewardHistory();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'daily rewards unavailable';
@@ -383,6 +404,10 @@ export class DailyRewardsWindow {
       notice +
       armory;
     if (!this.replaceStoreBody(body, markup)) return;
+    // Dense armory compatibility chips defer their repeated portrait data URLs
+    // so this markup stays kilobytes rather than megabytes. Hydration assigns
+    // the already-cached nine class portraits by DOM property after mounting.
+    hydratePortraits(body);
     body.querySelector<HTMLButtonElement>('[data-buy-claudium]')?.addEventListener('click', () => {
       this.openClaudiumFromStore();
     });
@@ -438,7 +463,7 @@ export class DailyRewardsWindow {
     return (
       `<article class="armory-card rarity-${esc(row.skin.rarity)}${row.owned ? ' owned' : ''}${row.applied ? ' applied' : ''}">` +
       `<button type="button" data-armory-skin="${esc(row.skin.id)}" aria-label="${esc(t('hudChrome.wocStore.inspectAria', { item: copy.name }))}">` +
-      `<span class="armory-card-art"><img src="${esc(row.art)}" alt="" loading="lazy">${badge}${this.armoryClassChipsHtml(row)}</span>` +
+      `<span class="armory-card-art"><img src="${esc(row.art)}" alt="" loading="lazy" decoding="async">${badge}${this.armoryClassChipsHtml(row)}</span>` +
       `<span class="armory-card-copy"><span class="armory-card-type">${esc(weaponTypeLabel(row.skin.weaponType))}</span>` +
       `<h4>${esc(copy.name)}</h4>${state}</span>` +
       `</button></article>`
@@ -453,13 +478,17 @@ export class DailyRewardsWindow {
     const chips = row.eligibleClasses
       .map((cls) => {
         const name = tEntity({ kind: 'class', id: cls, field: 'name' });
-        return `<span class="armory-class-chip" title="${esc(name)}">${portraitChipHtml({ cls, name, badge: false })}</span>`;
+        return `<span class="armory-class-chip" title="${esc(name)}">${portraitChipHtml({ cls, name, badge: false, deferSource: true })}</span>`;
       })
       .join('');
     return chips ? `<span class="armory-classes">${chips}</span>` : '';
   }
 
   private openArmoryInspect(row: ArmorySkinRow): void {
+    this.ensureArmoryInspect().open(row);
+  }
+
+  private ensureArmoryInspect(): ArmoryInspect {
     if (!this.armoryInspect) {
       this.armoryInspect = new ArmoryInspect({
         appearance: () => {
@@ -483,7 +512,7 @@ export class DailyRewardsWindow {
         },
       });
     }
-    this.armoryInspect.open(row);
+    return this.armoryInspect;
   }
 
   /** Re-project + repaint after an optimistic apply/detach or a grant, keeping
@@ -606,6 +635,10 @@ export class DailyRewardsWindow {
       body.innerHTML = `<div class="dr-empty dr-error" role="alert">${esc(t('hudChrome.dailyRewards.error'))}</div>`;
       return;
     }
+    if (view.kind === 'disabled') {
+      body.innerHTML = `<div class="dr-empty" role="status">${esc(t('hudChrome.dailyRewards.disabled'))}</div>`;
+      return;
+    }
     body.innerHTML =
       this.summaryHtml(view) +
       this.walletHtml(view) +
@@ -659,9 +692,20 @@ export class DailyRewardsWindow {
   }
 
   private loadingHtml(storeEnabled: boolean): string {
+    // A visible loading state until the first snapshot paints: the window shows
+    // an opaque body the moment it opens, and the snapshot fetch has no
+    // deadline, so an empty body would read as a large black box. The store
+    // variant is aria-hidden because the tab strip's data-woc-store-loading
+    // indicator already announces busy; the rewards-only variant has no tab
+    // strip, so its loading block is the live status itself.
+    const spinner = (label: string, live: boolean): string =>
+      `<div class="cl-loading"${live ? ' role="status" aria-live="polite"' : ' aria-hidden="true"'}>` +
+      `<span class="cl-spinner" aria-hidden="true"></span>` +
+      `<span>${esc(label)}</span>` +
+      `</div>`;
     return storeEnabled
-      ? '<div id="woc-store-panel" class="dr-body woc-store-body" role="tabpanel" aria-labelledby="woc-store-tab-store"></div>'
-      : '<div class="dr-body woc-store-body"></div>';
+      ? `<div id="woc-store-panel" class="dr-body woc-store-body" role="tabpanel" aria-labelledby="woc-store-tab-store">${spinner(t('hudChrome.wocStore.loading'), false)}</div>`
+      : `<div class="dr-body woc-store-body">${spinner(t('hudChrome.dailyRewards.loading'), true)}</div>`;
   }
 
   private syncStoreLoading(): void {
@@ -834,7 +878,12 @@ export class DailyRewardsWindow {
           typeof task.multiplier === 'number' && Number.isFinite(task.multiplier)
             ? `<em>${esc(t('hudChrome.dailyRewards.taskMultiplier', { multiplier: formatNumber(task.multiplier, { maximumFractionDigits: 2 }) }))}</em>`
             : '';
-        return `<li class="${task.completed ? 'done' : ''}"><span>${esc(task.title)}</span><small><span>${esc(task.description)}</span>${multiplier}</small><b>${formatNumber(task.points, { maximumFractionDigits: 0 })}</b></li>`;
+        const description = dailyRewardTaskDescription(
+          task.type,
+          task.description,
+          t('hudChrome.dailyRewards.oneVsOneExcluded'),
+        );
+        return `<li class="${task.completed ? 'done' : ''}"><span>${esc(task.title)}</span><small><span>${esc(description)}</span>${multiplier}</small><b>${formatNumber(task.points, { maximumFractionDigits: 0 })}</b></li>`;
       })
       .join('');
     return (

@@ -49,6 +49,7 @@ export const DRAKELANDS_ZONE: ZoneDef = {
   ],
   welcome:
     'Hot wind rolls off the wastes ahead. Dragons wheel over the Drakemaw, and troll fires burn in the dunes.',
+  welcomeQuestId: 'q_dk_ash_on_the_wind',
 };
 
 // The causeway road runs on through the Wyrmgate, then forks into the wastes.
@@ -92,8 +93,8 @@ export const DRAKELANDS_ROADS: { x: number; z: number }[][] = [
   ], // the Cinder Dunes -> west to the Snowline crossing (fire meets ice)
 ];
 
-// Content fill (creatures, folk, quests) lands in a follow-up pass; the
-// skeleton ships the zone, its shape, and the walk-in entrance first.
+// The wastes' first inhabitants: emberwing drakes wheel over the Drakemaw,
+// the ashbone dead muster in the dunes, and the troll clans raid the roads.
 export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
   emberwing_drake: {
     id: 'emberwing_drake',
@@ -110,7 +111,7 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     moveSpeed: 9,
     aggroRadius: 18,
     elite: true,
-    loot: [],
+    loot: [{ itemId: 'emberwing_scale', chance: 0.7, questId: 'q_dk_scales_of_the_maw' }],
     scale: 1.4,
     color: 0xd84028,
   },
@@ -128,7 +129,7 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 12,
     moveSpeed: 8,
     aggroRadius: 13,
-    loot: [],
+    loot: [{ itemId: 'ashbone_war_brand', chance: 0.6, questId: 'q_dk_marrow_and_ash' }],
     scale: 1,
     color: 0xe8dcc8,
   },
@@ -146,7 +147,7 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 13,
     moveSpeed: 8,
     aggroRadius: 13,
-    loot: [],
+    loot: [{ itemId: 'ashbone_war_brand', chance: 0.6, questId: 'q_dk_marrow_and_ash' }],
     scale: 1.1,
     color: 0xd8c8a8,
   },
@@ -168,11 +169,309 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     scale: 1.15,
     color: 0xb07040,
   },
+  // The brood-mother of every emberwing in the Drakemaw sky, gold as a coal
+  // about to catch against her red-scaled children (q_dk_matriarch_of_the_maw).
+  // Spawned by the quest camps appended at the END of the merged CAMPS array
+  // (draw-order rule); her crater roost sits well off every road.
+  cindraleth_maw_matriarch: {
+    id: 'cindraleth_maw_matriarch',
+    name: 'Cindraleth the Maw Matriarch',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'dragonkin',
+    hpBase: 170,
+    hpPerLevel: 36,
+    dmgBase: 18,
+    dmgPerLevel: 3.2,
+    attackSpeed: 2.3,
+    armorPerLevel: 18,
+    moveSpeed: 9,
+    aggroRadius: 20,
+    elite: true,
+    loot: [],
+    scale: 1.9,
+    color: 0xf0b040,
+  },
 };
-export const DRAKELANDS_NPCS: Record<string, NpcDef> = {};
-export const DRAKELANDS_QUESTS: Record<string, QuestDef> = {};
-export const DRAKELANDS_QUEST_ORDER: string[] = [];
-export const DRAKELANDS_ITEMS: Record<string, ItemDef> = {};
+// The folk of the wastes: the gatecaptain and her quartermaster hold
+// Wyrmwatch, and a lone scout camps in the far dunes within sight of the
+// Orkadia wargate. The scout stands far from the hub on purpose: the war
+// chain sends players out to find her.
+export const DRAKELANDS_NPCS: Record<string, NpcDef> = {
+  gatecaptain_brannoc: {
+    id: 'gatecaptain_brannoc',
+    name: 'Gatecaptain Brannoc',
+    title: 'Commander of Wyrmwatch',
+    pos: { x: 407, z: 1895 },
+    facing: 2.6,
+    color: 0xa84838,
+    questIds: [
+      'q_dk_ash_on_the_wind',
+      'q_dk_banners_over_the_dunes',
+      'q_dk_watcher_at_the_wargate',
+      'q_dk_matriarch_of_the_maw',
+    ],
+    greeting: 'Wyrmwatch holds the gate. Has held it forty years. It will hold it tonight.',
+  },
+  quartermaster_sela: {
+    id: 'quartermaster_sela',
+    name: 'Quartermaster Sela',
+    title: 'Keeper of the Garrison Stores',
+    pos: { x: 398, z: 1908 },
+    facing: -0.6,
+    color: 0xc09858,
+    questIds: ['q_dk_trolls_on_the_road', 'q_dk_scorched_stores'],
+    greeting: 'Every crate in this yard crossed forty miles of ash to get here. Treat them kindly.',
+  },
+  scout_yerrin: {
+    id: 'scout_yerrin',
+    name: 'Scout Yerrin',
+    title: 'Far-Dune Watcher',
+    pos: { x: 494, z: 2100 },
+    facing: -2.4,
+    color: 0x8a7a58,
+    questIds: [
+      'q_dk_watcher_at_the_wargate',
+      'q_dk_marrow_and_ash',
+      'q_dk_scales_of_the_maw',
+      'q_dk_matriarch_of_the_maw',
+    ],
+    greeting: 'Keep low. Sound carries strangely off the glass, and the gate below has ears.',
+  },
+};
+
+export const DRAKELANDS_QUESTS: Record<string, QuestDef> = {
+  q_dk_ash_on_the_wind: {
+    id: 'q_dk_ash_on_the_wind',
+    name: 'Ash on the Wind',
+    giverNpcId: 'gatecaptain_brannoc',
+    turnInNpcId: 'gatecaptain_brannoc',
+    text: 'Look south off the palisade, $N. Those fires in the dunes are not troll cookfires, they are ashbone musters, and every night there are more. The dead come up out of the bonefields with sand still in their teeth. Cut down ten raiders before they cut a road to my gate.',
+    completionText:
+      'Ten fewer blades in the dunes, and the muster fires burned lower last night. My sentries slept, which they have not done in a week. Well cut, $N.',
+    objectives: [
+      { type: 'kill', targetMobId: 'ashbone_raider', count: 10, label: 'Ashbone Raider slain' },
+    ],
+    xpReward: 3800,
+    copperReward: 1800,
+    itemRewards: {},
+    minLevel: 16,
+  },
+  q_dk_trolls_on_the_road: {
+    id: 'q_dk_trolls_on_the_road',
+    name: 'Trolls on the Road',
+    giverNpcId: 'quartermaster_sela',
+    turnInNpcId: 'quartermaster_sela',
+    text: 'The dune trolls have learned the sound of a supply wagon, $N. They hit the Cinder Dunes road three times this month, and the last driver walked in carrying nothing but the reins. Eight trolls off that road and my wagons roll again.',
+    completionText:
+      'Eight, and my drivers have stopped writing farewell letters before every run. The garrison eats because of you, $N.',
+    objectives: [{ type: 'kill', targetMobId: 'dune_troll', count: 8, label: 'Dune Troll slain' }],
+    xpReward: 4200,
+    copperReward: 2000,
+    itemRewards: {},
+    minLevel: 16,
+  },
+  q_dk_scorched_stores: {
+    id: 'q_dk_scorched_stores',
+    name: 'Scorched Stores',
+    giverNpcId: 'quartermaster_sela',
+    turnInNpcId: 'quartermaster_sela',
+    text: 'The last wagon burned, $N, but iron-strapped crates do not burn through. Four of them are still lying scorched along the dunes road with a season of salt, nails, and bowstrings inside. Bring my stores home before the trolls work out how to open them.',
+    completionText:
+      'Scorched black and every latch still holding. The smith gets his nails, the fletcher her strings, and you get the boots I was saving for whoever brought my crates back, $N.',
+    objectives: [
+      {
+        type: 'interact',
+        targetObjectItemId: 'scorched_supply_crate',
+        count: 4,
+        label: 'Scorched supply crate recovered',
+      },
+    ],
+    xpReward: 4000,
+    copperReward: 1900,
+    itemRewards: {
+      warrior: 'cinderwalk_treads',
+      mage: 'cinderwalk_treads',
+      rogue: 'cinderwalk_treads',
+    },
+    requiresQuest: 'q_dk_trolls_on_the_road',
+    minLevel: 17,
+  },
+  q_dk_banners_over_the_dunes: {
+    id: 'q_dk_banners_over_the_dunes',
+    name: 'Banners over the Dunes',
+    giverNpcId: 'gatecaptain_brannoc',
+    turnInNpcId: 'gatecaptain_brannoc',
+    text: 'The ashbone muster at the old bonefield graves, $N, and my patrols cannot read the dunes the way they read a wall. Kill five of their warcallers, the ones that scream the dead upright, and plant a warning banner on each muster ground so my sentries can mark it from the ridge.',
+    completionText:
+      'Three banners snapping in the hot wind, right where my glass can find them. With five warcallers silenced, whatever answers their call will come slower. You bought us time, $N.',
+    objectives: [
+      {
+        type: 'kill',
+        targetMobId: 'ashbone_warcaller',
+        count: 5,
+        label: 'Ashbone Warcaller slain',
+      },
+      {
+        type: 'interact',
+        targetObjectItemId: 'wyrmwatch_warning_banner',
+        count: 3,
+        label: 'Warning banner planted',
+      },
+    ],
+    xpReward: 4800,
+    copperReward: 2600,
+    itemRewards: {},
+    requiresQuest: 'q_dk_ash_on_the_wind',
+    minLevel: 17,
+  },
+  q_dk_watcher_at_the_wargate: {
+    id: 'q_dk_watcher_at_the_wargate',
+    name: 'The Watcher at the Wargate',
+    giverNpcId: 'gatecaptain_brannoc',
+    turnInNpcId: 'scout_yerrin',
+    text: 'Something is pulling the ashbone east, $N, and I sent my best to learn what. Scout Yerrin has camped a month in the far dunes past Trollmoot, in sight of a gate nobody built in my lifetime. Her reports stopped ten days ago. Find her camp and get me her eyes.',
+    completionText:
+      'Brannoc sent you? Then my last runner never made it. Keep your voice down and sit, $N. You see that gate below? Count the war-banners in front of it, and you will understand why I stopped writing things down.',
+    objectives: [
+      { type: 'interact', targetNpcId: 'scout_yerrin', count: 1, label: 'Find Scout Yerrin' },
+    ],
+    xpReward: 2400,
+    copperReward: 950,
+    itemRewards: {},
+    requiresQuest: 'q_dk_banners_over_the_dunes',
+    minLevel: 18,
+  },
+  q_dk_marrow_and_ash: {
+    id: 'q_dk_marrow_and_ash',
+    name: 'Marrow and Ash',
+    giverNpcId: 'scout_yerrin',
+    turnInNpcId: 'scout_yerrin',
+    text: 'Every ashbone raider carries a war-brand, $N: a scorched tally of the host it marches under. I have counted four hosts from this ridge, but guesses are not intelligence. Bring me six brands off the raiders and their warcallers, and I will give Brannoc the shape of the war that is coming.',
+    completionText:
+      'Six brands, and one mark burned into every one of them. This is no raid muster, $N. Every host in the dunes answers to the wargate below us, the trolls call it Orkadia, and no five soldiers I ever served with could break what drums behind that door. Perhaps five like you.',
+    objectives: [
+      { type: 'collect', itemId: 'ashbone_war_brand', count: 6, label: 'Ashbone War-Brand' },
+    ],
+    xpReward: 4400,
+    copperReward: 2200,
+    itemRewards: {},
+    requiresQuest: 'q_dk_watcher_at_the_wargate',
+  },
+  q_dk_scales_of_the_maw: {
+    id: 'q_dk_scales_of_the_maw',
+    name: 'Scales of the Maw',
+    giverNpcId: 'scout_yerrin',
+    turnInNpcId: 'scout_yerrin',
+    text: 'When the wind turns off the Drakemaw, the emberwing drakes ride it over my camp low enough to count their teeth, $N. They range farther every day, and something in that crater drives them. Bring me three of their scales. Scales remember heat, and I can read where a drake has been roosting by the burn.',
+    completionText:
+      'Look at the underside of this one, $N: scorched in a spiral, and only one thing nests in circles. These drakes are brood-guards. Something in the Drakemaw is a mother.',
+    objectives: [
+      { type: 'collect', itemId: 'emberwing_scale', count: 3, label: 'Emberwing Scale' },
+    ],
+    xpReward: 5000,
+    copperReward: 2600,
+    itemRewards: {},
+    requiresQuest: 'q_dk_watcher_at_the_wargate',
+    minLevel: 19,
+    suggestedPlayers: 2,
+  },
+  q_dk_matriarch_of_the_maw: {
+    id: 'q_dk_matriarch_of_the_maw',
+    name: 'Matriarch of the Maw',
+    giverNpcId: 'scout_yerrin',
+    turnInNpcId: 'gatecaptain_brannoc',
+    text: 'The scales told it true, $N. I climbed the rim at dawn and saw her on the crater floor: Cindraleth, the matriarch every emberwing in this sky was hatched under, gold as a coal about to catch. While she broods, the drakes grow bolder, and Wyrmwatch cannot fight dragons and the ashbone both. End her in her crater, then carry the word to Gatecaptain Brannoc. Do not go alone.',
+    completionText:
+      "The sky over the Drakemaw has been empty for two days, and now you walk through my gate with a matriarch's blood on your boots. Wyrmwatch has stood forty years on watch for exactly this, $N. Take these pauldrons, mawscale, worked by our own smith. Wear them where the drakes can see.",
+    objectives: [
+      {
+        type: 'kill',
+        targetMobId: 'cindraleth_maw_matriarch',
+        count: 1,
+        label: 'Cindraleth the Maw Matriarch slain',
+      },
+    ],
+    xpReward: 6000,
+    copperReward: 3600,
+    itemRewards: {
+      warrior: 'mawscale_pauldrons',
+      mage: 'mawscale_pauldrons',
+      rogue: 'mawscale_pauldrons',
+    },
+    requiresQuest: 'q_dk_scales_of_the_maw',
+    minLevel: 19,
+    suggestedPlayers: 2,
+  },
+};
+
+// Level-braided presentation order (not strictly chain order), matching the
+// Veiled Hollow convention.
+export const DRAKELANDS_QUEST_ORDER: string[] = [
+  'q_dk_ash_on_the_wind',
+  'q_dk_trolls_on_the_road',
+  'q_dk_scorched_stores',
+  'q_dk_banners_over_the_dunes',
+  'q_dk_watcher_at_the_wargate',
+  'q_dk_marrow_and_ash',
+  'q_dk_scales_of_the_maw',
+  'q_dk_matriarch_of_the_maw',
+];
+
+export const DRAKELANDS_ITEMS: Record<string, ItemDef> = {
+  // --- quest items ---
+  ashbone_war_brand: {
+    id: 'ashbone_war_brand',
+    name: 'Ashbone War-Brand',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_dk_marrow_and_ash',
+  },
+  emberwing_scale: {
+    id: 'emberwing_scale',
+    name: 'Emberwing Scale',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_dk_scales_of_the_maw',
+  },
+  scorched_supply_crate: {
+    id: 'scorched_supply_crate',
+    name: 'Scorched Supply Crate',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_dk_scorched_stores',
+    noVendorSell: true,
+  },
+  wyrmwatch_warning_banner: {
+    id: 'wyrmwatch_warning_banner',
+    name: 'Wyrmwatch Warning Banner',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_dk_banners_over_the_dunes',
+    noVendorSell: true,
+  },
+  // --- quest rewards ---
+  cinderwalk_treads: {
+    id: 'cinderwalk_treads',
+    name: 'Cinderwalk Treads',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'feet',
+    quality: 'uncommon',
+    stats: { armor: 58, sta: 4, spi: 3 },
+    sellValue: 900,
+  },
+  mawscale_pauldrons: {
+    id: 'mawscale_pauldrons',
+    name: 'Mawscale Pauldrons',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'shoulder',
+    quality: 'rare',
+    stats: { armor: 72, sta: 6, int: 4 },
+    sellValue: 2200,
+  },
+};
 export const DRAKELANDS_CAMPS: CampDef[] = [
   { mobId: 'dune_troll', center: { x: 460, z: 2140 }, radius: 10, count: 3 },
   { mobId: 'dune_troll', center: { x: 476, z: 2124 }, radius: 8, count: 2 },
@@ -184,7 +483,44 @@ export const DRAKELANDS_CAMPS: CampDef[] = [
   { mobId: 'emberwing_drake', center: { x: 419, z: 2266 }, radius: 8, count: 1 },
   { mobId: 'emberwing_drake', center: { x: 302, z: 2258 }, radius: 8, count: 1 },
 ];
-export const DRAKELANDS_OBJECTS: GroundObjectDef[] = [];
+export const DRAKELANDS_OBJECTS: GroundObjectDef[] = [
+  {
+    itemId: 'scorched_supply_crate',
+    name: 'Scorched Supply Crate',
+    // Strewn where the burned wagon broke apart along the Wyrmwatch -> Cinder
+    // Dunes road.
+    positions: [
+      { x: 372, z: 1968 },
+      { x: 360, z: 2014 },
+      { x: 348, z: 2046 },
+      { x: 332, z: 2094 },
+    ],
+  },
+  {
+    itemId: 'wyrmwatch_warning_banner',
+    name: 'Wyrmwatch Warning Banner',
+    // Banner stakes dropped at the three bonefield muster grounds, one per
+    // grave-ring, waiting to be driven in.
+    positions: [
+      { x: 350, z: 2090 },
+      { x: 302, z: 2180 },
+      { x: 450, z: 2110 },
+    ],
+  },
+];
+
+// Quest-camp additions (a warcaller muster, a far-ranging drake, and the
+// matriarch's crater roost). Kept separate from DRAKELANDS_CAMPS and appended
+// at the very END of the merged CAMPS array in data.ts: camps draw world-gen
+// rng in array order, so only a tail append leaves every existing spawn
+// untouched.
+export const DRAKELANDS_QUEST_CAMPS: CampDef[] = [
+  { mobId: 'ashbone_warcaller', center: { x: 302, z: 2180 }, radius: 8, count: 2 },
+  { mobId: 'emberwing_drake', center: { x: 322, z: 2252 }, radius: 8, count: 1 },
+  // Cindraleth's roost: a lava crater on the Drakemaw's eastern flank, well
+  // away from every marked road.
+  { mobId: 'cindraleth_maw_matriarch', center: { x: 436, z: 2348 }, radius: 6, count: 1 },
+];
 
 export const DRAKELANDS_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
@@ -228,6 +564,10 @@ export const DRAKELANDS_PROPS: ZonePropsDef = {
   tents: [
     { x: 396, z: 1894, rot: 0.8, scale: 1 },
     { x: 412, z: 1906, rot: -1.9, scale: 1 },
+    { x: 497, z: 2097, rot: -2.2, scale: 1 }, // Scout Yerrin's ridge camp above the wargate
   ],
-  campfires: [[404, 1900]],
+  campfires: [
+    [404, 1900],
+    [492, 2103], // Yerrin's low fire, banked so the gate does not see it
+  ],
 };

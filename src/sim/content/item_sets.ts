@@ -4,14 +4,15 @@
 // (tier 1) and the Nythraxis raid (tier 2), plus three leveling "haste kit"
 // families assembled from existing world-drop items. Wearing enough pieces of
 // a family grants stacking 2-, 3-, and 4-piece bonuses, resolved in
-// `recalcPlayerStats` (primary stats, attack power, crit, haste, knockback
-// resistance). Every epic family's 4-piece tier is a proc (see SetProc):
+// `recalcPlayerStats` (primary stats, attack power, crit, haste, cast pushback
+// immunity). Every epic family's 4-piece tier is a proc (see SetProc):
 // weapon-crit-triggered for the plate and leather archetypes, spell-cast-
 // triggered for the caster archetypes, resolved by combat/set_procs.ts.
 //
 // Bonuses are keyed by archetype: the plate (Strength) families get attack
 // power then Strength/Stamina; the leather (Agility) families get attack power
-// then Agility/crit; the cloth (caster) families get knockback resistance at 2
+// then Agility/crit; the cloth (caster) families get full spell-pushback
+// immunity (damage taken never delays a cast; NOT physical knockback) at 2
 // pieces and Intellect plus Stamina for tier 1, or Intellect plus Spirit for
 // tier 2, at 3 pieces. Every tier-2 3-piece bonus ALSO grants haste (ONE stat:
 // faster melee and ranged swings AND shorter casts/channels), and the three
@@ -21,11 +22,13 @@
 
 import type { ItemSet, SetBonusEffect, SetBonusTier, SetProc } from '../types';
 
-// Haste granted by a 3-piece bonus (fraction). The one knob for every haste
-// source: 0.15 makes swings 15% faster and casts/channels 15% shorter.
-export const SET_HASTE_3PC = 0.15;
-export const SET_HASTE_3PC_RATING = 150; // -> 15% haste at 10 rating = 1%
-export const SET_CRIT_3PC_RATING = 20; // -> +2% crit at 10 rating = 1%
+// Haste granted by a 3-piece bonus after the global combat-rating conversion:
+// what SET_HASTE_3PC_RATING is worth once recalcPlayerStats converts it. Read
+// only by the tests, deliberately as a literal so it pins the conversion
+// independently; it must be updated by hand whenever HASTE_RATING_PER_PCT moves.
+export const SET_HASTE_3PC = 0.075;
+export const SET_HASTE_3PC_RATING = 150; // -> 7.5% haste at 20 rating = 1%
+export const SET_CRIT_3PC_RATING = 20; // -> +1% crit at 20 rating = 1%
 // The two T2 4-piece bleeds (Bonesplinter, Ragged Gash) are marginal on their own
 // (roughly their 2-piece's flat 40 AP). They now also grant Hit rating so completing
 // the set is worth chasing for Heroic (+3 above-level), where the bleed alone was not.
@@ -77,7 +80,7 @@ const AGILITY_T1_BONUSES: SetBonusTier[] = [
   {
     pieces: 3,
     effect: { agi: 15, critRating: SET_CRIT_3PC_RATING },
-    text: 'Increases Agility by 15 and critical strike chance by 2%.',
+    text: 'Increases Agility by 15 and critical strike chance by 1%.',
   },
   {
     pieces: 4,
@@ -100,8 +103,8 @@ const AGILITY_T1_BONUSES: SetBonusTier[] = [
 const CASTER_T1_BONUSES: SetBonusTier[] = [
   {
     pieces: 2,
-    effect: { knockbackResistance: 1, sp: 20 },
-    text: 'Increases spell power by 20. You cannot be knocked back (100% knockback resistance).',
+    effect: { castPushbackReduction: 1, sp: 20 },
+    text: 'Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).',
   },
   {
     pieces: 3,
@@ -130,7 +133,7 @@ const STRENGTH_T2_BONUSES: SetBonusTier[] = [
   {
     pieces: 3,
     effect: { str: 15, sta: 15, hasteRating: SET_HASTE_3PC_RATING },
-    text: 'Increases Strength by 15, Stamina by 15, and attack and casting speed by 15%.',
+    text: 'Increases Strength by 15, Stamina by 15, and attack and casting speed by 7.5%.',
   },
   {
     pieces: 4,
@@ -163,7 +166,7 @@ const AGILITY_T2_BONUSES: SetBonusTier[] = [
   {
     pieces: 3,
     effect: { agi: 15, critRating: SET_CRIT_3PC_RATING, hasteRating: SET_HASTE_3PC_RATING },
-    text: 'Increases Agility by 15, critical strike chance by 2%, and attack and casting speed by 15%.',
+    text: 'Increases Agility by 15, critical strike chance by 1%, and attack and casting speed by 7.5%.',
   },
   {
     pieces: 4,
@@ -193,13 +196,13 @@ const AGILITY_T2_BONUSES: SetBonusTier[] = [
 const CASTER_T2_BONUSES: SetBonusTier[] = [
   {
     pieces: 2,
-    effect: { knockbackResistance: 1, sp: 20 },
-    text: 'Increases spell power by 20. You cannot be knocked back (100% knockback resistance).',
+    effect: { castPushbackReduction: 1, sp: 20 },
+    text: 'Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).',
   },
   {
     pieces: 3,
     effect: { int: 15, spi: 15, hasteRating: SET_HASTE_3PC_RATING },
-    text: 'Increases Intellect by 15, Spirit by 15, and attack and casting speed by 15%.',
+    text: 'Increases Intellect by 15, Spirit by 15, and attack and casting speed by 7.5%.',
   },
   {
     pieces: 4,
@@ -224,7 +227,7 @@ const HASTE_KIT_BONUSES: SetBonusTier[] = [
   {
     pieces: 3,
     effect: { hasteRating: SET_HASTE_3PC_RATING },
-    text: 'Increases attack and casting speed by 15%.',
+    text: 'Increases attack and casting speed by 7.5%.',
   },
 ];
 

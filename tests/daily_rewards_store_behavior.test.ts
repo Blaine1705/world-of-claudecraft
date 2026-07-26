@@ -4,14 +4,19 @@ vi.mock('../src/ui/armory_inspect', () => ({
   ArmoryInspect: class {
     openSkinId: string | null = null;
     close(): void {}
+    destroy(): void {}
     open(): void {}
+    async prewarm(): Promise<void> {}
     refresh(): void {}
   },
   badgeLabel: () => '',
   rarityLabel: () => '',
   weaponTypeLabel: () => '',
 }));
-vi.mock('../src/ui/portrait_chip', () => ({ portraitChipHtml: () => '' }));
+vi.mock('../src/ui/portrait_chip', () => ({
+  hydratePortraits: () => undefined,
+  portraitChipHtml: () => '',
+}));
 
 import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import { DailyRewardsWindow } from '../src/ui/daily_rewards_window';
@@ -41,6 +46,41 @@ function rootStub(body: Record<string, unknown> | null = null): HTMLElement {
 }
 
 describe('DailyRewardsWindow store refresh behavior', () => {
+  it('does not render wallet connection controls in the Store', () => {
+    let html = '';
+    const body = {
+      dataset: {},
+      get innerHTML() {
+        return html;
+      },
+      set innerHTML(value: string) {
+        html = value;
+      },
+      querySelector: () => null,
+      querySelectorAll: () => [],
+    };
+    const window = new DailyRewardsWindow({
+      root: () => rootStub(body),
+      world: worldStub,
+      closeOthers: () => undefined,
+      captureFocus: () => null,
+      restoreFocus: () => undefined,
+    });
+    Object.assign(window as unknown as Record<string, unknown>, {
+      storeBalance: 750,
+      armorySections: [],
+    });
+
+    (window as unknown as { paintStore(body: HTMLElement): void }).paintStore(
+      body as unknown as HTMLElement,
+    );
+
+    expect(html).not.toContain('Connect wallet');
+    expect(html).not.toContain('recovery phrase or private key');
+    expect(html).not.toContain('data-store-wallet');
+    expect(html).not.toContain('woc-store-wallet');
+  });
+
   it('selects and opens the Store without toggling an open window closed', () => {
     const root = rootStub();
     root.style.display = 'none';

@@ -7,8 +7,11 @@ import {
   columnBlendAt,
   DUNGEON_FLOOR_Y,
   DUNGEON_X_THRESHOLD,
+  dungeonAt,
   getActiveWorldContent,
   getContentGeneration,
+  instanceOrigin,
+  instanceSlotForZ,
   ROADS,
   STRIP_MAX_X,
   STRIP_MIN_X,
@@ -22,10 +25,12 @@ import {
 } from './data';
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
 import { galeDeckSurface } from './gale_harbor';
+import { orkadiaFieldHeight } from './orkadia_field';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
 import type { BiomeId, HeightStamp, ZoneDef } from './types';
 import { isInSowfieldShell, SOWFIELD_FLAT, sowfieldStandLift } from './vale_cup_layout';
+import { wildheartFieldHeight } from './wildheart_field';
 
 // Terrain is a pure function of (x, z, seed): both the sim (ground clamping)
 // and the renderer (mesh) sample the same heightfield, so they always agree.
@@ -2945,9 +2950,25 @@ function applyLakeShoreGrading(x: number, z: number, h: number): number {
 }
 
 // Ground height including instanced dungeon floors (flat, far off-world), the
-// walkable Vale Cup grandstand lift, raised docks, and custom-map sculpt edits.
+// Orkadia open-field relief, the walkable Vale Cup grandstand lift, raised
+// docks, and custom-map sculpt edits.
 export function groundHeight(x: number, z: number, seed: number): number {
-  if (x > DUNGEON_X_THRESHOLD) return DUNGEON_FLOOR_Y;
+  if (x > DUNGEON_X_THRESHOLD) {
+    // Orkadia's instance is an open field, not a flat floor: dunes, side berms,
+    // and the boss terrace rise off the instance plane (src/sim/orkadia_field.ts).
+    // The renderer displaces its ground mesh with the same function, so what you
+    // see is what you stand on.
+    const dungeon = dungeonAt(x);
+    if (dungeon?.interior === 'orkadia') {
+      const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
+      return DUNGEON_FLOOR_Y + orkadiaFieldHeight(x - origin.x, z - origin.z);
+    }
+    if (dungeon?.interior === 'wildheart') {
+      const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
+      return DUNGEON_FLOOR_Y + wildheartFieldHeight(x - origin.x, z - origin.z);
+    }
+    return DUNGEON_FLOOR_Y;
+  }
   // The Vale Cup grandstands are walkable: the ground steps up in seated tiers so
   // players can climb the bleachers (raised WALKABLE ground is the heightfield).
   // This lives in groundHeight, NOT terrainHeight, so the render's flat terrain

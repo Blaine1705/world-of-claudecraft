@@ -4,7 +4,7 @@
 // The class tests that fight a live forest wolf keep the full built-in world:
 // they need a real camp mob.
 import { describe, expect, it } from 'vitest';
-import { abilitiesKnownAt, CLASSES, instanceOrigin, MOBS } from '../src/sim/data';
+import { ABILITIES, abilitiesKnownAt, CLASSES, instanceOrigin, MOBS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL } from '../src/sim/types';
 import { face, makeWorld, mustEntity, nearestMob, teleport } from './social_shared';
@@ -21,7 +21,10 @@ describe('nine classes', () => {
       expect(CLASSES[cls].abilities.length).toBeGreaterThan(0);
       // the full kit resolves at MAX_LEVEL; the 10-20 band still has things to learn
       const kit = abilitiesKnownAt(cls, MAX_LEVEL);
-      expect(kit.length).toBe(CLASSES[cls].abilities.length);
+      const sharedKit = CLASSES[cls].abilities.filter(
+        (id) => !ABILITIES[id]?.specs && (ABILITIES[id]?.learnLevel ?? Infinity) <= MAX_LEVEL,
+      );
+      expect(kit.map((known) => known.def.id)).toEqual(sharedKit);
       expect(abilitiesKnownAt(cls, 10).length).toBeLessThan(kit.length);
       // every class's core kit keeps scaling: something reaches rank 3+ by 20
       expect(kit.some((k) => k.rank >= 3)).toBe(true);

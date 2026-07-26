@@ -15,6 +15,7 @@ import { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import { RIFT_TIER_COLORS, type RiftTier, type ZoneDef } from '../types';
 import { groundHeight, WATER_LEVEL } from '../world';
+import { RIFT_RANK_BASE_LEVEL } from './ranks';
 import { generateRiftPlan } from './rift_gen';
 import type { RiftEvent } from './types';
 import {
@@ -37,16 +38,16 @@ export const COMMUNITY_RIFT_PORTAL_LIFETIME = 6 * 60 * 60;
 export const COMMUNITY_RIFT_PORTAL_REFILL_DELAY = 60;
 const RIFT_EVENT_HISTORY_LIMIT = 64;
 
-/** Rank tuning. `raceMarks` is paid only to the first group and is deliberately
- * separate from the normal rank reward so the speed race has a visible prize. */
-export const RIFT_TIER_INFO: Record<
-  RiftTier,
-  { baseLevel: number; marks: number; raceMarks: number; color: number }
-> = {
-  C: { baseLevel: 20, marks: 1, raceMarks: 1, color: RIFT_TIER_COLORS.C },
-  B: { baseLevel: 22, marks: 2, raceMarks: 1, color: RIFT_TIER_COLORS.B },
-  A: { baseLevel: 25, marks: 3, raceMarks: 2, color: RIFT_TIER_COLORS.A },
-  S: { baseLevel: 28, marks: 4, raceMarks: 3, color: RIFT_TIER_COLORS.S },
+/** Rank tuning. Rifts pay NO Heroic Marks at any rank (maintainer decision:
+ * marks stay a heroic dungeon/raid currency; the rift prize is the clear-time
+ * gear ladder, rings, essence, mounts, and coin). baseLevel comes from the
+ * canonical rank map in ./ranks.ts, which every difficulty consumer inverts
+ * back into the rank. */
+export const RIFT_TIER_INFO: Record<RiftTier, { baseLevel: number; color: number }> = {
+  C: { baseLevel: RIFT_RANK_BASE_LEVEL.C, color: RIFT_TIER_COLORS.C },
+  B: { baseLevel: RIFT_RANK_BASE_LEVEL.B, color: RIFT_TIER_COLORS.B },
+  A: { baseLevel: RIFT_RANK_BASE_LEVEL.A, color: RIFT_TIER_COLORS.A },
+  S: { baseLevel: RIFT_RANK_BASE_LEVEL.S, color: RIFT_TIER_COLORS.S },
 };
 
 const TIERS: readonly RiftTier[] = ['C', 'B', 'A', 'S'];

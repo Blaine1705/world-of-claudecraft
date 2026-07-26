@@ -1,3 +1,8 @@
+import {
+  buildingCameraHeight,
+  buildingTerrainEnvelope,
+  isEastbrookGrandArmoury,
+} from './building_layout';
 import { MOUNT_RACE_JUMP_FIXTURES, raceGateSegment } from './content/mounts';
 import {
   arenaOriginAt,
@@ -23,14 +28,17 @@ import { isLitanyModuleId, litanyModuleLosColliders } from './delve_litany_layou
 import {
   ARENA_LAYOUT,
   CRYPT_LAYOUT,
+  DROWNED_COURT_LAYOUT,
   layoutColliders,
   NYTHRAXIS_LAYOUT,
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
 } from './dungeon_layout';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
+import { ORKADIA_FIELD_COLLIDER_SPECS, ORKADIA_FIELD_WALLS } from './orkadia_field';
 import type { BuildingDef, WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
+import { WILDHEART_FIELD_COLLIDER_SPECS, WILDHEART_FIELD_WALLS } from './wildheart_field';
 import {
   crossesGardenHedge,
   crossesSealedBorder,
@@ -39,6 +47,7 @@ import {
   generateDecorationsInBounds,
   groundHeight,
   reachPalmSpots,
+  terrainHeight,
 } from './world';
 import { yumiMazeColliders } from './yumi_maze_layout';
 
@@ -94,20 +103,26 @@ function rotY(lx: number, lz: number, rot: number): { x: number; z: number } {
   return { x: lx * c + lz * s, z: -lx * s + lz * c };
 }
 
+// default backward offset/radius for a mine's spoil mound behind the timber portal,
+// shared with the renderer (src/render/props.ts) so the two can't drift apart
+export const MINE_MOUND_DEFAULT_OFFSET = 3.4;
+export const MINE_MOUND_DEFAULT_RADIUS = 5;
+
+export function mineMoundFootprint(m: {
+  x: number;
+  z: number;
+  rot: number;
+  moundOffset?: number;
+  moundRadius?: number;
+}): { x: number; z: number; r: number } {
+  const r = m.moundRadius ?? MINE_MOUND_DEFAULT_RADIUS;
+  const mound = rotY(0, -(m.moundOffset ?? MINE_MOUND_DEFAULT_OFFSET), m.rot);
+  return { x: m.x + mound.x, z: m.z + mound.z, r };
+}
+
 // ---------------------------------------------------------------------------
 // Collider sets
 // ---------------------------------------------------------------------------
-
-// Per-kind building heights: the camera-collider top AND the renderer's roof
-// line (render/props.ts imports this so the two can never drift apart).
-export const BUILDING_COLLIDER_HEIGHTS: Partial<Record<BuildingDef['kind'], number>> = {
-  chapel: 10.8,
-  inn: 7.8,
-  hollowInn: 8.5,
-  hollowChapel: 10.5,
-  hollowSmith: 6.2,
-  hollowMarket: 5.2,
-};
 
 function staticWorldColliders(seed: number): Collider[] {
   const out: Collider[] = [];
@@ -118,7 +133,9 @@ function staticWorldColliders(seed: number): Collider[] {
   // chase cam no longer pulls in for them; the renderer hides whichever one
   // crosses the eye-to-camera segment instead.
   for (const b of PROPS.buildings) {
-    const height = BUILDING_COLLIDER_HEIGHTS[b.kind] ?? 8.0;
+    const cameraTopY = isEastbrookGrandArmoury(b)
+      ? buildingTerrainEnvelope(b, (x, z) => terrainHeight(x, z, seed)).cameraTopY
+      : topY(seed, b.x, b.z, buildingCameraHeight(b));
     out.push({
       type: 'obb',
       x: b.x,
@@ -126,7 +143,7 @@ function staticWorldColliders(seed: number): Collider[] {
       hw: b.w / 2,
       hd: b.d / 2,
       rot: b.rot,
-      cameraTopY: topY(seed, b.x, b.z, height),
+      cameraTopY,
       camGhost: true,
     });
   }
@@ -136,8 +153,8 @@ function staticWorldColliders(seed: number): Collider[] {
       x: w.x,
       z: w.z,
       r: w.r,
-      cameraTopY: topY(seed, w.x, w.z, 3.7),
-      camGhost: true,
+      cameraTopY: topY(seed, w.x, w.z, w.height ?? 3.7),
+      camGhost: w.camGhost ?? true,
     });
   // the collider runs wider than the data radius: the modeled trunks flare
   // at the base, and the r that sizes the tree understates the bark line
@@ -222,15 +239,58 @@ function staticWorldColliders(seed: number): Collider[] {
       cameraTopY: topY(seed, p.x, p.z, 7),
       camGhost: true,
     });
-  for (const s of PROPS.stalls)
+  for (const s of PROPS.stalls) {
+    const cameraTopY = topY(seed, s.x, s.z, s.height ?? 3.1);
+    if (s.w !== undefined && s.d !== undefined) {
+      out.push({
+        type: 'obb',
+        x: s.x,
+        z: s.z,
+        hw: s.w / 2,
+        hd: s.d / 2,
+        rot: s.rot,
+        cameraTopY,
+        camGhost: s.camGhost ?? true,
+      });
+    } else {
+      out.push({
+        type: 'circle',
+        x: s.x,
+        z: s.z,
+        r: s.r,
+        cameraTopY,
+        camGhost: s.camGhost ?? true,
+      });
+    }
+  }
+  for (const prop of [...(PROPS.benches ?? []), ...(PROPS.walls ?? [])]) {
     out.push({
-      type: 'circle',
-      x: s.x,
-      z: s.z,
-      r: s.r,
-      cameraTopY: topY(seed, s.x, s.z, 3.1),
+      type: 'obb',
+      x: prop.x,
+      z: prop.z,
+      hw: prop.w / 2,
+      hd: prop.d / 2,
+      rot: prop.rot,
+      cameraTopY: topY(seed, prop.x, prop.z, prop.height),
+      camGhost: prop.camGhost ?? false,
+    });
+  }
+
+  // Interactable town boards are authored through active WorldContent rather
+  // than PROPS. The same service record drives their spawn and exact OBB, and
+  // custom worlds that omit the service inherit no Eastbrook collision.
+  for (const board of content.services?.noticeboards ?? []) {
+    out.push({
+      type: 'obb',
+      x: board.x,
+      z: board.z,
+      hw: board.width / 2,
+      hd: board.depth / 2,
+      rot: board.rotation,
+      cameraTopY: topY(seed, board.x, board.z, board.height),
       camGhost: true,
     });
+  }
 
   // hand-placed GLB decor: circle collider matched to the model footprint;
   // r 0/absent entries are walk-through dressing and add no collider
@@ -248,10 +308,8 @@ function staticWorldColliders(seed: number): Collider[] {
 
   // mines: mound behind the timber portal
   for (const m of PROPS.mines) {
-    const mound = rotY(0, -3.4, m.rot);
-    const x = m.x + mound.x,
-      z = m.z + mound.z;
-    out.push({ type: 'circle', x, z, r: 5, cameraTopY: topY(seed, x, z, 5.2), camGhost: true });
+    const { x, z, r } = mineMoundFootprint(m);
+    out.push({ type: 'circle', x, z, r, cameraTopY: topY(seed, x, z, r + 0.2), camGhost: true });
   }
 
   // Dock decks are raised walkable ground in world.ts; only a non-empty hut blocks.
@@ -302,14 +360,15 @@ function staticWorldColliders(seed: number): Collider[] {
     if (len < 1e-6) continue;
     const x = (f.x1 + f.x2) / 2,
       z = (f.z1 + f.z2) / 2;
+    const halfDepth = (f.width ?? FENCE_HALF_DEPTH * 2) / 2;
     out.push({
       type: 'obb',
       x,
       z,
-      hw: len / 2 + FENCE_END_PAD,
-      hd: FENCE_HALF_DEPTH,
+      hw: len / 2 + (f.width === undefined ? FENCE_END_PAD : halfDepth),
+      hd: halfDepth,
       rot: Math.atan2(-dz, dx),
-      cameraTopY: topY(seed, x, z, FENCE_RAIL_HEIGHT),
+      cameraTopY: topY(seed, x, z, f.height ?? FENCE_RAIL_HEIGHT),
       camGhost: true,
       isFence: true,
     });
@@ -382,6 +441,10 @@ function staticWorldColliders(seed: number): Collider[] {
   return out;
 }
 
+/** Test-only visibility into the authored static set so world-layout tests can
+ *  pin real collider extents and camera tops rather than re-testing helpers. */
+export const colliderInternalsForTest = { staticWorldColliders };
+
 // Interior collision sets, in instance-local coordinates. Derived from the
 // SAME plain-data layouts the renderer builds the KayKit modules from
 // (sim/dungeon_layout.ts), so render geometry and collision can no longer
@@ -390,7 +453,57 @@ const CRYPT_COLLIDERS: Collider[] = layoutColliders(CRYPT_LAYOUT);
 const SANCTUM_COLLIDERS: Collider[] = layoutColliders(SANCTUM_LAYOUT);
 const TEMPLE_COLLIDERS: Collider[] = layoutColliders(TEMPLE_LAYOUT);
 const ARENA_COLLIDERS: Collider[] = layoutColliders(ARENA_LAYOUT);
+const DROWNED_COURT_COLLIDERS: Collider[] = layoutColliders(DROWNED_COURT_LAYOUT);
 const NYTHRAXIS_COLLIDERS: Collider[] = layoutColliders(NYTHRAXIS_LAYOUT);
+
+// Orkadia is an OPEN FIELD, not a room kit: a perimeter enclosure (plain obbs
+// that pull the chase cam in like interior walls, so players cannot leave the
+// war-camp) plus one circle per placed prop, camGhost + cameraTopY following
+// the world-prop contract. Both halves derive from the SAME placement table
+// the renderer builds the field from (src/sim/orkadia_field.ts), so what you
+// see is what you collide with. The skull dais stays walkable (no collider),
+// matching the room-kit boss-dais contract.
+const ORKADIA_COLLIDERS: Collider[] = [
+  ...ORKADIA_FIELD_WALLS.map(
+    (w): Collider => ({ type: 'obb', x: w.x, z: w.z, hw: w.hw, hd: w.hd, rot: 0 }),
+  ),
+  ...ORKADIA_FIELD_COLLIDER_SPECS.map(
+    (s): Collider => ({ type: 'circle', x: s.x, z: s.z, r: s.r, cameraTopY: s.h, camGhost: true }),
+  ),
+];
+
+// Wildheart follows the same open-field contract, but its walkable bridges and
+// water ribbons are heightfield surfaces rather than blocking props.
+const WILDHEART_COLLIDERS: Collider[] = [
+  ...WILDHEART_FIELD_WALLS.map(
+    (wall): Collider => ({
+      type: 'obb',
+      x: wall.x,
+      z: wall.z,
+      hw: wall.hw,
+      hd: wall.hd,
+      rot: 0,
+    }),
+  ),
+  ...WILDHEART_FIELD_COLLIDER_SPECS.map(
+    (spec): Collider => ({
+      type: 'circle',
+      x: spec.x,
+      z: spec.z,
+      r: spec.r,
+      cameraTopY: spec.h,
+      camGhost: true,
+    }),
+  ),
+];
+
+// Arena slots host fixed maps by slot parity (EVEN = Coliseum, ODD = Drowned
+// Court; see ARENA_MAPS in dungeon_layout.ts). Both sets are built once at
+// module load, so per-slot collision stays fully static. Exported for the
+// per-slot layout pin tests.
+export function arenaCollidersForSlot(slot: number): Collider[] {
+  return ((slot % 2) + 2) % 2 === 1 ? DROWNED_COURT_COLLIDERS : ARENA_COLLIDERS;
+}
 
 // Interior collider sets keyed by DungeonDef.interior.
 const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
@@ -398,6 +511,8 @@ const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
   sanctum: SANCTUM_COLLIDERS,
   temple: TEMPLE_COLLIDERS,
   nythraxis: NYTHRAXIS_COLLIDERS,
+  orkadia: ORKADIA_COLLIDERS,
+  wildheart: WILDHEART_COLLIDERS,
 };
 
 // ---------------------------------------------------------------------------
@@ -696,7 +811,7 @@ export function resolvePosition(
   }
   if (isArenaPos(x)) {
     const o = arenaOriginAt(z);
-    const local = resolveAgainst(ARENA_COLLIDERS, x - o.x, z - o.z, r, ignoreFences);
+    const local = resolveAgainst(arenaCollidersForSlot(o.slot), x - o.x, z - o.z, r, ignoreFences);
     return { x: local.x + o.x, z: local.z + o.z };
   }
   if (isRiftPos(x)) {
@@ -718,7 +833,16 @@ export function resolvePosition(
 }
 
 function crossesFence(fromX: number, fromZ: number, toX: number, toZ: number, r: number): boolean {
-  const crossesSegment = (x1: number, z1: number, x2: number, z2: number): boolean => {
+  // endPad extends the crossing test past each end of the segment. An authored
+  // fence overrides it with its own width so a wide rail is not walked around
+  // at its posts; the race gates keep the default.
+  const crossesSegment = (
+    x1: number,
+    z1: number,
+    x2: number,
+    z2: number,
+    endPad = FENCE_END_PAD,
+  ): boolean => {
     const dx = x2 - x1,
       dz = z2 - z1;
     const len = Math.hypot(dx, dz);
@@ -741,12 +865,14 @@ function crossesFence(fromX: number, fromZ: number, toX: number, toZ: number, r:
     const hitX = fromX + (toX - fromX) * t;
     const hitZ = fromZ + (toZ - fromZ) * t;
     const along = (hitX - x1) * ux + (hitZ - z1) * uz;
-    return along >= -FENCE_END_PAD - r && along <= len + FENCE_END_PAD + r;
+    return along >= -endPad - r && along <= len + endPad + r;
   };
 
   const props = getActiveWorldContent().props;
   for (const f of props.fences) {
-    if (crossesSegment(f.x1, f.z1, f.x2, f.z2)) return true;
+    if (crossesSegment(f.x1, f.z1, f.x2, f.z2, f.width === undefined ? undefined : f.width / 2)) {
+      return true;
+    }
   }
   // Click-to-move uses this same query to auto-jump a rail. Include the race
   // fixtures so its route behaves like keyboard movement instead of walking
@@ -800,6 +926,20 @@ export function resolveMovement(
     // shove the resolved position across it either
     if (crossesSealedBorder(x, z, resolved.z)) break;
     if (crossesGardenHedge(x, z, resolved.x, resolved.z)) break;
+    // Rift interiors: a resolution is a SLIDE, never a teleport. When a wide
+    // obstacle abuts a thin wall (a chamber-waist stub reaching the side wall),
+    // chained pushOuts can walk the centre across the wall centreline and eject
+    // the mover OUTSIDE the room; any step that resolves further than a
+    // slide-scale distance from its target is that ejection, so treat it as a
+    // hard block (keep the last good position) instead of accepting it. Scoped
+    // to the rift band so no pre-existing space changes behavior.
+    if (
+      riftToken !== 0 &&
+      isRiftPos(nextX) &&
+      Math.hypot(resolved.x - nextX, resolved.z - nextZ) > 1.2
+    ) {
+      break;
+    }
     x = resolved.x;
     z = resolved.z;
     if (Math.hypot(x - nextX, z - nextZ) > r * 0.25) {
@@ -1002,7 +1142,7 @@ export function cameraOcclusion(
   if (isArenaPos(ax)) {
     const o = arenaOriginAt(az);
     return sweepColliders(
-      ARENA_COLLIDERS,
+      arenaCollidersForSlot(o.slot),
       ax - o.x,
       ay,
       az - o.z,
@@ -1094,7 +1234,7 @@ function sightBlockedAt(
   }
   if (isArenaPos(x)) {
     const o = arenaOriginAt(z);
-    return overlapsAny(ARENA_COLLIDERS, x - o.x, z - o.z, false);
+    return overlapsAny(arenaCollidersForSlot(o.slot), x - o.x, z - o.z, false);
   }
   if (isRiftPos(x)) {
     const region = riftRegionAt(riftToken, x, z);

@@ -5,6 +5,8 @@ import * as THREE from 'three';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import { resampleHdrRgba } from '../hdr_resample';
+import { MAX_LOAD_ATTEMPTS, retryDelayMs } from './load_retry';
 import { assetUrl } from './media';
 import { assetLoadStarted, recordAssetLoad } from './stats';
 
@@ -55,6 +57,23 @@ function scheduleLoad<T>(q: AssetQueue, run: () => Promise<T>): Promise<T> {
   });
 }
 
+/** Retries a fetch-and-parse attempt on failure: a single transient network
+ *  blip (common on mobile connections) must not permanently sink a boot-time
+ *  asset load. Only the LAST attempt's error escapes; earlier ones are
+ *  swallowed since the caller only cares whether it eventually succeeded. */
+function withRetry<T>(attemptOnce: () => Promise<T>): Promise<T> {
+  const attempt = (n: number): Promise<T> =>
+    attemptOnce().catch((err: unknown) => {
+      if (n >= MAX_LOAD_ATTEMPTS) throw err;
+      return new Promise<T>((resolve, reject) => {
+        globalThis.setTimeout(() => {
+          attempt(n + 1).then(resolve, reject);
+        }, retryDelayMs(n));
+      });
+    });
+  return attempt(1);
+}
+
 function loader(): GLTFLoader {
   if (!gltfLoader) {
     gltfLoader = new GLTFLoader();
@@ -70,30 +89,29 @@ export function loadGltf(url: string): Promise<GLTF> {
   let p = gltfCache.get(resolved);
   if (!p) {
     const startedAt = assetLoadStarted();
-    p = scheduleLoad(
-      gltfQueue,
-      () =>
-        new Promise<GLTF>((resolve, reject) => {
-          loader().load(
-            resolved,
-            (gltf) => {
-              recordAssetLoad('gltf', resolved, startedAt);
-              resolve(gltf);
-            },
-            undefined,
-            () => {
-              recordAssetLoad('gltf', resolved, startedAt, true);
-              reject(new Error(`asset load failed: ${url} (missing file or bad GLB)`));
-            },
-          );
-        }),
-    ).catch((err: unknown) => {
-      // Evict the rejected promise so the next call re-fetches rather than
-      // permanently caching a failure (black void bug: rejected promise poisons
-      // ensureDungeonAssets for the whole session).
-      gltfCache.delete(resolved);
-      throw err;
-    });
+    p = scheduleLoad(gltfQueue, () =>
+      withRetry(
+        () =>
+          new Promise<GLTF>((resolve, reject) => {
+            loader().load(resolved, resolve, undefined, () =>
+              reject(new Error(`asset load failed: ${url} (missing file or bad GLB)`)),
+            );
+          }),
+      ),
+    ).then(
+      (gltf) => {
+        recordAssetLoad('gltf', resolved, startedAt);
+        return gltf;
+      },
+      (err: unknown) => {
+        recordAssetLoad('gltf', resolved, startedAt, true);
+        // Evict the rejected promise so the next call re-fetches rather than
+        // permanently caching a failure (black void bug: rejected promise poisons
+        // ensureDungeonAssets for the whole session).
+        gltfCache.delete(resolved);
+        throw err;
+      },
+    );
     gltfCache.set(resolved, p);
   }
   return p;
@@ -117,7 +135,10 @@ const hdrWorkerPending = new Map<
   number,
   (r: import('./hdr_decode_worker').HdrDecodeResponse) => void
 >();
-function hdrDecodeInWorker(url: string): Promise<import('./hdr_decode_worker').HdrDecodeResponse> {
+function hdrDecodeInWorker(
+  url: string,
+  maxWidth?: number,
+): Promise<import('./hdr_decode_worker').HdrDecodeResponse> {
   if (!hdrWorker) {
     try {
       hdrWorker = new Worker(new URL('./hdr_decode_worker.ts', import.meta.url), {
@@ -145,7 +166,11 @@ function hdrDecodeInWorker(url: string): Promise<import('./hdr_decode_worker').H
   const id = ++hdrWorkerSeq;
   return new Promise((resolve) => {
     hdrWorkerPending.set(id, resolve);
-    hdrWorker?.postMessage({ id, url } satisfies import('./hdr_decode_worker').HdrDecodeRequest);
+    hdrWorker?.postMessage({
+      id,
+      url,
+      maxWidth,
+    } satisfies import('./hdr_decode_worker').HdrDecodeRequest);
   });
 }
 
@@ -164,44 +189,97 @@ function finishHdrTexture(tex: THREE.DataTexture): THREE.DataTexture {
   return tex;
 }
 
+interface HdrTextureImage {
+  data: Uint16Array<ArrayBuffer> | Float32Array<ArrayBuffer>;
+  width: number;
+  height: number;
+}
+
+function decodedHdrImage(image: unknown): HdrTextureImage | null {
+  if (typeof image !== 'object' || image === null) return null;
+  const data = Reflect.get(image, 'data');
+  const width = Reflect.get(image, 'width');
+  const height = Reflect.get(image, 'height');
+  if (
+    (!(data instanceof Uint16Array) && !(data instanceof Float32Array)) ||
+    typeof width !== 'number' ||
+    !Number.isInteger(width) ||
+    width <= 0 ||
+    typeof height !== 'number' ||
+    !Number.isInteger(height) ||
+    height <= 0
+  ) {
+    return null;
+  }
+  if (!(data.buffer instanceof ArrayBuffer)) return null;
+  const pixels =
+    data instanceof Uint16Array
+      ? new Uint16Array(data.buffer, data.byteOffset, data.length)
+      : new Float32Array(data.buffer, data.byteOffset, data.length);
+  return { data: pixels, width, height };
+}
+
+export interface HdrLoadOptions {
+  /** Resize decoded pixels in the worker before transfer (used by PMREM). */
+  maxWidth?: number;
+}
+
 /** Equirectangular Radiance .hdr for IBL / sky sampling (HalfFloat). */
-export function loadHdr(url: string): Promise<THREE.DataTexture> {
+export function loadHdr(url: string, options: HdrLoadOptions = {}): Promise<THREE.DataTexture> {
   const resolved = assetUrl(url);
-  let p = hdrCache.get(resolved);
+  const maxWidth = options.maxWidth ? Math.max(1, Math.floor(options.maxWidth)) : undefined;
+  const cacheKey = maxWidth ? `${resolved}#max-width=${maxWidth}` : resolved;
+  let p = hdrCache.get(cacheKey);
   if (!p) {
     const startedAt = assetLoadStarted();
-    p = scheduleLoad(hdrQueue, async () => {
-      // Decode off-thread when the host has workers (the game client);
-      // plain-Node tests and exotic hosts fall back to the loader path.
-      if (typeof Worker !== 'undefined') {
-        const decoded = await hdrDecodeInWorker(resolved);
-        if (decoded.ok && decoded.data && decoded.width && decoded.height) {
-          const pixels = decoded.data as unknown as Uint16Array<ArrayBuffer>;
-          const tex = new THREE.DataTexture(pixels, decoded.width, decoded.height);
-          tex.type = decoded.type as THREE.TextureDataType;
-          finishHdrTexture(tex);
-          recordAssetLoad('hdr', resolved, startedAt);
-          return tex;
+    p = scheduleLoad(hdrQueue, () =>
+      withRetry(async () => {
+        if (typeof Worker !== 'undefined') {
+          const decoded = await hdrDecodeInWorker(resolved, maxWidth);
+          if (decoded.ok && decoded.data && decoded.width && decoded.height) {
+            const pixels = decoded.data as unknown as Uint16Array<ArrayBuffer>;
+            const tex = new THREE.DataTexture(pixels, decoded.width, decoded.height);
+            tex.type = decoded.type as THREE.TextureDataType;
+            return finishHdrTexture(tex);
+          }
         }
-        // fall through to the main-thread loader on a worker failure
-      }
-      return new Promise<THREE.DataTexture>((resolve, reject) => {
-        new RGBELoader().load(
-          resolved,
-          (tex) => {
-            tex.mapping = THREE.EquirectangularReflectionMapping;
-            recordAssetLoad('hdr', resolved, startedAt);
-            resolve(tex);
-          },
-          undefined,
-          () => {
-            recordAssetLoad('hdr', resolved, startedAt, true);
-            reject(new Error(`hdr load failed: ${url}`));
-          },
-        );
-      });
-    });
-    hdrCache.set(resolved, p);
+        return new Promise<THREE.DataTexture>((resolve, reject) => {
+          new RGBELoader().load(
+            resolved,
+            (loaded) => {
+              let tex = loaded;
+              const image = decodedHdrImage(loaded.image);
+              if (maxWidth && !image) {
+                reject(new Error(`hdr load failed: ${url} (invalid decoded pixels)`));
+                return;
+              }
+              if (maxWidth && image && image.width > maxWidth) {
+                const resized = resampleHdrRgba(image.data, image.width, image.height, maxWidth);
+                tex = new THREE.DataTexture(resized.data, resized.width, resized.height);
+                tex.type = loaded.type;
+                finishHdrTexture(tex);
+                loaded.dispose();
+              } else {
+                tex.mapping = THREE.EquirectangularReflectionMapping;
+              }
+              resolve(tex);
+            },
+            undefined,
+            () => reject(new Error(`hdr load failed: ${url}`)),
+          );
+        });
+      }),
+    ).then(
+      (tex) => {
+        recordAssetLoad('hdr', resolved, startedAt);
+        return tex;
+      },
+      (err: unknown) => {
+        recordAssetLoad('hdr', resolved, startedAt, true);
+        throw err;
+      },
+    );
+    hdrCache.set(cacheKey, p);
   }
   return p;
 }
@@ -216,25 +294,31 @@ export function loadTexture(
   let p = texCache.get(key);
   if (!p) {
     const startedAt = assetLoadStarted();
-    p = scheduleLoad(
-      textureQueue,
-      () =>
-        new Promise<THREE.Texture>((resolve, reject) => {
-          new THREE.TextureLoader().load(
-            resolved,
-            (tex) => {
-              if (opts.srgb) tex.colorSpace = THREE.SRGBColorSpace;
-              if (opts.repeat) tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-              recordAssetLoad('texture', resolved, startedAt);
-              resolve(tex);
-            },
-            undefined,
-            () => {
-              recordAssetLoad('texture', resolved, startedAt, true);
-              reject(new Error(`texture load failed: ${url}`));
-            },
-          );
-        }),
+    p = scheduleLoad(textureQueue, () =>
+      withRetry(
+        () =>
+          new Promise<THREE.Texture>((resolve, reject) => {
+            new THREE.TextureLoader().load(
+              resolved,
+              (tex) => {
+                if (opts.srgb) tex.colorSpace = THREE.SRGBColorSpace;
+                if (opts.repeat) tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+                resolve(tex);
+              },
+              undefined,
+              () => reject(new Error(`texture load failed: ${url}`)),
+            );
+          }),
+      ),
+    ).then(
+      (tex) => {
+        recordAssetLoad('texture', resolved, startedAt);
+        return tex;
+      },
+      (err: unknown) => {
+        recordAssetLoad('texture', resolved, startedAt, true);
+        throw err;
+      },
     );
     texCache.set(key, p);
   }

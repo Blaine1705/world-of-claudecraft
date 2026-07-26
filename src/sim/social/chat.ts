@@ -29,8 +29,9 @@ import {
   type SentChat,
 } from '../sim';
 import type { SimContext } from '../sim_context';
-import { dist2d, type Entity, type OverheadEmoteId, YELL_RANGE } from '../types';
+import { dist2d, type Entity, type OverheadEmoteId, type PlayerClass, YELL_RANGE } from '../types';
 import { requestUnstuck } from '../unstuck';
+import { setAwayState } from './away';
 import * as readouts from './chat_readouts';
 
 const CHAT_BURST = 8; // messages a player may send back-to-back...
@@ -44,6 +45,18 @@ const OVERHEAD_EMOTE_DURATION = 3.2;
 // mob/boss yell emitters (mob/yells.ts, encounters/*) never call this.
 function speakerTitle(meta: PlayerMeta): { fromTitle?: string } {
   return meta.activeTitle ? { fromTitle: meta.activeTitle } : {};
+}
+
+// The speaker's class, spread into every PLAYER-sourced chat emit as the
+// optional `classId` field, the same pattern as speakerTitle above and for the
+// same reason: it rides the event because general/world/lfg/guild chat reaches
+// listeners far outside the sender's interest scope, where reading the class
+// off `IWorld.entities` at render time (world-complete offline, interest-
+// scoped online) would silently drop it for the exact channels it matters
+// most in. Always present for a player sender (a class is never optional), so
+// this only omits the key for the mob/boss yell emitters, which never call it.
+function speakerClass(meta: PlayerMeta): { classId: PlayerClass } {
+  return { classId: meta.cls };
 }
 
 // Predefined social emotes. Each entry maps a command (and its aliases) to the
@@ -117,7 +130,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     const mode = awaym[1].toLowerCase() as AwayStatus['mode'];
     const custom = awaym[2]?.trim();
     if (r.meta.away?.mode === mode && !custom) {
-      r.meta.away = null;
+      setAwayState(r.e, r.meta, null);
       ctx.emit({
         type: 'log',
         text:
@@ -129,7 +142,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       });
     } else {
       const message = custom || (mode === 'afk' ? 'Away From Keyboard' : 'Do Not Disturb');
-      r.meta.away = { mode, message };
+      setAwayState(r.e, r.meta, { mode, message });
       ctx.emit({
         type: 'log',
         text:
@@ -145,7 +158,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
 
   // Any other chat means you're back: clear a lingering away status.
   if (r.meta.away) {
-    r.meta.away = null;
+    setAwayState(r.e, r.meta, null);
     ctx.emit({
       type: 'log',
       text: 'You are no longer marked as away.',
@@ -224,6 +237,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
           fromPid: r.meta.entityId,
           from: r.meta.name,
           ...speakerTitle(r.meta),
+          ...speakerClass(r.meta),
           text,
           channel: 'roll',
           pid: mPid,
@@ -238,6 +252,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
           fromPid: r.meta.entityId,
           from: r.meta.name,
           ...speakerTitle(r.meta),
+          ...speakerClass(r.meta),
           text,
           channel: 'roll',
           pid: meta.entityId,
@@ -698,6 +713,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
           fromPid: r.meta.entityId,
           from: r.meta.name,
           ...speakerTitle(r.meta),
+          ...speakerClass(r.meta),
           to: target.name,
           text: msg,
           channel: 'whisper',
@@ -719,6 +735,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
         fromPid: r.meta.entityId,
         from: r.meta.name,
         ...speakerTitle(r.meta),
+        ...speakerClass(r.meta),
         text: msg,
         channel: 'whisper',
         pid: target.entityId,
@@ -728,6 +745,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       fromPid: r.meta.entityId,
       from: r.meta.name,
       ...speakerTitle(r.meta),
+      ...speakerClass(r.meta),
       to: target.name,
       text: msg,
       channel: 'whisper',
@@ -745,6 +763,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
         fromPid: target.entityId,
         from: target.name,
         ...speakerTitle(target),
+        ...speakerClass(target),
         text: reply,
         channel: 'whisper',
         pid: r.meta.entityId,
@@ -768,6 +787,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
         fromPid: r.meta.entityId,
         from: r.meta.name,
         ...speakerTitle(r.meta),
+        ...speakerClass(r.meta),
         text: clean,
         channel: 'party',
         pid: mPid,
@@ -787,6 +807,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       fromPid: r.meta.entityId,
       from: r.meta.name,
       ...speakerTitle(r.meta),
+      ...speakerClass(r.meta),
       text: clean,
       channel: 'general',
     });
@@ -827,6 +848,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
           fromPid: r.meta.entityId,
           from: r.meta.name,
           ...speakerTitle(r.meta),
+          ...speakerClass(r.meta),
           text: clean,
           channel,
           pid: subPid,
@@ -905,6 +927,7 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       fromPid: r.meta.entityId,
       from: r.meta.name,
       ...speakerTitle(r.meta),
+      ...speakerClass(r.meta),
       text: clean,
       channel,
       entityId: r.e.id,
@@ -1005,6 +1028,7 @@ export function broadcastEmote(
       fromPid: actor.entityId,
       from: actor.name,
       ...speakerTitle(actor),
+      ...speakerClass(actor),
       text: body,
       channel: 'emote',
       entityId: actorEntity.id,

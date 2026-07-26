@@ -10,19 +10,27 @@ import type { MountKey } from '../sim/content/mounts';
 export interface IWorldMounts {
   /** The persisted stable pick (always a valid key; the horse by default). */
   selectedMount(): MountKey;
-  /** The owned subset of the catalog, in catalog order: the horse always,
-   *  any other mount while its reins item sits in bags or bank. */
+  /** The owned subset of the catalog, in catalog order: any mount whose
+   *  reins item sits in bags or bank (soulbound). A fresh player owns nothing. */
   ownedMounts(): readonly MountKey[];
+  /** Whether the player has purchased the riding skill from Marla (80g).
+   *  Required before selecting or summoning any mount. */
+  ridingTrained(): boolean;
   /** Pick an owned mount (level-gated; swaps in place while riding). */
   selectMount(key: MountKey): void;
   /** Mount the selected mount, or dismount while riding. */
   toggleMounted(): void;
+  /** Purchase the riding skill from Marla the stables trainer for 80 gold (800000
+   *  copper). One-time: once ridingTrained is true it never reverts. Requires the
+   *  player to be level 20, alive, and standing near Marla. Emits an error toast on
+   *  failure (not enough money, wrong NPC, wrong level). */
+  learnRiding(npcId: number): void;
   /** Legacy start for a riding-lesson attempt at Stablemaster Marla, gating
-   *  reins_valorsteed's q_riding_lessons quest reward (charges the one-time 100g
-   *  fee on first success). Current lesson completion comes from finishing the
-   *  show-jumping race on the lent training Valorsteed. Server-authoritative; rules live in
-   *  src/sim/mounts_training.ts, feedback rides the mountTrain* events. Current
-   *  clients start the lesson directly from the race platform instead. */
+   *  reins_valorsteed's q_riding_lessons quest reward. Current lesson completion
+   *  comes from finishing the show-jumping race on the lent training Valorsteed.
+   *  Server-authoritative; rules live in src/sim/mounts_training.ts, feedback
+   *  rides the mountTrain* events. Current clients start the lesson directly from
+   *  the race platform instead. */
   mountTrainBegin(): void;
   /** Begin a show-jumping race from the glowing square behind the arch. An active
    *  riding quest may start dismounted (the server lends its training horse);

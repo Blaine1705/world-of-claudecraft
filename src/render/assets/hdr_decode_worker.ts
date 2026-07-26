@@ -4,10 +4,12 @@
 // time zone streaming brought in a new biome's sky. The decoded pixel buffer
 // transfers back zero-copy; the main thread only builds the DataTexture.
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
+import { resampleHdrRgba } from '../hdr_resample';
 
 export interface HdrDecodeRequest {
   id: number;
   url: string;
+  maxWidth?: number;
 }
 
 export interface HdrDecodeResponse {
@@ -22,7 +24,7 @@ export interface HdrDecodeResponse {
 }
 
 self.onmessage = async (e: MessageEvent<HdrDecodeRequest>) => {
-  const { id, url } = e.data;
+  const { id, url, maxWidth } = e.data;
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`hdr fetch failed: ${res.status}`);
@@ -33,15 +35,19 @@ self.onmessage = async (e: MessageEvent<HdrDecodeRequest>) => {
       data: Uint16Array | Float32Array;
       type: number;
     };
+    const resized =
+      maxWidth && maxWidth > 0
+        ? resampleHdrRgba(parsed.data, parsed.width, parsed.height, maxWidth)
+        : parsed;
     const out: HdrDecodeResponse = {
       id,
       ok: true,
-      width: parsed.width,
-      height: parsed.height,
-      data: parsed.data,
+      width: resized.width,
+      height: resized.height,
+      data: resized.data,
       type: parsed.type,
     };
-    (self as unknown as Worker).postMessage(out, [parsed.data.buffer as ArrayBuffer]);
+    (self as unknown as Worker).postMessage(out, [resized.data.buffer as ArrayBuffer]);
   } catch (err) {
     const out: HdrDecodeResponse = { id, ok: false, error: String(err) };
     (self as unknown as Worker).postMessage(out);

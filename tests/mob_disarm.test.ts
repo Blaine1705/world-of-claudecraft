@@ -101,6 +101,35 @@ describe('mob disarm ("Disarming Smash")', () => {
     expect(dummy.hp).toBeLessThan(before);
   });
 
+  // Bug: Disarming Smash refreshes its full 6s duration on every landed proc,
+  // with no guard against re-applying while already active. A single Thornpeak
+  // Crusher swings every 2.6s, so a run of lucky 25%-chance procs (or a second
+  // crusher in the same pack landing its own roll) can keep re-arming the debuff
+  // faster than it falls off, locking the player out of auto-attack for far
+  // longer than the stated 6s window ("Autoattack on Thornpeak Crusher freqently
+  // does not work. Cant start swingtimer again").
+  it('does not extend disarm past its base duration on a repeat proc while already active', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(60); // enough HP to survive incidental mob swings during the tick loop
+    const p = sim.player;
+    const mob = spawnCrusher(sim, p);
+    try {
+      MOBS['ogre_crusher'].disarm!.chance = 1; // deterministic: every landed hit procs
+      swing(sim, mob, p); // first proc: applies the debuff, 6s remaining
+      const first = p.auras.find((a) => a.kind === 'disarm');
+      expect(first?.remaining).toBe(6);
+      // Let 5s pass (still disarmed: 1s left), then land a second proc before it
+      // falls off. The debuff must NOT reset back up to a fresh 6s.
+      for (let i = 0; i < 20 * 5; i++) sim.tick();
+      swing(sim, mob, p);
+      const second = p.auras.find((a) => a.kind === 'disarm');
+      expect(second).toBeTruthy();
+      expect(second!.remaining).toBeCloseTo(1, 1);
+    } finally {
+      MOBS['ogre_crusher'].disarm!.chance = 0.25;
+    }
+  });
+
   it('a friendly pet swing never disarms its target', () => {
     const sim = makeSim();
     const p = sim.player;

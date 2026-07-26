@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   distanceSqToZone,
   fogFarForPreparedZones,
+  INITIAL_SKY_PREWARM_RADIUS,
   MAX_OUTDOOR_FOG_FAR,
   MIN_OUTDOOR_FOG_FAR,
   UNPREPARED_ZONE_FOG_GUARD,
@@ -38,11 +39,34 @@ describe('renderer zone-streaming horizon', () => {
     expect(ids.length).toBeLessThan(ZONES.length / 2);
   });
 
+  it('limits loading-screen sky uploads to the active and immediately adjacent biomes', () => {
+    const nearby = zonesWithinStreamingHorizon(ZONES, 2, -2, INITIAL_SKY_PREWARM_RADIUS);
+    expect(nearby.map((zone) => zone.id)).toEqual([
+      'eastbrook_vale',
+      'farshore_isle',
+      'mirefen_marsh',
+    ]);
+    expect([...new Set(nearby.map((zone) => zone.biome))]).toEqual(['vale', 'marsh']);
+  });
+
   it('prioritizes the camera-facing zone when adjacent boundaries tie', () => {
     const east = zonesWithinStreamingHorizon(ZONES, 0, 0, 470, 1, 0).map((zone) => zone.id);
     const north = zonesWithinStreamingHorizon(ZONES, 0, 0, 470, 0, 1).map((zone) => zone.id);
     expect(east.indexOf('farshore_isle')).toBeLessThan(east.indexOf('mirefen_marsh'));
     expect(north.indexOf('mirefen_marsh')).toBeLessThan(north.indexOf('farshore_isle'));
+  });
+
+  it('prepares the travel-direction zone before a marginally nearer sideways zone', () => {
+    // Regression for the Mirefen crossing stall: from the spawn walk north,
+    // Farshore (178 yd east) is strictly nearer than Mirefen (182 yd north),
+    // so nearest-first ordering spent the whole approach building the isle
+    // while the player crossed into an unprepared marsh.
+    const ids = zonesWithinStreamingHorizon(ZONES, 2, -2, 470, 0, 1).map((zone) => zone.id);
+    expect(ids[0]).toBe('eastbrook_vale');
+    expect(ids.indexOf('mirefen_marsh')).toBeLessThan(ids.indexOf('farshore_isle'));
+    // A stationary east-facing camera still takes the strictly nearer isle.
+    const east = zonesWithinStreamingHorizon(ZONES, 2, -2, 470, 1, 0).map((zone) => zone.id);
+    expect(east.indexOf('farshore_isle')).toBeLessThan(east.indexOf('mirefen_marsh'));
   });
 
   it('uses a non-zero movement threshold for cheap frame-loop rechecks', () => {

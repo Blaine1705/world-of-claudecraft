@@ -26,6 +26,7 @@ import {
 import { polygonIsStarShaped, polygonSelfIntersects, polygonSignedArea } from '../geometry2d';
 import { Rng } from '../rng';
 import { authoredLiftAt } from './authored';
+import { RIFT_RANK_BASE_LEVEL, riftFloorLevel, riftHeroicTuningFor } from './ranks';
 import { buildStyle, mixSeed } from './style';
 import type {
   RiftFloorPlan,
@@ -43,11 +44,13 @@ import { applyRiftUpgrade } from './upgrade';
 // ---- Tuning -----------------------------------------------------------------
 const MIN_FLOORS = 3;
 const MAX_FLOORS = 6;
-// Rift mobs never exceed this level, even on a deep S-rank floor. The player cap is
-// MAX_LEVEL (20) and 24+ is effectively unreachable, so an S-rank baseLevel (28) +
-// deep floorIndex would spawn mobs the player can never match; clamp so the hardest
-// rift tops out a hair above the cap (22) and stays a fair, if brutal, fight.
-const RIFT_LEVEL_CAP = 22;
+
+// Mob levels are rank-banded in rift/ranks.ts: C ramps under the classic
+// fairness cap (22), B/A hold 22 and get their bite from the heroic stat
+// transform, and S-rank floors are a flat 23 by design (re-exported here for
+// the callers that historically read the cap off the generator).
+export { RIFT_LEVEL_CAP, RIFT_MAX_MOB_LEVEL } from './ranks';
+
 const ENTRY_Z_OFFSET = 8; // player arrival, past the entrance porch
 const AISLE_HALF = 5.5; // centre column kept clear of all obstacles (walkable spine)
 const BODY_R = 0.6; // player body radius used for clearance checks
@@ -68,17 +71,26 @@ const RIFT_SUFFIXES = [
  * shifts any draw the procedural generator makes. */
 const SET_PIECE_CHANCE = 0.15;
 
-/** Whether this rift seed opens the hand-authored Infernal Citadel. Pure and
- * independent of rank: the tier only sets baseLevel (marks/loot), so the citadel
- * can headline a C-rank or an S-rank portal alike. */
+/** Whether this SEED rolls the hand-authored Infernal Citadel (pure seed
+ * property; whether it actually OPENS depends on the rank, see isSetPieceRift). */
 export function isSetPieceSeed(seed: number): boolean {
   return new Rng(mixSeed(seed, 0x1f3e)).chance(SET_PIECE_CHANCE);
 }
 
-/** How many floors this rift runs (deterministic from the seed). The authored
- * set-piece descends from the citadel halls into the pit. */
-export function riftFloorCount(seed: number): number {
-  if (isSetPieceSeed(seed)) return INFERNAL_FLOOR_COUNT;
+/** Whether this seed+rank opens the citadel. The 2-floor authored set-piece is
+ * C content only: B, A and S rank dungeons are heroic scaled and guaranteed
+ * 3+ floors, so a heroic-rank portal always runs the procedural descent, even
+ * on a set-piece seed. Pure over the descriptor, so every host agrees. */
+export function isSetPieceRift(seed: number, baseLevel: number): boolean {
+  return isSetPieceSeed(seed) && riftHeroicTuningFor(baseLevel) === null;
+}
+
+/** How many floors this rift runs (deterministic from the descriptor). The
+ * authored set-piece descends from the citadel halls into the pit; every
+ * procedural rift (including any B/A/S run) is 3 to 6 floors. `baseLevel`
+ * defaults to the C-rank baseline for legacy seed-only callers. */
+export function riftFloorCount(seed: number, baseLevel: number = RIFT_RANK_BASE_LEVEL.C): number {
+  if (isSetPieceRift(seed, baseLevel)) return INFERNAL_FLOOR_COUNT;
   return new Rng(mixSeed(seed, 0x510f)).int(MIN_FLOORS, MAX_FLOORS);
 }
 
@@ -521,21 +533,18 @@ function planObjects(
     }
   }
 
-  // Off-path hidden treasure: ~45% of non-boss floors tuck a reward chest into a
-  // wall pocket behind an illusion (fake) wall you walk THROUGH to reach it. The
-  // fake wall renders as solid stone but carries no collider (see layoutColliders),
-  // so a curious explorer who pushes into the "dead end" is rewarded.
+  // Off-path treasure: ~45% of non-boss floors tuck a reward chest against a wall
+  // off the main aisle. It used to hide behind an illusion (fake) wall, but every
+  // rift wall is solid now (phantom walls confused more than they delighted and
+  // could visually swallow objectives), so the chest simply sits in the open as a
+  // reward for hugging the walls.
   if (rng.chance(0.45)) {
     const side = rng.chance(0.5) ? -1 : 1;
     const zT = Math.round(layout.zMin + rng.range(32, Math.max(32, layout.dais.z - 26)));
     const localW = halfWidthAt(zT);
     if (localW >= AISLE_HALF + 8) {
-      // Chest sits in the pocket (toClear guarantees it is off the wall); the fake
-      // wall stands between it and the aisle (nearer the spine), so you push through
-      // the fake wall to reach the chest against the real wall.
+      // toClear guarantees the chest is off the wall (and every other collider).
       const chest = toClear(colliders, side * (localW - 4), zT, 1.0);
-      layout.illusionWalls = layout.illusionWalls ?? [];
-      layout.illusionWalls.push({ x: side * (localW - 6.5), z: zT, hw: 2.6, hd: 2.4 });
       out.push({ kind: 'treasure', x: chest.x, z: chest.z, name: 'Hidden Cache' });
     }
   }
@@ -716,12 +725,12 @@ function upgradedFloor(base: RiftFloorPlan, upgrade?: RiftUpgradeManifest | null
 const CACHE_LIMIT = 128;
 
 function floorLevelFor(baseLevel: number, floorIndex: number): number {
-  return Math.max(1, Math.min(RIFT_LEVEL_CAP, Math.round(baseLevel) + floorIndex));
+  return riftFloorLevel(baseLevel, floorIndex);
 }
 
 /** The rift as a whole: name + floor count (derived from seed + baseLevel). */
 export function generateRiftPlan(seed: number, baseLevel: number): RiftPlan {
-  if (isSetPieceSeed(seed)) {
+  if (isSetPieceRift(seed, baseLevel)) {
     return {
       seed,
       baseLevel,
@@ -730,7 +739,7 @@ export function generateRiftPlan(seed: number, baseLevel: number): RiftPlan {
       floorCount: INFERNAL_FLOOR_COUNT,
     };
   }
-  const floorCount = riftFloorCount(seed);
+  const floorCount = riftFloorCount(seed, baseLevel);
   const bossTheme = themeForFloor(seed, floorCount - 1);
   const nameRng = new Rng(mixSeed(seed, 0x9a3e));
   const noun = nameRng.pick(bossTheme.nouns as string[]);
@@ -756,9 +765,9 @@ export function generateRiftFloor(
   const cached = FLOOR_CACHE.get(key);
   if (cached) return upgradedFloor(cached, upgrade);
 
-  // Authored set-piece seeds short-circuit the whole procedural chain BEFORE any
-  // draw is made, so the procedural draw order for every other seed is untouched.
-  if (isSetPieceSeed(seed)) {
+  // Authored set-piece runs short-circuit the whole procedural chain BEFORE any
+  // draw is made, so the procedural draw order for every other run is untouched.
+  if (isSetPieceRift(seed, baseLevel)) {
     const setIndex = Math.max(0, Math.min(INFERNAL_FLOOR_COUNT - 1, floorIndex));
     const setPiece = buildInfernalCitadelFloor(
       seed,
@@ -771,7 +780,7 @@ export function generateRiftFloor(
     return upgradedFloor(setPiece, upgrade);
   }
 
-  const floorCount = riftFloorCount(seed);
+  const floorCount = riftFloorCount(seed, baseLevel);
   const clampedIndex = Math.max(0, Math.min(floorCount - 1, floorIndex));
   const isBoss = clampedIndex === floorCount - 1;
   const theme = themeForFloor(seed, clampedIndex);

@@ -177,15 +177,19 @@ describe('delve spatial band', () => {
     expect(isDelvePos(ARENA_X)).toBe(false);
   });
 
-  it('pins the delve boundary against the arena seam (relocation regression)', () => {
+  it('pins the delve boundary against the arena and Orkadia seams (relocation regression)', () => {
     // DELVE_X_MIN moved 3600 -> 4800 when v0.10.0 pushed the arena to x=4200,
     // and the whole instance plane moved east by INSTANCE_X_BASE when the
     // world went grid (stage 2). Pin the load-bearing offset and the exact
-    // arena/delve seam so a respacing that re-introduces overlap fails here.
+    // arena/dungeon/delve seams so a respacing that re-introduces overlap fails here.
     expect(DELVE_X_MIN).toBe(INSTANCE_X_BASE + 4800);
-    // The seam: DELVE_BAND_X_MIN is the first delve x; the x just below it is arena.
-    expect(isArenaPos(DELVE_BAND_X_MIN - 1)).toBe(true);
+    // Three regions sit west of the delve band: the tight arena column (ARENA_X),
+    // the Orkadia dungeon slot (index 6, past the arena), then the delve band. The
+    // x just below the delve band is the Orkadia slot, NOT the arena, so the arena
+    // band no longer stretches across the whole gap (that was the pitch-black-room bug).
+    expect(isArenaPos(DELVE_BAND_X_MIN - 1)).toBe(false);
     expect(isDelvePos(DELVE_BAND_X_MIN - 1)).toBe(false);
+    expect(dungeonAt(DELVE_BAND_X_MIN - 1)?.interior).toBe('orkadia');
     expect(isDelvePos(DELVE_BAND_X_MIN)).toBe(true);
     expect(isArenaPos(DELVE_BAND_X_MIN)).toBe(false);
     // Keep a real gap between the arena anchor and the delve band.
@@ -910,7 +914,7 @@ describe('delve reward chest + surface exit flow', () => {
     sim.player.pos = { ...chestEnt.pos };
     sim.player.prevPos = { ...chestEnt.pos };
 
-    sim.delveInteract(chestId);
+    expect(sim.delveInteract(chestId)).toBe(true);
     const events = sim.tick();
     const offer = events.find((e) => e.type === 'lockpickOffer');
     expect(offer).toBeDefined();
@@ -1082,7 +1086,7 @@ describe('delve reward chest + surface exit flow', () => {
     killBoss(sim, run);
     const chestId = pickLockFlawless(sim, run, 1);
 
-    sim.delveInteract(chestId); // already looted
+    expect(sim.delveInteract(chestId)).toBe(false); // already looted
     const events = sim.tick();
     const emptyLog = events.find(
       (ev) => ev.type === 'log' && (ev as any).text === 'The chest is empty.',
@@ -2423,13 +2427,13 @@ describe('The Drowned Litany (Phase 5 room puzzles)', () => {
     sim.tick();
     expect(run.objectState[ropeId!].triggered).toBe(false);
     expect(cantor.hp).toBe(hp0);
-    sim.delveInteract(ropeId!);
+    expect(sim.delveInteract(ropeId!)).toBe(true);
     expect(run.objectState[ropeId!].triggered).toBe(true);
     expect(rope.templateId).toBe('delve_bell_rope_pulled');
     expect(hp0 - cantor.hp).toBe(18);
     // A second pull on a slack rope is inert.
     sim.drainEvents();
-    sim.delveInteract(ropeId!);
+    expect(sim.delveInteract(ropeId!)).toBe(false);
     const events = sim.drainEvents();
     expect(events.some((e) => e.type === 'error' && e.text === 'Nothing happens.')).toBe(true);
     expect(hp0 - cantor.hp).toBe(18);
