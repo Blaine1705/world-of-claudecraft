@@ -1300,10 +1300,10 @@ export const en_XA: EnTranslations = {
     },
     "plurals": {
       "guildMembers": {
-        "one": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕ]",
-        "few": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕš]",
-        "many": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕš]",
-        "other": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕš]"
+        "one": "[ýóúŕ ĝúíļð ŕáñķ íš {rank}; {count} ɱéɱƀéŕ]",
+        "few": "[ýóúŕ ĝúíļð ŕáñķ íš {rank}; {count} ɱéɱƀéŕš]",
+        "many": "[ýóúŕ ĝúíļð ŕáñķ íš {rank}; {count} ɱéɱƀéŕš]",
+        "other": "[ýóúŕ ĝúíļð ŕáñķ íš {rank}; {count} ɱéɱƀéŕš]"
       },
       "finderPartySize": {
         "one": "[{count} þļáýéŕ]",

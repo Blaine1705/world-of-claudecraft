@@ -1210,10 +1210,10 @@ export const hudChromeStrings = {
   // count is auto-supplied as {count}. Keep all four categories present per base.
   plurals: {
     guildMembers: {
-      one: 'you are {rank}, {count} member',
-      few: 'you are {rank}, {count} members',
-      many: 'you are {rank}, {count} members',
-      other: 'you are {rank}, {count} members',
+      one: 'your guild rank is {rank}; {count} member',
+      few: 'your guild rank is {rank}; {count} members',
+      many: 'your guild rank is {rank}; {count} members',
+      other: 'your guild rank is {rank}; {count} members',
     },
     finderPartySize: {
       one: '{count} player',

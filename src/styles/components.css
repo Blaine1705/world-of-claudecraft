@@ -7307,6 +7307,8 @@
     font-size: 12px;
     color: #f0ead8;
     overflow-wrap: anywhere;
+    user-select: text;
+    -webkit-user-select: text;
   }
   .soc-billboard-msg.empty {
     color: #887c5c;
