@@ -5,7 +5,7 @@
 // never drift from shipped content.
 
 import { describe, expect, it } from 'vitest';
-import { CAMPS, GATHER_NODES, GROUND_OBJECTS, MOBS, QUESTS } from '../src/sim/data';
+import { CAMPS, GATHER_NODES, GROUND_OBJECTS, MOBS, QUESTS, zoneAt } from '../src/sim/data';
 import { questObjectiveAreas, questObjectivesForMob } from '../src/sim/quest_targets';
 import type { QuestDef, QuestProgress } from '../src/sim/types';
 
@@ -145,18 +145,63 @@ describe('questObjectiveAreas', () => {
     expect(containing, 'expected one area enclosing the whole object cluster').toBeTruthy();
   });
 
-  it('marks every node of a gather objective type', () => {
+  it('encloses each cluster of gather nodes in one circle, never one per node', () => {
+    // This used to look for a circle centred exactly ON each node, because the
+    // gather branch drew one per node. Six nodes of every type in every zone made
+    // that a smear: the fills are translucent and composite per circle, so
+    // overlapping blobs darkened toward opaque, and each carried its own opaque
+    // numbered badge. Clustered circles are the fix, and the properties that
+    // matter are containment (no node loses its marker) and zone residency (an
+    // area whose centre lands in the wrong band is culled off every map).
     const quest = QUESTS.q_prof_intro;
     const objectiveIndex = quest.objectives.findIndex((objective) => objective.type === 'gather');
     expect(objectiveIndex).toBeGreaterThanOrEqual(0);
     const areas = questObjectiveAreas(activeLog(quest));
     const oreNodes = GATHER_NODES.filter((node) => node.type === 'ore');
+    expect(oreNodes.length).toBeGreaterThan(0);
+
+    // 1. Every node still sits inside an area, and that area carries the ref.
+    const areaFor = new Map<string, (typeof areas)[number]>();
     for (const node of oreNodes) {
       const area = areas.find(
-        (candidate) => candidate.center.x === node.pos.x && candidate.center.z === node.pos.z,
+        (candidate) =>
+          Math.hypot(candidate.center.x - node.pos.x, candidate.center.z - node.pos.z) <=
+          candidate.radius + 1e-9,
       );
-      expect(area, `gather node ${node.id} should have an objective area`).toBeTruthy();
-      expect(area?.objectives).toContainEqual({ questId: quest.id, objectiveIndex });
+      expect(area, `gather node ${node.id} should sit inside an objective area`).toBeTruthy();
+      if (!area) continue;
+      expect(area.objectives).toContainEqual({ questId: quest.id, objectiveIndex });
+      areaFor.set(node.id, area);
+    }
+
+    // 2. Fewer circles than nodes: the clustering is doing something. A per-node
+    // implementation passes arm 1 trivially, so without this the rewrite would
+    // not be pinned at all.
+    const oreAreas = new Set(areaFor.values());
+    expect(oreAreas.size, `${oreAreas.size} circles for ${oreNodes.length} ore nodes`).toBeLessThan(
+      oreNodes.length,
+    );
+
+    // 3. The worst case specifically: Eastbrook's six veins are all held inside
+    // one 20-yard ring around the Copper Dig landmark (see
+    // tests/gather_nodes.test.ts), which is exactly the pile the old loop drew six
+    // times. They must resolve to ONE circle, and it must hold all six.
+    const eastbrookOre = oreNodes.filter((n) => n.zoneId === 'eastbrook_vale');
+    expect(eastbrookOre.length).toBe(6);
+    const digAreas = new Set(eastbrookOre.map((n) => areaFor.get(n.id)));
+    expect(digAreas.size, 'the Copper Dig ore field should be one circle').toBe(1);
+
+    // 4. Every area's centre resolves to the same zone as every node inside it.
+    // map_window_view culls areas by centre z against the committed zone band, so
+    // a cluster straddling a boundary would vanish from both maps rather than
+    // render twice.
+    for (const node of oreNodes) {
+      const area = areaFor.get(node.id);
+      if (!area) continue;
+      expect(
+        zoneAt(area.center.z).id,
+        `the circle holding ${node.id} is centred in ${zoneAt(area.center.z).id}, not ${node.zoneId}`,
+      ).toBe(node.zoneId);
     }
   });
 

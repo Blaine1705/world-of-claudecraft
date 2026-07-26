@@ -32,6 +32,18 @@ export interface QuestObjectiveArea {
 const CAMP_AREA_PAD = 4;
 // Radius drawn around a lone point target (an interact NPC or single object).
 const POINT_AREA_RADIUS = 6;
+// How close two gather nodes have to be to read as ONE place on the map, used
+// by pushNodeCluster below. Every zone carries six nodes of every type
+// (content/gather_nodes.ts), so a circle per node put six translucent fills and
+// six numbered badges over one zone map, several of them overlapping, and the
+// map went from "the ore is over there" to a blue smear. This groups them first.
+//
+// 30 yards is not a knife edge: the authored clusters sit 5 to 25 yards apart
+// internally and 40-plus yards from the next cluster, so every threshold from 26
+// to 32 yards produces the identical grouping and 30 is the middle of that
+// plateau. For scale, it is close to the widest authored mob camp (24 yards),
+// which is the spread the map already draws as a single kill-objective blob.
+const NODE_CLUSTER_LINK_YD = 30;
 
 // The player's active quests' objectives that still need progress. 'ready'
 // and 'done' quests contribute nothing (the '?' turn-in marker guides those).
@@ -141,23 +153,68 @@ export function questObjectiveAreas(
         push(ref, { x: camp.center.x, z: camp.center.z }, camp.radius + CAMP_AREA_PAD);
     }
   };
-  // One enclosing circle per ground-object definition: centroid of its spawn
-  // positions plus the farthest point (a simple bound is plenty at map scale).
+  // Centroid of a set of points plus its farthest member: a simple enclosing
+  // bound, which is plenty at map scale (this is not a minimal enclosing circle
+  // and does not need to be).
+  const pushEnclosing = (ref: QuestObjectiveRef, points: readonly { x: number; z: number }[]) => {
+    let cx = 0;
+    let cz = 0;
+    for (const p of points) {
+      cx += p.x;
+      cz += p.z;
+    }
+    cx /= points.length;
+    cz /= points.length;
+    let r = 0;
+    for (const p of points) r = Math.max(r, Math.hypot(p.x - cx, p.z - cz));
+    push(ref, { x: cx, z: cz }, Math.max(POINT_AREA_RADIUS, r + CAMP_AREA_PAD));
+  };
+  // One enclosing circle per ground-object definition: each def already carries
+  // its own authored cluster of spawn positions.
   const pushObjectCluster = (ref: QuestObjectiveRef, itemId: string): void => {
     for (const def of GROUND_OBJECTS) {
       if (def.itemId !== itemId || def.positions.length === 0) continue;
-      let cx = 0;
-      let cz = 0;
-      for (const p of def.positions) {
-        cx += p.x;
-        cz += p.z;
-      }
-      cx /= def.positions.length;
-      cz /= def.positions.length;
-      let r = 0;
-      for (const p of def.positions) r = Math.max(r, Math.hypot(p.x - cx, p.z - cz));
-      push(ref, { x: cx, z: cz }, Math.max(POINT_AREA_RADIUS, r + CAMP_AREA_PAD));
+      pushEnclosing(ref, def.positions);
     }
+  };
+  // The same enclosing circle for gather nodes, one per CLUSTER. Unlike
+  // GROUND_OBJECTS, GATHER_NODES is a flat list with no authored cluster record,
+  // so the grouping is derived: single linkage at NODE_CLUSTER_LINK_YD, which is
+  // deterministic (it reads only the fixed content table, in table order, and the
+  // relation "within N yards" is symmetric so the result is independent of visit
+  // order). Grouping by zoneId instead would NOT do: the six nodes of a type in
+  // one zone are deliberately spread across it, so a per-zone circle would be
+  // 120-plus yards wide and mark most of the map as "here".
+  const pushNodeCluster = (ref: QuestObjectiveRef, nodeType: string): void => {
+    const nodes = GATHER_NODES.filter((n) => n.type === nodeType);
+    if (nodes.length === 0) return;
+    const root = nodes.map((_, i) => i);
+    const find = (i: number): number => {
+      let r = i;
+      while (root[r] !== r) r = root[r];
+      // path-compress so repeated finds stay cheap on long chains
+      while (root[i] !== r) {
+        const next = root[i];
+        root[i] = r;
+        i = next;
+      }
+      return r;
+    };
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const d = Math.hypot(nodes[i].pos.x - nodes[j].pos.x, nodes[i].pos.z - nodes[j].pos.z);
+        if (d <= NODE_CLUSTER_LINK_YD) root[find(i)] = find(j);
+      }
+    }
+    const groups = new Map<number, { x: number; z: number }[]>();
+    for (let i = 0; i < nodes.length; i++) {
+      const key = find(i);
+      const group = groups.get(key);
+      // fresh {x,z}: never alias the shared GATHER_NODES content
+      if (group) group.push({ x: nodes[i].pos.x, z: nodes[i].pos.z });
+      else groups.set(key, [{ x: nodes[i].pos.x, z: nodes[i].pos.z }]);
+    }
+    for (const group of groups.values()) pushEnclosing(ref, group);
   };
   for (const { questId, objectiveIndex, obj } of incompleteObjectives(questLog)) {
     const ref: QuestObjectiveRef = { questId, objectiveIndex };
@@ -170,12 +227,7 @@ export function questObjectiveAreas(
       const npc = obj.targetNpcId ? NPCS[obj.targetNpcId] : undefined;
       // fresh {x,z}: never alias the shared NPCS content the sim places from
       if (npc) push(ref, { x: npc.pos.x, z: npc.pos.z }, POINT_AREA_RADIUS);
-    } else if (obj.type === 'gather' && obj.nodeType) {
-      for (const node of GATHER_NODES) {
-        if (node.type === obj.nodeType)
-          push(ref, { x: node.pos.x, z: node.pos.z }, POINT_AREA_RADIUS);
-      }
-    }
+    } else if (obj.type === 'gather' && obj.nodeType) pushNodeCluster(ref, obj.nodeType);
   }
   return out;
 }

@@ -12,6 +12,7 @@ import { describe, expect, it } from 'vitest';
 import {
   CAMPS,
   DUNGEON_LIST,
+  GATHER_NODES,
   PROPS,
   QUESTS,
   WORLD_MAX_X,
@@ -476,6 +477,47 @@ describe('active-quest objective areas (the classic POI blobs)', () => {
     const model = buildOverworldMapModel(input(makeOverworldWorld('sim', activeLog()), 1));
     // single-quest log: every area carries badge number 1
     for (const a of model.questAreas) expect(a.numbers).toEqual([1]);
+  });
+
+  it('plots one blob per gather-node cluster, and the zone cull keeps them', () => {
+    // The gather branch of questObjectiveAreas is the one that groups a flat node
+    // table into clusters (quest_targets.ts pushNodeCluster), and it is the one
+    // this pure core can silently swallow: the zone-band cull here reads a
+    // circle's CENTRE, so a cluster centroid landing outside the committed band
+    // drops the blob from every map with nothing red. Nothing exercised a gather
+    // objective through this core before, so nothing would have caught it.
+    const gatherQuest = Object.values(QUESTS).find((q) =>
+      q.objectives.some((o) => o.type === 'gather' && o.nodeType === 'ore'),
+    );
+    expect(gatherQuest, 'expected a quest with an ore gather objective').toBeDefined();
+    if (!gatherQuest) return;
+    const log: Map<string, QuestProgress> = new Map([
+      [
+        gatherQuest.id,
+        {
+          questId: gatherQuest.id,
+          counts: gatherQuest.objectives.map(() => 0),
+          state: 'active' as const,
+        },
+      ],
+    ]);
+    const model = buildOverworldMapModel(input(makeOverworldWorld('sim', log), 1));
+    const zoneOre = GATHER_NODES.filter(
+      (n) => n.type === 'ore' && n.pos.z >= ZONE.zMin && n.pos.z < ZONE.zMax,
+    );
+    expect(zoneOre.length).toBeGreaterThan(1);
+    // Survived the cull, and fewer blobs than nodes: a per-node implementation
+    // would put one on each, which is the smear this replaced.
+    expect(model.questAreas.length).toBeGreaterThan(0);
+    expect(
+      model.questAreas.length,
+      `${model.questAreas.length} blobs for ${zoneOre.length} in-zone ore nodes`,
+    ).toBeLessThan(zoneOre.length);
+    for (const a of model.questAreas) {
+      expect(Number.isFinite(a.mx)).toBe(true);
+      expect(Number.isFinite(a.my)).toBe(true);
+      expect(a.radius).toBeGreaterThan(0);
+    }
   });
 
   it('hit-tests a hovered point to the objective identities under it (deduped)', () => {
