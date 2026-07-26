@@ -23,7 +23,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { bagCapacity, canGrantItemInstance, fitsAll } from './bags';
+import { bagCapacity, canGrantItemInstance, fitForItemInstance, fitsAll } from './bags';
 import { type NoticeboardDef, noticeboardDefByEntityId } from './content/noticeboards';
 import { HARVEST_COMPONENT_SPECIMENS, monsterMaterialTierFor } from './content/professions';
 import { corpseInteractionAvailability } from './corpse_interaction';
@@ -366,20 +366,33 @@ export function harvestCorpse(
   // pure extras. A signed instance merges into a byte-equal same-signer stack
   // (identical-payload stacking; never a plain stack, #1165), so
   // this gate accepts same-signer stack room OR a genuinely free slot
-  // (canGrantItemInstance, the countFit model harvestNode's signed grants
-  // share, #2139); with neither the signed-family grant falls back to the
-  // plain fungible top-up (the signature truncates, the yield does not) while
-  // a specimen truncates outright, the same truncation contract harvestNode's
-  // signed grants follow. Each downgrade tells the player via the text-free
-  // personal gatherDowngrade event, at most ONCE per harvest command (the
-  // toolDeniedEmitted idiom); the mark-lost arm runs first, so when both a
-  // signature and a jackpot are lost the single event reports the mark.
+  // (fitForItemInstance, the countFit model harvestNode's signed grants
+  // share, #2139) sized to the FULL rolled quantity, not a one-unit probe:
+  // any nonzero fit grants that many signed units (a full rolled qty when the
+  // bags have room for all of it, a partial one otherwise), mirroring
+  // harvestNode's own countFit-sized addItemInstance call so a multi-unit
+  // signable roll is never truncated to a single unit when it does not have
+  // to be. Only a genuine zero-room miss falls back to the plain fungible
+  // top-up at the full rolled quantity (the signature is lost, the yield is
+  // not); a specimen truncates outright, the same one-unit truncation
+  // contract harvestNode's signed grants follow. Each downgrade tells the
+  // player via the text-free personal gatherDowngrade event, at most ONCE per
+  // harvest command (the toolDeniedEmitted idiom); the mark-lost arm runs
+  // first, so when both a signature and a jackpot are lost the single event
+  // reports the mark.
   let downgradeEmitted = false;
   for (const grant of signedGrants) {
     if (grant.specimen) continue;
     const payload = { signer: meta.name };
-    if (canGrantItemInstance(meta.inventory, bagCapacity(meta.bags), grant.itemId, payload)) {
-      ctx.addItemInstance(grant.itemId, payload, meta.entityId);
+    const fit = fitForItemInstance(
+      meta.inventory,
+      bagCapacity(meta.bags),
+      grant.itemId,
+      grant.plainQty,
+      payload,
+    );
+    if (fit > 0) {
+      ctx.addItemInstance(grant.itemId, payload, meta.entityId, fit);
     } else {
       ctx.addItem(grant.itemId, grant.plainQty, meta.entityId);
       if (!downgradeEmitted) {

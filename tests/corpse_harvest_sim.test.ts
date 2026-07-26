@@ -336,7 +336,32 @@ describe('signed Pristine specimens (#1145)', () => {
     const slot = meta.inventory.find((s) => s.itemId === 'wolf_fang');
     expect(slot).toBeDefined();
     expect(slot?.instance?.signer).toBe('Alpha');
-    expect(sim.countItem('wolf_fang', a)).toBe(1);
+    // Seed 5's fang roll lands tier 3 (harvestTierQuantity), and roomy bags
+    // fit the whole thing: the signature truncates only when the bags force
+    // it to, never the rolled quantity itself (#2139's own contract).
+    expect(sim.countItem('wolf_fang', a)).toBe(3);
+  });
+
+  it('an empty-bag signed grant lands the FULL rolled quantity, never truncated to one (seed 5)', () => {
+    // Regression pin: the unfixed code called addItemInstance with no count
+    // argument (defaulting to 1) even though grant.plainQty (the rolled tier
+    // quantity, harvestTierQuantity) sat right there, silently discarding the
+    // rest of a multi-unit signable roll. Empty bags have room for the whole
+    // roll, so the fixed grant must land as one signed stack at the full
+    // rolled count, not a single unit.
+    const { sim, internals, a, mob } = setup(5);
+    const meta = internals.players.get(a)!;
+    // A fresh character's starting kit leaves the bags nearly empty (roomy,
+    // not necessarily zero items): plenty of free slots for a 3-unit roll.
+    expect(bagCapacity(meta.bags) - meta.inventory.length).toBeGreaterThan(3);
+    sim.harvestCorpse(mob.id, ['fang'], a);
+    const signedSlots = meta.inventory.filter(
+      (s) => s.itemId === 'wolf_fang' && s.instance?.signer === 'Alpha',
+    );
+    // Exactly one signed stack, not several single-unit slots.
+    expect(signedSlots).toHaveLength(1);
+    expect(signedSlots[0].count).toBe(3);
+    expect(sim.countItem('wolf_fang', a)).toBe(3);
   });
 
   it('every other specimen family grants its own jackpot beside the plain component (seed 5)', () => {
@@ -395,7 +420,9 @@ describe('signed Pristine specimens (#1145)', () => {
     const slot = meta.inventory.find((s) => s.itemId === 'homespun_cloth');
     expect(slot).toBeDefined();
     expect(slot?.instance?.signer).toBe('Alpha');
-    expect(sim.countItem('homespun_cloth', a)).toBe(1);
+    // Seed 5's cloth roll lands tier 2 (harvestTierQuantity) against this
+    // corpse and focus, and roomy bags fit the whole thing.
+    expect(sim.countItem('homespun_cloth', a)).toBe(2);
   });
 
   it('a slot-full signed-family harvest falls back to the plain stack, never over capacity (seed 5)', () => {
@@ -613,10 +640,13 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
   });
 
   it('a slot-full bag with a same-signer stack WITH room keeps the signature: the grant merges (seed 5)', () => {
-    // Seed 5's fang roll clears the signable floor (pre-verified above). Slot
-    // 0 is the plain partial stack the pre-gate reserves against (and the
-    // would-be fallback target); slot 1 is the byte-equal same-signer stack
-    // whose room the merge-aware guard must accept with zero free slots.
+    // Seed 5's fang roll clears the signable floor at tier 3 (pre-verified
+    // above: harvestTierQuantity rolls a 3-unit yield). Slot 0 is the plain
+    // partial stack the pre-gate reserves against (and the would-be fallback
+    // target); slot 1 is the byte-equal same-signer stack whose room the
+    // merge-aware guard must accept with zero free slots, and which has room
+    // for the FULL rolled quantity (stackSizeOf(wolf_fang) - 3 existing is
+    // far more than the 3-unit roll).
     const { sim, internals, a, mob } = setup(5);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
@@ -627,12 +657,14 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     sim.drainEvents();
     sim.harvestCorpse(mob.id, ['fang'], a);
     expect(mob.harvestClaimedBy).toBe(a);
-    // The signed grant merged into the same-signer stack: one unit, no new
-    // slot, no overflow, and the plain stack was never topped up.
+    // The signed grant merged into the same-signer stack: no new slot, no
+    // overflow, and the plain stack was never topped up.
     expect(m.inventory.length).toBe(cap);
     const signed = m.inventory.find((s) => s.itemId === 'wolf_fang' && s.instance);
     expect(signed?.instance?.signer).toBe('Alpha');
-    expect(signed?.count).toBe(4);
+    // The full 3-unit roll merged in on top of the seeded 3 (the signature
+    // truncates only when the bags force it to, never the rolled quantity).
+    expect(signed?.count).toBe(6);
     const plain = m.inventory.find((s) => s.itemId === 'wolf_fang' && !s.instance);
     expect(plain?.count).toBe(1);
     // The signature survived: no downgrade notice fires.
