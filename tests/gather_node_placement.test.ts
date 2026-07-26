@@ -534,9 +534,17 @@ describe('gather node placement: every node sits on ground a player can work', (
     // is the world's own answer to "how thickly is content laid out". Measured on
     // the shipped content, camps reach 39.9 percent of Eastbrook's walkable
     // ground, 48.7 of Mirefen's and 55.1 of Thornpeak's, 48.0 percent world-wide.
-    // Gathering sits deliberately below that: nodes reach 40.9 / 43.7 / 45.6 per
-    // zone, 43.4 percent world-wide. The world-wide comparison is asserted below
+    // Gathering sits deliberately below that: nodes reach 40.6 / 43.7 / 45.6 per
+    // zone, 43.3 percent world-wide. The world-wide comparison is asserted below
     // rather than left as prose, so "below the mob-camp figure" cannot rot.
+    //
+    // If this arm ever reds, read the failure message before assuming a node
+    // moved. The denominator is walkable-and-dry ground, so it also moves when
+    // terrain, water or a static collider does: a new building in Eastbrook, a
+    // widened lake, or an edit-layer change shifts the fraction without anyone
+    // touching gather content. Eastbrook clears the floor by 0.6 points, so it is
+    // the zone that will notice first, and the message names the measured figure
+    // so the next reader can tell a drained zone from a resized denominator.
     const COVERAGE_RADIUS = 40;
     const COVERAGE_FLOOR_PCT = 40;
 
@@ -582,7 +590,9 @@ describe('gather node placement: every node sits on ground a player can work', (
 
     // Not passing by slack: the leanest zone (Eastbrook, whose six ore veins are
     // held inside one 20-yard ring by tests/gather_nodes.test.ts and so cover
-    // little ground between them) sits within 5 points of the floor.
+    // little ground between them) sits within 5 points of the floor. Measured at
+    // 40.6, so the floor is 0.6 points from biting, which is deliberate: a floor
+    // the content clears by twenty points asserts nothing.
     expect(leanest, `leanest zone coverage ${leanest.toFixed(1)} percent`).toBeLessThan(
       COVERAGE_FLOOR_PCT + 5,
     );

@@ -502,6 +502,12 @@ describe('active-quest objective areas (the classic POI blobs)', () => {
       ],
     ]);
     const model = buildOverworldMapModel(input(makeOverworldWorld('sim', log), 1));
+    // Both IWorld shapes, through the clustering path specifically. The existing
+    // two-shape identity test above runs with an EMPTY quest log, so it never
+    // reaches the gather branch at all; this makes the host-parity claim for that
+    // branch real rather than structural.
+    const client = buildOverworldMapModel(input(makeOverworldWorld('client', log), 1));
+    expect(client.questAreas).toEqual(model.questAreas);
     const zoneOre = GATHER_NODES.filter(
       (n) => n.type === 'ore' && n.pos.z >= ZONE.zMin && n.pos.z < ZONE.zMax,
     );

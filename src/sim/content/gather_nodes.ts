@@ -13,6 +13,18 @@
 // tests/gather_node_placement.test.ts holds every zone to keeping 40 percent of
 // its walkable ground within 40 yards of a node, and holds every coordinate to
 // being dry, walkable, unblocked, reachable and workable.
+//
+// One case that honestly does NOT improve, recorded so nobody reads the above as
+// a blanket claim: a player working ONE profession in Eastbrook. All six veins
+// there are held inside a 20-yard ring around the Copper Dig by
+// tests/gather_nodes.test.ts, because q_prof_intro sends a level-1 character to
+// that landmark by name and the ore has to be findable there. So a solo miner
+// still clears the whole field in well under half a minute and then waits, and
+// the single wait is longer than it was (about 210 seconds against about 110).
+// The hourly ceiling is identical either way, and the fix does land for a
+// gatherer working more than one profession, and for mining in the two later
+// zones where the veins really are spread. Zone-1 mining is the deliberate
+// exception, not an oversight.
 
 import type { GatherNodeDef, GatherNodeType } from '../types';
 
@@ -57,13 +69,25 @@ export const GATHER_NODES: GatherNodeDef[] = [
   // outcrops from the trio above so the dig is a short circuit rather than one
   // spot. All six stay inside the 20-yard ring tests/gather_nodes.test.ts holds
   // every Eastbrook vein to (the ore has to be findable from the landmark
-  // q_prof_intro names), and these three sit 17 yards out, so the ring is not
-  // being ridden.
+  // q_prof_intro names), and these three sit 17 to 18 yards out, so the ring is
+  // not being ridden.
+  //
+  // One of the three is placed AWAY from the obvious spot on purpose. Grix the
+  // Tunnelking, the zone's rare elite, spawns at (-95, -78) with a 4-yard ring
+  // and a 13-yard aggro radius, and the natural vein position on that side of
+  // the outcrops sat 2.2 yards from his spawn centre. q_prof_intro is the first
+  // quest in the game, taken at level 1, and damage cancels a gather cast
+  // outright, so that would have put a fresh character inside a level-7 elite's
+  // aggro to finish the tutorial. This vein sits 30 yards off instead, matching
+  // the 19 to 22 yards the rest of the field keeps. No arm pins camp clearance
+  // (a third of all nodes sit inside an ordinary camp on purpose, which is
+  // fine: those are grey trash, not a rare), so this is a judgement recorded
+  // here rather than a rule.
   {
     id: 'ore_eastbrook_4',
     zoneId: 'eastbrook_vale',
     type: 'ore',
-    pos: { x: -96, z: -76 },
+    pos: { x: -92, z: -48 },
     level: 4,
     tier: 1,
   },

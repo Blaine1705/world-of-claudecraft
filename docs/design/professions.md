@@ -308,7 +308,8 @@ guards.
 | UNBIND_FEE_BY_QUALITY_TIER | src/sim/professions/commission.ts | [2500, 10000, 40000] copper, clamp both ends |
 | GATHER_CAST_BASE / FLOOR / TOOL_TIER / BAND (sec) | src/sim/professions/gathering.ts | 2.5 / 1.5 / 0.4 / 0.15 |
 | GATHER_GAIN_TIER_STEP | src/sim/professions/gathering.ts | 25 |
-| NODE_HARVEST_TABLE respawnSeconds | src/sim/professions/gathering.ts | 240 (ore / wood / herb), paired with 6 nodes per type per zone in src/sim/content/gather_nodes.ts: the per-zone ceiling is nodes x 3600 / respawn, so the two are one lever and move together |
+| NODE_HARVEST_TABLE respawnSeconds | src/sim/professions/gathering.ts | 240 (ore / wood / herb) |
+| gather nodes per type per zone | src/sim/content/gather_nodes.ts | 6 |
 | GATHER_RARE_EVENT_CHANCE / YIELD_MULT | src/sim/professions/gather_events.ts | 1/90 / 5 |
 | FISH_BITE_DELAY_MIN / MAX / ROD_REDUCTION (sec) | src/sim/professions/fishing.ts | 3 / 8 / 1.5 |
 | FISH_REEL_WINDOW_SEC / ROD_BONUS_SEC | src/sim/professions/fishing.ts | 3 / 0.75 |
@@ -335,6 +336,16 @@ maintainer-accepted for this release; correct post-launch via data-only
 levers (respawn seconds, node density, quantity per rarity, bite-delay band,
 junk share), never via smaller gain numbers. If mastery should get longer,
 the lever is material quantities per craft.
+
+Respawn seconds and node density are ONE lever, not two. The per-zone harvest
+ceiling is nodes x 3600 / respawn, so moving either alone moves the ceiling:
+240 seconds with six nodes per type per zone is the same 270 harvests an hour
+per zone as the earlier 120 seconds with three, and it brought the two later
+zones down onto that figure from 360 rather than lifting any zone. What the
+pair buys is world density and a longer circuit, so the wait is spent
+travelling instead of standing at a node already worked. The rare-event knob
+reads the same product (GATHER_RARE_EVENT_CHANCE, gather_events.ts), so it
+must be re-derived if either number is ever tuned on its own.
 
 ## Locked rulings (do not re-litigate)
 

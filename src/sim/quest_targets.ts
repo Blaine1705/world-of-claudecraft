@@ -9,7 +9,12 @@
 // interest-radius limited: a camp far across the zone still resolves.
 
 import { CAMPS, GATHER_NODES, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from './data';
-import { type QuestObjective, type QuestProgress, questObjectiveRequired } from './types';
+import {
+  type GatherNodeType,
+  type QuestObjective,
+  type QuestProgress,
+  questObjectiveRequired,
+} from './types';
 
 /** Identity of one quest objective (the map tooltip resolves its localized
  *  label + live counts from this; the pure layers never carry text). */
@@ -32,18 +37,96 @@ export interface QuestObjectiveArea {
 const CAMP_AREA_PAD = 4;
 // Radius drawn around a lone point target (an interact NPC or single object).
 const POINT_AREA_RADIUS = 6;
-// How close two gather nodes have to be to read as ONE place on the map, used
-// by pushNodeCluster below. Every zone carries six nodes of every type
-// (content/gather_nodes.ts), so a circle per node put six translucent fills and
-// six numbered badges over one zone map, several of them overlapping, and the
-// map went from "the ore is over there" to a blue smear. This groups them first.
-//
-// 30 yards is not a knife edge: the authored clusters sit 5 to 25 yards apart
-// internally and 40-plus yards from the next cluster, so every threshold from 26
-// to 32 yards produces the identical grouping and 30 is the middle of that
-// plateau. For scale, it is close to the widest authored mob camp (24 yards),
-// which is the spread the map already draws as a single kill-objective blob.
+/**
+ * How close two gather nodes have to be to read as ONE place on the map, used by
+ * gatherNodeClusters below. Every zone carries six nodes of every type
+ * (content/gather_nodes.ts), so a circle per node put six translucent fills and
+ * six numbered badges on one zone map. The fills composite per circle rather
+ * than merging, so overlapping ones darken toward opaque, and each carries its
+ * own opaque badge as wide as the blob it labels. Grouping first fixes that.
+ *
+ * How completely depends on the type, and only ore was a true pile: Eastbrook's
+ * six veins are held inside one 20-yard ring by tests/gather_nodes.test.ts and
+ * collapse 6 circles to 1, while the wood and herb additions were deliberately
+ * spread 40 to 80 yards apart, so those go 6 to 4 and were never a smear. Ore is
+ * the worst case this constant is sized for, not the typical one.
+ *
+ * 30 yards is not a knife edge, but the margin is smaller than it looks and the
+ * measured numbers belong here rather than a comfortable round one. Single
+ * linkage is transitive, so a cluster can be much wider than the link distance:
+ * the widest pair inside one cluster is wood_thornpeak_t2 to wood_thornpeak_t3
+ * at 49.98 yards, chained through two intermediate stands. Going the other way,
+ * the nearest pair in two DIFFERENT clusters is wood_mirefen_1 to wood_mirefen_3
+ * at 33.54 yards, so there are 3.5 yards of headroom above 30, not tens. The
+ * partition is identical for every integer link from 26 to 33; nudge one of
+ * those two stands 4 yards and two blobs silently become one, which is why
+ * tests/quest_targets.test.ts pins the grouping across that band.
+ *
+ * On scale: the largest blob this produces is 29.9 yards (the four-stand
+ * Glimmermere chain), against the 28.0 yards the map already draws for a
+ * kill objective on the widest authored camp (radius 24 plus CAMP_AREA_PAD). So
+ * a gather blob is the same size of object the map has always drawn, and it
+ * scales with zoom the same way. The tradeoff that buys: the world map no longer
+ * shows individual vein positions, because the old per-node circles were
+ * centred ON the nodes. The minimap still marks every node individually inside
+ * its rim (src/ui/minimap_markers.ts), which is the surface for "exactly where".
+ */
 const NODE_CLUSTER_LINK_YD = 30;
+
+/**
+ * Gather nodes of one type, grouped into the clusters the map draws one circle
+ * around each of. Single linkage at `linkYd`: two nodes are in the same group
+ * when a chain of within-`linkYd` hops connects them, which is exactly the
+ * connected components of that symmetric relation and therefore independent of
+ * the order the pairs are visited in.
+ *
+ * Exported for the grouping pin in tests/quest_targets.test.ts, which is the
+ * only reason `linkYd` is a parameter: a derived grouping with no stability pin
+ * is one content nudge away from silently merging two blobs.
+ *
+ * Deterministic in ORDER as well as membership. Groups come back sorted by their
+ * lowest GATHER_NODES index and members in table order, stated explicitly rather
+ * than inherited from Map insertion order, because the emitted order is what
+ * numbers the badges a player sees and a later rewrite to a plain object would
+ * otherwise reorder them silently.
+ */
+export function gatherNodeClusters(
+  nodeType: GatherNodeType,
+  linkYd: number = NODE_CLUSTER_LINK_YD,
+): { x: number; z: number }[][] {
+  const nodes = GATHER_NODES.filter((n) => n.type === nodeType);
+  const root = nodes.map((_, i) => i);
+  const find = (i: number): number => {
+    let r = i;
+    while (root[r] !== r) r = root[r];
+    // path-compress so repeated finds stay cheap on long chains
+    while (root[i] !== r) {
+      const next = root[i];
+      root[i] = r;
+      i = next;
+    }
+    return r;
+  };
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const d = Math.hypot(nodes[i].pos.x - nodes[j].pos.x, nodes[i].pos.z - nodes[j].pos.z);
+      if (d <= linkYd) root[find(i)] = find(j);
+    }
+  }
+  const byRoot = new Map<number, number[]>();
+  for (let i = 0; i < nodes.length; i++) {
+    const key = find(i);
+    const members = byRoot.get(key);
+    if (members) members.push(i);
+    else byRoot.set(key, [i]);
+  }
+  return (
+    [...byRoot.values()]
+      .sort((a, b) => a[0] - b[0])
+      // fresh {x,z}: never alias the shared GATHER_NODES content
+      .map((members) => members.map((i) => ({ x: nodes[i].pos.x, z: nodes[i].pos.z })))
+  );
+}
 
 // The player's active quests' objectives that still need progress. 'ready'
 // and 'done' quests contribute nothing (the '?' turn-in marker guides those).
@@ -155,8 +238,14 @@ export function questObjectiveAreas(
   };
   // Centroid of a set of points plus its farthest member: a simple enclosing
   // bound, which is plenty at map scale (this is not a minimal enclosing circle
-  // and does not need to be).
-  const pushEnclosing = (ref: QuestObjectiveRef, points: readonly { x: number; z: number }[]) => {
+  // and does not need to be). An empty set has no centroid, so it draws nothing
+  // rather than a NaN circle: both callers below already guarantee a member, and
+  // this keeps that a precondition rather than a latent garbage blob.
+  const pushEnclosing = (
+    ref: QuestObjectiveRef,
+    points: readonly { x: number; z: number }[],
+  ): void => {
+    if (points.length === 0) return;
     let cx = 0;
     let cz = 0;
     for (const p of points) {
@@ -177,44 +266,9 @@ export function questObjectiveAreas(
       pushEnclosing(ref, def.positions);
     }
   };
-  // The same enclosing circle for gather nodes, one per CLUSTER. Unlike
-  // GROUND_OBJECTS, GATHER_NODES is a flat list with no authored cluster record,
-  // so the grouping is derived: single linkage at NODE_CLUSTER_LINK_YD, which is
-  // deterministic (it reads only the fixed content table, in table order, and the
-  // relation "within N yards" is symmetric so the result is independent of visit
-  // order). Grouping by zoneId instead would NOT do: the six nodes of a type in
-  // one zone are deliberately spread across it, so a per-zone circle would be
-  // 120-plus yards wide and mark most of the map as "here".
-  const pushNodeCluster = (ref: QuestObjectiveRef, nodeType: string): void => {
-    const nodes = GATHER_NODES.filter((n) => n.type === nodeType);
-    if (nodes.length === 0) return;
-    const root = nodes.map((_, i) => i);
-    const find = (i: number): number => {
-      let r = i;
-      while (root[r] !== r) r = root[r];
-      // path-compress so repeated finds stay cheap on long chains
-      while (root[i] !== r) {
-        const next = root[i];
-        root[i] = r;
-        i = next;
-      }
-      return r;
-    };
-    for (let i = 0; i < nodes.length; i++) {
-      for (let j = i + 1; j < nodes.length; j++) {
-        const d = Math.hypot(nodes[i].pos.x - nodes[j].pos.x, nodes[i].pos.z - nodes[j].pos.z);
-        if (d <= NODE_CLUSTER_LINK_YD) root[find(i)] = find(j);
-      }
-    }
-    const groups = new Map<number, { x: number; z: number }[]>();
-    for (let i = 0; i < nodes.length; i++) {
-      const key = find(i);
-      const group = groups.get(key);
-      // fresh {x,z}: never alias the shared GATHER_NODES content
-      if (group) group.push({ x: nodes[i].pos.x, z: nodes[i].pos.z });
-      else groups.set(key, [{ x: nodes[i].pos.x, z: nodes[i].pos.z }]);
-    }
-    for (const group of groups.values()) pushEnclosing(ref, group);
+  // The same enclosing circle for gather nodes, one per CLUSTER.
+  const pushNodeCluster = (ref: QuestObjectiveRef, nodeType: GatherNodeType): void => {
+    for (const group of gatherNodeClusters(nodeType)) pushEnclosing(ref, group);
   };
   for (const { questId, objectiveIndex, obj } of incompleteObjectives(questLog)) {
     const ref: QuestObjectiveRef = { questId, objectiveIndex };
