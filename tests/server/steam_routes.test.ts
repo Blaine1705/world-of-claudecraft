@@ -595,7 +595,11 @@ describe('login with Steam does not exist', () => {
   // deletes from the `//` inside a URL literal to end of line, which silently
   // drops real code from the scan (server/steam/ticket.ts's PARTNER_API_HOST is
   // exactly that shape) and would take a violation sharing that line with it.
-  // Same idiom as codeOnly in tests/professions_silent_loot.test.ts.
+  // Same idiom as codeOnly in tests/professions_silent_loot.test.ts. The order
+  // trades one hazard for a rarer one: a `/*` written inside a line comment now
+  // opens a block strip that runs to the next `*/`. No file under server/steam
+  // has that shape, and the strip only ever deletes, so both hazards fail
+  // toward a quieter scan rather than a false accusation.
   const codeOnly = (source: string): string =>
     source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
@@ -613,10 +617,13 @@ describe('login with Steam does not exist', () => {
       tsFilesUnder(STEAM_DIR).map((f) => f.file),
       'server/steam source files: a new module joins this list and stays clear of FORBIDDEN',
     ).toEqual(STEAM_SOURCE_FILES);
-    // The strip must not eat live code: a regression that blanked the source
-    // would leave the rule below passing over nothing at all.
+    // The strip must not eat live code. Bound to the WHOLE url literal, not to
+    // the identifier: under the old line-comments-first order this line survived
+    // as `export const PARTNER_API_HOST = 'https:`, so an identifier check
+    // passed while 25 characters of real code left the scan. Only the full
+    // literal turns that revert red.
     expect(codeOnly(fs.readFileSync(path.join(STEAM_DIR, 'ticket.ts'), 'utf8'))).toContain(
-      'PARTNER_API_HOST',
+      "'https://partner.steam-api.com'",
     );
     // ... and it must still remove the prose that states the rule, or the scan
     // reports the documentation as a violation of itself.

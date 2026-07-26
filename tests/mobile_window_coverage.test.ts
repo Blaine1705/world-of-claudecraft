@@ -124,7 +124,17 @@ const MOBILE_WINDOW_EXCEPTIONS: Record<string, string> = {
 // coverage assertion RED, which needs no depth fix to be noticed.
 function stylesText(): string {
   const dir = fileURLToPath(new URL(STYLES_DIR, import.meta.url));
-  const files = readdirSync(dir).filter((f) => f.endsWith('.css'));
+  const entries = readdirSync(dir, { withFileTypes: true });
+  // The premise, checked rather than asserted in prose: the reasoning above
+  // holds only while every sheet sits at the top level. The day one lands in a
+  // subdirectory this throws here, where the comment explaining the decision
+  // is, so the choice gets re-made deliberately instead of quietly meaning
+  // something else. Derived from the SAME read as the file list, so this file
+  // still owns exactly one directory reader.
+  if (entries.some((e) => e.isDirectory())) {
+    throw new Error('src/styles gained a subdirectory: re-read the note above stylesText()');
+  }
+  const files = entries.map((e) => e.name).filter((f) => f.endsWith('.css'));
   return files
     .map((f) => readFileSync(`${dir}/${f}`, 'utf8').replace(/\/\*[\s\S]*?\*\//g, ''))
     .join('\n');
@@ -160,6 +170,13 @@ function hasMobileRule(css: string, id: string): boolean {
 // the comma or the brace, and the block carries a real pin property. Only the
 // exception-necessity check below uses this; hasMobileRule above stays looser on
 // purpose, because a sheeted window is usually positioned through its parts.
+// Across the 142 ids named in a body.mobile-touch selector today the two answers
+// differ for 7, every one of them an ancestor-only rule (#deed-tracker's own
+// block is a font-size, its max-height sits on .dt-list).
+// It misses `#id.state { ... }`, where a class follows the id: that reads as
+// "not id-scoped" and keeps an exception alive, which is the safe direction for
+// the only caller (a wrongly-kept exception is inert; a wrongly-dropped one
+// would demand mobile CSS that nobody decided to write).
 function hasOwnSheetRule(css: string, id: string): boolean {
   const selRe = new RegExp(
     `body\\.mobile-touch[^,{}]*#${id}(?![-a-z0-9])(?::[a-z-]+(?:\\([^)]*\\))?)*\\s*[,{]`,
