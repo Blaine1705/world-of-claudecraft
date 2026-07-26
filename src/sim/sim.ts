@@ -40,6 +40,7 @@ import {
 } from './combat/auras';
 import {
   meleeSwing as meleeSwingImpl,
+  rangedSwing as rangedSwingImpl,
   startAutoAttack as startAutoAttackImpl,
   stopAutoAttack as stopAutoAttackImpl,
   updatePlayerAutoAttack as updatePlayerAutoAttackImpl,
@@ -74,6 +75,7 @@ import { frostMageChannelPulse } from './combat/frost_mage';
 import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
 import {
   applyHeal as applyHealImpl,
+  consumeHealAbsorb as consumeHealAbsorbImpl,
   critVulnBonus as critVulnBonusImpl,
   healingTakenMult as healingTakenMultImpl,
   healingThreat as healingThreatImpl,
@@ -237,7 +239,11 @@ import {
 import { type MailSave, PostOffice } from './mail/post_office';
 import { Market, type MarketListing, type MarketSave } from './market';
 import { defaultMarketQuery, type MarketQuery } from './market_query';
-import { mobCombatProfile as mobCombatProfileFn } from './mob/combat_profile';
+import {
+  mobCombatProfile as mobCombatProfileFn,
+  mobEffectiveMeleeRange as mobEffectiveMeleeRangeImpl,
+  tryMobMeleeSwingInRange as tryMobMeleeSwingInRangeImpl,
+} from './mob/combat_profile';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
 import * as lifecycle from './mob/lifecycle';
 import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
@@ -5286,6 +5292,10 @@ export class Sim {
     return critVulnBonusImpl(this.ctx, target);
   }
 
+  consumeHealAbsorb(target: Entity, healed: number): number {
+    return consumeHealAbsorbImpl(this.ctx, target, healed);
+  }
+
   private applyHeal(
     source: Entity,
     target: Entity,
@@ -5739,6 +5749,14 @@ export class Sim {
     updatePlayerAutoAttackImpl(this.ctx, p, meta);
   }
 
+  rangedSwing(
+    attacker: Entity,
+    target: Entity,
+    ranged: { min: number; max: number; speed: number; wand?: boolean; school?: string },
+  ): void {
+    rangedSwingImpl(this.ctx, attacker, target, ranged);
+  }
+
   private meleeSwing(
     attacker: Entity,
     target: Entity,
@@ -5901,6 +5919,14 @@ export class Sim {
   // -------------------------------------------------------------------------
   // Mob AI
   // -------------------------------------------------------------------------
+
+  mobEffectiveMeleeRange(mob: Entity): number {
+    return mobEffectiveMeleeRangeImpl(mob);
+  }
+
+  tryMobMeleeSwingInRange(mob: Entity, target: Entity): boolean {
+    return tryMobMeleeSwingInRangeImpl(this.ctx, mob, target);
+  }
 
   private refreshMobLeashFromAction(source: Entity | null, target: Entity): void {
     if (
