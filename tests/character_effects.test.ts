@@ -5,12 +5,12 @@ import {
   characterRecklessnessActive,
   characterSanguineAuraActive,
   characterSoulRendActive,
+  characterVeilboundState,
   characterWeaponAuraMode,
   hunterPetFerocityStage,
   hunterPetFrenzyActive,
   hunterPetVisualScale,
   tithefiendEmpoweredActive,
-  characterVeilboundState,
 } from '../src/render/character_effects';
 import type { Entity } from '../src/sim/types';
 

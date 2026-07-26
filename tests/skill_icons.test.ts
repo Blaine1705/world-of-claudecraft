@@ -3,10 +3,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
-import { abilitiesKnownAt } from '../src/sim/content/classes';
-import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
 import { PALADIN_CHOICE_ROWS } from '../src/sim/content/choice_rows_classic';
-import { ABILITIES } from '../src/sim/content/classes';
+import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
+import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
 import { ABILITY_IMAGE_IDS, abilityImageUrl } from '../src/ui/icons';
 import { PALADIN_TALENT_IMAGE_IDS } from '../src/ui/talent_icons';
 
