@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   claimSeekerEntitlement,
   hasSeekerEntitlement,
-  seekerEntitlementForAccount,
   SEEKER_ENTITLEMENT_SCHEMA,
+  seekerEntitlementForAccount,
 } from '../server/seeker_entitlement_db';
 
 function fakePool(results: Record<string, unknown>[][]) {

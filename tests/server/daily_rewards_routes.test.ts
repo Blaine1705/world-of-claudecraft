@@ -425,8 +425,10 @@ describe('daily-rewards route table', () => {
     for (const r of routes) {
       const expectedMiddlewareCount =
         r.method === 'POST' && r.path === '/api/daily-rewards/spin' ? 2 : 1;
-      expect(Array.isArray(r.middleware) && r.middleware.length === expectedMiddlewareCount, r.path)
-        .toBe(true);
+      expect(
+        Array.isArray(r.middleware) && r.middleware.length === expectedMiddlewareCount,
+        r.path,
+      ).toBe(true);
       expect(r.schema, r.path).toBeUndefined();
     }
   });

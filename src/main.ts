@@ -101,6 +101,7 @@ import { isOfflineModeAvailable } from './game/offline_mode_gate';
 import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
+import { seekerFirstRunSettings } from './game/seeker_first_run_settings';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import { SelfMotionFrameBuffer } from './game/self_motion_frame_buffer';
 import {
@@ -120,7 +121,6 @@ import {
 } from './game/spawn_cinematic';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
-import { seekerFirstRunSettings } from './game/seeker_first_run_settings';
 import { resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
@@ -6790,14 +6790,13 @@ function showWalletPicker(
     const extensionHelp = document.createElement('p');
     extensionHelp.className = 'wallet-picker-help wallet-picker-extension-help';
     extensionHelp.id = 'wallet-picker-extension-help';
-    extensionHelp.textContent =
-      NATIVE_APP
-        ? t('wallet.seekerAppHelp')
-        : mode === 'standalone'
-          ? t('wallet.standaloneAppHelp')
-          : mode === 'mobile'
-            ? t('wallet.mobileAppHelp')
-            : t('wallet.extensionHelp');
+    extensionHelp.textContent = NATIVE_APP
+      ? t('wallet.seekerAppHelp')
+      : mode === 'standalone'
+        ? t('wallet.standaloneAppHelp')
+        : mode === 'mobile'
+          ? t('wallet.mobileAppHelp')
+          : t('wallet.extensionHelp');
 
     const list = document.createElement('div');
     list.className = 'wallet-picker-list';

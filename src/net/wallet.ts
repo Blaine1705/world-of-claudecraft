@@ -30,10 +30,7 @@ import type {
   MobileWalletLauncher,
   MobileWalletState,
 } from './mobile_wallet_deeplink';
-import type {
-  NativeSolanaWalletClient,
-  NativeSolanaWalletState,
-} from './native_solana_mobile';
+import type { NativeSolanaWalletClient, NativeSolanaWalletState } from './native_solana_mobile';
 import type { WalletConnectClient, WalletConnectState } from './wallet_connect';
 import {
   currentStandaloneWalletWebApp,

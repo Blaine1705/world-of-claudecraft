@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+  isSeekerGenesisToken,
   SEEKER_GENESIS_TOKEN_GROUP_ADDRESS,
   SEEKER_GENESIS_TOKEN_METADATA_ADDRESS,
   SEEKER_GENESIS_TOKEN_MINT_AUTHORITY,
   type SeekerGenesisTokenDescriptor,
-  isSeekerGenesisToken,
   verifiedSeekerGenesisTokenMint,
 } from '../server/seeker_genesis_token';
 
@@ -44,8 +44,6 @@ describe('Seeker Genesis Token verification', () => {
         validDescriptor,
       ]),
     ).toBe(validDescriptor.mintAddress);
-    expect(
-      verifiedSeekerGenesisTokenMint([{ ...validDescriptor, ownerAmount: '0' }]),
-    ).toBeNull();
+    expect(verifiedSeekerGenesisTokenMint([{ ...validDescriptor, ownerAmount: '0' }])).toBeNull();
   });
 });

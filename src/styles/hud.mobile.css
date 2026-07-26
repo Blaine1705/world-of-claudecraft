@@ -1438,9 +1438,7 @@
     :is(.ui-icon, .mobile-label) {
     display: none !important;
   }
-  body.mobile-touch.seeker-wallet-enabled
-    #mobile-combat-controls
-    #mobile-daily-rewards:active {
+  body.mobile-touch.seeker-wallet-enabled #mobile-combat-controls #mobile-daily-rewards:active {
     transform: scale(0.92);
   }
   body.mobile-touch.seeker-wallet-enabled
