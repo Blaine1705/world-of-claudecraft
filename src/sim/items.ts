@@ -17,6 +17,7 @@
 // (enforced by tests/architecture.test.ts). This region draws NO rng.
 
 import { addStacked, bagCapacity, bagsFullError, equipBag as equipBagCmd } from './bags';
+import { resolveVendorRowGate } from './content/vendor_row_gates';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import {
@@ -553,6 +554,23 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
   }
   if (dist2d(p.pos, npc.pos) > INTERACT_RANGE + 2) {
     ctx.error(meta.entityId, 'Too far away.');
+    return;
+  }
+  // Vendor row gates (content/vendor_row_gates.ts): the authoritative half of
+  // the same resolver the vendor window renders its locked rows from, so the
+  // lock the player sees is the lock the purchase enforces. Checked BEFORE the
+  // balance below, matching the delve shop's order (delves/runs.ts
+  // delveBuyShopItem): a player who cannot use the tool yet should learn that
+  // rather than be told to come back with more copper.
+  //
+  // The denial reuses the delve gate's own line, which the client already
+  // localizes in every locale (sim_i18n.ts -> sim.delve.shopItemLocked). It is
+  // the accurate sentence for this refusal and stays generic; the specific
+  // threshold is on the row itself, which is where a player reads it before
+  // ever clicking. Reaching this at all means a stale view or a hand-built
+  // command, because the window renders a gated row disabled.
+  if (resolveVendorRowGate(itemId, meta.gatheringProficiency).locked) {
+    ctx.error(meta.entityId, 'You have not unlocked that item yet.');
     return;
   }
   // Food and drink are handed over in a stack (vendorStackSize); the player pays

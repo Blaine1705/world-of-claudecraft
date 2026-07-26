@@ -69,6 +69,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         price: { copper: 5, honor: 0 },
         quantity: 1,
         affordable: true,
+        locked: false,
       },
       {
         itemId: 'water',
@@ -76,6 +77,7 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         price: { copper: 2, honor: 0 },
         quantity: 1,
         affordable: true,
+        locked: false,
       },
     ];
     const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
@@ -102,6 +104,86 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
     const rows = grids[0].querySelectorAll('.vendor-item');
     expect(rows.length).toBe(1);
     expect(rows[0].parentElement).toBe(grids[0]);
+  });
+
+  it('paints a proficiency-locked row disabled, with its requirement, and no aria-label', () => {
+    // The three things a locked row owes, driven through the real painter:
+    // it stays in the grid (never dropped), it says WHY it is closed, and it
+    // leaves the accessible name to its own content so the requirement is not
+    // replaced by a "Buy X for Y" label promising a purchase it refuses.
+    const goods: VendorGoodsRow[] = [
+      {
+        itemId: 'iron_mining_pick',
+        item: item('iron_mining_pick'),
+        price: { copper: 120, honor: 0 },
+        quantity: 1,
+        affordable: true,
+        locked: true,
+        requirement: { professionId: 'mining', proficiency: 40 },
+      },
+    ];
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const el = document.createElement('div');
+    renderVendorWindow(el, 'Vendor', view, deps());
+
+    const row = el.querySelector('.vendor-item') as HTMLButtonElement;
+    expect(row).not.toBeNull();
+    expect(row.classList.contains('vendor-locked')).toBe(true);
+    // Disabled even though it IS affordable: the two refusal reasons are
+    // separate axes and the gate closes the row on its own.
+    expect(row.disabled).toBe(true);
+    expect(row.hasAttribute('aria-label')).toBe(false);
+    expect(row.querySelector('.vi-sub')?.textContent).toBe('Requires Mining 40');
+    // The price still renders: a locked row shows what it will cost.
+    expect(row.querySelector('.vi-price')?.textContent).toContain('120');
+  });
+
+  it('leaves an unlocked row interactive, aria-labelled, and free of a requirement line', () => {
+    // The counter-example that keeps the arm above from passing on a painter
+    // that marked every row locked.
+    const goods: VendorGoodsRow[] = [
+      {
+        itemId: 'copper_mining_pick',
+        item: item('copper_mining_pick'),
+        price: { copper: 20, honor: 0 },
+        quantity: 1,
+        affordable: true,
+        locked: false,
+      },
+    ];
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const el = document.createElement('div');
+    renderVendorWindow(el, 'Vendor', view, deps());
+
+    const row = el.querySelector('.vendor-item') as HTMLButtonElement;
+    expect(row.classList.contains('vendor-locked')).toBe(false);
+    expect(row.disabled).toBe(false);
+    expect(row.getAttribute('aria-label')).toBe('Buy Copper Mining Pick for 20c');
+    expect(row.querySelector('.vi-sub')).toBeNull();
+  });
+
+  it('an unaffordable but UNGATED row disables without claiming a requirement', () => {
+    // Distinguishes the two disabled states: only the gated one grows the
+    // .vendor-locked class and the requirement line.
+    const goods: VendorGoodsRow[] = [
+      {
+        itemId: 'copper_mining_pick',
+        item: item('copper_mining_pick'),
+        price: { copper: 20, honor: 0 },
+        quantity: 1,
+        affordable: false,
+        locked: false,
+      },
+    ];
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const el = document.createElement('div');
+    renderVendorWindow(el, 'Vendor', view, deps());
+
+    const row = el.querySelector('.vendor-item') as HTMLButtonElement;
+    expect(row.disabled).toBe(true);
+    expect(row.classList.contains('vendor-locked')).toBe(false);
+    expect(row.querySelector('.vi-sub')).toBeNull();
+    expect(row.hasAttribute('aria-label')).toBe(true);
   });
 
   it('appends no empty .vendor-goods-grid when both sections are empty', () => {

@@ -9,6 +9,7 @@
 
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
+import { GATHERING_PROFESSION_NAME_KEYS } from '../../gathering_profession_name';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from '../../i18n';
 import type { PainterHostPresentation } from '../../painter_host';
 import { svgIcon } from '../../ui_icons';
@@ -44,6 +45,28 @@ function goodsPriceText(price: VendorPrice): string {
   const honor = price.honor > 0 ? honorText(price.honor) : '';
   if (money && honor) return t('hudChrome.warfare.dualPrice', { money, honor });
   return money || honor;
+}
+
+/** The requirement line under a locked row's name: the localized gathering
+ *  profession plus the proficiency that opens it, e.g. "Requires Mining 40".
+ *
+ *  Reuses hudChrome.crafting.skillReqLine rather than minting a second sentence
+ *  saying the same thing: its rendered English is exactly this line, it is
+ *  filled in every locale, and its `{craft}` placeholder is a name slot, not a
+ *  claim that the named thing is a craft (the crafting window passes a craft,
+ *  this passes a gathering profession). The trainer's own locked-row key stays
+ *  separate because its wording, "Taught at", is trainer-specific and false of a
+ *  merchant. Empty string for a profession with no display-name key, matching
+ *  every other consumer of that table: no name is printable, so no line is. */
+function requirementText(row: VendorGoodsRow): string {
+  const requirement = row.requirement;
+  if (!requirement) return '';
+  const nameKey = GATHERING_PROFESSION_NAME_KEYS[requirement.professionId];
+  if (nameKey === undefined) return '';
+  return t('hudChrome.crafting.skillReqLine', {
+    craft: t(nameKey),
+    skill: formatNumber(requirement.proficiency, { maximumFractionDigits: 0 }),
+  });
 }
 
 function goodsPriceHtml(row: VendorGoodsRow, deps: VendorWindowDeps): string {
@@ -85,24 +108,37 @@ export function renderVendorWindow(
     const { itemId, item, quantity } = goods;
     const row = document.createElement('button');
     row.type = 'button';
-    row.className = 'vendor-item';
-    row.disabled = !goods.affordable;
+    // A gate the viewer has not met disables the row exactly like an
+    // unaffordable one, and adds the .vendor-locked class the stylesheet greys
+    // it by. The row STAYS in the grid: the ladder above you is the thing worth
+    // seeing (train_window.ts's locked recipes, same reasoning).
+    row.className = goods.locked ? 'vendor-item vendor-locked' : 'vendor-item';
+    row.disabled = !goods.affordable || goods.locked;
     const price = goodsPriceText(goods.price);
     const itemName = itemDisplayName(item);
     const stack =
       quantity > 1
         ? ` ${t('itemUi.bags.stackCount', { count: formatNumber(quantity, { maximumFractionDigits: 0 }) })}`
         : '';
-    row.setAttribute(
-      'aria-label',
-      t('itemUi.vendor.buyAria', { item: `${itemName}${stack}`, price }),
-    );
-    row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${esc(stack)}</span><span class="vi-price">${goodsPriceHtml(goods, deps)}</span>`;
+    const requirement = goods.locked ? requirementText(goods) : '';
+    // A locked row deliberately sets NO aria-label, the trainer's locked-row
+    // behaviour (train_window.ts): an aria-label REPLACES the button's content
+    // as its accessible name, so the "Buy {item} for {price}" wording would
+    // both promise a purchase the row refuses and hide the requirement line
+    // that says why. Leaving it off lets the name, the requirement and the
+    // price inside the button compose the accessible name themselves.
+    if (!requirement) {
+      row.setAttribute(
+        'aria-label',
+        t('itemUi.vendor.buyAria', { item: `${itemName}${stack}`, price }),
+      );
+    }
+    row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${esc(stack)}${requirement ? `<span class="vi-sub">${esc(requirement)}</span>` : ''}</span><span class="vi-price">${goodsPriceHtml(goods, deps)}</span>`;
     row.addEventListener('click', () => deps.onBuy(itemId));
-    deps.attachTooltip(
-      row,
-      () =>
-        `${deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuy'))}</div>`,
+    deps.attachTooltip(row, () =>
+      goods.locked
+        ? `${deps.itemTooltip(item)}${requirement ? `<div class="tt-sub">${esc(requirement)}</div>` : ''}`
+        : `${deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuy'))}</div>`,
     );
     goodsGrid.appendChild(row);
   }

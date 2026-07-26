@@ -2688,6 +2688,12 @@ export const hudChromeStrings = {
     // line, skill-gain difficulty labels, hub-station badge) plus the
     // masterwork and tier-up celebration copy. Masterwork is a proc with
     // baked bonus stats; the copy never claims a quality-rank upgrade.
+    // Rendered by the crafting window's recipe rows AND by a locked vendor row
+    // in the goods grid (hud/vendor/vendor_window.ts), which reuses it so a
+    // tool gated on gathering proficiency needs no second key saying the same
+    // sentence. {craft} is a NAME slot, not a claim of craftness: the crafting
+    // window passes a craft name, the vendor row a gathering profession name.
+    // Rewording this restyles that vendor line too.
     skillReqLine: 'Requires {craft} {skill}',
     difficultyFull: 'Full skill gain',
     difficultyReduced: 'Reduced skill gain',

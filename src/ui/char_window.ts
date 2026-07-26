@@ -27,6 +27,7 @@ import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
 import { dropRequiredLevel, paperdollDropAction } from './equip_drop_core';
 import { esc } from './esc';
+import { GATHERING_PROFESSION_NAME_KEYS } from './gathering_profession_name';
 import { buildGatheringProficiencyRows } from './gathering_view';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
@@ -150,17 +151,6 @@ export interface CharWindowDeps extends PainterHostPresentation {
   showError(text: string): void;
 }
 
-// Maps each gathering profession id to its hud_chrome display-name key (issue
-// 1124). String-keyed like the sibling professions_window.ts GATHERING_NAME_KEYS
-// (and this file's CRAFT_NAME_KEYS): an id with no key here renders no row
-// (fishing landed with Professions 2.0).
-const GATHERING_PROFESSION_LABEL_KEY: Record<string, TranslationKey> = {
-  mining: 'hudChrome.gathering.mining',
-  logging: 'hudChrome.gathering.logging',
-  herbalism: 'hudChrome.gathering.herbalism',
-  fishing: 'hudChrome.gathering.fishing',
-};
-
 const SHARE_GLYPH =
   '<svg class="pc-share-ico" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M18 16.1a3 3 0 0 0-2.3 1.1l-6.7-3.9a3 3 0 0 0 0-2.6l6.7-3.9A3 3 0 1 0 15 4l-6.7 3.9a3 3 0 1 0 0 8.2L15 20a3 3 0 1 0 3-3.9z"/></svg>';
 
@@ -281,7 +271,7 @@ export class CharWindow {
     const rows = buildGatheringProficiencyRows(world);
     const items = rows
       .map((r) => {
-        const key = GATHERING_PROFESSION_LABEL_KEY[r.professionId];
+        const key = GATHERING_PROFESSION_NAME_KEYS[r.professionId];
         if (key === undefined) return '';
         const imageUrl = professionImageUrl(`gather_${r.professionId}`);
         const icon = imageUrl

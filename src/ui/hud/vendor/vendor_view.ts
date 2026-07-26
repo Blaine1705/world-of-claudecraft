@@ -9,6 +9,7 @@
 //
 // DOM-free and i18n-free so tests/vendor_view.test.ts can drive it directly.
 
+import { resolveVendorRowGate, type VendorRowGate } from '../../../sim/content/vendor_row_gates';
 import type { InvSlot, ItemDef } from '../../../sim/types';
 import { vendorStackSize } from '../../../sim/vendor_stack';
 
@@ -21,6 +22,13 @@ export interface VendorGoodsRow {
   quantity: number;
   /** Advisory UI state only; the authoritative buy path rechecks both balances. */
   affordable: boolean;
+  /** True when a proficiency gate on this row is unmet (content/vendor_row_gates.ts).
+   *  Advisory only, exactly like `affordable`: buyItem re-runs the same resolver.
+   *  A locked row still renders, greyed with its requirement, never dropped. */
+  locked: boolean;
+  /** The row's gate when it carries one, met or not, so the painter can name
+   *  the requirement. Ids and numbers only; this core stays i18n-free. */
+  requirement?: VendorRowGate;
 }
 
 export interface VendorPrice {
@@ -33,6 +41,11 @@ export interface VendorPrice {
 export interface VendorBalances {
   copper: number;
   honor: number;
+  /** The viewer's gathering counters, for the advisory row gate. Absent means
+   *  an empty map, i.e. every gated row reads locked, which is the safe
+   *  direction: a caller that forgets to pass it under-promises rather than
+   *  offering a purchase the sim will refuse. */
+  gatheringProficiency?: Readonly<Record<string, number>>;
 }
 
 export interface VendorBuybackRow {
@@ -57,6 +70,13 @@ export interface VendorView {
  * positive copper or Honor price (vendors never list a priceless item). Buyback:
  * a stored slot is redeemable only if the item still exists and the stack count
  * is positive.
+ *
+ * A row whose proficiency gate is unmet is still OFFERED, carrying `locked` and
+ * its `requirement`: the two drop rules above are about rows that could never be
+ * bought by anyone, while a gate is a row you cannot buy YET, and hiding those
+ * would leave a player unable to learn that the next tool exists or what opens
+ * it. Same reasoning as the trainer's locked recipes (train_view.ts) and the
+ * delve shop's locked offers.
  */
 export function buildVendorView(
   vendorItemIds: readonly string[],
@@ -74,12 +94,17 @@ export function buildVendorView(
       honor: Math.max(0, Math.floor(item.priceHonor ?? 0)),
     };
     if (price.copper <= 0 && price.honor <= 0) continue;
+    // The SAME resolver items.ts buyItem runs, never a mirror of its rule, so
+    // the lock the player sees cannot drift from what the purchase allows.
+    const gate = resolveVendorRowGate(itemId, balances.gatheringProficiency ?? {});
     goods.push({
       itemId,
       item,
       price,
       quantity,
       affordable: balances.copper >= price.copper && balances.honor >= price.honor,
+      locked: gate.locked,
+      ...(gate.requirement ? { requirement: gate.requirement } : {}),
     });
   }
   const buyback: VendorBuybackRow[] = [];

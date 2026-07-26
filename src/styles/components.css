@@ -4830,6 +4830,16 @@
     opacity: 0.45;
     cursor: default;
   }
+  /* A row locked by an unmet proficiency gate (vendor_row_gates.ts) already
+     greys through :disabled above, which is also what an unaffordable row
+     does; the .vi-sub requirement line is what tells the two apart, so it
+     takes the same error tint an unsatisfied cost takes just below, rather
+     than the dim sub-line grey it would otherwise inherit. Information, never
+     decoration: the line states the requirement in text, and the tint only
+     says the requirement is the unmet one. */
+  .vendor-item.vendor-locked .vi-sub {
+    color: var(--color-text-error);
+  }
   /* An unaffordable fee (train and unbind rows emit .unaffordable) tints
      like an unsatisfied cost everywhere else in the language; the row's
      disabled opacity alone left the reason invisible. */

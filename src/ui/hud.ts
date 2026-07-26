@@ -11646,6 +11646,12 @@ export class Hud {
       buildVendorView(npc.vendorItems, this.sim.vendorBuyback, ITEMS, {
         copper: this.sim.copper,
         honor: this.sim.honor,
+        // The advisory half of the vendor row gate. An IWorld member both
+        // worlds already implement (Sim reads PlayerMeta, ClientWorld mirrors
+        // the self-delta), so the locked state resolves client-side with no
+        // new wire field, exactly as the delve shop resolves its lock badge
+        // from the mirrored clears map.
+        gatheringProficiency: this.sim.gatheringProficiency,
       }),
       {
         ...this.presentationBag,
@@ -12305,6 +12311,15 @@ export class Hud {
     this.lastProfessionSurfaceSig = sig;
     this.charWindow.renderIfOpen();
     if ($('#crafting-window').style.display === 'flex') this.renderCrafting();
+    // An open vendor window rides the same signature, because a gathering
+    // counter is now one of the things a goods row is painted from: crossing a
+    // tool's threshold has to unlock its row, and nothing else would repaint
+    // it. The two are reachable together: the window closes only past 8 yards
+    // of the merchant, the nearest gather node to any counter is 9.01 yards
+    // (tanner_hesk to wood_mirefen_3), and a harvest happens within 5 yards of
+    // the node, so a player can stand inside both. The guard is the shipped
+    // open-vendor form; a closed window costs nothing but the comparison above.
+    if (this.openVendorNpcId !== null) this.renderVendor();
   }
 
   renderBags(): void {

@@ -13,6 +13,7 @@ import type { IWorld } from '../world_api';
 import { archetypeTitleText, craftNameText } from './char_window';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
+import { GATHERING_PROFESSION_NAME_KEYS } from './gathering_profession_name';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { professionIconUrl } from './icons';
 import type { PainterHostPresentation } from './painter_host';
@@ -49,17 +50,6 @@ const CEILING_LABEL_KEYS: Record<EmpowermentCeiling, TranslationKey> = {
   unlimited: 'hudChrome.professions.ceilingUnlimited',
   rare: 'hudChrome.professions.ceilingRare',
   common: 'hudChrome.professions.ceilingCommon',
-};
-
-// Gathering display-name keys (the char-window gathering section family).
-// Every GATHERING_PROFESSION_IDS id adds its id here alongside its catalog
-// key; an id with no key renders no row (the
-// view core passes every row through).
-const GATHERING_NAME_KEYS: Record<string, TranslationKey> = {
-  mining: 'hudChrome.gathering.mining',
-  logging: 'hudChrome.gathering.logging',
-  herbalism: 'hudChrome.gathering.herbalism',
-  fishing: 'hudChrome.gathering.fishing',
 };
 
 /**
@@ -419,7 +409,7 @@ export class ProfessionsWindow {
   private gatheringHtml(model: ProfessionsViewModel): string {
     const rows = model.gathering
       .map((row) => {
-        const key = GATHERING_NAME_KEYS[row.professionId];
+        const key = GATHERING_PROFESSION_NAME_KEYS[row.professionId];
         if (key === undefined) return '';
         const pct = Math.round(row.bar.fillFraction * 100);
         return (
