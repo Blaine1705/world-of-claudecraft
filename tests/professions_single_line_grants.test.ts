@@ -146,22 +146,46 @@ const professionGrant = (itemId: string, count = 1): SimEvent =>
     callerLogs: true,
   }) as SimEvent;
 
+// Every cue this file stubs, as ONE list the beforeEach installs and
+// firedCues() reads back, so the two can never cover different sets.
+const STUBBED_CUES = [
+  'lootItem',
+  'coin',
+  'gather',
+  'gatherRareTier',
+  'craftSuccess',
+  'masterwork',
+  'disenchant',
+  'salvage',
+  'enchant',
+  'fishReel',
+] as const;
+
+/** The names of every stubbed cue that actually fired, in list order. Asking
+ *  about the whole set is what makes #2458's "same action, same audio" a real
+ *  claim: naming lootItem and coin alone would miss a cue added on some other
+ *  arm later. */
+const firedCues = (): string[] =>
+  STUBBED_CUES.filter((name) => {
+    const spy = audio[name] as unknown as { mock?: { calls: unknown[] } };
+    return (spy.mock?.calls.length ?? 0) > 0;
+  });
+
+/** The exact event burst the sim emits for one successful unbind, per arm.
+ *  The stacked arm peels a copy back through the grant hub (both stand-down
+ *  flags since #2458); the lone arm clears boundTo in place, never reaches the
+ *  hub, and so has no grant event at all. That asymmetry in the BURST is the
+ *  whole reason the two arms could ever have sounded different. */
+const unbindBurst = (arm: 'stacked' | 'lone'): SimEvent[] => [
+  ...(arm === 'stacked' ? [professionGrant(SWORD, 1)] : []),
+  { type: 'unbindResult', pid: PLAYER_ID, ok: true, itemId: SWORD, fee: 2500 } as SimEvent,
+];
+
 beforeEach(() => {
   mountBags();
   // Every cue is stubbed: this file is about lines, and the cue contract has
   // its own file. The fishing arm's cue count is asserted below, though.
-  for (const name of [
-    'lootItem',
-    'coin',
-    'gather',
-    'gatherRareTier',
-    'craftSuccess',
-    'masterwork',
-    'disenchant',
-    'salvage',
-    'enchant',
-    'fishReel',
-  ] as const) {
+  for (const name of STUBBED_CUES) {
     vi.spyOn(audio, name).mockImplementation(() => {});
   }
 });
@@ -336,16 +360,7 @@ describe('one profession action prints exactly one grant line', () => {
     // stacked on top of the unbind line. A single-copy unbind clears in place
     // and never reaches the hub, so only the stacked arm ever double-logged.
     const hud = makeHud();
-    hud.handleEvents([
-      {
-        type: 'loot',
-        text: `You receive: ${ITEMS[SWORD]?.name}.`,
-        pid: PLAYER_ID,
-        silent: true,
-        callerLogs: true,
-      } as SimEvent,
-      { type: 'unbindResult', pid: PLAYER_ID, ok: true, itemId: SWORD, fee: 2500 } as SimEvent,
-    ]);
+    hud.handleEvents(unbindBurst('stacked'));
     const rendered = lines(hud);
     expect(rendered).toHaveLength(1);
     expect(rendered[0]).not.toContain('You receive');
@@ -353,28 +368,36 @@ describe('one profession action prints exactly one grant line', () => {
     // #2458: the cue stands down too. Unbind has no dedicated cue of its own,
     // so hudChrome.unbind.unbound is documented as the ONE success surface (no
     // toast, no sound cue, the trainResult rule) and the grant carries silent
-    // alongside callerLogs.
-    expect(audio.lootItem).not.toHaveBeenCalled();
-    expect(audio.coin).not.toHaveBeenCalled();
+    // alongside callerLogs. Asked across EVERY stubbed cue, not just the two
+    // the hub loot arm can reach, so a cue routed through some other arm later
+    // cannot slip in under a narrower assertion.
+    expect(firedCues()).toEqual([]);
     // The peel still moved items, so the bag mirror still repaints.
     expect(hud.renderBags).toHaveBeenCalled();
   });
 
   it('unbinding a lone copy sounds exactly like unbinding out of a stack', () => {
-    // #2458's acceptance criterion, and the only place the two arms are
-    // comparable: the count-1 arm clears boundTo in place, so its burst is the
-    // unbindResult event ALONE with no hub grant to flag. Driving it beside the
-    // stacked burst above is what makes "same action, same audio" a pin rather
-    // than a claim about one arm at a time.
-    const hud = makeHud();
-    hud.handleEvents([
-      { type: 'unbindResult', pid: PLAYER_ID, ok: true, itemId: SWORD, fee: 2500 } as SimEvent,
-    ]);
-    const rendered = lines(hud);
+    // #2458's acceptance criterion, stated as one comparison rather than two
+    // separate single-arm claims. The count-1 arm clears boundTo in place, so
+    // its burst is the unbindResult event ALONE with no hub grant to flag,
+    // which is why the two arms could ever have differed. This is a negative
+    // control, not the regression guard for the fix: it passes on the old code
+    // too. What it adds is the cross-arm equality, so the sim pin in
+    // tests/professions_commissions.test.ts stays the decisive one.
+    const stacked = makeHud();
+    stacked.handleEvents(unbindBurst('stacked'));
+    const stackedCues = firedCues();
+    vi.clearAllMocks();
+
+    const lone = makeHud();
+    lone.handleEvents(unbindBurst('lone'));
+    const loneCues = firedCues();
+
+    const rendered = lines(lone);
     expect(rendered).toHaveLength(1);
     expect(rendered[0]).toContain(itemDisplayName(ITEMS[SWORD]));
-    expect(audio.lootItem).not.toHaveBeenCalled();
-    expect(audio.coin).not.toHaveBeenCalled();
+    expect(loneCues).toEqual(stackedCues);
+    expect(loneCues).toEqual([]);
   });
 
   it('a yield-free disenchant success renders no dangling empty operand', () => {
@@ -618,6 +641,10 @@ describe('non-profession grants are untouched', () => {
     // LINE without owning the CUE, so the ding must still fire. Merging the
     // two guards into `if (!(ev.silent || ev.callerLogs))` is behaviorally the
     // regression those pins exist to stop, and it passes them; it fails here.
+    // Deliberately SYNTHETIC since #2458: no production emitter sets the two
+    // flags apart any more, so this fixture is the only thing keeping the hub's
+    // two independent guards from being collapsed into one condition. Do not
+    // delete it as unreachable.
     expect(audio.lootItem).toHaveBeenCalledTimes(1);
   });
 });

@@ -516,7 +516,11 @@ describe('every professions grant site is accounted for (#2430)', () => {
     // A regex that stopped matching would make the sweep below green while
     // checking nothing, so bind both the count and the shape.
     expect(sites.length).toBeGreaterThanOrEqual(19);
-    expect(sites.some((s) => s.file === 'commission.ts')).toBe(true);
+    // Bound to the CALL, not just the file: `.some(file === ...)` alone stays
+    // green if commission.ts keeps some other grant while the unbind peel moves
+    // out of src/sim/professions and off the sweep entirely. The find-then-
+    // toContain form fails on a missing site too (undefined has no substring).
+    expect(sites.find((s) => s.file === 'commission.ts')?.call).toContain('silent: true');
     expect(sites.some((s) => s.call.includes('callerLogs: true'))).toBe(true);
     expect(sites.some((s) => s.call.includes('silent: true'))).toBe(true);
     // The balanced-paren walk must capture the whole call, opts object and all,

@@ -75,7 +75,16 @@ describe('hud.ts unbindResult event arm (source pins)', () => {
   it('stays single-surface: chat log only, no banner, toast, or audio cue in the arm', () => {
     const arm = unbindResultArm();
     expect(arm.match(/this\.log\(/g)?.length, 'exactly the ok + deny log call sites').toBe(2);
-    expect(arm).not.toMatch(/showBanner|showToast|this\.audio|playSfx|playCue|celebrat/i);
+    // The audio half has to police the idioms hud.ts ACTUALLY uses, which are
+    // `audio.<cue>(` and `sfx.playUi(` (the working form is
+    // tests/professions_audio_wiring.test.ts). The alternation here used to
+    // list this.audio / playSfx / playCue / showToast, none of which occurs
+    // anywhere in hud.ts, so that half matched nothing and a real cue added to
+    // this arm would have passed the whole repo: the HUD cue pins only name
+    // lootItem and coin. #2458 made cue-free the load-bearing contract on BOTH
+    // unbind arms, so this is the guard that has to hold it.
+    expect(arm).not.toMatch(/\baudio\.\w+\(|\bsfx\.play\w*\(/);
+    expect(arm).not.toMatch(/showBanner|showToast|celebrat/i);
   });
 
   it('renders nothing for a reason-less deny (the silent malformed-item-id arm)', () => {

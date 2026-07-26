@@ -6794,8 +6794,11 @@ export class Sim {
   // the caller owns the player-visible line for this grant and renders a
   // richer one off its own result event, so the hub's "You receive:" line
   // stands down instead of printing a second line for the one grant (#2430).
-  // The two stay independent by design, but no shipped caller needs them
-  // apart: a grant whose result event owns the line owns the cue too, either
+  // The two stay independent by design, but no shipped caller sets exactly one
+  // (true repo-wide today; the enforced part is professions plus corpse
+  // harvest, which tests/professions_silent_loot.test.ts sweeps, and every
+  // other grant in the game passes no opts at all). A grant whose result event
+  // owns the line owns the cue too, either
   // as a dedicated cue of its own (gather/craft/disenchant/salvage/enchant/
   // fishing/corpse harvest) or as deliberate SILENCE, which is still owning it
   // (the Maker's Bond unbind peel in professions/commission.ts, whose contract
