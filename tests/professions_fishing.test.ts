@@ -522,14 +522,13 @@ describe('fishing proficiency accrual (pin 3)', () => {
   });
 });
 
-describe('fishing character XP: the deliberate zero (phase 0)', () => {
+describe('fishing character XP: the deliberate zero', () => {
   it('grants no character XP on any branch, through both the direct and live cast paths', () => {
     // Fishing is the only UNCAPPED gathering faucet (no node, no per-player
     // respawn), so it pays zero character XP by design: at a world-node
     // harvest's per-action XP it would be worth several times the XP per hour
-    // of every other gathering profession (ruling 3,
-    // docs/design/professions-tuning-packet.md). completeFishing carries that
-    // as a comment; this is the pin, so a later phase touching fishing cannot
+    // of every other gathering profession. completeFishing carries that as a
+    // comment; this is the pin, so a later change touching fishing cannot
     // quietly turn the prose false.
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;

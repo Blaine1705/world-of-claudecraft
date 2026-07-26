@@ -168,11 +168,11 @@ describe('hud wiring', () => {
   });
 
   it("paints the earned moment in the deed variant, not the level-up's gold banner", () => {
-    // Phase 0 of the professions tuning packet: a deed unlock used to fire the
-    // level-up's exact banner, and an early character trips several deeds in
-    // its first few gathering actions, so the two moments were unreadable
-    // apart. The variant is presentation only: same copy, same lifetime, and
-    // the announcer push stays (information is never gated on a visual).
+    // A deed unlock used to fire the level-up's exact banner, and an early
+    // character trips several deeds in its first few gathering actions, so the
+    // two moments were unreadable apart. The variant is presentation only:
+    // same copy, same lifetime, and the announcer push stays (information is
+    // never gated on a visual).
     const start = hud.indexOf('private handleDeedUnlocks(');
     expect(start).toBeGreaterThan(-1);
     // Strip line comments first: this method's prose names the 'deed' variant,

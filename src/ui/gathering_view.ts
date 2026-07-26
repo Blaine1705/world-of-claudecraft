@@ -188,8 +188,7 @@ export function gatherRareTierFor(
  *  threshold forward, so 99.5 reads 99, not a fake crossed 100 while the
  *  100-proficiency deed is still locked. `maxSkill` is the profession's
  *  content cap, carried so every readout can render a DENOMINATOR: a bare
- *  moving integer is what reads as a character level to a new player (see
- *  docs/design/professions-tuning-packet.md, phase 0). */
+ *  moving integer is what reads as a character level to a new player. */
 export interface GatheringProficiencyRow {
   professionId: GatheringProfessionId;
   value: number;

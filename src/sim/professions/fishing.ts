@@ -298,8 +298,7 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   // delve clear, craft, and the node harvest in gathering.ts) do not include
   // this file, and that absence is the design, not an oversight: fishing pays
   // fishing proficiency and loot, never levels. Pinned by the zero-XP test in
-  // tests/professions_fishing.test.ts and recorded in
-  // docs/design/professions-tuning-packet.md.
+  // tests/professions_fishing.test.ts.
   // Fishing proficiency: a landed catch accrues the fractional
   // schedule amount (fishingCatchGain above, junk cut off past band 0) through
   // the shared gathering-grant queue, draining on the tick path exactly like a

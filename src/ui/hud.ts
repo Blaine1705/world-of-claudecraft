@@ -824,9 +824,8 @@ type ItemQuality = NonNullable<ItemDef['quality']>;
  *  bare gold celebration text every milestone has always used (level up, zone
  *  crossing, craft masterwork, duel result). 'deed' is the Book of Deeds
  *  plate: a framed, quieter parchment treatment, because a deed accomplishment
- *  firing an identical gold banner to a real level-up is a documented cause of
- *  players reading routine gathering progress as leveling
- *  (docs/design/professions-tuning-packet.md, phase 0). */
+ *  firing an identical gold banner to a real level-up is a known cause of
+ *  players reading routine gathering progress as leveling. */
 export type BannerVariant = 'default' | 'deed';
 const ITEM_SLOT_LABEL_KEYS: Record<ItemSlot, TranslationKey> = {
   mainhand: 'itemUi.slots.mainhand',
@@ -10698,10 +10697,9 @@ export class Hud {
       const bannerText = t('hudChrome.deeds.unlockedBanner', { name: deedName(plan.bannerId) });
       // The 'deed' variant, NOT the shared gold level-up treatment: an early
       // character trips three or more deeds in its first five gathering
-      // actions, and an identical banner made those read as levels
-      // (docs/design/professions-tuning-packet.md, phase 0). Copy, lifetime
-      // and the announcer push below are untouched: this is presentation
-      // only, never information.
+      // actions, and an identical banner made those read as levels. Copy,
+      // lifetime and the announcer push below are untouched: this is
+      // presentation only, never information.
       this.showBanner(bannerText, true, undefined, 'deed');
       // The banner div carries no live semantics and the chat log is
       // deliberately aria-live off, so the polite #combat-live region is what

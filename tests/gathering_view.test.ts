@@ -247,10 +247,10 @@ describe('buildGatheringProficiencyRows', () => {
   });
 
   it('carries the per-profession content cap so a readout can render a denominator', () => {
-    // Phase 0 of the professions tuning packet: a bare integer that moves +1
-    // per harvest is what reads as a character level. Every row carries its
-    // own cap, and fishing's 200 is NOT the 100 the other three share, so a
-    // readout can never print one profession's bar against another's ceiling.
+    // A bare integer that moves +1 per harvest is what reads as a character
+    // level. Every row carries its own cap, and fishing's 200 is NOT the 100
+    // the other three share, so a readout can never print one profession's bar
+    // against another's ceiling.
     const rows = buildGatheringProficiencyRows(makeWorld({ proficiency: { mining: 12 } }));
     expect(rows.map((r) => [r.professionId, r.maxSkill])).toEqual([
       ['mining', 100],

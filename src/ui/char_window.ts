@@ -276,8 +276,7 @@ export class CharWindow {
   // Data comes from the pure gathering_view.ts core; this painter only formats it.
   // The value renders "12 / 100" through the SAME hudChrome.professions.skillValue
   // key the professions window uses, never a bare integer: an unbounded number
-  // that ticks up +1 per harvest is what players read as a character level
-  // (docs/design/professions-tuning-packet.md, phase 0).
+  // that ticks up +1 per harvest is what players read as a character level.
   private gatheringHtml(world: IWorld): string {
     const rows = buildGatheringProficiencyRows(world);
     const items = rows
