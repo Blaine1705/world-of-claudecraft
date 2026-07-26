@@ -99,7 +99,14 @@ describe('hud.ts unbindResult event arm (source pins)', () => {
     // also sfx.crowdRoar( (4), sfx.unloop( (3) and voice.play( (2), so a
     // `sfx.play\w*` alternation still misses three live spellings. The
     // working form is tests/professions_audio_wiring.test.ts.
-    expect(arm).not.toMatch(/\b(audio|sfx|voice)\.\w+\(/);
+    //
+    // The three module receivers are not the whole surface either: hud.ts
+    // routes sound through three private methods of its OWN, this.combat(
+    // (18 uses, a positional wrapper straight onto sfx.playAt), plus
+    // this.playEventSfx( and this.playAttackerSfx(. A cue added to this arm
+    // through any of those never names a module, so the receiver alternation
+    // alone waves it through.
+    expect(arm).not.toMatch(/\b(audio|sfx|voice)\.\w+\(|\bthis\.(combat|play\w*Sfx)\(/);
     // Out-of-chat surfaces: the whole this.show<X>( family, which is what
     // "banner or toast" means in this file. showBanner (45) and showError
     // (21) are the live ones, and showError is BOTH halves at once, since it
