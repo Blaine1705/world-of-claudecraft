@@ -928,6 +928,165 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
   });
 });
 
+// #2474: a corpse is single-use, so the family a repeated tag names must be
+// harvested ONCE however many times the frame repeats it. The pick reaches the
+// sim straight off the wire (server/game.ts type-filters `components` and
+// forwards it), and before the dedupe a hand-crafted ['hide','hide'] rolled,
+// granted and logged the hide family twice off one claim, signed Pristine Hides
+// included. Driven end to end here (rolls, grants, ledger, claim, lifecycle),
+// not just at the pure boundary in tests/gathering.test.ts.
+describe('a repeated component tag harvests the family once (#2474)', () => {
+  // Same seed, same corpse template, one command each: the duplicated pick must
+  // land the deduped pick's world, exactly.
+  function harvestWith(
+    templateId: string,
+    components: string[],
+    seed: number,
+  ): { inventory: unknown; events: unknown; draws: number; claimedBy: number | null } {
+    const { sim, internals, a } = setup(seed);
+    const template = MOBS[templateId];
+    const corpse = createMob(7774, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    corpse.dead = true;
+    corpse.aiState = 'dead';
+    corpse.corpseTimer = 9999;
+    corpse.respawnTimer = 9999;
+    internals.entities.set(corpse.id, corpse);
+    sim.drainEvents();
+    let draws = 0;
+    const rng = (sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }).rng;
+    rng.setObserver(() => {
+      draws++;
+    });
+    sim.harvestCorpse(corpse.id, components, a);
+    rng.setObserver(null);
+    return {
+      inventory: structuredClone(internals.players.get(a)!.inventory),
+      events: sim.drainEvents(),
+      draws,
+      claimedBy: corpse.harvestClaimedBy,
+    };
+  }
+
+  // wild_boar tags hide/tusk/meat: three tags, so a two-entry pick stays under
+  // the spread threshold and lands on the arm that used to hand the duplicate
+  // straight through. old_greyjaw (hide/fang/claw) is the same arm one tag map
+  // over. forest_wolf tags hide/fang: two tags, so ['hide','hide'] used to
+  // clear `>= tagged.length` and spread onto fang instead.
+  const CASES: { templateId: string; tag: string; arm: string }[] = [
+    { templateId: 'wild_boar', tag: 'hide', arm: 'concentrate' },
+    { templateId: 'wild_boar', tag: 'meat', arm: 'concentrate' },
+    { templateId: 'old_greyjaw', tag: 'fang', arm: 'concentrate' },
+    { templateId: 'forest_wolf', tag: 'hide', arm: 'spread threshold' },
+    { templateId: 'forest_wolf', tag: 'fang', arm: 'spread threshold' },
+  ];
+
+  it('grants exactly what the single tag grants, on the same seed, on both arms', () => {
+    for (const c of CASES) {
+      for (const seed of [2, 5, 11]) {
+        const label = `${c.templateId} ${c.tag} (${c.arm}) @${seed}`;
+        const dup = harvestWith(c.templateId, [c.tag, c.tag], seed);
+        const once = harvestWith(c.templateId, [c.tag], seed);
+        // The whole observable result of the command: what landed in the bags,
+        // every event it emitted (the harvestResult ledger included), and how
+        // much rng it spent doing it.
+        expect(dup.inventory, `${label} inventory`).toEqual(once.inventory);
+        expect(dup.events, `${label} events`).toEqual(once.events);
+        expect(dup.draws, `${label} draws`).toEqual(once.draws);
+        // ... and the claim is still spent exactly once, by the harvester.
+        expect(dup.claimedBy, `${label} claim`).toBe(once.claimedBy);
+        expect(dup.claimedBy, `${label} claim is the harvester`).not.toBeNull();
+      }
+    }
+  });
+
+  it('rolls and grants the family ONE time, not once per repeat (seed 5, absolute counts)', () => {
+    // The equality above would also pass if both sides were wrong together, so
+    // the doubled quantities are pinned to literals here. Seed 5 clears the
+    // signable floor on the first rarity roll, which is what made the old
+    // duplicate hand out a second signed Pristine Hide off a single corpse.
+    const { sim, internals, a } = setup(5);
+    const template = MOBS.wild_boar;
+    const corpse = createMob(7773, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    corpse.dead = true;
+    corpse.aiState = 'dead';
+    corpse.corpseTimer = 9999;
+    corpse.respawnTimer = 9999;
+    internals.entities.set(corpse.id, corpse);
+    expect(template.componentTags).toEqual(['hide', 'tusk', 'meat']);
+    sim.drainEvents();
+    sim.harvestCorpse(corpse.id, ['hide', 'hide'], a);
+    // Two draws is one family's worth (tier roll + rarity roll); four was the
+    // bug. Read off the ledger the client actually prints, which carries one
+    // entry per distinct granted item.
+    const result = sim
+      .drainEvents()
+      .filter((e): e is Extract<typeof e, { type: 'harvestResult' }> => e.type === 'harvestResult');
+    expect(result).toHaveLength(1);
+    expect(result[0].yields.map((y) => y.itemId).sort()).toEqual(['pristine_hide', 'rough_hide']);
+    expect(result[0].yields.filter((y) => y.itemId === 'rough_hide')).toHaveLength(1);
+    expect(sim.countItem('rough_hide', a)).toBe(4);
+    expect(sim.countItem('pristine_hide', a)).toBe(1);
+    const meta = internals.players.get(a)!;
+    expect(meta.inventory.filter((s) => s.itemId === 'pristine_hide')).toHaveLength(1);
+    // Nothing from the tags the caller never named.
+    expect(sim.countItem('game_meat', a)).toBe(0);
+  });
+
+  it('a repeat cannot pull in a tag the caller never asked for (spread threshold, seed 5)', () => {
+    // forest_wolf tags hide and fang, so ['hide','hide'] used to clear
+    // `chosen.length >= tagged.length` and spread across BOTH families at the
+    // zero concentration bonus a real two-tag pick earns. The fang line is the
+    // decisive one: a dedupe that ran after the length test would still grant it.
+    const { sim, mob, a } = setup(5);
+    expect(MOBS.forest_wolf.componentTags).toEqual(['hide', 'fang']);
+    sim.harvestCorpse(mob.id, ['hide', 'hide'], a);
+    expect(sim.countItem('rough_hide', a)).toBeGreaterThan(0);
+    expect(sim.countItem('wolf_fang', a)).toBe(0);
+  });
+
+  it('a repeat inside a MULTI-family pick collapses only its own family', () => {
+    // The mixed case: the other tags in the same frame must still be harvested,
+    // in the order they were named. wild_boar's tusk maps to no item, so hide
+    // and meat are the two that land.
+    const { sim, internals, a } = setup(5);
+    const template = MOBS.wild_boar;
+    const corpse = createMob(7772, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    corpse.dead = true;
+    corpse.aiState = 'dead';
+    corpse.corpseTimer = 9999;
+    corpse.respawnTimer = 9999;
+    internals.entities.set(corpse.id, corpse);
+    sim.drainEvents();
+    sim.harvestCorpse(corpse.id, ['meat', 'hide', 'meat'], a);
+    const result = sim
+      .drainEvents()
+      .filter((e): e is Extract<typeof e, { type: 'harvestResult' }> => e.type === 'harvestResult');
+    expect(result).toHaveLength(1);
+    // Ledger order follows the pick's first-occurrence order, meat before hide,
+    // which is also the chat-line order the player reads (#2457).
+    expect(result[0].yields.map((y) => y.itemId)).toEqual(['game_meat', 'rough_hide']);
+    expect(
+      internals.players.get(a)!.inventory.filter((s) => s.itemId === 'game_meat'),
+    ).toHaveLength(1);
+  });
+
+  it('leaves the corpse lifecycle exactly where a single-tag harvest leaves it', () => {
+    // The claim is single-use whatever the frame said: the repeat spends it
+    // once, the corpse is denied to everyone after, and the harvested-corpse
+    // timer clamp is the same one the deduped pick produces.
+    const { sim, mob, a, b } = setup(11);
+    const once = setup(11);
+    sim.harvestCorpse(mob.id, ['hide', 'hide'], a);
+    once.sim.harvestCorpse(once.mob.id, ['hide'], once.a);
+    expect(mob.harvestClaimedBy).toBe(a);
+    expect(mob.corpseTimer).toBe(once.mob.corpseTimer);
+    expect(mob.lootable).toBe(once.mob.lootable);
+    // A second command, repeated tag or not, is denied against the same corpse.
+    sim.harvestCorpse(mob.id, ['hide', 'hide'], b);
+    expect(mob.harvestClaimedBy).toBe(a);
+  });
+});
+
 // Corpse premium-arm tool gating (Professions 2.0): the plain
 // component grant is NEVER gated (the bare-hands floor); only the
 // signed/specimen upgrade of a signable rarity roll checks the best owned
@@ -1436,5 +1595,87 @@ describe('harvestCorpse omitted components over the wire', () => {
     const spy = vi.spyOn(server.sim, 'harvestCorpse').mockImplementation(() => {});
     (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
     expect(spy).toHaveBeenCalledWith(4242, ['hide'], session.pid);
+  });
+});
+
+// #2474 over the wire. The `components` array is a client-supplied value the
+// authoritative server acts on, and no shipped client sends a repeat (the loot
+// window's picker and the interact key both build unique tags), so the only way
+// in is a hand-crafted frame. This drives exactly that frame through a REAL
+// GameServer into the REAL sim, because the wire is where the untrusted value
+// enters and a fix that only held for a direct sim call would not close it.
+// Two servers, one command each: GameServer pins a constant WORLD_SEED and
+// neither run ticks, so the two worlds are byte-identical at harvest time and
+// any difference in the result is the pick.
+describe('a repeated component tag over the wire, through a real GameServer (#2474)', () => {
+  function serverHarvest(components: string[]): {
+    raw: string;
+    inventory: { itemId: string; count: number; instance?: unknown }[];
+    hides: number;
+    claimedBy: number | null;
+  } {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 93, 'Alpha');
+    const internals = server.sim as unknown as SimInternals;
+    const self = internals.entities.get(session.pid)!;
+    self.pos = { x: 0, y: 0, z: 0 };
+    self.prevPos = { x: 0, y: 0, z: 0 };
+    // wild_boar tags hide/tusk/meat: three tags, so a two-entry pick stays
+    // under the spread threshold and lands on the arm that used to hand the
+    // repeat through to the roll loop.
+    const template = MOBS.wild_boar;
+    const mobId = Math.max(...internals.entities.keys()) + 1;
+    const mob = createMob(mobId, template, template.maxLevel, { x: 2, y: 0, z: 0 });
+    mob.dead = true;
+    mob.aiState = 'dead';
+    mob.corpseTimer = 9999;
+    mob.respawnTimer = 9999;
+    internals.entities.set(mob.id, mob);
+    // A hand-built frame, the untrusted shape the issue reproduces with, parsed
+    // and dispatched exactly as a socket message is. `t: 'cmd'` is the real
+    // envelope (ClientWorld.rawCmd); without it the dispatcher drops the frame
+    // as a protocol anomaly and the test would pass on an unharvested corpse.
+    const raw = JSON.stringify({ t: 'cmd', cmd: 'harvestCorpse', id: mobId, components });
+    (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
+    return {
+      raw,
+      inventory: structuredClone(internals.players.get(session.pid)!.inventory),
+      hides: server.sim.countItem('rough_hide', session.pid),
+      claimedBy: mob.harvestClaimedBy,
+    };
+  }
+
+  it('lands the same bags a single tag lands, and spends the claim once', () => {
+    const dup = serverHarvest(['hide', 'hide']);
+    const once = serverHarvest(['hide']);
+    // The frame really carried the repeat: the assertion below is about the
+    // sim collapsing it, not about the payload never arriving.
+    expect(dup.raw).toContain('["hide","hide"]');
+    // Not a vacuous comparison of two empty bags: the harvest actually yielded.
+    expect(once.hides).toBeGreaterThan(0);
+    expect(dup.hides).toBe(once.hides);
+    expect(dup.inventory).toEqual(once.inventory);
+    expect(dup.claimedBy).not.toBeNull();
+    expect(dup.claimedBy).toBe(once.claimedBy);
+  });
+
+  it('forwards the repeat verbatim: the SIM boundary is what closes it, not the server', () => {
+    // Deliberate, and the reason the fix lives in effectiveFocusComponents: the
+    // offline Sim and the headless env call the same command without ever
+    // passing through server/game.ts, so sanitizing here would have left both
+    // hosts open. If a future change starts deduping on the server too, this
+    // test is the one that should be re-argued, not quietly deleted.
+    const server = new GameServer();
+    const session = joinServer(server, fakeWs(), 94, 'Alpha');
+    const raw = JSON.stringify({
+      t: 'cmd',
+      cmd: 'harvestCorpse',
+      id: 4242,
+      components: ['hide', 'hide'],
+    });
+    const spy = vi.spyOn(server.sim, 'harvestCorpse').mockImplementation(() => {});
+    (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
+    expect(spy).toHaveBeenCalledWith(4242, ['hide', 'hide'], session.pid);
   });
 });
