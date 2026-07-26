@@ -1141,6 +1141,12 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     // no loot, so the harvest takes the collapse arm and clamps the timer to 4.
     expect(mob.corpseTimer).toBe(4);
     expect(mob.corpseTimer).toBe(once.mob.corpseTimer);
+    // `lootable` is pinned against the arm that decides it rather than against
+    // the twin: this corpse has no loot, so it takes the collapse arm and ends
+    // false. Compared to the twin alone the line would hold even if the command
+    // never ran, since a createMob corpse starts out unlootable.
+    expect(mob.loot).toBeNull();
+    expect(mob.lootable).toBe(false);
     expect(mob.lootable).toBe(once.mob.lootable);
     // A second command, repeated tag or not, is denied against the same corpse.
     sim.harvestCorpse(mob.id, ['hide', 'hide'], b);
@@ -1245,6 +1251,21 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
           internals.entities.set(corpse.id, corpse);
           return corpse.id;
         },
+      },
+      {
+        // The sixth early return, and the only one that refuses SILENTLY (no
+        // error text): the target is not a dead mob. "Every arm" has to mean
+        // every arm, so the live mob and the unknown id are both here.
+        label: 'the target mob is still alive',
+        arrange: ({ mob }) => {
+          mob.dead = false;
+          mob.aiState = 'idle';
+          return mob.id;
+        },
+      },
+      {
+        label: 'the target id is not an entity at all',
+        arrange: () => 4242,
       },
     ];
     for (const arm of refusals) {
