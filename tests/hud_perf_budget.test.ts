@@ -433,14 +433,24 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
 // applies to it there.
 //
 // THE ESCAPE THAT SURVIVES, named rather than papered over: a window can be driven from
-// OUTSIDE itself. `Hud.update()` already reaches two of them, `renderTownFocus` and
-// `renderCrafting`, and both are correct today because both sit behind the 500ms slow band
-// and an invalidation key (hud.ts calls the crafting window a cold painter in as many
-// words). A future ungated call from that same method would make a window per-frame with
-// nothing in THIS file to see it, since the driver lives in the coordinator, not in the
-// painter. Closing that means a contract on `Hud.update()`'s call graph, which is a
-// different gate in a different file; it is not something a per-painter source scan can
-// reach, and pretending otherwise would be the more dangerous outcome.
+// OUTSIDE itself, and three already are. Walking `Hud.update()`'s call graph finds three
+// window repaints on the per-frame path, and all three are correct today because each sits
+// behind an invalidation gate rather than a cadence alone:
+//   renderTownFocus     -> town_focus_window, on the 500ms slow band, only while open
+//   renderCrafting      -> crafting_window, slow band plus a station-signature change
+//                          (hud.ts calls it a cold painter in as many words)
+//   paintLootSettings   -> loot_settings_window, gated purely on a low-frequency settings
+//                          + membership signature, deliberately excluding hp/resource so it
+//                          does not rebuild every combat tick
+// (A fourth path reaches bags_window through closeVendor, which is an out-of-range vendor
+// auto-close, not a repaint.)
+//
+// So a future UNGATED call from that same method would make a window per-frame with nothing
+// in THIS file to see it: the driver lives in the coordinator, not in the painter. Closing
+// it means a contract on `Hud.update()`'s call graph, which is a different gate in a
+// different file and carries its own blast radius (a source walk over a coordinator of this
+// size leans entirely on its own anti-vacuity pins). It is not something a per-painter
+// source scan can reach, and pretending otherwise would be the more dangerous outcome.
 //
 // Cold needs NO registration, which is what makes it safe as a default: every window painter
 // not listed below is held to zero on every matcher, so a new window is covered the day it
