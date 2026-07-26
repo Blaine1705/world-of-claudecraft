@@ -14,17 +14,31 @@
 // its walkable ground within 40 yards of a node, and holds every coordinate to
 // being dry, walkable, unblocked, reachable and workable.
 //
-// One case that honestly does NOT improve, recorded so nobody reads the above as
-// a blanket claim: a player working ONE profession in Eastbrook. All six veins
-// there are held inside a 20-yard ring around the Copper Dig by
-// tests/gather_nodes.test.ts, because q_prof_intro sends a level-1 character to
-// that landmark by name and the ore has to be findable there. So a solo miner
-// still clears the whole field in well under half a minute and then waits, and
-// the single wait is longer than it was (about 210 seconds against about 110).
-// The hourly ceiling is identical either way, and the fix does land for a
-// gatherer working more than one profession, and for mining in the two later
-// zones where the veins really are spread. Zone-1 mining is the deliberate
-// exception, not an oversight.
+// What "spends the wait walking" does and does not mean, measured rather than
+// asserted, because the honest version is narrower than the slogan. Modelling a
+// circuit as a nearest-neighbour tour at RUN_SPEED plus the 2.5-second cast
+// ceiling, working ALL of a zone's nodes:
+//
+//                  before (9/12/12 at 120s)      after (18 at 240s)
+//   Eastbrook       69s circuit, 43 pct idle      160s circuit, 33 pct idle
+//   Mirefen        109s circuit,  9 pct idle      207s circuit, 14 pct idle
+//   Thornpeak      113s circuit,  6 pct idle      197s circuit, 18 pct idle
+//
+// So the starting zone, which is where the complaint came from and where 43
+// percent of a session really was standing still, improves. The two later zones
+// get slightly worse, because their circuits were ALREADY nearly respawn-length,
+// so the packet's premise that "every zone circuit is shorter than the respawn"
+// was only substantially true of Eastbrook. And no circuit exceeds the respawn
+// even now: a gatherer working one profession is idle most of the cycle in every
+// zone, before and after (a solo Eastbrook miner: 10s of work in 120 before, 30s
+// in 240 now, because the six veins are held inside a 20-yard ring around the
+// Copper Dig by tests/gather_nodes.test.ts so q_prof_intro's ore is findable at
+// the landmark it names).
+//
+// The absolute circuit roughly doubled and now covers the zone rather than three
+// clearings, which is the density half of the goal and is real. The idle half is
+// only delivered in zone 1. Recorded here so the next reader does not believe
+// waiting was solved.
 
 import type { GatherNodeDef, GatherNodeType } from '../types';
 
@@ -262,13 +276,15 @@ export const GATHER_NODES: GatherNodeDef[] = [
     tier: 1,
   },
   // Every marsh vein sat in the northern third, within sight of Fenbridge. This
-  // one is out at the Sunken Bastion approach, so the southern half of the zone
-  // has ore of its own.
+  // one is out on the Drowned Chapel shore, so the southern half of the zone has
+  // ore of its own. It is the NEARER of the two ore additions to the hub (172
+  // yards against 196), which is why it is the tier-1 one: see the hub-distance
+  // rule in the tier-ramp block below.
   {
     id: 'ore_mirefen_4',
     zoneId: 'mirefen_marsh',
     type: 'ore',
-    pos: { x: 45, z: 491 },
+    pos: { x: 111, z: 431 },
     level: 10,
     tier: 1,
   },
@@ -451,13 +467,13 @@ export const GATHER_NODES: GatherNodeDef[] = [
     level: 10,
     tier: 2,
   },
-  // The Drowned Chapel shore, 172 yards out from Fenbridge against the near
-  // vein's 71.
+  // The Sunken Bastion approach, 196 yards out from Fenbridge and the deepest ore
+  // in the zone, so it is the ore addition that takes the higher tier.
   {
     id: 'ore_mirefen_t2b',
     zoneId: 'mirefen_marsh',
     type: 'ore',
-    pos: { x: 111, z: 431 },
+    pos: { x: 45, z: 491 },
     level: 10,
     tier: 2,
   },

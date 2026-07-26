@@ -327,8 +327,19 @@ describe('questObjectiveAreas', () => {
       if (type === 'ore') {
         const eastbrook = nodes.filter((n) => n.zoneId === 'eastbrook_vale');
         expect(eastbrook.length).toBe(6);
-        const digAreas = new Set(eastbrook.map((n) => areaFor.get(n.id)));
-        expect(digAreas.size, 'the Copper Dig ore field should be one circle').toBe(1);
+        const digAreas = [...new Set(eastbrook.map((n) => areaFor.get(n.id)))];
+        expect(digAreas.length, 'the Copper Dig ore field should be one circle').toBe(1);
+        // And the EXACT circle, computed from the six veins rather than restated.
+        // Every other grouping pin in this file reads gatherNodeClusters, so a
+        // caller that re-grouped WITHOUT the helper (grouping by zoneId, say) would
+        // satisfy containment, fewer-circles, one-circle and zone residency alike.
+        // This is the arm that reads what questObjectiveAreas actually emitted.
+        const cx = eastbrook.reduce((s, n) => s + n.pos.x, 0) / 6;
+        const cz = eastbrook.reduce((s, n) => s + n.pos.z, 0) / 6;
+        const far = Math.max(...eastbrook.map((n) => Math.hypot(n.pos.x - cx, n.pos.z - cz)));
+        expect(digAreas[0]?.center.x).toBeCloseTo(cx, 9);
+        expect(digAreas[0]?.center.z).toBeCloseTo(cz, 9);
+        expect(digAreas[0]?.radius).toBeCloseTo(Math.max(6, far + 4), 9);
       }
     }
   });

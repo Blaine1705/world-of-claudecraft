@@ -119,4 +119,24 @@ describe('diffChangedPaths', () => {
     expect(plan.isVisual).toBe(true);
     expect(plan.generic).toEqual(['hud-desktop', 'hud-mobile']);
   });
+
+  it('gather-node content shoots all three surfaces it is visible on', () => {
+    // Gather-node placement shows up in three places: the world map's terrain and
+    // labels, the quest-objective blobs, and the in-world props. A `when` list that
+    // only names the blobs would silently skip the other two, and the omission is
+    // invisible because a missing target just means one fewer screenshot. Pinning
+    // the resolved key ORDER makes a typo in either list red instead.
+    expect(
+      resolveTargets(['src/sim/content/gather_nodes.ts']).map((t: { key: string }) => t.key),
+    ).toEqual(['world-map', 'gather-quest-map-areas', 'gather-node']);
+    // The quest-blob geometry lives in the sim leaf, and only the blob target
+    // depends on it, so that path resolves to exactly one.
+    expect(resolveTargets(['src/sim/quest_targets.ts']).map((t: { key: string }) => t.key)).toEqual(
+      ['gather-quest-map-areas'],
+    );
+    // Both are visual, so a placement-only or geometry-only change never falls
+    // through to "nothing to shoot".
+    expect(classifyDiff(['src/sim/content/gather_nodes.ts']).isVisual).toBe(true);
+    expect(classifyDiff(['src/sim/quest_targets.ts']).isVisual).toBe(true);
+  });
 });

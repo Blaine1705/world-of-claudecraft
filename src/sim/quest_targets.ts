@@ -71,7 +71,10 @@ const POINT_AREA_RADIUS = 6;
  * six supply_crate spawns in the STARTING zone. The largest blob the gather
  * clustering produces is 29.9 yards (the four-stand Glimmermere chain), so 59
  * percent of the biggest circle this helper already draws, and smaller than the
- * one in zone 1. A world-space objective region that scales with zoom is what
+ * one in zone 1. That 29.9 is the widest the helper CAN produce rather than the
+ * widest a player sees: no shipped quest gathers wood, so the widest blob
+ * actually drawn today is 26.5 yards, the Thornpeak ore field. A world-space
+ * objective region that scales with zoom is what
  * this whole layer is; clustering in canvas space instead would make gather blobs
  * the only ones that did not.
  *
@@ -94,10 +97,13 @@ const NODE_CLUSTER_LINK_YD = 30;
  * is one content nudge away from silently merging two blobs.
  *
  * Deterministic in ORDER as well as membership. Groups come back sorted by their
- * lowest GATHER_NODES index and members in table order, stated explicitly rather
- * than inherited from Map insertion order, because the emitted order is what
- * numbers the badges a player sees and a later rewrite to a plain object would
- * otherwise reorder them silently.
+ * lowest GATHER_NODES index and members in table order. The sort is a no-op
+ * today, since byRoot is filled in ascending index so insertion order already
+ * matches, and it is written anyway so the guarantee is in the code rather than
+ * in a property of Map that a rewrite to a plain object would quietly drop. What
+ * that order actually controls is paint order and the order of refs the map's
+ * hover tooltip lists, NOT the numbers on the badges: those come from quest
+ * acceptance order in map_window_view's questNumbersByLog.
  */
 export function gatherNodeClusters(
   nodeType: GatherNodeType,

@@ -155,6 +155,14 @@ describe('q_prof_intro: mining, and only mining, satisfies the gather objective'
       expect(sim.meta(pid)!.questLog.get('q_prof_intro')?.counts).toEqual([index + 1]);
     });
     expect(sim.questState('q_prof_intro', pid)).toBe('ready');
+    // Name the two materials rather than leaving "cross-material" implied by the
+    // zone-keyed table: the objective counts ore of any kind, so the run must have
+    // banked both zones' yields and still credited five.
+    const eastbrookOre = nodeMaterialFor('ore', 'eastbrook_vale').itemId;
+    const mirefenOre = nodeMaterialFor('ore', 'mirefen_marsh').itemId;
+    expect(eastbrookOre).not.toBe(mirefenOre);
+    expect(sim.countItem(eastbrookOre, pid), eastbrookOre).toBeGreaterThan(0);
+    expect(sim.countItem(mirefenOre, pid), mirefenOre).toBeGreaterThan(0);
 
     player.pos.x = giver.pos.x;
     player.pos.z = giver.pos.z;

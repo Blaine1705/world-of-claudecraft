@@ -25,17 +25,20 @@ import {
   CAMPS,
   GATHER_NODE_TYPES,
   GATHER_NODES,
+  MOBS,
   WORLD_MAX_X,
   ZONES,
   zoneAt,
 } from '../src/sim/data';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
+import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
 import { INTERACT_RANGE } from '../src/sim/types';
 import {
   DECORATION_MAX_SLOPE,
   groundHeight,
   isInWaterBody,
   nearSteepWalls,
+  roadDistance,
   terrainHeight,
   terrainSteepness,
   terrainSteepnessAt,
@@ -466,9 +469,13 @@ describe('gather node placement: every node sits on ground a player can work', (
   it('count floor: every zone keeps every gathering profession worth visiting', () => {
     // A relocation must never be allowed to drain a zone of a type (moving a node
     // across a band boundary would), and the count itself is the density the
-    // world is tuned around: every zone carries six nodes of every type against a
-    // 240-second respawn (NODE_HARVEST_TABLE), which is what keeps a gathering
-    // circuit longer than the wait it is meant to fill.
+    // world is tuned around: every zone carries six nodes of every type against
+    // the 240-second respawn in NODE_HARVEST_TABLE, which is the pair that holds
+    // the per-zone harvest ceiling flat while roughly doubling the circuit. NOT,
+    // deliberately not, "which makes the circuit longer than the wait": measured
+    // as a nearest-neighbour tour, no zone circuit reaches 240 seconds even now
+    // (160 / 207 / 197 for all 18 nodes), and the honest before-and-after is
+    // recorded at the top of src/sim/content/gather_nodes.ts.
     //
     // The total is NOT enough on its own. Thornpeak carries six nodes per type
     // but only two of them are tier 1, so a total-only floor would still pass a
@@ -510,9 +517,10 @@ describe('gather node placement: every node sits on ground a player can work', (
     // number deliberately did NOT move with the count: the two nodes Thornpeak
     // gained per type went to tier 2 and tier 3, because a tier only one node in
     // the zone carries would have halved its own rate when respawn doubled, and
-    // tier 3 is what carries a gatherer's last 25 points of proficiency. A
-    // starter-tool traveller still has two workable nodes per type there, which
-    // is what the tier-1 floor above exists to protect.
+    // tier 3 is what carries a gatherer's last 25 points of proficiency. The
+    // floor above only demands ONE tier-1 node per type; that a starter-tool
+    // traveller actually gets two in Thornpeak is pinned here, by this exact
+    // value, and nowhere else.
     expect(leanestTier1).toBe(2);
   });
 
@@ -605,6 +613,119 @@ describe('gather node placement: every node sits on ground a player can work', (
       worldNodePct,
       `nodes reach ${worldNodePct.toFixed(1)} percent world-wide against mob camps' ${worldCampPct.toFixed(1)}`,
     ).toBeLessThan(worldCampPct);
+  });
+
+  it('the starting zone keeps its nodes clear of a rare elite', () => {
+    // A vein once shipped 2.2 yards from Grix the Tunnelking's spawn centre, and
+    // Grix is level 7, rare, elite, cc-immune, with a 13-yard aggro radius. That
+    // vein is one of the six q_prof_intro sends a level-1 character to, and a
+    // 2.5-second harvest cast inside a rare elite's aggro is a death rather than a
+    // fight, since damage cancels the cast outright. Nothing caught it: the arms
+    // in this file ask whether ground is workable, not whether it is survivable.
+    //
+    // Scoped to eastbrook_vale on purpose, and the unscoped version is not simply
+    // omitted for convenience: it would fail on shipped tier-2 and tier-3 content
+    // in the level-17 zone (ore_thornpeak_t2 sits 2.8 yards from the
+    // ironvein_foreman rare), which is flavour aimed at a player who can survive
+    // it. The starting zone is where the danger is asymmetric, so that is where
+    // the rule holds.
+    const rares = CAMPS.filter((camp) => {
+      const mob = MOBS[camp.mobId];
+      return mob?.rare === true && mob?.elite === true;
+    });
+    expect(rares.length, 'no rare elite camps found, so this arm proves nothing').toBeGreaterThan(
+      0,
+    );
+    const starting = ZONES[0];
+    expect(starting.id).toBe('eastbrook_vale');
+    const startingRares = rares.filter((camp) => zoneAt(camp.center.z).id === starting.id);
+    expect(
+      startingRares.length,
+      'no rare elite in the starting zone, so this arm proves nothing',
+    ).toBeGreaterThan(0);
+    for (const node of GATHER_NODES.filter((n) => n.zoneId === starting.id)) {
+      for (const camp of startingRares) {
+        // Spawn ring plus the mob's own detection reach: the worst case is a mob
+        // rolled to the near edge of its ring noticing a player at the node.
+        const danger = camp.radius + (MOBS[camp.mobId]?.aggroRadius ?? 0);
+        const d = Math.hypot(node.pos.x - camp.center.x, node.pos.z - camp.center.z);
+        expect(
+          d,
+          `${node.id} is ${d.toFixed(2)}yd from the rare ${camp.mobId}, inside its ${danger}yd reach`,
+        ).toBeGreaterThan(danger);
+      }
+    }
+  });
+
+  it('the road band holds exactly the five nodes it held before this file existed', () => {
+    // The trailing comment at the bottom of this file explains why road clearance
+    // is NOT an arm: generateDecorations screens world props at 5 yards from a
+    // road, and five shipped nodes sit inside that, two of them the Copper Dig ore
+    // deliberately placed beside the mine road and pinned there. Leaving that as
+    // prose meant a relocation could quietly add a sixth. Pinning the exception
+    // SET keeps the decision where it belongs (a human adding to this list) while
+    // making a new violation mechanical rather than invisible. This is not the
+    // clearance rule; it is the record of who is exempt from one.
+    const inBand = GATHER_NODES.filter((n) => roadDistance(n.pos.x, n.pos.z) < 5)
+      .map((n) => n.id)
+      .sort();
+    expect(inBand).toEqual([
+      'herb_thornpeak_2',
+      'ore_eastbrook_1',
+      'ore_eastbrook_3',
+      'ore_mirefen_2',
+      'wood_mirefen_t2',
+    ]);
+  });
+
+  it('the added higher-tier node of each type is the one further from its hub', () => {
+    // The rule the tier-ramp block in gather_nodes.ts states: of a type's two
+    // additions in a later zone, the higher tier goes to the further one, so the
+    // long arm of the new circuit is the arm that asks for the better tool. It has
+    // to be scoped to the ADDITIONS (the `b` ids and their plainly-numbered
+    // siblings) rather than applied to all nodes, because the shipped Thornpeak
+    // ore pair predates the rule and inverts it. Unpinned, the rule drifted once
+    // already during authoring: the Mirefen ore pair was tiered the wrong way
+    // round until this arm's numbers were measured.
+    for (const zone of ZONES) {
+      for (const type of GATHER_NODE_TYPES) {
+        const added = GATHER_NODES.filter(
+          (n) => n.zoneId === zone.id && n.type === type && /(_[456]|_t[23]b)$/.test(n.id),
+        );
+        if (added.length < 2) continue;
+        const byTier = [...added].sort((a, b) => a.tier - b.tier);
+        const lowest = byTier[0];
+        const highest = byTier[byTier.length - 1];
+        if (lowest.tier === highest.tier) continue; // all one tier (Eastbrook)
+        const hubDist = (n: (typeof added)[number]) =>
+          Math.hypot(n.pos.x - zone.hub.x, n.pos.z - zone.hub.z);
+        expect(
+          hubDist(highest),
+          `${highest.id} (tier ${highest.tier}) is ${hubDist(highest).toFixed(1)}yd from the ${zone.id} hub but ${lowest.id} (tier ${lowest.tier}) is ${hubDist(lowest).toFixed(1)}`,
+        ).toBeGreaterThan(hubDist(lowest));
+      }
+    }
+  });
+
+  it('every zone lands on one harvest ceiling, which is why both levers moved', () => {
+    // The whole reason the node count and the respawn changed together. The
+    // ceiling a zone can sustain is nodes * 3600 / respawn, and the point was to
+    // hold it flat rather than raise it: Eastbrook was 9 nodes at 120 seconds and
+    // is 18 at 240, identical, while Mirefen and Thornpeak came DOWN from 12 at
+    // 120. Composition of the count floor and the respawn literal implies this,
+    // but nothing named it, so tuning either lever alone would leave both of those
+    // pins green while the ceiling moved.
+    const perHour = (nodes: number) => (nodes * 3600) / NODE_HARVEST_TABLE.ore.respawnSeconds;
+    const ceilings = ZONES.map((zone) =>
+      perHour(GATHER_NODES.filter((n) => n.zoneId === zone.id).length),
+    );
+    expect(new Set(ceilings).size, `zone ceilings differ: ${ceilings.join(', ')}`).toBe(1);
+    expect(ceilings[0]).toBe(270);
+    // All three types share the respawn, so the ceiling is one number per zone
+    // rather than three.
+    for (const type of GATHER_NODE_TYPES) {
+      expect(NODE_HARVEST_TABLE[type].respawnSeconds).toBe(NODE_HARVEST_TABLE.ore.respawnSeconds);
+    }
   });
 
   it('render anchor: groundHeight and terrainHeight agree at every node', () => {
