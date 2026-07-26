@@ -827,7 +827,7 @@ type ItemQuality = NonNullable<ItemDef['quality']>;
  *  firing an identical gold banner to a real level-up is a documented cause of
  *  players reading routine gathering progress as leveling
  *  (docs/design/professions-tuning-packet.md, phase 0). */
-type BannerVariant = 'default' | 'deed';
+export type BannerVariant = 'default' | 'deed';
 const ITEM_SLOT_LABEL_KEYS: Record<ItemSlot, TranslationKey> = {
   mainhand: 'itemUi.slots.mainhand',
   offhand: 'itemUi.slots.offhand',

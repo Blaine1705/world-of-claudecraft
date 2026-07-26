@@ -522,6 +522,53 @@ describe('fishing proficiency accrual (pin 3)', () => {
   });
 });
 
+describe('fishing character XP: the deliberate zero (phase 0)', () => {
+  it('grants no character XP on any branch, through both the direct and live cast paths', () => {
+    // Fishing is the only UNCAPPED gathering faucet (no node, no per-player
+    // respawn), so it pays zero character XP by design: at a world-node
+    // harvest's per-action XP it would be worth several times the XP per hour
+    // of every other gathering profession (ruling 3,
+    // docs/design/professions-tuning-packet.md). completeFishing carries that
+    // as a comment; this is the pin, so a later phase touching fishing cannot
+    // quietly turn the prose false.
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    const before = meta.counters.xpGained;
+
+    // The direct path: enough casts to cover landed fish, landed junk, and
+    // the no-bite branch at this seed.
+    let landed = 0;
+    let empty = 0;
+    for (let i = 0; i < 30; i++) {
+      if (castOnce(sim, meta).caught === null) empty++;
+      else landed++;
+    }
+    expect(landed).toBeGreaterThan(0);
+    expect(empty).toBeGreaterThan(0);
+    expect(meta.counters.xpGained).toBe(before);
+
+    // The live cast lifecycle (bite, armed reel window, landed catch) too, so
+    // the zero is not an artifact of calling completeFishing directly. The
+    // implement gate (#2343) needs tackle in bags; the simple pole is
+    // mechanically identical to bare hands, so it perturbs no draw.
+    sim.addItem('simple_fishing_pole', 1);
+    teleportToValeShore(sim);
+    for (let i = 0; i < 5; i++) castOnceLive(sim, meta);
+    expect(meta.counters.xpGained).toBe(before);
+
+    // The proficiency faucet DID run: this is a real zero on a live path, not
+    // a run where nothing happened.
+    sim.tick();
+    expect(meta.gatheringProficiency.fishing).toBeGreaterThan(0);
+
+    // Non-vacuity: the same counter is live and does move when something
+    // actually grants character XP, so the assertions above are a genuine
+    // zero rather than a probe that can never increment.
+    sim.ctx.grantXp(10, meta);
+    expect(meta.counters.xpGained).toBeGreaterThan(before);
+  });
+});
+
 describe('fishing catch gain schedule (Professions 2.0)', () => {
   it('fishingCatchGain walks the fractional schedule AT the half-band boundaries', () => {
     expect(fishingCatchGain(0, false)).toBe(1);

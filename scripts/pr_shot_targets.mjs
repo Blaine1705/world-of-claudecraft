@@ -981,6 +981,31 @@ export const TARGETS = [
     },
   },
   {
+    key: 'deed-unlock-banner',
+    label: 'Deed unlock banner (its own plate, not the level-up gold text)',
+    when: ['ui/deeds_view', 'ui/deed_tracker', 'styles/hud.css'],
+    // Drives the REAL earned moment (Hud.handleDeedUnlocks -> the pure
+    // buildDeedUnlockPlan -> showBanner), never showBanner directly, so the
+    // capture exercises the actual paint path including the variant argument.
+    // prog_first_steps is the level-2 deed, i.e. exactly the one that used to
+    // fire looking identical to the level-up banner it shares an element with.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        window.__game?.hud?.handleDeedUnlocks?.([{ deedId: 'prog_first_steps' }]);
+      });
+      // The banner holds for 2600 ms before it starts fading; shoot inside it.
+      await wait(500);
+      const shown = await page.evaluate(() => {
+        const el = document.querySelector('#banner');
+        return !!el && el.style.opacity === '1' && (el.textContent ?? '').length > 0;
+      });
+      return shown ? { clip: '#banner' } : {};
+    },
+  },
+  {
     key: 'worn-enchant-tooltip',
     label: 'Paperdoll tooltip after enchanting the WORN piece in place',
     when: ['professions/enchanting', 'ui/enchant_apply_view'],

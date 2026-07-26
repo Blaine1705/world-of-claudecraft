@@ -253,9 +253,12 @@ describe('char_window: profession art placements', () => {
     // The same key the professions window uses, so the two surfaces cannot
     // drift apart and a locale owns the separator. Never a concatenated
     // '/' literal in the painter.
-    expect(painter).toContain("t('hudChrome.professions.skillValue'");
-    expect(painter).toMatch(/skill:\s*formatNumber\(r\.displayValue/);
-    expect(painter).toMatch(/max:\s*formatNumber\(r\.maxSkill/);
+    // Strip whole-line comments first: gatheringHtml's own comment names this
+    // key in prose, so an uncommented read is one reword from self-satisfying.
+    const code = painter.replace(/^\s*\/\/.*$/gm, '');
+    expect(code).toContain("t('hudChrome.professions.skillValue'");
+    expect(code).toMatch(/skill:\s*formatNumber\(r\.displayValue/);
+    expect(code).toMatch(/max:\s*formatNumber\(r\.maxSkill/);
   });
 });
 

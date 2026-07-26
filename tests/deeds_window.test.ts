@@ -10,11 +10,20 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
+import { audio } from '../src/game/audio';
+import { deedName } from '../src/ui/deed_i18n';
+import { Hud } from '../src/ui/hud';
 
 // This file runs under jsdom (for the keyboard-guard behavioral test below),
 // where import.meta.url is an http URL that readFileSync rejects; resolve the
 // source-guard reads from __dirname instead.
 const read = (rel: string): string => readFileSync(join(__dirname, rel), 'utf8');
+
+// Source-text pins must not be satisfiable by PROSE: several of the methods
+// pinned below carry comments that name the very tokens the pins look for.
+// Only WHOLE-line comments: a trailing-comment or URL-bearing code line must
+// survive intact, or the pins below would stop seeing the code they guard.
+const stripLineComments = (src: string): string => src.replace(/^\s*\/\/.*$/gm, '');
 
 const painter = read('../src/ui/deeds_window.ts');
 const tracker = read('../src/ui/deed_tracker_painter.ts');
@@ -165,30 +174,100 @@ describe('hud wiring', () => {
     // apart. The variant is presentation only: same copy, same lifetime, and
     // the announcer push stays (information is never gated on a visual).
     const start = hud.indexOf('private handleDeedUnlocks(');
-    const body = hud.slice(start, hud.indexOf('log(text: string', start));
+    expect(start).toBeGreaterThan(-1);
+    // Strip line comments first: this method's prose names the 'deed' variant,
+    // so an uncommented slice would let a reworded comment satisfy the pin.
+    const body = stripLineComments(hud.slice(start, hud.indexOf('log(text: string', start)));
     expect(body).toContain("this.showBanner(bannerText, true, undefined, 'deed');");
     expect(body).toContain('this.combatAnnouncer.push(bannerText, performance.now());');
   });
 
   it('gives the deed banner its own plate in CSS, on desktop and touch', () => {
-    const hudCss = read('../src/styles/hud.css');
-    const hudMobileCss = read('../src/styles/hud.mobile.css');
     const tokensCss = read('../src/styles/tokens.css');
-    // A framed plate in its own colour, never the bare --gold level-up text.
-    expect(hudCss).toMatch(/#banner\.banner-deed[\s\S]*?color:\s*var\(--color-deed-banner-text\)/);
-    expect(hudCss).toMatch(
-      /#banner\.banner-deed[\s\S]*?border:[^;]*var\(--color-deed-banner-border\)/,
-    );
-    expect(hudCss).toMatch(
-      /#banner\.banner-deed[\s\S]*?background:\s*var\(--color-deed-banner-bg\)/,
-    );
-    // Colours are tokens, never literals at the use site.
-    expect(tokensCss).toContain('--color-deed-banner-text:');
-    expect(tokensCss).toContain('--color-deed-banner-border:');
-    expect(tokensCss).toContain('--color-deed-banner-bg:');
-    // The plate is sized for touch in BOTH mobile blocks (the landscape media
-    // query restates the whole #banner block, so one rule would be won back).
-    expect(hudMobileCss.match(/body\.mobile-touch #banner\.banner-deed/g)?.length).toBe(2);
+    // Bound the match to the rule's own block: an unbounded [\s\S]*? would
+    // happily match a declaration in some LATER rule and go vacuous the day
+    // another selector uses these tokens.
+    const plateIdx = hudCss.indexOf('#banner.banner-deed');
+    expect(plateIdx).toBeGreaterThan(-1);
+    const plate = hudCss.slice(plateIdx, hudCss.indexOf('}', plateIdx));
+    expect(plate).toMatch(/color:\s*var\(--color-deed-banner-text\)/);
+    expect(plate).toMatch(/border:[^;]*var\(--color-deed-banner-border\)/);
+    expect(plate).toMatch(/background:\s*var\(--color-deed-banner-bg\)/);
+    // The decorative lift sheds with the graphics tier like its neighbours.
+    expect(plate).toMatch(/box-shadow:[^;]*var\(--fx-shadow/);
+    // Tokens carry real values, and the deed text colour is NOT the level-up
+    // gold: aliasing it to --gold would keep every other pin green while
+    // erasing the entire point of the variant.
+    const tokenValue = (name: string): string => {
+      const m = tokensCss.match(new RegExp(`${name}:\\s*([^;]+);`));
+      expect(m, `${name} missing from tokens.css`).toBeTruthy();
+      return (m?.[1] ?? '').trim();
+    };
+    for (const name of [
+      '--color-deed-banner-text',
+      '--color-deed-banner-border',
+      '--color-deed-banner-bg',
+    ]) {
+      expect(tokenValue(name).length).toBeGreaterThan(2);
+    }
+    expect(tokenValue('--color-deed-banner-text')).not.toBe('var(--gold)');
+    expect(tokenValue('--color-deed-banner-text').toLowerCase()).not.toBe('#ffd100');
+    // ONE touch rule covers both orientations: it is a class more specific
+    // than the landscape block's plain `body.mobile-touch #banner`, so a
+    // second copy inside the media query would be dead CSS.
+    expect(hudMobile.match(/body\.mobile-touch #banner\.banner-deed/g)?.length).toBe(1);
+  });
+
+  // The two source pins above prove hud.ts PASSES 'deed' and that showBanner
+  // SETS the class, but neither executes the join. This drives the real
+  // earned-moment arm end to end on the real Hud.prototype method.
+  it('paints the real deed unlock as a deed-variant banner, with copy and lifetime intact', () => {
+    vi.useFakeTimers();
+    const achievement = vi.spyOn(audio, 'achievement').mockImplementation(() => {});
+    try {
+      const h = Object.create(Hud.prototype) as unknown as {
+        bannerEl: HTMLElement;
+        bannerTimer: number | undefined;
+        log: ReturnType<typeof vi.fn>;
+        combatAnnouncer: { push: ReturnType<typeof vi.fn> };
+        handleDeedUnlocks(events: { deedId: string; retro?: boolean }[]): void;
+        showBanner(text: string): void;
+      };
+      h.bannerEl = document.createElement('div');
+      h.bannerTimer = undefined;
+      h.log = vi.fn();
+      h.combatAnnouncer = { push: vi.fn() };
+
+      h.handleDeedUnlocks([{ deedId: 'prog_first_steps' }]);
+
+      // The variant actually reached the element.
+      expect(h.bannerEl.classList.contains('banner-deed')).toBe(true);
+      // Copy is unchanged: the localized unlock line, naming the deed, and it
+      // still reaches the polite live region.
+      const copy = h.bannerEl.querySelector('.banner-copy')?.textContent ?? '';
+      expect(copy).toContain(deedName('prog_first_steps'));
+      expect(h.combatAnnouncer.push).toHaveBeenCalledTimes(1);
+      expect(h.combatAnnouncer.push.mock.calls[0][0]).toBe(copy);
+      expect(achievement).toHaveBeenCalledTimes(1);
+
+      // Lifetime is unchanged: the deed plate holds for the same 2600 ms the
+      // shared slot has always used, so the variant cannot quietly linger.
+      expect(h.bannerEl.style.opacity).toBe('1');
+      vi.advanceTimersByTime(2599);
+      expect(h.bannerEl.style.opacity).toBe('1');
+      vi.advanceTimersByTime(1);
+      expect(h.bannerEl.style.opacity).toBe('0');
+
+      // ...and a default banner through the same slot holds exactly as long.
+      h.showBanner('Level 12!');
+      expect(h.bannerEl.classList.contains('banner-deed')).toBe(false);
+      expect(h.bannerEl.style.opacity).toBe('1');
+      vi.advanceTimersByTime(2600);
+      expect(h.bannerEl.style.opacity).toBe('0');
+    } finally {
+      vi.useRealTimers();
+      vi.restoreAllMocks();
+    }
   });
 
   it('announces the unlock and the retro summary through the polite #combat-live region', () => {

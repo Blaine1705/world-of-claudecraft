@@ -294,10 +294,11 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   // below. It is the only UNCAPPED gathering faucet (a catch needs no node and
   // no per-player respawn timer), so at the per-action XP a world-node harvest
   // pays it would be worth several times the XP per hour of every other
-  // gathering profession. The sim's five grantXp sites (mob kill, quest
-  // turn-in, delve clear, craft, and the node harvest in gathering.ts) do not
-  // include this file, and that absence is the design, not an oversight:
-  // fishing pays fishing proficiency and loot, never levels. Recorded in
+  // gathering profession. The sim's grantXp sites (mob kill, quest turn-in,
+  // delve clear, craft, and the node harvest in gathering.ts) do not include
+  // this file, and that absence is the design, not an oversight: fishing pays
+  // fishing proficiency and loot, never levels. Pinned by the zero-XP test in
+  // tests/professions_fishing.test.ts and recorded in
   // docs/design/professions-tuning-packet.md.
   // Fishing proficiency: a landed catch accrues the fractional
   // schedule amount (fishingCatchGain above, junk cut off past band 0) through

@@ -258,9 +258,6 @@ describe('buildGatheringProficiencyRows', () => {
       ['herbalism', 100],
       ['fishing', 200],
     ]);
-    for (const row of rows) {
-      expect(row.maxSkill).toBe(GATHERING_PROFESSIONS[row.professionId].maxSkill);
-    }
   });
 
   it('sources the cap from content, ignoring an absent or malformed wire maxSkill', () => {

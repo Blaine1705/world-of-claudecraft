@@ -2287,7 +2287,10 @@
     gap: 6px;
   }
   /* The deed plate scales with the rest of the touch chrome; the desktop
-     26px would eat a phone's width once the plate's padding is added. */
+     26px would eat a phone's width once the plate's padding is added. One
+     rule covers both orientations: the landscape block below restates plain
+     `body.mobile-touch #banner`, which is a class less specific than this, so
+     it cannot win the size back no matter the source order. */
   body.mobile-touch #banner.banner-deed {
     font-size: calc(19px * var(--mobile-chrome-scale, 1));
     padding: 6px 14px;
@@ -4991,12 +4994,6 @@
       text-align: center;
       white-space: normal;
       overflow-wrap: anywhere;
-    }
-    /* Landscape repeats the touch banner block wholesale, so the deed plate
-       has to restate its size here or the block above would win it back. */
-    body.mobile-touch #banner.banner-deed {
-      font-size: calc(19px * var(--mobile-chrome-scale, 1));
-      padding: 6px 14px;
     }
     body.mobile-touch #subzone-banner {
       top: 25%;

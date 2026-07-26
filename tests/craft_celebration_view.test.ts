@@ -16,7 +16,7 @@ import {
   computeCraftTierUps,
   observeCraftSkillsForTierUps,
 } from '../src/ui/craft_celebration_view';
-import { Hud } from '../src/ui/hud';
+import { type BannerVariant, Hud } from '../src/ui/hud';
 import { MASTERWORK_SEAL_IMAGE_URL } from '../src/ui/profession_art';
 
 describe('computeCraftTierUps', () => {
@@ -163,7 +163,7 @@ interface CraftCelebrationHudHarness {
     text: string,
     motion?: boolean,
     decorativeIconUrl?: string,
-    variant?: 'default' | 'deed',
+    variant?: BannerVariant,
   ): void;
 }
 
