@@ -26,6 +26,29 @@ async function pollForSize(page, selector, attempts = 20, intervalMs = 500) {
   return false;
 }
 
+// Teleport onto the Merchant's stall (zone1, {0, 11.5}) so marketOpen's proximity gate
+// passes, then open the Browse tab. Shared by the market filter-chrome targets below.
+//
+// Two deliberate display writes, mirroring the market-window target: #market-window is
+// forced hidden FIRST so pollForSize cannot pass on a window that was already up (only
+// openMarket's own display:flex clears it), and #bags is hidden because the market docks
+// its companion alongside and, on mobile, over the top of it.
+async function openMarketBrowse(page) {
+  await page.evaluate(() => {
+    const p = window.__game?.sim?.player;
+    if (p?.pos) {
+      p.pos.x = 0;
+      p.pos.z = 11.5;
+    }
+    const el = document.querySelector('#market-window');
+    if (el) el.style.display = 'none';
+    window.__game?.hud?.openMarket?.();
+    const bags = document.querySelector('#bags');
+    if (bags) bags.style.display = 'none';
+  });
+  return pollForSize(page, '#market-window');
+}
+
 export const TARGETS = [
   {
     key: 'player-tooltip',
@@ -877,6 +900,55 @@ export const TARGETS = [
       });
       const open = await pollForSize(page, '#market-window');
       return open ? { clip: '#market-window' } : {};
+    },
+  },
+  // The market-window target above shoots the browse grid with every dropdown CLOSED, so
+  // it is blind to the filter vocabulary itself. These two open the menus. Keyed on the
+  // shared query module (which holds the option lists) plus the view core (which decides
+  // WHICH menus a type raises), and deliberately NOT on ui/market_window, so an unrelated
+  // painter layout change does not drag them along.
+  {
+    key: 'market-type-filter-list',
+    label: 'World Market item-type filter list (open)',
+    when: ['sim/market_query', 'ui/market_view'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      if (!(await openMarketBrowse(page))) return {};
+      const opened = await page.evaluate(() => {
+        const menu = document.querySelector('[data-market-filter-menu="itemType"]');
+        const btn = menu?.querySelector('.mkt-select-btn');
+        if (!btn) return false;
+        btn.click();
+        return true;
+      });
+      if (!opened) return {};
+      await wait(250);
+      return { clip: '#market-window' };
+    },
+  },
+  {
+    key: 'market-bag-size-filter',
+    label: 'World Market bag capacity filter (Bags selected, sizes open)',
+    when: ['sim/market_query', 'ui/market_view'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      // Skip rather than clip a selector that never appeared, matching the sibling
+      // market-window target: a shot of the whole page is worse than no shot.
+      if (!(await openMarketBrowse(page))) return {};
+      // On the BASE commit there is no 'bag' option, so this is a no-op and the shot
+      // is the plain browse tab: exactly the "before" this change is contrasted with.
+      await page.evaluate(() => {
+        document
+          .querySelector('[data-market-filter-menu="itemType"] [data-market-filter-option="bag"]')
+          ?.click();
+      });
+      await wait(250);
+      await page.evaluate(() => {
+        const menu = document.querySelector('[data-market-filter-menu="subtype"]');
+        menu?.querySelector('.mkt-select-btn')?.click();
+      });
+      await wait(250);
+      return { clip: '#market-window' };
     },
   },
   {
@@ -2973,6 +3045,17 @@ export const TARGETS = [
       { key: 'targets-replace', targets: true, replace: true },
       { key: 'targets-replace-mobile', targets: true, replace: true, mobile: true },
       { key: 'replace-confirm', targets: true, replace: true, replaceConfirm: true },
+      // The confirm on touch: this dialog carries the most copy of any state
+      // here (what dies, the no-refund ruling, what survives, the price), so
+      // the narrow landscape viewport is where it is most likely to wrap or
+      // clip, and it needs its own capture rather than a desktop stand-in.
+      {
+        key: 'replace-confirm-mobile',
+        targets: true,
+        replace: true,
+        replaceConfirm: true,
+        mobile: true,
+      },
     ],
     async capture(page, variant) {
       await page.evaluate(() => {
@@ -2992,6 +3075,15 @@ export const TARGETS = [
             // one on screen), and a plain bagged copy (the classic target), so
             // the target step paints all three families at once. Real ids
             // only, never hand-written display strings.
+            //
+            // The bagged victim carries ALL THREE surviving facts (#2421): the
+            // signature, a masterwork bake (str, distinct from the int the
+            // enchant contributes, so the confirm's kept line and the tooltip's
+            // own attribution split agree), and an armed bind-on-trade lock.
+            // That is what puts a full "Kept: ..." line on screen; the worn
+            // copy stays plain-enchanted, so the same shot also shows the arm
+            // that deliberately claims no bind state. The bagged plain copy of
+            // the SAME item id is the mixed holding whose twin now says so.
             sim.addItemInstance('eastbrook_arming_sword', {
               enchant: 'enchant_weapon_agility',
               rolled: { stats: { agi: 2 } },
@@ -3000,7 +3092,8 @@ export const TARGETS = [
             sim.addItemInstance('eastbrook_arming_sword', {
               signer: 'Aldric',
               enchant: 'enchant_weapon_intellect',
-              rolled: { stats: { int: 2 } },
+              rolled: { masterwork: true, stats: { int: 2, str: 3 } },
+              bindOnTrade: true,
             });
             sim.addItem('eastbrook_arming_sword', 1);
             sim.addItem('arcane_dust', 6);
