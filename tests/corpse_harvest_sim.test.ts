@@ -972,13 +972,30 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
   // straight through. old_greyjaw (hide/fang/claw) is the same arm one tag map
   // over. forest_wolf tags hide/fang: two tags, so ['hide','hide'] used to
   // clear `>= tagged.length` and spread onto fang instead.
-  const CASES: { templateId: string; tag: string; arm: string }[] = [
-    { templateId: 'wild_boar', tag: 'hide', arm: 'concentrate' },
-    { templateId: 'wild_boar', tag: 'meat', arm: 'concentrate' },
-    { templateId: 'old_greyjaw', tag: 'fang', arm: 'concentrate' },
-    { templateId: 'forest_wolf', tag: 'hide', arm: 'spread threshold' },
-    { templateId: 'forest_wolf', tag: 'fang', arm: 'spread threshold' },
+  // `tags` is pinned per row, not just described: the arm a row exercises is
+  // decided by the corpse's tag COUNT against the two-entry pick, so a content
+  // retag would slide a row onto the other arm while the table still claimed to
+  // cover both. Pinning the tags here is what keeps the matrix honest.
+  const CASES: { templateId: string; tag: string; arm: string; tags: string[] }[] = [
+    { templateId: 'wild_boar', tag: 'hide', arm: 'concentrate', tags: ['hide', 'tusk', 'meat'] },
+    { templateId: 'wild_boar', tag: 'meat', arm: 'concentrate', tags: ['hide', 'tusk', 'meat'] },
+    { templateId: 'old_greyjaw', tag: 'fang', arm: 'concentrate', tags: ['hide', 'fang', 'claw'] },
+    { templateId: 'forest_wolf', tag: 'hide', arm: 'spread threshold', tags: ['hide', 'fang'] },
+    { templateId: 'forest_wolf', tag: 'fang', arm: 'spread threshold', tags: ['hide', 'fang'] },
   ];
+
+  it('covers both arms for real: each row is the corpse shape it claims to be', () => {
+    for (const c of CASES) {
+      expect(MOBS[c.templateId].componentTags, `${c.templateId} tags`).toEqual(c.tags);
+      expect(c.tags, `${c.templateId} ${c.tag} is on the corpse`).toContain(c.tag);
+      // A two-entry pick is under the spread threshold only while the corpse
+      // carries MORE than two tags; at exactly two it clears `>= tagged.length`.
+      const arm = c.tags.length > 2 ? 'concentrate' : 'spread threshold';
+      expect(arm, `${c.templateId} ${c.tag} arm`).toBe(c.arm);
+    }
+    expect(CASES.map((c) => c.arm)).toContain('concentrate');
+    expect(CASES.map((c) => c.arm)).toContain('spread threshold');
+  });
 
   it('grants exactly what the single tag grants, on the same seed, on both arms', () => {
     for (const c of CASES) {
@@ -992,6 +1009,10 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
         expect(dup.inventory, `${label} inventory`).toEqual(once.inventory);
         expect(dup.events, `${label} events`).toEqual(once.events);
         expect(dup.draws, `${label} draws`).toEqual(once.draws);
+        // An absolute floor under that equality, so a mis-wired observer
+        // reading 0 on both sides cannot pass: one mapped family costs exactly
+        // one tier roll plus one rarity roll, on every row.
+        expect(once.draws, `${label} single-pick draws`).toBe(2);
         // ... and the claim is still spent exactly once, by the harvester.
         expect(dup.claimedBy, `${label} claim`).toBe(once.claimedBy);
         expect(dup.claimedBy, `${label} claim is the harvester`).not.toBeNull();
@@ -999,11 +1020,42 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     }
   });
 
+  it('never mints a second signed Pristine Hide off one claim (seed 11, the issue case)', () => {
+    // The headline harm the issue reports, at the one state that actually
+    // reaches it. Pre-fix, seed 11 rolled rare-or-better on BOTH of the
+    // duplicate's rarity rolls and handed out two Pristine Hides plus 6
+    // rough_hide off a single-use corpse; nothing else in this suite exercises
+    // the doubled SIGNED arm, which is the valuable half of the exploit
+    // (a non-fungible, signer-stamped item, minted twice from one claim).
+    // Post-fix the repeat lands the single tag's world exactly: no specimen,
+    // 4 hides, one claim.
+    const { sim, internals, a } = setup(11);
+    const template = MOBS.wild_boar;
+    const corpse = createMob(7769, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    corpse.dead = true;
+    corpse.aiState = 'dead';
+    corpse.corpseTimer = 9999;
+    corpse.respawnTimer = 9999;
+    internals.entities.set(corpse.id, corpse);
+    sim.harvestCorpse(corpse.id, ['hide', 'hide'], a);
+    expect(sim.countItem('pristine_hide', a)).toBe(0);
+    expect(sim.countItem('rough_hide', a)).toBe(4);
+    // Signed instances never merge into a plain stack, so a doubled jackpot
+    // would show up as instance slots, not as a bigger count.
+    expect(
+      internals.players.get(a)!.inventory.filter((s) => s.instance?.signer === 'Alpha'),
+    ).toHaveLength(0);
+  });
+
   it('rolls and grants the family ONE time, not once per repeat (seed 5, absolute counts)', () => {
     // The equality above would also pass if both sides were wrong together, so
-    // the doubled quantities are pinned to literals here. Seed 5 clears the
-    // signable floor on the first rarity roll, which is what made the old
-    // duplicate hand out a second signed Pristine Hide off a single corpse.
+    // the quantities are pinned to literals here. At this seed the deduped
+    // single roll clears the signable floor, so the specimen below is the
+    // ORDINARY one-family jackpot, not a doubled one: pre-fix the same command
+    // rolled twice at a lower concentration bonus and came back with 8 plain
+    // hides and no specimen at all. Both numbers move under a revert, which is
+    // what makes them decisive. The doubled-specimen state has its own case
+    // above, at the seed that actually reaches it.
     const { sim, internals, a } = setup(5);
     const template = MOBS.wild_boar;
     const corpse = createMob(7773, template, template.maxLevel, { x: 0, y: 0, z: 0 });
@@ -1023,7 +1075,11 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
       .filter((e): e is Extract<typeof e, { type: 'harvestResult' }> => e.type === 'harvestResult');
     expect(result).toHaveLength(1);
     expect(result[0].yields.map((y) => y.itemId).sort()).toEqual(['pristine_hide', 'rough_hide']);
-    expect(result[0].yields.filter((y) => y.itemId === 'rough_hide')).toHaveLength(1);
+    // The QUANTITY on that entry, not its count: recordHarvestYield merges
+    // same-item grants, so the doubled harvest also produced exactly one
+    // rough_hide row, just carrying 8 instead of 4. Only the number can tell
+    // the two apart.
+    expect(result[0].yields.find((y) => y.itemId === 'rough_hide')?.qty).toBe(4);
     expect(sim.countItem('rough_hide', a)).toBe(4);
     expect(sim.countItem('pristine_hide', a)).toBe(1);
     const meta = internals.players.get(a)!;
@@ -1076,9 +1132,14 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     // timer clamp is the same one the deduped pick produces.
     const { sim, mob, a, b } = setup(11);
     const once = setup(11);
+    expect(mob.corpseTimer).toBe(9999);
     sim.harvestCorpse(mob.id, ['hide', 'hide'], a);
     once.sim.harvestCorpse(once.mob.id, ['hide'], once.a);
     expect(mob.harvestClaimedBy).toBe(a);
+    // Literals, not only the twin comparison: two runs of the same post-fix
+    // path move together, so an equality alone cannot fail. This corpse carries
+    // no loot, so the harvest takes the collapse arm and clamps the timer to 4.
+    expect(mob.corpseTimer).toBe(4);
     expect(mob.corpseTimer).toBe(once.mob.corpseTimer);
     expect(mob.lootable).toBe(once.mob.lootable);
     // A second command, repeated tag or not, is denied against the same corpse.
