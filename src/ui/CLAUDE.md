@@ -124,7 +124,12 @@ The contract above is the WHAT; reach for the matching one when you build a hot 
   string. The only fix for a per-item text loop is to leave the text API: rasterize each distinct
   (glyph, color) ONCE into an offscreen sprite and `drawImage` it, with the destination
   `Math.round`ed (a fractional blit destination is resampled, and unrounded it silently depends on
-  whoever last set `imageSmoothingEnabled`). Reference: `minimap_painter` NPC glyphs.
+  whoever last set `imageSmoothingEnabled`). Reference for a CLOSED glyph set: `minimap_painter`
+  NPC glyphs, which needs no eviction because the set and the color are both fixed. For
+  LOCALIZED, open-ended labels (names, POI titles), reuse `text_sprite_cache.ts`: it measures the
+  box, bakes the outline plus fill passes into one sprite, rounds the blit, and bounds the live
+  set with an LRU trim taken at the redraw boundary, never mid-redraw (trimming mid-redraw lets a
+  label-heavy redraw evict what it is still drawing). Consumer: `map_window_painter`.
 - **DPR backing store only where it must be crisp.** A HiDPI canvas sizes its backing store to
   `devicePixelRatio` and reassigns `width`/`height` only when the DPR changes (assignment clears
   the canvas); portraits are DPR-scaled (`unit_portrait_painter`), the minimap/map/delve are 1:1.

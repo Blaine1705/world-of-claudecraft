@@ -1,13 +1,26 @@
-// No-magic-values + cadence guard for the overworld map painter.
+// No-magic-values + cadence guard for the overworld map painter, plus the
+// label-sprite behavior (issue 2476).
 //
 // The pure geometry is covered by tests/map_window_view.test.ts. This suite also
 // drives the real painter through a narrow fake 2D context so adapter wiring and
-// token selection are behavior assertions rather than source-text guesses.
+// token selection are behavior assertions rather than source-text guesses. The
+// same fake records every canvas TEXT entry point on the map context, so "every
+// label goes through the sprite cache" is a behavior pin too: the painter must
+// leave that context's text API completely untouched. The cache itself (sizing,
+// eviction, the rounding) is pinned in tests/text_sprite_cache.test.ts.
 
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { BUILTIN_WORLD, setActiveWorldContent, ZONES } from '../src/sim/data';
-import { emptyZoneProps } from '../src/sim/types';
+import {
+  BUILTIN_WORLD,
+  CAMPS,
+  DUNGEON_LIST,
+  QUESTS,
+  setActiveWorldContent,
+  ZONES,
+} from '../src/sim/data';
+import { emptyZoneProps, type QuestProgress } from '../src/sim/types';
+import { overworldDungeonPortals } from '../src/ui/map_dungeon_portals';
 import { MapWindowPainter } from '../src/ui/map_window_painter';
 import type { IWorld } from '../src/world_api';
 
@@ -43,21 +56,82 @@ const MAP_COLOR_TOKENS = [
   '--color-map-campfire',
 ];
 
+/** One label rasterized into its own offscreen canvas by the sprite cache. */
+interface LabelSprite {
+  width: number;
+  height: number;
+  /** Each text pass baked into this sprite, in order. */
+  ink: Array<{ op: 'fill' | 'stroke'; color: string; text: string }>;
+}
+
+/** The label a sprite carries (every pass bakes the same string). */
+function spriteText(sprite: LabelSprite): string {
+  return sprite.ink[0]?.text ?? '';
+}
+
 interface PaintTrace {
   fills: Array<{ style: string; commands: string[] }>;
   styleReads: string[];
+  /** Every canvas minted through document.createElement('canvas'). */
+  sprites: LabelSprite[];
+  /** Every 3-argument drawImage: the label blits (the terrain blit passes 9). */
+  blits: Array<{ sprite: LabelSprite; dx: number; dy: number }>;
+  /** Every canvas text entry point used on the MAP context, which must stay empty. */
+  textApi: string[];
+  /** Every stroke() on the map context with the strokeStyle it used. */
+  strokes: Array<{ style: string; commands: string[] }>;
+}
+
+function makeLabelSprite(trace: PaintTrace): LabelSprite {
+  const ctx = {
+    font: '',
+    fillStyle: '',
+    strokeStyle: '',
+    lineWidth: 1,
+    textAlign: 'start',
+    textBaseline: 'alphabetic',
+    measureText(text: string): { width: number } {
+      return { width: text.length * 6 };
+    },
+    fillText(text: string): void {
+      sprite.ink.push({ op: 'fill', color: String(ctx.fillStyle), text });
+    },
+    strokeText(text: string): void {
+      sprite.ink.push({ op: 'stroke', color: String(ctx.strokeStyle), text });
+    },
+  };
+  const sprite: LabelSprite = {
+    width: 0,
+    height: 0,
+    ink: [] as LabelSprite['ink'],
+    getContext: (kind: string): unknown => (kind === '2d' ? (ctx as unknown) : null),
+  } as unknown as LabelSprite;
+  trace.sprites.push(sprite);
+  return sprite;
 }
 
 function fakeMapContext(trace: PaintTrace): CanvasRenderingContext2D {
   let commands: string[] = [];
+  let font = '';
   const ctx = {
     fillStyle: '',
     strokeStyle: '',
     lineWidth: 1,
-    font: '',
     textAlign: 'start',
     imageSmoothingEnabled: false,
-    drawImage(): void {},
+    get font(): string {
+      return font;
+    },
+    set font(value: string) {
+      font = value;
+      trace.textApi.push(`font=${value}`);
+    },
+    drawImage(image: unknown, ...rest: number[]): void {
+      // The 3-argument form is a label sprite; the terrain sub-rect blit passes 9.
+      if (rest.length === 2) {
+        trace.blits.push({ sprite: image as LabelSprite, dx: rest[0], dy: rest[1] });
+      }
+    },
     beginPath(): void {
       commands = [];
     },
@@ -76,9 +150,19 @@ function fakeMapContext(trace: PaintTrace): CanvasRenderingContext2D {
     fill(): void {
       trace.fills.push({ style: String(ctx.fillStyle), commands: [...commands] });
     },
-    stroke(): void {},
-    fillText(): void {},
-    strokeText(): void {},
+    stroke(): void {
+      trace.strokes.push({ style: String(ctx.strokeStyle), commands: [...commands] });
+    },
+    measureText(text: string): { width: number } {
+      trace.textApi.push(`measureText:${text}`);
+      return { width: 0 };
+    },
+    fillText(text: string): void {
+      trace.textApi.push(`fillText:${text}`);
+    },
+    strokeText(text: string): void {
+      trace.textApi.push(`strokeText:${text}`);
+    },
     save(): void {},
     restore(): void {},
     translate(): void {},
@@ -88,13 +172,23 @@ function fakeMapContext(trace: PaintTrace): CanvasRenderingContext2D {
 }
 
 function installMapStyleGlobals(trace: PaintTrace): void {
-  vi.stubGlobal('document', { documentElement: {} });
+  vi.stubGlobal('document', {
+    documentElement: {},
+    createElement(tag: string): unknown {
+      if (tag !== 'canvas') throw new Error(`unexpected createElement(${tag})`);
+      return makeLabelSprite(trace);
+    },
+  });
   vi.stubGlobal('getComputedStyle', () => ({
     getPropertyValue(token: string): string {
       trace.styleReads.push(token);
       return `paint:${token}`;
     },
   }));
+}
+
+function newTrace(): PaintTrace {
+  return { fills: [], styleReads: [], sprites: [], blits: [], textApi: [], strokes: [] };
 }
 
 function mapWorld(): IWorld {
@@ -145,7 +239,7 @@ describe('map_window_painter: no magic values', () => {
   });
 
   it('draws the active-world armoury footprint with its dedicated token', () => {
-    const trace: PaintTrace = { fills: [], styleReads: [] };
+    const trace = newTrace();
     installMapStyleGlobals(trace);
     const ctx = fakeMapContext(trace);
     const painter = new MapWindowPainter();
@@ -222,5 +316,226 @@ describe('map_window_painter: cadence + cached background preserved', () => {
     expect(code).not.toContain('renderTerrainCanvas');
     // Hud keeps the bg cache + prewarm and passes the cached canvas in each redraw.
     expect(hud).toContain('bg: this.mapZoneBg(zone)');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Label sprites (issue 2476): every on-canvas label is a cached blit.
+// ---------------------------------------------------------------------------
+
+const LABEL_ZONE = ZONES[0];
+const LABEL_ZONE_CZ = (LABEL_ZONE.zMin + LABEL_ZONE.zMax) / 2;
+
+// Real content rather than a synthetic fixture, so a rename in the quest tables
+// cannot leave this passing against a stale expectation.
+function questWithGiver() {
+  const quest = Object.values(QUESTS).find((q) => q.giverNpcId);
+  if (!quest) throw new Error('expected a quest with a giverNpcId');
+  return quest;
+}
+
+function killQuestInZone() {
+  for (const quest of Object.values(QUESTS)) {
+    for (const objective of quest.objectives) {
+      if (objective.type !== 'kill') continue;
+      const camp = CAMPS.find(
+        (c) =>
+          c.mobId === objective.targetMobId &&
+          c.center.z >= LABEL_ZONE.zMin &&
+          c.center.z < LABEL_ZONE.zMax,
+      );
+      if (camp) return quest;
+    }
+  }
+  throw new Error('expected a kill quest with a camp in the first zone');
+}
+
+function dungeonName(id: string): string {
+  const dungeon = DUNGEON_LIST.find((d) => d.id === id);
+  if (!dungeon) throw new Error(`unknown dungeon ${id}`);
+  return dungeon.name;
+}
+
+/** A world that exercises every label layer at once: the zone title, the POI
+ *  labels, a dungeon portal name, a quest-giver glyph, two ally names, and a
+ *  numbered quest badge. */
+function labelWorld(): IWorld {
+  const giver = questWithGiver();
+  const kill = killQuestInZone();
+  return {
+    player: { id: 1, kind: 'player', name: 'Painter', pos: { x: 0, z: LABEL_ZONE_CZ }, facing: 0 },
+    entities: new Map([
+      [
+        2,
+        {
+          id: 2,
+          kind: 'npc',
+          name: 'Giver',
+          templateId: giver.giverNpcId,
+          questIds: [giver.id],
+          pos: { x: 10, z: LABEL_ZONE_CZ },
+        },
+      ],
+    ]),
+    socialInfo: {
+      friends: [{ id: 10, name: 'FriendA', online: true, x: 4, z: LABEL_ZONE_CZ }],
+      guild: { members: [{ id: 11, name: 'GuildB', online: true, x: 6, z: LABEL_ZONE_CZ }] },
+    },
+    cfg: { seed: 42, playerClass: 'warrior' },
+    questState: (q: string) => (q === giver.id ? 'available' : 'unavailable'),
+    questLog: new Map<string, QuestProgress>([
+      [
+        kill.id,
+        { questId: kill.id, counts: kill.objectives.map(() => 0), state: 'active' as const },
+      ],
+    ]),
+  } as unknown as IWorld;
+}
+
+/** Every label this world must put on the canvas, sourced from the content
+ *  tables rather than from the painter's own localizers. */
+function expectedLabels(): Set<string> {
+  return new Set<string>([
+    LABEL_ZONE.name,
+    ...LABEL_ZONE.pois.map((poi) => poi.label),
+    ...overworldDungeonPortals(DUNGEON_LIST, LABEL_ZONE.zMin, LABEL_ZONE.zMax).map((portal) =>
+      dungeonName(portal.id),
+    ),
+    '!', // the quest-giver glyph for an available quest
+    'FriendA',
+    'GuildB',
+    '1', // the single active quest's badge number
+  ]);
+}
+
+function labelPaintOptions(ping?: { x: number; z: number }) {
+  return {
+    zone: LABEL_ZONE,
+    bg: { width: 560, height: 560 } as HTMLCanvasElement,
+    canvasSize: 560,
+    zoom: 1,
+    center: null,
+    ping: ping ?? null,
+  };
+}
+
+describe('map_window_painter: labels blit from the sprite cache', () => {
+  it('draws every label layer without touching the map context text API', () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+    const ctx = fakeMapContext(trace);
+
+    new MapWindowPainter().paintOverworld(ctx, labelWorld(), labelPaintOptions());
+
+    // The whole point of the change: no ctx.font assignment, no fillText,
+    // strokeText or measureText on the surface the painter draws to.
+    expect(trace.textApi).toEqual([]);
+    // Every label was rasterized once, and every one of them was blitted.
+    expect(new Set(trace.sprites.map(spriteText))).toEqual(expectedLabels());
+    expect(new Set(trace.blits.map((blit) => spriteText(blit.sprite)))).toEqual(expectedLabels());
+    expect(trace.blits.length).toBeGreaterThanOrEqual(trace.sprites.length);
+  });
+
+  it('rounds every label blit to a whole pixel', () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    new MapWindowPainter().paintOverworld(fakeMapContext(trace), labelWorld(), labelPaintOptions());
+
+    expect(trace.blits.length).toBeGreaterThan(0);
+    const fractional = trace.blits.filter(
+      (blit) => !Number.isInteger(blit.dx) || !Number.isInteger(blit.dy),
+    );
+    expect(fractional).toEqual([]);
+  });
+
+  it('bakes the outline into each label, and leaves the badge number outline-free', () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    new MapWindowPainter().paintOverworld(fakeMapContext(trace), labelWorld(), labelPaintOptions());
+
+    const title = trace.sprites.find((s) => spriteText(s) === LABEL_ZONE.name);
+    expect(title?.ink).toEqual([
+      { op: 'stroke', color: 'paint:--color-map-outline', text: LABEL_ZONE.name },
+      { op: 'fill', color: 'paint:--color-map-label', text: LABEL_ZONE.name },
+    ]);
+    const friend = trace.sprites.find((s) => spriteText(s) === 'FriendA');
+    expect(friend?.ink).toEqual([
+      { op: 'stroke', color: 'paint:--color-map-outline', text: 'FriendA' },
+      { op: 'fill', color: 'paint:--color-map-ally-friend', text: 'FriendA' },
+    ]);
+    const guild = trace.sprites.find((s) => spriteText(s) === 'GuildB');
+    expect(guild?.ink[1]).toEqual({
+      op: 'fill',
+      color: 'paint:--color-map-ally-guild',
+      text: 'GuildB',
+    });
+    const poi = trace.sprites.find((s) => spriteText(s) === LABEL_ZONE.pois[0].label);
+    expect(poi?.ink).toEqual([
+      { op: 'stroke', color: 'paint:--color-map-outline', text: LABEL_ZONE.pois[0].label },
+      { op: 'fill', color: 'paint:--color-map-label', text: LABEL_ZONE.pois[0].label },
+    ]);
+    const portalLabel = dungeonName(
+      overworldDungeonPortals(DUNGEON_LIST, LABEL_ZONE.zMin, LABEL_ZONE.zMax)[0].id,
+    );
+    const portal = trace.sprites.find((s) => spriteText(s) === portalLabel);
+    expect(portal?.ink).toEqual([
+      { op: 'stroke', color: 'paint:--color-map-outline', text: portalLabel },
+      { op: 'fill', color: 'paint:--color-map-portal-label', text: portalLabel },
+    ]);
+    // The badge sits on its own gold disc, so it is the one label with no outline.
+    const badge = trace.sprites.find((s) => spriteText(s) === '1');
+    expect(badge?.ink).toEqual([
+      { op: 'fill', color: 'paint:--color-map-quest-badge-text', text: '1' },
+    ]);
+  });
+
+  it('reuses the sprites on the next redraw instead of rasterizing again', () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+    const ctx = fakeMapContext(trace);
+    const painter = new MapWindowPainter();
+    const world = labelWorld();
+
+    painter.paintOverworld(ctx, world, labelPaintOptions());
+    const minted = trace.sprites.length;
+    const blitted = trace.blits.length;
+    expect(minted).toBeGreaterThan(0);
+
+    painter.paintOverworld(ctx, world, labelPaintOptions());
+    expect(trace.sprites).toHaveLength(minted); // no new canvases
+    expect(trace.blits).toHaveLength(blitted * 2); // but every label drawn again
+    expect(trace.textApi).toEqual([]);
+  });
+
+  it('keeps the Show-on-Map ping color off every later outline', () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    new MapWindowPainter().paintOverworld(
+      fakeMapContext(trace),
+      labelWorld(),
+      labelPaintOptions({ x: 0, z: LABEL_ZONE_CZ }),
+    );
+
+    // The ping rings themselves do draw in the ping token.
+    expect(trace.strokes.some((s) => s.style === 'paint:--color-map-ping')).toBe(true);
+    // The player arrow is stroked after them and must not inherit that color.
+    const arrow = trace.strokes.filter(
+      (s) => s.commands.join(',') === 'moveTo,lineTo,lineTo,closePath',
+    );
+    expect(arrow.map((s) => s.style)).toEqual(['paint:--color-map-outline']);
+    // Neither may the quest-giver glyph, which now names its outline explicitly.
+    const glyph = trace.sprites.find((s) => spriteText(s) === '!');
+    expect(glyph?.ink).toEqual([
+      { op: 'stroke', color: 'paint:--color-map-outline', text: '!' },
+      { op: 'fill', color: 'paint:--color-map-npc-quest', text: '!' },
+    ]);
   });
 });
