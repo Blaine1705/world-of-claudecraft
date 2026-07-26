@@ -19,8 +19,17 @@ import { QUALITY_COLOR } from '../src/ui/icons';
 function read(rel: string): string {
   return readFileSync(fileURLToPath(new URL(rel, import.meta.url)), 'utf8');
 }
-const HUD_CSS = read('../src/styles/hud.css');
-const HUD_MOBILE_CSS = read('../src/styles/hud.mobile.css');
+/** CSS source with block comments stripped. A RAW read makes every rule pin
+ *  below gameable in one move: wrapping a rule in a comment leaves its text
+ *  byte-identical, so a pin that matches the raw file goes on passing over dead
+ *  CSS. (Verified: commenting out the destructive-row rule left all of this
+ *  file green.) The painter pin further down strips TS comments for exactly the
+ *  same reason; this is that treatment extended to the stylesheets. */
+function readCss(rel: string): string {
+  return read(rel).replace(/\/\*[\s\S]*?\*\//g, '');
+}
+const HUD_CSS = readCss('../src/styles/hud.css');
+const HUD_MOBILE_CSS = readCss('../src/styles/hud.mobile.css');
 const PAINTER_TS = read('../src/ui/bag_item_action_menu.ts');
 const HUD_TS = read('../src/ui/hud.ts');
 const CHAT_TS = read('../src/ui/hud/chat/chat_window_controller.ts');
@@ -155,7 +164,7 @@ describe('#ctx-menu destructive meta sub-line (Apply Enchant replace row)', () =
     expect(danger).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
     expect(danger).not.toMatch(/\b(?:rgba?|hsla?)\(/);
     // And the token actually exists rather than silently falling back.
-    expect(read('../src/styles/tokens.css')).toMatch(/--color-text-error:\s*#[0-9a-fA-F]{3,8};/);
+    expect(readCss('../src/styles/tokens.css')).toMatch(/--color-text-error:\s*#[0-9a-fA-F]{3,8};/);
     // Always-on: a destructive warning is actionable information, so it can
     // never be shed by a graphics tier.
     expect(danger).not.toContain('--fx-');

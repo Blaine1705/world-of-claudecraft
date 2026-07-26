@@ -27,6 +27,7 @@ import {
 } from '../src/ui/enchant_apply_view';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
+import { wornTooltipInstance } from '../src/ui/item_instance_tooltip';
 
 // A real item id for a slot, taken from live content so the def.slot match is
 // exercised against ITEMS exactly as the runtime picker reads it.
@@ -586,11 +587,57 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
       /for \(const \[slot, inst\] of Object\.entries\(e\.equippedInstances\)\)[\s\S]*?\n {4}\}/,
     );
     expect(block, 'the eqi projection loop moved').not.toBeNull();
-    const projected = [...(block?.[0].matchAll(/pub\.(\w+) = inst\.\w+/g) ?? [])].map((m) => m[1]);
+    // Comments stripped first: a "boundTo is deliberately absent" note inside
+    // the loop must not read as a widening, and a commented-out assignment must
+    // not read as coverage either.
+    const body = (block?.[0] ?? '').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    const projected = [...body.matchAll(/pub\.(\w+) = inst\.\w+/g)].map((m) => m[1]);
     // Exactly the cosmetic inspect fields, and NOTHING that carries bind state.
     expect(projected.sort()).toEqual(['enchant', 'rolled', 'signer']);
-    expect(projected).not.toContain('boundTo');
-    expect(projected).not.toContain('bindOnTrade');
+    // Syntax-independent backstop: the extractor above only sees dot-notation
+    // assignment, so a widening written as pub['boundTo'] = inst.boundTo or an
+    // Object.assign spread would slip past it. Pin the FIELD NAMES out of the
+    // loop body entirely, which no assignment shape can dodge.
+    for (const field of ['boundTo', 'bindOnTrade', 'charges']) {
+      expect(body, `${field} must not ride the public eqi wire`).not.toContain(field);
+    }
+  });
+
+  // The SAME trim has a SECOND consumer: wornTooltipInstance
+  // (item_instance_tooltip.ts) strips the paperdoll tooltip to the eqi fields
+  // for the identical reason. Both are pinned in their own files, but nothing
+  // linked them, so widening the wire would fail only the pin above and leave
+  // the tooltip copy to be found later. Cross-pinned here instead: the two
+  // consumers of one policy must agree, mechanically.
+  it('pins wornTooltipInstance to that same allowlist, so both consumers move together', () => {
+    const worn = wornTooltipInstance({
+      signer: 'Tester',
+      enchant: 'enchant_chest_stamina',
+      rolled: { masterwork: true, stats: { sta: 4 } },
+      boundTo: 7,
+      bindOnTrade: true,
+      charges: { some_effect: 2 },
+    });
+    expect(
+      Object.keys(worn ?? {}).sort(),
+      'wornTooltipInstance and the eqi wire encode one policy: widen both or neither',
+    ).toEqual(['enchant', 'rolled', 'signer']);
+  });
+
+  // The exported sweep list claims two things about itself: that it is the
+  // WHOLE union, and that it is in emit order. It is derived from the
+  // tsc-checked key table, so the first claim now holds by construction; this
+  // pins the second against the emitter, which is the only thing derivation
+  // cannot guarantee. A victim carrying everything must emit exactly the list.
+  it('is the emit order, pinned against preservedReplaceTraits itself', () => {
+    expect(
+      preservedReplaceTraits({
+        signer: 'Tester',
+        rolled: { masterwork: true },
+        boundTo: 1,
+        bindOnTrade: true,
+      }),
+    ).toEqual([...ENCHANT_PRESERVED_TRAITS]);
   });
 
   it('names a live, non-empty catalog row for every trait, and no two share one', () => {
@@ -806,18 +853,71 @@ describe('enchant_apply_view: mixedHolding (#2421)', () => {
     expect(targets).toEqual([{ itemId: chestId, count: 2 }]);
   });
 
+  // The CROSS-FAMILY holding: the enchanted copy is WORN and its plain twin is
+  // in the bags. Both paint into one list, so the bare bagged row is exactly the
+  // "one row has a sub-line, the other has none" pair the flag exists to remove,
+  // and nothing about it being on the body changes that.
+  it('flags a bagged plain row whose only enchanted twin is WORN', () => {
+    const worn = wornEnchantTargets(
+      { chest: chestId },
+      { chest: { enchant: 'enchant_chest_spirit' } },
+      'enchant_chest_stamina',
+    );
+    expect(worn[0]?.replace, 'the worn copy is the enchanted twin').toBeDefined();
+    expect(enchantTargets([{ itemId: chestId, count: 2 }], 'enchant_chest_stamina', worn)).toEqual([
+      { itemId: chestId, count: 2, mixedHolding: true },
+    ]);
+    // Without the worn rows the same bags read as unambiguous, which is what
+    // makes the argument load-bearing rather than incidental.
+    expect(
+      enchantTargets([{ itemId: chestId, count: 2 }], 'enchant_chest_stamina')[0].mixedHolding,
+    ).toBeUndefined();
+  });
+
+  it('flags a bagged plain row when the WORN twin is a same-enchant deny row too', () => {
+    // Disabled, but still on screen and still stating a state the bare bagged
+    // row does not: the pair is read before either is activated.
+    const worn = wornEnchantTargets(
+      { chest: chestId },
+      { chest: { enchant: 'enchant_chest_stamina' } },
+      'enchant_chest_stamina',
+    );
+    expect(worn[0]?.replace?.sameEnchant).toBe(true);
+    expect(
+      enchantTargets([{ itemId: chestId, count: 1 }], 'enchant_chest_stamina', worn)[0]
+        .mixedHolding,
+    ).toBe(true);
+  });
+
+  // The OTHER known limit, pinned the same way: a plain worn copy beside a plain
+  // bagged one is a LOCATION ambiguity, not a state one. Both are unenchanted,
+  // so "Not enchanted" would say nothing that told them apart; the worn row
+  // already states where it is, and closing the rest needs a bag-side
+  // counterpart to the Worn tag rather than this flag.
+  it('does NOT flag a bagged plain row whose worn twin is also plain', () => {
+    const worn = wornEnchantTargets({ chest: chestId }, {}, 'enchant_chest_stamina');
+    expect(worn, 'the worn copy is a plain, unflagged target row').toEqual([
+      { itemId: chestId, slot: 'chest' },
+    ]);
+    const targets = enchantTargets([{ itemId: chestId, count: 1 }], 'enchant_chest_stamina', worn);
+    expect(Object.hasOwn(targets[0], 'mixedHolding')).toBe(false);
+  });
+
   // The KNOWN LIMIT, pinned so it reads as a scoped decision rather than as
   // coverage: mixedHolding keys on the item ID, and itemDisplayName resolves a
   // heroic variant to its base item's name, so a base/heroic pair is two ids
   // that render one string and neither row is flagged. Pre-existing (the pair
-  // collides on the base branch too) and tracked as a follow-up; this test
-  // fails the day the flag is generalized, which is the reminder to delete it.
+  // collides on the base branch too) and tracked as #2466; this test fails the
+  // day the flag is generalized, which is the reminder to delete it.
   it('does NOT flag a base/heroic pair, which shares a display NAME across two ids', () => {
-    const heroic = Object.keys(ITEMS).find((id) => {
+    const found = Object.keys(ITEMS).find((id) => {
       const def = ITEMS[id];
       return def.heroicOf !== undefined && ITEMS[def.heroicOf]?.slot === 'chest';
     });
-    if (!heroic) return; // no heroic chest variant in content: nothing to pin
+    // Asserted, never an early return: content HAS heroic chest variants, and a
+    // silent skip would let this pin rot into a test that proves nothing.
+    expect(found, 'content carries a heroic chest variant to pin the limit with').toBeDefined();
+    const heroic = found as string;
     const base = ITEMS[heroic].heroicOf as string;
     expect(itemDisplayName(ITEMS[heroic])).toBe(itemDisplayName(ITEMS[base]));
     const targets = enchantTargets(

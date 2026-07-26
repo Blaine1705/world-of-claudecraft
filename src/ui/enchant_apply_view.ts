@@ -224,14 +224,16 @@ const PRESERVED_TRAIT_KEYS: Record<EnchantPreservedTrait, TranslationKey> = {
   bond: 'hudChrome.enchanting.replaceConfirmKeepsBond',
 };
 
-/** Every trait, in the order preservedReplaceTraits emits them. Exported so a
- *  test can sweep the real union instead of hand-copying it and silently
- *  missing a member added later. */
-export const ENCHANT_PRESERVED_TRAITS: readonly EnchantPreservedTrait[] = [
-  'signer',
-  'masterwork',
-  'bond',
-];
+/** Every trait, in the order preservedReplaceTraits emits them. DERIVED from
+ *  PRESERVED_TRAIT_KEYS rather than written out again: that table is a
+ *  `Record<EnchantPreservedTrait, ...>`, so tsc forces it complete, and a fourth
+ *  trait lands here the moment it lands there. A hand-written twin only LOOKED
+ *  exhaustive: dropping a member from it typechecked cleanly and quietly
+ *  narrowed every test that sweeps this. Insertion order IS the emit order,
+ *  pinned against preservedReplaceTraits in tests/enchant_apply_view.test.ts. */
+export const ENCHANT_PRESERVED_TRAITS: readonly EnchantPreservedTrait[] = Object.keys(
+  PRESERVED_TRAIT_KEYS,
+) as EnchantPreservedTrait[];
 
 export function preservedTraitKey(trait: EnchantPreservedTrait): TranslationKey {
   return PRESERVED_TRAIT_KEYS[trait];
@@ -285,7 +287,15 @@ export interface EnchantReplaceTargetInfo {
   /** What the swap does NOT destroy (#2421), in preservedReplaceTraits order.
    *  ABSENT, never an empty array, when the victim carries none of them: the
    *  thin consumer paints the kept line only when there is something true to
-   *  say. */
+   *  say.
+   *
+   *  Describes the copy replaceVictimIndex pins RIGHT NOW, and inherits #2415's
+   *  accepted pin window whole: a copy arriving at a higher index between dialog
+   *  and accept moves the pin, so this can go stale exactly as the "Replaces X"
+   *  warning already can. Worth stating, because the direction flips: that
+   *  warning went stale toward naming the wrong casualty, this goes stale toward
+   *  promising a trait the newcomer lacks. Same one-confirm-click window, same
+   *  actor's-own loss, no new exposure. */
   preserved?: EnchantPreservedTrait[];
 }
 
@@ -328,12 +338,18 @@ export interface EnchantTargetRow {
    *  replaceVictimIndex choice), so what the dialog names is exactly what a
    *  confirmed apply destroys. */
   replace?: EnchantReplaceTargetInfo;
-  /** Set on BOTH rows of a MIXED HOLDING (#2421): one item id held plain AND
-   *  already enchanted, the only case this function emits two rows for ONE item
-   *  id. ABSENT, never false, everywhere else. The thin consumer tags the plain
-   *  twin from this, so the pair is told apart by what each row SAYS rather than
-   *  by one of them having a sub-line and the other not, which is the whole of
-   *  the distinction a screen reader gets otherwise.
+  /** Set on the rows of a MIXED HOLDING (#2421): one item id held plain AND
+   *  already enchanted. ABSENT, never false, everywhere else. The thin consumer
+   *  tags the plain twin from this, so the pair is told apart by what each row
+   *  SAYS rather than by one of them having a sub-line and the other not, which
+   *  is the whole of the distinction a screen reader gets otherwise.
+   *
+   *  The enchanted twin counts whether it sits in the BAGS or on the BODY: both
+   *  families paint into the one list a player reads, so an enchanted WORN copy
+   *  leaves its bagged plain twin in exactly the bare-row state this flag exists
+   *  to remove. Pass the worn rows to enchantTargets to have that arm counted
+   *  (the consumer does); with none passed the flag describes the bagged pair
+   *  alone.
    *
    *  NOT a general duplicate-NAME flag, and deliberately not claimed as one:
    *  itemDisplayName resolves a heroic variant to its base item's name
@@ -341,8 +357,15 @@ export interface EnchantTargetRow {
    *  DIFFERENT ids that still render one string. Keying on the rendered name
    *  would need the name resolver in this core and a discriminator the picker
    *  does not have today (the heroic mark lives on the tooltip's quality line),
-   *  so that collision predates this change and stays open; see the follow-up
-   *  issue. tests/enchant_apply_view.test.ts pins the limit so it cannot be
+   *  so that collision predates this change and stays open as #2466.
+   *
+   *  Nor is it a LOCATION flag. A plain bagged copy beside a plain WORN copy of
+   *  the same id is left bare on purpose: both are unenchanted, so "Not
+   *  enchanted" would say nothing that told them apart, and the worn row already
+   *  states where it is. Closing that one needs a bag-side counterpart to the
+   *  Worn tag, not this flag. Same class as two rings of one id both reading
+   *  "Worn (Finger)", the settled #2415 limit.
+   *  tests/enchant_apply_view.test.ts pins both limits so neither can be
    *  mistaken for coverage. */
   mixedHolding?: true;
 }
@@ -356,10 +379,18 @@ export interface EnchantTargetRow {
  *  after the plain rows, each describing the pinned victim the sim would
  *  consume (replaceVictimIndex, the same function the sim's replace arm
  *  walks). Grouped by item id (the apply command is itemId-keyed), each family
- *  in first-seen inventory order. */
+ *  in first-seen inventory order.
+ *
+ *  `worn` is the WORN family the same picker paints above these rows
+ *  (wornEnchantTargets), passed in for ONE reason: so the mixedHolding flag can
+ *  see an enchanted copy that happens to be on the body rather than in the bags.
+ *  The two families are one list to the reader, so an enchanted worn copy leaves
+ *  its bagged plain twin just as bare as an enchanted bagged one would. Nothing
+ *  else reads it, and the default (none) is the bagged-pair-only behavior. */
 export function enchantTargets(
   inventory: readonly InvSlot[],
   enchantId: string,
+  worn: readonly WornEnchantTargetRow[] = [],
 ): EnchantTargetRow[] {
   const enchant = ENCHANTS[enchantId];
   if (!enchant) return [];
@@ -383,14 +414,15 @@ export function enchantTargets(
     if (!replace) continue;
     rows.push({ itemId, count, replace });
   }
-  // Mark the mixed holdings (#2421) once both families are in, so the flag
+  // Mark the mixed holdings (#2421) once every family is in, so the flag
   // reflects the rows actually EMITTED: an enchanted copy the picker dropped
   // (an unresolvable marker id) leaves its plain twin unambiguous and unmarked.
-  const mixed = new Set(
-    rows
-      .filter((row) => row.replace !== undefined && byItem.has(row.itemId))
-      .map((row) => row.itemId),
-  );
+  // The enchanted twin may be a WORN row rather than a bagged one; both paint
+  // into the one list a player reads, so both leave a bare plain row ambiguous.
+  const enchantedIds = new Set<string>();
+  for (const row of rows) if (row.replace !== undefined) enchantedIds.add(row.itemId);
+  for (const row of worn) if (row.replace !== undefined) enchantedIds.add(row.itemId);
+  const mixed = new Set([...enchantedIds].filter((itemId) => byItem.has(itemId)));
   for (const row of rows) if (mixed.has(row.itemId)) row.mixedHolding = true;
   return rows;
 }

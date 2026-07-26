@@ -19,8 +19,9 @@
 //     dialog's OK sends the apply with the explicit confirm flag. That row
 //     paints as DESTRUCTIVE rather than informational, its confirm states what
 //     the swap KEEPS as well as what it destroys, and the plain twin of a mixed
-//     holding states its own state so the pair never shares an accessible
-//     name (#2421); the pure core decides all three.
+//     holding (an enchanted copy of the same id in the bags OR on the body)
+//     states its own state so the pair never differs by a sub-line alone
+//     (#2421); the pure core decides all three.
 //
 // The pure decisions live in the two view cores; this owns only DOM + dispatch,
 // talks to the world exclusively through IWorld, and never decides an outcome.
@@ -324,7 +325,6 @@ export class BagItemActionMenu {
   // never offered).
   private openTargetPicker(enchantId: string, x: number, y: number): void {
     const world = this.deps.world();
-    const targets = enchantTargets(world.inventory, enchantId);
     // The self entity mirror carries equippedInstances in BOTH worlds (offline
     // Sim and online ClientWorld), the same read the paperdoll tooltip uses.
     const worn = wornEnchantTargets(
@@ -332,6 +332,11 @@ export class BagItemActionMenu {
       world.entities.get(world.playerId)?.equippedInstances ?? {},
       enchantId,
     );
+    // Worn FIRST, because the bagged family needs it: an enchanted copy on the
+    // body leaves a bagged plain copy of the same id just as ambiguous as an
+    // enchanted bagged one would (#2421), and both paint into the one list a
+    // player reads. enchantTargets owns that decision; this only supplies it.
+    const targets = enchantTargets(world.inventory, enchantId, worn);
     const title = esc(t('hudChrome.enchanting.targetTitle'));
     if (targets.length === 0 && worn.length === 0) {
       this.paint(
@@ -363,12 +368,15 @@ export class BagItemActionMenu {
     // The plain twin of a MIXED HOLDING (#2421) states its own state, so the
     // two rows sharing one item name differ by what each SAYS rather than by
     // one of them carrying a sub-line and the other carrying none, which is all
-    // an assistive-tech user or a quick scan had to go on. Only on that twin:
-    // an unambiguous plain row stays tag-free (enchant_apply_view mixedHolding).
-    // Scoped to the ONE-ITEM-ID pair that flag describes, not to every possible
-    // duplicate name: a base item and its heroic variant share a display name
-    // across two ids, and two rings of one id both label "Worn (Finger)". Both
-    // predate this change and neither is claimed fixed here.
+    // an assistive-tech user or a quick scan had to go on. The enchanted twin
+    // counts from EITHER family, bags or body, since this list shows both. Only
+    // on that twin: an unambiguous plain row stays tag-free (enchant_apply_view
+    // mixedHolding). Scoped to the ONE-ITEM-ID pair that flag describes, not to
+    // every possible duplicate name: a base item and its heroic variant share a
+    // display name across two ids (#2466), and two rings of one id both label
+    // "Worn (Finger)". Both predate this change and neither is claimed fixed
+    // here. A function, not a const string, so an ordinary target list with no
+    // mixed holding pays no t() call at all.
     const plainMeta = (): string =>
       `<span class="ctx-item-meta">${esc(t('hudChrome.enchanting.plainTag'))}</span>`;
     const rows = [

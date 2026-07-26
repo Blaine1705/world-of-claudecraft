@@ -728,6 +728,49 @@ describe('BagItemActionMenu target step: destructive-path communication (#2421)'
     // Both rows carry a sub-line now, so the distinction no longer rests on one
     // of them having none.
     expect(rows.map((row) => row.metas.length)).toEqual([1, 1]);
+    // The plain tag is INFORMATIONAL and must stay muted: "not enchanted"
+    // promises no destruction, and letting it take the danger modifier would
+    // spend the warning treatment on the safe row.
+    expect(rows[0].metas[0].classes).toEqual([CTX_ITEM_META_CLASS]);
+    expect(rows[1].metas[0].classes).toEqual([CTX_ITEM_META_CLASS, CTX_ITEM_DANGER_CLASS]);
+  });
+
+  it('tags the bagged plain twin when the enchanted copy is WORN, not bagged', () => {
+    // The cross-family holding: one list, two rows, one item name, and the
+    // enchanted copy happens to be on the body. Nothing about that changes what
+    // the bare bagged row fails to say.
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        { itemId: SWORD, count: 1 },
+      ],
+      equipment: { mainhand: SWORD },
+      equippedInstances: { mainhand: { enchant: AGILITY, rolled: { stats: { agi: 2 } } } },
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    const rows = h.rows();
+    expect(rows.map((row) => row.act)).toEqual(['worn:mainhand', `target:${SWORD}`]);
+    expect(rows[0].text).toBe(
+      'Eastbrook Arming SwordWorn (mainhand)Replaces Enchant Weapon - Agility',
+    );
+    expect(rows[1].text).toBe('Eastbrook Arming SwordNot enchanted');
+    expect(rows[1].metas[0].classes).toEqual([CTX_ITEM_META_CLASS]);
+  });
+
+  it('leaves the bagged plain row bare when the worn twin is ALSO plain', () => {
+    // The accepted limit: both copies are unenchanted, so "Not enchanted" would
+    // not tell them apart, and the worn row already states where it is.
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        { itemId: SWORD, count: 1 },
+      ],
+      equipment: { mainhand: SWORD },
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    const rows = h.rows();
+    expect(rows.map((row) => row.act)).toEqual(['worn:mainhand', `target:${SWORD}`]);
+    expect(rows[1].metas).toEqual([]);
   });
 
   it('leaves an UNAMBIGUOUS plain row tag-free: the tag is disambiguation, not decoration', () => {
@@ -825,7 +868,9 @@ describe('BagItemActionMenu target step: destructive-path communication (#2421)'
     h.click('worn:mainhand');
     const lines = h.confirms[0].body.split('\n');
     expect(lines[2]).toBe("Kept: Maker's mark, Masterwork bonus");
-    expect(h.confirms[0].body).not.toContain('Bound state');
+    // Named against the label this dialog ACTUALLY emits. An earlier draft
+    // asserted a string no catalog row carries, which could never have failed.
+    expect(h.confirms[0].body).not.toContain('Commission bond');
   });
 
   it('states survivors on a LEGACY victim too, whose stat lines name what dies', () => {

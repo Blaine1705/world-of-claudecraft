@@ -5148,9 +5148,11 @@
     padding-inline-start: 6px;
   }
   /* The forced palette replaces every author color, so the warning tint stops
-     carrying the distinction. Restore a NON-COLOR cue (the #tf-name.hostile
-     precedent) and stamp the rule in a system color so the row still reads as
-     the heavier one. */
+     carrying the distinction. The UNDERLINE is what restores it: a non-color
+     cue, the #tf-name.hostile precedent. The border survives on its own (width
+     and style are not forced, only color), so the system-color restatement
+     below is belt and braces in the .ai-tag / .streamer-badge idiom further
+     down this file, not the load-bearing half of this rule. */
   @media (forced-colors: active) {
     #ctx-menu .ctx-item-meta.ctx-item-danger {
       border-inline-start-color: CanvasText;
