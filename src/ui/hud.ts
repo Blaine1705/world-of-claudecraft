@@ -1,5 +1,5 @@
 import { audio } from '../game/audio';
-import { corpseLootAvailability } from '../game/corpse_loot_availability';
+import { corpseLootAvailability, localPartyMemberIds } from '../game/corpse_loot_availability';
 import type { GamepadKind } from '../game/gamepad_map';
 import { InstanceMusicController } from '../game/instance_music';
 import { type Keybinds, keyCapLabel } from '../game/keybinds';
@@ -42,6 +42,7 @@ import { resolveActiveWeaponSkin } from '../sim/content/weapon_skin_rules';
 import type { ZoneDef } from '../sim/data';
 import {
   ABILITIES,
+  ALL_RECIPES,
   CLASSES,
   DELVE_LIST,
   DELVES,
@@ -79,6 +80,7 @@ import type {
   ItemInstancePayload,
   ItemSlot,
   MailResultCode,
+  MotdResultCode,
   PetMode,
   PlayerClass,
   ResourceType,
@@ -128,6 +130,7 @@ import {
 import { ArenaWindow } from './arena_window';
 import { auraDisplayNameFromSource } from './aura_display_name';
 import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
+import { auraGainLogKeyFor, findAuraForGainEvent } from './aura_gain_log';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, createAurasView } from './auras_view';
 import { attachAvatarFallback } from './avatar_fallback';
@@ -142,6 +145,7 @@ import { charBagsPaired } from './char_bags_pairing_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
 import { archetypeTitleText, CharWindow, craftNameText } from './char_window';
 import { activeCharacterAppearancePreview } from './character_appearance';
+import { chatBubbleStyle } from './chat_bubble_style';
 import {
   ignoreKey,
   type PlayerSocialFlags,
@@ -149,6 +153,7 @@ import {
   resolvePlayerSocialFlags,
   serializeIgnoreList,
 } from './chat_ignore_core';
+import { ClaudiumLauncherBalance } from './claudium_launcher_balance_core';
 import type { ClaudiumRail, ClaudiumSnapshot } from './claudium_window';
 import { ClaudiumWindow } from './claudium_window';
 import { formatClockTime } from './clock';
@@ -156,6 +161,7 @@ import { CombatAnnouncer } from './combat_announcer';
 import {
   auraApplyCue,
   castCueForAbility,
+  consumeHealCue,
   impactCueForDamage,
   type MobVoiceAction,
   mobVoiceActionForDamage,
@@ -175,7 +181,7 @@ import {
   type CraftTierUp,
   observeCraftSkillsForTierUps,
 } from './craft_celebration_view';
-import { buildCraftingView, craftLearnHints } from './crafting_view';
+import { buildCraftingView, craftingReagentSig, craftLearnHints } from './crafting_view';
 import { renderCraftingWindow, stationNameText } from './crafting_window';
 import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow } from './daily_rewards_window';
@@ -208,6 +214,7 @@ import { emoteIconUrl } from './emote_icons';
 import {
   applyEnchantResultToast,
   disenchantResultToast,
+  disenchantSecondaryLineKey,
   salvageResultToast,
 } from './enchanting_view';
 import {
@@ -229,12 +236,20 @@ import {
   resetFramePositionsOnce,
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
+import { gatherToolTooltipLines } from './gather_tool_tooltip';
 import {
   buildGatheringProficiencyRows,
   gatherDeniedLineKey,
   gatherDowngradeLineKey,
+  gatherRareTierFor,
+  gatherToolNoNodeKey,
 } from './gathering_view';
+import { craftedLineKey, gatherLineKey, grantItemToken, grantQtyText } from './grant_line_view';
 import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
+import {
+  handleShiftClearContextMenu,
+  handleShiftClearKeydown,
+} from './hud/action_bar/action_bar_clear';
 import { ActionBarController } from './hud/action_bar/action_bar_controller';
 import {
   ACTION_BAR_ABILITY_SLOTS,
@@ -329,6 +344,7 @@ import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
 import { buildHeroicVendorView } from './hud/vendor/heroic_vendor_view';
 import { renderHeroicVendorWindow } from './hud/vendor/heroic_vendor_window';
+import { TrainLearnTracker } from './hud/vendor/train_learn_core';
 import { buildTrainView, isRecipeKnownForViewer } from './hud/vendor/train_view';
 import { renderTrainWindow } from './hud/vendor/train_window';
 import { buildUnbindView } from './hud/vendor/unbind_view';
@@ -379,7 +395,9 @@ import {
   npcMarkerAt,
   questAreaObjectivesAt,
 } from './map_window_view';
+import { marketCollectIndicatorView } from './market_view';
 import { MarketWindow } from './market_window';
+import { materialHintLine } from './material_hint_view';
 import { Meters } from './meters';
 import { minimapMode } from './minimap_markers';
 import { MINIMAP_SIZE, MinimapPainter } from './minimap_painter';
@@ -769,6 +787,12 @@ const CALENDAR_RESULT_KEYS: Record<CalendarResultCode, TranslationKey> = {
   badInput: 'hudChrome.calendar.result.badInput',
   calendarFull: 'hudChrome.calendar.result.calendarFull',
   eventGone: 'hudChrome.calendar.result.eventGone',
+};
+// Guild billboard outcome lines (`set` is the chat-log success).
+const MOTD_RESULT_KEYS: Record<MotdResultCode, TranslationKey> = {
+  set: 'hudChrome.social.billboard.result.set',
+  notInGuild: 'hudChrome.calendar.result.notInGuild',
+  notOfficer: 'hudChrome.social.billboard.result.notOfficer',
 };
 const HONOR_REASON_KEYS: Record<HonorReason, TranslationKey> = {
   arena_win: 'hudChrome.warfare.reasons.arenaWin',
@@ -1280,6 +1304,10 @@ export class Hud {
   private openVendorNpcId: number | null = null;
   private openHeroicVendorNpcId: number | null = null;
   private openTrainNpcId: number | null = null;
+  // Learn flights + confirmed-grant overlay for the train window (issue
+  // #2342): begin on click (the double-submit guard), resolve on the
+  // trainResult event, read surfaces consumed by buildTrainView.
+  private readonly trainLearns = new TrainLearnTracker();
   // Standalone trapping window (the professions/mailbox shape, NOT the
   // vendor's docked bags pairing): capture the opener + install the Tab trap
   // at open, return focus on close (src/ui/CLAUDE.md focus contract).
@@ -1304,6 +1332,13 @@ export class Hud {
   // (walking into/out of a station, or the own mobile station expiring); the
   // server re-validates the gate on every craft anyway.
   private lastCraftingStationSig = '';
+  // Signature of the bag as of the last crafting-window paint (#2375). The
+  // Craft gate is inventory-derived, so an open window goes stale on ANY bag
+  // change (a vendor buy, loot, mail, trade, bank withdraw, quest reward);
+  // refreshOpenCraftingIfReagentsChanged diffs the live bag against this and
+  // repaints only on a real move. Same cold-painter posture as the station
+  // signature above: never a per-frame repaint.
+  private lastCraftingReagentSig = '';
   // Character and Crafting are cold painters. Diff the local crafting
   // identity plus the gathering proficiency rows on the slow band so a late
   // online cprof or professions snapshot replaces stale archetype art/title
@@ -1467,6 +1502,9 @@ export class Hud {
   // Ravenpost envelope indicator (slow-band, value-diffed; see updateMailIndicator).
   private mailIndicatorEl: HTMLElement | null = null;
   private lastMailUnread = -1;
+  // World Market collect indicator (slow-band, value-diffed; see updateMarketIndicator).
+  private marketIndicatorEl: HTMLElement | null = null;
+  private lastMarketCollectPending: boolean | null = null;
   private pendingPetFeed = false;
   private petModeMenuOpen = false;
   constructor(
@@ -1615,7 +1653,13 @@ export class Hud {
       element: $('#loot-window'),
       document,
       world: () => this.sim,
-      corpseAvailability: (mob) => corpseLootAvailability(mob, this.sim.playerId),
+      corpseAvailability: (mob) =>
+        corpseLootAvailability(
+          mob,
+          this.sim.playerId,
+          true,
+          localPartyMemberIds(this.sim.partyInfo),
+        ),
       closeTransient: () => this.closeOtherWindows('#loot-window'),
       hideTooltip: () => this.hideTooltip(),
       entityName: entityDisplayName,
@@ -1730,13 +1774,17 @@ export class Hud {
     this.actionBarController.init();
     this.buildActionBar();
     this.initMailIndicator();
+    this.initMarketIndicator();
     this.refreshKeybindLabels();
     this.buildXpTicks();
     document.addEventListener('woc:languagechange', () => this.refreshLocalizedDynamicUi());
     // re-render the bag footer (and re-composite an open player card) when the
     // connected wallet's $WOC balance changes
     onWalletUiChange(() => {
-      if ($('#bags').style.display !== 'none') this.renderBags();
+      // Footer-only, as this comment always claimed: the balance lands asynchronously
+      // with no user action behind it, so a full rebuild would drop the bag-search
+      // caret and strand a hovered tooltip. Cold-load-safe gate (#1538) too.
+      if (bagsWindowShown($('#bags').style.display)) this.bagsWindow.refreshMoneyRow();
       this.playerCard.refresh();
       this.claudiumWindow.onWalletChanged();
     });
@@ -2397,6 +2445,7 @@ export class Hud {
         !!charWindow && this.isWindowVisible(charWindow),
         document.body.classList.contains('vendor-open'),
         document.body.classList.contains('bank-open'),
+        document.body.classList.contains('market-open'),
         document.body.classList.contains('char-bags-paired'),
       ),
     );
@@ -3594,8 +3643,15 @@ export class Hud {
       this.showPrompt(text, acceptLabel, onAccept, onDecline),
     startWhisper: (name) => this.startWhisper(name),
   });
+  // Set by main.ts once the realm's /api/status advert answers, which lands AFTER
+  // this window is constructed: a hosted dev/PBE realm booted with
+  // ALLOW_DEV_COMMANDS=1 lights the /dev GUI without needing a dev client build
+  // (production realms never set the env, so it stays dark there). Kept beside the
+  // build-time HudFeatures flag rather than mutating it, so the constructor's
+  // features bag stays the immutable record of what the BUILD asked for.
+  private devCommandsAdvertised = false;
   private readonly devCommandWindow = new DevCommandWindow({
-    available: () => this.features.devCommandsEnabled === true,
+    available: () => this.devCommandsAvailable,
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#dev-command-window'),
     ...this.windowFocus('#dev-command-window'),
@@ -3642,6 +3698,7 @@ export class Hud {
       this.lastPetBarSig = '';
     },
     isHotbarItemId: (itemId) => this.isHotbarItemId(itemId),
+    useGatherTool: (item) => this.gatherToolUseHook?.(item) ?? false,
     setDragAction: (action) => {
       this.dragAction = action ? { action, sourceIndex: null } : null;
     },
@@ -4028,7 +4085,7 @@ export class Hud {
     storeSnapshot: async () => {
       const snapshot = await this.claudiumHooks?.storeSnapshot();
       if (!snapshot) return { available: false, balance: null, items: [] };
-      this.setClaudiumLauncherBalance(snapshot.balance);
+      this.claudiumBalance.set(snapshot.balance);
       return {
         available: snapshot.available,
         balance: snapshot.balance,
@@ -4038,7 +4095,7 @@ export class Hud {
     spendStoreItem: async (itemId, kind, expectedCostClaudium) => {
       const result = await this.claudiumHooks?.spend(itemId, kind, expectedCostClaudium);
       if (result?.balance !== null && result?.balance !== undefined) {
-        this.setClaudiumLauncherBalance(result.balance);
+        this.claudiumBalance.set(result.balance);
       }
       return (
         result ?? {
@@ -4060,10 +4117,24 @@ export class Hud {
   // hooks are null and the window renders its clean disabled/empty state. The
   // window computes NOTHING; every number rides in through these hooks.
   private claudiumHooks: ClaudiumHooks | null = null;
-  private claudiumLauncherBalance: number | null = null;
-  private claudiumLauncherBalancePending = false;
-  private claudiumLauncherBalanceLastMs = 0;
-  private claudiumLauncherBalanceSeq = 0;
+  // The launcher's Claudium balance and its throttled read live in their own
+  // host-agnostic module (claudium_launcher_balance_core.ts). The HUD keeps only the
+  // wiring: what a read is, and what converging the display means. onChanged fires
+  // for EVERY balance write, which is what makes a store spend catch an open bag up
+  // (#2414), and ONLY when the number moved, which is what stops a poll that
+  // returned the value already on screen from rewriting the footer (#2411).
+  private readonly claudiumBalance = new ClaudiumLauncherBalance({
+    enabled: () => this.claudiumHooks !== null,
+    read: () => this.claudiumHooks?.balance() ?? Promise.resolve(null),
+    onChanged: () => {
+      // Footer-only, and on the cold-load-safe gate (#1538). A balance lands on its
+      // own schedule with no user action behind it, so a full renderBags() here
+      // would tear the window down under a player who is mid-drag, hovering a
+      // tooltip, or typing in bag search.
+      if (bagsWindowShown($('#bags').style.display)) this.bagsWindow.refreshMoneyRow();
+    },
+    now: () => Date.now(),
+  });
   private readonly claudiumWindow = new ClaudiumWindow({
     root: () => $('#claudium-window'),
     closeOthers: () => this.closeOtherWindows('#claudium-window'),
@@ -4075,7 +4146,7 @@ export class Hud {
           skus: [],
           nativeRails: { sol: false, usdc: false, woc: false },
         } satisfies ClaudiumSnapshot);
-      this.setClaudiumLauncherBalance(snapshot.balance);
+      this.claudiumBalance.set(snapshot.balance);
       return snapshot;
     },
     buy: (rail, sku) => this.claudiumHooks?.buy(rail, sku) ?? Promise.resolve(),
@@ -4253,42 +4324,11 @@ export class Hud {
 
   private claudiumLauncherHtml(): string {
     if (!this.claudiumHooks) return '';
-    this.refreshClaudiumLauncherBalance();
-    const label =
-      this.claudiumLauncherBalance === null
-        ? '--'
-        : formatNumber(this.claudiumLauncherBalance, { maximumFractionDigits: 0 });
+    this.claudiumBalance.refresh();
+    const balance = this.claudiumBalance.balance;
+    const label = balance === null ? '--' : formatNumber(balance, { maximumFractionDigits: 0 });
     const aria = t('hudChrome.claudium.open');
     return `<button type="button" class="claudium-launcher" data-claudium-launcher title="${esc(aria)}" aria-label="${esc(aria)}"><img class="claudium-coin" src="/claudium/icons/claudium_coin_64.webp" alt=""><span class="claudium-launcher-balance">${esc(label)}</span></button>`;
-  }
-
-  private setClaudiumLauncherBalance(balance: number | null): void {
-    this.claudiumLauncherBalance = balance;
-    this.claudiumLauncherBalanceLastMs = Date.now();
-  }
-
-  private refreshClaudiumLauncherBalance(force = false): void {
-    if (!this.claudiumHooks || this.claudiumLauncherBalancePending) return;
-    const now = Date.now();
-    if (!force && now - this.claudiumLauncherBalanceLastMs < 30_000) return;
-    this.claudiumLauncherBalancePending = true;
-    const seq = ++this.claudiumLauncherBalanceSeq;
-    void this.claudiumHooks
-      .balance()
-      .then((balance) => {
-        if (seq !== this.claudiumLauncherBalanceSeq) return;
-        this.setClaudiumLauncherBalance(balance);
-        if ($('#bags').style.display !== 'none') this.renderBags();
-      })
-      .catch(() => {
-        if (seq !== this.claudiumLauncherBalanceSeq) return;
-        this.setClaudiumLauncherBalance(null);
-      })
-      .finally(() => {
-        if (seq === this.claudiumLauncherBalanceSeq) {
-          this.claudiumLauncherBalancePending = false;
-        }
-      });
   }
 
   // One-line aura effect summary HTML for the buff/debuff tooltip: the pure descriptor
@@ -4756,8 +4796,14 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFood', { amount: itemNumber(item.foodHp), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
     if (item.drinkMana)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useDrink', { amount: itemNumber(item.drinkMana), seconds: itemNumber(CONSUME_DURATION) }))}</div>`;
-    if (item.use?.type === 'fishing')
-      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useFishing'))}</div>`;
+    // Gathering implements (#2343): picks/axes/sickles/rods and the simple
+    // pole render their kind, requirement, use, and bonus lines from the
+    // pure sibling module (the item_instance_tooltip.ts pattern).
+    html += gatherToolTooltipLines(item);
+    // Purpose hint for the eight enchanting materials (material_hint_view.ts
+    // keys the table by item id): what the reagent is for and which gear
+    // disenchants into it. Every other item id renders nothing here.
+    html += materialHintLine(item.id);
     if (item.potionHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
     if (item.potionMana)
@@ -5576,7 +5622,10 @@ export class Hud {
       }
     } else if (action?.type === 'item' && this.isHotbarItemId(action.id)) {
       if (this.tradeOpen) return;
-      this.sim.useItem(action.id);
+      // Gathering tools route through the interact-style handler first
+      // (#2343); everything else (and fishing implements) keeps the plain
+      // useItem command.
+      if (!this.tryGatherToolUse(action.id)) this.sim.useItem(action.id);
       if ($('#bags').style.display !== 'none') this.renderBags();
       this.flashActionSlot(barSlot);
     }
@@ -5755,15 +5804,10 @@ export class Hud {
           this.hideTooltip();
         };
         btn.addEventListener('contextmenu', (e) => {
-          if (!e.shiftKey) return;
-          e.preventDefault();
-          clearSlot();
+          handleShiftClearContextMenu(e, clearSlot);
         });
         btn.addEventListener('keydown', (e) => {
-          if (!e.shiftKey || (e.key !== 'Delete' && e.key !== 'Backspace')) return;
-          e.preventDefault();
-          e.stopPropagation();
-          clearSlot();
+          handleShiftClearKeydown(e, clearSlot);
         });
         btn.addEventListener('dragstart', (e) => {
           const action = this.actionForSlot(slot);
@@ -5832,29 +5876,29 @@ export class Hud {
           this.clearActionDropTargets();
         });
         this.bindMobileActionDrag(btn, slot);
-        // right-click clears the slot so a full bar can make room for new spells
-        btn.addEventListener('contextmenu', (e) => {
-          e.preventDefault();
-          if (this.hotbarActions[slot - 1] === null) return;
-          this.hotbarActions = clearHotbarSlot(this.hotbarActions, slot - 1);
-          this.saveSlotMap();
-          this.hideTooltip();
-        });
       } else {
         // Slot 0 (Attack). Right-click removes the Attack toggle from the bar
         // (Interface option showAttackButton -> off), freeing the slot and its key
-        // for a normal action; right-click again clears whatever was dropped in.
-        // The Options toggle restores Attack at any time.
+        // for a normal action. The Options toggle restores Attack at any time.
         btn.draggable = true;
-        btn.addEventListener('contextmenu', (e) => {
-          e.preventDefault();
-          if (this.attackSlotIsAttack()) {
-            this.optionsHooks?.settings.set('showAttackButton', false);
-          } else if (this.attackSlotAction !== null) {
-            this.attackSlotAction = null;
-            this.saveAttackSlotAction();
-          }
+        const clearAttackSlotAction = () => {
+          if (this.attackSlotAction === null) return;
+          this.attackSlotAction = null;
+          this.saveAttackSlotAction();
           this.hideTooltip();
+        };
+        btn.addEventListener('contextmenu', (e) => {
+          if (this.attackSlotIsAttack()) {
+            e.preventDefault();
+            this.optionsHooks?.settings.set('showAttackButton', false);
+            this.hideTooltip();
+            return;
+          }
+          handleShiftClearContextMenu(e, clearAttackSlotAction);
+        });
+        btn.addEventListener('keydown', (e) => {
+          if (this.attackSlotIsAttack()) return;
+          handleShiftClearKeydown(e, clearAttackSlotAction);
         });
         btn.addEventListener('dragstart', (e) => {
           const action = this.actionForSlot(0);
@@ -7024,7 +7068,8 @@ export class Hud {
   private applyDailyRewardsLauncherStatus(status: DailyRewardStatus): void {
     if (!this.dailyRewardsEnabled()) return;
     const button = this.dailyRewardsButtonEl;
-    const spinReady = !status.eligibility.eligible || !status.spin.claimed;
+    const spinReady =
+      status.enabled !== false && (!status.eligibility.eligible || !status.spin.claimed);
     this.mobileDailyRewardsButtonEl?.classList.toggle('spin-ready', spinReady);
     if (!button) return;
     if (!this.showDailyRewardsChestButton()) {
@@ -7039,9 +7084,9 @@ export class Hud {
   private refreshDailyRewardsLauncher(force = false): void {
     if (!this.dailyRewardsEnabled()) return;
     const button = this.dailyRewardsButtonEl;
-    if (!button) return;
+    const mobileButton = this.mobileDailyRewardsButtonEl;
+    if (!button && !mobileButton) return;
     this.applyDailyRewardsChestButtonVisibility();
-    if (!this.showDailyRewardsChestButton()) return;
     const now = performance.now();
     // Slow closed-window poll; the why and the arithmetic live in the core.
     if (!shouldRefreshDailyRewardsLauncher(force, now, this.lastDailyRewardsLauncherRefreshAt)) {
@@ -7057,7 +7102,8 @@ export class Hud {
       })
       .catch(() => {
         if (seq !== this.dailyRewardsLauncherSeq) return;
-        button.classList.remove('spin-ready');
+        button?.classList.remove('spin-ready');
+        mobileButton?.classList.remove('spin-ready');
       });
   }
 
@@ -7121,10 +7167,16 @@ export class Hud {
       // craft regardless.
       if (
         $('#crafting-window').style.display === 'flex' &&
-        stationTypesSignature(inRangeStationTypes(sim.player.pos, sim.activeMobileStationCraft)) !==
-          this.lastCraftingStationSig
+        stationTypesSignature(
+          inRangeStationTypes(sim.stationPlacements, sim.player.pos, sim.activeMobileStationCraft),
+        ) !== this.lastCraftingStationSig
       )
         this.renderCrafting();
+      // Bag staleness (#2375): the same cold-painter treatment for the other
+      // half of the Craft gate. This is the ONE edge that covers every bag
+      // source in BOTH hosts (loot, mail, trade, bank, quest reward), so the
+      // window can never sit disabled on reagents the player is holding.
+      this.refreshOpenCraftingIfReagentsChanged();
     }
 
     // player frame: the first instance of the unit_frame family. Build a
@@ -7715,6 +7767,12 @@ export class Hud {
     if (slowHud && this.mailboxWindow.isOpen) this.mailboxWindow.refreshIfChanged();
     // The bank closes itself when the bank mirror goes null (left the banker).
     if (slowHud && this.bankWindow.isOpen) this.bankWindow.refreshIfChanged();
+    // The bag money row is a cold painter, and several copper credits reach no bags
+    // arm in EITHER host (a trainer fee, a settled Vale Cup bet, delve and lockpick
+    // copper), so this is the backstop that converges them all (#2373). Online the
+    // ClientWorld purse diff gets there first via onInventoryChanged. The window owns
+    // the latch and repaints only its .money footer, never the whole grid.
+    if (slowHud) this.bagsWindow.refreshIfChanged();
     if (slowHud && this.deedsWindow.isOpen) this.deedsWindow.refreshIfChanged();
     if (slowHud) this.refreshOpenProfessionSurfacesIfChanged();
     if (slowHud && this.professionsWindow.isOpen) this.professionsWindow.refreshIfChanged();
@@ -7726,6 +7784,7 @@ export class Hud {
     if (slowHud) this.updateDeedTracker();
     if (slowHud && this.calendarWindow.isOpen) this.calendarWindow.refreshIfChanged();
     if (slowHud) this.updateMailIndicator();
+    if (slowHud) this.updateMarketIndicator();
   }
 
   private initMailIndicator(): void {
@@ -7761,6 +7820,45 @@ export class Hud {
       el.setAttribute('aria-label', t('hudChrome.mailbox.indicatorAria', { count }));
       el.title = t('hudChrome.mailbox.indicatorTip', { count });
     }
+  }
+
+  private initMarketIndicator(): void {
+    // Null-guarded (the raid-lockout init pattern): a game entry missing the
+    // badge markup must degrade to no badge, never abort the rest of HUD init.
+    const el = $('#market-indicator') as HTMLButtonElement | null;
+    if (!el) return;
+    this.marketIndicatorEl = el;
+    const activate = () => {
+      // At the Merchant the coin opens the World Market (the same gate the
+      // market window itself lives behind); anywhere else it is informational
+      // only: the tooltip already says the proceeds wait at the Merchant.
+      if (this.nearbyMarketNpc()) this.openMarket();
+    };
+    el.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      activate();
+    });
+    el.addEventListener('keydown', (ev) => {
+      if (ev.key !== 'Enter' && ev.key !== ' ') return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      activate();
+    });
+  }
+
+  // The World Market coin by the minimap: visible while sale proceeds or
+  // returned items wait at the Merchant (the mail envelope pattern).
+  // Slow-band, value-diffed writes only (the bit changes rarely); the static
+  // title/aria come from index.html's data-i18n attributes.
+  private updateMarketIndicator(): void {
+    const el = this.marketIndicatorEl ?? ($('#market-indicator') as HTMLElement | null);
+    if (!el) return;
+    this.marketIndicatorEl = el;
+    const view = marketCollectIndicatorView(this.sim.marketCollectPending);
+    if (view.visible === this.lastMarketCollectPending) return;
+    this.lastMarketCollectPending = view.visible;
+    el.hidden = !view.visible;
   }
 
   // Classic "low mana/energy" warning: pulse the player resource bar when power
@@ -8619,8 +8717,28 @@ export class Hud {
       case 'heal':
       case 'heal2': {
         const tgt = sim.entities.get(ev.targetId);
-        if (tgt)
-          this.combat('heal_impact', tgt.pos.x, tgt.pos.y, tgt.pos.z, 1.0, { cooldown: 0.1 });
+        if (!tgt) return;
+        // A potion/eat/drink heal (items.ts / combat/auras.ts) plays its own
+        // dedicated cue instead of the generic heal_impact; consumeHealCue
+        // returns null for every other heal source (leech, second wind,
+        // companion heals, ...), which falls through to heal_impact unchanged.
+        const cue = ev.type === 'heal' ? consumeHealCue(ev) : null;
+        if (ev.type === 'heal' && ev.source && !cue) return; // eat/drink tick, not a sound tick
+        // A HoT tick fires this every couple seconds for its whole duration; the
+        // one-shot application cue (Sim.applyAura) now covers the "heal landed"
+        // moment instead, so ticks stay silent. Frenzied Regeneration is fully
+        // exempt from this change (a Bear Form self-heal, never aimed at anyone
+        // else, so the repeat doesn't read as spammy the way a party HoT does):
+        // it keeps its old, unchanged tick-only sound, so the one-shot
+        // application emit is skipped for it too, or it would gain an extra pop
+        // on top of its untouched ticking. Confirmed in-game on Priest (Renew)
+        // and Druid (Rejuvenation, Regrowth, Frenzied Regeneration): the others
+        // land once on application and stay silent for the rest of their
+        // duration; Frenzied Regeneration keeps ticking exactly as before.
+        const isHot = ev.type === 'heal2' && ev.hot === true;
+        const isFrenziedRegen = ev.type === 'heal2' && ev.abilityId === 'frenzied_regeneration';
+        if (isHot ? !isFrenziedRegen : isFrenziedRegen) return;
+        this.combat(cue ?? 'heal_impact', tgt.pos.x, tgt.pos.y, tgt.pos.z, 1.0, { cooldown: 0.1 });
         return;
       }
       case 'aura': {
@@ -8943,6 +9061,14 @@ export class Hud {
           }
           break;
         }
+        // The rank itself already rides every self snapshot; the open character
+        // sheet is only repainted on an explicit trigger, so without this it
+        // keeps showing the pre-prestige rank until closed and reopened. Same
+        // job the 'honor' case below does for the sheet's Honor balance.
+        case 'prestige': {
+          this.renderCharIfOpen();
+          break;
+        }
         case 'honor': {
           const amount = formatNumber(ev.amount, { maximumFractionDigits: 0 });
           const honorMessage = t('hudChrome.warfare.honorGain', {
@@ -8978,7 +9104,12 @@ export class Hud {
           audio.levelUp();
           if (isTalentRowUnlockLevel(ev.level)) {
             this.showBanner(t('game.talents.rowUnlockToast'));
-            sfx.playUi('quest_ready', { gain: 4.5 });
+            // No local gain override: the manifest's resolved gain (keyTrimDb)
+            // is the single source of truth, same fix efe124264 already
+            // applied to every other quest_ready call site. This one was
+            // missed; stacking this on top of the corrected catalog gain was
+            // clipping (+3.4dBTP effective).
+            sfx.playUi('quest_ready');
           }
           if (ev.level === 5) {
             const characterId = (this.sim as unknown as { characterId?: number }).characterId;
@@ -9019,7 +9150,15 @@ export class Hud {
         case 'comboPoint':
           break;
         case 'loot': {
-          this.log(this.localizeLootText(ev.text), '#7fdc4f');
+          // callerLogs: a professions grant whose own result event (gatherResult
+          // / fishingResult / craftResult / disenchantResult / salvageResult /
+          // enchantResult) renders the player-visible line for this same grant,
+          // richer than this one (rolled quality color, quantity, a clickable
+          // item link). The hub line stands down so one action prints one line
+          // (#2430). Everything else in this arm still runs for those grants:
+          // the loot-roll close below, the bag refresh, and the independent
+          // audio guard.
+          if (!ev.callerLogs) this.log(this.localizeLootText(ev.text), '#7fdc4f');
           if (
             / wins .+ \(\d+\)$/.test(ev.text) ||
             /^Everyone passed on .+\.$/.test(ev.text) ||
@@ -9027,13 +9166,19 @@ export class Hud {
             /^.+ was not assigned and is free for all\.$/.test(ev.text)
           )
             this.lootRolls.closeForItem(ev.text);
-          if (
-            ev.text.includes('loot') ||
-            ev.text.includes('Sold') ||
-            ev.text.includes('Bought back')
-          )
-            audio.coin();
-          else audio.lootItem();
+          // silent: the audio half of the same idea, and independent of it (a
+          // caller can own the cue without owning the line). A professions
+          // grant with its own dedicated cue sets this so the generic ding
+          // doesn't stack on top of it.
+          if (!ev.silent) {
+            if (
+              ev.text.includes('loot') ||
+              ev.text.includes('Sold') ||
+              ev.text.includes('Bought back')
+            )
+              audio.coin();
+            else audio.lootItem();
+          }
           if ($('#bags').style.display !== 'none') this.renderBags();
           break;
         }
@@ -9044,10 +9189,26 @@ export class Hud {
           // instead of polling every frame.
           this.craftTierUpDrains = CRAFT_TIER_UP_DRAIN_WINDOW;
           if (ev.ok && ev.itemId) {
-            const item = ITEMS[ev.itemId];
-            const name = item ? itemDisplayName(item) : ev.itemId;
-            this.log(t('hudChrome.crafting.craftedToast', { name }), '#7fdc4f');
-            audio.lootItem();
+            // The ONLY line for the craft grant: the hub's 'loot' events are
+            // emitted both silent and callerLogs for every craft-output grant
+            // (see crafting.ts), so this line has to carry what they used to,
+            // the output count of a resultCount > 1 recipe included (#2430).
+            // The line keeps its loot-family green; the output's quality now
+            // rides the item link's own color, which is where a player reads
+            // it everywhere else in chat.
+            this.log(
+              t(craftedLineKey(ev.count), {
+                name: grantItemToken(ev.itemId),
+                qty: grantQtyText(ev.count),
+              }),
+              '#7fdc4f',
+            );
+            const recipe = ALL_RECIPES.find((r) => r.id === ev.recipeId);
+            audio.craftSuccess(recipe?.professionId ?? '');
+            // Masterwork layers alongside the family cue above, never replaces
+            // it: craftResult.masterwork mirrors the standalone 'masterwork'
+            // event (see src/sim/types.ts), so this one check covers both.
+            if (ev.masterwork) audio.masterwork();
           } else if (!ev.ok) {
             // station_required names WHICH station: no station field
             // rides the event, the type resolves from the recipe content
@@ -9070,7 +9231,9 @@ export class Hud {
                           ? 'hudChrome.crafting.throttled'
                           : ev.reason === 'recipe_not_learned'
                             ? 'hudChrome.crafting.recipeNotLearned'
-                            : 'hudChrome.crafting.insufficientMaterials',
+                            : ev.reason === 'no_bag_space'
+                              ? 'hudChrome.crafting.noBagSpace'
+                              : 'hudChrome.crafting.insufficientMaterials',
                   ),
               '#ff6b6b',
             );
@@ -9084,6 +9247,10 @@ export class Hud {
           // from recipeId plus static content, identical in both worlds. ONE
           // chat line either way: no toast and no sound cue on success (the
           // grant-hub double-log trap; the fee/grant surfaces stay single).
+          // The result closes the row's learn flight; an ok joins the
+          // confirmed overlay so the repaint below reads Known even when the
+          // cprof mirror has not caught up yet (issue #2342).
+          this.trainLearns.resolve(ev.recipeId, ev.ok);
           const trainedRecipe = recipeById(ev.recipeId);
           if (ev.ok) {
             const item = trainedRecipe ? ITEMS[trainedRecipe.resultItemId] : undefined;
@@ -9152,7 +9319,9 @@ export class Hud {
                     ? 'hudChrome.unbind.notBound'
                     : ev.reason === 'unbind_cannot_afford'
                       ? 'hudChrome.unbind.cannotAfford'
-                      : 'hudChrome.unbind.outOfRange',
+                      : ev.reason === 'unbind_no_space'
+                        ? 'hudChrome.unbind.noSpace'
+                        : 'hudChrome.unbind.outOfRange',
               ),
               '#ff6b6b',
             );
@@ -9165,11 +9334,12 @@ export class Hud {
           break;
         }
         case 'masterwork': {
-          // Personal masterwork proc (Professions 2.0). The grant hub
-          // already printed the loot line + cue and the craftResult arm above
-          // already logged craftedToast + lootItem, so this arm re-logs no
-          // grant and re-cues no lootItem: it only feeds the drain-end
-          // celebration plan (banner + toast + ONE audio.achievement).
+          // Personal masterwork proc (Professions 2.0). The craftResult arm
+          // above already logged the crafted line and played the craft cue,
+          // and since #2430 that line is the only one for the craft grant (the
+          // grant hub's own line and ding stand down for it), so this arm
+          // re-logs no grant and re-cues no lootItem: it only feeds the
+          // drain-end celebration plan (banner + toast + ONE audio.achievement).
           masterworkItemId = ev.itemId;
           break;
         }
@@ -9202,43 +9372,48 @@ export class Hud {
         case 'gatherResult': {
           // Harvest feedback line (Professions 2.0), colored by rolled
           // material rarity. Identical on every graphics tier (player feedback
-          // is never profile-gated). The grant hub's own 'loot' event already
-          // prints the "You receive:" line and plays the loot cue, so this
-          // line uses distinct gather wording; the strike cue is
-          // the physical pick/axe/sickle impact of the completed gather cast,
-          // not a second loot notification, with a rare variant for a rare+
-          // material or a rare-event roll.
-          const item = ITEMS[ev.itemId];
-          const name = item ? itemDisplayName(item) : ev.itemId;
+          // is never profile-gated). This is the ONLY line for the harvest
+          // grant: the grant hub's own 'loot' event is emitted both silent and
+          // callerLogs for a gather grant (see gathering.ts harvestNode), so
+          // neither the generic ding nor the "You receive:" line stacks on top
+          // of this line and its dedicated node-type cue (#2430). The
+          // node-type impact always plays; a rare-or-better material roll (or
+          // any rare-event roll) layers one additional tiered stinger on top,
+          // never a replacement for the impact.
+          // The LINE color is the rolled rarity (the yield roll), while the
+          // item link inside it paints from the item's own def quality: the
+          // same Copper Ore is granted at every roll, only the qty scales, so
+          // the link must not claim the ore itself got rarer.
           this.log(
-            ev.qty > 1
-              ? t('hudChrome.gathering.gatherLineQty', {
-                  name,
-                  qty: formatNumber(ev.qty, { maximumFractionDigits: 0 }),
-                })
-              : t('hudChrome.gathering.gatherLine', { name }),
+            t(gatherLineKey(ev.qty), {
+              name: grantItemToken(ev.itemId),
+              qty: grantQtyText(ev.qty),
+            }),
             QUALITY_COLOR[ev.rarity],
           );
-          if (
-            ev.rareEvent !== null ||
-            ev.rarity === 'rare' ||
-            ev.rarity === 'epic' ||
-            ev.rarity === 'legendary'
-          )
-            audio.gatherRare();
-          else audio.gatherStrike();
+          audio.gather(ev.nodeType);
+          const gatherRareTier = gatherRareTierFor(ev.rarity, ev.rareEvent);
+          if (gatherRareTier) audio.gatherRareTier(gatherRareTier);
           break;
         }
         case 'gatherDenied': {
           // Tool-tier denial (Professions 2.0): an error toast ONLY.
           // No loot line, no cue, no other state (the grant-hub double-log
           // trap); the sim event is text-free, so the pure core resolves the
-          // key off surface + professionId and requiredTier interpolates.
+          // key off surface + professionId + requiredTier (tier 1 = no tool
+          // owned at all, #2343) and requiredTier interpolates.
           this.showError(
-            t(gatherDeniedLineKey(ev.surface, ev.professionId), {
+            t(gatherDeniedLineKey(ev.surface, ev.professionId, ev.requiredTier), {
               tier: formatNumber(ev.requiredTier, { maximumFractionDigits: 0 }),
             }),
           );
+          break;
+        }
+        case 'gatherToolNoNode': {
+          // Bag-clicked gathering tool with nothing in reach (#2343): an
+          // error toast ONLY, the gatherDenied pattern above; the sim event
+          // is text-free, so the pure core resolves the key off professionId.
+          this.showError(t(gatherToolNoNodeKey(ev.professionId)));
           break;
         }
         case 'gatherDowngrade': {
@@ -9251,41 +9426,75 @@ export class Hud {
         }
         case 'disenchantResult': {
           // Enchanting disenchant outcome (Professions 2.0): text-free,
-          // so enchanting_view.ts maps the event to its key + sink and the item
-          // name interpolates. The grant hub's own 'loot' events already print
-          // the material yield lines, so success is a distinct action line (the
-          // gatherResult pattern), never a second receive notification.
+          // so enchanting_view.ts maps the event to its key + sink and the
+          // names interpolate. The success line is the ONLY line for the whole
+          // action now that the hub's 'loot' events stand down for it
+          // (callerLogs, see enchanting.ts resolveDisenchant), so it names both
+          // the piece that was consumed and the material that came back; a
+          // rare+ yield's typed secondary is a different item, so it takes one
+          // extra line rather than being folded into this one (#2430).
+          // Item-link tokens only expand on the chat log, never in showError,
+          // so the deny arm stays name-free.
           const toast = disenchantResultToast(ev);
-          const item = ITEMS[ev.itemId];
-          const params = { item: item ? itemDisplayName(item) : ev.itemId };
-          if (toast.sink === 'log') this.log(t(toast.key, params), '#7fdc4f');
-          else this.showError(t(toast.key));
+          if (toast.sink === 'log') {
+            this.log(
+              t(toast.key, {
+                item: grantItemToken(ev.itemId),
+                material: ev.materialItemId ? grantItemToken(ev.materialItemId) : '',
+                qty: grantQtyText(ev.count),
+              }),
+              '#7fdc4f',
+            );
+            const secondary = disenchantSecondaryLineKey(ev);
+            if (secondary && ev.secondaryItemId)
+              this.log(
+                t(secondary, {
+                  material: grantItemToken(ev.secondaryItemId),
+                  qty: grantQtyText(ev.secondaryCount),
+                }),
+                '#7fdc4f',
+              );
+            audio.disenchant();
+          } else this.showError(t(toast.key));
           break;
         }
         case 'salvageResult': {
           // Enchanting salvage outcome (Professions 2.0): same shape as
-          // disenchantResult above.
+          // disenchantResult above, minus the secondary (salvage yields one
+          // material). Its success line names the consumed piece and the
+          // reclaimed material for the same reason.
           const toast = salvageResultToast(ev);
-          const item = ITEMS[ev.itemId];
-          const params = { item: item ? itemDisplayName(item) : ev.itemId };
-          if (toast.sink === 'log') this.log(t(toast.key, params), '#7fdc4f');
-          else this.showError(t(toast.key));
+          if (toast.sink === 'log') {
+            this.log(
+              t(toast.key, {
+                item: grantItemToken(ev.itemId),
+                material: ev.materialItemId ? grantItemToken(ev.materialItemId) : '',
+                qty: grantQtyText(ev.count),
+              }),
+              '#7fdc4f',
+            );
+            audio.salvage();
+          } else this.showError(t(toast.key));
           break;
         }
         case 'enchantResult': {
           // Apply-enchant outcome (Professions 2.0): the success line
           // names the item AND the enchant (enchantName.<id>, its first render
-          // sink); every deny is an error toast.
+          // sink); every deny is an error toast. The ONLY line for the action:
+          // the bagged arms re-mint the player's own copy through the grant
+          // hub, whose "You receive:" line claimed they had received an item
+          // that never left their bags, and now stands down (#2430). The WORN
+          // arm never reaches the hub at all, so both arms print exactly this.
           const toast = applyEnchantResultToast(ev);
-          const item = ITEMS[ev.itemId];
           if (toast.sink === 'log') {
             this.log(
               t(toast.key, {
-                item: item ? itemDisplayName(item) : ev.itemId,
+                item: grantItemToken(ev.itemId),
                 enchant: t(`hudChrome.enchantName.${ev.enchantId}` as TranslationKey),
               }),
               '#7fdc4f',
             );
+            audio.enchant();
           } else {
             this.showError(t(toast.key));
           }
@@ -9294,14 +9503,14 @@ export class Hud {
         case 'fishingResult': {
           // Reel-in feedback line (Professions 2.0), colored by the
           // caught item's quality. Identical on every graphics tier (player
-          // feedback is never profile-gated). The grant hub's own 'loot' event
-          // already prints the "You receive:" line and plays the loot cue, so
-          // this line uses distinct reel-in wording; the reel cue
-          // is the splash-and-crank of the landed reel itself, not a second
-          // loot notification.
-          const item = ITEMS[ev.itemId];
+          // feedback is never profile-gated). This is the ONLY line for the
+          // catch grant, and the reel cue (the splash-and-crank of the landed
+          // reel) its only cue: the grant hub's 'loot' event is emitted both
+          // silent and callerLogs for a landed catch (see fishing.ts
+          // completeFishing), which is what stopped a catch printing three
+          // lines and playing two cues (#2430).
           this.log(
-            t('hudChrome.gathering.catchLine', { name: item ? itemDisplayName(item) : ev.itemId }),
+            t('hudChrome.gathering.catchLine', { name: grantItemToken(ev.itemId) }),
             QUALITY_COLOR[ev.quality],
           );
           audio.fishReel();
@@ -9374,6 +9583,18 @@ export class Hud {
           // Keyboard/sim interact at a banker NPC: open the bank window.
           this.openBank();
           break;
+        case 'noticeboard':
+          // The board has no posted content yet. The structured private event
+          // keeps this feedback localized and identical offline and online.
+          // Mobile keeps the chat log collapsed during normal play, so mirror
+          // the durable/live-announced log line into the shared transient
+          // banner instead of making a successful interaction look inert.
+          {
+            const message = t('hudChrome.noticeboard.empty');
+            this.showBanner(message);
+            this.log(message, '#c8b98f');
+          }
+          break;
         case 'mailArrived': {
           // Player names splice verbatim; authored letters carry their
           // letterId, so the sender localizes through the entity dictionary
@@ -9413,6 +9634,14 @@ export class Hud {
             this.showError(t(CALENDAR_RESULT_KEYS[ev.code]));
           }
           this.calendarWindow.onCalendarResult(ev.code);
+          break;
+        }
+        case 'motdResult': {
+          if (ev.code === 'set') {
+            this.log(t(MOTD_RESULT_KEYS[ev.code]), '#c8f7c5');
+          } else {
+            this.showError(t(MOTD_RESULT_KEYS[ev.code]));
+          }
           break;
         }
         case 'deedBroadcast': {
@@ -9602,13 +9831,19 @@ export class Hud {
               );
               break;
           }
-          if (
-            (ev.channel === 'say' || ev.channel === 'yell' || ev.channel === 'emote') &&
-            ev.entityId !== undefined
-          ) {
+          // Overhead speech bubbles. say/yell/emote carry the speaker's entity
+          // id; party also anchors on the speaker because its emit sets
+          // fromPid = the speaker entity (#1659), so it bubbles with no sim
+          // change. chatBubbleStyle returns null for every channel that does not
+          // bubble: general/world/lfg/whisper/roll (too noisy or private) and
+          // guild/officer (server social broadcasts that carry no speaker id, so
+          // the client has no entity to anchor to; a server/wire follow-up).
+          const bubbleStyle = ev.channel === undefined ? null : chatBubbleStyle(ev.channel);
+          const bubbleSpeakerId = ev.entityId ?? ev.fromPid;
+          if (bubbleStyle && typeof bubbleSpeakerId === 'number') {
             const masked = this.maskChat(this.chatLinkPlainText(ev.text));
             const bubble = ev.channel === 'emote' ? `${ev.from} ${masked}` : masked;
-            this.renderer.showChatBubble(ev.entityId, bubble, ev.channel === 'yell');
+            this.renderer.showChatBubble(bubbleSpeakerId, bubble, bubbleStyle);
           }
           // Voiced encounter dialogue (boss/NPC yells) — no-op unless a clip was
           // generated for this exact line (scripts/voices/extra_lines.mjs).
@@ -9669,7 +9904,7 @@ export class Hud {
           break;
         }
         case 'partyInvite':
-          audio.invitePrompt();
+          audio.partyInvite();
           this.showPrompt(
             t('hud.prompts.partyInvite', { name: `<b>${esc(ev.fromName)}</b>` }),
             t('hud.prompts.joinParty'),
@@ -9718,7 +9953,7 @@ export class Hud {
           );
           break;
         case 'guildInvite':
-          audio.invitePrompt();
+          audio.levelUp();
           this.showPrompt(
             t('hud.prompts.guildInvite', {
               name: `<b>${esc(ev.fromName)}</b>`,
@@ -10256,10 +10491,12 @@ export class Hud {
           break;
         case 'castStart':
           // cast-loop SFX is spatial now (see playEventSfx); the profession
-          // casts (Professions 2.0) add a personal placeholder cue
-          // at cast start, feedback-gated like other notification cues.
+          // casts (Professions 2.0) add a personal cue at cast start,
+          // feedback-gated like other notification cues. Gathering's cue
+          // branches by node type (a pickaxe/axe/knife tool-out sound);
+          // ev.gatherNodeType is only set on a gather cast (see gathering.ts).
           if (ev.entityId === sim.playerId) {
-            if (ev.ability === GATHER_CAST_ID) audio.gatherCast();
+            if (ev.ability === GATHER_CAST_ID) audio.gatherCast(ev.gatherNodeType);
             else if (ev.ability === FISHING_CAST_ID) audio.fishCast();
           }
           break;
@@ -10294,8 +10531,12 @@ export class Hud {
               '#d8a0d8',
             );
           } else if (tgt && ev.gained) {
+            const matched = findAuraForGainEvent(tgt.auras, ev.name, ev.auraKind);
             this.combatLog(
-              t('hud.combat.auraAfflicted', { target: entityDisplayName(tgt), name: auraName }),
+              t(auraGainLogKeyFor(matched, ev.auraKind), {
+                target: entityDisplayName(tgt),
+                name: auraName,
+              }),
               '#d8a0d8',
             );
           }
@@ -10888,6 +11129,7 @@ export class Hud {
       'You join the Ashen Coliseum queue. Stand by for a worthy opponent…': 'hud.logs.arenaJoin',
       'You leave the Ashen Coliseum queue.': 'hud.logs.arenaLeave',
       'You step onto the sands of the Ashen Coliseum.': 'hud.logs.arenaSands',
+      'You step onto the flooded stones of the Drowned Court.': 'hud.logs.arenaSandsDrowned',
       'Fight!': 'hud.system.arenaStart',
       'Trade window opened.': 'hud.logs.tradeOpened',
       'Trade complete.': 'hud.logs.tradeComplete',
@@ -11030,11 +11272,16 @@ export class Hud {
     match = /^(.+) was not assigned and is free for all\.$/.exec(text);
     if (match)
       return t('hudChrome.masterLoot.unassigned', { item: itemDisplayNameFromSource(match[1]) });
-    match = /^Sold (.+) for (.+)\.$/.exec(text);
+    // The optional xN suffix (vendor-selling a stack) routes through
+    // itemStackDisplayName so the item NAME still localizes, the same
+    // treatment as the receive/listed/bought/reclaimed arms above and below:
+    // a greedy single capture would feed "Copper Ore x2" to the exact-name
+    // lookup and silently degrade to raw English.
+    match = /^Sold (.+?)( x\d+)? for (.+)\.$/.exec(text);
     if (match)
       return t('hud.logs.soldItem', {
-        item: itemDisplayNameFromSource(match[1]),
-        money: this.localizeSimMoney(match[2]),
+        item: itemStackDisplayName(match[1], match[2]),
+        money: this.localizeSimMoney(match[3]),
       });
     match = /^Listed (.+?)( x\d+)? on the World Market for (.+)\.$/.exec(text);
     if (match)
@@ -11232,6 +11479,24 @@ export class Hud {
     this.arenaWindow.setPracticeHook(fn);
   }
 
+  // Client-side gathering-tool use routing (#2343): main.ts wires the handler
+  // (node scan + handleGatherNodeInteract + the #1982 autorun stop) after the
+  // input layer exists; bags clicks and hotbar presses on a pick/axe/sickle
+  // try it first and fall back to the plain useItem command when it declines
+  // (non-tools, fishing implements, or the hook not yet wired).
+  private gatherToolUseHook: ((item: ItemDef) => boolean) | null = null;
+
+  setGatherToolUseHook(fn: ((item: ItemDef) => boolean) | null): void {
+    this.gatherToolUseHook = fn;
+  }
+
+  /** True when the gathering-tool routing consumed this item use. */
+  tryGatherToolUse(itemId: string): boolean {
+    const item = ITEMS[itemId];
+    if (!item) return false;
+    return this.gatherToolUseHook?.(item) ?? false;
+  }
+
   private inFiesta(): boolean {
     return this.fiesta.isActive();
   }
@@ -11317,6 +11582,10 @@ export class Hud {
       buy();
       if ($('#bags').style.display !== 'none') this.renderBags();
       this.renderVendor();
+      // The issue #2375 repro: buying the last reagent with the crafting
+      // window open must enable the row on the click, not on the next slow
+      // tick (offline has no authoritative-delta hook to ride).
+      this.refreshOpenCraftingIfReagentsChanged();
     };
     renderVendorWindow(
       $('#vendor-window'),
@@ -11430,18 +11699,33 @@ export class Hud {
       $('#train-window'),
       entityDisplayName(npc),
       buildTrainView(npc.templateId, {
+        stations: this.sim.stationPlacements,
         knownRecipes: identity.knownRecipes,
         craftSkills: identity.craftSkills,
         copper: this.sim.copper,
         items: ITEMS,
+        pendingRecipes: this.trainLearns.pendingIds(performance.now()),
+        confirmedRecipes: this.trainLearns.confirmedIds(identity.knownRecipes),
       }),
       {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),
-        onTrain: (recipeId) => this.sim.trainRecipe(recipeId),
+        onTrain: (recipeId) => this.trainRecipeClicked(recipeId),
         onClose: () => this.closeTrain(),
       },
     );
+  }
+
+  // The Learn click's first-feedback path (issue #2342): open the flight
+  // BEFORE the command leaves (a re-activation while it is open is swallowed,
+  // so a rapid double-click never re-sends train_recipe and never surfaces
+  // train_already_known), then repaint so the row disables immediately. The
+  // flight closes when the trainResult event resolves it, or by TTL if the
+  // answer is lost to a disconnect.
+  private trainRecipeClicked(recipeId: string): void {
+    if (!this.trainLearns.begin(recipeId, performance.now())) return;
+    this.sim.trainRecipe(recipeId);
+    this.renderTrain();
   }
 
   closeTrain(): void {
@@ -11597,10 +11881,14 @@ export class Hud {
     // the own active mobile station), computed once per repaint, so the row
     // disable mirrors the deny exactly. The server re-validates on craft.
     const inRangeStations = inRangeStationTypes(
+      this.sim.stationPlacements,
       this.sim.player.pos,
       this.sim.activeMobileStationCraft,
     );
     this.lastCraftingStationSig = stationTypesSignature(inRangeStations);
+    // Re-arm the bag diff on EVERY paint, whatever caused it, so a repaint
+    // from one edge never leaves another edge owing a second one (#2375).
+    this.lastCraftingReagentSig = craftingReagentSig(this.sim.inventory, this.sim.player.name);
     // The window lists only KNOWN recipes, so an unlearned trainer
     // recipe never renders as a craftable row (it surfaces in the Train
     // ladder instead). The SAME viewer-side predicate the ladder's known
@@ -11619,6 +11907,7 @@ export class Hud {
         this.sim.craftSkills,
         this.sim.craftingIdentity,
         inRangeStations,
+        this.sim.player.name,
       ),
       {
         ...this.presentationBag,
@@ -11656,7 +11945,7 @@ export class Hud {
       buildProfessionIdentityView(this.sim.craftingIdentity),
       // Per-section "learnable at a master" hints: crafts with unlearned
       // trainer recipes, off the same mirrored knownRecipes set (both hosts).
-      craftLearnHints(this.sim.craftingIdentity.knownRecipes),
+      craftLearnHints(this.sim.craftingIdentity.knownRecipes, this.sim.stationPlacements),
     );
   }
 
@@ -11754,6 +12043,16 @@ export class Hud {
   private onBagsClosed(): void {
     if (document.body.classList.contains('mobile-touch') && this.bankWindow.isOpen) {
       document.body.classList.remove('bank-open');
+    }
+    // The market cluster undocks the same way: a bags-only close (the bags x-btn
+    // or the tray toggle; the market keeps its own x-btn, bags is only its
+    // optional Sell-tab companion) must not leave the still-open market pinned
+    // to the left half of the mobile 50/50 pairing with nothing on the right.
+    // Dropping the class lets the standalone mobile sheet rule take the full
+    // width back; mobile-only exactly like the bank arm above (desktop
+    // deliberately keeps the docked offset until the market closes).
+    if (document.body.classList.contains('mobile-touch') && this.marketWindow.isOpen) {
+      document.body.classList.remove('market-open');
     }
     // The char-sheet companion undocks too: with the bags gone the sheet takes the
     // full screen back rather than staying a half-width orphan.
@@ -11883,20 +12182,49 @@ export class Hud {
     // onBagsClosed drops the class while the bank stays up; idempotent on desktop,
     // which never undocks).
     if (this.bankWindow.isOpen) document.body.classList.add('bank-open');
+    // Re-dock the market pairing the same way (its mobile undock in onBagsClosed
+    // mirrors the bank's; idempotent on desktop, which never undocks).
+    if (this.marketWindow.isOpen) document.body.classList.add('market-open');
     // Dock the char-sheet pairing when its companion opens (the touch cluster).
     this.syncCharBagsPairing();
     audio.bagOpen();
-    // Pull a fresh on-chain $WOC balance for the footer; the async result
-    // re-renders the bag via the onWalletUiChange listener wired in the ctor.
+    // Pull a fresh on-chain $WOC balance for the footer; the async result repaints
+    // the footer (not the whole bag) via the onWalletUiChange listener wired in the
+    // ctor. The display is set to 'flex' above precisely so that listener's
+    // bagsWindowShown gate sees an open window when the balance lands.
     this.optionsHooks?.refreshWocBalance();
   }
 
   // Called when an authoritative inventory delta lands (online snapshots
   // carry inventory separately from the event frames that normally redraw).
   onInventoryChanged(): void {
-    if ($('#bags').style.display !== 'none') this.renderBags();
+    // Cold-load-safe gate (#1538): a never-opened window's inline display is '', which
+    // the raw `!== 'none'` form reads as shown. That mattered little while only
+    // inventory deltas landed here, but every money-only credit now routes through
+    // this hook (#2373), so a hidden window would be rebuilt on each one.
+    if (bagsWindowShown($('#bags').style.display)) this.renderBags();
     if (this.openVendorNpcId !== null) this.renderVendor();
     this.renderCharIfOpen();
+    // The crafting window rides this hook too (#2375): it is the online
+    // host's instant edge for an authoritative delta, and offline it is what
+    // the bank window raises on a withdraw. Every other offline bag source
+    // converges on the slow band instead.
+    this.refreshOpenCraftingIfReagentsChanged();
+  }
+
+  /**
+   * Repaint an OPEN crafting window when the bag facts behind its Craft gate
+   * actually moved (issue #2375). Cheap enough for the slow band and for every
+   * inventory delta: the window has to be open before the signature is built
+   * at all, and an unchanged bag never reaches the painter.
+   */
+  private refreshOpenCraftingIfReagentsChanged(): void {
+    if ($('#crafting-window').style.display !== 'flex') return;
+    if (
+      craftingReagentSig(this.sim.inventory, this.sim.player.name) === this.lastCraftingReagentSig
+    )
+      return;
+    this.renderCrafting();
   }
 
   onCosmeticsChanged(): void {
@@ -11950,6 +12278,7 @@ export class Hud {
       bagsShown: bagsWindowShown($('#bags').style.display),
       bankOpen: this.bankWindow.isOpen,
       vendorOpen: this.vendorOpen,
+      marketOpen: this.marketWindow.isOpen,
     });
     document.body.classList.toggle('char-bags-paired', paired);
   }
@@ -12288,9 +12617,15 @@ export class Hud {
     el.setAttribute('role', 'dialog');
     el.setAttribute('aria-modal', 'true');
     el.setAttribute('aria-labelledby', 'confirm-dialog-title');
+    // The body is the DESCRIPTION, not decoration: on a destroy confirm it
+    // carries what dies, whether anything is refunded, and what it costs. With
+    // focus landing on OK, a screen reader announces the dialog name and the
+    // focused control, so without this association the warning is never read
+    // aloud and the accept is one keypress away.
+    el.setAttribute('aria-describedby', 'confirm-dialog-body');
     el.innerHTML =
       `<div class="panel-title"><span id="confirm-dialog-title">${esc(title)}</span><button type="button" class="x-btn" data-cancel aria-label="${esc(cancelText)}">${svgIcon('close')}</button></div>` +
-      `<div class="cd-body">${esc(body)}</div>` +
+      `<div class="cd-body" id="confirm-dialog-body">${esc(body)}</div>` +
       `<div class="cd-actions"><button type="button" class="btn" data-cancel>${esc(cancelText)}</button><button type="button" class="btn cd-ok" data-ok>${esc(okText)}</button></div>`;
     document.body.appendChild(el);
     this.bringWindowToFront(el);
@@ -12557,11 +12892,8 @@ export class Hud {
   attachClaudium(hooks: ClaudiumHooks): void {
     this.claudiumHooks = hooks;
     this.syncDailyRewardsSurfaceLabels();
-    this.claudiumLauncherBalance = null;
-    this.claudiumLauncherBalanceLastMs = 0;
-    this.claudiumLauncherBalanceSeq++;
-    this.claudiumLauncherBalancePending = false;
-    this.refreshClaudiumLauncherBalance(true);
+    this.claudiumBalance.reset();
+    this.claudiumBalance.refresh(true);
   }
 
   attachStorePromoCard(): void {
@@ -12595,7 +12927,7 @@ export class Hud {
   }
 
   async refreshClaudium(): Promise<void> {
-    this.refreshClaudiumLauncherBalance(true);
+    this.claudiumBalance.refresh(true);
     if (!this.claudiumWindow.isOpen) return;
     await this.claudiumWindow.render();
   }
@@ -13583,6 +13915,21 @@ export class Hud {
 
   toggleSocial(): void {
     this.socialWindow.toggle();
+  }
+
+  // The single source of truth for "may this client offer the /dev GUI": either the
+  // build asked for it (local `npm run dev`) or the connected realm advertised
+  // ALLOW_DEV_COMMANDS=1. Both the window's own `available` gate and the "/dev gui"
+  // chat hook in main.ts read THIS, so the two can never disagree.
+  get devCommandsAvailable(): boolean {
+    return this.features.devCommandsEnabled === true || this.devCommandsAdvertised;
+  }
+
+  // Latch the realm's dev-command advert on. One-way on purpose: the advert is only
+  // ever consulted to LIGHT the surface, and every dev_* command is re-gated
+  // server-side per message, so this can never grant power the realm withholds.
+  noteDevCommandsAdvertised(): void {
+    this.devCommandsAdvertised = true;
   }
 
   toggleDevCommandWindow(): boolean {

@@ -30,8 +30,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 424,
-      "state": "435e70fb",
-      "events": "06360479",
+      "state": "ac5dd3a5",
+      "events": "0e9538e1",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -41,7 +41,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 424,
-      "state": "5710a5f7",
+      "state": "55121365",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -52,7 +52,7 @@
       "tick": 54,
       "time": 2.7,
       "nextId": 424,
-      "state": "c49f153f",
+      "state": "d213c315",
       "events": "5675a148",
       "rng": {
         "draws": 51,
@@ -606,8 +606,8 @@
               "remaining": 27.3,
               "school": "holy",
               "sourceId": 415,
-              "value": 222,
-              "value2": 222
+              "value": 322,
+              "value2": 322
             },
             {
               "duration": 30,
@@ -991,7 +991,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 424,
-      "state": "9f70c44a",
+      "state": "74c9c914",
       "events": "a8a82d12",
       "rng": {
         "draws": 77,
@@ -1002,7 +1002,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 424,
-      "state": "67adb7b4",
+      "state": "c636f412",
       "events": "741638a5",
       "rng": {
         "draws": 152,
@@ -1013,7 +1013,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 424,
-      "state": "21dfecf2",
+      "state": "7e232454",
       "events": "741638a5",
       "rng": {
         "draws": 248,
@@ -1024,8 +1024,8 @@
       "tick": 120,
       "time": 6,
       "nextId": 424,
-      "state": "fa4da1e1",
-      "events": "a6661957",
+      "state": "54b200dd",
+      "events": "ff01d0e2",
       "rng": {
         "draws": 369,
         "digest": "85cb80eb"
@@ -1035,7 +1035,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 424,
-      "state": "4d128045",
+      "state": "d3f47755",
       "events": "48b6915e",
       "rng": {
         "draws": 505,
@@ -1046,7 +1046,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 424,
-      "state": "96a9749d",
+      "state": "bdf94bba",
       "events": "9462558a",
       "rng": {
         "draws": 628,
@@ -1057,7 +1057,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 424,
-      "state": "ff03e241",
+      "state": "1b540c4a",
       "events": "741638a5",
       "rng": {
         "draws": 784,
@@ -1068,7 +1068,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 424,
-      "state": "6e8c99eb",
+      "state": "a1e9dd3b",
       "events": "5f186bca",
       "rng": {
         "draws": 918,
@@ -1079,7 +1079,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 424,
-      "state": "1a24c0a6",
+      "state": "06a41dea",
       "events": "7b58d302",
       "rng": {
         "draws": 997,
@@ -1090,7 +1090,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 424,
-      "state": "75a6f57e",
+      "state": "660bcb5d",
       "events": "741638a5",
       "rng": {
         "draws": 1081,
@@ -1101,7 +1101,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 424,
-      "state": "2e79edf9",
+      "state": "36c9fb86",
       "events": "2ee27520",
       "rng": {
         "draws": 1149,
@@ -1112,7 +1112,7 @@
       "tick": 280,
       "time": 14,
       "nextId": 424,
-      "state": "04abf89f",
+      "state": "3c573faa",
       "events": "ed85c05a",
       "rng": {
         "draws": 1256,
@@ -1123,7 +1123,7 @@
       "tick": 300,
       "time": 15,
       "nextId": 424,
-      "state": "8c0806f8",
+      "state": "a8f777c5",
       "events": "741638a5",
       "rng": {
         "draws": 1354,
@@ -1134,7 +1134,7 @@
       "tick": 301,
       "time": 15.05,
       "nextId": 424,
-      "state": "834ed1fc",
+      "state": "6c5eefb1",
       "events": "741638a5",
       "rng": {
         "draws": 1359,
@@ -1693,8 +1693,8 @@
               "remaining": 14.95,
               "school": "holy",
               "sourceId": 415,
-              "value": 222,
-              "value2": 222
+              "value": 322,
+              "value2": 322
             },
             {
               "duration": 30,
@@ -1790,7 +1790,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 1284,
+          "resource": 1266,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -1837,7 +1837,7 @@
           "dodgeChance": 0.0695,
           "fallStartY": 1.5,
           "fiveSecondRule": 114.05,
-          "hp": 548,
+          "hp": 574,
           "id": 418,
           "kind": "player",
           "level": 20,
@@ -2229,7 +2229,7 @@
       "tick": 320,
       "time": 16,
       "nextId": 425,
-      "state": "bb164878",
+      "state": "4708ee55",
       "events": "8fd928be",
       "rng": {
         "draws": 1463,
@@ -2240,7 +2240,7 @@
       "tick": 340,
       "time": 17,
       "nextId": 425,
-      "state": "81c10221",
+      "state": "5fe47ca4",
       "events": "6df10624",
       "rng": {
         "draws": 1572,
@@ -2251,7 +2251,7 @@
       "tick": 360,
       "time": 18,
       "nextId": 425,
-      "state": "e696599a",
+      "state": "57170cd0",
       "events": "89a5f572",
       "rng": {
         "draws": 1662,
@@ -2262,7 +2262,7 @@
       "tick": 380,
       "time": 19,
       "nextId": 425,
-      "state": "156f0df5",
+      "state": "5107fe7f",
       "events": "514b02cf",
       "rng": {
         "draws": 1770,
@@ -2273,7 +2273,7 @@
       "tick": 393,
       "time": 19.65,
       "nextId": 425,
-      "state": "c119e800",
+      "state": "9eb3e8f2",
       "events": "d0b8a530",
       "rng": {
         "draws": 1823,
@@ -2832,8 +2832,8 @@
               "remaining": 10.35,
               "school": "holy",
               "sourceId": 415,
-              "value": 222,
-              "value2": 222
+              "value": 322,
+              "value2": 322
             },
             {
               "duration": 30,
@@ -2976,7 +2976,7 @@
           "dodgeChance": 0.0695,
           "fallStartY": 1.5,
           "fiveSecondRule": 118.65,
-          "hp": 588,
+          "hp": 614,
           "id": 418,
           "kind": "player",
           "level": 20,
@@ -3353,7 +3353,7 @@
       "tick": 393,
       "time": 19.65,
       "nextId": 425,
-      "state": "c119e800",
+      "state": "9eb3e8f2",
       "events": "741638a5",
       "rng": {
         "draws": 1823,
@@ -3912,8 +3912,8 @@
               "remaining": 10.35,
               "school": "holy",
               "sourceId": 415,
-              "value": 222,
-              "value2": 222
+              "value": 322,
+              "value2": 322
             },
             {
               "duration": 30,
@@ -4056,7 +4056,7 @@
           "dodgeChance": 0.0695,
           "fallStartY": 1.5,
           "fiveSecondRule": 118.65,
-          "hp": 588,
+          "hp": 614,
           "id": 418,
           "kind": "player",
           "level": 20,

@@ -48,6 +48,8 @@ Repository skills live in `.agents/skills/` and are invoked as `$skill-name`:
 - `$woc-file-issue`: draft an issue, and file it only with explicit authorization.
 - `$woc-write-game-tooltips`: write or audit plain English tooltips against live combat values and
   scaling.
+- `$woc-image-to-glb`: build a shipping GLB asset from a reference image through the
+  repo pipeline.
 - `$woc-release-merge-audit`: find semantic damage after release integration.
 - `$woc-release-malware-audit`: scan and judge malicious-code risk.
 - `$woc-codex-audit`: compare the checked-in Codex architecture with current official

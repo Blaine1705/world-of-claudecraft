@@ -23,6 +23,17 @@ const FLAVOR_BY_TYPE: Record<GatherNodeType, GatherRareEventFlavor> = {
   herb: 'moonlit_bloom',
 };
 
+// The tier-1 tool per node family (#2343: every node harvest needs a
+// matching-profession tool in bags; a tier-1 tool at a tier-1 node leaves the
+// cast formula and both rng draws untouched). Hunt loops that wipe the bags
+// re-add the tool by direct push, never sim.addItem: a push emits no loot
+// event, so the pinned one-loot-line frames below stay exact.
+const TOOL_BY_TYPE: Record<GatherNodeType, string> = {
+  ore: 'copper_mining_pick',
+  wood: 'handaxe',
+  herb: 'gathering_sickle',
+};
+
 // A minimal rng whose single next() returns a fixed value, for boundary pins.
 function stubRng(value: number): Rng {
   return { next: () => value } as unknown as Rng;
@@ -252,7 +263,10 @@ describe('rare events through Sim.harvestNode (all three flavors)', () => {
     for (let i = 0; i < 2000; i++) {
       // Reset the session-only cooldown and bag state so every iteration is a
       // clean granted harvest: the hunt advances ONLY the shared rng stream.
+      // The wipe removes the #2343 tool too, so re-add it (event- and
+      // draw-free) before the harvest.
       meta.inventory.length = 0;
+      meta.inventory.push({ itemId: TOOL_BY_TYPE[node.type], count: 1 });
       delete meta.nodeHarvestReadyAt[nodeId];
       expect(sim.harvestNode(nodeId, pid)).toBe(true);
       completeCastNow(sim, pid);
@@ -294,10 +308,20 @@ describe('rare events through Sim.harvestNode (all three flavors)', () => {
 
     // The whole windfall is ONE batched loot line with the x5 suffix, never
     // one line and cue per unit (the recorded loot-burst polish).
-    const lootLines = events
-      .filter((e) => e.type === 'loot')
-      .map((e) => (e as { text: string }).text);
-    expect(lootLines).toEqual(['You receive: Copper Ore x5.']);
+    const lootEvents = events.filter((e) => e.type === 'loot') as Array<{
+      text: string;
+      silent?: boolean;
+      callerLogs?: boolean;
+    }>;
+    expect(lootEvents.map((e) => e.text)).toEqual(['You receive: Copper Ore x5.']);
+    // #2430: this is the SIGNED batched arm of the harvest grant, a different
+    // call site from the fungible one tests/professions_silent_loot.test.ts
+    // drives, and it is the arm every rare-event windfall takes. Both hub
+    // feedbacks stand down here too, so the gatherResult line above is the
+    // only line and the node cue the only cue. Without this the arm was
+    // pinned only by an opaque parity digest.
+    expect(lootEvents[0].silent).toBe(true);
+    expect(lootEvents[0].callerLogs).toBe(true);
 
     // The per-flavor deed mark (deeds.ts registers a deed per flavor).
     expect(meta.deedStats.visited.has('gather_event:pristine_vein')).toBe(true);
@@ -365,6 +389,7 @@ describe('rarity-floor signing through Sim.harvestNode', () => {
     meta.gatheringProficiency.mining = 100;
     for (let i = 0; i < 3000; i++) {
       meta.inventory.length = 0;
+      meta.inventory.push({ itemId: TOOL_BY_TYPE.ore, count: 1 }); // the #2343 tool gate
       delete meta.nodeHarvestReadyAt[nodeId];
       expect(sim.harvestNode(nodeId, pid)).toBe(true);
       completeCastNow(sim, pid);
@@ -438,10 +463,12 @@ describe('grant truncation at the command boundary (full bags)', () => {
     const { sim, pid, nodeId, meta } = simAtOreNode();
     const capacity = bagCapacity(meta.bags);
     for (let i = 0; i < 2000; i++) {
-      // Each attempt starts with exactly ONE free slot (filler is a
-      // non-copper junk id so nothing merges with the harvest yield).
+      // Each attempt starts with exactly ONE free slot: the #2343 tool takes
+      // one slot and the filler (a non-copper junk id so nothing merges with
+      // the harvest yield) tops the bag up to capacity - 1.
       meta.inventory.length = 0;
-      for (let f = 0; f < capacity - 1; f++)
+      meta.inventory.push({ itemId: TOOL_BY_TYPE.ore, count: 1 });
+      for (let f = 0; f < capacity - 2; f++)
         meta.inventory.push({ itemId: 'bone_fragments', count: 1 });
       delete meta.nodeHarvestReadyAt[nodeId];
       expect(sim.harvestNode(nodeId, pid)).toBe(true);
@@ -480,9 +507,11 @@ describe('grant truncation at the command boundary (full bags)', () => {
       // never merges into a plain stack (identical-payload stacking still
       // refuses payload-vs-no-payload) and the first signed unit needs a
       // genuinely free slot, so a signed roll here must fall back to an
-      // unsigned top-up grant, never overflow.
+      // unsigned top-up grant, never overflow. The #2343 tool takes one of
+      // the full slots, so the filler drops to capacity - 2.
       meta.inventory.length = 0;
-      for (let f = 0; f < capacity - 1; f++)
+      meta.inventory.push({ itemId: TOOL_BY_TYPE.ore, count: 1 });
+      for (let f = 0; f < capacity - 2; f++)
         meta.inventory.push({ itemId: 'bone_fragments', count: 1 });
       meta.inventory.push({ itemId: 'copper_ore', count: 15 });
       delete meta.nodeHarvestReadyAt[nodeId];
@@ -527,8 +556,11 @@ describe('grant truncation at the command boundary (full bags)', () => {
       // byte-equal same-signer stack now offers signed room. countFit models
       // that merge room, so the signed units must land there signed instead
       // of falling back to the unsigned top-up (#2139, merge-aware guards).
+      // The #2343 tool takes one of the full slots, so the filler drops to
+      // capacity - 3.
       meta.inventory.length = 0;
-      for (let f = 0; f < capacity - 2; f++)
+      meta.inventory.push({ itemId: TOOL_BY_TYPE.ore, count: 1 });
+      for (let f = 0; f < capacity - 3; f++)
         meta.inventory.push({ itemId: 'bone_fragments', count: 1 });
       meta.inventory.push({ itemId: 'copper_ore', count: 15 });
       meta.inventory.push({ itemId: 'copper_ore', count: 5, instance: { signer: 'Packrat' } });
@@ -564,9 +596,11 @@ describe('grant truncation at the command boundary (full bags)', () => {
     meta.gatheringProficiency.mining = 100;
     for (let i = 0; i < 3000; i++) {
       // Bag completely full, with the only room being ONE unit of top-up on
-      // an existing copper stack (stack size 20).
+      // an existing copper stack (stack size 20). The #2343 tool takes one of
+      // the full slots, so the filler drops to capacity - 2.
       meta.inventory.length = 0;
-      for (let f = 0; f < capacity - 1; f++)
+      meta.inventory.push({ itemId: TOOL_BY_TYPE.ore, count: 1 });
+      for (let f = 0; f < capacity - 2; f++)
         meta.inventory.push({ itemId: 'bone_fragments', count: 1 });
       meta.inventory.push({ itemId: 'copper_ore', count: 19 });
       delete meta.nodeHarvestReadyAt[nodeId];

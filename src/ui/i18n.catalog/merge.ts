@@ -524,6 +524,9 @@ const mergeStringsEn = {
       clickUseInstant: 'Click to use instantly in combat',
       clickUse: 'Click to use',
       clickBuyback: 'Click to buy back',
+      // Rendered by the item tooltip (hud.ts), the bag sockets (bags_window.ts) AND the
+      // World Market's bag-capacity dropdown (market_window.ts), which reuses it so a new
+      // bag size needs no new key. Rewording this restyles that market control too.
       bagSlots: '{slots} Slot Bag',
     },
     vendor: {
@@ -650,6 +653,11 @@ const mergeStringsEn = {
       playerLevelClassTitle: '{name} - Lv {level} {className}',
       noChallengers: 'No challengers ranked yet - be the first.',
       matchInProgress: 'Match in progress vs {name}.',
+      mapName: 'Map: {name}',
+      map: {
+        coliseum: 'Ashen Coliseum',
+        drownedCourt: 'The Drowned Court',
+      },
       leaveQueue: 'Leave Queue',
       searching: 'Searching for an opponent... ({count} in queue)',
       enterQueue: 'Enter the Queue',

@@ -85,7 +85,14 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.warspirit_cadence",
     "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.auraEffect.mendingCurrent",
-    "hudChrome.auraEffect.mendingCurrentPercent"
+    "hudChrome.auraEffect.mendingCurrentPercent",
+    "hudChrome.crafting.craftedToastQty",
+    "hudChrome.enchanting.disenchantedAlso",
+    "hudChrome.enchanting.disenchantedAlsoQty",
+    "hudChrome.enchanting.disenchantedYield",
+    "hudChrome.enchanting.disenchantedYieldQty",
+    "hudChrome.enchanting.salvagedYield",
+    "hudChrome.enchanting.salvagedYieldQty"
   ],
   "es_ES": [
     "abilityUi.resources.focus",
@@ -163,7 +170,14 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.warspirit_cadence",
     "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.auraEffect.mendingCurrent",
-    "hudChrome.auraEffect.mendingCurrentPercent"
+    "hudChrome.auraEffect.mendingCurrentPercent",
+    "hudChrome.crafting.craftedToastQty",
+    "hudChrome.enchanting.disenchantedAlso",
+    "hudChrome.enchanting.disenchantedAlsoQty",
+    "hudChrome.enchanting.disenchantedYield",
+    "hudChrome.enchanting.disenchantedYieldQty",
+    "hudChrome.enchanting.salvagedYield",
+    "hudChrome.enchanting.salvagedYieldQty"
   ],
   "fr_FR": [
     "abilityUi.resources.focus",
@@ -241,7 +255,14 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.warspirit_cadence",
     "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.auraEffect.mendingCurrent",
-    "hudChrome.auraEffect.mendingCurrentPercent"
+    "hudChrome.auraEffect.mendingCurrentPercent",
+    "hudChrome.crafting.craftedToastQty",
+    "hudChrome.enchanting.disenchantedAlso",
+    "hudChrome.enchanting.disenchantedAlsoQty",
+    "hudChrome.enchanting.disenchantedYield",
+    "hudChrome.enchanting.disenchantedYieldQty",
+    "hudChrome.enchanting.salvagedYield",
+    "hudChrome.enchanting.salvagedYieldQty"
   ],
   "fr_CA": [
     "abilityUi.resources.focus",
@@ -319,7 +340,14 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.warspirit_cadence",
     "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.auraEffect.mendingCurrent",
-    "hudChrome.auraEffect.mendingCurrentPercent"
+    "hudChrome.auraEffect.mendingCurrentPercent",
+    "hudChrome.crafting.craftedToastQty",
+    "hudChrome.enchanting.disenchantedAlso",
+    "hudChrome.enchanting.disenchantedAlsoQty",
+    "hudChrome.enchanting.disenchantedYield",
+    "hudChrome.enchanting.disenchantedYieldQty",
+    "hudChrome.enchanting.salvagedYield",
+    "hudChrome.enchanting.salvagedYieldQty"
   ],
   "en_CA": [],
   "it_IT": [
@@ -398,7 +426,14 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.warspirit_cadence",
     "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.auraEffect.mendingCurrent",
-    "hudChrome.auraEffect.mendingCurrentPercent"
+    "hudChrome.auraEffect.mendingCurrentPercent",
+    "hudChrome.crafting.craftedToastQty",
+    "hudChrome.enchanting.disenchantedAlso",
+    "hudChrome.enchanting.disenchantedAlsoQty",
+    "hudChrome.enchanting.disenchantedYield",
+    "hudChrome.enchanting.disenchantedYieldQty",
+    "hudChrome.enchanting.salvagedYield",
+    "hudChrome.enchanting.salvagedYieldQty"
   ],
   "de_DE": [
     "abilityUi.resources.focus",
@@ -476,7 +511,14 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.warspirit_cadence",
     "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.auraEffect.mendingCurrent",
-    "hudChrome.auraEffect.mendingCurrentPercent"
+    "hudChrome.auraEffect.mendingCurrentPercent",
+    "hudChrome.crafting.craftedToastQty",
+    "hudChrome.enchanting.disenchantedAlso",
+    "hudChrome.enchanting.disenchantedAlsoQty",
+    "hudChrome.enchanting.disenchantedYield",
+    "hudChrome.enchanting.disenchantedYieldQty",
+    "hudChrome.enchanting.salvagedYield",
+    "hudChrome.enchanting.salvagedYieldQty"
   ],
   "zh_CN": [
     "entities.abilities.unleash_weapon.description",
@@ -570,7 +612,14 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.warspirit_cadence",
     "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.auraEffect.mendingCurrent",
-    "hudChrome.auraEffect.mendingCurrentPercent"
+    "hudChrome.auraEffect.mendingCurrentPercent",
+    "hudChrome.crafting.craftedToastQty",
+    "hudChrome.enchanting.disenchantedAlso",
+    "hudChrome.enchanting.disenchantedAlsoQty",
+    "hudChrome.enchanting.disenchantedYield",
+    "hudChrome.enchanting.disenchantedYieldQty",
+    "hudChrome.enchanting.salvagedYield",
+    "hudChrome.enchanting.salvagedYieldQty"
   ],
   "ru_RU": [
     "entities.abilities.unleash_weapon.description",
@@ -652,7 +701,14 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.warspirit_cadence",
     "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.auraEffect.mendingCurrent",
-    "hudChrome.auraEffect.mendingCurrentPercent"
+    "hudChrome.auraEffect.mendingCurrentPercent",
+    "hudChrome.crafting.craftedToastQty",
+    "hudChrome.enchanting.disenchantedAlso",
+    "hudChrome.enchanting.disenchantedAlsoQty",
+    "hudChrome.enchanting.disenchantedYield",
+    "hudChrome.enchanting.disenchantedYieldQty",
+    "hudChrome.enchanting.salvagedYield",
+    "hudChrome.enchanting.salvagedYieldQty"
   ],
   "nl_NL": [
     "abilityUi.resources.focus",
@@ -730,7 +786,14 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.warspirit_cadence",
     "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.auraEffect.mendingCurrent",
-    "hudChrome.auraEffect.mendingCurrentPercent"
+    "hudChrome.auraEffect.mendingCurrentPercent",
+    "hudChrome.crafting.craftedToastQty",
+    "hudChrome.enchanting.disenchantedAlso",
+    "hudChrome.enchanting.disenchantedAlsoQty",
+    "hudChrome.enchanting.disenchantedYield",
+    "hudChrome.enchanting.disenchantedYieldQty",
+    "hudChrome.enchanting.salvagedYield",
+    "hudChrome.enchanting.salvagedYieldQty"
   ],
   "pl_PL": [
     "abilityUi.resources.focus",
@@ -808,7 +871,14 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.warspirit_cadence",
     "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.auraEffect.mendingCurrent",
-    "hudChrome.auraEffect.mendingCurrentPercent"
+    "hudChrome.auraEffect.mendingCurrentPercent",
+    "hudChrome.crafting.craftedToastQty",
+    "hudChrome.enchanting.disenchantedAlso",
+    "hudChrome.enchanting.disenchantedAlsoQty",
+    "hudChrome.enchanting.disenchantedYield",
+    "hudChrome.enchanting.disenchantedYieldQty",
+    "hudChrome.enchanting.salvagedYield",
+    "hudChrome.enchanting.salvagedYieldQty"
   ],
   "id_ID": [
     "abilityUi.resources.focus",
@@ -886,7 +956,14 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.warspirit_cadence",
     "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.auraEffect.mendingCurrent",
-    "hudChrome.auraEffect.mendingCurrentPercent"
+    "hudChrome.auraEffect.mendingCurrentPercent",
+    "hudChrome.crafting.craftedToastQty",
+    "hudChrome.enchanting.disenchantedAlso",
+    "hudChrome.enchanting.disenchantedAlsoQty",
+    "hudChrome.enchanting.disenchantedYield",
+    "hudChrome.enchanting.disenchantedYieldQty",
+    "hudChrome.enchanting.salvagedYield",
+    "hudChrome.enchanting.salvagedYieldQty"
   ],
   "tr_TR": [
     "abilityUi.resources.focus",
@@ -964,7 +1041,14 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.warspirit_cadence",
     "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.auraEffect.mendingCurrent",
-    "hudChrome.auraEffect.mendingCurrentPercent"
+    "hudChrome.auraEffect.mendingCurrentPercent",
+    "hudChrome.crafting.craftedToastQty",
+    "hudChrome.enchanting.disenchantedAlso",
+    "hudChrome.enchanting.disenchantedAlsoQty",
+    "hudChrome.enchanting.disenchantedYield",
+    "hudChrome.enchanting.disenchantedYieldQty",
+    "hudChrome.enchanting.salvagedYield",
+    "hudChrome.enchanting.salvagedYieldQty"
   ],
   "sv_SE": [
     "abilityUi.resources.focus",
@@ -1042,7 +1126,14 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.warspirit_cadence",
     "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.auraEffect.mendingCurrent",
-    "hudChrome.auraEffect.mendingCurrentPercent"
+    "hudChrome.auraEffect.mendingCurrentPercent",
+    "hudChrome.crafting.craftedToastQty",
+    "hudChrome.enchanting.disenchantedAlso",
+    "hudChrome.enchanting.disenchantedAlsoQty",
+    "hudChrome.enchanting.disenchantedYield",
+    "hudChrome.enchanting.disenchantedYieldQty",
+    "hudChrome.enchanting.salvagedYield",
+    "hudChrome.enchanting.salvagedYieldQty"
   ],
   "vi_VN": [
     "abilityUi.resources.focus",
@@ -1120,7 +1211,14 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.warspirit_cadence",
     "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.auraEffect.mendingCurrent",
-    "hudChrome.auraEffect.mendingCurrentPercent"
+    "hudChrome.auraEffect.mendingCurrentPercent",
+    "hudChrome.crafting.craftedToastQty",
+    "hudChrome.enchanting.disenchantedAlso",
+    "hudChrome.enchanting.disenchantedAlsoQty",
+    "hudChrome.enchanting.disenchantedYield",
+    "hudChrome.enchanting.disenchantedYieldQty",
+    "hudChrome.enchanting.salvagedYield",
+    "hudChrome.enchanting.salvagedYieldQty"
   ],
   "da_DK": [
     "abilityUi.resources.focus",
@@ -1198,6 +1296,13 @@ export const pending: Record<string, readonly string[]> = {
     "guide.abilityHook.warspirit_cadence",
     "hudChrome.auraEffect.hunterFerocity",
     "hudChrome.auraEffect.mendingCurrent",
-    "hudChrome.auraEffect.mendingCurrentPercent"
+    "hudChrome.auraEffect.mendingCurrentPercent",
+    "hudChrome.crafting.craftedToastQty",
+    "hudChrome.enchanting.disenchantedAlso",
+    "hudChrome.enchanting.disenchantedAlsoQty",
+    "hudChrome.enchanting.disenchantedYield",
+    "hudChrome.enchanting.disenchantedYieldQty",
+    "hudChrome.enchanting.salvagedYield",
+    "hudChrome.enchanting.salvagedYieldQty"
   ]
 };

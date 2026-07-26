@@ -105,7 +105,7 @@ function standInWilds(sim: Sim, pid: number): void {
   const e = sim.ctx.entities.get(pid)!;
   e.pos.x = 99999;
   e.pos.z = 99999;
-  expect(isAtAnyStation(e.pos)).toBe(false);
+  expect(isAtAnyStation(STATIONS, e.pos)).toBe(false);
 }
 
 function setCopper(sim: Sim, pid: number, c: number): void {
@@ -130,6 +130,15 @@ function countDraws<T>(sim: Sim, fn: () => T): { result: T; draws: number } {
 
 function errorTexts(events: SimEvent[]): string[] {
   return events.filter((e) => e.type === 'error').map((e) => (e as { text: string }).text);
+}
+
+function lootEvents(events: SimEvent[]) {
+  return events.filter((e) => e.type === 'loot') as Array<{
+    type: 'loot';
+    text: string;
+    silent?: boolean;
+    callerLogs?: boolean;
+  }>;
 }
 
 function unbindEvents(events: SimEvent[]) {
@@ -480,7 +489,7 @@ describe('unbind fee ladder (the resolved tier-scaled ruling)', () => {
     standAtStation(sim, pid);
     setCopper(sim, pid, 50000);
     const r = sim.ctx.resolve(pid)!;
-    const result = resolveUnbind(r.meta, r.e.pos, SWORD);
+    const result = resolveUnbind(STATIONS, r.meta, r.e.pos, SWORD);
     expect(result.ok).toBe(true);
     expect(result.fee).toBe(2500); // the common-def sword, not the epic payload
   });
@@ -624,10 +633,24 @@ describe('unbind service deny order and mutation', () => {
     expect(slotsOf(sim, pid, QA_ITEM)).toHaveLength(1); // merged, count 2
     standAtStation(sim, pid);
     setCopper(sim, pid, 50000);
+    sim.drainEvents(); // drop the two seeding grants' loud loot events
     const result = unbindItemMod(sim.ctx, QA_ITEM, pid);
     expect(result.ok).toBe(true);
     expect(result.fee).toBe(10000); // rare rung
     expect(copperOf(sim, pid)).toBe(40000);
+    // #2430: the peel re-grants the player's OWN copy through the hub, so the
+    // hub's "You receive:" line claimed an acquisition that never happened AND
+    // stacked on top of the unbindResult line the client already logs. The
+    // grant carries callerLogs so the client stands that line down.
+    const loot = lootEvents(sim.drainEvents());
+    expect(loot).toHaveLength(1);
+    expect(loot[0].callerLogs).toBe(true);
+    // NOT silent: unbind has no dedicated cue of its own, so this is the one
+    // production grant that owns the line without owning the cue. Written as
+    // an own-key check, not toBeUndefined(): the conditional-spread contract
+    // (Sim.addItem) is that an unset flag is ABSENT, and a written-undefined
+    // key would move the parity digest of every grant in the game.
+    expect(Object.hasOwn(loot[0], 'silent')).toBe(false);
     const slots = slotsOf(sim, pid, QA_ITEM);
     const bound = slots.filter((s) => s.instance?.boundTo !== undefined);
     const free = slots.filter((s) => s.instance?.boundTo === undefined);
@@ -636,6 +659,22 @@ describe('unbind service deny order and mutation', () => {
     expect(free).toHaveLength(1);
     expect(free[0].count).toBe(1);
     expect(free[0].instance?.bindOnTrade).toBe(true);
+  });
+
+  it('a single-copy unbind reaches the hub at all, so it has no line to stand down', () => {
+    // The negative control for the pin above, and the reason the double-line
+    // only ever showed on a STACK: a lone bound copy is cleared in place, so
+    // no grant happens and unbindResult is the only event either way. Without
+    // this, flagging the peel could read as "unbind grants are flagged" when
+    // the two arms actually differ in whether a grant exists.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.ctx.addItemInstance(SWORD, { bindOnTrade: true, boundTo: pid }, pid);
+    standAtStation(sim, pid);
+    setCopper(sim, pid, 10000);
+    sim.drainEvents();
+    expect(unbindItemMod(sim.ctx, SWORD, pid).ok).toBe(true);
+    expect(lootEvents(sim.drainEvents())).toHaveLength(0);
   });
 
   it('the whole unbind path draws NO rng', () => {
@@ -1092,7 +1131,7 @@ describe('bound holder lifecycle: every non-transfer right survives the bond', (
     mintBound(sim, pid);
     sim.equipItem(SWORD, pid);
     setCopper(sim, pid, 50000);
-    const result = resolveUnbind(meta, STATIONS[0].pos, SWORD);
+    const result = resolveUnbind(STATIONS, meta, STATIONS[0].pos, SWORD);
     expect(result).toMatchObject({ ok: false, reason: 'unbind_not_bound' });
     expect(copperOf(sim, pid)).toBe(50000);
   });
@@ -1323,7 +1362,7 @@ describe('unbind deny-order discrimination and station-gate edges', () => {
     sim.ctx.addItemInstance(SWORD, { bindOnTrade: true, boundTo: pid }, pid);
     standInWilds(sim, pid);
     setCopper(sim, pid, 0);
-    const result = resolveUnbind(meta, sim.ctx.entities.get(pid)!.pos, SWORD);
+    const result = resolveUnbind(STATIONS, meta, sim.ctx.entities.get(pid)!.pos, SWORD);
     expect(result).toMatchObject({ ok: false, reason: 'unbind_out_of_range', fee: 2500 });
   });
 
@@ -1333,7 +1372,7 @@ describe('unbind deny-order discrimination and station-gate edges', () => {
     const meta = sim.players.get(pid)!;
     sim.addItem(POTION, 1, pid);
     setCopper(sim, pid, 50000);
-    const result = resolveUnbind(meta, STATIONS[0].pos, POTION);
+    const result = resolveUnbind(STATIONS, meta, STATIONS[0].pos, POTION);
     expect(result).toMatchObject({ ok: false, reason: 'unbind_not_eligible' });
   });
 
@@ -1342,7 +1381,7 @@ describe('unbind deny-order discrimination and station-gate edges', () => {
     const pid = sim.playerId;
     const meta = sim.players.get(pid)!;
     setCopper(sim, pid, 50000);
-    const result = resolveUnbind(meta, STATIONS[0].pos, SWORD);
+    const result = resolveUnbind(STATIONS, meta, STATIONS[0].pos, SWORD);
     expect(result).toMatchObject({ ok: false, reason: 'unbind_not_bound' });
   });
 
@@ -1360,7 +1399,7 @@ describe('unbind deny-order discrimination and station-gate edges', () => {
     expect(strictlyInsideAny, 'the edge probe sits on the boundary, not inside a neighbor').toBe(
       false,
     );
-    expect(isAtAnyStation(atEdge)).toBe(true);
+    expect(isAtAnyStation(STATIONS, atEdge)).toBe(true);
 
     const beyond = [
       { dx: 1, dz: 0 },
@@ -1380,7 +1419,7 @@ describe('unbind deny-order discrimination and station-gate edges', () => {
         }),
       );
     expect(beyond, 'a just-beyond probe position clear of every station').toBeDefined();
-    expect(isAtAnyStation(beyond!)).toBe(false);
+    expect(isAtAnyStation(STATIONS, beyond!)).toBe(false);
   });
 
   it('an ACTIVE mobile station under the player never satisfies the unbind gate', () => {
@@ -1390,13 +1429,13 @@ describe('unbind deny-order discrimination and station-gate edges', () => {
     const p = sim.ctx.entities.get(pid)!;
     p.pos.x = 0;
     p.pos.z = 150;
-    expect(isAtAnyStation(p.pos)).toBe(false);
+    expect(isAtAnyStation(STATIONS, p.pos)).toBe(false);
     meta.craftSkills.alchemy = 75; // specialized: mobile placement is gated on it
     setCopper(sim, pid, 50000);
     sim.placeMobileStation('alchemy', pid);
     expect(meta.mobileStation?.craftId).toBe('alchemy');
     sim.ctx.addItemInstance(SWORD, { bindOnTrade: true, boundTo: pid }, pid);
-    const result = resolveUnbind(meta, p.pos, SWORD);
+    const result = resolveUnbind(STATIONS, meta, p.pos, SWORD);
     expect(result).toMatchObject({ ok: false, reason: 'unbind_out_of_range' });
     expect(copperOf(sim, pid)).toBe(50000);
   });
