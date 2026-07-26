@@ -608,7 +608,11 @@ describe('the World Market — the Merchant', () => {
     expect(house.length).toBeGreaterThan(0);
     // every seeded row sits below the base, with room for the table to grow
     expect(Math.max(...house.map((l) => l.id))).toBeLessThan(MARKET_PLAYER_LISTING_ID_BASE);
-    expect(house.length).toBeLessThan(MARKET_PLAYER_LISTING_ID_BASE);
+    // and the room is real, not one row's worth: the stock table can grow to ten
+    // times its current size and still not reach the player band. "Below the
+    // base" alone would hold just as well with a base of house.length + 1, which
+    // is the state #2463 was filed about.
+    expect(house.length * 10).toBeLessThan(MARKET_PLAYER_LISTING_ID_BASE);
 
     const seller = sim.addPlayer('warrior', 'Seller');
     standAtMerchant(sim, seller);
@@ -741,6 +745,27 @@ describe('the World Market — the Merchant', () => {
     expect(sim.marketListings.filter((l) => l.house).length).toBe(houseIds.length);
   });
 
+  it('burns no listing ids on save rows it cannot replay at all', () => {
+    // A row with no usable item id is dropped, so it must not consume a planned
+    // id on the way out: the id plan has to describe what actually lands in the
+    // book, or the boot log reports reissues for rows nobody ever sees and the
+    // counter skips ids for no reason.
+    const sim = makeWorld();
+    const before = sim.serializeMarket().nextListingId;
+    sim.loadMarket({
+      listings: [
+        // malformed id AND no item id: unusable on both counts
+        { id: Number.NaN, sellerKey: '12', sellerName: 'Seller', count: 1, price: 10 },
+        null,
+      ],
+      collections: [],
+      nextListingId: 1,
+    } as never);
+
+    expect(sim.marketListings.filter((l) => !l.house).length).toBe(0);
+    expect(sim.serializeMarket().nextListingId).toBe(before);
+  });
+
   it('keeps listings and collection items whose item id is no longer known', () => {
     // A content edit (rename/retire/typo of an item id) must NOT vaporize every
     // in-flight copy of that item sitting on the market at the next restart.
@@ -749,7 +774,10 @@ describe('the World Market — the Merchant', () => {
     const save = {
       listings: [
         {
-          id: 7,
+          // A player-band id, so this case stays about the unknown ITEM id: an
+          // id inside the reseeded house band would also be reissued by the
+          // #2463 repair, which is a different test's charter.
+          id: 1007,
           sellerKey: '12',
           sellerName: 'Seller',
           itemId: 'retired_relic', // not in ITEMS
@@ -768,7 +796,7 @@ describe('the World Market — the Merchant', () => {
           ],
         },
       ],
-      nextListingId: 8,
+      nextListingId: 1008,
     };
 
     const sim = makeWorld();
@@ -840,10 +868,13 @@ describe('World Market: a now-soulbound listing is returned to the seller', () =
     // A save from BEFORE heroic_mark became soulbound can still hold a listing of
     // it (the list-time gate only blocks NEW listings). loadMarket must not keep a
     // soulbound item on the market; it returns it to the seller's collection.
+    // Player-band ids (>= MARKET_PLAYER_LISTING_ID_BASE): ids inside the
+    // reseeded house band would be reissued by the #2463 repair, which would
+    // leave this case quietly testing the reclaim over a renumbered book.
     const save = {
       listings: [
         {
-          id: 1,
+          id: 1001,
           sellerKey,
           sellerName: 'Ada',
           itemId: 'heroic_mark',
@@ -852,7 +883,7 @@ describe('World Market: a now-soulbound listing is returned to the seller', () =
           secondsLeft: 1000,
         },
         {
-          id: 2,
+          id: 1002,
           sellerKey,
           sellerName: 'Ada',
           itemId: 'wolf_fang',
@@ -862,7 +893,7 @@ describe('World Market: a now-soulbound listing is returned to the seller', () =
         },
       ],
       collections: [],
-      nextListingId: 3,
+      nextListingId: 1003,
     };
     sim.market.loadMarket(save as never);
 

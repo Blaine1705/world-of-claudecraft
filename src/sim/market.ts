@@ -576,7 +576,12 @@ export class Market {
 
   loadMarket(save: MarketSave | null | undefined): void {
     if (!save) return;
-    const saved = save.listings ?? [];
+    // Drop the rows that carry no item id at all BEFORE planning, so the plan
+    // describes exactly what gets pushed: no planned id is burned on a row that
+    // never lands, and `remapped` counts only reissues the book actually took.
+    // (A listing whose item id is merely no longer in ITEMS is a different case
+    // and is KEPT; see the loop below.)
+    const saved = (save.listings ?? []).filter((l) => l && typeof l.itemId === 'string');
     // Settle the id counter and reissue any collision BEFORE a single row is
     // pushed back. The house band is already in the book (seeded by the ctor)
     // and is sized by the CURRENT stock table, so a save written under a smaller
@@ -587,7 +592,7 @@ export class Market {
     // loads the market before any client connects (server/main.ts).
     const plan = planListingIds({
       taken: this.marketListings.map((l) => l.id),
-      saved: saved.map((l) => l?.id),
+      saved: saved.map((l) => l.id),
       from: this.nextListingId,
       savedNext: save.nextListingId,
     });
@@ -599,7 +604,6 @@ export class Market {
       // dormant, recoverable data (the owner can reclaim it into bags, exactly
       // as the character load path keeps unknown ids verbatim); a re-added or
       // corrected id rehydrates it. Display/buy paths already guard on ITEMS[id].
-      if (!l || typeof l.itemId !== 'string') continue;
       if (!ITEMS[l.itemId])
         console.warn(`market: keeping listing with unknown item id ${l.itemId}`);
       this.marketListings.push({

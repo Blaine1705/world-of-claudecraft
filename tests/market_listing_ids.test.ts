@@ -9,6 +9,19 @@ import {
   playerListingIdFloor,
 } from '../src/sim/market_listing_ids';
 
+describe('MARKET_PLAYER_LISTING_ID_BASE', () => {
+  it('is pinned to its literal value', () => {
+    // Deliberately a literal, not a self-comparison: every OTHER assertion in
+    // this file and in tests/market.test.ts is written against the constant, so
+    // shrinking it would leave all of them green while destroying the headroom
+    // the band exists to provide (at base 24 the 23-row stock table already sits
+    // flush against the first player id, re-arming #2463 on the next stock row).
+    // Raising it is fine on its own, but it moves where every future player id
+    // lands, so it should be a deliberate edit rather than a silent one.
+    expect(MARKET_PLAYER_LISTING_ID_BASE).toBe(1000);
+  });
+});
+
 describe('isListingId', () => {
   it('accepts only positive safe integers', () => {
     expect(isListingId(1)).toBe(true);
