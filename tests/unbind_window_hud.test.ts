@@ -25,7 +25,17 @@ function unbindResultArm(): string {
   const end = hudSource.indexOf("case 'masterwork': {", start);
   expect(start, 'unbindResult case arm present in handleEvents').toBeGreaterThan(-1);
   expect(end, 'unbindResult arm precedes the masterwork arm').toBeGreaterThan(start);
-  return hudSource.slice(start, end);
+  // Comments stripped from the slice (`://` protocol slashes preserved), the
+  // repo's raw-source-pin idiom (the codeOnly helper in
+  // tests/professions_silent_loot.test.ts). This arm's whole subject is what
+  // it deliberately does NOT do, so the odds of a future comment NAMING a cue
+  // or a toast here are high, and it would turn the negative pins below red
+  // for the wrong reason; on the other side a commented-out key would satisfy
+  // the positive pins.
+  return hudSource
+    .slice(start, end)
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
 }
 
 describe('hud.ts unbindResult event arm (source pins)', () => {
@@ -75,16 +85,28 @@ describe('hud.ts unbindResult event arm (source pins)', () => {
   it('stays single-surface: chat log only, no banner, toast, or audio cue in the arm', () => {
     const arm = unbindResultArm();
     expect(arm.match(/this\.log\(/g)?.length, 'exactly the ok + deny log call sites').toBe(2);
-    // The audio half has to police the idioms hud.ts ACTUALLY uses, which are
-    // `audio.<cue>(` and `sfx.playUi(` (the working form is
-    // tests/professions_audio_wiring.test.ts). The alternation here used to
-    // list this.audio / playSfx / playCue / showToast, none of which occurs
-    // anywhere in hud.ts, so that half matched nothing and a real cue added to
-    // this arm would have passed the whole repo: the HUD cue pins only name
-    // lootItem and coin. #2458 made cue-free the load-bearing contract on BOTH
-    // unbind arms, so this is the guard that has to hold it.
-    expect(arm).not.toMatch(/\baudio\.\w+\(|\bsfx\.play\w*\(/);
-    expect(arm).not.toMatch(/showBanner|showToast|celebrat/i);
+    // BOTH halves police the idioms hud.ts ACTUALLY uses, because an
+    // alternation of strings the file does not contain matches nothing and
+    // waves through the exact thing it names. This pin used to list
+    // this.audio / playSfx / playCue / showToast, and all four occur ZERO
+    // times in hud.ts (showToast occurs nowhere in src/ at all), so a real
+    // cue added to this arm would have passed the whole repo: the HUD cue
+    // pins only name lootItem and coin. #2458 made cue-free the load-bearing
+    // contract on BOTH unbind arms, so this is the guard that has to hold it.
+    //
+    // Cue idioms: bind the RECEIVER, not the method, because hud.ts reaches
+    // audio through audio.<cue>( (99) and sfx.playUi( / sfx.playAt( (17) but
+    // also sfx.crowdRoar( (4), sfx.unloop( (3) and voice.play( (2), so a
+    // `sfx.play\w*` alternation still misses three live spellings. The
+    // working form is tests/professions_audio_wiring.test.ts.
+    expect(arm).not.toMatch(/\b(audio|sfx|voice)\.\w+\(/);
+    // Out-of-chat surfaces: the whole this.show<X>( family, which is what
+    // "banner or toast" means in this file. showBanner (45) and showError
+    // (21) are the live ones, and showError is BOTH halves at once, since it
+    // paints the error toast and calls audio.error() itself, so the cue pin
+    // above would not have caught it either.
+    expect(arm).not.toMatch(/\bthis\.show[A-Z]\w*\(/);
+    expect(arm).not.toMatch(/celebrat/i);
   });
 
   it('renders nothing for a reason-less deny (the silent malformed-item-id arm)', () => {

@@ -500,16 +500,26 @@ describe('every professions grant site is accounted for (#2430)', () => {
     'export function harvestCorpse(',
   );
 
+  // Whitespace-normalized ONCE, here, so every pin below reads the same shape.
+  // The two sweeps used to disagree: one matched `callerLogs: true` on raw
+  // call text and the other normalized first, so a formatter that wrapped an
+  // opts object between a key and its value would have blinded one of them
+  // (in the safe direction, but for a reason nobody could see from the
+  // assertion). Comments are already gone by this point (codeOnly above).
+  const flatten = (call: string) => call.replace(/\s+/g, ' ');
   const sites = [
     ...readdirSync(dir)
       .filter((f) => f.endsWith('.ts'))
       .flatMap((file) =>
         grantCalls(codeOnly(readFileSync(path.join(dir, file), 'utf8'))).map((call) => ({
           file,
-          call,
+          call: flatten(call),
         })),
       ),
-    ...grantCalls(harvestBody).map((call) => ({ file: 'interaction.ts:harvestCorpse', call })),
+    ...grantCalls(harvestBody).map((call) => ({
+      file: 'interaction.ts:harvestCorpse',
+      call: flatten(call),
+    })),
   ];
 
   it('the scanner actually finds the grant sites (never passes vacuously)', () => {
@@ -552,9 +562,8 @@ describe('every professions grant site is accounted for (#2430)', () => {
     // harvest several cues rather than one stray ding (#2457 acceptance
     // criterion 3).
     for (const site of harvestSites) {
-      const call = site.call.replace(/\s+/g, ' ');
-      expect(call, call).toContain('silent: true');
-      expect(call, call).toContain('callerLogs: true');
+      expect(site.call, site.call).toContain('silent: true');
+      expect(site.call, site.call).toContain('callerLogs: true');
     }
     // pickUpObject's grant is the nearest one outside the function.
     expect(harvestBody).not.toContain('objectItemId');
@@ -570,30 +579,30 @@ describe('every professions grant site is accounted for (#2430)', () => {
         !NO_RESULT_EVENT_GRANTS.some((marker) => s.call.includes(marker)),
     );
     expect(
-      unaccounted.map((s) => `${s.file}: ${s.call.replace(/\s+/g, ' ')}`),
+      unaccounted.map((s) => `${s.file}: ${s.call}`),
       'a professions grant that neither sets callerLogs nor is a documented no-result-event grant',
     ).toEqual([]);
   });
 
   it('every grant that stands its line down stands its CUE down too (#2458)', () => {
     // The two flags stay independent by design, but no production professions
-    // grant needs them apart any more. A result event either fires its own
-    // dedicated cue (craft, gather, fish, enchant, disenchant, salvage, corpse
-    // harvest) or is deliberately cue-free (unbind, the trainResult
-    // single-surface rule documented above hudChrome.unbind.unbound). Either
-    // way the hub's generic ding has to stand down, or the action plays a
-    // second cue on top of its own, or one the contract says it does not have.
+    // grant needs them apart any more. A result event owns the cue in one of
+    // three ways: it fires a dedicated one (craft, gather, fish, enchant,
+    // disenchant, salvage), it replays the SAME generic ding itself exactly
+    // once for a whole multi-item command (corpse harvest, which has never had
+    // a recording of its own, hud.ts case 'harvestResult'), or it is
+    // deliberately cue-free (unbind, the trainResult single-surface rule
+    // documented above hudChrome.unbind.unbound). All three own it, so all
+    // three need the hub's ding down, or the action plays a second cue on top
+    // of its own, or one the contract says it does not have.
     // The unbind peel was the last holdout, and the asymmetry it created (a
     // ding out of a stack, silence out of a lone copy, for the same action on
     // the same item) was invisible only because commission-eligible kinds all
     // stack one per slot today. This is the forward guard for the day one does
     // not: the same grant reached by a different route must sound the same.
-    // Whitespace-normalized like the harvestCorpse pin above, so a future
-    // formatter wrapping one opts object across lines cannot quietly turn a
-    // real site into a non-match and empty this list for the wrong reason.
-    const lineOnlySites = sites
-      .map((s) => ({ file: s.file, call: s.call.replace(/\s+/g, ' ') }))
-      .filter((s) => s.call.includes('callerLogs: true') && !s.call.includes('silent: true'));
+    const lineOnlySites = sites.filter(
+      (s) => s.call.includes('callerLogs: true') && !s.call.includes('silent: true'),
+    );
     expect(
       lineOnlySites.map((s) => `${s.file}: ${s.call}`),
       'a professions grant that elides the hub line but still plays the generic hub ding',

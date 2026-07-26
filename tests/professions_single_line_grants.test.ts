@@ -161,10 +161,18 @@ const STUBBED_CUES = [
   'fishReel',
 ] as const;
 
-/** The names of every stubbed cue that actually fired, in list order. Asking
- *  about the whole set is what makes #2458's "same action, same audio" a real
- *  claim: naming lootItem and coin alone would miss a cue added on some other
- *  arm later. */
+/** The names of every STUBBED cue that actually fired, in list order. Asking
+ *  about the whole set is what makes #2458's "same action, same audio" more
+ *  than a two-name claim: naming lootItem and coin alone would miss a cue
+ *  added on some other arm later.
+ *
+ *  Its reach stops at STUBBED_CUES, and deliberately so rather than by
+ *  oversight: a cue reached through an idiom this file does not stub
+ *  (sfx.playUi, sfx.crowdRoar, voice.play, audio.click) would fire for real
+ *  in jsdom and read as absent here. The complement that closes that is the
+ *  source pin over the whole unbindResult arm in
+ *  tests/unbind_window_hud.test.ts, which forbids every audio/sfx/voice call
+ *  in it outright. Read the two together, not this one alone. */
 const firedCues = (): string[] =>
   STUBBED_CUES.filter((name) => {
     const spy = audio[name] as unknown as { mock?: { calls: unknown[] } };
@@ -368,9 +376,12 @@ describe('one profession action prints exactly one grant line', () => {
     // #2458: the cue stands down too. Unbind has no dedicated cue of its own,
     // so hudChrome.unbind.unbound is documented as the ONE success surface (no
     // toast, no sound cue, the trainResult rule) and the grant carries silent
-    // alongside callerLogs. Asked across EVERY stubbed cue, not just the two
-    // the hub loot arm can reach, so a cue routed through some other arm later
-    // cannot slip in under a narrower assertion.
+    // alongside callerLogs. Asked across every stubbed cue, not just the two
+    // the hub loot arm can reach, so a cue routed through some OTHER arm of
+    // the burst does not slip in under a narrower assertion. What that cannot
+    // see is an unstubbed idiom, which is why the arm's own source pin in
+    // tests/unbind_window_hud.test.ts forbids the whole audio/sfx/voice
+    // receiver set rather than a cue list.
     expect(firedCues()).toEqual([]);
     // The peel still moved items, so the bag mirror still repaints.
     expect(hud.renderBags).toHaveBeenCalled();
