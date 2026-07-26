@@ -9402,8 +9402,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.sameEnchantTag': 'Já aplicado',
   'hudChrome.crafting.craftedToastQty': 'Feito: {name} x{qty}',
   'hudChrome.enchanting.disenchantedYield': 'Você desencanta {item} em {material}.',
-  'hudChrome.enchanting.disenchantedYieldQty':
-    'Você desencanta {item} em {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Você desencanta {item} em {material} x{qty}.',
   'hudChrome.enchanting.disenchantedAlso': 'Você também recupera {material}.',
   'hudChrome.enchanting.disenchantedAlsoQty': 'Você também recupera {material} x{qty}.',
   'hudChrome.enchanting.salvagedYield': 'Você recupera {item} em {material}.',

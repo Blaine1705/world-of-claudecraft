@@ -9274,8 +9274,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.sameEnchantTag': 'Allerede anvendt',
   'hudChrome.crafting.craftedToastQty': 'Udformet: {name} x{qty}',
   'hudChrome.enchanting.disenchantedYield': 'Du affortryller {item} til {material}.',
-  'hudChrome.enchanting.disenchantedYieldQty':
-    'Du affortryller {item} til {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Du affortryller {item} til {material} x{qty}.',
   'hudChrome.enchanting.disenchantedAlso': 'Du genvinder også {material}.',
   'hudChrome.enchanting.disenchantedAlsoQty': 'Du genvinder også {material} x{qty}.',
   'hudChrome.enchanting.salvagedYield': 'Du bjærger {item} til {material}.',

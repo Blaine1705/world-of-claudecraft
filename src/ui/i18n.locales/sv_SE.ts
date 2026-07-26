@@ -9284,8 +9284,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.sameEnchantTag': 'Redan applicerad',
   'hudChrome.crafting.craftedToastQty': 'Tillverkad: {name} x{qty}',
   'hudChrome.enchanting.disenchantedYield': 'Du avförtrollar {item} till {material}.',
-  'hudChrome.enchanting.disenchantedYieldQty':
-    'Du avförtrollar {item} till {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Du avförtrollar {item} till {material} x{qty}.',
   'hudChrome.enchanting.disenchantedAlso': 'Du återvinner också {material}.',
   'hudChrome.enchanting.disenchantedAlsoQty': 'Du återvinner också {material} x{qty}.',
   'hudChrome.enchanting.salvagedYield': 'Du bärgar {item} till {material}.',
