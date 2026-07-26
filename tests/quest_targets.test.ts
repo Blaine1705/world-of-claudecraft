@@ -204,6 +204,54 @@ describe('questObjectiveAreas', () => {
     expect(key(gatherNodeClusters('wood', 60))).not.toBe(key(gatherNodeClusters('wood')));
   });
 
+  it('keeps the derived cluster radius inside what authored clusters already draw', () => {
+    // The arms above pin WHICH nodes group together; none of them bounds how big
+    // the resulting circle gets, and that number is derived rather than authored.
+    // Every other blob in this layer has its size visible at the authoring site: a
+    // human writes `radius: 24` on a camp, or writes out seven crate positions. A
+    // cluster radius is nobody's decision, and single linkage is transitive, so a
+    // chain of nodes each within 30 yards merges however far the chain runs. Adding
+    // one stand between wood_mirefen_1 and wood_mirefen_3 (33.54 yards apart)
+    // legitimately re-mints the partition pin above while the blob grows, and
+    // without this arm that growth is invisible.
+    const radiusOf = (points: { x: number; z: number }[]) => {
+      const cx = points.reduce((s, p) => s + p.x, 0) / points.length;
+      const cz = points.reduce((s, p) => s + p.z, 0) / points.length;
+      const far = Math.max(...points.map((p) => Math.hypot(p.x - cx, p.z - cz)));
+      return Math.max(6, far + 4); // POINT_AREA_RADIUS, CAMP_AREA_PAD: module-private
+    };
+    let worst = 0;
+    let worstType = '';
+    for (const type of GATHER_NODE_TYPES) {
+      for (const group of gatherNodeClusters(type)) {
+        const r = radiusOf(group);
+        if (r > worst) {
+          worst = r;
+          worstType = type;
+        }
+      }
+    }
+    // Ceiling one: the same helper's other caller, computed live rather than
+    // asserted as a number. pushObjectCluster has always collapsed point-shaped
+    // ground-object spawns into one circle, and its widest (the seven
+    // lost_caravan_goods crates, 50.32yd) is what this layer demonstrably
+    // tolerates. Two different content tables, so this is a real comparison and
+    // not a value compared against itself.
+    const authoredWidest = Math.max(
+      ...GROUND_OBJECTS.filter((def) => def.positions.length > 0).map((def) =>
+        radiusOf([...def.positions]),
+      ),
+    );
+    expect(authoredWidest).toBeGreaterThan(40); // the precedent is real, not empty
+    expect(
+      worst,
+      `widest ${worstType} cluster is ${worst.toFixed(2)}yd against the widest authored cluster's ${authoredWidest.toFixed(2)}`,
+    ).toBeLessThanOrEqual(authoredWidest);
+    // Ceiling two, tight enough to notice: 29.89yd ships today, so a chain that
+    // grows past 35 reds here and gets looked at rather than shipping quietly.
+    expect(worst, `widest cluster ${worst.toFixed(2)}yd`).toBeLessThan(35);
+  });
+
   it('encloses each cluster of gather nodes in one circle, never one per node', () => {
     // This used to look for a circle centred exactly ON each node, because the
     // gather branch drew one per node. Six nodes of every type in every zone made

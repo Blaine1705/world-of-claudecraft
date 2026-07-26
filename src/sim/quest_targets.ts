@@ -62,14 +62,23 @@ const POINT_AREA_RADIUS = 6;
  * those two stands 4 yards and two blobs silently become one, which is why
  * tests/quest_targets.test.ts pins the grouping across that band.
  *
- * On scale: the largest blob this produces is 29.9 yards (the four-stand
- * Glimmermere chain), against the 28.0 yards the map already draws for a
- * kill objective on the widest authored camp (radius 24 plus CAMP_AREA_PAD). So
- * a gather blob is the same size of object the map has always drawn, and it
- * scales with zoom the same way. The tradeoff that buys: the world map no longer
- * shows individual vein positions, because the old per-node circles were
- * centred ON the nodes. The minimap still marks every node individually inside
- * its rim (src/ui/minimap_markers.ts), which is the surface for "exactly where".
+ * On scale, and on the objection this invites ("a blob that swallows the view at
+ * high zoom is worse than the pile it replaced"): the closest precedent is not a
+ * mob camp but pushEnclosing's OTHER caller. pushObjectCluster has always drawn
+ * one circle per GROUND_OBJECTS def rather than one per position, over content
+ * that is just as point-shaped as a gather node, and it already ships a 50.3-yard
+ * circle over the seven lost_caravan_goods crates and a 32.2-yard one over the
+ * six supply_crate spawns in the STARTING zone. The largest blob the gather
+ * clustering produces is 29.9 yards (the four-stand Glimmermere chain), so 59
+ * percent of the biggest circle this helper already draws, and smaller than the
+ * one in zone 1. A world-space objective region that scales with zoom is what
+ * this whole layer is; clustering in canvas space instead would make gather blobs
+ * the only ones that did not.
+ *
+ * The tradeoff it does buy: the world map no longer shows individual vein
+ * positions, because the old per-node circles were centred ON the nodes. The
+ * minimap still marks every node individually inside its rim
+ * (src/ui/minimap_markers.ts), which is the surface for "exactly where".
  */
 const NODE_CLUSTER_LINK_YD = 30;
 
