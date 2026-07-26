@@ -49,6 +49,19 @@ interface PropPlacement {
   rot: number;
 }
 
+// Meshopt-quantized attributes are normalized ints; bake them to plain
+// floats BEFORE applying a world matrix, or setXYZ clamps every vertex
+// back into the normalized [-1, 1] domain (the castle_features guard).
+function attributeToFloat(geo: THREE.BufferGeometry, name: string): void {
+  const attr = geo.getAttribute(name);
+  if (!attr || (attr.array instanceof Float32Array && !attr.normalized)) return;
+  const out = new Float32Array(attr.count * attr.itemSize);
+  for (let i = 0; i < attr.count; i++) {
+    for (let c = 0; c < attr.itemSize; c++) out[i * attr.itemSize + c] = attr.getComponent(i, c);
+  }
+  geo.setAttribute(name, new THREE.BufferAttribute(out, attr.itemSize));
+}
+
 // bake a loaded scene into parts + its native footprint (xz-centered,
 // min-y at 0: the fen_features idiom, plus the measured box for scaling)
 function extractParts(scene: THREE.Group): {
@@ -61,6 +74,8 @@ function extractParts(scene: THREE.Group): {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh) return;
     const geo = mesh.geometry.clone();
+    attributeToFloat(geo, 'position');
+    attributeToFloat(geo, 'normal');
     geo.applyMatrix4(mesh.matrixWorld);
     parts.push({ geo, mat: mesh.material as THREE.Material });
   });

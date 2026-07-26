@@ -1,11 +1,16 @@
-// The Last Keep: a zero-combat authored room-graph castle interior.
+// The Last Keep: a zero-combat authored room-graph castle interior, laid out
+// as THREE STORIES (undercroft / state floor / residence) of adjacent room
+// groups at three lift bands joined by stair rooms.
 // Pins the structural contracts the layout must keep: every room is reachable
 // from the entrance hall through real doorways, every door straddles exactly
 // two rooms on a shared wall line (with the opening inside both rooms' shared
 // span), the dungeon entry and exit both land inside the entrance hall, decor
 // uses only keys the authored decor renderer handles and never sits on a stair
-// ramp, and the layout yields a real collision set.
+// ramp, the layout yields a real collision set, and the renderer's furnishing
+// plan (src/render/lastkeep_dressing.ts) honors the doorway-lane and decor
+// clearance contract.
 import { describe, expect, it } from 'vitest';
+import { type KeepDressingSpot, lastKeepFurnishings } from '../src/render/lastkeep_dressing';
 import { DUNGEON_LIST, DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt } from '../src/sim/data';
 import {
   type AuthoredDoor,
@@ -145,24 +150,80 @@ describe('The Last Keep layout', () => {
     expect(gap).toBeGreaterThan(2); // DOOR_TRIGGER_RADIUS: arrival must not re-trigger the exit
   });
 
-  it('the gaol sits lowest and the tower climbs in +1.6 steps', () => {
+  it('reads as three stories: undercroft 0, state floor 3, residence 6, tower above', () => {
     const lift = (id: string): number => rooms.find((r) => r.id === id)?.lift ?? 0;
     const lowest = Math.min(...rooms.map((r) => r.lift ?? 0));
-    // Negative lifts are unsupported by the render relief path, so the cells sit
-    // at exactly 0 and everything else is raised above them.
+    // Negative lifts are unsupported by the render relief path, so the
+    // undercroft sits at exactly 0 and everything else is raised above it.
     expect(lowest).toBe(0);
-    for (const id of ['gaol', 'cell_north', 'cell_mid', 'cell_south']) {
+    // STORY 0, the undercroft: the only dungeon-flavored story.
+    for (const id of ['gaol', 'cell_north', 'cell_mid', 'cell_south', 'storeroom', 'wine_cellar']) {
       expect(lift(id), id).toBe(0);
     }
-    expect(lift('gaol_stair')).toBeGreaterThan(0);
-    expect(lift('hall_entrance')).toBeGreaterThan(lift('gaol_stair'));
+    // STORY 1, the state floor, with the throne dais +1.2 above it.
+    for (const id of [
+      'hall_entrance',
+      'great_hall',
+      'ballroom',
+      'kitchen',
+      'pantry',
+      'council',
+      'treasury',
+    ]) {
+      expect(lift(id), id).toBeCloseTo(3.0, 5);
+    }
     expect(lift('throne_dais') - lift('great_hall')).toBeCloseTo(1.2, 5);
-    expect(lift('tower_mid') - lift('tower_base')).toBeCloseTo(1.6, 5);
-    expect(lift('tower_lookout') - lift('tower_mid')).toBeCloseTo(1.6, 5);
+    // STORY 2, the residence floor, reached over two half landings.
+    for (const id of ['gallery', 'royal_chamber', 'solar', 'library']) {
+      expect(lift(id), id).toBeCloseTo(6.0, 5);
+    }
+    expect(lift('gaol_stair')).toBeCloseTo(1.5, 5);
+    expect(lift('stair_grand')).toBeCloseTo(4.5, 5);
+    expect(lift('stair_servants')).toBeCloseTo(4.5, 5);
+    // The watch tower continues above the residence to the lookout.
+    expect(lift('tower_mid')).toBeCloseTo(7.5, 5);
+    expect(lift('tower_lookout')).toBeCloseTo(9.0, 5);
+    // Every lift change across a door is a climbable half landing (max 1.5
+    // per step: slope 0.25 over the 6yd ramp band, far under the 1.5 gate).
+    for (const d of doors) {
+      const pair = doorRooms(rooms, d) as [AuthoredRoom, AuthoredRoom];
+      const step = Math.abs((pair[0].lift ?? 0) - (pair[1].lift ?? 0));
+      expect(step, `door (${d.x},${d.z}) lift step`).toBeLessThanOrEqual(1.5 + 1e-9);
+    }
     // lastKeepLiftAt (the groundHeight arm's source) agrees with the room data
     expect(lastKeepLiftAt(def.entry.x, def.entry.z)).toBeCloseTo(lift('hall_entrance'), 5);
-    expect(lastKeepLiftAt(31, 1)).toBe(0); // middle cell floor
-    expect(lastKeepLiftAt(37, 47)).toBeCloseTo(lift('tower_lookout'), 5);
+    expect(lastKeepLiftAt(34, -1)).toBe(0); // middle cell floor
+    expect(lastKeepLiftAt(33, 97)).toBeCloseTo(lift('tower_lookout'), 5);
+    expect(lastKeepLiftAt(0, 72)).toBeCloseTo(lift('gallery'), 5);
+  });
+
+  it('the residence floor loops: two distinct stair routes reach story 2', () => {
+    // Removing either stair room must leave the residence reachable through
+    // the other, so story 2 never hangs off a single staircase.
+    for (const removed of ['stair_grand', 'stair_servants']) {
+      const kept = rooms.filter((r) => r.id !== removed);
+      const adjacency = new Map<string, string[]>();
+      for (const d of doors) {
+        const pair = doorRooms(kept, d);
+        if (!pair) continue;
+        const [a, b] = pair;
+        adjacency.set(a.id, [...(adjacency.get(a.id) ?? []), b.id]);
+        adjacency.set(b.id, [...(adjacency.get(b.id) ?? []), a.id]);
+      }
+      const seen = new Set<string>(['hall_entrance']);
+      const queue = ['hall_entrance'];
+      while (queue.length > 0) {
+        const cur = queue.pop() as string;
+        for (const next of adjacency.get(cur) ?? []) {
+          if (seen.has(next)) continue;
+          seen.add(next);
+          queue.push(next);
+        }
+      }
+      for (const id of ['gallery', 'royal_chamber', 'solar', 'library']) {
+        expect(seen.has(id), `${id} unreachable without ${removed}`).toBe(true);
+      }
+    }
   });
 
   it('decor uses only renderer-supported keys, inside a room, never on a stair ramp', () => {
@@ -180,11 +241,79 @@ describe('The Last Keep layout', () => {
     }
   });
 
+  it('the dungeon dressing (cages, bones) is confined to the undercroft', () => {
+    for (const d of LASTKEEP_DECOR) {
+      if (d.key !== 'hanging_cage' && d.key !== 'bone_pile') continue;
+      const room = roomAt(rooms, d.x, d.z) as AuthoredRoom;
+      // The pantry's larder cage is the one lived-in use of the cage model.
+      if (d.key === 'hanging_cage' && room.id === 'pantry') continue;
+      expect(room.lift ?? 0, `${d.key} at (${d.x},${d.z}) is above the undercroft`).toBeLessThan(
+        1.6,
+      );
+    }
+  });
+
   it('layoutColliders yields walls and decor footprints', () => {
     const colliders = layoutColliders(LASTKEEP_LAYOUT);
     expect(colliders.length).toBeGreaterThan(0);
     expect(colliders.some((c) => c.type === 'obb')).toBe(true); // wall runs
     expect(colliders.some((c) => c.type === 'circle')).toBe(true); // decor footprints
+  });
+
+  it('furnishing plan: every kcas piece sits in a room, off ramps, off decor, off door lanes', () => {
+    const spots = lastKeepFurnishings();
+    expect(spots.length).toBeGreaterThan(60); // the keep is FURNISHED, not dressed
+    // The library is the bookcase-heavy room.
+    const libraryBookcases = spots.filter(
+      (s) => s.kind === 'kcasBookcase' && roomAt(rooms, s.x, s.z)?.id === 'library',
+    );
+    expect(libraryBookcases.length).toBeGreaterThanOrEqual(6);
+    // The doorway-lane contract: a walk lane through every opening, extended
+    // 1.5yd into both rooms, that no floor-standing piece's footprint enters.
+    const laneRects = doors.map((d) => {
+      const pair = doorRooms(rooms, d) as [AuthoredRoom, AuthoredRoom];
+      const zWall = pair[0].z1 === d.z || pair[0].z0 === d.z;
+      return zWall
+        ? { x0: d.x - d.hw, x1: d.x + d.hw, z0: d.z - d.hd - 1.5, z1: d.z + d.hd + 1.5 }
+        : { x0: d.x - d.hw - 1.5, x1: d.x + d.hw + 1.5, z0: d.z - d.hd, z1: d.z + d.hd };
+    });
+    const circleHitsRect = (
+      s: KeepDressingSpot,
+      r: { x0: number; x1: number; z0: number; z1: number },
+    ): boolean => {
+      const cx = Math.max(r.x0, Math.min(r.x1, s.x));
+      const cz = Math.max(r.z0, Math.min(r.z1, s.z));
+      return Math.hypot(s.x - cx, s.z - cz) < s.clearR;
+    };
+    for (const s of spots) {
+      const room = roomAt(rooms, s.x, s.z);
+      expect(room, `${s.kind} at (${s.x},${s.z}) is outside every room`).not.toBeNull();
+      // Never on a stair ramp (a tilted bookcase or a bench floating over the
+      // run): the local lift must be the room's flat floor.
+      const at = authoredLiftAt(rooms, doors, s.x, s.z);
+      expect(at, `${s.kind} at (${s.x},${s.z}) sits on a ramp`).toBeCloseTo(
+        (room as AuthoredRoom).lift ?? 0,
+        5,
+      );
+      if (s.mounted) continue; // banners and sconces hang above the lanes
+      for (const lane of laneRects) {
+        expect(
+          circleHitsRect(s, lane),
+          `${s.kind} at (${s.x},${s.z}) blocks the door lane (${lane.x0}..${lane.x1}, ${lane.z0}..${lane.z1})`,
+        ).toBe(false);
+      }
+      // Never on a sim decor collider (brazier, statue, forge, ...): the
+      // furniture carries no collider of its own, so overlapping one would
+      // bury the collidable prop inside a table or keg.
+      for (const d of LASTKEEP_DECOR) {
+        if (d.r === undefined || d.r <= 0) continue;
+        const dist = Math.hypot(s.x - d.x, s.z - d.z);
+        expect(
+          dist,
+          `${s.kind} at (${s.x},${s.z}) lands on decor ${d.key} at (${d.x},${d.z})`,
+        ).toBeGreaterThanOrEqual(d.r + 0.2);
+      }
+    }
   });
 
   it('a player enters through the door path, spawns no mobs, and leaves clean', () => {

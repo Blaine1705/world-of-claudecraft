@@ -868,7 +868,11 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     // Overflow band: indexes 0..7 are taken (temple 3, orkadia 6, wildheart 7),
     // so the keep claims 8 (instanceOrigin: DUNGEON_OVERFLOW_X_BASE + 600).
     index: 8,
-    doorPos: { x: 420, z: 2026 }, // centered on the keep's courtyard face (castle_layout)
+    // On the ward terrace at the keep's west front: clear of the keep's
+    // decor collider (r 8.5 at 421,2003), of both ward step tops, and of
+    // the terrace mid-walk, so neither the leave-drop (z - 4) nor casual
+    // foot traffic clips a collider or the 2yd door trigger (castle_layout)
+    doorPos: { x: 413.5, z: 2016.5 },
     // Arrival just inside the entrance hall's south end, 4yd north of the exit
     // portal so zoning in never lands inside the exit's 2yd door trigger.
     entry: { x: 0, z: -5 },

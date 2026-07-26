@@ -294,6 +294,9 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   hexrMarket: { url: '/models/biome/hexr_market.glb', kit: 'khex' },
   hexrBlacksmith: { url: '/models/biome/hexr_blacksmith.glb', kit: 'khex' },
   hexrWindmill: { url: '/models/biome/hexr_windmill.glb', kit: 'khex' },
+  hexrArcheryrange: { url: '/models/biome/hexr_archeryrange.glb', kit: 'khex' },
+  hexrTowerCatapult: { url: '/models/biome/hexr_tower_catapult.glb', kit: 'khex' },
+  hexrTowerBase2: { url: '/models/biome/hexr_tower_base.glb', kit: 'khex' },
 };
 
 type PropKey = keyof typeof PROP_ASSET_DEFS;

@@ -1,10 +1,11 @@
 // The Last Keep's castle grounds: a real player can enter by all three
-// gates, climb both stair flights to the wall-walk, reach the watch
-// chamber, and can NEVER walk through the curtain walls. The walls are
-// castleLift terrain (the beacon idiom), so these are movement-kernel
-// walks against the live sim, not geometry assertions.
+// gates, climb the stair flights to the wall-walk, reach the watch
+// chamber, climb the ward steps to the keep terrace, and can NEVER walk
+// through the curtain walls or the ward's retaining edge. The walls are
+// castleLift terrain (the beacon idiom) over terraced pads, so these are
+// movement-kernel walks against the live sim, not geometry assertions.
 import { describe, expect, it } from 'vitest';
-import { CASTLE, CASTLE_GATES, castleLift, inCastleGrounds } from '../src/sim/castle_layout';
+import { CASTLE, CASTLE_GATES, castleLift } from '../src/sim/castle_layout';
 import { Sim } from '../src/sim/sim';
 import { groundHeight } from '../src/sim/world';
 
@@ -51,60 +52,75 @@ function walkTo(
 }
 
 describe('the Last Keep castle grounds', () => {
-  it('a player walks in by the main gate, the postern, and the breach', () => {
-    const routes = [
-      { name: 'main', from: { x: 364, z: 2028.9 }, to: { x: 388, z: 2028.9 } },
-      { name: 'postern', from: { x: 408.9, z: 1996 }, to: { x: 408.9, z: 2010 } },
-      { name: 'breach', from: { x: 446, z: 2050 }, to: { x: 430, z: 2050 } },
-    ];
-    for (const r of routes) {
-      const { sim, p, meta } = makeWalker(r.from);
-      expect(walkTo(sim, p, meta, r.to), `${r.name} gate should admit the walker`).toBe(true);
-      expect(inCastleGrounds(p.pos.x, p.pos.z), `${r.name}: walker should be inside`).toBe(true);
+  it('a player enters by the main gate, the postern alley, and the breach', () => {
+    // main gate: straight in off the road
+    {
+      const { sim, p, meta } = makeWalker({ x: 352, z: 2029.9 });
+      expect(walkTo(sim, p, meta, { x: 376, z: 2029.9 }), 'main gate').toBe(true);
+    }
+    // postern: through the doorway into the wall-side alley, then west
+    // into the open bailey (the alley runs between wall and ward terrace)
+    {
+      const { sim, p, meta } = makeWalker({ x: 408.9, z: 1982 });
+      expect(walkTo(sim, p, meta, { x: 408.9, z: 1990.3 }), 'postern doorway').toBe(true);
+      expect(walkTo(sim, p, meta, { x: 396, z: 1990.3 }), 'the alley west').toBe(true);
+      expect(walkTo(sim, p, meta, { x: 392, z: 2000 }), 'into the bailey').toBe(true);
+    }
+    // breach: over the rubble line into the yard
+    {
+      const { sim, p, meta } = makeWalker({ x: 444, z: 2050.9 });
+      expect(walkTo(sim, p, meta, { x: 429, z: 2050.9 }), 'breach').toBe(true);
     }
   });
 
   it('the curtain wall refuses a direct crossing everywhere but the gates', () => {
-    // charge the west wall head-on at three non-gate spots; the walker must
-    // stay outside (the wall face is a sheer riser the climb gate refuses)
-    for (const z of [2012, 2042, 2058]) {
-      const { sim, p, meta } = makeWalker({ x: 368, z });
-      walkTo(sim, p, meta, { x: 380, z }, 20 * 10);
+    for (const z of [2010, 2044, 2060]) {
+      const { sim, p, meta } = makeWalker({ x: 354, z });
+      walkTo(sim, p, meta, { x: 366, z }, 20 * 10);
       expect(p.pos.x, `wall at z ${z} should stop the walker`).toBeLessThan(CASTLE.wx0 - 0.4);
     }
   });
 
-  it('both courtyard flights climb to the wall-walk, and the walk reaches the watch chamber', () => {
-    // west flight: from the courtyard floor up the ramp, then south along
-    // the walk to the SW bastion
+  it('the ward steps climb the terrace and its edge refuses shortcuts', () => {
     {
-      const { sim, p, meta } = makeWalker({ x: 376.7, z: 2040 });
-      expect(walkTo(sim, p, meta, { x: 376.7, z: 2058 })).toBe(true);
-      expect(walkTo(sim, p, meta, { x: 374, z: 2062 })).toBe(true);
-      const h = p.pos.y - CASTLE.pad.h;
-      expect(h, 'west flight should land on the walk').toBeGreaterThan(CASTLE.wallH - 0.5);
-    }
-    // gate-side flight, then east along the walk, up the watch flight into
-    // the chamber at towerH
-    {
-      const { sim, p, meta } = makeWalker({ x: 416, z: 2003.7 });
-      expect(walkTo(sim, p, meta, { x: 433, z: 2003.7 })).toBe(true);
-      expect(walkTo(sim, p, meta, { x: 437, z: 2003 })).toBe(true); // NE bastion
-      // south along the east walk (the breach parts it; stop north of it)
-      expect(walkTo(sim, p, meta, { x: 437, z: 2040 })).toBe(true);
-      expect(p.pos.y - CASTLE.pad.h).toBeGreaterThan(CASTLE.wallH - 0.5);
+      const { sim, p, meta } = makeWalker({ x: 405.75, z: 2026 });
+      expect(walkTo(sim, p, meta, { x: 405.75, z: 2014 }), 'ward step').toBe(true);
+      expect(p.pos.y, 'on the terrace').toBeGreaterThan(CASTLE.ward.h - 0.4);
     }
     {
-      // the watch flight rides the far wall-walk east into the SE chamber
-      // (waypoints hug the walk: the walker is a straight-liner, and a
-      // diagonal shortcut would step off the wall into the courtyard)
-      const { sim, p, meta } = makeWalker({ x: 376.7, z: 2046 });
-      expect(walkTo(sim, p, meta, { x: 376.7, z: 2059 })).toBe(true);
-      expect(walkTo(sim, p, meta, { x: 374.5, z: 2063 })).toBe(true); // SW bastion
-      expect(walkTo(sim, p, meta, { x: 382, z: 2064 })).toBe(true); // onto the far walk
-      expect(walkTo(sim, p, meta, { x: 420, z: 2064 })).toBe(true);
-      expect(walkTo(sim, p, meta, { x: 437, z: 2064 })).toBe(true);
-      expect(p.pos.y - CASTLE.pad.h, 'watch chamber floor').toBeGreaterThan(CASTLE.towerH - 0.5);
+      const { sim, p, meta } = makeWalker({ x: 413.5, z: 2024 });
+      walkTo(sim, p, meta, { x: 413.5, z: 2012 }, 20 * 8);
+      expect(p.pos.z, 'the retaining edge should stop the walker').toBeGreaterThan(
+        CASTLE.ward.z1 + 0.4,
+      );
+    }
+  });
+
+  it('the flights climb to the walk; the walk circuit reaches the watch chamber', () => {
+    const walkH = CASTLE.walkAbs;
+    // west flight to the walk, then south along it to the SW bastion
+    {
+      const { sim, p, meta } = makeWalker({ x: 362.3, z: 2043 });
+      expect(walkTo(sim, p, meta, { x: 362.3, z: 2057.6 })).toBe(true);
+      expect(walkTo(sim, p, meta, { x: 360.4, z: 2060.5 })).toBe(true);
+      expect(walkTo(sim, p, meta, { x: 360, z: 2069 })).toBe(true);
+      expect(p.pos.y, 'SW bastion').toBeGreaterThan(walkH - 0.5);
+    }
+    // the alley flight to the NE walk, then south along the east wall
+    {
+      const { sim, p, meta } = makeWalker({ x: 416, z: 1990.2 });
+      expect(walkTo(sim, p, meta, { x: 432.5, z: 1990.2 })).toBe(true);
+      expect(walkTo(sim, p, meta, { x: 436.8, z: 1990 })).toBe(true); // NE bastion
+      expect(walkTo(sim, p, meta, { x: 436.8, z: 2040 })).toBe(true);
+      expect(p.pos.y, 'east walk').toBeGreaterThan(walkH - 0.5);
+    }
+    // the far walk east into the watch chamber (spawned on the walk; the
+    // waypoints hug the strip since the walker is a straight-liner)
+    {
+      const { sim, p, meta } = makeWalker({ x: 380, z: CASTLE.wz1 });
+      expect(walkTo(sim, p, meta, { x: 420, z: CASTLE.wz1 })).toBe(true);
+      expect(walkTo(sim, p, meta, { x: 436.8, z: CASTLE.wz1 })).toBe(true);
+      expect(p.pos.y, 'watch chamber floor').toBeGreaterThan(CASTLE.watchAbs - 0.5);
     }
   });
 
@@ -119,8 +135,11 @@ describe('the Last Keep castle grounds', () => {
     }
   });
 
-  it('the keep door spot is open courtyard at pad height', () => {
-    expect(castleLift(420, 2026)).toBe(0);
-    expect(Math.abs(groundHeight(420, 2026, SEED) - CASTLE.pad.h)).toBeLessThan(0.1);
+  it('the keep door spot and its leave-drop are open terrace ground', () => {
+    // doorPos in content/dungeons.ts, and the leave teleport at z - 4
+    for (const z of [2016.5, 2012.5]) {
+      expect(castleLift(413.5, z)).toBe(0);
+      expect(Math.abs(groundHeight(413.5, z, SEED) - CASTLE.ward.h)).toBeLessThan(0.1);
+    }
   });
 });

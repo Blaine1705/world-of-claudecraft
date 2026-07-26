@@ -269,6 +269,24 @@
       "out": "models/biome/hexr_windmill.glb",
       "type": "static",
       "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_archeryrange_red.gltf",
+      "out": "models/biome/hexr_archeryrange.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_tower_catapult_red.gltf",
+      "out": "models/biome/hexr_tower_catapult.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "/Users/demihenderson/Documents/WoC/The Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/red/building_tower_base_red.gltf",
+      "out": "models/biome/hexr_tower_base.glb",
+      "type": "static",
+      "maxTex": 512
     }
   ]
 }

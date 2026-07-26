@@ -483,6 +483,18 @@ const WILDHEART_SUN_INTENSITY = 1.55;
 const WILDHEART_HEMI_INTENSITY = 0.68;
 const WILDHEART_ENV_INTENSITY = 0.32;
 const WILDHEART_RIM_BOOST = 1.5;
+// The Last Keep is a LIVED-IN castle interior, not a crypt: a higher, warmed
+// ambient floor (over the candle-orange torch lights the interior itself
+// carries) so its halls read golden and inhabited while staying indoors-dim.
+// Scoped to interior 'lastkeep' only; every other underground interior keeps
+// the DUNGEON_* rig.
+const LASTKEEP_SUN_INTENSITY = 0.55;
+const LASTKEEP_HEMI_INTENSITY = 0.52;
+const LASTKEEP_ENV_INTENSITY = 0.16;
+const LASTKEEP_RIM_BOOST = 1.9;
+const LASTKEEP_SUN_COLOR = 0xffd9a8;
+const LASTKEEP_HEMI_SKY_COLOR = 0xffe4c4;
+const LASTKEEP_HEMI_GROUND_COLOR = 0x4a3826;
 const RENDERER_PHASE_SAMPLE_LIMIT = 720;
 const RENDER_DIAGNOSTICS_SAMPLE_MS = 2000;
 const RENDER_DIAGNOSTICS_IDLE_TIMEOUT_MS = 1000;
@@ -5804,7 +5816,8 @@ export class Renderer {
     | 'rift'
     | 'practice'
     | 'orkadiaField'
-    | 'wildheartField' = 'outdoor';
+    | 'wildheartField'
+    | 'lastkeep' = 'outdoor';
 
   /** Drop a retired interior's scene nodes and prune its lights/flames out of
    * the per-frame registries. See riftInteriorGroups for why nothing here
@@ -6138,6 +6151,7 @@ export class Renderer {
     // and the daylight rig and only swaps in its own ashen field haze.
     const inOrkadiaField = interior === 'orkadia';
     const inWildheartField = interior === 'wildheart';
+    const inLastKeep = interior === 'lastkeep';
     const desired = inPractice
       ? 'practice'
       : inDelve
@@ -6152,11 +6166,13 @@ export class Renderer {
                 ? 'orkadiaField'
                 : inWildheartField
                   ? 'wildheartField'
-                  : inside
-                    ? 'dungeon'
-                    : camY < waterLevelAt(px, pz) - 0.05
-                      ? 'underwater'
-                      : 'outdoor';
+                  : inLastKeep
+                    ? 'lastkeep'
+                    : inside
+                      ? 'dungeon'
+                      : camY < waterLevelAt(px, pz) - 0.05
+                        ? 'underwater'
+                        : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
@@ -6217,6 +6233,13 @@ export class Renderer {
         fog.color.setHex(0x8ca786);
         fog.near = 105;
         fog.far = 430;
+      } else if (desired === 'lastkeep') {
+        // The Last Keep: a warm hearth-lit haze pushed well back, so its
+        // grand three-story halls read golden and inhabited instead of
+        // dissolving into the crypt's cold near-black murk.
+        fog.color.setHex(0x241610);
+        fog.near = 30;
+        fog.far = 150;
       } else if (desired === 'delve') {
         // the collapsed reliquary breathes a warm ember murk, dried-blood
         // charcoal, tighter than the overworld crypt's cold near-black, so the
@@ -6255,6 +6278,7 @@ export class Renderer {
         const mazeNight = desired === 'yumiMaze';
         const orkadiaStorm = desired === 'orkadiaField';
         const wildheartSun = desired === 'wildheartField';
+        const keepHearth = desired === 'lastkeep';
         const underground =
           desired === 'dungeon' ||
           desired === 'temple' ||
@@ -6269,36 +6293,44 @@ export class Renderer {
             ? ORKADIA_SUN_INTENSITY
             : wildheartSun
               ? WILDHEART_SUN_INTENSITY
-              : underground
-                ? DUNGEON_SUN_INTENSITY
-                : SUN_INTENSITY * this.dnGrade.lightScale;
+              : keepHearth
+                ? LASTKEEP_SUN_INTENSITY
+                : underground
+                  ? DUNGEON_SUN_INTENSITY
+                  : SUN_INTENSITY * this.dnGrade.lightScale;
         this.hemi.intensity = mazeNight
           ? YUMI_MAZE_HEMI_INTENSITY
           : orkadiaStorm
             ? ORKADIA_HEMI_INTENSITY
             : wildheartSun
               ? WILDHEART_HEMI_INTENSITY
-              : underground
-                ? DUNGEON_HEMI_INTENSITY
-                : HEMI_INTENSITY * this.dnGrade.lightScale;
+              : keepHearth
+                ? LASTKEEP_HEMI_INTENSITY
+                : underground
+                  ? DUNGEON_HEMI_INTENSITY
+                  : HEMI_INTENSITY * this.dnGrade.lightScale;
         this.scene.environmentIntensity = mazeNight
           ? YUMI_MAZE_ENV_INTENSITY
           : orkadiaStorm
             ? ORKADIA_ENV_INTENSITY
             : wildheartSun
               ? WILDHEART_ENV_INTENSITY
-              : underground
-                ? DUNGEON_ENV_INTENSITY
-                : this.envOutdoorIntensity * this.dnGrade.lightScale;
+              : keepHearth
+                ? LASTKEEP_ENV_INTENSITY
+                : underground
+                  ? DUNGEON_ENV_INTENSITY
+                  : this.envOutdoorIntensity * this.dnGrade.lightScale;
         sharedUniforms.uRimBoost.value = mazeNight
           ? YUMI_MAZE_RIM_BOOST
           : orkadiaStorm
             ? ORKADIA_RIM_BOOST
             : wildheartSun
               ? WILDHEART_RIM_BOOST
-              : underground
-                ? DUNGEON_RIM_BOOST
-                : 1;
+              : keepHearth
+                ? LASTKEEP_RIM_BOOST
+                : underground
+                  ? DUNGEON_RIM_BOOST
+                  : 1;
         if (orkadiaStorm) {
           this.sun.color.setHex(0xa9b8a8);
           this.hemi.color.setHex(0x899b9a);
@@ -6307,6 +6339,12 @@ export class Renderer {
           this.sun.color.setHex(0xffd48c);
           this.hemi.color.setHex(0xd8ebca);
           this.hemi.groundColor.setHex(0x5b4a2d);
+        } else if (keepHearth) {
+          // hearth-gold key and bounce; the outdoor path re-grades these
+          // colors every frame once the player steps back outside
+          this.sun.color.setHex(LASTKEEP_SUN_COLOR);
+          this.hemi.color.setHex(LASTKEEP_HEMI_SKY_COLOR);
+          this.hemi.groundColor.setHex(LASTKEEP_HEMI_GROUND_COLOR);
         }
       }
       return;

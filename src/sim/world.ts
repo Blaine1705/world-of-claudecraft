@@ -1,5 +1,5 @@
 import { beaconSpiralLift } from './beacon_spiral';
-import { CASTLE, castleLift, castlePadWeight } from './castle_layout';
+import { castleLift, castlePadTarget, castlePadWeight } from './castle_layout';
 import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
 import { PALMREACH_PROPS } from './content/palmreach';
 import {
@@ -2220,12 +2220,14 @@ function applyEmberLavaBasins(x: number, z: number, h: number): number {
   return out;
 }
 
-// The Last Keep's courtyard pad: the castle grounds grade level (the plan
-// lives in castle_layout.ts), with a gentle skirt back onto the midlands.
+// The Last Keep's terraced grounds: the castle pads grade to their local
+// target (the outer bailey floor, or the raised inner ward with its stair
+// cuts; the plan lives in castle_layout.ts), with a gentle skirt back onto
+// the midlands.
 function applyCastlePad(x: number, z: number, h: number): number {
   const w = castlePadWeight(x, z);
   if (w <= 0) return h;
-  return h + (CASTLE.pad.h - h) * w;
+  return h + (castlePadTarget(x, z) - h) * w;
 }
 
 // ---------------------------------------------------------------------------
