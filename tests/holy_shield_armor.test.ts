@@ -58,7 +58,7 @@ describe('Hallowed Wall armor bonus', () => {
     expect(aura?.value).toBe(150);
     expect(aura?.duration).toBe(10);
     expect(aura?.remaining).toBeGreaterThan(9);
-    expect(paladin.stats.armor).toBeGreaterThan(baseArmor);
+    expect(paladin.stats.armor).toBe(baseArmor + 150);
     expect(sim.ctx.effectiveArmor(paladin)).toBe(paladin.stats.armor);
     expect(armorReduction(sim.ctx.effectiveArmor(paladin), paladin.level)).toBeGreaterThan(
       baseReduction,
@@ -81,7 +81,7 @@ describe('Hallowed Wall armor bonus', () => {
     );
     expect(auras).toHaveLength(1);
     expect(auras[0].remaining).toBeGreaterThan(9);
-    expect(paladin.stats.armor).toBeGreaterThan(baseArmor);
+    expect(paladin.stats.armor).toBe(baseArmor + 150);
   });
 
   it('expires cleanly and removes the derived armor bonus', () => {
