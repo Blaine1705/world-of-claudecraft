@@ -1085,6 +1085,126 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     sim.harvestCorpse(mob.id, ['hide', 'hide'], b);
     expect(mob.harvestClaimedBy).toBe(a);
   });
+
+  it('reserves ONE family of stack room, so a repeat no longer over-reserves the gate', () => {
+    // The boundary this fix actually MOVES, and the reason the pre-claim gate
+    // and the roll have to agree: the gate reserves the most a component can
+    // roll, so the duplicated pick used to ask for two families' worth (12
+    // rough_hide, 2 x the legendary tier quantity) where one was ever granted.
+    // A bag holding room for exactly one family therefore refused the repeat
+    // outright while accepting the identical single-tag pick. Both now behave
+    // the same, which is the whole contract.
+    const stack = stackSizeOf(ITEMS.rough_hide);
+    const rig = (components: string[]) => {
+      const { sim, internals, a } = setup(5);
+      const template = MOBS.wild_boar;
+      const corpse = createMob(7771, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+      corpse.dead = true;
+      corpse.aiState = 'dead';
+      corpse.corpseTimer = 9999;
+      corpse.respawnTimer = 9999;
+      internals.entities.set(corpse.id, corpse);
+      const m = internals.players.get(a)!;
+      fillBags(sim, internals, a);
+      // Zero free slots, and stack room for exactly one family's top roll.
+      m.inventory[0] = { itemId: 'rough_hide', count: stack - 6 };
+      let draws = 0;
+      const rng = (sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } })
+        .rng;
+      rng.setObserver(() => {
+        draws++;
+      });
+      sim.harvestCorpse(corpse.id, components, a);
+      rng.setObserver(null);
+      return {
+        claimedBy: corpse.harvestClaimedBy,
+        hides: sim.countItem('rough_hide', a),
+        draws,
+      };
+    };
+    const dup = rig(['hide', 'hide']);
+    const once = rig(['hide']);
+    // The single pick has always fit here, so this is the decisive half: the
+    // repeat has to reach the same harvested state, not the refusal it used to
+    // get. Absolute values, not just equality, so both sides cannot be wrong.
+    expect(once.claimedBy).not.toBeNull();
+    expect(once.draws).toBe(2);
+    expect(dup.claimedBy).toBe(once.claimedBy);
+    expect(dup.draws).toBe(once.draws);
+    expect(dup.hides).toBe(once.hides);
+    expect(dup.hides).toBe(stack - 6 + 4);
+  });
+
+  it('draws NO rng when refused, on every refusal arm, repeat or not', () => {
+    // A refused command must not shift the world's draw order for everyone
+    // else. Both source comments state that as a hard determinism contract and
+    // nothing pinned it, and this change is what moved the gate that decides
+    // one of these arms, so it is pinned here across all five.
+    const refusals: {
+      label: string;
+      arrange: (rig: ReturnType<typeof setup>) => number;
+    }[] = [
+      {
+        label: 'full bags (the pre-claim capacity gate)',
+        arrange: ({ sim, internals, a, mob }) => {
+          fillBags(sim, internals, a);
+          return mob.id;
+        },
+      },
+      {
+        label: 'too far away',
+        arrange: ({ internals, a, mob }) => {
+          internals.entities.get(a)!.pos = { x: 500, y: 0, z: 0 };
+          return mob.id;
+        },
+      },
+      {
+        label: 'the corpse is already claimed',
+        arrange: ({ mob, b }) => {
+          mob.harvestClaimedBy = b;
+          return mob.id;
+        },
+      },
+      {
+        label: 'the harvester is dead',
+        arrange: ({ internals, a, mob }) => {
+          internals.entities.get(a)!.dead = true;
+          return mob.id;
+        },
+      },
+      {
+        label: 'the corpse carries no component tags',
+        arrange: ({ internals }) => {
+          const template = MOBS.warlock_imp;
+          const corpse = createMob(7770, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+          corpse.dead = true;
+          corpse.aiState = 'dead';
+          corpse.corpseTimer = 9999;
+          corpse.respawnTimer = 9999;
+          internals.entities.set(corpse.id, corpse);
+          return corpse.id;
+        },
+      },
+    ];
+    for (const arm of refusals) {
+      for (const components of [['hide', 'hide'], ['hide']]) {
+        const rig = setup(5);
+        const mobId = arm.arrange(rig);
+        let draws = 0;
+        const rng = (
+          rig.sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }
+        ).rng;
+        rng.setObserver(() => {
+          draws++;
+        });
+        rig.sim.harvestCorpse(mobId, components, rig.a);
+        rng.setObserver(null);
+        const label = `${arm.label} ${JSON.stringify(components)}`;
+        expect(draws, `${label} draws`).toBe(0);
+        expect(rig.sim.countItem('rough_hide', rig.a), `${label} yield`).toBe(0);
+      }
+    }
+  });
 });
 
 // Corpse premium-arm tool gating (Professions 2.0): the plain

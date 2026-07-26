@@ -768,9 +768,9 @@ export interface FocusHarvestYield {
  * in tags the caller never asked for. First occurrence wins (Set iteration is
  * insertion-ordered), so tag ORDER is untouched: it is the order the yields,
  * the grants and the harvestResult ledger entries land in (#2457). Same
- * order-preserving idiom the picker's own view-core already applied to the tags
- * it renders (src/ui/hud/loot/corpse_harvest_view.ts), which is why no shipped
- * client can produce the repeat in the first place.
+ * order-preserving idiom the picker's own view-core (`corpseHarvestView`)
+ * already applied to the tags it renders, which is why no shipped client can
+ * produce the repeat in the first place.
  * `taggedComponents` needs no dedupe of its own; content uniqueness is pinned
  * by tests/mob_component_tags.test.ts.
  */
