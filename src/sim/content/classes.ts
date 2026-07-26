@@ -3280,7 +3280,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         rank: 4,
         level: 20,
         cost: 0,
-        effects: [{ type: 'weaponStrike', bonus: 4, weaponMult: 0.1 }],
+        effects: [{ type: 'weaponStrike', bonus: 10, weaponMult: 0.1 }],
       },
     ],
     description:
@@ -3322,16 +3322,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       {
         type: 'unleashBeast',
-        primaryMin: 83,
-        primaryMax: 105,
-        clapMin: 26,
-        clapMax: 34,
+        primaryMin: 42,
+        primaryMax: 53,
+        clapMin: 57,
+        clapMax: 75,
+        secondaryClapMult: 1.5,
         radius: 6,
         frenzyDuration: 8,
       },
     ],
     description:
-      "Consume 3 Pack Ferocity after your pet strikes for 83 to 105 Physical damage and claps every enemy within 6 yards for 26 to 34. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 enemies within 5 yards of the target.",
+      "Consume 3 Pack Ferocity after your pet strikes for 42 to 53 Physical damage and claps every enemy within 6 yards for 57 to 75. The clap deals 50% more damage to enemies other than the main target. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 enemies within 5 yards of the target.",
   },
   stampede: {
     id: 'stampede',
@@ -3375,7 +3376,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     scalesWith: 'ranged',
     requiresTarget: true,
     effects: [
-      { type: 'directDamage', min: 22, max: 28 },
+      { type: 'directDamage', min: 26, max: 33 },
       { type: 'gainResource', amount: 20 },
     ],
     description:
@@ -3497,17 +3498,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: true,
-    effects: [{ type: 'weaponStrike', bonus: 12 }],
+    effects: [{ type: 'weaponStrike', bonus: 22, weaponMult: 0.45 }],
     ranks: [
       {
         rank: 2,
         level: 16,
         cost: 30,
-        effects: [{ type: 'weaponStrike', bonus: 24 }],
+        effects: [{ type: 'weaponStrike', bonus: 48, weaponMult: 0.45 }],
       },
     ],
     description:
-      'Strike for weapon damage plus $d. If the target has your Bloodhook Wound, deal 1 wound tick immediately and refresh the wound to 12 sec. Damage increases with Attack Power through weapon damage.',
+      'Strike for 45% weapon damage plus $d. If the target has your Bloodhook Wound, deal 1 wound tick immediately and refresh the wound to 12 sec. Damage increases with Attack Power through weapon damage.',
   },
   hunting_momentum: {
     id: 'hunting_momentum',
@@ -3625,7 +3626,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: true, // a fired shot: damage resolves when the arrow lands
     scalesWith: 'ranged',
     requiresTarget: true,
-    effects: [{ type: 'directDamage', min: 52, max: 64 }],
+    effects: [{ type: 'directDamage', min: 61, max: 75 }],
     description:
       'Shoot the target for $d Physical damage. Damage increases with Ranged Attack Power.',
   },
@@ -3646,7 +3647,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: true,
     scalesWith: 'ranged',
     requiresTarget: true,
-    effects: [{ type: 'directDamage', min: 11, max: 15 }],
+    effects: [{ type: 'directDamage', min: 13, max: 18 }],
     description:
       'Fire 6 shots over 2.4 sec while moving. Each shot deals $d Physical damage and increases with Ranged Attack Power.',
   },
