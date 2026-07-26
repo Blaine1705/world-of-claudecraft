@@ -330,8 +330,14 @@ describe('Eastbrook authored gameplay data integration', () => {
       'weaver_ottilie',
       'tinker_gizzel',
     ]);
+    // Everything except pos/facing, hashed: the placement rebuild must not have
+    // touched any other NpcDef field. Re-minted deliberately when the gathered
+    // materials came off the station masters' vendorItems rows (the ruling that
+    // no NPC stocks a gathered material), which is a content change to this
+    // payload, not placement drift. Any UNEXPLAINED move here is the bug it
+    // was written to catch.
     expect(createHash('sha256').update(JSON.stringify(stableTownNpcPayload())).digest('hex')).toBe(
-      '92c37779f6a29982ec3541169d995fc4365c9696a9b7a0e2fd32713094073db1',
+      '1fd1f30ecf79ac54411e9e90076be7becb1b64f621de8bc7afabffc5c6b5211b',
     );
     expect(ZONE1_TOWN_NPC_IDS).toHaveLength(15);
     for (const id of ZONE1_TOWN_NPC_IDS) {

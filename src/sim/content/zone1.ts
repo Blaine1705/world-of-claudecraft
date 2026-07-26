@@ -707,16 +707,11 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     // its escalating make-amends return live here now (moved off Smith Haldren),
     // plus the repeatable forge work order.
     questIds: ['q_prof_attune_smith', 'q_prof_amends_smith', 'q_prof_workorder_forge'],
-    // Station stocking: thorium_ore is the premium reagent the forge
-    // station's own recipe (recipe_sootscale_mantle) consumes, so the master
-    // sells it alongside quartermaster_bree (zone3).
-    vendorItems: [
-      'copper_mining_pick',
-      'iron_mining_pick',
-      'mithril_mining_pick',
-      'smithing_flux',
-      'thorium_ore',
-    ],
+    // Station stocking: the forge master sells the tools and the vendor-only
+    // staple its station's recipes need. thorium_ore, the premium reagent
+    // recipe_sootscale_mantle consumes, is NOT here: it is a node yield, and no
+    // NPC stocks a gathered material (professions.md, Locked rulings).
+    vendorItems: ['copper_mining_pick', 'iron_mining_pick', 'mithril_mining_pick', 'smithing_flux'],
     greeting: 'The forge answers to me, $C. Bring good ore and it will answer to you too.',
   },
   cook_marlow: {
@@ -751,19 +746,11 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     // anchor master. Attunement, make-amends return, and the repeatable loom work
     // order live here.
     questIds: ['q_prof_attune_outfitter', 'q_prof_amends_outfitter', 'q_prof_workorder_loom'],
-    // Station stocking: thorium_ore was stocked as the premium
-    // reagent of the loom's own recipe. An input rework later
-    // moved recipe_wardweave_cowl off osmium (silk plus premium herbs now),
-    // but the stock stays: removing a shipped vendor row is out of that
-    // rework's scope, and loom customers still buy it for the
-    // forge crafts next door.
-    vendorItems: [
-      'linen_pouch',
-      'travelers_knapsack',
-      'gathering_sickle',
-      'spool_of_thread',
-      'thorium_ore',
-    ],
+    // Station stocking: the loom master sells its own goods, the tier-1 sickle,
+    // and the vendor-only thread staple. thorium_ore used to sit here as a
+    // premium reagent; it is a node yield, and no NPC stocks a gathered
+    // material (professions.md, Locked rulings).
+    vendorItems: ['linen_pouch', 'travelers_knapsack', 'gathering_sickle', 'spool_of_thread'],
     greeting: 'Mind the threads, $C. A steady hand at the loom beats a strong one.',
   },
   tinker_gizzel: {
@@ -781,9 +768,11 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'q_prof_amends_bombardier',
       'q_prof_workorder_toolworks',
     ],
-    // Station stocking: the six premium reagents the toolworks
-    // recipes (TOOL_RECIPES) consume, previously sold only by
-    // quartermaster_bree (zone3).
+    // Station stocking: the toolworks tools, plus arcanite_bar, the one premium
+    // reagent TOOL_RECIPES consume that a counter may carry. The other five
+    // (thorium_ore, ashwood_log, elderwood_log, goldleaf_herb, sunpetal_herb)
+    // are node yields, and no NPC stocks a gathered material (professions.md,
+    // Locked rulings): a tool above tier 3 is gathered up to, not bought.
     vendorItems: [
       'handaxe',
       'felling_axe',
@@ -791,12 +780,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'bronze_sickle',
       'silverleaf_sickle',
       'simple_fishing_pole',
-      'thorium_ore',
       'arcanite_bar',
-      'ashwood_log',
-      'elderwood_log',
-      'goldleaf_herb',
-      'sunpetal_herb',
     ],
     greeting:
       'Springs, sprockets, and sharp edges, $C: the toolworks has whatever your hands lack.',

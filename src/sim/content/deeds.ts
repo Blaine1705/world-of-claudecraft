@@ -1942,12 +1942,12 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'quest', questId: 'q_prof_intro' },
   },
-  // Reagent sourcing: every toolworks recipe requires one of the six tier
-  // 4/5 reagents (thorium_ore, arcanite_bar, ashwood_log, elderwood_log,
-  // goldleaf_herb, sunpetal_herb), sold by Quartermaster Bree at the
-  // Highwatch hub (zone3.ts), so this deed (and feat_book_complete through
-  // it) is completable in live play. The vendor-to-craft-to-grant chain is
-  // pinned by tests/professions_crafting_hub.test.ts. The stat key stays
+  // Completability: the trigger is ONE station-bound craft at ANY station, not
+  // a toolworks tool recipe and not any single vendor's stock, so no change to
+  // what a counter sells can strand this deed (or feat_book_complete through
+  // it). What it does need is that every station recipe has a live reagent
+  // source, a vendor row or a gather node, which is what
+  // tests/professions_crafting_hub.test.ts pins. The stat key stays
   // 'hubCraftsPerformed' (persisted): it counts station-bound
   // crafts at any station (see professions/crafting.ts craftItem).
   prog_tools_of_the_trade: {

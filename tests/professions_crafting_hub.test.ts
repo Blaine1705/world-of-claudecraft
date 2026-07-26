@@ -27,6 +27,7 @@ import { ZONE2_ZONE } from '../src/sim/content/zone2';
 import { ZONE3_ZONE } from '../src/sim/content/zone3';
 import { ITEMS, NPCS } from '../src/sim/data';
 import { craftItem, resolveCraft } from '../src/sim/professions/crafting';
+import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import {
   isStationActive,
   placeMobileStationForPlayer,
@@ -342,7 +343,7 @@ describe('resolveCraft station gate (position-only, per type)', () => {
 });
 
 describe('station reagent sourcing (prog_tools_of_the_trade completability)', () => {
-  const HUB_REAGENTS = [
+  const PREMIUM_REAGENTS = [
     'thorium_ore',
     'arcanite_bar',
     'ashwood_log',
@@ -350,6 +351,8 @@ describe('station reagent sourcing (prog_tools_of_the_trade completability)', ()
     'goldleaf_herb',
     'sunpetal_herb',
   ] as const;
+  /** The five of the six a node yields, so a counter may not carry them. */
+  const GATHERED_PREMIUM_REAGENTS = PREMIUM_REAGENTS.filter((id) => id !== 'arcanite_bar');
 
   // Every id a player can actually buy: on some NPC's vendor list AND carrying
   // the buyValue the live buy path requires (items.ts buyItem checks both).
@@ -357,9 +360,16 @@ describe('station reagent sourcing (prog_tools_of_the_trade completability)', ()
   for (const npc of Object.values(NPCS)) {
     for (const id of npc.vendorItems ?? []) if (ITEMS[id]?.buyValue) vendorSold.add(id);
   }
+  // Every id a gather node yields. Since the delist this is the OTHER live
+  // source a station reagent can bottom out at, and for the five gathered
+  // premium reagents it is the ONLY one.
+  const nodeYields = new Set<string>();
+  for (const byZone of Object.values(NODE_MATERIAL_TABLE)) {
+    for (const row of Object.values(byZone)) nodeYields.add(row.itemId);
+  }
 
   function acquirable(itemId: string, seen: Set<string> = new Set()): boolean {
-    if (vendorSold.has(itemId)) return true;
+    if (vendorSold.has(itemId) || nodeYields.has(itemId)) return true;
     if (seen.has(itemId)) return false;
     seen.add(itemId);
     // Each sibling reagent branch gets its own copy of the path: `seen` is a
@@ -371,11 +381,11 @@ describe('station reagent sourcing (prog_tools_of_the_trade completability)', ()
     );
   }
 
-  it('every toolworks tool-recipe reagent chain bottoms out at a live vendor', () => {
+  it('every toolworks tool-recipe reagent chain bottoms out at a live source', () => {
     // The deed needs one station craft, so at least one recipe must be
     // completable; this pins ALL six tool recipes, reagents and base tools
-    // alike, so no future recipe or stock edit can silently strand the deed
-    // again. (CASTER_HUB_RECIPES stay out of scope on purpose: their
+    // alike, so no future recipe or stock edit can silently strand the deed.
+    // (CASTER_HUB_RECIPES stay out of scope on purpose: their
     // linen/spider/bone reagents are mob drops, not vendor goods.)
     for (const recipe of TOOL_RECIPES) {
       for (const reagent of recipe.reagents) {
@@ -385,22 +395,47 @@ describe('station reagent sourcing (prog_tools_of_the_trade completability)', ()
         ).toBe(true);
       }
     }
+    // Non-vacuity for the NODE arm specifically: at least one tool-recipe
+    // reagent must be reachable ONLY by gathering, or the arm added above
+    // would be dead code and this whole block would revert to a vendor-only
+    // claim without failing.
+    const nodeOnly = TOOL_RECIPES.flatMap((recipe) => recipe.reagents)
+      .map((reagent) => reagent.itemId)
+      .filter((itemId) => nodeYields.has(itemId) && !vendorSold.has(itemId));
+    expect(nodeOnly.length).toBeGreaterThan(0);
   });
 
-  it('Quartermaster Bree sells all six reagents from the Highwatch hub', () => {
-    const bree = NPCS.quartermaster_bree;
-    for (const id of HUB_REAGENTS) {
-      expect(bree.vendorItems, `${id} missing from Bree's stock`).toContain(id);
+  it('the five gathered premium reagents are reachable ONLY by gathering', () => {
+    for (const id of GATHERED_PREMIUM_REAGENTS) {
+      expect(nodeYields.has(id), `${id} must be a node yield`).toBe(true);
+      expect(vendorSold.has(id), `${id} must not be buyable from any NPC`).toBe(false);
     }
-    // Bree's counter stays inside the Highwatch hub circle, so the shopping
-    // trip is one stop (crafting then happens at the recipe's own station).
+    // The refined one is the opposite case, which is what makes the pair above
+    // a real discrimination rather than a blanket assertion.
+    expect(nodeYields.has('arcanite_bar')).toBe(false);
+    expect(vendorSold.has('arcanite_bar')).toBe(true);
+  });
+
+  it('Quartermaster Bree keeps the refined reagent, inside the Highwatch hub', () => {
+    const bree = NPCS.quartermaster_bree;
+    expect(bree.vendorItems, "arcanite_bar missing from Bree's stock").toContain('arcanite_bar');
+    for (const id of GATHERED_PREMIUM_REAGENTS) {
+      expect(bree.vendorItems, `${id} must no longer be on Bree's counter`).not.toContain(id);
+    }
+    // Bree's counter stays inside the Highwatch hub circle, so what she does
+    // still sell is one stop (crafting then happens at the recipe's own station).
     const distToHub = Math.hypot(bree.pos.x - ZONE3_ZONE.hub.x, bree.pos.z - ZONE3_ZONE.hub.z);
     expect(distToHub).toBeLessThanOrEqual(ZONE3_ZONE.hub.radius);
+  });
+
+  it('all six premium reagents keep their price literals (the economy basis)', () => {
     // Per-item price pins (literals, not derived): the trade-goods 4x staple
     // markup, and buy stays above sell so there is no vendor arbitrage loop. A
     // price-tier change on any single reagent must fail here, not slip past a
-    // shared range check.
-    const REAGENT_PRICES: Record<(typeof HUB_REAGENTS)[number], [number, number]> = {
+    // shared range check. The five delisted ones keep buyValue precisely
+    // BECAUSE reagentUnitValue reads it (tests/recipe_economy.test.ts): the
+    // delist took the stock row, never the price.
+    const REAGENT_PRICES: Record<(typeof PREMIUM_REAGENTS)[number], [number, number]> = {
       thorium_ore: [60, 15],
       arcanite_bar: [160, 40],
       ashwood_log: [60, 15],
@@ -408,7 +443,7 @@ describe('station reagent sourcing (prog_tools_of_the_trade completability)', ()
       goldleaf_herb: [60, 15],
       sunpetal_herb: [160, 40],
     };
-    for (const id of HUB_REAGENTS) {
+    for (const id of PREMIUM_REAGENTS) {
       const def = ITEMS[id];
       // Reagents are common (white), NOT a rarity color: a material must never fall
       // into the junk sweep (sellAllJunk vendors quality 'poor'). The tier lives in
@@ -420,36 +455,48 @@ describe('station reagent sourcing (prog_tools_of_the_trade completability)', ()
     }
   });
 
-  it('vendor purchases alone complete the deed: shop at Wilkes and Bree, craft at the toolworks', () => {
+  it('the ore for the tool craft comes from a node now: Bree refuses to sell it', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const anySim = sim as any;
     const meta = anySim.players.get(pid);
-    meta.copper = 390; // mithril_mining_pick 150 + four thorium_ore at 60, exact
+    meta.copper = 390; // what the old counter purchase used to cost, exactly
 
     const npcEntity = (templateId: string) =>
       [...anySim.entities.values()].find((e: any) => e.templateId === templateId);
 
-    // Every recipe input comes from a real vendor purchase, nothing granted:
-    // the base tool from Trader Wilkes in Eastbrook, the ore from Bree.
+    // The base tool is still a real vendor purchase (tools stay stocked).
     const wilkes = npcEntity('trader_wilkes');
     placeAt(sim, pid, wilkes.pos);
     sim.buyItem(wilkes.id, 'mithril_mining_pick');
     expect(sim.countItem('mithril_mining_pick', pid)).toBe(1);
+    expect(meta.copper).toBe(240);
 
+    // The ore is not: buyItem denies on the missing stock row, charging nothing.
     const bree = npcEntity('quartermaster_bree');
     placeAt(sim, pid, bree.pos);
     for (let i = 0; i < 4; i++) sim.buyItem(bree.id, 'thorium_ore');
-    expect(sim.countItem('thorium_ore', pid)).toBe(4);
-    expect(meta.copper).toBe(0); // both price literals held
+    expect(sim.countItem('thorium_ore', pid)).toBe(0);
+    expect(meta.copper).toBe(240);
+  });
 
-    // The craft happens at the recipe's own station (the Eastbrook
-    // toolworks), not at Bree's counter; a walk, never another purchase.
+  it('one station craft earns the deed, with the ore gathered rather than bought', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const anySim = sim as any;
+    const meta = anySim.players.get(pid);
+
+    // Standing in for the harvest: thorium_ore is a live node yield (pinned
+    // above), so this models the only source a player now has for it.
+    grantItem(sim, 'thorium_ore', 4, pid);
+    grantItem(sim, 'mithril_mining_pick', 1, pid);
+
     placeAt(sim, pid, toolworks.pos);
     const result = craftItem(anySim.ctx, 'recipe_thorium_mining_pick', false, pid);
     expect(result.ok).toBe(true);
     expect(sim.countItem('thorium_mining_pick', pid)).toBe(1);
     expect(sim.countItem('thorium_ore', pid)).toBe(0);
+    // The deed's real trigger: one station-bound craft, at any station.
     expect(meta.deedStats.counters.hubCraftsPerformed).toBe(1);
     sim.tick();
     expect(meta.deedsEarned.has('prog_tools_of_the_trade')).toBe(true);

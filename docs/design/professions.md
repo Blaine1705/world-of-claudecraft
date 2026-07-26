@@ -344,8 +344,14 @@ the lever is material quantities per craft.
   reagents, the craft fee, market cut, unbind fees, make-amends costs). No
   recipe vendors above its input value (`tests/recipe_economy.test.ts`
   enforces output sellValue strictly below reagent value; the value model is
-  reagentUnitValue = buyValue when finite and positive, else sellValue). No
-  gathered or monster material ever gets a vendor buyValue.
+  reagentUnitValue = buyValue when finite and positive, else sellValue). No NPC
+  ever STOCKS a gathered or monster material: nothing a node, a corpse, or a
+  mob yields appears in any `vendorItems` row, so mastery is gathered for, not
+  shopped for. Those materials keep their `buyValue`, which is the economy
+  basis the rule above reads (`reagentUnitValue` falls back to `sellValue`, and
+  every gathered material is priced at exactly 4x, so dropping the field would
+  flip 28 recipes gold-positive against the rule rather than tighten it).
+  `arcanite_bar` is refined, not gathered, and stays stocked.
 - Market: gold buys MATERIALS, never skill. Fungible materials stay
   listable; the curve, the shared throttle, and material volume are the
   sanctioned brake on purchased progress.

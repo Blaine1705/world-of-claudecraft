@@ -1,23 +1,71 @@
-// Station stocking: the six premium (tier 4/5) station-recipe
-// reagents move within reach of their stations. tinker_gizzel (toolworks)
-// stocks all six; the forge/loom/tannery masters each gained exactly
-// thorium_ore (their own station recipe's premium reagent); the kitchens and
-// apothecary masters gained nothing; quartermaster_bree (the pre-existing
-// Highwatch trade-goods source) keeps all six.
+// Vendor stocking against the locked ruling (docs/design/professions.md): no
+// NPC ever STOCKS a gathered or monster material. The five node yields that
+// used to ride the station masters' counters (thorium_ore, ashwood_log,
+// elderwood_log, goldleaf_herb, sunpetal_herb) are delisted; arcanite_bar is
+// refined rather than gathered (no node yields it) and stays.
+//
+// The ruling is about the vendorItems ROW, not the price field: every delisted
+// material keeps its buyValue, which is the basis reagentUnitValue reads in
+// tests/recipe_economy.test.ts. That split is pinned below in both directions.
 import { describe, expect, it } from 'vitest';
 import { ZONE1_NPCS } from '../src/sim/content/zone1';
 import { ZONE2_NPCS } from '../src/sim/content/zone2';
 import { ZONE3_NPCS } from '../src/sim/content/zone3';
-import { ITEMS } from '../src/sim/data';
+import { ITEMS, NPCS } from '../src/sim/data';
+import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 
-const PREMIUM_REAGENTS = [
-  'thorium_ore',
-  'arcanite_bar',
-  'ashwood_log',
-  'elderwood_log',
-  'goldleaf_herb',
-  'sunpetal_herb',
+/** The five node yields delisted from every counter, spelled out as literals. */
+const DELISTED = ['ashwood_log', 'elderwood_log', 'goldleaf_herb', 'sunpetal_herb', 'thorium_ore'];
+
+/** The one premium reagent a counter may still carry: refined, never gathered. */
+const REFINED_PREMIUM_REAGENT = 'arcanite_bar';
+
+/**
+ * Monster materials and specimens (the mob-drop half of the ruling) plus the
+ * raw fish a cast lands. Literal by necessity: unlike node yields these have no
+ * single live content table to derive from.
+ */
+const MONSTER_MATERIALS = [
+  'rough_hide',
+  'spider_silk',
+  'venom_gland',
+  'game_meat',
+  'homespun_cloth',
+  'pristine_hide',
+  'pristine_silk',
+  'pristine_venom_gland',
+  'prime_cut',
 ];
+const RAW_FISH = [
+  'raw_river_perch',
+  'raw_marsh_pike',
+  'raw_bog_eel',
+  'raw_frostgill_trout',
+  'raw_stonescale_carp',
+  'raw_mirror_trout',
+];
+
+/** Every id any NPC anywhere stocks, mapped to the NPCs stocking it. */
+function stockedByNpc(): Map<string, string[]> {
+  const stocked = new Map<string, string[]>();
+  for (const [npcId, npc] of Object.entries(NPCS)) {
+    for (const itemId of npc.vendorItems ?? []) {
+      const sellers = stocked.get(itemId);
+      if (sellers) sellers.push(npcId);
+      else stocked.set(itemId, [npcId]);
+    }
+  }
+  return stocked;
+}
+
+/** The live node yields, derived from the content table so the list cannot rot. */
+function liveNodeYields(): string[] {
+  const yields = new Set<string>();
+  for (const byZone of Object.values(NODE_MATERIAL_TABLE)) {
+    for (const row of Object.values(byZone)) yields.add(row.itemId);
+  }
+  return [...yields].sort();
+}
 
 function stockOf(npcs: Record<string, { vendorItems?: readonly string[] }>, id: string): string[] {
   const npc = npcs[id];
@@ -25,32 +73,81 @@ function stockOf(npcs: Record<string, { vendorItems?: readonly string[] }>, id: 
   return [...npc.vendorItems];
 }
 
-describe('master vendor stocking', () => {
-  it('tinker_gizzel stocks exactly the six premium reagents appended after its prior stock', () => {
-    const stock = stockOf(ZONE1_NPCS, 'tinker_gizzel');
-    expect(stock.slice(-6)).toEqual(PREMIUM_REAGENTS);
-    // Prior toolworks stock survives ahead of the reagents.
-    expect(stock).toContain('handaxe');
-    expect(stock).toContain('simple_fishing_pole');
+describe('the no-NPC-stocks-a-gathered-material ruling', () => {
+  it('no NPC anywhere stocks any live node yield', () => {
+    const stocked = stockedByNpc();
+    const yields = liveNodeYields();
+    // Non-vacuity: the scan must have a real corpus on both sides, or a broken
+    // table read would pass this by finding nothing to check.
+    expect(yields.length).toBe(9);
+    expect(stocked.size).toBeGreaterThan(20);
+    for (const itemId of yields) {
+      expect(stocked.get(itemId) ?? [], `${itemId} is stocked by an NPC`).toEqual([]);
+    }
   });
 
-  it('forge, loom, and tannery masters each gained exactly thorium_ore', () => {
+  it('the scan is live: arcanite_bar, refined and never gathered, IS still stocked', () => {
+    // The counterexample that makes the sweep above decisive. Without it a
+    // stockedByNpc() that silently returned an empty map would read as a pass.
+    const stocked = stockedByNpc();
+    expect(stocked.get(REFINED_PREMIUM_REAGENT) ?? []).not.toEqual([]);
+    expect(liveNodeYields()).not.toContain(REFINED_PREMIUM_REAGENT);
+  });
+
+  it('no NPC stocks a monster material, a specimen, or a raw fish', () => {
+    const stocked = stockedByNpc();
+    expect(MONSTER_MATERIALS.length + RAW_FISH.length).toBe(15);
+    for (const itemId of [...MONSTER_MATERIALS, ...RAW_FISH]) {
+      // Guard the literals against a rename: an id with no ItemDef would make
+      // its own row vacuously pass.
+      expect(ITEMS[itemId], `${itemId} has no ItemDef`).toBeDefined();
+      expect(stocked.get(itemId) ?? [], `${itemId} is stocked by an NPC`).toEqual([]);
+    }
+  });
+
+  it('every delisted material KEEPS its buyValue (the economy basis, never the stock row)', () => {
+    for (const itemId of DELISTED) {
+      const def = ITEMS[itemId];
+      expect(def, itemId).toBeDefined();
+      expect(typeof def.buyValue, `${itemId} buyValue type`).toBe('number');
+      expect(def.buyValue as number, `${itemId} buyValue`).toBeGreaterThan(0);
+      // The 4x trade-goods markup the economy model rests on.
+      expect(def.buyValue, `${itemId} buyValue is 4x sellValue`).toBe(def.sellValue * 4);
+    }
+  });
+});
+
+describe('master vendor stocking after the delist', () => {
+  it('tinker_gizzel keeps its tools and the refined reagent, and nothing gathered', () => {
+    const stock = stockOf(ZONE1_NPCS, 'tinker_gizzel');
+    expect(stock).toEqual([
+      'handaxe',
+      'felling_axe',
+      'ironbark_axe',
+      'bronze_sickle',
+      'silverleaf_sickle',
+      'simple_fishing_pole',
+      'arcanite_bar',
+    ]);
+  });
+
+  it('the forge, loom, and tannery masters carry no premium reagent at all', () => {
     for (const [npcs, id] of [
       [ZONE1_NPCS, 'forgemistress_darva'],
       [ZONE1_NPCS, 'weaver_ottilie'],
       [ZONE2_NPCS, 'tanner_hesk'],
     ] as const) {
       const stock = stockOf(npcs, id);
-      expect(stock[stock.length - 1], id).toBe('thorium_ore');
-      expect(
-        stock.filter((itemId) => itemId === 'thorium_ore'),
-        id,
-      ).toHaveLength(1);
-      // thorium_ore is the ONLY premium reagent these masters carry.
-      for (const reagent of PREMIUM_REAGENTS.slice(1)) {
+      for (const reagent of [...DELISTED, REFINED_PREMIUM_REAGENT]) {
         expect(stock, `${id} must not stock ${reagent}`).not.toContain(reagent);
       }
+      // Their vendor-only staple stays: the delist took reagents off the
+      // counter, it did not empty it.
+      expect(stock.length, id).toBeGreaterThan(0);
     }
+    expect(stockOf(ZONE1_NPCS, 'forgemistress_darva')).toContain('smithing_flux');
+    expect(stockOf(ZONE1_NPCS, 'weaver_ottilie')).toContain('spool_of_thread');
+    expect(stockOf(ZONE2_NPCS, 'tanner_hesk')).toContain('tanning_agent');
   });
 
   it('the kitchens and apothecary masters carry no premium reagents', () => {
@@ -59,16 +156,17 @@ describe('master vendor stocking', () => {
       [ZONE3_NPCS, 'alchemist_verane'],
     ] as const) {
       const stock = stockOf(npcs, id);
-      for (const reagent of PREMIUM_REAGENTS) {
+      for (const reagent of [...DELISTED, REFINED_PREMIUM_REAGENT]) {
         expect(stock, `${id} must not stock ${reagent}`).not.toContain(reagent);
       }
     }
   });
 
-  it('quartermaster_bree keeps all six premium reagents (the pre-existing source)', () => {
+  it('quartermaster_bree keeps arcanite_bar alone of the six', () => {
     const stock = stockOf(ZONE3_NPCS, 'quartermaster_bree');
-    for (const reagent of PREMIUM_REAGENTS) {
-      expect(stock, reagent).toContain(reagent);
+    expect(stock).toContain(REFINED_PREMIUM_REAGENT);
+    for (const reagent of DELISTED) {
+      expect(stock, `bree must not stock ${reagent}`).not.toContain(reagent);
     }
   });
 

@@ -739,15 +739,11 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     // Professions 2.0: the Fenbridge tannery master runs the repeatable
     // leatherworking work order.
     questIds: ['q_prof_workorder_tannery'],
-    // Station stocking: thorium_ore is the premium reagent the
-    // tannery station's own recipe (recipe_duskhide_wraps) consumes.
-    vendorItems: [
-      'travelers_knapsack',
-      'tough_jerky',
-      'smoked_eel',
-      'tanning_agent',
-      'thorium_ore',
-    ],
+    // Station stocking: the tannery master sells its goods and the vendor-only
+    // tanning staple. thorium_ore, the premium reagent recipe_duskhide_wraps
+    // consumes, is NOT here: it is a node yield, and no NPC stocks a gathered
+    // material (professions.md, Locked rulings).
+    vendorItems: ['travelers_knapsack', 'tough_jerky', 'smoked_eel', 'tanning_agent'],
     greeting: 'A hide is only as good as its tanning, $C. The vats are ready when you are.',
   },
 };

@@ -1128,15 +1128,12 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'silverleaf_sickle',
       'simple_fishing_pole',
       // Tier 4/5 station-recipe reagents (items.ts): Bree is the Highwatch
-      // trade-goods vendor, so every station-bound (stationType) recipe has
-      // a live reagent source (prog_tools_of_the_trade needs at least one
-      // station craft to be possible).
-      'thorium_ore',
+      // trade-goods vendor, but she carries only arcanite_bar, the one premium
+      // reagent that is refined rather than gathered (no node anywhere yields
+      // it). The other five (thorium_ore, ashwood_log, elderwood_log,
+      // goldleaf_herb, sunpetal_herb) are node yields, and no NPC stocks a
+      // gathered material (professions.md, Locked rulings).
       'arcanite_bar',
-      'ashwood_log',
-      'elderwood_log',
-      'goldleaf_herb',
-      'sunpetal_herb',
     ],
     greeting:
       'Wool, hardtack, and steel-shod boots — Highwatch runs on all three, and I am short of everything.',
