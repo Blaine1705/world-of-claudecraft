@@ -2023,8 +2023,8 @@ export const fr_FR: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Collecte du Marché mondial en attente",
-      "tip": "De l'or ou des objets vous attendent chez le Marchand."
+      "aria": "Produit ou objets du Marché mondial en attente",
+      "tip": "Le produit de vos ventes ou des objets retournés vous attendent chez le Marchand."
     },
     "noticeboard": {
       "empty": "Rien ne semble affiché."

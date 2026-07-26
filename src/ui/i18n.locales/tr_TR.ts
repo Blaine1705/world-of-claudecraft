@@ -9257,8 +9257,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} ile {max} arası {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Büyülü',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Büyülü)',
-  'hudChrome.marketIndicator.aria': 'Dünya Pazarı toplaması bekliyor',
-  'hudChrome.marketIndicator.tip': "Tüccar'da senin için bekleyen altın ya da eşyalar var.",
+  'hudChrome.marketIndicator.aria': 'Dünya Pazarı gelirleri veya eşyaları bekliyor',
+  'hudChrome.marketIndicator.tip':
+    "Satış gelirleri veya iade edilen eşyalar Tüccar'da seni bekliyor.",
   'hudChrome.materialHint.arcaneDust':
     'Sıradan ve az bulunur eşyalardan büyü bozularak elde edilen büyü malzemesi.',
   'hudChrome.materialHint.arcaneEssence':

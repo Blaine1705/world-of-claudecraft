@@ -2023,8 +2023,8 @@ export const es_ES: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Recogida pendiente en el Mercado Mundial",
-      "tip": "Oro u objetos te esperan en el Mercader."
+      "aria": "Ganancias u objetos del Mercado Mundial en espera",
+      "tip": "Las ganancias de venta u objetos devueltos te esperan en el Mercader."
     },
     "noticeboard": {
       "empty": "Parece que no hay nada publicado."

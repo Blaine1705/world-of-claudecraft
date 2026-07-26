@@ -2023,8 +2023,8 @@ export const ja_JP: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "世界市場の受け取り待ち",
-      "tip": "ゴールドやアイテムが商人のもとで受け取りを待っています。"
+      "aria": "世界市場の売上またはアイテムが受け取り待ち",
+      "tip": "売上金または返品アイテムが商人のもとで受け取りを待っています。"
     },
     "noticeboard": {
       "empty": "何も貼られていないようだ。"

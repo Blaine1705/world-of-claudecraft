@@ -7844,6 +7844,10 @@ export class Hud {
     const el = $('#market-indicator') as HTMLButtonElement | null;
     if (!el) return;
     this.marketIndicatorEl = el;
+    this.attachTooltip(
+      el,
+      () => `<div class="tt-sub">${esc(t('hudChrome.marketIndicator.tip'))}</div>`,
+    );
     const activate = () => {
       // At the Merchant the coin opens the World Market (the same gate the
       // market window itself lives behind); anywhere else it is informational

@@ -9355,8 +9355,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} hingga {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Dimantrai',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Dimantrai)',
-  'hudChrome.marketIndicator.aria': 'Pengambilan Pasar Dunia menanti',
-  'hudChrome.marketIndicator.tip': 'Emas atau barang menantimu di Sang Pedagang.',
+  'hudChrome.marketIndicator.aria': 'Hasil atau barang Pasar Dunia menanti',
+  'hudChrome.marketIndicator.tip':
+    'Hasil penjualan atau barang yang dikembalikan menantimu di Sang Pedagang.',
   'hudChrome.materialHint.arcaneDust':
     'Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan umum dan tak biasa.',
   'hudChrome.materialHint.arcaneEssence':

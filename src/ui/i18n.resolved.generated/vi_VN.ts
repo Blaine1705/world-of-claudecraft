@@ -2023,8 +2023,8 @@ export const vi_VN: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Có hàng chờ thu tại Chợ Thế Giới",
-      "tip": "Vàng hoặc vật phẩm đang chờ bạn tại Thương Nhân."
+      "aria": "Tiền bán hoặc vật phẩm Chợ Thế Giới đang chờ",
+      "tip": "Tiền bán hàng hoặc vật phẩm bị trả lại đang chờ bạn tại Thương Nhân."
     },
     "noticeboard": {
       "empty": "Có vẻ như chưa có gì được dán lên."

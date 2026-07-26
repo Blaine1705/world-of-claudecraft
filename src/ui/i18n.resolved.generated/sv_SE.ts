@@ -2023,8 +2023,8 @@ export const sv_SE: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Hämtning väntar vid Världsmarknaden",
-      "tip": "Guld eller föremål väntar på dig hos Köpmannen."
+      "aria": "Världsmarknadsintäkter eller föremål väntar",
+      "tip": "Försäljningsintäkter eller returnerade föremål väntar på dig hos Köpmannen."
     },
     "noticeboard": {
       "empty": "Inget verkar vara uppsatt."

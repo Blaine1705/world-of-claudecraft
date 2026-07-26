@@ -9444,8 +9444,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} bis {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Verzaubert',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Verzaubert)',
-  'hudChrome.marketIndicator.aria': 'Abholung auf dem Weltmarkt wartet',
-  'hudChrome.marketIndicator.tip': 'Gold oder Gegenstände warten beim Händler auf dich.',
+  'hudChrome.marketIndicator.aria': 'Weltmarkt-Erlöse oder Gegenstände warten',
+  'hudChrome.marketIndicator.tip':
+    'Verkaufserlöse oder zurückgegebene Gegenstände warten beim Händler auf dich.',
   'hudChrome.materialHint.arcaneDust':
     'Verzauberungsreagenz. Entzaubert aus gewöhnlicher und ungewöhnlicher Ausrüstung.',
   'hudChrome.materialHint.arcaneEssence':

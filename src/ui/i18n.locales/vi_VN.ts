@@ -9280,8 +9280,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} đến {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Đã Pháp Khắc',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Đã Pháp Khắc)',
-  'hudChrome.marketIndicator.aria': 'Có hàng chờ thu tại Chợ Thế Giới',
-  'hudChrome.marketIndicator.tip': 'Vàng hoặc vật phẩm đang chờ bạn tại Thương Nhân.',
+  'hudChrome.marketIndicator.aria': 'Tiền bán hoặc vật phẩm Chợ Thế Giới đang chờ',
+  'hudChrome.marketIndicator.tip':
+    'Tiền bán hàng hoặc vật phẩm bị trả lại đang chờ bạn tại Thương Nhân.',
   'hudChrome.materialHint.arcaneDust':
     'Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị phổ thông và khác thường.',
   'hudChrome.materialHint.arcaneEssence':

@@ -2023,8 +2023,8 @@ export const de_DE: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Abholung auf dem Weltmarkt wartet",
-      "tip": "Gold oder Gegenstände warten beim Händler auf dich."
+      "aria": "Weltmarkt-Erlöse oder Gegenstände warten",
+      "tip": "Verkaufserlöse oder zurückgegebene Gegenstände warten beim Händler auf dich."
     },
     "noticeboard": {
       "empty": "Hier scheint nichts ausgehängt zu sein."

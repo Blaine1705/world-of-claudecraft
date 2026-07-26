@@ -2023,8 +2023,8 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Čeká vyzvednutí ze Světového trhu",
-      "tip": "U Obchodníka na tebe čekají zlato nebo předměty."
+      "aria": "Čekají výnosy nebo předměty ze Světového trhu",
+      "tip": "U Obchodníka na tebe čekají výnosy z prodeje nebo vrácené předměty."
     },
     "noticeboard": {
       "empty": "Zdá se, že tu nic nevisí."

@@ -2023,8 +2023,8 @@ export const id_ID: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Pengambilan Pasar Dunia menanti",
-      "tip": "Emas atau barang menantimu di Sang Pedagang."
+      "aria": "Hasil atau barang Pasar Dunia menanti",
+      "tip": "Hasil penjualan atau barang yang dikembalikan menantimu di Sang Pedagang."
     },
     "noticeboard": {
       "empty": "Sepertinya tidak ada yang ditempel."

@@ -2023,8 +2023,8 @@ export const pl_PL: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Oczekujący odbiór z Rynku Świata",
-      "tip": "Złoto lub przedmioty czekają na ciebie u Kupca."
+      "aria": "Przychody lub przedmioty z Rynku Świata czekają",
+      "tip": "Przychody ze sprzedaży lub zwrócone przedmioty czekają na ciebie u Kupca."
     },
     "noticeboard": {
       "empty": "Wygląda na to, że nic tu nie wywieszono."

@@ -2023,8 +2023,8 @@ export const it_IT: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Ritiro in attesa dal Mercato Mondiale",
-      "tip": "Oro o oggetti ti aspettano al Mercante."
+      "aria": "Ricavi o oggetti del Mercato Mondiale in attesa",
+      "tip": "Ricavi di vendita o oggetti restituiti ti aspettano dal Mercante."
     },
     "noticeboard": {
       "empty": "Non sembra esserci nulla di affisso."

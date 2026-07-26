@@ -2023,8 +2023,8 @@ export const en: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "World Market collection waiting",
-      "tip": "Gold or items are waiting for you at the Merchant."
+      "aria": "World Market proceeds or items waiting",
+      "tip": "Sale proceeds or returned items are waiting for you at the Merchant."
     },
     "noticeboard": {
       "empty": "Nothing seems posted."

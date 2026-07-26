@@ -9490,8 +9490,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} à {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Enchanté',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Enchanté)',
-  'hudChrome.marketIndicator.aria': 'Collecte du Marché mondial en attente',
-  'hudChrome.marketIndicator.tip': "De l'or ou des objets vous attendent chez le Marchand.",
+  'hudChrome.marketIndicator.aria': 'Produit ou objets du Marché mondial en attente',
+  'hudChrome.marketIndicator.tip':
+    'Le produit de vos ventes ou des objets retournés vous attendent chez le Marchand.',
   'hudChrome.materialHint.arcaneDust':
     "Réactif d'enchantement. Obtenu en désenchantant de l'équipement commun et peu commun.",
   'hudChrome.materialHint.arcaneEssence':

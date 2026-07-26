@@ -9179,8 +9179,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} až {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Okouzlený',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (okouzleno)',
-  'hudChrome.marketIndicator.aria': 'Čeká vyzvednutí ze Světového trhu',
-  'hudChrome.marketIndicator.tip': 'U Obchodníka na tebe čekají zlato nebo předměty.',
+  'hudChrome.marketIndicator.aria': 'Čekají výnosy nebo předměty ze Světového trhu',
+  'hudChrome.marketIndicator.tip':
+    'U Obchodníka na tebe čekají výnosy z prodeje nebo vrácené předměty.',
   'hudChrome.materialHint.arcaneDust':
     'Reagencie k okouzlení. Získává se rozzačarováním běžné a neobvyklé výbavy.',
   'hudChrome.materialHint.arcaneEssence':

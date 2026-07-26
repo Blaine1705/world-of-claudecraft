@@ -2023,8 +2023,8 @@ export const tr_TR: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Dünya Pazarı toplaması bekliyor",
-      "tip": "Tüccar'da senin için bekleyen altın ya da eşyalar var."
+      "aria": "Dünya Pazarı gelirleri veya eşyaları bekliyor",
+      "tip": "Satış gelirleri veya iade edilen eşyalar Tüccar'da seni bekliyor."
     },
     "noticeboard": {
       "empty": "Görünüşe göre hiçbir şey asılmamış."

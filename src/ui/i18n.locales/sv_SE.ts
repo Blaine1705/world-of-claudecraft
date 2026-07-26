@@ -9246,8 +9246,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} till {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Förtrollad',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Förtrollad)',
-  'hudChrome.marketIndicator.aria': 'Hämtning väntar vid Världsmarknaden',
-  'hudChrome.marketIndicator.tip': 'Guld eller föremål väntar på dig hos Köpmannen.',
+  'hudChrome.marketIndicator.aria': 'Världsmarknadsintäkter eller föremål väntar',
+  'hudChrome.marketIndicator.tip':
+    'Försäljningsintäkter eller returnerade föremål väntar på dig hos Köpmannen.',
   'hudChrome.materialHint.arcaneDust':
     'Förtrollningsreagens. Fås genom avförtrollning av vanlig och ovanlig utrustning.',
   'hudChrome.materialHint.arcaneEssence':

@@ -2023,8 +2023,8 @@ export const da_DK: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Afhentning fra Verdensmarkedet venter",
-      "tip": "Guld eller genstande venter på dig hos Købmanden."
+      "aria": "Verdensmarkedsprovenu eller genstande venter",
+      "tip": "Salgsprovenu eller returnerede genstande venter på dig hos Købmanden."
     },
     "noticeboard": {
       "empty": "Der ser ikke ud til at være slået noget op."

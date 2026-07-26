@@ -2023,8 +2023,8 @@ export const nl_NL: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Ophaling wacht bij de Wereldmarkt",
-      "tip": "Goud of voorwerpen wachten op je bij de Koopman."
+      "aria": "Wereldmarkt-opbrengst of voorwerpen wachten",
+      "tip": "Verkoopopbrengst of teruggekeerde voorwerpen wachten op je bij de Koopman."
     },
     "noticeboard": {
       "empty": "Er lijkt niets opgehangen te zijn."

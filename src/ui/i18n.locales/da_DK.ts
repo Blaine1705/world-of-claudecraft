@@ -9236,8 +9236,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} til {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Fortryllet',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Fortryllet)',
-  'hudChrome.marketIndicator.aria': 'Afhentning fra Verdensmarkedet venter',
-  'hudChrome.marketIndicator.tip': 'Guld eller genstande venter på dig hos Købmanden.',
+  'hudChrome.marketIndicator.aria': 'Verdensmarkedsprovenu eller genstande venter',
+  'hudChrome.marketIndicator.tip':
+    'Salgsprovenu eller returnerede genstande venter på dig hos Købmanden.',
   'hudChrome.materialHint.arcaneDust':
     'Fortryllelsesreagens. Fås ved affortryllelse af almindeligt og ualmindeligt udstyr.',
   'hudChrome.materialHint.arcaneEssence':

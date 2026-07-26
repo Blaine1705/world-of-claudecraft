@@ -9416,8 +9416,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} a {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Encantado',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Encantado)',
-  'hudChrome.marketIndicator.aria': 'Recogida pendiente en el Mercado Mundial',
-  'hudChrome.marketIndicator.tip': 'Oro u objetos te esperan en el Mercader.',
+  'hudChrome.marketIndicator.aria': 'Ganancias u objetos del Mercado Mundial en espera',
+  'hudChrome.marketIndicator.tip':
+    'Las ganancias de venta u objetos devueltos te esperan en el Mercader.',
   'hudChrome.materialHint.arcaneDust':
     'Reactivo de encantamiento. Se obtiene desencantando equipo común y poco común.',
   'hudChrome.materialHint.arcaneEssence':

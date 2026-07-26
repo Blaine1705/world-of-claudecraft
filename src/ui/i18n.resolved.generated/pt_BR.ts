@@ -2023,8 +2023,8 @@ export const pt_BR: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Coleta do Mercado Mundial pendente",
-      "tip": "Há ouro ou itens esperando por você com o Mercador."
+      "aria": "Receita ou itens do Mercado Mundial aguardam",
+      "tip": "Receita de vendas ou itens devolvidos estão esperando por você com o Mercador."
     },
     "noticeboard": {
       "empty": "Parece que não há nada afixado."

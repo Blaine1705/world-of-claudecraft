@@ -9299,8 +9299,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': 'od {min} do {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Zaklęty',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Zaklęty)',
-  'hudChrome.marketIndicator.aria': 'Oczekujący odbiór z Rynku Świata',
-  'hudChrome.marketIndicator.tip': 'Złoto lub przedmioty czekają na ciebie u Kupca.',
+  'hudChrome.marketIndicator.aria': 'Przychody lub przedmioty z Rynku Świata czekają',
+  'hudChrome.marketIndicator.tip':
+    'Przychody ze sprzedaży lub zwrócone przedmioty czekają na ciebie u Kupca.',
   'hudChrome.materialHint.arcaneDust':
     'Składnik do zaklinania. Pozyskiwany z rozbrajania pospolitego i niezwykłego ekwipunku.',
   'hudChrome.materialHint.arcaneEssence':
