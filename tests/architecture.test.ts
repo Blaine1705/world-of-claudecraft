@@ -796,7 +796,9 @@ describe('curated bare-named pure cores (cross-check)', () => {
 //
 //   pure core       *_view / *_core, or a bare name registered in UI_PURE_CORES
 //                   -> the pure-core sweeps above
-//   painter         *_painter
+//   painter         *_painter (and *_window, which this sweep ALSO keeps; see
+//                   SWEPT_BY_NAME_RE below for why the coverage is deliberately
+//                   double rather than exclusive)
 //                   -> tests/hud_perf_budget.test.ts
 //   painter helper  registered in UI_PAINTER_HELPERS
 //                   -> the hard contract below: host-agnostic, deterministic,
@@ -824,16 +826,25 @@ describe('curated bare-named pure cores (cross-check)', () => {
 // already owns `document` gains nothing from re-registering the day it also calls
 // `addEventListener`, and the hazard here is the UNCLASSIFIED module.
 //
-// The one caveat on "non-voluntary", worth knowing because it is the cheapest way
-// out: a module named *_painter.ts leaves this sweep for the painter gate, where
-// CANVAS_PAINTERS is a plain exemption list with no host scan behind it. That gate
-// predates this one and closing it is its own change.
+// A module named *_painter.ts leaves this sweep for the painter gate, so that gate
+// is load-bearing for this one. It used to be the cheapest way out, because
+// CANVAS_PAINTERS there was a plain exemption list with no scan behind it; it is
+// now a scanned bucket with an identity proof (a registered canvas painter must
+// name a 2D context type AND actually draw on one), so parking a DOM module there
+// fails rather than exempting it.
 
 const uiRoot = join(repoRoot, 'src', 'ui');
 
 // The filename families the other two sweeps already own. *_view / *_core is
-// onDiskCores() above; *_painter is findUiPainters() in hud_perf_budget.test.ts,
-// which matches the same suffix.
+// onDiskCores() above; *_painter is findUiPainters() in hud_perf_budget.test.ts.
+//
+// That gate also sweeps *_window.ts, the second painter name src/ui/CLAUDE.md
+// sanctions, and this regex deliberately does NOT: a window painter is
+// DOUBLE-COVERED, and the two gates cover different things. There it holds the
+// painter contract that survives a cold cadence (no forced-reflow layout read, no
+// per-frame driver of its own); here it is classified as a module, which is what
+// pins that a window owning browser state is registered rather than assumed. Adding
+// _window here would drop 35 modules out of THIS sweep to buy nothing.
 const SWEPT_BY_NAME_RE = /_(?:view|core|painter)\.ts$/;
 
 // The host surface this sweep looks for. It takes several patterns rather than
@@ -1125,10 +1136,12 @@ describe('src/ui module classification (every module is swept by exactly one gat
     // pin here would stay green.
     expect(residual).toContain(join(repoRoot, 'src/ui/i18n.resolved.generated/en.ts'));
     expect(residual.filter((f) => f.includes('i18n')).length).toBeGreaterThan(50);
-    // A *_window.ts painter stays in THIS sweep's domain on purpose. The painter
-    // gate matches *_painter.ts only (findUiPainters in hud_perf_budget.test.ts),
-    // so adding _window to SWEPT_BY_NAME_RE would drop every window painter out of
-    // BOTH gates rather than hand it to the other one.
+    // A *_window.ts painter stays in THIS sweep's domain on purpose, and is swept by
+    // the painter gate as well (PAINTER_FILE_RE in hud_perf_budget.test.ts matches
+    // both sanctioned painter names). The double coverage is the design: that gate
+    // owns its layout-read and frame-driver contract, this one owns the DOM-module
+    // classification. Adding _window to SWEPT_BY_NAME_RE would drop 35 modules out of
+    // this sweep and buy nothing, since the other gate already has them.
     expect(SWEPT_BY_NAME_RE.test('src/ui/hud/vendor/vendor_window.ts')).toBe(false);
     expect(residual).toContain(join(repoRoot, 'src/ui/hud/vendor/vendor_window.ts'));
   });

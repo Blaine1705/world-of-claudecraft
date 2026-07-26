@@ -84,9 +84,11 @@ Per-frame HUD code (anything reached from `Hud.update()`) holds these:
 - **The perf gate.** `scripts/perf_tour.mjs` (run per per-frame phase against the recorded
   baseline) asserts `frameP95 <= baseline` and a bounded AoE-burst FCT node count; each
   green-gate commit is TAGGED so a cumulative regression bisects. The STANDING vitest budget
-  is `tests/hud_perf_budget.test.ts`, split by host: it scans every hot painter for raw writes
-  AND per-frame forced-reflow layout reads (`offsetWidth`/`getBoundingClientRect`/..., the
-  layout-thrash killer); drives the non-pooled painters through a `makeWriterFacet` loop
+  is `tests/hud_perf_budget.test.ts`, split by host: it scans every painter under both
+  sanctioned names for raw writes AND forced-reflow layout reads
+  (`offsetWidth`/`getBoundingClientRect`/`getComputedStyle`/..., the layout-thrash killer, and
+  note that this tree calls `getComputedStyle` BARE, never as a member); drives the non-pooled
+  painters through a `makeWriterFacet` loop
   asserting establishing-write + elision for BOTH a Sim- and a `ClientWorld`-shaped input; and
   (gated behind `HUD_PERF_BUDGET_TOUR=1`) asserts on EVERY viewport the run-length-INDEPENDENT
   elision-bypass COUNT `hudHotDomWrites` at or below the committed baseline anchor (a COUNT,
@@ -188,10 +190,26 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
   escaping the purity scan. Register it in the `UI_PURE_CORES` allowlist there. Test it
   same-input-same-output against BOTH a Sim- and a `ClientWorld`-shaped stub.
 - **Thin painter** `src/ui/<name>_window.ts` (or `_painter.ts`): paints/updates nodes and wires
-  callbacks via an injected `deps` object; owns no state and never imports `Hud`. ALL DOM writes
-  go through the `PainterHost` elided writers; it drives tokens / CSS vars, never a literal
-  hex/px/color in TS (the per-painter no-magic-values source guard). Interpolated names pass
-  through `esc()`; a pure extraction reuses existing `t()` keys and adds none.
+  callbacks via an injected `deps` object; owns no state and never imports `Hud`. It drives
+  tokens / CSS vars, never a literal hex/px/color in TS (the per-painter no-magic-values source
+  guard). Interpolated names pass through `esc()`; a pure extraction reuses existing `t()` keys
+  and adds none. BOTH names are swept by the painter gate (`tests/hud_perf_budget.test.ts`,
+  `PAINTER_FILE_RE`), which sorts every painter into exactly one of three buckets:
+  - **facet-routed** (`HOT_PAINTERS`): a per-frame painter. ALL its DOM writes go through the
+    `PainterHost` elided writers, and it makes no forced-reflow layout read. Both are scanned
+    with EXACT per-token counts, so a raw `el.textContent =` / `style.*` / `setAttribute` /
+    `innerHTML` fails unless it is a documented build-time exception.
+  - **canvas** (`CANVAS_PAINTERS`): draws to a 2D context under the cadence + cached-token
+    regime. Same two scans with its own counted exceptions, plus an identity proof (it must
+    name a 2D context type AND actually draw on one), so the list cannot be used to park a
+    DOM module outside both gates.
+  - **cold**, the DEFAULT for a `*_window.ts` and needing no registration: a window rendered
+    on open / refresh. Write-elision is a per-frame contract and deliberately does not apply
+    (a count over a once-per-open rebuild fails on ordinary edits and misses the real hazard),
+    but the two cadence-independent halves do: **no forced-reflow layout read** and **no
+    per-frame driver of its own** (`requestAnimationFrame`, or a `setInterval` beyond a
+    documented, counted allowance recording its cadence). A window that genuinely goes
+    per-frame moves into `HOT_PAINTERS` and takes the raw-write scan with it.
 - **Neither of the two?** A **painter-side helper**, and it is a LAST RESORT: if the DOM touch can
   live in the painter, it must. A helper is for logic a painter needs that cannot be a pure core
   (it has to touch the DOM) and is not itself a painter. Register it in `UI_PAINTER_HELPERS`
@@ -203,9 +221,9 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
   EVERY other `src/ui` module too: one that reaches a host (a browser global, a browser-only API,
   the wall clock, an RNG) is registered in `UI_DOM_MODULES`, and anything unregistered must reach
   no host at all. So a new module cannot escape both completeness sweeps by being named neither
-  `*_view`/`*_core` nor `*_painter`. Note where a `<name>_window.ts` painter lands: the painter
-  perf gate matches `*_painter.ts` only, so a window painter is classified by this sweep like any
-  other module and is registered in `UI_DOM_MODULES` once it touches `document`.
+  `*_view`/`*_core` nor `*_painter`. A `<name>_window.ts` painter is covered TWICE on purpose:
+  the painter gate holds its cold contract (above), and this sweep still classifies it as a
+  module, so it is registered in `UI_DOM_MODULES` once it touches `document`.
 - **For chrome:** satisfy the HUD-chrome WCAG 2.2 AA contract above; mark the window root with
   `markDialogRoot` (`src/ui/dialog_root.ts`): role=dialog + aria-modal + exactly ONE accessible
   name (labelledBy wins and clears aria-label), cold-path raw `setAttribute` BY DESIGN (not
