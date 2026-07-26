@@ -423,6 +423,29 @@ describe('auto_attack rangedSwing: Auto Shot vs Wand', () => {
       events.some((e) => e.type === 'damage' && e.ability === 'Wand' && e.school === 'arcane'),
     ).toBe(true);
   });
+
+  it('a dodgy target does not dodge Auto Shot outside melee range', () => {
+    const { sim, p } = makeSim('hunter', 30);
+    const targetPid = sim.addPlayer('rogue', 'Dodgy');
+    const target = sim.entities.get(targetPid);
+    if (target?.kind !== 'player') throw new Error('test target missing');
+    target.pos = { x: p.pos.x, y: p.pos.y, z: p.pos.z + 20 };
+    target.dodgeChance = 1;
+    target.stats = { ...target.stats, armor: 0 };
+    p.rangedPower = 0;
+    p.critChance = 0;
+    const events = capture(sim);
+
+    rangedSwing(sim.ctx, p, target, { min: 10, max: 10, speed: 2 });
+    landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot');
+
+    const shot = events.find(
+      (e): e is DamageEvent => isDamageEvent(e) && e.ability === 'Auto Shot',
+    );
+    expect(shot?.kind).toBe('hit');
+    expect(shot?.amount).toBeGreaterThan(0);
+    expect(events.some((e) => e.type === 'damage' && e.kind === 'dodge')).toBe(false);
+  });
 });
 
 describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
