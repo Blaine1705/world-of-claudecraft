@@ -93,6 +93,14 @@ type DisplayGlobalKey = Exclude<
   | 'paladinDawnEcho'
   | 'paladinDawnEchoDevotion'
   | 'paladinPerpetualSun'
+  // Rogue v0.29 rows: bespoke mechanics whose options carry hand-authored
+  // descriptions (docs/design/rogue-v029-class-design.md), never generated
+  // stat labels.
+  | 'onKillCombo'
+  | 'onKillVanishReset'
+  | 'secondShadowPct'
+  | 'duskEconomyPct'
+  | 'foulPlayGuard'
 >;
 
 const NON_DISPLAY_GLOBALS = new Set<GlobalKey>([
@@ -130,6 +138,11 @@ const NON_DISPLAY_GLOBALS = new Set<GlobalKey>([
   'paladinDawnEcho',
   'paladinDawnEchoDevotion',
   'paladinPerpetualSun',
+  'onKillCombo',
+  'onKillVanishReset',
+  'secondShadowPct',
+  'duskEconomyPct',
+  'foulPlayGuard',
 ]);
 
 export interface TalentLocaleText {
@@ -10692,7 +10705,8 @@ type DescribedAddedEffect = Extract<
       | 'extendDot'
       | 'interrupt'
       | 'consumeDot'
-      | 'selfBuff';
+      | 'selfBuff'
+      | 'debuffTargetSource';
   }
 >;
 
@@ -10706,7 +10720,8 @@ function assertDescribedAddedEffect(effect: AbilityEffect): asserts effect is De
     effect.type !== 'extendDot' &&
     effect.type !== 'interrupt' &&
     effect.type !== 'consumeDot' &&
-    effect.type !== 'selfBuff'
+    effect.type !== 'selfBuff' &&
+    effect.type !== 'debuffTargetSource'
   ) {
     throw new Error(`Unsupported talent rider effect: ${effect.type}`);
   }
@@ -10742,12 +10757,21 @@ function addedEffectDescription(
     case 'consumeDot':
       return `${name} -> ${abilityName(effect.dot)}: ${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s.`;
     case 'selfBuff': {
+      // Ghostfoot Ward's shield_wall is a damage CUT, so it renders negative and
+      // names the stat (rogue v0.29). Every other rider is a straight buff, and
+      // buff_haste / buff_speed carry a multiplier (1.15), so they show the delta.
+      if (effect.kind === 'shield_wall') {
+        return `${name}: -${formatPercent(effect.value, lang)} ${text.statLabels.damage} (${seconds(effect.duration, lang)}).`;
+      }
       const value =
         effect.kind === 'buff_haste' || effect.kind === 'buff_speed'
           ? effect.value - 1
           : effect.value;
       return `${name}: +${formatPercent(value, lang)} (${seconds(effect.duration, lang)}).`;
     }
+    // Marked Prey / Grave Brand: a vulnerability brand on the target.
+    case 'debuffTargetSource':
+      return `${name}: +${formatPercent(effect.value, lang)} ${text.statLabels.damage} (${seconds(effect.duration, lang)}).`;
   }
 }
 

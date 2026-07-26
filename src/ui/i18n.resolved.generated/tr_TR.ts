@@ -1631,6 +1631,12 @@ export const tr_TR: EnTranslations = {
       "radiantResonance": "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
       "solarReprisal": "Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant",
       "dawnsWrath": "HoW: all HP · +1 use · CD 0 · +{pct}% DMG",
+      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
+      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
+      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
+      "veiledEdge": "Your next Lurker's Strike strikes for double",
+      "duskEconomy": "Abilities cost {pct}% less energy",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "sp": "Büyü gücünü {value} artırır",
@@ -8108,6 +8114,10 @@ export const tr_TR: EnTranslations = {
         "name": "Eter Kuyusu",
         "description": "Restaura manayı rápidamente. (büyücü yeteneği)"
       },
+      "flurry_of_knives": {
+        "name": "Bıçak Sağanağı",
+        "description": "Fırlatma bıçaklarıyla 6 m içindeki tüm düşmanları biçer, {damage} fiziksel hasar verir ve 2 kombo puanı kazandırır. (Haydut yeteneği)"
+      },
       "frenzied_regeneration": {
         "name": "Yaban Onarımı",
         "description": "10 sn. boyunca 180 sağlık yeniler. Yalnızca Ayı Formunda kullanılabilir. (Druid yeteneği)"
@@ -8268,9 +8278,33 @@ export const tr_TR: EnTranslations = {
         "name": "Büyü Kilidi",
         "description": "Hedefi kullanım sırasında susturur ve 5 saniye boyunca o okuldan atış yapılmasını engeller."
       },
+      "thieves_chorus": {
+        "name": "Hırsızlar Korosu",
+        "description": "Islıkla verilen işaret grubu coşturur: saldırı, büyü ve kanal hızı 10 sn boyunca %10 artar. Yakın zamanda grup hızlandırması alan müttefikler yararlanamayacak kadar bitkindir. (Haydut yeteneği)"
+      },
       "tranquility": {
         "name": "Koru Şarkısı",
         "description": "4 sn. boyunca iyileştirici enerji yönlendirir ve 30 m içindeki müttefikleri her saniye 42 ile 52 iyileştirir. (Druid yeteneği)"
+      },
+      "venom_dart": {
+        "name": "Zehirli Dart",
+        "description": "Zehirli bir dart fırlatarak {damage} doğa hasarı verir. 1 kombo puanı kazandırır. Knifework: Zehir Yarığı yaranızı 6 sn uzatır, en fazla 20 sn."
+      },
+      "body_blow": {
+        "name": "Gövde Darbesi",
+        "description": "Silah hasarının %130’u artı 10 vuran, 2 kombo puanı kazandıran ve Redline’ı bir kademe derinleştiren ağır bir darbe. (Thuggery motoru)"
+      },
+      "knockout_blow": {
+        "name": "Nakavt Darbesi",
+        "description": "Redline’ı nakavtla bitirir: 45 artı kombo puanı başına 35 vurur, her Redline kademesinde %25 daha sert olur ve 25 enerji geri kazandırır. (Thuggery motoru)"
+      },
+      "veilstrike": {
+        "name": "Perde Vuruşu",
+        "description": "Alacakaranlık birikimini tüketerek 6 sn boyunca gölgeye bürünürsün: gizlilik açılışların açıkta çalışır ve %25 daha fazla hasar verirsin. (Skulduggery motoru)"
+      },
+      "venomrend": {
+        "name": "Zehir Yarığı",
+        "description": "Zehir Ayinini tüketir: 22 artı kombo puanı başına 26 hasar vurur, kanamalarının kalan hasarını patlatır ve 25 enerji yeniler. (Knifework motoru)"
       },
       "typhoon": {
         "name": "Tayfun",

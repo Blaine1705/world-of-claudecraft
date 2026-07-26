@@ -19,6 +19,7 @@ import type { Entity } from '../types';
 import { convergenceOnCast } from './convergence';
 import { combustionRestokesCinderfall, PERSONAL_BARRIER_IDS } from './fire_mage';
 import { priestOnCastCompleted } from './priest/talents';
+import { rogueEngineOnCast } from './rogue_engines';
 import { onShamanCastCompleted } from './shaman_talents';
 
 function state(player: Entity): NonNullable<Entity['procState']> {
@@ -193,6 +194,9 @@ export function onCastCompleted(
   // Phoenix Trance restokes one Cinderfall charge (designer rule 2026-07-25);
   // same reasoning: the one seam every completed cast passes. Draws no rng.
   combustionRestokesCinderfall(ctx, player, abilityId);
+  // Rogue spec engines (combat/rogue_engines.ts): Skulduggery banks Gloam
+  // from Duskveil openers and the Red Ribbon rhythm. Same funnel, no rng.
+  rogueEngineOnCast(ctx, player, abilityId, target);
   if (wasEmpowered) return;
   for (const def of procsFor(ctx, player)) {
     const trigger = def.trigger;

@@ -993,6 +993,27 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.name': 'Trượt Bóng',
   'entities.abilities.silence.name': 'Câm Lặng',
   'entities.abilities.tranquility.name': 'Khúc Ca Rừng Thưa',
+  'entities.abilities.flurry_of_knives.name': 'Loạt Dao Xoáy',
+  'entities.abilities.flurry_of_knives.description':
+    'Quất tất cả kẻ địch trong vòng 6 m bằng dao phóng, gây {damage} sát thương vật lý và nhận 2 điểm liên hoàn. (thiên phú Đạo tặc)',
+  'entities.abilities.thieves_chorus.name': 'Hợp Xướng Đạo Tặc',
+  'entities.abilities.thieves_chorus.description':
+    'Tiếng huýt sáo hiệu lệnh thúc giục cả nhóm: tốc độ đánh, niệm chú và duy trì tăng 10% trong 10 giây. Đồng minh vừa nhận hiệu ứng tăng tốc nhóm quá kiệt sức để hưởng lợi. (thiên phú Đạo tặc)',
+  'entities.abilities.venomrend.name': 'Xé Độc',
+  'entities.abilities.venomrend.description':
+    'Nuốt trọn Nghi Thức Độc: đánh 22 cộng 26 mỗi điểm liên hoàn, kích nổ sát thương còn lại của các vết chảy máu và hồi 25 năng lượng. (động cơ Knifework)',
+  'entities.abilities.veilstrike.name': 'Đòn Màn Che',
+  'entities.abilities.veilstrike.description':
+    'Nuốt trọn kho U Ám để phủ bóng tối lên người trong 6 giây: các đòn mở màn ẩn thân dùng được giữa chốn đông người và bạn gây thêm 25% sát thương. (động cơ Skulduggery)',
+  'entities.abilities.body_blow.name': 'Đòn Thân',
+  'entities.abilities.body_blow.description':
+    'Một đòn nặng gây 130% sát thương vũ khí cộng 10, cho 2 điểm liên hoàn và làm sâu thêm Redline một nấc. (động cơ Thuggery)',
+  'entities.abilities.knockout_blow.name': 'Đòn Nốc Ao',
+  'entities.abilities.knockout_blow.description':
+    'Kết thúc Redline bằng cú nốc ao: đánh 45 cộng 35 mỗi điểm liên hoàn, mạnh hơn 25% mỗi nấc Redline, và hồi 25 năng lượng. (động cơ Thuggery)',
+  'entities.abilities.venom_dart.name': 'Phi Tiêu Độc',
+  'entities.abilities.venom_dart.description':
+    'Búng một phi tiêu tẩm độc gây {damage} sát thương tự nhiên. Cho 1 điểm liên hoàn. Knifework: kéo dài vết thương Xé Độc của bạn thêm 6 giây, tối đa 20 giây.',
   'entities.abilities.smoke_screen.name': 'Màn Khói',
   'entities.abilities.smoke_screen.description':
     'Bạn biến mất trong đám khói, tăng 30% khả năng né tránh trong 8 giây.',

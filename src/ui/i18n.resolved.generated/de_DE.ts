@@ -1631,6 +1631,12 @@ export const de_DE: EnTranslations = {
       "radiantResonance": "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
       "solarReprisal": "Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant",
       "dawnsWrath": "HoW: all HP · +1 use · CD 0 · +{pct}% DMG",
+      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
+      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
+      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
+      "veiledEdge": "Your next Lurker's Strike strikes for double",
+      "duskEconomy": "Abilities cost {pct}% less energy",
       "increase": {
         "ap": "Erhöht Angriffskraft um {value}",
         "sp": "Erhöht die Zaubermacht um {value}",
@@ -8108,6 +8114,10 @@ export const de_DE: EnTranslations = {
         "name": "Ätherbrunnen",
         "description": "Restaura Mana rápidamente. (Magier-Talent)"
       },
+      "flurry_of_knives": {
+        "name": "Messerhagel",
+        "description": "Peitscht alle Gegner im Umkreis von 6 m mit Wurfmessern, verursacht {damage} körperlichen Schaden und gewährt 2 Combopunkte. (Schurkentalent)"
+      },
       "frenzied_regeneration": {
         "name": "Wilde Heilung",
         "description": "Stellt im Verlauf von 10 Sek. 180 Gesundheit wieder her. Nur in Bärengestalt. (Druidentalent)"
@@ -8268,9 +8278,33 @@ export const de_DE: EnTranslations = {
         "name": "Schweigegebot",
         "description": "Bringt das Ziel mitten im Zauberwirken zum Schweigen und hindert es 5 Sek. lang daran, Zauber dieser Schule zu wirken."
       },
+      "thieves_chorus": {
+        "name": "Chor der Diebe",
+        "description": "Ein gepfiffenes Signal spornt eure Gruppe an: Angriffs-, Zauber- und Kanalisierungstempo für 10 Sek. um 10% erhöht. Verbündete, die kürzlich einen Gruppentempo-Schub erhielten, sind zu erschöpft, um zu profitieren. (Schurkentalent)"
+      },
       "tranquility": {
         "name": "Hainlied",
         "description": "Kanalisiert 4 Sek. lang heilende Energie und heilt Verbündete im Umkreis von 30 m jede Sekunde um 42 bis 52. (Druidentalent)"
+      },
+      "venom_dart": {
+        "name": "Giftpfeil",
+        "description": "Schnippt einen vergifteten Pfeil für {damage} Naturschaden. Gewährt 1 Combopunkt. Knifework: verlängert eure Giftriss-Wunde um 6 Sek., bis zu 20 Sek."
+      },
+      "body_blow": {
+        "name": "Körpertreffer",
+        "description": "Ein wuchtiger Treffer für 130% Waffenschaden plus 10, der 2 Combopunkte gewährt und die Redline um eine Stufe vertieft. (Thuggery-Engine)"
+      },
+      "knockout_blow": {
+        "name": "K.o.-Schlag",
+        "description": "Beendet die Redline mit einem K.o.: trifft für 45 plus 35 pro Combopunkt, pro Redline-Stufe 25% härter, und stellt 25 Energie wieder her. (Thuggery-Engine)"
+      },
+      "veilstrike": {
+        "name": "Schleierstoß",
+        "description": "Verzehrt den Düstervorrat und hüllt euch 6 Sek. lang in Schatten: eure Schleichangriffe funktionieren im Offenen und ihr verursacht 25% mehr Schaden. (Skulduggery-Engine)"
+      },
+      "venomrend": {
+        "name": "Giftriss",
+        "description": "Verzehrt das Giftritual: trifft für 22 plus 26 pro Combopunkt, bringt den Restschaden eurer Blutungen zur Detonation und stellt 25 Energie wieder her. (Knifework-Engine)"
       },
       "typhoon": {
         "name": "Taifun",

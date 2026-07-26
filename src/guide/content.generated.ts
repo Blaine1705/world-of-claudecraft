@@ -1012,6 +1012,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "kick",
         "name": "Boot"
+      },
+      {
+        "id": "venom_dart",
+        "name": "Venom Dart"
       }
     ],
     "model": "player_rogue",

@@ -1008,6 +1008,27 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.name': 'Skuggkliv',
   'entities.abilities.silence.name': 'Tystnad',
   'entities.abilities.tranquility.name': 'Gläntsång',
+  'entities.abilities.flurry_of_knives.name': 'Knivstorm',
+  'entities.abilities.flurry_of_knives.description':
+    'Piskar alla fiender inom 6 m med kastknivar, vållar {damage} fysisk skada och ger 2 kombopoäng. (skurktalang)',
+  'entities.abilities.thieves_chorus.name': 'Tjuvarnas kör',
+  'entities.abilities.thieves_chorus.description':
+    'En visslad signal sporrar din grupp: attack-, besvärjelse- och kanaliseringstakt ökad med 10% i 10 sek. Allierade som nyligen fått en grupphastighetsvåg är för utmattade för att gynnas. (skurktalang)',
+  'entities.abilities.venomrend.name': 'Giftrivning',
+  'entities.abilities.venomrend.description':
+    'Förtär Giftritualen: slår för 22 plus 26 per kombopoäng, detonerar dina blödningars återstående skada och återställer 25 energi. (Knifework-motorn)',
+  'entities.abilities.veilstrike.name': 'Slöjhugg',
+  'entities.abilities.veilstrike.description':
+    'Förtär Skymningsförrådet och sveper dig i skugga i 6 sek: dina smygöppnare fungerar i det öppna och du gör 25% mer skada. (Skulduggery-motorn)',
+  'entities.abilities.body_blow.name': 'Kroppsslag',
+  'entities.abilities.body_blow.description':
+    'Ett tungt slag för 130% vapenskada plus 10 som ger 2 combopoäng och fördjupar Redline med ett steg. (Thuggery-motorn)',
+  'entities.abilities.knockout_blow.name': 'Knockoutslag',
+  'entities.abilities.knockout_blow.description':
+    'Avsluta Redline med en knockout: slår för 45 plus 35 per combopoäng, 25% hårdare per Redline-steg, och återställer 25 energi. (Thuggery-motorn)',
+  'entities.abilities.venom_dart.name': 'Giftpil',
+  'entities.abilities.venom_dart.description':
+    'Slungar en förgiftad pil för {damage} naturskada. Ger 1 combopoäng. Knifework: förlänger ditt Giftrivning-sår med 6 sek, upp till 20 sek.',
   'entities.abilities.smoke_screen.name': 'Rökridå',
   'entities.abilities.smoke_screen.description':
     'Du försvinner i ett rökmoln, vilket ökar din chans att undvika med 30 % i 8 sek.',

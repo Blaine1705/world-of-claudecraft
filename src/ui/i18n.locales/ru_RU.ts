@@ -302,9 +302,30 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.name': 'Психический крик',
   'entities.abilities.shadowstep.name': 'Теневой шаг',
   'entities.abilities.silence.name': 'Безмолвие',
+  'entities.abilities.venomrend.name': 'Ядовитый разрыв',
+  'entities.abilities.venomrend.description':
+    'Поглощает Ритуал яда: наносит 22 плюс 26 за каждое очко серии приемов, подрывает оставшийся урон ваших кровотечений и восстанавливает 25 ед. энергии. (механика Knifework)',
+  'entities.abilities.veilstrike.name': 'Удар завесы',
+  'entities.abilities.veilstrike.description':
+    'Поглощает запас Сумрака, окутывая вас тенью на 6 сек.: ваши скрытные приемы открытия работают в открытую, и вы наносите на 25% больше урона. (механика Skulduggery)',
+  'entities.abilities.body_blow.name': 'Удар по корпусу',
+  'entities.abilities.body_blow.description':
+    'Тяжелый удар, наносящий 130% урона от оружия плюс 10, дающий 2 очка серии приемов и углубляющий Redline на одно деление. (механика Thuggery)',
+  'entities.abilities.knockout_blow.name': 'Нокаутирующий удар',
+  'entities.abilities.knockout_blow.description':
+    'Завершите Redline нокаутом: наносит 45 плюс 35 урона за каждое очко серии приемов, на 25% сильнее за каждое деление Redline, и восстанавливает 25 энергии. (механика Thuggery)',
+  'entities.abilities.venom_dart.name': 'Ядовитый дротик',
+  'entities.abilities.venom_dart.description':
+    'Метает отравленный дротик, нанося {damage} урона от сил природы. Дает 1 очко серии приемов. Knifework: продлевает вашу рану от «Ядовитого разрыва» на 6 сек, но не дольше 20 сек.',
   'entities.abilities.smoke_screen.name': 'Дымовая завеса',
   'entities.abilities.smoke_screen.description':
     'Вы скрываетесь в облаке дыма, повышая шанс уклонения на 30% на 8 сек.',
+  'entities.abilities.flurry_of_knives.name': 'Вихрь ножей',
+  'entities.abilities.flurry_of_knives.description':
+    'Осыпает метательными ножами всех врагов в радиусе 6 м, нанося {damage} ед. физического урона и давая 2 очка серии приемов. (талант разбойника)',
+  'entities.abilities.thieves_chorus.name': 'Хор воров',
+  'entities.abilities.thieves_chorus.description':
+    'Условный свист подстегивает вашу группу, увеличивая скорость атаки, произнесения заклинаний и поддержания на 10% на 10 сек. Союзники, недавно получившие групповое ускорение, слишком истощены, чтобы получить эффект. (талант разбойника)',
   'entities.abilities.spellsteal.name': 'Похищение чар',
   'entities.abilities.spellsteal.description':
     'Похищает один положительный магический эффект у противника и переносит его на вас.',
@@ -597,6 +618,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_hourglass.name': 'Песочные часы остановки',
   'entities.abilities.temporal_hourglass.description':
     'Помещает временные песочные часы в выбранную точку. Под врагом они останавливают его на {hostilePveDuration} сек. в PvE или на {hostilePvpDuration} сек. в PvP; любой урон снимает эффект. Под вами или союзником из группы они создают стазис на {duration} сек., защищают от урона, запрещают действовать и восстанавливают {healing}% максимального здоровья. Ваши способности восстанавливаются на {selfCooldownRecovery}% быстрее, а способности союзника на {allyCooldownRecovery}% быстрее. На пустой земле часы ждут {groundDuration} сек. и воздействуют на первую допустимую цель, которая на них наступит. Положительный эффект можно снять вручную.',
+  'hudChrome.auraEffect.venomRitual':
+    'Ядовитый ритуал: этап {stacks} из {max}. Атаки-накопители добавляют этапы; на этапе {max} «Вечный сон» превращается в «Ядовитый разрыв»',
+  'hudChrome.auraEffect.gloam':
+    'Сумрак: этап {stacks} из {max}. На этапе {max} «Сумеречная завеса» превращается в «Удар завесы»',
+  'hudChrome.auraEffect.redline':
+    'Redline: деление {stacks} из {max}. «Удар по корпусу» добавляет деления; «Нокаутирующий удар» бьет на {pct}% сильнее за каждое деление и закрывает окно. Истекшее окно пропадает впустую',
+  'hudChrome.auraEffect.veilstrikeWindow':
+    'Окутан тенью: скрытные приемы можно использовать в открытую с любого угла, наносимый урон увеличен на {pct}%',
+  'hudChrome.auraEffect.veiledEdge': 'Следующий «Удар скрытня» нанесет двойной урон',
+  'hudChrome.auraEffect.duskEconomy': 'Способности стоят на {pct}% меньше энергии',
   'hudChrome.auraEffect.temporalHourglass':
     'Невосприимчивость к урону и невозможность действовать; восстанавливает здоровье и ускоряет способности. Щелкните правой кнопкой, чтобы отменить.',
   'hudChrome.auth.appleLoginCta': 'Продолжить с Apple',

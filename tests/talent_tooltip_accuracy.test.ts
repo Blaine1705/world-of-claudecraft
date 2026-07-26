@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, it } from 'vitest';
+import { DUSK_ECONOMY_LINGER_SEC } from '../src/sim/combat/rogue_talents';
 import { CHOICE_ROWS } from '../src/sim/content/choice_rows';
 import { ABILITIES } from '../src/sim/content/classes';
 import { ROW_TREES, TALENTS } from '../src/sim/content/talents';
@@ -276,6 +277,10 @@ const PCT_FIELDS = new Set([
   'paladinRecurringGrace',
   'paladinDivinePurposeChance',
   'paladinDawnEcho',
+  // Rogue v0.29 rows: Dusk Economy's cost cut ("50%") and Second Shadow's
+  // finisher echo fraction ("40%").
+  'duskEconomyPct',
+  'secondShadowPct',
 ]);
 
 function expectedTokens(effect: unknown): string[] {
@@ -316,6 +321,21 @@ function expectedTokens(effect: unknown): string[] {
       if (shapedAura.duration) toks.push(`${+shapedAura.duration.toFixed(1)}`);
       return;
     }
+    // Fraction-valued rider effects (Ghostfoot Ward's shield_wall damage cut,
+    // Marked Prey's vulnerability, Deathmark's source brand): the stated number
+    // is the percentage. The rider's duration may simply ride its host buff, so
+    // it is legitimate in copy but not required (see legitNumbers).
+    const shapedRider = obj as { type?: string; kind?: string; value?: number };
+    if (
+      (shapedRider.type === 'selfBuff' || shapedRider.type === 'debuffTargetSource') &&
+      (shapedRider.kind === 'shield_wall' ||
+        shapedRider.kind === 'vulnerability' ||
+        shapedRider.kind === 'vuln_source') &&
+      typeof shapedRider.value === 'number'
+    ) {
+      toks.push(`${+(shapedRider.value * 100).toFixed(1)}%`);
+      return;
+    }
     for (const [key, value] of Object.entries(obj)) {
       if (typeof value === 'number') {
         if (value === 0) continue;
@@ -329,6 +349,12 @@ function expectedTokens(effect: unknown): string[] {
         // divineAscension case (the exported paladin_devotion constants), so the
         // stated numbers are intrinsic, not this 1.
         if (key === 'ascensionRush' || key === 'ascensionWard') continue;
+        // Kill Chain's Smokestep refresh and Foul Play's CC guard are
+        // picked/not-picked flags too; their copy is behavioral, not numeric.
+        if (key === 'onKillVanishReset' || key === 'foulPlayGuard') continue;
+        // costPct -1 means the ability costs nothing; tooltips say "cost no
+        // energy" rather than "100% less".
+        if (key === 'costPct' && value === -1) continue;
         // A +50% spell or heal crit-damage mastery lifts the 1.5x base to 2.0x, which the
         // hand-written descriptions phrase as "double" rather than "50%".
         if ((key === 'critDmgSpellPct' || key === 'critDmgHealPct') && value === 0.5) {
@@ -402,6 +428,20 @@ function legitNumbers(effect: unknown): Set<number> {
       if (shapedAura.duration) add(shapedAura.duration, false);
       return;
     }
+    // Fraction-valued rider effects (see expectedTokens): percentage plus an
+    // optional stated duration are both legitimate.
+    const shapedRider = obj as { type?: string; kind?: string; value?: number; duration?: number };
+    if (
+      (shapedRider.type === 'selfBuff' || shapedRider.type === 'debuffTargetSource') &&
+      (shapedRider.kind === 'shield_wall' ||
+        shapedRider.kind === 'vulnerability' ||
+        shapedRider.kind === 'vuln_source') &&
+      typeof shapedRider.value === 'number'
+    ) {
+      add(shapedRider.value, true);
+      if (shapedRider.duration) add(shapedRider.duration, false);
+      return;
+    }
     for (const [key, value] of Object.entries(obj)) {
       if (typeof value === 'number') {
         if (key === 'battleRhythm') {
@@ -436,6 +476,11 @@ function legitNumbers(effect: unknown): Set<number> {
         // Second Wind regenerates only below the SECOND_WIND_THRESHOLD floor
         // (0.35 in combat/auras.ts): the 35% gate is intrinsic to the mechanic.
         if (key === 'secondWindPctPerSec') out.add(35);
+        // Second Shadow fires only from a full 5-combo finisher: the gate is
+        // intrinsic to the mechanic (effect_dispatch.ts), so copy may state 5.
+        if (key === 'secondShadowPct') out.add(5);
+        // Dusk Economy lingers DUSK_ECONOMY_LINGER_SEC after leaving stealth.
+        if (key === 'duskEconomyPct') out.add(DUSK_ECONOMY_LINGER_SEC);
         // Combat Mastery is a flag; the per-stance riders are the exported
         // STANCE_MASTERY_* constants the sim applies at runtime.
         if (key === 'stanceMastery') {

@@ -127,6 +127,12 @@ import {
 import { paladinManaCostMultiplier } from './paladin_support';
 import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { hasTithefiendTarget } from './priest/vespers';
+import {
+  detonatorFreeMultiplier,
+  gloamBankArmed,
+  veilAllowsStealthAbilities,
+} from './rogue_engines';
+import { combineCostMultipliers, duskCostMultiplier } from './rogue_talents';
 import { onShamanManaSpent, shamanCastTimeMultiplier, shamanManaCost } from './shaman_talents';
 import { resolveUnleashWeaponTarget, unleashWeaponCastError } from './shaman_unleash_weapon';
 import { onStormcastConsumed, STORMCAST_CHEAP_ID, STORMCAST_ID } from './shaman_warspirit';
@@ -742,10 +748,14 @@ export function castAbility(
       (aura.empowerAbilities === undefined || aura.empowerAbilities.includes(ability.id)),
   );
   const freeBySolarReprisal = solarReprisalMakesAbilityFree(p, ability.id);
-  const cheapMultiplier = nextCastCheapMultiplier(p, ability.id);
-  // Both class discounts compose: each is the identity for the other class, so the
-  // order only matters for a caster that somehow held both (shaman subtracts, then
-  // paladin scales what is left).
+  // The rogue discounts (Dusk Economy, the free Gloam detonator) fold beside the
+  // empower-cheap multiplier first; the shaman and paladin mana shaping then applies
+  // to the result below. All three are the identity for the other classes, so the
+  // order only matters for a caster that somehow held more than one.
+  const cheapMultiplier = combineCostMultipliers(
+    combineCostMultipliers(nextCastCheapMultiplier(p, ability.id), duskCostMultiplier(ctx, p)),
+    detonatorFreeMultiplier(ctx, p, ability.id),
+  );
   const discountedCost =
     cheapMultiplier === null ? res.cost : Math.ceil(res.cost * cheapMultiplier);
   const shamanAdjustedCost = shamanManaCost(ctx, p, discountedCost);
@@ -821,7 +831,15 @@ export function castAbility(
     ctx.error(p.id, "You can't do that while shapeshifted.");
     return;
   }
-  if (ability.requiresStealth && !p.auras.some((a) => a.kind === 'stealth')) {
+  if (
+    ability.requiresStealth &&
+    !res.ignoreStealthRequirement &&
+    !veilAllowsStealthAbilities(p) &&
+    // A full Gloam bank unlocks the openers in the open: the cast that goes
+    // through is the detonation (rogueGloamDetonation at runEffects).
+    !gloamBankArmed(p) &&
+    !p.auras.some((a) => a.kind === 'stealth')
+  ) {
     ctx.error(p.id, 'You must be stealthed.');
     return;
   }
@@ -954,6 +972,13 @@ export function castAbility(
           ctx.error(p.id, 'You must wield a dagger.');
           return;
         }
+        // Shadow-wreathed (or about to detonate a full Gloam bank), the
+        // strike comes from nowhere: the veil waives the behind requirement
+        // like it waives stealth. Without it, a solo mob faces its attacker
+        // constantly and the veiled Lurker's Strike could never land (owner
+        // playtest). The armed-bank case covers the detonator itself, whose
+        // veil rises at runEffects, after this gate.
+        if (veilAllowsStealthAbilities(p) || gloamBankArmed(p)) continue;
         // Inside FACING_HOLD_DIST the target's facing is held steady (see
         // steadyAngleTo) and "behind" is undefined anyway, so overlapping the
         // target always reads as in front: no point-blank Backstab through a
@@ -1161,6 +1186,16 @@ export function castAbility(
       if (consumedCheapAura !== null) {
         res = { ...res, cost: Math.ceil(res.cost * consumedCheapAura.value) };
       }
+      // Dusk Economy and the free Gloam detonator apply here, at the ONE spot
+      // that mutates the billed cost for instants and channels. The
+      // empower-cheap charge is consumed above; these stateless discounts
+      // must not compound the same way, so they live only in this branch
+      // (and the affordability gate above).
+      const duskCheap = combineCostMultipliers(
+        duskCostMultiplier(ctx, p),
+        detonatorFreeMultiplier(ctx, p, ability.id),
+      );
+      if (duskCheap !== null) res = { ...res, cost: Math.ceil(res.cost * duskCheap) };
     }
   }
 

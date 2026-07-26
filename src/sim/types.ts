@@ -276,6 +276,18 @@ export type AuraKind =
   // no stat effect. While it rides, a target cannot benefit from another group haste
   // burst (aoeAllyHaste with exhaust), so the effects can never be chained.
   | 'sated'
+  // Dusk Economy linger (rogue row, combat/rogue_talents.ts): a pure marker worn
+  // for 6 sec after leaving Duskveil; while it rides, energy costs stay cut.
+  | 'dusk_economy'
+  // Rogue spec engines (combat/rogue_engines.ts): pure stage markers. The
+  // player owns each state; buttons transform off the stacks via
+  // actionReplacement (venom_ritual arms Venomrend, gloam arms Veilstrike),
+  // redline drives the Wicked Slash offhand echo window, and veiled_edge is
+  // the one-shot Lurker's Strike spike Veilstrike arms.
+  | 'venom_ritual'
+  | 'gloam'
+  | 'redline'
+  | 'veiled_edge'
   // Cauterize lockout (fire mage, combat/fire_mage.ts): a pure debuff marking that
   // the lethal save already fired. While worn, Cauterize cannot save again. It
   // SURVIVES death (resurrection.ts aurasSurvivingDeath) and pauses while dead, so
@@ -2365,6 +2377,14 @@ export interface AbilityRank {
   threatFlat?: number; // overrides the base threat.flat for this rank
 }
 
+// One transform-in-place rule: while the actor wears at least minStacks of the
+// aura kind, the base action resolves as abilityId (see combat/action_replacement.ts).
+export interface ActionReplacementRule {
+  abilityId: string;
+  auraKind: AuraKind;
+  minStacks?: number;
+}
+
 export interface AbilityDef {
   id: string;
   name: string;
@@ -2429,14 +2449,6 @@ export interface AbilityDef {
   // has not committed to a spec keeps the full kit, and talent/row GRANTS are
   // never filtered (the tree they come from is already spec-scoped).
   specs?: readonly string[];
-  // A known action may resolve to another authored ability while a visible aura
-  // state is active. The hotbar keeps the base id, so saved bindings survive the
-  // transformation. The replacement itself is never learned as a second action.
-  actionReplacement?: {
-    abilityId: string;
-    auraKind: AuraKind;
-    minStacks?: number;
-  };
   // Spec EXCLUSION (Reaver Strike vs Revenge): when set, a player whose CHOSEN
   // spec id is in the list DROPS this ability from their known list, even though
   // it is otherwise ungated. Used to swap one ability for a spec-exclusive
@@ -2511,6 +2523,13 @@ export interface AbilityDef {
   // full 5-stack Icicles buff). Absent means any presence of the aura suffices.
   // The whole aura is still consumed on cast (consumeAuraKind removes it).
   requiresAuraStacks?: number;
+  // A known action may resolve to another authored ability while a visible aura
+  // state is active. The hotbar keeps the base id, so saved bindings survive the
+  // transformation. The replacement itself is never learned as a second action.
+  // A list holds one rule per spec engine (the aura kinds are spec-gated, so at
+  // most one rule can match); the first matching rule wins.
+  // (Ported from the PR #2218 owned-classes infrastructure.)
+  actionReplacement?: ActionReplacementRule | ActionReplacementRule[];
   // Spend-ALL ability (Iron Resolve): `cost` is only the MINIMUM gate; the
   // actual bill is the caster's resource bar (capped by spendResourceCap when
   // set), snapshotted into the resolved cost at apply time so both the spend and

@@ -2,6 +2,7 @@ import type { ClassChoiceRows } from './talent_rows';
 
 const rogueBuilderAbilityIds = [
   'sinister_strike',
+  'body_blow', // Wicked Slash transformed inside the Redline window
   'backstab',
   'gouge',
   'ambush',
@@ -740,56 +741,43 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
   rows: [
     {
       level: 5,
-      theme: 'opening_rotation',
-      decision: 'Wicked Slash cadence vs Craven Thrust weave vs opener energy',
+      theme: 'movement',
+      decision: 'teleport strike vs kill momentum vs rotational speed',
       options: [
         {
-          id: 'rog_r5_relentless_strikes',
-          name: 'Ceaseless Cuts',
-          description: 'Every 3rd Wicked Slash restores 30 energy.',
+          id: 'rog_r5_shadeslip',
+          name: 'Shadeslip',
+          description: 'Grants Shadeslip.',
+          icon: 'shadowstep',
+          effect: { grant: { ability: 'shadowstep' } },
+        },
+        {
+          id: 'rog_r5_killers_pace',
+          name: "Killer's Pace",
+          description: 'Killing blows grant 40% movement speed for 6 sec.',
+          icon: 'sprint',
+          effect: { global: { onKillSpeedPct: 0.4 } },
+        },
+        {
+          id: 'rog_r5_slipstream',
+          name: 'Quickstep',
+          description:
+            'Landing Wicked Slash or Craven Thrust grants 20% movement speed for 2 sec. Once every 8 sec.',
           icon: 'sinister_strike',
           effect: {
             proc: {
-              id: 'rog_ceaseless_cuts',
-              name: 'Ceaseless Cuts',
-              trigger: { on: 'castNth', n: 3, abilities: ['sinister_strike'] },
-              responses: [{ kind: 'resource', amount: 30, resourceType: 'energy' }],
-            },
-          },
-        },
-        {
-          id: 'rog_r5_improved_backstab',
-          name: "Knife's Dividend",
-          description: 'Craven Thrust makes your next Dirt Nap within 6 sec cost 50% less energy.',
-          icon: 'backstab',
-          effect: {
-            proc: {
-              id: 'rog_improved_backstab',
-              name: "Knife's Dividend",
-              trigger: { on: 'castNth', n: 1, abilities: ['backstab'] },
+              id: 'rog_slipstream',
+              name: 'Quickstep',
+              trigger: { on: 'castNth', n: 1, abilities: ['sinister_strike', 'backstab'], icd: 8 },
               responses: [
                 {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_cheap',
-                  abilities: ['eviscerate'],
-                  duration: 6,
-                  costPct: 0.5,
+                  kind: 'aura',
+                  auraKind: 'buff_speed',
+                  value: 1.2,
+                  duration: 2,
+                  name: 'Quickstep',
                 },
               ],
-            },
-          },
-        },
-        {
-          id: 'rog_r5_opportunist',
-          name: 'Dusk Dividend',
-          description: "Using Lurker's Strike or Throat Wire restores 20 energy.",
-          icon: 'ambush',
-          effect: {
-            proc: {
-              id: 'rog_dusk_dividend',
-              name: 'Dusk Dividend',
-              trigger: { on: 'castNth', n: 1, abilities: ['ambush', 'garrote'] },
-              responses: [{ kind: 'resource', amount: 20, resourceType: 'energy' }],
             },
           },
         },
@@ -797,9 +785,31 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
     },
     {
       level: 8,
-      theme: 'control',
-      decision: 'evasive smoke vs Eye Jab follow-up vs Low Blow energy refund',
+      theme: 'defense',
+      decision: 'lethal insurance vs hardened Ghostfoot vs active cloud',
       options: [
+        {
+          id: 'rog_r8_borrowed_breath',
+          name: 'Borrowed Breath',
+          description:
+            'A blow that would kill you leaves you at 1 health instead. Once every 120 sec.',
+          icon: 'vanish',
+          effect: { global: { cheatDeathIcd: 120 } },
+        },
+        {
+          id: 'rog_r8_ghostfoot_ward',
+          name: 'Ghostfoot Ward',
+          description: 'Ghostfoot also reduces all damage you take by 30% while it is active.',
+          icon: 'evasion',
+          effect: {
+            ability: [
+              {
+                ability: 'evasion',
+                addEffects: [{ type: 'selfBuff', kind: 'shield_wall', value: 0.3, duration: 15 }],
+              },
+            ],
+          },
+        },
         {
           id: 'rog_r8_smoke_screen',
           name: 'Smoke Screen',
@@ -807,144 +817,125 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
           icon: 'smoke_screen',
           effect: { grant: { ability: 'smoke_screen' } },
         },
-        {
-          id: 'rog_r8_improved_gouge',
-          name: 'Blindside Opening',
-          description: 'Eye Jab makes your next Craven Thrust within 6 sec free.',
-          icon: 'gouge',
-          effect: {
-            proc: {
-              id: 'rog_blindside_opening',
-              name: 'Blindside Opening',
-              trigger: { on: 'castNth', n: 1, abilities: ['gouge'] },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_free',
-                  abilities: ['backstab'],
-                  duration: 6,
-                },
-              ],
-            },
-          },
-        },
-        {
-          id: 'rog_r8_improved_kidney_shot',
-          name: 'Paid in Pain',
-          description: 'Low Blow restores 15 energy when used.',
-          icon: 'kidney_shot',
-          effect: {
-            proc: {
-              id: 'rog_improved_low_blow',
-              name: 'Paid in Pain',
-              trigger: { on: 'castNth', n: 1, abilities: ['kidney_shot'] },
-              responses: [{ kind: 'resource', amount: 15 }],
-            },
-          },
-        },
       ],
     },
     {
       level: 11,
-      theme: 'cooldown_tempo',
-      decision: 'full cooldown reset vs stored escape charges vs builder-fed free tempo',
+      theme: 'control',
+      decision: 'stun payoff vs free utility CC vs mid-fight stun access',
       options: [
         {
-          id: 'rog_r11_preparation',
-          name: 'Contingency',
-          description: 'Grants Contingency.',
-          icon: 'preparation',
-          effect: { grant: { ability: 'preparation' } },
-        },
-        {
-          id: 'rog_r11_endurance',
-          name: 'Second Exit',
-          description: 'Swift Heels and Ghostfoot each store 2 uses.',
-          icon: 'sprint',
+          id: 'rog_r11_marked_prey',
+          name: 'Marked Prey',
+          description:
+            'Enemies you stun with Gut Punch or Low Blow take 10% more damage from all attackers for 6 sec.',
+          icon: 'kidney_shot',
           effect: {
             ability: [
-              { ability: 'sprint', bonusCharges: 1 },
-              { ability: 'evasion', bonusCharges: 1 },
+              {
+                ability: 'kidney_shot',
+                addEffects: [
+                  {
+                    type: 'debuffTargetSource',
+                    kind: 'vulnerability',
+                    value: 0.1,
+                    duration: 6,
+                    auraId: 'marked_prey',
+                    auraName: 'Marked Prey',
+                  },
+                ],
+              },
+              {
+                ability: 'cheap_shot',
+                addEffects: [
+                  {
+                    type: 'debuffTargetSource',
+                    kind: 'vulnerability',
+                    value: 0.1,
+                    duration: 6,
+                    auraId: 'marked_prey',
+                    auraName: 'Marked Prey',
+                  },
+                ],
+              },
             ],
           },
         },
         {
-          id: 'rog_r11_improved_slice_and_dice',
-          name: 'Borrowed Tempo',
-          description: 'Every 3rd builder makes your next Cutthroat Tempo within 8 sec free.',
-          icon: 'slice_and_dice',
+          id: 'rog_r11_foul_play',
+          name: 'Foul Play',
+          description:
+            'Eye Jab and Sap cost no energy, and your own poisons and bleeds no longer break your Eye Jab.',
+          icon: 'gouge',
           effect: {
-            proc: {
-              id: 'rog_improved_cutthroat_tempo',
-              name: 'Borrowed Tempo',
-              trigger: {
-                on: 'castNth',
-                n: 3,
-                abilities: rogueBuilderAbilityIds,
-              },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_free',
-                  abilities: ['slice_and_dice'],
-                  duration: 8,
-                },
-              ],
-            },
+            ability: [
+              { ability: 'gouge', costPct: -1 },
+              { ability: 'sap', costPct: -1 },
+            ],
+            global: { foulPlayGuard: 1 },
+          },
+        },
+        {
+          id: 'rog_r11_cheap_trick',
+          name: 'Cheap Trick',
+          description: 'Gut Punch no longer requires Duskveil.',
+          icon: 'cheap_shot',
+          effect: {
+            ability: [{ ability: 'cheap_shot', ignoreStealthRequirement: true }],
           },
         },
       ],
     },
     {
       level: 14,
-      theme: 'combo_engine',
-      decision: 'two-finisher builder discount vs evasive strike vs poison-fed energy',
+      theme: 'kit_management',
+      decision: 'stealth economy vs poison economy vs builder rhythm',
       options: [
         {
-          id: 'rog_r14_seal_fate',
-          name: 'Final Notice',
+          id: 'rog_r14_dusk_economy',
+          name: 'Dusk Economy',
           description:
-            'Each Dirt Nap or Bleed Out makes your next builder within 8 sec cost 50% less energy.',
-          icon: 'eviscerate',
-          effect: {
-            proc: {
-              id: 'rog_final_notice',
-              name: 'Final Notice',
-              trigger: { on: 'castNth', n: 1, abilities: ['eviscerate', 'rupture'] },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_cheap',
-                  abilities: rogueBuilderAbilityIds,
-                  duration: 8,
-                  costPct: 0.5,
-                },
-              ],
-            },
-          },
-        },
-        {
-          id: 'rog_r14_ghostly_strike',
-          name: 'Wraith Strike',
-          description: 'Grants Wraith Strike.',
-          icon: 'ghostly_strike',
-          effect: { grant: { ability: 'ghostly_strike' } },
+            'Abilities cost 50% less energy while in Duskveil or shadow-wreathed by the veil, and for 6 sec after leaving Duskveil.',
+          icon: 'stealth',
+          effect: { global: { duskEconomyPct: 0.5 } },
         },
         {
           // Balance pass: was a flat 5 energy on EVERY poisoned auto (a
           // permanent ~40% passive energy-regen boost on dual-wield swing
-          // rates). Now the Combat Potency shape: chance-based.
-          id: 'rog_r14_deadly_brew',
+          // rates). Now the Combat Potency shape: chance-based, with an
+          // internal cooldown so it cannot scale with attack speed into the
+          // universally-best pick (the engines pass measured it paying the
+          // fastest swinger most, inverting the row's spec flavors).
+          id: 'rog_r14_venom_dividend',
           name: 'Venom Dividend',
           description:
-            'Landed melee auto-attacks with an active poison have a 20% chance to restore 10 energy.',
+            'Landed melee auto-attacks with an active poison have a 20% chance to restore 10 energy. Once every 2 sec.',
           icon: 'deadly_poison',
           effect: {
             proc: {
               id: 'rog_deadly_brew',
               name: 'Venom Dividend',
-              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue', chance: 0.2 },
+              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue', chance: 0.2, icd: 2 },
               responses: [{ kind: 'resource', amount: 10 }],
+            },
+          },
+        },
+        {
+          id: 'rog_r14_ceaseless_cuts',
+          name: 'Ceaseless Cuts',
+          // Wicked Slash is Thuggery's builder (Knifework thrusts, Skulduggery
+          // ribbons), so this is the combat-flavored pick; tuned so it beats
+          // the generic poison economy for the spec that actually slashes.
+          // Body Blow counts: it IS Wicked Slash while the Redline window
+          // runs, and the window starving itself would kill the sprint.
+          description: 'Every 3rd Wicked Slash restores 50 energy.',
+          icon: 'sinister_strike',
+          effect: {
+            proc: {
+              id: 'rog_ceaseless_cuts',
+              name: 'Ceaseless Cuts',
+              trigger: { on: 'castNth', n: 3, abilities: ['sinister_strike', 'body_blow'] },
+              responses: [{ kind: 'resource', amount: 50, resourceType: 'energy' }],
             },
           },
         },
@@ -952,18 +943,19 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
     },
     {
       level: 17,
-      theme: 'survival_escape',
-      decision: 'spell defense vs Ghostfoot burst energy vs lethal-hit insurance',
+      theme: 'major_window',
+      decision: 'personal cleave burst vs defense turned tempo vs party rally',
       options: [
         {
-          id: 'rog_r17_cloak_of_shadows',
-          name: 'Shadecloak',
-          description: 'Grants Shadecloak.',
-          icon: 'cloak_of_shadows',
-          effect: { grant: { ability: 'cloak_of_shadows' } },
+          id: 'rog_r17_flurry_of_knives',
+          name: 'Flurry of Knives',
+          description:
+            'Grants Flurry of Knives: lash every enemy within 6 yd and gain 2 combo points.',
+          icon: 'flurry_of_knives',
+          effect: { grant: { ability: 'flurry_of_knives' } },
         },
         {
-          id: 'rog_r17_improved_evasion',
+          id: 'rog_r17_ghostfoot_gambit',
           name: 'Ghostfoot Gambit',
           description:
             'Ghostfoot restores 30 energy and makes your next builder within 8 sec cost 50% less energy.',
@@ -987,62 +979,84 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
           },
         },
         {
-          id: 'rog_r17_cheat_death',
-          name: 'Borrowed Breath',
+          id: 'rog_r17_thieves_chorus',
+          name: "Thieves' Chorus",
           description:
-            'A blow that would kill you leaves you at 1 health instead. Once every 120 sec.',
-          icon: 'vanish',
-          effect: { global: { cheatDeathIcd: 120 } },
+            "Grants Thieves' Chorus: your party attacks and casts 10% faster for 10 sec.",
+          icon: 'thieves_chorus',
+          effect: { grant: { ability: 'thieves_chorus' } },
         },
       ],
     },
     {
       level: 20,
-      theme: 'capstone_execution',
-      decision: 'target teleport vs finisher-fed haste cooldown vs opener-fed finisher discount',
+      theme: 'capstone',
+      decision: 'shadow echo vs marked target vs kill momentum',
       options: [
         {
-          id: 'rog_r20_shadowstep',
-          name: 'Shadeslip',
-          description: 'Grants Shadeslip.',
-          icon: 'shadowstep',
-          effect: { grant: { ability: 'shadowstep' } },
+          id: 'rog_r20_second_shadow',
+          name: 'Second Shadow',
+          description:
+            'Dirt Nap cast at 5 combo points strikes again from the shadows for 75% of its damage.',
+          icon: 'backstab',
+          effect: { global: { secondShadowPct: 0.75 } },
         },
         {
-          id: 'rog_r20_adrenaline_junkie',
-          name: 'Redline Habit',
-          description: "Each finisher reduces Quickened Blood's cooldown by 6 sec.",
-          icon: 'adrenaline_rush',
+          id: 'rog_r20_deathmark',
+          name: 'Grave Brand',
+          description:
+            'Your Duskveil openers brand the target for 20 sec. You deal 12% more damage to the branded target.',
+          icon: 'garrote',
           effect: {
-            proc: {
-              id: 'rog_adrenaline_junkie',
-              name: 'Redline Habit',
-              trigger: { on: 'castNth', n: 1, abilities: rogueFinisherAbilityIds },
-              responses: [{ kind: 'cooldownRefund', ability: 'adrenaline_rush', seconds: 6 }],
-            },
+            ability: [
+              {
+                ability: 'ambush',
+                addEffects: [
+                  {
+                    type: 'debuffTargetSource',
+                    kind: 'vuln_source',
+                    value: 0.12,
+                    duration: 20,
+                    auraId: 'deathmark',
+                    auraName: 'Grave Brand',
+                  },
+                ],
+              },
+              {
+                ability: 'garrote',
+                addEffects: [
+                  {
+                    type: 'debuffTargetSource',
+                    kind: 'vuln_source',
+                    value: 0.12,
+                    duration: 20,
+                    auraId: 'deathmark',
+                    auraName: 'Grave Brand',
+                  },
+                ],
+              },
+              {
+                ability: 'cheap_shot',
+                addEffects: [
+                  {
+                    type: 'debuffTargetSource',
+                    kind: 'vuln_source',
+                    value: 0.12,
+                    duration: 20,
+                    auraId: 'deathmark',
+                    auraName: 'Grave Brand',
+                  },
+                ],
+              },
+            ],
           },
         },
         {
-          id: 'rog_r20_master_assassin',
-          name: 'First Cut, Last Word',
-          description: 'Each opener makes your next finisher within 6 sec cost 50% less energy.',
-          icon: 'ambush',
-          effect: {
-            proc: {
-              id: 'rog_master_assassin',
-              name: 'First Cut, Last Word',
-              trigger: { on: 'castNth', n: 1, abilities: ['ambush', 'garrote', 'cheap_shot'] },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_cheap',
-                  abilities: rogueFinisherAbilityIds,
-                  duration: 6,
-                  costPct: 0.5,
-                },
-              ],
-            },
-          },
+          id: 'rog_r20_kill_chain',
+          name: 'Kill Chain',
+          description: 'Killing blows refresh Smokestep and grant 5 combo points.',
+          icon: 'vanish',
+          effect: { global: { onKillCombo: 5, onKillVanishReset: 1 } },
         },
       ],
     },

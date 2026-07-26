@@ -41,11 +41,12 @@ describe('talent empowerNext scoping', () => {
         scan(`${cls} spec ${spec.id} mastery`, procsInEffect(spec.mastery.effect));
       }
     }
-    // Pin the approved v0.29 proc surface exactly. A deliberate proc addition or
-    // removal must update this sentinel, while a refactor that drops rows from
-    // ROW_TREES cannot silently weaken the scoping audit.
-    // 18, not #2218's 19: #2428 retired one paladin empowerNext proc.
-    expect(scanned).toBe(18);
+    // Pin the approved v0.29 proc surface exactly (hunter, shaman, priest, paladin
+    // and the rogue row redesign together). A deliberate proc addition or removal
+    // must update this sentinel, while a refactor that drops rows from ROW_TREES
+    // cannot silently weaken the scoping audit.
+    // 19 on the shared base, minus 1 retired by #2428 and 5 by #2328.
+    expect(scanned).toBe(13);
     expect(offenders).toEqual([]);
   });
 });

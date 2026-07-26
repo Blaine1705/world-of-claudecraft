@@ -3037,6 +3037,13 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   aspect_of_the_wild: r('nature', 'leafGreen', ['paw', { p: 'sunburst', ...BR }], ['glow']),
   // rogue
   smoke_screen: r('shadow', 'steel', ['fist'], ['glow']),
+  flurry_of_knives: r('steel', 'silverWhite', ['dagger', { p: 'sunburst', ...BR }], ['motion']),
+  thieves_chorus: r('shadow', 'gold', ['roar', { p: 'dagger', ...BR }], ['sparkle']),
+  venomrend: r('nature', 'venom', ['dagger', { p: 'flame', ...BR }], ['glow']),
+  venom_dart: r('nature', 'venom', ['arrow', { p: 'droplet', ...BR }], ['motion']),
+  body_blow: r('steel', 'blood', ['fist', { p: 'sunburst', ...BR }], ['motion']),
+  knockout_blow: r('steel', 'gold', ['fist', { p: 'skull', ...BR }], ['glow']),
+  veilstrike: r('shadow', 'shadowPurple', ['eye', { p: 'dagger', ...BR }], ['motion']),
   preparation: r('shadow', 'steel', ['scroll', { p: 'dagger', ...BR }], ['sparkle']),
   ghostly_strike: r('shadow', 'silverWhite', ['dagger', { p: 'eye', ...TR }], ['glow']),
   cloak_of_shadows: r('shadow', 'shadowPurple', ['shield', { p: 'eye', ...BR }], ['glow']),

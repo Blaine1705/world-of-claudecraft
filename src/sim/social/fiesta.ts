@@ -166,6 +166,7 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
           buffPct: 0,
           castWhileMoving: false,
           damagePushbackImmune: false,
+          ignoreStealthRequirement: false,
           bonusCharges: 0,
           addEffects: [],
         };

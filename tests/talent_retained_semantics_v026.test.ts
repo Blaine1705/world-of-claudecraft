@@ -215,7 +215,7 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     expect(target.auras.some((aura) => aura.id === 'fear_incap')).toBe(false);
   });
 
-  it.each([['rogue', 17, 'rog_r17_cheat_death', 120]] as const)(
+  it.each([['rogue', 8, 'rog_r8_borrowed_breath', 120]] as const)(
     '%s cheat death saves once, honors its %d-row ICD, and rearms deterministically',
     (cls, level, optionId, icd) => {
       const selectedSim = () => {

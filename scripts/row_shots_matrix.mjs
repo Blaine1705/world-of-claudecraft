@@ -111,14 +111,14 @@ const CLASS_PLAN = {
     spec: 'combat',
     name: 'Rowrog',
     rows: {
-      5: 'rog_r5_improved_backstab', // Improved Backstab
-      8: 'rog_r8_kick', // Boot (grant kick)
-      11: 'rog_r11_preparation', // Contingency (grant preparation)
-      14: 'rog_r14_ghostly_strike', // Wraith Strike (grant ghostly_strike)
-      17: 'rog_r17_cloak_of_shadows', // Shadecloak (grant cloak_of_shadows)
-      20: 'rog_r20_shadowstep', // Shadeslip (grant shadowstep)
+      5: 'rog_r5_shadeslip', // Shadeslip (grant shadowstep)
+      8: 'rog_r8_smoke_screen', // Smoke Screen (grant smoke_screen)
+      11: 'rog_r11_cheap_trick', // Cheap Trick
+      14: 'rog_r14_venom_dividend', // Venom Dividend
+      17: 'rog_r17_flurry_of_knives', // Flurry of Knives (grant)
+      20: 'rog_r20_kill_chain', // Kill Chain
     },
-    moment: 'cloak_of_shadows', // row-granted at 17 (Shadecloak), visible self buff
+    moment: 'smoke_screen', // row-granted at 8 (Smoke Screen), visible self buff
     momentIsSelfBuff: true,
     momentFallbacks: ['adrenaline_rush', 'evasion', 'sprint'],
   },

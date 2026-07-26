@@ -1631,6 +1631,12 @@ export const zh_CN: EnTranslations = {
       "radiantResonance": "你的下一次治愈之光将瞬发，或下一次黎明之拥的法力消耗降低 {pct}%，施法时间缩短至 {castTime} 秒",
       "solarReprisal": "你的下一次向阳飞盾不消耗法力、无视冷却时间且伤害提高 {pct}%；恩典之锤无视冷却时间并为你恢复相当于伤害量 100% 的生命值；或使治愈之光变为瞬发",
       "dawnsWrath": "HoW: all HP · +1 use · CD 0 · +{pct}% DMG",
+      "venomRitual": "毒祭：第{stacks}/{max}层。连击点生成技能累积层数，达到{max}层时，长眠变为蚀毒撕裂",
+      "gloam": "幽暝：第{stacks}/{max}层。达到{max}层时，暮帷变为罩影突袭",
+      "redline": "红线：第{stacks}/{max}格。击体重拳增加格数；击倒重拳每格伤害提高{pct}%，命中后结束窗口。窗口超时则作废",
+      "veilstrikeWindow": "暗影缠身：你的暮帷先制技可在明处以任意角度使用，造成的伤害提高{pct}%",
+      "veiledEdge": "你的下一次潜伏突袭造成双倍伤害",
+      "duskEconomy": "技能的能量消耗降低{pct}%",
       "increase": {
         "ap": "攻击强度提高 {value}",
         "sp": "法术强度提高 {value}",
@@ -8108,6 +8114,10 @@ export const zh_CN: EnTranslations = {
         "name": "以太之井",
         "description": "快速恢复法力。（法师天赋）"
       },
+      "flurry_of_knives": {
+        "name": "刀刃乱舞",
+        "description": "掷出飞刀鞭笞6码内的所有敌人，造成{damage}点物理伤害，并获得2个连击点。（潜行者天赋）"
+      },
       "frenzied_regeneration": {
         "name": "野性愈合",
         "description": "在10秒内恢复180点生命值。只能在熊形态下使用。（德鲁伊天赋）"
@@ -8268,9 +8278,33 @@ export const zh_CN: EnTranslations = {
         "name": "封口令",
         "description": "在施法中沉默目标，并在5秒内封锁该法术学派。"
       },
+      "thieves_chorus": {
+        "name": "盗贼合唱",
+        "description": "一声呼哨激励你的队伍，使攻击、施法和引导速度提高10%，持续10秒。近期受过群体加速激励的盟友过于疲惫，无法受益。（潜行者天赋）"
+      },
       "tranquility": {
         "name": "林地之歌",
         "description": "引导恢复能量4秒，每秒为30码内的盟友恢复42至52点生命值。（德鲁伊天赋）"
+      },
+      "venom_dart": {
+        "name": "毒镖",
+        "description": "弹出一枚毒镖，造成{damage}点自然伤害。获得1个连击点。刀工：使你的蚀毒撕裂伤口延长6秒，最多20秒。"
+      },
+      "body_blow": {
+        "name": "击体重拳",
+        "description": "沉重的一击，造成130%武器伤害外加10点，获得2个连击点，并使红线加深一格。（战斗引擎）"
+      },
+      "knockout_blow": {
+        "name": "击倒重拳",
+        "description": "以击倒终结红线：造成45点伤害，每个连击点额外造成35点，红线每格加深使伤害提高25%，并恢复25点能量。（战斗引擎）"
+      },
+      "veilstrike": {
+        "name": "罩影突袭",
+        "description": "耗尽幽暝储备，暗影缠身6秒：你的潜行先制技可在明处使用，且造成的伤害提高25%。（诡诈引擎）"
+      },
+      "venomrend": {
+        "name": "蚀毒撕裂",
+        "description": "吞噬毒祭：造成22点伤害，每个连击点额外造成26点，引爆你的流血效果的剩余伤害，并恢复25点能量。（刀工引擎）"
       },
       "typhoon": {
         "name": "台风",

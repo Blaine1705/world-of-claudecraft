@@ -1657,6 +1657,18 @@ export const hudChromeStrings = {
     solarReprisal:
       'Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant',
     dawnsWrath: 'HoW: all HP · +1 use · CD 0 · +{pct}% DMG',
+    // Rogue spec-engine states; wordy (M16): filled in the five non-Latin
+    // locales in this change.
+    venomRitual:
+      'Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend',
+    gloam:
+      'Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil',
+    redline:
+      'Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it',
+    veilstrikeWindow:
+      'Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%',
+    veiledEdge: "Your next Lurker's Strike strikes for double",
+    duskEconomy: 'Abilities cost {pct}% less energy',
     increase: {
       ap: 'Increases attack power by {value}',
       sp: 'Increases spell power by {value}',

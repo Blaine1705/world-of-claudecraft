@@ -182,7 +182,7 @@ const ROGUE_SPECS: SpecDef[] = [
     'Knifework',
     'dps',
     'x',
-    'A burst specialist using critical strikes and finishers.',
+    'A poisoned burst specialist: builder strikes stack the Venom Ritual, and at 6 stages Dirt Nap becomes Venomrend, detonating every bleed and reopening the wound.',
     'cold_blood',
     // Balance pass (maintainer sheet): the backstab identity (the classic
     // Improved Backstab 30%), not a bleed rider on Subtlety's turf.
@@ -205,7 +205,7 @@ const ROGUE_SPECS: SpecDef[] = [
     'Thuggery',
     'dps',
     '/',
-    'A sustained fighter focused on direct weapon strikes.',
+    'A stand-up brawler: a full-combo Dirt Nap opens the Redline window, where Body Blows deepen the pips and Knockout Blow cashes them out before the clock runs dry.',
     'blade_flurry',
     // Balance pass (maintainer sheet): the only mastery in the game with a
     // penalty loses it.
@@ -222,7 +222,7 @@ const ROGUE_SPECS: SpecDef[] = [
     'Skulduggery',
     'dps',
     '>',
-    'A stealth attacker built around openers, control, and avoidance.',
+    "A shadow banker: Duskveil openers and Red Ribbons bank Gloam; a full bank unlocks your openers in the open, and the next one thrown detonates it into a shadow veil led by a doubled Lurker's Strike.",
     'hemorrhage',
     // Balance pass (maintainer sheet): tuned down from +40% crit damage and
     // +10% Agility; the stealth-speed identity comes in instead (the Duskveil

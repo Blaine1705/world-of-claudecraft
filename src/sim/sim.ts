@@ -111,6 +111,7 @@ import { cleanupPriestState } from './combat/priest/lifecycle';
 import { resolveVespersAbility } from './combat/priest/vespers';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
 import { rewindHealAmount } from './combat/rewind';
+import { duskLingerOnStealthBreak } from './combat/rogue_talents';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
 import { clearSpiritmendCurrents } from './combat/shaman_spiritmend';
 import { clearShamanTalentState, onGhostWolfExited } from './combat/shaman_talents';
@@ -941,6 +942,7 @@ export interface ResolvedAbility {
   threatMult: number; // classic multiplier on this ability's damage-threat
   castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
   damagePushbackImmune?: boolean; // talent-granted immunity to damage-driven cast pushback
+  ignoreStealthRequirement?: boolean; // Cheap Trick: the resolved ability drops requiresStealth
   charges?: number; // authored stored uses; undefined means one use
   bonusCharges?: number; // talent-added uses, kept distinct from native maxCharges
   /** 1-based authoritative charge stage for hold-to-charge spells. */
@@ -4526,6 +4528,10 @@ export class Sim {
     if (!r) return null;
     const known = r.meta.known.find((k) => k.def.id === abilityId) ?? null;
     if (!known) return null;
+    // Action-slot replacement: the base id stays on the hotbar while the
+    // resolved definition follows aura state (rogue engine transforms and the
+    // hunter resolvers land here, the one choke point the cast path, cost
+    // checks, and the server all read).
     let found = resolveActionReplacement(known, r.e);
     found = resolveColdsightAbility(found, r.e, r.meta);
     found = resolveHunterSharedAbility(found, r.e, r.meta);
@@ -5695,6 +5701,7 @@ export class Sim {
     e.auras.splice(idx, 1);
     e.stealthed = false; // keep the cache live without waiting for updateAuras
     this.emit({ type: 'aura', targetId: e.id, name, gained: false });
+    duskLingerOnStealthBreak(this.ctx, e);
   }
 
   private breakGhostWolf(e: Entity): void {
