@@ -3736,10 +3736,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'consecration',
   'righteous_fury',
   'retribution_aura',
-  // hunter (CraftPix premium "RPG Archer skill icons" pack). The archer pack is
-  // arrows/bows/traps only — the beast/aspect-animal abilities (aspect_of_the_hawk,
-  // aspect_of_the_monkey, tame_beast, dismiss_pet, revive_pet) have no fitting art
-  // here and intentionally stay on their procedural recipes until a beast pack lands.
+  // hunter (CraftPix premium packs plus project-generated v0.29 class rework art).
   'raptor_strike',
   'mongoose_bite',
   'arcane_shot',
@@ -3749,8 +3746,22 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'rapid_fire',
   'wing_clip',
   'aspect_of_the_cheetah',
-  // priest (CraftPix premium "RPG Priest skill icons" pack). The pack is all-holy —
-  // the shadow spells (shadow_word_pain, mind_flay) have no dark art and stay procedural.
+  'pack_command',
+  'stampede',
+  'unleash_beast',
+  'measured_shot',
+  'pack_rally',
+  'shrapnel_charge',
+  'bloodtrail_assault',
+  'trailbreak',
+  'wildheart',
+  'shellskin',
+  'frostjaw_trap',
+  'cold_focus',
+  'bloodhook',
+  'hunting_momentum',
+  'fieldcraft_reentry',
+  // priest (CraftPix premium packs plus project-generated v0.29 class rework art).
   'smite',
   'lesser_heal',
   'power_word_fortitude',
@@ -3759,6 +3770,12 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'mind_blast',
   'heal',
   'flash_heal',
+  'veilstep',
+  'scouring_mercy',
+  'seraphic_vigil',
+  'summon_tithefiend',
+  'martyrs_aegis',
+  'choir_of_deliverance',
   // warlock (CraftPix premium "RPG Warlock skill icons" pack + "RPG Demon skill icons"
   // pack for the summons/life_tap/searing_pain that the warlock pack couldn't cover).
   'shadow_bolt',
@@ -3950,8 +3967,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'dash',
   'tigers_fury',
   'rip',
-  // shaman (no dedicated pack — matched against the two generic CraftPix "100 RPG/skill
-  // icon" packs + earth-magician for the earth abilities; aeromancer went unused). 11/11.
+  // shaman (CraftPix generic packs plus project-generated v0.29 class rework art).
   'lightning_bolt',
   'rockbiter_weapon',
   'healing_wave',
@@ -3963,6 +3979,16 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'frostbrand_weapon',
   'ghost_wolf',
   'stormstrike',
+  'galeheart_weapon',
+  'thunder_reservoir',
+  'warspirit_cadence',
+  'stormsurge',
+  'lifespring_weapon',
+  'unleash_weapon',
+  'tidecall',
+  'stoneward',
+  'primal_exaltation',
+  'ancestor_return',
   // cross-class fills from the two generic CraftPix "100 RPG/skill icon" packs — abilities
   // their own class pack couldn't cover but a generic icon fit. (warrior taunt completes warrior.)
   'aspect_of_the_hawk',

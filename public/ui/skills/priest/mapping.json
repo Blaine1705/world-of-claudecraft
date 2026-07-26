@@ -4,6 +4,11 @@
   "iconSize": 128,
   "sourcePack": "tmp/asset_src/priest-skill-icons (CraftPix premium)",
   "runtimeDir": "public/ui/skills/priest",
+  "generatedArt": {
+    "source": "OpenAI image generation through Codex",
+    "generatedOn": "2026-07-25",
+    "purpose": "Original project art for the v0.29 Priest class rework"
+  },
   "abilities": [
     {
       "abilityId": "smite",
@@ -56,6 +61,42 @@
       "sourcePack": "_Missing_Priest",
       "sourceFile": "8.png",
       "output": "mind_flay.webp"
+    },
+    {
+      "abilityId": "veilstep",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "veilstep.webp"
+    },
+    {
+      "abilityId": "scouring_mercy",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "scouring_mercy.webp"
+    },
+    {
+      "abilityId": "seraphic_vigil",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "seraphic_vigil.webp"
+    },
+    {
+      "abilityId": "summon_tithefiend",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "summon_tithefiend.webp"
+    },
+    {
+      "abilityId": "martyrs_aegis",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "martyrs_aegis.webp"
+    },
+    {
+      "abilityId": "choir_of_deliverance",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "choir_of_deliverance.webp"
     }
   ],
   "deferredStayProcedural": {}

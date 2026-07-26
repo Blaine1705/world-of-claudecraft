@@ -1,6 +1,7 @@
 import { closeSync, existsSync, openSync, readdirSync, readFileSync, readSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { ABILITY_IMAGE_IDS, abilityImageUrl } from '../src/ui/icons';
 
@@ -57,6 +58,46 @@ function isValidWebp(file: string): boolean {
 const webpFiles = (): string[] =>
   walk(skillsDir).filter((p) => path.extname(p).toLowerCase() === '.webp');
 
+const PR_2218_OWNED_CLASS_ICON_IDS = {
+  hunter: [
+    'bloodhook',
+    'bloodtrail_assault',
+    'cold_focus',
+    'fieldcraft_reentry',
+    'frostjaw_trap',
+    'hunting_momentum',
+    'measured_shot',
+    'pack_command',
+    'pack_rally',
+    'shellskin',
+    'shrapnel_charge',
+    'stampede',
+    'trailbreak',
+    'unleash_beast',
+    'wildheart',
+  ],
+  shaman: [
+    'ancestor_return',
+    'galeheart_weapon',
+    'lifespring_weapon',
+    'primal_exaltation',
+    'stoneward',
+    'stormsurge',
+    'thunder_reservoir',
+    'tidecall',
+    'unleash_weapon',
+    'warspirit_cadence',
+  ],
+  priest: [
+    'choir_of_deliverance',
+    'martyrs_aegis',
+    'scouring_mercy',
+    'seraphic_vigil',
+    'summon_tithefiend',
+    'veilstep',
+  ],
+} as const;
+
 describe('class ability webp icons', () => {
   it('has image-backed ability ids wired (guards the fixture)', () => {
     expect(ABILITY_IMAGE_IDS.size).toBeGreaterThan(0);
@@ -91,6 +132,26 @@ describe('class ability webp icons', () => {
   it('uses the owner-provided painted icons for both Chronomancy abilities', () => {
     expect(abilityImageUrl('collective_reversal')).toBe('/ui/skills/mage/collective_reversal.webp');
     expect(abilityImageUrl('temporal_hourglass')).toBe('/ui/skills/mage/temporal_hourglass.webp');
+  });
+
+  it('image-backs every ability icon introduced by PR #2218 with recorded provenance', () => {
+    for (const [cls, ids] of Object.entries(PR_2218_OWNED_CLASS_ICON_IDS)) {
+      const mapping = JSON.parse(
+        readFileSync(path.join(skillsDir, cls, 'mapping.json'), 'utf8'),
+      ) as {
+        abilities: Array<{ abilityId: string; sourcePack?: string; output: string }>;
+      };
+      const entries = new Map(mapping.abilities.map((entry) => [entry.abilityId, entry]));
+
+      for (const id of ids) {
+        expect(abilityImageUrl(id)).toBe(`/ui/skills/${cls}/${id}.webp`);
+        expect(entries.get(id)).toMatchObject({
+          abilityId: id,
+          sourcePack: 'OpenAI image generation through Codex',
+          output: `${id}.webp`,
+        });
+      }
+    }
   });
 
   it('A) every image-backed ability id resolves to a committed, valid .webp', () => {
@@ -141,5 +202,19 @@ describe('class ability webp icons', () => {
       orphans,
       'unwired or misplaced webp(s) committed; remove dead-weight art or wire the id into ABILITY_IMAGE_IDS',
     ).toEqual([]);
+  });
+
+  it('D) keeps every PR #2218 ability icon at the canonical 128px square size', async () => {
+    const wrongSize: string[] = [];
+    for (const [cls, ids] of Object.entries(PR_2218_OWNED_CLASS_ICON_IDS)) {
+      for (const id of ids) {
+        const file = path.join(skillsDir, cls, `${id}.webp`);
+        const metadata = await sharp(file).metadata();
+        if (metadata.width !== 128 || metadata.height !== 128) {
+          wrongSize.push(`${path.relative(repoRoot, file)} (${metadata.width}x${metadata.height})`);
+        }
+      }
+    }
+    expect(wrongSize).toEqual([]);
   });
 });

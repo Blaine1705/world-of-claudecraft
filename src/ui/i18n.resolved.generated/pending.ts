@@ -478,22 +478,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.mendingCurrent",
     "hudChrome.auraEffect.mendingCurrentPercent"
   ],
-  "zh_CN": [
-    "entities.abilities.unleash_weapon.description",
-    "entities.abilities.unleash_weapon.name"
-  ],
-  "zh_TW": [
-    "entities.abilities.unleash_weapon.description",
-    "entities.abilities.unleash_weapon.name"
-  ],
-  "ko_KR": [
-    "entities.abilities.unleash_weapon.description",
-    "entities.abilities.unleash_weapon.name"
-  ],
-  "ja_JP": [
-    "entities.abilities.unleash_weapon.description",
-    "entities.abilities.unleash_weapon.name"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "abilityUi.resources.focus",
     "classDetails.resources.focus",
@@ -572,10 +560,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.mendingCurrent",
     "hudChrome.auraEffect.mendingCurrentPercent"
   ],
-  "ru_RU": [
-    "entities.abilities.unleash_weapon.description",
-    "entities.abilities.unleash_weapon.name"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "abilityUi.resources.focus",
     "classDetails.resources.focus",

@@ -4,6 +4,11 @@
   "iconSize": 128,
   "sourcePack": "tmp/asset_src/archer-skill-icons (CraftPix; files have a leading space ' N.png')",
   "runtimeDir": "public/ui/skills/hunter",
+  "generatedArt": {
+    "source": "OpenAI image generation through Codex",
+    "generatedOn": "2026-07-25",
+    "purpose": "Original project art for the v0.29 Hunter class rework"
+  },
   "abilities": [
     {
       "abilityId": "raptor_strike",
@@ -79,8 +84,98 @@
       "sourcePack": "_Missing_Icons_Hunter",
       "sourceFile": "41.png",
       "output": "aspect_of_the_monkey.webp"
+    },
+    {
+      "abilityId": "pack_command",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "pack_command.webp"
+    },
+    {
+      "abilityId": "stampede",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "stampede.webp"
+    },
+    {
+      "abilityId": "unleash_beast",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "unleash_beast.webp"
+    },
+    {
+      "abilityId": "measured_shot",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "measured_shot.webp"
+    },
+    {
+      "abilityId": "pack_rally",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "pack_rally.webp"
+    },
+    {
+      "abilityId": "shrapnel_charge",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "shrapnel_charge.webp"
+    },
+    {
+      "abilityId": "bloodtrail_assault",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "bloodtrail_assault.webp"
+    },
+    {
+      "abilityId": "trailbreak",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "trailbreak.webp"
+    },
+    {
+      "abilityId": "wildheart",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "wildheart.webp"
+    },
+    {
+      "abilityId": "shellskin",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "shellskin.webp"
+    },
+    {
+      "abilityId": "frostjaw_trap",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "frostjaw_trap.webp"
+    },
+    {
+      "abilityId": "cold_focus",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "cold_focus.webp"
+    },
+    {
+      "abilityId": "bloodhook",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "bloodhook.webp"
+    },
+    {
+      "abilityId": "hunting_momentum",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "hunting_momentum.webp"
+    },
+    {
+      "abilityId": "fieldcraft_reentry",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "fieldcraft_reentry.webp"
     }
   ],
-  "note": "5 beast/aspect-animal abilities lack art in the archer pack; they keep their procedural icons until a beast/companion pack is added.",
+  "note": "The v0.29 Hunter class rework icons are original project-generated art. Earlier abilities retain their recorded CraftPix provenance.",
   "deferredStayProcedural": {}
 }

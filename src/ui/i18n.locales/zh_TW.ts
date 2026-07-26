@@ -8731,4 +8731,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.name': '風暴湧動',
   'entities.abilities.stormsurge.description':
     '被動：先祖打擊冷卻時，消耗風暴施法有25%機率重置其冷卻。連續失敗4次後必定重置。（戰魂）',
+  'entities.abilities.unleash_weapon.name': '釋放武器',
+  'entities.abilities.unleash_weapon.description':
+    '釋放目前的武器灌注。焰烙造成54至64點火焰傷害，獲得30%法術強度加成，並獲得2層雷霆。風心用武器攻擊，推進戰魂節律，並使攻擊速度提高20%，持續6秒。縛石造成75%武器傷害，迫使目標攻擊你，並使你受到的傷害降低20%，持續4秒。活泉消耗目標身上的癒合水流，立即治療其剩餘治療量的125%，並使8秒內下一次受到的傷害降低，降低量等於實際恢復生命值的50%。',
 };

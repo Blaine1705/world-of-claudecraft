@@ -9147,4 +9147,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.name': '폭풍쇄도',
   'entities.abilities.stormsurge.description':
     '지속 효과: 선조의 일격이 재사용 대기 중일 때 폭풍시전을 소모하면 25% 확률로 재사용 대기시간을 초기화합니다. 4번 실패하면 다음에는 반드시 발동합니다. (전령)',
+  'entities.abilities.unleash_weapon.name': '무기 해방',
+  'entities.abilities.unleash_weapon.description':
+    '활성화된 무기 마법을 해방합니다. 화염낙인은 54에서 64의 화염 피해를 입히고 주문력의 30%가 추가되며 천둥을 2 얻습니다. 질풍은 무기로 공격하고 전령의 박자를 진행하며 6초 동안 공격 속도를 20% 높입니다. 바위결속은 무기 피해의 75%를 입히고 대상이 자신을 공격하게 하며 4초 동안 받는 피해를 20% 줄입니다. 생명의 샘은 치유의 물결을 소모해 남은 치유량의 125%를 즉시 회복하고 8초 안에 받는 다음 피해를 실제 회복량의 50%만큼 줄입니다.',
 };
