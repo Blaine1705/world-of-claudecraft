@@ -1008,7 +1008,7 @@ export const TARGETS = [
   {
     key: 'char-window',
     label: 'Character window',
-    when: ['ui/char_window', 'ui/char_view'],
+    when: ['ui/char_window', 'ui/char_view', 'ui/stat_tooltip_view'],
     // Desktop and mobile, each in two framings: the default top framing, plus
     // the gathering panel scrolled into view (it sits below the fold and is
     // per-player progression info a player reads on both form factors,
