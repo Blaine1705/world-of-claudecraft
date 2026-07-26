@@ -9,6 +9,11 @@
     "aeromancer (evaluated, unused)"
   ],
   "runtimeDir": "public/ui/skills/shaman",
+  "generatedArt": {
+    "source": "OpenAI image generation through Codex",
+    "generatedOn": "2026-07-25",
+    "purpose": "Original project art for the v0.29 Shaman class rework"
+  },
   "abilities": [
     {
       "abilityId": "lightning_bolt",
@@ -75,6 +80,96 @@
       "sourcePack": "skill100",
       "sourceFile": "skill icon 65.png",
       "output": "stormstrike.webp"
+    },
+    {
+      "abilityId": "galeheart_weapon",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "galeheart_weapon.webp"
+    },
+    {
+      "abilityId": "thunder_reservoir",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "thunder_reservoir.webp"
+    },
+    {
+      "abilityId": "warspirit_cadence",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "warspirit_cadence.webp"
+    },
+    {
+      "abilityId": "stormsurge",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "stormsurge.webp"
+    },
+    {
+      "abilityId": "lifespring_weapon",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "lifespring_weapon.webp"
+    },
+    {
+      "abilityId": "unleash_weapon",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "unleash_weapon.webp"
+    },
+    {
+      "abilityId": "tidecall",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "tidecall.webp"
+    },
+    {
+      "abilityId": "stoneward",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "stoneward.webp"
+    },
+    {
+      "abilityId": "primal_exaltation",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "primal_exaltation.webp"
+    },
+    {
+      "abilityId": "ancestor_return",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218",
+      "output": "ancestor_return.webp"
+    },
+    {
+      "abilityId": "chain_lightning",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218 owned-class icon completion",
+      "output": "chain_lightning.webp"
+    },
+    {
+      "abilityId": "earthquake",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218 owned-class icon completion",
+      "output": "earthquake.webp"
+    },
+    {
+      "abilityId": "bloodlust",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218 owned-class icon completion",
+      "output": "bloodlust.webp"
+    },
+    {
+      "abilityId": "elemental_mastery",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218 owned-class icon completion",
+      "output": "elemental_mastery.webp"
+    },
+    {
+      "abilityId": "chain_heal",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218 owned-class icon completion",
+      "output": "chain_heal.webp"
     }
   ],
   "deferredStayProcedural": {}

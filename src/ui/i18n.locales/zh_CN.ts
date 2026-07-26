@@ -8850,4 +8850,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.name': '风暴涌动',
   'entities.abilities.stormsurge.description':
     '被动：先祖打击冷却时，消耗风暴施法有25%几率重置其冷却。连续失败4次后必定重置。（战魂）',
+  'entities.abilities.unleash_weapon.name': '释放武器',
+  'entities.abilities.unleash_weapon.description':
+    '释放当前的武器灌注。焰烙造成54至64点火焰伤害，获得30%法术强度加成，并获得2层雷霆。风心用武器攻击，推进战魂节律，并使攻击速度提高20%，持续6秒。缚石造成75%武器伤害，迫使目标攻击你，并使你受到的伤害降低20%，持续4秒。活泉消耗目标身上的愈合水流，立即治疗其剩余治疗量的125%，并使8秒内下一次受到的伤害降低，降低量等于实际恢复生命值的50%。',
 };

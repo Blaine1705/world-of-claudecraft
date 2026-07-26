@@ -75,6 +75,10 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   earth_shock: [3, 25],
   // Spiritmend deposits are calculated after the direct heal resolves.
   healing_wave: [12, 30, 50],
+  // Unleash Weapon dispatches to four spec enchant implementations. Their
+  // values live in shaman_unleash_weapon.ts and shaman_spiritmend.ts rather
+  // than one shared ability effect array.
+  unleash_weapon: [54, 64, 30, 2, 20, 6, 75, 4, 125, 8, 50],
 };
 
 // Every resolved rank of every class ability (deduped by rank).

@@ -9287,4 +9287,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.stormsurge.name': 'ストームサージ',
   'entities.abilities.stormsurge.description':
     'パッシブ：アンセストラルストライクのクールダウン中にストームキャストを消費すると、25%の確率でクールダウンをリセットする。4回失敗すると次は必ず発動する。（ウォースピリット）',
+  'entities.abilities.unleash_weapon.name': '武器解放',
+  'entities.abilities.unleash_weapon.description':
+    '有効な武器付与を解放する。火焔烙印は54から64の火炎ダメージを与え、魔力の30%が加算され、雷鳴を2得る。疾風は武器で攻撃し、戦霊の律動を進め、6秒間攻撃速度を20%上昇させる。石縛は武器ダメージの75%を与え、対象を強制的に自分へ攻撃させ、4秒間受けるダメージを20%軽減する。命泉は癒しの水流を消費し、残りの回復量の125%を即時に回復し、8秒以内の次の一撃を実際の回復量の50%分軽減する。',
 };
