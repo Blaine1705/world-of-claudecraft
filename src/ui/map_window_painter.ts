@@ -27,6 +27,11 @@
 // strings (dungeon and POI names, player names), which is why the cache it holds is
 // measured, bounded and evicting rather than a fixed per-glyph table.
 //
+// The six per-redraw TextSpriteStyle literals below are deliberate: they close
+// over the colors resolved for THIS redraw, so they cannot be module constants,
+// and six object literals plus one key string per label is far less work than the
+// text API they replace. Do not trade them for a color-diffing memo.
+//
 // NO-MAGIC-VALUES: a 2D context cannot read CSS vars, so the
 // painter resolves the `--color-map-*` tokens via getComputedStyle ONCE per redraw
 // (cached for the frame, never per-marker); every other literal (font, radius,

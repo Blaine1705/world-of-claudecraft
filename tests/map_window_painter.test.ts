@@ -19,9 +19,11 @@ import {
   setActiveWorldContent,
   ZONES,
 } from '../src/sim/data';
-import { emptyZoneProps, type QuestProgress } from '../src/sim/types';
+import { emptyZoneProps, isQuestTurnInNpc, type QuestProgress } from '../src/sim/types';
 import { overworldDungeonPortals } from '../src/ui/map_dungeon_portals';
 import { MapWindowPainter } from '../src/ui/map_window_painter';
+import { buildOverworldMapModel } from '../src/ui/map_window_view';
+import { TEXT_SPRITE_LIMIT } from '../src/ui/text_sprite_cache';
 import type { IWorld } from '../src/world_api';
 
 const painter = readFileSync(new URL('../src/ui/map_window_painter.ts', import.meta.url), 'utf8');
@@ -60,8 +62,23 @@ const MAP_COLOR_TOKENS = [
 interface LabelSprite {
   width: number;
   height: number;
-  /** Each text pass baked into this sprite, in order. */
-  ink: Array<{ op: 'fill' | 'stroke'; color: string; text: string }>;
+  /** Each text pass baked into this sprite, in order. The x/y are the sprite's
+   *  own origin, which is what the blit destination subtracts. */
+  ink: Array<{ op: 'fill' | 'stroke'; color: string; text: string; x: number; y: number }>;
+}
+
+/** Where a blit put the label's anchor back: destination plus the sprite origin. */
+function blitAnchor(blit: { sprite: LabelSprite; dx: number; dy: number }): {
+  x: number;
+  y: number;
+} {
+  const origin = blit.sprite.ink[0];
+  return { x: blit.dx + (origin?.x ?? 0), y: blit.dy + (origin?.y ?? 0) };
+}
+
+/** One ink pass without its sprite-local origin, for the color/order pins. */
+function inkStyle(pass: LabelSprite['ink'][number]): { op: string; color: string; text: string } {
+  return { op: pass.op, color: pass.color, text: pass.text };
 }
 
 /** The label a sprite carries (every pass bakes the same string). */
@@ -93,11 +110,11 @@ function makeLabelSprite(trace: PaintTrace): LabelSprite {
     measureText(text: string): { width: number } {
       return { width: text.length * 6 };
     },
-    fillText(text: string): void {
-      sprite.ink.push({ op: 'fill', color: String(ctx.fillStyle), text });
+    fillText(text: string, x: number, y: number): void {
+      sprite.ink.push({ op: 'fill', color: String(ctx.fillStyle), text, x, y });
     },
-    strokeText(text: string): void {
-      sprite.ink.push({ op: 'stroke', color: String(ctx.strokeStyle), text });
+    strokeText(text: string, x: number, y: number): void {
+      sprite.ink.push({ op: 'stroke', color: String(ctx.strokeStyle), text, x, y });
     },
   };
   const sprite: LabelSprite = {
@@ -392,6 +409,55 @@ function labelWorld(): IWorld {
   } as unknown as IWorld;
 }
 
+/** A quest whose giver is also its turn-in npc, so one npc can show the '?'
+ *  (ready) glyph rather than the '!' (available) one. */
+function turnInQuestWithGiver() {
+  const quest = Object.values(QUESTS).find(
+    (q) => q.giverNpcId && isQuestTurnInNpc(q, q.giverNpcId),
+  );
+  if (!quest) throw new Error('expected a quest whose giver is also a turn-in npc');
+  return quest;
+}
+
+/** The same world with its one quest-giver ready to turn in. */
+function readyGlyphWorld(): IWorld {
+  const quest = turnInQuestWithGiver();
+  const world = labelWorld() as unknown as {
+    entities: Map<number, { templateId: string; questIds: string[] }>;
+    questState: (q: string) => string;
+  };
+  const npc = world.entities.get(2);
+  if (!npc) throw new Error('expected the fixture npc');
+  npc.templateId = quest.giverNpcId as string;
+  npc.questIds = [quest.id];
+  world.questState = (q: string) => (q === quest.id ? 'ready' : 'unavailable');
+  return world as unknown as IWorld;
+}
+
+/** A world with more distinct ally names than the sprite budget holds, so a
+ *  redraw overshoots it and the next redraw's trim is observable. */
+function crowdedAllyWorld(count: number): IWorld {
+  const world = labelWorld() as unknown as {
+    socialInfo: { friends: Array<Record<string, unknown>>; guild: null };
+  };
+  world.socialInfo = {
+    friends: Array.from({ length: count }, (_, i) => ({
+      id: 100 + i,
+      name: `Ally${i}`,
+      online: true,
+      x: -40 + (i % 60),
+      z: LABEL_ZONE_CZ,
+    })),
+    guild: null,
+  };
+  return world as unknown as IWorld;
+}
+
+/** The dungeon name the committed zone's one portal carries. */
+function portalLabelText(): string {
+  return dungeonName(overworldDungeonPortals(DUNGEON_LIST, LABEL_ZONE.zMin, LABEL_ZONE.zMax)[0].id);
+}
+
 /** Every label this world must put on the canvas, sourced from the content
  *  tables rather than from the painter's own localizers. */
 function expectedLabels(): Set<string> {
@@ -437,6 +503,54 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     expect(trace.blits.length).toBeGreaterThanOrEqual(trace.sprites.length);
   });
 
+  it('lands each label on the anchor its layer names, rounded', () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+    const world = labelWorld();
+
+    new MapWindowPainter().paintOverworld(fakeMapContext(trace), world, labelPaintOptions());
+
+    // The same pure model the painter builds, so this pins the painter's OFFSETS
+    // and rounding rather than re-deriving the projection.
+    const model = buildOverworldMapModel({
+      world,
+      props: BUILTIN_WORLD.props,
+      zone: LABEL_ZONE,
+      zoom: 1,
+      center: null,
+      canvasSize: 560,
+      decorations: [],
+      ping: null,
+    });
+    const anchorOf = (text: string): { x: number; y: number } => {
+      const blit = trace.blits.find((b) => spriteText(b.sprite) === text);
+      if (!blit) throw new Error(`no blit for ${text}`);
+      return blitAnchor(blit);
+    };
+    const at = (x: number, y: number): { x: number; y: number } => ({
+      x: Math.round(x),
+      y: Math.round(y),
+    });
+
+    // Title: centered on the canvas, on its own baseline row.
+    expect(anchorOf(LABEL_ZONE.name)).toEqual(at(560 / 2, 20));
+    // POI label: on the POI point itself.
+    expect(anchorOf(LABEL_ZONE.pois[0].label)).toEqual(at(model.pois[0].mx, model.pois[0].my));
+    // Quest-giver glyph: on the marker, which is what the hover hit-test
+    // (npcMarkerAt, over the same mx/my) resolves against.
+    expect(anchorOf('!')).toEqual(at(model.npcs[0].mx, model.npcs[0].my));
+    // Dungeon name: 9px above its portal dot.
+    expect(anchorOf(portalLabelText())).toEqual(at(model.portals[0].mx, model.portals[0].my - 9));
+    // Ally names: 8px above their dots, one per ally.
+    const friend = model.allies.find((a) => a.name === 'FriendA');
+    const guild = model.allies.find((a) => a.name === 'GuildB');
+    expect(anchorOf('FriendA')).toEqual(at(friend?.mx ?? 0, (friend?.my ?? 0) - 8));
+    expect(anchorOf('GuildB')).toEqual(at(guild?.mx ?? 0, (guild?.my ?? 0) - 8));
+    // Badge number: lifted 4px above its disc centre.
+    expect(anchorOf('1')).toEqual(at(model.questAreas[0].mx, model.questAreas[0].my + 4));
+  });
+
   it('rounds every label blit to a whole pixel', () => {
     const trace = newTrace();
     installMapStyleGlobals(trace);
@@ -459,23 +573,23 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     new MapWindowPainter().paintOverworld(fakeMapContext(trace), labelWorld(), labelPaintOptions());
 
     const title = trace.sprites.find((s) => spriteText(s) === LABEL_ZONE.name);
-    expect(title?.ink).toEqual([
+    expect(title?.ink.map(inkStyle)).toEqual([
       { op: 'stroke', color: 'paint:--color-map-outline', text: LABEL_ZONE.name },
       { op: 'fill', color: 'paint:--color-map-label', text: LABEL_ZONE.name },
     ]);
     const friend = trace.sprites.find((s) => spriteText(s) === 'FriendA');
-    expect(friend?.ink).toEqual([
+    expect(friend?.ink.map(inkStyle)).toEqual([
       { op: 'stroke', color: 'paint:--color-map-outline', text: 'FriendA' },
       { op: 'fill', color: 'paint:--color-map-ally-friend', text: 'FriendA' },
     ]);
     const guild = trace.sprites.find((s) => spriteText(s) === 'GuildB');
-    expect(guild?.ink[1]).toEqual({
+    expect(guild?.ink.map(inkStyle)[1]).toEqual({
       op: 'fill',
       color: 'paint:--color-map-ally-guild',
       text: 'GuildB',
     });
     const poi = trace.sprites.find((s) => spriteText(s) === LABEL_ZONE.pois[0].label);
-    expect(poi?.ink).toEqual([
+    expect(poi?.ink.map(inkStyle)).toEqual([
       { op: 'stroke', color: 'paint:--color-map-outline', text: LABEL_ZONE.pois[0].label },
       { op: 'fill', color: 'paint:--color-map-label', text: LABEL_ZONE.pois[0].label },
     ]);
@@ -483,13 +597,13 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
       overworldDungeonPortals(DUNGEON_LIST, LABEL_ZONE.zMin, LABEL_ZONE.zMax)[0].id,
     );
     const portal = trace.sprites.find((s) => spriteText(s) === portalLabel);
-    expect(portal?.ink).toEqual([
+    expect(portal?.ink.map(inkStyle)).toEqual([
       { op: 'stroke', color: 'paint:--color-map-outline', text: portalLabel },
       { op: 'fill', color: 'paint:--color-map-portal-label', text: portalLabel },
     ]);
     // The badge sits on its own gold disc, so it is the one label with no outline.
     const badge = trace.sprites.find((s) => spriteText(s) === '1');
-    expect(badge?.ink).toEqual([
+    expect(badge?.ink.map(inkStyle)).toEqual([
       { op: 'fill', color: 'paint:--color-map-quest-badge-text', text: '1' },
     ]);
   });
@@ -513,6 +627,97 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     expect(trace.textApi).toEqual([]);
   });
 
+  it('draws each label exactly once per redraw, and keeps smoothing on', () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+    const ctx = fakeMapContext(trace);
+
+    const result = new MapWindowPainter().paintOverworld(ctx, labelWorld(), labelPaintOptions());
+
+    const badges = result.questAreas.reduce((n, area) => n + area.numbers.length, 0);
+    const expected =
+      1 + // the zone title
+      LABEL_ZONE.pois.length +
+      overworldDungeonPortals(DUNGEON_LIST, LABEL_ZONE.zMin, LABEL_ZONE.zMax).length +
+      result.npcs.length +
+      2 + // the two allies
+      badges;
+    expect(trace.blits).toHaveLength(expected);
+    // The rounding rationale hangs on smoothing staying ON for the terrain blit.
+    expect(ctx.imageSmoothingEnabled).toBe(true);
+  });
+
+  it('colors each ally dot by its own relationship', () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    new MapWindowPainter().paintOverworld(fakeMapContext(trace), labelWorld(), labelPaintOptions());
+
+    // The model plots friends before guild members, so the dot fills follow.
+    const allyDots = trace.fills.filter(
+      (fill) => fill.style.endsWith('ally-friend') || fill.style.endsWith('ally-guild'),
+    );
+    expect(allyDots).toEqual([
+      { style: 'paint:--color-map-ally-friend', commands: ['arc'] },
+      { style: 'paint:--color-map-ally-guild', commands: ['arc'] },
+    ]);
+  });
+
+  it("draws the '?' glyph for a turn-in that is ready, with the same styling", () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    new MapWindowPainter().paintOverworld(
+      fakeMapContext(trace),
+      readyGlyphWorld(),
+      labelPaintOptions(),
+    );
+
+    const glyphs = trace.sprites.filter((sprite) => ['?', '!'].includes(spriteText(sprite)));
+    expect(glyphs.map(spriteText)).toEqual(['?']);
+    expect(glyphs[0].ink.map(inkStyle)).toEqual([
+      { op: 'stroke', color: 'paint:--color-map-outline', text: '?' },
+      { op: 'fill', color: 'paint:--color-map-npc-quest', text: '?' },
+    ]);
+  });
+
+  it('opens each redraw on the cache, so the budget is enforced in the shipped path', () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+    const ctx = fakeMapContext(trace);
+    const painter = new MapWindowPainter();
+    const world = crowdedAllyWorld(TEXT_SPRITE_LIMIT + 8);
+
+    painter.paintOverworld(ctx, world, labelPaintOptions());
+    const minted = trace.sprites.length;
+    expect(minted).toBeGreaterThan(TEXT_SPRITE_LIMIT);
+
+    // The second redraw opens with a trim, so the labels that fell out of the
+    // budget rasterize again. Without the beginRedraw call nothing is evicted and
+    // this mints zero, which is the unbounded growth the budget exists to stop.
+    painter.paintOverworld(ctx, world, labelPaintOptions());
+    expect(trace.sprites.length).toBeGreaterThan(minted);
+  });
+
+  it("holds every zone's static labels inside the budget, so ordinary play never evicts", () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+    const ctx = fakeMapContext(trace);
+    const painter = new MapWindowPainter();
+    const world = labelWorld();
+
+    for (const zone of ZONES) {
+      painter.paintOverworld(ctx, world, { ...labelPaintOptions(), zone });
+    }
+
+    expect(trace.sprites.length).toBeLessThan(TEXT_SPRITE_LIMIT);
+  });
+
   it('keeps the Show-on-Map ping color off every later outline', () => {
     const trace = newTrace();
     installMapStyleGlobals(trace);
@@ -533,7 +738,7 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     expect(arrow.map((s) => s.style)).toEqual(['paint:--color-map-outline']);
     // Neither may the quest-giver glyph, which now names its outline explicitly.
     const glyph = trace.sprites.find((s) => spriteText(s) === '!');
-    expect(glyph?.ink).toEqual([
+    expect(glyph?.ink.map(inkStyle)).toEqual([
       { op: 'stroke', color: 'paint:--color-map-outline', text: '!' },
       { op: 'fill', color: 'paint:--color-map-npc-quest', text: '!' },
     ]);

@@ -62,13 +62,30 @@ interface TextInk {
   descent: number;
 }
 
-/** Sprites kept across redraws. Sized for a whole session's map labels (3 zone
- *  titles, 29 POI labels, the dungeon names, the badge digits) plus a healthy
- *  ally-name working set, so ordinary play never evicts. A variable-width label
- *  at these font sizes runs roughly 150x20px, i.e. about 12KB of backing store,
- *  so the resident cost stays in the same class as one cached zone terrain
- *  canvas. */
-export const TEXT_SPRITE_LIMIT = 128;
+/** Sprites kept across redraws.
+ *
+ *  Sized ABOVE the largest label set a single redraw can possibly ask for, which
+ *  is what makes cross-redraw thrash impossible rather than merely unlikely: a
+ *  working set larger than the budget would evict each entry just before its
+ *  next use and re-rasterize the lot every redraw, which on the unthrottled
+ *  drag-pan path is worse than the fillText this replaced. The ceiling, all of it
+ *  server- or content-capped (tests/text_sprite_cache.test.ts pins the
+ *  arithmetic against those sources, so raising a cap fails there first):
+ *
+ *    150  ally names   (server/social.ts FRIEND_LIMIT 50 + GUILD_MEMBER_LIMIT 100)
+ *     96  badge digits (one per quest in the content tables)
+ *     11  POI labels   (the widest zone)
+ *      3  portal names (the zone with the most dungeon doors)
+ *      1  zone title
+ *      2  quest-giver glyphs
+ *   ----
+ *    263, rounded up for headroom.
+ *
+ *  The budget is a ceiling, not a working set: ordinary play resides at a couple
+ *  of dozen sprites. Even the pathological set costs well under 2MB of backing
+ *  store (an ally name rasterizes to roughly 80x20px, about 6KB; badge digits are
+ *  a fraction of that), the same class as one cached zone terrain canvas. */
+export const TEXT_SPRITE_LIMIT = 320;
 
 // Slack around the measured ink on every side, so glyph antialiasing is never
 // clipped. The outline adds half its width on top (a stroke straddles the path).
@@ -79,6 +96,10 @@ const SPRITE_PADDING = 2;
 // near 0.22em, so 0.3 leaves room without a second measurement.
 const FALLBACK_DESCENT_RATIO = 0.3;
 const FALLBACK_FONT_PX = 12;
+// The anchor a sprite rasterizes and reports its origin against. Measurement and
+// draw MUST agree on both (see measureInk).
+const SPRITE_ALIGN = 'center';
+const SPRITE_BASELINE = 'alphabetic';
 
 /**
  * A bounded per-(font, fill, outline, text) cache of rasterized labels. One
@@ -184,6 +205,8 @@ function rasterize(text: string, style: TextSpriteStyle): TextSprite | null {
   // that measureText reports.
   const pad = Math.ceil(outline / 2) + SPRITE_PADDING;
   const ink = measureInk(ctx, text, style.font);
+  // originX/originY are where the caller's anchor sits inside the sprite: the ink
+  // box grown by the padding on the left and above.
   const originX = Math.ceil(ink.left) + pad;
   const originY = Math.ceil(ink.ascent) + pad;
   // Assigning width/height RESETS every context property (and clears the
@@ -191,8 +214,8 @@ function rasterize(text: string, style: TextSpriteStyle): TextSprite | null {
   canvas.width = Math.max(1, originX + Math.ceil(ink.right) + pad);
   canvas.height = Math.max(1, originY + Math.ceil(ink.descent) + pad);
   ctx.font = style.font;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = SPRITE_ALIGN;
+  ctx.textBaseline = SPRITE_BASELINE;
   if (style.stroke !== undefined) {
     ctx.strokeStyle = style.stroke;
     ctx.lineWidth = style.lineWidth ?? 0;
@@ -203,20 +226,32 @@ function rasterize(text: string, style: TextSpriteStyle): TextSprite | null {
   return { canvas, originX, originY };
 }
 
-// Ink extents around a centered, alphabetic-baseline anchor. Sizing a sprite
-// from an undefined would silently produce a NaN canvas, so every field falls
-// back to a derived value on platforms that do not report the actual bounding
-// box.
+// Ink extents around the anchor the sprite is drawn on. TWO rules keep a sprite
+// from clipping its own label, and both are load-bearing:
+//
+//  1. Measure under the SAME textAlign and textBaseline the draw uses. The actual
+//     bounding box is reported relative to the alignment point, so measuring
+//     under the default 'start' and drawing under 'center' reports a box that
+//     starts at the anchor while the glyphs run half their width to its LEFT, and
+//     the sprite clips exactly that half away.
+//  2. Take the UNION of the reported ink box and the plain advance/em box. That
+//     makes rule 1 a tightness optimization rather than a correctness dependency:
+//     a platform that ignores textAlign in its metrics, or omits the
+//     actualBoundingBox family entirely (older WebKit), gets a box that is a
+//     little roomy instead of one that cuts the label in half.
 function measureInk(ctx: CanvasRenderingContext2D, text: string, font: string): TextInk {
   ctx.font = font;
+  ctx.textAlign = SPRITE_ALIGN;
+  ctx.textBaseline = SPRITE_BASELINE;
   const m: Partial<TextMetrics> | undefined = ctx.measureText(text);
-  const width = finite(m?.width, 0);
+  const half = finite(m?.width, 0) / 2;
   const px = fontPx(font);
+  const descent = px * FALLBACK_DESCENT_RATIO;
   return {
-    left: finite(m?.actualBoundingBoxLeft, width / 2),
-    right: finite(m?.actualBoundingBoxRight, width / 2),
-    ascent: finite(m?.actualBoundingBoxAscent, px),
-    descent: finite(m?.actualBoundingBoxDescent, px * FALLBACK_DESCENT_RATIO),
+    left: Math.max(half, finite(m?.actualBoundingBoxLeft, half)),
+    right: Math.max(half, finite(m?.actualBoundingBoxRight, half)),
+    ascent: Math.max(px, finite(m?.actualBoundingBoxAscent, px)),
+    descent: Math.max(descent, finite(m?.actualBoundingBoxDescent, descent)),
   };
 }
 
