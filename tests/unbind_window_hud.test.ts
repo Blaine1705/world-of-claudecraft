@@ -85,35 +85,37 @@ describe('hud.ts unbindResult event arm (source pins)', () => {
   it('stays single-surface: chat log only, no banner, toast, or audio cue in the arm', () => {
     const arm = unbindResultArm();
     expect(arm.match(/this\.log\(/g)?.length, 'exactly the ok + deny log call sites').toBe(2);
-    // BOTH halves police the idioms hud.ts ACTUALLY uses, because an
-    // alternation of strings the file does not contain matches nothing and
-    // waves through the exact thing it names. This pin used to list
-    // this.audio / playSfx / playCue / showToast, and all four occur ZERO
-    // times in hud.ts (showToast occurs nowhere in src/ at all), so a real
-    // cue added to this arm would have passed the whole repo: the HUD cue
-    // pins only name lootItem and coin. #2458 made cue-free the load-bearing
-    // contract on BOTH unbind arms, so this is the guard that has to hold it.
+    // ALLOWLIST, not a blocklist, and that is the whole point. This pin spent
+    // two rounds losing an arms race it could not win: it began as an
+    // alternation of this.audio / playSfx / playCue / showToast, all four of
+    // which occur ZERO times in hud.ts (showToast occurs nowhere in src/ at
+    // all), so it enforced only its banner clause and a real cue added here
+    // would have passed the whole repo. Naming the live idioms instead just
+    // moved the goalposts: hud.ts reaches sound through audio.<cue>( AND
+    // sfx.playUi( / sfx.playAt( AND sfx.crowdRoar( AND sfx.unloop( AND
+    // voice.play( AND three private wrappers of its own (this.combat, an
+    // 18-use route straight onto sfx.playAt, plus playEventSfx and
+    // playAttackerSfx), and its out-of-chat surfaces are showBanner,
+    // showError (itself BOTH a toast and a cue, since it calls audio.error),
+    // showPrompt, showSelfNote, showSubzone, confirmDialog, inputDialog,
+    // combatLog, flashActionSlot. Every enumeration of that was one idiom
+    // short of the next one somebody adds.
     //
-    // Cue idioms: bind the RECEIVER, not the method, because hud.ts reaches
-    // audio through audio.<cue>( (99) and sfx.playUi( / sfx.playAt( (17) but
-    // also sfx.crowdRoar( (4), sfx.unloop( (3) and voice.play( (2), so a
-    // `sfx.play\w*` alternation still misses three live spellings. The
-    // working form is tests/professions_audio_wiring.test.ts.
-    //
-    // The three module receivers are not the whole surface either: hud.ts
-    // routes sound through three private methods of its OWN, this.combat(
-    // (18 uses, a positional wrapper straight onto sfx.playAt), plus
-    // this.playEventSfx( and this.playAttackerSfx(. A cue added to this arm
-    // through any of those never names a module, so the receiver alternation
-    // alone waves it through.
-    expect(arm).not.toMatch(/\b(audio|sfx|voice)\.\w+\(|\bthis\.(combat|play\w*Sfx)\(/);
-    // Out-of-chat surfaces: the whole this.show<X>( family, which is what
-    // "banner or toast" means in this file. showBanner (45) and showError
-    // (21) are the live ones, and showError is BOTH halves at once, since it
-    // paints the error toast and calls audio.error() itself, so the cue pin
-    // above would not have caught it either.
-    expect(arm).not.toMatch(/\bthis\.show[A-Z]\w*\(/);
-    expect(arm).not.toMatch(/celebrat/i);
+    // So enumerate what the arm IS instead. Its entire method surface is
+    // three calls, and #2458 made "one chat line and nothing else" the
+    // load-bearing contract on BOTH unbind arms, so anything a contributor
+    // adds here has to show up in this list and be argued for by name.
+    const selfCalls = [...new Set(arm.match(/\bthis\.\w+\(/g) ?? [])].sort();
+    expect(selfCalls, 'the arm calls nothing but the chat line and the two repaints').toEqual([
+      'this.log(',
+      'this.renderBags(',
+      'this.renderUnbind(',
+    ]);
+    // The allowlist cannot see a call with no `this.` receiver, which is
+    // exactly how every module-level cue is spelled, so the receiver pin
+    // stays as its complement. Between them: no bare audio/sfx/voice call,
+    // and no method of the Hud beyond the three named above.
+    expect(arm).not.toMatch(/\b(audio|sfx|voice)\.\w+\(/);
   });
 
   it('renders nothing for a reason-less deny (the silent malformed-item-id arm)', () => {
