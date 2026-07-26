@@ -529,7 +529,7 @@ const COLD_PAINTERS = ON_DISK_PAINTERS.filter(
   (f) => f.endsWith('_window.ts') && !SCANNED_FILES.has(f),
 );
 
-describe('hud_perf_budget ARM 1: hot painters make no raw DOM write (Node, npm test)', () => {
+describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract (Node, npm test)', () => {
   for (const { file, allow, reflowAllow } of SCANNED_PAINTERS) {
     it(`${file} routes every per-frame write through the elided writers`, () => {
       const code = painterSource(file);

@@ -72,7 +72,8 @@ use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
   run it after any `src/sim/` change. It ALSO completeness-checks the UI/render pure cores: a NEW
   pure core MUST follow the `*_view`/`*_core` naming (a bare name escapes the reverse sweep) and
   be registered in `UI_PURE_CORES`/`RENDER_PURE_CORES`, or the guard fails. It then classifies
-  every REMAINING `src/ui` module (the ones the pure-core and `*_painter` name families miss): one
+  every REMAINING `src/ui` module (the ones the pure-core and `*_painter` name families miss,
+  window painters included: a `*_window.ts` is covered here AND by the painter gate below): one
   that reaches for a browser global must be registered in `UI_PAINTER_HELPERS` (a host-agnostic
   painter-side helper, which then may only mint its own canvas and must stay deterministic and
   colorless) or in `UI_DOM_MODULES` (it owns browser state), and anything unregistered must touch
@@ -83,6 +84,12 @@ use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
   brace silently discards all later CSS); re-run after touching `src/styles/` or entry inline styles.
 - Perf budgets: `hud_perf_budget` (baseline in `hud_perf_budget.baseline.md`), `render_budget`,
   `tests/server/perf_gate` + `tick_perf_capture`, `alloc_probe` (probe in `tests/util/`).
+  `hud_perf_budget` also owns the painter half of the `src/ui` classification, over BOTH
+  sanctioned painter names (`*_painter.ts` and `*_window.ts`): a painter is facet-routed
+  (`HOT_PAINTERS`, no raw per-frame write and no forced-reflow read), canvas
+  (`CANVAS_PAINTERS`, same scans plus an identity proof that it really draws on a 2D context),
+  or cold, the registration-free default for a window (no forced-reflow read and no per-frame
+  driver of its own; write-elision is a per-frame contract and deliberately does not apply).
 - SFX gates: the `sfx_*` suites (`sfx_conform`, `sfx_studio_server_security`,
   `tests/server/static_sfx_serving`, ...) mirror `npm run sfx:check`.
 - `malware_scan.test.ts` is the release-gate backstop (signatures from `scripts/malware_scan.mjs`,
