@@ -617,6 +617,7 @@ interface SweepResult {
   violations: string[];
   scanned: string[];
   observed: number;
+  checked: string[];
 }
 
 // The bucket sweep, extracted so the VERDICT PATH itself can be exercised. Collecting into
@@ -634,6 +635,7 @@ function sweepBucket(
 ): SweepResult {
   const violations: string[] = [];
   const scanned: string[] = [];
+  const checked = new Set<string>();
   let observed = 0;
   for (const file of files) {
     const code = read(file);
@@ -642,56 +644,78 @@ function sweepBucket(
     for (const [token, re] of matchers) {
       const expected = allow[token] ?? 0;
       const actual = countMatches(code, re);
+      checked.add(token);
       observed += actual;
       if (actual !== expected) {
         violations.push(`${file}: ${token} appears ${actual}x, expected ${expected}`);
       }
     }
   }
-  return { violations, scanned, observed };
+  return { violations, scanned, observed, checked: [...checked] };
 }
 
 const coldReflowAllowance = new Map(COLD_PAINTER_ALLOWANCES.map((c) => [c.file, c.reflowAllow]));
 const coldDriverAllowance = new Map(COLD_PAINTER_ALLOWANCES.map((c) => [c.file, c.driverAllow]));
 
+// The per-file scan for one matcher family. It RETURNS the labels it checked so the caller
+// can assert the whole family was walked: every count in the scanned buckets is expected 0
+// except a handful of documented allowances, so truncating the matcher loop to nothing
+// asserts nothing and passes. Non-vacuity here has to be about the matchers, not the counts.
+function checkTokenCounts(
+  file: string,
+  code: string,
+  matchers: ReadonlyArray<readonly [string, RegExp]>,
+  allow: TokenAllowance,
+  why: string,
+): string[] {
+  const checked: string[] = [];
+  for (const [token, re] of matchers) {
+    const expected = allow[token] ?? 0;
+    const actual = countMatches(code, re);
+    checked.push(token);
+    expect(actual, `${file}: ${token} appears ${actual}x, expected ${expected} (${why})`).toBe(
+      expected,
+    );
+  }
+  return checked;
+}
+
+const labelsOf = (matchers: ReadonlyArray<readonly [string, RegExp]>): string[] =>
+  matchers.map(([label]) => label);
+
 describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract (Node, npm test)', () => {
   for (const { file, allow, reflowAllow, driverAllow } of SCANNED_PAINTERS) {
     it(`${file} owns no repeating driver of its own`, () => {
-      const code = painterSource(file);
-      for (const [token, re] of FRAME_DRIVERS) {
-        const expected = driverAllow?.[token] ?? 0;
-        const actual = countMatches(code, re);
-        expect(
-          actual,
-          `${file}: ${token} appears ${actual}x, expected ${expected} (a painter driven by Hud.update() has no business owning a second clock; this scan covers every bucket so a window PROMOTED into HOT_PAINTERS keeps its driver contract instead of shedding it on the way in)`,
-        ).toBe(expected);
-      }
+      const checked = checkTokenCounts(
+        file,
+        painterSource(file),
+        FRAME_DRIVERS,
+        driverAllow ?? {},
+        'a painter driven by Hud.update() has no business owning a second clock; this scan covers every bucket so a window PROMOTED into HOT_PAINTERS keeps its driver contract instead of shedding it on the way in',
+      );
+      expect(checked).toEqual(labelsOf(FRAME_DRIVERS));
     });
-  }
 
-  for (const { file, allow, reflowAllow } of SCANNED_PAINTERS) {
     it(`${file} routes every per-frame write through the elided writers`, () => {
-      const code = painterSource(file);
-      for (const [token, re] of RAW_WRITES) {
-        const expected = allow[token] ?? 0;
-        const actual = countMatches(code, re);
-        expect(
-          actual,
-          `${file}: ${token} appears ${actual}x, expected ${expected} (per-frame writes must go through the PainterHost facet; only a DOCUMENTED build-time exception is allowed)`,
-        ).toBe(expected);
-      }
+      const checked = checkTokenCounts(
+        file,
+        painterSource(file),
+        RAW_WRITES,
+        allow,
+        'per-frame writes must go through the PainterHost facet; only a DOCUMENTED build-time exception is allowed',
+      );
+      expect(checked).toEqual(labelsOf(RAW_WRITES));
     });
 
     it(`${file} makes no per-frame forced-reflow layout read`, () => {
-      const code = painterSource(file);
-      for (const [token, re] of FORCED_REFLOW_READS) {
-        const expected = reflowAllow[token] ?? 0;
-        const actual = countMatches(code, re);
-        expect(
-          actual,
-          `${file}: ${token} appears ${actual}x, expected ${expected} (a per-frame layout read flushes pending layout = thrash; only a DOCUMENTED reflow flush is allowed)`,
-        ).toBe(expected);
-      }
+      const checked = checkTokenCounts(
+        file,
+        painterSource(file),
+        FORCED_REFLOW_READS,
+        reflowAllow,
+        'a per-frame layout read flushes pending layout = thrash; only a DOCUMENTED reflow flush is allowed',
+      );
+      expect(checked).toEqual(labelsOf(FORCED_REFLOW_READS));
     });
   }
 
@@ -749,11 +773,14 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
   // than 70 near-identical cases, collecting every violation so a failure names all of them
   // at once (the idiom tests/architecture.test.ts uses for its own sweeps).
   it('cold window painters make no forced-reflow layout read beyond a documented allowance', () => {
-    const { violations, scanned, observed } = sweepBucket(
+    const { violations, scanned, observed, checked } = sweepBucket(
       COLD_PAINTERS,
       FORCED_REFLOW_READS,
       (f) => coldReflowAllowance.get(f) ?? {},
       painterSource,
+    );
+    expect(checked, 'the cold reflow sweep skipped part of the vocabulary').toEqual(
+      labelsOf(FORCED_REFLOW_READS),
     );
     // Non-vacuity for the sweep itself, not just for its bucket: a loop narrowed to an empty
     // slice, or a painterSource() that silently returned nothing, would report zero
@@ -773,11 +800,14 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
   });
 
   it('cold window painters own no repeating driver beyond a documented allowance', () => {
-    const { violations, scanned, observed } = sweepBucket(
+    const { violations, scanned, observed, checked } = sweepBucket(
       COLD_PAINTERS,
       FRAME_DRIVERS,
       (f) => coldDriverAllowance.get(f) ?? {},
       painterSource,
+    );
+    expect(checked, 'the cold driver sweep skipped part of the vocabulary').toEqual(
+      labelsOf(FRAME_DRIVERS),
     );
     // Same non-vacuity guard as the reflow sweep: zero violations over zero files is not a
     // pass. The positive control is the lockpick clock, the one module-owned repaint driver
