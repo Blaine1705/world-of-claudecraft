@@ -360,16 +360,22 @@ Which hub stocks which tier is content, not a constant: each hub sells only the
 tiers its own nodes use (Eastbrook tier 1, Fenbridge tiers 1 to 2, Highwatch
 tiers 1 to 3), with the tiered rods a standing exception at Trader Wilkes.
 
-The gate is on the NPC COUNTER, not on tool access, and two routes are open by
-design rather than by omission. A tool already owned keeps working at every tier
-it always did (nothing in the gate reads inventory). And the six gated tools
-carry no `noMarketList`, so a player may buy one from another player at any
-proficiency; the tier-4 tool recipes give that a real market, since they consume
-the tier-3 tools as reagents. **Open ruling:** closing the market route means
-adding `noMarketList` to the six, which reverses the shipped "tiers 2 and 3 are
-bought, never granted, so they stay sellable and listable" decision and touches
-the market economy, so it is a maintainer call. Until it is made, describe the
-gate as pacing what a merchant will sell, never as pacing tool access.
+The gate is a PURCHASE gate on the NPC counter, not a use-time gate. What a tool
+can work is decided solely by `canGatherTier` (`src/sim/professions/tools.ts`),
+which never reads proficiency, so every non-counter route reaches full tier at
+any proficiency. Three are open by design rather than by omission: a tool
+already owned (nothing in the gate reads inventory), buyback (returning a
+player's own sold item is not a new acquisition, reachable at 0 only via the
+one-time mastery reset), and the World Market, since the six carry no
+`noMarketList` and the tier-4 tool recipes consume the tier-3 tools as reagents.
+
+**Open ruling, and it is bigger than it looks.** The question is not "should
+these be listable", which reads like a one-line content edit. It is whether tool
+tier should gate at USE time rather than at purchase. That would strand every
+player already holding a tool above their proficiency and turn 70 into a hard
+prerequisite for the tier-4 recipes, so deferring is the conservative side.
+Until it is settled, describe the gate as pacing what a merchant will sell,
+never as pacing tool access.
 
 One knock-on worth naming: the tier-4 engineering tool recipes consume the
 tier-3 land tools, so buying that reagent from a counter now needs 70 in the

@@ -23,19 +23,32 @@
 // a counter and buy the top land tool, which skips the whole tool ladder the
 // gathering trades are paced around.
 //
-// SCOPE, stated precisely because it is narrower than it may read: this gates
-// the NPC COUNTER, not access to the tool. Two routes are deliberately left
-// open. A tool already in a player's bags keeps working at every tier it always
-// did, because nothing here reads or removes inventory. And these six tools
-// carry neither `noVendorSell` nor `noMarketList` (content/items.ts: only the
-// three tier-1 tools do, and only to close a quest re-grant mint), so a player
-// may still buy one from another player on the World Market at any proficiency,
-// which the tier-4 tool recipes give real demand for since they consume the
-// tier-3 tools as reagents. That is a live design question, not an oversight
-// this table forgot: closing it means adding `noMarketList` to the six, which
-// reverses a shipped decision and touches the market economy, so it is the
-// maintainer's ruling to make. Until it is made, do not describe this as
-// pacing tool ACCESS; it paces what a merchant will sell you.
+// SCOPE, stated precisely because it is narrower than it may read: this is a
+// PURCHASE gate on the NPC counter, not a USE-time gate. What a tool can work
+// is decided solely by `canGatherTier` (professions/tools.ts), which never
+// reads proficiency, so EVERY non-counter route reaches full tier at any
+// proficiency. Three are open today, deliberately:
+//
+//  - A tool already in a player's bags. Nothing here reads or removes
+//    inventory, so a tool owned before this shipped keeps working exactly as
+//    it did.
+//  - Buyback (items.ts buyBackItem), which is not gated on purpose: returning
+//    a player their own sold item is not a new acquisition. It is reachable at
+//    0 proficiency only through the one-time mastery reset, which zeroes the
+//    counter at load while the buyback list persists.
+//  - The World Market. These six carry neither `noVendorSell` nor
+//    `noMarketList` (content/items.ts: only the three tier-1 tools do, and only
+//    to close a quest re-grant mint), so a player may buy one from another
+//    player at any proficiency, which the tier-4 tool recipes give real demand
+//    for since they consume the tier-3 tools as reagents.
+//
+// The open ruling is NOT "should these be listable". Framed that way it looks
+// like a one-line content edit; the real choice is whether tool tier should
+// gate at USE time instead of at purchase, which would strand every player who
+// already owns a tool above their proficiency and make 70 a hard prerequisite
+// for the tier-4 recipes. That is the maintainer's call, and deferring it is
+// the conservative side. Until it is made, do not describe this as pacing tool
+// ACCESS; it paces what a merchant will sell you.
 //
 // DOM-free, rng-free and host-agnostic (src/sim purity, tests/architecture.test.ts).
 
@@ -114,8 +127,21 @@ export function resolveVendorRowGate(
   itemId: string,
   proficiency: Readonly<Record<string, number>>,
 ): VendorRowGateState {
+  // hasOwn, not a bare lookup: the table is an object literal, so `constructor`
+  // and friends would otherwise resolve to a truthy non-gate. Unreachable from
+  // either live call site today, but a custom world document can put arbitrary
+  // strings into an NPC's vendorItems (sim/map_doc.ts), and this resolver is
+  // exported and driven directly by tests. The mirrored delve gate is
+  // array-find based, so matching its shape does not cover this.
+  if (!Object.hasOwn(VENDOR_ROW_GATES, itemId)) return { locked: false };
   const requirement = VENDOR_ROW_GATES[itemId];
-  if (!requirement) return { locked: false };
-  const held = proficiency[requirement.professionId] ?? 0;
+  // Coerced, never taken on trust. The sim's own map is sanitized on load
+  // (normalizeGatheringProficiency admits only finite numbers), but the ONLINE
+  // client assigns the mirrored map straight off the wire with no shape check,
+  // and a non-finite value would sail through a bare `<` comparison: NaN < 40
+  // is false, which would OPEN a gated row. Absent and malformed must both
+  // read 0 and lock, which is what the contract above promises.
+  const raw = proficiency[requirement.professionId];
+  const held = typeof raw === 'number' && Number.isFinite(raw) ? raw : 0;
   return { locked: held < requirement.proficiency, requirement };
 }

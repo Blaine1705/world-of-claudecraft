@@ -12326,8 +12326,10 @@ export class Hud {
     //
     // The one exception is the `/dev gather` cheat, which grants proficiency
     // from anywhere on a dev realm. Cosmetic only: the lock is advisory, the
-    // buy path re-runs the same resolver, and proficiency only ever rises, so
-    // a stale row is over-locked rather than wrongly open.
+    // buy path re-runs the same resolver, and proficiency only ever rises in
+    // session, so a stale row is over-locked rather than wrongly open. (The
+    // sole decrement anywhere is the one-time mastery reset, which runs inside
+    // applyState at character load, when no window can be open.)
   }
 
   renderBags(): void {

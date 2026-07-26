@@ -19,7 +19,7 @@ import {
   TIER3_TOOL_GATE_PROFICIENCY,
   VENDOR_ROW_GATES,
 } from '../src/sim/content/vendor_row_gates';
-import { GATHER_NODES, ITEMS, NPCS } from '../src/sim/data';
+import { GATHER_NODES, ITEMS, NPCS, zoneAt } from '../src/sim/data';
 import * as items from '../src/sim/items';
 import { GATHER_GAIN_TIER_STEP, gatherNodeGainMultiplier } from '../src/sim/professions/gathering';
 import { Sim } from '../src/sim/sim';
@@ -97,6 +97,35 @@ describe('vendor row gate resolver', () => {
     expect(resolveVendorRowGate('mithril_mining_pick', {}).requirement?.proficiency).toBe(
       TIER3_TOOL_GATE_PROFICIENCY,
     );
+  });
+
+  it('treats a MALFORMED proficiency value as 0, which locks, exactly like an absent one', () => {
+    // A bare `held < threshold` comparison lets NaN through: NaN < 40 is false,
+    // so the row would OPEN. The sim's own map is sanitized on load, but the
+    // online client mirrors gprof straight off the wire with no shape check and
+    // hands that map to the view, so this is the one direction the resolver
+    // must not fail open in.
+    for (const bad of [Number.NaN, Number.POSITIVE_INFINITY, undefined, null, '99', {}]) {
+      const map = { mining: bad } as unknown as Record<string, number>;
+      expect(resolveVendorRowGate('iron_mining_pick', map).locked, String(bad)).toBe(true);
+    }
+    // Infinity is malformed, not "very skilled": a wire value that large is a
+    // corrupt payload, and reading it as qualified would open every row.
+    expect(
+      resolveVendorRowGate('iron_mining_pick', {
+        mining: Number.NEGATIVE_INFINITY,
+      }).locked,
+    ).toBe(true);
+  });
+
+  it('never resolves a prototype key as a gate', () => {
+    // The table is an object literal, so a bare lookup answers `constructor`
+    // and friends with a truthy non-gate. A custom world document can put an
+    // arbitrary string into an NPC's vendorItems, so the ids reaching this
+    // resolver are not all content-authored.
+    for (const key of ['constructor', 'toString', '__proto__', 'hasOwnProperty']) {
+      expect(resolveVendorRowGate(key, {}), key).toEqual({ locked: false });
+    }
   });
 
   it('gates each tool on its OWN profession, never on another counter', () => {
@@ -413,6 +442,46 @@ describe('the gated tools are stocked somewhere a gated row can be seen', () => 
       const stockists = Object.values(NPCS).filter((npc) => npc.vendorItems?.includes(itemId));
       expect(stockists.length, `${itemId} is stocked by no NPC`).toBeGreaterThan(0);
     }
+  });
+
+  it('no hub anywhere stocks a land tool above its own zone node tier', () => {
+    // The rule that justifies taking six rows off Eastbrook, DERIVED rather
+    // than enumerated. The hand-written arms in tests/professions_tools.test.ts
+    // are a lower bound per zone ("Fenbridge stocks at least these"), so they
+    // could not have caught the bug this change fixes: Eastbrook broke this
+    // rule for its whole life and shipped green, and dropping a tier-3 axe onto
+    // the Fenbridge counter would still ship green today. This arm is the upper
+    // bound, and it holds for every current and future tool-stocking NPC.
+    const maxNodeTierInZone = new Map<string, number>();
+    for (const node of GATHER_NODES) {
+      maxNodeTierInZone.set(
+        node.zoneId,
+        Math.max(maxNodeTierInZone.get(node.zoneId) ?? 0, node.tier),
+      );
+    }
+    expect(maxNodeTierInZone.size).toBeGreaterThan(0);
+
+    // NPC z coordinates map to zones the way the world does; resolve each
+    // stocking NPC to its zone through the shipped zone lookup rather than by
+    // hand, so a relocated merchant is judged against its new ground.
+    let checked = 0;
+    for (const npc of Object.values(NPCS)) {
+      for (const itemId of npc.vendorItems ?? []) {
+        const use = ITEMS[itemId]?.use;
+        // Land tools only: fishing has no nodes, so the rule cannot be stated
+        // for rods and they are a documented standing exception.
+        if (use?.type !== 'gatherTool' || use.professionId === 'fishing') continue;
+        const zoneId = zoneAt(npc.pos.z).id;
+        const nodeCeiling = maxNodeTierInZone.get(zoneId) ?? 0;
+        expect(
+          use.tier,
+          `${npc.id} (${zoneId}) stocks ${itemId} at tier ${use.tier} above its ground's ${nodeCeiling}`,
+        ).toBeLessThanOrEqual(nodeCeiling);
+        checked++;
+      }
+    }
+    // Non-vacuity: the sweep must actually have seen the shipped tool rows.
+    expect(checked).toBeGreaterThan(10);
   });
 
   it('no gated counter sits close enough to a node to harvest with its window open', () => {
