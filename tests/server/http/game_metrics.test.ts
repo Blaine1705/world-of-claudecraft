@@ -10,6 +10,7 @@
 
 import { Registry } from 'prom-client';
 import { describe, expect, it } from 'vitest';
+import { COPPER_FLOW_SOURCES, HARVEST_BANDS } from '../../../server/economy_telemetry';
 import {
   type GameStateSource,
   registerGameStateMetrics,
@@ -17,6 +18,9 @@ import {
   WOC_ACCOUNTS_ONLINE,
   WOC_CHARACTERS_CREATED_TOTAL,
   WOC_CHAT_MESSAGES_TOTAL,
+  WOC_COPPER_CREDITED_TOTAL,
+  WOC_COPPER_SPENT_TOTAL,
+  WOC_GATHER_HARVESTS_TOTAL,
   WOC_INPUT_FRAMES_MISSED_TOTAL,
   WOC_PLAYERS_ONLINE,
   WOC_SIM_ENTITIES,
@@ -286,6 +290,9 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
       WOC_INPUT_FRAMES_MISSED_TOTAL,
       WOC_CHAT_MESSAGES_TOTAL,
       WOC_CHARACTERS_CREATED_TOTAL,
+      WOC_COPPER_CREDITED_TOTAL,
+      WOC_COPPER_SPENT_TOTAL,
+      WOC_GATHER_HARVESTS_TOTAL,
     ]) {
       const metric = registry.getSingleMetric(name) as unknown as { inc: () => never };
       metric.inc = () => {
@@ -299,6 +306,9 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(() => counters.wsInputSeqGap(3)).not.toThrow();
     expect(() => counters.chatMessage()).not.toThrow();
     expect(() => counters.characterCreated()).not.toThrow();
+    expect(() => counters.copperCredited('quest', 50)).not.toThrow();
+    expect(() => counters.copperSpent('vendor', 20)).not.toThrow();
+    expect(() => counters.harvest('mid')).not.toThrow();
   });
 
   it('bounds the ws direction label to in/out and emits no per-player label anywhere', async () => {
@@ -327,5 +337,106 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     ]) {
       expect(labelValues(text, forbidden).size).toBe(0);
     }
+  });
+});
+
+describe('registerGameStateMetrics: economy telemetry counters', () => {
+  it('pre-registers every copper source and harvest band series at zero', async () => {
+    const registry = new Registry();
+    registerGameStateMetrics(registry, stubSource());
+    // Scrape BEFORE any sink call: prom counters cannot backfill, so every
+    // economic surface and every band must be visible from boot rather than
+    // appearing the first time a player earns a coin or swings a pick.
+    const text = await registry.metrics();
+
+    expect(WOC_COPPER_CREDITED_TOTAL).toBe('woc_copper_credited_total');
+    expect(WOC_COPPER_SPENT_TOTAL).toBe('woc_copper_spent_total');
+    expect(WOC_GATHER_HARVESTS_TOTAL).toBe('woc_gather_harvests_total');
+    for (const name of [
+      WOC_COPPER_CREDITED_TOTAL,
+      WOC_COPPER_SPENT_TOTAL,
+      WOC_GATHER_HARVESTS_TOTAL,
+    ]) {
+      expect(text).toContain(`# TYPE ${name} counter`);
+    }
+    for (const source of COPPER_FLOW_SOURCES) {
+      for (const name of [WOC_COPPER_CREDITED_TOTAL, WOC_COPPER_SPENT_TOTAL]) {
+        expect(
+          sampleValue(text, new RegExp(`^${name}\\{source="${source}"\\} (\\d+)$`, 'm')),
+          `${name} ${source}`,
+        ).toBe('0');
+      }
+    }
+    for (const band of HARVEST_BANDS) {
+      expect(
+        sampleValue(
+          text,
+          new RegExp(`^woc_gather_harvests_total\\{band="${band}"\\} (\\d+)$`, 'm'),
+        ),
+        band,
+      ).toBe('0');
+    }
+  });
+
+  it('increments copper by amount and harvests by one, each under its own label', async () => {
+    const registry = new Registry();
+    const counters = registerGameStateMetrics(registry, stubSource());
+
+    counters.copperCredited('quest', 150);
+    counters.copperCredited('quest', 50);
+    counters.copperCredited('loot', 7);
+    counters.copperSpent('vendor', 20);
+    counters.harvest('mid');
+    counters.harvest('mid');
+    counters.harvest('premium');
+
+    const text = await registry.metrics();
+    expect(sampleValue(text, /^woc_copper_credited_total\{source="quest"\} (\d+)$/m)).toBe('200');
+    expect(sampleValue(text, /^woc_copper_credited_total\{source="loot"\} (\d+)$/m)).toBe('7');
+    // Untouched surfaces stay at their pre-registered zero rather than drifting.
+    expect(sampleValue(text, /^woc_copper_credited_total\{source="vendor"\} (\d+)$/m)).toBe('0');
+    expect(sampleValue(text, /^woc_copper_spent_total\{source="vendor"\} (\d+)$/m)).toBe('20');
+    expect(sampleValue(text, /^woc_copper_spent_total\{source="quest"\} (\d+)$/m)).toBe('0');
+    expect(sampleValue(text, /^woc_gather_harvests_total\{band="mid"\} (\d+)$/m)).toBe('2');
+    expect(sampleValue(text, /^woc_gather_harvests_total\{band="premium"\} (\d+)$/m)).toBe('1');
+    expect(sampleValue(text, /^woc_gather_harvests_total\{band="starter"\} (\d+)$/m)).toBe('0');
+  });
+
+  it('drops a non-positive or non-finite copper amount instead of corrupting the series', async () => {
+    const registry = new Registry();
+    const counters = registerGameStateMetrics(registry, stubSource());
+
+    // A counter can only go up. These are caller bugs, and the sink's job is to
+    // keep them out of the exposition rather than throw inside a command path.
+    counters.copperCredited('quest', 0);
+    counters.copperCredited('quest', -5);
+    counters.copperCredited('quest', Number.NaN);
+    counters.copperSpent('vendor', Number.POSITIVE_INFINITY);
+    counters.copperCredited('quest', 10);
+
+    const text = await registry.metrics();
+    expect(sampleValue(text, /^woc_copper_credited_total\{source="quest"\} (\d+)$/m)).toBe('10');
+    expect(sampleValue(text, /^woc_copper_spent_total\{source="vendor"\} (\d+)$/m)).toBe('0');
+  });
+
+  it('emits no label beyond the two fixed economy vocabularies', async () => {
+    const registry = new Registry();
+    const counters = registerGameStateMetrics(registry, stubSource());
+    counters.copperCredited('quest', 1);
+    counters.harvest('starter');
+
+    const text = await registry.metrics();
+    const sources = new Set(
+      [...text.matchAll(/^woc_copper_(?:credited|spent)_total\{source="([^"]+)"\}/gm)].map(
+        (m) => m[1],
+      ),
+    );
+    expect([...sources].sort()).toEqual([...COPPER_FLOW_SOURCES].sort());
+    const bands = new Set(
+      [...text.matchAll(/^woc_gather_harvests_total\{band="([^"]+)"\}/gm)].map((m) => m[1]),
+    );
+    expect([...bands].sort()).toEqual([...HARVEST_BANDS].sort());
+    // No per-player dimension anywhere on these families.
+    expect(text).not.toMatch(/woc_(copper|gather)[^\n]*\b(account|character|player|name|ip)=/);
   });
 });

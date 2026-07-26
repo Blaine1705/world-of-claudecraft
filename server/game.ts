@@ -150,6 +150,7 @@ import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueRelay } from './discord_relay';
 import { formatDuration } from './duration';
+import { copperFlowSourceForCommand, harvestBandForItem } from './economy_telemetry';
 import { shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, serializeEventFragments } from './event_frame';
 import { mergedPrsForLogin } from './github_contributors';
@@ -3918,13 +3919,40 @@ export class GameServer {
       );
       return;
     }
+    const cmd = this.messageCommand(msg);
+    // Economy telemetry: sample the acting player's copper across this one
+    // dispatch, so a command's own credit or debit is attributed to its
+    // economic surface with no sim-side signal and no gameplay effect. Two
+    // O(1) map reads, and the 20 Hz movement lane is skipped outright since an
+    // input frame can never move copper. Sampled AFTER the catch as well as the
+    // happy path: a command that threw halfway may still have moved coin.
+    const copperBefore = cmd === 'input' ? undefined : this.sim.meta(session.pid)?.copper;
     // a malformed payload must never take down the server for everyone
     try {
       this.dispatchMessage(session, msg, raw, receivedAtMs);
     } catch (err) {
-      const cmd = this.messageCommand(msg);
       console.error(`bad message from ${session.name} (cmd: ${cmd}):`, err);
     }
+    if (copperBefore !== undefined) this.recordCopperFlow(session, cmd, copperBefore);
+  }
+
+  /**
+   * Book the acting player's copper delta from one command dispatch onto the
+   * bounded-cardinality flow counters. Deliberately NOT a complete ledger: a
+   * credit that lands on a third party (a party fair-split to a non-acting
+   * looter) or outside any command (a tick-driven payout) has no dispatch to
+   * attribute it to and is not booked. server/economy_telemetry.ts records
+   * that, and operators read these series as per-surface trend, not as a sum
+   * that must reconcile against total coin in the world.
+   */
+  private recordCopperFlow(session: ClientSession, command: string, before: number): void {
+    // A session that left during its own dispatch (logout) has no meta to read
+    // back; skip rather than book a phantom drain of the player's whole purse.
+    const after = this.sim.meta(session.pid)?.copper;
+    if (after === undefined || after === before) return;
+    const source = copperFlowSourceForCommand(command);
+    if (after > before) gameMetricsCounters().copperCredited(source, after - before);
+    else gameMetricsCounters().copperSpent(source, before - after);
   }
 
   private messageCommand(msg: unknown): string {
@@ -6189,6 +6217,9 @@ export class GameServer {
   // duel result, arena win) and enqueue a card for the Discord bot to post. The
   // drain endpoint resolves which players are linked and tags them; the queue
   // dedupes so one moment yields one card.
+  //
+  // This is also the tick's ONE observer pass over the event list, so the
+  // per-band harvest counter rides it rather than adding a second O(n) walk.
   private detectActivity(events: SimEvent[]): void {
     const now = Date.now();
     // Deed unlocks accumulate per session and record AFTER the loop, behind a
@@ -6212,6 +6243,12 @@ export class GameServer {
           // must not spam their guild).
           if (ev.retro !== true) this.maybeBroadcastDeedUnlock(s, ev.deedId);
         }
+      }
+      // Economy telemetry: one granted node harvest, counted under the band of
+      // what it yielded. Bots emit this too and are counted like anyone else,
+      // deliberately: the series exists to show what the world is harvesting.
+      if (ev.type === 'gatherResult') {
+        gameMetricsCounters().harvest(harvestBandForItem(ev.itemId));
       }
       if (ev.type === 'levelup' && ev.pid !== undefined) {
         const session = this.clients.get(ev.pid);

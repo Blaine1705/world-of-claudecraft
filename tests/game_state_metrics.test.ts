@@ -39,6 +39,7 @@ vi.mock('../server/db', () => ({
   releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
+import type { CopperFlowSource, HarvestBand } from '../server/economy_telemetry';
 import { type ClientSession, GameServer } from '../server/game';
 import { type GameStateSource, registerGameStateMetrics } from '../server/http/game_metrics';
 import {
@@ -60,7 +61,8 @@ import {
   MSG_RATE_REFILL_PER_SECOND,
   MSG_SEQ_GAP_SANITY,
 } from '../server/msg_rate_limit';
-import type { PlayerClass } from '../src/sim/types';
+import { ITEMS } from '../src/sim/data';
+import type { PlayerClass, SimEvent } from '../src/sim/types';
 
 interface FakeClient {
   sent: unknown[];
@@ -390,6 +392,9 @@ function recordingSink() {
   let chats = 0;
   const dropped: WsDropCause[] = [];
   const seqGaps: number[] = [];
+  const credited: Array<[CopperFlowSource, number]> = [];
+  const spent: Array<[CopperFlowSource, number]> = [];
+  const harvests: HarvestBand[] = [];
   const sink: GameMetricsCounters = {
     wsMessage(direction) {
       if (direction === 'in') wsIn++;
@@ -407,11 +412,23 @@ function recordingSink() {
       chats++;
     },
     characterCreated() {},
+    copperCredited(source, amount) {
+      credited.push([source, amount]);
+    },
+    copperSpent(source, amount) {
+      spent.push([source, amount]);
+    },
+    harvest(band) {
+      harvests.push(band);
+    },
   };
   return {
     sink,
     dropped,
     seqGaps,
+    credited,
+    spent,
+    harvests,
     wsIn: () => wsIn,
     rateKicks: () => rateKicks,
     chats: () => chats,
@@ -722,6 +739,140 @@ describe('inbound drop, kick, and seq-gap counters at their emission sites', () 
     vi.setSystemTime(GATE_T0 + 1000);
     server.handleMessage(session, inputFrame(MSG_LANE_MOVEMENT_BURST + 2));
     expect(rec.seqGaps).toEqual([1]);
+    server.stop();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Economy telemetry: the copper-flow sampler around one command dispatch and
+// the per-band harvest counter on the tick's event pass. Recording-fake pins
+// driven through the real handleMessage / detectActivity, same pattern as the
+// drop and seq-gap counters above.
+// ---------------------------------------------------------------------------
+
+/** Put the player on top of an NPC so the vendor proximity checks pass. */
+function placeOnNpc(server: GameServer, pid: number, templateId: string): void {
+  const sim = server.sim as unknown as Record<string, any>;
+  const npc = [...sim.entities.values()].find((e: any) => e.templateId === templateId);
+  if (!npc) throw new Error(`npc ${templateId} not in world`);
+  const player = sim.entities.get(pid);
+  player.pos.x = npc.pos.x;
+  player.pos.z = npc.pos.z;
+  player.pos.y = npc.pos.y;
+  player.prevPos = { ...player.pos };
+  sim.rebucket(player);
+}
+
+function vendorSellFrame(item: string, count: number): string {
+  return JSON.stringify({ t: 'cmd', cmd: 'sell', item, count });
+}
+
+/** One granted node harvest, in the exact shape professions/gathering.ts emits. */
+function harvestEvent(itemId: string): SimEvent {
+  return {
+    type: 'gatherResult',
+    pid: 999,
+    nodeId: 'node_test',
+    nodeType: 'ore',
+    professionId: 'mining',
+    itemId,
+    rarity: 'common',
+    qty: 1,
+    rareEvent: null,
+  } as SimEvent;
+}
+
+describe('economy telemetry counters at their emission sites', () => {
+  it('books a real vendor sale as a credit under the vendor surface', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+    const session = join(server, fakeWs(), 100, 1, 'Ayla');
+    const meta = server.sim.meta(session.pid) as unknown as Record<string, any>;
+    placeOnNpc(server, session.pid, 'trader_wilkes');
+    server.sim.addItem('bronze_sickle', 1, session.pid);
+    meta.copper = 0;
+
+    server.handleMessage(session, vendorSellFrame('bronze_sickle', 1));
+
+    expect(meta.copper).toBe(ITEMS.bronze_sickle.sellValue);
+    expect(rec.credited).toEqual([['vendor', ITEMS.bronze_sickle.sellValue]]);
+    expect(rec.spent).toEqual([]);
+    server.stop();
+  });
+
+  it('books a real vendor purchase as a spend, and the amount is the delta not the price list', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+    const session = join(server, fakeWs(), 100, 1, 'Ayla');
+    const meta = server.sim.meta(session.pid) as unknown as Record<string, any>;
+    placeOnNpc(server, session.pid, 'trader_wilkes');
+    meta.copper = 500;
+    const npcId = [...(server.sim as unknown as Record<string, any>).entities.values()].find(
+      (e: any) => e.templateId === 'trader_wilkes',
+    ).id;
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'buy', npc: npcId, item: 'iron_mining_pick' }),
+    );
+
+    const paid = 500 - (meta.copper as number);
+    expect(paid).toBe(ITEMS.iron_mining_pick.buyValue);
+    expect(rec.spent).toEqual([['vendor', paid]]);
+    expect(rec.credited).toEqual([]);
+    server.stop();
+  });
+
+  it('books nothing at all when a command moves no copper', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+    const session = join(server, fakeWs(), 100, 1, 'Ayla');
+    const meta = server.sim.meta(session.pid) as unknown as Record<string, any>;
+    meta.copper = 250;
+
+    // A movement frame (the 20 Hz lane the sampler skips outright), a chat
+    // line, and a denied sale: none of the three may book a sample.
+    server.handleMessage(session, inputFrame(1));
+    server.handleMessage(session, chatFrame('hello'));
+    server.handleMessage(session, vendorSellFrame('bronze_sickle', 1)); // none held, no vendor
+
+    expect(meta.copper).toBe(250);
+    expect(rec.credited).toEqual([]);
+    expect(rec.spent).toEqual([]);
+    server.stop();
+  });
+
+  it('counts each granted harvest under its own material band', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+
+    // The real observer pass over a tick's events, fed one harvest per band.
+    (server as unknown as Record<string, any>).detectActivity([
+      harvestEvent('copper_ore'),
+      harvestEvent('goldleaf_herb'),
+      harvestEvent('sunpetal_herb'),
+      harvestEvent('copper_ore'),
+    ]);
+
+    expect(rec.harvests).toEqual(['starter', 'mid', 'premium', 'starter']);
+    server.stop();
+  });
+
+  it('counts a harvest without needing a live session for the gatherer', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+
+    // pid 999 has no ClientSession (a bot, or a player who left mid-tick). The
+    // deed and levelup arms in this same loop filter on this.clients; the
+    // harvest counter deliberately does not, because it measures the world.
+    (server as unknown as Record<string, any>).detectActivity([harvestEvent('thorium_ore')]);
+
+    expect(rec.harvests).toEqual(['mid']);
     server.stop();
   });
 });

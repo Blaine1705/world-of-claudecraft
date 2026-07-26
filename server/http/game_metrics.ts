@@ -23,6 +23,12 @@
 
 import { Counter, Gauge, type Registry } from 'prom-client';
 import {
+  COPPER_FLOW_SOURCES,
+  type CopperFlowSource,
+  HARVEST_BANDS,
+  type HarvestBand,
+} from '../economy_telemetry';
+import {
   type GameMetricsCounters,
   WS_DROP_CAUSES,
   type WsDropCause,
@@ -64,6 +70,15 @@ export const WOC_CHAT_MESSAGES_TOTAL = 'woc_chat_messages_total';
 
 /** Total characters successfully created. */
 export const WOC_CHARACTERS_CREATED_TOTAL = 'woc_characters_created_total';
+
+/** Total copper credited to acting players, labeled by economic surface. */
+export const WOC_COPPER_CREDITED_TOTAL = 'woc_copper_credited_total';
+
+/** Total copper debited from acting players, labeled by economic surface. */
+export const WOC_COPPER_SPENT_TOTAL = 'woc_copper_spent_total';
+
+/** Total granted node harvests, labeled by material band. */
+export const WOC_GATHER_HARVESTS_TOTAL = 'woc_gather_harvests_total';
 
 /**
  * The FIXED set of loop phases surfaced on woc_sim_tick_phase_seconds. These are
@@ -252,6 +267,33 @@ export function registerGameStateMetrics(
     registers: [registry],
   });
 
+  const copperCredited = new Counter({
+    name: WOC_COPPER_CREDITED_TOTAL,
+    help: 'Total copper credited to acting players during their own command, by economic surface.',
+    labelNames: ['source'],
+    registers: [registry],
+  });
+  const copperSpent = new Counter({
+    name: WOC_COPPER_SPENT_TOTAL,
+    help: 'Total copper debited from acting players during their own command, by economic surface.',
+    labelNames: ['source'],
+    registers: [registry],
+  });
+  // Prom counters cannot backfill a scrape: pre-register every source series at
+  // zero so a dashboard shows each surface from boot, not from its first coin.
+  for (const source of COPPER_FLOW_SOURCES) {
+    copperCredited.inc({ source }, 0);
+    copperSpent.inc({ source }, 0);
+  }
+
+  const harvests = new Counter({
+    name: WOC_GATHER_HARVESTS_TOTAL,
+    help: 'Total granted node harvests, by material band.',
+    labelNames: ['band'],
+    registers: [registry],
+  });
+  for (const band of HARVEST_BANDS) harvests.inc({ band }, 0);
+
   return {
     wsMessage(direction: WsMessageDirection): void {
       try {
@@ -293,6 +335,29 @@ export function registerGameStateMetrics(
         charactersCreated.inc();
       } catch {
         // Drop the sample rather than propagate into the create path.
+      }
+    },
+    copperCredited(source: CopperFlowSource, amount: number): void {
+      try {
+        // A counter can only go up: a non-positive or non-finite sample is a
+        // caller bug, and dropping it is better than throwing inside dispatch.
+        if (Number.isFinite(amount) && amount > 0) copperCredited.inc({ source }, amount);
+      } catch {
+        // Drop the sample rather than propagate into the command path.
+      }
+    },
+    copperSpent(source: CopperFlowSource, amount: number): void {
+      try {
+        if (Number.isFinite(amount) && amount > 0) copperSpent.inc({ source }, amount);
+      } catch {
+        // Drop the sample rather than propagate into the command path.
+      }
+    },
+    harvest(band: HarvestBand): void {
+      try {
+        harvests.inc({ band });
+      } catch {
+        // Drop the sample rather than propagate into the event-routing path.
       }
     },
   };

@@ -15,9 +15,12 @@
 // GameStateSource the exporter registration captures. See server/http/game_metrics.ts.
 //
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
-// only label values here are the ws-message direction (a fixed two) and the
-// inbound drop cause (the fixed six-value WS_DROP_CAUSES set). Nothing
-// per-player (account id, character id, name, ip) is ever passed as a label.
+// only label values here are the ws-message direction (a fixed two), the
+// inbound drop cause (the fixed six-value WS_DROP_CAUSES set), the copper-flow
+// source and the harvest band (the two fixed sets in server/economy_telemetry.ts).
+// Nothing per-player (account id, character id, name, ip) is ever a label.
+
+import type { CopperFlowSource, HarvestBand } from '../economy_telemetry';
 
 /** The two directions a ws frame is counted under: client-to-server or server-to-client. */
 export type WsMessageDirection = 'in' | 'out';
@@ -67,6 +70,18 @@ export interface GameMetricsCounters {
   chatMessage(): void;
   /** One character successfully created. */
   characterCreated(): void;
+  /**
+   * `amount` copper (always positive) credited to the acting player during a
+   * command attributed to `source`. Sampled as the player's own copper delta
+   * across one command dispatch, so a credit that lands on a THIRD party (a
+   * party fair-split to a non-acting looter) or outside any command (a tick
+   * driven payout) is not booked here; see server/economy_telemetry.ts.
+   */
+  copperCredited(source: CopperFlowSource, amount: number): void;
+  /** `amount` copper (always positive) debited from the acting player, same sampling. */
+  copperSpent(source: CopperFlowSource, amount: number): void;
+  /** One granted node harvest, counted under its material band. */
+  harvest(band: HarvestBand): void;
 }
 
 /** A sink that drops every signal; the slot default until boot wires the real one. */
@@ -77,6 +92,9 @@ export const noopGameMetricsCounters: GameMetricsCounters = {
   wsInputSeqGap() {},
   chatMessage() {},
   characterCreated() {},
+  copperCredited() {},
+  copperSpent() {},
+  harvest() {},
 };
 
 let activeCounters: GameMetricsCounters = noopGameMetricsCounters;
