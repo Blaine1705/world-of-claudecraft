@@ -33,7 +33,12 @@
 // DOM: needs `document.createElement('canvas')`, so this is a painter-side
 // helper, not a pure core. It stays host-agnostic otherwise (no window, no
 // Three, no i18n, no CSS-var reads: the caller passes resolved colors), and its
-// tests drive it through a fake document + fake 2D context.
+// tests drive it through a fake document + fake 2D context. That contract is
+// enforced rather than merely described: the module is registered in
+// UI_PAINTER_HELPERS in tests/architecture.test.ts, whose classification sweep
+// holds it to exactly this (host-agnostic, deterministic, no literal color, and
+// `document` only to mint the canvas above). Keep the registration in sync if
+// this file is moved or renamed.
 
 /** How one label rasterizes. `stroke` + `lineWidth` are the classic
  *  outlined-label pair (the outline is what keeps a map label readable over

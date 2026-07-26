@@ -374,8 +374,9 @@ tint with vector `PRIMITIVES` and optional `FX`. Unknown ids fall back via
 ## Small modules (pure-core + thin-consumer exemplars)
 Logic lifted out of `hud.ts`: a host-agnostic core a Vitest imports directly, plus a thin
 DOM/canvas consumer. EXEMPLARS only, each named for a non-obvious contract: the canonical
-index is the `UI_PURE_CORES` allowlist in `tests/architecture.test.ts`, and each module's
-header carries its own contract.
+index is the `UI_PURE_CORES` allowlist in `tests/architecture.test.ts` (a module that must
+touch the DOM is indexed in the sibling `UI_PAINTER_HELPERS` / `UI_DOM_MODULES` lists in that
+same file), and each module's header carries its own contract.
 - **unit_portrait.ts** / **unit_portrait_painter.ts**: the canonical template pair (DOM-free
   geometry + crest-id core, thin DPR-aware painter); player and target frames share it.
 - **hud/vendor/vendor_view.ts** / **vendor_window.ts**: the first window migrated out of

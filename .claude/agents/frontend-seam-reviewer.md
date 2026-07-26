@@ -63,7 +63,12 @@ logic grown onto a coordinator as a finding.
    stable discriminators). No DOM globals, no `Math.random` / `Date.now` / `performance.now`.
    The core has a DIRECT unit test driving it against BOTH a Sim-shaped and a
    ClientWorld-mirror-shaped `IWorld` stub (online-only shapes differ: absorb is offline-only,
-   target cast remaining and combo pips differ). Gate: `npx vitest run tests/architecture.test.ts`.
+   target cast remaining and combo pips differ). A module that can be NEITHER a pure core (it
+   has to touch the DOM) nor a painter is a painter-side helper: the same suite classifies it,
+   so it must be registered in `UI_PAINTER_HELPERS` (host-agnostic, deterministic, colorless,
+   `document` only to mint its own detached node) or, if it owns browser state, in
+   `UI_DOM_MODULES`; anything unregistered must touch no browser global at all.
+   Gate: `npx vitest run tests/architecture.test.ts`.
 
 2. **Thin painter on the PainterHost seam.** The painter (`*_painter.ts` / `*_window.ts`) is
    INSTANCE-PARAMETERIZED (takes a descriptor / injected element refs, no hardcoded element

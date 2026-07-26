@@ -327,6 +327,11 @@ function countToken(code: string, token: string): number {
   return (code.match(re) ?? []).length;
 }
 
+// The painter half of the src/ui classification: this suffix is what makes a
+// module a painter. The OTHER half is the module-classification sweep in
+// tests/architecture.test.ts (SWEPT_BY_NAME_RE), whose residual set is everything
+// this function does NOT match, so widening the suffix here silently shrinks that
+// sweep's domain: change both together.
 function findUiPainters(dir: string, prefix = ''): string[] {
   const painters: string[] = [];
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
