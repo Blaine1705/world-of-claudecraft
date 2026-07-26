@@ -22,6 +22,7 @@ import {
   FIELD_RECIPES,
   TOOL_RECIPES,
 } from '../src/sim/content/recipes';
+import { TIER3_TOOL_GATE_PROFICIENCY } from '../src/sim/content/vendor_row_gates';
 import { ZONE1_ZONE } from '../src/sim/content/zone1';
 import { ZONE2_ZONE } from '../src/sim/content/zone2';
 import { ZONE3_ZONE } from '../src/sim/content/zone3';
@@ -460,21 +461,25 @@ describe('station reagent sourcing (prog_tools_of_the_trade completability)', ()
     const pid = sim.playerId;
     const anySim = sim as any;
     const meta = anySim.players.get(pid);
-    meta.copper = 390; // what the old counter purchase used to cost, exactly
+    meta.copper = 640; // what the counter purchase below used to cost, exactly
 
     const npcEntity = (templateId: string) =>
       [...anySim.entities.values()].find((e: any) => e.templateId === templateId);
 
-    // The base tool is still a real vendor purchase (tools stay stocked).
-    const wilkes = npcEntity('trader_wilkes');
-    placeAt(sim, pid, wilkes.pos);
-    sim.buyItem(wilkes.id, 'mithril_mining_pick');
+    // The base tool is still a real vendor purchase (tools stay stocked). Both
+    // halves of the setup moved with the tool gate and the hub-stocking rule:
+    // Highwatch rather than Eastbrook, because tier-3 tools are now sold only
+    // where tier-3 veins are, and with the mining proficiency its row asks for
+    // (content/vendor_row_gates.ts). Neither is what this case is about, they
+    // are the control that proves the ore denial below is about the ore.
+    const bree = npcEntity('quartermaster_bree');
+    placeAt(sim, pid, bree.pos);
+    meta.gatheringProficiency.mining = TIER3_TOOL_GATE_PROFICIENCY;
+    sim.buyItem(bree.id, 'mithril_mining_pick');
     expect(sim.countItem('mithril_mining_pick', pid)).toBe(1);
     expect(meta.copper).toBe(240);
 
     // The ore is not: buyItem denies on the missing stock row, charging nothing.
-    const bree = npcEntity('quartermaster_bree');
-    placeAt(sim, pid, bree.pos);
     for (let i = 0; i < 4; i++) sim.buyItem(bree.id, 'thorium_ore');
     expect(sim.countItem('thorium_ore', pid)).toBe(0);
     expect(meta.copper).toBe(240);

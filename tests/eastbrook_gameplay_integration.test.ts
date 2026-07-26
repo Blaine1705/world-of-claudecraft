@@ -336,9 +336,46 @@ describe('Eastbrook authored gameplay data integration', () => {
     // no NPC stocks a gathered material), which is a content change to this
     // payload, not placement drift. Any UNEXPLAINED move here is the bug it
     // was written to catch.
+    //
+    // Re-minted a second time when Eastbrook stopped stocking the tier-2 and
+    // tier-3 land tools, the hub rule that a zone sells the tiers its own
+    // nodes use (Eastbrook is entirely tier-1 ground). Exactly three of the 16
+    // payloads moved and all three moves are vendorItems rows: trader_wilkes
+    // (six tools dropped, both rods kept), forgemistress_darva (two picks
+    // dropped) and tinker_gizzel (four axes and sickles dropped). Nothing else
+    // in any def, and no placement field, changed. The arm below re-checks
+    // those two rows are still the ones this case owns.
     expect(createHash('sha256').update(JSON.stringify(stableTownNpcPayload())).digest('hex')).toBe(
-      '1fd1f30ecf79ac54411e9e90076be7becb1b64f621de8bc7afabffc5c6b5211b',
+      '253d5927ed17e438faa5d66b57e031cc1ab3af61370b773e0d714bc3426226e8',
     );
+    // The three moved rows, stated so the hash above is auditable rather than
+    // a number to re-mint on sight: a future drift in some OTHER field of some
+    // other NPC would move the hash while leaving these three intact, which is
+    // exactly the case the digest alone cannot describe.
+    expect(ZONE1_NPCS.trader_wilkes.vendorItems).toEqual([
+      'baked_bread',
+      'spring_water',
+      'roasted_boar',
+      'tough_jerky',
+      'minor_healing_potion',
+      'minor_mana_potion',
+      'linen_pouch',
+      'travelers_knapsack',
+      'copper_mining_pick',
+      'handaxe',
+      'gathering_sickle',
+      'ironreel_fishing_rod',
+      'silverstream_fishing_rod',
+    ]);
+    expect(ZONE1_NPCS.forgemistress_darva.vendorItems).toEqual([
+      'copper_mining_pick',
+      'smithing_flux',
+    ]);
+    expect(ZONE1_NPCS.tinker_gizzel.vendorItems).toEqual([
+      'handaxe',
+      'simple_fishing_pole',
+      'arcanite_bar',
+    ]);
     expect(ZONE1_TOWN_NPC_IDS).toHaveLength(15);
     for (const id of ZONE1_TOWN_NPC_IDS) {
       const placement = EASTBROOK_NPC_PLACEMENTS_BY_ID[id];
