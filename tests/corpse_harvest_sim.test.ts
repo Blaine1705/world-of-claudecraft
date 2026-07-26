@@ -1612,6 +1612,7 @@ describe('a repeated component tag over the wire, through a real GameServer (#24
     raw: string;
     inventory: { itemId: string; count: number; instance?: unknown }[];
     hides: number;
+    draws: number;
     claimedBy: number | null;
   } {
     const server = new GameServer();
@@ -1637,11 +1638,20 @@ describe('a repeated component tag over the wire, through a real GameServer (#24
     // envelope (ClientWorld.rawCmd); without it the dispatcher drops the frame
     // as a protocol anomaly and the test would pass on an unharvested corpse.
     const raw = JSON.stringify({ t: 'cmd', cmd: 'harvestCorpse', id: mobId, components });
+    let draws = 0;
+    const rng = (
+      server.sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }
+    ).rng;
+    rng.setObserver(() => {
+      draws++;
+    });
     (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
+    rng.setObserver(null);
     return {
       raw,
       inventory: structuredClone(internals.players.get(session.pid)!.inventory),
       hides: server.sim.countItem('rough_hide', session.pid),
+      draws,
       claimedBy: mob.harvestClaimedBy,
     };
   }
@@ -1658,6 +1668,13 @@ describe('a repeated component tag over the wire, through a real GameServer (#24
     expect(dup.inventory).toEqual(once.inventory);
     expect(dup.claimedBy).not.toBeNull();
     expect(dup.claimedBy).toBe(once.claimedBy);
+    // The most decisive pin available over the wire, and the one the bags
+    // alone cannot make: rolls are what a doubled harvest actually spent. One
+    // family costs two draws (tier roll plus rarity roll); the repeat used to
+    // cost four, so this is a literal, not an equality that could hold at any
+    // value.
+    expect(dup.draws).toBe(2);
+    expect(once.draws).toBe(2);
   });
 
   it('forwards the repeat verbatim: the SIM boundary is what closes it, not the server', () => {
