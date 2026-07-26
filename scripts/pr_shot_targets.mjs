@@ -2973,6 +2973,17 @@ export const TARGETS = [
       { key: 'targets-replace', targets: true, replace: true },
       { key: 'targets-replace-mobile', targets: true, replace: true, mobile: true },
       { key: 'replace-confirm', targets: true, replace: true, replaceConfirm: true },
+      // The confirm on touch: this dialog carries the most copy of any state
+      // here (what dies, the no-refund ruling, what survives, the price), so
+      // the narrow landscape viewport is where it is most likely to wrap or
+      // clip, and it needs its own capture rather than a desktop stand-in.
+      {
+        key: 'replace-confirm-mobile',
+        targets: true,
+        replace: true,
+        replaceConfirm: true,
+        mobile: true,
+      },
     ],
     async capture(page, variant) {
       await page.evaluate(() => {
@@ -2992,6 +3003,15 @@ export const TARGETS = [
             // one on screen), and a plain bagged copy (the classic target), so
             // the target step paints all three families at once. Real ids
             // only, never hand-written display strings.
+            //
+            // The bagged victim carries ALL THREE surviving facts (#2421): the
+            // signature, a masterwork bake (str, distinct from the int the
+            // enchant contributes, so the confirm's kept line and the tooltip's
+            // own attribution split agree), and an armed bind-on-trade lock.
+            // That is what puts a full "Kept: ..." line on screen; the worn
+            // copy stays plain-enchanted, so the same shot also shows the arm
+            // that deliberately claims no bind state. The bagged plain copy of
+            // the SAME item id is the mixed holding whose twin now says so.
             sim.addItemInstance('eastbrook_arming_sword', {
               enchant: 'enchant_weapon_agility',
               rolled: { stats: { agi: 2 } },
@@ -3000,7 +3020,8 @@ export const TARGETS = [
             sim.addItemInstance('eastbrook_arming_sword', {
               signer: 'Aldric',
               enchant: 'enchant_weapon_intellect',
-              rolled: { stats: { int: 2 } },
+              rolled: { masterwork: true, stats: { int: 2, str: 3 } },
+              bindOnTrade: true,
             });
             sim.addItem('eastbrook_arming_sword', 1);
             sim.addItem('arcane_dust', 6);
