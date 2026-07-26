@@ -432,6 +432,16 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
 // A window that genuinely goes per-frame is moved into HOT_PAINTERS, and the raw-write scan
 // applies to it there.
 //
+// THE ESCAPE THAT SURVIVES, named rather than papered over: a window can be driven from
+// OUTSIDE itself. `Hud.update()` already reaches two of them, `renderTownFocus` and
+// `renderCrafting`, and both are correct today because both sit behind the 500ms slow band
+// and an invalidation key (hud.ts calls the crafting window a cold painter in as many
+// words). A future ungated call from that same method would make a window per-frame with
+// nothing in THIS file to see it, since the driver lives in the coordinator, not in the
+// painter. Closing that means a contract on `Hud.update()`'s call graph, which is a
+// different gate in a different file; it is not something a per-painter source scan can
+// reach, and pretending otherwise would be the more dangerous outcome.
+//
 // Cold needs NO registration, which is what makes it safe as a default: every window painter
 // not listed below is held to zero on every matcher, so a new window is covered the day it
 // lands rather than the day someone remembers it. The asymmetry with `*_painter.ts`, which must be consciously placed
