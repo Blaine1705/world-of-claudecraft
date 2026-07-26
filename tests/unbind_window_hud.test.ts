@@ -91,15 +91,16 @@ describe('hud.ts unbindResult event arm (source pins)', () => {
     // which occur ZERO times in hud.ts (showToast occurs nowhere in src/ at
     // all), so it enforced only its banner clause and a real cue added here
     // would have passed the whole repo. Naming the live idioms instead just
-    // moved the goalposts: hud.ts reaches sound through audio.<cue>( AND
-    // sfx.playUi( / sfx.playAt( AND sfx.crowdRoar( AND sfx.unloop( AND
-    // voice.play( AND three private wrappers of its own (this.combat, an
-    // 18-use route straight onto sfx.playAt, plus playEventSfx and
-    // playAttackerSfx), and its out-of-chat surfaces are showBanner,
+    // moved the goalposts: hud.ts reaches sound through audio.<cue>(, and
+    // sfx.playUi( / playAt( / crowdRoar( / unloop( / loop( / goalHorn(, and
+    // voice.play(, and three private wrappers of its own (this.combat, a
+    // route straight onto sfx.playAt, plus playEventSfx and
+    // playAttackerSfx); its out-of-chat surfaces run to showBanner,
     // showError (itself BOTH a toast and a cue, since it calls audio.error),
     // showPrompt, showSelfNote, showSubzone, confirmDialog, inputDialog,
-    // combatLog, flashActionSlot. Every enumeration of that was one idiom
-    // short of the next one somebody adds.
+    // combatLog and flashActionSlot. Neither list is closed, and that is the
+    // point: every enumeration of them was one idiom short of the next one
+    // somebody adds.
     //
     // So enumerate what the arm IS instead. Its entire method surface is
     // three calls, and #2458 made "one chat line and nothing else" the
