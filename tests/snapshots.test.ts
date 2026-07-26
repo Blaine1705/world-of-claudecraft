@@ -150,6 +150,34 @@ function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWo
 }
 
 describe('self stat wire round-trip', () => {
+  it('mirrors Paladin shield block stats from the live equip command path', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Cedric', 'paladin');
+    server.sim.addItem('eastbrook_buckler', 1, session.pid);
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'equip', item: 'eastbrook_buckler', slot: 'offhand' }),
+    );
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.equip.offhand).toBe('eastbrook_buckler');
+    expect(snap.self.stats.armor).toBeGreaterThan(0);
+    expect(snap.self.stats.sta).toBeGreaterThan(0);
+    expect(snap.self.blk).toBeGreaterThan(0);
+    expect(snap.self.bval).toBe(6);
+
+    const client = bareClient(session.pid, 'paladin');
+    const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
+    internals.applySnapshot(snap);
+    expect(client.player.offhandItemId).toBe('eastbrook_buckler');
+    expect(client.player.equippedItems.offhand).toBe('eastbrook_buckler');
+    expect(client.player.stats.armor).toBe(snap.self.stats.armor);
+    expect(client.player.stats.sta).toBe(snap.self.stats.sta);
+    expect(client.player.blockChance).toBe(snap.self.blk);
+    expect(client.player.blockValue).toBe(6);
+  });
+
   it('mirrors crit/haste rating from the self snapshot onto the paper-doll entity', () => {
     const client = bareClient(1);
     const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
@@ -3051,7 +3079,9 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   atitle: 'activeTitle',
   bags: 'bags',
   bank: 'bankInfo',
+  blk: 'blockChance',
   buyback: 'vendorBuyback',
+  bval: 'blockValue',
   cds: 'cooldowns',
   cosmetics: 'accountCosmetics',
   cprof: 'craftingIdentity',
@@ -3745,7 +3775,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     // reviewable change landing in alphabetical order
     expect(Object.keys(TERSE_TO_IWORLD)).toEqual([...Object.keys(TERSE_TO_IWORLD)].sort());
     // every entry is either a delta key or one of the always-present self scalars
-    const SELF_SCALARS = new Set(['res', 'mres', 'rtype', 'lxp', 'rxp', 'prk']);
+    const SELF_SCALARS = new Set(['blk', 'bval', 'res', 'mres', 'rtype', 'lxp', 'rxp', 'prk']);
     for (const terse of Object.keys(TERSE_TO_IWORLD)) {
       expect(
         (ALL_DELTA_KEYS as readonly string[]).includes(terse) || SELF_SCALARS.has(terse),

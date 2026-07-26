@@ -59,6 +59,23 @@ describe('shield block', () => {
     expect(sim.player.blockValue).toBe(6);
   });
 
+  it('an eligible Paladin shield aimed at offhand updates live block stats', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'paladin', autoEquip: true });
+    sim.addItem('eastbrook_buckler', 1);
+
+    sim.equipItemToSlot('eastbrook_buckler', 'offhand');
+
+    expect(sim.player.offhandItemId).toBe('eastbrook_buckler');
+    expect(sim.player.equippedItems.offhand).toBe('eastbrook_buckler');
+    expect(sim.player.stats.armor).toBeGreaterThan(0);
+    expect(sim.player.stats.sta).toBeGreaterThan(0);
+    expect(sim.player.blockChance).toBe(SHIELD_BLOCK_BASE);
+    expect(sim.player.blockValue).toBe(6);
+    sim.tick();
+    expect(sim.player.blockChance).toBe(SHIELD_BLOCK_BASE);
+    expect(sim.player.blockValue).toBe(6);
+  });
+
   it('unrelated classes do not gain block stats without an eligible shield', () => {
     const sim = new Sim({ seed: 7, playerClass: 'rogue', autoEquip: true });
     expect(sim.player.blockChance).toBe(0);
