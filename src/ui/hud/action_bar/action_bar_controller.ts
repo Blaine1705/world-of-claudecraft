@@ -28,6 +28,10 @@ import {
   syncHotbarActions,
   saveAttackSlotAction as writeAttackSlotAction,
 } from './hotbar';
+import {
+  ownedClassSpecDefaultAbilityIds,
+  shouldSeedOwnedSpecDefault,
+} from './owned_class_spec_defaults';
 
 export { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 
@@ -39,6 +43,8 @@ export interface ActionBarControllerDeps {
   storage: Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
   playerClass: PlayerClass;
   playerName: string;
+  playerLevel(): number;
+  talentSpec(): string | null;
   knownAbilityIds(): readonly string[];
   hasAura(kind: string): boolean;
   isInSportMatch(): boolean;
@@ -60,6 +66,8 @@ export class ActionBarController {
   );
   private loadedFromStorage = false;
   private knownAbilityIdsAtLastSync: Set<string> | null = null;
+  private talentSpecAtLastSync: string | null | undefined;
+  private playerLevelAtLastSync: number | null = null;
   private attackActionState: HotbarAction = null;
   // Suppresses the persistence seam while the controller is loading/seeding from
   // storage: only user-driven changes after init should upload. Flipped true at
@@ -139,6 +147,14 @@ export class ActionBarController {
 
   syncKnownAbilities(): void {
     const knownAbilityIds = [...this.deps.knownAbilityIds()];
+    const talentSpec = this.deps.talentSpec();
+    const playerLevel = this.deps.playerLevel();
+    if (this.trySeedOwnedSpecDefault(knownAbilityIds, talentSpec, playerLevel)) {
+      this.knownAbilityIdsAtLastSync = new Set(knownAbilityIds);
+      this.talentSpecAtLastSync = talentSpec;
+      this.playerLevelAtLastSync = playerLevel;
+      return;
+    }
     const autoPlaceAbilityIds = new Set<string>();
     const consider = (id: string): void => {
       // A passive (Measured Fury) is known but never castable, so it never
@@ -169,6 +185,50 @@ export class ActionBarController {
     this.actionState = synced.actions;
     if (synced.changed) this.saveActions();
     this.knownAbilityIdsAtLastSync = new Set(knownAbilityIds);
+    this.talentSpecAtLastSync = talentSpec;
+    this.playerLevelAtLastSync = playerLevel;
+  }
+
+  private trySeedOwnedSpecDefault(
+    knownAbilityIds: readonly string[],
+    talentSpec: string | null,
+    playerLevel: number,
+  ): boolean {
+    if (this.activeFormState !== 'normal') return false;
+    const currentIds = ownedClassSpecDefaultAbilityIds(
+      this.deps.playerClass,
+      talentSpec,
+      playerLevel,
+      new Set(knownAbilityIds),
+    );
+    if (!currentIds) return false;
+
+    const firstSync = this.talentSpecAtLastSync === undefined;
+    const specChanged = !firstSync && this.talentSpecAtLastSync !== talentSpec;
+    const reachedLevel20 =
+      !firstSync && (this.playerLevelAtLastSync ?? playerLevel) < 20 && playerLevel >= 20;
+    if (!firstSync && !specChanged && !reachedLevel20) return false;
+
+    let previousGenerated: HotbarAction[] | null = null;
+    if (!firstSync && this.knownAbilityIdsAtLastSync) {
+      const previousIds = ownedClassSpecDefaultAbilityIds(
+        this.deps.playerClass,
+        this.talentSpecAtLastSync ?? null,
+        this.playerLevelAtLastSync ?? playerLevel,
+        this.knownAbilityIdsAtLastSync,
+      );
+      const fallbackIds = [...this.knownAbilityIdsAtLastSync].filter((id) =>
+        this.shouldAutoPlaceOnForm(id, 'normal'),
+      );
+      previousGenerated = buildDefaultFormBar(previousIds ?? fallbackIds, ACTION_BAR_ABILITY_SLOTS);
+    }
+    if (!shouldSeedOwnedSpecDefault(this.actionState, previousGenerated, this.loadedFromStorage)) {
+      return false;
+    }
+
+    this.actionState = buildDefaultFormBar(currentIds, ACTION_BAR_ABILITY_SLOTS);
+    this.saveActions();
+    return true;
   }
 
   addAbility(abilityId: string): boolean {
@@ -200,11 +260,21 @@ export class ActionBarController {
   }
 
   resetActiveBar(): void {
+    const knownAbilityIds = [...this.deps.knownAbilityIds()];
+    const ownedSpecDefault =
+      this.activeFormState === 'normal'
+        ? ownedClassSpecDefaultAbilityIds(
+            this.deps.playerClass,
+            this.deps.talentSpec(),
+            this.deps.playerLevel(),
+            new Set(knownAbilityIds),
+          )
+        : null;
     this.actionState = buildDefaultFormBar(
-      this.formKitAbilityIds(this.activeFormState),
+      ownedSpecDefault ?? this.formKitAbilityIds(this.activeFormState),
       ACTION_BAR_ABILITY_SLOTS,
     );
-    this.knownAbilityIdsAtLastSync = new Set(this.deps.knownAbilityIds());
+    this.knownAbilityIdsAtLastSync = new Set(knownAbilityIds);
     this.markFormBarSeeded();
     this.saveActions();
   }

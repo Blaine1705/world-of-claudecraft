@@ -54,7 +54,7 @@ export function abilityDamageBonus(
       // channel coefficient in combat, not the single-cast one.
       return def.channel
         ? channelTickBonus(power, def)
-        : directHitBonus(power, def, res.castTime, false);
+        : directHitBonus(power, def, res.castTime, false, eff.spellPowerCoeff);
     case 'aoeDamage':
     case 'aoeRoot':
     case 'chainDamage':
@@ -107,6 +107,10 @@ export function abilityDamageBonus(
       const ticks = eff.interval > 0 ? Math.max(1, eff.duration / eff.interval) : 1;
       return dotTickBonus(power, def, eff.duration, eff.interval) * ticks;
     }
+    case 'hunterBloodhook':
+      return Math.round(scaling.rangedPower * eff.rangedPowerCoeff * (eff.damageMult ?? 1));
+    case 'hunterStampede':
+      return Math.round(scaling.rangedPower * eff.rangedPowerCoeff);
     default:
       return 0;
   }
@@ -130,6 +134,7 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
       eff.type === 'aoeDamage' ||
       eff.type === 'aoeHeal' ||
       eff.type === 'aoeRoot' ||
+      eff.type === 'chainDamage' ||
       eff.type === 'groundAoE' ||
       (eff.type === 'repositionToAim' && eff.landingAoe !== undefined) ||
       eff.type === 'consumeAura' ||
@@ -137,7 +142,9 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
       eff.type === 'drainTick' ||
       eff.type === 'sunder' ||
       eff.type === 'faerieFire' ||
-      eff.type === 'lifeTap',
+      eff.type === 'lifeTap' ||
+      eff.type === 'hunterBloodhook' ||
+      eff.type === 'hunterStampede',
   );
 }
 

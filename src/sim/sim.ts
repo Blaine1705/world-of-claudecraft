@@ -28,6 +28,7 @@ import {
 import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
 import { lineOfSightClear, resolveMovement, resolvePosition } from './colliders';
+import { resolveActionReplacement } from './combat/action_replacement';
 import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
 import { auraReplacementConflicts } from './combat/aura_stacking';
 import {
@@ -73,6 +74,7 @@ import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
 import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
+import { updateGuardian } from './combat/guardians';
 import {
   applyHeal as applyHealImpl,
   consumeHealAbsorb as consumeHealAbsorbImpl,
@@ -82,10 +84,22 @@ import {
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
 import { advanceHeroicLeap } from './combat/heroic_leap';
+import { resolveColdsightAbility } from './combat/hunter_coldsight';
+import { clearFieldcraftState, finishBloodhook } from './combat/hunter_fieldcraft';
+import { clearPacklordState } from './combat/hunter_packlord';
+import {
+  clearHunterTalentState,
+  hunterPetFerocityDamageMultiplier,
+  resolveHunterSharedAbility,
+} from './combat/hunter_shared';
 import { tickNaturesFury } from './combat/natures_fury';
+import { cleanupPriestState } from './combat/priest/lifecycle';
+import { resolveVespersAbility } from './combat/priest/vespers';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
 import { rewindHealAmount } from './combat/rewind';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
+import { clearSpiritmendCurrents } from './combat/shaman_spiritmend';
+import { clearShamanTalentState, onGhostWolfExited } from './combat/shaman_talents';
 import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
 import { isSpellResisted } from './combat/spell_resist';
 import { isCritImmuneTank } from './combat/tank_crit_immunity';
@@ -909,6 +923,9 @@ export interface ResolvedAbility {
   bonusCharges?: number; // talent-added uses, kept distinct from native maxCharges
   /** 1-based authoritative charge stage for hold-to-charge spells. */
   empowerLevel?: number;
+  hunterApex?: boolean;
+  hunterOverdraw?: boolean;
+  hunterRhythm?: boolean;
 }
 
 export interface RewardCounters {
@@ -1258,7 +1275,8 @@ export interface AwayStatus {
 // cleanly (addPlayer falls back to the unranked defaults).
 export interface CharacterState {
   // Production content migration revision. Revision 1 is the v0.26 all-class
-  // Talents V2 migration; absent means a pre-v0.26 character JSONB save.
+  // Talents V2 migration; revision 2 is the v0.29 Hunter redesign repick.
+  // Absent means a pre-v0.26 character JSONB save.
   contentRevision?: number;
   level: number;
   xp: number;
@@ -2502,7 +2520,7 @@ export class Sim {
       player.resource =
         classDef.resourceType === 'mana'
           ? Math.min(player.maxResource, Math.max(0, savedState.resource))
-          : classDef.resourceType === 'energy'
+          : classDef.resourceType === 'energy' || classDef.resourceType === 'focus'
             ? 100
             : 0;
     } else {
@@ -2510,7 +2528,7 @@ export class Sim {
       player.resource =
         classDef.resourceType === 'mana'
           ? player.maxResource
-          : classDef.resourceType === 'energy'
+          : classDef.resourceType === 'energy' || classDef.resourceType === 'focus'
             ? 100
             : 0;
     }
@@ -2827,6 +2845,9 @@ export class Sim {
     if (leavingRun?.lockpick && leavingRun.lockpick.ownerId === pid)
       this.ctx.abandonLockpick(leavingRun);
     this.preparePlayerLeave(pid);
+    clearSpiritmendCurrents(this.ctx, pid);
+    const leaving = this.entities.get(pid);
+    if (leaving) clearShamanTalentState(this.ctx, leaving);
     despawnMobsForDev(this.ctx, pid, 'spawned');
     // leave social systems cleanly. removeFromParty lives on the PartyMachine now
     // (A1); reach it through the seam, keeping this call in its load-bearing
@@ -2896,6 +2917,13 @@ export class Sim {
     const meta = this.players.get(pid);
     if (!meta) return;
     meta.leaving = true;
+    cleanupPriestState(this.ctx, pid);
+    const leaving = this.entities.get(pid);
+    if (leaving && meta.cls === 'hunter') {
+      clearHunterTalentState(this.ctx, leaving);
+      clearPacklordState(this.ctx, leaving);
+      clearFieldcraftState(this.ctx, leaving);
+    }
     // Dungeon Finder teardown FIRST, while the leaver's party/roster still resolves
     // (drops their queue unit, fails their proposal, closes their listing, withdraws
     // their application). It runs HERE, not in removePlayer, because the server calls
@@ -4450,8 +4478,12 @@ export class Sim {
   resolvedAbility(abilityId: string, pid?: number): ResolvedAbility | null {
     const r = this.resolve(pid);
     if (!r) return null;
-    const found = r.meta.known.find((k) => k.def.id === abilityId) ?? null;
-    if (!found) return null;
+    const known = r.meta.known.find((k) => k.def.id === abilityId) ?? null;
+    if (!known) return null;
+    let found = resolveActionReplacement(known, r.e);
+    found = resolveColdsightAbility(found, r.e, r.meta);
+    found = resolveHunterSharedAbility(found, r.e, r.meta);
+    found = resolveVespersAbility(found, r.meta);
     // A "draining curse" (cost_tax aura) inflates the resource cost of every
     // ability the victim uses. Resolve it here, the single choke point all cost
     // checks/spends read, so the affordability check and the spend stay in
@@ -4569,8 +4601,12 @@ export class Sim {
 
     for (const e of this.entities.values()) {
       if (e.kind === 'mob') {
-        if (this.shouldSkipIdleMobTick(e)) continue;
-        this.updateMob(e);
+        if (e.guardianState) {
+          if (!updateGuardian(this.ctx, e)) continue;
+        } else {
+          if (this.shouldSkipIdleMobTick(e)) continue;
+          this.updateMob(e);
+        }
         // Tag the mob.update lap with the mob so the host can attribute this slice
         // of the phase cost to its zone/group. The sim reads nothing
         // from it and allocates nothing, so this stays behavior- and parity-inert.
@@ -4841,6 +4877,7 @@ export class Sim {
     }
     const ownerMeta = this.players.get(e.ownerId);
     if (ownerMeta) mult *= 1 + this.playerMods(ownerMeta).global.petDmgPct;
+    mult *= hunterPetFerocityDamageMultiplier(this.ctx, e);
     return mult;
   }
 
@@ -4926,6 +4963,7 @@ export class Sim {
     const target = this.entities.get(p.chargeTargetId);
     p.chargeTimeLeft -= DT;
     const done = (arrived: boolean): boolean => {
+      finishBloodhook(this.ctx, p, target ?? null, arrived);
       p.chargeTargetId = null;
       p.chargePath = [];
       if (target) p.facing = steadyAngleTo(p.pos, target.pos, p.facing);
@@ -5299,6 +5337,7 @@ export class Sim {
     abilityId: string | null = null,
     canCrit = true,
     canTriggerWeaponProcs = true,
+    resolution?: { resolved: number },
   ): number {
     return applyHealImpl(
       this.ctx,
@@ -5309,6 +5348,7 @@ export class Sim {
       abilityId,
       canCrit,
       canTriggerWeaponProcs,
+      resolution,
     );
   }
 
@@ -5580,6 +5620,7 @@ export class Sim {
     const name = e.auras[idx].name;
     e.auras.splice(idx, 1);
     this.emit({ type: 'aura', targetId: e.id, name, gained: false });
+    onGhostWolfExited(this.ctx, e);
   }
 
   // Taunt/Growl, classic semantics: never misses, lifts the caster's threat to
@@ -8900,7 +8941,11 @@ export class Sim {
                 // 2026-07-12): other chronomancers' echoes still heal in the sim but
                 // never show in this viewer's group/raid strip. echoVisibleTo reads
                 // the real aura sourceId, so no wire field is added.
-                auras: partyFrameAuras(e.auras.filter((a) => echoVisibleTo(a, this.primaryId))),
+                auras: partyFrameAuras(
+                  e.auras.filter((a) => echoVisibleTo(a, this.primaryId)),
+                  undefined,
+                  e.maxHp,
+                ),
               },
             ]
           : [];

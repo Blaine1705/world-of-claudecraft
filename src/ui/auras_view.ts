@@ -28,6 +28,7 @@
 // mirror aura {stacks:undefined} derive identical output.
 
 import { isDebuffAura as classifyDebuffAura, DEBUFF_AURA_KINDS } from '../sim/aura_classify';
+import { isPersistentEngineAura } from '../sim/persistent_aura';
 import type { AuraKind } from '../sim/types';
 import type { AuraSchool } from './aura_effect';
 
@@ -105,6 +106,8 @@ export interface AuraInput {
   tickInterval?: number;
   school?: AuraSchool;
   stacks?: number;
+  /** Party-frame-only relative pool badge for Mending Current. */
+  poolPct?: number;
   // Remaining charges on a charge-limited aura (e.g. Lightning Shield's 3 reflects). Present
   // on the offline Sim aura and mirrored over the wire; undefined for ordinary auras. When
   // present it drives the badge overlay INSTEAD of stacks (a charge count, not a stack count),
@@ -311,18 +314,22 @@ export function createAurasView(
         slot.iconKey = deps.iconId(a);
         slot.isDebuff = debuff;
         slot.school = debuff ? (a.school ?? 'physical') : '';
-        const toggle = (TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id)) && !TIMED_IDS.has(a.id);
+        const toggle =
+          (TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id) || isPersistentEngineAura(a.id)) &&
+          !TIMED_IDS.has(a.id);
         slot.durationText = toggle ? '' : compactAuraDuration(a.remaining, units);
         // Toggles show no countdown, so they never blink either.
         slot.expiring = !toggle && isAuraExpiring(a.remaining, a.duration);
         // A charge-limited aura badges its remaining charges (shown even at 1); otherwise the
         // badge shows a stack count, and only when it stacks past 1.
         slot.stacksText =
-          a.charges !== undefined
-            ? deps.formatStacks(a.charges)
-            : a.stacks && a.stacks > 1
-              ? deps.formatStacks(a.stacks)
-              : '';
+          a.poolPct !== undefined
+            ? deps.formatStacks(a.poolPct)
+            : a.charges !== undefined
+              ? deps.formatStacks(a.charges)
+              : a.stacks && a.stacks > 1
+                ? deps.formatStacks(a.stacks)
+                : '';
         slot.name = deps.auraName(a);
         slot.remaining = a.remaining;
         // The buff bar (mode 'buffs', the player's own auras) offers right-click-cancel;

@@ -33,6 +33,14 @@
 // (enforced by tests/architecture.test.ts).
 
 import { stripTemporalEchoes } from '../combat/chronomancy';
+import { clearFieldcraftState } from '../combat/hunter_fieldcraft';
+import { clearPacklordState } from '../combat/hunter_packlord';
+import { clearHunterTalentState } from '../combat/hunter_shared';
+import { cleanupPriestState } from '../combat/priest/lifecycle';
+import { clearSpiritmendState } from '../combat/shaman_spiritmend';
+import { clearShamanTalentState } from '../combat/shaman_talents';
+import { clearThundercallState } from '../combat/shaman_thundercall';
+import { clearWarspiritState } from '../combat/shaman_warspirit';
 import { abilitiesKnownAt } from '../content/classes';
 import {
   cloneAllocation,
@@ -237,6 +245,18 @@ function markTalentSnapshotDirty(meta: PlayerMeta, revisionBeforeMutation: numbe
   if (meta.wireRev === revisionBeforeMutation) meta.wireRev++;
 }
 
+function cancelPendingProjectilesFrom(ctx: SimContext, sourceId: number): void {
+  const retained: typeof ctx.pendingProjectiles = [];
+  for (const projectile of ctx.pendingProjectiles) {
+    if (projectile.sourceId !== sourceId) {
+      retained.push(projectile);
+      continue;
+    }
+    projectile.fizzle?.();
+  }
+  ctx.pendingProjectiles = retained;
+}
+
 function commitTalentAllocation(
   ctx: SimContext,
   meta: PlayerMeta,
@@ -258,15 +278,37 @@ function commitTalentAllocation(
   if (allocationsEqual(meta.talents, sanitized)) return true;
 
   const previousSpec = meta.talents.spec;
+  if (meta.cls === 'shaman') {
+    clearShamanTalentState(ctx, player, new Set(Object.values(sanitized.rows)));
+  }
+  if (previousSpec !== sanitized.spec) {
+    cancelPendingProjectilesFrom(ctx, player.id);
+    // Remove old spec auras before the single stat recomputation below. In
+    // particular, Stonebound's armor must not be baked into the new spec.
+    clearThundercallState(ctx, player);
+    clearWarspiritState(ctx, player);
+    clearSpiritmendState(ctx, player);
+  }
   meta.talents = sanitized;
   recomputeTalents(ctx, meta);
-  if (previousSpec !== sanitized.spec) ctx.revalidateOffhandForSpec(player.id);
+  if (previousSpec !== sanitized.spec) {
+    ctx.revalidateOffhandForSpec(player.id);
+  }
+  if (meta.cls === 'priest') cleanupPriestState(ctx, player.id);
   // A spec-locked pet outlives its spec otherwise (owner report: the frost
   // Water Elemental kept fighting for a fire mage): if the ability that
   // summons the ACTIVE pet is no longer in the new build's known list, the
   // companion returns home. Tamed hunter pets are never spec-gated, so they
   // are untouched; deterministic, no rng.
   dismissSpecLockedPet(ctx, player, meta);
+  if (meta.cls === 'hunter') {
+    clearHunterTalentState(ctx, player);
+    if (sanitized.spec !== 'beast_mastery') clearPacklordState(ctx, player);
+    if (sanitized.spec !== 'survival') clearFieldcraftState(ctx, player);
+    if (sanitized.spec !== 'marksmanship') {
+      player.auras = player.auras.filter((aura) => aura.kind !== 'hunter_cold_focus');
+    }
+  }
   // Chronomancy: leaving the healer spec (the new build no longer knows Temporal
   // Echo) clears any Temporal Echo marks this mage placed, so a fire/frost mage
   // never keeps feeding a stale echo. Keyed by sourceId; marks the mage carries

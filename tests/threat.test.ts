@@ -1523,22 +1523,24 @@ describe('caster wand auto-attack (#94)', () => {
   });
 });
 
-describe('on-next-swing cooldowns (#56)', () => {
-  it('Gutting Strike applies its 6s cooldown when the queued swing resolves', () => {
+describe('hunter melee generator', () => {
+  it('Gutting Strike resolves immediately and generates Focus instead of queueing', () => {
     const sim = makeSim('hunter');
     sim.setPlayerLevel(10);
+    expect(sim.setSpec('survival')).toBe(true);
     const wolf = nearestMob(sim, 'forest_wolf');
     teleport(sim, sim.player, wolf.pos.x + 2, wolf.pos.z); // inside melee range
     sim.targetEntity(wolf.id);
     sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
-    sim.player.resource = sim.player.maxResource;
+    sim.player.resource = 0;
+    const startHp = wolf.hp;
 
-    sim.castAbility('raptor_strike'); // queues on next swing; cooldown not yet set
-    // tick until the auto-attack swing lands and consumes the queued ability
-    for (let i = 0; i < 20 * 4 && sim.player.queuedOnSwing !== null; i++) sim.tick();
+    sim.castAbility('raptor_strike');
 
-    expect(sim.player.queuedOnSwing).toBe(null); // the swing resolved
-    expect(sim.player.cooldowns.get('raptor_strike') ?? 0).toBeGreaterThan(0); // cooldown now ticking
+    expect(sim.player.queuedOnSwing).toBe(null);
+    expect(sim.player.cooldowns.get('raptor_strike') ?? 0).toBe(0);
+    expect(sim.player.resource).toBe(15);
+    expect(wolf.hp).toBeLessThan(startHp);
   });
 });
 

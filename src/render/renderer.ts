@@ -2,6 +2,10 @@ import * as THREE from 'three';
 import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
 import { cameraOcclusion } from '../sim/colliders';
 import {
+  emptyPriestMarkerState,
+  priestMarkerStateForAuras,
+} from '../sim/combat/priest/presentation';
+import {
   ABILITIES,
   ARENA_SLOT_COUNT,
   arenaOrigin,
@@ -61,8 +65,12 @@ import {
 } from './camera_feel_core';
 import {
   characterRecklessnessActive,
-  characterSanguineAuraActive,
   characterSoulRendActive,
+  characterWeaponAuraMode,
+  hunterPetFerocityStage,
+  hunterPetFrenzyActive,
+  hunterPetVisualScale,
+  tithefiendEmpoweredActive,
 } from './character_effects';
 import {
   type AnimState,
@@ -184,6 +192,7 @@ import {
   remainingPrewarmViewBudget,
   resolvePrewarmPolicy,
 } from './prewarm_policy';
+import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { buildPropMaterialPrewarmGroup, buildProps } from './props';
 import { buildGroundQuestObject } from './quest_objects';
 import { isOwnedPetHostile } from './reaction';
@@ -649,6 +658,7 @@ export interface EntityView {
   temporalHourglassVisual: TemporalHourglassVisual | null;
   frostNovaRootVisual: FrostNovaRootVisual | null; // Atadura de Hielo restraint at the feet
   mageBarrierVisual: MageBarrierVisual | null; // personal mage absorb shell, built lazily
+  priestMarkersVisual: PriestMarkersVisual | null; // static Doctrine/Vigil/Effigy/Gloomtithe cues
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
   mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
   offhandItemId: string | null; // last-rendered shield/second weapon, independent of mainhand skins
@@ -1161,6 +1171,7 @@ export class Renderer {
     theme: 'frost',
     value: 0,
   };
+  private readonly priestMarkerStateScratch = emptyPriestMarkerState();
   private glacialFrontVisual!: GlacialFrontVisual;
   private fishingBobbers!: FishingBobberVisual;
   private weather: Weather;
@@ -4469,6 +4480,7 @@ export class Renderer {
       temporalHourglassVisual: null,
       frostNovaRootVisual: null,
       mageBarrierVisual: null,
+      priestMarkersVisual: null,
       height,
       clickTarget,
       nameplate: np,
@@ -5494,6 +5506,12 @@ export class Renderer {
         mageBarrierState,
         dt,
       );
+      v.priestMarkersVisual = syncPriestMarkersVisual(
+        v.priestMarkersVisual,
+        v.group,
+        v.height,
+        priestMarkerStateForAuras(e.auras, this.priestMarkerStateScratch),
+      );
       const iceBlockActivated = v.iceBlockVisual?.activatedThisFrame === true;
 
       this.updateBaseVisual(e, v);
@@ -5537,7 +5555,12 @@ export class Renderer {
         v.visual.setWeaponSkin(e.weaponSkinId);
         this.reconcileViewLights(v);
       }
-      v.visual.setWeaponAura(characterSanguineAuraActive(e));
+      v.visual.setWeaponAura(characterWeaponAuraMode(e));
+      const petOwner = e.ownerId === null ? null : (sim.entities.get(e.ownerId) ?? null);
+      const ferocityStage = hunterPetFerocityStage(e, petOwner);
+      const petFrenzy = hunterPetFrenzyActive(e, petOwner);
+      v.visual.setFerocityStage(petFrenzy ? 3 : ferocityStage);
+      v.visual.setPresentationScale(hunterPetVisualScale(ferocityStage, petFrenzy));
 
       // live sheathe toggle (Z key): the sim's weaponStowed bit moves held
       // props between the hands and the on-back pose (self or a peer)
@@ -5933,6 +5956,16 @@ export class Renderer {
         }
       } else if (v.recklessOn) {
         v.recklessOn = false;
+      }
+      if (!e.dead && (ferocityStage > 0 || petFrenzy)) {
+        this.vfx.castSparkle(
+          e.id,
+          'fire',
+          dt * (0.45 + ferocityStage * 0.35 + (petFrenzy ? 1 : 0)),
+        );
+      }
+      if (tithefiendEmpoweredActive(e)) {
+        this.vfx.castSparkle(e.id, 'shadow', dt * 2.4);
       }
       // Shapeshift-form particle auras riding the tints above: metamorph fire,
       // moonkin star motes, shadowform gloom wisps. Suppressed for the dead

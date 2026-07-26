@@ -4152,7 +4152,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     'Ein sorgfältig gespannter Schuss, der {damage} Schaden verursacht.',
   'entities.abilities.rapid_fire.name': 'Fieberhafter Zug',
-  'entities.abilities.rapid_fire.description': 'Erhöht euer Angriffstempo 15 Sek. lang um 40%.',
+  'entities.abilities.rapid_fire.description':
+    'Kanalisiert während der Bewegung über 2,4 Sek. sechs schnelle Schüsse, die jeweils {damage} körperlichen Schaden verursachen.',
   'entities.abilities.smite.name': 'Göttliche Pein',
   'entities.abilities.smite.description': 'Peinigt den Gegner für {damage} Heiligschaden.',
   'entities.abilities.lesser_heal.name': 'Geflüstertes Gebet',
@@ -6374,6 +6375,16 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Dein wichtigster Feuerzauber, landet einen Treffer und lässt das Ziel brennen.',
   'guide.abilityHook.flame_shock':
     'Ein sofortiger Brand, der zu Beginn trifft und mit der Zeit weiter versengt.',
+  'guide.abilityHook.galeheart_weapon':
+    'Erfüllt beide Waffen mit Sturmwind und belohnt einen gleichmäßigen Angriffsrhythmus.',
+  'guide.abilityHook.lifespring_weapon':
+    'Erfüllt deine Waffe mit heilendem Wasser und verstärkt deinen anhaltenden Heilfluss.',
+  'guide.abilityHook.tidecall':
+    'Ruft die Gezeiten und verstärkt die nächste Folge von Heilzaubern.',
+  'guide.abilityHook.stoneward':
+    'Errichtet einen geladenen Steinschild, der erlittenen Schaden in Heilung verwandelt.',
+  'guide.abilityHook.primal_exaltation':
+    'Entfesselt kurzzeitig die Elementarkraft deiner Spezialisierung.',
   'guide.abilityHook.frost_armor':
     'Eine anhaltende Selbststärkung, die deine Rüstung vor einem Kampf härtet.',
   'guide.abilityHook.frostbolt':

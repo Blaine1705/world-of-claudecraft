@@ -133,7 +133,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.berserk.name': 'Багровая дымка',
   'entities.abilities.blink.name': 'Мерцающий шаг',
   'entities.abilities.bloodlust.name': 'Боевые барабаны',
-  'entities.abilities.chain_lightning.name': 'Разветвленная молния',
+  'entities.abilities.chain_lightning.name': 'Небесная ветвь',
   'entities.abilities.chaos_bolt.name': 'Стрела погибели',
   'entities.abilities.cleansing_verdict.name': 'Очищающий приговор',
   'entities.abilities.cleansing_verdict.description':
@@ -1084,6 +1084,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'settings.languageLoadUnavailable': 'Этот язык недоступен.',
   'game.hud.lowMana': 'Мало маны',
   'game.hud.lowEnergy': 'Мало энергии',
+  'game.hud.lowFocus': 'Мало концентрации',
   'game.talents.title': 'Таланты',
   'game.talents.classTab': 'Класс',
   'game.talents.specTab': 'Специализация',
@@ -1613,6 +1614,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'classDetails.resources.mana': 'Мана',
   'classDetails.resources.energy': 'Энергия',
   'classDetails.resources.rage': 'Ярость',
+  'classDetails.resources.focus': 'Концентрация',
   'classDetails.roles.warrior': 'Танк / ближний DPS',
   'classDetails.roles.paladin': 'Лекарь / танк / ближний DPS',
   'classDetails.roles.hunter': 'Дальний DPS',
@@ -2216,6 +2218,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.mana': 'маны',
   'abilityUi.resources.rage': 'ярости',
   'abilityUi.resources.energy': 'энергии',
+  'abilityUi.resources.focus': 'концентрации',
   'abilityUi.forms.bear': 'медведя',
   'abilityUi.forms.cat': 'волка',
   'abilityUi.cast.fishing': 'Рыбная ловля',
@@ -2544,6 +2547,48 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.volley.name': 'Залп',
   'entities.abilities.volley.description':
     'Осыпает указанную область стрелами в течение 3 сек., нанося {damage} ед. урона каждые 0.5 сек. врагам в ней.',
+  'entities.abilities.pack_command.name': 'Команда стае',
+  'entities.abilities.pack_command.description':
+    'Приказывает вашему живому питомцу атаковать. Успешное попадание дает 20 ед. концентрации и один уровень Свирепости стаи.',
+  'entities.abilities.unleash_beast.name': 'Высвободить зверя',
+  'entities.abilities.unleash_beast.description':
+    'Высвобождает полную Свирепость стаи в мощном ударе по основной цели и по области, а затем ненадолго приводит питомца в неистовство с рассекающими атаками.',
+  'entities.abilities.measured_shot.name': 'Выверенный выстрел',
+  'entities.abilities.measured_shot.description':
+    'Выверенный выстрел наносит {damage} ед. физического урона и при попадании дает 20 ед. концентрации.',
+  'entities.abilities.cold_focus.name': 'Холодная сосредоточенность',
+  'entities.abilities.cold_focus.description':
+    'На 12 сек. Выверенный выстрел дает больше концентрации, а Дальний натяг становится быстрее и дешевле. (Фирменная способность Холодного взора)',
+  'entities.abilities.bloodhook.name': 'Кровавый крюк',
+  'entities.abilities.bloodhook.description':
+    'Рывок к врагу на расстоянии от 8 до 25 м, открывающий основную рану с кровотечением на 24 ед. урона за 12 сек. (Фирменная способность Полевой выучки)',
+  'entities.abilities.shrapnel_charge.name': 'Шрапнельный заряд',
+  'entities.abilities.shrapnel_charge.description':
+    'Поражает цель и ближайших врагов шрапнелью, затем распространяет с основной цели короткое кровотечение.',
+  'entities.abilities.bloodtrail_assault.name': 'Натиск по кровавому следу',
+  'entities.abilities.bloodtrail_assault.description':
+    'На 12 сек. усиливает Кровавый крюк, Разрыв раны, Шрапнельный заряд и последующие атаки питомца.',
+  'entities.abilities.trailbreak.name': 'Разрыв следа',
+  'entities.abilities.trailbreak.description':
+    'Отпрыгивает назад, не теряя состояние специализации. Полевая выучка также подготавливает следующее возвращение в бой.',
+  'entities.abilities.hunting_momentum.name': 'Охотничий натиск',
+  'entities.abilities.hunting_momentum.description':
+    'Пассивно: Потрошащий удар дает 1 заряд Охотничьего натиска на 8 сек., вплоть до 3 зарядов. При 3 зарядах Ответный клык наносит на 45% больше урона от удара и поглощает все заряды. (Полевая выучка)',
+  'entities.abilities.fieldcraft_reentry.name': 'Подготовленное возвращение',
+  'entities.abilities.fieldcraft_reentry.description':
+    'Пассивно: Разрыв следа обновляет Охотничий натиск и на 12 сек. усиливает следующий Потрошащий удар или Кровавый крюк. Потрошащий удар наносит на 15% больше урона за каждый заряд. Кровавый крюк наносит еще от 18 до 24 ед. физического урона, увеличенного на 15% за каждый заряд и зависящего от силы атаки дальнего боя. При 3 зарядах любая атака поглощает Охотничий натиск. (Полевая выучка)',
+  'entities.abilities.wildheart.name': 'Дикое сердце',
+  'entities.abilities.wildheart.description':
+    'Мгновенно восстанавливает 30% от максимального запаса здоровья.',
+  'entities.abilities.shellskin.name': 'Панцирная кожа',
+  'entities.abilities.shellskin.description':
+    'Снижает получаемый урон на 60% на 8 сек., но во время действия запрещает атаковать.',
+  'entities.abilities.frostjaw_trap.name': 'Капкан ледяной пасти',
+  'entities.abilities.frostjaw_trap.description':
+    'Устанавливает взведенную ловушку у выбранного врага или у ваших ног. Она обездвиживает первого сработавшего на ней врага и замедляет врагов рядом.',
+  'entities.abilities.pack_rally.name': 'Сбор стаи',
+  'entities.abilities.pack_rally.description':
+    'Принимает Облик скакуна и воодушевляет ближайших союзников, повышая на 10 сек. скорость передвижения на 30%, а скорость атак и применения способностей на 10%.',
   'entities.abilities.hurricane.name': 'Ураган',
   'entities.abilities.hurricane.description':
     'Обрушивает ураган на указанную область на 6 сек., нанося врагам {damage} ед. урона силами природы каждую секунду.',
@@ -2728,7 +2773,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     'Тщательно натянутый выстрел, наносящий {damage} ед. урона.',
   'entities.abilities.rapid_fire.name': 'Лихорадочный натяг',
-  'entities.abilities.rapid_fire.description': 'Повышает скорость атаки на 40% на 15 сек.',
+  'entities.abilities.rapid_fire.description':
+    'Во время движения выпускает шесть быстрых стрел за 2,4 сек. Каждая наносит {damage} ед. физического урона.',
   'entities.abilities.smite.name': 'Кара',
   'entities.abilities.smite.description':
     'Карает врага, нанося {damage} ед. урона от светлой магии.',
@@ -2765,9 +2811,24 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Насыщает ваше оружие яростью камня: каждый удар наносит {damage} ед. дополнительного урона в течение 5 мин.',
   'entities.abilities.healing_wave.name': 'Целебные воды',
   'entities.abilities.healing_wave.description': 'Исцеляет дружественную цель на {damage}.',
-  'entities.abilities.chain_heal.name': 'Цепное исцеление',
+  'entities.abilities.chain_heal.name': 'Каскадное исцеление',
   'entities.abilities.chain_heal.description':
-    'Исцеляет дружественную цель на большую величину, затем перескакивает на 2 ближайших союзников, исцеляя на 50% меньше с каждым прыжком. (Специализация Исцеление)',
+    'Исцеляет дружественную цель на 120-145, затем перескакивает на 2 ближайших союзников, снижая исцеление вдвое с каждым прыжком. Каждый задетый союзник расходует ваш Поток исцеления для дополнительного всплеска. (Фирменное умение Исцеления духа)',
+  'entities.abilities.galeheart_weapon.name': 'Оружие сердца бури',
+  'entities.abilities.galeheart_weapon.description':
+    'Наполняет оружие шквалом. Каждая третья попавшая атака оружием дважды отзывается эхом и актирует Буревое колдовство.',
+  'entities.abilities.lifespring_weapon.name': 'Оружие живого источника',
+  'entities.abilities.lifespring_weapon.description':
+    'Наполняет оружие живой водой, увеличивая накопление Потока исцеления на 20%.',
+  'entities.abilities.primal_exaltation.name': 'Первозданное возвышение',
+  'entities.abilities.primal_exaltation.description':
+    'На 12 сек. высвобождает силу вашей специализации, усиливая ее обычную ротацию. (Талант шамана)',
+  'entities.abilities.stoneward.name': 'Каменный оберег',
+  'entities.abilities.stoneward.description':
+    'Защищает одного союзника на 60 сек. и имеет 6 зарядов. Урон расходует заряд, исцеляя 5% от максимума здоровья не чаще раза в 3 сек. (Талант шамана)',
+  'entities.abilities.tidecall.name': 'Зов прилива',
+  'entities.abilities.tidecall.description':
+    'Призывает быструю целительную волну, исцеляя союзника и добавляя рассчитанное исцеление к Потоку исцеления.',
   'entities.abilities.earth_shock.name': 'Земной толчок',
   'entities.abilities.earth_shock.description':
     'Мгновенно поражает цель ударной силой, нанося {damage} ед. урона от сил природы.',
@@ -5292,6 +5353,23 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Превращает вас в живой огненный шар для быстрого движения по открытой местности.',
   'guide.abilityHook.flame_shock':
     'Мгновенный поджог, который бьет сразу и продолжает жечь со временем.',
+  'guide.abilityHook.galeheart_weapon':
+    'Наполняет оба оружия штормовым ветром и вознаграждает ровный ритм атак.',
+  'guide.abilityHook.thunder_reservoir':
+    'Копит молнии до полной разрядки через Земной толчок или Разлом земли.',
+  'guide.abilityHook.warspirit_cadence':
+    'Превращает ровный ритм оружия в Эхо бурного сердца и мгновенное заклинание.',
+  'guide.abilityHook.stormsurge':
+    'Иногда досрочно возвращает Удар предков после расхода Бурезаклятия.',
+  'guide.abilityHook.lifespring_weapon':
+    'Наполняет оружие целебной водой и усиливает непрерывный поток исцеления.',
+  'guide.abilityHook.tidecall': 'Мгновенно исцеляет союзника и наполняет его Поток исцеления.',
+  'guide.abilityHook.ancestor_return':
+    'После долгого применения вне боя возвращает к жизни всех погибших участников группы или рейда.',
+  'guide.abilityHook.stoneward':
+    'Поднимает заряженный каменный щит, превращающий полученный урон в исцеление.',
+  'guide.abilityHook.primal_exaltation':
+    'Ненадолго высвобождает стихийную силу, соответствующую специализации.',
   'guide.abilityHook.frost_armor':
     'Длительное усиление на себя, которое укрепляет броню перед боем.',
   'guide.abilityHook.frostbolt':
@@ -5316,12 +5394,20 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Обменивает часть вашего здоровья обратно в ману, когда вы выдыхаетесь.',
   'guide.abilityHook.lightning_bolt':
     'Накладываемый удар силами природы с дистанции, ваш основной способ бить издалека.',
+  'guide.abilityHook.chain_lightning':
+    'Поражает одну цель и перескакивает на двух ближайших врагов, давая один заряд Грома за все применение.',
   'guide.abilityHook.lightning_shield':
     'Заряжает вас так, что атакующие получают урон силами природы, когда бьют вас.',
   'guide.abilityHook.mark_of_the_wild':
     'Длительное благословение, которое вы накладываете на себя или союзника перед боем.',
+  'guide.abilityHook.measured_shot':
+    'Выверенный дальний выстрел, восстанавливающий концентрацию для более мощных атак.',
   'guide.abilityHook.mongoose_bite':
     'Контрудар, который становится доступен сразу после того, как враг уклонился.',
+  'guide.abilityHook.pack_command':
+    'Приказывает вашему спутнику атаковать и накапливает Свирепость стаи для Высвобождения зверя.',
+  'guide.abilityHook.stampede':
+    'Призывает трех зверей атаковать в течение 12 сек. Используйте при максимальной Свирепости стаи, чтобы звери сохраняли наибольшую прибавку к урону все время призыва.',
   'guide.abilityHook.moonfire':
     'Бьет мгновенно и оставляет цель гореть, удобно использовать в движении.',
   'guide.abilityHook.power_word_fortitude':
@@ -6189,6 +6275,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': 'Кольчуга',
   'hudChrome.auraEffect.dot': 'Наносит {value} единиц урона ({school}) каждые {interval} сек',
   'hudChrome.auraEffect.hot': 'Восстанавливает {value} здоровья каждые {interval} сек',
+  'hudChrome.auraEffect.mendingCurrent':
+    'Накапливает {value} исцеления, которое высвобождается со временем или расходуется Каскадным исцелением',
+  'hudChrome.auraEffect.mendingCurrentPercent':
+    'Накапливает исцеление в размере {pct}% от максимума здоровья для Каскадного исцеления',
   'hudChrome.auraEffect.absorb': 'Поглощает {value} единиц урона',
   'hudChrome.auraEffect.healAbsorb': 'Поглощает {value} единиц входящего исцеления',
   'hudChrome.auraEffect.thorns': 'Наносит {value} единиц урона ({school}) атакующим',
@@ -6203,6 +6293,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.dmgDoneReduce': 'Снижает наносимый урон на {pct}%',
   'hudChrome.auraEffect.elementalConvergencePrimed':
     'Следующее заклинание другой стихийной школы активирует Стихийное слияние',
+  'hudChrome.auraEffect.hunterFerocity':
+    'Стайная свирепость, {stacks} зар.: урон вашего питомца повышен на {pct}%',
   'hudChrome.auraEffect.heatingUp':
     'Следующий критический удар огненного заклинания в серии дает «Полосу везения»; некритический удар снимает «Разогрев»',
   'hudChrome.auraEffect.tongues': 'Увеличивает время произнесения заклинаний на {pct}%',
@@ -8138,7 +8230,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.description':
     'Приводит союзников в радиусе 30 м в исступление, повышая их скорость атаки на 30% на 15 сек. (талант шамана)',
   'entities.abilities.chain_lightning.description':
-    'Обрушивает молнию на выбранную область, нанося ближайшим противникам {damage} ед. урона. (талант шамана)',
+    'Поражает цель и перескакивает еще на 2 противников в радиусе 10 м, нанося каждому {damage} ед. урона от сил природы. При попадании заклинание дает 1 заряд Грома за все применение, а не за каждую цель. Урон повышается от силы заклинаний. Изначальное мастерство может сделать заклинание мгновенным, а Изначальное возвышение вдвое сокращает время произнесения. (Громовержец)',
   'entities.abilities.chaos_bolt.description':
     'Выпускает сгусток хаотического огня, наносящий {damage} ед. урона от Огня. (талант чернокнижника)',
   'entities.abilities.cloak_of_shadows.description':
@@ -8641,6 +8733,23 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildgrowth_leggings.name': 'Поножи дикого роста',
   'entities.items.wildsoul_maul.name': 'Молот дикой души',
   'hudChrome.professions.skillValue': '{skill} / {max}',
+  'entities.abilities.veilstep.name': 'Шаг сквозь завесу',
+  'entities.abilities.veilstep.description': 'Перемещает сквозь завесу в направлении взгляда.',
+  'entities.abilities.scouring_mercy.name': 'Карающее милосердие',
+  'entities.abilities.scouring_mercy.description':
+    'Поражает противника силой Света или мгновенно исцеляет союзника. Особая способность Доктрины.',
+  'entities.abilities.seraphic_vigil.name': 'Серафическое бдение',
+  'entities.abilities.seraphic_vigil.description':
+    'Накладывает на союзника оберегающее благословение, исцеляющее его при опасном падении здоровья. Особая способность Благословения.',
+  'entities.abilities.summon_tithefiend.name': 'Призыв демона десятины',
+  'entities.abilities.summon_tithefiend.description':
+    'Поглощает Мрачную десятину и призывает временного демона, преследующего ваше Изваяние. Особая способность Вечерни.',
+  'entities.abilities.martyrs_aegis.name': 'Эгида мученика',
+  'entities.abilities.martyrs_aegis.description':
+    'Уменьшает получаемый союзником урон на 40% на 8 сек.',
+  'entities.abilities.choir_of_deliverance.name': 'Хор избавления',
+  'entities.abilities.choir_of_deliverance.description':
+    'Поддерживается 6 сек., исцеляя ближайших участников группы раз в 2 сек.',
   'entities.items.resonant_thread.name': 'Резонирующая нить',
   'entities.items.resonant_hide.name': 'Резонирующая шкура',
   'entities.items.resonant_links.name': 'Резонирующие звенья',
@@ -8930,6 +9039,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.cannotAfford': 'Вам не хватает денег на снятие привязки.',
   'hudChrome.unbind.outOfRange': 'Для снятия привязки нужно стоять у мастерской.',
   'hudChrome.unbind.noSpace': 'В сумках нет места для предмета со снятой привязкой.',
+  'entities.abilities.stampede.name': 'Звериный натиск',
+  'entities.abilities.stampede.description':
+    'Призывает 3 зверей на 12 сек. Каждый зверь атакует раз в 2 сек. и наносит {damage} ед. физического урона. Показанный урон включает 8% от силы атаки дальнего боя до прибавок к урону питомцев. Звери запоминают Свирепость стаи при призыве и наносят на 10% больше урона за каждый заряд. Пока Звериный натиск восстанавливается, успешная Команда стае с вероятностью 20% сбрасывает его время восстановления; после 5 неудачных попыток сброс срабатывает наверняка. Пока звери активны, сброс невозможен. (Повелитель стаи)',
+  'entities.abilities.ancestor_return.name': 'Возвращение предков',
+  'entities.abilities.ancestor_return.description':
+    'Возвращает к жизни всех погибших участников группы или рейда у их тел с 30% здоровья и маны. Нельзя применять в бою. (Целитель духов)',
   // Professions 2.0 wiki arm: the professions hub rewrite and the
   // /wiki/professions detail pages (M16 non-Latin fills, added with the keys).
   'guide.professions.ringHeading': 'Кольцо ремесел',
@@ -9342,4 +9457,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': 'Нет предмета с таким идентификатором.',
   'devCommand.kitCurrentSpec': 'Текущая специализация',
   'hudChrome.enchanting.wornTag': 'Надето ({slot})',
+  'entities.abilities.thunder_reservoir.name': 'Грозовой запас',
+  'entities.abilities.thunder_reservoir.description':
+    'Пассивно: Дуга молнии и Небесная ветвь накапливают Гром, максимум 5. При 5 зарядах Земной толчок наносит на 125% больше урона, а Разлом земли на 100%, затем расходуется весь Гром. (Громовержец)',
+  'entities.abilities.warspirit_cadence.name': 'Ритм духа войны',
+  'entities.abilities.warspirit_cadence.description':
+    'Пассивно: каждая 3-я попавшая атака оружием вызывает 2 Эха бурного сердца по 50% урона от сил природы и дает Бурезаклятие на 12 сек. Бурезаклятие делает следующую Дугу молнии, Толчок или Целебные воды мгновенными и снижает расход маны на 50%. Удар предков считается за 2 атаки. (Дух войны)',
+  'entities.abilities.stormsurge.name': 'Штормовой натиск',
+  'entities.abilities.stormsurge.description':
+    'Пассивно: пока Удар предков восстанавливается, расход Бурезаклятия с вероятностью 25% сбрасывает его время восстановления. После 4 неудач сброс гарантирован. (Дух войны)',
+  'entities.abilities.unleash_weapon.name': 'Высвобождение оружия',
+  'entities.abilities.unleash_weapon.description':
+    'Высвобождает активное зачарование оружия. Пламенное клеймо наносит 54-64 ед. урона от огня с прибавкой 30% силы заклинаний и дает 2 заряда Грома. Сердце бури наносит удар оружием, продвигает Ритм духа войны и повышает скорость атаки на 20% на 6 сек. Каменные узы наносят 75% урона оружия, заставляют цель атаковать вас и снижают получаемый урон на 20% на 4 сек. Живой источник расходует Поток исцеления, мгновенно восстанавливает 125% оставшегося объема и в течение 8 сек. уменьшает урон от следующего удара на 50% фактически восстановленного здоровья.',
 };

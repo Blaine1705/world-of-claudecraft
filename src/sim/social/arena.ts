@@ -928,7 +928,12 @@ export function readyArenaFighter(
   if (meta)
     recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   e.hp = e.maxHp;
-  e.resource = e.resourceType === 'mana' ? e.maxResource : e.resourceType === 'energy' ? 100 : 0;
+  e.resource =
+    e.resourceType === 'mana'
+      ? e.maxResource
+      : e.resourceType === 'energy' || e.resourceType === 'focus'
+        ? 100
+        : 0;
   // Target retention is a separate concern from clearPrep (clean slate vs
   // fight-start top-off): only the countdown-end call site passes
   // keepValidTargetPids, so a selection made during prep survives the gates

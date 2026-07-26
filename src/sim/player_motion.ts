@@ -18,6 +18,7 @@
 // by the extraction.
 
 import { isRooted, isStunned } from './combat/cc';
+import { iceFloesAuraForAbility } from './combat/empower_next';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
 import { GHOST_RUN_MULT } from './spirit';
 import {
@@ -168,7 +169,8 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
         casting != null &&
         (casting.def.castWhileMoving ||
           casting.castWhileMoving ||
-          p.auras.some((a) => a.kind === 'ice_floes'));
+          iceFloesAuraForAbility(p, p.castingAbility) !== undefined ||
+          p.auras.some((a) => a.kind === 'processional_grace'));
       if (!mobile) deps.cancelCast(p);
     }
     const len = Math.hypot(mx, mz);

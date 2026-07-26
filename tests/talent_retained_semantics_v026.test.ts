@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { dealDamage } from '../src/sim/combat/damage';
 import { runEffects } from '../src/sim/combat/effect_dispatch';
-import { onCastCompleted, onDamageTaken, tickProcState } from '../src/sim/combat/talent_procs';
+import { tickProcState } from '../src/sim/combat/talent_procs';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import {
   accumulateTalentEffect,
@@ -91,7 +91,7 @@ function effect<T extends AbilityEffect['type']>(
 }
 
 describe('retained v0.26 all-class Talents V2 semantics', () => {
-  it('resolves the final Twin Verdicts, Rattling Ambush, Storm Recall, Sky Echo, Bruin Rebound, and content values', () => {
+  it('resolves the retained Twin Verdicts, Bruin Rebound, and Warlock content values', () => {
     const rowOption = (cls: PlayerClass, id: string) => {
       const option = ROW_TREES[cls].flatMap((row) => row.options).find((o) => o.id === id);
       if (!option) throw new Error(`missing row option ${cls}:${id}`);
@@ -106,42 +106,6 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     expect(verdict.cooldown).toBeCloseTo(8);
     expect(verdict.bonusCharges ?? 0).toBe(0);
 
-    // Balance pass: hun_r14_sniper_training is Steady Draw now (the Rattling
-    // Ambush reset+free relay was the worst loop in the game).
-    const steadyDraw = rowOption('hunter', 'hun_r14_sniper_training');
-    expect(steadyDraw.name).toBe('Steady Draw');
-    expect(steadyDraw.effect.proc).toBeUndefined();
-    const aimed = resolved('hunter', 'aimed_shot', { 14: 'hun_r14_sniper_training' });
-    expect(aimed.castTime).toBeCloseTo(2.4);
-    expect(effect(aimed, 'directDamage')).toEqual(
-      effect(resolved('hunter', 'aimed_shot'), 'directDamage'),
-    );
-
-    const recall = rowOption('shaman', 'sha_r20_elemental_fury');
-    expect(recall.name).toBe('Storm Recall');
-    expect(recall.effect.proc).toEqual({
-      id: 'sha_storm_recall',
-      name: 'Storm Recall',
-      school: 'nature',
-      trigger: { on: 'spellCrit', abilities: ['lightning_bolt'] },
-      responses: [
-        { kind: 'cooldownRefund', ability: 'earth_shock', seconds: 'reset' },
-        { kind: 'empowerNext', aura: 'next_cast_free', abilities: ['earth_shock'], duration: 8 },
-      ],
-    });
-    const bolt = resolved('shaman', 'lightning_bolt', { 20: 'sha_r20_elemental_fury' });
-    const jolt = resolved('shaman', 'earth_shock', { 20: 'sha_r20_elemental_fury' });
-    expect(effect(bolt, 'directDamage')).toEqual(
-      effect(resolved('shaman', 'lightning_bolt'), 'directDamage'),
-    );
-    expect(effect(jolt, 'directDamage')).toEqual(
-      effect(resolved('shaman', 'earth_shock'), 'directDamage'),
-    );
-
-    const skyEcho = rowOption('shaman', 'sha_r11_elemental_attunement');
-    expect(skyEcho.name).toBe('Sky Echo');
-    expect(skyEcho.effect.proc?.name).toBe('Sky Echo');
-
     const bruin = rowOption('druid', 'dru_r8_brutal_bash');
     expect(bruin.name).toBe('Bruin Rebound');
     expect(bruin.effect.proc?.name).toBe('Bruin Rebound');
@@ -150,9 +114,6 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
       { kind: 'cooldownRefund', ability: 'bash', seconds: 20 },
     ]);
 
-    expect(
-      effect(resolved('priest', 'mind_sear', { 20: 'pri_r20_mind_sear' }), 'aoeDamage'),
-    ).toMatchObject({ min: 24, max: 28 });
     const carnage = ROW_TREES.warlock
       .flatMap((row) => row.options)
       .find((option) => option.id === 'wlk_r20_grimoire_of_haste');
@@ -192,21 +153,6 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     expect(doubleBlink).toMatchObject({ charges: 2, bonusCharges: 1 });
   });
 
-  it('Fieldhardy (was Calloused Hide) is a flat max-health passive', () => {
-    // Balance pass: the on-hit instant Long Draw is gone; the option is the
-    // classic Survivalist shape and no bigHitTaken response remains on it.
-    const sim = harness(new Sim({ seed: 2608, playerClass: 'hunter', autoEquip: false }));
-    sim.setPlayerLevel(20);
-    const before = sim.player.maxHp;
-    expect(sim.selectTalentRow(17, 'hun_r17_thick_hide')).toBe(true);
-    expect(sim.player.maxHp).toBeGreaterThan(before);
-    const player = sim.player;
-    player.resource = player.maxResource;
-    spawnTarget(sim, player);
-    onDamageTaken(sim.ctx, player, Math.ceil(player.maxHp * 0.15));
-    expect(player.auras.some((aura) => aura.id === 'hun_calloused_hide')).toBe(false);
-  });
-
   it('consumes a scoped cheap-cast aura at the authoritative cost boundary', () => {
     const sim = harness(new Sim({ seed: 2609, playerClass: 'druid', autoEquip: false }));
     sim.setPlayerLevel(20);
@@ -232,29 +178,6 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
 
     expect(player.resource).toBe(0);
     expect(player.auras.some((aura) => aura.id === 'test_cheap_claw')).toBe(false);
-  });
-
-  it('snapshots Viperfletch from the preceding resolved Fell Shot hit', () => {
-    const sim = harness(new Sim({ seed: 2610, playerClass: 'hunter', autoEquip: false }));
-    sim.setPlayerLevel(20);
-    expect(sim.selectTalentRow(14, 'hun_r14_serpents_venom')).toBe(true);
-    const player = sim.player;
-    const target = spawnTarget(sim, player);
-    const res = sim.resolvedAbility('arcane_shot');
-    if (!res) throw new Error('missing Fell Shot');
-    sim.events = [];
-
-    runEffects(sim.ctx, player, metaOf(sim), target, res);
-
-    const direct = sim.events.find(
-      (event) => event.type === 'damage' && event.ability === res.def.name,
-    );
-    if (!direct || direct.type !== 'damage') throw new Error('missing direct Fell Shot damage');
-    const dot = target.auras.find(
-      (aura) => aura.kind === 'dot' && aura.id === 'arcane_shot' && aura.sourceId === player.id,
-    );
-    expect(dot?.value).toBe(Math.max(1, Math.round(Math.round(direct.amount * 0.5) / 3)));
-    expect(dot?.school).toBe('nature');
   });
 
   it("applies conditional bolt damage only for the caster's DoT", () => {
@@ -283,54 +206,11 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
       const event = sim.events.find(
         (candidate) => candidate.type === 'damage' && candidate.ability === res.def.name,
       );
-      if (!event || event.type !== 'damage') throw new Error('missing Gloom Bolt damage');
+      if (event?.type !== 'damage') throw new Error('missing Gloom Bolt damage');
       return event.amount;
     };
 
     expect(damage(true)).toBeGreaterThan(damage(false));
-  });
-
-  it('Steady Rain prevents damage pushback without changing baseline channels', () => {
-    const castRemainingAfterHit = (selected: boolean): number => {
-      const sim = harness(new Sim({ seed: 2612, playerClass: 'hunter', autoEquip: false }));
-      sim.setPlayerLevel(20);
-      if (selected) expect(sim.selectTalentRow(20, 'hun_r20_improved_volley')).toBe(true);
-      const player = sim.player;
-      const attacker = spawnTarget(sim, player, 4);
-      player.castingAbility = 'volley';
-      player.castRemaining = 2;
-      player.castTotal = 3;
-      dealDamage(sim.ctx, attacker, player, 10, false, 'physical', 'Test Hit', 'hit');
-      return player.castRemaining;
-    };
-
-    expect(castRemainingAfterHit(false)).toBeGreaterThan(2);
-    expect(castRemainingAfterHit(true)).toBe(2);
-  });
-
-  it('fires and consumes Mercy Deferred when real damage crosses its health threshold', () => {
-    const sim = harness(new Sim({ seed: 2613, playerClass: 'priest', autoEquip: false }));
-    sim.setPlayerLevel(20);
-    expect(sim.selectTalentRow(14, 'pri_r14_greater_heal')).toBe(true);
-    const player = sim.player;
-    const attacker = spawnTarget(sim, player, 4);
-
-    onCastCompleted(sim.ctx, player, 'heal', player);
-    expect(player.auras).toContainEqual(
-      expect.objectContaining({ kind: 'heal_echo', value: 60, value2: 0.35 }),
-    );
-    player.hp = Math.round(player.maxHp * 0.4);
-    const damage = Math.round(player.maxHp * 0.1);
-    const expectedHp = Math.min(player.maxHp, player.hp - damage + 60);
-    sim.events = [];
-
-    dealDamage(sim.ctx, attacker, player, damage, false, 'physical', 'Test Hit', 'hit');
-
-    expect(player.hp).toBe(expectedHp);
-    expect(player.auras.some((aura) => aura.kind === 'heal_echo')).toBe(false);
-    expect(sim.events).toContainEqual(
-      expect.objectContaining({ type: 'spellfx', fx: 'echoBurst', targetId: player.id }),
-    );
   });
 
   it('makes winning Lingering Dread absorb 20% max-health damage before fear breaks', () => {

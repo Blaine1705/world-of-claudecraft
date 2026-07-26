@@ -3063,7 +3063,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een sluipopener die de vijand harkt voor wapenschade plus {damage} en bloedingsschade veroorzaakt gedurende 9 sec. Levert 1 combopunt op. Alleen in Wolfsgedaante.',
   'entities.abilities.rake.name': 'Villen',
   'entities.abilities.rapid_fire.description':
-    'Verhoogt je aanvalssnelheid met 40% gedurende 15 sec.',
+    'Kanaliseer zes snelle schoten in 2,4 sec. terwijl je beweegt. Elk schot richt {damage} fysieke schade aan.',
   'entities.abilities.rapid_fire.name': 'Koortsige Trek',
   'entities.abilities.raptor_strike.description':
     'Een sterke slagaanval die de schade met {damage} verhoogt. Activeert bij je volgende slag.',
@@ -4663,6 +4663,16 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Je belangrijkste vuurnuke, raakt hard en laat het doelwit branden.',
   'guide.abilityHook.flame_shock':
     'Een directe brand die vooraan inslaat en blijft schroeien na verloop van tijd.',
+  'guide.abilityHook.galeheart_weapon':
+    'Doordrenkt beide wapens met stormwind en beloont een stabiel aanvalsritme.',
+  'guide.abilityHook.lifespring_weapon':
+    'Doordrenkt je wapen met herstellend water en versterkt je aanhoudende genezingsstroom.',
+  'guide.abilityHook.tidecall':
+    'Roept het getij op en versterkt je volgende reeks genezingsspreuken.',
+  'guide.abilityHook.stoneward':
+    'Richt een geladen stenen schild op dat opgelopen schade in genezing omzet.',
+  'guide.abilityHook.primal_exaltation':
+    'Ontketent kort de elementaire kracht van je specialisatie.',
   'guide.abilityHook.frost_armor':
     'Een blijvende zelfbuff die je pantser verhardt voor een gevecht.',
   'guide.abilityHook.frostbolt':

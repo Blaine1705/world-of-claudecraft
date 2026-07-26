@@ -136,7 +136,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.berserk.name': '赤红迷雾',
   'entities.abilities.blink.name': '闪烁步',
   'entities.abilities.bloodlust.name': '战鼓',
-  'entities.abilities.chain_lightning.name': '叉状闪电',
+  'entities.abilities.chain_lightning.name': '天穹分枝',
   'entities.abilities.chaos_bolt.name': '毁灭箭',
   'entities.abilities.cleansing_verdict.name': '净化裁决',
   'entities.abilities.cleansing_verdict.description':
@@ -1037,6 +1037,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'settings.languageLoadUnavailable': '该语言不可用。',
   'game.hud.lowMana': '法力不足',
   'game.hud.lowEnergy': '能量不足',
+  'game.hud.lowFocus': '集中值不足',
   'game.talents.title': '天赋',
   'game.talents.classTab': '职业',
   'game.talents.specTab': '专精',
@@ -1520,6 +1521,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'classDetails.resources.mana': '法力',
   'classDetails.resources.energy': '能量',
   'classDetails.resources.rage': '怒气',
+  'classDetails.resources.focus': '集中值',
   'classDetails.roles.warrior': '坦克 / 近战 DPS',
   'classDetails.roles.paladin': '治疗 / 坦克 / 近战 DPS',
   'classDetails.roles.hunter': '远程 DPS',
@@ -2095,6 +2097,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.mana': '法力',
   'abilityUi.resources.rage': '怒气',
   'abilityUi.resources.energy': '能量',
+  'abilityUi.resources.focus': '集中值',
   'abilityUi.forms.bear': '熊',
   'abilityUi.forms.cat': '狼',
   'abilityUi.cast.fishing': '钓鱼',
@@ -2415,6 +2418,46 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.volley.name': '乱射',
   'entities.abilities.volley.description':
     '向目标区域射出箭雨，持续 3 秒，每 0.5 秒对其中的敌人造成 {damage} 点伤害。',
+  'entities.abilities.pack_command.name': '兽群号令',
+  'entities.abilities.pack_command.description':
+    '命令你的活体宠物发动攻击。命中后产生 20 点集中值和一层兽群凶性。',
+  'entities.abilities.unleash_beast.name': '释放野兽',
+  'entities.abilities.unleash_beast.description':
+    '释放满层兽群凶性，对主要目标发动重击并拍击周围敌人，随后使宠物短暂进入顺劈狂乱。',
+  'entities.abilities.measured_shot.name': '审慎射击',
+  'entities.abilities.measured_shot.description':
+    '一记从容瞄准的射击，造成 {damage} 点物理伤害，并在命中时产生 20 点集中值。',
+  'entities.abilities.cold_focus.name': '冷静专注',
+  'entities.abilities.cold_focus.description':
+    '持续 12 秒，审慎射击产生更多集中值，蓄力长射的速度更快、消耗更低。（冷视招牌技能）',
+  'entities.abilities.bloodhook.name': '血钩',
+  'entities.abilities.bloodhook.description':
+    '冲向 8 至 25 码外的敌人，撕开一道主要伤口，在 12 秒内造成 24 点流血伤害。（野战技艺招牌技能）',
+  'entities.abilities.shrapnel_charge.name': '榴片炸弹',
+  'entities.abilities.shrapnel_charge.description':
+    '用榴片轰击目标及其附近敌人，随后从主要目标扩散一道短暂的流血。',
+  'entities.abilities.bloodtrail_assault.name': '血迹突袭',
+  'entities.abilities.bloodtrail_assault.description':
+    '持续 12 秒，强化血钩、撕伤、榴片炸弹以及宠物的后续攻击。',
+  'entities.abilities.trailbreak.name': '断迹',
+  'entities.abilities.trailbreak.description':
+    '向后跃开且不丢失专精状态。野战技艺还会为下一次重返战场做好准备。',
+  'entities.abilities.hunting_momentum.name': '狩猎势能',
+  'entities.abilities.hunting_momentum.description':
+    '被动：剖膛一击会获得1层狩猎势能，持续8秒，最多3层。达到3层时，反噬獠牙的打击伤害提高45%，并消耗所有层数。（野战技艺）',
+  'entities.abilities.fieldcraft_reentry.name': '蓄势返场',
+  'entities.abilities.fieldcraft_reentry.description':
+    '被动：断迹会刷新狩猎势能，并使你在12秒内的下一次剖膛一击或血钩获得返场强化。剖膛一击每层造成15%额外伤害。血钩造成18至24点额外物理伤害，每层再提高15%，并随远程攻击强度提高。达到3层时，任一攻击都会消耗狩猎势能。（野战技艺）',
+  'entities.abilities.wildheart.name': '野性之心',
+  'entities.abilities.wildheart.description': '立即恢复最大生命值的 30%。',
+  'entities.abilities.shellskin.name': '甲壳之肤',
+  'entities.abilities.shellskin.description': '受到的伤害降低 60%，持续 8 秒，但生效期间无法攻击。',
+  'entities.abilities.frostjaw_trap.name': '霜颚陷阱',
+  'entities.abilities.frostjaw_trap.description':
+    '在选中的敌人处或脚下放置已启动的陷阱。它会定身第一个触发的敌人，并减速附近敌人。',
+  'entities.abilities.pack_rally.name': '兽群集结',
+  'entities.abilities.pack_rally.description':
+    '进入骏马之姿，并激励附近盟友，使其移动速度提高 30%、攻击与施法速度提高 10%，持续 10 秒。',
   'entities.abilities.hurricane.name': '飓风',
   'entities.abilities.hurricane.description':
     '在目标区域召唤飓风，持续 6 秒，每秒重击敌人并造成 {damage} 点自然伤害。',
@@ -2591,7 +2634,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.name': '引弓长射',
   'entities.abilities.aimed_shot.description': '一次精心引弓的射击，造成 {damage} 点伤害。',
   'entities.abilities.rapid_fire.name': '狂热引弓',
-  'entities.abilities.rapid_fire.description': '使你的攻击速度提高 40%，持续 15 秒。',
+  'entities.abilities.rapid_fire.description':
+    '移动时在2.4秒内快速射出6箭，每箭造成{damage}点物理伤害。',
   'entities.abilities.smite.name': '惩击',
   'entities.abilities.smite.description': '惩击敌人，造成 {damage} 点神圣伤害。',
   'entities.abilities.lesser_heal.name': '低语祈祷',
@@ -2621,9 +2665,24 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '以大地之怒灌注你的武器：每次挥击额外造成 {damage} 点伤害，持续 5 分钟。',
   'entities.abilities.healing_wave.name': '治愈之水',
   'entities.abilities.healing_wave.description': '为一个友方目标恢复 {damage} 点生命值。',
-  'entities.abilities.chain_heal.name': '治疗链',
+  'entities.abilities.chain_heal.name': '湍流愈合',
   'entities.abilities.chain_heal.description':
-    '大量治疗一个友方目标，然后跳跃至多2个附近的盟友，每次跳跃的治疗量降低50%。（恢复专精招牌）',
+    '为一个友方目标恢复120至145点生命值，随后跳跃至多2个附近盟友，每次跳跃的治疗量减半。每个被波及的盟友都会消耗你的愈合水流，造成额外治疗。（灵愈招牌）',
+  'entities.abilities.galeheart_weapon.name': '风心武器',
+  'entities.abilities.galeheart_weapon.description':
+    '为武器灌注疾风。每第三次命中的武器攻击会回响两次，并触发风暴施法。',
+  'entities.abilities.lifespring_weapon.name': '活泉武器',
+  'entities.abilities.lifespring_weapon.description':
+    '为武器灌注生命之水，使愈合水流的注入量提高20%。',
+  'entities.abilities.primal_exaltation.name': '原初升华',
+  'entities.abilities.primal_exaltation.description':
+    '解放你的专精力量，持续12秒，强化其常规循环。（萨满祭司天赋）',
+  'entities.abilities.stoneward.name': '石之守护',
+  'entities.abilities.stoneward.description':
+    '使一名盟友获得6层、持续60秒的保护。受到伤害时消耗一层，恢复5%最大生命值，每3秒最多触发一次。（萨满祭司天赋）',
+  'entities.abilities.tidecall.name': '潮汐召唤',
+  'entities.abilities.tidecall.description':
+    '召来迅捷的复苏潮汐，治疗一名盟友，并将计算后的治疗量注入愈合水流。',
   'entities.abilities.earth_shock.name': '大地震击',
   'entities.abilities.earth_shock.description':
     '立即以震荡之力冲击目标，造成 {damage} 点自然伤害。',
@@ -4975,6 +5034,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.fireball': '你的主力火焰输出，命中后让目标持续燃烧。',
   'guide.abilityHook.fireball_form': '化身为活体火球，高速穿越开阔地带。',
   'guide.abilityHook.flame_shock': '瞬发的灼烧，先打出一记，并持续灼烧目标。',
+  'guide.abilityHook.galeheart_weapon': '为双持武器灌注风暴之风，以稳定的攻击节奏获取回报。',
+  'guide.abilityHook.thunder_reservoir': '积蓄雷电，直到大地震击或断层震荡能释放满额威力。',
+  'guide.abilityHook.warspirit_cadence': '将稳定的武器节奏转化为风心回响和一次瞬发法术机会。',
+  'guide.abilityHook.stormsurge': '消耗风暴施法机会后，有时会提前恢复先祖打击。',
+  'guide.abilityHook.lifespring_weapon': '为武器灌注复苏之水，强化持续的治疗节奏。',
+  'guide.abilityHook.tidecall': '立即治疗一名盟友，并注入满额愈合水流。',
+  'guide.abilityHook.ancestor_return': '在战斗外长时间施法后，使所有阵亡的小队或团队成员复活。',
+  'guide.abilityHook.stoneward': '升起充能石盾，将受到的伤害转化为恢复。',
+  'guide.abilityHook.primal_exaltation': '短暂释放与你专精相符的元素力量。',
   'guide.abilityHook.frost_armor': '持续的自我增益，开战前先硬化你的护甲。',
   'guide.abilityHook.frostbolt': '从远处发动攻击并减速目标，让它无法贴近你。',
   'guide.abilityHook.garrote': '从潜行中起手，用钢丝使目标持续流血。',
@@ -4988,10 +5056,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.lesser_heal': '稳健的施法治疗，有空站定时为盟友补血。',
   'guide.abilityHook.life_tap': '在法力枯竭时，将部分自身生命值转化为法力。',
   'guide.abilityHook.lightning_bolt': '一次远程施法的自然伤害，是你远距离的常用手段。',
+  'guide.abilityHook.chain_lightning': '攻击一个目标并跳向附近两名敌人，整次施法产生一层雷霆。',
   'guide.abilityHook.lightning_shield': '为你充能，让攻击者打中你时受到自然伤害。',
   'guide.abilityHook.mark_of_the_wild': '开战前为自己或盟友施加的持续祝福。',
+  'guide.abilityHook.measured_shot': '一记从容瞄准的远程射击，为你的强力攻击恢复集中值。',
   'guide.abilityHook.mongoose_bite': '在敌人闪躲之后立即可用的反击技。',
   'guide.abilityHook.moonfire': '瞬间命中并让目标持续燃烧，移动时也很好用。',
+  'guide.abilityHook.pack_command': '命令你的伙伴发动攻击，并积攒凶性以释放野兽。',
+  'guide.abilityHook.stampede':
+    '召唤三只野兽攻击12秒。叠满兽群凶性后使用，可让它们在整个召唤期间保持最高伤害加成。',
   'guide.abilityHook.power_word_fortitude': '提升盟友的生命上限，开怪前施放并保持它的存在。',
   'guide.abilityHook.power_word_shield': '为盟友裹上一层护盾，在伤害落地前先吸收。',
   'guide.abilityHook.raptor_strike': '一记沉重的近战挥击，用于有东西贴近你时。',
@@ -5807,6 +5880,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': '锁甲',
   'hudChrome.auraEffect.dot': '每 {interval} 秒造成 {value} 点{school}伤害',
   'hudChrome.auraEffect.hot': '每 {interval} 秒恢复 {value} 点生命值',
+  'hudChrome.auraEffect.mendingCurrent': '储存 {value} 点治疗量，随时间释放或由湍流愈合消耗',
+  'hudChrome.auraEffect.mendingCurrentPercent':
+    '储存相当于最大生命值 {pct}% 的治疗量，供湍流愈合消耗',
   'hudChrome.auraEffect.absorb': '吸收 {value} 点伤害',
   'hudChrome.auraEffect.healAbsorb': '吸收 {value} 点受到的治疗',
   'hudChrome.auraEffect.thorns': '对攻击者造成 {value} 点{school}伤害',
@@ -5819,6 +5895,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.dmgDone': '造成的伤害提高 {pct}%',
   'hudChrome.auraEffect.dmgDoneReduce': '造成的伤害降低 {pct}%',
   'hudChrome.auraEffect.elementalConvergencePrimed': '你的下一个不同元素学派法术将触发元素汇聚',
+  'hudChrome.auraEffect.hunterFerocity': '{stacks} 层兽群凶性：你的宠物造成的伤害提高 {pct}%',
   'hudChrome.auraEffect.heatingUp':
     '你的下一个火焰生成技能若连续造成暴击，会获得炽热连击；未造成暴击则移除热力迸发',
   'hudChrome.auraEffect.tongues': '施法时间延长 {pct}%',
@@ -7605,7 +7682,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.description':
     '使30码内的盟友陷入狂乱，攻击速度提高30%，持续15秒。（萨满天赋）',
   'entities.abilities.chain_lightning.description':
-    '向目标区域投掷闪电，对附近的敌人造成{damage}点伤害。（萨满天赋）',
+    '攻击目标，并跳向10码内最多2名敌人，对每个目标造成{damage}点自然伤害。命中时整次施法获得1层雷霆，而不是每个目标各获得1层。伤害随法术强度提高。原始掌控可使其瞬发，原始升华会使其施法时间缩短一半。（唤雷者）',
   'entities.abilities.chaos_bolt.description':
     '投掷一枚混沌火焰弹，造成{damage}点火焰伤害。（术士天赋）',
   'entities.abilities.cloak_of_shadows.description':
@@ -8075,6 +8152,22 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildgrowth_leggings.name': '荒野生长护腿',
   'entities.items.wildsoul_maul.name': '荒野之魂重锤',
   'hudChrome.professions.skillValue': '{skill} / {max}',
+  'entities.abilities.veilstep.name': '帷幕步',
+  'entities.abilities.veilstep.description': '朝面向的方向穿越帷幕。',
+  'entities.abilities.scouring_mercy.name': '涤罪慈悲',
+  'entities.abilities.scouring_mercy.description':
+    '以神圣之力净化一名敌人，或立即救治一名友方目标。教义专属技能。',
+  'entities.abilities.seraphic_vigil.name': '炽天使守望',
+  'entities.abilities.seraphic_vigil.description':
+    '为一名盟友施加守望祝福，在其陷入危险时恢复生命值。赐福专属技能。',
+  'entities.abilities.summon_tithefiend.name': '召唤什一魔',
+  'entities.abilities.summon_tithefiend.description':
+    '消耗幽暗什一来召唤一只临时存在的什一魔，追猎你的塑像。晚祷专属技能。',
+  'entities.abilities.martyrs_aegis.name': '殉道者圣盾',
+  'entities.abilities.martyrs_aegis.description': '使一名盟友受到的伤害降低 40%，持续 8 秒。',
+  'entities.abilities.choir_of_deliverance.name': '救赎圣咏团',
+  'entities.abilities.choir_of_deliverance.description':
+    '引导 6 秒，每 2 秒为附近的队伍成员恢复生命值。',
   'entities.items.resonant_thread.name': '共鸣丝线',
   'entities.items.resonant_hide.name': '共鸣兽皮',
   'entities.items.resonant_links.name': '共鸣锁环',
@@ -8347,6 +8440,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.cannotAfford': '你付不起解绑费用。',
   'hudChrome.unbind.outOfRange': '你必须站在工作台旁才能解绑。',
   'hudChrome.unbind.noSpace': '背包空间不足，无法存放解绑后的物品。',
+  'entities.abilities.stampede.name': '兽群奔袭',
+  'entities.abilities.stampede.description':
+    '召唤3只野兽，持续12秒。每只野兽每2秒攻击一次，造成{damage}点物理伤害。显示的伤害已计入你远程攻击强度的8%，但尚未计入宠物伤害加成。野兽在召唤时会锁定兽群凶性层数，每层使其伤害提高10%。兽群奔袭处于冷却时，成功施放兽群号令有20%几率重置其冷却；连续5次未触发后必定重置。野兽存在期间无法重置。（兽群之主）',
+  'entities.abilities.ancestor_return.name': '先祖归来',
+  'entities.abilities.ancestor_return.description':
+    '呼唤小队或团队中所有阵亡成员，使其在尸体处复活并恢复30%生命值和法力值。战斗中无法施放。（灵愈）',
   // Professions 2.0 wiki arm: the professions hub rewrite and the
   // /wiki/professions detail pages (M16 non-Latin fills, added with the keys).
   'guide.professions.ringHeading': '制作之轮',
@@ -8742,4 +8841,16 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': '没有该 ID 对应的物品。',
   'devCommand.kitCurrentSpec': '当前专精',
   'hudChrome.enchanting.wornTag': '已装备（{slot}）',
+  'entities.abilities.thunder_reservoir.name': '雷霆蓄能',
+  'entities.abilities.thunder_reservoir.description':
+    '被动：奥术闪电和天穹连锁会获得雷霆，最多5层。达到5层时，大地震击造成的伤害提高125%，或裂地震波造成的伤害提高100%，随后消耗全部雷霆。（雷霆召唤）',
+  'entities.abilities.warspirit_cadence.name': '战魂节律',
+  'entities.abilities.warspirit_cadence.description':
+    '被动：每第3次命中的武器攻击会触发2次裂风回响，各造成50%自然伤害，并获得持续12秒的风暴施法。风暴施法使下一个奥术闪电、震击或治愈之水瞬发且法力消耗降低50%。先祖打击计作2次攻击。（战魂）',
+  'entities.abilities.stormsurge.name': '风暴涌动',
+  'entities.abilities.stormsurge.description':
+    '被动：先祖打击冷却时，消耗风暴施法有25%几率重置其冷却。连续失败4次后必定重置。（战魂）',
+  'entities.abilities.unleash_weapon.name': '释放武器',
+  'entities.abilities.unleash_weapon.description':
+    '释放当前的武器灌注。焰烙造成54至64点火焰伤害，获得30%法术强度加成，并获得2层雷霆。风心用武器攻击，推进战魂节律，并使攻击速度提高20%，持续6秒。缚石造成75%武器伤害，迫使目标攻击你，并使你受到的伤害降低20%，持续4秒。活泉消耗目标身上的愈合水流，立即治疗其剩余治疗量的125%，并使8秒内下一次受到的伤害降低，降低量等于实际恢复生命值的50%。',
 };

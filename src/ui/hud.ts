@@ -29,6 +29,9 @@ import {
   normalizeStreamerLink,
   type StreamerLinks,
 } from '../sim/account_flair';
+import { resolveActionReplacement } from '../sim/combat/action_replacement';
+import { resolveColdsightAbilityForSpec } from '../sim/combat/hunter_coldsight';
+import { resolveHunterSharedAbilityForTalents } from '../sim/combat/hunter_shared';
 import { warriorParryChance } from '../sim/combat/warrior_hit_table';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
@@ -427,6 +430,7 @@ import { partyFrameSignature, selectPartyFrameMembers } from './party_frames';
 import { PartyFramesPainter } from './party_frames_painter';
 import type { PerfOverlayHooks } from './perf_overlay_settings';
 import { PET_ACTION_ICONS, petFeedButtonState } from './pet_action_icons';
+import { isControllableOwnedPet, ownedCombatSourceOwnerId } from './pet_entity';
 import {
   chatPlayerContextActions,
   type PlayerContextAction,
@@ -754,6 +758,7 @@ const RESOURCE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {
   mana: 'abilityUi.resources.mana',
   rage: 'abilityUi.resources.rage',
   energy: 'abilityUi.resources.energy',
+  focus: 'abilityUi.resources.focus',
 };
 // Ravenpost mailResult refusal codes to their toast lines. `sent`/`collected`
 // are successes rendered as chat-log lines in handleEvents, but they map here
@@ -1514,6 +1519,8 @@ export class Hud {
       storage: localStorage,
       playerClass: this.sim.cfg.playerClass,
       playerName: this.sim.player.name,
+      playerLevel: () => this.sim.player.level,
+      talentSpec: () => this.sim.talentSpec,
       knownAbilityIds: () => this.sim.known.map((known) => known.def.id),
       hasAura: (kind) => this.sim.player.auras.some((aura) => aura.kind === kind),
       isInSportMatch: () => {
@@ -3615,9 +3622,8 @@ export class Hud {
     respec: () => this.sim.respec(),
     currentBar: () => this.hotbarActions.map((a) => (a && a.type === 'ability' ? a.id : null)),
     saveLoadout: (name, bar, alloc) => this.sim.saveLoadout(name, bar, alloc),
-    switchLoadout: (i) => this.sim.switchLoadout(i),
+    switchLoadout: (i, bar, alloc) => this.requestLoadoutSwitch(i, bar, alloc),
     deleteLoadout: (i) => this.sim.deleteLoadout(i),
-    applyLoadoutBar: (bar, alloc) => this.applyLoadoutBar(bar, alloc),
     inputDialog: (opts) => this.inputDialog(opts),
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
@@ -5248,9 +5254,12 @@ export class Hud {
   abilityForSlot(barSlot: number): ResolvedAbility | null {
     // barSlot 1..33 (three desktop rows of eleven configurable slots)
     const action = this.actionForSlot(barSlot);
-    return action?.type === 'ability'
-      ? (this.sim.known.find((k) => k.def.id === action.id) ?? null)
-      : null;
+    if (action?.type !== 'ability') return null;
+    const known = this.sim.known.find((entry) => entry.def.id === action.id) ?? null;
+    if (!known || this.sim.cfg.playerClass !== 'hunter') return known;
+    let resolved = resolveActionReplacement(known, this.sim.player);
+    resolved = resolveColdsightAbilityForSpec(resolved, this.sim.player, this.sim.talents.spec);
+    return resolveHunterSharedAbilityForTalents(resolved, this.sim.player, this.sim.talents);
   }
 
   private itemForSlot(barSlot: number): ItemDef | null {
@@ -6562,7 +6571,7 @@ export class Hud {
 
   private ownPet(): Entity | null {
     for (const e of this.sim.entities.values()) {
-      if (e.kind === 'mob' && e.ownerId === this.sim.playerId) return e;
+      if (isControllableOwnedPet(e, this.sim.playerId)) return e;
     }
     return null;
   }
@@ -7132,6 +7141,7 @@ export class Hud {
     if (slowHud) this.updateRaidLockoutBadge();
     if (slowHud) this.refreshDailyRewardsLauncher();
     this.maybeRestoreActionBarLayout();
+    this.resolvePendingLoadoutBar();
     this.syncActiveHotbarForm();
     this.syncSlotMap(); // picks up newly learned abilities mid-session
 
@@ -8870,8 +8880,11 @@ export class Hud {
           const tgt = sim.entities.get(ev.targetId);
           if (!tgt) break;
           const isPlayerSource = ev.sourceId === sim.playerId;
+          const isPlayerOwnedSource = ownedCombatSourceOwnerId(src) === sim.playerId;
           const isPlayerTarget = ev.targetId === sim.playerId;
-          if (isPlayerSource || isPlayerTarget) this.lastCombatEventAt = performance.now();
+          if (isPlayerSource || isPlayerOwnedSource || isPlayerTarget) {
+            this.lastCombatEventAt = performance.now();
+          }
           if (isPlayerTarget && (ev.absorbed ?? 0) > 0) {
             const absorbShape = fctSpawnShape({ type: 'absorb' });
             if (absorbShape)
@@ -8902,6 +8915,7 @@ export class Hud {
               ability: false,
               crit: false,
               isPlayerSource,
+              isPlayerOwnedSource,
               isPlayerTarget,
             });
             if (shape)
@@ -8925,7 +8939,7 @@ export class Hud {
               this.fiestaWordPop(t('fiesta.word.dodge'), '#7fd4ff', 1);
               this.renderer.addShake(0.15);
             }
-            if (isPlayerSource) {
+            if (isPlayerSource || isPlayerOwnedSource) {
               const logKey =
                 ev.kind === 'miss'
                   ? 'hud.combat.miss'
@@ -8953,6 +8967,7 @@ export class Hud {
             ability: !!ev.ability,
             crit: ev.crit,
             isPlayerSource,
+            isPlayerOwnedSource,
             isPlayerTarget,
           });
           if (
@@ -12974,6 +12989,46 @@ export class Hud {
     this.saveSlotMap();
   }
 
+  private pendingLoadoutBar: {
+    index: number;
+    bar: (string | null)[];
+    alloc: TalentAllocation;
+    requestedAt: number;
+  } | null = null;
+
+  /** Apply a saved bar only after the authoritative world confirms the loadout.
+   *  Offline Sim confirms synchronously; ClientWorld waits for its snapshot. */
+  private requestLoadoutSwitch(
+    index: number,
+    bar: (string | null)[],
+    alloc: TalentAllocation,
+  ): void {
+    this.sim.switchLoadout(index);
+    if (this.sim.activeLoadout === index) {
+      this.pendingLoadoutBar = null;
+      this.applyLoadoutBar(bar, alloc);
+      return;
+    }
+    this.pendingLoadoutBar = {
+      index,
+      bar: [...bar],
+      alloc: { spec: alloc.spec, rows: { ...alloc.rows } },
+      requestedAt: performance.now(),
+    };
+  }
+
+  private resolvePendingLoadoutBar(): void {
+    const pending = this.pendingLoadoutBar;
+    if (!pending) return;
+    if (this.sim.activeLoadout === pending.index) {
+      this.pendingLoadoutBar = null;
+      this.applyLoadoutBar(pending.bar, pending.alloc);
+      return;
+    }
+    // A rejected command must never mutate the bar or wait forever.
+    if (performance.now() - pending.requestedAt > 5000) this.pendingLoadoutBar = null;
+  }
+
   // -------------------------------------------------------------------------
   // Quest log window
   // -------------------------------------------------------------------------
@@ -13180,7 +13235,7 @@ export class Hud {
     const t = tid !== null ? this.sim.entities.get(tid) : null;
     if (t && t.kind === 'player' && t.id !== this.sim.playerId) {
       this.openContextMenu(t.id, t.name, x, y);
-    } else if (t && t.kind === 'mob' && t.ownerId === this.sim.playerId) {
+    } else if (t && isControllableOwnedPet(t, this.sim.playerId)) {
       this.openPetMenu(t.id, t.name, t.dead, x, y);
     } else if (
       t &&
@@ -14348,7 +14403,9 @@ function dungeonDisplayNameFromSource(name: string): string {
 
 function entityDisplayName(entity: Entity): string {
   if (entity.kind === 'mob')
-    return entity.ownerId !== null ? entity.name : mobDisplayName(entity.templateId);
+    return entity.ownerId !== null
+      ? (localizeSimAuraName(entity.name) ?? entity.name)
+      : mobDisplayName(entity.templateId);
   if (entity.kind === 'npc') return npcDisplayName(entity.templateId);
   return entity.name;
 }
@@ -14490,8 +14547,11 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
       case 'aoeDamage':
       case 'aoeHeal':
       case 'aoeRoot':
+      case 'chainDamage':
       case 'groundAoE':
       case 'drainTick':
+        return abilityAmountRange(primary.min, primary.max) + suffix(primary);
+      case 'hunterStampede':
         return abilityAmountRange(primary.min, primary.max) + suffix(primary);
       case 'repositionToAim':
         return primary.landingAoe
@@ -14522,6 +14582,10 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
             base: formatAbilityNumber(primary.base),
             perCombo: formatAbilityNumber(primary.perCombo),
           }) + suffix(primary)
+        );
+      case 'hunterBloodhook':
+        return (
+          formatAbilityNumber(primary.bleedTotal * (primary.damageMult ?? 1)) + suffix(primary)
         );
     }
   }

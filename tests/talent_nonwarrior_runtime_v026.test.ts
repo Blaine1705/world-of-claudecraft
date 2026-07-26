@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { runEffects } from '../src/sim/combat/effect_dispatch';
-import { onCastCompleted, onMeleeSwing } from '../src/sim/combat/talent_procs';
+import { onShamanCastCompleted } from '../src/sim/combat/shaman_talents';
+import { thunderCharges, thundercallOnArcBoltImpact } from '../src/sim/combat/shaman_thundercall';
+import { onCastCompleted } from '../src/sim/combat/talent_procs';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { type ResolvedAbility, Sim } from '../src/sim/sim';
@@ -93,26 +95,6 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     );
   });
 
-  it('lands Splitshot at the selected point and keeps Twin Fletching talent charges explicit', () => {
-    const baseline = simWithRows('hunter', {});
-    expect(resolved(baseline, 'arcane_shot')).toMatchObject({ bonusCharges: 0 });
-    expect(resolved(baseline, 'arcane_shot').charges).toBeUndefined();
-
-    const sim = simWithRows('hunter', {
-      5: 'hun_r5_quick_shots',
-      14: 'hun_r14_multi_shot',
-    });
-    expect(resolved(sim, 'arcane_shot')).toMatchObject({ charges: 2, bonusCharges: 1 });
-    const distant = addTarget(sim, 20);
-    const nearCaster = addTarget(sim, 3);
-    sim.player.resource = sim.player.maxResource;
-
-    sim.castAbility('multi_shot', undefined, { x: distant.pos.x, z: distant.pos.z });
-
-    expect(distant.hp).toBeLessThan(distant.maxHp);
-    expect(nearCaster.hp).toBe(nearCaster.maxHp);
-  });
-
   it('restores energy on every third Wicked Slash with Ceaseless Cuts', () => {
     const sim = simWithRows('rogue', { 5: 'rog_r5_relentless_strikes' });
     const target = addTarget(sim);
@@ -126,28 +108,28 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     expect(sim.player.resource).toBe(30);
   });
 
-  it('adds one talent charge for Twin Fracture and Twin Icebind', () => {
-    const priest = simWithRows('priest', { 14: 'pri_r14_mind_melt' });
+  it('adds one talent charge for Twin Icebind', () => {
     // The mage rework replaced Twin Embers (mag_r5_impulse, fire_blast) with
     // Twin Icebind (mag_r11_twin_nova, frost_nova) as the charge-model row.
     const mage = simWithRows('mage', { 11: 'mag_r11_twin_nova' });
 
-    expect(resolved(priest, 'mind_blast')).toMatchObject({ charges: 2, bonusCharges: 1 });
     expect(resolved(mage, 'frost_nova')).toMatchObject({ charges: 2, bonusCharges: 1 });
   });
 
-  it('heals from Imbued Lifeblood only while a weapon imbue is active', () => {
+  it('arms Flowing Elements only after a Jolt', () => {
     const sim = simWithRows('shaman', { 5: 'sha_r5_imbue_mastery' });
-    const rng = sim.ctx.rng as typeof sim.ctx.rng & { chance(probability: number): boolean };
-    rng.chance = () => false;
-    sim.player.hp = sim.player.maxHp - 20;
-
-    onMeleeSwing(sim.ctx, sim.player);
-    expect(sim.player.hp).toBe(sim.player.maxHp - 20);
-
-    sim.player.auras.push(aura('test_imbue', 'imbue', sim.playerId, 'nature'));
-    onMeleeSwing(sim.ctx, sim.player);
-    expect(sim.player.hp).toBe(sim.player.maxHp - 12);
+    onShamanCastCompleted(sim.ctx, sim.player, 'lightning_bolt');
+    expect(sim.player.auras.some((candidate) => candidate.id === 'shaman_flowing_elements')).toBe(
+      false,
+    );
+    onShamanCastCompleted(sim.ctx, sim.player, 'earth_shock');
+    expect(
+      sim.player.auras.find((candidate) => candidate.id === 'shaman_flowing_elements'),
+    ).toMatchObject({
+      kind: 'ice_floes',
+      duration: 8,
+      empowerAbilities: ['lightning_bolt', 'healing_wave'],
+    });
   });
 
   it('makes Consume mobile with Walking Hunger', () => {
@@ -207,141 +189,19 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     );
   });
 
-  it('requires the caster-owned Dirge of Decay for Twisted Faith', () => {
-    const damage = (dotId: string | null, sourceId: number): number => {
-      const sim = simWithRows('priest', { 5: 'pri_r5_twisted_faith' });
-      const target = addTarget(sim);
-      if (dotId) {
-        target.auras.push(aura(dotId, 'dot', sourceId || sim.playerId, 'shadow'));
-      }
-      const ability = resolved(sim, 'mind_blast');
-      sim.player.spellPower = 0;
-      sim.player.critChance = 0;
-      const rng = sim.ctx.rng as typeof sim.ctx.rng & {
-        chance(probability: number): boolean;
-        range(min: number, max: number): number;
-      };
-      rng.chance = () => false;
-      rng.range = (min) => min;
-      const before = target.hp;
-      runResolved(sim, target, ability);
-      return before - target.hp;
-    };
-
-    const noDot = damage(null, 0);
-    expect(damage('corruption', 0)).toBe(noDot);
-    expect(damage('shadow_word_pain', 999_999)).toBe(noDot);
-    expect(damage('shadow_word_pain', 0)).toBeGreaterThan(noDot * 1.2);
-  });
-
-  it('extends only the caster-owned Dirge of Decay and caps extension at six seconds', () => {
-    const sim = simWithRows('priest', { 14: 'pri_r14_pain_and_suffering' });
-    const target = addTarget(sim);
-    const own = {
-      ...aura('shadow_word_pain', 'dot', sim.playerId, 'shadow'),
-      remaining: 8,
-      duration: 8,
-      tickInterval: 2,
-      tickTimer: 2,
-    };
-    const foreign = {
-      ...own,
-      sourceId: 999_999,
-    };
-    target.auras.push(foreign, own);
-    const ability = resolved(sim, 'mind_flay');
-    const extend = ability.effects.find((effect) => effect.type === 'extendDot');
-    if (!extend) throw new Error('missing Endless Dirge effect');
-    const extensionOnly = { ...ability, effects: [extend] };
-    const rng = sim.ctx.rng as typeof sim.ctx.rng & {
-      chance(probability: number): boolean;
-      range(min: number, max: number): number;
-    };
-    let rngDraws = 0;
-    rng.chance = () => {
-      rngDraws++;
-      return false;
-    };
-    rng.range = (min) => {
-      rngDraws++;
-      return min;
-    };
-
-    for (let tick = 0; tick < 8; tick++) runResolved(sim, target, extensionOnly);
-
-    expect(own).toMatchObject({ remaining: 14, duration: 14, extendedBy: 6 });
-    expect(foreign).toMatchObject({ remaining: 8, duration: 8 });
-    expect(foreign.extendedBy).toBeUndefined();
-    expect(rngDraws).toBe(0);
-  });
-
-  it('applies Endless Dirge through each real Litany of Woe channel tick', () => {
-    const sim = simWithRows('priest', { 14: 'pri_r14_pain_and_suffering' });
-    const target = addTarget(sim, 18);
-    const own = {
-      ...aura('shadow_word_pain', 'dot', sim.playerId, 'shadow'),
-      remaining: 8,
-      duration: 8,
-      tickInterval: 2,
-      tickTimer: 2,
-    };
-    const foreign = { ...own, sourceId: 999_999 };
-    target.auras.push(foreign, own);
-    sim.player.resource = sim.player.maxResource;
-
-    sim.castAbility('mind_flay');
-    for (let tick = 0; tick < 80; tick++) sim.tick();
-
-    expect(own.duration).toBe(11);
-    expect(own.extendedBy).toBe(3);
-    expect(foreign.duration).toBe(8);
-    expect(foreign.extendedBy).toBeUndefined();
-  });
-
-  it('detonates the pending next Cinder Jolt tick and preserves another caster DoT', () => {
-    const detonation = (tickTimer: number): { damage: number; foreignRemains: boolean } => {
-      const sim = simWithRows('shaman', { 14: 'sha_r14_improved_flame_shock' });
-      const target = addTarget(sim);
-      const own = {
-        ...aura('flame_shock', 'dot', sim.playerId, 'fire', 10),
-        remaining: 5,
-        duration: 12,
-        tickInterval: 3,
-        tickTimer,
-      };
-      const foreign = { ...own, sourceId: 999_999 };
-      target.auras.push(foreign, own);
-      const ability = resolved(sim, 'earth_shock');
-      const consume = ability.effects.find((effect) => effect.type === 'consumeDot');
-      if (!consume) throw new Error('missing Cinder Rupture effect');
-      const detonationOnly = { ...ability, effects: [consume] };
-      const rng = sim.ctx.rng as typeof sim.ctx.rng & {
-        chance(probability: number): boolean;
-        range(min: number, max: number): number;
-      };
-      let rngDraws = 0;
-      rng.chance = () => {
-        rngDraws++;
-        return false;
-      };
-      rng.range = (min) => {
-        rngDraws++;
-        return min;
-      };
-      const before = target.hp;
-
-      runResolved(sim, target, detonationOnly);
-
-      expect(target.auras).not.toContain(own);
-      expect(rngDraws).toBe(0);
-      return {
-        damage: before - target.hp,
-        foreignRemains: target.auras.includes(foreign),
-      };
-    };
-
-    expect(detonation(1)).toEqual({ damage: 20, foreignRemains: true });
-    expect(detonation(3)).toEqual({ damage: 10, foreignRemains: true });
+  it('adds an extra Pyrebrand charge every third Arc Bolt with Imbue Mastery', () => {
+    const sim = simWithRows('shaman', { 14: 'sha_r14_improved_flame_shock' });
+    expect(
+      sim.applyTalents({ spec: 'elemental', rows: { 14: 'sha_r14_improved_flame_shock' } }),
+    ).toBe(true);
+    sim.player.auras.push(aura('flametongue_weapon', 'imbue', sim.playerId, 'fire'));
+    thundercallOnArcBoltImpact(sim.ctx, sim.player);
+    thundercallOnArcBoltImpact(sim.ctx, sim.player);
+    thundercallOnArcBoltImpact(sim.ctx, sim.player);
+    expect(thunderCharges(sim.player)).toBe(4);
+    expect(
+      resolved(sim, 'earth_shock').effects.some((effect) => effect.type === 'consumeDot'),
+    ).toBe(false);
   });
 
   it('pins exact Cleansing Verdict and Voidfeast healing with correct dispel direction', () => {

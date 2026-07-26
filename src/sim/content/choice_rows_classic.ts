@@ -1,17 +1,5 @@
 import type { ClassChoiceRows } from './talent_rows';
 
-const hunterRangedShotAbilityIds = [
-  'auto_shot',
-  'serpent_sting',
-  'arcane_shot',
-  'concussive_shot',
-  'aimed_shot',
-  'wyvern_sting',
-  'counter_shot',
-  'multi_shot',
-  'volley',
-];
-
 const rogueBuilderAbilityIds = [
   'sinister_strike',
   'backstab',
@@ -31,13 +19,28 @@ const rogueFinisherAbilityIds = [
   'expose_armor',
 ];
 
-const priestManaHealingAbilityIds = [
+const priestManaSpellAbilityIds = [
+  'smite',
   'lesser_heal',
+  'power_word_fortitude',
+  'shadow_word_pain',
+  'power_word_shield',
   'renew',
+  'mind_blast',
   'heal',
+  'mind_flay',
   'flash_heal',
-  'holy_nova',
+  'scouring_mercy',
   'prayer_of_healing',
+  'holy_nova',
+  'seraphic_vigil',
+  'summon_tithefiend',
+  'silence',
+  'psychic_scream',
+  'veilstep',
+  'power_infusion',
+  'martyrs_aegis',
+  'choir_of_deliverance',
 ];
 
 const warlockDamagingFireSpellAbilityIds = [
@@ -513,260 +516,254 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
   rows: [
     {
       level: 5,
-      theme: 'shot_cadence',
-      decision: 'venom damage vs banked Fell Shots vs stronger Guises',
+      theme: 'mobility',
+      decision: 'active escape vs long travel vs rotational movement',
       options: [
         {
-          // Balance pass: was Venom Relay, an every-cast free-Fell-Shot relay.
-          // Now the classic Improved Serpent Sting shape: a flat poison boost.
-          id: 'hun_r5_improved_serpent_sting',
-          name: 'Deepvenom',
-          description: "Venom Barb's poison deals 20% more damage.",
-          icon: 'serpent_sting',
-          effect: { ability: [{ ability: 'serpent_sting', dmgPct: 0.2 }] },
+          id: 'hun_r5_tactical_retreat',
+          name: 'Tactical Retreat',
+          description: 'Trailbreak stores 2 uses and removes roots and movement slows when used.',
+          icon: 'trailbreak',
+          effect: { ability: [{ ability: 'trailbreak', bonusCharges: 1 }] },
         },
         {
-          id: 'hun_r5_quick_shots',
-          name: 'Twin Fletching',
-          description: 'Fell Shot stores 2 uses.',
-          icon: 'arcane_shot',
-          effect: { ability: [{ ability: 'arcane_shot', bonusCharges: 1 }] },
-        },
-        {
-          // Balance pass: was a swap-into-guise shot discount that cost more
-          // mana than it saved. Now the Guises themselves get stronger.
-          // Courser's Guise (learn 14) stays unbuffed: the unlock guard bans
-          // a level-5 row from modifying a later-learned ability.
-          id: 'hun_r5_aspect_mastery',
-          name: 'Guisecraft',
-          description: "Harrier's Guise and Marten's Guise effects are 25% stronger.",
-          icon: 'aspect_of_the_hawk',
+          id: 'hun_r5_enduring_courser',
+          name: 'Enduring Courser',
+          description:
+            "Courser's Guise grants 60% movement speed for 3 sec when activated. 20 sec internal cooldown.",
+          icon: 'aspect_of_the_cheetah',
           effect: {
-            ability: [
-              { ability: 'aspect_of_the_hawk', buffPct: 0.25 },
-              { ability: 'aspect_of_the_monkey', buffPct: 0.25 },
-            ],
+            ability: [{ ability: 'aspect_of_the_cheetah' }],
+            runtime: { movementSpeedPct: 0.6, duration: 3, internalCooldown: 20 },
+          },
+        },
+        {
+          id: 'hun_r5_predators_pace',
+          name: "Predator's Pace",
+          description:
+            'A successful Focus generator grants 20% movement speed for 3 sec. 8 sec internal cooldown.',
+          icon: 'measured_shot',
+          effect: {
+            ability: [{ ability: 'measured_shot' }],
+            runtime: { movementSpeedPct: 0.2, duration: 3, internalCooldown: 8 },
           },
         },
       ],
     },
     {
       level: 8,
-      theme: 'ranged_control',
-      decision: 'ranged disorient vs ground root vs frequent rooting shot',
+      theme: 'defense',
+      decision: 'precise mitigation vs recovery vs passive smoothing',
       options: [
         {
-          id: 'hun_r8_startle_shot',
-          name: 'Startle Shot',
-          description: 'Grants Startle Shot: a ranged disorient that breaks on any damage.',
-          icon: 'startle_shot',
-          effect: { grant: { ability: 'startle_shot' } },
+          id: 'hun_r8_receding_shell',
+          name: 'Receding Shell',
+          description:
+            'Recast Shellskin to end it early and refund 50% of its unused duration, up to 45 sec.',
+          icon: 'shellskin',
+          effect: {
+            ability: [{ ability: 'shellskin' }],
+            runtime: { cooldownRefundPct: 0.5, cooldownRefundCap: 45 },
+          },
         },
         {
-          id: 'hun_r8_frost_trap',
-          name: 'Rime Snare',
-          description: 'Grants Rime Snare.',
-          icon: 'frost_trap',
-          effect: { grant: { ability: 'frost_trap' } },
+          id: 'hun_r8_shared_recovery',
+          name: 'Shared Recovery',
+          description:
+            'Wildheart also heals your pet for 30% and grants both of you 20% damage reduction for 4 sec.',
+          icon: 'wildheart',
+          effect: {
+            ability: [{ ability: 'wildheart' }],
+            runtime: { petHealPct: 0.3, damageReductionPct: 0.2, duration: 4 },
+          },
         },
         {
-          // Balance pass round two: NO cooldown cut either (it pushed the 50%
-          // slow toward half uptime). The talent deepens the slow inside the
-          // same window instead: a second slow aura at 0.3 wins the
-          // moveSpeedMult min() over the baseline 0.5.
-          id: 'hun_r8_improved_concussive',
-          name: 'Pinning Barb',
-          description: "Rattling Shot's slow deepens to 70% for its 4 sec duration.",
+          id: 'hun_r8_beastguard',
+          name: 'Beastguard',
+          description:
+            'Redirect 15% of damage to a living pet without reducing it below 20% health. Without one, take 8% less damage below 50% health.',
           icon: 'concussive_shot',
           effect: {
-            ability: [
-              {
-                ability: 'concussive_shot',
-                addEffects: [{ type: 'slow', mult: 0.3, duration: 4 }],
-              },
-            ],
+            global: { petDmgSharePct: 0.15 },
+            runtime: {
+              petHealthFloorPct: 0.2,
+              fallbackDamageReductionPct: 0.08,
+              healthThresholdPct: 0.5,
+            },
           },
         },
       ],
     },
     {
       level: 11,
-      theme: 'sustain',
-      decision: 'pet sustain vs shot-fed mana vs reactive self-shield',
+      theme: 'control',
+      decision: 'interrupt coverage vs trap control vs pursuit control',
       options: [
         {
-          id: 'hun_r11_mend_pet',
-          name: 'Patch Up',
-          description: 'Patch Up heals a living pet for 50% more.',
-          icon: 'mend_pet',
-          effect: { ability: [{ ability: 'revive_pet', dmgPct: 0.5 }] },
-        },
-        {
-          // Balance pass: the instant-Long-Draw second payload is gone; the
-          // mana return stays (and G1 keeps proc-fed free shots from feeding
-          // the counter).
-          id: 'hun_r11_efficiency',
-          name: 'Lean Quiver',
-          description: 'Every 3rd ranged shot restores 20 mana.',
-          icon: 'aimed_shot',
+          id: 'hun_r11_double_hush',
+          name: 'Double Hush',
+          description: 'Hushing Shot stores 2 uses, each with a 24 sec recharge.',
+          icon: 'counter_shot',
           effect: {
-            proc: {
-              id: 'hun_lean_quiver',
-              name: 'Lean Quiver',
-              trigger: {
-                on: 'castNth',
-                n: 3,
-                abilities: hunterRangedShotAbilityIds,
-              },
-              responses: [{ kind: 'resource', amount: 20 }],
-            },
+            ability: [{ ability: 'counter_shot', bonusCharges: 1, cooldownFlat: 4 }],
           },
         },
         {
-          // Balance pass round three (maintainer rule: shields belong to
-          // priests only): the panic response is the skirmisher escape burst.
-          id: 'hun_r11_survival_instincts',
-          name: 'Deathless Will',
+          id: 'hun_r11_binding_payload',
+          name: 'Binding Payload',
           description:
-            'Taking a hit for at least 30% of your maximum health grants 40% movement speed for 4 sec. 30 sec internal cooldown.',
-          icon: 'aspect_of_the_monkey',
+            'Frostjaw Trap roots every enemy in its trigger area for 3 sec, then slows them by 40% for 4 sec.',
+          icon: 'frostjaw_trap',
           effect: {
-            proc: {
-              id: 'hun_deathless_will',
-              name: 'Deathless Will',
-              school: 'nature',
-              trigger: { on: 'bigHitTaken', hpFrac: 0.3, icd: 30 },
-              responses: [
-                {
-                  kind: 'aura',
-                  auraKind: 'buff_speed',
-                  value: 1.4,
-                  duration: 4,
-                  name: 'Deathless Will',
-                },
-              ],
-            },
+            ability: [{ ability: 'frostjaw_trap' }],
+            runtime: { rootDuration: 3, slowPct: 0.4, slowDuration: 4 },
+          },
+        },
+        {
+          id: 'hun_r11_crippling_pursuit',
+          name: 'Crippling Pursuit',
+          description:
+            'Rattling Shot or Fettering Slash roots an already slowed target for 2 sec. 12 sec per-target cooldown.',
+          icon: 'concussive_shot',
+          effect: {
+            ability: [{ ability: 'concussive_shot' }],
+            runtime: { rootDuration: 2, perTargetCooldown: 12 },
           },
         },
       ],
     },
     {
       level: 14,
-      theme: 'damage_profile',
-      decision: 'area shot vs faster Long Draw vs venom rider',
+      theme: 'focus_engine',
+      decision: 'resource rhythm vs trap linkage vs timed guises',
       options: [
         {
-          id: 'hun_r14_multi_shot',
-          name: 'Splitshot',
-          description: 'Grants Splitshot.',
-          icon: 'multi_shot',
-          effect: { grant: { ability: 'multi_shot' } },
-        },
-        {
-          // Balance pass: was Rattling Ambush, the worst loop in the game
-          // (every Rattling Shot reset Fell Shot AND made it free). Now the
-          // Long Draw lane: a plain cast-speed talent.
-          id: 'hun_r14_sniper_training',
-          name: 'Steady Draw',
-          description: "Long Draw's cast time is reduced by 20%.",
-          icon: 'aimed_shot',
-          effect: { ability: [{ ability: 'aimed_shot', castPct: -0.2 }] },
-        },
-        {
-          id: 'hun_r14_serpents_venom',
-          name: 'Viperfletch',
+          id: 'hun_r14_efficient_rhythm',
+          name: 'Efficient Rhythm',
           description:
-            'Fell Shot also envenoms the target for 50% of its damage over 3 sec, ticking every 1 sec.',
-          icon: 'serpent_sting',
+            'After spending 75 Focus, your next Focus generator grants 20 additional Focus.',
+          icon: 'measured_shot',
           effect: {
-            ability: [
-              {
-                ability: 'arcane_shot',
-                addEffects: [
-                  {
-                    type: 'dot',
-                    total: 0,
-                    directPct: 0.5,
-                    duration: 3,
-                    interval: 1,
-                    school: 'nature',
-                  },
-                ],
-              },
-            ],
+            ability: [{ ability: 'measured_shot' }],
+            runtime: { focusSpendThreshold: 75, focusBonus: 20 },
+          },
+        },
+        {
+          id: 'hun_r14_trapcraft',
+          name: 'Trapcraft',
+          description:
+            "Frostjaw Trap's cooldown is reduced by 20%. Triggering it restores 20 Focus and reduces Trailbreak's cooldown by 5 sec.",
+          icon: 'frostjaw_trap',
+          effect: { ability: [{ ability: 'frostjaw_trap', cooldownPct: -0.2 }] },
+        },
+        {
+          id: 'hun_r14_guise_mastery',
+          name: 'Guise Mastery',
+          description:
+            "For 6 sec, Harrier's Guise increases Focus generation by 50%, Marten's Guise reduces direct damage by 25%, and Courser's Guise grants 50% movement speed, or 60% with Enduring Courser. 20 sec shared cooldown.",
+          icon: 'aspect_of_the_hawk',
+          effect: {
+            ability: [{ ability: 'aspect_of_the_hawk' }],
+            runtime: {
+              duration: 6,
+              focusGenerationPct: 0.5,
+              damageReductionPct: 0.25,
+              movementSpeedPct: 0.5,
+              enduringMovementSpeedPct: 0.6,
+              internalCooldown: 20,
+            },
           },
         },
       ],
     },
     {
       level: 17,
-      theme: 'survival_response',
-      decision: 'active avoidance vs pet damage sharing vs hardy constitution',
+      theme: 'major_window',
+      decision: 'personal burst vs pressure defense vs party rally',
       options: [
         {
-          id: 'hun_r17_deterrence',
-          name: 'Bristleguard',
-          description: 'Grants Bristleguard.',
-          icon: 'deterrence',
-          effect: { grant: { ability: 'deterrence' } },
+          id: 'hun_r17_apex_instinct',
+          name: 'Apex Instinct',
+          description:
+            'Howling Rage, Cold Focus, or Bloodtrail Assault restores 40 Focus. Your next 3 Focus spenders cost 50% less and deal 20% more damage. These uses expire 4 sec after the triggering cooldown ends.',
+          icon: 'bestial_wrath',
+          effect: {
+            ability: [{ ability: 'arcane_shot' }],
+            runtime: {
+              focusGain: 40,
+              charges: 3,
+              costReductionPct: 0.5,
+              primaryDamagePct: 0.2,
+              durationBuffer: 4,
+            },
+          },
         },
         {
-          id: 'hun_r17_master_tamer',
-          name: 'Bloodbond',
-          description: 'While your pet is alive, 20% of damage you take is redirected to it.',
-          icon: 'tame_beast',
-          effect: { global: { petDmgSharePct: 0.2 } },
+          id: 'hun_r17_shell_and_fang',
+          name: 'Shell and Fang',
+          description:
+            'Shellskin allows attacks and pet commands, but its damage reduction is reduced to 40%.',
+          icon: 'shellskin',
+          effect: {
+            ability: [{ ability: 'shellskin' }],
+            runtime: { damageReductionPct: 0.4 },
+          },
         },
         {
-          // Balance pass: was Calloused Hide (take a big hit, gain an instant
-          // Long Draw). Now the classic Survivalist shape.
-          id: 'hun_r17_thick_hide',
-          name: 'Fieldhardy',
-          description: 'Increases your maximum health by 10%.',
-          icon: 'aspect_of_the_monkey',
-          effect: { stats: { maxHpPct: 0.1 } },
+          id: 'hun_r17_pack_rally',
+          name: 'Pack Rally',
+          description:
+            "Courser's Guise can trigger Pack Rally, granting nearby allies 30% movement and 10% attack and cast speed for 10 sec. 90 sec cooldown.",
+          icon: 'aspect_of_the_wild',
+          effect: {
+            ability: [{ ability: 'aspect_of_the_cheetah' }],
+            runtime: {
+              movementSpeedPct: 0.3,
+              hastePct: 0.1,
+              duration: 10,
+              internalCooldown: 90,
+            },
+          },
         },
       ],
     },
     {
       level: 20,
-      theme: 'apex_hunt',
-      decision: 'steadfast Arrowfall vs shot-fed burst uptime vs party attack rally',
+      theme: 'focus_capstone',
+      decision: 'personal cleave vs trap echoes vs pet echoes',
       options: [
         {
-          id: 'hun_r20_improved_volley',
-          name: 'Steady Rain',
+          id: 'hun_r20_overdraw',
+          name: 'Overdraw',
           description:
-            'Arrowfall deals 50% more damage, and taking damage cannot shorten its channel.',
-          icon: 'volley',
+            'Every 3rd Focus spender deals 35% more primary damage and cleaves 50% of that damage to 2 nearby enemies.',
+          icon: 'arcane_shot',
           effect: {
-            ability: [{ ability: 'volley', dmgPct: 0.5, damagePushbackImmune: true }],
+            ability: [{ ability: 'arcane_shot' }],
+            runtime: { everyNth: 3, primaryDamagePct: 0.35, cleavePct: 0.5, targetCap: 2 },
           },
         },
         {
-          // Balance pass: was 15 sec per proc with no gate (free shots fed it
-          // and compressed the 300 sec cooldown to ~75). Now 5 sec, at most
-          // once every 8 sec, and G1 keeps proc-fed shots out of the count.
-          id: 'hun_r20_rapid_killing',
-          name: 'Redline Draw',
+          id: 'hun_r20_chain_reaction',
+          name: 'Chain Reaction',
           description:
-            "Every 3rd ranged shot reduces Fevered Draw's cooldown by 5 sec, at most once every 8 sec.",
-          icon: 'rapid_fire',
+            'Frostjaw Trap marks enemies within 4 yards for 8 sec. Your next 3 Focus spenders echo 40% damage between marked enemies.',
+          icon: 'frostjaw_trap',
           effect: {
-            proc: {
-              id: 'hun_redline_draw',
-              name: 'Redline Draw',
-              trigger: { on: 'castNth', n: 3, abilities: hunterRangedShotAbilityIds, icd: 8 },
-              responses: [{ kind: 'cooldownRefund', ability: 'rapid_fire', seconds: 5 }],
-            },
+            ability: [{ ability: 'frostjaw_trap' }],
+            runtime: { radius: 4, markDuration: 8, charges: 3, echoPct: 0.4 },
           },
         },
         {
-          id: 'hun_r20_aspect_of_the_wild',
-          name: 'Wildfang Rally',
-          description: 'Grants Wildfang Rally.',
-          icon: 'aspect_of_the_wild',
-          effect: { grant: { ability: 'aspect_of_the_wild' } },
+          id: 'hun_r20_fang_chorus',
+          name: 'Fang Chorus',
+          description:
+            'Each Focus spender commands a 50%-strength pet echo. Every 3rd echo becomes a 4 yd clap.',
+          icon: 'tame_beast',
+          effect: {
+            ability: [{ ability: 'arcane_shot' }],
+            runtime: { echoPct: 0.5, everyNth: 3, radius: 4 },
+          },
         },
       ],
     },
@@ -1090,229 +1087,74 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
   rows: [
     {
       level: 5,
-      theme: 'faith',
-      decision: 'Scouring Hymn cadence vs prayer-cadence ward vs Dirge-gated Mindfracture damage',
+      theme: 'movement',
+      decision: 'move a protected ally, escape control, or preserve casting while moving',
       options: [
         {
           id: 'pri_r5_improved_renew',
-          name: 'Warding Refrain',
-          description:
-            'Every 3rd Whispered Prayer hardens its target into a ward absorbing 40 damage for 10 sec.',
-          icon: 'lesser_heal',
+          name: 'Sheltering Step',
+          description: 'Psalm of Warding grants its target 40% movement speed for 3 sec.',
+          icon: 'power_word_shield',
           effect: {
-            proc: {
-              id: 'pri_lingering_ward',
-              name: 'Warding Refrain',
-              trigger: { on: 'castNth', n: 3, abilities: ['lesser_heal'] },
-              responses: [{ kind: 'absorb', amount: 40, duration: 10, name: 'Warding Refrain' }],
-            },
+            intrinsic: { mechanic: 'priest_sheltering_step', metrics: { pct: 0.4, duration: 3 } },
           },
         },
         {
           id: 'pri_r5_searing_light',
-          name: 'Third Verse',
+          name: 'Veil Unbound',
           description:
-            'Every 3rd Scouring Hymn makes your next mana-cost healing spell within 8 sec free.',
-          icon: 'smite',
+            'Veilstep removes roots and slows, then grants 50% movement speed for 3 sec.',
+          icon: 'veilstep',
           effect: {
-            proc: {
-              id: 'pri_searing_light',
-              name: 'Third Verse',
-              trigger: { on: 'castNth', n: 3, abilities: ['smite'] },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_free',
-                  abilities: priestManaHealingAbilityIds,
-                  duration: 8,
-                },
-              ],
-            },
+            intrinsic: { mechanic: 'priest_veil_unbound', metrics: { pct: 0.5, duration: 3 } },
           },
         },
         {
           id: 'pri_r5_twisted_faith',
-          name: 'Dirgebound Thought',
-          description:
-            'Mindfracture deals 25% more damage to targets afflicted by your Dirge of Decay.',
-          icon: 'shadow_word_pain',
+          name: 'Processional Grace',
+          description: 'Veilstep allows the Priest to cast while moving for 4 sec.',
+          icon: 'veilstep',
           effect: {
-            ability: [
-              {
-                ability: 'mind_blast',
-                dmgPctVsDotted: 0.25,
-                dmgPctVsDottedAbility: 'shadow_word_pain',
-              },
-            ],
+            intrinsic: { mechanic: 'priest_processional_grace', metrics: { duration: 4 } },
           },
         },
       ],
     },
     {
       level: 8,
-      theme: 'intercession',
-      decision: 'single-target silence vs area fear vs consumed-shield heal',
+      theme: 'defense',
+      decision: 'active self recovery, prepared ally recovery, or reactive protection',
       options: [
+        {
+          id: 'pri_r17_desperate_prayer',
+          name: 'Last Prayer',
+          description: 'Learn Last Prayer, which instantly heals you for 30% of maximum health.',
+          icon: 'desperate_prayer',
+          effect: {
+            grant: { ability: 'desperate_prayer' },
+            intrinsic: { mechanic: 'priest_last_prayer', metrics: { pct: 0.3 } },
+          },
+        },
         {
           id: 'pri_r8_improved_shield',
           name: 'Shattered Psalm',
           description:
-            'When your Psalm of Warding is fully consumed, it bursts, healing its owner for 45.',
+            'When Psalm of Warding is fully consumed, it heals its target for 12% maximum health.',
           icon: 'power_word_shield',
           effect: {
             proc: {
               id: 'pri_shield_burst',
               name: 'Shattered Psalm',
               trigger: { on: 'shieldConsumed', ability: 'power_word_shield' },
-              responses: [{ kind: 'heal', amount: 45 }],
+              responses: [{ kind: 'heal', amountPctMaxHp: 0.12 }],
             },
           },
-        },
-        {
-          id: 'pri_r8_silence',
-          name: 'Hushword',
-          description: 'Grants Hushword.',
-          icon: 'silence',
-          effect: { grant: { ability: 'silence' } },
-        },
-        {
-          id: 'pri_r8_psychic_scream',
-          name: 'Terror Canticle',
-          description: 'Grants Terror Canticle.',
-          icon: 'psychic_scream',
-          effect: { grant: { ability: 'psychic_scream' } },
-        },
-      ],
-    },
-    {
-      level: 11,
-      theme: 'discipline',
-      decision: 'on-demand free cast vs healing-cadence discount vs Mindfracture leech',
-      options: [
-        {
-          id: 'pri_r11_inner_focus',
-          name: 'Stilled Mind',
-          description: 'Grants Stilled Mind.',
-          icon: 'inner_focus',
-          effect: { grant: { ability: 'inner_focus' } },
-        },
-        {
-          id: 'pri_r11_meditation',
-          name: 'Measured Mercy',
-          description:
-            'Every 3rd mana-cost healing spell makes your next mana-cost healing spell within 10 sec cost 50% less.',
-          icon: 'lesser_heal',
-          effect: {
-            proc: {
-              id: 'pri_nocturns',
-              name: 'Measured Mercy',
-              trigger: {
-                on: 'castNth',
-                n: 3,
-                abilities: priestManaHealingAbilityIds,
-              },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_cheap',
-                  abilities: priestManaHealingAbilityIds,
-                  duration: 10,
-                  costPct: 0.5,
-                },
-              ],
-            },
-          },
-        },
-        {
-          id: 'pri_r11_vampiric_embrace',
-          name: 'Gloam Siphon',
-          description:
-            'Mindfracture also afflicts the target for 30 damage over 3 sec, ticking every 1 sec and healing you for 100% of it.',
-          icon: 'mind_blast',
-          effect: {
-            ability: [
-              {
-                ability: 'mind_blast',
-                addEffects: [{ type: 'dot', total: 30, duration: 3, interval: 1, leechPct: 1 }],
-              },
-            ],
-          },
-        },
-      ],
-    },
-    {
-      level: 14,
-      theme: 'investment',
-      decision: 'banked Mindfractures vs emergency heal echo vs extended decay',
-      options: [
-        {
-          id: 'pri_r14_mind_melt',
-          name: 'Twin Fracture',
-          description: 'Mindfracture stores 2 uses.',
-          icon: 'mind_blast',
-          effect: { ability: [{ ability: 'mind_blast', bonusCharges: 1 }] },
-        },
-        {
-          id: 'pri_r14_greater_heal',
-          name: 'Mercy Deferred',
-          description:
-            'Solemn Prayer leaves an echo for 10 sec: if the target falls below 35% health, they are instantly healed for 60.',
-          icon: 'heal',
-          effect: {
-            proc: {
-              id: 'pri_heal_echo',
-              name: 'Mercy Deferred',
-              trigger: { on: 'castNth', n: 1, abilities: ['heal'] },
-              responses: [
-                { kind: 'echo', belowFrac: 0.35, window: 10, heal: 60, name: 'Mercy Deferred' },
-              ],
-            },
-          },
-        },
-        {
-          id: 'pri_r14_pain_and_suffering',
-          name: 'Endless Dirge',
-          description:
-            'Each Litany of Woe tick extends your Dirge of Decay on the target by 1 sec, up to 6 added sec.',
-          icon: 'mind_flay',
-          effect: {
-            ability: [
-              {
-                ability: 'mind_flay',
-                addEffects: [
-                  { type: 'extendDot', dot: 'shadow_word_pain', seconds: 1, maxBonus: 6 },
-                ],
-              },
-            ],
-          },
-        },
-      ],
-    },
-    {
-      level: 17,
-      theme: 'resilience',
-      decision: 'instant self-heal vs stronger party fortitude vs reactive ward',
-      options: [
-        {
-          id: 'pri_r17_desperate_prayer',
-          name: 'Last Prayer',
-          description: 'Grants Last Prayer.',
-          icon: 'desperate_prayer',
-          effect: { grant: { ability: 'desperate_prayer' } },
-        },
-        {
-          id: 'pri_r17_improved_fortitude',
-          name: 'Resolve Unbroken',
-          description:
-            'Litany of Resolve effect increased by 50%, granting your party 7.5% Stamina instead of 5%.',
-          icon: 'power_word_fortitude',
-          effect: { ability: [{ ability: 'power_word_fortitude', buffPct: 0.5 }] },
         },
         {
           id: 'pri_r17_inner_fire',
           name: 'Wounded Halo',
           description:
-            'Taking a hit for at least 15% of your maximum health kindles a ward absorbing 15% of your maximum health for 10 sec. 20 sec internal cooldown.',
+            'A hit for at least 15% maximum health grants a 15% absorb for 10 sec. 20 sec internal cooldown.',
           icon: 'power_word_shield',
           effect: {
             proc: {
@@ -1328,39 +1170,179 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
       ],
     },
     {
-      level: 20,
-      theme: 'prayer',
-      decision: 'party healing vs area shadow damage vs critical-heal wards',
+      level: 11,
+      theme: 'control',
+      decision: 'single-target stop, longer area control, or shield-fed pursuit control',
       options: [
         {
-          id: 'pri_r20_prayer_of_healing',
-          name: 'Choirmend',
-          description: 'Grants Choirmend.',
-          icon: 'prayer_of_healing',
-          effect: { grant: { ability: 'prayer_of_healing' } },
+          id: 'pri_r8_silence',
+          name: 'Hushword',
+          description: 'Learn Hushword, which silences one enemy for 4 sec. 30 sec cooldown.',
+          icon: 'silence',
+          effect: { grant: { ability: 'silence' } },
         },
         {
-          id: 'pri_r20_mind_sear',
-          name: 'Thoughtburn',
-          description: 'Grants Thoughtburn.',
-          icon: 'mind_sear',
-          effect: { grant: { ability: 'mind_sear' } },
-        },
-        {
-          id: 'pri_r20_blessed_recovery',
-          name: 'Halo Aftershock',
+          id: 'pri_r8_psychic_scream',
+          name: 'Lingering Dread',
           description:
-            'Critical heals from Whispered Prayer, Solemn Prayer, Urgent Prayer, Sunburst Canticle, and Choirmend also ward the target, absorbing 50 damage for 10 sec.',
-          icon: 'flash_heal',
+            "Reduces Terror Canticle's cooldown by 30%. Feared enemies remain 50% slowed for 4 sec.",
+          icon: 'psychic_scream',
+          effect: {
+            ability: [{ ability: 'psychic_scream', cooldownPct: -0.3 }],
+            intrinsic: { mechanic: 'priest_lingering_dread', metrics: { pct: 0.5, duration: 4 } },
+          },
+        },
+        {
+          id: 'pri_r11_vampiric_embrace',
+          name: 'Binding Psalm',
+          description:
+            'An enemy that fully consumes Psalm of Warding is rooted for 2 sec, once per enemy every 12 sec.',
+          icon: 'power_word_shield',
+          effect: {
+            intrinsic: { mechanic: 'priest_binding_psalm', metrics: { duration: 2, icd: 12 } },
+          },
+        },
+      ],
+    },
+    {
+      level: 14,
+      theme: 'management',
+      decision: 'protect one key spell, follow a mana rhythm, or deepen the spec relationship',
+      options: [
+        {
+          id: 'pri_r11_inner_focus',
+          name: 'Stilled Mind',
+          description: 'Grants Stilled Mind. Your next Priest spell is free and uninterruptible.',
+          icon: 'inner_focus',
+          effect: { grant: { ability: 'inner_focus' } },
+        },
+        {
+          id: 'pri_r11_meditation',
+          name: 'Measured Faith',
+          description:
+            'Every 3rd Mana-spending Priest spell makes the next Priest spell within 10 sec cost 50% less Mana.',
+          icon: 'lesser_heal',
           effect: {
             proc: {
-              id: 'pri_blessed_recovery',
-              name: 'Halo Aftershock',
-              trigger: {
-                on: 'spellCrit',
-                abilities: ['lesser_heal', 'heal', 'flash_heal', 'holy_nova', 'prayer_of_healing'],
+              id: 'pri_measured_faith',
+              name: 'Measured Faith',
+              trigger: { on: 'castNth', n: 3, abilities: priestManaSpellAbilityIds },
+              responses: [
+                {
+                  kind: 'empowerNext',
+                  aura: 'next_cast_cheap',
+                  abilities: priestManaSpellAbilityIds,
+                  duration: 10,
+                  costPct: 0.5,
+                },
+              ],
+            },
+          },
+        },
+        {
+          id: 'pri_r14_pain_and_suffering',
+          name: 'Living Covenant',
+          description:
+            'Doctrine damage-healing restores Psalm of Warding by 20% of the healing done, up to its original absorb. Benison turns Choirmend overhealing into a 10 sec absorb capped at 10% maximum health. Each Vespers Effigy echo extends Dirge of Decay by 1 sec, up to 6 sec per target.',
+          icon: 'power_word_shield',
+          effect: {
+            intrinsic: {
+              mechanic: 'priest_living_covenant',
+              metrics: {
+                doctrineShieldPct: 0.2,
+                benisonAbsorbDuration: 10,
+                benisonAbsorbCapPct: 0.1,
+                vespersExtension: 1,
+                vespersExtensionCap: 6,
               },
-              responses: [{ kind: 'absorb', amount: 50, duration: 10, name: 'Halo Aftershock' }],
+            },
+          },
+        },
+      ],
+    },
+    {
+      level: 17,
+      theme: 'major prayer',
+      decision: 'throughput, planned ally protection, or sustained group recovery',
+      options: [
+        {
+          id: 'pri_r17_anointing',
+          name: 'Anointing',
+          description:
+            'Learn Anointing, which grants one ally 20% more damage, healing, and casting speed for 15 sec. 120 sec cooldown.',
+          icon: 'power_infusion',
+          effect: { grant: { ability: 'power_infusion' } },
+        },
+        {
+          id: 'pri_r17_martyrs_aegis',
+          name: "Martyr's Aegis",
+          description:
+            "Learn Martyr's Aegis, which reduces one ally's incoming damage by 40% for 8 sec. 120 sec cooldown.",
+          icon: 'martyrs_aegis',
+          effect: { grant: { ability: 'martyrs_aegis' } },
+        },
+        {
+          id: 'pri_r17_choir_of_deliverance',
+          name: 'Choir of Deliverance',
+          description:
+            'Learn Choir of Deliverance, which channels for 6 sec and heals nearby party members every 2 sec. 180 sec cooldown.',
+          icon: 'choir_of_deliverance',
+          effect: { grant: { ability: 'choir_of_deliverance' } },
+        },
+      ],
+    },
+    {
+      level: 20,
+      theme: 'capstone',
+      decision: 'widen the relationship, repeat its payoff, or manifest its spirit',
+      options: [
+        {
+          id: 'pri_r20_twin_covenant',
+          name: 'Twin Covenant',
+          description:
+            'Doctrine can link 2 allies and converts 70% of Holy damage into healing for each. Benison stores 2 Seraphic Vigil uses and can protect 2 allies. Vespers can bind 2 Effigies; both build the same Gloomtithe bank.',
+          icon: 'seraphic_vigil',
+          effect: {
+            ability: [{ ability: 'seraphic_vigil', bonusCharges: 1 }],
+            intrinsic: {
+              mechanic: 'priest_twin_covenant',
+              metrics: {
+                doctrineConversionPct: 0.7,
+                linkCap: 2,
+                vigilCharges: 2,
+                vigilTargetCap: 2,
+                effigyCap: 2,
+              },
+            },
+          },
+        },
+        {
+          id: 'pri_r20_second_verse',
+          name: 'Second Verse',
+          description:
+            'After 2 sec, repeat 40% of Scouring Mercy healing from Doctrine, group healing from Benison, or Effigy echo damage from Vespers. The repeat cannot trigger itself.',
+          icon: 'smite',
+          effect: {
+            intrinsic: { mechanic: 'priest_second_verse', metrics: { pct: 0.4, delay: 2 } },
+          },
+        },
+        {
+          id: 'pri_r20_incarnate_spirit',
+          name: 'Incarnate Spirit',
+          description:
+            'A fully consumed Psalm of Warding heals its target for 40% of the original absorb. Benison Vigil healing also heals up to 3 nearby party members for 40%. A 5-stack Vespers Tithefiend deals 50% more damage and lasts 50% longer.',
+          icon: 'summon_tithefiend',
+          effect: {
+            intrinsic: {
+              mechanic: 'priest_incarnate_spirit',
+              metrics: {
+                shieldHealPct: 0.4,
+                splashTargetCap: 3,
+                splashHealPct: 0.4,
+                tithefiendStacks: 5,
+                tithefiendDamagePct: 0.5,
+                tithefiendDurationPct: 0.5,
+              },
             },
           },
         },
@@ -1373,245 +1355,62 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
   rows: [
     {
       level: 5,
-      theme: 'elements',
-      decision: 'Arc Bolt-fed free jolt vs reflected-hit instant bolt vs imbued sustain',
+      theme: 'movement',
+      decision: 'instant escape vs planned speed burst vs mobile elemental casting',
       options: [
         {
           id: 'sha_r5_concussion',
-          name: 'Fault Line',
-          description:
-            'Every 3rd Arc Bolt makes your next Earthen Jolt, Cinder Jolt, or Rime Jolt within 8 sec free.',
-          icon: 'lightning_bolt',
-          effect: {
-            proc: {
-              id: 'sha_fault_line',
-              name: 'Fault Line',
-              trigger: { on: 'castNth', n: 3, abilities: ['lightning_bolt'] },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_free',
-                  abilities: ['earth_shock', 'flame_shock', 'frost_shock'],
-                  duration: 8,
-                },
-              ],
-            },
-          },
+          name: 'Wolfstep',
+          description: 'Shadewolf becomes instant. Entering it removes roots and movement slows.',
+          icon: 'ghost_wolf',
+          effect: { ability: [{ ability: 'ghost_wolf', castPct: -1 }] },
         },
         {
           id: 'sha_r5_improved_lightning_shield',
-          name: 'Rebounding Current',
-          description:
-            'When your Thunder Ward reflects a strike, your next Arc Bolt within 8 sec is instant.',
-          icon: 'lightning_shield',
-          effect: {
-            proc: {
-              id: 'sha_ward_surge',
-              name: 'Rebounding Current',
-              trigger: { on: 'thornsReflect', ability: 'lightning_shield' },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_instant',
-                  abilities: ['lightning_bolt'],
-                  duration: 8,
-                },
-              ],
-            },
-          },
+          name: 'Gathering Winds',
+          description: 'Entering Shadewolf grants 60% movement speed for 3 sec, once every 20 sec.',
+          icon: 'ghost_wolf',
+          effect: { runtime: { speedPercent: 60, duration: 3, internalCooldown: 20 } },
         },
         {
           id: 'sha_r5_imbue_mastery',
-          name: 'Imbued Lifeblood',
-          description: 'Each landed melee auto-attack with an active weapon imbue heals you for 8.',
-          icon: 'rockbiter_weapon',
-          effect: {
-            proc: {
-              id: 'sha_imbued_lifeblood',
-              name: 'Imbued Lifeblood',
-              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue' },
-              responses: [{ kind: 'heal', amount: 8 }],
-            },
-          },
+          name: 'Flowing Elements',
+          description:
+            'After using a Jolt, the next Arc Bolt or Mending Waters started within 8 sec can be cast while moving.',
+          icon: 'lightning_bolt',
+          effect: { runtime: { window: 8 } },
         },
       ],
     },
     {
       level: 8,
-      theme: 'jolts',
-      decision: 'interrupting Earthen Jolt vs rooting Rime Jolt vs Jolt-fed mana',
+      theme: 'defense',
+      decision: 'prepared ally protection vs reactive warding vs automatic burst recovery',
       options: [
         {
           id: 'sha_r8_improved_earth_shock',
-          name: 'Fault Rebuke',
-          description: 'Earthen Jolt also interrupts spellcasting for a 2 sec school lockout.',
-          icon: 'earth_shock',
-          effect: {
-            ability: [{ ability: 'earth_shock', addEffects: [{ type: 'interrupt', lockout: 2 }] }],
-          },
+          name: 'Stoneward',
+          description:
+            'Grants Stoneward, a 60 sec ally shield with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec.',
+          icon: 'lightning_shield',
+          effect: { grant: { ability: 'stoneward' } },
         },
         {
           id: 'sha_r8_frost_bind',
-          name: 'Rime Lock',
-          description: 'Rime Jolt also roots the target for 2 sec.',
-          icon: 'frost_shock',
-          effect: {
-            ability: [{ ability: 'frost_shock', addEffects: [{ type: 'root', duration: 2 }] }],
-          },
+          name: 'Warded Elements',
+          description: 'Thunder Ward retaliation grants 10% damage reduction for 3 sec.',
+          icon: 'lightning_shield',
+          effect: { runtime: { damageReductionPercent: 10, duration: 3 } },
         },
         {
           id: 'sha_r8_shock_efficiency',
-          name: 'Returning Current',
-          description: 'Every 3rd Jolt restores 30 mana.',
-          icon: 'earth_shock',
-          effect: {
-            proc: {
-              id: 'sha_returning_current',
-              name: 'Returning Current',
-              trigger: {
-                on: 'castNth',
-                n: 3,
-                abilities: ['earth_shock', 'flame_shock', 'frost_shock'],
-              },
-              responses: [{ kind: 'resource', amount: 30, resourceType: 'mana' }],
-            },
-          },
-        },
-      ],
-    },
-    {
-      level: 11,
-      theme: 'attunement',
-      decision: 'heal-crit tempo vs bolt-crit tempo vs healing-over-time spring',
-      options: [
-        {
-          id: 'sha_r11_ancestral_guidance',
-          name: 'Guiding Spirits',
+          name: 'Ancestral Mending',
           description:
-            'When your Mending Waters critically heals, your next Mending Waters within 10 sec is instant.',
+            'Taking a hit for at least 15% of your maximum health heals you for 12% of maximum health. 20 sec internal cooldown.',
           icon: 'healing_wave',
           effect: {
             proc: {
-              id: 'sha_guiding_spirits',
-              name: 'Guiding Spirits',
-              trigger: { on: 'spellCrit', abilities: ['healing_wave'] },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_instant',
-                  abilities: ['healing_wave'],
-                  duration: 10,
-                },
-              ],
-            },
-          },
-        },
-        {
-          id: 'sha_r11_elemental_attunement',
-          name: 'Sky Echo',
-          description: 'Arc Bolt critical strikes make your next Arc Bolt within 8 sec instant.',
-          icon: 'lightning_bolt',
-          effect: {
-            proc: {
-              id: 'sha_elemental_attunement',
-              name: 'Sky Echo',
-              school: 'nature',
-              trigger: { on: 'spellCrit', abilities: ['lightning_bolt'] },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_instant',
-                  abilities: ['lightning_bolt'],
-                  duration: 8,
-                },
-              ],
-            },
-          },
-        },
-        {
-          id: 'sha_r11_healing_stream',
-          name: 'Springwell',
-          description: 'Grants Springwell.',
-          icon: 'healing_stream',
-          effect: { grant: { ability: 'healing_stream' } },
-        },
-      ],
-    },
-    {
-      level: 14,
-      theme: 'storm',
-      decision: 'area lightning vs DoT detonation vs imbued-melee Jolt cooldowns',
-      options: [
-        {
-          id: 'sha_r14_chain_lightning',
-          name: 'Skybranch',
-          description: 'Grants Skybranch.',
-          icon: 'chain_lightning',
-          effect: { grant: { ability: 'chain_lightning' } },
-        },
-        {
-          id: 'sha_r14_improved_flame_shock',
-          name: 'Cinder Rupture',
-          description:
-            'Earthen Jolt detonates your Cinder Jolt on the target, dealing its remaining damage instantly.',
-          icon: 'flame_shock',
-          effect: {
-            ability: [
-              { ability: 'earth_shock', addEffects: [{ type: 'consumeDot', dot: 'flame_shock' }] },
-            ],
-          },
-        },
-        {
-          id: 'sha_r14_weapon_fury',
-          name: 'Imbued Tempo',
-          description:
-            'Landed melee auto-attacks with an imbued weapon shave 0.5 sec off your Jolt cooldowns.',
-          icon: 'stormstrike',
-          effect: {
-            proc: {
-              id: 'sha_weapon_fury',
-              name: 'Imbued Tempo',
-              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue' },
-              responses: [
-                { kind: 'cooldownRefund', ability: 'earth_shock', seconds: 0.5 },
-                { kind: 'cooldownRefund', ability: 'flame_shock', seconds: 0.5 },
-                { kind: 'cooldownRefund', ability: 'frost_shock', seconds: 0.5 },
-              ],
-            },
-          },
-        },
-      ],
-    },
-    {
-      level: 17,
-      theme: 'warding',
-      decision: 'ground root vs instant travel form vs reactive absorb',
-      options: [
-        {
-          id: 'sha_r17_earthbind',
-          name: 'Gripping Earth',
-          description: 'Grants Gripping Earth.',
-          icon: 'earthbind',
-          effect: { grant: { ability: 'earthbind' } },
-        },
-        {
-          id: 'sha_r17_improved_ghost_wolf',
-          name: 'Wolfstep',
-          description: 'Shadewolf becomes instant.',
-          icon: 'ghost_wolf',
-          effect: { ability: [{ ability: 'ghost_wolf', castPct: -1 }] },
-        },
-        {
-          // Phase-2 defensive pass: the copy-paste shield becomes the shaman
-          // flavor: the ancestors knit the wound shut on the spot.
-          id: 'sha_r17_elemental_warding',
-          name: 'Ancestral Mending',
-          description:
-            'Taking a hit for at least 15% of your maximum health instantly heals you for 12% of your maximum health. 20 sec internal cooldown.',
-          icon: 'lightning_shield',
-          effect: {
-            proc: {
-              id: 'sha_elemental_warding',
+              id: 'sha_ancestral_mending',
               name: 'Ancestral Mending',
               trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 20 },
               responses: [{ kind: 'heal', amountPctMaxHp: 0.12 }],
@@ -1621,55 +1420,143 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
       ],
     },
     {
-      level: 20,
-      theme: 'ascendance',
-      decision: 'party haste vs crit-fed Jolt burst vs emergency healing echoes',
+      level: 11,
+      theme: 'control',
+      decision: 'interrupt vs single-target root vs target-centered group control',
       options: [
         {
-          id: 'sha_r20_bloodlust',
-          name: 'Storm Chorus',
-          description: 'Grants Storm Chorus.',
-          icon: 'bloodlust',
-          effect: { grant: { ability: 'bloodlust' } },
+          id: 'sha_r11_ancestral_guidance',
+          name: 'Fault Rebuke',
+          description: 'Earthen Jolt interrupts spellcasting for a 4 sec school lockout.',
+          icon: 'earth_shock',
+          effect: {
+            ability: [{ ability: 'earth_shock', addEffects: [{ type: 'interrupt', lockout: 4 }] }],
+          },
         },
         {
-          id: 'sha_r20_elemental_fury',
-          name: 'Storm Recall',
-          description:
-            "Arc Bolt critical strikes finish Earthen Jolt's cooldown and make your next Earthen Jolt within 8 sec free.",
-          icon: 'lightning_bolt',
+          id: 'sha_r11_elemental_attunement',
+          name: 'Rime Lock',
+          description: 'Rime Jolt roots the target for 2 sec.',
+          icon: 'frost_shock',
           effect: {
-            proc: {
-              id: 'sha_storm_recall',
-              name: 'Storm Recall',
-              school: 'nature',
-              trigger: { on: 'spellCrit', abilities: ['lightning_bolt'] },
-              responses: [
-                { kind: 'cooldownRefund', ability: 'earth_shock', seconds: 'reset' },
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_free',
-                  abilities: ['earth_shock'],
-                  duration: 8,
-                },
-              ],
+            ability: [{ ability: 'frost_shock', addEffects: [{ type: 'root', duration: 2 }] }],
+          },
+        },
+        {
+          id: 'sha_r11_healing_stream',
+          name: 'Gripping Earth',
+          description:
+            'Grants a target-centered Groundsnare that roots enemies within 4 yd for 2 sec, then slows them by 40% for 6 sec. 30 sec cooldown.',
+          icon: 'earthbind',
+          effect: { grant: { ability: 'earthbind' }, runtime: { slowPercent: 40 } },
+        },
+      ],
+    },
+    {
+      level: 14,
+      theme: 'kit_management',
+      decision: 'predictable mana efficiency vs stronger imbues vs ward sustain',
+      options: [
+        {
+          id: 'sha_r14_chain_lightning',
+          name: 'Flow State',
+          description:
+            'After spending 120 Mana, your next Shaman action that costs Mana costs 40 less. The ready state has no short expiry.',
+          icon: 'healing_wave',
+          effect: { runtime: { manaThreshold: 120, costReduction: 40 } },
+        },
+        {
+          id: 'sha_r14_improved_flame_shock',
+          name: 'Imbue Mastery',
+          description:
+            'Pyrebrand grants 1 extra Thunder charge every 3rd Arc Bolt. Galeheart echoes deal 25% more damage, Stonebound gains 5% damage reduction, and Lifespring deposits 20% more Mending Current.',
+          icon: 'rockbiter_weapon',
+          effect: {
+            runtime: {
+              extraCharge: 1,
+              everyNthBolt: 3,
+              galeheartPercent: 25,
+              stoneboundPercent: 5,
+              lifespringPercent: 20,
             },
           },
         },
         {
-          id: 'sha_r20_tidal_waves',
-          name: 'Undertow Promise',
+          id: 'sha_r14_weapon_fury',
+          name: 'Ward Cycle',
           description:
-            'Every 3rd Mending Waters leaves an echo for 10 sec: if the target falls below 35% health, the echo heals them for 80.',
-          icon: 'healing_wave',
+            'A successful Arc Bolt, Ancestral Strike, or Mending Waters restores 1 Thunder Ward charge and 10 Mana, once every 6 sec.',
+          icon: 'lightning_shield',
+          effect: { runtime: { wardCharges: 1, mana: 10, internalCooldown: 6 } },
+        },
+      ],
+    },
+    {
+      level: 17,
+      theme: 'power_spike',
+      decision: 'throughput cooldown vs extended mobile casting vs major ward defense',
+      options: [
+        {
+          id: 'sha_r17_earthbind',
+          name: 'Primal Exaltation',
+          description:
+            'For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. 120 sec cooldown.',
+          icon: 'elemental_mastery',
+          effect: { grant: { ability: 'primal_exaltation' } },
+        },
+        {
+          id: 'sha_r17_improved_ghost_wolf',
+          name: 'Wayfarer Grace',
+          description:
+            'When ready, exiting Shadewolf allows casting while moving for 8 sec. 90 sec internal cooldown.',
+          icon: 'ghost_wolf',
+          effect: { runtime: { duration: 8, internalCooldown: 90 } },
+        },
+        {
+          id: 'sha_r17_elemental_warding',
+          name: 'Ancestral Bulwark',
+          description:
+            'Activating Thunder Ward grants 40% damage reduction for 6 sec. 120 sec internal cooldown.',
+          icon: 'lightning_shield',
           effect: {
-            proc: {
-              id: 'sha_undertow_promise',
-              name: 'Undertow Promise',
-              trigger: { on: 'castNth', n: 3, abilities: ['healing_wave'] },
-              responses: [
-                { kind: 'echo', belowFrac: 0.35, window: 10, heal: 80, name: 'Undertow Promise' },
-              ],
+            runtime: { damageReductionPercent: 40, duration: 6, internalCooldown: 120 },
+          },
+        },
+      ],
+    },
+    {
+      level: 20,
+      theme: 'capstone',
+      decision: 'shorter rebuild vs delayed payoff echo vs weapon-defined payoff',
+      options: [
+        {
+          id: 'sha_r20_bloodlust',
+          name: 'Deep Reservoir',
+          description:
+            'Retains part of your specialization resource after a full payoff: 2 Thunder, 1 cadence step, or 25% reseeded Mending Current.',
+          icon: 'lightning_bolt',
+          effect: { runtime: { thunderCharges: 2, cadenceSteps: 1, reseedPercent: 25 } },
+        },
+        {
+          id: 'sha_r20_elemental_fury',
+          name: 'Echoing Elements',
+          description:
+            'A full vent repeats for 40% after 1 sec, a Stormcast spell repeats for 40%, and consumed Mending Current healing repeats for 40% after 2 sec. Echoes cannot trigger further effects.',
+          icon: 'chain_lightning',
+          effect: { runtime: { echoPercent: 40, damageDelay: 1, healingDelay: 2 } },
+        },
+        {
+          id: 'sha_r20_tidal_waves',
+          name: 'Living Weapon',
+          description:
+            "After a full vent, Pyrebrand makes the next Arc Bolt instant. Galeheart's final echo cleaves for 50% to 2 nearby enemies, Stonebound Stormcast grants an 8% maximum-health absorb, and Lifespring makes Tidecall deposit 50% into a nearby injured ally.",
+          icon: 'rockbiter_weapon',
+          effect: {
+            runtime: {
+              cleavePercent: 50,
+              cleaveTargets: 2,
+              absorbPercent: 8,
+              allyDepositPercent: 50,
             },
           },
         },

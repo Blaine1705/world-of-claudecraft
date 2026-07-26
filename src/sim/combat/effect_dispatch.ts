@@ -87,12 +87,60 @@ import { glacialFrontContains } from './glacial_front';
 import { livingGroupRaidInRadius } from './group_targeting';
 import { applyGroupHaste } from './haste_burst';
 import { armHeroicLeap, relocateSwept } from './heroic_leap';
-import { spawnHunterTrap } from './hunter_trap';
+import {
+  onFieldcraftWeaponStrike,
+  runShrapnelCharge,
+  startBloodhook,
+  trailbreak,
+} from './hunter_fieldcraft';
+import {
+  applyHowlingRage,
+  runFrenzyFellShotCleave,
+  runPackCommand,
+  runStampede,
+  runUnleashBeast,
+} from './hunter_packlord';
+import {
+  activateHunterMajorWindow,
+  cripplingPursuit,
+  grantHunterFocus,
+  onHunterGuiseActivated,
+  onHunterPrimaryDamage,
+  runHunterPackRally,
+  runHunterWildheart,
+} from './hunter_shared';
+import { spawnFrostjawTrap, spawnHunterTrap } from './hunter_trap';
 import { resurrectDeadGroupMembers } from './mass_resurrection';
+import { benisonAfterAbility } from './priest/benison';
+import { doctrineAfterAbility } from './priest/doctrine';
+import { priestAfterAbility, priestOnGroupHeal } from './priest/talents';
+import { gloomtitheStacksForCast, vespersAfterAbility } from './priest/vespers';
 import { offerResurrection } from './resurrection_offer';
 import { applyRewind } from './rewind';
 import { spawnRingOfFrost } from './ring_of_frost';
-import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
+import { consumeMendingCurrent, depositMendingCurrent } from './shaman_spiritmend';
+import {
+  applyPrimalExaltation,
+  applyStoneward,
+  onGhostWolfExited,
+  onThunderWardActivated,
+  triggerWardCycle,
+} from './shaman_talents';
+import {
+  armPrimalMastery,
+  consumeThunderVent,
+  shouldEchoThunderGroundVent,
+  thundercallDamageMultiplier,
+  thundercallOnArcBoltImpact,
+  thundercallOnChainLightningImpact,
+} from './shaman_thundercall';
+import { runUnleashWeapon } from './shaman_unleash_weapon';
+import {
+  applyStoneboundJolt,
+  applyWarspiritPosture,
+  stoneboundThreatMultiplier,
+} from './shaman_warspirit';
+import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 import { applyTemporalHourglass } from './temporal_hourglass';
 
@@ -194,6 +242,7 @@ export function runEffects(
   attackAnimationStarted = false,
 ): void {
   const ability = res.def;
+  const vespersGloomtitheStacks = gloomtitheStacksForCast(p, ability.id);
   const isSpell = ability.school !== 'physical';
   const mods = ctx.playerMods(meta);
   const spentCombo = ability.spendsCombo ? p.comboPoints : 0;
@@ -226,7 +275,16 @@ export function runEffects(
       recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
     }
   }
-  const threatOpts = { flat: res.threatFlat, mult: res.threatMult };
+  const threatOpts = {
+    flat: res.threatFlat,
+    mult: res.threatMult * stoneboundThreatMultiplier(ctx, p),
+  };
+
+  if (ability.id === 'elemental_mastery') armPrimalMastery(ctx, p);
+  if (ability.id === 'primal_exaltation') applyPrimalExaltation(ctx, p);
+  if (ability.id === 'stoneward' && target) applyStoneward(ctx, p, target);
+  if (ability.id === 'lightning_shield') onThunderWardActivated(ctx, p);
+  if (ability.id === 'unleash_weapon') runUnleashWeapon(ctx, p, target);
 
   // Cleaving Blows (Fury passive): Red Harvest refunds one stored Twinstrike
   // use on the abilityCharges recharge model. A partial refund leaves the
@@ -274,6 +332,7 @@ export function runEffects(
 
   if (ability.requiresAuraKind) consumeAuraKind(ctx, p, ability.requiresAuraKind);
 
+  let targetBuffIndex = 0;
   for (const eff of res.effects) {
     switch (eff.type) {
       case 'temporalHourglass': {
@@ -302,6 +361,10 @@ export function runEffects(
           weaponMult *= 1.15;
           bonus = Math.round(bonus * 1.15);
         }
+        const hunterStrike =
+          meta.cls === 'hunter' &&
+          (ability.id === 'raptor_strike' || ability.id === 'mongoose_bite');
+        let landedDamage = 0;
         const hit = ctx.meleeSwing(p, target, bonus, ability.name, {
           cannotBeDodged: eff.cannotBeDodged,
           weaponMult,
@@ -312,8 +375,9 @@ export function runEffects(
           // Redhanded Craven Thrust mastery) ride the shared hit table.
           critBonus: mods.abilities[ability.id]?.critPct ?? 0,
           onDealt:
-            areaEcho || sweeping
+            areaEcho || sweeping || hunterStrike
               ? (amount) => {
+                  landedDamage = amount;
                   if (areaEcho) {
                     areaEchoDealt = true;
                     echoAreaDamage(
@@ -339,6 +403,10 @@ export function runEffects(
                 }
               : undefined,
         });
+        if (hit && hunterStrike) {
+          onFieldcraftWeaponStrike(ctx, p, target, ability.id, landedDamage);
+          onHunterPrimaryDamage(ctx, p, target, res, landedDamage);
+        }
         if (hit && sureCrit) sureCritRolled = true;
         if (hit && ability.awardsCombo) {
           ctx.awardCombo(p, target, ability.awardsCombo);
@@ -368,7 +436,13 @@ export function runEffects(
         // Ranged AP for hunter shots, melee Attack Power for physical specials.
         // abilityScalingPower picks the rating; powerScale (inside directHitBonus)
         // applies the AP scale-down. A non-scaling effect just contributes 0.
-        dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
+        dmg += directHitBonus(
+          abilityScalingPower(p, ability),
+          ability,
+          res.castTime,
+          false,
+          eff.spellPowerCoeff,
+        );
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
         // Ice Lance against a frozen-counting target (combat/frost_mage.ts):
         // the per-cast resolution carries its 3x; 1 for every other cast.
@@ -401,6 +475,7 @@ export function runEffects(
         // more Temporal Echo healing (no hidden heal bonus). Deterministic; reads
         // the caster's charge aura (combat/chronomancy.ts).
         if (ability.id === ARCANE_SURGE_ID) dmg *= aetherSurgeDamageMult(p);
+        dmg *= thundercallDamageMultiplier(ctx, p, ability.id);
         const finalDamage = Math.round(dmg);
         lastDirectDamage = finalDamage;
         ctx.dealDamage(
@@ -418,6 +493,16 @@ export function runEffects(
           false,
           ability.id,
         );
+        onHunterPrimaryDamage(ctx, p, target, res, finalDamage);
+        if (ability.id === 'arcane_shot') runFrenzyFellShotCleave(ctx, p, target);
+        if (ability.id === 'lightning_bolt') {
+          thundercallOnArcBoltImpact(ctx, p);
+          triggerWardCycle(ctx, p);
+        }
+        if (ability.id === 'earth_shock') {
+          consumeThunderVent(ctx, p, ability.id, target, finalDamage);
+          applyStoneboundJolt(ctx, p, target);
+        }
         if (areaEcho) {
           areaEchoDealt = true;
           echoAreaDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
@@ -625,7 +710,7 @@ export function runEffects(
         break;
       }
       case 'massResurrectGroup': {
-        resurrectDeadGroupMembers(ctx, p, eff.hpFrac);
+        resurrectDeadGroupMembers(ctx, p, eff.hpFrac, ability.school);
         break;
       }
       case 'perfectMoment': {
@@ -660,6 +745,10 @@ export function runEffects(
         const healAmount =
           ctx.rng.range(eff.min, eff.max) + directHealBonus(p.spellPower, res.castTime);
         const healed = ctx.applyHeal(p, healTarget, healAmount, ability.name, ability.id);
+        if (ability.id === 'healing_wave' || ability.id === 'tidecall') {
+          depositMendingCurrent(ctx, p, healTarget, healAmount, ability.id);
+        }
+        if (ability.id === 'healing_wave') triggerWardCycle(ctx, p);
         // Power Echo (mage choice row): the armed echo also repeats a direct HEAL
         // (Temporal Mend, Temporal Echo) at its fraction of the RESOLVED heal on
         // the same target, consumed BEFORE the repeat so a copy can never re-echo.
@@ -733,6 +822,7 @@ export function runEffects(
           });
           const hopAmount = Math.max(1, Math.round(baseAmount * eff.falloff ** i));
           ctx.applyHeal(p, chain[i], hopAmount, ability.name, ability.id);
+          consumeMendingCurrent(ctx, p, chain[i]);
         }
         break;
       }
@@ -795,6 +885,16 @@ export function runEffects(
         break;
       }
       case 'imbue': {
+        if (ability.id === 'galeheart_weapon' || ability.id === 'rockbiter_weapon') {
+          applyWarspiritPosture(
+            ctx,
+            p,
+            ability.id === 'galeheart_weapon' ? 'galeheart' : 'stonebound',
+            eff.bonus,
+            eff.duration,
+          );
+          break;
+        }
         for (let i = p.auras.length - 1; i >= 0; i--) {
           const a = p.auras[i];
           if (a.kind === 'imbue' && a.id !== ability.id) {
@@ -1050,9 +1150,12 @@ export function runEffects(
       case 'drainTick':
         break; // handled per channel tick
       case 'buffTarget': {
+        const auraId =
+          targetBuffIndex === 0 ? ability.id : `${ability.id}_${eff.kind}_${targetBuffIndex}`;
+        targetBuffIndex += 1;
         const applyBuff = (e: Entity) =>
           ctx.applyAura(e, {
-            id: ability.id,
+            id: auraId,
             name: ability.name,
             kind: eff.kind,
             remaining: eff.duration,
@@ -1201,6 +1304,7 @@ export function runEffects(
       }
       case 'slow': {
         if (!target || target.dead) break;
+        const alreadySlowed = target.auras.some((aura) => aura.kind === 'slow');
         ctx.applyAura(target, {
           id: `${ability.id}_slow`,
           name: ability.name,
@@ -1211,6 +1315,7 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
         });
+        cripplingPursuit(ctx, p, target, ability.id, alreadySlowed);
         ctx.enterCombat(p, target);
         break;
       }
@@ -1494,6 +1599,10 @@ export function runEffects(
             ability.id,
           );
         }
+        if (ability.id === 'chain_lightning' && hitList.length > 0) {
+          thundercallOnChainLightningImpact(ctx, p);
+          triggerWardCycle(ctx, p);
+        }
         break;
       }
       case 'aoeHeal': {
@@ -1509,7 +1618,28 @@ export function runEffects(
         for (const m of friendliesInRadius(ctx, p, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
           const healAmount = ctx.rng.range(eff.min, eff.max) + aoeHealBonus;
-          ctx.applyHeal(p, m, healAmount, ability.name, ability.id);
+          const missingBefore = m.maxHp - m.hp;
+          const resolution = { resolved: 0 };
+          const healed = ctx.applyHeal(
+            p,
+            m,
+            healAmount,
+            ability.name,
+            ability.id,
+            true,
+            true,
+            resolution,
+          );
+          priestOnGroupHeal(
+            ctx,
+            p,
+            m,
+            ability.id,
+            ability.name,
+            resolution.resolved,
+            missingBefore,
+            healed,
+          );
         }
         break;
       }
@@ -1529,12 +1659,14 @@ export function runEffects(
         // Ground-targeted casts drop the zone where they were aimed; others lay it
         // under the caster (e.g. Consecration at your feet).
         const zoneCenter = p.castAim ?? p.pos;
+        const thundercallMult = thundercallDamageMultiplier(ctx, p, ability.id);
+        const echoThunderVent = shouldEchoThunderGroundVent(ctx, p, ability.id);
         const groundEffect: GroundAoE = {
           sourceId: p.id,
           pos: { ...zoneCenter },
           radius: eff.radius,
-          min: eff.min,
-          max: eff.max,
+          min: Math.round(eff.min * thundercallMult),
+          max: Math.round(eff.max * thundercallMult),
           remaining: eff.duration,
           interval: eff.interval,
           tickTimer: eff.interval,
@@ -1542,7 +1674,9 @@ export function runEffects(
           ability: ability.name,
           // Each pulse is an AoE hit; scale per tick off the school's rating
           // (Spell Power, Ranged AP, or melee Attack Power for physical pulses).
-          spBonus: directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true),
+          spBonus:
+            directHitBonus(abilityScalingPower(p, ability), ability, res.castTime, true) *
+            thundercallMult,
           allyBuffPct: eff.allyBuffPct,
           igniteFrac: eff.igniteFrac,
           slowMult: eff.slowMult,
@@ -1611,6 +1745,25 @@ export function runEffects(
         // hit lands one interval later, exactly the fall time.
         if (!eff.delayed) ctx.pulseGroundAoE(groundEffect, threatOpts, true);
         ctx.groundAoEs.push(groundEffect);
+        if (echoThunderVent) {
+          // Faultwake's full vent is the whole zone, so mirror each pulse one
+          // second later at 40%. This echo carries damage only: it cannot copy
+          // slows, ignites, or another Echoing Elements trigger.
+          ctx.groundAoEs.push({
+            sourceId: p.id,
+            pos: { ...zoneCenter },
+            radius: eff.radius,
+            min: Math.max(1, Math.round(groundEffect.min * 0.4)),
+            max: Math.max(1, Math.round(groundEffect.max * 0.4)),
+            remaining: eff.duration + 1,
+            interval: eff.interval,
+            tickTimer: 1,
+            school: ability.school,
+            ability: 'Echoing Elements',
+            spBonus: (groundEffect.spBonus ?? 0) * 0.4,
+          });
+        }
+        consumeThunderVent(ctx, p, ability.id);
         break;
       }
       case 'aoeAttackSpeed': {
@@ -2091,6 +2244,18 @@ export function runEffects(
                 ability.school,
                 eff.breakOnDamage ? damageBreakThreshold(m.maxHp, eff.breakOnDamage) : undefined,
               );
+              if (ability.id === 'earthbind') {
+                ctx.applyAura(m, {
+                  id: 'earthbind_slow',
+                  name: ability.name,
+                  kind: 'slow',
+                  remaining: 8,
+                  duration: 8,
+                  value: 0.6,
+                  sourceId: p.id,
+                  school: ability.school,
+                });
+              }
             }
           }
         }
@@ -2225,6 +2390,7 @@ export function runEffects(
             p.auras.splice(existing, 1);
             if (eff.kind === 'stealth') p.stealthed = false; // toggled back out of stealth
             ctx.emit({ type: 'aura', targetId: p.id, name: ability.name, gained: false });
+            if (ability.id === 'ghost_wolf') onGhostWolfExited(ctx, p);
             recalcPlayerStats(
               p,
               meta.cls,
@@ -2301,6 +2467,10 @@ export function runEffects(
           ctx.playerMods(meta),
           meta.equipmentInstance,
         );
+        onHunterGuiseActivated(ctx, p, meta, ability.id);
+        if (ability.id === 'cold_focus' || ability.id === 'bloodtrail_assault') {
+          activateHunterMajorWindow(ctx, p, eff.duration);
+        }
         break;
       }
       case 'petBuff': {
@@ -2343,7 +2513,47 @@ export function runEffects(
           meta.cls === 'warrior' && p.resourceType === 'rage'
             ? eff.amount * warriorAbilityRageMult(ctx, p, meta)
             : eff.amount;
-        p.resource = Math.min(p.maxResource, p.resource + amount);
+        if (meta.cls === 'hunter' && p.resourceType === 'focus') {
+          grantHunterFocus(ctx, p, amount, ability.id, true);
+        } else {
+          p.resource = Math.min(p.maxResource, p.resource + amount);
+        }
+        break;
+      }
+      case 'packCommand': {
+        runPackCommand(ctx, p, target, eff, ability.name);
+        break;
+      }
+      case 'unleashBeast': {
+        runUnleashBeast(ctx, p, target, eff, ability.name);
+        break;
+      }
+      case 'howlingRage': {
+        applyHowlingRage(ctx, p, eff.duration);
+        break;
+      }
+      case 'hunterStampede': {
+        runStampede(ctx, p, target, eff, ability.name);
+        break;
+      }
+      case 'hunterBloodhook': {
+        startBloodhook(ctx, p, target, eff);
+        break;
+      }
+      case 'hunterShrapnel': {
+        runShrapnelCharge(ctx, p, target, eff, ability.name);
+        break;
+      }
+      case 'hunterTrailbreak': {
+        trailbreak(ctx, p, eff.distance);
+        break;
+      }
+      case 'hunterPackRally': {
+        runHunterPackRally(ctx, p, eff.duration, eff.radius);
+        break;
+      }
+      case 'frostjawTrap': {
+        spawnFrostjawTrap(ctx, p, eff, ability.name, ability.id, ability.range);
         break;
       }
       case 'aoeAllyMaxHp': {
@@ -2433,6 +2643,7 @@ export function runEffects(
           ? Math.max(eff.pct, 0.2)
           : eff.pct;
         ctx.applyHeal(p, p, Math.round(p.maxHp * pct), ability.name);
+        if (ability.id === 'wildheart') runHunterWildheart(ctx, p);
         break;
       }
       case 'selfHotPctMax': {
@@ -2595,6 +2806,10 @@ export function runEffects(
   // two procs (committed frost only, so no existing golden moves); Flurry
   // plants Winter's Chill on its surviving target. Inert for everyone else.
   frostMageAfterCast(ctx, p, meta, ability, target);
+  benisonAfterAbility(ctx, p, meta, target, ability.id);
+  doctrineAfterAbility(ctx, p, meta, target, ability.id);
+  vespersAfterAbility(ctx, p, meta, target, ability.id, vespersGloomtitheStacks);
+  priestAfterAbility(ctx, p, ability.id, target);
 
   if (ability.spendsCombo && spentCombo > 0) {
     p.comboPoints = 0;

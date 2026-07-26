@@ -103,9 +103,11 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
   },
   'priest/shadow': {
     stats: { int: 6 },
+    global: { spellDmgPct: 0.15 },
     abilities: {
-      shadow_word_pain: { dmgPct: 0.24, costPct: -0.1 },
-      mind_blast: { dmgPct: 0.18, costPct: -0.1 },
+      shadow_word_pain: { dmgPct: 0.45, costPct: -0.1 },
+      mind_blast: { dmgPct: 0.5, costPct: -0.1 },
+      mind_flay: { dmgPct: 0.6 },
     },
   },
   'shaman/elemental': {
@@ -296,6 +298,23 @@ describe('v0.28 passive restoration hotfix', () => {
       }
     }
     expect(dead).toEqual([]);
+  });
+
+  it('applies the Survival physical baseline to custom Fieldcraft effects', () => {
+    const known = abilitiesKnownAt(
+      'hunter',
+      20,
+      computeTalentModifiers('hunter', allocation('survival'), 20),
+    );
+    const bloodhook = known
+      .find(({ def }) => def.id === 'bloodhook')
+      ?.effects.find((effect) => effect.type === 'hunterBloodhook');
+    const shrapnel = known
+      .find(({ def }) => def.id === 'shrapnel_charge')
+      ?.effects.find((effect) => effect.type === 'hunterShrapnel');
+
+    expect(bloodhook).toMatchObject({ damageMult: 1.06 });
+    expect(shrapnel).toMatchObject({ damageMult: 1.06 });
   });
 
   it('restores the complete repository-backed baseline for all 21 applicable specs', () => {

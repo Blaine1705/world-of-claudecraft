@@ -133,6 +133,7 @@ describe('ground-targeted casting (thematic per-class spells)', () => {
     const sim = new Sim({ seed: 7, playerClass: cls, noPlayer: true });
     const pid = sim.addPlayer(cls, 'Caster');
     sim.setPlayerLevel(20, pid);
+    if (cls === 'shaman' && !sim.setSpec('elemental', pid)) throw new Error('no elemental spec');
     const me = sim.entities.get(pid);
     if (!me) throw new Error('no caster');
     me.resource = 9999;
@@ -214,7 +215,7 @@ describe('ground-targeted casting (thematic per-class spells)', () => {
     const fx = aimedFx(sim);
     expect(fx?.radius).toBe(8);
     const zone = (sim as unknown as { groundAoEs: GroundAoE[] }).groundAoEs.find(
-      (z) => z.ability === 'Earthquake',
+      (z) => z.ability === 'Faultwake',
     );
     expect(zone).toBeDefined();
     expect(zone?.pos.x).toBeCloseTo(16, 1);

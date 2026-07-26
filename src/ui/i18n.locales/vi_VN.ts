@@ -3027,7 +3027,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Một đòn mở màn từ trạng thái ẩn thân cào xé kẻ địch gây sát thương vũ khí cộng thêm {damage} và gây sát thương chảy máu trong 9 giây. Tặng 1 điểm liên hoàn. Chỉ dùng được ở Hình Sói.',
   'entities.abilities.rake.name': 'Lóc Xé',
   'entities.abilities.rapid_fire.description':
-    'Tăng tốc độ tấn công của bạn thêm 40% trong 15 giây.',
+    'Vừa di chuyển vừa bắn nhanh sáu phát trong 2,4 giây. Mỗi phát gây {damage} sát thương vật lý.',
   'entities.abilities.rapid_fire.name': 'Giương Cung Cuồng Loạn',
   'entities.abilities.raptor_strike.description':
     'Một đòn cận chiến mạnh tăng sát thương thêm {damage}. Kích hoạt ở đòn đánh tiếp theo của bạn.',
@@ -4619,6 +4619,15 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Đòn hỏa thuật chủ lực của bạn, vừa giáng một đòn vừa khiến mục tiêu cháy âm ỉ.',
   'guide.abilityHook.flame_shock':
     'Một đòn thiêu đốt tức thời giáng trực diện và tiếp tục sém cháy theo thời gian.',
+  'guide.abilityHook.galeheart_weapon':
+    'Truyền gió bão vào cả hai vũ khí và tưởng thưởng nhịp tấn công đều đặn.',
+  'guide.abilityHook.lifespring_weapon':
+    'Truyền nước hồi phục vào vũ khí và tăng cường dòng chữa lành liên tục.',
+  'guide.abilityHook.tidecall': 'Triệu gọi thủy triều để cường hóa chuỗi phép hồi phục kế tiếp.',
+  'guide.abilityHook.stoneward':
+    'Dựng khiên đá tích năng, chuyển sát thương phải chịu thành hồi phục.',
+  'guide.abilityHook.primal_exaltation':
+    'Giải phóng sức mạnh nguyên tố theo chuyên môn trong thời gian ngắn.',
   'guide.abilityHook.frost_armor':
     'Một buff bản thân lâu dài giúp tôi luyện giáp của bạn trước trận đấu.',
   'guide.abilityHook.frostbolt': 'Tấn công từ xa và làm chậm mục tiêu để nó không thể áp sát bạn.',

@@ -135,7 +135,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.berserk.name': '赤き霞',
   'entities.abilities.blink.name': '瞬き歩み',
   'entities.abilities.bloodlust.name': '戦の太鼓',
-  'entities.abilities.chain_lightning.name': '枝分かれの稲妻',
+  'entities.abilities.chain_lightning.name': '天枝の雷',
   'entities.abilities.chaos_bolt.name': '破滅の矢',
   'entities.abilities.cleansing_verdict.name': '浄化の裁定',
   'entities.abilities.cleansing_verdict.description':
@@ -1071,6 +1071,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'settings.languageLoadUnavailable': 'その言語は利用できません。',
   'game.hud.lowMana': 'マナ低下',
   'game.hud.lowEnergy': 'エネルギー低下',
+  'game.hud.lowFocus': '集中値低下',
   'game.talents.title': 'タレント',
   'game.talents.classTab': 'クラス',
   'game.talents.specTab': '専門化',
@@ -1594,6 +1595,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'classDetails.resources.mana': 'マナ',
   'classDetails.resources.energy': 'エネルギー',
   'classDetails.resources.rage': '怒り',
+  'classDetails.resources.focus': '集中値',
   'classDetails.roles.warrior': 'タンク / 近接DPS',
   'classDetails.roles.paladin': 'ヒーラー / タンク / 近接DPS',
   'classDetails.roles.hunter': '遠隔DPS',
@@ -2191,6 +2193,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.mana': 'マナ',
   'abilityUi.resources.rage': '怒り',
   'abilityUi.resources.energy': 'エネルギー',
+  'abilityUi.resources.focus': '集中値',
   'abilityUi.forms.bear': '熊',
   'abilityUi.forms.cat': '狼',
   'abilityUi.cast.fishing': '釣り',
@@ -2523,6 +2526,47 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.volley.name': '乱射',
   'entities.abilities.volley.description':
     '対象地点に3秒間、矢を降らせ、範囲内の敵に0.5秒ごとに{damage}のダメージを与えます。',
+  'entities.abilities.pack_command.name': '群れの指令',
+  'entities.abilities.pack_command.description':
+    '生きたペットに攻撃を命じます。命中すると集中値を20生成し、群れの獰猛さを1段階得ます。',
+  'entities.abilities.unleash_beast.name': '獣の解放',
+  'entities.abilities.unleash_beast.description':
+    '最大まで高まった群れの獰猛さを解放し、主対象を強打して周囲も叩きます。その後、ペットを短時間の範囲攻撃狂乱に駆り立てます。',
+  'entities.abilities.measured_shot.name': '精密射撃',
+  'entities.abilities.measured_shot.description':
+    '慎重に狙った一射で{damage}の物理ダメージを与え、命中時に集中値を20生成します。',
+  'entities.abilities.cold_focus.name': '冷徹集中',
+  'entities.abilities.cold_focus.description':
+    '12秒間、精密射撃がより多くの集中値を生成し、引き絞りの速度が上がって消費も減ります。（冷眼のシグネチャ）',
+  'entities.abilities.bloodhook.name': '血鉤',
+  'entities.abilities.bloodhook.description':
+    '8から25ヤード離れた敵へ突進して主傷口を開き、12秒間で24の出血ダメージを与えます。（野戦術のシグネチャ）',
+  'entities.abilities.shrapnel_charge.name': '榴散弾装薬',
+  'entities.abilities.shrapnel_charge.description':
+    '対象と周囲の敵を榴散弾で吹き飛ばし、主対象から短時間の出血を広げます。',
+  'entities.abilities.bloodtrail_assault.name': '血跡強襲',
+  'entities.abilities.bloodtrail_assault.description':
+    '12秒間、血鉤、裂傷、榴散弾装薬、そしてペットの追撃を強化します。',
+  'entities.abilities.trailbreak.name': '離脱跳躍',
+  'entities.abilities.trailbreak.description':
+    '専門化の状態を失わずに後方へ跳びます。野戦術では次の再突入も準備します。',
+  'entities.abilities.hunting_momentum.name': '狩猟の勢い',
+  'entities.abilities.hunting_momentum.description':
+    'パッシブ：腹裂きの一撃で狩猟の勢いを1スタック獲得します。8秒間持続し、最大3スタックです。3スタック時、反撃の牙の打撃ダメージが45%増加し、全スタックを消費します。（野戦術）',
+  'entities.abilities.fieldcraft_reentry.name': '再突入準備',
+  'entities.abilities.fieldcraft_reentry.description':
+    'パッシブ：離脱跳躍は狩猟の勢いを更新し、12秒以内の次の腹裂きの一撃または血鉤を強化します。腹裂きの一撃は1スタックごとに15%の追加ダメージを与えます。血鉤は18から24の追加物理ダメージを与え、1スタックごとに15%増加し、遠隔攻撃力でも増加します。3スタック時はいずれの攻撃も狩猟の勢いを消費します。（野戦術）',
+  'entities.abilities.wildheart.name': '野生の心',
+  'entities.abilities.wildheart.description': '最大体力の30%を即座に回復します。',
+  'entities.abilities.shellskin.name': '甲殻の皮膚',
+  'entities.abilities.shellskin.description':
+    '8秒間、受けるダメージを60%軽減しますが、効果中は攻撃できません。',
+  'entities.abilities.frostjaw_trap.name': '霜顎の罠',
+  'entities.abilities.frostjaw_trap.description':
+    '選択した敵の位置か足元に起動済みの罠を置きます。最初に作動させた敵を足止めし、周囲の敵を減速させます。',
+  'entities.abilities.pack_rally.name': '群れの結集',
+  'entities.abilities.pack_rally.description':
+    '駿馬の相をまとい、周囲の味方を鼓舞します。10秒間、移動速度を30%、攻撃速度と詠唱速度を10%上昇させます。',
   'entities.abilities.hurricane.name': 'ハリケーン',
   'entities.abilities.hurricane.description':
     '対象地点に6秒間、ハリケーンを呼び起こし、敵を打ちのめして毎秒{damage}の自然ダメージを与えます。',
@@ -2706,7 +2750,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     '慎重に引き絞った射撃で {damage} のダメージを与えます。',
   'entities.abilities.rapid_fire.name': '熱狂の速射',
-  'entities.abilities.rapid_fire.description': '15秒間、攻撃速度が40%増加します。',
+  'entities.abilities.rapid_fire.description':
+    '移動しながら2.4秒かけて6発の高速射撃を行い、1発ごとに{damage}の物理ダメージを与えます。',
   'entities.abilities.smite.name': 'スマイト',
   'entities.abilities.smite.description': '敵に {damage} の神聖ダメージを与えます。',
   'entities.abilities.lesser_heal.name': '囁きの祈り',
@@ -2741,9 +2786,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '石の怒りを武器に込めます。5分間、各スイングが{damage}の追加ダメージを与えます。',
   'entities.abilities.healing_wave.name': '癒しの水流',
   'entities.abilities.healing_wave.description': '味方対象の体力を {damage} 回復します。',
-  'entities.abilities.chain_heal.name': 'チェインヒール',
+  'entities.abilities.chain_heal.name': '流転の癒し',
   'entities.abilities.chain_heal.description':
-    '味方1体を大きく回復し、近くの味方最大2体に連鎖します。連鎖するごとに回復量が50%減少します。（回復スペシャライゼーション）',
+    '味方1体の体力を120から145回復し、近くの味方最大2体に連鎖します。連鎖ごとに回復量は半減し、届いた味方ごとに癒しの水流を消費して追加回復を発生させます。（スピリットメンド固有）',
+  'entities.abilities.galeheart_weapon.name': '疾風の武器',
+  'entities.abilities.galeheart_weapon.description':
+    '武器に疾風を宿します。3回目の命中ごとに武器攻撃が2度反響し、ストームキャストを発動します。',
+  'entities.abilities.lifespring_weapon.name': '命泉の武器',
+  'entities.abilities.lifespring_weapon.description':
+    '武器に生命の水を宿し、癒しの水流への蓄積量を20%増加させます。',
+  'entities.abilities.primal_exaltation.name': '原初の高揚',
+  'entities.abilities.primal_exaltation.description':
+    '専門分野の力を12秒間解放し、通常のローテーションを強化します。（シャーマンのタレント）',
+  'entities.abilities.stoneward.name': '石の守り',
+  'entities.abilities.stoneward.description':
+    '味方1体を6チャージで60秒間守ります。ダメージを受けると1チャージを消費し、3秒に1回、最大体力の5%を回復します。（シャーマンのタレント）',
+  'entities.abilities.tidecall.name': '潮呼び',
+  'entities.abilities.tidecall.description':
+    '素早い癒しの潮を呼び、味方1体を回復して計算後の回復量を癒しの水流に加えます。',
   'entities.abilities.earth_shock.name': '大地の衝撃',
   'entities.abilities.earth_shock.description':
     '衝撃の力で対象を即座に打ち、{damage} の自然ダメージを与えます。',
@@ -5222,6 +5282,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.fireball': '主力のファイア火力。一撃を当て、標的を燃焼させ続けます。',
   'guide.abilityHook.fireball_form': '生きた火球へと姿を変え、開けた場所を高速で駆け抜けます。',
   'guide.abilityHook.flame_shock': '前面に一撃を与え、その後も継続して焼き続ける即時の燃焼です。',
+  'guide.abilityHook.galeheart_weapon': '二刀に嵐の風を宿し、安定した攻撃リズムを力に変えます。',
+  'guide.abilityHook.thunder_reservoir':
+    '雷を蓄え、大地の衝撃か断層の目覚めで最大威力を解放します。',
+  'guide.abilityHook.warspirit_cadence':
+    '安定した武器のリズムを疾風の残響と即時呪文の機会に変えます。',
+  'guide.abilityHook.stormsurge':
+    'ストームキャストを消費すると、祖霊の一撃が早く戻ることがあります。',
+  'guide.abilityHook.lifespring_weapon': '武器に癒やしの水を宿し、継続する回復の流れを強めます。',
+  'guide.abilityHook.tidecall': '味方1体を即時に回復し、癒しの水流を最大まで蓄えます。',
+  'guide.abilityHook.ancestor_return':
+    '戦闘外で長く詠唱し、倒れたパーティーまたはレイドの全員を蘇生します。',
+  'guide.abilityHook.stoneward': '力を蓄えた石の盾を掲げ、受けたダメージを回復に変えます。',
+  'guide.abilityHook.primal_exaltation': '専門分野に応じた元素の力を短時間解き放ちます。',
   'guide.abilityHook.frost_armor': '戦闘の前にアーマーを固める、持続する自己強化です。',
   'guide.abilityHook.frostbolt': '遠距離から攻撃し、標的を減速させて近づけなくします。',
   'guide.abilityHook.garrote': 'ステルスから仕掛け、ワイヤーで標的を継続的に出血させます。',
@@ -5237,11 +5310,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '立ち止まる余裕があるときに味方の体力を満タンに戻す、安定した詠唱です。',
   'guide.abilityHook.life_tap': 'マナが尽きたとき、自分の体力を一部マナに変換します。',
   'guide.abilityHook.lightning_bolt': 'ネイチャーダメージを与える遠距離詠唱。遠くからの主力です。',
+  'guide.abilityHook.chain_lightning':
+    '1体を攻撃して近くの敵2体へ跳び、1回の発動全体で雷鳴を1つ蓄えます。',
   'guide.abilityHook.lightning_shield':
     '身にまとい、攻撃してきた相手にネイチャーダメージを与えます。',
   'guide.abilityHook.mark_of_the_wild': '戦闘の前に自分や味方に付与する、持続する祝福です。',
+  'guide.abilityHook.measured_shot': '慎重に狙う遠距離射撃で、強力な攻撃に使う集中値を回復します。',
   'guide.abilityHook.mongoose_bite': '敵の回避の直後に使える反撃です。',
   'guide.abilityHook.moonfire': '即座に当たり標的を燃焼させるため、移動中にも向いています。',
+  'guide.abilityHook.pack_command': '相棒に攻撃を命じ、獣の解放に必要な獰猛さを蓄えます。',
+  'guide.abilityHook.stampede':
+    '3体の獣を12秒間呼び出して攻撃させます。群れの獰猛さが最大の時に使うと、召喚中ずっと最大のダメージ上昇を保ちます。',
   'guide.abilityHook.power_word_fortitude':
     '味方の体力総量を上げます。プルの前に唱え、維持し続けましょう。',
   'guide.abilityHook.power_word_shield': '味方をシールドで包み、攻撃が当たる前に吸収します。',
@@ -6086,6 +6165,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': '鎖',
   'hudChrome.auraEffect.dot': '{interval}秒ごとに{value}の{school}ダメージを与える',
   'hudChrome.auraEffect.hot': '{interval}秒ごとに体力を{value}回復する',
+  'hudChrome.auraEffect.mendingCurrent':
+    '{value}の回復量を蓄え、時間経過または流転の癒しで消費して解放する',
+  'hudChrome.auraEffect.mendingCurrentPercent': '最大体力の{pct}%分の回復量を流転の癒し用に蓄える',
   'hudChrome.auraEffect.absorb': '{value}のダメージを吸収する',
   'hudChrome.auraEffect.healAbsorb': '受ける回復を{value}吸収する',
   'hudChrome.auraEffect.thorns': '攻撃者に{value}の{school}ダメージを与える',
@@ -6099,6 +6181,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.dmgDoneReduce': '与えるダメージを{pct}%低下させる',
   'hudChrome.auraEffect.elementalConvergencePrimed':
     '次に異なる属性の呪文を唱えると、エレメンタル・コンバージェンスが発動します',
+  'hudChrome.auraEffect.hunterFerocity':
+    '群れの獰猛さ{stacks}スタック：ペットの与えるダメージが{pct}%上昇',
   'hudChrome.auraEffect.heatingUp':
     '次の炎系ビルダーが連続でクリティカルになるとホットストリークを獲得し、クリティカルでなければヒーティングアップが解除されます',
   'hudChrome.auraEffect.tongues': '詠唱時間を{pct}%増加させる',
@@ -7996,7 +8080,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.description':
     '30ヤード以内の味方を狂乱させ、攻撃速度を30%上昇させる。効果時間15秒。（シャーマンのタレント）',
   'entities.abilities.chain_lightning.description':
-    '対象地点へ雷を放ち、周囲の敵に{damage}のダメージを与える。（シャーマンのタレント）',
+    '対象を攻撃し、10ヤード以内の敵最大2体へ跳び移り、それぞれに{damage}の自然ダメージを与える。命中すると、対象ごとではなく詠唱全体で雷霆を1つ得る。ダメージはスペルパワーで増加する。原始の熟達で即時発動になり、原始の高揚で詠唱時間が半分になる。（雷呼び）',
   'entities.abilities.chaos_bolt.description':
     '混沌の炎を放ち、{damage}の火属性ダメージを与える。（ウォーロックのタレント）',
   'entities.abilities.cloak_of_shadows.description':
@@ -8482,6 +8566,22 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildgrowth_leggings.name': '野生の成長のレギンス',
   'entities.items.wildsoul_maul.name': '野生魂の大槌',
   'hudChrome.professions.skillValue': '{skill} / {max}',
+  'entities.abilities.veilstep.name': 'ヴェイルステップ',
+  'entities.abilities.veilstep.description': '向いている方向へ帷をすり抜ける。',
+  'entities.abilities.scouring_mercy.name': '浄罪の慈悲',
+  'entities.abilities.scouring_mercy.description':
+    '敵を聖なる力で浄化するか、味方1体を即座に癒す。ドクトリン固有能力。',
+  'entities.abilities.seraphic_vigil.name': '熾天使の見守り',
+  'entities.abilities.seraphic_vigil.description':
+    '味方1体に見守りの祝福を与え、危機に陥った時に体力を回復する。ベネディクション固有能力。',
+  'entities.abilities.summon_tithefiend.name': 'タイスフィーンド招来',
+  'entities.abilities.summon_tithefiend.description':
+    'グルームタイスを消費し、あなたのエフィジーを狙う一時的なタイスフィーンドを呼び出す。ヴェスパー固有能力。',
+  'entities.abilities.martyrs_aegis.name': '殉教者の盾',
+  'entities.abilities.martyrs_aegis.description': '味方1体が受けるダメージを8秒間40%軽減する。',
+  'entities.abilities.choir_of_deliverance.name': '救済の聖歌隊',
+  'entities.abilities.choir_of_deliverance.description':
+    '6秒間詠唱し、2秒ごとに周囲のパーティメンバーを回復する。',
   'entities.items.resonant_thread.name': '共鳴の糸',
   'entities.items.resonant_hide.name': '共鳴の獣皮',
   'entities.items.resonant_links.name': '共鳴の鎖',
@@ -8763,6 +8863,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.cannotAfford': 'バインド解除の手数料を支払えません。',
   'hudChrome.unbind.outOfRange': 'バインド解除するには作業台のそばにいる必要があります。',
   'hudChrome.unbind.noSpace': 'バッグにバインド解除したアイテムを入れる空きがありません。',
+  'entities.abilities.stampede.name': '獣群突撃',
+  'entities.abilities.stampede.description':
+    '獣を3体、12秒間召喚する。各獣は2秒ごとに攻撃し、{damage}の物理ダメージを与える。表示ダメージには遠隔攻撃力の8%が含まれるが、ペットダメージボーナスは含まれない。獣は召喚時の群れの獰猛さを記録し、1スタックごとにダメージが10%増加する。獣群突撃がクールダウン中、群れの指令の命中は20%の確率でクールダウンをリセットし、5回連続で失敗すると必ず発動する。獣が活動中はリセットされない。（群れの王）',
+  'entities.abilities.ancestor_return.name': '祖霊の帰還',
+  'entities.abilities.ancestor_return.description':
+    'グループまたはレイドの倒れたメンバー全員を遺体の場所で蘇生し、体力とマナを30%回復させる。戦闘中は使用できない。（霊癒）',
   // Professions 2.0 wiki arm: the professions hub rewrite and the
   // /wiki/professions detail pages (M16 non-Latin fills, added with the keys).
   'guide.professions.ringHeading': '製作の輪',
@@ -9172,4 +9278,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': 'そのIDのアイテムはありません。',
   'devCommand.kitCurrentSpec': '現在のスペック',
   'hudChrome.enchanting.wornTag': '装備中 ({slot})',
+  'entities.abilities.thunder_reservoir.name': '雷鳴の貯蔵',
+  'entities.abilities.thunder_reservoir.description':
+    'パッシブ：アークボルトとスカイブランチで雷鳴を獲得し、最大5。5になると、アースンジョルトは125%、フォールトウェイクは100%追加ダメージを与え、その後すべての雷鳴を消費する。（サンダーコール）',
+  'entities.abilities.warspirit_cadence.name': '戦霊の律動',
+  'entities.abilities.warspirit_cadence.description':
+    'パッシブ：武器攻撃が3回命中するたび、50%の自然ダメージを与えるゲイルハートエコーが2回発動し、12秒間ストームキャストを得る。ストームキャストは次のアークボルト、ジョルト、またはメンディングウォーターを即時発動かつ消費マナ半減にする。アンセストラルストライクは2回分として数える。（ウォースピリット）',
+  'entities.abilities.stormsurge.name': 'ストームサージ',
+  'entities.abilities.stormsurge.description':
+    'パッシブ：アンセストラルストライクのクールダウン中にストームキャストを消費すると、25%の確率でクールダウンをリセットする。4回失敗すると次は必ず発動する。（ウォースピリット）',
+  'entities.abilities.unleash_weapon.name': '武器解放',
+  'entities.abilities.unleash_weapon.description':
+    '有効な武器付与を解放する。火焔烙印は54から64の火炎ダメージを与え、魔力の30%が加算され、雷鳴を2得る。疾風は武器で攻撃し、戦霊の律動を進め、6秒間攻撃速度を20%上昇させる。石縛は武器ダメージの75%を与え、対象を強制的に自分へ攻撃させ、4秒間受けるダメージを20%軽減する。命泉は癒しの水流を消費し、残りの回復量の125%を即時に回復し、8秒以内の次の一撃を実際の回復量の50%分軽減する。',
 };

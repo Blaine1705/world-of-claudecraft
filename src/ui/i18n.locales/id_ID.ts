@@ -2962,7 +2962,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Pembuka siluman yang menggaruk musuh sebesar kerusakan senjata ditambah {damage} dan menimbulkan kerusakan berdarah selama 9 detik. Memberi 1 poin kombo. Hanya dalam Wujud Serigala.',
   'entities.abilities.rake.name': 'Kupasan',
   'entities.abilities.rapid_fire.description':
-    'Meningkatkan kecepatan serangmu sebesar 40% selama 15 detik.',
+    'Salurkan enam tembakan cepat selama 2,4 detik sambil bergerak. Setiap tembakan menimbulkan {damage} kerusakan fisik.',
   'entities.abilities.rapid_fire.name': 'Tarikan Menggebu',
   'entities.abilities.raptor_strike.description':
     'Serangan jarak dekat kuat yang meningkatkan kerusakan sebesar {damage}. Aktif pada ayunan berikutnya.',
@@ -4556,6 +4556,15 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Serangan api utamamu, menghantam sekaligus meninggalkan sasaran terbakar.',
   'guide.abilityHook.flame_shock':
     'Bakaran seketika yang menghantam di awal dan terus menghanguskan seiring waktu.',
+  'guide.abilityHook.galeheart_weapon':
+    'Mengilhami kedua senjata dengan angin badai dan menghadiahi ritme serangan yang stabil.',
+  'guide.abilityHook.lifespring_weapon':
+    'Mengilhami senjatamu dengan air pemulih dan memperkuat aliran penyembuhan berkelanjutan.',
+  'guide.abilityHook.tidecall':
+    'Memanggil pasang untuk memperkuat rangkaian mantra penyembuhan berikutnya.',
+  'guide.abilityHook.stoneward':
+    'Mendirikan perisai batu bermuatan yang mengubah damage diterima menjadi pemulihan.',
+  'guide.abilityHook.primal_exaltation': 'Melepaskan kekuatan elemen spesialisasimu untuk sesaat.',
   'guide.abilityHook.frost_armor':
     'Penguat-diri tahan lama yang mengeraskan zirahmu sebelum pertarungan.',
   'guide.abilityHook.frostbolt':

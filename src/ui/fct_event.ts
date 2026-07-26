@@ -24,6 +24,8 @@ export type FctSpawnSource =
       readonly ability: boolean;
       readonly crit: boolean;
       readonly isPlayerSource: boolean;
+      /** Whether a temporary guardian owned by the player caused the event. */
+      readonly isPlayerOwnedSource?: boolean;
       readonly isPlayerTarget: boolean;
     }
   | { readonly type: 'absorb' }
@@ -67,7 +69,7 @@ export function fctSpawnShape(src: FctSpawnSource): FctSpawnShape | null {
       // player taking it floats damage-taken; a hit between two non-player entities floats
       // nothing (the live site's `if (isPlayerSource && !isPlayerTarget) ... else if
       // (isPlayerTarget)` with no else).
-      if (src.isPlayerSource && !src.isPlayerTarget)
+      if ((src.isPlayerSource || src.isPlayerOwnedSource) && !src.isPlayerTarget)
         return {
           kind: src.ability ? 'damage-done-ability' : 'damage-done-auto',
           isSelf: false,

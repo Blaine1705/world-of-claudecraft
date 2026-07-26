@@ -5,7 +5,7 @@
 // live through src/ui/talent_i18n.ts. No balance numbers or instanced spoilers here.
 
 export type GuideRole = 'tank' | 'healer' | 'dps';
-export type GuideResource = 'rage' | 'mana' | 'energy';
+export type GuideResource = 'rage' | 'mana' | 'energy' | 'focus';
 
 export interface GuideAbilityRef { id: string; name: string; }
 export interface GuideClassSpec { id: string; name: string; role: GuideRole; signature: string; }
@@ -612,7 +612,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
   {
     "id": "hunter",
     "color": "#a6d84f",
-    "resource": "mana",
+    "resource": "focus",
     "roles": [
       "dps"
     ],
@@ -627,13 +627,13 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "marksmanship",
         "name": "Coldsight",
         "role": "dps",
-        "signature": "trueshot_aura"
+        "signature": "cold_focus"
       },
       {
         "id": "survival",
         "name": "Fieldcraft",
         "role": "dps",
-        "signature": "wyvern_sting"
+        "signature": "bloodhook"
       }
     ],
     "signatureAbilities": [
@@ -642,24 +642,24 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Gutting Strike"
       },
       {
+        "id": "pack_command",
+        "name": "Pack Command"
+      },
+      {
+        "id": "stampede",
+        "name": "Stampede"
+      },
+      {
+        "id": "measured_shot",
+        "name": "Measured Shot"
+      },
+      {
         "id": "aspect_of_the_hawk",
         "name": "Harrier's Guise"
       },
       {
         "id": "serpent_sting",
         "name": "Venom Barb"
-      },
-      {
-        "id": "arcane_shot",
-        "name": "Fell Shot"
-      },
-      {
-        "id": "concussive_shot",
-        "name": "Rattling Shot"
-      },
-      {
-        "id": "mongoose_bite",
-        "name": "Counterfang"
       }
     ],
     "abilities": [
@@ -668,6 +668,18 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Gutting Strike"
       },
       {
+        "id": "pack_command",
+        "name": "Pack Command"
+      },
+      {
+        "id": "stampede",
+        "name": "Stampede"
+      },
+      {
+        "id": "measured_shot",
+        "name": "Measured Shot"
+      },
+      {
         "id": "aspect_of_the_hawk",
         "name": "Harrier's Guise"
       },
@@ -685,11 +697,35 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "mongoose_bite",
-        "name": "Counterfang"
+        "name": "Woundrend"
+      },
+      {
+        "id": "hunting_momentum",
+        "name": "Hunting Momentum"
+      },
+      {
+        "id": "fieldcraft_reentry",
+        "name": "Armed Re-entry"
       },
       {
         "id": "wing_clip",
         "name": "Fettering Slash"
+      },
+      {
+        "id": "trailbreak",
+        "name": "Trailbreak"
+      },
+      {
+        "id": "wildheart",
+        "name": "Wildheart"
+      },
+      {
+        "id": "shellskin",
+        "name": "Shellskin"
+      },
+      {
+        "id": "frostjaw_trap",
+        "name": "Frostjaw Trap"
       },
       {
         "id": "tame_beast",
@@ -718,6 +754,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "rapid_fire",
         "name": "Fevered Draw"
+      },
+      {
+        "id": "shrapnel_charge",
+        "name": "Shrapnel Charge"
+      },
+      {
+        "id": "bloodtrail_assault",
+        "name": "Bloodtrail Assault"
       },
       {
         "id": "volley",
@@ -890,25 +934,25 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "discipline",
         "name": "Doctrine",
         "role": "healer",
-        "signature": "power_infusion"
+        "signature": "scouring_mercy"
       },
       {
         "id": "holy",
         "name": "Benison",
         "role": "healer",
-        "signature": "holy_nova"
+        "signature": "seraphic_vigil"
       },
       {
         "id": "shadow",
         "name": "Vespers",
         "role": "dps",
-        "signature": "shadowform"
+        "signature": "summon_tithefiend"
       }
     ],
     "signatureAbilities": [
       {
         "id": "smite",
-        "name": "Smite"
+        "name": "Scouring Hymn"
       },
       {
         "id": "lesser_heal",
@@ -934,7 +978,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "abilities": [
       {
         "id": "smite",
-        "name": "Smite"
+        "name": "Scouring Hymn"
       },
       {
         "id": "lesser_heal",
@@ -971,6 +1015,38 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "flash_heal",
         "name": "Urgent Prayer"
+      },
+      {
+        "id": "veilstep",
+        "name": "Veilstep"
+      },
+      {
+        "id": "psychic_scream",
+        "name": "Terror Canticle"
+      },
+      {
+        "id": "scouring_mercy",
+        "name": "Scouring Mercy"
+      },
+      {
+        "id": "prayer_of_healing",
+        "name": "Choirmend"
+      },
+      {
+        "id": "holy_nova",
+        "name": "Sunburst Canticle"
+      },
+      {
+        "id": "seraphic_vigil",
+        "name": "Seraphic Vigil"
+      },
+      {
+        "id": "shadowform",
+        "name": "Gloamveil"
+      },
+      {
+        "id": "summon_tithefiend",
+        "name": "Call Tithefiend"
       }
     ],
     "model": "player_priest",
@@ -1011,24 +1087,24 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Arc Bolt"
       },
       {
+        "id": "thunder_reservoir",
+        "name": "Thunder Reservoir"
+      },
+      {
+        "id": "chain_lightning",
+        "name": "Skybranch"
+      },
+      {
         "id": "rockbiter_weapon",
         "name": "Stonebound Weapon"
       },
       {
-        "id": "healing_wave",
-        "name": "Mending Waters"
+        "id": "galeheart_weapon",
+        "name": "Galeheart Weapon"
       },
       {
-        "id": "earth_shock",
-        "name": "Earthen Jolt"
-      },
-      {
-        "id": "lightning_shield",
-        "name": "Thunder Ward"
-      },
-      {
-        "id": "flame_shock",
-        "name": "Cinder Jolt"
+        "id": "warspirit_cadence",
+        "name": "Warspirit Cadence"
       }
     ],
     "abilities": [
@@ -1037,12 +1113,48 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Arc Bolt"
       },
       {
+        "id": "thunder_reservoir",
+        "name": "Thunder Reservoir"
+      },
+      {
+        "id": "chain_lightning",
+        "name": "Skybranch"
+      },
+      {
         "id": "rockbiter_weapon",
         "name": "Stonebound Weapon"
       },
       {
+        "id": "galeheart_weapon",
+        "name": "Galeheart Weapon"
+      },
+      {
+        "id": "warspirit_cadence",
+        "name": "Warspirit Cadence"
+      },
+      {
+        "id": "stormsurge",
+        "name": "Stormsurge"
+      },
+      {
+        "id": "lifespring_weapon",
+        "name": "Lifespring Weapon"
+      },
+      {
+        "id": "unleash_weapon",
+        "name": "Unleash Weapon"
+      },
+      {
         "id": "healing_wave",
         "name": "Mending Waters"
+      },
+      {
+        "id": "tidecall",
+        "name": "Tidecall"
+      },
+      {
+        "id": "ancestor_return",
+        "name": "Ancestors' Return"
       },
       {
         "id": "earth_shock",
@@ -1065,16 +1177,16 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Rime Jolt"
       },
       {
-        "id": "frostbrand_weapon",
-        "name": "Rimebound Weapon"
-      },
-      {
         "id": "ghost_wolf",
         "name": "Shadewolf"
       },
       {
         "id": "earthquake",
-        "name": "Earthquake"
+        "name": "Faultwake"
+      },
+      {
+        "id": "bloodlust",
+        "name": "Storm Chorus"
       }
     ],
     "model": "player_shaman",

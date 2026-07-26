@@ -15,6 +15,7 @@ import type { SimEvent } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { tEntity } from './entity_i18n';
 import { formatNumber, type TranslationKey, t } from './i18n';
+import { guardianOwnerId } from './pet_entity';
 
 const ENCOUNTER_END_SECONDS = 5;
 const HISTORY_CAP = 8;
@@ -106,7 +107,9 @@ export class MeterData {
     // can also legitimately land at amount 0 (full HP, fully absorbed) and that
     // real cast should still count as party activity.
     if (ev.type === 'heal2' && ev.cueOnly) return;
-    const sourceInParty = partyPids.has(ev.sourceId);
+    const sourceEntity = world.entities.get(ev.sourceId);
+    const creditedSourceId = guardianOwnerId(sourceEntity) ?? ev.sourceId;
+    const sourceInParty = partyPids.has(creditedSourceId);
     const targetInParty = partyPids.has(ev.targetId);
     if (!sourceInParty && !targetInParty) return;
 
@@ -118,13 +121,13 @@ export class MeterData {
     if (ev.type === 'damage' && sourceInParty && ev.kind === 'hit' && ev.amount > 0) {
       const target = world.entities.get(ev.targetId);
       if (target && target.kind === 'mob') {
-        const src = world.entities.get(ev.sourceId);
-        const member = world.partyInfo?.members.find((m) => m.pid === ev.sourceId);
-        const name = member?.name ?? src?.name ?? `#${ev.sourceId}`;
+        const src = world.entities.get(creditedSourceId);
+        const member = world.partyInfo?.members.find((m) => m.pid === creditedSourceId);
+        const name = member?.name ?? src?.name ?? `#${creditedSourceId}`;
         const cls =
-          member?.cls ?? (ev.sourceId === world.player.id ? world.player.templateId : null);
+          member?.cls ?? (creditedSourceId === world.player.id ? world.player.templateId : null);
         for (const enc of [this.current, this.allTime]) {
-          const t = this.tally(enc, ev.sourceId, name, cls, partyPids);
+          const t = this.tally(enc, creditedSourceId, name, cls, partyPids);
           t.dmg += ev.amount;
           if (enc === this.current) {
             t.dmgByMob.set(ev.targetId, (t.dmgByMob.get(ev.targetId) ?? 0) + ev.amount);
@@ -140,12 +143,13 @@ export class MeterData {
         }
       }
     } else if (ev.type === 'heal2' && sourceInParty && ev.amount > 0) {
-      const member = world.partyInfo?.members.find((m) => m.pid === ev.sourceId);
-      const src = world.entities.get(ev.sourceId);
-      const name = member?.name ?? src?.name ?? `#${ev.sourceId}`;
-      const cls = member?.cls ?? (ev.sourceId === world.player.id ? world.player.templateId : null);
+      const member = world.partyInfo?.members.find((m) => m.pid === creditedSourceId);
+      const src = world.entities.get(creditedSourceId);
+      const name = member?.name ?? src?.name ?? `#${creditedSourceId}`;
+      const cls =
+        member?.cls ?? (creditedSourceId === world.player.id ? world.player.templateId : null);
       for (const enc of [this.current, this.allTime]) {
-        this.tally(enc, ev.sourceId, name, cls, partyPids).heal += ev.amount;
+        this.tally(enc, creditedSourceId, name, cls, partyPids).heal += ev.amount;
       }
     }
   }

@@ -174,6 +174,30 @@ describe('stable snapshot timer protocol', () => {
     expect(client.player.cooldowns.size).toBe(0);
   });
 
+  it('does not age persistent engine auras when stable snapshots omit them', () => {
+    const client = bareClient(1, 'shaman');
+    apply(client, {
+      tw: 2,
+      time: 10,
+      self: playerWire(1, {
+        tid: 'shaman',
+        auras: [
+          {
+            ...aura('shaman_flow_state_progress', { rem: 86_400 }),
+            dur: 86_400,
+          },
+        ],
+      }),
+    });
+
+    apply(client, { tw: 2, time: 11, self: playerWire(1, { tid: 'shaman' }) });
+
+    expect(client.player.auras[0]).toMatchObject({
+      id: 'shaman_flow_state_progress',
+      remaining: 86_400,
+    });
+  });
+
   it('freezes retained auras while ordinary cooldown deadlines continue', () => {
     const client = bareClient(1);
     apply(client, {

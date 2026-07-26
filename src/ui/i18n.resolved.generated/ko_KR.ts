@@ -240,7 +240,8 @@ export const ko_KR: EnTranslations = {
     },
     "hud": {
       "lowMana": "마나 부족",
-      "lowEnergy": "기력 부족"
+      "lowEnergy": "기력 부족",
+      "lowFocus": "집중 부족"
     },
     "talents": {
       "title": "특성",
@@ -1581,6 +1582,8 @@ export const ko_KR: EnTranslations = {
     "auraEffect": {
       "dot": "{interval}초마다 {value}의 {school} 피해를 입힙니다",
       "hot": "{interval}초마다 생명력을 {value} 회복합니다",
+      "mendingCurrent": "치유량 {value}를 저장하여 시간에 따라 방출하거나 쇄도하는 치유로 소모합니다",
+      "mendingCurrentPercent": "최대 생명력의 {pct}%에 해당하는 치유량을 쇄도하는 치유용으로 저장합니다",
       "absorb": "{value}의 피해를 흡수합니다",
       "healAbsorb": "들어오는 치유를 {value}만큼 흡수합니다",
       "thorns": "공격자에게 {value}의 {school} 피해를 입힙니다",
@@ -1593,6 +1596,7 @@ export const ko_KR: EnTranslations = {
       "dmgDoneReduce": "입히는 피해가 {pct}% 감소합니다",
       "heatingUp": "다음 화염 생성기가 연속으로 치명타를 적중하면 몰아치는 열기를 얻고, 치명타가 아니면 달아오름이 제거됩니다",
       "elementalConvergencePrimed": "다음에 다른 원소 계열 주문을 시전하면 원소 융합이 발동합니다",
+      "hunterFerocity": "무리의 흉포함 {stacks}중첩: 야수가 입히는 피해가 {pct}% 증가합니다",
       "battleStance": "전투 태세: 분노 생성 10% 증가",
       "berserkerStance": "광전사 태세: 치명타 확률 3% 증가, 피해 3% 증가",
       "crit": "치명타 확률이 {pct}% 증가합니다",
@@ -3275,6 +3279,9 @@ export const ko_KR: EnTranslations = {
       "blessing_of_might": "아군 대상의 공격력을 높여 주며, 전투를 시작하기 전에 시전하면 좋습니다.",
       "divine_protection": "상황이 험해질 때 피해를 흡수하는 신속한 보호의 결계입니다.",
       "raptor_strike": "무언가가 거리를 좁혀 왔을 때 강하게 휘두르는 근접 일격입니다.",
+      "pack_command": "동료에게 공격을 명령하고, 야수 해방에 필요한 흉포함을 쌓습니다.",
+      "stampede": "야수 세 마리를 12초 동안 불러 공격시킵니다. 무리의 야성이 최대일 때 사용하면 소환 내내 최대 피해 보너스를 유지합니다.",
+      "measured_shot": "신중하게 조준한 원거리 사격으로, 강력한 공격에 쓸 집중을 회복합니다.",
       "aspect_of_the_hawk": "유지해 두면 원거리 공격력을 높여 주는 상입니다.",
       "serpent_sting": "독을 묻혀 시간이 지나며 자연 피해의 출혈을 입힙니다.",
       "arcane_shot": "원거리에서 즉시 날리는 사격으로, 빠르게 추가 피해를 줍니다.",
@@ -3293,11 +3300,21 @@ export const ko_KR: EnTranslations = {
       "power_word_shield": "아군을 보호막으로 감싸 타격이 닿기 전에 흡수합니다.",
       "renew": "시간이 지나며 회복되는 치유로, 시전하고 계속 이동하기 좋습니다.",
       "lightning_bolt": "자연 피해를 주는 원거리 시전기로, 멀리서 쓰는 주력기입니다.",
+      "chain_lightning": "한 대상을 공격하고 주변 적 두 명에게 튕기며, 전체 시전에서 천둥 한 개를 쌓습니다.",
+      "thunder_reservoir": "대지 충격이나 단층 각성이 최대 위력으로 방출할 때까지 번개를 비축합니다.",
       "rockbiter_weapon": "무기에 기운을 불어넣어 근접 공격이 더 강하게 들어가게 합니다.",
       "healing_wave": "주력 치유로, 자신이나 아군의 체력을 직접 회복시킵니다.",
       "earth_shock": "지금 당장 필요한 자연 피해를 즉시 주는 충격기입니다.",
       "lightning_shield": "몸에 전하를 둘러 공격자가 당신을 칠 때 자연 피해를 받게 합니다.",
       "flame_shock": "즉시 타격을 입히고 시간이 지나며 계속 불태우는 점화기입니다.",
+      "galeheart_weapon": "쌍수 무기에 폭풍의 바람을 불어넣어 안정적인 공격 리듬을 보상합니다.",
+      "warspirit_cadence": "안정적인 무기 리듬을 질풍의 메아리와 즉시 시전 기회로 바꿉니다.",
+      "stormsurge": "폭풍 시전 기회를 소모하면 선조의 일격이 일찍 돌아올 수 있습니다.",
+      "lifespring_weapon": "무기에 치유의 물을 불어넣어 이어지는 회복 흐름을 강화합니다.",
+      "tidecall": "아군을 즉시 치유하고 치유의 물결을 최대로 저장합니다.",
+      "ancestor_return": "전투 중이 아닐 때 길게 시전해 쓰러진 파티 또는 공격대원 모두를 부활시킵니다.",
+      "stoneward": "충전된 돌 방패를 세워 받는 피해를 회복으로 바꿉니다.",
+      "primal_exaltation": "전문화에 맞는 원소의 힘을 짧은 시간 폭발시킵니다.",
       "fireball": "주력 화염 공격기로, 타격을 입히고 대상을 계속 불태웁니다.",
       "fireball_form": "살아 있는 화염구로 변해 탁 트인 지형을 빠르게 가로지릅니다.",
       "frost_armor": "전투 전에 방어구를 단단하게 만드는 지속형 자기 강화입니다.",
@@ -5797,7 +5814,8 @@ export const ko_KR: EnTranslations = {
     "resources": {
       "mana": "마나",
       "energy": "기력",
-      "rage": "분노"
+      "rage": "분노",
+      "focus": "집중"
     },
     "roles": {
       "warrior": "탱커 / 근접 DPS",
@@ -6491,7 +6509,8 @@ export const ko_KR: EnTranslations = {
     "resources": {
       "mana": "마나",
       "rage": "분노",
-      "energy": "기력"
+      "energy": "기력",
+      "focus": "집중"
     },
     "forms": {
       "bear": "곰",
@@ -6866,6 +6885,58 @@ export const ko_KR: EnTranslations = {
       "volley": {
         "name": "일제 사격",
         "description": "지정한 지역에 3초 동안 화살을 쏟아부어 그 안의 적에게 0.5초마다 {damage}의 피해를 입힙니다."
+      },
+      "pack_command": {
+        "name": "무리 명령",
+        "description": "살아 있는 소환수에게 공격을 명령합니다. 적중하면 집중 20과 무리 흉포 1단계를 얻습니다."
+      },
+      "stampede": {
+        "name": "야수 쇄도",
+        "description": "야수 3마리를 12초 동안 소환합니다. 각 야수는 2초마다 공격해 {damage}의 물리 피해를 입힙니다. 표시된 피해에는 원거리 전투력의 8%가 포함되지만 소환수 피해 보너스는 포함되지 않습니다. 야수는 소환될 때 무리의 흉포함을 저장하며, 중첩당 피해가 10% 증가합니다. 야수 쇄도가 재사용 대기 중일 때 무리 명령이 적중하면 20% 확률로 재사용 대기시간이 초기화되며, 5번 연속 실패하면 반드시 초기화됩니다. 야수들이 활동 중일 때는 초기화되지 않습니다. (무리군주)"
+      },
+      "unleash_beast": {
+        "name": "야수 해방",
+        "description": "최대로 쌓인 무리 흉포를 해방해 주 대상과 주변을 강타한 뒤, 소환수를 잠시 휩쓸기 광란에 빠뜨립니다."
+      },
+      "measured_shot": {
+        "name": "정밀 사격",
+        "description": "신중하게 조준한 사격으로 {damage}의 물리 피해를 주고, 적중 시 집중 20을 얻습니다."
+      },
+      "cold_focus": {
+        "name": "냉정한 집중",
+        "description": "12초 동안 정밀 사격이 더 많은 집중을 생성하고, 장궁 당기기가 더 빠르고 저렴해집니다. (냉철한 시야 상징)"
+      },
+      "bloodhook": {
+        "name": "피갈고리",
+        "description": "8에서 25미터 떨어진 적에게 돌진해 주 상처를 내고, 12초에 걸쳐 24의 출혈 피해를 줍니다. (야전술 상징)"
+      },
+      "shrapnel_charge": {
+        "name": "파편 폭약",
+        "description": "대상과 주변 적을 파편으로 폭파한 뒤, 주 대상에게서 짧은 출혈을 퍼뜨립니다."
+      },
+      "bloodtrail_assault": {
+        "name": "핏길 습격",
+        "description": "12초 동안 피갈고리, 상처 찢기, 파편 폭약과 소환수의 후속 공격을 강화합니다."
+      },
+      "trailbreak": {
+        "name": "흔적 끊기",
+        "description": "전문화 상태를 잃지 않고 뒤로 도약합니다. 야전술은 다음 재진입도 준비합니다."
+      },
+      "wildheart": {
+        "name": "야생의 심장",
+        "description": "최대 생명력의 30%를 즉시 회복합니다."
+      },
+      "shellskin": {
+        "name": "갑각 피부",
+        "description": "8초 동안 받는 피해가 60% 감소하지만, 효과가 지속되는 동안 공격할 수 없습니다."
+      },
+      "frostjaw_trap": {
+        "name": "서리턱 덫",
+        "description": "선택한 적의 위치나 발밑에 작동 준비된 덫을 놓습니다. 처음 발동시킨 적을 이동 불가로 만들고 주변 적을 느리게 합니다."
+      },
+      "pack_rally": {
+        "name": "무리 결집",
+        "description": "준마의 상을 취하고 주변 아군을 독려해 10초 동안 이동 속도를 30%, 공격 및 시전 속도를 10% 높입니다."
       },
       "hurricane": {
         "name": "폭풍우",
@@ -7251,6 +7322,14 @@ export const ko_KR: EnTranslations = {
         "name": "반격의 송곳니",
         "description": "대상이 회피한 후 반격하여 무기 피해에 {damage}를 더한 피해를 입힙니다. 회피할 수 없습니다."
       },
+      "hunting_momentum": {
+        "name": "사냥의 기세",
+        "description": "지속 효과: 내장 가르기가 8초 동안 사냥의 기세 1중첩을 부여합니다. 최대 3중첩입니다. 3중첩에서 반격의 송곳니가 45% 더 많은 타격 피해를 주고 모든 중첩을 소모합니다. (야전술)"
+      },
+      "fieldcraft_reentry": {
+        "name": "재진입 준비",
+        "description": "지속 효과: 흔적 끊기가 사냥의 기세를 갱신하고 12초 안에 사용하는 다음 내장 가르기 또는 피갈고리를 강화합니다. 내장 가르기는 중첩당 15%의 추가 피해를 줍니다. 피갈고리는 18에서 24의 추가 물리 피해를 주고 중첩당 15% 증가하며 원거리 전투력에 따라 증가합니다. 3중첩에서는 두 공격 모두 사냥의 기세를 소모합니다. (야전술)"
+      },
       "wing_clip": {
         "name": "족쇄 베기",
         "description": "상처를 내어 {damage}의 피해를 입히고 10초 동안 적의 이동 속도를 40%만큼 감소시킵니다."
@@ -7269,7 +7348,7 @@ export const ko_KR: EnTranslations = {
       },
       "rapid_fire": {
         "name": "열광의 연사",
-        "description": "15초 동안 공격 속도가 40%만큼 증가합니다."
+        "description": "이동하면서 2.4초에 걸쳐 6발을 빠르게 발사합니다. 각 발은 {damage}의 물리 피해를 줍니다."
       },
       "smite": {
         "name": "성스러운 일격",
@@ -7314,6 +7393,10 @@ export const ko_KR: EnTranslations = {
       "lightning_bolt": {
         "name": "전격 화살",
         "description": "번개 화살을 던져 {damage}의 자연 피해를 입힙니다."
+      },
+      "thunder_reservoir": {
+        "name": "천둥 비축",
+        "description": "지속 효과: 비전 화살과 하늘가지가 천둥을 최대 5까지 부여합니다. 천둥이 5일 때 대지 충격은 125%, 단층각성은 100%의 추가 피해를 주고 모든 천둥을 소모합니다. (천둥소환)"
       },
       "rockbiter_weapon": {
         "name": "바위결속 무기",
@@ -7536,8 +7619,40 @@ export const ko_KR: EnTranslations = {
         "description": "대상을 공격해 무기 피해에 추가로 {damage}의 신성 피해를 줍니다. (성기사 특성)"
       },
       "chain_heal": {
-        "name": "연쇄 치유",
-        "description": "아군 대상을 대량으로 치유한 후, 근처 아군 최대 2명에게 도약합니다. 도약할 때마다 치유량이 50% 감소합니다. (복원 전문화)"
+        "name": "쇄도하는 치유",
+        "description": "아군 대상의 생명력을 120~145 회복시킨 후 근처 아군 최대 2명에게 도약하며, 도약할 때마다 치유량이 절반으로 줄어듭니다. 영향을 받은 아군마다 치유의 물결을 소모해 추가로 회복시킵니다. (영혼 치유 고유)"
+      },
+      "galeheart_weapon": {
+        "name": "질풍의 무기",
+        "description": "무기에 질풍을 불어넣습니다. 적중한 세 번째 무기 공격마다 두 번 반향하고 폭풍 시전을 활성화합니다."
+      },
+      "warspirit_cadence": {
+        "name": "전령의 박자",
+        "description": "지속 효과: 무기 공격이 3번 적중할 때마다 50%의 자연 피해를 주는 질풍 메아리가 2번 발동하고 12초 동안 폭풍시전을 얻습니다. 폭풍시전은 다음 비전 화살, 충격 또는 치유의 물결을 즉시 시전하고 마나 소모를 50% 줄입니다. 선조의 일격은 공격 2회로 계산됩니다. (전령)"
+      },
+      "stormsurge": {
+        "name": "폭풍쇄도",
+        "description": "지속 효과: 선조의 일격이 재사용 대기 중일 때 폭풍시전을 소모하면 25% 확률로 재사용 대기시간을 초기화합니다. 4번 실패하면 다음에는 반드시 발동합니다. (전령)"
+      },
+      "lifespring_weapon": {
+        "name": "생명의 샘 무기",
+        "description": "무기에 생명의 물을 불어넣어 치유의 물결 저장량을 20% 늘립니다."
+      },
+      "unleash_weapon": {
+        "name": "무기 해방",
+        "description": "활성화된 무기 마법을 해방합니다. 화염낙인은 54에서 64의 화염 피해를 입히고 주문력의 30%가 추가되며 천둥을 2 얻습니다. 질풍은 무기로 공격하고 전령의 박자를 진행하며 6초 동안 공격 속도를 20% 높입니다. 바위결속은 무기 피해의 75%를 입히고 대상이 자신을 공격하게 하며 4초 동안 받는 피해를 20% 줄입니다. 생명의 샘은 치유의 물결을 소모해 남은 치유량의 125%를 즉시 회복하고 8초 안에 받는 다음 피해를 실제 회복량의 50%만큼 줄입니다."
+      },
+      "primal_exaltation": {
+        "name": "원시적 승천",
+        "description": "12초 동안 전문화의 힘을 해방해 기본 순환을 강화합니다. (주술사 특성)"
+      },
+      "stoneward": {
+        "name": "돌 수호",
+        "description": "아군 하나를 6회 충전으로 60초 동안 보호합니다. 피해를 받으면 충전 1회를 소모해 3초마다 한 번 최대 생명력의 5%를 회복합니다. (주술사 특성)"
+      },
+      "tidecall": {
+        "name": "해일 부름",
+        "description": "빠른 회복의 해일을 불러 아군을 치유하고 계산된 치유량을 치유의 물결에 더합니다."
       },
       "metamorphosis": {
         "name": "악마 변신",
@@ -7800,8 +7915,8 @@ export const ko_KR: EnTranslations = {
         "description": "30미터 안의 아군을 광분시켜 15초 동안 공격 속도를 30%만큼 증가시킵니다. (주술사 특성)"
       },
       "chain_lightning": {
-        "name": "갈래 번개",
-        "description": "대상 지역에 번개를 내리쳐 주위 적에게 {damage}의 피해를 입힙니다. (주술사 특성)"
+        "name": "하늘가지",
+        "description": "대상을 공격한 뒤 10미터 안의 적 최대 2명에게 번져 각각 {damage}의 자연 피해를 입힙니다. 적중하면 대상마다가 아니라 시전 전체에서 천둥 1개를 얻습니다. 피해는 주문력에 따라 증가합니다. 원시 숙련은 이 주문을 즉시 시전하게 할 수 있고, 원시 고양은 시전 시간을 절반으로 줄입니다. (천둥소환사)"
       },
       "chaos_bolt": {
         "name": "파멸 화살",
@@ -7935,6 +8050,10 @@ export const ko_KR: EnTranslations = {
         "name": "집단 역행",
         "description": "그룹 또는 공격대에서 사망한 모든 구성원의 시간선을 되돌려 시체 옆에서 생명력과 마나가 30%인 상태로 부활시킵니다. 전투 중에는 시전할 수 없습니다. (시간 마법)"
       },
+      "ancestor_return": {
+        "name": "선조의 귀환",
+        "description": "파티 또는 공격대에서 쓰러진 모든 구성원을 시체가 있는 곳에서 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (영혼치유사)"
+      },
       "temporal_rewind": {
         "name": "되감기",
         "description": "파티 또는 공격대에 비전 파동을 보내 시간을 되감습니다. 40미터 내 각 아군이 지난 5초 동안 받은 피해의 30%를 회복시킵니다(최대 생명력의 35%까지). 이 효과는 치명타로 발동하지 않습니다. (시간술)"
@@ -8026,6 +8145,30 @@ export const ko_KR: EnTranslations = {
       "voidfeast": {
         "name": "공허의 포식",
         "description": "마법 효과 하나(적의 이로운 효과 또는 아군의 해로운 효과)를 삼키고 최대 생명력의 6%를 회복합니다."
+      },
+      "veilstep": {
+        "name": "장막걸음",
+        "description": "바라보는 방향으로 장막을 통과합니다."
+      },
+      "scouring_mercy": {
+        "name": "정화의 자비",
+        "description": "적을 신성한 힘으로 정화하거나 아군 대상을 즉시 치유합니다. 교리 고유 능력입니다."
+      },
+      "seraphic_vigil": {
+        "name": "치천사의 수호",
+        "description": "아군 한 명에게 수호의 축복을 걸어 위험에 처하면 생명력을 회복시킵니다. 축복 고유 능력입니다."
+      },
+      "summon_tithefiend": {
+        "name": "십일조 악마 소환",
+        "description": "어둠의 십일조를 소모해 당신의 형상을 사냥하는 일시적인 십일조 악마를 소환합니다. 만과 고유 능력입니다."
+      },
+      "martyrs_aegis": {
+        "name": "순교자의 방패",
+        "description": "아군 한 명이 받는 피해를 8초 동안 40% 감소시킵니다."
+      },
+      "choir_of_deliverance": {
+        "name": "구원의 성가대",
+        "description": "6초 동안 정신을 집중해 2초마다 주위 파티원을 치유합니다."
       },
       "bear_charge": {
         "name": "큰곰 돌진",

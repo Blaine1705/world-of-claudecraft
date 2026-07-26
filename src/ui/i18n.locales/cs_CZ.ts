@@ -5054,7 +5054,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'Zahajovací útok z plížení, který rozdrásá nepřítele za poškození zbraně plus {damage} a způsobí krvácení během 9 s. Udělí 1 combo bod. Pouze ve vlčí podobě.',
   'entities.abilities.rake.name': 'Stažení z kůže',
-  'entities.abilities.rapid_fire.description': 'Zvýší tvoji rychlost útoku o 40 % na 15 s.',
+  'entities.abilities.rapid_fire.description':
+    'Za pohybu vystřelíš během 2,4 s šest rychlých střel, z nichž každá způsobí {damage} bodů fyzického poškození.',
   'entities.abilities.rapid_fire.name': 'Horečný nátah',
   'entities.abilities.raptor_strike.description':
     'Silný útok na blízko, který zvýší poškození o {damage}. Aktivuje se při tvém dalším úderu.',
@@ -6987,6 +6988,14 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.lightning_shield':
     'Nabije tě, takže útočníci dostanou přírodní poškození, když tě zasáhnou.',
   'guide.abilityHook.flame_shock': 'Okamžité spálení, které zasáhne hned a dál pálí v čase.',
+  'guide.abilityHook.galeheart_weapon':
+    'Naplní obě zbraně bouřlivým větrem a odměňuje stálý rytmus útoků.',
+  'guide.abilityHook.lifespring_weapon':
+    'Naplní zbraň léčivou vodou a posílí plynulý proud léčení.',
+  'guide.abilityHook.tidecall': 'Přivolá příliv a posílí následující sérii léčivých kouzel.',
+  'guide.abilityHook.stoneward':
+    'Vztyčí nabitý kamenný štít, který mění utržené poškození v léčení.',
+  'guide.abilityHook.primal_exaltation': 'Krátce uvolní živelnou sílu odpovídající specializaci.',
   'guide.abilityHook.fireball': 'Tvoje hlavní ohnivá rána, zasáhne a nechá cíl hořet.',
   'guide.abilityHook.frost_armor': 'Trvalý self-buff, který před bojem zpevní tvoji zbroj.',
   'guide.abilityHook.arcane_intellect':

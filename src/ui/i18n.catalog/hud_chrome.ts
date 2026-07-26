@@ -1600,6 +1600,8 @@ export const hudChromeStrings = {
   auraEffect: {
     dot: 'Deals {value} {school} damage every {interval} sec',
     hot: 'Restores {value} health every {interval} sec',
+    mendingCurrent: 'Stores {value} healing, released over time or consumed by Cascading Mend',
+    mendingCurrentPercent: 'Stores healing equal to {pct}% of maximum health for Cascading Mend',
     absorb: 'Absorbs {value} damage',
     healAbsorb: 'Absorbs {value} incoming healing',
     thorns: 'Deals {value} {school} damage to attackers',
@@ -1615,6 +1617,7 @@ export const hudChromeStrings = {
       'Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up',
     elementalConvergencePrimed:
       'Your next spell from the other elemental school grants Elemental Convergence',
+    hunterFerocity: '{stacks} Pack Ferocity: your pet deals {pct}% more damage',
     battleStance: 'Battle Stance: 10% more rage generation',
     berserkerStance: 'Berserker Stance: crits 3% more often and hit 3% harder',
     crit: 'Increases critical strike chance by {pct}%',

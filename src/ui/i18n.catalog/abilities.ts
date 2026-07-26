@@ -56,6 +56,7 @@ const abilityStringsEn = {
       mana: 'Mana',
       rage: 'Rage',
       energy: 'Energy',
+      focus: 'Focus',
     },
     forms: {
       bear: 'Bear',
@@ -111,7 +112,7 @@ export const abilityStrings = {
         damageRange: '{min} a {max}',
         finisherDamage: '{base} más {perCombo} por punto de combo',
       },
-      resources: { mana: 'Maná', rage: 'ira', energy: 'energía' },
+      resources: { mana: 'Maná', rage: 'ira', energy: 'energía', focus: 'concentración' },
       forms: { bear: 'oso', cat: 'felino' },
     },
   },
@@ -161,7 +162,7 @@ export const abilityStrings = {
         damageRange: '{min} à {max}',
         finisherDamage: '{base} plus {perCombo} par point de combo',
       },
-      resources: { mana: 'mana', rage: 'rage', energy: 'énergie' },
+      resources: { mana: 'mana', rage: 'rage', energy: 'énergie', focus: 'concentration' },
       forms: { bear: 'ours', cat: 'félin' },
     },
   },
@@ -212,7 +213,7 @@ export const abilityStrings = {
         damageRange: '{min} a {max}',
         finisherDamage: '{base} più {perCombo} per punto combo',
       },
-      resources: { mana: 'mana', rage: 'rabbia', energy: 'energia' },
+      resources: { mana: 'mana', rage: 'rabbia', energy: 'energia', focus: 'concentrazione' },
       forms: { bear: 'orso', cat: 'felino' },
     },
   },
@@ -261,7 +262,7 @@ export const abilityStrings = {
         damageRange: '{min} bis {max}',
         finisherDamage: '{base} plus {perCombo} pro Combopunkt',
       },
-      resources: { mana: 'Mana', rage: 'Wut', energy: 'Energie' },
+      resources: { mana: 'Mana', rage: 'Wut', energy: 'Energie', focus: 'Fokus' },
       forms: { bear: 'Bären', cat: 'Katzen' },
     },
   },
@@ -309,7 +310,7 @@ export const abilityStrings = {
         damageRange: '{min} 到 {max}',
         finisherDamage: '{base} 加每个连击点 {perCombo}',
       },
-      resources: { mana: '法力', rage: '怒气', energy: '能量' },
+      resources: { mana: '法力', rage: '怒气', energy: '能量', focus: '集中值' },
       forms: { bear: '熊', cat: '猎豹' },
     },
   },
@@ -357,7 +358,7 @@ export const abilityStrings = {
         damageRange: '{min} 到 {max}',
         finisherDamage: '{base} 加每個連擊點 {perCombo}',
       },
-      resources: { mana: '法力', rage: '怒氣', energy: '能量' },
+      resources: { mana: '法力', rage: '怒氣', energy: '能量', focus: '集中值' },
       forms: { bear: '熊', cat: '獵豹' },
     },
   },
@@ -405,7 +406,7 @@ export const abilityStrings = {
         damageRange: '{min}에서 {max}',
         finisherDamage: '기본 {base}, 연계 점수당 {perCombo}',
       },
-      resources: { mana: '마나', rage: '분노', energy: '기력' },
+      resources: { mana: '마나', rage: '분노', energy: '기력', focus: '집중' },
       forms: { bear: '곰', cat: '표범' },
     },
   },
@@ -453,7 +454,7 @@ export const abilityStrings = {
         damageRange: '{min}から{max}',
         finisherDamage: '{base}にコンボポイントごと{perCombo}',
       },
-      resources: { mana: 'マナ', rage: '怒り', energy: 'エネルギー' },
+      resources: { mana: 'マナ', rage: '怒り', energy: 'エネルギー', focus: '集中値' },
       forms: { bear: '熊', cat: '猫' },
     },
   },
@@ -502,7 +503,7 @@ export const abilityStrings = {
         damageRange: '{min} a {max}',
         finisherDamage: '{base} mais {perCombo} por ponto de combo',
       },
-      resources: { mana: 'mana', rage: 'raiva', energy: 'energia' },
+      resources: { mana: 'mana', rage: 'raiva', energy: 'energia', focus: 'foco' },
       forms: { bear: 'urso', cat: 'felino' },
     },
   },
@@ -551,7 +552,7 @@ export const abilityStrings = {
         damageRange: 'от {min} до {max}',
         finisherDamage: '{base} плюс {perCombo} за прием серии',
       },
-      resources: { mana: 'маны', rage: 'ярости', energy: 'энергии' },
+      resources: { mana: 'маны', rage: 'ярости', energy: 'энергии', focus: 'концентрации' },
       forms: { bear: 'медведя', cat: 'кошки' },
     },
   },
@@ -616,14 +617,75 @@ const classAbilityNamesEn = {
         'Rains arrows on the target area for 3 sec, dealing {damage} damage every 0.5 sec to enemies caught in it.',
       ],
       [
+        'pack_command',
+        'Pack Command',
+        "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit.",
+      ],
+      [
+        'stampede',
+        'Stampede',
+        'Summon 3 beasts for 12 sec. Each attacks every 2 sec for {damage} Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed after 5 failed chances. It cannot reset while the beasts are active. (Packlord)',
+      ],
+      [
+        'unleash_beast',
+        'Unleash Beast',
+        "Consume 3 Pack Ferocity after your pet strikes for 83 to 105 Physical damage and claps every enemy within 6 yards for 26 to 34. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 nearby enemies.",
+      ],
+      [
+        'measured_shot',
+        'Measured Shot',
+        'Shoot the target for {damage} Physical damage. A hit restores 20 Focus. Damage increases with Ranged Attack Power.',
+      ],
+      [
+        'cold_focus',
+        'Cold Focus',
+        'For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)',
+      ],
+      [
+        'bloodhook',
+        'Bloodhook',
+        'Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)',
+      ],
+      [
+        'shrapnel_charge',
+        'Shrapnel Charge',
+        'Hit the target for 24 to 30 Physical damage and up to 4 other enemies within 6 yards for 13 to 17. Other targets also bleed for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Direct damage increases with Ranged Attack Power.',
+      ],
+      [
+        'bloodtrail_assault',
+        'Bloodtrail Assault',
+        'For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 nearby enemies, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards, deals 25% more base damage to its main target, and triggers 50% more wound damage.',
+      ],
+      [
+        'trailbreak',
+        'Trailbreak',
+        'Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec.',
+      ],
+      ['wildheart', 'Wildheart', 'Immediately restore 30% of your maximum health.'],
+      [
+        'shellskin',
+        'Shellskin',
+        'Reduce damage taken by 60% for 8 sec, but prevent attacks while active.',
+      ],
+      [
+        'frostjaw_trap',
+        'Frostjaw Trap',
+        'Place a trap at the selected enemy or at your feet. It arms after 0.75 sec and lasts 30 sec. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec.',
+      ],
+      [
+        'pack_rally',
+        'Pack Rally',
+        "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec.",
+      ],
+      [
         'hurricane',
         'Galeheart',
         'Calls a hurricane onto the target area for 6 sec, battering enemies for {damage} Nature damage each second.',
       ],
       [
         'earthquake',
-        'Earthquake',
-        'Shakes the target area for 6 sec, battering enemies for {damage} Nature damage every 1.5 sec.',
+        'Faultwake',
+        'Shake an 8-yard area for 6 sec, dealing {damage} Nature damage every 1.5 sec. Thundercall empowers it at full Thunder.',
       ],
       [
         'heroic_strike',
@@ -1020,7 +1082,7 @@ const classAbilityNamesEn = {
       [
         'raptor_strike',
         'Gutting Strike',
-        'A strong melee attack that increases damage by {damage}. Activates on your next swing.',
+        'Strike for 10% weapon damage plus {damage}. A hit restores 15 Focus and grants 1 Hunting Momentum. Damage increases with Attack Power through weapon damage.',
       ],
       [
         'aspect_of_the_hawk',
@@ -1040,8 +1102,18 @@ const classAbilityNamesEn = {
       ],
       [
         'mongoose_bite',
-        'Counterfang',
-        'Counterattack after the target dodges for weapon damage plus {damage}. Cannot be dodged.',
+        'Woundrend',
+        'Strike for weapon damage plus {damage}. If the target has your Bloodhook Wound, deal 1 wound tick immediately and refresh the wound to 12 sec. Damage increases with Attack Power through weapon damage.',
+      ],
+      [
+        'hunting_momentum',
+        'Hunting Momentum',
+        'Passive: Gutting Strike grants 1 Hunting Momentum for 8 sec, up to 3. At 3 stacks, Woundrend deals 45% more strike damage and consumes the stacks. (Fieldcraft)',
+      ],
+      [
+        'fieldcraft_reentry',
+        'Armed Re-entry',
+        'Passive: Trailbreak refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)',
       ],
       [
         'wing_clip',
@@ -1058,9 +1130,21 @@ const classAbilityNamesEn = {
         "Courser's Guise",
         "Take on the courser's guise, increasing movement speed by 30% for 30 min.",
       ],
-      ['aimed_shot', 'Long Draw', 'A carefully drawn shot that deals {damage} damage.'],
-      ['rapid_fire', 'Fevered Draw', 'Increases your attack speed by 40% for 15 sec.'],
-      ['smite', 'Smite', 'Smites the enemy for {damage} Holy damage.'],
+      [
+        'aimed_shot',
+        'Long Draw',
+        'Shoot the target for {damage} Physical damage. Damage increases with Ranged Attack Power.',
+      ],
+      [
+        'rapid_fire',
+        'Fevered Draw',
+        'Fire 6 shots over 2.4 sec while moving. Each shot deals {damage} Physical damage and increases with Ranged Attack Power.',
+      ],
+      [
+        'smite',
+        'Scouring Hymn',
+        'Deal {damage} Holy damage. Doctrine heals each linked ally for 30% of the damage. With no linked ally, it heals the lowest-health party member for 15%.',
+      ],
       ['lesser_heal', 'Whispered Prayer', 'Heals a friendly target for {damage}.'],
       [
         'power_word_fortitude',
@@ -1070,15 +1154,19 @@ const classAbilityNamesEn = {
       [
         'shadow_word_pain',
         'Dirge of Decay',
-        'A word of darkness causes {damage} Shadow damage over 18 sec.',
+        'Deal {damage} total Shadow damage over 18 sec, once every 3 sec. Vespers increases this damage by 25%. Each tick on your Effigy grants 1 Gloomtithe.',
       ],
       [
         'power_word_shield',
         'Psalm of Warding',
-        'Shields the target, absorbing {damage} damage for 30 sec.',
+        'Shield a friendly target, absorbing {damage} damage for 30 sec. Doctrine also links the target to your Holy damage for 30 sec.',
       ],
       ['renew', 'Lingering Grace', 'Heals the target for {damage} over 15 sec.'],
-      ['mind_blast', 'Mindfracture', "Blasts the target's mind for {damage} Shadow damage."],
+      [
+        'mind_blast',
+        'Mindfracture',
+        'Deal {damage} Shadow damage. Damage increases with Spell Power. Vespers binds a target with your Dirge of Decay as its Effigy, grants 1 Gloomtithe, and echoes 30% of the damage to up to 3 other enemies with your Dirge.',
+      ],
       [
         'heal',
         'Solemn Prayer',
@@ -1090,17 +1178,30 @@ const classAbilityNamesEn = {
         "Assaults the target's mind with Shadow energy, causing {damage} damage each second for 3 sec.",
       ],
       ['flash_heal', 'Urgent Prayer', 'A fast prayer that heals a friendly target for {damage}.'],
-      ['lightning_bolt', 'Arc Bolt', 'Hurls a bolt of lightning for {damage} Nature damage.'],
+      [
+        'lightning_bolt',
+        'Arc Bolt',
+        'Deal {damage} Nature damage. Thundercall: a hit grants 1 Thunder.',
+      ],
+      [
+        'thunder_reservoir',
+        'Thunder Reservoir',
+        'Passive: Arc Bolt and Skybranch grant Thunder, up to 5. At 5 Thunder, Earthen Jolt deals 125% more damage or Faultwake deals 100% more damage, then consumes all Thunder. (Thundercall)',
+      ],
       [
         'rockbiter_weapon',
         'Stonebound Weapon',
-        'Imbues your weapon with the fury of stone: each swing deals {damage} additional damage for 5 min.',
+        'Imbue your weapon for 30 min. Each swing deals {damage} extra damage. Warspirit also gains 30% armor, takes 10% less damage, and generates twice as much threat. Earthen Jolt forces its target to attack you for 3 sec, and Thunder Ward grants 10% damage reduction for 3 sec.',
       ],
-      ['healing_wave', 'Mending Waters', 'Heals a friendly target for {damage}.'],
+      [
+        'healing_wave',
+        'Mending Waters',
+        "Heal a friendly target for {damage}. Spiritmend stores 50% of the healing calculated before overhealing as Mending Current for 12 sec, up to 30% of the target's maximum health.",
+      ],
       [
         'earth_shock',
         'Earthen Jolt',
-        'Instantly shocks the target with concussive force for {damage} Nature damage.',
+        'Deal {damage} Nature damage. Thundercall empowers it at full Thunder. Stonebound forces the target to attack you.',
       ],
       [
         'lightning_shield',
@@ -1115,7 +1216,7 @@ const classAbilityNamesEn = {
       [
         'flametongue_weapon',
         'Pyrebrand Weapon',
-        'Imbues your weapon with elemental fire: each swing deals {damage} additional Fire damage for 5 min.',
+        'Imbues your weapon for 30 min. Each swing deals {damage} additional Fire damage.',
       ],
       [
         'frost_shock',
@@ -1130,12 +1231,12 @@ const classAbilityNamesEn = {
       [
         'ghost_wolf',
         'Shadewolf',
-        'Turns you into a Shadewolf, increasing movement speed by 40% for 10 min.',
+        'Take Shadewolf form, increasing movement speed by 40%. Cast again to return to normal form.',
       ],
       [
         'stormstrike',
         'Ancestral Strike',
-        'Channels the storm through your weapon, instantly striking for weapon damage plus {damage}.',
+        'Strike for weapon damage plus {damage} and advance Warspirit Cadence by 2 steps. Damage increases with Attack Power through weapon damage.',
       ],
       [
         'shadow_bolt',
@@ -1321,8 +1422,48 @@ const classAbilityNamesEn = {
       ],
       [
         'chain_heal',
-        'Chain Heal',
-        'Heals a friendly target for 120 to 145, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)',
+        'Cascading Mend',
+        'Heal a friendly target for 120 to 145, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)',
+      ],
+      [
+        'galeheart_weapon',
+        'Galeheart Weapon',
+        'Imbue both weapons for 30 min, enabling Warspirit Cadence.',
+      ],
+      [
+        'warspirit_cadence',
+        'Warspirit Cadence',
+        'Passive: Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)',
+      ],
+      [
+        'stormsurge',
+        'Stormsurge',
+        'Passive: While Ancestral Strike is on cooldown, consuming Stormcast has a 25% chance to reset it. If the first 3 chances fail, the 4th always resets it. (Warspirit)',
+      ],
+      [
+        'lifespring_weapon',
+        'Lifespring Weapon',
+        'Imbue your weapon for 30 min. Mending Waters and Tidecall add 20% more healing to Mending Current.',
+      ],
+      [
+        'unleash_weapon',
+        'Unleash Weapon',
+        'Unleash your active weapon enchant. Pyrebrand deals 54 to 64 Fire damage, gains 30% of Spell Power, and grants 2 Thunder. Galeheart strikes with your weapon, advances Warspirit Cadence, and grants 20% attack speed for 6 sec. Stonebound strikes for 75% weapon damage, forces the target to attack you, and reduces damage taken by 20% for 4 sec. Lifespring consumes your Mending Current, heals for 125% of its remaining healing, and reduces the next hit within 8 sec by 50% of the health restored.',
+      ],
+      [
+        'primal_exaltation',
+        'Primal Exaltation',
+        'For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)',
+      ],
+      [
+        'stoneward',
+        'Stoneward',
+        'Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)',
+      ],
+      [
+        'tidecall',
+        'Tidecall',
+        "Heal a friendly target for 58 to 72. The heal increases with Spell Power. Add the same healing calculated before overhealing to Mending Current, up to 30% of the target's maximum health.",
       ],
       [
         'metamorphosis',
@@ -1347,7 +1488,7 @@ const classAbilityNamesEn = {
       [
         'bestial_wrath',
         'Howling Rage',
-        'Sends you into a bestial rage, increasing your attack power by 20% and your pet damage by 100% for 15 sec. (Beast Mastery signature)',
+        'Grant 3 Pack Ferocity. Your next Unleash Beast within 20 sec deals 50% more strike and clap damage, and its frenzy lasts 12 sec instead of 8. (Packlord signature)',
       ],
       [
         'trueshot_aura',
@@ -1392,22 +1533,22 @@ const classAbilityNamesEn = {
       [
         'power_infusion',
         'Anointing',
-        'Infuses a friendly target with power, increasing spell haste by 20% for 15 sec. (Discipline signature)',
+        'Anoints a friendly target, increasing damage, healing, and casting speed by 20% for 15 sec.',
       ],
       [
         'holy_nova',
-        'Holy Nova',
-        'Causes an explosion of holy radiance, healing nearby allies for {damage} and damaging nearby enemies. (Holy signature)',
+        'Sunburst Canticle',
+        'Heal allies within 10 yards for {damage} and deal 24 to 30 Holy damage to enemies in the same area. Both amounts increase with Spell Power. (Benison baseline)',
       ],
       [
         'shadowform',
-        'Gloamveil Form',
-        'Assume a Shadowform, increasing your Shadow damage by 15 and empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
+        'Gloamveil',
+        'Enter Gloamveil, increasing your Shadow damage by 25%. Cast it again to leave Gloamveil. (Vespers signature)',
       ],
       [
         'elemental_mastery',
         'Primal Mastery',
-        'Calls on the storm, making your next spell instant. (Elemental signature)',
+        'For 12 sec, Arc Bolt grants 2 Thunder. Your next Arc Bolt or Skybranch is instant, and your next full Thunder payoff deals 25% more damage. (Thundercall signature)',
       ],
       [
         'siphon_life',
@@ -1644,7 +1785,7 @@ const classAbilityNamesEn = {
       [
         'chain_lightning',
         'Skybranch',
-        'Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)',
+        'Strike up to 3 enemies within 10 yards for {damage} Nature damage each. Thundercall: a hit grants 1 Thunder. Damage increases with Spell Power.',
       ],
       [
         'chaos_bolt',
@@ -1700,7 +1841,7 @@ const classAbilityNamesEn = {
       [
         'earthbind',
         'Gripping Earth',
-        'Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)',
+        'Roots enemies within 4 yd of the target point for 2 sec, then slows them by 40% for 6 sec. (Shaman talent)',
       ],
       [
         'evocation',
@@ -1799,6 +1940,11 @@ const classAbilityNamesEn = {
         'collective_reversal',
         'Collective Reversal',
         'Rewinds every fallen member of your group or raid, returning them to life at their body with 30% health and mana. Cannot be cast in combat. (Chronomancy)',
+      ],
+      [
+        'ancestor_return',
+        "Ancestors' Return",
+        'Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)',
       ],
       [
         'temporal_rewind',
@@ -1906,6 +2052,28 @@ const classAbilityNamesEn = {
         'voidfeast',
         'Voidfeast',
         'Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health. Only usable when there is an effect to devour.',
+      ],
+      ['veilstep', 'Veilstep', 'Steps through the veil in the direction you are facing.'],
+      [
+        'scouring_mercy',
+        'Scouring Mercy',
+        'Deal 72 to 84 Holy damage to an enemy or heal a friendly target for 130 to 155. Both amounts increase with Spell Power. Damage also heals each Doctrine-linked ally for 30%, or the lowest-health party member for 15% if no ally is linked. (Doctrine signature)',
+      ],
+      [
+        'seraphic_vigil',
+        'Seraphic Vigil',
+        'Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)',
+      ],
+      [
+        'summon_tithefiend',
+        'Call Tithefiend',
+        'Consume all Gloomtithe to summon a Tithefiend for 6, 8, 10, 12, or 15 sec at 1 to 5 stacks. It attacks every 2 sec for 20 to 24 Shadow damage, plus 8 per extra stack. Five stacks make it larger and increase its damage by 25%. Its damage increases with your Spell Power. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)',
+      ],
+      ['martyrs_aegis', "Martyr's Aegis", 'Reduces one ally incoming damage by 40% for 8 sec.'],
+      [
+        'choir_of_deliverance',
+        'Choir of Deliverance',
+        'Channels for 6 sec, healing nearby party members every 2 sec.',
       ],
     ]),
   },

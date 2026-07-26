@@ -222,6 +222,46 @@ export interface TalentEffect {
   proc?: ProcDef;
   ability?: AbilityModEffect[];
   global?: GlobalModEffect;
+  // Numeric contract for bespoke runtime hooks that do not fit a generic
+  // modifier primitive. Tooltip audits read this metadata so authored copy and
+  // the implementation constants stay in lockstep.
+  runtime?: {
+    [key: string]: number | undefined;
+    movementSpeedPct?: number;
+    enduringMovementSpeedPct?: number;
+    focusGenerationPct?: number;
+    damageReductionPct?: number;
+    fallbackDamageReductionPct?: number;
+    petHealPct?: number;
+    cooldownRefundPct?: number;
+    petHealthFloorPct?: number;
+    healthThresholdPct?: number;
+    slowPct?: number;
+    costReductionPct?: number;
+    primaryDamagePct?: number;
+    cleavePct?: number;
+    echoPct?: number;
+    hastePct?: number;
+    focusSpendThreshold?: number;
+    focusBonus?: number;
+    focusGain?: number;
+    duration?: number;
+    rootDuration?: number;
+    slowDuration?: number;
+    markDuration?: number;
+    internalCooldown?: number;
+    perTargetCooldown?: number;
+    cooldownRefundCap?: number;
+    durationBuffer?: number;
+    charges?: number;
+    radius?: number;
+    targetCap?: number;
+    everyNth?: number;
+  };
+  // Class-owned mechanics that intentionally live behind a narrow combat hook
+  // rather than the generic modifier/proc engine. `values` keeps authored
+  // tooltip numbers mechanically auditable; the sim ignores this metadata.
+  intrinsic?: { mechanic: string; metrics: Record<string, number> };
 }
 
 export interface SpecDef {
@@ -282,6 +322,9 @@ export interface ResolvedAbilityMod {
 export interface TalentModifiers {
   spec: string | null;
   role: Role | null;
+  /** Selected option ids baked alongside the numeric modifiers. Combat modules
+   *  query this flat map instead of walking the authoritative allocation. */
+  selected: Record<string, true>;
   stats: Required<StatModEffect>;
   abilities: Record<string, ResolvedAbilityMod>;
   global: Required<GlobalModEffect>;
@@ -560,6 +603,7 @@ export function emptyModifiers(): TalentModifiers {
   return {
     spec: null,
     role: null,
+    selected: {},
     stats: zeroStats(),
     abilities: {},
     global: zeroGlobal(),
@@ -707,7 +751,10 @@ export function computeTalentModifiers(
     const optionId = allocation.rows[row.level];
     if (!optionId) continue;
     const option = row.options.find((candidate) => candidate.id === optionId);
-    if (option) accumulateTalentEffect(modifiers, option.effect);
+    if (option) {
+      modifiers.selected[option.id] = true;
+      accumulateTalentEffect(modifiers, option.effect);
+    }
   }
   return modifiers;
 }

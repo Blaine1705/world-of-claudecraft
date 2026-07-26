@@ -3736,9 +3736,9 @@ function hitRatingHeroic(withHitGear: boolean): Scenario {
 // updatePlayerAutoAttack tick driver across several swing intervals for five
 // builds at once: a warrior meleeing a spiked-hide boar (thorns reflect tail) with
 // Heroic Strike queued (queuedOnSwing spend + bonus, cooldown 0), a rogue plain
-// melee, a hunter in melee with Raptor Strike queued (queuedOnSwing + on-next-swing
-// cooldown set, cd 6), a hunter at range firing Auto Shot (physical, armor-mitigated,
-// 8yd dead zone), and a mage wanding (arcane, no armor, no dead zone). Targets are
+// melee, a hunter mixing instant Gutting Strike into melee, a hunter at range firing
+// Auto Shot (physical, armor-mitigated, 8yd dead zone), and a mage wanding (arcane,
+// no armor, no dead zone). Targets are
 // re-pinned to their lane each round so the ranged dead-zone vs wand branches stay
 // exercised, and the rogue's auto-attack is stopped at the end (stopAutoAttack entry).
 function c5AutoAttack(): Scenario {
@@ -3748,7 +3748,7 @@ function c5AutoAttack(): Scenario {
       'player auto-attack driver updatePlayerAutoAttack (swingTimer cadence, facing/range gates)',
       'meleeSwing white-hit table: single rng.next() miss/dodge + crit + armor mitigation',
       'queuedOnSwing heroic_strike spend + bonus (warrior, cooldown 0)',
-      'queuedOnSwing raptor_strike spend + bonus + on-next-swing cooldown set (hunter, cooldown 6)',
+      'instant raptor_strike weaponStrike mixed into the hunter melee lane',
       'overpowerUntil window set on a melee dodge',
       'spiked-hide reflect tail of meleeSwing (wild_boar Bristled Hide)',
       'rangedSwing Auto Shot (hunter, physical, armor-mitigated, 8yd dead zone)',
@@ -3820,12 +3820,12 @@ function c5AutoAttack(): Scenario {
         }
         eWarrior.resource = eWarrior.maxResource;
         eHunterM.resource = eHunterM.maxResource;
-        // Queue on-next-swing abilities (the guard avoids the cast-toggle that a
-        // re-cast while already queued would trigger).
+        // Queue the warrior's on-next-swing ability (the guard avoids toggling it
+        // off), while the Hunter uses its immediate melee Focus generator.
         if (eWarrior.gcdRemaining <= 0 && !eWarrior.castingAbility && !eWarrior.queuedOnSwing) {
           sim.castAbility('heroic_strike', warrior);
         }
-        if (eHunterM.gcdRemaining <= 0 && !eHunterM.castingAbility && !eHunterM.queuedOnSwing) {
+        if (eHunterM.gcdRemaining <= 0 && !eHunterM.castingAbility) {
           sim.castAbility('raptor_strike', hunterM);
         }
         rec.tick(10);
@@ -4521,6 +4521,230 @@ function professionsGather(seed = 1): Scenario {
   };
 }
 
+// Shaman v0.29: one seed-pinned run carries all three spec engines through the
+// shared recorder so their aura state, events, stored healing values, and RNG
+// draw order are covered by the same deterministic golden as every other sim.
+function shamanEngines(): Scenario {
+  return {
+    name: 'shaman_engines',
+    coverage: [
+      'class:shaman (Thundercall, Warspirit, Spiritmend)',
+      'Thundercall Arc Bolt build and Earthen Jolt vent',
+      'Warspirit dual-wield cadence and Stormcast state',
+      'Spiritmend Tidecall deposit and Cascading Mend consumption',
+      'Shaman spec state in deterministic headless snapshots',
+    ],
+    build: () => new Sim({ seed: 2929, playerClass: 'shaman', noPlayer: true, autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const elementalId = sim.addPlayer('shaman', 'Stormbank');
+      const warspiritId = sim.addPlayer('shaman', 'Cadence');
+      const spiritmendId = sim.addPlayer('shaman', 'Current');
+      const allyId = sim.addPlayer('warrior', 'Anchor');
+      for (const pid of [elementalId, warspiritId, spiritmendId, allyId]) {
+        sim.setPlayerLevel(20, pid);
+      }
+      sim.setSpec('elemental', elementalId);
+      sim.setSpec('enhancement', warspiritId);
+      sim.setSpec('restoration', spiritmendId);
+      const elemental = sim.entities.get(elementalId) as AnyEntity;
+      const warspirit = sim.entities.get(warspiritId) as AnyEntity;
+      const spiritmend = sim.entities.get(spiritmendId) as AnyEntity;
+      const ally = sim.entities.get(allyId) as AnyEntity;
+      const dummy = spawnMob(
+        sim,
+        'training_dummy',
+        20,
+        elemental.pos.x,
+        elemental.pos.y,
+        elemental.pos.z + 8,
+      );
+      beef(dummy, 1_000_000);
+      rec.track(dummy.id);
+
+      for (const shaman of [elemental, warspirit]) {
+        teleport(sim, shaman, dummy.pos.x, dummy.pos.z - 3);
+        face(shaman, dummy);
+        sim.targetEntity(dummy.id, shaman.id);
+      }
+      elemental.resource = elemental.maxResource;
+      sim.castAbility('lightning_bolt', elemental.id);
+      rec.tick(80);
+      elemental.resource = elemental.maxResource;
+      elemental.gcdRemaining = 0;
+      sim.castAbility('earth_shock', elemental.id);
+      rec.tick(20);
+      rec.snapshot('thundercall-vent');
+
+      sim.addItem('training_mace', 1, warspirit.id);
+      sim.equipItem('training_mace', warspirit.id);
+      warspirit.resource = warspirit.maxResource;
+      sim.castAbility('galeheart_weapon', warspirit.id);
+      rec.tick(2);
+      warspirit.autoAttack = true;
+      warspirit.swingTimer = 0;
+      warspirit.offhandSwingTimer = 0;
+      rec.tick(80);
+      rec.snapshot('warspirit-cadence');
+
+      teleport(sim, spiritmend, ally.pos.x, ally.pos.z - 2);
+      ally.hp = Math.round(ally.maxHp * 0.35);
+      spiritmend.resource = spiritmend.maxResource;
+      sim.targetEntity(ally.id, spiritmend.id);
+      sim.castAbility('tidecall', spiritmend.id);
+      rec.tick(2);
+      spiritmend.resource = spiritmend.maxResource;
+      spiritmend.gcdRemaining = 0;
+      sim.castAbility('chain_heal', spiritmend.id);
+      rec.tick(80);
+      rec.snapshot('spiritmend-consume');
+    },
+  };
+}
+
+// Priest Codex baseline loops: all three specializations execute through the
+// shared Sim host, including source-owned links, attached Vigil, Effigy echoes,
+// the Gloomtithe bank, autonomous Tithefiend strikes, and respec cleanup.
+function priestCodex(seed = 2929): Scenario {
+  return {
+    name: 'priest_codex',
+    coverage: [
+      'class:priest Doctrine linked damage conversion',
+      'class:priest Benison committed and immediate group healing plus Seraphic Vigil',
+      'class:priest Vespers Effigy, deterministic echo, Gloomtithe, and Tithefiend',
+      'Priest respec cleanup removes links, bank, and guardian',
+    ],
+    build: () => new Sim({ seed, playerClass: 'priest', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const doctrineId = sim.addPlayer('priest', 'Doctrine');
+      const doctrineAllyId = sim.addPlayer('warrior', 'Doctrine Ally');
+      const benisonId = sim.addPlayer('priest', 'Benison');
+      const benisonAllyId = sim.addPlayer('warrior', 'Benison Ally');
+      const vespersId = sim.addPlayer('priest', 'Vespers');
+      for (const pid of [doctrineId, doctrineAllyId, benisonId, benisonAllyId, vespersId]) {
+        sim.setPlayerLevel(20, pid);
+      }
+      sim.setSpec('discipline', doctrineId);
+      sim.setSpec('holy', benisonId);
+      sim.setSpec('shadow', vespersId);
+
+      const doctrine = sim.entities.get(doctrineId) as AnyEntity;
+      const doctrineAlly = sim.entities.get(doctrineAllyId) as AnyEntity;
+      const benison = sim.entities.get(benisonId) as AnyEntity;
+      const benisonAlly = sim.entities.get(benisonAllyId) as AnyEntity;
+      const vespers = sim.entities.get(vespersId) as AnyEntity;
+      const origin = doctrine.pos;
+      for (const [index, entity] of [
+        doctrine,
+        doctrineAlly,
+        benison,
+        benisonAlly,
+        vespers,
+      ].entries()) {
+        teleport(sim, entity, origin.x + index, origin.z);
+        beef(entity);
+      }
+      sim.partyInvite(doctrineAllyId, doctrineId);
+      sim.partyAccept(doctrineAllyId);
+      sim.partyInvite(benisonAllyId, benisonId);
+      sim.partyAccept(benisonAllyId);
+
+      const primary = spawnMob(sim, 'training_dummy', 20, origin.x, origin.y, origin.z + 8);
+      const secondary = spawnMob(sim, 'training_dummy', 20, origin.x + 3, origin.y, origin.z + 9);
+      const tertiary = spawnMob(sim, 'training_dummy', 20, origin.x - 4, origin.y, origin.z + 9);
+      const foreignOnly = spawnMob(
+        sim,
+        'training_dummy',
+        20,
+        origin.x + 1,
+        origin.y,
+        origin.z + 10,
+      );
+      for (const mob of [primary, secondary, tertiary, foreignOnly]) {
+        mob.hostile = true;
+        mob.aiState = 'idle';
+        beef(mob);
+        rec.track(mob.id);
+      }
+
+      const cast = (pid: number, targetId: number, abilityId: string, ticks: number): void => {
+        const caster = sim.entities.get(pid) as AnyEntity;
+        caster.gcdRemaining = 0;
+        caster.resource = caster.maxResource;
+        caster.cooldowns.delete(abilityId);
+        sim.targetEntity(targetId, pid);
+        sim.castAbility(abilityId, pid);
+        rec.tick(ticks);
+      };
+
+      doctrineAlly.hp = Math.floor(doctrineAlly.maxHp * 0.5);
+      cast(doctrineId, doctrineAllyId, 'power_word_shield', 2);
+      cast(doctrineId, primary.id, 'smite', 50);
+
+      benisonAlly.hp = Math.floor(benisonAlly.maxHp * 0.5);
+      cast(benisonId, benisonAllyId, 'seraphic_vigil', 2);
+      sim.dealDamage(
+        primary,
+        benisonAlly,
+        Math.ceil(benisonAlly.maxHp * 0.2),
+        false,
+        'shadow',
+        'Parity Hit',
+        'hit',
+      );
+      rec.snapshot('vigil-triggered');
+      benisonAlly.hp = Math.floor(benisonAlly.maxHp * 0.5);
+      cast(benisonId, benisonAllyId, 'prayer_of_healing', 65);
+      benisonAlly.hp = Math.floor(benisonAlly.maxHp * 0.5);
+      cast(benisonId, benisonAllyId, 'holy_nova', 2);
+
+      cast(vespersId, primary.id, 'shadow_word_pain', 30);
+      cast(vespersId, secondary.id, 'shadow_word_pain', 30);
+      cast(vespersId, tertiary.id, 'shadow_word_pain', 30);
+      cast(doctrineId, foreignOnly.id, 'shadow_word_pain', 30);
+      rec.notes.bankBeforeMindfracture =
+        vespers.auras.find((aura: Aura) => aura.kind === 'gloomtithe')?.stacks ?? 0;
+      const mindfractureEventStart = rec.allEvents.length;
+      cast(vespersId, primary.id, 'mind_blast', 60);
+      rec.notes.bankAfterMindfracture =
+        vespers.auras.find((aura: Aura) => aura.kind === 'gloomtithe')?.stacks ?? 0;
+      const mindfractureEchoTargets: number[] = [];
+      for (const event of rec.allEvents.slice(mindfractureEventStart)) {
+        if (event.type === 'damage' && event.ability === 'Effigy Echo') {
+          mindfractureEchoTargets.push(event.targetId);
+        }
+      }
+      rec.notes.mindfractureEchoTargets = mindfractureEchoTargets;
+      rec.notes.expectedEchoTargets = [secondary.id, tertiary.id];
+      rec.notes.foreignOwnerIsolated = !mindfractureEchoTargets.includes(foreignOnly.id);
+      rec.snapshot('effigy-banked');
+      cast(vespersId, primary.id, 'summon_tithefiend', 2);
+      rec.notes.manaAfterSummon = vespers.resource;
+      const guardian = [...sim.entities.values()].find(
+        (entity) => entity.ownerId === vespersId && entity.guardianState?.key === 'tithefiend',
+      );
+      if (guardian) rec.track(guardian.id);
+      rec.tick(90);
+      rec.notes.manaAfterGuardian = vespers.resource;
+
+      rec.notes.doctrineId = doctrineId;
+      rec.notes.doctrineAllyId = doctrineAllyId;
+      rec.notes.benisonId = benisonId;
+      rec.notes.benisonAllyId = benisonAllyId;
+      rec.notes.vespersId = vespersId;
+      rec.notes.guardianId = guardian?.id ?? null;
+      vespers.inCombat = false;
+      vespers.combatTimer = 10;
+      rec.notes.respecSucceeded = sim.setSpec('discipline', vespersId);
+      rec.snapshot('respec-cleanup');
+      rec.notes.cleanupComplete = ![...sim.entities.values()].some(
+        (entity) => entity.ownerId === vespersId && entity.guardianState?.key === 'tithefiend',
+      );
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -4578,4 +4802,6 @@ export const SCENARIOS: Scenario[] = [
   chatSocial(),
   professionsCraft(),
   professionsGather(),
+  shamanEngines(),
+  priestCodex(),
 ];

@@ -26,6 +26,11 @@
 
 import { freeCostAuraActive } from '../../../sim/combat/empower_next';
 import { frostProcGlowActive } from '../../../sim/combat/frost_mage';
+import { packlordActionGlowActive } from '../../../sim/combat/hunter_packlord';
+import { priestActionGlowActive } from '../../../sim/combat/priest/presentation';
+import { mendingCurrentTargetCapped } from '../../../sim/combat/shaman_spiritmend';
+import { flowStateDiscountedCost } from '../../../sim/combat/shaman_talents';
+import { thundercallPayoffGlowActive } from '../../../sim/combat/shaman_thundercall';
 import {
   type AbilityDef,
   type AuraKind,
@@ -83,20 +88,15 @@ export interface ActionBarAbility {
   bonusCharges?: number;
 }
 
+/** The aura fields the bar reads to derive proc glows and next-cast empowerment. */
 export interface ActionBarAuraInput {
+  id?: string;
+  sourceId?: number;
   kind: AuraKind;
   value?: number;
   empowerAbilities?: readonly string[];
   /** Stacks, for a stack-gated ability (Glacial Spike needs 5 Icicles). */
   stacks?: number;
-}
-
-/** The aura fields the bar reads to derive the proc glow and next-cast
- *  empowerment: a structural subset of Aura both worlds mirror. */
-export interface ActionBarAuraInput {
-  kind: AuraKind;
-  value?: number;
-  empowerAbilities?: readonly string[];
 }
 
 /** One slot of the bar descriptor: slot identity plus host-resolved accessors to the
@@ -145,6 +145,7 @@ export interface ActionBarDeps {
 
 /** The player fields the bar reads; a structural subset both worlds mirror. */
 export interface ActionBarPlayerInput {
+  id?: number;
   autoAttack: boolean;
   dead: boolean;
   resource: number;
@@ -186,6 +187,8 @@ export interface ActionBarPlayerInput {
 export interface ActionBarTargetInput {
   dead: boolean;
   pos: Vec3;
+  maxHp?: number;
+  auras?: readonly ActionBarAuraInput[];
 }
 
 /** The world subset one tick reads: the player, the current target, and inventory
@@ -483,6 +486,10 @@ export function createActionBarView(
         // the slot is usable at any resource and glows (the sim predicate is
         // imported so bar and combat can never disagree on the proc's scope).
         const freeByProc = ability.cost > 0 && freeCostAuraActive(player.auras, def.id);
+        const displayedCost = flowStateDiscountedCost(player.auras, ability.cost);
+        const flowStateReady = displayedCost < ability.cost;
+        const tidecallTargetCapped =
+          def.id === 'tidecall' && mendingCurrentTargetCapped(player.id, target);
         // A kill-window ability (Victory Rush): usable only while its enabling
         // aura is worn, and it glows while the window is open.
         let windowOpen = true;
@@ -501,7 +508,7 @@ export function createActionBarView(
           windowGlow = windowOpen;
         }
         slot.usable =
-          (!(player.resource < ability.cost) || freeByProc) &&
+          (!(player.resource < displayedCost) || freeByProc) &&
           windowOpen &&
           !(maxCharges > 1 && chargesLeft <= 0) &&
           (!def.requiresStealth || player.stealthed);
@@ -514,8 +521,15 @@ export function createActionBarView(
         // Frost procs (combat/frost_mage.ts): Ice Lance glows on a banked
         // Fingers of Frost, Flurry on an armed Brain Freeze (the same shared
         // sim predicate idiom as freeCostAuraActive above).
-        slot.procGlow = freeByProc || windowGlow || frostProcGlowActive(player.auras ?? [], def.id);
-        slot.empowered = hasEmpoweringAura(player.auras, ability);
+        slot.procGlow =
+          freeByProc ||
+          windowGlow ||
+          frostProcGlowActive(player.auras ?? [], def.id) ||
+          packlordActionGlowActive(player.auras ?? [], def.id) ||
+          thundercallPayoffGlowActive(player.auras ?? [], def.id) ||
+          flowStateReady ||
+          priestActionGlowActive(player.auras ?? [], def.id);
+        slot.empowered = hasEmpoweringAura(player.auras, ability) || tidecallTargetCapped;
         slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
           slot: slotLabel,
           ability: deps.abilityName(def),

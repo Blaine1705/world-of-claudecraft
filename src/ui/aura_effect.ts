@@ -36,6 +36,7 @@ export interface AuraEffectInput {
   tickInterval?: number;
   school?: AuraSchool;
   stacks?: number;
+  poolPct?: number;
 }
 
 export interface AuraEffectDescriptor {
@@ -66,6 +67,11 @@ const flatStat = (statKey: string, value: number): AuraEffectDescriptor => ({
  * one-line summary (the tooltip then falls back to name + remaining time only).
  */
 export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
+  if (a.id === 'shaman_mending_current') {
+    return a.poolPct !== undefined
+      ? { key: `${KEY}.mendingCurrentPercent`, nums: { pct: round(a.poolPct) } }
+      : { key: `${KEY}.mendingCurrent`, nums: { value: round(a.value) } };
+  }
   if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
     return { key: `${KEY}.temporalHourglass`, nums: {} };
   }
@@ -74,6 +80,10 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
   }
   if (a.id === 'convergence_mark' && a.kind === 'internal_cd') {
     return { key: `${KEY}.elementalConvergencePrimed`, nums: {} };
+  }
+  if (a.kind === 'hunter_ferocity') {
+    const stacks = Math.min(3, Math.max(0, Math.trunc(a.stacks ?? a.value)));
+    return { key: `${KEY}.hunterFerocity`, nums: { stacks, pct: stacks * 10 } };
   }
   switch (a.kind) {
     case 'dot':

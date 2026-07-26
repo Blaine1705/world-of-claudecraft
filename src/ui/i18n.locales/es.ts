@@ -3996,7 +3996,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Un disparo cuidadosamente tensado que inflige {damage} de daño.',
   'entities.abilities.rapid_fire.name': 'Tensado Febril',
   'entities.abilities.rapid_fire.description':
-    'Aumenta tu velocidad de ataque un 40% durante 15 s.',
+    'Canaliza seis disparos rápidos durante 2,4 s mientras te mueves. Cada uno inflige {damage} de daño físico.',
   'entities.abilities.smite.name': 'Punición',
   'entities.abilities.smite.description': 'Castiga al enemigo por {damage} de daño Sagrado.',
   'entities.abilities.lesser_heal.name': 'Plegaria Susurrada',
@@ -6280,6 +6280,16 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Tu principal hechizo de fuego: golpea con fuerza y deja al objetivo ardiendo.',
   'guide.abilityHook.flame_shock':
     'Una quemadura instantánea que golpea de inmediato y sigue abrasando con el tiempo.',
+  'guide.abilityHook.galeheart_weapon':
+    'Imbuye ambas armas con vientos de tormenta y premia un ritmo de ataques constante.',
+  'guide.abilityHook.lifespring_weapon':
+    'Imbuye tu arma con agua reparadora y refuerza tu flujo continuo de sanación.',
+  'guide.abilityHook.tidecall':
+    'Invoca la marea y potencia la siguiente secuencia de hechizos de sanación.',
+  'guide.abilityHook.stoneward':
+    'Alza un escudo de piedra cargado que convierte el daño recibido en sanación.',
+  'guide.abilityHook.primal_exaltation':
+    'Desata brevemente el poder elemental propio de tu especialización.',
   'guide.abilityHook.frost_armor':
     'Una mejora propia y duradera que refuerza tu armadura antes de un combate.',
   'guide.abilityHook.frostbolt':

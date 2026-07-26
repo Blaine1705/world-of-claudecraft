@@ -38,7 +38,7 @@ import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import { abilityScalingPower, channelTickBonus } from '../spell_scaling';
-import type { AbilityDef, Entity, Vec3 } from '../types';
+import type { AbilityDef, Aura, Entity, Vec3 } from '../types';
 import {
   angleTo,
   armorReduction,
@@ -80,9 +80,11 @@ import {
   consumeFreeCostFor,
   consumeNextAttackCrit,
   consumeNextCastCheap,
-  consumeNextCastInstant,
+  consumeNextCastCheapAura,
+  consumeNextCastInstantAura,
   hasFreeCostFor,
   hasScopedNextCastInstant,
+  iceFloesAuraForAbility,
   nextCastCheapMultiplier,
 } from './empower_next';
 import { isActionLockingFormAuraKind, isResourceShiftFormAuraKind } from './forms';
@@ -93,7 +95,14 @@ import {
   frostMageChannelStart,
 } from './frost_mage';
 import { empoweredCastProgress, empoweredStageForProgress } from './glacial_front';
+import { bloodhookStartError } from './hunter_fieldcraft';
+import { packCommandError } from './hunter_packlord';
+import { cancelRecedingShell, noteHunterFocusSpend } from './hunter_shared';
 import { hasDeadGroupMember, isMassResurrectionAbility } from './mass_resurrection';
+import { hasTithefiendTarget } from './priest/vespers';
+import { onShamanManaSpent, shamanCastTimeMultiplier, shamanManaCost } from './shaman_talents';
+import { resolveUnleashWeaponTarget, unleashWeaponCastError } from './shaman_unleash_weapon';
+import { onStormcastConsumed, STORMCAST_CHEAP_ID, STORMCAST_ID } from './shaman_warspirit';
 import {
   hasCastShield,
   noteSpellHit,
@@ -137,6 +146,26 @@ function isToggleBuff(ability: AbilityDef): boolean {
 
 function isStasisToggle(ability: AbilityDef): boolean {
   return ability.effects.some((effect) => effect.type === 'selfBuff' && effect.kind === 'stasis');
+}
+
+function shellskinBlocksAbility(entity: Entity, meta: PlayerMeta, ability: AbilityDef): boolean {
+  if (!entity.auras.some((aura) => aura.id === 'shellskin')) return false;
+  if (meta.talents.rows[17] === 'hun_r17_shell_and_fang') return false;
+  if (ability.id === 'shellskin') return false;
+  if (ability.requiresTarget && ability.targetType !== 'friendly') return true;
+  return ability.effects.some((effect) =>
+    [
+      'directDamage',
+      'weaponDamage',
+      'weaponStrike',
+      'aoeDamage',
+      'packCommand',
+      'unleashBeast',
+      'hunterBloodhook',
+      'hunterShrapnel',
+      'frostjawTrap',
+    ].includes(effect.type),
+  );
 }
 
 function cancelStasisToggle(ctx: SimContext, entity: Entity, ability: AbilityDef): boolean {
@@ -395,7 +424,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     // Ice Floes (mage choice row): a COMPLETED hard cast spends one protected
     // use whether or not the caster actually moved (the buff is a banked
     // window, not a refund). Fishing above never spends one. Draws no rng.
-    const floes = p.auras.find((a) => a.kind === 'ice_floes');
+    const floes = iceFloesAuraForAbility(p, castId);
     if (floes) {
       floes.value -= 1;
       if (floes.value <= 0) {
@@ -444,7 +473,7 @@ export function releaseEmpoweredAbility(ctx: SimContext, abilityId: string, pid?
   p.castRemaining = 0;
   ctx.emit({ type: 'castStop', entityId: p.id, success: true });
 
-  const floes = p.auras.find((a) => a.kind === 'ice_floes');
+  const floes = iceFloesAuraForAbility(p, abilityId);
   if (floes) {
     floes.value -= 1;
     if (floes.value <= 0) {
@@ -564,12 +593,21 @@ export function castAbility(
   if (!r) return;
   const { meta, e: p } = r;
   let res = ctx.resolvedAbility(abilityId, p.id);
-  if (!res || p.dead) return;
+  if (!res) {
+    ctx.error(p.id, 'You do not know that ability.');
+    return;
+  }
+  if (p.dead) return;
   // Passive traits are spellbook information and mechanics hooks, never actions.
   if (res.def.passive) return;
   meta.lastActiveTick = ctx.tickCount; // a cast attempt is a deliberate action
   const ability = res.def;
+  if (cancelRecedingShell(ctx, p, meta, ability.id)) return;
   if (cancelStasisToggle(ctx, p, ability)) return;
+  if (shellskinBlocksAbility(p, meta, ability)) {
+    ctx.error(p.id, 'Shellskin prevents attacks.');
+    return;
+  }
   // Ice Block (usableWhileControlled) may be pressed through ordinary control;
   // cleanseSelf removes the player-breakable debuffs while encounter-authored
   // unbreakable control remains. Its own stasis is handled by the recast toggle above.
@@ -594,7 +632,9 @@ export function castAbility(
       (effect) =>
         effect.type === 'blinkForward' ||
         effect.type === 'repositionToAim' ||
-        effect.type === 'charge',
+        effect.type === 'charge' ||
+        effect.type === 'hunterBloodhook' ||
+        effect.type === 'hunterTrailbreak',
     )
   ) {
     ctx.error(p.id, 'You are stunned!');
@@ -658,16 +698,30 @@ export function castAbility(
   // shifting out of a form is free; shifting across forms bills the parked
   // mana (the live bar is rage/energy in a form) — see spendAbilityCost
   const canCastFree = res.cost > 0 && hasFreeCostFor(p, ability.id);
+  const stormcastArmedForAbility = p.auras.some(
+    (aura) =>
+      aura.id === STORMCAST_ID &&
+      (aura.empowerAbilities === undefined || aura.empowerAbilities.includes(ability.id)),
+  );
   const cheapMultiplier = nextCastCheapMultiplier(p, ability.id);
-  const payableCost = cheapMultiplier === null ? res.cost : Math.ceil(res.cost * cheapMultiplier);
-  if (p.resource < payableCost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
+  const discountedCost =
+    cheapMultiplier === null ? res.cost : Math.ceil(res.cost * cheapMultiplier);
+  const payableCost = shamanManaCost(ctx, p, discountedCost);
+  if (
+    p.resource < payableCost &&
+    (!canCastFree || stormcastArmedForAbility) &&
+    !togglingOff &&
+    !formShiftKind(p, ability)
+  ) {
     ctx.error(
       p.id,
       p.resourceType === 'rage'
         ? 'Not enough rage!'
         : p.resourceType === 'energy'
           ? 'Not enough energy!'
-          : 'Not enough mana!',
+          : p.resourceType === 'focus'
+            ? 'Not enough Focus!'
+            : 'Not enough mana!',
     );
     return;
   }
@@ -696,6 +750,10 @@ export function castAbility(
     )
   ) {
     ctx.error(p.id, 'That ability is not ready yet.');
+    return;
+  }
+  if (ability.id === 'summon_tithefiend' && !hasTithefiendTarget(ctx, p.id)) {
+    ctx.error(p.id, 'Your Tithefiend needs an enemy affected by Dirge of Decay.');
     return;
   }
   // combo points are character-bound: any built points finish on the current target
@@ -731,7 +789,23 @@ export function castAbility(
   }
 
   let target: Entity | null = null;
-  if (ability.requiresTarget && ability.targetsDead) {
+  if (ability.id === 'unleash_weapon') {
+    target = resolveUnleashWeaponTarget(ctx, p, castTargetId);
+    const error = unleashWeaponCastError(p, target);
+    if (error) {
+      ctx.error(p.id, error);
+      return;
+    }
+    if (!target) return;
+    if (dist2d(p.pos, target.pos) > ability.range) {
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    if (ctx.lineOfSightBlocked(p, target, ability)) {
+      ctx.error(p.id, 'Line of sight.');
+      return;
+    }
+  } else if (ability.requiresTarget && ability.targetsDead) {
     // Combat res: the target must be a DEAD group/raid member (no self-cast fallback).
     const dead = resolveDeadAllyTarget(ctx, p, castTargetId);
     if (!dead) {
@@ -875,6 +949,20 @@ export function castAbility(
       }
     }
   }
+  if (ability.id === 'pack_command' || ability.id === 'unleash_beast') {
+    const error = packCommandError(ctx, p, target);
+    if (error) {
+      ctx.error(p.id, error);
+      return;
+    }
+  }
+  if (ability.id === 'bloodhook') {
+    const error = bloodhookStartError(ctx, p, target);
+    if (error) {
+      ctx.error(p.id, error);
+      return;
+    }
+  }
   // Hard Bargain cannot spend the caster's last health. Reject it before GCD,
   // cost, cooldown, and cast-completion proc hooks so a failed conversion cannot
   // arm Blood Credit or count toward any cast-based talent.
@@ -916,10 +1004,23 @@ export function castAbility(
           ? { x: p.pos.x + (dx / d) * maxRange, y: p.pos.y, z: p.pos.z + (dz / d) * maxRange }
           : { x: aim.x, y: p.pos.y, z: aim.z };
     } else {
-      // No point chosen (e.g. a keybind cast with nothing under the cursor): fall
-      // back to the caster's own position so the spell still resolves at the feet,
-      // exactly as a caster-centered cast would.
-      aimPoint = { x: p.pos.x, y: p.pos.y, z: p.pos.z };
+      // Faultwake's keybind default is the selected hostile; other position
+      // spells retain the canonical at-feet fallback. Clamp the selected point
+      // through the same authoritative range rule as explicit ground input.
+      const selected =
+        (ability.id === 'earthquake' || ability.id === 'earthbind') && p.targetId !== null
+          ? (ctx.entities.get(p.targetId) ?? null)
+          : null;
+      const fallback =
+        selected && !selected.dead && ctx.isHostileTo(p, selected) ? selected.pos : p.pos;
+      const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
+      const dx = fallback.x - p.pos.x;
+      const dz = fallback.z - p.pos.z;
+      const d = Math.hypot(dx, dz);
+      aimPoint =
+        d > maxRange
+          ? { x: p.pos.x + (dx / d) * maxRange, y: p.pos.y, z: p.pos.z + (dz / d) * maxRange }
+          : { x: fallback.x, y: p.pos.y, z: fallback.z };
     }
   }
 
@@ -976,23 +1077,34 @@ export function castAbility(
   // unchanged.
   const gcd = Math.max(MIN_GCD, ctx.playerGcdFor(meta.cls) / spellHasteMult(p));
   // A channel keeps its duration, so it must not eat a next_cast_instant charge.
-  const castTime =
+  let consumedInstantAura: Aura | null = null;
+  if (
     !ability.channel &&
     res.castTime > 0 &&
-    (ability.school !== 'physical' || hasScopedNextCastInstant(p, ability.id)) &&
-    consumeNextCastInstant(ctx, p, ability.id)
-      ? 0
-      : res.castTime;
+    (ability.school !== 'physical' || hasScopedNextCastInstant(p, ability.id))
+  ) {
+    consumedInstantAura = consumeNextCastInstantAura(ctx, p, ability.id);
+  }
+  const castTime =
+    consumedInstantAura !== null ? 0 : res.castTime * shamanCastTimeMultiplier(p, ability.id);
   // A free cast is consumed where the cost is actually billed: here for channels
   // and instants (this tick resolves them via the local `res`), but for cast-time
   // spells the bill lands in applyAbility at completion, which RE-RESOLVES the
   // ability, so the charge must survive until then and be consumed there.
+  let consumedCheapAura: Aura | null = null;
   if ((castTime === 0 || ability.channel) && !togglingOff) {
-    if (canCastFree && consumeFreeCostFor(ctx, p, ability.id)) {
+    if (consumedInstantAura?.id === STORMCAST_ID && res.cost > 0) {
+      consumedCheapAura = consumeNextCastCheapAura(ctx, p, ability.id);
+      if (consumedCheapAura !== null) {
+        res = { ...res, cost: Math.ceil(res.cost * consumedCheapAura.value) };
+      }
+    } else if (canCastFree && consumeFreeCostFor(ctx, p, ability.id)) {
       res = { ...res, cost: 0 };
     } else if (res.cost > 0) {
-      const cheap = consumeNextCastCheap(ctx, p, ability.id);
-      if (cheap !== null) res = { ...res, cost: Math.ceil(res.cost * cheap) };
+      consumedCheapAura = consumeNextCastCheapAura(ctx, p, ability.id);
+      if (consumedCheapAura !== null) {
+        res = { ...res, cost: Math.ceil(res.cost * consumedCheapAura.value) };
+      }
     }
   }
 
@@ -1058,7 +1170,14 @@ export function castAbility(
   const instantResolved = ability.empowerStages
     ? { ...res, empowerLevel: ability.empowerStages }
     : res;
-  applyAbility(ctx, p, meta, instantResolved, castTargetId);
+  const stormcastReservation =
+    consumedInstantAura?.id === STORMCAST_ID
+      ? {
+          instant: consumedInstantAura,
+          cheap: consumedCheapAura?.id === STORMCAST_CHEAP_ID ? consumedCheapAura : null,
+        }
+      : null;
+  applyAbility(ctx, p, meta, instantResolved, castTargetId, stormcastReservation);
   // instant ground-targeted cast: its effects have consumed the aim point. An
   // interleaved instant instead hands the aim back to the cast still running.
   p.castAim = blinkThrough ? heldCastAim : null;
@@ -1145,12 +1264,15 @@ function spendAbilityCost(
     }
     return;
   }
-  spendResource(p, res.cost);
+  const paidCost = shamanManaCost(ctx, p, res.cost);
+  spendResource(p, paidCost);
+  onShamanManaSpent(ctx, p, paidCost, res.cost > 0);
+  noteHunterFocusSpend(ctx, p, meta, res);
   // Overflowing Power (mage choice row): every 10% of maximum mana actually
   // spent shaves manaDefCdrPer10 seconds off the mage defensive cooldowns,
   // capped per rolling window (the 'internal_cd' aura carries the window's
   // running total, so no new entity field enters the parity state hash).
-  overflowingPowerCdr(ctx, p, meta, res.cost);
+  overflowingPowerCdr(ctx, p, meta, paidCost);
   // Colossal Might: each point of rage actually spent shaves cdrPerRage seconds
   // off the tracked offensive cooldowns. 0 for everyone without the capstone.
   applyRageSpendCooldownRefund(ctx, p, meta, spentRage);
@@ -1490,12 +1612,40 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
   });
 }
 
+interface StormcastReservation {
+  instant: Aura;
+  cheap: Aura | null;
+}
+
+function restoreStormcastReservation(
+  ctx: SimContext,
+  player: Entity,
+  reservation: StormcastReservation | null,
+): void {
+  if (!reservation || player.dead) return;
+  if (!player.auras.some((aura) => aura.id === reservation.instant.id)) {
+    ctx.applyAura(player, { ...reservation.instant });
+  }
+  if (reservation.cheap && !player.auras.some((aura) => aura.id === reservation.cheap?.id)) {
+    ctx.applyAura(player, { ...reservation.cheap });
+  }
+}
+
+function completeStormcastReservation(
+  ctx: SimContext,
+  player: Entity,
+  reservation: StormcastReservation | null,
+): void {
+  if (reservation) onStormcastConsumed(ctx, player);
+}
+
 function applyAbility(
   ctx: SimContext,
   p: Entity,
   meta: PlayerMeta,
   res: ResolvedAbility,
   castTargetId: number | null = null,
+  stormcastReservation: StormcastReservation | null = null,
 ): void {
   // Consume the mouseover override: an instant cast passes it directly; a
   // timed cast stored it on the entity at start (updateCasting's finish call
@@ -1589,7 +1739,23 @@ function applyAbility(
   }
 
   let target: Entity | null = null;
-  if (ability.requiresTarget && ability.targetsDead) {
+  if (ability.id === 'unleash_weapon') {
+    target = resolveUnleashWeaponTarget(ctx, p, castTarget);
+    const error = unleashWeaponCastError(p, target);
+    if (error) {
+      ctx.error(p.id, error);
+      return;
+    }
+    if (!target) return;
+    if (dist2d(p.pos, target.pos) > ability.range + 2) {
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    if (ctx.lineOfSightBlocked(p, target, ability)) {
+      ctx.error(p.id, 'Line of sight.');
+      return;
+    }
+  } else if (ability.requiresTarget && ability.targetsDead) {
     // Combat res finish: the dead ally's id was stored in castTarget at cast start
     // (it is auto-deselected from p.targetId once dead, so we cannot re-derive it).
     const dead = resolveDeadAllyTarget(ctx, p, castTarget);
@@ -1643,16 +1809,19 @@ function applyAbility(
       return;
     }
   }
-  const canCastFree = res.cost > 0 && hasFreeCostFor(p, ability.id);
+  const canCastFree =
+    stormcastReservation === null && res.cost > 0 && hasFreeCostFor(p, ability.id);
   const cheapMultiplier = nextCastCheapMultiplier(p, ability.id);
-  const payableCost = cheapMultiplier === null ? res.cost : Math.ceil(res.cost * cheapMultiplier);
+  const discountedCost =
+    cheapMultiplier === null ? res.cost : Math.ceil(res.cost * cheapMultiplier);
+  const payableCost = shamanManaCost(ctx, p, discountedCost);
   if (p.resource < payableCost && !canCastFree && !togglingOff && !formShiftKind(p, ability)) {
     ctx.error(p.id, `Not enough ${p.resourceType ?? 'resource'}!`);
     return;
   }
   if (canCastFree && !togglingOff && consumeFreeCostFor(ctx, p, ability.id)) {
     res = { ...res, cost: 0 };
-  } else if (res.cost > 0 && !togglingOff) {
+  } else if (stormcastReservation === null && res.cost > 0 && !togglingOff) {
     const cheap = consumeNextCastCheap(ctx, p, ability.id);
     if (cheap !== null) res = { ...res, cost: Math.ceil(res.cost * cheap) };
   }
@@ -1672,6 +1841,7 @@ function applyAbility(
     spendAbilityCost(ctx, p, meta, res);
     armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.bonusCharges ?? 0);
     ctx.runEffects(p, meta, target, res);
+    completeStormcastReservation(ctx, p, stormcastReservation);
     // 'spellCast' means SPELLS: a physical friendly ability never rolls.
     if (p.kind === 'player' && ability.school !== 'physical')
       ctx.applySetProcs(p, target, 'spellCast');
@@ -1711,23 +1881,31 @@ function applyAbility(
     // tanking, so a taunt ability skips the resist roll entirely (physical taunts like
     // Goad / Menace already never roll, since they resolve instantly below).
     const isTaunt = res.effects.some((eff) => eff.type === 'taunt');
-    scheduleProjectile(ctx, p, target, (src, tgt) => {
-      if (isSpell && !isTaunt && isSpellResisted(ctx.rng, src.level, tgt.level, src.hitBonus)) {
-        ctx.emit({
-          type: 'damage',
-          sourceId: src.id,
-          targetId: tgt.id,
-          amount: 0,
-          crit: false,
-          school: ability.school,
-          ability: ability.name,
-          kind: 'resist',
-        });
-        ctx.enterCombat(src, tgt);
-        return;
-      }
-      ctx.runEffects(src, meta, tgt, res, !isSpell);
-    });
+    scheduleProjectile(
+      ctx,
+      p,
+      target,
+      (src, tgt) => {
+        if (isSpell && !isTaunt && isSpellResisted(ctx.rng, src.level, tgt.level, src.hitBonus)) {
+          ctx.emit({
+            type: 'damage',
+            sourceId: src.id,
+            targetId: tgt.id,
+            amount: 0,
+            crit: false,
+            school: ability.school,
+            ability: ability.name,
+            kind: 'resist',
+          });
+          ctx.enterCombat(src, tgt);
+          restoreStormcastReservation(ctx, src, stormcastReservation);
+          return;
+        }
+        ctx.runEffects(src, meta, tgt, res, !isSpell);
+        completeStormcastReservation(ctx, src, stormcastReservation);
+      },
+      () => restoreStormcastReservation(ctx, p, stormcastReservation),
+    );
     // 'spellCast' set procs (Clearcasting) roll at CAST COMPLETION, matching the
     // trigger name: the cast is done even though the bolt is still in flight (a
     // resisted or fizzled bolt was still a cast). Physical projectile shots
@@ -1752,6 +1930,7 @@ function applyAbility(
     });
   }
   ctx.runEffects(p, meta, target, res);
+  completeStormcastReservation(ctx, p, stormcastReservation);
   // 'spellCast' means SPELLS: physical specials (a cat/bear weapon strike from a
   // cloth-capable druid) and toggle-offs fall through here and must not roll.
   if (p.kind === 'player' && ability.school !== 'physical' && !togglingOff)

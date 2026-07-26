@@ -135,7 +135,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.berserk.name': '붉은 안개',
   'entities.abilities.blink.name': '섬광걸음',
   'entities.abilities.bloodlust.name': '전쟁 북',
-  'entities.abilities.chain_lightning.name': '갈래 번개',
+  'entities.abilities.chain_lightning.name': '하늘가지',
   'entities.abilities.chaos_bolt.name': '파멸 화살',
   'entities.abilities.cleansing_verdict.name': '정화의 심판',
   'entities.abilities.cleansing_verdict.description':
@@ -1073,6 +1073,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'settings.languageLoadUnavailable': '해당 언어를 사용할 수 없습니다.',
   'game.hud.lowMana': '마나 부족',
   'game.hud.lowEnergy': '기력 부족',
+  'game.hud.lowFocus': '집중 부족',
   'game.talents.title': '특성',
   'game.talents.classTab': '직업',
   'game.talents.specTab': '전문화',
@@ -1583,6 +1584,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'classDetails.resources.mana': '마나',
   'classDetails.resources.energy': '기력',
   'classDetails.resources.rage': '분노',
+  'classDetails.resources.focus': '집중',
   'classDetails.roles.warrior': '탱커 / 근접 DPS',
   'classDetails.roles.paladin': '치유 / 탱커 / 근접 DPS',
   'classDetails.roles.hunter': '원거리 DPS',
@@ -2175,6 +2177,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.mana': '마나',
   'abilityUi.resources.rage': '분노',
   'abilityUi.resources.energy': '기력',
+  'abilityUi.resources.focus': '집중',
   'abilityUi.forms.bear': '곰',
   'abilityUi.forms.cat': '늑대',
   'abilityUi.cast.fishing': '낚시',
@@ -2503,6 +2506,47 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.volley.name': '일제 사격',
   'entities.abilities.volley.description':
     '지정한 지역에 3초 동안 화살을 쏟아부어 그 안의 적에게 0.5초마다 {damage}의 피해를 입힙니다.',
+  'entities.abilities.pack_command.name': '무리 명령',
+  'entities.abilities.pack_command.description':
+    '살아 있는 소환수에게 공격을 명령합니다. 적중하면 집중 20과 무리 흉포 1단계를 얻습니다.',
+  'entities.abilities.unleash_beast.name': '야수 해방',
+  'entities.abilities.unleash_beast.description':
+    '최대로 쌓인 무리 흉포를 해방해 주 대상과 주변을 강타한 뒤, 소환수를 잠시 휩쓸기 광란에 빠뜨립니다.',
+  'entities.abilities.measured_shot.name': '정밀 사격',
+  'entities.abilities.measured_shot.description':
+    '신중하게 조준한 사격으로 {damage}의 물리 피해를 주고, 적중 시 집중 20을 얻습니다.',
+  'entities.abilities.cold_focus.name': '냉정한 집중',
+  'entities.abilities.cold_focus.description':
+    '12초 동안 정밀 사격이 더 많은 집중을 생성하고, 장궁 당기기가 더 빠르고 저렴해집니다. (냉철한 시야 상징)',
+  'entities.abilities.bloodhook.name': '피갈고리',
+  'entities.abilities.bloodhook.description':
+    '8에서 25미터 떨어진 적에게 돌진해 주 상처를 내고, 12초에 걸쳐 24의 출혈 피해를 줍니다. (야전술 상징)',
+  'entities.abilities.shrapnel_charge.name': '파편 폭약',
+  'entities.abilities.shrapnel_charge.description':
+    '대상과 주변 적을 파편으로 폭파한 뒤, 주 대상에게서 짧은 출혈을 퍼뜨립니다.',
+  'entities.abilities.bloodtrail_assault.name': '핏길 습격',
+  'entities.abilities.bloodtrail_assault.description':
+    '12초 동안 피갈고리, 상처 찢기, 파편 폭약과 소환수의 후속 공격을 강화합니다.',
+  'entities.abilities.trailbreak.name': '흔적 끊기',
+  'entities.abilities.trailbreak.description':
+    '전문화 상태를 잃지 않고 뒤로 도약합니다. 야전술은 다음 재진입도 준비합니다.',
+  'entities.abilities.hunting_momentum.name': '사냥의 기세',
+  'entities.abilities.hunting_momentum.description':
+    '지속 효과: 내장 가르기가 8초 동안 사냥의 기세 1중첩을 부여합니다. 최대 3중첩입니다. 3중첩에서 반격의 송곳니가 45% 더 많은 타격 피해를 주고 모든 중첩을 소모합니다. (야전술)',
+  'entities.abilities.fieldcraft_reentry.name': '재진입 준비',
+  'entities.abilities.fieldcraft_reentry.description':
+    '지속 효과: 흔적 끊기가 사냥의 기세를 갱신하고 12초 안에 사용하는 다음 내장 가르기 또는 피갈고리를 강화합니다. 내장 가르기는 중첩당 15%의 추가 피해를 줍니다. 피갈고리는 18에서 24의 추가 물리 피해를 주고 중첩당 15% 증가하며 원거리 전투력에 따라 증가합니다. 3중첩에서는 두 공격 모두 사냥의 기세를 소모합니다. (야전술)',
+  'entities.abilities.wildheart.name': '야생의 심장',
+  'entities.abilities.wildheart.description': '최대 생명력의 30%를 즉시 회복합니다.',
+  'entities.abilities.shellskin.name': '갑각 피부',
+  'entities.abilities.shellskin.description':
+    '8초 동안 받는 피해가 60% 감소하지만, 효과가 지속되는 동안 공격할 수 없습니다.',
+  'entities.abilities.frostjaw_trap.name': '서리턱 덫',
+  'entities.abilities.frostjaw_trap.description':
+    '선택한 적의 위치나 발밑에 작동 준비된 덫을 놓습니다. 처음 발동시킨 적을 이동 불가로 만들고 주변 적을 느리게 합니다.',
+  'entities.abilities.pack_rally.name': '무리 결집',
+  'entities.abilities.pack_rally.description':
+    '준마의 상을 취하고 주변 아군을 독려해 10초 동안 이동 속도를 30%, 공격 및 시전 속도를 10% 높입니다.',
   'entities.abilities.hurricane.name': '폭풍우',
   'entities.abilities.hurricane.description':
     '지정한 지역에 6초 동안 폭풍우를 일으켜 매초 적에게 {damage}의 자연 피해를 입힙니다.',
@@ -2685,7 +2729,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     '신중하게 시위를 당긴 사격으로 {damage}의 피해를 입힙니다.',
   'entities.abilities.rapid_fire.name': '열광의 연사',
-  'entities.abilities.rapid_fire.description': '15초 동안 공격 속도가 40%만큼 증가합니다.',
+  'entities.abilities.rapid_fire.description':
+    '이동하면서 2.4초에 걸쳐 6발을 빠르게 발사합니다. 각 발은 {damage}의 물리 피해를 줍니다.',
   'entities.abilities.smite.name': '성스러운 일격',
   'entities.abilities.smite.description': '적에게 {damage}의 신성 피해를 입힙니다.',
   'entities.abilities.lesser_heal.name': '속삭이는 기도',
@@ -2721,9 +2766,24 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '바위의 분노로 무기를 강화합니다. 5분 동안 매 공격마다 {damage}의 추가 피해를 입힙니다.',
   'entities.abilities.healing_wave.name': '치유의 물결',
   'entities.abilities.healing_wave.description': '아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
-  'entities.abilities.chain_heal.name': '연쇄 치유',
+  'entities.abilities.chain_heal.name': '쇄도하는 치유',
   'entities.abilities.chain_heal.description':
-    '아군 대상을 대량으로 치유한 후, 근처 아군 최대 2명에게 도약합니다. 도약할 때마다 치유량이 50% 감소합니다. (복원 전문화)',
+    '아군 대상의 생명력을 120~145 회복시킨 후 근처 아군 최대 2명에게 도약하며, 도약할 때마다 치유량이 절반으로 줄어듭니다. 영향을 받은 아군마다 치유의 물결을 소모해 추가로 회복시킵니다. (영혼 치유 고유)',
+  'entities.abilities.galeheart_weapon.name': '질풍의 무기',
+  'entities.abilities.galeheart_weapon.description':
+    '무기에 질풍을 불어넣습니다. 적중한 세 번째 무기 공격마다 두 번 반향하고 폭풍 시전을 활성화합니다.',
+  'entities.abilities.lifespring_weapon.name': '생명의 샘 무기',
+  'entities.abilities.lifespring_weapon.description':
+    '무기에 생명의 물을 불어넣어 치유의 물결 저장량을 20% 늘립니다.',
+  'entities.abilities.primal_exaltation.name': '원시적 승천',
+  'entities.abilities.primal_exaltation.description':
+    '12초 동안 전문화의 힘을 해방해 기본 순환을 강화합니다. (주술사 특성)',
+  'entities.abilities.stoneward.name': '돌 수호',
+  'entities.abilities.stoneward.description':
+    '아군 하나를 6회 충전으로 60초 동안 보호합니다. 피해를 받으면 충전 1회를 소모해 3초마다 한 번 최대 생명력의 5%를 회복합니다. (주술사 특성)',
+  'entities.abilities.tidecall.name': '해일 부름',
+  'entities.abilities.tidecall.description':
+    '빠른 회복의 해일을 불러 아군을 치유하고 계산된 치유량을 치유의 물결에 더합니다.',
   'entities.abilities.earth_shock.name': '대지의 충격',
   'entities.abilities.earth_shock.description':
     '대상을 즉시 강타해 {damage}의 자연 피해를 입힙니다.',
@@ -5216,6 +5276,21 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.fireball': '주력 화염 공격기로, 타격을 입히고 대상을 계속 불태웁니다.',
   'guide.abilityHook.fireball_form': '살아 있는 화염구로 변해 탁 트인 지형을 빠르게 가로지릅니다.',
   'guide.abilityHook.flame_shock': '즉시 타격을 입히고 시간이 지나며 계속 불태우는 점화기입니다.',
+  'guide.abilityHook.galeheart_weapon':
+    '쌍수 무기에 폭풍의 바람을 불어넣어 안정적인 공격 리듬을 보상합니다.',
+  'guide.abilityHook.thunder_reservoir':
+    '대지 충격이나 단층 각성이 최대 위력으로 방출할 때까지 번개를 비축합니다.',
+  'guide.abilityHook.warspirit_cadence':
+    '안정적인 무기 리듬을 질풍의 메아리와 즉시 시전 기회로 바꿉니다.',
+  'guide.abilityHook.stormsurge':
+    '폭풍 시전 기회를 소모하면 선조의 일격이 일찍 돌아올 수 있습니다.',
+  'guide.abilityHook.lifespring_weapon':
+    '무기에 치유의 물을 불어넣어 이어지는 회복 흐름을 강화합니다.',
+  'guide.abilityHook.tidecall': '아군을 즉시 치유하고 치유의 물결을 최대로 저장합니다.',
+  'guide.abilityHook.ancestor_return':
+    '전투 중이 아닐 때 길게 시전해 쓰러진 파티 또는 공격대원 모두를 부활시킵니다.',
+  'guide.abilityHook.stoneward': '충전된 돌 방패를 세워 받는 피해를 회복으로 바꿉니다.',
+  'guide.abilityHook.primal_exaltation': '전문화에 맞는 원소의 힘을 짧은 시간 폭발시킵니다.',
   'guide.abilityHook.frost_armor': '전투 전에 방어구를 단단하게 만드는 지속형 자기 강화입니다.',
   'guide.abilityHook.frostbolt':
     '원거리에서 타격하며 대상의 이동 속도를 늦춰 다가오지 못하게 합니다.',
@@ -5232,11 +5307,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '가만히 서 있을 여유가 있을 때 아군의 체력을 채우는 안정적인 치유입니다.',
   'guide.abilityHook.life_tap': '마나가 바닥날 때 자신의 생명력 일부를 마나로 전환합니다.',
   'guide.abilityHook.lightning_bolt': '자연 피해를 주는 원거리 시전기로, 멀리서 쓰는 주력기입니다.',
+  'guide.abilityHook.chain_lightning':
+    '한 대상을 공격하고 주변 적 두 명에게 튕기며, 전체 시전에서 천둥 한 개를 쌓습니다.',
   'guide.abilityHook.lightning_shield':
     '몸에 전하를 둘러 공격자가 당신을 칠 때 자연 피해를 받게 합니다.',
   'guide.abilityHook.mark_of_the_wild': '전투 전에 자신이나 아군에게 걸어 두는 지속형 축복입니다.',
+  'guide.abilityHook.measured_shot':
+    '신중하게 조준한 원거리 사격으로, 강력한 공격에 쓸 집중을 회복합니다.',
   'guide.abilityHook.mongoose_bite': '적이 회피한 직후에 사용할 수 있게 열리는 반격기입니다.',
   'guide.abilityHook.moonfire': '즉시 타격하고 대상을 계속 불태우므로, 이동 중에 쓰기 좋습니다.',
+  'guide.abilityHook.pack_command':
+    '동료에게 공격을 명령하고, 야수 해방에 필요한 흉포함을 쌓습니다.',
+  'guide.abilityHook.stampede':
+    '야수 세 마리를 12초 동안 불러 공격시킵니다. 무리의 야성이 최대일 때 사용하면 소환 내내 최대 피해 보너스를 유지합니다.',
   'guide.abilityHook.power_word_fortitude':
     '아군의 생명력을 높여 주므로, 전투를 시작하기 전에 시전하고 유지하세요.',
   'guide.abilityHook.power_word_shield': '아군을 보호막으로 감싸 타격이 닿기 전에 흡수합니다.',
@@ -6085,6 +6168,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': '사슬',
   'hudChrome.auraEffect.dot': '{interval}초마다 {value}의 {school} 피해를 입힙니다',
   'hudChrome.auraEffect.hot': '{interval}초마다 생명력을 {value} 회복합니다',
+  'hudChrome.auraEffect.mendingCurrent':
+    '치유량 {value}를 저장하여 시간에 따라 방출하거나 쇄도하는 치유로 소모합니다',
+  'hudChrome.auraEffect.mendingCurrentPercent':
+    '최대 생명력의 {pct}%에 해당하는 치유량을 쇄도하는 치유용으로 저장합니다',
   'hudChrome.auraEffect.absorb': '{value}의 피해를 흡수합니다',
   'hudChrome.auraEffect.healAbsorb': '들어오는 치유를 {value}만큼 흡수합니다',
   'hudChrome.auraEffect.thorns': '공격자에게 {value}의 {school} 피해를 입힙니다',
@@ -6098,6 +6185,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.dmgDoneReduce': '입히는 피해가 {pct}% 감소합니다',
   'hudChrome.auraEffect.elementalConvergencePrimed':
     '다음에 다른 원소 계열 주문을 시전하면 원소 융합이 발동합니다',
+  'hudChrome.auraEffect.hunterFerocity':
+    '무리의 흉포함 {stacks}중첩: 야수가 입히는 피해가 {pct}% 증가합니다',
   'hudChrome.auraEffect.heatingUp':
     '다음 화염 생성기가 연속으로 치명타를 적중하면 몰아치는 열기를 얻고, 치명타가 아니면 달아오름이 제거됩니다',
   'hudChrome.auraEffect.tongues': '시전 시간을 {pct}% 증가시킵니다',
@@ -7984,7 +8073,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.description':
     '30미터 안의 아군을 광분시켜 15초 동안 공격 속도를 30%만큼 증가시킵니다. (주술사 특성)',
   'entities.abilities.chain_lightning.description':
-    '대상 지역에 번개를 내리쳐 주위 적에게 {damage}의 피해를 입힙니다. (주술사 특성)',
+    '대상을 공격한 뒤 10미터 안의 적 최대 2명에게 번져 각각 {damage}의 자연 피해를 입힙니다. 적중하면 대상마다가 아니라 시전 전체에서 천둥 1개를 얻습니다. 피해는 주문력에 따라 증가합니다. 원시 숙련은 이 주문을 즉시 시전하게 할 수 있고, 원시 고양은 시전 시간을 절반으로 줄입니다. (천둥소환사)',
   'entities.abilities.chaos_bolt.description':
     '혼돈의 불꽃 화살을 던져 {damage}의 화염 피해를 입힙니다. (흑마법사 특성)',
   'entities.abilities.cloak_of_shadows.description':
@@ -8470,6 +8559,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildgrowth_leggings.name': '야생성장 다리보호구',
   'entities.items.wildsoul_maul.name': '야생영혼 철퇴',
   'hudChrome.professions.skillValue': '{skill} / {max}',
+  'entities.abilities.veilstep.name': '장막걸음',
+  'entities.abilities.veilstep.description': '바라보는 방향으로 장막을 통과합니다.',
+  'entities.abilities.scouring_mercy.name': '정화의 자비',
+  'entities.abilities.scouring_mercy.description':
+    '적을 신성한 힘으로 정화하거나 아군 대상을 즉시 치유합니다. 교리 고유 능력입니다.',
+  'entities.abilities.seraphic_vigil.name': '치천사의 수호',
+  'entities.abilities.seraphic_vigil.description':
+    '아군 한 명에게 수호의 축복을 걸어 위험에 처하면 생명력을 회복시킵니다. 축복 고유 능력입니다.',
+  'entities.abilities.summon_tithefiend.name': '십일조 악마 소환',
+  'entities.abilities.summon_tithefiend.description':
+    '어둠의 십일조를 소모해 당신의 형상을 사냥하는 일시적인 십일조 악마를 소환합니다. 만과 고유 능력입니다.',
+  'entities.abilities.martyrs_aegis.name': '순교자의 방패',
+  'entities.abilities.martyrs_aegis.description':
+    '아군 한 명이 받는 피해를 8초 동안 40% 감소시킵니다.',
+  'entities.abilities.choir_of_deliverance.name': '구원의 성가대',
+  'entities.abilities.choir_of_deliverance.description':
+    '6초 동안 정신을 집중해 2초마다 주위 파티원을 치유합니다.',
   'entities.items.resonant_thread.name': '공명의 실',
   'entities.items.resonant_hide.name': '공명의 가죽',
   'entities.items.resonant_links.name': '공명의 사슬',
@@ -8754,6 +8860,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.cannotAfford': '귀속 해제 수수료를 지불할 수 없습니다.',
   'hudChrome.unbind.outOfRange': '귀속을 해제하려면 작업대 옆에 있어야 합니다.',
   'hudChrome.unbind.noSpace': '가방에 귀속 해제한 아이템을 넣을 공간이 없습니다.',
+  'entities.abilities.stampede.name': '야수 쇄도',
+  'entities.abilities.stampede.description':
+    '야수 3마리를 12초 동안 소환합니다. 각 야수는 2초마다 공격해 {damage}의 물리 피해를 입힙니다. 표시된 피해에는 원거리 전투력의 8%가 포함되지만 소환수 피해 보너스는 포함되지 않습니다. 야수는 소환될 때 무리의 흉포함을 저장하며, 중첩당 피해가 10% 증가합니다. 야수 쇄도가 재사용 대기 중일 때 무리 명령이 적중하면 20% 확률로 재사용 대기시간이 초기화되며, 5번 연속 실패하면 반드시 초기화됩니다. 야수들이 활동 중일 때는 초기화되지 않습니다. (무리군주)',
+  'entities.abilities.ancestor_return.name': '선조의 귀환',
+  'entities.abilities.ancestor_return.description':
+    '파티 또는 공격대에서 쓰러진 모든 구성원을 시체가 있는 곳에서 생명력과 마나 30%로 되살립니다. 전투 중에는 시전할 수 없습니다. (영혼치유사)',
   // Professions 2.0 wiki arm: the professions hub rewrite and the
   // /wiki/professions detail pages (M16 non-Latin fills, added with the keys).
   'guide.professions.ringHeading': '제작의 원환',
@@ -9161,4 +9273,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': '해당 ID를 가진 아이템이 없습니다.',
   'devCommand.kitCurrentSpec': '현재 전문화',
   'hudChrome.enchanting.wornTag': '착용 중 ({slot})',
+  'entities.abilities.thunder_reservoir.name': '천둥 비축',
+  'entities.abilities.thunder_reservoir.description':
+    '지속 효과: 비전 화살과 하늘가지가 천둥을 최대 5까지 부여합니다. 천둥이 5일 때 대지 충격은 125%, 단층각성은 100%의 추가 피해를 주고 모든 천둥을 소모합니다. (천둥소환)',
+  'entities.abilities.warspirit_cadence.name': '전령의 박자',
+  'entities.abilities.warspirit_cadence.description':
+    '지속 효과: 무기 공격이 3번 적중할 때마다 50%의 자연 피해를 주는 질풍 메아리가 2번 발동하고 12초 동안 폭풍시전을 얻습니다. 폭풍시전은 다음 비전 화살, 충격 또는 치유의 물결을 즉시 시전하고 마나 소모를 50% 줄입니다. 선조의 일격은 공격 2회로 계산됩니다. (전령)',
+  'entities.abilities.stormsurge.name': '폭풍쇄도',
+  'entities.abilities.stormsurge.description':
+    '지속 효과: 선조의 일격이 재사용 대기 중일 때 폭풍시전을 소모하면 25% 확률로 재사용 대기시간을 초기화합니다. 4번 실패하면 다음에는 반드시 발동합니다. (전령)',
+  'entities.abilities.unleash_weapon.name': '무기 해방',
+  'entities.abilities.unleash_weapon.description':
+    '활성화된 무기 마법을 해방합니다. 화염낙인은 54에서 64의 화염 피해를 입히고 주문력의 30%가 추가되며 천둥을 2 얻습니다. 질풍은 무기로 공격하고 전령의 박자를 진행하며 6초 동안 공격 속도를 20% 높입니다. 바위결속은 무기 피해의 75%를 입히고 대상이 자신을 공격하게 하며 4초 동안 받는 피해를 20% 줄입니다. 생명의 샘은 치유의 물결을 소모해 남은 치유량의 125%를 즉시 회복하고 8초 안에 받는 다음 피해를 실제 회복량의 50%만큼 줄입니다.',
 };

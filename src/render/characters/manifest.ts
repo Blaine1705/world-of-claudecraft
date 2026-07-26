@@ -1230,6 +1230,7 @@ const MOB_KEYS: Record<string, string> = {
   duskborn: 'mob_demon',
   warlock_imp: 'mob_demon_flying',
   warlock_voidwalker: 'mob_demonalt',
+  guardian_tithefiend: 'mob_demonalt',
   wild_boar: 'mob_boar',
   // beasts that would otherwise fall back to the wolf model (FAMILY_KEYS.beast)
   old_cragmaw: 'mob_bear',

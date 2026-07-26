@@ -20,6 +20,23 @@ function producesEffect(cls: PlayerClass, specId: string, sig: string): string {
   p.maxHp = p.hp = 1_000_000;
   p.resource = p.maxResource;
   p.comboPoints = 5;
+  const signature = ABILITIES[sig];
+  // Some signatures are finishers that consume a resource aura. This smoke test
+  // exercises the cast while its declared prerequisite is armed; the dedicated
+  // class tests own how that aura is earned and how an unarmed cast is rejected.
+  if (signature?.requiresAuraKind) {
+    p.auras.push({
+      id: `spec_signature_${signature.requiresAuraKind}`,
+      name: 'Signature prerequisite',
+      kind: signature.requiresAuraKind,
+      remaining: 30,
+      duration: 30,
+      value: 0,
+      stacks: signature.requiresAuraStacks ?? 1,
+      sourceId: pid,
+      school: signature.school,
+    });
+  }
   // a friendly ally (for heals/buffs) and a hostile dummy (for damage/CC), both pinned
   const ally = createMob((sim as any).nextId++, MOBS.ridge_stalker, 20, {
     x: p.pos.x + 3,
@@ -42,6 +59,18 @@ function producesEffect(cls: PlayerClass, specId: string, sig: string): string {
   for (const e of [ally, mob]) {
     sim.entities.set(e.id, e);
     (sim as any).rebucket(e);
+  }
+  if (sig === 'summon_tithefiend') {
+    mob.auras.push({
+      id: 'shadow_word_pain',
+      name: 'Dirge of Decay',
+      kind: 'dot',
+      remaining: 18,
+      duration: 18,
+      value: 1,
+      sourceId: pid,
+      school: 'shadow',
+    });
   }
   p.facing = 0;
   sim.targetEntity(mob.id, pid);

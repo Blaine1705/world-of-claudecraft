@@ -123,13 +123,13 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
     const swift = render('paladin', (e) => e.id === 'pal_r14_swift_verdicts');
     expect(swift).toContain('cooldown is reduced by 20%');
 
-    // Balance pass: the option is now Steady Draw, a plain cast-speed talent.
-    const sniper = render('hunter', (e) => e.id === 'hun_r14_sniper_training');
-    expect(sniper).toContain('cast time is reduced by 20%');
+    // Hunter Talents 2.0: Trapcraft exposes the real cooldown reduction.
+    const trapcraft = render('hunter', (e) => e.id === 'hun_r14_trapcraft');
+    expect(trapcraft).toContain('cooldown is reduced by 20%');
 
     const attunement = render('shaman', (e) => e.id === 'sha_r11_elemental_attunement');
-    expect(attunement).toContain('critical strikes');
-    expect(attunement).toContain('instant');
+    expect(attunement).toContain('roots the target');
+    expect(attunement).toContain('2 sec');
 
     const mastery = render('warrior', (e) => e.id === 'war_row_blood_offering');
     expect(mastery).toContain('ability criticals deal 15% more damage');
@@ -164,6 +164,9 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
 // records that power specs, masteries, and the choice rows.
 
 const PCT_FIELDS = new Set([
+  // Class-owned intrinsic mechanic metadata uses `pct` for its player-facing
+  // fraction while runtime behavior stays in the class combat module.
+  'pct',
   'leechPct',
   'hpFrac',
   'belowFrac',
@@ -175,6 +178,13 @@ const PCT_FIELDS = new Set([
   'armorPct',
   'maxHpPct',
   'strPct',
+  'doctrineShieldPct',
+  'benisonAbsorbCapPct',
+  'doctrineConversionPct',
+  'shieldHealPct',
+  'splashHealPct',
+  'tithefiendDamagePct',
+  'tithefiendDurationPct',
   'agiPct',
   'intPct',
   'spiPct',
@@ -236,6 +246,23 @@ const PCT_FIELDS = new Set([
   // entity.ts / auras.ts, shown as "5%" and "20%" in the hand-written description.
   'manaPct',
   'manaRegenPct',
+  // Hunter Talents 2.0 stores bespoke runtime constants here so the authored
+  // tooltip remains mechanically auditable without fake ability modifiers.
+  'movementSpeedPct',
+  'enduringMovementSpeedPct',
+  'focusGenerationPct',
+  'damageReductionPct',
+  'fallbackDamageReductionPct',
+  'petHealPct',
+  'cooldownRefundPct',
+  'petHealthFloorPct',
+  'healthThresholdPct',
+  'slowPct',
+  'costReductionPct',
+  'primaryDamagePct',
+  'cleavePct',
+  'echoPct',
+  'hastePct',
 ]);
 
 function expectedTokens(effect: unknown): string[] {
@@ -618,20 +645,17 @@ describe('talent tooltip accuracy for specs, masteries, and choice rows', () => 
     expect(survival).toContain('dodge chance by 4%');
   });
 
-  it('localized thorns procs identify the ward and reflected melee strike trigger', async () => {
+  it('Warded Elements identifies the ward retaliation and defensive value', async () => {
     await ensureLocaleLoaded('es');
     setLanguage('es');
     const entry = effects.find(
-      (candidate) =>
-        candidate.cls === 'shaman' && candidate.id.endsWith('sha_r5_improved_lightning_shield'),
+      (candidate) => candidate.cls === 'shaman' && candidate.id.endsWith('sha_r8_frost_bind'),
     );
     if (!entry) throw new Error('missing Improved Thunder Ward talent entry');
 
     const rendered = entry.render();
-    expect(rendered).toContain(tEntity({ kind: 'ability', id: 'lightning_shield', field: 'name' }));
-    expect(rendered).toContain(
-      'Protege a un aliado para que los atacantes cuerpo a cuerpo se hieran al golpearlo.',
-    );
+    expect(rendered).toContain('Thunder Ward retaliation');
+    expect(rendered).toContain('10%');
     setLanguage('en');
   });
 });

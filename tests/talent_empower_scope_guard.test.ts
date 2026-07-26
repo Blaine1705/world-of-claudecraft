@@ -41,9 +41,10 @@ describe('talent empowerNext scoping', () => {
         scan(`${cls} spec ${spec.id} mastery`, procsInEffect(spec.mastery.effect));
       }
     }
-    // The scan must actually cover the proc surface: a refactor that moves the
-    // rows out from under ROW_TREES should redden this, not silently pass.
-    expect(scanned).toBeGreaterThan(20);
+    // Pin the approved v0.29 proc surface exactly. A deliberate proc addition or
+    // removal must update this sentinel, while a refactor that drops rows from
+    // ROW_TREES cannot silently weaken the scoping audit.
+    expect(scanned).toBe(19);
     expect(offenders).toEqual([]);
   });
 });

@@ -18,6 +18,8 @@ import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { convergenceOnCast } from './convergence';
 import { combustionRestokesCinderfall, PERSONAL_BARRIER_IDS } from './fire_mage';
+import { priestOnCastCompleted } from './priest/talents';
+import { onShamanCastCompleted } from './shaman_talents';
 
 function state(player: Entity): NonNullable<Entity['procState']> {
   if (!player.procState) player.procState = { counters: {}, icds: {} };
@@ -177,6 +179,7 @@ export function onCastCompleted(
   abilityId: string,
   target?: Entity | null,
 ): void {
+  priestOnCastCompleted(ctx, player);
   // G1 guard: a cast that consumed an empower aura (flag set at the consume
   // funnel in empower_next.ts) never advances a castNth counter, so free-cast
   // relay procs cannot feed cast-counter procs. The flag covers exactly one
@@ -186,6 +189,7 @@ export function onCastCompleted(
   // Elemental Convergence (mage choice row): school-alternation memory, kept
   // here because every completed cast funnels through this hook. Draws no rng.
   convergenceOnCast(ctx, player, abilityId);
+  onShamanCastCompleted(ctx, player, abilityId);
   // Phoenix Trance restokes one Cinderfall charge (designer rule 2026-07-25);
   // same reasoning: the one seam every completed cast passes. Draws no rng.
   combustionRestokesCinderfall(ctx, player, abilityId);

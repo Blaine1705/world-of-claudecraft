@@ -4565,7 +4565,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Un tir soigneusement décoché qui inflige {damage} points de dégâts.',
   'entities.abilities.rapid_fire.name': 'Tir fiévreux',
   'entities.abilities.rapid_fire.description':
-    "Augmente votre vitesse d'attaque de 40% pendant 15 s.",
+    'Canalise six tirs rapides en 2,4 s tout en vous déplaçant. Chaque tir inflige {damage} points de dégâts physiques.',
   'entities.abilities.smite.name': 'Châtiment',
   'entities.abilities.smite.description': "Châtie l'ennemi pour {damage} points de dégâts Sacrés.",
   'entities.abilities.lesser_heal.name': 'Prière murmurée',
@@ -6864,6 +6864,16 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Votre frappe de feu principale: elle inflige un coup et laisse la cible en flammes.',
   'guide.abilityHook.flame_shock':
     "Une brûlure instantanée qui frappe d'emblée et continue de consumer dans la durée.",
+  'guide.abilityHook.galeheart_weapon':
+    "Imprègne vos deux armes de vents d'orage et récompense un rythme d'attaque régulier.",
+  'guide.abilityHook.lifespring_weapon':
+    "Imprègne votre arme d'eau réparatrice et renforce votre flux de soins continu.",
+  'guide.abilityHook.tidecall':
+    'Appelle la marée pour renforcer votre prochaine série de sorts de soins.',
+  'guide.abilityHook.stoneward':
+    'Dresse un bouclier de pierre chargé qui transforme les dégâts subis en soins.',
+  'guide.abilityHook.primal_exaltation':
+    'Libère brièvement la puissance élémentaire propre à votre spécialisation.',
   'guide.abilityHook.frost_armor':
     'Une amélioration personnelle durable qui renforce votre armure avant un combat.',
   'guide.abilityHook.frostbolt':

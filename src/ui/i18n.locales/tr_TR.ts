@@ -2931,7 +2931,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'Düşmanı silah hasarı artı {damage} ile tırmalayan ve 9 saniye boyunca kanama hasarı yaratan gizlilik açılışı. 1 kombo puanı kazandırır. Yalnızca Kurt Formu.',
   'entities.abilities.rake.name': 'Deri Yüzme',
-  'entities.abilities.rapid_fire.description': 'Saldırı hızını 15 saniye boyunca %40 artırır.',
+  'entities.abilities.rapid_fire.description':
+    'Hareket ederken 2,4 saniye boyunca altı hızlı atış yapar. Her atış {damage} fiziksel hasar verir.',
   'entities.abilities.rapid_fire.name': 'Hummalı Çekiş',
   'entities.abilities.raptor_strike.description':
     'Hasarı {damage} artıran güçlü bir yakın dövüş saldırısı. Bir sonraki vuruşunda etkinleşir.',
@@ -4502,6 +4503,16 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.fireball':
     'Ana ateş bombası; bir darbe indirir ve hedefi yanar halde bırakır.',
   'guide.abilityHook.flame_shock': 'Önden vuran ve zamanla yakmayı sürdüren ani bir yanış.',
+  'guide.abilityHook.galeheart_weapon':
+    'İki silahı da fırtına rüzgârlarıyla doldurur ve düzenli saldırı ritmini ödüllendirir.',
+  'guide.abilityHook.lifespring_weapon':
+    'Silahını onarıcı suyla doldurur ve devamlı iyileştirme akışını güçlendirir.',
+  'guide.abilityHook.tidecall':
+    'Gelgiti çağırır ve sıradaki iyileştirme büyüsü dizisini güçlendirir.',
+  'guide.abilityHook.stoneward':
+    'Alınan hasarı iyileştirmeye çeviren yüklü bir taş kalkan yükseltir.',
+  'guide.abilityHook.primal_exaltation':
+    'Uzmanlığına özgü element gücünü kısa süreliğine serbest bırakır.',
   'guide.abilityHook.frost_armor':
     'Dövüşten önce zırhını sertleştiren kalıcı bir öz güçlendirmesi.',
   'guide.abilityHook.frostbolt': 'Menzilden vurur ve hedefi yavaşlatır, böylece sana yaklaşamaz.',

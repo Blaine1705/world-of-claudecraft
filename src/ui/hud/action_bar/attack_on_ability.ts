@@ -92,6 +92,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   enrageChance: 'other',
   finisherStun: 'other',
   gainResource: 'other',
+  hunterStampede: 'damage',
   selfDamagePctMax: 'other',
   selfHealPctMax: 'other',
   selfHotPctMax: 'other',
@@ -115,6 +116,14 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   ballShoot: 'other',
   sportDash: 'other',
   sportShove: 'other',
+  packCommand: 'damage',
+  unleashBeast: 'damage',
+  howlingRage: 'other',
+  hunterBloodhook: 'damage',
+  hunterShrapnel: 'damage',
+  hunterTrailbreak: 'other',
+  hunterPackRally: 'other',
+  frostjawTrap: 'other',
 };
 
 /**

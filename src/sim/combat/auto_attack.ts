@@ -58,6 +58,8 @@ import { runWeaponProcs } from './equip_procs';
 import { baseSwingSpeed, rangedAutoProfile } from './form_swing';
 import { isTravelFormAuraKind } from './forms';
 import { rangedShotProfile } from './ranged_shot';
+import { triggerWardCycle } from './shaman_talents';
+import { advanceWarspiritCadence, stoneboundThreatMultiplier } from './shaman_warspirit';
 import { onCastCompleted, onMeleeSwing } from './talent_procs';
 import { applyThornsReaction } from './thorns_charge';
 import { warriorMeleeDefense } from './warrior_hit_table';
@@ -503,7 +505,7 @@ export function meleeSwing(
   const dealtAmount = Math.max(1, Math.round(dmg));
   ctx.dealDamage(attacker, target, dealtAmount, crit, 'physical', abilityName, 'hit', false, {
     flat: opts.threatFlat ?? 0,
-    mult: opts.threatMult ?? 1,
+    mult: (opts.threatMult ?? 1) * stoneboundThreatMultiplier(ctx, attacker),
   });
   opts.onDealt?.(dealtAmount);
   // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND
@@ -513,7 +515,14 @@ export function meleeSwing(
   // Landed-swing talent responses resolve before the target retaliates or the
   // weapon's on-hit proc fires. This is observable for defensive healing and
   // preserves the authored Oathwheel, Venom Dividend, and imbue proc cadence.
-  if (attacker.kind === 'player') onMeleeSwing(ctx, attacker);
+  if (attacker.kind === 'player') {
+    if (abilityName === null) advanceWarspiritCadence(ctx, attacker, target, dealtAmount, 1);
+    else if (abilityName === 'Ancestral Strike') {
+      advanceWarspiritCadence(ctx, attacker, target, dealtAmount, 2);
+      triggerWardCycle(ctx, attacker);
+    }
+    onMeleeSwing(ctx, attacker);
+  }
   // thorns / lightning shield: melee attackers take damage back. Charge-limited
   // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.
   if (!attacker.dead) {

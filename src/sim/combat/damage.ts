@@ -66,6 +66,23 @@ import {
   igniteOnCrit,
   PERSONAL_BARRIER_IDS,
 } from './fire_mage';
+import { clearFieldcraftState } from './hunter_fieldcraft';
+import { clearPacklordState } from './hunter_packlord';
+import {
+  breakEnduringCourserBurst,
+  clearHunterTalentState,
+  hasHunterTalent,
+} from './hunter_shared';
+import { doctrineConvertDamage } from './priest/doctrine';
+import { cleanupPriestState } from './priest/lifecycle';
+import {
+  priestOnAuraEnded,
+  priestOnShieldConsumed,
+  priestOnVigilTriggered,
+} from './priest/talents';
+import { vespersEchoDamage, vespersOnEntityDeath } from './priest/vespers';
+import { clearSpiritmendCurrents, UNLEASH_WEAPON_GUARD_ID } from './shaman_spiritmend';
+import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
@@ -402,6 +419,10 @@ export function dealDamage(
       a.value -= soaked;
       amount -= soaked;
       totalAbsorbed += soaked;
+      // Unleash Weapon protects against one damage event only. Any unused
+      // protection falls away after that hit instead of behaving like a
+      // conventional multi-hit absorb shield.
+      if (a.id === UNLEASH_WEAPON_GUARD_ID) a.value = 0;
       if (a.value <= 0) {
         target.auras.splice(i, 1);
         ctx.emit({ type: 'aura', targetId: target.id, name: a.name, gained: false });
@@ -409,6 +430,7 @@ export function dealDamage(
         const shielder = ctx.entities.get(a.sourceId);
         if (shielder && !shielder.dead && shielder.kind === 'player') {
           onShieldConsumed(ctx, shielder, a.id, target);
+          priestOnShieldConsumed(ctx, shielder, a, target, source);
         }
       }
     }
@@ -416,10 +438,20 @@ export function dealDamage(
 
   if (target.kind === 'player' && amount > 0) {
     const meta = ctx.players.get(target.id);
+    if (meta?.cls === 'hunter') breakEnduringCourserBurst(ctx, target);
     const share = meta ? ctx.playerMods(meta).global.petDmgSharePct : 0;
     const pet = share > 0 ? ctx.petOf(target.id) : null;
+    const beastguard = !!meta && hasHunterTalent(meta, 'hun_r8_beastguard');
+    if (beastguard && (!pet || pet.dead) && target.hp < target.maxHp * 0.5) {
+      amount = Math.round(amount * 0.92);
+    }
     if (pet && !pet.dead) {
-      const redirected = Math.min(amount, Math.round(amount * share));
+      const petFloor = beastguard ? Math.ceil(pet.maxHp * 0.2) : 0;
+      const redirected = Math.min(
+        amount,
+        Math.round(amount * share),
+        Math.max(0, pet.hp - petFloor),
+      );
       if (redirected > 0) {
         amount -= redirected;
         ctx.dealDamage(
@@ -709,6 +741,8 @@ export function dealDamage(
   // above (duel/fiesta/arena) intentionally skip conversion (PRD 13.9 defers PvP
   // tuning to a later phase).
   chronomancyConvertArcaneDamage(ctx, source, preHp - target.hp, school, aoe);
+  doctrineConvertDamage(ctx, source, preHp - target.hp, school, abilityId ?? null);
+  vespersEchoDamage(ctx, source, target, preHp - target.hp, abilityId ?? null);
 
   if (amount > 0) {
     if (target.kind === 'mob' && DAMAGE_IDLE_DESPAWN_MOB_IDS.has(target.templateId)) {
@@ -738,6 +772,7 @@ export function dealDamage(
           gained: false,
         });
         target.auras.splice(i, 1);
+        priestOnAuraEnded(ctx, target, breakable);
       }
     }
   }
@@ -753,7 +788,10 @@ export function dealDamage(
       ctx.emit({ type: 'aura', targetId: target.id, name: aura.name, gained: false });
       const healer = ctx.entities.get(aura.sourceId);
       if (healer && !healer.dead) {
-        ctx.applyHeal(healer, target, aura.value, aura.name);
+        const healed = ctx.applyHeal(healer, target, aura.value, aura.name);
+        if (aura.id === 'seraphic_vigil') {
+          priestOnVigilTriggered(ctx, healer, target, healed);
+        }
         ctx.emit({
           type: 'spellfx',
           sourceId: aura.sourceId,
@@ -870,7 +908,10 @@ export function dealDamage(
     const meta = ctx.players.get(target.id);
     if (meta) meta.counters.damageTaken += amount;
     // Talent procs listening for big single hits (deterministic, ICD-gated).
-    if (amount > 0 && !target.dead) onDamageTaken(ctx, target, amount);
+    if (amount > 0 && !target.dead) {
+      onDamageTaken(ctx, target, amount);
+      onShamanDamageTaken(ctx, target, amount);
+    }
     if (target.resourceType === 'rage' && source && source.id !== target.id) {
       const isWarrior = meta?.cls === 'warrior';
       const baseRage = isWarrior
@@ -1013,6 +1054,11 @@ function reflectSpellWard(
 }
 
 export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): void {
+  if (e.kind === 'player') {
+    clearSpiritmendCurrents(ctx, e.id);
+    clearShamanTalentState(ctx, e);
+  }
+  vespersOnEntityDeath(ctx, e);
   resetProcState(e);
   e.dead = true;
   e.hp = 0;
@@ -1060,7 +1106,13 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // shed by aurasSurvivingDeath above). Keyed by sourceId, so marks THIS player
     // carries from another chronomancer are left alone.
     stripTemporalEchoes(ctx, e.id);
+    cleanupPriestState(ctx, e.id);
     const meta = ctx.players.get(e.id);
+    if (meta?.cls === 'hunter') {
+      clearHunterTalentState(ctx, e);
+      clearPacklordState(ctx, e);
+      clearFieldcraftState(ctx, e);
+    }
     if (meta) meta.counters.deaths++;
     // The Book of Deeds death hook (lifetime deaths counter, the Keeper's Toll
     // delight, perfection-window taints, the world-boss survival record) already
@@ -1155,6 +1207,9 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     e.aggroTargetId = null;
     clearThreat(e);
     if (e.ownerId !== null) {
+      const owner = ctx.entities.get(e.ownerId);
+      const ownerMeta = owner ? ctx.players.get(owner.id) : null;
+      if (owner && ownerMeta?.cls === 'hunter') clearPacklordState(ctx, owner);
       e.corpseTimer = Infinity;
       e.respawnTimer = Infinity;
       e.hostile = false;

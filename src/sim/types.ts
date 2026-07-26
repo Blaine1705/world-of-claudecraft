@@ -208,7 +208,7 @@ export const ALL_CLASSES: PlayerClass[] = [
   'warlock',
   'druid',
 ];
-export type ResourceType = 'rage' | 'mana' | 'energy';
+export type ResourceType = 'rage' | 'mana' | 'energy' | 'focus';
 export const OVERHEAD_EMOTE_IDS = [
   'wave',
   'laugh',
@@ -238,6 +238,7 @@ export type AiState = 'idle' | 'chase' | 'attack' | 'flee' | 'evade' | 'dead';
 
 export type AuraKind =
   | 'dot'
+  | 'doctrine'
   | 'slow'
   | 'stun'
   | 'stasis'
@@ -321,6 +322,9 @@ export type AuraKind =
   | 'brain_freeze'
   | 'winters_chill'
   | 'icicles'
+  // Vespers Priest: source-owned self resource built by Mindfracture and
+  // Effigy-bound Dirge ticks, consumed whole by Call Tithefiend.
+  | 'gloomtithe'
   // Chronomancer offensive cooldown (combat/chronomancy.ts): while worn, Aether
   // Darts does not consume the caster's Arcane Charges.
   | 'perfect_moment'
@@ -382,6 +386,7 @@ export type AuraKind =
   | 'buff_armor_pct'
   | 'buff_ap_pct'
   | 'buff_dmg_done'
+  | 'buff_heal_done'
   | 'buff_crit'
   | 'buff_rage_gen'
   | 'buff_reckless'
@@ -396,11 +401,20 @@ export type AuraKind =
   | 'victory_rush'
   | 'aoe_echo'
   | 'sure_crit'
+  // Hunter specialization state. These are visible owner auras, not resources.
+  // Pack Ferocity and Hunting Momentum carry their stage in `stacks`.
+  | 'hunter_ferocity'
+  | 'hunter_frenzy'
+  | 'hunter_cold_focus'
+  | 'hunter_momentum'
+  | 'hunter_reentry'
+  | 'hunter_bloodtrail'
   // Ice Floes (mage choice row): `value` = cast-time spells left that may be
   // cast while moving. player_motion skips its cancel while worn; finishing a
   // hard cast decrements the value and removes the aura at 0
   // (casting_lifecycle). Draws no rng.
   | 'ice_floes'
+  | 'processional_grace'
   // Overload (mage choice row): armed amplifier; the next mana spell is baked
   // 40% stronger and 50% costlier from a scaled copy of its resolved ability
   // (casting_lifecycle consumeOverload). value = the output fraction (0.4).
@@ -487,6 +501,9 @@ export interface Aura {
   // extendDot bookkeeping: seconds already added to this DoT application, so
   // the per-application maxBonus cap holds across channel ticks.
   extendedBy?: number;
+  // Vespers duplicate guard: one Dirge aura can mint at most one Gloomtithe
+  // stack in a simulation tick even if a hook is accidentally dispatched twice.
+  gloomtitheTick?: number;
   leechPct?: number; // dot only: fraction of tick damage healed back to source
   // dot only: the per-tick value was copied from ALREADY-RESOLVED damage (Ignite's
   // 40%-of-the-crit bank), so ticks pass dealDamage's alreadyFinal and skip the
@@ -1807,7 +1824,14 @@ export type AbilityEffect =
       requiresBehind?: boolean;
       weaponMult?: number;
     } // instant special attack (sinister strike, overpower, backstab)
-  | { type: 'directDamage'; min: number; max: number; vsRootedMult?: number }
+  | {
+      type: 'directDamage';
+      min: number;
+      max: number;
+      vsRootedMult?: number;
+      /** Optional authored coefficient that replaces the cast-time coefficient. */
+      spellPowerCoeff?: number;
+    }
   // rageOnInterrupt: rage minted when a cast is ACTUALLY cut (Pummel's
   // incentive design), scaled like ability-granted rage; never on a whiff.
   | { type: 'interrupt'; lockout: number; rageOnInterrupt?: number }
@@ -1843,6 +1867,64 @@ export type AbilityEffect =
   | { type: 'clearCooldowns'; abilities: string[] }
   | { type: 'breakRoots' }
   | { type: 'breakControl' }
+  | {
+      type: 'packCommand';
+      min: number;
+      max: number;
+      focus: number;
+      ferocityDuration: number;
+    }
+  | {
+      type: 'unleashBeast';
+      primaryMin: number;
+      primaryMax: number;
+      clapMin: number;
+      clapMax: number;
+      radius: number;
+      frenzyDuration: number;
+    }
+  | { type: 'howlingRage'; duration: number }
+  | {
+      type: 'hunterStampede';
+      beasts: number;
+      duration: number;
+      attackInterval: number;
+      min: number;
+      max: number;
+      rangedPowerCoeff: number;
+    }
+  | {
+      type: 'hunterBloodhook';
+      bleedTotal: number;
+      bleedDuration: number;
+      bleedInterval: number;
+      rangedPowerCoeff: number;
+      damageMult?: number;
+    }
+  | {
+      type: 'hunterShrapnel';
+      primaryMin: number;
+      primaryMax: number;
+      splashMin: number;
+      splashMax: number;
+      radius: number;
+      maxTargets: number;
+      spreadTotal: number;
+      spreadDuration: number;
+      spreadInterval: number;
+      damageMult?: number;
+    }
+  | { type: 'hunterTrailbreak'; distance: number }
+  | { type: 'hunterPackRally'; duration: number; radius: number }
+  | {
+      type: 'frostjawTrap';
+      radius: number;
+      armTime: number;
+      lifetime: number;
+      rootDuration: number;
+      slowMult: number;
+      slowDuration: number;
+    }
   // Ice Block: strip every player-removable debuff (control, DoTs, stat saps, ...)
   // Broader than breakRoots and breakControl. See effect_dispatch.
   | { type: 'cleanseSelf' }
@@ -2230,6 +2312,14 @@ export interface AbilityDef {
   // has not committed to a spec keeps the full kit, and talent/row GRANTS are
   // never filtered (the tree they come from is already spec-scoped).
   specs?: readonly string[];
+  // A known action may resolve to another authored ability while a visible aura
+  // state is active. The hotbar keeps the base id, so saved bindings survive the
+  // transformation. The replacement itself is never learned as a second action.
+  actionReplacement?: {
+    abilityId: string;
+    auraKind: AuraKind;
+    minStacks?: number;
+  };
   // Spec EXCLUSION (Reaver Strike vs Revenge): when set, a player whose CHOSEN
   // spec id is in the list DROPS this ability from their known list, even though
   // it is otherwise ungated. Used to swap one ability for a spec-exclusive
@@ -2701,7 +2791,29 @@ export interface DamageTick {
   amount: number;
 }
 
+/** Transient, non-command guardian runtime. Never serialized or put on the pet bar. */
+export interface GuardianState {
+  key: string;
+  remaining: number;
+  attackTimer: number;
+  attackInterval: number;
+  minDamage: number;
+  maxDamage: number;
+  /** Fraction of the owner's current Spell Power added to each guardian hit. */
+  spellPowerCoeff?: number;
+  school: string;
+  abilityId: string;
+  abilityName: string;
+  preferredTargetId: number | null;
+  maxRange: number;
+  /** Optional owner-scoped aura required on every valid target. */
+  requiredTargetAuraId?: string;
+  /** Fire-and-forget guardians may dismiss when their target contract is exhausted. */
+  dismissWhenUntargeted?: boolean;
+}
+
 export interface Entity {
+  guardianState?: GuardianState;
   // Transient talent-proc counters and internal cooldowns (combat/talent_procs.ts).
   // Never serialized; reset on death.
   procState?: { counters: Record<string, number>; icds: Record<string, number> };

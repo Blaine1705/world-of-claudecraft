@@ -28,6 +28,10 @@ import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
+import {
+  emptyPriestMarkerState,
+  priestMarkerStateForAuras,
+} from '../src/sim/combat/priest/presentation';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -1985,6 +1989,68 @@ describe('client-side delta merge', () => {
     (client as any).applySnapshot({ t: 'snap', ents: [w] });
     const aura = client.entities.get(e.id)?.auras.find((a) => a.id === 'pri_searing_light');
     expect(aura?.empowerAbilities).toEqual(['smite']);
+  });
+
+  it('round-trips Priest relationship and Gloomtithe presentation state online', () => {
+    const sim = new Sim({ seed: 29, playerClass: 'priest', autoEquip: true });
+    const e = sim.player;
+    e.auras.push(
+      {
+        id: 'priest_doctrine',
+        name: 'Doctrine',
+        kind: 'doctrine',
+        remaining: 30,
+        duration: 30,
+        value: 0.3,
+        sourceId: e.id,
+        school: 'holy',
+      },
+      {
+        id: 'seraphic_vigil',
+        name: 'Seraphic Vigil',
+        kind: 'heal_echo',
+        remaining: 30,
+        duration: 30,
+        value: 180,
+        sourceId: e.id,
+        school: 'holy',
+      },
+      {
+        id: 'priest_gloomtithe',
+        name: 'Gloomtithe',
+        kind: 'gloomtithe',
+        remaining: 15,
+        duration: 15,
+        value: 0,
+        stacks: 5,
+        sourceId: e.id,
+        school: 'shadow',
+      },
+      {
+        id: 'priest_effigy',
+        name: 'Effigy',
+        kind: 'hex',
+        remaining: 18,
+        duration: 18,
+        value: 0.3,
+        sourceId: e.id,
+        school: 'shadow',
+      },
+    );
+
+    const client = bareClient(e.id + 1000, 'priest');
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
+    const mirrored = client.entities.get(e.id);
+    if (!mirrored) throw new Error('online priest missing');
+
+    expect(priestMarkerStateForAuras(mirrored.auras, emptyPriestMarkerState())).toEqual({
+      doctrine: true,
+      vigil: true,
+      dirge: false,
+      effigy: true,
+      gloomtitheStacks: 5,
+      summonReady: true,
+    });
   });
 
   it('snaps the interpolation anchor on a teleport but tweens normal moves', () => {

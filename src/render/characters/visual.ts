@@ -45,6 +45,8 @@ export type { AnimState, BaseState } from './anim_state';
 // Current canvas height in device pixels, pushed by the renderer on resolution
 // changes so newly created weapon-skin VFX rigs size their point sprites right.
 let weaponVfxViewportHeight = 1080;
+const STONEBOUND_SHARD_GEOMETRY = new THREE.OctahedronGeometry(1, 0);
+type WeaponAuraMode = 'none' | 'sanguine' | 'stonebound';
 
 export function setWeaponVfxViewportHeight(heightPx: number): void {
   weaponVfxViewportHeight = Math.max(1, Math.round(heightPx));
@@ -122,6 +124,14 @@ const MOONKIN_TINT = new THREE.Color(0x9d6bff);
 // (the fire aura around it comes from vfx.formAura, not the material). Kept
 // dark enough that the body still shades and the flames read against it.
 const METAMORPH_TINT = new THREE.Color(0x4f2170);
+const FEROCITY_TINTS = [
+  new THREE.Color(0xd98a62),
+  new THREE.Color(0xd84a35),
+  new THREE.Color(0xd62418),
+] as const;
+const FEROCITY_TINT_STRENGTH = [0.18, 0.32, 0.48] as const;
+const FEROCITY_EMISSIVE = [0x2a0802, 0x4a0803, 0x6a0803] as const;
+const FEROCITY_EMISSIVE_STRENGTH = [0.08, 0.15, 0.23] as const;
 
 // shared invisible click capsule — raycaster ignores `visible`, render doesn't
 let clickGeoSingleton: THREE.CylinderGeometry | null = null;
@@ -201,12 +211,17 @@ export class CharacterVisual {
    *  overlay clone as "original" and the golden ring never restores. */
   private haloBaseMaterial: THREE.Material | THREE.Material[] | null = null;
   private weaponAuraMeshes: THREE.Mesh[] = [];
-  private weaponAuraOn = false;
+  private weaponAuraMode: WeaponAuraMode = 'none';
   private ghostMaterials = new Map<THREE.Material, THREE.Material>();
   private soulRendMaterials = new Map<THREE.Material, THREE.Material>();
   private shadowformMaterials = new Map<THREE.Material, THREE.Material>();
   private moonkinMaterials = new Map<THREE.Material, THREE.Material>();
   private metamorphMaterials = new Map<THREE.Material, THREE.Material>();
+  private ferocityMaterials = [
+    new Map<THREE.Material, THREE.Material>(),
+    new Map<THREE.Material, THREE.Material>(),
+    new Map<THREE.Material, THREE.Material>(),
+  ];
 
   private baseState: BaseState = 'idle';
   private current: THREE.AnimationAction | null = null;
@@ -229,6 +244,8 @@ export class CharacterVisual {
   private shadowform = false;
   private moonkin = false;
   private metamorph = false;
+  private ferocityStage = 0;
+  private presentationScale = 1;
   private bobPhase = Math.random() * Math.PI * 2;
 
   constructor(
@@ -628,6 +645,21 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
+  /** Scale only the drawn pose. The click proxy remains at its authoritative size. */
+  setPresentationScale(scale: number): void {
+    const next = Number.isFinite(scale) ? Math.min(1.2, Math.max(1, scale)) : 1;
+    if (next === this.presentationScale) return;
+    this.presentationScale = next;
+    this.poseWrap.scale.setScalar(next);
+  }
+
+  setFerocityStage(stage: number): void {
+    const next = Number.isFinite(stage) ? Math.min(3, Math.max(0, Math.trunc(stage))) : 0;
+    if (next === this.ferocityStage) return;
+    this.ferocityStage = next;
+    this.applyVisualMaterials();
+  }
+
   setShadowform(on: boolean): void {
     if (on === this.shadowform) return;
     this.shadowform = on;
@@ -851,44 +883,78 @@ export class CharacterVisual {
     this.rebuildWeaponAura();
   }
 
-  setWeaponAura(on: boolean): void {
-    if (on === this.weaponAuraOn) return;
-    this.weaponAuraOn = on;
+  setWeaponAura(mode: WeaponAuraMode): void {
+    if (mode === this.weaponAuraMode) return;
+    this.weaponAuraMode = mode;
     this.rebuildWeaponAura();
   }
 
   private rebuildWeaponAura(): void {
     this.disposeWeaponAura();
-    if (!this.weaponAuraOn) return;
+    if (this.weaponAuraMode === 'none') return;
 
     const weaponHolders: THREE.Object3D[] = [];
     this.model.traverse((o) => {
       if (o.userData.swapWeaponHolder) weaponHolders.push(o);
     });
-    const mainhand = weaponHolders.find((o) => o.userData.heldSlot === 0) ?? weaponHolders[0];
-    if (!mainhand) return;
-    mainhand.traverse((o) => {
-      const mesh = o as THREE.Mesh;
-      if (!mesh.isMesh || !mesh.userData.weaponMesh || !mesh.parent) return;
-      const aura = new THREE.Mesh(
-        mesh.geometry,
+    const holders =
+      this.weaponAuraMode === 'stonebound'
+        ? weaponHolders
+        : [weaponHolders.find((o) => o.userData.heldSlot === 0) ?? weaponHolders[0]];
+    for (const holder of holders) {
+      holder?.traverse((o) => {
+        const mesh = o as THREE.Mesh;
+        if (!mesh.isMesh || !mesh.userData.weaponMesh || !mesh.parent) return;
+        const stonebound = this.weaponAuraMode === 'stonebound';
+        const aura = new THREE.Mesh(
+          mesh.geometry,
+          new THREE.MeshBasicMaterial({
+            color: stonebound ? 0x9a9384 : 0x45ff9a,
+            transparent: true,
+            opacity: stonebound ? 0.72 : 0.42,
+            depthWrite: false,
+            blending: stonebound ? THREE.NormalBlending : THREE.AdditiveBlending,
+            side: THREE.DoubleSide,
+            wireframe: stonebound,
+          }),
+        );
+        aura.position.copy(mesh.position);
+        aura.quaternion.copy(mesh.quaternion);
+        aura.scale.copy(mesh.scale).multiplyScalar(stonebound ? 1.14 : 1.08);
+        aura.renderOrder = 3;
+        aura.userData.weaponVfxMesh = true;
+        mesh.parent.add(aura);
+        this.weaponAuraMeshes.push(aura);
+      });
+    }
+    if (this.weaponAuraMode === 'stonebound') this.buildStoneboundArmorShards();
+  }
+
+  private buildStoneboundArmorShards(): void {
+    const placements = [
+      { x: -0.42, y: this.height * 0.7, z: 0, sx: 0.2, sy: 0.13, rz: -0.35 },
+      { x: 0.42, y: this.height * 0.7, z: 0, sx: 0.2, sy: 0.13, rz: 0.35 },
+      { x: 0, y: this.height * 0.53, z: 0.2, sx: 0.24, sy: 0.18, rz: 0 },
+    ];
+    for (const placement of placements) {
+      const shard = new THREE.Mesh(
+        STONEBOUND_SHARD_GEOMETRY,
         new THREE.MeshBasicMaterial({
-          color: 0x45ff9a,
+          color: 0x777065,
           transparent: true,
-          opacity: 0.42,
+          opacity: 0.82,
+          wireframe: true,
           depthWrite: false,
-          blending: THREE.AdditiveBlending,
-          side: THREE.DoubleSide,
         }),
       );
-      aura.position.copy(mesh.position);
-      aura.quaternion.copy(mesh.quaternion);
-      aura.scale.copy(mesh.scale).multiplyScalar(1.08);
-      aura.renderOrder = 3;
-      aura.userData.weaponVfxMesh = true;
-      mesh.parent.add(aura);
-      this.weaponAuraMeshes.push(aura);
-    });
+      shard.position.set(placement.x, placement.y, placement.z);
+      shard.rotation.z = placement.rz;
+      shard.scale.set(placement.sx, placement.sy, 0.11);
+      shard.renderOrder = 3;
+      shard.userData.weaponVfxMesh = true;
+      this.poseWrap.add(shard);
+      this.weaponAuraMeshes.push(shard);
+    }
   }
 
   private disposeWeaponAura(): void {
@@ -999,10 +1065,18 @@ export class CharacterVisual {
     const materials = new Set<THREE.Material>([
       ...this.ghostMaterials.values(),
       ...this.soulRendMaterials.values(),
+      ...this.shadowformMaterials.values(),
+      ...this.moonkinMaterials.values(),
+      ...this.metamorphMaterials.values(),
+      ...this.ferocityMaterials.flatMap((cache) => [...cache.values()]),
     ]);
     for (const material of materials) material.dispose();
     this.ghostMaterials.clear();
     this.soulRendMaterials.clear();
+    this.shadowformMaterials.clear();
+    this.moonkinMaterials.clear();
+    this.metamorphMaterials.clear();
+    for (const cache of this.ferocityMaterials) cache.clear();
   }
 
   /** Move every held prop between the hands and the sheathed on-back pose (the
@@ -1128,7 +1202,33 @@ export class CharacterVisual {
     if (this.metamorph) return this.metamorphMaterial(material);
     if (this.moonkin) return this.moonkinMaterial(material);
     if (this.shadowform) return this.shadowformMaterial(material);
+    if (this.ferocityStage > 0) return this.ferocityMaterial(material, this.ferocityStage);
     return material;
+  }
+
+  private ferocityMaterial(material: THREE.Material, stage: number): THREE.Material {
+    const index = Math.min(2, Math.max(0, stage - 1));
+    const cache = this.ferocityMaterials[index];
+    const cached = cache.get(material);
+    if (cached) return cached;
+    const marked = material.clone();
+    const withColor = marked as THREE.Material & {
+      color?: THREE.Color;
+      emissive?: THREE.Color;
+      emissiveIntensity?: number;
+    };
+    if (withColor.color) {
+      withColor.color.lerp(FEROCITY_TINTS[index], FEROCITY_TINT_STRENGTH[index]);
+    }
+    if (withColor.emissive) {
+      withColor.emissive.setHex(FEROCITY_EMISSIVE[index]);
+      withColor.emissiveIntensity = Math.max(
+        withColor.emissiveIntensity ?? 0,
+        FEROCITY_EMISSIVE_STRENGTH[index],
+      );
+    }
+    cache.set(material, marked);
+    return marked;
   }
 
   private ghostMaterial(material: THREE.Material): THREE.Material {

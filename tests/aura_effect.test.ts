@@ -32,6 +32,24 @@ describe('auraEffectDescriptor', () => {
     expect(d?.school).toBeUndefined();
   });
 
+  it('describes Mending Current as a whole pool and its relative party-frame size', () => {
+    expect(desc({ id: 'shaman_mending_current', kind: 'hot', value: 300 })).toEqual({
+      key: 'hudChrome.auraEffect.mendingCurrent',
+      nums: { value: 300 },
+    });
+    expect(desc({ id: 'shaman_mending_current', kind: 'hot', value: 300, poolPct: 30 })).toEqual({
+      key: 'hudChrome.auraEffect.mendingCurrentPercent',
+      nums: { pct: 30 },
+    });
+  });
+
+  it('shows the current Pack Ferocity stack and total pet damage bonus', () => {
+    expect(desc({ kind: 'hunter_ferocity', value: 2, stacks: 2 })).toEqual({
+      key: 'hudChrome.auraEffect.hunterFerocity',
+      nums: { stacks: 2, pct: 20 },
+    });
+  });
+
   it('reports a movement slow as a percent reduction from the multiplier', () => {
     expect(desc({ kind: 'slow', value: 0.5 })).toEqual({
       key: 'hudChrome.auraEffect.slow',

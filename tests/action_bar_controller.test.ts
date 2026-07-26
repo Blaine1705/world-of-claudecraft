@@ -25,6 +25,8 @@ class MemoryStorage {
 
 interface MutableState {
   known: string[];
+  level: number;
+  spec: string | null;
   auras: string[];
   sportTeam: number | null | undefined;
   showAttackButton: boolean;
@@ -51,6 +53,8 @@ function makeHarness(
 ): Harness {
   const state: MutableState = {
     known: [...known],
+    level: 20,
+    spec: null,
     auras: [],
     sportTeam: undefined,
     showAttackButton: true,
@@ -59,6 +63,8 @@ function makeHarness(
     storage,
     playerClass,
     playerName: 'ActionbarTester',
+    playerLevel: () => state.level,
+    talentSpec: () => state.spec,
     knownAbilityIds: () => state.known,
     hasAura: (kind) => state.auras.includes(kind),
     isInSportMatch: () => state.sportTeam !== undefined && state.sportTeam !== null,
@@ -341,6 +347,116 @@ describe('ActionBarController form persistence', () => {
   });
 });
 
+describe('ActionBarController owned-class level 20 defaults', () => {
+  const beastMasteryKnown = [
+    'arcane_shot',
+    'pack_command',
+    'counter_shot',
+    'trailbreak',
+    'wildheart',
+  ];
+  const marksmanshipKnown = [
+    'arcane_shot',
+    'measured_shot',
+    'aimed_shot',
+    'rapid_fire',
+    'counter_shot',
+    'trailbreak',
+    'wildheart',
+  ];
+
+  it('seeds a new level 20 character in the designed priority order', () => {
+    const harness = makeHarness('hunter', beastMasteryKnown, bar());
+    harness.state.spec = 'beast_mastery';
+
+    harness.controller.init();
+    harness.controller.syncKnownAbilities();
+
+    expect(harness.controller.actions).toEqual(
+      bar('pack_command', 'arcane_shot', 'counter_shot', 'trailbreak', 'wildheart'),
+    );
+  });
+
+  it('replaces an untouched generated bar when the character changes spec', () => {
+    const harness = makeHarness('hunter', beastMasteryKnown, bar());
+    harness.state.spec = 'beast_mastery';
+    harness.controller.init();
+    harness.controller.syncKnownAbilities();
+
+    harness.state.spec = 'marksmanship';
+    harness.state.known = marksmanshipKnown;
+    harness.controller.syncKnownAbilities();
+
+    expect(harness.controller.actions).toEqual(
+      bar(
+        'measured_shot',
+        'aimed_shot',
+        'rapid_fire',
+        'arcane_shot',
+        'counter_shot',
+        'trailbreak',
+        'wildheart',
+      ),
+    );
+  });
+
+  it('preserves a customized bar through a spec change while removing invalid abilities', () => {
+    const harness = makeHarness('hunter', beastMasteryKnown, bar());
+    harness.state.spec = 'beast_mastery';
+    harness.controller.init();
+    harness.controller.syncKnownAbilities();
+    harness.controller.replaceActions(
+      bar('arcane_shot', 'pack_command', 'wildheart', 'counter_shot', 'trailbreak'),
+    );
+    harness.controller.saveActions();
+
+    harness.state.spec = 'marksmanship';
+    harness.state.known = marksmanshipKnown;
+    harness.controller.syncKnownAbilities();
+
+    expect(harness.controller.actions.slice(0, 7)).toEqual([
+      { type: 'ability', id: 'arcane_shot' },
+      { type: 'ability', id: 'measured_shot' },
+      { type: 'ability', id: 'wildheart' },
+      { type: 'ability', id: 'counter_shot' },
+      { type: 'ability', id: 'trailbreak' },
+      { type: 'ability', id: 'aimed_shot' },
+      { type: 'ability', id: 'rapid_fire' },
+    ]);
+    expect(harness.controller.actions.some((action) => action?.id === 'pack_command')).toBe(false);
+  });
+
+  it('does not overwrite a stored custom or intentionally empty bar', () => {
+    for (const storedBar of [bar('arcane_shot', 'pack_command'), bar()]) {
+      const storage = new MemoryStorage();
+      storage.setItem('woc_hotbar_hunter_ActionbarTester', JSON.stringify(storedBar));
+      const harness = makeHarness('hunter', beastMasteryKnown, bar(), storage);
+      harness.state.spec = 'beast_mastery';
+
+      harness.controller.init();
+      harness.controller.syncKnownAbilities();
+
+      expect(harness.controller.actions).toEqual(storedBar);
+    }
+  });
+
+  it('upgrades the untouched learned-order bar when the character reaches level 20', () => {
+    const harness = makeHarness('hunter', beastMasteryKnown, bar());
+    harness.state.spec = 'beast_mastery';
+    harness.state.level = 19;
+    harness.controller.init();
+    harness.controller.syncKnownAbilities();
+    expect(harness.controller.actions).toEqual(bar(...beastMasteryKnown));
+
+    harness.state.level = 20;
+    harness.controller.syncKnownAbilities();
+
+    expect(harness.controller.actions).toEqual(
+      bar('pack_command', 'arcane_shot', 'counter_shot', 'trailbreak', 'wildheart'),
+    );
+  });
+});
+
 describe('ActionBarController attack slot', () => {
   it('loads, hides, exposes, and removes the persisted freed-slot action', () => {
     const storage = new MemoryStorage();
@@ -480,6 +596,8 @@ describe('ActionBarController persistence seam', () => {
       storage,
       playerClass: 'warrior',
       playerName: 'ActionbarTester',
+      playerLevel: () => 20,
+      talentSpec: () => null,
       knownAbilityIds: () => ['heroic_strike', 'sunder_armor'],
       hasAura: () => false,
       isInSportMatch: () => false,
@@ -521,6 +639,8 @@ describe('ActionBarController persistence seam', () => {
       storage,
       playerClass: 'warrior',
       playerName: 'ActionbarTester',
+      playerLevel: () => 20,
+      talentSpec: () => null,
       knownAbilityIds: () => ['heroic_strike'],
       hasAura: () => false,
       isInSportMatch: () => false,

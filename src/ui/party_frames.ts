@@ -1,5 +1,5 @@
 import { isPartyFrameRelevantAura } from '../sim/aura_classify';
-import type { PartyInfo, PartyMemberInfo } from '../world_api';
+import type { PartyInfo, PartyMemberAura, PartyMemberInfo } from '../world_api';
 
 export const PARTY_FRAME_RANGE_YD = 100;
 
@@ -33,6 +33,24 @@ export const DEFAULT_PARTY_FRAME_DISPLAY: PartyFrameDisplayConfig = {
 const ROLE_ORDER = { tank: 0, healer: 1, dps: 2 } as const;
 
 export { isPartyFrameRelevantAura as partyFrameAuraIsRelevant };
+
+const PARTY_AURA_PRIORITY: Readonly<Record<string, number>> = {
+  priest_doctrine: 0,
+  seraphic_vigil: 1,
+};
+
+/** Keep relationship-defining Priest cues at the visible edge of clipped desktop
+ * and mobile aura strips while retaining stable server order for every other aura. */
+export function prioritizePartyFrameAuras(auras: readonly PartyMemberAura[]): PartyMemberAura[] {
+  return auras
+    .map((aura, index) => ({ aura, index }))
+    .sort(
+      (a, b) =>
+        (PARTY_AURA_PRIORITY[a.aura.id] ?? 2) - (PARTY_AURA_PRIORITY[b.aura.id] ?? 2) ||
+        a.index - b.index,
+    )
+    .map(({ aura }) => aura);
+}
 
 /** Resolve the persisted presentation choice. Automatic keeps classic five-player
  * frames, then switches to the compact grid when the party is converted to a raid. */
@@ -125,7 +143,9 @@ export function partyFrameSignature(
     // The aura strip, appended inline (no intermediate array): a joined/left aura,
     // a kind flip, or a sap-sign flip changes the string and repaints the row.
     if (m.auras) {
-      for (const a of m.auras) sig += `${a.id},${a.kind},${a.neg ? 1 : 0},${a.remaining ?? ''};`;
+      for (const a of m.auras) {
+        sig += `${a.id},${a.kind},${a.neg ? 1 : 0},${a.remaining ?? ''},${a.poolPct ?? ''};`;
+      }
     }
     sig += `W${m.rewind ?? 0}:I${m.incomingHeal ?? 0}:A${m.hasAggro ?? 0}:C${m.connected ?? 1}|`;
   }

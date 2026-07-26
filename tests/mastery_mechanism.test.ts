@@ -49,22 +49,20 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
     expect(retThorns && 'value' in retThorns ? retThorns.value : null).toBe(6);
   });
 
-  it('Resolve Unbroken strengthens its stat buff via buffPct, not the buff-exempt dmgPct', () => {
-    // The active Talents V2 row buffs a percent stat buff; with damage mods no longer
-    // scaling percent buffs, it must ride buffPct. The row's 50% modifier scales the
-    // +5% base buff to the authored +7.5%, without rounding the percentage to 8%.
-    const mods = computeTalentModifiers(
-      'priest',
-      { spec: null, rows: { 17: 'pri_r17_improved_fortitude' } },
-      20,
+  it('the Protection power floor strengthens its rate buff through buffPct', () => {
+    // This fixture must survive class-row redesigns. Protection's passive package
+    // strengthens a percent armor aura through buffPct, while damage modifiers stay
+    // exempt from utility-rate buffs.
+    const mods = computeTalentModifiers('paladin', { spec: 'protection', rows: {} }, 20);
+    const devotion = abilitiesKnownAt('paladin', 20, mods).find(
+      (a) => a.def.id === 'devotion_aura',
     );
-    const fortitude = abilitiesKnownAt('priest', 20, mods).find(
-      (a) => a.def.id === 'power_word_fortitude',
+    const buff = devotion?.effects.find(
+      (e) => e.type === 'buffTarget' && e.kind === 'buff_armor_pct',
     );
-    const buff = fortitude?.effects.find(
-      (e) => e.type === 'buffTarget' && e.kind === 'buff_sta_pct',
-    );
-    expect(buff && 'value' in buff ? buff.value : null).toBe(7.5);
+    // The base 10% aura gains the authored 40% buff increase without rounding
+    // the percentage as though it were a flat armor magnitude.
+    expect(buff && 'value' in buff ? buff.value : null).toBe(14);
   });
 });
 

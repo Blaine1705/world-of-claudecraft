@@ -6,7 +6,7 @@
 // parity drives both world shapes to identical output.
 
 import { describe, expect, it, vi } from 'vitest';
-import { type AbilityDef, type Aura, type ItemDef, MELEE_RANGE } from '../src/sim/types';
+import { type AbilityDef, type ItemDef, MELEE_RANGE } from '../src/sim/types';
 import {
   ABILITY_ICON_PREFIX,
   type ActionBarAbility,
@@ -81,6 +81,7 @@ function fakeDeps(): ActionBarDeps {
 }
 
 interface WorldOpts {
+  playerId?: number;
   autoAttack?: boolean;
   dead?: boolean;
   resource?: number;
@@ -91,6 +92,8 @@ interface WorldOpts {
   playerPos?: { x: number; y: number; z: number };
   targetPos?: { x: number; y: number; z: number } | null;
   targetDead?: boolean;
+  targetMaxHp?: number;
+  targetAuras?: ActionBarAuraInput[];
   inventory?: { itemId: string; count: number }[];
   abilityCharges?: {
     [id: string]: { charges: number; recharge?: number; rechargeLength?: number } | undefined;
@@ -103,6 +106,7 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
   const targetPos = opts.targetPos === undefined ? null : opts.targetPos;
   return {
     player: {
+      id: opts.playerId,
       autoAttack: opts.autoAttack ?? false,
       dead: opts.dead ?? false,
       resource: opts.resource ?? 100,
@@ -115,7 +119,15 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       stealthed: opts.stealthed ?? false,
       auras: opts.auras ?? [],
     },
-    target: targetPos === null ? null : { dead: opts.targetDead ?? false, pos: targetPos },
+    target:
+      targetPos === null
+        ? null
+        : {
+            dead: opts.targetDead ?? false,
+            pos: targetPos,
+            maxHp: opts.targetMaxHp,
+            auras: opts.targetAuras,
+          },
     inventory: opts.inventory ?? [],
   };
 }
@@ -392,6 +404,27 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     expect(state.slots[1].procGlow).toBe(false); // not named -> no glow
   });
 
+  it('keeps Tithefiend glowing while Gloomtithe is fully banked', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('summon_tithefiend', { cost: 10 }) })),
+      fakeDeps(),
+    );
+
+    const ready = view.tick(
+      world({
+        auras: [{ id: 'priest_gloomtithe', kind: 'gloomtithe', stacks: 5 }],
+      }),
+    );
+    expect(ready.slots[0].procGlow).toBe(true);
+
+    const building = view.tick(
+      world({
+        auras: [{ id: 'priest_gloomtithe', kind: 'gloomtithe', stacks: 4 }],
+      }),
+    );
+    expect(building.slots[0].procGlow).toBe(false);
+  });
+
   it('lets unscoped next-cast auras empower every eligible ability slot', () => {
     const view = createActionBarView(
       descriptor(
@@ -435,6 +468,64 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
 });
 
 describe('actionBarView: free-cost proc glow + kill-window (procGlow / usable)', () => {
+  it('glows both Thundercall vents at a full five-charge bank', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('earth_shock', { cost: 25 }) }),
+        slot(2, { ability: ability('earthquake', { cost: 55 }) }),
+        slot(3, { ability: ability('lightning_bolt', { cost: 20 }) }),
+      ),
+      fakeDeps(),
+    );
+    const state = view.tick(
+      world({
+        auras: [{ id: 'shaman_thunder_charges', kind: 'internal_cd', stacks: 5 }],
+      }),
+    );
+    expect(state.slots.map((entry) => entry.procGlow)).toEqual([true, true, false]);
+  });
+
+  it('uses and glows the Flow State discounted cost instead of dimming a free action', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('healing_wave', { cost: 25 }) }),
+        slot(2, { ability: ability('chain_heal', { cost: 60 }) }),
+      ),
+      fakeDeps(),
+    );
+    const state = view.tick(
+      world({
+        resource: 0,
+        auras: [{ id: 'shaman_flow_state_ready', kind: 'internal_cd' }],
+      }),
+    );
+    expect(state.slots[0]).toMatchObject({ usable: true, procGlow: true });
+    expect(state.slots[1]).toMatchObject({ usable: false, procGlow: true });
+  });
+
+  it('marks Tidecall empowered when the targeted ally already has a full owned pool', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('tidecall', { cost: 40 }) })),
+      fakeDeps(),
+    );
+    const capped = view.tick(
+      world({
+        playerId: 7,
+        targetPos: { x: 1, y: 0, z: 0 },
+        targetMaxHp: 1_000,
+        targetAuras: [
+          {
+            id: 'shaman_mending_current',
+            sourceId: 7,
+            kind: 'hot',
+            value: 500,
+          },
+        ],
+      }),
+    ).slots[0];
+    expect(capped.empowered).toBe(true);
+  });
+
   it('a Battle Trance proc glows and frees exactly the scoped abilities at zero rage', () => {
     const view = createActionBarView(
       descriptor(

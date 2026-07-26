@@ -239,6 +239,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Energy',
         rage: 'Rage',
+        focus: 'Focus',
       },
       roles: {
         warrior: 'Tank / Melee DPS',
@@ -439,6 +440,7 @@ export const shellStrings = {
         mana: 'Maná',
         energy: 'Energía',
         rage: 'Ira',
+        focus: 'Concentración',
       },
       roles: {
         warrior: 'Tanque / DPS cuerpo a cuerpo',
@@ -642,6 +644,7 @@ export const shellStrings = {
         mana: 'Maná',
         energy: 'Energía',
         rage: 'Ira',
+        focus: 'Concentración',
       },
       roles: {
         warrior: 'Tanque / DPS cuerpo a cuerpo',
@@ -846,6 +849,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Énergie',
         rage: 'Rage',
+        focus: 'Concentration',
       },
       roles: {
         warrior: 'Tank / DPS mêlée',
@@ -1050,6 +1054,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Énergie',
         rage: 'Rage',
+        focus: 'Concentration',
       },
       roles: {
         warrior: 'Tank / DPS mêlée',
@@ -1266,6 +1271,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Energy',
         rage: 'Rage',
+        focus: 'Focus',
       },
       roles: {
         warrior: 'Tank / Melee DPS',
@@ -1468,6 +1474,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Energia',
         rage: 'Rabbia',
+        focus: 'Concentrazione',
       },
       roles: {
         warrior: 'Tank / DPS da mischia',
@@ -1672,6 +1679,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Energie',
         rage: 'Wut',
+        focus: 'Fokus',
       },
       roles: {
         warrior: 'Tank / Nahkampf-DPS',
@@ -1873,6 +1881,7 @@ export const shellStrings = {
         mana: '法力',
         energy: '能量',
         rage: '怒气',
+        focus: '集中值',
       },
       roles: {
         warrior: '坦克 / 近战 DPS',
@@ -2061,6 +2070,7 @@ export const shellStrings = {
         mana: '法力',
         energy: '能量',
         rage: '怒氣',
+        focus: '集中值',
       },
       roles: {
         warrior: '坦克 / 近戰 DPS',
@@ -2250,6 +2260,7 @@ export const shellStrings = {
         mana: '마나',
         energy: '기력',
         rage: '분노',
+        focus: '집중',
       },
       roles: {
         warrior: '탱커 / 근접 DPS',
@@ -2450,6 +2461,7 @@ export const shellStrings = {
         mana: 'マナ',
         energy: 'エネルギー',
         rage: '怒り',
+        focus: '集中値',
       },
       roles: {
         warrior: 'タンク / 近接DPS',
@@ -2648,6 +2660,7 @@ export const shellStrings = {
         mana: 'Mana',
         energy: 'Energia',
         rage: 'Raiva',
+        focus: 'Foco',
       },
       roles: {
         warrior: 'Tanque / DPS corpo a corpo',
@@ -2851,6 +2864,7 @@ export const shellStrings = {
         mana: 'Мана',
         energy: 'Энергия',
         rage: 'Ярость',
+        focus: 'Концентрация',
       },
       roles: {
         warrior: 'Танк / ближний DPS',

@@ -2807,7 +2807,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'En smygöppnare som krafsar fienden för vapenskada plus {damage} och vållar blödningsskada över 9 sek. Ger 1 kombopoäng. Endast i vargform.',
   'entities.abilities.rake.name': 'Flå',
-  'entities.abilities.rapid_fire.description': 'Ökar din anfallshastighet med 40 % i 15 sek.',
+  'entities.abilities.rapid_fire.description':
+    'Kanalisera sex snabba skott under 2,4 sek. medan du rör dig. Varje skott orsakar {damage} fysisk skada.',
   'entities.abilities.rapid_fire.name': 'Febrigt drag',
   'entities.abilities.raptor_strike.description':
     'Ett kraftfullt närstridsanfall som ökar skadan med {damage}. Aktiveras vid ditt nästa hugg.',
@@ -4437,6 +4438,16 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Din huvudsakliga eldkanon, landar ett slag och lämnar målet brinnande.',
   'guide.abilityHook.flame_shock':
     'En omedelbar brand som slår direkt och fortsätter att svida över tid.',
+  'guide.abilityHook.galeheart_weapon':
+    'Fyller båda vapnen med stormvind och belönar en jämn attackrytm.',
+  'guide.abilityHook.lifespring_weapon':
+    'Fyller ditt vapen med läkande vatten och stärker ditt fortlöpande läkningsflöde.',
+  'guide.abilityHook.tidecall':
+    'Kallar på tidvattnet och förstärker nästa följd av läkande besvärjelser.',
+  'guide.abilityHook.stoneward':
+    'Reser en laddad stensköld som omvandlar mottagen skada till läkning.',
+  'guide.abilityHook.primal_exaltation':
+    'Släpper kortvarigt lös din specialiserings elementarkraft.',
   'guide.abilityHook.frost_armor':
     'En varaktig självförstärkning som härdar din rustning före en strid.',
   'guide.abilityHook.frostbolt':

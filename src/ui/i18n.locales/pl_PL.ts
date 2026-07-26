@@ -2974,7 +2974,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.description':
     'Otwarcie ze skradania, które rozdziera wroga za obrażenia broni plus {damage} i powoduje krwawienie w ciągu 9 sek. Przyznaje 1 punkt kombinacji. Tylko w postaci wilka.',
   'entities.abilities.rake.name': 'Zdzieranie',
-  'entities.abilities.rapid_fire.description': 'Zwiększa twoją prędkość ataku o 40% na 15 sek.',
+  'entities.abilities.rapid_fire.description':
+    'Podczas ruchu wystrzel sześć szybkich strzałów w ciągu 2,4 sek. Każdy zadaje {damage} obrażeń fizycznych.',
   'entities.abilities.rapid_fire.name': 'Gorączkowy ostrzał',
   'entities.abilities.raptor_strike.description':
     'Potężny atak w zwarciu, który zwiększa obrażenia o {damage}. Aktywuje się przy następnym uderzeniu.',
@@ -4564,6 +4565,15 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.fireball': 'Twój główny ognisty czar; trafia mocno i pozostawia płonący cel.',
   'guide.abilityHook.flame_shock':
     'Natychmiastowe podpalenie, które uderza od razu i nadal przypieka z czasem.',
+  'guide.abilityHook.galeheart_weapon':
+    'Nasyca obie bronie burzowym wiatrem i nagradza równy rytm ataków.',
+  'guide.abilityHook.lifespring_weapon':
+    'Nasyca broń leczniczą wodą i wzmacnia ciągły nurt uzdrawiania.',
+  'guide.abilityHook.tidecall': 'Przyzywa przypływ i wzmacnia kolejną serię zaklęć leczących.',
+  'guide.abilityHook.stoneward':
+    'Wznosi naładowaną kamienną tarczę, która zamienia otrzymane obrażenia w leczenie.',
+  'guide.abilityHook.primal_exaltation':
+    'Na krótko uwalnia moc żywiołów właściwą dla twojej specjalizacji.',
   'guide.abilityHook.frost_armor': 'Trwałe wzmocnienie, które utwardza twój pancerz przed walką.',
   'guide.abilityHook.frostbolt':
     'Uderza z dystansu i spowalnia cel, by nie mógł się do ciebie zbliżyć.',
