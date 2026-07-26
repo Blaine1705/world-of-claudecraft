@@ -69,12 +69,29 @@ export const GATHER_NODES: GatherNodeDef[] = [
     tier: 1,
   },
 
-  // Eastbrook Vale, herb patches near Mirror Lake
+  // Eastbrook Vale, herb patches along Mirror Lake's bank. All three used to sit
+  // ON the lake floor, about 4 yards under the surface (the lake is centred at
+  // (-92, 88) with radius 30, and its basin bottoms out at waterLevel - 4), so
+  // the only way to pick a herb in the starting zone was to swim to the bottom
+  // of a lake, and none of the three had anywhere inside harvest reach a player
+  // could stand. They now run along the dry bank 33 to 36 yards out from the
+  // lake centre, still in sight of the water, clearing its surface by 3.2 to 4.4
+  // yards on ground flat enough to work.
+  // tests/gather_node_placement.test.ts pins every arm.
+  //
+  // One deliberate consequence: the old spots sat inside the Mirror Lake POI's
+  // 20-yard visit radius, so a herbalist used to be credited that landmark just
+  // by picking here, and the bank is 10 to 14 yards outside it. Wayfarer of the
+  // Vale now asks for an actual walk to the shore, which is what a landmark
+  // ought to ask, and the walk stays dry: the visit radius holds plenty of dry
+  // standable ground, up to 4.96 yards of freeboard, so nothing about that deed
+  // requires swimming. tests/gather_node_placement.test.ts pins that property
+  // too, since after this change nothing else in the suite touches that POI.
   {
     id: 'herb_eastbrook_1',
     zoneId: 'eastbrook_vale',
     type: 'herb',
-    pos: { x: -86, z: 90 },
+    pos: { x: -59, z: 91 },
     level: 4,
     tier: 1,
   },
@@ -82,7 +99,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_eastbrook_2',
     zoneId: 'eastbrook_vale',
     type: 'herb',
-    pos: { x: -92, z: 80 },
+    pos: { x: -57, z: 82 },
     level: 4,
     tier: 1,
   },
@@ -90,7 +107,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_eastbrook_3',
     zoneId: 'eastbrook_vale',
     type: 'herb',
-    pos: { x: -80, z: 95 },
+    pos: { x: -58, z: 99 },
     level: 4,
     tier: 1,
   },
@@ -146,11 +163,16 @@ export const GATHER_NODES: GatherNodeDef[] = [
     tier: 1,
   },
 
+  // Two of the three marsh herb patches were also on a lake floor, each in the
+  // dead centre of one of the zone's two smaller pools ((60, 380) radius 25 and
+  // (-40, 450) radius 20), about 4 yards under. Both moved out to the dry shore
+  // of the same pool, so a marsh herb still grows by marsh water and the patch
+  // is workable. herb_mirefen_3 was already on dry ground and has not moved.
   {
     id: 'herb_mirefen_1',
     zoneId: 'mirefen_marsh',
     type: 'herb',
-    pos: { x: 60, z: 385 },
+    pos: { x: 29, z: 395 },
     level: 10,
     tier: 1,
   },
@@ -158,7 +180,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_mirefen_2',
     zoneId: 'mirefen_marsh',
     type: 'herb',
-    pos: { x: -45, z: 452 },
+    pos: { x: -66, z: 458 },
     level: 10,
     tier: 1,
   },
@@ -193,11 +215,27 @@ export const GATHER_NODES: GatherNodeDef[] = [
     tier: 1,
   },
 
+  // This stand was the near-vertical one: it stood in the Glimmermere shallows
+  // with only 0.46 yards of freeboard, and the lake wall inside its own harvest
+  // reach climbs at 3.28 rise/run against a movement climb limit of 1.5, so a
+  // player working it was pushed off the face. The node itself measured a
+  // walkable 0.94, which is why nothing short of a reach sweep found it. Moved
+  // round to a rise 13 yards out from the lake centre. That is still inside the
+  // Glimmermere's authored 18-yard disc, so this is a hummock standing 5 yards
+  // clear of the water plane rather than a shore, which is fine: what the old
+  // spot got wrong was the 0.46 yards of freeboard and the wall, and this has
+  // 5.00 and stays under 0.94 across the whole reach. Nearer the lake than
+  // before, and still the anchor the tier-2 stand sits a short walk from
+  // (18.7 yards). It also happens to sit clear of every mob camp radius, as the
+  // old spot did, which is worth keeping if a later edit moves it again: damage
+  // cancels a gather cast outright rather than pushing it back, so a contested
+  // patch is materially harder to work. Not a rule, though, and no arm pins it:
+  // a third of the shipped nodes sit inside a camp on purpose.
   {
     id: 'wood_thornpeak_1',
     zoneId: 'thornpeak_heights',
     type: 'wood',
-    pos: { x: -55, z: 765 },
+    pos: { x: -63, z: 771 },
     level: 17,
     tier: 1,
   },
@@ -254,11 +292,14 @@ export const GATHER_NODES: GatherNodeDef[] = [
     level: 10,
     tier: 2,
   },
+  // Followed herb_mirefen_1 off the pool it shared: it sat inside the same
+  // footprint at 3.55 yards under. Still 12 yards from that patch, holding the
+  // short-walk-from-the-cluster rule this block describes.
   {
     id: 'herb_mirefen_t2',
     zoneId: 'mirefen_marsh',
     type: 'herb',
-    pos: { x: 52, z: 396 },
+    pos: { x: 34, z: 406 },
     level: 10,
     tier: 2,
   },

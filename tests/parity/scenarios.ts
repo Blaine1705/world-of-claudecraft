@@ -4500,7 +4500,15 @@ function professionsGather(seed = 1): Scenario {
       // moonlit-bloom sheenleaf) survives into the final inventory sample
       // even when the window hits more than once. The hunted seed's FIRST
       // rare event lands inside this window (gatherRareEvent + x5 yield).
-      teleport(sim, p, -86, 90); // herb_eastbrook_1
+      // Stands ON herb_eastbrook_1, since harvestNode gates on INTERACT_RANGE.
+      // This literal tracked the patch when it sat on the Mirror Lake floor;
+      // the patch moved onto the dry bank and the golden was re-minted for the
+      // new stand point. The re-mint is confined to position: the draw digest,
+      // the 204-draw count, the tick count and every event digest are
+      // byte-identical, and what moved is this position, the state digests that
+      // hash it, and the mirror_lake POI visit the old spot only earned by
+      // being underwater. The two-draw-per-harvest contract is untouched.
+      teleport(sim, p, -59, 91); // herb_eastbrook_1
       for (let i = 0; i < 100; i++) {
         meta.gatheringProficiency.herbalism = 0;
         // The retention filter keeps the three tools (ahead of the gate,
