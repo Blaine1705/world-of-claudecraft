@@ -33,6 +33,7 @@
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
 import { ITEMS } from '../sim/data';
+import type { HarvestYieldKind } from '../sim/professions/harvest_yields';
 import { itemDisplayName } from './entity_i18n';
 import { tryEncodeItemLink } from './hud/quest/quest_link';
 import { formatNumber } from './i18n';
@@ -73,6 +74,31 @@ export function gatherLineKey(qty: number): TranslationKey {
   return isMultiUnitGrant(qty)
     ? 'hudChrome.gathering.gatherLineQty'
     : 'hudChrome.gathering.gatherLine';
+}
+
+/** The corpse-harvest line for ONE landed yield (#2457). Corpse harvest is the
+ *  one flow whose single command grants several distinct items, so its result
+ *  event carries a list and this selector runs per entry rather than per
+ *  command.
+ *
+ *  A Pristine specimen (#1145) takes its own wording: it is a pure extra
+ *  granted BESIDE its family's own plain component, so a shared line would
+ *  read as if the harvest yielded the same thing twice. That is the precedent
+ *  a rare-or-better disenchant already sets for its typed secondary
+ *  (`disenchantedAlso` in enchanting_view.ts), and a specimen is always
+ *  exactly one unit, which is why it has no quantity sibling.
+ *
+ *  A SIGNED component deliberately renders the same line as a plain one: the
+ *  node-gather windfall has never had a line of its own either (the signed
+ *  batch in professions/gathering.ts harvestNode renders `gatherLine`), and
+ *  two gathering surfaces announcing the same mark differently would be the
+ *  drift. The discriminant still rides the event, so the two can diverge later
+ *  without a wire change. */
+export function harvestLineKey(y: { kind: HarvestYieldKind; qty: number }): TranslationKey {
+  if (y.kind === 'specimen') return 'hudChrome.gathering.harvestSpecimenLine';
+  return isMultiUnitGrant(y.qty)
+    ? 'hudChrome.gathering.harvestLineQty'
+    : 'hudChrome.gathering.harvestLine';
 }
 
 /** The crafted line for one successful craft: the quantity variant only for a
