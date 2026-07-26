@@ -94,17 +94,19 @@ describe('planCast / planImpact', () => {
     expect(planCast(spec, 0).burstCount).toBe(24); // 60 * 0.4
   });
 
-  it('tier 1 halves counts but keeps the ring; tier 2 is color-only minimal', () => {
+  it('tier 1 halves counts; tier 2 is color-only minimal but every tier keeps the ring', () => {
     const spec = ABILITY_VFX_SPECS.whirlwind; // sp: 34, rg: 1.6
     const full = planCast(spec, 1, 0);
     const reduced = planCast(spec, 1, 1);
     const minimal = planCast(spec, 1, 2);
     expect(full.ringScale).toBeGreaterThan(0);
     expect(reduced.burstCount).toBe(Math.round(full.burstCount / 2));
-    // the area telegraph is actionable: it survives tier 1
+    // The area telegraph is actionable, so NO degrade tier may drop it: a
+    // player whose client is busy (or on a lower preset, once the cap is
+    // preset-scaled) must still see where the ground effect lands.
     expect(reduced.ringScale).toBe(full.ringScale);
+    expect(minimal.ringScale).toBe(full.ringScale);
     expect(minimal.burstCount).toBeLessThanOrEqual(TIER2_BURST_COUNT_MAX);
-    expect(minimal.ringScale).toBe(0);
     expect(minimal.color).toBe(full.color);
     // impacts degrade the same way and never flash the area ring
     expect(planImpact(spec, true, 1, 2).burstCount).toBeLessThanOrEqual(TIER2_BURST_COUNT_MAX);

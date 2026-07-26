@@ -371,11 +371,34 @@ export type FlipbookStyle = (typeof FLIPBOOK_STYLES)[number];
 
 const flipbookCache = new Map<FlipbookStyle, THREE.CanvasTexture>();
 
+// The frame painters below author in a fixed 128 px cell space (their arc radii
+// and filament lengths are absolute pixels), so the authored size and the
+// SHIPPED size are separate numbers: the sheet rasterizes at FLIP_CELL_PX and a
+// single canvas scale maps the 128 px authoring space onto it. Halving the
+// shipped cell therefore shrinks the artwork instead of clipping it against the
+// per-cell clip rect.
+//
+// Sizing: 64 px per cell is an 8x8 sheet at 512 px, 1 MB on the GPU per style
+// and 6 MB across the six (a 128 px cell is 1024 px and 4 MB per style, 25 MB
+// across the set). An impact reads for about 0.2 s at roughly a coin's size on
+// screen, so the authored resolution was never reaching a pixel.
+//
+// Known tradeoff: canvas scales stroke widths too, so the thinnest filament
+// strokes in the painters below (lineWidth 1.1, and the 0.5 tail of the
+// eroding ring) land sub-pixel here and antialias to a fainter line rather
+// than a crisp one. Both occur late in the animation, where the frame is
+// already fading out on alpha, so the loss is at the dimmest moment of the
+// effect. Raise this back to 128 if an A/B shows the filaments reading too
+// weak; do not raise it on suspicion, the memory is real and the detail is not.
+const FLIP_AUTHOR_CELL_PX = 128;
+const FLIP_CELL_PX = 64;
+
 export function flipbookSheet(style: FlipbookStyle): THREE.CanvasTexture {
   let tex = flipbookCache.get(style);
   if (!tex) {
-    const cell = 128;
-    tex = makeCanvas(FLIPBOOK_GRID * cell, (g) => {
+    const cell = FLIP_AUTHOR_CELL_PX;
+    tex = makeCanvas(FLIPBOOK_GRID * FLIP_CELL_PX, (g) => {
+      g.scale(FLIP_CELL_PX / cell, FLIP_CELL_PX / cell);
       for (let f = 0; f < FLIPBOOK_GRID * FLIPBOOK_GRID; f++) {
         const t = f / (FLIPBOOK_GRID * FLIPBOOK_GRID - 1);
         const cx = (f % FLIPBOOK_GRID) * cell + cell / 2;

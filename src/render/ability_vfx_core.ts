@@ -9,8 +9,8 @@
 //   volley in [1, 4]
 //   burstCount in [4, 60] after the (0.4 + 0.6 * quality) scale; tier 2 <= 6
 //   burstPower in (0, 1.6]
-//   ringScale >= 0 (0 = no ring); tier 2 drops the ring entirely (tier 1
-//   keeps it, the area telegraph is actionable, not decoration)
+//   ringScale >= 0 (0 = no ring); NO tier drops the ring, the area telegraph
+//   is actionable, not decoration
 
 // Compact per-ability visual spec (key legend in ability_vfx_specs.ts header):
 // c=color p=palette pw=power sp=sparks rg=ringScale vr=vRing db=debris
@@ -294,7 +294,13 @@ function buildPlan(
     volley: tier >= 2 ? 1 : Math.round(clamp(spec.b?.vl ?? 1, 1, VOLLEY_MAX)),
     burstCount,
     burstPower,
-    ringScale: tier >= 2 ? 0 : (spec.rg ?? 0),
+    // The area ring is the ground-effect TELEGRAPH: a player reads it and moves
+    // out of it, so it survives every degrade tier. Tier 2 sheds decoration
+    // (bursts, volleys, light) and keeps the actionable read, which is the
+    // graphics-fairness rule applied to the spam guard: two players in the same
+    // fight must have the same information to act on, whatever their preset or
+    // however busy the second is (docs/design/graphics-settings-fairness.md).
+    ringScale: spec.rg ?? 0,
     light: tier >= 2 ? 0 : (spec.li ?? 0) * (0.4 + 0.6 * quality),
     swirlColor: lighten(color, 0.25),
     sparkleColor: color,
