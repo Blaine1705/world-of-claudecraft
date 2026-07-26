@@ -48,13 +48,28 @@ describe('Paladin core abilities', () => {
 
   it('exposes Ward of Faith to every Paladin specialization', () => {
     expect(ABILITIES.divine_protection.hiddenFromPlayer).not.toBe(true);
-    expect(ABILITIES.divine_protection.cooldown).toBe(60);
+    expect(ABILITIES.divine_protection.cooldown).toBe(30);
+    expect(ABILITIES.divine_protection.ranks).toBeUndefined();
 
     for (const spec of [null, 'holy', 'protection', 'retribution'] as const) {
       const sim = new Sim({ seed: 37, playerClass: 'paladin', autoEquip: true });
       sim.setPlayerLevel(20);
       if (spec) expect(sim.setSpec(spec)).toBe(true);
-      expect(sim.resolvedAbility('divine_protection')?.def.name).toBe('Ward of Faith');
+      const ward = resolve(sim, 'divine_protection');
+      expect(ward.def.name).toBe('Ward of Faith');
+      expect(ward.effects).toEqual([
+        { type: 'absorb', amount: 0, casterMaxHpPct: 0.25, duration: 10 },
+      ]);
+
+      run(sim, null, ward);
+      expect(sim.player.auras).toContainEqual(
+        expect.objectContaining({
+          id: 'divine_protection',
+          kind: 'absorb',
+          value: Math.round(sim.player.maxHp * 0.25),
+          duration: 10,
+        }),
+      );
     }
   });
 
@@ -451,7 +466,13 @@ describe('Paladin core abilities', () => {
     ]);
     expect(resolve(protection, 'holy_shield').effects).toEqual([
       { type: 'selfBuff', kind: 'buff_block', value: 0.4, duration: 10 },
-      { type: 'absorb', amount: 135, duration: 10, auraId: 'holy_shield_absorb' },
+      {
+        type: 'absorb',
+        amount: 0,
+        casterMaxHpPct: 0.15,
+        duration: 10,
+        auraId: 'holy_shield_absorb',
+      },
       { type: 'threatPulse', amount: 150, radius: 8 },
     ]);
     expect(resolve(protection, 'consecration').effects).toEqual([

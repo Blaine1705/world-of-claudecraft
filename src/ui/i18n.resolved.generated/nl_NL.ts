@@ -7396,7 +7396,7 @@ export const nl_NL: EnTranslations = {
       },
       "divine_protection": {
         "name": "Wering van Geloof",
-        "description": "Een beschermende wering absorbeert {damage} schade gedurende 10 sec."
+        "description": "Een heilig schild absorbeert {damage}% van je maximale gezondheid gedurende {duration} sec."
       },
       "hammer_of_justice": {
         "name": "Splijtende Rechtershamer",
@@ -7404,7 +7404,7 @@ export const nl_NL: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Laatste Rite",
-        "description": "Een enorme golf van genezing: herstelt {damage} levenskracht. 10 min hersteltijd."
+        "description": "Een enorme golf van genezing herstelt {damage}% van je maximale gezondheid. 10 min hersteltijd."
       },
       "holy_taunt": {
         "name": "Heilige Aansporing",
@@ -7420,7 +7420,7 @@ export const nl_NL: EnTranslations = {
       },
       "consecration": {
         "name": "Heilige Grond",
-        "description": "Wijdt de grond onder je en schroeit nabije vijanden elke 2 sec voor {damage} Heilige schade gedurende 10 sec."
+        "description": "Wijdt de grond 9 sec en veroorzaakt elke seconde {damage} Heilige schade. Geloofswachters krijgen binnenin 10% minder schade."
       },
       "bastion_sweep": {
         "name": "Bastionzwaai",
@@ -7820,7 +7820,7 @@ export const nl_NL: EnTranslations = {
       },
       "holy_shield": {
         "name": "Heilig schild",
-        "description": "Beschermt je 10 sec met Heilige kracht, verhoogt pantser met 90 en raakt melee-aanvallers voor 12 Heilige schade. (Bescherming signatuur)"
+        "description": "Verhoogt blokkeren met 30% en geeft gedurende {duration} sec een schild van {damage}% van je maximale gezondheid. Hemelvaart versterkt de verdediging."
       },
       "bestial_wrath": {
         "name": "Beestachtige woede",

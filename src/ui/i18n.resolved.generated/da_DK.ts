@@ -7396,7 +7396,7 @@ export const da_DK: EnTranslations = {
       },
       "divine_protection": {
         "name": "Troens Værn",
-        "description": "Et helligt værn opsuger {damage} skade i 10 sek."
+        "description": "Et helligt skjold opsuger {damage}% af dit maksimale helbred i {duration} sek."
       },
       "hammer_of_justice": {
         "name": "Splintrende Dommerhammer",
@@ -7404,7 +7404,7 @@ export const da_DK: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Sidste Rite",
-        "description": "En massiv bølge af helbredelse: genopretter {damage} helbred. 10 min afkøling."
+        "description": "En massiv bølge af helbredelse genopretter {damage}% af dit maksimale helbred. 10 min afkøling."
       },
       "holy_taunt": {
         "name": "Hellig Æggelse",
@@ -7420,7 +7420,7 @@ export const da_DK: EnTranslations = {
       },
       "consecration": {
         "name": "Hellig Jord",
-        "description": "Indvier jorden under dig, og svider nærliggende fjender for {damage} Hellig skade hvert 2. sek i 10 sek."
+        "description": "Indvier jorden i 9 sek. og giver {damage} Hellig skade hvert sekund. Trosvogtere tager 10% mindre skade, mens de står i området."
       },
       "bastion_sweep": {
         "name": "Bastionssving",
@@ -7820,7 +7820,7 @@ export const da_DK: EnTranslations = {
       },
       "holy_shield": {
         "name": "Hellig skjold",
-        "description": "Beskytter dig med hellig kraft i 10 sek, øger rustning med 90 og rammer nærkampsangribere for 12 hellig skade. (Beskyttelsessignatur)"
+        "description": "Øger blokering med 30% og giver et skjold på {damage}% af dit maksimale helbred i {duration} sek. Ascension styrker forsvaret."
       },
       "bestial_wrath": {
         "name": "Bestialsk vrede",

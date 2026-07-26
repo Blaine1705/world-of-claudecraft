@@ -7396,7 +7396,7 @@ export const zh_TW: EnTranslations = {
       },
       "divine_protection": {
         "name": "信仰守護",
-        "description": "一道神聖護盾吸收 {damage} 點傷害，持續 10 秒。"
+        "description": "一道神聖護盾吸收相當於你最大生命值 {damage}% 的傷害，持續 {duration} 秒。"
       },
       "hammer_of_justice": {
         "name": "裂碎法槌",
@@ -7404,7 +7404,7 @@ export const zh_TW: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "臨終聖禮",
-        "description": "巨大的治療湧流：恢復 {damage} 點生命值。10 分鐘冷卻時間。"
+        "description": "巨大的治療湧流恢復你最大生命值的 {damage}%。10 分鐘冷卻時間。"
       },
       "holy_taunt": {
         "name": "神聖挑釁",
@@ -7420,7 +7420,7 @@ export const zh_TW: EnTranslations = {
       },
       "consecration": {
         "name": "聖化之地",
-        "description": "奉獻你腳下的土地，持續 10 秒，每 2 秒灼燒附近敵人造成 {damage} 點神聖傷害。"
+        "description": "奉獻地面 9 秒，每秒造成 {damage} 點神聖傷害。信仰守衛站在其中時受到的傷害降低 10%。"
       },
       "bastion_sweep": {
         "name": "壁壘橫掃",
@@ -7820,7 +7820,7 @@ export const zh_TW: EnTranslations = {
       },
       "holy_shield": {
         "name": "神聖之盾",
-        "description": "以神聖之力保護你10秒，護甲提高90，並對近戰攻擊者造成12點神聖傷害。（防護專精招牌）"
+        "description": "格擋提高 30%，並獲得相當於最大生命值 {damage}% 的護盾，持續 {duration} 秒。昇華會強化防禦。"
       },
       "bestial_wrath": {
         "name": "狂野怒火",

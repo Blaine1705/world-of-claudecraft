@@ -2,11 +2,10 @@ import { writeFileSync } from 'node:fs';
 import {
   defaultBuild,
   type TalentAllocation,
-  talentPointsAtLevel,
   validateAllocation,
 } from '../src/sim/content/talents';
 import { DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
-import { canEquipItem } from '../src/sim/equipment_rules';
+import { canEquipItem, weaponHand } from '../src/sim/equipment_rules';
 import { Sim } from '../src/sim/sim';
 import {
   dist2d,
@@ -26,7 +25,14 @@ type Spec = {
   role: Role;
   kind: SpecKind;
   melee: boolean;
-  talents: TalentAllocation;
+  talents: {
+    spec: string | null;
+    rows?: TalentAllocation['rows'];
+    // Kept so older matrix plans remain readable while the runner migrates
+    // them to the current six-row allocation at the boundary.
+    ranks?: Record<string, number>;
+    choices?: Record<string, string>;
+  };
   prepull?: string[];
   rotation: string[];
   healRotation?: string[];
@@ -65,13 +71,25 @@ const specs = {
         prot_imp_thunder_clap: 2,
       },
       choices: { war_tactical_choice: 'tc_bladed_armor' },
+      rows: {
+        5: 'war_row_double_charge',
+        8: 'war_row_die_by_the_sword',
+        11: 'war_row_storm_bolt',
+        14: 'war_row_blood_offering',
+        17: 'war_row_avatar',
+        20: 'war_row_sanguine_aura',
+      },
     },
     rotation: [
       'defensive_stance',
       'battle_shout',
+      'die_by_sword',
+      'raised_guard',
+      'iron_resolve',
       'sunder_armor',
       'shield_slam',
       'thunder_clap',
+      'revenge',
       'heroic_strike',
     ],
   },
@@ -91,13 +109,29 @@ const specs = {
         prot_imp_righteous_fury: 2,
       },
       choices: { pal_holy_calling: 'pal_calling_guardian' },
+      rows: {
+        5: 'pal_r5_divine_steed',
+        8: 'pal_r8_enduring_protection',
+        11: 'pal_r11_fist_of_justice',
+        14: 'pal_r14_divine_purpose',
+        17: 'pal_r17_extended_dawn',
+        20: 'pal_r20_aura_mastery',
+      },
     },
     rotation: [
-      'righteous_fury',
-      'devotion_aura',
+      'devotion_ward',
+      'lay_on_hands',
+      'divine_protection',
+      'aura_mastery',
+      'bastion_rite',
+      'holy_shield',
+      'veilbound_march',
+      'divine_ascension',
       'consecration',
       'vowkeeper_strike',
-      'seal_of_righteousness',
+      'bastion_sweep',
+      'sunward_disc',
+      'hammer_of_grace',
     ],
   },
   feralDruidTank: {
@@ -702,12 +736,89 @@ function statScore(item: ItemDef, spec: Spec): number {
   );
 }
 
+function isNythraxisDrop(item: ItemDef): boolean {
+  return (
+    NYTHRAXIS_DROP_IDS.has(item.id) || (!!item.heroicOf && NYTHRAXIS_DROP_IDS.has(item.heroicOf))
+  );
+}
+
+function sharedTankScore(item: ItemDef): number {
+  const stats = item.stats ?? {};
+  const weaponDps = item.weapon
+    ? (item.weapon.min + item.weapon.max) / 2 / Math.max(0.1, item.weapon.speed)
+    : 0;
+  return (
+    (stats.sta ?? 0) * 1_000 +
+    (stats.armor ?? 0) * 5 +
+    (item.blockValue ?? 0) * 50 +
+    (stats.str ?? 0) * 25 +
+    (stats.agi ?? 0) * 10 +
+    weaponDps
+  );
+}
+
+function sharedTankCandidates(slot: ItemDef['slot']): ItemDef[] {
+  return Object.values(ITEMS)
+    .filter(
+      (item) =>
+        item.slot === slot &&
+        !isNythraxisDrop(item) &&
+        (item.requiredLevel ?? 1) <= 20 &&
+        canEquipItem('warrior', item) &&
+        canEquipItem('paladin', item) &&
+        (slot !== 'mainhand' || (item.kind === 'weapon' && weaponHand(item) !== 'twohand')) &&
+        (slot !== 'offhand' || (item.blockValue ?? 0) > 0),
+    )
+    .sort((a, b) => sharedTankScore(b) - sharedTankScore(a) || a.id.localeCompare(b.id));
+}
+
+const SHARED_TANK_SINGLE_SLOTS: ItemDef['slot'][] = [
+  'mainhand',
+  'offhand',
+  'helmet',
+  'neck',
+  'shoulder',
+  'chest',
+  'waist',
+  'legs',
+  'gloves',
+  'feet',
+];
+
+function sharedTankGearIds(): string[] {
+  return [
+    ...SHARED_TANK_SINGLE_SLOTS.map((slot) => sharedTankCandidates(slot)[0]?.id).filter(
+      (id): id is string => !!id,
+    ),
+    ...sharedTankCandidates('ring')
+      .slice(0, 2)
+      .map((ring) => ring.id),
+  ];
+}
+
+function equipSharedTankGear(sim: Sim, pid: number): void {
+  for (const slot of SHARED_TANK_SINGLE_SLOTS) {
+    const item = sharedTankCandidates(slot)[0];
+    if (!item) continue;
+    sim.addItem(item.id, 1, pid);
+    sim.equipItem(item.id, pid);
+  }
+  for (const [index, ring] of sharedTankCandidates('ring').slice(0, 2).entries()) {
+    sim.addItem(ring.id, 1, pid);
+    sim.equipItemToSlot(ring.id, `ring${index + 1}` as EquipSlot, pid);
+  }
+}
+
 function equipBest(sim: Sim, pid: number, spec: Spec) {
+  if (spec.kind === 'tank' && (spec.cls === 'warrior' || spec.cls === 'paladin')) {
+    equipSharedTankGear(sim, pid);
+    return;
+  }
   for (const slot of SLOTS) {
     const item = Object.values(ITEMS)
       .filter(
         (candidate) =>
-          !NYTHRAXIS_DROP_IDS.has(candidate.id) &&
+          !isNythraxisDrop(candidate) &&
           candidate.slot === slot &&
           (candidate.kind === 'weapon' || candidate.kind === 'armor') &&
           canEquipItem(spec.cls, candidate),
@@ -720,14 +831,19 @@ function equipBest(sim: Sim, pid: number, spec: Spec) {
   }
 }
 
-function ensureTalents(sim: Sim, pid: number, spec: Spec) {
-  const check = validateAllocation(spec.cls, spec.talents, talentPointsAtLevel(20));
+function ensureTalents(sim: Sim, pid: number, spec: Spec): TalentAllocation {
+  const defaults = defaultBuild(spec.cls, 20);
+  const allocation: TalentAllocation = {
+    spec: spec.talents.spec,
+    rows: spec.talents.rows ?? defaults.rows,
+  };
+  const check = validateAllocation(spec.cls, allocation, 20);
   if (!check.ok) {
     console.warn(`Invalid talents for ${spec.key}: ${check.reason}`);
   }
-  if (!sim.applyTalents(spec.talents, pid)) {
-    sim.applyTalents(defaultBuild(spec.cls, talentPointsAtLevel(20)), pid);
-  }
+  if (sim.applyTalents(allocation, pid)) return allocation;
+  sim.applyTalents(defaults, pid);
+  return defaults;
 }
 
 function livingAdds(sim: Sim) {
@@ -743,7 +859,8 @@ function cast(sim: Sim, pid: number, targetId: number, ability: string) {
   const target = sim.entities.get(targetId);
   if (target) face(p, target);
   const before = `${p.castingAbility}|${p.gcdRemaining}|${p.queuedOnSwing}|${p.resource}|${p.auras.length}`;
-  sim.castAbility(ability, pid);
+  if (ability === 'lay_on_hands') sim.castAbilityOn(ability, pid, pid);
+  else sim.castAbility(ability, pid);
   const after = `${p.castingAbility}|${p.gcdRemaining}|${p.queuedOnSwing}|${p.resource}|${p.auras.length}`;
   return before !== after;
 }
@@ -786,6 +903,7 @@ const SELF_BUFF_ABILITIES = new Set([
   'seal_of_righteousness',
   'instant_poison',
   'defensive_stance',
+  'devotion_ward',
   'bear_form',
   'cat_form',
   'barkskin',
@@ -806,6 +924,7 @@ function sunderStacks(target: Entity): number {
 }
 
 function shouldTryAbility(caster: Entity, target: Entity, ability: string): boolean {
+  const hpPct = caster.maxHp > 0 ? caster.hp / caster.maxHp : 0;
   if (DOT_ABILITIES.has(ability) && auraActive(target, ability, caster.id)) return false;
   if (SELF_BUFF_ABILITIES.has(ability) && auraActive(caster, ability)) return false;
   if (TARGET_DEBUFF_ABILITIES.has(ability) && auraActive(target, ability, caster.id)) return false;
@@ -817,6 +936,24 @@ function shouldTryAbility(caster: Entity, target: Entity, ability: string): bool
   if ((ability === 'maul' || ability === 'heroic_strike') && caster.queuedOnSwing === ability)
     return false;
   if (ability === 'sunder_armor' && sunderStacks(target) >= 5) return false;
+  if (ability === 'die_by_sword' && (hpPct > 0.7 || auraActive(caster, 'die_by_sword')))
+    return false;
+  if (ability === 'raised_guard' && auraActive(caster, 'raised_guard_dr')) return false;
+  if (ability === 'iron_resolve' && (caster.resource < 40 || auraActive(caster, 'iron_resolve')))
+    return false;
+  if (ability === 'lay_on_hands' && hpPct > 0.25) return false;
+  if (ability === 'divine_protection' && (hpPct > 0.85 || auraActive(caster, 'divine_protection')))
+    return false;
+  if (ability === 'aura_mastery' && (hpPct > 0.7 || auraActive(caster, 'aura_mastery')))
+    return false;
+  if (ability === 'bastion_rite' && auraActive(caster, 'bastion_rite')) return false;
+  if (ability === 'holy_shield' && auraActive(caster, 'holy_shield')) return false;
+  if (
+    ability === 'divine_ascension' &&
+    ((caster.paladinDevotion?.value ?? 0) < 20 ||
+      (caster.paladinDevotion?.ascensionCharges ?? 0) > 0)
+  )
+    return false;
   return true;
 }
 
@@ -858,6 +995,7 @@ function setupWarlockImp(sim: Sim, pid: number) {
 }
 
 type Result = {
+  seed: number;
   key: string;
   killed: boolean;
   seconds: number;
@@ -902,8 +1040,11 @@ type Result = {
       playerId: number;
       resourceType: Entity['resourceType'];
       maxHp: number;
+      armor: number;
       maxResource: number;
       startResource: number;
+      equippedItemIds: string[];
+      talentRows: TalentAllocation['rows'];
       finalHp: number;
       finalResource: number;
       dead: boolean;
@@ -916,6 +1057,7 @@ type Result = {
       healingTaken: number;
       castsStarted: Record<string, number>;
       attemptedCasts: Record<string, number>;
+      successfulCasts: Record<string, number>;
       damageDoneByAbility: Record<string, number>;
       damageTakenByAbility: Record<string, number>;
       healingDoneByAbility: Record<string, number>;
@@ -991,13 +1133,14 @@ function secureAddThreat(add: Entity, tankPid: number, lead: number): void {
   }
 }
 
-function runGroup(groupSpecs: Spec[], key: string): Result {
-  const sim = new Sim({ seed: 42, noPlayer: true, playerClass: 'warrior' });
+function runGroup(groupSpecs: Spec[], key: string, seed = 42): Result {
+  const sim = new Sim({ seed, noPlayer: true, playerClass: 'warrior' });
   const pids = groupSpecs.map((spec, i) => sim.addPlayer(spec.cls, `${spec.key}_${i}`));
+  const appliedTalents = new Map<number, TalentAllocation>();
   for (let i = 0; i < pids.length; i++) {
     sim.players.get(pids[i])?.questsDone.add('q_nythraxis_bound_guardian');
     sim.setPlayerLevel(20, pids[i]);
-    ensureTalents(sim, pids[i], groupSpecs[i]);
+    appliedTalents.set(pids[i], ensureTalents(sim, pids[i], groupSpecs[i]));
     equipBest(sim, pids[i], groupSpecs[i]);
   }
   for (let i = 0; i < pids.length; i++) {
@@ -1049,8 +1192,13 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
       playerId: pids[i],
       resourceType: e.resourceType,
       maxHp: e.maxHp,
+      armor: sim.ctx.effectiveArmor(e),
       maxResource: e.maxResource,
       startResource: e.resource,
+      equippedItemIds: Object.values(e.equippedItems)
+        .filter((itemId): itemId is string => typeof itemId === 'string')
+        .sort(),
+      talentRows: appliedTalents.get(pids[i])?.rows ?? {},
       finalHp: e.hp,
       finalResource: e.resource,
       dead: false,
@@ -1062,6 +1210,7 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
       healingTaken: 0,
       castsStarted: {},
       attemptedCasts: {},
+      successfulCasts: {},
       damageDoneByAbility: {},
       damageTakenByAbility: {},
       healingDoneByAbility: {},
@@ -1278,7 +1427,10 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
         for (const heal of spec.healRotation ?? []) {
           const metric = actorMetrics.get(hpid)!;
           metric.attemptedCasts[heal] = (metric.attemptedCasts[heal] ?? 0) + 1;
-          if (cast(sim, hpid, target.id, heal)) break;
+          if (cast(sim, hpid, target.id, heal)) {
+            metric.successfulCasts[heal] = (metric.successfulCasts[heal] ?? 0) + 1;
+            break;
+          }
         }
       }
     }
@@ -1310,18 +1462,25 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
       if (shouldRangedAutoFallback(sim, p, target, spec)) continue;
       if (
         spec.key === 'feral_druid_tank' &&
+        pid === activeBossTankPid &&
         target.aggroTargetId !== p.id &&
         shouldTryAbility(p, target, 'growl')
       ) {
         const metric = actorMetrics.get(pid)!;
         metric.attemptedCasts.growl = (metric.attemptedCasts.growl ?? 0) + 1;
-        if (cast(sim, pid, target.id, 'growl')) continue;
+        if (cast(sim, pid, target.id, 'growl')) {
+          metric.successfulCasts.growl = (metric.successfulCasts.growl ?? 0) + 1;
+          continue;
+        }
       }
       for (const ability of spec.rotation) {
         if (!shouldTryAbility(p, target, ability)) continue;
         const metric = actorMetrics.get(pid)!;
         metric.attemptedCasts[ability] = (metric.attemptedCasts[ability] ?? 0) + 1;
-        if (cast(sim, pid, target.id, ability)) break;
+        if (cast(sim, pid, target.id, ability)) {
+          metric.successfulCasts[ability] = (metric.successfulCasts[ability] ?? 0) + 1;
+          break;
+        }
       }
     }
 
@@ -1631,6 +1790,7 @@ function runGroup(groupSpecs: Spec[], key: string): Result {
     }
   }
   return {
+    seed,
     key,
     killed: boss.dead,
     seconds,
@@ -1678,31 +1838,81 @@ function hashString(value: string): number {
 }
 
 const limit = Number(process.env.MATRIX_LIMIT ?? '96');
+const tankMonteCarloRuns = Number(process.env.MATRIX_TANK_MC_RUNS ?? '0');
+if (!Number.isInteger(tankMonteCarloRuns) || tankMonteCarloRuns < 0) {
+  throw new Error('MATRIX_TANK_MC_RUNS must be a non-negative integer');
+}
 const plans: { tank: Spec; healerSet: Spec[]; dpsSet: Spec[] }[] = [];
 for (const { tank } of tankPlans) {
   for (const healerSet of healerCombos) {
     for (const dpsSet of dpsCombos) plans.push({ tank, healerSet, dpsSet });
   }
 }
+const tankMonteCarloPlans = [
+  {
+    tank: specs.protectionWarrior,
+    healerSet: [specs.holyPriest, specs.disciplinePriest, specs.restorationShaman],
+    dpsSet: [
+      specs.combatRogue,
+      specs.armsWarrior,
+      specs.fireMage,
+      specs.marksmanshipHunter,
+      specs.retributionPaladin,
+    ],
+  },
+  {
+    tank: specs.protectionPaladin,
+    healerSet: [specs.holyPriest, specs.disciplinePriest, specs.restorationShaman],
+    dpsSet: [
+      specs.combatRogue,
+      specs.armsWarrior,
+      specs.fireMage,
+      specs.marksmanshipHunter,
+      specs.retributionPaladin,
+    ],
+  },
+] satisfies { tank: Spec; healerSet: Spec[]; dpsSet: Spec[] }[];
 const selected =
-  plans.length <= limit
-    ? plans
-    : [...plans].sort((a, b) => hashString(planKey(a)) - hashString(planKey(b))).slice(0, limit);
+  tankMonteCarloRuns > 0
+    ? tankMonteCarloPlans
+    : plans.length <= limit
+      ? plans
+      : [...plans].sort((a, b) => hashString(planKey(a)) - hashString(planKey(b))).slice(0, limit);
 const shardCount = Number(process.env.MATRIX_SHARD_COUNT ?? '1');
 const shardIndex = Number(process.env.MATRIX_SHARD_INDEX ?? '0');
 if (!Number.isInteger(shardCount) || shardCount < 1)
   throw new Error('MATRIX_SHARD_COUNT must be a positive integer');
 if (!Number.isInteger(shardIndex) || shardIndex < 0 || shardIndex >= shardCount)
   throw new Error('MATRIX_SHARD_INDEX must be between 0 and MATRIX_SHARD_COUNT - 1');
-const selectedForShard = selected.filter((_, index) => index % shardCount === shardIndex);
-const attempted = plans.length;
+// Standard matrix mode shards plans. Monte Carlo mode shards seed samples so
+// each shard still contains both tank distributions.
+const selectedForShard =
+  tankMonteCarloRuns > 0
+    ? selected
+    : selected.filter((_, index) => index % shardCount === shardIndex);
+const attempted =
+  tankMonteCarloRuns > 0 ? tankMonteCarloPlans.length * tankMonteCarloRuns : plans.length;
 const results: Result[] = [];
-for (const { tank, healerSet, dpsSet } of selectedForShard) {
-  const offTank = (
-    tank.key === 'protection_paladin' ? specs.protectionWarrior : specs.protectionPaladin
-  ) as Spec;
-  const group = [tank, { ...offTank, role: 'offTank' as Role }, ...healerSet, ...dpsSet];
-  results.push(runGroup(group, planKey({ tank, healerSet, dpsSet })));
+const seeds =
+  tankMonteCarloRuns > 0
+    ? Array.from({ length: tankMonteCarloRuns }, (_, index) => index + 1)
+    : [42];
+for (const [seedIndex, seed] of seeds.entries()) {
+  if (tankMonteCarloRuns > 0 && seedIndex % shardCount !== shardIndex) continue;
+  for (const { tank, healerSet, dpsSet } of selectedForShard) {
+    // Keep the support roster identical in comparative tank simulations. Using the
+    // other candidate as off-tank made its much higher threat change who was
+    // actually taking Nythraxis' melee swings, invalidating the comparison.
+    const offTank = (
+      tankMonteCarloRuns > 0
+        ? specs.feralDruidTank
+        : tank.key === 'protection_paladin'
+          ? specs.protectionWarrior
+          : specs.protectionPaladin
+    ) as Spec;
+    const group = [tank, { ...offTank, role: 'offTank' as Role }, ...healerSet, ...dpsSet];
+    results.push(runGroup(group, planKey({ tank, healerSet, dpsSet }), seed));
+  }
 }
 
 const killed = results.filter((r) => r.killed);
@@ -1822,9 +2032,88 @@ for (const r of results) {
   }
 }
 
+function average(values: readonly number[]): number {
+  return values.length > 0 ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+}
+
+function percentile(values: readonly number[], fraction: number): number {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  return sorted[Math.min(sorted.length - 1, Math.floor((sorted.length - 1) * fraction))];
+}
+
+const tankMonteCarloSummary = ['protection_warrior', 'protection_paladin'].map((tankKey) => {
+  const samples = results
+    .filter((result) => result.key.startsWith(`${tankKey}|`))
+    .map((result) => {
+      const tank = result.actors[tankKey];
+      const minimumSampledHpPct = tank.dead
+        ? 0
+        : Math.min(1, ...tank.hpSamples.map((sample) => sample.value / tank.maxHp));
+      const healerNetManaConsumed = Object.values(result.actors)
+        .filter((actor) => actor.role === 'healer')
+        .reduce(
+          (total, healer) => total + Math.max(0, healer.startResource - healer.finalResource),
+          0,
+        );
+      const groupDps =
+        Object.values(result.actors).reduce((total, actor) => total + actor.damageDone, 0) /
+        Math.max(0.05, result.seconds);
+      const tankActiveSeconds = Math.max(0.05, tank.deathTime ?? result.seconds);
+      return {
+        killed: result.killed,
+        tankDead: tank.dead,
+        survivalSeconds: tank.deathTime ?? result.seconds,
+        maxHp: tank.maxHp,
+        armor: tank.armor,
+        dps: tank.dps,
+        damageTakenPerSecond: tank.damageTaken / tankActiveSeconds,
+        healingTakenPerSecond: tank.healingTaken / tankActiveSeconds,
+        selfHealingPerSecond: tank.healingDone / tankActiveSeconds,
+        minimumSampledHpPct,
+        finalHpPct: tank.dead ? 0 : tank.finalHp / tank.maxHp,
+        healerNetManaConsumed,
+        groupDps,
+        fightSeconds: result.seconds,
+      };
+    });
+  const survivalTimes = samples.map((sample) => sample.survivalSeconds);
+  const kills = samples.filter((sample) => sample.killed);
+  return {
+    key: tankKey,
+    n: samples.length,
+    killRate: average(samples.map((sample) => Number(sample.killed))),
+    tankDeathRate: average(samples.map((sample) => Number(sample.tankDead))),
+    avgSurvivalSeconds: round1(average(survivalTimes)),
+    p10SurvivalSeconds: round1(percentile(survivalTimes, 0.1)),
+    medianSurvivalSeconds: round1(percentile(survivalTimes, 0.5)),
+    avgKillSeconds:
+      kills.length > 0 ? round1(average(kills.map((sample) => sample.fightSeconds))) : null,
+    avgMaxHp: Math.round(average(samples.map((sample) => sample.maxHp))),
+    avgArmor: Math.round(average(samples.map((sample) => sample.armor))),
+    avgTankDps: round1(average(samples.map((sample) => sample.dps))),
+    avgGroupDps: round1(average(samples.map((sample) => sample.groupDps))),
+    avgDamageTakenPerSecond: round1(average(samples.map((sample) => sample.damageTakenPerSecond))),
+    avgHealingTakenPerSecond: round1(
+      average(samples.map((sample) => sample.healingTakenPerSecond)),
+    ),
+    avgSelfHealingPerSecond: round1(average(samples.map((sample) => sample.selfHealingPerSecond))),
+    avgMinimumSampledHpPct: round1(
+      average(samples.map((sample) => sample.minimumSampledHpPct)) * 100,
+    ),
+    avgFinalHpPct: round1(average(samples.map((sample) => sample.finalHpPct)) * 100),
+    avgHealerNetManaConsumed: Math.round(
+      average(samples.map((sample) => sample.healerNetManaConsumed)),
+    ),
+  };
+});
+
 const output = {
   attempted,
   selected: selected.length,
+  tankMonteCarloRuns,
+  sharedTankGear: sharedTankGearIds(),
+  tankMonteCarloSummary,
   shardIndex,
   shardCount,
   run: results.length,
@@ -1920,6 +2209,8 @@ console.log(
       attempted: output.attempted,
       run: output.run,
       killed: output.killed,
+      sharedTankGear: output.sharedTankGear,
+      tankMonteCarloSummary: output.tankMonteCarloSummary,
       wipeReasonSummary: output.wipeReasonSummary,
       tankSwapSummary: output.tankSwapSummary,
       mechanicSummary: output.mechanicSummary,

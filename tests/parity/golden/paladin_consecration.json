@@ -165,8 +165,8 @@
       "tick": 60,
       "time": 3,
       "nextId": 417,
-      "state": "0d344e10",
-      "events": "f543dc49",
+      "state": "ec3a4254",
+      "events": "50df722a",
       "rng": {
         "draws": 83,
         "digest": "8b5d61e1"
@@ -176,7 +176,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 417,
-      "state": "bc3570b0",
+      "state": "2c63416e",
       "events": "aa24fe13",
       "rng": {
         "draws": 174,
@@ -187,8 +187,8 @@
       "tick": 100,
       "time": 5,
       "nextId": 417,
-      "state": "efd34a7c",
-      "events": "d60ca2f4",
+      "state": "fdefe684",
+      "events": "c96f7443",
       "rng": {
         "draws": 271,
         "digest": "cdedd7df"
@@ -198,7 +198,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 417,
-      "state": "2757313f",
+      "state": "22f2bb3b",
       "events": "e37fe947",
       "rng": {
         "draws": 389,
@@ -209,7 +209,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 417,
-      "state": "46bfd362",
+      "state": "9c99997e",
       "events": "a93f72a6",
       "rng": {
         "draws": 505,
@@ -220,7 +220,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 417,
-      "state": "ba9c0009",
+      "state": "d7e474d9",
       "events": "e53b0552",
       "rng": {
         "draws": 636,
@@ -231,7 +231,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 417,
-      "state": "bcbcb516",
+      "state": "afa507f2",
       "events": "4375cd29",
       "rng": {
         "draws": 764,
@@ -242,7 +242,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 417,
-      "state": "31811a91",
+      "state": "79204395",
       "events": "741638a5",
       "rng": {
         "draws": 904,
@@ -253,7 +253,7 @@
       "tick": 201,
       "time": 10.05,
       "nextId": 417,
-      "state": "1d61d2c8",
+      "state": "5476cc24",
       "events": "741638a5",
       "rng": {
         "draws": 910,
@@ -278,7 +278,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 241,
-            "damageTaken": 19
+            "damageTaken": 17
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -380,7 +380,7 @@
           "dodgeChance": 0.068,
           "fallStartY": 1.5,
           "fiveSecondRule": 10,
-          "hp": 49981,
+          "hp": 49983,
           "id": 415,
           "inCombat": true,
           "kind": "player",

@@ -1180,13 +1180,13 @@ const classAbilityNamesEn = {
       [
         'divine_protection',
         'Ward of Faith',
-        'A protective ward absorbs {damage} damage for 10 sec.',
+        'A sacred ward absorbs {damage}% of your maximum health for {duration} sec. Enduring Protection increases the ward.',
       ],
       ['hammer_of_justice', 'Sundering Gavel', 'Stuns the target for {duration} sec.'],
       [
         'lay_on_hands',
         'Last Rite',
-        'A massive surge of healing: restores {damage} health and generates 1 Devotion when it restores health. 10 min cooldown.',
+        'A massive surge that restores {damage}% of your maximum health and generates 1 Devotion when it restores health. 10 min cooldown.',
       ],
       [
         'holy_taunt',
@@ -1206,7 +1206,7 @@ const classAbilityNamesEn = {
       [
         'consecration',
         'Holy Ground',
-        'Consecrate the ground beneath you for 9 sec, dealing {damage} Holy damage with high threat every second. The first impact generates 1 Devotion. Faithwardens take 5% less damage while standing inside. Ascension increases its damage.',
+        'Consecrate the ground beneath you for 9 sec, dealing {damage} Holy damage with high threat every second. The first impact generates 1 Devotion. Faithwardens take 10% less damage while standing inside. Ascension increases its damage.',
       ],
       [
         'bastion_sweep',
@@ -1643,7 +1643,7 @@ const classAbilityNamesEn = {
       [
         'holy_shield',
         'Hallowed Wall',
-        'Gain 30% block and an absorb shield for 8 sec, releasing a pulse of threat. Ascension strengthens and extends the defense.',
+        'Gain 30% block and a shield that absorbs {damage}% of your maximum health for {duration} sec, releasing a pulse of threat. Ascension strengthens and extends the defense.',
       ],
       [
         'bestial_wrath',

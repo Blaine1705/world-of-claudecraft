@@ -7396,7 +7396,7 @@ export const ja_JP: EnTranslations = {
       },
       "divine_protection": {
         "name": "信仰の守り",
-        "description": "守りの結界が10秒間{damage}ダメージを吸収します。"
+        "description": "聖なる盾が最大体力の{damage}%に相当するダメージを{duration}秒間吸収します。"
       },
       "hammer_of_justice": {
         "name": "断裂の裁き槌",
@@ -7404,7 +7404,7 @@ export const ja_JP: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "最後の秘跡",
-        "description": "大きな癒やしの波で体力を{damage}回復します。クールダウン10分。"
+        "description": "大きな癒やしの波で最大体力の{damage}%を回復します。クールダウン10分。"
       },
       "holy_taunt": {
         "name": "聖なる挑発",
@@ -7420,7 +7420,7 @@ export const ja_JP: EnTranslations = {
       },
       "consecration": {
         "name": "聖なる大地",
-        "description": "足元の地面を聖別し、10秒間、周囲の敵を焼いて2秒ごとに{damage}の神聖ダメージを与えます。"
+        "description": "地面を9秒間聖別し、毎秒{damage}の神聖ダメージを与えます。信仰の守護者は範囲内で受けるダメージが10%減少します。"
       },
       "bastion_sweep": {
         "name": "砦の薙ぎ払い",
@@ -7820,7 +7820,7 @@ export const ja_JP: EnTranslations = {
       },
       "holy_shield": {
         "name": "ホーリーシールド",
-        "description": "10秒間、聖なる力で自分を守り、防御力を90上げ、近接攻撃者に12の聖属性ダメージを与えます。（プロテクション特性のシグネチャ）"
+        "description": "ブロック率が30%上昇し、最大体力の{damage}%に相当する盾を{duration}秒間得ます。アセンションは防御を強化します。"
       },
       "bestial_wrath": {
         "name": "野獣の怒り",

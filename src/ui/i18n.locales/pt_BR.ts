@@ -4041,12 +4041,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Coloca uma Bênção em um alvo aliado, aumentando o poder de ataque em {buff} por 5 min.',
   'entities.abilities.divine_protection.name': 'Salvaguarda da Fé',
   'entities.abilities.divine_protection.description':
-    'Uma salvaguarda protetora absorve {damage} de dano por 10 s.',
+    'Um escudo sagrado absorve {damage}% da sua vida máxima por {duration} s.',
   'entities.abilities.hammer_of_justice.name': 'Malho Dilacerante',
   'entities.abilities.hammer_of_justice.description': 'Atordoa o alvo por {duration} s.',
   'entities.abilities.lay_on_hands.name': 'Extrema-Unção',
   'entities.abilities.lay_on_hands.description':
-    'Uma onda massiva de cura: restaura {damage} de vida. Recarga de 10 min.',
+    'Uma onda massiva de cura restaura {damage}% da sua vida máxima. Recarga de 10 min.',
   'entities.abilities.flash_of_light.name': 'Cura Luminosa',
   'entities.abilities.flash_of_light.description':
     'Uma explosão de Luz rápida e eficiente que cura um alvo aliado em {damage}.',
@@ -4055,7 +4055,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Bane os perversos com ira Sagrada, causando {damage} de dano Sagrado.',
   'entities.abilities.consecration.name': 'Solo Sagrado',
   'entities.abilities.consecration.description':
-    'Consagra o chão sob você, queimando inimigos próximos com {damage} de dano Sagrado a cada 2 s por 10 s.',
+    'Consagra o chão por 9 s e causa {damage} de dano Sagrado a cada segundo. Guardiões da Fé sofrem 10% menos dano enquanto estiverem dentro.',
   'entities.abilities.righteous_fury.name': 'Juramento Ardente',
   'entities.abilities.righteous_fury.description':
     'Aumenta a ameaça gerada pelo seu dano Sagrado em 60% por 30 min. A base do paladino tanque.',
@@ -4321,7 +4321,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Choca um alvo aliado com energia Sagrada, curando-o em {damage}. (assinatura Sagrado)',
   'entities.abilities.holy_shield.name': 'Escudo Sagrado',
   'entities.abilities.holy_shield.description':
-    'Protege você com poder Sagrado por 10 s, aumentando a armadura em 90 e atingindo atacantes corpo a corpo com 12 de dano Sagrado. (assinatura Proteção)',
+    'Aumenta o bloqueio em 30% e concede por {duration} s um escudo de {damage}% da sua vida máxima. Ascensão fortalece a defesa.',
   'entities.abilities.bestial_wrath.name': 'Ira Bestial',
   'entities.abilities.bestial_wrath.description':
     'Lança você em ira bestial, aumentando o poder de ataque em 55 por 15 s. (assinatura Domínio das Feras)',

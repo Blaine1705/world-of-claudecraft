@@ -7396,7 +7396,7 @@ export const ko_KR: EnTranslations = {
       },
       "divine_protection": {
         "name": "신념의 결계",
-        "description": "보호의 결계가 10초 동안 {damage}의 피해를 흡수합니다."
+        "description": "신성한 보호막이 최대 생명력의 {damage}%에 해당하는 피해를 {duration}초 동안 흡수합니다."
       },
       "hammer_of_justice": {
         "name": "분쇄의 망치",
@@ -7404,7 +7404,7 @@ export const ko_KR: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "마지막 의식",
-        "description": "막대한 치유의 힘으로 생명력을 {damage}만큼 회복시킵니다. 재사용 대기시간 10분."
+        "description": "막대한 치유의 힘으로 최대 생명력의 {damage}%를 회복합니다. 재사용 대기시간 10분."
       },
       "holy_taunt": {
         "name": "신성한 부추김",
@@ -7420,7 +7420,7 @@ export const ko_KR: EnTranslations = {
       },
       "consecration": {
         "name": "신성한 땅",
-        "description": "발밑의 땅을 신성화하여 10초 동안 2초마다 주위 적에게 {damage}의 신성 피해를 입힙니다."
+        "description": "땅을 9초 동안 신성화하여 매초 {damage}의 신성 피해를 입힙니다. 신앙의 수호자는 범위 안에서 받는 피해가 10% 감소합니다."
       },
       "bastion_sweep": {
         "name": "보루 휩쓸기",
@@ -7820,7 +7820,7 @@ export const ko_KR: EnTranslations = {
       },
       "holy_shield": {
         "name": "신성한 방패",
-        "description": "10초 동안 신성한 힘으로 자신을 보호하여 방어도를 90만큼 올리고 근접 공격자에게 12의 신성 피해를 줍니다. (보호 전문화 상징)"
+        "description": "방패 막기가 30% 증가하고 최대 생명력의 {damage}%에 해당하는 보호막을 {duration}초 동안 얻습니다. 승천은 방어를 강화합니다."
       },
       "bestial_wrath": {
         "name": "야수의 격노",

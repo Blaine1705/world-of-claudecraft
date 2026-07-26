@@ -14631,7 +14631,6 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
   if (primary) {
     switch (primary.type) {
       case 'directDamage':
-      case 'heal':
       case 'aoeDamage':
       case 'aoeHeal':
       case 'aoeRoot':
@@ -14642,6 +14641,10 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
         return abilityAmountRange(primary.min, primary.max) + suffix(primary);
       case 'hunterStampede':
         return abilityAmountRange(primary.min, primary.max) + suffix(primary);
+      case 'heal':
+        return primary.casterMaxHpPct === undefined
+          ? abilityAmountRange(primary.min, primary.max) + suffix(primary)
+          : formatAbilityNumber(primary.casterMaxHpPct * 100);
       case 'repositionToAim':
         return primary.landingAoe
           ? abilityAmountRange(primary.landingAoe.min, primary.landingAoe.max)
@@ -14687,7 +14690,9 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
     case 'hot':
       return formatAbilityNumber(secondary.total) + suffix(secondary);
     case 'absorb':
-      return formatAbilityNumber(secondary.amount) + suffix(secondary);
+      return secondary.casterMaxHpPct === undefined
+        ? formatAbilityNumber(secondary.amount) + suffix(secondary)
+        : formatAbilityNumber(secondary.casterMaxHpPct * 100);
     case 'imbue':
       return formatAbilityNumber(secondary.bonus);
     default:

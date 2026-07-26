@@ -7396,7 +7396,7 @@ export const cs_CZ: EnTranslations = {
       },
       "divine_protection": {
         "name": "Ochrana víry",
-        "description": "Ochranná záštita pohltí {damage} poškození na 10 s."
+        "description": "Svatý štít pohltí {damage}% tvého maximálního zdraví na {duration} s."
       },
       "hammer_of_justice": {
         "name": "Rozrážecí palice",
@@ -7404,7 +7404,7 @@ export const cs_CZ: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Poslední obřad",
-        "description": "Mohutná vlna léčení: obnoví {damage} zdraví. Cooldown 10 min."
+        "description": "Mohutná vlna léčení obnoví {damage}% tvého maximálního zdraví. Cooldown 10 min."
       },
       "holy_taunt": {
         "name": "Posvátná výzva",
@@ -7420,7 +7420,7 @@ export const cs_CZ: EnTranslations = {
       },
       "consecration": {
         "name": "Svatá půda",
-        "description": "Posvětí půdu pod tebou a sežehne blízké nepřátele za {damage} svatého poškození každé 2 s po dobu 10 s."
+        "description": "Posvětí půdu na 9 s a každou sekundu způsobí {damage} svatého poškození. Strážci víry uvnitř utrpí o 10% méně poškození."
       },
       "bastion_sweep": {
         "name": "Rozmach bastionu",
@@ -7820,7 +7820,7 @@ export const cs_CZ: EnTranslations = {
       },
       "holy_shield": {
         "name": "Posvěcená hradba",
-        "description": "Vrhne na nepřítele zářivou záštitu, způsobí mu svaté poškození a odrazí se ke 2 blízkým nepřátelům. (klíčová schopnost Ochrany)"
+        "description": "Zvýší blokování o 30% a na {duration} s poskytne štít za {damage}% tvého maximálního zdraví. Vzestup posílí obranu."
       },
       "bestial_wrath": {
         "name": "Vyjící běs",

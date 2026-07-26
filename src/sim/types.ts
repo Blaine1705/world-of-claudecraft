@@ -2006,7 +2006,15 @@ export type AbilityEffect =
   // Swept teleport: travel facing-forward (Shadeslip snaps behind the target),
   // stopping at walls, steep slopes, and deep water.
   | { type: 'blinkForward'; distance: number; breakRoots?: boolean }
-  | { type: 'heal'; min: number; max: number } // friendly target (or self)
+  | {
+      type: 'heal';
+      min: number;
+      max: number;
+      // When present, the base heal is this fraction of the caster's maximum
+      // health instead of a random min/max roll plus Spell Power.
+      casterMaxHpPct?: number;
+      canCrit?: boolean;
+    } // friendly target (or self)
   // Chronomancy Temporal Echo (docs/prd/mage-chronomancy.md section 13): place a
   // per-caster mark on the friendly target (or self) for `duration` sec. The
   // small initial heal is authored as a sibling `heal` effect on the same
@@ -2092,6 +2100,8 @@ export type AbilityEffect =
       amount: number;
       duration: number;
       spellPowerCoeff?: number;
+      // Adds a shield equal to this fraction of the caster's maximum health.
+      casterMaxHpPct?: number;
       auraId?: string;
     } // power word: shield
   | { type: 'imbue'; bonus: number; duration: number } // seals / rockbiter: extra damage per swing

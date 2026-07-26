@@ -7396,7 +7396,7 @@ export const es: EnTranslations = {
       },
       "divine_protection": {
         "name": "Égida de Fe",
-        "description": "Una égida protectora absorbe {damage} de daño durante 10 s."
+        "description": "Una égida protectora absorbe un {damage}% de tu salud máxima durante {duration} s. Protección duradera aumenta el escudo."
       },
       "hammer_of_justice": {
         "name": "Mazo Demoledor",
@@ -7404,7 +7404,7 @@ export const es: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Último Rito",
-        "description": "Una enorme oleada de sanación: restaura {damage} de salud. Tiempo de reutilización de 10 min."
+        "description": "Una enorme oleada restaura un {damage}% de tu salud máxima y genera 1 de Devoción si sana. Tiempo de reutilización de 10 min."
       },
       "holy_taunt": {
         "name": "Provocación sagrada",
@@ -7420,7 +7420,7 @@ export const es: EnTranslations = {
       },
       "consecration": {
         "name": "Tierra Sagrada",
-        "description": "Consagra el suelo bajo tus pies y abrasa a los enemigos cercanos por {damage} de daño Sagrado cada 2 s durante 10 s."
+        "description": "Consagra el suelo bajo tus pies durante 9 s e inflige {damage} de daño Sagrado con gran amenaza cada segundo. El primer impacto genera 1 de Devoción. Los Guardianes de la Fe reciben un 10% menos de daño mientras permanecen dentro. Ascensión aumenta su daño."
       },
       "bastion_sweep": {
         "name": "Barrido del Bastión",
@@ -7820,7 +7820,7 @@ export const es: EnTranslations = {
       },
       "holy_shield": {
         "name": "Escudo Sagrado",
-        "description": "Te protege con poder Sagrado durante 10 s, aumenta la armadura en 90 y golpea a los atacantes cuerpo a cuerpo con 12 de daño Sagrado. (habilidad distintiva de Protección)"
+        "description": "Obtienes un 30% de bloqueo y un escudo que absorbe un {damage}% de tu salud máxima durante {duration} s, y emites un pulso de amenaza. Ascensión refuerza y prolonga la defensa."
       },
       "bestial_wrath": {
         "name": "Cólera de las bestias",

@@ -93,7 +93,12 @@ describe('paladin choice-row definitions', () => {
 
   it('resolves the numerical ability modifiers exactly', () => {
     const ward = resolved(rig({ 8: 'pal_r8_enduring_protection' }), 'divine_protection');
-    expect(ward.effects[0]).toMatchObject({ type: 'absorb', amount: 165, duration: 15 });
+    expect(ward.effects[0]).toMatchObject({
+      type: 'absorb',
+      amount: 0,
+      casterMaxHpPct: 0.35,
+      duration: 15,
+    });
 
     expect(resolved(rig({ 8: 'pal_r8_steady_hands' }), 'lay_on_hands').cooldown).toBe(420);
     expect(resolved(rig({ 11: 'pal_r11_fist_of_justice' }), 'hammer_of_justice').cooldown).toBe(45);
@@ -185,6 +190,9 @@ describe('paladin row runtime', () => {
       expect.arrayContaining([
         expect.objectContaining({ id: 'steady_hands_hot', kind: 'hot', duration: 6 }),
       ]),
+    );
+    expect(sim.player.auras.find((aura) => aura.id === 'steady_hands_hot')?.value).toBe(
+      Math.round(Math.round(sim.player.maxHp * 0.3) / 3),
     );
   });
 

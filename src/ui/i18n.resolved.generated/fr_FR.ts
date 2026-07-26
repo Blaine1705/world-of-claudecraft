@@ -7396,7 +7396,7 @@ export const fr_FR: EnTranslations = {
       },
       "divine_protection": {
         "name": "Garde de la foi",
-        "description": "Une garde protectrice absorbe {damage} points de dégâts pendant 10 s."
+        "description": "Un bouclier sacré absorbe {damage}% de vos points de vie maximum pendant {duration} s."
       },
       "hammer_of_justice": {
         "name": "Maillet fracassant",
@@ -7404,7 +7404,7 @@ export const fr_FR: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Dernier sacrement",
-        "description": "Une vague de soins massive: rend {damage} points de vie. Temps de recharge de 10 min."
+        "description": "Une vague de soins massive rend {damage}% de vos points de vie maximum. Temps de recharge de 10 min."
       },
       "holy_taunt": {
         "name": "Provocation sacrée",
@@ -7420,7 +7420,7 @@ export const fr_FR: EnTranslations = {
       },
       "consecration": {
         "name": "Terre consacrée",
-        "description": "Consacre le sol sous vos pieds et brûle les ennemis proches pour {damage} points de dégâts Sacrés toutes les 2 s pendant 10 s."
+        "description": "Consacre le sol pendant 9 s et inflige {damage} points de dégâts Sacrés chaque seconde. Les Gardiens de la foi y subissent 10% de dégâts en moins."
       },
       "bastion_sweep": {
         "name": "Balayage du bastion",
@@ -7820,7 +7820,7 @@ export const fr_FR: EnTranslations = {
       },
       "holy_shield": {
         "name": "Bouclier sacré",
-        "description": "Vous protège avec une puissance sacrée pendant 10 s, augmente l’armure de 90 et frappe les attaquants en mêlée pour 12 points de dégâts du Sacré. (signature Protection)"
+        "description": "Augmente le blocage de 30% et confère pendant {duration} s un bouclier absorbant {damage}% de vos points de vie maximum. Ascension renforce la défense."
       },
       "bestial_wrath": {
         "name": "Courroux bestial",

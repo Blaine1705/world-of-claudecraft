@@ -65,6 +65,7 @@ import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { rangedShotProfile } from './ranged_shot';
 import { triggerWardCycle } from './shaman_talents';
 import { advanceWarspiritCadence, stoneboundThreatMultiplier } from './shaman_warspirit';
+import { blockedMeleeDamage } from './shield_block';
 import { onCastCompleted, onMeleeSwing } from './talent_procs';
 import { applyThornsReaction } from './thorns_charge';
 import { warriorMeleeDefense } from './warrior_hit_table';
@@ -514,9 +515,14 @@ export function meleeSwing(
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
   const blocked = blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance;
   if (blocked) {
-    dmg = Math.max(1, dmg - target.blockValue);
     const targetMeta = target.kind === 'player' ? ctx.players.get(target.id) : undefined;
-    if (targetMeta && ctx.playerMods(targetMeta).spec === 'protection') {
+    const targetSpec = targetMeta ? ctx.playerMods(targetMeta).spec : null;
+    dmg = blockedMeleeDamage(
+      dmg,
+      target.blockValue,
+      target.templateId === 'paladin' && targetSpec === 'protection',
+    );
+    if (targetMeta && targetSpec === 'protection') {
       grantDevotionFromBlock(target);
       tryGrantSolarReprisal(ctx, target, 'block');
     }

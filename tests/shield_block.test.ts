@@ -1,9 +1,9 @@
 // Restored from the pre-revert payload (f274835b1^) and adapted to the current
 // model: block rides the same one-roll hit table as parry (warriorMeleeDefense),
-// gated to warriors holding a shield, front-arc only. blockChance/blockValue
-// live on the entity (entity.ts recalc: SHIELD_BLOCK_BASE with a shield); there
-// is no entity.parryChance to zero anymore, so these tests pin the rng roll
-// into the block window instead.
+// gated to Warriors or Paladins holding a shield, front-arc only.
+// blockChance/blockValue live on the entity (entity.ts recalc: SHIELD_BLOCK_BASE
+// with a shield); there is no entity.parryChance to zero anymore, so these tests
+// pin the rng roll into the block window instead.
 import { describe, expect, it } from 'vitest';
 import { meleeSwing } from '../src/sim/combat/auto_attack';
 import { MOBS } from '../src/sim/data';
@@ -46,6 +46,18 @@ describe('shield block', () => {
     expect(sim.player.blockValue).toBe(6);
   });
 
+  it('a Protection Paladin gains block stats by equipping a shield', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'paladin', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('protection')).toBe(true);
+    sim.addItem('eastbrook_buckler', 1);
+    sim.equipItem('eastbrook_buckler');
+
+    expect(sim.player.offhandItemId).toBe('eastbrook_buckler');
+    expect(sim.player.blockChance).toBe(SHIELD_BLOCK_BASE);
+    expect(sim.player.blockValue).toBe(6);
+  });
+
   it('mob melee from the front is reduced by blockValue; from behind it is not', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true }) as AnySim;
     const player = sim.player;
@@ -74,6 +86,69 @@ describe('shield block', () => {
     sim.mobSwing(mob, player);
     const back = damageEvents(sim.drainEvents()).find((e) => e.kind === 'hit');
     expect(back?.amount).toBe(20); // unmitigated
+  });
+
+  it('Protection Paladin mob blocks reduce 20% of the physical hit plus blockValue', () => {
+    const sim = new Sim({
+      seed: 7,
+      playerClass: 'paladin',
+      autoEquip: true,
+    }) as AnySim;
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('protection')).toBe(true);
+    sim.addItem('eastbrook_buckler', 1);
+    sim.equipItem('eastbrook_buckler');
+    const player = sim.player;
+    const mob = spawnMobInFront(sim, player);
+    player.dodgeChance = 0;
+    player.blockChance = 1;
+    player.blockValue = 6;
+    player.stats.armor = 0;
+    mob.weapon = { min: 100, max: 100, speed: 2 };
+    mob.attackPower = 0;
+    sim.rng.next = () => 0.9;
+
+    player.facing = 0;
+    sim.drainEvents();
+    sim.mobSwing(mob, player);
+
+    const blocked = damageEvents(sim.drainEvents()).find((e) => e.kind === 'hit');
+    expect(blocked?.amount).toBe(74); // 100 * 80% - blockValue 6
+
+    player.hp = player.maxHp;
+    player.facing = Math.PI;
+    sim.drainEvents();
+    sim.mobSwing(mob, player);
+    const fromBehind = damageEvents(sim.drainEvents()).find((e) => e.kind === 'hit');
+    expect(fromBehind?.amount).toBe(100);
+  });
+
+  it('non-Protection Paladin mob blocks retain the flat blockValue behavior', () => {
+    const sim = new Sim({
+      seed: 7,
+      playerClass: 'paladin',
+      autoEquip: true,
+    }) as AnySim;
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('holy')).toBe(true);
+    sim.addItem('eastbrook_buckler', 1);
+    sim.equipItem('eastbrook_buckler');
+    const player = sim.player;
+    const mob = spawnMobInFront(sim, player);
+    player.dodgeChance = 0;
+    player.blockChance = 1;
+    player.blockValue = 6;
+    player.stats.armor = 0;
+    mob.weapon = { min: 100, max: 100, speed: 2 };
+    mob.attackPower = 0;
+    sim.rng.next = () => 0.9;
+
+    player.facing = 0;
+    sim.drainEvents();
+    sim.mobSwing(mob, player);
+
+    const blocked = damageEvents(sim.drainEvents()).find((e) => e.kind === 'hit');
+    expect(blocked?.amount).toBe(94); // 100 - blockValue 6
   });
 
   it('player melee into a shielded target is reduced only from the front', () => {
@@ -106,5 +181,86 @@ describe('shield block', () => {
     expect(meleeSwing(sim.ctx, attacker, defender, 0, null, { cannotBeDodged: true })).toBe(true);
     const back = damageEvents(sim.drainEvents()).find((e) => e.kind === 'hit');
     expect(back?.amount).toBe(20);
+  });
+
+  it('Protection Paladin blocks use the same 20% reduction against player melee', () => {
+    const sim = new Sim({
+      seed: 7,
+      playerClass: 'warrior',
+      autoEquip: true,
+      noPlayer: true,
+    }) as AnySim;
+    const attackerId = sim.addPlayer('warrior', 'Attacker');
+    const defenderId = sim.addPlayer('paladin', 'Defender');
+    sim.setPlayerLevel(20, attackerId);
+    sim.setPlayerLevel(20, defenderId);
+    expect(sim.setSpec('protection', defenderId)).toBe(true);
+    sim.addItem('eastbrook_buckler', 1, defenderId);
+    sim.equipItem('eastbrook_buckler', defenderId);
+    const attacker = sim.entities.get(attackerId);
+    const defender = sim.entities.get(defenderId);
+    if (!attacker || !defender) throw new Error('missing combatant');
+    attacker.weapon = { min: 100, max: 100, speed: 2 };
+    attacker.attackPower = 0;
+    attacker.critChance = 0;
+    defender.stats.armor = 0;
+    defender.dodgeChance = 0;
+    defender.blockChance = 1;
+    defender.blockValue = 6;
+    attacker.pos = { x: 0, y: 0, z: 0 };
+    defender.pos = { x: 0, y: 0, z: 2 };
+    attacker.facing = 0;
+    defender.facing = Math.PI;
+    sim.rng.next = () => 0.9;
+
+    sim.drainEvents();
+    expect(meleeSwing(sim.ctx, attacker, defender, 0, null, { cannotBeDodged: true })).toBe(true);
+
+    const blocked = damageEvents(sim.drainEvents()).find((e) => e.kind === 'hit');
+    expect(blocked?.amount).toBe(74); // 100 * 80% - blockValue 6
+
+    defender.hp = defender.maxHp;
+    defender.facing = 0;
+    sim.drainEvents();
+    expect(meleeSwing(sim.ctx, attacker, defender, 0, null, { cannotBeDodged: true })).toBe(true);
+    const fromBehind = damageEvents(sim.drainEvents()).find((e) => e.kind === 'hit');
+    expect(fromBehind?.amount).toBe(100);
+  });
+
+  it('non-Protection Paladin blocks retain flat blockValue against player melee', () => {
+    const sim = new Sim({
+      seed: 7,
+      playerClass: 'warrior',
+      autoEquip: true,
+      noPlayer: true,
+    }) as AnySim;
+    const attackerId = sim.addPlayer('warrior', 'Attacker');
+    const defenderId = sim.addPlayer('paladin', 'Defender');
+    sim.setPlayerLevel(20, attackerId);
+    sim.setPlayerLevel(20, defenderId);
+    expect(sim.setSpec('holy', defenderId)).toBe(true);
+    sim.addItem('eastbrook_buckler', 1, defenderId);
+    sim.equipItem('eastbrook_buckler', defenderId);
+    const attacker = sim.entities.get(attackerId);
+    const defender = sim.entities.get(defenderId);
+    if (!attacker || !defender) throw new Error('missing combatant');
+    attacker.weapon = { min: 100, max: 100, speed: 2 };
+    attacker.attackPower = 0;
+    attacker.critChance = 0;
+    defender.stats.armor = 0;
+    defender.dodgeChance = 0;
+    defender.blockChance = 1;
+    defender.blockValue = 6;
+    attacker.pos = { x: 0, y: 0, z: 0 };
+    defender.pos = { x: 0, y: 0, z: 2 };
+    attacker.facing = 0;
+    defender.facing = Math.PI;
+    sim.rng.next = () => 0.9;
+
+    sim.drainEvents();
+    expect(meleeSwing(sim.ctx, attacker, defender, 0, null, { cannotBeDodged: true })).toBe(true);
+
+    const blocked = damageEvents(sim.drainEvents()).find((e) => e.kind === 'hit');
+    expect(blocked?.amount).toBe(94); // 100 - blockValue 6
   });
 });

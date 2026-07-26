@@ -7396,7 +7396,7 @@ export const tr_TR: EnTranslations = {
       },
       "divine_protection": {
         "name": "İnanç Siperi",
-        "description": "Koruyucu bir siper 10 saniye boyunca {damage} hasarı emer."
+        "description": "Kutsal bir kalkan {duration} saniye boyunca azami canının %{damage} kadarını emer."
       },
       "hammer_of_justice": {
         "name": "Parçalayan Tokmak",
@@ -7404,7 +7404,7 @@ export const tr_TR: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Son Ayin",
-        "description": "Devasa bir iyileştirme dalgası: {damage} can geri kazandırır. 10 dakika bekleme süresi."
+        "description": "Devasa bir iyileştirme dalgası azami canının %{damage} kadarını geri kazandırır. 10 dakika bekleme süresi."
       },
       "holy_taunt": {
         "name": "Kutsal Tahrik",
@@ -7420,7 +7420,7 @@ export const tr_TR: EnTranslations = {
       },
       "consecration": {
         "name": "Kutsal Toprak",
-        "description": "Altındaki zemini kutsar, yakındaki düşmanları 10 saniye boyunca her 2 saniyede bir {damage} Kutsal hasarla dağlar."
+        "description": "Zemini 9 saniyeliğine kutsar ve her saniye {damage} Kutsal hasar verir. İnanç Muhafızları içerideyken %10 daha az hasar alır."
       },
       "bastion_sweep": {
         "name": "Burç Savurması",
@@ -7820,7 +7820,7 @@ export const tr_TR: EnTranslations = {
       },
       "holy_shield": {
         "name": "Kutsal Kalkan",
-        "description": "Seni 10 sn boyunca Kutsal güçle korur, zırhı 90 artırır ve yakın dövüş saldırganlarına 12 Kutsal hasar verir. (Koruma imzası)"
+        "description": "Engellemeyi %30 artırır ve {duration} saniye boyunca azami canının %{damage} kadarına eşit kalkan verir. Yükseliş savunmayı güçlendirir."
       },
       "bestial_wrath": {
         "name": "Vahşi Gazap",

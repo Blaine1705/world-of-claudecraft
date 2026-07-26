@@ -7396,7 +7396,7 @@ export const vi_VN: EnTranslations = {
       },
       "divine_protection": {
         "name": "Bùa Hộ Đức Tin",
-        "description": "Một tấm bùa hộ mệnh hấp thụ {damage} sát thương trong 10 giây."
+        "description": "Một lá chắn thánh hấp thụ {damage}% máu tối đa của bạn trong {duration} giây."
       },
       "hammer_of_justice": {
         "name": "Búa Phán Nứt Vỡ",
@@ -7404,7 +7404,7 @@ export const vi_VN: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Nghi Thức Cuối Cùng",
-        "description": "Một luồng trị liệu khổng lồ: hồi phục {damage} máu. Hồi chiêu 10 phút."
+        "description": "Một luồng trị liệu khổng lồ hồi phục {damage}% máu tối đa của bạn. Hồi chiêu 10 phút."
       },
       "holy_taunt": {
         "name": "Khiêu Khích Thánh",
@@ -7420,7 +7420,7 @@ export const vi_VN: EnTranslations = {
       },
       "consecration": {
         "name": "Thánh Địa",
-        "description": "Thánh hóa mặt đất bên dưới ngươi, thiêu đốt kẻ địch lân cận gây {damage} sát thương Thần Thánh mỗi 2 giây trong 10 giây."
+        "description": "Thánh hóa mặt đất trong 9 giây và gây {damage} sát thương Thần Thánh mỗi giây. Hộ Vệ Đức Tin chịu ít hơn 10% sát thương khi đứng bên trong."
       },
       "bastion_sweep": {
         "name": "Quét Thành Lũy",
@@ -7820,7 +7820,7 @@ export const vi_VN: EnTranslations = {
       },
       "holy_shield": {
         "name": "Khiên Thánh",
-        "description": "Bảo vệ bạn bằng sức mạnh Thánh trong 10 giây, tăng giáp thêm 90 và đánh kẻ tấn công cận chiến gây 12 sát thương Thánh. (dấu ấn Bảo Hộ)"
+        "description": "Tăng chặn đòn 30% và tạo lá chắn bằng {damage}% máu tối đa trong {duration} giây. Thăng Thiên tăng cường phòng thủ."
       },
       "bestial_wrath": {
         "name": "Cơn Thịnh Nộ Dã Thú",

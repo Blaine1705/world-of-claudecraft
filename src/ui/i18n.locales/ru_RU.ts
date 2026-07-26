@@ -2879,12 +2879,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Накладывает Благословение на дружественную цель, повышая силу атаки на {buff} на 5 мин.',
   'entities.abilities.divine_protection.name': 'Оберег веры',
   'entities.abilities.divine_protection.description':
-    'Защитный оберег поглощает {damage} ед. урона в течение 10 сек.',
+    'Священный щит поглощает урон в размере {damage}% от вашего максимального запаса здоровья на {duration} сек.',
   'entities.abilities.hammer_of_justice.name': 'Раскалывающий молот',
   'entities.abilities.hammer_of_justice.description': 'Оглушает цель на {duration} сек.',
   'entities.abilities.lay_on_hands.name': 'Последний обряд',
   'entities.abilities.lay_on_hands.description':
-    'Мощный поток исцеления: восстанавливает {damage} здоровья. Время восстановления 10 мин.',
+    'Мощный поток исцеления восстанавливает {damage}% вашего максимального запаса здоровья. Время восстановления 10 мин.',
   'entities.abilities.holy_taunt.name': 'Священное подстрекательство',
   'entities.abilities.holy_taunt.description':
     'Провоцирует цель: ваша угроза повышается до уровня самого ненавистного ей врага, и она вынуждена атаковать вас 3 сек.',
@@ -2896,7 +2896,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Изгоняет нечестивых священным гневом, нанося {damage} ед. урона от светлой магии.',
   'entities.abilities.consecration.name': 'Святая земля',
   'entities.abilities.consecration.description':
-    'Освящает землю под вами, обжигая ближайших врагов на {damage} ед. урона от светлой магии каждые 2 сек. в течение 10 сек.',
+    'Освящает землю на 9 сек. и каждую секунду наносит {damage} ед. урона от Света. Хранители веры внутри получают на 10% меньше урона.',
   'entities.abilities.righteous_fury.name': 'Пылающая клятва',
   'entities.abilities.righteous_fury.description':
     'Повышает угрозу от вашего урона светлой магией на 60% на 30 мин. Основа паладина-танка.',
@@ -3188,7 +3188,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Поражает дружественную цель энергией Света и исцеляет ее на {damage}. (знаковое умение Света)',
   'entities.abilities.holy_shield.name': 'Священный щит',
   'entities.abilities.holy_shield.description':
-    'Защищает вас силой Света на 10 сек., повышает броню на 90 и поражает атакующих в ближнем бою на 12 ед. урона от Света. (знаковое умение Защиты)',
+    'Повышает блокирование на 30% и дает на {duration} сек. щит в размере {damage}% максимального здоровья. Вознесение усиливает защиту.',
   'entities.abilities.bestial_wrath.name': 'Звериный гнев',
   'entities.abilities.bestial_wrath.description':
     'Повергает вас в звериную ярость, повышая силу атаки на 55 на 15 сек. (знаковое умение Повелителя зверей)',
