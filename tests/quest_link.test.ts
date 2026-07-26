@@ -175,8 +175,9 @@ describe('the guarded encoders return null exactly when the parser would balk (#
 // beside the parser. Moving it into src/sim to share it would trade this gap
 // for a worse one (the predicate and the regex could then drift). Those ids
 // come from mob loot tables, the same content-bounded exposure the client
-// sites had. The token-construction arm below is therefore scoped to the
-// client layers that CAN import the module.
+// sites had. src/sim is therefore the ONE directory the token-construction arm
+// below excludes, and it excludes nothing else: every other tree under src/ can
+// import this module, so every other tree is swept.
 // ---------------------------------------------------------------------------
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
@@ -217,11 +218,14 @@ const posixRel = (file: string): string => relative(repoRoot, file).replaceAll('
 // tryEncodeItemLink / tryEncodeQuestLink from matching.
 const RAW_ENCODER_RE = /\b(?:encodeItemLink|encodeQuestLink)\b/;
 
-// A token being BUILT by interpolation, which is how a call site would bypass
-// the module altogether rather than by importing from it. Deliberately narrow:
-// it does not match hud.ts's `text.includes('[[i:')`, which READS a token
-// rather than minting one, and it does not claim to catch string concatenation.
-const HAND_ROLLED_TOKEN_RE = /\[\[[qi]:\$\{/;
+// A token being BUILT, which is how a call site would bypass the module
+// altogether rather than by importing from it. Two ways to mint one inline: a
+// template interpolation, and an id concatenated onto the prefix. Narrow on
+// purpose either way, since the character after the prefix has to be `${` or a
+// closing quote followed by `+`: hud.ts's `text.includes('[[i:')` READS a token
+// rather than minting one and must stay allowed. What it still does not claim
+// to catch is a prefix hoisted into a named constant and concatenated later.
+const HAND_ROLLED_TOKEN_RE = /\[\[[qi]:(?:\$\{|['"`]\s*\+)/;
 
 function offenders(files: string[], re: RegExp): string[] {
   const found: string[] = [];
@@ -235,17 +239,34 @@ function offenders(files: string[], re: RegExp): string[] {
 
 describe('no call site can encode a chat link without the charset guard (#2459)', () => {
   const srcFiles = walk(join(repoRoot, 'src'));
-  const clientFiles = ['ui', 'render', 'game', 'net'].flatMap((dir) =>
-    walk(join(repoRoot, 'src', dir)),
-  );
+  // Everything the guard can actually reach: all of src minus src/sim, the one
+  // gap the header records. Derived by filtering the single walk rather than by
+  // listing client directories, because an allowlist would have left src/main.ts,
+  // src/admin, src/guide, src/editor and src/world_api unswept and would need
+  // editing again the next time a top-level client directory appears.
+  const guardableFiles = srcFiles.filter((f) => !posixRel(f).startsWith('src/sim/'));
 
   it('actually found the trees it claims to sweep', () => {
     // A walk that silently returned nothing would make both sweeps below pass
     // for the wrong reason.
     expect(srcFiles.length).toBeGreaterThan(500);
-    expect(clientFiles.length).toBeGreaterThan(200);
+    expect(guardableFiles.length).toBeGreaterThan(200);
     expect(srcFiles.map(posixRel)).toContain(QUEST_LINK_FILE);
-    expect(clientFiles.map(posixRel)).toContain('src/ui/hud/chat/chat_window_controller.ts');
+    expect(guardableFiles.map(posixRel)).toContain('src/ui/hud/chat/chat_window_controller.ts');
+    // The trees an allowlist of client directories would have missed.
+    expect(guardableFiles.map(posixRel)).toContain('src/main.ts');
+    expect(guardableFiles.map(posixRel)).toContain('src/guide/app.ts');
+  });
+
+  it('excludes src/sim from the token arm, and excludes nothing else', () => {
+    // Both directions of the one documented gap. Drop the filter and the arm
+    // reds on loot_roll.ts instead of on a real offender; widen it past src/sim
+    // and a whole tree stops being swept with nothing to say so.
+    expect(srcFiles.map(posixRel)).toContain('src/sim/loot/loot_roll.ts');
+    expect(guardableFiles.map(posixRel)).not.toContain('src/sim/loot/loot_roll.ts');
+    const excluded = srcFiles.filter((f) => !guardableFiles.includes(f)).map(posixRel);
+    expect(excluded.every((rel) => rel.startsWith('src/sim/'))).toBe(true);
+    expect(excluded.length).toBeGreaterThan(0);
   });
 
   it('leaves the raw encoders referenced only by the module that owns them', () => {
@@ -256,10 +277,11 @@ describe('no call site can encode a chat link without the charset guard (#2459)'
     ).toEqual([]);
   });
 
-  it('lets no client module hand-roll a token instead of asking the encoder', () => {
+  it('lets nothing outside src/sim hand-roll a token instead of asking the encoder', () => {
     expect(
-      offenders(clientFiles, HAND_ROLLED_TOKEN_RE),
-      `build chat links with tryEncodeItemLink / tryEncodeQuestLink, not a template literal`,
+      offenders(guardableFiles, HAND_ROLLED_TOKEN_RE),
+      `build chat links with tryEncodeItemLink / tryEncodeQuestLink, never by interpolating\n` +
+        `or concatenating an id onto "[[i:" yourself`,
     ).toEqual([]);
   });
 
@@ -277,8 +299,14 @@ describe('no call site can encode a chat link without the charset guard (#2459)'
     expect(HAND_ROLLED_TOKEN_RE.test('text: `Rolling for [[i:${itemId}]].`')).toBe(true);
     // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the source literally contains this template expression
     expect(HAND_ROLLED_TOKEN_RE.test('const raw = `[[q:${questId}]]`;')).toBe(true);
-    // hud.ts's detection read is not a producer and must stay allowed.
+    // The concatenated form mints exactly the same doomed token, in either quote.
+    expect(HAND_ROLLED_TOKEN_RE.test("const raw = '[[i:' + itemId + ']]';")).toBe(true);
+    expect(HAND_ROLLED_TOKEN_RE.test('const raw = "[[q:" + questId + "]]";')).toBe(true);
+    // hud.ts's detection read is not a producer and must stay allowed. Neither
+    // is a bare prefix constant: the arm keys on the '+' that follows the quote,
+    // so a read stays green whether or not anything trails it.
     expect(HAND_ROLLED_TOKEN_RE.test("if (text.includes('[[i:')) {")).toBe(false);
+    expect(HAND_ROLLED_TOKEN_RE.test("const isLink = text.startsWith('[[q:') && ok;")).toBe(false);
 
     // The stripper itself: a prose mention must not read as a call, and a
     // commented-out call must not hide one.
