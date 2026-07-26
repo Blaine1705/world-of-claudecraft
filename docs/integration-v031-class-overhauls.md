@@ -136,3 +136,52 @@ merge: PR #2218 Hunter/Shaman/Priest v0.29 redesigns (@ryan-foo) into integratio
    a `BOOST_KIT_VERSION` bump re-kits the fleet.
 4. One PR into `release/v0.31.0`, merged with a real merge commit, with a credits table
    naming each owner and PR.
+
+## Progress log
+
+### 2026-07-26: #2218 landed
+
+`integration/v031-class-overhauls` = `release/v0.31.0` + runbook + **#2218 (@ryan-foo)**.
+
+Backups of all three pre-integration heads: `../pr-backups/20260726/` (local refs, range
+bundles, PR metadata, restore recipes).
+
+Done on #2218:
+
+- `release/v0.31.0` merged into `ryan-foo:integration/v029-owned-classes` (it was 173
+  commits behind), base retargeted to `release/v0.31.0`, notification posted. Their two
+  artwork commits, pushed mid-verification, were merged forward rather than force-pushed.
+- 20 catch-up conflicts resolved, then merged here with `--no-ff`.
+- **Combat probes anchored out of the rebuilt town** (`scripts/probe_anchor.ts`). This was
+  the session's real find: the v0.31 Eastbrook rebuild walled the spawn in, so probes that
+  place targets relative to the player were measuring sight-gated rotations. Beast Mastery
+  read 43 DPS against its real 68 because the pet reach gate refused Pack Command. Any new
+  combat fixture MUST use this anchor, never the raw spawn.
+- Eastbrook capture provenance re-recorded (`rerecord_polish_provenance.mjs`). **#2428 and
+  #2328 will trip the same pin**, because it hashes whole-file `renderer.ts` and every class
+  overhaul touches it. Run the script, verify no other fingerprinted input moved, paste the
+  two literals it prints.
+
+Known red on the branch, all attributed by running the same files on `pr/2218` and on
+`release/v0.31.0`:
+
+| Tests | Cause | Owner |
+|---|---|---|
+| hunter_dps_balance (2), owned_class_balance_harness (1), hunter_talents (1) | bands set before the crit/haste halving (#2358) | @ryan-foo, retune |
+| ability_tooltip_consistency (1), i18n_completeness (1) | pre-existing on their branch, pass on release | @ryan-foo |
+| deploy_watchdog (2) | docker, red on release too | not ours |
+| sfx_*, deeds_content, world_auth_scripts | flake under parallel load, pass in isolation | not ours |
+
+### Next: #2428 (paladin)
+
+The merge was pre-flighted and aborted rather than rushed. 62 conflicts: 26 generated i18n
+(regen), 1 parity golden (re-mint), 35 needing hands. Of 87 hunks in those 35 files,
+`scripts/conflict_classify.py` puts **49 as pure additive** (both sides only add at the same
+anchor, so a line union is behavior-preserving) and **38 as needing judgment**, concentrated
+in `src/sim/combat/effect_dispatch.ts` (7), `casting_lifecycle.ts` (6),
+`tests/talent_retained_semantics_v026.test.ts` (3), `server/snapshot_timer_wire.ts` (3) and
+`src/render/characters/visual.ts` (1 of 7).
+
+Run the classifier before resolving, and do not blind-union a grouped list: `src/ui/icons.ts`
+is the trap, where ids sit under per-class comment headers and a naive union files paladin ids
+under the hunter comment.
