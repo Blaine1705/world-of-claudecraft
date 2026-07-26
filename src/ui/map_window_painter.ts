@@ -12,11 +12,13 @@
 // hud.update()'s mediumHud band (>=250ms) behind the `display === 'block'` guard,
 // blitting the cached terrain background (Hud-owned, prewarmed) each redraw. Hud
 // also redraws it out of band on open, on zoom, on the Dungeon Finder's "Show on
-// Map", and once per drag-pan pointermove (mobile pinch-zoom lands on that same
-// pointermove path), which is UNTHROTTLED: a drag or a pinch repaints at the
-// pointer-event rate, so reading this painter as a cold ~4Hz on-open path holds
-// only while nobody is touching the map. This painter does not change any of those
-// call sites or the cadence; it only owns the draw.
+// Map", and once per drag-pan pointermove, which is UNTHROTTLED (no rAF coalesce,
+// no dirty check). Mobile pinch-zoom repaints just as often through its own
+// pointermove listener on the same canvas, which routes via map_pinch_zoom's
+// onZoom into zoomMap. So a drag or a pinch repaints at the pointer-event rate,
+// and reading this painter as a cold ~4Hz on-open path holds only while nobody is
+// touching the map. This painter does not change any of those call sites or the
+// cadence; it only owns the draw.
 //
 // TEXT: every label draws as a cached offscreen sprite (text_sprite_cache), never
 // through the canvas text API. Each canvas text entry point re-resolves font state
@@ -28,10 +30,10 @@
 // strings (dungeon and POI names, player names), which is why the cache it holds is
 // measured, bounded and evicting rather than a fixed per-glyph table.
 //
-// The six per-redraw TextSpriteStyle literals below are deliberate: they close
+// The seven per-redraw TextSpriteStyle literals below are deliberate: they close
 // over the colors resolved for THIS redraw, so they cannot be module constants,
-// and six object literals plus one key string per label is far less work than the
-// text API they replace. Do not trade them for a color-diffing memo.
+// and seven object literals plus one key string per label is far less work than
+// the text API they replace. Do not trade them for a color-diffing memo.
 //
 // NO-MAGIC-VALUES: a 2D context cannot read CSS vars, so the
 // painter resolves the `--color-map-*` tokens via getComputedStyle ONCE per redraw

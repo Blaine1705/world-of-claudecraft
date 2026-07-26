@@ -29,7 +29,10 @@ import type { IWorld } from '../src/world_api';
 const painter = readFileSync(new URL('../src/ui/map_window_painter.ts', import.meta.url), 'utf8');
 // Drop comments so prose can't create a false positive (mirrors architecture.test).
 const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
-const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+const hudSource = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+// Comments stripped for the same reason as `code` above: a wiring pin that a
+// commented-out call satisfies is not a pin (see the repo's raw-source rule).
+const hud = hudSource.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
 
 const MAP_COLOR_TOKENS = [
@@ -87,7 +90,11 @@ function spriteText(sprite: LabelSprite): string {
 }
 
 interface PaintTrace {
-  fills: Array<{ style: string; commands: string[] }>;
+  /** Monotonic draw counter, stamped on every fill and stroke, so a stroke can be
+   *  matched to the fill of the SAME path rather than to any similar one
+   *  elsewhere in the redraw. */
+  seq: number;
+  fills: Array<{ style: string; commands: string[]; at: number }>;
   styleReads: string[];
   /** Every canvas minted through document.createElement('canvas'). */
   sprites: LabelSprite[];
@@ -95,8 +102,9 @@ interface PaintTrace {
   blits: Array<{ sprite: LabelSprite; dx: number; dy: number }>;
   /** Every canvas text entry point used on the MAP context, which must stay empty. */
   textApi: string[];
-  /** Every stroke() on the map context with the strokeStyle it used. */
-  strokes: Array<{ style: string; commands: string[] }>;
+  /** Every stroke() on the map context with the stroke state it used. The width
+   *  matters as much as the color: the badge block leaves 1.5 behind. */
+  strokes: Array<{ style: string; lineWidth: number; commands: string[]; at: number }>;
 }
 
 function makeLabelSprite(trace: PaintTrace): LabelSprite {
@@ -165,10 +173,15 @@ function fakeMapContext(trace: PaintTrace): CanvasRenderingContext2D {
       commands.push('closePath');
     },
     fill(): void {
-      trace.fills.push({ style: String(ctx.fillStyle), commands: [...commands] });
+      trace.fills.push({ style: String(ctx.fillStyle), commands: [...commands], at: trace.seq++ });
     },
     stroke(): void {
-      trace.strokes.push({ style: String(ctx.strokeStyle), commands: [...commands] });
+      trace.strokes.push({
+        style: String(ctx.strokeStyle),
+        lineWidth: ctx.lineWidth,
+        commands: [...commands],
+        at: trace.seq++,
+      });
     },
     measureText(text: string): { width: number } {
       trace.textApi.push(`measureText:${text}`);
@@ -205,7 +218,7 @@ function installMapStyleGlobals(trace: PaintTrace): void {
 }
 
 function newTrace(): PaintTrace {
-  return { fills: [], styleReads: [], sprites: [], blits: [], textApi: [], strokes: [] };
+  return { seq: 0, fills: [], styleReads: [], sprites: [], blits: [], textApi: [], strokes: [] };
 }
 
 function mapWorld(): IWorld {
@@ -303,7 +316,9 @@ describe('map_window_painter: no magic values', () => {
     });
     painter.paintOverworld(ctx, world, options);
 
-    const buildingFills = trace.fills.filter((fill) => buildingStyles.has(fill.style));
+    const buildingFills = trace.fills
+      .filter((fill) => buildingStyles.has(fill.style))
+      .map(({ style, commands }) => ({ style, commands }));
     expect(buildingFills).toEqual([
       {
         style: 'paint:--color-map-building-armoury',
@@ -451,6 +466,56 @@ function crowdedAllyWorld(count: number): IWorld {
     guild: null,
   };
   return world as unknown as IWorld;
+}
+
+/** The same world with nothing in the quest log, so the painter draws no quest
+ *  areas and no badges. This is the arm where the portal block's own stroke
+ *  state is load-bearing: with quest areas present the badge block happens to
+ *  leave the outline color behind, so the portal block inherits it by luck. */
+function noQuestWorld(): IWorld {
+  const world = labelWorld() as unknown as {
+    questLog: Map<string, unknown>;
+    questState: (q: string) => string;
+  };
+  world.questLog = new Map();
+  world.questState = () => 'unavailable';
+  return world as unknown as IWorld;
+}
+
+/** Two active quests whose kill objectives share one camp, so a single quest
+ *  area carries TWO badge numbers and the side-by-side layout is exercised. */
+function sharedCampWorld(): { world: IWorld; questIds: string[] } {
+  const shared = new Map<string, string[]>();
+  for (const quest of Object.values(QUESTS)) {
+    for (const objective of quest.objectives) {
+      if (objective.type !== 'kill') continue;
+      const camp = CAMPS.find(
+        (c) =>
+          c.mobId === objective.targetMobId &&
+          c.center.z >= LABEL_ZONE.zMin &&
+          c.center.z < LABEL_ZONE.zMax,
+      );
+      if (!camp) continue;
+      const ids = shared.get(String(objective.targetMobId)) ?? [];
+      if (!ids.includes(quest.id)) ids.push(quest.id);
+      shared.set(String(objective.targetMobId), ids);
+    }
+  }
+  const pair = [...shared.values()].find((ids) => ids.length >= 2);
+  if (!pair) throw new Error('expected two quests sharing a camp in the first zone');
+  const questIds = pair.slice(0, 2);
+  const world = labelWorld() as unknown as { questLog: Map<string, QuestProgress> };
+  world.questLog = new Map(
+    questIds.map((id) => [
+      id,
+      {
+        questId: id,
+        counts: (QUESTS[id]?.objectives ?? []).map(() => 0),
+        state: 'active' as const,
+      },
+    ]),
+  );
+  return { world: world as unknown as IWorld, questIds };
 }
 
 /** The dungeon name the committed zone's one portal carries. */
@@ -656,9 +721,9 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     new MapWindowPainter().paintOverworld(fakeMapContext(trace), labelWorld(), labelPaintOptions());
 
     // The model plots friends before guild members, so the dot fills follow.
-    const allyDots = trace.fills.filter(
-      (fill) => fill.style.endsWith('ally-friend') || fill.style.endsWith('ally-guild'),
-    );
+    const allyDots = trace.fills
+      .filter((fill) => fill.style.endsWith('ally-friend') || fill.style.endsWith('ally-guild'))
+      .map(({ style, commands }) => ({ style, commands }));
     expect(allyDots).toEqual([
       { style: 'paint:--color-map-ally-friend', commands: ['arc'] },
       { style: 'paint:--color-map-ally-guild', commands: ['arc'] },
@@ -739,8 +804,121 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
   it('is wired to the language switch Hud fans out', () => {
     // The painter cannot listen for woc:languagechange itself (it owns no DOM),
     // so the one-line wiring in Hud's relocalizer is what makes the clear happen.
-    expect(hud).toContain('this.mapPainter.relocalize();');
     expect(hud).toContain("document.addEventListener('woc:languagechange'");
+    // Scoped to the relocalizer the language switch fans out to, not just to the
+    // 8000-line file: a bare toContain also passes when the call has been moved
+    // to a branch that never runs.
+    expect(hud).toContain('() => this.refreshLocalizedDynamicUi()');
+    const relocalizer = /private refreshLocalizedDynamicUi\(\): void \{([\s\S]*?)\n {2}\}/.exec(
+      hud,
+    );
+    expect(relocalizer, 'hud.refreshLocalizedDynamicUi no longer parses').not.toBeNull();
+    expect(relocalizer?.[1]).toContain('this.mapPainter.relocalize();');
+  });
+
+  it('outlines each portal dot in the outline token at the label width', () => {
+    // Both halves are load-bearing and neither was observable before: the badge
+    // block immediately above leaves lineWidth at 1.5, so without the portal
+    // block naming its own the dots outline at half width on every zone that has
+    // an active quest, which is the ordinary case.
+    for (const [arm, world] of [
+      ['with quest areas', labelWorld()],
+      // And with the quest log empty NOTHING sets strokeStyle before the portal
+      // loop, so the color half only becomes observable here.
+      ['without quest areas', noQuestWorld()],
+    ] as const) {
+      const trace = newTrace();
+      installMapStyleGlobals(trace);
+      setActiveWorldContent(BUILTIN_WORLD);
+
+      const result = new MapWindowPainter().paintOverworld(
+        fakeMapContext(trace),
+        world,
+        labelPaintOptions(),
+      );
+
+      const portals = overworldDungeonPortals(DUNGEON_LIST, LABEL_ZONE.zMin, LABEL_ZONE.zMax);
+      expect(portals.length, arm).toBeGreaterThan(0);
+      // Each portal dot fills then strokes the SAME path, so its own outline is
+      // the first stroke after its fill. Matching by draw order rather than by
+      // "some arc somewhere used these settings" is what makes this decisive:
+      // the ally dots later in the redraw use the identical color and width.
+      const dotFills = trace.fills.filter(
+        (fill) => fill.style === 'paint:--color-map-portal-dot' && fill.commands.join() === 'arc',
+      );
+      expect(dotFills, arm).toHaveLength(portals.length);
+      const dotStrokes = dotFills.map((fill) => {
+        const stroke = trace.strokes.find((s) => s.at > fill.at);
+        if (!stroke) throw new Error(`${arm}: no stroke follows a portal dot fill`);
+        return { style: stroke.style, lineWidth: stroke.lineWidth };
+      });
+      expect(dotStrokes, `${arm}: each portal dot outlines in the outline token at 3`).toEqual(
+        dotFills.map(() => ({ style: 'paint:--color-map-outline', lineWidth: 3 })),
+      );
+      // And the badge width may not survive into any later arc.
+      const badges = result.questAreas.reduce((n, a) => n + a.numbers.length, 0);
+      const narrowArcs = trace.strokes.filter(
+        (stroke) => stroke.commands.join() === 'arc' && stroke.lineWidth === 1.5,
+      );
+      expect(narrowArcs.length, arm).toBe(badges);
+    }
+  });
+
+  it('fills each quest badge disc in its own token', () => {
+    // Hoisted above the badge loop when the labels became sprites; unhoisted it
+    // silently paints in the quest-area blob color set a few lines earlier.
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    const result = new MapWindowPainter().paintOverworld(
+      fakeMapContext(trace),
+      labelWorld(),
+      labelPaintOptions(),
+    );
+
+    const badges = result.questAreas.reduce((n, area) => n + area.numbers.length, 0);
+    expect(badges).toBeGreaterThan(0);
+    const discs = trace.fills.filter(
+      (fill) =>
+        fill.style === 'paint:--color-map-quest-badge-fill' && fill.commands.join() === 'arc',
+    );
+    expect(discs).toHaveLength(badges);
+  });
+
+  it('lays two badges on one camp side by side around its centre', () => {
+    // With one number per area the layout term is always zero, so the offset
+    // ships unexercised: this is the arm where it does something.
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+    const { world } = sharedCampWorld();
+
+    const result = new MapWindowPainter().paintOverworld(
+      fakeMapContext(trace),
+      world,
+      labelPaintOptions(),
+    );
+
+    const shared = result.questAreas.find((area) => area.numbers.length === 2);
+    expect(shared, 'expected one area serving two quests').toBeDefined();
+    if (!shared) return;
+    const anchorOf = (text: string): { x: number; y: number } => {
+      const blit = trace.blits.find((b) => spriteText(b.sprite) === text);
+      if (!blit) throw new Error(`no blit for ${text}`);
+      return blitAnchor(blit);
+    };
+    // Radius 9, gap 2, so the pair straddles the centre at -10 and +10, both
+    // lifted the same 4px above it.
+    const [first, second] = shared.numbers.map(String);
+    expect(anchorOf(first)).toEqual({
+      x: Math.round(shared.mx - 10),
+      y: Math.round(shared.my + 4),
+    });
+    expect(anchorOf(second)).toEqual({
+      x: Math.round(shared.mx + 10),
+      y: Math.round(shared.my + 4),
+    });
   });
 
   it('keeps the Show-on-Map ping color off every later outline', () => {
