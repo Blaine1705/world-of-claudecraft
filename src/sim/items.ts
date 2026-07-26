@@ -30,7 +30,7 @@ import {
 } from './equipment_rules';
 import { formatMoney } from './format_money';
 import { moveStackToCell } from './inventory_order';
-import { canStackInstancePayloads } from './item_instance_merge';
+import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import { useGatherToolItem } from './professions/gathering';
@@ -766,22 +766,41 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
 }
 
 // `index` addresses the exact row the client clicked (its position in
-// meta.vendorBuyback, mirrored to the client verbatim as VendorView.buyback[].index).
-// Rows with the same itemId are no longer interchangeable once an instanced
-// (masterwork/signed) sale and a plain sale can coexist: the buyback list is
-// keyed by canStackInstancePayloads (recordVendorBuyback), so a plain
-// itemId-only lookup could silently redeem the wrong copy (a signed row when
-// the player clicked the plain one, or vice versa). A missing/stale index
-// (older client message, or the row moved under a concurrent action) falls
-// back to the first itemId match, same as before.
-export function buyBackItem(ctx: SimContext, itemId: string, index?: number, pid?: number): void {
+// meta.vendorBuyback, mirrored to the client verbatim as VendorView.buyback[].index),
+// and `expectedInstance` is that same row's instance payload as the client last saw
+// it (VendorBuybackRow.instance). Rows with the same itemId are no longer
+// interchangeable once an instanced (masterwork/signed) sale and a plain sale can
+// coexist: the buyback list is keyed by canStackInstancePayloads (recordVendorBuyback),
+// so an itemId-only lookup could silently redeem the wrong copy once a same-itemId row
+// shifts under a stale index (#2398 review: a plain sale recorded after the client's
+// snapshot can push the clicked masterwork row to a different index, and a bare
+// itemId check on the new occupant would pass and hand back the wrong payload).
+// The indexed row is only honored when its current payload still matches what the
+// client clicked; otherwise this falls back to an exact (itemId, payload) scan across
+// the whole list, and only if that also comes up empty does it fall back to the
+// first itemId-only match (a missing/no-instance click from an older client message).
+export function buyBackItem(
+  ctx: SimContext,
+  itemId: string,
+  index?: number,
+  pid?: number,
+  expectedInstance?: ItemInstancePayload,
+): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
   const indexed = index !== undefined ? meta.vendorBuyback[index] : undefined;
+  const indexedMatches =
+    indexed?.itemId === itemId && itemInstancePayloadsEqual(indexed.instance, expectedInstance);
   const slot =
-    indexed?.itemId === itemId ? indexed : meta.vendorBuyback.find((s) => s.itemId === itemId);
+    (indexedMatches ? indexed : undefined) ??
+    meta.vendorBuyback.find(
+      (s) => s.itemId === itemId && itemInstancePayloadsEqual(s.instance, expectedInstance),
+    ) ??
+    (expectedInstance === undefined
+      ? meta.vendorBuyback.find((s) => s.itemId === itemId)
+      : undefined);
   if (!def || !slot || slot.count <= 0) {
     ctx.error(meta.entityId, 'That item is not available for buyback.');
     return;

@@ -1,4 +1,4 @@
-import type { EquipSlot, InvSlot } from '../sim/types';
+import type { EquipSlot, InvSlot, ItemInstancePayload } from '../sim/types';
 
 export interface IWorldInventory {
   inventory: InvSlot[];
@@ -35,5 +35,9 @@ export interface IWorldInventory {
   // `index` addresses the exact row in vendorBuyback the player clicked
   // (VendorView.buyback[].index); rows can share an itemId with different
   // instance payloads, so the index disambiguates which copy comes back.
-  buyBackItem(itemId: string, index?: number): void;
+  // `instance` is that same row's payload as last seen by the client
+  // (VendorView.buyback[].instance): the server only honors the index when
+  // the row still carries this exact payload, so a stale index that now
+  // points at a different same-itemId row cannot redeem the wrong copy (#2398).
+  buyBackItem(itemId: string, index?: number, instance?: ItemInstancePayload): void;
 }

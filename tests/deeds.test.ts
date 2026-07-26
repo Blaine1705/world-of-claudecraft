@@ -1063,7 +1063,7 @@ describe('persistence', () => {
     meta.deedStats.itemsDiscovered.delete('wolf_fang');
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
     sim.entities.get(pid)!.pos = { x: wilkes.pos.x + 2, y: wilkes.pos.y, z: wilkes.pos.z };
-    sim.buyBackItem('wolf_fang', undefined, pid);
+    sim.buyBackItem('wolf_fang', undefined, undefined, pid);
     expect(sim.countItem('wolf_fang', pid)).toBe(1);
     expect(meta.deedStats.itemsDiscovered.has('wolf_fang')).toBe(true);
   });
