@@ -510,6 +510,16 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // Base gathering tools (#1123). Each is infinite-durability (this repo has
   // no durability field on ItemDef) and tiered: `use.tier` gates which
   // node/material tiers it can gather (see src/sim/professions/tools.ts).
+  //
+  // The three TIER-1 tools carry noVendorSell, and only those three. They are
+  // handed out by the gather quests' requiredItems (zone1.ts), which re-grants
+  // a missing one on every accept, and q_prof_hobby_switch is repeatable, so a
+  // sellable grant would be an unbounded copper faucet: accept, sell for 4,
+  // abandon, repeat. Vendor sale is the arm that matters because it MINTS
+  // copper; a World Market listing only moves copper between players (and
+  // pays the market cut), and every tier-1 tool is a 20-copper vendor staple
+  // anyway, so noMarketList would cost players a real convenience to close
+  // nothing. Tiers 2 and 3 are bought, never granted, so they stay sellable.
   copper_mining_pick: {
     id: 'copper_mining_pick',
     name: 'Copper Mining Pick',
@@ -518,6 +528,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     use: { type: 'gatherTool', professionId: 'mining', tier: 1 },
     sellValue: 4,
     buyValue: 20,
+    noVendorSell: true,
   },
   iron_mining_pick: {
     id: 'iron_mining_pick',
@@ -545,6 +556,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     use: { type: 'gatherTool', professionId: 'logging', tier: 1 },
     sellValue: 4,
     buyValue: 20,
+    noVendorSell: true,
   },
   felling_axe: {
     id: 'felling_axe',
@@ -572,6 +584,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     use: { type: 'gatherTool', professionId: 'herbalism', tier: 1 },
     sellValue: 4,
     buyValue: 20,
+    noVendorSell: true,
   },
   bronze_sickle: {
     id: 'bronze_sickle',

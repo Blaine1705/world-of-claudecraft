@@ -817,6 +817,12 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     xpReward: 150,
     copperReward: 50,
     itemRewards: {},
+    // The quest says to go swing a pick, and under the always-require-tool rule
+    // (#2343) a bare-handed harvest is denied outright. A new character starts
+    // with zero copper and nothing grants a tool, so this was unstartable on a
+    // fresh account. questFallbackGrants hands the pick over on accept and
+    // re-grants it if it is ever lost, exactly like a prerequisite quest item.
+    requiredItems: ['copper_mining_pick'],
   },
   q_wolves: {
     id: 'q_wolves',
@@ -1146,6 +1152,9 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     copperReward: 0,
     itemRewards: {},
     shareable: false,
+    // An anchor master is an independent entry point (no q_prof_intro gate), so
+    // this one cannot lean on the intro quest's pick: it grants its own.
+    requiredItems: ['copper_mining_pick'],
     completionEffect: { type: 'attunePair', mode: 'new', pairId: 'weaponcrafting+armorcrafting' },
   },
   q_prof_attune_outfitter: {
@@ -1193,6 +1202,9 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     copperReward: 0,
     itemRewards: {},
     shareable: false,
+    // A herb objective, so this one grants the SICKLE, not the pick: a mining
+    // tool does not satisfy the herbalism tool gate.
+    requiredItems: ['gathering_sickle'],
     completionEffect: { type: 'attunePair', mode: 'new', pairId: 'engineering+alchemy' },
   },
   // Make-amends returns (Professions 2.0): repeatable, one per anchor
@@ -1377,6 +1389,10 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     requiresQuest: 'q_prof_intro',
     repeatable: true,
     shareable: false,
+    // Also a herb objective, so also the sickle. This is the repeatable one, so
+    // it is the reason the tier-1 tools carry noVendorSell (items.ts): without
+    // that flag, accept-sell-abandon would be an unbounded copper faucet.
+    requiredItems: ['gathering_sickle'],
     completionEffect: { type: 'switchHobby' },
   },
 };
