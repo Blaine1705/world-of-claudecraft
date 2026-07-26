@@ -187,8 +187,14 @@ function itemMatchesType(item: ItemDef, filter: MarketItemTypeFilter): boolean {
   // Exhaustive on purpose: a future MARKET_ITEM_TYPE_FILTERS entry with no arm above
   // reddens tsc here instead of silently inheriting the 'other' predicate, which is
   // how `bag` browsed as nothing at all for its whole life before this arm existed.
+  // The runtime tail is `false`, not the asserted value: types are erased in the
+  // bundle, so returning `unhandled` would hand back the filter STRING, which is
+  // truthy, and a category that somehow slipped past tsc would match EVERY item.
+  // An empty category is the visible failure mode; one that matches everything is
+  // the silent one this arm exists to prevent.
   const unhandled: never = filter;
-  return unhandled;
+  void unhandled;
+  return false;
 }
 
 function weaponFamily(item: ItemDef): MarketWeaponTypeFilter {
