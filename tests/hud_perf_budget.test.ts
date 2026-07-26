@@ -591,12 +591,16 @@ describe('hud_perf_budget ARM 1: hot painters make no raw DOM write (Node, npm t
     expect(windows.length, 'the window painters vanished from the sweep').toBeGreaterThan(30);
     expect(windows).toContain('hud/vendor/vendor_window.ts');
     expect(windows).toContain('options_window.ts');
-    // Every window is either cold (the default, scanned below) or promoted into a scanned
-    // bucket. There is no third state and nothing to register for the default.
-    expect(new Set([...COLD_PAINTERS, ...windows.filter((f) => SCANNED_FILES.has(f))])).toEqual(
-      new Set(windows),
-    );
     expect(COLD_PAINTERS.length).toBeGreaterThan(30);
+    // WHERE representative painters land, pinned by name. "every window is cold or scanned"
+    // would be true by construction (COLD_PAINTERS is defined as the windows the scanned
+    // buckets do not claim), so it could never fail and would prove nothing; these can.
+    // map_window_painter is the one to watch: it carries `window` in its name but ends in
+    // _painter, so it is the CANVAS branch and must not be mistaken for a window.
+    expect(COLD_PAINTERS).toContain('hud/vendor/vendor_window.ts');
+    expect(COLD_PAINTERS).toContain('options_window.ts');
+    expect(windows).not.toContain('map_window_painter.ts');
+    expect(SCANNED_FILES.has('map_window_painter.ts')).toBe(true);
   });
 
   // The cold contract. Swept as ONE test per matcher family over the whole bucket rather
