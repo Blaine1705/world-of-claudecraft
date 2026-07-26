@@ -1187,6 +1187,7 @@ const MAGE_DEFENSIVE_COOLDOWNS = [
   'blink',
   'ice_barrier',
   'blazing_barrier',
+  'temporal_barrier',
   'greater_invisibility',
 ] as const;
 const OVERFLOW_CAP_SECONDS = 10;
