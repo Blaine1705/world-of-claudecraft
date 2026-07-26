@@ -150,10 +150,10 @@ function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWo
 }
 
 describe('self stat wire round-trip', () => {
-  it('mirrors Paladin shield block stats from the live equip command path', () => {
+  it('mirrors Warrior shield block stats from the live equip command path', () => {
     const server = new GameServer();
     const fc = fakeWs();
-    const session = joinServer(server, fc, 1, 'Cedric', 'paladin');
+    const session = joinServer(server, fc, 1, 'Cedric', 'warrior');
     server.sim.addItem('eastbrook_buckler', 1, session.pid);
     server.handleMessage(
       session,
@@ -167,7 +167,7 @@ describe('self stat wire round-trip', () => {
     expect(snap.self.blk).toBeGreaterThan(0);
     expect(snap.self.bval).toBe(6);
 
-    const client = bareClient(session.pid, 'paladin');
+    const client = bareClient(session.pid, 'warrior');
     const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
     internals.applySnapshot(snap);
     expect(client.player.offhandItemId).toBe('eastbrook_buckler');

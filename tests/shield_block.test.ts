@@ -1,6 +1,6 @@
 // Restored from the pre-revert payload (f274835b1^) and adapted to the current
 // model: block rides the same one-roll hit table as parry (warriorMeleeDefense),
-// gated to shield-eligible classes holding a shield, front-arc only. blockChance/blockValue
+// gated to warriors holding a shield, front-arc only. blockChance/blockValue
 // live on the entity (entity.ts recalc: SHIELD_BLOCK_BASE with a shield); there
 // is no entity.parryChance to zero anymore, so these tests pin the rng roll
 // into the block window instead.
@@ -46,7 +46,7 @@ describe('shield block', () => {
     expect(sim.player.blockValue).toBe(6);
   });
 
-  it('an eligible Paladin shield equips block stats, but no shield does not', () => {
+  it('a Paladin shield does not equip block stats', () => {
     const sim = new Sim({ seed: 7, playerClass: 'paladin', autoEquip: true });
     expect(sim.player.blockChance).toBe(0);
     expect(sim.player.blockValue).toBe(0);
@@ -55,11 +55,11 @@ describe('shield block', () => {
     sim.equipItem('eastbrook_buckler');
 
     expect(sim.player.offhandItemId).toBe('eastbrook_buckler');
-    expect(sim.player.blockChance).toBe(SHIELD_BLOCK_BASE);
-    expect(sim.player.blockValue).toBe(6);
+    expect(sim.player.blockChance).toBe(0);
+    expect(sim.player.blockValue).toBe(0);
   });
 
-  it('an eligible Paladin shield aimed at offhand updates live block stats', () => {
+  it('a Paladin shield aimed at offhand stays block-ineligible after stat recalculation', () => {
     const sim = new Sim({ seed: 7, playerClass: 'paladin', autoEquip: true });
     sim.addItem('eastbrook_buckler', 1);
 
@@ -69,11 +69,11 @@ describe('shield block', () => {
     expect(sim.player.equippedItems.offhand).toBe('eastbrook_buckler');
     expect(sim.player.stats.armor).toBeGreaterThan(0);
     expect(sim.player.stats.sta).toBeGreaterThan(0);
-    expect(sim.player.blockChance).toBe(SHIELD_BLOCK_BASE);
-    expect(sim.player.blockValue).toBe(6);
+    expect(sim.player.blockChance).toBe(0);
+    expect(sim.player.blockValue).toBe(0);
     sim.tick();
-    expect(sim.player.blockChance).toBe(SHIELD_BLOCK_BASE);
-    expect(sim.player.blockValue).toBe(6);
+    expect(sim.player.blockChance).toBe(0);
+    expect(sim.player.blockValue).toBe(0);
   });
 
   it('unrelated classes do not gain block stats without an eligible shield', () => {
@@ -144,14 +144,13 @@ describe('shield block', () => {
     expect(back?.amount).toBe(20);
   });
 
-  it('Paladin frontal melee block emits a live block outcome on a mob swing', () => {
+  it('Paladin with a shield does not block a frontal mob swing', () => {
     const sim = new Sim({ seed: 7, playerClass: 'paladin', autoEquip: true }) as AnySim;
     const player = sim.player;
     sim.addItem('eastbrook_buckler', 1);
     sim.equipItem('eastbrook_buckler');
     const mob = spawnMobInFront(sim, player);
     player.dodgeChance = 0;
-    player.blockChance = 1;
     player.stats.armor = 0;
     mob.weapon = { min: 20, max: 20, speed: 2 };
     mob.attackPower = 0;
@@ -162,8 +161,8 @@ describe('shield block', () => {
     sim.mobSwing(mob, player);
 
     const hit = damageEvents(sim.drainEvents()).find((e) => e.sourceId === mob.id);
-    expect(hit?.kind).toBe('block');
-    expect(hit?.amount).toBe(14);
+    expect(hit?.kind).toBe('hit');
+    expect(hit?.amount).toBe(20);
   });
 
   it('Paladin without a shield and shield-ineligible classes do not block mob swings', () => {
