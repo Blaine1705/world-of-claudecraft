@@ -704,11 +704,23 @@ describe('every professions grant site is accounted for (#2430)', () => {
         path.join(fixture, 'nested', 'deeper', 'line_only.ts'),
         'ctx.addItem(itemId, 1, pid, {\n  callerLogs: true,\n});\n',
       );
+      // Grant-shaped prose in a non-source sibling. Nothing in the real tree
+      // exercises the extension filter (src/sim/professions/CLAUDE.md holds no
+      // grant text), so without this the filter could be deleted and every
+      // other case here would stay green.
+      writeFileSync(
+        path.join(fixture, 'nested', 'notes.md'),
+        'The old call read ctx.addItem(itemId, 1, pid);\n',
+      );
 
       const found = grantSitesUnder(fixture);
       // Discovered at every depth, labeled by relative path with forward
       // slashes: bare names would collide across subdirectories, and a label
       // that dropped the directory would make EXPECTED_GRANT_SITES ambiguous.
+      // The list is exact and ORDERED on purpose, which is three pins in one:
+      // notes.md is absent (the .ts filter holds), the depth-first name sort
+      // holds (readdir order is byte-lexicographic on a dev APFS checkout and
+      // hash order on the ext4 CI runner), and nothing is swept twice.
       expect(found.map((s) => s.file)).toEqual([
         'nested/bare.ts',
         'nested/deeper/line_only.ts',
