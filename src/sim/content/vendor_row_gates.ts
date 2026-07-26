@@ -33,14 +33,16 @@
 //    inventory, so a tool owned before this shipped keeps working exactly as
 //    it did.
 //  - Buyback (items.ts buyBackItem), which is not gated on purpose: returning
-//    a player their own sold item is not a new acquisition. It is reachable at
-//    0 proficiency only through the one-time mastery reset, which zeroes the
-//    counter at load while the buyback list persists.
+//    a player their own sold item is not a new acquisition. Reaching it at 0
+//    proficiency needs the tool to have been owned and sold first, which the
+//    one-time mastery reset allows (it zeroes the counter at load while the
+//    buyback list persists) and so does any of the routes below.
 //  - The World Market. These six carry neither `noVendorSell` nor
-//    `noMarketList` (content/items.ts: only the three tier-1 tools do, and only
-//    to close a quest re-grant mint), so a player may buy one from another
-//    player at any proficiency, which the tier-4 tool recipes give real demand
-//    for since they consume the tier-3 tools as reagents.
+//    `noMarketList` (of the gathering tools only the three tier-1 ones carry
+//    those flags, and only to close a quest re-grant mint), so a player may buy
+//    one from another player at any proficiency, which the tier-4 tool recipes
+//    give real demand for since they consume the tier-3 tools as reagents.
+//    Trade and mail are the same route by a different door.
 //
 // The open ruling is NOT "should these be listable". Framed that way it looks
 // like a one-line content edit; the real choice is whether tool tier should

@@ -365,9 +365,11 @@ can work is decided solely by `canGatherTier` (`src/sim/professions/tools.ts`),
 which never reads proficiency, so every non-counter route reaches full tier at
 any proficiency. Three are open by design rather than by omission: a tool
 already owned (nothing in the gate reads inventory), buyback (returning a
-player's own sold item is not a new acquisition, reachable at 0 only via the
-one-time mastery reset), and the World Market, since the six carry no
-`noMarketList` and the tier-4 tool recipes consume the tier-3 tools as reagents.
+player's own sold item is not a new acquisition; reaching it at 0 needs the tool
+owned and sold first, which the one-time mastery reset allows and so does the
+market), and player-to-player transfer, since the six carry no `noMarketList`
+and the tier-4 tool recipes consume the tier-3 tools as reagents. Trade and mail
+are the market route by a different door.
 
 **Open ruling, and it is bigger than it looks.** The question is not "should
 these be listable", which reads like a one-line content edit. It is whether tool
