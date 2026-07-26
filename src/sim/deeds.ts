@@ -28,7 +28,7 @@
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { pointsSpent } from './content/talents';
-import { ITEMS, MOBS, ZONES, zoneAt } from './data';
+import { ITEMS, MOBS, zoneAt } from './data';
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
 import type { ArenaMatch, InstanceSlot, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -1647,7 +1647,7 @@ export function onCupTouchForDeeds(ctx: SimContext, match: CupMatchForDeeds, pid
 export function onCupGoalForDeeds(
   ctx: SimContext,
   match: CupMatchForDeeds,
-  team: 'A' | 'B',
+  _team: 'A' | 'B',
   scorerPid: number | null,
 ): void {
   if (!match.rated || scorerPid === null) return;

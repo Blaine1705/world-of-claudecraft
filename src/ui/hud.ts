@@ -293,7 +293,6 @@ import {
   HOTBAR_ACTION_MIME,
   type HotbarAction,
   handleMobileAttackTap,
-  loadAttackSlotAction,
   loadoutKnownAbilityIds,
   parseHotbarAction,
   placeAbilityOnSlot,
@@ -523,9 +522,7 @@ import { ValeCupWindow, vcupNationName } from './vale_cup_window';
 import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
 import {
   onWalletUiChange,
-  verifiedWocBalance,
   walletConnectionView,
-  walletDisplayAvailable,
   walletUiEnabled,
   wocBalance,
   wocBalanceVerified,
@@ -7060,14 +7057,6 @@ export class Hud {
     // showDailyRewardsChestButton preference (which only declutters the rail).
     if (!this.dailyRewardsEnabled())
       this.mobileDailyRewardsButtonEl?.classList.remove('spin-ready');
-  }
-
-  private setDailyRewardsChestButtonPreference(show: boolean): void {
-    if (this.optionsHooks) {
-      this.optionsHooks.onSettingChange('showDailyRewardsChest', show);
-      return;
-    }
-    this.setDailyRewardsChestButtonVisible(show);
   }
 
   setDailyRewardsChestButtonVisible(show: boolean): void {
