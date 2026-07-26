@@ -10,7 +10,7 @@
 
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { QUESTS } from '../src/sim/data';
+import { QUESTS, YUMI_BAND_X_MIN } from '../src/sim/data';
 import { isQuestTurnInNpc } from '../src/sim/types';
 import { MinimapPainter } from '../src/ui/minimap_painter';
 import type { IWorld } from '../src/world_api';
@@ -24,6 +24,9 @@ const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url)
 // Slice from a REQUIRED marker. A bare `code.slice(code.indexOf(m))` degrades to
 // `code.slice(-1)` (a single '}') when the marker is gone, which would turn every
 // "this body does not contain X" pin below into a vacuous pass against a full revert.
+// With no `end`, the slice runs to EOF: drawMarkers is deliberately the last method in
+// the class, so that is exactly the draw loop, and anything appended after it is held to
+// the same no-text rule on purpose.
 function sliceFrom(source: string, marker: string, end?: string): string {
   const start = source.indexOf(marker);
   if (start < 0) throw new Error(`minimap_painter.ts no longer contains "${marker}"`);
@@ -460,8 +463,12 @@ describe('minimap_painter: NPC glyphs draw from the sprite cache, never per-mark
     installGlyphGlobals(trace);
     const ctx = fakeMinimapContext(trace);
     // paintYumiMaze shares drawMarkers, so the maze arm must land the glyph on the same
-    // rounded anchor. Its own maze background canvas is created first.
-    paintMaze(newPainter(), ctx, glyphWorld([{ x: 4, z: 98.5, quest: true }], 'ready'));
+    // rounded anchor. Marker projection is player-relative, so holding the npc at the
+    // same offset keeps the expected destination. Its maze background canvas is built
+    // first, hence the extra createElement in trace.sprites.
+    const world = glyphWorld([{ x: YUMI_BAND_X_MIN + 4, z: 98.5, quest: true }], 'ready');
+    (world.player as { pos: { x: number } }).pos.x = YUMI_BAND_X_MIN;
+    paintMaze(newPainter(), ctx, world);
 
     expect(trace.blits).toHaveLength(1);
     expect(trace.blits[0].dx).toBe(70);
