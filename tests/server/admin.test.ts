@@ -516,7 +516,8 @@ describe('operator :id loader + enum :action', () => {
   for (const action of ['suspend', 'unsuspend', 'ban', 'unban'] as const) {
     it(`decodes the valid action "${action}" and reaches moderateAccount`, async () => {
       const moderateAccount = vi.fn(async () => {});
-      authedAdminDb({ moderateAccount, accountMailTarget: async () => null });
+      const revokeTokensExcept = vi.fn(async () => {});
+      authedAdminDb({ moderateAccount, accountMailTarget: async () => null, revokeTokensExcept });
       installAdminRuntime();
       const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/:action', {
         headers: { authorization: BEARER },
@@ -528,6 +529,13 @@ describe('operator :id loader + enum :action', () => {
       expect(moderateAccount).toHaveBeenCalledWith(
         expect.objectContaining({ accountId: 5, adminAccountId: ADMIN_ACCOUNT_ID, action }),
       );
+      // suspend/ban sign the target out of every device (mirrors reset-password);
+      // unsuspend/unban are non-punitive reversals and must never touch tokens.
+      if (action === 'suspend' || action === 'ban') {
+        expect(revokeTokensExcept).toHaveBeenCalledWith(5, null);
+      } else {
+        expect(revokeTokensExcept).not.toHaveBeenCalled();
+      }
     });
   }
 
@@ -648,11 +656,13 @@ describe('game.* side effects preserved', () => {
 
   it('a suspend disconnects the target account and fires the best-effort mail', async () => {
     const emailSecurityIncident = vi.fn();
+    const revokeTokensExcept = vi.fn(async () => {});
     authedAdminDb({
       moderateAccount: async () => {},
       accountMailTarget: async () =>
         ({ id: 5, username: 'x', email: 'x@y.z', locale: 'en', marketing_opt_in: false }) as never,
       emailSecurityIncident,
+      revokeTokensExcept,
     });
     const rt = installAdminRuntime();
     const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/:action', {
@@ -661,6 +671,7 @@ describe('game.* side effects preserved', () => {
       body: { reason: 'griefing' },
     });
     expect(r.status).toBe(200);
+    expect(revokeTokensExcept).toHaveBeenCalledWith(5, null);
     expect(rt.disconnectAccount).toHaveBeenCalledWith(5, 'This account is suspended.');
   });
 
@@ -815,6 +826,7 @@ describe('game.* side effects preserved', () => {
       accountMailTarget: async () => {
         throw new Error('mail db down');
       },
+      revokeTokensExcept: vi.fn(async () => {}),
     });
     const rt = installAdminRuntime();
     // The email is fired as a void .then().catch(), so the 200 is written synchronously
@@ -1444,6 +1456,7 @@ describe('migrated write handlers + side effects (QA gate parity coverage)', () 
       moderateAccount: async () => {},
       accountMailTarget: async () => target,
       emailSecurityIncident,
+      revokeTokensExcept: vi.fn(async () => {}),
     });
     installAdminRuntime();
     const r = await runRoute('POST', '/admin/api/moderation/accounts/:id/:action', {
@@ -1465,6 +1478,7 @@ describe('migrated write handlers + side effects (QA gate parity coverage)', () 
       moderateAccount: async () => {},
       accountMailTarget: async () => target,
       emailSecurityIncident,
+      revokeTokensExcept: vi.fn(async () => {}),
     });
     installAdminRuntime();
     await runRoute('POST', '/admin/api/moderation/accounts/:id/:action', {
@@ -2058,6 +2072,7 @@ describe('remaining legacy guard negatives (re-verification audit)', () => {
       moderateAccount: async () => {},
       accountMailTarget: async () => target,
       emailSecurityIncident,
+      revokeTokensExcept: vi.fn(async () => {}),
     });
     installAdminRuntime();
     await runRoute('POST', '/admin/api/moderation/accounts/:id/:action', {
