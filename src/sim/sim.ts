@@ -6798,15 +6798,17 @@ export class Sim {
   // (true repo-wide today; the enforced part is professions plus corpse
   // harvest, which tests/professions_silent_loot.test.ts sweeps, and every
   // other grant in the game passes no opts at all). A grant whose result event
-  // owns the line owns the cue too, either
-  // as a dedicated cue of its own (gather/craft/disenchant/salvage/enchant/
-  // fishing/corpse harvest) or as deliberate SILENCE, which is still owning it
-  // (the Maker's Bond unbind peel in professions/commission.ts, whose contract
-  // above hudChrome.unbind.unbound is no toast and no cue at all: #2458, and
-  // tests/professions_silent_loot.test.ts sweeps for it). A grant with no
-  // result event behind it sets NEITHER, or it goes invisible: the once-ever
-  // Codfather quest catch (professions/fishing.ts) returns before its emit, so
-  // the hub line and ding are its only feedback.
+  // owns the line owns the cue too, in one of three ways: a dedicated cue of
+  // its own (gather/craft/disenchant/salvage/enchant/fishing), the SAME
+  // generic ding replayed by the result arm exactly once for the whole
+  // command (corpse harvest, which has never had a recording of its own, so
+  // it keeps the sound it always made and only stops stacking it: #2457), or
+  // deliberate SILENCE, which is still owning it (the Maker's Bond unbind
+  // peel in professions/commission.ts, whose contract above
+  // hudChrome.unbind.unbound is no toast and no cue at all: #2458). A grant
+  // with no result event behind it sets NEITHER, or it goes invisible: the
+  // once-ever Codfather quest catch (professions/fishing.ts) returns before
+  // its emit, so the hub line and ding are its only feedback.
   // Professions 2.0's later phases
   // add new grant sites here (Phase 4 rare-event jackpot yields, Phase 13's
   // disenchant UI wiring): pass the same opts from those too, or the new
