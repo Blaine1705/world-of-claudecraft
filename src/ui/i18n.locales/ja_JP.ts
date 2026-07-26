@@ -3994,8 +3994,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.drakelands.pois.1.label': 'ゲートウッドの森',
   'entities.zones.drakelands.pois.2.label': 'シンダー砂丘',
   'entities.zones.drakelands.pois.3.label': 'トロールムート',
-  'entities.zones.drakelands.pois.4.label': 'ブラッドグラスの平原',
-  'entities.zones.drakelands.pois.5.label': 'ドレイクモウ火口',
+  'entities.zones.drakelands.pois.4.label': '最後の砦',
+  'entities.zones.drakelands.pois.5.label': 'ブラッドグラスの平原',
+  'entities.zones.drakelands.pois.6.label': 'ドレイクモウ火口',
   'entities.zones.frostveil.name': 'フロストヴェイルの果て',
   'entities.zones.frostveil.welcome':
     '雪がすべての音を呑み込む。揺らめくオーロラの下で、寒さそのものが目覚めているかのようだ。',
@@ -9801,6 +9802,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.wildheart_basin.enterText':
     '温かな雨が古い石の上で音を立てる。ワイルドハート盆地が目の前に開けた。',
   'entities.dungeons.wildheart_basin.leaveText': '石の牙の下をくぐり、パームリーチの陽光へ戻った。',
+  'entities.dungeons.the_last_keep.name': '最後の砦',
+  'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
+  'entities.dungeons.the_last_keep.leaveText': '砦の扉を閉め、ドレイクランドの風の中へ戻った。',
   'entities.items.wildheart_tuskblade.name': 'ワイルドハートの牙大剣',
   'entities.items.wildheart_hexwood_staff.name': '盆地の呪木杖',
   'entities.items.wildheart_fangknife.name': 'ズルガーの牙小刀',

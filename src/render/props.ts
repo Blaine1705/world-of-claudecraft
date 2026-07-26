@@ -81,7 +81,9 @@ interface PropAssetDef {
   strip?: RegExp;
 }
 
-const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
+// exported for render/castle_features.ts, which instances the kcas castle
+// set through the same registry (one preload gate, one manifest surface)
+export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   house1: { url: '/models/props/house_1.glb', kit: 'village' },
   house2: { url: '/models/props/house_2.glb', kit: 'village', yaw: -Math.PI / 2 },
   house3: { url: '/models/props/house_3.glb', kit: 'village' },
@@ -241,6 +243,57 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   mushroomGlowCluster: { url: '/models/props/mushroom_glow_cluster.glb', kit: 'hollow' },
   flowerGlow: { url: '/models/props/flower_glow.glb', kit: 'hollow' },
   shrubFlowering: { url: '/models/props/shrub_flowering.glb', kit: 'hollow' },
+  // The Drakelands castle structure set: KayKit Dungeon Remastered (CC0) pieces
+  // at walkable scale (shipped by scripts/assets/specs/drakelands_castle.json):
+  // curtain walls, gates, stairs, battlement barriers, floors, red banners,
+  // torches, rubble, and keep furnishings for the great hall.
+  kcasWall: { url: '/models/biome/kcas_wall.glb', kit: 'kcas' },
+  kcasWallHalf: { url: '/models/biome/kcas_wall_half.glb', kit: 'kcas' },
+  kcasWallCorner: { url: '/models/biome/kcas_wall_corner.glb', kit: 'kcas' },
+  kcasWallGated: { url: '/models/biome/kcas_wall_gated.glb', kit: 'kcas' },
+  kcasWallDoorway: { url: '/models/biome/kcas_wall_doorway.glb', kit: 'kcas' },
+  kcasWallBroken: { url: '/models/biome/kcas_wall_broken.glb', kit: 'kcas' },
+  kcasWallCracked: { url: '/models/biome/kcas_wall_cracked.glb', kit: 'kcas' },
+  kcasWallWindow: { url: '/models/biome/kcas_wall_window.glb', kit: 'kcas' },
+  kcasWallPillar: { url: '/models/biome/kcas_wall_pillar.glb', kit: 'kcas' },
+  kcasStairsWide: { url: '/models/biome/kcas_stairs_wide.glb', kit: 'kcas' },
+  kcasStairsWalled: { url: '/models/biome/kcas_stairs_walled.glb', kit: 'kcas' },
+  kcasBarrier: { url: '/models/biome/kcas_barrier.glb', kit: 'kcas' },
+  kcasBarrierHalf: { url: '/models/biome/kcas_barrier_half.glb', kit: 'kcas' },
+  kcasBarrierCorner: { url: '/models/biome/kcas_barrier_corner.glb', kit: 'kcas' },
+  kcasColumn: { url: '/models/biome/kcas_column.glb', kit: 'kcas' },
+  kcasPillar: { url: '/models/biome/kcas_pillar.glb', kit: 'kcas' },
+  kcasFloorLarge: { url: '/models/biome/kcas_floor_large.glb', kit: 'kcas' },
+  kcasFloorWeeds: { url: '/models/biome/kcas_floor_weeds.glb', kit: 'kcas' },
+  kcasFoundation: { url: '/models/biome/kcas_foundation.glb', kit: 'kcas' },
+  kcasBannerRedA: { url: '/models/biome/kcas_banner_red_a.glb', kit: 'kcas' },
+  kcasBannerRedShield: { url: '/models/biome/kcas_banner_red_shield.glb', kit: 'kcas' },
+  kcasBannerRedTriple: { url: '/models/biome/kcas_banner_red_triple.glb', kit: 'kcas' },
+  kcasTorch: { url: '/models/biome/kcas_torch.glb', kit: 'kcas' },
+  kcasTorchMounted: { url: '/models/biome/kcas_torch_mounted.glb', kit: 'kcas' },
+  kcasRubbleLarge: { url: '/models/biome/kcas_rubble_large.glb', kit: 'kcas' },
+  kcasRubbleHalf: { url: '/models/biome/kcas_rubble_half.glb', kit: 'kcas' },
+  kcasRocks: { url: '/models/biome/kcas_rocks.glb', kit: 'kcas' },
+  kcasChestGold: { url: '/models/biome/kcas_chest_gold.glb', kit: 'kcas' },
+  kcasTableLong: { url: '/models/biome/kcas_table_long.glb', kit: 'kcas' },
+  kcasBench: { url: '/models/biome/kcas_bench.glb', kit: 'kcas' },
+  kcasBookcase: { url: '/models/biome/kcas_bookcase.glb', kit: 'kcas' },
+  kcasKeg: { url: '/models/biome/kcas_keg.glb', kit: 'kcas' },
+  kcasBarrel: { url: '/models/biome/kcas_barrel.glb', kit: 'kcas' },
+  // The Drakelands castle bailey: KayKit Medieval Hexagon Pack buildings in the
+  // red colorway (same drakelands_castle.json spec; hex-tile scale, so decor
+  // entries carry scale like the other hex buildings).
+  hexrCastle: { url: '/models/biome/hexr_castle.glb', kit: 'khex' },
+  hexrTownhall: { url: '/models/biome/hexr_townhall.glb', kit: 'khex' },
+  hexrBarracks: { url: '/models/biome/hexr_barracks.glb', kit: 'khex' },
+  hexrChurch: { url: '/models/biome/hexr_church.glb', kit: 'khex' },
+  hexrTavern: { url: '/models/biome/hexr_tavern.glb', kit: 'khex' },
+  hexrStables: { url: '/models/biome/hexr_stables.glb', kit: 'khex' },
+  hexrHomeA: { url: '/models/biome/hexr_home_a.glb', kit: 'khex' },
+  hexrHomeB: { url: '/models/biome/hexr_home_b.glb', kit: 'khex' },
+  hexrMarket: { url: '/models/biome/hexr_market.glb', kit: 'khex' },
+  hexrBlacksmith: { url: '/models/biome/hexr_blacksmith.glb', kit: 'khex' },
+  hexrWindmill: { url: '/models/biome/hexr_windmill.glb', kit: 'khex' },
 };
 
 type PropKey = keyof typeof PROP_ASSET_DEFS;

@@ -3977,8 +3977,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.drakelands.pois.1.label': '관문숲',
   'entities.zones.drakelands.pois.2.label': '잿빛 사구',
   'entities.zones.drakelands.pois.3.label': '트롤무트',
-  'entities.zones.drakelands.pois.4.label': '핏빛유리 벌판',
-  'entities.zones.drakelands.pois.5.label': '드레이크모 화산구',
+  'entities.zones.drakelands.pois.4.label': '마지막 요새',
+  'entities.zones.drakelands.pois.5.label': '핏빛유리 벌판',
+  'entities.zones.drakelands.pois.6.label': '드레이크모 화산구',
   'entities.zones.frostveil.name': '서리장막 봉우리',
   'entities.zones.frostveil.welcome':
     '눈이 모든 소리를 삼킨다. 춤추는 오로라 아래, 추위 그 자체가 깨어 있는 듯하다.',
@@ -9791,6 +9792,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '따뜻한 비가 오래된 돌 위에서 치익 소리를 냅니다. 야생심장 분지가 눈앞에 펼쳐집니다.',
   'entities.dungeons.wildheart_basin.leaveText':
     '돌송곳니 아래를 지나 팜리치의 햇살 속으로 돌아갑니다.',
+  'entities.dungeons.the_last_keep.name': '마지막 요새',
+  'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
+  'entities.dungeons.the_last_keep.leaveText':
+    '요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다.',
   'entities.items.wildheart_tuskblade.name': '야생심장 엄니대검',
   'entities.items.wildheart_hexwood_staff.name': '분지의 사술나무 지팡이',
   'entities.items.wildheart_fangknife.name': '줄가르의 송곳니칼',

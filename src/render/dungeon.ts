@@ -27,6 +27,7 @@ import {
   type DungeonLayout,
   type GridPoint,
   type InteriorStyle,
+  LASTKEEP_LAYOUT,
   NYTHRAXIS_LAYOUT,
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
@@ -772,7 +773,12 @@ export class DungeonInteriors {
               arenaMapForSlot(arenaOriginAt(oz).slot).layout
             : interior === 'nythraxis'
               ? NYTHRAXIS_LAYOUT
-              : CRYPT_LAYOUT);
+              : interior === 'lastkeep'
+                ? // The Last Keep: an authored room-graph castle interior; its
+                  // rooms/doors/decor route the build through the authored path
+                  // below, exactly like the citadel's set-piece floors.
+                  LASTKEEP_LAYOUT
+                : CRYPT_LAYOUT);
     const variant = opts?.style?.kit ?? opts?.variant ?? this.variantFor(interior, ox, oz);
     const torch = opts?.style?.torch ?? TORCH_COLORS[variant];
     const daisRaised = opts?.style?.daisRaised;
@@ -1254,6 +1260,10 @@ export class DungeonInteriors {
     if (interior === 'nythraxis') return 'nythraxis';
     if (interior === 'sanctum') return 'sanctum';
     if (interior === 'temple') return 'temple';
+    // The Last Keep rides the crypt kit grade: cold blue torchlight over plain
+    // stone reads as the abandoned castle's cold halls. Explicit so the overflow
+    // band's origin x can never accidentally trip the bastion-band check below.
+    if (interior === 'lastkeep') return 'crypt';
     const bastionX = instanceOrigin(1, 0).x;
     if (Math.abs(ox - bastionX) < 250) return 'bastion';
     return 'crypt';

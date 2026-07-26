@@ -9671,6 +9671,9 @@ export const ko_KR: EnTranslations = {
       "mantle_of_the_unbroken_shore": {
         "name": "부서지지 않은 해안의 어깨덮개"
       },
+      "last_keep_signet": {
+        "name": "Signet of the Last Keep"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -13828,9 +13831,12 @@ export const ko_KR: EnTranslations = {
             "label": "트롤무트"
           },
           "4": {
-            "label": "핏빛유리 벌판"
+            "label": "마지막 요새"
           },
           "5": {
+            "label": "핏빛유리 벌판"
+          },
+          "6": {
             "label": "드레이크모 화산구"
           }
         }
@@ -14108,6 +14114,11 @@ export const ko_KR: EnTranslations = {
         "name": "야생심장 분지",
         "enterText": "따뜻한 비가 오래된 돌 위에서 치익 소리를 냅니다. 야생심장 분지가 눈앞에 펼쳐집니다.",
         "leaveText": "돌송곳니 아래를 지나 팜리치의 햇살 속으로 돌아갑니다."
+      },
+      "the_last_keep": {
+        "name": "마지막 요새",
+        "enterText": "마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.",
+        "leaveText": "요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다."
       },
       "drowned_temple": {
         "name": "익사한 신전",

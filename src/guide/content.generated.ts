@@ -1783,6 +1783,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Gatewood",
       "Cinder Dunes",
       "Trollmoot",
+      "The Last Keep",
       "Bloodglass Fields",
       "Drakemaw Caldera"
     ],

@@ -29,6 +29,7 @@ import {
   ARENA_LAYOUT,
   CRYPT_LAYOUT,
   DROWNED_COURT_LAYOUT,
+  LASTKEEP_LAYOUT,
   layoutColliders,
   NYTHRAXIS_LAYOUT,
   SANCTUM_LAYOUT,
@@ -470,6 +471,11 @@ const TEMPLE_COLLIDERS: Collider[] = layoutColliders(TEMPLE_LAYOUT);
 const ARENA_COLLIDERS: Collider[] = layoutColliders(ARENA_LAYOUT);
 const DROWNED_COURT_COLLIDERS: Collider[] = layoutColliders(DROWNED_COURT_LAYOUT);
 const NYTHRAXIS_COLLIDERS: Collider[] = layoutColliders(NYTHRAXIS_LAYOUT);
+// The Last Keep: an authored room-graph interior, so its walls (minus
+// doorways) and decor footprints all derive from the one shared layout,
+// exactly like the rift citadel floors (layoutColliders routes through
+// authoredColliders).
+const LASTKEEP_COLLIDERS: Collider[] = layoutColliders(LASTKEEP_LAYOUT);
 
 // Orkadia is an OPEN FIELD, not a room kit: a perimeter enclosure (plain obbs
 // that pull the chase cam in like interior walls, so players cannot leave the
@@ -528,6 +534,7 @@ const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
   nythraxis: NYTHRAXIS_COLLIDERS,
   orkadia: ORKADIA_COLLIDERS,
   wildheart: WILDHEART_COLLIDERS,
+  lastkeep: LASTKEEP_COLLIDERS,
 };
 
 // ---------------------------------------------------------------------------

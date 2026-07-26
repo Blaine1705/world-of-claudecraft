@@ -10,6 +10,7 @@ import {
   type AuthoredDoor,
   type AuthoredRoom,
   authoredColliders,
+  authoredLiftAt,
 } from './rift/authored';
 
 export type { AuthoredDecor, AuthoredDoor, AuthoredRoom };
@@ -215,6 +216,195 @@ export const TEMPLE_LAYOUT: DungeonLayout = (() => {
     dais: { x: 0, z: 116, r: 10.5 },
   };
 })();
+
+// The Last Keep (interior 'lastkeep'): a zero-combat castle interior in the
+// Drakelands, built on the AUTHORED room-graph path (rooms + doors + decor
+// replace the rectangular shell entirely, exactly like the Infernal Citadel).
+// A walkable set piece: no spawns, no loot, just the keep itself.
+//
+//   z increases NORTH. The player enters at the south end of the entrance hall.
+//   Verticality: the gaol (cells) sits LOWEST. Negative lifts are unsupported by
+//   the render relief path (placeAuthoredRelief draws no riser for lift <= 0 and
+//   clamps descending ramp steps at 0.05), so instead of sinking the cells below
+//   datum the cells sit at lift 0 and the whole main floor is raised to 2.4:
+//     gaol corridor + 3 cells      lift 0    (the keep's lowest point)
+//     gaol stair (landing)         lift 1.2
+//     main floor (halls + wings)   lift 2.4
+//     throne dais                  lift 3.6  (+1.2 over the great hall)
+//     tower stair chain            lift 2.4 -> 4.0 -> 5.6  (+0 -> +1.6 -> +3.2)
+//   Every lift change happens across a door, so authoredLiftAt turns each one
+//   into a stair ramp shared by sim and render.
+//
+// Decor uses ONLY the keys the authored/rift decor renderer already handles
+// (src/render/rift_decor.ts DECOR_MODELS + the procedural 'pentagram'/'rug'):
+// braziers light the halls (the authored path has no pillar torches), the bone
+// throne holds the dais, the hell forge and slag cauldron read as the kitchen
+// hearth, hanging cages as the larder and the gaol's gibbet, the altar as the
+// treasury plinth, and the pentagram as the crest inlaid in the council floor.
+// Collision radii are the footprints measured from the built GLBs (the same
+// constants the Infernal Citadel uses), so the collider matches the model.
+
+const KEEP_R_BRAZIER = 0.85;
+const KEEP_R_STATUE = 0.75;
+const KEEP_R_FORGE = 1.3;
+const KEEP_R_CAULDRON = 0.7;
+const KEEP_R_CAGE = 1.0;
+const KEEP_R_BONES = 0.5;
+const KEEP_R_THRONE = 0.83;
+const KEEP_R_ALTAR = 1.0; // 0.8 base footprint x the 1.2 scale below
+
+const KEEP_LIFT = 2.4; // main-floor lift (the cells below sit at 0)
+
+const keepBrazier = (x: number, z: number): AuthoredDecor => ({
+  key: 'infernal_brazier',
+  x,
+  z,
+  yaw: 0,
+  r: KEEP_R_BRAZIER,
+});
+
+export const LASTKEEP_ROOMS: readonly AuthoredRoom[] = [
+  // The main floor (lift 2.4).
+  { id: 'hall_entrance', x0: -9, x1: 9, z0: -12, z1: 10, lift: KEEP_LIFT },
+  { id: 'great_hall', x0: -12, x1: 12, z0: 10, z1: 46, lift: KEEP_LIFT }, // throne room, the largest
+  { id: 'throne_dais', x0: -7, x1: 7, z0: 46, z1: 54, lift: KEEP_LIFT + 1.2 },
+  { id: 'ballroom', x0: -34, x1: -12, z0: 16, z1: 40, lift: KEEP_LIFT },
+  { id: 'kitchen', x0: -30, x1: -16, z0: -4, z1: 16, lift: KEEP_LIFT },
+  { id: 'pantry', x0: -42, x1: -30, z0: 0, z1: 12, lift: KEEP_LIFT },
+  { id: 'council', x0: 12, x1: 32, z0: 18, z1: 36, lift: KEEP_LIFT },
+  { id: 'treasury', x0: 18, x1: 28, z0: 36, z1: 46, lift: KEEP_LIFT },
+  // Guard tower stair: three stacked rooms climbing +1.6 each, off the council's
+  // east wall, topping out at the lookout.
+  { id: 'tower_base', x0: 32, x1: 42, z0: 20, z1: 30, lift: KEEP_LIFT },
+  { id: 'tower_mid', x0: 32, x1: 42, z0: 30, z1: 40, lift: KEEP_LIFT + 1.6 },
+  { id: 'tower_lookout', x0: 32, x1: 42, z0: 40, z1: 50, lift: KEEP_LIFT + 3.2 },
+  // The gaol: a landing steps down off the entrance hall, then the cell
+  // corridor at the keep's lowest level with three cell alcoves off its east.
+  { id: 'gaol_stair', x0: 9, x1: 19, z0: -8, z1: 2, lift: 1.2 },
+  { id: 'gaol', x0: 19, x1: 27, z0: -12, z1: 14 }, // lift 0: the bottom of the keep
+  { id: 'cell_north', x0: 27, x1: 35, z0: 6, z1: 13 },
+  { id: 'cell_mid', x0: 27, x1: 35, z0: -2, z1: 5 },
+  { id: 'cell_south', x0: 27, x1: 35, z0: -10, z1: -3 },
+];
+
+export const LASTKEEP_DOORS: readonly AuthoredDoor[] = [
+  { x: 0, z: 10, hw: 3, hd: 1 }, // entrance hall -> great hall
+  { x: 0, z: 46, hw: 4, hd: 1 }, // great hall -> throne dais (wide stair, +1.2)
+  { x: -12, z: 28, hw: 1, hd: 3 }, // great hall -> ballroom
+  { x: -23, z: 16, hw: 2.5, hd: 1 }, // ballroom -> kitchen
+  { x: -30, z: 6, hw: 1, hd: 2 }, // kitchen -> pantry
+  { x: 12, z: 27, hw: 1, hd: 3 }, // great hall -> council chamber
+  { x: 23, z: 36, hw: 1.2, hd: 1 }, // council -> treasury (the narrow "locked" vault door)
+  { x: 32, z: 25, hw: 1, hd: 2 }, // council -> tower base
+  { x: 37, z: 30, hw: 2, hd: 1 }, // tower base -> tower mid (stair, +1.6)
+  { x: 37, z: 40, hw: 2, hd: 1 }, // tower mid -> lookout (stair, +1.6)
+  { x: 9, z: -3, hw: 1, hd: 2 }, // entrance hall -> gaol stair (down, -1.2)
+  { x: 19, z: -3, hw: 1, hd: 2 }, // gaol stair -> gaol corridor (down, -1.2)
+  { x: 27, z: 9.5, hw: 1, hd: 1.4 }, // gaol -> north cell
+  { x: 27, z: 1.5, hw: 1, hd: 1.4 }, // gaol -> middle cell
+  { x: 27, z: -6.5, hw: 1, hd: 1.4 }, // gaol -> south cell
+];
+
+export const LASTKEEP_DECOR: readonly AuthoredDecor[] = [
+  // Entrance hall: lit threshold, sentinel statues flanking the inner door.
+  keepBrazier(-6, -8),
+  keepBrazier(6, -8),
+  keepBrazier(-6, 6),
+  keepBrazier(6, 6),
+  { key: 'infernal_statue', x: -5, z: 8, yaw: Math.PI, r: KEEP_R_STATUE },
+  { key: 'infernal_statue', x: 5, z: 8, yaw: Math.PI, r: KEEP_R_STATUE },
+  // Great hall: a processional rug up the spine, brazier colonnade lines, and
+  // honor-guard statues flanking the throne stair. (The kit's red wall banners
+  // land automatically on the authored walls: the throne backdrop.)
+  { key: 'rug', x: 0, z: 25, yaw: 0 },
+  keepBrazier(-9, 14),
+  keepBrazier(9, 14),
+  keepBrazier(-9, 24),
+  keepBrazier(9, 24),
+  keepBrazier(-9, 34),
+  keepBrazier(9, 34),
+  { key: 'infernal_statue', x: -6, z: 43, yaw: Math.PI / 2, r: KEEP_R_STATUE },
+  { key: 'infernal_statue', x: 6, z: 43, yaw: -Math.PI / 2, r: KEEP_R_STATUE },
+  // Throne dais: the throne against the north wall, facing down the hall.
+  { key: 'bone_throne', x: 0, z: 52, yaw: Math.PI, r: KEEP_R_THRONE },
+  keepBrazier(-4.5, 51.5),
+  keepBrazier(4.5, 51.5),
+  // Ballroom: an open dance floor ringed by firelight and statuary.
+  keepBrazier(-31, 19),
+  keepBrazier(-15, 19),
+  keepBrazier(-31, 37),
+  keepBrazier(-15, 37),
+  { key: 'infernal_statue', x: -33, z: 28, yaw: Math.PI / 2, r: KEEP_R_STATUE },
+  { key: 'infernal_statue', x: -23, z: 37.5, yaw: Math.PI, r: KEEP_R_STATUE },
+  // Kitchen: the great hearth on the south wall, the cook's cauldron beside it,
+  // butcher scraps about the floor.
+  { key: 'hell_forge', x: -24, z: -2, yaw: 0, r: KEEP_R_FORGE },
+  { key: 'slag_cauldron', x: -27, z: 1, yaw: 0.6, r: KEEP_R_CAULDRON },
+  { key: 'bone_pile', x: -18, z: 6, yaw: 1.2, r: KEEP_R_BONES },
+  { key: 'bone_pile', x: -20, z: -2, yaw: 2.4, r: KEEP_R_BONES },
+  keepBrazier(-18, 13),
+  // Pantry: a hanging larder cage and the last of the stores.
+  { key: 'hanging_cage', x: -36, z: 9, yaw: 0.4, r: KEEP_R_CAGE },
+  { key: 'bone_pile', x: -40, z: 3, yaw: 0.8, r: KEEP_R_BONES },
+  { key: 'bone_pile', x: -33, z: 1, yaw: 2.0, r: KEEP_R_BONES },
+  keepBrazier(-40, 10),
+  // Council chamber: the royal crest inlaid in the floor (the closest decor the
+  // renderer supports to a council table), corner braziers, and two wardens
+  // flanking the treasury door.
+  { key: 'pentagram', x: 22, z: 27, yaw: 0, scale: 5 },
+  keepBrazier(15, 21),
+  keepBrazier(29, 21),
+  keepBrazier(15, 33),
+  keepBrazier(29, 33),
+  { key: 'infernal_statue', x: 20, z: 34, yaw: Math.PI, r: KEEP_R_STATUE },
+  { key: 'infernal_statue', x: 26, z: 34, yaw: Math.PI, r: KEEP_R_STATUE },
+  // Treasury: the vault plinth (no chest decor exists in the authored set) lit
+  // by two braziers.
+  { key: 'infernal_altar', x: 23, z: 42, yaw: 0, scale: 1.2, r: KEEP_R_ALTAR },
+  keepBrazier(20, 44),
+  keepBrazier(26, 44),
+  // Tower stair: one light per landing; the lookout's brazier is the beacon.
+  keepBrazier(40, 22),
+  keepBrazier(34.5, 34),
+  keepBrazier(37, 47),
+  // The gaol: a torch on the landing, the corridor's gibbet, prisoner remains.
+  keepBrazier(14, 0),
+  keepBrazier(21, -10),
+  keepBrazier(25, 5),
+  { key: 'hanging_cage', x: 23, z: 12, yaw: 0.3, r: KEEP_R_CAGE },
+  { key: 'bone_pile', x: 21, z: 6, yaw: 2.8, r: KEEP_R_BONES },
+  { key: 'bone_pile', x: 31.5, z: 10, yaw: 0.5, r: KEEP_R_BONES },
+  { key: 'bone_pile', x: 31.5, z: 1, yaw: 1.7, r: KEEP_R_BONES },
+  { key: 'bone_pile', x: 31.5, z: -7, yaw: 2.9, r: KEEP_R_BONES },
+];
+
+export const LASTKEEP_LAYOUT: DungeonLayout = {
+  zMin: -12,
+  zMax: 54,
+  sideWallZ: 21,
+  sideWallHd: 34,
+  pillars: [],
+  tombs: [],
+  stubs: [],
+  // The dais marker sits under the lifted throne-dais room: placeDais' platform
+  // blocks and rim decor (drawn from y 0) are entirely buried inside the room's
+  // solid riser, so the authored dais room IS the visible boss-stage geometry.
+  dais: { x: 0, z: 51, r: 4 },
+  wallX: 42,
+  endWallHw: 43,
+  floorHalfX: 42,
+  rooms: LASTKEEP_ROOMS.map((r) => ({ ...r })),
+  doors: LASTKEEP_DOORS.map((d) => ({ ...d })),
+  decor: LASTKEEP_DECOR.map((d) => ({ ...d })),
+};
+
+/** Raised-floor height of The Last Keep at instance-local (x, z). The
+ * groundHeight arm for interior 'lastkeep' (src/sim/world.ts) reads this, the
+ * same per-interior relief idiom as orkadiaFieldHeight/wildheartFieldHeight, so
+ * players stand on the same lifts the renderer builds risers and stairs for. */
+export function lastKeepLiftAt(lx: number, lz: number): number {
+  return authoredLiftAt(LASTKEEP_ROOMS, LASTKEEP_DOORS, lx, lz);
+}
 
 // The Ashen Coliseum (interior 'arena'): a fully-enclosed pit, no door, no
 // aisle (combatants are teleported in by matchmaking). Side walls stay at

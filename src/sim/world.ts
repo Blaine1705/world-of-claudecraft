@@ -1,4 +1,5 @@
 import { beaconSpiralLift } from './beacon_spiral';
+import { CASTLE, castleLift, castlePadWeight } from './castle_layout';
 import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
 import { PALMREACH_PROPS } from './content/palmreach';
 import {
@@ -24,6 +25,7 @@ import {
   ZONES,
 } from './data';
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
+import { lastKeepLiftAt } from './dungeon_layout';
 import {
   EMBER_FLAT_POOLS,
   EMBER_LAVA_LINKS,
@@ -2218,6 +2220,14 @@ function applyEmberLavaBasins(x: number, z: number, h: number): number {
   return out;
 }
 
+// The Last Keep's courtyard pad: the castle grounds grade level (the plan
+// lives in castle_layout.ts), with a gentle skirt back onto the midlands.
+function applyCastlePad(x: number, z: number, h: number): number {
+  const w = castlePadWeight(x, z);
+  if (w <= 0) return h;
+  return h + (CASTLE.pad.h - h) * w;
+}
+
 // ---------------------------------------------------------------------------
 // Signature landforms: one distinctive terrain idea per northern realm, so
 // no two maps read alike. All of them yield to roads (every marked route
@@ -3038,6 +3048,13 @@ export function groundHeight(x: number, z: number, seed: number): number {
       const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
       return DUNGEON_FLOOR_Y + wildheartFieldHeight(x - origin.x, z - origin.z);
     }
+    if (dungeon?.interior === 'lastkeep') {
+      // The Last Keep's authored rooms carry per-room lifts (door ramps
+      // become stairs); the renderer builds risers and stairs from the same
+      // authoredLiftAt field, so what you climb is what you stand on.
+      const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
+      return DUNGEON_FLOOR_Y + lastKeepLiftAt(x - origin.x, z - origin.z);
+    }
     return DUNGEON_FLOOR_Y;
   }
   // The Vale Cup grandstands are walkable: the ground steps up in seated tiers so
@@ -3049,13 +3066,21 @@ export function groundHeight(x: number, z: number, seed: number): number {
   // terrainHeight, so it never touches the flat instance/rift floor above.)
   // The Old Beacon's stair rides the same idiom: beaconSpiralLift raises the
   // walkable plank helix and gallery ring around the lighthouse (and its
-  // sheer core plug is what blocks walking through the tower).
-  const terrain = terrainHeight(x, z, seed) + sowfieldStandLift(x, z) + beaconSpiralLift(x, z);
+  // sheer core plug is what blocks walking through the tower). The Last
+  // Keep's curtain walls, bastions, and stair flights ride it too
+  // (castleLift): the wall mass is a sheer riser the climb gate refuses,
+  // and its flat top is the wall-walk.
+  const terrain =
+    terrainHeight(x, z, seed) + sowfieldStandLift(x, z) + beaconSpiralLift(x, z) + castleLift(x, z);
   return Math.max(terrain, dockSurfaceHeight(x, z, seed));
 }
 
 export function terrainHeight(x: number, z: number, seed: number): number {
   let h = terrainHeightUnpadded(x, z, seed);
+  // The Last Keep's courtyard pad, over the FINISHED height (the world-edge
+  // sea shave runs late in the unpadded chain and was clipping the castle's
+  // seaward corner; the castle plateau must win everywhere inside its walls).
+  h = applyCastlePad(x, z, h);
   // Level pads under the Evergarden's modeled flower beds, applied over the
   // FINISHED height (the garden seam reshapes the lawn per position, so an
   // early flatten would drift apart again): each bed ensemble sits flush on
@@ -3934,6 +3959,8 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     // beds, and the shaped basins stay clear (a rock there is also a stray
     // collider standing in the melt)
     if (gz > 2160 && gz < 2360 && emberLinkDistanceNorm(gx, gz) < 1.1) return null;
+    // the Last Keep's graded grounds carry no wild scatter
+    if (castlePadWeight(gx, gz) > 0) return null;
     for (const pool of EMBER_FLAT_POOLS) {
       if (Math.hypot(gx - pool.x, gz - pool.z) < pool.r * 1.6 + 4) return null;
     }

@@ -6,6 +6,7 @@
 // pass (southPassX). Terrain shape: the EMBER_* tables in world.ts (coast
 // lobes, the desert gradient, volcano cones).
 
+import { CASTLE_BUILDINGS } from '../castle_layout';
 import type {
   CampDef,
   GroundObjectDef,
@@ -44,6 +45,7 @@ export const DRAKELANDS_ZONE: ZoneDef = {
     { x: 360, z: 1940, label: 'The Gatewood', id: 'the_gatewood' },
     { x: 330, z: 2100, label: 'Cinder Dunes', id: 'cinder_dunes' },
     { x: 460, z: 2140, label: 'Trollmoot', id: 'trollmoot' },
+    { x: 406, z: 2032, label: 'The Last Keep', id: 'the_last_keep' },
     { x: 270, z: 2270, label: 'Bloodglass Fields', id: 'bloodglass_fields' },
     { x: 390, z: 2320, label: 'Drakemaw Caldera', id: 'drakemaw_caldera' },
   ],
@@ -447,6 +449,16 @@ export const DRAKELANDS_QUEST_ORDER: string[] = [
 ];
 
 export const DRAKELANDS_ITEMS: Record<string, ItemDef> = {
+  // --- keepsakes ---
+  // The Last Keep's entrance-hall souvenir: the interior instance's one
+  // ground object (a dungeon must place at least one encounter; the
+  // zero-combat keep places a keepsake instead of a fight).
+  last_keep_signet: {
+    id: 'last_keep_signet',
+    name: 'Signet of the Last Keep',
+    kind: 'junk',
+    sellValue: 25,
+  },
   // --- quest items ---
   ashbone_war_brand: {
     id: 'ashbone_war_brand',
@@ -552,11 +564,12 @@ export const DRAKELANDS_QUEST_CAMPS: CampDef[] = [
 
 export const DRAKELANDS_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),
-  // fallen keeps of the old drake-cult: castle ruins across the wastes
+  // fallen keeps of the old drake-cult: castle ruins across the wastes.
+  // (The Last Keep's ring at (422, 2032) is gone: that castle STANDS now,
+  // rebuilt as the walled garrison in castle_layout.ts.)
   ruinRings: [
     { x: 330, z: 2114, ringR: 10, columns: 8 }, // the Cinder Bastion
     { x: 338, z: 2124, ringR: 6, columns: 5 },
-    { x: 422, z: 2032, ringR: 8, columns: 6 }, // the Last Keep, forest's edge
     { x: 468, z: 2158, ringR: 7, columns: 6 }, // the Trollmoot henge
     { x: 268, z: 2256, ringR: 6, columns: 5 }, // Bloodglass watch
   ],
@@ -574,11 +587,21 @@ export const DRAKELANDS_PROPS: ZonePropsDef = {
     { kind: 'house', x: 393, z: 1888, w: 5, d: 5, rot: 2.0 },
     { kind: 'house', x: 416, z: 1912, w: 5, d: 6, rot: 2.6 },
   ],
-  wells: [{ x: 410, z: 1902, r: 1.5 }],
+  wells: [
+    { x: 410, z: 1902, r: 1.5 },
+    // the Last Keep's courtyard well
+    { x: 408, z: 2033, r: 1.5 },
+  ],
   stalls: [
     { x: 398, z: 1896, rot: 0.5, r: 1.6 },
     { x: 410, z: 1910, rot: -1.2, r: 1.6 },
+    // the keep's market row inside the main gate
+    { x: 391, z: 2033, rot: 0.7, r: 1.6 },
+    { x: 402, z: 2044.5, rot: -2.1, r: 1.6 },
   ],
+  // the Last Keep's bailey: every building comes from the castle plan (one
+  // source of truth with the walls, walks, and colliders)
+  decorProps: [...CASTLE_BUILDINGS],
   crates: [
     [406, 1892],
     [396, 1912],

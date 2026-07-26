@@ -9671,6 +9671,9 @@ export const ja_JP: EnTranslations = {
       "mantle_of_the_unbroken_shore": {
         "name": "揺るがぬ岸のマント"
       },
+      "last_keep_signet": {
+        "name": "Signet of the Last Keep"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -13828,9 +13831,12 @@ export const ja_JP: EnTranslations = {
             "label": "トロールムート"
           },
           "4": {
-            "label": "ブラッドグラスの平原"
+            "label": "最後の砦"
           },
           "5": {
+            "label": "ブラッドグラスの平原"
+          },
+          "6": {
             "label": "ドレイクモウ火口"
           }
         }
@@ -14108,6 +14114,11 @@ export const ja_JP: EnTranslations = {
         "name": "ワイルドハート盆地",
         "enterText": "温かな雨が古い石の上で音を立てる。ワイルドハート盆地が目の前に開けた。",
         "leaveText": "石の牙の下をくぐり、パームリーチの陽光へ戻った。"
+      },
+      "the_last_keep": {
+        "name": "最後の砦",
+        "enterText": "最後の砦の冷たく静まり返った広間へ足を踏み入れた。",
+        "leaveText": "砦の扉を閉め、ドレイクランドの風の中へ戻った。"
       },
       "drowned_temple": {
         "name": "溺れし神殿",

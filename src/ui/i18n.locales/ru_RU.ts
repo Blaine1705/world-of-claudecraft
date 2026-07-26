@@ -4022,8 +4022,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.drakelands.pois.1.label': 'Привратный лес',
   'entities.zones.drakelands.pois.2.label': 'Пепельные дюны',
   'entities.zones.drakelands.pois.3.label': 'Тролльмут',
-  'entities.zones.drakelands.pois.4.label': 'Кровостеклянные поля',
-  'entities.zones.drakelands.pois.5.label': 'Кальдера Дрейкмо',
+  'entities.zones.drakelands.pois.4.label': 'Последний оплот',
+  'entities.zones.drakelands.pois.5.label': 'Кровостеклянные поля',
+  'entities.zones.drakelands.pois.6.label': 'Кальдера Дрейкмо',
   'entities.zones.frostveil.name': 'Морозный Предел',
   'entities.zones.frostveil.welcome':
     'Снег глотает каждый звук. Под танцующим сиянием сам холод кажется живым.',
@@ -9974,6 +9975,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Тёплый дождь шипит на древнем камне. Перед вами открывается Котловина Дикого Сердца.',
   'entities.dungeons.wildheart_basin.leaveText':
     'Вы проходите под каменными клыками и возвращаетесь к солнцу Палмрича.',
+  'entities.dungeons.the_last_keep.name': 'Последний оплот',
+  'entities.dungeons.the_last_keep.enterText': 'Вы входите в холодные безмолвные залы Последнего оплота.',
+  'entities.dungeons.the_last_keep.leaveText': 'Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов.',
   'entities.items.wildheart_tuskblade.name': 'Клыкастый клинок Дикого Сердца',
   'entities.items.wildheart_hexwood_staff.name': 'Посох колдовского дерева из Котловины',
   'entities.items.wildheart_fangknife.name': 'Клыковый нож Зулгара',

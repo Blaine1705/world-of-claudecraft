@@ -566,6 +566,7 @@ const DUNGEON_IDS = [
   'nythraxis_boss_arena',
   'orkadia',
   'wildheart_basin',
+  'the_last_keep',
 ] as const;
 const DELVE_IDS = ['collapsed_reliquary', 'drowned_litany'] as const;
 // Ravenpost authored letters (src/sim/content/letters.ts): the welcome letter

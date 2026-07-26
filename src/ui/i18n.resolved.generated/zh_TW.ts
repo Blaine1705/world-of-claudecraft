@@ -9671,6 +9671,9 @@ export const zh_TW: EnTranslations = {
       "mantle_of_the_unbroken_shore": {
         "name": "不破海岸披風"
       },
+      "last_keep_signet": {
+        "name": "Signet of the Last Keep"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -13828,9 +13831,12 @@ export const zh_TW: EnTranslations = {
             "label": "巨魔集會"
           },
           "4": {
-            "label": "血玻璃原野"
+            "label": "最後的堡壘"
           },
           "5": {
+            "label": "血玻璃原野"
+          },
+          "6": {
             "label": "龍喉火山口"
           }
         }
@@ -14108,6 +14114,11 @@ export const zh_TW: EnTranslations = {
         "name": "荒野之心盆地",
         "enterText": "溫熱的雨水在古老石面上嘶嘶作響。荒野之心盆地在你眼前展開。",
         "leaveText": "你從石牙之下穿回棕櫚之境的陽光中。"
+      },
+      "the_last_keep": {
+        "name": "最後的堡壘",
+        "enterText": "你踏入最後的堡壘那冰冷而寂靜的大廳。",
+        "leaveText": "你帶上堡門，重新走進龍裔荒原的寒風中。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",

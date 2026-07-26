@@ -64,6 +64,7 @@ import {
   stepCameraFeel,
   stepLandingDetector,
 } from './camera_feel_core';
+import { buildCastleFeatures, type CastleFeaturesView } from './castle_features';
 import {
   characterRecklessnessActive,
   characterSanguineAuraActive,
@@ -1274,6 +1275,7 @@ export class Renderer {
   private impactSite: ImpactSiteView;
   private realmFlora: RealmFloraView | null = null;
   private emberFeatures: EmberFeaturesView | null = null;
+  private castleFeatures: CastleFeaturesView | null = null;
   private frostSky: FrostSkyView | null = null;
   private fenFeatures: FenFeaturesView | null = null;
   private amberFeatures: AmberFeaturesView | null = null;
@@ -2617,6 +2619,10 @@ export class Renderer {
         if (!this.emberFeatures) {
           this.emberFeatures = buildEmberFeatures(this.sim.cfg.seed);
           this.attachZoneFeature(this.emberFeatures);
+        }
+        if (!this.castleFeatures) {
+          this.castleFeatures = buildCastleFeatures();
+          this.attachZoneFeature(this.castleFeatures);
         }
         break;
       case 'frost':

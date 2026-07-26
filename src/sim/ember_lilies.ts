@@ -8,6 +8,7 @@
 // and on any slope one edge lifts clear of the dirt and the whole plant
 // reads as floating. Pure leaf: deterministic, memoized, no SimContext.
 
+import { castleClear } from './castle_layout';
 import { EMBER_FLAT_POOLS, EMBER_LAVA_LINKS, emberNearestOnLink } from './ember_lava_layout';
 import { hash2 } from './rng';
 import {
@@ -41,6 +42,7 @@ const WYRMWATCH = { x: 404, z: 1900, r: 32 } as const;
 export function emberScatterClear(x: number, z: number): boolean {
   if (roadDistance(x, z) < 6) return false;
   if (Math.hypot(x - WYRMWATCH.x, z - WYRMWATCH.z) < WYRMWATCH.r) return false;
+  if (!castleClear(x, z)) return false; // the Last Keep's grounds
   for (const pool of EMBER_LAVA_POOLS) {
     if (Math.hypot(x - pool.x, z - pool.z) < pool.r * 1.5 + 6) return false;
   }

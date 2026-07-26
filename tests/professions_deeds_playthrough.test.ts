@@ -166,8 +166,8 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       if (sim.lastCraftResult.masterwork === true) procAt = i;
       else purgeItem('eastbrook_ritual_vestments'); // keep the bags clear between attempts
     }
-    // Hunted literal (seed 4242, this exact beat order, re-recorded at the
-    // procedural-dungeons merge): the proc lands on attempt index 0.
+    // Hunted literal (seed 4242, this exact beat order, re-recorded at The
+    // Last Keep's overworld door spawn): the proc lands on attempt index 0.
     expect(procAt).toBe(0);
     expect(meta.deedStats.counters.masterworksCrafted).toBe(1);
     const evs = sim.tick();
@@ -258,10 +258,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false);
   });
 
-  // 90s budget: the re-hunted koi session sits deep in the shared stream
-  // (index 73), and every session ticks the REAL world to its bite.
+  // 90s budget: the re-hunted koi session sits at index 26 in the shared
+  // stream, and every session ticks the REAL world to its bite.
   // Raised timeout (the climb_slope idiom): this beat drives thousands of
-  // REAL world ticks (74 bite-and-reel sessions plus bounded combat waits),
+  // REAL world ticks (27 bite-and-reel sessions plus bounded combat waits),
   // which overruns the 5s default under CI/core contention; every loop is
   // guard-bounded, so a genuine hang still terminates into a failed pin.
   it('beat 11: the koi lands through the REAL bite-and-reel loop and the deed fires on the catch', {
@@ -294,9 +294,9 @@ describe('scripted playthrough (one sim, live sites only)', () => {
         sawBiteOnKoiSession = bit;
       }
     }
-    // Hunted literal (seed 4242, after every beat above, re-recorded at the
-    // procedural-dungeons merge): the koi bites on session index 73.
-    expect(koiSession).toBe(73);
+    // Hunted literal (seed 4242, after every beat above, re-recorded at The
+    // Last Keep's overworld door spawn): the koi bites on session index 26.
+    expect(koiSession).toBe(26);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -309,9 +309,9 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Bank the run's loot: the hunts need free bags for the x5 windfalls, and
     // no later beat reads the inventory. Pure state cleanup, zero draws.
     meta.inventory.length = 0;
-    // Hunted literals (seed 4242, after every beat above, re-recorded at the
-    // procedural-dungeons merge): the harvest index where each flavor's
-    // 1-in-90 event fires under the shared stream.
+    // Hunted literals (seed 4242, after every beat above, re-recorded at The
+    // Last Keep's overworld door spawn): the harvest index where each
+    // flavor's 1-in-90 event fires under the shared stream.
     // #2343: each hunt's harvest needs its profession's tool in bags. The
     // tier-1 tools ride the whole beat (purgeItem never touches them) and
     // addItem draws no rng, so the hunted hitAt literals hold.
@@ -321,18 +321,18 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Hunted literals (seed 4242, after every beat above): the harvest index
     // where each flavor's 1-in-90 event fires under the shared stream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 148 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 88 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 152,
+        hitAt: 12,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 156,
+        hitAt: 163,
       },
     ];
     for (const hunt of hunts) {
@@ -389,9 +389,9 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       sim.harvestCorpse(mob.id, ['hide'], pid);
       if (sim.countItem('pristine_hide', pid) > 0) hitAt = i;
     }
-    // Hunted literal (seed 4242, after every beat above, re-recorded at the
-    // procedural-dungeons merge): the rare-or-better rarity roll that mints
-    // the signed specimen lands on attempt index 18.
+    // Hunted literal (seed 4242, after every beat above, re-recorded at The
+    // Last Keep's overworld door spawn): the rare-or-better rarity roll that
+    // mints the signed specimen lands on attempt index 18.
     expect(hitAt).toBe(18);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
