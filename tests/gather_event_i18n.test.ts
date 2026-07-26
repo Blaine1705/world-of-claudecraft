@@ -128,7 +128,16 @@ describe('the single-line grant contract (#2430)', () => {
   // that widens the guard (eliding the loot-roll close or the bag refresh with
   // it) or narrows it back out (printing the hub line again) leaves every
   // wording pin above green, so bind the arm's structure at the source level.
-  const hudSource = () => readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+  // Comments stripped (`://` protocol slashes preserved), the repo's
+  // raw-source-pin idiom, matching tests/professions_silent_loot.test.ts and
+  // tests/professions_audio_wiring.test.ts. Every pin below matches on call
+  // TEXT, and commenting a call out in place is the ordinary way to disable
+  // one, which would otherwise leave the call's own words sitting in the arm
+  // and every assertion here green.
+  const hudSource = () =>
+    readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
   const lootArm = () => {
     const source = hudSource();
     const start = source.indexOf("case 'loot': {");

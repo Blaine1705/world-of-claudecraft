@@ -1,16 +1,19 @@
-// Pure, host-agnostic core for the profession GRANT LINES (#2430): the single
-// chat line a player-initiated profession action prints for the items it
-// granted.
+// Pure, host-agnostic core for the profession GRANT LINES (#2430): the chat
+// line a player-initiated profession action prints for the items it granted,
+// one per DISTINCT granted item. Six of the seven flows grant a single item per
+// command, so that is one line; corpse harvest (#2457) is the exception whose
+// one command can land several.
 //
 // Background: every grant in the game flows through the one shared inventory
 // hub (Sim.addItem/addItemInstance), which emits a 'loot' SimEvent carrying a
 // flat "You receive: X" line. A profession action ALSO emits its own richer
-// result event (gatherResult / fishingResult / craftResult / disenchantResult /
-// salvageResult / enchantResult), so one action printed two lines for one
-// grant, the plainer one first. The hub line now stands down for those grants
-// (the loot event's `callerLogs` flag, see src/sim/types.ts), which makes the
-// profession's own line the ONLY line for the grant, so it has to carry
-// everything the hub line used to: the item, its quantity, and a link to it.
+// result event (gatherResult / harvestResult / fishingResult / craftResult /
+// disenchantResult / salvageResult / enchantResult), so one action printed two
+// lines for one grant, the plainer one first. The hub line now stands down for
+// those grants (the loot event's `callerLogs` flag, see src/sim/types.ts),
+// which makes the profession's own line the ONLY line for the grant, so it has
+// to carry everything the hub line used to: the item, its quantity, and a link
+// to it.
 //
 // This module owns the three decisions that gives the HUD, so the event arms in
 // hud.ts stay thin and all three are unit-testable in Node:
@@ -25,7 +28,7 @@
 // gather and craft selectors live beside grantItemToken/grantQtyText rather
 // than in gathering_view.ts / crafting_view.ts (which own the DENY and picker
 // key families for those professions) precisely because the thing that has to
-// stay consistent is what one grant line looks like across all six flows.
+// stay consistent is what one grant line looks like across all seven flows.
 // enchanting_view.ts is the one exception, and only because it already owned
 // the event -> key + sink mapping for those three commands before #2430; it
 // consumes isMultiUnitGrant from here so the families cannot diverge.
