@@ -236,13 +236,19 @@ export function buildMarketView(input: MarketViewInput): MarketView {
 }
 
 /**
- * The count of items waiting to be collected, for the Collect tab's badge. The
- * proceeds purse counts as one, plus each returned stack.
+ * What axis the subtype menu narrows by. The painter switches its caption and its
+ * option labels on THIS, never on the item type again: the two are decided together
+ * here, so an item type that gains a subtype axis cannot get its options from one
+ * place and its wording from another.
  */
+export type MarketSubtypeKind = 'armorSlot' | 'weaponFamily' | 'bagCapacity';
+
 /** Which secondary browse menus an item type shows, and the subtype menu's options. */
 export interface MarketFilterMenus {
   /** The subtype menu's option list, or null when this type has no subtype axis. */
   subtype: readonly MarketSubtypeFilter[] | null;
+  /** What those options MEAN, for the painter's caption and per-option wording. */
+  subtypeKind: MarketSubtypeKind | null;
   /** True when the armor-class (cloth / leather / mail) menu applies. */
   armorClass: boolean;
   /** True when the primary-stat menu applies. */
@@ -261,14 +267,33 @@ export interface MarketFilterMenus {
  */
 export function marketFilterMenus(itemType: MarketItemTypeFilter): MarketFilterMenus {
   if (itemType === 'armor')
-    return { subtype: MARKET_ARMOR_TYPE_FILTERS, armorClass: true, primaryStat: true };
+    return {
+      subtype: MARKET_ARMOR_TYPE_FILTERS,
+      subtypeKind: 'armorSlot',
+      armorClass: true,
+      primaryStat: true,
+    };
   if (itemType === 'weapon')
-    return { subtype: MARKET_WEAPON_TYPE_FILTERS, armorClass: false, primaryStat: true };
+    return {
+      subtype: MARKET_WEAPON_TYPE_FILTERS,
+      subtypeKind: 'weaponFamily',
+      armorClass: false,
+      primaryStat: true,
+    };
   if (itemType === 'bag')
-    return { subtype: MARKET_BAG_SIZE_FILTERS, armorClass: false, primaryStat: false };
-  return { subtype: null, armorClass: false, primaryStat: false };
+    return {
+      subtype: MARKET_BAG_SIZE_FILTERS,
+      subtypeKind: 'bagCapacity',
+      armorClass: false,
+      primaryStat: false,
+    };
+  return { subtype: null, subtypeKind: null, armorClass: false, primaryStat: false };
 }
 
+/**
+ * The count of items waiting to be collected, for the Collect tab's badge. The
+ * proceeds purse counts as one, plus each returned stack.
+ */
 export function marketCollectBadgeCount(info: MarketInfo | null): number {
   if (!info) return 0;
   return (info.collectionCopper > 0 ? 1 : 0) + info.collectionItems.length;

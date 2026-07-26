@@ -43,6 +43,7 @@ import {
   type MarketCollectBody,
   type MarketSellBody,
   type MarketSellMeta,
+  type MarketSubtypeKind,
   type MarketTab,
   marketCollectBadgeCount,
   marketFilterMenus,
@@ -744,13 +745,14 @@ export class MarketWindow {
     return t('itemUi.market.filterRarityAll');
   }
 
-  private marketSubtypeLabel(): string {
-    if (this.itemTypeFilter === 'bag') return t('itemUi.market.filterBagSize');
-    return t(
-      this.itemTypeFilter === 'armor'
-        ? 'itemUi.market.filterArmorSlot'
-        : 'itemUi.market.filterWeaponType',
-    );
+  // Both label functions switch on the core's subtypeKind, never on the item type:
+  // the options and their wording are decided together in marketFilterMenus, so a type
+  // that gains a subtype axis cannot get its list from one place and its words from
+  // another (which is how a bag size would have read "Other weapons").
+  private marketSubtypeLabel(kind: MarketSubtypeKind): string {
+    if (kind === 'bagCapacity') return t('itemUi.market.filterBagSize');
+    if (kind === 'armorSlot') return t('itemUi.market.filterArmorSlot');
+    return t('itemUi.market.filterWeaponType');
   }
 
   private marketArmorClassLabel(filter: MarketArmorClassFilter): string {
@@ -767,22 +769,27 @@ export class MarketWindow {
     return t('itemUi.market.filterPrimaryStatAll');
   }
 
-  private marketSubtypeOptionLabel(filter: MarketSubtypeFilter): string {
+  private marketSubtypeOptionLabel(kind: MarketSubtypeKind, filter: MarketSubtypeFilter): string {
     // Bags first: their option values are capacities, so they must not fall through to
     // the weapon-family chain below, whose tail labels anything unmatched "Other weapons".
-    if (this.itemTypeFilter === 'bag')
-      return filter === 'all'
+    if (kind === 'bagCapacity') {
+      const slots = Number(filter);
+      // A non-numeric value here means a subtype left over from another item type, which
+      // the wire's union allowlist permits even though the chrome resets on every type
+      // change. Label it "All bags" rather than rendering a literal "NaN Slot Bag".
+      return filter === 'all' || !Number.isFinite(slots)
         ? t('itemUi.market.filterBagAll')
         : t('itemUi.tooltip.bagSlots', {
-            slots: formatNumber(Number(filter), { maximumFractionDigits: 0 }),
+            // useGrouping: false so the label and the option VALUE stay the same digits
+            // at any capacity the catalog might ship ("1000", never "1,000").
+            slots: formatNumber(slots, { maximumFractionDigits: 0, useGrouping: false }),
           });
+    }
     if (filter === 'all')
       return t(
-        this.itemTypeFilter === 'armor'
-          ? 'itemUi.market.filterArmorAll'
-          : 'itemUi.market.filterWeaponAll',
+        kind === 'armorSlot' ? 'itemUi.market.filterArmorAll' : 'itemUi.market.filterWeaponAll',
       );
-    if (this.itemTypeFilter === 'armor') return this.deps.slotName(filter as ItemSlot);
+    if (kind === 'armorSlot') return this.deps.slotName(filter as ItemSlot);
     if (filter === 'sword') return t('itemUi.market.weaponSword');
     if (filter === 'dagger') return t('itemUi.market.weaponDagger');
     if (filter === 'staff') return t('itemUi.market.weaponStaff');
@@ -802,7 +809,10 @@ export class MarketWindow {
     const optionHtml = options
       .map((option) => {
         const selected = option === value;
-        return `<button type="button" class="mkt-select-option${selected ? ' sel' : ''}" role="option" tabindex="-1" aria-selected="${selected ? 'true' : 'false'}" data-market-filter-option="${option}">${esc(optionLabel(option))}</button>`;
+        // esc() on the value too: every option used to be a source-authored literal, but
+        // the bag capacities are derived from content (ITEMS[*].bagSlots), so the reason
+        // this interpolation was safe by construction no longer holds on its own.
+        return `<button type="button" class="mkt-select-option${selected ? ' sel' : ''}" role="option" tabindex="-1" aria-selected="${selected ? 'true' : 'false'}" data-market-filter-option="${esc(option)}">${esc(optionLabel(option))}</button>`;
       })
       .join('');
     return (
@@ -818,6 +828,8 @@ export class MarketWindow {
     // WHICH secondary menus this item type shows is a pure function of the type, so it
     // is decided in the view core and merely painted here.
     const menus = marketFilterMenus(this.itemTypeFilter);
+    // Bound to a const so the null check below narrows inside the option-label closure.
+    const subtypeKind = menus.subtypeKind;
     return (
       `<div class="mkt-filters" role="group" aria-label="${esc(t('itemUi.market.filters'))}">` +
       this.renderMarketFilterMenu(
@@ -827,13 +839,13 @@ export class MarketWindow {
         MARKET_ITEM_TYPE_FILTERS,
         (filter) => this.marketItemTypeLabel(filter as MarketItemTypeFilter),
       ) +
-      (menus.subtype
+      (menus.subtype && subtypeKind
         ? this.renderMarketFilterMenu(
             'subtype',
-            this.marketSubtypeLabel(),
+            this.marketSubtypeLabel(subtypeKind),
             this.subtypeFilter,
             menus.subtype,
-            (filter) => this.marketSubtypeOptionLabel(filter as MarketSubtypeFilter),
+            (filter) => this.marketSubtypeOptionLabel(subtypeKind, filter as MarketSubtypeFilter),
           )
         : '') +
       (menus.armorClass

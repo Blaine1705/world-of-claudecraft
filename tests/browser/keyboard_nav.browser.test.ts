@@ -514,6 +514,16 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
     pickItemType(root, 'armor');
     expect(filterLabel(root, 'subtype')).toBe('Armor slot');
     expect(queries.at(-1)?.subtype).toBe('all');
+    // The option list swaps too, not just the caption and the committed value: a stale
+    // capacity list under an "Armor slot" caption would be unusable chrome.
+    const armorOptions = Array.from(
+      req(
+        root.querySelector<HTMLElement>('[data-market-filter-menu="subtype"]'),
+        'armor slot filter menu',
+      ).querySelectorAll<HTMLElement>('[data-market-filter-option]'),
+    ).map((option) => option.dataset.marketFilterOption);
+    expect(armorOptions).toContain('chest');
+    expect(armorOptions).not.toContain(MARKET_BAG_SIZE_FILTERS[1]);
   });
 
   it('Escape closes the listbox and returns focus to the trigger', () => {

@@ -904,15 +904,16 @@ export const TARGETS = [
   },
   // The market-window target above shoots the browse grid with every dropdown CLOSED, so
   // it is blind to the filter vocabulary itself. These two open the menus. Keyed on the
-  // shared query module (the filter option lists live there), so an unrelated
-  // market_window layout change does not drag them along.
+  // shared query module (which holds the option lists) plus the view core (which decides
+  // WHICH menus a type raises), and deliberately NOT on ui/market_window, so an unrelated
+  // painter layout change does not drag them along.
   {
     key: 'market-type-filter-list',
     label: 'World Market item-type filter list (open)',
-    when: ['sim/market_query'],
+    when: ['sim/market_query', 'ui/market_view'],
     variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
     async capture(page) {
-      await openMarketBrowse(page);
+      if (!(await openMarketBrowse(page))) return {};
       const opened = await page.evaluate(() => {
         const menu = document.querySelector('[data-market-filter-menu="itemType"]');
         const btn = menu?.querySelector('.mkt-select-btn');
@@ -928,10 +929,12 @@ export const TARGETS = [
   {
     key: 'market-bag-size-filter',
     label: 'World Market bag capacity filter (Bags selected, sizes open)',
-    when: ['sim/market_query'],
+    when: ['sim/market_query', 'ui/market_view'],
     variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
     async capture(page) {
-      await openMarketBrowse(page);
+      // Skip rather than clip a selector that never appeared, matching the sibling
+      // market-window target: a shot of the whole page is worse than no shot.
+      if (!(await openMarketBrowse(page))) return {};
       // On the BASE commit there is no 'bag' option, so this is a no-op and the shot
       // is the plain browse tab: exactly the "before" this change is contrasted with.
       await page.evaluate(() => {

@@ -273,7 +273,10 @@ describe('market_window: behavior preserved through the core', () => {
   it('delegates the per-item-type menu shape to the view core instead of re-deriving it', () => {
     const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
     expect(code).toContain('marketFilterMenus(this.itemTypeFilter)');
-    expect(code).toMatch(/\(menus\.subtype\s*\?\s*this\.renderMarketFilterMenu\(\s*'subtype'/);
+    expect(code).toContain('const subtypeKind = menus.subtypeKind;');
+    expect(code).toMatch(
+      /\(menus\.subtype\s*&&\s*subtypeKind\s*\?\s*this\.renderMarketFilterMenu\(\s*'subtype'/,
+    );
     expect(code).toMatch(
       /\(menus\.armorClass\s*\?\s*this\.renderMarketFilterMenu\(\s*'armorClass'/,
     );
@@ -282,9 +285,21 @@ describe('market_window: behavior preserved through the core', () => {
     );
     // No inline gate may survive alongside the delegation, or the core stops being the
     // single source of truth for the menu shape.
-    expect(code, 'the menu shape must not be re-derived on the painter').not.toMatch(
-      /itemTypeFilter === 'bag'\s*\|\||\|\|\s*this\.itemTypeFilter === 'bag'/,
+    // No inline re-derivation may survive in ANY form (ternary, ||, a hoisted const),
+    // or the core stops being the single source of truth for the menu shape. The painter
+    // switches on the core's subtypeKind, so it needs no item-type test of its own: the
+    // one legitimate 'bag' comparison left is marketItemTypeLabel's, on its `filter`
+    // argument rather than on this.itemTypeFilter.
+    expect(code, 'the menu shape must not be re-derived on the painter').not.toContain(
+      "this.itemTypeFilter === 'bag'",
     );
+    expect(code, 'subtype wording must switch on the core discriminator').toMatch(
+      /kind === 'bagCapacity'/,
+    );
+    // The option VALUE is escaped too. Every option used to be a source-authored literal
+    // from an `as const` tuple; the bag capacities are the first derived from content, so
+    // what made this interpolation safe by construction no longer holds on its own.
+    expect(code).toContain('data-market-filter-option="${esc(option)}"');
     // The bag labels are i18n dispatch, which a pure core may not do, so they stay here.
     expect(code).toContain("t('itemUi.market.filterTypeBag')");
     expect(code).toContain("t('itemUi.market.filterBagSize')");
@@ -299,8 +314,12 @@ describe('market_window: behavior preserved through the core', () => {
   // bag capacity menu is the first new consumer of that pair since it was introduced.
   it('keeps the dropdown menu height in the painter and the stylesheet in agreement', () => {
     const preferred = painter.match(/const MKT_MENU_PREFERRED_HEIGHT = (\d+);/)?.[1];
-    expect(preferred, 'MKT_MENU_PREFERRED_HEIGHT must exist').toBeTruthy();
-    expect(componentsCss).toContain(`max-height: ${preferred}px`);
+    expect(preferred, 'MKT_MENU_PREFERRED_HEIGHT must exist').toBe('236');
+    // Scoped to the .mkt-select-menu rule rather than searched across the whole sheet,
+    // so the agreement is proved against the rule that actually caps this menu.
+    const rule = componentsCss.match(/\.mkt-select-menu\s*\{[^}]*\}/)?.[0];
+    expect(rule, '.mkt-select-menu rule must exist').toBeTruthy();
+    expect(rule).toContain(`max-height: ${preferred}px`);
   });
 
   it('preserves the buy / list / cancel / collect dispatch and money formatting', () => {
