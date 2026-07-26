@@ -553,7 +553,11 @@ function resolveDeadAllyTarget(
   return party && party.members.includes(t.id) ? t : null;
 }
 
-function vanishedLowBlowFallbackTarget(ctx: SimContext, p: Entity, ability: AbilityDef): Entity | null {
+function vanishedLowBlowFallbackTarget(
+  ctx: SimContext,
+  p: Entity,
+  ability: AbilityDef,
+): Entity | null {
   if (ability.id !== 'kidney_shot') return null;
   if (p.targetId !== null) return null;
   if (!p.auras.some((a) => a.kind === 'stealth')) return null;
