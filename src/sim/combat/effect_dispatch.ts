@@ -132,6 +132,10 @@ function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): void {
   p.combatTimer = 5;
   p.inCombat = false;
   p.autoAttack = false;
+  p.targetId = null;
+  p.queuedOnSwing = null;
+  delete p.queuedOnSwingFree;
+  delete p.queuedOnSwingCostMultiplier;
 
   const pet = ctx.petOf(p.id);
   const escapeIds = pet ? [p.id, pet.id] : [p.id];
@@ -139,6 +143,7 @@ function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): void {
     pet.combatTimer = 5;
     pet.inCombat = false;
     pet.aggroTargetId = null;
+    pet.targetId = null;
   }
 
   for (const entity of ctx.entities.values()) {

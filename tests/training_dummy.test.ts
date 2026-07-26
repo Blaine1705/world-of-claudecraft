@@ -29,6 +29,18 @@ function meleePlayerAt(sim: Sim, x: number, z: number): number {
   return pid;
 }
 
+function roguePlayerAt(sim: Sim, x: number, z: number): number {
+  const pid = sim.addPlayer('rogue', 'Ivara', { autoEquip: true });
+  sim.setPlayerLevel(18, pid);
+  const e = sim.entities.get(pid)!;
+  e.pos.x = x;
+  e.pos.z = z;
+  e.pos.y = groundHeight(x, z, sim.cfg.seed);
+  e.prevPos = { ...e.pos };
+  (sim as any).rebucket(e);
+  return pid;
+}
+
 describe('Highwatch training dummy', () => {
   it('spawns on the hill above Highwatch, attackable but inert', () => {
     const sim = makeWorld();
@@ -87,6 +99,38 @@ describe('Highwatch training dummy', () => {
     expect(player.inCombat).toBe(false);
     expect(d.inCombat).toBe(false);
     expect(d.threat.size).toBe(0);
+  });
+
+  it('lets Smokestep escape dummy combat without keeping target pressure', () => {
+    const sim = makeWorld();
+    const d = dummyOf(sim);
+    const pid = roguePlayerAt(sim, d.pos.x + 1, d.pos.z);
+    const rogue = sim.entities.get(pid)!;
+    rogue.targetId = d.id;
+    rogue.autoAttack = true;
+    for (let i = 0; i < 20 * 4 && d.hp === d.maxHp; i++) sim.tick();
+
+    expect(d.hp).toBeLessThan(d.maxHp);
+    expect(rogue.inCombat).toBe(true);
+    expect(rogue.autoAttack).toBe(true);
+    expect(rogue.targetId).toBe(d.id);
+    expect(d.threat.has(pid)).toBe(true);
+
+    sim.castAbility('vanish', pid);
+
+    expect(rogue.auras.some((a) => a.name === 'Smokestep' && a.kind === 'stealth')).toBe(true);
+    expect(rogue.cooldowns.has('vanish')).toBe(true);
+    expect(rogue.inCombat).toBe(false);
+    expect(rogue.autoAttack).toBe(false);
+    expect(rogue.targetId).toBeNull();
+    expect(d.threat.has(pid)).toBe(false);
+    expect(d.aggroTargetId).toBeNull();
+
+    sim.tick();
+
+    expect(rogue.auras.some((a) => a.name === 'Smokestep' && a.kind === 'stealth')).toBe(true);
+    expect(rogue.inCombat).toBe(false);
+    expect(rogue.autoAttack).toBe(false);
   });
 
   it('keeps Defiant Bellow inert and fully repairs any hostile dummy state', () => {

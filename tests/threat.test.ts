@@ -808,12 +808,16 @@ describe('rogue stealth', () => {
     stalker.swingTimer = 0;
     rogue.inCombat = true;
     rogue.combatTimer = 0;
+    rogue.targetId = stalker.id;
+    rogue.autoAttack = true;
 
     const hpAfterEscape = rogue.hp;
     sim.castAbility('vanish');
 
     expect(rogue.auras.some((a) => a.name === 'Smokestep' && a.kind === 'stealth')).toBe(true);
     expect(rogue.cooldowns.has('vanish')).toBe(true);
+    expect(rogue.autoAttack).toBe(false);
+    expect(rogue.targetId).toBeNull();
     expect(stalker.aggroTargetId).toBeNull();
     expect(stalker.forcedTargetId).toBeNull();
     expect(stalker.threat.has(rogue.id)).toBe(false);
