@@ -109,13 +109,12 @@ describe('vendor row gate resolver', () => {
       const map = { mining: bad } as unknown as Record<string, number>;
       expect(resolveVendorRowGate('iron_mining_pick', map).locked, String(bad)).toBe(true);
     }
-    // Infinity is malformed, not "very skilled": a wire value that large is a
-    // corrupt payload, and reading it as qualified would open every row.
-    expect(
-      resolveVendorRowGate('iron_mining_pick', {
-        mining: Number.NEGATIVE_INFINITY,
-      }).locked,
-    ).toBe(true);
+    // Of the values above, NaN / +Infinity / '99' / {} are the ones that
+    // DISCRIMINATE: each opens the row under a bare `held < threshold` and
+    // locks it under the shipped coercion. undefined and null pass either way
+    // and are carried by the absent-value case above, so they are breadth, not
+    // the guard. A -Infinity arm was dropped for exactly that reason: it locks
+    // under both, so it proved nothing while reading like a second check.
   });
 
   it('never resolves a prototype key as a gate', () => {
@@ -489,6 +488,15 @@ describe('the HUD actually feeds the viewer proficiency into the view', () => {
         'NPC_WINDOW_CLOSE_RANGE',
       );
     }
+    // Invariant-shaped, not spelling-shaped: the loop above only sees the
+    // `(p.pos, npc.pos)` spelling and a count floor cannot notice an extra
+    // check, so a fifth window closing on `dist2d(p.pos, merchant.pos) > 30`
+    // would sail past it. No dist2d comparison in this file may use a numeric
+    // literal at all; the shipped file has none.
+    expect(
+      [...source.matchAll(/dist2d\([^)]*\)\s*>=?\s*[0-9]/g)].map((m) => m[0]),
+      'a dist2d range compared against a bare number',
+    ).toEqual([]);
   });
 });
 
@@ -523,24 +531,40 @@ describe('the gated tools are stocked somewhere a gated row can be seen', () => 
     // NPC z coordinates map to zones the way the world does; resolve each
     // stocking NPC to its zone through the shipped zone lookup rather than by
     // hand, so a relocated merchant is judged against its new ground.
-    let checked = 0;
+    let gatedRowsChecked = 0;
+    const ceilingsExercised = new Set<string>();
     for (const npc of Object.values(NPCS)) {
       for (const itemId of npc.vendorItems ?? []) {
         const use = ITEMS[itemId]?.use;
         // Land tools only: fishing has no nodes, so the rule cannot be stated
         // for rods and they are a documented standing exception.
         if (use?.type !== 'gatherTool' || use.professionId === 'fishing') continue;
-        const zoneId = zoneAt(npc.pos.z).id;
-        const nodeCeiling = maxNodeTierInZone.get(zoneId) ?? 0;
+        const zone = zoneAt(npc.pos.z);
+        // zoneAt SATURATES: it walks bands by zMax and falls back to the last
+        // zone, so an NPC past the final band (or at a NaN z) silently resolves
+        // to the highest-ceilinged zone in the world and would be judged against
+        // the most permissive ground there is. Assert the resolved zone really
+        // contains the merchant, so a fallback fails instead of passing free.
+        expect(
+          npc.pos.z >= zone.zMin && npc.pos.z < zone.zMax,
+          `${npc.id} at z=${npc.pos.z} resolved to ${zone.id} (${zone.zMin}..${zone.zMax}) by fallback`,
+        ).toBe(true);
+        const nodeCeiling = maxNodeTierInZone.get(zone.id) ?? 0;
         expect(
           use.tier,
-          `${npc.id} (${zoneId}) stocks ${itemId} at tier ${use.tier} above its ground's ${nodeCeiling}`,
+          `${npc.id} (${zone.id}) stocks ${itemId} at tier ${use.tier} above its ground's ${nodeCeiling}`,
         ).toBeLessThanOrEqual(nodeCeiling);
-        checked++;
+        if (use.tier >= 2) gatedRowsChecked++;
+        ceilingsExercised.add(zone.id);
       }
     }
-    // Non-vacuity: the sweep must actually have seen the shipped tool rows.
-    expect(checked).toBeGreaterThan(10);
+    // Non-vacuity, counting only the rows this rule can actually constrain: a
+    // tier-1 row satisfies `tier <= ceiling` in every zone trivially, so a
+    // count over ALL tool rows is met by the tier-1 rows alone and the sweep
+    // could pass having seen no gated row at all.
+    expect(gatedRowsChecked, 'the sweep must see the tier-2 and tier-3 rows').toBe(9);
+    // And it must have judged every zone that stocks tools, not just one.
+    expect(ceilingsExercised.size).toBe(3);
   });
 
   it('no gated counter sits close enough to a node to harvest with its window open', () => {
