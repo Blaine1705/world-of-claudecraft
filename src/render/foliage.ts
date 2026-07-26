@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { DRAKELANDS_FLOWER_MEADOWS } from '../sim/content/drakelands';
 import { GALECREST_FLOWER_MEADOWS } from '../sim/content/galecrest';
 import { STABLE_PADDOCK } from '../sim/content/mounts';
 import { REALM_FLOWER_MEADOWS } from '../sim/content/realm';
@@ -1733,11 +1734,12 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
       { p: [190, 150, 235], c: [240, 220, 120] },
       { p: [246, 242, 250], c: [244, 200, 70] },
     ],
-    // Drakelands: reds and embers
+    // Drakelands: bright firebloom reds and oranges (the authored meadow
+    // fields around Wyrmwatch read as drifts of flame)
     ember: [
-      { p: [225, 70, 60], c: [120, 30, 20] },
-      { p: [240, 110, 60], c: [140, 60, 20] },
-      { p: [200, 50, 80], c: [90, 20, 30] },
+      { p: [244, 70, 48], c: [130, 28, 16] },
+      { p: [250, 142, 46], c: [150, 72, 20] },
+      { p: [238, 96, 60], c: [125, 40, 22] },
     ],
     // Amberfall: oranges, yellows, whites
     amber: [
@@ -1880,6 +1882,8 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     // plus meadow drifts, so its chunks carry the largest flower buffer
     // the Willowfen floor is all flower field (its grass is suppressed
     // below), so its chunks carry a near-garden flower buffer
+    // the Drakelands' authored firebloom fields bloom on near-bare ground
+    // (ember grass density is 0), so their chunks need a field-sized buffer
     const flowerCap = Math.max(
       8,
       Math.floor(
@@ -1888,7 +1892,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
             ? 1.2
             : chunkBiome === 'fen'
               ? 0.8
-              : fieldChunk || stableBandChunk
+              : fieldChunk || stableBandChunk || chunkBiome === 'ember'
                 ? 0.45
                 : 0.14),
       ),
@@ -1909,13 +1913,16 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     const j0 = Math.floor(minZ / step) - 1;
     const j1 = Math.ceil(maxZ / step) + 1;
     // authored flower meadows overlapping this chunk (the dusk realm's
-    // meadow bowls, and the Galecrest's house gardens + tarn shore rings)
+    // meadow bowls, the Galecrest's house gardens + tarn shore rings, and
+    // the Drakelands' firebloom fields around Wyrmwatch)
     const meadowSource =
       chunkBiome === 'dusk'
         ? REALM_FLOWER_MEADOWS
         : chunkBiome === 'gale'
           ? GALECREST_FLOWER_MEADOWS
-          : null;
+          : chunkBiome === 'ember'
+            ? DRAKELANDS_FLOWER_MEADOWS
+            : null;
     const meadowsInChunk = meadowSource
       ? meadowSource.filter(
           (mw) =>
@@ -2032,29 +2039,34 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
 
     // Authored meadows also bloom independent of grass anchors: the scrubby
     // basin shore carries few tufts (each tuft is a flower anchor above), so
-    // a direct grid pass keeps the drifts solid on bare ground too.
+    // a direct grid pass keeps the drifts solid on bare ground too. The
+    // Drakelands' fields take a second jittered sample per cell: with the
+    // ember ground bare of grass, one sample reads gappy, not a field.
+    const meadowReps = chunkBiome === 'ember' ? 2 : 1;
     for (const mw of meadowsInChunk) {
       for (let i = i0; i <= i1 && fn < flowerCap; i++) {
         for (let j = j0; j <= j1 && fn < flowerCap; j++) {
-          if (hashAt(i, j, 14) > 0.5) continue;
-          const fx = i * step + (hashAt(i, j, 15) - 0.5) * step * 1.6;
-          const fz = j * step + (hashAt(i, j, 16) - 0.5) * step * 1.6;
-          if (fx < minX || fx >= maxX || fz < minZ || fz >= maxZ) continue;
-          const mdx = fx - mw.x;
-          const mdz = fz - mw.z;
-          if (mdx * mdx + mdz * mdz >= mw.r * mw.r) continue;
-          const fh = terrainHeight(fx, fz, seed);
-          if (fh < WATER_LEVEL + 1.6 || tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) {
-            continue;
+          for (let rep = 0; rep < meadowReps && fn < flowerCap; rep++) {
+            if (hashAt(i + rep * 41, j, 14) > 0.5) continue;
+            const fx = i * step + (hashAt(i + rep * 41, j, 15) - 0.5) * step * 1.6;
+            const fz = j * step + (hashAt(i, j + rep * 41, 16) - 0.5) * step * 1.6;
+            if (fx < minX || fx >= maxX || fz < minZ || fz >= maxZ) continue;
+            const mdx = fx - mw.x;
+            const mdz = fz - mw.z;
+            if (mdx * mdx + mdz * mdz >= mw.r * mw.r) continue;
+            const fh = terrainHeight(fx, fz, seed);
+            if (fh < WATER_LEVEL + 1.6 || tooSteep(fx, fz, seed) || roadDistance(fx, fz) < 3.2) {
+              continue;
+            }
+            const fs = 0.55 + hashAt(i + rep, j, 17) * 0.5;
+            q.setFromAxisAngle(up, hashAt(i, j + rep, 18) * 12.4);
+            m.compose(v.set(fx, fh, fz), q, sv.set(fs, fs, fs));
+            fm.setMatrixAt(fn, m);
+            c.setHex(0xffffff);
+            c.offsetHSL((hashAt(i, j, 19) - 0.5) * 0.04, 0, (hashAt(j, i, 19) - 0.5) * 0.12);
+            fm.setColorAt(fn, c);
+            fn++;
           }
-          const fs = 0.55 + hashAt(i, j, 17) * 0.5;
-          q.setFromAxisAngle(up, hashAt(i, j, 18) * 12.4);
-          m.compose(v.set(fx, fh, fz), q, sv.set(fs, fs, fs));
-          fm.setMatrixAt(fn, m);
-          c.setHex(0xffffff);
-          c.offsetHSL((hashAt(i, j, 19) - 0.5) * 0.04, 0, (hashAt(j, i, 19) - 0.5) * 0.12);
-          fm.setColorAt(fn, c);
-          fn++;
         }
       }
     }

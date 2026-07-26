@@ -53,6 +53,27 @@ export const DRAKELANDS_ZONE: ZoneDef = {
 };
 
 // The causeway road runs on through the Wyrmgate, then forks into the wastes.
+// Authored always-bloom flower circles (render/foliage.ts reads these the
+// way the dusk realm reads REALM_FLOWER_MEADOWS): firebloom fields on the
+// green land around Wyrmwatch and down the Gatewood road verges, before the
+// waste opens. The ember flower palette is bright red and orange, so the
+// fields read as drifts of flame against the grass line.
+export const DRAKELANDS_FLOWER_MEADOWS: { x: number; z: number; r: number }[] = [
+  // the gate lawns north of town, flanking the causeway road
+  { x: 384, z: 1858, r: 9 },
+  { x: 426, z: 1866, r: 8 },
+  // the east downs off the hub ring
+  { x: 440, z: 1908, r: 11 },
+  { x: 432, z: 1934, r: 7 },
+  // the west approach and the warren hollow
+  { x: 368, z: 1884, r: 9 },
+  { x: 352, z: 1914, r: 7 },
+  // the Gatewood road south, verges widening toward the dune fork
+  { x: 382, z: 1946, r: 10 },
+  { x: 356, z: 1986, r: 12 },
+  { x: 390, z: 1992, r: 8 },
+];
+
 export const DRAKELANDS_ROADS: { x: number; z: number }[][] = [
   [
     { x: 404, z: 1804 },

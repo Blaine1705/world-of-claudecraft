@@ -163,6 +163,8 @@ describe('the Drakemaw Caldera vent is leavable without touching lava', () => {
 describe('the smaller Drakemaw cone craters are leavable on foot', () => {
   it('walks out of both cone craters', { timeout: 90_000 }, () => {
     expect(escapes({ x: 270, z: 2282 }, 30)).toBe(true);
-    expect(escapes({ x: 500, z: 2370 }, 30)).toBe(true);
+    // the east cone moved inland to (487, 2356): at (500, 2370) it straddled
+    // the column strait and row mere carves and its seaward half drowned
+    expect(escapes({ x: 487, z: 2356 }, 30)).toBe(true);
   });
 });

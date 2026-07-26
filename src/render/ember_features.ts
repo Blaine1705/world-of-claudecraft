@@ -6,6 +6,12 @@
 // contract as realm_flora: build once, update(time) animates, lights join
 // the renderer's rank-culled fireLights budget.
 import * as THREE from 'three';
+import {
+  EMBER_FLAT_POOLS,
+  EMBER_LAVA_LINKS,
+  emberLinkPolyline,
+  emberNearestOnLink,
+} from '../sim/ember_lava_layout';
 import { hash2 } from '../sim/rng';
 import { EMBER_LAVA_POOLS, EMBER_VOLCANOES, roadDistance, terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
@@ -19,7 +25,6 @@ const EMBER_PROP_URLS = {
   riverB: '/models/props/lava_river_b.glb',
   riverC: '/models/props/lava_river_c.glb',
   riverEnd: '/models/props/lava_river_end.glb',
-  terrace: '/models/props/lava_terrace.glb',
   hoard: '/models/props/dragon_hoard.glb',
   eggs: '/models/props/dragon_eggs.glb',
   lily: '/models/props/ember_lily.glb',
@@ -127,116 +132,96 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
     }
   };
 
-  // --- the lava: the modeled pool filling every shaped basin (the old
-  // procedural discs are gone), a flat-land pool-and-river network out on
-  // the waste, terraces cascading the volcano flanks into the pools, and
-  // each basin's glow light kept ---
+  // --- the lava: the modeled pool filling every shaped basin and crater,
+  // and the flat-land pool-and-river network out on the waste. The network
+  // geometry (pools, tree links, meander curves) is the shared layout leaf
+  // src/sim/ember_lava_layout.ts; the terrain grades a flush bed under the
+  // SAME curves (world.ts applyEmberLavaNetwork), so nothing here floats
+  // and nothing sinks. One river per pool pair; a crater keeps exactly one
+  // pool sized to its pit and nothing else. ---
   {
     const T = (x: number, z: number): number => terrainHeight(x, z, seed);
+    // crater pits: one pool each, fitted to the pit rather than the melt
+    // record's own r (the Drakemaw's eye nests inside its escape bench)
+    const CRATER_FIT: Record<string, number> = {
+      '390,2320': 19, // the Drakemaw vent, up to the wade-out ramp
+      '270,2282': 14.5, // the west cone's pit
+      '487,2356': 12.5, // the east cone's pit
+    };
     const poolSpots: PropPlacement[] = EMBER_LAVA_POOLS.map((pool) => ({
       x: pool.x,
       z: pool.z,
       y: pool.floor + 0.4,
-      fp: pool.r * 2.15,
+      fp: CRATER_FIT[`${pool.x},${pool.z}`] ?? pool.r * 2.15,
       rot: hash2(pool.x, pool.z, seed + 801) * Math.PI * 2,
     }));
-    // the flat-land network: render-only pools on probed level ground,
-    // joined to one another and to the shaped basins by long river runs
-    poolSpots.push({ x: 330, z: 2250, y: T(330, 2250) - 0.2, fp: 16, rot: 0.7 });
-    poolSpots.push({ x: 344, z: 2233, y: T(344, 2233) - 0.2, fp: 12, rot: 2.1 });
-    poolSpots.push({ x: 418, z: 2196, y: T(418, 2196) - 0.2, fp: 14, rot: 1.4 });
+    // the flat-land network pools, resting on their graded level pads
+    for (const pool of EMBER_FLAT_POOLS) {
+      poolSpots.push({
+        x: pool.x,
+        z: pool.z,
+        y: pool.h + 0.15,
+        fp: pool.r * 2,
+        rot: hash2(pool.x, pool.z, seed + 802) * Math.PI * 2,
+      });
+    }
     instanceProp('pool', poolSpots);
-    const seg = (x: number, z: number, rot: number, fp = 9): PropPlacement => ({
+    const seg = (x: number, z: number, rot: number, fp: number): PropPlacement => ({
       x,
       z,
       y: T(x, z) - 0.1,
       fp,
       rot,
     });
-    // a connecting run: alternating river variants laid nose to tail from
-    // just outside one pool's rim to just outside the other's. Each model's
-    // channel runs along its own axis (variant A along +z, B/C and the end
-    // piece along +x, measured from the shipped GLBs), so every piece takes
-    // a per-variant yaw offset that lands its channel ON the run bearing;
-    // every other piece also flips end-for-end so the mouths meet flush
-    // instead of repeating the same closed end down the run.
+    // each link renders as alternating river variants laid nose to tail
+    // along the SHARED meander polyline (the same curve the terrain bed
+    // follows). Each model's channel runs along its own axis (variant A
+    // along +z, B/C and the end piece along +x, measured from the shipped
+    // GLBs), so every piece takes a per-variant yaw offset that lands its
+    // channel ON the local tangent; every other piece also flips
+    // end-for-end so the mouths meet flush instead of repeating the same
+    // closed end down the run.
     const AXIS_OFFSET = [0, -Math.PI / 2, -Math.PI / 2]; // riverA, riverB, riverC
     const riverSegs: PropPlacement[][] = [[], [], []];
     const endSegs: PropPlacement[] = [];
-    // the run MEANDERS: a deterministic lateral sway bends the chain so the
-    // curved pieces read as one long winding river rather than a ruler line;
-    // each piece takes the local tangent's yaw, and the graded terrain bed
-    // (world.ts EMBER_LAVA_RUNS) is wide enough to carry the whole wiggle
-    const chain = (x0: number, z0: number, x1: number, z1: number, fp: number): void => {
-      const len = Math.hypot(x1 - x0, z1 - z0);
-      const dirx = (x1 - x0) / len;
-      const dirz = (z1 - z0) / len;
-      const px = -dirz; // lateral unit
-      const pz = dirx;
-      const phase = hash2(x0, z1, seed + 806) * Math.PI * 2;
-      const amp = Math.min(3.4, len * 0.12);
-      const wave = (Math.PI * 2) / (fp * 3.2);
+    for (const link of EMBER_LAVA_LINKS) {
+      const pts = emberLinkPolyline(link);
+      // cumulative arc length along the polyline
+      const arc: number[] = [0];
+      for (let i = 1; i < pts.length; i++) {
+        arc.push(arc[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].z - pts[i - 1].z));
+      }
+      const len = arc[arc.length - 1];
       const at = (d: number): { x: number; z: number } => {
-        // sway fades to zero at both ends so the mouths stay on the pools
-        const fade = Math.sin(Math.min(Math.PI, (d / len) * Math.PI));
-        const off = Math.sin(d * wave + phase) * amp * fade;
-        return { x: x0 + dirx * d + px * off, z: z0 + dirz * d + pz * off };
+        let i = 1;
+        while (i < arc.length - 1 && arc[i] < d) i++;
+        const t = (d - arc[i - 1]) / Math.max(1e-6, arc[i] - arc[i - 1]);
+        return {
+          x: pts[i - 1].x + (pts[i].x - pts[i - 1].x) * t,
+          z: pts[i - 1].z + (pts[i].z - pts[i - 1].z) * t,
+        };
       };
-      const step = fp * 0.72;
+      const step = link.w * 0.72;
       let k = 0;
-      for (let d = step * 0.5; d < len - step * 0.4; d += step) {
+      for (let d = link.trim0; d < len - link.trim1; d += step) {
         const here = at(d);
         const ahead = at(Math.min(len, d + 1.5));
         const yaw = Math.atan2(ahead.x - here.x, ahead.z - here.z);
         const variant = k % 3;
         const flip = k % 2 === 1 ? Math.PI : 0;
-        riverSegs[variant].push(seg(here.x, here.z, yaw + AXIS_OFFSET[variant] + flip, fp));
+        riverSegs[variant].push(seg(here.x, here.z, yaw + AXIS_OFFSET[variant] + flip, link.w));
         k++;
       }
-      const rot = Math.atan2(x1 - x0, z1 - z0);
-      endSegs.push(
-        seg(
-          x1 - Math.sin(rot) * step * 0.3,
-          z1 - Math.cos(rot) * step * 0.3,
-          rot - Math.PI / 2,
-          fp,
-        ),
-      );
-    };
-    chain(330, 2250, 344, 2233, 9); // the twin pools' own link
-    chain(330, 2250, 302, 2328, 10); // the long run south into the waste basin
-    chain(294, 2318, 302, 2328, 8); // the west cone's terrace outflow
-    chain(418, 2196, 446, 2220, 9); // the north pool into the spring basin
+      // the receiving mouth's cap, tucked just short of the pool
+      const tail = at(Math.max(0, len - link.trim1 + step * 0.25));
+      const tailPrev = at(Math.max(0, len - link.trim1 + step * 0.25 - 1.5));
+      const tailYaw = Math.atan2(tail.x - tailPrev.x, tail.z - tailPrev.z);
+      endSegs.push(seg(tail.x, tail.z, tailYaw - Math.PI / 2, link.w));
+    }
     instanceProp('riverA', riverSegs[0]);
     instanceProp('riverB', riverSegs[1]);
     instanceProp('riverC', riverSegs[2]);
-    // river mouths: the chain ends, the Moltenmaw saddle overflow, and the
-    // east cone's foot
-    instanceProp('riverEnd', [
-      ...endSegs,
-      seg(428, 2335, Math.atan2(438 - 418, 2326 - 2342) - Math.PI / 2, 11),
-      seg(480, 2343, Math.atan2(-14, -15) - Math.PI / 2, 9),
-    ]);
-    // the terraces, stepped down the flanks toward the pools below
-    const terr = (x: number, z: number, tx: number, tz: number): PropPlacement => ({
-      x,
-      z,
-      y: T(x, z) - 0.15,
-      fp: 10,
-      rot: Math.atan2(tx - x, tz - z),
-    });
-    instanceProp('terrace', [
-      // the Drakemaw's southeast flank, down into the Moltenmaw
-      terr(400, 2328, 418, 2342),
-      terr(406, 2333, 418, 2342),
-      terr(412, 2338, 418, 2342),
-      // the west cone, down toward the waste pool
-      terr(276, 2292, 302, 2328),
-      terr(292, 2320, 302, 2328),
-      // the east cone's northwest face, to the river mouth at its foot
-      terr(494, 2358, 480, 2343),
-      terr(486, 2350, 480, 2343),
-    ]);
+    instanceProp('riverEnd', endSegs);
     for (const pool of EMBER_LAVA_POOLS) {
       const light = new THREE.PointLight(0xff5a18, 8, pool.r * 3.4, 2);
       light.position.set(pool.x, pool.floor + 2.6, pool.z);
@@ -244,13 +229,9 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
       glowLights.push(light);
       group.add(light);
     }
-    for (const p2 of [
-      { x: 330, z: 2250, r: 8 },
-      { x: 344, z: 2233, r: 6 },
-      { x: 418, z: 2196, r: 7 },
-    ]) {
-      const light = new THREE.PointLight(0xff5a18, 6, p2.r * 3.4, 2);
-      light.position.set(p2.x, T(p2.x, p2.z) + 2.2, p2.z);
+    for (const pool of EMBER_FLAT_POOLS) {
+      const light = new THREE.PointLight(0xff5a18, 6, pool.r * 3.4, 2);
+      light.position.set(pool.x, pool.h + 2.2, pool.z);
       light.userData.baseIntensity = 6;
       glowLights.push(light);
       group.add(light);
@@ -284,24 +265,22 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
         { x: 302, z: 2258 },
       ])
         if (Math.hypot(x - den.x, z - den.z) < 13) return false;
-      if (Math.hypot(x - 330, z - 2250) < 12 || Math.hypot(x - 344, z - 2233) < 9) return false;
-      if (Math.hypot(x - 418, z - 2196) < 11) return false;
-      // the river runs keep their banks clear
-      for (const run of [
-        [330, 2250, 302, 2328],
-        [294, 2318, 302, 2328],
-        [418, 2196, 446, 2220],
-        [330, 2250, 344, 2233],
-      ] as const) {
-        const dx = run[2] - run[0];
-        const dz = run[3] - run[1];
-        const t = Math.max(
-          0,
-          Math.min(1, ((x - run[0]) * dx + (z - run[1]) * dz) / (dx * dx + dz * dz)),
-        );
-        if (Math.hypot(x - (run[0] + dx * t), z - (run[1] + dz * t)) < 8) return false;
+      for (const pool of EMBER_FLAT_POOLS) {
+        if (Math.hypot(x - pool.x, z - pool.z) < pool.r * 1.5 + 5) return false;
+      }
+      // the river links keep their banks clear (the shared meander, so the
+      // clearance follows the real channel, not the straight chord)
+      for (const link of EMBER_LAVA_LINKS) {
+        if (emberNearestOnLink(link, x, z).dist < link.w * 0.8 + 4) return false;
       }
       return true;
+    };
+    // level-ground gate (the willow rule): lilies only root on flats
+    const levelAt = (x: number, z: number): boolean => {
+      const e = 1.2;
+      const hx = terrainHeight(x + e, z, seed) - terrainHeight(x - e, z, seed);
+      const hz = terrainHeight(x, z + e, seed) - terrainHeight(x, z - e, seed);
+      return Math.hypot(hx, hz) / (2 * e) <= 0.3;
     };
     for (let gx = 200; gx <= 530; gx += 12) {
       for (let gz = 1830; gz <= 2405; gz += 12) {
@@ -312,22 +291,50 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
         const y = terrainHeight(x, z, seed);
         if (y < 1) continue;
         if (!clearOf(x, z)) continue;
-        const spot = {
-          x,
-          z,
-          y: y - 0.1,
-          rot: hash2(z, x, seed + 841) * Math.PI * 2,
-        };
-        if (r < 0.07) {
-          // a giant lily only roots on LEVEL ground (the willow rule)
-          const e = 1.2;
-          const hx = terrainHeight(x + e, z, seed) - terrainHeight(x - e, z, seed);
-          const hz = terrainHeight(x, z + e, seed) - terrainHeight(x, z - e, seed);
-          if (Math.hypot(hx, hz) / (2 * e) > 0.3) continue;
-          lilySpots.push({ ...spot, fp: 7 + hash2(x, z, seed + 851) * 4 });
-        } else {
-          crystalSpots.push({ ...spot, fp: 1.8 + hash2(x, z, seed + 861) * 1.6 });
+        if (r >= 0.055) {
+          crystalSpots.push({
+            x,
+            z,
+            y: y - 0.1,
+            rot: hash2(z, x, seed + 841) * Math.PI * 2,
+            fp: 1.8 + hash2(x, z, seed + 861) * 1.6,
+          });
+          continue;
         }
+        // a lily GROVE: the giants grow in families, huge elders at the
+        // heart, giants around them, smaller lilies at the skirt (1 to 2
+        // huge, 2 to 3 giant, 3 to 4 small per clump), every stem on its
+        // own probed level ground
+        if (!levelAt(x, z)) continue;
+        const tier = [
+          { n: 1 + Math.round(hash2(gx, gz, seed + 852)), lo: 11, hi: 15, rad: 3.2 },
+          { n: 2 + Math.round(hash2(gx, gz, seed + 853)), lo: 7, hi: 10, rad: 7.5 },
+          { n: 3 + Math.round(hash2(gx, gz, seed + 854)), lo: 3.5, hi: 6, rad: 11 },
+        ];
+        let placed = 0;
+        tier.forEach((t, ti) => {
+          for (let k = 0; k < t.n; k++) {
+            const ang = hash2(gx + k, gz + ti * 7, seed + 855) * Math.PI * 2;
+            const dist =
+              ti === 0 && k === 0
+                ? 0
+                : t.rad * (0.55 + hash2(gx, gz + k + ti * 13, seed + 856) * 0.45);
+            const lx = x + Math.sin(ang) * dist;
+            const lz = z + Math.cos(ang) * dist;
+            const ly = terrainHeight(lx, lz, seed);
+            if (ly < 1 || !clearOf(lx, lz) || !levelAt(lx, lz)) continue;
+            lilySpots.push({
+              x: lx,
+              z: lz,
+              y: ly - 0.1,
+              fp: t.lo + hash2(lz, lx, seed + 857) * (t.hi - t.lo),
+              rot: hash2(lx, lz, seed + 858) * Math.PI * 2,
+            });
+            placed++;
+          }
+        });
+        // a clump that lost every stem to the gates leaves no mark
+        if (placed === 0) continue;
       }
     }
     // a dense crystal garden on the Bloodglass Fields

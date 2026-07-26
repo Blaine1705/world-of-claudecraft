@@ -24,6 +24,12 @@ import {
   ZONES,
 } from './data';
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
+import {
+  EMBER_FLAT_POOLS,
+  EMBER_LAVA_LINKS,
+  emberLinkDistanceNorm,
+  emberNearestOnLink,
+} from './ember_lava_layout';
 import { galeDeckSurface } from './gale_harbor';
 import { orkadiaFieldHeight } from './orkadia_field';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
@@ -1965,7 +1971,10 @@ function applyFrostCoast(x: number, z: number, h: number): number {
 export const EMBER_VOLCANOES = [
   { x: 390, z: 2320, r: 62, h: 27, craterR: 16, craterD: 13 }, // Drakemaw Caldera
   { x: 270, z: 2282, r: 40, h: 20, craterR: 8, craterD: 8 },
-  { x: 500, z: 2370, r: 36, h: 18, craterR: 7, craterD: 7 },
+  // the east cone, on its real footing: at (500, 2370) it straddled the
+  // column strait and row mere carves, which sank its seaward half (and
+  // its crater pool) to the seabed after every shaping pass
+  { x: 487, z: 2356, r: 32, h: 18, craterR: 7, craterD: 7 },
   { x: 318, z: 2392, r: 30, h: 14, craterR: 0, craterD: 0 },
 ] as const;
 // the Snowline crossing's drake-side footing (appended to the ember lobes
@@ -1973,15 +1982,24 @@ export const EMBER_VOLCANOES = [
 
 // Open lava pools out in the wastes (shaped as shallow flat-floored basins;
 // the render lava surface sits just above each floor).
+// padK: where the flat melt floor ends, as a fraction of r. The default 0.95
+// keeps the whole model footprint on level ground; the Drakemaw vent keeps
+// the original tight eye (0.55) because its shore is the escape bench's
+// wade-out ramp (DRAKEMAW_ESCAPE), pinned by tests/terrain_escape.test.ts.
 export const EMBER_LAVA_POOLS = [
-  { x: 390, z: 2320, r: 14, floor: 12 }, // the vent inside the Drakemaw crater
+  { x: 390, z: 2320, r: 14, floor: 12, padK: 0.55 }, // the vent inside the Drakemaw crater
   { x: 446, z: 2220, r: 11, floor: -0.5 },
   { x: 302, z: 2328, r: 11, floor: 0 },
-  // crater pools high in the two smaller cones
-  { x: 270, z: 2282, r: 7, floor: 11.5 },
-  { x: 500, z: 2370, r: 6, floor: 9.5 },
-  // the Moltenmaw: an open lava-lake field east of the caldera
-  { x: 418, z: 2342, r: 16, floor: -1.2 },
+  // crater pools high in the two smaller cones (padK 0.55: the pit walls
+  // cradle the model's rocky ring, and the escape walkers need the legacy
+  // gentle floor-to-wall transition)
+  { x: 270, z: 2282, r: 7, floor: 11.5, padK: 0.55 },
+  { x: 487, z: 2356, r: 6, floor: 9.5, padK: 0.55 },
+  // the Moltenmaw: an open lava-lake field east of the caldera. The big eye
+  // sits at (423, 2347) so its whole model footprint (r * 1.15) stays clear
+  // of the Drakemaw escape bench ring (benchFade 23 from the vent), whose
+  // every-azimuth dry-shore guarantee is pinned by tests/terrain_escape.
+  { x: 423, z: 2347, r: 16, floor: -1.2 },
   { x: 438, z: 2326, r: 10, floor: -1.2 },
 ] as const;
 
@@ -2068,79 +2086,132 @@ function applyDrakemawEscape(x: number, z: number, h: number): number {
   return out;
 }
 
-// The modeled lava network's ground (render/ember_features.ts): a LEVEL pad
-// under each render-only pool and a smooth constant-gradient bed under each
-// connecting river run, so every modeled piece sits flush instead of
-// sinking into the dunes. Pure blend toward authored heights.
-const EMBER_LAVA_PADS = [
-  { x: 330, z: 2250, r: 10, h: 3.4 },
-  { x: 344, z: 2233, r: 8, h: 3.4 },
-  { x: 418, z: 2196, r: 9, h: 5.4 },
-] as const;
-const EMBER_LAVA_RUNS = [
-  { x0: 330, z0: 2250, x1: 344, z1: 2233, h0: 3.4, h1: 3.4 },
-  { x0: 330, z0: 2250, x1: 302, z1: 2328, h0: 3.4, h1: 2.0 },
-  { x0: 294, z0: 2318, x1: 302, z1: 2328, h0: 0.8, h1: 1.9 },
-  { x0: 418, z0: 2196, x1: 446, z1: 2220, h0: 5.4, h1: 2.4 },
-] as const;
-function emberRunDistance(x: number, z: number): number {
-  let best = Infinity;
-  for (const run of EMBER_LAVA_RUNS) {
-    const dx = run.x1 - run.x0;
-    const dz = run.z1 - run.z0;
-    const t = Math.max(
-      0,
-      Math.min(1, ((x - run.x0) * dx + (z - run.z0) * dz) / (dx * dx + dz * dz)),
-    );
-    best = Math.min(best, Math.hypot(x - (run.x0 + dx * t), z - (run.z0 + dz * t)));
-  }
-  return best;
+// The east cone's breach: a shallow melt-notch cut southwest through its
+// crater rim, the walkable way out (the Drakemaw gorge idiom scaled down;
+// an unbreached crater is a foot trap, and this cone's old seaward breach
+// was an accident of the coast carve). The notch floor starts above the
+// rendered melt surface so the pool never drains through it.
+const EAST_CONE_BREACH = {
+  x: 487,
+  z: 2356,
+  angle: Math.atan2(-25.1, -16.4), // toward the open waste at (470, 2331)
+  startH: 10.4,
+  slope: 0.55,
+  floorH: 3.0,
+  endR: 30,
+} as const;
+function applyEastConeBreach(x: number, z: number, h: number): number {
+  const b = EAST_CONE_BREACH;
+  const dx = x - b.x;
+  const dz = z - b.z;
+  if (Math.abs(dx) > b.endR + 8 || Math.abs(dz) > b.endR + 8) return h;
+  const along = dx * Math.cos(b.angle) + dz * Math.sin(b.angle);
+  const perp = Math.abs(dx * Math.sin(b.angle) - dz * Math.cos(b.angle));
+  if (along < 2 || along > b.endR || perp > 5.5) return h;
+  const wedge =
+    (1 - smoothstep(2.5, 5.5, perp)) *
+    smoothstep(2, 6, along) *
+    (1 - smoothstep(b.endR - 6, b.endR, along));
+  if (wedge <= 0) return h;
+  const ramp = Math.max(b.startH - b.slope * Math.max(0, along - 5), b.floorH);
+  return h + (ramp - h) * wedge;
 }
 
-function applyEmberLavaRuns(x: number, z: number, h: number): number {
+// The modeled lava network's ground (render/ember_features.ts): the pool
+// records, link topology, and meander curves live in the shared leaf
+// src/sim/ember_lava_layout.ts, and this applier grades terrain to them:
+// a LEVEL pad flush under each pool model's whole footprint, a flat bed
+// following each river link's actual meander, and a low moulded shoulder
+// ringing both so the melt sits down IN the ground. Every rim parts where
+// a channel crosses it (emberLinkDistanceNorm), and every slope stays
+// gentle (rise/run well under the movement climb gate), so nothing strands
+// a player inside the melt line.
+function applyEmberLavaNetwork(x: number, z: number, h: number): number {
   if (z < DRAKE_ZMIN || z > DRAKE_ZMAX) return h;
+  if (x < 260 || x > 480 || z < 2160 || z > 2360) return h; // network bbox
   let out = h;
-  for (const pad of EMBER_LAVA_PADS) {
-    const d = Math.hypot(x - pad.x, z - pad.z);
-    if (d < pad.r + 7) {
-      const w = 1 - smoothstep(pad.r, pad.r + 7, d);
-      out = out + (pad.h - out) * w;
+  const linkNorm = emberLinkDistanceNorm(x, z);
+  const rimGate = smoothstep(0.55, 1.15, linkNorm);
+  for (const pool of EMBER_FLAT_POOLS) {
+    const d = Math.hypot(x - pool.x, z - pool.z);
+    const edge = pool.r * 1.15; // the model's rocky ring ends here
+    if (d < edge + 7) {
+      // flush pad under the whole model, easing back to open ground
+      const w = 1 - smoothstep(edge, edge + 4.5, d);
+      // the moulded shoulder just past the model edge (0.33 rise/run)
+      const rim =
+        1.5 *
+        smoothstep(edge - 1, edge + 2, d) *
+        (1 - smoothstep(edge + 2, edge + 6.5, d)) *
+        rimGate;
+      out = out + (pool.h - out) * w + rim;
     }
   }
-  for (const run of EMBER_LAVA_RUNS) {
-    const dx = run.x1 - run.x0;
-    const dz = run.z1 - run.z0;
-    const len2 = dx * dx + dz * dz;
-    const t = Math.max(0, Math.min(1, ((x - run.x0) * dx + (z - run.z0) * dz) / len2));
-    const d = Math.hypot(x - (run.x0 + dx * t), z - (run.z0 + dz * t));
-    if (d < 8 + 8) {
-      const w = 1 - smoothstep(8, 16, d);
-      const target = run.h0 + (run.h1 - run.h0) * t;
-      out = out + (target - out) * w;
+  for (const link of EMBER_LAVA_LINKS) {
+    const s = emberNearestOnLink(link, x, z);
+    const half = link.w * 0.62; // the channel model overhangs its melt line
+    if (s.dist < half + 6.5) {
+      const w = 1 - smoothstep(half, half + 3.5, s.dist);
+      // low banks shouldering the channel, parted at every pool mouth
+      const bankGate = smoothstep(0.1, 0.55, poolDistanceNorm(x, z));
+      const rim =
+        1.2 *
+        smoothstep(half - 0.5, half + 2, s.dist) *
+        (1 - smoothstep(half + 2, half + 6, s.dist)) *
+        bankGate;
+      out = out + (s.h - out) * w + rim;
     }
   }
   return out;
 }
 
+// distance to the nearest pool edge (flat pools AND shaped basins),
+// normalized by that pool's radius: river banks fade out near mouths
+function poolDistanceNorm(x: number, z: number): number {
+  let best = Infinity;
+  for (const pool of EMBER_FLAT_POOLS) {
+    best = Math.min(best, Math.hypot(x - pool.x, z - pool.z) / pool.r - 1.15);
+  }
+  for (const pool of EMBER_LAVA_POOLS) {
+    best = Math.min(best, Math.hypot(x - pool.x, z - pool.z) / pool.r - 1.15);
+  }
+  return best;
+}
+
 // Real craters, carved after the cones: a raised rock lip rings each pool
 // and the floor sinks genuinely below the surrounding ground, so the melt
 // sits down INSIDE its bowl the way lake water does (the floors stay above
-// WATER_LEVEL so the zone water plane never floods a vent).
+// WATER_LEVEL so the zone water plane never floods a vent). The flat floor
+// runs out past the whole model footprint (r * 1.15) so the modeled rim
+// rests on level ground even where the base terrain falls away (the coast
+// side of the Moltenmaw used to drop out from under its pool), and the lip
+// peaks OUTSIDE the model edge: the moulded shoulder players walk over.
 function applyEmberLavaBasins(x: number, z: number, h: number): number {
   if (z < DRAKE_ZMIN || z > DRAKE_ZMAX) return h;
   let out = h;
   for (const pool of EMBER_LAVA_POOLS) {
     const d = Math.hypot(x - pool.x, z - pool.z);
-    if (d < pool.r * 2.2) {
-      // the lip: rises from the bowl edge, falls away outward; it parts
-      // where a modeled river run crosses it, so the melt flows in flush
+    if (d < pool.r * 2.4) {
+      const padK = (pool as { padK?: number }).padK ?? 0.95;
+      const linkGate = smoothstep(0.55, 1.15, emberLinkDistanceNorm(x, z));
+      // the lip: rises past the melt edge, falls away outward; it parts
+      // where a modeled river link crosses it (normalized by that link's
+      // width), so the melt flows in flush. Crater-nested pools
+      // (padK < 0.9) keep the legacy tight lip the escape walkers are
+      // tuned against; open basins take the outward moulded shoulder.
       const lip =
-        2.4 *
-        smoothstep(pool.r * 0.7, pool.r * 1.05, d) *
-        (1 - smoothstep(pool.r * 1.05, pool.r * 2.2, d)) *
-        smoothstep(4, 9, emberRunDistance(x, z));
-      // the bowl: flat melt floor inside, blending up to the lip
-      const blend = smoothstep(pool.r * 0.55, pool.r * 1.05, d);
+        padK < 0.9
+          ? 2.4 *
+            smoothstep(pool.r * 0.7, pool.r * 1.05, d) *
+            (1 - smoothstep(pool.r * 1.05, pool.r * 2.2, d)) *
+            linkGate
+          : 2.4 *
+            smoothstep(pool.r * 1.02, pool.r * 1.45, d) *
+            (1 - smoothstep(pool.r * 1.45, pool.r * 2.4, d)) *
+            linkGate;
+      // the bowl: flat melt floor under the model, blending up to the lip
+      // across a gentle walkable shoulder
+      const blend = smoothstep(pool.r * padK, pool.r * (padK + 0.4), d);
       out = out * blend + pool.floor * (1 - blend) + lip;
     }
   }
@@ -3252,9 +3323,10 @@ function terrainHeightUnpadded(x: number, z: number, seed: number): number {
   h = applyStripFlankCoast(x, z, h);
   h = applyRowMeres(x, z, h);
   h = applyNorthBay(x, z, h);
-  h = applyEmberLavaRuns(x, z, h);
+  h = applyEmberLavaNetwork(x, z, h);
   h = applyEmberLavaBasins(x, z, h);
   h = applyDrakemawEscape(x, z, h);
+  h = applyEastConeBreach(x, z, h);
   h = applyFrostTerraces(x, z, h);
   h = applyFenBraids(x, z, h);
   // (The Great Maze no longer shapes terrain: its hedge walls are modeled
@@ -3852,11 +3924,22 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     kind = r < 0.14 ? 'tree' : r < 0.28 ? 'tree2' : 'rock';
   } else if (biome === 'ember') {
     // the gatewood thins mile by mile into open waste: trees fade out
-    // northward, scorched rock takes over
+    // northward, scorched rock takes over (the widened rock band keeps the
+    // waste strewn with boulders the way a volcanic plain reads)
     const t = Math.max(0, Math.min(1, (gz - 1560) / 170));
     const treeGate = 0.36 * (1 - t) + 0.05 * t;
-    if (r > treeGate + 0.12 + t * 0.1) return null; // rockier as the waste opens
+    if (r > treeGate + 0.2 + t * 0.16) return null; // rockier as the waste opens
     kind = r < treeGate * 0.55 ? 'tree' : r < treeGate ? 'tree2' : 'rock';
+    // no boulders inside the modeled lava network: the melt pads, the river
+    // beds, and the shaped basins stay clear (a rock there is also a stray
+    // collider standing in the melt)
+    if (gz > 2160 && gz < 2360 && emberLinkDistanceNorm(gx, gz) < 1.1) return null;
+    for (const pool of EMBER_FLAT_POOLS) {
+      if (Math.hypot(gx - pool.x, gz - pool.z) < pool.r * 1.6 + 4) return null;
+    }
+    for (const pool of EMBER_LAVA_POOLS) {
+      if (Math.hypot(gx - pool.x, gz - pool.z) < pool.r * 1.7 + 4) return null;
+    }
   } else if (biome === 'frost') {
     // hardy pines and broken stone on the snow benches
     if (r > 0.36) return null;
