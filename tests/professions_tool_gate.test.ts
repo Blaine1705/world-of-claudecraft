@@ -9,6 +9,8 @@
 // tier-1 tool, so a threshold at or above that ceiling is unreachable by the
 // only means a new player has: the ladder would dead-end with no test failing.
 
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { GATHERING_PROFESSIONS, type GatheringProfessionId } from '../src/sim/content/professions';
 import {
@@ -24,6 +26,7 @@ import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { type Entity, INTERACT_RANGE, type SimEvent } from '../src/sim/types';
 import { buildVendorView } from '../src/ui/hud/vendor/vendor_view';
+import { NPC_WINDOW_CLOSE_RANGE } from '../src/ui/npc_service_range';
 
 function ctxOf(sim: Sim): SimContext {
   return (sim as unknown as { ctx: SimContext }).ctx;
@@ -106,6 +109,21 @@ describe('vendor row gate resolver', () => {
   });
 });
 
+describe('the threshold values themselves', () => {
+  it('are 40 and 70, pinned as literals', () => {
+    // Everything else in this file compares the constants to THEMSELVES, which
+    // proves the wiring and proves nothing about the numbers: a mutation to
+    // 45 / 65 keeps the whole suite green while staying under the ceiling and
+    // inside the margin. These two numbers are published player copy (the wiki
+    // tools note interpolates them, and the vendor row renders them), so a
+    // rebalance has to touch this claim rather than drift past it. Same
+    // reasoning and same shape as the tier-1 price pin in
+    // tests/professions_tools.test.ts.
+    expect(TIER2_TOOL_GATE_PROFICIENCY).toBe(40);
+    expect(TIER3_TOOL_GATE_PROFICIENCY).toBe(70);
+  });
+});
+
 describe('gate thresholds against the live gain curve', () => {
   // The derived ceiling: the LOWEST proficiency at which a tier-1 node's gain
   // multiplier has fallen to zero, computed by walking the real function rather
@@ -172,8 +190,6 @@ describe('gate table completeness', () => {
 
   it('every vendor-priced land tool above tier 1 carries a gate, and tier 1 carries none', () => {
     const tools = landTools();
-    // Non-vacuity: the loop must actually see the shipped ladder.
-    expect(tools.length).toBe(9);
     for (const [itemId, tier] of tools) {
       const gate = VENDOR_ROW_GATES[itemId];
       if (tier === 1) {
@@ -191,6 +207,9 @@ describe('gate table completeness', () => {
         (ITEMS[itemId].use as { professionId: GatheringProfessionId }).professionId,
       );
     }
+    // Non-vacuity, asserted AFTER the loop so a newly added ungated tool is
+    // named by its own arm first rather than reported as a bare count change.
+    expect(tools.length).toBe(9);
   });
 
   it('no fishing implement is gated: rods belong to the fishing work, not this ladder', () => {
@@ -208,6 +227,14 @@ describe('gate table completeness', () => {
 
   it('gates only ever name a gathering profession that exists', () => {
     for (const [itemId, gate] of Object.entries(VENDOR_ROW_GATES)) {
+      // The gated id must be a real land gathering tool. Without this a gate
+      // on, say, baked_bread would satisfy every other arm in this file.
+      const use = ITEMS[itemId]?.use;
+      expect(use?.type, itemId).toBe('gatherTool');
+      expect(
+        use?.type === 'gatherTool' ? use.professionId : undefined,
+        `${itemId} gate profession matches the tool`,
+      ).toBe(gate.professionId);
       expect(GATHERING_PROFESSIONS[gate.professionId], itemId).toBeDefined();
       expect(gate.proficiency, itemId).toBeGreaterThan(0);
       expect(gate.proficiency, itemId).toBeLessThanOrEqual(
@@ -313,7 +340,7 @@ describe('the vendor view core renders a gated row locked, never dropped', () =>
     expect(gated.affordable).toBe(true);
   });
 
-  it('unlocks the row at the same threshold the buy path uses', () => {
+  it('unlocks the row at the threshold the shared resolver uses', () => {
     const view = buildVendorView(stock, [], ITEMS, {
       ...balances,
       gatheringProficiency: { mining: TIER2_TOOL_GATE_PROFICIENCY },
@@ -321,15 +348,21 @@ describe('the vendor view core renders a gated row locked, never dropped', () =>
     expect(view.goods.find((g) => g.itemId === 'iron_mining_pick')?.locked).toBe(false);
   });
 
-  it('omitting the proficiency map locks every gated row rather than opening it', () => {
-    const view = buildVendorView(stock, [], ITEMS, balances);
+  it('an EMPTY proficiency map locks every gated row rather than opening it', () => {
+    // The map is a required field, so it can no longer be forgotten silently;
+    // what remains reachable is a caller satisfying the type with an empty
+    // object. That must lock (the under-promising direction), never open.
+    const view = buildVendorView(stock, [], ITEMS, { ...balances, gatheringProficiency: {} });
     expect(view.goods.find((g) => g.itemId === 'iron_mining_pick')?.locked).toBe(true);
     expect(view.goods.find((g) => g.itemId === 'copper_mining_pick')?.locked).toBe(false);
   });
 
-  it('agrees with the buy path on every stocked tool at a sweep of proficiencies', () => {
-    // The whole point of one shared resolver: no proficiency exists at which
-    // the window and the sim disagree about a row.
+  it('agrees with the SHARED RESOLVER on every stocked tool across a proficiency sweep', () => {
+    // Named for what it actually drives. The view and the sim cannot disagree
+    // because they call one resolver, and this sweeps that agreement across
+    // the whole stocked ladder; the buy path's own enforcement is driven
+    // directly in the buy-path describe above, which is where deleting the
+    // guard from items.ts turns red.
     const toolStock = Object.keys(ITEMS).filter((id) => {
       const use = ITEMS[id].use;
       return use?.type === 'gatherTool' && ITEMS[id].buyValue !== undefined;
@@ -347,6 +380,27 @@ describe('the vendor view core renders a gated row locked, never dropped', () =>
         );
       }
     }
+  });
+});
+
+describe('the HUD actually feeds the viewer proficiency into the view', () => {
+  it('passes gatheringProficiency into buildVendorView', () => {
+    // The one line the rest of this file cannot reach: every other arm hands
+    // the map in by hand, and no test constructs a real Hud. Deleting that
+    // argument is now a compile error (VendorBalances requires the field), but
+    // a caller could still satisfy the type with an empty literal, which the
+    // resolver reads as 0 and which therefore LOCKS every gated row for every
+    // player at any proficiency, silently, in the safe-looking direction.
+    // Comments are stripped first so a mention in prose cannot satisfy it.
+    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|\s)\/\/.*$/gm, '$1');
+    const call = source.slice(source.indexOf('buildVendorView('));
+    expect(call.startsWith('buildVendorView(')).toBe(true);
+    const args = call.slice(0, call.indexOf('),\n'));
+    expect(args).toContain('gatheringProficiency:');
+    // and it comes from the world, not from a literal.
+    expect(args).toMatch(/gatheringProficiency:\s*this\.sim\.gatheringProficiency/);
   });
 });
 
@@ -373,13 +427,18 @@ describe('the gated tools are stocked somewhere a gated row can be seen', () => 
     // If content ever moves a node or a tool-stocking merchant inside this
     // gap, the stale-lock case becomes real and the vendor window needs a
     // repaint hook. Failing here is the signal to make that call deliberately.
-    const VENDOR_CLOSE_RANGE = 8; // hud.ts: dist2d(p.pos, npc.pos) > 8 closes it
-    const reach = VENDOR_CLOSE_RANGE + INTERACT_RANGE;
+    // Imported, never re-stated: a hand-copied 8 made this arm one-sided, so
+    // widening the HUD's close range left it green while the stale-lock case
+    // it guards became real.
+    const reach = NPC_WINDOW_CLOSE_RANGE + INTERACT_RANGE;
     const gatedStockists = Object.values(NPCS).filter((npc) =>
       (npc.vendorItems ?? []).some((itemId) => VENDOR_ROW_GATES[itemId]),
     );
-    // Non-vacuity: if no NPC stocks a gated tool the loop below asserts nothing.
+    // Non-vacuity on BOTH dimensions: an empty stockist list or an empty node
+    // table would leave `closest` at Infinity and pass without comparing a
+    // single pair.
     expect(gatedStockists.length).toBeGreaterThan(0);
+    expect(GATHER_NODES.length).toBeGreaterThan(0);
     let closest = Number.POSITIVE_INFINITY;
     let closestPair = '';
     for (const npc of gatedStockists) {

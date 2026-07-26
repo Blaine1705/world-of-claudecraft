@@ -343,15 +343,13 @@ describe('Eastbrook authored gameplay data integration', () => {
     // payloads moved and all three moves are vendorItems rows: trader_wilkes
     // (six tools dropped, both rods kept), forgemistress_darva (two picks
     // dropped) and tinker_gizzel (four axes and sickles dropped). Nothing else
-    // in any def, and no placement field, changed. The arm below re-checks
-    // those two rows are still the ones this case owns.
-    expect(createHash('sha256').update(JSON.stringify(stableTownNpcPayload())).digest('hex')).toBe(
-      '253d5927ed17e438faa5d66b57e031cc1ab3af61370b773e0d714bc3426226e8',
-    );
-    // The three moved rows, stated so the hash above is auditable rather than
-    // a number to re-mint on sight: a future drift in some OTHER field of some
-    // other NPC would move the hash while leaving these three intact, which is
-    // exactly the case the digest alone cannot describe.
+    // in any def, and no placement field, changed. The three row assertions
+    // above re-check that those are still the rows this case owns.
+    // The three moved rows, asserted BEFORE the digest below so they actually
+    // run: a failing expect throws, so stating them after the hash meant they
+    // never evaluated in the one case they exist to describe. Ordered this way
+    // a drift in some OTHER field of some other NPC moves the hash while these
+    // three stay green, which is the diagnostic the digest alone cannot give.
     expect(ZONE1_NPCS.trader_wilkes.vendorItems).toEqual([
       'baked_bread',
       'spring_water',
@@ -376,6 +374,9 @@ describe('Eastbrook authored gameplay data integration', () => {
       'simple_fishing_pole',
       'arcanite_bar',
     ]);
+    expect(createHash('sha256').update(JSON.stringify(stableTownNpcPayload())).digest('hex')).toBe(
+      '253d5927ed17e438faa5d66b57e031cc1ab3af61370b773e0d714bc3426226e8',
+    );
     expect(ZONE1_TOWN_NPC_IDS).toHaveLength(15);
     for (const id of ZONE1_TOWN_NPC_IDS) {
       const placement = EASTBROOK_NPC_PLACEMENTS_BY_ID[id];

@@ -2199,6 +2199,9 @@ export const TARGETS = [
       'sim/content/vendor_row_gates',
       'ui/hud/vendor/vendor_view',
       'ui/hud/vendor/vendor_window',
+      // The shared profession-name table renders INTO the requirement line, so
+      // a change there changes this frame.
+      'ui/gathering_profession_name',
     ],
     // Quartermaster Bree is the only counter carrying all three rungs of a
     // ladder at once (Highwatch has tier-1 through tier-3 ground), so one frame

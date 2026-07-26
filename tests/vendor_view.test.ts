@@ -24,7 +24,14 @@ function item(
   } as unknown as ItemDef;
 }
 
-const RICH = { copper: 1_000_000, honor: 1_000_000 } as const;
+// A rich, fully skilled viewer: these cases are about pricing and buyback, so
+// the gathering counters are capped to keep every row open and out of the way.
+// The gate's own cases live in tests/professions_tool_gate.test.ts.
+const RICH = {
+  copper: 1_000_000,
+  honor: 1_000_000,
+  gatheringProficiency: { mining: 100, logging: 100, herbalism: 100 },
+} as const;
 
 function table(...items: ItemDef[]): Record<string, ItemDef> {
   return Object.fromEntries(items.map((i) => [i.id, i]));
@@ -95,13 +102,13 @@ describe('buildVendorView goods', () => {
   it('requires both balances for a dual-price good', () => {
     const items = table(item('blade', { buyValue: 25, priceHonor: 80 }));
     expect(
-      buildVendorView(['blade'], [], items, { copper: 25, honor: 80 }).goods[0].affordable,
+      buildVendorView(['blade'], [], items, { ...RICH, copper: 25, honor: 80 }).goods[0].affordable,
     ).toBe(true);
     expect(
-      buildVendorView(['blade'], [], items, { copper: 24, honor: 80 }).goods[0].affordable,
+      buildVendorView(['blade'], [], items, { ...RICH, copper: 24, honor: 80 }).goods[0].affordable,
     ).toBe(false);
     expect(
-      buildVendorView(['blade'], [], items, { copper: 25, honor: 79 }).goods[0].affordable,
+      buildVendorView(['blade'], [], items, { ...RICH, copper: 25, honor: 79 }).goods[0].affordable,
     ).toBe(false);
   });
 });

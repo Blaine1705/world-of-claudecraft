@@ -424,6 +424,7 @@ import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob
 import { isMobileFullscreenWindowOpen } from './mobile_fullscreen_window_core';
 import { MobileMoreDialogController } from './mobile_more_dialog';
 import { MovableFrame } from './movable_frame';
+import { NPC_WINDOW_CLOSE_RANGE } from './npc_service_range';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
 import { PartyBelowTargetPainter } from './party_below_target_painter';
@@ -7721,19 +7722,19 @@ export class Hud {
       this.lootWindow.updateProximity();
       if (this.openVendorNpcId !== null) {
         const npc = sim.entities.get(this.openVendorNpcId);
-        if (!npc || dist2d(p.pos, npc.pos) > 8) this.closeVendor();
+        if (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE) this.closeVendor();
       }
       if (this.openHeroicVendorNpcId !== null) {
         const npc = sim.entities.get(this.openHeroicVendorNpcId);
-        if (!npc || dist2d(p.pos, npc.pos) > 8) this.closeHeroicVendor();
+        if (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE) this.closeHeroicVendor();
       }
       if (this.openTrainNpcId !== null) {
         const npc = sim.entities.get(this.openTrainNpcId);
-        if (!npc || dist2d(p.pos, npc.pos) > 8) this.closeTrain();
+        if (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE) this.closeTrain();
       }
       if (this.openUnbindNpcId !== null) {
         const npc = sim.entities.get(this.openUnbindNpcId);
-        if (!npc || dist2d(p.pos, npc.pos) > 8) this.closeUnbind();
+        if (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE) this.closeUnbind();
       }
       this.questDialog.updateProximity();
     }
@@ -12313,15 +12314,20 @@ export class Hud {
     if ($('#crafting-window').style.display === 'flex') this.renderCrafting();
     // The open VENDOR window deliberately does NOT ride this signature, even
     // though a gathering counter is one of the things its goods rows are now
-    // painted from (the tool gate, sim/content/vendor_row_gates.ts). Crossing a
-    // threshold with that window open is geometrically impossible: it closes
-    // past 8 yards of the merchant, a harvest needs the player within
-    // INTERACT_RANGE of a node, and the nearest node to any counter stocking a
-    // gated tool is 16.40 yards away, wider than those two reaches combined.
-    // The separation is asserted in tests/professions_tool_gate.test.ts rather
-    // than trusted, so content that moves a node or a merchant into that gap
-    // fails there and this decision gets revisited instead of silently
+    // painted from (the tool gate, sim/content/vendor_row_gates.ts). No
+    // player-reachable path crosses a threshold while that window is up: it
+    // closes past NPC_WINDOW_CLOSE_RANGE of the merchant, a harvest needs the
+    // player within INTERACT_RANGE of a node, and no node sits close enough to
+    // a counter stocking a gated tool for both to hold at once. The separation
+    // is asserted against those two constants in
+    // tests/professions_tool_gate.test.ts rather than trusted, so content that
+    // moves a node or a merchant into that gap fails there instead of silently
     // becoming a stale lock.
+    //
+    // The one exception is the `/dev gather` cheat, which grants proficiency
+    // from anywhere on a dev realm. Cosmetic only: the lock is advisory, the
+    // buy path re-runs the same resolver, and proficiency only ever rises, so
+    // a stale row is over-locked rather than wrongly open.
   }
 
   renderBags(): void {

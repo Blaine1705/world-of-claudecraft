@@ -18,15 +18,24 @@
 //
 // Why the tool ladder is gated at all: a tool's tier is the only thing that
 // decides which node tiers it can work (professions/tools.ts canGatherTier),
-// nothing else gates the purchase, and every price here is inside a first-zone
+// nothing else gated the purchase, and every price here is inside a first-zone
 // quest income. So a level-1 character with no proficiency at all could walk to
 // a counter and buy the top land tool, which skips the whole tool ladder the
-// gathering trades are paced around. Proficiency is the honest gate: it is
-// earned by doing the thing the tool is for.
+// gathering trades are paced around.
 //
-// Owned tools are never touched. This gates the PURCHASE only: a tool already
-// in a player's bags keeps working at every tier it always did, and nothing
-// here reads or removes inventory.
+// SCOPE, stated precisely because it is narrower than it may read: this gates
+// the NPC COUNTER, not access to the tool. Two routes are deliberately left
+// open. A tool already in a player's bags keeps working at every tier it always
+// did, because nothing here reads or removes inventory. And these six tools
+// carry neither `noVendorSell` nor `noMarketList` (content/items.ts: only the
+// three tier-1 tools do, and only to close a quest re-grant mint), so a player
+// may still buy one from another player on the World Market at any proficiency,
+// which the tier-4 tool recipes give real demand for since they consume the
+// tier-3 tools as reagents. That is a live design question, not an oversight
+// this table forgot: closing it means adding `noMarketList` to the six, which
+// reverses a shipped decision and touches the market economy, so it is the
+// maintainer's ruling to make. Until it is made, do not describe this as
+// pacing tool ACCESS; it paces what a merchant will sell you.
 //
 // DOM-free, rng-free and host-agnostic (src/sim purity, tests/architecture.test.ts).
 

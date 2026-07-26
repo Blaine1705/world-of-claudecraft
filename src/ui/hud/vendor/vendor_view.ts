@@ -41,11 +41,15 @@ export interface VendorPrice {
 export interface VendorBalances {
   copper: number;
   honor: number;
-  /** The viewer's gathering counters, for the advisory row gate. Absent means
-   *  an empty map, i.e. every gated row reads locked, which is the safe
-   *  direction: a caller that forgets to pass it under-promises rather than
-   *  offering a purchase the sim will refuse. */
-  gatheringProficiency?: Readonly<Record<string, number>>;
+  /** The viewer's gathering counters, for the advisory row gate.
+   *
+   *  REQUIRED, deliberately. Defaulting it would be safe against the sim (an
+   *  empty map locks rather than opens), but the failure it hides is worse than
+   *  the one it prevents: forgetting to pass it shows every player a lock that
+   *  is not real, and a capped gatherer silently loses the ability to buy the
+   *  tool they earned, with nothing red anywhere. Required turns that into a
+   *  compile error naming every call site. */
+  gatheringProficiency: Readonly<Record<string, number>>;
 }
 
 export interface VendorBuybackRow {
@@ -96,7 +100,7 @@ export function buildVendorView(
     if (price.copper <= 0 && price.honor <= 0) continue;
     // The SAME resolver items.ts buyItem runs, never a mirror of its rule, so
     // the lock the player sees cannot drift from what the purchase allows.
-    const gate = resolveVendorRowGate(itemId, balances.gatheringProficiency ?? {});
+    const gate = resolveVendorRowGate(itemId, balances.gatheringProficiency);
     goods.push({
       itemId,
       item,

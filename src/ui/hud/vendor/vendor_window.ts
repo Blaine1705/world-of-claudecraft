@@ -127,7 +127,12 @@ export function renderVendorWindow(
     // both promise a purchase the row refuses and hide the requirement line
     // that says why. Leaving it off lets the name, the requirement and the
     // price inside the button compose the accessible name themselves.
-    if (!requirement) {
+    // Keyed on `locked`, never on whether the requirement TEXT came back
+    // non-empty: those differ for a locked row whose profession has no
+    // display-name key, and that case would otherwise get the "Buy {item} for
+    // {price}" name on a button the sim refuses, which is the exact failure
+    // this branch exists to prevent.
+    if (!goods.locked) {
       row.setAttribute(
         'aria-label',
         t('itemUi.vendor.buyAria', { item: `${itemName}${stack}`, price }),

@@ -360,6 +360,23 @@ Which hub stocks which tier is content, not a constant: each hub sells only the
 tiers its own nodes use (Eastbrook tier 1, Fenbridge tiers 1 to 2, Highwatch
 tiers 1 to 3), with the tiered rods a standing exception at Trader Wilkes.
 
+The gate is on the NPC COUNTER, not on tool access, and two routes are open by
+design rather than by omission. A tool already owned keeps working at every tier
+it always did (nothing in the gate reads inventory). And the six gated tools
+carry no `noMarketList`, so a player may buy one from another player at any
+proficiency; the tier-4 tool recipes give that a real market, since they consume
+the tier-3 tools as reagents. **Open ruling:** closing the market route means
+adding `noMarketList` to the six, which reverses the shipped "tiers 2 and 3 are
+bought, never granted, so they stay sellable and listable" decision and touches
+the market economy, so it is a maintainer call. Until it is made, describe the
+gate as pacing what a merchant will sell, never as pacing tool access.
+
+One knock-on worth naming: the tier-4 engineering tool recipes consume the
+tier-3 land tools, so buying that reagent from a counter now needs 70 in the
+matching gathering trade. Not a completability regression (the tool deed is any
+station craft, and the same recipes already need node-only materials), but it is
+a new coupling between an engineering craft and a gathering counter.
+
 Respawn seconds and node density are ONE lever, not two. The per-zone harvest
 ceiling is nodes x 3600 / respawn, so moving either alone moves the ceiling:
 240 seconds with six nodes per type per zone is the same 270 harvests an hour

@@ -138,6 +138,74 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
     expect(row.querySelector('.vi-price')?.textContent).toContain('120');
   });
 
+  it('swaps the locked row TOOLTIP from click-to-buy to the requirement', () => {
+    // The deps bag's attachTooltip is a no-op by default, so the tooltip
+    // builder closure never runs and this branch was invisible. Capture the
+    // builder and invoke it: a row that refuses the click must not still
+    // invite it, which is a user-visible contradiction rather than a nicety.
+    const built: string[] = [];
+    const goods: VendorGoodsRow[] = [
+      {
+        itemId: 'iron_mining_pick',
+        item: item('iron_mining_pick'),
+        price: { copper: 120, honor: 0 },
+        quantity: 1,
+        affordable: true,
+        locked: true,
+        requirement: { professionId: 'mining', proficiency: 40 },
+      },
+    ];
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const el = document.createElement('div');
+    renderVendorWindow(
+      el,
+      'Vendor',
+      view,
+      deps({
+        attachTooltip: (_node: HTMLElement, build: () => string) => {
+          built.push(build());
+        },
+      }),
+    );
+
+    // The goods row is the first tooltip attached (sell-junk and buyback rows
+    // attach their own after it).
+    expect(built.length).toBeGreaterThan(0);
+    expect(built[0]).toContain('Requires Mining 40');
+    expect(built[0]).not.toContain('Click to buy');
+  });
+
+  it('keeps click-to-buy on an unlocked row TOOLTIP', () => {
+    // The counter-example: without it the arm above passes on a painter that
+    // dropped the click hint from every row.
+    const built: string[] = [];
+    const goods: VendorGoodsRow[] = [
+      {
+        itemId: 'copper_mining_pick',
+        item: item('copper_mining_pick'),
+        price: { copper: 20, honor: 0 },
+        quantity: 1,
+        affordable: true,
+        locked: false,
+      },
+    ];
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const el = document.createElement('div');
+    renderVendorWindow(
+      el,
+      'Vendor',
+      view,
+      deps({
+        attachTooltip: (_node: HTMLElement, build: () => string) => {
+          built.push(build());
+        },
+      }),
+    );
+
+    expect(built[0]).toContain('Click to buy');
+    expect(built[0]).not.toContain('Requires');
+  });
+
   it('leaves an unlocked row interactive, aria-labelled, and free of a requirement line', () => {
     // The counter-example that keeps the arm above from passing on a painter
     // that marked every row locked.

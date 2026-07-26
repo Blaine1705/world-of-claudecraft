@@ -511,11 +511,14 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // no durability field on ItemDef) and tiered: `use.tier` gates which
   // node/material tiers it can gather (see src/sim/professions/tools.ts).
   //
-  // PRICES: 20 / 120 / 400 up the three vendor rungs, and the two steps up are
-  // deliberately steep against a first-zone solo quest income of roughly 5,300
-  // copper. Tier 1 stays the trivial 20-copper one-time purchase the #2343
-  // no-strand story rests on; the rungs above it are a real decision rather
-  // than pocket change, which is what makes the proficiency gate on them
+  // PRICES: 20 / 120 / 400 up the three vendor rungs, pinned as literals in
+  // tests/professions_tools.test.ts so a rebalance has to touch that claim
+  // rather than drift past it. The two steps up are deliberately steep against
+  // a first-zone solo quest income (measured during planning, and the figure
+  // itself is not pinned anywhere, so treat it as the reason for the shape
+  // rather than as a live number). Tier 1 stays the trivial one-time purchase
+  // the #2343 no-strand story rests on; the rungs above it are a real decision
+  // rather than pocket change, which is what makes the proficiency gate on them
   // (content/vendor_row_gates.ts) a pace rather than a formality. Thousands
   // would have been a wall instead of a pace.
   //

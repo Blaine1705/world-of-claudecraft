@@ -139,6 +139,30 @@ describe('gathering tool tier gating (#1123)', () => {
     }
   });
 
+  it('the tier-2 and tier-3 land tools are the 120 and 400 rungs above that', () => {
+    // Literal pins for the same reason as the 20 above, and the gap they close
+    // is real: every other assertion about these prices is either a
+    // self-comparison against the def or a one-sided inequality, so raising
+    // 120 to 200 and 400 to 900 leaves the whole suite green. The wiki tool
+    // ladder regenerates from these defs and republishes them, so a silent
+    // reprice ships as published copy.
+    for (const toolId of ['iron_mining_pick', 'felling_axe', 'bronze_sickle'] as const) {
+      expect(ITEMS[toolId]?.buyValue, toolId).toBe(120);
+    }
+    for (const toolId of ['mithril_mining_pick', 'ironbark_axe', 'silverleaf_sickle'] as const) {
+      expect(ITEMS[toolId]?.buyValue, toolId).toBe(400);
+    }
+    // The ladder is monotone, and each rung is strictly above the one below:
+    // an ordering regression that kept all three literals would be a different
+    // bug, and this is the arm that would still catch it.
+    expect(ITEMS.copper_mining_pick.buyValue).toBeLessThan(
+      ITEMS.iron_mining_pick.buyValue as number,
+    );
+    expect(ITEMS.iron_mining_pick.buyValue).toBeLessThan(
+      ITEMS.mithril_mining_pick.buyValue as number,
+    );
+  });
+
   it('a base tool never becomes unusable, because this repo has no durability mechanic', () => {
     const pick = ITEMS.copper_mining_pick;
     // ItemDef (src/sim/types.ts) carries no durability field anywhere in this repo,

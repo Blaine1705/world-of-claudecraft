@@ -344,8 +344,15 @@ describe('hudChrome.gathering catch line (Professions 2.0)', () => {
     const withoutComments = (file: string) =>
       readFileSync(path.resolve(process.cwd(), file), 'utf8')
         .replace(/\/\*[\s\S]*?\*\//g, '')
-        .replace(/^\s*\/\/.*$/gm, '');
-    for (const file of ['src/ui/char_window.ts', 'src/ui/professions_window.ts']) {
+        // Trailing comments too, not just whole lines: a `// ... KEYS` tail
+        // would otherwise satisfy the positive check below on its own.
+        .replace(/(^|\s)\/\/.*$/gm, '$1');
+    for (const file of [
+      'src/ui/char_window.ts',
+      'src/ui/professions_window.ts',
+      // The third consumer, which is why the table was extracted at all.
+      'src/ui/hud/vendor/vendor_window.ts',
+    ]) {
       const source = withoutComments(file);
       expect(source.includes('GATHERING_PROFESSION_NAME_KEYS'), `${file} consumes the table`).toBe(
         true,

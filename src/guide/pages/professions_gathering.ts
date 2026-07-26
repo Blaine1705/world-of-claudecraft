@@ -7,6 +7,10 @@
 // numbers (cast timing, band thresholds, odds, prices); the mirrored accuracy
 // guards live in tests/guide.test.ts.
 
+import {
+  TIER2_TOOL_GATE_PROFICIENCY,
+  TIER3_TOOL_GATE_PROFICIENCY,
+} from '../../sim/content/vendor_row_gates';
 import { esc } from '../../ui/esc';
 import { formatMoney, formatNumber, type TranslationKey, t } from '../../ui/i18n';
 import {
@@ -47,7 +51,14 @@ function toolRow(tool: GuideProfTool): string {
 function toolsSection(g: GuideProfGathering): string {
   return `<section class="guide-block" id="prof-tools">
       <h2>${esc(t('guide.profPages.toolsHeading'))}</h2>
-      ${paras('guide.profPages.toolsNote')}
+      ${paras('guide.profPages.toolsNote', {
+        // Fed from the live gate constants, the sibling sections' idiom
+        // (rhythmBody takes the cast curve, nodesNote the respawn), so a
+        // retune moves the prose in all 19 languages instead of leaving a
+        // stale number behind in each of them.
+        tier2: formatNumber(TIER2_TOOL_GATE_PROFICIENCY),
+        tier3: formatNumber(TIER3_TOOL_GATE_PROFICIENCY),
+      })}
       <div class="guide-table-scroll"><table class="guide-keytable guide-prof-table">
         <thead><tr>
           <th scope="col">${esc(t('guide.profPages.colTool'))}</th>

@@ -58,6 +58,10 @@ import {
   STATIONS,
 } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
+import {
+  TIER2_TOOL_GATE_PROFICIENCY,
+  TIER3_TOOL_GATE_PROFICIENCY,
+} from '../src/sim/content/vendor_row_gates';
 import { CAMPS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
 import { MARKET_CUT, MARKET_LISTING_DEPOSIT_COPPER } from '../src/sim/market';
 import {
@@ -1390,6 +1394,39 @@ describe('Guide professions gathering accuracy', () => {
       expect(
         rod.vendors.some((v) => v.name === 'Trader Wilkes' || v.name === 'Fisherman Brandt'),
       ).toBe(true);
+    }
+  });
+
+  it('publishes the tool-gate thresholds through placeholders in EVERY locale', () => {
+    // The tools note states the two gate thresholds. It takes them as {tier2} /
+    // {tier3} rather than as literals so a retune moves the published prose in
+    // all 19 languages at once; a fill that dropped the tokens would republish
+    // frozen numbers, and nothing else would notice, because the value would
+    // still be present and translated.
+    const en = t('guide.profPages.toolsNote', {
+      tier2: String(TIER2_TOOL_GATE_PROFICIENCY),
+      tier3: String(TIER3_TOOL_GATE_PROFICIENCY),
+    });
+    expect(en).toContain(String(TIER2_TOOL_GATE_PROFICIENCY));
+    expect(en).toContain(String(TIER3_TOOL_GATE_PROFICIENCY));
+    expect(en, 'no token left unspliced').not.toMatch(/\{[A-Za-z0-9_]+\}/);
+
+    // Every shipped locale, read off the resolved bundles: both tokens present,
+    // and the old "stocked at every hub" claim gone. The second half is the one
+    // a reword silently leaves behind, since the row stays "translated".
+    const dir = resolve(process.cwd(), 'src/ui/i18n.resolved.generated');
+    // Locale bundles only: the directory also holds the barrel, the lazy
+    // loader map, and the pending slice.
+    const INFRA = new Set(['index.ts', 'loaders.ts', 'pending.ts']);
+    const locales = readdirSync(dir).filter((f) => f.endsWith('.ts') && !INFRA.has(f));
+    expect(locales.length).toBeGreaterThan(15);
+    for (const file of locales) {
+      const source = readFileSync(`${dir}/${file}`, 'utf8');
+      const at = source.indexOf('toolsNote');
+      expect(at, `${file} carries toolsNote`).toBeGreaterThan(-1);
+      const value = source.slice(at, at + 2400);
+      expect(value, `${file} keeps {tier2}`).toContain('{tier2}');
+      expect(value, `${file} keeps {tier3}`).toContain('{tier3}');
     }
   });
 

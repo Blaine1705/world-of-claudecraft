@@ -685,6 +685,14 @@ export const en = {
       companionMaxRank: 'This companion is already fully upgraded.',
       companionMarksRequired: 'You need {marks} Delve Marks to upgrade {name}.',
       cannotAffordCompanionUpgrade: 'You cannot afford this upgrade.',
+      // TWO producers now emit this exact English, both matched to this key by
+      // the one anchored rule in sim_i18n.ts: the delve Marks shop
+      // (delves/runs.ts delveBuyShopItem) and the NPC vendor's proficiency row
+      // gate (items.ts buyItem, content/vendor_row_gates.ts). The sentence is
+      // deliberately generic and true of both. Specializing it to delves would
+      // silently reword a vendor refusal, and the matcher keys on the TEXT, so
+      // nothing would go red: give the vendor its own key first if this ever
+      // needs to name delves.
       shopItemLocked: 'You have not unlocked that item yet.',
       shopMarksRequired: 'You need {marks} Delve Marks to buy {name}.',
       shopSealPremiumOnly:
