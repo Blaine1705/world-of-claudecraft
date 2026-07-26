@@ -819,8 +819,10 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     itemRewards: {},
     // The quest says to go swing a pick, and under the always-require-tool rule
     // (#2343) a bare-handed harvest is denied outright. A new character starts
-    // with zero copper and nothing grants a tool, so this was unstartable on a
-    // fresh account. questFallbackGrants hands the pick over on accept and
+    // with zero copper, so the game's FIRST quest silently required a detour to
+    // earn 20 copper and buy a pick before its objective could move at all (the
+    // pick is a vendor staple, so this was a dead end only until the player
+    // found that out). questFallbackGrants hands the pick over on accept and
     // re-grants it if it is ever lost, exactly like a prerequisite quest item.
     requiredItems: ['copper_mining_pick'],
   },

@@ -897,6 +897,9 @@ export class BagsWindow {
       case 'marketSell':
         this.deps.stageMarketSell(s.itemId);
         break;
+      case 'vendorSellBlocked':
+        this.deps.showError(t('itemUi.tooltip.cannotVendor'));
+        return;
       case 'vendorSell':
         this.sellBagItem(s, ev);
         break;

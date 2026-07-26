@@ -25,6 +25,8 @@ export type { BagCells };
 export interface BagItemInfo {
   kind: string;
   noMarketList?: boolean;
+  /** Refused by the sim's vendor sell path (src/sim/items.ts sellItem). */
+  noVendorSell?: boolean;
   /** Truthy when the item has a generic "use" effect (e.g. fishing). */
   use?: unknown;
   /** Protected from destruction (the sim's discardItem also no-ops these). */
@@ -60,6 +62,7 @@ export type BagAction =
   | 'marketSellBlockedQuest'
   | 'marketSellBlockedNoMarket'
   | 'vendorSell'
+  | 'vendorSellBlocked'
   | 'bankDeposit'
   | 'bankDepositBlockedQuest'
   | 'petFeed'
@@ -104,7 +107,13 @@ export function bagItemAction(item: BagItemInfo, mode: BagMode): BagAction {
     if (item.noMarketList) return 'marketSellBlockedNoMarket';
     return 'marketSell';
   }
-  if (mode.vendorOpen) return 'vendorSell';
+  if (mode.vendorOpen) {
+    // Mirrors the sim's vendor rule (src/sim/items.ts sellItem refuses on
+    // noVendorSell), so the click is denied in place with a toast instead of
+    // dispatching a sale the server was always going to refuse.
+    if (item.noVendorSell) return 'vendorSellBlocked';
+    return 'vendorSell';
+  }
   // Window modes cluster before the armed pet-feed cursor (vendor beats pet-feed
   // today); the sim refuses a quest item, so block it in place with the deny toast.
   if (mode.bankDeposit) return item.kind === 'quest' ? 'bankDepositBlockedQuest' : 'bankDeposit';
@@ -227,7 +236,9 @@ export function bagTooltipHintKey(item: BagItemInfo, mode: BagMode): BagTooltipH
       : 'itemUi.tooltip.clickMarketList';
   }
   if (mode.vendorOpen)
-    return item.kind === 'quest' ? 'itemUi.tooltip.cannotVendor' : 'itemUi.tooltip.clickSell';
+    return item.kind === 'quest' || item.noVendorSell
+      ? 'itemUi.tooltip.cannotVendor'
+      : 'itemUi.tooltip.clickSell';
   if (mode.bankDeposit)
     return item.kind === 'quest' ? 'hudChrome.bank.cannotDeposit' : 'hudChrome.bank.depositHint';
   if (item.kind === 'quest') return 'itemUi.tooltip.clickDestroy';

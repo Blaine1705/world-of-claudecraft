@@ -178,10 +178,13 @@ describe('THE ECONOMY INVARIANT', () => {
     // the bound runs over.
     expect(liveVendorFed.map((recipe) => recipe.id)).toEqual([]);
     // The live set is a subset of the counterfactual one by construction, and
-    // the counterfactual one is what still carries the assertions. Stating both
-    // here is what makes "the live set is empty" safe to assert at all.
+    // the counterfactual one is what still carries the assertions. Stating the
+    // subset relation as a SET operation, not as a loop over liveVendorFed:
+    // that loop runs zero times against the emptiness asserted one line up,
+    // which is the same assert-nothing shape this rewrite exists to remove.
     const counterfactual = new Set(counterfactuallyVendorFedRecipes().map((r) => r.id));
-    for (const recipe of liveVendorFed) expect(counterfactual.has(recipe.id)).toBe(true);
+    const liveIds = liveVendorFed.map((recipe) => recipe.id);
+    expect(liveIds.filter((id) => !counterfactual.has(id))).toEqual([]);
     expect(counterfactual.size).toBeGreaterThan(0);
     // vendorStockedIds itself must be live, or the emptiness above is a lie
     // told by a broken reader rather than a fact about the content.

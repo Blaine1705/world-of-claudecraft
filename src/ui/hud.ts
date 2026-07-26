@@ -4828,7 +4828,13 @@ export class Hud {
     html += this.itemProcBlock(item);
     html += this.itemSetBlock(item);
     html += instanceMakersMarkLine(instance, item.kind);
-    if (item.sellValue > 0)
+    // Gated on the SAME pair the vendor path refuses on (src/sim/items.ts
+    // sellItem), never on sellValue alone: a def can carry a sellValue it will
+    // never be paid, and advertising a price the server is about to deny is a
+    // lie the player only discovers from an error toast. The tier-1 gathering
+    // tools are the case that made this matter, being common staples a new
+    // player actively tries to sell back.
+    if (item.sellValue > 0 && !item.noVendorSell && !item.soulbound)
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.sellPrice', { money: formatLocalizedMoney(item.sellValue) }))}</div>`;
     if (compare) html += this.itemCompareBlock(item);
     return html;

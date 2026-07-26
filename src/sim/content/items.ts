@@ -511,15 +511,30 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // no durability field on ItemDef) and tiered: `use.tier` gates which
   // node/material tiers it can gather (see src/sim/professions/tools.ts).
   //
-  // The three TIER-1 tools carry noVendorSell, and only those three. They are
-  // handed out by the gather quests' requiredItems (zone1.ts), which re-grants
-  // a missing one on every accept, and q_prof_hobby_switch is repeatable, so a
-  // sellable grant would be an unbounded copper faucet: accept, sell for 4,
-  // abandon, repeat. Vendor sale is the arm that matters because it MINTS
-  // copper; a World Market listing only moves copper between players (and
-  // pays the market cut), and every tier-1 tool is a 20-copper vendor staple
-  // anyway, so noMarketList would cost players a real convenience to close
-  // nothing. Tiers 2 and 3 are bought, never granted, so they stay sellable.
+  // The three TIER-1 tools carry BOTH noVendorSell and noMarketList, and only
+  // those three. The gather quests hand a pick or a sickle over through
+  // requiredItems (zone1.ts), re-granting a missing one on every accept, and
+  // q_prof_hobby_switch is repeatable, so the grant needs both flags:
+  //
+  // - noVendorSell closes the copper MINT. Without it, accept, sell for 4,
+  //   abandon, repeat prints copper out of nothing.
+  // - noMarketList closes the value route left over once the mint is shut. The
+  //   re-grant predicate is questFallbackGrants -> ctx.countItem, and countItem
+  //   scans ONLY meta.inventory (sim.ts): bank a tool, or mail or trade it
+  //   away, and the next accept hands over another. That makes the SUPPLY
+  //   unbounded, and an unbounded free supply meeting a free listing
+  //   (MARKET_LISTING_DEPOSIT_COPPER is 0) is an indefinite drain on other
+  //   players' copper, and on the 20-copper vendor purchase it undercuts.
+  //
+  // Together the two flags leave a minted copy with no route to value at all.
+  // The unbounded MINT itself is not closed here: that needs the re-grant
+  // predicate to span the bank, mail, and market escrow, which is a change to
+  // shared quest logic rather than to this table.
+  //
+  // handaxe is flagged for SYMMETRY, not because it closes anything: no quest
+  // has a wood objective, so no quest ever grants it. Three tier-1 tools that
+  // behave alike beat two that do and one that does not. Tiers 2 and 3 are
+  // bought, never granted, so they stay sellable and listable.
   copper_mining_pick: {
     id: 'copper_mining_pick',
     name: 'Copper Mining Pick',
@@ -529,6 +544,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 4,
     buyValue: 20,
     noVendorSell: true,
+    noMarketList: true,
   },
   iron_mining_pick: {
     id: 'iron_mining_pick',
@@ -557,6 +573,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 4,
     buyValue: 20,
     noVendorSell: true,
+    noMarketList: true,
   },
   felling_axe: {
     id: 'felling_axe',
@@ -585,6 +602,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 4,
     buyValue: 20,
     noVendorSell: true,
+    noMarketList: true,
   },
   bronze_sickle: {
     id: 'bronze_sickle',

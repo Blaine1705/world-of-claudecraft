@@ -3,8 +3,10 @@
 // Prometheus label values, so the property that matters most is that the label
 // set is CLOSED: an unrecognized command must fall into 'other', never become
 // its own series.
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  COPPER_FLOW_COMMANDS,
   COPPER_FLOW_SOURCES,
   type CopperFlowSource,
   copperFlowSourceForCommand,
@@ -97,6 +99,14 @@ describe('harvest band classification', () => {
     // The safe direction for a counter: an id nobody has classified is counted,
     // in the lowest band, rather than dropped or crashing the event pass.
     expect(harvestBandForItem('not_a_real_item')).toBe('starter');
+    // Prototype keys degrade safely too. materialTierForItem indexes a plain
+    // object, so 'toString' resolves to an inherited FUNCTION rather than 0;
+    // both numeric comparisons are then false and the band falls through to
+    // 'starter'. Pinned because that safety is incidental, not designed, and a
+    // future band added above 'premium' could turn it into a wrong label.
+    for (const key of ['toString', 'constructor', 'valueOf', '__proto__']) {
+      expect(harvestBandForItem(key), key).toBe('starter');
+    }
   });
 
   it('classifies every live node yield into the exported band set', () => {
@@ -115,5 +125,76 @@ describe('harvest band classification', () => {
     // All three bands are actually reachable from live content, so no exported
     // series is permanently dead.
     expect(seen).toEqual(new Set(HARVEST_BANDS));
+  });
+});
+
+describe('the classifier map is complete and its keys are real commands', () => {
+  it('pins every mapped command, not a sample of them', () => {
+    // A sampled pin lets a wrong label on any unsampled key ship silently, and
+    // a mislabeled surface is worse than a missing one: the series still moves,
+    // just under the wrong name. The whole map is spelled out.
+    const mapped = Object.fromEntries(
+      [...COPPER_FLOW_COMMANDS]
+        .sort()
+        .map((command) => [command, copperFlowSourceForCommand(command)]),
+    );
+    expect(mapped).toEqual({
+      apply_enchant: 'craft',
+      autoloot: 'loot',
+      bank_buy_slots: 'bank',
+      buy: 'vendor',
+      buyback: 'vendor',
+      collect_delve_chest_loot: 'delve',
+      craft_item: 'craft',
+      delve_buy: 'delve',
+      delve_interact: 'delve',
+      delve_rite_choose: 'delve',
+      dev_give: 'dev',
+      dev_level: 'dev',
+      disenchant_item: 'craft',
+      harvestCorpse: 'loot',
+      harvest_node: 'loot',
+      lockpick_action: 'delve',
+      loot: 'loot',
+      lootRoll: 'loot',
+      mail_send: 'mail',
+      mail_take: 'mail',
+      market_buy: 'market',
+      market_cancel: 'market',
+      market_collect: 'market',
+      market_list: 'market',
+      pickup: 'loot',
+      place_mobile_station: 'craft',
+      play_card: 'wager',
+      respec: 'craft',
+      salvage_item: 'craft',
+      sell: 'vendor',
+      sell_all_junk: 'vendor',
+      train_recipe: 'craft',
+      trade_accept: 'trade',
+      trade_confirm: 'trade',
+      turnin: 'quest',
+      unbind_item: 'craft',
+      vcup_bet: 'wager',
+    });
+  });
+
+  it('every mapped key is a command the dispatcher actually routes', () => {
+    // The silent-degradation guard. A command rename (or a typo in a future
+    // addition) downgrades that surface to 'other' with every other test still
+    // green: the metric keeps reporting, just wrong, which is the worst failure
+    // mode observability has. Read the dispatch vocabulary out of the source.
+    const source = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8');
+    // Strip line comments first, so a commented-out case cannot vouch for a key.
+    const live = source.replace(/^\s*\/\/.*$/gm, '');
+    const dispatched = new Set(
+      [...live.matchAll(/case '([A-Za-z_][A-Za-z0-9_]*)':/g)].map((m) => m[1]),
+    );
+    // Non-vacuity: the scrape must have found a real switch, or every key below
+    // would "pass" against an empty set.
+    expect(dispatched.size).toBeGreaterThan(100);
+    expect(dispatched.has('sell')).toBe(true);
+    const unknown = [...COPPER_FLOW_COMMANDS].filter((command) => !dispatched.has(command)).sort();
+    expect(unknown).toEqual([]);
   });
 });

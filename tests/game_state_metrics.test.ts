@@ -767,9 +767,13 @@ function vendorSellFrame(item: string, count: number): string {
   return JSON.stringify({ t: 'cmd', cmd: 'sell', item, count });
 }
 
-/** One granted node harvest, in the exact shape professions/gathering.ts emits. */
+/** One granted node harvest, in the exact shape professions/gathering.ts emits.
+ *  Typed through Extract rather than `as SimEvent`: a blanket cast would swallow
+ *  a rename of the very field the counter reads, leaving the server booking
+ *  every harvest as 'starter' with this test still green. */
+type GatherResultEvent = Extract<SimEvent, { type: 'gatherResult' }>;
 function harvestEvent(itemId: string): SimEvent {
-  return {
+  const event: GatherResultEvent = {
     type: 'gatherResult',
     pid: 999,
     nodeId: 'node_test',
@@ -779,7 +783,8 @@ function harvestEvent(itemId: string): SimEvent {
     rarity: 'common',
     qty: 1,
     rareEvent: null,
-  } as SimEvent;
+  };
+  return event;
 }
 
 describe('economy telemetry counters at their emission sites', () => {
@@ -873,6 +878,91 @@ describe('economy telemetry counters at their emission sites', () => {
     (server as unknown as Record<string, any>).detectActivity([harvestEvent('thorium_ore')]);
 
     expect(rec.harvests).toEqual(['mid']);
+    server.stop();
+  });
+});
+
+describe('economy telemetry: the sampler edges', () => {
+  it('still books the delta when the dispatch throws halfway through', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+    const session = join(server, fakeWs(), 100, 1, 'Ayla');
+    const meta = server.sim.meta(session.pid) as unknown as Record<string, any>;
+    meta.copper = 500;
+
+    // The property the sampler's placement after the catch exists for: a
+    // command that moved coin and then blew up must not be silently unbooked.
+    // Stub the sim call the 'buy' arm makes so it debits and then throws.
+    const sim = server.sim as unknown as Record<string, any>;
+    const realBuy = sim.buyItem;
+    sim.buyItem = () => {
+      meta.copper -= 60;
+      throw new Error('exploded mid-purchase');
+    };
+    try {
+      server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'buy', npc: 1, item: 'x' }));
+    } finally {
+      sim.buyItem = realBuy;
+    }
+
+    expect(meta.copper).toBe(440);
+    expect(rec.spent).toEqual([['vendor', 60]]);
+    server.stop();
+  });
+
+  it('books nothing when the acting player is gone by the after-sample', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+    const session = join(server, fakeWs(), 100, 1, 'Ayla');
+    const sim = server.sim as unknown as Record<string, any>;
+    const meta = server.sim.meta(session.pid) as unknown as Record<string, any>;
+    meta.copper = 500;
+
+    // The guard's own case: the player record is gone by the time the after
+    // sample reads it. Driven by removing the player inside the dispatch, since
+    // a plain logout does NOT remove it synchronously (leave() is async, so the
+    // meta is still there when the sampler runs). Without the guard the missing
+    // read books a drain of the player's entire purse against 'vendor'.
+    const realBuy = sim.buyItem;
+    sim.buyItem = () => {
+      sim.players.delete(session.pid);
+    };
+    try {
+      server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'buy', npc: 1, item: 'x' }));
+    } finally {
+      sim.buyItem = realBuy;
+    }
+
+    expect(server.sim.meta(session.pid)).toBeFalsy();
+    expect(rec.spent).toEqual([]);
+    expect(rec.credited).toEqual([]);
+    server.stop();
+  });
+
+  it('survives a payload whose cmd cannot be coerced to a string', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+    const session = join(server, fakeWs(), 100, 1, 'Ayla');
+
+    // String() throws on an object with a non-callable toString, and the
+    // command name is read BEFORE the malformed-payload try. A frame like this
+    // must be contained like any other garbage: no throw out of handleMessage,
+    // and the frame still counted inbound.
+    for (const frame of [
+      '{"cmd":{"toString":1}}',
+      '{"cmd":{"toString":null,"valueOf":null}}',
+      '{"t":{"toString":1}}',
+      '{"cmd":123}',
+    ]) {
+      expect(() => server.handleMessage(session, frame), frame).not.toThrow();
+    }
+    expect(rec.wsIn()).toBe(4);
+    expect(rec.credited).toEqual([]);
+    expect(rec.spent).toEqual([]);
+    expect(session.left).toBe(false);
     server.stop();
   });
 });

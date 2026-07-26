@@ -8,6 +8,11 @@
 // material keeps its buyValue, which is the basis reagentUnitValue reads in
 // tests/recipe_economy.test.ts. That split is pinned below in both directions.
 import { describe, expect, it } from 'vitest';
+import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
+import {
+  HARVEST_COMPONENT_ITEMS,
+  HARVEST_COMPONENT_SPECIMENS,
+} from '../src/sim/content/professions';
 import { ZONE1_NPCS } from '../src/sim/content/zone1';
 import { ZONE2_NPCS } from '../src/sim/content/zone2';
 import { ZONE3_NPCS } from '../src/sim/content/zone3';
@@ -21,29 +26,30 @@ const DELISTED = ['ashwood_log', 'elderwood_log', 'goldleaf_herb', 'sunpetal_her
 const REFINED_PREMIUM_REAGENT = 'arcanite_bar';
 
 /**
- * Monster materials and specimens (the mob-drop half of the ruling) plus the
- * raw fish a cast lands. Literal by necessity: unlike node yields these have no
- * single live content table to derive from.
+ * Monster materials and specimens (the mob-drop half of the ruling) plus every
+ * id a cast can land. DERIVED from live content, never a hand-kept literal: a
+ * literal list here silently stops covering whatever content adds next, which
+ * is exactly how `wolf_fang` and `glimmerfin_koi` sat unguarded.
  */
-const MONSTER_MATERIALS = [
-  'rough_hide',
-  'spider_silk',
-  'venom_gland',
-  'game_meat',
-  'homespun_cloth',
-  'pristine_hide',
-  'pristine_silk',
-  'pristine_venom_gland',
-  'prime_cut',
-];
-const RAW_FISH = [
-  'raw_river_perch',
-  'raw_marsh_pike',
-  'raw_bog_eel',
-  'raw_frostgill_trout',
-  'raw_stonescale_carp',
-  'raw_mirror_trout',
-];
+function liveMonsterMaterials(): string[] {
+  return [
+    ...new Set([
+      ...Object.values(HARVEST_COMPONENT_ITEMS),
+      ...Object.values(HARVEST_COMPONENT_SPECIMENS),
+    ]),
+  ].sort();
+}
+
+function liveFishingCatches(): string[] {
+  const ids = new Set<string>();
+  for (const byZone of FISHING_TABLES_BY_BAND) {
+    for (const table of Object.values(byZone)) {
+      // A null itemId is the empty-hook row, not an item.
+      for (const entry of table) if (entry.itemId !== null) ids.add(entry.itemId);
+    }
+  }
+  return [...ids].sort();
+}
 
 /** Every id any NPC anywhere stocks, mapped to the NPCs stocking it. */
 function stockedByNpc(): Map<string, string[]> {
@@ -94,12 +100,22 @@ describe('the no-NPC-stocks-a-gathered-material ruling', () => {
     expect(liveNodeYields()).not.toContain(REFINED_PREMIUM_REAGENT);
   });
 
-  it('no NPC stocks a monster material, a specimen, or a raw fish', () => {
+  it('no NPC stocks a monster material, a specimen, or anything a cast lands', () => {
     const stocked = stockedByNpc();
-    expect(MONSTER_MATERIALS.length + RAW_FISH.length).toBe(15);
-    for (const itemId of [...MONSTER_MATERIALS, ...RAW_FISH]) {
-      // Guard the literals against a rename: an id with no ItemDef would make
-      // its own row vacuously pass.
+    const monster = liveMonsterMaterials();
+    const catches = liveFishingCatches();
+    // Non-vacuity, and a live-corpus floor rather than an exact count: these are
+    // derived from content that is expected to GROW, and a pin that has to be
+    // edited on every addition is a pin that gets edited without thought.
+    expect(monster.length).toBeGreaterThanOrEqual(10);
+    expect(catches.length).toBeGreaterThanOrEqual(9);
+    // The two families the derivation must actually reach, named so a table
+    // rename that empties one of them cannot pass as "nothing to check".
+    expect(monster).toContain('wolf_fang');
+    expect(monster).toContain('pristine_hide');
+    expect(catches).toContain('glimmerfin_koi');
+    for (const itemId of [...monster, ...catches]) {
+      // An id with no ItemDef would make its own row vacuously pass.
       expect(ITEMS[itemId], `${itemId} has no ItemDef`).toBeDefined();
       expect(stocked.get(itemId) ?? [], `${itemId} is stocked by an NPC`).toEqual([]);
     }

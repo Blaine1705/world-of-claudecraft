@@ -4,10 +4,12 @@
 //
 // Both halves are one mechanism. Under the always-require-tool rule (#2343) a
 // bare-handed harvest is denied outright, and a new character starts with zero
-// copper, so a gather quest that grants nothing is unstartable on a fresh
-// account. questFallbackGrants closes that on accept, and re-grants on every
-// accept; q_prof_hobby_switch is repeatable, so the grant needs noVendorSell or
-// accept-sell-abandon mints copper without bound.
+// copper, so a gather quest that grants nothing silently required a detour to
+// earn 20 copper and buy the tool first. questFallbackGrants closes that on
+// accept, and re-grants on every accept; q_prof_hobby_switch is repeatable, so
+// the grant needs noVendorSell (or accept-sell-abandon mints copper) AND
+// noMarketList (or the same loop, stashing instead of selling, drains other
+// players' copper through a free listing instead).
 import { describe, expect, it } from 'vitest';
 import type { GatheringProfessionId } from '../src/sim/content/professions';
 import { ZONE1_QUESTS } from '../src/sim/content/zone1';
@@ -125,11 +127,14 @@ describe('the gather quests grant the tool their own objective needs', () => {
   });
 
   it('accepting on a fresh character with zero copper actually hands the tool over', () => {
-    // One pick quest and one sickle quest, both driven through the real accept
-    // path. The attunement quest carries a completionEffect, so it needs its
-    // pinned pair as the selection; q_prof_intro takes none.
+    // All three non-repeatable gather quests driven through the real accept
+    // path, both tools covered. The attunement quests carry a completionEffect,
+    // so each needs its own pinned pair as the selection; q_prof_intro takes
+    // none. q_prof_attune_smith matters most: it is the independent entry point
+    // with no q_prof_intro gate, so it cannot lean on the intro quest's pick.
     for (const [questId, selection] of [
       ['q_prof_intro', undefined],
+      ['q_prof_attune_smith', 'weaponcrafting+armorcrafting'],
       ['q_prof_attune_bombardier', 'engineering+alchemy'],
     ] as const) {
       const { sim, pid, meta } = simAtGiver(questId);
@@ -179,17 +184,63 @@ describe('the gather quests grant the tool their own objective needs', () => {
   });
 });
 
-describe('the tier-1 starter tools cannot be vendored back into copper', () => {
-  it('every tier-1 gathering tool carries noVendorSell, and no higher tier does', () => {
+describe('the tier-1 starter tools have no route to value', () => {
+  it('every tier-1 gathering tool carries BOTH flags, and no higher tier carries either', () => {
     for (const itemId of TIER_1_TOOLS) {
-      expect(ITEMS[itemId]?.noVendorSell, `${itemId}`).toBe(true);
+      // noVendorSell closes the copper mint; noMarketList closes the value
+      // route the unbounded re-grant supply would otherwise reach through a
+      // free listing. Both are load-bearing, so both are pinned.
+      expect(ITEMS[itemId]?.noVendorSell, `${itemId} noVendorSell`).toBe(true);
+      expect(ITEMS[itemId]?.noMarketList, `${itemId} noMarketList`).toBe(true);
     }
-    // The negative arm: without it, "all tools are unsellable" would pass this
+    // The negative arm: without it, "all tools are locked down" would pass this
     // block just as happily as the intended rule.
     for (const itemId of HIGHER_TIER_TOOLS) {
       expect(ITEMS[itemId], itemId).toBeDefined();
       expect(ITEMS[itemId].noVendorSell ?? false, `${itemId} must stay sellable`).toBe(false);
+      expect(ITEMS[itemId].noMarketList ?? false, `${itemId} must stay listable`).toBe(false);
     }
+  });
+
+  it('the re-grant supply is unbounded, so the tools must have no value route at all', () => {
+    // The reason both flags exist, stated as a test rather than as prose. The
+    // re-grant predicate is questFallbackGrants -> ctx.countItem, and countItem
+    // scans ONLY meta.inventory: stash the tool anywhere else and the next
+    // accept hands over another. This pins that the SUPPLY is unbounded, which
+    // is what makes an open sell or listing route unacceptable rather than
+    // merely untidy.
+    const questId = 'q_prof_hobby_switch';
+    const { sim, pid, meta } = simAtGiver(questId);
+    const tool = ZONE1_QUESTS[questId].requiredItems![0];
+    meta.questsDone.add('q_prof_intro');
+    attuneArchetypePair(sim.ctx, pid, 'engineering+alchemy', 'new');
+    const hobby = hobbyCandidatesForPair(
+      meta.archetype.activeArchetype as string,
+      meta.archetype.pairedMajor as string,
+    ).find((candidate: string) => candidate !== meta.archetype.hobbyCraft) as string;
+
+    let minted = 0;
+    for (let cycle = 0; cycle < 3; cycle++) {
+      expect(sim.countItem(tool, pid), `cycle ${cycle} starts empty-handed`).toBe(0);
+      acceptQuest(sim.ctx, questId, hobby, pid);
+      // A fresh tool appeared from nothing, on a quest already completed before.
+      expect(sim.countItem(tool, pid), `cycle ${cycle} grant`).toBe(1);
+      minted += 1;
+      // Stand in for a bank deposit, a mail attachment, or a trade: the tool
+      // leaves the inventory countItem reads, and nothing else changes.
+      sim.removeItem(tool, 1, pid);
+      sim.abandonQuest(questId, pid);
+    }
+    // Three accepts, three tools minted, none of them still in a bag. The
+    // supply is bounded by nothing but how often the player re-accepts.
+    expect(minted).toBe(3);
+    expect(sim.countItem(tool, pid)).toBe(0);
+
+    // Which is fine ONLY because a stashed copy converts to nothing: the def
+    // carries both flags, so neither the vendor nor the World Market will take
+    // it. If either flag is ever dropped, this loop becomes a live exploit.
+    expect(ITEMS[tool].noVendorSell).toBe(true);
+    expect(ITEMS[tool].noMarketList).toBe(true);
   });
 
   it('sellItem refuses a granted tool and pays nothing, but still pays for a tier-2 one', () => {
@@ -211,7 +262,11 @@ describe('the tier-1 starter tools cannot be vendored back into copper', () => {
     expect(meta.copper).toBe(ITEMS.bronze_sickle.sellValue);
   });
 
-  it('the junk sweep never picks up a granted tool either', () => {
+  // NOT a noVendorSell pin: junkSellableSlot gates on quality === 'poor' first,
+  // and every tier-1 tool is 'common', so this stays green with the flag
+  // removed. What it does pin is that a granted tool never becomes junk-quality,
+  // which is the other way the sweep could start eating them.
+  it('the junk sweep never picks up a granted tool, on the quality gate alone', () => {
     const { sim, pid, meta } = simAtGiver('q_prof_intro');
     const vendor = findNpc(sim, 'trader_wilkes');
     teleport(sim, sim.entities.get(pid) as AnyEntity, vendor.pos.x, vendor.pos.z);

@@ -11,6 +11,12 @@
 // players actually reach the mid and premium nodes or stall on the starter
 // band. Neither reads back into gameplay: this is observability only.
 //
+// COPPER FLOW IS A TREND, NOT A LEDGER. It is sampled as the acting player's
+// copper delta across one command dispatch, so it books nothing for a credit
+// that lands on a third party, and it MISATTRIBUTES a tick-driven payout to
+// whichever command is sampled next. Do not sum these series and expect them
+// to reconcile against total coin in the world.
+//
 // CARDINALITY IS BOUNDED BY CONSTRUCTION, the same contract as
 // server/http/game_signals.ts. A client command outside the allowlist below
 // classifies as 'other' rather than becoming its own series, so the label set
@@ -90,6 +96,14 @@ const SOURCE_BY_COMMAND: ReadonlyMap<string, CopperFlowSource> = new Map(
     dev_level: 'dev',
   } satisfies Record<string, CopperFlowSource>),
 );
+
+/**
+ * Every command the map classifies, exposed so a test can pin the WHOLE mapping
+ * and check the keys are commands the dispatcher actually routes. A key that
+ * stops matching a real command downgrades its surface to 'other' silently,
+ * which leaves the metric reporting the wrong thing rather than nothing.
+ */
+export const COPPER_FLOW_COMMANDS: readonly string[] = Object.freeze([...SOURCE_BY_COMMAND.keys()]);
 
 /** The economic surface a client command's copper move is attributed to. */
 export function copperFlowSourceForCommand(command: string): CopperFlowSource {

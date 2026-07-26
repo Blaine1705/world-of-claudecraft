@@ -3924,9 +3924,12 @@ export class GameServer {
     // dispatch, so a command's own credit or debit is attributed to its
     // economic surface with no sim-side signal and no gameplay effect. Two
     // O(1) map reads, and the 20 Hz movement lane is skipped outright since an
-    // input frame can never move copper. Sampled AFTER the catch as well as the
-    // happy path: a command that threw halfway may still have moved coin.
-    const copperBefore = cmd === 'input' ? undefined : this.sim.meta(session.pid)?.copper;
+    // input frame can never move copper. The skip reads isInputFrame, NOT
+    // cmd === 'input': messageCommand reports `cmd` first, so a frame of
+    // {"t":"input","cmd":"x"} is dispatched as movement while reporting a
+    // different name. Sampled AFTER the catch as well as the happy path: a
+    // command that threw halfway may still have moved coin.
+    const copperBefore = this.isInputFrame(msg) ? undefined : this.sim.meta(session.pid)?.copper;
     // a malformed payload must never take down the server for everyone
     try {
       this.dispatchMessage(session, msg, raw, receivedAtMs);
@@ -3938,12 +3941,14 @@ export class GameServer {
 
   /**
    * Book the acting player's copper delta from one command dispatch onto the
-   * bounded-cardinality flow counters. Deliberately NOT a complete ledger: a
-   * credit that lands on a third party (a party fair-split to a non-acting
-   * looter) or outside any command (a tick-driven payout) has no dispatch to
-   * attribute it to and is not booked. server/economy_telemetry.ts records
-   * that, and operators read these series as per-surface trend, not as a sum
-   * that must reconcile against total coin in the world.
+   * bounded-cardinality flow counters. Deliberately NOT a complete ledger, in
+   * two ways. A credit that lands on a THIRD party (a party fair-split to a
+   * non-acting looter) is never booked at all, having no dispatch of its own to
+   * attribute it to. A tick-driven payout to the acting player is worse than
+   * unbooked: it lands between two dispatches and is then MISATTRIBUTED to
+   * whichever command happens to be sampled next. Operators read these series
+   * as per-surface trend, never as a sum that reconciles against total coin in
+   * the world. server/economy_telemetry.ts carries the same warning.
    */
   private recordCopperFlow(session: ClientSession, command: string, before: number): void {
     // A session that left during its own dispatch (logout) has no meta to read
@@ -3958,7 +3963,23 @@ export class GameServer {
   private messageCommand(msg: unknown): string {
     if (typeof msg !== 'object' || msg === null || Array.isArray(msg)) return 'unknown';
     const record = msg as Record<string, unknown>;
-    return String(record.cmd ?? record.t ?? 'unknown');
+    // TOTAL BY CONSTRUCTION, no coercion. `cmd` and `t` are client-supplied, and
+    // String() THROWS on an object whose toString is not callable, so a frame of
+    // {"cmd":{"toString":1}} used to die here. This runs outside the
+    // malformed-payload try in handleMessage, so a throw would escape the very
+    // guard that exists to keep one bad frame from reaching the process handler,
+    // taking the anomaly observation and the command-lane token down with it.
+    const raw = record.cmd ?? record.t;
+    return typeof raw === 'string' ? raw : 'unknown';
+  }
+
+  /** True for a movement frame, keyed on the SAME field dispatchMessage routes
+   *  movement on (`t`), never on the `cmd`-first name messageCommand reports: a
+   *  frame of {"t":"input","cmd":"x"} is dispatched as movement, so anything
+   *  that skips work for the 20 Hz lane has to agree with the dispatcher. */
+  private isInputFrame(msg: unknown): boolean {
+    if (typeof msg !== 'object' || msg === null || Array.isArray(msg)) return false;
+    return (msg as Record<string, unknown>).t === 'input';
   }
 
   /** Draw a post-parse lane token (R5). On a drop the frame is discarded,
