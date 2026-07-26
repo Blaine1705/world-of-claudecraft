@@ -425,6 +425,13 @@ export const TARGETS = [
       'sim/zone',
       'render/terrain',
       'render/world',
+      // Gather-node placement is visible on three surfaces, and the
+      // gather-quest-map-areas target below only covers one of them (the quest
+      // blobs, which need an active gather objective). A placement-only change
+      // still moves the minimap markers and the in-world props, so it should
+      // shoot the plain map and an in-world frame too.
+      'sim/content/gather_nodes',
+      'render/gather_nodes',
     ],
     // Teleport to a known landmark (offline, no dev command), open the world-map window,
     // and clip to it; fall back to the full frame if the window did not open.
@@ -444,6 +451,53 @@ export const TARGETS = [
         return !!w && getComputedStyle(w).display !== 'none';
       });
       return open ? { clip: '#map-window' } : {};
+    },
+  },
+  {
+    key: 'gather-quest-map-areas',
+    label: 'World map: gather-objective blobs',
+    when: ['sim/quest_targets', 'sim/content/gather_nodes'],
+    // The quest-objective blobs are the only WORLD-MAP layer that reads
+    // GATHER_NODES (the minimap reads it directly, and the world-map target above
+    // covers that), and they only render while a gather objective is INCOMPLETE,
+    // so the recipe has to accept the quest rather than just open the map.
+    // q_prof_intro's objective is
+    // "harvest 5 ore veins", which puts the ore layer on the map. Standing at the
+    // Copper Dig is what makes the shot legible: every Eastbrook vein sits inside one
+    // 20-yard ring there, so it is where a circle-per-node layer piles up.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      const setup = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const p = sim.player;
+        if (!p?.pos) return { ok: false, reason: 'no player' };
+        // acceptQuest enforces the giver's proximity gate, so step onto Foreman
+        // Odell before taking it rather than calling it from across the zone.
+        let giver = null;
+        for (const e of sim.entities?.values?.() ?? []) {
+          if (e?.templateId === 'foreman_odell') giver = e;
+        }
+        if (!giver?.pos) return { ok: false, reason: 'foreman_odell not in the roster' };
+        p.pos.x = giver.pos.x;
+        p.pos.z = giver.pos.z;
+        sim.acceptQuest?.('q_prof_intro');
+        if (sim.questState?.('q_prof_intro') !== 'active')
+          return { ok: false, reason: `quest state ${sim.questState?.('q_prof_intro')}` };
+        p.pos.x = -84; // Copper Dig, Eastbrook Vale
+        p.pos.z = -64;
+        const el = document.querySelector('#map-window');
+        // Force hidden first so pollForSize cannot pass on a window that was already
+        // up from an earlier target in the same run (the market recipe's precedent).
+        if (el) el.style.display = 'none';
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`gather-quest map setup failed: ${setup.reason}`);
+      await wait(400);
+      await page.evaluate(() => window.__game?.hud?.toggleMap?.());
+      const open = await pollForSize(page, '#map-window');
+      if (!open) throw new Error('map window did not open');
+      return { clip: '#map-window' };
     },
   },
   {
