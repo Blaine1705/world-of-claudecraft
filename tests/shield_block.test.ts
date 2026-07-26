@@ -46,6 +46,25 @@ describe('shield block', () => {
     expect(sim.player.blockValue).toBe(6);
   });
 
+  it('an eligible Paladin shield equips block stats, but no shield does not', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'paladin', autoEquip: true });
+    expect(sim.player.blockChance).toBe(0);
+    expect(sim.player.blockValue).toBe(0);
+
+    sim.addItem('eastbrook_buckler', 1);
+    sim.equipItem('eastbrook_buckler');
+
+    expect(sim.player.offhandItemId).toBe('eastbrook_buckler');
+    expect(sim.player.blockChance).toBe(SHIELD_BLOCK_BASE);
+    expect(sim.player.blockValue).toBe(6);
+  });
+
+  it('unrelated classes do not gain block stats without an eligible shield', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'rogue', autoEquip: true });
+    expect(sim.player.blockChance).toBe(0);
+    expect(sim.player.blockValue).toBe(0);
+  });
+
   it('mob melee from the front is reduced by blockValue; from behind it is not', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true }) as AnySim;
     const player = sim.player;
@@ -81,7 +100,7 @@ describe('shield block', () => {
     const attacker = sim.player;
     const defenderId = sim.addPlayer('warrior', 'Shielded');
     const defender = sim.entities.get(defenderId);
-    if (!defender || defender.kind !== 'player') throw new Error('missing defender');
+    if (defender?.kind !== 'player') throw new Error('missing defender');
     attacker.weapon = { min: 20, max: 20, speed: 2 };
     attacker.attackPower = 0;
     attacker.critChance = 0;
@@ -106,5 +125,26 @@ describe('shield block', () => {
     expect(meleeSwing(sim.ctx, attacker, defender, 0, null, { cannotBeDodged: true })).toBe(true);
     const back = damageEvents(sim.drainEvents()).find((e) => e.kind === 'hit');
     expect(back?.amount).toBe(20);
+  });
+
+  it('Paladin frontal melee block reduces a mob swing', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'paladin', autoEquip: true }) as AnySim;
+    const player = sim.player;
+    sim.addItem('eastbrook_buckler', 1);
+    sim.equipItem('eastbrook_buckler');
+    const mob = spawnMobInFront(sim, player);
+    player.dodgeChance = 0;
+    player.blockChance = 1;
+    player.stats.armor = 0;
+    mob.weapon = { min: 20, max: 20, speed: 2 };
+    mob.attackPower = 0;
+    sim.rng.next = () => 0.9;
+
+    player.facing = 0;
+    sim.drainEvents();
+    sim.mobSwing(mob, player);
+
+    const hit = damageEvents(sim.drainEvents()).find((e) => e.kind === 'hit');
+    expect(hit?.amount).toBe(14);
   });
 });
