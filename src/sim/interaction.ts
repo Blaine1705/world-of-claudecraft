@@ -240,7 +240,7 @@ export function harvestCorpse(
     return;
   }
   const mob = ctx.entities.get(mobId);
-  if (!mob || mob.kind !== 'mob' || !mob.dead) return;
+  if (mob?.kind !== 'mob' || !mob.dead) return;
   const componentTags = MOBS[mob.templateId]?.componentTags;
   if (!isHarvestableCorpse(componentTags)) {
     ctx.error(meta.entityId, 'That corpse has nothing to harvest.');

@@ -1249,7 +1249,7 @@ export const TARGETS = [
     async capture(page, variant) {
       const staged = await page.evaluate(() => {
         const sim = window.__game?.sim;
-        if (!sim || !sim.player) return { ok: false, reason: 'offline world is unavailable' };
+        if (!sim?.player) return { ok: false, reason: 'offline world is unavailable' };
         const me = sim.player.name;
         const m = (over) => ({
           id: over.id,
@@ -1370,7 +1370,7 @@ export const TARGETS = [
     async capture(page, variant) {
       const staged = await page.evaluate((rank) => {
         const sim = window.__game?.sim;
-        if (!sim || !sim.player) return { ok: false, reason: 'offline world is unavailable' };
+        if (!sim?.player) return { ok: false, reason: 'offline world is unavailable' };
         const me = sim.player.name;
         const m = (over) => ({
           id: over.id,
@@ -2233,7 +2233,7 @@ export const TARGETS = [
     // command, because offline the sim answers synchronously and the very next
     // event drain would resolve the row back out of pending; online this state
     // is what the window shows for the whole round trip.
-    async capture(page, variant) {
+    async capture(page, _variant) {
       await page.evaluate(() => {
         document.querySelector('.camera-prompt-confirm')?.click();
         document.querySelector('.tut-skip')?.click();
