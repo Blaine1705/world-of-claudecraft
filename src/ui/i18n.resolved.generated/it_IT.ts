@@ -666,7 +666,7 @@ export const it_IT: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% di sconto",
+      "railWocDiscount": "{percent}% di sconto",
       "railWocUnavailable": "I prezzi WOC non sono disponibili al momento.",
       "railNativeUnavailable": "SOL/WOC non disponibile.",
       "amountLabel": "Quantità",

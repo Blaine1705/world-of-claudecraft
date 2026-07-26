@@ -666,7 +666,7 @@ export const tr_TR: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "%20 indirim",
+      "railWocDiscount": "%{percent} indirim",
       "railWocUnavailable": "WOC fiyatlandırması şu anda mevcut değil.",
       "railNativeUnavailable": "SOL/WOC şu anda kullanılamıyor.",
       "amountLabel": "Miktar",

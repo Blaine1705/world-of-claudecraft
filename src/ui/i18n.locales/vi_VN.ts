@@ -8223,7 +8223,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Thẻ',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': 'Giảm 20%',
+  'hudChrome.claudium.railWocDiscount': 'Giảm {percent}%',
   'hudChrome.claudium.railWocUnavailable': 'Giá WOC hiện không có sẵn.',
   'hudChrome.claudium.showAmounts': 'Hiển thị tất cả số lượng Claudium',
   'hudChrome.claudium.skuRow': '{usd} đổi lấy {claudium} Claudium',

@@ -421,7 +421,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Карта',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': 'Скидка 20%',
+  'hudChrome.claudium.railWocDiscount': 'Скидка {percent}%',
   'hudChrome.claudium.solBalance': 'SOL: {amount}',
   'hudChrome.claudium.wocBalance': 'WOC: {amount}',
   'hudChrome.claudium.railWocUnavailable': 'Цена WOC сейчас недоступна.',

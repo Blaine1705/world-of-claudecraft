@@ -666,7 +666,7 @@ export const en_XA: EnTranslations = {
       "railSol": "[ŠÓĻ]",
       "railUsdc": "[ÚŠÐÇ]",
       "railWoc": "[ŴÓÇ]",
-      "railWocDiscount": "[20% óƒƒ]",
+      "railWocDiscount": "[{percent}% óƒƒ]",
       "railWocUnavailable": "[ŴÓÇ þŕíçíñĝ íš úñáʋáíļáƀļé ŕíĝĥţ ñóŵ.]",
       "railNativeUnavailable": "[Çŕýþţó óƒƒ.]",
       "amountLabel": "[Áɱóúñţ]",

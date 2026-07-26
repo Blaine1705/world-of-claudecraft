@@ -8290,7 +8290,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Kort',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20% rabat',
+  'hudChrome.claudium.railWocDiscount': '{percent}% rabat',
   'hudChrome.claudium.railWocUnavailable': 'WOC-priser er ikke tilgængelige lige nu.',
   'hudChrome.claudium.showAmounts': 'Vis alle Claudium-beløb',
   'hudChrome.claudium.skuRow': '{usd} til {claudium} Claudium',

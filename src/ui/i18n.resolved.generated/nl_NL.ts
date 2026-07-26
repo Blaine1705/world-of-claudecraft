@@ -666,7 +666,7 @@ export const nl_NL: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% korting",
+      "railWocDiscount": "{percent}% korting",
       "railWocUnavailable": "WOC-prijzen zijn momenteel niet beschikbaar.",
       "railNativeUnavailable": "SOL/WOC staat uit.",
       "amountLabel": "Hoeveelheid",

@@ -666,7 +666,7 @@ export const zh_TW: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "優惠 20%",
+      "railWocDiscount": "優惠 {percent}%",
       "railWocUnavailable": "WOC 定價目前無法使用。",
       "railNativeUnavailable": "SOL/WOC 無法使用",
       "amountLabel": "數量",

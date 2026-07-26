@@ -426,7 +426,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': '카드',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20% 할인',
+  'hudChrome.claudium.railWocDiscount': '{percent}% 할인',
   'hudChrome.claudium.solBalance': 'SOL: {amount}',
   'hudChrome.claudium.wocBalance': 'WOC: {amount}',
   'hudChrome.claudium.railWocUnavailable': '현재 WOC 가격을 이용할 수 없습니다.',
