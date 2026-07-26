@@ -12987,11 +12987,9 @@ export class Hud {
   // applyLoadoutBar back to back).
   private applyLoadoutBar(bar: (string | null)[], alloc: TalentAllocation): void {
     const known = loadoutKnownAbilityIds(this.sim.cfg.playerClass, alloc, this.sim.player.level);
-    this.hotbarActions = applyLoadoutBarActions(
-      this.hotbarActions,
-      bar,
-      Hud.BAR_ABILITY_SLOTS,
-      (id) => known.has(id),
+    this.actionBarController.replaceActionsForLoadout(
+      applyLoadoutBarActions(this.hotbarActions, bar, Hud.BAR_ABILITY_SLOTS, (id) => known.has(id)),
+      known,
     );
     this.saveSlotMap();
   }
