@@ -34,7 +34,7 @@
 
 import { ITEMS } from '../sim/data';
 import { itemDisplayName } from './entity_i18n';
-import { encodeItemLink, isLinkableId } from './hud/quest/quest_link';
+import { tryEncodeItemLink } from './hud/quest/quest_link';
 import { formatNumber } from './i18n';
 import type { TranslationKey } from './i18n.catalog';
 
@@ -42,14 +42,15 @@ import type { TranslationKey } from './i18n.catalog';
  *  client can resolve it (the chat log renders it as a clickable, tooltipped,
  *  quality-colored `[Name]`), otherwise the plain localized name. An id the
  *  chat-link parser cannot match would reach the player as literal "[[i:...]]"
- *  source text, so `isLinkableId` (which lives beside that parser's own regex,
- *  never restated here) picks the plain-name path for it. An id absent from
- *  ITEMS (content drift between client and server) degrades to the raw id
+ *  source text, so `tryEncodeItemLink` (the guarded encoder, which lives beside
+ *  that parser's own regex and answers the charset question for every encode
+ *  site) returns null for one and the plain-name path takes over. An id absent
+ *  from ITEMS (content drift between client and server) degrades to the raw id
  *  rather than the renderer's bare `[?]`, so the line still names something. */
 export function grantItemToken(itemId: string): string {
   const item = ITEMS[itemId];
   if (!item) return itemId;
-  return isLinkableId(itemId) ? encodeItemLink(itemId) : itemDisplayName(item);
+  return tryEncodeItemLink(itemId) ?? itemDisplayName(item);
 }
 
 /** True when a grant of `count` units should render the quantity-bearing line
