@@ -1,4 +1,5 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
@@ -438,6 +439,29 @@ describe('every professions grant site is accounted for (#2430)', () => {
   // old double-log by omission.
   const dir = path.resolve(process.cwd(), 'src/sim/professions');
 
+  // The per-file grant counts as they stand. The floor this replaces
+  // (`sites.length >= 19`) sat three under the real 22, so up to three sites
+  // could leave the sweep and be absorbed silently: splitting one module into a
+  // folder, or deleting a call, is exactly how a shipped grant would go quiet
+  // while every test here stayed green (#2485). Per file, a disappearance or a
+  // relocation reads as a diff instead. Adding a grant is a deliberate act
+  // already (it has to set its flags); bump its number here in the same change.
+  //
+  // What this map does NOT claim: the scan matches `ctx.addItem`/
+  // `ctx.addItemInstance` call TEXT, so a grant routed through a destructured
+  // `const { addItem } = ctx` or a module-local helper contributes no row and
+  // no count drift. Nothing in src/sim/professions does that today. Recursion
+  // widens which FILES are read, not which call shapes are recognized.
+  const EXPECTED_GRANT_SITES: Record<string, number> = {
+    'commission.ts': 1,
+    'crafting.ts': 6,
+    'enchanting.ts': 4,
+    'fishing.ts': 2,
+    'gathering.ts': 2,
+    'salvage.ts': 1,
+    'interaction.ts:harvestCorpse': 6,
+  };
+
   // Sites that deliberately carry NEITHER flag, keyed by a stable substring of
   // the call itself. A grant belongs here ONLY when no result event follows it,
   // because eliding the hub line for it would make the grant invisible.
@@ -475,6 +499,50 @@ describe('every professions grant site is accounted for (#2430)', () => {
     return calls;
   };
 
+  // Whitespace-normalized ONCE, here, so every pin below reads the same shape.
+  // The two sweeps used to disagree: one matched `callerLogs: true` on raw
+  // call text and the other normalized first, so a formatter that wrapped an
+  // opts object between a key and its value would have blinded one of them
+  // (in the safe direction, but for a reason nobody could see from the
+  // assertion). Comments are already gone by this point (codeOnly above).
+  const flatten = (call: string) => call.replace(/\s+/g, ' ');
+
+  /** Every .ts file under `root`, RECURSIVELY, labeled by its path relative to
+   *  `root` with forward slashes (so a top-level file keeps its bare name and
+   *  the per-file pins below go on resolving). The single-level `readdirSync`
+   *  this replaces read one directory deep, so the day src/sim/professions grew
+   *  a subdirectory every grant inside it would have left both sweeps below
+   *  while they stayed green, covering less than the day before (#2485).
+   *  Entries are sorted by name, so the label list is the same on the ext4 CI
+   *  runner (readdir in hash order) as on a dev APFS checkout. The label idiom
+   *  is tests/i18n_admin_catalog.test.ts's walk, which recursed for the same
+   *  reason: a flat read misses what a subdirectory holds. */
+  const tsFilesUnder = (root: string, prefix = ''): Array<{ file: string; full: string }> => {
+    const out: Array<{ file: string; full: string }> = [];
+    const entries = readdirSync(root, { withFileTypes: true }).sort((a, b) =>
+      a.name < b.name ? -1 : a.name > b.name ? 1 : 0,
+    );
+    for (const entry of entries) {
+      const full = path.join(root, entry.name);
+      if (entry.isDirectory()) out.push(...tsFilesUnder(full, `${prefix}${entry.name}/`));
+      else if (entry.isFile() && entry.name.endsWith('.ts')) {
+        out.push({ file: `${prefix}${entry.name}`, full });
+      }
+    }
+    return out;
+  };
+
+  /** Every grant call under `root`, each tagged with the relative file it came
+   *  from. Takes a directory rather than closing over `dir`, so the fixture
+   *  case below drives the exact scanner the sweep uses, not a restatement. */
+  const grantSitesUnder = (root: string): Array<{ file: string; call: string }> =>
+    tsFilesUnder(root).flatMap(({ file, full }) =>
+      grantCalls(codeOnly(readFileSync(full, 'utf8'))).map((call) => ({
+        file,
+        call: flatten(call),
+      })),
+    );
+
   /** The brace-balanced body of the named top-level function in `source`. */
   const functionBody = (source: string, signature: string): string => {
     const at = source.indexOf(signature);
@@ -500,32 +568,42 @@ describe('every professions grant site is accounted for (#2430)', () => {
     'export function harvestCorpse(',
   );
 
-  // Whitespace-normalized ONCE, here, so every pin below reads the same shape.
-  // The two sweeps used to disagree: one matched `callerLogs: true` on raw
-  // call text and the other normalized first, so a formatter that wrapped an
-  // opts object between a key and its value would have blinded one of them
-  // (in the safe direction, but for a reason nobody could see from the
-  // assertion). Comments are already gone by this point (codeOnly above).
-  const flatten = (call: string) => call.replace(/\s+/g, ' ');
-  const sites = [
-    ...readdirSync(dir)
-      .filter((f) => f.endsWith('.ts'))
-      .flatMap((file) =>
-        grantCalls(codeOnly(readFileSync(path.join(dir, file), 'utf8'))).map((call) => ({
-          file,
-          call: flatten(call),
-        })),
-      ),
+  type GrantSite = { file: string; call: string };
+
+  const sites: GrantSite[] = [
+    ...grantSitesUnder(dir),
     ...grantCalls(harvestBody).map((call) => ({
       file: 'interaction.ts:harvestCorpse',
       call: flatten(call),
     })),
   ];
 
+  // The two rules the sweeps below enforce, as functions of a site list, so the
+  // recursion case can put a nested grant to the REAL predicates rather than to
+  // a restatement of them that could drift out of agreement with these.
+  const grantsKeepingTheHubLine = (all: GrantSite[]): GrantSite[] =>
+    all.filter(
+      (s) =>
+        !s.call.includes('callerLogs: true') &&
+        !NO_RESULT_EVENT_GRANTS.some((marker) => s.call.includes(marker)),
+    );
+  const grantsKeepingTheHubCue = (all: GrantSite[]): GrantSite[] =>
+    all.filter((s) => s.call.includes('callerLogs: true') && !s.call.includes('silent: true'));
+
+  const describeSites = (all: GrantSite[]): string[] => all.map((s) => `${s.file}: ${s.call}`);
+
   it('the scanner actually finds the grant sites (never passes vacuously)', () => {
     // A regex that stopped matching would make the sweep below green while
-    // checking nothing, so bind both the count and the shape.
-    expect(sites.length).toBeGreaterThanOrEqual(19);
+    // checking nothing, so bind both the count and the shape. Per FILE, not as
+    // one total: the floor this replaces (>= 19, against a real 22) left slack
+    // for up to three sites to leave the sweep unnoticed, and a module split
+    // into a subdirectory takes its whole file's worth out at once (#2485).
+    const byFile: Record<string, number> = {};
+    for (const site of sites) byFile[site.file] = (byFile[site.file] ?? 0) + 1;
+    expect(
+      byFile,
+      'grant sites per file: a NEW grant sets silent + callerLogs (or joins NO_RESULT_EVENT_GRANTS), and THEN bumps its number here; a number that dropped means a grant left the sweep',
+    ).toEqual(EXPECTED_GRANT_SITES);
     // Bound to the CALL and to its identity, not just the file: `.some(file ===
     // ...)` alone stays green if commission.ts keeps some other grant while the
     // unbind peel moves out of src/sim/professions and off the sweep entirely,
@@ -554,13 +632,13 @@ describe('every professions grant site is accounted for (#2430)', () => {
     const harvestSites = sites.filter((s) => s.file === 'interaction.ts:harvestCorpse');
     expect(harvestSites).toHaveLength(6);
     // BOTH flags. The shared cue sweep below now asks for `silent` everywhere
-    // too (#2458 retired the one site that owned the line without the cue), so
-    // this is no longer the only place `silent` is checked. It stays because it
-    // binds what the shared sweep cannot: the COUNT, six, and with it the
-    // harvestCorpse slice itself. One harvest command grants several DISTINCT
-    // items, so a site that kept `callerLogs` but lost `silent` would give one
-    // harvest several cues rather than one stray ding (#2457 acceptance
-    // criterion 3).
+    // too (#2458 retired the one site that owned the line without the cue), and
+    // EXPECTED_GRANT_SITES now carries the count of six as well, so neither is
+    // this pin's alone any more. It stays because the count belongs HERE, next
+    // to the boundary checks it interprets: six is what says the slice found
+    // the whole function. One harvest command grants several DISTINCT items, so
+    // a site that kept `callerLogs` but lost `silent` would give one harvest
+    // several cues rather than one stray ding (#2457 acceptance criterion 3).
     for (const site of harvestSites) {
       expect(site.call, site.call).toContain('silent: true');
       expect(site.call, site.call).toContain('callerLogs: true');
@@ -573,13 +651,8 @@ describe('every professions grant site is accounted for (#2430)', () => {
   });
 
   it('every grant either stands its hub line down or is a named no-result-event grant', () => {
-    const unaccounted = sites.filter(
-      (s) =>
-        !s.call.includes('callerLogs: true') &&
-        !NO_RESULT_EVENT_GRANTS.some((marker) => s.call.includes(marker)),
-    );
     expect(
-      unaccounted.map((s) => `${s.file}: ${s.call}`),
+      describeSites(grantsKeepingTheHubLine(sites)),
       'a professions grant that neither sets callerLogs nor is a documented no-result-event grant',
     ).toEqual([]);
   });
@@ -600,13 +673,58 @@ describe('every professions grant site is accounted for (#2430)', () => {
     // the same item) was invisible only because commission-eligible kinds all
     // stack one per slot today. This is the forward guard for the day one does
     // not: the same grant reached by a different route must sound the same.
-    const lineOnlySites = sites.filter(
-      (s) => s.call.includes('callerLogs: true') && !s.call.includes('silent: true'),
-    );
     expect(
-      lineOnlySites.map((s) => `${s.file}: ${s.call}`),
+      describeSites(grantsKeepingTheHubCue(sites)),
       'a professions grant that elides the hub line but still plays the generic hub ding',
     ).toEqual([]);
+  });
+
+  it('the scan descends, so a grant in a SUBDIRECTORY faces both sweeps (#2485)', () => {
+    // src/sim/professions is flat today, so nothing above can tell a recursive
+    // walk from the single-level one it replaces: both sweeps would go on
+    // passing if the walk quietly stopped at the top level again, while a
+    // module split into a folder took its grants out of coverage. Drive the
+    // real scanner over a fixture tree instead, and put its nested grants to
+    // the real predicates, so the recursion is pinned rather than eyeballed.
+    const fixture = mkdtempSync(path.join(tmpdir(), 'woc-grant-scan-'));
+    try {
+      mkdirSync(path.join(fixture, 'nested', 'deeper'), { recursive: true });
+      writeFileSync(
+        path.join(fixture, 'top.ts'),
+        'ctx.addItem(itemId, 1, pid, { silent: true, callerLogs: true });\n',
+      );
+      // One nested violation per sweep: a bare grant (keeps the hub LINE) and a
+      // line-only grant (keeps the hub CUE, the #2458 half). One file each, so a
+      // walk that descended but mislabeled would show up as a wrong file name.
+      writeFileSync(
+        path.join(fixture, 'nested', 'bare.ts'),
+        'ctx.addItemInstance(itemId, payload, pid);\n',
+      );
+      writeFileSync(
+        path.join(fixture, 'nested', 'deeper', 'line_only.ts'),
+        'ctx.addItem(itemId, 1, pid, {\n  callerLogs: true,\n});\n',
+      );
+
+      const found = grantSitesUnder(fixture);
+      // Discovered at every depth, labeled by relative path with forward
+      // slashes: bare names would collide across subdirectories, and a label
+      // that dropped the directory would make EXPECTED_GRANT_SITES ambiguous.
+      expect(found.map((s) => s.file)).toEqual([
+        'nested/bare.ts',
+        'nested/deeper/line_only.ts',
+        'top.ts',
+      ]);
+      // ... and both sweeps really do fire on them.
+      expect(grantsKeepingTheHubLine(found).map((s) => s.file)).toEqual(['nested/bare.ts']);
+      expect(grantsKeepingTheHubCue(found).map((s) => s.file)).toEqual([
+        'nested/deeper/line_only.ts',
+      ]);
+      // The flagged top-level grant is the negative control: the sweeps clear
+      // it, so a predicate that flagged everything could not fake this case.
+      expect(found.find((s) => s.file === 'top.ts')?.call).toContain('callerLogs: true');
+    } finally {
+      rmSync(fixture, { recursive: true, force: true });
+    }
   });
 
   it('the exclusion list has no stale entries', () => {
