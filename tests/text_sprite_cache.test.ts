@@ -793,40 +793,35 @@ describe('text_sprite_cache: hostile and partial metrics', () => {
 });
 
 describe('text_sprite_cache: stays a host-agnostic painter helper', () => {
-  // The module ends in neither _view/_core nor _painter, so it escapes BOTH
-  // completeness sweeps (tests/architecture.test.ts UI_PURE_CORES and
-  // tests/hud_perf_budget.test.ts CANVAS_PAINTERS). That is correct as written (a
-  // pure core may not touch the DOM, and this one must create a canvas), but it
-  // leaves the file unguarded, so its own suite carries the scan.
+  // This module ends in neither _view/_core nor _painter, so it is swept by
+  // NEITHER the pure-core gate nor the painter gate, and it used to carry the
+  // whole host-agnosticism scan itself. That scan now lives where it cannot be
+  // forgotten by the next module of this shape: the src/ui module-classification
+  // sweep in tests/architecture.test.ts registers this file in
+  // UI_PAINTER_HELPERS and enforces the forbidden hosts, the single sanctioned
+  // document.createElement call, the deterministic-clock rule and the
+  // no-literal-color rule against it.
+  //
+  // What stays here are the two pins that sweep deliberately does not make. It
+  // applies the shared pure-core import rule (no three, no render/game/net, no
+  // DOM-owning painter), which would happily allow a sibling ui import, while this
+  // module imports NOTHING AT ALL, and staying that way is what lets a Vitest
+  // drive it through a fake document with no module graph behind it. And it bounds
+  // `document` to createElement calls without bounding HOW MANY, while this module
+  // makes exactly one DOM call, which is the tighter thing worth keeping.
   const source = readFileSync(new URL('../src/ui/text_sprite_cache.ts', import.meta.url), 'utf8');
   const code = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
-
-  it('reaches for no host beyond the canvas it rasterizes into', () => {
-    for (const forbidden of [
-      'window.',
-      'Date.now',
-      'performance.now',
-      'Math.random',
-      'getComputedStyle',
-      'localStorage',
-      'requestAnimationFrame',
-    ]) {
-      expect(code, `text_sprite_cache must not use ${forbidden}`).not.toContain(forbidden);
-    }
-    // document is allowed for exactly one thing: minting the offscreen canvas.
-    expect(code.match(/document\./g) ?? []).toEqual(['document.']);
-    expect(code).toContain("document.createElement('canvas')");
-  });
 
   it('imports nothing at all, so it cannot drift into the render or HUD graph', () => {
     expect(code.match(/^import\s/gm) ?? []).toEqual([]);
   });
 
-  it('carries no literal color: the caller passes resolved tokens', () => {
-    const hex = code.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [];
-    const rgb = code.match(/\brgba?\s*\(/g) ?? [];
-    expect(hex, `hex colors: ${hex.join(', ')}`).toEqual([]);
-    expect(rgb, `rgb colors: ${rgb.join(', ')}`).toEqual([]);
+  // The sweep bounds document access to createElement calls; it pins neither WHICH
+  // element nor HOW MANY, and minting one offscreen canvas is the whole reason
+  // this helper is allowed near the DOM at all.
+  it('makes exactly one DOM call: the offscreen canvas it mints', () => {
+    expect(code.match(/document\b/g) ?? []).toEqual(['document']);
+    expect(code).toContain("document.createElement('canvas')");
   });
 });
 
