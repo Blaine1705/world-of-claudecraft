@@ -646,6 +646,11 @@ describe('non-profession grants are untouched', () => {
     // two independent guards from being collapsed into one condition. Do not
     // delete it as unreachable.
     expect(audio.lootItem).toHaveBeenCalledTimes(1);
+    // Positive control for firedCues(), which the unbind symmetry pins above
+    // read as an EMPTY set. A helper that could never observe a call would make
+    // those pass vacuously; this is the one burst in the file that fires
+    // exactly one cue, so it anchors the helper against the same spies.
+    expect(firedCues()).toEqual(['lootItem']);
   });
 });
 
