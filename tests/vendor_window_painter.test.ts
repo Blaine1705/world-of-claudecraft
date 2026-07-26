@@ -138,6 +138,37 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
     expect(row.querySelector('.vi-price')?.textContent).toContain('120');
   });
 
+  it('suppresses the buy aria-label on a locked row even when no requirement text renders', () => {
+    // The aria-label branch keys on `locked`, not on whether the requirement
+    // TEXT came back non-empty, and this is the ONLY input that tells the two
+    // apart: a locked row whose profession has no display-name key renders no
+    // sub-line, so the text-keyed form would fall through and label the row
+    // "Buy X for Y" on a button the sim refuses. Reverting the discriminator
+    // leaves every other arm in this file green, which is why this case exists.
+    const goods: VendorGoodsRow[] = [
+      {
+        itemId: 'iron_mining_pick',
+        item: item('iron_mining_pick'),
+        price: { copper: 120, honor: 0 },
+        quantity: 1,
+        affordable: true,
+        locked: true,
+        // An id with no entry in the shared name table.
+        requirement: { professionId: 'not_a_profession' as never, proficiency: 40 },
+      },
+    ];
+    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false };
+    const el = document.createElement('div');
+    renderVendorWindow(el, 'Vendor', view, deps());
+
+    const row = el.querySelector('.vendor-item') as HTMLButtonElement;
+    expect(row.classList.contains('vendor-locked')).toBe(true);
+    expect(row.disabled).toBe(true);
+    // No requirement line is printable, and no misleading buy label either.
+    expect(row.querySelector('.vi-sub')).toBeNull();
+    expect(row.getAttribute('aria-label')).toBeNull();
+  });
+
   it('swaps the locked row TOOLTIP from click-to-buy to the requirement', () => {
     // The deps bag's attachTooltip is a no-op by default, so the tooltip
     // builder closure never runs and this branch was invisible. Capture the

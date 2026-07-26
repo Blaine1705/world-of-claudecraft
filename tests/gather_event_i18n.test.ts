@@ -345,7 +345,10 @@ describe('hudChrome.gathering catch line (Professions 2.0)', () => {
       readFileSync(path.resolve(process.cwd(), file), 'utf8')
         .replace(/\/\*[\s\S]*?\*\//g, '')
         // Trailing comments too, not just whole lines: a `// ... KEYS` tail
-        // would otherwise satisfy the positive check below on its own.
+        // would otherwise satisfy the positive check below on its own. The
+        // strip is context-free, so a string literal containing whitespace
+        // then `//` would be truncated; verified absent in the files below,
+        // and a URL's `//` follows a colon, so it is never matched.
         .replace(/(^|\s)\/\/.*$/gm, '$1');
     for (const file of [
       'src/ui/char_window.ts',

@@ -344,7 +344,7 @@ describe('Eastbrook authored gameplay data integration', () => {
     // (six tools dropped, both rods kept), forgemistress_darva (two picks
     // dropped) and tinker_gizzel (four axes and sickles dropped). Nothing else
     // in any def, and no placement field, changed. The three row assertions
-    // above re-check that those are still the rows this case owns.
+    // that follow re-check that those are still the rows this case owns.
     // The three moved rows, asserted BEFORE the digest below so they actually
     // run: a failing expect throws, so stating them after the hash meant they
     // never evaluated in the one case they exist to describe. Ordered this way

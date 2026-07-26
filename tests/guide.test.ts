@@ -1411,9 +1411,10 @@ describe('Guide professions gathering accuracy', () => {
     expect(en).toContain(String(TIER3_TOOL_GATE_PROFICIENCY));
     expect(en, 'no token left unspliced').not.toMatch(/\{[A-Za-z0-9_]+\}/);
 
-    // Every shipped locale, read off the resolved bundles: both tokens present,
-    // and the old "stocked at every hub" claim gone. The second half is the one
-    // a reword silently leaves behind, since the row stays "translated".
+    // Every shipped locale, read off the resolved bundles: both tokens present
+    // AND neither threshold spelled out as a literal. The second half is what a
+    // reword silently leaves behind, since the row stays "translated" and no
+    // i18n gate ever marks it pending.
     const dir = resolve(process.cwd(), 'src/ui/i18n.resolved.generated');
     // Locale bundles only: the directory also holds the barrel, the lazy
     // loader map, and the pending slice.
@@ -1424,9 +1425,23 @@ describe('Guide professions gathering accuracy', () => {
       const source = readFileSync(`${dir}/${file}`, 'utf8');
       const at = source.indexOf('toolsNote');
       expect(at, `${file} carries toolsNote`).toBeGreaterThan(-1);
-      const value = source.slice(at, at + 2400);
+      // Bounded by the value's own line, not a magic width: a window wider
+      // than the longest translation reaches into following keys, and the
+      // direction of that looseness is a FALSE PASS.
+      const lineEnd = source.slice(at).indexOf('\n');
+      const value = source.slice(at, lineEnd === -1 ? undefined : at + lineEnd);
       expect(value, `${file} keeps {tier2}`).toContain('{tier2}');
       expect(value, `${file} keeps {tier3}`).toContain('{tier3}');
+      // The half a placeholder check alone cannot see: a fill that spelled the
+      // numbers out would keep the tokens elsewhere in the sentence and still
+      // publish frozen values. Neither threshold may appear as a literal.
+      const withoutTokens = value.replace(/\{[^}]*\}/g, '');
+      expect(withoutTokens, `${file} spells out ${TIER2_TOOL_GATE_PROFICIENCY}`).not.toContain(
+        String(TIER2_TOOL_GATE_PROFICIENCY),
+      );
+      expect(withoutTokens, `${file} spells out ${TIER3_TOOL_GATE_PROFICIENCY}`).not.toContain(
+        String(TIER3_TOOL_GATE_PROFICIENCY),
+      );
     }
   });
 

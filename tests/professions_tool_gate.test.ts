@@ -431,6 +431,24 @@ describe('the HUD actually feeds the viewer proficiency into the view', () => {
     // and it comes from the world, not from a literal.
     expect(args).toMatch(/gatheringProficiency:\s*this\.sim\.gatheringProficiency/);
   });
+
+  it('closes its service windows on the shared constant, never on an inlined number', () => {
+    // The geometry arm below reads NPC_WINDOW_CLOSE_RANGE, so it only guards
+    // the separation while the HUD still reads it too. Replacing the proximity
+    // literals with a bare number leaves the constant at 8, the arm green, and
+    // the stale-lock hole re-opened, so pin the read itself.
+    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|\s)\/\/.*$/gm, '$1');
+    // Every service-window proximity check compares against the constant.
+    const checks = [...source.matchAll(/dist2d\(p\.pos, npc\.pos\) > ([A-Za-z_0-9.]+)/g)];
+    expect(checks.length, 'the proximity checks are still there').toBeGreaterThanOrEqual(4);
+    for (const [, operand] of checks) {
+      expect(operand, 'proximity check compares against the shared constant').toBe(
+        'NPC_WINDOW_CLOSE_RANGE',
+      );
+    }
+  });
 });
 
 describe('the gated tools are stocked somewhere a gated row can be seen', () => {
