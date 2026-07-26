@@ -421,7 +421,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': '银行卡',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '优惠 20%',
+  'hudChrome.claudium.railWocDiscount': '优惠 {percent}%',
   'hudChrome.claudium.solBalance': 'SOL：{amount}',
   'hudChrome.claudium.wocBalance': 'WOC：{amount}',
   'hudChrome.claudium.railWocUnavailable': 'WOC 定价暂时不可用。',

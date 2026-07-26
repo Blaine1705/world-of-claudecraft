@@ -336,7 +336,8 @@ describe('signed Pristine specimens (#1145)', () => {
     const slot = meta.inventory.find((s) => s.itemId === 'wolf_fang');
     expect(slot).toBeDefined();
     expect(slot?.instance?.signer).toBe('Alpha');
-    expect(sim.countItem('wolf_fang', a)).toBe(1);
+    // The whole rolled quantity, stamped (#2473), not a single token unit.
+    expect(sim.countItem('wolf_fang', a)).toBe(3);
   });
 
   it('every other specimen family grants its own jackpot beside the plain component (seed 5)', () => {
@@ -395,7 +396,10 @@ describe('signed Pristine specimens (#1145)', () => {
     const slot = meta.inventory.find((s) => s.itemId === 'homespun_cloth');
     expect(slot).toBeDefined();
     expect(slot?.instance?.signer).toBe('Alpha');
-    expect(sim.countItem('homespun_cloth', a)).toBe(1);
+    // This corpse's own rolled quantity (#2473): the bandit's cloth tier rolls
+    // two where the wolf's fang rolls three at the same seed, so the count
+    // tracks the ROLL rather than any constant the arm could hardcode.
+    expect(sim.countItem('homespun_cloth', a)).toBe(2);
   });
 
   it('a slot-full signed-family harvest falls back to the plain stack, never over capacity (seed 5)', () => {
@@ -627,12 +631,14 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     sim.drainEvents();
     sim.harvestCorpse(mob.id, ['fang'], a);
     expect(mob.harvestClaimedBy).toBe(a);
-    // The signed grant merged into the same-signer stack: one unit, no new
-    // slot, no overflow, and the plain stack was never topped up.
+    // The signed grant merged into the same-signer stack: no new slot, no
+    // overflow, and the plain stack was never topped up. The stack absorbs the
+    // whole three-unit roll (#2473) because seventeen units of merge room
+    // cover it; the partial-room case is its own pin below.
     expect(m.inventory.length).toBe(cap);
     const signed = m.inventory.find((s) => s.itemId === 'wolf_fang' && s.instance);
     expect(signed?.instance?.signer).toBe('Alpha');
-    expect(signed?.count).toBe(4);
+    expect(signed?.count).toBe(6);
     const plain = m.inventory.find((s) => s.itemId === 'wolf_fang' && !s.instance);
     expect(plain?.count).toBe(1);
     // The signature survived: no downgrade notice fires.
@@ -686,6 +692,600 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     // The plain component still arrived through its reserved top-up room.
     expect(sim.countItem('rough_hide', a)).toBeGreaterThan(1);
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toHaveLength(0);
+  });
+});
+
+// #2473: on a specimen-less family the component ITSELF is the signed grant,
+// so the signature and the yield ride one call. That call used to pass a
+// hardcoded count of 1 while the downgrade fallback right beneath it granted
+// the whole rolled quantity, so a rare roll was a yield LOSS and a fuller bag
+// was a yield GAIN. The premium arm must never be the smaller grant: it lands
+// the rolled quantity signed, or it does not land signed at all.
+describe('a signed specimen-less grant carries its rolled quantity (#2473)', () => {
+  it('draws no rng of its own: the count comes from the tier roll already taken', () => {
+    // The draw pin ON the arm the change touched. The sibling cases in
+    // tests/corpse_harvest_result_event.test.ts cover the plain and specimen
+    // paths; a counted grant that re-rolled anything per unit would show up
+    // here as more than the one tier roll plus one rarity roll.
+    const { sim, a, mob } = setup(5);
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      sim.harvestCorpse(mob.id, ['fang'], a);
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    // Never vacuous: this seed really does reach the multi-unit signed arm.
+    expect(sim.countItem('wolf_fang', a)).toBe(3);
+    expect(draws).toBe(2);
+  });
+
+  it('grants exactly the units its own downgrade fallback would, signed (seed 5, fang)', () => {
+    // Same seed, same corpse, same roll: the ONLY difference between the two
+    // runs is whether the bags can hold the instance. Rolling rare must not
+    // cost the player units, so the two counts have to agree.
+    const roomy = setup(5);
+    roomy.sim.harvestCorpse(roomy.mob.id, ['fang'], roomy.a);
+    const signedSlot = roomy.internals.players
+      .get(roomy.a)!
+      .inventory.find((s) => s.itemId === 'wolf_fang');
+    // The premium arm really is the one under test: the units landed stamped.
+    expect(signedSlot?.instance?.signer).toBe('Alpha');
+    const signedQty = roomy.sim.countItem('wolf_fang', roomy.a);
+
+    const full = setup(5);
+    fillBags(full.sim, full.internals, full.a);
+    const m = full.internals.players.get(full.a)!;
+    m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
+    expect(m.inventory.length).toBe(bagCapacity(m.bags));
+    full.sim.harvestCorpse(full.mob.id, ['fang'], full.a);
+    expect(m.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance)).toBe(false);
+    // Minus the unit seeded into the partial stack the fallback tops up.
+    const downgradedQty = full.sim.countItem('wolf_fang', full.a) - 1;
+
+    expect(signedQty).toBe(downgradedQty);
+    // Bound to the roll's own tier quantity too, so a future change that made
+    // BOTH arms grant one unit could not pass the equality above alone.
+    expect(downgradedQty).toBe(3);
+  });
+
+  it('grants the whole rolled quantity into ONE signed slot, never a unit per slot (seed 5)', () => {
+    // A mergeable signer payload stacks (#1165), so three units are one slot,
+    // not three: the counted grant must not cost the player bag space that a
+    // plain grant of the same size would not.
+    const { sim, internals, a, mob } = setup(5);
+    const m = internals.players.get(a)!;
+    const before = m.inventory.length;
+    sim.drainEvents();
+    sim.harvestCorpse(mob.id, ['fang'], a);
+    const signed = m.inventory.filter((s) => s.itemId === 'wolf_fang');
+    expect(signed).toHaveLength(1);
+    expect(signed[0].count).toBe(3);
+    expect(m.inventory.length).toBe(before + 1);
+    // The slot's count is the ledger's count is the roll: bound to the event
+    // rather than to the literal alone, so a change that moved the grant and
+    // the report together could not pass by agreeing with itself.
+    const result = sim
+      .drainEvents()
+      .find((e): e is Extract<typeof e, { type: 'harvestResult' }> => e.type === 'harvestResult');
+    expect(result?.yields).toEqual([
+      { itemId: 'wolf_fang', qty: signed[0].count, rarity: 'rare', kind: 'signed' },
+    ]);
+  });
+
+  it('the cloth family carries its rolled quantity the same way (seed 5)', () => {
+    // The second specimen-less family, so the fix is the ARM's behavior and not
+    // a fang-shaped special case. Its roll is TWO where the fang above is
+    // three, which is what proves the count is read off the roll.
+    const { sim, internals, a } = setup(5);
+    const template = MOBS.vale_bandit;
+    const corpse = createMob(7775, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    corpse.dead = true;
+    corpse.aiState = 'dead';
+    corpse.corpseTimer = 9999;
+    corpse.respawnTimer = 9999;
+    internals.entities.set(corpse.id, corpse);
+    sim.harvestCorpse(corpse.id, ['cloth'], a);
+    const slot = internals.players.get(a)!.inventory.find((s) => s.itemId === 'homespun_cloth');
+    expect(slot?.instance?.signer).toBe('Alpha');
+    expect(slot?.count).toBe(2);
+    // The two families really do land on different counts, so neither literal
+    // can be a constant the arm hardcoded.
+    const fang = setup(5);
+    fang.sim.harvestCorpse(fang.mob.id, ['fang'], fang.a);
+    expect(fang.sim.countItem('wolf_fang', fang.a)).not.toBe(slot?.count);
+  });
+
+  it('refuses the signature when only PART of the rolled quantity fits, never overflowing', () => {
+    // The state a "grant plainQty whenever ONE copy fits" fix would break, and
+    // the reason the guard counts the WHOLE quantity: zero free slots and a
+    // same-signer stack with room for exactly one unit LESS than the roll. Two
+    // units would merge and the third would push a fresh slot past capacity
+    // (#2139), so the grant takes the plain fallback and its mark-lost toast
+    // instead. The signature truncates, the yield does not: the same contract
+    // the zero-merge-room boundary above follows.
+    //
+    // Seeded ONE short of the roll on purpose. At any looser distance a guard
+    // that asked for `plainQty - 1` (or for a hardcoded 2) would refuse here
+    // too and the case could not tell it from the real one; at exactly
+    // plainQty - 1 that guard accepts, merges two, opens a slot, and overflows
+    // the bag to 17 of 16. The accept side of the same boundary is the case
+    // below.
+    const { sim, internals, a, mob } = setup(5);
+    fillBags(sim, internals, a);
+    const m = internals.players.get(a)!;
+    const cap = bagCapacity(m.bags);
+    const stack = stackSizeOf(ITEMS.wolf_fang);
+    m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
+    m.inventory[1] = { itemId: 'wolf_fang', count: stack - 2, instance: { signer: 'Alpha' } };
+    expect(m.inventory.length).toBe(cap);
+    sim.drainEvents();
+    sim.harvestCorpse(mob.id, ['fang'], a);
+    expect(mob.harvestClaimedBy).toBe(a);
+    expect(m.inventory.length).toBe(cap);
+    // Untouched: a partially-landed signed grant is not a thing.
+    expect(m.inventory[1].count).toBe(stack - 2);
+    // The yield still arrived WHOLE, through the plain stack's reserved room.
+    expect(m.inventory[0].count).toBe(4);
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toEqual([
+      { type: 'gatherDowngrade', pid: a, surface: 'corpse', lost: 'mark' },
+    ]);
+  });
+
+  it('takes the signature when the merge room EXACTLY covers the roll (seed 5)', () => {
+    // The accept side of the same boundary, one unit up from the case above:
+    // room for exactly three against a three-unit roll. A guard that asked for
+    // one unit more than the roll would refuse here and quietly cost players
+    // signatures they earned, which no other case in the suite can see.
+    const { sim, internals, a, mob } = setup(5);
+    fillBags(sim, internals, a);
+    const m = internals.players.get(a)!;
+    const cap = bagCapacity(m.bags);
+    const stack = stackSizeOf(ITEMS.wolf_fang);
+    m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
+    m.inventory[1] = { itemId: 'wolf_fang', count: stack - 3, instance: { signer: 'Alpha' } };
+    expect(m.inventory.length).toBe(cap);
+    sim.drainEvents();
+    sim.harvestCorpse(mob.id, ['fang'], a);
+    expect(m.inventory.length).toBe(cap);
+    // The whole roll merged into the same-signer stack, filling it exactly.
+    expect(m.inventory[1].count).toBe(stack);
+    expect(m.inventory[1].instance?.signer).toBe('Alpha');
+    // The plain stack was never touched: the signature took the whole yield.
+    expect(m.inventory[0].count).toBe(1);
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toHaveLength(0);
+  });
+
+  it('a partial-merge spill can cost a pending specimen its slot, deliberately (seed 11)', () => {
+    // The one behavior #2473 trades away, pinned so it stays a decision. With
+    // partial same-signer merge room the counted grant needs a fresh slot
+    // where the one-unit grant it replaced merged for free, so on a corpse
+    // that procs a specimen too the last free slot goes to the component and
+    // the jackpot truncates with its lost: 'find' notice. The component wins
+    // that slot because its loop runs first, not because it holds a claim on
+    // it: the pre-gate reserves PLAIN room, which a signed instance can never
+    // spend. THIS bag has no plain fang stack, so refusing the signature would
+    // route the fallback's uncapped addItem to the same slot and lose the mark
+    // for nothing. The sibling case below is the other half, where refusing
+    // WOULD have saved the jackpot and the trade is still taken.
+    const stack = stackSizeOf(ITEMS.wolf_fang);
+    const { sim, internals, a, mob } = setup(11);
+    const m = internals.players.get(a)!;
+    const cap = bagCapacity(m.bags);
+    // Exactly ONE free slot, and a same-signer fang stack one unit short of
+    // the roll, so the signed grant merges what it can and spills.
+    fillBags(sim, internals, a);
+    m.inventory[0] = { itemId: 'rough_hide', count: 14 };
+    m.inventory[1] = { itemId: 'wolf_fang', count: stack - 1, instance: { signer: 'Alpha' } };
+    m.inventory.pop();
+    expect(m.inventory.length).toBe(cap - 1);
+    sim.drainEvents();
+    sim.harvestCorpse(mob.id, undefined, a);
+    const events = sim.drainEvents();
+    // The signature landed whole, across the filled stack and the free slot.
+    expect(m.inventory.length).toBe(cap);
+    expect(sim.countItem('wolf_fang', a)).toBe(stack - 1 + 2);
+    expect(m.inventory.every((s) => s.itemId !== 'wolf_fang' || !!s.instance)).toBe(true);
+    // ... and the jackpot had nowhere left to go, so it truncated and said so.
+    expect(m.inventory.some((s) => s.itemId === 'pristine_hide')).toBe(false);
+    expect(events.filter((e) => e.type === 'gatherDowngrade')).toEqual([
+      { type: 'gatherDowngrade', pid: a, surface: 'corpse', lost: 'find' },
+    ]);
+  });
+
+  it('and it costs the specimen even when a plain stack could have taken the yield', () => {
+    // The refuting half of the case above, and the one the trade is actually
+    // argued on: the same spill, but with a PLAIN fang stack holding room for
+    // the whole roll. Refusing the signature here would have parked the yield
+    // in that stack for free and left the slot to the jackpot, so this is the
+    // state where holding back would genuinely have saved a Pristine Hide. It
+    // is still not held back, because a rule that refuses whenever a jackpot
+    // is pending costs tens of signatures for each specimen it saves. Pinning
+    // the losing side too, so the trade cannot be mistaken for an oversight.
+    const stack = stackSizeOf(ITEMS.wolf_fang);
+    const { sim, internals, a, mob } = setup(11);
+    const m = internals.players.get(a)!;
+    const cap = bagCapacity(m.bags);
+    fillBags(sim, internals, a);
+    m.inventory[0] = { itemId: 'rough_hide', count: 14 };
+    m.inventory[1] = { itemId: 'wolf_fang', count: 14 };
+    m.inventory[2] = { itemId: 'wolf_fang', count: stack - 1, instance: { signer: 'Alpha' } };
+    m.inventory.pop();
+    expect(m.inventory.length).toBe(cap - 1);
+    sim.drainEvents();
+    sim.harvestCorpse(mob.id, undefined, a);
+    const events = sim.drainEvents();
+    // The signature took the free slot: the plain stack it could have merged
+    // into on the downgrade arm is untouched.
+    expect(m.inventory.length).toBe(cap);
+    expect(m.inventory[1].count).toBe(14);
+    expect(m.inventory[2].count).toBe(stack);
+    // ... and the jackpot paid for it.
+    expect(m.inventory.some((s) => s.itemId === 'pristine_hide')).toBe(false);
+    expect(events.filter((e) => e.type === 'gatherDowngrade')).toEqual([
+      { type: 'gatherDowngrade', pid: a, surface: 'corpse', lost: 'find' },
+    ]);
+  });
+});
+
+// #2474: a corpse is single-use, so the family a repeated tag names must be
+// harvested ONCE however many times the frame repeats it. The pick reaches the
+// sim straight off the wire (server/game.ts type-filters `components` and
+// forwards it), and before the dedupe a hand-crafted ['hide','hide'] rolled,
+// granted and logged the hide family twice off one claim, signed Pristine Hides
+// included. Driven end to end here (rolls, grants, ledger, claim, lifecycle),
+// not just at the pure boundary in tests/gathering.test.ts.
+describe('a repeated component tag harvests the family once (#2474)', () => {
+  // Same seed, same corpse template, one command each: the duplicated pick must
+  // land the deduped pick's world, exactly.
+  function harvestWith(
+    templateId: string,
+    components: string[],
+    seed: number,
+  ): { inventory: unknown; events: unknown; draws: number; claimedBy: number | null } {
+    const { sim, internals, a } = setup(seed);
+    const template = MOBS[templateId];
+    const corpse = createMob(7774, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    corpse.dead = true;
+    corpse.aiState = 'dead';
+    corpse.corpseTimer = 9999;
+    corpse.respawnTimer = 9999;
+    internals.entities.set(corpse.id, corpse);
+    sim.drainEvents();
+    let draws = 0;
+    const rng = (sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }).rng;
+    rng.setObserver(() => {
+      draws++;
+    });
+    sim.harvestCorpse(corpse.id, components, a);
+    rng.setObserver(null);
+    return {
+      inventory: structuredClone(internals.players.get(a)!.inventory),
+      events: sim.drainEvents(),
+      draws,
+      claimedBy: corpse.harvestClaimedBy,
+    };
+  }
+
+  // wild_boar tags hide/tusk/meat: three tags, so a two-entry pick stays under
+  // the spread threshold and lands on the arm that used to hand the duplicate
+  // straight through. old_greyjaw (hide/fang/claw) is the same arm one tag map
+  // over. forest_wolf tags hide/fang: two tags, so ['hide','hide'] used to
+  // clear `>= tagged.length` and spread onto fang instead.
+  // `tags` is pinned per row, not just described: the arm a row exercises is
+  // decided by the corpse's tag COUNT against the two-entry pick, so a content
+  // retag would slide a row onto the other arm while the table still claimed to
+  // cover both. Pinning the tags here is what keeps the matrix honest.
+  const CASES: { templateId: string; tag: string; arm: string; tags: string[] }[] = [
+    { templateId: 'wild_boar', tag: 'hide', arm: 'concentrate', tags: ['hide', 'tusk', 'meat'] },
+    { templateId: 'wild_boar', tag: 'meat', arm: 'concentrate', tags: ['hide', 'tusk', 'meat'] },
+    { templateId: 'old_greyjaw', tag: 'fang', arm: 'concentrate', tags: ['hide', 'fang', 'claw'] },
+    { templateId: 'forest_wolf', tag: 'hide', arm: 'spread threshold', tags: ['hide', 'fang'] },
+    { templateId: 'forest_wolf', tag: 'fang', arm: 'spread threshold', tags: ['hide', 'fang'] },
+  ];
+
+  it('covers both arms for real: each row is the corpse shape it claims to be', () => {
+    for (const c of CASES) {
+      expect(MOBS[c.templateId].componentTags, `${c.templateId} tags`).toEqual(c.tags);
+      expect(c.tags, `${c.templateId} ${c.tag} is on the corpse`).toContain(c.tag);
+      // A two-entry pick is under the spread threshold only while the corpse
+      // carries MORE than two tags; at exactly two it clears `>= tagged.length`.
+      const arm = c.tags.length > 2 ? 'concentrate' : 'spread threshold';
+      expect(arm, `${c.templateId} ${c.tag} arm`).toBe(c.arm);
+    }
+    expect(CASES.map((c) => c.arm)).toContain('concentrate');
+    expect(CASES.map((c) => c.arm)).toContain('spread threshold');
+  });
+
+  it('grants exactly what the single tag grants, on the same seed, on both arms', () => {
+    for (const c of CASES) {
+      for (const seed of [2, 5, 11]) {
+        const label = `${c.templateId} ${c.tag} (${c.arm}) @${seed}`;
+        const dup = harvestWith(c.templateId, [c.tag, c.tag], seed);
+        const once = harvestWith(c.templateId, [c.tag], seed);
+        // The whole observable result of the command: what landed in the bags,
+        // every event it emitted (the harvestResult ledger included), and how
+        // much rng it spent doing it.
+        expect(dup.inventory, `${label} inventory`).toEqual(once.inventory);
+        expect(dup.events, `${label} events`).toEqual(once.events);
+        expect(dup.draws, `${label} draws`).toEqual(once.draws);
+        // An absolute floor under that equality, so a mis-wired observer
+        // reading 0 on both sides cannot pass: one mapped family costs exactly
+        // one tier roll plus one rarity roll, on every row.
+        expect(once.draws, `${label} single-pick draws`).toBe(2);
+        // ... and the claim is still spent exactly once, by the harvester.
+        expect(dup.claimedBy, `${label} claim`).toBe(once.claimedBy);
+        expect(dup.claimedBy, `${label} claim is the harvester`).not.toBeNull();
+      }
+    }
+  });
+
+  it('never mints a second signed Pristine Hide off one claim (seed 11, the issue case)', () => {
+    // The headline harm the issue reports, at the one state that actually
+    // reaches it. Pre-fix, seed 11 rolled rare-or-better on BOTH of the
+    // duplicate's rarity rolls and handed out two Pristine Hides plus 6
+    // rough_hide off a single-use corpse; nothing else in this suite exercises
+    // the doubled SIGNED arm, which is the valuable half of the exploit
+    // (a non-fungible, signer-stamped item, minted twice from one claim).
+    // Post-fix the repeat lands the single tag's world exactly: no specimen,
+    // 4 hides, one claim.
+    const { sim, internals, a } = setup(11);
+    const template = MOBS.wild_boar;
+    const corpse = createMob(7769, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    corpse.dead = true;
+    corpse.aiState = 'dead';
+    corpse.corpseTimer = 9999;
+    corpse.respawnTimer = 9999;
+    internals.entities.set(corpse.id, corpse);
+    sim.harvestCorpse(corpse.id, ['hide', 'hide'], a);
+    expect(sim.countItem('pristine_hide', a)).toBe(0);
+    expect(sim.countItem('rough_hide', a)).toBe(4);
+    // Signed instances never merge into a plain stack, so a doubled jackpot
+    // would show up as instance slots, not as a bigger count.
+    expect(
+      internals.players.get(a)!.inventory.filter((s) => s.instance?.signer === 'Alpha'),
+    ).toHaveLength(0);
+  });
+
+  it('rolls and grants the family ONE time, not once per repeat (seed 5, absolute counts)', () => {
+    // The equality above would also pass if both sides were wrong together, so
+    // the quantities are pinned to literals here. At this seed the deduped
+    // single roll clears the signable floor, so the specimen below is the
+    // ORDINARY one-family jackpot, not a doubled one: pre-fix the same command
+    // rolled twice at a lower concentration bonus and came back with 8 plain
+    // hides and no specimen at all. Both numbers move under a revert, which is
+    // what makes them decisive. The doubled-specimen state has its own case
+    // above, at the seed that actually reaches it.
+    const { sim, internals, a } = setup(5);
+    const template = MOBS.wild_boar;
+    const corpse = createMob(7773, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    corpse.dead = true;
+    corpse.aiState = 'dead';
+    corpse.corpseTimer = 9999;
+    corpse.respawnTimer = 9999;
+    internals.entities.set(corpse.id, corpse);
+    expect(template.componentTags).toEqual(['hide', 'tusk', 'meat']);
+    sim.drainEvents();
+    sim.harvestCorpse(corpse.id, ['hide', 'hide'], a);
+    // Two draws is one family's worth (tier roll + rarity roll); four was the
+    // bug. Read off the ledger the client actually prints, which carries one
+    // entry per distinct granted item.
+    const result = sim
+      .drainEvents()
+      .filter((e): e is Extract<typeof e, { type: 'harvestResult' }> => e.type === 'harvestResult');
+    expect(result).toHaveLength(1);
+    expect(result[0].yields.map((y) => y.itemId).sort()).toEqual(['pristine_hide', 'rough_hide']);
+    // The QUANTITY on that entry, not its count: recordHarvestYield merges
+    // same-item grants, so the doubled harvest also produced exactly one
+    // rough_hide row, just carrying 8 instead of 4. Only the number can tell
+    // the two apart.
+    expect(result[0].yields.find((y) => y.itemId === 'rough_hide')?.qty).toBe(4);
+    expect(sim.countItem('rough_hide', a)).toBe(4);
+    expect(sim.countItem('pristine_hide', a)).toBe(1);
+    const meta = internals.players.get(a)!;
+    expect(meta.inventory.filter((s) => s.itemId === 'pristine_hide')).toHaveLength(1);
+    // Nothing from the tags the caller never named.
+    expect(sim.countItem('game_meat', a)).toBe(0);
+  });
+
+  it('a repeat cannot pull in a tag the caller never asked for (spread threshold, seed 5)', () => {
+    // forest_wolf tags hide and fang, so ['hide','hide'] used to clear
+    // `chosen.length >= tagged.length` and spread across BOTH families at the
+    // zero concentration bonus a real two-tag pick earns. The fang line is the
+    // decisive one: a dedupe that ran after the length test would still grant it.
+    const { sim, mob, a } = setup(5);
+    expect(MOBS.forest_wolf.componentTags).toEqual(['hide', 'fang']);
+    sim.harvestCorpse(mob.id, ['hide', 'hide'], a);
+    expect(sim.countItem('rough_hide', a)).toBeGreaterThan(0);
+    expect(sim.countItem('wolf_fang', a)).toBe(0);
+  });
+
+  it('a repeat inside a MULTI-family pick collapses only its own family', () => {
+    // The mixed case: the other tags in the same frame must still be harvested,
+    // in the order they were named. wild_boar's tusk maps to no item, so hide
+    // and meat are the two that land.
+    const { sim, internals, a } = setup(5);
+    const template = MOBS.wild_boar;
+    const corpse = createMob(7772, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    corpse.dead = true;
+    corpse.aiState = 'dead';
+    corpse.corpseTimer = 9999;
+    corpse.respawnTimer = 9999;
+    internals.entities.set(corpse.id, corpse);
+    sim.drainEvents();
+    sim.harvestCorpse(corpse.id, ['meat', 'hide', 'meat'], a);
+    const result = sim
+      .drainEvents()
+      .filter((e): e is Extract<typeof e, { type: 'harvestResult' }> => e.type === 'harvestResult');
+    expect(result).toHaveLength(1);
+    // Ledger order follows the pick's first-occurrence order, meat before hide,
+    // which is also the chat-line order the player reads (#2457).
+    expect(result[0].yields.map((y) => y.itemId)).toEqual(['game_meat', 'rough_hide']);
+    expect(
+      internals.players.get(a)!.inventory.filter((s) => s.itemId === 'game_meat'),
+    ).toHaveLength(1);
+  });
+
+  it('leaves the corpse lifecycle exactly where a single-tag harvest leaves it', () => {
+    // The claim is single-use whatever the frame said: the repeat spends it
+    // once, the corpse is denied to everyone after, and the harvested-corpse
+    // timer clamp is the same one the deduped pick produces.
+    const { sim, mob, a, b } = setup(11);
+    const once = setup(11);
+    expect(mob.corpseTimer).toBe(9999);
+    sim.harvestCorpse(mob.id, ['hide', 'hide'], a);
+    once.sim.harvestCorpse(once.mob.id, ['hide'], once.a);
+    expect(mob.harvestClaimedBy).toBe(a);
+    // Literals, not only the twin comparison: two runs of the same post-fix
+    // path move together, so an equality alone cannot fail. This corpse carries
+    // no loot, so the harvest takes the collapse arm and clamps the timer to 4.
+    expect(mob.corpseTimer).toBe(4);
+    expect(mob.corpseTimer).toBe(once.mob.corpseTimer);
+    // `lootable` is pinned against the arm that decides it rather than against
+    // the twin: this corpse has no loot, so it takes the collapse arm and ends
+    // false. Compared to the twin alone the line would hold even if the command
+    // never ran, since a createMob corpse starts out unlootable.
+    expect(mob.loot).toBeNull();
+    expect(mob.lootable).toBe(false);
+    expect(mob.lootable).toBe(once.mob.lootable);
+    // A second command, repeated tag or not, is denied against the same corpse.
+    sim.harvestCorpse(mob.id, ['hide', 'hide'], b);
+    expect(mob.harvestClaimedBy).toBe(a);
+  });
+
+  it('reserves ONE family of stack room, so a repeat no longer over-reserves the gate', () => {
+    // The boundary this fix actually MOVES, and the reason the pre-claim gate
+    // and the roll have to agree: the gate reserves the most a component can
+    // roll, so the duplicated pick used to ask for two families' worth (12
+    // rough_hide, 2 x the legendary tier quantity) where one was ever granted.
+    // A bag holding room for exactly one family therefore refused the repeat
+    // outright while accepting the identical single-tag pick. Both now behave
+    // the same, which is the whole contract.
+    const stack = stackSizeOf(ITEMS.rough_hide);
+    const rig = (components: string[]) => {
+      const { sim, internals, a } = setup(5);
+      const template = MOBS.wild_boar;
+      const corpse = createMob(7771, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+      corpse.dead = true;
+      corpse.aiState = 'dead';
+      corpse.corpseTimer = 9999;
+      corpse.respawnTimer = 9999;
+      internals.entities.set(corpse.id, corpse);
+      const m = internals.players.get(a)!;
+      fillBags(sim, internals, a);
+      // Zero free slots, and stack room for exactly one family's top roll.
+      m.inventory[0] = { itemId: 'rough_hide', count: stack - 6 };
+      let draws = 0;
+      const rng = (sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } })
+        .rng;
+      rng.setObserver(() => {
+        draws++;
+      });
+      sim.harvestCorpse(corpse.id, components, a);
+      rng.setObserver(null);
+      return {
+        claimedBy: corpse.harvestClaimedBy,
+        hides: sim.countItem('rough_hide', a),
+        draws,
+      };
+    };
+    const dup = rig(['hide', 'hide']);
+    const once = rig(['hide']);
+    // The single pick has always fit here, so this is the decisive half: the
+    // repeat has to reach the same harvested state, not the refusal it used to
+    // get. Absolute values, not just equality, so both sides cannot be wrong.
+    expect(once.claimedBy).not.toBeNull();
+    expect(once.draws).toBe(2);
+    expect(dup.claimedBy).toBe(once.claimedBy);
+    expect(dup.draws).toBe(once.draws);
+    expect(dup.hides).toBe(once.hides);
+    expect(dup.hides).toBe(stack - 6 + 4);
+  });
+
+  it('draws NO rng when refused, on every refusal arm, repeat or not', () => {
+    // A refused command must not shift the world's draw order for everyone
+    // else. Both source comments state that as a hard determinism contract and
+    // nothing pinned it, and this change is what moved the gate that decides
+    // one of these arms, so it is pinned here across all five.
+    const refusals: {
+      label: string;
+      arrange: (rig: ReturnType<typeof setup>) => number;
+    }[] = [
+      {
+        label: 'full bags (the pre-claim capacity gate)',
+        arrange: ({ sim, internals, a, mob }) => {
+          fillBags(sim, internals, a);
+          return mob.id;
+        },
+      },
+      {
+        label: 'too far away',
+        arrange: ({ internals, a, mob }) => {
+          internals.entities.get(a)!.pos = { x: 500, y: 0, z: 0 };
+          return mob.id;
+        },
+      },
+      {
+        label: 'the corpse is already claimed',
+        arrange: ({ mob, b }) => {
+          mob.harvestClaimedBy = b;
+          return mob.id;
+        },
+      },
+      {
+        label: 'the harvester is dead',
+        arrange: ({ internals, a, mob }) => {
+          internals.entities.get(a)!.dead = true;
+          return mob.id;
+        },
+      },
+      {
+        label: 'the corpse carries no component tags',
+        arrange: ({ internals }) => {
+          const template = MOBS.warlock_imp;
+          const corpse = createMob(7770, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+          corpse.dead = true;
+          corpse.aiState = 'dead';
+          corpse.corpseTimer = 9999;
+          corpse.respawnTimer = 9999;
+          internals.entities.set(corpse.id, corpse);
+          return corpse.id;
+        },
+      },
+      {
+        // The sixth early return, and the only one that refuses SILENTLY (no
+        // error text): the target is not a dead mob. "Every arm" has to mean
+        // every arm, so the live mob and the unknown id are both here.
+        label: 'the target mob is still alive',
+        arrange: ({ mob }) => {
+          mob.dead = false;
+          mob.aiState = 'idle';
+          return mob.id;
+        },
+      },
+      {
+        label: 'the target id is not an entity at all',
+        arrange: () => 4242,
+      },
+    ];
+    for (const arm of refusals) {
+      for (const components of [['hide', 'hide'], ['hide']]) {
+        const rig = setup(5);
+        const mobId = arm.arrange(rig);
+        let draws = 0;
+        const rng = (
+          rig.sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }
+        ).rng;
+        rng.setObserver(() => {
+          draws++;
+        });
+        rig.sim.harvestCorpse(mobId, components, rig.a);
+        rng.setObserver(null);
+        const label = `${arm.label} ${JSON.stringify(components)}`;
+        expect(draws, `${label} draws`).toBe(0);
+        expect(rig.sim.countItem('rough_hide', rig.a), `${label} yield`).toBe(0);
+      }
+    }
   });
 });
 
@@ -1197,5 +1797,104 @@ describe('harvestCorpse omitted components over the wire', () => {
     const spy = vi.spyOn(server.sim, 'harvestCorpse').mockImplementation(() => {});
     (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
     expect(spy).toHaveBeenCalledWith(4242, ['hide'], session.pid);
+  });
+});
+
+// #2474 over the wire. The `components` array is a client-supplied value the
+// authoritative server acts on, and no shipped client sends a repeat (the loot
+// window's picker and the interact key both build unique tags), so the only way
+// in is a hand-crafted frame. This drives exactly that frame through a REAL
+// GameServer into the REAL sim, because the wire is where the untrusted value
+// enters and a fix that only held for a direct sim call would not close it.
+// Two servers, one command each: GameServer pins a constant WORLD_SEED and
+// neither run ticks, so the two worlds are byte-identical at harvest time and
+// any difference in the result is the pick.
+describe('a repeated component tag over the wire, through a real GameServer (#2474)', () => {
+  function serverHarvest(components: string[]): {
+    raw: string;
+    inventory: { itemId: string; count: number; instance?: unknown }[];
+    hides: number;
+    draws: number;
+    claimedBy: number | null;
+  } {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 93, 'Alpha');
+    const internals = server.sim as unknown as SimInternals;
+    const self = internals.entities.get(session.pid)!;
+    self.pos = { x: 0, y: 0, z: 0 };
+    self.prevPos = { x: 0, y: 0, z: 0 };
+    // wild_boar tags hide/tusk/meat: three tags, so a two-entry pick stays
+    // under the spread threshold and lands on the arm that used to hand the
+    // repeat through to the roll loop.
+    const template = MOBS.wild_boar;
+    const mobId = Math.max(...internals.entities.keys()) + 1;
+    const mob = createMob(mobId, template, template.maxLevel, { x: 2, y: 0, z: 0 });
+    mob.dead = true;
+    mob.aiState = 'dead';
+    mob.corpseTimer = 9999;
+    mob.respawnTimer = 9999;
+    internals.entities.set(mob.id, mob);
+    // A hand-built frame, the untrusted shape the issue reproduces with, parsed
+    // and dispatched exactly as a socket message is. `t: 'cmd'` is the real
+    // envelope (ClientWorld.rawCmd); without it the dispatcher drops the frame
+    // as a protocol anomaly and the test would pass on an unharvested corpse.
+    const raw = JSON.stringify({ t: 'cmd', cmd: 'harvestCorpse', id: mobId, components });
+    let draws = 0;
+    const rng = (
+      server.sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }
+    ).rng;
+    rng.setObserver(() => {
+      draws++;
+    });
+    (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
+    rng.setObserver(null);
+    return {
+      raw,
+      inventory: structuredClone(internals.players.get(session.pid)!.inventory),
+      hides: server.sim.countItem('rough_hide', session.pid),
+      draws,
+      claimedBy: mob.harvestClaimedBy,
+    };
+  }
+
+  it('lands the same bags a single tag lands, and spends the claim once', () => {
+    const dup = serverHarvest(['hide', 'hide']);
+    const once = serverHarvest(['hide']);
+    // The frame really carried the repeat: the assertion below is about the
+    // sim collapsing it, not about the payload never arriving.
+    expect(dup.raw).toContain('["hide","hide"]');
+    // Not a vacuous comparison of two empty bags: the harvest actually yielded.
+    expect(once.hides).toBeGreaterThan(0);
+    expect(dup.hides).toBe(once.hides);
+    expect(dup.inventory).toEqual(once.inventory);
+    expect(dup.claimedBy).not.toBeNull();
+    expect(dup.claimedBy).toBe(once.claimedBy);
+    // The most decisive pin available over the wire, and the one the bags
+    // alone cannot make: rolls are what a doubled harvest actually spent. One
+    // family costs two draws (tier roll plus rarity roll); the repeat used to
+    // cost four, so this is a literal, not an equality that could hold at any
+    // value.
+    expect(dup.draws).toBe(2);
+    expect(once.draws).toBe(2);
+  });
+
+  it('forwards the repeat verbatim: the SIM boundary is what closes it, not the server', () => {
+    // Deliberate, and the reason the fix lives in effectiveFocusComponents: the
+    // offline Sim and the headless env call the same command without ever
+    // passing through server/game.ts, so sanitizing here would have left both
+    // hosts open. If a future change starts deduping on the server too, this
+    // test is the one that should be re-argued, not quietly deleted.
+    const server = new GameServer();
+    const session = joinServer(server, fakeWs(), 94, 'Alpha');
+    const raw = JSON.stringify({
+      t: 'cmd',
+      cmd: 'harvestCorpse',
+      id: 4242,
+      components: ['hide', 'hide'],
+    });
+    const spy = vi.spyOn(server.sim, 'harvestCorpse').mockImplementation(() => {});
+    (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
+    expect(spy).toHaveBeenCalledWith(4242, ['hide', 'hide'], session.pid);
   });
 });

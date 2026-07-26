@@ -5060,6 +5060,10 @@ export class Hud {
     // The keyed-pool party rows reuse their DOM, so a rebuild never re-runs t() on
     // their badge tooltips / leave label; re-localize them in place on a switch.
     this.partyFramesPainter.relocalize();
+    // The world map rasterizes its labels into sprites keyed on the RESOLVED
+    // string, so a switch can never draw the old language; clearing is about not
+    // carrying dead rasters in the sprite budget.
+    this.mapPainter.relocalize();
     // The unit-frame move/lock buttons' labels are set once at construction + on
     // toggle, so re-localize them in place on a language switch (same reason as
     // the party rows above).
@@ -9173,8 +9177,12 @@ export class Hud {
             this.lootRolls.closeForItem(ev.text);
           // silent: the audio half of the same idea, and independent of it (a
           // caller can own the cue without owning the line). A professions
-          // grant with its own dedicated cue sets this so the generic ding
-          // doesn't stack on top of it.
+          // grant sets this when it owns the cue for the same grant: it has a
+          // dedicated one and the generic ding would stack on top, or it
+          // replays that same ding itself exactly once for a whole multi-item
+          // command (the harvestResult arm below), or its result event is
+          // cue-free by contract and the ding would be the only sound at all
+          // (the Maker's Bond unbind, #2458).
           if (!ev.silent) {
             if (
               ev.text.includes('loot') ||

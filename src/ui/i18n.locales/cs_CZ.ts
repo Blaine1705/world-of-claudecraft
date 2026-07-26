@@ -8223,7 +8223,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Karta',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': 'Sleva 20 %',
+  'hudChrome.claudium.railWocDiscount': 'Sleva {percent} %',
   'hudChrome.claudium.railWocUnavailable': 'Cena ve WOC nyní není dostupná.',
   'hudChrome.claudium.showAmounts': 'Zobrazit všechny nabídky Claudium',
   'hudChrome.claudium.skuRow': '{claudium} Claudium za {usd}',

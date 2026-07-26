@@ -8276,7 +8276,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Kartu',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': 'Diskon 20%.',
+  'hudChrome.claudium.railWocDiscount': 'Diskon {percent}%.',
   'hudChrome.claudium.railWocUnavailable': 'Harga WOC tidak tersedia saat ini.',
   'hudChrome.claudium.showAmounts': 'Tampilkan semua jumlah Claudium',
   'hudChrome.claudium.skuRow': '{usd} untuk {claudium} Claudium',

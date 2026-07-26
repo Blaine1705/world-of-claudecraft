@@ -666,7 +666,7 @@ export const ko_KR: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% 할인",
+      "railWocDiscount": "{percent}% 할인",
       "railWocUnavailable": "현재 WOC 가격을 이용할 수 없습니다.",
       "railNativeUnavailable": "SOL/WOC 사용 불가",
       "amountLabel": "수량",
