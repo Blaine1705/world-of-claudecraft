@@ -1,6 +1,6 @@
 // Restored from the pre-revert payload (f274835b1^) and adapted to the current
 // model: block rides the same one-roll hit table as parry (warriorMeleeDefense),
-// gated to warriors holding a shield, front-arc only. blockChance/blockValue
+// gated to shield-eligible classes holding a shield, front-arc only. blockChance/blockValue
 // live on the entity (entity.ts recalc: SHIELD_BLOCK_BASE with a shield); there
 // is no entity.parryChance to zero anymore, so these tests pin the rng roll
 // into the block window instead.
@@ -101,7 +101,7 @@ describe('shield block', () => {
     player.facing = 0; // facing the mob: block applies
     sim.drainEvents();
     sim.mobSwing(mob, player);
-    const front = damageEvents(sim.drainEvents()).find((e) => e.kind === 'hit');
+    const front = damageEvents(sim.drainEvents()).find((e) => e.kind === 'block');
     expect(front?.amount).toBe(14); // 20 - blockValue 6
 
     player.facing = Math.PI; // mob behind: warriorMeleeDefense zeroes the block
@@ -133,7 +133,7 @@ describe('shield block', () => {
 
     sim.drainEvents();
     expect(meleeSwing(sim.ctx, attacker, defender, 0, null, { cannotBeDodged: true })).toBe(true);
-    const front = damageEvents(sim.drainEvents()).find((e) => e.kind === 'hit');
+    const front = damageEvents(sim.drainEvents()).find((e) => e.kind === 'block');
     expect(front?.amount).toBe(14);
 
     defender.hp = defender.maxHp;
@@ -144,7 +144,7 @@ describe('shield block', () => {
     expect(back?.amount).toBe(20);
   });
 
-  it('Paladin frontal melee block reduces a mob swing', () => {
+  it('Paladin frontal melee block emits a live block outcome on a mob swing', () => {
     const sim = new Sim({ seed: 7, playerClass: 'paladin', autoEquip: true }) as AnySim;
     const player = sim.player;
     sim.addItem('eastbrook_buckler', 1);
@@ -161,7 +161,48 @@ describe('shield block', () => {
     sim.drainEvents();
     sim.mobSwing(mob, player);
 
-    const hit = damageEvents(sim.drainEvents()).find((e) => e.kind === 'hit');
+    const hit = damageEvents(sim.drainEvents()).find((e) => e.sourceId === mob.id);
+    expect(hit?.kind).toBe('block');
     expect(hit?.amount).toBe(14);
+  });
+
+  it('Paladin without a shield and shield-ineligible classes do not block mob swings', () => {
+    const unshielded = new Sim({ seed: 7, playerClass: 'paladin', autoEquip: true }) as AnySim;
+    const paladin = unshielded.player;
+    const paladinMob = spawnMobInFront(unshielded, paladin);
+    paladin.dodgeChance = 0;
+    paladin.blockChance = 1;
+    paladin.blockValue = 0;
+    paladin.stats.armor = 0;
+    paladinMob.weapon = { min: 20, max: 20, speed: 2 };
+    paladinMob.attackPower = 0;
+    unshielded.rng.next = () => 0.9;
+
+    paladin.facing = 0;
+    unshielded.drainEvents();
+    unshielded.mobSwing(paladinMob, paladin);
+    const unshieldedHit = damageEvents(unshielded.drainEvents()).find(
+      (e) => e.sourceId === paladinMob.id,
+    );
+    expect(unshieldedHit?.kind).toBe('hit');
+    expect(unshieldedHit?.amount).toBe(20);
+
+    const rogueSim = new Sim({ seed: 7, playerClass: 'rogue', autoEquip: true }) as AnySim;
+    const rogue = rogueSim.player;
+    const rogueMob = spawnMobInFront(rogueSim, rogue);
+    rogue.dodgeChance = 0;
+    rogue.blockChance = 1;
+    rogue.blockValue = 6;
+    rogue.stats.armor = 0;
+    rogueMob.weapon = { min: 20, max: 20, speed: 2 };
+    rogueMob.attackPower = 0;
+    rogueSim.rng.next = () => 0.9;
+
+    rogue.facing = 0;
+    rogueSim.drainEvents();
+    rogueSim.mobSwing(rogueMob, rogue);
+    const rogueHit = damageEvents(rogueSim.drainEvents()).find((e) => e.sourceId === rogueMob.id);
+    expect(rogueHit?.kind).toBe('hit');
+    expect(rogueHit?.amount).toBe(20);
   });
 });

@@ -28,7 +28,7 @@ import { createMob } from '../entity';
 import { Rng } from '../rng';
 import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools } from '../sim';
 import type { SimContext } from '../sim_context';
-import { DT, type Entity, TICK_RATE } from '../types';
+import { type DamageEventKind, DT, type Entity, TICK_RATE } from '../types';
 import { teleportPoints, YUMI_TELEPORT_MIN_SEP, yumiMazeLayout } from '../yumi_maze_layout';
 import * as arenaMod from './arena';
 import { fiestaDownEntity } from './fiesta';
@@ -459,7 +459,7 @@ export function yumiCatDamaged(
   crit: boolean,
   school: string,
   ability: string | null,
-  kind: 'hit' | 'miss' | 'dodge',
+  kind: DamageEventKind,
   attackAnimationStarted = false,
 ): void {
   if (match.state !== 'active' || cat.dead) return;

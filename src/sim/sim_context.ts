@@ -45,6 +45,7 @@ import type {
   AbilityDef,
   Aura,
   CrowdControlDrCategory,
+  DamageEventKind,
   DeedStatKey,
   DelveRun,
   DungeonDifficulty,
@@ -289,7 +290,7 @@ export interface SimContextCallbacks {
     crit: boolean,
     school: string,
     ability: string | null,
-    kind: 'hit' | 'miss' | 'dodge',
+    kind: DamageEventKind,
     noRage?: boolean,
     threatOpts?: { flat?: number; mult?: number },
     direct?: boolean,
@@ -358,7 +359,7 @@ export interface SimContextCallbacks {
     crit: boolean,
     school: string,
     ability: string | null,
-    kind: 'hit' | 'miss' | 'dodge',
+    kind: DamageEventKind,
     attackAnimationStarted?: boolean,
   ): void;
   cleanupYumiMatch(match: ArenaMatch): void;

@@ -491,6 +491,7 @@ import {
   type CrowdControlDrState,
   cloneInvSlot,
   cloneItemInstancePayload,
+  type DamageEventKind,
   DELVE_COMPANION_HEAL_INTERVAL,
   type DeedStats,
   type DelveDef,
@@ -5781,7 +5782,7 @@ export class Sim {
     crit: boolean,
     school: string,
     ability: string | null,
-    kind: 'hit' | 'miss' | 'dodge',
+    kind: DamageEventKind,
     noRage = false,
     threatOpts?: { flat?: number; mult?: number },
     direct = true,
@@ -6122,11 +6123,12 @@ export class Sim {
     dmg *= this.petDamageMult(mob);
     const rawDmg = dmg; // pre-armor, post-crit/enrage — basis for cleave splash
     dmg *= 1 - armorReduction(this.effectiveArmor(target), mob.level);
-    if (blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance) {
+    const blocked = blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance;
+    if (blocked) {
       dmg = Math.max(1, dmg - target.blockValue);
     }
     const dealt = Math.max(1, Math.round(dmg));
-    this.dealDamage(mob, target, dealt, crit, 'physical', null, 'hit');
+    this.dealDamage(mob, target, dealt, crit, 'physical', null, blocked ? 'block' : 'hit');
     runMobSwingAffixes(this.ctx, mob, target, { dealt, crit, rawDmg });
   }
 

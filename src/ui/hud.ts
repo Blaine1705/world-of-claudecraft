@@ -8646,7 +8646,8 @@ export class Hud {
         if (swing && src) {
           this.combat(swing, src.pos.x, src.pos.y, src.pos.z, 1.0, { cooldown: 0.08 });
         }
-        if ((ev.absorbed ?? 0) > 0) this.combat('combat_block', tp.x, tp.y, tp.z, 0.55);
+        if ((ev.absorbed ?? 0) > 0 || ev.kind === 'block')
+          this.combat('combat_block', tp.x, tp.y, tp.z, 0.55);
         // The miss/dodge/resist/parry "avoid" cues are interface feedback (they report
         // an outcome, not a world impact), so the Interface & Feedback Sounds toggle
         // silences them. The early return stays either way, so a muted avoid never
