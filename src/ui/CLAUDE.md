@@ -83,11 +83,13 @@ Per-frame HUD code (anything reached from `Hud.update()`) holds these:
   `HOT_PAINTERS` / `CANVAS_PAINTERS`, not every module `update()` touches. `Hud.update()` also
   polls about half the `*_window.ts` painters (`spellbook_window.tickOpen()` runs every frame
   while open; arena / dungeon_finder / vale_cup / card_duel `render()` on the 250ms band; the
-  rest get `refreshIfChanged()` on the 500ms band), and those rebuild behind their OWN
-  invalidation signature, which no per-file scan can see. So a window on a poll is held to
-  the write-elision standard by review, not by the gate: keep the signature guard, and if you
-  add a genuinely per-frame write path, route it through the facet and move the module into
-  `HOT_PAINTERS`.
+  rest get `refreshIfChanged()` on the 500ms band). MOST of those rebuild behind their own
+  invalidation signature, which no per-file scan can see, and `town_focus_window` does not:
+  it repaints on the open check alone, which is the standing proof that the signature guard is
+  a convention rather than something enforced. So a window on a poll is held to the
+  write-elision standard by review, not by the gate: give it a signature guard and keep it,
+  and if you add a genuinely per-frame write path, route it through the facet and move the
+  module into `HOT_PAINTERS`.
 - **Allocation-light cores.** A per-frame view-core returns a REUSED, preallocated container +
   slots (no per-frame array/object garbage); jitter/clock stay in the painter, never the core.
   Guarded always-on by the reference-stability probe `tests/util/alloc_probe.ts`.

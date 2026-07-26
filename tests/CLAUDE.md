@@ -88,8 +88,10 @@ use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
   sanctioned painter names (`*_painter.ts` and `*_window.ts`): a painter is facet-routed
   (`HOT_PAINTERS`, no raw per-frame write and no forced-reflow read), canvas
   (`CANVAS_PAINTERS`, same scans plus an identity proof that it really draws on a 2D context),
-  or cold, the registration-free default for a window (no forced-reflow read and no per-frame
-  driver of its own; write-elision is a per-frame contract and deliberately does not apply).
+  or cold, the registration-free default for a window (no forced-reflow read and no repeating
+  driver of its own, at any cadence). The raw-write scan is waived for cold NOT because a
+  window is cold, which this tree contradicts, but because a COUNT cannot tell a build-time
+  write from a repeated one; see the bucket 3 comment for the cadences involved.
 - SFX gates: the `sfx_*` suites (`sfx_conform`, `sfx_studio_server_security`,
   `tests/server/static_sfx_serving`, ...) mirror `npm run sfx:check`.
 - `malware_scan.test.ts` is the release-gate backstop (signatures from `scripts/malware_scan.mjs`,

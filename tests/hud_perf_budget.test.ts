@@ -25,7 +25,7 @@
 //     on disk so a NEW painter under EITHER SANCTIONED NAME cannot silently escape. That
 //     scope is the honest one and is narrower than "every per-frame src/ui module": a
 //     module under a third name is out of reach here, and several are driven from
-//     Hud.update() today (dungeon_finder_proposal_popup, the four vale_cup surfaces), held
+//     Hud.update() today (dungeon_finder_proposal_popup and the five vale_cup surfaces), held
 //     only by the module sweep in tests/architecture.test.ts. (Render-resident painters
 //     under src/render, e.g. the cadence-throttled nameplate painter, are intentionally
 //     outside this HUD-painter file.)
@@ -250,7 +250,7 @@ const RAW_WRITES: ReadonlyArray<readonly [string, RegExp]> = [
   ['.setAttributeNS', /\.setAttributeNS\b/g],
   [
     "['computed']",
-    /\[\s*['"](?:style|textContent|classList|className|setAttribute|removeAttribute|setProperty|innerHTML|dataset|outerHTML|insertAdjacentHTML|cssText|toggleAttribute)['"]\s*\]/g,
+    /\[\s*['"](?:style|textContent|classList|className|setAttribute|removeAttribute|setProperty|innerHTML|dataset|outerHTML|insertAdjacentHTML|insertAdjacentText|cssText|toggleAttribute|setAttributeNS)['"]\s*\]/g,
   ],
 ];
 
@@ -502,8 +502,9 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
 // so a window polled per frame is held to write-elision and a signature-guarded one is not.
 // That is a different gate in a different file, with its own blast radius: a source walk
 // over a coordinator this size leans entirely on its own anti-vacuity pins. Filed as a
-// follow-up rather than half-built here, because a declaration listing six windows when
-// seventeen qualify would read as a complete classification and would not be one.
+// follow-up rather than half-built here, because a declaration naming a handful of windows
+// when a third of the family qualifies would read as a complete classification and would
+// not be one.
 //
 // Cold needs NO registration, which is what makes it safe as a default: every window painter
 // not listed below is held to zero on every matcher, so a new window is covered the day it
@@ -777,9 +778,6 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     expect(SCANNED_FILES.has('map_window_painter.ts')).toBe(true);
   });
 
-  // The cold contract. Swept as ONE test per matcher family over the whole bucket rather
-  // than 70 near-identical cases, collecting every violation so a failure names all of them
-  // at once (the idiom tests/architecture.test.ts uses for its own sweeps).
   // The cold contract. Swept as ONE test per matcher family over the whole bucket rather
   // than 70 near-identical cases, collecting every violation so a failure names all of them
   // at once (the idiom tests/architecture.test.ts uses for its own sweeps).
@@ -1081,6 +1079,10 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       ['.toggleAttribute', "el.toggleAttribute('hidden', on);", 'el.toggleAttributeShim(a);'],
       ['.setAttributeNS', "el.setAttributeNS(ns, 'x', v);", 'el.setAttributeNSShim(a);'],
       ["['computed']", "el['textContent'] = name;", 'const k = map["textContentish"];'],
+      // The computed alternation must cover EVERY dot arm above, not most of them: two were
+      // missing and both counted zero, which is the same shape of hole as a dead arm.
+      ["['computed']", "el['setAttributeNS'](ns, 'x', v);", "el['setAttributeNSish']();"],
+      ["['computed']", "el['insertAdjacentText']('beforeend', t);", "el['insertAdjacent']();"],
     ] as const) {
       const re = writes.get(label);
       expect(re, `the ${label} arm must exist`).toBeDefined();
@@ -1112,7 +1114,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       ['.setAttributeNS', /\.setAttributeNS\b/g],
       [
         "['computed']",
-        /\[\s*['"](?:style|textContent|classList|className|setAttribute|removeAttribute|setProperty|innerHTML|dataset|outerHTML|insertAdjacentHTML|cssText|toggleAttribute)['"]\s*\]/g,
+        /\[\s*['"](?:style|textContent|classList|className|setAttribute|removeAttribute|setProperty|innerHTML|dataset|outerHTML|insertAdjacentHTML|insertAdjacentText|cssText|toggleAttribute|setAttributeNS)['"]\s*\]/g,
       ],
     ]);
     expect(FORCED_REFLOW_READS).toEqual([
