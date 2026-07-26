@@ -556,15 +556,16 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'minor_mana_potion',
       'linen_pouch',
       'travelers_knapsack',
+      // Gathering tools, TIER 1 ONLY (#2343's rule: each zone hub stocks the
+      // tiers its own nodes use). Eastbrook is entirely tier-1 ground, so a
+      // tier-2 or tier-3 land tool opens nothing here; the marsh and the peaks
+      // sell the rungs their own veins need, and this counter used to be the
+      // one place in the world that sold the whole ladder at the front door.
+      // The tiered rods stay: fishing has no nodes for the rule to speak of,
+      // and Wilkes has always been their only stockist.
       'copper_mining_pick',
-      'iron_mining_pick',
-      'mithril_mining_pick',
       'handaxe',
-      'felling_axe',
-      'ironbark_axe',
       'gathering_sickle',
-      'bronze_sickle',
-      'silverleaf_sickle',
       'ironreel_fishing_rod',
       'silverstream_fishing_rod',
     ],
@@ -710,8 +711,10 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     // Station stocking: the forge master sells the tools and the vendor-only
     // staple its station's recipes need. thorium_ore, the premium reagent
     // recipe_sootscale_mantle consumes, is NOT here: it is a node yield, and no
-    // NPC stocks a gathered material (professions.md, Locked rulings).
-    vendorItems: ['copper_mining_pick', 'iron_mining_pick', 'mithril_mining_pick', 'smithing_flux'],
+    // NPC stocks a gathered material (professions.md, Locked rulings). The
+    // pick is tier 1 alone, the tier Eastbrook's own veins use; the higher
+    // rungs moved to the hubs whose ground needs them.
+    vendorItems: ['copper_mining_pick', 'smithing_flux'],
     greeting: 'The forge answers to me, $C. Bring good ore and it will answer to you too.',
   },
   cook_marlow: {
@@ -773,15 +776,11 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     // (thorium_ore, ashwood_log, elderwood_log, goldleaf_herb, sunpetal_herb)
     // are node yields, and no NPC stocks a gathered material (professions.md,
     // Locked rulings): a tool above tier 3 is gathered up to, not bought.
-    vendorItems: [
-      'handaxe',
-      'felling_axe',
-      'ironbark_axe',
-      'bronze_sickle',
-      'silverleaf_sickle',
-      'simple_fishing_pole',
-      'arcanite_bar',
-    ],
+    // Tier-1 implements only, the tier Eastbrook's own stands and patches use.
+    // The tier-2 and tier-3 axes and sickles moved to the marsh and the peaks;
+    // the tier-1 sickle still sits on Ottilie rather than here, the shipped
+    // split between the two masters.
+    vendorItems: ['handaxe', 'simple_fishing_pole', 'arcanite_bar'],
     greeting:
       'Springs, sprockets, and sharp edges, $C: the toolworks has whatever your hands lack.',
   },

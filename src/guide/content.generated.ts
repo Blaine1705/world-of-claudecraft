@@ -6881,16 +6881,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "name": "Iron Mining Pick",
         "tier": 2,
         "quality": "common",
-        "priceCopper": 60,
+        "priceCopper": 120,
         "vendors": [
-          {
-            "name": "Trader Wilkes",
-            "hub": "Eastbrook"
-          },
-          {
-            "name": "Forgemistress Darva",
-            "hub": "Eastbrook"
-          },
           {
             "name": "Provisioner Hale",
             "hub": "Fenbridge"
@@ -6905,16 +6897,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "name": "Skysilver Mining Pick",
         "tier": 3,
         "quality": "uncommon",
-        "priceCopper": 150,
+        "priceCopper": 400,
         "vendors": [
-          {
-            "name": "Trader Wilkes",
-            "hub": "Eastbrook"
-          },
-          {
-            "name": "Forgemistress Darva",
-            "hub": "Eastbrook"
-          },
           {
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
@@ -7022,16 +7006,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "name": "Felling Axe",
         "tier": 2,
         "quality": "common",
-        "priceCopper": 60,
+        "priceCopper": 120,
         "vendors": [
-          {
-            "name": "Trader Wilkes",
-            "hub": "Eastbrook"
-          },
-          {
-            "name": "Tinker Gizzel",
-            "hub": "Eastbrook"
-          },
           {
             "name": "Provisioner Hale",
             "hub": "Fenbridge"
@@ -7046,16 +7022,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "name": "Ironbark Axe",
         "tier": 3,
         "quality": "uncommon",
-        "priceCopper": 150,
+        "priceCopper": 400,
         "vendors": [
-          {
-            "name": "Trader Wilkes",
-            "hub": "Eastbrook"
-          },
-          {
-            "name": "Tinker Gizzel",
-            "hub": "Eastbrook"
-          },
           {
             "name": "Quartermaster Bree",
             "hub": "Highwatch"
@@ -7163,16 +7131,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "name": "Bronze Sickle",
         "tier": 2,
         "quality": "common",
-        "priceCopper": 60,
+        "priceCopper": 120,
         "vendors": [
-          {
-            "name": "Trader Wilkes",
-            "hub": "Eastbrook"
-          },
-          {
-            "name": "Tinker Gizzel",
-            "hub": "Eastbrook"
-          },
           {
             "name": "Provisioner Hale",
             "hub": "Fenbridge"
@@ -7187,16 +7147,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "name": "Sheenleaf Sickle",
         "tier": 3,
         "quality": "uncommon",
-        "priceCopper": 150,
+        "priceCopper": 400,
         "vendors": [
-          {
-            "name": "Trader Wilkes",
-            "hub": "Eastbrook"
-          },
-          {
-            "name": "Tinker Gizzel",
-            "hub": "Eastbrook"
-          },
           {
             "name": "Quartermaster Bree",
             "hub": "Highwatch"

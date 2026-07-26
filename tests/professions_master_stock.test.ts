@@ -134,17 +134,16 @@ describe('the no-NPC-stocks-a-gathered-material ruling', () => {
 });
 
 describe('master vendor stocking after the delist', () => {
-  it('tinker_gizzel keeps its tools and the refined reagent, and nothing gathered', () => {
+  it('tinker_gizzel keeps its tier-1 tools and the refined reagent, and nothing gathered', () => {
+    // Re-minted when Eastbrook stopped over-stocking: the toolworks master used
+    // to carry logging tiers 1 to 3 and herbalism tiers 2 and 3, which made the
+    // starting town the one place selling the top of two ladders. Eastbrook is
+    // all tier-1 ground, so those rungs moved to the hubs whose own nodes use
+    // them. What this arm has always been for is unchanged and still holds:
+    // the counter carries arcanite_bar, the one premium reagent that is
+    // refined rather than gathered, and no node yield at all.
     const stock = stockOf(ZONE1_NPCS, 'tinker_gizzel');
-    expect(stock).toEqual([
-      'handaxe',
-      'felling_axe',
-      'ironbark_axe',
-      'bronze_sickle',
-      'silverleaf_sickle',
-      'simple_fishing_pole',
-      'arcanite_bar',
-    ]);
+    expect(stock).toEqual(['handaxe', 'simple_fishing_pole', 'arcanite_bar']);
   });
 
   it('the forge, loom, and tannery masters carry no premium reagent at all', () => {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { TOOL_EFFECTS } from '../src/sim/content/professions';
+import { VENDOR_ROW_GATES } from '../src/sim/content/vendor_row_gates';
 import { GATHER_NODES, ITEMS, NPCS } from '../src/sim/data';
 import {
   applyEffectBonus,
@@ -60,21 +61,37 @@ describe('gathering tool tier gating (#1123)', () => {
     }
   });
 
-  it('the base tools are actually stocked by Trader Wilkes', () => {
-    const stock = NPCS.trader_wilkes.vendorItems ?? [];
+  it('the zone 1 hub stocks the tier-1 implements and NOT the rungs above them', () => {
+    // Re-minted when Eastbrook stopped over-stocking. Wilkes used to carry the
+    // whole nine-tool ladder, which put the top land tool of every trade on
+    // the starting town's front counter; Eastbrook is entirely tier-1 ground,
+    // so the higher rungs open nothing here and now live at the hubs whose own
+    // veins need them (the arm below pins those). The tier-1 rows staying is
+    // the load-bearing half: they are what the #2343 always-need-a-tool rule
+    // and the gather quests' 20-copper story rest on.
+    const eastbrook = [
+      ...(NPCS.trader_wilkes.vendorItems ?? []),
+      ...(NPCS.forgemistress_darva.vendorItems ?? []),
+      ...(NPCS.weaver_ottilie.vendorItems ?? []),
+      ...(NPCS.tinker_gizzel.vendorItems ?? []),
+    ];
+    for (const toolId of ['copper_mining_pick', 'handaxe', 'gathering_sickle']) {
+      expect(eastbrook, `${toolId} must stay buyable in the first zone`).toContain(toolId);
+    }
     for (const toolId of [
-      'copper_mining_pick',
       'iron_mining_pick',
       'mithril_mining_pick',
-      'handaxe',
       'felling_axe',
       'ironbark_axe',
-      'gathering_sickle',
       'bronze_sickle',
       'silverleaf_sickle',
     ]) {
-      expect(stock).toContain(toolId);
+      expect(eastbrook, `${toolId} is above Eastbrook's own node tier`).not.toContain(toolId);
     }
+    // The tiered rods are the deliberate exception and stay at Wilkes: fishing
+    // has no nodes for the hub rule to be expressed against.
+    expect(NPCS.trader_wilkes.vendorItems).toContain('ironreel_fishing_rod');
+    expect(NPCS.trader_wilkes.vendorItems).toContain('silverstream_fishing_rod');
   });
 
   it('the zone 2 and zone 3 hubs stock the tool tiers their own nodes use (#2343)', () => {
@@ -434,7 +451,7 @@ describe('sim-level node access gating (Professions 2.0)', () => {
     ).toBe(3);
   });
 
-  it('the tiered fishing rods are vendor gatherTool content on the exact pick pricing ladder', () => {
+  it('the tiered fishing rods are vendor gatherTool content, now off the pick pricing ladder', () => {
     expect(gatherToolTier(ITEMS.ironreel_fishing_rod, 'fishing')).toBe(2);
     expect(gatherToolTier(ITEMS.silverstream_fishing_rod, 'fishing')).toBe(3);
     expect(ITEMS.ironreel_fishing_rod).toMatchObject({
@@ -449,9 +466,23 @@ describe('sim-level node access gating (Professions 2.0)', () => {
       buyValue: 150,
       sellValue: 25,
     });
-    // Same ladder as the tier-2/3 picks, by construction not coincidence.
-    expect(ITEMS.ironreel_fishing_rod.buyValue).toBe(ITEMS.iron_mining_pick.buyValue);
-    expect(ITEMS.silverstream_fishing_rod.buyValue).toBe(ITEMS.mithril_mining_pick.buyValue);
+    // The rods and the picks USED to share one ladder by construction. They no
+    // longer do, and the divergence is the assertion: the land tools were
+    // repriced to 120 and 400 alongside the proficiency gate that paces the
+    // node ladder they open, and the reason to raise a price there is the node
+    // ladder itself, which fishing has none of. Rod pricing is the fishing
+    // work's to move, not this one's, so the rods held at 60 and 150. Pinned
+    // as a strict inequality rather than left implicit, so a later change that
+    // silently re-couples them has to say so here.
+    expect(ITEMS.ironreel_fishing_rod.buyValue).toBeLessThan(
+      ITEMS.iron_mining_pick.buyValue as number,
+    );
+    expect(ITEMS.silverstream_fishing_rod.buyValue).toBeLessThan(
+      ITEMS.mithril_mining_pick.buyValue as number,
+    );
+    // The rods are ungated for the same reason (content/vendor_row_gates.ts).
+    expect(VENDOR_ROW_GATES.ironreel_fishing_rod).toBeUndefined();
+    expect(VENDOR_ROW_GATES.silverstream_fishing_rod).toBeUndefined();
     const stock = NPCS.trader_wilkes.vendorItems ?? [];
     expect(stock).toContain('ironreel_fishing_rod');
     expect(stock).toContain('silverstream_fishing_rod');

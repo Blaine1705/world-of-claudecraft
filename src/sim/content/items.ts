@@ -511,6 +511,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // no durability field on ItemDef) and tiered: `use.tier` gates which
   // node/material tiers it can gather (see src/sim/professions/tools.ts).
   //
+  // PRICES: 20 / 120 / 400 up the three vendor rungs, and the two steps up are
+  // deliberately steep against a first-zone solo quest income of roughly 5,300
+  // copper. Tier 1 stays the trivial 20-copper one-time purchase the #2343
+  // no-strand story rests on; the rungs above it are a real decision rather
+  // than pocket change, which is what makes the proficiency gate on them
+  // (content/vendor_row_gates.ts) a pace rather than a formality. Thousands
+  // would have been a wall instead of a pace.
+  //
+  // The tiered fishing RODS below deliberately no longer share this ladder:
+  // they kept 60 and 150 while the land tools moved, because the reason to
+  // raise a price here is the node ladder these three tools gate, and fishing
+  // has no nodes. Their pricing belongs with the rest of the fishing work.
+  //
   // The three TIER-1 tools carry BOTH noVendorSell and noMarketList, and only
   // those three. The gather quests hand a pick or a sickle over through
   // requiredItems (zone1.ts), re-granting a missing one on every accept, and
@@ -553,7 +566,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     use: { type: 'gatherTool', professionId: 'mining', tier: 2 },
     sellValue: 10,
-    buyValue: 60,
+    buyValue: 120,
   },
   mithril_mining_pick: {
     id: 'mithril_mining_pick',
@@ -562,7 +575,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'uncommon',
     use: { type: 'gatherTool', professionId: 'mining', tier: 3 },
     sellValue: 25,
-    buyValue: 150,
+    buyValue: 400,
   },
   handaxe: {
     id: 'handaxe',
@@ -582,7 +595,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     use: { type: 'gatherTool', professionId: 'logging', tier: 2 },
     sellValue: 10,
-    buyValue: 60,
+    buyValue: 120,
   },
   ironbark_axe: {
     id: 'ironbark_axe',
@@ -591,7 +604,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'uncommon',
     use: { type: 'gatherTool', professionId: 'logging', tier: 3 },
     sellValue: 25,
-    buyValue: 150,
+    buyValue: 400,
   },
   gathering_sickle: {
     id: 'gathering_sickle',
@@ -611,7 +624,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     use: { type: 'gatherTool', professionId: 'herbalism', tier: 2 },
     sellValue: 10,
-    buyValue: 60,
+    buyValue: 120,
   },
   silverleaf_sickle: {
     id: 'silverleaf_sickle',
@@ -620,7 +633,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'uncommon',
     use: { type: 'gatherTool', professionId: 'herbalism', tier: 3 },
     sellValue: 25,
-    buyValue: 150,
+    buyValue: 400,
   },
   // Crafted base tools, tier 4 and 5 (#1135). Same shape and gating as the
   // vendor tools above (infinite-durability, `use.tier` gates node AND
