@@ -31,7 +31,8 @@ Subdirectories (plus one shared fixture):
   `npm run test:browser`) for WebKit/Safari CSS, axe, target-size; never a bare `vitest run`.
 - `progression/`: mirrors `src/sim/progression/` (unit tests for the extracted modules).
 - `helpers/` + `util/`: shared cross-suite utilities (`fake_dom.ts`, the reusable
-  hand-rolled fake DOM for controller suites, `i18n_determinism.ts`, `alloc_probe.ts`).
+  hand-rolled fake DOM for controller suites, `i18n_determinism.ts`, `ts_files_under.ts`,
+  `alloc_probe.ts`).
 - `global_setup.ts`: runs on every vitest invocation (`vite.config.ts` `test.globalSetup`);
   mints the SFX Studio temp root (`WOC_SFX_STUDIO_TEST_ROOT`).
 
@@ -64,6 +65,15 @@ transport (see `social_system.test.ts`) rather than mocking. REST/RouteDef endpo
 use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
 
 ## Coverage & guards
+- **A guard that scans a directory of sources walks it with `helpers/ts_files_under.ts`,
+  never its own `readdirSync`.** A single-level read is a defect, not a style choice: the
+  day the scanned root grows a subdirectory, everything inside leaves the scan and the
+  guard stays green over a quietly smaller surface (#2485, then #2489 three times over).
+  Apart from `src/ui`, every scan root is flat today, so no assertion over the real tree
+  can tell a recursive walk from a flat one: pin the recursion with a `mkdtemp` fixture
+  that drives the guard's OWN producer, and keep the vacuity floor near the real count (a
+  floor sitting under it is what lets a moved file hide). Where the root IS deep, a
+  file-count floor over the real tree pins it directly, as `mobile_window_coverage` does.
 - `tests/parity/` is the golden-trace gate: ANY sim behavior change turns it red by
   design. Read `tests/parity/CLAUDE.md` first; regenerate only deliberately via
   `UPDATE_PARITY=1 npx vitest run tests/parity`, in its own reviewed commit.
