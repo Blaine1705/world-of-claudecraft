@@ -329,7 +329,7 @@ describe('one profession action prints exactly one grant line', () => {
     ]);
   });
 
-  it('unbinding one copy out of a stack prints the unbind line only', () => {
+  it('unbinding one copy out of a stack prints the unbind line only, with no cue', () => {
     // The sweep's last grant site (commission.ts unbindItem). A bound stack of
     // byte-equal copies is SPLIT: one copy is peeled off and re-granted through
     // the hub, so the player was told they received an item they already held,
@@ -341,6 +341,7 @@ describe('one profession action prints exactly one grant line', () => {
         type: 'loot',
         text: `You receive: ${ITEMS[SWORD]?.name}.`,
         pid: PLAYER_ID,
+        silent: true,
         callerLogs: true,
       } as SimEvent,
       { type: 'unbindResult', pid: PLAYER_ID, ok: true, itemId: SWORD, fee: 2500 } as SimEvent,
@@ -349,11 +350,31 @@ describe('one profession action prints exactly one grant line', () => {
     expect(rendered).toHaveLength(1);
     expect(rendered[0]).not.toContain('You receive');
     expect(rendered[0]).toContain(itemDisplayName(ITEMS[SWORD]));
-    // The cue is deliberately NOT stood down for this one: unbind has no
-    // dedicated cue of its own, so the grant sets callerLogs without silent.
-    expect(audio.lootItem).toHaveBeenCalledTimes(1);
+    // #2458: the cue stands down too. Unbind has no dedicated cue of its own,
+    // so hudChrome.unbind.unbound is documented as the ONE success surface (no
+    // toast, no sound cue, the trainResult rule) and the grant carries silent
+    // alongside callerLogs.
+    expect(audio.lootItem).not.toHaveBeenCalled();
+    expect(audio.coin).not.toHaveBeenCalled();
     // The peel still moved items, so the bag mirror still repaints.
     expect(hud.renderBags).toHaveBeenCalled();
+  });
+
+  it('unbinding a lone copy sounds exactly like unbinding out of a stack', () => {
+    // #2458's acceptance criterion, and the only place the two arms are
+    // comparable: the count-1 arm clears boundTo in place, so its burst is the
+    // unbindResult event ALONE with no hub grant to flag. Driving it beside the
+    // stacked burst above is what makes "same action, same audio" a pin rather
+    // than a claim about one arm at a time.
+    const hud = makeHud();
+    hud.handleEvents([
+      { type: 'unbindResult', pid: PLAYER_ID, ok: true, itemId: SWORD, fee: 2500 } as SimEvent,
+    ]);
+    const rendered = lines(hud);
+    expect(rendered).toHaveLength(1);
+    expect(rendered[0]).toContain(itemDisplayName(ITEMS[SWORD]));
+    expect(audio.lootItem).not.toHaveBeenCalled();
+    expect(audio.coin).not.toHaveBeenCalled();
   });
 
   it('a yield-free disenchant success renders no dangling empty operand', () => {

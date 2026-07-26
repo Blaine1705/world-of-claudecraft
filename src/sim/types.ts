@@ -3299,9 +3299,11 @@ export type SimEvent = { pid?: number } & (
   | { type: 'learnAbility'; abilityId: string; rank: number }
   // The hub grant event. Two independent stand-down flags, both set only from
   // Sim.addItem/addItemInstance's opts param (the one place either gets set):
-  // - silent: true suppresses the client's default loot AUDIO cue; a caller with
-  //   its own dedicated cue for the same grant (gathering/crafting/enchanting)
-  //   sets it so the generic ding doesn't stack on top of it.
+  // - silent: true suppresses the client's default loot AUDIO cue; a caller
+  //   that owns the cue for this grant sets it, whether it owns one of its own
+  //   (gathering/crafting/enchanting) so the generic ding doesn't stack on top
+  //   of it, or owns it as SILENCE because its result event is cue-free by
+  //   contract (the Maker's Bond unbind, #2458).
   // - callerLogs: true suppresses the client's default "You receive: X" TEXT
   //   line, because the caller owns the player-visible line for this grant and
   //   renders a richer one (rolled quality color, quantity, clickable item
