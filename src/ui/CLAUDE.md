@@ -78,6 +78,16 @@ Per-frame HUD code (anything reached from `Hud.update()`) holds these:
   `imgCache`). A painter NEVER calls `el.textContent =` / `style.*` / `setAttribute` /
   `innerHTML` directly; both the elision mechanism and the no-raw-write rule are guarded
   always-on (`tests/painter_host.test.ts` + the per-painter source scans).
+  **Where the guard actually reaches.** The rule above is the standard for anything reached
+  from `Hud.update()`; the source scan that enforces it covers the painters registered in
+  `HOT_PAINTERS` / `CANVAS_PAINTERS`, not every module `update()` touches. `Hud.update()` also
+  polls about half the `*_window.ts` painters (`spellbook_window.tickOpen()` runs every frame
+  while open; arena / dungeon_finder / vale_cup / card_duel `render()` on the 250ms band; the
+  rest get `refreshIfChanged()` on the 500ms band), and those rebuild behind their OWN
+  invalidation signature, which no per-file scan can see. So a window on a poll is held to
+  the write-elision standard by review, not by the gate: keep the signature guard, and if you
+  add a genuinely per-frame write path, route it through the facet and move the module into
+  `HOT_PAINTERS`.
 - **Allocation-light cores.** A per-frame view-core returns a REUSED, preallocated container +
   slots (no per-frame array/object garbage); jitter/clock stay in the painter, never the core.
   Guarded always-on by the reference-stability probe `tests/util/alloc_probe.ts`.
@@ -195,21 +205,35 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
   guard). Interpolated names pass through `esc()`; a pure extraction reuses existing `t()` keys
   and adds none. BOTH names are swept by the painter gate (`tests/hud_perf_budget.test.ts`,
   `PAINTER_FILE_RE`), which sorts every painter into exactly one of three buckets:
-  - **facet-routed** (`HOT_PAINTERS`): a per-frame painter. ALL its DOM writes go through the
-    `PainterHost` elided writers, and it makes no forced-reflow layout read. Both are scanned
-    with EXACT per-token counts, so a raw `el.textContent =` / `style.*` / `setAttribute` /
-    `innerHTML` fails unless it is a documented build-time exception.
+  - **facet-routed** (`HOT_PAINTERS`): the painters held to the FULL write contract. Usually
+    per-frame, but membership is the contract rather than the cadence, which is why
+    `tab_strip_painter` (cold chrome wiring) is registered here and why a cold `*_painter.ts`
+    belongs here too: every `*_painter.ts` must be in this bucket or the canvas one. ALL its
+    DOM writes go through the `PainterHost` elided writers, and it makes no forced-reflow
+    layout read. Both are scanned with EXACT per-token counts, so a raw `el.textContent =` /
+    `style.*` / `setAttribute` / `innerHTML` fails unless it is a documented build-time
+    exception.
   - **canvas** (`CANVAS_PAINTERS`): draws to a 2D context under the cadence + cached-token
-    regime. Same two scans with its own counted exceptions, plus an identity proof (it must
-    name a 2D context type AND actually draw on one), so the list cannot be used to park a
-    DOM module outside both gates.
-  - **cold**, the DEFAULT for a `*_window.ts` and needing no registration: a window rendered
-    on open / refresh. Write-elision is a per-frame contract and deliberately does not apply
-    (a count over a once-per-open rebuild fails on ordinary edits and misses the real hazard),
-    but the two cadence-independent halves do: **no forced-reflow layout read** and **no
-    per-frame driver of its own** (`requestAnimationFrame`, or a `setInterval` beyond a
-    documented, counted allowance recording its cadence). A window that genuinely goes
-    per-frame moves into `HOT_PAINTERS` and takes the raw-write scan with it.
+    regime (`minimap_painter` caches its resolved tokens for the session; `map_window_painter`
+    and `delve_map_painter` re-resolve per redraw). Same two scans with its own counted
+    exceptions, plus an identity proof (it must name a 2D context type AND actually draw on
+    one), so the list cannot be used to park a DOM module outside both gates.
+  - **cold**, the DEFAULT for a `*_window.ts` and needing no registration. It does NOT mean
+    nothing calls the window repeatedly (see the per-frame contract above: `Hud.update()`
+    polls about half of them); it means the gate makes no cadence claim. The raw-write scan
+    deliberately does not apply, because a COUNT cannot tell a build-time write from a
+    repeated one at any cadence, so it fails on ordinary edits and misses the real hazard.
+    The two contracts that hold whatever the cadence are enforced: **no forced-reflow layout
+    read** and **no repeating driver of its own** (`requestAnimationFrame` /
+    `requestIdleCallback`, or a `setInterval` beyond a documented, counted allowance recording
+    its cadence). A window that grows a genuinely per-frame write path moves into
+    `HOT_PAINTERS` and takes the raw-write scan with it, keeping the driver scan, which every
+    bucket runs.
+  Two limits, so neither reads as more than it is: the scans are per FILE, so a layout read
+  one hop away in a shared helper is invisible unless the helper is named as a proxy token
+  (`getUiScale` is; a new one would have to be added), and a third filename escapes the gate
+  entirely (`*_controller.ts` under `src/ui/hud/<domain>/`, and bare-named per-frame modules
+  like `vale_cup_hud.ts`), held only by the module sweep in `tests/architecture.test.ts`.
 - **Neither of the two?** A **painter-side helper**, and it is a LAST RESORT: if the DOM touch can
   live in the painter, it must. A helper is for logic a painter needs that cannot be a pure core
   (it has to touch the DOM) and is not itself a painter. Register it in `UI_PAINTER_HELPERS`

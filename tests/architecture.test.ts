@@ -828,10 +828,12 @@ describe('curated bare-named pure cores (cross-check)', () => {
 //
 // A module named *_painter.ts leaves this sweep for the painter gate, so that gate
 // is load-bearing for this one. It used to be the cheapest way out, because
-// CANVAS_PAINTERS there was a plain exemption list with no scan behind it; it is
-// now a scanned bucket with an identity proof (a registered canvas painter must
-// name a 2D context type AND actually draw on one), so parking a DOM module there
-// fails rather than exempting it.
+// CANVAS_PAINTERS there was a plain exemption list with no scan behind it. It is now
+// a scanned bucket: a parked DOM module has to pass the same exact-count raw-write
+// and forced-reflow scans every other painter passes, and additionally an identity
+// proof (name a 2D context type AND draw on one) that a real DOM module fails. The
+// scans are the durable half; the identity proof is a source-text check and two
+// lines of dead canvas code would satisfy it.
 
 const uiRoot = join(repoRoot, 'src', 'ui');
 
