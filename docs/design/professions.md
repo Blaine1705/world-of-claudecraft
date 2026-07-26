@@ -311,6 +311,9 @@ guards.
 | NODE_HARVEST_TABLE respawnSeconds | src/sim/professions/gathering.ts | 240 (ore / wood / herb) |
 | gather nodes per type per zone | src/sim/content/gather_nodes.ts | 6 |
 | GATHER_RARE_EVENT_CHANCE / YIELD_MULT | src/sim/professions/gather_events.ts | 1/90 / 5 |
+| TIER2 / TIER3_TOOL_GATE_PROFICIENCY | src/sim/content/vendor_row_gates.ts | 40 / 70 |
+| vendor land-tool buyValue by tier | src/sim/content/items.ts | 20 / 120 / 400 (tiers 1 to 3) |
+| tiered rod buyValue by tier | src/sim/content/items.ts | 60 / 150 (tiers 2 and 3) |
 | FISH_BITE_DELAY_MIN / MAX / ROD_REDUCTION (sec) | src/sim/professions/fishing.ts | 3 / 8 / 1.5 |
 | FISH_REEL_WINDOW_SEC / ROD_BONUS_SEC | src/sim/professions/fishing.ts | 3 / 0.75 |
 | FISHING_SESSION_CAP_SEC | src/sim/types.ts | 15 |
@@ -336,6 +339,26 @@ maintainer-accepted for this release; correct post-launch via data-only
 levers (respawn seconds, node density, quantity per rarity, bite-delay band,
 junk share), never via smaller gain numbers. If mastery should get longer,
 the lever is material quantities per craft.
+
+The two tool-gate thresholds and the land-tool prices are the pacing lever on
+the tool ladder, and both halves are needed: the gate says when you may buy the
+next rung, the price says what it costs once you may. Neither is a gain number,
+so neither touches the locked ruling above. Both thresholds must stay strictly
+below the proficiency at which a tier-1 node stops teaching, which is
+`GATHER_GAIN_TIER_STEP` times 3: the first zone is entirely tier-1 ground and
+the gather quests grant only the tier-1 tool, so a threshold at or above that
+ceiling is unreachable by the only means a new player has, and the ladder
+dead-ends. `tests/professions_tool_gate.test.ts` derives the ceiling from the
+live constants rather than restating it, so retuning the curve fails there
+instead of quietly bricking the climb; 70 rather than the ceiling-hugging 75 is
+that margin made deliberate. The prices are read against a first-zone solo
+quest income of roughly 5,300 copper. Rods are deliberately outside both: their
+profession has no nodes, so neither the ceiling derivation nor the hub-stocking
+rule below can be expressed for them.
+
+Which hub stocks which tier is content, not a constant: each hub sells only the
+tiers its own nodes use (Eastbrook tier 1, Fenbridge tiers 1 to 2, Highwatch
+tiers 1 to 3), with the tiered rods a standing exception at Trader Wilkes.
 
 Respawn seconds and node density are ONE lever, not two. The per-zone harvest
 ceiling is nodes x 3600 / respawn, so moving either alone moves the ceiling:
