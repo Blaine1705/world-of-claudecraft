@@ -1490,6 +1490,24 @@ describe('food, drink, vendor', () => {
     expect(sim.countItem('wolf_fang')).toBe(0);
   });
 
+  // Regression: "Sell amount to NPC" (Discord #bug-reports, Corotexus). A custom
+  // amount typed into the sell-quantity dialog above one stack's size (wolf_fang
+  // has no explicit stackSize, so it defaults to 20, see sim/bags.ts stackSizeOf)
+  // must sell the FULL amount by pulling from every stack the player holds, not
+  // silently cap at one stack's worth.
+  it('vendor sells a custom amount greater than one stack size, drawing from every stack', () => {
+    const sim = makeSim('warrior');
+    const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
+    teleportTo(sim, wilkes.pos.x + 2, wilkes.pos.z);
+    sim.addItem('wolf_fang', 100); // spread across five 20-stacks
+    expect(sim.inventory.filter((s) => s.itemId === 'wolf_fang')).toHaveLength(5);
+
+    sim.sellItem('wolf_fang', 100);
+
+    expect(sim.copper).toBe(400);
+    expect(sim.countItem('wolf_fang')).toBe(0);
+  });
+
   it('vendor ignores invalid sell quantities', () => {
     const sim = makeSim('warrior');
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
