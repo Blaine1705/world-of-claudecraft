@@ -771,3 +771,361 @@ describe('curated bare-named pure cores (cross-check)', () => {
     ).toEqual([...new Set(BARE_NAMED.map((f) => relative(repoRoot, f)))].sort());
   });
 });
+
+// ---------------------------------------------------------------------------
+// src/ui module classification: the THIRD completeness sweep.
+//
+// The pure-core sweeps above classify BY FILENAME (*_view / *_core), and so does
+// the painter sweep in tests/hud_perf_budget.test.ts (*_painter, split into
+// HOT_PAINTERS / CANVAS_PAINTERS). A module named neither way used to fall
+// between the two and carry no contract at all. text_sprite_cache.ts, the label
+// rasterizer map_window_painter blits, is the first of that shape: it CANNOT be a
+// pure core (it has to call document.createElement('canvas')) and it is not a
+// painter, so its own suite carried a hand-written host-agnosticism scan that the
+// next module of the same shape would have had to remember to copy.
+//
+// This sweep makes the classification total. Every src/ui/**/*.ts lands in
+// exactly one bucket:
+//
+//   pure core       *_view / *_core, or a bare name registered in UI_PURE_CORES
+//                   -> the pure-core sweeps above
+//   painter         *_painter
+//                   -> tests/hud_perf_budget.test.ts
+//   painter helper  registered in UI_PAINTER_HELPERS
+//                   -> the hard contract below: host-agnostic, deterministic,
+//                      colorless, and `document` ONLY to mint its own canvas
+//   DOM module      registered in UI_DOM_MODULES
+//                   -> exempt, because owning browser state IS the job
+//   everything else the default bucket, which needs no list
+//                   -> must reach for no browser global at all
+//
+// That default bucket is what makes the gate non-voluntary. It costs no
+// registration, so a NEW module that reads window / localStorage / Date.now /
+// getComputedStyle fails HERE until someone classifies it on purpose, whatever it
+// is named. Both curated lists are then pinned in both directions: an entry must
+// exist on disk, and an entry that touches no browser global at all is a stale
+// exemption and fails, so neither list can accrete a blanket opt-out.
+
+const uiRoot = join(repoRoot, 'src', 'ui');
+
+// The filename families the other two sweeps already own. *_view / *_core is
+// onDiskCores() above; *_painter is findUiPainters() in hud_perf_budget.test.ts,
+// which matches the same suffix.
+const SWEPT_BY_NAME_RE = /_(?:view|core|painter)\.ts$/;
+
+// Browser globals as they appear in a member access. STRICTER than DOM_GLOBAL_RE
+// on purpose, and the difference is load-bearing: src/ui carries player prose, so
+// an English catalog line ending "...close the map window." matches that scan's
+// looser `\s*[.[]` form. Requiring a tight member access (no space, an identifier
+// after the dot) lets this sweep cover the i18n catalogs, the locale overlays and
+// the generated bundles instead of exempting whole directories, which would be
+// exactly the kind of hole this gate exists to close. Verified equivalent: on the
+// tree at the time this landed, the strict form over raw source and the loose form
+// over string-stripped source flag the identical file set.
+const UI_HOST_GLOBAL_RE =
+  /\b(?:document|window|navigator|localStorage|sessionStorage)(?:\.[A-Za-z_$]|\[)/;
+// Browser-only entry points called bare off globalThis, which the member-access
+// scan above cannot see.
+const UI_BROWSER_API_RE =
+  /\b(?:getComputedStyle|requestAnimationFrame|requestIdleCallback|matchMedia)\b/;
+
+// A registered painter helper's ONE sanctioned DOM call: minting its own detached
+// node. Everything else on `document` (querySelector, body, getElementById,
+// addEventListener) reaches the LIVE tree, which is what makes a module a DOM
+// module rather than a helper.
+const HELPER_DOC_ACCESS_RE = /\bdocument(?:\.[A-Za-z_$]|\[)/g;
+const HELPER_DOC_ALLOWED_RE = /\bdocument\.createElement\(/g;
+// The rest of the host surface, forbidden to a helper outright.
+const HELPER_HOST_GLOBAL_RE =
+  /\b(?:window|navigator|localStorage|sessionStorage)(?:\.[A-Za-z_$]|\[)/;
+
+// Literal colors. A painter helper takes RESOLVED color tokens from its caller
+// (the painter reads the --color-* CSS vars once per redraw), so a baked color in
+// the helper is a token-discipline break. Deliberately NOT applied to the default
+// bucket: the icon and art modules (icons.ts, chrome_icon_art.ts,
+// decorative_art.ts) legitimately bake their palettes.
+const COLOR_HEX_RE = /#[0-9a-fA-F]{3,8}\b/g;
+const COLOR_FUNC_RE = /\brgba?\s*\(/g;
+
+// Host-agnostic painter-side helpers: DOM-touching enough that a pure core cannot
+// hold them, host-agnostic enough that a Vitest drives them through a fake
+// document. Registering one buys the hard contract below, not an exemption.
+const UI_PAINTER_HELPERS = ['src/ui/text_sprite_cache.ts'].map((rel) => join(repoRoot, rel));
+
+// Modules that OWN browser state: the windows, the HUD controllers, the drag /
+// resize / focus plumbing, the storage-backed settings, the icon and theme
+// runtimes. Exempt from the scan by conscious registration. Adding a line here is
+// the deliberate act; the honesty pin below deletes the option of adding one
+// pre-emptively, since an entry that touches no browser global fails.
+const UI_DOM_MODULES = [
+  'src/ui/arena_window.ts',
+  'src/ui/armory_inspect.ts',
+  'src/ui/bag_item_action_menu.ts',
+  'src/ui/bags_window.ts',
+  'src/ui/bank_window.ts',
+  'src/ui/camera_prompt.ts',
+  'src/ui/char_skin_window.ts',
+  'src/ui/char_window.ts',
+  'src/ui/charselect_news.ts',
+  'src/ui/chat_command_menu.ts',
+  'src/ui/claudium_window.ts',
+  'src/ui/crafting_window.ts',
+  'src/ui/daily_rewards_window.ts',
+  'src/ui/deeds_window.ts',
+  'src/ui/desktop_update_toast.ts',
+  'src/ui/dev_command_window.ts',
+  'src/ui/entry_guard_banner.ts',
+  'src/ui/focus_manager.ts',
+  'src/ui/gather_node_tooltip.ts',
+  'src/ui/gpu_notice_toast.ts',
+  'src/ui/hud.ts',
+  'src/ui/hud/chat/chat_geometry_controller.ts',
+  'src/ui/hud/chat/chat_window_controller.ts',
+  'src/ui/hud/cosmetics/skin_event_controller.ts',
+  'src/ui/hud/delve/lockpick_controller.ts',
+  'src/ui/hud/delve/lockpick_window.ts',
+  'src/ui/hud/delve/rite_controller.ts',
+  'src/ui/hud/delve/rite_window.ts',
+  'src/ui/hud/fiesta/fiesta_controller.ts',
+  'src/ui/hud/loot/corpse_harvest_window.ts',
+  'src/ui/hud/loot/loot_roll_controller.ts',
+  'src/ui/hud/loot/loot_window_controller.ts',
+  'src/ui/hud/player_card/player_card.ts',
+  'src/ui/hud/player_card/player_card_controller.ts',
+  'src/ui/hud/quest/quest_dialog_controller.ts',
+  'src/ui/hud/quest/quest_tracker_controller.ts',
+  'src/ui/hud/quest/questlog_window.ts',
+  'src/ui/hud/vendor/heroic_vendor_window.ts',
+  'src/ui/hud/vendor/train_window.ts',
+  'src/ui/hud/vendor/unbind_window.ts',
+  'src/ui/hud/vendor/vendor_window.ts',
+  'src/ui/i18n.ts',
+  'src/ui/icon_prewarm.ts',
+  'src/ui/icons.ts',
+  'src/ui/inspect_window.ts',
+  'src/ui/item_drop_hit_test.ts',
+  'src/ui/loading_slow_hint.ts',
+  'src/ui/loading_tips.ts',
+  'src/ui/mailbox_window.ts',
+  'src/ui/market_window.ts',
+  'src/ui/meters.ts',
+  'src/ui/minimap_gilded_ornament.ts',
+  'src/ui/mobile_wallet_launcher.ts',
+  'src/ui/movable_frame.ts',
+  'src/ui/native_update_prompt.ts',
+  'src/ui/options_window.ts',
+  'src/ui/perf_metrics_sampler.ts',
+  'src/ui/perf_nudge_toast.ts',
+  'src/ui/perf_ornament_svg.ts',
+  'src/ui/perf_overlay.ts',
+  'src/ui/perf_overlay_config.ts',
+  'src/ui/perf_overlay_settings.ts',
+  'src/ui/proc_overlay_drag.ts',
+  'src/ui/profession_identity_card.ts',
+  'src/ui/profession_tutorial_window.ts',
+  'src/ui/professions_window.ts',
+  'src/ui/reconnect_overlay.ts',
+  'src/ui/settings_controls.ts',
+  'src/ui/social_window.ts',
+  'src/ui/spectate_badge.ts',
+  'src/ui/spellbook_window.ts',
+  'src/ui/steam_link.ts',
+  'src/ui/store_stack_diag.ts',
+  'src/ui/talents_window.ts',
+  'src/ui/theme.ts',
+  'src/ui/touch_item_drag.ts',
+  'src/ui/touch_tap.ts',
+  'src/ui/town_focus_window.ts',
+  'src/ui/tutorial.ts',
+  'src/ui/ui_effects_applier.ts',
+  'src/ui/ui_scale.ts',
+  'src/ui/vale_cup_betting.ts',
+  'src/ui/vale_cup_briefing.ts',
+  'src/ui/vale_cup_charge.ts',
+  'src/ui/vale_cup_hud.ts',
+  'src/ui/window_drag.ts',
+  'src/ui/window_resize.ts',
+].map((rel) => join(repoRoot, rel));
+
+// The sweep's domain: every src/ui module the other two sweeps do NOT already
+// own, which is the gap the classification has to fill.
+function uiResidualModules(): string[] {
+  const cores = new Set(UI_PURE_CORES);
+  return walk(uiRoot).filter((f) => !SWEPT_BY_NAME_RE.test(f) && !cores.has(f));
+}
+
+// True when the file reaches for the browser at all: a DOM global, a
+// browser-only entry point, or wall-clock/random nondeterminism.
+function touchesBrowser(file: string): boolean {
+  const code = stripComments(readFileSync(file, 'utf8'));
+  return (
+    UI_HOST_GLOBAL_RE.test(code) || UI_BROWSER_API_RE.test(code) || NONDETERMINISM_RE.test(code)
+  );
+}
+
+describe('src/ui module classification (every module is swept by exactly one gate)', () => {
+  const residual = uiResidualModules();
+  const helpers = new Set(UI_PAINTER_HELPERS);
+  const domModules = new Set(UI_DOM_MODULES);
+
+  // Anti-vacuity: a walk() over the wrong root, or a residual filter that
+  // accidentally matched everything, would make every scan below pass over an
+  // empty set. Pin that the sweep really reaches the tree AND the one module this
+  // gate was written for.
+  it('sweeps a real, non-empty slice of src/ui (anti-vacuity)', () => {
+    expect(walk(uiRoot).length).toBeGreaterThan(200);
+    expect(residual.length).toBeGreaterThan(100);
+    expect(residual).toContain(join(repoRoot, 'src/ui/text_sprite_cache.ts'));
+  });
+
+  it('registers each classified module once, on disk, outside the core and painter families', () => {
+    const problems: string[] = [];
+    const seen = new Set<string>();
+    for (const [name, files] of [
+      ['UI_PAINTER_HELPERS', UI_PAINTER_HELPERS],
+      ['UI_DOM_MODULES', UI_DOM_MODULES],
+    ] as const) {
+      for (const f of files) {
+        const shown = relative(repoRoot, f);
+        if (!existsSync(f)) problems.push(`${shown} (${name}: missing on disk)`);
+        if (seen.has(f)) problems.push(`${shown} (${name}: listed twice)`);
+        seen.add(f);
+        if (SWEPT_BY_NAME_RE.test(f)) {
+          problems.push(`${shown} (${name}: a *_view/*_core/*_painter is swept by its own gate)`);
+        }
+        if (new Set(UI_PURE_CORES).has(f)) {
+          problems.push(`${shown} (${name}: already registered in UI_PURE_CORES)`);
+        }
+      }
+    }
+    expect(
+      problems,
+      `each classified src/ui module must exist and belong to exactly one bucket:\n${problems.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  // COMPLETENESS, the point of the gate: a module that reaches for the browser and
+  // is in NEITHER list fails, so a new DOM-touching helper cannot land unclassified
+  // the way text_sprite_cache.ts could before this.
+  it('classifies every browser-touching src/ui module (completeness)', () => {
+    const unclassified = residual
+      .filter((f) => !helpers.has(f) && !domModules.has(f))
+      .filter(touchesBrowser)
+      .map((f) => relative(repoRoot, f));
+    expect(
+      unclassified,
+      `unclassified src/ui module(s) reaching for the browser: register a host-agnostic painter-side helper in UI_PAINTER_HELPERS (it may then only mint its own canvas, and must stay deterministic and colorless), or a module that OWNS browser state in UI_DOM_MODULES:\n${unclassified.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  // The other direction: an exemption nobody needs. Without this, the cheapest way
+  // past the gate would be to add your new module to UI_DOM_MODULES and never touch
+  // a global at all, and the list would rot into a blanket opt-out.
+  it('keeps both lists honest: no exemption for a module that touches no browser global', () => {
+    const stale = [...UI_PAINTER_HELPERS, ...UI_DOM_MODULES]
+      .filter((f) => existsSync(f) && !touchesBrowser(f))
+      .map((f) => relative(repoRoot, f));
+    expect(
+      stale,
+      `stale classification: these modules reach for no browser global, so they need no entry (drop them; the default bucket already scans them):\n${stale.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('painter helpers reach for no browser host beyond the canvas they rasterize into', () => {
+    const violations: string[] = [];
+    for (const file of UI_PAINTER_HELPERS) {
+      const shown = relative(repoRoot, file);
+      const code = stripComments(readFileSync(file, 'utf8'));
+      for (const [what, re] of [
+        ['a DOM/browser global', HELPER_HOST_GLOBAL_RE],
+        ['a browser-only entry point', UI_BROWSER_API_RE],
+        ['wall-clock time or randomness', NONDETERMINISM_RE],
+      ] as const) {
+        for (const line of code.split('\n')) {
+          if (re.test(line)) violations.push(`${shown}: ${what}: ${line.trim()}`);
+        }
+      }
+      const docAccess = code.match(HELPER_DOC_ACCESS_RE) ?? [];
+      const minted = code.match(HELPER_DOC_ALLOWED_RE) ?? [];
+      if (docAccess.length !== minted.length) {
+        violations.push(
+          `${shown}: ${docAccess.length} document reference(s) but only ${minted.length} document.createElement( call(s): a helper mints its own detached node and never reaches the live tree`,
+        );
+      }
+    }
+    expect(
+      violations,
+      `src/ui painter helpers must stay host-agnostic and deterministic:\n${violations.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('painter helpers import nothing from render/game/net, three, or a DOM-owning painter', () => {
+    const violations = scanImports(UI_PAINTER_HELPERS, forbiddenUiCoreImport);
+    expect(
+      violations,
+      `src/ui painter helpers follow the pure-core import rule:\n${violations.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('painter helpers carry no literal color (the caller passes resolved tokens)', () => {
+    const violations: string[] = [];
+    for (const file of UI_PAINTER_HELPERS) {
+      const code = stripComments(readFileSync(file, 'utf8'));
+      const shown = relative(repoRoot, file);
+      for (const hit of code.match(COLOR_HEX_RE) ?? []) violations.push(`${shown}: ${hit}`);
+      for (const hit of code.match(COLOR_FUNC_RE) ?? []) violations.push(`${shown}: ${hit}`);
+    }
+    expect(
+      violations,
+      `a painter helper takes RESOLVED color tokens from its painter, never a baked literal:\n${violations.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  // Teeth for the matchers this sweep adds (the standing self-test pattern the
+  // shared DOM/determinism regexes already follow above): a weakened regex would
+  // pass every scan vacuously, and the prose negative is the specific reason this
+  // sweep does not reuse DOM_GLOBAL_RE.
+  it('the src/ui host-global matchers keep their teeth', () => {
+    for (const positive of [
+      'document.createElement(x)',
+      'window.innerWidth',
+      'navigator.userAgent',
+      "localStorage['k']",
+      'sessionStorage.setItem(a, b)',
+      'if (window.matchMedia) return;',
+    ]) {
+      expect(UI_HOST_GLOBAL_RE.test(positive), positive).toBe(true);
+    }
+    for (const negative of [
+      // Player prose, the reason this matcher is tighter than DOM_GLOBAL_RE.
+      "'Press M to close the map window. Then click the marker.',",
+      "'This document. Signed.',",
+      'const windowless = computeViewport();',
+      'this.documentTitle = t;',
+    ]) {
+      expect(UI_HOST_GLOBAL_RE.test(negative), negative).toBe(false);
+    }
+    for (const positive of [
+      'getComputedStyle(el)',
+      'requestAnimationFrame(step)',
+      'requestIdleCallback(slice)',
+      'matchMedia in window',
+    ]) {
+      expect(UI_BROWSER_API_RE.test(positive), positive).toBe(true);
+    }
+    for (const negative of ['getComputedLayout(el)', 'requestAnimation(step)', 'idleCallback()']) {
+      expect(UI_BROWSER_API_RE.test(negative), negative).toBe(false);
+    }
+    // The helper document rule counts every access, so a second, live-tree call
+    // cannot hide behind the sanctioned one.
+    const both = "document.createElement('canvas'); document.body.append(c);";
+    expect((both.match(HELPER_DOC_ACCESS_RE) ?? []).length).toBe(2);
+    expect((both.match(HELPER_DOC_ALLOWED_RE) ?? []).length).toBe(1);
+    // And the color matchers see both literal forms.
+    expect('#ff0'.match(COLOR_HEX_RE)).toEqual(['#ff0']);
+    expect('#ffcc00aa'.match(COLOR_HEX_RE)).toEqual(['#ffcc00aa']);
+    expect('rgba(0, 0, 0, .5)'.match(COLOR_FUNC_RE)).toEqual(['rgba(']);
+    expect('rgb(1 2 3)'.match(COLOR_FUNC_RE)).toEqual(['rgb(']);
+    expect('const hex = colorToken;'.match(COLOR_HEX_RE)).toBeNull();
+  });
+});

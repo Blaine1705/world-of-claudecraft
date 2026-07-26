@@ -192,6 +192,16 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
   go through the `PainterHost` elided writers; it drives tokens / CSS vars, never a literal
   hex/px/color in TS (the per-painter no-magic-values source guard). Interpolated names pass
   through `esc()`; a pure extraction reuses existing `t()` keys and adds none.
+- **Neither of the two?** A module that cannot be a pure core (it has to touch the DOM) and is not
+  a painter is a **painter-side helper**: register it in `UI_PAINTER_HELPERS`
+  (`tests/architecture.test.ts`) and it holds a hard contract: host-agnostic (no `window` /
+  `navigator` / `localStorage` / `getComputedStyle` / `requestAnimationFrame`), deterministic (no
+  `Date.now` / `performance.now` / `Math.random`), no literal hex/rgb color (the painter passes
+  RESOLVED tokens), and `document` ONLY to mint its own detached node via `createElement`, never to
+  reach the live tree. Exemplar: `text_sprite_cache.ts`. That sweep classifies EVERY other `src/ui`
+  module too: one that owns browser state is registered in `UI_DOM_MODULES`, and anything
+  unregistered must reach for no browser global at all. So a new module cannot escape both
+  completeness sweeps by being named neither `*_view`/`*_core` nor `*_painter`.
 - **For chrome:** satisfy the HUD-chrome WCAG 2.2 AA contract above; mark the window root with
   `markDialogRoot` (`src/ui/dialog_root.ts`): role=dialog + aria-modal + exactly ONE accessible
   name (labelledBy wins and clears aria-label), cold-path raw `setAttribute` BY DESIGN (not
