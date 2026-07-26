@@ -280,6 +280,40 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   kcasBookcase: { url: '/models/biome/kcas_bookcase.glb', kit: 'kcas' },
   kcasKeg: { url: '/models/biome/kcas_keg.glb', kit: 'kcas' },
   kcasBarrel: { url: '/models/biome/kcas_barrel.glb', kit: 'kcas' },
+  // The Last Keep's lived-in interior furniture (KayKit Dungeon Remastered
+  // tavern set, already committed under public/models/dungeon): beds for the
+  // residence wing, seating and clothed tables for the dining rooms, shelves,
+  // buffet counters, candelabra, stores, and the chapel shrine. Instanced by
+  // src/render/lastkeep_dressing.ts through this same registry (one preload
+  // gate, one manifest surface).
+  kcasBedRoyal: { url: '/models/dungeon/bed_decorated.glb', kit: 'kcas' },
+  kcasBedDouble: { url: '/models/dungeon/bed_b_double.glb', kit: 'kcas' },
+  kcasBedSingle: { url: '/models/dungeon/bed_b_single.glb', kit: 'kcas' },
+  kcasBedBunk: { url: '/models/dungeon/bed_a_stacked.glb', kit: 'kcas' },
+  kcasBedCot: { url: '/models/dungeon/bed_a_single.glb', kit: 'kcas' },
+  kcasBedroll: { url: '/models/dungeon/bed_floor.glb', kit: 'kcas' },
+  kcasChair: { url: '/models/dungeon/chair.glb', kit: 'kcas' },
+  kcasStool: { url: '/models/dungeon/stool.glb', kit: 'kcas' },
+  kcasTableRoundSmall: { url: '/models/dungeon/table_round_small.glb', kit: 'kcas' },
+  kcasTableRoundMedium: { url: '/models/dungeon/table_round_medium.glb', kit: 'kcas' },
+  // NOTE: the laid feast table (table_long_tablecloth_decorated_a) is already
+  // registered above as kcasTableLong (/models/biome/kcas_table_long.glb), so
+  // only the PLAIN clothed table is a new entry.
+  kcasTableCloth: { url: '/models/dungeon/table_long_tablecloth.glb', kit: 'kcas' },
+  kcasShelfLarge: { url: '/models/dungeon/shelf_large.glb', kit: 'kcas' },
+  kcasShelfSmall: { url: '/models/dungeon/shelf_small.glb', kit: 'kcas' },
+  kcasShelfBooks: { url: '/models/dungeon/shelf_small_books.glb', kit: 'kcas' },
+  kcasShelfCandles: { url: '/models/dungeon/shelf_small_candles.glb', kit: 'kcas' },
+  kcasBarA: { url: '/models/dungeon/bar_straight_a.glb', kit: 'kcas' },
+  kcasBarB: { url: '/models/dungeon/bar_straight_b.glb', kit: 'kcas' },
+  kcasBarC: { url: '/models/dungeon/bar_straight_c.glb', kit: 'kcas' },
+  kcasBartopMedium: { url: '/models/dungeon/bartop_a_medium.glb', kit: 'kcas' },
+  kcasCandleTriple: { url: '/models/dungeon/candle_triple.glb', kit: 'kcas' },
+  kcasCrateLarge: { url: '/models/dungeon/crate_large.glb', kit: 'kcas' },
+  kcasCrateSmall: { url: '/models/dungeon/crate_small.glb', kit: 'kcas' },
+  kcasCratesStacked: { url: '/models/dungeon/crates_stacked.glb', kit: 'kcas' },
+  kcasSwordShield: { url: '/models/dungeon/sword_shield.glb', kit: 'kcas' },
+  kcasShrine: { url: '/models/dungeon/shrine_candles.glb', kit: 'kcas' },
   // The Drakelands castle bailey: KayKit Medieval Hexagon Pack buildings in the
   // red colorway (same drakelands_castle.json spec; hex-tile scale, so decor
   // entries carry scale like the other hex buildings).

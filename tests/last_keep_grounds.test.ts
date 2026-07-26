@@ -53,10 +53,11 @@ function walkTo(
 
 describe('the Last Keep castle grounds', () => {
   it('a player enters by the main gate, the postern alley, and the breach', () => {
-    // main gate: straight in off the road
+    // main gate: straight in off the road, through the barbican's outer
+    // doorway, across the forecourt, and under the gatehouse arch
     {
-      const { sim, p, meta } = makeWalker({ x: 352, z: 2029.9 });
-      expect(walkTo(sim, p, meta, { x: 376, z: 2029.9 }), 'main gate').toBe(true);
+      const { sim, p, meta } = makeWalker({ x: 330, z: 2029.9 });
+      expect(walkTo(sim, p, meta, { x: 376, z: 2029.9 }), 'outer gate + main gate').toBe(true);
     }
     // postern: through the doorway into the wall-side alley, then west
     // into the open bailey (the alley runs between wall and ward terrace)
@@ -78,6 +79,26 @@ describe('the Last Keep castle grounds', () => {
       const { sim, p, meta } = makeWalker({ x: 354, z });
       walkTo(sim, p, meta, { x: 366, z }, 20 * 10);
       expect(p.pos.x, `wall at z ${z} should stop the walker`).toBeLessThan(CASTLE.wx0 - 0.4);
+    }
+  });
+
+  it('the barbican wall refuses a crossing; the garden opens only at its doorways', () => {
+    // the outer work is a sheer 4yd riser off the road line
+    {
+      const { sim, p, meta } = makeWalker({ x: 336, z: 2020 });
+      walkTo(sim, p, meta, { x: 350, z: 2020 }, 20 * 8);
+      expect(p.pos.x, 'the barbican wall should stop the walker').toBeLessThan(340.8);
+    }
+    // in through the garden's west doorway
+    {
+      const { sim, p, meta } = makeWalker({ x: 366.75, z: 2088 });
+      expect(walkTo(sim, p, meta, { x: 366.75, z: 2079 }), 'garden doorway').toBe(true);
+    }
+    // the garden wall itself refuses the shortcut
+    {
+      const { sim, p, meta } = makeWalker({ x: 400, z: 2088 });
+      walkTo(sim, p, meta, { x: 400, z: 2079 }, 20 * 8);
+      expect(p.pos.z, 'the garden wall should stop the walker').toBeGreaterThan(2084.1);
     }
   });
 
@@ -141,5 +162,17 @@ describe('the Last Keep castle grounds', () => {
       expect(castleLift(413.5, z)).toBe(0);
       expect(Math.abs(groundHeight(413.5, z, SEED) - CASTLE.ward.h)).toBeLessThan(0.1);
     }
+  });
+
+  it('the tall towers stand at their heights and stay unreachable from the walk', () => {
+    // NW garrison silo at 17, SE watch at 20 (reached by its flight)
+    expect(Math.abs(groundHeight(CASTLE.wx0, CASTLE.wz0, SEED) - 17)).toBeLessThan(0.1);
+    expect(Math.abs(groundHeight(CASTLE.wx1, CASTLE.wz1, SEED) - CASTLE.watchAbs)).toBeLessThan(
+      0.1,
+    );
+    // a walker on the west walk cannot climb the NW silo's sheer side
+    const { sim, p, meta } = makeWalker({ x: CASTLE.wx0, z: 1995 });
+    walkTo(sim, p, meta, { x: CASTLE.wx0, z: CASTLE.wz0 }, 20 * 8);
+    expect(p.pos.z, 'the silo face should stop the walker').toBeGreaterThan(1990.6);
   });
 });

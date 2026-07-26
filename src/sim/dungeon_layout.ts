@@ -231,12 +231,16 @@ export const TEMPLE_LAYOUT: DungeonLayout = (() => {
 //     STORY 0, the undercroft   lift 0    gaol + 3 cells, vaulted storeroom,
 //                                          wine cellar (the only dungeon story)
 //     gaol stair (half landing) lift 1.5  entrance hall -> gaol
-//     STORY 1, the state floor  lift 3.0  entrance hall, great hall, ballroom,
-//                                          kitchen + pantry, council, treasury
-//     throne dais               lift 4.2  (+1.2 over the great hall)
+//     STORY 1, the state floor  lift 3.0  entrance hall, guard room + armory,
+//                                          great (feast) hall, walled throne
+//                                          room, ballroom, kitchen + pantry,
+//                                          steward's office, dining parlor,
+//                                          council, treasury
+//     throne dais               lift 4.2  (+1.2 over the throne room)
 //     grand + servants' stairs  lift 4.5  two half landings, so story 2 loops
 //     STORY 2, the residence    lift 6.0  long gallery, library, royal chamber,
-//                                          solar, all off the gallery
+//                                          three guest chambers, solar, chapel,
+//                                          servants' quarters
 //     tower stair, the lookout  lift 7.5 / 9.0  continuing above story 2
 //   Every lift change happens across a door, so authoredLiftAt turns each one
 //   into a stair ramp shared by sim and render. Each 1.5 step ramps over a 6yd
@@ -246,11 +250,12 @@ export const TEMPLE_LAYOUT: DungeonLayout = (() => {
 // (src/render/rift_decor.ts DECOR_MODELS + the procedural 'pentagram'/'rug').
 // The cage/bone dressing is confined to the undercroft (the dungeon story);
 // stories 1 and 2 carry braziers, statues, rugs, the throne, the treasury
-// plinth, and the council crest, and the WARM furnishing (bookcases, tables,
-// benches, kegs, banners, mounted torches) is instanced by the renderer's
-// lastkeep dressing pass (src/render/lastkeep_dressing.ts) from these same
-// room rects. Collision radii are the footprints measured from the built GLBs
-// (the same constants the Infernal Citadel uses), so colliders match models.
+// plinth, and the council crest, and the WARM furnishing (beds, tables,
+// chairs, bookcases, buffet counters, candle rows, kegs, banners, mounted
+// torches) is instanced by the renderer's lastkeep dressing pass
+// (src/render/lastkeep_dressing.ts) from these same room rects. Collision
+// radii are the footprints measured from the built GLBs (the same constants
+// the Infernal Citadel uses), so colliders match models.
 
 const KEEP_R_BRAZIER = 0.85;
 const KEEP_R_STATUE = 0.75;
@@ -277,11 +282,22 @@ const keepBrazier = (x: number, z: number): AuthoredDecor => ({
 export const LASTKEEP_ROOMS: readonly AuthoredRoom[] = [
   // STORY 1, the state floor (lift 3.0).
   { id: 'hall_entrance', x0: -10, x1: 12, z0: -16, z1: 8, lift: KEEP_STORY1_LIFT },
-  { id: 'great_hall', x0: -14, x1: 14, z0: 8, z1: 48, lift: KEEP_STORY1_LIFT }, // the largest room
-  { id: 'throne_dais', x0: -8, x1: 8, z0: 48, z1: 56, lift: KEEP_STORY1_LIFT + 1.2 },
+  // The garrison wing flanks the entrance: the guard room watches the door,
+  // the armory behind it opens onto the ballroom's service side.
+  { id: 'guard_room', x0: -24, x1: -10, z0: -14, z1: 4, lift: KEEP_STORY1_LIFT },
+  { id: 'armory', x0: -24, x1: -14, z0: 4, z1: 18, lift: KEEP_STORY1_LIFT },
+  { id: 'great_hall', x0: -14, x1: 14, z0: 8, z1: 40, lift: KEEP_STORY1_LIFT }, // the feast hall
+  // The walled throne room north of the feast hall, its dais raised +1.2
+  // behind a wide ceremonial stair.
+  { id: 'throne_room', x0: -14, x1: 14, z0: 40, z1: 56, lift: KEEP_STORY1_LIFT },
+  { id: 'throne_dais', x0: -7, x1: 7, z0: 56, z1: 62, lift: KEEP_STORY1_LIFT + 1.2 },
   { id: 'ballroom', x0: -38, x1: -14, z0: 18, z1: 44, lift: KEEP_STORY1_LIFT },
   { id: 'kitchen', x0: -38, x1: -24, z0: 44, z1: 58, lift: KEEP_STORY1_LIFT },
   { id: 'pantry', x0: -24, x1: -14, z0: 46, z1: 56, lift: KEEP_STORY1_LIFT },
+  // The east service rooms off the feast hall: the steward's office and the
+  // crown's private dining parlor.
+  { id: 'steward_office', x0: 14, x1: 22, z0: 10, z1: 20, lift: KEEP_STORY1_LIFT },
+  { id: 'dining_parlor', x0: 14, x1: 22, z0: 22, z1: 36, lift: KEEP_STORY1_LIFT },
   { id: 'council', x0: 14, x1: 32, z0: 42, z1: 56, lift: KEEP_STORY1_LIFT },
   { id: 'treasury', x0: 32, x1: 42, z0: 44, z1: 54, lift: KEEP_STORY1_LIFT },
   // STORY 2, the residence floor (lift 6.0), reached by TWO stair rooms (the
@@ -291,7 +307,15 @@ export const LASTKEEP_ROOMS: readonly AuthoredRoom[] = [
   { id: 'stair_servants', x0: -34, x1: -24, z0: 58, z1: 68, lift: KEEP_STAIR_UP },
   { id: 'gallery', x0: -24, x1: 24, z0: 66, z1: 78, lift: KEEP_STORY2_LIFT }, // the long gallery
   { id: 'royal_chamber', x0: -42, x1: -24, z0: 68, z1: 84, lift: KEEP_STORY2_LIFT },
+  // The bedrooms wing: three guest chambers off the gallery's north side, and
+  // the servants' quarters tucked beside their stair.
+  { id: 'guest_west', x0: -24, x1: -17, z0: 78, z1: 90, lift: KEEP_STORY2_LIFT },
+  { id: 'guest_mid', x0: -17, x1: -10, z0: 78, z1: 90, lift: KEEP_STORY2_LIFT },
+  { id: 'guest_east', x0: 8, x1: 24, z0: 78, z1: 90, lift: KEEP_STORY2_LIFT },
+  { id: 'servants_quarters', x0: -42, x1: -34, z0: 58, z1: 68, lift: KEEP_STORY2_LIFT },
   { id: 'solar', x0: -8, x1: 8, z0: 78, z1: 90, lift: KEEP_STORY2_LIFT },
+  // The keep's private chapel, north of the solar at the residence's far end.
+  { id: 'chapel', x0: -8, x1: 8, z0: 90, z1: 100, lift: KEEP_STORY2_LIFT },
   { id: 'library', x0: 24, x1: 42, z0: 60, z1: 80, lift: KEEP_STORY2_LIFT },
   // The watch tower continues above the residence: stair turret, then the
   // open lookout at the keep's highest point.
@@ -311,22 +335,33 @@ export const LASTKEEP_ROOMS: readonly AuthoredRoom[] = [
 
 export const LASTKEEP_DOORS: readonly AuthoredDoor[] = [
   // The state floor.
-  { x: 0, z: 8, hw: 3.5, hd: 1 }, // entrance hall -> great hall
-  { x: 0, z: 48, hw: 4.5, hd: 1 }, // great hall -> throne dais (wide stair, +1.2)
+  { x: 0, z: 8, hw: 3.5, hd: 1 }, // entrance hall -> great (feast) hall
+  { x: -10, z: -5, hw: 1, hd: 1.4 }, // entrance hall -> guard room
+  { x: -19, z: 4, hw: 2, hd: 1 }, // guard room -> armory
+  { x: -19, z: 18, hw: 2, hd: 1 }, // armory -> ballroom (the garrison's service door)
   { x: -14, z: 31, hw: 1, hd: 3 }, // great hall -> ballroom
+  { x: 0, z: 40, hw: 3.5, hd: 1 }, // great hall -> throne room (the processional arch)
+  { x: 0, z: 56, hw: 4.5, hd: 1 }, // throne room -> throne dais (wide stair, +1.2)
+  { x: 14, z: 15, hw: 1, hd: 1.4 }, // great hall -> steward's office
+  { x: 14, z: 24, hw: 1, hd: 1.4 }, // great hall -> dining parlor
+  { x: 14, z: 45, hw: 1, hd: 1.4 }, // throne room -> council chamber
   { x: -31, z: 44, hw: 2.5, hd: 1 }, // ballroom -> kitchen
   { x: -24, z: 51, hw: 1, hd: 2 }, // kitchen -> pantry
-  { x: 14, z: 45, hw: 1, hd: 1.4 }, // great hall -> council chamber
   { x: 32, z: 49, hw: 1, hd: 1.2 }, // council -> treasury (the narrow "locked" vault door)
   // Up to the residence: two separate stairs so story 2 loops.
   { x: 19, z: 56, hw: 2, hd: 1 }, // council -> grand stair (+1.5)
   { x: 19, z: 66, hw: 2, hd: 1 }, // grand stair -> gallery (+1.5)
   { x: -29, z: 58, hw: 2, hd: 1 }, // kitchen -> servants' stair (+1.5)
   { x: -29, z: 68, hw: 2, hd: 1 }, // servants' stair -> royal chamber (+1.5)
+  { x: -34, z: 63, hw: 1, hd: 1.2 }, // servants' stair -> servants' quarters (+1.5)
   // The residence floor.
   { x: -24, z: 73, hw: 1, hd: 2 }, // royal chamber -> gallery
   { x: 0, z: 78, hw: 2.5, hd: 1 }, // gallery -> solar
   { x: 24, z: 72, hw: 1, hd: 2.5 }, // gallery -> library
+  { x: -20.5, z: 78, hw: 1.2, hd: 1 }, // gallery -> west guest chamber
+  { x: -13.5, z: 78, hw: 1.2, hd: 1 }, // gallery -> middle guest chamber
+  { x: 16, z: 78, hw: 1.2, hd: 1 }, // gallery -> east guest chamber
+  { x: 0, z: 90, hw: 1.5, hd: 1 }, // solar -> chapel
   // The watch tower above the residence.
   { x: 33, z: 80, hw: 2, hd: 1 }, // library -> tower stair (+1.5)
   { x: 33, z: 90, hw: 2, hd: 1 }, // tower stair -> lookout (+1.5)
@@ -348,27 +383,41 @@ export const LASTKEEP_DECOR: readonly AuthoredDecor[] = [
   keepBrazier(9, -13),
   { key: 'infernal_statue', x: -5, z: 6, yaw: Math.PI, r: KEEP_R_STATUE },
   { key: 'infernal_statue', x: 5, z: 6, yaw: Math.PI, r: KEEP_R_STATUE },
-  // Great hall: a processional rug up the spine, brazier colonnade lines, and
-  // honor-guard statues flanking the throne stair.
-  { key: 'rug', x: 0, z: 28, yaw: 0 },
+  // Guard room: watch-fire by the door, one in the bunk corner.
+  keepBrazier(-22.5, -12.5),
+  keepBrazier(-11.8, 2.4),
+  // Armory: racks and crates come from the dressing pass; two work fires.
+  keepBrazier(-16.2, 9.5),
+  keepBrazier(-15.8, 16.3),
+  // Great hall: a processional rug up the spine toward the throne room arch,
+  // brazier colonnade lines down both long walls.
+  { key: 'rug', x: 0, z: 26, yaw: 0 },
   keepBrazier(-11, 14),
   keepBrazier(11, 14),
   keepBrazier(-11, 26),
   keepBrazier(11, 26),
   keepBrazier(-11, 38),
   keepBrazier(11, 38),
-  { key: 'infernal_statue', x: -7, z: 44, yaw: Math.PI / 2, r: KEEP_R_STATUE },
-  { key: 'infernal_statue', x: 7, z: 44, yaw: -Math.PI / 2, r: KEEP_R_STATUE },
+  // Throne room: honor-guard statues inside the arch, corner braziers, and a
+  // wide court carpet before the dais stair (the candle rows are dressing).
+  { key: 'infernal_statue', x: -8, z: 43, yaw: Math.PI / 2, r: KEEP_R_STATUE },
+  { key: 'infernal_statue', x: 8, z: 43, yaw: -Math.PI / 2, r: KEEP_R_STATUE },
+  { key: 'rug', x: 0, z: 49, yaw: Math.PI / 2 },
+  keepBrazier(-12, 42),
+  keepBrazier(12, 42),
+  keepBrazier(-12, 54),
+  keepBrazier(12, 54),
   // Throne dais: the throne against the north wall, facing down the hall.
-  { key: 'bone_throne', x: 0, z: 54, yaw: Math.PI, r: KEEP_R_THRONE },
-  keepBrazier(-5.5, 53.5),
-  keepBrazier(5.5, 53.5),
-  // Ballroom: an open dance floor ringed by firelight and statuary.
+  { key: 'bone_throne', x: 0, z: 60.2, yaw: Math.PI, r: KEEP_R_THRONE },
+  keepBrazier(-5, 60.6),
+  keepBrazier(5, 60.6),
+  // Ballroom: an open dance floor ringed by firelight and statuary (the
+  // buffet counters, wall benches, and candle rows are dressing).
   keepBrazier(-35, 21),
-  keepBrazier(-17, 21),
+  keepBrazier(-16.8, 23),
   keepBrazier(-35, 41),
   keepBrazier(-17, 41),
-  { key: 'infernal_statue', x: -36, z: 31, yaw: Math.PI / 2, r: KEEP_R_STATUE },
+  { key: 'infernal_statue', x: -36.5, z: 20.2, yaw: Math.PI / 2, r: KEEP_R_STATUE },
   { key: 'infernal_statue', x: -26, z: 42, yaw: Math.PI, r: KEEP_R_STATUE },
   // Kitchen: the great hearth on the west wall, the cook's cauldron beside it.
   { key: 'hell_forge', x: -35.5, z: 51.5, yaw: Math.PI / 2, r: KEEP_R_FORGE },
@@ -377,6 +426,10 @@ export const LASTKEEP_DECOR: readonly AuthoredDecor[] = [
   // Pantry: the hanging larder cage among the stores.
   { key: 'hanging_cage', x: -17, z: 53, yaw: 0.4, r: KEEP_R_CAGE },
   keepBrazier(-16.5, 47.5),
+  // Steward's office and the private dining parlor: quiet hearth-light.
+  keepBrazier(16, 18.5),
+  keepBrazier(20.8, 23.5),
+  keepBrazier(15.5, 34.5),
   // Council chamber: the royal crest inlaid in the floor beneath the council
   // table, corner braziers.
   { key: 'pentagram', x: 23, z: 48, yaw: 0, scale: 4.5 },
@@ -395,14 +448,19 @@ export const LASTKEEP_DECOR: readonly AuthoredDecor[] = [
   { key: 'rug', x: 0, z: 72, yaw: Math.PI / 2 },
   keepBrazier(-18, 68),
   keepBrazier(14, 68),
-  keepBrazier(-18, 76),
-  keepBrazier(14, 76),
-  { key: 'infernal_statue', x: -10, z: 76.5, yaw: Math.PI, r: KEEP_R_STATUE },
+  keepBrazier(-18, 74.5),
+  keepBrazier(14, 74.5),
+  { key: 'infernal_statue', x: -9, z: 76.5, yaw: Math.PI, r: KEEP_R_STATUE },
   { key: 'infernal_statue', x: 8, z: 76.5, yaw: Math.PI, r: KEEP_R_STATUE },
-  // Royal chamber, solar, library: hearth-light; furniture comes from the
-  // renderer's dressing pass (the library walls are lined with bookcases).
+  // Royal chamber, guest chambers, servants' quarters, solar, library:
+  // hearth-light; the beds, shelves, and tables come from the dressing pass.
+  // The chapel alone is candle-lit (its shrine and candle rows are dressing).
   keepBrazier(-40, 70),
   keepBrazier(-26, 82),
+  keepBrazier(-20.5, 80.6),
+  keepBrazier(-11.3, 84.5),
+  keepBrazier(22.5, 88.5),
+  keepBrazier(-36, 59.8),
   keepBrazier(-6, 88),
   keepBrazier(6, 88),
   keepBrazier(33, 62.5),
@@ -438,7 +496,7 @@ export const LASTKEEP_LAYOUT: DungeonLayout = {
   // The dais marker sits under the lifted throne-dais room: placeDais' platform
   // blocks and rim decor (drawn from y 0) are entirely buried inside the room's
   // solid riser, so the authored dais room IS the visible boss-stage geometry.
-  dais: { x: 0, z: 52, r: 4 },
+  dais: { x: 0, z: 59, r: 4 },
   wallX: 42,
   endWallHw: 43,
   floorHalfX: 42,

@@ -17,8 +17,8 @@
 
 export const CASTLE = {
   // the graded grounds (terrain levels to the local pad target; the skirt
-  // blends out to the waste)
-  pad: { x0: 348, x1: 452, z0: 1980, z1: 2085, h: 6 },
+  // blends out to the waste; the west reach carries the barbican forecourt)
+  pad: { x0: 334, x1: 452, z0: 1980, z1: 2085, h: 6 },
   // the inner ward: the keep's raised terrace
   ward: { x0: 398, x1: 433.4, z0: 1991.4, z1: 2018, h: 8.6 },
   // the curtain wall square: wall centerlines
@@ -46,13 +46,51 @@ export const CASTLE = {
 // corner bastion's edge), so every gate is EXACTLY one module: the arch
 // piece the render places is the opening the lift field leaves.
 export const CASTLE_GATES = {
-  /** the main gatehouse: west wall, facing the Wyrmwatch road */
-  main: { a0: 2026.4, a1: 2033.4 },
+  /** the main gatehouse: west wall, facing the Wyrmwatch road. The span is
+   *  the DOORWAY module's own visual opening (its solid flanks stay wall),
+   *  so the lift never lets a walker pass through rendered stone */
+  main: { a0: 2028.2, a1: 2031.6 },
   /** the rear postern: a narrow servant door (the doorway module's own
    *  opening; the module's solid flanks stay wall) */
   postern: { a0: 407.6, a1: 410.2 },
   /** the east breach: the wall the drakes brought down, a rubble climb */
   breach: { a0: 2047.4, a1: 2054.4 },
+  /** the barbican's outer gate, aligned with the main gate on the road line
+   *  (the outer doorway renders at wall scale 1, so its opening is narrower) */
+  outer: { a0: 2028.9, a1: 2030.9 },
+} as const;
+
+// The barbican: a low-walled forecourt in front of the main gate, its own
+// outer gate on the road line. The walls are lift plateaus like the curtain
+// (sheer 4yd risers, no walk on top), with two round-out turrets at the
+// outer corners (listed in CASTLE_TOWERS).
+export const BARBICAN = {
+  /** outer wall centerline */
+  x: 342,
+  z0: 2016,
+  z1: 2044,
+  /** ABSOLUTE wall-top height (a lower outer work than the curtain) */
+  hAbs: 10,
+  /** wall thickness */
+  th: 1.8,
+} as const;
+
+// The walled garden annex: the sheltered strip between the far wall and the
+// pad's south edge, behind low walls with two garden doorways. Entered from
+// outside (the west road side and the breach side); the far wall-walk looks
+// down into it.
+export const GARDEN = {
+  x0: 362,
+  x1: 435,
+  /** south garden wall centerline */
+  wallZ: 2083,
+  /** ABSOLUTE garden wall top */
+  hAbs: 9,
+  th: 1.6,
+  /** the two doorway gaps in the south wall (x spans) */
+  gates: [
+    { a0: 365, a1: 368.5 },
+  ],
 } as const;
 
 // Towers: four corner bastions (the SE is the tall watch) plus three
@@ -66,7 +104,9 @@ export interface CastleTower {
   tall: boolean;
 }
 export const CASTLE_TOWERS: readonly CastleTower[] = [
-  { x: CASTLE.wx0, z: CASTLE.wz0, hAbs: CASTLE.walkAbs, hw: CASTLE.towerHw, tall: false }, // NW
+  // NW: the second tall tower, a windowed drum for skyline balance with the
+  // SE watch (no stair reaches its cap; it is the garrison's sealed silo)
+  { x: CASTLE.wx0, z: CASTLE.wz0, hAbs: 17, hw: CASTLE.towerHw, tall: true },
   { x: CASTLE.wx1, z: CASTLE.wz0, hAbs: CASTLE.walkAbs, hw: CASTLE.towerHw, tall: false }, // NE
   { x: CASTLE.wx0, z: CASTLE.wz1, hAbs: CASTLE.walkAbs, hw: CASTLE.towerHw, tall: false }, // SW
   { x: CASTLE.wx1, z: CASTLE.wz1, hAbs: CASTLE.watchAbs, hw: CASTLE.towerHw, tall: true }, // SE watch
@@ -74,6 +114,9 @@ export const CASTLE_TOWERS: readonly CastleTower[] = [
   { x: CASTLE.wx0, z: 2012.4, hAbs: CASTLE.walkAbs, hw: CASTLE.midTowerHw, tall: false }, // west
   { x: CASTLE.wx1, z: 2033.4, hAbs: CASTLE.walkAbs, hw: CASTLE.midTowerHw, tall: false }, // east
   { x: 398.4, z: CASTLE.wz1, hAbs: CASTLE.walkAbs, hw: CASTLE.midTowerHw, tall: false }, // south
+  // barbican round-out turrets at the forecourt's outer corners
+  { x: BARBICAN.x, z: BARBICAN.z0, hAbs: 11, hw: 1.6, tall: false },
+  { x: BARBICAN.x, z: BARBICAN.z1, hAbs: 11, hw: 1.6, tall: false },
 ] as const;
 
 // Stairs onto the walls: solid stone ramp masses (the sowfield grandstand
@@ -157,10 +200,12 @@ export const CASTLE_BUILDINGS: readonly CastleBuilding[] = [
 // Ember crystals of varying sizes around the grounds and approach (drawn by
 // render/ember_features.ts with the shared crystal model).
 export const CASTLE_CRYSTALS: readonly { x: number; z: number; fp: number }[] = [
-  // flanking the main gate approach
+  // the barbican forecourt: crystal-lit yard flanking the road
   { x: 354.5, z: 2023, fp: 5.5 },
   { x: 355, z: 2036.5, fp: 4.2 },
-  { x: 349, z: 2030, fp: 2.4 },
+  { x: 347.5, z: 2038.5, fp: 2.4 },
+  // outside the outer gate, marking the approach
+  { x: 337.5, z: 2023.5, fp: 3.4 },
   // the bailey court
   { x: 396, z: 2026, fp: 1.8 },
   { x: 416, z: 2036, fp: 2.6 },
@@ -241,16 +286,36 @@ export function castlePadWeight(x: number, z: number): number {
 
 const HT = CASTLE.wallTh / 2;
 
-// wall strip: full ABS walk height across the strip, gap over each gate
+// wall strip: full ABS height across the strip, gap over each gate
 function wallStripAbs(
   along: number,
   across: number,
   wallLine: number,
   gate: { a0: number; a1: number } | null,
+  hAbs = CASTLE.walkAbs,
+  halfTh = HT,
 ): number {
-  if (Math.abs(across - wallLine) > HT) return 0;
+  if (Math.abs(across - wallLine) > halfTh) return 0;
   if (gate && inSpan(along, gate)) return 0;
-  return CASTLE.walkAbs;
+  return hAbs;
+}
+
+// a bounded wall segment strip (the barbican and garden walls): ABS height
+// across the strip between s0 and s1, with optional gate gaps
+function segStripAbs(
+  along: number,
+  across: number,
+  line: number,
+  s0: number,
+  s1: number,
+  hAbs: number,
+  halfTh: number,
+  gates: readonly { a0: number; a1: number }[] = [],
+): number {
+  if (along < s0 || along > s1) return 0;
+  if (Math.abs(across - line) > halfTh) return 0;
+  for (const g of gates) if (inSpan(along, g)) return 0;
+  return hAbs;
 }
 
 /**
@@ -276,6 +341,32 @@ export function castleLift(x: number, z: number): number {
       abs,
       wallStripAbs(x, z, CASTLE.wz0, G.postern), // near wall
       wallStripAbs(x, z, CASTLE.wz1, null), // far wall (solid)
+    );
+  }
+  // the barbican forecourt: outer wall on the road line plus its two side
+  // walls back to the curtain (all low sheer works, no walk on top)
+  {
+    const b = BARBICAN;
+    const bht = b.th / 2;
+    abs = Math.max(
+      abs,
+      segStripAbs(z, x, b.x, b.z0, b.z1, b.hAbs, bht, [G.outer]),
+      // MUTATION: side walls deleted
+      0,
+      0,
+    );
+  }
+  // the walled garden behind the far wall: a low south wall with two
+  // doorway gaps, closed by short returns to the curtain
+  {
+    const g = GARDEN;
+    const ght = g.th / 2;
+    abs = Math.max(
+      abs,
+      segStripAbs(x, z, g.wallZ, g.x0, g.x1, g.hAbs, ght, g.gates),
+      // MUTATION: end returns deleted
+      0,
+      0,
     );
   }
   // tower bastions (square tops, walkable, continuous with the walks)

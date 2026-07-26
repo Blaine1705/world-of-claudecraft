@@ -163,18 +163,33 @@ describe('The Last Keep layout', () => {
     // STORY 1, the state floor, with the throne dais +1.2 above it.
     for (const id of [
       'hall_entrance',
+      'guard_room',
+      'armory',
       'great_hall',
+      'throne_room',
       'ballroom',
       'kitchen',
       'pantry',
+      'steward_office',
+      'dining_parlor',
       'council',
       'treasury',
     ]) {
       expect(lift(id), id).toBeCloseTo(3.0, 5);
     }
-    expect(lift('throne_dais') - lift('great_hall')).toBeCloseTo(1.2, 5);
+    expect(lift('throne_dais') - lift('throne_room')).toBeCloseTo(1.2, 5);
     // STORY 2, the residence floor, reached over two half landings.
-    for (const id of ['gallery', 'royal_chamber', 'solar', 'library']) {
+    for (const id of [
+      'gallery',
+      'royal_chamber',
+      'guest_west',
+      'guest_mid',
+      'guest_east',
+      'servants_quarters',
+      'solar',
+      'chapel',
+      'library',
+    ]) {
       expect(lift(id), id).toBeCloseTo(6.0, 5);
     }
     expect(lift('gaol_stair')).toBeCloseTo(1.5, 5);
@@ -199,7 +214,9 @@ describe('The Last Keep layout', () => {
 
   it('the residence floor loops: two distinct stair routes reach story 2', () => {
     // Removing either stair room must leave the residence reachable through
-    // the other, so story 2 never hangs off a single staircase.
+    // the other, so story 2 never hangs off a single staircase. (The
+    // servants' quarters are deliberately excluded: they open only onto the
+    // servants' stair, their whole point.)
     for (const removed of ['stair_grand', 'stair_servants']) {
       const kept = rooms.filter((r) => r.id !== removed);
       const adjacency = new Map<string, string[]>();
@@ -220,7 +237,16 @@ describe('The Last Keep layout', () => {
           queue.push(next);
         }
       }
-      for (const id of ['gallery', 'royal_chamber', 'solar', 'library']) {
+      for (const id of [
+        'gallery',
+        'royal_chamber',
+        'guest_west',
+        'guest_mid',
+        'guest_east',
+        'solar',
+        'chapel',
+        'library',
+      ]) {
         expect(seen.has(id), `${id} unreachable without ${removed}`).toBe(true);
       }
     }
@@ -262,12 +288,42 @@ describe('The Last Keep layout', () => {
 
   it('furnishing plan: every kcas piece sits in a room, off ramps, off decor, off door lanes', () => {
     const spots = lastKeepFurnishings();
-    expect(spots.length).toBeGreaterThan(60); // the keep is FURNISHED, not dressed
+    expect(spots.length).toBeGreaterThan(150); // the keep is FURNISHED, not dressed
+    const inRoom = (s: KeepDressingSpot, id: string): boolean => roomAt(rooms, s.x, s.z)?.id === id;
+    const count = (id: string, pred: (kind: KeepDressingSpot['kind']) => boolean): number =>
+      spots.filter((s) => inRoom(s, id) && pred(s.kind)).length;
     // The library is the bookcase-heavy room.
-    const libraryBookcases = spots.filter(
-      (s) => s.kind === 'kcasBookcase' && roomAt(rooms, s.x, s.z)?.id === 'library',
-    );
-    expect(libraryBookcases.length).toBeGreaterThanOrEqual(6);
+    expect(count('library', (k) => k === 'kcasBookcase')).toBeGreaterThanOrEqual(6);
+    // Castle-v3 room-identity pins: the throne room's candle rows, feast
+    // tables in the great hall, the parlor's set dinner table, the ballroom
+    // buffet, a bed in every bedroom, bunks by the servants' stair, the
+    // chapel's shrine and pews, and the armory's wall racks.
+    expect(count('throne_room', (k) => k === 'kcasCandleTriple')).toBeGreaterThanOrEqual(8);
+    // kcasTableLong is the laid (food-decorated) tablecloth model.
+    expect(
+      count('great_hall', (k) => k === 'kcasTableCloth' || k === 'kcasTableLong'),
+    ).toBeGreaterThanOrEqual(4);
+    expect(count('dining_parlor', (k) => k === 'kcasTableCloth')).toBeGreaterThanOrEqual(1);
+    expect(count('dining_parlor', (k) => k === 'kcasChair')).toBeGreaterThanOrEqual(4);
+    expect(
+      count('ballroom', (k) => k === 'kcasBarA' || k === 'kcasBarB' || k === 'kcasBarC'),
+    ).toBeGreaterThanOrEqual(3);
+    expect(count('royal_chamber', (k) => k === 'kcasBedRoyal')).toBe(1);
+    expect(count('guest_west', (k) => k === 'kcasBedSingle')).toBeGreaterThanOrEqual(2);
+    expect(count('guest_mid', (k) => k === 'kcasBedDouble')).toBe(1);
+    expect(count('guest_east', (k) => k === 'kcasBedDouble')).toBe(1);
+    expect(count('servants_quarters', (k) => k === 'kcasBedBunk')).toBeGreaterThanOrEqual(2);
+    expect(count('guard_room', (k) => k === 'kcasBedCot')).toBeGreaterThanOrEqual(2);
+    expect(count('chapel', (k) => k === 'kcasShrine')).toBe(1);
+    expect(count('chapel', (k) => k === 'kcasBench')).toBeGreaterThanOrEqual(4);
+    expect(count('armory', (k) => k === 'kcasSwordShield')).toBeGreaterThanOrEqual(2);
+    // Prisoner bedrolls dress every gaol cell.
+    for (const cell of ['cell_north', 'cell_mid', 'cell_south']) {
+      expect(
+        count(cell, (k) => k === 'kcasBedroll'),
+        cell,
+      ).toBe(1);
+    }
     // The doorway-lane contract: a walk lane through every opening, extended
     // 1.5yd into both rooms, that no floor-standing piece's footprint enters.
     const laneRects = doors.map((d) => {

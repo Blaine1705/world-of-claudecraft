@@ -11,10 +11,12 @@
 // and steps, the keep's turret crown, parapets, stairs, banners, torches.
 import * as THREE from 'three';
 import {
+  BARBICAN,
   CASTLE,
   CASTLE_GATES,
   CASTLE_RAMPS,
   CASTLE_TOWERS,
+  GARDEN,
   WARD_STEP_RUN,
   WARD_STEPS,
 } from '../sim/castle_layout';
@@ -29,7 +31,6 @@ const CASTLE_KEYS = [
   'kcasWall',
   'kcasWallHalf',
   'kcasWallCorner',
-  'kcasWallGated',
   'kcasWallDoorway',
   'kcasWallBroken',
   'kcasWallWindow',
@@ -49,6 +50,7 @@ const CASTLE_KEYS = [
   'kcasFloorWeeds',
   'kcasStairsWide',
   'kcasFoundation',
+  'kcasBench',
   'hexrTowerA',
 ] as const;
 type CastleKey = (typeof CASTLE_KEYS)[number];
@@ -93,13 +95,25 @@ function attributeToFloat(geo: THREE.BufferGeometry, name: string): void {
   geo.setAttribute(name, new THREE.BufferAttribute(out, attr.itemSize));
 }
 
+// Parts to leave out of a piece when instancing: the doorway module's door
+// leaf stays out so every gate renders as an OPEN archway (the lift field's
+// gate gap matches the arch opening; a closed door visual over walkable
+// ground reads as walking through wood).
+const SKIP_PARTS: Partial<Record<CastleKey, RegExp>> = {
+  kcasWallDoorway: /_door$/i,
+};
+
 // bake a loaded scene into parts, xz-centered with min-y at 0
-function extractParts(scene: THREE.Group): { geo: THREE.BufferGeometry; mat: THREE.Material }[] {
+function extractParts(
+  scene: THREE.Group,
+  skip?: RegExp,
+): { geo: THREE.BufferGeometry; mat: THREE.Material }[] {
   scene.updateMatrixWorld(true);
   const parts: { geo: THREE.BufferGeometry; mat: THREE.Material }[] = [];
   scene.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh) return;
+    if (skip && (skip.test(mesh.name) || (mesh.parent && skip.test(mesh.parent.name)))) return;
     const geo = mesh.geometry.clone();
     attributeToFloat(geo, 'position');
     attributeToFloat(geo, 'normal');
@@ -181,7 +195,7 @@ export function buildCastleFeatures(): CastleFeaturesView {
       a0: CASTLE.wz0 + hw,
       a1: CASTLE.wz1 - hw,
       gate: CASTLE_GATES.main,
-      gatePiece: 'kcasWallGated',
+      gatePiece: 'kcasWallDoorway',
     },
     {
       axis: 'z',
@@ -231,15 +245,23 @@ export function buildCastleFeatures(): CastleFeaturesView {
       const v = Math.abs(Math.round(c * 7 + run.line)) % 11;
       place(run, c, v === 3 ? 'kcasWallWindow' : 'kcasWall');
     }
-    // parapets along BOTH walk edges, parted over gates
+    // parapets: a low crenellated STONE battlement along the outer edge
+    // (small wall modules), a guard rail along the inner edge, both parted
+    // over gates. The outer side is away from the bailey per run.
     const off = CASTLE.wallTh / 2 - 0.2;
+    const outerSide: -1 | 1 = run.line === CASTLE.wx0 || run.line === CASTLE.wz0 ? -1 : 1;
+    const bat = 0.4; // battlement piece scale: 1.6 long, 1.6 tall
+    for (let c = run.a0 + 0.8; c <= run.a1 - 0.8; c += 4 * bat) {
+      if (run.gate && c > run.gate.a0 - 1 && c < run.gate.a1 + 1) continue;
+      const x = run.axis === 'z' ? run.line + outerSide * off : c;
+      const z = run.axis === 'z' ? c : run.line + outerSide * off;
+      put('kcasWall', { x, y: walkY - 0.04, z, rot: run.axis === 'z' ? Math.PI / 2 : 0, s: bat });
+    }
     for (let c = run.a0 + 1; c <= run.a1 - 1; c += 2 * S) {
       if (run.gate && c > run.gate.a0 - 1 && c < run.gate.a1 + 1) continue;
-      for (const side of [-1, 1] as const) {
-        const x = run.axis === 'z' ? run.line + side * off : c;
-        const z = run.axis === 'z' ? c : run.line + side * off;
-        put('kcasBarrierHalf', { x, y: walkY, z, rot: run.axis === 'z' ? Math.PI / 2 : 0 });
-      }
+      const x = run.axis === 'z' ? run.line - outerSide * off : c;
+      const z = run.axis === 'z' ? c : run.line - outerSide * off;
+      put('kcasBarrierHalf', { x, y: walkY, z, rot: run.axis === 'z' ? Math.PI / 2 : 0 });
     }
     // the VISIBLE walk floor: cap slabs over the whole strip, parted at
     // gates and tucked under the tower caps at the ends
@@ -270,26 +292,40 @@ export function buildCastleFeatures(): CastleFeaturesView {
     ];
     const shellScale = (thw * 2) / 4; // face length matches the square
     for (const f of faces) put('kcasWall', { x: f.x, y: padY, z: f.z, rot: f.rot, s: shellScale });
+    // a solid stone core from the pad to the cap: the lift terrain the
+    // player stands on is not rendered, so without this the band between
+    // the shell tops and the cap slab reads as open air from outside
+    {
+      const core = new THREE.Mesh(
+        new THREE.BoxGeometry(thw * 2 - 0.4, t.hAbs - padY, thw * 2 - 0.4),
+        slabMat,
+      );
+      core.position.set(t.x, padY + (t.hAbs - padY) / 2, t.z);
+      core.castShadow = true;
+      core.receiveShadow = true;
+      group.add(core);
+    }
     slab(t.x, t.z, thw * 2 + 0.5, thw * 2 + 0.5, t.hAbs - 0.02);
     if (t.tall) {
-      // the watch chamber: a windowed second storey on all four faces,
-      // stacked flush on the shell so the shaft reads solid at range (the
-      // flight arrives at the tower TOP, above these piece tops, so the
-      // west face can close too; features are render-only, terrain moves)
+      // a windowed upper storey on all four faces, stacked flush on the
+      // shell and scaled so its top meets the tower's own cap height (the
+      // SE watch flight arrives at the tower TOP, above these piece tops)
       const storeyY = padY + 4 * shellScale - 0.1;
-      put('kcasWallWindow', { x: t.x, y: storeyY, z: t.z - thw, rot: 0, s: shellScale });
-      put('kcasWallWindow', { x: t.x, y: storeyY, z: t.z + thw, rot: 0, s: shellScale });
-      put('kcasWallWindow', { x: t.x + thw, y: storeyY, z: t.z, rot: Math.PI / 2, s: shellScale });
-      put('kcasWallWindow', { x: t.x - thw, y: storeyY, z: t.z, rot: Math.PI / 2, s: shellScale });
-      slab(t.x, t.z, thw * 2 + 0.5, thw * 2 + 0.5, CASTLE.watchAbs - 0.02);
+      const ws = Math.max(0.6, (t.hAbs - storeyY + 0.08) / 4);
+      put('kcasWallWindow', { x: t.x, y: storeyY, z: t.z - thw, rot: 0, s: ws });
+      put('kcasWallWindow', { x: t.x, y: storeyY, z: t.z + thw, rot: 0, s: ws });
+      put('kcasWallWindow', { x: t.x + thw, y: storeyY, z: t.z, rot: Math.PI / 2, s: ws });
+      put('kcasWallWindow', { x: t.x - thw, y: storeyY, z: t.z, rot: Math.PI / 2, s: ws });
       put('kcasBannerRedTriple', {
         x: t.x + thw - 0.4,
-        y: CASTLE.watchAbs + 0.1,
+        y: t.hAbs + 0.1,
         z: t.z,
         rot: -Math.PI / 2,
         s: 1.4,
       });
-      put('kcasTorch', { x: t.x, y: CASTLE.watchAbs, z: t.z, rot: 0, s: 1.6 });
+      if (t.hAbs === CASTLE.watchAbs) {
+        put('kcasTorch', { x: t.x, y: t.hAbs, z: t.z, rot: 0, s: 1.6 });
+      }
     } else {
       for (const f of faces) {
         put('kcasBarrier', { x: f.x, y: t.hAbs, z: f.z, rot: f.rot, s: shellScale });
@@ -405,23 +441,162 @@ export function buildCastleFeatures(): CastleFeaturesView {
   put('kcasRocks', { x: CASTLE.wx1 + 2.6, y: padY, z: bm + 2.6, rot: 1.1, s: 1.3 });
   put('kcasRocks', { x: CASTLE.wx1 - 3.0, y: padY, z: bm - 2.8, rot: 4.2, s: 1.0 });
 
-  // ---- the stair flights: solid sloped masses with a tread at the foot ----
+  // ---- the barbican forecourt: a lower outer work at wall scale 1 (the
+  // module is 4 long and 4 tall, exactly the 6 to 10 rise), an open outer
+  // doorway on the road line, cap slabs, and torch light in the yard ----
+  {
+    const b = BARBICAN;
+    const om = (CASTLE_GATES.outer.a0 + CASTLE_GATES.outer.a1) / 2;
+    // outer wall modules (4-long grid anchored at z0), doorway at the gate
+    const n = Math.round((b.z1 - b.z0) / 4);
+    for (let k = 0; k < n; k++) {
+      const cz = b.z0 + 2 + k * 4;
+      if (cz > CASTLE_GATES.outer.a0 - 2.2 && cz < CASTLE_GATES.outer.a1 + 2.2) {
+        put('kcasWallDoorway', { x: b.x, y: padY, z: om, rot: Math.PI / 2, s: 1 });
+        continue;
+      }
+      put('kcasWall', { x: b.x, y: padY, z: cz, rot: Math.PI / 2, s: 1 });
+    }
+    // side walls back to the curtain: four modules and a half-length end
+    for (const sz of [b.z0, b.z1]) {
+      for (let cx = b.x + 2; cx < CASTLE.wx0 - 2; cx += 4) {
+        put('kcasWall', { x: cx, y: padY, z: sz, rot: 0, s: 1 });
+      }
+      put('kcasWallHalf', { x: CASTLE.wx0 - 1.6, y: padY, z: sz, rot: 0, s: 1 });
+      slab((b.x + CASTLE.wx0) / 2, sz, CASTLE.wx0 - b.x, b.th + 0.2, b.hAbs - 0.02);
+    }
+    for (const [s0, s1] of [
+      [b.z0, CASTLE_GATES.outer.a0],
+      [CASTLE_GATES.outer.a1, b.z1],
+    ] as const) {
+      slab(b.x, (s0 + s1) / 2, b.th + 0.2, s1 - s0, b.hAbs - 0.02);
+    }
+    // gate dressing: banners on the outer face, torches inside the yard
+    for (const side of [-1, 1] as const) {
+      put('kcasBannerRedA', {
+        x: b.x - 1.2,
+        y: padY + 2.6,
+        z: om + side * 2.6,
+        rot: Math.PI / 2,
+        s: 1.3,
+      });
+    }
+    for (const [tx, tz] of [
+      [b.x + 4.5, 2020.5],
+      [b.x + 4.5, 2039.5],
+    ] as const) {
+      put('kcasTorch', { x: tx, y: padY, z: tz, rot: 0, s: 1.5 });
+      const light = new THREE.PointLight(0xff7a28, 4, 13, 2);
+      light.position.set(tx, padY + 2.4, tz);
+      light.userData.baseIntensity = 4;
+      glowLights.push(light);
+      group.add(light);
+    }
+    // the road through the yard: weed tiles from the outer gate to the main
+    for (let px = 344; px <= 358; px += M) {
+      put('kcasFloorWeeds', { x: px, y: padY + 0.02, z: gm - 1.0, rot: (px * 7) % 3 });
+    }
+  }
+
+  // ---- the walled garden behind the far wall: half-length wall modules
+  // at a garden scale, pillar jambs and torches at the two doorways,
+  // benches and weed beds inside (the crystals already seeded here glow
+  // over the beds) ----
+  {
+    const g = GARDEN;
+    const gs = 0.75; // wall piece: 1.5 long, 3 tall (tops at abs 9)
+    const inGap = (v: number): boolean =>
+      g.gates.some((gap) => v > gap.a0 - 0.8 && v < gap.a1 + 0.8);
+    for (let cx = g.x0 + 0.75; cx <= g.x1 - 0.75; cx += 1.5) {
+      if (inGap(cx)) continue;
+      put('kcasWallHalf', { x: cx, y: padY, z: g.wallZ, rot: 0, s: gs });
+    }
+    for (const rx of [g.x0, g.x1]) {
+      for (let cz = CASTLE.wz1 + 2.4; cz <= g.wallZ - 0.7; cz += 1.5) {
+        put('kcasWallHalf', { x: rx, y: padY, z: cz, rot: Math.PI / 2, s: gs });
+      }
+    }
+    for (const gap of g.gates) {
+      for (const side of [-1, 1] as const) {
+        put('kcasWallPillar', {
+          x: side === -1 ? gap.a0 - 0.4 : gap.a1 + 0.4,
+          y: padY,
+          z: g.wallZ,
+          rot: 0,
+          s: 0.9,
+        });
+      }
+      put('kcasTorch', {
+        x: (gap.a0 + gap.a1) / 2 + 1.4,
+        y: padY,
+        z: g.wallZ - 1.8,
+        rot: 0,
+        s: 1.4,
+      });
+      const light = new THREE.PointLight(0xffa14a, 3.5, 12, 2);
+      light.position.set((gap.a0 + gap.a1) / 2, padY + 2.2, g.wallZ - 1.6);
+      light.userData.baseIntensity = 3.5;
+      glowLights.push(light);
+      group.add(light);
+    }
+    // beds and benches: quiet rows under the far wall
+    for (const [bx, bz, br] of [
+      [372, 2077.5, 0.3],
+      [386, 2079.5, -0.2],
+      [402, 2077, 0.15],
+      [414, 2079.5, -0.35],
+      [424, 2077, 0.1],
+    ] as const) {
+      put('kcasFloorWeeds', { x: bx, y: padY + 0.02, z: bz, rot: br * 4 });
+      put('kcasFloorWeeds', { x: bx + 4.2, y: padY + 0.02, z: bz + 1.4, rot: br * 7 + 1 });
+    }
+    for (const [bx, bz, brot] of [
+      [376, 2075.2, 0],
+      [394, 2080.8, Math.PI],
+      [410, 2075.2, 0],
+      [428, 2080.8, Math.PI],
+    ] as const) {
+      put('kcasBench', { x: bx, y: padY, z: bz, rot: brot, s: 1.3 });
+    }
+  }
+
+  // ---- the stair flights: SOLID wedge piers from their footing to the
+  // sloped surface (the lift terrain is invisible, so the mass itself must
+  // read as built masonry), with a stone tread at each bailey foot ----
+  const wedgeMat = slabMat.clone();
+  wedgeMat.side = THREE.DoubleSide;
   for (const rmp of CASTLE_RAMPS) {
-    const len = Math.abs(rmp.a1 - rmp.a0);
-    const width = rmp.b1 - rmp.b0;
-    const rise = rmp.h1 - rmp.h0;
-    const geo = new THREE.BoxGeometry(
-      rmp.axis === 'x' ? len : width,
-      1.2,
-      rmp.axis === 'x' ? width : len,
-    );
-    const mesh = new THREE.Mesh(geo, slabMat);
-    const cx = rmp.axis === 'x' ? (rmp.a0 + rmp.a1) / 2 : (rmp.b0 + rmp.b1) / 2;
-    const cz = rmp.axis === 'x' ? (rmp.b0 + rmp.b1) / 2 : (rmp.a0 + rmp.a1) / 2;
-    mesh.position.set(cx, (rmp.h0 + rmp.h1) / 2 - 0.55, cz);
-    const tilt = Math.atan2(rise, rmp.a1 - rmp.a0);
-    if (rmp.axis === 'x') mesh.rotation.z = -tilt;
-    else mesh.rotation.x = tilt;
+    const baseY = rmp.h0 <= padY + 0.1 || rmp.h1 <= padY + 0.1 ? padY - 0.4 : CASTLE.walkAbs - 0.6;
+    // 8 corners: along the run a0 -> a1, surface h0 -> h1, flat base
+    const lo = { a: rmp.a0, h: rmp.h0 };
+    const hi = { a: rmp.a1, h: rmp.h1 };
+    const pxz = (a: number, b: number): [number, number] => (rmp.axis === 'x' ? [a, b] : [b, a]);
+    const verts: number[] = [];
+    const quad = (
+      p0: [number, number, number],
+      p1: [number, number, number],
+      p2: [number, number, number],
+      p3: [number, number, number],
+    ): void => {
+      verts.push(...p0, ...p1, ...p2, ...p0, ...p2, ...p3);
+    };
+    const c = (a: number, b: number, y: number): [number, number, number] => {
+      const [x, z] = pxz(a, b);
+      return [x, y, z];
+    };
+    const b0 = rmp.b0;
+    const b1 = rmp.b1;
+    // top (sloped), both sides, both ends, base underside
+    quad(c(lo.a, b0, lo.h), c(hi.a, b0, hi.h), c(hi.a, b1, hi.h), c(lo.a, b1, lo.h));
+    quad(c(lo.a, b0, baseY), c(hi.a, b0, baseY), c(hi.a, b0, hi.h), c(lo.a, b0, lo.h));
+    quad(c(lo.a, b1, lo.h), c(hi.a, b1, hi.h), c(hi.a, b1, baseY), c(lo.a, b1, baseY));
+    quad(c(lo.a, b0, lo.h), c(lo.a, b1, lo.h), c(lo.a, b1, baseY), c(lo.a, b0, baseY));
+    quad(c(hi.a, b0, baseY), c(hi.a, b1, baseY), c(hi.a, b1, hi.h), c(hi.a, b0, hi.h));
+    quad(c(lo.a, b0, baseY), c(lo.a, b1, baseY), c(hi.a, b1, baseY), c(hi.a, b0, baseY));
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(verts), 3));
+    geo.computeVertexNormals();
+    const mesh = new THREE.Mesh(geo, wedgeMat);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     group.add(mesh);
@@ -476,7 +651,7 @@ export function buildCastleFeatures(): CastleFeaturesView {
   for (const [key, list] of spots) {
     const scene = castleScenes[key];
     if (!scene || list.length === 0) continue;
-    for (const part of extractParts(scene)) {
+    for (const part of extractParts(scene, SKIP_PARTS[key])) {
       const mesh = new THREE.InstancedMesh(part.geo, part.mat, list.length);
       list.forEach((p, i) => {
         const s = p.s ?? S;
