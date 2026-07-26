@@ -120,6 +120,29 @@ describe('diffChangedPaths', () => {
     expect(plan.generic).toEqual(['hud-desktop', 'hud-mobile']);
   });
 
+  it('the vendor row gate resolves its own target from the sim table and both view halves', () => {
+    // The gate spans a sim content table and the two vendor-window halves, and
+    // only the sim table is outside src/ui, so a gate-table-only change would
+    // fall through to "nothing to shoot" without its own `when` entry. Pinning
+    // the resolved key ORDER also catches a typo in either list.
+    expect(
+      resolveTargets(['src/sim/content/vendor_row_gates.ts']).map((t: { key: string }) => t.key),
+    ).toEqual(['vendor-tool-gate']);
+    // Both view halves resolve this target and ONLY this target. Worth pinning
+    // because it is easy to assume otherwise: the bags target lists 'ui/vendor'
+    // in its own `when`, but these modules live at src/ui/hud/vendor/, so that
+    // entry does not substring-match them and never shot this window.
+    expect(
+      resolveTargets(['src/ui/hud/vendor/vendor_view.ts']).map((t: { key: string }) => t.key),
+    ).toEqual(['vendor-tool-gate']);
+    expect(
+      resolveTargets(['src/ui/hud/vendor/vendor_window.ts']).map((t: { key: string }) => t.key),
+    ).toEqual(['vendor-tool-gate']);
+    // A sim-only content change is still visual, because the gate changes what
+    // the goods grid paints.
+    expect(classifyDiff(['src/sim/content/vendor_row_gates.ts']).isVisual).toBe(true);
+  });
+
   it('gather-node content shoots all three surfaces it is visible on', () => {
     // Gather-node placement shows up in three places: the world map's terrain and
     // labels, the quest-objective blobs, and the in-world props. A `when` list that

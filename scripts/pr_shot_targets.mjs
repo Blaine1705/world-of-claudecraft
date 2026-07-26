@@ -2193,6 +2193,94 @@ export const TARGETS = [
     },
   },
   {
+    key: 'vendor-tool-gate',
+    label: 'Vendor goods: a tool row locked by gathering proficiency',
+    when: [
+      'sim/content/vendor_row_gates',
+      'ui/hud/vendor/vendor_view',
+      'ui/hud/vendor/vendor_window',
+    ],
+    // Quartermaster Bree is the only counter carrying all three rungs of a
+    // ladder at once (Highwatch has tier-1 through tier-3 ground), so one frame
+    // shows the whole rule: the tier-1 pick open, the tier-2 locked with
+    // "Requires Mining 40", the tier-3 locked with "Requires Mining 70". Mining
+    // is left at 0 rather than staged part-way, because a fresh counter is the
+    // state a player actually walks up to first and it is the only one that
+    // renders BOTH thresholds.
+    //
+    // Copper is set high so the rows are unmistakably closed by the gate rather
+    // than by the price: the two refusals share a greyed row and only the
+    // requirement line tells them apart, which is exactly what the shot is for.
+    //
+    // The same recipe runs unchanged on the base tree, where Bree stocks the
+    // same three picks at the old prices and no row is gated, so the before and
+    // after frames differ only by this change.
+    variants: [
+      { key: 'desktop', charClass: 'warrior', charName: 'Oreseeker' },
+      { key: 'mobile', charClass: 'warrior', charName: 'Oreseeker', mobile: true },
+    ],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      // One evaluate for state + open: the HUD closes the vendor window once the
+      // player is more than 8 yards from the merchant, so the teleport and the
+      // open have to land in the same frame as the ticking sim.
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const bree = [...sim.entities.values()].find((e) => e.templateId === 'quartermaster_bree');
+        if (!bree) return { ok: false, reason: 'no quartermaster_bree entity' };
+        const p = sim.player;
+        if (!p?.pos) return { ok: false, reason: 'no player' };
+        p.pos.x = bree.pos.x + 2;
+        p.pos.z = bree.pos.z;
+        p.prevPos = { ...p.pos };
+        sim.copper = 100000;
+        const el = document.querySelector('#vendor-window');
+        // Force hidden first so the size poll cannot pass on a window left up
+        // by an earlier target in the same run (the market recipe's precedent).
+        if (el) el.style.display = 'none';
+        game.hud.openVendor(bree.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`vendor-tool-gate setup failed: ${setup.reason}`);
+      const open = await pollForSize(page, '#vendor-window');
+      if (!open) throw new Error('vendor window did not open');
+      await wait(200);
+      // Verify the frame carries what the shot claims. On the BASE tree there
+      // is no gate at all, so a zero count is the correct before state and only
+      // the after side is checked; the marker is the class this change adds.
+      const locked = await page.evaluate(
+        () => document.querySelectorAll('#vendor-window .vendor-locked').length,
+      );
+      const gateShipped = await page.evaluate(
+        () => document.querySelectorAll('#vendor-window .vendor-item .vi-sub').length > 0,
+      );
+      if (gateShipped && locked < 2) {
+        throw new Error(`expected both gated rungs to render locked, saw ${locked}`);
+      }
+      if (variant?.mobile) {
+        // The short landscape viewport cannot show the whole goods grid, and the
+        // picks sit below the consumables; scroll the first locked row into view
+        // so the frame carries a requirement line rather than the food rows.
+        await page.evaluate(() => {
+          const row =
+            document.querySelector('#vendor-window .vendor-locked') ??
+            document.querySelector('#vendor-window .vendor-item');
+          row?.scrollIntoView({ block: 'center' });
+        });
+        await wait(300);
+      }
+      return { clip: '#vendor-window' };
+    },
+  },
+  {
     key: 'train-window',
     label: 'Train view: station-master recipe training ladder',
     when: ['ui/hud/vendor/train_view', 'ui/hud/vendor/train_window'],
