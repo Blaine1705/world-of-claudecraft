@@ -136,6 +136,70 @@ describe('talent production save migrations', () => {
     expect(migrated.copper).toBe(legacy.copper);
   });
 
+  // Every class redesigned in the v0.31 wave needs the same repair the Hunter got.
+  // The revision-2 guard originally named only 'hunter' because that was the only
+  // redesign in flight; #2428 (paladin) and #2328 (rogue) landed later, and their
+  // retired abilities were being left on live bars.
+  it.each([
+    ['paladin', 'retribution', ['judgement', 'seal_of_righteousness']],
+    ['rogue', 'subtlety', ['contingency', 'wraith_strike']],
+  ] as const)('scrubs retired %s abilities off a revision-1 bar', (cls, spec, retired) => {
+    const legacy = cloneFixture();
+    legacy.contentRevision = 1;
+    legacy.level = 20;
+    legacy.talents = { spec, rows: {} };
+    legacy.loadouts = [{ name: 'Old', alloc: { spec, rows: {} }, bar: [...retired] }];
+    legacy.activeLoadout = 0;
+
+    const migrated = migrateCharacterTalentsV2(cls, legacy);
+
+    expect(migrated.contentRevision).toBe(CURRENT_CHARACTER_CONTENT_REVISION);
+    for (const abilityId of retired) {
+      expect(migrated.loadouts?.[0].bar).not.toContain(abilityId);
+    }
+    // The repaired bar is usable, not merely emptied.
+    expect(migrated.loadouts?.[0].bar.filter(Boolean).length).toBeGreaterThan(0);
+  });
+
+  // A class nobody redesigned keeps its bar EXACTLY as saved: its usable slots
+  // survive and nothing is re-seeded into slots the player deliberately left empty.
+  it('does not re-seed the bar of a class the revision did not redesign', () => {
+    const legacy = cloneFixture();
+    legacy.contentRevision = 1;
+    legacy.level = 20;
+    legacy.talents = { spec: 'arms', rows: {} };
+    legacy.loadouts = [
+      { name: 'Sparse', alloc: { spec: 'arms', rows: {} }, bar: ['charge', null, 'mortal_strike'] },
+    ];
+    legacy.activeLoadout = 0;
+
+    const migrated = migrateCharacterTalentsV2('warrior', legacy);
+
+    expect(migrated.contentRevision).toBe(CURRENT_CHARACTER_CONTENT_REVISION);
+    // Exactly the two saved actives, still in their saved slots, gap intact.
+    expect(migrated.loadouts?.[0].bar.slice(0, 3)).toEqual(['charge', null, 'mortal_strike']);
+    expect(migrated.loadouts?.[0].bar.filter(Boolean)).toEqual(['charge', 'mortal_strike']);
+  });
+
+  // ...but a slot it CANNOT use is still dropped, even though the class was not
+  // redesigned: Reaver Strike is excludeSpecs'd out of Arms, and nothing else
+  // removes it (talent_loadouts.repairBar only checks the slot is a string).
+  it('drops an unusable slot even for a class the revision did not redesign', () => {
+    const legacy = cloneFixture();
+    legacy.contentRevision = 1;
+    legacy.level = 20;
+    legacy.talents = { spec: 'arms', rows: {} };
+    legacy.loadouts = [
+      { name: 'Stale', alloc: { spec: 'arms', rows: {} }, bar: ['heroic_strike', 'charge'] },
+    ];
+    legacy.activeLoadout = 0;
+
+    const migrated = migrateCharacterTalentsV2('warrior', legacy);
+
+    expect(migrated.loadouts?.[0].bar).not.toContain('heroic_strike');
+    expect(migrated.loadouts?.[0].bar).toContain('charge');
+  });
+
   it('loads, saves, and reloads the migrated Warrior without duplicate learning or neutral-state loss', () => {
     const sim = new Sim({ seed: 17, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Migration Fixture', { state: cloneFixture() });

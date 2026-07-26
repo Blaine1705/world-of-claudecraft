@@ -172,6 +172,39 @@ Known red on the branch, all attributed by running the same files on `pr/2218` a
 | deploy_watchdog (2) | docker, red on release too | not ours |
 | sfx_*, deeds_content, world_auth_scripts | flake under parallel load, pass in isolation | not ours |
 
+## The save-migration rule, for every future class rework
+
+This one cost a live-character bug in the v0.31 wave and will recur, because the trap only
+springs when SEVERAL class reworks land together.
+
+`src/sim/talent_save_migration.ts` repairs a saved character: it grants a free row repick and
+scrubs ability ids off saved action bars. Revision 2 was written while the hunter redesign was
+the only one in flight, so its guard read `cls !== 'hunter'`. Paladin (#2428) and rogue (#2328)
+joined the same revision later and nobody widened it, so their saves advanced the revision
+marker and were otherwise untouched. Live paladins kept `judgement` on the bar after the
+ability stopped existing, and the docstring's promise to scrub the retired rogue grants
+(Contingency, Wraith Strike, Shadecloak) was simply false.
+
+Nothing downstream catches it: `talent_loadouts.repairBar` only checks that a slot is a
+string, so a dead id survives every load.
+
+The split now is:
+
+- **Scrub runs for EVERY class, always.** A slot naming an ability the character cannot use is
+  dead whoever owns it. This is the safety net, and it does not depend on anyone maintaining a
+  list.
+- **Repick and re-seed stay gated** to `REDESIGNED_AT_CURRENT_REVISION`, because refilling
+  empty slots would disturb a bar an untouched player deliberately left gapped.
+
+**When you rework a class:** bump `CURRENT_CHARACTER_CONTENT_REVISION` and rewrite
+`REDESIGNED_AT_CURRENT_REVISION` to the classes redesigned at the NEW revision. It is
+per-revision, not cumulative. If your rework joins a revision someone else opened, ADD YOUR
+CLASS to the existing set rather than assuming the marker bump covers you.
+
+Verify it the way it is verified now, by running a real save through rather than reading the
+code: `tests/talent_save_migration_v026.test.ts` puts a retired id on a revision-1 bar per
+class and asserts it is gone, and asserts an untouched class keeps its gaps.
+
 ### Next: #2428 (paladin)
 
 The merge was pre-flighted and aborted rather than rushed. 62 conflicts: 26 generated i18n
