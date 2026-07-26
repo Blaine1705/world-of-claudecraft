@@ -720,9 +720,10 @@ describe('BagItemActionMenu target step: destructive-path communication (#2421)'
     const rows = h.rows();
     expect(rows.map((row) => row.act)).toEqual([`target:${SWORD}`, `replace:${SWORD}`]);
     // The accessible name of a role=button .ctx-item is computed from its
-    // contents, so these two strings ARE the two accessible names. Pinned
-    // whole, not by toContain: the requirement is that they DIFFER, and that
-    // each states its own state rather than one of them staying silent.
+    // contents, so these strings are what FEEDS it (accname inserts whitespace
+    // around the block-level sub-line, so AT reads them spaced). Pinned whole,
+    // not by toContain: the requirement is that they DIFFER, and that each
+    // states its own state rather than one of them staying silent.
     expect(rows[0].text).toBe('Eastbrook Arming SwordNot enchanted');
     expect(rows[1].text).toBe('Eastbrook Arming SwordReplaces Enchant Weapon - Agility');
     // Both rows carry a sub-line now, so the distinction no longer rests on one

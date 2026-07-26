@@ -245,6 +245,12 @@ export function preservedTraitKey(trait: EnchantPreservedTrait): TranslationKey 
  *  the lock and `boundTo` is the lock applied, and the swap leaves both alone,
  *  so the dialog has one thing to say either way.
  *
+ *  Each field is tested the way ITS OWN render sink tests it, which is not one
+ *  rule: `signer` on truthiness, matching instanceMakersMarkLine's `!signer`
+ *  gate, so an empty name is never promised a mark the tooltip would not draw;
+ *  `boundTo` on PRESENCE, because entity id 0 is a real player and truthiness
+ *  would lose the very first character in a world its line.
+ *
  *  `wireTrimmed` marks a victim read off the WORN mirror. The public `eqi` wire
  *  carries signer/enchant/rolled ONLY (server/game.ts data minimization, the
  *  same trim wornTooltipInstance applies), so an online client cannot see a worn
@@ -263,7 +269,7 @@ export function preservedReplaceTraits(
   wireTrimmed = false,
 ): EnchantPreservedTrait[] {
   const traits: EnchantPreservedTrait[] = [];
-  if (victim.signer !== undefined) traits.push('signer');
+  if (victim.signer) traits.push('signer');
   if (victim.rolled?.masterwork === true) traits.push('masterwork');
   if (wireTrimmed) return traits;
   if (victim.boundTo !== undefined || victim.bindOnTrade === true) traits.push('bond');
@@ -303,11 +309,17 @@ export interface EnchantReplaceTargetInfo {
  *  when the copy is not replaceable: a marker id that no longer resolves
  *  cannot be subtracted exactly, so the sim refuses it (the defensive
  *  already_enchanted arm) and the picker must not offer it. Mirrors the sim's
- *  replace-arm validity gates one for one. */
+ *  replace-arm validity gates one for one.
+ *
+ *  `wireTrimmed` is REQUIRED here, with no default, deliberately: the permissive
+ *  answer is the one that over-claims, and this is a truthfulness guard, so a
+ *  third arm added later has to state which mirror it read rather than inherit
+ *  silence. The exported preservedReplaceTraits keeps its default, since there
+ *  the untrimmed full payload is the ordinary case. */
 function replaceInfoFor(
   victim: ItemInstancePayload,
   enchantId: string,
-  wireTrimmed = false,
+  wireTrimmed: boolean,
 ): EnchantReplaceTargetInfo | undefined {
   const preserved = preservedReplaceTraits(victim, wireTrimmed);
   if (victim.enchant !== undefined) {
@@ -410,7 +422,10 @@ export function enchantTargets(
     const victimIdx = replaceVictimIndex(inventory, itemId);
     const victim = victimIdx >= 0 ? inventory[victimIdx].instance : undefined;
     if (!victim) continue;
-    const replace = replaceInfoFor(victim, enchantId);
+    // false: the bagged arm reads the self `inv` mirror, which carries the FULL
+    // payload in both hosts (the server ships meta.inventory whole), so the
+    // confirm can honestly speak for the bind state here.
+    const replace = replaceInfoFor(victim, enchantId, false);
     if (!replace) continue;
     rows.push({ itemId, count, replace });
   }

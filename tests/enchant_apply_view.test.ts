@@ -540,6 +540,11 @@ describe('enchant_apply_view: preservedReplaceTraits (#2421)', () => {
     // boundTo is an entity id, and id 0 is a real one: presence decides, never
     // truthiness, or the very first character in a world would lose its line.
     expect(preservedReplaceTraits({ boundTo: 0 })).toEqual(['bond']);
+    // signer takes the OPPOSITE rule, on purpose, because it is a NAME: the
+    // tooltip's own maker's-mark line gates on `!instance?.signer`, so an empty
+    // string draws no mark and the confirm must not promise one either. The two
+    // fields disagree because their render sinks disagree, not by accident.
+    expect(preservedReplaceTraits({ signer: '' })).toEqual([]);
   });
 
   it('emits the signed masterwork case in one fixed order, signature first', () => {
