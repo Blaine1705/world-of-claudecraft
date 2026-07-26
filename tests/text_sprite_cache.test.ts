@@ -404,13 +404,19 @@ describe('text_sprite_cache: the bound and its eviction', () => {
     // content tables. Recompute them here so raising a cap, adding quests, or
     // authoring a wider zone fails HERE rather than silently degrading the map
     // into a rasterize-every-redraw loop on the unthrottled drag-pan path.
-    const social = readFileSync(new URL('../server/social.ts', import.meta.url), 'utf8');
+    // Comments stripped first, so a commented-out declaration above the real one
+    // cannot satisfy the regex (the repo's raw-source pin rule).
+    const social = readFileSync(new URL('../server/social.ts', import.meta.url), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
     const cap = (name: string): number => {
       const match = new RegExp(`const ${name} = (\\d+);`).exec(social);
       if (!match) throw new Error(`server/social.ts no longer declares ${name}`);
       return Number(match[1]);
     };
     const allyNames = cap('FRIEND_LIMIT') + cap('GUILD_MEMBER_LIMIT');
+    // The hard ceiling, deliberately: nothing caps the active quest log, so every
+    // quest in the content tables can in principle carry a badge number at once.
     const badgeDigits = Object.keys(QUESTS).length;
     const poiLabels = Math.max(...ZONES.map((zone) => zone.pois.length));
     const portalNames = Math.max(
@@ -439,6 +445,23 @@ describe('text_sprite_cache: the bound and its eviction', () => {
 
     expect(trace.sprites).toHaveLength(2);
     expect(trace.blits).toHaveLength(3);
+  });
+
+  it('drops every sprite on clear, so a language switch carries no dead rasters', () => {
+    const trace = newTrace();
+    installDocument(trace);
+    const cache = new TextSpriteCache();
+    const ctx = targetContext(trace);
+
+    cache.draw(ctx, 'Eastbrook Vale', 0, 0, OUTLINED);
+    cache.draw(ctx, 'The Hollow Crypt', 0, 0, OUTLINED);
+    expect(cache.size).toBe(2);
+
+    cache.clear();
+    expect(cache.size).toBe(0);
+    // And the next draw genuinely re-rasterizes rather than serving a stale hit.
+    cache.draw(ctx, 'Eastbrook Vale', 0, 0, OUTLINED);
+    expect(trace.sprites).toHaveLength(3);
   });
 
   it('trims to the budget at the redraw boundary, least recently used first', () => {

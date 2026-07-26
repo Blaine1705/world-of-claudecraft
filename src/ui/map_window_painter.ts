@@ -12,9 +12,10 @@
 // hud.update()'s mediumHud band (>=250ms) behind the `display === 'block'` guard,
 // blitting the cached terrain background (Hud-owned, prewarmed) each redraw. Hud
 // also redraws it out of band on open, on zoom, on the Dungeon Finder's "Show on
-// Map", and once per drag-pan pointermove, which is UNTHROTTLED: a drag repaints
-// at the pointer-event rate, so reading this painter as a cold ~4Hz on-open path
-// holds only while nobody is dragging. This painter does not change any of those
+// Map", and once per drag-pan pointermove (mobile pinch-zoom lands on that same
+// pointermove path), which is UNTHROTTLED: a drag or a pinch repaints at the
+// pointer-event rate, so reading this painter as a cold ~4Hz on-open path holds
+// only while nobody is touching the map. This painter does not change any of those
 // call sites or the cadence; it only owns the draw.
 //
 // TEXT: every label draws as a cached offscreen sprite (text_sprite_cache), never
@@ -160,6 +161,14 @@ export class MapWindowPainter {
   // it) so the sprites survive across redraws; it trims itself back to its
   // budget at each redraw boundary.
   private readonly labels = new TextSpriteCache();
+
+  /** Drop the cached label sprites on a language switch: every label re-resolves
+   *  to a new string, so the old rasters can never be reused and would only sit
+   *  in the budget until eviction worked them out. Hud calls this from its
+   *  woc:languagechange handler, like the other in-place relocalizers. */
+  relocalize(): void {
+    this.labels.clear();
+  }
 
   /** Read the map color tokens in one getComputedStyle pass (a 2D
    *  context can only read a CSS var this way; never per-marker). */

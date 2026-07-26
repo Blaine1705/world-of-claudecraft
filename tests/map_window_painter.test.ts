@@ -718,6 +718,31 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     expect(trace.sprites.length).toBeLessThan(TEXT_SPRITE_LIMIT);
   });
 
+  it('drops its label sprites when Hud relocalizes the dynamic UI', () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+    const ctx = fakeMapContext(trace);
+    const painter = new MapWindowPainter();
+    const world = labelWorld();
+
+    painter.paintOverworld(ctx, world, labelPaintOptions());
+    const minted = trace.sprites.length;
+    painter.paintOverworld(ctx, world, labelPaintOptions());
+    expect(trace.sprites).toHaveLength(minted); // cached, as usual
+
+    painter.relocalize();
+    painter.paintOverworld(ctx, world, labelPaintOptions());
+    expect(trace.sprites).toHaveLength(minted * 2); // every label rasterized again
+  });
+
+  it('is wired to the language switch Hud fans out', () => {
+    // The painter cannot listen for woc:languagechange itself (it owns no DOM),
+    // so the one-line wiring in Hud's relocalizer is what makes the clear happen.
+    expect(hud).toContain('this.mapPainter.relocalize();');
+    expect(hud).toContain("document.addEventListener('woc:languagechange'");
+  });
+
   it('keeps the Show-on-Map ping color off every later outline', () => {
     const trace = newTrace();
     installMapStyleGlobals(trace);

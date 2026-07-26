@@ -116,6 +116,13 @@ export class TextSpriteCache {
     return this.sprites.size;
   }
 
+  /** Drop every sprite. The caller owns the reason: the map painter calls this on
+   *  a language switch, where every label re-resolves to a new string and the old
+   *  rasters would otherwise sit in the budget until LRU worked them out. */
+  clear(): void {
+    this.sprites.clear();
+  }
+
   /** Open a redraw: trim back to the budget, oldest first. Called BEFORE the
    *  redraw's draws so a label-heavy redraw can overshoot rather than thrash
    *  (see the header). */
