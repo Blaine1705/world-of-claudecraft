@@ -8248,7 +8248,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Tarjeta',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20 % de descuento',
+  'hudChrome.claudium.railWocDiscount': '{percent} % de descuento',
   'hudChrome.claudium.railWocUnavailable':
     'Los precios en WOC no están disponibles en este momento.',
   'hudChrome.claudium.showAmounts': 'Mostrar todas las cantidades de Claudium',
