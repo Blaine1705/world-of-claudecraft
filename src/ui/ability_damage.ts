@@ -72,6 +72,10 @@ export function abilityDamageBonus(
     case 'aoeHeal':
       // AoE heals take the same per-target coefficient penalty as aoeDamage.
       return directHealBonus(scaling.spellPower, res.castTime);
+    case 'chainHeal':
+      // Combat applies the full direct-heal coefficient to the first target,
+      // then applies the authored falloff to each jump.
+      return directHealBonus(scaling.spellPower, res.castTime);
     case 'consumeAura':
       if (eff.deal) return directHitBonus(power, def, res.castTime, false);
       if (eff.heal) return directHealBonus(scaling.spellPower, res.castTime);
@@ -133,6 +137,7 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
       eff.type === 'weaponStrike' ||
       eff.type === 'aoeDamage' ||
       eff.type === 'aoeHeal' ||
+      eff.type === 'chainHeal' ||
       eff.type === 'aoeRoot' ||
       eff.type === 'chainDamage' ||
       eff.type === 'groundAoE' ||

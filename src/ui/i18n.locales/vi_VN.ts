@@ -8129,8 +8129,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     'Cao trên Đỉnh Gai, cơn bão trên Stormcrag đôi khi tụ lại thành một hình hài. Thunzharr, Đỉnh Núi Thức Giấc trỗi dậy nơi đó theo một nhịp đều đặn, một nguyên tố mạnh cỡ raid được chiến đấu giữa thế giới mở bởi bất kỳ ai đáp lời, và hắn càng lúc càng hùng mạnh hơn khi càng nhiều người thách đấu đứng lên chống lại. Mọi người tham gia trận chiến đều kiếm được lượt bốc chiến lợi phẩm của riêng mình từ hắn, theo lệ khóa lượt raid, và cái chết của hắn nán lại đủ lâu để những người đã ngã xuống chạy về và nhận phần của mình. Hãy tụ hội nhiều gươm đao hơn bạn nghĩ mình cần.',
   'guide.worldPage.worldBossTitle': 'Khi đỉnh núi thức giấc: con trùm thế giới',
-  'entities.abilities.chain_heal.description':
-    'Hồi phục một lượng lớn máu cho một mục tiêu đồng minh, sau đó lan sang tối đa 2 đồng minh ở gần; lượng hồi phục giảm 50% sau mỗi lần lan. (Kỹ năng chủ lực của Hồi Phục)',
   'entities.abilities.chain_heal.name': 'Hồi Máu Liên Hoàn',
   'entities.abilities.counter_shot.description':
     'Một phát bắn nhanh làm gián đoạn quá trình niệm phép của mục tiêu và khóa hệ phép đó trong 4 giây.',
@@ -8512,8 +8510,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Đánh kẻ địch gây {damage} sát thương Bóng tối, rồi khiến chúng kinh hoàng trong 3 giây. (thiên phú Warlock)',
   'entities.abilities.deep_freeze.description':
     'Congela profundamente a mục tiêu, inflige {damage} de daño de Băng y lo aturde durante 4 giây. (thiên phú pháp sư)',
-  'entities.abilities.desperate_prayer.description':
-    'Hồi ngay {damage} máu cho bạn. (thiên phú Tu sĩ)',
   'entities.abilities.deterrence.description':
     'Tăng 50 điểm phần trăm khả năng né tránh của bạn trong 10 giây. (thiên phú Thợ săn)',
   'entities.abilities.divine_shield.description':

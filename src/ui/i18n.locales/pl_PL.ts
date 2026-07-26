@@ -8226,8 +8226,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     'Wysoko na Ciernistym Szczycie burza nad Stormcrag czasem przybiera kształt. Thunzharr, Budzący się Szczyt powstaje tam w stałym rytmie, żywiołak o sile rajdowej zwalczany w otwartym świecie przez każdego, kto odpowie na wezwanie, i staje się tym potężniejszy, im więcej wyzywających staje przeciw niemu. Każdy, kto dołączy do walki, otrzymuje własne losowanie jego zdobyczy, honorowane na zasadach blokady rajdowej, a jego upadek trwa dość długo, by polegli zdążyli wrócić po swoje. Zbierz więcej mieczy, niż sądzisz, że potrzebujesz.',
   'guide.worldPage.worldBossTitle': 'Gdy szczyt się budzi: boss świata',
-  'entities.abilities.chain_heal.description':
-    'Leczy sojusznika za dużą wartość, a następnie przeskakuje do maksymalnie 2 pobliskich sojuszników, lecząc o 50% mniej przy każdym skoku. (Sztandarowa zdolność Odnowy)',
   'entities.abilities.chain_heal.name': 'Leczenie Łańcuchowe',
   'entities.abilities.counter_shot.description':
     'Szybki strzał, który przerywa rzucanie zaklęć celu i blokuje tę szkołę na 4 sekundy.',
@@ -8608,8 +8606,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Uderza wroga, zadając {damage} obrażeń od Cienia, a następnie przeraża go na 3 sek. (talent Czarnoksiężnika)',
   'entities.abilities.deep_freeze.description':
     'Congela profundamente a cel, inflige {damage} de daño de Mrozu y lo aturde durante 4 s. (talent maga)',
-  'entities.abilities.desperate_prayer.description':
-    'Natychmiast leczy cię o {damage}. (talent Kapłana)',
   'entities.abilities.deterrence.description':
     'Zwiększa twoją szansę na unik o 50 punktów procentowych na 10 sek. (talent Łowcy)',
   'entities.abilities.divine_shield.description':

@@ -8041,8 +8041,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     'Högt uppe på Törntoppen samlar stormen över Stormcrag ibland en skepnad. Thunzharr, det vaknande berget reser sig där i en jämn rytm, en elementar av raidstyrka som bekämpas i den öppna världen av vem som än svarar på uppropet, och han växer sig mäktigare ju fler utmanare som står emot honom. Alla som ansluter till striden förtjänar sin egen kastning på hans byte, hedrad på raidspärrens villkor, och hans fall dröjer kvar länge nog för de fallna att springa tillbaka och kräva sitt. Samla fler svärd än du tror du behöver.',
   'guide.worldPage.worldBossTitle': 'När berget vaknar: världsbossen',
-  'entities.abilities.chain_heal.description':
-    'Läker ett vänligt mål för en stor mängd och hoppar sedan till upp till 2 ytterligare allierade i närheten. Varje hopp läker för 50% mindre. (Återställningssignatur)',
   'entities.abilities.chain_heal.name': 'Kedjeläkning',
   'entities.abilities.counter_shot.description':
     'Ett snabbt skott som avbryter målets besvärjelse och låser den magiskolan i 4 sek.',
@@ -8421,8 +8419,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Träffar fienden för {damage} Skuggskada och skrämmer den sedan i 3 sek. (häxmästartalang)',
   'entities.abilities.deep_freeze.description':
     'Congela profundamente a målet, inflige {damage} de daño de Frost y lo aturde durante 4 sek. (magikertalang)',
-  'entities.abilities.desperate_prayer.description':
-    'Helar dig omedelbart för {damage}. (prästtalang)',
   'entities.abilities.deterrence.description':
     'Ökar din chans att undvika med 50 procentenheter i 10 sek. (jägartalang)',
   'entities.abilities.divine_shield.description':

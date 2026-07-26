@@ -8131,8 +8131,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     'No alto de Thornpeak, a tempestade sobre Stormcrag às vezes toma forma. Thunzharr, o Pico Desperto se ergue ali em um ritmo constante, um elemental com força de raide enfrentado no mundo aberto por quem quer que atenda ao chamado, e ele fica mais poderoso quanto mais desafiantes se erguem contra ele. Cada um que entra na luta ganha o próprio sorteio dos despojos dele, honrado nos termos do bloqueio de raide, e sua queda perdura o bastante para que os tombados corram de volta e reivindiquem o que lhes cabe. Reúna mais espadas do que você acha que precisa.',
   'guide.worldPage.worldBossTitle': 'Quando o pico desperta: o chefe mundial',
-  'entities.abilities.chain_heal.description':
-    'Cura bastante um alvo aliado e depois salta para até 2 outros aliados próximos, curando 50% menos a cada salto. (Habilidade característica de Restauração)',
   'entities.abilities.chain_heal.name': 'Cura em Cadeia',
   'entities.abilities.counter_shot.description':
     'Um disparo rápido que interrompe a conjuração do alvo e bloqueia essa escola por 4 s.',
@@ -8520,8 +8518,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Atinge o inimigo, causando {damage} de dano de Sombra, e depois o horroriza por 3 s. (talento de Bruxo)',
   'entities.abilities.deep_freeze.description':
     'Congela profundamente a alvo, inflige {damage} de daño de Gelo y lo aturde durante 4 s. (talento de mago)',
-  'entities.abilities.desperate_prayer.description':
-    'Cura você instantaneamente em {damage}. (talento de Sacerdote)',
   'entities.abilities.deterrence.description':
     'Aumenta sua chance de esquiva em 50 pontos percentuais por 10 s. (talento de Caçador)',
   'entities.abilities.divine_shield.description':

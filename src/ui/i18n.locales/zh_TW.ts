@@ -147,6 +147,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.death_coil.name': '墓穴纏卷',
   'entities.abilities.deep_freeze.name': '死霜',
   'entities.abilities.desperate_prayer.name': '最後祈禱',
+  'entities.abilities.desperate_prayer.description': '立即恢復你最大生命值的30%。',
   'entities.abilities.deterrence.name': '鬃刺守衛',
   'entities.abilities.divine_shield.name': '聖光守護',
   'entities.abilities.earthbind.name': '攫握大地',
@@ -2669,7 +2670,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_wave.description': '為一個友方目標恢復 {damage} 點生命值。',
   'entities.abilities.chain_heal.name': '湧流癒合',
   'entities.abilities.chain_heal.description':
-    '為一個友方目標恢復120至145點生命值，隨後跳躍至多2個附近盟友，每次跳躍的治療量減半。每個被波及的盟友都會消耗你的癒合水流，造成額外治療。（靈癒招牌）',
+    '為一個友方目標恢復{damage}點生命值，隨後跳躍至12碼內最多2個盟友。每次跳躍的治療量為上一個目標的50%。每個被波及的盟友都會消耗其剩餘的癒合水流，並立即恢復所消耗數值125%的生命值。初始治療量隨法術強度提高。（靈癒招牌）',
   'entities.abilities.galeheart_weapon.name': '風心武器',
   'entities.abilities.galeheart_weapon.description':
     '為武器灌注疾風。每第三次命中的武器攻擊會回響兩次，並觸發風暴施法。',
@@ -2684,7 +2685,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '使一名盟友獲得6層、持續60秒的保護。受到傷害時消耗一層，恢復5%最大生命值，每3秒最多觸發一次。（薩滿祭司天賦）',
   'entities.abilities.tidecall.name': '潮汐召喚',
   'entities.abilities.tidecall.description':
-    '召來迅捷的復甦潮汐，治療一名盟友，並將計算後的治療量注入癒合水流。',
+    '為一個友方目標恢復{damage}點生命值。治療量隨法術強度提高。將過量治療前的完整治療量加入癒合水流，最多為目標最大生命值的30%。',
   'entities.abilities.earth_shock.name': '大地震擊',
   'entities.abilities.earth_shock.description':
     '立即以震盪之力衝擊目標，造成 {damage} 點自然傷害。',
@@ -7693,7 +7694,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '攻擊敵人並造成{damage}點暗影傷害，隨後使其恐懼3秒。（術士天賦）',
   'entities.abilities.deep_freeze.description':
     '將目標深度凍結，造成 {damage} 點冰霜傷害並使其昏迷 4 秒。（法師天賦）',
-  'entities.abilities.desperate_prayer.description': '立即為你恢復{damage}點生命值。（牧師天賦）',
   'entities.abilities.deterrence.description':
     '使你的閃躲幾率提高50個百分點，持續10秒。（獵人天賦）',
   'entities.abilities.divine_shield.description':
@@ -8168,7 +8168,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.martyrs_aegis.description': '使一名盟友受到的傷害降低 40%，持續 8 秒。',
   'entities.abilities.choir_of_deliverance.name': '救贖聖詠團',
   'entities.abilities.choir_of_deliverance.description':
-    '引導 6 秒，每 2 秒為附近的隊伍成員恢復生命值。',
+    '引導6秒，每2秒為30碼內的隊伍成員恢復{damage}點生命值。治療量隨法術強度提高。',
   'entities.items.resonant_thread.name': '共鳴絲線',
   'entities.items.resonant_hide.name': '共鳴獸皮',
   'entities.items.resonant_links.name': '共鳴鎖環',

@@ -8196,8 +8196,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     'Højt oppe på Tornetop samler stormen over Stormcrag sig undertiden til en skikkelse. Thunzharr, den Vågnende Tind rejser sig der i en fast rytme, en elementar af raidstyrke, der bekæmpes i den åbne verden af hvem end der svarer på kaldet, og han vokser sig mægtigere, jo flere udfordrere der stiller op mod ham. Alle, der slutter sig til kampen, tjener deres eget kast om hans bytte, hædret på raidspærrings-vilkår, og hans fald varer længe nok til, at de faldne kan løbe tilbage og gøre krav på deres del. Saml flere sværd, end du tror, du har brug for.',
   'guide.worldPage.worldBossTitle': 'Når tinden vågner: verdensbossen',
-  'entities.abilities.chain_heal.description':
-    'Helbreder et venligt mål for en stor mængde og springer derefter til op til 2 yderligere allierede i nærheden. Helbredelsen mindskes med 50% for hvert spring. (Genoprettelsessignatur)',
   'entities.abilities.chain_heal.name': 'Kædeheling',
   'entities.abilities.counter_shot.description':
     'Et hurtigt skud, der afbryder målets besværgelse og låser den pågældende magiskole i 4 sek.',
@@ -8577,8 +8575,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Rammer fjenden for {damage} Skyggeskade og skræmmer den derefter i 3 sek. (troldmandstalent)',
   'entities.abilities.deep_freeze.description':
     'Congela profundamente a målet, inflige {damage} de daño de Frost y lo aturde durante 4 sek. (magikertalent)',
-  'entities.abilities.desperate_prayer.description':
-    'Helbreder dig øjeblikkeligt for {damage}. (præstetalent)',
   'entities.abilities.deterrence.description':
     'Øger din undvigelseschance med 50 procentpoint i 10 sek. (jægertalent)',
   'entities.abilities.divine_shield.description':

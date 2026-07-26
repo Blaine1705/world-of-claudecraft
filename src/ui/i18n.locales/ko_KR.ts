@@ -148,6 +148,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.description':
     '대상을 깊이 얼려 {damage}의 냉기 피해를 입히고 4초 동안 기절시킵니다. (마법사 특성)',
   'entities.abilities.desperate_prayer.name': '마지막 기도',
+  'entities.abilities.desperate_prayer.description': '최대 생명력의 30%를 즉시 회복합니다.',
   'entities.abilities.deterrence.name': '가시수호',
   'entities.abilities.divine_shield.name': '빛의 수호',
   'entities.abilities.earthbind.name': '붙드는 대지',
@@ -2768,7 +2769,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_wave.description': '아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
   'entities.abilities.chain_heal.name': '쇄도하는 치유',
   'entities.abilities.chain_heal.description':
-    '아군 대상의 생명력을 120~145 회복시킨 후 근처 아군 최대 2명에게 도약하며, 도약할 때마다 치유량이 절반으로 줄어듭니다. 영향을 받은 아군마다 치유의 물결을 소모해 추가로 회복시킵니다. (영혼 치유 고유)',
+    '아군 대상의 생명력을 {damage}만큼 회복시킨 후 12야드 안의 아군 최대 2명에게 도약합니다. 도약할 때마다 이전 대상의 50%만큼 치유합니다. 영향을 받은 아군마다 남은 치유의 물결을 소모해 소모량의 125%만큼 즉시 회복시킵니다. 첫 치유량은 주문력에 따라 증가합니다. (영혼 치유 고유)',
   'entities.abilities.galeheart_weapon.name': '질풍의 무기',
   'entities.abilities.galeheart_weapon.description':
     '무기에 질풍을 불어넣습니다. 적중한 세 번째 무기 공격마다 두 번 반향하고 폭풍 시전을 활성화합니다.',
@@ -2783,7 +2784,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '아군 하나를 6회 충전으로 60초 동안 보호합니다. 피해를 받으면 충전 1회를 소모해 3초마다 한 번 최대 생명력의 5%를 회복합니다. (주술사 특성)',
   'entities.abilities.tidecall.name': '해일 부름',
   'entities.abilities.tidecall.description':
-    '빠른 회복의 해일을 불러 아군을 치유하고 계산된 치유량을 치유의 물결에 더합니다.',
+    '아군 대상의 생명력을 {damage}만큼 회복시킵니다. 치유량은 주문력에 따라 증가합니다. 초과 치유 전의 전체 치유량을 치유의 물결에 더하며, 대상 최대 생명력의 30%까지 저장합니다.',
   'entities.abilities.earth_shock.name': '대지의 충격',
   'entities.abilities.earth_shock.description':
     '대상을 즉시 강타해 {damage}의 자연 피해를 입힙니다.',
@@ -8082,8 +8083,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상을 저주해 12초 동안 이동 속도를 30%만큼 감소시킵니다. (흑마법사 특성)',
   'entities.abilities.death_coil.description':
     '적에게 {damage}의 암흑 피해를 입힌 뒤 3초 동안 공포에 빠뜨립니다. (흑마법사 특성)',
-  'entities.abilities.desperate_prayer.description':
-    '즉시 생명력을 {damage}만큼 회복합니다. (사제 특성)',
   'entities.abilities.deterrence.description':
     '10초 동안 회피 확률을 50%포인트 증가시킵니다. (사냥꾼 특성)',
   'entities.abilities.divine_shield.description':
@@ -8575,7 +8574,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '아군 한 명이 받는 피해를 8초 동안 40% 감소시킵니다.',
   'entities.abilities.choir_of_deliverance.name': '구원의 성가대',
   'entities.abilities.choir_of_deliverance.description':
-    '6초 동안 정신을 집중해 2초마다 주위 파티원을 치유합니다.',
+    '6초 동안 정신을 집중해 30야드 안의 파티원을 2초마다 {damage}만큼 치유합니다. 치유량은 주문력에 따라 증가합니다.',
   'entities.items.resonant_thread.name': '공명의 실',
   'entities.items.resonant_hide.name': '공명의 가죽',
   'entities.items.resonant_links.name': '공명의 사슬',

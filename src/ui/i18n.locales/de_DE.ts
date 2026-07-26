@@ -8239,8 +8239,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     'Hoch auf dem Thornpeak nimmt der Sturm über Stormcrag zuweilen Gestalt an. Thunzharr, der Erwachende Gipfel erhebt sich dort in stetigem Rhythmus, ein Elementar von Schlachtzugsstärke, in der offenen Welt von allen bekämpft, die dem Ruf folgen, und er wird umso mächtiger, je mehr Herausforderer sich ihm entgegenstellen. Jeder, der sich dem Kampf anschließt, verdient seinen eigenen Wurf auf seine Beute, nach den Regeln der Schlachtzugssperre gewährt, und sein Fall währt lange genug, dass die Gefallenen zurücklaufen und ihr Recht einfordern können. Sammle mehr Schwerter, als du zu brauchen glaubst.',
   'guide.worldPage.worldBossTitle': 'Wenn der Gipfel erwacht: der Weltboss',
-  'entities.abilities.chain_heal.description':
-    'Heilt ein verbündetes Ziel um einen großen Betrag und springt dann auf bis zu 2 weitere Verbündete in der Nähe über. Die Heilung verringert sich mit jedem Sprung um 50%. (Wiederherstellungs-Signatur)',
   'entities.abilities.chain_heal.name': 'Kettenheilung',
   'entities.abilities.counter_shot.description':
     'Ein schneller Schuss, der das Zauberwirken des Ziels unterbricht und es 4 Sek. lang daran hindert, Zauber dieser Schule zu wirken.',
@@ -8630,8 +8628,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Trifft den Gegner für {damage} Schattenschaden und versetzt ihn anschließend 3 Sek. lang in Entsetzen. (Hexenmeistertalent)',
   'entities.abilities.deep_freeze.description':
     'Congela profundamente a Ziel, inflige {damage} de daño de Frost y lo aturde durante 4 Sek.. (Magier-Talent)',
-  'entities.abilities.desperate_prayer.description':
-    'Heilt Euch sofort um {damage}. (Priestertalent)',
   'entities.abilities.deterrence.description':
     'Erhöht Eure Ausweichchance 10 Sek. lang um 50 Prozentpunkte. (Jägertalent)',
   'entities.abilities.divine_shield.description':

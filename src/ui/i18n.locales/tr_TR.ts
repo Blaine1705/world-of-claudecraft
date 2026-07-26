@@ -8018,8 +8018,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     "Dikenzirve'nin yükseklerinde, Fırtınakaya'nın üzerindeki fırtına bazen bir biçim toplar. Uyanan Zirve Thunzharr orada düzenli bir ritimle yükselir; açık dünyada, çağrıya yanıt veren herkesçe dövüşülen, akın gücünde bir elemental ve karşısına ne kadar çok meydan okuyan dikilirse o kadar güçlenir. Dövüşe katılan herkes, akın kilidi koşullarında saygı gören kendi ganimet payını kazanır ve düşüşü, devrilenlerin geri koşup hakkını almasına yetecek kadar sürer. İhtiyacın olduğunu düşündüğünden daha fazla kılıç topla.",
   'guide.worldPage.worldBossTitle': 'Zirve uyandığında: dünya şefi',
-  'entities.abilities.chain_heal.description':
-    'Bir müttefiki büyük miktarda iyileştirir, ardından yakındaki en fazla 2 müttefike sıçrar ve her sıçramada %50 daha az iyileştirir. (Restorasyonun simge yeteneği)',
   'entities.abilities.chain_heal.name': 'Zincirleme İyileştirme',
   'entities.abilities.counter_shot.description':
     'Hedefin büyüsünü kesintiye uğratan ve okulu 4 saniyeliğine kilitleyen anlık atış.',
@@ -8402,8 +8400,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Düşmana {damage} Gölge hasarı verir, ardından onu 3 sn. boyunca dehşete düşürür. (Karabüyücü yeteneği)',
   'entities.abilities.deep_freeze.description':
     'Congela profundamente a hedefi, inflige {damage} de daño de Buz y lo aturde durante 4 sn. (büyücü yeteneği)',
-  'entities.abilities.desperate_prayer.description':
-    'Seni anında {damage} iyileştirir. (Rahip yeteneği)',
   'entities.abilities.deterrence.description':
     'Kaçınma şansını 10 sn. boyunca 50 yüzde puan artırır. (Avcı yeteneği)',
   'entities.abilities.divine_shield.description':

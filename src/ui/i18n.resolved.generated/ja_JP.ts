@@ -7620,7 +7620,7 @@ export const ja_JP: EnTranslations = {
       },
       "chain_heal": {
         "name": "流転の癒し",
-        "description": "味方1体の体力を120から145回復し、近くの味方最大2体に連鎖します。連鎖ごとに回復量は半減し、届いた味方ごとに癒しの水流を消費して追加回復を発生させます。（スピリットメンド固有）"
+        "description": "味方1体の体力を{damage}回復し、12ヤード以内の味方最大2体に連鎖します。連鎖するたびに回復量は直前の対象の50%になります。届いた味方ごとに残りの癒しの水流を消費し、消費量の125%を即座に回復します。最初の回復量はスペルパワーで増加します。（スピリットメンド固有）"
       },
       "galeheart_weapon": {
         "name": "疾風の武器",
@@ -7652,7 +7652,7 @@ export const ja_JP: EnTranslations = {
       },
       "tidecall": {
         "name": "潮呼び",
-        "description": "素早い癒しの潮を呼び、味方1体を回復して計算後の回復量を癒しの水流に加えます。"
+        "description": "味方1体の体力を{damage}回復します。回復量はスペルパワーで増加します。オーバーヒール前の回復量を癒しの水流に加えます。上限は対象の最大体力の30%です。"
       },
       "metamorphosis": {
         "name": "悪魔変身",
@@ -7952,7 +7952,7 @@ export const ja_JP: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "最後の祈り",
-        "description": "自分の体力を即座に{damage}回復する。（プリーストのタレント）"
+        "description": "最大体力の30%を即座に回復します。"
       },
       "deterrence": {
         "name": "針毛の守り",
@@ -8168,7 +8168,7 @@ export const ja_JP: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "救済の聖歌隊",
-        "description": "6秒間詠唱し、2秒ごとに周囲のパーティメンバーを回復する。"
+        "description": "6秒間チャネルし、30ヤード以内のパーティメンバーを2秒ごとに{damage}回復します。回復量はスペルパワーで増加します。"
       },
       "bear_charge": {
         "name": "ブルーインラッシュ",

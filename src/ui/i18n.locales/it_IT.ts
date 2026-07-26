@@ -8286,8 +8286,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     "In alto su Thornpeak, la tempesta sopra Stormcrag a volte prende forma. Thunzharr, la Vetta Risvegliata si erge lì con un ritmo costante, un elementale della potenza di un'incursione affrontato nel mondo aperto da chiunque risponda alla chiamata, e diventa più possente quanto più sfidanti gli si oppongono. Chiunque si unisca allo scontro guadagna il proprio tiro sul suo bottino, onorato secondo le regole di blocco d'incursione, e la sua caduta indugia abbastanza a lungo perché i caduti possano tornare di corsa a reclamare il dovuto. Raduna più spade di quante pensi ti servano.",
   'guide.worldPage.worldBossTitle': 'Quando la vetta si desta: il boss del mondo',
-  'entities.abilities.chain_heal.description':
-    'Cura abbondantemente un bersaglio alleato, poi si propaga a un massimo di altri 2 alleati vicini, curando il 50% in meno a ogni salto. (Abilità distintiva di Rigenerazione)',
   'entities.abilities.chain_heal.name': 'Guarigione a Catena',
   'entities.abilities.counter_shot.description':
     "Un tiro rapido che interrompe il lancio dell'incantesimo del bersaglio e blocca quella scuola per 4 s.",
@@ -8673,8 +8671,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Colpisce il nemico infliggendo {damage} danni da Ombra, poi lo terrorizza per 3 sec. (talento dello Stregone)',
   'entities.abilities.deep_freeze.description':
     'Congela profundamente a bersaglio, inflige {damage} de daño de Gelo y lo aturde durante 4 s. (talento da mago)',
-  'entities.abilities.desperate_prayer.description':
-    'Ti cura istantaneamente di {damage}. (talento del Sacerdote)',
   'entities.abilities.deterrence.description':
     'Aumenta la tua probabilità di schivata di 50 punti percentuali per 10 sec. (talento del Cacciatore)',
   'entities.abilities.divine_shield.description':

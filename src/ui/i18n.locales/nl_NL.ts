@@ -8261,8 +8261,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     'Hoog op Doorntop verzamelt de storm boven Stormcrag soms een gedaante. Thunzharr, de Ontwakende Piek verrijst daar met een vast ritme, een elementaal met de kracht van een raid, bevochten in de open wereld door wie de roep beantwoordt, en hij wordt machtiger naarmate meer uitdagers tegen hem opstaan. Iedereen die zich in het gevecht mengt, verdient zijn eigen worp van zijn buit, geëerd op raidlockout-voorwaarden, en zijn val blijft lang genoeg hangen zodat de gevallenen kunnen terugrennen om hun deel op te eisen. Verzamel meer zwaarden dan je denkt nodig te hebben.',
   'guide.worldPage.worldBossTitle': 'Wanneer de piek ontwaakt: de wereldbaas',
-  'entities.abilities.chain_heal.description':
-    'Geneest een bevriend doelwit voor een grote hoeveelheid en springt daarna naar maximaal 2 andere bondgenoten in de buurt. Elke sprong geneest 50% minder. (Herstelkenmerk)',
   'entities.abilities.chain_heal.name': 'Kettinggenezing',
   'entities.abilities.counter_shot.description':
     'Een snel schot dat de spreuk van het doelwit onderbreekt en die magieschool 4 sec vergrendelt.',
@@ -8647,8 +8645,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Treft de vijand voor {damage} Schaduwschade en vervult hem daarna 3 sec. met afgrijzen. (tovenaarstalent)',
   'entities.abilities.deep_freeze.description':
     'Congela profundamente a doelwit, inflige {damage} de daño de Vorst y lo aturde durante 4 sec. (magiertalent)',
-  'entities.abilities.desperate_prayer.description':
-    'Geneest je direct voor {damage}. (priestertalent)',
   'entities.abilities.deterrence.description':
     'Verhoogt je ontwijkingskans met 50 procentpunten gedurende 10 sec. (jagertalent)',
   'entities.abilities.divine_shield.description':

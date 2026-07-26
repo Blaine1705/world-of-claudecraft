@@ -72,13 +72,15 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // Thundercall and Stonebound values live in their spec runtime modules.
   lightning_bolt: [1, 5],
   rockbiter_weapon: [3, 10],
-  earth_shock: [3, 25],
+  earth_shock: [3, 5, 125],
   // Spiritmend deposits are calculated after the direct heal resolves.
   healing_wave: [12, 30, 50],
   // Unleash Weapon dispatches to four spec enchant implementations. Their
   // values live in shaman_unleash_weapon.ts and shaman_spiritmend.ts rather
   // than one shared ability effect array.
-  unleash_weapon: [54, 64, 30, 2, 20, 6, 75, 4, 125, 8, 50],
+  unleash_weapon: [54, 64, 30, 2, 20, 6, 75, 3, 4, 125, 8, 50],
+  // The shared Temporal Exhaustion gate is owned by combat/haste_burst.ts.
+  bloodlust: [10],
 };
 
 // Every resolved rank of every class ability (deduped by rank).

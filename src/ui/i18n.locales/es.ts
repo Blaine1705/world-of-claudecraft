@@ -8152,8 +8152,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     'En lo alto de Thornpeak, la tormenta sobre Stormcrag a veces cobra forma. Thunzharr, la Cima Despierta se alza allí con un ritmo constante, un elemental con fuerza de banda al que se combate en el mundo abierto por quienquiera que responda a la llamada, y se vuelve más poderoso cuantos más retadores se le enfrentan. Cada quien que se une al combate gana su propia tirada de su botín, respetada según las reglas de bloqueo de banda, y su caída perdura lo bastante para que los caídos vuelvan corriendo y reclamen lo suyo. Reúne más espadas de las que crees necesitar.',
   'guide.worldPage.worldBossTitle': 'Cuando la cima despierta: el jefe del mundo',
-  'entities.abilities.chain_heal.description':
-    'Sana una gran cantidad a un objetivo amistoso y luego salta a un máximo de 2 aliados cercanos adicionales, sanando un 50 % menos con cada salto. (habilidad distintiva de Restauración)',
   'entities.abilities.chain_heal.name': 'Sanación en cadena',
   'entities.abilities.counter_shot.description':
     'Un disparo rápido que interrumpe el lanzamiento de hechizos del objetivo y bloquea esa escuela durante 4 s.',
@@ -8575,8 +8573,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Golpea al enemigo e inflige {damage} de daño de las Sombras, y después lo aterroriza durante 3 s. (talento de Brujo)',
   'entities.abilities.deep_freeze.description':
     'Congela profundamente a objetivo, inflige {damage} de daño de Escarcha y lo aturde durante 4 s. (talento de mago)',
-  'entities.abilities.desperate_prayer.description':
-    'Te sana al instante por {damage}. (talento de Sacerdote)',
   'entities.abilities.deterrence.description':
     'Aumenta tu probabilidad de esquivar en 50 puntos porcentuales durante 10 s. (talento de Cazador)',
   'entities.abilities.divine_shield.description':

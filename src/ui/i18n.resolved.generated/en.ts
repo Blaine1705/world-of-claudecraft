@@ -6884,7 +6884,7 @@ export const en: EnTranslations = {
       },
       "volley": {
         "name": "Volley",
-        "description": "Rains arrows on the target area for 3 sec, dealing {damage} damage every 0.5 sec to enemies caught in it."
+        "description": "Rain arrows over an 8-yard area for 3 sec. Enemies in the area take {damage} Physical damage every 0.5 sec. Damage increases with Ranged Attack Power."
       },
       "pack_command": {
         "name": "Pack Command",
@@ -6896,7 +6896,7 @@ export const en: EnTranslations = {
       },
       "unleash_beast": {
         "name": "Unleash Beast",
-        "description": "Consume 3 Pack Ferocity after your pet strikes for 83 to 105 Physical damage and claps every enemy within 6 yards for 26 to 34. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 nearby enemies."
+        "description": "Consume 3 Pack Ferocity after your pet strikes for 83 to 105 Physical damage and claps every enemy within 6 yards for 26 to 34. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 enemies within 5 yards of the target."
       },
       "measured_shot": {
         "name": "Measured Shot",
@@ -6916,7 +6916,7 @@ export const en: EnTranslations = {
       },
       "bloodtrail_assault": {
         "name": "Bloodtrail Assault",
-        "description": "For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 nearby enemies, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards, deals 25% more base damage to its main target, and triggers 50% more wound damage."
+        "description": "For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 enemies within 5 yards, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards of radius, deals 25% more base damage to its main target, and triggers 50% more wound damage."
       },
       "trailbreak": {
         "name": "Trailbreak",
@@ -6936,7 +6936,7 @@ export const en: EnTranslations = {
       },
       "pack_rally": {
         "name": "Pack Rally",
-        "description": "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec."
+        "description": "Adopt Courser's Guise. You, your companion, and group or raid allies within 30 yards gain 30% movement speed and 10% attack, casting, and channeling speed for 10 sec."
       },
       "hurricane": {
         "name": "Galeheart",
@@ -6944,7 +6944,7 @@ export const en: EnTranslations = {
       },
       "earthquake": {
         "name": "Faultwake",
-        "description": "Shake an 8-yard area for 6 sec, dealing {damage} Nature damage every 1.5 sec. Thundercall empowers it at full Thunder."
+        "description": "Shake an 8-yard area for 6 sec, dealing {damage} Nature damage every 1.5 sec. Damage increases with Spell Power. Thundercall: at 5 Thunder, deal 100% more damage and consume all Thunder."
       },
       "heroic_strike": {
         "name": "Reaver Strike",
@@ -7304,19 +7304,19 @@ export const en: EnTranslations = {
       },
       "aspect_of_the_hawk": {
         "name": "Harrier's Guise",
-        "description": "Take on the harrier's guise, increasing attack power by {buff} for 30 min."
+        "description": "Adopt Harrier's Guise, increasing your Attack Power by {buff} for 30 min."
       },
       "serpent_sting": {
         "name": "Venom Barb",
-        "description": "Stings the target, dealing {damage} Nature damage over 15 sec."
+        "description": "Deal {damage} total Nature damage over 15 sec, once every 3 sec. Damage increases with Ranged Attack Power."
       },
       "arcane_shot": {
         "name": "Fell Shot",
-        "description": "An instant shot that deals {damage} Arcane damage."
+        "description": "Shoot the target for {damage} Arcane damage. Damage increases with Ranged Attack Power."
       },
       "concussive_shot": {
         "name": "Rattling Shot",
-        "description": "Dazes the target for {damage} damage, slowing movement by 50% for 4 sec."
+        "description": "Shoot the target for {damage} Physical damage and slow it by 50% for 4 sec. Damage increases with Ranged Attack Power."
       },
       "mongoose_bite": {
         "name": "Woundrend",
@@ -7332,15 +7332,15 @@ export const en: EnTranslations = {
       },
       "wing_clip": {
         "name": "Fettering Slash",
-        "description": "Inflicts a wound for {damage} damage, slowing the enemy by 40% for 10 sec."
+        "description": "Slash the target for {damage} Physical damage and slow it by 40% for 10 sec. Damage increases with Attack Power."
       },
       "aspect_of_the_monkey": {
         "name": "Marten's Guise",
-        "description": "Take on the marten's guise, increasing your dodge chance by 8% for 30 min."
+        "description": "Adopt Marten's Guise, increasing your dodge chance by 8% for 30 min."
       },
       "aspect_of_the_cheetah": {
         "name": "Courser's Guise",
-        "description": "Take on the courser's guise, increasing movement speed by 30% for 30 min."
+        "description": "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min."
       },
       "aimed_shot": {
         "name": "Long Draw",
@@ -7352,19 +7352,19 @@ export const en: EnTranslations = {
       },
       "smite": {
         "name": "Scouring Hymn",
-        "description": "Deal {damage} Holy damage. Doctrine heals each linked ally for 30% of the damage. With no linked ally, it heals the lowest-health party member for 15%."
+        "description": "Deal {damage} Holy damage. Damage increases with Spell Power. Doctrine: heal each linked ally for 30% of the damage. If no ally is linked, heal the lowest-health party member for 15%."
       },
       "lesser_heal": {
         "name": "Whispered Prayer",
-        "description": "Heals a friendly target for {damage}."
+        "description": "Heal a friendly target for {damage}. Healing increases with Spell Power."
       },
       "power_word_fortitude": {
         "name": "Litany of Resolve",
-        "description": "Increases the Stamina of all party members by {buff}% for 30 min."
+        "description": "Increase the Stamina of every party member by {buff}% for 30 min."
       },
       "shadow_word_pain": {
         "name": "Dirge of Decay",
-        "description": "Deal {damage} total Shadow damage over 18 sec, once every 3 sec. Vespers increases this damage by 25%. Each tick on your Effigy grants 1 Gloomtithe."
+        "description": "Deal {damage} total Shadow damage over 18 sec, once every 3 sec. Damage increases with Spell Power. Vespers: deal 25% more damage, and each tick on your Effigy grants 1 Gloomtithe."
       },
       "power_word_shield": {
         "name": "Psalm of Warding",
@@ -7372,7 +7372,7 @@ export const en: EnTranslations = {
       },
       "renew": {
         "name": "Lingering Grace",
-        "description": "Heals the target for {damage} over 15 sec."
+        "description": "Heal the target for {damage} over 15 sec, once every 3 sec. Healing increases with Spell Power."
       },
       "mind_blast": {
         "name": "Mindfracture",
@@ -7380,19 +7380,19 @@ export const en: EnTranslations = {
       },
       "heal": {
         "name": "Solemn Prayer",
-        "description": "A slow but powerful prayer that heals a friendly target for {damage}."
+        "description": "Heal a friendly target for {damage}. Healing increases with Spell Power."
       },
       "mind_flay": {
         "name": "Litany of Woe",
-        "description": "Assaults the target's mind with Shadow energy, causing {damage} damage each second for 3 sec."
+        "description": "Channel for 3 sec, dealing {damage} Shadow damage each second. Damage increases with Spell Power."
       },
       "flash_heal": {
         "name": "Urgent Prayer",
-        "description": "A fast prayer that heals a friendly target for {damage}."
+        "description": "Heal a friendly target for {damage}. Healing increases with Spell Power."
       },
       "lightning_bolt": {
         "name": "Arc Bolt",
-        "description": "Deal {damage} Nature damage. Thundercall: a hit grants 1 Thunder."
+        "description": "Deal {damage} Nature damage. Damage increases with Spell Power. Thundercall: a hit grants 1 Thunder."
       },
       "thunder_reservoir": {
         "name": "Thunder Reservoir",
@@ -7404,19 +7404,19 @@ export const en: EnTranslations = {
       },
       "healing_wave": {
         "name": "Mending Waters",
-        "description": "Heal a friendly target for {damage}. Spiritmend stores 50% of the healing calculated before overhealing as Mending Current for 12 sec, up to 30% of the target's maximum health."
+        "description": "Heal a friendly target for {damage}. Healing increases with Spell Power. Spiritmend: store 50% of the full heal before overhealing as Mending Current for 12 sec, up to 30% of the target's maximum health."
       },
       "earth_shock": {
         "name": "Earthen Jolt",
-        "description": "Deal {damage} Nature damage. Thundercall empowers it at full Thunder. Stonebound forces the target to attack you."
+        "description": "Deal {damage} Nature damage. Damage increases with Spell Power. Thundercall: at 5 Thunder, deal 125% more damage and consume all Thunder. Stonebound: force the target to attack you for 3 sec."
       },
       "lightning_shield": {
         "name": "Thunder Ward",
-        "description": "Surrounds you with crackling lightning: melee attackers take {buff} Nature damage, up to 3 charges and at most once every 5 seconds."
+        "description": "Surround yourself with lightning for 10 min. The next 3 melee attacks against you deal {buff} Nature damage to the attacker, at most once every 5 sec."
       },
       "flame_shock": {
         "name": "Cinder Jolt",
-        "description": "Sears the target with fire for {damage} damage plus {overTime} over 12 sec."
+        "description": "Deal {damage} Fire damage, then {overTime} Fire damage over 12 sec. The initial hit increases with Spell Power."
       },
       "flametongue_weapon": {
         "name": "Pyrebrand Weapon",
@@ -7424,7 +7424,7 @@ export const en: EnTranslations = {
       },
       "frost_shock": {
         "name": "Rime Jolt",
-        "description": "Instantly shocks the target with frost for {damage} Frost damage and slows its movement by 50% for 8 sec."
+        "description": "Deal {damage} Frost damage and slow the target by 50% for 8 sec. Damage increases with Spell Power."
       },
       "frostbrand_weapon": {
         "name": "Rimebound Weapon",
@@ -7432,7 +7432,7 @@ export const en: EnTranslations = {
       },
       "ghost_wolf": {
         "name": "Shadewolf",
-        "description": "Take Shadewolf form, increasing movement speed by 40%. Cast again to return to normal form."
+        "description": "Become a Shadewolf and move 40% faster. Cast again to return to your normal form."
       },
       "stormstrike": {
         "name": "Ancestral Strike",
@@ -7620,7 +7620,7 @@ export const en: EnTranslations = {
       },
       "chain_heal": {
         "name": "Cascading Mend",
-        "description": "Heal a friendly target for 120 to 145, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)"
+        "description": "Heal a friendly target for {damage}, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)"
       },
       "galeheart_weapon": {
         "name": "Galeheart Weapon",
@@ -7640,7 +7640,7 @@ export const en: EnTranslations = {
       },
       "unleash_weapon": {
         "name": "Unleash Weapon",
-        "description": "Unleash your active weapon enchant. Pyrebrand deals 54 to 64 Fire damage, gains 30% of Spell Power, and grants 2 Thunder. Galeheart strikes with your weapon, advances Warspirit Cadence, and grants 20% attack speed for 6 sec. Stonebound strikes for 75% weapon damage, forces the target to attack you, and reduces damage taken by 20% for 4 sec. Lifespring consumes your Mending Current, heals for 125% of its remaining healing, and reduces the next hit within 8 sec by 50% of the health restored."
+        "description": "Trigger your active weapon enchant. Pyrebrand: deal 54 to 64 Fire damage plus 30% of your Spell Power and gain 2 Thunder. Galeheart: strike with your weapon, advance Warspirit Cadence, and gain 20% attack speed for 6 sec. Stonebound: strike for 75% weapon damage, force the target to attack you for 3 sec, and take 20% less damage for 4 sec. Lifespring: consume Mending Current, heal for 125% of its remaining healing, and reduce the next hit within 8 sec by 50% of the health restored."
       },
       "primal_exaltation": {
         "name": "Primal Exaltation",
@@ -7652,7 +7652,7 @@ export const en: EnTranslations = {
       },
       "tidecall": {
         "name": "Tidecall",
-        "description": "Heal a friendly target for 58 to 72. The heal increases with Spell Power. Add the same healing calculated before overhealing to Mending Current, up to 30% of the target's maximum health."
+        "description": "Heal a friendly target for {damage}. Healing increases with Spell Power. Add the full heal before overhealing to Mending Current, up to 30% of the target's maximum health."
       },
       "metamorphosis": {
         "name": "Dread Aspect",
@@ -7676,7 +7676,7 @@ export const en: EnTranslations = {
       },
       "trueshot_aura": {
         "name": "Sureflight Aura",
-        "description": "Inspires nearby allies, increasing attack power by 10% for 30 min. (Marksmanship signature)"
+        "description": "Increase the Attack Power of allies within 30 yards by 10% for 30 min. (Marksmanship signature)"
       },
       "wyvern_sting": {
         "name": "Wyvern Sting",
@@ -7912,7 +7912,7 @@ export const en: EnTranslations = {
       },
       "bloodlust": {
         "name": "Storm Chorus",
-        "description": "Whips your group or raid into a frenzy, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Storm Chorus or Temporal Acceleration are too exhausted to benefit. (Shaman talent)"
+        "description": "Increase the attack, casting, and channeling speed of group or raid allies within 30 yards by 30% for 15 sec. Affected allies cannot benefit from Storm Chorus or Temporal Acceleration again for 10 min. (Shaman talent)"
       },
       "chain_lightning": {
         "name": "Skybranch",
@@ -7952,7 +7952,7 @@ export const en: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Last Prayer",
-        "description": "Instantly heals you for {damage}. (Priest talent)"
+        "description": "Instantly heals you for 30% of maximum health."
       },
       "deterrence": {
         "name": "Bristleguard",
@@ -8004,7 +8004,7 @@ export const en: EnTranslations = {
       },
       "inner_focus": {
         "name": "Stilled Mind",
-        "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
+        "description": "Makes your next Priest spell free and uninterruptible. Lasts 60 sec."
       },
       "innervate": {
         "name": "Lifesap",
@@ -8076,7 +8076,7 @@ export const en: EnTranslations = {
       },
       "mind_sear": {
         "name": "Thoughtburn",
-        "description": "Channels shadow energy at the target area, damaging nearby enemies each second for {damage}. (Priest talent)"
+        "description": "Channel for 3 sec, dealing {damage} Shadow damage each second to enemies within 8 yards of the target area. Damage increases with Spell Power. (Priest talent)"
       },
       "multi_shot": {
         "name": "Splitshot",
@@ -8084,7 +8084,7 @@ export const en: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Choirmend",
-        "description": "Heals nearby allies for {damage}. (Priest talent)"
+        "description": "Heal allies within 30 yards for {damage}. Healing increases with Spell Power. (Benison)"
       },
       "preparation": {
         "name": "Contingency",
@@ -8096,11 +8096,11 @@ export const en: EnTranslations = {
       },
       "psychic_scream": {
         "name": "Terror Canticle",
-        "description": "Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)"
+        "description": "Frighten enemies within 8 yards for up to 4 sec. Damage may break the effect."
       },
       "counter_shot": {
         "name": "Hushing Shot",
-        "description": "A snap shot that interrupts the target's spellcast and locks that school for 4 sec."
+        "description": "Interrupt the target and prevent spells from that school for 4 sec."
       },
       "rebuke": {
         "name": "Reproach",
@@ -8148,7 +8148,7 @@ export const en: EnTranslations = {
       },
       "veilstep": {
         "name": "Veilstep",
-        "description": "Steps through the veil in the direction you are facing."
+        "description": "Step 10 yards forward through the veil."
       },
       "scouring_mercy": {
         "name": "Scouring Mercy",
@@ -8160,15 +8160,15 @@ export const en: EnTranslations = {
       },
       "summon_tithefiend": {
         "name": "Call Tithefiend",
-        "description": "Consume all Gloomtithe to summon a Tithefiend for 6, 8, 10, 12, or 15 sec at 1 to 5 stacks. It attacks every 2 sec for 20 to 24 Shadow damage, plus 8 per extra stack. Five stacks make it larger and increase its damage by 25%. Its damage increases with your Spell Power. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)"
+        "description": "Consume all Gloomtithe to summon a Tithefiend. It lasts 6, 8, 10, 12, or 15 sec at 1 to 5 stacks and attacks every 2 sec. Each attack deals 20 to 24 Shadow damage plus 8 per extra stack and increases with your Spell Power. At 5 stacks, the fiend grows larger and deals 25% more damage. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% of its damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)"
       },
       "martyrs_aegis": {
         "name": "Martyr's Aegis",
-        "description": "Reduces one ally incoming damage by 40% for 8 sec."
+        "description": "Reduce one ally's incoming damage by 40% for 8 sec."
       },
       "choir_of_deliverance": {
         "name": "Choir of Deliverance",
-        "description": "Channels for 6 sec, healing nearby party members every 2 sec."
+        "description": "Channel for 6 sec, healing party members within 30 yards for {damage} every 2 sec. Healing increases with Spell Power."
       },
       "bear_charge": {
         "name": "Bruin Rush",

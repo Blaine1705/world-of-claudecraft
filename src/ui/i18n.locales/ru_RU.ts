@@ -144,6 +144,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.death_coil.name': 'Могильная спираль',
   'entities.abilities.deep_freeze.name': 'Мертвый мороз',
   'entities.abilities.desperate_prayer.name': 'Последняя молитва',
+  'entities.abilities.desperate_prayer.description':
+    'Мгновенно восстанавливает вам 30% от максимального запаса здоровья.',
   'entities.abilities.deterrence.name': 'Колючий страж',
   'entities.abilities.divine_shield.name': 'Световой оберег',
   'entities.abilities.earthbind.name': 'Хватка земли',
@@ -2813,7 +2815,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_wave.description': 'Исцеляет дружественную цель на {damage}.',
   'entities.abilities.chain_heal.name': 'Каскадное исцеление',
   'entities.abilities.chain_heal.description':
-    'Исцеляет дружественную цель на 120-145, затем перескакивает на 2 ближайших союзников, снижая исцеление вдвое с каждым прыжком. Каждый задетый союзник расходует ваш Поток исцеления для дополнительного всплеска. (Фирменное умение Исцеления духа)',
+    'Исцеляет дружественную цель на {damage}, затем перескакивает на 2 союзников в радиусе 12 ярдов. Каждый прыжок исцеляет на 50% от предыдущего. Каждый задетый союзник расходует оставшийся Поток исцеления и мгновенно восстанавливает 125% от израсходованного объема. Первичное исцеление усиливается силой заклинаний. (Фирменное умение Исцеления духа)',
   'entities.abilities.galeheart_weapon.name': 'Оружие сердца бури',
   'entities.abilities.galeheart_weapon.description':
     'Наполняет оружие шквалом. Каждая третья попавшая атака оружием дважды отзывается эхом и актирует Буревое колдовство.',
@@ -2828,7 +2830,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Защищает одного союзника на 60 сек. и имеет 6 зарядов. Урон расходует заряд, исцеляя 5% от максимума здоровья не чаще раза в 3 сек. (Талант шамана)',
   'entities.abilities.tidecall.name': 'Зов прилива',
   'entities.abilities.tidecall.description':
-    'Призывает быструю целительную волну, исцеляя союзника и добавляя рассчитанное исцеление к Потоку исцеления.',
+    'Исцеляет дружественную цель на {damage}. Исцеление усиливается силой заклинаний. Добавляет полный объем до избыточного исцеления в Поток исцеления, вплоть до 30% максимального здоровья цели.',
   'entities.abilities.earth_shock.name': 'Земной толчок',
   'entities.abilities.earth_shock.description':
     'Мгновенно поражает цель ударной силой, нанося {damage} ед. урона от сил природы.',
@@ -8241,8 +8243,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Поражает противника, нанося {damage} ед. урона от Темной магии, а затем повергает его в ужас на 3 сек. (талант чернокнижника)',
   'entities.abilities.deep_freeze.description':
     'Глубоко замораживает цель, нанося {damage} ед. урона от льда и оглушая ее на 4 сек. (Талант мага)',
-  'entities.abilities.desperate_prayer.description':
-    'Мгновенно восстанавливает вам {damage} ед. здоровья. (талант жреца)',
   'entities.abilities.deterrence.description':
     'Повышает вероятность уклонения на 50 процентных пунктов на 10 сек. (талант охотника)',
   'entities.abilities.divine_shield.description':
@@ -8749,7 +8749,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Уменьшает получаемый союзником урон на 40% на 8 сек.',
   'entities.abilities.choir_of_deliverance.name': 'Хор избавления',
   'entities.abilities.choir_of_deliverance.description':
-    'Поддерживается 6 сек., исцеляя ближайших участников группы раз в 2 сек.',
+    'Поддерживается 6 сек., исцеляя участников группы в радиусе 30 ярдов на {damage} раз в 2 сек. Исцеление усиливается силой заклинаний.',
   'entities.items.resonant_thread.name': 'Резонирующая нить',
   'entities.items.resonant_hide.name': 'Резонирующая шкура',
   'entities.items.resonant_links.name': 'Резонирующие звенья',
