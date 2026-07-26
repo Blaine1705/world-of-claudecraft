@@ -417,9 +417,12 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
 // for itself when the same value is rewritten sixty times a second and buys nothing on a
 // once-per-open rebuild. A raw-write COUNT over that rebuild would be a number with no
 // signal in either direction: it fails on the ordinary window edits that make up a large
-// share of src/ui commits (options_window alone carries 220 build-time writes and was
-// touched 38 times in the last 300 window commits), while the hazard it is supposed to
-// catch, an EXISTING write becoming periodic, moves no count at all.
+// share of src/ui commits, while the hazard it is supposed to catch, an EXISTING write
+// becoming periodic, moves no count at all. (The measurement that settled it, taken when
+// this bucket was added rather than pinned anywhere: the heaviest window carried well over
+// two hundred build-time writes and was the single most-edited module in the family, so the
+// gate would have reddened on a large fraction of the commits that touch a window and on
+// none of the ones that would matter.)
 //
 // So the cold bucket holds the two contracts that do not depend on cadence, and holds them
 // with the same exact counts every other bucket uses:
@@ -429,9 +432,9 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
 // A window that genuinely goes per-frame is moved into HOT_PAINTERS, and the raw-write scan
 // applies to it there.
 //
-// Cold needs NO registration: 29 of the 35 window painters declare nothing and are held to
-// zero on every matcher, so a new window is covered the day it lands. Only these six have
-// anything to declare. The asymmetry with `*_painter.ts`, which must be consciously placed
+// Cold needs NO registration, which is what makes it safe as a default: every window painter
+// not listed below is held to zero on every matcher, so a new window is covered the day it
+// lands rather than the day someone remembers it. The asymmetry with `*_painter.ts`, which must be consciously placed
 // in HOT_PAINTERS or CANVAS_PAINTERS or fail the completeness check, is on purpose: that
 // name asserts "per-frame or canvas", so a forgotten one is a real mistake, while cold is
 // simply what a window is.
