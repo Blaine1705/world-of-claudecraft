@@ -70,18 +70,30 @@ const PLAYER_ARROW_TIP_Y = -7;
 const PLAYER_ARROW_HALF_X = 4.5;
 const PLAYER_ARROW_BASE_Y = 5.5;
 
-// NPC quest glyph typography (byte-faithful to `'bold 11px Georgia'` + the inline
-// fillText offset mx - 2, my + 3, drawn with the default textAlign/textBaseline).
+// NPC quest glyph typography (the glyph set drawn at `'bold 11px Georgia'` on the
+// inline site's mx - 2, my + 3 anchor, with the default textAlign/textBaseline).
 //
 // The glyphs draw from a tiny per-(glyph, color) sprite cache, never a per-marker
-// fillText: assigning ctx.font re-parses the font string and fillText re-rasterizes
-// the glyph on every call (~0.5ms each on a GPU canvas), which made a quest-hub
-// redraw with ~17 NPC markers cost ~8.6ms of its ~9ms, a visible hitch at the 10Hz
-// cadence. The sprite draws the glyph ONCE at the same font, then each redraw is a
-// plain drawImage blit. Positioning stays byte-faithful: the sprite records where
-// the fillText origin sits inside it, and the blit subtracts that origin so the
-// glyph's left edge / alphabetic baseline land exactly where the inline
-// `fillText(glyph, mx - 2, my + 3)` put them.
+// fillText. Measured in Chrome at 17 iterations per redraw against a dirty style tree
+// (the crowded-town case: ~80 nameplate transform writes land in the same frame):
+// bare `ctx.font` assignments 0.033ms, fillText with the font already set 0.037ms,
+// measureText alone 0.0368ms, drawImage 0.0062ms. On a quiet page all four are equal.
+// EVERY canvas text entry point (the font setter, fillText, measureText) re-resolves
+// font state against the document, so the cost tracks how dirty the style tree is,
+// NOT the font string and NOT the marker count: hoisting `ctx.font` above the loop
+// measures no better than leaving it inside it (0.0385 vs 0.036), and only leaving
+// the text API altogether is a fix. drawImage is flat.
+//
+// Corollary worth keeping in view when reading a profile: NPC glyph markers come only
+// from `e.kind === 'npc'` (minimap_markers.ts), so a player crowd adds circles and
+// arrows but never glyphs. The town's quest givers are on the minimap at zero players;
+// the crowd is the multiplier via the nameplate DOM, not the source of the glyphs.
+//
+// The sprite draws the glyph ONCE at the same font, then each redraw is a plain blit.
+// The sprite records where its internal fillText origin sits, and the blit subtracts
+// that origin so the glyph lands on the same anchor the inline
+// `fillText(glyph, mx - 2, my + 3)` used, rounded to a whole pixel (the drawMarkers
+// 'npc' case has the why: the rounding is load-bearing, not cosmetic).
 const NPC_GLYPH_FONT = 'bold 11px Georgia';
 const NPC_GLYPH_OFFSET_X = 2;
 const NPC_GLYPH_OFFSET_Y = 3;
@@ -323,11 +335,14 @@ export class MinimapPainter {
     sprite.width = NPC_GLYPH_SPRITE_SIZE;
     sprite.height = NPC_GLYPH_SPRITE_SIZE;
     const sctx = sprite.getContext('2d');
-    if (sctx) {
-      sctx.fillStyle = color;
-      sctx.font = NPC_GLYPH_FONT;
-      sctx.fillText(glyph, NPC_GLYPH_SPRITE_ORIGIN_X, NPC_GLYPH_SPRITE_BASELINE_Y);
-    }
+    // Cache only once the glyph actually rasterized, matching the two sibling caches in
+    // this file (ensureMazeBg, resolveColors): freezing a blank sprite from one transient
+    // context failure would hide every NPC glyph for the rest of the session. Returning
+    // the blank sprite uncached keeps this redraw's draw a no-op and self-heals the next.
+    if (!sctx) return sprite;
+    sctx.fillStyle = color;
+    sctx.font = NPC_GLYPH_FONT;
+    sctx.fillText(glyph, NPC_GLYPH_SPRITE_ORIGIN_X, NPC_GLYPH_SPRITE_BASELINE_Y);
     this.glyphSprites.set(key, sprite);
     return sprite;
   }
@@ -349,12 +364,27 @@ export class MinimapPainter {
           ctx.stroke();
           break;
         case 'npc':
-          // Blit the cached glyph sprite so its internal fillText origin lands on
-          // the inline site's (mx - 2, my + 3) anchor exactly.
+          // Blit the cached glyph sprite so its internal fillText origin lands on the
+          // inline site's (mx - 2, my + 3) anchor.
+          //
+          // ROUNDED, and that is load-bearing rather than cosmetic. mx/my are continuous
+          // floats (minimap_markers.ts projects `half + dx`), so the destination is
+          // fractional nearly always, and a fractional drawImage destination is RESAMPLED:
+          // measured, the same 11px glyph blitted at a sub-pixel phase with
+          // imageSmoothingEnabled ON yields 53 ink pixels and ZERO fully-solid ones, i.e.
+          // mush. Rounding makes the output identical whether smoothing is on or off (35
+          // ink / 7 solid either way), so glyph legibility never silently depends on the
+          // `imageSmoothingEnabled = false` the two paint entry points set for the terrain
+          // background blit; it also drops the nearest-neighbour artifact at exactly
+          // half-pixel phase. No measurable cost.
+          //
+          // The tradeoff, deliberately taken: the glyph now snaps to whole pixels where
+          // fillText advanced it in quarter-pixel steps. At the minimap's 1.7 px/yard base
+          // scale that is a sub-pixel marker shift on a surface that redraws at 10Hz.
           ctx.drawImage(
             this.npcGlyphSprite(m.glyph, colors.npcQuest),
-            m.mx - NPC_GLYPH_OFFSET_X - NPC_GLYPH_SPRITE_ORIGIN_X,
-            m.my + NPC_GLYPH_OFFSET_Y - NPC_GLYPH_SPRITE_BASELINE_Y,
+            Math.round(m.mx - NPC_GLYPH_OFFSET_X - NPC_GLYPH_SPRITE_ORIGIN_X),
+            Math.round(m.my + NPC_GLYPH_OFFSET_Y - NPC_GLYPH_SPRITE_BASELINE_Y),
           );
           break;
         case 'portal':
