@@ -1336,16 +1336,22 @@ describe('Guide professions gathering accuracy', () => {
         ).length;
         expect(row.count).toBe(simCount);
       }
-      expect(g.respawnSeconds).toBe(120);
+      // Re-minted from 120 alongside the node-count expansion: the wiki prints
+      // this straight out of NODE_HARVEST_TABLE, and the two moved together so
+      // the per-zone harvest ceiling stayed flat (gathering.ts).
+      expect(g.respawnSeconds).toBe(240);
     }
-    // Spot pin: Thornpeak ships one tier-3 node per gathering type.
+    // Spot pin: Thornpeak ships two tier-3 nodes per gathering type. Was one,
+    // and doubled with the respawn so a tier-3 gatherer's rate held; the number
+    // matters here because tier 3 is the only tier that finishes the climb to
+    // proficiency 100.
     const mining = GUIDE_PROF_GATHERING.find((g) => g.id === 'mining');
     const t3 = mining?.nodes?.find((n) => n.tier === 3);
     expect(t3).toEqual({
       zone: 'Thornpeak Heights',
       tier: 3,
       toolTier: 3,
-      count: 1,
+      count: 2,
       material: 'Osmium Ore',
     });
   });

@@ -51,13 +51,23 @@ export type GatheringProficiency = Record<GatheringProfessionId, number>;
 // placeholder junk grants (bone_fragments/linen_scrap/spider_leg) are gone,
 // but those items themselves survive (recipes consume them, players hold
 // them): only their node source went away.
+//
+// respawnSeconds is 240 and moved there together with the node count, which
+// doubled to six per type per zone (content/gather_nodes.ts). The pair is one
+// change and has to stay one: the per-zone ceiling is nodes * 3600 / respawn,
+// so 9 nodes at 120 seconds and 18 at 240 are the same 270 harvests an hour,
+// and Mirefen and Thornpeak (12 nodes at 120, 360 an hour) come DOWN onto that
+// same figure rather than up. What the pair buys is circuit length: every zone
+// circuit used to be shorter than the respawn, so a gathering session was spent
+// standing at a node already worked. Raising respawn alone would have cut the
+// ceiling; adding nodes alone would have raised it. Neither is the goal.
 export const NODE_HARVEST_TABLE: Record<
   GatherNodeType,
   { professionId: GatheringProfessionId; respawnSeconds: number }
 > = {
-  ore: { professionId: 'mining', respawnSeconds: 120 },
-  wood: { professionId: 'logging', respawnSeconds: 120 },
-  herb: { professionId: 'herbalism', respawnSeconds: 120 },
+  ore: { professionId: 'mining', respawnSeconds: 240 },
+  wood: { professionId: 'logging', respawnSeconds: 240 },
+  herb: { professionId: 'herbalism', respawnSeconds: 240 },
 };
 
 // Every material row yields this many units per rolled rarity (one

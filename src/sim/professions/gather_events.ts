@@ -12,8 +12,15 @@ import type { GatherNodeDef, GatherNodeType, GatherRareEventFlavor, SimEvent } f
 import type { MasterworkProc } from './masterwork';
 
 // One shared cadence knob: state.md target of roughly 1 per zone per 20
-// minutes, from 120s node respawn and up to 9 nodes per zone giving at most
+// minutes, from 240s node respawn and 18 nodes per zone giving at most
 // ~90 harvests per zone per 20 minutes; tuned per family.
+//
+// Those two inputs both doubled at once (120s and up to 9 nodes before), and
+// their product is what this knob reads, so the derivation lands on the same 90
+// and the constant did not move. That is not a coincidence to preserve by luck:
+// the node count and the respawn were changed together precisely to hold the
+// per-zone harvest ceiling flat (see NODE_HARVEST_TABLE in gathering.ts). If
+// either is ever tuned alone, re-derive this.
 export const GATHER_RARE_EVENT_CHANCE = 1 / 90;
 
 // A rare event multiplies the harvest yield and forces signed instances

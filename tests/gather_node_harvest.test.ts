@@ -608,20 +608,38 @@ describe('the RuneScape rule (#2343): pre-phase nodes deny bare hands and need o
     }
   });
 
-  it('the ramp is purely additive: only the NEW _t2/_t3 veins carry tier 2 or higher', () => {
+  it('the ramp is purely additive: only the _t2/_t3 veins carry tier 2 or higher', () => {
+    // Re-minted from nine ids to eighteen when every zone went to six nodes per
+    // type: Mirefen gained a second tier-2 vein of each type and Thornpeak a
+    // second tier-2 AND a second tier-3, so no tier is carried by a single node
+    // any more (a lone node's rate would have halved when respawn doubled). The
+    // load-bearing claim is unchanged and is why the list is spelled out rather
+    // than counted: every tier-2-or-higher node is a `_t2`/`_t3`-suffixed id, so
+    // no zone-1 node and no plainly-numbered node ever needs a better tool. A
+    // future tier bump on, say, ore_eastbrook_1 reds here rather than silently
+    // locking the starting zone behind a 120-copper pick.
     const gated = GATHER_NODES.filter((n) => n.tier > 1)
       .map((n) => n.id)
       .sort();
     expect(gated).toEqual([
       'herb_mirefen_t2',
+      'herb_mirefen_t2b',
       'herb_thornpeak_t2',
+      'herb_thornpeak_t2b',
       'herb_thornpeak_t3',
+      'herb_thornpeak_t3b',
       'ore_mirefen_t2',
+      'ore_mirefen_t2b',
       'ore_thornpeak_t2',
+      'ore_thornpeak_t2b',
       'ore_thornpeak_t3',
+      'ore_thornpeak_t3b',
       'wood_mirefen_t2',
+      'wood_mirefen_t2b',
       'wood_thornpeak_t2',
+      'wood_thornpeak_t2b',
       'wood_thornpeak_t3',
+      'wood_thornpeak_t3b',
     ]);
   });
 });

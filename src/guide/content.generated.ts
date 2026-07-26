@@ -6943,21 +6943,21 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "Eastbrook Vale",
         "tier": 1,
         "toolTier": 1,
-        "count": 3,
+        "count": 6,
         "material": "Copper Ore"
       },
       {
         "zone": "Mirefen Marsh",
         "tier": 1,
         "toolTier": 1,
-        "count": 3,
+        "count": 4,
         "material": "Iron Ore"
       },
       {
         "zone": "Mirefen Marsh",
         "tier": 2,
         "toolTier": 2,
-        "count": 1,
+        "count": 2,
         "material": "Iron Ore"
       },
       {
@@ -6971,18 +6971,18 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "Thornpeak Heights",
         "tier": 2,
         "toolTier": 2,
-        "count": 1,
+        "count": 2,
         "material": "Osmium Ore"
       },
       {
         "zone": "Thornpeak Heights",
         "tier": 3,
         "toolTier": 3,
-        "count": 1,
+        "count": 2,
         "material": "Osmium Ore"
       }
     ],
-    "respawnSeconds": 120
+    "respawnSeconds": 240
   },
   {
     "id": "logging",
@@ -7084,21 +7084,21 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "Eastbrook Vale",
         "tier": 1,
         "toolTier": 1,
-        "count": 3,
+        "count": 6,
         "material": "Ironbark Log"
       },
       {
         "zone": "Mirefen Marsh",
         "tier": 1,
         "toolTier": 1,
-        "count": 3,
+        "count": 4,
         "material": "Ashwood Log"
       },
       {
         "zone": "Mirefen Marsh",
         "tier": 2,
         "toolTier": 2,
-        "count": 1,
+        "count": 2,
         "material": "Ashwood Log"
       },
       {
@@ -7112,18 +7112,18 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "Thornpeak Heights",
         "tier": 2,
         "toolTier": 2,
-        "count": 1,
+        "count": 2,
         "material": "Highpine Log"
       },
       {
         "zone": "Thornpeak Heights",
         "tier": 3,
         "toolTier": 3,
-        "count": 1,
+        "count": 2,
         "material": "Highpine Log"
       }
     ],
-    "respawnSeconds": 120
+    "respawnSeconds": 240
   },
   {
     "id": "herbalism",
@@ -7225,21 +7225,21 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "Eastbrook Vale",
         "tier": 1,
         "toolTier": 1,
-        "count": 3,
+        "count": 6,
         "material": "Sheenleaf Herb"
       },
       {
         "zone": "Mirefen Marsh",
         "tier": 1,
         "toolTier": 1,
-        "count": 3,
+        "count": 4,
         "material": "Goldleaf Herb"
       },
       {
         "zone": "Mirefen Marsh",
         "tier": 2,
         "toolTier": 2,
-        "count": 1,
+        "count": 2,
         "material": "Goldleaf Herb"
       },
       {
@@ -7253,18 +7253,18 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "Thornpeak Heights",
         "tier": 2,
         "toolTier": 2,
-        "count": 1,
+        "count": 2,
         "material": "Sunpetal Herb"
       },
       {
         "zone": "Thornpeak Heights",
         "tier": 3,
         "toolTier": 3,
-        "count": 1,
+        "count": 2,
         "material": "Sunpetal Herb"
       }
     ],
-    "respawnSeconds": 120
+    "respawnSeconds": 240
   },
   {
     "id": "fishing",

@@ -308,6 +308,7 @@ guards.
 | UNBIND_FEE_BY_QUALITY_TIER | src/sim/professions/commission.ts | [2500, 10000, 40000] copper, clamp both ends |
 | GATHER_CAST_BASE / FLOOR / TOOL_TIER / BAND (sec) | src/sim/professions/gathering.ts | 2.5 / 1.5 / 0.4 / 0.15 |
 | GATHER_GAIN_TIER_STEP | src/sim/professions/gathering.ts | 25 |
+| NODE_HARVEST_TABLE respawnSeconds | src/sim/professions/gathering.ts | 240 (ore / wood / herb), paired with 6 nodes per type per zone in src/sim/content/gather_nodes.ts: the per-zone ceiling is nodes x 3600 / respawn, so the two are one lever and move together |
 | GATHER_RARE_EVENT_CHANCE / YIELD_MULT | src/sim/professions/gather_events.ts | 1/90 / 5 |
 | FISH_BITE_DELAY_MIN / MAX / ROD_REDUCTION (sec) | src/sim/professions/fishing.ts | 3 / 8 / 1.5 |
 | FISH_REEL_WINDOW_SEC / ROD_BONUS_SEC | src/sim/professions/fishing.ts | 3 / 0.75 |

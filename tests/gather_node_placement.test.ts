@@ -21,7 +21,14 @@
 
 import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
-import { GATHER_NODE_TYPES, GATHER_NODES, WORLD_MAX_X, ZONES, zoneAt } from '../src/sim/data';
+import {
+  CAMPS,
+  GATHER_NODE_TYPES,
+  GATHER_NODES,
+  WORLD_MAX_X,
+  ZONES,
+  zoneAt,
+} from '../src/sim/data';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { INTERACT_RANGE } from '../src/sim/types';
 import {
@@ -456,14 +463,15 @@ describe('gather node placement: every node sits on ground a player can work', (
     expect(tightest, `tightest pair ${pair}`).toBeLessThan(INTERACT_RANGE + 1);
   });
 
-  it('coverage floor: every zone keeps every gathering profession worth visiting', () => {
+  it('count floor: every zone keeps every gathering profession worth visiting', () => {
     // A relocation must never be allowed to drain a zone of a type (moving a node
-    // across a band boundary would). The floor is what ships today, so it holds a
-    // relocation flat without freezing the count: node COUNTS are owned elsewhere
-    // and only ever grow from here.
+    // across a band boundary would), and the count itself is the density the
+    // world is tuned around: every zone carries six nodes of every type against a
+    // 240-second respawn (NODE_HARVEST_TABLE), which is what keeps a gathering
+    // circuit longer than the wait it is meant to fill.
     //
-    // The total is NOT enough on its own. Thornpeak ships four nodes per type but
-    // only two of them are tier 1, so a total-only floor of 3 would still pass a
+    // The total is NOT enough on its own. Thornpeak carries six nodes per type
+    // but only two of them are tier 1, so a total-only floor would still pass a
     // relocation that drained the zone's last tier-1 node and left a traveller
     // holding a starter tool with nothing it can work. Hence the second floor.
     for (const zone of ZONES) {
@@ -472,7 +480,7 @@ describe('gather node placement: every node sits on ground a player can work', (
         expect(
           ofType.length,
           `${zone.id} offers only ${ofType.length} ${type} node(s)`,
-        ).toBeGreaterThanOrEqual(3);
+        ).toBeGreaterThanOrEqual(6);
         const tier1 = ofType.filter((n) => n.tier === 1);
         expect(
           tier1.length,
@@ -482,7 +490,7 @@ describe('gather node placement: every node sits on ground a player can work', (
     }
   });
 
-  it('the coverage floors are exercised by real content, not passing by slack', () => {
+  it('the count floors are exercised by real content, not passing by slack', () => {
     // Both floors sit close enough to the shipped content to bite. Without this,
     // either could hold purely because every zone ships far more than the floor.
     let leanestTotal = Number.POSITIVE_INFINITY;
@@ -494,11 +502,99 @@ describe('gather node placement: every node sits on ground a player can work', (
         leanestTier1 = Math.min(leanestTier1, ofType.filter((n) => n.tier === 1).length);
       }
     }
-    // Eastbrook ships exactly three of each type, so the total floor is tight.
-    expect(leanestTotal).toBe(3);
-    // Thornpeak ships exactly two tier-1 nodes of each type, so losing both is
-    // two relocations away, not a theoretical concern.
+    // Every zone now carries exactly six of each type, so the total floor is
+    // exact rather than merely tight: it was three when Eastbrook shipped three
+    // ore, three wood and three herb, and it moved with the content.
+    expect(leanestTotal).toBe(6);
+    // Thornpeak still carries exactly two tier-1 nodes of each type, and this
+    // number deliberately did NOT move with the count: the two nodes Thornpeak
+    // gained per type went to tier 2 and tier 3, because a tier only one node in
+    // the zone carries would have halved its own rate when respawn doubled, and
+    // tier 3 is what carries a gatherer's last 25 points of proficiency. A
+    // starter-tool traveller still has two workable nodes per type there, which
+    // is what the tier-1 floor above exists to protect.
     expect(leanestTier1).toBe(2);
+  });
+
+  it('spatial coverage: a gathering circuit reaches most of every zone', () => {
+    // The count floor above says a zone HAS six of each type; it cannot say they
+    // are spread. Six nodes thickened into one clearing satisfy it while leaving
+    // most of the zone with nothing to gather, which is the shape the content
+    // actually had (Eastbrook's ore, wood and herb were three clumps, and 13.5
+    // percent of the zone's walkable ground sat within 40 yards of any node).
+    //
+    // The metric is deliberately an AREA measure rather than a spread measure.
+    // The obvious alternatives, an enclosing-circle radius or a
+    // minimum-pairwise-distance bound, both land exactly on a boundary of the
+    // shipped content (the Eastbrook ore trio is intentionally 5.00 yards apart
+    // with a 10.00-yard span, see the spacing arms above), so either would be a
+    // knife edge that a legitimate content nudge flips.
+    //
+    // Where 40 percent comes from: the same measure over mob camp centres, which
+    // is the world's own answer to "how thickly is content laid out". Measured on
+    // the shipped content, camps reach 39.9 percent of Eastbrook's walkable
+    // ground, 48.7 of Mirefen's and 55.1 of Thornpeak's, 48.0 percent world-wide.
+    // Gathering sits deliberately below that: nodes reach 40.9 / 43.7 / 45.6 per
+    // zone, 43.4 percent world-wide. The world-wide comparison is asserted below
+    // rather than left as prose, so "below the mob-camp figure" cannot rot.
+    const COVERAGE_RADIUS = 40;
+    const COVERAGE_FLOOR_PCT = 40;
+
+    /** Fraction of `cells` within COVERAGE_RADIUS of any of `centres`, as a percent. */
+    const reachPct = (
+      cells: { x: number; z: number }[],
+      centres: { x: number; z: number }[],
+    ): number => {
+      let hit = 0;
+      for (const c of cells) {
+        if (centres.some((p) => Math.hypot(p.x - c.x, p.z - c.z) <= COVERAGE_RADIUS)) hit++;
+      }
+      return (hit / cells.length) * 100;
+    };
+
+    let worldCells = 0;
+    let worldNodeHits = 0;
+    let worldCampHits = 0;
+    let leanest = Number.POSITIVE_INFINITY;
+    for (const zone of ZONES) {
+      // Walkable-and-dry ground on a 2-yard lattice: the same two predicates the
+      // arms above hold a node to, so "walkable ground" means one thing in this
+      // file. Coarser than the reach sweeps because this is a whole-zone area
+      // integral, not a per-node screen.
+      const cells: { x: number; z: number }[] = [];
+      for (let x = -WORLD_MAX_X; x <= WORLD_MAX_X; x += 2) {
+        for (let z = zone.zMin; z <= zone.zMax; z += 2) {
+          if (canStand(x, z) && isDryLand(x, z)) cells.push({ x, z });
+        }
+      }
+      const nodes = GATHER_NODES.filter((n) => n.zoneId === zone.id).map((n) => n.pos);
+      const camps = CAMPS.filter((c) => zoneAt(c.center.z).id === zone.id).map((c) => c.center);
+      const nodePct = reachPct(cells, nodes);
+      expect(
+        nodePct,
+        `${zone.id} keeps only ${nodePct.toFixed(1)} percent of its walkable ground within ${COVERAGE_RADIUS}yd of a gather node`,
+      ).toBeGreaterThanOrEqual(COVERAGE_FLOOR_PCT);
+      leanest = Math.min(leanest, nodePct);
+      worldCells += cells.length;
+      worldNodeHits += (nodePct / 100) * cells.length;
+      worldCampHits += (reachPct(cells, camps) / 100) * cells.length;
+    }
+
+    // Not passing by slack: the leanest zone (Eastbrook, whose six ore veins are
+    // held inside one 20-yard ring by tests/gather_nodes.test.ts and so cover
+    // little ground between them) sits within 5 points of the floor.
+    expect(leanest, `leanest zone coverage ${leanest.toFixed(1)} percent`).toBeLessThan(
+      COVERAGE_FLOOR_PCT + 5,
+    );
+
+    // And the relationship the floor was chosen against, pinned rather than
+    // asserted in prose: gathering is laid out less thickly than combat is.
+    const worldNodePct = (worldNodeHits / worldCells) * 100;
+    const worldCampPct = (worldCampHits / worldCells) * 100;
+    expect(
+      worldNodePct,
+      `nodes reach ${worldNodePct.toFixed(1)} percent world-wide against mob camps' ${worldCampPct.toFixed(1)}`,
+    ).toBeLessThan(worldCampPct);
   });
 
   it('render anchor: groundHeight and terrainHeight agree at every node', () => {

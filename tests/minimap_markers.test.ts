@@ -107,6 +107,15 @@ function makeWorld(shape: 'sim' | 'client'): IWorld {
     playerId: 1,
     stationPlacements: STATIONS,
     questState: (q: string) => (q === GIVER_QUEST.id ? 'available' : 'unavailable'),
+    // The gather-node reads. This scenario is not about gathering, but the core
+    // consults both members for any node inside the rim, and whether one IS
+    // inside the rim is a fact about world content, not about this fixture. It
+    // used to carry neither member and passed only because no node happened to
+    // sit near (0, PZ); the moment one did, every test in this file threw on
+    // `inventory is not iterable`. Supplying them makes the fixture answer for
+    // itself whatever the map looks like.
+    inventory: [],
+    nodeHarvestableByMe: () => true,
   } as unknown as IWorld;
 }
 
@@ -150,6 +159,14 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     // ally (friend), ally (guild), npc('!'), npc('•'), portal, object-loot, mob(aggro),
     // mob, mob-loot, party-disc (pid 5), party-arrow (pid 16), player. The stranger
     // (id 4) and the party member (id 5) produce NO entity-loop marker; id 14 is culled.
+    //
+    // The two gather-node entries are content, not fixture: wood_eastbrook_4 and
+    // wood_eastbrook_5 sit 25.0 and 40.6 yards from (0, PZ), inside the
+    // 43.53-yard rim, and the node loop runs between the party loop and the
+    // player arrow. They appeared when the Eastbrook wood stands were spread up
+    // the north road instead of clumped at Webwood; a future stand near (0, 100)
+    // legitimately re-mints this list, which is why the whole ordered sequence is
+    // asserted rather than a subset.
     expect(kinds).toEqual([
       'ally',
       'ally',
@@ -162,6 +179,8 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
       'mob-loot',
       'party-disc',
       'party-arrow',
+      'gather-node',
+      'gather-node',
       'player',
     ]);
     const allies = markers.filter((m) => m.kind === 'ally') as Extract<
@@ -297,6 +316,10 @@ describe('station markers (Professions 2.0)', () => {
       stationPlacements: STATIONS,
       questState: () => 'unavailable',
       nodeHarvestableByMe: () => true,
+      // Paired with nodeHarvestableByMe above: both gather-node reads, both
+      // needed by any viewer with a node inside the rim, which the "field
+      // viewer" case below now is (wood_eastbrook_5 is 12 yards from (0, 150)).
+      inventory: [],
       ...over,
     } as unknown as IWorld;
   }
