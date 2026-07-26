@@ -7064,6 +7064,11 @@ export class Hud {
     if (show) this.refreshDailyRewardsLauncher(true);
   }
 
+  setDailyRewardsChestButtonPreference(show: boolean): void {
+    this.optionsHooks?.onSettingChange('showDailyRewardsChest', show);
+    this.setDailyRewardsChestButtonVisible(show);
+  }
+
   private applyDailyRewardsLauncherStatus(status: DailyRewardStatus): void {
     if (!this.dailyRewardsEnabled()) return;
     const button = this.dailyRewardsButtonEl;
