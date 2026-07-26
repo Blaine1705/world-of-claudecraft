@@ -9314,4 +9314,285 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': '{enchant} yerine geçer',
   'hudChrome.enchanting.sameEnchant': 'O eşyada zaten bu büyü var.',
   'hudChrome.enchanting.sameEnchantTag': 'Zaten uygulandı',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'abilityUi.resources.devotion': 'Adanmışlık',
+  'abilityUi.resources.focus': 'odak',
+  'classDetails.resources.focus': 'Odak',
+  'game.hud.lowFocus': 'Düşük odak',
+  'hud.errors.notEnoughDevotion': 'Yeterli Adanmışlık yok!',
+  'hudChrome.paladin.devotion': 'Adanmışlık',
+  'hudChrome.paladin.devotionValue': 'Adanmışlık {value} / {max}',
+  'hudChrome.paladin.devotionAscensionCharges':
+    'Adanmışlık {value} / {max}. Yüceliş: {charges} şarj.',
+  'hudChrome.paladin.devotionAscensionLast': 'Adanmışlık {value} / {max}. Yüceliş: son şarj.',
+  'hudChrome.paladin.ascensionLastAnnouncement': 'Yüceliş: son şarj',
+  'hudChrome.paladin.ascensionSpenderAria':
+    'Eylem yuvası {slot}: {ability}. Bir Yüceliş şarjı tüketir.',
+  'hudChrome.crafting.craftedToastQty': 'Üretildi: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedAlso': 'Ayrıca {material} geri kazanırsın.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Ayrıca {material} x{qty} geri kazanırsın.',
+  'hudChrome.enchanting.disenchantedYield':
+    '{item} eşyasını büyüsünü bozarak {material} elde edersin.',
+  'hudChrome.enchanting.disenchantedYieldQty':
+    '{item} eşyasını büyüsünü bozarak {material} x{qty} elde edersin.',
+  'hudChrome.enchanting.salvagedYield': '{item} içinden {material} kurtarırsın.',
+  'hudChrome.enchanting.salvagedYieldQty': '{item} içinden {material} x{qty} kurtarırsın.',
+  'hudChrome.auraEffect.dawnsWrath': 'GÇ: her can · +1 kullanım · Bekleme 0 · +{pct}% hasar',
+  'hudChrome.auraEffect.duskEconomy': 'Yetenekler {pct}% daha az enerji harcar',
+  'hudChrome.auraEffect.hunterFerocity':
+    '{stacks} Sürü Vahşeti: evcil hayvanın {pct}% daha fazla hasar verir',
+  'hudChrome.auraEffect.veiledEdge': 'Sonraki Pusucu Vuruşun iki kat sert vurur',
+  'hudChrome.auraEffect.gloam':
+    'Alacakaranlık: aşama {stacks} / {max}. {max} olduğunda Alacakaranlık Perdesi açılışların açık alanda kullanılabilir olur ve atılan bir sonraki BEDAVA olup birikimi gölge perdesine patlatır',
+  'hudChrome.auraEffect.mendingCurrent':
+    '{value} iyileştirme biriktirir; zamanla salınır veya Şelale Onarımı tarafından tüketilir',
+  'hudChrome.auraEffect.mendingCurrentPercent':
+    'Şelale Onarımı için azami canın {pct}% kadar iyileştirme biriktirir',
+  'hudChrome.auraEffect.radiantResonance':
+    'Sonraki Onaran Işığın anında olur veya sonraki Şafağın Kucaklaması {pct}% daha az mana harcar ve {castTime} sn içinde okunur',
+  'hudChrome.auraEffect.redline':
+    'Kırmızı Çizgi: çentik {stacks} / {max}. Gövde Vuruşları çentik ekler; Merhamet Darbesi çentik başına {pct}% daha sert vurur ve pencereyi kapatır. Önce sona ererse kaybedilir',
+  'hudChrome.auraEffect.solarReprisal':
+    'Sonraki Güneş Diskin mana harcamaz, bekleme süresini yok sayar ve {pct}% daha fazla hasar verir; Lütuf Çekici bekleme süresini yok sayar ve verdiği hasarın 100% kadarını sana iyileştirir; ya da Onaran Işık anında olur',
+  'hudChrome.auraEffect.veilstrikeWindow':
+    'Gölge Perdesi: Alacakaranlık Perdesi açılışların açık alanda her açıdan kullanılabilir ve verdiğin hasar {pct}% artar',
+  'hudChrome.auraEffect.venomRitual':
+    'Zehir Ayini: aşama {stacks} / {max}. Biriktiren vuruşlar aşama ekler; {max} olduğunda Toprak Uykusu Zehir Yırtığına dönüşür',
+  'entities.abilities.aegis_first_dawn.name': 'İlk Şafağın Kalkanı',
+  'entities.abilities.aura_mastery.name': 'Kutsal Uyum',
+  'entities.abilities.bastion_rite.name': 'Burç Ayini',
+  'entities.abilities.bastion_sweep.name': 'Burç Savurması',
+  'entities.abilities.beacon_of_light.name': 'Işık Feneri',
+  'entities.abilities.dawn_devotion.name': 'Şafak Adanmışlığı',
+  'entities.abilities.dawnfall.name': 'Şafak Düşüşü',
+  'entities.abilities.dawns_embrace.name': 'Şafağın Kucaklaması',
+  'entities.abilities.devotion_ward.name': 'Burç Adanmışlığı',
+  'entities.abilities.divine_ascension.name': 'Kutsal Yüceliş',
+  'entities.abilities.faithforged_guard.name': 'Işığın Borcu',
+  'entities.abilities.final_edict.name': 'Son Ferman',
+  'entities.abilities.grace_devotion.name': 'Lütuf Adanmışlığı',
+  'entities.abilities.guardian_covenant.name': 'Koruyucu Ahdi',
+  'entities.abilities.hammer_of_grace.name': 'Lütuf Çekici',
+  'entities.abilities.hushbrand.name': 'Suskunluk Damgası',
+  'entities.abilities.life_covenant.name': 'Yaşam Ahdi',
+  'entities.abilities.martyrs_aegis.name': 'Şehidin Kalkanı',
+  'entities.abilities.mercy_lance.name': 'Merhamet Mızrağı',
+  'entities.abilities.oath_chain.name': 'Yemin Zinciri',
+  'entities.abilities.radiant_chorus.name': 'Işıyan Koro',
+  'entities.abilities.radiant_devotion.name': 'Işıyan Adanmışlık',
+  'entities.abilities.recall_the_fallen.name': 'Düşenleri Çağır',
+  'entities.abilities.sacred_challenge.name': 'Kutsal Dürtü',
+  'entities.abilities.sacred_form.name': 'Kutsal Suret',
+  'entities.abilities.seraphic_vigil.name': 'Serafik Nöbet',
+  'entities.abilities.solar_invocation.name': 'Güneş Çağrısı',
+  'entities.abilities.solar_step.name': 'Güneş Adımı',
+  'entities.abilities.sun_gods_verdict.name': 'Güneş Tanrısının Hükmü',
+  'entities.abilities.sunward_disc.name': 'Güneş Diski',
+  'entities.abilities.valkyrs_calling.name': 'Valkyrie Çağrısı',
+  'entities.abilities.veilbound_march.name': 'Perde Yürüyüşü',
+  'entities.abilities.veilbound_mark.name': 'Perde Damgası',
+  'entities.abilities.vowkeeper_strike.name': 'Yemin Bekçisi Vuruşu',
+  'entities.abilities.choir_of_deliverance.name': 'Kurtuluş Korosu',
+  'entities.abilities.scouring_mercy.name': 'Arındıran Merhamet',
+  'entities.abilities.aegis_first_dawn.description':
+    '5 sn kanalize ederek 10 metrelik kutsal bir kubbe oluşturur. İçindeki müttefikler her saniye iyileşir ve 50% daha az hasar alır. Kanalizasyonu tamamlamak son bir iyileştirme salar ve 4 sn boyunca 30% hareket hızı verir.',
+  'entities.abilities.aura_mastery.description':
+    '8 sn boyunca grubundaki her etkin Adanmışlığı ve Kısas Aurasını güçlendirir. Burç Adanmışlığı hasarı 15% azaltır; Kısas 15 Kutsal hasar verir. Birden fazla kullanım birikmek yerine yeniler.',
+  'entities.abilities.bastion_rite.description':
+    'Alınan fiziksel hasarı 20% azaltır ve blok şansını 6 sn boyunca 20% artırır. Yüceliş süreyi 10 sn yapar.',
+  'entities.abilities.bastion_sweep.description':
+    'Kuşandığın kalkanı 180 derecelik ön yayda düşmanların arasından savurarak {damage} Kutsal hasar verir, yüksek tehdit oluşturur ve 1 Adanmışlık üretir. Yüceliş hasarı 30%, yarıçapı 8 m yapar.',
+  'entities.abilities.beacon_of_light.description':
+    'Bir grup üyesini Işık Fenerin olarak işaretler. 60 m içindeki başka bir grup üyesine yaptığın etkili doğrudan iyileştirmenin 50% kadarı Feneri de iyileştirir. Alan ve süreli iyileştirme aktarılmaz. Biriniz ölene dek sürer.',
+  'entities.abilities.dawn_devotion.description':
+    'Senin ve grup üyelerinin saldırı gücünü 30 dk boyunca 40 artırır. Kendi Işıyan veya Lütuf Adanmışlığının yerini alır, ancak diğer paladinlerin Adanmışlıkları ve savaşçı naralarıyla birlikte var olur.',
+  'entities.abilities.dawnfall.description':
+    'Yakındaki düşmanlara {damage} Kutsal hasar verir ve 1 Adanmışlık üretir. En az bir düşmanı vurmak Son Fermanın kalan bekleme süresini 2 sn kısaltır. Yüceliş hasarını ve yarıçapını artırır.',
+  'entities.abilities.dawns_embrace.description':
+    'Güçlü bir iyileştirme salar ve 1 Adanmışlık üretir. Işıyan Rezonans mana maliyetini 50%, okuma süresini 1,5 sn yapar. Yüceliş onu anında yapar ve iyileştirmesini 35% artırır.',
+  'entities.abilities.devotion_ward.description':
+    'Senin ve grup üyelerinin aldığı hasarı ölüme veya değiştirilmeye dek 5% azaltır. Yalnızca bu aura ile Kısas Aurası birbirinin yerini alır; Işıyan, Şafak ve Lütuf Adanmışlığı birlikte var olur.',
+  'entities.abilities.divine_ascension.description':
+    '20 Adanmışlık tüketerek en fazla 45 sn boyunca 5 Yüceliş şarjı kazandırır. İşaretli yetenekler bir şarj tüketir ve ek bir etki kazanır.',
+  'entities.abilities.faithforged_guard.description':
+    '8 sn boyunca sana gelen bir sonraki düşman vuruşu yanıtlanır: {buff} kadar hasar reddedilir ve saldırgana Kutsal hasar olarak döndürülür, sen de 1 Adanmışlık kazanırsın. Yalnızca tek bir darbe yanıtlanır. Yüceliş yanıtlayabildiği miktarı 50% artırır.',
+  'entities.abilities.final_edict.description':
+    'Ezici bir silah vuruşu indirir ve hasar verdiğinde 1 Adanmışlık üretir. Başarılı bir vuruş Şafak Düşüşünün kalan bekleme süresini 2 sn kısaltır. Başarılı otomatik saldırılar ve Son Ferman vuruşlarının 15% ihtimalle 8 sn boyunca Şafağın Gazabını verme şansı vardır. Yüceliş ayrıca çevrende Kutsal bir patlama salar.',
+  'entities.abilities.grace_devotion.description':
+    'Sen ve grup üyeleri her 5 sn 15 mana geri kazanır ve 30 dk boyunca 3% daha az mana harcarsınız. Kendi Işıyan veya Şafak Adanmışlığının yerini alır, ancak diğer paladinlerin Adanmışlıklarıyla birlikte var olur.',
+  'entities.abilities.guardian_covenant.description':
+    'Dost bir hedefi ve kendini korur, alınan hasarı 8 sn boyunca 20% azaltır. Dost hedef seçili değilse varsayılan olarak seni seçer.',
+  'entities.abilities.hammer_of_grace.description':
+    '20 m içindeki bir düşmana anında kutsal bir çekiç fırlatarak {damage} hasar verir, 70 mana geri kazandırır, verdiği hasarın 50% kadarını sana iyileştirir ve hasar verdiğinde 1 Adanmışlık üretir. Güneş Kısası, Lütuf Çekicinin bekleme süresini yok saymasını ve verdiği hasarın 100% kadarını sana iyileştirmesini sağlar.',
+  'entities.abilities.hushbrand.description':
+    'Büyü okumayı keser ve o okuldan büyüleri 4 sn engeller.',
+  'entities.abilities.life_covenant.description':
+    'Bir müttefikin aldığı hasarı 6 sn boyunca 40% azaltır. Yüceliş sırasında ayrıca şarj tüketmeden 120 puanlık bir kalkan verir.',
+  'entities.abilities.martyrs_aegis.description':
+    'Bir müttefikin aldığı hasarı 8 sn boyunca 40% azaltır.',
+  'entities.abilities.mercy_lance.description':
+    'Bir düşmana {damage} Kutsal hasar verir ve hasar verdiğinde 1 Adanmışlık üretir. Yüceliş sırasında kritik vuruşu garantilemek için 1 şarj tüketir.',
+  'entities.abilities.oath_chain.description':
+    'Uzaktaki bir düşmanı anında kutsal bir zincirle bağlar. Düşman saniyede 18 m hızla 3 m mesafeye gelene dek sana doğru ilerler, ardından 4 sn boyunca 50% yavaşlar. Yüceliş sırasında yakındaki ikinci bir düşmanı da bağlar.',
+  'entities.abilities.radiant_chorus.description':
+    'Yakındaki müttefikleri {damage} iyileştirir ve 1 Adanmışlık üretir. En az 2 müttefiki etkili biçimde iyileştirmek Işıyan Rezonans verir: sonraki Onaran Işığın anında olur veya sonraki Şafağın Kucaklaması 50% daha az mana harcar ve 1,5 sn içinde okunur. Yüceliş Işıyan Koronun iyileştirmesini ve yarıçapını artırır.',
+  'entities.abilities.radiant_devotion.description':
+    'Senin ve grup üyelerinin büyü gücünü 30 dk boyunca 20 artırır. Kendi Şafak veya Lütuf Adanmışlığının yerini alır, ancak diğer paladinlerin Adanmışlıklarıyla birlikte var olur.',
+  'entities.abilities.recall_the_fallen.description':
+    'Ölü bir grup üyesini 35% can ve manayla yaşama döndürür. 16. seviye ya da üzeri bir Güneş Şifacısı bunun yerine grubun düşmüş tüm üyelerini geri çağırır.',
+  'entities.abilities.sacred_challenge.description':
+    'Bir düşmanı sana saldırmaya zorlar. Yüceliş sırasında ayrıca şarj tüketmeden alınan tüm hasarı 4 sn boyunca 15% azaltır.',
+  'entities.abilities.sacred_form.description':
+    'Ölüme dek kutsal bir hale girer; iyileştirmeyi 10%, büyü kritik şansını 5% artırır ve üretilen tehdidi 50% azaltır. Yalnızca Güneş Şifacıları için.',
+  'entities.abilities.seraphic_vigil.description':
+    'Bir müttefiki 30 sn korur. Onu 35% canın altına düşüren ilk vuruş Nöbeti tüketir ve onu 180 iyileştirir. (Lütuf imzası)',
+  'entities.abilities.scouring_mercy.description':
+    'Bir düşmana 72 ila 84 Kutsal hasar verir ya da dost bir hedefi 130 ila 155 iyileştirir. Her iki değer de büyü gücüyle artar. Hasar ayrıca Öğreti ile bağlı her müttefiki 30%, hiç bağlı müttefik yoksa en düşük canlı grup üyesini 15% iyileştirir. (Öğreti imzası)',
+  'entities.abilities.solar_invocation.description':
+    'Bir müttefiki anında {damage} iyileştirir ya da bir düşmana orta düzeyde Kutsal hasar verir. Her iki kullanım da 1 Adanmışlık üretir. Yüceliş sırasında iyileştirme okuması hedefin 10 m yakınındaki dost oyuncuları da yarısı kadar iyileştirir.',
+  'entities.abilities.solar_step.description': 'Hareket hızını 2 sn boyunca 150% artırır.',
+  'entities.abilities.sun_gods_verdict.description':
+    'Bir düşmanı 30 sn boyunca Güneş Tanrısının Hükmü altında yargılar. Son Ferman ve Şafak Düşüşü başarılı vuruşta birer şarj işler. Üçüncü şarjı koyan yetenek cezayı belirler: Son Ferman mahkûma yıkıcı hasar salar; Şafak Düşüşü hükmü patlatarak yakındaki düşmanlara hasar verir ve onları 1,5 sn sersemletir.',
+  'entities.abilities.sunward_disc.description':
+    'Kalkan gerektirir. Vurup ardından yakındaki düşmanlar arasında seken ışıyan bir disk fırlatır. Hasar veren her çarpma 1 Adanmışlık üretir. Güneş Kısası Güneş Diskinin mana harcamamasını, bekleme süresini yok saymasını ve 20% daha fazla hasar vermesini sağlar. Yüceliş 5 sekmeyi güçlendirir.',
+  'entities.abilities.valkyrs_calling.description':
+    'Havaya yükselir, düşmana doğru uçarken hasara karşı bağışık olursun. 2 sn sonra hedef alana inerek {damage} Kutsal hasar verir ve 1 Adanmışlık üretirsin. Yüceliş çarpma hasarını 50% artırır ve 1 şarj tüketir.',
+  'entities.abilities.veilbound_march.description':
+    '4 sn boyunca eterik olursun; 40% hareket hızı ve 30% zırh kazanır, köklenmeye, yavaşlamaya ve yer değiştirmeye karşı bağışık olursun. İçinden geçtiğin düşmanlar 6 sn boyunca Perde Damgası alır: her saniye Kutsal hasar alır, sana 20% daha az hasar verir ve ek tehdit üretirler. İlk damga 1 Adanmışlık verir. Yürüyüş bittiğinde yakındaki damgalı düşmanlar son bir patlama alır. Yüceliş patlamayı 50% artırır ve onları hafifçe sana çeker.',
+  'entities.abilities.veilbound_mark.description':
+    'Her saniye Kutsal hasar alır, damgayı basan paladine 20% daha az hasar verir ve o paladine karşı ek tehdit üretir.',
+  'entities.abilities.vowkeeper_strike.description':
+    'Yüksek tehditle vurur ve 1 Adanmışlık üretir. Başarılı bir vuruşun 8 sn boyunca Güneş Kısası verme ihtimali 20%; her başarılı blokun 25%. Güneş Kısası sonraki Güneş Diskini, Lütuf Çekicini veya Onaran Işığını güçlendirir. Yüceliş ayrıca küçük bir emici kalkan verir.',
+  'entities.abilities.choir_of_deliverance.description':
+    '6 sn kanalize ederek yakındaki grup üyelerini her 2 sn iyileştirir.',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'entities.abilities.bloodhook.name': 'Kanlı Çengel',
+  'entities.abilities.bloodtrail_assault.name': 'Kan İzi Saldırısı',
+  'entities.abilities.cold_focus.name': 'Soğuk Odak',
+  'entities.abilities.fieldcraft_reentry.name': 'Silahlı Dönüş',
+  'entities.abilities.frostjaw_trap.name': 'Buzçene Tuzağı',
+  'entities.abilities.hunting_momentum.name': 'Av İvmesi',
+  'entities.abilities.measured_shot.name': 'Ölçülü Atış',
+  'entities.abilities.pack_command.name': 'Sürü Emri',
+  'entities.abilities.pack_rally.name': 'Sürü Toplanması',
+  'entities.abilities.shellskin.name': 'Kabuk Deri',
+  'entities.abilities.shrapnel_charge.name': 'Şarapnel Yükü',
+  'entities.abilities.stampede.name': 'İzdiham',
+  'entities.abilities.trailbreak.name': 'İz Kırma',
+  'entities.abilities.unleash_beast.name': 'Canavarı Salıver',
+  'entities.abilities.wildheart.name': 'Yaban Yürek',
+  'entities.abilities.bloodhook.description':
+    'Bir düşmana atılır ve Kanlı Çengel Yarası uygular; 12 sn boyunca 4 vuruşta 34 temel Fiziksel hasar artı menzilli saldırı gücünün 26% kadarını verir. (Saha Ustalığı imzası)',
+  'entities.abilities.bloodtrail_assault.description':
+    '12 sn boyunca Kanlı Çengel, 60% güçte bir yarayı yakındaki en fazla 2 düşmana yayar, Yara Yırtma 18 hasarlık bir evcil hayvan saldırısı emreder ve Şarapnel Yükü 2 metre kazanır, ana hedefine 25% daha fazla temel hasar verir ve 50% daha fazla yara hasarı tetikler.',
+  'entities.abilities.cold_focus.description':
+    '12 sn boyunca Ölçülü Atış 50% daha fazla odak geri kazandırır, Uzun Çekiş ise 25% daha az harcar ve 30% daha hızlı okunur. (Soğuk Bakış imzası)',
+  'entities.abilities.fieldcraft_reentry.description':
+    'Pasif: İz Kırma, Av İvmesini tazeler ve sonraki Deşen Vuruşunu veya Kanlı Çengelini 12 sn hazırlar. Deşen Vuruş katman başına 15% daha fazla hasar verir. Kanlı Çengel 18 ila 24 ek Fiziksel hasar verir; bu, katman başına 15% ve menzilli saldırı gücünle artar. 3 katmanda iki saldırıdan biri Av İvmesini tüketir. (Saha Ustalığı)',
+  'entities.abilities.frostjaw_trap.description':
+    'Seçili düşmana veya ayaklarının dibine bir tuzak yerleştirir. 0,75 sn sonra kurulur ve 30 sn sürer. Onu tetikleyen ilk düşman 3 sn köklenir ve 4 metre içindeki düşmanlar 4 sn boyunca 50% yavaşlar.',
+  'entities.abilities.hunting_momentum.description':
+    'Pasif: Deşen Vuruş 8 sn boyunca 1 Av İvmesi verir, en fazla 3. 3 katmanda Yara Yırtma 45% daha fazla vuruş hasarı verir ve katmanları tüketir. (Saha Ustalığı)',
+  'entities.abilities.measured_shot.description':
+    'Hedefe {damage} Fiziksel hasar verecek şekilde ateş eder. İsabet 20 odak geri kazandırır. Hasar menzilli saldırı gücüyle artar.',
+  'entities.abilities.pack_command.description':
+    'Yaşayan evcil hayvanına 36 ila 48 Fiziksel hasar vurması için emir verir. Hasar evcil hayvanın saldırı gücüyle artar. İsabet 20 odak geri kazandırır ve 30 sn boyunca 1 Sürü Vahşeti verir, en fazla 3. Her katman evcil hayvanının verdiği tüm hasarı 10% artırır. Bu vuruş, isabetten önceki katmanlarını kullanır.',
+  'entities.abilities.pack_rally.description':
+    'Küheylan Suretine bürünür ve yakındaki müttefikleri 10 sn boyunca 30% hareket hızı ile 10% saldırı ve okuma hızıyla toplar.',
+  'entities.abilities.shellskin.description':
+    'Alınan hasarı 8 sn boyunca 60% azaltır, ancak etkinken saldırmayı engeller.',
+  'entities.abilities.shrapnel_charge.description':
+    'Hedefe 24 ila 30 Fiziksel hasar, 6 metre içindeki en fazla 4 düşmana ise 13 ila 17 hasar vurur. Diğer hedefler ayrıca 6 sn boyunca 12 hasarla kanar. Ana hedef Kanlı Çengel Yaranı taşıyorsa anında 1 yara vuruşu uygulanır. Doğrudan hasar menzilli saldırı gücüyle artar.',
+  'entities.abilities.stampede.description':
+    '12 sn boyunca 3 canavar çağırır. Her biri 2 sn arayla {damage} Fiziksel hasar verir. Gösterilen hasar, evcil hayvan hasar bonuslarından önce menzilli saldırı gücünün 8% kadarını içerir. Canavarlar çağrıldıklarında Sürü Vahşetini sabitler ve katman başına 10% hasar kazanır. İzdiham beklemedeyken başarılı Sürü Emirlerinin onu sıfırlama ihtimali 20%, 5 başarısız denemeden sonra garantidir. Canavarlar etkinken sıfırlanamaz. (Sürü Efendisi)',
+  'entities.abilities.trailbreak.description':
+    '12 metre geriye sıçrar. Av İvmen varsa tazelenir ve Dönüşü 12 sn hazırlar.',
+  'entities.abilities.unleash_beast.description':
+    'Evcil hayvanın 83 ila 105 Fiziksel hasar vurup 6 metre içindeki her düşmanı 26 ila 34 sarsmasının ardından 3 Sürü Vahşeti tüketir. Vuruş ve sarsıntı, Sürü Vahşetinin tam 30% evcil hayvan hasar bonusunu kullanır ve evcil hayvanın saldırı gücüyle artar. Sonraki 8 sn boyunca evcil hayvan 25% daha fazla hasar verir, 35% daha hızlı saldırır ve Uğursuz Atışın yakındaki en fazla 2 düşmanı biçmesini sağlar.',
+  'entities.abilities.wildheart.description': 'Azami canının 30% kadarını anında geri kazandırır.',
+  'entities.abilities.ancestor_return.name': 'Ataların Dönüşü',
+  'entities.abilities.galeheart_weapon.name': 'Fırtına Yüreği Silahı',
+  'entities.abilities.lifespring_weapon.name': 'Yaşam Pınarı Silahı',
+  'entities.abilities.primal_exaltation.name': 'İlksel Yüceltme',
+  'entities.abilities.stoneward.name': 'Taş Muhafız',
+  'entities.abilities.stormsurge.name': 'Fırtına Kabarması',
+  'entities.abilities.thunder_reservoir.name': 'Gök Gürültüsü Haznesi',
+  'entities.abilities.tidecall.name': 'Gelgit Çağrısı',
+  'entities.abilities.unleash_weapon.name': 'Silahı Salıver',
+  'entities.abilities.warspirit_cadence.name': 'Savaş Ruhu Ritmi',
+  'entities.abilities.ancestor_return.description':
+    'Grubunun ya da akınının düşmüş her üyesini bedeninin başında 30% can ve manayla yaşama döndürür. Savaşta okunamaz. (Ruh Onarımı)',
+  'entities.abilities.galeheart_weapon.description':
+    'Her iki silahı 30 dk büyüler ve Savaş Ruhu Ritmini etkinleştirir.',
+  'entities.abilities.lifespring_weapon.description':
+    'Silahını 30 dk büyüler. Onaran Sular ve Gelgit Çağrısı, Onarım Akıntısına 20% daha fazla iyileştirme ekler.',
+  'entities.abilities.primal_exaltation.description':
+    '12 sn boyunca Gök Gürültüsü Çağrısının Ark Oku ve Çatallı Yıldırımı 50% daha hızlı okunur ve Ark Oku 2 Gök Gürültüsü verir; Savaş Ruhu her 2 silah isabetinde ritmini tetikler; Ruh Onarımı, Onarım Akıntısına 50% daha fazla iyileştirme ekler. (Şaman yeteneği)',
+  'entities.abilities.stoneward.description':
+    'Bir müttefiki 60 sn boyunca 6 şarjla korur. Hasar bir şarj tüketerek azami canın 5% kadarını iyileştirir, 3 snde bir. (Şaman yeteneği)',
+  'entities.abilities.stormsurge.description':
+    "Pasif: Ata Vuruşu beklemedeyken bir Fırtına Alameti tüketmenin onu sıfırlama ihtimali 25%. İlk 3 şans başarısız olursa 4.'sü her zaman sıfırlar. (Savaş Ruhu)",
+  'entities.abilities.thunder_reservoir.description':
+    'Pasif: Ark Oku ve Çatallı Yıldırım Gök Gürültüsü verir, en fazla 5. 5 Gök Gürültüsünde Toprak Sarsıntısı 125% daha fazla hasar verir ya da Deprem 100% daha fazla verir, ardından tüm Gök Gürültüsünü tüketir. (Gök Gürültüsü Çağrısı)',
+  'entities.abilities.tidecall.description':
+    'Dost bir hedefi 58 ila 72 iyileştirir. İyileştirme büyü gücüyle artar. Aşırı iyileştirmeden önce hesaplanan aynı iyileştirmeyi, hedefin azami canının 30% kadarına dek Onarım Akıntısına ekler.',
+  'entities.abilities.unleash_weapon.description':
+    'Silahının etkin büyüsünü salıverir. Ateş Damgası 54 ila 64 Ateş hasarı verir, büyü gücünün 30% kadarını kazanır ve 2 Gök Gürültüsü verir. Fırtına Yüreği silahınla vurur, Savaş Ruhu Ritmini ilerletir ve 6 sn boyunca 20% saldırı hızı verir. Taş Bağı silah hasarının 75% kadarıyla vurur, hedefi sana saldırmaya zorlar ve alınan hasarı 4 sn boyunca 20% azaltır. Yaşam Pınarı, Onarım Akıntını tüketir, kalan iyileştirmesinin 125% kadarını iyileştirir ve 8 sn içindeki sonraki vuruşu geri kazandırılan canın 50% kadarı azaltır.',
+  'entities.abilities.warspirit_cadence.description':
+    'Pasif: isabet eden her 3. silah saldırısı 50% Doğa hasarıyla 2 Fırtına Yüreği Yankısı tetikler ve 12 sn boyunca Fırtına Alameti verir. Fırtına Alameti sonraki Ark Okunu, Sarsıntını veya Onaran Sularını anında yapar ve mana maliyetini 50% düşürür. Ata Vuruşu 2 saldırı sayılır. (Savaş Ruhu)',
+  'entities.abilities.summon_tithefiend.name': 'Öşür İfriti Çağır',
+  'entities.abilities.summon_tithefiend.description':
+    'Tüm Kasvet Öşürünü tüketerek 1 ila 5 katmanda 6, 8, 10, 12 veya 15 sn boyunca bir Öşür İfriti çağırır. 2 sn arayla 20 ila 24 Gölge hasarı, artı her ek katman için 8 hasar verir. Beş katmanda büyür ve hasarı 25% artar. Hasarı büyü gücünle artar. Kuklanı tercih eder. Her isabet azami mananın 1% kadarını geri kazandırır ve Çürüme Ağıdını taşıyan en fazla 3 başka düşmana hasarın 15% kadarını yansıtır. (Akşam Duası imzası)',
+  'entities.abilities.veilstep.name': 'Perde Adımı',
+  'entities.abilities.veilstep.description': 'Baktığın yönde perdenin içinden geçer.',
+  'entities.quests.q_divine_tome.title': 'Şafağa Bağlı Cilt',
+  'entities.quests.q_divine_tome.objectives.0.label': 'Huzursuz Kemikler huzura kavuşturuldu',
+  'entities.quests.q_divine_tome.text':
+    'Işık içinde sessizce durmuyor, {playerName}. Ölülere huzur verişini gördüm ve çok az paladine öğretilen şeye hazır olduğuna inanıyorum: düşmüş bir ruhun yaşayanlara geri çağrıldığı Çağrı Ayini. Sözleri, burada benim korumamdaki Şafağa Bağlı Ciltte saklıdır; ama huzursuz ölüler hâlâ bu toprakta yürürken bir kitap hiçbir lütuf değildir. Toprağa 6 Huzursuz Kemik daha geri ver, öğretmeye başlayayım.',
+  'entities.quests.q_divine_tome.completion':
+    'Şapel avlusu sessizleşiyor. Sözlere hazırsın, {playerName}, ama Çağrı Ayini ılık bir şapelde söylenemez. Yaşamla ölüm arasındaki perdenin inceldiği yerde okunmalıdır. Cildi kuzeye, Mirefen Bataklığına götürmeye niyetliyim. Beni oraya izle, bunu bitirelim.',
+  'entities.quests.q_rite_of_redemption.title': 'Çağrı Ayini',
+  'entities.quests.q_rite_of_redemption.objectives.0.label': 'Boğulmuş Ölüler huzura kavuşturuldu',
+  'entities.quests.q_rite_of_redemption.text':
+    'Demek beni bataklığa dek izledin, {playerName}. Güzel. Şafağa Bağlı Cilt yanımda ve bu boğulmuş toprak, sözlerinin ait olduğu yer: ölülerin gömülü kalmadığı bir yerden başka hiçbir yerde yaşamla ölüm arasındaki perde bu kadar ince değildir. Ama boğulmuşlar sesini dizenin ortasında aşağı çekerdi. Ayine yaraşır bir alan aç: Boğulmuş Ölülerden 8 tanesini huzura kavuştur, birlikte kutsayalım.',
+  'entities.quests.q_rite_of_redemption.completion':
+    'Diz çök, {playerName}, ve sözleri yüksek sesle oku. İşte. Hissediyor musun? Işık artık ellerinde yalnızca yaşayanları onarmıyor, öteye geçenleri de geri çağırabiliyor. Onu bilgece kullan. Umutsuz bir savaşa geri çağrılan bir ruh merhamet değil, zulümdür. Kalk, Kurtarıcı.',
+  'guide.abilityHook.hammer_of_justice':
+    'Bir düşmanı kısa ve güvenilir bir sersemletmeyle durdurur.',
+  'guide.abilityHook.oath_chain':
+    'Uzaktaki bir düşmanı sürünün içine sürükler ve kaçışını yavaşlatır.',
+  'guide.abilityHook.ancestor_return':
+    'Savaş dışında uzun bir okumanın ardından grubun ya da akının düşmüş her üyesini yaşama döndürür.',
+  'guide.abilityHook.avenging_wrath':
+    '10 Adanmışlık verir, ardından on beş saniye boyunca yeteneklerin ürettiği Adanmışlığı ikiye katlar.',
+  'guide.abilityHook.bastion_sweep':
+    'Tehdidi kapmak ve Adanmışlık biriktirmek için kalkanını bir grubun içinden savurur.',
+  'guide.abilityHook.chain_lightning':
+    'Bir hedefe vurur ve yakındaki iki düşmana sıçrar, tüm okuma için bir Gök Gürültüsü biriktirir.',
+  'guide.abilityHook.consecration':
+    'Çevrendeki toprağı sürekli Kutsal hasar ve tehditle sahiplenir.',
+  'guide.abilityHook.hammer_of_wrath':
+    'Yaralı bir düşmanı uzaktan infaz eder, ya da kanatların etkinken herhangi bir düşmanı.',
+  'guide.abilityHook.holy_shield':
+    'Adanmışlığı etkin bir blok penceresine, emilime ve bir tehdit darbesine harcar.',
+  'guide.abilityHook.lay_on_hands':
+    'Bir müttefik düşmek üzereyken büyük miktarda can geri kazandırır.',
+  'guide.abilityHook.measured_shot':
+    'Daha ağır saldırıların için odak geri kazandıran, ölçülü bir menzilli atış.',
+  'guide.abilityHook.pack_command':
+    'Yoldaşına vurmasını ve Sürü Vahşeti biriktirmesini emreder. Her katman, Canavarı Salıver katmanları harcayana dek evcil hayvanının 10% daha fazla, en çok 30% hasar vermesini sağlar.',
+  'guide.abilityHook.stampede':
+    'Üç canavarı 12 saniye saldırmaya çağırır. Tüm çağrı boyunca azami hasar bonusunu korumaları için tam Sürü Vahşetiyle kullan.',
+  'guide.abilityHook.stormsurge':
+    'Bir Fırtına Alameti fırsatını harcadıktan sonra Ata Vuruşunu bazen erken geri getirir.',
+  'guide.abilityHook.thunder_reservoir':
+    'Toprak Sarsıntısı ya da Deprem tam güçte bir ödül salana dek yıldırım biriktirir.',
+  'guide.abilityHook.veilbound_march':
+    'Bir grubun içinden geçerek onu damgala, sana verdiği hasarı köreltir ve tehdidi sabitle.',
+  'guide.abilityHook.warspirit_cadence':
+    'İstikrarlı bir silah ritmini Fırtına Yüreği Yankılarına ve anlık bir büyü fırsatına dönüştürür.',
 };

@@ -241,7 +241,7 @@ export const nl_NL: EnTranslations = {
     "hud": {
       "lowMana": "Weinig mana",
       "lowEnergy": "Weinig energie",
-      "lowFocus": "Low Focus"
+      "lowFocus": "Weinig focus"
     },
     "talents": {
       "title": "Talenten",
@@ -749,12 +749,12 @@ export const nl_NL: EnTranslations = {
       "resting": "Aan het rusten"
     },
     "paladin": {
-      "devotion": "Devotion",
-      "devotionValue": "Devotion {value} of {max}",
-      "devotionAscensionCharges": "Devotion {value} of {max}. Ascension {charges} charges.",
-      "devotionAscensionLast": "Devotion {value} of {max}. Ascension final charge.",
-      "ascensionLastAnnouncement": "Ascension final charge",
-      "ascensionSpenderAria": "Action slot {slot}: {ability}. Consumes one Ascension charge."
+      "devotion": "Toewijding",
+      "devotionValue": "Toewijding {value} van {max}",
+      "devotionAscensionCharges": "Toewijding {value} van {max}. Verheffing: {charges} ladingen.",
+      "devotionAscensionLast": "Toewijding {value} van {max}. Verheffing: laatste lading.",
+      "ascensionLastAnnouncement": "Verheffing: laatste lading",
+      "ascensionSpenderAria": "Actievak {slot}: {ability}. Verbruikt één Verheffingslading."
     },
     "abilityScaling": {
       "bonus": "(+{value})"
@@ -1590,8 +1590,8 @@ export const nl_NL: EnTranslations = {
     "auraEffect": {
       "dot": "Brengt elke {interval} s {value} {school}schade toe",
       "hot": "Herstelt elke {interval} s {value} gezondheid",
-      "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",
-      "mendingCurrentPercent": "Stores healing equal to {pct}% of maximum health for Cascading Mend",
+      "mendingCurrent": "Slaat {value} genezing op, na verloop van tijd vrijgegeven of verbruikt door Cascadeherstel",
+      "mendingCurrentPercent": "Slaat genezing op gelijk aan {pct}% van de maximale gezondheid voor Cascadeherstel",
       "absorb": "Absorbeert {value} schade",
       "healAbsorb": "Absorbeert {value} inkomende genezing",
       "thorns": "Verursacht bei Angreifern {value} {school}schaden",
@@ -1605,7 +1605,7 @@ export const nl_NL: EnTranslations = {
       "dmgDoneReduce": "Vermindert aangerichte schade met {pct}%",
       "heatingUp": "Je volgende opeenvolgende kritieke treffer van een Vuur-opbouwer verleent Hete reeks; een niet-kritieke opbouwer verwijdert Opwarmen",
       "elementalConvergencePrimed": "Je volgende spreuk van de andere elementaire school verleent Elementaire Convergentie",
-      "hunterFerocity": "{stacks} Pack Ferocity: your pet deals {pct}% more damage",
+      "hunterFerocity": "{stacks} Roedelfelheid: je huisdier richt {pct}% meer schade aan",
       "battleStance": "Strijdhouding: 10% meer woedeopbouw",
       "berserkerStance": "Berserkerhouding: kritieke treffers landen 3% vaker en raken 3% harder",
       "crit": "Verhoogt kans op kritieke treffers met {pct}%",
@@ -1628,15 +1628,15 @@ export const nl_NL: EnTranslations = {
       "freeCast": "Je volgende bezwering kost niets",
       "instantCast": "Je volgende spreuk met een bezweringstijd is direct",
       "cheapCast": "Je volgende spreuk kost {pct}% minder",
-      "radiantResonance": "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
-      "solarReprisal": "Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant",
-      "dawnsWrath": "HoW: all HP · +1 use · CD 0 · +{pct}% DMG",
-      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
-      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
-      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
-      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
-      "veiledEdge": "Your next Lurker's Strike strikes for double",
-      "duskEconomy": "Abilities cost {pct}% less energy",
+      "radiantResonance": "Je volgende Helend Licht is direct, of je volgende Omhelzing van de Dageraad kost {pct}% minder mana en wordt in {castTime} sec. gespreukt",
+      "solarReprisal": "Je volgende Zonneschijf kost geen mana, negeert de afkoeling en richt {pct}% meer schade aan; de Hamer der Genade negeert zijn afkoeling en geneest je voor 100% van de aangerichte schade; of Helend Licht is direct",
+      "dawnsWrath": "HvT: elke gezondheid · +1 gebruik · Afkoeling 0 · +{pct}% schade",
+      "venomRitual": "Gifritueel: fase {stacks} van {max}. Opbouwslagen voegen fasen toe; bij {max} wordt Zandslaap tot Gifscheur",
+      "gloam": "Schemer: fase {stacks} van {max}. Bij {max} worden je Schemersluier-openingen in het open veld bruikbaar, en de volgende die je werpt is GRATIS en laat de voorraad ontploffen tot de schaduwsluier",
+      "redline": "Rode Lijn: kerf {stacks} van {max}. Lichaamsstoten voegen kerven toe; de Genadeslag slaat {pct}% harder toe per kerf en sluit het venster. Eerder aflopen doet het vervallen",
+      "veilstrikeWindow": "Schaduwsluier: je Schemersluier-openingen zijn in het open veld vanuit elke hoek bruikbaar, en de aangerichte schade stijgt met {pct}%",
+      "veiledEdge": "Je volgende Sluipersslag slaat dubbel zo hard toe",
+      "duskEconomy": "Vaardigheden kosten {pct}% minder energie",
       "increase": {
         "ap": "Erhöht Angriffskraft um {value}",
         "sp": "Verhoogt spreukkracht met {value}",
@@ -2370,7 +2370,7 @@ export const nl_NL: EnTranslations = {
       "empty": "Nog geen recepten bekend.",
       "resultAria": "Ambacht {name}",
       "craftedToast": "Gemaakt: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Gemaakt: {name} x{qty}",
       "insufficientMaterials": "Daar heb je de materialen niet voor.",
       "unknownRecipe": "Dat recept bestaat niet.",
       "comboRequirementUnmet": "Je hebt niet beide vereiste ambachten op het vereiste niveau voor dat recept.",
@@ -2463,13 +2463,13 @@ export const nl_NL: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Je onbetoverd {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Je onttovert {item} tot {material}.",
+      "disenchantedYieldQty": "Je onttovert {item} tot {material} x{qty}.",
+      "disenchantedAlso": "Je krijgt ook {material} terug.",
+      "disenchantedAlsoQty": "Je krijgt ook {material} x{qty} terug.",
       "salvagedLine": "Je salvaged {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Je wint {material} uit {item}.",
+      "salvagedYieldQty": "Je wint {material} x{qty} uit {item}.",
       "enchantAppliedLine": "Je betoverd {item} met {enchant}.",
       "notHeld": "Je hebt dat voorwerp niet.",
       "notDisenchantable": "Je kunt dat niet onbetoveren.",
@@ -3293,21 +3293,21 @@ export const nl_NL: EnTranslations = {
       "holy_light": "Een gestage, flinke genezing om een bondgenoot of jezelf aan te vullen.",
       "devotion_aura": "Een blijvende zelfbuff die pantser verhoogt zodat klappen zachter aankomen.",
       "judgement": "Besteedt je actieve Zegel om een vijand van korte afstand te raken.",
-      "hammer_of_wrath": "Executes a wounded enemy from range, or any enemy while your wings are active.",
-      "avenging_wrath": "Grants 10 Devotion, then doubles Devotion generated by abilities for fifteen seconds.",
-      "bastion_sweep": "Sweeps your shield through a group to seize threat and build Devotion.",
-      "oath_chain": "Drags a distant enemy into your pack and slows its escape.",
-      "veilbound_march": "Pass through a pack to mark it, blunt its damage against you, and lock in threat.",
-      "holy_shield": "Spends Devotion on an active block window, absorption, and a threat pulse.",
-      "consecration": "Claims the ground around you with sustained Holy damage and threat.",
-      "hammer_of_justice": "Stops one enemy with a short, reliable stun.",
-      "lay_on_hands": "Restores a large amount of health when an ally is close to falling.",
+      "hammer_of_wrath": "Executeert een gewonde vijand van afstand, of elke vijand zolang je vleugels actief zijn.",
+      "avenging_wrath": "Verleent 10 Toewijding en verdubbelt daarna vijftien seconden lang de door vaardigheden gegenereerde Toewijding.",
+      "bastion_sweep": "Zwaait met je schild door een groep om dreiging te grijpen en Toewijding op te bouwen.",
+      "oath_chain": "Sleept een verre vijand je roedel in en remt zijn ontsnapping.",
+      "veilbound_march": "Ga door een groep heen om die te merken, hun schade tegen jou af te zwakken en dreiging vast te zetten.",
+      "holy_shield": "Geeft Toewijding uit aan een actief blokkeervenster, absorptie en een dreigingspuls.",
+      "consecration": "Eist de grond om je heen op met aanhoudende Heilige schade en dreiging.",
+      "hammer_of_justice": "Stopt één vijand met een korte, betrouwbare verdoving.",
+      "lay_on_hands": "Herstelt een grote hoeveelheid gezondheid wanneer een bondgenoot bijna valt.",
       "blessing_of_might": "Verhoogt de aanvalskracht van een vriendelijk doelwit, goed om voor een pull uit te spreken.",
       "divine_protection": "Een snelle beschermende wering om schade op te vangen als het hard tegen hard gaat.",
       "raptor_strike": "Een harde uithaal van dichtbij voor wanneer iets de afstand met je overbrugt.",
-      "pack_command": "Orders your companion to strike and build Pack Ferocity. Each stack makes your pet deal 10% more damage, up to 30%, before Unleash Beast spends the stacks.",
-      "stampede": "Calls three beasts to attack for 12 seconds. Use it at full Pack Ferocity so they keep the maximum damage bonus for the whole summon.",
-      "measured_shot": "A deliberate ranged shot that restores Focus for your heavier attacks.",
+      "pack_command": "Beveelt je metgezel toe te slaan en Roedelfelheid op te bouwen. Elke stapel laat je huisdier 10% meer schade aanrichten, tot 30%, voordat Ontketen Beest de stapels uitgeeft.",
+      "stampede": "Roept drie beesten op om 12 seconden aan te vallen. Gebruik hem bij volle Roedelfelheid zodat ze de maximale schadebonus de hele oproeping behouden.",
+      "measured_shot": "Een beheerst afstandsschot dat focus herstelt voor je zwaardere aanvallen.",
       "aspect_of_the_hawk": "Een houding die je aanhoudt om je aanvalskracht op afstand aan te scherpen.",
       "serpent_sting": "Plaatst een gif dat natuurschade laat bloeden na verloop van tijd.",
       "arcane_shot": "Een direct schot van afstand voor snelle extra schade.",
@@ -3326,19 +3326,19 @@ export const nl_NL: EnTranslations = {
       "power_word_shield": "Hult een bondgenoot in een schild dat klappen opvangt voordat ze aankomen.",
       "renew": "Een genezing die tikt na verloop van tijd, goed om uit te spreken en te blijven bewegen.",
       "lightning_bolt": "Een spreuk van Natuurschade op afstand, je vertrouwde keuze van veraf.",
-      "chain_lightning": "Strikes one target and jumps to two nearby enemies, building one Thunder for the whole cast.",
-      "thunder_reservoir": "Banks lightning until Earthen Jolt or Faultwake can release a full-power payoff.",
+      "chain_lightning": "Raakt één doelwit en springt naar twee nabije vijanden, en bouwt voor de hele spreuk één Donder op.",
+      "thunder_reservoir": "Slaat bliksem op tot de Aardse Schok of de Aardbeving een uitbetaling op volle kracht kan vrijgeven.",
       "rockbiter_weapon": "Doordringt je wapen zodat elke uithaal harder aankomt in het melee.",
       "healing_wave": "Je belangrijkste genezing, een directe heling voor jezelf of een bondgenoot.",
       "earth_shock": "Een directe schok voor snelle Natuurschade wanneer je het nu nodig hebt.",
       "lightning_shield": "Laadt je op zodat aanvallers Natuurschade oplopen wanneer ze je raken.",
       "flame_shock": "Een directe brand die vooraan inslaat en blijft schroeien na verloop van tijd.",
       "galeheart_weapon": "Doordrenkt beide wapens met stormwind en beloont een stabiel aanvalsritme.",
-      "warspirit_cadence": "Turns a steady weapon rhythm into Galeheart Echoes and an instant spell opportunity.",
-      "stormsurge": "Sometimes brings Ancestral Strike back early after you spend a Stormcast opportunity.",
+      "warspirit_cadence": "Verandert een gestaag wapenritme in Stormhartecho's en een kans op een directe spreuk.",
+      "stormsurge": "Brengt de Voorouderslag soms eerder terug nadat je een Stormteken-kans hebt uitgegeven.",
       "lifespring_weapon": "Doordrenkt je wapen met herstellend water en versterkt je aanhoudende genezingsstroom.",
       "tidecall": "Roept het getij op en versterkt je volgende reeks genezingsspreuken.",
-      "ancestor_return": "Returns every fallen group or raid member to life after a long out-of-combat cast.",
+      "ancestor_return": "Brengt na een lange spreuk buiten gevecht elk gevallen groeps- of raidlid terug tot leven.",
       "stoneward": "Richt een geladen stenen schild op dat opgelopen schade in genezing omzet.",
       "primal_exaltation": "Ontketent kort de elementaire kracht van je specialisatie.",
       "fireball": "Je belangrijkste vuurnuke, raakt hard en laat het doelwit branden.",
@@ -6223,7 +6223,7 @@ export const nl_NL: EnTranslations = {
       "notEnoughRage": "Niet genoeg woede!",
       "notEnoughEnergy": "Niet genoeg energie!",
       "notEnoughMana": "Niet genoeg mana!",
-      "notEnoughDevotion": "Not enough Devotion!",
+      "notEnoughDevotion": "Niet genoeg Toewijding!",
       "notEnoughResource": "Niet genoeg {resource}!",
       "notEnoughHealth": "Niet genoeg gezondheid.",
       "targetMustDodge": "Je doelwit moet eerst ontwijken.",
@@ -6537,8 +6537,8 @@ export const nl_NL: EnTranslations = {
       "mana": "Mana",
       "rage": "Woede",
       "energy": "Energie",
-      "focus": "Focus",
-      "devotion": "Devotion"
+      "focus": "focus",
+      "devotion": "Toewijding"
     },
     "forms": {
       "bear": "Beer",
@@ -6915,56 +6915,56 @@ export const nl_NL: EnTranslations = {
         "description": "Laat gedurende 3 sec een pijlenregen neerdalen op het doelgebied en richt elke 0.5 sec {damage} schade aan bij vijanden erin."
       },
       "pack_command": {
-        "name": "Pack Command",
-        "description": "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit."
+        "name": "Roedelbevel",
+        "description": "Beveelt je levende huisdier toe te slaan voor 36 tot 48 fysieke schade. De schade stijgt met de aanvalskracht van het huisdier. Een treffer herstelt 20 focus en verleent 30 sec. lang 1 Roedelfelheid, tot 3. Elke stapel verhoogt alle schade van je huisdier met 10%. Deze slag gebruikt de stapels die je vóór de treffer had."
       },
       "stampede": {
-        "name": "Stampede",
-        "description": "Summon 3 beasts for 12 sec. Each attacks every 2 sec for {damage} Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed after 5 failed chances. It cannot reset while the beasts are active. (Packlord)"
+        "name": "Stormloop",
+        "description": "Roept 12 sec. lang 3 beesten op. Elk valt elke 2 sec. aan voor {damage} fysieke schade. De getoonde schade bevat 8% van je afstandsaanvalskracht vóór huisdierschadebonussen. De beesten leggen de Roedelfelheid vast bij het oproepen en winnen 10% schade per stapel. Terwijl de Stormloop afkoelt, hebben geslaagde Roedelbevelen 20% kans om hem te herstellen, gegarandeerd na 5 mislukte kansen. Hij kan niet herstellen zolang de beesten actief zijn. (Roedelheer)"
       },
       "unleash_beast": {
-        "name": "Unleash Beast",
-        "description": "Consume 3 Pack Ferocity after your pet strikes for 83 to 105 Physical damage and claps every enemy within 6 yards for 26 to 34. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 nearby enemies."
+        "name": "Ontketen Beest",
+        "description": "Verbruikt 3 Roedelfelheid nadat je huisdier heeft toegeslagen voor 83 tot 105 fysieke schade en elke vijand binnen 6 meter heeft geschud voor 26 tot 34. De slag en de schok gebruiken de volledige huisdierschadebonus van 30% van Roedelfelheid en stijgen met de aanvalskracht van het huisdier. De volgende 8 sec. richt het huisdier 25% meer schade aan, valt 35% sneller aan en laat het Boosaardig Schot tot 2 nabije vijanden raken."
       },
       "measured_shot": {
-        "name": "Measured Shot",
-        "description": "Shoot the target for {damage} Physical damage. A hit restores 20 Focus. Damage increases with Ranged Attack Power."
+        "name": "Beheerst Schot",
+        "description": "Schiet op het doelwit voor {damage} fysieke schade. Een treffer herstelt 20 focus. De schade stijgt met de afstandsaanvalskracht."
       },
       "cold_focus": {
-        "name": "Cold Focus",
-        "description": "For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)"
+        "name": "Koude Focus",
+        "description": "12 sec. lang herstelt het Beheerst Schot 50% meer focus, en kost de Lange Trek 25% minder en wordt 30% sneller gespreukt. (Koudzicht-kenmerk)"
       },
       "bloodhook": {
-        "name": "Bloodhook",
-        "description": "Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)"
+        "name": "Bloedhaak",
+        "description": "Stormt op een vijand af en brengt de Bloedhaakwond aan, die over 12 sec. in 4 tikken 34 fysieke basisschade plus 26% van je afstandsaanvalskracht aanricht. (Veldkunst-kenmerk)"
       },
       "shrapnel_charge": {
-        "name": "Shrapnel Charge",
-        "description": "Hit the target for 24 to 30 Physical damage and up to 4 other enemies within 6 yards for 13 to 17. Other targets also bleed for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Direct damage increases with Ranged Attack Power."
+        "name": "Scherflading",
+        "description": "Raakt het doelwit voor 24 tot 30 fysieke schade en tot 4 andere vijanden binnen 6 meter voor 13 tot 17. De andere doelwitten bloeden ook 6 sec. lang voor 12 schade. Als het hoofddoel je Bloedhaakwond draagt, wordt direct 1 wondtik aangericht. De directe schade stijgt met de afstandsaanvalskracht."
       },
       "bloodtrail_assault": {
-        "name": "Bloodtrail Assault",
-        "description": "For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 nearby enemies, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards, deals 25% more base damage to its main target, and triggers 50% more wound damage."
+        "name": "Bloedspoor-aanval",
+        "description": "12 sec. lang verspreidt de Bloedhaak een wond op 60% sterkte naar maximaal 2 nabije vijanden, beveelt Wondscheur een huisdieraanval van 18 schade, en wint de Scherflading 2 meter, richt 25% meer basisschade aan bij het hoofddoel en veroorzaakt 50% meer wondschade."
       },
       "trailbreak": {
-        "name": "Trailbreak",
-        "description": "Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
+        "name": "Spoorbreuk",
+        "description": "Spring 12 meter achterwaarts. Als je Jachtvaart hebt, wordt die vernieuwd en maakt de Terugkeer 12 sec. gereed."
       },
       "wildheart": {
-        "name": "Wildheart",
-        "description": "Immediately restore 30% of your maximum health."
+        "name": "Wildhart",
+        "description": "Herstelt direct 30% van je maximale gezondheid."
       },
       "shellskin": {
-        "name": "Shellskin",
-        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+        "name": "Schildhuid",
+        "description": "Vermindert de opgelopen schade 8 sec. lang met 60%, maar verhindert aanvallen zolang ze actief is."
       },
       "frostjaw_trap": {
-        "name": "Frostjaw Trap",
-        "description": "Place a trap at the selected enemy or at your feet. It arms after 0.75 sec and lasts 30 sec. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec."
+        "name": "Vorstkaakval",
+        "description": "Plaatst een val bij de gekozen vijand of aan je voeten. Hij scherpt na 0,75 sec. en duurt 30 sec. De eerste vijand die hem activeert wordt 3 sec. geworteld, en vijanden binnen 4 meter worden 4 sec. met 50% vertraagd."
       },
       "pack_rally": {
-        "name": "Pack Rally",
-        "description": "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec."
+        "name": "Roedelverzameling",
+        "description": "Neem de Gedaante van de Draver aan en verzamel nabije bondgenoten 10 sec. lang met 30% loopsnelheid en 10% aanvals- en spreuksnelheid."
       },
       "hurricane": {
         "name": "Orkaan",
@@ -7275,116 +7275,116 @@ export const nl_NL: EnTranslations = {
         "description": "Geneest een bevriend doelwit voor {damage}."
       },
       "divine_ascension": {
-        "name": "Divine Ascension",
-        "description": "Consume 20 Devotion to gain 5 Ascension charges for up to 45 sec. Marked abilities consume one charge and gain an additional effect."
+        "name": "Goddelijke Verheffing",
+        "description": "Verbruikt 20 Toewijding om maximaal 45 sec. lang 5 Verheffingsladingen te krijgen. Gemarkeerde vaardigheden verbruiken één lading en krijgen een extra effect."
       },
       "aura_mastery": {
-        "name": "Sacred Concord",
-        "description": "For 8 sec, empower every active Devotion and Requital Aura in your group. Bastion Devotion reduces damage by 15%; Requital deals 15 Holy damage. Multiple uses refresh instead of stacking."
+        "name": "Heilige Eendracht",
+        "description": "Versterkt 8 sec. lang elke actieve Toewijding en Vergeldingsaura in je groep. De Toewijding van het Bastion vermindert schade met 15%; Vergelding richt 15 Heilige schade aan. Meervoudig gebruik vernieuwt in plaats van te stapelen."
       },
       "devotion_ward": {
-        "name": "Bastion Devotion",
-        "description": "Reduce damage taken by you and party members by 5% until death or replacement. Only this aura and Requital Aura replace each other; Radiant, Dawn, and Grace Devotion coexist."
+        "name": "Toewijding van het Bastion",
+        "description": "Vermindert de schade die jij en je groepsleden oplopen met 5% tot de dood of vervanging. Alleen deze aura en de Vergeldingsaura vervangen elkaar; Stralende Toewijding, Toewijding van de Dageraad en van Genade bestaan naast elkaar."
       },
       "hammer_of_grace": {
-        "name": "Hammer of Grace",
-        "description": "Instantly hurl a holy hammer at an enemy within 20 m for {damage}, restoring 70 mana, healing yourself for 50% of damage dealt, and generating 1 Devotion when it deals damage. Solar Reprisal lets Hammer of Grace ignore its cooldown and heal you for 100% of damage dealt."
+        "name": "Hamer der Genade",
+        "description": "Werpt direct een heilige hamer naar een vijand binnen 20 m voor {damage}, herstelt 70 mana, geneest jou voor 50% van de aangerichte schade en genereert 1 Toewijding wanneer hij schade aanricht. Zonnevergelding laat de Hamer der Genade zijn afkoeling negeren en geneest je voor 100% van de aangerichte schade."
       },
       "hushbrand": {
-        "name": "Hushbrand",
-        "description": "Interrupts spellcasting and prevents spells from that school for 4 sec."
+        "name": "Zwijgmerk",
+        "description": "Onderbreekt het spreuken en verhindert 4 sec. lang spreuken van die school."
       },
       "guardian_covenant": {
-        "name": "Guardian Covenant",
-        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
+        "name": "Verbond van de Wachter",
+        "description": "Beschermt een bevriend doelwit en jezelf en vermindert 8 sec. lang de opgelopen schade met 20%. Kiest standaard jou wanneer geen bevriend doelwit is geselecteerd."
       },
       "solar_step": {
-        "name": "Solar Step",
-        "description": "Increase your movement speed by 150% for 2 sec."
+        "name": "Zonnestap",
+        "description": "Verhoogt je loopsnelheid 2 sec. lang met 150%."
       },
       "solar_invocation": {
-        "name": "Solar Invocation",
-        "description": "Instantly heal an ally for {damage} or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much."
+        "name": "Zonne-aanroeping",
+        "description": "Geneest direct een bondgenoot voor {damage} of richt matige Heilige schade aan bij een vijand. Beide toepassingen genereren 1 Toewijding. Tijdens Verheffing geneest een genezende spreuk ook bevriende spelers binnen 10 m van het doelwit voor de helft."
       },
       "radiant_devotion": {
-        "name": "Radiant Devotion",
-        "description": "Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion, but coexists with Devotions from other Paladins."
+        "name": "Stralende Toewijding",
+        "description": "Verhoogt de spreukkracht van jou en je groepsleden 30 min. lang met 20. Vervangt je eigen Toewijding van de Dageraad of van Genade, maar bestaat naast de Toewijdingen van andere paladijnen."
       },
       "dawn_devotion": {
-        "name": "Dawn Devotion",
-        "description": "Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion, but coexists with Devotions from other Paladins and with Warrior shouts."
+        "name": "Toewijding van de Dageraad",
+        "description": "Verhoogt de aanvalskracht van jou en je groepsleden 30 min. lang met 40. Vervangt je eigen Stralende Toewijding of Toewijding van Genade, maar bestaat naast de Toewijdingen van andere paladijnen en naast krijgerskreten."
       },
       "grace_devotion": {
-        "name": "Grace Devotion",
-        "description": "You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min. Replaces your own Radiant or Dawn Devotion, but coexists with Devotions from other Paladins."
+        "name": "Toewijding van Genade",
+        "description": "Jij en je groepsleden herstellen elke 5 sec. 15 mana en betalen 30 min. lang 3% minder mana. Vervangt je eigen Stralende Toewijding of Toewijding van de Dageraad, maar bestaat naast de Toewijdingen van andere paladijnen."
       },
       "recall_the_fallen": {
-        "name": "Recall the Fallen",
-        "description": "Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group."
+        "name": "Roep de Gevallenen",
+        "description": "Brengt een dood groepslid terug tot leven met 35% gezondheid en mana. Een Zonneheler van niveau 16 of hoger roept in plaats daarvan elk gevallen groepslid terug."
       },
       "beacon_of_light": {
-        "name": "Beacon of Light",
-        "description": "Mark one group member as your Beacon of Light. 50% of your effective direct healing on another group member within 60 m also heals the Beacon. Area and periodic healing do not transfer. Lasts until either of you dies."
+        "name": "Baken van Licht",
+        "description": "Markeert één groepslid als je Baken van Licht. 50% van je effectieve directe genezing op een ander groepslid binnen 60 m geneest ook het Baken. Gebieds- en periodieke genezing wordt niet overgedragen. Duurt tot een van jullie sterft."
       },
       "final_edict": {
-        "name": "Final Edict",
-        "description": "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Holy explosion around you."
+        "name": "Laatste Edict",
+        "description": "Levert een verpletterende wapenslag en genereert 1 Toewijding wanneer die schade aanricht. Een geslaagde treffer vermindert de resterende afkoeling van Dageraadsval met 2 sec. Geslaagde auto-aanvallen en treffers van het Laatste Edict hebben 15% kans om 8 sec. lang Toorn van de Dageraad te verlenen. Verheffing ontketent bovendien een Heilige explosie om je heen."
       },
       "dawnfall": {
-        "name": "Dawnfall",
-        "description": "Deal {damage} Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict's remaining cooldown by 2 sec. Ascension increases its damage and radius."
+        "name": "Dageraadsval",
+        "description": "Richt {damage} Heilige schade aan bij nabije vijanden en genereert 1 Toewijding. Ten minste één vijand raken vermindert de resterende afkoeling van het Laatste Edict met 2 sec. Verheffing verhoogt schade en straal."
       },
       "sun_gods_verdict": {
-        "name": "Verdict of the Sun God",
-        "description": "Judge an enemy beneath the Verdict of the Sun God for 30 sec. Final Edict and Dawnfall inscribe one charge on a successful hit. The ability that lands the third charge dictates the sentence: Final Edict unleashes devastating damage on the condemned; Dawnfall detonates the verdict, damaging and stunning nearby enemies for 1.5 sec."
+        "name": "Vonnis van de Zonnegod",
+        "description": "Berecht een vijand 30 sec. onder het Vonnis van de Zonnegod. Het Laatste Edict en Dageraadsval schrijven bij een geslaagde treffer één lading in. De vaardigheid die de derde lading plaatst bepaalt het vonnis: het Laatste Edict ontketent verwoestende schade op de veroordeelde; Dageraadsval laat het vonnis ontploffen en beschadigt en verdooft nabije vijanden 1,5 sec."
       },
       "valkyrs_calling": {
-        "name": "Valkyr's Calling",
-        "description": "Ascend into the air, becoming immune to damage as you fly toward the enemy. After 2 sec, descend upon the target area for {damage} Holy damage and generate 1 Devotion. Ascension increases the impact damage by 50% and consumes 1 charge."
+        "name": "Roep van de Walkure",
+        "description": "Stijg op in de lucht en word immuun voor schade terwijl je naar de vijand vliegt. Na 2 sec. daal je neer op het doelgebied voor {damage} Heilige schade en genereer je 1 Toewijding. Verheffing verhoogt de inslagschade met 50% en verbruikt 1 lading."
       },
       "faithforged_guard": {
-        "name": "Debt of Light",
-        "description": "For 8 sec, the next enemy hit against you is answered: up to {buff} damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered. Ascension raises the amount it can answer by 50%."
+        "name": "Schuld van Licht",
+        "description": "8 sec. lang wordt de volgende vijandelijke treffer tegen jou beantwoord: tot {buff} schade wordt geweigerd en als Heilige schade aan de aanvaller teruggegeven, en je krijgt 1 Toewijding. Slechts één slag wordt beantwoord. Verheffing verhoogt het bedrag dat beantwoord kan worden met 50%."
       },
       "mercy_lance": {
-        "name": "Mercy Lance",
-        "description": "Deal {damage} Holy damage to an enemy and generate 1 Devotion when it deals damage. During Ascension, it consumes 1 charge to guarantee a critical hit."
+        "name": "Lans der Genade",
+        "description": "Richt {damage} Heilige schade aan bij een vijand en genereert 1 Toewijding wanneer ze schade aanricht. Tijdens Verheffing verbruikt ze 1 lading om een kritieke treffer te garanderen."
       },
       "sacred_form": {
-        "name": "Sacred Form",
-        "description": "Enter a sacred state until death, increasing healing by 10%, spell critical chance by 5%, and reducing threat generated by 50%. Sunmender only."
+        "name": "Heilige Gedaante",
+        "description": "Gaat tot de dood in een heilige staat, verhoogt genezing met 10% en de kritieke spreukkans met 5%, en vermindert de gegenereerde dreiging met 50%. Alleen voor Zonnehelers."
       },
       "dawns_embrace": {
-        "name": "Dawn's Embrace",
-        "description": "Deliver a powerful heal and generate 1 Devotion. Radiant Resonance reduces its mana cost by 50% and cast time to 1.5 sec. Ascension makes it instant and increases its healing by 35%."
+        "name": "Omhelzing van de Dageraad",
+        "description": "Levert een krachtige genezing en genereert 1 Toewijding. Stralende Resonantie verlaagt de manakosten met 50% en de spreuktijd tot 1,5 sec. Verheffing maakt haar direct en verhoogt haar genezing met 35%."
       },
       "radiant_chorus": {
-        "name": "Radiant Chorus",
-        "description": "Heal nearby allies for {damage} and generate 1 Devotion. Effectively healing at least 2 allies grants Radiant Resonance: your next Mending Light is instant, or your next Dawn's Embrace costs 50% less mana and casts in 1.5 sec. Ascension increases Radiant Chorus healing and radius."
+        "name": "Stralend Koor",
+        "description": "Geneest nabije bondgenoten voor {damage} en genereert 1 Toewijding. Ten minste 2 bondgenoten effectief genezen verleent Stralende Resonantie: je volgende Helend Licht is direct, of je volgende Omhelzing van de Dageraad kost 50% minder mana en wordt in 1,5 sec. gespreukt. Verheffing verhoogt de genezing en straal van het Stralend Koor."
       },
       "life_covenant": {
-        "name": "Life Covenant",
-        "description": "Reduce an ally's damage taken by 40% for 6 sec. During Ascension it also grants a 120-point shield without consuming a charge."
+        "name": "Verbond van Leven",
+        "description": "Vermindert 6 sec. lang de schade van een bondgenoot met 40%. Tijdens Verheffing verleent het ook een schild van 120 punten zonder een lading te verbruiken."
       },
       "aegis_first_dawn": {
-        "name": "Aegis of the First Dawn",
-        "description": "Channel for 5 sec, creating a 10 meter holy dome. Allies inside are healed every second and take 50% less damage. Completing the channel releases a final heal and grants 30% movement speed for 4 sec."
+        "name": "Aegis van de Eerste Dageraad",
+        "description": "Bundel 5 sec. en creëer een heilige koepel van 10 meter. Bondgenoten erbinnen worden elke seconde genezen en krijgen 50% minder schade. Het voltooien van de bundeling geeft een laatste genezing en verleent 4 sec. lang 30% loopsnelheid."
       },
       "vowkeeper_strike": {
-        "name": "Vowkeeper Strike",
-        "description": "Strike with high threat and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal empowers your next Sunward Disc, Hammer of Grace, or Mending Light. Ascension also grants a small absorption shield."
+        "name": "Eedbewaardersslag",
+        "description": "Slaat toe met hoge dreiging en genereert 1 Toewijding. Een geslaagde slag heeft 20% kans om 8 sec. lang Zonnevergelding te verlenen; elke geslaagde blokkering 25%. Zonnevergelding versterkt je volgende Zonneschijf, Hamer der Genade of Helend Licht. Verheffing verleent ook een klein absorptieschild."
       },
       "bastion_rite": {
-        "name": "Bastion Rite",
-        "description": "Reduce physical damage taken by 20% and increase block chance by 20% for 6 sec. Ascension extends the duration to 10 sec."
+        "name": "Rite van het Bastion",
+        "description": "Vermindert ontvangen fysieke schade met 20% en verhoogt de blokkeerkans 6 sec. lang met 20%. Verheffing verlengt de duur tot 10 sec."
       },
       "sunward_disc": {
-        "name": "Sunward Disc",
-        "description": "Requires a shield. Hurl a radiant disc that strikes and then bounces between nearby enemies. Each damaging impact generates 1 Devotion. Solar Reprisal makes Sunward Disc cost no mana, ignore its cooldown, and deal 20% more damage. Ascension empowers 5 bounces."
+        "name": "Zonneschijf",
+        "description": "Vereist een schild. Werpt een stralende schijf die raakt en dan tussen nabije vijanden stuitert. Elke schadelijke inslag genereert 1 Toewijding. Zonnevergelding zorgt dat de Zonneschijf geen mana kost, de afkoeling negeert en 20% meer schade aanricht. Verheffing versterkt 5 stuiters."
       },
       "sacred_challenge": {
-        "name": "Sacred Goad",
-        "description": "Compel an enemy to attack you. During Ascension it also reduces all damage received by 15% for 4 sec without consuming a charge."
+        "name": "Heilige Prikkel",
+        "description": "Dwingt een vijand jou aan te vallen. Tijdens Verheffing vermindert het ook 4 sec. lang alle ontvangen schade met 15% zonder een lading te verbruiken."
       },
       "devotion_aura": {
         "name": "Standvastige Aura",
@@ -7423,20 +7423,20 @@ export const nl_NL: EnTranslations = {
         "description": "Wijdt de grond onder je en schroeit nabije vijanden elke 2 sec voor {damage} Heilige schade gedurende 10 sec."
       },
       "bastion_sweep": {
-        "name": "Bastion Sweep",
-        "description": "Sweep your equipped shield through enemies in a 180 degree frontal arc for {damage} Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m."
+        "name": "Bastionzwaai",
+        "description": "Zwaai met je uitgeruste schild door vijanden in een frontale boog van 180 graden voor {damage} Heilige schade met hoge dreiging en genereer 1 Toewijding. Verheffing verhoogt de schade met 30% en de straal tot 8 m."
       },
       "oath_chain": {
-        "name": "Oath Chain",
-        "description": "Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy."
+        "name": "Eedketting",
+        "description": "Bindt direct een verre vijand met een heilige ketting. De vijand beweegt met 18 m per seconde naar je toe tot hij 3 m bereikt en wordt dan 4 sec. lang met 50% vertraagd. Tijdens Verheffing bindt ze een tweede nabije vijand."
       },
       "veilbound_march": {
-        "name": "Veilbound March",
-        "description": "Become ethereal for 4 sec, gaining 40% movement speed and 30% armor and becoming immune to roots, slows, and displacement. Enemies you pass through are Veil Marked for 6 sec, taking Holy damage each second, dealing 20% less damage to you, and generating extra threat. The first mark grants 1 Devotion. When the march ends, nearby marked enemies take a final burst. Ascension increases the burst by 50% and lightly pulls them toward you."
+        "name": "Sluiermars",
+        "description": "Word 4 sec. etherisch, krijg 40% loopsnelheid en 30% pantser en word immuun voor wortels, vertragingen en verplaatsing. Vijanden waar je doorheen gaat krijgen 6 sec. het Sluiermerk: ze lopen elke seconde Heilige schade op, richten 20% minder schade bij jou aan en genereren extra dreiging. Het eerste merk verleent 1 Toewijding. Als de mars eindigt, krijgen nabije gemerkte vijanden een laatste uitbarsting. Verheffing verhoogt de uitbarsting met 50% en trekt ze licht naar je toe."
       },
       "veilbound_mark": {
-        "name": "Veil Mark",
-        "description": "Takes Holy damage each second, deals 20% less damage to the Paladin who applied the mark, and generates additional threat toward that Paladin."
+        "name": "Sluiermerk",
+        "description": "Loopt elke seconde Heilige schade op, richt 20% minder schade aan bij de paladijn die het merk plaatste en genereert extra dreiging jegens die paladijn."
       },
       "righteous_fury": {
         "name": "Brandende Eed",
@@ -7479,12 +7479,12 @@ export const nl_NL: EnTranslations = {
         "description": "Tegenaanval nadat het doelwit ontwijkt voor wapenschade plus {damage}. Kan niet worden ontweken."
       },
       "hunting_momentum": {
-        "name": "Hunting Momentum",
-        "description": "Passive: Gutting Strike grants 1 Hunting Momentum for 8 sec, up to 3. At 3 stacks, Woundrend deals 45% more strike damage and consumes the stacks. (Fieldcraft)"
+        "name": "Jachtvaart",
+        "description": "Passief: de Weidslag verleent 8 sec. lang 1 Jachtvaart, tot 3. Bij 3 stapels richt Wondscheur 45% meer slagschade aan en verbruikt de stapels. (Veldkunst)"
       },
       "fieldcraft_reentry": {
-        "name": "Armed Re-entry",
-        "description": "Passive: Trailbreak refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)"
+        "name": "Gewapende Terugkeer",
+        "description": "Passief: Spoorbreuk vernieuwt de Jachtvaart en maakt je volgende Weidslag of Bloedhaak 12 sec. gereed. De Weidslag richt per stapel 15% meer schade aan. De Bloedhaak richt 18 tot 24 extra fysieke schade aan, verhoogd met 15% per stapel en door je afstandsaanvalskracht. Bij 3 stapels verbruikt een van beide aanvallen de Jachtvaart. (Veldkunst)"
       },
       "wing_clip": {
         "name": "Kluisterende Houw",
@@ -7551,8 +7551,8 @@ export const nl_NL: EnTranslations = {
         "description": "Werpt een bliksemschicht voor {damage} Natuurschade."
       },
       "thunder_reservoir": {
-        "name": "Thunder Reservoir",
-        "description": "Passive: Arc Bolt and Skybranch grant Thunder, up to 5. At 5 Thunder, Earthen Jolt deals 125% more damage or Faultwake deals 100% more damage, then consumes all Thunder. (Thundercall)"
+        "name": "Donderreservoir",
+        "description": "Passief: de Boogbliksem en de Gevorkte bliksem verlenen Donder, tot 5. Bij 5 Donder richt de Aardse Schok 125% meer schade aan of de Aardbeving 100% meer, en dan wordt alle Donder verbruikt. (Donderroep)"
       },
       "rockbiter_weapon": {
         "name": "Steengebonden Wapen",
@@ -7779,36 +7779,36 @@ export const nl_NL: EnTranslations = {
         "description": "Geneest een bevriend doelwit voor een grote hoeveelheid en springt daarna naar maximaal 2 andere bondgenoten in de buurt. Elke sprong geneest 50% minder. (Herstelkenmerk)"
       },
       "galeheart_weapon": {
-        "name": "Galeheart Weapon",
-        "description": "Imbue both weapons for 30 min, enabling Warspirit Cadence."
+        "name": "Stormhartwapen",
+        "description": "Betovert beide wapens 30 min. lang en schakelt de Krijgsgeestcadans in."
       },
       "warspirit_cadence": {
-        "name": "Warspirit Cadence",
-        "description": "Passive: Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)"
+        "name": "Krijgsgeestcadans",
+        "description": "Passief: elke 3e geraakte wapenaanval veroorzaakt 2 Stormhartecho's voor 50% Natuurschade en verleent 12 sec. lang een Stormteken. Het Stormteken maakt je volgende Boogbliksem, Schok of Helende Wateren direct en verlaagt de manakosten met 50%. De Voorouderslag telt als 2 aanvallen. (Krijgsgeest)"
       },
       "stormsurge": {
-        "name": "Stormsurge",
-        "description": "Passive: While Ancestral Strike is on cooldown, consuming Stormcast has a 25% chance to reset it. If the first 3 chances fail, the 4th always resets it. (Warspirit)"
+        "name": "Stormvloed",
+        "description": "Passief: terwijl de Voorouderslag afkoelt, heeft het verbruiken van een Stormteken 25% kans om hem te herstellen. Als de eerste 3 kansen mislukken, herstelt de 4e hem altijd. (Krijgsgeest)"
       },
       "lifespring_weapon": {
-        "name": "Lifespring Weapon",
-        "description": "Imbue your weapon for 30 min. Mending Waters and Tidecall add 20% more healing to Mending Current."
+        "name": "Levensbronwapen",
+        "description": "Betovert je wapen 30 min. lang. Helende Wateren en de Getijderoep voegen 20% meer genezing toe aan de Herstelstroom."
       },
       "unleash_weapon": {
-        "name": "Unleash Weapon",
-        "description": "Unleash your active weapon enchant. Pyrebrand deals 54 to 64 Fire damage, gains 30% of Spell Power, and grants 2 Thunder. Galeheart strikes with your weapon, advances Warspirit Cadence, and grants 20% attack speed for 6 sec. Stonebound strikes for 75% weapon damage, forces the target to attack you, and reduces damage taken by 20% for 4 sec. Lifespring consumes your Mending Current, heals for 125% of its remaining healing, and reduces the next hit within 8 sec by 50% of the health restored."
+        "name": "Ontketen Wapen",
+        "description": "Ontketent de actieve betovering van je wapen. Het Vuurmerk richt 54 tot 64 Vuurschade aan, wint 30% van de spreukkracht en verleent 2 Donder. Het Stormhart slaat toe met je wapen, brengt de Krijgsgeestcadans vooruit en verleent 6 sec. lang 20% aanvalssnelheid. De Steenband slaat toe voor 75% wapenschade, dwingt het doelwit jou aan te vallen en vermindert 4 sec. lang de opgelopen schade met 20%. De Levensbron verbruikt je Herstelstroom, geneest voor 125% van de resterende genezing en vermindert de volgende treffer binnen 8 sec. met 50% van de herstelde gezondheid."
       },
       "primal_exaltation": {
-        "name": "Primal Exaltation",
-        "description": "For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)"
+        "name": "Oerverheffing",
+        "description": "12 sec. lang worden de Boogbliksem en de Gevorkte bliksem van Donderroep 50% sneller gespreukt, en verleent de Boogbliksem 2 Donder; de Krijgsgeest activeert zijn cadans elke 2 wapentreffers; het Geestherstel voegt 50% meer genezing toe aan de Herstelstroom. (Sjamaantalent)"
       },
       "stoneward": {
-        "name": "Stoneward",
-        "description": "Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)"
+        "name": "Steenwacht",
+        "description": "Beschermt een bondgenoot 60 sec. met 6 ladingen. Schade verbruikt een lading om 5% van de maximale gezondheid te genezen, eens per 3 sec. (Sjamaantalent)"
       },
       "tidecall": {
-        "name": "Tidecall",
-        "description": "Heal a friendly target for 58 to 72. The heal increases with Spell Power. Add the same healing calculated before overhealing to Mending Current, up to 30% of the target's maximum health."
+        "name": "Getijderoep",
+        "description": "Geneest een bevriend doelwit voor 58 tot 72. De genezing stijgt met spreukkracht. Voegt dezelfde vóór overgenezing berekende genezing toe aan de Herstelstroom, tot 30% van de maximale gezondheid van het doelwit."
       },
       "metamorphosis": {
         "name": "Metamorfose",
@@ -8195,8 +8195,8 @@ export const nl_NL: EnTranslations = {
         "description": "Spoelt de tijdlijn van elk gesneuveld lid van je groep of raid terug en brengt hen bij hun lichaam tot leven met 30% gezondheid en mana. Kan niet tijdens een gevecht worden gebruikt. (Chronomantie)"
       },
       "ancestor_return": {
-        "name": "Ancestors' Return",
-        "description": "Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)"
+        "name": "Terugkeer der Voorouders",
+        "description": "Roept elk gevallen lid van je groep of raid bij hun lichaam terug tot leven met 30% gezondheid en mana. Kan niet in gevecht worden gespreukt. (Geestherstel)"
       },
       "temporal_rewind": {
         "name": "Terugspoelen",
@@ -8315,28 +8315,28 @@ export const nl_NL: EnTranslations = {
         "description": "Verslindt een magisch effect (een gunstig effect van een vijand of een schadelijk effect van een bondgenoot) en geneest je voor 6% van je maximale gezondheid."
       },
       "veilstep": {
-        "name": "Veilstep",
-        "description": "Steps through the veil in the direction you are facing."
+        "name": "Sluierstap",
+        "description": "Stapt door de sluier in de richting waarin je kijkt."
       },
       "scouring_mercy": {
-        "name": "Scouring Mercy",
-        "description": "Deal 72 to 84 Holy damage to an enemy or heal a friendly target for 130 to 155. Both amounts increase with Spell Power. Damage also heals each Doctrine-linked ally for 30%, or the lowest-health party member for 15% if no ally is linked. (Doctrine signature)"
+        "name": "Louterende Genade",
+        "description": "Richt 72 tot 84 Heilige schade aan bij een vijand of geneest een bevriend doelwit voor 130 tot 155. Beide bedragen stijgen met spreukkracht. De schade geneest ook elke via de Leer verbonden bondgenoot voor 30%, of het groepslid met de laagste gezondheid voor 15% als geen bondgenoot verbonden is. (Leer-kenmerk)"
       },
       "seraphic_vigil": {
-        "name": "Seraphic Vigil",
-        "description": "Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)"
+        "name": "Serafijnse Wake",
+        "description": "Beschermt een bondgenoot 30 sec. De eerste treffer die hem onder 35% gezondheid brengt verbruikt de Wake en geneest hem voor 180. (Zegen-kenmerk)"
       },
       "summon_tithefiend": {
-        "name": "Call Tithefiend",
-        "description": "Consume all Gloomtithe to summon a Tithefiend for 6, 8, 10, 12, or 15 sec at 1 to 5 stacks. It attacks every 2 sec for 20 to 24 Shadow damage, plus 8 per extra stack. Five stacks make it larger and increase its damage by 25%. Its damage increases with your Spell Power. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)"
+        "name": "Roep Tiendduivel op",
+        "description": "Verbruikt alle Somberetiende om bij 1 tot 5 stapels een Tiendduivel op te roepen voor 6, 8, 10, 12 of 15 sec. Hij valt elke 2 sec. aan voor 20 tot 24 Schaduwschade, plus 8 per extra stapel. Bij vijf stapels wordt hij groter en stijgt zijn schade met 25%. Zijn schade stijgt met jouw spreukkracht. Hij verkiest je Beeltenis. Elke treffer herstelt 1% van het maximale mana en weerkaatst 15% van de schade naar maximaal 3 andere vijanden met jouw Klaagzang van Verval. (Vesper-kenmerk)"
       },
       "martyrs_aegis": {
-        "name": "Martyr's Aegis",
-        "description": "Reduces one ally incoming damage by 40% for 8 sec."
+        "name": "Aegis van de Martelaar",
+        "description": "Vermindert 8 sec. lang de schade van een bondgenoot met 40%."
       },
       "choir_of_deliverance": {
-        "name": "Choir of Deliverance",
-        "description": "Channels for 6 sec, healing nearby party members every 2 sec."
+        "name": "Koor der Verlossing",
+        "description": "Bundelt 6 sec. en geneest elke 2 sec. nabije groepsleden."
       },
       "bear_charge": {
         "name": "Bruin-stormloop",
@@ -10940,12 +10940,12 @@ export const nl_NL: EnTranslations = {
         }
       },
       "q_divine_tome": {
-        "title": "The Dawnbound Tome",
-        "text": "The Light does not rest in you quietly, {playerName}. I have watched you lay the dead to peace, and I believe you are ready for what few paladins are ever taught: the Rite of Recall, by which a fallen soul is called back to the living. Its words are kept in the Dawnbound Tome, here in my keeping, but a book is no blessing while the restless dead still walk this ground. Return 6 more Restless Bones to the earth, and I will begin to teach you.",
-        "completion": "The chapel yard grows quiet. You are ready for the words, {playerName}, but the Rite of Recall cannot be spoken in a warm chapel. It must be sung where the veil between life and death wears thin. I mean to carry the Tome north into the Mirefen Marsh. Follow me there, and we will finish this.",
+        "title": "Het Dageraadsboek",
+        "text": "Het Licht rust niet stil in jou, {playerName}. Ik heb gezien hoe je de doden vrede bracht, en ik geloof dat je klaar bent voor wat weinig paladijnen ooit geleerd wordt: de Rite van de Terugroeping, waarmee een gevallen ziel wordt teruggeroepen naar de levenden. Haar woorden worden bewaard in het Dageraadsboek, hier in mijn hoede, maar een boek is geen zegen zolang de rusteloze doden nog over deze grond lopen. Leg nog 6 Rusteloze Beenderen terug in de aarde, en ik zal je beginnen te onderwijzen.",
+        "completion": "De kapelhof wordt stil. Je bent klaar voor de woorden, {playerName}, maar de Rite van de Terugroeping kan niet in een warme kapel worden uitgesproken. Ze moet gezongen worden waar de sluier tussen leven en dood dun wordt. Ik ben van plan het Boek noordwaarts naar het Mirefen-moeras te dragen. Volg me daarheen, en we maken dit af.",
         "objectives": {
           "0": {
-            "label": "Restless Bones laid to rest"
+            "label": "Rusteloze Beenderen te ruste gelegd"
           }
         }
       },
@@ -11106,12 +11106,12 @@ export const nl_NL: EnTranslations = {
         }
       },
       "q_rite_of_redemption": {
-        "title": "The Rite of Recall",
-        "text": "So you followed me into the mire, {playerName}. Good. I have the Dawnbound Tome here, and this drowned ground is where its words belong: nowhere is the veil between life and death thinner than a place where the dead will not stay buried. But the drowned would drag your voice down mid-verse. Clear a space fit for the rite: put 8 of the Drowned Dead to rest, and we will consecrate it together.",
-        "completion": "Kneel, {playerName}, and read the words aloud. There. Do you feel it? The Light no longer only mends the living in your hands, it can summon back those who have crossed over. Use it wisely. A soul called back to a hopeless fight is a cruelty, not a mercy. Rise, Redeemer.",
+        "title": "De Rite van de Terugroeping",
+        "text": "Dus je volgde me het slijk in, {playerName}. Goed. Ik heb het Dageraadsboek hier, en deze verdronken grond is waar zijn woorden thuishoren: nergens is de sluier tussen leven en dood dunner dan op een plek waar de doden niet begraven blijven. Maar de verdronkenen zouden je stem midden in het vers omlaag trekken. Maak een ruimte vrij die de rite waardig is: leg 8 van de Verdronken Doden te ruste, en we zullen haar samen wijden.",
+        "completion": "Kniel, {playerName}, en lees de woorden hardop. Daar. Voel je het? Het Licht heelt in jouw handen niet langer alleen de levenden, het kan hen terugroepen die zijn overgestoken. Gebruik het wijs. Een ziel die wordt teruggeroepen in een hopeloos gevecht is een wreedheid, geen genade. Sta op, Verlosser.",
         "objectives": {
           "0": {
-            "label": "Drowned Dead laid to rest"
+            "label": "Verdronken Doden te ruste gelegd"
           }
         }
       },

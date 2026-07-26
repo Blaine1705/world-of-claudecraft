@@ -241,7 +241,7 @@ export const sv_SE: EnTranslations = {
     "hud": {
       "lowMana": "Låg mana",
       "lowEnergy": "Låg energi",
-      "lowFocus": "Low Focus"
+      "lowFocus": "Lågt fokus"
     },
     "talents": {
       "title": "Talanger",
@@ -749,12 +749,12 @@ export const sv_SE: EnTranslations = {
       "resting": "Vilar"
     },
     "paladin": {
-      "devotion": "Devotion",
-      "devotionValue": "Devotion {value} of {max}",
-      "devotionAscensionCharges": "Devotion {value} of {max}. Ascension {charges} charges.",
-      "devotionAscensionLast": "Devotion {value} of {max}. Ascension final charge.",
-      "ascensionLastAnnouncement": "Ascension final charge",
-      "ascensionSpenderAria": "Action slot {slot}: {ability}. Consumes one Ascension charge."
+      "devotion": "Hängivenhet",
+      "devotionValue": "Hängivenhet {value} av {max}",
+      "devotionAscensionCharges": "Hängivenhet {value} av {max}. Upphöjelse: {charges} laddningar.",
+      "devotionAscensionLast": "Hängivenhet {value} av {max}. Upphöjelse: sista laddningen.",
+      "ascensionLastAnnouncement": "Upphöjelse: sista laddningen",
+      "ascensionSpenderAria": "Handlingsplats {slot}: {ability}. Förbrukar en upphöjelseladdning."
     },
     "abilityScaling": {
       "bonus": "(+{value})"
@@ -1590,8 +1590,8 @@ export const sv_SE: EnTranslations = {
     "auraEffect": {
       "dot": "Gör {value} {school}-skada var {interval}:e s",
       "hot": "Återställer {value} hälsa var {interval}:e s",
-      "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",
-      "mendingCurrentPercent": "Stores healing equal to {pct}% of maximum health for Cascading Mend",
+      "mendingCurrent": "Lagrar {value} läkning, frisläppt över tid eller förbrukad av Kaskadlagning",
+      "mendingCurrentPercent": "Lagrar läkning motsvarande {pct}% av maxhälsan för Kaskadlagning",
       "absorb": "Absorberar {value} skada",
       "healAbsorb": "Absorberar {value} inkommande läkning",
       "thorns": "Verursacht bei Angreifern {value} {school}schaden",
@@ -1605,7 +1605,7 @@ export const sv_SE: EnTranslations = {
       "dmgDoneReduce": "Minskar orsakad skada med {pct}%",
       "heatingUp": "Ditt nästa på varandra följande kritiska Eld-byggarslag ger Het svit; ett icke-kritiskt byggarslag tar bort Värms upp",
       "elementalConvergencePrimed": "Din nästa besvärjelse från den andra elementarskolan ger Elementär konvergens",
-      "hunterFerocity": "{stacks} Pack Ferocity: your pet deals {pct}% more damage",
+      "hunterFerocity": "{stacks} Flockvildhet: ditt husdjur gör {pct}% mer skada",
       "battleStance": "Stridsställning: 10% mer raserigenerering",
       "berserkerStance": "Bärsärkaställning: kritiska träffar sker 3% oftare och slår 3% hårdare",
       "crit": "Ökar kritisk träffchans med {pct}%",
@@ -1628,15 +1628,15 @@ export const sv_SE: EnTranslations = {
       "freeCast": "Ditt nästa kast kostar ingenting",
       "instantCast": "Din nästa besvärjelse med kasttid är omedelbar",
       "cheapCast": "Din nästa besvärjelse kostar {pct}% mindre",
-      "radiantResonance": "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
-      "solarReprisal": "Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant",
-      "dawnsWrath": "HoW: all HP · +1 use · CD 0 · +{pct}% DMG",
-      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
-      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
-      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
-      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
-      "veiledEdge": "Your next Lurker's Strike strikes for double",
-      "duskEconomy": "Abilities cost {pct}% less energy",
+      "radiantResonance": "Ditt nästa Lagande ljus blir omedelbart, eller din nästa Gryningens famn kostar {pct}% mindre mana och kastas på {castTime} sek",
+      "solarReprisal": "Din nästa Solskiva kostar ingen mana, ignorerar nedkylningen och gör {pct}% mer skada; Nådens hammare ignorerar sin nedkylning och läker dig för 100% av skadan; eller Lagande ljus blir omedelbart",
+      "dawnsWrath": "VH: all hälsa · +1 användning · Nedkylning 0 · +{pct}% skada",
+      "venomRitual": "Giftritual: steg {stacks} av {max}. Uppbyggande slag lägger till steg; vid {max} blir Sista vilan till Giftslitning",
+      "gloam": "Skymning: steg {stacks} av {max}. Vid {max} låses dina skymningsslöjeöppningar upp i öppen terräng, och nästa du kastar är GRATIS och detonerar förrådet till skuggslöjan",
+      "redline": "Röd linje: hack {stacks} av {max}. Kroppsträffar lägger till hack; Nådastöten slår {pct}% hårdare per hack och stänger fönstret. Går det ut först förloras det",
+      "veilstrikeWindow": "Skuggslöja: dina skymningsslöjeöppningar kan användas i öppen terräng från valfri vinkel, och skadan du gör ökar med {pct}%",
+      "veiledEdge": "Ditt nästa lurarslag slår dubbelt så hårt",
+      "duskEconomy": "Förmågor kostar {pct}% mindre energi",
       "increase": {
         "ap": "Erhöht Angriffskraft um {value}",
         "sp": "Ökar besvärjelsekraft med {value}",
@@ -2370,7 +2370,7 @@ export const sv_SE: EnTranslations = {
       "empty": "Inga recept kända än.",
       "resultAria": "Hantverk {name}",
       "craftedToast": "Tillverkad: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Tillverkat: {name} x{qty}",
       "insufficientMaterials": "Du har inte materialet för det.",
       "unknownRecipe": "Det receptet finns inte.",
       "comboRequirementUnmet": "Du har inte båda de hantverk som krävs på den nivå receptet kräver.",
@@ -2463,13 +2463,13 @@ export const sv_SE: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Du avförtrollar {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Du förtrollar bort {item} och får {material}.",
+      "disenchantedYieldQty": "Du förtrollar bort {item} och får {material} x{qty}.",
+      "disenchantedAlso": "Du får även tillbaka {material}.",
+      "disenchantedAlsoQty": "Du får även tillbaka {material} x{qty}.",
       "salvagedLine": "Du bärgar {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Du bärgar {material} ur {item}.",
+      "salvagedYieldQty": "Du bärgar {material} x{qty} ur {item}.",
       "enchantAppliedLine": "Du förtrollar {item} med {enchant}.",
       "notHeld": "Du har inte det föremålet.",
       "notDisenchantable": "Du kan inte avförtrylla det.",
@@ -3293,21 +3293,21 @@ export const sv_SE: EnTranslations = {
       "holy_light": "En stadig, rejäl läkning för att toppa upp en allierad eller dig själv.",
       "devotion_aura": "En varaktig självförstärkning som höjer rustningen så slag landar mjukare.",
       "judgement": "Förbrukar ditt aktiva sigill för att slå en fiende från kort avstånd.",
-      "hammer_of_wrath": "Executes a wounded enemy from range, or any enemy while your wings are active.",
-      "avenging_wrath": "Grants 10 Devotion, then doubles Devotion generated by abilities for fifteen seconds.",
-      "bastion_sweep": "Sweeps your shield through a group to seize threat and build Devotion.",
-      "oath_chain": "Drags a distant enemy into your pack and slows its escape.",
-      "veilbound_march": "Pass through a pack to mark it, blunt its damage against you, and lock in threat.",
-      "holy_shield": "Spends Devotion on an active block window, absorption, and a threat pulse.",
-      "consecration": "Claims the ground around you with sustained Holy damage and threat.",
-      "hammer_of_justice": "Stops one enemy with a short, reliable stun.",
-      "lay_on_hands": "Restores a large amount of health when an ally is close to falling.",
+      "hammer_of_wrath": "Avrättar en sårad fiende på avstånd, eller vilken fiende som helst medan dina vingar är aktiva.",
+      "avenging_wrath": "Ger 10 hängivenhet och fördubblar sedan hängivenheten som förmågor genererar i femton sekunder.",
+      "bastion_sweep": "Sveper skölden genom en grupp för att rycka åt sig hot och bygga hängivenhet.",
+      "oath_chain": "Släpar en avlägsen fiende in i din flock och bromsar dess flykt.",
+      "veilbound_march": "Gå genom en grupp för att märka den, trubba av dess skada mot dig och låsa fast hotet.",
+      "holy_shield": "Spenderar hängivenhet på ett aktivt blockfönster, absorption och en hotpuls.",
+      "consecration": "Gör anspråk på marken runt dig med ihållande helig skada och hot.",
+      "hammer_of_justice": "Stoppar en fiende med en kort, pålitlig bedövning.",
+      "lay_on_hands": "Återställer en stor mängd hälsa när en allierad är nära att falla.",
       "blessing_of_might": "Höjer ett vänligt måls attackstyrka, bra att kasta före en anstormning.",
       "divine_protection": "Ett snabbt skyddande värn för att suga upp skada när det blir tufft.",
       "raptor_strike": "Ett hårt närstridssving för när något sluter avståndet till dig.",
-      "pack_command": "Orders your companion to strike and build Pack Ferocity. Each stack makes your pet deal 10% more damage, up to 30%, before Unleash Beast spends the stacks.",
-      "stampede": "Calls three beasts to attack for 12 seconds. Use it at full Pack Ferocity so they keep the maximum damage bonus for the whole summon.",
-      "measured_shot": "A deliberate ranged shot that restores Focus for your heavier attacks.",
+      "pack_command": "Befaller din följeslagare att slå och bygga Flockvildhet. Varje stapel får ditt husdjur att göra 10% mer skada, upp till 30%, innan Släpp loss besten spenderar staplarna.",
+      "stampede": "Kallar tre bestar att attackera i 12 sekunder. Använd den vid full Flockvildhet så att de behåller den maximala skadebonusen under hela frammaningen.",
+      "measured_shot": "Ett medvetet distansskott som återställer fokus för dina tyngre attacker.",
       "aspect_of_the_hawk": "En skepnad du håller uppe för att skärpa din avståndsattackstyrka.",
       "serpent_sting": "Landar ett gift som blöder naturskada över tid.",
       "arcane_shot": "Ett omedelbart skott på avstånd för snabb extra skada.",
@@ -3326,19 +3326,19 @@ export const sv_SE: EnTranslations = {
       "power_word_shield": "Sveper in en allierad i en sköld som suger upp slag innan de landar.",
       "renew": "En läkning som tickar över tid, bra att kasta och fortsätta röra dig.",
       "lightning_bolt": "En avståndskastning av naturskada, ditt förstaval på långt håll.",
-      "chain_lightning": "Strikes one target and jumps to two nearby enemies, building one Thunder for the whole cast.",
-      "thunder_reservoir": "Banks lightning until Earthen Jolt or Faultwake can release a full-power payoff.",
+      "chain_lightning": "Träffar ett mål och hoppar till två närliggande fiender och bygger en Åska för hela kastningen.",
+      "thunder_reservoir": "Lagrar blixtar tills Jordstöten eller Jordbävningen kan frigöra en utbetalning med full kraft.",
       "rockbiter_weapon": "Besjälar ditt vapen så att varje sving landar hårdare i närstrid.",
       "healing_wave": "Din huvudsakliga läkning, en direkt botning för dig själv eller en allierad.",
       "earth_shock": "En omedelbar chock för snabb naturskada när du behöver det nu.",
       "lightning_shield": "Laddar dig så att angripare tar naturskada när de slår dig.",
       "flame_shock": "En omedelbar brand som slår direkt och fortsätter att svida över tid.",
       "galeheart_weapon": "Fyller båda vapnen med stormvind och belönar en jämn attackrytm.",
-      "warspirit_cadence": "Turns a steady weapon rhythm into Galeheart Echoes and an instant spell opportunity.",
-      "stormsurge": "Sometimes brings Ancestral Strike back early after you spend a Stormcast opportunity.",
+      "warspirit_cadence": "Förvandlar en stadig vapenrytm till Stormhjärteekon och ett tillfälle till en omedelbar besvärjelse.",
+      "stormsurge": "Ger ibland tillbaka Förfäderslaget tidigt efter att du spenderat ett Stormteckentillfälle.",
       "lifespring_weapon": "Fyller ditt vapen med läkande vatten och stärker ditt fortlöpande läkningsflöde.",
       "tidecall": "Kallar på tidvattnet och förstärker nästa följd av läkande besvärjelser.",
-      "ancestor_return": "Returns every fallen group or raid member to life after a long out-of-combat cast.",
+      "ancestor_return": "Återför varje fallen grupp- eller rädmedlem till livet efter en lång kastning utanför strid.",
       "stoneward": "Reser en laddad stensköld som omvandlar mottagen skada till läkning.",
       "primal_exaltation": "Släpper kortvarigt lös din specialiserings elementarkraft.",
       "fireball": "Din huvudsakliga eldkanon, landar ett slag och lämnar målet brinnande.",
@@ -5841,7 +5841,7 @@ export const sv_SE: EnTranslations = {
       "mana": "Mana",
       "energy": "Energi",
       "rage": "Raseri",
-      "focus": "Focus"
+      "focus": "Fokus"
     },
     "roles": {
       "warrior": "Tank / Närstrids-DPS",
@@ -6223,7 +6223,7 @@ export const sv_SE: EnTranslations = {
       "notEnoughRage": "Inte tillräckligt med raseri!",
       "notEnoughEnergy": "Inte tillräckligt med energi!",
       "notEnoughMana": "Inte tillräckligt med mana!",
-      "notEnoughDevotion": "Not enough Devotion!",
+      "notEnoughDevotion": "Inte tillräckligt med hängivenhet!",
       "notEnoughResource": "Inte tillräckligt med {resource}!",
       "notEnoughHealth": "Inte tillräckligt med hälsa.",
       "targetMustDodge": "Ditt mål måste väja undan först.",
@@ -6537,8 +6537,8 @@ export const sv_SE: EnTranslations = {
       "mana": "Mana",
       "rage": "Raseri",
       "energy": "Energi",
-      "focus": "Focus",
-      "devotion": "Devotion"
+      "focus": "fokus",
+      "devotion": "Hängivenhet"
     },
     "forms": {
       "bear": "Björn",
@@ -6915,56 +6915,56 @@ export const sv_SE: EnTranslations = {
         "description": "Låter pilar regna över målområdet i 3 sek och vållar {damage} skada var 0.5 sek på fiender som fångas i det."
       },
       "pack_command": {
-        "name": "Pack Command",
-        "description": "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit."
+        "name": "Flockbefallning",
+        "description": "Befall ditt levande husdjur att slå för 36 till 48 fysisk skada. Skadan ökar med husdjurets attackkraft. En träff återställer 20 fokus och ger 1 Flockvildhet i 30 sek, upp till 3. Varje stapel ökar all skada ditt husdjur gör med 10%. Detta slag använder de staplar du hade före träffen."
       },
       "stampede": {
-        "name": "Stampede",
-        "description": "Summon 3 beasts for 12 sec. Each attacks every 2 sec for {damage} Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed after 5 failed chances. It cannot reset while the beasts are active. (Packlord)"
+        "name": "Vilt språng",
+        "description": "Frammanar 3 bestar i 12 sek. Var och en attackerar var 2:e sek för {damage} fysisk skada. Den visade skadan inkluderar 8% av din distansattackkraft före husdjursskadebonusar. Bestarna låser Flockvildheten när de frammanas och får 10% skada per stapel. Medan Vilt språng är på nedkylning har lyckade Flockbefallningar 20% chans att återställa det, garanterat efter 5 misslyckade chanser. Det kan inte återställas medan bestarna är aktiva. (Flockherre)"
       },
       "unleash_beast": {
-        "name": "Unleash Beast",
-        "description": "Consume 3 Pack Ferocity after your pet strikes for 83 to 105 Physical damage and claps every enemy within 6 yards for 26 to 34. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 nearby enemies."
+        "name": "Släpp loss besten",
+        "description": "Förbrukar 3 Flockvildhet efter att ditt husdjur slagit för 83 till 105 fysisk skada och skakat varje fiende inom 6 meter för 26 till 34. Slaget och skakningen använder Flockvildhetens fulla husdjursskadebonus på 30% och ökar med husdjurets attackkraft. I 8 sek därefter gör husdjuret 25% mer skada, attackerar 35% snabbare och får Ondskeskott att träffa upp till 2 närliggande fiender."
       },
       "measured_shot": {
-        "name": "Measured Shot",
-        "description": "Shoot the target for {damage} Physical damage. A hit restores 20 Focus. Damage increases with Ranged Attack Power."
+        "name": "Avvägt skott",
+        "description": "Skjut målet för {damage} fysisk skada. En träff återställer 20 fokus. Skadan ökar med distansattackkraft."
       },
       "cold_focus": {
-        "name": "Cold Focus",
-        "description": "For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)"
+        "name": "Kallt fokus",
+        "description": "I 12 sek återställer Avvägt skott 50% mer fokus, och Långt drag kostar 25% mindre och kastas 30% snabbare. (Kallsiktsignatur)"
       },
       "bloodhook": {
-        "name": "Bloodhook",
-        "description": "Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)"
+        "name": "Blodkrok",
+        "description": "Storma mot en fiende och applicera Blodkrokssår som gör 34 fysisk grundskada plus 26% av din distansattackkraft över 12 sek i 4 pulser. (Fältkonstsignatur)"
       },
       "shrapnel_charge": {
-        "name": "Shrapnel Charge",
-        "description": "Hit the target for 24 to 30 Physical damage and up to 4 other enemies within 6 yards for 13 to 17. Other targets also bleed for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Direct damage increases with Ranged Attack Power."
+        "name": "Splitterladdning",
+        "description": "Träffar målet för 24 till 30 fysisk skada och upp till 4 andra fiender inom 6 meter för 13 till 17. De andra målen blöder också för 12 skada över 6 sek. Om huvudmålet bär ditt Blodkrokssår görs 1 sårpuls omedelbart. Direktskadan ökar med distansattackkraft."
       },
       "bloodtrail_assault": {
-        "name": "Bloodtrail Assault",
-        "description": "For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 nearby enemies, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards, deals 25% more base damage to its main target, and triggers 50% more wound damage."
+        "name": "Blodspårsanfall",
+        "description": "I 12 sek sprider Blodkroken ett sår med 60% styrka till upp till 2 närliggande fiender, Sårslitning befaller en husdjursattack på 18 skada, och Splitterladdningen får 2 meter, gör 25% mer grundskada på sitt huvudmål och utlöser 50% mer sårskada."
       },
       "trailbreak": {
-        "name": "Trailbreak",
-        "description": "Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
+        "name": "Spårbrott",
+        "description": "Hoppa 12 meter bakåt. Om du har Jaktfart förnyas den och laddar Återkomsten i 12 sek."
       },
       "wildheart": {
-        "name": "Wildheart",
-        "description": "Immediately restore 30% of your maximum health."
+        "name": "Vildhjärta",
+        "description": "Återställer omedelbart 30% av din maximala hälsa."
       },
       "shellskin": {
-        "name": "Shellskin",
-        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+        "name": "Skalhud",
+        "description": "Minskar skadan du tar med 60% i 8 sek, men hindrar attacker medan den är aktiv."
       },
       "frostjaw_trap": {
-        "name": "Frostjaw Trap",
-        "description": "Place a trap at the selected enemy or at your feet. It arms after 0.75 sec and lasts 30 sec. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec."
+        "name": "Frostkäftsfälla",
+        "description": "Placera en fälla vid den valda fienden eller vid dina fötter. Den osäkras efter 0,75 sek och varar 30 sek. Den första fienden som utlöser den rotas i 3 sek, och fiender inom 4 meter saktas ned med 50% i 4 sek."
       },
       "pack_rally": {
-        "name": "Pack Rally",
-        "description": "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec."
+        "name": "Flocksamling",
+        "description": "Anta Springarens skepnad och samla närliggande allierade med 30% förflyttningshastighet och 10% attack- och kasthastighet i 10 sek."
       },
       "hurricane": {
         "name": "Orkan",
@@ -7275,116 +7275,116 @@ export const sv_SE: EnTranslations = {
         "description": "Läker ett vänligt mål för {damage}."
       },
       "divine_ascension": {
-        "name": "Divine Ascension",
-        "description": "Consume 20 Devotion to gain 5 Ascension charges for up to 45 sec. Marked abilities consume one charge and gain an additional effect."
+        "name": "Gudomlig upphöjelse",
+        "description": "Förbrukar 20 hängivenhet för att få 5 upphöjelseladdningar i upp till 45 sek. Märkta förmågor förbrukar en laddning och får en extra effekt."
       },
       "aura_mastery": {
-        "name": "Sacred Concord",
-        "description": "For 8 sec, empower every active Devotion and Requital Aura in your group. Bastion Devotion reduces damage by 15%; Requital deals 15 Holy damage. Multiple uses refresh instead of stacking."
+        "name": "Helig endräkt",
+        "description": "Förstärker i 8 sek varje aktiv hängivenhet och vedergällningsaura i din grupp. Bastionens hängivenhet minskar skadan med 15%; Vedergällning gör 15 helig skada. Flera användningar förnyar i stället för att staplas."
       },
       "devotion_ward": {
-        "name": "Bastion Devotion",
-        "description": "Reduce damage taken by you and party members by 5% until death or replacement. Only this aura and Requital Aura replace each other; Radiant, Dawn, and Grace Devotion coexist."
+        "name": "Bastionens hängivenhet",
+        "description": "Minskar skadan du och gruppmedlemmarna tar med 5% till döden eller ersättning. Bara denna aura och Vedergällningsauran ersätter varandra; Strålande, Gryningens och Nådens hängivenhet samexisterar."
       },
       "hammer_of_grace": {
-        "name": "Hammer of Grace",
-        "description": "Instantly hurl a holy hammer at an enemy within 20 m for {damage}, restoring 70 mana, healing yourself for 50% of damage dealt, and generating 1 Devotion when it deals damage. Solar Reprisal lets Hammer of Grace ignore its cooldown and heal you for 100% of damage dealt."
+        "name": "Nådens hammare",
+        "description": "Slungar omedelbart en helig hammare mot en fiende inom 20 m för {damage}, återställer 70 mana, läker dig för 50% av skadan och genererar 1 hängivenhet när den gör skada. Solvedergällning låter Nådens hammare ignorera sin nedkylning och läka dig för 100% av skadan."
       },
       "hushbrand": {
-        "name": "Hushbrand",
-        "description": "Interrupts spellcasting and prevents spells from that school for 4 sec."
+        "name": "Tystnadsmärke",
+        "description": "Avbryter besvärjelser och hindrar besvärjelser från den skolan i 4 sek."
       },
       "guardian_covenant": {
-        "name": "Guardian Covenant",
-        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
+        "name": "Väktarens förbund",
+        "description": "Skyddar ett vänligt mål och dig själv och minskar skadan ni tar med 20% i 8 sek. Väljer dig som standard när inget vänligt mål är valt."
       },
       "solar_step": {
-        "name": "Solar Step",
-        "description": "Increase your movement speed by 150% for 2 sec."
+        "name": "Solsteg",
+        "description": "Ökar din förflyttningshastighet med 150% i 2 sek."
       },
       "solar_invocation": {
-        "name": "Solar Invocation",
-        "description": "Instantly heal an ally for {damage} or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much."
+        "name": "Solåkallan",
+        "description": "Läker omedelbart en allierad för {damage} eller gör måttlig helig skada på en fiende. Båda användningarna genererar 1 hängivenhet. Under Upphöjelse läker en läkande kastning även allierade spelare inom 10 m av målet för hälften."
       },
       "radiant_devotion": {
-        "name": "Radiant Devotion",
-        "description": "Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion, but coexists with Devotions from other Paladins."
+        "name": "Strålande hängivenhet",
+        "description": "Ökar besvärjelsekraften hos dig och gruppmedlemmarna med 20 i 30 min. Ersätter din egen Gryningens eller Nådens hängivenhet, men samexisterar med hängivenheter från andra paladiner."
       },
       "dawn_devotion": {
-        "name": "Dawn Devotion",
-        "description": "Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion, but coexists with Devotions from other Paladins and with Warrior shouts."
+        "name": "Gryningens hängivenhet",
+        "description": "Ökar attackkraften hos dig och gruppmedlemmarna med 40 i 30 min. Ersätter din egen Strålande eller Nådens hängivenhet, men samexisterar med hängivenheter från andra paladiner och med krigarrop."
       },
       "grace_devotion": {
-        "name": "Grace Devotion",
-        "description": "You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min. Replaces your own Radiant or Dawn Devotion, but coexists with Devotions from other Paladins."
+        "name": "Nådens hängivenhet",
+        "description": "Du och gruppmedlemmarna återfår 15 mana var 5:e sek och betalar 3% mindre mana i 30 min. Ersätter din egen Strålande eller Gryningens hängivenhet, men samexisterar med hängivenheter från andra paladiner."
       },
       "recall_the_fallen": {
-        "name": "Recall the Fallen",
-        "description": "Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group."
+        "name": "Kalla de fallna",
+        "description": "Återför en död gruppmedlem till livet med 35% hälsa och mana. En Solhelare på nivå 16 eller högre kallar i stället tillbaka varje fallen medlem i gruppen."
       },
       "beacon_of_light": {
-        "name": "Beacon of Light",
-        "description": "Mark one group member as your Beacon of Light. 50% of your effective direct healing on another group member within 60 m also heals the Beacon. Area and periodic healing do not transfer. Lasts until either of you dies."
+        "name": "Ljusets båk",
+        "description": "Märk en gruppmedlem som din Ljusets båk. 50% av din effektiva direktläkning på en annan gruppmedlem inom 60 m läker även båken. Ytläkning och periodisk läkning överförs inte. Varar tills någon av er dör."
       },
       "final_edict": {
-        "name": "Final Edict",
-        "description": "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Holy explosion around you."
+        "name": "Sista påbudet",
+        "description": "Levererar ett krossande vapenslag och genererar 1 hängivenhet när det gör skada. En lyckad träff minskar Gryningsfalls återstående nedkylning med 2 sek. Lyckade autoattacker och träffar med Sista påbudet har 15% chans att ge Gryningens vrede i 8 sek. Upphöjelse frigör dessutom en helig explosion runt dig."
       },
       "dawnfall": {
-        "name": "Dawnfall",
-        "description": "Deal {damage} Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict's remaining cooldown by 2 sec. Ascension increases its damage and radius."
+        "name": "Gryningsfall",
+        "description": "Gör {damage} helig skada på närliggande fiender och genererar 1 hängivenhet. Att träffa minst en fiende minskar Sista påbudets återstående nedkylning med 2 sek. Upphöjelse ökar dess skada och radie."
       },
       "sun_gods_verdict": {
-        "name": "Verdict of the Sun God",
-        "description": "Judge an enemy beneath the Verdict of the Sun God for 30 sec. Final Edict and Dawnfall inscribe one charge on a successful hit. The ability that lands the third charge dictates the sentence: Final Edict unleashes devastating damage on the condemned; Dawnfall detonates the verdict, damaging and stunning nearby enemies for 1.5 sec."
+        "name": "Solgudens dom",
+        "description": "Dömer en fiende under Solgudens dom i 30 sek. Sista påbudet och Gryningsfall inskriver en laddning vid varje lyckad träff. Förmågan som sätter den tredje laddningen dikterar domen: Sista påbudet släpper lös förödande skada på den dömde; Gryningsfall detonerar domen och skadar och bedövar närliggande fiender i 1,5 sek."
       },
       "valkyrs_calling": {
-        "name": "Valkyr's Calling",
-        "description": "Ascend into the air, becoming immune to damage as you fly toward the enemy. After 2 sec, descend upon the target area for {damage} Holy damage and generate 1 Devotion. Ascension increases the impact damage by 50% and consumes 1 charge."
+        "name": "Valkyrians kallelse",
+        "description": "Stig upp i luften och bli immun mot skada medan du flyger mot fienden. Efter 2 sek störtar du ned över målområdet för {damage} helig skada och genererar 1 hängivenhet. Upphöjelse ökar nedslagsskadan med 50% och förbrukar 1 laddning."
       },
       "faithforged_guard": {
-        "name": "Debt of Light",
-        "description": "For 8 sec, the next enemy hit against you is answered: up to {buff} damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered. Ascension raises the amount it can answer by 50%."
+        "name": "Ljusets skuld",
+        "description": "I 8 sek besvaras nästa fiendeträff mot dig: upp till {buff} skada nekas och återförs till angriparen som helig skada, och du får 1 hängivenhet. Endast ett slag besvaras. Upphöjelse höjer mängden den kan besvara med 50%."
       },
       "mercy_lance": {
-        "name": "Mercy Lance",
-        "description": "Deal {damage} Holy damage to an enemy and generate 1 Devotion when it deals damage. During Ascension, it consumes 1 charge to guarantee a critical hit."
+        "name": "Barmhärtighetens lans",
+        "description": "Gör {damage} helig skada på en fiende och genererar 1 hängivenhet när den gör skada. Under Upphöjelse förbrukar den 1 laddning för att garantera en kritisk träff."
       },
       "sacred_form": {
-        "name": "Sacred Form",
-        "description": "Enter a sacred state until death, increasing healing by 10%, spell critical chance by 5%, and reducing threat generated by 50%. Sunmender only."
+        "name": "Helig gestalt",
+        "description": "Går in i ett heligt tillstånd till döden, ökar läkning med 10% och kritisk besvärjelsechans med 5%, och minskar genererat hot med 50%. Endast för Solhelare."
       },
       "dawns_embrace": {
-        "name": "Dawn's Embrace",
-        "description": "Deliver a powerful heal and generate 1 Devotion. Radiant Resonance reduces its mana cost by 50% and cast time to 1.5 sec. Ascension makes it instant and increases its healing by 35%."
+        "name": "Gryningens famn",
+        "description": "Levererar en kraftfull läkning och genererar 1 hängivenhet. Strålande resonans minskar dess manakostnad med 50% och kasttiden till 1,5 sek. Upphöjelse gör den omedelbar och ökar dess läkning med 35%."
       },
       "radiant_chorus": {
-        "name": "Radiant Chorus",
-        "description": "Heal nearby allies for {damage} and generate 1 Devotion. Effectively healing at least 2 allies grants Radiant Resonance: your next Mending Light is instant, or your next Dawn's Embrace costs 50% less mana and casts in 1.5 sec. Ascension increases Radiant Chorus healing and radius."
+        "name": "Strålande kör",
+        "description": "Läker närliggande allierade för {damage} och genererar 1 hängivenhet. Att effektivt läka minst 2 allierade ger Strålande resonans: ditt nästa Lagande ljus blir omedelbart, eller din nästa Gryningens famn kostar 50% mindre mana och kastas på 1,5 sek. Upphöjelse ökar Strålande körs läkning och radie."
       },
       "life_covenant": {
-        "name": "Life Covenant",
-        "description": "Reduce an ally's damage taken by 40% for 6 sec. During Ascension it also grants a 120-point shield without consuming a charge."
+        "name": "Livets förbund",
+        "description": "Minskar skadan en allierad tar med 40% i 6 sek. Under Upphöjelse ger den även en sköld på 120 poäng utan att förbruka en laddning."
       },
       "aegis_first_dawn": {
-        "name": "Aegis of the First Dawn",
-        "description": "Channel for 5 sec, creating a 10 meter holy dome. Allies inside are healed every second and take 50% less damage. Completing the channel releases a final heal and grants 30% movement speed for 4 sec."
+        "name": "Första gryningens egid",
+        "description": "Kanalisera i 5 sek och skapa en helig kupol på 10 meter. Allierade inuti läks varje sekund och tar 50% mindre skada. Att fullborda kanaliseringen frigör en sista läkning och ger 30% förflyttningshastighet i 4 sek."
       },
       "vowkeeper_strike": {
-        "name": "Vowkeeper Strike",
-        "description": "Strike with high threat and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal empowers your next Sunward Disc, Hammer of Grace, or Mending Light. Ascension also grants a small absorption shield."
+        "name": "Edvaktarens slag",
+        "description": "Slår med hög hotnivå och genererar 1 hängivenhet. Ett lyckat slag har 20% chans att ge Solvedergällning i 8 sek; varje lyckad block har 25%. Solvedergällning förstärker din nästa Solskiva, Nådens hammare eller Lagande ljus. Upphöjelse ger även en liten absorptionssköld."
       },
       "bastion_rite": {
-        "name": "Bastion Rite",
-        "description": "Reduce physical damage taken by 20% and increase block chance by 20% for 6 sec. Ascension extends the duration to 10 sec."
+        "name": "Bastionens rit",
+        "description": "Minskar fysisk skada du tar med 20% och ökar blockchansen med 20% i 6 sek. Upphöjelse förlänger varaktigheten till 10 sek."
       },
       "sunward_disc": {
-        "name": "Sunward Disc",
-        "description": "Requires a shield. Hurl a radiant disc that strikes and then bounces between nearby enemies. Each damaging impact generates 1 Devotion. Solar Reprisal makes Sunward Disc cost no mana, ignore its cooldown, and deal 20% more damage. Ascension empowers 5 bounces."
+        "name": "Solskiva",
+        "description": "Kräver en sköld. Slungar en strålande skiva som träffar och sedan studsar mellan närliggande fiender. Varje skadande nedslag genererar 1 hängivenhet. Solvedergällning gör att Solskivan inte kostar mana, ignorerar sin nedkylning och gör 20% mer skada. Upphöjelse förstärker 5 studsar."
       },
       "sacred_challenge": {
-        "name": "Sacred Goad",
-        "description": "Compel an enemy to attack you. During Ascension it also reduces all damage received by 15% for 4 sec without consuming a charge."
+        "name": "Helig sporre",
+        "description": "Tvingar en fiende att attackera dig. Under Upphöjelse minskar den även all skada du tar med 15% i 4 sek utan att förbruka en laddning."
       },
       "devotion_aura": {
         "name": "Ståndaktig aura",
@@ -7423,20 +7423,20 @@ export const sv_SE: EnTranslations = {
         "description": "Inviger marken under dig och svedjar närliggande fiender för {damage} helig skada varannan sek i 10 sek."
       },
       "bastion_sweep": {
-        "name": "Bastion Sweep",
-        "description": "Sweep your equipped shield through enemies in a 180 degree frontal arc for {damage} Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m."
+        "name": "Bastionssvep",
+        "description": "Svep din utrustade sköld genom fiender i en 180 graders frontal båge för {damage} helig skada med hög hotnivå och generera 1 hängivenhet. Upphöjelse ökar skadan med 30% och radien till 8 m."
       },
       "oath_chain": {
-        "name": "Oath Chain",
-        "description": "Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy."
+        "name": "Edkedja",
+        "description": "Binder omedelbart en avlägsen fiende med en helig kedja. Fienden färdas mot dig med 18 m per sekund tills den når 3 m och saktas sedan ned med 50% i 4 sek. Under Upphöjelse binder den en andra närliggande fiende."
       },
       "veilbound_march": {
-        "name": "Veilbound March",
-        "description": "Become ethereal for 4 sec, gaining 40% movement speed and 30% armor and becoming immune to roots, slows, and displacement. Enemies you pass through are Veil Marked for 6 sec, taking Holy damage each second, dealing 20% less damage to you, and generating extra threat. The first mark grants 1 Devotion. When the march ends, nearby marked enemies take a final burst. Ascension increases the burst by 50% and lightly pulls them toward you."
+        "name": "Slöjmarsch",
+        "description": "Bli eterisk i 4 sek, få 40% förflyttningshastighet och 30% rustning och bli immun mot rötter, inbromsningar och förflyttning. Fiender du passerar genom får Slöjmärket i 6 sek: de tar helig skada varje sekund, gör 20% mindre skada på dig och genererar extra hot. Det första märket ger 1 hängivenhet. När marschen slutar tar närliggande märkta fiender en sista urladdning. Upphöjelse ökar urladdningen med 50% och drar dem lätt mot dig."
       },
       "veilbound_mark": {
-        "name": "Veil Mark",
-        "description": "Takes Holy damage each second, deals 20% less damage to the Paladin who applied the mark, and generates additional threat toward that Paladin."
+        "name": "Slöjmärke",
+        "description": "Tar helig skada varje sekund, gör 20% mindre skada på paladinen som satte märket och genererar extra hot mot den paladinen."
       },
       "righteous_fury": {
         "name": "Brinnande ed",
@@ -7479,12 +7479,12 @@ export const sv_SE: EnTranslations = {
         "description": "Motanfall efter att målet väjt undan för vapenskada plus {damage}. Kan inte väjas undan."
       },
       "hunting_momentum": {
-        "name": "Hunting Momentum",
-        "description": "Passive: Gutting Strike grants 1 Hunting Momentum for 8 sec, up to 3. At 3 stacks, Woundrend deals 45% more strike damage and consumes the stacks. (Fieldcraft)"
+        "name": "Jaktfart",
+        "description": "Passiv: Rensarslaget ger 1 Jaktfart i 8 sek, upp till 3. Vid 3 staplar gör Sårslitning 45% mer slagskada och förbrukar staplarna. (Fältkonst)"
       },
       "fieldcraft_reentry": {
-        "name": "Armed Re-entry",
-        "description": "Passive: Trailbreak refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)"
+        "name": "Beväpnad återkomst",
+        "description": "Passiv: Spårbrott förnyar Jaktfarten och laddar ditt nästa Rensarslag eller Blodkrok i 12 sek. Rensarslaget gör 15% mer skada per stapel. Blodkroken gör 18 till 24 extra fysisk skada, ökad med 15% per stapel och av din distansattackkraft. Vid 3 staplar förbrukar endera attacken Jaktfarten. (Fältkonst)"
       },
       "wing_clip": {
         "name": "Fjättrande hugg",
@@ -7551,8 +7551,8 @@ export const sv_SE: EnTranslations = {
         "description": "Slungar en blixt för {damage} naturskada."
       },
       "thunder_reservoir": {
-        "name": "Thunder Reservoir",
-        "description": "Passive: Arc Bolt and Skybranch grant Thunder, up to 5. At 5 Thunder, Earthen Jolt deals 125% more damage or Faultwake deals 100% more damage, then consumes all Thunder. (Thundercall)"
+        "name": "Åskreservoar",
+        "description": "Passiv: Bågblixten och Gaffelblixten ger Åska, upp till 5. Vid 5 Åska gör Jordstöten 125% mer skada eller Jordbävningen 100% mer, och sedan förbrukas all Åska. (Åskkallelse)"
       },
       "rockbiter_weapon": {
         "name": "Stenbundet vapen",
@@ -7779,36 +7779,36 @@ export const sv_SE: EnTranslations = {
         "description": "Läker ett vänligt mål för en stor mängd och hoppar sedan till upp till 2 ytterligare allierade i närheten. Varje hopp läker för 50% mindre. (Återställningssignatur)"
       },
       "galeheart_weapon": {
-        "name": "Galeheart Weapon",
-        "description": "Imbue both weapons for 30 min, enabling Warspirit Cadence."
+        "name": "Stormhjärtevapen",
+        "description": "Förtrollar båda vapnen i 30 min och möjliggör Krigsandens kadens."
       },
       "warspirit_cadence": {
-        "name": "Warspirit Cadence",
-        "description": "Passive: Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)"
+        "name": "Krigsandens kadens",
+        "description": "Passiv: var 3:e landad vapenattack utlöser 2 Stormhjärteekon för 50% naturskada och ger ett Stormtecken i 12 sek. Stormtecknet gör din nästa Bågblixt, Stöt eller Lagande vatten omedelbar och sänker manakostnaden med 50%. Förfäderslaget räknas som 2 attacker. (Krigsande)"
       },
       "stormsurge": {
-        "name": "Stormsurge",
-        "description": "Passive: While Ancestral Strike is on cooldown, consuming Stormcast has a 25% chance to reset it. If the first 3 chances fail, the 4th always resets it. (Warspirit)"
+        "name": "Stormsvall",
+        "description": "Passiv: medan Förfäderslaget är på nedkylning har förbrukandet av ett Stormtecken 25% chans att återställa det. Om de 3 första chanserna misslyckas återställer den 4:e det alltid. (Krigsande)"
       },
       "lifespring_weapon": {
-        "name": "Lifespring Weapon",
-        "description": "Imbue your weapon for 30 min. Mending Waters and Tidecall add 20% more healing to Mending Current."
+        "name": "Livskällevapen",
+        "description": "Förtrollar ditt vapen i 30 min. Lagande vatten och Tidvattenskallelse lägger till 20% mer läkning till Lagningsströmmen."
       },
       "unleash_weapon": {
-        "name": "Unleash Weapon",
-        "description": "Unleash your active weapon enchant. Pyrebrand deals 54 to 64 Fire damage, gains 30% of Spell Power, and grants 2 Thunder. Galeheart strikes with your weapon, advances Warspirit Cadence, and grants 20% attack speed for 6 sec. Stonebound strikes for 75% weapon damage, forces the target to attack you, and reduces damage taken by 20% for 4 sec. Lifespring consumes your Mending Current, heals for 125% of its remaining healing, and reduces the next hit within 8 sec by 50% of the health restored."
+        "name": "Släpp loss vapnet",
+        "description": "Släpper loss ditt vapens aktiva förtrollning. Eldmärket gör 54 till 64 eldskada, får 30% av besvärjelsekraften och ger 2 Åska. Stormhjärtat slår med ditt vapen, driver Krigsandens kadens framåt och ger 20% attackhastighet i 6 sek. Stenbundet slår för 75% vapenskada, tvingar målet att attackera dig och minskar skadan du tar med 20% i 4 sek. Livskällan förbrukar din Lagningsström, läker för 125% av dess återstående läkning och minskar nästa träff inom 8 sek med 50% av den återställda hälsan."
       },
       "primal_exaltation": {
-        "name": "Primal Exaltation",
-        "description": "For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)"
+        "name": "Urtida upphöjelse",
+        "description": "I 12 sek kastas Åskkallelsens Bågblixt och Gaffelblixt 50% snabbare, och Bågblixten ger 2 Åska; Krigsanden utlöser sin kadens var 2:a vapenträff; Andelagningen lägger till 50% mer läkning till Lagningsströmmen. (Shamantalang)"
       },
       "stoneward": {
-        "name": "Stoneward",
-        "description": "Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)"
+        "name": "Stenvärn",
+        "description": "Skyddar en allierad i 60 sek med 6 laddningar. Skada förbrukar en laddning för att läka 5% av maxhälsan, en gång var 3:e sek. (Shamantalang)"
       },
       "tidecall": {
-        "name": "Tidecall",
-        "description": "Heal a friendly target for 58 to 72. The heal increases with Spell Power. Add the same healing calculated before overhealing to Mending Current, up to 30% of the target's maximum health."
+        "name": "Tidvattenskallelse",
+        "description": "Läker ett vänligt mål för 58 till 72. Läkningen ökar med besvärjelsekraft. Lägger till samma läkning beräknad före överläkning till Lagningsströmmen, upp till 30% av målets maxhälsa."
       },
       "metamorphosis": {
         "name": "Metamorfos",
@@ -8195,8 +8195,8 @@ export const sv_SE: EnTranslations = {
         "description": "Spolar tillbaka tidslinjen för varje fallen medlem i din grupp eller raid och återupplivar dem vid kroppen med 30% hälsa och mana. Kan inte användas i strid. (Kronomanti)"
       },
       "ancestor_return": {
-        "name": "Ancestors' Return",
-        "description": "Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)"
+        "name": "Förfädernas återkomst",
+        "description": "Kallar varje fallen medlem i din grupp eller räd tillbaka till livet vid sin kropp med 30% hälsa och mana. Kan inte kastas i strid. (Andelagning)"
       },
       "temporal_rewind": {
         "name": "Tillbakaspolning",
@@ -8315,28 +8315,28 @@ export const sv_SE: EnTranslations = {
         "description": "Slukar en magisk effekt (en gynnsam från en fiende eller en skadlig från en allierad) och helar dig med 6 % av din maximala hälsa."
       },
       "veilstep": {
-        "name": "Veilstep",
-        "description": "Steps through the veil in the direction you are facing."
+        "name": "Slöjsteg",
+        "description": "Kliver genom slöjan i den riktning du blickar."
       },
       "scouring_mercy": {
-        "name": "Scouring Mercy",
-        "description": "Deal 72 to 84 Holy damage to an enemy or heal a friendly target for 130 to 155. Both amounts increase with Spell Power. Damage also heals each Doctrine-linked ally for 30%, or the lowest-health party member for 15% if no ally is linked. (Doctrine signature)"
+        "name": "Rensande nåd",
+        "description": "Gör 72 till 84 helig skada på en fiende eller läker ett vänligt mål för 130 till 155. Båda beloppen ökar med besvärjelsekraft. Skadan läker även varje läroförbunden allierad för 30%, eller gruppmedlemmen med lägst hälsa för 15% om ingen allierad är förbunden. (Lärosignatur)"
       },
       "seraphic_vigil": {
-        "name": "Seraphic Vigil",
-        "description": "Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)"
+        "name": "Serafisk vaka",
+        "description": "Skyddar en allierad i 30 sek. Den första träffen som för denne under 35% hälsa förbrukar Vakan och läker denne för 180. (Välsignelsesignatur)"
       },
       "summon_tithefiend": {
-        "name": "Call Tithefiend",
-        "description": "Consume all Gloomtithe to summon a Tithefiend for 6, 8, 10, 12, or 15 sec at 1 to 5 stacks. It attacks every 2 sec for 20 to 24 Shadow damage, plus 8 per extra stack. Five stacks make it larger and increase its damage by 25%. Its damage increases with your Spell Power. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)"
+        "name": "Frammana tiondedemon",
+        "description": "Förbrukar all Dysterhetstionde för att frammana en tiondedemon i 6, 8, 10, 12 eller 15 sek vid 1 till 5 staplar. Den attackerar var 2:e sek för 20 till 24 skuggskada, plus 8 per extra stapel. Vid fem staplar blir den större och dess skada ökar med 25%. Dess skada ökar med din besvärjelsekraft. Den föredrar din Bildstod. Varje träff återställer 1% av maxmanan och ekar 15% av skadan till upp till 3 andra fiender med din Förfallets klagosång. (Aftonsångssignatur)"
       },
       "martyrs_aegis": {
-        "name": "Martyr's Aegis",
-        "description": "Reduces one ally incoming damage by 40% for 8 sec."
+        "name": "Martyrens egid",
+        "description": "Minskar skadan en allierad tar med 40% i 8 sek."
       },
       "choir_of_deliverance": {
-        "name": "Choir of Deliverance",
-        "description": "Channels for 6 sec, healing nearby party members every 2 sec."
+        "name": "Befrielsens kör",
+        "description": "Kanaliserar i 6 sek och läker närliggande gruppmedlemmar var 2:e sek."
       },
       "bear_charge": {
         "name": "Bruinrusning",
@@ -10940,12 +10940,12 @@ export const sv_SE: EnTranslations = {
         }
       },
       "q_divine_tome": {
-        "title": "The Dawnbound Tome",
-        "text": "The Light does not rest in you quietly, {playerName}. I have watched you lay the dead to peace, and I believe you are ready for what few paladins are ever taught: the Rite of Recall, by which a fallen soul is called back to the living. Its words are kept in the Dawnbound Tome, here in my keeping, but a book is no blessing while the restless dead still walk this ground. Return 6 more Restless Bones to the earth, and I will begin to teach you.",
-        "completion": "The chapel yard grows quiet. You are ready for the words, {playerName}, but the Rite of Recall cannot be spoken in a warm chapel. It must be sung where the veil between life and death wears thin. I mean to carry the Tome north into the Mirefen Marsh. Follow me there, and we will finish this.",
+        "title": "Gryningsbundna tomen",
+        "text": "Ljuset vilar inte tyst i dig, {playerName}. Jag har sett dig lägga de döda till ro, och jag tror att du är redo för det som få paladiner någonsin får lära sig: Återkallelsens rit, genom vilken en fallen själ kallas tillbaka till de levande. Dess ord förvaras i Gryningsbundna tomen, här i min vård, men en bok är ingen välsignelse så länge de rastlösa döda ännu vandrar på denna mark. Återlämna 6 Rastlösa ben till jorden, så börjar jag undervisa dig.",
+        "completion": "Kapellgården blir tyst. Du är redo för orden, {playerName}, men Återkallelsens rit kan inte uttalas i ett varmt kapell. Den måste sjungas där slöjan mellan liv och död tunnas ut. Jag ämnar bära tomen norrut till Mirefenkärret. Följ mig dit, så avslutar vi detta.",
         "objectives": {
           "0": {
-            "label": "Restless Bones laid to rest"
+            "label": "Rastlösa ben lagda till ro"
           }
         }
       },
@@ -11106,12 +11106,12 @@ export const sv_SE: EnTranslations = {
         }
       },
       "q_rite_of_redemption": {
-        "title": "The Rite of Recall",
-        "text": "So you followed me into the mire, {playerName}. Good. I have the Dawnbound Tome here, and this drowned ground is where its words belong: nowhere is the veil between life and death thinner than a place where the dead will not stay buried. But the drowned would drag your voice down mid-verse. Clear a space fit for the rite: put 8 of the Drowned Dead to rest, and we will consecrate it together.",
-        "completion": "Kneel, {playerName}, and read the words aloud. There. Do you feel it? The Light no longer only mends the living in your hands, it can summon back those who have crossed over. Use it wisely. A soul called back to a hopeless fight is a cruelty, not a mercy. Rise, Redeemer.",
+        "title": "Återkallelsens rit",
+        "text": "Så du följde mig ut i dyn, {playerName}. Bra. Jag har Gryningsbundna tomen här, och denna dränkta mark är där dess ord hör hemma: ingenstans är slöjan mellan liv och död tunnare än där de döda inte stannar begravda. Men de dränkta skulle dra ned din röst mitt i versen. Röj en plats värdig riten: lägg 8 av de Dränkta döda till ro, så inviger vi den tillsammans.",
+        "completion": "Knäböj, {playerName}, och läs orden högt. Där. Känner du det? Ljuset lagar inte längre bara de levande i dina händer, det kan kalla tillbaka dem som gått över. Använd det vist. En själ som kallas tillbaka till en hopplös strid är en grymhet, inte en nåd. Res dig, Återlösare.",
         "objectives": {
           "0": {
-            "label": "Drowned Dead laid to rest"
+            "label": "Dränkta döda lagda till ro"
           }
         }
       },

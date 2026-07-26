@@ -241,7 +241,7 @@ export const id_ID: EnTranslations = {
     "hud": {
       "lowMana": "Mana Rendah",
       "lowEnergy": "Energi Rendah",
-      "lowFocus": "Low Focus"
+      "lowFocus": "Fokus rendah"
     },
     "talents": {
       "title": "Talenta",
@@ -749,12 +749,12 @@ export const id_ID: EnTranslations = {
       "resting": "Beristirahat"
     },
     "paladin": {
-      "devotion": "Devotion",
-      "devotionValue": "Devotion {value} of {max}",
-      "devotionAscensionCharges": "Devotion {value} of {max}. Ascension {charges} charges.",
-      "devotionAscensionLast": "Devotion {value} of {max}. Ascension final charge.",
-      "ascensionLastAnnouncement": "Ascension final charge",
-      "ascensionSpenderAria": "Action slot {slot}: {ability}. Consumes one Ascension charge."
+      "devotion": "Pengabdian",
+      "devotionValue": "Pengabdian {value} dari {max}",
+      "devotionAscensionCharges": "Pengabdian {value} dari {max}. Kenaikan: {charges} muatan.",
+      "devotionAscensionLast": "Pengabdian {value} dari {max}. Kenaikan: muatan terakhir.",
+      "ascensionLastAnnouncement": "Kenaikan: muatan terakhir",
+      "ascensionSpenderAria": "Slot aksi {slot}: {ability}. Menghabiskan satu muatan Kenaikan."
     },
     "abilityScaling": {
       "bonus": "(+{value})"
@@ -1590,8 +1590,8 @@ export const id_ID: EnTranslations = {
     "auraEffect": {
       "dot": "Memberikan {value} kerusakan {school} setiap {interval} dtk",
       "hot": "Memulihkan {value} kesehatan setiap {interval} dtk",
-      "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",
-      "mendingCurrentPercent": "Stores healing equal to {pct}% of maximum health for Cascading Mend",
+      "mendingCurrent": "Menyimpan {value} penyembuhan, dilepaskan seiring waktu atau dihabiskan oleh Tambalan Bertingkat",
+      "mendingCurrentPercent": "Menyimpan penyembuhan setara {pct}% nyawa maksimum untuk Tambalan Bertingkat",
       "absorb": "Menyerap {value} kerusakan",
       "healAbsorb": "Menyerap {value} penyembuhan masuk",
       "thorns": "Inflige {value} de daño de {school} a los atacantes",
@@ -1605,7 +1605,7 @@ export const id_ID: EnTranslations = {
       "dmgDoneReduce": "Mengurangi kerusakan yang diberikan sebesar {pct}%",
       "heatingUp": "Serangan kritis pembangun Api berturutan berikutmu memberikan Hot Streak; pembangun yang tidak kritis menghapus Heating Up",
       "elementalConvergencePrimed": "Mantra berikutmu dari sekolah elemen lain memberikan Konvergensi Elemen",
-      "hunterFerocity": "{stacks} Pack Ferocity: your pet deals {pct}% more damage",
+      "hunterFerocity": "{stacks} Keganasan Kawanan: hewan peliharaanmu memberi {pct}% lebih banyak kerusakan",
       "battleStance": "Kuda-kuda Tempur: penghasilan amarah 10% lebih banyak",
       "berserkerStance": "Kuda-kuda Berserker: kritis 3% lebih sering dan menghantam 3% lebih keras",
       "crit": "Meningkatkan peluang serangan kritis sebesar {pct}%",
@@ -1628,15 +1628,15 @@ export const id_ID: EnTranslations = {
       "freeCast": "Rapalan berikutmu tidak membutuhkan biaya",
       "instantCast": "Mantra berikutmu yang memiliki waktu rapalan menjadi seketika",
       "cheapCast": "Mantra berikutmu menghabiskan {pct}% lebih sedikit mana",
-      "radiantResonance": "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
-      "solarReprisal": "Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant",
-      "dawnsWrath": "HoW: all HP · +1 use · CD 0 · +{pct}% DMG",
-      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
-      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
-      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
-      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
-      "veiledEdge": "Your next Lurker's Strike strikes for double",
-      "duskEconomy": "Abilities cost {pct}% less energy",
+      "radiantResonance": "Cahaya Pemulih berikutnya menjadi seketika, atau Pelukan Fajar berikutnya menghabiskan {pct}% lebih sedikit mana dan dirapal dalam {castTime} dtk",
+      "solarReprisal": "Cakram Surya berikutnya tidak menghabiskan mana, mengabaikan jeda, dan memberi {pct}% lebih banyak kerusakan; Palu Karunia mengabaikan jedanya dan menyembuhkanmu sebesar 100% kerusakan yang diberikan; atau Cahaya Pemulih menjadi seketika",
+      "dawnsWrath": "PM: berapa pun nyawa · +1 penggunaan · Jeda 0 · +{pct}% kerusakan",
+      "venomRitual": "Ritual Bisa: tahap {stacks} dari {max}. Serangan penumpuk menambah tahap; pada {max}, Tidur Abadi berubah menjadi Robekan Bisa",
+      "gloam": "Remang: tahap {stacks} dari {max}. Pada {max}, pembuka Tabir Senjamu terbuka di area terbuka, dan yang berikutnya dilempar GRATIS serta meledakkan simpanan menjadi tabir bayangan",
+      "redline": "Garis Merah: takik {stacks} dari {max}. Pukulan Badan menambah takik; Pukulan Penghabisan menghantam {pct}% lebih keras per takik dan menutup jendela. Habis lebih dulu berarti hilang",
+      "veilstrikeWindow": "Tabir Bayangan: pembuka Tabir Senjamu dapat dipakai di area terbuka dari sudut mana pun, dan kerusakan yang kamu beri meningkat {pct}%",
+      "veiledEdge": "Serangan Pengintai berikutnya menghantam dua kali lipat",
+      "duskEconomy": "Kemampuan menghabiskan {pct}% lebih sedikit energi",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "sp": "Meningkatkan daya mantra sebesar {value}",
@@ -2370,7 +2370,7 @@ export const id_ID: EnTranslations = {
       "empty": "Belum ada resep yang diketahui.",
       "resultAria": "Kerajinan {name}",
       "craftedToast": "Dibuat: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Dibuat: {name} x{qty}",
       "insufficientMaterials": "Anda tidak memiliki bahan untuk itu.",
       "unknownRecipe": "Resep itu tidak ada.",
       "comboRequirementUnmet": "Kamu tidak memiliki kedua keahlian yang diperlukan pada tingkat yang disyaratkan untuk resep itu.",
@@ -2463,13 +2463,13 @@ export const id_ID: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Kamu menghancurkan pemantraan {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Kamu melepas pesona {item} menjadi {material}.",
+      "disenchantedYieldQty": "Kamu melepas pesona {item} menjadi {material} x{qty}.",
+      "disenchantedAlso": "Kamu juga memperoleh kembali {material}.",
+      "disenchantedAlsoQty": "Kamu juga memperoleh kembali {material} x{qty}.",
       "salvagedLine": "Kamu menyalvasi {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Kamu menyelamatkan {material} dari {item}.",
+      "salvagedYieldQty": "Kamu menyelamatkan {material} x{qty} dari {item}.",
       "enchantAppliedLine": "Kamu memantrai {item} dengan {enchant}.",
       "notHeld": "Kamu tidak memiliki barang itu.",
       "notDisenchantable": "Kamu tidak bisa menghancurkan pemantraan itu.",
@@ -3293,21 +3293,21 @@ export const id_ID: EnTranslations = {
       "holy_light": "Penyembuhan mantap berukuran besar untuk memenuhi nyawa sekutu atau dirimu sendiri.",
       "devotion_aura": "Penguat-diri tahan lama yang menaikkan zirah sehingga pukulan terasa lebih ringan.",
       "judgement": "Menghabiskan Segel aktifmu untuk menghantam musuh dari jarak dekat.",
-      "hammer_of_wrath": "Executes a wounded enemy from range, or any enemy while your wings are active.",
-      "avenging_wrath": "Grants 10 Devotion, then doubles Devotion generated by abilities for fifteen seconds.",
-      "bastion_sweep": "Sweeps your shield through a group to seize threat and build Devotion.",
-      "oath_chain": "Drags a distant enemy into your pack and slows its escape.",
-      "veilbound_march": "Pass through a pack to mark it, blunt its damage against you, and lock in threat.",
-      "holy_shield": "Spends Devotion on an active block window, absorption, and a threat pulse.",
-      "consecration": "Claims the ground around you with sustained Holy damage and threat.",
-      "hammer_of_justice": "Stops one enemy with a short, reliable stun.",
-      "lay_on_hands": "Restores a large amount of health when an ally is close to falling.",
+      "hammer_of_wrath": "Mengeksekusi musuh yang terluka dari jauh, atau musuh mana pun selama sayapmu aktif.",
+      "avenging_wrath": "Memberi 10 Pengabdian, lalu melipatduakan Pengabdian yang dihasilkan kemampuan selama lima belas detik.",
+      "bastion_sweep": "Menyapukan perisaimu menembus kelompok untuk merebut ancaman dan menumpuk Pengabdian.",
+      "oath_chain": "Menyeret musuh jauh ke dalam kawananmu dan memperlambat pelariannya.",
+      "veilbound_march": "Menembus satu kelompok untuk menandainya, menumpulkan kerusakannya terhadapmu, dan mengunci ancaman.",
+      "holy_shield": "Membelanjakan Pengabdian untuk jendela tangkis aktif, penyerapan, dan denyut ancaman.",
+      "consecration": "Menguasai tanah di sekitarmu dengan kerusakan Suci dan ancaman yang berkelanjutan.",
+      "hammer_of_justice": "Menghentikan satu musuh dengan pingsan singkat yang dapat diandalkan.",
+      "lay_on_hands": "Memulihkan nyawa dalam jumlah besar ketika sekutu nyaris tumbang.",
       "blessing_of_might": "Menaikkan daya serang sasaran kawan, bagus dirapalkan sebelum menarik musuh.",
       "divine_protection": "Perisai pelindung sekejap untuk menyerap kerusakan saat keadaan memburuk.",
       "raptor_strike": "Ayunan jarak dekat yang keras untuk saat sesuatu memperpendek jarak denganmu.",
-      "pack_command": "Orders your companion to strike and build Pack Ferocity. Each stack makes your pet deal 10% more damage, up to 30%, before Unleash Beast spends the stacks.",
-      "stampede": "Calls three beasts to attack for 12 seconds. Use it at full Pack Ferocity so they keep the maximum damage bonus for the whole summon.",
-      "measured_shot": "A deliberate ranged shot that restores Focus for your heavier attacks.",
+      "pack_command": "Memerintahkan pendampingmu menyerang dan menumpuk Keganasan Kawanan. Setiap tumpukan membuat hewan peliharaanmu memberi 10% lebih banyak kerusakan, hingga 30%, sebelum Lepaskan Sang Buas membelanjakan tumpukannya.",
+      "stampede": "Memanggil tiga binatang buas untuk menyerang selama 12 detik. Gunakan pada Keganasan Kawanan penuh agar mereka mempertahankan bonus kerusakan maksimum sepanjang pemanggilan.",
+      "measured_shot": "Tembakan jarak jauh yang disengaja dan memulihkan fokus untuk seranganmu yang lebih berat.",
       "aspect_of_the_hawk": "Kuda-kuda yang kamu jaga untuk mempertajam daya serang jarak jauhmu.",
       "serpent_sting": "Menanamkan bisa yang menguras kerusakan alam seiring waktu.",
       "arcane_shot": "Tembakan seketika dari kejauhan untuk tambahan kerusakan cepat.",
@@ -3326,19 +3326,19 @@ export const id_ID: EnTranslations = {
       "power_word_shield": "Menyelubungi sekutu dengan perisai yang menyerap pukulan sebelum mengena.",
       "renew": "Penyembuhan yang menggerogoti seiring waktu, bagus dirapalkan lalu terus bergerak.",
       "lightning_bolt": "Rapalan kerusakan Alam jarak jauh, andalanmu dari kejauhan.",
-      "chain_lightning": "Strikes one target and jumps to two nearby enemies, building one Thunder for the whole cast.",
-      "thunder_reservoir": "Banks lightning until Earthen Jolt or Faultwake can release a full-power payoff.",
+      "chain_lightning": "Mengenai satu sasaran dan melompat ke dua musuh di dekatnya, menumpuk satu Guruh untuk seluruh rapalan.",
+      "thunder_reservoir": "Menyimpan petir sampai Sentakan Bumi atau Gempa Bumi dapat melepaskan imbalan berkekuatan penuh.",
       "rockbiter_weapon": "Mengisi senjatamu sehingga tiap ayunan menghantam lebih keras dalam jarak dekat.",
       "healing_wave": "Penyembuhan utamamu, pemulih langsung untuk dirimu atau sekutu.",
       "earth_shock": "Kejutan seketika untuk kerusakan Alam cepat saat kamu membutuhkannya sekarang.",
       "lightning_shield": "Mengisi tubuhmu sehingga penyerang menerima kerusakan Alam saat mereka memukulmu.",
       "flame_shock": "Bakaran seketika yang menghantam di awal dan terus menghanguskan seiring waktu.",
       "galeheart_weapon": "Mengilhami kedua senjata dengan angin badai dan menghadiahi ritme serangan yang stabil.",
-      "warspirit_cadence": "Turns a steady weapon rhythm into Galeheart Echoes and an instant spell opportunity.",
-      "stormsurge": "Sometimes brings Ancestral Strike back early after you spend a Stormcast opportunity.",
+      "warspirit_cadence": "Mengubah irama senjata yang mantap menjadi Gema Hati Badai dan peluang mantra seketika.",
+      "stormsurge": "Kadang mengembalikan Serangan Leluhur lebih awal setelah kamu membelanjakan peluang Pertanda Badai.",
       "lifespring_weapon": "Mengilhami senjatamu dengan air pemulih dan memperkuat aliran penyembuhan berkelanjutan.",
       "tidecall": "Memanggil pasang untuk memperkuat rangkaian mantra penyembuhan berikutnya.",
-      "ancestor_return": "Returns every fallen group or raid member to life after a long out-of-combat cast.",
+      "ancestor_return": "Menghidupkan kembali setiap anggota kelompok atau serbuan yang gugur setelah rapalan panjang di luar pertempuran.",
       "stoneward": "Mendirikan perisai batu bermuatan yang mengubah damage diterima menjadi pemulihan.",
       "primal_exaltation": "Melepaskan kekuatan elemen spesialisasimu untuk sesaat.",
       "fireball": "Serangan api utamamu, menghantam sekaligus meninggalkan sasaran terbakar.",
@@ -5841,7 +5841,7 @@ export const id_ID: EnTranslations = {
       "mana": "Mana",
       "energy": "Energi",
       "rage": "Amukan",
-      "focus": "Focus"
+      "focus": "Fokus"
     },
     "roles": {
       "warrior": "Tank / DPS Jarak Dekat",
@@ -6223,7 +6223,7 @@ export const id_ID: EnTranslations = {
       "notEnoughRage": "Amarah tidak cukup!",
       "notEnoughEnergy": "Energi tidak cukup!",
       "notEnoughMana": "Mana tidak cukup!",
-      "notEnoughDevotion": "Not enough Devotion!",
+      "notEnoughDevotion": "Pengabdian tidak cukup!",
       "notEnoughResource": "{resource} tidak cukup!",
       "notEnoughHealth": "Nyawa tidak cukup.",
       "targetMustDodge": "Sasaranmu harus mengelak terlebih dahulu.",
@@ -6537,8 +6537,8 @@ export const id_ID: EnTranslations = {
       "mana": "Mana",
       "rage": "Amukan",
       "energy": "Energi",
-      "focus": "Focus",
-      "devotion": "Devotion"
+      "focus": "fokus",
+      "devotion": "Pengabdian"
     },
     "forms": {
       "bear": "Beruang",
@@ -6915,56 +6915,56 @@ export const id_ID: EnTranslations = {
         "description": "Menghujani area sasaran dengan panah selama 3 detik, memberi {damage} kerusakan setiap 0.5 detik kepada musuh di dalamnya."
       },
       "pack_command": {
-        "name": "Pack Command",
-        "description": "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit."
+        "name": "Perintah Kawanan",
+        "description": "Memerintahkan hewan peliharaanmu yang hidup untuk menyerang sebesar 36 sampai 48 kerusakan Fisik. Kerusakan meningkat dengan kekuatan serang hewan peliharaan. Serangan yang mengenai memulihkan 20 fokus dan memberi 1 Keganasan Kawanan selama 30 dtk, hingga 3. Setiap tumpukan menambah semua kerusakan hewan peliharaanmu sebesar 10%. Serangan ini memakai tumpukan yang kamu miliki sebelum benturan."
       },
       "stampede": {
-        "name": "Stampede",
-        "description": "Summon 3 beasts for 12 sec. Each attacks every 2 sec for {damage} Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed after 5 failed chances. It cannot reset while the beasts are active. (Packlord)"
+        "name": "Serbuan Liar",
+        "description": "Memanggil 3 binatang buas selama 12 dtk. Masing-masing menyerang tiap 2 dtk sebesar {damage} kerusakan Fisik. Kerusakan yang ditampilkan mencakup 8% kekuatan serang jarak jauhmu sebelum bonus kerusakan hewan peliharaan. Binatang buas mengunci Keganasan Kawanan saat dipanggil, memperoleh 10% kerusakan per tumpukan. Saat Serbuan Liar dalam jeda, Perintah Kawanan yang berhasil berpeluang 20% mengatur ulangnya, dijamin setelah 5 peluang gagal. Ia tidak dapat diatur ulang selama binatang buas aktif. (Penguasa Kawanan)"
       },
       "unleash_beast": {
-        "name": "Unleash Beast",
-        "description": "Consume 3 Pack Ferocity after your pet strikes for 83 to 105 Physical damage and claps every enemy within 6 yards for 26 to 34. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 nearby enemies."
+        "name": "Lepaskan Sang Buas",
+        "description": "Menghabiskan 3 Keganasan Kawanan setelah hewan peliharaanmu menyerang sebesar 83 sampai 105 kerusakan Fisik dan mengguncang setiap musuh dalam 6 meter sebesar 26 sampai 34. Serangan dan guncangan memakai bonus kerusakan hewan peliharaan penuh 30% dari Keganasan Kawanan dan meningkat dengan kekuatan serang hewan peliharaan. Selama 8 dtk sesudahnya, hewan peliharaan memberi 25% lebih banyak kerusakan, menyerang 35% lebih cepat, dan membuat Tembakan Bengis membelah hingga 2 musuh di dekatnya."
       },
       "measured_shot": {
-        "name": "Measured Shot",
-        "description": "Shoot the target for {damage} Physical damage. A hit restores 20 Focus. Damage increases with Ranged Attack Power."
+        "name": "Tembakan Terukur",
+        "description": "Menembak sasaran sebesar {damage} kerusakan Fisik. Tembakan yang mengenai memulihkan 20 fokus. Kerusakan meningkat dengan kekuatan serang jarak jauh."
       },
       "cold_focus": {
-        "name": "Cold Focus",
-        "description": "For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)"
+        "name": "Fokus Dingin",
+        "description": "Selama 12 dtk, Tembakan Terukur memulihkan 50% lebih banyak fokus, dan Tarikan Panjang menghabiskan 25% lebih sedikit serta dirapal 30% lebih cepat. (Ciri khas Pandangan Dingin)"
       },
       "bloodhook": {
-        "name": "Bloodhook",
-        "description": "Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)"
+        "name": "Kait Darah",
+        "description": "Menerjang ke arah musuh dan menerapkan Luka Kait Darah, memberi 34 kerusakan Fisik dasar ditambah 26% kekuatan serang jarak jauhmu selama 12 dtk dalam 4 denyut. (Ciri khas Kecakapan Lapangan)"
       },
       "shrapnel_charge": {
-        "name": "Shrapnel Charge",
-        "description": "Hit the target for 24 to 30 Physical damage and up to 4 other enemies within 6 yards for 13 to 17. Other targets also bleed for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Direct damage increases with Ranged Attack Power."
+        "name": "Muatan Serpihan",
+        "description": "Mengenai sasaran sebesar 24 sampai 30 kerusakan Fisik dan hingga 4 musuh lain dalam 6 meter sebesar 13 sampai 17. Sasaran lain juga berdarah sebesar 12 kerusakan selama 6 dtk. Bila sasaran utama membawa Luka Kait Darahmu, 1 denyut luka diberikan seketika. Kerusakan langsung meningkat dengan kekuatan serang jarak jauh."
       },
       "bloodtrail_assault": {
-        "name": "Bloodtrail Assault",
-        "description": "For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 nearby enemies, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards, deals 25% more base damage to its main target, and triggers 50% more wound damage."
+        "name": "Serbuan Jejak Darah",
+        "description": "Selama 12 dtk, Kait Darah menyebarkan luka berkekuatan 60% ke maksimal 2 musuh di dekatnya, Robek Luka memerintahkan serangan hewan peliharaan sebesar 18 kerusakan, dan Muatan Serpihan bertambah 2 meter, memberi 25% lebih banyak kerusakan dasar ke sasaran utamanya, serta memicu 50% lebih banyak kerusakan luka."
       },
       "trailbreak": {
-        "name": "Trailbreak",
-        "description": "Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
+        "name": "Putus Jejak",
+        "description": "Melompat 12 meter ke belakang. Bila kamu punya Momentum Berburu, ia disegarkan dan menyiapkan Masuk Kembali selama 12 dtk."
       },
       "wildheart": {
-        "name": "Wildheart",
-        "description": "Immediately restore 30% of your maximum health."
+        "name": "Hati Liar",
+        "description": "Seketika memulihkan 30% nyawa maksimummu."
       },
       "shellskin": {
-        "name": "Shellskin",
-        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+        "name": "Kulit Cangkang",
+        "description": "Mengurangi kerusakan yang diterima 60% selama 8 dtk, tetapi mencegah serangan selama aktif."
       },
       "frostjaw_trap": {
-        "name": "Frostjaw Trap",
-        "description": "Place a trap at the selected enemy or at your feet. It arms after 0.75 sec and lasts 30 sec. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec."
+        "name": "Jerat Rahang Beku",
+        "description": "Menempatkan jerat pada musuh terpilih atau di kakimu. Ia aktif setelah 0,75 dtk dan bertahan 30 dtk. Musuh pertama yang memicunya terakar 3 dtk, dan musuh dalam 4 meter diperlambat 50% selama 4 dtk."
       },
       "pack_rally": {
-        "name": "Pack Rally",
-        "description": "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec."
+        "name": "Pengumpulan Kawanan",
+        "description": "Mengambil Wujud Kuda Perang dan mengumpulkan sekutu di dekatnya dengan 30% kecepatan gerak serta 10% kecepatan serang dan rapal selama 10 dtk."
       },
       "hurricane": {
         "name": "Badai",
@@ -7275,116 +7275,116 @@ export const id_ID: EnTranslations = {
         "description": "Menyembuhkan target sekutu sebesar {damage}."
       },
       "divine_ascension": {
-        "name": "Divine Ascension",
-        "description": "Consume 20 Devotion to gain 5 Ascension charges for up to 45 sec. Marked abilities consume one charge and gain an additional effect."
+        "name": "Kenaikan Ilahi",
+        "description": "Menghabiskan 20 Pengabdian untuk memperoleh 5 muatan Kenaikan hingga 45 dtk. Kemampuan bertanda menghabiskan satu muatan dan memperoleh efek tambahan."
       },
       "aura_mastery": {
-        "name": "Sacred Concord",
-        "description": "For 8 sec, empower every active Devotion and Requital Aura in your group. Bastion Devotion reduces damage by 15%; Requital deals 15 Holy damage. Multiple uses refresh instead of stacking."
+        "name": "Kerukunan Suci",
+        "description": "Selama 8 dtk, memperkuat setiap Pengabdian dan Aura Pembalasan aktif di kelompokmu. Pengabdian Benteng mengurangi kerusakan 15%; Pembalasan memberi 15 kerusakan Suci. Penggunaan berulang menyegarkan, bukan menumpuk."
       },
       "devotion_ward": {
-        "name": "Bastion Devotion",
-        "description": "Reduce damage taken by you and party members by 5% until death or replacement. Only this aura and Requital Aura replace each other; Radiant, Dawn, and Grace Devotion coexist."
+        "name": "Pengabdian Benteng",
+        "description": "Mengurangi kerusakan yang diterima kamu dan anggota kelompok sebesar 5% sampai mati atau tergantikan. Hanya aura ini dan Aura Pembalasan yang saling menggantikan; Pengabdian Berseri, Fajar, dan Karunia berdampingan."
       },
       "hammer_of_grace": {
-        "name": "Hammer of Grace",
-        "description": "Instantly hurl a holy hammer at an enemy within 20 m for {damage}, restoring 70 mana, healing yourself for 50% of damage dealt, and generating 1 Devotion when it deals damage. Solar Reprisal lets Hammer of Grace ignore its cooldown and heal you for 100% of damage dealt."
+        "name": "Palu Karunia",
+        "description": "Seketika melemparkan palu suci ke musuh dalam 20 m sebesar {damage}, memulihkan 70 mana, menyembuhkanmu sebesar 50% kerusakan yang diberikan, dan menghasilkan 1 Pengabdian saat memberi kerusakan. Pembalasan Surya membuat Palu Karunia mengabaikan jedanya dan menyembuhkanmu sebesar 100% kerusakan yang diberikan."
       },
       "hushbrand": {
-        "name": "Hushbrand",
-        "description": "Interrupts spellcasting and prevents spells from that school for 4 sec."
+        "name": "Tanda Bisu",
+        "description": "Memutus perapalan dan mencegah mantra dari aliran itu selama 4 dtk."
       },
       "guardian_covenant": {
-        "name": "Guardian Covenant",
-        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
+        "name": "Perjanjian Penjaga",
+        "description": "Melindungi satu sasaran sekutu dan dirimu, mengurangi kerusakan yang diterima 20% selama 8 dtk. Memilih dirimu secara bawaan bila tidak ada sasaran sekutu."
       },
       "solar_step": {
-        "name": "Solar Step",
-        "description": "Increase your movement speed by 150% for 2 sec."
+        "name": "Langkah Surya",
+        "description": "Menambah kecepatan gerakmu 150% selama 2 dtk."
       },
       "solar_invocation": {
-        "name": "Solar Invocation",
-        "description": "Instantly heal an ally for {damage} or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much."
+        "name": "Seruan Surya",
+        "description": "Seketika menyembuhkan sekutu sebesar {damage} atau memberi kerusakan Suci sedang kepada musuh. Kedua penggunaan menghasilkan 1 Pengabdian. Selama Kenaikan, rapalan penyembuhan juga menyembuhkan pemain sekutu dalam 10 m dari sasaran sebesar separuhnya."
       },
       "radiant_devotion": {
-        "name": "Radiant Devotion",
-        "description": "Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion, but coexists with Devotions from other Paladins."
+        "name": "Pengabdian Berseri",
+        "description": "Menambah kekuatan mantra kamu dan anggota kelompok sebesar 20 selama 30 mnt. Menggantikan Pengabdian Fajar atau Karuniamu sendiri, tetapi berdampingan dengan Pengabdian paladin lain."
       },
       "dawn_devotion": {
-        "name": "Dawn Devotion",
-        "description": "Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion, but coexists with Devotions from other Paladins and with Warrior shouts."
+        "name": "Pengabdian Fajar",
+        "description": "Menambah kekuatan serang kamu dan anggota kelompok sebesar 40 selama 30 mnt. Menggantikan Pengabdian Berseri atau Karuniamu sendiri, tetapi berdampingan dengan Pengabdian paladin lain dan dengan seruan pendekar."
       },
       "grace_devotion": {
-        "name": "Grace Devotion",
-        "description": "You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min. Replaces your own Radiant or Dawn Devotion, but coexists with Devotions from other Paladins."
+        "name": "Pengabdian Karunia",
+        "description": "Kamu dan anggota kelompok memulihkan 15 mana tiap 5 dtk dan membayar 3% lebih sedikit mana selama 30 mnt. Menggantikan Pengabdian Berseri atau Fajarmu sendiri, tetapi berdampingan dengan Pengabdian paladin lain."
       },
       "recall_the_fallen": {
-        "name": "Recall the Fallen",
-        "description": "Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group."
+        "name": "Panggil yang Gugur",
+        "description": "Menghidupkan kembali anggota kelompok yang mati dengan 35% nyawa dan mana. Penyembuh Surya level 16 atau lebih tinggi justru memanggil kembali seluruh anggota kelompok yang gugur."
       },
       "beacon_of_light": {
-        "name": "Beacon of Light",
-        "description": "Mark one group member as your Beacon of Light. 50% of your effective direct healing on another group member within 60 m also heals the Beacon. Area and periodic healing do not transfer. Lasts until either of you dies."
+        "name": "Mercusuar Cahaya",
+        "description": "Menandai satu anggota kelompok sebagai Mercusuar Cahayamu. 50% penyembuhan langsungmu yang efektif pada anggota kelompok lain dalam 60 m juga menyembuhkan Mercusuar. Penyembuhan area dan berkala tidak dialihkan. Bertahan sampai salah satu dari kalian mati."
       },
       "final_edict": {
-        "name": "Final Edict",
-        "description": "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Holy explosion around you."
+        "name": "Titah Terakhir",
+        "description": "Melancarkan serangan senjata yang menghancurkan dan menghasilkan 1 Pengabdian saat memberi kerusakan. Pukulan yang berhasil memangkas sisa jeda Runtuhnya Fajar sebesar 2 dtk. Serangan otomatis yang berhasil dan pukulan Titah Terakhir berpeluang 15% memberi Murka Fajar selama 8 dtk. Kenaikan juga melepaskan ledakan Suci di sekitarmu."
       },
       "dawnfall": {
-        "name": "Dawnfall",
-        "description": "Deal {damage} Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict's remaining cooldown by 2 sec. Ascension increases its damage and radius."
+        "name": "Runtuhnya Fajar",
+        "description": "Memberi {damage} kerusakan Suci kepada musuh di dekatnya dan menghasilkan 1 Pengabdian. Mengenai setidaknya satu musuh memangkas sisa jeda Titah Terakhir sebesar 2 dtk. Kenaikan menambah kerusakan dan radiusnya."
       },
       "sun_gods_verdict": {
-        "name": "Verdict of the Sun God",
-        "description": "Judge an enemy beneath the Verdict of the Sun God for 30 sec. Final Edict and Dawnfall inscribe one charge on a successful hit. The ability that lands the third charge dictates the sentence: Final Edict unleashes devastating damage on the condemned; Dawnfall detonates the verdict, damaging and stunning nearby enemies for 1.5 sec."
+        "name": "Putusan Dewa Matahari",
+        "description": "Mengadili musuh di bawah Putusan Dewa Matahari selama 30 dtk. Titah Terakhir dan Runtuhnya Fajar menuliskan satu muatan pada pukulan yang berhasil. Kemampuan yang menempatkan muatan ketiga menentukan hukumannya: Titah Terakhir melepaskan kerusakan dahsyat pada terdakwa; Runtuhnya Fajar meledakkan putusan, melukai dan membuat musuh di dekatnya terhuyung 1,5 dtk."
       },
       "valkyrs_calling": {
-        "name": "Valkyr's Calling",
-        "description": "Ascend into the air, becoming immune to damage as you fly toward the enemy. After 2 sec, descend upon the target area for {damage} Holy damage and generate 1 Devotion. Ascension increases the impact damage by 50% and consumes 1 charge."
+        "name": "Panggilan Valkyrie",
+        "description": "Naik ke udara, menjadi kebal kerusakan saat kamu terbang ke arah musuh. Setelah 2 dtk, kamu menukik ke area sasaran sebesar {damage} kerusakan Suci dan menghasilkan 1 Pengabdian. Kenaikan menambah kerusakan benturan 50% dan menghabiskan 1 muatan."
       },
       "faithforged_guard": {
-        "name": "Debt of Light",
-        "description": "For 8 sec, the next enemy hit against you is answered: up to {buff} damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered. Ascension raises the amount it can answer by 50%."
+        "name": "Utang Cahaya",
+        "description": "Selama 8 dtk, pukulan musuh berikutnya terhadapmu dijawab: hingga {buff} kerusakan ditolak dan dikembalikan kepada penyerang sebagai kerusakan Suci, dan kamu memperoleh 1 Pengabdian. Hanya satu pukulan yang dijawab. Kenaikan menaikkan jumlah yang dapat dijawab sebesar 50%."
       },
       "mercy_lance": {
-        "name": "Mercy Lance",
-        "description": "Deal {damage} Holy damage to an enemy and generate 1 Devotion when it deals damage. During Ascension, it consumes 1 charge to guarantee a critical hit."
+        "name": "Tombak Belas Kasih",
+        "description": "Memberi {damage} kerusakan Suci kepada musuh dan menghasilkan 1 Pengabdian saat memberi kerusakan. Selama Kenaikan, ia menghabiskan 1 muatan untuk menjamin serangan kritis."
       },
       "sacred_form": {
-        "name": "Sacred Form",
-        "description": "Enter a sacred state until death, increasing healing by 10%, spell critical chance by 5%, and reducing threat generated by 50%. Sunmender only."
+        "name": "Wujud Suci",
+        "description": "Memasuki keadaan suci hingga mati, menambah penyembuhan 10% dan peluang kritis mantra 5%, serta mengurangi ancaman yang dihasilkan 50%. Hanya untuk Penyembuh Surya."
       },
       "dawns_embrace": {
-        "name": "Dawn's Embrace",
-        "description": "Deliver a powerful heal and generate 1 Devotion. Radiant Resonance reduces its mana cost by 50% and cast time to 1.5 sec. Ascension makes it instant and increases its healing by 35%."
+        "name": "Pelukan Fajar",
+        "description": "Melepaskan penyembuhan kuat dan menghasilkan 1 Pengabdian. Resonansi Berseri memangkas biaya mananya 50% dan waktu rapal menjadi 1,5 dtk. Kenaikan menjadikannya seketika dan menambah penyembuhannya 35%."
       },
       "radiant_chorus": {
-        "name": "Radiant Chorus",
-        "description": "Heal nearby allies for {damage} and generate 1 Devotion. Effectively healing at least 2 allies grants Radiant Resonance: your next Mending Light is instant, or your next Dawn's Embrace costs 50% less mana and casts in 1.5 sec. Ascension increases Radiant Chorus healing and radius."
+        "name": "Paduan Suara Berseri",
+        "description": "Menyembuhkan sekutu di dekatnya sebesar {damage} dan menghasilkan 1 Pengabdian. Menyembuhkan secara efektif setidaknya 2 sekutu memberi Resonansi Berseri: Cahaya Pemulih berikutnya menjadi seketika, atau Pelukan Fajar berikutnya menghabiskan 50% lebih sedikit mana dan dirapal dalam 1,5 dtk. Kenaikan menambah penyembuhan dan radius Paduan Suara Berseri."
       },
       "life_covenant": {
-        "name": "Life Covenant",
-        "description": "Reduce an ally's damage taken by 40% for 6 sec. During Ascension it also grants a 120-point shield without consuming a charge."
+        "name": "Perjanjian Kehidupan",
+        "description": "Mengurangi kerusakan yang diterima sekutu sebesar 40% selama 6 dtk. Selama Kenaikan juga memberi perisai 120 poin tanpa menghabiskan muatan."
       },
       "aegis_first_dawn": {
-        "name": "Aegis of the First Dawn",
-        "description": "Channel for 5 sec, creating a 10 meter holy dome. Allies inside are healed every second and take 50% less damage. Completing the channel releases a final heal and grants 30% movement speed for 4 sec."
+        "name": "Perisai Fajar Pertama",
+        "description": "Salurkan selama 5 dtk, menciptakan kubah suci berdiameter 10 meter. Sekutu di dalamnya disembuhkan tiap detik dan menerima 50% lebih sedikit kerusakan. Menyelesaikan penyaluran melepaskan penyembuhan akhir dan memberi 30% kecepatan gerak selama 4 dtk."
       },
       "vowkeeper_strike": {
-        "name": "Vowkeeper Strike",
-        "description": "Strike with high threat and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal empowers your next Sunward Disc, Hammer of Grace, or Mending Light. Ascension also grants a small absorption shield."
+        "name": "Serangan Penjaga Ikrar",
+        "description": "Menyerang dengan ancaman tinggi dan menghasilkan 1 Pengabdian. Serangan yang berhasil berpeluang 20% memberi Pembalasan Surya selama 8 dtk; setiap tangkisan yang berhasil berpeluang 25%. Pembalasan Surya memperkuat Cakram Surya, Palu Karunia, atau Cahaya Pemulih berikutnya. Kenaikan juga memberi perisai penyerap kecil."
       },
       "bastion_rite": {
-        "name": "Bastion Rite",
-        "description": "Reduce physical damage taken by 20% and increase block chance by 20% for 6 sec. Ascension extends the duration to 10 sec."
+        "name": "Ritus Benteng",
+        "description": "Mengurangi kerusakan fisik yang diterima 20% dan menambah peluang tangkis 20% selama 6 dtk. Kenaikan memperpanjang durasi menjadi 10 dtk."
       },
       "sunward_disc": {
-        "name": "Sunward Disc",
-        "description": "Requires a shield. Hurl a radiant disc that strikes and then bounces between nearby enemies. Each damaging impact generates 1 Devotion. Solar Reprisal makes Sunward Disc cost no mana, ignore its cooldown, and deal 20% more damage. Ascension empowers 5 bounces."
+        "name": "Cakram Surya",
+        "description": "Membutuhkan perisai. Melemparkan cakram berseri yang menghantam lalu memantul di antara musuh di dekatnya. Setiap benturan yang melukai menghasilkan 1 Pengabdian. Pembalasan Surya membuat Cakram Surya tidak menghabiskan mana, mengabaikan jedanya, dan memberi 20% lebih banyak kerusakan. Kenaikan memperkuat 5 pantulan."
       },
       "sacred_challenge": {
-        "name": "Sacred Goad",
-        "description": "Compel an enemy to attack you. During Ascension it also reduces all damage received by 15% for 4 sec without consuming a charge."
+        "name": "Pacuan Suci",
+        "description": "Memaksa musuh menyerangmu. Selama Kenaikan juga mengurangi seluruh kerusakan yang diterima sebesar 15% selama 4 dtk tanpa menghabiskan muatan."
       },
       "devotion_aura": {
         "name": "Aura Teguh",
@@ -7423,20 +7423,20 @@ export const id_ID: EnTranslations = {
         "description": "Mentahbiskan tanah di bawahmu, membakar musuh terdekat untuk {damage} kerusakan Suci setiap 2 detik selama 10 detik."
       },
       "bastion_sweep": {
-        "name": "Bastion Sweep",
-        "description": "Sweep your equipped shield through enemies in a 180 degree frontal arc for {damage} Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m."
+        "name": "Sapuan Benteng",
+        "description": "Sapukan perisai yang kamu kenakan menembus musuh dalam busur depan 180 derajat sebesar {damage} kerusakan Suci dengan ancaman tinggi dan menghasilkan 1 Pengabdian. Kenaikan menambah kerusakan 30% dan radius menjadi 8 m."
       },
       "oath_chain": {
-        "name": "Oath Chain",
-        "description": "Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy."
+        "name": "Rantai Sumpah",
+        "description": "Seketika mengikat musuh jauh dengan rantai suci. Musuh bergerak ke arahmu dengan 18 m per detik sampai mencapai 3 m, lalu diperlambat 50% selama 4 dtk. Selama Kenaikan ia mengikat musuh kedua di dekatnya."
       },
       "veilbound_march": {
-        "name": "Veilbound March",
-        "description": "Become ethereal for 4 sec, gaining 40% movement speed and 30% armor and becoming immune to roots, slows, and displacement. Enemies you pass through are Veil Marked for 6 sec, taking Holy damage each second, dealing 20% less damage to you, and generating extra threat. The first mark grants 1 Devotion. When the march ends, nearby marked enemies take a final burst. Ascension increases the burst by 50% and lightly pulls them toward you."
+        "name": "Barisan Tabir",
+        "description": "Menjadi halus selama 4 dtk, memperoleh 40% kecepatan gerak dan 30% baju zirah serta kebal terhadap akar, perlambatan, dan pemindahan. Musuh yang kamu lewati mendapat Tanda Tabir selama 6 dtk: mereka menerima kerusakan Suci tiap detik, memberimu 20% lebih sedikit kerusakan, dan menghasilkan ancaman tambahan. Tanda pertama memberi 1 Pengabdian. Saat barisan berakhir, musuh bertanda di dekatnya menerima ledakan akhir. Kenaikan menambah ledakan 50% dan sedikit menarik mereka ke arahmu."
       },
       "veilbound_mark": {
-        "name": "Veil Mark",
-        "description": "Takes Holy damage each second, deals 20% less damage to the Paladin who applied the mark, and generates additional threat toward that Paladin."
+        "name": "Tanda Tabir",
+        "description": "Menerima kerusakan Suci tiap detik, memberi 20% lebih sedikit kerusakan kepada paladin yang menempatkan tanda, dan menghasilkan ancaman tambahan terhadap paladin itu."
       },
       "righteous_fury": {
         "name": "Sumpah Membara",
@@ -7479,12 +7479,12 @@ export const id_ID: EnTranslations = {
         "description": "Serangan balasan setelah target mengelak sebesar kerusakan senjata ditambah {damage}. Tidak dapat dielakkan."
       },
       "hunting_momentum": {
-        "name": "Hunting Momentum",
-        "description": "Passive: Gutting Strike grants 1 Hunting Momentum for 8 sec, up to 3. At 3 stacks, Woundrend deals 45% more strike damage and consumes the stacks. (Fieldcraft)"
+        "name": "Momentum Berburu",
+        "description": "Pasif: Serangan Pembelah memberi 1 Momentum Berburu selama 8 dtk, hingga 3. Pada 3 tumpukan, Robek Luka memberi 45% lebih banyak kerusakan serangan dan menghabiskan tumpukan. (Kecakapan Lapangan)"
       },
       "fieldcraft_reentry": {
-        "name": "Armed Re-entry",
-        "description": "Passive: Trailbreak refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)"
+        "name": "Masuk Kembali Bersenjata",
+        "description": "Pasif: Putus Jejak menyegarkan Momentum Berburu dan menyiapkan Serangan Pembelah atau Kait Darah berikutnya selama 12 dtk. Serangan Pembelah memberi 15% lebih banyak kerusakan per tumpukan. Kait Darah memberi 18 sampai 24 kerusakan Fisik tambahan, meningkat 15% per tumpukan dan oleh kekuatan serang jarak jauhmu. Pada 3 tumpukan, salah satu serangan menghabiskan Momentum Berburu. (Kecakapan Lapangan)"
       },
       "wing_clip": {
         "name": "Tebasan Pembelenggu",
@@ -7551,8 +7551,8 @@ export const id_ID: EnTranslations = {
         "description": "Melontarkan sambaran petir sebesar {damage} kerusakan Alam."
       },
       "thunder_reservoir": {
-        "name": "Thunder Reservoir",
-        "description": "Passive: Arc Bolt and Skybranch grant Thunder, up to 5. At 5 Thunder, Earthen Jolt deals 125% more damage or Faultwake deals 100% more damage, then consumes all Thunder. (Thundercall)"
+        "name": "Wadah Guruh",
+        "description": "Pasif: Sambaran Busur dan Petir Bercabang memberi Guruh, hingga 5. Pada 5 Guruh, Sentakan Bumi memberi 125% lebih banyak kerusakan atau Gempa Bumi 100% lebih banyak, lalu menghabiskan seluruh Guruh. (Panggilan Guruh)"
       },
       "rockbiter_weapon": {
         "name": "Senjata Stonebound",
@@ -7779,36 +7779,36 @@ export const id_ID: EnTranslations = {
         "description": "Menyembuhkan target sekutu dalam jumlah besar, lalu melompat ke hingga 2 sekutu terdekat lainnya dengan penyembuhan 50% lebih sedikit pada setiap lompatan. (Kemampuan khas Pemulihan)"
       },
       "galeheart_weapon": {
-        "name": "Galeheart Weapon",
-        "description": "Imbue both weapons for 30 min, enabling Warspirit Cadence."
+        "name": "Senjata Hati Badai",
+        "description": "Menyihir kedua senjata selama 30 mnt, mengaktifkan Irama Roh Perang."
       },
       "warspirit_cadence": {
-        "name": "Warspirit Cadence",
-        "description": "Passive: Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)"
+        "name": "Irama Roh Perang",
+        "description": "Pasif: setiap serangan senjata ke-3 yang mengenai memicu 2 Gema Hati Badai sebesar 50% kerusakan Alam dan memberi Pertanda Badai selama 12 dtk. Pertanda Badai membuat Sambaran Busur, Sentakan, atau Air Pemulih berikutnya seketika dan memangkas biaya mananya 50%. Serangan Leluhur dihitung sebagai 2 serangan. (Roh Perang)"
       },
       "stormsurge": {
-        "name": "Stormsurge",
-        "description": "Passive: While Ancestral Strike is on cooldown, consuming Stormcast has a 25% chance to reset it. If the first 3 chances fail, the 4th always resets it. (Warspirit)"
+        "name": "Gelombang Badai",
+        "description": "Pasif: selama Serangan Leluhur dalam jeda, menghabiskan Pertanda Badai berpeluang 25% mengatur ulangnya. Bila 3 peluang pertama gagal, yang ke-4 selalu mengatur ulangnya. (Roh Perang)"
       },
       "lifespring_weapon": {
-        "name": "Lifespring Weapon",
-        "description": "Imbue your weapon for 30 min. Mending Waters and Tidecall add 20% more healing to Mending Current."
+        "name": "Senjata Mata Air Kehidupan",
+        "description": "Menyihir senjatamu selama 30 mnt. Air Pemulih dan Panggilan Pasang menambah 20% lebih banyak penyembuhan ke Arus Pemulih."
       },
       "unleash_weapon": {
-        "name": "Unleash Weapon",
-        "description": "Unleash your active weapon enchant. Pyrebrand deals 54 to 64 Fire damage, gains 30% of Spell Power, and grants 2 Thunder. Galeheart strikes with your weapon, advances Warspirit Cadence, and grants 20% attack speed for 6 sec. Stonebound strikes for 75% weapon damage, forces the target to attack you, and reduces damage taken by 20% for 4 sec. Lifespring consumes your Mending Current, heals for 125% of its remaining healing, and reduces the next hit within 8 sec by 50% of the health restored."
+        "name": "Lepaskan Senjata",
+        "description": "Melepaskan sihir aktif senjatamu. Tanda Bara memberi 54 sampai 64 kerusakan Api, memperoleh 30% kekuatan mantra, dan memberi 2 Guruh. Hati Badai menyerang dengan senjatamu, memajukan Irama Roh Perang, dan memberi 20% kecepatan serang selama 6 dtk. Ikatan Batu menyerang sebesar 75% kerusakan senjata, memaksa sasaran menyerangmu, dan mengurangi kerusakan yang diterima 20% selama 4 dtk. Mata Air Kehidupan menghabiskan Arus Pemulihmu, menyembuhkan sebesar 125% sisa penyembuhannya, dan mengurangi benturan berikutnya dalam 8 dtk sebesar 50% nyawa yang dipulihkan."
       },
       "primal_exaltation": {
-        "name": "Primal Exaltation",
-        "description": "For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)"
+        "name": "Pemuliaan Purba",
+        "description": "Selama 12 dtk, Sambaran Busur dan Petir Bercabang milik Panggilan Guruh dirapal 50% lebih cepat, dan Sambaran Busur memberi 2 Guruh; Roh Perang memicu iramanya tiap 2 benturan senjata; Tambal Roh menambah 50% lebih banyak penyembuhan ke Arus Pemulih. (Bakat syaman)"
       },
       "stoneward": {
-        "name": "Stoneward",
-        "description": "Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)"
+        "name": "Penjaga Batu",
+        "description": "Melindungi satu sekutu selama 60 dtk dengan 6 muatan. Kerusakan menghabiskan satu muatan untuk menyembuhkan 5% nyawa maksimum, sekali tiap 3 dtk. (Bakat syaman)"
       },
       "tidecall": {
-        "name": "Tidecall",
-        "description": "Heal a friendly target for 58 to 72. The heal increases with Spell Power. Add the same healing calculated before overhealing to Mending Current, up to 30% of the target's maximum health."
+        "name": "Panggilan Pasang",
+        "description": "Menyembuhkan sasaran sekutu sebesar 58 sampai 72. Penyembuhan meningkat dengan kekuatan mantra. Menambahkan penyembuhan sama yang dihitung sebelum kelebihan ke Arus Pemulih, hingga 30% nyawa maksimum sasaran."
       },
       "metamorphosis": {
         "name": "Metamorfosis",
@@ -8195,8 +8195,8 @@ export const id_ID: EnTranslations = {
         "description": "Memundurkan alur waktu setiap anggota grup atau raid yang gugur, menghidupkan mereka kembali di dekat jasad dengan 30% kesehatan dan mana. Tidak dapat digunakan saat bertarung. (Kronomansi)"
       },
       "ancestor_return": {
-        "name": "Ancestors' Return",
-        "description": "Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)"
+        "name": "Kembalinya Leluhur",
+        "description": "Memanggil kembali setiap anggota kelompok atau serbuanmu yang gugur ke kehidupan di sisi jasadnya dengan 30% nyawa dan mana. Tidak dapat dirapal dalam pertempuran. (Tambal Roh)"
       },
       "temporal_rewind": {
         "name": "Putar Balik Waktu",
@@ -8315,28 +8315,28 @@ export const id_ID: EnTranslations = {
         "description": "Melahap efek sihir (efek menguntungkan dari musuh atau efek berbahaya dari sekutu) dan memulihkan 6% nyawa maksimummu."
       },
       "veilstep": {
-        "name": "Veilstep",
-        "description": "Steps through the veil in the direction you are facing."
+        "name": "Langkah Tabir",
+        "description": "Melangkah menembus tabir ke arah yang kamu hadapi."
       },
       "scouring_mercy": {
-        "name": "Scouring Mercy",
-        "description": "Deal 72 to 84 Holy damage to an enemy or heal a friendly target for 130 to 155. Both amounts increase with Spell Power. Damage also heals each Doctrine-linked ally for 30%, or the lowest-health party member for 15% if no ally is linked. (Doctrine signature)"
+        "name": "Belas Kasih Pembersih",
+        "description": "Memberi 72 sampai 84 kerusakan Suci kepada musuh atau menyembuhkan sasaran sekutu sebesar 130 sampai 155. Kedua nilai meningkat dengan kekuatan mantra. Kerusakan juga menyembuhkan setiap sekutu yang terikat Doktrin sebesar 30%, atau anggota kelompok bernyawa terendah sebesar 15% bila tidak ada yang terikat. (Ciri khas Doktrin)"
       },
       "seraphic_vigil": {
-        "name": "Seraphic Vigil",
-        "description": "Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)"
+        "name": "Jaga Serafik",
+        "description": "Melindungi satu sekutu selama 30 dtk. Pukulan pertama yang membuatnya turun di bawah 35% nyawa menghabiskan Jaga dan menyembuhkannya sebesar 180. (Ciri khas Berkat)"
       },
       "summon_tithefiend": {
-        "name": "Call Tithefiend",
-        "description": "Consume all Gloomtithe to summon a Tithefiend for 6, 8, 10, 12, or 15 sec at 1 to 5 stacks. It attacks every 2 sec for 20 to 24 Shadow damage, plus 8 per extra stack. Five stacks make it larger and increase its damage by 25%. Its damage increases with your Spell Power. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)"
+        "name": "Panggil Iblis Persepuluhan",
+        "description": "Menghabiskan seluruh Persepuluhan Suram untuk memanggil Iblis Persepuluhan selama 6, 8, 10, 12, atau 15 dtk pada 1 sampai 5 tumpukan. Ia menyerang tiap 2 dtk sebesar 20 sampai 24 kerusakan Bayangan, ditambah 8 per tumpukan tambahan. Pada lima tumpukan ia membesar dan kerusakannya naik 25%. Kerusakannya meningkat dengan kekuatan mantramu. Ia lebih memilih Patungmu. Setiap benturan memulihkan 1% mana maksimum dan menggemakan 15% kerusakan ke maksimal 3 musuh lain yang membawa Ratapan Pembusukanmu. (Ciri khas Vesper)"
       },
       "martyrs_aegis": {
-        "name": "Martyr's Aegis",
-        "description": "Reduces one ally incoming damage by 40% for 8 sec."
+        "name": "Perisai Martir",
+        "description": "Mengurangi kerusakan yang diterima sekutu sebesar 40% selama 8 dtk."
       },
       "choir_of_deliverance": {
-        "name": "Choir of Deliverance",
-        "description": "Channels for 6 sec, healing nearby party members every 2 sec."
+        "name": "Paduan Suara Pembebasan",
+        "description": "Menyalurkan selama 6 dtk, menyembuhkan anggota kelompok di dekatnya tiap 2 dtk."
       },
       "bear_charge": {
         "name": "Terjangan Bruin",
@@ -10940,12 +10940,12 @@ export const id_ID: EnTranslations = {
         }
       },
       "q_divine_tome": {
-        "title": "The Dawnbound Tome",
-        "text": "The Light does not rest in you quietly, {playerName}. I have watched you lay the dead to peace, and I believe you are ready for what few paladins are ever taught: the Rite of Recall, by which a fallen soul is called back to the living. Its words are kept in the Dawnbound Tome, here in my keeping, but a book is no blessing while the restless dead still walk this ground. Return 6 more Restless Bones to the earth, and I will begin to teach you.",
-        "completion": "The chapel yard grows quiet. You are ready for the words, {playerName}, but the Rite of Recall cannot be spoken in a warm chapel. It must be sung where the veil between life and death wears thin. I mean to carry the Tome north into the Mirefen Marsh. Follow me there, and we will finish this.",
+        "title": "Kitab Terikat Fajar",
+        "text": "Cahaya tidak beristirahat dengan tenang dalam dirimu, {playerName}. Aku telah melihatmu membaringkan yang mati dalam damai, dan aku percaya kamu siap untuk hal yang jarang diajarkan kepada paladin mana pun: Ritus Pemanggilan, yang dengannya jiwa yang gugur dipanggil kembali kepada yang hidup. Kata-katanya tersimpan dalam Kitab Terikat Fajar, di sini dalam penjagaanku, tetapi sebuah buku bukanlah berkat selama orang mati yang gelisah masih berjalan di tanah ini. Kembalikan 6 Tulang Gelisah lagi ke tanah, dan aku akan mulai mengajarimu.",
+        "completion": "Halaman kapel menjadi hening. Kamu siap untuk kata-katanya, {playerName}, tetapi Ritus Pemanggilan tidak dapat diucapkan di kapel yang hangat. Ia harus dinyanyikan di tempat tabir antara hidup dan mati menipis. Aku berniat membawa Kitab ke utara, ke Rawa Mirefen. Ikuti aku ke sana, dan kita akan menyelesaikannya.",
         "objectives": {
           "0": {
-            "label": "Restless Bones laid to rest"
+            "label": "Tulang Gelisah dibaringkan"
           }
         }
       },
@@ -11106,12 +11106,12 @@ export const id_ID: EnTranslations = {
         }
       },
       "q_rite_of_redemption": {
-        "title": "The Rite of Recall",
-        "text": "So you followed me into the mire, {playerName}. Good. I have the Dawnbound Tome here, and this drowned ground is where its words belong: nowhere is the veil between life and death thinner than a place where the dead will not stay buried. But the drowned would drag your voice down mid-verse. Clear a space fit for the rite: put 8 of the Drowned Dead to rest, and we will consecrate it together.",
-        "completion": "Kneel, {playerName}, and read the words aloud. There. Do you feel it? The Light no longer only mends the living in your hands, it can summon back those who have crossed over. Use it wisely. A soul called back to a hopeless fight is a cruelty, not a mercy. Rise, Redeemer.",
+        "title": "Ritus Pemanggilan",
+        "text": "Jadi kamu mengikutiku ke lumpur, {playerName}. Bagus. Kitab Terikat Fajar ada padaku, dan tanah tenggelam ini adalah tempat kata-katanya berada: tidak ada tempat di mana tabir antara hidup dan mati lebih tipis daripada tempat orang mati enggan tetap terkubur. Tetapi yang tenggelam akan menyeret suaramu di tengah bait. Bersihkan ruang yang layak bagi ritus: baringkan 8 dari Mayat Tenggelam, dan kita akan menyucikannya bersama.",
+        "completion": "Berlututlah, {playerName}, dan bacakan kata-katanya dengan lantang. Nah. Kamu merasakannya? Cahaya di tanganmu tidak lagi hanya memulihkan yang hidup, ia dapat memanggil kembali mereka yang telah menyeberang. Gunakan dengan bijak. Jiwa yang dipanggil kembali ke pertempuran tanpa harapan adalah kekejaman, bukan belas kasih. Bangkitlah, Sang Penebus.",
         "objectives": {
           "0": {
-            "label": "Drowned Dead laid to rest"
+            "label": "Mayat Tenggelam dibaringkan"
           }
         }
       },

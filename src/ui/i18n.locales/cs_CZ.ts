@@ -9233,4 +9233,281 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Nahradí {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Tento předmět už má toto okouzlení.',
   'hudChrome.enchanting.sameEnchantTag': 'Již aplikováno',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'abilityUi.resources.devotion': 'Oddanost',
+  'abilityUi.resources.focus': 'soustředění',
+  'classDetails.resources.focus': 'Soustředění',
+  'game.hud.lowFocus': 'Nízké soustředění',
+  'hud.errors.notEnoughDevotion': 'Nedostatek Oddanosti!',
+  'hudChrome.paladin.devotion': 'Oddanost',
+  'hudChrome.paladin.devotionValue': 'Oddanost {value} z {max}',
+  'hudChrome.paladin.devotionAscensionCharges':
+    'Oddanost {value} z {max}. Vzestup: {charges} nábojů.',
+  'hudChrome.paladin.devotionAscensionLast': 'Oddanost {value} z {max}. Vzestup: poslední náboj.',
+  'hudChrome.paladin.ascensionLastAnnouncement': 'Vzestup: poslední náboj',
+  'hudChrome.paladin.ascensionSpenderAria':
+    'Slot akce {slot}: {ability}. Spotřebuje jeden náboj Vzestupu.',
+  'hudChrome.crafting.craftedToastQty': 'Vyrobeno: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedAlso': 'Získáváš také {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Získáváš také {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedYield': 'Odčaruješ {item} a získáš {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Odčaruješ {item} a získáš {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Vytěžíš {material} z {item}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Vytěžíš {material} x{qty} z {item}.',
+  'hudChrome.auraEffect.dawnsWrath':
+    'KH: libovolné zdraví · +1 použití · Obnova 0 · +{pct}% poškození',
+  'hudChrome.auraEffect.duskEconomy': 'Schopnosti stojí o {pct}% méně energie',
+  'hudChrome.auraEffect.hunterFerocity':
+    '{stacks} Zuřivosti smečky: tvůj společník způsobuje o {pct}% větší poškození',
+  'hudChrome.auraEffect.veiledEdge': 'Tvůj další Úder číhajícího zasáhne dvojnásobně',
+  'hudChrome.auraEffect.gloam':
+    'Šero: stupeň {stacks} z {max}. Při {max} se tvá zahájení Soumračného závoje odemknou i na otevřeném prostranství a další vržené je ZDARMA a odpálí zásobu do stínového závoje',
+  'hudChrome.auraEffect.mendingCurrent':
+    'Ukládá {value} léčení, uvolňovaného v čase nebo spotřebovaného Kaskádovou látkou',
+  'hudChrome.auraEffect.mendingCurrentPercent':
+    'Ukládá léčení rovné {pct}% maximálního zdraví pro Kaskádovou látku',
+  'hudChrome.auraEffect.radiantResonance':
+    'Tvé další Léčivé světlo bude okamžité, nebo tvé další Objetí úsvitu stojí o {pct}% méně many a sesílá se za {castTime} s',
+  'hudChrome.auraEffect.redline':
+    'Červená linie: zářez {stacks} z {max}. Rány do těla přidávají zářezy; Rána z milosti zasáhne o {pct}% tvrději za zářez a uzavře okno. Dřívější vypršení je ztratí',
+  'hudChrome.auraEffect.solarReprisal':
+    'Tvůj další Sluneční disk nestojí manu, ignoruje obnovu a způsobí o {pct}% větší poškození; Kladivo milosti ignoruje svou obnovu a vyléčí tě za 100% způsobeného poškození; nebo je Léčivé světlo okamžité',
+  'hudChrome.auraEffect.veilstrikeWindow':
+    'Stínový závoj: tvá zahájení Soumračného závoje lze použít na otevřeném prostranství z libovolného úhlu a způsobené poškození se zvyšuje o {pct}%',
+  'hudChrome.auraEffect.venomRitual':
+    'Jedový rituál: stupeň {stacks} z {max}. Budující údery přidávají stupně; při {max} se Do hrobu mění v Jedovou trhlinu',
+  'entities.abilities.aegis_first_dawn.name': 'Egida prvního úsvitu',
+  'entities.abilities.aura_mastery.name': 'Svatá svornost',
+  'entities.abilities.bastion_rite.name': 'Obřad bastionu',
+  'entities.abilities.bastion_sweep.name': 'Rozmach bastionu',
+  'entities.abilities.beacon_of_light.name': 'Maják světla',
+  'entities.abilities.dawn_devotion.name': 'Oddanost úsvitu',
+  'entities.abilities.dawnfall.name': 'Pád úsvitu',
+  'entities.abilities.dawns_embrace.name': 'Objetí úsvitu',
+  'entities.abilities.devotion_ward.name': 'Oddanost bastionu',
+  'entities.abilities.divine_ascension.name': 'Božský vzestup',
+  'entities.abilities.faithforged_guard.name': 'Dluh světla',
+  'entities.abilities.final_edict.name': 'Poslední edikt',
+  'entities.abilities.grace_devotion.name': 'Oddanost milosti',
+  'entities.abilities.guardian_covenant.name': 'Úmluva strážce',
+  'entities.abilities.hammer_of_grace.name': 'Kladivo milosti',
+  'entities.abilities.hushbrand.name': 'Znamení ticha',
+  'entities.abilities.life_covenant.name': 'Úmluva života',
+  'entities.abilities.martyrs_aegis.name': 'Egida mučedníka',
+  'entities.abilities.mercy_lance.name': 'Kopí milosrdenství',
+  'entities.abilities.oath_chain.name': 'Řetěz přísahy',
+  'entities.abilities.radiant_chorus.name': 'Zářivý sbor',
+  'entities.abilities.radiant_devotion.name': 'Zářivá oddanost',
+  'entities.abilities.recall_the_fallen.name': 'Povolej padlé',
+  'entities.abilities.sacred_challenge.name': 'Svatá pobídka',
+  'entities.abilities.sacred_form.name': 'Svatá podoba',
+  'entities.abilities.seraphic_vigil.name': 'Serafínská stráž',
+  'entities.abilities.solar_invocation.name': 'Sluneční vzývání',
+  'entities.abilities.solar_step.name': 'Sluneční krok',
+  'entities.abilities.sun_gods_verdict.name': 'Ortel boha slunce',
+  'entities.abilities.sunward_disc.name': 'Sluneční disk',
+  'entities.abilities.valkyrs_calling.name': 'Volání valkýry',
+  'entities.abilities.veilbound_march.name': 'Pochod závoje',
+  'entities.abilities.veilbound_mark.name': 'Znamení závoje',
+  'entities.abilities.vowkeeper_strike.name': 'Úder strážce slibů',
+  'entities.abilities.choir_of_deliverance.name': 'Sbor vysvobození',
+  'entities.abilities.scouring_mercy.name': 'Očistné milosrdenství',
+  'entities.abilities.aegis_first_dawn.description':
+    'Sesílej 5 s a vytvoř svatou kupoli o průměru 10 metrů. Spojenci uvnitř jsou léčeni každou sekundu a utrpí o 50% méně poškození. Dokončení seslání uvolní závěrečné léčení a udělí 30% rychlosti pohybu na 4 s.',
+  'entities.abilities.aura_mastery.description':
+    'Na 8 s posílí každou aktivní Oddanost a Auru odplaty ve tvé skupině. Oddanost bastionu snižuje poškození o 15%; Odplata způsobí 15 Svatého poškození. Vícenásobná použití se obnovují místo sčítání.',
+  'entities.abilities.bastion_rite.description':
+    'Snižuje utrpěné fyzické poškození o 20% a zvyšuje šanci na blok o 20% na 6 s. Vzestup prodlouží trvání na 10 s.',
+  'entities.abilities.bastion_sweep.description':
+    'Rozmáchni se nasazeným štítem skrz nepřátele v předním oblouku 180 stupňů za {damage} Svatého poškození s vysokou hrozbou a získej 1 Oddanost. Vzestup zvýší poškození o 30% a poloměr na 8 m.',
+  'entities.abilities.beacon_of_light.description':
+    'Označí jednoho člena skupiny jako tvůj Maják světla. 50% tvého účinného přímého léčení na jiném členovi skupiny do 60 m léčí také Maják. Plošné a periodické léčení se nepřenáší. Trvá, dokud jeden z vás nezemře.',
+  'entities.abilities.dawn_devotion.description':
+    'Zvyšuje tvou útočnou sílu a sílu členů skupiny o 40 na 30 min. Nahrazuje tvou vlastní Zářivou oddanost nebo Oddanost milosti, ale koexistuje s Oddanostmi jiných paladinů a s válečnickými pokřiky.',
+  'entities.abilities.dawnfall.description':
+    'Způsobí {damage} Svatého poškození blízkým nepřátelům a získá 1 Oddanost. Zásah alespoň jednoho nepřítele zkrátí zbývající obnovu Posledního ediktu o 2 s. Vzestup zvýší jeho poškození a poloměr.',
+  'entities.abilities.dawns_embrace.description':
+    'Uvolní mocné léčení a získá 1 Oddanost. Zářivá rezonance sníží jeho náklady na manu o 50% a dobu sesílání na 1,5 s. Vzestup jej učiní okamžitým a zvýší jeho léčení o 35%.',
+  'entities.abilities.devotion_ward.description':
+    'Snižuje poškození, které utrpíš ty a členové skupiny, o 5% do smrti nebo nahrazení. Pouze tato aura a Aura odplaty se navzájem nahrazují; Zářivá oddanost, Oddanost úsvitu a milosti koexistují.',
+  'entities.abilities.divine_ascension.description':
+    'Spotřebuje 20 Oddanosti a získá 5 nábojů Vzestupu až na 45 s. Označené schopnosti spotřebují jeden náboj a získají další efekt.',
+  'entities.abilities.faithforged_guard.description':
+    'Na 8 s je další nepřátelský zásah proti tobě zodpovězen: až {buff} poškození je odepřeno a vráceno útočníkovi jako Svaté poškození a ty získáš 1 Oddanost. Zodpovězen je pouze jeden úder. Vzestup zvýší množství, které dokáže zodpovědět, o 50%.',
+  'entities.abilities.final_edict.description':
+    'Zasadí drtivý úder zbraní a získá 1 Oddanost, když způsobí poškození. Úspěšný zásah zkrátí zbývající obnovu Pádu úsvitu o 2 s. Úspěšné automatické útoky a zásahy Posledního ediktu mají 15% šanci udělit Hněv úsvitu na 8 s. Vzestup navíc uvolní Svatou explozi kolem tebe.',
+  'entities.abilities.grace_devotion.description':
+    'Ty a členové skupiny obnovujete 15 many každých 5 s a platíte o 3% méně many po dobu 30 min. Nahrazuje tvou vlastní Zářivou oddanost nebo Oddanost úsvitu, ale koexistuje s Oddanostmi jiných paladinů.',
+  'entities.abilities.guardian_covenant.description':
+    'Chrání spřáteleného cíle i tebe a snižuje utrpěné poškození o 20% na 8 s. Ve výchozím stavu vybere tebe, pokud není zvolen spřátelený cíl.',
+  'entities.abilities.hammer_of_grace.description':
+    'Okamžitě mrští svatým kladivem na nepřítele do 20 m za {damage}, obnoví 70 many, vyléčí tě za 50% způsobeného poškození a získá 1 Oddanost, když způsobí poškození. Sluneční odplata nechá Kladivo milosti ignorovat obnovu a vyléčí tě za 100% způsobeného poškození.',
+  'entities.abilities.hushbrand.description':
+    'Přeruší sesílání a zabrání kouzlům z dané školy na 4 s.',
+  'entities.abilities.life_covenant.description':
+    'Snižuje poškození utrpěné spojencem o 40% na 6 s. Během Vzestupu navíc udělí štít 120 bodů bez spotřebování náboje.',
+  'entities.abilities.martyrs_aegis.description':
+    'Snižuje poškození utrpěné spojencem o 40% na 8 s.',
+  'entities.abilities.mercy_lance.description':
+    'Způsobí {damage} Svatého poškození nepříteli a získá 1 Oddanost, když způsobí poškození. Během Vzestupu spotřebuje 1 náboj a zaručí kritický zásah.',
+  'entities.abilities.oath_chain.description':
+    'Okamžitě spoutá vzdáleného nepřítele svatým řetězem. Nepřítel se k tobě přesouvá rychlostí 18 m za sekundu, dokud nedosáhne 3 m, a poté je zpomalen o 50% na 4 s. Během Vzestupu spoutá druhého blízkého nepřítele.',
+  'entities.abilities.radiant_chorus.description':
+    'Vyléčí blízké spojence za {damage} a získá 1 Oddanost. Účinné vyléčení alespoň 2 spojenců udělí Zářivou rezonanci: tvé další Léčivé světlo bude okamžité, nebo tvé další Objetí úsvitu stojí o 50% méně many a sesílá se za 1,5 s. Vzestup zvýší léčení a poloměr Zářivého sboru.',
+  'entities.abilities.radiant_devotion.description':
+    'Zvyšuje tvou sílu kouzel a sílu členů skupiny o 20 na 30 min. Nahrazuje tvou vlastní Oddanost úsvitu nebo milosti, ale koexistuje s Oddanostmi jiných paladinů.',
+  'entities.abilities.recall_the_fallen.description':
+    'Vrátí mrtvého člena skupiny zpět k životu s 35% zdraví a many. Slunečný léčitel na úrovni 16 nebo vyšší místo toho povolá zpět každého padlého člena skupiny.',
+  'entities.abilities.sacred_challenge.description':
+    'Přinutí nepřítele, aby na tebe zaútočil. Během Vzestupu navíc sníží veškeré utrpěné poškození o 15% na 4 s bez spotřebování náboje.',
+  'entities.abilities.sacred_form.description':
+    'Vstoupí do svatého stavu až do smrti, zvýší léčení o 10% a kritickou šanci kouzel o 5% a sníží vytvářenou hrozbu o 50%. Pouze pro Slunečné léčitele.',
+  'entities.abilities.seraphic_vigil.description':
+    'Chrání spojence po dobu 30 s. První zásah, který jej srazí pod 35% zdraví, spotřebuje Stráž a vyléčí jej za 180. (Signatura Požehnání)',
+  'entities.abilities.scouring_mercy.description':
+    'Způsobí 72 až 84 Svatého poškození nepříteli nebo vyléčí spřáteleného cíle za 130 až 155. Obě hodnoty rostou se silou kouzel. Poškození navíc vyléčí každého spojence spojeného Doktrínou za 30%, nebo člena skupiny s nejnižším zdravím za 15%, pokud není spojen nikdo. (Signatura Doktríny)',
+  'entities.abilities.solar_invocation.description':
+    'Okamžitě vyléčí spojence za {damage} nebo způsobí mírné Svaté poškození nepříteli. Obě použití získají 1 Oddanost. Během Vzestupu léčivé seslání vyléčí také spřátelené hráče do 10 m od cíle za polovinu.',
+  'entities.abilities.solar_step.description': 'Zvýší tvou rychlost pohybu o 150% na 2 s.',
+  'entities.abilities.sun_gods_verdict.description':
+    'Odsoudí nepřítele pod Ortel boha slunce na 30 s. Poslední edikt a Pád úsvitu vepíší jeden náboj při úspěšném zásahu. Schopnost, která umístí třetí náboj, určí rozsudek: Poslední edikt uvolní ničivé poškození na odsouzeného; Pád úsvitu ortel odpálí a poškodí a omráčí blízké nepřátele na 1,5 s.',
+  'entities.abilities.sunward_disc.description':
+    'Vyžaduje štít. Mrští zářivým diskem, který zasáhne a poté se odráží mezi blízkými nepřáteli. Každý poškozující dopad získá 1 Oddanost. Sluneční odplata způsobí, že Sluneční disk nestojí manu, ignoruje obnovu a způsobí o 20% větší poškození. Vzestup posílí 5 odrazů.',
+  'entities.abilities.valkyrs_calling.description':
+    'Vzneseš se do vzduchu a staneš se imunním vůči poškození, zatímco letíš k nepříteli. Po 2 s se snese na cílovou oblast za {damage} Svatého poškození a získá 1 Oddanost. Vzestup zvýší poškození dopadu o 50% a spotřebuje 1 náboj.',
+  'entities.abilities.veilbound_march.description':
+    'Staneš se éterickým na 4 s, získáš 40% rychlosti pohybu a 30% brnění a staneš se imunním vůči znehybnění, zpomalení a odsunutí. Nepřátelé, kterými projdeš, získají Znamení závoje na 6 s: každou sekundu utrpí Svaté poškození, způsobují ti o 20% menší poškození a vytvářejí dodatečnou hrozbu. První znamení udělí 1 Oddanost. Když pochod skončí, blízcí označení nepřátelé utrpí závěrečný výbuch. Vzestup zvýší výbuch o 50% a lehce je přitáhne k tobě.',
+  'entities.abilities.veilbound_mark.description':
+    'Každou sekundu utrpí Svaté poškození, způsobuje o 20% menší poškození paladinovi, který znamení umístil, a vytváří vůči tomuto paladinovi dodatečnou hrozbu.',
+  'entities.abilities.vowkeeper_strike.description':
+    'Udeří s vysokou hrozbou a získá 1 Oddanost. Úspěšný úder má 20% šanci udělit Sluneční odplatu na 8 s; každý úspěšný blok 25%. Sluneční odplata posílí tvůj další Sluneční disk, Kladivo milosti nebo Léčivé světlo. Vzestup navíc udělí malý pohlcující štít.',
+  'entities.abilities.choir_of_deliverance.description':
+    'Sesílá 6 s a léčí blízké členy skupiny každé 2 s.',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'entities.abilities.bloodhook.name': 'Krvavý hák',
+  'entities.abilities.bloodtrail_assault.name': 'Útok krvavé stopy',
+  'entities.abilities.cold_focus.name': 'Chladné soustředění',
+  'entities.abilities.fieldcraft_reentry.name': 'Ozbrojený návrat',
+  'entities.abilities.frostjaw_trap.name': 'Past mrazivé čelisti',
+  'entities.abilities.hunting_momentum.name': 'Lovecký spád',
+  'entities.abilities.measured_shot.name': 'Odměřený výstřel',
+  'entities.abilities.pack_command.name': 'Povel smečky',
+  'entities.abilities.pack_rally.name': 'Shromáždění smečky',
+  'entities.abilities.shellskin.name': 'Krunýřová kůže',
+  'entities.abilities.shrapnel_charge.name': 'Střepinová nálož',
+  'entities.abilities.stampede.name': 'Úprk',
+  'entities.abilities.trailbreak.name': 'Zlom stopy',
+  'entities.abilities.unleash_beast.name': 'Vypusť bestii',
+  'entities.abilities.wildheart.name': 'Divoké srdce',
+  'entities.abilities.bloodhook.description':
+    'Vyraz na nepřítele a uděl Ránu krvavého háku, která způsobí 34 základního Fyzického poškození plus 26% tvé síly útoku na dálku po dobu 12 s ve 4 ticích. (Signatura Polního umu)',
+  'entities.abilities.bloodtrail_assault.description':
+    'Po dobu 12 s Krvavý hák rozšíří ránu se 60% silou až na 2 blízké nepřátele, Trhání ran přikáže útok společníka za 18 poškození a Střepinová nálož získá 2 metry, způsobí o 25% větší základní poškození svému hlavnímu cíli a spustí o 50% větší poškození z ran.',
+  'entities.abilities.cold_focus.description':
+    'Po dobu 12 s Odměřený výstřel obnoví o 50% více soustředění a Dlouhý nátah stojí o 25% méně a sesílá se o 30% rychleji. (Signatura Chladného zraku)',
+  'entities.abilities.fieldcraft_reentry.description':
+    'Pasivní: Zlom stopy obnoví Lovecký spád a připraví tvůj další Kuchající úder nebo Krvavý hák na 12 s. Kuchající úder způsobí o 15% větší poškození za nános. Krvavý hák způsobí 18 až 24 dodatečného Fyzického poškození, zvýšeného o 15% za nános a tvou silou útoku na dálku. Při 3 nánosech jeden z útoků spotřebuje Lovecký spád. (Polní um)',
+  'entities.abilities.frostjaw_trap.description':
+    'Umísti past k vybranému nepříteli nebo ke svým nohám. Aktivuje se po 0,75 s a trvá 30 s. První nepřítel, který ji spustí, je znehybněn na 3 s a nepřátelé do 4 metrů jsou zpomaleni o 50% na 4 s.',
+  'entities.abilities.hunting_momentum.description':
+    'Pasivní: Kuchající úder udělí 1 Lovecký spád na 8 s, až do 3. Při 3 nánosech Trhání ran způsobí o 45% větší poškození úderu a spotřebuje nánosy. (Polní um)',
+  'entities.abilities.measured_shot.description':
+    'Vystřel na cíl za {damage} Fyzického poškození. Zásah obnoví 20 soustředění. Poškození roste se silou útoku na dálku.',
+  'entities.abilities.pack_command.description':
+    'Přikaž svému živému společníkovi udeřit za 36 až 48 Fyzického poškození. Poškození roste se silou útoku společníka. Zásah obnoví 20 soustředění a udělí 1 Zuřivost smečky na 30 s, až do 3. Každý nános zvyšuje veškeré poškození tvého společníka o 10%. Tento úder používá nánosy, které jsi měl před zásahem.',
+  'entities.abilities.pack_rally.description':
+    'Přijmi Podobu oře a shromáždi blízké spojence s 30% rychlosti pohybu a 10% rychlosti útoku a sesílání na 10 s.',
+  'entities.abilities.shellskin.description':
+    'Snižuje utrpěné poškození o 60% na 8 s, ale zabraňuje útokům, dokud je aktivní.',
+  'entities.abilities.shrapnel_charge.description':
+    'Zasáhne cíl za 24 až 30 Fyzického poškození a až 4 další nepřátele do 6 metrů za 13 až 17. Ostatní cíle navíc krvácejí za 12 poškození po dobu 6 s. Pokud hlavní cíl nese tvou Ránu krvavého háku, způsobí 1 tik rány okamžitě. Přímé poškození roste se silou útoku na dálku.',
+  'entities.abilities.stampede.description':
+    'Přivolá 3 bestie na 12 s. Každá útočí každé 2 s za {damage} Fyzického poškození. Zobrazené poškození zahrnuje 8% tvé síly útoku na dálku před bonusy k poškození společníka. Bestie zafixují Zuřivost smečky při přivolání a získají 10% poškození za nános. Zatímco je Úprk v obnově, úspěšné Povely smečky mají 20% šanci jej resetovat, zaručeně po 5 neúspěšných šancích. Nemůže se resetovat, dokud jsou bestie aktivní. (Pán smečky)',
+  'entities.abilities.trailbreak.description':
+    'Skoč 12 metrů vzad. Máš-li Lovecký spád, obnoví se a připraví Návrat na 12 s.',
+  'entities.abilities.unleash_beast.description':
+    'Spotřebuje 3 Zuřivosti smečky poté, co tvůj společník udeří za 83 až 105 Fyzického poškození a otřese každým nepřítelem do 6 metrů za 26 až 34. Úder i otřes používají plný 30% bonus k poškození společníka ze Zuřivosti smečky a rostou se silou útoku společníka. Po následujících 8 s společník způsobuje o 25% větší poškození, útočí o 35% rychleji a Prokletý výstřel zasáhne až 2 blízké nepřátele.',
+  'entities.abilities.wildheart.description': 'Okamžitě obnoví 30% tvého maximálního zdraví.',
+  'entities.abilities.ancestor_return.name': 'Návrat předků',
+  'entities.abilities.galeheart_weapon.name': 'Zbraň srdce vichru',
+  'entities.abilities.lifespring_weapon.name': 'Zbraň pramene života',
+  'entities.abilities.primal_exaltation.name': 'Prvotní povznesení',
+  'entities.abilities.stoneward.name': 'Kamenná stráž',
+  'entities.abilities.stormsurge.name': 'Bouřná vlna',
+  'entities.abilities.thunder_reservoir.name': 'Zásobárna hromu',
+  'entities.abilities.tidecall.name': 'Volání přílivu',
+  'entities.abilities.unleash_weapon.name': 'Vypusť zbraň',
+  'entities.abilities.warspirit_cadence.name': 'Kadence válečného ducha',
+  'entities.abilities.ancestor_return.description':
+    'Povolá zpět k životu u jejich těla každého padlého člena tvé skupiny nebo výpravy s 30% zdraví a many. Nelze seslat v boji. (Duchovní látka)',
+  'entities.abilities.galeheart_weapon.description':
+    'Očaruje obě zbraně na 30 min a umožní Kadenci válečného ducha.',
+  'entities.abilities.lifespring_weapon.description':
+    'Očaruje tvou zbraň na 30 min. Léčivé vody a Volání přílivu přidávají o 20% více léčení do Léčivého proudu.',
+  'entities.abilities.primal_exaltation.description':
+    'Po dobu 12 s se Bleskový šíp a Rozvětvený blesk Volání hromu sesílají o 50% rychleji a Bleskový šíp udělí 2 Hromy; Válečný duch spouští svou kadenci každé 2 zásahy zbraní; Duchovní látka přidává o 50% více léčení do Léčivého proudu. (Talent šamana)',
+  'entities.abilities.stoneward.description':
+    'Chrání spojence po dobu 60 s se 6 náboji. Poškození spotřebuje náboj a vyléčí 5% maximálního zdraví, jednou za 3 s. (Talent šamana)',
+  'entities.abilities.stormsurge.description':
+    'Pasivní: zatímco je Úder předků v obnově, spotřebování Znamení bouře má 25% šanci jej resetovat. Pokud první 3 šance selžou, 4. jej vždy resetuje. (Válečný duch)',
+  'entities.abilities.thunder_reservoir.description':
+    'Pasivní: Bleskový šíp a Rozvětvený blesk udělují Hrom, až do 5. Při 5 Hromech způsobí Zemní otřes o 125% větší poškození nebo Zemětřesení o 100% větší a poté spotřebuje veškerý Hrom. (Volání hromu)',
+  'entities.abilities.tidecall.description':
+    'Vyléčí spřáteleného cíle za 58 až 72. Léčení roste se silou kouzel. Přidá stejné léčení spočítané před přeléčením do Léčivého proudu, až do 30% maximálního zdraví cíle.',
+  'entities.abilities.unleash_weapon.description':
+    'Vypustí aktivní očarování tvé zbraně. Ohnivé znamení způsobí 54 až 64 Ohnivého poškození, získá 30% síly kouzel a udělí 2 Hromy. Srdce vichru udeří tvou zbraní, posune Kadenci válečného ducha a udělí 20% rychlosti útoku na 6 s. Kamenné pouto udeří za 75% poškození zbraní, přinutí cíl zaútočit na tebe a sníží utrpěné poškození o 20% na 4 s. Pramen života spotřebuje tvůj Léčivý proud, vyléčí za 125% jeho zbývajícího léčení a sníží další zásah do 8 s o 50% obnoveného zdraví.',
+  'entities.abilities.warspirit_cadence.description':
+    'Pasivní: každý 3. úspěšný útok zbraní spustí 2 Ozvěny srdce vichru za 50% Přírodního poškození a udělí Znamení bouře na 12 s. Znamení bouře učiní tvůj další Bleskový šíp, Otřes nebo Léčivé vody okamžitými a sníží jejich náklady na manu o 50%. Úder předků se počítá jako 2 útoky. (Válečný duch)',
+  'entities.abilities.summon_tithefiend.name': 'Přivolej desátkového běsa',
+  'entities.abilities.summon_tithefiend.description':
+    'Spotřebuje veškerý Ponurý desátek a přivolá desátkového běsa na 6, 8, 10, 12 nebo 15 s při 1 až 5 nánosech. Útočí každé 2 s za 20 až 24 Stínového poškození, plus 8 za každý další nános. Při pěti nánosech se zvětší a jeho poškození vzroste o 25%. Jeho poškození roste s tvou silou kouzel. Upřednostňuje tvou Podobiznu. Každý zásah obnoví 1% maximální many a odrazí 15% poškození až na 3 další nepřátele s tvým Žalozpěvem rozkladu. (Signatura Nešpor)',
+  'entities.abilities.veilstep.name': 'Krok závoje',
+  'entities.abilities.veilstep.description': 'Prokročí závojem ve směru, kterým hledíš.',
+  'entities.quests.q_divine_tome.title': 'Úsvitem spoutaný svazek',
+  'entities.quests.q_divine_tome.objectives.0.label': 'Neklidné kosti uloženy k odpočinku',
+  'entities.quests.q_divine_tome.text':
+    'Světlo v tobě nespočívá tiše, {playerName}. Viděl jsem tě ukládat mrtvé k pokoji a věřím, že jsi připraven na to, čemu se učí jen málo paladinů: Obřad povolání, jímž je padlá duše volána zpět mezi živé. Jeho slova jsou uchována v Úsvitem spoutaném svazku, zde v mé péči, ale kniha není žádným požehnáním, dokud po této zemi stále chodí neklidní mrtví. Vrať zemi ještě 6 Neklidných kostí a začnu tě učit.',
+  'entities.quests.q_divine_tome.completion':
+    'Nádvoří kaple ztichne. Jsi připraven na slova, {playerName}, ale Obřad povolání nelze pronést v teplé kapli. Musí být zpíván tam, kde se závoj mezi životem a smrtí ztenčuje. Hodlám odnést Svazek na sever do Mirefenských močálů. Následuj mě tam a dokončíme to.',
+  'entities.quests.q_rite_of_redemption.title': 'Obřad povolání',
+  'entities.quests.q_rite_of_redemption.objectives.0.label': 'Utonulí mrtví uloženi k odpočinku',
+  'entities.quests.q_rite_of_redemption.text':
+    'Takže jsi mě následoval do bahna, {playerName}. Dobře. Mám tu Úsvitem spoutaný svazek a tato utopená země je místem, kam jeho slova patří: nikde není závoj mezi životem a smrtí tenčí než tam, kde mrtví nezůstanou pohřbeni. Ale utonulí by tvůj hlas stáhli dolů uprostřed verše. Vyklidi prostor hodný obřadu: ulož k odpočinku 8 Utonulých mrtvých a společně jej posvětíme.',
+  'entities.quests.q_rite_of_redemption.completion':
+    'Poklekni, {playerName}, a přečti slova nahlas. Tak. Cítíš to? Světlo v tvých rukou už nespravuje jen živé, dokáže povolat zpět ty, kdo přešli. Užívej je moudře. Duše povolaná zpět do beznadějného boje je krutost, ne milost. Povstaň, Vykupiteli.',
+  'guide.abilityHook.hammer_of_justice':
+    'Zastaví jednoho nepřítele krátkým, spolehlivým omráčením.',
+  'guide.abilityHook.oath_chain': 'Přitáhne vzdáleného nepřítele do tvé smečky a zbrzdí jeho útěk.',
+  'guide.abilityHook.ancestor_return':
+    'Vrátí k životu každého padlého člena skupiny nebo výpravy po dlouhém seslání mimo boj.',
+  'guide.abilityHook.avenging_wrath':
+    'Udělí 10 Oddanosti a poté na patnáct sekund zdvojnásobí Oddanost získanou schopnostmi.',
+  'guide.abilityHook.bastion_sweep':
+    'Rozmáchne se štítem skrz skupinu, aby strhl hrozbu a budoval Oddanost.',
+  'guide.abilityHook.chain_lightning':
+    'Zasáhne jeden cíl a přeskočí na dva blízké nepřátele, přičemž za celé seslání získá jeden Hrom.',
+  'guide.abilityHook.consecration': 'Zabere zemi kolem tebe trvalým Svatým poškozením a hrozbou.',
+  'guide.abilityHook.hammer_of_wrath':
+    'Popraví raněného nepřítele z dálky, nebo jakéhokoli nepřítele, dokud jsou tvá křídla aktivní.',
+  'guide.abilityHook.holy_shield':
+    'Utratí Oddanost za okno aktivního bloku, pohlcení a impuls hrozby.',
+  'guide.abilityHook.lay_on_hands': 'Obnoví velké množství zdraví, když je spojenec blízko pádu.',
+  'guide.abilityHook.measured_shot':
+    'Rozvážný výstřel na dálku, který obnoví soustředění pro tvé těžší útoky.',
+  'guide.abilityHook.pack_command':
+    'Přikáže tvému společníkovi udeřit a budovat Zuřivost smečky. Každý nános způsobí, že tvůj společník zadá o 10% větší poškození, až do 30%, než Vypusť bestii nánosy utratí.',
+  'guide.abilityHook.stampede':
+    'Přivolá tři bestie k útoku na 12 sekund. Použij ji při plné Zuřivosti smečky, aby si udržely maximální bonus k poškození po celé přivolání.',
+  'guide.abilityHook.stormsurge':
+    'Někdy vrátí Úder předků dříve poté, co utratíš příležitost se Znamením bouře.',
+  'guide.abilityHook.thunder_reservoir':
+    'Hromadí blesky, dokud Zemní otřes nebo Zemětřesení nemohou uvolnit výplatu v plné síle.',
+  'guide.abilityHook.veilbound_march':
+    'Projdi skupinou, abys ji označil, otupil její poškození vůči tobě a upevnil hrozbu.',
+  'guide.abilityHook.warspirit_cadence':
+    'Promění ustálený rytmus zbraně v Ozvěny srdce vichru a příležitost k okamžitému kouzlu.',
 };

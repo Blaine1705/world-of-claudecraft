@@ -9302,4 +9302,282 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Ersätter {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Det föremålet har redan den förtrollningen.',
   'hudChrome.enchanting.sameEnchantTag': 'Redan applicerad',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'abilityUi.resources.devotion': 'Hängivenhet',
+  'abilityUi.resources.focus': 'fokus',
+  'classDetails.resources.focus': 'Fokus',
+  'game.hud.lowFocus': 'Lågt fokus',
+  'hud.errors.notEnoughDevotion': 'Inte tillräckligt med hängivenhet!',
+  'hudChrome.paladin.devotion': 'Hängivenhet',
+  'hudChrome.paladin.devotionValue': 'Hängivenhet {value} av {max}',
+  'hudChrome.paladin.devotionAscensionCharges':
+    'Hängivenhet {value} av {max}. Upphöjelse: {charges} laddningar.',
+  'hudChrome.paladin.devotionAscensionLast':
+    'Hängivenhet {value} av {max}. Upphöjelse: sista laddningen.',
+  'hudChrome.paladin.ascensionLastAnnouncement': 'Upphöjelse: sista laddningen',
+  'hudChrome.paladin.ascensionSpenderAria':
+    'Handlingsplats {slot}: {ability}. Förbrukar en upphöjelseladdning.',
+  'hudChrome.crafting.craftedToastQty': 'Tillverkat: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedAlso': 'Du får även tillbaka {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Du får även tillbaka {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedYield': 'Du förtrollar bort {item} och får {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty':
+    'Du förtrollar bort {item} och får {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Du bärgar {material} ur {item}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Du bärgar {material} x{qty} ur {item}.',
+  'hudChrome.auraEffect.dawnsWrath': 'VH: all hälsa · +1 användning · Nedkylning 0 · +{pct}% skada',
+  'hudChrome.auraEffect.duskEconomy': 'Förmågor kostar {pct}% mindre energi',
+  'hudChrome.auraEffect.hunterFerocity': '{stacks} Flockvildhet: ditt husdjur gör {pct}% mer skada',
+  'hudChrome.auraEffect.veiledEdge': 'Ditt nästa lurarslag slår dubbelt så hårt',
+  'hudChrome.auraEffect.gloam':
+    'Skymning: steg {stacks} av {max}. Vid {max} låses dina skymningsslöjeöppningar upp i öppen terräng, och nästa du kastar är GRATIS och detonerar förrådet till skuggslöjan',
+  'hudChrome.auraEffect.mendingCurrent':
+    'Lagrar {value} läkning, frisläppt över tid eller förbrukad av Kaskadlagning',
+  'hudChrome.auraEffect.mendingCurrentPercent':
+    'Lagrar läkning motsvarande {pct}% av maxhälsan för Kaskadlagning',
+  'hudChrome.auraEffect.radiantResonance':
+    'Ditt nästa Lagande ljus blir omedelbart, eller din nästa Gryningens famn kostar {pct}% mindre mana och kastas på {castTime} sek',
+  'hudChrome.auraEffect.redline':
+    'Röd linje: hack {stacks} av {max}. Kroppsträffar lägger till hack; Nådastöten slår {pct}% hårdare per hack och stänger fönstret. Går det ut först förloras det',
+  'hudChrome.auraEffect.solarReprisal':
+    'Din nästa Solskiva kostar ingen mana, ignorerar nedkylningen och gör {pct}% mer skada; Nådens hammare ignorerar sin nedkylning och läker dig för 100% av skadan; eller Lagande ljus blir omedelbart',
+  'hudChrome.auraEffect.veilstrikeWindow':
+    'Skuggslöja: dina skymningsslöjeöppningar kan användas i öppen terräng från valfri vinkel, och skadan du gör ökar med {pct}%',
+  'hudChrome.auraEffect.venomRitual':
+    'Giftritual: steg {stacks} av {max}. Uppbyggande slag lägger till steg; vid {max} blir Sista vilan till Giftslitning',
+  'entities.abilities.aegis_first_dawn.name': 'Första gryningens egid',
+  'entities.abilities.aura_mastery.name': 'Helig endräkt',
+  'entities.abilities.bastion_rite.name': 'Bastionens rit',
+  'entities.abilities.bastion_sweep.name': 'Bastionssvep',
+  'entities.abilities.beacon_of_light.name': 'Ljusets båk',
+  'entities.abilities.dawn_devotion.name': 'Gryningens hängivenhet',
+  'entities.abilities.dawnfall.name': 'Gryningsfall',
+  'entities.abilities.dawns_embrace.name': 'Gryningens famn',
+  'entities.abilities.devotion_ward.name': 'Bastionens hängivenhet',
+  'entities.abilities.divine_ascension.name': 'Gudomlig upphöjelse',
+  'entities.abilities.faithforged_guard.name': 'Ljusets skuld',
+  'entities.abilities.final_edict.name': 'Sista påbudet',
+  'entities.abilities.grace_devotion.name': 'Nådens hängivenhet',
+  'entities.abilities.guardian_covenant.name': 'Väktarens förbund',
+  'entities.abilities.hammer_of_grace.name': 'Nådens hammare',
+  'entities.abilities.hushbrand.name': 'Tystnadsmärke',
+  'entities.abilities.life_covenant.name': 'Livets förbund',
+  'entities.abilities.martyrs_aegis.name': 'Martyrens egid',
+  'entities.abilities.mercy_lance.name': 'Barmhärtighetens lans',
+  'entities.abilities.oath_chain.name': 'Edkedja',
+  'entities.abilities.radiant_chorus.name': 'Strålande kör',
+  'entities.abilities.radiant_devotion.name': 'Strålande hängivenhet',
+  'entities.abilities.recall_the_fallen.name': 'Kalla de fallna',
+  'entities.abilities.sacred_challenge.name': 'Helig sporre',
+  'entities.abilities.sacred_form.name': 'Helig gestalt',
+  'entities.abilities.seraphic_vigil.name': 'Serafisk vaka',
+  'entities.abilities.solar_invocation.name': 'Solåkallan',
+  'entities.abilities.solar_step.name': 'Solsteg',
+  'entities.abilities.sun_gods_verdict.name': 'Solgudens dom',
+  'entities.abilities.sunward_disc.name': 'Solskiva',
+  'entities.abilities.valkyrs_calling.name': 'Valkyrians kallelse',
+  'entities.abilities.veilbound_march.name': 'Slöjmarsch',
+  'entities.abilities.veilbound_mark.name': 'Slöjmärke',
+  'entities.abilities.vowkeeper_strike.name': 'Edvaktarens slag',
+  'entities.abilities.choir_of_deliverance.name': 'Befrielsens kör',
+  'entities.abilities.scouring_mercy.name': 'Rensande nåd',
+  'entities.abilities.aegis_first_dawn.description':
+    'Kanalisera i 5 sek och skapa en helig kupol på 10 meter. Allierade inuti läks varje sekund och tar 50% mindre skada. Att fullborda kanaliseringen frigör en sista läkning och ger 30% förflyttningshastighet i 4 sek.',
+  'entities.abilities.aura_mastery.description':
+    'Förstärker i 8 sek varje aktiv hängivenhet och vedergällningsaura i din grupp. Bastionens hängivenhet minskar skadan med 15%; Vedergällning gör 15 helig skada. Flera användningar förnyar i stället för att staplas.',
+  'entities.abilities.bastion_rite.description':
+    'Minskar fysisk skada du tar med 20% och ökar blockchansen med 20% i 6 sek. Upphöjelse förlänger varaktigheten till 10 sek.',
+  'entities.abilities.bastion_sweep.description':
+    'Svep din utrustade sköld genom fiender i en 180 graders frontal båge för {damage} helig skada med hög hotnivå och generera 1 hängivenhet. Upphöjelse ökar skadan med 30% och radien till 8 m.',
+  'entities.abilities.beacon_of_light.description':
+    'Märk en gruppmedlem som din Ljusets båk. 50% av din effektiva direktläkning på en annan gruppmedlem inom 60 m läker även båken. Ytläkning och periodisk läkning överförs inte. Varar tills någon av er dör.',
+  'entities.abilities.dawn_devotion.description':
+    'Ökar attackkraften hos dig och gruppmedlemmarna med 40 i 30 min. Ersätter din egen Strålande eller Nådens hängivenhet, men samexisterar med hängivenheter från andra paladiner och med krigarrop.',
+  'entities.abilities.dawnfall.description':
+    'Gör {damage} helig skada på närliggande fiender och genererar 1 hängivenhet. Att träffa minst en fiende minskar Sista påbudets återstående nedkylning med 2 sek. Upphöjelse ökar dess skada och radie.',
+  'entities.abilities.dawns_embrace.description':
+    'Levererar en kraftfull läkning och genererar 1 hängivenhet. Strålande resonans minskar dess manakostnad med 50% och kasttiden till 1,5 sek. Upphöjelse gör den omedelbar och ökar dess läkning med 35%.',
+  'entities.abilities.devotion_ward.description':
+    'Minskar skadan du och gruppmedlemmarna tar med 5% till döden eller ersättning. Bara denna aura och Vedergällningsauran ersätter varandra; Strålande, Gryningens och Nådens hängivenhet samexisterar.',
+  'entities.abilities.divine_ascension.description':
+    'Förbrukar 20 hängivenhet för att få 5 upphöjelseladdningar i upp till 45 sek. Märkta förmågor förbrukar en laddning och får en extra effekt.',
+  'entities.abilities.faithforged_guard.description':
+    'I 8 sek besvaras nästa fiendeträff mot dig: upp till {buff} skada nekas och återförs till angriparen som helig skada, och du får 1 hängivenhet. Endast ett slag besvaras. Upphöjelse höjer mängden den kan besvara med 50%.',
+  'entities.abilities.final_edict.description':
+    'Levererar ett krossande vapenslag och genererar 1 hängivenhet när det gör skada. En lyckad träff minskar Gryningsfalls återstående nedkylning med 2 sek. Lyckade autoattacker och träffar med Sista påbudet har 15% chans att ge Gryningens vrede i 8 sek. Upphöjelse frigör dessutom en helig explosion runt dig.',
+  'entities.abilities.grace_devotion.description':
+    'Du och gruppmedlemmarna återfår 15 mana var 5:e sek och betalar 3% mindre mana i 30 min. Ersätter din egen Strålande eller Gryningens hängivenhet, men samexisterar med hängivenheter från andra paladiner.',
+  'entities.abilities.guardian_covenant.description':
+    'Skyddar ett vänligt mål och dig själv och minskar skadan ni tar med 20% i 8 sek. Väljer dig som standard när inget vänligt mål är valt.',
+  'entities.abilities.hammer_of_grace.description':
+    'Slungar omedelbart en helig hammare mot en fiende inom 20 m för {damage}, återställer 70 mana, läker dig för 50% av skadan och genererar 1 hängivenhet när den gör skada. Solvedergällning låter Nådens hammare ignorera sin nedkylning och läka dig för 100% av skadan.',
+  'entities.abilities.hushbrand.description':
+    'Avbryter besvärjelser och hindrar besvärjelser från den skolan i 4 sek.',
+  'entities.abilities.life_covenant.description':
+    'Minskar skadan en allierad tar med 40% i 6 sek. Under Upphöjelse ger den även en sköld på 120 poäng utan att förbruka en laddning.',
+  'entities.abilities.martyrs_aegis.description': 'Minskar skadan en allierad tar med 40% i 8 sek.',
+  'entities.abilities.mercy_lance.description':
+    'Gör {damage} helig skada på en fiende och genererar 1 hängivenhet när den gör skada. Under Upphöjelse förbrukar den 1 laddning för att garantera en kritisk träff.',
+  'entities.abilities.oath_chain.description':
+    'Binder omedelbart en avlägsen fiende med en helig kedja. Fienden färdas mot dig med 18 m per sekund tills den når 3 m och saktas sedan ned med 50% i 4 sek. Under Upphöjelse binder den en andra närliggande fiende.',
+  'entities.abilities.radiant_chorus.description':
+    'Läker närliggande allierade för {damage} och genererar 1 hängivenhet. Att effektivt läka minst 2 allierade ger Strålande resonans: ditt nästa Lagande ljus blir omedelbart, eller din nästa Gryningens famn kostar 50% mindre mana och kastas på 1,5 sek. Upphöjelse ökar Strålande körs läkning och radie.',
+  'entities.abilities.radiant_devotion.description':
+    'Ökar besvärjelsekraften hos dig och gruppmedlemmarna med 20 i 30 min. Ersätter din egen Gryningens eller Nådens hängivenhet, men samexisterar med hängivenheter från andra paladiner.',
+  'entities.abilities.recall_the_fallen.description':
+    'Återför en död gruppmedlem till livet med 35% hälsa och mana. En Solhelare på nivå 16 eller högre kallar i stället tillbaka varje fallen medlem i gruppen.',
+  'entities.abilities.sacred_challenge.description':
+    'Tvingar en fiende att attackera dig. Under Upphöjelse minskar den även all skada du tar med 15% i 4 sek utan att förbruka en laddning.',
+  'entities.abilities.sacred_form.description':
+    'Går in i ett heligt tillstånd till döden, ökar läkning med 10% och kritisk besvärjelsechans med 5%, och minskar genererat hot med 50%. Endast för Solhelare.',
+  'entities.abilities.seraphic_vigil.description':
+    'Skyddar en allierad i 30 sek. Den första träffen som för denne under 35% hälsa förbrukar Vakan och läker denne för 180. (Välsignelsesignatur)',
+  'entities.abilities.scouring_mercy.description':
+    'Gör 72 till 84 helig skada på en fiende eller läker ett vänligt mål för 130 till 155. Båda beloppen ökar med besvärjelsekraft. Skadan läker även varje läroförbunden allierad för 30%, eller gruppmedlemmen med lägst hälsa för 15% om ingen allierad är förbunden. (Lärosignatur)',
+  'entities.abilities.solar_invocation.description':
+    'Läker omedelbart en allierad för {damage} eller gör måttlig helig skada på en fiende. Båda användningarna genererar 1 hängivenhet. Under Upphöjelse läker en läkande kastning även allierade spelare inom 10 m av målet för hälften.',
+  'entities.abilities.solar_step.description': 'Ökar din förflyttningshastighet med 150% i 2 sek.',
+  'entities.abilities.sun_gods_verdict.description':
+    'Dömer en fiende under Solgudens dom i 30 sek. Sista påbudet och Gryningsfall inskriver en laddning vid varje lyckad träff. Förmågan som sätter den tredje laddningen dikterar domen: Sista påbudet släpper lös förödande skada på den dömde; Gryningsfall detonerar domen och skadar och bedövar närliggande fiender i 1,5 sek.',
+  'entities.abilities.sunward_disc.description':
+    'Kräver en sköld. Slungar en strålande skiva som träffar och sedan studsar mellan närliggande fiender. Varje skadande nedslag genererar 1 hängivenhet. Solvedergällning gör att Solskivan inte kostar mana, ignorerar sin nedkylning och gör 20% mer skada. Upphöjelse förstärker 5 studsar.',
+  'entities.abilities.valkyrs_calling.description':
+    'Stig upp i luften och bli immun mot skada medan du flyger mot fienden. Efter 2 sek störtar du ned över målområdet för {damage} helig skada och genererar 1 hängivenhet. Upphöjelse ökar nedslagsskadan med 50% och förbrukar 1 laddning.',
+  'entities.abilities.veilbound_march.description':
+    'Bli eterisk i 4 sek, få 40% förflyttningshastighet och 30% rustning och bli immun mot rötter, inbromsningar och förflyttning. Fiender du passerar genom får Slöjmärket i 6 sek: de tar helig skada varje sekund, gör 20% mindre skada på dig och genererar extra hot. Det första märket ger 1 hängivenhet. När marschen slutar tar närliggande märkta fiender en sista urladdning. Upphöjelse ökar urladdningen med 50% och drar dem lätt mot dig.',
+  'entities.abilities.veilbound_mark.description':
+    'Tar helig skada varje sekund, gör 20% mindre skada på paladinen som satte märket och genererar extra hot mot den paladinen.',
+  'entities.abilities.vowkeeper_strike.description':
+    'Slår med hög hotnivå och genererar 1 hängivenhet. Ett lyckat slag har 20% chans att ge Solvedergällning i 8 sek; varje lyckad block har 25%. Solvedergällning förstärker din nästa Solskiva, Nådens hammare eller Lagande ljus. Upphöjelse ger även en liten absorptionssköld.',
+  'entities.abilities.choir_of_deliverance.description':
+    'Kanaliserar i 6 sek och läker närliggande gruppmedlemmar var 2:e sek.',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'entities.abilities.bloodhook.name': 'Blodkrok',
+  'entities.abilities.bloodtrail_assault.name': 'Blodspårsanfall',
+  'entities.abilities.cold_focus.name': 'Kallt fokus',
+  'entities.abilities.fieldcraft_reentry.name': 'Beväpnad återkomst',
+  'entities.abilities.frostjaw_trap.name': 'Frostkäftsfälla',
+  'entities.abilities.hunting_momentum.name': 'Jaktfart',
+  'entities.abilities.measured_shot.name': 'Avvägt skott',
+  'entities.abilities.pack_command.name': 'Flockbefallning',
+  'entities.abilities.pack_rally.name': 'Flocksamling',
+  'entities.abilities.shellskin.name': 'Skalhud',
+  'entities.abilities.shrapnel_charge.name': 'Splitterladdning',
+  'entities.abilities.stampede.name': 'Vilt språng',
+  'entities.abilities.trailbreak.name': 'Spårbrott',
+  'entities.abilities.unleash_beast.name': 'Släpp loss besten',
+  'entities.abilities.wildheart.name': 'Vildhjärta',
+  'entities.abilities.bloodhook.description':
+    'Storma mot en fiende och applicera Blodkrokssår som gör 34 fysisk grundskada plus 26% av din distansattackkraft över 12 sek i 4 pulser. (Fältkonstsignatur)',
+  'entities.abilities.bloodtrail_assault.description':
+    'I 12 sek sprider Blodkroken ett sår med 60% styrka till upp till 2 närliggande fiender, Sårslitning befaller en husdjursattack på 18 skada, och Splitterladdningen får 2 meter, gör 25% mer grundskada på sitt huvudmål och utlöser 50% mer sårskada.',
+  'entities.abilities.cold_focus.description':
+    'I 12 sek återställer Avvägt skott 50% mer fokus, och Långt drag kostar 25% mindre och kastas 30% snabbare. (Kallsiktsignatur)',
+  'entities.abilities.fieldcraft_reentry.description':
+    'Passiv: Spårbrott förnyar Jaktfarten och laddar ditt nästa Rensarslag eller Blodkrok i 12 sek. Rensarslaget gör 15% mer skada per stapel. Blodkroken gör 18 till 24 extra fysisk skada, ökad med 15% per stapel och av din distansattackkraft. Vid 3 staplar förbrukar endera attacken Jaktfarten. (Fältkonst)',
+  'entities.abilities.frostjaw_trap.description':
+    'Placera en fälla vid den valda fienden eller vid dina fötter. Den osäkras efter 0,75 sek och varar 30 sek. Den första fienden som utlöser den rotas i 3 sek, och fiender inom 4 meter saktas ned med 50% i 4 sek.',
+  'entities.abilities.hunting_momentum.description':
+    'Passiv: Rensarslaget ger 1 Jaktfart i 8 sek, upp till 3. Vid 3 staplar gör Sårslitning 45% mer slagskada och förbrukar staplarna. (Fältkonst)',
+  'entities.abilities.measured_shot.description':
+    'Skjut målet för {damage} fysisk skada. En träff återställer 20 fokus. Skadan ökar med distansattackkraft.',
+  'entities.abilities.pack_command.description':
+    'Befall ditt levande husdjur att slå för 36 till 48 fysisk skada. Skadan ökar med husdjurets attackkraft. En träff återställer 20 fokus och ger 1 Flockvildhet i 30 sek, upp till 3. Varje stapel ökar all skada ditt husdjur gör med 10%. Detta slag använder de staplar du hade före träffen.',
+  'entities.abilities.pack_rally.description':
+    'Anta Springarens skepnad och samla närliggande allierade med 30% förflyttningshastighet och 10% attack- och kasthastighet i 10 sek.',
+  'entities.abilities.shellskin.description':
+    'Minskar skadan du tar med 60% i 8 sek, men hindrar attacker medan den är aktiv.',
+  'entities.abilities.shrapnel_charge.description':
+    'Träffar målet för 24 till 30 fysisk skada och upp till 4 andra fiender inom 6 meter för 13 till 17. De andra målen blöder också för 12 skada över 6 sek. Om huvudmålet bär ditt Blodkrokssår görs 1 sårpuls omedelbart. Direktskadan ökar med distansattackkraft.',
+  'entities.abilities.stampede.description':
+    'Frammanar 3 bestar i 12 sek. Var och en attackerar var 2:e sek för {damage} fysisk skada. Den visade skadan inkluderar 8% av din distansattackkraft före husdjursskadebonusar. Bestarna låser Flockvildheten när de frammanas och får 10% skada per stapel. Medan Vilt språng är på nedkylning har lyckade Flockbefallningar 20% chans att återställa det, garanterat efter 5 misslyckade chanser. Det kan inte återställas medan bestarna är aktiva. (Flockherre)',
+  'entities.abilities.trailbreak.description':
+    'Hoppa 12 meter bakåt. Om du har Jaktfart förnyas den och laddar Återkomsten i 12 sek.',
+  'entities.abilities.unleash_beast.description':
+    'Förbrukar 3 Flockvildhet efter att ditt husdjur slagit för 83 till 105 fysisk skada och skakat varje fiende inom 6 meter för 26 till 34. Slaget och skakningen använder Flockvildhetens fulla husdjursskadebonus på 30% och ökar med husdjurets attackkraft. I 8 sek därefter gör husdjuret 25% mer skada, attackerar 35% snabbare och får Ondskeskott att träffa upp till 2 närliggande fiender.',
+  'entities.abilities.wildheart.description': 'Återställer omedelbart 30% av din maximala hälsa.',
+  'entities.abilities.ancestor_return.name': 'Förfädernas återkomst',
+  'entities.abilities.galeheart_weapon.name': 'Stormhjärtevapen',
+  'entities.abilities.lifespring_weapon.name': 'Livskällevapen',
+  'entities.abilities.primal_exaltation.name': 'Urtida upphöjelse',
+  'entities.abilities.stoneward.name': 'Stenvärn',
+  'entities.abilities.stormsurge.name': 'Stormsvall',
+  'entities.abilities.thunder_reservoir.name': 'Åskreservoar',
+  'entities.abilities.tidecall.name': 'Tidvattenskallelse',
+  'entities.abilities.unleash_weapon.name': 'Släpp loss vapnet',
+  'entities.abilities.warspirit_cadence.name': 'Krigsandens kadens',
+  'entities.abilities.ancestor_return.description':
+    'Kallar varje fallen medlem i din grupp eller räd tillbaka till livet vid sin kropp med 30% hälsa och mana. Kan inte kastas i strid. (Andelagning)',
+  'entities.abilities.galeheart_weapon.description':
+    'Förtrollar båda vapnen i 30 min och möjliggör Krigsandens kadens.',
+  'entities.abilities.lifespring_weapon.description':
+    'Förtrollar ditt vapen i 30 min. Lagande vatten och Tidvattenskallelse lägger till 20% mer läkning till Lagningsströmmen.',
+  'entities.abilities.primal_exaltation.description':
+    'I 12 sek kastas Åskkallelsens Bågblixt och Gaffelblixt 50% snabbare, och Bågblixten ger 2 Åska; Krigsanden utlöser sin kadens var 2:a vapenträff; Andelagningen lägger till 50% mer läkning till Lagningsströmmen. (Shamantalang)',
+  'entities.abilities.stoneward.description':
+    'Skyddar en allierad i 60 sek med 6 laddningar. Skada förbrukar en laddning för att läka 5% av maxhälsan, en gång var 3:e sek. (Shamantalang)',
+  'entities.abilities.stormsurge.description':
+    'Passiv: medan Förfäderslaget är på nedkylning har förbrukandet av ett Stormtecken 25% chans att återställa det. Om de 3 första chanserna misslyckas återställer den 4:e det alltid. (Krigsande)',
+  'entities.abilities.thunder_reservoir.description':
+    'Passiv: Bågblixten och Gaffelblixten ger Åska, upp till 5. Vid 5 Åska gör Jordstöten 125% mer skada eller Jordbävningen 100% mer, och sedan förbrukas all Åska. (Åskkallelse)',
+  'entities.abilities.tidecall.description':
+    'Läker ett vänligt mål för 58 till 72. Läkningen ökar med besvärjelsekraft. Lägger till samma läkning beräknad före överläkning till Lagningsströmmen, upp till 30% av målets maxhälsa.',
+  'entities.abilities.unleash_weapon.description':
+    'Släpper loss ditt vapens aktiva förtrollning. Eldmärket gör 54 till 64 eldskada, får 30% av besvärjelsekraften och ger 2 Åska. Stormhjärtat slår med ditt vapen, driver Krigsandens kadens framåt och ger 20% attackhastighet i 6 sek. Stenbundet slår för 75% vapenskada, tvingar målet att attackera dig och minskar skadan du tar med 20% i 4 sek. Livskällan förbrukar din Lagningsström, läker för 125% av dess återstående läkning och minskar nästa träff inom 8 sek med 50% av den återställda hälsan.',
+  'entities.abilities.warspirit_cadence.description':
+    'Passiv: var 3:e landad vapenattack utlöser 2 Stormhjärteekon för 50% naturskada och ger ett Stormtecken i 12 sek. Stormtecknet gör din nästa Bågblixt, Stöt eller Lagande vatten omedelbar och sänker manakostnaden med 50%. Förfäderslaget räknas som 2 attacker. (Krigsande)',
+  'entities.abilities.summon_tithefiend.name': 'Frammana tiondedemon',
+  'entities.abilities.summon_tithefiend.description':
+    'Förbrukar all Dysterhetstionde för att frammana en tiondedemon i 6, 8, 10, 12 eller 15 sek vid 1 till 5 staplar. Den attackerar var 2:e sek för 20 till 24 skuggskada, plus 8 per extra stapel. Vid fem staplar blir den större och dess skada ökar med 25%. Dess skada ökar med din besvärjelsekraft. Den föredrar din Bildstod. Varje träff återställer 1% av maxmanan och ekar 15% av skadan till upp till 3 andra fiender med din Förfallets klagosång. (Aftonsångssignatur)',
+  'entities.abilities.veilstep.name': 'Slöjsteg',
+  'entities.abilities.veilstep.description': 'Kliver genom slöjan i den riktning du blickar.',
+  'entities.quests.q_divine_tome.title': 'Gryningsbundna tomen',
+  'entities.quests.q_divine_tome.objectives.0.label': 'Rastlösa ben lagda till ro',
+  'entities.quests.q_divine_tome.text':
+    'Ljuset vilar inte tyst i dig, {playerName}. Jag har sett dig lägga de döda till ro, och jag tror att du är redo för det som få paladiner någonsin får lära sig: Återkallelsens rit, genom vilken en fallen själ kallas tillbaka till de levande. Dess ord förvaras i Gryningsbundna tomen, här i min vård, men en bok är ingen välsignelse så länge de rastlösa döda ännu vandrar på denna mark. Återlämna 6 Rastlösa ben till jorden, så börjar jag undervisa dig.',
+  'entities.quests.q_divine_tome.completion':
+    'Kapellgården blir tyst. Du är redo för orden, {playerName}, men Återkallelsens rit kan inte uttalas i ett varmt kapell. Den måste sjungas där slöjan mellan liv och död tunnas ut. Jag ämnar bära tomen norrut till Mirefenkärret. Följ mig dit, så avslutar vi detta.',
+  'entities.quests.q_rite_of_redemption.title': 'Återkallelsens rit',
+  'entities.quests.q_rite_of_redemption.objectives.0.label': 'Dränkta döda lagda till ro',
+  'entities.quests.q_rite_of_redemption.text':
+    'Så du följde mig ut i dyn, {playerName}. Bra. Jag har Gryningsbundna tomen här, och denna dränkta mark är där dess ord hör hemma: ingenstans är slöjan mellan liv och död tunnare än där de döda inte stannar begravda. Men de dränkta skulle dra ned din röst mitt i versen. Röj en plats värdig riten: lägg 8 av de Dränkta döda till ro, så inviger vi den tillsammans.',
+  'entities.quests.q_rite_of_redemption.completion':
+    'Knäböj, {playerName}, och läs orden högt. Där. Känner du det? Ljuset lagar inte längre bara de levande i dina händer, det kan kalla tillbaka dem som gått över. Använd det vist. En själ som kallas tillbaka till en hopplös strid är en grymhet, inte en nåd. Res dig, Återlösare.',
+  'guide.abilityHook.hammer_of_justice': 'Stoppar en fiende med en kort, pålitlig bedövning.',
+  'guide.abilityHook.oath_chain':
+    'Släpar en avlägsen fiende in i din flock och bromsar dess flykt.',
+  'guide.abilityHook.ancestor_return':
+    'Återför varje fallen grupp- eller rädmedlem till livet efter en lång kastning utanför strid.',
+  'guide.abilityHook.avenging_wrath':
+    'Ger 10 hängivenhet och fördubblar sedan hängivenheten som förmågor genererar i femton sekunder.',
+  'guide.abilityHook.bastion_sweep':
+    'Sveper skölden genom en grupp för att rycka åt sig hot och bygga hängivenhet.',
+  'guide.abilityHook.chain_lightning':
+    'Träffar ett mål och hoppar till två närliggande fiender och bygger en Åska för hela kastningen.',
+  'guide.abilityHook.consecration':
+    'Gör anspråk på marken runt dig med ihållande helig skada och hot.',
+  'guide.abilityHook.hammer_of_wrath':
+    'Avrättar en sårad fiende på avstånd, eller vilken fiende som helst medan dina vingar är aktiva.',
+  'guide.abilityHook.holy_shield':
+    'Spenderar hängivenhet på ett aktivt blockfönster, absorption och en hotpuls.',
+  'guide.abilityHook.lay_on_hands':
+    'Återställer en stor mängd hälsa när en allierad är nära att falla.',
+  'guide.abilityHook.measured_shot':
+    'Ett medvetet distansskott som återställer fokus för dina tyngre attacker.',
+  'guide.abilityHook.pack_command':
+    'Befaller din följeslagare att slå och bygga Flockvildhet. Varje stapel får ditt husdjur att göra 10% mer skada, upp till 30%, innan Släpp loss besten spenderar staplarna.',
+  'guide.abilityHook.stampede':
+    'Kallar tre bestar att attackera i 12 sekunder. Använd den vid full Flockvildhet så att de behåller den maximala skadebonusen under hela frammaningen.',
+  'guide.abilityHook.stormsurge':
+    'Ger ibland tillbaka Förfäderslaget tidigt efter att du spenderat ett Stormteckentillfälle.',
+  'guide.abilityHook.thunder_reservoir':
+    'Lagrar blixtar tills Jordstöten eller Jordbävningen kan frigöra en utbetalning med full kraft.',
+  'guide.abilityHook.veilbound_march':
+    'Gå genom en grupp för att märka den, trubba av dess skada mot dig och låsa fast hotet.',
+  'guide.abilityHook.warspirit_cadence':
+    'Förvandlar en stadig vapenrytm till Stormhjärteekon och ett tillfälle till en omedelbar besvärjelse.',
 };

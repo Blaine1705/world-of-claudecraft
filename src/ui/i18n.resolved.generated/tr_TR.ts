@@ -241,7 +241,7 @@ export const tr_TR: EnTranslations = {
     "hud": {
       "lowMana": "Düşük Mana",
       "lowEnergy": "Düşük Enerji",
-      "lowFocus": "Low Focus"
+      "lowFocus": "Düşük odak"
     },
     "talents": {
       "title": "Yetenekler",
@@ -749,12 +749,12 @@ export const tr_TR: EnTranslations = {
       "resting": "Dinleniyor"
     },
     "paladin": {
-      "devotion": "Devotion",
-      "devotionValue": "Devotion {value} of {max}",
-      "devotionAscensionCharges": "Devotion {value} of {max}. Ascension {charges} charges.",
-      "devotionAscensionLast": "Devotion {value} of {max}. Ascension final charge.",
-      "ascensionLastAnnouncement": "Ascension final charge",
-      "ascensionSpenderAria": "Action slot {slot}: {ability}. Consumes one Ascension charge."
+      "devotion": "Adanmışlık",
+      "devotionValue": "Adanmışlık {value} / {max}",
+      "devotionAscensionCharges": "Adanmışlık {value} / {max}. Yüceliş: {charges} şarj.",
+      "devotionAscensionLast": "Adanmışlık {value} / {max}. Yüceliş: son şarj.",
+      "ascensionLastAnnouncement": "Yüceliş: son şarj",
+      "ascensionSpenderAria": "Eylem yuvası {slot}: {ability}. Bir Yüceliş şarjı tüketir."
     },
     "abilityScaling": {
       "bonus": "(+{value})"
@@ -1590,8 +1590,8 @@ export const tr_TR: EnTranslations = {
     "auraEffect": {
       "dot": "Her {interval} sn {value} {school} hasarı verir",
       "hot": "Her {interval} sn {value} sağlık yeniler",
-      "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",
-      "mendingCurrentPercent": "Stores healing equal to {pct}% of maximum health for Cascading Mend",
+      "mendingCurrent": "{value} iyileştirme biriktirir; zamanla salınır veya Şelale Onarımı tarafından tüketilir",
+      "mendingCurrentPercent": "Şelale Onarımı için azami canın {pct}% kadar iyileştirme biriktirir",
       "absorb": "{value} hasar emer",
       "healAbsorb": "Gelen iyileştirmenin {value} kadarını emer",
       "thorns": "Inflige {value} de daño de {school} a los atacantes",
@@ -1605,7 +1605,7 @@ export const tr_TR: EnTranslations = {
       "dmgDoneReduce": "Verilen hasarı {pct}% azaltır",
       "heatingUp": "Bir sonraki ardışık Ateş kurucu kritik vuruşun Sıcak Seri kazandırır; kritik olmayan bir kurucu Isınıyor'u kaldırır",
       "elementalConvergencePrimed": "Diğer element okulundan bir sonraki büyün Element Yakınsaması kazandırır",
-      "hunterFerocity": "{stacks} Pack Ferocity: your pet deals {pct}% more damage",
+      "hunterFerocity": "{stacks} Sürü Vahşeti: evcil hayvanın {pct}% daha fazla hasar verir",
       "battleStance": "Savaş Duruşu: %10 daha fazla öfke üretimi",
       "berserkerStance": "Berserker Duruşu: kritikler %3 daha sık gerçekleşir ve %3 daha sert vurur",
       "crit": "Kritik vuruş şansını %{pct} artırır",
@@ -1628,15 +1628,15 @@ export const tr_TR: EnTranslations = {
       "freeCast": "Bir sonraki büyün hiçbir şeye mal olmaz",
       "instantCast": "Çeviri süresi olan bir sonraki büyün anlık olur",
       "cheapCast": "Bir sonraki büyün {pct}% daha az mana harcar",
-      "radiantResonance": "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
-      "solarReprisal": "Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant",
-      "dawnsWrath": "HoW: all HP · +1 use · CD 0 · +{pct}% DMG",
-      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
-      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
-      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
-      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
-      "veiledEdge": "Your next Lurker's Strike strikes for double",
-      "duskEconomy": "Abilities cost {pct}% less energy",
+      "radiantResonance": "Sonraki Onaran Işığın anında olur veya sonraki Şafağın Kucaklaması {pct}% daha az mana harcar ve {castTime} sn içinde okunur",
+      "solarReprisal": "Sonraki Güneş Diskin mana harcamaz, bekleme süresini yok sayar ve {pct}% daha fazla hasar verir; Lütuf Çekici bekleme süresini yok sayar ve verdiği hasarın 100% kadarını sana iyileştirir; ya da Onaran Işık anında olur",
+      "dawnsWrath": "GÇ: her can · +1 kullanım · Bekleme 0 · +{pct}% hasar",
+      "venomRitual": "Zehir Ayini: aşama {stacks} / {max}. Biriktiren vuruşlar aşama ekler; {max} olduğunda Toprak Uykusu Zehir Yırtığına dönüşür",
+      "gloam": "Alacakaranlık: aşama {stacks} / {max}. {max} olduğunda Alacakaranlık Perdesi açılışların açık alanda kullanılabilir olur ve atılan bir sonraki BEDAVA olup birikimi gölge perdesine patlatır",
+      "redline": "Kırmızı Çizgi: çentik {stacks} / {max}. Gövde Vuruşları çentik ekler; Merhamet Darbesi çentik başına {pct}% daha sert vurur ve pencereyi kapatır. Önce sona ererse kaybedilir",
+      "veilstrikeWindow": "Gölge Perdesi: Alacakaranlık Perdesi açılışların açık alanda her açıdan kullanılabilir ve verdiğin hasar {pct}% artar",
+      "veiledEdge": "Sonraki Pusucu Vuruşun iki kat sert vurur",
+      "duskEconomy": "Yetenekler {pct}% daha az enerji harcar",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "sp": "Büyü gücünü {value} artırır",
@@ -2370,7 +2370,7 @@ export const tr_TR: EnTranslations = {
       "empty": "Henüz bilinen bir tarif yok.",
       "resultAria": "{name} zanaatı",
       "craftedToast": "Hazırlanma Tarihi: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Üretildi: {name} x{qty}",
       "insufficientMaterials": "Bunun için malzemeleriniz yok.",
       "unknownRecipe": "O tarif mevcut değil.",
       "comboRequirementUnmet": "O tarif için gereken iki zanaata da gereken kademede sahip değilsin.",
@@ -2463,13 +2463,13 @@ export const tr_TR: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "{item} büyüsünü bozdunuz.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "{item} eşyasını büyüsünü bozarak {material} elde edersin.",
+      "disenchantedYieldQty": "{item} eşyasını büyüsünü bozarak {material} x{qty} elde edersin.",
+      "disenchantedAlso": "Ayrıca {material} geri kazanırsın.",
+      "disenchantedAlsoQty": "Ayrıca {material} x{qty} geri kazanırsın.",
       "salvagedLine": "{item} parçaladınız.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "{item} içinden {material} kurtarırsın.",
+      "salvagedYieldQty": "{item} içinden {material} x{qty} kurtarırsın.",
       "enchantAppliedLine": "{item} üzerine {enchant} büyüsü uyguladınız.",
       "notHeld": "O eşya elinizde yok.",
       "notDisenchantable": "Bunun büyüsünü bozamazsınız.",
@@ -3293,21 +3293,21 @@ export const tr_TR: EnTranslations = {
       "holy_light": "Bir dostu ya da kendini tam doldurmak için istikrarlı, hatırı sayılır bir iyileştirme.",
       "devotion_aura": "Zırhı yükselten kalıcı bir öz güçlendirmesi, böylece darbeler daha hafif gelir.",
       "judgement": "Aktif Mührünü harcayarak kısa menzilden bir düşmana vurur.",
-      "hammer_of_wrath": "Executes a wounded enemy from range, or any enemy while your wings are active.",
-      "avenging_wrath": "Grants 10 Devotion, then doubles Devotion generated by abilities for fifteen seconds.",
-      "bastion_sweep": "Sweeps your shield through a group to seize threat and build Devotion.",
-      "oath_chain": "Drags a distant enemy into your pack and slows its escape.",
-      "veilbound_march": "Pass through a pack to mark it, blunt its damage against you, and lock in threat.",
-      "holy_shield": "Spends Devotion on an active block window, absorption, and a threat pulse.",
-      "consecration": "Claims the ground around you with sustained Holy damage and threat.",
-      "hammer_of_justice": "Stops one enemy with a short, reliable stun.",
-      "lay_on_hands": "Restores a large amount of health when an ally is close to falling.",
+      "hammer_of_wrath": "Yaralı bir düşmanı uzaktan infaz eder, ya da kanatların etkinken herhangi bir düşmanı.",
+      "avenging_wrath": "10 Adanmışlık verir, ardından on beş saniye boyunca yeteneklerin ürettiği Adanmışlığı ikiye katlar.",
+      "bastion_sweep": "Tehdidi kapmak ve Adanmışlık biriktirmek için kalkanını bir grubun içinden savurur.",
+      "oath_chain": "Uzaktaki bir düşmanı sürünün içine sürükler ve kaçışını yavaşlatır.",
+      "veilbound_march": "Bir grubun içinden geçerek onu damgala, sana verdiği hasarı köreltir ve tehdidi sabitle.",
+      "holy_shield": "Adanmışlığı etkin bir blok penceresine, emilime ve bir tehdit darbesine harcar.",
+      "consecration": "Çevrendeki toprağı sürekli Kutsal hasar ve tehditle sahiplenir.",
+      "hammer_of_justice": "Bir düşmanı kısa ve güvenilir bir sersemletmeyle durdurur.",
+      "lay_on_hands": "Bir müttefik düşmek üzereyken büyük miktarda can geri kazandırır.",
       "blessing_of_might": "Dost bir hedefin saldırı gücünü yükseltir, akından önce kullanmak iyidir.",
       "divine_protection": "İşler kızıştığında hasarı emmek için hızlı bir koruyucu siper.",
       "raptor_strike": "Bir şey aradaki mesafeyi kapattığında kullanılacak sert bir yakın dövüş savruşu.",
-      "pack_command": "Orders your companion to strike and build Pack Ferocity. Each stack makes your pet deal 10% more damage, up to 30%, before Unleash Beast spends the stacks.",
-      "stampede": "Calls three beasts to attack for 12 seconds. Use it at full Pack Ferocity so they keep the maximum damage bonus for the whole summon.",
-      "measured_shot": "A deliberate ranged shot that restores Focus for your heavier attacks.",
+      "pack_command": "Yoldaşına vurmasını ve Sürü Vahşeti biriktirmesini emreder. Her katman, Canavarı Salıver katmanları harcayana dek evcil hayvanının 10% daha fazla, en çok 30% hasar vermesini sağlar.",
+      "stampede": "Üç canavarı 12 saniye saldırmaya çağırır. Tüm çağrı boyunca azami hasar bonusunu korumaları için tam Sürü Vahşetiyle kullan.",
+      "measured_shot": "Daha ağır saldırıların için odak geri kazandıran, ölçülü bir menzilli atış.",
       "aspect_of_the_hawk": "Menzilli saldırı gücünü keskinleştirmek için sürekli açık tuttuğun bir suret.",
       "serpent_sting": "Zamanla doğa hasarı kanatan bir zehir bulaştırır.",
       "arcane_shot": "Hızlı ek hasar için menzilden ani bir atış.",
@@ -3326,19 +3326,19 @@ export const tr_TR: EnTranslations = {
       "power_word_shield": "Bir dostu, darbeler isabet etmeden onları emen bir kalkanla sarar.",
       "renew": "Zamanla hasar veren bir iyileştirme; okuyup hareket etmeye devam etmek iyidir.",
       "lightning_bolt": "Menzilli bir Doğa hasarı okuması; uzaktan başvuru becerin.",
-      "chain_lightning": "Strikes one target and jumps to two nearby enemies, building one Thunder for the whole cast.",
-      "thunder_reservoir": "Banks lightning until Earthen Jolt or Faultwake can release a full-power payoff.",
+      "chain_lightning": "Bir hedefe vurur ve yakındaki iki düşmana sıçrar, tüm okuma için bir Gök Gürültüsü biriktirir.",
+      "thunder_reservoir": "Toprak Sarsıntısı ya da Deprem tam güçte bir ödül salana dek yıldırım biriktirir.",
       "rockbiter_weapon": "Silahını güçlendirir, böylece yakın dövüşte her savruş daha sert iner.",
       "healing_wave": "Ana iyileştirmen; kendin ya da bir dostun için doğrudan bir tedavi.",
       "earth_shock": "Şimdi gerektiğinde hızlı Doğa hasarı için ani bir şok.",
       "lightning_shield": "Seni yükler, böylece sana vuran saldırganlar Doğa hasarı alır.",
       "flame_shock": "Önden vuran ve zamanla yakmayı sürdüren ani bir yanış.",
       "galeheart_weapon": "İki silahı da fırtına rüzgârlarıyla doldurur ve düzenli saldırı ritmini ödüllendirir.",
-      "warspirit_cadence": "Turns a steady weapon rhythm into Galeheart Echoes and an instant spell opportunity.",
-      "stormsurge": "Sometimes brings Ancestral Strike back early after you spend a Stormcast opportunity.",
+      "warspirit_cadence": "İstikrarlı bir silah ritmini Fırtına Yüreği Yankılarına ve anlık bir büyü fırsatına dönüştürür.",
+      "stormsurge": "Bir Fırtına Alameti fırsatını harcadıktan sonra Ata Vuruşunu bazen erken geri getirir.",
       "lifespring_weapon": "Silahını onarıcı suyla doldurur ve devamlı iyileştirme akışını güçlendirir.",
       "tidecall": "Gelgiti çağırır ve sıradaki iyileştirme büyüsü dizisini güçlendirir.",
-      "ancestor_return": "Returns every fallen group or raid member to life after a long out-of-combat cast.",
+      "ancestor_return": "Savaş dışında uzun bir okumanın ardından grubun ya da akının düşmüş her üyesini yaşama döndürür.",
       "stoneward": "Alınan hasarı iyileştirmeye çeviren yüklü bir taş kalkan yükseltir.",
       "primal_exaltation": "Uzmanlığına özgü element gücünü kısa süreliğine serbest bırakır.",
       "fireball": "Ana ateş bombası; bir darbe indirir ve hedefi yanar halde bırakır.",
@@ -5841,7 +5841,7 @@ export const tr_TR: EnTranslations = {
       "mana": "Mana",
       "energy": "Enerji",
       "rage": "Öfke",
-      "focus": "Focus"
+      "focus": "Odak"
     },
     "roles": {
       "warrior": "Tank / Yakın DPS",
@@ -6223,7 +6223,7 @@ export const tr_TR: EnTranslations = {
       "notEnoughRage": "Yeterli öfke yok!",
       "notEnoughEnergy": "Yeterli enerji yok!",
       "notEnoughMana": "Yeterli mana yok!",
-      "notEnoughDevotion": "Not enough Devotion!",
+      "notEnoughDevotion": "Yeterli Adanmışlık yok!",
       "notEnoughResource": "Yeterli {resource} yok!",
       "notEnoughHealth": "Yeterli can yok.",
       "targetMustDodge": "Önce hedefinin sıyrılması gerekir.",
@@ -6537,8 +6537,8 @@ export const tr_TR: EnTranslations = {
       "mana": "Mana",
       "rage": "Öfke",
       "energy": "Enerji",
-      "focus": "Focus",
-      "devotion": "Devotion"
+      "focus": "odak",
+      "devotion": "Adanmışlık"
     },
     "forms": {
       "bear": "Ayı",
@@ -6915,56 +6915,56 @@ export const tr_TR: EnTranslations = {
         "description": "Hedef alana 3 saniye boyunca ok yağdırır ve içindeki düşmanlara her 0.5 saniyede bir {damage} hasar verir."
       },
       "pack_command": {
-        "name": "Pack Command",
-        "description": "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit."
+        "name": "Sürü Emri",
+        "description": "Yaşayan evcil hayvanına 36 ila 48 Fiziksel hasar vurması için emir verir. Hasar evcil hayvanın saldırı gücüyle artar. İsabet 20 odak geri kazandırır ve 30 sn boyunca 1 Sürü Vahşeti verir, en fazla 3. Her katman evcil hayvanının verdiği tüm hasarı 10% artırır. Bu vuruş, isabetten önceki katmanlarını kullanır."
       },
       "stampede": {
-        "name": "Stampede",
-        "description": "Summon 3 beasts for 12 sec. Each attacks every 2 sec for {damage} Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed after 5 failed chances. It cannot reset while the beasts are active. (Packlord)"
+        "name": "İzdiham",
+        "description": "12 sn boyunca 3 canavar çağırır. Her biri 2 sn arayla {damage} Fiziksel hasar verir. Gösterilen hasar, evcil hayvan hasar bonuslarından önce menzilli saldırı gücünün 8% kadarını içerir. Canavarlar çağrıldıklarında Sürü Vahşetini sabitler ve katman başına 10% hasar kazanır. İzdiham beklemedeyken başarılı Sürü Emirlerinin onu sıfırlama ihtimali 20%, 5 başarısız denemeden sonra garantidir. Canavarlar etkinken sıfırlanamaz. (Sürü Efendisi)"
       },
       "unleash_beast": {
-        "name": "Unleash Beast",
-        "description": "Consume 3 Pack Ferocity after your pet strikes for 83 to 105 Physical damage and claps every enemy within 6 yards for 26 to 34. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 nearby enemies."
+        "name": "Canavarı Salıver",
+        "description": "Evcil hayvanın 83 ila 105 Fiziksel hasar vurup 6 metre içindeki her düşmanı 26 ila 34 sarsmasının ardından 3 Sürü Vahşeti tüketir. Vuruş ve sarsıntı, Sürü Vahşetinin tam 30% evcil hayvan hasar bonusunu kullanır ve evcil hayvanın saldırı gücüyle artar. Sonraki 8 sn boyunca evcil hayvan 25% daha fazla hasar verir, 35% daha hızlı saldırır ve Uğursuz Atışın yakındaki en fazla 2 düşmanı biçmesini sağlar."
       },
       "measured_shot": {
-        "name": "Measured Shot",
-        "description": "Shoot the target for {damage} Physical damage. A hit restores 20 Focus. Damage increases with Ranged Attack Power."
+        "name": "Ölçülü Atış",
+        "description": "Hedefe {damage} Fiziksel hasar verecek şekilde ateş eder. İsabet 20 odak geri kazandırır. Hasar menzilli saldırı gücüyle artar."
       },
       "cold_focus": {
-        "name": "Cold Focus",
-        "description": "For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)"
+        "name": "Soğuk Odak",
+        "description": "12 sn boyunca Ölçülü Atış 50% daha fazla odak geri kazandırır, Uzun Çekiş ise 25% daha az harcar ve 30% daha hızlı okunur. (Soğuk Bakış imzası)"
       },
       "bloodhook": {
-        "name": "Bloodhook",
-        "description": "Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)"
+        "name": "Kanlı Çengel",
+        "description": "Bir düşmana atılır ve Kanlı Çengel Yarası uygular; 12 sn boyunca 4 vuruşta 34 temel Fiziksel hasar artı menzilli saldırı gücünün 26% kadarını verir. (Saha Ustalığı imzası)"
       },
       "shrapnel_charge": {
-        "name": "Shrapnel Charge",
-        "description": "Hit the target for 24 to 30 Physical damage and up to 4 other enemies within 6 yards for 13 to 17. Other targets also bleed for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Direct damage increases with Ranged Attack Power."
+        "name": "Şarapnel Yükü",
+        "description": "Hedefe 24 ila 30 Fiziksel hasar, 6 metre içindeki en fazla 4 düşmana ise 13 ila 17 hasar vurur. Diğer hedefler ayrıca 6 sn boyunca 12 hasarla kanar. Ana hedef Kanlı Çengel Yaranı taşıyorsa anında 1 yara vuruşu uygulanır. Doğrudan hasar menzilli saldırı gücüyle artar."
       },
       "bloodtrail_assault": {
-        "name": "Bloodtrail Assault",
-        "description": "For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 nearby enemies, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards, deals 25% more base damage to its main target, and triggers 50% more wound damage."
+        "name": "Kan İzi Saldırısı",
+        "description": "12 sn boyunca Kanlı Çengel, 60% güçte bir yarayı yakındaki en fazla 2 düşmana yayar, Yara Yırtma 18 hasarlık bir evcil hayvan saldırısı emreder ve Şarapnel Yükü 2 metre kazanır, ana hedefine 25% daha fazla temel hasar verir ve 50% daha fazla yara hasarı tetikler."
       },
       "trailbreak": {
-        "name": "Trailbreak",
-        "description": "Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
+        "name": "İz Kırma",
+        "description": "12 metre geriye sıçrar. Av İvmen varsa tazelenir ve Dönüşü 12 sn hazırlar."
       },
       "wildheart": {
-        "name": "Wildheart",
-        "description": "Immediately restore 30% of your maximum health."
+        "name": "Yaban Yürek",
+        "description": "Azami canının 30% kadarını anında geri kazandırır."
       },
       "shellskin": {
-        "name": "Shellskin",
-        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+        "name": "Kabuk Deri",
+        "description": "Alınan hasarı 8 sn boyunca 60% azaltır, ancak etkinken saldırmayı engeller."
       },
       "frostjaw_trap": {
-        "name": "Frostjaw Trap",
-        "description": "Place a trap at the selected enemy or at your feet. It arms after 0.75 sec and lasts 30 sec. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec."
+        "name": "Buzçene Tuzağı",
+        "description": "Seçili düşmana veya ayaklarının dibine bir tuzak yerleştirir. 0,75 sn sonra kurulur ve 30 sn sürer. Onu tetikleyen ilk düşman 3 sn köklenir ve 4 metre içindeki düşmanlar 4 sn boyunca 50% yavaşlar."
       },
       "pack_rally": {
-        "name": "Pack Rally",
-        "description": "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec."
+        "name": "Sürü Toplanması",
+        "description": "Küheylan Suretine bürünür ve yakındaki müttefikleri 10 sn boyunca 30% hareket hızı ile 10% saldırı ve okuma hızıyla toplar."
       },
       "hurricane": {
         "name": "Kasırga",
@@ -7275,116 +7275,116 @@ export const tr_TR: EnTranslations = {
         "description": "Dost bir hedefi {damage} iyileştirir."
       },
       "divine_ascension": {
-        "name": "Divine Ascension",
-        "description": "Consume 20 Devotion to gain 5 Ascension charges for up to 45 sec. Marked abilities consume one charge and gain an additional effect."
+        "name": "Kutsal Yüceliş",
+        "description": "20 Adanmışlık tüketerek en fazla 45 sn boyunca 5 Yüceliş şarjı kazandırır. İşaretli yetenekler bir şarj tüketir ve ek bir etki kazanır."
       },
       "aura_mastery": {
-        "name": "Sacred Concord",
-        "description": "For 8 sec, empower every active Devotion and Requital Aura in your group. Bastion Devotion reduces damage by 15%; Requital deals 15 Holy damage. Multiple uses refresh instead of stacking."
+        "name": "Kutsal Uyum",
+        "description": "8 sn boyunca grubundaki her etkin Adanmışlığı ve Kısas Aurasını güçlendirir. Burç Adanmışlığı hasarı 15% azaltır; Kısas 15 Kutsal hasar verir. Birden fazla kullanım birikmek yerine yeniler."
       },
       "devotion_ward": {
-        "name": "Bastion Devotion",
-        "description": "Reduce damage taken by you and party members by 5% until death or replacement. Only this aura and Requital Aura replace each other; Radiant, Dawn, and Grace Devotion coexist."
+        "name": "Burç Adanmışlığı",
+        "description": "Senin ve grup üyelerinin aldığı hasarı ölüme veya değiştirilmeye dek 5% azaltır. Yalnızca bu aura ile Kısas Aurası birbirinin yerini alır; Işıyan, Şafak ve Lütuf Adanmışlığı birlikte var olur."
       },
       "hammer_of_grace": {
-        "name": "Hammer of Grace",
-        "description": "Instantly hurl a holy hammer at an enemy within 20 m for {damage}, restoring 70 mana, healing yourself for 50% of damage dealt, and generating 1 Devotion when it deals damage. Solar Reprisal lets Hammer of Grace ignore its cooldown and heal you for 100% of damage dealt."
+        "name": "Lütuf Çekici",
+        "description": "20 m içindeki bir düşmana anında kutsal bir çekiç fırlatarak {damage} hasar verir, 70 mana geri kazandırır, verdiği hasarın 50% kadarını sana iyileştirir ve hasar verdiğinde 1 Adanmışlık üretir. Güneş Kısası, Lütuf Çekicinin bekleme süresini yok saymasını ve verdiği hasarın 100% kadarını sana iyileştirmesini sağlar."
       },
       "hushbrand": {
-        "name": "Hushbrand",
-        "description": "Interrupts spellcasting and prevents spells from that school for 4 sec."
+        "name": "Suskunluk Damgası",
+        "description": "Büyü okumayı keser ve o okuldan büyüleri 4 sn engeller."
       },
       "guardian_covenant": {
-        "name": "Guardian Covenant",
-        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
+        "name": "Koruyucu Ahdi",
+        "description": "Dost bir hedefi ve kendini korur, alınan hasarı 8 sn boyunca 20% azaltır. Dost hedef seçili değilse varsayılan olarak seni seçer."
       },
       "solar_step": {
-        "name": "Solar Step",
-        "description": "Increase your movement speed by 150% for 2 sec."
+        "name": "Güneş Adımı",
+        "description": "Hareket hızını 2 sn boyunca 150% artırır."
       },
       "solar_invocation": {
-        "name": "Solar Invocation",
-        "description": "Instantly heal an ally for {damage} or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much."
+        "name": "Güneş Çağrısı",
+        "description": "Bir müttefiki anında {damage} iyileştirir ya da bir düşmana orta düzeyde Kutsal hasar verir. Her iki kullanım da 1 Adanmışlık üretir. Yüceliş sırasında iyileştirme okuması hedefin 10 m yakınındaki dost oyuncuları da yarısı kadar iyileştirir."
       },
       "radiant_devotion": {
-        "name": "Radiant Devotion",
-        "description": "Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion, but coexists with Devotions from other Paladins."
+        "name": "Işıyan Adanmışlık",
+        "description": "Senin ve grup üyelerinin büyü gücünü 30 dk boyunca 20 artırır. Kendi Şafak veya Lütuf Adanmışlığının yerini alır, ancak diğer paladinlerin Adanmışlıklarıyla birlikte var olur."
       },
       "dawn_devotion": {
-        "name": "Dawn Devotion",
-        "description": "Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion, but coexists with Devotions from other Paladins and with Warrior shouts."
+        "name": "Şafak Adanmışlığı",
+        "description": "Senin ve grup üyelerinin saldırı gücünü 30 dk boyunca 40 artırır. Kendi Işıyan veya Lütuf Adanmışlığının yerini alır, ancak diğer paladinlerin Adanmışlıkları ve savaşçı naralarıyla birlikte var olur."
       },
       "grace_devotion": {
-        "name": "Grace Devotion",
-        "description": "You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min. Replaces your own Radiant or Dawn Devotion, but coexists with Devotions from other Paladins."
+        "name": "Lütuf Adanmışlığı",
+        "description": "Sen ve grup üyeleri her 5 sn 15 mana geri kazanır ve 30 dk boyunca 3% daha az mana harcarsınız. Kendi Işıyan veya Şafak Adanmışlığının yerini alır, ancak diğer paladinlerin Adanmışlıklarıyla birlikte var olur."
       },
       "recall_the_fallen": {
-        "name": "Recall the Fallen",
-        "description": "Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group."
+        "name": "Düşenleri Çağır",
+        "description": "Ölü bir grup üyesini 35% can ve manayla yaşama döndürür. 16. seviye ya da üzeri bir Güneş Şifacısı bunun yerine grubun düşmüş tüm üyelerini geri çağırır."
       },
       "beacon_of_light": {
-        "name": "Beacon of Light",
-        "description": "Mark one group member as your Beacon of Light. 50% of your effective direct healing on another group member within 60 m also heals the Beacon. Area and periodic healing do not transfer. Lasts until either of you dies."
+        "name": "Işık Feneri",
+        "description": "Bir grup üyesini Işık Fenerin olarak işaretler. 60 m içindeki başka bir grup üyesine yaptığın etkili doğrudan iyileştirmenin 50% kadarı Feneri de iyileştirir. Alan ve süreli iyileştirme aktarılmaz. Biriniz ölene dek sürer."
       },
       "final_edict": {
-        "name": "Final Edict",
-        "description": "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Holy explosion around you."
+        "name": "Son Ferman",
+        "description": "Ezici bir silah vuruşu indirir ve hasar verdiğinde 1 Adanmışlık üretir. Başarılı bir vuruş Şafak Düşüşünün kalan bekleme süresini 2 sn kısaltır. Başarılı otomatik saldırılar ve Son Ferman vuruşlarının 15% ihtimalle 8 sn boyunca Şafağın Gazabını verme şansı vardır. Yüceliş ayrıca çevrende Kutsal bir patlama salar."
       },
       "dawnfall": {
-        "name": "Dawnfall",
-        "description": "Deal {damage} Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict's remaining cooldown by 2 sec. Ascension increases its damage and radius."
+        "name": "Şafak Düşüşü",
+        "description": "Yakındaki düşmanlara {damage} Kutsal hasar verir ve 1 Adanmışlık üretir. En az bir düşmanı vurmak Son Fermanın kalan bekleme süresini 2 sn kısaltır. Yüceliş hasarını ve yarıçapını artırır."
       },
       "sun_gods_verdict": {
-        "name": "Verdict of the Sun God",
-        "description": "Judge an enemy beneath the Verdict of the Sun God for 30 sec. Final Edict and Dawnfall inscribe one charge on a successful hit. The ability that lands the third charge dictates the sentence: Final Edict unleashes devastating damage on the condemned; Dawnfall detonates the verdict, damaging and stunning nearby enemies for 1.5 sec."
+        "name": "Güneş Tanrısının Hükmü",
+        "description": "Bir düşmanı 30 sn boyunca Güneş Tanrısının Hükmü altında yargılar. Son Ferman ve Şafak Düşüşü başarılı vuruşta birer şarj işler. Üçüncü şarjı koyan yetenek cezayı belirler: Son Ferman mahkûma yıkıcı hasar salar; Şafak Düşüşü hükmü patlatarak yakındaki düşmanlara hasar verir ve onları 1,5 sn sersemletir."
       },
       "valkyrs_calling": {
-        "name": "Valkyr's Calling",
-        "description": "Ascend into the air, becoming immune to damage as you fly toward the enemy. After 2 sec, descend upon the target area for {damage} Holy damage and generate 1 Devotion. Ascension increases the impact damage by 50% and consumes 1 charge."
+        "name": "Valkyrie Çağrısı",
+        "description": "Havaya yükselir, düşmana doğru uçarken hasara karşı bağışık olursun. 2 sn sonra hedef alana inerek {damage} Kutsal hasar verir ve 1 Adanmışlık üretirsin. Yüceliş çarpma hasarını 50% artırır ve 1 şarj tüketir."
       },
       "faithforged_guard": {
-        "name": "Debt of Light",
-        "description": "For 8 sec, the next enemy hit against you is answered: up to {buff} damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered. Ascension raises the amount it can answer by 50%."
+        "name": "Işığın Borcu",
+        "description": "8 sn boyunca sana gelen bir sonraki düşman vuruşu yanıtlanır: {buff} kadar hasar reddedilir ve saldırgana Kutsal hasar olarak döndürülür, sen de 1 Adanmışlık kazanırsın. Yalnızca tek bir darbe yanıtlanır. Yüceliş yanıtlayabildiği miktarı 50% artırır."
       },
       "mercy_lance": {
-        "name": "Mercy Lance",
-        "description": "Deal {damage} Holy damage to an enemy and generate 1 Devotion when it deals damage. During Ascension, it consumes 1 charge to guarantee a critical hit."
+        "name": "Merhamet Mızrağı",
+        "description": "Bir düşmana {damage} Kutsal hasar verir ve hasar verdiğinde 1 Adanmışlık üretir. Yüceliş sırasında kritik vuruşu garantilemek için 1 şarj tüketir."
       },
       "sacred_form": {
-        "name": "Sacred Form",
-        "description": "Enter a sacred state until death, increasing healing by 10%, spell critical chance by 5%, and reducing threat generated by 50%. Sunmender only."
+        "name": "Kutsal Suret",
+        "description": "Ölüme dek kutsal bir hale girer; iyileştirmeyi 10%, büyü kritik şansını 5% artırır ve üretilen tehdidi 50% azaltır. Yalnızca Güneş Şifacıları için."
       },
       "dawns_embrace": {
-        "name": "Dawn's Embrace",
-        "description": "Deliver a powerful heal and generate 1 Devotion. Radiant Resonance reduces its mana cost by 50% and cast time to 1.5 sec. Ascension makes it instant and increases its healing by 35%."
+        "name": "Şafağın Kucaklaması",
+        "description": "Güçlü bir iyileştirme salar ve 1 Adanmışlık üretir. Işıyan Rezonans mana maliyetini 50%, okuma süresini 1,5 sn yapar. Yüceliş onu anında yapar ve iyileştirmesini 35% artırır."
       },
       "radiant_chorus": {
-        "name": "Radiant Chorus",
-        "description": "Heal nearby allies for {damage} and generate 1 Devotion. Effectively healing at least 2 allies grants Radiant Resonance: your next Mending Light is instant, or your next Dawn's Embrace costs 50% less mana and casts in 1.5 sec. Ascension increases Radiant Chorus healing and radius."
+        "name": "Işıyan Koro",
+        "description": "Yakındaki müttefikleri {damage} iyileştirir ve 1 Adanmışlık üretir. En az 2 müttefiki etkili biçimde iyileştirmek Işıyan Rezonans verir: sonraki Onaran Işığın anında olur veya sonraki Şafağın Kucaklaması 50% daha az mana harcar ve 1,5 sn içinde okunur. Yüceliş Işıyan Koronun iyileştirmesini ve yarıçapını artırır."
       },
       "life_covenant": {
-        "name": "Life Covenant",
-        "description": "Reduce an ally's damage taken by 40% for 6 sec. During Ascension it also grants a 120-point shield without consuming a charge."
+        "name": "Yaşam Ahdi",
+        "description": "Bir müttefikin aldığı hasarı 6 sn boyunca 40% azaltır. Yüceliş sırasında ayrıca şarj tüketmeden 120 puanlık bir kalkan verir."
       },
       "aegis_first_dawn": {
-        "name": "Aegis of the First Dawn",
-        "description": "Channel for 5 sec, creating a 10 meter holy dome. Allies inside are healed every second and take 50% less damage. Completing the channel releases a final heal and grants 30% movement speed for 4 sec."
+        "name": "İlk Şafağın Kalkanı",
+        "description": "5 sn kanalize ederek 10 metrelik kutsal bir kubbe oluşturur. İçindeki müttefikler her saniye iyileşir ve 50% daha az hasar alır. Kanalizasyonu tamamlamak son bir iyileştirme salar ve 4 sn boyunca 30% hareket hızı verir."
       },
       "vowkeeper_strike": {
-        "name": "Vowkeeper Strike",
-        "description": "Strike with high threat and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal empowers your next Sunward Disc, Hammer of Grace, or Mending Light. Ascension also grants a small absorption shield."
+        "name": "Yemin Bekçisi Vuruşu",
+        "description": "Yüksek tehditle vurur ve 1 Adanmışlık üretir. Başarılı bir vuruşun 8 sn boyunca Güneş Kısası verme ihtimali 20%; her başarılı blokun 25%. Güneş Kısası sonraki Güneş Diskini, Lütuf Çekicini veya Onaran Işığını güçlendirir. Yüceliş ayrıca küçük bir emici kalkan verir."
       },
       "bastion_rite": {
-        "name": "Bastion Rite",
-        "description": "Reduce physical damage taken by 20% and increase block chance by 20% for 6 sec. Ascension extends the duration to 10 sec."
+        "name": "Burç Ayini",
+        "description": "Alınan fiziksel hasarı 20% azaltır ve blok şansını 6 sn boyunca 20% artırır. Yüceliş süreyi 10 sn yapar."
       },
       "sunward_disc": {
-        "name": "Sunward Disc",
-        "description": "Requires a shield. Hurl a radiant disc that strikes and then bounces between nearby enemies. Each damaging impact generates 1 Devotion. Solar Reprisal makes Sunward Disc cost no mana, ignore its cooldown, and deal 20% more damage. Ascension empowers 5 bounces."
+        "name": "Güneş Diski",
+        "description": "Kalkan gerektirir. Vurup ardından yakındaki düşmanlar arasında seken ışıyan bir disk fırlatır. Hasar veren her çarpma 1 Adanmışlık üretir. Güneş Kısası Güneş Diskinin mana harcamamasını, bekleme süresini yok saymasını ve 20% daha fazla hasar vermesini sağlar. Yüceliş 5 sekmeyi güçlendirir."
       },
       "sacred_challenge": {
-        "name": "Sacred Goad",
-        "description": "Compel an enemy to attack you. During Ascension it also reduces all damage received by 15% for 4 sec without consuming a charge."
+        "name": "Kutsal Dürtü",
+        "description": "Bir düşmanı sana saldırmaya zorlar. Yüceliş sırasında ayrıca şarj tüketmeden alınan tüm hasarı 4 sn boyunca 15% azaltır."
       },
       "devotion_aura": {
         "name": "Sarsılmaz Aura",
@@ -7423,20 +7423,20 @@ export const tr_TR: EnTranslations = {
         "description": "Altındaki zemini kutsar, yakındaki düşmanları 10 saniye boyunca her 2 saniyede bir {damage} Kutsal hasarla dağlar."
       },
       "bastion_sweep": {
-        "name": "Bastion Sweep",
-        "description": "Sweep your equipped shield through enemies in a 180 degree frontal arc for {damage} Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m."
+        "name": "Burç Savurması",
+        "description": "Kuşandığın kalkanı 180 derecelik ön yayda düşmanların arasından savurarak {damage} Kutsal hasar verir, yüksek tehdit oluşturur ve 1 Adanmışlık üretir. Yüceliş hasarı 30%, yarıçapı 8 m yapar."
       },
       "oath_chain": {
-        "name": "Oath Chain",
-        "description": "Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy."
+        "name": "Yemin Zinciri",
+        "description": "Uzaktaki bir düşmanı anında kutsal bir zincirle bağlar. Düşman saniyede 18 m hızla 3 m mesafeye gelene dek sana doğru ilerler, ardından 4 sn boyunca 50% yavaşlar. Yüceliş sırasında yakındaki ikinci bir düşmanı da bağlar."
       },
       "veilbound_march": {
-        "name": "Veilbound March",
-        "description": "Become ethereal for 4 sec, gaining 40% movement speed and 30% armor and becoming immune to roots, slows, and displacement. Enemies you pass through are Veil Marked for 6 sec, taking Holy damage each second, dealing 20% less damage to you, and generating extra threat. The first mark grants 1 Devotion. When the march ends, nearby marked enemies take a final burst. Ascension increases the burst by 50% and lightly pulls them toward you."
+        "name": "Perde Yürüyüşü",
+        "description": "4 sn boyunca eterik olursun; 40% hareket hızı ve 30% zırh kazanır, köklenmeye, yavaşlamaya ve yer değiştirmeye karşı bağışık olursun. İçinden geçtiğin düşmanlar 6 sn boyunca Perde Damgası alır: her saniye Kutsal hasar alır, sana 20% daha az hasar verir ve ek tehdit üretirler. İlk damga 1 Adanmışlık verir. Yürüyüş bittiğinde yakındaki damgalı düşmanlar son bir patlama alır. Yüceliş patlamayı 50% artırır ve onları hafifçe sana çeker."
       },
       "veilbound_mark": {
-        "name": "Veil Mark",
-        "description": "Takes Holy damage each second, deals 20% less damage to the Paladin who applied the mark, and generates additional threat toward that Paladin."
+        "name": "Perde Damgası",
+        "description": "Her saniye Kutsal hasar alır, damgayı basan paladine 20% daha az hasar verir ve o paladine karşı ek tehdit üretir."
       },
       "righteous_fury": {
         "name": "Yanan Yemin",
@@ -7479,12 +7479,12 @@ export const tr_TR: EnTranslations = {
         "description": "Hedef sıyırma yaptıktan sonra silah hasarı artı {damage} ile karşı saldırı. Sıyrılamaz."
       },
       "hunting_momentum": {
-        "name": "Hunting Momentum",
-        "description": "Passive: Gutting Strike grants 1 Hunting Momentum for 8 sec, up to 3. At 3 stacks, Woundrend deals 45% more strike damage and consumes the stacks. (Fieldcraft)"
+        "name": "Av İvmesi",
+        "description": "Pasif: Deşen Vuruş 8 sn boyunca 1 Av İvmesi verir, en fazla 3. 3 katmanda Yara Yırtma 45% daha fazla vuruş hasarı verir ve katmanları tüketir. (Saha Ustalığı)"
       },
       "fieldcraft_reentry": {
-        "name": "Armed Re-entry",
-        "description": "Passive: Trailbreak refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)"
+        "name": "Silahlı Dönüş",
+        "description": "Pasif: İz Kırma, Av İvmesini tazeler ve sonraki Deşen Vuruşunu veya Kanlı Çengelini 12 sn hazırlar. Deşen Vuruş katman başına 15% daha fazla hasar verir. Kanlı Çengel 18 ila 24 ek Fiziksel hasar verir; bu, katman başına 15% ve menzilli saldırı gücünle artar. 3 katmanda iki saldırıdan biri Av İvmesini tüketir. (Saha Ustalığı)"
       },
       "wing_clip": {
         "name": "Prangalayan Kesik",
@@ -7551,8 +7551,8 @@ export const tr_TR: EnTranslations = {
         "description": "Bir yıldırım oku fırlatarak {damage} Doğa hasarı verir."
       },
       "thunder_reservoir": {
-        "name": "Thunder Reservoir",
-        "description": "Passive: Arc Bolt and Skybranch grant Thunder, up to 5. At 5 Thunder, Earthen Jolt deals 125% more damage or Faultwake deals 100% more damage, then consumes all Thunder. (Thundercall)"
+        "name": "Gök Gürültüsü Haznesi",
+        "description": "Pasif: Ark Oku ve Çatallı Yıldırım Gök Gürültüsü verir, en fazla 5. 5 Gök Gürültüsünde Toprak Sarsıntısı 125% daha fazla hasar verir ya da Deprem 100% daha fazla verir, ardından tüm Gök Gürültüsünü tüketir. (Gök Gürültüsü Çağrısı)"
       },
       "rockbiter_weapon": {
         "name": "Stonebound Silahı",
@@ -7779,36 +7779,36 @@ export const tr_TR: EnTranslations = {
         "description": "Bir müttefiki büyük miktarda iyileştirir, ardından yakındaki en fazla 2 müttefike sıçrar ve her sıçramada %50 daha az iyileştirir. (Restorasyonun simge yeteneği)"
       },
       "galeheart_weapon": {
-        "name": "Galeheart Weapon",
-        "description": "Imbue both weapons for 30 min, enabling Warspirit Cadence."
+        "name": "Fırtına Yüreği Silahı",
+        "description": "Her iki silahı 30 dk büyüler ve Savaş Ruhu Ritmini etkinleştirir."
       },
       "warspirit_cadence": {
-        "name": "Warspirit Cadence",
-        "description": "Passive: Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)"
+        "name": "Savaş Ruhu Ritmi",
+        "description": "Pasif: isabet eden her 3. silah saldırısı 50% Doğa hasarıyla 2 Fırtına Yüreği Yankısı tetikler ve 12 sn boyunca Fırtına Alameti verir. Fırtına Alameti sonraki Ark Okunu, Sarsıntını veya Onaran Sularını anında yapar ve mana maliyetini 50% düşürür. Ata Vuruşu 2 saldırı sayılır. (Savaş Ruhu)"
       },
       "stormsurge": {
-        "name": "Stormsurge",
-        "description": "Passive: While Ancestral Strike is on cooldown, consuming Stormcast has a 25% chance to reset it. If the first 3 chances fail, the 4th always resets it. (Warspirit)"
+        "name": "Fırtına Kabarması",
+        "description": "Pasif: Ata Vuruşu beklemedeyken bir Fırtına Alameti tüketmenin onu sıfırlama ihtimali 25%. İlk 3 şans başarısız olursa 4.'sü her zaman sıfırlar. (Savaş Ruhu)"
       },
       "lifespring_weapon": {
-        "name": "Lifespring Weapon",
-        "description": "Imbue your weapon for 30 min. Mending Waters and Tidecall add 20% more healing to Mending Current."
+        "name": "Yaşam Pınarı Silahı",
+        "description": "Silahını 30 dk büyüler. Onaran Sular ve Gelgit Çağrısı, Onarım Akıntısına 20% daha fazla iyileştirme ekler."
       },
       "unleash_weapon": {
-        "name": "Unleash Weapon",
-        "description": "Unleash your active weapon enchant. Pyrebrand deals 54 to 64 Fire damage, gains 30% of Spell Power, and grants 2 Thunder. Galeheart strikes with your weapon, advances Warspirit Cadence, and grants 20% attack speed for 6 sec. Stonebound strikes for 75% weapon damage, forces the target to attack you, and reduces damage taken by 20% for 4 sec. Lifespring consumes your Mending Current, heals for 125% of its remaining healing, and reduces the next hit within 8 sec by 50% of the health restored."
+        "name": "Silahı Salıver",
+        "description": "Silahının etkin büyüsünü salıverir. Ateş Damgası 54 ila 64 Ateş hasarı verir, büyü gücünün 30% kadarını kazanır ve 2 Gök Gürültüsü verir. Fırtına Yüreği silahınla vurur, Savaş Ruhu Ritmini ilerletir ve 6 sn boyunca 20% saldırı hızı verir. Taş Bağı silah hasarının 75% kadarıyla vurur, hedefi sana saldırmaya zorlar ve alınan hasarı 4 sn boyunca 20% azaltır. Yaşam Pınarı, Onarım Akıntını tüketir, kalan iyileştirmesinin 125% kadarını iyileştirir ve 8 sn içindeki sonraki vuruşu geri kazandırılan canın 50% kadarı azaltır."
       },
       "primal_exaltation": {
-        "name": "Primal Exaltation",
-        "description": "For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)"
+        "name": "İlksel Yüceltme",
+        "description": "12 sn boyunca Gök Gürültüsü Çağrısının Ark Oku ve Çatallı Yıldırımı 50% daha hızlı okunur ve Ark Oku 2 Gök Gürültüsü verir; Savaş Ruhu her 2 silah isabetinde ritmini tetikler; Ruh Onarımı, Onarım Akıntısına 50% daha fazla iyileştirme ekler. (Şaman yeteneği)"
       },
       "stoneward": {
-        "name": "Stoneward",
-        "description": "Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)"
+        "name": "Taş Muhafız",
+        "description": "Bir müttefiki 60 sn boyunca 6 şarjla korur. Hasar bir şarj tüketerek azami canın 5% kadarını iyileştirir, 3 snde bir. (Şaman yeteneği)"
       },
       "tidecall": {
-        "name": "Tidecall",
-        "description": "Heal a friendly target for 58 to 72. The heal increases with Spell Power. Add the same healing calculated before overhealing to Mending Current, up to 30% of the target's maximum health."
+        "name": "Gelgit Çağrısı",
+        "description": "Dost bir hedefi 58 ila 72 iyileştirir. İyileştirme büyü gücüyle artar. Aşırı iyileştirmeden önce hesaplanan aynı iyileştirmeyi, hedefin azami canının 30% kadarına dek Onarım Akıntısına ekler."
       },
       "metamorphosis": {
         "name": "Metamorfoz",
@@ -8195,8 +8195,8 @@ export const tr_TR: EnTranslations = {
         "description": "Grubunuzdaki veya baskınınızdaki her ölü üyenin zaman çizgisini geri sarar ve onları bedenlerinin yanında %30 sağlık ve mana ile hayata döndürür. Savaş sırasında kullanılamaz. (Kronomansi)"
       },
       "ancestor_return": {
-        "name": "Ancestors' Return",
-        "description": "Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)"
+        "name": "Ataların Dönüşü",
+        "description": "Grubunun ya da akınının düşmüş her üyesini bedeninin başında 30% can ve manayla yaşama döndürür. Savaşta okunamaz. (Ruh Onarımı)"
       },
       "temporal_rewind": {
         "name": "Geri Sar",
@@ -8315,28 +8315,28 @@ export const tr_TR: EnTranslations = {
         "description": "Bir büyü etkisini (düşmandaki faydalı etkiyi veya müttefikteki zararlı etkiyi) yutar ve azami sağlığının %6’sını iyileştirir."
       },
       "veilstep": {
-        "name": "Veilstep",
-        "description": "Steps through the veil in the direction you are facing."
+        "name": "Perde Adımı",
+        "description": "Baktığın yönde perdenin içinden geçer."
       },
       "scouring_mercy": {
-        "name": "Scouring Mercy",
-        "description": "Deal 72 to 84 Holy damage to an enemy or heal a friendly target for 130 to 155. Both amounts increase with Spell Power. Damage also heals each Doctrine-linked ally for 30%, or the lowest-health party member for 15% if no ally is linked. (Doctrine signature)"
+        "name": "Arındıran Merhamet",
+        "description": "Bir düşmana 72 ila 84 Kutsal hasar verir ya da dost bir hedefi 130 ila 155 iyileştirir. Her iki değer de büyü gücüyle artar. Hasar ayrıca Öğreti ile bağlı her müttefiki 30%, hiç bağlı müttefik yoksa en düşük canlı grup üyesini 15% iyileştirir. (Öğreti imzası)"
       },
       "seraphic_vigil": {
-        "name": "Seraphic Vigil",
-        "description": "Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)"
+        "name": "Serafik Nöbet",
+        "description": "Bir müttefiki 30 sn korur. Onu 35% canın altına düşüren ilk vuruş Nöbeti tüketir ve onu 180 iyileştirir. (Lütuf imzası)"
       },
       "summon_tithefiend": {
-        "name": "Call Tithefiend",
-        "description": "Consume all Gloomtithe to summon a Tithefiend for 6, 8, 10, 12, or 15 sec at 1 to 5 stacks. It attacks every 2 sec for 20 to 24 Shadow damage, plus 8 per extra stack. Five stacks make it larger and increase its damage by 25%. Its damage increases with your Spell Power. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)"
+        "name": "Öşür İfriti Çağır",
+        "description": "Tüm Kasvet Öşürünü tüketerek 1 ila 5 katmanda 6, 8, 10, 12 veya 15 sn boyunca bir Öşür İfriti çağırır. 2 sn arayla 20 ila 24 Gölge hasarı, artı her ek katman için 8 hasar verir. Beş katmanda büyür ve hasarı 25% artar. Hasarı büyü gücünle artar. Kuklanı tercih eder. Her isabet azami mananın 1% kadarını geri kazandırır ve Çürüme Ağıdını taşıyan en fazla 3 başka düşmana hasarın 15% kadarını yansıtır. (Akşam Duası imzası)"
       },
       "martyrs_aegis": {
-        "name": "Martyr's Aegis",
-        "description": "Reduces one ally incoming damage by 40% for 8 sec."
+        "name": "Şehidin Kalkanı",
+        "description": "Bir müttefikin aldığı hasarı 8 sn boyunca 40% azaltır."
       },
       "choir_of_deliverance": {
-        "name": "Choir of Deliverance",
-        "description": "Channels for 6 sec, healing nearby party members every 2 sec."
+        "name": "Kurtuluş Korosu",
+        "description": "6 sn kanalize ederek yakındaki grup üyelerini her 2 sn iyileştirir."
       },
       "bear_charge": {
         "name": "Bruin Hücumu",
@@ -10940,12 +10940,12 @@ export const tr_TR: EnTranslations = {
         }
       },
       "q_divine_tome": {
-        "title": "The Dawnbound Tome",
-        "text": "The Light does not rest in you quietly, {playerName}. I have watched you lay the dead to peace, and I believe you are ready for what few paladins are ever taught: the Rite of Recall, by which a fallen soul is called back to the living. Its words are kept in the Dawnbound Tome, here in my keeping, but a book is no blessing while the restless dead still walk this ground. Return 6 more Restless Bones to the earth, and I will begin to teach you.",
-        "completion": "The chapel yard grows quiet. You are ready for the words, {playerName}, but the Rite of Recall cannot be spoken in a warm chapel. It must be sung where the veil between life and death wears thin. I mean to carry the Tome north into the Mirefen Marsh. Follow me there, and we will finish this.",
+        "title": "Şafağa Bağlı Cilt",
+        "text": "Işık içinde sessizce durmuyor, {playerName}. Ölülere huzur verişini gördüm ve çok az paladine öğretilen şeye hazır olduğuna inanıyorum: düşmüş bir ruhun yaşayanlara geri çağrıldığı Çağrı Ayini. Sözleri, burada benim korumamdaki Şafağa Bağlı Ciltte saklıdır; ama huzursuz ölüler hâlâ bu toprakta yürürken bir kitap hiçbir lütuf değildir. Toprağa 6 Huzursuz Kemik daha geri ver, öğretmeye başlayayım.",
+        "completion": "Şapel avlusu sessizleşiyor. Sözlere hazırsın, {playerName}, ama Çağrı Ayini ılık bir şapelde söylenemez. Yaşamla ölüm arasındaki perdenin inceldiği yerde okunmalıdır. Cildi kuzeye, Mirefen Bataklığına götürmeye niyetliyim. Beni oraya izle, bunu bitirelim.",
         "objectives": {
           "0": {
-            "label": "Restless Bones laid to rest"
+            "label": "Huzursuz Kemikler huzura kavuşturuldu"
           }
         }
       },
@@ -11106,12 +11106,12 @@ export const tr_TR: EnTranslations = {
         }
       },
       "q_rite_of_redemption": {
-        "title": "The Rite of Recall",
-        "text": "So you followed me into the mire, {playerName}. Good. I have the Dawnbound Tome here, and this drowned ground is where its words belong: nowhere is the veil between life and death thinner than a place where the dead will not stay buried. But the drowned would drag your voice down mid-verse. Clear a space fit for the rite: put 8 of the Drowned Dead to rest, and we will consecrate it together.",
-        "completion": "Kneel, {playerName}, and read the words aloud. There. Do you feel it? The Light no longer only mends the living in your hands, it can summon back those who have crossed over. Use it wisely. A soul called back to a hopeless fight is a cruelty, not a mercy. Rise, Redeemer.",
+        "title": "Çağrı Ayini",
+        "text": "Demek beni bataklığa dek izledin, {playerName}. Güzel. Şafağa Bağlı Cilt yanımda ve bu boğulmuş toprak, sözlerinin ait olduğu yer: ölülerin gömülü kalmadığı bir yerden başka hiçbir yerde yaşamla ölüm arasındaki perde bu kadar ince değildir. Ama boğulmuşlar sesini dizenin ortasında aşağı çekerdi. Ayine yaraşır bir alan aç: Boğulmuş Ölülerden 8 tanesini huzura kavuştur, birlikte kutsayalım.",
+        "completion": "Diz çök, {playerName}, ve sözleri yüksek sesle oku. İşte. Hissediyor musun? Işık artık ellerinde yalnızca yaşayanları onarmıyor, öteye geçenleri de geri çağırabiliyor. Onu bilgece kullan. Umutsuz bir savaşa geri çağrılan bir ruh merhamet değil, zulümdür. Kalk, Kurtarıcı.",
         "objectives": {
           "0": {
-            "label": "Drowned Dead laid to rest"
+            "label": "Boğulmuş Ölüler huzura kavuşturuldu"
           }
         }
       },

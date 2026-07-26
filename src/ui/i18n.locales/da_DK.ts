@@ -9291,4 +9291,281 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Erstatter {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Den genstand har allerede den fortryllelse.',
   'hudChrome.enchanting.sameEnchantTag': 'Allerede anvendt',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'abilityUi.resources.devotion': 'Hengivenhed',
+  'abilityUi.resources.focus': 'fokus',
+  'classDetails.resources.focus': 'Fokus',
+  'game.hud.lowFocus': 'Lavt fokus',
+  'hud.errors.notEnoughDevotion': 'Ikke nok Hengivenhed!',
+  'hudChrome.paladin.devotion': 'Hengivenhed',
+  'hudChrome.paladin.devotionValue': 'Hengivenhed {value} af {max}',
+  'hudChrome.paladin.devotionAscensionCharges':
+    'Hengivenhed {value} af {max}. Ophøjelse: {charges} ladninger.',
+  'hudChrome.paladin.devotionAscensionLast':
+    'Hengivenhed {value} af {max}. Ophøjelse: sidste ladning.',
+  'hudChrome.paladin.ascensionLastAnnouncement': 'Ophøjelse: sidste ladning',
+  'hudChrome.paladin.ascensionSpenderAria':
+    'Handlingsplads {slot}: {ability}. Bruger én Ophøjelsesladning.',
+  'hudChrome.crafting.craftedToastQty': 'Fremstillet: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedAlso': 'Du får også {material} tilbage.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Du får også {material} x{qty} tilbage.',
+  'hudChrome.enchanting.disenchantedYield': 'Du affortryller {item} til {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Du affortryller {item} til {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Du bjærger {material} fra {item}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Du bjærger {material} x{qty} fra {item}.',
+  'hudChrome.auraEffect.dawnsWrath': 'VH: enhver sundhed · +1 brug · Nedkøling 0 · +{pct}% skade',
+  'hudChrome.auraEffect.duskEconomy': 'Evner koster {pct}% mindre energi',
+  'hudChrome.auraEffect.hunterFerocity': '{stacks} Flokvildskab: dit kæledyr gør {pct}% mere skade',
+  'hudChrome.auraEffect.veiledEdge': 'Dit næste Lurerslag rammer dobbelt så hårdt',
+  'hudChrome.auraEffect.gloam':
+    'Tusmørke: trin {stacks} af {max}. Ved {max} låses dine Tusmørkesløråbninger op i det åbne, og den næste du kaster er GRATIS og detonerer forrådet til skyggesløret',
+  'hudChrome.auraEffect.mendingCurrent':
+    'Opbevarer {value} helbredelse, frigivet over tid eller forbrugt af Kaskadelapning',
+  'hudChrome.auraEffect.mendingCurrentPercent':
+    'Opbevarer helbredelse svarende til {pct}% af maksimal sundhed til Kaskadelapning',
+  'hudChrome.auraEffect.radiantResonance':
+    'Dit næste Lægende Lys bliver øjeblikkeligt, eller din næste Daggryets Favn koster {pct}% mindre mana og kastes på {castTime} sek.',
+  'hudChrome.auraEffect.redline':
+    'Rød Linje: hak {stacks} af {max}. Kropsslag tilføjer hak; Nådestødet rammer {pct}% hårdere per hak og lukker vinduet. Udløber det først, mistes det',
+  'hudChrome.auraEffect.solarReprisal':
+    'Din næste Solskive koster ingen mana, ignorerer nedkølingen og gør {pct}% mere skade; Nådens Hammer ignorerer sin nedkøling og helbreder dig for 100% af den gjorte skade; eller Lægende Lys bliver øjeblikkeligt',
+  'hudChrome.auraEffect.veilstrikeWindow':
+    'Skyggeslør: dine Tusmørkesløråbninger kan bruges i det åbne fra enhver vinkel, og den gjorte skade øges med {pct}%',
+  'hudChrome.auraEffect.venomRitual':
+    'Giftritual: trin {stacks} af {max}. Opbyggende slag tilføjer trin; ved {max} bliver Gravsøvn til Giftflænge',
+  'entities.abilities.aegis_first_dawn.name': 'Første Daggrys Ægide',
+  'entities.abilities.aura_mastery.name': 'Hellig Endrægtighed',
+  'entities.abilities.bastion_rite.name': 'Bastionens Ritual',
+  'entities.abilities.bastion_sweep.name': 'Bastionssving',
+  'entities.abilities.beacon_of_light.name': 'Lysets Bavn',
+  'entities.abilities.dawn_devotion.name': 'Daggryets Hengivenhed',
+  'entities.abilities.dawnfall.name': 'Daggryfald',
+  'entities.abilities.dawns_embrace.name': 'Daggryets Favn',
+  'entities.abilities.devotion_ward.name': 'Bastionens Hengivenhed',
+  'entities.abilities.divine_ascension.name': 'Guddommelig Ophøjelse',
+  'entities.abilities.faithforged_guard.name': 'Lysets Gæld',
+  'entities.abilities.final_edict.name': 'Sidste Påbud',
+  'entities.abilities.grace_devotion.name': 'Nådens Hengivenhed',
+  'entities.abilities.guardian_covenant.name': 'Vogterens Pagt',
+  'entities.abilities.hammer_of_grace.name': 'Nådens Hammer',
+  'entities.abilities.hushbrand.name': 'Tavshedsmærke',
+  'entities.abilities.life_covenant.name': 'Livets Pagt',
+  'entities.abilities.martyrs_aegis.name': 'Martyrens Ægide',
+  'entities.abilities.mercy_lance.name': 'Barmhjertighedens Lanse',
+  'entities.abilities.oath_chain.name': 'Edskæde',
+  'entities.abilities.radiant_chorus.name': 'Strålende Kor',
+  'entities.abilities.radiant_devotion.name': 'Strålende Hengivenhed',
+  'entities.abilities.recall_the_fallen.name': 'Kald de Faldne',
+  'entities.abilities.sacred_challenge.name': 'Hellig Spore',
+  'entities.abilities.sacred_form.name': 'Hellig Skikkelse',
+  'entities.abilities.seraphic_vigil.name': 'Serafisk Vagt',
+  'entities.abilities.solar_invocation.name': 'Solpåkaldelse',
+  'entities.abilities.solar_step.name': 'Solskridt',
+  'entities.abilities.sun_gods_verdict.name': 'Solgudens Dom',
+  'entities.abilities.sunward_disc.name': 'Solskive',
+  'entities.abilities.valkyrs_calling.name': 'Valkyriens Kalden',
+  'entities.abilities.veilbound_march.name': 'Slørmarch',
+  'entities.abilities.veilbound_mark.name': 'Slørmærke',
+  'entities.abilities.vowkeeper_strike.name': 'Edvogterens Slag',
+  'entities.abilities.choir_of_deliverance.name': 'Befrielsens Kor',
+  'entities.abilities.scouring_mercy.name': 'Rensende Nåde',
+  'entities.abilities.aegis_first_dawn.description':
+    'Kanaliser i 5 sek. og skab en hellig kuppel på 10 meter. Allierede indeni helbredes hvert sekund og tager 50% mindre skade. At fuldføre kanaliseringen frigiver en sidste helbredelse og giver 30% bevægelseshastighed i 4 sek.',
+  'entities.abilities.aura_mastery.description':
+    'Styrker i 8 sek. enhver aktiv Hengivenhed og Gengældelsesaura i din gruppe. Bastionens Hengivenhed reducerer skade med 15%; Gengældelse gør 15 hellig skade. Flere anvendelser fornyer i stedet for at stable.',
+  'entities.abilities.bastion_rite.description':
+    'Reducerer fysisk skade, du tager, med 20% og øger blokeringschancen med 20% i 6 sek. Ophøjelse forlænger varigheden til 10 sek.',
+  'entities.abilities.bastion_sweep.description':
+    'Sving dit udrustede skjold gennem fjender i en frontal bue på 180 grader for {damage} hellig skade med høj trussel og generer 1 Hengivenhed. Ophøjelse øger skaden med 30% og radius til 8 m.',
+  'entities.abilities.beacon_of_light.description':
+    'Markerer ét gruppemedlem som din Lysets Bavn. 50% af din effektive direkte helbredelse på et andet gruppemedlem inden for 60 m helbreder også Bavnen. Områdehelbredelse og periodisk helbredelse overføres ikke. Varer indtil en af jer dør.',
+  'entities.abilities.dawn_devotion.description':
+    'Øger angrebskraften hos dig og gruppemedlemmerne med 40 i 30 min. Erstatter din egen Strålende eller Nådens Hengivenhed, men eksisterer side om side med Hengivenheder fra andre paladiner og med krigerråb.',
+  'entities.abilities.dawnfall.description':
+    'Gør {damage} hellig skade på nærliggende fjender og genererer 1 Hengivenhed. At ramme mindst én fjende reducerer Sidste Påbuds resterende nedkøling med 2 sek. Ophøjelse øger dens skade og radius.',
+  'entities.abilities.dawns_embrace.description':
+    'Leverer en kraftfuld helbredelse og genererer 1 Hengivenhed. Strålende Resonans reducerer dens manaomkostning med 50% og kastetiden til 1,5 sek. Ophøjelse gør den øjeblikkelig og øger dens helbredelse med 35%.',
+  'entities.abilities.devotion_ward.description':
+    'Reducerer den skade, du og gruppemedlemmerne tager, med 5% indtil død eller udskiftning. Kun denne aura og Gengældelsesauraen erstatter hinanden; Strålende, Daggryets og Nådens Hengivenhed eksisterer side om side.',
+  'entities.abilities.divine_ascension.description':
+    'Forbruger 20 Hengivenhed for at få 5 Ophøjelsesladninger i op til 45 sek. Markerede evner forbruger én ladning og får en ekstra effekt.',
+  'entities.abilities.faithforged_guard.description':
+    'I 8 sek. besvares det næste fjendtlige slag mod dig: op til {buff} skade nægtes og returneres til angriberen som hellig skade, og du får 1 Hengivenhed. Kun ét slag besvares. Ophøjelse hæver den mængde, den kan besvare, med 50%.',
+  'entities.abilities.final_edict.description':
+    'Leverer et knusende våbenslag og genererer 1 Hengivenhed, når det gør skade. Et vellykket træf reducerer Daggryfalds resterende nedkøling med 2 sek. Vellykkede autoangreb og træf med Sidste Påbud har 15% chance for at give Daggryets Vrede i 8 sek. Ophøjelse frigiver desuden en hellig eksplosion omkring dig.',
+  'entities.abilities.grace_devotion.description':
+    'Du og gruppemedlemmerne genvinder 15 mana hvert 5. sek. og betaler 3% mindre mana i 30 min. Erstatter din egen Strålende eller Daggryets Hengivenhed, men eksisterer side om side med Hengivenheder fra andre paladiner.',
+  'entities.abilities.guardian_covenant.description':
+    'Beskytter et venligt mål og dig selv og reducerer den skade, I tager, med 20% i 8 sek. Vælger dig som standard, når intet venligt mål er valgt.',
+  'entities.abilities.hammer_of_grace.description':
+    'Kaster øjeblikkeligt en hellig hammer mod en fjende inden for 20 m for {damage}, genopretter 70 mana, helbreder dig for 50% af den gjorte skade og genererer 1 Hengivenhed, når den gør skade. Solgengældelse lader Nådens Hammer ignorere sin nedkøling og helbrede dig for 100% af den gjorte skade.',
+  'entities.abilities.hushbrand.description':
+    'Afbryder besværgelser og forhindrer besværgelser fra den skole i 4 sek.',
+  'entities.abilities.life_covenant.description':
+    'Reducerer den skade, en allieret tager, med 40% i 6 sek. Under Ophøjelse giver den også et skjold på 120 point uden at forbruge en ladning.',
+  'entities.abilities.martyrs_aegis.description':
+    'Reducerer den skade, en allieret tager, med 40% i 8 sek.',
+  'entities.abilities.mercy_lance.description':
+    'Gør {damage} hellig skade på en fjende og genererer 1 Hengivenhed, når den gør skade. Under Ophøjelse forbruger den 1 ladning for at garantere et kritisk træf.',
+  'entities.abilities.oath_chain.description':
+    'Binder øjeblikkeligt en fjern fjende med en hellig kæde. Fjenden bevæger sig mod dig med 18 m i sekundet, indtil den når 3 m, og sænkes derefter med 50% i 4 sek. Under Ophøjelse binder den en anden nærliggende fjende.',
+  'entities.abilities.radiant_chorus.description':
+    'Helbreder nærliggende allierede for {damage} og genererer 1 Hengivenhed. At helbrede mindst 2 allierede effektivt giver Strålende Resonans: dit næste Lægende Lys bliver øjeblikkeligt, eller din næste Daggryets Favn koster 50% mindre mana og kastes på 1,5 sek. Ophøjelse øger Strålende Kors helbredelse og radius.',
+  'entities.abilities.radiant_devotion.description':
+    'Øger besværgelseskraften hos dig og gruppemedlemmerne med 20 i 30 min. Erstatter din egen Daggryets eller Nådens Hengivenhed, men eksisterer side om side med Hengivenheder fra andre paladiner.',
+  'entities.abilities.recall_the_fallen.description':
+    'Bringer et dødt gruppemedlem tilbage til livet med 35% sundhed og mana. En Solheler på niveau 16 eller derover kalder i stedet ethvert faldent medlem af gruppen tilbage.',
+  'entities.abilities.sacred_challenge.description':
+    'Tvinger en fjende til at angribe dig. Under Ophøjelse reducerer den også al modtaget skade med 15% i 4 sek. uden at forbruge en ladning.',
+  'entities.abilities.sacred_form.description':
+    'Går ind i en hellig tilstand indtil døden, øger helbredelse med 10% og kritisk besværgelseschance med 5%, og reducerer genereret trussel med 50%. Kun for Solhelere.',
+  'entities.abilities.seraphic_vigil.description':
+    'Beskytter en allieret i 30 sek. Det første slag, der bringer vedkommende under 35% sundhed, forbruger Vagten og helbreder vedkommende for 180. (Velsignelsessignatur)',
+  'entities.abilities.scouring_mercy.description':
+    'Gør 72 til 84 hellig skade på en fjende eller helbreder et venligt mål for 130 til 155. Begge beløb stiger med besværgelseskraft. Skaden helbreder også hver lærebundet allieret for 30%, eller gruppemedlemmet med lavest sundhed for 15%, hvis ingen allieret er bundet. (Læresignatur)',
+  'entities.abilities.solar_invocation.description':
+    'Helbreder øjeblikkeligt en allieret for {damage} eller gør moderat hellig skade på en fjende. Begge anvendelser genererer 1 Hengivenhed. Under Ophøjelse helbreder en helbredende kastning også allierede spillere inden for 10 m af målet for halvdelen.',
+  'entities.abilities.solar_step.description': 'Øger din bevægelseshastighed med 150% i 2 sek.',
+  'entities.abilities.sun_gods_verdict.description':
+    'Dømmer en fjende under Solgudens Dom i 30 sek. Sidste Påbud og Daggryfald indskriver én ladning ved et vellykket træf. Den evne, der sætter den tredje ladning, dikterer dommen: Sidste Påbud udløser ødelæggende skade på den dømte; Daggryfald detonerer dommen og skader og bedøver nærliggende fjender i 1,5 sek.',
+  'entities.abilities.sunward_disc.description':
+    'Kræver et skjold. Kaster en strålende skive, der rammer og derefter hopper mellem nærliggende fjender. Hvert skadevoldende nedslag genererer 1 Hengivenhed. Solgengældelse gør, at Solskiven ikke koster mana, ignorerer sin nedkøling og gør 20% mere skade. Ophøjelse styrker 5 hop.',
+  'entities.abilities.valkyrs_calling.description':
+    'Stig op i luften og bliv immun over for skade, mens du flyver mod fjenden. Efter 2 sek. styrter du ned over målområdet for {damage} hellig skade og genererer 1 Hengivenhed. Ophøjelse øger nedslagsskaden med 50% og forbruger 1 ladning.',
+  'entities.abilities.veilbound_march.description':
+    'Bliv æterisk i 4 sek., få 40% bevægelseshastighed og 30% rustning og bliv immun over for rødder, nedsættelser og forskydning. Fjender, du passerer igennem, får Slørmærket i 6 sek.: de tager hellig skade hvert sekund, gør 20% mindre skade på dig og genererer ekstra trussel. Det første mærke giver 1 Hengivenhed. Når marchen slutter, tager nærliggende mærkede fjender et sidste udbrud. Ophøjelse øger udbruddet med 50% og trækker dem let mod dig.',
+  'entities.abilities.veilbound_mark.description':
+    'Tager hellig skade hvert sekund, gør 20% mindre skade på den paladin, der satte mærket, og genererer ekstra trussel mod den paladin.',
+  'entities.abilities.vowkeeper_strike.description':
+    'Slår med høj trussel og genererer 1 Hengivenhed. Et vellykket slag har 20% chance for at give Solgengældelse i 8 sek.; hver vellykket blokering har 25%. Solgengældelse styrker din næste Solskive, Nådens Hammer eller Lægende Lys. Ophøjelse giver også et lille absorptionsskjold.',
+  'entities.abilities.choir_of_deliverance.description':
+    'Kanaliserer i 6 sek. og helbreder nærliggende gruppemedlemmer hvert 2. sek.',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'entities.abilities.bloodhook.name': 'Blodkrog',
+  'entities.abilities.bloodtrail_assault.name': 'Blodsporsangreb',
+  'entities.abilities.cold_focus.name': 'Koldt Fokus',
+  'entities.abilities.fieldcraft_reentry.name': 'Bevæbnet Genindtræden',
+  'entities.abilities.frostjaw_trap.name': 'Frostkæbefælde',
+  'entities.abilities.hunting_momentum.name': 'Jagtfart',
+  'entities.abilities.measured_shot.name': 'Afmålt Skud',
+  'entities.abilities.pack_command.name': 'Flokbefaling',
+  'entities.abilities.pack_rally.name': 'Floksamling',
+  'entities.abilities.shellskin.name': 'Skalhud',
+  'entities.abilities.shrapnel_charge.name': 'Splintladning',
+  'entities.abilities.stampede.name': 'Vildt Spring',
+  'entities.abilities.trailbreak.name': 'Sporbrud',
+  'entities.abilities.unleash_beast.name': 'Slip Bæstet Løs',
+  'entities.abilities.wildheart.name': 'Vildhjerte',
+  'entities.abilities.bloodhook.description':
+    'Storm mod en fjende og påfør Blodkrogssår, der gør 34 fysisk grundskade plus 26% af din afstandsangrebskraft over 12 sek. i 4 pulser. (Feltkunstsignatur)',
+  'entities.abilities.bloodtrail_assault.description':
+    'I 12 sek. spreder Blodkrogen et sår med 60% styrke til op til 2 nærliggende fjender, Sårflænge befaler et kæledyrsangreb på 18 skade, og Splintladningen får 2 meter, gør 25% mere grundskade på sit hovedmål og udløser 50% mere sårskade.',
+  'entities.abilities.cold_focus.description':
+    'I 12 sek. genopretter Afmålt Skud 50% mere fokus, og Langt Træk koster 25% mindre og kastes 30% hurtigere. (Koldsynssignatur)',
+  'entities.abilities.fieldcraft_reentry.description':
+    'Passiv: Sporbrud fornyer Jagtfarten og gør dit næste Sprættende Slag eller Blodkrog klar i 12 sek. Sprættende Slag gør 15% mere skade per stak. Blodkrogen gør 18 til 24 ekstra fysisk skade, øget med 15% per stak og af din afstandsangrebskraft. Ved 3 stakke forbruger et af angrebene Jagtfarten. (Feltkunst)',
+  'entities.abilities.frostjaw_trap.description':
+    'Placer en fælde ved den valgte fjende eller ved dine fødder. Den armeres efter 0,75 sek. og varer 30 sek. Den første fjende, der udløser den, rodfæstes i 3 sek., og fjender inden for 4 meter sænkes med 50% i 4 sek.',
+  'entities.abilities.hunting_momentum.description':
+    'Passiv: Sprættende Slag giver 1 Jagtfart i 8 sek., op til 3. Ved 3 stakke gør Sårflænge 45% mere slagskade og forbruger stakkene. (Feltkunst)',
+  'entities.abilities.measured_shot.description':
+    'Skyd målet for {damage} fysisk skade. Et træf genopretter 20 fokus. Skaden stiger med afstandsangrebskraft.',
+  'entities.abilities.pack_command.description':
+    'Befal dit levende kæledyr at slå for 36 til 48 fysisk skade. Skaden stiger med kæledyrets angrebskraft. Et træf genopretter 20 fokus og giver 1 Flokvildskab i 30 sek., op til 3. Hver stak øger al skade, dit kæledyr gør, med 10%. Dette slag bruger de stakke, du havde før træffet.',
+  'entities.abilities.pack_rally.description':
+    'Antag Gangerens Skikkelse og saml nærliggende allierede med 30% bevægelseshastighed og 10% angrebs- og kastehastighed i 10 sek.',
+  'entities.abilities.shellskin.description':
+    'Reducerer den skade, du tager, med 60% i 8 sek., men forhindrer angreb, mens den er aktiv.',
+  'entities.abilities.shrapnel_charge.description':
+    'Rammer målet for 24 til 30 fysisk skade og op til 4 andre fjender inden for 6 meter for 13 til 17. De øvrige mål bløder også for 12 skade over 6 sek. Hvis hovedmålet bærer dit Blodkrogssår, gøres 1 sårpuls straks. Den direkte skade stiger med afstandsangrebskraft.',
+  'entities.abilities.stampede.description':
+    'Tilkalder 3 bæster i 12 sek. Hvert angriber hvert 2. sek. for {damage} fysisk skade. Den viste skade inkluderer 8% af din afstandsangrebskraft før kæledyrsskadebonusser. Bæsterne fastlåser Flokvildskabet ved tilkaldelsen og får 10% skade per stak. Mens Vildt Spring er under nedkøling, har vellykkede Flokbefalinger 20% chance for at nulstille det, garanteret efter 5 mislykkede chancer. Det kan ikke nulstilles, mens bæsterne er aktive. (Flokherre)',
+  'entities.abilities.trailbreak.description':
+    'Spring 12 meter baglæns. Har du Jagtfart, fornyes den og gør Genindtræden klar i 12 sek.',
+  'entities.abilities.unleash_beast.description':
+    'Forbruger 3 Flokvildskab, efter at dit kæledyr har slået for 83 til 105 fysisk skade og rystet enhver fjende inden for 6 meter for 26 til 34. Slaget og rystelsen bruger Flokvildskabets fulde kæledyrsskadebonus på 30% og stiger med kæledyrets angrebskraft. I de følgende 8 sek. gør kæledyret 25% mere skade, angriber 35% hurtigere og får Grumt Skud til at ramme op til 2 nærliggende fjender.',
+  'entities.abilities.wildheart.description': 'Genopretter straks 30% af din maksimale sundhed.',
+  'entities.abilities.ancestor_return.name': 'Forfædrenes Tilbagekomst',
+  'entities.abilities.galeheart_weapon.name': 'Stormhjertevåben',
+  'entities.abilities.lifespring_weapon.name': 'Livskildevåben',
+  'entities.abilities.primal_exaltation.name': 'Urgammel Ophøjelse',
+  'entities.abilities.stoneward.name': 'Stenværn',
+  'entities.abilities.stormsurge.name': 'Stormflod',
+  'entities.abilities.thunder_reservoir.name': 'Tordenreservoir',
+  'entities.abilities.tidecall.name': 'Tidevandskald',
+  'entities.abilities.unleash_weapon.name': 'Slip Våbnet Løs',
+  'entities.abilities.warspirit_cadence.name': 'Krigsåndens Kadence',
+  'entities.abilities.ancestor_return.description':
+    'Kalder ethvert faldent medlem af din gruppe eller dit togt tilbage til livet ved deres krop med 30% sundhed og mana. Kan ikke kastes i kamp. (Åndelapning)',
+  'entities.abilities.galeheart_weapon.description':
+    'Fortryller begge våben i 30 min. og muliggør Krigsåndens Kadence.',
+  'entities.abilities.lifespring_weapon.description':
+    'Fortryller dit våben i 30 min. Lægende Vande og Tidevandskald tilføjer 20% mere helbredelse til Lapningsstrømmen.',
+  'entities.abilities.primal_exaltation.description':
+    'I 12 sek. kastes Tordenkaldets Lysbuelyn og Gaffellyn 50% hurtigere, og Lysbuelynet giver 2 Torden; Krigsånden udløser sin kadence hvert 2. våbentræf; Åndelapningen tilføjer 50% mere helbredelse til Lapningsstrømmen. (Shamantalent)',
+  'entities.abilities.stoneward.description':
+    'Beskytter en allieret i 60 sek. med 6 ladninger. Skade forbruger en ladning for at helbrede 5% af den maksimale sundhed, én gang hvert 3. sek. (Shamantalent)',
+  'entities.abilities.stormsurge.description':
+    'Passiv: mens Forfædreslaget er under nedkøling, har forbruget af et Stormtegn 25% chance for at nulstille det. Hvis de 3 første chancer mislykkes, nulstiller den 4. det altid. (Krigsånd)',
+  'entities.abilities.thunder_reservoir.description':
+    'Passiv: Lysbuelynet og Gaffellynet giver Torden, op til 5. Ved 5 Torden gør Jordstødet 125% mere skade eller Jordskælvet 100% mere, og derefter forbruges al Torden. (Tordenkald)',
+  'entities.abilities.tidecall.description':
+    'Helbreder et venligt mål for 58 til 72. Helbredelsen stiger med besværgelseskraft. Tilføjer den samme helbredelse beregnet før overhelbredelse til Lapningsstrømmen, op til 30% af målets maksimale sundhed.',
+  'entities.abilities.unleash_weapon.description':
+    'Slipper dit våbens aktive fortryllelse løs. Ildmærket gør 54 til 64 ildskade, får 30% af besværgelseskraften og giver 2 Torden. Stormhjertet slår med dit våben, driver Krigsåndens Kadence frem og giver 20% angrebshastighed i 6 sek. Stenbundet slår for 75% våbenskade, tvinger målet til at angribe dig og reducerer den skade, du tager, med 20% i 4 sek. Livskilden forbruger din Lapningsstrøm, helbreder for 125% af dens resterende helbredelse og reducerer det næste træf inden for 8 sek. med 50% af den genoprettede sundhed.',
+  'entities.abilities.warspirit_cadence.description':
+    'Passiv: hvert 3. landede våbenangreb udløser 2 Stormhjerteekkoer for 50% naturskade og giver et Stormtegn i 12 sek. Stormtegnet gør dit næste Lysbuelyn, Stød eller Lægende Vande øjeblikkeligt og sænker manaomkostningen med 50%. Forfædreslaget tæller som 2 angreb. (Krigsånd)',
+  'entities.abilities.summon_tithefiend.name': 'Tilkald Tiendedæmon',
+  'entities.abilities.summon_tithefiend.description':
+    'Forbruger al Dysterhedstiende for at tilkalde en Tiendedæmon i 6, 8, 10, 12 eller 15 sek. ved 1 til 5 stakke. Den angriber hvert 2. sek. for 20 til 24 skyggeskade, plus 8 per ekstra stak. Ved fem stakke bliver den større, og dens skade øges med 25%. Dens skade stiger med din besværgelseskraft. Den foretrækker dit Billede. Hvert træf genopretter 1% af den maksimale mana og genlyder 15% af skaden til op til 3 andre fjender med din Forfaldets Klagesang. (Aftensangssignatur)',
+  'entities.abilities.veilstep.name': 'Slørskridt',
+  'entities.abilities.veilstep.description': 'Skrider gennem sløret i den retning, du kigger.',
+  'entities.quests.q_divine_tome.title': 'Daggrybundne Bind',
+  'entities.quests.q_divine_tome.objectives.0.label': 'Rastløse Knogler lagt til hvile',
+  'entities.quests.q_divine_tome.text':
+    'Lyset hviler ikke stille i dig, {playerName}. Jeg har set dig lægge de døde til fred, og jeg tror, du er klar til det, som få paladiner nogensinde bliver undervist i: Genkaldelsens Ritual, hvormed en falden sjæl kaldes tilbage til de levende. Dets ord opbevares i Daggrybundne Bind, her i min varetægt, men en bog er ingen velsignelse, så længe de rastløse døde stadig vandrer på denne jord. Læg 6 Rastløse Knogler mere tilbage i jorden, så begynder jeg at undervise dig.',
+  'entities.quests.q_divine_tome.completion':
+    'Kapelgården bliver stille. Du er klar til ordene, {playerName}, men Genkaldelsens Ritual kan ikke udtales i et lunt kapel. Det skal synges dér, hvor sløret mellem liv og død bliver tyndt. Jeg agter at bære Bindet nordpå til Mirefen-mosen. Følg mig derhen, så gør vi dette færdigt.',
+  'entities.quests.q_rite_of_redemption.title': 'Genkaldelsens Ritual',
+  'entities.quests.q_rite_of_redemption.objectives.0.label': 'Druknede Døde lagt til hvile',
+  'entities.quests.q_rite_of_redemption.text':
+    'Så du fulgte mig ud i mudderet, {playerName}. Godt. Jeg har Daggrybundne Bind her, og denne druknede jord er, hvor dets ord hører hjemme: intetsteds er sløret mellem liv og død tyndere end et sted, hvor de døde ikke bliver liggende begravet. Men de druknede ville trække din stemme ned midt i verset. Ryd et rum, der er ritualet værdigt: læg 8 af de Druknede Døde til hvile, så indvier vi det sammen.',
+  'entities.quests.q_rite_of_redemption.completion':
+    'Knæl, {playerName}, og læs ordene højt. Dér. Mærker du det? Lyset lapper ikke længere kun de levende i dine hænder, det kan kalde dem tilbage, som er gået over. Brug det klogt. En sjæl, der kaldes tilbage til en håbløs kamp, er en grusomhed, ikke en nåde. Rejs dig, Forløser.',
+  'guide.abilityHook.hammer_of_justice': 'Stopper én fjende med en kort, pålidelig bedøvelse.',
+  'guide.abilityHook.oath_chain': 'Slæber en fjern fjende ind i din flok og bremser dens flugt.',
+  'guide.abilityHook.ancestor_return':
+    'Bringer ethvert faldent gruppe- eller togtmedlem tilbage til livet efter en lang kastning uden for kamp.',
+  'guide.abilityHook.avenging_wrath':
+    'Giver 10 Hengivenhed og fordobler derefter den Hengivenhed, evner genererer, i femten sekunder.',
+  'guide.abilityHook.bastion_sweep':
+    'Svinger dit skjold gennem en gruppe for at rive truslen til dig og opbygge Hengivenhed.',
+  'guide.abilityHook.chain_lightning':
+    'Rammer ét mål og hopper til to nærliggende fjender og opbygger én Torden for hele kastningen.',
+  'guide.abilityHook.consecration':
+    'Gør krav på jorden omkring dig med vedvarende hellig skade og trussel.',
+  'guide.abilityHook.hammer_of_wrath':
+    'Henretter en såret fjende på afstand, eller enhver fjende mens dine vinger er aktive.',
+  'guide.abilityHook.holy_shield':
+    'Bruger Hengivenhed på et aktivt blokeringsvindue, absorption og en trusselspuls.',
+  'guide.abilityHook.lay_on_hands':
+    'Genopretter en stor mængde sundhed, når en allieret er tæt på at falde.',
+  'guide.abilityHook.measured_shot':
+    'Et bevidst afstandsskud, der genopretter fokus til dine tungere angreb.',
+  'guide.abilityHook.pack_command':
+    'Befaler din ledsager at slå og opbygge Flokvildskab. Hver stak får dit kæledyr til at gøre 10% mere skade, op til 30%, før Slip Bæstet Løs bruger stakkene.',
+  'guide.abilityHook.stampede':
+    'Kalder tre bæster til at angribe i 12 sekunder. Brug den ved fuldt Flokvildskab, så de beholder den maksimale skadebonus under hele tilkaldelsen.',
+  'guide.abilityHook.stormsurge':
+    'Bringer nogle gange Forfædreslaget tidligt tilbage, efter du har brugt en Stormtegn-mulighed.',
+  'guide.abilityHook.thunder_reservoir':
+    'Opsparer lyn, indtil Jordstødet eller Jordskælvet kan frigive en udbetaling ved fuld kraft.',
+  'guide.abilityHook.veilbound_march':
+    'Gå gennem en gruppe for at mærke den, sløve dens skade mod dig og fastlåse truslen.',
+  'guide.abilityHook.warspirit_cadence':
+    'Forvandler en stabil våbenrytme til Stormhjerteekkoer og en mulighed for en øjeblikkelig besværgelse.',
 };

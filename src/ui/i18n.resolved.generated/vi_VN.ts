@@ -241,7 +241,7 @@ export const vi_VN: EnTranslations = {
     "hud": {
       "lowMana": "Cạn Mana",
       "lowEnergy": "Cạn Năng Lượng",
-      "lowFocus": "Low Focus"
+      "lowFocus": "Tập trung thấp"
     },
     "talents": {
       "title": "Thiên phú",
@@ -749,12 +749,12 @@ export const vi_VN: EnTranslations = {
       "resting": "Đang Nghỉ Ngơi"
     },
     "paladin": {
-      "devotion": "Devotion",
-      "devotionValue": "Devotion {value} of {max}",
-      "devotionAscensionCharges": "Devotion {value} of {max}. Ascension {charges} charges.",
-      "devotionAscensionLast": "Devotion {value} of {max}. Ascension final charge.",
-      "ascensionLastAnnouncement": "Ascension final charge",
-      "ascensionSpenderAria": "Action slot {slot}: {ability}. Consumes one Ascension charge."
+      "devotion": "Sùng Tín",
+      "devotionValue": "Sùng Tín {value} trên {max}",
+      "devotionAscensionCharges": "Sùng Tín {value} trên {max}. Thăng Thiên: {charges} lượt.",
+      "devotionAscensionLast": "Sùng Tín {value} trên {max}. Thăng Thiên: lượt cuối.",
+      "ascensionLastAnnouncement": "Thăng Thiên: lượt cuối",
+      "ascensionSpenderAria": "Ô hành động {slot}: {ability}. Tiêu tốn một lượt Thăng Thiên."
     },
     "abilityScaling": {
       "bonus": "(+{value})"
@@ -1590,8 +1590,8 @@ export const vi_VN: EnTranslations = {
     "auraEffect": {
       "dot": "Gây {value} sát thương {school} mỗi {interval} giây",
       "hot": "Hồi {value} máu mỗi {interval} giây",
-      "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",
-      "mendingCurrentPercent": "Stores healing equal to {pct}% of maximum health for Cascading Mend",
+      "mendingCurrent": "Tích {value} hồi máu, giải phóng dần theo thời gian hoặc bị Vá Tầng Tầng tiêu thụ",
+      "mendingCurrentPercent": "Tích lượng hồi máu bằng {pct}% máu tối đa cho Vá Tầng Tầng",
       "absorb": "Hấp thụ {value} sát thương",
       "healAbsorb": "Hấp thụ {value} hồi máu nhận vào",
       "thorns": "Inflige {value} de daño de {school} a los atacantes",
@@ -1605,7 +1605,7 @@ export const vi_VN: EnTranslations = {
       "dmgDoneReduce": "Giảm sát thương gây ra đi {pct}%",
       "heatingUp": "Cú chí mạng tiếp theo của kỹ năng xây dựng Lửa liên tiếp sẽ ban Hot Streak; cú không chí mạng sẽ xóa Đang Nóng Dần",
       "elementalConvergencePrimed": "Phép tiếp theo của bạn từ trường nguyên tố khác sẽ ban Hội Tụ Nguyên Tố",
-      "hunterFerocity": "{stacks} Pack Ferocity: your pet deals {pct}% more damage",
+      "hunterFerocity": "{stacks} Hung Tính Bầy Đàn: thú nuôi của bạn gây thêm {pct}% sát thương",
       "battleStance": "Thế Công: tạo nộ khí nhiều hơn 10%",
       "berserkerStance": "Thế Cuồng Chiến: chí mạng thường xuyên hơn 3% và mạnh hơn 3%",
       "crit": "Tăng tỉ lệ chí mạng thêm {pct}%",
@@ -1628,15 +1628,15 @@ export const vi_VN: EnTranslations = {
       "freeCast": "Lần thi triển tiếp theo của bạn không tốn mana",
       "instantCast": "Phép tiếp theo của bạn có thời gian thi triển sẽ lập tức",
       "cheapCast": "Phép tiếp theo của bạn tốn ít hơn {pct}%",
-      "radiantResonance": "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
-      "solarReprisal": "Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant",
-      "dawnsWrath": "HoW: all HP · +1 use · CD 0 · +{pct}% DMG",
-      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
-      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
-      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
-      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
-      "veiledEdge": "Your next Lurker's Strike strikes for double",
-      "duskEconomy": "Abilities cost {pct}% less energy",
+      "radiantResonance": "Thánh Quang Chữa Lành kế tiếp của bạn thành tức thời, hoặc Vòng Tay Bình Minh kế tiếp tốn ít hơn {pct}% mana và niệm trong {castTime} giây",
+      "solarReprisal": "Đĩa Nhật Quang kế tiếp của bạn không tốn mana, bỏ qua hồi chiêu và gây thêm {pct}% sát thương; Búa Ân Điển bỏ qua hồi chiêu và hồi cho bạn 100% sát thương đã gây; hoặc Thánh Quang Chữa Lành thành tức thời",
+      "dawnsWrath": "BTN: mọi mức máu · +1 lượt dùng · Hồi chiêu 0 · +{pct}% sát thương",
+      "venomRitual": "Nghi Lễ Độc: giai đoạn {stacks} trên {max}. Các đòn tích lũy thêm giai đoạn; ở {max}, Giấc Ngủ Vùi Đất trở thành Xé Độc",
+      "gloam": "Nhá Nhem: giai đoạn {stacks} trên {max}. Ở {max}, các đòn mở màn Màn Hoàng Hôn mở khóa ngoài trống trải, và đòn ném kế tiếp là MIỄN PHÍ và kích nổ kho tích thành màn bóng tối",
+      "redline": "Vạch Đỏ: khấc {stacks} trên {max}. Đòn Thân thêm khấc; Đòn Kết Liễu đánh mạnh hơn {pct}% mỗi khấc và đóng cửa sổ. Hết hạn trước thì mất",
+      "veilstrikeWindow": "Màn Bóng Tối: các đòn mở màn Màn Hoàng Hôn của bạn dùng được ngoài trống trải từ mọi góc, và sát thương gây ra tăng {pct}%",
+      "veiledEdge": "Đòn Rình Rập kế tiếp của bạn đánh mạnh gấp đôi",
+      "duskEconomy": "Kỹ năng tốn ít hơn {pct}% năng lượng",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "sp": "Tăng sức mạnh phép thuật lên {value}",
@@ -2370,7 +2370,7 @@ export const vi_VN: EnTranslations = {
       "empty": "Chưa có công thức nấu ăn nào được biết đến.",
       "resultAria": "Thủ công {name}",
       "craftedToast": "Đã chế tác: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Đã chế tạo: {name} x{qty}",
       "insufficientMaterials": "Bạn không có tài liệu cho việc đó.",
       "unknownRecipe": "Công thức đó không tồn tại.",
       "comboRequirementUnmet": "Bạn chưa có cả hai nghề chế tạo cần thiết ở bậc yêu cầu cho công thức đó.",
@@ -2463,13 +2463,13 @@ export const vi_VN: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Bạn hủy pháp khắc {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Bạn giải phù {item} và thu được {material}.",
+      "disenchantedYieldQty": "Bạn giải phù {item} và thu được {material} x{qty}.",
+      "disenchantedAlso": "Bạn cũng thu lại được {material}.",
+      "disenchantedAlsoQty": "Bạn cũng thu lại được {material} x{qty}.",
       "salvagedLine": "Bạn tháo dỡ {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Bạn tháo được {material} từ {item}.",
+      "salvagedYieldQty": "Bạn tháo được {material} x{qty} từ {item}.",
       "enchantAppliedLine": "Bạn pháp khắc {item} với {enchant}.",
       "notHeld": "Bạn không có vật phẩm đó.",
       "notDisenchantable": "Bạn không thể hủy pháp khắc vật phẩm đó.",
@@ -3293,21 +3293,21 @@ export const vi_VN: EnTranslations = {
       "holy_light": "Một đòn trị liệu vững chãi, đáng kể để hồi đầy cho đồng đội hoặc bản thân.",
       "devotion_aura": "Một buff bản thân lâu dài giúp tăng giáp để đòn đánh giảm uy lực.",
       "judgement": "Tiêu Ấn Chú đang kích hoạt để giáng đòn lên kẻ địch từ cự ly gần.",
-      "hammer_of_wrath": "Executes a wounded enemy from range, or any enemy while your wings are active.",
-      "avenging_wrath": "Grants 10 Devotion, then doubles Devotion generated by abilities for fifteen seconds.",
-      "bastion_sweep": "Sweeps your shield through a group to seize threat and build Devotion.",
-      "oath_chain": "Drags a distant enemy into your pack and slows its escape.",
-      "veilbound_march": "Pass through a pack to mark it, blunt its damage against you, and lock in threat.",
-      "holy_shield": "Spends Devotion on an active block window, absorption, and a threat pulse.",
-      "consecration": "Claims the ground around you with sustained Holy damage and threat.",
-      "hammer_of_justice": "Stops one enemy with a short, reliable stun.",
-      "lay_on_hands": "Restores a large amount of health when an ally is close to falling.",
+      "hammer_of_wrath": "Kết liễu một kẻ địch bị thương từ xa, hoặc bất kỳ kẻ địch nào khi đôi cánh của bạn còn hoạt động.",
+      "avenging_wrath": "Ban 10 Sùng Tín, rồi nhân đôi lượng Sùng Tín do kỹ năng tạo ra trong mười lăm giây.",
+      "bastion_sweep": "Quét khiên xuyên qua một nhóm để giành lấy mức đe dọa và tích Sùng Tín.",
+      "oath_chain": "Kéo một kẻ địch ở xa vào giữa bầy của bạn và ghìm đường tháo chạy của nó.",
+      "veilbound_march": "Đi xuyên qua một nhóm để đánh dấu chúng, làm cùn sát thương của chúng lên bạn và ghim chặt mức đe dọa.",
+      "holy_shield": "Dùng Sùng Tín để mở cửa sổ đỡ đòn chủ động, hấp thụ và một nhịp đe dọa.",
+      "consecration": "Chiếm lấy mặt đất quanh bạn bằng sát thương Thánh và mức đe dọa kéo dài.",
+      "hammer_of_justice": "Chặn một kẻ địch bằng đòn choáng ngắn và đáng tin cậy.",
+      "lay_on_hands": "Hồi một lượng máu lớn khi đồng minh sắp gục ngã.",
       "blessing_of_might": "Tăng sức tấn công cho mục tiêu thân thiện, nên niệm trước khi vào trận.",
       "divine_protection": "Một tấm bùa hộ mệnh nhanh gọn để hứng sát thương khi tình thế ngặt nghèo.",
       "raptor_strike": "Một cú vung cận chiến mạnh tay cho khi có kẻ áp sát bạn.",
-      "pack_command": "Orders your companion to strike and build Pack Ferocity. Each stack makes your pet deal 10% more damage, up to 30%, before Unleash Beast spends the stacks.",
-      "stampede": "Calls three beasts to attack for 12 seconds. Use it at full Pack Ferocity so they keep the maximum damage bonus for the whole summon.",
-      "measured_shot": "A deliberate ranged shot that restores Focus for your heavier attacks.",
+      "pack_command": "Ra lệnh cho bạn đồng hành tấn công và tích Hung Tính Bầy Đàn. Mỗi lớp khiến thú nuôi của bạn gây thêm 10% sát thương, tối đa 30%, trước khi Thả Thú Dữ tiêu hết các lớp.",
+      "stampede": "Gọi ba con thú tấn công trong 12 giây. Hãy dùng khi Hung Tính Bầy Đàn đầy để chúng giữ trọn thưởng sát thương tối đa suốt lần triệu.",
+      "measured_shot": "Một phát bắn tầm xa có chủ đích, hồi tập trung cho các đòn nặng hơn của bạn.",
       "aspect_of_the_hawk": "Một trạng thái bạn duy trì để gia tăng sức tấn công tầm xa.",
       "serpent_sting": "Tiêm vào một liều nọc độc gây sát thương tự nhiên theo thời gian.",
       "arcane_shot": "Một phát bắn tức thời từ xa cho lượng sát thương phụ nhanh gọn.",
@@ -3326,19 +3326,19 @@ export const vi_VN: EnTranslations = {
       "power_word_shield": "Bao bọc đồng đội trong một tấm khiên hứng đòn trước khi chúng giáng xuống.",
       "renew": "Một đòn trị liệu hồi theo thời gian, hữu dụng để niệm rồi tiếp tục di chuyển.",
       "lightning_bolt": "Một đòn niệm sát thương Tự Nhiên tầm xa, lựa chọn quen thuộc của bạn từ xa.",
-      "chain_lightning": "Strikes one target and jumps to two nearby enemies, building one Thunder for the whole cast.",
-      "thunder_reservoir": "Banks lightning until Earthen Jolt or Faultwake can release a full-power payoff.",
+      "chain_lightning": "Đánh trúng một mục tiêu rồi nhảy sang hai kẻ địch gần đó, tích một Sấm cho cả lần niệm.",
+      "thunder_reservoir": "Tích sét cho đến khi Địa Giật hoặc Động Đất có thể tung ra phần thưởng đầy sức mạnh.",
       "rockbiter_weapon": "Phù chú vũ khí của bạn để mỗi cú vung cận chiến giáng nặng hơn.",
       "healing_wave": "Đòn trị liệu chủ lực của bạn, một liều hồi trực tiếp cho bản thân hoặc đồng đội.",
       "earth_shock": "Một cú chấn động tức thời cho sát thương Tự Nhiên nhanh khi bạn cần ngay.",
       "lightning_shield": "Tích điện cho bạn để kẻ tấn công nhận sát thương Tự Nhiên khi đánh trúng bạn.",
       "flame_shock": "Một đòn thiêu đốt tức thời giáng trực diện và tiếp tục sém cháy theo thời gian.",
       "galeheart_weapon": "Truyền gió bão vào cả hai vũ khí và tưởng thưởng nhịp tấn công đều đặn.",
-      "warspirit_cadence": "Turns a steady weapon rhythm into Galeheart Echoes and an instant spell opportunity.",
-      "stormsurge": "Sometimes brings Ancestral Strike back early after you spend a Stormcast opportunity.",
+      "warspirit_cadence": "Biến nhịp vũ khí đều đặn thành Tiếng Vọng Tâm Phong và một cơ hội niệm phép tức thời.",
+      "stormsurge": "Đôi khi đưa Đòn Tổ Tiên trở lại sớm sau khi bạn dùng một cơ hội Điềm Bão.",
       "lifespring_weapon": "Truyền nước hồi phục vào vũ khí và tăng cường dòng chữa lành liên tục.",
       "tidecall": "Triệu gọi thủy triều để cường hóa chuỗi phép hồi phục kế tiếp.",
-      "ancestor_return": "Returns every fallen group or raid member to life after a long out-of-combat cast.",
+      "ancestor_return": "Đưa mọi thành viên nhóm hoặc đội đã ngã xuống trở lại sự sống sau một lần niệm dài ngoài chiến đấu.",
       "stoneward": "Dựng khiên đá tích năng, chuyển sát thương phải chịu thành hồi phục.",
       "primal_exaltation": "Giải phóng sức mạnh nguyên tố theo chuyên môn trong thời gian ngắn.",
       "fireball": "Đòn hỏa thuật chủ lực của bạn, vừa giáng một đòn vừa khiến mục tiêu cháy âm ỉ.",
@@ -5841,7 +5841,7 @@ export const vi_VN: EnTranslations = {
       "mana": "Mana",
       "energy": "Năng Lượng",
       "rage": "Nộ Khí",
-      "focus": "Focus"
+      "focus": "Tập Trung"
     },
     "roles": {
       "warrior": "Đỡ Đòn / DPS Cận Chiến",
@@ -6223,7 +6223,7 @@ export const vi_VN: EnTranslations = {
       "notEnoughRage": "Không đủ nộ khí!",
       "notEnoughEnergy": "Không đủ năng lượng!",
       "notEnoughMana": "Không đủ mana!",
-      "notEnoughDevotion": "Not enough Devotion!",
+      "notEnoughDevotion": "Không đủ Sùng Tín!",
       "notEnoughResource": "Không đủ {resource}!",
       "notEnoughHealth": "Không đủ sinh lực.",
       "targetMustDodge": "Mục tiêu của bạn phải né được trước đã.",
@@ -6537,8 +6537,8 @@ export const vi_VN: EnTranslations = {
       "mana": "Mana",
       "rage": "Nộ Khí",
       "energy": "Năng Lượng",
-      "focus": "Focus",
-      "devotion": "Devotion"
+      "focus": "tập trung",
+      "devotion": "Sùng Tín"
     },
     "forms": {
       "bear": "Gấu",
@@ -6915,56 +6915,56 @@ export const vi_VN: EnTranslations = {
         "description": "Trút mưa tên xuống khu vực mục tiêu trong 3 giây, gây {damage} sát thương mỗi 0.5 giây cho kẻ địch bên trong."
       },
       "pack_command": {
-        "name": "Pack Command",
-        "description": "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit."
+        "name": "Lệnh Bầy Đàn",
+        "description": "Ra lệnh cho thú nuôi còn sống của bạn đánh gây 36 đến 48 sát thương Vật Lý. Sát thương tăng theo sức tấn công của thú nuôi. Một đòn trúng hồi 20 tập trung và ban 1 Hung Tính Bầy Đàn trong 30 giây, tối đa 3. Mỗi lớp tăng 10% toàn bộ sát thương thú nuôi của bạn gây ra. Đòn này dùng số lớp bạn có trước khi trúng."
       },
       "stampede": {
-        "name": "Stampede",
-        "description": "Summon 3 beasts for 12 sec. Each attacks every 2 sec for {damage} Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed after 5 failed chances. It cannot reset while the beasts are active. (Packlord)"
+        "name": "Bầy Xéo",
+        "description": "Triệu 3 con thú trong 12 giây. Mỗi con tấn công mỗi 2 giây gây {damage} sát thương Vật Lý. Sát thương hiển thị bao gồm 8% sức tấn công tầm xa của bạn trước các thưởng sát thương thú nuôi. Các con thú khóa Hung Tính Bầy Đàn khi được triệu, nhận thêm 10% sát thương mỗi lớp. Khi Bầy Xéo đang hồi chiêu, các Lệnh Bầy Đàn thành công có 20% cơ hội đặt lại, chắc chắn sau 5 lần thất bại. Nó không thể đặt lại khi các con thú còn hoạt động. (Chúa Tể Bầy Đàn)"
       },
       "unleash_beast": {
-        "name": "Unleash Beast",
-        "description": "Consume 3 Pack Ferocity after your pet strikes for 83 to 105 Physical damage and claps every enemy within 6 yards for 26 to 34. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 nearby enemies."
+        "name": "Thả Thú Dữ",
+        "description": "Tiêu 3 Hung Tính Bầy Đàn sau khi thú nuôi của bạn đánh gây 83 đến 105 sát thương Vật Lý và chấn động mọi kẻ địch trong 6 mét gây 26 đến 34. Đòn đánh và chấn động dùng trọn thưởng sát thương thú nuôi 30% của Hung Tính Bầy Đàn và tăng theo sức tấn công của thú nuôi. Trong 8 giây sau đó, thú nuôi gây thêm 25% sát thương, tấn công nhanh hơn 35% và khiến Bắn Tà Ác chém lan tới 2 kẻ địch gần đó."
       },
       "measured_shot": {
-        "name": "Measured Shot",
-        "description": "Shoot the target for {damage} Physical damage. A hit restores 20 Focus. Damage increases with Ranged Attack Power."
+        "name": "Phát Bắn Điềm Tĩnh",
+        "description": "Bắn mục tiêu gây {damage} sát thương Vật Lý. Một phát trúng hồi 20 tập trung. Sát thương tăng theo sức tấn công tầm xa."
       },
       "cold_focus": {
-        "name": "Cold Focus",
-        "description": "For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)"
+        "name": "Tập Trung Lạnh",
+        "description": "Trong 12 giây, Phát Bắn Điềm Tĩnh hồi thêm 50% tập trung, còn Kéo Dài tốn ít hơn 25% và niệm nhanh hơn 30%. (Dấu ấn Nhãn Băng)"
       },
       "bloodhook": {
-        "name": "Bloodhook",
-        "description": "Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)"
+        "name": "Móc Máu",
+        "description": "Lao tới kẻ địch và gây Vết Thương Móc Máu, gây 34 sát thương Vật Lý cơ bản cộng 26% sức tấn công tầm xa của bạn trong 12 giây qua 4 nhịp. (Dấu ấn Dã Chiến)"
       },
       "shrapnel_charge": {
-        "name": "Shrapnel Charge",
-        "description": "Hit the target for 24 to 30 Physical damage and up to 4 other enemies within 6 yards for 13 to 17. Other targets also bleed for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Direct damage increases with Ranged Attack Power."
+        "name": "Đạn Mảnh",
+        "description": "Đánh trúng mục tiêu gây 24 đến 30 sát thương Vật Lý và tối đa 4 kẻ địch khác trong 6 mét gây 13 đến 17. Các mục tiêu khác cũng chảy máu 12 sát thương trong 6 giây. Nếu mục tiêu chính mang Vết Thương Móc Máu của bạn, gây ngay 1 nhịp vết thương. Sát thương trực tiếp tăng theo sức tấn công tầm xa."
       },
       "bloodtrail_assault": {
-        "name": "Bloodtrail Assault",
-        "description": "For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 nearby enemies, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards, deals 25% more base damage to its main target, and triggers 50% more wound damage."
+        "name": "Đột Kích Vệt Máu",
+        "description": "Trong 12 giây, Móc Máu lan một vết thương ở 60% sức mạnh sang tối đa 2 kẻ địch gần đó, Xé Thương ra lệnh cho thú nuôi tấn công gây 18 sát thương, và Đạn Mảnh tăng 2 mét, gây thêm 25% sát thương cơ bản lên mục tiêu chính và kích hoạt thêm 50% sát thương vết thương."
       },
       "trailbreak": {
-        "name": "Trailbreak",
-        "description": "Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
+        "name": "Cắt Dấu",
+        "description": "Nhảy lùi 12 mét. Nếu bạn có Đà Săn, nó được làm mới và nạp sẵn Tái Nhập trong 12 giây."
       },
       "wildheart": {
-        "name": "Wildheart",
-        "description": "Immediately restore 30% of your maximum health."
+        "name": "Tim Hoang Dã",
+        "description": "Tức thời hồi 30% máu tối đa của bạn."
       },
       "shellskin": {
-        "name": "Shellskin",
-        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+        "name": "Da Mai",
+        "description": "Giảm 60% sát thương phải chịu trong 8 giây, nhưng ngăn bạn tấn công khi còn hiệu lực."
       },
       "frostjaw_trap": {
-        "name": "Frostjaw Trap",
-        "description": "Place a trap at the selected enemy or at your feet. It arms after 0.75 sec and lasts 30 sec. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec."
+        "name": "Bẫy Hàm Băng",
+        "description": "Đặt bẫy tại kẻ địch được chọn hoặc dưới chân bạn. Bẫy kích hoạt sau 0,75 giây và tồn tại 30 giây. Kẻ địch đầu tiên chạm bẫy bị trói chân 3 giây, và kẻ địch trong 4 mét bị làm chậm 50% trong 4 giây."
       },
       "pack_rally": {
-        "name": "Pack Rally",
-        "description": "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec."
+        "name": "Tập Hợp Bầy Đàn",
+        "description": "Khoác Dáng Tuấn Mã và tập hợp đồng minh gần đó với 30% tốc chạy cùng 10% tốc đánh và tốc niệm trong 10 giây."
       },
       "hurricane": {
         "name": "Cuồng Phong",
@@ -7275,116 +7275,116 @@ export const vi_VN: EnTranslations = {
         "description": "Trị liệu cho đồng minh {damage} máu."
       },
       "divine_ascension": {
-        "name": "Divine Ascension",
-        "description": "Consume 20 Devotion to gain 5 Ascension charges for up to 45 sec. Marked abilities consume one charge and gain an additional effect."
+        "name": "Thăng Thiên Thần Thánh",
+        "description": "Tiêu 20 Sùng Tín để nhận 5 lượt Thăng Thiên trong tối đa 45 giây. Các kỹ năng được đánh dấu tiêu một lượt và nhận thêm một hiệu ứng."
       },
       "aura_mastery": {
-        "name": "Sacred Concord",
-        "description": "For 8 sec, empower every active Devotion and Requital Aura in your group. Bastion Devotion reduces damage by 15%; Requital deals 15 Holy damage. Multiple uses refresh instead of stacking."
+        "name": "Hòa Hợp Thánh Thiện",
+        "description": "Trong 8 giây, tăng cường mọi Sùng Tín và Hào Quang Báo Thù đang hoạt động trong nhóm bạn. Sùng Tín Thành Lũy giảm 15% sát thương; Báo Thù gây 15 sát thương Thánh. Dùng nhiều lần sẽ làm mới thay vì cộng dồn."
       },
       "devotion_ward": {
-        "name": "Bastion Devotion",
-        "description": "Reduce damage taken by you and party members by 5% until death or replacement. Only this aura and Requital Aura replace each other; Radiant, Dawn, and Grace Devotion coexist."
+        "name": "Sùng Tín Thành Lũy",
+        "description": "Giảm 5% sát thương mà bạn và các thành viên nhóm phải chịu cho đến khi chết hoặc bị thay thế. Chỉ hào quang này và Hào Quang Báo Thù thay thế lẫn nhau; Sùng Tín Rực Rỡ, Bình Minh và Ân Điển cùng tồn tại."
       },
       "hammer_of_grace": {
-        "name": "Hammer of Grace",
-        "description": "Instantly hurl a holy hammer at an enemy within 20 m for {damage}, restoring 70 mana, healing yourself for 50% of damage dealt, and generating 1 Devotion when it deals damage. Solar Reprisal lets Hammer of Grace ignore its cooldown and heal you for 100% of damage dealt."
+        "name": "Búa Ân Điển",
+        "description": "Tức thời ném một chiếc búa thánh vào kẻ địch trong 20 m gây {damage}, hồi 70 mana, hồi cho bạn 50% sát thương đã gây và tạo 1 Sùng Tín khi gây sát thương. Báo Thù Nhật Quang cho phép Búa Ân Điển bỏ qua hồi chiêu và hồi cho bạn 100% sát thương đã gây."
       },
       "hushbrand": {
-        "name": "Hushbrand",
-        "description": "Interrupts spellcasting and prevents spells from that school for 4 sec."
+        "name": "Dấu Tịch Lặng",
+        "description": "Ngắt việc niệm chú và ngăn các phép thuộc trường phái đó trong 4 giây."
       },
       "guardian_covenant": {
-        "name": "Guardian Covenant",
-        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
+        "name": "Giao Ước Hộ Vệ",
+        "description": "Bảo vệ một mục tiêu đồng minh và chính bạn, giảm 20% sát thương phải chịu trong 8 giây. Mặc định chọn bạn khi không có mục tiêu đồng minh nào được chọn."
       },
       "solar_step": {
-        "name": "Solar Step",
-        "description": "Increase your movement speed by 150% for 2 sec."
+        "name": "Bước Nhật Quang",
+        "description": "Tăng 150% tốc độ di chuyển của bạn trong 2 giây."
       },
       "solar_invocation": {
-        "name": "Solar Invocation",
-        "description": "Instantly heal an ally for {damage} or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much."
+        "name": "Triệu Nhật",
+        "description": "Tức thời hồi {damage} máu cho một đồng minh hoặc gây sát thương Thánh vừa phải lên kẻ địch. Cả hai cách dùng đều tạo 1 Sùng Tín. Trong Thăng Thiên, một lần niệm hồi máu cũng hồi một nửa cho các người chơi đồng minh trong 10 m quanh mục tiêu."
       },
       "radiant_devotion": {
-        "name": "Radiant Devotion",
-        "description": "Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion, but coexists with Devotions from other Paladins."
+        "name": "Sùng Tín Rực Rỡ",
+        "description": "Tăng 20 sức mạnh phép thuật cho bạn và các thành viên nhóm trong 30 phút. Thay thế Sùng Tín Bình Minh hoặc Ân Điển của chính bạn, nhưng cùng tồn tại với Sùng Tín của các thánh kỵ sĩ khác."
       },
       "dawn_devotion": {
-        "name": "Dawn Devotion",
-        "description": "Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion, but coexists with Devotions from other Paladins and with Warrior shouts."
+        "name": "Sùng Tín Bình Minh",
+        "description": "Tăng 40 sức tấn công cho bạn và các thành viên nhóm trong 30 phút. Thay thế Sùng Tín Rực Rỡ hoặc Ân Điển của chính bạn, nhưng cùng tồn tại với Sùng Tín của các thánh kỵ sĩ khác và với tiếng hô của chiến binh."
       },
       "grace_devotion": {
-        "name": "Grace Devotion",
-        "description": "You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min. Replaces your own Radiant or Dawn Devotion, but coexists with Devotions from other Paladins."
+        "name": "Sùng Tín Ân Điển",
+        "description": "Bạn và các thành viên nhóm hồi 15 mana mỗi 5 giây và tốn ít hơn 3% mana trong 30 phút. Thay thế Sùng Tín Rực Rỡ hoặc Bình Minh của chính bạn, nhưng cùng tồn tại với Sùng Tín của các thánh kỵ sĩ khác."
       },
       "recall_the_fallen": {
-        "name": "Recall the Fallen",
-        "description": "Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group."
+        "name": "Gọi Người Ngã Xuống",
+        "description": "Đưa một thành viên nhóm đã chết trở lại sự sống với 35% máu và mana. Người Chữa Lành Mặt Trời cấp 16 trở lên sẽ thay vào đó gọi về mọi thành viên đã ngã xuống của nhóm."
       },
       "beacon_of_light": {
-        "name": "Beacon of Light",
-        "description": "Mark one group member as your Beacon of Light. 50% of your effective direct healing on another group member within 60 m also heals the Beacon. Area and periodic healing do not transfer. Lasts until either of you dies."
+        "name": "Ngọn Hải Đăng Ánh Sáng",
+        "description": "Đánh dấu một thành viên nhóm làm Ngọn Hải Đăng Ánh Sáng của bạn. 50% lượng hồi máu trực tiếp hiệu quả của bạn lên một thành viên khác trong 60 m cũng hồi cho Ngọn Hải Đăng. Hồi máu diện rộng và theo chu kỳ không được truyền. Kéo dài đến khi một trong hai chết."
       },
       "final_edict": {
-        "name": "Final Edict",
-        "description": "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Holy explosion around you."
+        "name": "Sắc Lệnh Cuối",
+        "description": "Tung một đòn vũ khí nghiền nát và tạo 1 Sùng Tín khi gây sát thương. Một đòn trúng thành công giảm 2 giây hồi chiêu còn lại của Bình Minh Rơi. Các đòn đánh thường trúng và các đòn Sắc Lệnh Cuối có 15% cơ hội ban Cơn Thịnh Nộ Bình Minh trong 8 giây. Thăng Thiên còn giải phóng một vụ nổ Thánh quanh bạn."
       },
       "dawnfall": {
-        "name": "Dawnfall",
-        "description": "Deal {damage} Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict's remaining cooldown by 2 sec. Ascension increases its damage and radius."
+        "name": "Bình Minh Rơi",
+        "description": "Gây {damage} sát thương Thánh lên kẻ địch gần đó và tạo 1 Sùng Tín. Đánh trúng ít nhất một kẻ địch sẽ giảm 2 giây hồi chiêu còn lại của Sắc Lệnh Cuối. Thăng Thiên tăng sát thương và bán kính."
       },
       "sun_gods_verdict": {
-        "name": "Verdict of the Sun God",
-        "description": "Judge an enemy beneath the Verdict of the Sun God for 30 sec. Final Edict and Dawnfall inscribe one charge on a successful hit. The ability that lands the third charge dictates the sentence: Final Edict unleashes devastating damage on the condemned; Dawnfall detonates the verdict, damaging and stunning nearby enemies for 1.5 sec."
+        "name": "Phán Quyết Thần Mặt Trời",
+        "description": "Phán xử một kẻ địch dưới Phán Quyết Thần Mặt Trời trong 30 giây. Sắc Lệnh Cuối và Bình Minh Rơi khắc một dấu khi đánh trúng. Kỹ năng đặt dấu thứ ba sẽ định đoạt bản án: Sắc Lệnh Cuối giáng sát thương tàn khốc lên kẻ bị kết tội; Bình Minh Rơi kích nổ phán quyết, gây sát thương và làm choáng kẻ địch gần đó trong 1,5 giây."
       },
       "valkyrs_calling": {
-        "name": "Valkyr's Calling",
-        "description": "Ascend into the air, becoming immune to damage as you fly toward the enemy. After 2 sec, descend upon the target area for {damage} Holy damage and generate 1 Devotion. Ascension increases the impact damage by 50% and consumes 1 charge."
+        "name": "Tiếng Gọi Valkyrie",
+        "description": "Bay lên không trung, miễn nhiễm sát thương khi bạn lao về phía kẻ địch. Sau 2 giây, bạn giáng xuống khu vực mục tiêu gây {damage} sát thương Thánh và tạo 1 Sùng Tín. Thăng Thiên tăng 50% sát thương va chạm và tiêu 1 lượt."
       },
       "faithforged_guard": {
-        "name": "Debt of Light",
-        "description": "For 8 sec, the next enemy hit against you is answered: up to {buff} damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered. Ascension raises the amount it can answer by 50%."
+        "name": "Món Nợ Ánh Sáng",
+        "description": "Trong 8 giây, đòn đánh tiếp theo của kẻ địch nhắm vào bạn sẽ được đáp trả: tối đa {buff} sát thương bị chặn và trả lại kẻ tấn công dưới dạng sát thương Thánh, và bạn nhận 1 Sùng Tín. Chỉ một đòn được đáp trả. Thăng Thiên nâng lượng có thể đáp trả thêm 50%."
       },
       "mercy_lance": {
-        "name": "Mercy Lance",
-        "description": "Deal {damage} Holy damage to an enemy and generate 1 Devotion when it deals damage. During Ascension, it consumes 1 charge to guarantee a critical hit."
+        "name": "Thương Từ Bi",
+        "description": "Gây {damage} sát thương Thánh lên kẻ địch và tạo 1 Sùng Tín khi gây sát thương. Trong Thăng Thiên, nó tiêu 1 lượt để bảo đảm một đòn chí mạng."
       },
       "sacred_form": {
-        "name": "Sacred Form",
-        "description": "Enter a sacred state until death, increasing healing by 10%, spell critical chance by 5%, and reducing threat generated by 50%. Sunmender only."
+        "name": "Thánh Hình",
+        "description": "Bước vào trạng thái thánh cho đến khi chết, tăng 10% lượng hồi máu và 5% tỉ lệ chí mạng phép, đồng thời giảm 50% mức đe dọa tạo ra. Chỉ dành cho Người Chữa Lành Mặt Trời."
       },
       "dawns_embrace": {
-        "name": "Dawn's Embrace",
-        "description": "Deliver a powerful heal and generate 1 Devotion. Radiant Resonance reduces its mana cost by 50% and cast time to 1.5 sec. Ascension makes it instant and increases its healing by 35%."
+        "name": "Vòng Tay Bình Minh",
+        "description": "Tung ra một đòn hồi máu mạnh và tạo 1 Sùng Tín. Cộng Hưởng Rực Rỡ giảm 50% chi phí mana và thời gian niệm còn 1,5 giây. Thăng Thiên khiến nó tức thời và tăng 35% lượng hồi máu."
       },
       "radiant_chorus": {
-        "name": "Radiant Chorus",
-        "description": "Heal nearby allies for {damage} and generate 1 Devotion. Effectively healing at least 2 allies grants Radiant Resonance: your next Mending Light is instant, or your next Dawn's Embrace costs 50% less mana and casts in 1.5 sec. Ascension increases Radiant Chorus healing and radius."
+        "name": "Hợp Xướng Rực Rỡ",
+        "description": "Hồi {damage} máu cho đồng minh gần đó và tạo 1 Sùng Tín. Hồi máu hiệu quả cho ít nhất 2 đồng minh sẽ ban Cộng Hưởng Rực Rỡ: Thánh Quang Chữa Lành kế tiếp thành tức thời, hoặc Vòng Tay Bình Minh kế tiếp tốn ít hơn 50% mana và niệm trong 1,5 giây. Thăng Thiên tăng lượng hồi máu và bán kính của Hợp Xướng Rực Rỡ."
       },
       "life_covenant": {
-        "name": "Life Covenant",
-        "description": "Reduce an ally's damage taken by 40% for 6 sec. During Ascension it also grants a 120-point shield without consuming a charge."
+        "name": "Giao Ước Sinh Mệnh",
+        "description": "Giảm 40% sát thương một đồng minh phải chịu trong 6 giây. Trong Thăng Thiên còn ban một lá chắn 120 điểm mà không tiêu lượt."
       },
       "aegis_first_dawn": {
-        "name": "Aegis of the First Dawn",
-        "description": "Channel for 5 sec, creating a 10 meter holy dome. Allies inside are healed every second and take 50% less damage. Completing the channel releases a final heal and grants 30% movement speed for 4 sec."
+        "name": "Khiên Bình Minh Đầu Tiên",
+        "description": "Niệm trong 5 giây, tạo mái vòm thánh rộng 10 mét. Đồng minh bên trong được hồi máu mỗi giây và nhận ít hơn 50% sát thương. Hoàn tất việc niệm sẽ giải phóng một đợt hồi máu cuối và ban 30% tốc chạy trong 4 giây."
       },
       "vowkeeper_strike": {
-        "name": "Vowkeeper Strike",
-        "description": "Strike with high threat and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal empowers your next Sunward Disc, Hammer of Grace, or Mending Light. Ascension also grants a small absorption shield."
+        "name": "Đòn Giữ Thệ",
+        "description": "Đánh với mức đe dọa cao và tạo 1 Sùng Tín. Một đòn thành công có 20% cơ hội ban Báo Thù Nhật Quang trong 8 giây; mỗi lần đỡ thành công có 25%. Báo Thù Nhật Quang tăng cường Đĩa Nhật Quang, Búa Ân Điển hoặc Thánh Quang Chữa Lành kế tiếp của bạn. Thăng Thiên còn ban một lá chắn hấp thụ nhỏ."
       },
       "bastion_rite": {
-        "name": "Bastion Rite",
-        "description": "Reduce physical damage taken by 20% and increase block chance by 20% for 6 sec. Ascension extends the duration to 10 sec."
+        "name": "Nghi Thức Thành Lũy",
+        "description": "Giảm 20% sát thương vật lý phải chịu và tăng 20% tỉ lệ đỡ trong 6 giây. Thăng Thiên kéo dài thời gian lên 10 giây."
       },
       "sunward_disc": {
-        "name": "Sunward Disc",
-        "description": "Requires a shield. Hurl a radiant disc that strikes and then bounces between nearby enemies. Each damaging impact generates 1 Devotion. Solar Reprisal makes Sunward Disc cost no mana, ignore its cooldown, and deal 20% more damage. Ascension empowers 5 bounces."
+        "name": "Đĩa Nhật Quang",
+        "description": "Cần một chiếc khiên. Ném một chiếc đĩa rực rỡ đánh trúng rồi nảy giữa các kẻ địch gần đó. Mỗi cú va chạm gây sát thương tạo 1 Sùng Tín. Báo Thù Nhật Quang khiến Đĩa Nhật Quang không tốn mana, bỏ qua hồi chiêu và gây thêm 20% sát thương. Thăng Thiên tăng cường 5 lần nảy."
       },
       "sacred_challenge": {
-        "name": "Sacred Goad",
-        "description": "Compel an enemy to attack you. During Ascension it also reduces all damage received by 15% for 4 sec without consuming a charge."
+        "name": "Thúc Giục Thiêng",
+        "description": "Buộc một kẻ địch tấn công bạn. Trong Thăng Thiên còn giảm 15% mọi sát thương phải chịu trong 4 giây mà không tiêu lượt."
       },
       "devotion_aura": {
         "name": "Hào Quang Kiên Định",
@@ -7423,20 +7423,20 @@ export const vi_VN: EnTranslations = {
         "description": "Thánh hóa mặt đất bên dưới ngươi, thiêu đốt kẻ địch lân cận gây {damage} sát thương Thần Thánh mỗi 2 giây trong 10 giây."
       },
       "bastion_sweep": {
-        "name": "Bastion Sweep",
-        "description": "Sweep your equipped shield through enemies in a 180 degree frontal arc for {damage} Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m."
+        "name": "Quét Thành Lũy",
+        "description": "Quét khiên đang trang bị xuyên qua kẻ địch trong cung phía trước 180 độ, gây {damage} sát thương Thánh với mức đe dọa cao và tạo 1 Sùng Tín. Thăng Thiên tăng 30% sát thương và bán kính lên 8 m."
       },
       "oath_chain": {
-        "name": "Oath Chain",
-        "description": "Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy."
+        "name": "Xích Thề Nguyện",
+        "description": "Tức thời trói một kẻ địch ở xa bằng xích thánh. Kẻ địch di chuyển về phía bạn với tốc độ 18 m mỗi giây cho đến khi còn 3 m, rồi bị làm chậm 50% trong 4 giây. Trong Thăng Thiên, nó trói thêm một kẻ địch gần đó."
       },
       "veilbound_march": {
-        "name": "Veilbound March",
-        "description": "Become ethereal for 4 sec, gaining 40% movement speed and 30% armor and becoming immune to roots, slows, and displacement. Enemies you pass through are Veil Marked for 6 sec, taking Holy damage each second, dealing 20% less damage to you, and generating extra threat. The first mark grants 1 Devotion. When the march ends, nearby marked enemies take a final burst. Ascension increases the burst by 50% and lightly pulls them toward you."
+        "name": "Cuộc Hành Quân Màn Che",
+        "description": "Trở nên phi thực thể trong 4 giây, nhận 40% tốc chạy và 30% giáp, đồng thời miễn nhiễm trói chân, làm chậm và dịch chuyển. Kẻ địch bạn đi xuyên qua sẽ nhận Dấu Màn Che trong 6 giây: chúng chịu sát thương Thánh mỗi giây, gây ít hơn 20% sát thương lên bạn và tạo thêm mức đe dọa. Dấu đầu tiên ban 1 Sùng Tín. Khi cuộc hành quân kết thúc, kẻ địch bị đánh dấu ở gần chịu một đợt bùng nổ cuối. Thăng Thiên tăng 50% đợt bùng nổ và kéo nhẹ chúng về phía bạn."
       },
       "veilbound_mark": {
-        "name": "Veil Mark",
-        "description": "Takes Holy damage each second, deals 20% less damage to the Paladin who applied the mark, and generates additional threat toward that Paladin."
+        "name": "Dấu Màn Che",
+        "description": "Chịu sát thương Thánh mỗi giây, gây ít hơn 20% sát thương lên thánh kỵ sĩ đã đặt dấu, và tạo thêm mức đe dọa hướng về thánh kỵ sĩ đó."
       },
       "righteous_fury": {
         "name": "Lời Thề Rực Cháy",
@@ -7479,12 +7479,12 @@ export const vi_VN: EnTranslations = {
         "description": "Phản công sau khi mục tiêu né đòn, gây sát thương vũ khí cộng thêm {damage}. Không thể bị né."
       },
       "hunting_momentum": {
-        "name": "Hunting Momentum",
-        "description": "Passive: Gutting Strike grants 1 Hunting Momentum for 8 sec, up to 3. At 3 stacks, Woundrend deals 45% more strike damage and consumes the stacks. (Fieldcraft)"
+        "name": "Đà Săn",
+        "description": "Bị động: Đòn Mổ Bụng ban 1 Đà Săn trong 8 giây, tối đa 3. Ở 3 lớp, Xé Thương gây thêm 45% sát thương đòn đánh và tiêu hết các lớp. (Dã Chiến)"
       },
       "fieldcraft_reentry": {
-        "name": "Armed Re-entry",
-        "description": "Passive: Trailbreak refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)"
+        "name": "Tái Nhập Vũ Trang",
+        "description": "Bị động: Cắt Dấu làm mới Đà Săn và nạp sẵn Đòn Mổ Bụng hoặc Móc Máu kế tiếp trong 12 giây. Đòn Mổ Bụng gây thêm 15% sát thương mỗi lớp. Móc Máu gây thêm 18 đến 24 sát thương Vật Lý, tăng 15% mỗi lớp và theo sức tấn công tầm xa của bạn. Ở 3 lớp, một trong hai đòn sẽ tiêu Đà Săn. (Dã Chiến)"
       },
       "wing_clip": {
         "name": "Nhát Chém Xiềng Xích",
@@ -7551,8 +7551,8 @@ export const vi_VN: EnTranslations = {
         "description": "Phóng ra một tia sét gây {damage} sát thương Tự Nhiên."
       },
       "thunder_reservoir": {
-        "name": "Thunder Reservoir",
-        "description": "Passive: Arc Bolt and Skybranch grant Thunder, up to 5. At 5 Thunder, Earthen Jolt deals 125% more damage or Faultwake deals 100% more damage, then consumes all Thunder. (Thundercall)"
+        "name": "Bể Sấm",
+        "description": "Bị động: Tia Hồ Quang và Sét Rẽ Nhánh ban Sấm, tối đa 5. Ở 5 Sấm, Địa Giật gây thêm 125% sát thương hoặc Động Đất gây thêm 100%, rồi tiêu hết Sấm. (Gọi Sấm)"
       },
       "rockbiter_weapon": {
         "name": "Vũ Khí Khắc Đá",
@@ -7779,36 +7779,36 @@ export const vi_VN: EnTranslations = {
         "description": "Hồi phục một lượng lớn máu cho một mục tiêu đồng minh, sau đó lan sang tối đa 2 đồng minh ở gần; lượng hồi phục giảm 50% sau mỗi lần lan. (Kỹ năng chủ lực của Hồi Phục)"
       },
       "galeheart_weapon": {
-        "name": "Galeheart Weapon",
-        "description": "Imbue both weapons for 30 min, enabling Warspirit Cadence."
+        "name": "Vũ Khí Tâm Phong",
+        "description": "Phù phép cả hai vũ khí trong 30 phút, kích hoạt Nhịp Chiến Hồn."
       },
       "warspirit_cadence": {
-        "name": "Warspirit Cadence",
-        "description": "Passive: Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)"
+        "name": "Nhịp Chiến Hồn",
+        "description": "Bị động: cứ mỗi đòn vũ khí trúng thứ 3 sẽ kích hoạt 2 Tiếng Vọng Tâm Phong gây 50% sát thương Tự Nhiên và ban Điềm Bão trong 12 giây. Điềm Bão khiến Tia Hồ Quang, Địa Chấn hoặc Nước Chữa Lành kế tiếp của bạn thành tức thời và giảm 50% chi phí mana. Đòn Tổ Tiên tính là 2 đòn tấn công. (Chiến Hồn)"
       },
       "stormsurge": {
-        "name": "Stormsurge",
-        "description": "Passive: While Ancestral Strike is on cooldown, consuming Stormcast has a 25% chance to reset it. If the first 3 chances fail, the 4th always resets it. (Warspirit)"
+        "name": "Sóng Bão",
+        "description": "Bị động: khi Đòn Tổ Tiên đang hồi chiêu, việc tiêu một Điềm Bão có 25% cơ hội đặt lại nó. Nếu 3 cơ hội đầu thất bại, lần thứ 4 luôn đặt lại. (Chiến Hồn)"
       },
       "lifespring_weapon": {
-        "name": "Lifespring Weapon",
-        "description": "Imbue your weapon for 30 min. Mending Waters and Tidecall add 20% more healing to Mending Current."
+        "name": "Vũ Khí Suối Sinh",
+        "description": "Phù phép vũ khí của bạn trong 30 phút. Nước Chữa Lành và Gọi Thủy Triều thêm 20% lượng hồi máu vào Dòng Chữa Lành."
       },
       "unleash_weapon": {
-        "name": "Unleash Weapon",
-        "description": "Unleash your active weapon enchant. Pyrebrand deals 54 to 64 Fire damage, gains 30% of Spell Power, and grants 2 Thunder. Galeheart strikes with your weapon, advances Warspirit Cadence, and grants 20% attack speed for 6 sec. Stonebound strikes for 75% weapon damage, forces the target to attack you, and reduces damage taken by 20% for 4 sec. Lifespring consumes your Mending Current, heals for 125% of its remaining healing, and reduces the next hit within 8 sec by 50% of the health restored."
+        "name": "Thả Vũ Khí",
+        "description": "Giải phóng phù phép đang hoạt động trên vũ khí của bạn. Dấu Hỏa gây 54 đến 64 sát thương Lửa, nhận 30% sức mạnh phép thuật và ban 2 Sấm. Tâm Phong đánh bằng vũ khí của bạn, đẩy Nhịp Chiến Hồn tiến lên và ban 20% tốc đánh trong 6 giây. Thạch Phọc đánh gây 75% sát thương vũ khí, buộc mục tiêu tấn công bạn và giảm 20% sát thương phải chịu trong 4 giây. Suối Sinh tiêu Dòng Chữa Lành của bạn, hồi 125% lượng hồi còn lại và giảm đòn đánh kế tiếp trong 8 giây đi 50% lượng máu đã hồi."
       },
       "primal_exaltation": {
-        "name": "Primal Exaltation",
-        "description": "For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)"
+        "name": "Tôn Vinh Nguyên Thủy",
+        "description": "Trong 12 giây, Tia Hồ Quang và Sét Rẽ Nhánh của Gọi Sấm niệm nhanh hơn 50%, và Tia Hồ Quang ban 2 Sấm; Chiến Hồn kích hoạt nhịp của nó mỗi 2 đòn vũ khí trúng; Vá Hồn thêm 50% lượng hồi máu vào Dòng Chữa Lành. (Tài năng pháp sư)"
       },
       "stoneward": {
-        "name": "Stoneward",
-        "description": "Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)"
+        "name": "Thạch Vệ",
+        "description": "Bảo vệ một đồng minh trong 60 giây với 6 lượt. Sát thương tiêu một lượt để hồi 5% máu tối đa, mỗi 3 giây một lần. (Tài năng pháp sư)"
       },
       "tidecall": {
-        "name": "Tidecall",
-        "description": "Heal a friendly target for 58 to 72. The heal increases with Spell Power. Add the same healing calculated before overhealing to Mending Current, up to 30% of the target's maximum health."
+        "name": "Gọi Thủy Triều",
+        "description": "Hồi 58 đến 72 máu cho mục tiêu đồng minh. Lượng hồi tăng theo sức mạnh phép thuật. Thêm chính lượng hồi được tính trước khi dư vào Dòng Chữa Lành, tối đa 30% máu tối đa của mục tiêu."
       },
       "metamorphosis": {
         "name": "Biến Hình",
@@ -8195,8 +8195,8 @@ export const vi_VN: EnTranslations = {
         "description": "Tua ngược dòng thời gian của mọi thành viên đã chết trong nhóm hoặc đội đột kích, hồi sinh họ bên cạnh thi thể với 30% máu và năng lượng phép. Không thể thi triển khi đang chiến đấu. (Thời thuật)"
       },
       "ancestor_return": {
-        "name": "Ancestors' Return",
-        "description": "Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)"
+        "name": "Tổ Tiên Hồi Quy",
+        "description": "Gọi mọi thành viên đã ngã xuống trong nhóm hoặc đội của bạn trở lại sự sống ngay tại thi thể với 30% máu và mana. Không thể niệm khi đang chiến đấu. (Vá Hồn)"
       },
       "temporal_rewind": {
         "name": "Quay Ngược",
@@ -8315,28 +8315,28 @@ export const vi_VN: EnTranslations = {
         "description": "Nuốt một hiệu ứng phép thuật (hiệu ứng có lợi từ kẻ địch hoặc có hại từ đồng minh) và hồi cho bạn 6% máu tối đa."
       },
       "veilstep": {
-        "name": "Veilstep",
-        "description": "Steps through the veil in the direction you are facing."
+        "name": "Bước Màn Che",
+        "description": "Bước xuyên qua màn che theo hướng bạn đang nhìn."
       },
       "scouring_mercy": {
-        "name": "Scouring Mercy",
-        "description": "Deal 72 to 84 Holy damage to an enemy or heal a friendly target for 130 to 155. Both amounts increase with Spell Power. Damage also heals each Doctrine-linked ally for 30%, or the lowest-health party member for 15% if no ally is linked. (Doctrine signature)"
+        "name": "Từ Bi Thanh Tẩy",
+        "description": "Gây 72 đến 84 sát thương Thánh lên kẻ địch hoặc hồi 130 đến 155 máu cho mục tiêu đồng minh. Cả hai đều tăng theo sức mạnh phép thuật. Sát thương cũng hồi 30% cho mỗi đồng minh liên kết bằng Giáo Lý, hoặc 15% cho thành viên nhóm có ít máu nhất nếu không ai được liên kết. (Dấu ấn Giáo Lý)"
       },
       "seraphic_vigil": {
-        "name": "Seraphic Vigil",
-        "description": "Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)"
+        "name": "Canh Thức Thiên Sứ",
+        "description": "Bảo vệ một đồng minh trong 30 giây. Đòn đánh đầu tiên khiến họ xuống dưới 35% máu sẽ tiêu Canh Thức và hồi cho họ 180. (Dấu ấn Phúc Lành)"
       },
       "summon_tithefiend": {
-        "name": "Call Tithefiend",
-        "description": "Consume all Gloomtithe to summon a Tithefiend for 6, 8, 10, 12, or 15 sec at 1 to 5 stacks. It attacks every 2 sec for 20 to 24 Shadow damage, plus 8 per extra stack. Five stacks make it larger and increase its damage by 25%. Its damage increases with your Spell Power. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)"
+        "name": "Triệu Quỷ Thập Phân",
+        "description": "Tiêu toàn bộ Thập Phân U Ám để triệu một Quỷ Thập Phân trong 6, 8, 10, 12 hoặc 15 giây ở 1 đến 5 lớp. Nó tấn công mỗi 2 giây gây 20 đến 24 sát thương Bóng Tối, cộng 8 cho mỗi lớp thêm. Ở năm lớp nó lớn hơn và sát thương tăng 25%. Sát thương của nó tăng theo sức mạnh phép thuật của bạn. Nó ưu tiên Hình Nộm của bạn. Mỗi đòn trúng hồi 1% mana tối đa và vọng 15% sát thương sang tối đa 3 kẻ địch khác mang Khúc Bi Ai Mục Rữa của bạn. (Dấu ấn Kinh Chiều)"
       },
       "martyrs_aegis": {
-        "name": "Martyr's Aegis",
-        "description": "Reduces one ally incoming damage by 40% for 8 sec."
+        "name": "Khiên Tuẫn Đạo",
+        "description": "Giảm 40% sát thương một đồng minh phải chịu trong 8 giây."
       },
       "choir_of_deliverance": {
-        "name": "Choir of Deliverance",
-        "description": "Channels for 6 sec, healing nearby party members every 2 sec."
+        "name": "Hợp Xướng Giải Thoát",
+        "description": "Niệm trong 6 giây, hồi máu cho các thành viên nhóm gần đó mỗi 2 giây."
       },
       "bear_charge": {
         "name": "Cú Lao Bruin",
@@ -10940,12 +10940,12 @@ export const vi_VN: EnTranslations = {
         }
       },
       "q_divine_tome": {
-        "title": "The Dawnbound Tome",
-        "text": "The Light does not rest in you quietly, {playerName}. I have watched you lay the dead to peace, and I believe you are ready for what few paladins are ever taught: the Rite of Recall, by which a fallen soul is called back to the living. Its words are kept in the Dawnbound Tome, here in my keeping, but a book is no blessing while the restless dead still walk this ground. Return 6 more Restless Bones to the earth, and I will begin to teach you.",
-        "completion": "The chapel yard grows quiet. You are ready for the words, {playerName}, but the Rite of Recall cannot be spoken in a warm chapel. It must be sung where the veil between life and death wears thin. I mean to carry the Tome north into the Mirefen Marsh. Follow me there, and we will finish this.",
+        "title": "Cuốn Sách Buộc Bình Minh",
+        "text": "Ánh Sáng không lặng lẽ ngơi nghỉ trong ngươi, {playerName}. Ta đã thấy ngươi đưa người chết về bình an, và ta tin ngươi đã sẵn sàng cho điều mà rất ít thánh kỵ sĩ từng được dạy: Nghi Thức Triệu Hồi, nhờ đó một linh hồn đã ngã xuống được gọi trở lại với người sống. Lời của nó được giữ trong Cuốn Sách Buộc Bình Minh, ở đây dưới sự trông coi của ta, nhưng một cuốn sách chẳng phải phúc lành chừng nào những người chết bất an còn bước trên mảnh đất này. Hãy trả thêm 6 Xương Bất An về với đất, rồi ta sẽ bắt đầu dạy ngươi.",
+        "completion": "Sân nhà nguyện lặng đi. Ngươi đã sẵn sàng cho những lời ấy, {playerName}, nhưng Nghi Thức Triệu Hồi không thể được đọc trong một nhà nguyện ấm áp. Nó phải được hát nơi màn che giữa sự sống và cái chết mỏng đi. Ta định mang Cuốn Sách lên phía bắc, tới Đầm Mirefen. Hãy theo ta tới đó, và chúng ta sẽ hoàn tất việc này.",
         "objectives": {
           "0": {
-            "label": "Restless Bones laid to rest"
+            "label": "Xương Bất An đã được an nghỉ"
           }
         }
       },
@@ -11106,12 +11106,12 @@ export const vi_VN: EnTranslations = {
         }
       },
       "q_rite_of_redemption": {
-        "title": "The Rite of Recall",
-        "text": "So you followed me into the mire, {playerName}. Good. I have the Dawnbound Tome here, and this drowned ground is where its words belong: nowhere is the veil between life and death thinner than a place where the dead will not stay buried. But the drowned would drag your voice down mid-verse. Clear a space fit for the rite: put 8 of the Drowned Dead to rest, and we will consecrate it together.",
-        "completion": "Kneel, {playerName}, and read the words aloud. There. Do you feel it? The Light no longer only mends the living in your hands, it can summon back those who have crossed over. Use it wisely. A soul called back to a hopeless fight is a cruelty, not a mercy. Rise, Redeemer.",
+        "title": "Nghi Thức Triệu Hồi",
+        "text": "Vậy là ngươi đã theo ta vào bùn lầy, {playerName}. Tốt. Ta có Cuốn Sách Buộc Bình Minh ở đây, và mảnh đất ngập nước này chính là nơi lời của nó thuộc về: không đâu màn che giữa sự sống và cái chết mỏng hơn nơi người chết không chịu nằm yên dưới mộ. Nhưng những kẻ chết đuối sẽ kéo giọng ngươi xuống giữa câu. Hãy dọn một khoảng xứng với nghi thức: đưa 8 Người Chết Đuối về an nghỉ, rồi chúng ta sẽ cùng hiến thánh nơi này.",
+        "completion": "Hãy quỳ xuống, {playerName}, và đọc to những lời ấy. Đó. Ngươi có cảm nhận được không? Ánh Sáng trong tay ngươi không còn chỉ hàn gắn người sống, nó có thể gọi về những kẻ đã sang bên kia. Hãy dùng nó khôn ngoan. Một linh hồn bị gọi về một trận chiến vô vọng là sự tàn nhẫn, không phải lòng thương. Hãy đứng lên, Đấng Cứu Chuộc.",
         "objectives": {
           "0": {
-            "label": "Drowned Dead laid to rest"
+            "label": "Người Chết Đuối đã được an nghỉ"
           }
         }
       },

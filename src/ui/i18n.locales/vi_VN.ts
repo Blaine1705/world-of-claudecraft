@@ -9334,4 +9334,282 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Thay Thế {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Vật phẩm đó đã có phép khắc đó rồi.',
   'hudChrome.enchanting.sameEnchantTag': 'Đã Áp Dụng',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'abilityUi.resources.devotion': 'Sùng Tín',
+  'abilityUi.resources.focus': 'tập trung',
+  'classDetails.resources.focus': 'Tập Trung',
+  'game.hud.lowFocus': 'Tập trung thấp',
+  'hud.errors.notEnoughDevotion': 'Không đủ Sùng Tín!',
+  'hudChrome.paladin.devotion': 'Sùng Tín',
+  'hudChrome.paladin.devotionValue': 'Sùng Tín {value} trên {max}',
+  'hudChrome.paladin.devotionAscensionCharges':
+    'Sùng Tín {value} trên {max}. Thăng Thiên: {charges} lượt.',
+  'hudChrome.paladin.devotionAscensionLast': 'Sùng Tín {value} trên {max}. Thăng Thiên: lượt cuối.',
+  'hudChrome.paladin.ascensionLastAnnouncement': 'Thăng Thiên: lượt cuối',
+  'hudChrome.paladin.ascensionSpenderAria':
+    'Ô hành động {slot}: {ability}. Tiêu tốn một lượt Thăng Thiên.',
+  'hudChrome.crafting.craftedToastQty': 'Đã chế tạo: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedAlso': 'Bạn cũng thu lại được {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Bạn cũng thu lại được {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedYield': 'Bạn giải phù {item} và thu được {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Bạn giải phù {item} và thu được {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Bạn tháo được {material} từ {item}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Bạn tháo được {material} x{qty} từ {item}.',
+  'hudChrome.auraEffect.dawnsWrath':
+    'BTN: mọi mức máu · +1 lượt dùng · Hồi chiêu 0 · +{pct}% sát thương',
+  'hudChrome.auraEffect.duskEconomy': 'Kỹ năng tốn ít hơn {pct}% năng lượng',
+  'hudChrome.auraEffect.hunterFerocity':
+    '{stacks} Hung Tính Bầy Đàn: thú nuôi của bạn gây thêm {pct}% sát thương',
+  'hudChrome.auraEffect.veiledEdge': 'Đòn Rình Rập kế tiếp của bạn đánh mạnh gấp đôi',
+  'hudChrome.auraEffect.gloam':
+    'Nhá Nhem: giai đoạn {stacks} trên {max}. Ở {max}, các đòn mở màn Màn Hoàng Hôn mở khóa ngoài trống trải, và đòn ném kế tiếp là MIỄN PHÍ và kích nổ kho tích thành màn bóng tối',
+  'hudChrome.auraEffect.mendingCurrent':
+    'Tích {value} hồi máu, giải phóng dần theo thời gian hoặc bị Vá Tầng Tầng tiêu thụ',
+  'hudChrome.auraEffect.mendingCurrentPercent':
+    'Tích lượng hồi máu bằng {pct}% máu tối đa cho Vá Tầng Tầng',
+  'hudChrome.auraEffect.radiantResonance':
+    'Thánh Quang Chữa Lành kế tiếp của bạn thành tức thời, hoặc Vòng Tay Bình Minh kế tiếp tốn ít hơn {pct}% mana và niệm trong {castTime} giây',
+  'hudChrome.auraEffect.redline':
+    'Vạch Đỏ: khấc {stacks} trên {max}. Đòn Thân thêm khấc; Đòn Kết Liễu đánh mạnh hơn {pct}% mỗi khấc và đóng cửa sổ. Hết hạn trước thì mất',
+  'hudChrome.auraEffect.solarReprisal':
+    'Đĩa Nhật Quang kế tiếp của bạn không tốn mana, bỏ qua hồi chiêu và gây thêm {pct}% sát thương; Búa Ân Điển bỏ qua hồi chiêu và hồi cho bạn 100% sát thương đã gây; hoặc Thánh Quang Chữa Lành thành tức thời',
+  'hudChrome.auraEffect.veilstrikeWindow':
+    'Màn Bóng Tối: các đòn mở màn Màn Hoàng Hôn của bạn dùng được ngoài trống trải từ mọi góc, và sát thương gây ra tăng {pct}%',
+  'hudChrome.auraEffect.venomRitual':
+    'Nghi Lễ Độc: giai đoạn {stacks} trên {max}. Các đòn tích lũy thêm giai đoạn; ở {max}, Giấc Ngủ Vùi Đất trở thành Xé Độc',
+  'entities.abilities.aegis_first_dawn.name': 'Khiên Bình Minh Đầu Tiên',
+  'entities.abilities.aura_mastery.name': 'Hòa Hợp Thánh Thiện',
+  'entities.abilities.bastion_rite.name': 'Nghi Thức Thành Lũy',
+  'entities.abilities.bastion_sweep.name': 'Quét Thành Lũy',
+  'entities.abilities.beacon_of_light.name': 'Ngọn Hải Đăng Ánh Sáng',
+  'entities.abilities.dawn_devotion.name': 'Sùng Tín Bình Minh',
+  'entities.abilities.dawnfall.name': 'Bình Minh Rơi',
+  'entities.abilities.dawns_embrace.name': 'Vòng Tay Bình Minh',
+  'entities.abilities.devotion_ward.name': 'Sùng Tín Thành Lũy',
+  'entities.abilities.divine_ascension.name': 'Thăng Thiên Thần Thánh',
+  'entities.abilities.faithforged_guard.name': 'Món Nợ Ánh Sáng',
+  'entities.abilities.final_edict.name': 'Sắc Lệnh Cuối',
+  'entities.abilities.grace_devotion.name': 'Sùng Tín Ân Điển',
+  'entities.abilities.guardian_covenant.name': 'Giao Ước Hộ Vệ',
+  'entities.abilities.hammer_of_grace.name': 'Búa Ân Điển',
+  'entities.abilities.hushbrand.name': 'Dấu Tịch Lặng',
+  'entities.abilities.life_covenant.name': 'Giao Ước Sinh Mệnh',
+  'entities.abilities.martyrs_aegis.name': 'Khiên Tuẫn Đạo',
+  'entities.abilities.mercy_lance.name': 'Thương Từ Bi',
+  'entities.abilities.oath_chain.name': 'Xích Thề Nguyện',
+  'entities.abilities.radiant_chorus.name': 'Hợp Xướng Rực Rỡ',
+  'entities.abilities.radiant_devotion.name': 'Sùng Tín Rực Rỡ',
+  'entities.abilities.recall_the_fallen.name': 'Gọi Người Ngã Xuống',
+  'entities.abilities.sacred_challenge.name': 'Thúc Giục Thiêng',
+  'entities.abilities.sacred_form.name': 'Thánh Hình',
+  'entities.abilities.seraphic_vigil.name': 'Canh Thức Thiên Sứ',
+  'entities.abilities.solar_invocation.name': 'Triệu Nhật',
+  'entities.abilities.solar_step.name': 'Bước Nhật Quang',
+  'entities.abilities.sun_gods_verdict.name': 'Phán Quyết Thần Mặt Trời',
+  'entities.abilities.sunward_disc.name': 'Đĩa Nhật Quang',
+  'entities.abilities.valkyrs_calling.name': 'Tiếng Gọi Valkyrie',
+  'entities.abilities.veilbound_march.name': 'Cuộc Hành Quân Màn Che',
+  'entities.abilities.veilbound_mark.name': 'Dấu Màn Che',
+  'entities.abilities.vowkeeper_strike.name': 'Đòn Giữ Thệ',
+  'entities.abilities.choir_of_deliverance.name': 'Hợp Xướng Giải Thoát',
+  'entities.abilities.scouring_mercy.name': 'Từ Bi Thanh Tẩy',
+  'entities.abilities.aegis_first_dawn.description':
+    'Niệm trong 5 giây, tạo mái vòm thánh rộng 10 mét. Đồng minh bên trong được hồi máu mỗi giây và nhận ít hơn 50% sát thương. Hoàn tất việc niệm sẽ giải phóng một đợt hồi máu cuối và ban 30% tốc chạy trong 4 giây.',
+  'entities.abilities.aura_mastery.description':
+    'Trong 8 giây, tăng cường mọi Sùng Tín và Hào Quang Báo Thù đang hoạt động trong nhóm bạn. Sùng Tín Thành Lũy giảm 15% sát thương; Báo Thù gây 15 sát thương Thánh. Dùng nhiều lần sẽ làm mới thay vì cộng dồn.',
+  'entities.abilities.bastion_rite.description':
+    'Giảm 20% sát thương vật lý phải chịu và tăng 20% tỉ lệ đỡ trong 6 giây. Thăng Thiên kéo dài thời gian lên 10 giây.',
+  'entities.abilities.bastion_sweep.description':
+    'Quét khiên đang trang bị xuyên qua kẻ địch trong cung phía trước 180 độ, gây {damage} sát thương Thánh với mức đe dọa cao và tạo 1 Sùng Tín. Thăng Thiên tăng 30% sát thương và bán kính lên 8 m.',
+  'entities.abilities.beacon_of_light.description':
+    'Đánh dấu một thành viên nhóm làm Ngọn Hải Đăng Ánh Sáng của bạn. 50% lượng hồi máu trực tiếp hiệu quả của bạn lên một thành viên khác trong 60 m cũng hồi cho Ngọn Hải Đăng. Hồi máu diện rộng và theo chu kỳ không được truyền. Kéo dài đến khi một trong hai chết.',
+  'entities.abilities.dawn_devotion.description':
+    'Tăng 40 sức tấn công cho bạn và các thành viên nhóm trong 30 phút. Thay thế Sùng Tín Rực Rỡ hoặc Ân Điển của chính bạn, nhưng cùng tồn tại với Sùng Tín của các thánh kỵ sĩ khác và với tiếng hô của chiến binh.',
+  'entities.abilities.dawnfall.description':
+    'Gây {damage} sát thương Thánh lên kẻ địch gần đó và tạo 1 Sùng Tín. Đánh trúng ít nhất một kẻ địch sẽ giảm 2 giây hồi chiêu còn lại của Sắc Lệnh Cuối. Thăng Thiên tăng sát thương và bán kính.',
+  'entities.abilities.dawns_embrace.description':
+    'Tung ra một đòn hồi máu mạnh và tạo 1 Sùng Tín. Cộng Hưởng Rực Rỡ giảm 50% chi phí mana và thời gian niệm còn 1,5 giây. Thăng Thiên khiến nó tức thời và tăng 35% lượng hồi máu.',
+  'entities.abilities.devotion_ward.description':
+    'Giảm 5% sát thương mà bạn và các thành viên nhóm phải chịu cho đến khi chết hoặc bị thay thế. Chỉ hào quang này và Hào Quang Báo Thù thay thế lẫn nhau; Sùng Tín Rực Rỡ, Bình Minh và Ân Điển cùng tồn tại.',
+  'entities.abilities.divine_ascension.description':
+    'Tiêu 20 Sùng Tín để nhận 5 lượt Thăng Thiên trong tối đa 45 giây. Các kỹ năng được đánh dấu tiêu một lượt và nhận thêm một hiệu ứng.',
+  'entities.abilities.faithforged_guard.description':
+    'Trong 8 giây, đòn đánh tiếp theo của kẻ địch nhắm vào bạn sẽ được đáp trả: tối đa {buff} sát thương bị chặn và trả lại kẻ tấn công dưới dạng sát thương Thánh, và bạn nhận 1 Sùng Tín. Chỉ một đòn được đáp trả. Thăng Thiên nâng lượng có thể đáp trả thêm 50%.',
+  'entities.abilities.final_edict.description':
+    'Tung một đòn vũ khí nghiền nát và tạo 1 Sùng Tín khi gây sát thương. Một đòn trúng thành công giảm 2 giây hồi chiêu còn lại của Bình Minh Rơi. Các đòn đánh thường trúng và các đòn Sắc Lệnh Cuối có 15% cơ hội ban Cơn Thịnh Nộ Bình Minh trong 8 giây. Thăng Thiên còn giải phóng một vụ nổ Thánh quanh bạn.',
+  'entities.abilities.grace_devotion.description':
+    'Bạn và các thành viên nhóm hồi 15 mana mỗi 5 giây và tốn ít hơn 3% mana trong 30 phút. Thay thế Sùng Tín Rực Rỡ hoặc Bình Minh của chính bạn, nhưng cùng tồn tại với Sùng Tín của các thánh kỵ sĩ khác.',
+  'entities.abilities.guardian_covenant.description':
+    'Bảo vệ một mục tiêu đồng minh và chính bạn, giảm 20% sát thương phải chịu trong 8 giây. Mặc định chọn bạn khi không có mục tiêu đồng minh nào được chọn.',
+  'entities.abilities.hammer_of_grace.description':
+    'Tức thời ném một chiếc búa thánh vào kẻ địch trong 20 m gây {damage}, hồi 70 mana, hồi cho bạn 50% sát thương đã gây và tạo 1 Sùng Tín khi gây sát thương. Báo Thù Nhật Quang cho phép Búa Ân Điển bỏ qua hồi chiêu và hồi cho bạn 100% sát thương đã gây.',
+  'entities.abilities.hushbrand.description':
+    'Ngắt việc niệm chú và ngăn các phép thuộc trường phái đó trong 4 giây.',
+  'entities.abilities.life_covenant.description':
+    'Giảm 40% sát thương một đồng minh phải chịu trong 6 giây. Trong Thăng Thiên còn ban một lá chắn 120 điểm mà không tiêu lượt.',
+  'entities.abilities.martyrs_aegis.description':
+    'Giảm 40% sát thương một đồng minh phải chịu trong 8 giây.',
+  'entities.abilities.mercy_lance.description':
+    'Gây {damage} sát thương Thánh lên kẻ địch và tạo 1 Sùng Tín khi gây sát thương. Trong Thăng Thiên, nó tiêu 1 lượt để bảo đảm một đòn chí mạng.',
+  'entities.abilities.oath_chain.description':
+    'Tức thời trói một kẻ địch ở xa bằng xích thánh. Kẻ địch di chuyển về phía bạn với tốc độ 18 m mỗi giây cho đến khi còn 3 m, rồi bị làm chậm 50% trong 4 giây. Trong Thăng Thiên, nó trói thêm một kẻ địch gần đó.',
+  'entities.abilities.radiant_chorus.description':
+    'Hồi {damage} máu cho đồng minh gần đó và tạo 1 Sùng Tín. Hồi máu hiệu quả cho ít nhất 2 đồng minh sẽ ban Cộng Hưởng Rực Rỡ: Thánh Quang Chữa Lành kế tiếp thành tức thời, hoặc Vòng Tay Bình Minh kế tiếp tốn ít hơn 50% mana và niệm trong 1,5 giây. Thăng Thiên tăng lượng hồi máu và bán kính của Hợp Xướng Rực Rỡ.',
+  'entities.abilities.radiant_devotion.description':
+    'Tăng 20 sức mạnh phép thuật cho bạn và các thành viên nhóm trong 30 phút. Thay thế Sùng Tín Bình Minh hoặc Ân Điển của chính bạn, nhưng cùng tồn tại với Sùng Tín của các thánh kỵ sĩ khác.',
+  'entities.abilities.recall_the_fallen.description':
+    'Đưa một thành viên nhóm đã chết trở lại sự sống với 35% máu và mana. Người Chữa Lành Mặt Trời cấp 16 trở lên sẽ thay vào đó gọi về mọi thành viên đã ngã xuống của nhóm.',
+  'entities.abilities.sacred_challenge.description':
+    'Buộc một kẻ địch tấn công bạn. Trong Thăng Thiên còn giảm 15% mọi sát thương phải chịu trong 4 giây mà không tiêu lượt.',
+  'entities.abilities.sacred_form.description':
+    'Bước vào trạng thái thánh cho đến khi chết, tăng 10% lượng hồi máu và 5% tỉ lệ chí mạng phép, đồng thời giảm 50% mức đe dọa tạo ra. Chỉ dành cho Người Chữa Lành Mặt Trời.',
+  'entities.abilities.seraphic_vigil.description':
+    'Bảo vệ một đồng minh trong 30 giây. Đòn đánh đầu tiên khiến họ xuống dưới 35% máu sẽ tiêu Canh Thức và hồi cho họ 180. (Dấu ấn Phúc Lành)',
+  'entities.abilities.scouring_mercy.description':
+    'Gây 72 đến 84 sát thương Thánh lên kẻ địch hoặc hồi 130 đến 155 máu cho mục tiêu đồng minh. Cả hai đều tăng theo sức mạnh phép thuật. Sát thương cũng hồi 30% cho mỗi đồng minh liên kết bằng Giáo Lý, hoặc 15% cho thành viên nhóm có ít máu nhất nếu không ai được liên kết. (Dấu ấn Giáo Lý)',
+  'entities.abilities.solar_invocation.description':
+    'Tức thời hồi {damage} máu cho một đồng minh hoặc gây sát thương Thánh vừa phải lên kẻ địch. Cả hai cách dùng đều tạo 1 Sùng Tín. Trong Thăng Thiên, một lần niệm hồi máu cũng hồi một nửa cho các người chơi đồng minh trong 10 m quanh mục tiêu.',
+  'entities.abilities.solar_step.description': 'Tăng 150% tốc độ di chuyển của bạn trong 2 giây.',
+  'entities.abilities.sun_gods_verdict.description':
+    'Phán xử một kẻ địch dưới Phán Quyết Thần Mặt Trời trong 30 giây. Sắc Lệnh Cuối và Bình Minh Rơi khắc một dấu khi đánh trúng. Kỹ năng đặt dấu thứ ba sẽ định đoạt bản án: Sắc Lệnh Cuối giáng sát thương tàn khốc lên kẻ bị kết tội; Bình Minh Rơi kích nổ phán quyết, gây sát thương và làm choáng kẻ địch gần đó trong 1,5 giây.',
+  'entities.abilities.sunward_disc.description':
+    'Cần một chiếc khiên. Ném một chiếc đĩa rực rỡ đánh trúng rồi nảy giữa các kẻ địch gần đó. Mỗi cú va chạm gây sát thương tạo 1 Sùng Tín. Báo Thù Nhật Quang khiến Đĩa Nhật Quang không tốn mana, bỏ qua hồi chiêu và gây thêm 20% sát thương. Thăng Thiên tăng cường 5 lần nảy.',
+  'entities.abilities.valkyrs_calling.description':
+    'Bay lên không trung, miễn nhiễm sát thương khi bạn lao về phía kẻ địch. Sau 2 giây, bạn giáng xuống khu vực mục tiêu gây {damage} sát thương Thánh và tạo 1 Sùng Tín. Thăng Thiên tăng 50% sát thương va chạm và tiêu 1 lượt.',
+  'entities.abilities.veilbound_march.description':
+    'Trở nên phi thực thể trong 4 giây, nhận 40% tốc chạy và 30% giáp, đồng thời miễn nhiễm trói chân, làm chậm và dịch chuyển. Kẻ địch bạn đi xuyên qua sẽ nhận Dấu Màn Che trong 6 giây: chúng chịu sát thương Thánh mỗi giây, gây ít hơn 20% sát thương lên bạn và tạo thêm mức đe dọa. Dấu đầu tiên ban 1 Sùng Tín. Khi cuộc hành quân kết thúc, kẻ địch bị đánh dấu ở gần chịu một đợt bùng nổ cuối. Thăng Thiên tăng 50% đợt bùng nổ và kéo nhẹ chúng về phía bạn.',
+  'entities.abilities.veilbound_mark.description':
+    'Chịu sát thương Thánh mỗi giây, gây ít hơn 20% sát thương lên thánh kỵ sĩ đã đặt dấu, và tạo thêm mức đe dọa hướng về thánh kỵ sĩ đó.',
+  'entities.abilities.vowkeeper_strike.description':
+    'Đánh với mức đe dọa cao và tạo 1 Sùng Tín. Một đòn thành công có 20% cơ hội ban Báo Thù Nhật Quang trong 8 giây; mỗi lần đỡ thành công có 25%. Báo Thù Nhật Quang tăng cường Đĩa Nhật Quang, Búa Ân Điển hoặc Thánh Quang Chữa Lành kế tiếp của bạn. Thăng Thiên còn ban một lá chắn hấp thụ nhỏ.',
+  'entities.abilities.choir_of_deliverance.description':
+    'Niệm trong 6 giây, hồi máu cho các thành viên nhóm gần đó mỗi 2 giây.',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'entities.abilities.bloodhook.name': 'Móc Máu',
+  'entities.abilities.bloodtrail_assault.name': 'Đột Kích Vệt Máu',
+  'entities.abilities.cold_focus.name': 'Tập Trung Lạnh',
+  'entities.abilities.fieldcraft_reentry.name': 'Tái Nhập Vũ Trang',
+  'entities.abilities.frostjaw_trap.name': 'Bẫy Hàm Băng',
+  'entities.abilities.hunting_momentum.name': 'Đà Săn',
+  'entities.abilities.measured_shot.name': 'Phát Bắn Điềm Tĩnh',
+  'entities.abilities.pack_command.name': 'Lệnh Bầy Đàn',
+  'entities.abilities.pack_rally.name': 'Tập Hợp Bầy Đàn',
+  'entities.abilities.shellskin.name': 'Da Mai',
+  'entities.abilities.shrapnel_charge.name': 'Đạn Mảnh',
+  'entities.abilities.stampede.name': 'Bầy Xéo',
+  'entities.abilities.trailbreak.name': 'Cắt Dấu',
+  'entities.abilities.unleash_beast.name': 'Thả Thú Dữ',
+  'entities.abilities.wildheart.name': 'Tim Hoang Dã',
+  'entities.abilities.bloodhook.description':
+    'Lao tới kẻ địch và gây Vết Thương Móc Máu, gây 34 sát thương Vật Lý cơ bản cộng 26% sức tấn công tầm xa của bạn trong 12 giây qua 4 nhịp. (Dấu ấn Dã Chiến)',
+  'entities.abilities.bloodtrail_assault.description':
+    'Trong 12 giây, Móc Máu lan một vết thương ở 60% sức mạnh sang tối đa 2 kẻ địch gần đó, Xé Thương ra lệnh cho thú nuôi tấn công gây 18 sát thương, và Đạn Mảnh tăng 2 mét, gây thêm 25% sát thương cơ bản lên mục tiêu chính và kích hoạt thêm 50% sát thương vết thương.',
+  'entities.abilities.cold_focus.description':
+    'Trong 12 giây, Phát Bắn Điềm Tĩnh hồi thêm 50% tập trung, còn Kéo Dài tốn ít hơn 25% và niệm nhanh hơn 30%. (Dấu ấn Nhãn Băng)',
+  'entities.abilities.fieldcraft_reentry.description':
+    'Bị động: Cắt Dấu làm mới Đà Săn và nạp sẵn Đòn Mổ Bụng hoặc Móc Máu kế tiếp trong 12 giây. Đòn Mổ Bụng gây thêm 15% sát thương mỗi lớp. Móc Máu gây thêm 18 đến 24 sát thương Vật Lý, tăng 15% mỗi lớp và theo sức tấn công tầm xa của bạn. Ở 3 lớp, một trong hai đòn sẽ tiêu Đà Săn. (Dã Chiến)',
+  'entities.abilities.frostjaw_trap.description':
+    'Đặt bẫy tại kẻ địch được chọn hoặc dưới chân bạn. Bẫy kích hoạt sau 0,75 giây và tồn tại 30 giây. Kẻ địch đầu tiên chạm bẫy bị trói chân 3 giây, và kẻ địch trong 4 mét bị làm chậm 50% trong 4 giây.',
+  'entities.abilities.hunting_momentum.description':
+    'Bị động: Đòn Mổ Bụng ban 1 Đà Săn trong 8 giây, tối đa 3. Ở 3 lớp, Xé Thương gây thêm 45% sát thương đòn đánh và tiêu hết các lớp. (Dã Chiến)',
+  'entities.abilities.measured_shot.description':
+    'Bắn mục tiêu gây {damage} sát thương Vật Lý. Một phát trúng hồi 20 tập trung. Sát thương tăng theo sức tấn công tầm xa.',
+  'entities.abilities.pack_command.description':
+    'Ra lệnh cho thú nuôi còn sống của bạn đánh gây 36 đến 48 sát thương Vật Lý. Sát thương tăng theo sức tấn công của thú nuôi. Một đòn trúng hồi 20 tập trung và ban 1 Hung Tính Bầy Đàn trong 30 giây, tối đa 3. Mỗi lớp tăng 10% toàn bộ sát thương thú nuôi của bạn gây ra. Đòn này dùng số lớp bạn có trước khi trúng.',
+  'entities.abilities.pack_rally.description':
+    'Khoác Dáng Tuấn Mã và tập hợp đồng minh gần đó với 30% tốc chạy cùng 10% tốc đánh và tốc niệm trong 10 giây.',
+  'entities.abilities.shellskin.description':
+    'Giảm 60% sát thương phải chịu trong 8 giây, nhưng ngăn bạn tấn công khi còn hiệu lực.',
+  'entities.abilities.shrapnel_charge.description':
+    'Đánh trúng mục tiêu gây 24 đến 30 sát thương Vật Lý và tối đa 4 kẻ địch khác trong 6 mét gây 13 đến 17. Các mục tiêu khác cũng chảy máu 12 sát thương trong 6 giây. Nếu mục tiêu chính mang Vết Thương Móc Máu của bạn, gây ngay 1 nhịp vết thương. Sát thương trực tiếp tăng theo sức tấn công tầm xa.',
+  'entities.abilities.stampede.description':
+    'Triệu 3 con thú trong 12 giây. Mỗi con tấn công mỗi 2 giây gây {damage} sát thương Vật Lý. Sát thương hiển thị bao gồm 8% sức tấn công tầm xa của bạn trước các thưởng sát thương thú nuôi. Các con thú khóa Hung Tính Bầy Đàn khi được triệu, nhận thêm 10% sát thương mỗi lớp. Khi Bầy Xéo đang hồi chiêu, các Lệnh Bầy Đàn thành công có 20% cơ hội đặt lại, chắc chắn sau 5 lần thất bại. Nó không thể đặt lại khi các con thú còn hoạt động. (Chúa Tể Bầy Đàn)',
+  'entities.abilities.trailbreak.description':
+    'Nhảy lùi 12 mét. Nếu bạn có Đà Săn, nó được làm mới và nạp sẵn Tái Nhập trong 12 giây.',
+  'entities.abilities.unleash_beast.description':
+    'Tiêu 3 Hung Tính Bầy Đàn sau khi thú nuôi của bạn đánh gây 83 đến 105 sát thương Vật Lý và chấn động mọi kẻ địch trong 6 mét gây 26 đến 34. Đòn đánh và chấn động dùng trọn thưởng sát thương thú nuôi 30% của Hung Tính Bầy Đàn và tăng theo sức tấn công của thú nuôi. Trong 8 giây sau đó, thú nuôi gây thêm 25% sát thương, tấn công nhanh hơn 35% và khiến Bắn Tà Ác chém lan tới 2 kẻ địch gần đó.',
+  'entities.abilities.wildheart.description': 'Tức thời hồi 30% máu tối đa của bạn.',
+  'entities.abilities.ancestor_return.name': 'Tổ Tiên Hồi Quy',
+  'entities.abilities.galeheart_weapon.name': 'Vũ Khí Tâm Phong',
+  'entities.abilities.lifespring_weapon.name': 'Vũ Khí Suối Sinh',
+  'entities.abilities.primal_exaltation.name': 'Tôn Vinh Nguyên Thủy',
+  'entities.abilities.stoneward.name': 'Thạch Vệ',
+  'entities.abilities.stormsurge.name': 'Sóng Bão',
+  'entities.abilities.thunder_reservoir.name': 'Bể Sấm',
+  'entities.abilities.tidecall.name': 'Gọi Thủy Triều',
+  'entities.abilities.unleash_weapon.name': 'Thả Vũ Khí',
+  'entities.abilities.warspirit_cadence.name': 'Nhịp Chiến Hồn',
+  'entities.abilities.ancestor_return.description':
+    'Gọi mọi thành viên đã ngã xuống trong nhóm hoặc đội của bạn trở lại sự sống ngay tại thi thể với 30% máu và mana. Không thể niệm khi đang chiến đấu. (Vá Hồn)',
+  'entities.abilities.galeheart_weapon.description':
+    'Phù phép cả hai vũ khí trong 30 phút, kích hoạt Nhịp Chiến Hồn.',
+  'entities.abilities.lifespring_weapon.description':
+    'Phù phép vũ khí của bạn trong 30 phút. Nước Chữa Lành và Gọi Thủy Triều thêm 20% lượng hồi máu vào Dòng Chữa Lành.',
+  'entities.abilities.primal_exaltation.description':
+    'Trong 12 giây, Tia Hồ Quang và Sét Rẽ Nhánh của Gọi Sấm niệm nhanh hơn 50%, và Tia Hồ Quang ban 2 Sấm; Chiến Hồn kích hoạt nhịp của nó mỗi 2 đòn vũ khí trúng; Vá Hồn thêm 50% lượng hồi máu vào Dòng Chữa Lành. (Tài năng pháp sư)',
+  'entities.abilities.stoneward.description':
+    'Bảo vệ một đồng minh trong 60 giây với 6 lượt. Sát thương tiêu một lượt để hồi 5% máu tối đa, mỗi 3 giây một lần. (Tài năng pháp sư)',
+  'entities.abilities.stormsurge.description':
+    'Bị động: khi Đòn Tổ Tiên đang hồi chiêu, việc tiêu một Điềm Bão có 25% cơ hội đặt lại nó. Nếu 3 cơ hội đầu thất bại, lần thứ 4 luôn đặt lại. (Chiến Hồn)',
+  'entities.abilities.thunder_reservoir.description':
+    'Bị động: Tia Hồ Quang và Sét Rẽ Nhánh ban Sấm, tối đa 5. Ở 5 Sấm, Địa Giật gây thêm 125% sát thương hoặc Động Đất gây thêm 100%, rồi tiêu hết Sấm. (Gọi Sấm)',
+  'entities.abilities.tidecall.description':
+    'Hồi 58 đến 72 máu cho mục tiêu đồng minh. Lượng hồi tăng theo sức mạnh phép thuật. Thêm chính lượng hồi được tính trước khi dư vào Dòng Chữa Lành, tối đa 30% máu tối đa của mục tiêu.',
+  'entities.abilities.unleash_weapon.description':
+    'Giải phóng phù phép đang hoạt động trên vũ khí của bạn. Dấu Hỏa gây 54 đến 64 sát thương Lửa, nhận 30% sức mạnh phép thuật và ban 2 Sấm. Tâm Phong đánh bằng vũ khí của bạn, đẩy Nhịp Chiến Hồn tiến lên và ban 20% tốc đánh trong 6 giây. Thạch Phọc đánh gây 75% sát thương vũ khí, buộc mục tiêu tấn công bạn và giảm 20% sát thương phải chịu trong 4 giây. Suối Sinh tiêu Dòng Chữa Lành của bạn, hồi 125% lượng hồi còn lại và giảm đòn đánh kế tiếp trong 8 giây đi 50% lượng máu đã hồi.',
+  'entities.abilities.warspirit_cadence.description':
+    'Bị động: cứ mỗi đòn vũ khí trúng thứ 3 sẽ kích hoạt 2 Tiếng Vọng Tâm Phong gây 50% sát thương Tự Nhiên và ban Điềm Bão trong 12 giây. Điềm Bão khiến Tia Hồ Quang, Địa Chấn hoặc Nước Chữa Lành kế tiếp của bạn thành tức thời và giảm 50% chi phí mana. Đòn Tổ Tiên tính là 2 đòn tấn công. (Chiến Hồn)',
+  'entities.abilities.summon_tithefiend.name': 'Triệu Quỷ Thập Phân',
+  'entities.abilities.summon_tithefiend.description':
+    'Tiêu toàn bộ Thập Phân U Ám để triệu một Quỷ Thập Phân trong 6, 8, 10, 12 hoặc 15 giây ở 1 đến 5 lớp. Nó tấn công mỗi 2 giây gây 20 đến 24 sát thương Bóng Tối, cộng 8 cho mỗi lớp thêm. Ở năm lớp nó lớn hơn và sát thương tăng 25%. Sát thương của nó tăng theo sức mạnh phép thuật của bạn. Nó ưu tiên Hình Nộm của bạn. Mỗi đòn trúng hồi 1% mana tối đa và vọng 15% sát thương sang tối đa 3 kẻ địch khác mang Khúc Bi Ai Mục Rữa của bạn. (Dấu ấn Kinh Chiều)',
+  'entities.abilities.veilstep.name': 'Bước Màn Che',
+  'entities.abilities.veilstep.description': 'Bước xuyên qua màn che theo hướng bạn đang nhìn.',
+  'entities.quests.q_divine_tome.title': 'Cuốn Sách Buộc Bình Minh',
+  'entities.quests.q_divine_tome.objectives.0.label': 'Xương Bất An đã được an nghỉ',
+  'entities.quests.q_divine_tome.text':
+    'Ánh Sáng không lặng lẽ ngơi nghỉ trong ngươi, {playerName}. Ta đã thấy ngươi đưa người chết về bình an, và ta tin ngươi đã sẵn sàng cho điều mà rất ít thánh kỵ sĩ từng được dạy: Nghi Thức Triệu Hồi, nhờ đó một linh hồn đã ngã xuống được gọi trở lại với người sống. Lời của nó được giữ trong Cuốn Sách Buộc Bình Minh, ở đây dưới sự trông coi của ta, nhưng một cuốn sách chẳng phải phúc lành chừng nào những người chết bất an còn bước trên mảnh đất này. Hãy trả thêm 6 Xương Bất An về với đất, rồi ta sẽ bắt đầu dạy ngươi.',
+  'entities.quests.q_divine_tome.completion':
+    'Sân nhà nguyện lặng đi. Ngươi đã sẵn sàng cho những lời ấy, {playerName}, nhưng Nghi Thức Triệu Hồi không thể được đọc trong một nhà nguyện ấm áp. Nó phải được hát nơi màn che giữa sự sống và cái chết mỏng đi. Ta định mang Cuốn Sách lên phía bắc, tới Đầm Mirefen. Hãy theo ta tới đó, và chúng ta sẽ hoàn tất việc này.',
+  'entities.quests.q_rite_of_redemption.title': 'Nghi Thức Triệu Hồi',
+  'entities.quests.q_rite_of_redemption.objectives.0.label': 'Người Chết Đuối đã được an nghỉ',
+  'entities.quests.q_rite_of_redemption.text':
+    'Vậy là ngươi đã theo ta vào bùn lầy, {playerName}. Tốt. Ta có Cuốn Sách Buộc Bình Minh ở đây, và mảnh đất ngập nước này chính là nơi lời của nó thuộc về: không đâu màn che giữa sự sống và cái chết mỏng hơn nơi người chết không chịu nằm yên dưới mộ. Nhưng những kẻ chết đuối sẽ kéo giọng ngươi xuống giữa câu. Hãy dọn một khoảng xứng với nghi thức: đưa 8 Người Chết Đuối về an nghỉ, rồi chúng ta sẽ cùng hiến thánh nơi này.',
+  'entities.quests.q_rite_of_redemption.completion':
+    'Hãy quỳ xuống, {playerName}, và đọc to những lời ấy. Đó. Ngươi có cảm nhận được không? Ánh Sáng trong tay ngươi không còn chỉ hàn gắn người sống, nó có thể gọi về những kẻ đã sang bên kia. Hãy dùng nó khôn ngoan. Một linh hồn bị gọi về một trận chiến vô vọng là sự tàn nhẫn, không phải lòng thương. Hãy đứng lên, Đấng Cứu Chuộc.',
+  'guide.abilityHook.hammer_of_justice': 'Chặn một kẻ địch bằng đòn choáng ngắn và đáng tin cậy.',
+  'guide.abilityHook.oath_chain':
+    'Kéo một kẻ địch ở xa vào giữa bầy của bạn và ghìm đường tháo chạy của nó.',
+  'guide.abilityHook.ancestor_return':
+    'Đưa mọi thành viên nhóm hoặc đội đã ngã xuống trở lại sự sống sau một lần niệm dài ngoài chiến đấu.',
+  'guide.abilityHook.avenging_wrath':
+    'Ban 10 Sùng Tín, rồi nhân đôi lượng Sùng Tín do kỹ năng tạo ra trong mười lăm giây.',
+  'guide.abilityHook.bastion_sweep':
+    'Quét khiên xuyên qua một nhóm để giành lấy mức đe dọa và tích Sùng Tín.',
+  'guide.abilityHook.chain_lightning':
+    'Đánh trúng một mục tiêu rồi nhảy sang hai kẻ địch gần đó, tích một Sấm cho cả lần niệm.',
+  'guide.abilityHook.consecration':
+    'Chiếm lấy mặt đất quanh bạn bằng sát thương Thánh và mức đe dọa kéo dài.',
+  'guide.abilityHook.hammer_of_wrath':
+    'Kết liễu một kẻ địch bị thương từ xa, hoặc bất kỳ kẻ địch nào khi đôi cánh của bạn còn hoạt động.',
+  'guide.abilityHook.holy_shield':
+    'Dùng Sùng Tín để mở cửa sổ đỡ đòn chủ động, hấp thụ và một nhịp đe dọa.',
+  'guide.abilityHook.lay_on_hands': 'Hồi một lượng máu lớn khi đồng minh sắp gục ngã.',
+  'guide.abilityHook.measured_shot':
+    'Một phát bắn tầm xa có chủ đích, hồi tập trung cho các đòn nặng hơn của bạn.',
+  'guide.abilityHook.pack_command':
+    'Ra lệnh cho bạn đồng hành tấn công và tích Hung Tính Bầy Đàn. Mỗi lớp khiến thú nuôi của bạn gây thêm 10% sát thương, tối đa 30%, trước khi Thả Thú Dữ tiêu hết các lớp.',
+  'guide.abilityHook.stampede':
+    'Gọi ba con thú tấn công trong 12 giây. Hãy dùng khi Hung Tính Bầy Đàn đầy để chúng giữ trọn thưởng sát thương tối đa suốt lần triệu.',
+  'guide.abilityHook.stormsurge':
+    'Đôi khi đưa Đòn Tổ Tiên trở lại sớm sau khi bạn dùng một cơ hội Điềm Bão.',
+  'guide.abilityHook.thunder_reservoir':
+    'Tích sét cho đến khi Địa Giật hoặc Động Đất có thể tung ra phần thưởng đầy sức mạnh.',
+  'guide.abilityHook.veilbound_march':
+    'Đi xuyên qua một nhóm để đánh dấu chúng, làm cùn sát thương của chúng lên bạn và ghim chặt mức đe dọa.',
+  'guide.abilityHook.warspirit_cadence':
+    'Biến nhịp vũ khí đều đặn thành Tiếng Vọng Tâm Phong và một cơ hội niệm phép tức thời.',
 };

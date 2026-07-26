@@ -9354,4 +9354,287 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Zastępuje {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Ten przedmiot już ma to zaklęcie.',
   'hudChrome.enchanting.sameEnchantTag': 'Już zastosowane',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'abilityUi.resources.devotion': 'Oddanie',
+  'abilityUi.resources.focus': 'skupienie',
+  'classDetails.resources.focus': 'Skupienie',
+  'game.hud.lowFocus': 'Niskie skupienie',
+  'hud.errors.notEnoughDevotion': 'Za mało Oddania!',
+  'hudChrome.paladin.devotion': 'Oddanie',
+  'hudChrome.paladin.devotionValue': 'Oddanie {value} z {max}',
+  'hudChrome.paladin.devotionAscensionCharges':
+    'Oddanie {value} z {max}. Wzniesienie: {charges} ładunków.',
+  'hudChrome.paladin.devotionAscensionLast':
+    'Oddanie {value} z {max}. Wzniesienie: ostatni ładunek.',
+  'hudChrome.paladin.ascensionLastAnnouncement': 'Wzniesienie: ostatni ładunek',
+  'hudChrome.paladin.ascensionSpenderAria':
+    'Slot akcji {slot}: {ability}. Zużywa jeden ładunek Wzniesienia.',
+  'hudChrome.crafting.craftedToastQty': 'Wytworzono: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedAlso': 'Odzyskujesz również {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Odzyskujesz również {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedYield': 'Odczarowujesz {item}, otrzymując {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty':
+    'Odczarowujesz {item}, otrzymując {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Odzyskujesz {material} z {item}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Odzyskujesz {material} x{qty} z {item}.',
+  'hudChrome.auraEffect.dawnsWrath':
+    'MG: dowolne zdrowie · +1 użycie · Odnowienie 0 · +{pct}% obrażeń',
+  'hudChrome.auraEffect.duskEconomy': 'Umiejętności kosztują o {pct}% mniej energii',
+  'hudChrome.auraEffect.hunterFerocity':
+    '{stacks} Zaciekłości Sfory: twój towarzysz zadaje o {pct}% więcej obrażeń',
+  'hudChrome.auraEffect.veiledEdge': 'Twoje następne Uderzenie Czyhającego trafia podwójnie',
+  'hudChrome.auraEffect.gloam':
+    'Mrok: stopień {stacks} z {max}. Przy {max} twoje otwarcia Zmierzchowej Zasłony odblokowują się na otwartej przestrzeni, a następne rzucone jest DARMOWE i detonuje zapas w zasłonę cieni',
+  'hudChrome.auraEffect.mendingCurrent':
+    'Gromadzi {value} leczenia, uwalnianego z czasem lub zużywanego przez Kaskadowe Cerowanie',
+  'hudChrome.auraEffect.mendingCurrentPercent':
+    'Gromadzi leczenie równe {pct}% maksymalnego zdrowia na Kaskadowe Cerowanie',
+  'hudChrome.auraEffect.radiantResonance':
+    'Twoje następne Kojące Światło jest natychmiastowe albo twój następny Uścisk Świtu kosztuje o {pct}% mniej many i rzuca się w {castTime} s',
+  'hudChrome.auraEffect.redline':
+    'Czerwona Linia: nacięcie {stacks} z {max}. Ciosy w Korpus dodają nacięcia; Cios Łaski trafia o {pct}% mocniej za nacięcie i zamyka okno. Wcześniejsze wygaśnięcie je przepada',
+  'hudChrome.auraEffect.solarReprisal':
+    'Twój następny Słoneczny Dysk nie kosztuje many, ignoruje odnowienie i zadaje o {pct}% więcej obrażeń; Młot Łaski ignoruje odnowienie i leczy cię za 100% zadanych obrażeń; albo Kojące Światło jest natychmiastowe',
+  'hudChrome.auraEffect.veilstrikeWindow':
+    'Zasłona Cieni: twoje otwarcia Zmierzchowej Zasłony można stosować na otwartej przestrzeni pod każdym kątem, a zadawane obrażenia rosną o {pct}%',
+  'hudChrome.auraEffect.venomRitual':
+    'Rytuał Jadu: stopień {stacks} z {max}. Ciosy budujące dodają stopnie; przy {max} Wieczny sen staje się Jadowitym Rozdarciem',
+  'entities.abilities.aegis_first_dawn.name': 'Egida Pierwszego Świtu',
+  'entities.abilities.aura_mastery.name': 'Święta Zgoda',
+  'entities.abilities.bastion_rite.name': 'Rytuał Bastionu',
+  'entities.abilities.bastion_sweep.name': 'Zamach Bastionu',
+  'entities.abilities.beacon_of_light.name': 'Latarnia Światła',
+  'entities.abilities.dawn_devotion.name': 'Oddanie Świtu',
+  'entities.abilities.dawnfall.name': 'Upadek Świtu',
+  'entities.abilities.dawns_embrace.name': 'Uścisk Świtu',
+  'entities.abilities.devotion_ward.name': 'Oddanie Bastionu',
+  'entities.abilities.divine_ascension.name': 'Boskie Wzniesienie',
+  'entities.abilities.faithforged_guard.name': 'Dług Światła',
+  'entities.abilities.final_edict.name': 'Ostatni Edykt',
+  'entities.abilities.grace_devotion.name': 'Oddanie Łaski',
+  'entities.abilities.guardian_covenant.name': 'Przymierze Strażnika',
+  'entities.abilities.hammer_of_grace.name': 'Młot Łaski',
+  'entities.abilities.hushbrand.name': 'Piętno Ciszy',
+  'entities.abilities.life_covenant.name': 'Przymierze Życia',
+  'entities.abilities.martyrs_aegis.name': 'Egida Męczennika',
+  'entities.abilities.mercy_lance.name': 'Lanca Miłosierdzia',
+  'entities.abilities.oath_chain.name': 'Łańcuch Przysięgi',
+  'entities.abilities.radiant_chorus.name': 'Promienny Chór',
+  'entities.abilities.radiant_devotion.name': 'Promienne Oddanie',
+  'entities.abilities.recall_the_fallen.name': 'Przywołaj Poległych',
+  'entities.abilities.sacred_challenge.name': 'Święty Bodziec',
+  'entities.abilities.sacred_form.name': 'Święta Postać',
+  'entities.abilities.seraphic_vigil.name': 'Serafinowa Straż',
+  'entities.abilities.solar_invocation.name': 'Słoneczne Wezwanie',
+  'entities.abilities.solar_step.name': 'Słoneczny Krok',
+  'entities.abilities.sun_gods_verdict.name': 'Wyrok Boga Słońca',
+  'entities.abilities.sunward_disc.name': 'Słoneczny Dysk',
+  'entities.abilities.valkyrs_calling.name': 'Wezwanie Walkirii',
+  'entities.abilities.veilbound_march.name': 'Marsz Zasłony',
+  'entities.abilities.veilbound_mark.name': 'Piętno Zasłony',
+  'entities.abilities.vowkeeper_strike.name': 'Cios Strażnika Ślubów',
+  'entities.abilities.choir_of_deliverance.name': 'Chór Wybawienia',
+  'entities.abilities.scouring_mercy.name': 'Oczyszczające Miłosierdzie',
+  'entities.abilities.aegis_first_dawn.description':
+    'Kanalizuj przez 5 s, tworząc świętą kopułę o średnicy 10 metrów. Sojusznicy wewnątrz są leczeni co sekundę i otrzymują o 50% mniej obrażeń. Ukończenie kanalizowania uwalnia końcowe leczenie i zapewnia 30% prędkości ruchu przez 4 s.',
+  'entities.abilities.aura_mastery.description':
+    'Przez 8 s wzmacnia każde aktywne Oddanie i Aurę Odwetu w twojej drużynie. Oddanie Bastionu zmniejsza obrażenia o 15%; Odwet zadaje 15 obrażeń Świętych. Wielokrotne użycia odnawiają zamiast się kumulować.',
+  'entities.abilities.bastion_rite.description':
+    'Zmniejsza otrzymywane obrażenia fizyczne o 20% i zwiększa szansę bloku o 20% przez 6 s. Wzniesienie wydłuża czas trwania do 10 s.',
+  'entities.abilities.bastion_sweep.description':
+    'Zamach założoną tarczą przez wrogów w przednim łuku 180 stopni za {damage} obrażeń Świętych z wysokim zagrożeniem i generuje 1 Oddanie. Wzniesienie zwiększa obrażenia o 30%, a promień do 8 m.',
+  'entities.abilities.beacon_of_light.description':
+    'Oznacza jednego członka drużyny jako twoją Latarnię Światła. 50% twojego skutecznego leczenia bezpośredniego na innym członku drużyny w promieniu 60 m leczy także Latarnię. Leczenie obszarowe i okresowe nie jest przenoszone. Trwa, dopóki jedno z was nie zginie.',
+  'entities.abilities.dawn_devotion.description':
+    'Zwiększa moc ataku twoją i członków drużyny o 40 na 30 min. Zastępuje twoje własne Promienne Oddanie lub Oddanie Łaski, ale współistnieje z Oddaniami innych paladynów i z okrzykami wojownika.',
+  'entities.abilities.dawnfall.description':
+    'Zadaje {damage} obrażeń Świętych pobliskim wrogom i generuje 1 Oddanie. Trafienie co najmniej jednego wroga skraca pozostałe odnowienie Ostatniego Edyktu o 2 s. Wzniesienie zwiększa jego obrażenia i promień.',
+  'entities.abilities.dawns_embrace.description':
+    'Uwalnia potężne leczenie i generuje 1 Oddanie. Promienny Rezonans zmniejsza jego koszt many o 50%, a czas rzucania do 1,5 s. Wzniesienie czyni je natychmiastowym i zwiększa jego leczenie o 35%.',
+  'entities.abilities.devotion_ward.description':
+    'Zmniejsza obrażenia otrzymywane przez ciebie i członków drużyny o 5% do śmierci lub zastąpienia. Tylko ta aura i Aura Odwetu zastępują się nawzajem; Promienne Oddanie, Oddanie Świtu i Łaski współistnieją.',
+  'entities.abilities.divine_ascension.description':
+    'Zużywa 20 Oddania, aby uzyskać 5 ładunków Wzniesienia na maksymalnie 45 s. Oznaczone umiejętności zużywają jeden ładunek i zyskują dodatkowy efekt.',
+  'entities.abilities.faithforged_guard.description':
+    'Przez 8 s następny cios wroga wymierzony w ciebie zostaje odpowiedziany: do {buff} obrażeń zostaje odrzucone i zwrócone napastnikowi jako obrażenia Święte, a ty zyskujesz 1 Oddanie. Odpowiedziany zostaje tylko jeden cios. Wzniesienie zwiększa odpowiadaną wartość o 50%.',
+  'entities.abilities.final_edict.description':
+    'Zadaje miażdżący cios bronią i generuje 1 Oddanie, gdy zadaje obrażenia. Udane trafienie skraca pozostałe odnowienie Upadku Świtu o 2 s. Udane automatyczne ataki i trafienia Ostatniego Edyktu mają 15% szans na przyznanie Gniewu Świtu na 8 s. Wzniesienie uwalnia dodatkowo Świętą eksplozję wokół ciebie.',
+  'entities.abilities.grace_devotion.description':
+    'Ty i członkowie drużyny odzyskujecie 15 many co 5 s i płacicie o 3% mniej many przez 30 min. Zastępuje twoje własne Promienne Oddanie lub Oddanie Świtu, ale współistnieje z Oddaniami innych paladynów.',
+  'entities.abilities.guardian_covenant.description':
+    'Chroni sojuszniczy cel i ciebie, zmniejszając otrzymywane obrażenia o 20% przez 8 s. Domyślnie wybiera ciebie, gdy nie wskazano sojuszniczego celu.',
+  'entities.abilities.hammer_of_grace.description':
+    'Natychmiast ciska świętym młotem we wroga w promieniu 20 m za {damage}, odnawia 70 many, leczy cię za 50% zadanych obrażeń i generuje 1 Oddanie, gdy zadaje obrażenia. Słoneczny Odwet pozwala Młotowi Łaski zignorować odnowienie i leczyć cię za 100% zadanych obrażeń.',
+  'entities.abilities.hushbrand.description':
+    'Przerywa rzucanie zaklęć i blokuje zaklęcia z tej szkoły na 4 s.',
+  'entities.abilities.life_covenant.description':
+    'Zmniejsza obrażenia otrzymywane przez sojusznika o 40% przez 6 s. Podczas Wzniesienia zapewnia także tarczę 120 punktów bez zużywania ładunku.',
+  'entities.abilities.martyrs_aegis.description':
+    'Zmniejsza obrażenia otrzymywane przez sojusznika o 40% przez 8 s.',
+  'entities.abilities.mercy_lance.description':
+    'Zadaje {damage} obrażeń Świętych wrogowi i generuje 1 Oddanie, gdy zadaje obrażenia. Podczas Wzniesienia zużywa 1 ładunek, aby zagwarantować trafienie krytyczne.',
+  'entities.abilities.oath_chain.description':
+    'Natychmiast krępuje odległego wroga świętym łańcuchem. Wróg przemieszcza się ku tobie z prędkością 18 m na sekundę, aż osiągnie 3 m, a następnie zostaje spowolniony o 50% na 4 s. Podczas Wzniesienia krępuje drugiego pobliskiego wroga.',
+  'entities.abilities.radiant_chorus.description':
+    'Leczy pobliskich sojuszników za {damage} i generuje 1 Oddanie. Skuteczne wyleczenie co najmniej 2 sojuszników przyznaje Promienny Rezonans: twoje następne Kojące Światło jest natychmiastowe albo twój następny Uścisk Świtu kosztuje o 50% mniej many i rzuca się w 1,5 s. Wzniesienie zwiększa leczenie i promień Promiennego Chóru.',
+  'entities.abilities.radiant_devotion.description':
+    'Zwiększa moc zaklęć twoją i członków drużyny o 20 na 30 min. Zastępuje twoje własne Oddanie Świtu lub Łaski, ale współistnieje z Oddaniami innych paladynów.',
+  'entities.abilities.recall_the_fallen.description':
+    'Przywraca do życia martwego członka drużyny z 35% zdrowia i many. Słoneczny Uzdrowiciel na poziomie 16 lub wyższym przywołuje zamiast tego każdego poległego członka drużyny.',
+  'entities.abilities.sacred_challenge.description':
+    'Zmusza wroga do zaatakowania ciebie. Podczas Wzniesienia zmniejsza także wszystkie otrzymywane obrażenia o 15% przez 4 s bez zużywania ładunku.',
+  'entities.abilities.sacred_form.description':
+    'Wchodzi w święty stan aż do śmierci, zwiększając leczenie o 10% i szansę na trafienie krytyczne zaklęć o 5% oraz zmniejszając generowane zagrożenie o 50%. Tylko dla Słonecznych Uzdrowicieli.',
+  'entities.abilities.seraphic_vigil.description':
+    'Chroni sojusznika przez 30 s. Pierwszy cios, który zepchnie go poniżej 35% zdrowia, zużywa Straż i leczy go za 180. (Sygnatura Błogosławieństwa)',
+  'entities.abilities.scouring_mercy.description':
+    'Zadaje od 72 do 84 obrażeń Świętych wrogowi albo leczy sojuszniczy cel za 130 do 155. Obie wartości rosną wraz z mocą zaklęć. Obrażenia leczą także każdego sojusznika związanego Doktryną za 30% albo członka drużyny o najniższym zdrowiu za 15%, jeśli nikt nie jest związany. (Sygnatura Doktryny)',
+  'entities.abilities.solar_invocation.description':
+    'Natychmiast leczy sojusznika za {damage} albo zadaje umiarkowane obrażenia Święte wrogowi. Oba zastosowania generują 1 Oddanie. Podczas Wzniesienia rzut leczący leczy także sojuszniczych graczy w promieniu 10 m od celu o połowę.',
+  'entities.abilities.solar_step.description': 'Zwiększa twoją prędkość ruchu o 150% na 2 s.',
+  'entities.abilities.sun_gods_verdict.description':
+    'Osądza wroga pod Wyrokiem Boga Słońca przez 30 s. Ostatni Edykt i Upadek Świtu zapisują jeden ładunek przy udanym trafieniu. Umiejętność, która nałoży trzeci ładunek, dyktuje wyrok: Ostatni Edykt uwalnia druzgocące obrażenia na skazanym; Upadek Świtu detonuje wyrok, raniąc i ogłuszając pobliskich wrogów na 1,5 s.',
+  'entities.abilities.sunward_disc.description':
+    'Wymaga tarczy. Ciska promiennym dyskiem, który trafia, a następnie odbija się między pobliskimi wrogami. Każde raniące uderzenie generuje 1 Oddanie. Słoneczny Odwet sprawia, że Słoneczny Dysk nie kosztuje many, ignoruje odnowienie i zadaje o 20% więcej obrażeń. Wzniesienie wzmacnia 5 odbić.',
+  'entities.abilities.valkyrs_calling.description':
+    'Wznosisz się w powietrze, stając się odporny na obrażenia, gdy lecisz ku wrogowi. Po 2 s spadasz na obszar celu za {damage} obrażeń Świętych i generujesz 1 Oddanie. Wzniesienie zwiększa obrażenia uderzenia o 50% i zużywa 1 ładunek.',
+  'entities.abilities.veilbound_march.description':
+    'Stajesz się eteryczny na 4 s, zyskując 40% prędkości ruchu i 30% pancerza oraz odporność na unieruchomienia, spowolnienia i przemieszczenia. Wrogowie, przez których przechodzisz, otrzymują Piętno Zasłony na 6 s: co sekundę otrzymują obrażenia Święte, zadają ci o 20% mniej obrażeń i generują dodatkowe zagrożenie. Pierwsze piętno przyznaje 1 Oddanie. Gdy marsz się kończy, pobliscy napiętnowani wrogowie otrzymują końcowy wybuch. Wzniesienie zwiększa wybuch o 50% i lekko przyciąga ich ku tobie.',
+  'entities.abilities.veilbound_mark.description':
+    'Otrzymuje obrażenia Święte co sekundę, zadaje o 20% mniej obrażeń paladynowi, który nałożył piętno, i generuje dodatkowe zagrożenie wobec tego paladyna.',
+  'entities.abilities.vowkeeper_strike.description':
+    'Uderza z wysokim zagrożeniem i generuje 1 Oddanie. Udany cios ma 20% szans na przyznanie Słonecznego Odwetu na 8 s; każdy udany blok ma 25%. Słoneczny Odwet wzmacnia twój następny Słoneczny Dysk, Młot Łaski lub Kojące Światło. Wzniesienie zapewnia także niewielką tarczę pochłaniającą.',
+  'entities.abilities.choir_of_deliverance.description':
+    'Kanalizuje przez 6 s, lecząc pobliskich członków drużyny co 2 s.',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'entities.abilities.bloodhook.name': 'Krwawy Hak',
+  'entities.abilities.bloodtrail_assault.name': 'Szturm Krwawego Tropu',
+  'entities.abilities.cold_focus.name': 'Zimne Skupienie',
+  'entities.abilities.fieldcraft_reentry.name': 'Zbrojny Powrót',
+  'entities.abilities.frostjaw_trap.name': 'Pułapka Mroźnej Paszczy',
+  'entities.abilities.hunting_momentum.name': 'Rozpęd Łowów',
+  'entities.abilities.measured_shot.name': 'Wyważony Strzał',
+  'entities.abilities.pack_command.name': 'Rozkaz Sfory',
+  'entities.abilities.pack_rally.name': 'Zbiórka Sfory',
+  'entities.abilities.shellskin.name': 'Pancerna Skóra',
+  'entities.abilities.shrapnel_charge.name': 'Ładunek Odłamkowy',
+  'entities.abilities.stampede.name': 'Tratowanie',
+  'entities.abilities.trailbreak.name': 'Zerwanie Tropu',
+  'entities.abilities.unleash_beast.name': 'Spuść Bestię',
+  'entities.abilities.wildheart.name': 'Dzikie Serce',
+  'entities.abilities.bloodhook.description':
+    'Szarżuj na wroga i nałóż Ranę Krwawego Haka, zadającą 34 bazowych obrażeń Fizycznych plus 26% twojej mocy ataku dystansowego przez 12 s w 4 tyknięciach. (Sygnatura Rzemiosła Polowego)',
+  'entities.abilities.bloodtrail_assault.description':
+    'Przez 12 s Krwawy Hak rozprzestrzenia ranę o 60% mocy na maksymalnie 2 pobliskich wrogów, Rozdarcie Rany rozkazuje atak towarzysza za 18 obrażeń, a Ładunek Odłamkowy zyskuje 2 metry, zadaje o 25% więcej bazowych obrażeń głównemu celowi i wyzwala o 50% więcej obrażeń rany.',
+  'entities.abilities.cold_focus.description':
+    'Przez 12 s Wyważony Strzał odnawia o 50% więcej skupienia, a Długie Naciągnięcie kosztuje o 25% mniej i rzuca się o 30% szybciej. (Sygnatura Zimnego Wzroku)',
+  'entities.abilities.fieldcraft_reentry.description':
+    'Pasywna: Zerwanie Tropu odnawia Rozpęd Łowów i przygotowuje twoje następne Patroszące Uderzenie lub Krwawy Hak na 12 s. Patroszące Uderzenie zadaje o 15% więcej obrażeń za ładunek. Krwawy Hak zadaje od 18 do 24 dodatkowych obrażeń Fizycznych, zwiększonych o 15% za ładunek i przez twoją moc ataku dystansowego. Przy 3 ładunkach jeden z ataków zużywa Rozpęd Łowów. (Rzemiosło Polowe)',
+  'entities.abilities.frostjaw_trap.description':
+    'Umieszcza pułapkę przy wybranym wrogu lub u twoich stóp. Uzbraja się po 0,75 s i trwa 30 s. Pierwszy wróg, który ją wyzwoli, zostaje unieruchomiony na 3 s, a wrogowie w promieniu 4 metrów spowolnieni o 50% na 4 s.',
+  'entities.abilities.hunting_momentum.description':
+    'Pasywna: Patroszące Uderzenie przyznaje 1 Rozpęd Łowów na 8 s, do 3. Przy 3 ładunkach Rozdarcie Rany zadaje o 45% więcej obrażeń uderzenia i zużywa ładunki. (Rzemiosło Polowe)',
+  'entities.abilities.measured_shot.description':
+    'Strzela do celu za {damage} obrażeń Fizycznych. Trafienie odnawia 20 skupienia. Obrażenia rosną wraz z mocą ataku dystansowego.',
+  'entities.abilities.pack_command.description':
+    'Rozkazuje twojemu żywemu towarzyszowi uderzyć za 36 do 48 obrażeń Fizycznych. Obrażenia rosną wraz z mocą ataku towarzysza. Trafienie odnawia 20 skupienia i przyznaje 1 Zaciekłość Sfory na 30 s, do 3. Każdy ładunek zwiększa wszystkie obrażenia twojego towarzysza o 10%. To uderzenie korzysta z ładunków sprzed trafienia.',
+  'entities.abilities.pack_rally.description':
+    'Przyjmij Postać Rumaka i zbierz pobliskich sojuszników z 30% prędkości ruchu oraz 10% prędkości ataku i rzucania na 10 s.',
+  'entities.abilities.shellskin.description':
+    'Zmniejsza otrzymywane obrażenia o 60% na 8 s, ale uniemożliwia atakowanie, gdy jest aktywna.',
+  'entities.abilities.shrapnel_charge.description':
+    'Trafia cel za 24 do 30 obrażeń Fizycznych i do 4 innych wrogów w promieniu 6 metrów za 13 do 17. Pozostałe cele krwawią też za 12 obrażeń przez 6 s. Jeśli główny cel nosi twoją Ranę Krwawego Haka, zadaje 1 tyknięcie rany natychmiast. Obrażenia bezpośrednie rosną wraz z mocą ataku dystansowego.',
+  'entities.abilities.stampede.description':
+    'Przyzywa 3 bestie na 12 s. Każda atakuje co 2 s za {damage} obrażeń Fizycznych. Pokazane obrażenia zawierają 8% twojej mocy ataku dystansowego przed premiami do obrażeń towarzysza. Bestie utrwalają Zaciekłość Sfory przy przyzwaniu, zyskując 10% obrażeń za ładunek. Gdy Tratowanie jest w odnowieniu, udane Rozkazy Sfory mają 20% szans je zresetować, gwarantowane po 5 nieudanych szansach. Nie może się zresetować, gdy bestie są aktywne. (Władca Sfory)',
+  'entities.abilities.trailbreak.description':
+    'Skacz 12 metrów w tył. Jeśli masz Rozpęd Łowów, zostaje odnowiony i przygotowuje Powrót na 12 s.',
+  'entities.abilities.unleash_beast.description':
+    'Zużywa 3 Zaciekłości Sfory po tym, jak twój towarzysz uderzy za 83 do 105 obrażeń Fizycznych i wstrząśnie każdym wrogiem w promieniu 6 metrów za 26 do 34. Uderzenie i wstrząs korzystają z pełnej 30% premii do obrażeń towarzysza z Zaciekłości Sfory i rosną wraz z mocą ataku towarzysza. Przez kolejne 8 s towarzysz zadaje o 25% więcej obrażeń, atakuje o 35% szybciej i sprawia, że Plugawy strzał trafia do 2 pobliskich wrogów.',
+  'entities.abilities.wildheart.description':
+    'Natychmiast odnawia 30% twojego maksymalnego zdrowia.',
+  'entities.abilities.ancestor_return.name': 'Powrót Przodków',
+  'entities.abilities.galeheart_weapon.name': 'Broń Serca Wichru',
+  'entities.abilities.lifespring_weapon.name': 'Broń Źródła Życia',
+  'entities.abilities.primal_exaltation.name': 'Pradawne Uniesienie',
+  'entities.abilities.stoneward.name': 'Kamienna Straż',
+  'entities.abilities.stormsurge.name': 'Sztormowa Fala',
+  'entities.abilities.thunder_reservoir.name': 'Zbiornik Gromu',
+  'entities.abilities.tidecall.name': 'Wezwanie Przypływu',
+  'entities.abilities.unleash_weapon.name': 'Spuść Broń',
+  'entities.abilities.warspirit_cadence.name': 'Kadencja Ducha Wojny',
+  'entities.abilities.ancestor_return.description':
+    'Przywraca do życia przy ciele każdego poległego członka twojej drużyny lub rajdu z 30% zdrowia i many. Nie można rzucić w walce. (Duchowe Cerowanie)',
+  'entities.abilities.galeheart_weapon.description':
+    'Zaklina obie bronie na 30 min, umożliwiając Kadencję Ducha Wojny.',
+  'entities.abilities.lifespring_weapon.description':
+    'Zaklina twoją broń na 30 min. Kojące Wody i Wezwanie Przypływu dodają o 20% więcej leczenia do Nurtu Cerowania.',
+  'entities.abilities.primal_exaltation.description':
+    'Przez 12 s Łukowy pocisk i Rozgałęziona Błyskawica Wezwania Gromu rzucają się o 50% szybciej, a Łukowy pocisk przyznaje 2 Gromy; Duch Wojny wyzwala swoją kadencję co 2 trafienia bronią; Duchowe Cerowanie dodaje o 50% więcej leczenia do Nurtu Cerowania. (Talent szamana)',
+  'entities.abilities.stoneward.description':
+    'Chroni sojusznika przez 60 s z 6 ładunkami. Obrażenia zużywają ładunek, aby wyleczyć 5% maksymalnego zdrowia, raz na 3 s. (Talent szamana)',
+  'entities.abilities.stormsurge.description':
+    'Pasywna: gdy Uderzenie Przodków jest w odnowieniu, zużycie Znaku Burzy ma 25% szans je zresetować. Jeśli pierwsze 3 szanse zawiodą, 4. zawsze je resetuje. (Duch Wojny)',
+  'entities.abilities.thunder_reservoir.description':
+    'Pasywna: Łukowy pocisk i Rozgałęziona Błyskawica przyznają Grom, do 5. Przy 5 Gromach Ziemny wstrząs zadaje o 125% więcej obrażeń albo Trzęsienie ziemi o 100% więcej, a następnie zużywa cały Grom. (Wezwanie Gromu)',
+  'entities.abilities.tidecall.description':
+    'Leczy sojuszniczy cel za 58 do 72. Leczenie rośnie wraz z mocą zaklęć. Dodaje to samo leczenie obliczone przed nadleczeniem do Nurtu Cerowania, do 30% maksymalnego zdrowia celu.',
+  'entities.abilities.unleash_weapon.description':
+    'Uwalnia aktywne zaklęcie twojej broni. Piętno Ognia zadaje od 54 do 64 obrażeń od Ognia, zyskuje 30% mocy zaklęć i przyznaje 2 Gromy. Serce Wichru uderza twoją bronią, popycha Kadencję Ducha Wojny i przyznaje 20% prędkości ataku na 6 s. Kamienne Więzy uderzają za 75% obrażeń broni, zmuszają cel do zaatakowania ciebie i zmniejszają otrzymywane obrażenia o 20% na 4 s. Źródło Życia zużywa twój Nurt Cerowania, leczy za 125% jego pozostałego leczenia i zmniejsza następne trafienie w ciągu 8 s o 50% przywróconego zdrowia.',
+  'entities.abilities.warspirit_cadence.description':
+    'Pasywna: co 3. celne uderzenie bronią wyzwala 2 Echa Serca Wichru za 50% obrażeń od Natury i przyznaje Znak Burzy na 12 s. Znak Burzy czyni twój następny Łukowy pocisk, Wstrząs lub Kojące Wody natychmiastowymi i obniża ich koszt many o 50%. Uderzenie Przodków liczy się jako 2 ataki. (Duch Wojny)',
+  'entities.abilities.summon_tithefiend.name': 'Przyzwij Dziesięcinnika',
+  'entities.abilities.summon_tithefiend.description':
+    'Zużywa całą Mroczną Dziesięcinę, aby przyzwać Dziesięcinnika na 6, 8, 10, 12 lub 15 s przy 1 do 5 ładunków. Atakuje co 2 s za 20 do 24 obrażeń Cienia, plus 8 za każdy dodatkowy ładunek. Przy pięciu ładunkach staje się większy, a jego obrażenia rosną o 25%. Jego obrażenia rosną wraz z twoją mocą zaklęć. Preferuje twoją Kukłę. Każde trafienie odnawia 1% maksymalnej many i odbija 15% obrażeń na maksymalnie 3 innych wrogów z twoim Trenem Rozkładu. (Sygnatura Nieszporów)',
+  'entities.abilities.veilstep.name': 'Krok Zasłony',
+  'entities.abilities.veilstep.description':
+    'Przechodzi przez zasłonę w kierunku, w którym patrzysz.',
+  'entities.quests.q_divine_tome.title': 'Świtem Spętany Tom',
+  'entities.quests.q_divine_tome.objectives.0.label': 'Niespokojne Kości złożone do spoczynku',
+  'entities.quests.q_divine_tome.text':
+    'Światło nie spoczywa w tobie cicho, {playerName}. Widziałem, jak dajesz zmarłym spokój, i wierzę, że jesteś gotów na to, czego niewielu paladynów kiedykolwiek się uczy: Rytuał Przywołania, którym poległa dusza zostaje wezwana z powrotem do żywych. Jego słowa przechowywane są w Świtem Spętanym Tomie, tutaj pod moją pieczą, lecz księga nie jest błogosławieństwem, dopóki niespokojni zmarli wciąż chodzą po tej ziemi. Zwróć ziemi jeszcze 6 Niespokojnych Kości, a zacznę cię nauczać.',
+  'entities.quests.q_divine_tome.completion':
+    'Dziedziniec kaplicy cichnie. Jesteś gotów na słowa, {playerName}, lecz Rytuału Przywołania nie można wypowiedzieć w ciepłej kaplicy. Musi zostać zaśpiewany tam, gdzie zasłona między życiem a śmiercią staje się cienka. Zamierzam zanieść Tom na północ, na Mokradła Mirefen. Podążaj za mną, a dokończymy to.',
+  'entities.quests.q_rite_of_redemption.title': 'Rytuał Przywołania',
+  'entities.quests.q_rite_of_redemption.objectives.0.label': 'Utopieni złożeni do spoczynku',
+  'entities.quests.q_rite_of_redemption.text':
+    'A więc poszedłeś za mną w błoto, {playerName}. Dobrze. Mam tu Świtem Spętany Tom, a ta zatopiona ziemia jest miejscem, do którego należą jego słowa: nigdzie zasłona między życiem a śmiercią nie jest cieńsza niż tam, gdzie zmarli nie chcą pozostać pogrzebani. Lecz utopieni wciągnęliby twój głos w połowie wersu. Oczyść miejsce godne rytuału: złóż do spoczynku 8 Utopionych, a poświęcimy je razem.',
+  'entities.quests.q_rite_of_redemption.completion':
+    'Uklęknij, {playerName}, i odczytaj słowa na głos. Oto. Czujesz to? Światło w twoich dłoniach nie naprawia już tylko żywych, może przywołać tych, którzy przeszli na drugą stronę. Używaj go mądrze. Dusza wezwana z powrotem do beznadziejnej walki to okrucieństwo, nie łaska. Powstań, Odkupicielu.',
+  'guide.abilityHook.hammer_of_justice':
+    'Zatrzymuje jednego wroga krótkim, niezawodnym ogłuszeniem.',
+  'guide.abilityHook.oath_chain': 'Wciąga odległego wroga w twoją sforę i hamuje jego ucieczkę.',
+  'guide.abilityHook.ancestor_return':
+    'Przywraca do życia każdego poległego członka drużyny lub rajdu po długim rzucaniu poza walką.',
+  'guide.abilityHook.avenging_wrath':
+    'Przyznaje 10 Oddania, a następnie podwaja Oddanie generowane przez umiejętności przez piętnaście sekund.',
+  'guide.abilityHook.bastion_sweep':
+    'Zamachuje się tarczą przez grupę, aby przejąć zagrożenie i budować Oddanie.',
+  'guide.abilityHook.chain_lightning':
+    'Trafia jeden cel i przeskakuje na dwóch pobliskich wrogów, budując jeden Grom na całe rzucenie.',
+  'guide.abilityHook.consecration':
+    'Zajmuje ziemię wokół ciebie trwałymi obrażeniami Świętymi i zagrożeniem.',
+  'guide.abilityHook.hammer_of_wrath':
+    'Dobija rannego wroga z dystansu albo dowolnego wroga, gdy twoje skrzydła są aktywne.',
+  'guide.abilityHook.holy_shield':
+    'Wydaje Oddanie na okno aktywnego bloku, pochłanianie i impuls zagrożenia.',
+  'guide.abilityHook.lay_on_hands':
+    'Przywraca dużą ilość zdrowia, gdy sojusznik jest bliski upadku.',
+  'guide.abilityHook.measured_shot':
+    'Rozważny strzał dystansowy, który odnawia skupienie na twoje cięższe ataki.',
+  'guide.abilityHook.pack_command':
+    'Rozkazuje twojemu towarzyszowi uderzyć i budować Zaciekłość Sfory. Każdy ładunek sprawia, że twój towarzysz zadaje o 10% więcej obrażeń, do 30%, zanim Spuść Bestię zużyje ładunki.',
+  'guide.abilityHook.stampede':
+    'Wzywa trzy bestie do ataku na 12 sekund. Użyj jej przy pełnej Zaciekłości Sfory, aby zachowały maksymalną premię do obrażeń przez całe przyzwanie.',
+  'guide.abilityHook.stormsurge':
+    'Czasem wcześniej przywraca Uderzenie Przodków po tym, jak wykorzystasz okazję ze Znakiem Burzy.',
+  'guide.abilityHook.thunder_reservoir':
+    'Gromadzi błyskawice, aż Ziemny wstrząs lub Trzęsienie ziemi zdoła uwolnić pełnomocną wypłatę.',
+  'guide.abilityHook.veilbound_march':
+    'Przejdź przez grupę, aby ją napiętnować, stępić jej obrażenia wobec ciebie i przypieczętować zagrożenie.',
+  'guide.abilityHook.warspirit_cadence':
+    'Zamienia równy rytm broni w Echa Serca Wichru i okazję do natychmiastowego zaklęcia.',
 };

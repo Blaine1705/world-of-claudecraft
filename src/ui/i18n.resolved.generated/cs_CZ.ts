@@ -241,7 +241,7 @@ export const cs_CZ: EnTranslations = {
     "hud": {
       "lowMana": "Málo many",
       "lowEnergy": "Málo energie",
-      "lowFocus": "Low Focus"
+      "lowFocus": "Nízké soustředění"
     },
     "talents": {
       "title": "Talenty",
@@ -749,12 +749,12 @@ export const cs_CZ: EnTranslations = {
       "resting": "Odpočinek"
     },
     "paladin": {
-      "devotion": "Devotion",
-      "devotionValue": "Devotion {value} of {max}",
-      "devotionAscensionCharges": "Devotion {value} of {max}. Ascension {charges} charges.",
-      "devotionAscensionLast": "Devotion {value} of {max}. Ascension final charge.",
-      "ascensionLastAnnouncement": "Ascension final charge",
-      "ascensionSpenderAria": "Action slot {slot}: {ability}. Consumes one Ascension charge."
+      "devotion": "Oddanost",
+      "devotionValue": "Oddanost {value} z {max}",
+      "devotionAscensionCharges": "Oddanost {value} z {max}. Vzestup: {charges} nábojů.",
+      "devotionAscensionLast": "Oddanost {value} z {max}. Vzestup: poslední náboj.",
+      "ascensionLastAnnouncement": "Vzestup: poslední náboj",
+      "ascensionSpenderAria": "Slot akce {slot}: {ability}. Spotřebuje jeden náboj Vzestupu."
     },
     "abilityScaling": {
       "bonus": "(+{value})"
@@ -1590,8 +1590,8 @@ export const cs_CZ: EnTranslations = {
     "auraEffect": {
       "dot": "Způsobuje {value} {school} poškození každých {interval} s",
       "hot": "Obnovuje {value} zdraví každých {interval} s",
-      "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",
-      "mendingCurrentPercent": "Stores healing equal to {pct}% of maximum health for Cascading Mend",
+      "mendingCurrent": "Ukládá {value} léčení, uvolňovaného v čase nebo spotřebovaného Kaskádovou látkou",
+      "mendingCurrentPercent": "Ukládá léčení rovné {pct}% maximálního zdraví pro Kaskádovou látku",
       "absorb": "Absorbuje {value} poškození",
       "healAbsorb": "Absorbuje {value} příchozího léčení",
       "thorns": "Způsobuje útočníkům {value} {school} poškození",
@@ -1605,7 +1605,7 @@ export const cs_CZ: EnTranslations = {
       "dmgDoneReduce": "Snižuje způsobené poškození o {pct} %",
       "heatingUp": "Tvůj příští po sobě jdoucí kritický zásah stavebního ohnivého kouzla udělí Žhavou sérii; nekritický stavební útok Rozehřívání odstraní",
       "elementalConvergencePrimed": "Tvoje příští kouzlo z jiné živlové školy udělí Živlovou konvergenci",
-      "hunterFerocity": "{stacks} Pack Ferocity: your pet deals {pct}% more damage",
+      "hunterFerocity": "{stacks} Zuřivosti smečky: tvůj společník způsobuje o {pct}% větší poškození",
       "battleStance": "Bojový postoj: o 10 % vyšší generování vzteku",
       "berserkerStance": "Postoj berserka: kritické zásahy o 3 % častěji a o 3 % tvrdší",
       "crit": "Zvyšuje šanci na kritický zásah o {pct} %",
@@ -1628,15 +1628,15 @@ export const cs_CZ: EnTranslations = {
       "freeCast": "Tvoje příští seslání nestojí nic",
       "instantCast": "Tvoje příští kouzlo s dobou sesílání je okamžité",
       "cheapCast": "Tvoje příští kouzlo stojí o {pct} % méně",
-      "radiantResonance": "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
-      "solarReprisal": "Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant",
-      "dawnsWrath": "HoW: all HP · +1 use · CD 0 · +{pct}% DMG",
-      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
-      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
-      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
-      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
-      "veiledEdge": "Your next Lurker's Strike strikes for double",
-      "duskEconomy": "Abilities cost {pct}% less energy",
+      "radiantResonance": "Tvé další Léčivé světlo bude okamžité, nebo tvé další Objetí úsvitu stojí o {pct}% méně many a sesílá se za {castTime} s",
+      "solarReprisal": "Tvůj další Sluneční disk nestojí manu, ignoruje obnovu a způsobí o {pct}% větší poškození; Kladivo milosti ignoruje svou obnovu a vyléčí tě za 100% způsobeného poškození; nebo je Léčivé světlo okamžité",
+      "dawnsWrath": "KH: libovolné zdraví · +1 použití · Obnova 0 · +{pct}% poškození",
+      "venomRitual": "Jedový rituál: stupeň {stacks} z {max}. Budující údery přidávají stupně; při {max} se Do hrobu mění v Jedovou trhlinu",
+      "gloam": "Šero: stupeň {stacks} z {max}. Při {max} se tvá zahájení Soumračného závoje odemknou i na otevřeném prostranství a další vržené je ZDARMA a odpálí zásobu do stínového závoje",
+      "redline": "Červená linie: zářez {stacks} z {max}. Rány do těla přidávají zářezy; Rána z milosti zasáhne o {pct}% tvrději za zářez a uzavře okno. Dřívější vypršení je ztratí",
+      "veilstrikeWindow": "Stínový závoj: tvá zahájení Soumračného závoje lze použít na otevřeném prostranství z libovolného úhlu a způsobené poškození se zvyšuje o {pct}%",
+      "veiledEdge": "Tvůj další Úder číhajícího zasáhne dvojnásobně",
+      "duskEconomy": "Schopnosti stojí o {pct}% méně energie",
       "increase": {
         "ap": "Zvyšuje sílu útoku o {value}",
         "sp": "Zvyšuje sílu kouzel o {value}",
@@ -2370,7 +2370,7 @@ export const cs_CZ: EnTranslations = {
       "empty": "Zatím nejsou známy žádné recepty.",
       "resultAria": "Vyrobit {name}",
       "craftedToast": "Vyrobeno: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Vyrobeno: {name} x{qty}",
       "insufficientMaterials": "Na to nemáš materiály.",
       "unknownRecipe": "Tento recept neexistuje.",
       "comboRequirementUnmet": "Nemáš obě požadovaná řemesla na potřebné úrovni pro tento recept.",
@@ -2463,13 +2463,13 @@ export const cs_CZ: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Rozzačaruješ {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Odčaruješ {item} a získáš {material}.",
+      "disenchantedYieldQty": "Odčaruješ {item} a získáš {material} x{qty}.",
+      "disenchantedAlso": "Získáváš také {material}.",
+      "disenchantedAlsoQty": "Získáváš také {material} x{qty}.",
       "salvagedLine": "Rozebereš {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Vytěžíš {material} z {item}.",
+      "salvagedYieldQty": "Vytěžíš {material} x{qty} z {item}.",
       "enchantAppliedLine": "Okouzlíš {item} pomocí {enchant}.",
       "notHeld": "Tento předmět nemáš.",
       "notDisenchantable": "Toto nelze rozzačarovat.",
@@ -3293,21 +3293,21 @@ export const cs_CZ: EnTranslations = {
       "holy_light": "Stabilní, výrazné léčení pro doléčení spojence nebo sebe.",
       "devotion_aura": "Trvalý self-buff zvedající zbroj, takže zásahy dopadají měkčeji.",
       "judgement": "Utratí aktivní pečeť a udeří nepřítele z krátké vzdálenosti.",
-      "hammer_of_wrath": "Executes a wounded enemy from range, or any enemy while your wings are active.",
-      "avenging_wrath": "Grants 10 Devotion, then doubles Devotion generated by abilities for fifteen seconds.",
-      "bastion_sweep": "Sweeps your shield through a group to seize threat and build Devotion.",
-      "oath_chain": "Drags a distant enemy into your pack and slows its escape.",
-      "veilbound_march": "Pass through a pack to mark it, blunt its damage against you, and lock in threat.",
-      "holy_shield": "Spends Devotion on an active block window, absorption, and a threat pulse.",
-      "consecration": "Claims the ground around you with sustained Holy damage and threat.",
-      "hammer_of_justice": "Stops one enemy with a short, reliable stun.",
-      "lay_on_hands": "Restores a large amount of health when an ally is close to falling.",
+      "hammer_of_wrath": "Popraví raněného nepřítele z dálky, nebo jakéhokoli nepřítele, dokud jsou tvá křídla aktivní.",
+      "avenging_wrath": "Udělí 10 Oddanosti a poté na patnáct sekund zdvojnásobí Oddanost získanou schopnostmi.",
+      "bastion_sweep": "Rozmáchne se štítem skrz skupinu, aby strhl hrozbu a budoval Oddanost.",
+      "oath_chain": "Přitáhne vzdáleného nepřítele do tvé smečky a zbrzdí jeho útěk.",
+      "veilbound_march": "Projdi skupinou, abys ji označil, otupil její poškození vůči tobě a upevnil hrozbu.",
+      "holy_shield": "Utratí Oddanost za okno aktivního bloku, pohlcení a impuls hrozby.",
+      "consecration": "Zabere zemi kolem tebe trvalým Svatým poškozením a hrozbou.",
+      "hammer_of_justice": "Zastaví jednoho nepřítele krátkým, spolehlivým omráčením.",
+      "lay_on_hands": "Obnoví velké množství zdraví, když je spojenec blízko pádu.",
       "blessing_of_might": "Zvedne přátelskému cíli sílu útoku, dobré seslat před pullem.",
       "divine_protection": "Rychlá ochranná záštita, která pohltí poškození, když přituhne.",
       "raptor_strike": "Tvrdý útok na blízko pro chvíle, kdy se k tobě něco dostane.",
-      "pack_command": "Orders your companion to strike and build Pack Ferocity. Each stack makes your pet deal 10% more damage, up to 30%, before Unleash Beast spends the stacks.",
-      "stampede": "Calls three beasts to attack for 12 seconds. Use it at full Pack Ferocity so they keep the maximum damage bonus for the whole summon.",
-      "measured_shot": "A deliberate ranged shot that restores Focus for your heavier attacks.",
+      "pack_command": "Přikáže tvému společníkovi udeřit a budovat Zuřivost smečky. Každý nános způsobí, že tvůj společník zadá o 10% větší poškození, až do 30%, než Vypusť bestii nánosy utratí.",
+      "stampede": "Přivolá tři bestie k útoku na 12 sekund. Použij ji při plné Zuřivosti smečky, aby si udržely maximální bonus k poškození po celé přivolání.",
+      "measured_shot": "Rozvážný výstřel na dálku, který obnoví soustředění pro tvé těžší útoky.",
       "aspect_of_the_hawk": "Postoj, který udržuješ pro ostřejší sílu útoku na dálku.",
       "serpent_sting": "Zasadí jed, který v čase krvácí přírodní poškození.",
       "arcane_shot": "Okamžitý výstřel z dálky pro rychlé extra poškození.",
@@ -3326,19 +3326,19 @@ export const cs_CZ: EnTranslations = {
       "power_word_shield": "Obalí spojence štítem, který pohltí zásahy před dopadem.",
       "renew": "Léčení tikající v čase, dobré seslat a pokračovat v pohybu.",
       "lightning_bolt": "Kouzlo přírodního poškození na dálku, tvoje základní volba z odstupu.",
-      "chain_lightning": "Strikes one target and jumps to two nearby enemies, building one Thunder for the whole cast.",
-      "thunder_reservoir": "Banks lightning until Earthen Jolt or Faultwake can release a full-power payoff.",
+      "chain_lightning": "Zasáhne jeden cíl a přeskočí na dva blízké nepřátele, přičemž za celé seslání získá jeden Hrom.",
+      "thunder_reservoir": "Hromadí blesky, dokud Zemní otřes nebo Zemětřesení nemohou uvolnit výplatu v plné síle.",
       "rockbiter_weapon": "Naplní zbraň, aby každý švih na blízko dopadl tvrději.",
       "healing_wave": "Tvoje hlavní léčení, přímá náprava pro tebe nebo spojence.",
       "earth_shock": "Okamžitý šok pro rychlé přírodní poškození, když ho potřebuješ hned.",
       "lightning_shield": "Nabije tě, takže útočníci dostanou přírodní poškození, když tě zasáhnou.",
       "flame_shock": "Okamžité spálení, které zasáhne hned a dál pálí v čase.",
       "galeheart_weapon": "Naplní obě zbraně bouřlivým větrem a odměňuje stálý rytmus útoků.",
-      "warspirit_cadence": "Turns a steady weapon rhythm into Galeheart Echoes and an instant spell opportunity.",
-      "stormsurge": "Sometimes brings Ancestral Strike back early after you spend a Stormcast opportunity.",
+      "warspirit_cadence": "Promění ustálený rytmus zbraně v Ozvěny srdce vichru a příležitost k okamžitému kouzlu.",
+      "stormsurge": "Někdy vrátí Úder předků dříve poté, co utratíš příležitost se Znamením bouře.",
       "lifespring_weapon": "Naplní zbraň léčivou vodou a posílí plynulý proud léčení.",
       "tidecall": "Přivolá příliv a posílí následující sérii léčivých kouzel.",
-      "ancestor_return": "Returns every fallen group or raid member to life after a long out-of-combat cast.",
+      "ancestor_return": "Vrátí k životu každého padlého člena skupiny nebo výpravy po dlouhém seslání mimo boj.",
       "stoneward": "Vztyčí nabitý kamenný štít, který mění utržené poškození v léčení.",
       "primal_exaltation": "Krátce uvolní živelnou sílu odpovídající specializaci.",
       "fireball": "Tvoje hlavní ohnivá rána, zasáhne a nechá cíl hořet.",
@@ -5841,7 +5841,7 @@ export const cs_CZ: EnTranslations = {
       "mana": "Mana",
       "energy": "Energie",
       "rage": "Vztek",
-      "focus": "Focus"
+      "focus": "Soustředění"
     },
     "roles": {
       "warrior": "Tank / DPS na blízko",
@@ -6223,7 +6223,7 @@ export const cs_CZ: EnTranslations = {
       "notEnoughRage": "Nedostatek vzteku!",
       "notEnoughEnergy": "Nedostatek energie!",
       "notEnoughMana": "Nedostatek many!",
-      "notEnoughDevotion": "Not enough Devotion!",
+      "notEnoughDevotion": "Nedostatek Oddanosti!",
       "notEnoughResource": "Nedostatek zdroje: {resource}!",
       "notEnoughHealth": "Nedostatek zdraví.",
       "targetMustDodge": "Tvůj cíl se musí nejdřív vyhnout.",
@@ -6537,8 +6537,8 @@ export const cs_CZ: EnTranslations = {
       "mana": "Mana",
       "rage": "Vztek",
       "energy": "Energie",
-      "focus": "Focus",
-      "devotion": "Devotion"
+      "focus": "soustředění",
+      "devotion": "Oddanost"
     },
     "forms": {
       "bear": "Medvěd",
@@ -6915,56 +6915,56 @@ export const cs_CZ: EnTranslations = {
         "description": "Sesype šípy na cílovou oblast po dobu 3 s a způsobí {damage} poškození každých 0,5 s nepřátelům uvnitř."
       },
       "pack_command": {
-        "name": "Pack Command",
-        "description": "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit."
+        "name": "Povel smečky",
+        "description": "Přikaž svému živému společníkovi udeřit za 36 až 48 Fyzického poškození. Poškození roste se silou útoku společníka. Zásah obnoví 20 soustředění a udělí 1 Zuřivost smečky na 30 s, až do 3. Každý nános zvyšuje veškeré poškození tvého společníka o 10%. Tento úder používá nánosy, které jsi měl před zásahem."
       },
       "stampede": {
-        "name": "Stampede",
-        "description": "Summon 3 beasts for 12 sec. Each attacks every 2 sec for {damage} Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed after 5 failed chances. It cannot reset while the beasts are active. (Packlord)"
+        "name": "Úprk",
+        "description": "Přivolá 3 bestie na 12 s. Každá útočí každé 2 s za {damage} Fyzického poškození. Zobrazené poškození zahrnuje 8% tvé síly útoku na dálku před bonusy k poškození společníka. Bestie zafixují Zuřivost smečky při přivolání a získají 10% poškození za nános. Zatímco je Úprk v obnově, úspěšné Povely smečky mají 20% šanci jej resetovat, zaručeně po 5 neúspěšných šancích. Nemůže se resetovat, dokud jsou bestie aktivní. (Pán smečky)"
       },
       "unleash_beast": {
-        "name": "Unleash Beast",
-        "description": "Consume 3 Pack Ferocity after your pet strikes for 83 to 105 Physical damage and claps every enemy within 6 yards for 26 to 34. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 nearby enemies."
+        "name": "Vypusť bestii",
+        "description": "Spotřebuje 3 Zuřivosti smečky poté, co tvůj společník udeří za 83 až 105 Fyzického poškození a otřese každým nepřítelem do 6 metrů za 26 až 34. Úder i otřes používají plný 30% bonus k poškození společníka ze Zuřivosti smečky a rostou se silou útoku společníka. Po následujících 8 s společník způsobuje o 25% větší poškození, útočí o 35% rychleji a Prokletý výstřel zasáhne až 2 blízké nepřátele."
       },
       "measured_shot": {
-        "name": "Measured Shot",
-        "description": "Shoot the target for {damage} Physical damage. A hit restores 20 Focus. Damage increases with Ranged Attack Power."
+        "name": "Odměřený výstřel",
+        "description": "Vystřel na cíl za {damage} Fyzického poškození. Zásah obnoví 20 soustředění. Poškození roste se silou útoku na dálku."
       },
       "cold_focus": {
-        "name": "Cold Focus",
-        "description": "For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)"
+        "name": "Chladné soustředění",
+        "description": "Po dobu 12 s Odměřený výstřel obnoví o 50% více soustředění a Dlouhý nátah stojí o 25% méně a sesílá se o 30% rychleji. (Signatura Chladného zraku)"
       },
       "bloodhook": {
-        "name": "Bloodhook",
-        "description": "Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)"
+        "name": "Krvavý hák",
+        "description": "Vyraz na nepřítele a uděl Ránu krvavého háku, která způsobí 34 základního Fyzického poškození plus 26% tvé síly útoku na dálku po dobu 12 s ve 4 ticích. (Signatura Polního umu)"
       },
       "shrapnel_charge": {
-        "name": "Shrapnel Charge",
-        "description": "Hit the target for 24 to 30 Physical damage and up to 4 other enemies within 6 yards for 13 to 17. Other targets also bleed for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Direct damage increases with Ranged Attack Power."
+        "name": "Střepinová nálož",
+        "description": "Zasáhne cíl za 24 až 30 Fyzického poškození a až 4 další nepřátele do 6 metrů za 13 až 17. Ostatní cíle navíc krvácejí za 12 poškození po dobu 6 s. Pokud hlavní cíl nese tvou Ránu krvavého háku, způsobí 1 tik rány okamžitě. Přímé poškození roste se silou útoku na dálku."
       },
       "bloodtrail_assault": {
-        "name": "Bloodtrail Assault",
-        "description": "For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 nearby enemies, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards, deals 25% more base damage to its main target, and triggers 50% more wound damage."
+        "name": "Útok krvavé stopy",
+        "description": "Po dobu 12 s Krvavý hák rozšíří ránu se 60% silou až na 2 blízké nepřátele, Trhání ran přikáže útok společníka za 18 poškození a Střepinová nálož získá 2 metry, způsobí o 25% větší základní poškození svému hlavnímu cíli a spustí o 50% větší poškození z ran."
       },
       "trailbreak": {
-        "name": "Trailbreak",
-        "description": "Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
+        "name": "Zlom stopy",
+        "description": "Skoč 12 metrů vzad. Máš-li Lovecký spád, obnoví se a připraví Návrat na 12 s."
       },
       "wildheart": {
-        "name": "Wildheart",
-        "description": "Immediately restore 30% of your maximum health."
+        "name": "Divoké srdce",
+        "description": "Okamžitě obnoví 30% tvého maximálního zdraví."
       },
       "shellskin": {
-        "name": "Shellskin",
-        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+        "name": "Krunýřová kůže",
+        "description": "Snižuje utrpěné poškození o 60% na 8 s, ale zabraňuje útokům, dokud je aktivní."
       },
       "frostjaw_trap": {
-        "name": "Frostjaw Trap",
-        "description": "Place a trap at the selected enemy or at your feet. It arms after 0.75 sec and lasts 30 sec. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec."
+        "name": "Past mrazivé čelisti",
+        "description": "Umísti past k vybranému nepříteli nebo ke svým nohám. Aktivuje se po 0,75 s a trvá 30 s. První nepřítel, který ji spustí, je znehybněn na 3 s a nepřátelé do 4 metrů jsou zpomaleni o 50% na 4 s."
       },
       "pack_rally": {
-        "name": "Pack Rally",
-        "description": "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec."
+        "name": "Shromáždění smečky",
+        "description": "Přijmi Podobu oře a shromáždi blízké spojence s 30% rychlosti pohybu a 10% rychlosti útoku a sesílání na 10 s."
       },
       "hurricane": {
         "name": "Hurikán",
@@ -7275,116 +7275,116 @@ export const cs_CZ: EnTranslations = {
         "description": "Vyléčí spojenecký cíl za {damage}."
       },
       "divine_ascension": {
-        "name": "Divine Ascension",
-        "description": "Consume 20 Devotion to gain 5 Ascension charges for up to 45 sec. Marked abilities consume one charge and gain an additional effect."
+        "name": "Božský vzestup",
+        "description": "Spotřebuje 20 Oddanosti a získá 5 nábojů Vzestupu až na 45 s. Označené schopnosti spotřebují jeden náboj a získají další efekt."
       },
       "aura_mastery": {
-        "name": "Sacred Concord",
-        "description": "For 8 sec, empower every active Devotion and Requital Aura in your group. Bastion Devotion reduces damage by 15%; Requital deals 15 Holy damage. Multiple uses refresh instead of stacking."
+        "name": "Svatá svornost",
+        "description": "Na 8 s posílí každou aktivní Oddanost a Auru odplaty ve tvé skupině. Oddanost bastionu snižuje poškození o 15%; Odplata způsobí 15 Svatého poškození. Vícenásobná použití se obnovují místo sčítání."
       },
       "devotion_ward": {
-        "name": "Bastion Devotion",
-        "description": "Reduce damage taken by you and party members by 5% until death or replacement. Only this aura and Requital Aura replace each other; Radiant, Dawn, and Grace Devotion coexist."
+        "name": "Oddanost bastionu",
+        "description": "Snižuje poškození, které utrpíš ty a členové skupiny, o 5% do smrti nebo nahrazení. Pouze tato aura a Aura odplaty se navzájem nahrazují; Zářivá oddanost, Oddanost úsvitu a milosti koexistují."
       },
       "hammer_of_grace": {
-        "name": "Hammer of Grace",
-        "description": "Instantly hurl a holy hammer at an enemy within 20 m for {damage}, restoring 70 mana, healing yourself for 50% of damage dealt, and generating 1 Devotion when it deals damage. Solar Reprisal lets Hammer of Grace ignore its cooldown and heal you for 100% of damage dealt."
+        "name": "Kladivo milosti",
+        "description": "Okamžitě mrští svatým kladivem na nepřítele do 20 m za {damage}, obnoví 70 many, vyléčí tě za 50% způsobeného poškození a získá 1 Oddanost, když způsobí poškození. Sluneční odplata nechá Kladivo milosti ignorovat obnovu a vyléčí tě za 100% způsobeného poškození."
       },
       "hushbrand": {
-        "name": "Hushbrand",
-        "description": "Interrupts spellcasting and prevents spells from that school for 4 sec."
+        "name": "Znamení ticha",
+        "description": "Přeruší sesílání a zabrání kouzlům z dané školy na 4 s."
       },
       "guardian_covenant": {
-        "name": "Guardian Covenant",
-        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
+        "name": "Úmluva strážce",
+        "description": "Chrání spřáteleného cíle i tebe a snižuje utrpěné poškození o 20% na 8 s. Ve výchozím stavu vybere tebe, pokud není zvolen spřátelený cíl."
       },
       "solar_step": {
-        "name": "Solar Step",
-        "description": "Increase your movement speed by 150% for 2 sec."
+        "name": "Sluneční krok",
+        "description": "Zvýší tvou rychlost pohybu o 150% na 2 s."
       },
       "solar_invocation": {
-        "name": "Solar Invocation",
-        "description": "Instantly heal an ally for {damage} or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much."
+        "name": "Sluneční vzývání",
+        "description": "Okamžitě vyléčí spojence za {damage} nebo způsobí mírné Svaté poškození nepříteli. Obě použití získají 1 Oddanost. Během Vzestupu léčivé seslání vyléčí také spřátelené hráče do 10 m od cíle za polovinu."
       },
       "radiant_devotion": {
-        "name": "Radiant Devotion",
-        "description": "Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion, but coexists with Devotions from other Paladins."
+        "name": "Zářivá oddanost",
+        "description": "Zvyšuje tvou sílu kouzel a sílu členů skupiny o 20 na 30 min. Nahrazuje tvou vlastní Oddanost úsvitu nebo milosti, ale koexistuje s Oddanostmi jiných paladinů."
       },
       "dawn_devotion": {
-        "name": "Dawn Devotion",
-        "description": "Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion, but coexists with Devotions from other Paladins and with Warrior shouts."
+        "name": "Oddanost úsvitu",
+        "description": "Zvyšuje tvou útočnou sílu a sílu členů skupiny o 40 na 30 min. Nahrazuje tvou vlastní Zářivou oddanost nebo Oddanost milosti, ale koexistuje s Oddanostmi jiných paladinů a s válečnickými pokřiky."
       },
       "grace_devotion": {
-        "name": "Grace Devotion",
-        "description": "You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min. Replaces your own Radiant or Dawn Devotion, but coexists with Devotions from other Paladins."
+        "name": "Oddanost milosti",
+        "description": "Ty a členové skupiny obnovujete 15 many každých 5 s a platíte o 3% méně many po dobu 30 min. Nahrazuje tvou vlastní Zářivou oddanost nebo Oddanost úsvitu, ale koexistuje s Oddanostmi jiných paladinů."
       },
       "recall_the_fallen": {
-        "name": "Recall the Fallen",
-        "description": "Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group."
+        "name": "Povolej padlé",
+        "description": "Vrátí mrtvého člena skupiny zpět k životu s 35% zdraví a many. Slunečný léčitel na úrovni 16 nebo vyšší místo toho povolá zpět každého padlého člena skupiny."
       },
       "beacon_of_light": {
-        "name": "Beacon of Light",
-        "description": "Mark one group member as your Beacon of Light. 50% of your effective direct healing on another group member within 60 m also heals the Beacon. Area and periodic healing do not transfer. Lasts until either of you dies."
+        "name": "Maják světla",
+        "description": "Označí jednoho člena skupiny jako tvůj Maják světla. 50% tvého účinného přímého léčení na jiném členovi skupiny do 60 m léčí také Maják. Plošné a periodické léčení se nepřenáší. Trvá, dokud jeden z vás nezemře."
       },
       "final_edict": {
-        "name": "Final Edict",
-        "description": "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Holy explosion around you."
+        "name": "Poslední edikt",
+        "description": "Zasadí drtivý úder zbraní a získá 1 Oddanost, když způsobí poškození. Úspěšný zásah zkrátí zbývající obnovu Pádu úsvitu o 2 s. Úspěšné automatické útoky a zásahy Posledního ediktu mají 15% šanci udělit Hněv úsvitu na 8 s. Vzestup navíc uvolní Svatou explozi kolem tebe."
       },
       "dawnfall": {
-        "name": "Dawnfall",
-        "description": "Deal {damage} Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict's remaining cooldown by 2 sec. Ascension increases its damage and radius."
+        "name": "Pád úsvitu",
+        "description": "Způsobí {damage} Svatého poškození blízkým nepřátelům a získá 1 Oddanost. Zásah alespoň jednoho nepřítele zkrátí zbývající obnovu Posledního ediktu o 2 s. Vzestup zvýší jeho poškození a poloměr."
       },
       "sun_gods_verdict": {
-        "name": "Verdict of the Sun God",
-        "description": "Judge an enemy beneath the Verdict of the Sun God for 30 sec. Final Edict and Dawnfall inscribe one charge on a successful hit. The ability that lands the third charge dictates the sentence: Final Edict unleashes devastating damage on the condemned; Dawnfall detonates the verdict, damaging and stunning nearby enemies for 1.5 sec."
+        "name": "Ortel boha slunce",
+        "description": "Odsoudí nepřítele pod Ortel boha slunce na 30 s. Poslední edikt a Pád úsvitu vepíší jeden náboj při úspěšném zásahu. Schopnost, která umístí třetí náboj, určí rozsudek: Poslední edikt uvolní ničivé poškození na odsouzeného; Pád úsvitu ortel odpálí a poškodí a omráčí blízké nepřátele na 1,5 s."
       },
       "valkyrs_calling": {
-        "name": "Valkyr's Calling",
-        "description": "Ascend into the air, becoming immune to damage as you fly toward the enemy. After 2 sec, descend upon the target area for {damage} Holy damage and generate 1 Devotion. Ascension increases the impact damage by 50% and consumes 1 charge."
+        "name": "Volání valkýry",
+        "description": "Vzneseš se do vzduchu a staneš se imunním vůči poškození, zatímco letíš k nepříteli. Po 2 s se snese na cílovou oblast za {damage} Svatého poškození a získá 1 Oddanost. Vzestup zvýší poškození dopadu o 50% a spotřebuje 1 náboj."
       },
       "faithforged_guard": {
-        "name": "Debt of Light",
-        "description": "For 8 sec, the next enemy hit against you is answered: up to {buff} damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered. Ascension raises the amount it can answer by 50%."
+        "name": "Dluh světla",
+        "description": "Na 8 s je další nepřátelský zásah proti tobě zodpovězen: až {buff} poškození je odepřeno a vráceno útočníkovi jako Svaté poškození a ty získáš 1 Oddanost. Zodpovězen je pouze jeden úder. Vzestup zvýší množství, které dokáže zodpovědět, o 50%."
       },
       "mercy_lance": {
-        "name": "Mercy Lance",
-        "description": "Deal {damage} Holy damage to an enemy and generate 1 Devotion when it deals damage. During Ascension, it consumes 1 charge to guarantee a critical hit."
+        "name": "Kopí milosrdenství",
+        "description": "Způsobí {damage} Svatého poškození nepříteli a získá 1 Oddanost, když způsobí poškození. Během Vzestupu spotřebuje 1 náboj a zaručí kritický zásah."
       },
       "sacred_form": {
-        "name": "Sacred Form",
-        "description": "Enter a sacred state until death, increasing healing by 10%, spell critical chance by 5%, and reducing threat generated by 50%. Sunmender only."
+        "name": "Svatá podoba",
+        "description": "Vstoupí do svatého stavu až do smrti, zvýší léčení o 10% a kritickou šanci kouzel o 5% a sníží vytvářenou hrozbu o 50%. Pouze pro Slunečné léčitele."
       },
       "dawns_embrace": {
-        "name": "Dawn's Embrace",
-        "description": "Deliver a powerful heal and generate 1 Devotion. Radiant Resonance reduces its mana cost by 50% and cast time to 1.5 sec. Ascension makes it instant and increases its healing by 35%."
+        "name": "Objetí úsvitu",
+        "description": "Uvolní mocné léčení a získá 1 Oddanost. Zářivá rezonance sníží jeho náklady na manu o 50% a dobu sesílání na 1,5 s. Vzestup jej učiní okamžitým a zvýší jeho léčení o 35%."
       },
       "radiant_chorus": {
-        "name": "Radiant Chorus",
-        "description": "Heal nearby allies for {damage} and generate 1 Devotion. Effectively healing at least 2 allies grants Radiant Resonance: your next Mending Light is instant, or your next Dawn's Embrace costs 50% less mana and casts in 1.5 sec. Ascension increases Radiant Chorus healing and radius."
+        "name": "Zářivý sbor",
+        "description": "Vyléčí blízké spojence za {damage} a získá 1 Oddanost. Účinné vyléčení alespoň 2 spojenců udělí Zářivou rezonanci: tvé další Léčivé světlo bude okamžité, nebo tvé další Objetí úsvitu stojí o 50% méně many a sesílá se za 1,5 s. Vzestup zvýší léčení a poloměr Zářivého sboru."
       },
       "life_covenant": {
-        "name": "Life Covenant",
-        "description": "Reduce an ally's damage taken by 40% for 6 sec. During Ascension it also grants a 120-point shield without consuming a charge."
+        "name": "Úmluva života",
+        "description": "Snižuje poškození utrpěné spojencem o 40% na 6 s. Během Vzestupu navíc udělí štít 120 bodů bez spotřebování náboje."
       },
       "aegis_first_dawn": {
-        "name": "Aegis of the First Dawn",
-        "description": "Channel for 5 sec, creating a 10 meter holy dome. Allies inside are healed every second and take 50% less damage. Completing the channel releases a final heal and grants 30% movement speed for 4 sec."
+        "name": "Egida prvního úsvitu",
+        "description": "Sesílej 5 s a vytvoř svatou kupoli o průměru 10 metrů. Spojenci uvnitř jsou léčeni každou sekundu a utrpí o 50% méně poškození. Dokončení seslání uvolní závěrečné léčení a udělí 30% rychlosti pohybu na 4 s."
       },
       "vowkeeper_strike": {
-        "name": "Vowkeeper Strike",
-        "description": "Strike with high threat and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal empowers your next Sunward Disc, Hammer of Grace, or Mending Light. Ascension also grants a small absorption shield."
+        "name": "Úder strážce slibů",
+        "description": "Udeří s vysokou hrozbou a získá 1 Oddanost. Úspěšný úder má 20% šanci udělit Sluneční odplatu na 8 s; každý úspěšný blok 25%. Sluneční odplata posílí tvůj další Sluneční disk, Kladivo milosti nebo Léčivé světlo. Vzestup navíc udělí malý pohlcující štít."
       },
       "bastion_rite": {
-        "name": "Bastion Rite",
-        "description": "Reduce physical damage taken by 20% and increase block chance by 20% for 6 sec. Ascension extends the duration to 10 sec."
+        "name": "Obřad bastionu",
+        "description": "Snižuje utrpěné fyzické poškození o 20% a zvyšuje šanci na blok o 20% na 6 s. Vzestup prodlouží trvání na 10 s."
       },
       "sunward_disc": {
-        "name": "Sunward Disc",
-        "description": "Requires a shield. Hurl a radiant disc that strikes and then bounces between nearby enemies. Each damaging impact generates 1 Devotion. Solar Reprisal makes Sunward Disc cost no mana, ignore its cooldown, and deal 20% more damage. Ascension empowers 5 bounces."
+        "name": "Sluneční disk",
+        "description": "Vyžaduje štít. Mrští zářivým diskem, který zasáhne a poté se odráží mezi blízkými nepřáteli. Každý poškozující dopad získá 1 Oddanost. Sluneční odplata způsobí, že Sluneční disk nestojí manu, ignoruje obnovu a způsobí o 20% větší poškození. Vzestup posílí 5 odrazů."
       },
       "sacred_challenge": {
-        "name": "Sacred Goad",
-        "description": "Compel an enemy to attack you. During Ascension it also reduces all damage received by 15% for 4 sec without consuming a charge."
+        "name": "Svatá pobídka",
+        "description": "Přinutí nepřítele, aby na tebe zaútočil. Během Vzestupu navíc sníží veškeré utrpěné poškození o 15% na 4 s bez spotřebování náboje."
       },
       "devotion_aura": {
         "name": "Neochvějná aura",
@@ -7423,20 +7423,20 @@ export const cs_CZ: EnTranslations = {
         "description": "Posvětí půdu pod tebou a sežehne blízké nepřátele za {damage} svatého poškození každé 2 s po dobu 10 s."
       },
       "bastion_sweep": {
-        "name": "Bastion Sweep",
-        "description": "Sweep your equipped shield through enemies in a 180 degree frontal arc for {damage} Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m."
+        "name": "Rozmach bastionu",
+        "description": "Rozmáchni se nasazeným štítem skrz nepřátele v předním oblouku 180 stupňů za {damage} Svatého poškození s vysokou hrozbou a získej 1 Oddanost. Vzestup zvýší poškození o 30% a poloměr na 8 m."
       },
       "oath_chain": {
-        "name": "Oath Chain",
-        "description": "Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy."
+        "name": "Řetěz přísahy",
+        "description": "Okamžitě spoutá vzdáleného nepřítele svatým řetězem. Nepřítel se k tobě přesouvá rychlostí 18 m za sekundu, dokud nedosáhne 3 m, a poté je zpomalen o 50% na 4 s. Během Vzestupu spoutá druhého blízkého nepřítele."
       },
       "veilbound_march": {
-        "name": "Veilbound March",
-        "description": "Become ethereal for 4 sec, gaining 40% movement speed and 30% armor and becoming immune to roots, slows, and displacement. Enemies you pass through are Veil Marked for 6 sec, taking Holy damage each second, dealing 20% less damage to you, and generating extra threat. The first mark grants 1 Devotion. When the march ends, nearby marked enemies take a final burst. Ascension increases the burst by 50% and lightly pulls them toward you."
+        "name": "Pochod závoje",
+        "description": "Staneš se éterickým na 4 s, získáš 40% rychlosti pohybu a 30% brnění a staneš se imunním vůči znehybnění, zpomalení a odsunutí. Nepřátelé, kterými projdeš, získají Znamení závoje na 6 s: každou sekundu utrpí Svaté poškození, způsobují ti o 20% menší poškození a vytvářejí dodatečnou hrozbu. První znamení udělí 1 Oddanost. Když pochod skončí, blízcí označení nepřátelé utrpí závěrečný výbuch. Vzestup zvýší výbuch o 50% a lehce je přitáhne k tobě."
       },
       "veilbound_mark": {
-        "name": "Veil Mark",
-        "description": "Takes Holy damage each second, deals 20% less damage to the Paladin who applied the mark, and generates additional threat toward that Paladin."
+        "name": "Znamení závoje",
+        "description": "Každou sekundu utrpí Svaté poškození, způsobuje o 20% menší poškození paladinovi, který znamení umístil, a vytváří vůči tomuto paladinovi dodatečnou hrozbu."
       },
       "righteous_fury": {
         "name": "Hořící přísaha",
@@ -7479,12 +7479,12 @@ export const cs_CZ: EnTranslations = {
         "description": "Protiútok po uhnutí cíle za poškození zbraně plus {damage}. Nelze mu uhnout."
       },
       "hunting_momentum": {
-        "name": "Hunting Momentum",
-        "description": "Passive: Gutting Strike grants 1 Hunting Momentum for 8 sec, up to 3. At 3 stacks, Woundrend deals 45% more strike damage and consumes the stacks. (Fieldcraft)"
+        "name": "Lovecký spád",
+        "description": "Pasivní: Kuchající úder udělí 1 Lovecký spád na 8 s, až do 3. Při 3 nánosech Trhání ran způsobí o 45% větší poškození úderu a spotřebuje nánosy. (Polní um)"
       },
       "fieldcraft_reentry": {
-        "name": "Armed Re-entry",
-        "description": "Passive: Trailbreak refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)"
+        "name": "Ozbrojený návrat",
+        "description": "Pasivní: Zlom stopy obnoví Lovecký spád a připraví tvůj další Kuchající úder nebo Krvavý hák na 12 s. Kuchající úder způsobí o 15% větší poškození za nános. Krvavý hák způsobí 18 až 24 dodatečného Fyzického poškození, zvýšeného o 15% za nános a tvou silou útoku na dálku. Při 3 nánosech jeden z útoků spotřebuje Lovecký spád. (Polní um)"
       },
       "wing_clip": {
         "name": "Spoutávající sek",
@@ -7551,8 +7551,8 @@ export const cs_CZ: EnTranslations = {
         "description": "Vrhe bleskový šíp za {damage} přírodního poškození."
       },
       "thunder_reservoir": {
-        "name": "Thunder Reservoir",
-        "description": "Passive: Arc Bolt and Skybranch grant Thunder, up to 5. At 5 Thunder, Earthen Jolt deals 125% more damage or Faultwake deals 100% more damage, then consumes all Thunder. (Thundercall)"
+        "name": "Zásobárna hromu",
+        "description": "Pasivní: Bleskový šíp a Rozvětvený blesk udělují Hrom, až do 5. Při 5 Hromech způsobí Zemní otřes o 125% větší poškození nebo Zemětřesení o 100% větší a poté spotřebuje veškerý Hrom. (Volání hromu)"
       },
       "rockbiter_weapon": {
         "name": "Zbraň spoutaná kamenem",
@@ -7779,36 +7779,36 @@ export const cs_CZ: EnTranslations = {
         "description": "Vyléčí spojenecký cíl za velké množství zdraví, poté přeskočí až na 2 další blízké spojence. Každý další skok léčí o 50 % méně. (klíčová schopnost Obnovy)"
       },
       "galeheart_weapon": {
-        "name": "Galeheart Weapon",
-        "description": "Imbue both weapons for 30 min, enabling Warspirit Cadence."
+        "name": "Zbraň srdce vichru",
+        "description": "Očaruje obě zbraně na 30 min a umožní Kadenci válečného ducha."
       },
       "warspirit_cadence": {
-        "name": "Warspirit Cadence",
-        "description": "Passive: Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)"
+        "name": "Kadence válečného ducha",
+        "description": "Pasivní: každý 3. úspěšný útok zbraní spustí 2 Ozvěny srdce vichru za 50% Přírodního poškození a udělí Znamení bouře na 12 s. Znamení bouře učiní tvůj další Bleskový šíp, Otřes nebo Léčivé vody okamžitými a sníží jejich náklady na manu o 50%. Úder předků se počítá jako 2 útoky. (Válečný duch)"
       },
       "stormsurge": {
-        "name": "Stormsurge",
-        "description": "Passive: While Ancestral Strike is on cooldown, consuming Stormcast has a 25% chance to reset it. If the first 3 chances fail, the 4th always resets it. (Warspirit)"
+        "name": "Bouřná vlna",
+        "description": "Pasivní: zatímco je Úder předků v obnově, spotřebování Znamení bouře má 25% šanci jej resetovat. Pokud první 3 šance selžou, 4. jej vždy resetuje. (Válečný duch)"
       },
       "lifespring_weapon": {
-        "name": "Lifespring Weapon",
-        "description": "Imbue your weapon for 30 min. Mending Waters and Tidecall add 20% more healing to Mending Current."
+        "name": "Zbraň pramene života",
+        "description": "Očaruje tvou zbraň na 30 min. Léčivé vody a Volání přílivu přidávají o 20% více léčení do Léčivého proudu."
       },
       "unleash_weapon": {
-        "name": "Unleash Weapon",
-        "description": "Unleash your active weapon enchant. Pyrebrand deals 54 to 64 Fire damage, gains 30% of Spell Power, and grants 2 Thunder. Galeheart strikes with your weapon, advances Warspirit Cadence, and grants 20% attack speed for 6 sec. Stonebound strikes for 75% weapon damage, forces the target to attack you, and reduces damage taken by 20% for 4 sec. Lifespring consumes your Mending Current, heals for 125% of its remaining healing, and reduces the next hit within 8 sec by 50% of the health restored."
+        "name": "Vypusť zbraň",
+        "description": "Vypustí aktivní očarování tvé zbraně. Ohnivé znamení způsobí 54 až 64 Ohnivého poškození, získá 30% síly kouzel a udělí 2 Hromy. Srdce vichru udeří tvou zbraní, posune Kadenci válečného ducha a udělí 20% rychlosti útoku na 6 s. Kamenné pouto udeří za 75% poškození zbraní, přinutí cíl zaútočit na tebe a sníží utrpěné poškození o 20% na 4 s. Pramen života spotřebuje tvůj Léčivý proud, vyléčí za 125% jeho zbývajícího léčení a sníží další zásah do 8 s o 50% obnoveného zdraví."
       },
       "primal_exaltation": {
-        "name": "Primal Exaltation",
-        "description": "For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)"
+        "name": "Prvotní povznesení",
+        "description": "Po dobu 12 s se Bleskový šíp a Rozvětvený blesk Volání hromu sesílají o 50% rychleji a Bleskový šíp udělí 2 Hromy; Válečný duch spouští svou kadenci každé 2 zásahy zbraní; Duchovní látka přidává o 50% více léčení do Léčivého proudu. (Talent šamana)"
       },
       "stoneward": {
-        "name": "Stoneward",
-        "description": "Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)"
+        "name": "Kamenná stráž",
+        "description": "Chrání spojence po dobu 60 s se 6 náboji. Poškození spotřebuje náboj a vyléčí 5% maximálního zdraví, jednou za 3 s. (Talent šamana)"
       },
       "tidecall": {
-        "name": "Tidecall",
-        "description": "Heal a friendly target for 58 to 72. The heal increases with Spell Power. Add the same healing calculated before overhealing to Mending Current, up to 30% of the target's maximum health."
+        "name": "Volání přílivu",
+        "description": "Vyléčí spřáteleného cíle za 58 až 72. Léčení roste se silou kouzel. Přidá stejné léčení spočítané před přeléčením do Léčivého proudu, až do 30% maximálního zdraví cíle."
       },
       "metamorphosis": {
         "name": "Děsivý zjev",
@@ -8195,8 +8195,8 @@ export const cs_CZ: EnTranslations = {
         "description": "Vrátí časovou osu každého padlého člena vaší skupiny nebo raidu a oživí ho u jeho těla s 30% zdraví a many. Nelze seslat v boji. (Chronomancie)"
       },
       "ancestor_return": {
-        "name": "Ancestors' Return",
-        "description": "Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)"
+        "name": "Návrat předků",
+        "description": "Povolá zpět k životu u jejich těla každého padlého člena tvé skupiny nebo výpravy s 30% zdraví a many. Nelze seslat v boji. (Duchovní látka)"
       },
       "temporal_rewind": {
         "name": "Přetočení",
@@ -8315,28 +8315,28 @@ export const cs_CZ: EnTranslations = {
         "description": "Pohltí magický účinek (prospěšný z nepřítele nebo škodlivý ze spojence) a vyléčí vás o 6 % maximálního zdraví."
       },
       "veilstep": {
-        "name": "Veilstep",
-        "description": "Steps through the veil in the direction you are facing."
+        "name": "Krok závoje",
+        "description": "Prokročí závojem ve směru, kterým hledíš."
       },
       "scouring_mercy": {
-        "name": "Scouring Mercy",
-        "description": "Deal 72 to 84 Holy damage to an enemy or heal a friendly target for 130 to 155. Both amounts increase with Spell Power. Damage also heals each Doctrine-linked ally for 30%, or the lowest-health party member for 15% if no ally is linked. (Doctrine signature)"
+        "name": "Očistné milosrdenství",
+        "description": "Způsobí 72 až 84 Svatého poškození nepříteli nebo vyléčí spřáteleného cíle za 130 až 155. Obě hodnoty rostou se silou kouzel. Poškození navíc vyléčí každého spojence spojeného Doktrínou za 30%, nebo člena skupiny s nejnižším zdravím za 15%, pokud není spojen nikdo. (Signatura Doktríny)"
       },
       "seraphic_vigil": {
-        "name": "Seraphic Vigil",
-        "description": "Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)"
+        "name": "Serafínská stráž",
+        "description": "Chrání spojence po dobu 30 s. První zásah, který jej srazí pod 35% zdraví, spotřebuje Stráž a vyléčí jej za 180. (Signatura Požehnání)"
       },
       "summon_tithefiend": {
-        "name": "Call Tithefiend",
-        "description": "Consume all Gloomtithe to summon a Tithefiend for 6, 8, 10, 12, or 15 sec at 1 to 5 stacks. It attacks every 2 sec for 20 to 24 Shadow damage, plus 8 per extra stack. Five stacks make it larger and increase its damage by 25%. Its damage increases with your Spell Power. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)"
+        "name": "Přivolej desátkového běsa",
+        "description": "Spotřebuje veškerý Ponurý desátek a přivolá desátkového běsa na 6, 8, 10, 12 nebo 15 s při 1 až 5 nánosech. Útočí každé 2 s za 20 až 24 Stínového poškození, plus 8 za každý další nános. Při pěti nánosech se zvětší a jeho poškození vzroste o 25%. Jeho poškození roste s tvou silou kouzel. Upřednostňuje tvou Podobiznu. Každý zásah obnoví 1% maximální many a odrazí 15% poškození až na 3 další nepřátele s tvým Žalozpěvem rozkladu. (Signatura Nešpor)"
       },
       "martyrs_aegis": {
-        "name": "Martyr's Aegis",
-        "description": "Reduces one ally incoming damage by 40% for 8 sec."
+        "name": "Egida mučedníka",
+        "description": "Snižuje poškození utrpěné spojencem o 40% na 8 s."
       },
       "choir_of_deliverance": {
-        "name": "Choir of Deliverance",
-        "description": "Channels for 6 sec, healing nearby party members every 2 sec."
+        "name": "Sbor vysvobození",
+        "description": "Sesílá 6 s a léčí blízké členy skupiny každé 2 s."
       },
       "bear_charge": {
         "name": "Medvědí výpad",
@@ -10940,12 +10940,12 @@ export const cs_CZ: EnTranslations = {
         }
       },
       "q_divine_tome": {
-        "title": "The Dawnbound Tome",
-        "text": "The Light does not rest in you quietly, {playerName}. I have watched you lay the dead to peace, and I believe you are ready for what few paladins are ever taught: the Rite of Recall, by which a fallen soul is called back to the living. Its words are kept in the Dawnbound Tome, here in my keeping, but a book is no blessing while the restless dead still walk this ground. Return 6 more Restless Bones to the earth, and I will begin to teach you.",
-        "completion": "The chapel yard grows quiet. You are ready for the words, {playerName}, but the Rite of Recall cannot be spoken in a warm chapel. It must be sung where the veil between life and death wears thin. I mean to carry the Tome north into the Mirefen Marsh. Follow me there, and we will finish this.",
+        "title": "Úsvitem spoutaný svazek",
+        "text": "Světlo v tobě nespočívá tiše, {playerName}. Viděl jsem tě ukládat mrtvé k pokoji a věřím, že jsi připraven na to, čemu se učí jen málo paladinů: Obřad povolání, jímž je padlá duše volána zpět mezi živé. Jeho slova jsou uchována v Úsvitem spoutaném svazku, zde v mé péči, ale kniha není žádným požehnáním, dokud po této zemi stále chodí neklidní mrtví. Vrať zemi ještě 6 Neklidných kostí a začnu tě učit.",
+        "completion": "Nádvoří kaple ztichne. Jsi připraven na slova, {playerName}, ale Obřad povolání nelze pronést v teplé kapli. Musí být zpíván tam, kde se závoj mezi životem a smrtí ztenčuje. Hodlám odnést Svazek na sever do Mirefenských močálů. Následuj mě tam a dokončíme to.",
         "objectives": {
           "0": {
-            "label": "Restless Bones laid to rest"
+            "label": "Neklidné kosti uloženy k odpočinku"
           }
         }
       },
@@ -11106,12 +11106,12 @@ export const cs_CZ: EnTranslations = {
         }
       },
       "q_rite_of_redemption": {
-        "title": "The Rite of Recall",
-        "text": "So you followed me into the mire, {playerName}. Good. I have the Dawnbound Tome here, and this drowned ground is where its words belong: nowhere is the veil between life and death thinner than a place where the dead will not stay buried. But the drowned would drag your voice down mid-verse. Clear a space fit for the rite: put 8 of the Drowned Dead to rest, and we will consecrate it together.",
-        "completion": "Kneel, {playerName}, and read the words aloud. There. Do you feel it? The Light no longer only mends the living in your hands, it can summon back those who have crossed over. Use it wisely. A soul called back to a hopeless fight is a cruelty, not a mercy. Rise, Redeemer.",
+        "title": "Obřad povolání",
+        "text": "Takže jsi mě následoval do bahna, {playerName}. Dobře. Mám tu Úsvitem spoutaný svazek a tato utopená země je místem, kam jeho slova patří: nikde není závoj mezi životem a smrtí tenčí než tam, kde mrtví nezůstanou pohřbeni. Ale utonulí by tvůj hlas stáhli dolů uprostřed verše. Vyklidi prostor hodný obřadu: ulož k odpočinku 8 Utonulých mrtvých a společně jej posvětíme.",
+        "completion": "Poklekni, {playerName}, a přečti slova nahlas. Tak. Cítíš to? Světlo v tvých rukou už nespravuje jen živé, dokáže povolat zpět ty, kdo přešli. Užívej je moudře. Duše povolaná zpět do beznadějného boje je krutost, ne milost. Povstaň, Vykupiteli.",
         "objectives": {
           "0": {
-            "label": "Drowned Dead laid to rest"
+            "label": "Utonulí mrtví uloženi k odpočinku"
           }
         }
       },
