@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { anchorProbeInOpenField } from '../scripts/probe_anchor';
 import { BLOODHOOK_BLEED_ID, HUNTING_MOMENTUM_ID } from '../src/sim/combat/hunter_fieldcraft';
 import { PACK_FEROCITY_AURA_ID } from '../src/sim/combat/hunter_packlord';
 import { spawnFrostjawTrap } from '../src/sim/combat/hunter_trap';
@@ -16,6 +17,9 @@ function setup(): { sim: TestSim; hunter: Entity; target: Entity } {
   const sim = new Sim({ seed: 2960, playerClass: 'hunter', autoEquip: true }) as TestSim;
   sim.setPlayerLevel(20);
   expect(sim.setSpec('survival')).toBe(true);
+  // The v0.31 Eastbrook rebuild walled the spawn in: a 35-yard ranged cast from there is
+  // rejected for want of line of sight. Anchor the fixture in the open field instead.
+  anchorProbeInOpenField(sim);
   const target = createMob(sim.nextId++, MOBS.training_dummy, 20, {
     x: sim.player.pos.x,
     y: sim.player.pos.y,

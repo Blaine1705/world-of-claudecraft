@@ -10,6 +10,7 @@ import {
   type PlayerClass,
   type SimEvent,
 } from '../src/sim/types';
+import { anchorProbeInOpenField } from './probe_anchor';
 
 export type OwnedDpsSpec =
   | 'packlord'
@@ -537,6 +538,7 @@ export function runOwnedClassDpsProbe(
   const fixture = FIXTURES[spec];
   const sim = new Sim({ seed, playerClass: fixture.cls, autoEquip: false }) as ProbeSim;
   sim.setPlayerLevel(20);
+  anchorProbeInOpenField(sim);
   if (!sim.applyTalents({ spec: fixture.talentSpec, rows: {} } as never)) {
     throw new Error(`failed to apply ${fixture.talentSpec}`);
   }
@@ -728,6 +730,7 @@ export function runOwnedHealerProbe(
   const fixture = healerFixture(spec);
   const sim = new Sim({ seed, playerClass: fixture.cls, autoEquip: false }) as ProbeSim;
   sim.setPlayerLevel(20);
+  anchorProbeInOpenField(sim);
   if (!sim.applyTalents({ spec: fixture.talentSpec, rows: {} } as never)) {
     throw new Error(`failed to apply ${fixture.talentSpec}`);
   }
@@ -862,6 +865,7 @@ function incomingDamageForPosture(
 ): number {
   const sim = new Sim({ seed, playerClass: 'shaman', autoEquip: false }) as ProbeSim;
   sim.setPlayerLevel(20);
+  anchorProbeInOpenField(sim);
   if (!sim.applyTalents({ spec: 'enhancement', rows: {} } as never)) {
     throw new Error('failed to apply enhancement');
   }
@@ -903,6 +907,7 @@ export function runWarspiritOfftankProbe(
   const stoneboundIncomingDamage = incomingDamageForPosture('rockbiter_weapon', seed);
   const sim = new Sim({ seed, playerClass: 'shaman', autoEquip: false }) as ProbeSim;
   sim.setPlayerLevel(20);
+  anchorProbeInOpenField(sim);
   if (!sim.applyTalents({ spec: 'enhancement', rows: {} } as never)) {
     throw new Error('failed to apply enhancement');
   }

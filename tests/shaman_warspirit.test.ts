@@ -113,7 +113,12 @@ describe('Shaman v0.29 Warspirit', () => {
     sim.castAbility('healing_wave', shaman.id);
 
     expect(shaman.castingAbility).toBeNull();
-    expect(manaBefore - shaman.resource).toBeCloseTo((definition?.cost ?? 0) * 0.5, 5);
+    // The cast path has always CEILED a discounted cost (casting_lifecycle's
+    // `Math.ceil(res.cost * cheap)`), which only showed once Mending Waters resolved to
+    // an odd cost: the v0.31 healer rebalance moved it from 90 to 115, so half is 57.5
+    // and the sim charges 58. Assert the ceiling, not an exact half, so the pin holds at
+    // any cost parity.
+    expect(manaBefore - shaman.resource).toBe(Math.ceil((definition?.cost ?? 0) * 0.5));
     expect(shaman.auras.some((aura) => aura.id === STORMCAST_ID)).toBe(false);
   });
 
@@ -138,7 +143,7 @@ describe('Shaman v0.29 Warspirit', () => {
 
     sim.castAbility('healing_wave', shaman.id);
 
-    expect(manaBefore - shaman.resource).toBeCloseTo(definition.cost * 0.5, 5);
+    expect(manaBefore - shaman.resource).toBe(Math.ceil(definition.cost * 0.5));
     expect(shaman.auras.some((aura) => aura.id === 'set_clearcasting')).toBe(true);
     expect(shaman.auras.some((aura) => aura.id === STORMCAST_ID)).toBe(false);
     expect(shaman.auras.some((aura) => aura.id === STORMCAST_CHEAP_ID)).toBe(false);

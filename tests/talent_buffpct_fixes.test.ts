@@ -110,7 +110,11 @@ describe('talent buffPct resolver fixes', () => {
   });
 
   it('Earthquake groundAoE damage scales with the global spell damage modifier', () => {
+    // Faultwake (earthquake) is Elemental-only after the v0.29 shaman redesign, so a
+    // spec-less modifier set no longer resolves it at all. The mage cases above set
+    // their spec for the same reason; the scaling behavior under test is unchanged.
     const mods = emptyModifiers();
+    mods.spec = 'elemental';
     accumulateTalentEffect(mods, { global: { spellDmgPct: 0.3 } }, 1);
 
     const earthquake = resolvedEffect('shaman', 'earthquake', 'groundAoE', mods);
