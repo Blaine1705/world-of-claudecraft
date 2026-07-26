@@ -9,25 +9,85 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.gathering.harvestLine",
+    "hudChrome.gathering.harvestLineQty",
+    "hudChrome.gathering.harvestSpecimenLine"
+  ],
+  "es_ES": [
+    "hudChrome.gathering.harvestLine",
+    "hudChrome.gathering.harvestLineQty",
+    "hudChrome.gathering.harvestSpecimenLine"
+  ],
+  "fr_FR": [
+    "hudChrome.gathering.harvestLine",
+    "hudChrome.gathering.harvestLineQty",
+    "hudChrome.gathering.harvestSpecimenLine"
+  ],
+  "fr_CA": [
+    "hudChrome.gathering.harvestLine",
+    "hudChrome.gathering.harvestLineQty",
+    "hudChrome.gathering.harvestSpecimenLine"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.gathering.harvestLine",
+    "hudChrome.gathering.harvestLineQty",
+    "hudChrome.gathering.harvestSpecimenLine"
+  ],
+  "de_DE": [
+    "hudChrome.gathering.harvestLine",
+    "hudChrome.gathering.harvestLineQty",
+    "hudChrome.gathering.harvestSpecimenLine"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.gathering.harvestLine",
+    "hudChrome.gathering.harvestLineQty",
+    "hudChrome.gathering.harvestSpecimenLine"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.gathering.harvestLine",
+    "hudChrome.gathering.harvestLineQty",
+    "hudChrome.gathering.harvestSpecimenLine"
+  ],
+  "nl_NL": [
+    "hudChrome.gathering.harvestLine",
+    "hudChrome.gathering.harvestLineQty",
+    "hudChrome.gathering.harvestSpecimenLine"
+  ],
+  "pl_PL": [
+    "hudChrome.gathering.harvestLine",
+    "hudChrome.gathering.harvestLineQty",
+    "hudChrome.gathering.harvestSpecimenLine"
+  ],
+  "id_ID": [
+    "hudChrome.gathering.harvestLine",
+    "hudChrome.gathering.harvestLineQty",
+    "hudChrome.gathering.harvestSpecimenLine"
+  ],
+  "tr_TR": [
+    "hudChrome.gathering.harvestLine",
+    "hudChrome.gathering.harvestLineQty",
+    "hudChrome.gathering.harvestSpecimenLine"
+  ],
+  "sv_SE": [
+    "hudChrome.gathering.harvestLine",
+    "hudChrome.gathering.harvestLineQty",
+    "hudChrome.gathering.harvestSpecimenLine"
+  ],
+  "vi_VN": [
+    "hudChrome.gathering.harvestLine",
+    "hudChrome.gathering.harvestLineQty",
+    "hudChrome.gathering.harvestSpecimenLine"
+  ],
+  "da_DK": [
+    "hudChrome.gathering.harvestLine",
+    "hudChrome.gathering.harvestLineQty",
+    "hudChrome.gathering.harvestSpecimenLine"
+  ]
 };
