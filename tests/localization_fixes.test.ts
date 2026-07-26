@@ -1219,10 +1219,13 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
   });
 
   it('the src/sim/social glob still reaches its modules and feeds the corpus', () => {
-    // The corpus-wide floor above cannot see this: the glob is one input among
-    // forty explicit files, so it could contribute nothing at all and the total
-    // would still clear any sane floor. These two bind the glob itself, which
-    // is the input a subdirectory (or a rename) would silently empty.
+    // These bind the GLOB, where the floor above binds the total. Measured, so
+    // the difference is on the record: the corpus is 428 with the glob and 290
+    // without it, so the 400 floor does now catch a glob that empties
+    // completely (the 80 it replaced did not, which is what let this input be
+    // the quiet one). What the floor still cannot localize is a PARTIAL loss,
+    // and it cannot say which input went missing; these can, and they are the
+    // input a subdirectory or a rename would empty.
     expect(
       socialFiles.map((f) => f.file),
       'the src/sim/social walk reaches every module in the directory',
@@ -1248,6 +1251,20 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
       scanEmitCandidates(socialSrc, '').length,
       'the social glob still contributes its emits to the S3 corpus',
     ).toBeGreaterThan(220);
+  });
+
+  it('the corpus reads the tree through the shared walker, with no flat reader beside it', () => {
+    // The sibling of the pins in steam_routes / mobile_window_coverage /
+    // professions_silent_loot, and the same reasoning: src/sim/social is flat,
+    // so a second producer for socialSrc built on its own flat read would join
+    // the identical text to the corpus today and nothing here would notice.
+    const own = fs
+      .readFileSync(path.resolve(process.cwd(), 'tests/localization_fixes.test.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+    // Both needles assembled from halves so neither matches its own line.
+    expect(own.split(`readdir${'Sync('}`).length - 1).toBe(0);
+    expect(own).toContain(`helpers/ts_files${'_under'}`);
   });
 
   it('the social glob descends, so an emit in a SUBDIRECTORY is scanned too (#2489)', () => {

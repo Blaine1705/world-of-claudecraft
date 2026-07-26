@@ -1,4 +1,4 @@
-import { readdirSync } from 'node:fs';
+import { readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
 // The shared recursive source walk for guards that scan a directory of .ts
@@ -34,11 +34,15 @@ export interface TsSourceFile {
  * checkout and hash order on the ext4 CI runner, so an unsorted walk pins a
  * label list that only holds on one of them.
  *
- * The file arm is deliberately NOT gated on `entry.isFile()`. A `Dirent`
- * reports lstat, so that check reads false for a symlink, while the flat reads
- * this replaces followed one: gating on it would narrow coverage in exactly the
- * way this module exists to stop. Anything named `.ts` that is not a directory
- * gets returned.
+ * Symlinks are followed on BOTH arms, which takes deciding rather than
+ * defaulting: a `Dirent` reports lstat, so `isFile()` and `isDirectory()` both
+ * read false for one. Gating the file arm on `isFile()` would drop a symlinked
+ * module the flat `readdirSync().filter()` reads this replace would have read,
+ * and taking `isDirectory()` at face value would drop a whole symlinked
+ * subtree. Either is the silent narrowing this module exists to stop, so a
+ * symlink is resolved once and treated as whatever it points at. A broken one
+ * resolves to neither and, if it is named `.ts`, is still returned, so the
+ * consumer's own read fails loudly rather than the file leaving the scan.
  *
  * Walks by hand rather than through `readdirSync`'s `recursive: true`, which
  * emits directory entries into its own result (so a directory named `x.ts`
@@ -53,7 +57,11 @@ export function tsFilesUnder(root: string): TsSourceFile[] {
     );
     for (const entry of entries) {
       const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) out.push(...walk(full, `${prefix}${entry.name}/`));
+      const isDir =
+        entry.isDirectory() ||
+        (entry.isSymbolicLink() &&
+          (statSync(full, { throwIfNoEntry: false })?.isDirectory() ?? false));
+      if (isDir) out.push(...walk(full, `${prefix}${entry.name}/`));
       else if (entry.name.endsWith('.ts')) out.push({ file: `${prefix}${entry.name}`, full });
     }
     return out;

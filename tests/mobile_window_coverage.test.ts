@@ -113,8 +113,8 @@ const MOBILE_WINDOW_EXCEPTIONS: Record<string, string> = {
 //
 // This read stays SINGLE-LEVEL on purpose, unlike the src/ui walk above (#2489).
 // It models the sheets that actually reach a browser, not the files on disk:
-// every one of these ships, the 7 via the src/styles/index.css barrel and the
-// two .extra.css via a <link> in each entry (pinned by
+// all 10 ship, as the index.css barrel itself, the 7 it imports, and the two
+// .extra.css pulled in by a <link> in each entry (pinned by
 // tests/per_entry_css_wiring.test.ts). Recursing would be worse than a no-op
 // (src/styles has no subdirectories today): it would let a component-local or
 // experimental sheet parked in a subfolder count as mobile coverage for a rule
@@ -179,7 +179,11 @@ function hasMobileRule(css: string, id: string): boolean {
 // would demand mobile CSS that nobody decided to write).
 function hasOwnSheetRule(css: string, id: string): boolean {
   const selRe = new RegExp(
-    `body\\.mobile-touch[^,{}]*#${id}(?![-a-z0-9])(?::[a-z-]+(?:\\([^)]*\\))?)*\\s*[,{]`,
+    // No id-boundary lookahead here, unlike hasMobileRule: the trailing `[,{]`
+    // already does that job, since a longer id (#beta-extended searched for as
+    // #beta) leaves `-extended` where a comma or brace has to be. Mutation
+    // showed a lookahead here is unreachable, so it is not written.
+    `body\\.mobile-touch[^,{}]*#${id}(?::[a-z-]+(?:\\([^)]*\\))?)*\\s*[,{]`,
     'g',
   );
   let m: RegExpExecArray | null;
@@ -269,11 +273,13 @@ describe('mobile window coverage (Phase 5 parity)', () => {
   });
 
   it('the scrape reads src/ui through the shared walker, with no flat reader beside it', () => {
-    // The fixture pins the SCRAPER; nothing can pin that it still reaches the
-    // real tree through the walk, because every window-minting module is at the
-    // top level, so a second inline flat read would produce the same ids today.
-    // Exactly one directory read is left in this file: stylesText's, which is
-    // single-level by design (see its comment).
+    // The fixture pins the SCRAPER, and the file-count floor above pins that the
+    // real scrape reaches the whole tree. This closes the remaining gap: a
+    // second producer built on its own flat read would return the same window
+    // IDS today, since every window-minting module is at the top level, so the
+    // ids and windowClassFiles pins would not notice it. Exactly one directory
+    // read is left in this file: stylesText's, single-level by design (see its
+    // comment).
     const own = readFileSync(
       fileURLToPath(new URL('mobile_window_coverage.test.ts', import.meta.url)),
       'utf8',
@@ -282,7 +288,9 @@ describe('mobile window coverage (Phase 5 parity)', () => {
       .replace(/(^|[^:])\/\/.*$/gm, '$1');
     // Needle assembled from halves so it does not match itself.
     expect(own.split(`readdir${'Sync('}`).length - 1).toBe(1);
-    expect(own).toContain('helpers/ts_files_under');
+    // Needle split for the same reason as the one above: written whole it would
+    // match its own assertion line, so this passed even with the import gone.
+    expect(own).toContain(`helpers/ts_files${'_under'}`);
   });
 
   it('every window is either sheeted on mobile or an explicit exception', () => {
@@ -351,5 +359,24 @@ describe('mobile window coverage (Phase 5 parity)', () => {
     expect(hasOwnSheetRule(css, 'daily-rewards-window')).toBe(true);
     expect(hasOwnSheetRule(css, 'loot-window')).toBe(false);
     expect(hasMobileRule(css, 'loot-window')).toBe(true);
+    // The real cascade happens to satisfy both controls through one plain
+    // `#id { ... }` rule, so neither of the regex's other two clauses is
+    // exercised by it: delete the pseudo-class group or the id-boundary
+    // lookahead and the two controls above still pass. Drive those arms over a
+    // fixture cascade instead.
+    const fixtureCss = [
+      'body.mobile-touch #alpha:not(.docked) { max-height: 10px; }',
+      'body.mobile-touch #beta-extended { top: 0; }',
+      'body.mobile-touch #gamma .inner { min-height: 40px; }',
+    ].join('\n');
+    // The pseudo-class group: the id is still the target, `:not(.docked)` and
+    // all, so this is an id-scoped rule.
+    expect(hasOwnSheetRule(fixtureCss, 'alpha')).toBe(true);
+    // The boundary lookahead: #beta must not match the longer #beta-extended,
+    // or a window would inherit a namesake prefix's rule and lose its exception.
+    expect(hasOwnSheetRule(fixtureCss, 'beta')).toBe(false);
+    expect(hasOwnSheetRule(fixtureCss, 'beta-extended')).toBe(true);
+    // ... and the descendant shape stays out, which is the whole distinction.
+    expect(hasOwnSheetRule(fixtureCss, 'gamma')).toBe(false);
   });
 });

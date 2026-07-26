@@ -689,7 +689,9 @@ describe('login with Steam does not exist', () => {
     );
     // Needle assembled from halves so it does not match itself.
     expect(own.split(`readdir${'Sync('}`).length - 1).toBe(0);
-    expect(own).toContain('helpers/ts_files_under');
+    // Needle split for the same reason as the one above: written whole it would
+    // match its own assertion line, so this passed even with the import gone.
+    expect(own).toContain(`helpers/ts_files${'_under'}`);
   });
 
   it('a successful link response carries no token-shaped field', async () => {

@@ -769,9 +769,11 @@ describe('every professions grant site is accounted for (#2430)', () => {
     const needle = `readdir${'Sync('}`;
     expect(
       own.split(needle).length - 1,
-      'this file should not read a directory itself; the sweep goes through tests/helpers/ts_files_under, and a second reader could go flat while the shared one stays recursive',
+      'this file should not read a directory itself; the sweep goes through the shared walk helper, and a second reader could go flat while the shared one stays recursive',
     ).toBe(0);
-    expect(own).toContain('helpers/ts_files_under');
+    // Needle split for the same reason as the one above: written whole it would
+    // match its own assertion line, so this passed even with the import gone.
+    expect(own).toContain(`helpers/ts_files${'_under'}`);
   });
 
   it('the exclusion list has no stale entries', () => {

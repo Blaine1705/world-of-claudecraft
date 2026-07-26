@@ -69,10 +69,11 @@ use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
   never its own `readdirSync`.** A single-level read is a defect, not a style choice: the
   day the scanned root grows a subdirectory, everything inside leaves the scan and the
   guard stays green over a quietly smaller surface (#2485, then #2489 three times over).
-  Every scan root in the repo is flat today, so no assertion over the real tree can tell a
-  recursive walk from a flat one: pin the recursion with a `mkdtemp` fixture that drives
-  the guard's OWN producer, and keep the vacuity floor near the real count (a floor sitting
-  under it is what lets a moved file hide).
+  Apart from `src/ui`, every scan root is flat today, so no assertion over the real tree
+  can tell a recursive walk from a flat one: pin the recursion with a `mkdtemp` fixture
+  that drives the guard's OWN producer, and keep the vacuity floor near the real count (a
+  floor sitting under it is what lets a moved file hide). Where the root IS deep, a
+  file-count floor over the real tree pins it directly, as `mobile_window_coverage` does.
 - `tests/parity/` is the golden-trace gate: ANY sim behavior change turns it red by
   design. Read `tests/parity/CLAUDE.md` first; regenerate only deliberately via
   `UPDATE_PARITY=1 npx vitest run tests/parity`, in its own reviewed commit.

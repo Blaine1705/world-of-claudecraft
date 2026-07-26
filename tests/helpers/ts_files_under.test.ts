@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -76,9 +76,35 @@ describe('tsFilesUnder', () => {
     const found = tsFilesUnder(root);
     expect(found.map((f) => f.file)).toEqual(['kept.ts']);
     // `full` is what every consumer hands to readFileSync, so a label-only
-    // return would break them all; bind that it is absolute and correct.
+    // return would break them all. Read the file rather than re-deriving the
+    // path with the same path.join the walk used, which would compare the
+    // implementation to itself.
     expect(path.isAbsolute(found[0].full)).toBe(true);
-    expect(found[0].full).toBe(path.join(root, 'kept.ts'));
+    expect(readFileSync(found[0].full, 'utf8')).toBe('export const kept = true;\n');
+  });
+
+  it('descends a symlinked DIRECTORY (a Dirent reads false for that too)', () => {
+    // The other half of the symlink decision, and the more expensive one to get
+    // wrong: `entry.isDirectory()` is lstat-based, so taking it at face value
+    // drops an entire linked subtree rather than a single file, silently.
+    write('real/inside.ts');
+    write('real/deeper/lower.ts');
+    symlinkSync(path.join(root, 'real'), path.join(root, 'linked_dir'));
+    expect(tsFilesUnder(root).map((f) => f.file)).toEqual([
+      'linked_dir/deeper/lower.ts',
+      'linked_dir/inside.ts',
+      'real/deeper/lower.ts',
+      'real/inside.ts',
+    ]);
+  });
+
+  it('walks a DIRECTORY named like a source file instead of returning it', () => {
+    // The shape the hand-rolled walk exists for, per this module's own note:
+    // readdirSync's `recursive: true` emits directory entries into its result,
+    // so `namespace.ts` would come back as a file and reach the consumer's
+    // readFileSync as an EISDIR crash. Nothing else pins that reasoning.
+    write('namespace.ts/child.ts');
+    expect(tsFilesUnder(root).map((f) => f.file)).toEqual(['namespace.ts/child.ts']);
   });
 
   it('follows a symlinked .ts file (a Dirent reads false for one)', () => {
