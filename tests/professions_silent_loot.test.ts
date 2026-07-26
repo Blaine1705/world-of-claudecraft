@@ -500,24 +500,44 @@ describe('every professions grant site is accounted for (#2430)', () => {
     'export function harvestCorpse(',
   );
 
+  // Whitespace-normalized ONCE, here, so every pin below reads the same shape.
+  // The two sweeps used to disagree: one matched `callerLogs: true` on raw
+  // call text and the other normalized first, so a formatter that wrapped an
+  // opts object between a key and its value would have blinded one of them
+  // (in the safe direction, but for a reason nobody could see from the
+  // assertion). Comments are already gone by this point (codeOnly above).
+  const flatten = (call: string) => call.replace(/\s+/g, ' ');
   const sites = [
     ...readdirSync(dir)
       .filter((f) => f.endsWith('.ts'))
       .flatMap((file) =>
         grantCalls(codeOnly(readFileSync(path.join(dir, file), 'utf8'))).map((call) => ({
           file,
-          call,
+          call: flatten(call),
         })),
       ),
-    ...grantCalls(harvestBody).map((call) => ({ file: 'interaction.ts:harvestCorpse', call })),
+    ...grantCalls(harvestBody).map((call) => ({
+      file: 'interaction.ts:harvestCorpse',
+      call: flatten(call),
+    })),
   ];
 
   it('the scanner actually finds the grant sites (never passes vacuously)', () => {
     // A regex that stopped matching would make the sweep below green while
     // checking nothing, so bind both the count and the shape.
     expect(sites.length).toBeGreaterThanOrEqual(19);
-    expect(sites.some((s) => s.file === 'commission.ts')).toBe(true);
+    // Bound to the CALL and to its identity, not just the file: `.some(file ===
+    // ...)` alone stays green if commission.ts keeps some other grant while the
+    // unbind peel moves out of src/sim/professions and off the sweep entirely,
+    // and a file-scoped flag check still passes if that other grant is the one
+    // carrying the flag. The peel's own arguments are what pin the peel. The
+    // find-then-toContain form fails on a missing site too (undefined has no
+    // substring).
+    const peel = sites.find((s) => s.file === 'commission.ts')?.call;
+    expect(peel).toContain('freed, meta.entityId');
+    expect(peel).toContain('silent: true');
     expect(sites.some((s) => s.call.includes('callerLogs: true'))).toBe(true);
+    expect(sites.some((s) => s.call.includes('silent: true'))).toBe(true);
     // The balanced-paren walk must capture the whole call, opts object and all,
     // or every site would read as unflagged and the exclusion list would have
     // to grow to hide it.
@@ -533,17 +553,17 @@ describe('every professions grant site is accounted for (#2430)', () => {
     // red. Bind both ends.
     const harvestSites = sites.filter((s) => s.file === 'interaction.ts:harvestCorpse');
     expect(harvestSites).toHaveLength(6);
-    // BOTH flags, and only for these six. The shared sweep below can only ask
-    // for `callerLogs`, because a caller may legitimately own the line without
-    // the cue (commission.ts's Maker's Bond unbind peel does exactly that), so
-    // `silent` would go unchecked everywhere if it were not pinned here. Corpse
-    // harvest owns both halves: its result event logs its own lines AND plays
-    // its own single cue, so a site that kept `callerLogs` but lost `silent`
-    // would give one harvest two cues (#2457 acceptance criterion 3).
+    // BOTH flags. The shared cue sweep below now asks for `silent` everywhere
+    // too (#2458 retired the one site that owned the line without the cue), so
+    // this is no longer the only place `silent` is checked. It stays because it
+    // binds what the shared sweep cannot: the COUNT, six, and with it the
+    // harvestCorpse slice itself. One harvest command grants several DISTINCT
+    // items, so a site that kept `callerLogs` but lost `silent` would give one
+    // harvest several cues rather than one stray ding (#2457 acceptance
+    // criterion 3).
     for (const site of harvestSites) {
-      const call = site.call.replace(/\s+/g, ' ');
-      expect(call, call).toContain('silent: true');
-      expect(call, call).toContain('callerLogs: true');
+      expect(site.call, site.call).toContain('silent: true');
+      expect(site.call, site.call).toContain('callerLogs: true');
     }
     // pickUpObject's grant is the nearest one outside the function.
     expect(harvestBody).not.toContain('objectItemId');
@@ -559,8 +579,33 @@ describe('every professions grant site is accounted for (#2430)', () => {
         !NO_RESULT_EVENT_GRANTS.some((marker) => s.call.includes(marker)),
     );
     expect(
-      unaccounted.map((s) => `${s.file}: ${s.call.replace(/\s+/g, ' ')}`),
+      unaccounted.map((s) => `${s.file}: ${s.call}`),
       'a professions grant that neither sets callerLogs nor is a documented no-result-event grant',
+    ).toEqual([]);
+  });
+
+  it('every grant that stands its line down stands its CUE down too (#2458)', () => {
+    // The two flags stay independent by design, but no production professions
+    // grant needs them apart any more. A result event owns the cue in one of
+    // three ways: it fires a dedicated one (craft, gather, fish, enchant,
+    // disenchant, salvage), it replays the SAME generic ding itself exactly
+    // once for a whole multi-item command (corpse harvest, which has never had
+    // a recording of its own, hud.ts case 'harvestResult'), or it is
+    // deliberately cue-free (unbind, the trainResult single-surface rule
+    // documented above hudChrome.unbind.unbound). All three own it, so all
+    // three need the hub's ding down, or the action plays a second cue on top
+    // of its own, or one the contract says it does not have.
+    // The unbind peel was the last holdout, and the asymmetry it created (a
+    // ding out of a stack, silence out of a lone copy, for the same action on
+    // the same item) was invisible only because commission-eligible kinds all
+    // stack one per slot today. This is the forward guard for the day one does
+    // not: the same grant reached by a different route must sound the same.
+    const lineOnlySites = sites.filter(
+      (s) => s.call.includes('callerLogs: true') && !s.call.includes('silent: true'),
+    );
+    expect(
+      lineOnlySites.map((s) => `${s.file}: ${s.call}`),
+      'a professions grant that elides the hub line but still plays the generic hub ding',
     ).toEqual([]);
   });
 

@@ -9163,8 +9163,12 @@ export class Hud {
             this.lootRolls.closeForItem(ev.text);
           // silent: the audio half of the same idea, and independent of it (a
           // caller can own the cue without owning the line). A professions
-          // grant with its own dedicated cue sets this so the generic ding
-          // doesn't stack on top of it.
+          // grant sets this when it owns the cue for the same grant: it has a
+          // dedicated one and the generic ding would stack on top, or it
+          // replays that same ding itself exactly once for a whole multi-item
+          // command (the harvestResult arm below), or its result event is
+          // cue-free by contract and the ding would be the only sound at all
+          // (the Maker's Bond unbind, #2458).
           if (!ev.silent) {
             if (
               ev.text.includes('loot') ||
