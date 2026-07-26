@@ -15,6 +15,7 @@ import {
   registrationsByDay,
   sessionsByDay,
 } from './admin_db';
+import { cleanIpAssociationLookup } from './admin_ip_association';
 import { readOverviewCounts } from './admin_overview_cache';
 import {
   type AdminPermission,
@@ -757,9 +758,11 @@ export async function handleAdminApi(
 
     if (req.method === 'POST' && path === '/admin/api/blocked-ips') {
       const body = await readBody(req);
+      const cleanedIp = cleanIp(body.ip);
+      if (!cleanedIp) return fail(res, 400, 'a valid IP address is required');
       try {
         const ip = await addBlockedIp({
-          ip: body.ip,
+          ip: cleanedIp,
           reason: body.reason,
           createdByAccountId: accountId,
           expiresAt: body.expiresAt,
@@ -932,18 +935,20 @@ export async function handleAdminApi(
       });
     }
     if (path === '/admin/api/ip-associations') {
-      const ip = cleanIp(url.searchParams.get('ip'));
+      const ip = cleanIpAssociationLookup(url.searchParams.get('ip'));
       if (!ip) return fail(res, 400, 'a valid IP address is required');
       const { page, limit } = parsePageParams(url.searchParams);
       const associations = await associationsForIp(ip, page, limit);
       const onlineAccountIds = game.liveAccountIds();
+      const blockableIp = cleanIp(ip);
       return ok(res, {
         ...associations,
         accounts: associations.accounts.map((account) => ({
           ...account,
           online: onlineAccountIds.has(account.accountId),
         })),
-        blocked: game.isIpBlocked(ip),
+        blocked: blockableIp ? game.isIpBlocked(blockableIp) : false,
+        blockable: Boolean(blockableIp),
       });
     }
     if (path === '/admin/api/moderation/queue') {
@@ -1576,21 +1581,23 @@ async function sharedIpsHandler(ctx: Ctx): Promise<void> {
   });
 }
 
-/** GET /admin/api/ip-associations: accounts tied to one IP, with live online flags. */
+/** GET /admin/api/ip-associations: accounts tied to one stored IP marker, with live flags. */
 async function ipAssociationsHandler(ctx: Ctx): Promise<void> {
   const rt = useAdminRuntime();
-  const ip = adminDb().cleanIp(ctx.url.searchParams.get('ip'));
+  const ip = cleanIpAssociationLookup(ctx.url.searchParams.get('ip'));
   if (!ip) return fail(ctx.res, 400, 'a valid IP address is required');
   const { page, limit } = parsePageParams(ctx.url.searchParams);
   const associations = await adminDb().associationsForIp(ip, page, limit);
   const onlineAccountIds = rt.liveAccountIds();
+  const blockableIp = adminDb().cleanIp(ip);
   ok(ctx.res, {
     ...associations,
     accounts: associations.accounts.map((account) => ({
       ...account,
       online: onlineAccountIds.has(account.accountId),
     })),
-    blocked: rt.isIpBlocked(ip),
+    blocked: blockableIp ? rt.isIpBlocked(blockableIp) : false,
+    blockable: Boolean(blockableIp),
   });
 }
 
@@ -1603,9 +1610,11 @@ async function blockedIpsGetHandler(ctx: Ctx): Promise<void> {
 async function blockedIpsPostHandler(ctx: Ctx): Promise<void> {
   const rt = useAdminRuntime();
   const body = await readBody(ctx.req);
+  const cleanedIp = adminDb().cleanIp(body.ip);
+  if (!cleanedIp) return fail(ctx.res, 400, 'a valid IP address is required');
   try {
     const ip = await adminDb().addBlockedIp({
-      ip: body.ip,
+      ip: cleanedIp,
       reason: body.reason,
       createdByAccountId: ctxAccountId(ctx),
       expiresAt: body.expiresAt,

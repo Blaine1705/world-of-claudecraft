@@ -1195,6 +1195,40 @@ describe('migrated read handlers (QA gate parity coverage)', () => {
         page: 1,
         limit: 25,
         blocked: true,
+        blockable: true,
+      },
+      error: null,
+    });
+  });
+
+  it('ip-associations reads the stored unknown marker without treating it as blockable', async () => {
+    const associationsForIp = vi.fn(async (ip: string, page: number, limit: number) => ({
+      ip,
+      accounts: [{ accountId: 20 }],
+      total: 1,
+      page,
+      limit,
+    }));
+    authedAdminDb({ associationsForIp });
+    const rt = installAdminRuntime();
+
+    const r = await runRoute('GET', '/admin/api/ip-associations', {
+      url: '/admin/api/ip-associations?ip=unknown&page=1&limit=25',
+      headers: { authorization: BEARER },
+    });
+
+    expect(associationsForIp).toHaveBeenCalledWith('unknown', 1, 25);
+    expect(rt.isIpBlocked).not.toHaveBeenCalled();
+    expect(r.body).toEqual({
+      success: true,
+      data: {
+        ip: 'unknown',
+        accounts: [{ accountId: 20, online: false }],
+        total: 1,
+        page: 1,
+        limit: 25,
+        blocked: false,
+        blockable: false,
       },
       error: null,
     });
@@ -1975,7 +2009,7 @@ describe('catch -> 400 err.message remap (legacy prose passthrough, per write ha
       const r = await runRoute('POST', c.path, {
         headers: { authorization: BEARER },
         params: c.params,
-        body: {},
+        body: c.label === 'blocked-ips add' ? { ip: '9.9.9.9' } : {},
       });
       expect(r.status).toBe(400);
       expect(r.body).toEqual({ success: false, data: null, error: `${c.label} exploded` });
@@ -2073,14 +2107,32 @@ describe('remaining legacy guard negatives (re-verification audit)', () => {
   });
 
   it('400s a blocked-ips add when addBlockedIp rejects the ip (falsy), no reload and no kick', async () => {
-    authedAdminDb({ addBlockedIp: async () => '' });
+    const addBlockedIp = vi.fn(async () => '');
+    authedAdminDb({ cleanIp: () => '9.9.9.9', addBlockedIp });
     const rt = installAdminRuntime();
     const r = await runRoute('POST', '/admin/api/blocked-ips', {
       headers: { authorization: BEARER },
-      body: { ip: 'not-an-ip' },
+      body: { ip: '9.9.9.9' },
     });
     expect(r.status).toBe(400);
     expect(r.body).toEqual({ success: false, data: null, error: 'a valid IP address is required' });
+    expect(addBlockedIp).toHaveBeenCalledWith(expect.objectContaining({ ip: '9.9.9.9' }));
+    expect(rt.reloadBlockedIps).not.toHaveBeenCalled();
+    expect(rt.disconnectByIp).not.toHaveBeenCalled();
+  });
+
+  it('400s a blocked-ips add for unknown before the write boundary', async () => {
+    const addBlockedIp = vi.fn(async () => 'unknown');
+    authedAdminDb({ addBlockedIp });
+    const rt = installAdminRuntime();
+
+    const r = await runRoute('POST', '/admin/api/blocked-ips', {
+      headers: { authorization: BEARER },
+      body: { ip: 'unknown' },
+    });
+
+    expect(r.status).toBe(400);
+    expect(addBlockedIp).not.toHaveBeenCalled();
     expect(rt.reloadBlockedIps).not.toHaveBeenCalled();
     expect(rt.disconnectByIp).not.toHaveBeenCalled();
   });
