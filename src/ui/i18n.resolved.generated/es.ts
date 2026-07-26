@@ -241,7 +241,7 @@ export const es: EnTranslations = {
     "hud": {
       "lowMana": "Maná bajo",
       "lowEnergy": "Energía baja",
-      "lowFocus": "Low Focus"
+      "lowFocus": "Concentración baja"
     },
     "talents": {
       "title": "Talentos",
@@ -749,12 +749,12 @@ export const es: EnTranslations = {
       "resting": "Descansando"
     },
     "paladin": {
-      "devotion": "Devotion",
-      "devotionValue": "Devotion {value} of {max}",
-      "devotionAscensionCharges": "Devotion {value} of {max}. Ascension {charges} charges.",
-      "devotionAscensionLast": "Devotion {value} of {max}. Ascension final charge.",
-      "ascensionLastAnnouncement": "Ascension final charge",
-      "ascensionSpenderAria": "Action slot {slot}: {ability}. Consumes one Ascension charge."
+      "devotion": "Devoción",
+      "devotionValue": "Devoción {value} de {max}",
+      "devotionAscensionCharges": "Devoción {value} de {max}. Ascensión: {charges} cargas.",
+      "devotionAscensionLast": "Devoción {value} de {max}. Ascensión: última carga.",
+      "ascensionLastAnnouncement": "Ascensión: última carga",
+      "ascensionSpenderAria": "Ranura de acción {slot}: {ability}. Consume una carga de Ascensión."
     },
     "abilityScaling": {
       "bonus": "(+{value})"
@@ -1590,8 +1590,8 @@ export const es: EnTranslations = {
     "auraEffect": {
       "dot": "Inflige {value} de daño de {school} cada {interval} s",
       "hot": "Restaura {value} de salud cada {interval} s",
-      "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",
-      "mendingCurrentPercent": "Stores healing equal to {pct}% of maximum health for Cascading Mend",
+      "mendingCurrent": "Almacena {value} de sanación, liberada con el tiempo o consumida por Remiendo en Cascada",
+      "mendingCurrentPercent": "Almacena sanación equivalente al {pct}% de la salud máxima para Remiendo en Cascada",
       "absorb": "Absorbe {value} de daño",
       "healAbsorb": "Absorbe {value} de sanación recibida",
       "thorns": "Inflige {value} de daño de {school} a los atacantes",
@@ -1605,7 +1605,7 @@ export const es: EnTranslations = {
       "dmgDoneReduce": "Reduce el daño infligido un {pct}%",
       "heatingUp": "Tu siguiente golpe crítico consecutivo de Fuego activa Buena Racha; un golpe no crítico elimina Calentando Motores",
       "elementalConvergencePrimed": "Tu próximo hechizo de la otra escuela elemental otorga Convergencia Elemental",
-      "hunterFerocity": "{stacks} Pack Ferocity: your pet deals {pct}% more damage",
+      "hunterFerocity": "{stacks} de Ferocidad de Manada: tu mascota inflige un {pct}% más de daño",
       "battleStance": "Actitud de Batalla: un 10% más de generación de ira",
       "berserkerStance": "Actitud Rabiosa: los críticos aciertan un 3% más a menudo y golpean un 3% más fuerte",
       "crit": "Aumenta la probabilidad de golpe crítico un {pct}%",
@@ -1628,15 +1628,15 @@ export const es: EnTranslations = {
       "freeCast": "Tu siguiente lanzamiento no cuesta nada",
       "instantCast": "Tu siguiente hechizo con tiempo de lanzamiento es instantáneo",
       "cheapCast": "Tu siguiente hechizo cuesta un {pct}% menos",
-      "radiantResonance": "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
-      "solarReprisal": "Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant",
-      "dawnsWrath": "HoW: all HP · +1 use · CD 0 · +{pct}% DMG",
-      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
-      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
-      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
-      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
-      "veiledEdge": "Your next Lurker's Strike strikes for double",
-      "duskEconomy": "Abilities cost {pct}% less energy",
+      "radiantResonance": "Tu próxima Luz Reparadora es instantánea, o tu próximo Abrazo del Alba cuesta un {pct}% menos de maná y se lanza en {castTime} s",
+      "solarReprisal": "Tu próximo Disco Solar no cuesta maná, ignora su tiempo de reutilización e inflige un {pct}% más de daño; el Martillo de Gracia ignora su tiempo de reutilización y te sana por el 100% del daño infligido; o la Luz Reparadora es instantánea",
+      "dawnsWrath": "MdT: cualquier salud · +1 uso · TdR 0 · +{pct}% de daño",
+      "venomRitual": "Ritual de Veneno: fase {stacks} de {max}. Los golpes generadores suman fases; con {max}, Descanso Eterno se convierte en Desgarraveneno",
+      "gloam": "Penumbra: fase {stacks} de {max}. Con {max}, tus aperturas de Velo Crepuscular se habilitan a campo abierto, y la siguiente que lances es GRATUITA y detona la reserva en el velo de sombras",
+      "redline": "Línea Roja: muesca {stacks} de {max}. Los Golpes al Cuerpo suman muescas; el Golpe de Gracia pega un {pct}% más fuerte por muesca y cierra la ventana. Si expira antes, se pierde",
+      "veilstrikeWindow": "Velo de Sombras: tus aperturas de Velo Crepuscular pueden usarse a campo abierto desde cualquier ángulo, y el daño infligido aumenta un {pct}%",
+      "veiledEdge": "Tu próximo Golpe del Acechador golpea por el doble",
+      "duskEconomy": "Las habilidades cuestan un {pct}% menos de energía",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "sp": "Aumenta el poder con hechizos en {value}",
@@ -2370,7 +2370,7 @@ export const es: EnTranslations = {
       "empty": "Aún no se conocen recetas.",
       "resultAria": "Elaboración {name}",
       "craftedToast": "Elaborado: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Elaborado: {name} x{qty}",
       "insufficientMaterials": "No tienes los materiales para eso.",
       "unknownRecipe": "Esa receta no existe.",
       "comboRequirementUnmet": "No tienes las dos profesiones requeridas al nivel necesario para esa receta.",
@@ -2463,13 +2463,13 @@ export const es: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Desencatas {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Desencantas {item} y obtienes {material}.",
+      "disenchantedYieldQty": "Desencantas {item} y obtienes {material} x{qty}.",
+      "disenchantedAlso": "También recuperas {material}.",
+      "disenchantedAlsoQty": "También recuperas {material} x{qty}.",
       "salvagedLine": "Desguazas {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Recuperas {material} de {item}.",
+      "salvagedYieldQty": "Recuperas {material} x{qty} de {item}.",
       "enchantAppliedLine": "Encantas {item} con {enchant}.",
       "notHeld": "No tienes ese objeto.",
       "notDisenchantable": "No puedes desencatar eso.",
@@ -3293,21 +3293,21 @@ export const es: EnTranslations = {
       "holy_light": "Una sanación constante y considerable para reponer a un aliado o a ti mismo.",
       "devotion_aura": "Una mejora propia y duradera que aumenta la armadura para que los golpes hagan menos daño.",
       "judgement": "Gasta tu Sello activo para golpear a un enemigo a corta distancia.",
-      "hammer_of_wrath": "Executes a wounded enemy from range, or any enemy while your wings are active.",
-      "avenging_wrath": "Grants 10 Devotion, then doubles Devotion generated by abilities for fifteen seconds.",
-      "bastion_sweep": "Sweeps your shield through a group to seize threat and build Devotion.",
-      "oath_chain": "Drags a distant enemy into your pack and slows its escape.",
-      "veilbound_march": "Pass through a pack to mark it, blunt its damage against you, and lock in threat.",
-      "holy_shield": "Spends Devotion on an active block window, absorption, and a threat pulse.",
-      "consecration": "Claims the ground around you with sustained Holy damage and threat.",
-      "hammer_of_justice": "Stops one enemy with a short, reliable stun.",
-      "lay_on_hands": "Restores a large amount of health when an ally is close to falling.",
+      "hammer_of_wrath": "Ejecuta a un enemigo herido desde la distancia, o a cualquier enemigo mientras tus alas están activas.",
+      "avenging_wrath": "Otorga 10 de Devoción y luego duplica la Devoción generada por habilidades durante quince segundos.",
+      "bastion_sweep": "Barre con tu escudo a un grupo para arrebatar la amenaza y acumular Devoción.",
+      "oath_chain": "Arrastra a un enemigo lejano hasta tu grupo y frena su huida.",
+      "veilbound_march": "Atraviesa un grupo para marcarlo, mitigar su daño contra ti y afianzar la amenaza.",
+      "holy_shield": "Gasta Devoción en una ventana de bloqueo activo, absorción y un pulso de amenaza.",
+      "consecration": "Reclama el terreno a tu alrededor con daño Sagrado y amenaza sostenidos.",
+      "hammer_of_justice": "Detiene a un enemigo con un aturdimiento breve y fiable.",
+      "lay_on_hands": "Restaura una gran cantidad de salud cuando un aliado está a punto de caer.",
       "blessing_of_might": "Aumenta el poder de ataque de un objetivo amistoso; conviene lanzarla antes de iniciar el combate.",
       "divine_protection": "Una égida protectora rápida para absorber daño cuando las cosas se complican.",
       "raptor_strike": "Un golpe cuerpo a cuerpo contundente para cuando algo te cierra la distancia.",
-      "pack_command": "Orders your companion to strike and build Pack Ferocity. Each stack makes your pet deal 10% more damage, up to 30%, before Unleash Beast spends the stacks.",
-      "stampede": "Calls three beasts to attack for 12 seconds. Use it at full Pack Ferocity so they keep the maximum damage bonus for the whole summon.",
-      "measured_shot": "A deliberate ranged shot that restores Focus for your heavier attacks.",
+      "pack_command": "Ordena a tu compañero golpear y acumular Ferocidad de Manada. Cada acumulación hace que tu mascota inflija un 10% más de daño, hasta un 30%, antes de que Desatar Bestia gaste las acumulaciones.",
+      "stampede": "Llama a tres bestias para atacar durante 12 segundos. Úsala con la Ferocidad de Manada al máximo para que conserven la bonificación de daño completa durante toda la invocación.",
+      "measured_shot": "Un disparo a distancia deliberado que restaura concentración para tus ataques más pesados.",
       "aspect_of_the_hawk": "Una actitud que mantienes activa para agudizar tu poder de ataque a distancia.",
       "serpent_sting": "Inyecta un veneno que va causando daño de naturaleza con el tiempo.",
       "arcane_shot": "Un disparo instantáneo a distancia para algo de daño extra rápido.",
@@ -3326,19 +3326,19 @@ export const es: EnTranslations = {
       "power_word_shield": "Envuelve a un aliado en un escudo que absorbe los golpes antes de que impacten.",
       "renew": "Una sanación que va curando con el tiempo, ideal para lanzar y seguir moviéndote.",
       "lightning_bolt": "Un lanzamiento a distancia de daño de Naturaleza, tu recurso habitual desde lejos.",
-      "chain_lightning": "Strikes one target and jumps to two nearby enemies, building one Thunder for the whole cast.",
-      "thunder_reservoir": "Banks lightning until Earthen Jolt or Faultwake can release a full-power payoff.",
+      "chain_lightning": "Golpea a un objetivo y salta a dos enemigos cercanos, acumulando un Trueno por lanzamiento.",
+      "thunder_reservoir": "Acumula relámpagos hasta que la Sacudida Terrestre o el Terremoto puedan liberar una recompensa a plena potencia.",
       "rockbiter_weapon": "Imbuye tu arma para que cada golpe cuerpo a cuerpo impacte con más fuerza.",
       "healing_wave": "Tu sanación principal, una cura directa para ti o un aliado.",
       "earth_shock": "Un choque instantáneo de daño de Naturaleza rápido para cuando lo necesitas ya.",
       "lightning_shield": "Te carga de energía para que los atacantes reciban daño de Naturaleza al golpearte.",
       "flame_shock": "Una quemadura instantánea que golpea de inmediato y sigue abrasando con el tiempo.",
       "galeheart_weapon": "Imbuye ambas armas con vientos de tormenta y premia un ritmo de ataques constante.",
-      "warspirit_cadence": "Turns a steady weapon rhythm into Galeheart Echoes and an instant spell opportunity.",
-      "stormsurge": "Sometimes brings Ancestral Strike back early after you spend a Stormcast opportunity.",
+      "warspirit_cadence": "Convierte un ritmo de arma constante en Ecos del Corazón de Vendaval y una oportunidad de hechizo instantáneo.",
+      "stormsurge": "A veces devuelve antes el Golpe Ancestral después de que gastes una oportunidad de Presagio de Tormenta.",
       "lifespring_weapon": "Imbuye tu arma con agua reparadora y refuerza tu flujo continuo de sanación.",
       "tidecall": "Invoca la marea y potencia la siguiente secuencia de hechizos de sanación.",
-      "ancestor_return": "Returns every fallen group or raid member to life after a long out-of-combat cast.",
+      "ancestor_return": "Devuelve a la vida a todos los miembros caídos del grupo o la banda tras un largo lanzamiento fuera de combate.",
       "stoneward": "Alza un escudo de piedra cargado que convierte el daño recibido en sanación.",
       "primal_exaltation": "Desata brevemente el poder elemental propio de tu especialización.",
       "fireball": "Tu principal hechizo de fuego: golpea con fuerza y deja al objetivo ardiendo.",
@@ -5841,7 +5841,7 @@ export const es: EnTranslations = {
       "mana": "Maná",
       "energy": "Energía",
       "rage": "Ira",
-      "focus": "Focus"
+      "focus": "Concentración"
     },
     "roles": {
       "warrior": "Tanque / DPS cuerpo a cuerpo",
@@ -6223,7 +6223,7 @@ export const es: EnTranslations = {
       "notEnoughRage": "¡No tienes suficiente ira!",
       "notEnoughEnergy": "¡No tienes suficiente energía!",
       "notEnoughMana": "¡No tienes suficiente maná!",
-      "notEnoughDevotion": "Not enough Devotion!",
+      "notEnoughDevotion": "¡Devoción insuficiente!",
       "notEnoughResource": "¡No tienes suficiente {resource}!",
       "notEnoughHealth": "No tienes suficiente salud.",
       "targetMustDodge": "Tu objetivo debe esquivar primero.",
@@ -6537,8 +6537,8 @@ export const es: EnTranslations = {
       "mana": "Maná",
       "rage": "ira",
       "energy": "energía",
-      "focus": "Focus",
-      "devotion": "Devotion"
+      "focus": "concentración",
+      "devotion": "Devoción"
     },
     "forms": {
       "bear": "oso",
@@ -6915,56 +6915,56 @@ export const es: EnTranslations = {
         "description": "Lanza una lluvia de flechas sobre el área objetivo durante 3 s, infligiendo {damage} de daño cada 0.5 s a los enemigos atrapados."
       },
       "pack_command": {
-        "name": "Pack Command",
-        "description": "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit."
+        "name": "Orden de Manada",
+        "description": "Ordena a tu mascota viva golpear por 36 a 48 de daño Físico. El daño aumenta con el poder de ataque de la mascota. Un impacto restaura 20 de concentración y otorga 1 de Ferocidad de Manada durante 30 s, hasta 3. Cada acumulación aumenta un 10% todo el daño infligido por tu mascota. Este golpe usa las acumulaciones que tenías antes del impacto."
       },
       "stampede": {
-        "name": "Stampede",
-        "description": "Summon 3 beasts for 12 sec. Each attacks every 2 sec for {damage} Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed after 5 failed chances. It cannot reset while the beasts are active. (Packlord)"
+        "name": "Estampida",
+        "description": "Invoca 3 bestias durante 12 s. Cada una ataca cada 2 s por {damage} de daño Físico. El daño mostrado incluye un 8% de tu poder de ataque a distancia antes de las bonificaciones de daño de mascota. Las bestias fijan la Ferocidad de Manada al ser invocadas y ganan un 10% de daño por acumulación. Mientras la Estampida está en reutilización, las Órdenes de Manada certeras tienen un 20% de probabilidad de reiniciarla, garantizado tras 5 intentos fallidos. No puede reiniciarse mientras las bestias están activas. (Señor de la Manada)"
       },
       "unleash_beast": {
-        "name": "Unleash Beast",
-        "description": "Consume 3 Pack Ferocity after your pet strikes for 83 to 105 Physical damage and claps every enemy within 6 yards for 26 to 34. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 nearby enemies."
+        "name": "Desatar Bestia",
+        "description": "Consume 3 de Ferocidad de Manada después de que tu mascota golpee por 83 a 105 de daño Físico y sacuda a todos los enemigos a menos de 6 metros por 26 a 34. El golpe y la sacudida usan la bonificación completa del 30% de daño de mascota de la Ferocidad de Manada y aumentan con el poder de ataque de la mascota. Durante los 8 s siguientes, la mascota inflige un 25% más de daño, ataca un 35% más rápido y hace que el Disparo Funesto alcance hasta a 2 enemigos cercanos."
       },
       "measured_shot": {
-        "name": "Measured Shot",
-        "description": "Shoot the target for {damage} Physical damage. A hit restores 20 Focus. Damage increases with Ranged Attack Power."
+        "name": "Disparo Medido",
+        "description": "Dispara al objetivo por {damage} de daño Físico. Un impacto restaura 20 de concentración. El daño aumenta con el poder de ataque a distancia."
       },
       "cold_focus": {
-        "name": "Cold Focus",
-        "description": "For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)"
+        "name": "Concentración Gélida",
+        "description": "Durante 12 s, el Disparo Medido restaura un 50% más de concentración, y el Tiro Tenso cuesta un 25% menos y se lanza un 30% más rápido. (Distintivo de Vista Gélida)"
       },
       "bloodhook": {
-        "name": "Bloodhook",
-        "description": "Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)"
+        "name": "Garfio Sangriento",
+        "description": "Carga contra un enemigo y aplica Herida de Garfio Sangriento, infligiendo 34 de daño Físico base más un 26% de tu poder de ataque a distancia durante 12 s en 4 pulsos. (Distintivo de Arte de Campo)"
       },
       "shrapnel_charge": {
-        "name": "Shrapnel Charge",
-        "description": "Hit the target for 24 to 30 Physical damage and up to 4 other enemies within 6 yards for 13 to 17. Other targets also bleed for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Direct damage increases with Ranged Attack Power."
+        "name": "Carga de Metralla",
+        "description": "Golpea al objetivo por 24 a 30 de daño Físico y hasta a otros 4 enemigos a menos de 6 metros por 13 a 17. Los demás objetivos también sangran por 12 de daño durante 6 s. Si el objetivo principal tiene tu Herida de Garfio Sangriento, inflige 1 pulso de herida al instante. El daño directo aumenta con el poder de ataque a distancia."
       },
       "bloodtrail_assault": {
-        "name": "Bloodtrail Assault",
-        "description": "For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 nearby enemies, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards, deals 25% more base damage to its main target, and triggers 50% more wound damage."
+        "name": "Asalto del Rastro de Sangre",
+        "description": "Durante 12 s, el Garfio Sangriento propaga una herida al 60% de potencia a un máximo de 2 enemigos cercanos, el Desgarraheridas ordena un ataque de mascota de 18 de daño, y la Carga de Metralla gana 2 metros, inflige un 25% más de daño base a su objetivo principal y desencadena un 50% más de daño de herida."
       },
       "trailbreak": {
-        "name": "Trailbreak",
-        "description": "Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
+        "name": "Quiebrasendas",
+        "description": "Salta 12 metros hacia atrás. Si tienes Ímpetu de Caza, lo refresca y prepara la Reentrada durante 12 s."
       },
       "wildheart": {
-        "name": "Wildheart",
-        "description": "Immediately restore 30% of your maximum health."
+        "name": "Corazón Salvaje",
+        "description": "Restaura al instante el 30% de tu salud máxima."
       },
       "shellskin": {
-        "name": "Shellskin",
-        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+        "name": "Piel de Caparazón",
+        "description": "Reduce el daño recibido un 60% durante 8 s, pero impide atacar mientras está activa."
       },
       "frostjaw_trap": {
-        "name": "Frostjaw Trap",
-        "description": "Place a trap at the selected enemy or at your feet. It arms after 0.75 sec and lasts 30 sec. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec."
+        "name": "Trampa Fauces de Escarcha",
+        "description": "Coloca una trampa en el enemigo seleccionado o a tus pies. Se arma tras 0,75 s y dura 30 s. El primer enemigo que la active queda inmovilizado durante 3 s, y los enemigos a menos de 4 metros quedan ralentizados un 50% durante 4 s."
       },
       "pack_rally": {
-        "name": "Pack Rally",
-        "description": "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec."
+        "name": "Reunión de Manada",
+        "description": "Adopta el Aspecto del Corcel y reúne a los aliados cercanos con un 30% de velocidad de movimiento y un 10% de velocidad de ataque y lanzamiento durante 10 s."
       },
       "hurricane": {
         "name": "Huracán",
@@ -7275,116 +7275,116 @@ export const es: EnTranslations = {
         "description": "Sana a un objetivo amistoso por {damage}."
       },
       "divine_ascension": {
-        "name": "Divine Ascension",
-        "description": "Consume 20 Devotion to gain 5 Ascension charges for up to 45 sec. Marked abilities consume one charge and gain an additional effect."
+        "name": "Ascensión Divina",
+        "description": "Consume 20 de Devoción para obtener 5 cargas de Ascensión durante un máximo de 45 s. Las habilidades marcadas consumen una carga y ganan un efecto adicional."
       },
       "aura_mastery": {
-        "name": "Sacred Concord",
-        "description": "For 8 sec, empower every active Devotion and Requital Aura in your group. Bastion Devotion reduces damage by 15%; Requital deals 15 Holy damage. Multiple uses refresh instead of stacking."
+        "name": "Concordia Sagrada",
+        "description": "Durante 8 s, potencia todas las Devociones y Auras de Represalia activas de tu grupo. La Devoción del Bastión reduce el daño un 15%; la Represalia inflige 15 de daño Sagrado. Los usos múltiples se refrescan en vez de acumularse."
       },
       "devotion_ward": {
-        "name": "Bastion Devotion",
-        "description": "Reduce damage taken by you and party members by 5% until death or replacement. Only this aura and Requital Aura replace each other; Radiant, Dawn, and Grace Devotion coexist."
+        "name": "Devoción del Bastión",
+        "description": "Reduce el daño recibido por ti y por los miembros del grupo un 5% hasta la muerte o su reemplazo. Solo esta aura y el Aura de Represalia se reemplazan entre sí; las Devociones Radiante, del Alba y de Gracia coexisten."
       },
       "hammer_of_grace": {
-        "name": "Hammer of Grace",
-        "description": "Instantly hurl a holy hammer at an enemy within 20 m for {damage}, restoring 70 mana, healing yourself for 50% of damage dealt, and generating 1 Devotion when it deals damage. Solar Reprisal lets Hammer of Grace ignore its cooldown and heal you for 100% of damage dealt."
+        "name": "Martillo de Gracia",
+        "description": "Lanza al instante un martillo sagrado a un enemigo a menos de 20 m por {damage}, restaura 70 de maná, te sana por el 50% del daño infligido y genera 1 de Devoción cuando inflige daño. La Represalia Solar permite que el Martillo de Gracia ignore su tiempo de reutilización y te sane por el 100% del daño infligido."
       },
       "hushbrand": {
-        "name": "Hushbrand",
-        "description": "Interrupts spellcasting and prevents spells from that school for 4 sec."
+        "name": "Marca del Silencio",
+        "description": "Interrumpe el lanzamiento de hechizos e impide los hechizos de esa escuela durante 4 s."
       },
       "guardian_covenant": {
-        "name": "Guardian Covenant",
-        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
+        "name": "Pacto del Guardián",
+        "description": "Protege a un objetivo amistoso y a ti mismo, reduciendo el daño recibido un 20% durante 8 s. Te selecciona a ti por defecto si no hay objetivo amistoso."
       },
       "solar_step": {
-        "name": "Solar Step",
-        "description": "Increase your movement speed by 150% for 2 sec."
+        "name": "Paso Solar",
+        "description": "Aumenta tu velocidad de movimiento un 150% durante 2 s."
       },
       "solar_invocation": {
-        "name": "Solar Invocation",
-        "description": "Instantly heal an ally for {damage} or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much."
+        "name": "Invocación Solar",
+        "description": "Sana al instante a un aliado por {damage} o inflige daño Sagrado moderado a un enemigo. Cualquiera de los dos usos genera 1 de Devoción. Durante la Ascensión, un lanzamiento de sanación también sana a los jugadores aliados a menos de 10 m del objetivo por la mitad."
       },
       "radiant_devotion": {
-        "name": "Radiant Devotion",
-        "description": "Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion, but coexists with Devotions from other Paladins."
+        "name": "Devoción Radiante",
+        "description": "Aumenta el poder con hechizos tuyo y de los miembros del grupo en 20 durante 30 min. Reemplaza tu propia Devoción del Alba o de Gracia, pero coexiste con las Devociones de otros paladines."
       },
       "dawn_devotion": {
-        "name": "Dawn Devotion",
-        "description": "Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion, but coexists with Devotions from other Paladins and with Warrior shouts."
+        "name": "Devoción del Alba",
+        "description": "Aumenta el poder de ataque tuyo y de los miembros del grupo en 40 durante 30 min. Reemplaza tu propia Devoción Radiante o de Gracia, pero coexiste con las Devociones de otros paladines y con los gritos de guerrero."
       },
       "grace_devotion": {
-        "name": "Grace Devotion",
-        "description": "You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min. Replaces your own Radiant or Dawn Devotion, but coexists with Devotions from other Paladins."
+        "name": "Devoción de Gracia",
+        "description": "Tú y los miembros del grupo restauráis 15 de maná cada 5 s y pagáis un 3% menos de maná durante 30 min. Reemplaza tu propia Devoción Radiante o del Alba, pero coexiste con las Devociones de otros paladines."
       },
       "recall_the_fallen": {
-        "name": "Recall the Fallen",
-        "description": "Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group."
+        "name": "Llamar a los Caídos",
+        "description": "Devuelve a la vida a un miembro muerto del grupo con un 35% de salud y maná. Un Sanador del Sol de nivel 16 o superior llama de vuelta a todos los miembros caídos del grupo."
       },
       "beacon_of_light": {
-        "name": "Beacon of Light",
-        "description": "Mark one group member as your Beacon of Light. 50% of your effective direct healing on another group member within 60 m also heals the Beacon. Area and periodic healing do not transfer. Lasts until either of you dies."
+        "name": "Faro de Luz",
+        "description": "Marca a un miembro del grupo como tu Faro de Luz. El 50% de tu sanación directa efectiva sobre otro miembro del grupo a menos de 60 m también sana al Faro. La sanación de área y periódica no se transfiere. Dura hasta que uno de los dos muera."
       },
       "final_edict": {
-        "name": "Final Edict",
-        "description": "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Holy explosion around you."
+        "name": "Edicto Final",
+        "description": "Asesta un golpe de arma demoledor y genera 1 de Devoción cuando inflige daño. Un impacto certero reduce en 2 s el tiempo de reutilización restante de Caída del Alba. Los ataques automáticos certeros y los impactos del Edicto Final tienen un 15% de probabilidad de otorgar Ira del Alba durante 8 s. La Ascensión libera además una explosión Sagrada a tu alrededor."
       },
       "dawnfall": {
-        "name": "Dawnfall",
-        "description": "Deal {damage} Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict's remaining cooldown by 2 sec. Ascension increases its damage and radius."
+        "name": "Caída del Alba",
+        "description": "Inflige {damage} de daño Sagrado a los enemigos cercanos y genera 1 de Devoción. Golpear al menos a un enemigo reduce en 2 s el tiempo de reutilización restante del Edicto Final. La Ascensión aumenta su daño y su radio."
       },
       "sun_gods_verdict": {
-        "name": "Verdict of the Sun God",
-        "description": "Judge an enemy beneath the Verdict of the Sun God for 30 sec. Final Edict and Dawnfall inscribe one charge on a successful hit. The ability that lands the third charge dictates the sentence: Final Edict unleashes devastating damage on the condemned; Dawnfall detonates the verdict, damaging and stunning nearby enemies for 1.5 sec."
+        "name": "Veredicto del Dios Sol",
+        "description": "Juzga a un enemigo bajo el Veredicto del Dios Sol durante 30 s. El Edicto Final y la Caída del Alba inscriben una carga con cada impacto certero. La habilidad que coloque la tercera carga dicta la sentencia: el Edicto Final desata un daño devastador sobre el condenado; la Caída del Alba detona el veredicto, dañando y aturdiendo a los enemigos cercanos durante 1,5 s."
       },
       "valkyrs_calling": {
-        "name": "Valkyr's Calling",
-        "description": "Ascend into the air, becoming immune to damage as you fly toward the enemy. After 2 sec, descend upon the target area for {damage} Holy damage and generate 1 Devotion. Ascension increases the impact damage by 50% and consumes 1 charge."
+        "name": "Llamada de la Valquiria",
+        "description": "Asciende por los aires, volviéndote inmune al daño mientras vuelas hacia el enemigo. Tras 2 s, desciende sobre la zona objetivo por {damage} de daño Sagrado y genera 1 de Devoción. La Ascensión aumenta un 50% el daño de impacto y consume 1 carga."
       },
       "faithforged_guard": {
-        "name": "Debt of Light",
-        "description": "For 8 sec, the next enemy hit against you is answered: up to {buff} damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered. Ascension raises the amount it can answer by 50%."
+        "name": "Deuda de Luz",
+        "description": "Durante 8 s, el siguiente golpe enemigo contra ti recibe respuesta: se niega hasta {buff} de daño y se devuelve al atacante como daño Sagrado, y ganas 1 de Devoción. Solo se responde a un golpe. La Ascensión aumenta un 50% la cantidad que puede responder."
       },
       "mercy_lance": {
-        "name": "Mercy Lance",
-        "description": "Deal {damage} Holy damage to an enemy and generate 1 Devotion when it deals damage. During Ascension, it consumes 1 charge to guarantee a critical hit."
+        "name": "Lanza de Misericordia",
+        "description": "Inflige {damage} de daño Sagrado a un enemigo y genera 1 de Devoción cuando inflige daño. Durante la Ascensión consume 1 carga para garantizar un golpe crítico."
       },
       "sacred_form": {
-        "name": "Sacred Form",
-        "description": "Enter a sacred state until death, increasing healing by 10%, spell critical chance by 5%, and reducing threat generated by 50%. Sunmender only."
+        "name": "Forma Sagrada",
+        "description": "Entra en un estado sagrado hasta la muerte, aumentando la sanación un 10% y la probabilidad de crítico con hechizos un 5%, y reduciendo la amenaza generada un 50%. Solo para Sanadores del Sol."
       },
       "dawns_embrace": {
-        "name": "Dawn's Embrace",
-        "description": "Deliver a powerful heal and generate 1 Devotion. Radiant Resonance reduces its mana cost by 50% and cast time to 1.5 sec. Ascension makes it instant and increases its healing by 35%."
+        "name": "Abrazo del Alba",
+        "description": "Libera una sanación poderosa y genera 1 de Devoción. La Resonancia Radiante reduce su coste de maná un 50% y su tiempo de lanzamiento a 1,5 s. La Ascensión la vuelve instantánea y aumenta su sanación un 35%."
       },
       "radiant_chorus": {
-        "name": "Radiant Chorus",
-        "description": "Heal nearby allies for {damage} and generate 1 Devotion. Effectively healing at least 2 allies grants Radiant Resonance: your next Mending Light is instant, or your next Dawn's Embrace costs 50% less mana and casts in 1.5 sec. Ascension increases Radiant Chorus healing and radius."
+        "name": "Coro Radiante",
+        "description": "Sana a los aliados cercanos por {damage} y genera 1 de Devoción. Sanar de forma efectiva al menos a 2 aliados otorga Resonancia Radiante: tu próxima Luz Reparadora es instantánea, o tu próximo Abrazo del Alba cuesta un 50% menos de maná y se lanza en 1,5 s. La Ascensión aumenta la sanación y el radio del Coro Radiante."
       },
       "life_covenant": {
-        "name": "Life Covenant",
-        "description": "Reduce an ally's damage taken by 40% for 6 sec. During Ascension it also grants a 120-point shield without consuming a charge."
+        "name": "Pacto de Vida",
+        "description": "Reduce un 40% el daño recibido por un aliado durante 6 s. Durante la Ascensión también otorga un escudo de 120 puntos sin consumir carga."
       },
       "aegis_first_dawn": {
-        "name": "Aegis of the First Dawn",
-        "description": "Channel for 5 sec, creating a 10 meter holy dome. Allies inside are healed every second and take 50% less damage. Completing the channel releases a final heal and grants 30% movement speed for 4 sec."
+        "name": "Égida del Primer Alba",
+        "description": "Canaliza durante 5 s y crea una cúpula sagrada de 10 metros. Los aliados en su interior se sanan cada segundo y reciben un 50% menos de daño. Completar la canalización libera una sanación final y otorga un 30% de velocidad de movimiento durante 4 s."
       },
       "vowkeeper_strike": {
-        "name": "Vowkeeper Strike",
-        "description": "Strike with high threat and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal empowers your next Sunward Disc, Hammer of Grace, or Mending Light. Ascension also grants a small absorption shield."
+        "name": "Golpe del Guardavotos",
+        "description": "Golpea con amenaza elevada y genera 1 de Devoción. Un golpe certero tiene un 20% de probabilidad de otorgar Represalia Solar durante 8 s; cada bloqueo certero, un 25%. La Represalia Solar potencia tu próximo Disco Solar, Martillo de Gracia o Luz Reparadora. La Ascensión otorga además un pequeño escudo de absorción."
       },
       "bastion_rite": {
-        "name": "Bastion Rite",
-        "description": "Reduce physical damage taken by 20% and increase block chance by 20% for 6 sec. Ascension extends the duration to 10 sec."
+        "name": "Rito del Bastión",
+        "description": "Reduce el daño físico recibido un 20% y aumenta la probabilidad de bloqueo un 20% durante 6 s. La Ascensión amplía la duración a 10 s."
       },
       "sunward_disc": {
-        "name": "Sunward Disc",
-        "description": "Requires a shield. Hurl a radiant disc that strikes and then bounces between nearby enemies. Each damaging impact generates 1 Devotion. Solar Reprisal makes Sunward Disc cost no mana, ignore its cooldown, and deal 20% more damage. Ascension empowers 5 bounces."
+        "name": "Disco Solar",
+        "description": "Requiere un escudo. Lanza un disco radiante que golpea y luego rebota entre los enemigos cercanos. Cada impacto dañino genera 1 de Devoción. La Represalia Solar hace que el Disco Solar no cueste maná, ignore su tiempo de reutilización e inflija un 20% más de daño. La Ascensión potencia 5 rebotes."
       },
       "sacred_challenge": {
-        "name": "Sacred Goad",
-        "description": "Compel an enemy to attack you. During Ascension it also reduces all damage received by 15% for 4 sec without consuming a charge."
+        "name": "Acicate Sagrado",
+        "description": "Obliga a un enemigo a atacarte. Durante la Ascensión también reduce un 15% todo el daño recibido durante 4 s sin consumir carga."
       },
       "devotion_aura": {
         "name": "Aura Inquebrantable",
@@ -7423,20 +7423,20 @@ export const es: EnTranslations = {
         "description": "Consagra el suelo bajo tus pies y abrasa a los enemigos cercanos por {damage} de daño Sagrado cada 2 s durante 10 s."
       },
       "bastion_sweep": {
-        "name": "Bastion Sweep",
-        "description": "Sweep your equipped shield through enemies in a 180 degree frontal arc for {damage} Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m."
+        "name": "Barrido del Bastión",
+        "description": "Barre con tu escudo equipado a los enemigos en un arco frontal de 180 grados por {damage} de daño Sagrado con amenaza elevada y genera 1 de Devoción. La Ascensión aumenta el daño un 30% y el radio a 8 m."
       },
       "oath_chain": {
-        "name": "Oath Chain",
-        "description": "Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy."
+        "name": "Cadena de Juramento",
+        "description": "Ata al instante a un enemigo lejano con una cadena sagrada. El enemigo avanza hacia ti a 18 m por segundo hasta llegar a 3 m, y luego queda ralentizado un 50% durante 4 s. Durante la Ascensión ata a un segundo enemigo cercano."
       },
       "veilbound_march": {
-        "name": "Veilbound March",
-        "description": "Become ethereal for 4 sec, gaining 40% movement speed and 30% armor and becoming immune to roots, slows, and displacement. Enemies you pass through are Veil Marked for 6 sec, taking Holy damage each second, dealing 20% less damage to you, and generating extra threat. The first mark grants 1 Devotion. When the march ends, nearby marked enemies take a final burst. Ascension increases the burst by 50% and lightly pulls them toward you."
+        "name": "Marcha del Velo",
+        "description": "Vuélvete etéreo durante 4 s, ganando un 40% de velocidad de movimiento y un 30% de armadura, e inmune a raíces, ralentizaciones y desplazamientos. Los enemigos que atraviesas quedan con la Marca del Velo durante 6 s: reciben daño Sagrado cada segundo, te infligen un 20% menos de daño y generan amenaza adicional. La primera marca otorga 1 de Devoción. Al terminar la marcha, los enemigos marcados cercanos reciben una descarga final. La Ascensión aumenta la descarga un 50% y los atrae levemente hacia ti."
       },
       "veilbound_mark": {
-        "name": "Veil Mark",
-        "description": "Takes Holy damage each second, deals 20% less damage to the Paladin who applied the mark, and generates additional threat toward that Paladin."
+        "name": "Marca del Velo",
+        "description": "Recibe daño Sagrado cada segundo, inflige un 20% menos de daño al paladín que aplicó la marca y genera amenaza adicional hacia ese paladín."
       },
       "righteous_fury": {
         "name": "Juramento Ardiente",
@@ -7479,12 +7479,12 @@ export const es: EnTranslations = {
         "description": "Contraataca después de que el objetivo esquive e inflige daño de arma más {damage}. No puede esquivarse."
       },
       "hunting_momentum": {
-        "name": "Hunting Momentum",
-        "description": "Passive: Gutting Strike grants 1 Hunting Momentum for 8 sec, up to 3. At 3 stacks, Woundrend deals 45% more strike damage and consumes the stacks. (Fieldcraft)"
+        "name": "Ímpetu de Caza",
+        "description": "Pasiva: el Golpe Destripador otorga 1 de Ímpetu de Caza durante 8 s, hasta 3. Con 3 acumulaciones, el Desgarraheridas inflige un 45% más de daño de golpe y consume las acumulaciones. (Arte de Campo)"
       },
       "fieldcraft_reentry": {
-        "name": "Armed Re-entry",
-        "description": "Passive: Trailbreak refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)"
+        "name": "Reentrada Armada",
+        "description": "Pasiva: Quiebrasendas refresca el Ímpetu de Caza y prepara tu próximo Golpe Destripador o Garfio Sangriento durante 12 s. El Golpe Destripador inflige un 15% más de daño por acumulación. El Garfio Sangriento inflige de 18 a 24 de daño Físico adicional, aumentado un 15% por acumulación y por tu poder de ataque a distancia. Con 3 acumulaciones, cualquiera de los dos ataques consume el Ímpetu de Caza. (Arte de Campo)"
       },
       "wing_clip": {
         "name": "Tajo Aprisionante",
@@ -7551,8 +7551,8 @@ export const es: EnTranslations = {
         "description": "Lanza un rayo que inflige {damage} de daño de Naturaleza."
       },
       "thunder_reservoir": {
-        "name": "Thunder Reservoir",
-        "description": "Passive: Arc Bolt and Skybranch grant Thunder, up to 5. At 5 Thunder, Earthen Jolt deals 125% more damage or Faultwake deals 100% more damage, then consumes all Thunder. (Thundercall)"
+        "name": "Reserva de Truenos",
+        "description": "Pasiva: el Arco Eléctrico y el Relámpago Bifurcado otorgan Trueno, hasta 5. Con 5 de Trueno, la Sacudida Terrestre inflige un 125% más de daño o el Terremoto un 100% más, y luego consume todo el Trueno. (Llamatruenos)"
       },
       "rockbiter_weapon": {
         "name": "Arma Pétrea",
@@ -7779,36 +7779,36 @@ export const es: EnTranslations = {
         "description": "Sana una gran cantidad a un objetivo amistoso y luego salta a un máximo de 2 aliados cercanos adicionales, sanando un 50 % menos con cada salto. (habilidad distintiva de Restauración)"
       },
       "galeheart_weapon": {
-        "name": "Galeheart Weapon",
-        "description": "Imbue both weapons for 30 min, enabling Warspirit Cadence."
+        "name": "Arma Corazón de Vendaval",
+        "description": "Encanta ambas armas durante 30 min y habilita la Cadencia del Espíritu Guerrero."
       },
       "warspirit_cadence": {
-        "name": "Warspirit Cadence",
-        "description": "Passive: Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)"
+        "name": "Cadencia del Espíritu Guerrero",
+        "description": "Pasiva: cada 3.er ataque de arma certero desencadena 2 Ecos del Corazón de Vendaval por un 50% de daño de Naturaleza y otorga Presagio de Tormenta durante 12 s. El Presagio de Tormenta vuelve instantáneo tu próximo Arco Eléctrico, Sacudida o Aguas Reparadoras, y les reduce el coste de maná un 50%. El Golpe Ancestral cuenta como 2 ataques. (Espíritu Guerrero)"
       },
       "stormsurge": {
-        "name": "Stormsurge",
-        "description": "Passive: While Ancestral Strike is on cooldown, consuming Stormcast has a 25% chance to reset it. If the first 3 chances fail, the 4th always resets it. (Warspirit)"
+        "name": "Marejada de Tormenta",
+        "description": "Pasiva: mientras el Golpe Ancestral está en reutilización, consumir Presagio de Tormenta tiene un 25% de probabilidad de reiniciarlo. Si los 3 primeros intentos fallan, el 4.º siempre lo reinicia. (Espíritu Guerrero)"
       },
       "lifespring_weapon": {
-        "name": "Lifespring Weapon",
-        "description": "Imbue your weapon for 30 min. Mending Waters and Tidecall add 20% more healing to Mending Current."
+        "name": "Arma Manantial de Vida",
+        "description": "Encanta tu arma durante 30 min. Aguas Reparadoras y la Llamada de la Marea añaden un 20% más de sanación a la Corriente Sanadora."
       },
       "unleash_weapon": {
-        "name": "Unleash Weapon",
-        "description": "Unleash your active weapon enchant. Pyrebrand deals 54 to 64 Fire damage, gains 30% of Spell Power, and grants 2 Thunder. Galeheart strikes with your weapon, advances Warspirit Cadence, and grants 20% attack speed for 6 sec. Stonebound strikes for 75% weapon damage, forces the target to attack you, and reduces damage taken by 20% for 4 sec. Lifespring consumes your Mending Current, heals for 125% of its remaining healing, and reduces the next hit within 8 sec by 50% of the health restored."
+        "name": "Desatar Arma",
+        "description": "Desata el encantamiento activo de tu arma. La Marca Pírica inflige de 54 a 64 de daño de Fuego, gana un 30% del poder con hechizos y otorga 2 de Trueno. El Corazón de Vendaval golpea con tu arma, avanza la Cadencia del Espíritu Guerrero y otorga un 20% de velocidad de ataque durante 6 s. El Ligado a la Piedra golpea por un 75% del daño de arma, obliga al objetivo a atacarte y reduce el daño recibido un 20% durante 4 s. El Manantial de Vida consume tu Corriente Sanadora, sana por un 125% de su sanación restante y reduce el siguiente golpe en 8 s un 50% de la salud restaurada."
       },
       "primal_exaltation": {
-        "name": "Primal Exaltation",
-        "description": "For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)"
+        "name": "Exaltación Primigenia",
+        "description": "Durante 12 s, el Arco Eléctrico y el Relámpago Bifurcado de Llamatruenos se lanzan un 50% más rápido, y el Arco Eléctrico otorga 2 de Trueno; el Espíritu Guerrero activa su cadencia cada 2 impactos de arma; el Remiendo Espiritual añade un 50% más de sanación a la Corriente Sanadora. (Talento de chamán)"
       },
       "stoneward": {
-        "name": "Stoneward",
-        "description": "Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)"
+        "name": "Guarda de Piedra",
+        "description": "Protege a un aliado durante 60 s con 6 cargas. El daño consume una carga para sanar un 5% de la salud máxima, una vez cada 3 s. (Talento de chamán)"
       },
       "tidecall": {
-        "name": "Tidecall",
-        "description": "Heal a friendly target for 58 to 72. The heal increases with Spell Power. Add the same healing calculated before overhealing to Mending Current, up to 30% of the target's maximum health."
+        "name": "Llamada de la Marea",
+        "description": "Sana a un objetivo amistoso de 58 a 72. La sanación aumenta con el poder con hechizos. Añade la misma sanación calculada antes del exceso a la Corriente Sanadora, hasta un 30% de la salud máxima del objetivo."
       },
       "metamorphosis": {
         "name": "Metamorfosis",
@@ -8195,8 +8195,8 @@ export const es: EnTranslations = {
         "description": "Rebobina a todos los miembros muertos de tu grupo o banda y los devuelve a la vida junto a sus cuerpos con un 30% de salud y maná. No se puede lanzar en combate. (Cronomancia)"
       },
       "ancestor_return": {
-        "name": "Ancestors' Return",
-        "description": "Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)"
+        "name": "Retorno de los Ancestros",
+        "description": "Devuelve a la vida junto a su cuerpo a todos los miembros caídos de tu grupo o banda con un 30% de salud y maná. No puede lanzarse en combate. (Remiendo Espiritual)"
       },
       "temporal_rewind": {
         "name": "Rebobinar",
@@ -8315,28 +8315,28 @@ export const es: EnTranslations = {
         "description": "Devora un efecto mágico (uno beneficioso de un enemigo o uno perjudicial de un aliado) y te sana un 6% de tu salud máxima."
       },
       "veilstep": {
-        "name": "Veilstep",
-        "description": "Steps through the veil in the direction you are facing."
+        "name": "Paso del Velo",
+        "description": "Atraviesa el velo en la dirección a la que miras."
       },
       "scouring_mercy": {
-        "name": "Scouring Mercy",
-        "description": "Deal 72 to 84 Holy damage to an enemy or heal a friendly target for 130 to 155. Both amounts increase with Spell Power. Damage also heals each Doctrine-linked ally for 30%, or the lowest-health party member for 15% if no ally is linked. (Doctrine signature)"
+        "name": "Misericordia Purgante",
+        "description": "Inflige de 72 a 84 de daño Sagrado a un enemigo o sana a un objetivo amistoso de 130 a 155. Ambas cantidades aumentan con el poder con hechizos. El daño también sana un 30% a cada aliado vinculado por Doctrina, o un 15% al miembro del grupo con menos salud si no hay ninguno vinculado. (Distintivo de Doctrina)"
       },
       "seraphic_vigil": {
-        "name": "Seraphic Vigil",
-        "description": "Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)"
+        "name": "Vigilia Seráfica",
+        "description": "Protege a un aliado durante 30 s. El primer golpe que lo deje por debajo del 35% de salud consume la Vigilia y lo sana por 180. (Distintivo de Bendición)"
       },
       "summon_tithefiend": {
-        "name": "Call Tithefiend",
-        "description": "Consume all Gloomtithe to summon a Tithefiend for 6, 8, 10, 12, or 15 sec at 1 to 5 stacks. It attacks every 2 sec for 20 to 24 Shadow damage, plus 8 per extra stack. Five stacks make it larger and increase its damage by 25%. Its damage increases with your Spell Power. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)"
+        "name": "Invocar Diezmademonio",
+        "description": "Consume todo el Diezmo Sombrío para invocar un Diezmademonio durante 6, 8, 10, 12 o 15 s con 1 a 5 acumulaciones. Ataca cada 2 s por 20 a 24 de daño de Sombra, más 8 por cada acumulación adicional. Con cinco acumulaciones se vuelve más grande y aumenta su daño un 25%. Su daño aumenta con tu poder con hechizos. Prefiere tu Efigie. Cada impacto restaura un 1% del maná máximo y propaga un 15% del daño a un máximo de 3 enemigos más con tu Endecha de Descomposición. (Distintivo de Vísperas)"
       },
       "martyrs_aegis": {
-        "name": "Martyr's Aegis",
-        "description": "Reduces one ally incoming damage by 40% for 8 sec."
+        "name": "Égida del Mártir",
+        "description": "Reduce un 40% el daño recibido por un aliado durante 8 s."
       },
       "choir_of_deliverance": {
-        "name": "Choir of Deliverance",
-        "description": "Channels for 6 sec, healing nearby party members every 2 sec."
+        "name": "Coro de Liberación",
+        "description": "Canaliza durante 6 s y sana a los miembros cercanos del grupo cada 2 s."
       },
       "bear_charge": {
         "name": "Embestida de Bruin",
@@ -10940,12 +10940,12 @@ export const es: EnTranslations = {
         }
       },
       "q_divine_tome": {
-        "title": "The Dawnbound Tome",
-        "text": "The Light does not rest in you quietly, {playerName}. I have watched you lay the dead to peace, and I believe you are ready for what few paladins are ever taught: the Rite of Recall, by which a fallen soul is called back to the living. Its words are kept in the Dawnbound Tome, here in my keeping, but a book is no blessing while the restless dead still walk this ground. Return 6 more Restless Bones to the earth, and I will begin to teach you.",
-        "completion": "The chapel yard grows quiet. You are ready for the words, {playerName}, but the Rite of Recall cannot be spoken in a warm chapel. It must be sung where the veil between life and death wears thin. I mean to carry the Tome north into the Mirefen Marsh. Follow me there, and we will finish this.",
+        "title": "El Tomo del Alba",
+        "text": "La Luz no reposa en ti en silencio, {playerName}. Te he visto devolver la paz a los muertos, y creo que estás listo para lo que a muy pocos paladines se les enseña: el Rito de la Llamada, con el que un alma caída es llamada de vuelta a los vivos. Sus palabras se guardan en el Tomo del Alba, aquí bajo mi custodia, pero un libro no es bendición alguna mientras los muertos inquietos sigan caminando esta tierra. Devuelve 6 Huesos Inquietos más a la tierra y comenzaré a enseñarte.",
+        "completion": "El patio de la capilla queda en silencio. Estás listo para las palabras, {playerName}, pero el Rito de la Llamada no puede pronunciarse en una capilla cálida. Debe cantarse allí donde el velo entre la vida y la muerte se adelgaza. Pienso llevar el Tomo al norte, a la Ciénaga de Mirefen. Sígueme hasta allí y terminaremos esto.",
         "objectives": {
           "0": {
-            "label": "Restless Bones laid to rest"
+            "label": "Huesos Inquietos devueltos al descanso"
           }
         }
       },
@@ -11106,12 +11106,12 @@ export const es: EnTranslations = {
         }
       },
       "q_rite_of_redemption": {
-        "title": "The Rite of Recall",
-        "text": "So you followed me into the mire, {playerName}. Good. I have the Dawnbound Tome here, and this drowned ground is where its words belong: nowhere is the veil between life and death thinner than a place where the dead will not stay buried. But the drowned would drag your voice down mid-verse. Clear a space fit for the rite: put 8 of the Drowned Dead to rest, and we will consecrate it together.",
-        "completion": "Kneel, {playerName}, and read the words aloud. There. Do you feel it? The Light no longer only mends the living in your hands, it can summon back those who have crossed over. Use it wisely. A soul called back to a hopeless fight is a cruelty, not a mercy. Rise, Redeemer.",
+        "title": "El Rito de la Llamada",
+        "text": "Así que me seguiste hasta el fango, {playerName}. Bien. Tengo aquí el Tomo del Alba, y esta tierra anegada es donde sus palabras pertenecen: en ningún lugar es más delgado el velo entre la vida y la muerte que allí donde los muertos no permanecen enterrados. Pero los ahogados arrastrarían tu voz a mitad del verso. Despeja un espacio digno del rito: devuelve al descanso a 8 de los Ahogados y lo consagraremos juntos.",
+        "completion": "Arrodíllate, {playerName}, y lee las palabras en voz alta. Ahí está. ¿Lo sientes? La Luz ya no solo repara a los vivos en tus manos, ahora puede convocar de vuelta a quienes han cruzado. Úsala con sabiduría. Un alma llamada de vuelta a una lucha sin esperanza es una crueldad, no una misericordia. Levántate, Redentor.",
         "objectives": {
           "0": {
-            "label": "Drowned Dead laid to rest"
+            "label": "Ahogados devueltos al descanso"
           }
         }
       },
