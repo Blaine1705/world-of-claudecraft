@@ -351,8 +351,9 @@ ceiling is unreachable by the only means a new player has, and the ladder
 dead-ends. `tests/professions_tool_gate.test.ts` derives the ceiling from the
 live constants rather than restating it, so retuning the curve fails there
 instead of quietly bricking the climb; 70 rather than the ceiling-hugging 75 is
-that margin made deliberate. The prices are read against a first-zone solo
-quest income of roughly 5,300 copper. Rods are deliberately outside both: their
+that margin made deliberate. The prices were chosen against a first-zone solo
+quest income measured during planning; that figure is pinned nowhere, so it is
+the reason for the shape rather than a live number to check against. Rods are deliberately outside both: their
 profession has no nodes, so neither the ceiling derivation nor the hub-stocking
 rule below can be expressed for them.
 
@@ -363,13 +364,15 @@ tiers 1 to 3), with the tiered rods a standing exception at Trader Wilkes.
 The gate is a PURCHASE gate on the NPC counter, not a use-time gate. What a tool
 can work is decided solely by `canGatherTier` (`src/sim/professions/tools.ts`),
 which never reads proficiency, so every non-counter route reaches full tier at
-any proficiency. Three are open by design rather than by omission: a tool
-already owned (nothing in the gate reads inventory), buyback (returning a
-player's own sold item is not a new acquisition; reaching it at 0 needs the tool
-owned and sold first, which the one-time mastery reset allows and so does the
-market), and player-to-player transfer, since the six carry no `noMarketList`
-and the tier-4 tool recipes consume the tier-3 tools as reagents. Trade and mail
-are the market route by a different door.
+any proficiency. The routes worth naming, all open by design rather than by
+omission (and deliberately not given as a closed count, since a future feature
+can add another): a tool already owned, since nothing in the gate reads
+inventory; buyback, because returning a player's own sold item is not a new
+acquisition, and reaching it at 0 needs the tool owned and sold first, which the
+one-time mastery reset allows and so does any route below; and
+player-to-player transfer by market, direct trade or mail attachment, since none
+of the six carries `noMarketList`, `soulbound` or `bindOnTrade`, and the tier-4
+tool recipes consume the tier-3 tools as reagents.
 
 **Open ruling, and it is bigger than it looks.** The question is not "should
 these be listable", which reads like a one-line content edit. It is whether tool

@@ -55,9 +55,12 @@ function toolsSection(g: GuideProfGathering): string {
         // Fed from the live gate constants, the sibling sections' idiom
         // (rhythmBody takes the cast curve, nodesNote the respawn), so a
         // retune moves the prose in all 19 languages instead of leaving a
-        // stale number behind in each of them.
-        tier2: formatNumber(TIER2_TOOL_GATE_PROFICIENCY),
-        tier3: formatNumber(TIER3_TOOL_GATE_PROFICIENCY),
+        // stale number behind in each of them. Named ...Prof because the
+        // adjacent trainingBody key already uses {tier1}/{tier2} for training
+        // COSTS in copper, and a fill pass reading both should never have to
+        // guess which unit a token carries.
+        tier2Prof: formatNumber(TIER2_TOOL_GATE_PROFICIENCY),
+        tier3Prof: formatNumber(TIER3_TOOL_GATE_PROFICIENCY),
       })}
       <div class="guide-table-scroll"><table class="guide-keytable guide-prof-table">
         <thead><tr>

@@ -461,7 +461,9 @@ describe('station reagent sourcing (prog_tools_of_the_trade completability)', ()
     const pid = sim.playerId;
     const anySim = sim as any;
     const meta = anySim.players.get(pid);
-    meta.copper = 640; // what the counter purchase below used to cost, exactly
+    // 640 = the tier-3 pick's 400 plus the 240 this case asserts is left, so
+    // the purchase amount is pinned by arithmetic rather than restated.
+    meta.copper = 640;
 
     const npcEntity = (templateId: string) =>
       [...anySim.entities.values()].find((e: any) => e.templateId === templateId);

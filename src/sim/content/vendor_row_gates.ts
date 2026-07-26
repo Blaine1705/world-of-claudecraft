@@ -27,7 +27,10 @@
 // PURCHASE gate on the NPC counter, not a USE-time gate. What a tool can work
 // is decided solely by `canGatherTier` (professions/tools.ts), which never
 // reads proficiency, so EVERY non-counter route reaches full tier at any
-// proficiency. Three are open today, deliberately:
+// proficiency. No count is given here on purpose: the routes below are the
+// ones worth naming, not a closed set, and an enumeration that claims to be
+// complete is exactly the thing that rots when a future feature adds another
+// way to put an item in a player's hands.
 //
 //  - A tool already in a player's bags. Nothing here reads or removes
 //    inventory, so a tool owned before this shipped keeps working exactly as
@@ -42,7 +45,9 @@
 //    those flags, and only to close a quest re-grant mint), so a player may buy
 //    one from another player at any proficiency, which the tier-4 tool recipes
 //    give real demand for since they consume the tier-3 tools as reagents.
-//    Trade and mail are the same route by a different door.
+//  - Direct trade and mail attachments, which are the same player-to-player
+//    transfer through different doors: none of the six carries `soulbound` or
+//    `bindOnTrade` either.
 //
 // The open ruling is NOT "should these be listable". Framed that way it looks
 // like a one-line content edit; the real choice is whether tool tier should

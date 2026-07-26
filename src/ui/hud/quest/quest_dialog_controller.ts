@@ -18,6 +18,7 @@ import { esc } from '../../esc';
 import type { FocusTrapHandle } from '../../focus_manager';
 import { t } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
+import { NPC_WINDOW_CLOSE_RANGE } from '../../npc_service_range';
 import { archetypeImageUrl } from '../../profession_art';
 import { buildAttunementPreview } from '../../profession_identity_view';
 import { svgIcon } from '../../ui_icons';
@@ -234,7 +235,7 @@ export class QuestDialogController {
     if (this.npcId === null) return;
     const world = this.deps.world();
     const npc = world.entities.get(this.npcId);
-    if (!npc || dist2d(world.player.pos, npc.pos) > 8) this.close();
+    if (!npc || dist2d(world.player.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE) this.close();
   }
 
   clearVoiceSource(): void {

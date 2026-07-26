@@ -254,6 +254,23 @@ describe('gate table completeness', () => {
     expect(VENDOR_ROW_GATES.simple_fishing_pole).toBeUndefined();
   });
 
+  it('the gated tools stay transferable, which is what the open-routes note rests on', () => {
+    // The scope comment and the design doc both record player-to-player
+    // transfer as an OPEN route. That claim is load-bearing (it is the reason
+    // the gate is described as purchase-time rather than access-gating), and it
+    // rests entirely on the ABSENCE of three flags, which nothing pinned. If a
+    // future change adds noMarketList/soulbound/bindOnTrade to these six, that
+    // is the maintainer ruling being taken, and this arm is where it surfaces.
+    for (const itemId of Object.keys(VENDOR_ROW_GATES)) {
+      const def = ITEMS[itemId] as unknown as Record<string, unknown>;
+      expect(def.noMarketList, `${itemId} noMarketList`).toBeFalsy();
+      expect(def.soulbound, `${itemId} soulbound`).toBeFalsy();
+      expect(def.bindOnTrade, `${itemId} bindOnTrade`).toBeFalsy();
+      // And sellable, which is what makes the buyback route reachable at all.
+      expect(def.noVendorSell, `${itemId} noVendorSell`).toBeFalsy();
+    }
+  });
+
   it('gates only ever name a gathering profession that exists', () => {
     for (const [itemId, gate] of Object.entries(VENDOR_ROW_GATES)) {
       // The gated id must be a real land gathering tool. Without this a gate
@@ -314,6 +331,30 @@ describe('the buy path enforces the gate authoritatively', () => {
     const errs = errorTexts(sim.drainEvents());
     expect(errs).toContain('You have not unlocked that item yet.');
     expect(errs).not.toContain('Not enough money.');
+  });
+
+  it('leaves BUYBACK ungated, the documented ruling', () => {
+    // The scope comment and docs/design/professions.md both state buyback is
+    // deliberately not gated, because returning a player their own sold item is
+    // not a new acquisition. Nothing pinned it, so gating buyBackItem later, or
+    // hoisting the check into a helper both paths call, would flip a recorded
+    // ruling with nothing red.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const { pid, hale, meta } = shopper(sim);
+    meta.gatheringProficiency.mining = TIER2_TOOL_GATE_PROFICIENCY;
+    items.buyItem(ctxOf(sim), hale.id, 'iron_mining_pick', pid);
+    expect(sim.countItem('iron_mining_pick', pid)).toBe(1);
+
+    // Sell it back, then lose the proficiency (the mastery-reset shape).
+    items.sellItem(ctxOf(sim), 'iron_mining_pick', 1, pid);
+    expect(sim.countItem('iron_mining_pick', pid)).toBe(0);
+    meta.gatheringProficiency.mining = 0;
+    sim.drainEvents();
+
+    items.buyBackItem(ctxOf(sim), 'iron_mining_pick', pid);
+
+    expect(sim.countItem('iron_mining_pick', pid)).toBe(1);
+    expect(errorTexts(sim.drainEvents())).toEqual([]);
   });
 
   it('leaves the ungated tier-1 tool buyable by a player with no proficiency at all', () => {

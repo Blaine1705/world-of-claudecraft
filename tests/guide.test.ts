@@ -1404,8 +1404,8 @@ describe('Guide professions gathering accuracy', () => {
     // frozen numbers, and nothing else would notice, because the value would
     // still be present and translated.
     const en = t('guide.profPages.toolsNote', {
-      tier2: String(TIER2_TOOL_GATE_PROFICIENCY),
-      tier3: String(TIER3_TOOL_GATE_PROFICIENCY),
+      tier2Prof: String(TIER2_TOOL_GATE_PROFICIENCY),
+      tier3Prof: String(TIER3_TOOL_GATE_PROFICIENCY),
     });
     expect(en).toContain(String(TIER2_TOOL_GATE_PROFICIENCY));
     expect(en).toContain(String(TIER3_TOOL_GATE_PROFICIENCY));
@@ -1430,18 +1430,20 @@ describe('Guide professions gathering accuracy', () => {
       // direction of that looseness is a FALSE PASS.
       const lineEnd = source.slice(at).indexOf('\n');
       const value = source.slice(at, lineEnd === -1 ? undefined : at + lineEnd);
-      expect(value, `${file} keeps {tier2}`).toContain('{tier2}');
-      expect(value, `${file} keeps {tier3}`).toContain('{tier3}');
+      expect(value, `${file} keeps {tier2Prof}`).toContain('{tier2Prof}');
+      expect(value, `${file} keeps {tier3Prof}`).toContain('{tier3Prof}');
       // The half a placeholder check alone cannot see: a fill that spelled the
       // numbers out would keep the tokens elsewhere in the sentence and still
       // publish frozen values. Neither threshold may appear as a literal.
       const withoutTokens = value.replace(/\{[^}]*\}/g, '');
-      expect(withoutTokens, `${file} spells out ${TIER2_TOOL_GATE_PROFICIENCY}`).not.toContain(
-        String(TIER2_TOOL_GATE_PROFICIENCY),
-      );
-      expect(withoutTokens, `${file} spells out ${TIER3_TOOL_GATE_PROFICIENCY}`).not.toContain(
-        String(TIER3_TOOL_GATE_PROFICIENCY),
-      );
+      // Whole-number match, not a substring: an unrelated figure that merely
+      // CONTAINS the threshold digits (a 240-second respawn, say) must not trip
+      // this, or a future prose edit fails for the wrong reason.
+      for (const threshold of [TIER2_TOOL_GATE_PROFICIENCY, TIER3_TOOL_GATE_PROFICIENCY]) {
+        expect(withoutTokens, `${file} spells out ${threshold}`).not.toMatch(
+          new RegExp(`(^|[^0-9])${threshold}([^0-9]|$)`),
+        );
+      }
     }
   });
 
