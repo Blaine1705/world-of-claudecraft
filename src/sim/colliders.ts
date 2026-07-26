@@ -34,6 +34,7 @@ import {
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
 } from './dungeon_layout';
+import { emberLilySpots } from './ember_lilies';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
 import { ORKADIA_FIELD_COLLIDER_SPECS, ORKADIA_FIELD_WALLS } from './orkadia_field';
 import type { BuildingDef, WorldContent } from './types';
@@ -216,6 +217,20 @@ function staticWorldColliders(seed: number): Collider[] {
       cameraTopY: topY(seed, w.x, w.z, 6),
       camGhost: true,
     });
+  // ...and the Drakelands' giant ember lilies: the huge and giant tiers
+  // carry a rocky-bed collider (r 0 skirt lilies stay walk-through
+  // dressing), same one-list contract as the willows
+  for (const lily of emberLilySpots(seed)) {
+    if (lily.r <= 0) continue;
+    out.push({
+      type: 'circle',
+      x: lily.x,
+      z: lily.z,
+      r: lily.r,
+      cameraTopY: topY(seed, lily.x, lily.z, lily.fp * 0.55),
+      camGhost: true,
+    });
+  }
   // The Palmreach strand: a slim trunk collider at the base of every beach
   // palm, from the same deterministic list the renderer instances the models
   // from (world.ts). camGhost so the chase cam passes through instead of

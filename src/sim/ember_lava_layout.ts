@@ -59,7 +59,9 @@ export const EMBER_LAVA_LINKS: readonly EmberLavaLink[] = [
   // the twin waste pools' own short link
   // biome-ignore format: link rows read best as single lines
   { x0: 330, z0: 2250, h0: 3.4, x1: 344, z1: 2233, h1: 3.4, w: 10, amp: 1.2, wavelength: 40, phase: 1.1, trim0: 8, trim1: 6 },
-  // the long run south from the twin pools into the waste basin
+  // the long run south from the twin pools into the waste basin (gentle
+  // sway: the short bendy river pieces add their own curl on top, so a
+  // tight authored meander made the chain read as loops)
   {
     x0: 330,
     z0: 2250,
@@ -68,8 +70,8 @@ export const EMBER_LAVA_LINKS: readonly EmberLavaLink[] = [
     z1: 2328,
     h1: 0.6,
     w: 12,
-    amp: 2.4,
-    wavelength: 52,
+    amp: 1.8,
+    wavelength: 64,
     phase: 4.2,
     trim0: 8,
     trim1: 11,
@@ -83,8 +85,8 @@ export const EMBER_LAVA_LINKS: readonly EmberLavaLink[] = [
     z1: 2220,
     h1: 0.2,
     w: 11,
-    amp: 2.0,
-    wavelength: 46,
+    amp: 1.6,
+    wavelength: 56,
     phase: 2.6,
     trim0: 7,
     trim1: 11,

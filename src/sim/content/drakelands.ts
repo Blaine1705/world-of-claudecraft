@@ -72,6 +72,13 @@ export const DRAKELANDS_FLOWER_MEADOWS: { x: number; z: number; r: number }[] = 
   { x: 382, z: 1946, r: 10 },
   { x: 356, z: 1986, r: 12 },
   { x: 390, z: 1992, r: 8 },
+  // the second bloom wave: the causeway shore, the pass mouth, and the
+  // gatewood clearings past the warren
+  { x: 404, z: 1826, r: 7 },
+  { x: 418, z: 1842, r: 8 },
+  { x: 344, z: 1866, r: 8 },
+  { x: 330, z: 1940, r: 10 },
+  { x: 416, z: 1966, r: 9 },
 ];
 
 export const DRAKELANDS_ROADS: { x: number; z: number }[][] = [

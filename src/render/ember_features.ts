@@ -6,14 +6,10 @@
 // contract as realm_flora: build once, update(time) animates, lights join
 // the renderer's rank-culled fireLights budget.
 import * as THREE from 'three';
-import {
-  EMBER_FLAT_POOLS,
-  EMBER_LAVA_LINKS,
-  emberLinkPolyline,
-  emberNearestOnLink,
-} from '../sim/ember_lava_layout';
+import { EMBER_FLAT_POOLS, EMBER_LAVA_LINKS, emberLinkPolyline } from '../sim/ember_lava_layout';
+import { emberLilySpots, emberScatterClear } from '../sim/ember_lilies';
 import { hash2 } from '../sim/rng';
-import { EMBER_LAVA_POOLS, EMBER_VOLCANOES, roadDistance, terrainHeight } from '../sim/world';
+import { EMBER_LAVA_POOLS, terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
@@ -201,18 +197,29 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
           z: pts[i - 1].z + (pts[i].z - pts[i - 1].z) * t,
         };
       };
-      const step = link.w * 0.72;
+      // dense overlap (pieces are ~1.7x the step) so the short bendy
+      // variants read as ONE continuous channel; variant A is the strongly
+      // curved piece, so it appears only every 4th slot between the two
+      // gentler variants, and never right at a mouth (a hard curl against
+      // a pool rim reads as a loop, not a confluence)
+      const step = link.w * 0.58;
       let k = 0;
       for (let d = link.trim0; d < len - link.trim1; d += step) {
         const here = at(d);
         const ahead = at(Math.min(len, d + 1.5));
         const yaw = Math.atan2(ahead.x - here.x, ahead.z - here.z);
-        const variant = k % 3;
+        const nearMouth = d < link.trim0 + step * 1.5 || d > len - link.trim1 - step * 1.5;
+        const variant = !nearMouth && k % 4 === 3 ? 0 : k % 2 === 1 ? 2 : 1;
         const flip = k % 2 === 1 ? Math.PI : 0;
         riverSegs[variant].push(seg(here.x, here.z, yaw + AXIS_OFFSET[variant] + flip, link.w));
         k++;
       }
-      // the receiving mouth's cap, tucked just short of the pool
+      // a mouth cap at EACH pool, laid on the local tangent so the channel
+      // visually plugs into the pool ring instead of stopping short
+      const head = at(Math.min(len, link.trim0 - step * 0.25 < 0 ? 0 : link.trim0 - step * 0.25));
+      const headNext = at(Math.min(len, link.trim0 + 1.5));
+      const headYaw = Math.atan2(headNext.x - head.x, headNext.z - head.z);
+      endSegs.push(seg(head.x, head.z, headYaw + Math.PI / 2, link.w));
       const tail = at(Math.max(0, len - link.trim1 + step * 0.25));
       const tailPrev = at(Math.max(0, len - link.trim1 + step * 0.25 - 1.5));
       const tailYaw = Math.atan2(tail.x - tailPrev.x, tail.z - tailPrev.z);
@@ -249,92 +256,36 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
   ]);
 
   // --- the ember lilies (giant crystal-flower trees) and small ember
-  // crystal clusters, scattered across the dry waste ---
+  // crystal clusters. Lily grove placements come from the SHARED sim leaf
+  // (sim/ember_lilies.ts): the render draws exactly the list the collider
+  // builder blocks, and every stem passed the leaf's strict flat-ground
+  // gates (a bed on sloped dirt reads as floating). The bed rests at the
+  // LOWEST touched terrain point (spot.y), never a mid-slope average. ---
   {
-    const lilySpots: PropPlacement[] = [];
+    const lilySpots: PropPlacement[] = emberLilySpots(seed).map((lily) => ({
+      x: lily.x,
+      z: lily.z,
+      y: lily.y - 0.1,
+      fp: lily.fp,
+      rot: lily.rot,
+    }));
     const crystalSpots: PropPlacement[] = [];
-    const clearOf = (x: number, z: number): boolean => {
-      if (roadDistance(x, z) < 6) return false;
-      if (Math.hypot(x - 404, z - 1900) < 32) return false; // Wyrmwatch
-      for (const pool of EMBER_LAVA_POOLS)
-        if (Math.hypot(x - pool.x, z - pool.z) < pool.r * 1.5 + 6) return false;
-      for (const v of EMBER_VOLCANOES)
-        if (Math.hypot(x - v.x, z - v.z) < v.craterR + 10) return false;
-      for (const den of [
-        { x: 419, z: 2266 },
-        { x: 302, z: 2258 },
-      ])
-        if (Math.hypot(x - den.x, z - den.z) < 13) return false;
-      for (const pool of EMBER_FLAT_POOLS) {
-        if (Math.hypot(x - pool.x, z - pool.z) < pool.r * 1.5 + 5) return false;
-      }
-      // the river links keep their banks clear (the shared meander, so the
-      // clearance follows the real channel, not the straight chord)
-      for (const link of EMBER_LAVA_LINKS) {
-        if (emberNearestOnLink(link, x, z).dist < link.w * 0.8 + 4) return false;
-      }
-      return true;
-    };
-    // level-ground gate (the willow rule): lilies only root on flats
-    const levelAt = (x: number, z: number): boolean => {
-      const e = 1.2;
-      const hx = terrainHeight(x + e, z, seed) - terrainHeight(x - e, z, seed);
-      const hz = terrainHeight(x, z + e, seed) - terrainHeight(x, z - e, seed);
-      return Math.hypot(hx, hz) / (2 * e) <= 0.3;
-    };
     for (let gx = 200; gx <= 530; gx += 12) {
       for (let gz = 1830; gz <= 2405; gz += 12) {
         const r = hash2(gx, gz, seed + 811);
-        if (r > 0.2) continue;
+        if (r > 0.2 || r < 0.055) continue; // the grove band belongs to the leaf
         const x = gx + (hash2(gx + 1, gz, seed + 821) - 0.5) * 9;
         const z = gz + (hash2(gx, gz + 1, seed + 831) - 0.5) * 9;
         const y = terrainHeight(x, z, seed);
         if (y < 1) continue;
-        if (!clearOf(x, z)) continue;
-        if (r >= 0.055) {
-          crystalSpots.push({
-            x,
-            z,
-            y: y - 0.1,
-            rot: hash2(z, x, seed + 841) * Math.PI * 2,
-            fp: 1.8 + hash2(x, z, seed + 861) * 1.6,
-          });
-          continue;
-        }
-        // a lily GROVE: the giants grow in families, huge elders at the
-        // heart, giants around them, smaller lilies at the skirt (1 to 2
-        // huge, 2 to 3 giant, 3 to 4 small per clump), every stem on its
-        // own probed level ground
-        if (!levelAt(x, z)) continue;
-        const tier = [
-          { n: 1 + Math.round(hash2(gx, gz, seed + 852)), lo: 11, hi: 15, rad: 3.2 },
-          { n: 2 + Math.round(hash2(gx, gz, seed + 853)), lo: 7, hi: 10, rad: 7.5 },
-          { n: 3 + Math.round(hash2(gx, gz, seed + 854)), lo: 3.5, hi: 6, rad: 11 },
-        ];
-        let placed = 0;
-        tier.forEach((t, ti) => {
-          for (let k = 0; k < t.n; k++) {
-            const ang = hash2(gx + k, gz + ti * 7, seed + 855) * Math.PI * 2;
-            const dist =
-              ti === 0 && k === 0
-                ? 0
-                : t.rad * (0.55 + hash2(gx, gz + k + ti * 13, seed + 856) * 0.45);
-            const lx = x + Math.sin(ang) * dist;
-            const lz = z + Math.cos(ang) * dist;
-            const ly = terrainHeight(lx, lz, seed);
-            if (ly < 1 || !clearOf(lx, lz) || !levelAt(lx, lz)) continue;
-            lilySpots.push({
-              x: lx,
-              z: lz,
-              y: ly - 0.1,
-              fp: t.lo + hash2(lz, lx, seed + 857) * (t.hi - t.lo),
-              rot: hash2(lx, lz, seed + 858) * Math.PI * 2,
-            });
-            placed++;
-          }
+        if (!emberScatterClear(x, z)) continue;
+        crystalSpots.push({
+          x,
+          z,
+          y: y - 0.1,
+          rot: hash2(z, x, seed + 841) * Math.PI * 2,
+          fp: 1.8 + hash2(x, z, seed + 861) * 1.6,
         });
-        // a clump that lost every stem to the gates leaves no mark
-        if (placed === 0) continue;
       }
     }
     // a dense crystal garden on the Bloodglass Fields
@@ -344,7 +295,7 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
       const x = 270 + Math.sin(ang) * dist;
       const z = 2270 + Math.cos(ang) * dist;
       const y = terrainHeight(x, z, seed);
-      if (y < 1 || !clearOf(x, z)) continue;
+      if (y < 1 || !emberScatterClear(x, z)) continue;
       crystalSpots.push({
         x,
         z,
