@@ -33,8 +33,9 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
     const base = abilitiesKnownAt('paladin', 20, undefined).find(
       (a) => a.def.id === 'retribution_aura',
     );
-    const baseThorns = base?.effects.find((e) => e.type === 'selfBuff' && e.kind === 'thorns');
-    expect(baseThorns && 'value' in baseThorns ? baseThorns.value : null).toBe(5);
+    const baseThorns = base?.effects.find((e) => e.type === 'buffTarget' && e.kind === 'thorns');
+    // Rank 3 at level 20 (the aura ranks 5 -> 12 -> 22 at levels 7, 13 and 18).
+    expect(baseThorns && 'value' in baseThorns ? baseThorns.value : null).toBe(22);
 
     const retMods = computeTalentModifiers(
       'paladin',
@@ -44,9 +45,9 @@ describe('mastery does not corrupt utility rate buffs (F1)', () => {
     const ret = abilitiesKnownAt('paladin', 20, retMods).find(
       (a) => a.def.id === 'retribution_aura',
     );
-    const retThorns = ret?.effects.find((e) => e.type === 'selfBuff' && e.kind === 'thorns');
-    // 5 * 1.2 (ret meleeDmgPct 0.2) = 6, not 5 (the pre-fix regression left it at 5).
-    expect(retThorns && 'value' in retThorns ? retThorns.value : null).toBe(6);
+    const retThorns = ret?.effects.find((e) => e.type === 'buffTarget' && e.kind === 'thorns');
+    // 22 * 1.2 (ret meleeDmgPct 0.2) = 26, not 22 (the pre-fix regression left it unscaled).
+    expect(retThorns && 'value' in retThorns ? retThorns.value : null).toBe(26);
   });
 
   it('the Protection power floor strengthens its rate buff through buffPct', () => {

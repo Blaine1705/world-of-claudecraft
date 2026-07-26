@@ -44,7 +44,8 @@ describe('talent empowerNext scoping', () => {
     // Pin the approved v0.29 proc surface exactly. A deliberate proc addition or
     // removal must update this sentinel, while a refactor that drops rows from
     // ROW_TREES cannot silently weaken the scoping audit.
-    expect(scanned).toBe(19);
+    // 18, not #2218's 19: #2428 retired one paladin empowerNext proc.
+    expect(scanned).toBe(18);
     expect(offenders).toEqual([]);
   });
 });

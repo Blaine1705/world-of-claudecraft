@@ -30,6 +30,7 @@ import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
 import { lockNormalDungeonResetOnBossKill } from '../instances/dungeons';
+import { grantAbilityDevotion } from '../paladin_devotion';
 import { pvpDamageMultiplier } from '../pvp';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
@@ -73,6 +74,19 @@ import {
   clearHunterTalentState,
   hasHunterTalent,
 } from './hunter_shared';
+import { cleanupPaladinAegis } from './paladin_aegis';
+import { stripBeaconOfLight } from './paladin_beacon';
+import { protectionConsecrationDamageReduction } from './paladin_consecration';
+import {
+  answerDebtOfLight,
+  DEBT_OF_LIGHT_DEVOTION,
+  debtOfLightAura,
+} from './paladin_debt_of_light';
+import { stripSunGodVerdicts } from './paladin_sun_verdict';
+import { stripPaladinDevotionsFromSource } from './paladin_support';
+import { masteredPaladinAuraValue } from './paladin_talents';
+import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
+import { veilboundMarkDamageMultiplier } from './paladin_veilbound_march';
 import { doctrineConvertDamage } from './priest/doctrine';
 import { cleanupPriestState } from './priest/lifecycle';
 import {
@@ -147,6 +161,7 @@ export function dealDamage(
   )
     return;
   if (target.gm || target.devGod) return; // GMs and /dev god are invulnerable (every damage path funnels here)
+  if (isValkyrsCallingAirborne(target)) return;
   // Ice Block (Cold Coffin): while encased in stasis the mage is FULLY immune to
   // damage (owner 2026-07-13), so nothing gets through until it is cancelled or
   // expires. Every damage path funnels here, so this covers melee, spells, and DoTs.
@@ -158,6 +173,7 @@ export function dealDamage(
   // wild-mob leash recovery, and must not inherit this immunity from stale state.
   if (target.kind === 'mob' && target.aiState === 'evade' && target.ownerId === null) return;
   amount = Math.max(0, amount);
+  amount = Math.round(amount * veilboundMarkDamageMultiplier(source, target));
   const attackAnimation = attackAnimationStarted ? { attackAnimationStarted: true as const } : {};
 
   // Cauterize (fire spec): +12% Fire damage to enemies while the caster is burning
@@ -295,9 +311,11 @@ export function dealDamage(
   }
 
   if (source && source.id !== target.id && amount > 0) {
-    let reduction = 0;
+    let reduction = protectionConsecrationDamageReduction(ctx.groundAoEs, target);
     for (const aura of target.auras) {
-      if (aura.kind === 'buff_dr' || aura.kind === 'die_by_sword') reduction += aura.value;
+      if (aura.kind === 'buff_dr') {
+        reduction += masteredPaladinAuraValue(target, aura.id, aura.value);
+      } else if (aura.kind === 'die_by_sword') reduction += aura.value;
     }
     if (reduction > 0) amount = Math.round(amount * Math.max(0, 1 - reduction));
   }
@@ -409,8 +427,32 @@ export function dealDamage(
   // tick carries crit=false so it can never re-ignite itself. Draws no rng.
   igniteOnCrit(ctx, source, target, amount, crit, school, ability);
 
+  // Debt of Light answers BEFORE the generic shields: it is a deliberately armed
+  // single-hit answer, so it must be the thing that eats the blow the paladin
+  // armed it for rather than whatever passive absorb happens to be worn. Its
+  // return hit is queued and dealt after the incoming damage resolves, so the
+  // attacker's own defenses apply to it normally and it can never recurse (the
+  // aura is gone by then).
+  let debtReturn: { attacker: Entity; amount: number } | null = null;
+
   // absorb shields soak damage first
   let totalAbsorbed = 0;
+  if (amount > 0) {
+    const armed = debtOfLightAura(target);
+    if (armed) {
+      const answer = answerDebtOfLight(armed.value, amount, !!source && source.id !== target.id);
+      if (answer && source) {
+        amount -= answer.soaked;
+        totalAbsorbed += answer.soaked;
+        target.auras.splice(target.auras.indexOf(armed), 1);
+        ctx.emit({ type: 'aura', targetId: target.id, name: armed.name, gained: false });
+        if (target.kind === 'player') grantAbilityDevotion(target, DEBT_OF_LIGHT_DEVOTION);
+        if (answer.soaked > 0 && !source.dead) {
+          debtReturn = { attacker: source, amount: answer.soaked };
+        }
+      }
+    }
+  }
   if (amount > 0) {
     for (let i = target.auras.length - 1; i >= 0 && amount > 0; i--) {
       const a = target.auras[i];
@@ -952,6 +994,25 @@ export function dealDamage(
   }
   reflectSpellWard(ctx, source, target, amount, kind, school);
 
+  // Debt of Light's answer, once the incoming hit has fully resolved: the share of
+  // what was soaked goes back to the attacker as Holy damage. The aura was
+  // already removed when the blow was answered, so this can neither re-arm nor
+  // recurse, and noRage keeps the return from feeding the paladin's own meters
+  // a second time.
+  if (debtReturn && !debtReturn.attacker.dead && debtReturn.amount > 0) {
+    dealDamage(
+      ctx,
+      target,
+      debtReturn.attacker,
+      debtReturn.amount,
+      false,
+      'holy',
+      'Debt of Light',
+      'hit',
+      true,
+    );
+  }
+
   if (target.hp <= 0) {
     // A fiesta fighter who somehow bottoms out via a non-takedown path (a
     // friendly DoT tail, self-damage) is benched, not killed — never let the
@@ -1060,6 +1121,9 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   }
   vespersOnEntityDeath(ctx, e);
   resetProcState(e);
+  cleanupPaladinAegis(ctx, e.id);
+  stripSunGodVerdicts(ctx, e.id);
+  stripPaladinDevotionsFromSource(ctx, e.id);
   e.dead = true;
   e.hp = 0;
   ctx.clearNonPlayerStatAuras(e);
@@ -1107,6 +1171,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // carries from another chronomancer are left alone.
     stripTemporalEchoes(ctx, e.id);
     cleanupPriestState(ctx, e.id);
+    stripBeaconOfLight(ctx, e.id);
     const meta = ctx.players.get(e.id);
     if (meta?.cls === 'hunter') {
       clearHunterTalentState(ctx, e);
@@ -1130,6 +1195,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     e.chargeTargetId = null;
     e.chargePath = [];
     if (e.leap !== undefined) e.leap = null;
+    if (e.valkyrsCalling !== undefined) e.valkyrsCalling = null;
     e.followTargetId = null;
     ctx.emit({ type: 'playerDeath', pid: e.id });
     for (const m of ctx.entities.values()) {

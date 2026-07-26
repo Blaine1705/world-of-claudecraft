@@ -26,6 +26,7 @@
 // against a real lagging Sim.
 
 import { resolveMovement } from '../sim/colliders';
+import { hasValkyrsCallingFlightAura } from '../sim/combat/paladin_valkyrs_calling_state';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
 import { DT, type Entity, type MoveInput, RUN_SPEED } from '../sim/types';
 
@@ -205,7 +206,10 @@ export class SelfMotionPredictor {
    * path, which shares the same selfRenderPosition so the handoff is seamless).
    */
   step(self: Entity, frame: SelfMotionFrame): Vec3Like | null {
-    if (!frame.enabled) {
+    // Valkyr's Calling is server-driven movement. Let authoritative snapshot
+    // interpolation render the full ascent and approach instead of predicting
+    // ordinary grounded input over it.
+    if (!frame.enabled || hasValkyrsCallingFlightAura(self)) {
       this.reset();
       return null;
     }

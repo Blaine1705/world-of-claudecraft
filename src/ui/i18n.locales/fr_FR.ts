@@ -1111,7 +1111,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': 'Gel mort',
   'entities.abilities.desperate_prayer.name': 'Dernière prière',
   'entities.abilities.deterrence.name': 'Garde-hérissée',
-  'entities.abilities.divine_shield.name': 'Garde-lumière',
   'entities.abilities.earthbind.name': 'Terre agrippante',
   'entities.abilities.evocation.name': 'Puits d’éther',
   'entities.abilities.frenzied_regeneration.name': 'Régénération sauvage',
@@ -1119,7 +1118,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': 'Frappe spectrale',
   'entities.abilities.hammer_of_wrath.name': 'Marteau sonnant',
   'entities.abilities.healing_stream.name': 'Puits de source',
-  'entities.abilities.holy_wrath.name': 'Courroux du saint',
   'entities.abilities.howl_of_terror.name': 'Hurlement d’effroi',
   'entities.abilities.ice_block.name': 'Cercueil froid',
   'entities.abilities.inner_focus.name': 'Esprit apaisé',
@@ -1134,9 +1132,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.name': 'Glissement d’ombre',
   'entities.abilities.silence.name': 'Silence',
   'entities.abilities.tranquility.name': 'Chant du bosquet',
-  'entities.abilities.cleansing_verdict.name': 'Verdict purificateur',
-  'entities.abilities.cleansing_verdict.description':
-    'Dissipe un effet magique néfaste sur une cible alliée et lui rend {damage} points de vie par la magie du Sacré.',
   'entities.abilities.smoke_screen.name': 'Écran de fumée',
   'entities.abilities.smoke_screen.description':
     'Vous disparaissez dans un nuage de fumée, ce qui augmente vos chances d’esquiver de 30 % pendant 8 s.',
@@ -4527,7 +4522,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Augmente de 60% la menace générée par vos dégâts Sacrés pendant 30 min. La pierre angulaire du paladin tank.',
   'entities.abilities.retribution_aura.name': 'Aura de représailles',
   'entities.abilities.retribution_aura.description':
-    "Vous entoure d'énergie sacrée pendant 30 min, infligeant 5 points de dégâts Sacrés à tout ennemi qui vous frappe en mêlée.",
+    "Vous entoure, vous et votre groupe, d'énergie sacrée jusqu'à la mort ou au remplacement. Les ennemis qui frappent un allié affecté en mêlée subissent {buff} points de dégâts Sacrés, et les alliés affectés infligent {buff} points de dégâts Sacrés supplémentaires avec leurs attaques automatiques.",
   'entities.abilities.tame_beast.name': 'Lien sauvage',
   'entities.abilities.tame_beast.description':
     "Commence à apprivoiser une bête pour en faire votre compagnon. Elle doit être de votre niveau ou moins et ne pas être élite. Votre familier vous suit, attaque vos ennemis et génère sa propre menace. Vous ne pouvez avoir qu'un familier à la fois.",
@@ -8736,9 +8731,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'game.talents.choicesTab': 'Choix',
   'game.talents.rowUnlockToast': 'Nouveau choix de talent disponible !',
   'game.talents.rowUnlocks': 'Se débloque au niveau {level}',
-  'entities.abilities.aura_surge.name': "Ricochet de l'aube",
-  'entities.abilities.aura_surge.description':
-    "Projette un bouclier forgé à l'aube qui inflige {damage} dégâts sacrés, réduit la cible principale au silence pendant 2 s, puis rebondit sur jusqu'à 2 ennemis supplémentaires à moins de 10 m, infligeant 75 % des dégâts par rebond. (talent de Paladin)",
   'entities.abilities.aspect_of_the_wild.description':
     "Insuffle une force sauvage aux alliés à moins de 30 m, augmentant leur puissance d'attaque de 45 et leur vitesse d'attaque de 5 % pendant 5 min. (talent de Chasseur)",
   'entities.abilities.avatar.name': 'Incarnation',
@@ -8773,8 +8765,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Vous rend instantanément {damage} points de vie. (talent de Prêtre)',
   'entities.abilities.deterrence.description':
     "Augmente vos chances d'esquiver de 50 points de pourcentage pendant 10 s. (talent de Chasseur)",
-  'entities.abilities.divine_shield.description':
-    'Vous protège par la puissance sacrée, absorbant 900 points de dégâts pendant 8 s. (talent de Paladin)',
   'entities.abilities.earthbind.description':
     'Lie les ennemis proches à la terre et les immobilise pendant 2 s. (talent de Chaman)',
   'entities.abilities.evocation.description': 'Restaura mana rápidamente. (talent de mage)',
@@ -8788,8 +8778,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Lance un marteau sacré sur un ennemi blessé et lui inflige {damage} points de dégâts du Sacré. Utilisable uniquement sous 20 % de points de vie. (talent de Paladin)',
   'entities.abilities.healing_stream.description':
     'Rend 120 points de vie à une cible alliée en 12 s. (talent de Chaman)',
-  'entities.abilities.holy_wrath.description':
-    'Libère une puissance sacrée et inflige {damage} points de dégâts aux ennemis proches. (talent de Paladin)',
   'entities.abilities.howl_of_terror.description':
     "Effraie les ennemis proches pendant un maximum de 3 s. Les dégâts peuvent interrompre l'effet. (talent de Démoniste)",
   'entities.abilities.ice_block.description':

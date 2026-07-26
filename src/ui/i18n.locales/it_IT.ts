@@ -1061,7 +1061,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': 'Gelo Morto',
   'entities.abilities.desperate_prayer.name': 'Ultima Preghiera',
   'entities.abilities.deterrence.name': 'Guardia Ispida',
-  'entities.abilities.divine_shield.name': 'Custodia di Luce',
   'entities.abilities.earthbind.name': 'Terra Avvinghiante',
   'entities.abilities.evocation.name': 'Pozzo d’Etere',
   'entities.abilities.frenzied_regeneration.name': 'Rammendo Selvaggio',
@@ -1069,7 +1068,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': 'Colpo Spettrale',
   'entities.abilities.hammer_of_wrath.name': 'Martello Rintoccante',
   'entities.abilities.healing_stream.name': 'Fonte Viva',
-  'entities.abilities.holy_wrath.name': 'Ira del Santo',
   'entities.abilities.howl_of_terror.name': 'Ululato del Terrore',
   'entities.abilities.ice_block.name': 'Bara Fredda',
   'entities.abilities.inner_focus.name': 'Mente Quietata',
@@ -1084,9 +1082,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.name': 'Scivolo d’Ombra',
   'entities.abilities.silence.name': 'Silenzio',
   'entities.abilities.tranquility.name': 'Canto della Radura',
-  'entities.abilities.cleansing_verdict.name': 'Verdetto Purificante',
-  'entities.abilities.cleansing_verdict.description':
-    'Dissipa un effetto magico dannoso da un bersaglio alleato e lo cura di {damage} con magia Sacra.',
   'entities.abilities.smoke_screen.name': 'Cortina Fumogena',
   'entities.abilities.smoke_screen.description':
     'Scompari in una nube di fumo, aumentando del 30% la probabilità di schivare per 8 s.',
@@ -4080,7 +4075,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Aumenta del 60% la minaccia generata dai tuoi danni Sacri per 30 min. Il cardine del paladino difensore.',
   'entities.abilities.retribution_aura.name': 'Aura della Rivalsa',
   'entities.abilities.retribution_aura.description':
-    'Ti avvolge in energia sacra per 30 min, infliggendo 5 danni Sacri a ogni nemico che ti colpisce in mischia.',
+    'Avvolge te e il tuo gruppo in energia sacra fino alla morte o alla sostituzione. I nemici che colpiscono in mischia un alleato interessato subiscono {buff} danni Sacri, e gli alleati interessati infliggono {buff} danni Sacri aggiuntivi con gli attacchi automatici.',
   'entities.abilities.tame_beast.name': 'Vincolo Selvaggio',
   'entities.abilities.tame_beast.description':
     'Inizia ad addomesticare una bestia come compagna. Deve essere del tuo livello o inferiore e non élite. Il tuo famiglio ti segue, attacca i tuoi nemici e mantiene la propria minaccia. Puoi avere un solo famiglio alla volta.',
@@ -8640,9 +8635,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'game.talents.choicesTab': 'Scelte',
   'game.talents.rowUnlockToast': 'Nuova scelta di talento disponibile!',
   'game.talents.rowUnlocks': 'Si sblocca al livello {level}',
-  'entities.abilities.aura_surge.name': "Rimbalzo dell'Alba",
-  'entities.abilities.aura_surge.description':
-    "Scaglia uno scudo forgiato all'alba che infligge {damage} danni Sacri, silenzia il bersaglio principale per 2 sec. e rimbalza su un massimo di 2 nemici aggiuntivi entro 10 metri, infliggendo il 75% dei danni per rimbalzo. (talento del Paladino)",
   'entities.abilities.aspect_of_the_wild.description':
     'Infondi forza selvaggia negli alleati entro 30 m, aumentando la loro potenza d’attacco di 45 e la velocità d’attacco del 5% per 5 min. (talento del Cacciatore)',
   'entities.abilities.avatar.name': 'Incarnazione',
@@ -8677,8 +8669,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Ti cura istantaneamente di {damage}. (talento del Sacerdote)',
   'entities.abilities.deterrence.description':
     'Aumenta la tua probabilità di schivata di 50 punti percentuali per 10 sec. (talento del Cacciatore)',
-  'entities.abilities.divine_shield.description':
-    'Ti protegge con il potere sacro, assorbendo 900 danni per 8 sec. (talento del Paladino)',
   'entities.abilities.earthbind.description':
     'Lega alla terra i nemici vicini, immobilizzandoli per 2 sec. (talento dello Sciamano)',
   'entities.abilities.evocation.description': 'Restaura mana rápidamente. (talento da mago)',
@@ -8692,8 +8682,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Scaglia un martello sacro contro un nemico ferito, infliggendo {damage} danni sacri. Utilizzabile solo sotto il 20% di salute. (talento del Paladino)',
   'entities.abilities.healing_stream.description':
     'Ripristina 120 salute a un bersaglio alleato in 12 sec. (talento dello Sciamano)',
-  'entities.abilities.holy_wrath.description':
-    'Scatena il potere sacro, infliggendo {damage} danni ai nemici vicini. (talento del Paladino)',
   'entities.abilities.howl_of_terror.description':
     'Terrorizza i nemici vicini per un massimo di 3 sec. I danni possono interrompere l’effetto. (talento dello Stregone)',
   'entities.abilities.ice_block.description':

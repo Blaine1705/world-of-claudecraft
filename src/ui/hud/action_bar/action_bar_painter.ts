@@ -38,6 +38,8 @@ const CLASS_OUT_OF_RANGE = 'oor';
 const CLASS_QUEUED = 'queued';
 const CLASS_PROC = 'proc';
 const CLASS_EMPOWERED = 'empowered';
+const CLASS_ASCENSION_SPENDER = 'ascension-spender';
+const ASCENSION_COST_ATTR = 'data-ascension-cost';
 const CLASS_MANY_SPELLS = 'many-spells';
 // The count badge gains this class on a charge-pool ability so "2" reads as
 // stored charges, not an item stack (distinct plate + color in hud.css).
@@ -106,7 +108,9 @@ export class ActionBarPainter {
       this.writers.toggleClass(el.btn, CLASS_QUEUED, s.queued);
       this.writers.toggleClass(el.btn, CLASS_PROC, s.procGlow);
       this.writers.toggleClass(el.btn, CLASS_EMPOWERED, s.empowered);
+      this.writers.toggleClass(el.btn, CLASS_ASCENSION_SPENDER, s.ascensionSpender);
 
+      this.writers.setAttr(el.btn, ASCENSION_COST_ATTR, s.ascensionCostLabel);
       this.writers.setAttr(el.btn, ARIA_LABEL_ATTR, s.ariaLabel);
       this.writers.setText(el.keybindEl, s.keybindLabel);
     }

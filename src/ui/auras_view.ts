@@ -28,6 +28,7 @@
 // mirror aura {stacks:undefined} derive identical output.
 
 import { isDebuffAura as classifyDebuffAura, DEBUFF_AURA_KINDS } from '../sim/aura_classify';
+import { isCancelableAura } from '../sim/combat/aura_cancel';
 import { isPersistentEngineAura } from '../sim/persistent_aura';
 import type { AuraKind } from '../sim/types';
 import type { AuraSchool } from './aura_effect';
@@ -56,7 +57,7 @@ const TOGGLE_KINDS: ReadonlySet<AuraKind> = new Set([
 ]);
 // Ghost Wolf toggles too, but its aura rides the generic buff_speed kind (which
 // Sprint also uses, 15s and very much worth a countdown), so it hides by id.
-const TOGGLE_IDS: ReadonlySet<string> = new Set(['ghost_wolf']);
+const TOGGLE_IDS: ReadonlySet<string> = new Set(['ghost_wolf', 'beacon_of_light']);
 // The inverse override: an aura that rides a TOGGLE_KIND but is a genuine timed
 // buff worth a countdown. Greater Invisibility reuses the rogue-stealth machinery
 // for its vanish (kind 'stealth' with full move speed), but it is a fixed 20s
@@ -144,9 +145,9 @@ export interface AurasDeps {
   auraName(aura: AuraInput): string;
   /** The formatted stack count (host: `formatNumber(stacks, {maximumFractionDigits:0})`). */
   formatStacks(stacks: number): string;
-  /** The one-line aura effect-summary HTML the tooltip prepends (or '' when the aura has
-   *  no descriptor). Injected so the i18n-free core never calls t(): the host builds the
-   *  localized, esc'd HTML from the pure aura_effect descriptor. */
+  /** The localized, escaped tooltip body the tooltip prepends (or '' when unavailable).
+   *  The host may include the source ability description plus the one-line runtime
+   *  aura-effect summary; the i18n-free core never calls t(). */
   auraEffectHtml(aura: AuraInput): string;
   /** The localized single-letter duration unit suffixes the compact label appends
    *  (host: `t('hudChrome.unitFrame.durationUnitSeconds'/'...Minutes'/'...Hours'/
@@ -335,7 +336,7 @@ export function createAurasView(
         // The buff bar (mode 'buffs', the player's own auras) offers right-click-cancel;
         // a helpful buff is cancelable, a debuff never. The target debuff strip
         // (mode 'debuffs') is read-only, so nothing there is cancelable.
-        slot.cancelable = mode === 'buffs' && !debuff && a.unbreakableControl !== true;
+        slot.cancelable = mode === 'buffs' && isCancelableAura(a);
         slot.effectHtml = deps.auraEffectHtml(a);
         slot.own = own;
         count++;

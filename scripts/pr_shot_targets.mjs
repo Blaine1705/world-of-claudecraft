@@ -113,15 +113,22 @@ export const TARGETS = [
   },
   {
     key: 'tank-defensive-cds',
-    label: 'Tank defensive cooldowns',
-    when: ['tests/tank_defensive_cds.test.ts'],
+    // Widened past the tank when Dawnreaver grew a defensive of its own: the recipe
+    // is the same (learn it, arm it, shoot the spellbook row plus the armed slot),
+    // so the spec rides in as a variant rather than a copy of the capture body.
+    label: 'Defensive cooldowns',
+    when: ['tests/tank_defensive_cds.test.ts', 'combat/paladin_debt_of_light'],
     variants: [
       {
         key: 'paladin-desktop',
         charClass: 'paladin',
         charName: 'Dawnward',
-        abilityId: 'sacred_bulwark',
-        nearbyAbilityId: 'divine_protection',
+        // Faithwarden's authored defensives. Sacred Bulwark is retired kit
+        // (PALADIN_LEGACY_ABILITY_IDS), and the replacements are spec-gated, so
+        // the recipe specializes before it resolves them.
+        spec: 'protection',
+        abilityId: 'holy_shield',
+        nearbyAbilityId: 'bastion_rite',
       },
       {
         key: 'druid-desktop',
@@ -134,9 +141,19 @@ export const TARGETS = [
         key: 'paladin-mobile',
         charClass: 'paladin',
         charName: 'Sunward',
-        abilityId: 'sacred_bulwark',
-        nearbyAbilityId: 'divine_protection',
+        spec: 'protection',
+        abilityId: 'holy_shield',
+        nearbyAbilityId: 'bastion_rite',
         mobile: true,
+      },
+      {
+        // Dawnreaver's Debt of Light: armed before the blow, answers one hit.
+        key: 'paladin-retribution-desktop',
+        charClass: 'paladin',
+        charName: 'Dawnreaver',
+        spec: 'retribution',
+        abilityId: 'faithforged_guard',
+        nearbyAbilityId: 'final_edict',
       },
     ],
     async capture(page, variant) {
@@ -153,6 +170,7 @@ export const TARGETS = [
         const player = sim?.player;
         if (!sim || !player) return { known: false };
         sim.setPlayerLevel?.(20, player.id);
+        if (shot.spec) sim.setSpec?.(shot.spec);
         player.gm = true;
         player.resource = player.maxResource;
         const resolved = sim.resolvedAbility?.(shot.abilityId);

@@ -761,9 +761,11 @@ export function runOwnedHealerProbe(
   const healingBySource: Record<string, number> = {};
   const originalApplyHeal = sim.ctx.applyHeal;
   sim.ctx.applyHeal = (...args): number => {
-    const callerResolution = args[7];
+    // resolution is the LAST applyHeal parameter: the merge put #2428's
+    // beaconTransferEligible/alreadyResolved flags ahead of it at 7 and 8.
+    const callerResolution = args[9];
     const measured = { resolved: 0 };
-    args[7] = measured;
+    args[9] = measured;
     const effective = originalApplyHeal(...args);
     effectiveHealing += effective;
     const ability = args[3];

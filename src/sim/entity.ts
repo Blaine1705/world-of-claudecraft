@@ -222,6 +222,16 @@ export function createPlayer(id: number, cls: PlayerClass, pos: Vec3, name: stri
     const stance = buildStanceAura(BATTLE_STANCE, id);
     if (stance) e.auras.push(stance);
   }
+  if (cls === 'paladin') {
+    e.paladinDevotion = {
+      value: 0,
+      ascensionCharges: 0,
+      ascensionRemaining: 0,
+      outOfCombatTime: 0,
+      decayProgress: 0,
+      blockIcdRemaining: 0,
+    };
+  }
   return e;
 }
 
@@ -499,7 +509,9 @@ export function recalcPlayerStats(
       meetsLevelRequirement(lvl, mainhand)) ||
       (offhand?.kind === 'weapon' && offhand.hand === 'twohand'));
   const activeShield =
-    cls === 'warrior' && isShieldItem(offhand) && meetsLevelRequirement(lvl, offhand);
+    (cls === 'warrior' || cls === 'paladin') &&
+    isShieldItem(offhand) &&
+    meetsLevelRequirement(lvl, offhand);
   e.blockChance = activeShield ? SHIELD_BLOCK_BASE : 0;
   e.blockValue = activeShield ? (offhand.blockValue ?? 0) : 0;
   // The equipped mainhand item id: drives the held weapon model on the client

@@ -1622,6 +1622,45 @@ const PRIMITIVES = {
     ctx.fill();
     noShadow(ctx);
   },
+  ascension_seal(ctx, pal) {
+    noShadow(ctx);
+    ctx.shadowColor = pal.glow;
+    ctx.shadowBlur = 7;
+    ctx.strokeStyle = pal.light;
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.arc(0, 0, 22, 0, TAU);
+    ctx.stroke();
+    for (let index = 0; index < 5; index++) {
+      ctx.save();
+      ctx.rotate((index / 5) * TAU);
+      ctx.translate(0, -27);
+      ctx.rotate(Math.PI / 4);
+      ctx.fillStyle = index % 2 === 0 ? pal.light : pal.base;
+      ctx.fillRect(-4, -4, 8, 8);
+      ctx.strokeStyle = pal.accent;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(-4, -4, 8, 8);
+      ctx.restore();
+    }
+    ctx.fillStyle = rad(ctx, -3, -4, 13, [
+      [0, '#ffffff'],
+      [0.45, pal.light],
+      [1, pal.base],
+    ]);
+    ctx.beginPath();
+    ctx.arc(0, 0, 11, 0, TAU);
+    ctx.fill();
+    ctx.strokeStyle = pal.dark;
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(0, -8);
+    ctx.lineTo(0, 8);
+    ctx.moveTo(-8, 0);
+    ctx.lineTo(8, 0);
+    ctx.stroke();
+    noShadow(ctx);
+  },
   moon(ctx, pal) {
     ctx.beginPath();
     ctx.moveTo(4, -16.6);
@@ -2587,13 +2626,84 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   seal_of_righteousness: r('holy', 'holyGold', [{ p: 'sunburst', ...BIG }, 'sigil_rune'], ['glow']),
   holy_light: r('holy', 'holyGold', ['sunburst'], ['glow', 'sparkle']),
   devotion_aura: r('holy', 'holyGold', ['shield', { p: 'sunburst', ...TL }]),
-  judgement: r('holy', 'gold', [{ p: 'sunburst', ...BIG }, 'mace'], ['glow']),
   blessing_of_might: r('holy', 'gold', ['fist', { p: 'sunburst', ...TL }]),
   divine_protection: r('holy', 'silverWhite', ['shield'], ['glow']),
   sacred_bulwark: r('holy', 'holyGold', ['shield', { p: 'cross', ...BR }], ['arcs', 'glow']),
   hammer_of_justice: r('holy', 'gold', ['mace'], ['arcs']),
   lay_on_hands: r('holy', 'holyGold', [{ p: 'sunburst', ...BIG }, 'hand'], ['sparkle', 'glow']),
   holy_taunt: r('holy', 'holyGold', ['roar'], ['arcs']),
+  divine_ascension: r(
+    'holy',
+    'holyGold',
+    [
+      { p: 'ascension_seal', ...BIG },
+      { p: 'wing', ...BR },
+    ],
+    ['glow', 'sparkle'],
+  ),
+  hushbrand: r('holy', 'gold', ['fist', { p: 'sigil_rune', ...BR }], ['arcs']),
+  guardian_covenant: r('holy', 'holyGold', ['shield', { p: 'hand', ...BR }], ['glow']),
+  devotion_ward: r('holy', 'silverWhite', ['shield', { p: 'sunburst', ...BIG }], ['arcs']),
+  solar_step: r('holy', 'gold', ['boot', { p: 'lightning', ...TR }], ['motion', 'sparkle']),
+  solar_invocation: r(
+    'holy',
+    'holyGold',
+    [
+      { p: 'sunburst', ...BIG },
+      { p: 'heart', ...BR },
+    ],
+    ['arcs', 'sparkle'],
+  ),
+  hammer_of_grace: r('holy', 'sky', ['mace', { p: 'gem', ...BR }], ['glow']),
+  sacred_form: r('holy', 'silverWhite', ['wing', { p: 'cross', ...BR }], ['glow', 'sparkle']),
+  aegis_first_dawn: r(
+    'holy',
+    'holyGold',
+    ['shield', { p: 'sunburst', ...BIG }, { p: 'sigil_rune', ...BR }],
+    ['arcs', 'glow', 'sparkle'],
+  ),
+  radiant_devotion: r('holy', 'arcanePink', ['gem', { p: 'sunburst', ...TR }], ['arcs']),
+  dawn_devotion: r('holy', 'gold', ['fist', { p: 'sunburst', ...BR }], ['glow']),
+  grace_devotion: r('holy', 'sky', ['gem', { p: 'droplet', ...BR }], ['sparkle']),
+  recall_the_fallen: r('holy', 'silverWhite', ['cross', { p: 'hand', ...BR }], ['sparkle']),
+  beacon_of_light: r(
+    'holy',
+    'holyGold',
+    [
+      { p: 'sunburst', ...BIG },
+      { p: 'cross', ...BR },
+    ],
+    ['glow', 'sparkle'],
+  ),
+  final_edict: r('fury', 'ember', ['mace', { p: 'sunburst', ...BR }], ['arcs', 'glow']),
+  dawnfall: r('fury', 'holyGold', [{ p: 'sunburst', ...BIG }, 'sword'], ['arcs']),
+  sun_gods_verdict: r(
+    'holy',
+    'holyGold',
+    [
+      { p: 'sunburst', ...BIG },
+      { p: 'eye', ...BR },
+    ],
+    ['arcs', 'glow', 'sparkle'],
+  ),
+  valkyrs_calling: r(
+    'holy',
+    'holyGold',
+    [
+      { p: 'wing', ...BIG },
+      { p: 'sunburst', ...BR },
+    ],
+    ['motion', 'glow'],
+  ),
+  faithforged_guard: r('steel', 'gold', ['shield', { p: 'sword', ...BR }], ['glow']),
+  mercy_lance: r('holy', 'silverWhite', ['bolt', { p: 'heart', ...BR }], ['sparkle']),
+  dawns_embrace: r('holy', 'pink', ['hand', { p: 'sunburst', ...TR }], ['glow']),
+  radiant_chorus: r('holy', 'silverWhite', [{ p: 'sunburst', ...BIG }, 'cross'], ['sparkle']),
+  life_covenant: r('arcane', 'pink', ['heart', { p: 'shield', ...BR }], ['glow']),
+  vowkeeper_strike: r('steel', 'holyGold', ['mace', { p: 'shield', ...BR }], ['arcs']),
+  bastion_rite: r('steel', 'sky', ['shield', { p: 'sigil_rune', ...BR }], ['glow']),
+  sunward_disc: r('storm', 'gold', ['coin', { p: 'sunburst', ...BR }], ['motion', 'glow']),
+  sacred_challenge: r('storm', 'holyGold', ['roar', { p: 'shield', ...BR }], ['arcs']),
   // hunter
   raptor_strike: r('earth', 'blood', ['claw_slash']),
   aspect_of_the_hawk: r('storm', 'sky', ['wing'], ['glow']),
@@ -2794,6 +2904,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   flash_of_light: r('holy', 'holyGold', ['hand'], ['sparkle', 'glow']),
   exorcism: r('holy', 'holyGold', ['sunburst'], ['glow']),
   consecration: r('holy', 'holyGold', ['sigil_rune'], ['glow']),
+  aura_mastery: r('holy', 'holyGold', ['sunburst', 'shield'], ['arcs', 'glow']),
   righteous_fury: r('holy', 'gold', ['shield'], ['glow']),
   retribution_aura: r('holy', 'gold', ['sunburst'], ['arcs']),
   // hunter
@@ -2908,12 +3019,16 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   avatar: r('earth', 'earthBrown', ['helm', { p: 'fist', ...BR }], ['crack', 'glow']),
   sanguine_aura: r('blood', 'blood', ['droplet', { p: 'heart', ...TL }], ['arcs', 'glow']),
   // paladin
-  cleansing_verdict: r('holy', 'gold', ['sunburst'], ['glow']),
-  holy_wrath: r('holy', 'holyGold', ['sunburst', { p: 'cross', ...BR }], ['arcs']),
-  divine_shield: r('holy', 'gold', ['shield', { p: 'cross', ...BR }], ['glow']),
   avenging_wrath: r('holy', 'gold', ['wing', { p: 'sunburst', ...BR }], ['glow']),
   hammer_of_wrath: r('holy', 'holyGold', ['mace', { p: 'lightning', ...BR }], ['glow']),
-  aura_surge: r('holy', 'holyGold', ['shield', { p: 'sunburst', ...BR }], ['motion', 'glow']),
+  bastion_sweep: r('holy', 'gold', ['shield', { p: 'claw_slash', ...BR }], ['arcs', 'motion']),
+  oath_chain: r('holy', 'holyGold', ['tendrils', { p: 'hand', ...BR }], ['motion', 'glow']),
+  veilbound_march: r(
+    'holy',
+    'silverWhite',
+    ['boot', { p: 'wing', ...TR }, { p: 'sigil_rune', ...BR }],
+    ['motion', 'glow'],
+  ),
   // hunter
   startle_shot: r('nature', 'venom', ['sunburst'], ['glow']),
   frost_trap: r('frost', 'ice', ['snowflake', { p: 'tendrils', ...BR }], ['glow']),
@@ -3722,20 +3837,59 @@ function weaponIconUrl(id: string): string | null {
 // are exported for the gate in tests/skill_icons.test.ts.
 const SKILL_ICON_DIR = '/ui/skills';
 export const ABILITY_IMAGE_IDS = new Set<string>([
-  // paladin (CraftPix premium "RPG Paladin skill icons" pack)
+  // paladin (original project art for the overhaul and talent abilities, plus
+  // the existing CraftPix premium "RPG Paladin skill icons" base set)
+  'divine_ascension',
+  'devotion_ward',
+  'aura_mastery',
+  'hammer_of_grace',
+  'hushbrand',
+  'guardian_covenant',
+  'solar_step',
+  'solar_invocation',
+  'recall_the_fallen',
+  'beacon_of_light',
+  'radiant_devotion',
+  'dawn_devotion',
+  'grace_devotion',
+  'final_edict',
+  'dawnfall',
+  'sun_gods_verdict',
+  'valkyrs_calling',
+  'faithforged_guard',
+  'sacred_form',
+  'mercy_lance',
+  'dawns_embrace',
+  'radiant_chorus',
+  'life_covenant',
+  'aegis_first_dawn',
+  'vowkeeper_strike',
+  'bastion_rite',
+  'sunward_disc',
+  'sacred_challenge',
+  'bastion_sweep',
+  'oath_chain',
+  'veilbound_march',
   'seal_of_righteousness',
   'holy_light',
   'devotion_aura',
-  'judgement',
   'blessing_of_might',
   'divine_protection',
+  'sacred_bulwark',
   'hammer_of_justice',
   'lay_on_hands',
+  'holy_taunt',
   'flash_of_light',
   'exorcism',
   'consecration',
   'righteous_fury',
   'retribution_aura',
+  'crusader_strike',
+  'holy_shock',
+  'holy_shield',
+  'rebuke',
+  'avenging_wrath',
+  'hammer_of_wrath',
   // hunter (CraftPix premium packs plus project-generated v0.29 class rework art).
   'raptor_strike',
   'mongoose_bite',

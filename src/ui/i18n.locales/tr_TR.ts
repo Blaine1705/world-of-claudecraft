@@ -942,7 +942,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': 'Ölüdon',
   'entities.abilities.desperate_prayer.name': 'Son Dua',
   'entities.abilities.deterrence.name': 'Diken Muhafızı',
-  'entities.abilities.divine_shield.name': 'Işık Siperi',
   'entities.abilities.earthbind.name': 'Kavrayan Toprak',
   'entities.abilities.evocation.name': 'Eter Kuyusu',
   'entities.abilities.frenzied_regeneration.name': 'Yaban Onarımı',
@@ -950,7 +949,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': 'Hayalet Vuruş',
   'entities.abilities.hammer_of_wrath.name': 'Çınlayan Çekiç',
   'entities.abilities.healing_stream.name': 'Kaynak Kuyusu',
-  'entities.abilities.holy_wrath.name': 'Aziz Hiddeti',
   'entities.abilities.howl_of_terror.name': 'Dehşet Uluması',
   'entities.abilities.ice_block.name': 'Soğuk Tabut',
   'entities.abilities.inner_focus.name': 'Dingin Zihin',
@@ -965,9 +963,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.name': 'Gölge Kayışı',
   'entities.abilities.silence.name': 'Sessizlik',
   'entities.abilities.tranquility.name': 'Koru Şarkısı',
-  'entities.abilities.cleansing_verdict.name': 'Arındırıcı Hüküm',
-  'entities.abilities.cleansing_verdict.description':
-    'Dost bir hedeften zararlı bir büyü etkisini kaldırır ve onu {damage} Kutsal iyileştirir.',
   'entities.abilities.smoke_screen.name': 'Duman Perdesi',
   'entities.abilities.smoke_screen.description':
     'Bir duman bulutunda kaybolur ve 8 sn. boyunca kaçınma şansını %30 artırırsın.',
@@ -2945,7 +2940,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.renew.description': 'Hedefi 15 saniye boyunca {damage} iyileştirir.',
   'entities.abilities.renew.name': 'Kalıcı Lütuf',
   'entities.abilities.retribution_aura.description':
-    'Seni 30 dakika boyunca kutsal enerjiyle sarar; yakın dövüşte sana vuran her düşmana 5 Kutsal hasar verir.',
+    'Seni ve grubunu ölüme ya da değiştirilene kadar kutsal enerjiyle sarar. Etkilenen bir müttefike yakın dövüşte vuran düşmanlar {buff} Kutsal hasar alır ve etkilenen müttefikler otomatik saldırılarıyla {buff} ek Kutsal hasar verir.',
   'entities.abilities.retribution_aura.name': 'Karşılık Aurası',
   'entities.abilities.revive_pet.description':
     'Evcilinin yaralarını sarar. Yaşıyorsa 12 saniye boyunca her 3 saniyede bir iyileştirerek toplam {overTime} can yeniler. Ölüyse %35 canla diriltir.',
@@ -8369,9 +8364,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.revenge':
     'Önündeki düşmanları biçer ve bir kaçınma veya savuşturmadan sonra ücretsiz olabilir.',
   'guide.abilityHook.hamstring': 'Bir düşmanın hareketini sakatlayarak kaçmasını engeller.',
-  'entities.abilities.aura_surge.name': 'Şafak Sekmesi',
-  'entities.abilities.aura_surge.description':
-    'Şafakta dövülmüş bir kalkan fırlatarak {damage} Kutsal hasar verir, ana hedefi 2 sn susturur ve ardından 10 metre içindeki en fazla 2 ek düşmana sekerek her sekmede %75 hasar verir. (Paladin yeteneği)',
   'entities.abilities.aspect_of_the_wild.description':
     '30 m içindeki müttefikleri vahşi güçle cesaretlendirir, saldırı güçlerini 45 ve saldırı hızlarını 5 dk. boyunca %5 artırır. (Avcı yeteneği)',
   'entities.abilities.avatar.name': 'Savaş Timsali',
@@ -8406,8 +8398,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Seni anında {damage} iyileştirir. (Rahip yeteneği)',
   'entities.abilities.deterrence.description':
     'Kaçınma şansını 10 sn. boyunca 50 yüzde puan artırır. (Avcı yeteneği)',
-  'entities.abilities.divine_shield.description':
-    'Seni kutsal güçle korur ve 8 sn. boyunca 900 hasar soğurur. (Paladin yeteneği)',
   'entities.abilities.earthbind.description':
     'Yakındaki düşmanları toprağa bağlar ve 2 sn. boyunca kökler. (Şaman yeteneği)',
   'entities.abilities.evocation.description': 'Restaura manayı rápidamente. (büyücü yeteneği)',
@@ -8421,8 +8411,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Yaralı bir düşmana kutsal çekiç fırlatarak {damage} Kutsal hasar verir. Yalnızca %20 sağlığın altında kullanılabilir. (Paladin yeteneği)',
   'entities.abilities.healing_stream.description':
     'Bir müttefik hedefe 12 sn. boyunca 120 sağlık yeniler. (Şaman yeteneği)',
-  'entities.abilities.holy_wrath.description':
-    'Kutsal güç salarak yakındaki düşmanlara {damage} hasar verir. (Paladin yeteneği)',
   'entities.abilities.howl_of_terror.description':
     'Yakındaki düşmanları 3 sn. kadar korkutur. Hasar etkiyi bozabilir. (Karabüyücü yeteneği)',
   'entities.abilities.ice_block.description':

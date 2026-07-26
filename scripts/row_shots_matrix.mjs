@@ -81,16 +81,16 @@ const CLASS_PLAN = {
     spec: 'retribution',
     name: 'Rowpal',
     rows: {
-      5: 'pal_r5_vengeful_exorcism', // Vengeful Exorcism (proc: judgement resets exorcism)
-      8: 'pal_r8_rebuke', // Reproach (grant rebuke)
-      11: 'pal_r11_divine_wisdom', // Divine Wisdom (proc: instant Holy Light)
-      14: 'pal_r14_holy_wrath', // Saint's Ire (grant holy_wrath)
-      17: 'pal_r17_divine_shield', // Lightward (grant divine_shield)
-      20: 'pal_r20_avenging_wrath', // Wrathwing (grant avenging_wrath)
+      5: 'pal_r5_radiant_stride',
+      8: 'pal_r8_enduring_protection',
+      11: 'pal_r11_fist_of_justice',
+      14: 'pal_r14_zeal',
+      17: 'pal_r17_extended_dawn',
+      20: 'pal_r20_aura_mastery',
     },
-    moment: 'avenging_wrath',
+    moment: 'aura_mastery',
     momentIsSelfBuff: true,
-    momentFallbacks: ['divine_shield', 'divine_protection'],
+    momentFallbacks: ['avenging_wrath', 'divine_protection'],
   },
   mage: {
     spec: 'frost',

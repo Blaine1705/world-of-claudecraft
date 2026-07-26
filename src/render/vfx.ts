@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
+import { PaladinSpellVfxController, type PaladinSpellVfxSprite } from './paladin_spell_vfx';
 
 // Spell & ambience particle system. One pooled THREE.Points cloud drawn with
 // additive blending; projectiles are lightweight emitters that home on their
@@ -98,6 +99,19 @@ const SPR = {
   debris: 14,
   ring: 15,
 } as const;
+
+const PALADIN_SPRITES: Record<PaladinSpellVfxSprite, number> = {
+  glowSoft: SPR.glowSoft,
+  glowCore: SPR.glowCore,
+  flash: SPR.flash,
+  sparkle: SPR.sparkle,
+  sparkBurst: SPR.sparkBurst,
+  star: SPR.star,
+  magicRune: SPR.magicRune,
+  trace: SPR.trace,
+  slash: SPR.slash,
+  ring: SPR.ring,
+};
 
 const spriteImages: (TexImageSource | null)[] = SPRITE_FILES.map(() => null);
 for (let i = 0; i < SPRITE_FILES.length; i++) {
@@ -221,6 +235,7 @@ export class Vfx {
   private fwCols: THREE.Color[] = [];
   private fwFlash = new THREE.Color();
   private quality = 1;
+  private paladinSpellFx: PaladinSpellVfxController;
 
   constructor(
     private scene: THREE.Scene,
@@ -304,6 +319,30 @@ export class Vfx {
     this.points.frustumCulled = false;
     this.points.renderOrder = 5;
     scene.add(this.points);
+    this.paladinSpellFx = new PaladinSpellVfxController(anchor, (particle) => {
+      const essential =
+        particle.tag.includes('core') ||
+        particle.tag.includes('impact') ||
+        particle.tag.includes('rune') ||
+        particle.tag.includes('ring') ||
+        particle.tag === 'bastion-leading-edge' ||
+        particle.tag === 'bastion-ground-wave';
+      if (!essential && Math.random() * 100 >= this.scaledCount(100)) return;
+      this.spawn(
+        particle.position.x,
+        particle.position.y,
+        particle.position.z,
+        particle.velocity.x,
+        particle.velocity.y,
+        particle.velocity.z,
+        particle.color,
+        particle.size,
+        particle.lifetime,
+        particle.gravity,
+        PALADIN_SPRITES[particle.sprite],
+        particle.rotation,
+      );
+    });
   }
 
   setViewportScale(heightPx: number, fovDeg: number): void {
@@ -339,6 +378,7 @@ export class Vfx {
 
   clear(): void {
     this.projectiles.length = 0;
+    this.paladinSpellFx.clear();
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) this.removeBubbleBeam(i);
     this.life.fill(0);
     this.size.fill(0);
@@ -662,6 +702,178 @@ export class Vfx {
       );
     }
     this.spawn(at.x, at.y + 0.3, at.z, 0, 0.4, 0, core, 2.2, 0.45, 0, SPR.flash);
+  }
+
+  paladinAscensionImpact(
+    sourceId: number,
+    targetId: number,
+    impact: 'healing' | 'defensive' | 'offensive' | 'area' = 'offensive',
+  ): void {
+    const anchorId = impact === 'area' ? sourceId : targetId;
+
+    if (impact === 'healing') {
+      this.healGlow(anchorId);
+      this.buffSwirl(anchorId, 0xfff0c7);
+      return;
+    }
+    if (impact === 'defensive') {
+      this.wardBloom(anchorId, 'holy');
+      this.buffSwirl(anchorId, 0x9fd7ff);
+      return;
+    }
+
+    if (impact === 'area') this.nova(sourceId, 'holy');
+
+    const at = this.anchor(anchorId, 0.46);
+    if (!at) return;
+    const gold = new THREE.Color(impact === 'area' ? 0xffb52f : 0xffd85c).multiplyScalar(hdr(2.5));
+    const white = new THREE.Color(0xfff8d8).multiplyScalar(hdr(2.9));
+    const count = this.scaledCount(impact === 'area' ? 58 : 46);
+    for (let index = 0; index < count; index++) {
+      const angle = (index / count) * Math.PI * 2;
+      const speed = 4.5 + Math.random() * 4;
+      this.spawn(
+        at.x + Math.cos(angle) * 0.15,
+        at.y,
+        at.z + Math.sin(angle) * 0.15,
+        Math.cos(angle) * speed,
+        1.8 + Math.random() * 3.2,
+        Math.sin(angle) * speed,
+        index % 4 === 0 ? white : gold,
+        index % 4 === 0 ? 0.72 : 0.48,
+        0.55 + Math.random() * 0.35,
+        -4,
+        index % 4 === 0 ? SPR.star : SPR.sparkle,
+      );
+    }
+    this.spawn(at.x, at.y + 0.18, at.z, 0, 0.4, 0, white, 2.4, 0.28, 0, SPR.flash);
+    this.spawn(at.x, at.y - 0.2, at.z, 0, 0.2, 0, gold, 2.2, 0.48, 0, SPR.ring, 0);
+  }
+
+  paladinHolyShock(sourceId: number, targetId: number, mode: 'heal' | 'damage'): void {
+    this.paladinSpellFx.holyShock({ mode, sourceId, targetId });
+  }
+
+  paladinSunwardDisc(sourceId: number, targetId: number, hopIndex: number, totalHits = 3): void {
+    this.paladinSpellFx.sunwardDisc({
+      sourceId,
+      targetId,
+      hopIndex,
+      totalHits,
+      awaitImpact: true,
+    });
+  }
+
+  paladinSunwardDiscImpact(
+    sourceId: number,
+    targetId: number,
+    hopIndex: number,
+    totalHits = 3,
+  ): void {
+    this.paladinSpellFx.sunwardDiscImpact(sourceId, targetId, hopIndex, totalHits);
+  }
+
+  paladinBastionSweep(sourceId: number, radius: number, arcDegrees: number, facing: number): void {
+    this.paladinSpellFx.bastionSweep({
+      sourceId,
+      radius,
+      halfAngle: THREE.MathUtils.degToRad(arcDegrees) * 0.5,
+      facing,
+    });
+  }
+
+  paladinBastionSweepImpact(targetId: number): void {
+    this.paladinSpellFx.bastionSweepTarget(targetId);
+  }
+
+  // Dawnfall uses a timed dawn rune, circular slash, six short-lived radiant
+  // blades, and a shockwave clamped to the supplied gameplay radius.
+  paladinDawnfall(sourceId: number, radius: number): void {
+    this.paladinSpellFx.dawnfall({
+      casterId: sourceId,
+      radius,
+      bladeCount: this.scaledCount(6),
+    });
+  }
+
+  paladinDawnfallImpact(targetId: number): void {
+    this.paladinSpellFx.dawnfallTarget(targetId);
+  }
+
+  // Final Edict is deliberately tighter than Dawnfall: one descending blade,
+  // a compact seal under the victim, and a dense vertical impact shower.
+  paladinFinalEdict(sourceId: number, targetId: number): void {
+    const target = this.anchor(targetId, 0.08);
+    if (!target) return;
+    const source = this.anchor(sourceId, 0.45);
+    let sideX = 1;
+    let sideZ = 0;
+    if (source) {
+      const dx = target.x - source.x;
+      const dz = target.z - source.z;
+      const length = Math.hypot(dx, dz);
+      if (length > 0.001) {
+        sideX = -dz / length;
+        sideZ = dx / length;
+      }
+    }
+    const gold = new THREE.Color(0xffb91f).multiplyScalar(hdr(2.8));
+    const white = new THREE.Color(0xffffdc).multiplyScalar(hdr(3.2));
+
+    const bladeSegments = this.scaledCount(14);
+    for (let index = 0; index < bladeSegments; index++) {
+      const progress = index / Math.max(1, bladeSegments - 1);
+      this.spawn(
+        target.x,
+        target.y + 0.25 + progress * 2.55,
+        target.z,
+        0,
+        -4.6,
+        0,
+        index % 3 === 0 ? white : gold,
+        0.78 - progress * 0.28,
+        0.5,
+        0,
+        SPR.slash,
+        0,
+      );
+    }
+    const guardSegments = this.scaledCount(8);
+    for (let index = 0; index < guardSegments; index++) {
+      const offset = (index / Math.max(1, guardSegments - 1) - 0.5) * 1.4;
+      this.spawn(
+        target.x + sideX * offset,
+        target.y + 0.62,
+        target.z + sideZ * offset,
+        0,
+        -4,
+        0,
+        index % 2 === 0 ? white : gold,
+        0.5,
+        0.48,
+        0,
+        SPR.sparkle,
+      );
+    }
+    const impactCount = this.scaledCount(12);
+    for (let index = 0; index < impactCount; index++) {
+      const angle = (index / impactCount) * Math.PI * 2;
+      this.spawn(
+        target.x,
+        target.y + 0.2,
+        target.z,
+        Math.cos(angle) * 2.6,
+        2.2 + (index % 3) * 0.5,
+        Math.sin(angle) * 2.6,
+        index % 3 === 0 ? white : gold,
+        0.52,
+        0.5,
+        -5,
+        SPR.star,
+      );
+    }
+    this.spawn(target.x, target.y + 0.3, target.z, 0, 0.2, 0, white, 2.6, 0.28, 0, SPR.flash);
+    this.spawn(target.x, target.y + 0.05, target.z, 0, 0.1, 0, gold, 1.5, 0.45, 0, SPR.ring, 0);
   }
 
   // A stored heal-echo firing: a fountain of life-green motes bursting upward
@@ -1461,5 +1673,6 @@ export class Vfx {
     (geo.attributes.aColor as THREE.BufferAttribute).needsUpdate = true;
     (geo.attributes.aSprite as THREE.BufferAttribute).needsUpdate = true;
     (geo.attributes.aRot as THREE.BufferAttribute).needsUpdate = true;
+    this.paladinSpellFx.update(dt);
   }
 }

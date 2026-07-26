@@ -37,6 +37,14 @@ import {
   visualAssetUrlForGraphics,
   weaponSkinModelUrl,
 } from './manifest';
+import {
+  createPaladinBastionSweepClip,
+  PALADIN_BASTION_SWEEP_CLIP,
+} from './paladin_bastion_sweep_clip';
+import {
+  createPaladinTemplarsVerdictClip,
+  PALADIN_TEMPLARS_VERDICT_CLIP,
+} from './paladin_templars_verdict_clip';
 import { mergeSkinnedParts } from './rig_merge';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
@@ -1033,6 +1041,16 @@ export function prepareVisual(key: string): PreparedVisual {
   for (const clip of gltf.animations) clips.set(clip.name, clip);
   for (const url of def.animUrls ?? []) {
     for (const clip of resolvedGltf(url).animations) clips.set(clip.name, clip);
+  }
+  if (key === 'player_paladin') {
+    const verdictBase = clips.get('2H_Melee_Attack_Chop');
+    if (!verdictBase) throw new Error('Paladin Templar Verdict requires 2H_Melee_Attack_Chop');
+    clips.set(PALADIN_TEMPLARS_VERDICT_CLIP, createPaladinTemplarsVerdictClip(verdictBase));
+    const sweepBase = clips.get('1H_Melee_Attack_Slice_Diagonal');
+    if (!sweepBase) {
+      throw new Error('Paladin Bastion Sweep requires 1H_Melee_Attack_Slice_Diagonal');
+    }
+    clips.set(PALADIN_BASTION_SWEEP_CLIP, createPaladinBastionSweepClip(sweepBase));
   }
 
   // Pose a throwaway clone mid-idle, measure it, and bake the static mesh.

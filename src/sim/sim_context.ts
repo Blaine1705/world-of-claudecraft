@@ -383,6 +383,9 @@ export interface SimContextCallbacks {
     abilityId?: string | null,
     canCrit?: boolean,
     canTriggerWeaponProcs?: boolean,
+    beaconTransferEligible?: boolean,
+    alreadyResolved?: boolean,
+    // Out-param, last so the two boolean flags above keep their positions.
     resolution?: { resolved: number },
   ): number;
   // Spell crit chance from intellect. STAYS on Sim (shared: the casting/ability
@@ -721,6 +724,7 @@ export interface SimContextCallbacks {
       forceCrit?: boolean;
       critBonus?: number;
       onDealt?: (amount: number) => void;
+      onEffectiveDamage?: (amount: number) => void;
     },
   ): boolean;
   effectiveAttackPower(e: Entity): number;

@@ -56,6 +56,10 @@ const pctFromFrac = (frac: number): number => Math.abs(round(frac * 100));
 
 const KEY = 'hudChrome.auraEffect';
 
+export function auraEffectMaximumFractionDigits(value: number): number {
+  return Number.isInteger(value) ? 0 : 1;
+}
+
 // Flat stat buffs share one shape: positive raises the stat, negative lowers it.
 const flatStat = (statKey: string, value: number): AuraEffectDescriptor => ({
   key: `${KEY}.${value < 0 ? 'reduce' : 'increase'}.${statKey}`,
@@ -140,6 +144,21 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       return { key: `${KEY}.instantCast`, nums: {} };
     case 'next_cast_cheap':
       return { key: `${KEY}.cheapCast`, nums: { pct: pctFromFrac(a.value) } };
+    case 'paladin_radiant_resonance':
+      return {
+        key: `${KEY}.radiantResonance`,
+        nums: { pct: pctFromFrac(a.value), castTime: 1.5 },
+      };
+    case 'paladin_solar_reprisal':
+      return {
+        key: `${KEY}.solarReprisal`,
+        nums: { pct: pctFromFrac(a.value) },
+      };
+    case 'paladin_dawns_wrath':
+      return {
+        key: `${KEY}.dawnsWrath`,
+        nums: { pct: pctFromFrac(a.value) },
+      };
     case 'buff_int':
       return flatStat('int', a.value);
     case 'buff_agi':
@@ -237,10 +256,7 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       return { key: `${KEY}.lockout` };
 
     case 'imbue':
-      // value2/value3: judgement min/max bonus damage on the imbued weapon.
-      return a.value2 != null && a.value3 != null
-        ? { key: `${KEY}.imbueRange`, nums: { min: round(a.value2), max: round(a.value3) } }
-        : { key: `${KEY}.imbue` };
+      return { key: `${KEY}.imbue` };
     case 'stealth':
       return { key: `${KEY}.stealth`, nums: { pct: pctFromMult(a.value) } };
     case 'form_bear':

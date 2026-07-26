@@ -11,6 +11,7 @@
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { CAST_COMPLETE_EPS, DT } from '../types';
+import { masteredPaladinAuraValue } from './paladin_talents';
 import { onThunderWardRetaliated } from './shaman_talents';
 import { applyStoneboundWardSmoothing } from './shaman_warspirit';
 import { onThornsReflect } from './talent_procs';
@@ -61,7 +62,7 @@ export function applyThornsReaction(ctx: SimContext, defender: Entity, attacker:
       ctx.dealDamage(
         defender,
         attacker,
-        a.value,
+        masteredPaladinAuraValue(defender, a.id, a.value),
         false,
         a.school,
         a.name,

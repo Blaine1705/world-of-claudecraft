@@ -425,15 +425,15 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
 });
 
 describe('createWsAuth: timer-wire capability negotiation', () => {
-  it('passes only the exact optional v2 capability into the recipient session meta', async () => {
+  it('passes only the exact optional v3 capability into the recipient session meta', async () => {
     const capable = setup();
     await createWsAuth(capable.deps).authenticateWebSocket(
       asWs(capable.ws),
-      authRaw({ timerWire: 2 }),
+      authRaw({ timerWire: 3 }),
       capable.req,
     );
     expect(capable.game.join).toHaveBeenCalledTimes(1);
-    expect(joinedMeta(capable.game)).toMatchObject({ timerWireVersion: 2 });
+    expect(joinedMeta(capable.game)).toMatchObject({ timerWireVersion: 3 });
 
     const legacy = setup();
     await createWsAuth(legacy.deps).authenticateWebSocket(asWs(legacy.ws), authRaw(), legacy.req);
@@ -449,7 +449,16 @@ describe('createWsAuth: timer-wire capability negotiation', () => {
     expect(unknown.game.join).toHaveBeenCalledTimes(1);
     expect(joinedMeta(unknown.game)).toMatchObject({ timerWireVersion: 1 });
 
-    for (const coercible of ['2', true, { valueOf: () => 2 }]) {
+    const previous = setup();
+    await createWsAuth(previous.deps).authenticateWebSocket(
+      asWs(previous.ws),
+      authRaw({ timerWire: 2 }),
+      previous.req,
+    );
+    expect(previous.game.join).toHaveBeenCalledTimes(1);
+    expect(joinedMeta(previous.game)).toMatchObject({ timerWireVersion: 1 });
+
+    for (const coercible of ['3', true, { valueOf: () => 3 }]) {
       const strict = setup();
       await createWsAuth(strict.deps).authenticateWebSocket(
         asWs(strict.ws),
@@ -464,11 +473,11 @@ describe('createWsAuth: timer-wire capability negotiation', () => {
     resume.game.hasSessionForCharacter.mockReturnValue(true);
     await createWsAuth(resume.deps).authenticateWebSocket(
       asWs(resume.ws),
-      authRaw({ timerWire: 2 }),
+      authRaw({ timerWire: 3 }),
       resume.req,
     );
     expect(resume.deps.acquireCharacterLease).not.toHaveBeenCalled();
-    expect(joinedMeta(resume.game)).toMatchObject({ timerWireVersion: 2 });
+    expect(joinedMeta(resume.game)).toMatchObject({ timerWireVersion: 3 });
   });
 });
 

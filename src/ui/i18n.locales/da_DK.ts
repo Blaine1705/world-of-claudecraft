@@ -989,7 +989,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': 'Dødfrost',
   'entities.abilities.desperate_prayer.name': 'Sidste bøn',
   'entities.abilities.deterrence.name': 'Børsteværn',
-  'entities.abilities.divine_shield.name': 'Lysværn',
   'entities.abilities.earthbind.name': 'Gribende jord',
   'entities.abilities.evocation.name': 'Æterbrønd',
   'entities.abilities.frenzied_regeneration.name': 'Vild heling',
@@ -997,7 +996,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': 'Genfærdsslag',
   'entities.abilities.hammer_of_wrath.name': 'Klanghammer',
   'entities.abilities.healing_stream.name': 'Kildebrønd',
-  'entities.abilities.holy_wrath.name': 'Helgenvrede',
   'entities.abilities.howl_of_terror.name': 'Rædselshyl',
   'entities.abilities.ice_block.name': 'Kold kiste',
   'entities.abilities.inner_focus.name': 'Stillet sind',
@@ -1012,9 +1010,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.name': 'Skyggesmut',
   'entities.abilities.silence.name': 'Tavshed',
   'entities.abilities.tranquility.name': 'Lundens sang',
-  'entities.abilities.cleansing_verdict.name': 'Rensende Dom',
-  'entities.abilities.cleansing_verdict.description':
-    'Fjerner en skadelig magisk effekt fra et venligt mål og helbreder det med Hellig magi for {damage}.',
   'entities.abilities.smoke_screen.name': 'Røgslør',
   'entities.abilities.smoke_screen.description':
     'Du forsvinder i en røgsky, hvilket øger din undvigelseschance med 30 % i 8 sek.',
@@ -2829,7 +2824,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.renew.description': 'Helbreder målet for {damage} over 15 sek.',
   'entities.abilities.renew.name': 'Dvælende Nåde',
   'entities.abilities.retribution_aura.description':
-    'Omgiver dig med hellig energi i 30 min og tilføjer 5 Hellig skade til enhver fjende, der rammer dig i nærkamp.',
+    'Omgiver dig og din gruppe med hellig energi indtil død eller udskiftning. Fjender, der rammer en påvirket allieret i nærkamp, tager {buff} Hellig skade, og påvirkede allierede giver {buff} ekstra Hellig skade med automatiske angreb.',
   'entities.abilities.retribution_aura.name': 'Gengældelsens Aura',
   'entities.abilities.revive_pet.description':
     'Lapper dit kæledyr sammen. Hvis det lever, genopretter det i alt {overTime} helbred over 12 sek. med helbredelse hvert 3. sek. Hvis det er dødt, genopliver det med 35 % helbred.',
@@ -8544,9 +8539,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.revenge':
     'Svinger gennem fjender foran dig og kan blive gratis efter en undvigelse eller parering.',
   'guide.abilityHook.hamstring': 'Hæmmer en fjendes bevægelse, så den ikke kan flygte.',
-  'entities.abilities.aura_surge.name': 'Daggryets rikochet',
-  'entities.abilities.aura_surge.description':
-    'Kaster et daggrysmedet skjold for {damage} Hellig skade, bringer det primære mål til tavshed i 2 sek. og hopper derefter til op til 2 yderligere fjender inden for 10 meter for 75% skade pr. hop. (Paladintalent)',
   'entities.abilities.aspect_of_the_wild.description':
     'Indgyder vild styrke i allierede inden for 30 m og øger deres angrebskraft med 45 og angrebshastighed med 5 % i 5 min. (jægertalent)',
   'entities.abilities.avatar.name': 'Avatar',
@@ -8581,8 +8573,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Helbreder dig øjeblikkeligt for {damage}. (præstetalent)',
   'entities.abilities.deterrence.description':
     'Øger din undvigelseschance med 50 procentpoint i 10 sek. (jægertalent)',
-  'entities.abilities.divine_shield.description':
-    'Beskytter dig med hellig kraft og absorberer 900 skade i 8 sek. (paladintalent)',
   'entities.abilities.earthbind.description':
     'Binder fjender i nærheden til jorden og forankrer dem i 2 sek. (shamantalent)',
   'entities.abilities.evocation.description': 'Restaura mana rápidamente. (magikertalent)',
@@ -8596,8 +8586,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Kaster en hellig hammer mod en såret fjende for {damage} Hellig skade. Kan kun bruges under 20 % helbred. (paladintalent)',
   'entities.abilities.healing_stream.description':
     'Genopretter 120 helbred hos et allieret mål over 12 sek. (shamantalent)',
-  'entities.abilities.holy_wrath.description':
-    'Udløser hellig kraft og giver {damage} skade til fjender i nærheden. (paladintalent)',
   'entities.abilities.howl_of_terror.description':
     'Skræmmer fjender i nærheden i op til 3 sek. Skade kan bryde effekten. (troldmandstalent)',
   'entities.abilities.ice_block.description':

@@ -73,6 +73,7 @@ import {
 } from '../sim/types';
 import {
   type AccountCosmetics,
+  type ActiveConsecration,
   type ActiveFrostRing,
   type ActiveTemporalHourglass,
   type ArenaInfo,
@@ -150,6 +151,7 @@ interface ClientWireAura {
   rem?: number;
   exp?: number;
   dur: number;
+  perm?: 1;
   value?: number;
   value2?: number;
   value3?: number;
@@ -1577,6 +1579,7 @@ export class ClientWorld implements IWorld {
   private eventQueue: SimEvent[] = [];
   activeFrostRings: ActiveFrostRing[] = [];
   activeTemporalHourglasses: ActiveTemporalHourglass[] = [];
+  activeConsecrations: ActiveConsecration[] = [];
   // inventory deltas arrive in snapshots, separate from the event frames the
   // HUD redraws on — the frame loop polls this so open panels re-render
   private invChanged = false;
@@ -2352,6 +2355,36 @@ export class ClientWorld implements IWorld {
           ];
         })
       : [];
+    this.activeConsecrations = Array.isArray(snap.consecrations)
+      ? snap.consecrations.flatMap((value: unknown): ActiveConsecration[] => {
+          if (!value || typeof value !== 'object') return [];
+          const consecration = value as Record<string, unknown>;
+          if (
+            typeof consecration.id !== 'string' ||
+            ![
+              consecration.x,
+              consecration.z,
+              consecration.r,
+              consecration.dur,
+              consecration.rem,
+            ].every((entry) => typeof entry === 'number' && Number.isFinite(entry)) ||
+            (consecration.r as number) <= 0 ||
+            (consecration.dur as number) <= 0 ||
+            (consecration.rem as number) <= 0
+          )
+            return [];
+          return [
+            {
+              id: consecration.id,
+              x: consecration.x as number,
+              z: consecration.z as number,
+              radius: consecration.r as number,
+              duration: consecration.dur as number,
+              remaining: Math.min(consecration.rem as number, consecration.dur as number),
+            },
+          ];
+        })
+      : [];
 
     // lazy init (not the field initializer alone): tests build bare instances
     // via Object.create(ClientWorld.prototype), which skips field initializers
@@ -2363,6 +2396,7 @@ export class ClientWorld implements IWorld {
     const prevSelfDead = prevSelf?.dead ?? false;
 
     const auraRemaining = (aura: ClientWireAura): number => {
+      if (aura.perm === 1) return Number.POSITIVE_INFINITY;
       if (timerWire.mode !== 'stable' || timerWire.time === null) return Number(aura.rem);
       const deadlineRemaining = stableDeadlineRemaining(aura.exp, timerWire.time);
       if (deadlineRemaining !== null) return deadlineRemaining;
@@ -2513,6 +2547,19 @@ export class ClientWorld implements IWorld {
         e.maxResource = w.mres;
       }
       e.rangedPower = w.rp ?? 0;
+      if (w.pasc !== undefined && e.kind === 'player' && e.templateId === 'paladin') {
+        const ascensionCharges = Math.max(0, Math.floor(Number(w.pasc) || 0));
+        e.paladinDevotion ??= {
+          value: 0,
+          ascensionCharges: 0,
+          ascensionRemaining: 0,
+          outOfCombatTime: 0,
+          decayProgress: 0,
+          blockIcdRemaining: 0,
+        };
+        e.paladinDevotion.ascensionCharges = ascensionCharges;
+        e.paladinDevotion.ascensionRemaining = ascensionCharges > 0 ? 1 : 0;
+      }
       e.overheadEmoteId = isOverheadEmoteId(w.emo) ? w.emo : null;
       e.overheadEmoteUntil = e.overheadEmoteId ? Number.POSITIVE_INFINITY : 0;
       if (typeof w.emoSeq === 'number') e.overheadEmoteSeq = w.emoSeq;
@@ -2590,7 +2637,8 @@ export class ClientWorld implements IWorld {
             rec.name = a.name;
             rec.kind = a.kind;
             rec.remaining = auraRemaining(a);
-            rec.duration = a.dur;
+            rec.duration = a.perm === 1 ? Number.POSITIVE_INFINITY : a.dur;
+            rec.permanent = a.perm === 1;
             rec.value = a.value ?? 0;
             rec.value2 = a.value2;
             rec.value3 = a.value3;
@@ -2613,7 +2661,8 @@ export class ClientWorld implements IWorld {
             name: a.name,
             kind: a.kind,
             remaining: auraRemaining(a),
-            duration: a.dur,
+            duration: a.perm === 1 ? Number.POSITIVE_INFINITY : a.dur,
+            permanent: a.perm === 1,
             value: a.value ?? 0,
             value2: a.value2,
             value3: a.value3,
@@ -2784,6 +2833,18 @@ export class ClientWorld implements IWorld {
       e.gcdRemaining = s.gcd ?? 0;
       e.potionCdRemaining = s.pcd ?? 0;
       e.comboPoints = s.combo ?? 0;
+      if (s.pdev !== undefined) {
+        e.paladinDevotion = s.pdev
+          ? {
+              value: Number(s.pdev.value) || 0,
+              ascensionCharges: Number(s.pdev.charges) || 0,
+              ascensionRemaining: Number(s.pdev.remaining) || 0,
+              outOfCombatTime: 0,
+              decayProgress: 0,
+              blockIcdRemaining: 0,
+            }
+          : undefined;
+      }
       // Routed through the pending-target echo guard: a stale in-flight
       // snapshot must not clobber an optimistic targetEntity write (the target
       // frame + party-frames select flicker). This is the counting site: one
@@ -2918,7 +2979,7 @@ export class ClientWorld implements IWorld {
       if (s.sport !== undefined) this.sportRole = s.sport ? (s.sport.role ?? null) : null;
       this.known = this.sportRole
         ? resolveSportKit(this.sportRole)
-        : abilitiesKnownAt(this.cfg.playerClass, e.level, talentMods);
+        : abilitiesKnownAt(this.cfg.playerClass, e.level, talentMods, this.questsDone);
       // --- IWorldParty: party roster + raid markers, delta-omitted self-decode
       // (keep the prior value when absent; `marks: null` clears on disband). ---
       if (s.party !== undefined) this.partyInfo = s.party;
@@ -3110,6 +3171,7 @@ export class ClientWorld implements IWorld {
           }
         : undefined,
       cadenceBlocked,
+      this.cfg?.playerClass,
     );
   }
 

@@ -30,6 +30,7 @@
 import { ITEMS, isArenaPos, MOBS } from '../data';
 import { weaponHand } from '../equipment_rules';
 import { TWOHAND_DPS_MULT } from '../item_budget';
+import { grantDevotionFromBlock } from '../paladin_devotion';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -57,6 +58,10 @@ import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { baseSwingSpeed, rangedAutoProfile } from './form_swing';
 import { isTravelFormAuraKind } from './forms';
+import { tryGrantDawnsWrath } from './paladin_dawns_wrath';
+import { tryGrantSolarReprisal } from './paladin_solar_reprisal';
+import { applyRequitalAutoAttack } from './paladin_talents';
+import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { rangedShotProfile } from './ranged_shot';
 import { triggerWardCycle } from './shaman_talents';
 import { advanceWarspiritCadence, stoneboundThreatMultiplier } from './shaman_warspirit';
@@ -98,6 +103,7 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const p = r.e;
   if (p.dead) return;
   if (isInStasis(p)) return;
+  if (isValkyrsCallingAirborne(p)) return;
   if (p.auras.some((a) => isTravelFormAuraKind(a.kind))) return;
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
   // A target that just DIED (commonly the mob the engaging spell killed) is not a
@@ -152,6 +158,7 @@ export function stopAutoAttack(ctx: SimContext, pid?: number): void {
 export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   p.swingTimer = Math.max(0, p.swingTimer - DT);
   p.offhandSwingTimer = Math.max(0, p.offhandSwingTimer - DT);
+  if (isValkyrsCallingAirborne(p)) return;
   if (p.auras.some((a) => isTravelFormAuraKind(a.kind))) {
     p.autoAttack = false;
     return;
@@ -228,6 +235,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       threatFlat,
       threatMult,
       whiteDualWieldPenalty: p.dualWielding && abilityName === null,
+      autoAttack: true,
     });
     // Thuggery mastery (Sword Specialization shape): a landed mainhand auto has
     // a chance to swing once more. The pct gate keeps the rng stream untouched
@@ -237,6 +245,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       meleeSwing(ctx, p, t, 0, null, {
         autoAttackHand: 'mainhand',
         whiteDualWieldPenalty: p.dualWielding,
+        autoAttack: true,
       });
     }
     maybeProcBattleTrance(ctx, p, meta, connected);
@@ -256,6 +265,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       autoAttackHand: 'offhand',
       apSwingSpeed: offhand.speed,
       whiteDualWieldPenalty: true,
+      autoAttack: true,
     });
     maybeProcBattleTrance(ctx, p, meta, connected);
     maybeProcSuddenDeath(ctx, p, meta, connected);
@@ -379,6 +389,7 @@ export function rangedSwing(
       true,
       !ranged.wand,
     );
+    applyRequitalAutoAttack(ctx, atk, tgt);
     // 4-piece set procs keyed to weapon crits (ranged arm). Gated on setProcs
     // inside applySetProcs, so proc-less players draw no rng.
     if (crit && atk.kind === 'player') ctx.applySetProcs(atk, tgt, 'weaponCrit');
@@ -411,7 +422,9 @@ export function meleeSwing(
     // shared hit table.
     critBonus?: number;
     onDealt?: (amount: number) => void;
+    onEffectiveDamage?: (amount: number) => void;
     whiteDualWieldPenalty?: boolean;
+    autoAttack?: boolean;
   },
 ): boolean {
   const missChance =
@@ -499,15 +512,27 @@ export function meleeSwing(
     opts.forceCrit === true;
   if (crit) dmg *= 2 + attacker.critDmgPhysBonus;
   dmg *= 1 - armorReduction(ctx.effectiveArmor(target), attacker.level);
-  if (blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance) {
+  const blocked = blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance;
+  if (blocked) {
     dmg = Math.max(1, dmg - target.blockValue);
+    const targetMeta = target.kind === 'player' ? ctx.players.get(target.id) : undefined;
+    if (targetMeta && ctx.playerMods(targetMeta).spec === 'protection') {
+      grantDevotionFromBlock(target);
+      tryGrantSolarReprisal(ctx, target, 'block');
+    }
   }
   const dealtAmount = Math.max(1, Math.round(dmg));
+  const hpBefore = target.hp;
   ctx.dealDamage(attacker, target, dealtAmount, crit, 'physical', abilityName, 'hit', false, {
     flat: opts.threatFlat ?? 0,
     mult: (opts.threatMult ?? 1) * stoneboundThreatMultiplier(ctx, attacker),
   });
   opts.onDealt?.(dealtAmount);
+  opts.onEffectiveDamage?.(Math.max(0, hpBefore - target.hp));
+  if (opts.autoAttack) {
+    applyRequitalAutoAttack(ctx, attacker, target);
+    tryGrantDawnsWrath(ctx, attacker);
+  }
   // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND
   // the weaponStrike ability path, which resolves through this shell). Gated on
   // setProcs inside applySetProcs, so proc-less players draw no rng.

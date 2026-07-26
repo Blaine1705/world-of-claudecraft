@@ -34,11 +34,11 @@ const PALADIN_SPECS: SpecDef[] = [
   spec(
     'holy',
     'paladin',
-    'Sacrament',
+    'Sunmender',
     'healer',
     '+',
     'A devoted healer who turns the Light into steady single-target recovery.',
-    'holy_shock',
+    'mercy_lance',
     'Kindled Faith',
     'Your healing spells critically heal for double.',
     { global: { critDmgHealPct: 0.5 } },
@@ -46,23 +46,27 @@ const PALADIN_SPECS: SpecDef[] = [
   spec(
     'protection',
     'paladin',
-    'Vigil',
+    'Faithwarden',
     'tank',
     '#',
     'A shield-bearing defender who converts Holy power into threat and mitigation.',
-    'holy_shield',
+    'sunward_disc',
     'Oathward',
-    'Increases all threat you generate by 50% and your armor by 20%.',
-    { global: { threatPct: 0.5 }, stats: { armorPct: 0.2 } },
+    'Increases all threat you generate by 50%, your armor by 20% and your Stamina by 35%.',
+    // staPct 0.35 carries the 2026-07 tank-parity pass that used to live in
+    // SPEC_BASELINES: with no stamina multiplier the paladin sat at 76% of the
+    // prot warrior's effective HP. The mastery is where an overhauled class
+    // keeps its floor (see Recompense on the warrior), so it lands here.
+    { global: { threatPct: 0.5 }, stats: { armorPct: 0.2, staPct: 0.35 } },
   ),
   spec(
     'retribution',
     'paladin',
-    'Requital',
+    'Dawnreaver',
     'dps',
     'x',
     'A holy warrior who judges enemies with weapon strikes and radiant burst.',
-    'crusader_strike',
+    'final_edict',
     'Blood Debt',
     'Increases your Holy and physical ability damage by 20%.',
     { global: { meleeDmgPct: 0.2, spellDmgPct: 0.2 } },

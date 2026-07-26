@@ -13,6 +13,138 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.guardian_covenant.name': '守護の契約',
+  'entities.abilities.guardian_covenant.description':
+    '味方1人と自身を守り、8秒間、受けるダメージを20%減少させる。味方を選択していない場合は自身に使用する。',
+  'hudChrome.paladin.devotion': '献身',
+  'hudChrome.paladin.devotionValue': '献身 {value} / {max}',
+  'hudChrome.paladin.devotionAscensionCharges':
+    '献身 {value} / {max}。昇天のチャージ数: {charges}。',
+  'hudChrome.paladin.devotionAscensionLast': '献身 {value} / {max}。昇天の最後のチャージ。',
+  'hudChrome.paladin.ascensionLastAnnouncement': '昇天の最後のチャージ',
+  'hudChrome.paladin.ascensionSpenderAria':
+    'アクションスロット {slot}: {ability}。昇天のチャージを1消費する。',
+  'hudChrome.auraEffect.radiantResonance':
+    '次の癒やしの光が即時発動になる。または次の暁の抱擁のマナ消費が{pct}%減少し、詠唱時間が{castTime}秒になる',
+  'hudChrome.auraEffect.solarReprisal':
+    '次の陽光の円盤はマナを消費せず、クールダウンを無視してダメージが{pct}%増加する。恩寵の槌はクールダウンを無視し、与えたダメージの100%を回復する。または癒やしの光が即時発動になる',
+  'guide.abilityHook.hammer_of_wrath':
+    '遠距離から瀕死の敵を処刑する。翼が発動中なら、どの敵にも使用できる。',
+  'guide.abilityHook.avenging_wrath': '献身を10獲得し、15秒間、能力による献身の生成量を2倍にする。',
+  'guide.abilityHook.bastion_sweep': '盾で敵集団を薙ぎ払い、脅威を掌握して献身を蓄える。',
+  'guide.abilityHook.oath_chain': '遠くの敵を集団へ引き寄せ、逃走を遅らせる。',
+  'guide.abilityHook.veilbound_march':
+    '敵集団をすり抜けて印を刻み、自身へのダメージを弱め、脅威を固定する。',
+  'guide.abilityHook.holy_shield':
+    '献身を消費し、一定時間のブロック、吸収効果、脅威の波動を発動する。',
+  'guide.abilityHook.consecration': '周囲の地を聖別し、持続的な神聖ダメージと脅威を与える。',
+  'guide.abilityHook.hammer_of_justice': '短時間の確実なスタンで敵1体を止める。',
+  'guide.abilityHook.lay_on_hands': '味方が倒れかけたとき、その体力を大幅に回復する。',
+  'hud.errors.notEnoughDevotion': '献身が足りない！',
+  'abilityUi.resources.devotion': '献身',
+  'entities.abilities.divine_ascension.name': '神聖なる昇天',
+  'entities.abilities.divine_ascension.description':
+    '献身を20消費し、最大45秒間持続する昇天のチャージを5獲得する。対象となる能力はチャージを1消費し、追加効果を得る。',
+  'entities.abilities.aura_mastery.name': '聖なる調和',
+  'entities.abilities.aura_mastery.description':
+    '8秒間、グループ内で有効なすべての献身と報復のオーラを強化する。砦の献身はダメージを15%減少させ、報復は15の神聖ダメージを与える。複数回使用しても重複せず、持続時間が更新される。',
+  'entities.abilities.devotion_ward.name': '砦の献身',
+  'entities.abilities.devotion_ward.description':
+    '自身とパーティメンバーが受けるダメージを、死亡または置き換えられるまで5%減少させる。このオーラと報復のオーラだけが互いに置き換わり、光輝、暁、恩寵の献身とは共存する。',
+  'entities.abilities.hammer_of_grace.name': '恩寵の槌',
+  'entities.abilities.hammer_of_grace.description':
+    '20メートル以内の敵に聖なる槌を即座に投げ、{damage}ダメージを与える。マナを70回復し、与えたダメージの50%だけ自身を回復して、命中時に献身を1生成する。太陽の報復により、恩寵の槌はクールダウンを無視し、与えたダメージの100%だけ自身を回復する。',
+  'entities.abilities.hushbrand.name': '静寂の烙印',
+  'entities.abilities.hushbrand.description':
+    '呪文の詠唱を中断し、同系統の呪文を4秒間使用不能にする。',
+  'entities.abilities.solar_step.name': '陽光の歩み',
+  'entities.abilities.solar_step.description': '2秒間、移動速度を150%増加させる。',
+  'entities.abilities.solar_invocation.name': '太陽の祈願',
+  'entities.abilities.solar_invocation.description':
+    '味方1人の体力を即座に{damage}回復するか、敵1体に中程度の神聖ダメージを与える。どちらも献身を1生成する。昇天中に回復として使用すると、対象から10メートル以内の味方プレイヤーも半分の量だけ回復する。',
+  'entities.abilities.radiant_devotion.name': '光輝の献身',
+  'entities.abilities.radiant_devotion.description':
+    '30分間、自身とパーティメンバーの呪文威力を20増加させる。自身の暁または恩寵の献身を置き換えるが、他のパラディンの献身とは共存する。',
+  'entities.abilities.dawn_devotion.name': '暁の献身',
+  'entities.abilities.dawn_devotion.description':
+    '30分間、自身とパーティメンバーの攻撃力を40増加させる。自身の光輝または恩寵の献身を置き換えるが、他のパラディンの献身やウォリアーの雄叫びとは共存する。',
+  'entities.abilities.grace_devotion.name': '恩寵の献身',
+  'entities.abilities.grace_devotion.description':
+    '30分間、自身とパーティメンバーは5秒ごとにマナを15回復し、マナ消費が3%減少する。自身の光輝または暁の献身を置き換えるが、他のパラディンの献身とは共存する。',
+  'entities.abilities.recall_the_fallen.name': '倒れし者の呼び戻し',
+  'entities.abilities.recall_the_fallen.description':
+    '死亡したグループメンバーを、体力とマナが35%の状態で蘇生する。',
+  'entities.abilities.beacon_of_light.name': '光の標',
+  'entities.abilities.beacon_of_light.description':
+    'グループメンバー1人を光の標に指定する。60メートル以内にいる別のグループメンバーへの有効な直接回復の50%が、光の標も回復する。範囲回復と継続回復は転送されない。どちらかが死亡するまで持続する。',
+  'entities.abilities.final_edict.name': '最後の勅令',
+  'entities.abilities.final_edict.description':
+    '強烈な武器攻撃を放ち、命中時に献身を1生成する。命中すると暁落としの残りクールダウンが2秒短縮される。通常攻撃と最後の勅令の命中時、15%の確率で8秒間、暁の憤怒を得る。昇天中は自身の周囲に神聖な爆発も放つ。',
+  'entities.abilities.dawnfall.name': '暁落とし',
+  'entities.abilities.dawnfall.description':
+    '周囲の敵に{damage}の神聖ダメージを与え、献身を1生成する。1体以上に命中すると、最後の勅令の残りクールダウンが2秒短縮される。昇天中はダメージと範囲が増加する。',
+  'entities.abilities.sun_gods_verdict.name': '太陽神の裁決',
+  'entities.abilities.sun_gods_verdict.description':
+    '敵1体に30秒間、太陽神の裁決を下す。最後の勅令と暁落としが命中するたび、刻印が1つ付与される。3つ目の刻印を付与した能力が刑を決める。最後の勅令は罪人に壊滅的なダメージを与え、暁落としは裁決を爆発させて周囲の敵にダメージを与え、1.5秒間スタンさせる。',
+  'entities.abilities.valkyrs_calling.name': 'ヴァルキュリアの召命',
+  'entities.abilities.valkyrs_calling.description':
+    '空へ昇り、敵へ飛行する間はダメージを受けなくなる。2秒後、対象地点へ降下して{damage}の神聖ダメージを与え、献身を1生成する。昇天中は着地ダメージが50%増加し、チャージを1消費する。',
+  'entities.abilities.faithforged_guard.name': '聖光の負債',
+  'entities.abilities.faithforged_guard.description':
+    '8秒間、次に受ける敵の攻撃に報いる。最大{buff}のダメージを打ち消し、同量を神聖ダメージとして攻撃者に返し、信仰を1得る。報いるのは1撃のみ。昇天は報いられる量を50%増加させる。',
+  'entities.abilities.mercy_lance.name': '慈悲の槍',
+  'entities.abilities.mercy_lance.description':
+    '敵1体に{damage}の神聖ダメージを与え、命中時に献身を1生成する。昇天中はチャージを1消費し、必ずクリティカルヒットになる。',
+  'entities.abilities.sacred_form.name': '聖なる姿',
+  'entities.abilities.sacred_form.description':
+    '死亡するまで聖なる状態となり、回復量が10%、呪文のクリティカル率が5%増加し、生成する脅威が50%減少する。サンメンダー専用。',
+  'entities.abilities.dawns_embrace.name': '暁の抱擁',
+  'entities.abilities.dawns_embrace.description':
+    '強力な回復を与え、献身を1生成する。光輝の共鳴により、マナ消費が50%減少し、詠唱時間が1.5秒になる。昇天中は即時発動になり、回復量が35%増加する。',
+  'entities.abilities.radiant_chorus.name': '光輝の合唱',
+  'entities.abilities.radiant_chorus.description':
+    '周囲の味方を{damage}回復し、献身を1生成する。2人以上の味方を有効に回復すると光輝の共鳴を得る。次の癒やしの光が即時発動になるか、次の暁の抱擁のマナ消費が50%減少し、詠唱時間が1.5秒になる。昇天中は光輝の合唱の回復量と範囲が増加する。',
+  'entities.abilities.life_covenant.name': '生命の契約',
+  'entities.abilities.life_covenant.description':
+    '味方1人が受けるダメージを6秒間40%減少させる。昇天中はチャージを消費せず、さらに120ポイントの盾を付与する。',
+  'entities.abilities.aegis_first_dawn.name': '始暁の大盾',
+  'entities.abilities.aegis_first_dawn.description':
+    '5秒間詠唱し、半径10メートルの聖なるドームを作る。内部の味方は毎秒回復し、受けるダメージが50%減少する。詠唱を完了すると最後の回復を放ち、4秒間、移動速度を30%増加させる。',
+  'entities.abilities.vowkeeper_strike.name': '誓守の一撃',
+  'entities.abilities.vowkeeper_strike.description':
+    '高い脅威を与える一撃を放ち、献身を1生成する。命中時に20%の確率で8秒間、太陽の報復を得る。ブロック成功時にも25%の確率で得る。太陽の報復は次の陽光の円盤、恩寵の槌、癒やしの光のいずれかを強化する。昇天中は小さな吸収盾も付与する。',
+  'entities.abilities.bastion_rite.name': '砦の儀式',
+  'entities.abilities.bastion_rite.description':
+    '6秒間、受ける物理ダメージを20%減少させ、ブロック率を20%増加させる。昇天中は持続時間が10秒になる。',
+  'entities.abilities.sunward_disc.name': '陽光の円盤',
+  'entities.abilities.sunward_disc.description':
+    '盾が必要。輝く円盤を投げ、命中後に周囲の敵へ跳ね返らせる。ダメージを与えるたびに献身を1生成する。太陽の報復により、陽光の円盤はマナを消費せず、クールダウンを無視し、ダメージが20%増加する。昇天中は5回跳ね返る。',
+  'entities.abilities.sacred_challenge.name': '聖なる挑発',
+  'entities.abilities.sacred_challenge.description':
+    '敵1体に自身を攻撃させる。昇天中はチャージを消費せず、さらに4秒間、受けるすべてのダメージを15%減少させる。',
+  'entities.abilities.bastion_sweep.name': '砦の薙ぎ払い',
+  'entities.abilities.bastion_sweep.description':
+    '装備中の盾で前方180度の敵を薙ぎ払い、{damage}の神聖ダメージと高い脅威を与え、献身を1生成する。昇天中はダメージが30%増加し、半径が8メートルになる。',
+  'entities.abilities.oath_chain.name': '誓いの鎖',
+  'entities.abilities.oath_chain.description':
+    '遠くの敵を聖なる鎖で即座に縛る。敵は秒速18メートルで自身へ引き寄せられ、3メートルまで近づくと4秒間、移動速度が50%低下する。昇天中は周囲の敵をもう1体縛る。',
+  'entities.abilities.veilbound_march.name': '帳縛りの行進',
+  'entities.abilities.veilbound_march.description':
+    '4秒間、霊体となって移動速度が40%、防御力が30%増加し、移動不能、減速、強制移動を無効化する。すり抜けた敵には6秒間、帳の印が付与され、毎秒神聖ダメージを受け、自身へのダメージが20%減少し、自身に対する脅威が増加する。最初の印は献身を1生成する。行進終了時、周囲の印を付けた敵に最後の爆発を与える。昇天中は爆発のダメージが50%増加し、敵をわずかに引き寄せる。',
+  'entities.abilities.veilbound_mark.description':
+    '毎秒神聖ダメージを受け、印を付けたパラディンへのダメージが20%減少し、そのパラディンに対する脅威が増加する。',
+  'entities.quests.q_divine_tome.title': '暁縛りの聖典',
+  'entities.quests.q_divine_tome.text':
+    '光はあなたの中で静かに眠ってはいない、{playerName}。あなたが死者を安らかに眠らせる姿を見てきた。今こそ、ほとんどのパラディンが学ぶことのない秘儀を授けよう。倒れた魂を現世へ呼び戻す、呼び戻しの儀式だ。その言葉は、私が預かる暁縛りの聖典に記されている。だが、この地を彷徨う死者がいる限り、本は祝福とはならない。さまよう骸骨をあと6体、土へ還しなさい。そうすれば教えを始めよう。',
+  'entities.quests.q_divine_tome.completion':
+    '礼拝堂の庭は静かになった。{playerName}、あなたは言葉を学ぶ準備ができている。しかし呼び戻しの儀式は、暖かな礼拝堂で唱えるものではない。生と死の帳が薄くなった場所で歌わねばならない。私は聖典を北のミアフェン湿地へ運ぶ。そこで合流し、最後までやり遂げよう。',
+  'entities.quests.q_divine_tome.objectives.0.label': '安らかにしたさまよう骸骨',
+  'entities.quests.q_rite_of_redemption.title': '呼び戻しの儀式',
+  'entities.quests.q_rite_of_redemption.text':
+    '沼地までついてきたか、{playerName}。よろしい。暁縛りの聖典はここにある。この水没した地こそ、その言葉にふさわしい。死者が埋葬されたままでいられない場所ほど、生と死の帳が薄い場所はない。だが水没した死者は、詠唱の途中であなたの声を沈めようとするだろう。儀式にふさわしい場所を確保しなさい。水没した死者を8体眠らせ、共に聖別しよう。',
+  'entities.quests.q_rite_of_redemption.completion':
+    'ひざまずき、{playerName}、言葉を声に出して読みなさい。そうだ。感じるか？ あなたの手の光は、もはや生者を癒やすだけではない。彼岸へ渡った者を呼び戻すこともできる。賢明に使いなさい。絶望的な戦いへ魂を呼び戻すことは、慈悲ではなく残酷だ。立ちなさい、救済者よ。',
+  'entities.quests.q_rite_of_redemption.objectives.0.label': '安らかにした水没した死者',
   'hudChrome.crafting.identity.ceilingRare': 'レア上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -137,9 +269,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.name': '戦の太鼓',
   'entities.abilities.chain_lightning.name': '天枝の雷',
   'entities.abilities.chaos_bolt.name': '破滅の矢',
-  'entities.abilities.cleansing_verdict.name': '浄化の裁定',
-  'entities.abilities.cleansing_verdict.description':
-    '味方1体の有害な魔法効果を解除し、{damage}の体力を回復する。',
   'entities.abilities.cloak_of_shadows.name': '影まとい',
   'entities.abilities.cone_of_cold.name': '霜払い',
   'entities.abilities.curse_of_exhaustion.name': '鉛の呪い',
@@ -147,7 +276,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': '死霜',
   'entities.abilities.desperate_prayer.name': '最後の祈り',
   'entities.abilities.deterrence.name': '針毛の守り',
-  'entities.abilities.divine_shield.name': '光の護り',
   'entities.abilities.earthbind.name': '大地の縛り',
   'entities.abilities.evocation.name': 'エーテルの井戸',
   'entities.abilities.frenzied_regeneration.name': '野生の癒し',
@@ -155,7 +283,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': '亡霊の一撃',
   'entities.abilities.hammer_of_wrath.name': '鐘鳴りの槌',
   'entities.abilities.healing_stream.name': '湧き水',
-  'entities.abilities.holy_wrath.name': '聖者の怒り',
   'entities.abilities.howl_of_terror.name': '恐怖の遠吠え',
   'entities.abilities.ice_block.name': '冷たき棺',
   'entities.abilities.inner_focus.name': '静まる心',
@@ -2714,7 +2841,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '30分間、あなたの神聖ダメージが生成する脅威が60%増加します。タンク役パラディンの要です。',
   'entities.abilities.retribution_aura.name': '報復のオーラ',
   'entities.abilities.retribution_aura.description':
-    '30分間、聖なる力で身を包み、近接攻撃をしてきた敵に5の神聖ダメージを与えます。',
+    '死亡または置き換えられるまで、自身とパーティを聖なる力で包む。効果を受けた味方を近接攻撃した敵は{buff}の神聖ダメージを受け、効果を受けた味方の通常攻撃は{buff}の神聖ダメージを追加で与える。',
   'entities.abilities.tame_beast.name': '野生の絆',
   'entities.abilities.tame_beast.description':
     '獣を仲間にするための調教を始めます。獣はあなたのレベル以下で、エリートであってはなりません。ペットはあなたに従い、敵を攻撃し、独自の脅威を保ちます。同時に連れられるペットは1体だけです。',
@@ -8066,9 +8193,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_echo.name': '時の残響',
   'entities.abilities.temporal_echo.description':
     'より健やかだった瞬間の残響で味方に刻印し、即座に{damage}の体力を回復する。{duration}秒間、与えた秘術ダメージの一部が残響を通じてその味方を癒やす。',
-  'entities.abilities.aura_surge.name': '曙光の跳弾',
-  'entities.abilities.aura_surge.description':
-    '曙光で鍛えた盾を投げて{damage}の聖属性ダメージを与え、最初の対象を2秒間沈黙させる。その後、10ヤード以内の追加の敵最大2体へ跳ね返り、1回ごとに75%のダメージを与える。（パラディンのタレント）',
   'entities.abilities.aspect_of_the_wild.description':
     '30ヤード以内の味方を野生の力で鼓舞し、攻撃力を45、攻撃速度を5%上昇させる。効果時間5分。（ハンターのタレント）',
   'entities.abilities.avenging_wrath.description':
@@ -8095,8 +8219,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '自分の体力を即座に{damage}回復する。（プリーストのタレント）',
   'entities.abilities.deterrence.description':
     '回避率を50パーセントポイント上昇させる。効果時間10秒。（ハンターのタレント）',
-  'entities.abilities.divine_shield.description':
-    '聖なる力で身を守り、8秒間に900のダメージを吸収する。（パラディンのタレント）',
   'entities.abilities.earthbind.description':
     '周囲の敵を大地に縛り、2秒間移動不能にする。（シャーマンのタレント）',
   'entities.abilities.evocation.description': 'マナを急速に回復する。（メイジタレント）',
@@ -8110,8 +8232,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '傷ついた敵に聖なるハンマーを投げ、{damage}の聖属性ダメージを与える。体力が20%未満の対象にのみ使用可能。（パラディンのタレント）',
   'entities.abilities.healing_stream.description':
     '味方1体の体力を12秒かけて120回復する。（シャーマンのタレント）',
-  'entities.abilities.holy_wrath.description':
-    '聖なる力を解き放ち、周囲の敵に{damage}のダメージを与える。（パラディンのタレント）',
   'entities.abilities.howl_of_terror.description':
     '周囲の敵を最大3秒間恐怖状態にする。ダメージを受けると解除されることがある。（ウォーロックのタレント）',
   'entities.abilities.ice_block.description':

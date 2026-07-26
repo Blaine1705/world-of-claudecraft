@@ -5,7 +5,10 @@ import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
+import { PALADIN_CHOICE_ROWS } from '../src/sim/content/choice_rows_classic';
+import { ABILITIES } from '../src/sim/content/classes';
 import { ABILITY_IMAGE_IDS, abilityImageUrl } from '../src/ui/icons';
+import { PALADIN_TALENT_IMAGE_IDS } from '../src/ui/talent_icons';
 
 // Gate for the committed WebP class ability icons. The art under
 // public/ui/skills/<class>/<id>.webp is the source of truth (WebP only, no PNG/JPG in the
@@ -52,6 +55,32 @@ function isValidWebp(file: string): boolean {
     return (
       n === 12 && buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP'
     );
+  } finally {
+    closeSync(fd);
+  }
+}
+
+// Dimensions straight out of the WebP header (lossy VP8, lossless VP8L, or extended VP8X),
+// mirroring the dependency-free item-icon gate.
+function webpSize(file: string): { width: number; height: number } {
+  const fd = openSync(file, 'r');
+  try {
+    const buf = Buffer.alloc(32);
+    readSync(fd, buf, 0, 32, 0);
+    const tag = buf.toString('ascii', 12, 16);
+    if (tag === 'VP8 ')
+      return { width: buf.readUInt16LE(26) & 0x3fff, height: buf.readUInt16LE(28) & 0x3fff };
+    if (tag === 'VP8L') {
+      const bits = buf.readUInt32LE(21);
+      return { width: (bits & 0x3fff) + 1, height: ((bits >> 14) & 0x3fff) + 1 };
+    }
+    if (tag === 'VP8X') {
+      return {
+        width: (buf.readUIntLE(24, 3) & 0xffffff) + 1,
+        height: (buf.readUIntLE(27, 3) & 0xffffff) + 1,
+      };
+    }
+    throw new Error(`unknown webp chunk "${tag}" in ${file}`);
   } finally {
     closeSync(fd);
   }
@@ -118,9 +147,41 @@ const OWNED_CLASS_SPECS = {
   priest: ['discipline', 'holy', 'shadow'],
 } as const;
 
+const paladinWebpFiles = (): string[] =>
+  webpFiles().filter((file) => path.basename(path.dirname(file)) === 'paladin');
+
+type PaladinMapping = {
+  license: string;
+  generatedSource: string;
+  iconSize: number;
+  abilities: Array<{ abilityId: string; output: string }>;
+  talents: Array<{
+    talentId: string;
+    name: string;
+    sourceFile: string;
+    output: string;
+    confidence: string;
+  }>;
+};
+
+const paladinMapping = (): PaladinMapping =>
+  JSON.parse(
+    readFileSync(path.join(skillsDir, 'paladin', 'mapping.json'), 'utf8'),
+  ) as PaladinMapping;
+
 describe('class ability webp icons', () => {
   it('has image-backed ability ids wired (guards the fixture)', () => {
     expect(ABILITY_IMAGE_IDS.size).toBeGreaterThan(0);
+  });
+
+  it('gives every paladin ability painted artwork', () => {
+    const missing = Object.values(ABILITIES)
+      .filter((ability) => ability.class === 'paladin')
+      .map((ability) => ability.id)
+      .filter((id) => !ABILITY_IMAGE_IDS.has(id))
+      .sort();
+
+    expect(missing).toEqual([]);
   });
 
   it('uses the owner-provided Fireball Form and Counterspell artwork', () => {
@@ -130,7 +191,11 @@ describe('class ability webp icons', () => {
     const mapping = JSON.parse(
       readFileSync(path.join(skillsDir, 'mage', 'mapping.json'), 'utf8'),
     ) as {
-      abilities: Array<{ abilityId: string; sourceFile: string; output: string }>;
+      abilities: Array<{
+        abilityId: string;
+        sourceFile: string;
+        output: string;
+      }>;
     };
     const requested = new Map(
       mapping.abilities
@@ -218,10 +283,20 @@ describe('class ability webp icons', () => {
     ).toEqual([]);
   });
 
-  it('C) every committed webp is a wired ability icon in its own class folder (no orphans)', () => {
+  it('C) every committed webp is a wired ability or Paladin talent icon (no orphans)', () => {
     const orphans: string[] = [];
     for (const file of webpFiles()) {
       const id = path.basename(file, '.webp');
+      if (PALADIN_TALENT_IMAGE_IDS.has(id)) {
+        const expected = `/ui/skills/paladin/${id}.webp`;
+        const actual = `/${path.relative(publicDir, file).split(path.sep).join('/')}`;
+        if (actual !== expected) {
+          orphans.push(
+            `${path.relative(repoRoot, file)} (talent served as ${actual}, expected ${expected})`,
+          );
+        }
+        continue;
+      }
       if (!ABILITY_IMAGE_IDS.has(id)) {
         orphans.push(`${path.relative(repoRoot, file)} (id "${id}" not in ABILITY_IMAGE_IDS)`);
         continue;
@@ -250,5 +325,70 @@ describe('class ability webp icons', () => {
       }
     }
     expect(wrongSize).toEqual([]);
+  });
+
+  it('keeps every Paladin icon and provenance row in a one-to-one mapping', () => {
+    const files = paladinWebpFiles().map((file) => path.basename(file));
+    const mapping = paladinMapping();
+    const entries = [
+      ...mapping.abilities.map(({ abilityId: id, output }) => ({ id, output })),
+      ...mapping.talents.map(({ talentId: id, output }) => ({ id, output })),
+    ];
+    const outputs = entries.map(({ output }) => output);
+
+    expect(new Set(outputs).size, 'mapping.json contains duplicate output filenames').toBe(
+      outputs.length,
+    );
+    expect(
+      files.filter((file) => !outputs.includes(file)),
+      'Paladin artwork without provenance in mapping.json',
+    ).toEqual([]);
+    expect(
+      outputs.filter((file) => !files.includes(file)),
+      'mapping.json lists missing Paladin artwork',
+    ).toEqual([]);
+    expect(
+      entries.filter(({ id, output }) => output !== `${id}.webp`),
+      'Paladin provenance rows must map each ability or talent id to its canonical filename',
+    ).toEqual([]);
+  });
+
+  it('keeps choice rows, painted talent ids, files, and provenance in exact parity', () => {
+    const mapping = paladinMapping();
+    const choices = PALADIN_CHOICE_ROWS.rows.flatMap((row) => row.options);
+    const choiceIds = choices.map(({ id }) => id).sort();
+    const paintedIds = [...PALADIN_TALENT_IMAGE_IDS].sort();
+    const mappedIds = mapping.talents.map(({ talentId }) => talentId).sort();
+    const fileIds = paladinWebpFiles()
+      .map((file) => path.basename(file, '.webp'))
+      .filter((id) => id.startsWith('pal_r'))
+      .sort();
+
+    expect(paintedIds).toEqual(choiceIds);
+    expect(mappedIds).toEqual(choiceIds);
+    expect(fileIds).toEqual(choiceIds);
+    expect(mapping.generatedSource).toBe('OpenAI image generation, original project artwork');
+    expect(mapping.license).toContain('project-owned original art');
+
+    const choiceNames = new Map(choices.map(({ id, name }) => [id, name]));
+    for (const entry of mapping.talents) {
+      expect(entry.name, entry.talentId).toBe(choiceNames.get(entry.talentId));
+      expect(entry.sourceFile, entry.talentId).toBe(mapping.generatedSource);
+      expect(entry.confidence, entry.talentId).toBe('high');
+    }
+  });
+
+  it('keeps every Paladin icon at the declared 128px square', () => {
+    const { iconSize } = paladinMapping();
+    expect(iconSize).toBe(128);
+    const wrong = paladinWebpFiles()
+      .map((file) => ({ file, ...webpSize(file) }))
+      .filter(({ width, height }) => width !== iconSize || height !== iconSize)
+      .map(({ file, width, height }) => `${path.basename(file)} (${width}x${height})`);
+
+    expect(
+      wrong,
+      'resize Paladin source art to 128px square before running `npm run assets:skills`',
+    ).toEqual([]);
   });
 });

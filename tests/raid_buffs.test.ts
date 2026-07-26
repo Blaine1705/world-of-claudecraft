@@ -57,7 +57,6 @@ describe('standardized percent raid buffs', () => {
       ['arcane_intellect', 'buff_int_pct', 5],
       ['power_word_fortitude', 'buff_sta_pct', 5],
       ['mark_of_the_wild', 'buff_stats_pct', 5],
-      ['devotion_aura', 'buff_armor_pct', 10],
       ['blessing_of_might', 'buff_ap_pct', 10],
     ];
     for (const [id, kind, value] of cases) {
@@ -157,42 +156,53 @@ describe('standardized percent raid buffs', () => {
     expect(after.str).toBe(Math.round(before.str * 1.05));
   });
 
-  it('Devotion Aura raises party armor by 10%', () => {
+  it('Devotion Aura gives the party permanent 5% damage reduction without changing armor', () => {
     const sim = makeWorld();
     const pal = sim.addPlayer('paladin', 'Pal');
     const ally = sim.addPlayer('warrior', 'War');
+    // Bastion Devotion is the level 4 aura of the overhauled kit, so the caster
+    // has to be past that to know it at all.
+    sim.setPlayerLevel(4, pal);
     formParty(sim, pal, [ally]);
     const armorBefore = sim.entities.get(ally)!.stats.armor;
     ready(sim, pal);
-    sim.castAbility('devotion_aura', pal);
-    expect(sim.entities.get(ally)!.auras.some((a) => a.kind === 'buff_armor_pct')).toBe(true);
-    expect(sim.entities.get(ally)!.stats.armor).toBe(Math.round(armorBefore * 1.1));
+    sim.castAbility('devotion_ward', pal);
+    expect(sim.entities.get(ally)!.auras).toContainEqual(
+      expect.objectContaining({
+        id: 'devotion_ward',
+        kind: 'buff_dr',
+        value: 0.05,
+        permanent: true,
+        sourceId: pal,
+      }),
+    );
+    expect(sim.entities.get(ally)!.stats.armor).toBe(armorBefore);
   });
 
-  it('replaces the previous Blessing of Might from another caster', () => {
+  it('keeps Dawn Devotion from two Paladins as separate source-owned buffs', () => {
     const sim = makeWorld();
     const first = sim.addPlayer('paladin', 'Ald');
     const second = sim.addPlayer('paladin', 'Borin');
     const targetId = sim.addPlayer('warrior', 'War');
     const target = sim.entities.get(targetId)!;
-    sim.setPlayerLevel(4, first);
-    sim.setPlayerLevel(4, second);
+    sim.setPlayerLevel(10, first);
+    sim.setPlayerLevel(10, second);
+    formParty(sim, first, [second, targetId]);
 
     ready(sim, first);
-    sim.targetEntity(targetId, first);
-    sim.castAbility('blessing_of_might', first);
-    const firstAura = target.auras.find((a) => a.id === 'blessing_of_might')!;
+    sim.castAbility('dawn_devotion', first);
+    const firstAura = target.auras.find((a) => a.id === 'dawn_devotion' && a.sourceId === first)!;
     firstAura.remaining = 1200;
 
     ready(sim, second);
-    sim.targetEntity(targetId, second);
-    sim.castAbility('blessing_of_might', second);
+    sim.castAbility('dawn_devotion', second);
 
-    const blessings = target.auras.filter((a) => a.id === 'blessing_of_might');
-    expect(blessings).toHaveLength(1);
-    expect(blessings[0].sourceId).toBe(second);
-    expect(blessings[0].value).toBe(10);
-    expect(blessings[0].remaining).toBe(1800);
+    const devotions = target.auras.filter((a) => a.id === 'dawn_devotion');
+    expect(devotions).toHaveLength(2);
+    expect(devotions.map((a) => a.sourceId).sort()).toEqual([first, second].sort());
+    expect(devotions.every((a) => a.value === 40)).toBe(true);
+    expect(devotions.find((a) => a.sourceId === first)?.remaining).toBe(1200);
+    expect(devotions.find((a) => a.sourceId === second)?.remaining).toBe(1800);
   });
 
   it('does not stack Sureflight Aura from two hunters (same-class group buff)', () => {

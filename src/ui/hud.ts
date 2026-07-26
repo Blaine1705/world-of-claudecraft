@@ -129,8 +129,13 @@ import {
 } from './ability_damage';
 import { ArenaWindow } from './arena_window';
 import { auraDisplayNameFromSource } from './aura_display_name';
-import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
+import {
+  type AuraEffectInput,
+  auraEffectDescriptor,
+  auraEffectMaximumFractionDigits,
+} from './aura_effect';
 import { auraGainLogKeyFor, findAuraForGainEvent } from './aura_gain_log';
+import { renderAuraTooltipBodyHtml } from './aura_tooltip';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, createAurasView } from './auras_view';
 import { attachAvatarFallback } from './avatar_fallback';
@@ -423,6 +428,8 @@ import { MobileMoreDialogController } from './mobile_more_dialog';
 import { MovableFrame } from './movable_frame';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
+import { PaladinDevotionPainter } from './paladin_devotion_painter';
+import { createPaladinDevotionView } from './paladin_devotion_view';
 import { PartyBelowTargetPainter } from './party_below_target_painter';
 import { loadPartyCollapsed, savePartyCollapsed } from './party_collapse';
 import type { PartyRowAuraDeps } from './party_frame_row';
@@ -474,7 +481,11 @@ import { localizeServerText } from './server_i18n';
 import { localizeSimAuraName, localizeSimText } from './sim_i18n';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
-import { stanceBarView, WARRIOR_STANCE_GROUP } from './stance_bar_view';
+import {
+  activeStanceBarAbilityId,
+  isStanceBarAbilityGroup,
+  stanceBarView,
+} from './stance_bar_view';
 import {
   type BuffStatSource,
   buildStatTooltip,
@@ -1207,6 +1218,12 @@ export class Hud {
   // closure reads it from here).
   private targetPortraitSubject: Entity | null = null;
   private comboRowEl = $('#combo-row');
+  private paladinDevotionFrameEl = $('#paladin-devotion-frame');
+  private paladinDevotionEl = $('#paladin-devotion');
+  private paladinDevotionFillEl = $('#paladin-devotion-fill');
+  private paladinDevotionLabelEl = $('#paladin-devotion-label');
+  private paladinAscensionCharges = $<HTMLElement>('.paladin-ascension-charges').children;
+  private paladinAscensionStatusEl = $('#paladin-ascension-status');
   private castbarEl = $('#castbar');
   private castbarFillEl = this.castbarEl.querySelector('.fill') as HTMLElement;
   private castbarLabelEl = this.castbarEl.querySelector('.label') as HTMLElement;
@@ -1769,6 +1786,10 @@ export class Hud {
     this.chatWindow.init();
     this.chatGeometry.init();
     this.initFrameMovers();
+    attachOverlayDrag(this.paladinDevotionFrameEl, 'paladinDevotionAnchor', {
+      fx: 0.5,
+      fy: 0.72,
+    });
     this.initWindowManagement();
     this.emoteWheelSlots = this.loadEmoteWheelSlots();
     this.actionBarController.init();
@@ -3260,6 +3281,25 @@ export class Hud {
       this.hotDomSkippedWrites++;
     },
   );
+  private readonly paladinDevotionView = createPaladinDevotionView(
+    (value) => formatNumber(value, { maximumFractionDigits: 0 }),
+    (value, max, charges, lastCharge) =>
+      lastCharge
+        ? t('hudChrome.paladin.devotionAscensionLast', { value, max })
+        : charges !== '0'
+          ? t('hudChrome.paladin.devotionAscensionCharges', { value, max, charges })
+          : t('hudChrome.paladin.devotionValue', { value, max }),
+    t('hudChrome.paladin.ascensionLastAnnouncement'),
+  );
+  private readonly paladinDevotionPainter = new PaladinDevotionPainter(
+    this.writerFacet,
+    this.paladinDevotionFrameEl,
+    this.paladinDevotionEl,
+    this.paladinDevotionFillEl,
+    this.paladinDevotionLabelEl,
+    this.paladinAscensionCharges,
+    this.paladinAscensionStatusEl,
+  );
   private readonly delvePainter = new DelveMapPainter(this.writerFacet, classCss);
   // The Protect Yumi match strip + bench overlay (yumi_match_painter.ts):
   // facet-routed; structure from arenaInfo.match.yumi, dynamics from the
@@ -3522,7 +3562,7 @@ export class Hud {
       u.d = t('hudChrome.unitFrame.durationUnitDays');
       return u;
     },
-    auraEffectHtml: (a) => this.auraEffectTooltipHtml(a),
+    auraEffectHtml: (a) => this.auraTooltipBodyHtml(a),
     // Own-aura check for the target strip's ownFirst prominence: a missing/zero
     // sourceId (an old server's mirror) is never own, so the strip degrades to
     // the un-prioritized layout instead of misattributing another caster's dot.
@@ -4331,16 +4371,42 @@ export class Hud {
     return `<button type="button" class="claudium-launcher" data-claudium-launcher title="${esc(aria)}" aria-label="${esc(aria)}"><img class="claudium-coin" src="/claudium/icons/claudium_coin_64.webp" alt=""><span class="claudium-launcher-balance">${esc(label)}</span></button>`;
   }
 
+  // Complete aura tooltip body. A buff created by a known ability first shows that
+  // ability's localized, rank/talent-resolved description; the mechanical one-line
+  // descriptor follows when the aura kind has one. Proc-only auras without an ability
+  // definition still retain their descriptor. This keeps new ability buffs from
+  // silently degrading to name + timer just because their AuraKind is new.
+  private auraTooltipBodyHtml(a: AuraEffectInput & { id?: string }): string {
+    if (!a.id) return this.auraEffectTooltipHtml(a);
+    return renderAuraTooltipBodyHtml(a as AuraEffectInput & { id: string }, {
+      abilityDescription: (id) => {
+        const res = this.previewResolvedAbility(id);
+        if (!res) return null;
+        const p = this.sim.player;
+        const scaling: AbilityScaling = {
+          spellPower: p.spellPower,
+          rangedPower: p.rangedPower,
+          attackPower: p.attackPower,
+        };
+        return abilityDisplayDescription(res, abilityEffectText(res, scaling), scaling);
+      },
+      effectHtml: (aura) => this.auraEffectTooltipHtml(aura),
+      escapeHtml: esc,
+    });
+  }
+
   // One-line aura effect summary HTML for the buff/debuff tooltip: the pure descriptor
   // (aura_effect.ts) resolved to localized, esc'd text. Empty when the aura has no
-  // descriptor. Injected into the auras view so the i18n-free core never calls t().
+  // descriptor.
   private auraEffectTooltipHtml(a: AuraEffectInput & { id?: string }): string {
     const effect = auraEffectDescriptor(a);
     if (!effect) return '';
     const values: Record<string, string> = {};
     if (effect.nums) {
       for (const [k, n] of Object.entries(effect.nums)) {
-        values[k] = formatNumber(n, { maximumFractionDigits: 0 });
+        values[k] = formatNumber(n, {
+          maximumFractionDigits: auraEffectMaximumFractionDigits(n),
+        });
       }
     }
     // Resolve the {school} placeholder in the dot/absorb/thorns summaries. Prefer
@@ -5130,6 +5196,14 @@ export class Hud {
         t('abilityUi.tooltip.cost', {
           cost: formatAbilityNumber(res.cost),
           resource: resourceDisplayName(this.sim.player.resourceType),
+        }),
+      );
+    }
+    if (a.devotionCost) {
+      costLine.push(
+        t('abilityUi.tooltip.cost', {
+          cost: formatAbilityNumber(a.devotionCost),
+          resource: t('abilityUi.resources.devotion'),
         }),
       );
     }
@@ -6576,21 +6650,19 @@ export class Hud {
     return null;
   }
 
-  // The warrior stance bar: a small row of stance toggles stacked above the
-  // action bars, shown only for warriors and only for the stances valid for the
-  // current spec (Battle + Guarded for Arms/Prot, Berserker for Fury, Battle only
-  // for no spec). Rebuilds only when the known-stance set or the active stance
-  // changes (sig elision, like the pet bar).
+  // The stance-style choice bar: one shared row above the action bars for
+  // warrior stances and paladin auras. Rebuilds only when the known choice set
+  // or active choice changes (sig elision, like the pet bar).
   private renderStanceBar(): void {
     const bar = $('#stancebar') as HTMLElement;
-    const isWarrior = this.sim.cfg.playerClass === 'warrior';
-    const knownStances = isWarrior
-      ? this.sim.known.filter((k) => k.def.exclusiveGroup === WARRIOR_STANCE_GROUP)
+    const playerClass = this.sim.cfg.playerClass;
+    const usesChoiceBar = playerClass === 'warrior' || playerClass === 'paladin';
+    const knownStances = usesChoiceBar
+      ? this.sim.known.filter((k) => isStanceBarAbilityGroup(k.def.exclusiveGroup))
       : [];
     const knownIds = knownStances.map((k) => k.def.id);
-    const knownSet = new Set(knownIds);
-    const activeAura = this.sim.player.auras.find((a) => knownSet.has(a.id));
-    const model = stanceBarView(isWarrior, knownIds, activeAura ? activeAura.id : null);
+    const activeId = activeStanceBarAbilityId(knownIds, this.sim.player.auras, this.sim.player.id);
+    const model = stanceBarView(playerClass, knownIds, activeId);
     if (!model.visible) {
       bar.style.display = 'none';
       if (this.lastStanceBarSig !== '') {
@@ -7227,6 +7299,7 @@ export class Hud {
     } else {
       this.setDisplay(this.comboRowEl, 'none');
     }
+    this.paladinDevotionPainter.paint(this.paladinDevotionView.tick(p));
 
     // buff bar / debuff bar: the keyed-pool aura painter, driven by the auras_view core
     // every frame (the elided writers make a no-op frame free). Buffs and debuffs render to
@@ -7496,7 +7569,11 @@ export class Hud {
     // client (see src/net/online.ts, server/game.ts). The auras ARE mirrored, so
     // this stays correct on both hosts. Shared by every action-bar-family view
     // below (desktop bar, mobile ring, consumables quick bar).
-    const abPlayer = { ...p, stealthed: playerStealthed(p.auras) };
+    const abPlayer = {
+      ...p,
+      stealthed: playerStealthed(p.auras),
+      paladinSpec: sim.talentSpec,
+    };
     this.renderPetBar();
     this.renderStanceBar();
     this.flushPendingProcAuraNotes();
@@ -10977,6 +11054,7 @@ export class Hud {
       'Not enough rage!': 'hud.errors.notEnoughRage',
       'Not enough energy!': 'hud.errors.notEnoughEnergy',
       'Not enough mana!': 'hud.errors.notEnoughMana',
+      'Not enough Devotion!': 'hud.errors.notEnoughDevotion',
       'Not enough health.': 'hud.errors.notEnoughHealth',
       'Your target must dodge first.': 'hud.errors.targetMustDodge',
       'That ability requires combo points.': 'hud.errors.requiresCombo',
@@ -14508,10 +14586,11 @@ export function abilityRequirementLines(def: AbilityDef): string[] {
   if (def.spendsCombo) lines.push(t('abilityUi.tooltip.requiresCombo'));
   if (def.requiresDodgeProc) lines.push(t('abilityUi.tooltip.requiresDodge'));
   if (def.requiresOutOfCombat) lines.push(t('abilityUi.tooltip.requiresOutOfCombat'));
-  if (def.requiresTargetHpBelow !== undefined) {
+  const targetHealthThreshold = def.executeThreshold ?? def.requiresTargetHpBelow;
+  if (targetHealthThreshold !== undefined) {
     lines.push(
       t('abilityUi.tooltip.requiresTargetHealthBelow', {
-        percent: formatAbilityNumber(def.requiresTargetHpBelow * 100),
+        percent: formatAbilityNumber(targetHealthThreshold * 100),
       }),
     );
   }
@@ -14550,6 +14629,7 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
       case 'chainDamage':
       case 'groundAoE':
       case 'drainTick':
+      case 'valkyrsCalling':
         return abilityAmountRange(primary.min, primary.max) + suffix(primary);
       case 'hunterStampede':
         return abilityAmountRange(primary.min, primary.max) + suffix(primary);

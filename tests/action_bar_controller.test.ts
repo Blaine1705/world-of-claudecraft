@@ -79,6 +79,27 @@ describe('ActionBarController form persistence', () => {
     expect(ACTION_BAR_ABILITY_SLOTS).toBe(33);
   });
 
+  it('keeps Paladin auras on their choice row and auto-places standalone long buffs', () => {
+    const { controller } = makeHarness(
+      'paladin',
+      [
+        'devotion_ward',
+        'radiant_devotion',
+        'dawn_devotion',
+        'grace_devotion',
+        'retribution_aura',
+        'solar_step',
+      ],
+      bar(),
+    );
+
+    controller.syncKnownAbilities();
+
+    expect(controller.actions).toEqual(
+      bar('radiant_devotion', 'dawn_devotion', 'grace_devotion', 'solar_step'),
+    );
+  });
+
   it('extends a saved two-row bar with an empty third row without losing bindings', () => {
     const storage = new MemoryStorage();
     const legacy = Array.from(
@@ -554,6 +575,18 @@ describe('ActionBarController: passives never occupy an action slot', () => {
 
     expect(controller.actions).toEqual(bar('sunder_armor'));
     expect(JSON.parse(storage.getItem(key) ?? 'null')).toEqual(bar('sunder_armor'));
+  });
+
+  it('migrates removed Paladin abilities out of a persisted bar without moving valid slots', () => {
+    const storage = new MemoryStorage();
+    const key = 'woc_hotbar_paladin_ActionbarTester';
+    storage.setItem(key, JSON.stringify(bar('holy_light', 'flash_of_light')));
+    const { controller } = makeHarness('paladin', ['holy_light', 'flash_of_light'], bar(), storage);
+
+    controller.init();
+
+    expect(controller.actions).toEqual(bar('holy_light'));
+    expect(JSON.parse(storage.getItem(key) ?? 'null')).toEqual(bar('holy_light'));
   });
 
   it('rejects direct slot 0 assignment of a passive', () => {

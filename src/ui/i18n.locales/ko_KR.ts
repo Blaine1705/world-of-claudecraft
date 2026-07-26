@@ -13,6 +13,140 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.guardian_covenant.name': '수호의 서약',
+  'entities.abilities.guardian_covenant.description':
+    '아군 대상과 자신을 보호하여 8초 동안 받는 피해를 20% 감소시킵니다. 아군 대상을 선택하지 않으면 자신에게 사용합니다.',
+  'hudChrome.paladin.devotion': '헌신',
+  'hudChrome.paladin.devotionValue': '헌신 {value} / {max}',
+  'hudChrome.paladin.devotionAscensionCharges': '헌신 {value} / {max}. 승천 충전 {charges}회.',
+  'hudChrome.paladin.devotionAscensionLast': '헌신 {value} / {max}. 승천 마지막 충전.',
+  'hudChrome.paladin.ascensionLastAnnouncement': '승천 마지막 충전',
+  'hudChrome.paladin.ascensionSpenderAria':
+    '행동 단축바 {slot}: {ability}. 승천 충전을 1회 소모합니다.',
+  'hudChrome.auraEffect.radiantResonance':
+    '다음 치유의 빛이 즉시 시전되거나, 다음 여명의 포옹의 마나 소모량이 {pct}% 감소하고 시전 시간이 {castTime}초가 됩니다',
+  'hudChrome.auraEffect.solarReprisal':
+    '다음 태양 수호 원반은 마나를 소모하지 않고 재사용 대기시간을 무시하며 피해가 {pct}% 증가합니다. 은총의 망치는 재사용 대기시간을 무시하고 준 피해의 100%만큼 생명력을 회복합니다. 또는 치유의 빛이 즉시 시전됩니다',
+  'guide.abilityHook.hammer_of_wrath':
+    '멀리서 부상당한 적을 처형합니다. 날개가 활성화된 동안에는 모든 적에게 사용할 수 있습니다.',
+  'guide.abilityHook.avenging_wrath':
+    '헌신을 10 얻고, 15초 동안 능력으로 생성하는 헌신이 두 배가 됩니다.',
+  'guide.abilityHook.bastion_sweep':
+    '방패로 적 무리를 휩쓸어 위협 수준을 장악하고 헌신을 쌓습니다.',
+  'guide.abilityHook.oath_chain': '멀리 있는 적을 무리 안으로 끌어당기고 도주를 늦춥니다.',
+  'guide.abilityHook.veilbound_march':
+    '적 무리를 통과하며 표식을 남기고, 자신에게 주는 피해를 약화시키며 위협 수준을 고정합니다.',
+  'guide.abilityHook.holy_shield':
+    '헌신을 소모하여 일정 시간 동안 방패 막기, 피해 흡수, 위협 파동을 활성화합니다.',
+  'guide.abilityHook.consecration':
+    '주변 땅을 신성화하여 지속적인 신성 피해와 위협 수준을 생성합니다.',
+  'guide.abilityHook.hammer_of_justice': '짧고 확실한 기절로 적 하나를 저지합니다.',
+  'guide.abilityHook.lay_on_hands': '아군이 쓰러지기 직전에 많은 생명력을 회복시킵니다.',
+  'hud.errors.notEnoughDevotion': '헌신이 부족합니다!',
+  'abilityUi.resources.devotion': '헌신',
+  'entities.abilities.divine_ascension.name': '신성한 승천',
+  'entities.abilities.divine_ascension.description':
+    '헌신을 20 소모하여 최대 45초 동안 유지되는 승천 충전을 5회 얻습니다. 지정된 능력은 충전을 1회 소모하고 추가 효과를 얻습니다.',
+  'entities.abilities.aura_mastery.name': '성스러운 합일',
+  'entities.abilities.aura_mastery.description':
+    '8초 동안 파티에서 활성화된 모든 헌신과 응보의 오라를 강화합니다. 보루의 헌신은 피해를 15% 감소시키고, 응보는 15의 신성 피해를 줍니다. 여러 번 사용하면 중첩되지 않고 지속시간이 갱신됩니다.',
+  'entities.abilities.devotion_ward.name': '보루의 헌신',
+  'entities.abilities.devotion_ward.description':
+    '자신과 파티원이 받는 피해를 죽거나 효과가 교체될 때까지 5% 감소시킵니다. 이 오라와 응보의 오라만 서로 교체되며, 광휘, 여명, 은총의 헌신과는 함께 유지됩니다.',
+  'entities.abilities.hammer_of_grace.name': '은총의 망치',
+  'entities.abilities.hammer_of_grace.description':
+    '20미터 안의 적에게 성스러운 망치를 즉시 던져 {damage}의 피해를 주고, 마나를 70 회복하며, 준 피해의 50%만큼 자신의 생명력을 회복하고, 피해를 주면 헌신을 1 생성합니다. 태양의 응보가 활성화되면 은총의 망치는 재사용 대기시간을 무시하고 준 피해의 100%만큼 생명력을 회복합니다.',
+  'entities.abilities.hushbrand.name': '침묵의 낙인',
+  'entities.abilities.hushbrand.description':
+    '주문 시전을 방해하고 4초 동안 같은 계열의 주문을 사용하지 못하게 합니다.',
+  'entities.abilities.solar_step.name': '태양의 발걸음',
+  'entities.abilities.solar_step.description': '2초 동안 이동 속도가 150% 증가합니다.',
+  'entities.abilities.solar_invocation.name': '태양의 기원',
+  'entities.abilities.solar_invocation.description':
+    '아군 하나를 즉시 {damage}만큼 치유하거나 적 하나에게 중간 정도의 신성 피해를 줍니다. 어느 쪽이든 헌신을 1 생성합니다. 승천 중 치유로 사용하면 대상의 10미터 안에 있는 아군 플레이어도 절반만큼 치유합니다.',
+  'entities.abilities.radiant_devotion.name': '광휘의 헌신',
+  'entities.abilities.radiant_devotion.description':
+    '30분 동안 자신과 파티원의 주문력을 20 증가시킵니다. 자신의 여명 또는 은총의 헌신을 교체하지만, 다른 성기사의 헌신과는 함께 유지됩니다.',
+  'entities.abilities.dawn_devotion.name': '여명의 헌신',
+  'entities.abilities.dawn_devotion.description':
+    '30분 동안 자신과 파티원의 전투력을 40 증가시킵니다. 자신의 광휘 또는 은총의 헌신을 교체하지만, 다른 성기사의 헌신 및 전사의 외침과는 함께 유지됩니다.',
+  'entities.abilities.grace_devotion.name': '은총의 헌신',
+  'entities.abilities.grace_devotion.description':
+    '30분 동안 자신과 파티원이 5초마다 마나를 15 회복하고, 마나 소모량이 3% 감소합니다. 자신의 광휘 또는 여명의 헌신을 교체하지만, 다른 성기사의 헌신과는 함께 유지됩니다.',
+  'entities.abilities.recall_the_fallen.name': '쓰러진 자 소환',
+  'entities.abilities.recall_the_fallen.description':
+    '죽은 파티원을 생명력과 마나가 35%인 상태로 되살립니다.',
+  'entities.abilities.beacon_of_light.name': '빛의 봉화',
+  'entities.abilities.beacon_of_light.description':
+    '파티원 하나를 빛의 봉화로 지정합니다. 60미터 안에 있는 다른 파티원에게 적용한 유효 직접 치유량의 50%만큼 봉화도 치유합니다. 광역 및 지속 치유는 전달되지 않습니다. 둘 중 하나가 죽을 때까지 지속됩니다.',
+  'entities.abilities.final_edict.name': '최후의 칙령',
+  'entities.abilities.final_edict.description':
+    '강력한 무기 공격을 가하고 피해를 주면 헌신을 1 생성합니다. 적중하면 여명 강하의 남은 재사용 대기시간이 2초 감소합니다. 자동 공격과 최후의 칙령이 적중하면 15% 확률로 8초 동안 여명의 격노를 얻습니다. 승천 중에는 주변에 신성한 폭발도 일으킵니다.',
+  'entities.abilities.dawnfall.name': '여명 강하',
+  'entities.abilities.dawnfall.description':
+    '주변 적에게 {damage}의 신성 피해를 주고 헌신을 1 생성합니다. 적어도 하나의 적에게 적중하면 최후의 칙령의 남은 재사용 대기시간이 2초 감소합니다. 승천 중에는 피해와 범위가 증가합니다.',
+  'entities.abilities.sun_gods_verdict.name': '태양신의 판결',
+  'entities.abilities.sun_gods_verdict.description':
+    '30초 동안 적 하나에게 태양신의 판결을 내립니다. 최후의 칙령과 여명 강하가 적중할 때마다 각인을 하나 새깁니다. 세 번째 각인을 새긴 능력에 따라 형벌이 결정됩니다. 최후의 칙령은 심판받은 적에게 엄청난 피해를 주고, 여명 강하는 판결을 폭발시켜 주변 적에게 피해를 주고 1.5초 동안 기절시킵니다.',
+  'entities.abilities.valkyrs_calling.name': '발키리의 부름',
+  'entities.abilities.valkyrs_calling.description':
+    '공중으로 승천하여 적에게 날아가는 동안 피해에 면역이 됩니다. 2초 후 대상 지역으로 강하하여 {damage}의 신성 피해를 주고 헌신을 1 생성합니다. 승천 중에는 충돌 피해가 50% 증가하고 충전을 1회 소모합니다.',
+  'entities.abilities.faithforged_guard.name': '빛의 빚',
+  'entities.abilities.faithforged_guard.description':
+    '8초 동안 다음에 받는 적의 공격에 응답합니다. 최대 {buff}의 피해를 막고 같은 양을 신성 피해로 공격자에게 되돌려주며, 헌신을 1 얻습니다. 한 번의 공격에만 응답합니다. 승천은 응답할 수 있는 양을 50% 증가시킵니다.',
+  'entities.abilities.mercy_lance.name': '자비의 창',
+  'entities.abilities.mercy_lance.description':
+    '적 하나에게 {damage}의 신성 피해를 주고, 피해를 주면 헌신을 1 생성합니다. 승천 중에는 충전을 1회 소모하여 반드시 치명타로 적중합니다.',
+  'entities.abilities.sacred_form.name': '성스러운 형상',
+  'entities.abilities.sacred_form.description':
+    '죽을 때까지 성스러운 상태가 되어 치유량이 10%, 주문 극대화율이 5% 증가하고, 생성하는 위협 수준이 50% 감소합니다. 태양 치유사 전용입니다.',
+  'entities.abilities.dawns_embrace.name': '여명의 포옹',
+  'entities.abilities.dawns_embrace.description':
+    '강력한 치유를 적용하고 헌신을 1 생성합니다. 광휘의 공명은 마나 소모량을 50% 감소시키고 시전 시간을 1.5초로 줄입니다. 승천 중에는 즉시 시전되고 치유량이 35% 증가합니다.',
+  'entities.abilities.radiant_chorus.name': '광휘의 합창',
+  'entities.abilities.radiant_chorus.description':
+    '주변 아군을 {damage}만큼 치유하고 헌신을 1 생성합니다. 아군을 2명 이상 유효하게 치유하면 광휘의 공명을 얻습니다. 다음 치유의 빛이 즉시 시전되거나, 다음 여명의 포옹의 마나 소모량이 50% 감소하고 시전 시간이 1.5초가 됩니다. 승천 중에는 광휘의 합창의 치유량과 범위가 증가합니다.',
+  'entities.abilities.life_covenant.name': '생명의 서약',
+  'entities.abilities.life_covenant.description':
+    '6초 동안 아군 하나가 받는 피해를 40% 감소시킵니다. 승천 중에는 충전을 소모하지 않고 120의 피해를 흡수하는 보호막도 부여합니다.',
+  'entities.abilities.aegis_first_dawn.name': '첫 여명의 아이기스',
+  'entities.abilities.aegis_first_dawn.description':
+    '5초 동안 정신을 집중하여 반경 10미터의 성스러운 돔을 만듭니다. 안에 있는 아군은 매초 치유되고 받는 피해가 50% 감소합니다. 정신 집중을 완료하면 마지막 치유를 방출하고 4초 동안 이동 속도를 30% 증가시킵니다.',
+  'entities.abilities.vowkeeper_strike.name': '맹세수호자의 일격',
+  'entities.abilities.vowkeeper_strike.description':
+    '높은 위협 수준을 생성하는 공격을 가하고 헌신을 1 생성합니다. 적중하면 20% 확률로 8초 동안 태양의 응보를 얻고, 방패 막기에 성공할 때마다 25% 확률로 얻습니다. 태양의 응보는 다음 태양 수호 원반, 은총의 망치, 치유의 빛 중 하나를 강화합니다. 승천 중에는 작은 피해 흡수 보호막도 얻습니다.',
+  'entities.abilities.bastion_rite.name': '보루의 의식',
+  'entities.abilities.bastion_rite.description':
+    '6초 동안 받는 물리 피해를 20% 감소시키고 방패 막기 확률을 20% 증가시킵니다. 승천 중에는 지속시간이 10초로 증가합니다.',
+  'entities.abilities.sunward_disc.name': '태양 수호 원반',
+  'entities.abilities.sunward_disc.description':
+    '방패가 필요합니다. 빛나는 원반을 던져 적에게 적중시킨 후 주변 적 사이를 튕기게 합니다. 피해를 줄 때마다 헌신을 1 생성합니다. 태양의 응보가 활성화되면 태양 수호 원반은 마나를 소모하지 않고 재사용 대기시간을 무시하며 피해가 20% 증가합니다. 승천 중에는 5회 튕깁니다.',
+  'entities.abilities.sacred_challenge.name': '성스러운 도발',
+  'entities.abilities.sacred_challenge.description':
+    '적 하나가 자신을 공격하도록 강제합니다. 승천 중에는 충전을 소모하지 않고 4초 동안 받는 모든 피해도 15% 감소시킵니다.',
+  'entities.abilities.bastion_sweep.name': '보루 휩쓸기',
+  'entities.abilities.bastion_sweep.description':
+    '장착한 방패로 전방 180도 안의 적을 휩쓸어 {damage}의 신성 피해와 높은 위협 수준을 주고 헌신을 1 생성합니다. 승천 중에는 피해가 30% 증가하고 반경이 8미터로 늘어납니다.',
+  'entities.abilities.oath_chain.name': '맹세의 사슬',
+  'entities.abilities.oath_chain.description':
+    '멀리 있는 적을 성스러운 사슬로 즉시 결박합니다. 적은 자신에게서 3미터 거리까지 초당 18미터의 속도로 끌려오며, 도착하면 4초 동안 이동 속도가 50% 감소합니다. 승천 중에는 주변의 두 번째 적도 결박합니다.',
+  'entities.abilities.veilbound_march.name': '장막결속 행진',
+  'entities.abilities.veilbound_march.description':
+    '4초 동안 영체가 되어 이동 속도가 40%, 방어도가 30% 증가하고 이동 불가, 감속, 강제 이동에 면역이 됩니다. 통과한 적은 6초 동안 장막의 표식을 얻어 매초 신성 피해를 받고, 자신에게 주는 피해가 20% 감소하며, 자신에 대한 위협 수준이 증가합니다. 첫 표식은 헌신을 1 생성합니다. 행진이 끝나면 주변의 표식이 있는 적에게 마지막 폭발을 일으킵니다. 승천 중에는 폭발 피해가 50% 증가하고 적을 자신 쪽으로 조금 끌어당깁니다.',
+  'entities.abilities.veilbound_mark.description':
+    '매초 신성 피해를 받고, 표식을 남긴 성기사에게 주는 피해가 20% 감소하며, 해당 성기사에 대한 위협 수준이 증가합니다.',
+  'entities.quests.q_divine_tome.title': '여명결속 성전',
+  'entities.quests.q_divine_tome.text':
+    '빛은 그대 안에서 조용히 머물지 않네, {playerName}. 그대가 죽은 자들을 안식에 들게 하는 모습을 지켜보았고, 이제 소수의 성기사만 배우는 가르침을 받을 준비가 되었다고 믿네. 쓰러진 영혼을 산 자들 곁으로 불러오는 귀환의 의식이지. 그 주문은 내가 보관하는 여명결속 성전에 기록되어 있네. 하지만 불안한 망자들이 이 땅을 걷는 동안 책은 축복이 될 수 없지. 떠도는 해골 6구를 더 땅으로 돌려보내면 가르침을 시작하겠네.',
+  'entities.quests.q_divine_tome.completion':
+    '예배당 뜰이 조용해졌군. {playerName}, 그대는 주문을 배울 준비가 되었지만 귀환의 의식은 따뜻한 예배당에서 읊을 수 없네. 삶과 죽음 사이의 장막이 얇아지는 곳에서 노래해야 하지. 성전을 북쪽 미어펜 습지로 가져가겠네. 그곳에서 나를 따라오면 마무리할 수 있을 걸세.',
+  'entities.quests.q_divine_tome.objectives.0.label': '안식에 든 떠도는 해골',
+  'entities.quests.q_rite_of_redemption.title': '귀환의 의식',
+  'entities.quests.q_rite_of_redemption.text':
+    '습지까지 따라왔군, {playerName}. 좋아. 여명결속 성전은 여기 있네. 이 물에 잠긴 땅이야말로 그 주문이 있어야 할 곳이지. 죽은 자가 묻힌 채 머물지 않는 곳보다 삶과 죽음 사이의 장막이 얇은 곳은 없으니 말일세. 하지만 물에 빠진 망자들이 노래 중간에 그대의 목소리를 끌어내리려 할 걸세. 의식을 치를 만한 공간을 확보하게. 물에 빠진 망자 8구를 안식에 들게 하면 함께 성별하겠네.',
+  'entities.quests.q_rite_of_redemption.completion':
+    '무릎을 꿇고, {playerName}, 주문을 소리 내어 읽게. 바로 그거야. 느껴지는가? 이제 그대 손의 빛은 산 자를 치유하는 데 그치지 않고 저편으로 건너간 이들을 불러올 수 있네. 현명하게 사용하게. 가망 없는 싸움으로 영혼을 불러오는 것은 자비가 아니라 잔혹함이야. 일어나게, 구원자여.',
+  'entities.quests.q_rite_of_redemption.objectives.0.label': '안식에 든 물에 빠진 망자',
   'hudChrome.crafting.identity.ceilingRare': '희귀 상한',
   'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -137,9 +271,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.name': '전쟁 북',
   'entities.abilities.chain_lightning.name': '하늘가지',
   'entities.abilities.chaos_bolt.name': '파멸 화살',
-  'entities.abilities.cleansing_verdict.name': '정화의 심판',
-  'entities.abilities.cleansing_verdict.description':
-    '아군 대상의 해로운 마법 효과 하나를 정화하고 생명력을 {damage}만큼 회복합니다.',
   'entities.abilities.cloak_of_shadows.name': '그림자망토',
   'entities.abilities.cone_of_cold.name': '서리휩쓸기',
   'entities.abilities.curse_of_exhaustion.name': '납빛 저주',
@@ -149,7 +280,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '대상을 깊이 얼려 {damage}의 냉기 피해를 입히고 4초 동안 기절시킵니다. (마법사 특성)',
   'entities.abilities.desperate_prayer.name': '마지막 기도',
   'entities.abilities.deterrence.name': '가시수호',
-  'entities.abilities.divine_shield.name': '빛의 수호',
   'entities.abilities.earthbind.name': '붙드는 대지',
   'entities.abilities.evocation.name': '에테르샘',
   'entities.abilities.frenzied_regeneration.name': '야성 치유',
@@ -157,7 +287,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': '망령의 일격',
   'entities.abilities.hammer_of_wrath.name': '울림 망치',
   'entities.abilities.healing_stream.name': '샘물',
-  'entities.abilities.holy_wrath.name': '성자의 분노',
   'entities.abilities.howl_of_terror.name': '공포의 울부짖음',
   'entities.abilities.ice_block.name': '차가운 관',
   'entities.abilities.inner_focus.name': '고요한 마음',
@@ -2693,7 +2822,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '30분 동안 자신의 신성 피해가 생성하는 위협 수준이 60%만큼 증가합니다. 방어 성기사의 핵심입니다.',
   'entities.abilities.retribution_aura.name': '응보의 오라',
   'entities.abilities.retribution_aura.description':
-    '30분 동안 신성한 기운으로 자신을 감싸 근접 공격으로 자신을 타격하는 모든 적에게 5의 신성 피해를 입힙니다.',
+    '죽거나 교체될 때까지 자신과 파티를 신성한 기운으로 감쌉니다. 효과를 받는 아군을 근접 공격한 적은 {buff}의 신성 피해를 입고, 효과를 받는 아군의 자동 공격은 {buff}의 신성 피해를 추가로 입힙니다.',
   'entities.abilities.tame_beast.name': '야생의 결속',
   'entities.abilities.tame_beast.description':
     '야수를 길들여 동료로 삼기 시작합니다. 야수는 자신의 레벨 이하이며 정예가 아니어야 합니다. 소환수는 주인을 따르고 적을 공격하며 자체 위협 수준을 유지합니다. 한 번에 하나의 소환수만 둘 수 있습니다.',
@@ -8059,9 +8188,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_echo.name': '시간의 메아리',
   'entities.abilities.temporal_echo.description':
     '더 건강했던 순간의 메아리로 아군에게 표식을 남겨 즉시 생명력을 {damage} 회복시킵니다. {duration}초 동안 당신이 입힌 비전 피해의 일부가 메아리를 통해 그 아군을 치유합니다.',
-  'entities.abilities.aura_surge.name': '여명의 도탄',
-  'entities.abilities.aura_surge.description':
-    '여명으로 벼린 방패를 던져 {damage}의 신성 피해를 입히고 주 대상을 2초 동안 침묵시킨 뒤, 10미터 안의 추가 적 최대 2명에게 튕기며 도탄마다 75%의 피해를 입힙니다. (성기사 특성)',
   'entities.abilities.aspect_of_the_wild.description':
     '30미터 안의 아군에게 야생의 힘을 불어넣어 5분 동안 공격력을 45, 공격 속도를 5%만큼 증가시킵니다. (사냥꾼 특성)',
   'entities.abilities.avenging_wrath.description':
@@ -8086,8 +8212,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '즉시 생명력을 {damage}만큼 회복합니다. (사제 특성)',
   'entities.abilities.deterrence.description':
     '10초 동안 회피 확률을 50%포인트 증가시킵니다. (사냥꾼 특성)',
-  'entities.abilities.divine_shield.description':
-    '신성한 힘으로 자신을 보호해 8초 동안 900의 피해를 흡수합니다. (성기사 특성)',
   'entities.abilities.earthbind.description':
     '주위 적을 대지에 묶어 2초 동안 이동하지 못하게 합니다. (주술사 특성)',
   'entities.abilities.evocation.description': '마나를 빠르게 회복합니다. (마법사 특성)',
@@ -8101,8 +8225,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '부상당한 적에게 신성한 망치를 던져 {damage}의 신성 피해를 입힙니다. 생명력이 20% 미만일 때만 사용할 수 있습니다. (성기사 특성)',
   'entities.abilities.healing_stream.description':
     '12초에 걸쳐 아군 대상의 생명력을 120 회복합니다. (주술사 특성)',
-  'entities.abilities.holy_wrath.description':
-    '신성한 힘을 방출해 주위 적에게 {damage}의 피해를 입힙니다. (성기사 특성)',
   'entities.abilities.howl_of_terror.description':
     '주위 적을 최대 3초 동안 공포에 빠뜨립니다. 피해를 받으면 효과가 해제될 수 있습니다. (흑마법사 특성)',
   'entities.abilities.ice_block.description':

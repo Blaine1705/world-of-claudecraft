@@ -3,6 +3,13 @@ import { CHOICE_ROWS } from '../src/sim/content/choice_rows';
 import { ABILITIES } from '../src/sim/content/classes';
 import { ROW_TREES, TALENTS } from '../src/sim/content/talents';
 import {
+  AEGIS_OF_DEVOTION_DR,
+  AEGIS_OF_DEVOTION_DURATION,
+  DAWNS_PATH_SPEED_DURATION,
+  DAWNS_PATH_SPEED_MULT,
+  MAX_DEVOTION,
+} from '../src/sim/paladin_devotion';
+import {
   STANCE_MASTERY_BATTLE_CRIT_DMG,
   STANCE_MASTERY_BERSERKER_HASTE,
   STANCE_MASTERY_GUARDED_CUT,
@@ -119,9 +126,8 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
       if (!entry) throw new Error(`no talent entry matched for ${cls}`);
       return entry.render();
     };
-    // Balance pass: Swift Verdicts is a cooldown cut now, not banked charges.
-    const swift = render('paladin', (e) => e.id === 'pal_r14_swift_verdicts');
-    expect(swift).toContain('cooldown is reduced by 20%');
+    const fist = render('paladin', (e) => e.id === 'pal_r11_fist_of_justice');
+    expect(fist).toContain('cooldown is reduced by 25%');
 
     // Hunter Talents 2.0: Trapcraft exposes the real cooldown reduction.
     const trapcraft = render('hunter', (e) => e.id === 'hun_r14_trapcraft');
@@ -263,6 +269,13 @@ const PCT_FIELDS = new Set([
   'cleavePct',
   'echoPct',
   'hastePct',
+  'paladinRadiantStride',
+  'paladinDivineSteed',
+  'paladinDivineSteedBurstPct',
+  'paladinSteadyHandsHotPct',
+  'paladinRecurringGrace',
+  'paladinDivinePurposeChance',
+  'paladinDawnEcho',
 ]);
 
 function expectedTokens(effect: unknown): string[] {
@@ -272,6 +285,7 @@ function expectedTokens(effect: unknown): string[] {
     // Aura proc responses with multiplier-shaped kinds (buff_speed 1.4 =
     // "+40% movement"): the delta is the stated number, not the raw 1.4.
     const shapedAura = obj as {
+      type?: string;
       kind?: string;
       auraKind?: string;
       value?: number;
@@ -285,14 +299,36 @@ function expectedTokens(effect: unknown): string[] {
       if (shapedAura.duration) toks.push(`${+shapedAura.duration.toFixed(1)}`);
       return;
     }
+    if (shapedAura.type === 'selfBuff' && shapedAura.kind === 'buff_haste') {
+      toks.push(`${+(((shapedAura.value ?? 1) - 1) * 100).toFixed(1)}%`);
+      if (shapedAura.duration) toks.push(`${+shapedAura.duration.toFixed(1)}`);
+      return;
+    }
+    if (
+      shapedAura.type === 'selfBuff' &&
+      (shapedAura.kind === 'buff_crit' || shapedAura.kind === 'buff_spellhaste')
+    ) {
+      toks.push(`${+((shapedAura.value ?? 0) * 100).toFixed(1)}%`);
+      if (shapedAura.duration) toks.push(`${+shapedAura.duration.toFixed(1)}`);
+      return;
+    }
+    if (shapedAura.type === 'selfBuff' && shapedAura.kind === 'slow_immunity') {
+      if (shapedAura.duration) toks.push(`${+shapedAura.duration.toFixed(1)}`);
+      return;
+    }
     for (const [key, value] of Object.entries(obj)) {
       if (typeof value === 'number') {
         if (value === 0) continue;
         if (key === 'battleRhythm') continue;
-        // Blink While Casting / Elemental Convergence (mage choice rows) are
-        // picked/not-picked flags like battleRhythm; their timings are stated
-        // as durations, not this 1.
-        if (key === 'blinkCast' || key === 'convergence') continue;
+        // Temporal Rift / Blink While Casting / Elemental Convergence (mage
+        // choice rows) are picked/not-picked flags like battleRhythm; their
+        // timings are stated as durations, not this 1.
+        if (key === 'temporalRift' || key === 'blinkCast' || key === 'convergence') continue;
+        // Dawn's Path / Aegis of Devotion are picked/not-picked flags; their
+        // speed / duration / damage-reduction numbers live in effect_dispatch's
+        // divineAscension case (the exported paladin_devotion constants), so the
+        // stated numbers are intrinsic, not this 1.
+        if (key === 'ascensionRush' || key === 'ascensionWard') continue;
         // A +50% spell or heal crit-damage mastery lifts the 1.5x base to 2.0x, which the
         // hand-written descriptions phrase as "double" rather than "50%".
         if ((key === 'critDmgSpellPct' || key === 'critDmgHealPct') && value === 0.5) {
@@ -339,6 +375,7 @@ function legitNumbers(effect: unknown): Set<number> {
     // Aura proc responses with multiplier-shaped kinds (buff_speed 1.4 =
     // "+40% movement"): the delta is the stated number, not the raw 1.4.
     const shapedAura = obj as {
+      type?: string;
       kind?: string;
       auraKind?: string;
       value?: number;
@@ -349,6 +386,19 @@ function legitNumbers(effect: unknown): Set<number> {
       (shapedAura.auraKind === 'buff_speed' || shapedAura.auraKind === 'buff_haste')
     ) {
       add((shapedAura.value ?? 1) - 1, true);
+      if (shapedAura.duration) add(shapedAura.duration, false);
+      return;
+    }
+    if (shapedAura.type === 'selfBuff' && shapedAura.kind === 'buff_haste') {
+      add((shapedAura.value ?? 1) - 1, true);
+      if (shapedAura.duration) add(shapedAura.duration, false);
+      return;
+    }
+    if (
+      shapedAura.type === 'selfBuff' &&
+      (shapedAura.kind === 'buff_crit' || shapedAura.kind === 'buff_spellhaste')
+    ) {
+      add(shapedAura.value ?? 0, true);
       if (shapedAura.duration) add(shapedAura.duration, false);
       return;
     }
@@ -365,6 +415,21 @@ function legitNumbers(effect: unknown): Set<number> {
         // Cheat death leaves the player at 1 health: the floor is intrinsic to
         // the mechanic, so copy may state the 1.
         if (key === 'cheatDeathIcd') out.add(1);
+        // Dawn's Path / Aegis of Devotion riders are intrinsic to the sim
+        // (effect_dispatch's divineAscension case), so their copy legitimately
+        // states the exported speed / duration / damage-reduction numbers.
+        if (key === 'ascensionRush') {
+          out.add(Math.round((DAWNS_PATH_SPEED_MULT - 1) * 100));
+          out.add(DAWNS_PATH_SPEED_DURATION);
+        }
+        if (key === 'ascensionWard') {
+          out.add(Math.round(AEGIS_OF_DEVOTION_DR * 100));
+          out.add(AEGIS_OF_DEVOTION_DURATION);
+        }
+        if (key === 'paladinDivineSteed') {
+          out.add(Math.round((value / MAX_DEVOTION) * 100));
+          out.add(MAX_DEVOTION);
+        }
         if (key === 'bonusCharges') out.add(value + 1);
         // A slow mult also legitimizes the stated slow percentage (mult 0.5 = 50%).
         if (key === 'mult' && value > 0 && value < 1) out.add(Math.round((1 - value) * 100));

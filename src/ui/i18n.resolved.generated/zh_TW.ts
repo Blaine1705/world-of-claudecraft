@@ -748,6 +748,14 @@ export const zh_TW: EnTranslations = {
     "rest": {
       "resting": "休息中"
     },
+    "paladin": {
+      "devotion": "虔誠",
+      "devotionValue": "虔誠值 {value}/{max}",
+      "devotionAscensionCharges": "虔誠值 {value}/{max}。昇華充能：{charges}。",
+      "devotionAscensionLast": "虔誠值 {value}/{max}。昇華的最後一次充能。",
+      "ascensionLastAnnouncement": "昇華的最後一次充能",
+      "ascensionSpenderAria": "快捷列第 {slot} 格：{ability}。消耗一次昇華充能。"
+    },
     "abilityScaling": {
       "bonus": "(+{value})"
     },
@@ -1592,6 +1600,7 @@ export const zh_TW: EnTranslations = {
       "attackSpeedSlow": "攻擊速度減慢 {pct}%",
       "attackSpeedFast": "攻擊速度提高 {pct}%",
       "haste": "攻擊與施法速度提高 {pct}%",
+      "imbueRange": "武器附魔：裁決時造成 {min} 到 {max} 點額外傷害",
       "dmgDone": "造成的傷害提高 {pct}%",
       "dmgDoneReduce": "造成的傷害降低 {pct}%",
       "heatingUp": "你的下一個火焰生成技能若連續造成致命一擊，會獲得熾熱連擊；未造成致命一擊則移除熱力迸發",
@@ -1619,6 +1628,9 @@ export const zh_TW: EnTranslations = {
       "freeCast": "下一次施法不消耗任何資源",
       "instantCast": "下一個有施法時間的法術變為瞬發",
       "cheapCast": "下一個法術消耗降低{pct}%",
+      "radiantResonance": "你的下一次治癒之光將立即施放，或下一次黎明之擁的法力消耗降低 {pct}%，施法時間縮短至 {castTime} 秒",
+      "solarReprisal": "你的下一次向陽飛盾不消耗法力、無視冷卻時間且傷害提高 {pct}%；恩典之錘無視冷卻時間並為你恢復相當於傷害量 100% 的生命值；或使治癒之光立即施放",
+      "dawnsWrath": "HoW: all HP · +1 use · CD 0 · +{pct}% DMG",
       "increase": {
         "ap": "攻擊強度提高 {value}",
         "sp": "法術強度提高 {value}",
@@ -1670,7 +1682,6 @@ export const zh_TW: EnTranslations = {
       "disarm": "繳械：無法使用武器攻擊",
       "lockout": "法術學派被鎖定",
       "imbue": "武器被附上額外效果",
-      "imbueRange": "武器附魔：裁決時造成 {min} 到 {max} 點額外傷害",
       "stealth": "隱蔽；移動速度降低 {pct}%",
       "formBear": "巨熊形態：生命值與護甲提高",
       "formCat": "貓形態：近戰傷害與能量",
@@ -3276,6 +3287,15 @@ export const zh_TW: EnTranslations = {
       "holy_light": "穩定而可觀的治療，用來把友方或自己補滿。",
       "devotion_aura": "持續的自我增益，提升護甲讓敵人的攻擊更不痛。",
       "judgement": "消耗你當前的聖印，從近距離打擊敵人。",
+      "hammer_of_wrath": "從遠處處決一名受傷的敵人，或在聖翼啟動時處決任何敵人。",
+      "avenging_wrath": "獲得 10 點虔誠，並在接下來的十五秒內使技能產生的虔誠值加倍。",
+      "bastion_sweep": "以盾牌橫掃一群敵人，奪取仇恨並累積虔誠。",
+      "oath_chain": "將遠處的敵人拉入隊伍並減緩其逃離速度。",
+      "veilbound_march": "穿過敵群並留下印記，削弱其對你造成的傷害並牢牢鎖定仇恨。",
+      "holy_shield": "消耗虔誠，獲得主動格擋時段、吸收護盾和仇恨脈衝。",
+      "consecration": "以持續的神聖傷害和仇恨占據周圍地面。",
+      "hammer_of_justice": "以短暫而可靠的昏迷阻止一名敵人。",
+      "lay_on_hands": "在盟友瀕臨倒下時為其恢復大量生命值。",
       "blessing_of_might": "提升友方目標的攻擊強度，適合在開怪前施放。",
       "divine_protection": "快速的守護結界，在情勢危急時吸收傷害。",
       "raptor_strike": "在有東西貼上你時可用的一記重力近戰揮擊。",
@@ -6197,6 +6217,7 @@ export const zh_TW: EnTranslations = {
       "notEnoughRage": "怒氣不足！",
       "notEnoughEnergy": "能量不足！",
       "notEnoughMana": "法力不足！",
+      "notEnoughDevotion": "虔誠值不足！",
       "notEnoughResource": "{resource}不足！",
       "notEnoughHealth": "生命值不足。",
       "targetMustDodge": "你的目標必須先閃避。",
@@ -6510,7 +6531,8 @@ export const zh_TW: EnTranslations = {
       "mana": "法力",
       "rage": "怒氣",
       "energy": "能量",
-      "focus": "集中值"
+      "focus": "集中值",
+      "devotion": "虔誠"
     },
     "forms": {
       "bear": "熊",
@@ -7238,17 +7260,129 @@ export const zh_TW: EnTranslations = {
         "name": "誓約烙印",
         "description": "使你充滿神聖能量，持續 30 秒，使每次近戰揮擊造成 {damage} 點額外神聖傷害。可用裁決釋放。"
       },
+      "judgement": {
+        "name": "裁決",
+        "description": "對敵人釋放你當前的聖印，消耗它以造成其蘊藏的神聖傷害。"
+      },
       "holy_light": {
         "name": "療癒聖光",
         "description": "為一個友方目標恢復 {damage} 點生命值。"
       },
+      "divine_ascension": {
+        "name": "神聖昇華",
+        "description": "消耗 20 點虔誠，獲得 5 次昇華充能，最多持續 45 秒。標記的技能會消耗一次充能並獲得額外效果。"
+      },
+      "aura_mastery": {
+        "name": "神聖協律",
+        "description": "持續 8 秒，強化隊伍中所有啟動的虔誠光環和報償光環。壁壘虔誠使傷害降低 15%；報償造成 15 點神聖傷害。多次使用只會刷新效果，不會堆疊。"
+      },
+      "devotion_ward": {
+        "name": "壁壘虔誠",
+        "description": "使你和隊伍成員受到的傷害降低 5%，持續至死亡或被取代。只有此光環與報償光環會彼此取代；輝光、黎明和恩典虔誠可以共存。"
+      },
+      "hammer_of_grace": {
+        "name": "恩典之錘",
+        "description": "立即向 20 公尺內的敵人擲出聖錘，造成 {damage} 點傷害，恢復 70 點法力，為自己恢復相當於傷害量 50% 的生命值，並在造成傷害時產生 1 點虔誠。烈陽反擊會使恩典之錘無視冷卻時間，並為你恢復相當於傷害量 100% 的生命值。"
+      },
+      "hushbrand": {
+        "name": "寂靜烙印",
+        "description": "中斷施法，並使目標在 4 秒內無法施放該系法術。"
+      },
+      "guardian_covenant": {
+        "name": "守護契約",
+        "description": "保護一名友方目標和你自己，使受到的傷害降低20%，持續8秒。未選取友方目標時，預設對你自己施放。"
+      },
+      "solar_step": {
+        "name": "烈陽步",
+        "description": "使你的移動速度提高 150%，持續 2 秒。"
+      },
+      "solar_invocation": {
+        "name": "烈陽祈喚",
+        "description": "立即為一名盟友恢復 {damage} 點生命值，或對一名敵人造成中等神聖傷害。任一用途都會產生 1 點虔誠。昇華期間，治療施法還會治療目標 10 公尺內的友方玩家，治療量為原來的一半。"
+      },
+      "radiant_devotion": {
+        "name": "輝光虔誠",
+        "description": "使你和隊伍成員的法術強度提高 20 點，持續 30 分鐘。會取代你自己的黎明或恩典虔誠，但可與其他聖騎士的虔誠共存。"
+      },
+      "dawn_devotion": {
+        "name": "黎明虔誠",
+        "description": "使你和隊伍成員的攻擊強度提高 40 點，持續 30 分鐘。會取代你自己的輝光或恩典虔誠，但可與其他聖騎士的虔誠及戰士的戰吼共存。"
+      },
+      "grace_devotion": {
+        "name": "恩典虔誠",
+        "description": "你和隊伍成員每 5 秒恢復 15 點法力，且法力消耗降低 3%，持續 30 分鐘。會取代你自己的輝光或黎明虔誠，但可與其他聖騎士的虔誠共存。"
+      },
+      "recall_the_fallen": {
+        "name": "喚回逝者",
+        "description": "使一名死亡的隊伍成員復活，並恢復 35% 的生命值和法力值。"
+      },
+      "beacon_of_light": {
+        "name": "聖光信標",
+        "description": "將一名隊伍成員標記為你的聖光信標。你對 60 公尺內另一名隊伍成員造成的有效直接治療，有 50% 也會治療信標目標。範圍治療和週期性治療不會傳遞。持續至你或目標死亡。"
+      },
+      "final_edict": {
+        "name": "終末敕令",
+        "description": "發動一次沉重的武器攻擊，並在造成傷害時產生 1 點虔誠。命中後使黎明墜擊的剩餘冷卻時間縮短 2 秒。成功的自動攻擊和終末敕令命中有 15% 機率獲得持續 8 秒的黎明之怒。昇華還會在你周圍釋放神聖爆炸。"
+      },
+      "dawnfall": {
+        "name": "黎明墜擊",
+        "description": "對附近敵人造成 {damage} 點神聖傷害並產生 1 點虔誠。命中至少一個敵人會使終末敕令的剩餘冷卻時間縮短 2 秒。昇華會提高其傷害和作用半徑。"
+      },
+      "sun_gods_verdict": {
+        "name": "太陽神裁決",
+        "description": "以太陽神裁決審判一名敵人，持續 30 秒。終末敕令和黎明墜擊成功命中時會刻下一層印記。施加第三層印記的技能決定判決：終末敕令對罪人釋放毀滅性傷害；黎明墜擊引爆裁決，對附近敵人造成傷害並使其昏迷 1.5 秒。"
+      },
+      "valkyrs_calling": {
+        "name": "女武神的召喚",
+        "description": "升上空中，在飛向敵人期間免疫傷害。2 秒後降臨目標區域，造成 {damage} 點神聖傷害並產生 1 點虔誠。昇華會使衝擊傷害提高 50% 並消耗 1 次充能。"
+      },
+      "faithforged_guard": {
+        "name": "聖光之債",
+        "description": "在 8 秒內，你受到的下一次敵人攻擊將被回敬：至多抵消 {buff} 點傷害，並以等量神聖傷害返還給攻擊者，同時你獲得 1 點虔誠。只回敬一次攻擊。昇華使可回敬的數值提高 50%。"
+      },
+      "mercy_lance": {
+        "name": "慈悲聖槍",
+        "description": "對一名敵人造成 {damage} 點神聖傷害，並在造成傷害時產生 1 點虔誠。昇華期間消耗 1 次充能，使其必定造成致命一擊。"
+      },
+      "sacred_form": {
+        "name": "神聖形態",
+        "description": "進入持續至死亡的神聖狀態，使治療效果提高 10%、法術致命一擊機率提高 5%，產生的仇恨降低 50%。僅限黎明癒者。"
+      },
+      "dawns_embrace": {
+        "name": "黎明之擁",
+        "description": "施放一次強力治療並產生 1 點虔誠。輝光共鳴使其法力消耗降低 50%，施法時間縮短至 1.5 秒。昇華使其立即施放，且治療量提高 35%。"
+      },
+      "radiant_chorus": {
+        "name": "輝光聖歌",
+        "description": "為附近盟友恢復 {damage} 點生命值並產生 1 點虔誠。有效治療至少 2 名盟友會獲得輝光共鳴：你的下一次治癒之光將立即施放，或下一次黎明之擁的法力消耗降低 50%，施法時間縮短至 1.5 秒。昇華會提高輝光聖歌的治療量和作用半徑。"
+      },
+      "life_covenant": {
+        "name": "生命契約",
+        "description": "使一名盟友受到的傷害降低 40%，持續 6 秒。昇華期間還會給予一個可吸收 120 點傷害的護盾，且不消耗充能。"
+      },
+      "aegis_first_dawn": {
+        "name": "初曙聖盾",
+        "description": "引導 5 秒，創造一個半徑 10 公尺的神聖穹頂。穹頂內的盟友每秒受到治療，且受到的傷害降低 50%。完成引導時釋放最終治療，並使移動速度提高 30%，持續 4 秒。"
+      },
+      "vowkeeper_strike": {
+        "name": "守誓者打擊",
+        "description": "發動高仇恨攻擊並產生 1 點虔誠。成功命中有 20% 機率獲得持續 8 秒的烈陽反擊；每次成功格擋有 25% 機率觸發。烈陽反擊會強化你的下一次向陽飛盾、恩典之錘或治癒之光。昇華還會給予一個小型吸收護盾。"
+      },
+      "bastion_rite": {
+        "name": "壁壘儀式",
+        "description": "使受到的物理傷害降低 20%，格擋機率提高 20%，持續 6 秒。昇華將持續時間延長至 10 秒。"
+      },
+      "sunward_disc": {
+        "name": "向陽飛盾",
+        "description": "需要盾牌。擲出一面輝光飛盾，命中後在附近敵人之間彈射。每次造成傷害都會產生 1 點虔誠。烈陽反擊使向陽飛盾不消耗法力、無視冷卻時間且傷害提高 20%。昇華會強化 5 次彈射。"
+      },
+      "sacred_challenge": {
+        "name": "神聖挑釁",
+        "description": "迫使一名敵人攻擊你。昇華期間還會使你受到的所有傷害降低 15%，持續 4 秒，且不消耗充能。"
+      },
       "devotion_aura": {
         "name": "堅定光環",
         "description": "使你的護甲提高 {buff}，持續 30 分鐘。"
-      },
-      "judgement": {
-        "name": "裁決",
-        "description": "對敵人釋放你當前的聖印，消耗它以造成其蘊藏的神聖傷害。"
       },
       "blessing_of_might": {
         "name": "鋼鐵誓約",
@@ -7282,13 +7416,29 @@ export const zh_TW: EnTranslations = {
         "name": "聖化之地",
         "description": "奉獻你腳下的土地，持續 10 秒，每 2 秒灼燒附近敵人造成 {damage} 點神聖傷害。"
       },
+      "bastion_sweep": {
+        "name": "壁壘橫掃",
+        "description": "用裝備的盾牌橫掃前方 180 度範圍內的敵人，造成 {damage} 點高仇恨神聖傷害並產生 1 點虔誠。昇華使傷害提高 30%，半徑擴大至 8 公尺。"
+      },
+      "oath_chain": {
+        "name": "誓約鎖鏈",
+        "description": "立即用神聖鎖鏈束縛一名遠處敵人。敵人以每秒 18 公尺的速度向你移動，直至距離 3 公尺，隨後移動速度降低 50%，持續 4 秒。昇華期間還會束縛附近的第二名敵人。"
+      },
+      "veilbound_march": {
+        "name": "帷幕行軍",
+        "description": "進入靈體狀態 4 秒，移動速度提高 40%，護甲提高 30%，並免疫定身、減速和位移。你穿過的敵人會獲得持續 6 秒的帷幕印記，每秒受到神聖傷害，對你造成的傷害降低 20%，並對你產生額外仇恨。第一個印記會產生 1 點虔誠。行軍結束時，附近帶有印記的敵人會受到最終爆發傷害。昇華使爆發傷害提高 50%，並將他們輕微拉向你。"
+      },
+      "veilbound_mark": {
+        "name": "帷幕印記",
+        "description": "每秒受到神聖傷害，對施加印記的聖騎士造成的傷害降低 20%，並對該聖騎士產生額外仇恨。"
+      },
       "righteous_fury": {
         "name": "燃燒誓言",
         "description": "使你的神聖傷害產生的威脅值提高 60%，持續 30 分鐘。防護聖騎士的核心技能。"
       },
       "retribution_aura": {
         "name": "報償光環",
-        "description": "以神聖能量環繞自身，持續 30 分鐘，對任何近戰攻擊你的敵人造成 5 點神聖傷害。"
+        "description": "以神聖能量環繞你和你的隊伍，直到死亡或被替換。近戰攻擊受影響隊友的敵人受到 {buff} 點神聖傷害，受影響的隊友的普通攻擊額外造成 {buff} 點神聖傷害。"
       },
       "tame_beast": {
         "name": "野性繫絆",
@@ -7662,10 +7812,6 @@ export const zh_TW: EnTranslations = {
         "name": "神聖震擊",
         "description": "以神聖能量震擊一名友方目標，為其恢復{damage}點生命值。（神聖專精招牌）"
       },
-      "aura_surge": {
-        "name": "曙光彈射",
-        "description": "擲出曙光鑄造的盾牌，造成{damage}點神聖傷害並使主要目標沉默2秒，隨後彈射至10碼內最多2個額外敵人，每次彈射造成75%傷害。（聖騎士天賦）"
-      },
       "holy_shield": {
         "name": "神聖之盾",
         "description": "以神聖之力保護你10秒，護甲提高90，並對近戰攻擊者造成12點神聖傷害。（防護專精招牌）"
@@ -7922,10 +8068,6 @@ export const zh_TW: EnTranslations = {
         "name": "毀滅箭",
         "description": "投擲一枚混沌火焰彈，造成{damage}點火焰傷害。（術士天賦）"
       },
-      "cleansing_verdict": {
-        "name": "淨化裁決",
-        "description": "淨化一個友方目標身上的有害魔法效果，並為其恢復{damage}點生命值。"
-      },
       "cloak_of_shadows": {
         "name": "暗影斗篷",
         "description": "以暗影包裹你，在5秒內吸收420點傷害。（潛行者天賦）"
@@ -7958,10 +8100,6 @@ export const zh_TW: EnTranslations = {
         "name": "鬃刺守衛",
         "description": "使你的閃躲幾率提高50個百分點，持續10秒。（獵人天賦）"
       },
-      "divine_shield": {
-        "name": "聖光守護",
-        "description": "以神聖之力保護你，在8秒內吸收900點傷害。（聖騎士天賦）"
-      },
       "earthbind": {
         "name": "攫握大地",
         "description": "將附近的敵人束縛於大地，使其定身2秒。（薩滿天賦）"
@@ -7989,10 +8127,6 @@ export const zh_TW: EnTranslations = {
       "healing_stream": {
         "name": "泉湧",
         "description": "在12秒內為一個友方目標恢復120點生命值。（薩滿天賦）"
-      },
-      "holy_wrath": {
-        "name": "聖徒之怒",
-        "description": "釋放神聖之力，對附近的敵人造成{damage}點傷害。（聖騎士天賦）"
       },
       "howl_of_terror": {
         "name": "恐懼嚎叫",
@@ -10771,6 +10905,16 @@ export const zh_TW: EnTranslations = {
           }
         }
       },
+      "q_divine_tome": {
+        "title": "縛曉聖典",
+        "text": "聖光在你體內並非沉默不語，{playerName}。我看著你讓亡者安息，也相信你已經準備好學習極少有聖騎士能夠掌握的儀式：喚回儀式，以此將逝去的靈魂召回人世。儀式經文記載在我保管的縛曉聖典中，但只要躁動的亡者仍在這片土地上遊蕩，書本便帶不來祝福。再讓 6 具躁動骸骨歸於塵土，我便開始教你。",
+        "completion": "禮拜堂庭院終於安靜下來。你已經可以學習經文了，{playerName}，但喚回儀式不能在溫暖的禮拜堂中吟誦。必須前往生死帷幕薄弱之處。我會把聖典帶到北方的泥沼沼澤。到那裡來找我，我們將完成這場儀式。",
+        "objectives": {
+          "0": {
+            "label": "讓躁動骸骨安息"
+          }
+        }
+      },
       "q_bandits": {
         "title": "谷地強盜",
         "text": "一群割喉強盜在西南山丘紮營，本週已經搶了三輛貨車。擊殺10名谷地強盜。",
@@ -10921,6 +11065,16 @@ export const zh_TW: EnTranslations = {
         "title": "蘆葦中不得安息",
         "text": "香爐上的儀式會讓溺亡者在濕地觸及之處復起。我們還無法破除它，只能先少給敵人14名士兵。",
         "completion": "你給了死者比他們主人更多的憐憫。拿著，你早已應得。",
+        "objectives": {
+          "0": {
+            "label": "讓溺亡死者安息"
+          }
+        }
+      },
+      "q_rite_of_redemption": {
+        "title": "喚回儀式",
+        "text": "你果然跟隨我進入了沼澤，{playerName}。很好。縛曉聖典就在這裡，而這片積水之地正適合吟誦其中的經文：沒有哪裡比亡者不肯長眠之處更接近生死之間的帷幕。但那些溺亡者會在吟誦中途把你的聲音拖入水底。先清理出適合儀式的地方：讓 8 名溺亡死者安息，然後我們一同將此地聖化。",
+        "completion": "跪下，{playerName}，大聲念出經文。就是這樣。你感覺到了嗎？你手中的聖光不再只能治癒生者，也能召回已經離世的人。請明智地使用它。將靈魂召回一場毫無希望的戰鬥是殘忍，而非仁慈。起身吧，救贖者。",
         "objectives": {
           "0": {
             "label": "讓溺亡死者安息"

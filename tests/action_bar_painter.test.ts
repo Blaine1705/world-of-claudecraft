@@ -84,6 +84,8 @@ function slotState(over: Partial<ActionBarSlotState> = {}): ActionBarSlotState {
     queued: false,
     procGlow: false,
     empowered: false,
+    ascensionSpender: false,
+    ascensionCostLabel: '',
     ariaLabel: 'A',
     keybindLabel: 'K',
     ...over,
@@ -111,7 +113,10 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
           usable: false,
           outOfRange: true,
           queued: true,
+          procGlow: true,
           empowered: true,
+          ascensionSpender: true,
+          ascensionCostLabel: '-1',
           ariaLabel: 'aria1',
           keybindLabel: '1',
         }),
@@ -131,8 +136,10 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
       { m: 'toggleClass', args: [el.btn, 'unusable', true] },
       { m: 'toggleClass', args: [el.btn, 'oor', true] },
       { m: 'toggleClass', args: [el.btn, 'queued', true] },
-      { m: 'toggleClass', args: [el.btn, 'proc', false] },
+      { m: 'toggleClass', args: [el.btn, 'proc', true] },
       { m: 'toggleClass', args: [el.btn, 'empowered', true] },
+      { m: 'toggleClass', args: [el.btn, 'ascension-spender', true] },
+      { m: 'setAttr', args: [el.btn, 'data-ascension-cost', '-1'] },
       { m: 'setAttr', args: [el.btn, 'aria-label', 'aria1'] },
       { m: 'setText', args: [el.keybindEl, '1'] },
     ]);
@@ -153,6 +160,32 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
       m: 'setStyleProp',
       args: [el.label, 'background-image', 'URL()'],
     });
+  });
+
+  it('keeps the proc marker visible without animation and in forced-colors mode', () => {
+    const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+    const mobileCss = readFileSync(
+      new URL('../src/styles/hud.mobile.css', import.meta.url),
+      'utf8',
+    );
+    expect(css).toMatch(
+      /\.action-btn\.proc \{[\s\S]*?border-color: #ffd97a;[\s\S]*?0 0 12px #ffcf40e6/,
+    );
+    expect(css).toMatch(
+      /@media \(forced-colors: active\) \{[\s\S]*?\.action-btn\.proc \{[\s\S]*?border: 3px double Highlight;[\s\S]*?outline: 1px solid CanvasText;/,
+    );
+    expect(css).toMatch(
+      /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.action-btn\.proc,[\s\S]*?animation: none;/,
+    );
+    expect(mobileCss).toMatch(
+      /#mobile-action-ring button\.proc \{[\s\S]*?border-color: #ffd97a;[\s\S]*?0 0 12px #ffcf40e6/,
+    );
+    expect(mobileCss).toMatch(
+      /@media \(forced-colors: active\) \{[\s\S]*?#mobile-action-ring button\.proc \{[\s\S]*?border: 3px double Highlight;[\s\S]*?outline: 1px solid CanvasText;/,
+    );
+    expect(mobileCss).toMatch(
+      /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?#mobile-action-ring button\.proc,[\s\S]*?animation: none;/,
+    );
   });
 });
 

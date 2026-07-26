@@ -748,6 +748,14 @@ export const zh_CN: EnTranslations = {
     "rest": {
       "resting": "休息中"
     },
+    "paladin": {
+      "devotion": "虔诚",
+      "devotionValue": "虔诚值 {value}/{max}",
+      "devotionAscensionCharges": "虔诚值 {value}/{max}。升华充能：{charges}。",
+      "devotionAscensionLast": "虔诚值 {value}/{max}。升华的最后一次充能。",
+      "ascensionLastAnnouncement": "升华的最后一次充能",
+      "ascensionSpenderAria": "动作栏第 {slot} 格：{ability}。消耗一次升华充能。"
+    },
     "abilityScaling": {
       "bonus": "(+{value})"
     },
@@ -1592,6 +1600,7 @@ export const zh_CN: EnTranslations = {
       "attackSpeedSlow": "攻击速度减慢 {pct}%",
       "attackSpeedFast": "攻击速度提高 {pct}%",
       "haste": "攻击速度和施法速度提高 {pct}%",
+      "imbueRange": "武器已附魔：裁决时附加 {min} 到 {max} 点额外伤害",
       "dmgDone": "造成的伤害提高 {pct}%",
       "dmgDoneReduce": "造成的伤害降低 {pct}%",
       "heatingUp": "你的下一个火焰生成技能若连续造成暴击，会获得炽热连击；未造成暴击则移除热力迸发",
@@ -1619,6 +1628,9 @@ export const zh_CN: EnTranslations = {
       "freeCast": "下一次施法不消耗任何资源",
       "instantCast": "下一个有施法时间的法术变为瞬发",
       "cheapCast": "下一个法术消耗降低{pct}%",
+      "radiantResonance": "你的下一次治愈之光将瞬发，或下一次黎明之拥的法力消耗降低 {pct}%，施法时间缩短至 {castTime} 秒",
+      "solarReprisal": "你的下一次向阳飞盾不消耗法力、无视冷却时间且伤害提高 {pct}%；恩典之锤无视冷却时间并为你恢复相当于伤害量 100% 的生命值；或使治愈之光变为瞬发",
+      "dawnsWrath": "HoW: all HP · +1 use · CD 0 · +{pct}% DMG",
       "increase": {
         "ap": "攻击强度提高 {value}",
         "sp": "法术强度提高 {value}",
@@ -1670,7 +1682,6 @@ export const zh_CN: EnTranslations = {
       "disarm": "已缴械：无法使用武器攻击",
       "lockout": "法术学派被锁定",
       "imbue": "武器附有额外效果",
-      "imbueRange": "武器已附魔：裁决时附加 {min} 到 {max} 点额外伤害",
       "stealth": "已隐匿；移动速度降低 {pct}%",
       "formBear": "巨熊形态：生命值和护甲提高",
       "formCat": "猫形态：近战伤害与能量",
@@ -3276,6 +3287,15 @@ export const zh_CN: EnTranslations = {
       "holy_light": "稳健而可观的治疗，用于把盟友或自己奶满。",
       "devotion_aura": "持续的自我增益，提升护甲让攻击伤害更低。",
       "judgement": "消耗你激活的圣印，从近距离打击敌人。",
+      "hammer_of_wrath": "从远处处决一名受伤的敌人，或在圣翼激活时处决任意敌人。",
+      "avenging_wrath": "获得 10 点虔诚，并在接下来的十五秒内使技能产生的虔诚值翻倍。",
+      "bastion_sweep": "用盾牌横扫一群敌人，夺取仇恨并积累虔诚。",
+      "oath_chain": "将远处的敌人拉入队伍并减缓其逃离速度。",
+      "veilbound_march": "穿过敌群并留下印记，削弱其对你造成的伤害并牢牢锁定仇恨。",
+      "holy_shield": "消耗虔诚，获得主动格挡时段、吸收护盾和仇恨脉冲。",
+      "consecration": "以持续的神圣伤害和仇恨占据周围地面。",
+      "hammer_of_justice": "以短暂而可靠的昏迷阻止一名敌人。",
+      "lay_on_hands": "在盟友濒临倒下时为其恢复大量生命值。",
       "blessing_of_might": "提升友方目标的攻击强度，开怪前施放正合适。",
       "divine_protection": "一道快速的守护结界，在局势吃紧时吸收伤害。",
       "raptor_strike": "一记沉重的近战挥击，用于有东西贴近你时。",
@@ -6197,6 +6217,7 @@ export const zh_CN: EnTranslations = {
       "notEnoughRage": "怒气不足！",
       "notEnoughEnergy": "能量不足！",
       "notEnoughMana": "法力不足！",
+      "notEnoughDevotion": "虔诚值不足！",
       "notEnoughResource": "{resource}不足！",
       "notEnoughHealth": "生命值不足。",
       "targetMustDodge": "你的目标必须先闪避。",
@@ -6510,7 +6531,8 @@ export const zh_CN: EnTranslations = {
       "mana": "法力",
       "rage": "怒气",
       "energy": "能量",
-      "focus": "集中值"
+      "focus": "集中值",
+      "devotion": "虔诚"
     },
     "forms": {
       "bear": "熊",
@@ -7238,17 +7260,129 @@ export const zh_CN: EnTranslations = {
         "name": "誓约烙印",
         "description": "使你充满神圣能量，持续 30 秒，使每次近战挥击造成 {damage} 点额外神圣伤害。可用裁决释放。"
       },
+      "judgement": {
+        "name": "裁决",
+        "description": "对敌人释放你当前的圣印，将其消耗以造成它所储存的神圣伤害。"
+      },
       "holy_light": {
         "name": "愈疗之光",
         "description": "为一个友方目标恢复 {damage} 点生命值。"
       },
+      "divine_ascension": {
+        "name": "神圣升华",
+        "description": "消耗 20 点虔诚，获得 5 次升华充能，最多持续 45 秒。标记的技能会消耗一次充能并获得额外效果。"
+      },
+      "aura_mastery": {
+        "name": "神圣协律",
+        "description": "持续 8 秒，强化小队中所有激活的虔诚光环和报偿光环。壁垒虔诚使伤害降低 15%；报偿造成 15 点神圣伤害。多次使用只会刷新效果，不会叠加。"
+      },
+      "devotion_ward": {
+        "name": "壁垒虔诚",
+        "description": "使你和小队成员受到的伤害降低 5%，持续至死亡或被替换。只有此光环与报偿光环会彼此替换；辉光、黎明和恩典虔诚可以共存。"
+      },
+      "hammer_of_grace": {
+        "name": "恩典之锤",
+        "description": "立即向 20 米内的敌人掷出圣锤，造成 {damage} 点伤害，恢复 70 点法力，为自己恢复相当于伤害量 50% 的生命值，并在造成伤害时产生 1 点虔诚。烈阳反击会使恩典之锤无视冷却时间，并为你恢复相当于伤害量 100% 的生命值。"
+      },
+      "hushbrand": {
+        "name": "寂静烙印",
+        "description": "打断施法，并使目标在 4 秒内无法施放该系法术。"
+      },
+      "guardian_covenant": {
+        "name": "守护契约",
+        "description": "保护一名友方目标和你自己，使受到的伤害降低20%，持续8秒。未选中友方目标时，默认对你自己施放。"
+      },
+      "solar_step": {
+        "name": "烈阳步",
+        "description": "使你的移动速度提高 150%，持续 2 秒。"
+      },
+      "solar_invocation": {
+        "name": "烈阳祈唤",
+        "description": "立即为一名盟友恢复 {damage} 点生命值，或对一名敌人造成中等神圣伤害。任一用途都会产生 1 点虔诚。升华期间，治疗施法还会治疗目标 10 米内的友方玩家，治疗量为原来的一半。"
+      },
+      "radiant_devotion": {
+        "name": "辉光虔诚",
+        "description": "使你和小队成员的法术强度提高 20 点，持续 30 分钟。会替换你自己的黎明或恩典虔诚，但可与其他圣骑士的虔诚共存。"
+      },
+      "dawn_devotion": {
+        "name": "黎明虔诚",
+        "description": "使你和小队成员的攻击强度提高 40 点，持续 30 分钟。会替换你自己的辉光或恩典虔诚，但可与其他圣骑士的虔诚及战士的战吼共存。"
+      },
+      "grace_devotion": {
+        "name": "恩典虔诚",
+        "description": "你和小队成员每 5 秒恢复 15 点法力，且法力消耗降低 3%，持续 30 分钟。会替换你自己的辉光或黎明虔诚，但可与其他圣骑士的虔诚共存。"
+      },
+      "recall_the_fallen": {
+        "name": "唤回逝者",
+        "description": "使一名死亡的小队成员复活，并恢复 35% 的生命值和法力值。"
+      },
+      "beacon_of_light": {
+        "name": "圣光道标",
+        "description": "将一名小队成员标记为你的圣光道标。你对 60 米内另一名小队成员造成的有效直接治疗，有 50% 也会治疗道标目标。范围治疗和周期性治疗不会传递。持续至你或目标死亡。"
+      },
+      "final_edict": {
+        "name": "终末敕令",
+        "description": "发动一次沉重的武器攻击，并在造成伤害时产生 1 点虔诚。命中后使黎明坠击的剩余冷却时间缩短 2 秒。成功的自动攻击和终末敕令命中有 15% 几率获得持续 8 秒的黎明之怒。升华还会在你周围释放神圣爆炸。"
+      },
+      "dawnfall": {
+        "name": "黎明坠击",
+        "description": "对附近敌人造成 {damage} 点神圣伤害并产生 1 点虔诚。命中至少一个敌人会使终末敕令的剩余冷却时间缩短 2 秒。升华会提高其伤害和作用半径。"
+      },
+      "sun_gods_verdict": {
+        "name": "太阳神裁决",
+        "description": "以太阳神裁决审判一名敌人，持续 30 秒。终末敕令和黎明坠击成功命中时会刻下一层印记。施加第三层印记的技能决定判决：终末敕令对罪人释放毁灭性伤害；黎明坠击引爆裁决，对附近敌人造成伤害并使其昏迷 1.5 秒。"
+      },
+      "valkyrs_calling": {
+        "name": "瓦尔基里的召唤",
+        "description": "升上空中，在飞向敌人期间免疫伤害。2 秒后降临目标区域，造成 {damage} 点神圣伤害并产生 1 点虔诚。升华会使冲击伤害提高 50% 并消耗 1 次充能。"
+      },
+      "faithforged_guard": {
+        "name": "圣光之债",
+        "description": "在 8 秒内，你受到的下一次敌人攻击将被回敬：至多抵消 {buff} 点伤害，并以等量神圣伤害返还给攻击者，同时你获得 1 点虔诚。只回敬一次攻击。升华使可回敬的数值提高 50%。"
+      },
+      "mercy_lance": {
+        "name": "慈悲圣枪",
+        "description": "对一名敌人造成 {damage} 点神圣伤害，并在造成伤害时产生 1 点虔诚。升华期间消耗 1 次充能，使其必定暴击。"
+      },
+      "sacred_form": {
+        "name": "神圣形态",
+        "description": "进入持续至死亡的神圣状态，使治疗效果提高 10%、法术暴击几率提高 5%，产生的仇恨降低 50%。仅限黎明愈者。"
+      },
+      "dawns_embrace": {
+        "name": "黎明之拥",
+        "description": "施放一次强力治疗并产生 1 点虔诚。辉光共鸣使其法力消耗降低 50%，施法时间缩短至 1.5 秒。升华使其变为瞬发，且治疗量提高 35%。"
+      },
+      "radiant_chorus": {
+        "name": "辉光圣歌",
+        "description": "为附近盟友恢复 {damage} 点生命值并产生 1 点虔诚。有效治疗至少 2 名盟友会获得辉光共鸣：你的下一次治愈之光将瞬发，或下一次黎明之拥的法力消耗降低 50%，施法时间缩短至 1.5 秒。升华会提高辉光圣歌的治疗量和作用半径。"
+      },
+      "life_covenant": {
+        "name": "生命契约",
+        "description": "使一名盟友受到的伤害降低 40%，持续 6 秒。升华期间还会给予一个可吸收 120 点伤害的护盾，且不消耗充能。"
+      },
+      "aegis_first_dawn": {
+        "name": "初曙圣盾",
+        "description": "引导 5 秒，创造一个半径 10 米的神圣穹顶。穹顶内的盟友每秒受到治疗，且受到的伤害降低 50%。完成引导时释放最终治疗，并使移动速度提高 30%，持续 4 秒。"
+      },
+      "vowkeeper_strike": {
+        "name": "守誓者打击",
+        "description": "发动高仇恨攻击并产生 1 点虔诚。成功命中有 20% 几率获得持续 8 秒的烈阳反击；每次成功格挡有 25% 几率触发。烈阳反击会强化你的下一次向阳飞盾、恩典之锤或治愈之光。升华还会给予一个小型吸收护盾。"
+      },
+      "bastion_rite": {
+        "name": "壁垒仪式",
+        "description": "使受到的物理伤害降低 20%，格挡几率提高 20%，持续 6 秒。升华将持续时间延长至 10 秒。"
+      },
+      "sunward_disc": {
+        "name": "向阳飞盾",
+        "description": "需要盾牌。掷出一面辉光飞盾，命中后在附近敌人之间弹射。每次造成伤害都会产生 1 点虔诚。烈阳反击使向阳飞盾不消耗法力、无视冷却时间且伤害提高 20%。升华会强化 5 次弹射。"
+      },
+      "sacred_challenge": {
+        "name": "神圣挑衅",
+        "description": "迫使一名敌人攻击你。升华期间还会使你受到的所有伤害降低 15%，持续 4 秒，且不消耗充能。"
+      },
       "devotion_aura": {
         "name": "坚定光环",
         "description": "使你的护甲提高 {buff}，持续 30 分钟。"
-      },
-      "judgement": {
-        "name": "裁决",
-        "description": "对敌人释放你当前的圣印，将其消耗以造成它所储存的神圣伤害。"
       },
       "blessing_of_might": {
         "name": "钢铁誓约",
@@ -7282,13 +7416,29 @@ export const zh_CN: EnTranslations = {
         "name": "神圣领域",
         "description": "奉献你脚下的土地，持续 10 秒，每 2 秒灼烧附近敌人并造成 {damage} 点神圣伤害。"
       },
+      "bastion_sweep": {
+        "name": "壁垒横扫",
+        "description": "用装备的盾牌横扫前方 180 度范围内的敌人，造成 {damage} 点高仇恨神圣伤害并产生 1 点虔诚。升华使伤害提高 30%，半径扩大至 8 米。"
+      },
+      "oath_chain": {
+        "name": "誓约锁链",
+        "description": "立即用神圣锁链束缚一名远处敌人。敌人以每秒 18 米的速度向你移动，直至距离 3 米，随后移动速度降低 50%，持续 4 秒。升华期间还会束缚附近的第二名敌人。"
+      },
+      "veilbound_march": {
+        "name": "帷幕行军",
+        "description": "进入灵体状态 4 秒，移动速度提高 40%，护甲提高 30%，并免疫定身、减速和位移。你穿过的敌人会获得持续 6 秒的帷幕印记，每秒受到神圣伤害，对你造成的伤害降低 20%，并对你产生额外仇恨。第一个印记会产生 1 点虔诚。行军结束时，附近带有印记的敌人会受到最终爆发伤害。升华使爆发伤害提高 50%，并将他们轻微拉向你。"
+      },
+      "veilbound_mark": {
+        "name": "帷幕印记",
+        "description": "每秒受到神圣伤害，对施加印记的圣骑士造成的伤害降低 20%，并对该圣骑士产生额外仇恨。"
+      },
       "righteous_fury": {
         "name": "炽燃誓约",
         "description": "使你的神圣伤害产生的威胁值提高 60%，持续 30 分钟。防护圣骑士的核心技能。"
       },
       "retribution_aura": {
         "name": "报偿光环",
-        "description": "以神圣能量环绕自身，持续 30 分钟，对任何近战攻击你的敌人造成 5 点神圣伤害。"
+        "description": "以神圣能量环绕你和你的队伍，直到死亡或被替换。近战攻击受影响队友的敌人受到 {buff} 点神圣伤害，受影响的队友的普通攻击额外造成 {buff} 点神圣伤害。"
       },
       "tame_beast": {
         "name": "野性羁绊",
@@ -7662,10 +7812,6 @@ export const zh_CN: EnTranslations = {
         "name": "神圣震击",
         "description": "以神圣能量震击一个友方目标，为其恢复{damage}点生命值。（神圣专精招牌）"
       },
-      "aura_surge": {
-        "name": "曙光弹射",
-        "description": "掷出曙光铸造的盾牌，造成{damage}点神圣伤害并使首要目标沉默2秒，随后弹射至10码内最多2个额外敌人，每次弹射造成75%伤害。（圣骑士天赋）"
-      },
       "holy_shield": {
         "name": "神圣之盾",
         "description": "以神圣之力保护你10秒，护甲提高90，并对近战攻击者造成12点神圣伤害。（防护专精招牌）"
@@ -7922,10 +8068,6 @@ export const zh_CN: EnTranslations = {
         "name": "毁灭箭",
         "description": "投掷一枚混沌火焰弹，造成{damage}点火焰伤害。（术士天赋）"
       },
-      "cleansing_verdict": {
-        "name": "净化裁决",
-        "description": "净化一个友方目标身上的有害魔法效果，并为其恢复{damage}点生命值。"
-      },
       "cloak_of_shadows": {
         "name": "暗影斗篷",
         "description": "以暗影包裹你，在5秒内吸收420点伤害。（潜行者天赋）"
@@ -7958,10 +8100,6 @@ export const zh_CN: EnTranslations = {
         "name": "鬃刺守卫",
         "description": "使你的躲闪几率提高50个百分点，持续10秒。（猎人天赋）"
       },
-      "divine_shield": {
-        "name": "圣光守护",
-        "description": "以神圣之力保护你，在8秒内吸收900点伤害。（圣骑士天赋）"
-      },
       "earthbind": {
         "name": "攫握大地",
         "description": "将附近的敌人束缚于大地，使其定身2秒。（萨满天赋）"
@@ -7989,10 +8127,6 @@ export const zh_CN: EnTranslations = {
       "healing_stream": {
         "name": "泉涌",
         "description": "在12秒内为一个友方目标恢复120点生命值。（萨满天赋）"
-      },
-      "holy_wrath": {
-        "name": "圣徒之怒",
-        "description": "释放神圣之力，对附近的敌人造成{damage}点伤害。（圣骑士天赋）"
       },
       "howl_of_terror": {
         "name": "恐惧嚎叫",
@@ -10771,6 +10905,16 @@ export const zh_CN: EnTranslations = {
           }
         }
       },
+      "q_divine_tome": {
+        "title": "缚晓圣典",
+        "text": "圣光在你体内并非静默不语，{playerName}。我看着你让亡者安息，也相信你已经准备好学习极少有圣骑士能够掌握的仪式：唤回仪式，以此将逝去的灵魂召回人世。仪式经文记载在我保管的缚晓圣典中，但只要躁动的亡者仍在这片土地上游荡，书本便带不来祝福。再让 6 具躁动骸骨归于尘土，我便开始教你。",
+        "completion": "礼拜堂庭院终于安静下来。你已经可以学习经文了，{playerName}，但唤回仪式不能在温暖的礼拜堂中吟诵。必须前往生死帷幕薄弱之处。我会把圣典带到北方的泥沼沼泽。到那里来找我，我们将完成这场仪式。",
+        "objectives": {
+          "0": {
+            "label": "让躁动骸骨安息"
+          }
+        }
+      },
       "q_bandits": {
         "title": "谷地强盗",
         "text": "一群割喉强盗在西南山丘扎营，本周已经抢了三辆货车。击杀10名谷地强盗。",
@@ -10921,6 +11065,16 @@ export const zh_CN: EnTranslations = {
         "title": "芦苇中不得安息",
         "text": "香炉上的仪式会让溺亡者在湿地触及之处复起。我们还无法破除它，只能先少给敌人14名士兵。",
         "completion": "你给了死者比他们主人更多的怜悯。拿着，你早已应得。",
+        "objectives": {
+          "0": {
+            "label": "让溺亡死者安息"
+          }
+        }
+      },
+      "q_rite_of_redemption": {
+        "title": "唤回仪式",
+        "text": "你果然跟随我进入了沼泽，{playerName}。很好。缚晓圣典就在这里，而这片积水之地正适合吟诵其中的经文：没有哪里比亡者不肯长眠之处更接近生死之间的帷幕。但那些溺亡者会在吟诵中途把你的声音拖入水底。先清理出适合仪式的地方：让 8 名溺亡死者安息，然后我们一同将此地圣化。",
+        "completion": "跪下，{playerName}，大声念出经文。就是这样。你感觉到了吗？你手中的圣光不再只能治愈生者，也能召回已经离世的人。请明智地使用它。将灵魂召回一场毫无希望的战斗是残忍，而非仁慈。起身吧，救赎者。",
         "objectives": {
           "0": {
             "label": "让溺亡死者安息"

@@ -320,6 +320,7 @@ const hudStringsEn = {
       notEnoughRage: 'Not enough rage!',
       notEnoughEnergy: 'Not enough energy!',
       notEnoughMana: 'Not enough mana!',
+      notEnoughDevotion: 'Not enough Devotion!',
       notEnoughResource: 'Not enough {resource}!',
       notEnoughHealth: 'Not enough health.',
       targetMustDodge: 'Your target must dodge first.',

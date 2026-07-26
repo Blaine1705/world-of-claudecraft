@@ -78,37 +78,13 @@ describe('talent buffPct resolver fixes', () => {
     expect(effect.value).toBeCloseTo(0.112, 6);
   });
 
-  it('a judgement dmgPct ability mod scales the trigger damage multiplier', () => {
-    // Righteous Cause no longer carries this mod (it became a swing-CDR proc in
-    // the row-quality pass), so the engine fix is pinned on a synthetic effect.
-    const mods = emptyModifiers();
-    accumulateTalentEffect(mods, { ability: [{ ability: 'judgement', dmgPct: 0.15 }] }, 1);
-    const ability = abilitiesKnownAt('paladin', 20, mods).find((a) => a.def.id === 'judgement');
-    const effect = ability?.effects.find((candidate) => candidate.type === 'judgement');
-    if (!effect || effect.type !== 'judgement') throw new Error('missing judgement effect');
-    expect(effect.dmgMult).toBeCloseTo(1.15, 6);
-    expect(effect.flat ?? 0).toBe(0);
-  });
-
   // scaleEffect had no case for 'groundAoE' or 'repositionToAim', so a global
   // damage modifier (e.g. the Fiesta arena augments, aug_bloodhunter's
-  // +18%/+18%) silently no-opped on Consecration, Earthquake, Blizzard,
-  // Meteor, and Heroic Leap's landing hit while every directDamage ability
-  // scaled correctly. These pin the fix against the same global mult a
-  // directDamage ability already applies.
-  it('Consecration groundAoE damage scales with the global spell damage modifier, same factor as a directDamage ability', () => {
-    const mods = emptyModifiers();
-    accumulateTalentEffect(mods, { global: { spellDmgPct: 0.18 } }, 1);
-
-    const exorcism = resolvedEffect('paladin', 'exorcism', 'directDamage', mods);
-    expect(exorcism.min).toBe(Math.round(46 * 1.18));
-    expect(exorcism.max).toBe(Math.round(56 * 1.18));
-
-    const consecration = resolvedEffect('paladin', 'consecration', 'groundAoE', mods);
-    expect(consecration.min).toBe(Math.round(28 * 1.18));
-    expect(consecration.max).toBe(Math.round(34 * 1.18));
-  });
-
+  // +18%/+18%) silently no-opped on Earthquake, Blizzard, Meteor, and Heroic
+  // Leap's landing hit while every directDamage ability scaled correctly. These
+  // pin the fix against the same global mult a directDamage ability applies.
+  // (#2428 retired the Consecration/Exorcism arm: Rite of Expulsion left the
+  // level-20 kit and Holy Ground is now spec-gated and re-ranked.)
   it('Earthquake groundAoE damage scales with the global spell damage modifier', () => {
     // Faultwake (earthquake) is Elemental-only after the v0.29 shaman redesign, so a
     // spec-less modifier set no longer resolves it at all. The mage cases above set

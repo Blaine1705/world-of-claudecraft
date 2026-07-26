@@ -85,6 +85,7 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
         'dot',
         'expose',
         'faerie_fire',
+        'forced_move',
         'heal_absorb',
         'hex',
         'incapacitate',
@@ -97,6 +98,7 @@ describe('isAuraDebuff: the allowlist classification (lifted into the core)', ()
         'slow',
         'spellvuln',
         'stun',
+        'sun_verdict',
         'sunder',
         'tongues',
         'vulnerability',
@@ -118,6 +120,28 @@ describe('createAurasView: derivation per mode', () => {
     const debuffs = createAurasView('debuffs', deps()).tick(entity(auras));
     expect(debuffs.count).toBe(2);
     expect(debuffs.slots.slice(0, 2).map((s) => s.key)).toEqual(['deep_wounds', 'sunder']);
+  });
+
+  it('surfaces Divine Ascension as a charged buff', () => {
+    const state = createAurasView('buffs', deps()).tick(
+      entity([
+        aura({
+          id: 'divine_ascension',
+          name: 'Divine Ascension',
+          kind: 'internal_cd',
+          remaining: 45,
+          charges: 5,
+          value: 0,
+        }),
+      ]),
+    );
+
+    expect(state.count).toBe(1);
+    expect(state.slots[0]).toMatchObject({
+      key: 'divine_ascension',
+      isDebuff: false,
+      stacksText: '5',
+    });
   });
 
   it('renders bleed vulnerability as a non-cancelable debuff, never a helpful buff', () => {

@@ -21,6 +21,9 @@
 // (enforced by tests/architecture.test.ts).
 
 import { tickHunterTrap } from './combat/hunter_trap';
+import { cleanupPaladinAegis } from './combat/paladin_aegis';
+import { stripSunGodVerdicts } from './combat/paladin_sun_verdict';
+import { stripPaladinDevotionsFromSource } from './combat/paladin_support';
 import { tickRingOfFrost } from './combat/ring_of_frost';
 import { tickTemporalHourglassGround } from './combat/temporal_hourglass';
 import { DELVES, DUNGEON_X_THRESHOLD, dungeonAt, zoneAt } from './data';
@@ -64,6 +67,10 @@ export type GroundAoE = {
   slowMult?: number;
   slowDuration?: number;
   orbCdr?: boolean;
+  threat?: { flat?: number; mult?: number };
+  devotionOnFirstHit?: number;
+  devotionGranted?: boolean;
+  consecration?: { id: string; duration: number; protectionDamageReduction?: number };
   // Ring of Frost: annular contact trap state. Its duration uses `remaining`;
   // targets are remembered so standing on or re-entering one ring cannot chain-root.
   frostRing?: {
@@ -101,10 +108,11 @@ export type GroundAoE = {
   };
 };
 
-// A SimEvent scheduled to fire at a future sim time, optionally gated by a live-
-// reference guard checked at fire time. Scheduled by N1/M3 (still on Sim), drained
-// here by drainDelayedEvents.
-export type DelayedEvent = { at: number; event: SimEvent; guard?: () => boolean };
+// A SimEvent or deterministic simulation callback scheduled for a future sim time,
+// optionally gated by a live-reference guard checked at fire time.
+export type DelayedEvent =
+  | { at: number; event: SimEvent; guard?: () => boolean; resolve?: never }
+  | { at: number; resolve: () => void; guard?: () => boolean; event?: never };
 
 // In-place vector copy (the engine mutates entity positions; see immutability waiver).
 function copyPos(
@@ -132,6 +140,9 @@ export function dropEntityFromRoster(ctx: SimContext, id: number): void {
   ctx.clearEntityMarker(id); // a despawned entity keeps no raid marker
   const e = ctx.entities.get(id);
   if (!e) return;
+  cleanupPaladinAegis(ctx, id);
+  stripSunGodVerdicts(ctx, id);
+  stripPaladinDevotionsFromSource(ctx, id);
   // A despawned mob keeps no per-attempt Book of Deeds state: freeInstance,
   // freeDelveRun, and spawnDelveModule drop boss mobs without a kill, so a leaked
   // encounter/taint entry (entity ids are monotonic and never reused) would linger
@@ -192,7 +203,10 @@ export function drainDelayedEvents(ctx: SimContext): void {
   const pending: DelayedEvent[] = [];
   for (const delayed of ctx.delayedEvents) {
     if (delayed.at <= ctx.time) {
-      if (!delayed.guard || delayed.guard()) ctx.emit(delayed.event);
+      if (!delayed.guard || delayed.guard()) {
+        if (delayed.resolve) delayed.resolve();
+        else ctx.emit(delayed.event);
+      }
     } else pending.push(delayed);
   }
   ctx.delayedEvents = pending;
@@ -247,7 +261,7 @@ export function tickGroundAoEs(ctx: SimContext): void {
     effect.tickTimer -= DT;
     while (effect.tickTimer <= CAST_COMPLETE_EPS && effect.remaining > CAST_COMPLETE_EPS) {
       effect.tickTimer += effect.interval;
-      ctx.pulseGroundAoE(effect);
+      ctx.pulseGroundAoE(effect, effect.threat);
     }
     if (effect.remaining <= CAST_COMPLETE_EPS) ctx.groundAoEs.splice(i, 1);
   }

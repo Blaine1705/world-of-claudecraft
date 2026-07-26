@@ -1082,7 +1082,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': 'Martwy Mróz',
   'entities.abilities.desperate_prayer.name': 'Ostatnia Modlitwa',
   'entities.abilities.deterrence.name': 'Kolczasta Straż',
-  'entities.abilities.divine_shield.name': 'Straż Światła',
   'entities.abilities.earthbind.name': 'Chwytająca Ziemia',
   'entities.abilities.evocation.name': 'Studnia Eteru',
   'entities.abilities.frenzied_regeneration.name': 'Dzikie Gojenie',
@@ -1090,7 +1089,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': 'Widmowe Uderzenie',
   'entities.abilities.hammer_of_wrath.name': 'Bijący Młot',
   'entities.abilities.healing_stream.name': 'Źródlisko',
-  'entities.abilities.holy_wrath.name': 'Gniew Świętego',
   'entities.abilities.howl_of_terror.name': 'Wycie Grozy',
   'entities.abilities.ice_block.name': 'Zimna Trumna',
   'entities.abilities.inner_focus.name': 'Wyciszony Umysł',
@@ -1105,9 +1103,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.name': 'Cieniokrok',
   'entities.abilities.silence.name': 'Cisza',
   'entities.abilities.tranquility.name': 'Pieśń Gaju',
-  'entities.abilities.cleansing_verdict.name': 'Oczyszczający Wyrok',
-  'entities.abilities.cleansing_verdict.description':
-    'Usuwa szkodliwy efekt magiczny z przyjaznego celu i leczy go świętą magią za {damage}.',
   'entities.abilities.smoke_screen.name': 'Zasłona Dymna',
   'entities.abilities.smoke_screen.description':
     'Znikasz w chmurze dymu, zwiększając szansę na unik o 30% na 8 sek.',
@@ -2988,7 +2983,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.renew.description': 'Leczy cel o {damage} w ciągu 15 sek.',
   'entities.abilities.renew.name': 'Trwająca łaska',
   'entities.abilities.retribution_aura.description':
-    'Otacza cię świętą energią na 30 min, zadając 5 obrażeń od Świętości każdemu wrogowi, który zaatakuje cię wręcz.',
+    'Otacza ciebie i twoją drużynę świętą energią aż do śmierci lub zastąpienia. Wrogowie, którzy zaatakują wręcz objętego sojusznika, otrzymują {buff} obrażeń od Świętości, a objęci sojusznicy zadają {buff} dodatkowych obrażeń od Świętości atakami automatycznymi.',
   'entities.abilities.retribution_aura.name': 'Aura odpłaty',
   'entities.abilities.revive_pet.description':
     'Opatruje twojego zwierzaka. Jeśli żyje, przywraca mu łącznie {overTime} pkt. zdrowia przez 12 sek., co 3 sek. Jeśli nie żyje, wskrzesza go z 35% zdrowia.',
@@ -8575,9 +8570,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.revenge':
     'Uderza wrogów przed tobą i może stać się darmowa po uniku lub sparowaniu.',
   'guide.abilityHook.hamstring': 'Ogranicza ruch wroga, aby nie mógł uciec.',
-  'entities.abilities.aura_surge.name': 'Rykoszet świtu',
-  'entities.abilities.aura_surge.description':
-    'Rzuca wykutą o świcie tarczę, zadając {damage} obrażeń od Świętości i uciszając główny cel na 2 sek., po czym odbija się do maksymalnie 2 kolejnych wrogów w promieniu 10 metrów, zadając 75% obrażeń przy każdym odbiciu. (talent Paladyna)',
   'entities.abilities.aspect_of_the_wild.description':
     'Napełnia sojuszników w promieniu 30 m dziką siłą, zwiększając ich siłę ataku o 45 i szybkość ataku o 5% na 5 min. (talent Łowcy)',
   'entities.abilities.avatar.name': 'Awatar',
@@ -8612,8 +8604,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Natychmiast leczy cię o {damage}. (talent Kapłana)',
   'entities.abilities.deterrence.description':
     'Zwiększa twoją szansę na unik o 50 punktów procentowych na 10 sek. (talent Łowcy)',
-  'entities.abilities.divine_shield.description':
-    'Osłania cię świętą mocą, pochłaniając 900 obrażeń przez 8 sek. (talent Paladyna)',
   'entities.abilities.earthbind.description':
     'Przywiązuje pobliskich wrogów do ziemi i unieruchamia ich na 2 sek. (talent Szamana)',
   'entities.abilities.evocation.description': 'Restaura manę rápidamente. (talent maga)',
@@ -8627,8 +8617,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Ciska święty młot w rannego wroga, zadając {damage} obrażeń od Świętości. Można użyć tylko poniżej 20% zdrowia. (talent Paladyna)',
   'entities.abilities.healing_stream.description':
     'Przywraca sojuszniczemu celowi 120 zdrowia przez 12 sek. (talent Szamana)',
-  'entities.abilities.holy_wrath.description':
-    'Wyzwala świętą moc, zadając pobliskim wrogom {damage} obrażeń. (talent Paladyna)',
   'entities.abilities.howl_of_terror.description':
     'Przeraża pobliskich wrogów na maksymalnie 3 sek. Obrażenia mogą przerwać efekt. (talent Czarnoksiężnika)',
   'entities.abilities.ice_block.description':

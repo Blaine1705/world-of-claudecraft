@@ -6,7 +6,6 @@
   "coverage": [
     "runEffects multi-class multi-effect dispatch",
     "directDamage/finisherDamage range-then-chance (druid moonfire, rogue eviscerate)",
-    "judgement range-then-chance (paladin seal -> judgement)",
     "incapacitate fear-angle draw rng.range(-PI,PI) (warlock fear)",
     "aoeDamage per-target rng.range (mage arcane_explosion, 2 mobs)",
     "sunder miss rng.chance (warrior sunder_armor)",
@@ -35,8 +34,8 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 422,
-      "state": "dedd0a59",
-      "events": "db942aa5",
+      "state": "4c5b979d",
+      "events": "c2016eb4",
       "rng": {
         "draws": 2,
         "digest": "68f9f3dd"
@@ -46,7 +45,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 422,
-      "state": "dd687508",
+      "state": "67cec98c",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -57,7 +56,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 422,
-      "state": "f190e1a0",
+      "state": "2390e5c5",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -68,7 +67,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 422,
-      "state": "d8788115",
+      "state": "01e3b461",
       "events": "5636db41",
       "rng": {
         "draws": 2,
@@ -79,7 +78,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 422,
-      "state": "18d5b379",
+      "state": "2d59e758",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -90,7 +89,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 422,
-      "state": "14337183",
+      "state": "e8d1ca94",
       "events": "b1e513e5",
       "rng": {
         "draws": 2,
@@ -101,7 +100,7 @@
       "tick": 32,
       "time": 1.6,
       "nextId": 422,
-      "state": "f9d724fb",
+      "state": "acdb8a69",
       "events": "5c5a36ff",
       "rng": {
         "draws": 4,
@@ -381,6 +380,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -411,6 +411,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -420,7 +424,8 @@
           "entityId": 418,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace"
+            "mainhand": "training_mace",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -439,9 +444,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "protection"
           },
           "townFocus": {}
         },
@@ -788,6 +794,8 @@
         {
           "aiState": "idle",
           "attackPower": 120,
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 100.6,
           "comboUntil": -1,
           "critChance": 0.068,
@@ -803,8 +811,12 @@
           "maxHp": 50000,
           "maxResource": 660,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {
+            "outOfCombatTime": 1.6
+          },
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -821,10 +833,10 @@
           "spellPower": 16,
           "stats": {
             "agi": 36,
-            "armor": 365,
+            "armor": 479,
             "int": 32,
             "spi": 33,
-            "sta": 60,
+            "sta": 82,
             "str": 60
           },
           "templateId": "paladin",
@@ -1018,7 +1030,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 422,
-      "state": "216e9d18",
+      "state": "5f2c73bc",
       "events": "22113634",
       "rng": {
         "draws": 4,
@@ -1029,7 +1041,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 422,
-      "state": "d333f911",
+      "state": "4e2c087e",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -1040,7 +1052,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 422,
-      "state": "e3a9e050",
+      "state": "e538aea0",
       "events": "741638a5",
       "rng": {
         "draws": 36,
@@ -1051,7 +1063,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 422,
-      "state": "1b901d6c",
+      "state": "15b32afc",
       "events": "741638a5",
       "rng": {
         "draws": 50,
@@ -1062,7 +1074,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 422,
-      "state": "71dc1ba0",
+      "state": "c66af01b",
       "events": "741638a5",
       "rng": {
         "draws": 66,
@@ -1073,7 +1085,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 422,
-      "state": "7880b184",
+      "state": "11c658de",
       "events": "741638a5",
       "rng": {
         "draws": 80,
@@ -1084,7 +1096,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 422,
-      "state": "eaadc0f4",
+      "state": "a1ab44cf",
       "events": "741638a5",
       "rng": {
         "draws": 101,
@@ -1095,7 +1107,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 422,
-      "state": "eac593a6",
+      "state": "7bb311ef",
       "events": "741638a5",
       "rng": {
         "draws": 127,
@@ -1106,7 +1118,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 422,
-      "state": "a2f12eef",
+      "state": "8d33d8e1",
       "events": "741638a5",
       "rng": {
         "draws": 152,
@@ -1117,7 +1129,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 422,
-      "state": "518d962f",
+      "state": "f2e9c526",
       "events": "741638a5",
       "rng": {
         "draws": 174,
@@ -1128,7 +1140,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 422,
-      "state": "33186a8a",
+      "state": "8fe0b79a",
       "events": "741638a5",
       "rng": {
         "draws": 203,
@@ -1139,7 +1151,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 422,
-      "state": "5abbe558",
+      "state": "f6ead2a4",
       "events": "741638a5",
       "rng": {
         "draws": 230,
@@ -1150,7 +1162,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 422,
-      "state": "10794174",
+      "state": "a1f74951",
       "events": "741638a5",
       "rng": {
         "draws": 253,
@@ -1161,7 +1173,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 422,
-      "state": "625ea512",
+      "state": "b22ff554",
       "events": "741638a5",
       "rng": {
         "draws": 276,
@@ -1172,7 +1184,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 422,
-      "state": "80622264",
+      "state": "f23c7c99",
       "events": "741638a5",
       "rng": {
         "draws": 304,
@@ -1183,7 +1195,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 422,
-      "state": "481e43e9",
+      "state": "f1f6c026",
       "events": "741638a5",
       "rng": {
         "draws": 328,
@@ -1194,7 +1206,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 422,
-      "state": "9cf414ca",
+      "state": "5d093f4c",
       "events": "741638a5",
       "rng": {
         "draws": 360,
@@ -1205,7 +1217,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 422,
-      "state": "d7e801aa",
+      "state": "dcb54fb5",
       "events": "741638a5",
       "rng": {
         "draws": 388,
@@ -1216,7 +1228,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 422,
-      "state": "46fafbaa",
+      "state": "b372fee2",
       "events": "741638a5",
       "rng": {
         "draws": 408,
@@ -1227,7 +1239,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 422,
-      "state": "628ce60a",
+      "state": "27d7bf08",
       "events": "741638a5",
       "rng": {
         "draws": 435,
@@ -1238,7 +1250,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 423,
-      "state": "be40bb9a",
+      "state": "1ef5d06c",
       "events": "c09e532d",
       "rng": {
         "draws": 445,
@@ -1518,6 +1530,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -1548,6 +1561,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -1557,7 +1574,8 @@
           "entityId": 418,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace"
+            "mainhand": "training_mace",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -1576,9 +1594,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "protection"
           },
           "townFocus": {}
         },
@@ -1925,6 +1944,8 @@
         {
           "aiState": "idle",
           "attackPower": 120,
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 105.65,
           "comboUntil": -1,
           "critChance": 0.068,
@@ -1940,8 +1961,12 @@
           "maxHp": 50000,
           "maxResource": 660,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {
+            "outOfCombatTime": 6.65
+          },
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -1958,10 +1983,10 @@
           "spellPower": 16,
           "stats": {
             "agi": 36,
-            "armor": 365,
+            "armor": 479,
             "int": 32,
             "spi": 33,
-            "sta": 60,
+            "sta": 82,
             "str": 60
           },
           "templateId": "paladin",
@@ -2155,7 +2180,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 424,
-      "state": "39d6500b",
+      "state": "c7ef9aaf",
       "events": "b143e666",
       "rng": {
         "draws": 446,
@@ -2435,6 +2460,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -2465,6 +2491,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -2474,7 +2504,8 @@
           "entityId": 418,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace"
+            "mainhand": "training_mace",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -2493,9 +2524,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "protection"
           },
           "townFocus": {}
         },
@@ -2845,6 +2877,8 @@
         {
           "aiState": "idle",
           "attackPower": 120,
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 105.65,
           "comboUntil": -1,
           "critChance": 0.068,
@@ -2860,8 +2894,12 @@
           "maxHp": 50000,
           "maxResource": 660,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {
+            "outOfCombatTime": 6.65
+          },
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -2878,10 +2916,10 @@
           "spellPower": 16,
           "stats": {
             "agi": 36,
-            "armor": 365,
+            "armor": 479,
             "int": 32,
             "spi": 33,
-            "sta": 60,
+            "sta": 82,
             "str": 60
           },
           "templateId": "paladin",
@@ -3141,7 +3179,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 426,
-      "state": "90493b67",
+      "state": "f35641fb",
       "events": "e25d0965",
       "rng": {
         "draws": 448,
@@ -3426,6 +3464,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -3456,6 +3495,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -3465,7 +3508,8 @@
           "entityId": 418,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace"
+            "mainhand": "training_mace",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -3484,9 +3528,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "protection"
           },
           "townFocus": {}
         },
@@ -3836,6 +3881,8 @@
         {
           "aiState": "idle",
           "attackPower": 120,
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 105.65,
           "comboUntil": -1,
           "critChance": 0.068,
@@ -3851,8 +3898,12 @@
           "maxHp": 50000,
           "maxResource": 660,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {
+            "outOfCombatTime": 6.65
+          },
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -3869,10 +3920,10 @@
           "spellPower": 16,
           "stats": {
             "agi": 36,
-            "armor": 365,
+            "armor": 479,
             "int": 32,
             "spi": 33,
-            "sta": 60,
+            "sta": 82,
             "str": 60
           },
           "templateId": "paladin",
@@ -4240,7 +4291,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 427,
-      "state": "93fa62d8",
+      "state": "e536cb14",
       "events": "e3444394",
       "rng": {
         "draws": 453,
@@ -4529,6 +4580,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -4559,6 +4611,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -4568,7 +4624,8 @@
           "entityId": 418,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace"
+            "mainhand": "training_mace",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -4587,9 +4644,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "protection"
           },
           "townFocus": {}
         },
@@ -4947,6 +5005,8 @@
         {
           "aiState": "idle",
           "attackPower": 120,
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 105.65,
           "comboUntil": -1,
           "critChance": 0.068,
@@ -4962,8 +5022,12 @@
           "maxHp": 50000,
           "maxResource": 660,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {
+            "outOfCombatTime": 6.65
+          },
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
@@ -4980,10 +5044,10 @@
           "spellPower": 16,
           "stats": {
             "agi": 36,
-            "armor": 365,
+            "armor": 479,
             "int": 32,
             "spi": 33,
-            "sta": 60,
+            "sta": 82,
             "str": 60
           },
           "templateId": "paladin",
@@ -5416,13 +5480,13 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 428,
-      "state": "bcdb8b8f",
-      "events": "762a231a",
+      "state": "af3345a7",
+      "events": "64ef73a6",
       "rng": {
         "draws": 454,
         "digest": "b431b368"
       },
-      "label": "paladin-judge-consecrate",
+      "label": "paladin-bastion-consecrate",
       "players": [
         {
           "activeLoadout": -1,
@@ -5698,17 +5762,18 @@
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 33
+            "damageDealt": 27
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 33
+              "damageDealt": 27
             },
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -5739,6 +5804,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -5748,7 +5817,8 @@
           "entityId": 418,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace"
+            "mainhand": "training_mace",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -5767,9 +5837,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "protection"
           },
           "townFocus": {}
         },
@@ -6129,27 +6200,37 @@
           "attackPower": 120,
           "auras": [
             {
-              "duration": 30,
-              "id": "seal_of_righteousness",
-              "kind": "imbue",
-              "name": "Oathbrand",
-              "remaining": 30,
+              "duration": 6,
+              "id": "bastion_rite",
+              "kind": "buff_dr_phys",
+              "name": "Bastion Rite",
+              "remaining": 6,
               "school": "holy",
               "sourceId": 418,
-              "value": 11,
-              "value2": 30,
-              "value3": 44
+              "value": 0.2
+            },
+            {
+              "duration": 6,
+              "id": "bastion_rite_buff_block",
+              "kind": "buff_block",
+              "name": "Bastion Rite",
+              "remaining": 6,
+              "school": "holy",
+              "sourceId": 418,
+              "value": 0.2
             }
           ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "comboUntil": -1,
           "cooldowns": [
             [
-              "consecration",
-              8
+              "bastion_rite",
+              10
             ],
             [
-              "judgement",
-              10
+              "consecration",
+              12
             ]
           ],
           "critChance": 0.068,
@@ -6157,24 +6238,28 @@
           "dodgeChance": 0.068,
           "fallStartY": -1.36912,
           "gcdRemaining": 1.5,
-          "hp": 798,
+          "hp": 1018,
           "id": 418,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 798,
+          "maxHp": 1018,
           "maxResource": 660,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {
+            "value": 1
+          },
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 600,
+          "resource": 625,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -6184,10 +6269,10 @@
           "spellPower": 16,
           "stats": {
             "agi": 36,
-            "armor": 365,
+            "armor": 479,
             "int": 32,
             "spi": 33,
-            "sta": 60,
+            "sta": 82,
             "str": 60
           },
           "targetId": 427,
@@ -6625,7 +6710,7 @@
           "fallStartY": -1.36912,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499967,
+          "hp": 499973,
           "id": 427,
           "inCombat": true,
           "kind": "mob",
@@ -6657,7 +6742,7 @@
           "threat": [
             [
               418,
-              34
+              195.4
             ]
           ],
           "weapon": {
@@ -6672,7 +6757,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 429,
-      "state": "3966049c",
+      "state": "e7718750",
       "events": "a867c74e",
       "rng": {
         "draws": 454,
@@ -6954,17 +7039,18 @@
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 33
+            "damageDealt": 27
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 33
+              "damageDealt": 27
             },
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -6995,6 +7081,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -7004,7 +7094,8 @@
           "entityId": 418,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace"
+            "mainhand": "training_mace",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -7023,9 +7114,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "protection"
           },
           "townFocus": {}
         },
@@ -7385,27 +7477,37 @@
           "attackPower": 120,
           "auras": [
             {
-              "duration": 30,
-              "id": "seal_of_righteousness",
-              "kind": "imbue",
-              "name": "Oathbrand",
-              "remaining": 30,
+              "duration": 6,
+              "id": "bastion_rite",
+              "kind": "buff_dr_phys",
+              "name": "Bastion Rite",
+              "remaining": 6,
               "school": "holy",
               "sourceId": 418,
-              "value": 11,
-              "value2": 30,
-              "value3": 44
+              "value": 0.2
+            },
+            {
+              "duration": 6,
+              "id": "bastion_rite_buff_block",
+              "kind": "buff_block",
+              "name": "Bastion Rite",
+              "remaining": 6,
+              "school": "holy",
+              "sourceId": 418,
+              "value": 0.2
             }
           ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "comboUntil": -1,
           "cooldowns": [
             [
-              "consecration",
-              8
+              "bastion_rite",
+              10
             ],
             [
-              "judgement",
-              10
+              "consecration",
+              12
             ]
           ],
           "critChance": 0.068,
@@ -7413,24 +7515,28 @@
           "dodgeChance": 0.068,
           "fallStartY": -1.36912,
           "gcdRemaining": 1.5,
-          "hp": 798,
+          "hp": 1018,
           "id": 418,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 798,
+          "maxHp": 1018,
           "maxResource": 660,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {
+            "value": 1
+          },
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 600,
+          "resource": 625,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -7440,10 +7546,10 @@
           "spellPower": 16,
           "stats": {
             "agi": 36,
-            "armor": 365,
+            "armor": 479,
             "int": 32,
             "spi": 33,
-            "sta": 60,
+            "sta": 82,
             "str": 60
           },
           "targetId": 427,
@@ -7894,7 +8000,7 @@
           "fallStartY": -1.36912,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499967,
+          "hp": 499973,
           "id": 427,
           "inCombat": true,
           "kind": "mob",
@@ -7926,7 +8032,7 @@
           "threat": [
             [
               418,
-              34
+              195.4
             ]
           ],
           "weapon": {
@@ -7982,7 +8088,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 429,
-      "state": "3966049c",
+      "state": "e7718750",
       "events": "741638a5",
       "rng": {
         "draws": 454,
@@ -8264,17 +8370,18 @@
           "cls": "paladin",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 33
+            "damageDealt": 27
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 33
+              "damageDealt": 27
             },
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "spring_water",
               "training_mace"
@@ -8305,6 +8412,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -8314,7 +8425,8 @@
           "entityId": 418,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "training_mace"
+            "mainhand": "training_mace",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -8333,9 +8445,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "rows": {}
+            "rows": {},
+            "spec": "protection"
           },
           "townFocus": {}
         },
@@ -8695,27 +8808,37 @@
           "attackPower": 120,
           "auras": [
             {
-              "duration": 30,
-              "id": "seal_of_righteousness",
-              "kind": "imbue",
-              "name": "Oathbrand",
-              "remaining": 30,
+              "duration": 6,
+              "id": "bastion_rite",
+              "kind": "buff_dr_phys",
+              "name": "Bastion Rite",
+              "remaining": 6,
               "school": "holy",
               "sourceId": 418,
-              "value": 11,
-              "value2": 30,
-              "value3": 44
+              "value": 0.2
+            },
+            {
+              "duration": 6,
+              "id": "bastion_rite_buff_block",
+              "kind": "buff_block",
+              "name": "Bastion Rite",
+              "remaining": 6,
+              "school": "holy",
+              "sourceId": 418,
+              "value": 0.2
             }
           ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "comboUntil": -1,
           "cooldowns": [
             [
-              "consecration",
-              8
+              "bastion_rite",
+              10
             ],
             [
-              "judgement",
-              10
+              "consecration",
+              12
             ]
           ],
           "critChance": 0.068,
@@ -8723,24 +8846,28 @@
           "dodgeChance": 0.068,
           "fallStartY": -1.36912,
           "gcdRemaining": 1.5,
-          "hp": 798,
+          "hp": 1018,
           "id": 418,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 798,
+          "maxHp": 1018,
           "maxResource": 660,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
+          "paladinDevotion": {
+            "value": 1
+          },
           "petMode": "defensive",
           "pos": {
             "y": -1.36912,
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 600,
+          "resource": 625,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -8750,10 +8877,10 @@
           "spellPower": 16,
           "stats": {
             "agi": 36,
-            "armor": 365,
+            "armor": 479,
             "int": 32,
             "spi": 33,
-            "sta": 60,
+            "sta": 82,
             "str": 60
           },
           "targetId": 427,
@@ -9204,7 +9331,7 @@
           "fallStartY": -1.36912,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499967,
+          "hp": 499973,
           "id": 427,
           "inCombat": true,
           "kind": "mob",
@@ -9236,7 +9363,7 @@
           "threat": [
             [
               418,
-              34
+              195.4
             ]
           ],
           "weapon": {

@@ -82,7 +82,7 @@ export const CLASS_DETAILS: Record<PlayerClass, ClassDetails> = {
 // tests/charselect_class_details.test.ts so this never drifts from the sim.
 export const SIGNATURE_ABILITIES: Record<PlayerClass, string[]> = {
   warrior: ['charge', 'heroic_strike', 'execute'],
-  paladin: ['holy_light', 'judgement', 'seal_of_righteousness'],
+  paladin: ['holy_light', 'hammer_of_grace', 'divine_ascension'],
   hunter: ['pack_command', 'measured_shot', 'raptor_strike'],
   rogue: ['sinister_strike', 'eviscerate', 'evasion'],
   priest: ['smite', 'power_word_shield', 'shadow_word_pain'],
@@ -130,17 +130,17 @@ export const SPEC_CARD_INFO: Record<PlayerClass, Record<string, SpecCardInfo>> =
     holy: {
       primaryStat: 'int',
       complexity: 'low',
-      examples: ['holy_shock', 'holy_light', 'flash_of_light', 'lay_on_hands'],
+      examples: ['holy_light', 'dawns_embrace', 'radiant_chorus', 'lay_on_hands'],
     },
     protection: {
       primaryStat: 'str',
       complexity: 'medium',
-      examples: ['holy_shield', 'consecration', 'righteous_fury', 'sacred_bulwark'],
+      examples: ['bastion_sweep', 'oath_chain', 'holy_shield', 'consecration'],
     },
     retribution: {
       primaryStat: 'str',
       complexity: 'low',
-      examples: ['crusader_strike', 'judgement', 'seal_of_righteousness', 'exorcism'],
+      examples: ['final_edict', 'sun_gods_verdict', 'hammer_of_wrath', 'avenging_wrath'],
     },
   },
   hunter: {

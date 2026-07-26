@@ -57,6 +57,7 @@ const abilityStringsEn = {
       rage: 'Rage',
       energy: 'Energy',
       focus: 'Focus',
+      devotion: 'Devotion',
     },
     forms: {
       bear: 'Bear',
@@ -1014,18 +1015,158 @@ const classAbilityNamesEn = {
       [
         'seal_of_righteousness',
         'Oathbrand',
-        'Fills you with Holy power for 30 sec, causing each of your melee swings to deal {damage} additional Holy damage. Unleash with Verdict.',
-      ],
-      ['holy_light', 'Mending Light', 'Heals a friendly target for {damage}.'],
-      [
-        'devotion_aura',
-        'Steadfast Aura',
-        'Increases the armor of all party members by {buff}% for 30 min.',
+        'Fills you with Holy power for 30 sec, causing each of your melee swings to deal {damage} additional Holy damage.',
       ],
       [
         'judgement',
         'Verdict',
         'Unleashes your active Seal upon the enemy, consuming it to deal its stored Holy damage.',
+      ],
+      [
+        'holy_light',
+        'Mending Light',
+        'Quickly heals a friendly target for {damage}. Restoring health generates 1 Devotion, even without a specialization. Radiant Resonance or Solar Reprisal makes it instant.',
+      ],
+      [
+        'divine_ascension',
+        'Divine Ascension',
+        'Consume 20 Devotion to gain 5 Ascension charges for up to 45 sec. Marked abilities consume one charge and gain an additional effect.',
+      ],
+      [
+        'aura_mastery',
+        'Sacred Concord',
+        'For 8 sec, empower every active Devotion and Requital Aura in your group. Bastion Devotion reduces damage by 15%; Requital deals 15 Holy damage. Multiple uses refresh instead of stacking.',
+      ],
+      [
+        'devotion_ward',
+        'Bastion Devotion',
+        'Reduce damage taken by you and party members by 5% until death or replacement. Only this aura and Requital Aura replace each other; Radiant, Dawn, and Grace Devotion coexist.',
+      ],
+      [
+        'hammer_of_grace',
+        'Hammer of Grace',
+        'Instantly hurl a holy hammer at an enemy within 20 m for {damage}, restoring 70 mana, healing yourself for 50% of damage dealt, and generating 1 Devotion when it deals damage. Solar Reprisal lets Hammer of Grace ignore its cooldown and heal you for 100% of damage dealt.',
+      ],
+      [
+        'hushbrand',
+        'Hushbrand',
+        'Interrupts spellcasting and prevents spells from that school for 4 sec.',
+      ],
+      [
+        'guardian_covenant',
+        'Guardian Covenant',
+        'Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected.',
+      ],
+      ['solar_step', 'Solar Step', 'Increase your movement speed by 150% for 2 sec.'],
+      [
+        'solar_invocation',
+        'Solar Invocation',
+        'Instantly heal an ally for {damage} or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much.',
+      ],
+      [
+        'radiant_devotion',
+        'Radiant Devotion',
+        'Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion, but coexists with Devotions from other Paladins.',
+      ],
+      [
+        'dawn_devotion',
+        'Dawn Devotion',
+        'Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion, but coexists with Devotions from other Paladins and with Warrior shouts.',
+      ],
+      [
+        'grace_devotion',
+        'Grace Devotion',
+        'You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min. Replaces your own Radiant or Dawn Devotion, but coexists with Devotions from other Paladins.',
+      ],
+      [
+        'recall_the_fallen',
+        'Recall the Fallen',
+        'Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group.',
+      ],
+      [
+        'beacon_of_light',
+        'Beacon of Light',
+        'Mark one group member as your Beacon of Light. 50% of your effective direct healing on another group member within 60 m also heals the Beacon. Area and periodic healing do not transfer. Lasts until either of you dies.',
+      ],
+      [
+        'final_edict',
+        'Final Edict',
+        "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Holy explosion around you.",
+      ],
+      [
+        'dawnfall',
+        'Dawnfall',
+        "Deal {damage} Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict's remaining cooldown by 2 sec. Ascension increases its damage and radius.",
+      ],
+      [
+        'sun_gods_verdict',
+        'Verdict of the Sun God',
+        'Judge an enemy beneath the Verdict of the Sun God for 30 sec. Final Edict and Dawnfall inscribe one charge on a successful hit. The ability that lands the third charge dictates the sentence: Final Edict unleashes devastating damage on the condemned; Dawnfall detonates the verdict, damaging and stunning nearby enemies for 1.5 sec.',
+      ],
+      [
+        'valkyrs_calling',
+        "Valkyr's Calling",
+        'Ascend into the air, becoming immune to damage as you fly toward the enemy. After 2 sec, descend upon the target area for {damage} Holy damage and generate 1 Devotion. Ascension increases the impact damage by 50% and consumes 1 charge.',
+      ],
+      [
+        'faithforged_guard',
+        'Debt of Light',
+        'For 8 sec, the next enemy hit against you is answered: up to {buff} damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered. Ascension raises the amount it can answer by 50%.',
+      ],
+      [
+        'mercy_lance',
+        'Mercy Lance',
+        'Deal {damage} Holy damage to an enemy and generate 1 Devotion when it deals damage. During Ascension, it consumes 1 charge to guarantee a critical hit.',
+      ],
+      [
+        'sacred_form',
+        'Sacred Form',
+        'Enter a sacred state until death, increasing healing by 10%, spell critical chance by 5%, and reducing threat generated by 50%. Sunmender only.',
+      ],
+      [
+        'dawns_embrace',
+        "Dawn's Embrace",
+        'Deliver a powerful heal and generate 1 Devotion. Radiant Resonance reduces its mana cost by 50% and cast time to 1.5 sec. Ascension makes it instant and increases its healing by 35%.',
+      ],
+      [
+        'radiant_chorus',
+        'Radiant Chorus',
+        "Heal nearby allies for {damage} and generate 1 Devotion. Effectively healing at least 2 allies grants Radiant Resonance: your next Mending Light is instant, or your next Dawn's Embrace costs 50% less mana and casts in 1.5 sec. Ascension increases Radiant Chorus healing and radius.",
+      ],
+      [
+        'life_covenant',
+        'Life Covenant',
+        "Reduce an ally's damage taken by 40% for 6 sec. During Ascension it also grants a 120-point shield without consuming a charge.",
+      ],
+      [
+        'aegis_first_dawn',
+        'Aegis of the First Dawn',
+        'Channel for 5 sec, creating a 10 meter holy dome. Allies inside are healed every second and take 50% less damage. Completing the channel releases a final heal and grants 30% movement speed for 4 sec.',
+      ],
+      [
+        'vowkeeper_strike',
+        'Vowkeeper Strike',
+        'Strike with high threat and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal empowers your next Sunward Disc, Hammer of Grace, or Mending Light. Ascension also grants a small absorption shield.',
+      ],
+      [
+        'bastion_rite',
+        'Bastion Rite',
+        'Reduce physical damage taken by 20% and increase block chance by 20% for 6 sec. Ascension extends the duration to 10 sec.',
+      ],
+      [
+        'sunward_disc',
+        'Sunward Disc',
+        'Requires a shield. Hurl a radiant disc that strikes and then bounces between nearby enemies. Each damaging impact generates 1 Devotion. Solar Reprisal makes Sunward Disc cost no mana, ignore its cooldown, and deal 20% more damage. Ascension empowers 5 bounces.',
+      ],
+      [
+        'sacred_challenge',
+        'Sacred Goad',
+        'Compel an enemy to attack you. During Ascension it also reduces all damage received by 15% for 4 sec without consuming a charge.',
+      ],
+      [
+        'devotion_aura',
+        'Steadfast Aura',
+        'Increases the armor of all party members by {buff}% for 30 min.',
       ],
       [
         'blessing_of_might',
@@ -1041,7 +1182,7 @@ const classAbilityNamesEn = {
       [
         'lay_on_hands',
         'Last Rite',
-        'A massive surge of healing: restores {damage} health. 10 min cooldown.',
+        'A massive surge of healing: restores {damage} health and generates 1 Devotion when it restores health. 10 min cooldown.',
       ],
       [
         'holy_taunt',
@@ -1051,7 +1192,7 @@ const classAbilityNamesEn = {
       [
         'flash_of_light',
         'Lightmend',
-        'A quick, efficient burst of Light that heals a friendly target for {damage}.',
+        'A quick, efficient burst of Light that heals a friendly target for {damage}. Restoring health generates 1 Devotion, even without a specialization.',
       ],
       [
         'exorcism',
@@ -1061,17 +1202,37 @@ const classAbilityNamesEn = {
       [
         'consecration',
         'Holy Ground',
-        'Consecrates the ground beneath you, searing nearby enemies for {damage} Holy damage every 2 sec for 10 sec.',
+        'Consecrate the ground beneath you for 9 sec, dealing {damage} Holy damage with high threat every second. The first impact generates 1 Devotion. Faithwardens take 5% less damage while standing inside. Ascension increases its damage.',
+      ],
+      [
+        'bastion_sweep',
+        'Bastion Sweep',
+        'Sweep your equipped shield through enemies in a 180 degree frontal arc for {damage} Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m.',
+      ],
+      [
+        'oath_chain',
+        'Oath Chain',
+        'Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy.',
+      ],
+      [
+        'veilbound_march',
+        'Veilbound March',
+        'Become ethereal for 4 sec, gaining 40% movement speed and 30% armor and becoming immune to roots, slows, and displacement. Enemies you pass through are Veil Marked for 6 sec, taking Holy damage each second, dealing 20% less damage to you, and generating extra threat. The first mark grants 1 Devotion. When the march ends, nearby marked enemies take a final burst. Ascension increases the burst by 50% and lightly pulls them toward you.',
+      ],
+      [
+        'veilbound_mark',
+        'Veil Mark',
+        'Takes Holy damage each second, deals 20% less damage to the Paladin who applied the mark, and generates additional threat toward that Paladin.',
       ],
       [
         'righteous_fury',
         'Burning Oath',
-        "Increases the threat generated by your Holy damage by 60% for 30 min. The tanking paladin's cornerstone.",
+        'Passively increases the threat generated by your Holy damage by 60%. Faithwarden only.',
       ],
       [
         'retribution_aura',
         'Requital Aura',
-        'Surrounds you with holy energy for 30 min, dealing 5 Holy damage to any enemy that strikes you in melee.',
+        'Surrounds you and your party with holy energy until death or replacement. Enemies that strike an affected ally in melee take {buff} Holy damage, and affected allies deal {buff} additional Holy damage with auto-attacks.',
       ],
       [
         'tame_beast',
@@ -1476,14 +1637,9 @@ const classAbilityNamesEn = {
         'Shocks a friendly target with Holy energy to heal them, or an enemy for {damage} Holy damage. (Holy signature)',
       ],
       [
-        'aura_surge',
-        'Dawnward Ricochet',
-        'Hurl a dawnforged shield for {damage} Holy damage and silence the primary target for 2 sec. It bounces to up to 2 additional enemies within 10 yd for 75% damage per bounce. (Paladin talent)',
-      ],
-      [
         'holy_shield',
         'Hallowed Wall',
-        'Hurls a radiant aegis at an enemy for 90 to 110 Holy damage, then bounces to 2 nearby enemies for 60 to 75 Holy damage each. (Protection signature)',
+        'Gain 30% block and an absorb shield for 8 sec, releasing a pulse of threat. Ascension strengthens and extends the defense.',
       ],
       [
         'bestial_wrath',
@@ -1767,8 +1923,8 @@ const classAbilityNamesEn = {
       ],
       [
         'avenging_wrath',
-        'Wrathwing',
-        'Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)',
+        'Avenging Wrath',
+        'Unfurl physical wings of golden holy power, gaining 10 Devotion and doubling Devotion generated by your abilities for 15 sec. Also increases damage and healing done by 20%. Dawnreaver: enables Hammer of Wrath against any target.',
       ],
       ['berserk', 'Red Haze', 'Increases attack power by 70 for 15 sec. (Druid talent)'],
       [
@@ -1791,11 +1947,6 @@ const classAbilityNamesEn = {
         'chaos_bolt',
         'Ruinbolt',
         'Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)',
-      ],
-      [
-        'cleansing_verdict',
-        'Cleansing Verdict',
-        'Purges a harmful magic effect from a friendly target and heals them for {damage} Holy.',
       ],
       [
         'cloak_of_shadows',
@@ -1834,11 +1985,6 @@ const classAbilityNamesEn = {
         'Increases your dodge chance by 25 percentage points and reduces all damage taken by 30% for 10 sec. (Hunter talent)',
       ],
       [
-        'divine_shield',
-        'Lightward',
-        'Shields you with holy power, absorbing 900 damage for 8 sec. (Paladin talent)',
-      ],
-      [
         'earthbind',
         'Gripping Earth',
         'Roots enemies within 4 yd of the target point for 2 sec, then slows them by 40% for 6 sec. (Shaman talent)',
@@ -1865,18 +2011,13 @@ const classAbilityNamesEn = {
       ],
       [
         'hammer_of_wrath',
-        'Tolling Hammer',
-        'Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)',
+        'Hammer of Wrath',
+        "Hurl a holy hammer for {damage} damage and generate 1 Devotion. Usable below 20% health, or during Divine Ascension or Avenging Wrath. Dawn's Wrath grants an additional cast against any target that ignores its current cooldown and deals 20% more damage. Ascension increases its damage by 30%.",
       ],
       [
         'healing_stream',
         'Springwell',
         'Restores 120 health to a friendly target over 12 sec. (Shaman talent)',
-      ],
-      [
-        'holy_wrath',
-        "Saint's Ire",
-        'Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)',
       ],
       [
         'howl_of_terror',
@@ -2309,15 +2450,10 @@ export const classAbilityNames = {
         [
           'seal_of_righteousness',
           'Sello de rectitud',
-          'Te llena de poder Sagrado durante 30 s, haciendo que cada golpe cuerpo a cuerpo inflija 4 de daño Sagrado adicional. Desátalo con Sentencia.',
+          'Te llena de poder Sagrado durante 30 s, haciendo que cada golpe cuerpo a cuerpo inflija 4 de daño Sagrado adicional.',
         ],
         ['holy_light', 'Luz Sagrada', 'Sana a un objetivo amistoso por {damage}.'],
         ['devotion_aura', 'Aura de devoción', 'Aumenta tu armadura en 40 durante 30 min.'],
-        [
-          'judgement',
-          'Sentencia',
-          'Desata tu Sello activo sobre el enemigo, lo consume y causa su daño de sentencia.',
-        ],
         [
           'blessing_of_might',
           'Bendición de poderío',
@@ -3106,15 +3242,10 @@ export const classAbilityNames = {
         [
           'seal_of_righteousness',
           'Sceau de piété',
-          'Vous remplit de puissance Sacrée pendant 30 s, faisant infliger 4 points de dégâts Sacrés supplémentaires à chacune de vos frappes de mêlée. Libérez-le avec Jugement.',
+          'Vous remplit de puissance Sacrée pendant 30 s, faisant infliger 4 points de dégâts Sacrés supplémentaires à chacune de vos frappes de mêlée.',
         ],
         ['holy_light', 'Lumière sacrée', 'Rend {damage} points de vie à une cible alliée.'],
         ['devotion_aura', 'Aura de dévotion', 'Augmente votre armure de 40 pendant 30 min.'],
-        [
-          'judgement',
-          'Jugement',
-          "Libère votre Sceau actif sur l'ennemi, le consomme et inflige ses dégâts de jugement.",
-        ],
         [
           'blessing_of_might',
           'Bénédiction de puissance',
@@ -3838,15 +3969,10 @@ export const classAbilityNames = {
         [
           'seal_of_righteousness',
           'Sigillo della Rettitudine',
-          'Ti riempie di potere Sacro per 30 s, facendo infliggere 4 danni Sacri aggiuntivi a ogni tuo colpo in mischia. Scatenalo con Giudizio.',
+          'Ti riempie di potere Sacro per 30 s, facendo infliggere 4 danni Sacri aggiuntivi a ogni tuo colpo in mischia.',
         ],
         ['holy_light', 'Luce Sacra', 'Cura un bersaglio alleato di {damage}.'],
         ['devotion_aura', 'Aura di Devozione', 'Aumenta la tua armatura di 40 per 30 min.'],
-        [
-          'judgement',
-          'Giudizio',
-          'Scatena il tuo Sigillo attivo sul nemico, consumandolo per infliggere i suoi danni di giudizio.',
-        ],
         [
           'blessing_of_might',
           'Benedizione della Potenza',
@@ -4556,15 +4682,10 @@ export const classAbilityNames = {
         [
           'seal_of_righteousness',
           'Siegel der Rechtschaffenheit',
-          'Erfüllt euch 30 Sek. lang mit Heiliger Macht, sodass jeder Nahkampfschwung 4 zusätzlichen Heiligschaden verursacht. Mit Richturteil entfesseln.',
+          'Erfüllt euch 30 Sek. lang mit Heiliger Macht, sodass jeder Nahkampfschwung 4 zusätzlichen Heiligschaden verursacht.',
         ],
         ['holy_light', 'Heiliges Licht', 'Heilt ein freundliches Ziel um {damage}.'],
         ['devotion_aura', 'Aura der Hingabe', 'Erhöht eure Rüstung 30 Min. lang um 40.'],
-        [
-          'judgement',
-          'Richturteil',
-          'Entfesselt euer aktives Siegel auf den Gegner, verbraucht es und verursacht seinen Richturteilschaden.',
-        ],
         [
           'blessing_of_might',
           'Segen der Macht',
@@ -5196,11 +5317,10 @@ export const classAbilityNames = {
         [
           'seal_of_righteousness',
           '正义圣印',
-          '使你充满神圣能量，持续 30 秒，使每次近战挥击造成 4 点额外神圣伤害。可用审判释放。',
+          '使你充满神圣能量，持续 30 秒，使每次近战挥击造成 4 点额外神圣伤害。',
         ],
         ['holy_light', '圣光术', '为一个友方目标恢复 {damage} 点生命值。'],
         ['devotion_aura', '虔诚光环', '使你的护甲提高 40，持续 30 分钟。'],
-        ['judgement', '审判', '对敌人释放你当前的圣印，消耗它并造成对应的审判伤害。'],
         [
           'blessing_of_might',
           '力量祝福',
@@ -5617,11 +5737,10 @@ export const classAbilityNames = {
         [
           'seal_of_righteousness',
           '正義聖印',
-          '使你充滿神聖能量，持續 30 秒，使每次近戰揮擊造成 4 點額外神聖傷害。可用審判釋放。',
+          '使你充滿神聖能量，持續 30 秒，使每次近戰揮擊造成 4 點額外神聖傷害。',
         ],
         ['holy_light', '聖光術', '為一個友方目標恢復 {damage} 點生命值。'],
         ['devotion_aura', '虔誠光環', '使你的護甲提高 40，持續 30 分鐘。'],
-        ['judgement', '審判', '對敵人釋放你當前的聖印，消耗它並造成對應的審判傷害。'],
         [
           'blessing_of_might',
           '力量祝福',
@@ -6118,11 +6237,10 @@ export const classAbilityNames = {
         [
           'seal_of_righteousness',
           '정의의 문장',
-          '30초 동안 신성한 힘으로 가득 차 근접 공격마다 4의 추가 신성 피해를 입힙니다. 심판으로 해방할 수 있습니다.',
+          '30초 동안 신성한 힘으로 가득 차 근접 공격마다 4의 추가 신성 피해를 입힙니다.',
         ],
         ['holy_light', '성스러운 빛', '아군 대상의 생명력을 {damage}만큼 회복시킵니다.'],
         ['devotion_aura', '기원의 오라', '30분 동안 방어도가 40만큼 증가합니다.'],
-        ['judgement', '심판', '활성화된 문장을 적에게 해방하여 소모하고 심판 피해를 입힙니다.'],
         [
           'blessing_of_might',
           '힘의 축복',
@@ -6775,15 +6893,10 @@ export const classAbilityNames = {
         [
           'seal_of_righteousness',
           '正義のシール',
-          '30秒間、聖なる力で満たされ、近接攻撃ごとに4の追加神聖ダメージを与えます。ジャッジメントで解放します。',
+          '30秒間、聖なる力で満たされ、近接攻撃ごとに4の追加神聖ダメージを与えます。',
         ],
         ['holy_light', 'ホーリーライト', '味方対象の体力を {damage} 回復します。'],
         ['devotion_aura', 'ディヴォーションオーラ', '30分間、アーマーが40増加します。'],
-        [
-          'judgement',
-          'ジャッジメント',
-          '有効なシールを敵に解放し、消費してその裁きのダメージを与えます。',
-        ],
         ['blessing_of_might', '力の祝福', '味方対象に祝福を与え、5分間、攻撃力を15増加させます。'],
         [
           'divine_protection',
@@ -7450,15 +7563,10 @@ export const classAbilityNames = {
         [
           'seal_of_righteousness',
           'Selo da Retidão',
-          'Enche você de poder Sagrado por 30 s, fazendo cada golpe corpo a corpo causar 4 de dano Sagrado adicional. Libere com Julgamento.',
+          'Enche você de poder Sagrado por 30 s, fazendo cada golpe corpo a corpo causar 4 de dano Sagrado adicional.',
         ],
         ['holy_light', 'Luz Sagrada', 'Cura um alvo aliado em {damage}.'],
         ['devotion_aura', 'Aura de Devoção', 'Aumenta sua armadura em 40 por 30 min.'],
-        [
-          'judgement',
-          'Julgamento',
-          'Libera seu Selo ativo sobre o inimigo, consumindo-o para causar seu dano de julgamento.',
-        ],
         [
           'blessing_of_might',
           'Bênção do Poder',
@@ -8170,15 +8278,10 @@ export const classAbilityNames = {
         [
           'seal_of_righteousness',
           'Печать праведности',
-          'Наполняет вас силой Света на 30 сек., заставляя каждый удар в ближнем бою наносить 4 ед. дополнительного урона от светлой магии. Высвобождается Правосудием.',
+          'Наполняет вас силой Света на 30 сек., заставляя каждый удар в ближнем бою наносить 4 ед. дополнительного урона от светлой магии.',
         ],
         ['holy_light', 'Свет небес', 'Исцеляет дружественную цель на {damage}.'],
         ['devotion_aura', 'Аура благочестия', 'Повышает вашу броню на 40 на 30 мин.'],
-        [
-          'judgement',
-          'Правосудие',
-          'Высвобождает вашу активную Печать на врага, расходуя ее и нанося урон правосудия.',
-        ],
         [
           'blessing_of_might',
           'Благословение могущества',

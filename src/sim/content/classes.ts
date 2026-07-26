@@ -15,6 +15,7 @@ import {
   TEMPORAL_HOURGLASS_SELF_RADIUS,
   type WeaponInfo,
 } from '../types';
+import { PALADIN_CORE_ABILITIES } from './paladin_core_abilities';
 import { PRIEST_ABILITIES } from './priest';
 import { MENDING_WATERS_MANA_COST, TIDECALL_MANA_COST } from './shaman_tuning';
 import { TALENT_ABILITIES_V2 } from './talent_abilities_v2';
@@ -262,25 +263,58 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     manaPerLevel: 20,
     resourceType: 'mana',
     startWeapon: 'training_mace',
+    startOffhand: 'eastbrook_buckler',
     startChest: 'recruit_tunic',
     startItems: START_RATIONS_MANA,
     abilities: [
       'seal_of_righteousness',
       'holy_light',
-      'devotion_aura',
-      'judgement',
       'blessing_of_might',
       'divine_protection',
       'hammer_of_justice',
       'lay_on_hands',
-      'holy_taunt',
       'flash_of_light',
       'exorcism',
       'consecration',
       'righteous_fury',
-      'retribution_aura',
       'rebuke',
       'sacred_bulwark',
+      'holy_shock',
+      'holy_shield',
+      'crusader_strike',
+      'divine_ascension',
+      'devotion_ward',
+      'radiant_devotion',
+      'dawn_devotion',
+      'grace_devotion',
+      'retribution_aura',
+      'hammer_of_grace',
+      'hushbrand',
+      'solar_step',
+      'solar_invocation',
+      'recall_the_fallen',
+      'beacon_of_light',
+      'final_edict',
+      'dawnfall',
+      'faithforged_guard',
+      'hammer_of_wrath',
+      'guardian_covenant',
+      'avenging_wrath',
+      'sun_gods_verdict',
+      'valkyrs_calling',
+      'mercy_lance',
+      'sacred_form',
+      'dawns_embrace',
+      'radiant_chorus',
+      'life_covenant',
+      'aegis_first_dawn',
+      'vowkeeper_strike',
+      'bastion_rite',
+      'sunward_disc',
+      'sacred_challenge',
+      'bastion_sweep',
+      'oath_chain',
+      'veilbound_march',
     ],
     color: 0xf58ca0,
   },
@@ -505,6 +539,7 @@ const MAGE_PERSONAL_BARRIER_SPELL_POWER_COEFF = 0.5;
 const MAGE_TEMPORAL_BARRIER_SPELL_POWER_COEFF = 0.25;
 
 export const ABILITIES: Record<string, AbilityDef> = {
+  ...PALADIN_CORE_ABILITIES,
   // ====================== WARRIOR ======================
   heroic_strike: {
     id: 'heroic_strike',
@@ -2957,23 +2992,23 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'holy',
     requiresTarget: false,
-    effects: [{ type: 'imbue', bonus: 4, duration: 30, judgeMin: 10, judgeMax: 18 }],
+    effects: [{ type: 'imbue', bonus: 4, duration: 30 }],
     ranks: [
       {
         rank: 2,
         level: 10,
         cost: 35,
-        effects: [{ type: 'imbue', bonus: 7, duration: 30, judgeMin: 18, judgeMax: 28 }],
+        effects: [{ type: 'imbue', bonus: 7, duration: 30 }],
       },
       {
         rank: 3,
         level: 16,
         cost: 50,
-        effects: [{ type: 'imbue', bonus: 11, duration: 30, judgeMin: 30, judgeMax: 44 }],
+        effects: [{ type: 'imbue', bonus: 11, duration: 30 }],
       },
     ],
     description:
-      'Fills you with Holy power for 30 sec, causing each of your melee swings to deal $d additional Holy damage. Unleash with Verdict.',
+      'Fills you with Holy power for 30 sec, causing each of your melee swings to deal $d additional Holy damage.',
   },
   holy_light: {
     id: 'holy_light',
@@ -2981,7 +3016,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     class: 'paladin',
     learnLevel: 1,
     cost: 25,
-    castTime: 2.5,
+    castTime: 1.5,
     cooldown: 0,
     range: 30,
     school: 'holy',
@@ -2989,11 +3024,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 42, max: 51 }],
     ranks: [
-      { rank: 2, level: 8, cost: 50, effects: [{ type: 'heal', min: 76, max: 90 }] },
-      { rank: 3, level: 14, cost: 70, effects: [{ type: 'heal', min: 122, max: 144 }] },
-      { rank: 4, level: 20, cost: 117, effects: [{ type: 'heal', min: 275, max: 322 }] },
+      { rank: 2, level: 8, cost: 35, effects: [{ type: 'heal', min: 76, max: 90 }] },
+      { rank: 3, level: 14, cost: 50, effects: [{ type: 'heal', min: 122, max: 144 }] },
+      { rank: 4, level: 20, cost: 65, effects: [{ type: 'heal', min: 190, max: 222 }] },
     ],
-    description: 'Heals a friendly target for $d.',
+    description:
+      'Quickly heals a friendly target for $d. Restoring health generates 1 Devotion, even without a specialization. Radiant Resonance or Solar Reprisal makes it instant.',
   },
   devotion_aura: {
     id: 'devotion_aura',
@@ -3011,21 +3047,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'buffTarget', kind: 'buff_armor_pct', value: 10, duration: 1800, party: true },
     ],
     description: 'Increases the armor of all party members by $b% for 30 min.',
-  },
-  judgement: {
-    id: 'judgement',
-    name: 'Verdict',
-    class: 'paladin',
-    learnLevel: 4,
-    cost: 30,
-    castTime: 0,
-    cooldown: 10,
-    range: 10,
-    school: 'holy',
-    requiresTarget: true,
-    effects: [{ type: 'judgement' }],
-    description:
-      'Unleashes your active Seal upon the enemy, consuming it to deal its judgement damage.',
   },
   blessing_of_might: {
     id: 'blessing_of_might',
@@ -3050,7 +3071,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 6,
     cost: 15,
     castTime: 0,
-    cooldown: 180,
+    cooldown: 60,
     range: 0,
     school: 'holy',
     requiresTarget: false,
@@ -3084,7 +3105,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'hammer_of_justice',
     name: 'Sundering Gavel',
     class: 'paladin',
-    learnLevel: 8,
+    learnLevel: 2,
     cost: 30,
     castTime: 0,
     cooldown: 60,
@@ -3092,14 +3113,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'holy',
     requiresTarget: true,
     effects: [{ type: 'stun', duration: 3 }],
-    ranks: [{ rank: 2, level: 16, cost: 45, effects: [{ type: 'stun', duration: 4 }] }],
     description: 'Stuns the target for $t sec.',
   },
   lay_on_hands: {
     id: 'lay_on_hands',
     name: 'Last Rite',
     class: 'paladin',
-    learnLevel: 10,
+    // Level 8 so the row-8 pick that upgrades it (Steady Hands) has something to
+    // upgrade the moment it is taken.
+    learnLevel: 8,
     cost: 0,
     castTime: 0,
     cooldown: 600,
@@ -3109,13 +3131,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 250, max: 250 }],
     ranks: [{ rank: 2, level: 18, cost: 0, effects: [{ type: 'heal', min: 600, max: 600 }] }],
-    description: 'A massive surge of healing: restores $d health. 10 min cooldown.',
+    description:
+      'A massive surge of healing: restores $d health and generates 1 Devotion when it restores health. 10 min cooldown.',
   },
   holy_taunt: {
     id: 'holy_taunt',
     name: 'Sacred Goad',
     class: 'paladin',
     learnLevel: 10,
+    specs: ['protection'],
     cost: 0,
     castTime: 0,
     cooldown: 10,
@@ -3141,7 +3165,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 62, max: 76 }],
     ranks: [{ rank: 2, level: 20, cost: 46, effects: [{ type: 'heal', min: 90, max: 110 }] }],
-    description: 'A quick, efficient flash of Light that heals a friendly target for $d.',
+    description:
+      'A quick, efficient burst of Light that heals a friendly target for $d. Restoring health generates 1 Devotion, even without a specialization.',
   },
   exorcism: {
     id: 'exorcism',
@@ -3157,51 +3182,85 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'directDamage', min: 46, max: 56 }],
     description: 'Banishes the wicked with Holy wrath, causing $d Holy damage.',
   },
-  consecration: {
-    id: 'consecration',
-    name: 'Holy Ground',
-    class: 'paladin',
-    learnLevel: 8,
-    cost: 60,
-    castTime: 0,
-    cooldown: 8,
-    range: 0,
-    school: 'holy',
-    requiresTarget: false,
-    effects: [{ type: 'groundAoE', min: 28, max: 34, radius: 8, duration: 10, interval: 2 }],
-    description:
-      'Consecrates the ground beneath you, searing nearby enemies for $d Holy damage every 2 sec for 10 sec.',
-  },
   righteous_fury: {
     id: 'righteous_fury',
     name: 'Burning Oath',
     class: 'paladin',
-    learnLevel: 16,
-    cost: 30,
-    castTime: 0,
-    cooldown: 0,
-    range: 0,
-    school: 'holy',
-    requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'righteous_fury', value: 1.6, duration: 1800 }],
-    description:
-      "Increases the threat generated by your Holy damage by 60% for 30 min. The tanking paladin's cornerstone.",
-  },
-  retribution_aura: {
-    id: 'retribution_aura',
-    name: 'Requital Aura',
-    class: 'paladin',
-    learnLevel: 16,
+    learnLevel: 5,
+    specs: ['protection'],
     cost: 0,
     castTime: 0,
     cooldown: 0,
     range: 0,
     school: 'holy',
     requiresTarget: false,
-    exclusiveGroup: 'paladin_aura',
-    effects: [{ type: 'selfBuff', kind: 'thorns', value: 5, duration: 1800 }],
+    passive: true,
+    effects: [],
     description:
-      'Surrounds you with holy energy for 30 min, dealing 5 Holy damage to any enemy that strikes you in melee.',
+      'Passively increases the threat generated by your Holy damage by 60%. Faithwarden only.',
+  },
+  retribution_aura: {
+    id: 'retribution_aura',
+    name: 'Requital Aura',
+    class: 'paladin',
+    learnLevel: 7,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'holy',
+    requiresTarget: false,
+    exclusiveGroup: 'paladin_devotion',
+    // Ranked from level 7. The reflect is a FLAT value: it takes no spell power,
+    // no attack power and no level coefficient, and no talent touches it, so a
+    // single authored number is the aura's whole lifetime. At 5 it read as real
+    // pressure at 7 and as rounding error by 20, next to a kit that hits for 95 to
+    // 115. The ranks keep it worth the aura slot all the way up; Sacred Concord
+    // still triples whichever rank is live.
+    effects: [
+      {
+        type: 'buffTarget',
+        kind: 'thorns',
+        value: 5,
+        duration: 0,
+        permanent: true,
+        party: true,
+      },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 13,
+        cost: 0,
+        effects: [
+          {
+            type: 'buffTarget',
+            kind: 'thorns',
+            value: 12,
+            duration: 0,
+            permanent: true,
+            party: true,
+          },
+        ],
+      },
+      {
+        rank: 3,
+        level: 18,
+        cost: 0,
+        effects: [
+          {
+            type: 'buffTarget',
+            kind: 'thorns',
+            value: 22,
+            duration: 0,
+            permanent: true,
+            party: true,
+          },
+        ],
+      },
+    ],
+    description:
+      'Surrounds you and your party with holy energy until death or replacement. Enemies that strike an affected ally in melee take $b Holy damage, and affected allies deal $b additional Holy damage with auto-attacks.',
   },
 
   // ====================== HUNTER ======================
@@ -5846,24 +5905,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Shocks a friendly target with Holy energy to heal them, or an enemy for $d Holy damage. (Holy signature)',
   },
-  holy_shield: {
-    id: 'holy_shield',
-    name: 'Hallowed Wall',
-    class: 'paladin',
-    learnLevel: 10,
-    cost: 30,
-    castTime: 0,
-    cooldown: 8,
-    range: 30,
-    school: 'holy',
-    requiresTarget: true,
-    effects: [
-      { type: 'directDamage', min: 90, max: 110 },
-      { type: 'chainDamage', min: 60, max: 75, jumps: 2, falloff: 1, radius: 10 },
-    ],
-    description:
-      'Hurls a radiant aegis at an enemy for 90 to 110 Holy damage, then bounces to 2 nearby enemies for 60 to 75 Holy damage each. (Protection signature)',
-  },
   bestial_wrath: {
     id: 'bestial_wrath',
     name: 'Howling Rage',
@@ -6744,6 +6785,23 @@ export const ABILITIES: Record<string, AbilityDef> = {
   ...SPORT_ABILITIES,
 };
 
+const PALADIN_LEGACY_ABILITY_IDS = [
+  'seal_of_righteousness',
+  'devotion_aura',
+  'blessing_of_might',
+  'holy_taunt',
+  'flash_of_light',
+  'exorcism',
+  'rebuke',
+  'sacred_bulwark',
+  'holy_shock',
+  'crusader_strike',
+] as const;
+
+for (const abilityId of PALADIN_LEGACY_ABILITY_IDS) {
+  ABILITIES[abilityId].hiddenFromPlayer = true;
+}
+
 // A class ability resolved to a concrete rank, with talent modifiers already
 // folded into its cost / cast / cooldown / effects. The combat path reads only
 // these flat numbers - it never consults the talent tree. Structurally matches
@@ -6852,16 +6910,6 @@ function scaleEffect(
       return {
         ...eff,
         bonus: Math.round(eff.bonus * dmgMult + flat),
-        judgeMin:
-          eff.judgeMin === undefined ? undefined : Math.round(eff.judgeMin * dmgMult + flat),
-        judgeMax:
-          eff.judgeMax === undefined ? undefined : Math.round(eff.judgeMax * dmgMult + flat),
-      };
-    case 'judgement':
-      return {
-        ...eff,
-        dmgMult: (eff.dmgMult ?? 1) * dmgMult,
-        flat: (eff.flat ?? 0) + flat,
       };
     case 'heal':
       return {
@@ -6874,6 +6922,14 @@ function scaleEffect(
         ...eff,
         min: Math.round(eff.min * healMult + flat),
         max: Math.round(eff.max * healMult + flat),
+      };
+    case 'paladinAegis':
+      return {
+        ...eff,
+        tickMin: Math.round(eff.tickMin * healMult + flat),
+        tickMax: Math.round(eff.tickMax * healMult + flat),
+        finalMin: Math.round(eff.finalMin * healMult),
+        finalMax: Math.round(eff.finalMax * healMult),
       };
     case 'hot':
       return { ...eff, total: Math.round(eff.total * healMult * hotMult + flat) };
@@ -6985,6 +7041,19 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
     // Flat cooldown ADD (seconds), after the percent: Snap Bewitch turns a
     // cooldown-less cast instant by trading in a real cooldown.
     if (am.cooldownFlat) entry.cooldown = Math.max(0, entry.cooldown + am.cooldownFlat);
+    if (am.durationFlat) {
+      entry.effects = entry.effects.map((effect) => {
+        if (
+          effect.type === 'selfBuff' ||
+          effect.type === 'buffTarget' ||
+          effect.type === 'absorb' ||
+          effect.type === 'hot'
+        ) {
+          return { ...effect, duration: Math.max(0, effect.duration + (am.durationFlat ?? 0)) };
+        }
+        return effect;
+      });
+    }
     if (am.castWhileMoving) entry.castWhileMoving = true;
     if (am.damagePushbackImmune) entry.damagePushbackImmune = true;
     // Stored uses (Double Charge): base 1 unless the def itself is
@@ -7022,6 +7091,7 @@ export function abilitiesKnownAt(
   cls: PlayerClass,
   level: number,
   mods?: TalentModifiers,
+  questsDone?: ReadonlySet<string>,
 ): KnownAbility[] {
   const out: KnownAbility[] = [];
   const baseIds = CLASSES[cls].abilities;
@@ -7033,8 +7103,23 @@ export function abilitiesKnownAt(
   for (const id of ids) {
     const def = ABILITIES[id];
     if (!def) continue;
+    // Retired ids stay in ABILITIES so persisted action bars can identify and
+    // discard them, but they are not authoritative actions. Keeping them in
+    // `known` would let modified clients and RL slots cast abilities the
+    // official spellbook deliberately hides.
+    if (def.hiddenFromPlayer) continue;
     const granted = grantIds.has(id) || !baseIds.includes(id);
-    if (!granted && def.learnLevel > level) continue; // class kit is level-gated; grants bypass it
+    // Paladin specialization signatures also live in its authored class kit.
+    // Keep their requested progression levels authoritative instead of letting
+    // the generic signature grant reveal Mercy Lance, Final Edict, or Sunward
+    // Disc early. Row-granted actives remain grants and still bypass level gates.
+    const paladinBaseKitGrant = cls === 'paladin' && baseIds.includes(id);
+    if ((!granted || paladinBaseKitGrant) && def.learnLevel > level) continue;
+    // Quest-gated kit: a quest-locked ability stays hidden until its unlocking
+    // quest is in questsDone (paladin's recall_the_fallen <- q_rite_of_redemption).
+    // Grants bypass entirely (already scoped). Learned permanently: questsDone is
+    // durable, so a returning character keeps it through the load-time rebuild.
+    if (!granted && def.requiresQuest && !questsDone?.has(def.requiresQuest)) continue;
     // Spec-gated kit: a spec-restricted ability is shown ONLY when the player's
     // committed spec is in its `specs` list. With no spec chosen the shared base
     // kit stays but every spec-exclusive drops out, so exclusivity is visible

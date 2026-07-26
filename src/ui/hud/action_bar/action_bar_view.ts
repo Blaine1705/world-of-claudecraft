@@ -27,10 +27,19 @@
 import { freeCostAuraActive } from '../../../sim/combat/empower_next';
 import { frostProcGlowActive } from '../../../sim/combat/frost_mage';
 import { packlordActionGlowActive } from '../../../sim/combat/hunter_packlord';
+import { dawnsWrathHammerActive } from '../../../sim/combat/paladin_dawns_wrath';
+import { radiantResonanceAbilityGlowActive } from '../../../sim/combat/paladin_radiant_resonance';
+import {
+  solarReprisalAbilityGlowActive,
+  solarReprisalBypassesCooldown,
+  solarReprisalMakesAbilityFree,
+} from '../../../sim/combat/paladin_solar_reprisal';
+import { sunVerdictAbilityGlowActive } from '../../../sim/combat/paladin_sun_verdict';
 import { priestActionGlowActive } from '../../../sim/combat/priest/presentation';
 import { mendingCurrentTargetCapped } from '../../../sim/combat/shaman_spiritmend';
 import { flowStateDiscountedCost } from '../../../sim/combat/shaman_talents';
 import { thundercallPayoffGlowActive } from '../../../sim/combat/shaman_thundercall';
+import { isAscensionEmpoweredAbility } from '../../../sim/paladin_devotion';
 import {
   type AbilityDef,
   type AuraKind,
@@ -75,6 +84,7 @@ const NEXT_CAST_CHEAP: AuraKind = 'next_cast_cheap';
 const SLOT_ARIA_KEY: TranslationKey = 'abilityUi.actionBar.slotAria';
 const EMPTY_SLOT_ARIA_KEY: TranslationKey = 'abilityUi.actionBar.emptySlotAria';
 const ATTACK_NAME_KEY: TranslationKey = 'abilityUi.actionBar.attackName';
+const ASCENSION_SPENDER_ARIA_KEY: TranslationKey = 'hudChrome.paladin.ascensionSpenderAria';
 
 /** The ability fields the core reads. A structural subset of ResolvedAbility that
  *  both worlds expose (def + the talent-resolved cost). */
@@ -181,6 +191,12 @@ export interface ActionBarPlayerInput {
    *  kill-window gate, and the next-cast empowerment read. Both worlds expose
    *  the live aura list. */
   auras: readonly ActionBarAuraInput[];
+  paladinDevotion?: {
+    value: number;
+    ascensionCharges: number;
+    ascensionRemaining: number;
+  };
+  paladinSpec?: string | null;
 }
 
 /** The target fields the bar reads; null when there is no current target. */
@@ -228,6 +244,12 @@ export interface ActionBarSlotState {
    *  NEVER shed by a graphics tier. */
   procGlow: boolean;
   empowered: boolean;
+  /** This ability will consume one Ascension charge if used now. Kept
+   *  separate from generic empowerment so the painter can show an explicit
+   *  cost marker instead of relying on glow alone. */
+  ascensionSpender: boolean;
+  /** Localized visual cost used by the CSS badge through a data attribute. */
+  ascensionCostLabel: string;
   ariaLabel: string;
   keybindLabel: string;
 }
@@ -262,6 +284,8 @@ function makeSlotState(): ActionBarSlotState {
     queued: false,
     procGlow: false,
     empowered: false,
+    ascensionSpender: false,
+    ascensionCostLabel: '',
     ariaLabel: '',
     keybindLabel: '',
   };
@@ -364,6 +388,8 @@ export function createActionBarView(
           slot.queued = player.autoAttack;
           slot.procGlow = false;
           slot.empowered = false;
+          slot.ascensionSpender = false;
+          slot.ascensionCostLabel = '';
           slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
             slot: slotLabel,
             ability: deps.t(ATTACK_NAME_KEY),
@@ -392,6 +418,8 @@ export function createActionBarView(
           slot.queued = false;
           slot.procGlow = false;
           slot.empowered = false;
+          slot.ascensionSpender = false;
+          slot.ascensionCostLabel = '';
           slot.ariaLabel = deps.t(EMPTY_SLOT_ARIA_KEY, { slot: slotLabel });
           slot.keybindLabel = sd.keybindLabel();
           continue;
@@ -426,6 +454,8 @@ export function createActionBarView(
           slot.queued = false;
           slot.procGlow = false;
           slot.empowered = false;
+          slot.ascensionSpender = false;
+          slot.ascensionCostLabel = '';
           slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
             slot: slotLabel,
             ability: deps.itemName(item),
@@ -438,7 +468,12 @@ export function createActionBarView(
         // this guard mirrors the former `if (!known) continue` and narrows the type).
         if (ability === null) continue;
         const def = ability.def;
-        const cd = player.cooldowns.get(def.id) ?? 0;
+        const dawnsWrathActive = dawnsWrathHammerActive(player, def.id);
+        const solarReprisalActive = solarReprisalAbilityGlowActive(player, def.id);
+        const cd =
+          dawnsWrathActive || solarReprisalBypassesCooldown(player, def.id)
+            ? 0
+            : (player.cooldowns.get(def.id) ?? 0);
         const gcdActive = !def.offGcd && player.gcdRemaining > 0;
         const shown = Math.max(cd, gcdActive ? player.gcdRemaining : 0);
         const denom = cd > 0 ? def.cooldown : GCD;
@@ -490,6 +525,7 @@ export function createActionBarView(
         const flowStateReady = displayedCost < ability.cost;
         const tidecallTargetCapped =
           def.id === 'tidecall' && mendingCurrentTargetCapped(player.id, target);
+        const freeBySolarReprisal = solarReprisalMakesAbilityFree(player, def.id);
         // A kill-window ability (Victory Rush): usable only while its enabling
         // aura is worn, and it glows while the window is open.
         let windowOpen = true;
@@ -507,8 +543,17 @@ export function createActionBarView(
           }
           windowGlow = windowOpen;
         }
+        const ascensionReady =
+          def.id !== 'divine_ascension' ||
+          ((player.paladinDevotion?.value ?? 0) >= 20 &&
+            (player.paladinDevotion?.ascensionCharges ?? 0) <= 0);
+        const devotionReady =
+          def.devotionCost === undefined ||
+          (player.paladinDevotion?.value ?? 0) >= def.devotionCost;
         slot.usable =
-          (!(player.resource < displayedCost) || freeByProc) &&
+          (!(player.resource < displayedCost) || freeByProc || freeBySolarReprisal) &&
+          ascensionReady &&
+          devotionReady &&
           windowOpen &&
           !(maxCharges > 1 && chargesLeft <= 0) &&
           (!def.requiresStealth || player.stealthed);
@@ -521,19 +566,38 @@ export function createActionBarView(
         // Frost procs (combat/frost_mage.ts): Ice Lance glows on a banked
         // Fingers of Frost, Flurry on an armed Brain Freeze (the same shared
         // sim predicate idiom as freeCostAuraActive above).
+        const divineAscensionActive =
+          (player.paladinDevotion?.ascensionCharges ?? 0) > 0 &&
+          (player.paladinDevotion?.ascensionRemaining ?? 0) > 0;
+        const ascensionEmpowered =
+          divineAscensionActive && isAscensionEmpoweredAbility(player.paladinSpec ?? null, def.id);
+        // Radiant Chorus's proc: Mending Light turns instant and Dawn's Embrace
+        // halves its cost, so both light up while Radiant Resonance is worn.
+        const radiantResonanceActive = radiantResonanceAbilityGlowActive(player, def.id);
         slot.procGlow =
           freeByProc ||
+          dawnsWrathActive ||
+          solarReprisalActive ||
+          radiantResonanceActive ||
           windowGlow ||
           frostProcGlowActive(player.auras ?? [], def.id) ||
           packlordActionGlowActive(player.auras ?? [], def.id) ||
           thundercallPayoffGlowActive(player.auras ?? [], def.id) ||
           flowStateReady ||
-          priestActionGlowActive(player.auras ?? [], def.id);
-        slot.empowered = hasEmpoweringAura(player.auras, ability) || tidecallTargetCapped;
-        slot.ariaLabel = deps.t(SLOT_ARIA_KEY, {
-          slot: slotLabel,
-          ability: deps.abilityName(def),
-        });
+          priestActionGlowActive(player.auras ?? [], def.id) ||
+          sunVerdictAbilityGlowActive(target?.auras, player.id, def.id) ||
+          (def.id === 'divine_ascension' && ascensionReady);
+        slot.empowered =
+          hasEmpoweringAura(player.auras, ability) ||
+          tidecallTargetCapped ||
+          dawnsWrathActive ||
+          solarReprisalActive ||
+          radiantResonanceActive ||
+          ascensionEmpowered;
+        slot.ascensionSpender = ascensionEmpowered;
+        slot.ascensionCostLabel = ascensionEmpowered ? deps.formatCount(-1) : '';
+        const ariaKey = ascensionEmpowered ? ASCENSION_SPENDER_ARIA_KEY : SLOT_ARIA_KEY;
+        slot.ariaLabel = deps.t(ariaKey, { slot: slotLabel, ability: deps.abilityName(def) });
         slot.keybindLabel = sd.keybindLabel();
       }
 

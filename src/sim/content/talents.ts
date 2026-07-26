@@ -74,6 +74,7 @@ export interface AbilityModEffect {
   cooldownFlat?: number;
   castPct?: number;
   buffPct?: number;
+  durationFlat?: number;
   // Ability-scoped critical strike chance ADD (the classic Improved Backstab
   // shape). Reaches the weaponStrike hit table (meleeSwing critBonus) and the
   // directDamage crit roll in effect_dispatch.ts.
@@ -144,6 +145,23 @@ export interface GlobalModEffect {
   // a stacking burn (combat/fire_mage.ts igniteOnCrit copies the resolved
   // amount). Scales with level like every spec mastery.
   ignitionPct?: number;
+  // Paladin Divine Ascension (Amanecer) talents, applied at activation in
+  // effect_dispatch's divineAscension case:
+  // ascensionChargeBonus: extra empowered-ability charges (Extended Dawn).
+  // ascensionRush: 1 to cleanse roots/slows and grant a speed burst (Dawn's Path).
+  // ascensionWard: 1 to grant a brief damage-reduction ward (Aegis of Devotion).
+  ascensionChargeBonus?: number;
+  paladinRadiantStride?: number;
+  paladinDivineSteed?: number;
+  paladinDivineSteedBurstPct?: number;
+  paladinSteadyHandsHotPct?: number;
+  paladinRecurringGrace?: number;
+  paladinZeal?: number;
+  paladinSacredReserve?: number;
+  paladinDivinePurposeChance?: number;
+  paladinDawnEcho?: number;
+  paladinDawnEchoDevotion?: number;
+  paladinPerpetualSun?: number;
 }
 
 export type ProcTrigger =
@@ -312,6 +330,7 @@ export interface ResolvedAbilityMod {
   cooldownFlat: number;
   castPct: number;
   buffPct: number;
+  durationFlat?: number;
   critPct: number;
   castWhileMoving: boolean;
   damagePushbackImmune: boolean;
@@ -578,6 +597,18 @@ function zeroGlobal(): Required<GlobalModEffect> {
     blinkCast: 0,
     convergence: 0,
     ignitionPct: 0,
+    ascensionChargeBonus: 0,
+    paladinRadiantStride: 0,
+    paladinDivineSteed: 0,
+    paladinDivineSteedBurstPct: 0,
+    paladinSteadyHandsHotPct: 0,
+    paladinRecurringGrace: 0,
+    paladinZeal: 0,
+    paladinSacredReserve: 0,
+    paladinDivinePurposeChance: 0,
+    paladinDawnEcho: 0,
+    paladinDawnEchoDevotion: 0,
+    paladinPerpetualSun: 0,
   };
 }
 
@@ -591,6 +622,7 @@ function zeroAbilityMod(): ResolvedAbilityMod {
     cooldownFlat: 0,
     castPct: 0,
     buffPct: 0,
+    durationFlat: 0,
     critPct: 0,
     castWhileMoving: false,
     damagePushbackImmune: false,
@@ -681,6 +713,18 @@ export function accumulateTalentEffect(
     target.blinkCast += (source.blinkCast ?? 0) * multiplier;
     target.convergence += (source.convergence ?? 0) * multiplier;
     target.ignitionPct += (source.ignitionPct ?? 0) * multiplier;
+    target.ascensionChargeBonus += (source.ascensionChargeBonus ?? 0) * multiplier;
+    target.paladinRadiantStride += (source.paladinRadiantStride ?? 0) * multiplier;
+    target.paladinDivineSteed += (source.paladinDivineSteed ?? 0) * multiplier;
+    target.paladinDivineSteedBurstPct += (source.paladinDivineSteedBurstPct ?? 0) * multiplier;
+    target.paladinSteadyHandsHotPct += (source.paladinSteadyHandsHotPct ?? 0) * multiplier;
+    target.paladinRecurringGrace += (source.paladinRecurringGrace ?? 0) * multiplier;
+    target.paladinZeal += (source.paladinZeal ?? 0) * multiplier;
+    target.paladinSacredReserve += (source.paladinSacredReserve ?? 0) * multiplier;
+    target.paladinDivinePurposeChance += (source.paladinDivinePurposeChance ?? 0) * multiplier;
+    target.paladinDawnEcho += (source.paladinDawnEcho ?? 0) * multiplier;
+    target.paladinDawnEchoDevotion += (source.paladinDawnEchoDevotion ?? 0) * multiplier;
+    target.paladinPerpetualSun += (source.paladinPerpetualSun ?? 0) * multiplier;
   }
   for (const ability of effect.ability ?? []) {
     const target = modifiers.abilities[ability.ability] ?? zeroAbilityMod();
@@ -696,6 +740,7 @@ export function accumulateTalentEffect(
     target.cooldownFlat += (ability.cooldownFlat ?? 0) * multiplier;
     target.castPct += (ability.castPct ?? 0) * multiplier;
     target.buffPct += (ability.buffPct ?? 0) * multiplier;
+    target.durationFlat = (target.durationFlat ?? 0) + (ability.durationFlat ?? 0) * multiplier;
     target.critPct += (ability.critPct ?? 0) * multiplier;
     target.bonusCharges += (ability.bonusCharges ?? 0) * multiplier;
     if (ability.castWhileMoving) target.castWhileMoving = true;

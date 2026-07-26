@@ -120,7 +120,7 @@ export const ONLINE_WORLD_INCOMPATIBLE_MESSAGE =
 
 // Snapshot timer wire capability shared by the browser mirror and authoritative
 // server. Keep the version exact so rolling deploys can negotiate fail-closed.
-export const STABLE_TIMER_WIRE_VERSION = 2 as const;
+export const STABLE_TIMER_WIRE_VERSION = 3 as const;
 export type StableTimerWireVersion = typeof STABLE_TIMER_WIRE_VERSION;
 
 // Absolute cooldown schedule in server simulation seconds. A number is the
@@ -141,7 +141,11 @@ export type {
 export type { BankBonusSource, BankInfo } from './world_api/bank';
 export type { CardMinigameInfo } from './world_api/card_minigame';
 export { isOverheadEmoteId, OVERHEAD_EMOTES } from './world_api/chat';
-export type { ActiveFrostRing, ActiveTemporalHourglass } from './world_api/combat';
+export type {
+  ActiveConsecration,
+  ActiveFrostRing,
+  ActiveTemporalHourglass,
+} from './world_api/combat';
 export type { AccountCosmetics } from './world_api/cosmetics';
 export type {
   DailyRewardEligibilityView,

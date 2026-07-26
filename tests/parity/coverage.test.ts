@@ -183,10 +183,7 @@ describe('coverage: each scenario fires its subsystem', () => {
   it('paladin_consecration: ground AoE pulses fire from BOTH callers (immediate + deferred)', () => {
     const rec = run('paladin_consecration');
     const hits = (rec.allEvents as Ev[]).filter(
-      (e) =>
-        e.type === 'damage' &&
-        typeof e.ability === 'string' &&
-        e.ability.toLowerCase().includes('holy ground'),
+      (e) => e.type === 'damage' && e.ability === 'Holy Ground',
     );
     // 1 immediate on-cast pulse (~4097) + >=1 deferred interval pulse (~3052).
     expect(hits.length).toBeGreaterThanOrEqual(2);
@@ -611,14 +608,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     // pulseGroundAoE hit >=2 distinct in-radius targets (rng.range once per target).
     const aoeMobIds = rec.notes.aoeMobIds as number[];
     const consTargets = new Set(
-      ev
-        .filter(
-          (e) =>
-            e.type === 'damage' &&
-            typeof e.ability === 'string' &&
-            e.ability.toLowerCase().includes('holy ground'),
-        )
-        .map((e) => e.targetId),
+      ev.filter((e) => e.type === 'damage' && e.ability === 'Holy Ground').map((e) => e.targetId),
     );
     expect(aoeMobIds.filter((id) => consTargets.has(id)).length).toBeGreaterThanOrEqual(2);
   });
@@ -699,7 +689,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect((rec.allEvents as Ev[]).some((e) => e.type === 'death')).toBe(true);
   });
 
-  it('c4b_effect_dispatch: runEffects fans across sunder/aoe/finisher/judgement/fear/groundAoE/summon/form', () => {
+  it('c4b_effect_dispatch: runEffects fans across sunder/aoe/finisher/fear/groundAoE/summon/form', () => {
     const rec = run('c4b_effect_dispatch');
     const ev = rec.allEvents as Ev[];
     const ents = entities(rec);
@@ -731,7 +721,7 @@ describe('coverage: each scenario fires its subsystem', () => {
       ev.some((e) => e.type === 'damage' && e.sourceId === rogue && e.school === 'physical'),
     ).toBe(true);
     expect(ev.some((e) => e.type === 'comboPoint' && e.pid === rogue && e.points === 0)).toBe(true);
-    // paladin judgement: a holy damage from the paladin (the Seal unleashed).
+    // paladin consecration: holy damage came from the Paladin.
     const paladin = rec.notes.paladinId as number;
     expect(
       ev.some((e) => e.type === 'damage' && e.sourceId === paladin && e.school === 'holy'),

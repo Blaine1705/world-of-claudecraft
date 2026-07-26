@@ -43,6 +43,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { isStunned } from './cc';
+import { tickPaladinOathChainPull } from './paladin_control';
 import { priestOnAuraEnded } from './priest/talents';
 import { preservesGloomtithe, vespersOnDotTick } from './priest/vespers';
 import { tickMendingCurrent } from './shaman_spiritmend';
@@ -247,7 +248,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
   for (let i = snapshot.length - 1; i >= 0; i--) {
     const a = snapshot[i];
     if (!e.auras.includes(a)) continue; // removed by an earlier entry's side effect this tick
+    tickPaladinOathChainPull(ctx, e, a);
+    // A permanent aura (the paladin's Devotion auras) has no timer to run down.
     if (
+      !a.permanent &&
       !isPersistentEngineAura(a.id) &&
       (a.kind !== 'gloomtithe' || !preservesGloomtithe(ctx, e.id))
     ) {
@@ -289,7 +293,15 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             a.name,
             'hit',
             true,
-            dotSource ? { mult: stoneboundThreatMultiplier(ctx, dotSource) } : undefined,
+            // The source's Stonebound posture and the aura's own authored threat
+            // multiplier are independent, so a DoT carrying both applies both.
+            dotSource || a.threatMult !== undefined
+              ? {
+                  mult:
+                    (dotSource ? stoneboundThreatMultiplier(ctx, dotSource) : 1) *
+                    (a.threatMult ?? 1),
+                }
+              : undefined,
             // Periodic (DoT) ticks are not a direct attack: they must not walk a
             // mob's leash anchor, so a DoT-kited mob still leashes home.
             false,
@@ -335,13 +347,15 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             const src = ctx.entities.get(a.sourceId);
             if (src) ctx.healingThreat(src, e, healed);
           }
+        } else if (a.kind === 'buff_mana_grace' && e.resourceType === 'mana') {
+          e.resource = Math.min(e.maxResource, e.resource + Math.round(a.value));
         } else if (a.kind === 'polymorph') {
           const heal = Math.round(e.maxHp * 0.1);
           e.hp = Math.min(e.maxHp, e.hp + heal);
         }
       }
     }
-    if (a.remaining <= CAST_COMPLETE_EPS) {
+    if (!a.permanent && a.remaining <= CAST_COMPLETE_EPS) {
       // `i` indexes the snapshot, which no longer matches e.auras once a mid-tick
       // removal has shifted it, so splice the aura's actual live position. The
       // guard covers the one remaining self-removal window (an aura whose OWN

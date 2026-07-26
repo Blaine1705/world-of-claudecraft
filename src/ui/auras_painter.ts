@@ -67,6 +67,7 @@ const DUP_KEY_SEP = '#';
 const STACKS_SHOWN = '';
 const STACKS_HIDDEN = 'none';
 const ALWAYS_VISIBLE_AURA_IDS: ReadonlySet<string> = new Set([
+  'divine_ascension',
   'shaman_thunder_charges',
   'shaman_warspirit_cadence',
 ]);
@@ -178,6 +179,8 @@ export class AurasPainter {
     let rendered = 0;
     for (let i = 0; i < count; i++) {
       const s = slots[i];
+      // Never a debuff, and never an id on the always-visible list (Divine Ascension
+      // joined it from #2428): shed ordinary buff overflow only.
       if (!s.isDebuff && rendered >= cap && !ALWAYS_VISIBLE_AURA_IDS.has(s.key)) continue;
       rendered++;
       // Resolve the pool key. The common case (a unique aura id this frame) takes the

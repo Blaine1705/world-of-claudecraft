@@ -267,51 +267,6 @@ describe('auto_attack meleeSwing: landed talent procs resolve before retaliation
     expect(draws).toHaveLength(3);
   });
 
-  it.each([
-    {
-      name: 'Oathwheel cooldown refund',
-      cls: 'paladin' as const,
-      row: { 14: 'pal_r14_righteous_cause' },
-      prepare: (player: Entity) => player.cooldowns.set('judgement', 5),
-      read: (player: Entity) => player.cooldowns.get('judgement'),
-      expected: 4.5,
-    },
-  ])('applies $name before thorns without changing the shared RNG trace', (testCase) => {
-    const run = (active: boolean) => {
-      const { sim, p } = makeSim(testCase.cls, 20, 26014);
-      if (active) {
-        expect(sim.applyTalents({ spec: null, rows: testCase.row })).toBe(true);
-      }
-      const mob = spawnDummy(sim, p, 1);
-      addImbue(p);
-      addThorns(mob, 1);
-      p.mainhandItemId = null;
-      testCase.prepare(p);
-      let valueAtRetaliation: unknown;
-      const dealDamage = sim.ctx.dealDamage;
-      sim.ctx.dealDamage = ((source: Entity | null, target: Entity, ...args: unknown[]) => {
-        if (source?.id === mob.id && target.id === p.id && args[3] === 'Punishing Thorns') {
-          valueAtRetaliation = testCase.read(p);
-        }
-        return (dealDamage as (...callArgs: unknown[]) => unknown)(source, target, ...args);
-      }) as typeof sim.ctx.dealDamage;
-      const draws: number[] = [];
-      sim.rng.setObserver((value: number) => draws.push(value));
-
-      const connected = meleeSwing(sim.ctx, p, mob, 0, null, { cannotBeDodged: true });
-      sim.rng.setObserver(null);
-
-      expect(connected).toBe(true);
-      return { draws, valueAtRetaliation };
-    };
-
-    const baseline = run(false);
-    const active = run(true);
-    expect(active.valueAtRetaliation).toBe(testCase.expected);
-    expect(active.draws).toEqual(baseline.draws);
-    expect(active.draws).toHaveLength(3);
-  });
-
   it('Venom Dividend rolls its chance before thorns and pays only on success', () => {
     // Balance pass: the flat 5-per-swing became the Combat Potency shape (20%
     // chance for 10 energy), so the proc now draws exactly one rng roll per

@@ -33,6 +33,7 @@ const entrySource = `
   export { DELVE_COMPANIONS, DELVE_AFFIXES } from './src/sim/content/delves/index.ts';
   export { DEEDS, DEED_ORDER } from './src/sim/content/deeds.ts';
   export { DEED_IMAGE_IDS } from './src/ui/deed_image_ids.ts';
+  export { guideStrings } from './src/ui/i18n.catalog/guide.ts';
   export { VISUALS, visualKeyFor } from './src/render/characters/manifest.ts';
   export {
     CRAFT_RING, STATIONS, STATION_TYPE_BY_CRAFT, STATION_RADIUS, PERK_THRESHOLDS,
@@ -112,6 +113,7 @@ const {
   DEEDS,
   DEED_ORDER,
   DEED_IMAGE_IDS,
+  guideStrings,
   VISUALS,
   visualKeyFor,
   FISHING_SESSION_CAP_SEC,
@@ -222,10 +224,6 @@ function tintFor(visualKey, entityColor) {
 const playerVisualKey = (id) => visualKeyFor({ kind: 'player', templateId: id });
 const mobVisualKey = (id) => visualKeyFor({ kind: 'mob', templateId: id });
 
-// How many early, spoiler-safe abilities lead the "signature kit". The full kit
-// (allAbilities) follows so every class icon is showcased.
-const SIGNATURE_COUNT = 6;
-
 const classes = ALL_CLASSES.map((id) => {
   const def = CLASSES[id];
   const specDefs = TALENTS[id]?.specs ?? [];
@@ -238,7 +236,10 @@ const classes = ALL_CLASSES.map((id) => {
     signature: s.signature,
   }));
   const roles = ROLE_ORDER.filter((r) => specs.some((s) => s.role === r));
-  const kit = def.abilities ?? [];
+  const kit = (def.abilities ?? []).filter((abilityId) => {
+    const ability = ABILITIES[abilityId];
+    return ability && ability.hiddenFromPlayer !== true;
+  });
   // The class preview uses the same model + white tint the in-game character creator does.
   const vk = playerVisualKey(id);
   const tint = tintFor(vk, 0xffffff);
@@ -250,7 +251,10 @@ const classes = ALL_CLASSES.map((id) => {
     resource: def.resourceType,
     roles,
     specs,
-    signatureAbilities: kit.slice(0, SIGNATURE_COUNT).map(abilityRef),
+    signatureAbilities: kit
+      .filter((abilityId) => guideStrings.abilityHook[abilityId] !== undefined)
+      .slice(0, 6)
+      .map(abilityRef),
     abilities: kit.map(abilityRef),
     model,
     ...(tintHex != null ? { tint: tintHex } : {}),

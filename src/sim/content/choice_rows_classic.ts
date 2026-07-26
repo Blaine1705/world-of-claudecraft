@@ -266,246 +266,212 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
   rows: [
     {
       level: 5,
-      theme: 'holy_tempo',
-      decision: 'Verdict-fed mana vs mobile Mending Light vs Verdict-Rite resets',
+      theme: 'mobility',
+      decision: 'speed after Hammer of Grace vs a stronger Solar Step vs Devotion-driven speed',
       options: [
         {
-          id: 'pal_r5_crusaders_zeal',
-          name: 'Oath Returned',
-          description: 'Verdict restores 25 mana when cast.',
-          icon: 'judgement',
+          id: 'pal_r5_radiant_stride',
+          name: 'Radiant Stride',
+          description: 'Hammer of Grace grants 30% movement speed for 4 sec when it deals damage.',
+          icon: 'pal_r5_radiant_stride',
+          effect: { global: { paladinRadiantStride: 0.3 } },
+        },
+        {
+          id: 'pal_r5_steadfast_step',
+          name: 'Steadfast Step',
+          description: 'Solar Step lasts 2 sec longer and makes you immune to slows while active.',
+          icon: 'pal_r5_steadfast_step',
           effect: {
-            proc: {
-              id: 'pal_oath_returned',
-              name: 'Oath Returned',
-              trigger: { on: 'castNth', n: 1, abilities: ['judgement'] },
-              responses: [{ kind: 'resource', amount: 25, resourceType: 'mana' }],
-            },
+            ability: [
+              {
+                ability: 'solar_step',
+                durationFlat: 2,
+                addEffects: [{ type: 'selfBuff', kind: 'slow_immunity', value: 1, duration: 2 }],
+              },
+            ],
           },
         },
         {
-          id: 'pal_r5_blessed_momentum',
-          name: "Pilgrim's Light",
-          description: 'Mending Light is castable while moving.',
-          icon: 'holy_light',
-          effect: { ability: [{ ability: 'holy_light', castWhileMoving: true }] },
-        },
-        {
-          id: 'pal_r5_vengeful_exorcism',
-          name: 'Ashen Sentence',
+          id: 'pal_r5_divine_steed',
+          name: 'Divine Steed',
           description:
-            'Rite of Expulsion deals 25% more damage, costs 25% less, and Verdict resets its cooldown.',
-          icon: 'exorcism',
+            'Gain 0.75% movement speed per Devotion, up to 15% at 20. Activating Divine Ascension spends your Devotion and grants 30% movement speed for 5 sec.',
+          icon: 'pal_r5_divine_steed',
           effect: {
-            ability: [{ ability: 'exorcism', dmgPct: 0.25, costPct: -0.25 }],
-            proc: {
-              id: 'pal_vengeful_exorcism',
-              name: 'Vengeful Exorcism',
-              trigger: { on: 'castNth', n: 1, abilities: ['judgement'] },
-              responses: [{ kind: 'cooldownRefund', ability: 'exorcism', seconds: 'reset' }],
-            },
+            global: { paladinDivineSteed: 0.15, paladinDivineSteedBurstPct: 0.3 },
           },
         },
       ],
     },
     {
       level: 8,
-      theme: 'justice',
-      decision: 'ally dispel vs banked stuns vs Holy Ground lockdown',
+      theme: 'survival',
+      decision: 'a stronger personal ward vs a stronger emergency heal vs shielding overhealing',
       options: [
         {
-          id: 'pal_r8_cleansing_verdict',
-          name: 'Cleansing Verdict',
-          description:
-            'Grants Cleansing Verdict: purge a harmful magic effect off an ally and heal them.',
-          icon: 'cleansing_verdict',
-          effect: { grant: { ability: 'cleansing_verdict' } },
-        },
-        {
-          id: 'pal_r8_fist_of_justice',
-          name: 'Twin Gavels',
-          description: 'Sundering Gavel stores 2 uses.',
-          icon: 'hammer_of_justice',
-          effect: { ability: [{ ability: 'hammer_of_justice', bonusCharges: 1 }] },
-        },
-        {
-          id: 'pal_r8_consecrated_ground',
-          name: 'Hallowed Snare',
-          description: 'Holy Ground also roots enemies within 8 yd for 2 sec.',
-          icon: 'consecration',
+          id: 'pal_r8_enduring_protection',
+          name: 'Enduring Protection',
+          description: 'Ward of Faith absorbs 50% more damage and lasts 5 sec longer.',
+          icon: 'pal_r8_enduring_protection',
           effect: {
-            ability: [
-              {
-                ability: 'consecration',
-                addEffects: [{ type: 'aoeRoot', duration: 2, radius: 8, min: 0, max: 0 }],
-              },
-            ],
+            ability: [{ ability: 'divine_protection', dmgPct: 0.5, durationFlat: 5 }],
           },
+        },
+        {
+          id: 'pal_r8_steady_hands',
+          name: 'Steady Hands',
+          description:
+            'Last Rite recharges 30% faster and heals the target for another 30% of its direct healing over 6 sec.',
+          icon: 'pal_r8_steady_hands',
+          effect: {
+            ability: [{ ability: 'lay_on_hands', cooldownPct: -0.3 }],
+            global: { paladinSteadyHandsHotPct: 0.3 },
+          },
+        },
+        {
+          id: 'pal_r8_recurring_grace',
+          name: 'Recurring Grace',
+          description:
+            'Hammer of Grace overhealing becomes an absorb shield for 10 sec, capped at 10% of your maximum health.',
+          icon: 'pal_r8_recurring_grace',
+          effect: { global: { paladinRecurringGrace: 0.1 } },
         },
       ],
     },
     {
       level: 11,
-      theme: 'devotion',
-      decision: 'healing cadence vs shield-to-emergency reset vs critical-heal wards',
+      theme: 'control',
+      decision: 'a shorter stun cooldown vs two stored stuns vs a ranged slow',
       options: [
         {
-          id: 'pal_r11_divine_wisdom',
-          name: 'Third Benediction',
-          description:
-            'Every 3rd Mending Light or Lightmend makes your next Mending Light within 10 sec instant.',
-          icon: 'flash_of_light',
-          effect: {
-            proc: {
-              id: 'pal_divine_wisdom',
-              name: 'Third Benediction',
-              trigger: { on: 'castNth', n: 3, abilities: ['holy_light', 'flash_of_light'] },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_instant',
-                  abilities: ['holy_light'],
-                  duration: 10,
-                },
-              ],
-            },
-          },
+          id: 'pal_r11_fist_of_justice',
+          name: 'Fist of Justice',
+          description: "Sundering Gavel's cooldown is reduced by 25%.",
+          icon: 'pal_r11_fist_of_justice',
+          effect: { ability: [{ ability: 'hammer_of_justice', cooldownPct: -0.25 }] },
         },
         {
-          id: 'pal_r11_guardians_favor',
-          name: 'Mercy from Ruin',
-          description:
-            "When Ward of Faith is fully consumed, it shaves 120 sec off Last Rite's cooldown.",
-          icon: 'divine_protection',
-          effect: {
-            proc: {
-              id: 'pal_guardians_favor',
-              name: 'Mercy from Ruin',
-              trigger: { on: 'shieldConsumed', ability: 'divine_protection' },
-              responses: [{ kind: 'cooldownRefund', ability: 'lay_on_hands', seconds: 120 }],
-            },
-          },
+          id: 'pal_r11_double_sentence',
+          name: 'Double Sentence',
+          description: 'Sundering Gavel stores 2 uses.',
+          icon: 'pal_r11_double_sentence',
+          effect: { ability: [{ ability: 'hammer_of_justice', bonusCharges: 1 }] },
         },
         {
-          id: 'pal_r11_greater_blessing',
-          name: 'Afterglow Aegis',
-          description:
-            'Critical heals from Mending Light, Lightmend, and Last Rite also ward the target, absorbing 60 damage for 10 sec.',
-          icon: 'blessing_of_might',
+          id: 'pal_r11_radiant_shackles',
+          name: 'Radiant Shackles',
+          description: 'Hammer of Grace slows its target by 40% for 4 sec.',
+          icon: 'pal_r11_radiant_shackles',
           effect: {
-            proc: {
-              id: 'pal_greater_blessing',
-              name: 'Greater Blessing',
-              trigger: {
-                on: 'spellCrit',
-                abilities: ['holy_light', 'flash_of_light', 'lay_on_hands'],
+            ability: [
+              {
+                ability: 'hammer_of_grace',
+                addEffects: [{ type: 'slow', mult: 0.6, duration: 4 }],
               },
-              responses: [{ kind: 'absorb', amount: 60, duration: 10, name: 'Greater Blessing' }],
-            },
+            ],
           },
         },
       ],
     },
     {
       level: 14,
-      theme: 'reckoning',
-      decision: 'faster Verdicts vs area holy burst vs Oathbrand-fed Verdict tempo',
+      theme: 'devotion',
+      decision: 'extra generation cadence vs a post-Ascension reserve vs charge conservation',
       options: [
         {
-          // Balance pass (maintainer sheet): banked double Verdicts are out.
-          // The classic Improved Judgement shape instead.
-          id: 'pal_r14_swift_verdicts',
-          name: 'Swift Verdicts',
-          description: "Verdict's cooldown is reduced by 20%.",
-          icon: 'judgement',
-          effect: { ability: [{ ability: 'judgement', cooldownPct: -0.2 }] },
-        },
-        {
-          id: 'pal_r14_holy_wrath',
-          name: "Saint's Ire",
-          description: "Grants Saint's Ire.",
-          icon: 'holy_wrath',
-          effect: { grant: { ability: 'holy_wrath' } },
-        },
-        {
-          id: 'pal_r14_righteous_cause',
-          name: 'Oathwheel',
+          id: 'pal_r14_zeal',
+          name: 'Zeal',
           description:
-            'Landed melee attacks while your Oathbrand is active shave 0.5 sec off the cooldown of Verdict.',
-          icon: 'seal_of_righteousness',
-          effect: {
-            proc: {
-              id: 'pal_righteous_cause',
-              name: 'Righteous Cause',
-              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue' },
-              responses: [{ kind: 'cooldownRefund', ability: 'judgement', seconds: 0.5 }],
-            },
-          },
+            'Every third ability that actually generates Devotion grants 1 extra Devotion.',
+          icon: 'pal_r14_zeal',
+          effect: { global: { paladinZeal: 1 } },
+        },
+        {
+          id: 'pal_r14_sacred_reserve',
+          name: 'Sacred Reserve',
+          description: 'When Divine Ascension ends, regain 5 Devotion.',
+          icon: 'pal_r14_sacred_reserve',
+          effect: { global: { paladinSacredReserve: 5 } },
+        },
+        {
+          id: 'pal_r14_divine_purpose',
+          name: 'Divine Purpose',
+          description: 'Ascension-empowered abilities have a 20% chance not to consume a charge.',
+          icon: 'pal_r14_divine_purpose',
+          effect: { global: { paladinDivinePurposeChance: 0.2 } },
         },
       ],
     },
     {
       level: 17,
-      theme: 'sanctuary',
-      decision: 'personal bulwark vs ally emergency ward vs cheat death',
+      theme: 'dawn',
+      decision: 'more Ascension charges vs longer Avenging Wrath vs crit and haste during it',
       options: [
         {
-          id: 'pal_r17_divine_shield',
-          name: 'Lightward',
-          description: 'Grants Lightward.',
-          icon: 'divine_shield',
-          effect: { grant: { ability: 'divine_shield' } },
+          id: 'pal_r17_extended_dawn',
+          name: 'Extended Dawn',
+          description: 'Divine Ascension empowers 2 additional abilities.',
+          icon: 'pal_r17_extended_dawn',
+          effect: { global: { ascensionChargeBonus: 2 } },
         },
         {
-          id: 'pal_r17_sacred_ward',
-          name: "Rite's Afterglow",
+          id: 'pal_r17_radiant_wrath',
+          name: 'Radiant Wrath',
           description:
-            'Last Rite also wraps its target in a sacred ward absorbing 360 damage for 10 sec.',
-          icon: 'devotion_aura',
+            'Avenging Wrath lasts 5 sec longer (20 sec total) and its cooldown is reduced to 100 sec.',
+          icon: 'pal_r17_radiant_wrath',
           effect: {
-            ability: [
-              {
-                ability: 'lay_on_hands',
-                addEffects: [{ type: 'absorb', amount: 360, duration: 10 }],
-              },
-            ],
+            ability: [{ ability: 'avenging_wrath', cooldownFlat: -20, durationFlat: 5 }],
           },
         },
         {
-          id: 'pal_r17_ardent_defender',
-          name: 'Deathless Ardor',
-          description:
-            'A blow that would kill you leaves you at 1 health instead. Once every 180 sec.',
-          icon: 'divine_protection',
-          effect: { global: { cheatDeathIcd: 180 } },
+          id: 'pal_r17_sanctified_fervor',
+          name: 'Sanctified Fervor',
+          description: 'Avenging Wrath also grants 15% critical strike chance and 15% haste.',
+          icon: 'pal_r17_sanctified_fervor',
+          effect: {
+            ability: [
+              {
+                ability: 'avenging_wrath',
+                addEffects: [
+                  { type: 'selfBuff', kind: 'buff_crit', value: 0.15, duration: 15 },
+                  { type: 'selfBuff', kind: 'buff_haste', value: 1.15, duration: 15 },
+                  { type: 'selfBuff', kind: 'buff_spellhaste', value: 0.15, duration: 15 },
+                ],
+              },
+            ],
+          },
         },
       ],
     },
     {
       level: 20,
-      theme: 'holy_arsenal',
-      decision: 'self empowerment vs ranged execute vs silencing shield ricochet',
+      theme: 'capstone',
+      decision: 'empower active group auras vs direct-spell echoes vs a final solar burst',
       options: [
         {
-          id: 'pal_r20_avenging_wrath',
-          name: 'Wrathwing',
-          description: 'Grants Wrathwing.',
-          icon: 'avenging_wrath',
-          effect: { grant: { ability: 'avenging_wrath' } },
-        },
-        {
-          id: 'pal_r20_hammer_of_wrath',
-          name: 'Tolling Hammer',
-          description: 'Grants Tolling Hammer.',
-          icon: 'hammer_of_wrath',
-          effect: { grant: { ability: 'hammer_of_wrath' } },
-        },
-        {
           id: 'pal_r20_aura_mastery',
-          name: 'Dawnward Ricochet',
-          description: 'Grants Dawnward Ricochet.',
-          icon: 'holy_shield',
-          effect: { grant: { ability: 'aura_surge' } },
+          name: 'Sacred Concord',
+          description:
+            'For 8 sec, empower every active Devotion and Requital Aura in your group. Devotion reduces damage by 15%; Requital deals 15 Holy damage. 120 sec cooldown. Multiple uses refresh instead of stacking.',
+          icon: 'pal_r20_aura_mastery',
+          effect: { grant: { ability: 'aura_mastery' } },
+        },
+        {
+          id: 'pal_r20_dawn_echo',
+          name: 'Dawn Echo',
+          description:
+            'Every third direct ability that actually generates Devotion repeats its primary direct damage or healing at 40% on the same target. An effective echo grants 1 Devotion. The echo cannot crit or trigger other echoes, and grants no Devotion during Divine Ascension.',
+          icon: 'pal_r20_dawn_echo',
+          effect: { global: { paladinDawnEcho: 0.4, paladinDawnEchoDevotion: 1 } },
+        },
+        {
+          id: 'pal_r20_perpetual_sun',
+          name: 'Perpetual Sun',
+          description:
+            'Consuming your last Ascension charge deals 150 Holy damage within 10 m, heals allies within 20 m for 150, then doubles ability Devotion generation for 5 sec. Expiration does not trigger it.',
+          icon: 'pal_r20_perpetual_sun',
+          effect: { global: { paladinPerpetualSun: 150 } },
         },
       ],
     },

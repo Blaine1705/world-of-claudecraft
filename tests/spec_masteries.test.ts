@@ -103,9 +103,13 @@ describe('spec masteries', () => {
   });
 
   it('authors the all-27 extension mastery effects exactly', () => {
+    // staPct carries the tank-parity floor that used to live in SPEC_BASELINES:
+    // an overhauled class keeps its passive floor on the mastery (see Recompense
+    // on the warrior), and without a stamina multiplier Faithwarden sat at 76% of
+    // the prot warrior's effective HP.
     expect(TALENTS.paladin?.specs.find((s) => s.id === 'protection')?.mastery.effect).toEqual({
       global: { threatPct: 0.5 },
-      stats: { armorPct: 0.2 },
+      stats: { armorPct: 0.2, staPct: 0.35 },
     });
     expect(TALENTS.paladin?.specs.find((s) => s.id === 'retribution')?.mastery.effect).toEqual({
       global: { meleeDmgPct: 0.2, spellDmgPct: 0.2 },

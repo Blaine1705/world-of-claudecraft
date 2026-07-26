@@ -192,60 +192,31 @@ describe('shaman redesign', () => {
 });
 
 describe('paladin redesign', () => {
-  it('Vengeful Exorcism: Verdict resets the Rite of Expulsion cooldown', () => {
-    const { sim, p } = rig('paladin', 20, { 5: 'pal_r5_vengeful_exorcism' });
-    addTargetMob(sim, 100000, 8);
-    castAndSettle(sim, 'exorcism', 2);
-    expect(p.cooldowns.get('exorcism')).toBeGreaterThan(0);
-    castAndSettle(sim, 'seal_of_righteousness', 2);
-    castAndSettle(sim, 'judgement', 2);
-    expect(p.cooldowns.has('exorcism')).toBe(false);
+  it('Extended Dawn: Divine Ascension gains 2 additional charges', () => {
+    const { sim, p } = rig('paladin', 20, { 17: 'pal_r17_extended_dawn' });
+    if (!p.paladinDevotion) throw new Error('no devotion');
+    p.paladinDevotion.value = 20;
+    sim.castAbility('divine_ascension');
+    expect(p.paladinDevotion.ascensionCharges).toBe(7); // 5 base + 2
   });
 
-  it('Righteous Cause: swings under an active Oathbrand shave the Verdict cooldown', () => {
-    const { sim, p } = rig('paladin', 20, { 14: 'pal_r14_righteous_cause' });
-    addTargetMob(sim);
-    castAndSettle(sim, 'seal_of_righteousness', 2);
-    castAndSettle(sim, 'judgement', 2);
-    castAndSettle(sim, 'seal_of_righteousness', 2); // judgement consumed the seal; re-brand
-    const before = p.cooldowns.get('judgement');
-    expect(before).toBeGreaterThan(0);
-    sim.startAutoAttack();
-    let swings = 0;
-    for (let i = 0; i < 20 * 10 && swings === 0; i++) {
-      for (const ev of sim.tick()) {
-        if (ev.type === 'damage' && ev.sourceId === p.id && ev.school === 'physical') swings++;
-      }
-    }
-    expect(swings).toBeGreaterThan(0);
-    expect(p.cooldowns.get('judgement') ?? 0).toBeLessThan(before! - 0.5);
+  it('Divine Steed: activating Divine Ascension grants a movement-speed burst', () => {
+    const { sim, p } = rig('paladin', 20, { 5: 'pal_r5_divine_steed' });
+    if (!p.paladinDevotion) throw new Error('no devotion');
+    p.paladinDevotion.value = 20;
+    sim.castAbility('divine_ascension');
+    expect(p.auras.some((a) => a.kind === 'buff_speed' && a.id === 'divine_steed_burst')).toBe(
+      true,
+    );
   });
 
-  it('Deathless Ardor: a killing blow leaves 1 health, once per 180 sec', () => {
-    const { sim, p } = rig('paladin', 20, { 17: 'pal_r17_ardent_defender' });
-    const deal = (
-      sim as unknown as {
-        dealDamage(
-          s: Entity | null,
-          t: Entity,
-          n: number,
-          c: boolean,
-          sc: string,
-          a: string | null,
-          k: string,
-        ): void;
-      }
-    ).dealDamage.bind(sim);
-    deal(null, p, p.hp + 500, false, 'physical', null, 'hit');
-    expect(p.dead).toBe(false);
-    expect(p.hp).toBe(1);
-    deal(null, p, 50, false, 'physical', null, 'hit'); // inside the ICD: dies
-    expect(p.dead).toBe(true);
+  it('Sanctified Fervor: Avenging Wrath grants critical strike and both haste channels', () => {
+    const { sim, p } = rig('paladin', 20, { 17: 'pal_r17_sanctified_fervor' });
+    sim.castAbility('avenging_wrath');
+    expect(p.auras.some((a) => a.kind === 'buff_crit' && a.value === 0.15)).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'buff_haste' && a.value === 1.15)).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'buff_spellhaste' && a.value === 0.15)).toBe(true);
   });
-
-  // The #1756 choice pass redesigned aura_surge from the Radiant Swell armor
-  // buff into Dawnward Ricochet (chain damage + silence); the new behavior is
-  // pinned end to end in talent_retained_semantics_v026.test.ts.
 
   it('replay determinism: the proc-heavy priest run is bit-identical', () => {
     const run = () => {

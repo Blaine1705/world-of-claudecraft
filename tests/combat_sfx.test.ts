@@ -253,6 +253,36 @@ describe('combat SFX policy', () => {
     ).toEqual({ key: 'spell_nova', anchorId: 20 });
   });
 
+  it('gives each empowered Ascension impact a distinct sampled cue', () => {
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'holy',
+        fx: 'paladinAscensionStart',
+      }),
+    ).toBeNull();
+    for (const [impact, key, anchorId] of [
+      ['offensive', 'wand_holy', 20],
+      ['area', 'proj_holy', 10],
+      ['defensive', 'combat_block', 20],
+      ['healing', 'cast_chain_heal', 20],
+    ] as const) {
+      expect(
+        spellFxCue({
+          type: 'spellfx',
+          sourceId: 10,
+          targetId: 20,
+          school: 'holy',
+          fx: 'paladinAscensionImpact',
+          impact,
+        }),
+      ).toEqual({ key, anchorId });
+      expect(key in SFX_CLIPS).toBe(true);
+    }
+  });
+
   it('uses explicit cast and impact school maps', () => {
     expect(castCueForAbility('fireball')).toBe('cast_fire');
     expect(castCueForAbility('lightning_bolt')).toBe('cast_lightning_bolt');
@@ -384,6 +414,9 @@ describe('combat SFX policy', () => {
     expect(auraApplyCue(gained, aura('buff_ap'))).toBe('buff_apply');
     expect(auraApplyCue(gained, aura('dot'))).toBe('debuff_apply');
     expect(auraApplyCue(gained, aura('buff_ap', -5))).toBe('debuff_apply');
+    for (const id of ['divine_ascension', 'dawns_path_speed', 'aegis_of_devotion_dr']) {
+      expect(auraApplyCue(gained, { ...aura('buff_ap', 5), id })).toBeNull();
+    }
     expect(auraApplyCue({ ...gained, gained: false }, aura('dot'))).toBeNull();
     expect(auraApplyCue(gained, null)).toBeNull();
   });

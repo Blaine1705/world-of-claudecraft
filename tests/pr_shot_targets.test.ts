@@ -32,8 +32,9 @@ describe('classifyDiff', () => {
     const plan = classifyDiff(['tests/tank_defensive_cds.test.ts']);
     expect(plan.isVisual).toBe(true);
     expect(plan.specific.map((t: { key: string }) => t.key)).toEqual(['tank-defensive-cds']);
-    // paladin-desktop, druid-desktop, paladin-mobile.
-    expect(plan.specific[0].variants).toHaveLength(3);
+    // paladin-desktop, druid-desktop, paladin-mobile, paladin-retribution-desktop:
+    // the target widened past the tank when Dawnreaver grew Debt of Light.
+    expect(plan.specific[0].variants).toHaveLength(4);
   });
 
   it('maps a zone/terrain change to the world-map target', () => {

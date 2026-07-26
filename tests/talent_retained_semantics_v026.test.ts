@@ -13,7 +13,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import type { PlayerMeta, ResolvedAbility } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { AbilityEffect, Entity, PlayerClass, SimEvent } from '../src/sim/types';
+import type { AbilityEffect, Entity, PlayerClass } from '../src/sim/types';
 
 type TestSim = Sim & {
   nextId: number;
@@ -38,26 +38,6 @@ function spawnTarget(sim: TestSim, player: Entity, distance = 12): Entity {
   sim.addEntity(target);
   player.facing = Math.atan2(target.pos.x - player.pos.x, target.pos.z - player.pos.z);
   sim.targetEntity(target.id, player.id);
-  return target;
-}
-
-function spawnTargetAt(
-  sim: TestSim,
-  player: Entity,
-  id: number,
-  xOffset: number,
-  zOffset: number,
-): Entity {
-  const target = createMob(id, MOBS.forest_wolf, 1, {
-    x: player.pos.x + xOffset,
-    y: player.pos.y,
-    z: player.pos.z + zOffset,
-  });
-  target.maxHp = 50_000;
-  target.hp = target.maxHp;
-  target.hostile = true;
-  target.aiState = 'idle';
-  sim.addEntity(target);
   return target;
 }
 
@@ -91,20 +71,12 @@ function effect<T extends AbilityEffect['type']>(
 }
 
 describe('retained v0.26 all-class Talents V2 semantics', () => {
-  it('resolves the retained Twin Verdicts, Bruin Rebound, and Warlock content values', () => {
+  it('resolves the retained Bruin Rebound and Warlock content values', () => {
     const rowOption = (cls: PlayerClass, id: string) => {
       const option = ROW_TREES[cls].flatMap((row) => row.options).find((o) => o.id === id);
       if (!option) throw new Error(`missing row option ${cls}:${id}`);
       return option;
     };
-
-    // Balance pass: Swift Verdicts is a cooldown cut (10 -> 8 sec), not
-    // banked charges.
-    expect(rowOption('paladin', 'pal_r14_swift_verdicts').name).toBe('Swift Verdicts');
-    const verdict = resolved('paladin', 'judgement', { 14: 'pal_r14_swift_verdicts' });
-    expect(verdict).toMatchObject({ cost: 30 });
-    expect(verdict.cooldown).toBeCloseTo(8);
-    expect(verdict.bonusCharges ?? 0).toBe(0);
 
     const bruin = rowOption('druid', 'dru_r8_brutal_bash');
     expect(bruin.name).toBe('Bruin Rebound');
@@ -243,10 +215,7 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     expect(target.auras.some((aura) => aura.id === 'fear_incap')).toBe(false);
   });
 
-  it.each([
-    ['paladin', 17, 'pal_r17_ardent_defender', 180],
-    ['rogue', 17, 'rog_r17_cheat_death', 120],
-  ] as const)(
+  it.each([['rogue', 17, 'rog_r17_cheat_death', 120]] as const)(
     '%s cheat death saves once, honors its %d-row ICD, and rearms deterministically',
     (cls, level, optionId, icd) => {
       const selectedSim = () => {
@@ -290,32 +259,5 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
 
     expect(player.hp).toBe(0);
     expect(player.dead).toBe(true);
-  });
-
-  it('Dawnward Ricochet damages and silences its primary before deterministic falloff bounces', () => {
-    const sim = harness(new Sim({ seed: 2617, playerClass: 'paladin', autoEquip: false }));
-    sim.setPlayerLevel(20);
-    expect(sim.selectTalentRow(20, 'pal_r20_aura_mastery')).toBe(true);
-    const player = sim.player;
-    const primary = spawnTargetAt(sim, player, 9200, 3, 0);
-    // Insert the higher id first; equal-distance ties must still choose the lower id.
-    const tiedHigh = spawnTargetAt(sim, player, 9102, 3, 4);
-    const tiedLow = spawnTargetAt(sim, player, 9101, 7, 0);
-    const untouched = spawnTargetAt(sim, player, 9103, 13, 0);
-    const ricochet = sim.resolvedAbility('aura_surge');
-    if (!ricochet) throw new Error('missing Dawnward Ricochet');
-    sim.events = [];
-
-    runEffects(sim.ctx, player, metaOf(sim), primary, ricochet);
-
-    const damage = sim.events.filter(
-      (event): event is Extract<SimEvent, { type: 'damage' }> =>
-        event.type === 'damage' && event.ability === ricochet.def.name,
-    );
-    expect(damage.map((event) => event.targetId)).toEqual([primary.id, tiedLow.id, tiedHigh.id]);
-    expect(damage[1]?.amount).toBe(Math.max(1, Math.round((damage[0]?.amount ?? 0) * 0.75)));
-    expect(damage[2]?.amount).toBe(Math.max(1, Math.round((damage[0]?.amount ?? 0) * 0.75 ** 2)));
-    expect(primary.auras.some((aura) => aura.kind === 'silence')).toBe(true);
-    expect(untouched.hp).toBe(untouched.maxHp);
   });
 });

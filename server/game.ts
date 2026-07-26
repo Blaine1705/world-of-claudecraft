@@ -822,6 +822,7 @@ export interface AdminLiveAura {
   value: number;
   remaining: number;
   duration: number;
+  permanent?: boolean;
 }
 
 export interface AdminLiveLocation {
@@ -870,6 +871,7 @@ interface WireAura {
   kind: string;
   rem: number;
   dur: number;
+  perm?: 1;
   // The aura's magnitude, so buff/debuff hover tooltips show the REAL numbers online, exactly
   // as offline (the descriptor in src/ui/aura_effect.ts reads value per kind: flat stat amount,
   // slow/haste multiplier, dot/hot per-tick, absorb remaining, ...). Sent RAW (like `dur`, not
@@ -877,7 +879,7 @@ interface WireAura {
   // into -0 -> 0 and flip a stat-sap's isAuraDebuff classification. Omitted only when exactly 0,
   // which decodes back to 0, so value-less auras and an old server are unchanged.
   value?: number;
-  // imbue judgement min/max bonus-damage range (aura_effect imbueRange); only imbue sets these.
+  // Optional secondary/tertiary aura values; only effect kinds that define them set these.
   value2?: number;
   value3?: number;
   // dot/hot tick cadence in seconds, so the tooltip's "every N sec" is right online.
@@ -1007,14 +1009,21 @@ function chatSenderFlair(flair: AccountFlair): ChatSenderFlair | undefined {
 // result), so at raid-sized entity/aura counts and 20 Hz the spread form was a
 // measurable source of short-lived garbage. Output is byte-identical to the
 // prior spread chain; only the allocation shape changed.
+// A pre-v3 recipient ignores `perm`. Give it a large finite timer that is
+// refreshed by ordinary legacy aura snapshots, so rolling deploys keep the
+// aura visible instead of decoding the v3 sentinel as already expired.
+const LEGACY_PERMANENT_AURA_SECONDS = 7 * 24 * 60 * 60;
+
 function wireAura(a: Aura): WireAura {
+  const permanent = a.permanent === true;
   const w: WireAura = {
     id: a.id,
     name: a.name,
     kind: a.kind,
-    rem: round2(a.remaining),
-    dur: a.duration,
+    rem: permanent ? LEGACY_PERMANENT_AURA_SECONDS : round2(a.remaining),
+    dur: permanent ? LEGACY_PERMANENT_AURA_SECONDS : a.duration,
   };
+  if (permanent) w.perm = 1;
   // Carry the aura's magnitude so buff/debuff hover tooltips show the real numbers online,
   // not 0 (the descriptor in src/ui/aura_effect.ts reads value per kind). Sent RAW (like
   // `dur`, not round2) so the exact number and its sign survive JSON, keeping a negative
@@ -1023,7 +1032,7 @@ function wireAura(a: Aura): WireAura {
   // an old server are unchanged. A hover tooltip magnitude is non-actionable cosmetic text,
   // so sending it cannot let a graphics preset hide anything (graphics-settings fairness).
   if (a.value !== 0) w.value = a.value;
-  // imbue judgement min/max range; dot/hot tick cadence; non-physical school. Each rides
+  // Secondary/tertiary aura values; dot/hot tick cadence; non-physical school. Each rides
   // only when it carries meaning, so ordinary auras stay lean and decode to their defaults.
   if (a.value2 !== undefined) w.value2 = a.value2;
   if (a.value3 !== undefined) w.value3 = a.value3;
@@ -1107,6 +1116,12 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     if (e.petAutoWaterJet) out.pw = 1;
   }
   if (e.rangedPower) out.rp = e.rangedPower;
+  // Remote Paladins need the compact active-charge count so every client can
+  // render Ascension's orbiting seals. Self snapshots additionally carry pdev
+  // with the exact Devotion value and remaining duration for the local HUD.
+  if (e.kind === 'player' && e.templateId === 'paladin') {
+    out.pasc = e.paladinDevotion?.ascensionCharges ?? 0;
+  }
   // top hate-table entries so the party threat meter shows real numbers
   if (e.kind === 'mob' && !e.dead && e.threat.size > 0) out.thr = threatEntries(e, 8);
   if (includeAuras && e.auras.length > 0) {
@@ -3684,8 +3699,9 @@ export class GameServer {
           name: a.name,
           kind: a.kind,
           value: a.value,
-          remaining: round2(a.remaining),
-          duration: a.duration,
+          remaining: a.permanent ? 0 : round2(a.remaining),
+          duration: a.permanent ? 0 : a.duration,
+          permanent: a.permanent,
         })),
       });
     }
@@ -5380,6 +5396,7 @@ export class GameServer {
     const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}${tickHzJson}`;
     const activeFrostRings = this.sim.activeFrostRings;
     const activeTemporalHourglasses = this.sim.activeTemporalHourglasses;
+    const activeConsecrations = this.sim.activeConsecrations;
     // Resolve every live session's interest anchor up front, each inside its own
     // guard so a throw building one anchor cannot starve every other session's
     // snapshot this tick (server/CLAUDE.md, guarded_iter.ts). Positions are read
@@ -5561,10 +5578,23 @@ export class GameServer {
           );
         const temporalHourglassesJson =
           temporalHourglasses.length > 0 ? `,"hourglasses":[${temporalHourglasses.join(',')}]` : '';
+        const consecrations = activeConsecrations
+          .filter((consecration) => {
+            const dx = consecration.x - anchorEntity.pos.x;
+            const dz = consecration.z - anchorEntity.pos.z;
+            const limit = INTEREST_QUERY_RADIUS + consecration.radius;
+            return dx * dx + dz * dz <= limit * limit;
+          })
+          .map(
+            (consecration) =>
+              `{"id":${JSON.stringify(consecration.id)},"x":${round2(consecration.x)},"z":${round2(consecration.z)},"r":${round2(consecration.radius)},"dur":${round2(consecration.duration)},"rem":${round2(consecration.remaining)}}`,
+          );
+        const consecrationsJson =
+          consecrations.length > 0 ? `,"consecrations":[${consecrations.join(',')}]` : '';
         const timerWireJson = stableTimerWire ? `,"tw":${STABLE_TIMER_WIRE_VERSION}` : '';
         this.sendRaw(
           session,
-          `${head}${timerWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${keepJson}}`,
+          `${head}${timerWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${consecrationsJson}${keepJson}}`,
         );
       },
       (err, resolved) =>
@@ -5716,6 +5746,13 @@ export class GameServer {
       pcd: round2(p.potionCdRemaining),
       swing: round2(p.swingTimer),
       combo: p.comboPoints,
+      pdev: p.paladinDevotion
+        ? {
+            value: p.paladinDevotion.value,
+            charges: p.paladinDevotion.ascensionCharges,
+            remaining: round2(p.paladinDevotion.ascensionRemaining),
+          }
+        : null,
       target: p.targetId,
       auto: p.autoAttack,
       queued: p.queuedOnSwing,

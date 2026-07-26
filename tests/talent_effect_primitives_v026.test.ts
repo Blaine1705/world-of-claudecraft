@@ -84,7 +84,7 @@ describe('Talents V2 dispel and steal primitives', () => {
     sim.ctx.applyAura(ally, aura(sim.player, 'physical_bleed', 'dot', 4, 'physical'));
     expect(ally.stats.int).toBe(baseInt - 5);
 
-    runAbilityEffect(sim, ally, 'cleansing_verdict');
+    runAbilityEffect(sim, ally, 'voidfeast');
 
     expect(ally.auras.some((entry) => entry.id === 'magic_int_drain')).toBe(false);
     expect(ally.auras.some((entry) => entry.id === 'physical_bleed')).toBe(true);
@@ -105,6 +105,21 @@ describe('Talents V2 dispel and steal primitives', () => {
     expect(enemy.auras.some((entry) => entry.id === 'magic_curse')).toBe(true);
     const stolen = sim.player.auras.find((entry) => entry.id === 'magic_blessing');
     expect(stolen?.sourceId).toBe(sim.player.id);
+  });
+
+  it('does not steal permanent stance-style magic auras', () => {
+    const sim = new Sim({ seed: 21, playerClass: 'mage', autoEquip: true });
+    const enemy = addHostile(sim);
+    const permanent = aura(enemy, 'devotion_ward', 'buff_dr', 0.05, 'holy');
+    permanent.remaining = Number.POSITIVE_INFINITY;
+    permanent.duration = Number.POSITIVE_INFINITY;
+    permanent.permanent = true;
+    enemy.auras.push(permanent);
+
+    runAbilityEffect(sim, enemy, 'spellsteal');
+
+    expect(enemy.auras).toContainEqual(permanent);
+    expect(sim.player.auras.some((entry) => entry.id === 'devotion_ward')).toBe(false);
   });
 
   it.each([
@@ -301,7 +316,7 @@ describe('Talents V2 movement and control primitives', () => {
     const ally = paladin.entities.get(allyId);
     if (!ally || paladin.player.id !== casterId) throw new Error('missing dispel rig entities');
     ally.auras.push(unbreakableControl(paladin.player, 'scripted_silence', 'silence', 'shadow'));
-    runAbilityEffect(paladin, ally, 'cleansing_verdict');
+    runAbilityEffect(paladin, ally, 'voidfeast');
     expect(ally.auras.some((entry) => entry.id === 'scripted_silence')).toBe(true);
   });
 });

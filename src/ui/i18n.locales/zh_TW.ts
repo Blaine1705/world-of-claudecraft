@@ -13,6 +13,134 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.paladin.devotion': '虔誠',
+  'hudChrome.paladin.devotionValue': '虔誠值 {value}/{max}',
+  'hudChrome.paladin.devotionAscensionCharges': '虔誠值 {value}/{max}。昇華充能：{charges}。',
+  'hudChrome.paladin.devotionAscensionLast': '虔誠值 {value}/{max}。昇華的最後一次充能。',
+  'hudChrome.paladin.ascensionLastAnnouncement': '昇華的最後一次充能',
+  'hudChrome.paladin.ascensionSpenderAria': '快捷列第 {slot} 格：{ability}。消耗一次昇華充能。',
+  'hudChrome.auraEffect.radiantResonance':
+    '你的下一次治癒之光將立即施放，或下一次黎明之擁的法力消耗降低 {pct}%，施法時間縮短至 {castTime} 秒',
+  'hudChrome.auraEffect.solarReprisal':
+    '你的下一次向陽飛盾不消耗法力、無視冷卻時間且傷害提高 {pct}%；恩典之錘無視冷卻時間並為你恢復相當於傷害量 100% 的生命值；或使治癒之光立即施放',
+  'guide.abilityHook.hammer_of_wrath': '從遠處處決一名受傷的敵人，或在聖翼啟動時處決任何敵人。',
+  'guide.abilityHook.avenging_wrath':
+    '獲得 10 點虔誠，並在接下來的十五秒內使技能產生的虔誠值加倍。',
+  'guide.abilityHook.bastion_sweep': '以盾牌橫掃一群敵人，奪取仇恨並累積虔誠。',
+  'guide.abilityHook.oath_chain': '將遠處的敵人拉入隊伍並減緩其逃離速度。',
+  'guide.abilityHook.veilbound_march': '穿過敵群並留下印記，削弱其對你造成的傷害並牢牢鎖定仇恨。',
+  'guide.abilityHook.holy_shield': '消耗虔誠，獲得主動格擋時段、吸收護盾和仇恨脈衝。',
+  'guide.abilityHook.consecration': '以持續的神聖傷害和仇恨占據周圍地面。',
+  'guide.abilityHook.hammer_of_justice': '以短暫而可靠的昏迷阻止一名敵人。',
+  'guide.abilityHook.lay_on_hands': '在盟友瀕臨倒下時為其恢復大量生命值。',
+  'hud.errors.notEnoughDevotion': '虔誠值不足！',
+  'abilityUi.resources.devotion': '虔誠',
+  'entities.abilities.divine_ascension.name': '神聖昇華',
+  'entities.abilities.divine_ascension.description':
+    '消耗 20 點虔誠，獲得 5 次昇華充能，最多持續 45 秒。標記的技能會消耗一次充能並獲得額外效果。',
+  'entities.abilities.aura_mastery.name': '神聖協律',
+  'entities.abilities.aura_mastery.description':
+    '持續 8 秒，強化隊伍中所有啟動的虔誠光環和報償光環。壁壘虔誠使傷害降低 15%；報償造成 15 點神聖傷害。多次使用只會刷新效果，不會堆疊。',
+  'entities.abilities.devotion_ward.name': '壁壘虔誠',
+  'entities.abilities.devotion_ward.description':
+    '使你和隊伍成員受到的傷害降低 5%，持續至死亡或被取代。只有此光環與報償光環會彼此取代；輝光、黎明和恩典虔誠可以共存。',
+  'entities.abilities.hammer_of_grace.name': '恩典之錘',
+  'entities.abilities.hammer_of_grace.description':
+    '立即向 20 公尺內的敵人擲出聖錘，造成 {damage} 點傷害，恢復 70 點法力，為自己恢復相當於傷害量 50% 的生命值，並在造成傷害時產生 1 點虔誠。烈陽反擊會使恩典之錘無視冷卻時間，並為你恢復相當於傷害量 100% 的生命值。',
+  'entities.abilities.hushbrand.name': '寂靜烙印',
+  'entities.abilities.hushbrand.description': '中斷施法，並使目標在 4 秒內無法施放該系法術。',
+  'entities.abilities.solar_step.name': '烈陽步',
+  'entities.abilities.solar_step.description': '使你的移動速度提高 150%，持續 2 秒。',
+  'entities.abilities.solar_invocation.name': '烈陽祈喚',
+  'entities.abilities.solar_invocation.description':
+    '立即為一名盟友恢復 {damage} 點生命值，或對一名敵人造成中等神聖傷害。任一用途都會產生 1 點虔誠。昇華期間，治療施法還會治療目標 10 公尺內的友方玩家，治療量為原來的一半。',
+  'entities.abilities.radiant_devotion.name': '輝光虔誠',
+  'entities.abilities.radiant_devotion.description':
+    '使你和隊伍成員的法術強度提高 20 點，持續 30 分鐘。會取代你自己的黎明或恩典虔誠，但可與其他聖騎士的虔誠共存。',
+  'entities.abilities.dawn_devotion.name': '黎明虔誠',
+  'entities.abilities.dawn_devotion.description':
+    '使你和隊伍成員的攻擊強度提高 40 點，持續 30 分鐘。會取代你自己的輝光或恩典虔誠，但可與其他聖騎士的虔誠及戰士的戰吼共存。',
+  'entities.abilities.grace_devotion.name': '恩典虔誠',
+  'entities.abilities.grace_devotion.description':
+    '你和隊伍成員每 5 秒恢復 15 點法力，且法力消耗降低 3%，持續 30 分鐘。會取代你自己的輝光或黎明虔誠，但可與其他聖騎士的虔誠共存。',
+  'entities.abilities.recall_the_fallen.name': '喚回逝者',
+  'entities.abilities.recall_the_fallen.description':
+    '使一名死亡的隊伍成員復活，並恢復 35% 的生命值和法力值。',
+  'entities.abilities.beacon_of_light.name': '聖光信標',
+  'entities.abilities.beacon_of_light.description':
+    '將一名隊伍成員標記為你的聖光信標。你對 60 公尺內另一名隊伍成員造成的有效直接治療，有 50% 也會治療信標目標。範圍治療和週期性治療不會傳遞。持續至你或目標死亡。',
+  'entities.abilities.final_edict.name': '終末敕令',
+  'entities.abilities.final_edict.description':
+    '發動一次沉重的武器攻擊，並在造成傷害時產生 1 點虔誠。命中後使黎明墜擊的剩餘冷卻時間縮短 2 秒。成功的自動攻擊和終末敕令命中有 15% 機率獲得持續 8 秒的黎明之怒。昇華還會在你周圍釋放神聖爆炸。',
+  'entities.abilities.dawnfall.name': '黎明墜擊',
+  'entities.abilities.dawnfall.description':
+    '對附近敵人造成 {damage} 點神聖傷害並產生 1 點虔誠。命中至少一個敵人會使終末敕令的剩餘冷卻時間縮短 2 秒。昇華會提高其傷害和作用半徑。',
+  'entities.abilities.sun_gods_verdict.name': '太陽神裁決',
+  'entities.abilities.sun_gods_verdict.description':
+    '以太陽神裁決審判一名敵人，持續 30 秒。終末敕令和黎明墜擊成功命中時會刻下一層印記。施加第三層印記的技能決定判決：終末敕令對罪人釋放毀滅性傷害；黎明墜擊引爆裁決，對附近敵人造成傷害並使其昏迷 1.5 秒。',
+  'entities.abilities.valkyrs_calling.name': '女武神的召喚',
+  'entities.abilities.valkyrs_calling.description':
+    '升上空中，在飛向敵人期間免疫傷害。2 秒後降臨目標區域，造成 {damage} 點神聖傷害並產生 1 點虔誠。昇華會使衝擊傷害提高 50% 並消耗 1 次充能。',
+  'entities.abilities.faithforged_guard.name': '聖光之債',
+  'entities.abilities.faithforged_guard.description':
+    '在 8 秒內，你受到的下一次敵人攻擊將被回敬：至多抵消 {buff} 點傷害，並以等量神聖傷害返還給攻擊者，同時你獲得 1 點虔誠。只回敬一次攻擊。昇華使可回敬的數值提高 50%。',
+  'entities.abilities.mercy_lance.name': '慈悲聖槍',
+  'entities.abilities.mercy_lance.description':
+    '對一名敵人造成 {damage} 點神聖傷害，並在造成傷害時產生 1 點虔誠。昇華期間消耗 1 次充能，使其必定造成致命一擊。',
+  'entities.abilities.sacred_form.name': '神聖形態',
+  'entities.abilities.sacred_form.description':
+    '進入持續至死亡的神聖狀態，使治療效果提高 10%、法術致命一擊機率提高 5%，產生的仇恨降低 50%。僅限黎明癒者。',
+  'entities.abilities.dawns_embrace.name': '黎明之擁',
+  'entities.abilities.dawns_embrace.description':
+    '施放一次強力治療並產生 1 點虔誠。輝光共鳴使其法力消耗降低 50%，施法時間縮短至 1.5 秒。昇華使其立即施放，且治療量提高 35%。',
+  'entities.abilities.radiant_chorus.name': '輝光聖歌',
+  'entities.abilities.radiant_chorus.description':
+    '為附近盟友恢復 {damage} 點生命值並產生 1 點虔誠。有效治療至少 2 名盟友會獲得輝光共鳴：你的下一次治癒之光將立即施放，或下一次黎明之擁的法力消耗降低 50%，施法時間縮短至 1.5 秒。昇華會提高輝光聖歌的治療量和作用半徑。',
+  'entities.abilities.life_covenant.name': '生命契約',
+  'entities.abilities.life_covenant.description':
+    '使一名盟友受到的傷害降低 40%，持續 6 秒。昇華期間還會給予一個可吸收 120 點傷害的護盾，且不消耗充能。',
+  'entities.abilities.aegis_first_dawn.name': '初曙聖盾',
+  'entities.abilities.aegis_first_dawn.description':
+    '引導 5 秒，創造一個半徑 10 公尺的神聖穹頂。穹頂內的盟友每秒受到治療，且受到的傷害降低 50%。完成引導時釋放最終治療，並使移動速度提高 30%，持續 4 秒。',
+  'entities.abilities.vowkeeper_strike.name': '守誓者打擊',
+  'entities.abilities.vowkeeper_strike.description':
+    '發動高仇恨攻擊並產生 1 點虔誠。成功命中有 20% 機率獲得持續 8 秒的烈陽反擊；每次成功格擋有 25% 機率觸發。烈陽反擊會強化你的下一次向陽飛盾、恩典之錘或治癒之光。昇華還會給予一個小型吸收護盾。',
+  'entities.abilities.bastion_rite.name': '壁壘儀式',
+  'entities.abilities.bastion_rite.description':
+    '使受到的物理傷害降低 20%，格擋機率提高 20%，持續 6 秒。昇華將持續時間延長至 10 秒。',
+  'entities.abilities.sunward_disc.name': '向陽飛盾',
+  'entities.abilities.sunward_disc.description':
+    '需要盾牌。擲出一面輝光飛盾，命中後在附近敵人之間彈射。每次造成傷害都會產生 1 點虔誠。烈陽反擊使向陽飛盾不消耗法力、無視冷卻時間且傷害提高 20%。昇華會強化 5 次彈射。',
+  'entities.abilities.sacred_challenge.name': '神聖挑釁',
+  'entities.abilities.sacred_challenge.description':
+    '迫使一名敵人攻擊你。昇華期間還會使你受到的所有傷害降低 15%，持續 4 秒，且不消耗充能。',
+  'entities.abilities.bastion_sweep.name': '壁壘橫掃',
+  'entities.abilities.bastion_sweep.description':
+    '用裝備的盾牌橫掃前方 180 度範圍內的敵人，造成 {damage} 點高仇恨神聖傷害並產生 1 點虔誠。昇華使傷害提高 30%，半徑擴大至 8 公尺。',
+  'entities.abilities.oath_chain.name': '誓約鎖鏈',
+  'entities.abilities.oath_chain.description':
+    '立即用神聖鎖鏈束縛一名遠處敵人。敵人以每秒 18 公尺的速度向你移動，直至距離 3 公尺，隨後移動速度降低 50%，持續 4 秒。昇華期間還會束縛附近的第二名敵人。',
+  'entities.abilities.veilbound_march.name': '帷幕行軍',
+  'entities.abilities.veilbound_march.description':
+    '進入靈體狀態 4 秒，移動速度提高 40%，護甲提高 30%，並免疫定身、減速和位移。你穿過的敵人會獲得持續 6 秒的帷幕印記，每秒受到神聖傷害，對你造成的傷害降低 20%，並對你產生額外仇恨。第一個印記會產生 1 點虔誠。行軍結束時，附近帶有印記的敵人會受到最終爆發傷害。昇華使爆發傷害提高 50%，並將他們輕微拉向你。',
+  'entities.abilities.veilbound_mark.name': '帷幕印記',
+  'entities.abilities.veilbound_mark.description':
+    '每秒受到神聖傷害，對施加印記的聖騎士造成的傷害降低 20%，並對該聖騎士產生額外仇恨。',
+  'entities.quests.q_divine_tome.title': '縛曉聖典',
+  'entities.quests.q_divine_tome.text':
+    '聖光在你體內並非沉默不語，{playerName}。我看著你讓亡者安息，也相信你已經準備好學習極少有聖騎士能夠掌握的儀式：喚回儀式，以此將逝去的靈魂召回人世。儀式經文記載在我保管的縛曉聖典中，但只要躁動的亡者仍在這片土地上遊蕩，書本便帶不來祝福。再讓 6 具躁動骸骨歸於塵土，我便開始教你。',
+  'entities.quests.q_divine_tome.completion':
+    '禮拜堂庭院終於安靜下來。你已經可以學習經文了，{playerName}，但喚回儀式不能在溫暖的禮拜堂中吟誦。必須前往生死帷幕薄弱之處。我會把聖典帶到北方的泥沼沼澤。到那裡來找我，我們將完成這場儀式。',
+  'entities.quests.q_divine_tome.objectives.0.label': '讓躁動骸骨安息',
+  'entities.quests.q_rite_of_redemption.title': '喚回儀式',
+  'entities.quests.q_rite_of_redemption.text':
+    '你果然跟隨我進入了沼澤，{playerName}。很好。縛曉聖典就在這裡，而這片積水之地正適合吟誦其中的經文：沒有哪裡比亡者不肯長眠之處更接近生死之間的帷幕。但那些溺亡者會在吟誦中途把你的聲音拖入水底。先清理出適合儀式的地方：讓 8 名溺亡死者安息，然後我們一同將此地聖化。',
+  'entities.quests.q_rite_of_redemption.completion':
+    '跪下，{playerName}，大聲念出經文。就是這樣。你感覺到了嗎？你手中的聖光不再只能治癒生者，也能召回已經離世的人。請明智地使用它。將靈魂召回一場毫無希望的戰鬥是殘忍，而非仁慈。起身吧，救贖者。',
+  'entities.quests.q_rite_of_redemption.objectives.0.label': '讓溺亡死者安息',
+  'entities.abilities.guardian_covenant.name': '守護契約',
+  'entities.abilities.guardian_covenant.description':
+    '保護一名友方目標和你自己，使受到的傷害降低20%，持續8秒。未選取友方目標時，預設對你自己施放。',
   'hudChrome.crafting.identity.ceilingRare': '精良品質上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -138,9 +266,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodlust.name': '戰鼓',
   'entities.abilities.chain_lightning.name': '天穹分枝',
   'entities.abilities.chaos_bolt.name': '毀滅箭',
-  'entities.abilities.cleansing_verdict.name': '淨化裁決',
-  'entities.abilities.cleansing_verdict.description':
-    '淨化一個友方目標身上的有害魔法效果，並為其恢復{damage}點生命值。',
   'entities.abilities.cloak_of_shadows.name': '暗影斗篷',
   'entities.abilities.cone_of_cold.name': '寒霜橫掃',
   'entities.abilities.curse_of_exhaustion.name': '鉛沉妖咒',
@@ -148,7 +273,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deep_freeze.name': '死霜',
   'entities.abilities.desperate_prayer.name': '最後祈禱',
   'entities.abilities.deterrence.name': '鬃刺守衛',
-  'entities.abilities.divine_shield.name': '聖光守護',
   'entities.abilities.earthbind.name': '攫握大地',
   'entities.abilities.evocation.name': '乙太之井',
   'entities.abilities.frenzied_regeneration.name': '野性癒合',
@@ -156,7 +280,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ghostly_strike.name': '幽魂打擊',
   'entities.abilities.hammer_of_wrath.name': '鳴鐘之錘',
   'entities.abilities.healing_stream.name': '泉湧',
-  'entities.abilities.holy_wrath.name': '聖徒之怒',
   'entities.abilities.howl_of_terror.name': '恐懼嚎叫',
   'entities.abilities.ice_block.name': '寒冰棺',
   'entities.abilities.inner_focus.name': '靜心',
@@ -2602,7 +2725,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '使你的神聖傷害產生的威脅值提高 60%，持續 30 分鐘。防護聖騎士的核心技能。',
   'entities.abilities.retribution_aura.name': '報償光環',
   'entities.abilities.retribution_aura.description':
-    '以神聖能量環繞自身，持續 30 分鐘，對任何近戰攻擊你的敵人造成 5 點神聖傷害。',
+    '以神聖能量環繞你和你的隊伍，直到死亡或被替換。近戰攻擊受影響隊友的敵人受到 {buff} 點神聖傷害，受影響的隊友的普通攻擊額外造成 {buff} 點神聖傷害。',
   'entities.abilities.tame_beast.name': '野性繫絆',
   'entities.abilities.tame_beast.description':
     '開始馴服一隻野獸作為你的夥伴。牠必須不高於你的等級，且不能是精英。你的寵物會跟隨你、攻擊敵人，並保持自己的威脅值。同一時間只能擁有一隻寵物。',
@@ -7670,9 +7793,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_echo.name': '時光迴響',
   'entities.abilities.temporal_echo.description':
     '以更健康時刻的迴響標記一名盟友，立即恢復{damage}點生命值。{duration}秒內，你造成的秘法傷害有一部分會透過迴響轉化為對其的治療。',
-  'entities.abilities.aura_surge.name': '曙光彈射',
-  'entities.abilities.aura_surge.description':
-    '擲出曙光鑄造的盾牌，造成{damage}點神聖傷害並使主要目標沉默2秒，隨後彈射至10碼內最多2個額外敵人，每次彈射造成75%傷害。（聖騎士天賦）',
   'entities.abilities.aspect_of_the_wild.description':
     '以野性力量激勵30碼內的盟友，使其攻擊強度提高45、攻擊速度提高5%，持續5分鐘。（獵人天賦）',
   'entities.abilities.avenging_wrath.description':
@@ -7696,8 +7816,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.desperate_prayer.description': '立即為你恢復{damage}點生命值。（牧師天賦）',
   'entities.abilities.deterrence.description':
     '使你的閃躲幾率提高50個百分點，持續10秒。（獵人天賦）',
-  'entities.abilities.divine_shield.description':
-    '以神聖之力保護你，在8秒內吸收900點傷害。（聖騎士天賦）',
   'entities.abilities.earthbind.description': '將附近的敵人束縛於大地，使其定身2秒。（薩滿天賦）',
   'entities.abilities.evocation.description': '快速恢復法力。（法師天賦）',
   'entities.abilities.frenzied_regeneration.description':
@@ -7710,8 +7828,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '向受傷的敵人投擲神聖之錘，造成{damage}點神聖傷害。只能對生命值低於20%的目標使用。（聖騎士天賦）',
   'entities.abilities.healing_stream.description':
     '在12秒內為一個友方目標恢復120點生命值。（薩滿天賦）',
-  'entities.abilities.holy_wrath.description':
-    '釋放神聖之力，對附近的敵人造成{damage}點傷害。（聖騎士天賦）',
   'entities.abilities.howl_of_terror.description':
     '使附近的敵人恐懼，最多持續3秒。受到傷害可能打破該效果。（術士天賦）',
   'entities.abilities.ice_block.description':

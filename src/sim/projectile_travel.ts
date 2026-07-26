@@ -71,19 +71,22 @@ export type PendingProjectile = {
   fizzle?: () => void;
 };
 
-/** Queue a projectile launched now from `source` at `target`; `resolve` runs at the
- *  landing tick with the still-live source and target. The caller emits the
- *  `fx:'projectile'` visual itself (the renderer needs it immediately at launch). */
+/** Queue a projectile launched now from `origin` (the source position by default) at
+ *  `target`; `resolve` runs at the landing tick with the still-live authority source and
+ *  target. A custom origin lets ricochets travel from the previous impact while caster
+ *  liveness and attribution remain authoritative. The caller emits the `fx:'projectile'`
+ *  visual itself (the renderer needs it immediately at launch). */
 export function scheduleProjectile(
   ctx: SimContext,
   source: Entity,
   target: Entity,
   resolve: (source: Entity, target: Entity) => void,
+  origin: Readonly<{ x: number; z: number }> = source.pos,
   fizzle?: () => void,
 ): void {
   ctx.pendingProjectiles.push({
-    x: source.pos.x,
-    z: source.pos.z,
+    x: origin.x,
+    z: origin.z,
     sourceId: source.id,
     targetId: target.id,
     ttl: PROJECTILE_MAX_FLIGHT,
@@ -102,8 +105,10 @@ export function scheduleProjectile(
 export function advancePendingProjectiles(ctx: SimContext): void {
   if (ctx.pendingProjectiles.length === 0) return;
   const step = PROJECTILE_SPEED * DT;
+  const launchedBeforeTick = ctx.pendingProjectiles;
+  ctx.pendingProjectiles = [];
   const stillFlying: PendingProjectile[] = [];
-  for (const proj of ctx.pendingProjectiles) {
+  for (const proj of launchedBeforeTick) {
     const source = ctx.entities.get(proj.sourceId);
     const target = ctx.entities.get(proj.targetId);
     if (!source || source.dead || !target || target.dead) {
@@ -128,5 +133,5 @@ export function advancePendingProjectiles(ctx: SimContext): void {
     proj.z = next.z;
     stillFlying.push(proj);
   }
-  ctx.pendingProjectiles = stillFlying;
+  ctx.pendingProjectiles = [...stillFlying, ...ctx.pendingProjectiles];
 }

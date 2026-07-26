@@ -58,7 +58,7 @@ import {
   STATIONS,
 } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
-import { CAMPS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
+import { ABILITIES, CAMPS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
 import { MARKET_CUT, MARKET_LISTING_DEPOSIT_COPPER } from '../src/sim/market';
 import {
   WORK_ORDER_CADENCE_TICKS,
@@ -255,6 +255,18 @@ describe('Guide generated class content', () => {
       expect(c.specs.length).toBeGreaterThan(0);
       expect(c.signatureAbilities.length).toBeGreaterThan(0);
       expect(c.abilities.length).toBeGreaterThanOrEqual(c.signatureAbilities.length);
+      for (const ability of c.abilities) {
+        expect(
+          ABILITIES[ability.id]?.hiddenFromPlayer,
+          `${c.id}.${ability.id} is hidden from players`,
+        ).not.toBe(true);
+      }
+      for (const ability of c.signatureAbilities) {
+        expect(
+          ABILITIES[ability.id]?.hiddenFromPlayer,
+          `${c.id}.${ability.id} signature is hidden from players`,
+        ).not.toBe(true);
+      }
       for (const s of c.specs) {
         expect(['tank', 'healer', 'dps']).toContain(s.role);
         expect(s.signature.length).toBeGreaterThan(0);

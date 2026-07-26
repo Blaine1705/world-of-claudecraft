@@ -1,8 +1,9 @@
 {
   "class": "paladin",
-  "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+  "license": "Mixed: CraftPix premium for the legacy base set; project-owned original art for the paladin overhaul and talent abilities",
   "iconSize": 128,
   "sourcePack": "tmp/asset_src/paladin-skill-icons (CraftPix \u2014 see license.txt)",
+  "generatedSource": "OpenAI image generation, original project artwork",
   "runtimeDir": "public/ui/skills/paladin",
   "abilities": [
     {
@@ -25,13 +26,6 @@
       "sourceFile": "34.png",
       "output": "devotion_aura.webp",
       "confidence": "review"
-    },
-    {
-      "abilityId": "judgement",
-      "name": "Judgement",
-      "sourceFile": "50.png",
-      "output": "judgement.webp",
-      "confidence": "high"
     },
     {
       "abilityId": "blessing_of_might",
@@ -94,6 +88,407 @@
       "name": "Retribution Aura",
       "sourceFile": "44.png",
       "output": "retribution_aura.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "divine_ascension",
+      "name": "Divine Ascension",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "divine_ascension.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "devotion_ward",
+      "name": "Devotion Aura",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "devotion_ward.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "hammer_of_grace",
+      "name": "Hammer of Grace",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "hammer_of_grace.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "hushbrand",
+      "name": "Hushbrand",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "hushbrand.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "guardian_covenant",
+      "name": "Guardian Covenant",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "guardian_covenant.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "solar_step",
+      "name": "Solar Step",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "solar_step.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "solar_invocation",
+      "name": "Solar Invocation",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "solar_invocation.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "recall_the_fallen",
+      "name": "Recall the Fallen",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "recall_the_fallen.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "beacon_of_light",
+      "name": "Beacon of Light",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "beacon_of_light.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "radiant_devotion",
+      "name": "Radiant Devotion",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "radiant_devotion.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "dawn_devotion",
+      "name": "Dawn Devotion",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "dawn_devotion.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "grace_devotion",
+      "name": "Grace Devotion",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "grace_devotion.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "final_edict",
+      "name": "Final Edict",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "final_edict.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "dawnfall",
+      "name": "Dawnfall",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "dawnfall.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "faithforged_guard",
+      "name": "Debt of Light",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "faithforged_guard.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "sacred_form",
+      "name": "Sacred Form",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "sacred_form.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "mercy_lance",
+      "name": "Mercy Lance",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "mercy_lance.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "dawns_embrace",
+      "name": "Dawn's Embrace",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "dawns_embrace.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "radiant_chorus",
+      "name": "Radiant Chorus",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "radiant_chorus.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "life_covenant",
+      "name": "Life Covenant",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "life_covenant.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "aegis_first_dawn",
+      "name": "Aegis of the First Dawn",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "aegis_first_dawn.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "vowkeeper_strike",
+      "name": "Vowkeeper Strike",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "vowkeeper_strike.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "bastion_rite",
+      "name": "Bastion Rite",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "bastion_rite.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "sunward_disc",
+      "name": "Sunward Disc",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "sunward_disc.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "sacred_challenge",
+      "name": "Sacred Goad",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "sacred_challenge.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "sacred_bulwark",
+      "name": "Sacred Bulwark",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "sacred_bulwark.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "holy_taunt",
+      "name": "Sacred Goad",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "holy_taunt.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "crusader_strike",
+      "name": "Crusader Strike",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "crusader_strike.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "holy_shock",
+      "name": "Holy Shock",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "holy_shock.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "holy_shield",
+      "name": "Holy Shield",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "holy_shield.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "rebuke",
+      "name": "Reproach",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "rebuke.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "avenging_wrath",
+      "name": "Avenging Wrath",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "avenging_wrath.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "hammer_of_wrath",
+      "name": "Hammer of Wrath",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "hammer_of_wrath.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "bastion_sweep",
+      "name": "Bastion Sweep",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "bastion_sweep.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "oath_chain",
+      "name": "Oath Chain",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "oath_chain.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "sun_gods_verdict",
+      "name": "Verdict of the Sun God",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "sun_gods_verdict.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "valkyrs_calling",
+      "name": "Valkyr's Calling",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "valkyrs_calling.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "aura_mastery",
+      "name": "Sacred Concord",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "aura_mastery.webp",
+      "confidence": "high"
+    },
+    {
+      "abilityId": "veilbound_march",
+      "name": "Veilbound March",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "veilbound_march.webp",
+      "confidence": "high"
+    }
+  ],
+  "talents": [
+    {
+      "talentId": "pal_r5_radiant_stride",
+      "name": "Radiant Stride",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r5_radiant_stride.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r5_steadfast_step",
+      "name": "Steadfast Step",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r5_steadfast_step.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r5_divine_steed",
+      "name": "Divine Steed",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r5_divine_steed.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r8_enduring_protection",
+      "name": "Enduring Protection",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r8_enduring_protection.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r8_steady_hands",
+      "name": "Steady Hands",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r8_steady_hands.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r8_recurring_grace",
+      "name": "Recurring Grace",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r8_recurring_grace.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r11_fist_of_justice",
+      "name": "Fist of Justice",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r11_fist_of_justice.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r11_double_sentence",
+      "name": "Double Sentence",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r11_double_sentence.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r11_radiant_shackles",
+      "name": "Radiant Shackles",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r11_radiant_shackles.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r14_zeal",
+      "name": "Zeal",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r14_zeal.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r14_sacred_reserve",
+      "name": "Sacred Reserve",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r14_sacred_reserve.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r14_divine_purpose",
+      "name": "Divine Purpose",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r14_divine_purpose.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r17_extended_dawn",
+      "name": "Extended Dawn",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r17_extended_dawn.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r17_radiant_wrath",
+      "name": "Radiant Wrath",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r17_radiant_wrath.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r17_sanctified_fervor",
+      "name": "Sanctified Fervor",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r17_sanctified_fervor.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r20_aura_mastery",
+      "name": "Sacred Concord",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r20_aura_mastery.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r20_dawn_echo",
+      "name": "Dawn Echo",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r20_dawn_echo.webp",
+      "confidence": "high"
+    },
+    {
+      "talentId": "pal_r20_perpetual_sun",
+      "name": "Perpetual Sun",
+      "sourceFile": "OpenAI image generation, original project artwork",
+      "output": "pal_r20_perpetual_sun.webp",
       "confidence": "high"
     }
   ]

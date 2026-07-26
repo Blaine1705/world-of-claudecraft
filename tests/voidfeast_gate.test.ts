@@ -7,9 +7,9 @@ import type { Aura, Entity } from '../src/sim/types';
 // Voidfeast gate (maintainer request): the devour is ONLY castable when the
 // target actually carries a dispellable effect (a beneficial magic effect on
 // an enemy, or a harmful one on an ally). A no-food cast is refused at the
-// cast gate BEFORE billing (the judgement no-Seal precedent): no mana, no
-// cooldown. Other dispel abilities (Cleansing Verdict, Spellsteal) keep the
-// old fire-anyway behavior; the gate is the requiresDispellable opt-in.
+// cast gate BEFORE billing: no mana, no
+// cooldown. Other dispel abilities keep the old fire-anyway behavior; the
+// gate is the requiresDispellable opt-in.
 
 type Ev = { type?: string; text?: string };
 
@@ -90,7 +90,7 @@ describe('Voidfeast is only usable with something to devour', () => {
   });
 
   it('a physical-school effect is not food: still refused', () => {
-    const { sim, p, mob, events } = setup();
+    const { sim, mob, events } = setup();
     mob.auras.push({ ...buffAura(mob.id), school: 'physical' } as Aura);
     sim.castAbility('voidfeast');
     sim.tick();
@@ -98,18 +98,5 @@ describe('Voidfeast is only usable with something to devour', () => {
       true,
     );
     expect(mob.auras.some((aura) => aura.id === 'test_buff')).toBe(true);
-  });
-
-  it('Cleansing Verdict keeps the old behavior on a clean target (no gate)', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'paladin', autoEquip: true });
-    sim.setPlayerLevel(10);
-    expect(sim.applyTalents({ spec: null, rows: { 8: 'pal_r8_cleansing_verdict' } })).toBe(true);
-    const p = sim.player;
-    p.resource = p.maxResource;
-    sim.targetEntity(p.id);
-    const manaBefore = p.resource;
-    sim.castAbility('cleansing_verdict');
-    sim.tick();
-    expect(p.resource).toBeLessThan(manaBefore); // billed: the cast went through
   });
 });

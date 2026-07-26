@@ -20,6 +20,9 @@
 // unchanged. `playerMods` and `fiestaMatchInfo` STAY on Sim (read by ~13 recalc
 // sites / the presentation surface); this module consumes playerMods via ctx.
 
+import { cleanupPaladinAegis } from '../combat/paladin_aegis';
+import { stripSunGodVerdicts } from '../combat/paladin_sun_verdict';
+import { stripPaladinDevotionsFromSource } from '../combat/paladin_support';
 import {
   AUGMENTS_BY_ID,
   type AugmentDef,
@@ -295,6 +298,9 @@ export function fiestaRespawnTime(deaths: number, elapsed: number): number {
 export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | null): void {
   e.dead = true;
   e.hp = 0;
+  cleanupPaladinAegis(ctx, e.id);
+  stripSunGodVerdicts(ctx, e.id);
+  stripPaladinDevotionsFromSource(ctx, e.id);
   // Fiesta is a clean-slate minigame with its own timed revive: it intentionally strips
   // ALL auras (including The Keeper's Toll), unlike the overworld/delve death paths.
   e.auras = [];
