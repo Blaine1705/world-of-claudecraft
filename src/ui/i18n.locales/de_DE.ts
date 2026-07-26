@@ -9500,4 +9500,286 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Ersetzt {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Dieser Gegenstand hat diese Verzauberung bereits.',
   'hudChrome.enchanting.sameEnchantTag': 'Bereits angewendet',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'abilityUi.resources.devotion': 'Hingabe',
+  'abilityUi.resources.focus': 'Fokus',
+  'classDetails.resources.focus': 'Fokus',
+  'game.hud.lowFocus': 'Wenig Fokus',
+  'hud.errors.notEnoughDevotion': 'Nicht genug Hingabe!',
+  'hudChrome.paladin.devotion': 'Hingabe',
+  'hudChrome.paladin.devotionValue': 'Hingabe {value} von {max}',
+  'hudChrome.paladin.devotionAscensionCharges':
+    'Hingabe {value} von {max}. Aufstieg: {charges} Aufladungen.',
+  'hudChrome.paladin.devotionAscensionLast':
+    'Hingabe {value} von {max}. Aufstieg: letzte Aufladung.',
+  'hudChrome.paladin.ascensionLastAnnouncement': 'Aufstieg: letzte Aufladung',
+  'hudChrome.paladin.ascensionSpenderAria':
+    'Aktionsplatz {slot}: {ability}. Verbraucht eine Aufstiegsaufladung.',
+  'hudChrome.crafting.craftedToastQty': 'Hergestellt: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedAlso': 'Ihr erhaltet außerdem {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Ihr erhaltet außerdem {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedYield': 'Ihr entzaubert {item} zu {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Ihr entzaubert {item} zu {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Ihr gewinnt {material} aus {item}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Ihr gewinnt {material} x{qty} aus {item}.',
+  'hudChrome.auraEffect.dawnsWrath':
+    'HdZ: jede Gesundheit · +1 Einsatz · Abklingzeit 0 · +{pct}% Schaden',
+  'hudChrome.auraEffect.duskEconomy': 'Fähigkeiten kosten {pct}% weniger Energie',
+  'hudChrome.auraEffect.hunterFerocity':
+    '{stacks} Rudelwildheit: Euer Begleiter verursacht {pct}% mehr Schaden',
+  'hudChrome.auraEffect.veiledEdge': 'Euer nächster Lauererschlag trifft doppelt so hart',
+  'hudChrome.auraEffect.gloam':
+    'Dämmer: Stufe {stacks} von {max}. Bei {max} lassen sich Eure Dämmerschleier-Eröffnungen im Offenen einsetzen, und die nächste geworfene ist KOSTENLOS und zündet den Vorrat zum Schattenschleier',
+  'hudChrome.auraEffect.mendingCurrent':
+    'Speichert {value} Heilung, mit der Zeit freigesetzt oder von Kaskadenflickung verbraucht',
+  'hudChrome.auraEffect.mendingCurrentPercent':
+    'Speichert Heilung in Höhe von {pct}% der maximalen Gesundheit für Kaskadenflickung',
+  'hudChrome.auraEffect.radiantResonance':
+    'Euer nächstes Heilendes Licht wird sofort gewirkt, oder Eure nächste Umarmung der Morgenröte kostet {pct}% weniger Mana und wird in {castTime} Sek. gewirkt',
+  'hudChrome.auraEffect.redline':
+    'Rote Linie: Kerbe {stacks} von {max}. Körpertreffer fügen Kerben hinzu; der K.-o.-Schlag trifft pro Kerbe {pct}% härter und schließt das Fenster. Läuft es vorher ab, verfällt es',
+  'hudChrome.auraEffect.solarReprisal':
+    'Eure nächste Sonnenscheibe kostet kein Mana, ignoriert ihre Abklingzeit und verursacht {pct}% mehr Schaden; der Hammer der Gnade ignoriert seine Abklingzeit und heilt Euch um 100% des verursachten Schadens; oder Heilendes Licht wird sofort gewirkt',
+  'hudChrome.auraEffect.veilstrikeWindow':
+    'Schattenschleier: Eure Dämmerschleier-Eröffnungen sind im Offenen aus jedem Winkel einsetzbar, und der verursachte Schaden steigt um {pct}%',
+  'hudChrome.auraEffect.venomRitual':
+    'Giftritual: Stufe {stacks} von {max}. Aufbauschläge fügen Stufen hinzu; bei {max} wird Grabesschlaf zu Giftriss',
+  'entities.abilities.aegis_first_dawn.name': 'Ägide der Ersten Morgenröte',
+  'entities.abilities.aura_mastery.name': 'Heilige Eintracht',
+  'entities.abilities.bastion_rite.name': 'Ritus der Bastion',
+  'entities.abilities.bastion_sweep.name': 'Bastionsschwung',
+  'entities.abilities.beacon_of_light.name': 'Leuchtfeuer des Lichts',
+  'entities.abilities.dawn_devotion.name': 'Hingabe der Morgenröte',
+  'entities.abilities.dawnfall.name': 'Morgensturz',
+  'entities.abilities.dawns_embrace.name': 'Umarmung der Morgenröte',
+  'entities.abilities.devotion_ward.name': 'Hingabe der Bastion',
+  'entities.abilities.divine_ascension.name': 'Göttlicher Aufstieg',
+  'entities.abilities.faithforged_guard.name': 'Schuld des Lichts',
+  'entities.abilities.final_edict.name': 'Letztes Edikt',
+  'entities.abilities.grace_devotion.name': 'Hingabe der Gnade',
+  'entities.abilities.guardian_covenant.name': 'Bund des Wächters',
+  'entities.abilities.hammer_of_grace.name': 'Hammer der Gnade',
+  'entities.abilities.hushbrand.name': 'Schweigemal',
+  'entities.abilities.life_covenant.name': 'Bund des Lebens',
+  'entities.abilities.martyrs_aegis.name': 'Ägide des Märtyrers',
+  'entities.abilities.mercy_lance.name': 'Lanze der Gnade',
+  'entities.abilities.oath_chain.name': 'Eidkette',
+  'entities.abilities.radiant_chorus.name': 'Strahlender Chor',
+  'entities.abilities.radiant_devotion.name': 'Strahlende Hingabe',
+  'entities.abilities.recall_the_fallen.name': 'Ruf der Gefallenen',
+  'entities.abilities.sacred_challenge.name': 'Heiliger Ansporn',
+  'entities.abilities.sacred_form.name': 'Heilige Gestalt',
+  'entities.abilities.seraphic_vigil.name': 'Seraphische Wacht',
+  'entities.abilities.solar_invocation.name': 'Sonnenanrufung',
+  'entities.abilities.solar_step.name': 'Sonnenschritt',
+  'entities.abilities.sun_gods_verdict.name': 'Urteil des Sonnengottes',
+  'entities.abilities.sunward_disc.name': 'Sonnenscheibe',
+  'entities.abilities.valkyrs_calling.name': 'Ruf der Walküre',
+  'entities.abilities.veilbound_march.name': 'Schleiermarsch',
+  'entities.abilities.veilbound_mark.name': 'Schleiermal',
+  'entities.abilities.vowkeeper_strike.name': 'Schwurwahrerschlag',
+  'entities.abilities.choir_of_deliverance.name': 'Chor der Erlösung',
+  'entities.abilities.scouring_mercy.name': 'Läuternde Gnade',
+  'entities.abilities.aegis_first_dawn.description':
+    'Kanalisiert 5 Sek. lang und erschafft eine heilige Kuppel von 10 Metern. Verbündete darin werden jede Sekunde geheilt und erleiden 50% weniger Schaden. Der Abschluss der Kanalisierung setzt eine letzte Heilung frei und gewährt 4 Sek. lang 30% Tempo.',
+  'entities.abilities.aura_mastery.description':
+    'Verstärkt 8 Sek. lang jede aktive Hingabe und Vergeltungsaura in Eurer Gruppe. Die Hingabe der Bastion verringert Schaden um 15%; Vergeltung verursacht 15 Heiligschaden. Mehrfache Anwendungen erneuern sich, statt sich zu stapeln.',
+  'entities.abilities.bastion_rite.description':
+    'Verringert erlittenen physischen Schaden um 20% und erhöht die Blockchance 6 Sek. lang um 20%. Der Aufstieg verlängert die Dauer auf 10 Sek.',
+  'entities.abilities.bastion_sweep.description':
+    'Fegt mit Eurem angelegten Schild in einem frontalen 180-Grad-Bogen durch Gegner und verursacht {damage} Heiligschaden mit hoher Bedrohung und erzeugt 1 Hingabe. Der Aufstieg erhöht den Schaden um 30% und den Radius auf 8 m.',
+  'entities.abilities.beacon_of_light.description':
+    'Markiert ein Gruppenmitglied als Euer Leuchtfeuer des Lichts. 50% Eurer effektiven direkten Heilung an einem anderen Gruppenmitglied innerhalb von 60 m heilen auch das Leuchtfeuer. Flächen- und periodische Heilung werden nicht übertragen. Hält an, bis einer von Euch stirbt.',
+  'entities.abilities.dawn_devotion.description':
+    'Erhöht die Angriffskraft von Euch und Euren Gruppenmitgliedern 30 Min. lang um 40. Ersetzt Eure eigene Strahlende Hingabe oder Hingabe der Gnade, besteht aber neben den Hingaben anderer Paladine und neben Kriegerrufen.',
+  'entities.abilities.dawnfall.description':
+    'Verursacht {damage} Heiligschaden an nahen Gegnern und erzeugt 1 Hingabe. Mindestens einen Gegner zu treffen verringert die verbleibende Abklingzeit des Letzten Edikts um 2 Sek. Der Aufstieg erhöht Schaden und Radius.',
+  'entities.abilities.dawns_embrace.description':
+    'Wirkt eine mächtige Heilung und erzeugt 1 Hingabe. Strahlende Resonanz senkt die Manakosten um 50% und die Zauberzeit auf 1,5 Sek. Der Aufstieg macht sie sofort wirkbar und erhöht ihre Heilung um 35%.',
+  'entities.abilities.devotion_ward.description':
+    'Verringert den von Euch und Euren Gruppenmitgliedern erlittenen Schaden bis zum Tod oder zur Ersetzung um 5%. Nur diese Aura und die Vergeltungsaura ersetzen einander; Strahlende Hingabe, Hingabe der Morgenröte und Hingabe der Gnade bestehen nebeneinander.',
+  'entities.abilities.divine_ascension.description':
+    'Verbraucht 20 Hingabe, um bis zu 45 Sek. lang 5 Aufstiegsaufladungen zu erhalten. Markierte Fähigkeiten verbrauchen eine Aufladung und erhalten einen zusätzlichen Effekt.',
+  'entities.abilities.faithforged_guard.description':
+    '8 Sek. lang wird der nächste gegnerische Treffer gegen Euch beantwortet: Bis zu {buff} Schaden wird verwehrt und dem Angreifer als Heiligschaden zurückgegeben, und Ihr erhaltet 1 Hingabe. Nur ein Schlag wird beantwortet. Der Aufstieg erhöht die beantwortbare Menge um 50%.',
+  'entities.abilities.final_edict.description':
+    'Führt einen zermalmenden Waffenschlag aus und erzeugt 1 Hingabe, wenn er Schaden verursacht. Ein erfolgreicher Treffer verringert die verbleibende Abklingzeit des Morgensturzes um 2 Sek. Erfolgreiche Autoangriffe und Treffer des Letzten Edikts haben eine Chance von 15%, 8 Sek. lang Zorn der Morgenröte zu gewähren. Der Aufstieg löst zusätzlich eine heilige Explosion um Euch aus.',
+  'entities.abilities.grace_devotion.description':
+    'Ihr und Eure Gruppenmitglieder stellt alle 5 Sek. 15 Mana wieder her und zahlt 30 Min. lang 3% weniger Mana. Ersetzt Eure eigene Strahlende Hingabe oder Hingabe der Morgenröte, besteht aber neben den Hingaben anderer Paladine.',
+  'entities.abilities.guardian_covenant.description':
+    'Schützt ein freundliches Ziel und Euch selbst und verringert den erlittenen Schaden 8 Sek. lang um 20%. Wählt standardmäßig Euch, wenn kein freundliches Ziel ausgewählt ist.',
+  'entities.abilities.hammer_of_grace.description':
+    'Schleudert sofort einen heiligen Hammer auf einen Gegner innerhalb von 20 m für {damage}, stellt 70 Mana wieder her, heilt Euch um 50% des verursachten Schadens und erzeugt 1 Hingabe, wenn er Schaden verursacht. Sonnenvergeltung lässt den Hammer der Gnade seine Abklingzeit ignorieren und heilt Euch um 100% des verursachten Schadens.',
+  'entities.abilities.hushbrand.description':
+    'Unterbricht das Zauberwirken und verhindert 4 Sek. lang Zauber dieser Schule.',
+  'entities.abilities.life_covenant.description':
+    'Verringert den von einem Verbündeten erlittenen Schaden 6 Sek. lang um 40%. Während des Aufstiegs gewährt er zusätzlich einen Schild von 120 Punkten, ohne eine Aufladung zu verbrauchen.',
+  'entities.abilities.martyrs_aegis.description':
+    'Verringert den von einem Verbündeten erlittenen Schaden 8 Sek. lang um 40%.',
+  'entities.abilities.mercy_lance.description':
+    'Verursacht {damage} Heiligschaden an einem Gegner und erzeugt 1 Hingabe, wenn sie Schaden verursacht. Während des Aufstiegs verbraucht sie 1 Aufladung, um einen kritischen Treffer zu garantieren.',
+  'entities.abilities.oath_chain.description':
+    'Bindet sofort einen entfernten Gegner mit einer heiligen Kette. Der Gegner bewegt sich mit 18 m pro Sekunde auf Euch zu, bis er 3 m erreicht, und wird dann 4 Sek. lang um 50% verlangsamt. Während des Aufstiegs bindet sie einen zweiten nahen Gegner.',
+  'entities.abilities.radiant_chorus.description':
+    'Heilt nahe Verbündete um {damage} und erzeugt 1 Hingabe. Mindestens 2 Verbündete wirksam zu heilen gewährt Strahlende Resonanz: Euer nächstes Heilendes Licht wird sofort gewirkt, oder Eure nächste Umarmung der Morgenröte kostet 50% weniger Mana und wird in 1,5 Sek. gewirkt. Der Aufstieg erhöht Heilung und Radius des Strahlenden Chors.',
+  'entities.abilities.radiant_devotion.description':
+    'Erhöht die Zaubermacht von Euch und Euren Gruppenmitgliedern 30 Min. lang um 20. Ersetzt Eure eigene Hingabe der Morgenröte oder Hingabe der Gnade, besteht aber neben den Hingaben anderer Paladine.',
+  'entities.abilities.recall_the_fallen.description':
+    'Erweckt ein totes Gruppenmitglied mit 35% Gesundheit und Mana wieder zum Leben. Ein Sonnenheiler der Stufe 16 oder höher ruft stattdessen alle gefallenen Mitglieder der Gruppe zurück.',
+  'entities.abilities.sacred_challenge.description':
+    'Zwingt einen Gegner, Euch anzugreifen. Während des Aufstiegs verringert er zusätzlich 4 Sek. lang allen erlittenen Schaden um 15%, ohne eine Aufladung zu verbrauchen.',
+  'entities.abilities.sacred_form.description':
+    'Versetzt Euch bis zum Tod in einen heiligen Zustand, erhöht Heilung um 10% und kritische Zauberchance um 5% und verringert erzeugte Bedrohung um 50%. Nur für Sonnenheiler.',
+  'entities.abilities.seraphic_vigil.description':
+    'Schützt einen Verbündeten 30 Sek. lang. Der erste Treffer, der ihn unter 35% Gesundheit bringt, verbraucht die Wacht und heilt ihn um 180. (Segensspruch-Signatur)',
+  'entities.abilities.scouring_mercy.description':
+    'Verursacht 72 bis 84 Heiligschaden an einem Gegner oder heilt ein freundliches Ziel um 130 bis 155. Beide Werte steigen mit der Zaubermacht. Der Schaden heilt außerdem jeden über die Doktrin verbundenen Verbündeten um 30% oder, wenn kein Verbündeter verbunden ist, das Gruppenmitglied mit der geringsten Gesundheit um 15%. (Doktrin-Signatur)',
+  'entities.abilities.solar_invocation.description':
+    'Heilt einen Verbündeten sofort um {damage} oder verursacht mäßigen Heiligschaden an einem Gegner. Beide Anwendungen erzeugen 1 Hingabe. Während des Aufstiegs heilt ein Heilzauber zusätzlich verbündete Spieler innerhalb von 10 m um die Hälfte.',
+  'entities.abilities.solar_step.description': 'Erhöht Euer Tempo 2 Sek. lang um 150%.',
+  'entities.abilities.sun_gods_verdict.description':
+    'Richtet einen Gegner 30 Sek. lang unter dem Urteil des Sonnengottes. Das Letzte Edikt und der Morgensturz schreiben bei einem erfolgreichen Treffer je eine Aufladung ein. Die Fähigkeit, die die dritte Aufladung setzt, bestimmt das Urteil: Das Letzte Edikt entfesselt verheerenden Schaden am Verurteilten; der Morgensturz zündet das Urteil und verletzt und betäubt nahe Gegner 1,5 Sek. lang.',
+  'entities.abilities.sunward_disc.description':
+    'Erfordert einen Schild. Schleudert eine strahlende Scheibe, die trifft und dann zwischen nahen Gegnern abprallt. Jeder schädigende Einschlag erzeugt 1 Hingabe. Sonnenvergeltung lässt die Sonnenscheibe kein Mana kosten, ihre Abklingzeit ignorieren und 20% mehr Schaden verursachen. Der Aufstieg verstärkt 5 Abpraller.',
+  'entities.abilities.valkyrs_calling.description':
+    'Steigt in die Lüfte auf und werdet immun gegen Schaden, während Ihr auf den Gegner zufliegt. Nach 2 Sek. stürzt Ihr auf das Zielgebiet herab und verursacht {damage} Heiligschaden und erzeugt 1 Hingabe. Der Aufstieg erhöht den Einschlagsschaden um 50% und verbraucht 1 Aufladung.',
+  'entities.abilities.veilbound_march.description':
+    'Werdet 4 Sek. lang ätherisch, erhaltet 40% Tempo und 30% Rüstung und werdet immun gegen Wurzeln, Verlangsamungen und Verschiebungen. Gegner, die Ihr durchquert, erhalten 6 Sek. lang das Schleiermal: Sie erleiden jede Sekunde Heiligschaden, verursachen 20% weniger Schaden an Euch und erzeugen zusätzliche Bedrohung. Das erste Mal gewährt 1 Hingabe. Endet der Marsch, erleiden nahe markierte Gegner einen letzten Ausbruch. Der Aufstieg erhöht den Ausbruch um 50% und zieht sie leicht zu Euch.',
+  'entities.abilities.veilbound_mark.description':
+    'Erleidet jede Sekunde Heiligschaden, verursacht 20% weniger Schaden an dem Paladin, der das Mal gesetzt hat, und erzeugt zusätzliche Bedrohung gegenüber diesem Paladin.',
+  'entities.abilities.vowkeeper_strike.description':
+    'Schlägt mit hoher Bedrohung zu und erzeugt 1 Hingabe. Ein erfolgreicher Schlag hat eine Chance von 20%, 8 Sek. lang Sonnenvergeltung zu gewähren; jeder erfolgreiche Block eine von 25%. Sonnenvergeltung verstärkt Eure nächste Sonnenscheibe, Euren nächsten Hammer der Gnade oder Euer nächstes Heilendes Licht. Der Aufstieg gewährt zusätzlich einen kleinen Absorptionsschild.',
+  'entities.abilities.choir_of_deliverance.description':
+    'Kanalisiert 6 Sek. lang und heilt alle 2 Sek. nahe Gruppenmitglieder.',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'entities.abilities.bloodhook.name': 'Bluthaken',
+  'entities.abilities.bloodtrail_assault.name': 'Blutspurangriff',
+  'entities.abilities.cold_focus.name': 'Kalter Fokus',
+  'entities.abilities.fieldcraft_reentry.name': 'Bewaffneter Wiedereintritt',
+  'entities.abilities.frostjaw_trap.name': 'Frostkieferfalle',
+  'entities.abilities.hunting_momentum.name': 'Jagdschwung',
+  'entities.abilities.measured_shot.name': 'Bedachter Schuss',
+  'entities.abilities.pack_command.name': 'Rudelbefehl',
+  'entities.abilities.pack_rally.name': 'Rudelsammlung',
+  'entities.abilities.shellskin.name': 'Panzerhaut',
+  'entities.abilities.shrapnel_charge.name': 'Splitterladung',
+  'entities.abilities.stampede.name': 'Stampede',
+  'entities.abilities.trailbreak.name': 'Pfadbruch',
+  'entities.abilities.unleash_beast.name': 'Bestie entfesseln',
+  'entities.abilities.wildheart.name': 'Wildherz',
+  'entities.abilities.bloodhook.description':
+    'Stürmt auf einen Gegner zu und wendet die Bluthakenwunde an, die über 12 Sek. in 4 Ticks 34 physischen Grundschaden plus 26% Eurer Distanzangriffskraft verursacht. (Feldkunst-Signatur)',
+  'entities.abilities.bloodtrail_assault.description':
+    '12 Sek. lang verbreitet der Bluthaken eine Wunde mit 60% Stärke auf bis zu 2 nahe Gegner, Wundriss befiehlt einen Begleiterangriff mit 18 Schaden, und die Splitterladung gewinnt 2 Meter, verursacht 25% mehr Grundschaden an ihrem Hauptziel und löst 50% mehr Wundschaden aus.',
+  'entities.abilities.cold_focus.description':
+    '12 Sek. lang stellt der Bedachte Schuss 50% mehr Fokus wieder her, und der Lange Zug kostet 25% weniger und wird 30% schneller gewirkt. (Kaltsicht-Signatur)',
+  'entities.abilities.fieldcraft_reentry.description':
+    'Passiv: Pfadbruch erneuert den Jagdschwung und bereitet 12 Sek. lang Euren nächsten Weidschlag oder Bluthaken vor. Der Weidschlag verursacht pro Stapel 15% mehr Schaden. Der Bluthaken verursacht 18 bis 24 zusätzlichen physischen Schaden, erhöht um 15% pro Stapel und durch Eure Distanzangriffskraft. Bei 3 Stapeln verbraucht einer der beiden Angriffe den Jagdschwung. (Feldkunst)',
+  'entities.abilities.frostjaw_trap.description':
+    'Legt eine Falle beim gewählten Gegner oder zu Euren Füßen. Sie schärft sich nach 0,75 Sek. und hält 30 Sek. Der erste Gegner, der sie auslöst, wird 3 Sek. lang festgewurzelt, und Gegner innerhalb von 4 Metern werden 4 Sek. lang um 50% verlangsamt.',
+  'entities.abilities.hunting_momentum.description':
+    'Passiv: Der Weidschlag gewährt 8 Sek. lang 1 Jagdschwung, bis zu 3. Bei 3 Stapeln verursacht Wundriss 45% mehr Schlagschaden und verbraucht die Stapel. (Feldkunst)',
+  'entities.abilities.measured_shot.description':
+    'Beschießt das Ziel für {damage} physischen Schaden. Ein Treffer stellt 20 Fokus wieder her. Der Schaden steigt mit der Distanzangriffskraft.',
+  'entities.abilities.pack_command.description':
+    'Befiehlt Eurem lebenden Begleiter, für 36 bis 48 physischen Schaden zuzuschlagen. Der Schaden steigt mit der Angriffskraft des Begleiters. Ein Treffer stellt 20 Fokus wieder her und gewährt 30 Sek. lang 1 Rudelwildheit, bis zu 3. Jeder Stapel erhöht allen von Eurem Begleiter verursachten Schaden um 10%. Dieser Schlag nutzt die Stapel, die Ihr vor dem Treffer hattet.',
+  'entities.abilities.pack_rally.description':
+    'Nehmt die Gestalt des Zelters an und sammelt nahe Verbündete 10 Sek. lang mit 30% Tempo und 10% Angriffs- und Zaubertempo.',
+  'entities.abilities.shellskin.description':
+    'Verringert erlittenen Schaden 8 Sek. lang um 60%, verhindert aber Angriffe, solange sie aktiv ist.',
+  'entities.abilities.shrapnel_charge.description':
+    'Trifft das Ziel für 24 bis 30 physischen Schaden und bis zu 4 weitere Gegner innerhalb von 6 Metern für 13 bis 17. Die anderen Ziele bluten außerdem über 6 Sek. für 12 Schaden. Trägt das Hauptziel Eure Bluthakenwunde, wird sofort 1 Wundtick verursacht. Der direkte Schaden steigt mit der Distanzangriffskraft.',
+  'entities.abilities.stampede.description':
+    'Beschwört 12 Sek. lang 3 Bestien. Jede greift alle 2 Sek. für {damage} physischen Schaden an. Der angezeigte Schaden enthält 8% Eurer Distanzangriffskraft vor Begleiterschadensboni. Die Bestien fixieren beim Beschwören die Rudelwildheit und gewinnen 10% Schaden pro Stapel. Während die Stampede abklingt, haben erfolgreiche Rudelbefehle eine Chance von 20%, sie zurückzusetzen, garantiert nach 5 fehlgeschlagenen Chancen. Sie kann sich nicht zurücksetzen, solange die Bestien aktiv sind. (Rudelfürst)',
+  'entities.abilities.trailbreak.description':
+    'Springt 12 Meter rückwärts. Habt Ihr Jagdschwung, wird er erneuert und bereitet 12 Sek. lang den Wiedereintritt vor.',
+  'entities.abilities.unleash_beast.description':
+    'Verbraucht 3 Rudelwildheit, nachdem Euer Begleiter für 83 bis 105 physischen Schaden zugeschlagen und alle Gegner innerhalb von 6 Metern für 26 bis 34 erschüttert hat. Schlag und Erschütterung nutzen den vollen Begleiterschadensbonus von 30% der Rudelwildheit und steigen mit der Angriffskraft des Begleiters. In den folgenden 8 Sek. verursacht der Begleiter 25% mehr Schaden, greift 35% schneller an und lässt den Finsteren Schuss bis zu 2 nahe Gegner treffen.',
+  'entities.abilities.wildheart.description':
+    'Stellt sofort 30% Eurer maximalen Gesundheit wieder her.',
+  'entities.abilities.ancestor_return.name': 'Rückkehr der Ahnen',
+  'entities.abilities.galeheart_weapon.name': 'Sturmherzwaffe',
+  'entities.abilities.lifespring_weapon.name': 'Lebensquellwaffe',
+  'entities.abilities.primal_exaltation.name': 'Urtümliche Erhebung',
+  'entities.abilities.stoneward.name': 'Steinwacht',
+  'entities.abilities.stormsurge.name': 'Sturmflut',
+  'entities.abilities.thunder_reservoir.name': 'Donnerspeicher',
+  'entities.abilities.tidecall.name': 'Gezeitenruf',
+  'entities.abilities.unleash_weapon.name': 'Waffe entfesseln',
+  'entities.abilities.warspirit_cadence.name': 'Kriegsgeistkadenz',
+  'entities.abilities.ancestor_return.description':
+    'Ruft jedes gefallene Mitglied Eurer Gruppe oder Eures Schlachtzugs an seinem Körper mit 30% Gesundheit und Mana ins Leben zurück. Kann nicht im Kampf gewirkt werden. (Geistflickung)',
+  'entities.abilities.galeheart_weapon.description':
+    'Verzaubert beide Waffen 30 Min. lang und ermöglicht die Kriegsgeistkadenz.',
+  'entities.abilities.lifespring_weapon.description':
+    'Verzaubert Eure Waffe 30 Min. lang. Heilende Wasser und der Gezeitenruf fügen der Flickströmung 20% mehr Heilung hinzu.',
+  'entities.abilities.primal_exaltation.description':
+    '12 Sek. lang werden der Lichtbogenblitz und der Gabelblitz des Donnerrufs 50% schneller gewirkt, und der Lichtbogenblitz gewährt 2 Donner; der Kriegsgeist löst seine Kadenz alle 2 Waffentreffer aus; die Geistflickung fügt der Flickströmung 50% mehr Heilung hinzu. (Schamanentalent)',
+  'entities.abilities.stoneward.description':
+    'Schützt einen Verbündeten 60 Sek. lang mit 6 Aufladungen. Schaden verbraucht eine Aufladung, um 5% der maximalen Gesundheit zu heilen, einmal alle 3 Sek. (Schamanentalent)',
+  'entities.abilities.stormsurge.description':
+    'Passiv: Während der Ahnenschlag abklingt, hat das Verbrauchen eines Sturmzeichens eine Chance von 25%, ihn zurückzusetzen. Schlagen die ersten 3 Chancen fehl, setzt ihn die 4. immer zurück. (Kriegsgeist)',
+  'entities.abilities.thunder_reservoir.description':
+    'Passiv: Der Lichtbogenblitz und der Gabelblitz gewähren Donner, bis zu 5. Bei 5 Donner verursacht der Erdstoß 125% mehr Schaden oder das Erdbeben 100% mehr, und dann wird aller Donner verbraucht. (Donnerruf)',
+  'entities.abilities.tidecall.description':
+    'Heilt ein freundliches Ziel um 58 bis 72. Die Heilung steigt mit der Zaubermacht. Fügt der Flickströmung dieselbe vor Überheilung berechnete Heilung hinzu, bis zu 30% der maximalen Gesundheit des Ziels.',
+  'entities.abilities.unleash_weapon.description':
+    'Entfesselt Eure aktive Waffenverzauberung. Das Flammenmal verursacht 54 bis 64 Feuerschaden, gewinnt 30% der Zaubermacht und gewährt 2 Donner. Das Sturmherz schlägt mit Eurer Waffe zu, treibt die Kriegsgeistkadenz voran und gewährt 6 Sek. lang 20% Angriffstempo. Das Steingebundene schlägt für 75% Waffenschaden zu, zwingt das Ziel, Euch anzugreifen, und verringert erlittenen Schaden 4 Sek. lang um 20%. Die Lebensquelle verbraucht Eure Flickströmung, heilt um 125% ihrer verbleibenden Heilung und verringert den nächsten Treffer innerhalb von 8 Sek. um 50% der wiederhergestellten Gesundheit.',
+  'entities.abilities.warspirit_cadence.description':
+    'Passiv: Jeder 3. gelandete Waffenangriff löst 2 Sturmherzechos für 50% Naturschaden aus und gewährt 12 Sek. lang ein Sturmzeichen. Das Sturmzeichen macht Euren nächsten Lichtbogenblitz, Erdstoß oder Eure nächsten Heilenden Wasser sofort wirkbar und senkt deren Manakosten um 50%. Der Ahnenschlag zählt als 2 Angriffe. (Kriegsgeist)',
+  'entities.abilities.summon_tithefiend.name': 'Zehntteufel rufen',
+  'entities.abilities.summon_tithefiend.description':
+    'Verbraucht allen Düsterzehnt, um bei 1 bis 5 Stapeln einen Zehntteufel für 6, 8, 10, 12 oder 15 Sek. zu beschwören. Er greift alle 2 Sek. für 20 bis 24 Schattenschaden an, plus 8 pro zusätzlichem Stapel. Bei fünf Stapeln wird er größer und sein Schaden steigt um 25%. Sein Schaden steigt mit Eurer Zaubermacht. Er bevorzugt Euer Abbild. Jeder Treffer stellt 1% des maximalen Manas wieder her und überträgt 15% des Schadens auf bis zu 3 weitere Gegner mit Eurem Klagelied des Verfalls. (Vesper-Signatur)',
+  'entities.abilities.veilstep.name': 'Schleierschritt',
+  'entities.abilities.veilstep.description': 'Schreitet in Blickrichtung durch den Schleier.',
+  'entities.quests.q_divine_tome.title': 'Der Morgengebundene Foliant',
+  'entities.quests.q_divine_tome.objectives.0.label': 'Ruhelose Gebeine zur Ruhe gebettet',
+  'entities.quests.q_divine_tome.text':
+    'Das Licht ruht nicht still in Euch, {playerName}. Ich habe gesehen, wie Ihr die Toten zur Ruhe gebettet habt, und ich glaube, Ihr seid bereit für das, was nur wenigen Paladinen je gelehrt wird: den Ritus der Rückrufung, mit dem eine gefallene Seele zu den Lebenden zurückgerufen wird. Seine Worte werden im Morgengebundenen Folianten bewahrt, hier in meiner Obhut, doch ein Buch ist kein Segen, solange die ruhelosen Toten noch über diesen Boden wandeln. Bettet 6 weitere Ruhelose Gebeine zur Erde, und ich beginne, Euch zu unterweisen.',
+  'entities.quests.q_divine_tome.completion':
+    'Der Kapellenhof wird still. Ihr seid bereit für die Worte, {playerName}, doch der Ritus der Rückrufung kann nicht in einer warmen Kapelle gesprochen werden. Er muss dort gesungen werden, wo der Schleier zwischen Leben und Tod dünn wird. Ich gedenke, den Folianten nordwärts in das Moorfenn-Marschland zu tragen. Folgt mir dorthin, und wir bringen dies zu Ende.',
+  'entities.quests.q_rite_of_redemption.title': 'Der Ritus der Rückrufung',
+  'entities.quests.q_rite_of_redemption.objectives.0.label': 'Ertrunkene Tote zur Ruhe gebettet',
+  'entities.quests.q_rite_of_redemption.text':
+    'Ihr seid mir also in den Morast gefolgt, {playerName}. Gut. Ich habe den Morgengebundenen Folianten hier, und dieser ertrunkene Boden ist der Ort, an den seine Worte gehören: Nirgends ist der Schleier zwischen Leben und Tod dünner als dort, wo die Toten nicht begraben bleiben wollen. Doch die Ertrunkenen würden Eure Stimme mitten im Vers hinabziehen. Schafft einen Raum, der des Ritus würdig ist: Bettet 8 der Ertrunkenen Toten zur Ruhe, und wir weihen ihn gemeinsam.',
+  'entities.quests.q_rite_of_redemption.completion':
+    'Kniet nieder, {playerName}, und lest die Worte laut. Da. Spürt Ihr es? Das Licht heilt in Euren Händen nicht länger nur die Lebenden, es kann jene zurückrufen, die hinübergegangen sind. Nutzt es weise. Eine Seele, die in einen aussichtslosen Kampf zurückgerufen wird, ist eine Grausamkeit, keine Gnade. Erhebt Euch, Erlöser.',
+  'guide.abilityHook.hammer_of_justice':
+    'Hält einen Gegner mit einer kurzen, verlässlichen Betäubung auf.',
+  'guide.abilityHook.oath_chain':
+    'Zerrt einen entfernten Gegner in Euer Rudel und bremst seine Flucht.',
+  'guide.abilityHook.ancestor_return':
+    'Erweckt nach einem langen Zauber außerhalb des Kampfes jedes gefallene Gruppen- oder Schlachtzugsmitglied wieder zum Leben.',
+  'guide.abilityHook.avenging_wrath':
+    'Gewährt 10 Hingabe und verdoppelt dann fünfzehn Sekunden lang die von Fähigkeiten erzeugte Hingabe.',
+  'guide.abilityHook.bastion_sweep':
+    'Fegt mit Eurem Schild durch eine Gruppe, um Bedrohung an Euch zu reißen und Hingabe aufzubauen.',
+  'guide.abilityHook.chain_lightning':
+    'Trifft ein Ziel und springt auf zwei nahe Gegner über und baut für den gesamten Zauber einen Donner auf.',
+  'guide.abilityHook.consecration':
+    'Beansprucht den Boden um Euch mit anhaltendem Heiligschaden und anhaltender Bedrohung.',
+  'guide.abilityHook.hammer_of_wrath':
+    'Richtet einen verwundeten Gegner aus der Distanz hin, oder jeden Gegner, solange Eure Schwingen aktiv sind.',
+  'guide.abilityHook.holy_shield':
+    'Gibt Hingabe für ein aktives Blockfenster, Absorption und einen Bedrohungsimpuls aus.',
+  'guide.abilityHook.lay_on_hands':
+    'Stellt eine große Menge Gesundheit wieder her, wenn ein Verbündeter kurz vor dem Fall steht.',
+  'guide.abilityHook.measured_shot':
+    'Ein bedachter Distanzschuss, der Fokus für Eure schwereren Angriffe wiederherstellt.',
+  'guide.abilityHook.pack_command':
+    'Befiehlt Eurem Gefährten zuzuschlagen und Rudelwildheit aufzubauen. Jeder Stapel lässt Euren Begleiter 10% mehr Schaden verursachen, bis zu 30%, bevor Bestie entfesseln die Stapel ausgibt.',
+  'guide.abilityHook.stampede':
+    'Ruft drei Bestien, die 12 Sekunden lang angreifen. Setzt sie bei voller Rudelwildheit ein, damit sie den maximalen Schadensbonus für die gesamte Beschwörung behalten.',
+  'guide.abilityHook.stormsurge':
+    'Bringt den Ahnenschlag manchmal früher zurück, nachdem Ihr eine Sturmzeichen-Gelegenheit ausgegeben habt.',
+  'guide.abilityHook.thunder_reservoir':
+    'Speichert Blitze, bis der Erdstoß oder das Erdbeben eine Auszahlung mit voller Kraft freisetzen kann.',
+  'guide.abilityHook.veilbound_march':
+    'Durchquert eine Gruppe, um sie zu markieren, ihren Schaden gegen Euch abzustumpfen und Bedrohung zu sichern.',
+  'guide.abilityHook.warspirit_cadence':
+    'Verwandelt einen stetigen Waffenrhythmus in Sturmherzechos und eine Gelegenheit für einen Sofortzauber.',
 };

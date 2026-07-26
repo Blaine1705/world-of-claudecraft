@@ -9545,4 +9545,287 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Remplace {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Cet objet a déjà cet enchantement.',
   'hudChrome.enchanting.sameEnchantTag': 'Déjà appliqué',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'abilityUi.resources.devotion': 'Dévotion',
+  'abilityUi.resources.focus': 'concentration',
+  'classDetails.resources.focus': 'Concentration',
+  'game.hud.lowFocus': 'Concentration faible',
+  'hud.errors.notEnoughDevotion': 'Dévotion insuffisante !',
+  'hudChrome.paladin.devotion': 'Dévotion',
+  'hudChrome.paladin.devotionValue': 'Dévotion {value} sur {max}',
+  'hudChrome.paladin.devotionAscensionCharges':
+    'Dévotion {value} sur {max}. Ascension : {charges} charges.',
+  'hudChrome.paladin.devotionAscensionLast':
+    'Dévotion {value} sur {max}. Ascension : dernière charge.',
+  'hudChrome.paladin.ascensionLastAnnouncement': 'Ascension : dernière charge',
+  'hudChrome.paladin.ascensionSpenderAria':
+    "Emplacement d'action {slot} : {ability}. Consomme une charge d'Ascension.",
+  'hudChrome.crafting.craftedToastQty': 'Fabriqué : {name} x{qty}',
+  'hudChrome.enchanting.disenchantedAlso': 'Vous récupérez également {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Vous récupérez également {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedYield': 'Vous désenchantez {item} et obtenez {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty':
+    'Vous désenchantez {item} et obtenez {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Vous récupérez {material} à partir de {item}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Vous récupérez {material} x{qty} à partir de {item}.',
+  'hudChrome.auraEffect.dawnsWrath': 'MdC : tous PV · +1 usage · Recharge 0 · +{pct}% de dégâts',
+  'hudChrome.auraEffect.duskEconomy': "Les capacités coûtent {pct}% d'énergie en moins",
+  'hudChrome.auraEffect.hunterFerocity':
+    '{stacks} Férocité de meute : votre familier inflige {pct}% de dégâts en plus',
+  'hudChrome.auraEffect.veiledEdge': 'Votre prochaine Frappe du rôdeur frappe deux fois plus fort',
+  'hudChrome.auraEffect.gloam':
+    "Pénombre : palier {stacks} sur {max}. À {max}, vos ouvertures du Voile crépusculaire se débloquent à découvert, et la prochaine lancée est GRATUITE et fait détoner la réserve en voile d'ombre",
+  'hudChrome.auraEffect.mendingCurrent':
+    'Stocke {value} de soins, libérés avec le temps ou consommés par Reprise en cascade',
+  'hudChrome.auraEffect.mendingCurrentPercent':
+    'Stocke des soins équivalents à {pct}% des points de vie maximum pour Reprise en cascade',
+  'hudChrome.auraEffect.radiantResonance':
+    "Votre prochaine Lumière guérisseuse est instantanée, ou votre prochaine Étreinte de l'aube coûte {pct}% de mana en moins et s'incante en {castTime} s",
+  'hudChrome.auraEffect.redline':
+    'Ligne rouge : cran {stacks} sur {max}. Les Coups au corps ajoutent des crans ; le Coup de grâce frappe {pct}% plus fort par cran et clôt la fenêtre. Expirer avant la perd',
+  'hudChrome.auraEffect.solarReprisal':
+    'Votre prochain Disque solaire ne coûte pas de mana, ignore son temps de recharge et inflige {pct}% de dégâts en plus ; le Marteau de grâce ignore son temps de recharge et vous soigne de 100% des dégâts infligés ; ou la Lumière guérisseuse est instantanée',
+  'hudChrome.auraEffect.veilstrikeWindow':
+    "Voile d'ombre : vos ouvertures du Voile crépusculaire sont utilisables à découvert sous tout angle, et les dégâts infligés augmentent de {pct}%",
+  'hudChrome.auraEffect.venomRitual':
+    'Rituel de venin : palier {stacks} sur {max}. Les frappes génératrices ajoutent des paliers ; à {max}, Sommeil éternel devient Déchirure venimeuse',
+  'entities.abilities.aegis_first_dawn.name': 'Égide de la Première Aube',
+  'entities.abilities.aura_mastery.name': 'Concorde sacrée',
+  'entities.abilities.bastion_rite.name': 'Rite du bastion',
+  'entities.abilities.bastion_sweep.name': 'Balayage du bastion',
+  'entities.abilities.beacon_of_light.name': 'Phare de lumière',
+  'entities.abilities.dawn_devotion.name': "Dévotion de l'aube",
+  'entities.abilities.dawnfall.name': "Chute de l'aube",
+  'entities.abilities.dawns_embrace.name': "Étreinte de l'aube",
+  'entities.abilities.devotion_ward.name': 'Dévotion du bastion',
+  'entities.abilities.divine_ascension.name': 'Ascension divine',
+  'entities.abilities.faithforged_guard.name': 'Dette de lumière',
+  'entities.abilities.final_edict.name': 'Édit final',
+  'entities.abilities.grace_devotion.name': 'Dévotion de grâce',
+  'entities.abilities.guardian_covenant.name': 'Pacte du gardien',
+  'entities.abilities.hammer_of_grace.name': 'Marteau de grâce',
+  'entities.abilities.hushbrand.name': 'Marque du silence',
+  'entities.abilities.life_covenant.name': 'Pacte de vie',
+  'entities.abilities.martyrs_aegis.name': 'Égide du martyr',
+  'entities.abilities.mercy_lance.name': 'Lance de miséricorde',
+  'entities.abilities.oath_chain.name': 'Chaîne du serment',
+  'entities.abilities.radiant_chorus.name': 'Chœur radiant',
+  'entities.abilities.radiant_devotion.name': 'Dévotion radiante',
+  'entities.abilities.recall_the_fallen.name': 'Rappel des tombés',
+  'entities.abilities.sacred_challenge.name': 'Aiguillon sacré',
+  'entities.abilities.sacred_form.name': 'Forme sacrée',
+  'entities.abilities.seraphic_vigil.name': 'Veille séraphique',
+  'entities.abilities.solar_invocation.name': 'Invocation solaire',
+  'entities.abilities.solar_step.name': 'Pas solaire',
+  'entities.abilities.sun_gods_verdict.name': 'Verdict du Dieu Soleil',
+  'entities.abilities.sunward_disc.name': 'Disque solaire',
+  'entities.abilities.valkyrs_calling.name': 'Appel de la valkyrie',
+  'entities.abilities.veilbound_march.name': 'Marche du voile',
+  'entities.abilities.veilbound_mark.name': 'Marque du voile',
+  'entities.abilities.vowkeeper_strike.name': 'Frappe du gardevœu',
+  'entities.abilities.choir_of_deliverance.name': 'Chœur de délivrance',
+  'entities.abilities.scouring_mercy.name': 'Miséricorde purifiante',
+  'entities.abilities.aegis_first_dawn.description':
+    "Incantez pendant 5 s pour créer un dôme sacré de 10 mètres. Les alliés à l'intérieur sont soignés chaque seconde et subissent 50% de dégâts en moins. Terminer l'incantation libère un soin final et octroie 30% de vitesse de déplacement pendant 4 s.",
+  'entities.abilities.aura_mastery.description':
+    'Pendant 8 s, renforce toutes les Dévotions et Auras de représailles actives de votre groupe. La Dévotion du bastion réduit les dégâts de 15% ; les Représailles infligent 15 points de dégâts Sacrés. Les usages multiples se rafraîchissent au lieu de se cumuler.',
+  'entities.abilities.bastion_rite.description':
+    "Réduit les dégâts physiques subis de 20% et augmente les chances de blocage de 20% pendant 6 s. L'Ascension porte la durée à 10 s.",
+  'entities.abilities.bastion_sweep.description':
+    "Balayez les ennemis d'un arc frontal de 180 degrés avec votre bouclier équipé pour {damage} points de dégâts Sacrés avec une menace élevée et générez 1 Dévotion. L'Ascension augmente les dégâts de 30% et le rayon à 8 m.",
+  'entities.abilities.beacon_of_light.description':
+    "Désigne un membre du groupe comme votre Phare de lumière. 50% de vos soins directs effectifs sur un autre membre du groupe situé à moins de 60 m soignent aussi le Phare. Les soins de zone et périodiques ne sont pas transférés. Dure jusqu'à la mort de l'un de vous deux.",
+  'entities.abilities.dawn_devotion.description':
+    "Augmente la puissance d'attaque de vous-même et des membres du groupe de 40 pendant 30 min. Remplace votre propre Dévotion radiante ou de grâce, mais coexiste avec les Dévotions des autres paladins et avec les cris de guerrier.",
+  'entities.abilities.dawnfall.description':
+    "Inflige {damage} points de dégâts Sacrés aux ennemis proches et génère 1 Dévotion. Toucher au moins un ennemi réduit de 2 s le temps de recharge restant de l'Édit final. L'Ascension augmente ses dégâts et son rayon.",
+  'entities.abilities.dawns_embrace.description':
+    "Délivre un soin puissant et génère 1 Dévotion. La Résonance radiante réduit son coût en mana de 50% et son temps d'incantation à 1,5 s. L'Ascension la rend instantanée et augmente ses soins de 35%.",
+  'entities.abilities.devotion_ward.description':
+    "Réduit de 5% les dégâts subis par vous-même et les membres du groupe jusqu'à la mort ou au remplacement. Seules cette aura et l'Aura de représailles se remplacent mutuellement ; les Dévotions radiante, de l'aube et de grâce coexistent.",
+  'entities.abilities.divine_ascension.description':
+    "Consomme 20 Dévotion pour obtenir 5 charges d'Ascension pendant 45 s au maximum. Les capacités marquées consomment une charge et gagnent un effet supplémentaire.",
+  'entities.abilities.faithforged_guard.description':
+    "Pendant 8 s, le prochain coup ennemi porté contre vous reçoit une réponse : jusqu'à {buff} points de dégâts sont annulés et renvoyés à l'attaquant en dégâts Sacrés, et vous gagnez 1 Dévotion. Un seul coup reçoit une réponse. L'Ascension augmente de 50% le montant auquel elle peut répondre.",
+  'entities.abilities.final_edict.description':
+    "Assène une frappe d'arme dévastatrice et génère 1 Dévotion lorsqu'elle inflige des dégâts. Un coup réussi réduit de 2 s le temps de recharge restant de la Chute de l'aube. Les attaques automatiques réussies et les coups de l'Édit final ont 15% de chances d'octroyer le Courroux de l'aube pendant 8 s. L'Ascension libère en outre une explosion Sacrée autour de vous.",
+  'entities.abilities.grace_devotion.description':
+    "Vous et les membres du groupe récupérez 15 mana toutes les 5 s et payez 3% de mana en moins pendant 30 min. Remplace votre propre Dévotion radiante ou de l'aube, mais coexiste avec les Dévotions des autres paladins.",
+  'entities.abilities.guardian_covenant.description':
+    "Protège une cible alliée et vous-même, réduisant les dégâts subis de 20% pendant 8 s. Vous cible par défaut si aucune cible alliée n'est sélectionnée.",
+  'entities.abilities.hammer_of_grace.description':
+    "Lance instantanément un marteau sacré sur un ennemi à moins de 20 m pour {damage}, restaure 70 mana, vous soigne de 50% des dégâts infligés et génère 1 Dévotion lorsqu'il inflige des dégâts. Les Représailles solaires permettent au Marteau de grâce d'ignorer son temps de recharge et de vous soigner de 100% des dégâts infligés.",
+  'entities.abilities.hushbrand.description':
+    "Interrompt l'incantation et empêche les sorts de cette école pendant 4 s.",
+  'entities.abilities.life_covenant.description':
+    "Réduit de 40% les dégâts subis par un allié pendant 6 s. Pendant l'Ascension, octroie aussi un bouclier de 120 points sans consommer de charge.",
+  'entities.abilities.martyrs_aegis.description':
+    'Réduit de 40% les dégâts subis par un allié pendant 8 s.',
+  'entities.abilities.mercy_lance.description':
+    "Inflige {damage} points de dégâts Sacrés à un ennemi et génère 1 Dévotion lorsqu'elle inflige des dégâts. Pendant l'Ascension, elle consomme 1 charge pour garantir un coup critique.",
+  'entities.abilities.oath_chain.description':
+    "Entrave instantanément un ennemi lointain d'une chaîne sacrée. L'ennemi se déplace vers vous à 18 m par seconde jusqu'à 3 m, puis est ralenti de 50% pendant 4 s. Pendant l'Ascension, elle entrave un second ennemi proche.",
+  'entities.abilities.radiant_chorus.description':
+    "Soigne les alliés proches de {damage} et génère 1 Dévotion. Soigner efficacement au moins 2 alliés octroie la Résonance radiante : votre prochaine Lumière guérisseuse est instantanée, ou votre prochaine Étreinte de l'aube coûte 50% de mana en moins et s'incante en 1,5 s. L'Ascension augmente les soins et le rayon du Chœur radiant.",
+  'entities.abilities.radiant_devotion.description':
+    "Augmente la puissance des sorts de vous-même et des membres du groupe de 20 pendant 30 min. Remplace votre propre Dévotion de l'aube ou de grâce, mais coexiste avec les Dévotions des autres paladins.",
+  'entities.abilities.recall_the_fallen.description':
+    'Ramène à la vie un membre mort du groupe avec 35% de points de vie et de mana. Un Sagesoleil de niveau 16 ou plus rappelle à la place tous les membres tombés du groupe.',
+  'entities.abilities.sacred_challenge.description':
+    "Contraint un ennemi à vous attaquer. Pendant l'Ascension, réduit aussi de 15% tous les dégâts subis pendant 4 s sans consommer de charge.",
+  'entities.abilities.sacred_form.description':
+    "Entre dans un état sacré jusqu'à la mort, augmentant les soins de 10% et les chances de critique des sorts de 5%, et réduisant la menace générée de 50%. Réservé aux Sagesoleil.",
+  'entities.abilities.seraphic_vigil.description':
+    'Protège un allié pendant 30 s. Le premier coup qui le fait descendre sous 35% de points de vie consomme la Veille et le soigne de 180. (Signature de Bénison)',
+  'entities.abilities.scouring_mercy.description':
+    "Inflige 72 à 84 points de dégâts Sacrés à un ennemi ou soigne une cible alliée de 130 à 155. Les deux montants augmentent avec la puissance des sorts. Les dégâts soignent aussi chaque allié lié par la Doctrine de 30%, ou le membre du groupe le plus blessé de 15% si aucun allié n'est lié. (Signature de Doctrine)",
+  'entities.abilities.solar_invocation.description':
+    "Soigne instantanément un allié de {damage} ou inflige des dégâts Sacrés modérés à un ennemi. Les deux usages génèrent 1 Dévotion. Pendant l'Ascension, une incantation de soin soigne aussi de moitié les joueurs alliés à moins de 10 m de la cible.",
+  'entities.abilities.solar_step.description':
+    'Augmente votre vitesse de déplacement de 150% pendant 2 s.',
+  'entities.abilities.sun_gods_verdict.description':
+    "Juge un ennemi sous le Verdict du Dieu Soleil pendant 30 s. L'Édit final et la Chute de l'aube inscrivent une charge à chaque coup réussi. La capacité qui pose la troisième charge dicte la sentence : l'Édit final déchaîne des dégâts dévastateurs sur le condamné ; la Chute de l'aube fait détoner le verdict, blessant et étourdissant les ennemis proches pendant 1,5 s.",
+  'entities.abilities.sunward_disc.description':
+    "Nécessite un bouclier. Lance un disque radiant qui frappe puis rebondit entre les ennemis proches. Chaque impact infligeant des dégâts génère 1 Dévotion. Les Représailles solaires font que le Disque solaire ne coûte pas de mana, ignore son temps de recharge et inflige 20% de dégâts en plus. L'Ascension renforce 5 rebonds.",
+  'entities.abilities.valkyrs_calling.description':
+    "Vous vous élevez dans les airs, devenant insensible aux dégâts en volant vers l'ennemi. Après 2 s, vous vous abattez sur la zone ciblée pour {damage} points de dégâts Sacrés et générez 1 Dévotion. L'Ascension augmente les dégâts d'impact de 50% et consomme 1 charge.",
+  'entities.abilities.veilbound_march.description':
+    "Devenez éthéré pendant 4 s, gagnant 40% de vitesse de déplacement et 30% d'armure, et devenant insensible aux entraves, ralentissements et déplacements. Les ennemis que vous traversez reçoivent la Marque du voile pendant 6 s : ils subissent des dégâts Sacrés chaque seconde, vous infligent 20% de dégâts en moins et génèrent une menace supplémentaire. La première marque octroie 1 Dévotion. À la fin de la marche, les ennemis marqués proches subissent une déflagration finale. L'Ascension augmente la déflagration de 50% et les attire légèrement vers vous.",
+  'entities.abilities.veilbound_mark.description':
+    'Subit des dégâts Sacrés chaque seconde, inflige 20% de dégâts en moins au paladin qui a posé la marque et génère une menace supplémentaire envers ce paladin.',
+  'entities.abilities.vowkeeper_strike.description':
+    "Frappe avec une menace élevée et génère 1 Dévotion. Une frappe réussie a 20% de chances d'octroyer les Représailles solaires pendant 8 s ; chaque blocage réussi, 25%. Les Représailles solaires renforcent votre prochain Disque solaire, Marteau de grâce ou Lumière guérisseuse. L'Ascension octroie aussi un petit bouclier d'absorption.",
+  'entities.abilities.choir_of_deliverance.description':
+    'Incante pendant 6 s et soigne les membres proches du groupe toutes les 2 s.',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'entities.abilities.bloodhook.name': 'Croc sanglant',
+  'entities.abilities.bloodtrail_assault.name': 'Assaut de la piste sanglante',
+  'entities.abilities.cold_focus.name': 'Concentration glaciale',
+  'entities.abilities.fieldcraft_reentry.name': 'Rentrée armée',
+  'entities.abilities.frostjaw_trap.name': 'Piège Mâchegivre',
+  'entities.abilities.hunting_momentum.name': 'Élan de chasse',
+  'entities.abilities.measured_shot.name': 'Tir mesuré',
+  'entities.abilities.pack_command.name': 'Ordre de meute',
+  'entities.abilities.pack_rally.name': 'Ralliement de meute',
+  'entities.abilities.shellskin.name': 'Peau de carapace',
+  'entities.abilities.shrapnel_charge.name': 'Charge à fragmentation',
+  'entities.abilities.stampede.name': 'Ruée sauvage',
+  'entities.abilities.trailbreak.name': 'Brise-piste',
+  'entities.abilities.unleash_beast.name': 'Déchaîner la bête',
+  'entities.abilities.wildheart.name': 'Cœur sauvage',
+  'entities.abilities.bloodhook.description':
+    "Chargez un ennemi et appliquez la Plaie du croc sanglant, infligeant 34 points de dégâts Physiques de base plus 26% de votre puissance d'attaque à distance sur 12 s en 4 impulsions. (Signature de Maîtrise du terrain)",
+  'entities.abilities.bloodtrail_assault.description':
+    'Pendant 12 s, le Croc sanglant propage une plaie à 60% de puissance à un maximum de 2 ennemis proches, le Déchirement commande une attaque de familier de 18 points de dégâts, et la Charge à fragmentation gagne 2 mètres, inflige 25% de dégâts de base en plus à sa cible principale et déclenche 50% de dégâts de plaie en plus.',
+  'entities.abilities.cold_focus.description':
+    "Pendant 12 s, le Tir mesuré restaure 50% de concentration en plus, et la Longue traite coûte 25% de moins et s'incante 30% plus vite. (Signature de Regard glacial)",
+  'entities.abilities.fieldcraft_reentry.description':
+    "Passif : Brise-piste rafraîchit l'Élan de chasse et prépare votre prochaine Frappe éviscérante ou Croc sanglant pendant 12 s. La Frappe éviscérante inflige 15% de dégâts en plus par cumul. Le Croc sanglant inflige 18 à 24 points de dégâts Physiques supplémentaires, augmentés de 15% par cumul et par votre puissance d'attaque à distance. À 3 cumuls, l'une ou l'autre attaque consomme l'Élan de chasse. (Maîtrise du terrain)",
+  'entities.abilities.frostjaw_trap.description':
+    "Pose un piège sur l'ennemi sélectionné ou à vos pieds. Il s'arme après 0,75 s et dure 30 s. Le premier ennemi qui le déclenche est immobilisé pendant 3 s, et les ennemis à moins de 4 mètres sont ralentis de 50% pendant 4 s.",
+  'entities.abilities.hunting_momentum.description':
+    "Passif : la Frappe éviscérante octroie 1 Élan de chasse pendant 8 s, jusqu'à 3. À 3 cumuls, le Déchirement inflige 45% de dégâts de frappe en plus et consomme les cumuls. (Maîtrise du terrain)",
+  'entities.abilities.measured_shot.description':
+    "Tire sur la cible pour {damage} points de dégâts Physiques. Un coup au but restaure 20 concentration. Les dégâts augmentent avec la puissance d'attaque à distance.",
+  'entities.abilities.pack_command.description':
+    "Ordonne à votre familier vivant de frapper pour 36 à 48 points de dégâts Physiques. Les dégâts augmentent avec la puissance d'attaque du familier. Un coup au but restaure 20 concentration et octroie 1 Férocité de meute pendant 30 s, jusqu'à 3. Chaque cumul augmente de 10% tous les dégâts infligés par votre familier. Cette frappe utilise les cumuls que vous aviez avant le coup.",
+  'entities.abilities.pack_rally.description':
+    "Adoptez l'Aspect du coursier et ralliez les alliés proches avec 30% de vitesse de déplacement et 10% de vitesse d'attaque et d'incantation pendant 10 s.",
+  'entities.abilities.shellskin.description':
+    "Réduit les dégâts subis de 60% pendant 8 s, mais empêche d'attaquer tant que l'effet est actif.",
+  'entities.abilities.shrapnel_charge.description':
+    "Frappe la cible pour 24 à 30 points de dégâts Physiques et jusqu'à 4 autres ennemis à moins de 6 mètres pour 13 à 17. Les autres cibles saignent aussi pour 12 points de dégâts sur 6 s. Si la cible principale porte votre Plaie du croc sanglant, inflige immédiatement 1 impulsion de plaie. Les dégâts directs augmentent avec la puissance d'attaque à distance.",
+  'entities.abilities.stampede.description':
+    "Invoque 3 bêtes pendant 12 s. Chacune attaque toutes les 2 s pour {damage} points de dégâts Physiques. Les dégâts affichés incluent 8% de votre puissance d'attaque à distance avant les bonus de dégâts de familier. Les bêtes figent la Férocité de meute à l'invocation et gagnent 10% de dégâts par cumul. Tant que la Ruée sauvage est en recharge, les Ordres de meute réussis ont 20% de chances de la réinitialiser, garanti après 5 échecs. Elle ne peut pas se réinitialiser tant que les bêtes sont actives. (Seigneur de meute)",
+  'entities.abilities.trailbreak.description':
+    "Bondissez de 12 mètres en arrière. Si vous avez l'Élan de chasse, il est rafraîchi et prépare la Rentrée pendant 12 s.",
+  'entities.abilities.unleash_beast.description':
+    "Consomme 3 Férocité de meute après que votre familier a frappé pour 83 à 105 points de dégâts Physiques et secoué tous les ennemis à moins de 6 mètres pour 26 à 34. La frappe et la secousse utilisent le bonus complet de 30% de dégâts de familier de la Férocité de meute et augmentent avec la puissance d'attaque du familier. Pendant les 8 s suivantes, le familier inflige 25% de dégâts en plus, attaque 35% plus vite et fait que le Tir funeste touche jusqu'à 2 ennemis proches.",
+  'entities.abilities.wildheart.description':
+    'Restaure instantanément 30% de vos points de vie maximum.',
+  'entities.abilities.ancestor_return.name': 'Retour des ancêtres',
+  'entities.abilities.galeheart_weapon.name': 'Arme Cœur-de-bourrasque',
+  'entities.abilities.lifespring_weapon.name': 'Arme Source-de-vie',
+  'entities.abilities.primal_exaltation.name': 'Exaltation primordiale',
+  'entities.abilities.stoneward.name': 'Garde de pierre',
+  'entities.abilities.stormsurge.name': 'Houle de tempête',
+  'entities.abilities.thunder_reservoir.name': 'Réservoir de tonnerre',
+  'entities.abilities.tidecall.name': 'Appel des marées',
+  'entities.abilities.unleash_weapon.name': "Déchaîner l'arme",
+  'entities.abilities.warspirit_cadence.name': "Cadence de l'esprit guerrier",
+  'entities.abilities.ancestor_return.description':
+    'Ramène à la vie auprès de leur corps tous les membres tombés de votre groupe ou raid avec 30% de points de vie et de mana. Ne peut pas être incanté en combat. (Reprise spirituelle)',
+  'entities.abilities.galeheart_weapon.description':
+    "Enchante les deux armes pendant 30 min et active la Cadence de l'esprit guerrier.",
+  'entities.abilities.lifespring_weapon.description':
+    "Enchante votre arme pendant 30 min. Eaux réparatrices et l'Appel des marées ajoutent 20% de soins en plus au Courant réparateur.",
+  'entities.abilities.primal_exaltation.description':
+    "Pendant 12 s, le Éclair d'arc et l'Éclair fourchu de l'Appel du tonnerre s'incantent 50% plus vite, et le Éclair d'arc octroie 2 Tonnerre ; l'Esprit guerrier déclenche sa cadence tous les 2 coups d'arme ; la Reprise spirituelle ajoute 50% de soins en plus au Courant réparateur. (Talent de chaman)",
+  'entities.abilities.stoneward.description':
+    'Protège un allié pendant 60 s avec 6 charges. Les dégâts consomment une charge pour soigner 5% des points de vie maximum, une fois toutes les 3 s. (Talent de chaman)',
+  'entities.abilities.stormsurge.description':
+    'Passif : tant que la Frappe ancestrale est en recharge, consommer un Présage de tempête a 25% de chances de la réinitialiser. Si les 3 premières tentatives échouent, la 4e la réinitialise toujours. (Esprit guerrier)',
+  'entities.abilities.thunder_reservoir.description':
+    "Passif : le Éclair d'arc et l'Éclair fourchu octroient du Tonnerre, jusqu'à 5. À 5 Tonnerre, la Secousse tellurique inflige 125% de dégâts en plus ou le Tremblement de terre 100% de plus, puis consomme tout le Tonnerre. (Appel du tonnerre)",
+  'entities.abilities.tidecall.description':
+    "Soigne une cible alliée de 58 à 72. Les soins augmentent avec la puissance des sorts. Ajoute les mêmes soins calculés avant surplus au Courant réparateur, jusqu'à 30% des points de vie maximum de la cible.",
+  'entities.abilities.unleash_weapon.description':
+    "Déchaîne l'enchantement actif de votre arme. La Marque de pyre inflige 54 à 64 points de dégâts de Feu, gagne 30% de la puissance des sorts et octroie 2 Tonnerre. Le Cœur-de-bourrasque frappe avec votre arme, avance la Cadence de l'esprit guerrier et octroie 20% de vitesse d'attaque pendant 6 s. Le Lié-à-la-pierre frappe pour 75% des dégâts d'arme, force la cible à vous attaquer et réduit les dégâts subis de 20% pendant 4 s. La Source-de-vie consomme votre Courant réparateur, soigne de 125% de ses soins restants et réduit le prochain coup dans les 8 s de 50% des points de vie restaurés.",
+  'entities.abilities.warspirit_cadence.description':
+    "Passif : chaque 3e attaque d'arme réussie déclenche 2 Échos Cœur-de-bourrasque pour 50% de dégâts de Nature et octroie un Présage de tempête pendant 12 s. Le Présage de tempête rend instantané votre prochain Éclair d'arc, Secousse ou Eaux réparatrices, et en réduit le coût en mana de 50%. La Frappe ancestrale compte comme 2 attaques. (Esprit guerrier)",
+  'entities.abilities.summon_tithefiend.name': 'Invoquer un Démon de dîme',
+  'entities.abilities.summon_tithefiend.description':
+    "Consomme toute la Dîme lugubre pour invoquer un Démon de dîme pendant 6, 8, 10, 12 ou 15 s selon 1 à 5 cumuls. Il attaque toutes les 2 s pour 20 à 24 points de dégâts d'Ombre, plus 8 par cumul supplémentaire. À cinq cumuls, il grandit et ses dégâts augmentent de 25%. Ses dégâts augmentent avec votre puissance des sorts. Il préfère votre Effigie. Chaque coup restaure 1% du mana maximum et répercute 15% des dégâts sur un maximum de 3 autres ennemis portant votre Complainte de décrépitude. (Signature de Vêpres)",
+  'entities.abilities.veilstep.name': 'Pas du voile',
+  'entities.abilities.veilstep.description':
+    'Traverse le voile dans la direction où vous regardez.',
+  'entities.quests.q_divine_tome.title': "Le Tome de l'aube",
+  'entities.quests.q_divine_tome.objectives.0.label': 'Ossements agités remis au repos',
+  'entities.quests.q_divine_tome.text':
+    "La Lumière ne repose pas en vous en silence, {playerName}. Je vous ai vu rendre la paix aux morts, et je crois que vous êtes prêt pour ce que peu de paladins apprennent un jour : le Rite du Rappel, par lequel une âme tombée est rappelée parmi les vivants. Ses paroles sont conservées dans le Tome de l'aube, ici sous ma garde, mais un livre n'est nulle bénédiction tant que les morts agités arpentent encore cette terre. Rendez 6 Ossements agités de plus à la terre, et je commencerai à vous enseigner.",
+  'entities.quests.q_divine_tome.completion':
+    "La cour de la chapelle retrouve le silence. Vous êtes prêt pour les paroles, {playerName}, mais le Rite du Rappel ne peut être prononcé dans une chapelle tiède. Il doit être chanté là où le voile entre la vie et la mort s'amincit. J'entends porter le Tome au nord, dans le Marais de Mirefen. Suivez-moi là-bas et nous en finirons.",
+  'entities.quests.q_rite_of_redemption.title': 'Le Rite du Rappel',
+  'entities.quests.q_rite_of_redemption.objectives.0.label': 'Noyés remis au repos',
+  'entities.quests.q_rite_of_redemption.text':
+    "Ainsi vous m'avez suivi dans la fange, {playerName}. Bien. J'ai ici le Tome de l'aube, et cette terre noyée est là où ses paroles ont leur place : nulle part le voile entre la vie et la mort n'est plus mince qu'en un lieu où les morts refusent de rester enterrés. Mais les noyés entraîneraient votre voix au milieu du vers. Dégagez un espace digne du rite : remettez 8 des Noyés au repos, et nous le consacrerons ensemble.",
+  'entities.quests.q_rite_of_redemption.completion':
+    'Agenouillez-vous, {playerName}, et lisez les paroles à voix haute. Voilà. Le sentez-vous ? La Lumière ne répare plus seulement les vivants entre vos mains, elle peut rappeler ceux qui ont franchi le seuil. Usez-en avec sagesse. Une âme rappelée dans un combat sans espoir est une cruauté, non une miséricorde. Relevez-vous, Rédempteur.',
+  'guide.abilityHook.hammer_of_justice': 'Arrête un ennemi avec un étourdissement bref et fiable.',
+  'guide.abilityHook.oath_chain':
+    "Traîne un ennemi lointain jusqu'à votre meute et freine sa fuite.",
+  'guide.abilityHook.ancestor_return':
+    'Ramène à la vie tous les membres tombés du groupe ou du raid après une longue incantation hors combat.',
+  'guide.abilityHook.avenging_wrath':
+    'Octroie 10 Dévotion, puis double la Dévotion générée par les capacités pendant quinze secondes.',
+  'guide.abilityHook.bastion_sweep':
+    'Balaye un groupe avec votre bouclier pour saisir la menace et accumuler de la Dévotion.',
+  'guide.abilityHook.chain_lightning':
+    "Frappe une cible et rebondit sur deux ennemis proches, accumulant un Tonnerre pour toute l'incantation.",
+  'guide.abilityHook.consecration':
+    'Revendique le terrain autour de vous avec des dégâts Sacrés et une menace continus.',
+  'guide.abilityHook.hammer_of_wrath':
+    "Exécute un ennemi blessé à distance, ou n'importe quel ennemi tant que vos ailes sont actives.",
+  'guide.abilityHook.holy_shield':
+    "Dépense de la Dévotion pour une fenêtre de blocage actif, de l'absorption et une impulsion de menace.",
+  'guide.abilityHook.lay_on_hands':
+    'Restaure une grande quantité de points de vie quand un allié est sur le point de tomber.',
+  'guide.abilityHook.measured_shot':
+    'Un tir à distance posé qui restaure de la concentration pour vos attaques plus lourdes.',
+  'guide.abilityHook.pack_command':
+    "Ordonne à votre compagnon de frapper et d'accumuler la Férocité de meute. Chaque cumul fait que votre familier inflige 10% de dégâts en plus, jusqu'à 30%, avant que Déchaîner la bête ne dépense les cumuls.",
+  'guide.abilityHook.stampede':
+    "Appelle trois bêtes à attaquer pendant 12 secondes. Utilisez-la à Férocité de meute maximale pour qu'elles conservent le bonus de dégâts maximal pendant toute l'invocation.",
+  'guide.abilityHook.stormsurge':
+    'Ramène parfois la Frappe ancestrale plus tôt après que vous avez dépensé une occasion de Présage de tempête.',
+  'guide.abilityHook.thunder_reservoir':
+    "Accumule la foudre jusqu'à ce que la Secousse tellurique ou le Tremblement de terre puisse libérer une récompense à pleine puissance.",
+  'guide.abilityHook.veilbound_march':
+    'Traversez un groupe pour le marquer, émousser ses dégâts contre vous et verrouiller la menace.',
+  'guide.abilityHook.warspirit_cadence':
+    "Transforme un rythme d'arme régulier en Échos Cœur-de-bourrasque et en occasion de sort instantané.",
 };

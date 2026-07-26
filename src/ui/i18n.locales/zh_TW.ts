@@ -9001,4 +9001,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': '釋放武器',
   'entities.abilities.unleash_weapon.description':
     '釋放目前的武器灌注。焰烙造成54至64點火焰傷害，獲得30%法術強度加成，並獲得2層雷霆。風心用武器攻擊，推進戰魂節律，並使攻擊速度提高20%，持續6秒。縛石造成75%武器傷害，迫使目標攻擊你，並使你受到的傷害降低20%，持續4秒。活泉消耗目標身上的癒合水流，立即治療其剩餘治療量的125%，並使8秒內下一次受到的傷害降低，降低量等於實際恢復生命值的50%。',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'hudChrome.auraEffect.dawnsWrath': '制裁之錘：無生命限制 · +1次 · 冷卻0 · 傷害+{pct}%',
 };

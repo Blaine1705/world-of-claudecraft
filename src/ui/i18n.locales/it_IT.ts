@@ -9460,4 +9460,285 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Sostituisce {enchant}',
   'hudChrome.enchanting.sameEnchant': "Quell'oggetto ha già quell'incantesimo.",
   'hudChrome.enchanting.sameEnchantTag': 'Già applicato',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'abilityUi.resources.devotion': 'Devozione',
+  'abilityUi.resources.focus': 'concentrazione',
+  'classDetails.resources.focus': 'Concentrazione',
+  'game.hud.lowFocus': 'Concentrazione bassa',
+  'hud.errors.notEnoughDevotion': 'Devozione insufficiente!',
+  'hudChrome.paladin.devotion': 'Devozione',
+  'hudChrome.paladin.devotionValue': 'Devozione {value} su {max}',
+  'hudChrome.paladin.devotionAscensionCharges':
+    'Devozione {value} su {max}. Ascensione: {charges} cariche.',
+  'hudChrome.paladin.devotionAscensionLast':
+    'Devozione {value} su {max}. Ascensione: ultima carica.',
+  'hudChrome.paladin.ascensionLastAnnouncement': 'Ascensione: ultima carica',
+  'hudChrome.paladin.ascensionSpenderAria':
+    'Slot azione {slot}: {ability}. Consuma una carica di Ascensione.',
+  'hudChrome.crafting.craftedToastQty': 'Creato: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedAlso': 'Recuperi anche {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Recuperi anche {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedYield': 'Disincanti {item} ottenendo {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Disincanti {item} ottenendo {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Recuperi {material} da {item}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Recuperi {material} x{qty} da {item}.',
+  'hudChrome.auraEffect.dawnsWrath': 'MdI: qualsiasi salute · +1 uso · Recupero 0 · +{pct}% danni',
+  'hudChrome.auraEffect.duskEconomy': 'Le abilità costano il {pct}% di energia in meno',
+  'hudChrome.auraEffect.hunterFerocity':
+    '{stacks} Ferocia del Branco: il tuo famiglio infligge il {pct}% di danni in più',
+  'hudChrome.auraEffect.veiledEdge': "Il tuo prossimo Colpo dell'Agguato colpisce il doppio",
+  'hudChrome.auraEffect.gloam':
+    "Caligine: stadio {stacks} su {max}. A {max} le tue aperture del Velo Crepuscolare si sbloccano allo scoperto, e la prossima lanciata è GRATUITA e fa detonare la riserva nel velo d'ombra",
+  'hudChrome.auraEffect.mendingCurrent':
+    'Accumula {value} di cura, rilasciata nel tempo o consumata da Rammendo a Cascata',
+  'hudChrome.auraEffect.mendingCurrentPercent':
+    'Accumula cure pari al {pct}% della salute massima per Rammendo a Cascata',
+  'hudChrome.auraEffect.radiantResonance':
+    "La tua prossima Luce Risanatrice è istantanea, oppure il tuo prossimo Abbraccio dell'Alba costa il {pct}% di mana in meno e si lancia in {castTime} s",
+  'hudChrome.auraEffect.redline':
+    'Linea Rossa: tacca {stacks} su {max}. I Colpi al Corpo aggiungono tacche; il Colpo di Grazia colpisce il {pct}% più forte per tacca e chiude la finestra. Se scade prima, va persa',
+  'hudChrome.auraEffect.solarReprisal':
+    'Il tuo prossimo Disco Solare non costa mana, ignora il tempo di recupero e infligge il {pct}% di danni in più; il Martello della Grazia ignora il tempo di recupero e ti cura per il 100% dei danni inflitti; oppure la Luce Risanatrice è istantanea',
+  'hudChrome.auraEffect.veilstrikeWindow':
+    "Velo d'Ombra: le tue aperture del Velo Crepuscolare sono utilizzabili allo scoperto da qualsiasi angolazione, e i danni inflitti aumentano del {pct}%",
+  'hudChrome.auraEffect.venomRitual':
+    'Rituale del Veleno: stadio {stacks} su {max}. I colpi generatori aggiungono stadi; a {max}, Sonno Eterno diventa Squarciaveleno',
+  'entities.abilities.aegis_first_dawn.name': 'Egida della Prima Alba',
+  'entities.abilities.aura_mastery.name': 'Concordia Sacra',
+  'entities.abilities.bastion_rite.name': 'Rito del Bastione',
+  'entities.abilities.bastion_sweep.name': 'Falciata del Bastione',
+  'entities.abilities.beacon_of_light.name': 'Faro di Luce',
+  'entities.abilities.dawn_devotion.name': "Devozione dell'Alba",
+  'entities.abilities.dawnfall.name': "Caduta dell'Alba",
+  'entities.abilities.dawns_embrace.name': "Abbraccio dell'Alba",
+  'entities.abilities.devotion_ward.name': 'Devozione del Bastione',
+  'entities.abilities.divine_ascension.name': 'Ascensione Divina',
+  'entities.abilities.faithforged_guard.name': 'Debito di Luce',
+  'entities.abilities.final_edict.name': 'Editto Finale',
+  'entities.abilities.grace_devotion.name': 'Devozione della Grazia',
+  'entities.abilities.guardian_covenant.name': 'Patto del Guardiano',
+  'entities.abilities.hammer_of_grace.name': 'Martello della Grazia',
+  'entities.abilities.hushbrand.name': 'Marchio del Silenzio',
+  'entities.abilities.life_covenant.name': 'Patto della Vita',
+  'entities.abilities.martyrs_aegis.name': 'Egida del Martire',
+  'entities.abilities.mercy_lance.name': 'Lancia della Misericordia',
+  'entities.abilities.oath_chain.name': 'Catena del Giuramento',
+  'entities.abilities.radiant_chorus.name': 'Coro Radiante',
+  'entities.abilities.radiant_devotion.name': 'Devozione Radiante',
+  'entities.abilities.recall_the_fallen.name': 'Richiamo dei Caduti',
+  'entities.abilities.sacred_challenge.name': 'Pungolo Sacro',
+  'entities.abilities.sacred_form.name': 'Forma Sacra',
+  'entities.abilities.seraphic_vigil.name': 'Veglia Serafica',
+  'entities.abilities.solar_invocation.name': 'Invocazione Solare',
+  'entities.abilities.solar_step.name': 'Passo Solare',
+  'entities.abilities.sun_gods_verdict.name': 'Verdetto del Dio Sole',
+  'entities.abilities.sunward_disc.name': 'Disco Solare',
+  'entities.abilities.valkyrs_calling.name': 'Richiamo della Valchiria',
+  'entities.abilities.veilbound_march.name': 'Marcia del Velo',
+  'entities.abilities.veilbound_mark.name': 'Marchio del Velo',
+  'entities.abilities.vowkeeper_strike.name': 'Colpo del Custode dei Voti',
+  'entities.abilities.choir_of_deliverance.name': 'Coro della Liberazione',
+  'entities.abilities.scouring_mercy.name': 'Misericordia Purificatrice',
+  'entities.abilities.aegis_first_dawn.description':
+    "Canalizza per 5 s creando una cupola sacra di 10 metri. Gli alleati all'interno vengono curati ogni secondo e subiscono il 50% di danni in meno. Completare la canalizzazione libera una cura finale e concede il 30% di velocità di movimento per 4 s.",
+  'entities.abilities.aura_mastery.description':
+    'Per 8 s potenzia ogni Devozione e Aura di Rappresaglia attiva nel tuo gruppo. La Devozione del Bastione riduce i danni del 15%; la Rappresaglia infligge 15 danni Sacri. Gli usi multipli si rinnovano invece di sommarsi.',
+  'entities.abilities.bastion_rite.description':
+    "Riduce i danni fisici subiti del 20% e aumenta la probabilità di parata del 20% per 6 s. L'Ascensione porta la durata a 10 s.",
+  'entities.abilities.bastion_sweep.description':
+    "Fai roteare lo scudo equipaggiato contro i nemici in un arco frontale di 180 gradi per {damage} danni Sacri con minaccia elevata e generi 1 Devozione. L'Ascensione aumenta i danni del 30% e il raggio a 8 m.",
+  'entities.abilities.beacon_of_light.description':
+    'Marchia un membro del gruppo come tuo Faro di Luce. Il 50% delle tue cure dirette efficaci su un altro membro del gruppo entro 60 m cura anche il Faro. Le cure ad area e periodiche non vengono trasferite. Dura finché uno dei due non muore.',
+  'entities.abilities.dawn_devotion.description':
+    "Aumenta di 40 la potenza d'attacco tua e dei membri del gruppo per 30 min. Sostituisce la tua Devozione Radiante o della Grazia, ma coesiste con le Devozioni di altri paladini e con i gridi del guerriero.",
+  'entities.abilities.dawnfall.description':
+    "Infligge {damage} danni Sacri ai nemici vicini e genera 1 Devozione. Colpire almeno un nemico riduce di 2 s il tempo di recupero rimanente dell'Editto Finale. L'Ascensione ne aumenta danni e raggio.",
+  'entities.abilities.dawns_embrace.description':
+    "Libera una cura potente e genera 1 Devozione. La Risonanza Radiante ne riduce il costo in mana del 50% e il tempo di lancio a 1,5 s. L'Ascensione la rende istantanea e ne aumenta le cure del 35%.",
+  'entities.abilities.devotion_ward.description':
+    "Riduce del 5% i danni subiti da te e dai membri del gruppo fino alla morte o alla sostituzione. Solo quest'aura e l'Aura di Rappresaglia si sostituiscono a vicenda; le Devozioni Radiante, dell'Alba e della Grazia coesistono.",
+  'entities.abilities.divine_ascension.description':
+    'Consuma 20 Devozione per ottenere 5 cariche di Ascensione per un massimo di 45 s. Le abilità contrassegnate consumano una carica e ottengono un effetto aggiuntivo.',
+  'entities.abilities.faithforged_guard.description':
+    "Per 8 s il prossimo colpo nemico contro di te riceve risposta: fino a {buff} danni vengono negati e restituiti all'attaccante come danni Sacri, e ottieni 1 Devozione. Viene risposto a un solo colpo. L'Ascensione aumenta del 50% la quantità a cui può rispondere.",
+  'entities.abilities.final_edict.description':
+    "Assesta un colpo d'arma devastante e genera 1 Devozione quando infligge danni. Un colpo riuscito riduce di 2 s il tempo di recupero rimanente della Caduta dell'Alba. Gli attacchi automatici riusciti e i colpi dell'Editto Finale hanno il 15% di probabilità di concedere Ira dell'Alba per 8 s. L'Ascensione libera inoltre un'esplosione Sacra attorno a te.",
+  'entities.abilities.grace_devotion.description':
+    "Tu e i membri del gruppo recuperate 15 mana ogni 5 s e pagate il 3% di mana in meno per 30 min. Sostituisce la tua Devozione Radiante o dell'Alba, ma coesiste con le Devozioni di altri paladini.",
+  'entities.abilities.guardian_covenant.description':
+    'Protegge un bersaglio alleato e te stesso, riducendo i danni subiti del 20% per 8 s. Seleziona te per impostazione predefinita se non è scelto alcun bersaglio alleato.',
+  'entities.abilities.hammer_of_grace.description':
+    "Scaglia all'istante un martello sacro contro un nemico entro 20 m per {damage}, recupera 70 mana, ti cura per il 50% dei danni inflitti e genera 1 Devozione quando infligge danni. La Rappresaglia Solare permette al Martello della Grazia di ignorare il tempo di recupero e di curarti per il 100% dei danni inflitti.",
+  'entities.abilities.hushbrand.description':
+    'Interrompe il lancio e impedisce gli incantesimi di quella scuola per 4 s.',
+  'entities.abilities.life_covenant.description':
+    "Riduce del 40% i danni subiti da un alleato per 6 s. Durante l'Ascensione concede anche uno scudo di 120 punti senza consumare una carica.",
+  'entities.abilities.martyrs_aegis.description':
+    'Riduce del 40% i danni subiti da un alleato per 8 s.',
+  'entities.abilities.mercy_lance.description':
+    "Infligge {damage} danni Sacri a un nemico e genera 1 Devozione quando infligge danni. Durante l'Ascensione consuma 1 carica per garantire un colpo critico.",
+  'entities.abilities.oath_chain.description':
+    "Vincola all'istante un nemico lontano con una catena sacra. Il nemico avanza verso di te a 18 m al secondo finché non raggiunge i 3 m, poi viene rallentato del 50% per 4 s. Durante l'Ascensione vincola un secondo nemico vicino.",
+  'entities.abilities.radiant_chorus.description':
+    "Cura gli alleati vicini per {damage} e genera 1 Devozione. Curare efficacemente almeno 2 alleati concede Risonanza Radiante: la tua prossima Luce Risanatrice è istantanea, oppure il tuo prossimo Abbraccio dell'Alba costa il 50% di mana in meno e si lancia in 1,5 s. L'Ascensione aumenta cure e raggio del Coro Radiante.",
+  'entities.abilities.radiant_devotion.description':
+    "Aumenta di 20 la potenza magica tua e dei membri del gruppo per 30 min. Sostituisce la tua Devozione dell'Alba o della Grazia, ma coesiste con le Devozioni di altri paladini.",
+  'entities.abilities.recall_the_fallen.description':
+    'Riporta in vita un membro morto del gruppo con il 35% di salute e mana. Un Sanasole di livello 16 o superiore richiama invece tutti i membri caduti del gruppo.',
+  'entities.abilities.sacred_challenge.description':
+    "Costringe un nemico ad attaccarti. Durante l'Ascensione riduce anche del 15% tutti i danni subiti per 4 s senza consumare una carica.",
+  'entities.abilities.sacred_form.description':
+    'Entra in uno stato sacro fino alla morte, aumentando le cure del 10% e la probabilità di critico magico del 5%, e riducendo la minaccia generata del 50%. Solo per Sanasole.',
+  'entities.abilities.seraphic_vigil.description':
+    'Protegge un alleato per 30 s. Il primo colpo che lo porta sotto il 35% di salute consuma la Veglia e lo cura per 180. (Distintivo di Benedizione)',
+  'entities.abilities.scouring_mercy.description':
+    'Infligge da 72 a 84 danni Sacri a un nemico oppure cura un bersaglio alleato da 130 a 155. Entrambi gli importi aumentano con la potenza magica. I danni curano inoltre del 30% ogni alleato legato dalla Dottrina, o del 15% il membro del gruppo con meno salute se nessun alleato è legato. (Distintivo di Dottrina)',
+  'entities.abilities.solar_invocation.description':
+    "Cura all'istante un alleato per {damage} oppure infligge danni Sacri moderati a un nemico. Entrambi gli usi generano 1 Devozione. Durante l'Ascensione, un lancio di cura cura anche i giocatori alleati entro 10 m dal bersaglio per metà.",
+  'entities.abilities.solar_step.description':
+    'Aumenta la tua velocità di movimento del 150% per 2 s.',
+  'entities.abilities.sun_gods_verdict.description':
+    "Giudica un nemico sotto il Verdetto del Dio Sole per 30 s. L'Editto Finale e la Caduta dell'Alba incidono una carica a ogni colpo riuscito. L'abilità che assesta la terza carica detta la sentenza: l'Editto Finale scatena danni devastanti sul condannato; la Caduta dell'Alba fa detonare il verdetto, danneggiando e stordendo i nemici vicini per 1,5 s.",
+  'entities.abilities.sunward_disc.description':
+    "Richiede uno scudo. Scaglia un disco radiante che colpisce e poi rimbalza tra i nemici vicini. Ogni impatto dannoso genera 1 Devozione. La Rappresaglia Solare fa sì che il Disco Solare non costi mana, ignori il tempo di recupero e infligga il 20% di danni in più. L'Ascensione potenzia 5 rimbalzi.",
+  'entities.abilities.valkyrs_calling.description':
+    "Ti innalzi in volo, diventando immune ai danni mentre voli verso il nemico. Dopo 2 s piombi sull'area bersaglio per {damage} danni Sacri e generi 1 Devozione. L'Ascensione aumenta del 50% i danni d'impatto e consuma 1 carica.",
+  'entities.abilities.veilbound_march.description':
+    "Diventi etereo per 4 s, ottenendo il 40% di velocità di movimento e il 30% di armatura e diventando immune a radicamenti, rallentamenti e spostamenti. I nemici che attraversi ricevono il Marchio del Velo per 6 s: subiscono danni Sacri ogni secondo, ti infliggono il 20% di danni in meno e generano minaccia aggiuntiva. Il primo marchio concede 1 Devozione. Al termine della marcia, i nemici marchiati vicini subiscono un'esplosione finale. L'Ascensione aumenta l'esplosione del 50% e li attira leggermente verso di te.",
+  'entities.abilities.veilbound_mark.description':
+    'Subisce danni Sacri ogni secondo, infligge il 20% di danni in meno al paladino che ha applicato il marchio e genera minaccia aggiuntiva verso quel paladino.',
+  'entities.abilities.vowkeeper_strike.description':
+    "Colpisce con minaccia elevata e genera 1 Devozione. Un colpo riuscito ha il 20% di probabilità di concedere Rappresaglia Solare per 8 s; ogni parata riuscita il 25%. La Rappresaglia Solare potenzia il tuo prossimo Disco Solare, Martello della Grazia o Luce Risanatrice. L'Ascensione concede anche un piccolo scudo di assorbimento.",
+  'entities.abilities.choir_of_deliverance.description':
+    'Canalizza per 6 s curando i membri del gruppo vicini ogni 2 s.',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'entities.abilities.bloodhook.name': 'Uncino Sanguinario',
+  'entities.abilities.bloodtrail_assault.name': 'Assalto della Scia di Sangue',
+  'entities.abilities.cold_focus.name': 'Concentrazione Gelida',
+  'entities.abilities.fieldcraft_reentry.name': 'Rientro Armato',
+  'entities.abilities.frostjaw_trap.name': 'Trappola Fauci di Gelo',
+  'entities.abilities.hunting_momentum.name': 'Slancio di Caccia',
+  'entities.abilities.measured_shot.name': 'Tiro Misurato',
+  'entities.abilities.pack_command.name': 'Comando del Branco',
+  'entities.abilities.pack_rally.name': 'Adunata del Branco',
+  'entities.abilities.shellskin.name': 'Pelle di Corazza',
+  'entities.abilities.shrapnel_charge.name': 'Carica a Frammentazione',
+  'entities.abilities.stampede.name': 'Fuggifuggi',
+  'entities.abilities.trailbreak.name': 'Rompipista',
+  'entities.abilities.unleash_beast.name': 'Scatena la Bestia',
+  'entities.abilities.wildheart.name': 'Cuore Selvaggio',
+  'entities.abilities.bloodhook.description':
+    "Carica verso un nemico e applica Ferita da Uncino Sanguinario, infliggendo 34 danni Fisici base più il 26% della tua potenza d'attacco a distanza in 12 s con 4 impulsi. (Distintivo di Arte del Campo)",
+  'entities.abilities.bloodtrail_assault.description':
+    "Per 12 s l'Uncino Sanguinario propaga una ferita al 60% di potenza fino a 2 nemici vicini, Squarciaferite comanda un attacco del famiglio da 18 danni, e la Carica a Frammentazione guadagna 2 metri, infligge il 25% di danni base in più al bersaglio principale e attiva il 50% di danni da ferita in più.",
+  'entities.abilities.cold_focus.description':
+    'Per 12 s il Tiro Misurato recupera il 50% di concentrazione in più, e la Tesa Lunga costa il 25% in meno e si lancia il 30% più velocemente. (Distintivo di Vista Gelida)',
+  'entities.abilities.fieldcraft_reentry.description':
+    "Passiva: Rompipista rinnova lo Slancio di Caccia e prepara il tuo prossimo Colpo Sventratore o Uncino Sanguinario per 12 s. Il Colpo Sventratore infligge il 15% di danni in più per accumulo. L'Uncino Sanguinario infligge da 18 a 24 danni Fisici aggiuntivi, aumentati del 15% per accumulo e dalla tua potenza d'attacco a distanza. A 3 accumuli, uno dei due attacchi consuma lo Slancio di Caccia. (Arte del Campo)",
+  'entities.abilities.frostjaw_trap.description':
+    'Piazza una trappola sul nemico selezionato o ai tuoi piedi. Si arma dopo 0,75 s e dura 30 s. Il primo nemico che la attiva viene radicato per 3 s, e i nemici entro 4 metri vengono rallentati del 50% per 4 s.',
+  'entities.abilities.hunting_momentum.description':
+    'Passiva: il Colpo Sventratore concede 1 Slancio di Caccia per 8 s, fino a 3. A 3 accumuli, Squarciaferite infligge il 45% di danni da colpo in più e consuma gli accumuli. (Arte del Campo)',
+  'entities.abilities.measured_shot.description':
+    "Colpisci il bersaglio per {damage} danni Fisici. Un colpo a segno recupera 20 concentrazione. I danni aumentano con la potenza d'attacco a distanza.",
+  'entities.abilities.pack_command.description':
+    "Ordina al tuo famiglio vivo di colpire per 36-48 danni Fisici. I danni aumentano con la potenza d'attacco del famiglio. Un colpo a segno recupera 20 concentrazione e concede 1 Ferocia del Branco per 30 s, fino a 3. Ogni accumulo aumenta del 10% tutti i danni inflitti dal tuo famiglio. Questo colpo usa gli accumuli che avevi prima dell'impatto.",
+  'entities.abilities.pack_rally.description':
+    "Assumi la Sembianza del Corsiero e aduna gli alleati vicini con il 30% di velocità di movimento e il 10% di velocità d'attacco e di lancio per 10 s.",
+  'entities.abilities.shellskin.description':
+    'Riduce i danni subiti del 60% per 8 s, ma impedisce di attaccare mentre è attiva.',
+  'entities.abilities.shrapnel_charge.description':
+    "Colpisci il bersaglio per 24-30 danni Fisici e fino ad altri 4 nemici entro 6 metri per 13-17. Gli altri bersagli sanguinano anche per 12 danni in 6 s. Se il bersaglio principale ha la tua Ferita da Uncino Sanguinario, infligge subito 1 impulso di ferita. I danni diretti aumentano con la potenza d'attacco a distanza.",
+  'entities.abilities.stampede.description':
+    "Evoca 3 bestie per 12 s. Ognuna attacca ogni 2 s per {damage} danni Fisici. I danni mostrati includono l'8% della tua potenza d'attacco a distanza prima dei bonus ai danni del famiglio. Le bestie fissano la Ferocia del Branco all'evocazione, guadagnando il 10% di danni per accumulo. Mentre Fuggifuggi è in recupero, i Comandi del Branco riusciti hanno il 20% di probabilità di azzerarlo, garantito dopo 5 tentativi falliti. Non può azzerarsi mentre le bestie sono attive. (Signore del Branco)",
+  'entities.abilities.trailbreak.description':
+    "Balza 12 metri all'indietro. Se hai Slancio di Caccia, lo rinnova e prepara il Rientro per 12 s.",
+  'entities.abilities.unleash_beast.description':
+    "Consuma 3 Ferocia del Branco dopo che il tuo famiglio ha colpito per 83-105 danni Fisici e scosso ogni nemico entro 6 metri per 26-34. Il colpo e la scossa usano il bonus completo del 30% ai danni del famiglio della Ferocia del Branco e aumentano con la potenza d'attacco del famiglio. Per gli 8 s successivi il famiglio infligge il 25% di danni in più, attacca il 35% più velocemente e fa sì che il Tiro Nefasto colpisca fino a 2 nemici vicini.",
+  'entities.abilities.wildheart.description':
+    "Recupera all'istante il 30% della tua salute massima.",
+  'entities.abilities.ancestor_return.name': 'Ritorno degli Antenati',
+  'entities.abilities.galeheart_weapon.name': 'Arma Cuore di Bufera',
+  'entities.abilities.lifespring_weapon.name': 'Arma Fonte di Vita',
+  'entities.abilities.primal_exaltation.name': 'Esaltazione Primordiale',
+  'entities.abilities.stoneward.name': 'Guardia di Pietra',
+  'entities.abilities.stormsurge.name': 'Mareggiata',
+  'entities.abilities.thunder_reservoir.name': 'Riserva di Tuono',
+  'entities.abilities.tidecall.name': 'Richiamo della Marea',
+  'entities.abilities.unleash_weapon.name': "Scatena l'Arma",
+  'entities.abilities.warspirit_cadence.name': 'Cadenza dello Spirito Guerriero',
+  'entities.abilities.ancestor_return.description':
+    'Richiama in vita presso il loro corpo tutti i membri caduti del tuo gruppo o incursione con il 30% di salute e mana. Non può essere lanciata in combattimento. (Rammendo Spirituale)',
+  'entities.abilities.galeheart_weapon.description':
+    'Incanta entrambe le armi per 30 min, abilitando la Cadenza dello Spirito Guerriero.',
+  'entities.abilities.lifespring_weapon.description':
+    'Incanta la tua arma per 30 min. Acque Risanatrici e il Richiamo della Marea aggiungono il 20% di cure in più alla Corrente Risanatrice.',
+  'entities.abilities.primal_exaltation.description':
+    "Per 12 s il Dardo Folgorante e il Fulmine Biforcuto del Richiamo del Tuono si lanciano il 50% più velocemente, e il Dardo Folgorante concede 2 Tuono; lo Spirito Guerriero attiva la sua cadenza ogni 2 colpi d'arma; il Rammendo Spirituale aggiunge il 50% di cure in più alla Corrente Risanatrice. (Talento sciamano)",
+  'entities.abilities.stoneward.description':
+    'Protegge un alleato per 60 s con 6 cariche. I danni consumano una carica per curare il 5% della salute massima, una volta ogni 3 s. (Talento sciamano)',
+  'entities.abilities.stormsurge.description':
+    'Passiva: mentre il Colpo Ancestrale è in recupero, consumare un Presagio di Tempesta ha il 25% di probabilità di azzerarlo. Se i primi 3 tentativi falliscono, il 4° lo azzera sempre. (Spirito Guerriero)',
+  'entities.abilities.thunder_reservoir.description':
+    'Passiva: il Dardo Folgorante e il Fulmine Biforcuto concedono Tuono, fino a 5. Con 5 Tuono, la Scossa Tellurica infligge il 125% di danni in più oppure il Terremoto il 100% in più, e poi consuma tutto il Tuono. (Richiamo del Tuono)',
+  'entities.abilities.tidecall.description':
+    "Cura un bersaglio alleato da 58 a 72. La cura aumenta con la potenza magica. Aggiunge la stessa cura calcolata prima dell'eccesso alla Corrente Risanatrice, fino al 30% della salute massima del bersaglio.",
+  'entities.abilities.unleash_weapon.description':
+    "Scatena l'incantamento attivo della tua arma. Il Marchio Pirico infligge da 54 a 64 danni da Fuoco, guadagna il 30% della potenza magica e concede 2 Tuono. Il Cuore di Bufera colpisce con la tua arma, fa avanzare la Cadenza dello Spirito Guerriero e concede il 20% di velocità d'attacco per 6 s. Il Vincolo di Pietra colpisce per il 75% dei danni d'arma, costringe il bersaglio ad attaccarti e riduce i danni subiti del 20% per 4 s. La Fonte di Vita consuma la tua Corrente Risanatrice, cura per il 125% delle cure rimanenti e riduce il prossimo colpo entro 8 s del 50% della salute recuperata.",
+  'entities.abilities.warspirit_cadence.description':
+    "Passiva: ogni 3° attacco d'arma andato a segno attiva 2 Echi del Cuore di Bufera per il 50% di danni da Natura e concede Presagio di Tempesta per 12 s. Il Presagio di Tempesta rende istantaneo il tuo prossimo Dardo Folgorante, Scossa o Acque Risanatrici e ne riduce il costo in mana del 50%. Il Colpo Ancestrale conta come 2 attacchi. (Spirito Guerriero)",
+  'entities.abilities.summon_tithefiend.name': 'Evoca Demone della Decima',
+  'entities.abilities.summon_tithefiend.description':
+    "Consuma tutta la Decima Tenebrosa per evocare un Demone della Decima per 6, 8, 10, 12 o 15 s con 1-5 accumuli. Attacca ogni 2 s per 20-24 danni Ombra, più 8 per ogni accumulo extra. Con cinque accumuli diventa più grande e i suoi danni aumentano del 25%. I suoi danni aumentano con la tua potenza magica. Preferisce la tua Effigie. Ogni colpo recupera l'1% del mana massimo e riverbera il 15% dei danni fino ad altri 3 nemici con il tuo Canto di Decadimento. (Distintivo di Vespri)",
+  'entities.abilities.veilstep.name': 'Passo del Velo',
+  'entities.abilities.veilstep.description': 'Attraversa il velo nella direzione verso cui guardi.',
+  'entities.quests.q_divine_tome.title': "Il Tomo dell'Alba",
+  'entities.quests.q_divine_tome.objectives.0.label': 'Ossa Inquiete riposte',
+  'entities.quests.q_divine_tome.text':
+    "La Luce non riposa in te in silenzio, {playerName}. Ti ho visto dare pace ai morti, e credo tu sia pronto per ciò che a pochi paladini viene mai insegnato: il Rito del Richiamo, con cui un'anima caduta viene richiamata tra i vivi. Le sue parole sono custodite nel Tomo dell'Alba, qui sotto la mia custodia, ma un libro non è alcuna benedizione finché i morti inquieti camminano ancora su questa terra. Riporta altre 6 Ossa Inquiete alla terra, e comincerò a insegnarti.",
+  'entities.quests.q_divine_tome.completion':
+    'Il cortile della cappella torna silenzioso. Sei pronto per le parole, {playerName}, ma il Rito del Richiamo non può essere pronunciato in una cappella tiepida. Deve essere cantato dove il velo tra la vita e la morte si assottiglia. Intendo portare il Tomo a nord, nella Palude di Mirefen. Seguimi là e porteremo a termine questo.',
+  'entities.quests.q_rite_of_redemption.title': 'Il Rito del Richiamo',
+  'entities.quests.q_rite_of_redemption.objectives.0.label': 'Annegati riposti',
+  'entities.quests.q_rite_of_redemption.text':
+    "Così mi hai seguito nel fango, {playerName}. Bene. Ho qui il Tomo dell'Alba, e questa terra annegata è dove le sue parole appartengono: in nessun luogo il velo tra la vita e la morte è più sottile che dove i morti non restano sepolti. Ma gli annegati trascinerebbero giù la tua voce a metà del verso. Libera uno spazio degno del rito: riponi 8 degli Annegati, e lo consacreremo insieme.",
+  'entities.quests.q_rite_of_redemption.completion':
+    "Inginocchiati, {playerName}, e leggi le parole ad alta voce. Ecco. Lo senti? La Luce nelle tue mani non ripara più soltanto i vivi, può richiamare indietro coloro che hanno varcato la soglia. Usala con saggezza. Un'anima richiamata in una lotta senza speranza è una crudeltà, non una misericordia. Alzati, Redentore.",
+  'guide.abilityHook.hammer_of_justice': 'Ferma un nemico con uno stordimento breve e affidabile.',
+  'guide.abilityHook.oath_chain':
+    'Trascina un nemico lontano dentro il tuo branco e ne rallenta la fuga.',
+  'guide.abilityHook.ancestor_return':
+    "Riporta in vita ogni membro caduto del gruppo o dell'incursione dopo un lungo lancio fuori dal combattimento.",
+  'guide.abilityHook.avenging_wrath':
+    'Concede 10 Devozione, poi raddoppia la Devozione generata dalle abilità per quindici secondi.',
+  'guide.abilityHook.bastion_sweep':
+    'Fa roteare lo scudo in un gruppo per strappare la minaccia e accumulare Devozione.',
+  'guide.abilityHook.chain_lightning':
+    "Colpisce un bersaglio e rimbalza su due nemici vicini, accumulando un Tuono per l'intero lancio.",
+  'guide.abilityHook.consecration':
+    'Rivendica il terreno attorno a te con danni Sacri e minaccia continui.',
+  'guide.abilityHook.hammer_of_wrath':
+    'Giustizia un nemico ferito a distanza, o qualsiasi nemico mentre le tue ali sono attive.',
+  'guide.abilityHook.holy_shield':
+    'Spende Devozione per una finestra di parata attiva, assorbimento e un impulso di minaccia.',
+  'guide.abilityHook.lay_on_hands':
+    'Recupera una grande quantità di salute quando un alleato sta per cadere.',
+  'guide.abilityHook.measured_shot':
+    'Un tiro a distanza ponderato che recupera concentrazione per i tuoi attacchi più pesanti.',
+  'guide.abilityHook.pack_command':
+    'Ordina al tuo compagno di colpire e accumulare Ferocia del Branco. Ogni accumulo fa sì che il tuo famiglio infligga il 10% di danni in più, fino al 30%, prima che Scatena la Bestia consumi gli accumuli.',
+  'guide.abilityHook.stampede':
+    "Chiama tre bestie ad attaccare per 12 secondi. Usala con la Ferocia del Branco al massimo perché mantengano il bonus ai danni completo per tutta l'evocazione.",
+  'guide.abilityHook.stormsurge':
+    "A volte riporta prima il Colpo Ancestrale dopo che hai speso un'occasione di Presagio di Tempesta.",
+  'guide.abilityHook.thunder_reservoir':
+    'Accumula fulmini finché la Scossa Tellurica o il Terremoto non possono liberare una ricompensa a piena potenza.',
+  'guide.abilityHook.veilbound_march':
+    'Attraversa un gruppo per marchiarlo, smussarne i danni contro di te e assicurarti la minaccia.',
+  'guide.abilityHook.warspirit_cadence':
+    "Trasforma un ritmo d'arma costante in Echi del Cuore di Bufera e in un'occasione di incantesimo istantaneo.",
 };

@@ -9438,4 +9438,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': '무기 해방',
   'entities.abilities.unleash_weapon.description':
     '활성화된 무기 마법을 해방합니다. 화염낙인은 54에서 64의 화염 피해를 입히고 주문력의 30%가 추가되며 천둥을 2 얻습니다. 질풍은 무기로 공격하고 전령의 박자를 진행하며 6초 동안 공격 속도를 20% 높입니다. 바위결속은 무기 피해의 75%를 입히고 대상이 자신을 공격하게 하며 4초 동안 받는 피해를 20% 줄입니다. 생명의 샘은 치유의 물결을 소모해 남은 치유량의 125%를 즉시 회복하고 8초 안에 받는 다음 피해를 실제 회복량의 50%만큼 줄입니다.',
+
+  // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
+  // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
+  'entities.abilities.veilbound_mark.name': '장막의 표식',
+  'hudChrome.auraEffect.dawnsWrath': '천벌: 체력 무관 · +1회 · 재사용 0 · 피해 +{pct}%',
 };

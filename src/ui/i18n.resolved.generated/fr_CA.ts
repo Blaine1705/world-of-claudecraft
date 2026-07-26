@@ -241,7 +241,7 @@ export const fr_CA: EnTranslations = {
     "hud": {
       "lowMana": "Mana faible",
       "lowEnergy": "Énergie faible",
-      "lowFocus": "Low Focus"
+      "lowFocus": "Concentration faible"
     },
     "talents": {
       "title": "Talents",
@@ -749,12 +749,12 @@ export const fr_CA: EnTranslations = {
       "resting": "Au repos"
     },
     "paladin": {
-      "devotion": "Devotion",
-      "devotionValue": "Devotion {value} of {max}",
-      "devotionAscensionCharges": "Devotion {value} of {max}. Ascension {charges} charges.",
-      "devotionAscensionLast": "Devotion {value} of {max}. Ascension final charge.",
-      "ascensionLastAnnouncement": "Ascension final charge",
-      "ascensionSpenderAria": "Action slot {slot}: {ability}. Consumes one Ascension charge."
+      "devotion": "Dévotion",
+      "devotionValue": "Dévotion {value} sur {max}",
+      "devotionAscensionCharges": "Dévotion {value} sur {max}. Ascension : {charges} charges.",
+      "devotionAscensionLast": "Dévotion {value} sur {max}. Ascension : dernière charge.",
+      "ascensionLastAnnouncement": "Ascension : dernière charge",
+      "ascensionSpenderAria": "Emplacement d'action {slot} : {ability}. Consomme une charge d'Ascension."
     },
     "abilityScaling": {
       "bonus": "(+{value})"
@@ -1590,8 +1590,8 @@ export const fr_CA: EnTranslations = {
     "auraEffect": {
       "dot": "Cause {value} points de dégâts de {school} toutes les {interval} s",
       "hot": "Redonne {value} points de vie toutes les {interval} s",
-      "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",
-      "mendingCurrentPercent": "Stores healing equal to {pct}% of maximum health for Cascading Mend",
+      "mendingCurrent": "Stocke {value} de soins, libérés avec le temps ou consommés par Reprise en cascade",
+      "mendingCurrentPercent": "Stocke des soins équivalents à {pct}% des points de vie maximum pour Reprise en cascade",
       "absorb": "Bloque {value} points de dégâts",
       "healAbsorb": "Bloque {value} points de soins reçus",
       "thorns": "Cause {value} points de dégâts de {school} aux attaquants",
@@ -1605,7 +1605,7 @@ export const fr_CA: EnTranslations = {
       "dmgDoneReduce": "Réduit les dégâts infligés de {pct} %",
       "heatingUp": "Votre prochain coup critique consécutif d'un générateur de Feu accorde Bonne série ; un générateur sans critique supprime Chauffe en cours",
       "elementalConvergencePrimed": "Votre prochain sort de l'autre école élémentaire accorde la Convergence élémentaire",
-      "hunterFerocity": "{stacks} Pack Ferocity: your pet deals {pct}% more damage",
+      "hunterFerocity": "{stacks} Férocité de meute : votre familier inflige {pct}% de dégâts en plus",
       "battleStance": "Posture de combat : génération de rage accrue de 10%",
       "berserkerStance": "Posture de berserker : coups critiques 3% plus fréquents et 3% plus puissants",
       "crit": "Accroît les chances de coup critique de {pct}%",
@@ -1628,15 +1628,15 @@ export const fr_CA: EnTranslations = {
       "freeCast": "Votre prochaine incantation ne coûte rien",
       "instantCast": "Votre prochain sort avec un temps d'incantation est instantané",
       "cheapCast": "Votre prochain sort coûte {pct} % de mana en moins",
-      "radiantResonance": "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
-      "solarReprisal": "Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant",
-      "dawnsWrath": "HoW: all HP · +1 use · CD 0 · +{pct}% DMG",
-      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
-      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
-      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
-      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
-      "veiledEdge": "Your next Lurker's Strike strikes for double",
-      "duskEconomy": "Abilities cost {pct}% less energy",
+      "radiantResonance": "Votre prochaine Lumière guérisseuse est instantanée, ou votre prochaine Étreinte de l'aube coûte {pct}% de mana en moins et s'incante en {castTime} s",
+      "solarReprisal": "Votre prochain Disque solaire ne coûte pas de mana, ignore son temps de recharge et inflige {pct}% de dégâts en plus ; le Marteau de grâce ignore son temps de recharge et vous soigne de 100% des dégâts infligés ; ou la Lumière guérisseuse est instantanée",
+      "dawnsWrath": "MdC : tous PV · +1 usage · Recharge 0 · +{pct}% de dégâts",
+      "venomRitual": "Rituel de venin : palier {stacks} sur {max}. Les frappes génératrices ajoutent des paliers ; à {max}, Sommeil éternel devient Déchirure venimeuse",
+      "gloam": "Pénombre : palier {stacks} sur {max}. À {max}, vos ouvertures du Voile crépusculaire se débloquent à découvert, et la prochaine lancée est GRATUITE et fait détoner la réserve en voile d'ombre",
+      "redline": "Ligne rouge : cran {stacks} sur {max}. Les Coups au corps ajoutent des crans ; le Coup de grâce frappe {pct}% plus fort par cran et clôt la fenêtre. Expirer avant la perd",
+      "veilstrikeWindow": "Voile d'ombre : vos ouvertures du Voile crépusculaire sont utilisables à découvert sous tout angle, et les dégâts infligés augmentent de {pct}%",
+      "veiledEdge": "Votre prochaine Frappe du rôdeur frappe deux fois plus fort",
+      "duskEconomy": "Les capacités coûtent {pct}% d'énergie en moins",
       "increase": {
         "ap": "Accroît la puissance d'attaque de {value}",
         "sp": "Augmente la puissance des sorts de {value}",
@@ -2370,7 +2370,7 @@ export const fr_CA: EnTranslations = {
       "empty": "Aucune recette connue pour l'instant.",
       "resultAria": "Artisanat {name}",
       "craftedToast": "Fabriqué$1 {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Fabriqué : {name} x{qty}",
       "insufficientMaterials": "Vous n'avez pas le matériel pour cela.",
       "unknownRecipe": "Cette recette n'existe pas.",
       "comboRequirementUnmet": "Vous ne possédez pas les deux métiers requis au palier nécessaire pour cette recette.",
@@ -2463,13 +2463,13 @@ export const fr_CA: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Vous désenchantez {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Vous désenchantez {item} et obtenez {material}.",
+      "disenchantedYieldQty": "Vous désenchantez {item} et obtenez {material} x{qty}.",
+      "disenchantedAlso": "Vous récupérez également {material}.",
+      "disenchantedAlsoQty": "Vous récupérez également {material} x{qty}.",
       "salvagedLine": "Vous récupérez {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Vous récupérez {material} à partir de {item}.",
+      "salvagedYieldQty": "Vous récupérez {material} x{qty} à partir de {item}.",
       "enchantAppliedLine": "Vous enchantez {item} avec {enchant}.",
       "notHeld": "Vous n'avez pas cet objet.",
       "notDisenchantable": "Vous ne pouvez pas désenchanter cela.",
@@ -3293,21 +3293,21 @@ export const fr_CA: EnTranslations = {
       "holy_light": "Un soin régulier et conséquent pour remettre d'aplomb un allié ou vous-même.",
       "devotion_aura": "Une amélioration personnelle durable qui augmente l'armure pour amortir les coups.",
       "judgement": "Dépense votre Sceau actif pour frapper un ennemi à courte portée.",
-      "hammer_of_wrath": "Executes a wounded enemy from range, or any enemy while your wings are active.",
-      "avenging_wrath": "Grants 10 Devotion, then doubles Devotion generated by abilities for fifteen seconds.",
-      "bastion_sweep": "Sweeps your shield through a group to seize threat and build Devotion.",
-      "oath_chain": "Drags a distant enemy into your pack and slows its escape.",
-      "veilbound_march": "Pass through a pack to mark it, blunt its damage against you, and lock in threat.",
-      "holy_shield": "Spends Devotion on an active block window, absorption, and a threat pulse.",
-      "consecration": "Claims the ground around you with sustained Holy damage and threat.",
-      "hammer_of_justice": "Stops one enemy with a short, reliable stun.",
-      "lay_on_hands": "Restores a large amount of health when an ally is close to falling.",
+      "hammer_of_wrath": "Exécute un ennemi blessé à distance, ou n'importe quel ennemi tant que vos ailes sont actives.",
+      "avenging_wrath": "Octroie 10 Dévotion, puis double la Dévotion générée par les capacités pendant quinze secondes.",
+      "bastion_sweep": "Balaye un groupe avec votre bouclier pour saisir la menace et accumuler de la Dévotion.",
+      "oath_chain": "Traîne un ennemi lointain jusqu'à votre meute et freine sa fuite.",
+      "veilbound_march": "Traversez un groupe pour le marquer, émousser ses dégâts contre vous et verrouiller la menace.",
+      "holy_shield": "Dépense de la Dévotion pour une fenêtre de blocage actif, de l'absorption et une impulsion de menace.",
+      "consecration": "Revendique le terrain autour de vous avec des dégâts Sacrés et une menace continus.",
+      "hammer_of_justice": "Arrête un ennemi avec un étourdissement bref et fiable.",
+      "lay_on_hands": "Restaure une grande quantité de points de vie quand un allié est sur le point de tomber.",
       "blessing_of_might": "Augmente la puissance d'attaque d'une cible alliée, à lancer de préférence avant d'engager.",
       "divine_protection": "Une garde protectrice rapide pour encaisser les dégâts quand la situation se tend.",
       "raptor_strike": "Un coup de mêlée puissant pour quand quelque chose comble la distance.",
-      "pack_command": "Orders your companion to strike and build Pack Ferocity. Each stack makes your pet deal 10% more damage, up to 30%, before Unleash Beast spends the stacks.",
-      "stampede": "Calls three beasts to attack for 12 seconds. Use it at full Pack Ferocity so they keep the maximum damage bonus for the whole summon.",
-      "measured_shot": "A deliberate ranged shot that restores Focus for your heavier attacks.",
+      "pack_command": "Ordonne à votre compagnon de frapper et d'accumuler la Férocité de meute. Chaque cumul fait que votre familier inflige 10% de dégâts en plus, jusqu'à 30%, avant que Déchaîner la bête ne dépense les cumuls.",
+      "stampede": "Appelle trois bêtes à attaquer pendant 12 secondes. Utilisez-la à Férocité de meute maximale pour qu'elles conservent le bonus de dégâts maximal pendant toute l'invocation.",
+      "measured_shot": "Un tir à distance posé qui restaure de la concentration pour vos attaques plus lourdes.",
       "aspect_of_the_hawk": "Une posture à garder active pour aiguiser votre puissance d'attaque à distance.",
       "serpent_sting": "Inflige un venin qui inflige des dégâts de nature dans la durée.",
       "arcane_shot": "Un tir instantané à distance pour quelques dégâts supplémentaires rapides.",
@@ -3326,19 +3326,19 @@ export const fr_CA: EnTranslations = {
       "power_word_shield": "Enveloppe un allié d'un bouclier qui absorbe les coups avant qu'ils ne portent.",
       "renew": "Un soin qui s'égrène dans la durée, pratique à lancer en continuant de bouger.",
       "lightning_bolt": "Une incantation à distance de dégâts de Nature, votre solution de prédilection de loin.",
-      "chain_lightning": "Strikes one target and jumps to two nearby enemies, building one Thunder for the whole cast.",
-      "thunder_reservoir": "Banks lightning until Earthen Jolt or Faultwake can release a full-power payoff.",
+      "chain_lightning": "Frappe une cible et rebondit sur deux ennemis proches, accumulant un Tonnerre pour toute l'incantation.",
+      "thunder_reservoir": "Accumule la foudre jusqu'à ce que la Secousse tellurique ou le Tremblement de terre puisse libérer une récompense à pleine puissance.",
       "rockbiter_weapon": "Imprègne votre arme pour que chaque coup porte plus fort en mêlée.",
       "healing_wave": "Votre soin principal, un remède direct pour vous-même ou un allié.",
       "earth_shock": "Un horion instantané pour des dégâts de Nature rapides quand il les faut tout de suite.",
       "lightning_shield": "Vous charge pour que les attaquants subissent des dégâts de Nature quand ils vous frappent.",
       "flame_shock": "Une brûlure instantanée qui frappe d'emblée et continue de consumer dans la durée.",
       "galeheart_weapon": "Imprègne vos deux armes de vents d'orage et récompense un rythme d'attaque régulier.",
-      "warspirit_cadence": "Turns a steady weapon rhythm into Galeheart Echoes and an instant spell opportunity.",
-      "stormsurge": "Sometimes brings Ancestral Strike back early after you spend a Stormcast opportunity.",
+      "warspirit_cadence": "Transforme un rythme d'arme régulier en Échos Cœur-de-bourrasque et en occasion de sort instantané.",
+      "stormsurge": "Ramène parfois la Frappe ancestrale plus tôt après que vous avez dépensé une occasion de Présage de tempête.",
       "lifespring_weapon": "Imprègne votre arme d'eau réparatrice et renforce votre flux de soins continu.",
       "tidecall": "Appelle la marée pour renforcer votre prochaine série de sorts de soins.",
-      "ancestor_return": "Returns every fallen group or raid member to life after a long out-of-combat cast.",
+      "ancestor_return": "Ramène à la vie tous les membres tombés du groupe ou du raid après une longue incantation hors combat.",
       "stoneward": "Dresse un bouclier de pierre chargé qui transforme les dégâts subis en soins.",
       "primal_exaltation": "Libère brièvement la puissance élémentaire propre à votre spécialisation.",
       "fireball": "Votre frappe de feu principale: elle inflige un coup et laisse la cible en flammes.",
@@ -5841,7 +5841,7 @@ export const fr_CA: EnTranslations = {
       "mana": "Mana",
       "energy": "Énergie",
       "rage": "Rage",
-      "focus": "Focus"
+      "focus": "Concentration"
     },
     "roles": {
       "warrior": "Tank / DPS mêlée",
@@ -6223,7 +6223,7 @@ export const fr_CA: EnTranslations = {
       "notEnoughRage": "Pas assez de rage !",
       "notEnoughEnergy": "Pas assez d'énergie !",
       "notEnoughMana": "Pas assez de mana !",
-      "notEnoughDevotion": "Not enough Devotion!",
+      "notEnoughDevotion": "Dévotion insuffisante !",
       "notEnoughResource": "Pas assez de {resource} !",
       "notEnoughHealth": "Pas assez de points de vie.",
       "targetMustDodge": "Votre cible doit d'abord esquiver.",
@@ -6537,8 +6537,8 @@ export const fr_CA: EnTranslations = {
       "mana": "mana",
       "rage": "rage",
       "energy": "énergie",
-      "focus": "Focus",
-      "devotion": "Devotion"
+      "focus": "concentration",
+      "devotion": "Dévotion"
     },
     "forms": {
       "bear": "ours",
@@ -6915,56 +6915,56 @@ export const fr_CA: EnTranslations = {
         "description": "Fait pleuvoir des flèches sur la zone visée pendant 3 s, infligeant {damage} points de dégâts toutes les 0.5 s aux ennemis présents."
       },
       "pack_command": {
-        "name": "Pack Command",
-        "description": "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit."
+        "name": "Ordre de meute",
+        "description": "Ordonne à votre familier vivant de frapper pour 36 à 48 points de dégâts Physiques. Les dégâts augmentent avec la puissance d'attaque du familier. Un coup au but restaure 20 concentration et octroie 1 Férocité de meute pendant 30 s, jusqu'à 3. Chaque cumul augmente de 10% tous les dégâts infligés par votre familier. Cette frappe utilise les cumuls que vous aviez avant le coup."
       },
       "stampede": {
-        "name": "Stampede",
-        "description": "Summon 3 beasts for 12 sec. Each attacks every 2 sec for {damage} Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed after 5 failed chances. It cannot reset while the beasts are active. (Packlord)"
+        "name": "Ruée sauvage",
+        "description": "Invoque 3 bêtes pendant 12 s. Chacune attaque toutes les 2 s pour {damage} points de dégâts Physiques. Les dégâts affichés incluent 8% de votre puissance d'attaque à distance avant les bonus de dégâts de familier. Les bêtes figent la Férocité de meute à l'invocation et gagnent 10% de dégâts par cumul. Tant que la Ruée sauvage est en recharge, les Ordres de meute réussis ont 20% de chances de la réinitialiser, garanti après 5 échecs. Elle ne peut pas se réinitialiser tant que les bêtes sont actives. (Seigneur de meute)"
       },
       "unleash_beast": {
-        "name": "Unleash Beast",
-        "description": "Consume 3 Pack Ferocity after your pet strikes for 83 to 105 Physical damage and claps every enemy within 6 yards for 26 to 34. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 nearby enemies."
+        "name": "Déchaîner la bête",
+        "description": "Consomme 3 Férocité de meute après que votre familier a frappé pour 83 à 105 points de dégâts Physiques et secoué tous les ennemis à moins de 6 mètres pour 26 à 34. La frappe et la secousse utilisent le bonus complet de 30% de dégâts de familier de la Férocité de meute et augmentent avec la puissance d'attaque du familier. Pendant les 8 s suivantes, le familier inflige 25% de dégâts en plus, attaque 35% plus vite et fait que le Tir funeste touche jusqu'à 2 ennemis proches."
       },
       "measured_shot": {
-        "name": "Measured Shot",
-        "description": "Shoot the target for {damage} Physical damage. A hit restores 20 Focus. Damage increases with Ranged Attack Power."
+        "name": "Tir mesuré",
+        "description": "Tire sur la cible pour {damage} points de dégâts Physiques. Un coup au but restaure 20 concentration. Les dégâts augmentent avec la puissance d'attaque à distance."
       },
       "cold_focus": {
-        "name": "Cold Focus",
-        "description": "For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)"
+        "name": "Concentration glaciale",
+        "description": "Pendant 12 s, le Tir mesuré restaure 50% de concentration en plus, et la Longue traite coûte 25% de moins et s'incante 30% plus vite. (Signature de Regard glacial)"
       },
       "bloodhook": {
-        "name": "Bloodhook",
-        "description": "Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)"
+        "name": "Croc sanglant",
+        "description": "Chargez un ennemi et appliquez la Plaie du croc sanglant, infligeant 34 points de dégâts Physiques de base plus 26% de votre puissance d'attaque à distance sur 12 s en 4 impulsions. (Signature de Maîtrise du terrain)"
       },
       "shrapnel_charge": {
-        "name": "Shrapnel Charge",
-        "description": "Hit the target for 24 to 30 Physical damage and up to 4 other enemies within 6 yards for 13 to 17. Other targets also bleed for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Direct damage increases with Ranged Attack Power."
+        "name": "Charge à fragmentation",
+        "description": "Frappe la cible pour 24 à 30 points de dégâts Physiques et jusqu'à 4 autres ennemis à moins de 6 mètres pour 13 à 17. Les autres cibles saignent aussi pour 12 points de dégâts sur 6 s. Si la cible principale porte votre Plaie du croc sanglant, inflige immédiatement 1 impulsion de plaie. Les dégâts directs augmentent avec la puissance d'attaque à distance."
       },
       "bloodtrail_assault": {
-        "name": "Bloodtrail Assault",
-        "description": "For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 nearby enemies, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards, deals 25% more base damage to its main target, and triggers 50% more wound damage."
+        "name": "Assaut de la piste sanglante",
+        "description": "Pendant 12 s, le Croc sanglant propage une plaie à 60% de puissance à un maximum de 2 ennemis proches, le Déchirement commande une attaque de familier de 18 points de dégâts, et la Charge à fragmentation gagne 2 mètres, inflige 25% de dégâts de base en plus à sa cible principale et déclenche 50% de dégâts de plaie en plus."
       },
       "trailbreak": {
-        "name": "Trailbreak",
-        "description": "Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
+        "name": "Brise-piste",
+        "description": "Bondissez de 12 mètres en arrière. Si vous avez l'Élan de chasse, il est rafraîchi et prépare la Rentrée pendant 12 s."
       },
       "wildheart": {
-        "name": "Wildheart",
-        "description": "Immediately restore 30% of your maximum health."
+        "name": "Cœur sauvage",
+        "description": "Restaure instantanément 30% de vos points de vie maximum."
       },
       "shellskin": {
-        "name": "Shellskin",
-        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+        "name": "Peau de carapace",
+        "description": "Réduit les dégâts subis de 60% pendant 8 s, mais empêche d'attaquer tant que l'effet est actif."
       },
       "frostjaw_trap": {
-        "name": "Frostjaw Trap",
-        "description": "Place a trap at the selected enemy or at your feet. It arms after 0.75 sec and lasts 30 sec. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec."
+        "name": "Piège Mâchegivre",
+        "description": "Pose un piège sur l'ennemi sélectionné ou à vos pieds. Il s'arme après 0,75 s et dure 30 s. Le premier ennemi qui le déclenche est immobilisé pendant 3 s, et les ennemis à moins de 4 mètres sont ralentis de 50% pendant 4 s."
       },
       "pack_rally": {
-        "name": "Pack Rally",
-        "description": "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec."
+        "name": "Ralliement de meute",
+        "description": "Adoptez l'Aspect du coursier et ralliez les alliés proches avec 30% de vitesse de déplacement et 10% de vitesse d'attaque et d'incantation pendant 10 s."
       },
       "hurricane": {
         "name": "Ouragan",
@@ -7275,116 +7275,116 @@ export const fr_CA: EnTranslations = {
         "description": "Rend {damage} points de vie à une cible alliée."
       },
       "divine_ascension": {
-        "name": "Divine Ascension",
-        "description": "Consume 20 Devotion to gain 5 Ascension charges for up to 45 sec. Marked abilities consume one charge and gain an additional effect."
+        "name": "Ascension divine",
+        "description": "Consomme 20 Dévotion pour obtenir 5 charges d'Ascension pendant 45 s au maximum. Les capacités marquées consomment une charge et gagnent un effet supplémentaire."
       },
       "aura_mastery": {
-        "name": "Sacred Concord",
-        "description": "For 8 sec, empower every active Devotion and Requital Aura in your group. Bastion Devotion reduces damage by 15%; Requital deals 15 Holy damage. Multiple uses refresh instead of stacking."
+        "name": "Concorde sacrée",
+        "description": "Pendant 8 s, renforce toutes les Dévotions et Auras de représailles actives de votre groupe. La Dévotion du bastion réduit les dégâts de 15% ; les Représailles infligent 15 points de dégâts Sacrés. Les usages multiples se rafraîchissent au lieu de se cumuler."
       },
       "devotion_ward": {
-        "name": "Bastion Devotion",
-        "description": "Reduce damage taken by you and party members by 5% until death or replacement. Only this aura and Requital Aura replace each other; Radiant, Dawn, and Grace Devotion coexist."
+        "name": "Dévotion du bastion",
+        "description": "Réduit de 5% les dégâts subis par vous-même et les membres du groupe jusqu'à la mort ou au remplacement. Seules cette aura et l'Aura de représailles se remplacent mutuellement ; les Dévotions radiante, de l'aube et de grâce coexistent."
       },
       "hammer_of_grace": {
-        "name": "Hammer of Grace",
-        "description": "Instantly hurl a holy hammer at an enemy within 20 m for {damage}, restoring 70 mana, healing yourself for 50% of damage dealt, and generating 1 Devotion when it deals damage. Solar Reprisal lets Hammer of Grace ignore its cooldown and heal you for 100% of damage dealt."
+        "name": "Marteau de grâce",
+        "description": "Lance instantanément un marteau sacré sur un ennemi à moins de 20 m pour {damage}, restaure 70 mana, vous soigne de 50% des dégâts infligés et génère 1 Dévotion lorsqu'il inflige des dégâts. Les Représailles solaires permettent au Marteau de grâce d'ignorer son temps de recharge et de vous soigner de 100% des dégâts infligés."
       },
       "hushbrand": {
-        "name": "Hushbrand",
-        "description": "Interrupts spellcasting and prevents spells from that school for 4 sec."
+        "name": "Marque du silence",
+        "description": "Interrompt l'incantation et empêche les sorts de cette école pendant 4 s."
       },
       "guardian_covenant": {
-        "name": "Guardian Covenant",
-        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
+        "name": "Pacte du gardien",
+        "description": "Protège une cible alliée et vous-même, réduisant les dégâts subis de 20% pendant 8 s. Vous cible par défaut si aucune cible alliée n'est sélectionnée."
       },
       "solar_step": {
-        "name": "Solar Step",
-        "description": "Increase your movement speed by 150% for 2 sec."
+        "name": "Pas solaire",
+        "description": "Augmente votre vitesse de déplacement de 150% pendant 2 s."
       },
       "solar_invocation": {
-        "name": "Solar Invocation",
-        "description": "Instantly heal an ally for {damage} or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much."
+        "name": "Invocation solaire",
+        "description": "Soigne instantanément un allié de {damage} ou inflige des dégâts Sacrés modérés à un ennemi. Les deux usages génèrent 1 Dévotion. Pendant l'Ascension, une incantation de soin soigne aussi de moitié les joueurs alliés à moins de 10 m de la cible."
       },
       "radiant_devotion": {
-        "name": "Radiant Devotion",
-        "description": "Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion, but coexists with Devotions from other Paladins."
+        "name": "Dévotion radiante",
+        "description": "Augmente la puissance des sorts de vous-même et des membres du groupe de 20 pendant 30 min. Remplace votre propre Dévotion de l'aube ou de grâce, mais coexiste avec les Dévotions des autres paladins."
       },
       "dawn_devotion": {
-        "name": "Dawn Devotion",
-        "description": "Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion, but coexists with Devotions from other Paladins and with Warrior shouts."
+        "name": "Dévotion de l'aube",
+        "description": "Augmente la puissance d'attaque de vous-même et des membres du groupe de 40 pendant 30 min. Remplace votre propre Dévotion radiante ou de grâce, mais coexiste avec les Dévotions des autres paladins et avec les cris de guerrier."
       },
       "grace_devotion": {
-        "name": "Grace Devotion",
-        "description": "You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min. Replaces your own Radiant or Dawn Devotion, but coexists with Devotions from other Paladins."
+        "name": "Dévotion de grâce",
+        "description": "Vous et les membres du groupe récupérez 15 mana toutes les 5 s et payez 3% de mana en moins pendant 30 min. Remplace votre propre Dévotion radiante ou de l'aube, mais coexiste avec les Dévotions des autres paladins."
       },
       "recall_the_fallen": {
-        "name": "Recall the Fallen",
-        "description": "Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group."
+        "name": "Rappel des tombés",
+        "description": "Ramène à la vie un membre mort du groupe avec 35% de points de vie et de mana. Un Sagesoleil de niveau 16 ou plus rappelle à la place tous les membres tombés du groupe."
       },
       "beacon_of_light": {
-        "name": "Beacon of Light",
-        "description": "Mark one group member as your Beacon of Light. 50% of your effective direct healing on another group member within 60 m also heals the Beacon. Area and periodic healing do not transfer. Lasts until either of you dies."
+        "name": "Phare de lumière",
+        "description": "Désigne un membre du groupe comme votre Phare de lumière. 50% de vos soins directs effectifs sur un autre membre du groupe situé à moins de 60 m soignent aussi le Phare. Les soins de zone et périodiques ne sont pas transférés. Dure jusqu'à la mort de l'un de vous deux."
       },
       "final_edict": {
-        "name": "Final Edict",
-        "description": "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Holy explosion around you."
+        "name": "Édit final",
+        "description": "Assène une frappe d'arme dévastatrice et génère 1 Dévotion lorsqu'elle inflige des dégâts. Un coup réussi réduit de 2 s le temps de recharge restant de la Chute de l'aube. Les attaques automatiques réussies et les coups de l'Édit final ont 15% de chances d'octroyer le Courroux de l'aube pendant 8 s. L'Ascension libère en outre une explosion Sacrée autour de vous."
       },
       "dawnfall": {
-        "name": "Dawnfall",
-        "description": "Deal {damage} Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict's remaining cooldown by 2 sec. Ascension increases its damage and radius."
+        "name": "Chute de l'aube",
+        "description": "Inflige {damage} points de dégâts Sacrés aux ennemis proches et génère 1 Dévotion. Toucher au moins un ennemi réduit de 2 s le temps de recharge restant de l'Édit final. L'Ascension augmente ses dégâts et son rayon."
       },
       "sun_gods_verdict": {
-        "name": "Verdict of the Sun God",
-        "description": "Judge an enemy beneath the Verdict of the Sun God for 30 sec. Final Edict and Dawnfall inscribe one charge on a successful hit. The ability that lands the third charge dictates the sentence: Final Edict unleashes devastating damage on the condemned; Dawnfall detonates the verdict, damaging and stunning nearby enemies for 1.5 sec."
+        "name": "Verdict du Dieu Soleil",
+        "description": "Juge un ennemi sous le Verdict du Dieu Soleil pendant 30 s. L'Édit final et la Chute de l'aube inscrivent une charge à chaque coup réussi. La capacité qui pose la troisième charge dicte la sentence : l'Édit final déchaîne des dégâts dévastateurs sur le condamné ; la Chute de l'aube fait détoner le verdict, blessant et étourdissant les ennemis proches pendant 1,5 s."
       },
       "valkyrs_calling": {
-        "name": "Valkyr's Calling",
-        "description": "Ascend into the air, becoming immune to damage as you fly toward the enemy. After 2 sec, descend upon the target area for {damage} Holy damage and generate 1 Devotion. Ascension increases the impact damage by 50% and consumes 1 charge."
+        "name": "Appel de la valkyrie",
+        "description": "Vous vous élevez dans les airs, devenant insensible aux dégâts en volant vers l'ennemi. Après 2 s, vous vous abattez sur la zone ciblée pour {damage} points de dégâts Sacrés et générez 1 Dévotion. L'Ascension augmente les dégâts d'impact de 50% et consomme 1 charge."
       },
       "faithforged_guard": {
-        "name": "Debt of Light",
-        "description": "For 8 sec, the next enemy hit against you is answered: up to {buff} damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered. Ascension raises the amount it can answer by 50%."
+        "name": "Dette de lumière",
+        "description": "Pendant 8 s, le prochain coup ennemi porté contre vous reçoit une réponse : jusqu'à {buff} points de dégâts sont annulés et renvoyés à l'attaquant en dégâts Sacrés, et vous gagnez 1 Dévotion. Un seul coup reçoit une réponse. L'Ascension augmente de 50% le montant auquel elle peut répondre."
       },
       "mercy_lance": {
-        "name": "Mercy Lance",
-        "description": "Deal {damage} Holy damage to an enemy and generate 1 Devotion when it deals damage. During Ascension, it consumes 1 charge to guarantee a critical hit."
+        "name": "Lance de miséricorde",
+        "description": "Inflige {damage} points de dégâts Sacrés à un ennemi et génère 1 Dévotion lorsqu'elle inflige des dégâts. Pendant l'Ascension, elle consomme 1 charge pour garantir un coup critique."
       },
       "sacred_form": {
-        "name": "Sacred Form",
-        "description": "Enter a sacred state until death, increasing healing by 10%, spell critical chance by 5%, and reducing threat generated by 50%. Sunmender only."
+        "name": "Forme sacrée",
+        "description": "Entre dans un état sacré jusqu'à la mort, augmentant les soins de 10% et les chances de critique des sorts de 5%, et réduisant la menace générée de 50%. Réservé aux Sagesoleil."
       },
       "dawns_embrace": {
-        "name": "Dawn's Embrace",
-        "description": "Deliver a powerful heal and generate 1 Devotion. Radiant Resonance reduces its mana cost by 50% and cast time to 1.5 sec. Ascension makes it instant and increases its healing by 35%."
+        "name": "Étreinte de l'aube",
+        "description": "Délivre un soin puissant et génère 1 Dévotion. La Résonance radiante réduit son coût en mana de 50% et son temps d'incantation à 1,5 s. L'Ascension la rend instantanée et augmente ses soins de 35%."
       },
       "radiant_chorus": {
-        "name": "Radiant Chorus",
-        "description": "Heal nearby allies for {damage} and generate 1 Devotion. Effectively healing at least 2 allies grants Radiant Resonance: your next Mending Light is instant, or your next Dawn's Embrace costs 50% less mana and casts in 1.5 sec. Ascension increases Radiant Chorus healing and radius."
+        "name": "Chœur radiant",
+        "description": "Soigne les alliés proches de {damage} et génère 1 Dévotion. Soigner efficacement au moins 2 alliés octroie la Résonance radiante : votre prochaine Lumière guérisseuse est instantanée, ou votre prochaine Étreinte de l'aube coûte 50% de mana en moins et s'incante en 1,5 s. L'Ascension augmente les soins et le rayon du Chœur radiant."
       },
       "life_covenant": {
-        "name": "Life Covenant",
-        "description": "Reduce an ally's damage taken by 40% for 6 sec. During Ascension it also grants a 120-point shield without consuming a charge."
+        "name": "Pacte de vie",
+        "description": "Réduit de 40% les dégâts subis par un allié pendant 6 s. Pendant l'Ascension, octroie aussi un bouclier de 120 points sans consommer de charge."
       },
       "aegis_first_dawn": {
-        "name": "Aegis of the First Dawn",
-        "description": "Channel for 5 sec, creating a 10 meter holy dome. Allies inside are healed every second and take 50% less damage. Completing the channel releases a final heal and grants 30% movement speed for 4 sec."
+        "name": "Égide de la Première Aube",
+        "description": "Incantez pendant 5 s pour créer un dôme sacré de 10 mètres. Les alliés à l'intérieur sont soignés chaque seconde et subissent 50% de dégâts en moins. Terminer l'incantation libère un soin final et octroie 30% de vitesse de déplacement pendant 4 s."
       },
       "vowkeeper_strike": {
-        "name": "Vowkeeper Strike",
-        "description": "Strike with high threat and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal empowers your next Sunward Disc, Hammer of Grace, or Mending Light. Ascension also grants a small absorption shield."
+        "name": "Frappe du gardevœu",
+        "description": "Frappe avec une menace élevée et génère 1 Dévotion. Une frappe réussie a 20% de chances d'octroyer les Représailles solaires pendant 8 s ; chaque blocage réussi, 25%. Les Représailles solaires renforcent votre prochain Disque solaire, Marteau de grâce ou Lumière guérisseuse. L'Ascension octroie aussi un petit bouclier d'absorption."
       },
       "bastion_rite": {
-        "name": "Bastion Rite",
-        "description": "Reduce physical damage taken by 20% and increase block chance by 20% for 6 sec. Ascension extends the duration to 10 sec."
+        "name": "Rite du bastion",
+        "description": "Réduit les dégâts physiques subis de 20% et augmente les chances de blocage de 20% pendant 6 s. L'Ascension porte la durée à 10 s."
       },
       "sunward_disc": {
-        "name": "Sunward Disc",
-        "description": "Requires a shield. Hurl a radiant disc that strikes and then bounces between nearby enemies. Each damaging impact generates 1 Devotion. Solar Reprisal makes Sunward Disc cost no mana, ignore its cooldown, and deal 20% more damage. Ascension empowers 5 bounces."
+        "name": "Disque solaire",
+        "description": "Nécessite un bouclier. Lance un disque radiant qui frappe puis rebondit entre les ennemis proches. Chaque impact infligeant des dégâts génère 1 Dévotion. Les Représailles solaires font que le Disque solaire ne coûte pas de mana, ignore son temps de recharge et inflige 20% de dégâts en plus. L'Ascension renforce 5 rebonds."
       },
       "sacred_challenge": {
-        "name": "Sacred Goad",
-        "description": "Compel an enemy to attack you. During Ascension it also reduces all damage received by 15% for 4 sec without consuming a charge."
+        "name": "Aiguillon sacré",
+        "description": "Contraint un ennemi à vous attaquer. Pendant l'Ascension, réduit aussi de 15% tous les dégâts subis pendant 4 s sans consommer de charge."
       },
       "devotion_aura": {
         "name": "Aura inébranlable",
@@ -7423,20 +7423,20 @@ export const fr_CA: EnTranslations = {
         "description": "Consacre le sol sous vos pieds et brûle les ennemis proches pour {damage} points de dégâts Sacrés toutes les 2 s pendant 10 s."
       },
       "bastion_sweep": {
-        "name": "Bastion Sweep",
-        "description": "Sweep your equipped shield through enemies in a 180 degree frontal arc for {damage} Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m."
+        "name": "Balayage du bastion",
+        "description": "Balayez les ennemis d'un arc frontal de 180 degrés avec votre bouclier équipé pour {damage} points de dégâts Sacrés avec une menace élevée et générez 1 Dévotion. L'Ascension augmente les dégâts de 30% et le rayon à 8 m."
       },
       "oath_chain": {
-        "name": "Oath Chain",
-        "description": "Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy."
+        "name": "Chaîne du serment",
+        "description": "Entrave instantanément un ennemi lointain d'une chaîne sacrée. L'ennemi se déplace vers vous à 18 m par seconde jusqu'à 3 m, puis est ralenti de 50% pendant 4 s. Pendant l'Ascension, elle entrave un second ennemi proche."
       },
       "veilbound_march": {
-        "name": "Veilbound March",
-        "description": "Become ethereal for 4 sec, gaining 40% movement speed and 30% armor and becoming immune to roots, slows, and displacement. Enemies you pass through are Veil Marked for 6 sec, taking Holy damage each second, dealing 20% less damage to you, and generating extra threat. The first mark grants 1 Devotion. When the march ends, nearby marked enemies take a final burst. Ascension increases the burst by 50% and lightly pulls them toward you."
+        "name": "Marche du voile",
+        "description": "Devenez éthéré pendant 4 s, gagnant 40% de vitesse de déplacement et 30% d'armure, et devenant insensible aux entraves, ralentissements et déplacements. Les ennemis que vous traversez reçoivent la Marque du voile pendant 6 s : ils subissent des dégâts Sacrés chaque seconde, vous infligent 20% de dégâts en moins et génèrent une menace supplémentaire. La première marque octroie 1 Dévotion. À la fin de la marche, les ennemis marqués proches subissent une déflagration finale. L'Ascension augmente la déflagration de 50% et les attire légèrement vers vous."
       },
       "veilbound_mark": {
-        "name": "Veil Mark",
-        "description": "Takes Holy damage each second, deals 20% less damage to the Paladin who applied the mark, and generates additional threat toward that Paladin."
+        "name": "Marque du voile",
+        "description": "Subit des dégâts Sacrés chaque seconde, inflige 20% de dégâts en moins au paladin qui a posé la marque et génère une menace supplémentaire envers ce paladin."
       },
       "righteous_fury": {
         "name": "Serment ardent",
@@ -7479,12 +7479,12 @@ export const fr_CA: EnTranslations = {
         "description": "Contre-attaque après une esquive de la cible, infligeant les dégâts de l'arme plus {damage}. Ne peut pas être esquivée."
       },
       "hunting_momentum": {
-        "name": "Hunting Momentum",
-        "description": "Passive: Gutting Strike grants 1 Hunting Momentum for 8 sec, up to 3. At 3 stacks, Woundrend deals 45% more strike damage and consumes the stacks. (Fieldcraft)"
+        "name": "Élan de chasse",
+        "description": "Passif : la Frappe éviscérante octroie 1 Élan de chasse pendant 8 s, jusqu'à 3. À 3 cumuls, le Déchirement inflige 45% de dégâts de frappe en plus et consomme les cumuls. (Maîtrise du terrain)"
       },
       "fieldcraft_reentry": {
-        "name": "Armed Re-entry",
-        "description": "Passive: Trailbreak refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)"
+        "name": "Rentrée armée",
+        "description": "Passif : Brise-piste rafraîchit l'Élan de chasse et prépare votre prochaine Frappe éviscérante ou Croc sanglant pendant 12 s. La Frappe éviscérante inflige 15% de dégâts en plus par cumul. Le Croc sanglant inflige 18 à 24 points de dégâts Physiques supplémentaires, augmentés de 15% par cumul et par votre puissance d'attaque à distance. À 3 cumuls, l'une ou l'autre attaque consomme l'Élan de chasse. (Maîtrise du terrain)"
       },
       "wing_clip": {
         "name": "Taillade entravante",
@@ -7551,8 +7551,8 @@ export const fr_CA: EnTranslations = {
         "description": "Lance un éclair qui inflige {damage} points de dégâts de Nature."
       },
       "thunder_reservoir": {
-        "name": "Thunder Reservoir",
-        "description": "Passive: Arc Bolt and Skybranch grant Thunder, up to 5. At 5 Thunder, Earthen Jolt deals 125% more damage or Faultwake deals 100% more damage, then consumes all Thunder. (Thundercall)"
+        "name": "Réservoir de tonnerre",
+        "description": "Passif : le Éclair d'arc et l'Éclair fourchu octroient du Tonnerre, jusqu'à 5. À 5 Tonnerre, la Secousse tellurique inflige 125% de dégâts en plus ou le Tremblement de terre 100% de plus, puis consomme tout le Tonnerre. (Appel du tonnerre)"
       },
       "rockbiter_weapon": {
         "name": "Arme Stonebound",
@@ -7779,36 +7779,36 @@ export const fr_CA: EnTranslations = {
         "description": "Rend une grande quantité de points de vie à une cible alliée, puis rebondit sur un maximum de 2 autres alliés proches, avec des soins réduits de 50 % à chaque rebond. (signature Restauration)"
       },
       "galeheart_weapon": {
-        "name": "Galeheart Weapon",
-        "description": "Imbue both weapons for 30 min, enabling Warspirit Cadence."
+        "name": "Arme Cœur-de-bourrasque",
+        "description": "Enchante les deux armes pendant 30 min et active la Cadence de l'esprit guerrier."
       },
       "warspirit_cadence": {
-        "name": "Warspirit Cadence",
-        "description": "Passive: Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)"
+        "name": "Cadence de l'esprit guerrier",
+        "description": "Passif : chaque 3e attaque d'arme réussie déclenche 2 Échos Cœur-de-bourrasque pour 50% de dégâts de Nature et octroie un Présage de tempête pendant 12 s. Le Présage de tempête rend instantané votre prochain Éclair d'arc, Secousse ou Eaux réparatrices, et en réduit le coût en mana de 50%. La Frappe ancestrale compte comme 2 attaques. (Esprit guerrier)"
       },
       "stormsurge": {
-        "name": "Stormsurge",
-        "description": "Passive: While Ancestral Strike is on cooldown, consuming Stormcast has a 25% chance to reset it. If the first 3 chances fail, the 4th always resets it. (Warspirit)"
+        "name": "Houle de tempête",
+        "description": "Passif : tant que la Frappe ancestrale est en recharge, consommer un Présage de tempête a 25% de chances de la réinitialiser. Si les 3 premières tentatives échouent, la 4e la réinitialise toujours. (Esprit guerrier)"
       },
       "lifespring_weapon": {
-        "name": "Lifespring Weapon",
-        "description": "Imbue your weapon for 30 min. Mending Waters and Tidecall add 20% more healing to Mending Current."
+        "name": "Arme Source-de-vie",
+        "description": "Enchante votre arme pendant 30 min. Eaux réparatrices et l'Appel des marées ajoutent 20% de soins en plus au Courant réparateur."
       },
       "unleash_weapon": {
-        "name": "Unleash Weapon",
-        "description": "Unleash your active weapon enchant. Pyrebrand deals 54 to 64 Fire damage, gains 30% of Spell Power, and grants 2 Thunder. Galeheart strikes with your weapon, advances Warspirit Cadence, and grants 20% attack speed for 6 sec. Stonebound strikes for 75% weapon damage, forces the target to attack you, and reduces damage taken by 20% for 4 sec. Lifespring consumes your Mending Current, heals for 125% of its remaining healing, and reduces the next hit within 8 sec by 50% of the health restored."
+        "name": "Déchaîner l'arme",
+        "description": "Déchaîne l'enchantement actif de votre arme. La Marque de pyre inflige 54 à 64 points de dégâts de Feu, gagne 30% de la puissance des sorts et octroie 2 Tonnerre. Le Cœur-de-bourrasque frappe avec votre arme, avance la Cadence de l'esprit guerrier et octroie 20% de vitesse d'attaque pendant 6 s. Le Lié-à-la-pierre frappe pour 75% des dégâts d'arme, force la cible à vous attaquer et réduit les dégâts subis de 20% pendant 4 s. La Source-de-vie consomme votre Courant réparateur, soigne de 125% de ses soins restants et réduit le prochain coup dans les 8 s de 50% des points de vie restaurés."
       },
       "primal_exaltation": {
-        "name": "Primal Exaltation",
-        "description": "For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)"
+        "name": "Exaltation primordiale",
+        "description": "Pendant 12 s, le Éclair d'arc et l'Éclair fourchu de l'Appel du tonnerre s'incantent 50% plus vite, et le Éclair d'arc octroie 2 Tonnerre ; l'Esprit guerrier déclenche sa cadence tous les 2 coups d'arme ; la Reprise spirituelle ajoute 50% de soins en plus au Courant réparateur. (Talent de chaman)"
       },
       "stoneward": {
-        "name": "Stoneward",
-        "description": "Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)"
+        "name": "Garde de pierre",
+        "description": "Protège un allié pendant 60 s avec 6 charges. Les dégâts consomment une charge pour soigner 5% des points de vie maximum, une fois toutes les 3 s. (Talent de chaman)"
       },
       "tidecall": {
-        "name": "Tidecall",
-        "description": "Heal a friendly target for 58 to 72. The heal increases with Spell Power. Add the same healing calculated before overhealing to Mending Current, up to 30% of the target's maximum health."
+        "name": "Appel des marées",
+        "description": "Soigne une cible alliée de 58 à 72. Les soins augmentent avec la puissance des sorts. Ajoute les mêmes soins calculés avant surplus au Courant réparateur, jusqu'à 30% des points de vie maximum de la cible."
       },
       "metamorphosis": {
         "name": "Métamorphose",
@@ -8195,8 +8195,8 @@ export const fr_CA: EnTranslations = {
         "description": "Rembobine la ligne temporelle de chaque membre mort de votre groupe ou raid et le ramène à la vie près de son corps avec 30% de ses points de vie et de mana. Ne peut pas être lancé en combat. (Chronomancie)"
       },
       "ancestor_return": {
-        "name": "Ancestors' Return",
-        "description": "Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)"
+        "name": "Retour des ancêtres",
+        "description": "Ramène à la vie auprès de leur corps tous les membres tombés de votre groupe ou raid avec 30% de points de vie et de mana. Ne peut pas être incanté en combat. (Reprise spirituelle)"
       },
       "temporal_rewind": {
         "name": "Retour en arrière",
@@ -8315,28 +8315,28 @@ export const fr_CA: EnTranslations = {
         "description": "Dévore un effet magique (un effet bénéfique sur un ennemi ou un effet néfaste sur un allié) et vous rend 6 % de votre maximum de points de vie."
       },
       "veilstep": {
-        "name": "Veilstep",
-        "description": "Steps through the veil in the direction you are facing."
+        "name": "Pas du voile",
+        "description": "Traverse le voile dans la direction où vous regardez."
       },
       "scouring_mercy": {
-        "name": "Scouring Mercy",
-        "description": "Deal 72 to 84 Holy damage to an enemy or heal a friendly target for 130 to 155. Both amounts increase with Spell Power. Damage also heals each Doctrine-linked ally for 30%, or the lowest-health party member for 15% if no ally is linked. (Doctrine signature)"
+        "name": "Miséricorde purifiante",
+        "description": "Inflige 72 à 84 points de dégâts Sacrés à un ennemi ou soigne une cible alliée de 130 à 155. Les deux montants augmentent avec la puissance des sorts. Les dégâts soignent aussi chaque allié lié par la Doctrine de 30%, ou le membre du groupe le plus blessé de 15% si aucun allié n'est lié. (Signature de Doctrine)"
       },
       "seraphic_vigil": {
-        "name": "Seraphic Vigil",
-        "description": "Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)"
+        "name": "Veille séraphique",
+        "description": "Protège un allié pendant 30 s. Le premier coup qui le fait descendre sous 35% de points de vie consomme la Veille et le soigne de 180. (Signature de Bénison)"
       },
       "summon_tithefiend": {
-        "name": "Call Tithefiend",
-        "description": "Consume all Gloomtithe to summon a Tithefiend for 6, 8, 10, 12, or 15 sec at 1 to 5 stacks. It attacks every 2 sec for 20 to 24 Shadow damage, plus 8 per extra stack. Five stacks make it larger and increase its damage by 25%. Its damage increases with your Spell Power. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)"
+        "name": "Invoquer un Démon de dîme",
+        "description": "Consomme toute la Dîme lugubre pour invoquer un Démon de dîme pendant 6, 8, 10, 12 ou 15 s selon 1 à 5 cumuls. Il attaque toutes les 2 s pour 20 à 24 points de dégâts d'Ombre, plus 8 par cumul supplémentaire. À cinq cumuls, il grandit et ses dégâts augmentent de 25%. Ses dégâts augmentent avec votre puissance des sorts. Il préfère votre Effigie. Chaque coup restaure 1% du mana maximum et répercute 15% des dégâts sur un maximum de 3 autres ennemis portant votre Complainte de décrépitude. (Signature de Vêpres)"
       },
       "martyrs_aegis": {
-        "name": "Martyr's Aegis",
-        "description": "Reduces one ally incoming damage by 40% for 8 sec."
+        "name": "Égide du martyr",
+        "description": "Réduit de 40% les dégâts subis par un allié pendant 8 s."
       },
       "choir_of_deliverance": {
-        "name": "Choir of Deliverance",
-        "description": "Channels for 6 sec, healing nearby party members every 2 sec."
+        "name": "Chœur de délivrance",
+        "description": "Incante pendant 6 s et soigne les membres proches du groupe toutes les 2 s."
       },
       "bear_charge": {
         "name": "Ruée de Bruin",
@@ -10940,12 +10940,12 @@ export const fr_CA: EnTranslations = {
         }
       },
       "q_divine_tome": {
-        "title": "The Dawnbound Tome",
-        "text": "The Light does not rest in you quietly, {playerName}. I have watched you lay the dead to peace, and I believe you are ready for what few paladins are ever taught: the Rite of Recall, by which a fallen soul is called back to the living. Its words are kept in the Dawnbound Tome, here in my keeping, but a book is no blessing while the restless dead still walk this ground. Return 6 more Restless Bones to the earth, and I will begin to teach you.",
-        "completion": "The chapel yard grows quiet. You are ready for the words, {playerName}, but the Rite of Recall cannot be spoken in a warm chapel. It must be sung where the veil between life and death wears thin. I mean to carry the Tome north into the Mirefen Marsh. Follow me there, and we will finish this.",
+        "title": "Le Tome de l'aube",
+        "text": "La Lumière ne repose pas en vous en silence, {playerName}. Je vous ai vu rendre la paix aux morts, et je crois que vous êtes prêt pour ce que peu de paladins apprennent un jour : le Rite du Rappel, par lequel une âme tombée est rappelée parmi les vivants. Ses paroles sont conservées dans le Tome de l'aube, ici sous ma garde, mais un livre n'est nulle bénédiction tant que les morts agités arpentent encore cette terre. Rendez 6 Ossements agités de plus à la terre, et je commencerai à vous enseigner.",
+        "completion": "La cour de la chapelle retrouve le silence. Vous êtes prêt pour les paroles, {playerName}, mais le Rite du Rappel ne peut être prononcé dans une chapelle tiède. Il doit être chanté là où le voile entre la vie et la mort s'amincit. J'entends porter le Tome au nord, dans le Marais de Mirefen. Suivez-moi là-bas et nous en finirons.",
         "objectives": {
           "0": {
-            "label": "Restless Bones laid to rest"
+            "label": "Ossements agités remis au repos"
           }
         }
       },
@@ -11106,12 +11106,12 @@ export const fr_CA: EnTranslations = {
         }
       },
       "q_rite_of_redemption": {
-        "title": "The Rite of Recall",
-        "text": "So you followed me into the mire, {playerName}. Good. I have the Dawnbound Tome here, and this drowned ground is where its words belong: nowhere is the veil between life and death thinner than a place where the dead will not stay buried. But the drowned would drag your voice down mid-verse. Clear a space fit for the rite: put 8 of the Drowned Dead to rest, and we will consecrate it together.",
-        "completion": "Kneel, {playerName}, and read the words aloud. There. Do you feel it? The Light no longer only mends the living in your hands, it can summon back those who have crossed over. Use it wisely. A soul called back to a hopeless fight is a cruelty, not a mercy. Rise, Redeemer.",
+        "title": "Le Rite du Rappel",
+        "text": "Ainsi vous m'avez suivi dans la fange, {playerName}. Bien. J'ai ici le Tome de l'aube, et cette terre noyée est là où ses paroles ont leur place : nulle part le voile entre la vie et la mort n'est plus mince qu'en un lieu où les morts refusent de rester enterrés. Mais les noyés entraîneraient votre voix au milieu du vers. Dégagez un espace digne du rite : remettez 8 des Noyés au repos, et nous le consacrerons ensemble.",
+        "completion": "Agenouillez-vous, {playerName}, et lisez les paroles à voix haute. Voilà. Le sentez-vous ? La Lumière ne répare plus seulement les vivants entre vos mains, elle peut rappeler ceux qui ont franchi le seuil. Usez-en avec sagesse. Une âme rappelée dans un combat sans espoir est une cruauté, non une miséricorde. Relevez-vous, Rédempteur.",
         "objectives": {
           "0": {
-            "label": "Drowned Dead laid to rest"
+            "label": "Noyés remis au repos"
           }
         }
       },

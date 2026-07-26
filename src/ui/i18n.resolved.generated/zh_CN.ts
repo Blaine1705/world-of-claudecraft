@@ -1630,7 +1630,7 @@ export const zh_CN: EnTranslations = {
       "cheapCast": "下一个法术消耗降低{pct}%",
       "radiantResonance": "你的下一次治愈之光将瞬发，或下一次黎明之拥的法力消耗降低 {pct}%，施法时间缩短至 {castTime} 秒",
       "solarReprisal": "你的下一次向阳飞盾不消耗法力、无视冷却时间且伤害提高 {pct}%；恩典之锤无视冷却时间并为你恢复相当于伤害量 100% 的生命值；或使治愈之光变为瞬发",
-      "dawnsWrath": "HoW: all HP · +1 use · CD 0 · +{pct}% DMG",
+      "dawnsWrath": "制裁之锤：无生命限制 · +1次 · 冷却0 · 伤害+{pct}%",
       "venomRitual": "毒祭：第{stacks}/{max}层。连击点生成技能累积层数，达到{max}层时，长眠变为蚀毒撕裂",
       "gloam": "幽暝：第{stacks}/{max}层。达到{max}层时，暮帷变为罩影突袭",
       "redline": "红线：第{stacks}/{max}格。击体重拳增加格数；击倒重拳每格伤害提高{pct}%，命中后结束窗口。窗口超时则作废",
