@@ -5308,10 +5308,22 @@ export class Renderer {
       const d2 = cdx * cdx + cdz * cdz;
       const isSelf = id === p.id;
       // Pose carries information the player acts on (own feedback, the read on
-      // the current target, a cast windup telegraph) rather than mere cosmetic
-      // smoothness: such an entity is exempt from BOTH the cadence throttle and
-      // the crowd-pulled frozen-mesh swap below.
-      const actionablePose = animatesEveryFrame(id, p.id, p.targetId, e.castingAbility);
+      // the current target, pet combat, a cast windup telegraph) rather than
+      // mere cosmetic smoothness: such an entity is exempt from BOTH the cadence
+      // throttle and the crowd-pulled frozen-mesh swap below.
+      const combatTargetId = e.aggroTargetId ?? e.targetId;
+      const combatTarget =
+        e.inCombat && combatTargetId !== null ? sim.entities.get(combatTargetId) : undefined;
+      const actionablePose = animatesEveryFrame(
+        id,
+        p.id,
+        p.targetId,
+        e.castingAbility,
+        e.inCombat,
+        e.ownerId,
+        combatTargetId,
+        combatTarget?.ownerId ?? null,
+      );
       if (isSelf) {
         v.group.visible = true;
         v.isFar = false;
