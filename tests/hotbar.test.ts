@@ -633,6 +633,15 @@ describe('loadoutKnownAbilityIds', () => {
       null,
     ]);
   });
+
+  it('restores a target-build granted ability before the live known list updates', () => {
+    const enhancement = { ...emptyAllocation(), spec: 'enhancement' };
+    const enhancementKnown = loadoutKnownAbilityIds('shaman', enhancement, 20);
+
+    expect(applyLoadoutBar([null], ['stormstrike'], 1, (id) => enhancementKnown.has(id))).toEqual([
+      { type: 'ability', id: 'stormstrike' },
+    ]);
+  });
 });
 
 describe('mobile touch drag drop resolution', () => {
