@@ -4,7 +4,9 @@ This audit covers the new ability and passive icons introduced by PR #2218 for t
 
 ## Result
 
-All 31 new icon IDs now use dedicated image artwork instead of procedural fallback icons. Every new file is a 128 by 128 WebP and has a provenance entry in its class mapping file.
+All 43 project-generated owned-class icon IDs now use dedicated image artwork. Together with the existing painted class assets, every ability learned across the nine level-20 spellbooks resolves to painted art instead of a procedural fallback. Every project-generated file is a 128 by 128 WebP and has a provenance entry in its class mapping file.
+
+The final completion pass replaced the remaining 12 procedural fallbacks: Volley, Hushing Shot, Howling Rage, Skybranch, Faultwake, Storm Chorus, Primal Mastery, Cascading Mend, Terror Canticle, Choirmend, Sunburst Canticle, and Gloamveil.
 
 The artwork follows the visual language of the existing class icons:
 
@@ -12,7 +14,7 @@ The artwork follows the visual language of the existing class icons:
 - Shaman uses elemental weapons, lightning, water, earth, and spirit silhouettes with strong spec color cues.
 - Priest uses gold for healing and protection, violet for shadow magic, and clear figures or symbols for small-size readability.
 
-The full icon sheet is [pr-2218-owned-class-icons.png](../screenshots/pr-2218-owned-class-icons.png).
+The full project-generated icon sheet is [pr-2218-owned-class-icons.png](../screenshots/pr-2218-owned-class-icons.png).
 
 ## Icon inventory
 
@@ -33,6 +35,9 @@ The full icon sheet is [pr-2218-owned-class-icons.png](../screenshots/pr-2218-ow
 13. Bloodhook
 14. Hunting Momentum
 15. Armed Re-entry
+16. Volley
+17. Hushing Shot
+18. Howling Rage
 
 ### Shaman
 
@@ -46,6 +51,11 @@ The full icon sheet is [pr-2218-owned-class-icons.png](../screenshots/pr-2218-ow
 8. Stoneward
 9. Primal Exaltation
 10. Ancestors' Return
+11. Skybranch
+12. Faultwake
+13. Storm Chorus
+14. Primal Mastery
+15. Cascading Mend
 
 Unleash Weapon is a baseline spell for Elemental, Enhancement, and Restoration. Its result comes from the active spec weapon enchant. Elemental uses Pyrebrand, Enhancement uses Galeheart or Stonebound, and Restoration uses Lifespring.
 
@@ -57,6 +67,10 @@ Unleash Weapon is a baseline spell for Elemental, Enhancement, and Restoration. 
 4. Call Tithefiend
 5. Martyr's Aegis
 6. Choir of Deliverance
+7. Terror Canticle
+8. Choirmend
+9. Sunburst Canticle
+10. Gloamveil
 
 ## Spellbook evidence
 
@@ -83,7 +97,8 @@ The screenshots show the baseline level-20 spellbooks without talent choices all
 - The Enhancement weapon icons remain distinguishable at 34 pixels: Galeheart shows paired blades, Warspirit Cadence shows crossed weapons and cadence rings, and Stormsurge shows a single charged axe.
 - Tithefiend uses five visible orbs to connect the icon to its five-stack payoff.
 - No generated icon contains text, a logo, a watermark, or its own UI frame.
+- Every ability learned by the nine owned specs at level 20 now resolves to painted art.
 
 ## Known gap outside PR #2218
 
-The repository still contains 36 older Mage and Warrior icon files that are larger than the documented 128 by 128 target. They are not new to PR #2218 and were not resized here because that could change existing artwork quality. The #2218 icon-size test is deliberately scoped to the 31 new files.
+The repository still contains 36 older Mage and Warrior icon files that are larger than the documented 128 by 128 target. They are not new to PR #2218 and were not resized here because that could change existing artwork quality. The #2218 icon-size test is deliberately scoped to the 43 owned-class files.

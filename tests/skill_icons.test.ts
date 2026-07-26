@@ -3,6 +3,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
+import { abilitiesKnownAt } from '../src/sim/content/classes';
+import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
 import { ABILITY_IMAGE_IDS, abilityImageUrl } from '../src/ui/icons';
 
 // Gate for the committed WebP class ability icons. The art under
@@ -60,6 +62,7 @@ const webpFiles = (): string[] =>
 
 const PR_2218_OWNED_CLASS_ICON_IDS = {
   hunter: [
+    'bestial_wrath',
     'bloodhook',
     'bloodtrail_assault',
     'cold_focus',
@@ -74,10 +77,17 @@ const PR_2218_OWNED_CLASS_ICON_IDS = {
     'stampede',
     'trailbreak',
     'unleash_beast',
+    'counter_shot',
+    'volley',
     'wildheart',
   ],
   shaman: [
     'ancestor_return',
+    'bloodlust',
+    'chain_heal',
+    'chain_lightning',
+    'earthquake',
+    'elemental_mastery',
     'galeheart_weapon',
     'lifespring_weapon',
     'primal_exaltation',
@@ -90,12 +100,22 @@ const PR_2218_OWNED_CLASS_ICON_IDS = {
   ],
   priest: [
     'choir_of_deliverance',
+    'holy_nova',
     'martyrs_aegis',
+    'prayer_of_healing',
+    'psychic_scream',
     'scouring_mercy',
     'seraphic_vigil',
     'summon_tithefiend',
+    'shadowform',
     'veilstep',
   ],
+} as const;
+
+const OWNED_CLASS_SPECS = {
+  hunter: ['beast_mastery', 'marksmanship', 'survival'],
+  shaman: ['elemental', 'enhancement', 'restoration'],
+  priest: ['discipline', 'holy', 'shadow'],
 } as const;
 
 describe('class ability webp icons', () => {
@@ -134,7 +154,7 @@ describe('class ability webp icons', () => {
     expect(abilityImageUrl('temporal_hourglass')).toBe('/ui/skills/mage/temporal_hourglass.webp');
   });
 
-  it('image-backs every ability icon introduced by PR #2218 with recorded provenance', () => {
+  it('image-backs every owned-class icon delivered by PR #2218 with recorded provenance', () => {
     for (const [cls, ids] of Object.entries(PR_2218_OWNED_CLASS_ICON_IDS)) {
       const mapping = JSON.parse(
         readFileSync(path.join(skillsDir, cls, 'mapping.json'), 'utf8'),
@@ -152,6 +172,20 @@ describe('class ability webp icons', () => {
         });
       }
     }
+  });
+
+  it('image-backs every level-20 Hunter, Shaman, and Priest spellbook entry', () => {
+    const missing: string[] = [];
+    for (const cls of Object.keys(OWNED_CLASS_SPECS) as Array<keyof typeof OWNED_CLASS_SPECS>) {
+      const specs = OWNED_CLASS_SPECS[cls];
+      for (const spec of specs) {
+        const mods = computeTalentModifiers(cls, { ...emptyAllocation(), spec }, 20);
+        for (const { def } of abilitiesKnownAt(cls, 20, mods)) {
+          if (!abilityImageUrl(def.id)) missing.push(`${cls}/${spec}/${def.id}`);
+        }
+      }
+    }
+    expect(missing).toEqual([]);
   });
 
   it('A) every image-backed ability id resolves to a committed, valid .webp', () => {

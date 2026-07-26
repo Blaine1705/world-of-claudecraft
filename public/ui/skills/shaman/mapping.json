@@ -140,6 +140,36 @@
       "sourcePack": "OpenAI image generation through Codex",
       "sourceFile": "project-generated for PR #2218",
       "output": "ancestor_return.webp"
+    },
+    {
+      "abilityId": "chain_lightning",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218 owned-class icon completion",
+      "output": "chain_lightning.webp"
+    },
+    {
+      "abilityId": "earthquake",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218 owned-class icon completion",
+      "output": "earthquake.webp"
+    },
+    {
+      "abilityId": "bloodlust",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218 owned-class icon completion",
+      "output": "bloodlust.webp"
+    },
+    {
+      "abilityId": "elemental_mastery",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218 owned-class icon completion",
+      "output": "elemental_mastery.webp"
+    },
+    {
+      "abilityId": "chain_heal",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218 owned-class icon completion",
+      "output": "chain_heal.webp"
     }
   ],
   "deferredStayProcedural": {}

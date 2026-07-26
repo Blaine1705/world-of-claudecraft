@@ -97,6 +97,30 @@
       "sourcePack": "OpenAI image generation through Codex",
       "sourceFile": "project-generated for PR #2218",
       "output": "choir_of_deliverance.webp"
+    },
+    {
+      "abilityId": "psychic_scream",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218 owned-class icon completion",
+      "output": "psychic_scream.webp"
+    },
+    {
+      "abilityId": "prayer_of_healing",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218 owned-class icon completion",
+      "output": "prayer_of_healing.webp"
+    },
+    {
+      "abilityId": "holy_nova",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218 owned-class icon completion",
+      "output": "holy_nova.webp"
+    },
+    {
+      "abilityId": "shadowform",
+      "sourcePack": "OpenAI image generation through Codex",
+      "sourceFile": "project-generated for PR #2218 owned-class icon completion",
+      "output": "shadowform.webp"
     }
   ],
   "deferredStayProcedural": {}
