@@ -7309,7 +7309,7 @@ export const zh_CN: EnTranslations = {
       },
       "divine_protection": {
         "name": "信仰守护",
-        "description": "一道守护结界吸收 {damage} 点伤害，持续 10 秒。"
+        "description": "一道神圣护盾吸收相当于你最大生命值 {damage}% 的伤害，持续 {duration} 秒。"
       },
       "hammer_of_justice": {
         "name": "碎裂法槌",
@@ -7317,7 +7317,7 @@ export const zh_CN: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "临终圣礼",
-        "description": "巨大的治疗涌流：恢复 {damage} 点生命值。10 分钟冷却时间。"
+        "description": "巨大的治疗涌流恢复你最大生命值的 {damage}%。10 分钟冷却时间。"
       },
       "holy_taunt": {
         "name": "神圣挑衅",
@@ -7333,7 +7333,7 @@ export const zh_CN: EnTranslations = {
       },
       "consecration": {
         "name": "神圣领域",
-        "description": "奉献你脚下的土地，持续 10 秒，每 2 秒灼烧附近敌人并造成 {damage} 点神圣伤害。"
+        "description": "奉献地面 9 秒，每秒造成 {damage} 点神圣伤害。信仰守卫站在其中时受到的伤害降低 10%。"
       },
       "bastion_sweep": {
         "name": "壁垒横扫",
@@ -7689,7 +7689,7 @@ export const zh_CN: EnTranslations = {
       },
       "holy_shield": {
         "name": "神圣之盾",
-        "description": "以神圣之力保护你10秒，护甲提高90，并对近战攻击者造成12点神圣伤害。（防护专精招牌）"
+        "description": "格挡提高 30%，并获得相当于最大生命值 {damage}% 的护盾，持续 {duration} 秒。升华会强化防御。"
       },
       "bestial_wrath": {
         "name": "狂野怒火",

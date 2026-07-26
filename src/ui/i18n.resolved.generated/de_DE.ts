@@ -7309,7 +7309,7 @@ export const de_DE: EnTranslations = {
       },
       "divine_protection": {
         "name": "Bannschild des Glaubens",
-        "description": "Ein schützender Bannschild absorbiert 10 Sek. lang {damage} Schaden."
+        "description": "Ein heiliger Schild absorbiert {damage}% Eurer maximalen Gesundheit für {duration} Sek."
       },
       "hammer_of_justice": {
         "name": "Spaltender Richthammer",
@@ -7317,7 +7317,7 @@ export const de_DE: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Letzte Ölung",
-        "description": "Ein gewaltiger Heilungsstoß: Stellt {damage} Gesundheit wieder her. 10 Min. Abklingzeit."
+        "description": "Ein gewaltiger Heilungsstoß stellt {damage}% Eurer maximalen Gesundheit wieder her. 10 Min. Abklingzeit."
       },
       "holy_taunt": {
         "name": "Heiliger Ansporn",
@@ -7333,7 +7333,7 @@ export const de_DE: EnTranslations = {
       },
       "consecration": {
         "name": "Heiliger Boden",
-        "description": "Weiht den Boden unter euch und versengt nahe Gegner 10 Sek. lang alle 2 Sek. für {damage} Heiligschaden."
+        "description": "Weiht den Boden 9 Sek. lang und verursacht jede Sekunde {damage} Heiligschaden. Glaubenswächter erleiden darin 10% weniger Schaden."
       },
       "bastion_sweep": {
         "name": "Bastion Sweep",
@@ -7689,7 +7689,7 @@ export const de_DE: EnTranslations = {
       },
       "holy_shield": {
         "name": "Heiliger Schild",
-        "description": "Schützt Euch 10 Sek. lang mit Heiliger Macht, erhöht die Rüstung um 90 und trifft Nahkampfangreifer mit 12 Heiligschaden. (Schutz-Signatur)"
+        "description": "Erhöht die Blockchance um 30% und gewährt für {duration} Sek. einen Schild in Höhe von {damage}% Eurer maximalen Gesundheit. Aufstieg verstärkt die Verteidigung."
       },
       "bestial_wrath": {
         "name": "Zorn des Wildtiers",

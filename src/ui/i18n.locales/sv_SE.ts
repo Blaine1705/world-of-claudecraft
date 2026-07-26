@@ -2580,7 +2580,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Frammanar 2 flaskor vatten som återställer mana när de dricks. Högre rang frammanar renare vatten.',
   'entities.abilities.conjure_water.name': 'Vattenbindning',
   'entities.abilities.consecration.description':
-    'Inviger marken under dig och svedjar närliggande fiender för {damage} helig skada varannan sek i 10 sek.',
+    'Inviger marken i 9 sek och orsakar {damage} helig skada varje sekund. Trosväktare tar 10% mindre skada medan de står där.',
   'entities.abilities.consecration.name': 'Helig mark',
   'entities.abilities.corruption.description':
     'Fördärvar målet och vållar {damage} skuggskada under 18 sek.',
@@ -2614,7 +2614,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.dismiss_pet.description': 'Släpper tillbaka ditt djur ut i vildmarken.',
   'entities.abilities.dismiss_pet.name': 'Släpp följeslagare',
   'entities.abilities.divine_protection.description':
-    'Ett heligt värn absorberar {damage} skada i 10 sek.',
+    'En helig sköld absorberar {damage}% av din maximala hälsa i {duration} sek.',
   'entities.abilities.divine_protection.name': 'Trons värn',
   'entities.abilities.drain_life.description':
     'Dränerar målets liv och överför {damage} hälsa till dig varje sekund i 5 sek.',
@@ -2747,7 +2747,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Avslutande manöver som bedövar målet. Varar 1 sek längre per kombopoäng.',
   'entities.abilities.kidney_shot.name': 'Lågt slag',
   'entities.abilities.lay_on_hands.description':
-    'En massiv våg av läkning: återställer {damage} hälsa. 10 min nedkylning.',
+    'En massiv våg av läkning återställer {damage}% av din maximala hälsa. 10 min nedkylning.',
   'entities.abilities.lay_on_hands.name': 'Sista smörjelsen',
   'entities.abilities.lesser_heal.description': 'Läker ett vänligt mål för {damage}.',
   'entities.abilities.lesser_heal.name': 'Viskad bön',
@@ -2939,7 +2939,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Chockar ett vänligt mål med helig energi och läker det för {damage}. (Helig signatur)',
   'entities.abilities.holy_shield.name': 'Helig sköld',
   'entities.abilities.holy_shield.description':
-    'Skyddar dig med helig kraft i 10 sek, ökar rustning med 90 och slår närstridsangripare för 12 helig skada. (Skyddssignatur)',
+    'Ökar blockering med 30% och ger en sköld på {damage}% av din maximala hälsa i {duration} sek. Ascension stärker försvaret.',
   'entities.abilities.bestial_wrath.name': 'Bestialisk vrede',
   'entities.abilities.bestial_wrath.description':
     'Driver dig in i bestialisk vrede och ökar attackkraft med 55 i 15 sek. (Odjursmästarsignatur)',

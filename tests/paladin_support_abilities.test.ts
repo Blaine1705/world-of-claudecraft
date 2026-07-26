@@ -152,10 +152,10 @@ describe('Paladin support abilities', () => {
       castTime: 0,
     });
     expect(ABILITIES.lay_on_hands.hiddenFromPlayer).not.toBe(true);
-    expect(ABILITIES.lay_on_hands.effects).toEqual([{ type: 'heal', min: 250, max: 250 }]);
-    expect(ABILITIES.lay_on_hands.ranks?.at(-1)?.effects).toEqual([
-      { type: 'heal', min: 600, max: 600 },
+    expect(ABILITIES.lay_on_hands.effects).toEqual([
+      { type: 'heal', min: 0, max: 0, casterMaxHpPct: 1, canCrit: false },
     ]);
+    expect(ABILITIES.lay_on_hands.ranks).toBeUndefined();
     expect(ABILITIES.hammer_of_justice).toMatchObject({
       name: 'Sundering Gavel',
       cooldown: 60,
@@ -258,6 +258,46 @@ describe('Paladin support abilities', () => {
     expect(authority.player.cooldowns.size).toBe(0);
     expect(ABILITIES.unbinding_blessing).toBeUndefined();
     expect(ABILITIES.citadel_of_faith).toBeUndefined();
+  });
+
+  it("makes every spec's Last Rite heal for caster maximum health and preserve two RNG draws", () => {
+    for (const [index, spec] of ['holy', 'protection', 'retribution'].entries()) {
+      const sim = new Sim({ seed: 164 + index, playerClass: 'paladin', autoEquip: true });
+      sim.setPlayerLevel(20);
+      expect(sim.setSpec(spec as 'holy' | 'protection' | 'retribution')).toBe(true);
+      const allyId = sim.addPlayer('warrior', `Last Rite ${spec} Ally`, { autoEquip: true });
+      sim.setPlayerLevel(20, allyId);
+      const ally = sim.entities.get(allyId);
+      if (!ally) throw new Error('missing Last Rite ally');
+      ally.maxHp = sim.player.maxHp * 3;
+      ally.hp = 1;
+      sim.player.spellPower = 10_000;
+      let rangeCalls = 0;
+      let chanceCalls = 0;
+      sim.rng.range = () => {
+        rangeCalls++;
+        return 0;
+      };
+      sim.rng.chance = () => {
+        chanceCalls++;
+        return true;
+      };
+
+      run(sim, ally, resolve(sim, 'lay_on_hands'));
+
+      expect(ally.hp).toBe(1 + sim.player.maxHp);
+      expect(rangeCalls).toBe(1);
+      expect(chanceCalls).toBe(1);
+      expect(sim.drainEvents()).toContainEqual(
+        expect.objectContaining({
+          type: 'heal2',
+          sourceId: sim.playerId,
+          targetId: allyId,
+          amount: sim.player.maxHp,
+          crit: false,
+        }),
+      );
+    }
   });
 
   it('offers every Devotion to all three Paladin specializations', () => {

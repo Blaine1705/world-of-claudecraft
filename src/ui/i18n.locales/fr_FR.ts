@@ -4499,12 +4499,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Place une Bénédiction sur une cible alliée et augmente sa puissance d'attaque de {buff} pendant 5 min.",
   'entities.abilities.divine_protection.name': 'Garde de la foi',
   'entities.abilities.divine_protection.description':
-    'Une garde protectrice absorbe {damage} points de dégâts pendant 10 s.',
+    'Un bouclier sacré absorbe {damage}% de vos points de vie maximum pendant {duration} s.',
   'entities.abilities.hammer_of_justice.name': 'Maillet fracassant',
   'entities.abilities.hammer_of_justice.description': 'Étourdit la cible pendant {duration} s.',
   'entities.abilities.lay_on_hands.name': 'Dernier sacrement',
   'entities.abilities.lay_on_hands.description':
-    'Une vague de soins massive: rend {damage} points de vie. Temps de recharge de 10 min.',
+    'Une vague de soins massive rend {damage}% de vos points de vie maximum. Temps de recharge de 10 min.',
   'entities.abilities.flash_of_light.name': 'Soin de lumière',
   'entities.abilities.flash_of_light.description':
     'Un éclat de Lumière rapide et efficace qui rend {damage} points de vie à une cible alliée.',
@@ -4513,7 +4513,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Bannit les impies par une colère Sacrée et inflige {damage} points de dégâts Sacrés.',
   'entities.abilities.consecration.name': 'Terre consacrée',
   'entities.abilities.consecration.description':
-    'Consacre le sol sous vos pieds et brûle les ennemis proches pour {damage} points de dégâts Sacrés toutes les 2 s pendant 10 s.',
+    'Consacre le sol pendant 9 s et inflige {damage} points de dégâts Sacrés chaque seconde. Les Gardiens de la foi y subissent 10% de dégâts en moins.',
   'entities.abilities.righteous_fury.name': 'Serment ardent',
   'entities.abilities.righteous_fury.description':
     'Augmente de 60% la menace générée par vos dégâts Sacrés pendant 30 min. La pierre angulaire du paladin tank.',
@@ -4781,7 +4781,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Frappe une cible alliée avec de l’énergie sacrée et lui rend {damage} points de vie. (signature Sacré)',
   'entities.abilities.holy_shield.name': 'Bouclier sacré',
   'entities.abilities.holy_shield.description':
-    'Vous protège avec une puissance sacrée pendant 10 s, augmente l’armure de 90 et frappe les attaquants en mêlée pour 12 points de dégâts du Sacré. (signature Protection)',
+    'Augmente le blocage de 30% et confère pendant {duration} s un bouclier absorbant {damage}% de vos points de vie maximum. Ascension renforce la défense.',
   'entities.abilities.bestial_wrath.name': 'Courroux bestial',
   'entities.abilities.bestial_wrath.description':
     'Vous plonge dans une rage bestiale, augmentant la puissance d’attaque de 55 pendant 15 s. (signature Maîtrise des bêtes)',

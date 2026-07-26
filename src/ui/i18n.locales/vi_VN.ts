@@ -2796,7 +2796,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tạo ra 2 chai nước, hồi pháp lực khi uống. Cấp cao hơn tạo ra nước tinh khiết hơn.',
   'entities.abilities.conjure_water.name': 'Kết Nước',
   'entities.abilities.consecration.description':
-    'Thánh hóa mặt đất bên dưới ngươi, thiêu đốt kẻ địch lân cận gây {damage} sát thương Thần Thánh mỗi 2 giây trong 10 giây.',
+    'Thánh hóa mặt đất trong 9 giây và gây {damage} sát thương Thần Thánh mỗi giây. Hộ Vệ Đức Tin chịu ít hơn 10% sát thương khi đứng bên trong.',
   'entities.abilities.consecration.name': 'Thánh Địa',
   'entities.abilities.corruption.description':
     'Hủ hóa mục tiêu, gây {damage} sát thương Bóng Tối trong 18 giây.',
@@ -2830,7 +2830,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.dismiss_pet.description': 'Thả thú cưng của bạn về lại nơi hoang dã.',
   'entities.abilities.dismiss_pet.name': 'Thả Bạn Đồng Hành',
   'entities.abilities.divine_protection.description':
-    'Một tấm bùa hộ mệnh hấp thụ {damage} sát thương trong 10 giây.',
+    'Một lá chắn thánh hấp thụ {damage}% máu tối đa của bạn trong {duration} giây.',
   'entities.abilities.divine_protection.name': 'Bùa Hộ Đức Tin',
   'entities.abilities.drain_life.description':
     'Hút sinh lực của mục tiêu, chuyển {damage} máu sang cho bạn mỗi giây trong 5 giây.',
@@ -2964,7 +2964,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Đòn kết liễu làm choáng mục tiêu. Kéo dài thêm 1 giây cho mỗi điểm liên hoàn.',
   'entities.abilities.kidney_shot.name': 'Đòn Chơi Xấu',
   'entities.abilities.lay_on_hands.description':
-    'Một luồng trị liệu khổng lồ: hồi phục {damage} máu. Hồi chiêu 10 phút.',
+    'Một luồng trị liệu khổng lồ hồi phục {damage}% máu tối đa của bạn. Hồi chiêu 10 phút.',
   'entities.abilities.lay_on_hands.name': 'Nghi Thức Cuối Cùng',
   'entities.abilities.lesser_heal.description': 'Trị liệu cho đồng minh {damage} máu.',
   'entities.abilities.lesser_heal.name': 'Lời Nguyện Thì Thầm',
@@ -3162,7 +3162,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Gây sốc một mục tiêu đồng minh bằng năng lượng Thánh, hồi cho họ {damage}. (dấu ấn Thánh)',
   'entities.abilities.holy_shield.name': 'Khiên Thánh',
   'entities.abilities.holy_shield.description':
-    'Bảo vệ bạn bằng sức mạnh Thánh trong 10 giây, tăng giáp thêm 90 và đánh kẻ tấn công cận chiến gây 12 sát thương Thánh. (dấu ấn Bảo Hộ)',
+    'Tăng chặn đòn 30% và tạo lá chắn bằng {damage}% máu tối đa trong {duration} giây. Thăng Thiên tăng cường phòng thủ.',
   'entities.abilities.bestial_wrath.name': 'Cơn Thịnh Nộ Dã Thú',
   'entities.abilities.bestial_wrath.description':
     'Đưa bạn vào cơn giận dã thú, tăng sức mạnh tấn công thêm 55 trong 15 giây. (dấu ấn Thuần Thú)',

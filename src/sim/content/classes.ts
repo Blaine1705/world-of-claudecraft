@@ -3040,16 +3040,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 6,
     cost: 15,
     castTime: 0,
-    cooldown: 60,
+    cooldown: 30,
     range: 0,
     school: 'holy',
     requiresTarget: false,
     offGcd: true,
-    effects: [{ type: 'absorb', amount: 50, duration: 10 }],
-    ranks: [
-      { rank: 2, level: 14, cost: 25, effects: [{ type: 'absorb', amount: 110, duration: 10 }] },
-    ],
-    description: 'A holy shield absorbs $d damage for 10 sec.',
+    effects: [{ type: 'absorb', amount: 0, casterMaxHpPct: 0.25, duration: 10 }],
+    description:
+      'A holy shield absorbs $d% of your maximum health for $t sec. Enduring Protection increases the shield.',
   },
   // Paladin tank cooldown: a predictive divine cheat-death (the `guardian_ward`
   // aura, consumed by an enemy lethal blow in damage.ts). Its short window and
@@ -3098,10 +3096,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'holy',
     requiresTarget: true,
     targetType: 'friendly',
-    effects: [{ type: 'heal', min: 250, max: 250 }],
-    ranks: [{ rank: 2, level: 18, cost: 0, effects: [{ type: 'heal', min: 600, max: 600 }] }],
+    effects: [{ type: 'heal', min: 0, max: 0, casterMaxHpPct: 1, canCrit: false }],
     description:
-      'A massive surge of healing: restores $d health and generates 1 Devotion when it restores health. 10 min cooldown.',
+      'A massive surge that restores $d% of your maximum health and generates 1 Devotion when it restores health. 10 min cooldown.',
   },
   holy_taunt: {
     id: 'holy_taunt',
@@ -6403,6 +6400,7 @@ function scaleEffect(
         bonus: Math.round(eff.bonus * dmgMult + flat),
       };
     case 'heal':
+      if (eff.casterMaxHpPct !== undefined) return eff;
       return {
         ...eff,
         min: Math.round(eff.min * healMult + flat),
@@ -6443,7 +6441,14 @@ function scaleEffect(
           : undefined,
       };
     case 'absorb':
-      return { ...eff, amount: Math.round(eff.amount * healMult * absorbMult + flat) };
+      return {
+        ...eff,
+        amount: Math.round(eff.amount * healMult * absorbMult + flat),
+        casterMaxHpPct:
+          eff.casterMaxHpPct === undefined
+            ? undefined
+            : Math.round(eff.casterMaxHpPct * healMult * absorbMult * 10_000) / 10_000,
+      };
     // Only the buff kinds whose value is a flat MAGNITUDE (armor, attack power, a flat
     // primary stat, spell power, thorns damage) scale with a damage-power mod. Every
     // other selfBuff/buffTarget kind is a rate, multiplier, percent, or a locked

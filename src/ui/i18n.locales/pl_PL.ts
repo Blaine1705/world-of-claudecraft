@@ -2744,7 +2744,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przywołuje 2 butelki wody, które po wypiciu przywracają manę. Wyższe rangi przywołują czystszą wodę.',
   'entities.abilities.conjure_water.name': 'Przywołanie wody',
   'entities.abilities.consecration.description':
-    'Poświęca ziemię pod tobą, parząc pobliskich wrogów i zadając {damage} obrażeń od Świętości co 2 sek. przez 10 sek.',
+    'Poświęca ziemię na 9 sek. i co sekundę zadaje {damage} obrażeń od Świętości. Strażnicy Wiary otrzymują w niej o 10% mniej obrażeń.',
   'entities.abilities.consecration.name': 'Święta ziemia',
   'entities.abilities.corruption.description':
     'Skaża cel, zadając {damage} obrażeń cienia przez 18 sek.',
@@ -2778,7 +2778,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.dismiss_pet.description': 'Odsyła twoje zwierzę z powrotem na łono dziczy.',
   'entities.abilities.dismiss_pet.name': 'Uwolnij towarzysza',
   'entities.abilities.divine_protection.description':
-    'Ochronna osłona pochłania {damage} obrażeń przez 10 sek.',
+    'Święta tarcza pochłania {damage}% twojego maksymalnego zdrowia przez {duration} sek.',
   'entities.abilities.divine_protection.name': 'Osłona wiary',
   'entities.abilities.drain_life.description':
     'Wysysa życie celu, przekazując ci {damage} zdrowia co sekundę przez 5 sek.',
@@ -2912,7 +2912,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Ruch kończący, który ogłusza cel. Trwa o 1 sek dłużej za każdy punkt kombinacji.',
   'entities.abilities.kidney_shot.name': 'Cios poniżej pasa',
   'entities.abilities.lay_on_hands.description':
-    'Potężny przypływ uzdrowienia: przywraca {damage} zdrowia. 10 min czasu odnowienia.',
+    'Potężny przypływ uzdrowienia przywraca {damage}% twojego maksymalnego zdrowia. 10 min czasu odnowienia.',
   'entities.abilities.lay_on_hands.name': 'Ostatnie namaszczenie',
   'entities.abilities.lesser_heal.description': 'Leczy sprzymierzony cel o {damage}.',
   'entities.abilities.lesser_heal.name': 'Szeptana modlitwa',
@@ -3108,7 +3108,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Razisz przyjazny cel Świętą energią, lecząc go za {damage}. (specjalizacja Świętość)',
   'entities.abilities.holy_shield.name': 'Święta tarcza',
   'entities.abilities.holy_shield.description':
-    'Osłaniasz się Świętą mocą na 10 sek., zwiększając pancerz o 90 i rażąc napastników w zwarciu za 12 obrażeń Świętych. (specjalizacja Ochrona)',
+    'Zwiększa blok o 30% i daje na {duration} sek. tarczę równą {damage}% twojego maksymalnego zdrowia. Wniebowstąpienie wzmacnia obronę.',
   'entities.abilities.bestial_wrath.name': 'Bestialski gniew',
   'entities.abilities.bestial_wrath.description':
     'Wpadasz w bestialski szał, zwiększając siłę ataku o 55 na 15 sek. (specjalizacja Władca Bestii)',

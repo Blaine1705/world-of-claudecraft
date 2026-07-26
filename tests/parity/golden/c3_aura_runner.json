@@ -808,8 +808,8 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 419,
-      "state": "9b47c6f8",
-      "events": "3eb2c2c9",
+      "state": "416e4210",
+      "events": "2e10c8fd",
       "rng": {
         "draws": 310,
         "digest": "4dd33a08"
@@ -819,7 +819,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 419,
-      "state": "af176960",
+      "state": "3176f564",
       "events": "741638a5",
       "rng": {
         "draws": 332,
@@ -830,7 +830,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 419,
-      "state": "4b06f533",
+      "state": "4e86f333",
       "events": "741638a5",
       "rng": {
         "draws": 367,
@@ -841,7 +841,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 419,
-      "state": "c4bc5807",
+      "state": "4b76581f",
       "events": "741638a5",
       "rng": {
         "draws": 390,
@@ -852,7 +852,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 419,
-      "state": "41cf6645",
+      "state": "4e004a15",
       "events": "b028ead0",
       "rng": {
         "draws": 435,
@@ -863,7 +863,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 419,
-      "state": "078eab97",
+      "state": "d4964667",
       "events": "741638a5",
       "rng": {
         "draws": 466,
@@ -874,7 +874,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 419,
-      "state": "6e1c41e4",
+      "state": "2dbbda64",
       "events": "741638a5",
       "rng": {
         "draws": 502,
@@ -885,7 +885,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 419,
-      "state": "343719ae",
+      "state": "2fdd4002",
       "events": "741638a5",
       "rng": {
         "draws": 532,
@@ -896,8 +896,8 @@
       "tick": 145,
       "time": 7.25,
       "nextId": 419,
-      "state": "a0b6d1d9",
-      "events": "86cae7e9",
+      "state": "a4b4852d",
+      "events": "96631b58",
       "rng": {
         "draws": 562,
         "digest": "a07fed3f"
@@ -907,7 +907,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 419,
-      "state": "bb3268af",
+      "state": "77151eff",
       "events": "741638a5",
       "rng": {
         "draws": 595,
@@ -918,7 +918,7 @@
       "tick": 155,
       "time": 7.75,
       "nextId": 419,
-      "state": "86c81694",
+      "state": "4c03cfcc",
       "events": "741638a5",
       "rng": {
         "draws": 636,
@@ -929,7 +929,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 419,
-      "state": "0ac90b36",
+      "state": "2e2f343e",
       "events": "741638a5",
       "rng": {
         "draws": 656,
@@ -940,7 +940,7 @@
       "tick": 165,
       "time": 8.25,
       "nextId": 419,
-      "state": "7e90d3d5",
+      "state": "889b463d",
       "events": "31887c82",
       "rng": {
         "draws": 687,
@@ -951,7 +951,7 @@
       "tick": 170,
       "time": 8.5,
       "nextId": 419,
-      "state": "34f8b359",
+      "state": "125aeae9",
       "events": "741638a5",
       "rng": {
         "draws": 715,
@@ -962,7 +962,7 @@
       "tick": 175,
       "time": 8.75,
       "nextId": 419,
-      "state": "14de1a62",
+      "state": "db51624a",
       "events": "741638a5",
       "rng": {
         "draws": 750,
@@ -973,7 +973,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 419,
-      "state": "fb18e506",
+      "state": "705c7dbe",
       "events": "741638a5",
       "rng": {
         "draws": 793,
@@ -984,7 +984,7 @@
       "tick": 182,
       "time": 9.1,
       "nextId": 419,
-      "state": "6ea03941",
+      "state": "86a54429",
       "events": "2da2e24c",
       "rng": {
         "draws": 804,
@@ -1009,7 +1009,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 373,
-            "damageTaken": 28
+            "damageTaken": 25
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -1111,7 +1111,7 @@
           "dodgeChance": 0.068,
           "fallStartY": 1.5,
           "fiveSecondRule": 6,
-          "hp": 990,
+          "hp": 993,
           "id": 415,
           "inCombat": true,
           "kind": "player",

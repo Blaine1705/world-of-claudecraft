@@ -7309,7 +7309,7 @@ export const en: EnTranslations = {
       },
       "divine_protection": {
         "name": "Ward of Faith",
-        "description": "A protective ward absorbs {damage} damage for 10 sec."
+        "description": "A holy shield absorbs {damage}% of your maximum health for {duration} sec. Enduring Protection increases the shield."
       },
       "hammer_of_justice": {
         "name": "Sundering Gavel",
@@ -7317,7 +7317,7 @@ export const en: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Last Rite",
-        "description": "A massive surge of healing: restores {damage} health and generates 1 Devotion when it restores health. 10 min cooldown."
+        "description": "A massive surge that restores {damage}% of your maximum health and generates 1 Devotion when it restores health. 10 min cooldown."
       },
       "holy_taunt": {
         "name": "Sacred Goad",
@@ -7333,7 +7333,7 @@ export const en: EnTranslations = {
       },
       "consecration": {
         "name": "Holy Ground",
-        "description": "Consecrate the ground beneath you for 9 sec, dealing {damage} Holy damage with high threat every second. The first impact generates 1 Devotion. Faithwardens take 5% less damage while standing inside. Ascension increases its damage."
+        "description": "Consecrate the ground beneath you for 9 sec, dealing {damage} Holy damage with high threat every second. The first impact generates 1 Devotion. Faithwardens take 10% less damage while standing inside. Ascension increases its damage."
       },
       "bastion_sweep": {
         "name": "Bastion Sweep",
@@ -7689,7 +7689,7 @@ export const en: EnTranslations = {
       },
       "holy_shield": {
         "name": "Hallowed Wall",
-        "description": "Gain 30% block and an absorb shield for 8 sec, releasing a pulse of threat. Ascension strengthens and extends the defense."
+        "description": "Gain 30% block and a shield that absorbs {damage}% of your maximum health for {duration} sec, releasing a pulse of threat. Ascension strengthens and extends the defense."
       },
       "bestial_wrath": {
         "name": "Howling Rage",

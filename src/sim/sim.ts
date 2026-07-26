@@ -100,6 +100,7 @@ import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
 import { rewindHealAmount } from './combat/rewind';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
+import { blockedMeleeDamage } from './combat/shield_block';
 import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
 import { isSpellResisted } from './combat/spell_resist';
 import { isCritImmuneTank } from './combat/tank_crit_immunity';
@@ -6208,8 +6209,14 @@ export class Sim {
     dmg *= 1 - armorReduction(this.effectiveArmor(target), mob.level);
     const blocked = blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance;
     if (blocked) {
-      dmg = Math.max(1, dmg - target.blockValue);
-      if (target.kind === 'player' && this.players.get(target.id)?.talents.spec === 'protection') {
+      const targetMeta = target.kind === 'player' ? this.players.get(target.id) : undefined;
+      const targetSpec = targetMeta?.talents.spec ?? null;
+      dmg = blockedMeleeDamage(
+        dmg,
+        target.blockValue,
+        target.templateId === 'paladin' && targetSpec === 'protection',
+      );
+      if (targetMeta && targetSpec === 'protection') {
         grantDevotionFromBlock(target);
         tryGrantSolarReprisal(this.ctx, target, 'block');
       }

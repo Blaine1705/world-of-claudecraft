@@ -7309,7 +7309,7 @@ export const it_IT: EnTranslations = {
       },
       "divine_protection": {
         "name": "Barriera della Fede",
-        "description": "Una barriera protettiva assorbe {damage} danni per 10 sec."
+        "description": "Uno scudo sacro assorbe il {damage}% della tua salute massima per {duration} sec."
       },
       "hammer_of_justice": {
         "name": "Maglio Frantumante",
@@ -7317,7 +7317,7 @@ export const it_IT: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Ultimo Rito",
-        "description": "Una grande ondata di guarigione: ripristina {damage} salute. Tempo di recupero di 10 min."
+        "description": "Una grande ondata di guarigione ripristina il {damage}% della tua salute massima. Tempo di recupero di 10 min."
       },
       "holy_taunt": {
         "name": "Pungolo Sacro",
@@ -7333,7 +7333,7 @@ export const it_IT: EnTranslations = {
       },
       "consecration": {
         "name": "Terra Consacrata",
-        "description": "Consacra il terreno sotto di te, bruciando i nemici vicini per {damage} danni Sacri ogni 2 sec per 10 sec."
+        "description": "Consacra il terreno per 9 sec e infligge {damage} danni Sacri ogni secondo. I Guardiani della Fede subiscono il 10% di danni in meno al suo interno."
       },
       "bastion_sweep": {
         "name": "Bastion Sweep",
@@ -7689,7 +7689,7 @@ export const it_IT: EnTranslations = {
       },
       "holy_shield": {
         "name": "Scudo Sacro",
-        "description": "Ti protegge con potere Sacro per 10 s, aumentando l’armatura di 90 e colpendo gli assalitori in mischia per 12 danni Sacri. (firma Protezione)"
+        "description": "Aumenta il blocco del 30% e concede per {duration} sec uno scudo pari al {damage}% della tua salute massima. Ascensione rafforza la difesa."
       },
       "bestial_wrath": {
         "name": "Ira Bestiale",

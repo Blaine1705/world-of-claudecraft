@@ -1,6 +1,6 @@
 import type { Entity } from '../types';
 
-export const PROTECTION_CONSECRATION_DAMAGE_REDUCTION = 0.05;
+export const PROTECTION_CONSECRATION_DAMAGE_REDUCTION = 0.1;
 
 type ConsecrationZone = {
   sourceId: number;

@@ -3930,12 +3930,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Coloca una Bendición sobre un objetivo amistoso y aumenta su poder de ataque en {buff} durante 5 min.',
   'entities.abilities.divine_protection.name': 'Égida de Fe',
   'entities.abilities.divine_protection.description':
-    'Una égida protectora absorbe {damage} de daño durante 10 s.',
+    'Una égida protectora absorbe un {damage}% de tu salud máxima durante {duration} s. Protección duradera aumenta el escudo.',
   'entities.abilities.hammer_of_justice.name': 'Mazo Demoledor',
   'entities.abilities.hammer_of_justice.description': 'Aturde al objetivo durante {duration} s.',
   'entities.abilities.lay_on_hands.name': 'Último Rito',
   'entities.abilities.lay_on_hands.description':
-    'Una enorme oleada de sanación: restaura {damage} de salud. Tiempo de reutilización de 10 min.',
+    'Una enorme oleada restaura un {damage}% de tu salud máxima y genera 1 de Devoción si sana. Tiempo de reutilización de 10 min.',
   'entities.abilities.flash_of_light.name': 'Reparación de Luz',
   'entities.abilities.flash_of_light.description':
     'Un estallido de Luz rápido y eficiente que sana a un objetivo amistoso por {damage}.',
@@ -3944,7 +3944,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Expulsa a los malvados con cólera Sagrada y causa {damage} de daño Sagrado.',
   'entities.abilities.consecration.name': 'Tierra Sagrada',
   'entities.abilities.consecration.description':
-    'Consagra el suelo bajo tus pies y abrasa a los enemigos cercanos por {damage} de daño Sagrado cada 2 s durante 10 s.',
+    'Consagra el suelo bajo tus pies durante 9 s e inflige {damage} de daño Sagrado con gran amenaza cada segundo. El primer impacto genera 1 de Devoción. Los Guardianes de la Fe reciben un 10% menos de daño mientras permanecen dentro. Ascensión aumenta su daño.',
   'entities.abilities.righteous_fury.name': 'Juramento Ardiente',
   'entities.abilities.righteous_fury.description':
     'Aumenta un 60% la amenaza generada por tu daño Sagrado durante 30 min. La piedra angular del paladín tanque.',
@@ -4211,7 +4211,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Sacude a un objetivo amistoso con energía Sagrada y lo sana por {damage}. (habilidad distintiva de Sagrado)',
   'entities.abilities.holy_shield.name': 'Escudo Sagrado',
   'entities.abilities.holy_shield.description':
-    'Te protege con poder Sagrado durante 10 s, aumenta la armadura en 90 y golpea a los atacantes cuerpo a cuerpo con 12 de daño Sagrado. (habilidad distintiva de Protección)',
+    'Obtienes un 30% de bloqueo y un escudo que absorbe un {damage}% de tu salud máxima durante {duration} s, y emites un pulso de amenaza. Ascensión refuerza y prolonga la defensa.',
   'entities.abilities.bestial_wrath.name': 'Cólera de las bestias',
   'entities.abilities.bestial_wrath.description':
     'Te lanza a una ira bestial, aumentando el poder de ataque en 55 durante 15 s. (habilidad distintiva de Dominio de bestias)',

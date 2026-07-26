@@ -2588,7 +2588,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Frembringer 2 flasker vand, der genopretter mana, når de drikkes. Højere rang frembringer renere vand.',
   'entities.abilities.conjure_water.name': 'Vandbinding',
   'entities.abilities.consecration.description':
-    'Indvier jorden under dig, og svider nærliggende fjender for {damage} Hellig skade hvert 2. sek i 10 sek.',
+    'Indvier jorden i 9 sek. og giver {damage} Hellig skade hvert sekund. Trosvogtere tager 10% mindre skade, mens de står i området.',
   'entities.abilities.consecration.name': 'Hellig Jord',
   'entities.abilities.corruption.description':
     'Fordærver målet, og forvolder {damage} Skygge-skade over 18 sek.',
@@ -2622,7 +2622,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.dismiss_pet.description': 'Sender dit kæledyr tilbage til vildmarken.',
   'entities.abilities.dismiss_pet.name': 'Slip Følgesvend',
   'entities.abilities.divine_protection.description':
-    'Et helligt værn opsuger {damage} skade i 10 sek.',
+    'Et helligt skjold opsuger {damage}% af dit maksimale helbred i {duration} sek.',
   'entities.abilities.divine_protection.name': 'Troens Værn',
   'entities.abilities.drain_life.description':
     'Dræner målets liv og overfører {damage} helbred til dig hvert sekund i 5 sek.',
@@ -2755,7 +2755,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Afslutningstræk der bedøver målet. Varer 1 sek længere pr. kombopoint.',
   'entities.abilities.kidney_shot.name': 'Lavt Slag',
   'entities.abilities.lay_on_hands.description':
-    'En massiv bølge af helbredelse: genopretter {damage} helbred. 10 min afkøling.',
+    'En massiv bølge af helbredelse genopretter {damage}% af dit maksimale helbred. 10 min afkøling.',
   'entities.abilities.lay_on_hands.name': 'Sidste Rite',
   'entities.abilities.lesser_heal.description': 'Helbreder et venligt mål for {damage}.',
   'entities.abilities.lesser_heal.name': 'Hvisket Bøn',
@@ -2947,7 +2947,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Chokerer et venligt mål med hellig energi og helbreder det for {damage}. (Hellig signatur)',
   'entities.abilities.holy_shield.name': 'Hellig skjold',
   'entities.abilities.holy_shield.description':
-    'Beskytter dig med hellig kraft i 10 sek, øger rustning med 90 og rammer nærkampsangribere for 12 hellig skade. (Beskyttelsessignatur)',
+    'Øger blokering med 30% og giver et skjold på {damage}% af dit maksimale helbred i {duration} sek. Ascension styrker forsvaret.',
   'entities.abilities.bestial_wrath.name': 'Bestialsk vrede',
   'entities.abilities.bestial_wrath.description':
     'Sender dig i bestialsk raseri, så angrebskraft øges med 55 i 15 sek. (Bæstmestersignatur)',

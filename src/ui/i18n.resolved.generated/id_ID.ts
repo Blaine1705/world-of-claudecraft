@@ -7309,7 +7309,7 @@ export const id_ID: EnTranslations = {
       },
       "divine_protection": {
         "name": "Tameng Iman",
-        "description": "Perisai suci menyerap {damage} kerusakan selama 10 detik."
+        "description": "Perisai suci menyerap {damage}% dari kesehatan maksimummu selama {duration} detik."
       },
       "hammer_of_justice": {
         "name": "Palu Pembelah",
@@ -7317,7 +7317,7 @@ export const id_ID: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Ritus Terakhir",
-        "description": "Lonjakan penyembuhan masif: memulihkan {damage} kesehatan. Jeda 10 menit."
+        "description": "Lonjakan penyembuhan masif memulihkan {damage}% dari kesehatan maksimummu. Jeda 10 menit."
       },
       "holy_taunt": {
         "name": "Hasutan Suci",
@@ -7333,7 +7333,7 @@ export const id_ID: EnTranslations = {
       },
       "consecration": {
         "name": "Tanah Suci",
-        "description": "Mentahbiskan tanah di bawahmu, membakar musuh terdekat untuk {damage} kerusakan Suci setiap 2 detik selama 10 detik."
+        "description": "Mentahbiskan tanah selama 9 detik dan menimbulkan {damage} kerusakan Suci tiap detik. Penjaga Iman menerima 10% lebih sedikit kerusakan di dalamnya."
       },
       "bastion_sweep": {
         "name": "Bastion Sweep",
@@ -7689,7 +7689,7 @@ export const id_ID: EnTranslations = {
       },
       "holy_shield": {
         "name": "Perisai Suci",
-        "description": "Melindungimu dengan kekuatan Suci selama 10 dtk, meningkatkan zirah sebesar 90, dan menghantam penyerang jarak dekat dengan 12 kerusakan Suci. (ciri khas Perlindungan)"
+        "description": "Meningkatkan blok sebesar 30% dan memberi perisai sebesar {damage}% kesehatan maksimummu selama {duration} detik. Ascension memperkuat pertahanan."
       },
       "bestial_wrath": {
         "name": "Murka Buas",

@@ -15,7 +15,11 @@ describe('Holy Shield active mitigation', () => {
     expect(sim.player.auras).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ id: 'holy_shield', kind: 'buff_block', value: 0.3 }),
-        expect.objectContaining({ id: 'holy_shield_absorb', kind: 'absorb', value: 90 }),
+        expect.objectContaining({
+          id: 'holy_shield_absorb',
+          kind: 'absorb',
+          value: Math.round(sim.player.maxHp * 0.1),
+        }),
       ]),
     );
   });

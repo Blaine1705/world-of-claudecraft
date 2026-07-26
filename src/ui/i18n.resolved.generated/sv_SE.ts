@@ -7309,7 +7309,7 @@ export const sv_SE: EnTranslations = {
       },
       "divine_protection": {
         "name": "Trons värn",
-        "description": "Ett heligt värn absorberar {damage} skada i 10 sek."
+        "description": "En helig sköld absorberar {damage}% av din maximala hälsa i {duration} sek."
       },
       "hammer_of_justice": {
         "name": "Klyvande domarklubba",
@@ -7317,7 +7317,7 @@ export const sv_SE: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Sista smörjelsen",
-        "description": "En massiv våg av läkning: återställer {damage} hälsa. 10 min nedkylning."
+        "description": "En massiv våg av läkning återställer {damage}% av din maximala hälsa. 10 min nedkylning."
       },
       "holy_taunt": {
         "name": "Helig Sporre",
@@ -7333,7 +7333,7 @@ export const sv_SE: EnTranslations = {
       },
       "consecration": {
         "name": "Helig mark",
-        "description": "Inviger marken under dig och svedjar närliggande fiender för {damage} helig skada varannan sek i 10 sek."
+        "description": "Inviger marken i 9 sek och orsakar {damage} helig skada varje sekund. Trosväktare tar 10% mindre skada medan de står där."
       },
       "bastion_sweep": {
         "name": "Bastion Sweep",
@@ -7689,7 +7689,7 @@ export const sv_SE: EnTranslations = {
       },
       "holy_shield": {
         "name": "Helig sköld",
-        "description": "Skyddar dig med helig kraft i 10 sek, ökar rustning med 90 och slår närstridsangripare för 12 helig skada. (Skyddssignatur)"
+        "description": "Ökar blockering med 30% och ger en sköld på {damage}% av din maximala hälsa i {duration} sek. Ascension stärker försvaret."
       },
       "bestial_wrath": {
         "name": "Bestialisk vrede",

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { PALADIN_BASTION_SWEEP_IMPACT_TIME } from '../src/render/characters/paladin_bastion_sweep_clip';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
-import { grantDevotion } from '../src/sim/paladin_devotion';
+import { activateDivineAscension, grantDevotion } from '../src/sim/paladin_devotion';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -519,10 +519,40 @@ describe('Paladin Protection abilities', () => {
     expect(sim.player.auras).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ id: 'holy_shield', kind: 'buff_block', value: 0.3 }),
-        expect.objectContaining({ kind: 'absorb' }),
+        expect.objectContaining({
+          id: 'holy_shield_absorb',
+          kind: 'absorb',
+          value: Math.round(sim.player.maxHp * 0.1),
+        }),
       ]),
     );
     expect(target.threat.get(sim.playerId) ?? 0).toBeGreaterThan(0);
+  });
+
+  it('casts the Ascended Holy Shield as a 15% maximum-health absorb', () => {
+    const sim = makeProtection();
+    grantDevotion(sim.player, 20);
+    expect(activateDivineAscension(sim.player)).toBe(true);
+
+    sim.castAbility('holy_shield');
+
+    expect(sim.player.paladinDevotion?.ascensionCharges).toBe(4);
+    expect(sim.player.auras).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'holy_shield',
+          kind: 'buff_block',
+          value: 0.4,
+          duration: 10,
+        }),
+        expect.objectContaining({
+          id: 'holy_shield_absorb',
+          kind: 'absorb',
+          value: Math.round(sim.player.maxHp * 0.15),
+          duration: 10,
+        }),
+      ]),
+    );
   });
 
   it('Consecration ticks once per second for nine seconds with threat only inside its radius', () => {
@@ -578,14 +608,14 @@ describe('Paladin Protection abilities', () => {
     expect(sim.player.paladinDevotion?.value).toBe(0);
   });
 
-  it('reduces damage to a Protection Paladin by 5% only while standing in Consecration', () => {
+  it('reduces damage to a Protection Paladin by 10% only while standing in Consecration', () => {
     const sim = makeProtection();
     const attacker = targetAt(sim, 2);
     sim.castAbility('consecration');
 
     const insideHp = sim.player.hp;
     sim.ctx.dealDamage(attacker, sim.player, 100, false, 'holy', 'Test', 'hit');
-    expect(insideHp - sim.player.hp).toBe(95);
+    expect(insideHp - sim.player.hp).toBe(90);
 
     sim.player.hp = insideHp;
     sim.player.pos.z += 9;

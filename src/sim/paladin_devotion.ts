@@ -276,7 +276,15 @@ export function resolveAscensionAbility(
           return { ...effect, value: 0.4, duration: 10 };
         }
         if (effect.type === 'absorb') {
-          return { ...effect, amount: Math.round(effect.amount * 1.5), duration: 10 };
+          return {
+            ...effect,
+            amount: Math.round(effect.amount * 1.5),
+            casterMaxHpPct:
+              effect.casterMaxHpPct === undefined
+                ? undefined
+                : Math.round(effect.casterMaxHpPct * 1.5 * 10_000) / 10_000,
+            duration: 10,
+          };
         }
         return effect;
       case 'consecration':

@@ -308,10 +308,11 @@ export const PALADIN_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'pal_r8_enduring_protection',
           name: 'Enduring Protection',
-          description: 'Ward of Faith absorbs 50% more damage and lasts 5 sec longer.',
+          description:
+            "Increases Ward of Faith's maximum-health absorption by 40% and makes it last 5 sec longer.",
           icon: 'pal_r8_enduring_protection',
           effect: {
-            ability: [{ ability: 'divine_protection', dmgPct: 0.5, durationFlat: 5 }],
+            ability: [{ ability: 'divine_protection', dmgPct: 0.4, durationFlat: 5 }],
           },
         },
         {

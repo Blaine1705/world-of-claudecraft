@@ -4052,12 +4052,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Pone una Benedizione su un bersaglio alleato, aumentando la potenza d'attacco di {buff} per 5 min.",
   'entities.abilities.divine_protection.name': 'Barriera della Fede',
   'entities.abilities.divine_protection.description':
-    'Una barriera protettiva assorbe {damage} danni per 10 sec.',
+    'Uno scudo sacro assorbe il {damage}% della tua salute massima per {duration} sec.',
   'entities.abilities.hammer_of_justice.name': 'Maglio Frantumante',
   'entities.abilities.hammer_of_justice.description': 'Stordisce il bersaglio per {duration} sec.',
   'entities.abilities.lay_on_hands.name': 'Ultimo Rito',
   'entities.abilities.lay_on_hands.description':
-    'Una grande ondata di guarigione: ripristina {damage} salute. Tempo di recupero di 10 min.',
+    'Una grande ondata di guarigione ripristina il {damage}% della tua salute massima. Tempo di recupero di 10 min.',
   'entities.abilities.flash_of_light.name': 'Rammendo di Luce',
   'entities.abilities.flash_of_light.description':
     'Un rapido ed efficiente sprazzo di Luce che cura un bersaglio alleato di {damage}.',
@@ -4066,7 +4066,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Scaccia i malvagi con ira Sacra, infliggendo {damage} danni Sacri.',
   'entities.abilities.consecration.name': 'Terra Consacrata',
   'entities.abilities.consecration.description':
-    'Consacra il terreno sotto di te, bruciando i nemici vicini per {damage} danni Sacri ogni 2 sec per 10 sec.',
+    'Consacra il terreno per 9 sec e infligge {damage} danni Sacri ogni secondo. I Guardiani della Fede subiscono il 10% di danni in meno al suo interno.',
   'entities.abilities.righteous_fury.name': 'Giuramento Ardente',
   'entities.abilities.righteous_fury.description':
     'Aumenta del 60% la minaccia generata dai tuoi danni Sacri per 30 min. Il cardine del paladino difensore.',
@@ -4335,7 +4335,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Colpisce un bersaglio alleato con energia Sacra, curandolo di {damage}. (firma Sacro)',
   'entities.abilities.holy_shield.name': 'Scudo Sacro',
   'entities.abilities.holy_shield.description':
-    'Ti protegge con potere Sacro per 10 s, aumentando l’armatura di 90 e colpendo gli assalitori in mischia per 12 danni Sacri. (firma Protezione)',
+    'Aumenta il blocco del 30% e concede per {duration} sec uno scudo pari al {damage}% della tua salute massima. Ascensione rafforza la difesa.',
   'entities.abilities.bestial_wrath.name': 'Ira Bestiale',
   'entities.abilities.bestial_wrath.description':
     'Ti spinge in una furia bestiale, aumentando la potenza d’attacco di 55 per 15 s. (firma Affinità Animale)',

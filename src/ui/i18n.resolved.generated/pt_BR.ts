@@ -7309,7 +7309,7 @@ export const pt_BR: EnTranslations = {
       },
       "divine_protection": {
         "name": "Salvaguarda da Fé",
-        "description": "Uma salvaguarda protetora absorve {damage} de dano por 10 s."
+        "description": "Um escudo sagrado absorve {damage}% da sua vida máxima por {duration} s."
       },
       "hammer_of_justice": {
         "name": "Malho Dilacerante",
@@ -7317,7 +7317,7 @@ export const pt_BR: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Extrema-Unção",
-        "description": "Uma onda massiva de cura: restaura {damage} de vida. Recarga de 10 min."
+        "description": "Uma onda massiva de cura restaura {damage}% da sua vida máxima. Recarga de 10 min."
       },
       "holy_taunt": {
         "name": "Aguilhão Sagrado",
@@ -7333,7 +7333,7 @@ export const pt_BR: EnTranslations = {
       },
       "consecration": {
         "name": "Solo Sagrado",
-        "description": "Consagra o chão sob você, queimando inimigos próximos com {damage} de dano Sagrado a cada 2 s por 10 s."
+        "description": "Consagra o chão por 9 s e causa {damage} de dano Sagrado a cada segundo. Guardiões da Fé sofrem 10% menos dano enquanto estiverem dentro."
       },
       "bastion_sweep": {
         "name": "Bastion Sweep",
@@ -7689,7 +7689,7 @@ export const pt_BR: EnTranslations = {
       },
       "holy_shield": {
         "name": "Escudo Sagrado",
-        "description": "Protege você com poder Sagrado por 10 s, aumentando a armadura em 90 e atingindo atacantes corpo a corpo com 12 de dano Sagrado. (assinatura Proteção)"
+        "description": "Aumenta o bloqueio em 30% e concede por {duration} s um escudo de {damage}% da sua vida máxima. Ascensão fortalece a defesa."
       },
       "bestial_wrath": {
         "name": "Ira Bestial",

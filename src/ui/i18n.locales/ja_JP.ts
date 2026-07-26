@@ -2771,12 +2771,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '味方対象に祝福を与え、5分間、攻撃力を{buff}増加させます。',
   'entities.abilities.divine_protection.name': '信仰の守り',
   'entities.abilities.divine_protection.description':
-    '守りの結界が10秒間{damage}ダメージを吸収します。',
+    '聖なる盾が最大体力の{damage}%に相当するダメージを{duration}秒間吸収します。',
   'entities.abilities.hammer_of_justice.name': '断裂の裁き槌',
   'entities.abilities.hammer_of_justice.description': '対象を{duration}秒間スタンさせます。',
   'entities.abilities.lay_on_hands.name': '最後の秘跡',
   'entities.abilities.lay_on_hands.description':
-    '大きな癒やしの波で体力を{damage}回復します。クールダウン10分。',
+    '大きな癒やしの波で最大体力の{damage}%を回復します。クールダウン10分。',
   'entities.abilities.holy_taunt.name': '聖なる挑発',
   'entities.abilities.holy_taunt.description':
     '対象を挑発します。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。',
@@ -2788,7 +2788,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '聖なる怒りで邪悪を退け、{damage} の神聖ダメージを与えます。',
   'entities.abilities.consecration.name': '聖なる大地',
   'entities.abilities.consecration.description':
-    '足元の地面を聖別し、10秒間、周囲の敵を焼いて2秒ごとに{damage}の神聖ダメージを与えます。',
+    '地面を9秒間聖別し、毎秒{damage}の神聖ダメージを与えます。信仰の守護者は範囲内で受けるダメージが10%減少します。',
   'entities.abilities.righteous_fury.name': 'バーニングオース',
   'entities.abilities.righteous_fury.description':
     '30分間、あなたの神聖ダメージが生成する脅威が60%増加します。タンク役パラディンの要です。',
@@ -3059,7 +3059,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）',
   'entities.abilities.holy_shield.name': 'ホーリーシールド',
   'entities.abilities.holy_shield.description':
-    '10秒間、聖なる力で自分を守り、防御力を90上げ、近接攻撃者に12の聖属性ダメージを与えます。（プロテクション特性のシグネチャ）',
+    'ブロック率が30%上昇し、最大体力の{damage}%に相当する盾を{duration}秒間得ます。アセンションは防御を強化します。',
   'entities.abilities.bestial_wrath.name': '野獣の怒り',
   'entities.abilities.bestial_wrath.description':
     '野獣の怒りに入り、15秒間攻撃力が55上がります。（ビーストマスタリー特性のシグネチャ）',

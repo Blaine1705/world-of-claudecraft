@@ -4087,12 +4087,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Belegt ein freundliches Ziel mit einem Segen und erhöht seine Angriffskraft 5 Min. lang um {buff}.',
   'entities.abilities.divine_protection.name': 'Bannschild des Glaubens',
   'entities.abilities.divine_protection.description':
-    'Ein schützender Bannschild absorbiert 10 Sek. lang {damage} Schaden.',
+    'Ein heiliger Schild absorbiert {damage}% Eurer maximalen Gesundheit für {duration} Sek.',
   'entities.abilities.hammer_of_justice.name': 'Spaltender Richthammer',
   'entities.abilities.hammer_of_justice.description': 'Betäubt das Ziel {duration} Sek. lang.',
   'entities.abilities.lay_on_hands.name': 'Letzte Ölung',
   'entities.abilities.lay_on_hands.description':
-    'Ein gewaltiger Heilungsstoß: Stellt {damage} Gesundheit wieder her. 10 Min. Abklingzeit.',
+    'Ein gewaltiger Heilungsstoß stellt {damage}% Eurer maximalen Gesundheit wieder her. 10 Min. Abklingzeit.',
   'entities.abilities.flash_of_light.name': 'Lichtheilung',
   'entities.abilities.flash_of_light.description':
     'Ein schneller, effizienter Lichtstoß, der ein freundliches Ziel um {damage} heilt.',
@@ -4101,7 +4101,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Bannt das Böse mit Heiligem Zorn und verursacht {damage} Heiligschaden.',
   'entities.abilities.consecration.name': 'Heiliger Boden',
   'entities.abilities.consecration.description':
-    'Weiht den Boden unter euch und versengt nahe Gegner 10 Sek. lang alle 2 Sek. für {damage} Heiligschaden.',
+    'Weiht den Boden 9 Sek. lang und verursacht jede Sekunde {damage} Heiligschaden. Glaubenswächter erleiden darin 10% weniger Schaden.',
   'entities.abilities.righteous_fury.name': 'Brennender Eid',
   'entities.abilities.righteous_fury.description':
     'Erhöht die durch euren Heiligschaden erzeugte Bedrohung 30 Min. lang um 60%. Der Grundpfeiler des Tank-Paladins.',
@@ -4366,7 +4366,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Schockt ein freundliches Ziel mit Heiliger Energie und heilt es um {damage}. (Heilig-Signatur)',
   'entities.abilities.holy_shield.name': 'Heiliger Schild',
   'entities.abilities.holy_shield.description':
-    'Schützt Euch 10 Sek. lang mit Heiliger Macht, erhöht die Rüstung um 90 und trifft Nahkampfangreifer mit 12 Heiligschaden. (Schutz-Signatur)',
+    'Erhöht die Blockchance um 30% und gewährt für {duration} Sek. einen Schild in Höhe von {damage}% Eurer maximalen Gesundheit. Aufstieg verstärkt die Verteidigung.',
   'entities.abilities.bestial_wrath.name': 'Zorn des Wildtiers',
   'entities.abilities.bestial_wrath.description':
     'Versetzt Euch in einen bestialischen Zorn und erhöht die Angriffskraft 15 Sek. lang um 55. (Tierherrschafts-Signatur)',

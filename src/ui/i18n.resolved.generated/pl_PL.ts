@@ -7309,7 +7309,7 @@ export const pl_PL: EnTranslations = {
       },
       "divine_protection": {
         "name": "Osłona wiary",
-        "description": "Ochronna osłona pochłania {damage} obrażeń przez 10 sek."
+        "description": "Święta tarcza pochłania {damage}% twojego maksymalnego zdrowia przez {duration} sek."
       },
       "hammer_of_justice": {
         "name": "Druzgocący młot",
@@ -7317,7 +7317,7 @@ export const pl_PL: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Ostatnie namaszczenie",
-        "description": "Potężny przypływ uzdrowienia: przywraca {damage} zdrowia. 10 min czasu odnowienia."
+        "description": "Potężny przypływ uzdrowienia przywraca {damage}% twojego maksymalnego zdrowia. 10 min czasu odnowienia."
       },
       "holy_taunt": {
         "name": "Święte Podjudzenie",
@@ -7333,7 +7333,7 @@ export const pl_PL: EnTranslations = {
       },
       "consecration": {
         "name": "Święta ziemia",
-        "description": "Poświęca ziemię pod tobą, parząc pobliskich wrogów i zadając {damage} obrażeń od Świętości co 2 sek. przez 10 sek."
+        "description": "Poświęca ziemię na 9 sek. i co sekundę zadaje {damage} obrażeń od Świętości. Strażnicy Wiary otrzymują w niej o 10% mniej obrażeń."
       },
       "bastion_sweep": {
         "name": "Bastion Sweep",
@@ -7689,7 +7689,7 @@ export const pl_PL: EnTranslations = {
       },
       "holy_shield": {
         "name": "Święta tarcza",
-        "description": "Osłaniasz się Świętą mocą na 10 sek., zwiększając pancerz o 90 i rażąc napastników w zwarciu za 12 obrażeń Świętych. (specjalizacja Ochrona)"
+        "description": "Zwiększa blok o 30% i daje na {duration} sek. tarczę równą {damage}% twojego maksymalnego zdrowia. Wniebowstąpienie wzmacnia obronę."
       },
       "bestial_wrath": {
         "name": "Bestialski gniew",

@@ -2727,7 +2727,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menciptakan 2 botol air, memulihkan mana saat diminum. Tingkat lebih tinggi menciptakan air yang lebih murni.',
   'entities.abilities.conjure_water.name': 'Ikatan Air',
   'entities.abilities.consecration.description':
-    'Mentahbiskan tanah di bawahmu, membakar musuh terdekat untuk {damage} kerusakan Suci setiap 2 detik selama 10 detik.',
+    'Mentahbiskan tanah selama 9 detik dan menimbulkan {damage} kerusakan Suci tiap detik. Penjaga Iman menerima 10% lebih sedikit kerusakan di dalamnya.',
   'entities.abilities.consecration.name': 'Tanah Suci',
   'entities.abilities.corruption.description':
     'Mencemari target, menimbulkan {damage} kerusakan Bayangan selama 18 detik.',
@@ -2762,7 +2762,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.dismiss_pet.description': 'Melepaskan peliharaanmu kembali ke alam liar.',
   'entities.abilities.dismiss_pet.name': 'Lepaskan Pendamping',
   'entities.abilities.divine_protection.description':
-    'Perisai suci menyerap {damage} kerusakan selama 10 detik.',
+    'Perisai suci menyerap {damage}% dari kesehatan maksimummu selama {duration} detik.',
   'entities.abilities.divine_protection.name': 'Tameng Iman',
   'entities.abilities.drain_life.description':
     'Menyedot nyawa target, memindahkan {damage} kesehatan kepadamu setiap detik selama 5 detik.',
@@ -2899,7 +2899,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Gerakan penutup yang membuat target terpana. Bertahan 1 detik lebih lama per poin kombo.',
   'entities.abilities.kidney_shot.name': 'Pukulan Curang',
   'entities.abilities.lay_on_hands.description':
-    'Lonjakan penyembuhan masif: memulihkan {damage} kesehatan. Jeda 10 menit.',
+    'Lonjakan penyembuhan masif memulihkan {damage}% dari kesehatan maksimummu. Jeda 10 menit.',
   'entities.abilities.lay_on_hands.name': 'Ritus Terakhir',
   'entities.abilities.lesser_heal.description': 'Menyembuhkan target sekutu sebesar {damage}.',
   'entities.abilities.lesser_heal.name': 'Doa Berbisik',
@@ -3098,7 +3098,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Mengejutkan target kawan dengan energi Suci dan memulihkannya sebesar {damage}. (ciri khas Suci)',
   'entities.abilities.holy_shield.name': 'Perisai Suci',
   'entities.abilities.holy_shield.description':
-    'Melindungimu dengan kekuatan Suci selama 10 dtk, meningkatkan zirah sebesar 90, dan menghantam penyerang jarak dekat dengan 12 kerusakan Suci. (ciri khas Perlindungan)',
+    'Meningkatkan blok sebesar 30% dan memberi perisai sebesar {damage}% kesehatan maksimummu selama {duration} detik. Ascension memperkuat pertahanan.',
   'entities.abilities.bestial_wrath.name': 'Murka Buas',
   'entities.abilities.bestial_wrath.description':
     'Membawamu ke amarah buas, meningkatkan kekuatan serangan sebesar 55 selama 15 dtk. (ciri khas Penguasa Binatang)',

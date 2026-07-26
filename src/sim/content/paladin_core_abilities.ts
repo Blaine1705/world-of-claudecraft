@@ -662,11 +662,17 @@ const protection: AbilityDef[] = [
     offGcd: true,
     effects: [
       { type: 'selfBuff', kind: 'buff_block', value: 0.3, duration: 8 },
-      { type: 'absorb', amount: 90, duration: 8, auraId: 'holy_shield_absorb' },
+      {
+        type: 'absorb',
+        amount: 0,
+        casterMaxHpPct: 0.1,
+        duration: 8,
+        auraId: 'holy_shield_absorb',
+      },
       { type: 'threatPulse', amount: 150, radius: 8 },
     ],
     description:
-      'Gain 30% block and an absorb shield for 8 sec, releasing a pulse of threat. Ascension strengthens and extends the defense.',
+      'Gain 30% block and a shield that absorbs $d% of your maximum health for $t sec, releasing a pulse of threat. Ascension strengthens and extends the defense.',
   },
   {
     id: 'oath_chain',
@@ -758,7 +764,7 @@ const protection: AbilityDef[] = [
       },
     ],
     description:
-      'Consecrate the ground beneath you for 9 sec, dealing $d Holy damage with high threat every second. The first impact generates 1 Devotion. Faithwardens take 5% less damage while standing inside. Ascension increases its damage.',
+      'Consecrate the ground beneath you for 9 sec, dealing $d Holy damage with high threat every second. The first impact generates 1 Devotion. Faithwardens take 10% less damage while standing inside. Ascension increases its damage.',
   },
 ];
 

@@ -845,10 +845,15 @@ export function runEffects(
       case 'heal': {
         const healTarget = target ?? p;
         if (healTarget !== p && ctx.isHostileTo(p, healTarget)) break;
-        // Heals scale with Spell Power at the direct cast-time coefficient, the
-        // healing mirror of the direct-nuke rider (applyHeal fires the crit).
+        // Maximum-health heals are fixed class cooldowns and gain no Spell
+        // Power rider. Preserve the legacy direct-heal draw order, however:
+        // Last Rite used to roll its fixed min/max and crit before this change.
+        const rolledAmount = ctx.rng.range(eff.min, eff.max);
         const healAmount =
-          ctx.rng.range(eff.min, eff.max) + directHealBonus(p.spellPower, res.castTime);
+          eff.casterMaxHpPct === undefined
+            ? rolledAmount + directHealBonus(p.spellPower, res.castTime)
+            : Math.round(p.maxHp * eff.casterMaxHpPct);
+        if (eff.canCrit === false) ctx.rng.chance(0);
         // Only this direct-heal effect opts into Beacon transfer. Derived,
         // periodic, chained, area, and self-heal effects remain ineligible.
         const healed = ctx.applyHeal(
@@ -857,7 +862,7 @@ export function runEffects(
           healAmount,
           ability.name,
           ability.id,
-          true,
+          eff.canCrit ?? true,
           true,
           true,
         );
@@ -1027,7 +1032,10 @@ export function runEffects(
           kind: 'absorb',
           remaining: eff.duration,
           duration: eff.duration,
-          value: eff.amount + absorbBonus(p.spellPower, eff.spellPowerCoeff ?? 0),
+          value:
+            eff.amount +
+            Math.round(p.maxHp * (eff.casterMaxHpPct ?? 0)) +
+            absorbBonus(p.spellPower, eff.spellPowerCoeff ?? 0),
           sourceId: p.id,
           school: ability.school,
         });

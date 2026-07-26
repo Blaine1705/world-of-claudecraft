@@ -4830,7 +4830,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Vyvolá 2 lahve vody, které po vypití obnovují manu. Vyšší ranky vyvolají čistší vodu.',
   'entities.abilities.conjure_water.name': 'Vodní pouto',
   'entities.abilities.consecration.description':
-    'Posvětí půdu pod tebou a sežehne blízké nepřátele za {damage} svatého poškození každé 2 s po dobu 10 s.',
+    'Posvětí půdu na 9 s a každou sekundu způsobí {damage} svatého poškození. Strážci víry uvnitř utrpí o 10% méně poškození.',
   'entities.abilities.consecration.name': 'Svatá půda',
   'entities.abilities.corruption.description':
     'Zkazí cíl a způsobí {damage} stínového poškození během 18 s.',
@@ -4864,7 +4864,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.dismiss_pet.description': 'Propustí tvého mazlíčka zpět do divočiny.',
   'entities.abilities.dismiss_pet.name': 'Propustit společníka',
   'entities.abilities.divine_protection.description':
-    'Ochranná záštita pohltí {damage} poškození na 10 s.',
+    'Svatý štít pohltí {damage}% tvého maximálního zdraví na {duration} s.',
   'entities.abilities.divine_protection.name': 'Ochrana víry',
   'entities.abilities.drain_life.description':
     'Vysává život cíle a převádí ti {damage} zdraví každou sekundu po dobu 5 s.',
@@ -4988,7 +4988,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Dokončovací útok, který omráčí cíl. Trvá o 1 s déle za každý combo bod.',
   'entities.abilities.kidney_shot.name': 'Podpásovka',
   'entities.abilities.lay_on_hands.description':
-    'Mohutná vlna léčení: obnoví {damage} zdraví. Cooldown 10 min.',
+    'Mohutná vlna léčení obnoví {damage}% tvého maximálního zdraví. Cooldown 10 min.',
   'entities.abilities.lay_on_hands.name': 'Poslední obřad',
   'entities.abilities.lesser_heal.description': 'Vyléčí spojenecký cíl za {damage}.',
   'entities.abilities.lesser_heal.name': 'Šeptaná modlitba',
@@ -7663,7 +7663,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Zasáhne spojenecký cíl svatou energií a vyléčí ho, nebo způsobí nepříteli {damage} svatého poškození. (klíčová schopnost Svaté magie)',
   'entities.abilities.holy_shield.name': 'Posvěcená hradba',
   'entities.abilities.holy_shield.description':
-    'Vrhne na nepřítele zářivou záštitu, způsobí mu svaté poškození a odrazí se ke 2 blízkým nepřátelům. (klíčová schopnost Ochrany)',
+    'Zvýší blokování o 30% a na {duration} s poskytne štít za {damage}% tvého maximálního zdraví. Vzestup posílí obranu.',
   'entities.abilities.bestial_wrath.name': 'Vyjící běs',
   'entities.abilities.bestial_wrath.description':
     'Uvrhne tě do zvířecího běsnění, zvýší tvoji sílu útoku o 20 % a poškození způsobené tvým společníkem o 100 % na 15 s. (klíčová schopnost Mistrovství šelem)',
