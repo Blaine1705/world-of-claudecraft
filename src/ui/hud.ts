@@ -12311,15 +12311,17 @@ export class Hud {
     this.lastProfessionSurfaceSig = sig;
     this.charWindow.renderIfOpen();
     if ($('#crafting-window').style.display === 'flex') this.renderCrafting();
-    // An open vendor window rides the same signature, because a gathering
-    // counter is now one of the things a goods row is painted from: crossing a
-    // tool's threshold has to unlock its row, and nothing else would repaint
-    // it. The two are reachable together: the window closes only past 8 yards
-    // of the merchant, the nearest gather node to any counter is 9.01 yards
-    // (tanner_hesk to wood_mirefen_3), and a harvest happens within 5 yards of
-    // the node, so a player can stand inside both. The guard is the shipped
-    // open-vendor form; a closed window costs nothing but the comparison above.
-    if (this.openVendorNpcId !== null) this.renderVendor();
+    // The open VENDOR window deliberately does NOT ride this signature, even
+    // though a gathering counter is one of the things its goods rows are now
+    // painted from (the tool gate, sim/content/vendor_row_gates.ts). Crossing a
+    // threshold with that window open is geometrically impossible: it closes
+    // past 8 yards of the merchant, a harvest needs the player within
+    // INTERACT_RANGE of a node, and the nearest node to any counter stocking a
+    // gated tool is 16.40 yards away, wider than those two reaches combined.
+    // The separation is asserted in tests/professions_tool_gate.test.ts rather
+    // than trusted, so content that moves a node or a merchant into that gap
+    // fails there and this decision gets revisited instead of silently
+    // becoming a stale lock.
   }
 
   renderBags(): void {

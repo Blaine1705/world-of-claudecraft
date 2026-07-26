@@ -22,7 +22,7 @@ import * as items from '../src/sim/items';
 import { GATHER_GAIN_TIER_STEP, gatherNodeGainMultiplier } from '../src/sim/professions/gathering';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
-import type { Entity, SimEvent } from '../src/sim/types';
+import { type Entity, INTERACT_RANGE, type SimEvent } from '../src/sim/types';
 import { buildVendorView } from '../src/ui/hud/vendor/vendor_view';
 
 function ctxOf(sim: Sim): SimContext {
@@ -359,5 +359,40 @@ describe('the gated tools are stocked somewhere a gated row can be seen', () => 
       const stockists = Object.values(NPCS).filter((npc) => npc.vendorItems?.includes(itemId));
       expect(stockists.length, `${itemId} is stocked by no NPC`).toBeGreaterThan(0);
     }
+  });
+
+  it('no gated counter sits close enough to a node to harvest with its window open', () => {
+    // Why this is worth asserting: the vendor row's lock is ADVISORY and is
+    // painted when the window opens. Nothing repaints it on a proficiency
+    // change, which is only correct because a player cannot cross a threshold
+    // while looking at a gated row. The window closes past VENDOR_CLOSE_RANGE
+    // of the merchant (hud.ts, the openVendorNpcId proximity check) and a
+    // harvest needs the player within INTERACT_RANGE of the node, so the two
+    // standing circles have to be disjoint for that to hold.
+    //
+    // If content ever moves a node or a tool-stocking merchant inside this
+    // gap, the stale-lock case becomes real and the vendor window needs a
+    // repaint hook. Failing here is the signal to make that call deliberately.
+    const VENDOR_CLOSE_RANGE = 8; // hud.ts: dist2d(p.pos, npc.pos) > 8 closes it
+    const reach = VENDOR_CLOSE_RANGE + INTERACT_RANGE;
+    const gatedStockists = Object.values(NPCS).filter((npc) =>
+      (npc.vendorItems ?? []).some((itemId) => VENDOR_ROW_GATES[itemId]),
+    );
+    // Non-vacuity: if no NPC stocks a gated tool the loop below asserts nothing.
+    expect(gatedStockists.length).toBeGreaterThan(0);
+    let closest = Number.POSITIVE_INFINITY;
+    let closestPair = '';
+    for (const npc of gatedStockists) {
+      for (const node of GATHER_NODES) {
+        const d = Math.hypot(node.pos.x - npc.pos.x, node.pos.z - npc.pos.z);
+        if (d < closest) {
+          closest = d;
+          closestPair = `${npc.id} to ${node.id}`;
+        }
+      }
+    }
+    expect(closest, `${closestPair} is inside the vendor-open harvest reach`).toBeGreaterThan(
+      reach,
+    );
   });
 });

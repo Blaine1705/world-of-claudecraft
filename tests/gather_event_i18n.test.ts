@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { GATHERING_PROFESSION_IDS } from '../src/sim/content/professions';
+import { GATHERING_PROFESSION_NAME_KEYS } from '../src/ui/gathering_profession_name';
 import { hasTranslation, t } from '../src/ui/i18n';
 
 // Gather-event localization: the sim emits ids plus values only
@@ -309,22 +310,49 @@ describe('hudChrome.gathering catch line (Professions 2.0)', () => {
     expect(cueCalls).toEqual(['fishReel']);
   });
 
-  it('every gathering profession id has a catalog label and both window rows', () => {
-    // The label maps in char_window.ts and professions_window.ts are
-    // string-keyed (an id with no key renders no row), so tsc no longer
-    // forces exhaustiveness. This is the tripwire a future fifth gathering
-    // profession trips instead: its id must have the catalog key and a row
-    // in BOTH name-key maps, or the row silently vanishes from the windows.
-    const charSource = readFileSync(path.resolve(process.cwd(), 'src/ui/char_window.ts'), 'utf8');
-    const wheelSource = readFileSync(
-      path.resolve(process.cwd(), 'src/ui/professions_window.ts'),
-      'utf8',
-    );
+  it('every gathering profession id has a catalog label in the shared name table', () => {
+    // The label map is string-keyed (an id with no key renders no row), so tsc
+    // does not force exhaustiveness. This is the tripwire a future fifth
+    // gathering profession trips instead: its id must carry the catalog key or
+    // the row silently vanishes from every surface that names a profession.
+    //
+    // Re-pointed when the table was extracted: char_window.ts and
+    // professions_window.ts each held a byte-identical private copy, and the
+    // locked vendor row was the third consumer, so the one table now lives in
+    // gathering_profession_name.ts. This arm reads the REAL map rather than
+    // scanning the two window sources for the key string, which is both
+    // stronger (a source scan passes on a key that appears only in a comment,
+    // or on an entry mapped to the wrong value) and no longer coupled to which
+    // file the table happens to sit in.
     for (const id of GATHERING_PROFESSION_IDS) {
       const key = `hudChrome.gathering.${id}`;
       expect(hasTranslation(key as Parameters<typeof hasTranslation>[0]), key).toBe(true);
-      expect(charSource.includes(key), `char_window ${key}`).toBe(true);
-      expect(wheelSource.includes(key), `professions_window ${key}`).toBe(true);
+      expect(GATHERING_PROFESSION_NAME_KEYS[id], `name key for ${id}`).toBe(key);
+    }
+    // No extra ids: an entry for a profession that no longer exists would
+    // render a label for a row nothing produces.
+    expect(Object.keys(GATHERING_PROFESSION_NAME_KEYS).sort()).toEqual(
+      [...GATHERING_PROFESSION_IDS].sort(),
+    );
+  });
+
+  it('both profession windows read the shared name table rather than a private copy', () => {
+    // The half the map read above cannot see: a window that re-privatises its
+    // own copy would keep passing the exhaustiveness arm while drifting from
+    // it. Comments are stripped first, so the import cannot be satisfied by a
+    // mention in prose.
+    const withoutComments = (file: string) =>
+      readFileSync(path.resolve(process.cwd(), file), 'utf8')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/^\s*\/\/.*$/gm, '');
+    for (const file of ['src/ui/char_window.ts', 'src/ui/professions_window.ts']) {
+      const source = withoutComments(file);
+      expect(source.includes('GATHERING_PROFESSION_NAME_KEYS'), `${file} consumes the table`).toBe(
+        true,
+      );
+      expect(source.includes("hudChrome.gathering.mining'"), `${file} has no private copy`).toBe(
+        false,
+      );
     }
   });
 });

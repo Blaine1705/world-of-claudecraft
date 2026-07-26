@@ -818,13 +818,21 @@ describe('economy telemetry counters at their emission sites', () => {
       (e: any) => e.templateId === 'trader_wilkes',
     ).id;
 
+    // The tier-1 pick, not the tier-2 one this case used to buy: Eastbrook
+    // stocks only the tier its own nodes use now, and the tier-2 rung also
+    // asks for mining proficiency this fresh character has none of, so the
+    // old purchase would be refused twice over and book no spend at all.
+    // Either refusal would have made this case pass vacuously if it asserted
+    // only that nothing unexpected was booked, which is why it asserts the
+    // paid amount against the def.
     server.handleMessage(
       session,
-      JSON.stringify({ t: 'cmd', cmd: 'buy', npc: npcId, item: 'iron_mining_pick' }),
+      JSON.stringify({ t: 'cmd', cmd: 'buy', npc: npcId, item: 'copper_mining_pick' }),
     );
 
     const paid = 500 - (meta.copper as number);
-    expect(paid).toBe(ITEMS.iron_mining_pick.buyValue);
+    expect(paid).toBe(ITEMS.copper_mining_pick.buyValue);
+    expect(paid).toBeGreaterThan(0);
     expect(rec.spent).toEqual([['vendor', paid]]);
     expect(rec.credited).toEqual([]);
     server.stop();
