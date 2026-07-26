@@ -79,6 +79,14 @@ const OFFHAND_AUTO_ATTACK_DMG_MULT = 0.5;
 
 type AutoAttackHand = Extract<WeaponHand, 'onehand' | 'twohand'> | 'offhand';
 
+function hasDualWieldWhiteMissPenalty(ctx: SimContext, player: Entity, meta: PlayerMeta): boolean {
+  if (!player.dualWielding) return false;
+  // Both Warspirit weapons feed one shared three-hit cadence. Applying the generic
+  // dual-wield penalty here suppresses the specialization's damage and signature
+  // procs twice, especially against higher-level bosses.
+  return meta.cls !== 'shaman' || ctx.playerMods(meta).spec !== 'enhancement';
+}
+
 function autoAttackWeaponDamageMult(hand: AutoAttackHand, speed: number): number {
   const speedMult = Math.max(0.1, speed) / ONE_HAND_AUTO_ATTACK_BASE_SPEED;
   const handMult = hand === 'twohand' ? TWOHAND_DPS_MULT : 1;
@@ -193,6 +201,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   // logic in Sim.abilityNeedsLineOfSight.
   if (isArenaPos(p.pos.x) && !ctx.hasLineOfSight(p, t)) return;
   ctx.breakGhostWolf(p);
+  const dualWieldWhiteMissPenalty = hasDualWieldWhiteMissPenalty(ctx, p, meta);
 
   if (p.swingTimer <= 0) {
     let bonus = 0;
@@ -227,7 +236,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       autoAttackHand: 'mainhand',
       threatFlat,
       threatMult,
-      whiteDualWieldPenalty: p.dualWielding && abilityName === null,
+      whiteDualWieldPenalty: dualWieldWhiteMissPenalty && abilityName === null,
     });
     // Thuggery mastery (Sword Specialization shape): a landed mainhand auto has
     // a chance to swing once more. The pct gate keeps the rng stream untouched
@@ -236,7 +245,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     if (connected && abilityName === null && extraAttackPct > 0 && ctx.rng.chance(extraAttackPct)) {
       meleeSwing(ctx, p, t, 0, null, {
         autoAttackHand: 'mainhand',
-        whiteDualWieldPenalty: p.dualWielding,
+        whiteDualWieldPenalty: dualWieldWhiteMissPenalty,
       });
     }
     maybeProcBattleTrance(ctx, p, meta, connected);
@@ -255,7 +264,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       weapon: offhand,
       autoAttackHand: 'offhand',
       apSwingSpeed: offhand.speed,
-      whiteDualWieldPenalty: true,
+      whiteDualWieldPenalty: dualWieldWhiteMissPenalty,
     });
     maybeProcBattleTrance(ctx, p, meta, connected);
     maybeProcSuddenDeath(ctx, p, meta, connected);

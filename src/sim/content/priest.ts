@@ -92,7 +92,7 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     name: 'Choir of Deliverance',
     class: 'priest',
     learnLevel: 17,
-    cost: 150,
+    cost: 128,
     castTime: 0,
     channel: { duration: 6, ticks: 3 },
     cooldown: 180,

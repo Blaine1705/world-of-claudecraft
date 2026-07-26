@@ -96,8 +96,9 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     global: { healPct: 0.08 },
     abilities: {
       lesser_heal: { dmgPct: 0.18, costPct: -0.16 },
-      heal: { dmgPct: 0.18, costPct: -0.16, castPct: -0.2 },
+      heal: { dmgPct: 0.18, costPct: -0.3, castPct: -0.2 },
       flash_heal: { costPct: -0.16 },
+      prayer_of_healing: { costPct: -0.15 },
       smite: { castPct: -0.1 },
     },
   },
@@ -121,8 +122,9 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
   'shaman/enhancement': {
     stats: { int: 2, ap: 24 },
     abilities: {
-      lightning_bolt: { costPct: -0.1 },
-      earth_shock: { costPct: -0.1 },
+      lightning_bolt: { costPct: -0.2 },
+      earth_shock: { costPct: -0.2 },
+      flame_shock: { costPct: -0.2 },
       rockbiter_weapon: { dmgPct: 0.4 },
       stormstrike: { dmgPct: 0.25 },
     },

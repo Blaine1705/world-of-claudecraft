@@ -198,6 +198,35 @@ describe('Shaman v0.29 Warspirit', () => {
     expect(warspiritCadence(shaman)).toBe(2);
   });
 
+  it('does not add the generic dual-wield miss penalty to its cadence weapons', () => {
+    const { sim, shaman, target } = setup(2817);
+    sim.addItem('training_mace', 1, shaman.id);
+    sim.equipItem('training_mace', shaman.id);
+    expect(shaman.dualWielding).toBe(true);
+    castInstant(sim, shaman, GALEHEART_ID);
+
+    const meta = sim.meta(shaman.id);
+    if (!meta) throw new Error('missing Warspirit metadata');
+    shaman.hitBonus = 0;
+    sim.rng.next = () => 0.1;
+    shaman.autoAttack = true;
+    shaman.swingTimer = 0;
+    shaman.offhandSwingTimer = 0;
+    updatePlayerAutoAttack(sim.ctx, shaman, meta);
+
+    const swingKinds = sim
+      .drainEvents()
+      .flatMap((event) =>
+        event.type === 'damage' &&
+        event.sourceId === shaman.id &&
+        event.targetId === target.id &&
+        event.ability === null
+          ? [event.kind]
+          : [],
+      );
+    expect(swingKinds).toEqual(['hit', 'hit']);
+  });
+
   it('makes Stonebound an exclusive defensive posture and removes every rider on exit', () => {
     const { sim, shaman, target } = setup(2813);
     castInstant(sim, shaman, GALEHEART_ID);
