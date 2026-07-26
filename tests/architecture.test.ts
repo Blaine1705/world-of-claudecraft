@@ -316,6 +316,7 @@ const UI_PURE_CORES = [
   'src/ui/char_sheet_sig_core.ts',
   'src/ui/inspect_view.ts',
   'src/ui/quality_glow.ts',
+  'src/ui/lastkeep_map_view.ts',
   'src/ui/map_pinch_zoom_core.ts',
   'src/ui/bg_field_relief_core.ts',
   'src/ui/map_gather_tip_memo.ts',

@@ -707,6 +707,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorial.nextTipMap': 'ワールドマップ（{key}）でクエストの場所を確認しましょう。',
   'hudChrome.tutorial.nextTipSocial':
     'ソーシャル（{key}）を開いて、手強い戦いに備えるパーティーを探しましょう。',
+  'hudChrome.lastkeepMap.story.undercroft': '地下蔵',
+  'hudChrome.lastkeepMap.story.state': '公務の階',
+  'hudChrome.lastkeepMap.story.residence': '居住の階',
+  'hudChrome.lastkeepMap.story.tower': '見張り塔',
   'hudChrome.raidLockout.title': 'レイドロックアウト',
   'hudChrome.raidLockout.allReady': 'すべてのレイドが利用可能',
   'hudChrome.raidLockout.daysHours': '{d}日{h}時間',
@@ -10256,6 +10260,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '温かな雨が古い石の上で音を立てる。ワイルドハート盆地が目の前に開けた。',
   'entities.dungeons.wildheart_basin.leaveText': '石の牙の下をくぐり、パームリーチの陽光へ戻った。',
   'entities.dungeons.the_last_keep.name': '最後の砦',
+  'entities.items.last_keep_signet.name': '最後の砦の印章',
   'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
   'entities.items.last_keep_signet.name': '最後の砦の印章',
   'entities.items.reins_terrorspark_groundshaker.name': 'テラースパークの始動キー',

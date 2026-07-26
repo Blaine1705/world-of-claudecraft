@@ -705,6 +705,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorial.nextTipQuestLog': '퀘스트 기록({key})을 열어 근처의 다음 임무를 확인하세요.',
   'hudChrome.tutorial.nextTipMap': '월드 맵({key})에서 퀘스트가 있는 곳을 확인하세요.',
   'hudChrome.tutorial.nextTipSocial': '소셜({key})을 열어 강력한 전투를 위한 파티를 찾아보세요.',
+  'hudChrome.lastkeepMap.story.undercroft': '지하 저장고',
+  'hudChrome.lastkeepMap.story.state': '의전층',
+  'hudChrome.lastkeepMap.story.residence': '주거층',
+  'hudChrome.lastkeepMap.story.tower': '망루',
   'hudChrome.raidLockout.title': '공격대 잠금',
   'hudChrome.raidLockout.allReady': '모든 공격대 준비됨',
   'hudChrome.raidLockout.daysHours': '{d}일 {h}시간',
@@ -10241,6 +10245,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.wildheart_basin.leaveText':
     '돌송곳니 아래를 지나 팜리치의 햇살 속으로 돌아갑니다.',
   'entities.dungeons.the_last_keep.name': '마지막 요새',
+  'entities.items.last_keep_signet.name': '마지막 요새의 인장',
   'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
   'entities.items.last_keep_signet.name': '마지막 요새의 인장',
   'entities.items.reins_terrorspark_groundshaker.name': '테러스파크 시동 열쇠',

@@ -518,6 +518,8 @@ import { itemNameColor } from './item_name_color';
 import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
 import { itemSlotLabel as itemSlotName } from './item_slot_labels';
 import { knownItemDef, ownEntry } from './known_item';
+import { LastKeepMapPainter } from './lastkeep_map_painter';
+import { lastKeepMapActive } from './lastkeep_map_view';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { isCombatFlavorLog } from './log_event_route';
@@ -4131,6 +4133,9 @@ export class Hud {
     },
   );
   private readonly delvePainter = new DelveMapPainter(this.writerFacet, classCss);
+  // The Last Keep interior map (the castle floor plan): both surfaces routed
+  // by the lastKeepMapActive position guard, exactly like the delve branch.
+  private readonly lastKeepMapPainter = new LastKeepMapPainter(this.writerFacet, classCss);
   // The Protect Yumi match strip + bench overlay (yumi_match_painter.ts):
   // facet-routed; structure from arenaInfo.match.yumi, dynamics from the
   // yumiStatus/yumiDown events fed in handleEvents. Runs on the mediumHud
@@ -10595,6 +10600,18 @@ export class Hud {
       );
       return;
     }
+    // Inside The Last Keep: the baked floor plan for the player's current
+    // story, with the '#zone-label' story title (the delve branch pattern).
+    if (lastKeepMapActive(this.sim)) {
+      this.lastKeepMapPainter.paintMinimap(
+        ctx,
+        this.sim,
+        $('#zone-label'),
+        MINIMAP_SIZE,
+        this.minimapZoom,
+      );
+      return;
+    }
     // The overworld minimap: a pure marker core (minimap_markers) + the thin canvas
     // painter. It owns the cached terrain blit + the marker draws and writes
     // '#zone-label' through the write-elision facet. It blits the current zone's
@@ -10880,6 +10897,19 @@ export class Hud {
       return;
     }
     this.continentRegions = [];
+
+    // Inside The Last Keep: the whole-plan floor plate for the player's
+    // current story (title drawn on-canvas, the delve branch pattern); the
+    // continent overview above still wins when the player toggles up to it.
+    if (lastKeepMapActive(this.sim)) {
+      this.mapQuestAreas = [];
+      this.mapNpcMarkers = [];
+      this.mapGatherNodes = [];
+      this.mapGatherTipMemo = null;
+      const title = this.lastKeepMapPainter.paintWorldMap(ctx, this.sim, S);
+      this.setText(summaryEl, t('hud.core.mapSummary', { zone: title }));
+      return;
+    }
 
     // inside an instance, show the zone the dungeon's door is in (dungeonAt owns
     // the instance x-band layout); outdoors, follow the committed zone so
