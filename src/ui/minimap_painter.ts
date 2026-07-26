@@ -27,7 +27,7 @@
 import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, yumiMazeOriginAt } from '../sim/data';
 import { yumiMazeLayout } from '../sim/yumi_maze_layout';
 import type { IWorld } from '../world_api';
-import { createMinimapMarkers, type MinimapMarker } from './minimap_markers';
+import { createMinimapMarkers, type MinimapMarker, type NpcGlyph } from './minimap_markers';
 import type { PainterHostWriters } from './painter_host';
 
 // The fixed circular minimap surface (the #minimap canvas is 162x162). Exported so Hud
@@ -100,7 +100,11 @@ const NPC_GLYPH_OFFSET_Y = 3;
 // Sprite geometry: the fillText origin inside the sprite canvas. 11px Georgia bold
 // ascends at most ~11px above the alphabetic baseline and the glyph set ('?', '!',
 // '•') has no descenders, so a 16x16 canvas with the baseline at y=12 and the left
-// edge at x=2 contains every glyph with margin.
+// edge at x=2 contains every glyph with margin (verified in Georgia and under the
+// serif/sans fallbacks Android and most Linux resolve instead).
+// COUPLED TO NPC_GLYPH_FONT: the box is sized from that font's ascent, and a sprite
+// too small CLIPS rather than fails. Re-measure these three if the font size changes;
+// the test pins the exact font string so a change has to come through here.
 const NPC_GLYPH_SPRITE_SIZE = 16;
 const NPC_GLYPH_SPRITE_ORIGIN_X = 2;
 const NPC_GLYPH_SPRITE_BASELINE_Y = 12;
@@ -190,10 +194,12 @@ export class MinimapPainter {
   // The Protect Yumi maze wall cache (built on first in-maze redraw; the fixed
   // competitive layout never changes, so one raster serves the session).
   private mazeBg: HTMLCanvasElement | null = null;
-  // Per-(glyph, color) NPC glyph sprites (see the NPC_GLYPH_* header): at most a
-  // few entries (three glyphs, one resolved token color per session), each a 16x16
-  // canvas, so the map never needs eviction.
-  private readonly glyphSprites = new Map<string, HTMLCanvasElement>();
+  // NPC glyph sprites (see the NPC_GLYPH_* header), keyed color -> glyph. Nested rather
+  // than one map on a `${glyph}|${color}` composite so the per-marker lookup in the draw
+  // loop allocates NO key string. Bounded without eviction by construction: NpcGlyph is a
+  // closed three-member union and resolveColors freezes one color set for the session, so
+  // the live map holds at most three sprites of 16x16 each.
+  private readonly glyphSprites = new Map<string, Map<NpcGlyph, HTMLCanvasElement>>();
 
   constructor(
     private readonly writers: PainterHostWriters,
@@ -325,25 +331,34 @@ export class MinimapPainter {
   }
 
   // Rasterize (once) and return the sprite for an NPC quest glyph in `color`; the
-  // per-redraw draw is then a plain drawImage. Keyed on glyph + the resolved color
-  // string so a future theme/contrast cache bust naturally re-rasterizes.
-  private npcGlyphSprite(glyph: string, color: string): HTMLCanvasElement {
-    const key = `${glyph}|${color}`;
-    const cached = this.glyphSprites.get(key);
+  // per-redraw draw is then a plain drawImage. Keyed on the resolved color as well as the
+  // glyph so a future theme/contrast cache bust naturally re-rasterizes.
+  private npcGlyphSprite(glyph: NpcGlyph, color: string): HTMLCanvasElement {
+    let byGlyph = this.glyphSprites.get(color);
+    const cached = byGlyph?.get(glyph);
     if (cached) return cached;
     const sprite = document.createElement('canvas');
     sprite.width = NPC_GLYPH_SPRITE_SIZE;
     sprite.height = NPC_GLYPH_SPRITE_SIZE;
     const sctx = sprite.getContext('2d');
-    // Cache only once the glyph actually rasterized, matching the two sibling caches in
-    // this file (ensureMazeBg, resolveColors): freezing a blank sprite from one transient
-    // context failure would hide every NPC glyph for the rest of the session. Returning
-    // the blank sprite uncached keeps this redraw's draw a no-op and self-heals the next.
+    // A transient context failure must not be frozen: caching the blank canvas would hide
+    // every NPC glyph for the rest of the session. Returning it uncached makes this
+    // redraw's draw a no-op and self-heals on the next one.
     if (!sctx) return sprite;
     sctx.fillStyle = color;
     sctx.font = NPC_GLYPH_FONT;
     sctx.fillText(glyph, NPC_GLYPH_SPRITE_ORIGIN_X, NPC_GLYPH_SPRITE_BASELINE_Y);
-    this.glyphSprites.set(key, sprite);
+    // Same rule as resolveColors, for the same reason: a redraw before the stylesheet
+    // applies resolves '' for every token, and '' is an invalid fillStyle the canvas
+    // ignores, so the glyph rasterizes in the default black. Draw it this redraw (exactly
+    // what the inline fillText did on that frame) but never freeze it.
+    if (color) {
+      if (!byGlyph) {
+        byGlyph = new Map();
+        this.glyphSprites.set(color, byGlyph);
+      }
+      byGlyph.set(glyph, sprite);
+    }
     return sprite;
   }
 
@@ -369,14 +384,16 @@ export class MinimapPainter {
           //
           // ROUNDED, and that is load-bearing rather than cosmetic. mx/my are continuous
           // floats (minimap_markers.ts projects `half + dx`), so the destination is
-          // fractional nearly always, and a fractional drawImage destination is RESAMPLED:
-          // measured, the same 11px glyph blitted at a sub-pixel phase with
-          // imageSmoothingEnabled ON yields 53 ink pixels and ZERO fully-solid ones, i.e.
-          // mush. Rounding makes the output identical whether smoothing is on or off (35
-          // ink / 7 solid either way), so glyph legibility never silently depends on the
-          // `imageSmoothingEnabled = false` the two paint entry points set for the terrain
-          // background blit; it also drops the nearest-neighbour artifact at exactly
-          // half-pixel phase. No measurable cost.
+          // fractional nearly always, and a fractional drawImage destination is RESAMPLED.
+          // Measured in Chrome across sub-pixel phases 0.2 to 0.8, blitting this 16x16
+          // sprite: fractional with imageSmoothingEnabled OFF stays crisp (35 ink pixels,
+          // 5 fully-solid, at every phase) but fractional with smoothing ON collapses to
+          // 53 ink and ZERO fully-solid, i.e. mush. So the unrounded blit was legible only
+          // because of the `imageSmoothingEnabled = false` the two paint entry points set
+          // for the terrain background blit, several lines away and for another reason
+          // entirely, with nothing pinning that relationship. Rounded, both settings give
+          // the identical 35/5 at every phase, so legibility stops depending on it. No
+          // measurable cost.
           //
           // The tradeoff, deliberately taken: the glyph now snaps to whole pixels where
           // fillText advanced it in quarter-pixel steps. At the minimap's 1.7 px/yard base

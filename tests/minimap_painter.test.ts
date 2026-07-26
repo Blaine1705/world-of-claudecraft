@@ -163,6 +163,10 @@ function makeFakeSprite(trace: GlyphTrace): FakeSprite {
   const sctx = {
     font: '',
     fillStyle: '',
+    // globalAlpha + fillRect are what ensureMazeBg draws its wall slabs with; the glyph
+    // sprite itself only ever needs font/fillStyle/fillText.
+    globalAlpha: 1,
+    fillRect(): void {},
     fillText(glyph: string, x: number, y: number): void {
       ink.push({ glyph, x, y, font: sctx.font, fillStyle: sctx.fillStyle });
     },
@@ -294,6 +298,11 @@ function paint(p: MinimapPainter, ctx: CanvasRenderingContext2D, world: IWorld):
   p.paintOverworld(ctx, world, {} as HTMLElement, { width: 2048 } as HTMLCanvasElement, 1);
 }
 
+/** The Protect Yumi arm, which shares drawMarkers with the overworld arm. */
+function paintMaze(p: MinimapPainter, ctx: CanvasRenderingContext2D, world: IWorld): void {
+  p.paintYumiMaze(ctx, world, {} as HTMLElement, 1, 'Protect Yumi');
+}
+
 afterEach(() => {
   vi.unstubAllGlobals();
 });
@@ -423,6 +432,42 @@ describe('minimap_painter: NPC glyphs draw from the sprite cache, never per-mark
     // both sibling caches in this file (ensureMazeBg, resolveColors) refuse it too.
     expect(trace.sprites).toHaveLength(2);
     expect(trace.sprites[0].ink).toEqual([]);
+  });
+
+  it('does not cache a sprite rasterized before the tokens resolved', () => {
+    const trace = newTrace();
+    // A redraw before the stylesheet applies: every token reads ''. resolveColors
+    // deliberately refuses to freeze that, and the glyph cache must refuse it too, or
+    // three default-black sprites stay resident for the rest of the session.
+    trace.color = '';
+    installGlyphGlobals(trace);
+    const ctx = fakeMinimapContext(trace);
+    const p = newPainter();
+    const world = glyphWorld([{ x: 4, z: 98.5, quest: true }], 'ready');
+
+    paint(p, ctx, world);
+    paint(p, ctx, world);
+
+    expect(trace.sprites).toHaveLength(2);
+    // It still DRAWS on that redraw, exactly as the inline fillText did with an
+    // unresolved fillStyle: rasterized, just never frozen.
+    expect(trace.sprites[0].ink).toHaveLength(1);
+    expect(trace.blits).toHaveLength(2);
+  });
+
+  it('applies the same rounded blit on the Protect Yumi arm', () => {
+    const trace = newTrace();
+    installGlyphGlobals(trace);
+    const ctx = fakeMinimapContext(trace);
+    // paintYumiMaze shares drawMarkers, so the maze arm must land the glyph on the same
+    // rounded anchor. Its own maze background canvas is created first.
+    paintMaze(newPainter(), ctx, glyphWorld([{ x: 4, z: 98.5, quest: true }], 'ready'));
+
+    expect(trace.blits).toHaveLength(1);
+    expect(trace.blits[0].dx).toBe(70);
+    expect(trace.blits[0].dy).toBe(75);
+    expect(trace.minimapTextCalls).toBe(0);
+    expect(trace.minimapFontWrites).toBe(0);
   });
 
   it('keeps fillText and ctx.font assignment out of the per-marker draw loop', () => {
