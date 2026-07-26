@@ -447,6 +447,15 @@ describe('every professions grant site is accounted for (#2430)', () => {
     'THE_CODFATHER_ITEM_ID',
   ];
 
+  // Source with comments removed (`://` protocol slashes preserved), the repo's
+  // raw-source-pin idiom (tests/server/board_read_single_flight.test.ts). Every
+  // pin below matches on call TEXT, so without this a flag left behind as a
+  // comment satisfies the sweep, and the idiomatic way to disable a trailing
+  // optional argument is exactly to comment it out in place, leaving the flag
+  // words sitting inside the call's own parentheses.
+  const codeOnly = (source: string): string =>
+    source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+
   /** Every ctx.addItem / ctx.addItemInstance call in `source`, each as the full
    *  call text (paren-balanced, so a multi-line opts object is included). */
   const grantCalls = (source: string): string[] => {
@@ -466,22 +475,81 @@ describe('every professions grant site is accounted for (#2430)', () => {
     return calls;
   };
 
-  const sites = readdirSync(dir)
-    .filter((f) => f.endsWith('.ts'))
-    .flatMap((file) =>
-      grantCalls(readFileSync(path.join(dir, file), 'utf8')).map((call) => ({ file, call })),
-    );
+  /** The brace-balanced body of the named top-level function in `source`. */
+  const functionBody = (source: string, signature: string): string => {
+    const at = source.indexOf(signature);
+    expect(at, `${signature} not found`).toBeGreaterThan(-1);
+    const open = source.indexOf('{', at);
+    let depth = 0;
+    let end = open;
+    for (; end < source.length; end++) {
+      if (source[end] === '{') depth++;
+      else if (source[end] === '}' && --depth === 0) break;
+    }
+    return source.slice(open, end + 1);
+  };
+
+  // #2457: corpse harvest is a professions grant flow that does NOT live in
+  // src/sim/professions (it is a command body in interaction.ts), so the
+  // directory walk above could never see it, and its six grants sat unflagged
+  // through the whole of #2430. Only harvestCorpse's own body joins the sweep:
+  // the other grants in that file (lootCorpse's distribution, pickUpObject)
+  // are ordinary loot and must keep printing the hub line.
+  const harvestBody = functionBody(
+    codeOnly(readFileSync(path.resolve(process.cwd(), 'src/sim/interaction.ts'), 'utf8')),
+    'export function harvestCorpse(',
+  );
+
+  const sites = [
+    ...readdirSync(dir)
+      .filter((f) => f.endsWith('.ts'))
+      .flatMap((file) =>
+        grantCalls(codeOnly(readFileSync(path.join(dir, file), 'utf8'))).map((call) => ({
+          file,
+          call,
+        })),
+      ),
+    ...grantCalls(harvestBody).map((call) => ({ file: 'interaction.ts:harvestCorpse', call })),
+  ];
 
   it('the scanner actually finds the grant sites (never passes vacuously)', () => {
     // A regex that stopped matching would make the sweep below green while
     // checking nothing, so bind both the count and the shape.
-    expect(sites.length).toBeGreaterThanOrEqual(13);
+    expect(sites.length).toBeGreaterThanOrEqual(19);
     expect(sites.some((s) => s.file === 'commission.ts')).toBe(true);
     expect(sites.some((s) => s.call.includes('callerLogs: true'))).toBe(true);
     // The balanced-paren walk must capture the whole call, opts object and all,
     // or every site would read as unflagged and the exclusion list would have
     // to grow to hide it.
     expect(sites.find((s) => s.file === 'salvage.ts')?.call).toContain('callerLogs: true');
+  });
+
+  it('the harvestCorpse slice is the whole function and nothing but the function', () => {
+    // Two ways the slice could go wrong and leave the sweep green while
+    // checking the wrong thing: stopping early (the six grants shrink to
+    // fewer, so a real unflagged one hides outside the window) or running past
+    // the function's closing brace into the ordinary loot grants below, which
+    // legitimately carry neither flag and would turn the sweep permanently
+    // red. Bind both ends.
+    const harvestSites = sites.filter((s) => s.file === 'interaction.ts:harvestCorpse');
+    expect(harvestSites).toHaveLength(6);
+    // BOTH flags, and only for these six. The shared sweep below can only ask
+    // for `callerLogs`, because a caller may legitimately own the line without
+    // the cue (commission.ts's Maker's Bond unbind peel does exactly that), so
+    // `silent` would go unchecked everywhere if it were not pinned here. Corpse
+    // harvest owns both halves: its result event logs its own lines AND plays
+    // its own single cue, so a site that kept `callerLogs` but lost `silent`
+    // would give one harvest two cues (#2457 acceptance criterion 3).
+    for (const site of harvestSites) {
+      const call = site.call.replace(/\s+/g, ' ');
+      expect(call, call).toContain('silent: true');
+      expect(call, call).toContain('callerLogs: true');
+    }
+    // pickUpObject's grant is the nearest one outside the function.
+    expect(harvestBody).not.toContain('objectItemId');
+    // ... and the sliced window really is harvestCorpse: its last statement,
+    // the corpse-timer clamp, is inside it.
+    expect(harvestBody).toContain('CORPSE_INTERACT_GRACE_SECONDS');
   });
 
   it('every grant either stands its hub line down or is a named no-result-event grant', () => {
