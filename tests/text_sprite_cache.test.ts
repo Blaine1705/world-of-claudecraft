@@ -27,6 +27,9 @@ interface FakeInk {
   align: string;
   baseline: string;
   lineWidth: number;
+  /** The join cap in force. A mitered apex reaches miterLimit/2 line widths past
+   *  the ink, so this is what makes the sprite's padding a real bound. */
+  miterLimit: number;
 }
 
 interface FakeSprite {
@@ -53,6 +56,10 @@ interface Trace {
 // Canvas defaults a real context resets to when width/height is assigned.
 const DEFAULT_FONT = '10px sans-serif';
 const DEFAULT_COLOR = '#000000';
+// The canvas default join cap, which is exactly the one the module must NOT
+// leave in force: at 10, a mitered apex on a 3px outline reaches 15px past the
+// ink, well past any padding a sprite can afford.
+const DEFAULT_MITER_LIMIT = 10;
 
 /** Metrics like a modern browser's: the actual bounding box is reported relative
  *  to the CURRENT textAlign, so the same text measures differently depending on
@@ -83,6 +90,14 @@ function startAnchoredMetrics(text: string, font: string): Partial<TextMetrics> 
   return boundingBoxMetrics(text, font, 'start');
 }
 
+/** Metrics for a run whose ink sits WELL INSIDE the em box, which is the case the
+ *  ascent's em-box floor exists for: every other fixture here reports an ascent
+ *  above the font size, so without this one the floor never wins and could be
+ *  deleted with the suite green. */
+function shortInkMetrics(text: string, font: string, align: string): Partial<TextMetrics> {
+  return { ...boundingBoxMetrics(text, font, align), actualBoundingBoxAscent: fontPx(font) * 0.5 };
+}
+
 // Matches the module's own FALLBACK_FONT_PX so a font string with no px size
 // gives the fixtures and the module the same arithmetic.
 function fontPx(font: string): number {
@@ -95,6 +110,7 @@ function makeFakeSprite(trace: Trace): FakeSprite {
     fillStyle: DEFAULT_COLOR,
     strokeStyle: DEFAULT_COLOR,
     lineWidth: 1,
+    miterLimit: DEFAULT_MITER_LIMIT,
     textAlign: 'start',
     textBaseline: 'alphabetic',
     measureText(text: string): Partial<TextMetrics> {
@@ -114,6 +130,7 @@ function makeFakeSprite(trace: Trace): FakeSprite {
     align: ctx.textAlign,
     baseline: ctx.textBaseline,
     lineWidth: ctx.lineWidth,
+    miterLimit: ctx.miterLimit,
   });
   const sprite = {
     ink: [] as FakeInk[],
@@ -129,6 +146,7 @@ function makeFakeSprite(trace: Trace): FakeSprite {
     ctx.fillStyle = DEFAULT_COLOR;
     ctx.strokeStyle = DEFAULT_COLOR;
     ctx.lineWidth = 1;
+    ctx.miterLimit = DEFAULT_MITER_LIMIT;
     ctx.textAlign = 'start';
     ctx.textBaseline = 'alphabetic';
     sprite.ink.length = 0;
@@ -192,10 +210,11 @@ describe('text_sprite_cache: rasterize once, blit thereafter', () => {
     const sprite = trace.sprites[0];
     // 'AB' at 12px measured under 'center': advance 12, so left = right = 6;
     // ascent 14.4 (over the 12px em box, so the union takes it), descent 3 (under
-    // the 3.6 em fallback, so the union takes that). pad = ceil(3 / 2) + 2 = 4,
-    // giving originX = 6 + 4 = 10 and originY = ceil(14.4) + 4 = 19.
-    expect(sprite.width).toBe(20); // 10 + ceil(6) + 4
-    expect(sprite.height).toBe(27); // 19 + ceil(3.6) + 4
+    // the 3.6 em fallback, so the union takes that). The outline allowance is the
+    // MITER reach, not half the width: pad = ceil(3 * 8 / 2) + 2 = 14, giving
+    // originX = 6 + 14 = 20 and originY = ceil(14.4) + 14 = 29.
+    expect(sprite.width).toBe(40); // 20 + ceil(6) + 14
+    expect(sprite.height).toBe(47); // 29 + ceil(3.6) + 14
     // Measured under the same anchor it draws on: see the clipping trap below.
     expect(sprite.measured).toEqual(['bold 12px Georgia|center|alphabetic|AB']);
     // Both passes recorded AFTER the resize (the fake clears ink on resize), at
@@ -204,24 +223,28 @@ describe('text_sprite_cache: rasterize once, blit thereafter', () => {
       {
         op: 'stroke',
         text: 'AB',
-        x: 10,
-        y: 19,
+        x: 20,
+        y: 29,
         font: 'bold 12px Georgia',
         color: 'halo',
         align: 'center',
         baseline: 'alphabetic',
         lineWidth: 3,
+        // Capped BEFORE the stroke, and the same 8 the padding above is sized
+        // from: at the canvas default of 10 a mitered apex outreaches the box.
+        miterLimit: 8,
       },
       {
         op: 'fill',
         text: 'AB',
-        x: 10,
-        y: 19,
+        x: 20,
+        y: 29,
         font: 'bold 12px Georgia',
         color: 'ink',
         align: 'center',
         baseline: 'alphabetic',
         lineWidth: 3,
+        miterLimit: 8,
       },
     ]);
   });
@@ -253,9 +276,11 @@ describe('text_sprite_cache: rasterize once, blit thereafter', () => {
     cache.draw(targetContext(trace), '7', 0, 0, { font: 'bold 12px Georgia', fill: 'gold' });
 
     expect(trace.sprites[0].ink.map((i) => i.op)).toEqual(['fill']);
-    // No outline means no half-width allowance: pad is the antialias slack only,
-    // so originX = ceil(3) + 2 = 5 ('7' measures 6 wide at 12px).
+    // No outline means no miter allowance: pad is the antialias slack only, so
+    // originX = ceil(3) + 2 = 5 ('7' measures 6 wide at 12px). A fill has no
+    // joins, so the cap is left at the canvas default rather than set.
     expect(trace.sprites[0].width).toBe(10);
+    expect(trace.sprites[0].ink[0].miterLimit).toBe(DEFAULT_MITER_LIMIT);
   });
 
   it('draws nothing at all for empty text', () => {
@@ -277,12 +302,12 @@ describe('text_sprite_cache: the blit lands on the anchor, rounded', () => {
     installDocument(trace);
     const cache = new TextSpriteCache();
 
-    // origin is (10, 19) as computed above, so the raw destination would be
-    // (90.4, 31.6): a fractional destination is resampled, which is mush when
+    // origin is (20, 29) as computed above, so the raw destination would be
+    // (80.4, 21.6): a fractional destination is resampled, which is mush when
     // the caller left imageSmoothingEnabled on.
     cache.draw(targetContext(trace), 'AB', 100.4, 50.6, OUTLINED);
 
-    expect(trace.blits).toEqual([{ sprite: trace.sprites[0], dx: 90, dy: 32 }]);
+    expect(trace.blits).toEqual([{ sprite: trace.sprites[0], dx: 80, dy: 22 }]);
   });
 
   it('keeps every destination integral across sub-pixel phases', () => {
@@ -296,8 +321,8 @@ describe('text_sprite_cache: the blit lands on the anchor, rounded', () => {
     }
 
     // Value-pinned on BOTH axes, so a floor/ceil/trunc on either one fails here.
-    expect(trace.blits.map((b) => b.dx)).toEqual([90, 90, 90, 91, 91, 91]);
-    expect(trace.blits.map((b) => b.dy)).toEqual([31, 31, 31, 32, 32, 32]);
+    expect(trace.blits.map((b) => b.dx)).toEqual([80, 80, 80, 81, 81, 81]);
+    expect(trace.blits.map((b) => b.dy)).toEqual([21, 21, 21, 22, 22, 22]);
   });
 });
 
@@ -385,6 +410,25 @@ describe('text_sprite_cache: cache identity', () => {
       lineWidth: 3,
     });
     expect(cache.size).toBe(0);
+
+    // And so is an unresolved FILL alone. Pinned on its own, because the fixture
+    // above sets both at once and the outline arm alone satisfies it: with only
+    // that case the fill half of the guard could be deleted with this file green.
+    cache.draw(ctx, 'AB', 0, 0, {
+      font: 'bold 12px Georgia',
+      fill: '',
+      stroke: 'halo',
+      lineWidth: 3,
+    });
+    expect(cache.size).toBe(0);
+
+    // Including on the fill-only shape the quest badges actually ship, where the
+    // outline half of the guard is vacuously true (stroke is undefined, never
+    // ''), so the fill check is the ONLY thing standing between a pre-stylesheet
+    // redraw and a black digit frozen in for the session.
+    cache.draw(ctx, '7', 0, 0, { font: 'bold 12px Georgia', fill: '' });
+    expect(cache.size).toBe(0);
+
     // Once both resolve, it caches.
     cache.draw(ctx, 'AB', 0, 0, OUTLINED);
     expect(cache.size).toBe(1);
@@ -427,8 +471,23 @@ describe('text_sprite_cache: the bound and its eviction', () => {
 
     const worstCase =
       allyNames + badgeDigits + poiLabels + portalNames + zoneTitle + questGiverGlyphs;
-    expect(allyNames).toBe(150); // the caps the header's arithmetic quotes
-    expect(TEXT_SPRITE_LIMIT).toBeGreaterThanOrEqual(worstCase);
+    // Each term on its own, so a single one degenerating to zero under a refactor
+    // cannot hide behind another one's growth. Without these, the one-sided check
+    // at the bottom passes just as happily on a worst case of 3.
+    expect(allyNames, 'ally names: the two server caps').toBe(150);
+    expect(badgeDigits, 'badge digits: one per quest').toBeGreaterThan(0);
+    expect(poiLabels, 'POI labels: the widest zone').toBeGreaterThan(0);
+    expect(portalNames, 'portal names: the zone with the most doors').toBeGreaterThan(0);
+    // And the total may not silently shrink below the figure the module header
+    // quotes, which is the other direction the check below cannot see.
+    expect(
+      worstCase,
+      'the header quotes 263; a SMALLER total means a term broke',
+    ).toBeGreaterThanOrEqual(263);
+    expect(
+      TEXT_SPRITE_LIMIT,
+      `worst case grew to ${worstCase}: raise TEXT_SPRITE_LIMIT above it, or the map thrashes`,
+    ).toBeGreaterThanOrEqual(worstCase);
   });
 
   it('keys a label containing the key separator apart from its prefix', () => {
@@ -438,13 +497,23 @@ describe('text_sprite_cache: the bound and its eviction', () => {
     const ctx = targetContext(trace);
 
     // Ally names are player-supplied, so a label can carry whatever the key uses
-    // as a separator. Text is the LAST key field for exactly this reason.
+    // as a separator. Text is the LAST key field for exactly this reason: a
+    // newline in a label appends to the key rather than shifting the fields that
+    // would have followed it.
     cache.draw(ctx, 'A', 0, 0, OUTLINED);
     cache.draw(ctx, 'A\nbold 12px Georgia', 0, 0, OUTLINED);
     cache.draw(ctx, 'A\nbold 12px Georgia', 0, 0, OUTLINED);
 
     expect(trace.sprites).toHaveLength(2);
     expect(trace.blits).toHaveLength(3);
+
+    // And the separator has to actually be there. Text is keyed immediately after
+    // the outline width, so these two differ only in where that boundary falls:
+    // a key built by plain concatenation reads both as ...312 and serves the
+    // second label from the first one's sprite.
+    cache.draw(ctx, '12', 0, 0, { ...OUTLINED, lineWidth: 3 });
+    cache.draw(ctx, '2', 0, 0, { ...OUTLINED, lineWidth: 31 });
+    expect(trace.sprites).toHaveLength(4);
   });
 
   it('drops every sprite on clear, so a language switch carries no dead rasters', () => {
@@ -565,8 +634,8 @@ describe('text_sprite_cache: the sprite box never clips its own label', () => {
       // 14 characters at 12px measure 84 wide, so a centered draw needs 42px of
       // sprite to the left of the anchor plus the outline padding.
       const originX = 100 - trace.blits[0].dx;
-      expect(originX).toBeGreaterThanOrEqual(42 + 4);
-      expect(trace.sprites[0].width - originX).toBeGreaterThanOrEqual(42 + 4);
+      expect(originX).toBeGreaterThanOrEqual(42 + 14);
+      expect(trace.sprites[0].width - originX).toBeGreaterThanOrEqual(42 + 14);
       vi.unstubAllGlobals();
     }
   });
@@ -580,10 +649,10 @@ describe('text_sprite_cache: the sprite box never clips its own label', () => {
     cache.draw(targetContext(trace), 'AB', 100, 50, OUTLINED);
 
     // Start-anchored metrics claim left 0 and right 12. The union floors both at
-    // half the advance (6), so the origin is the same 10 as the centered case and
-    // only the right edge is roomier: 10 + 12 + 4.
-    expect(trace.blits[0].dx).toBe(90);
-    expect(trace.sprites[0].width).toBe(26);
+    // half the advance (6), so the origin is the same 20 as the centered case and
+    // only the right edge is roomier: 20 + 12 + 14.
+    expect(trace.blits[0].dx).toBe(80);
+    expect(trace.sprites[0].width).toBe(46);
   });
 });
 
@@ -627,8 +696,8 @@ describe('text_sprite_cache: hostile and partial metrics', () => {
 
     // NaN width falls back to 0 and the infinite ascent to the 12px font size;
     // sizing from either would give a NaN or an enormous canvas.
-    expect(trace.sprites[0].width).toBe(8);
-    expect(trace.sprites[0].height).toBe(24);
+    expect(trace.sprites[0].width).toBe(28);
+    expect(trace.sprites[0].height).toBe(44);
   });
 
   it('takes each bounding-box field independently, not all or nothing', () => {
@@ -640,8 +709,65 @@ describe('text_sprite_cache: hostile and partial metrics', () => {
 
     // The reported ascent (30) is used; left, right and descent fall back to half
     // the advance (10) and the 3.6 em descent.
-    expect(trace.sprites[0].width).toBe(28); // (10 + 4) + 10 + 4
-    expect(trace.sprites[0].height).toBe(42); // (30 + 4) + ceil(3.6) + 4
+    expect(trace.sprites[0].width).toBe(48); // (10 + 14) + 10 + 14
+    expect(trace.sprites[0].height).toBe(62); // (30 + 14) + ceil(3.6) + 14
+  });
+
+  it('pads and strokes at 1px when a style names an outline but no width', () => {
+    // A canvas IGNORES lineWidth = 0, so such a style strokes at the context
+    // default of 1. The key and the padding have to follow the width that is
+    // actually drawn, not the 0 the style literally carries.
+    const trace = newTrace();
+    installDocument(trace);
+
+    new TextSpriteCache().draw(targetContext(trace), 'AB', 100, 50, {
+      font: 'bold 12px Georgia',
+      fill: 'ink',
+      stroke: 'halo',
+    });
+
+    const sprite = trace.sprites[0];
+    expect(sprite.ink.map((i) => i.lineWidth)).toEqual([1, 1]);
+    // pad = ceil(1 * 8 / 2) + 2 = 6, so originX = ceil(6) + 6 = 12.
+    expect(sprite.width).toBe(24); // 12 + ceil(6) + 6
+  });
+
+  it('reads the px size out of the shorthand shapes a font string can take', () => {
+    // Only the fallback path consumes this, but it consumes it for the SIZE of
+    // the sprite, so a mis-parse is a clipped or a bloated label.
+    const cases: Array<{ font: string; height: number }> = [
+      // A fractional size keeps its fraction: ascent 13.5 -> ceil 14.
+      { font: 'bold 13.5px Georgia', height: 14 + 14 + Math.ceil(13.5 * 0.3) + 14 },
+      // A line-height shorthand takes the SIZE, not the ratio after the slash.
+      { font: 'bold 13px/1.2 Georgia', height: 13 + 14 + Math.ceil(13 * 0.3) + 14 },
+      // A family whose name contains the units does not win over the real size.
+      { font: 'bold 15px "Px Grotesk"', height: 15 + 14 + Math.ceil(15 * 0.3) + 14 },
+    ];
+    for (const { font, height } of cases) {
+      const trace = newTrace();
+      trace.metrics = () => ({ width: 20 });
+      installDocument(trace);
+
+      new TextSpriteCache().draw(targetContext(trace), 'AB', 100, 50, { ...OUTLINED, font });
+
+      expect(trace.sprites[0].height, font).toBe(height);
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('never sizes below the em box when the reported ink sits inside it', () => {
+    const trace = newTrace();
+    trace.metrics = shortInkMetrics;
+    installDocument(trace);
+
+    new TextSpriteCache().draw(targetContext(trace), 'AB', 100, 50, OUTLINED);
+
+    // Reported ascent is 6 at 12px, but the box is floored at the em size, so
+    // originY is 12 + 14 = 26 rather than 6 + 14 = 20. Taking the report at face
+    // value would clip a tall glyph in the same run, which is what a mixed-script
+    // label is (the Latin cap height and a CJK glyph's do not agree).
+    expect(trace.sprites[0].height).toBe(44); // (12 + 14) + ceil(3.6) + 14
+    expect(trace.blits[0].dy).toBe(24); // 50 - 26
   });
 
   it('falls back to a nominal font size when the font string carries no px', () => {
@@ -652,7 +778,7 @@ describe('text_sprite_cache: hostile and partial metrics', () => {
       ...OUTLINED,
       font: 'bold 16px Georgia',
     });
-    expect(sized.sprites[0].height).toBe(29); // (16 + 4) + ceil(4.8) + 4
+    expect(sized.sprites[0].height).toBe(49); // (16 + 14) + ceil(4.8) + 14
     vi.unstubAllGlobals();
 
     const unsized = newTrace();
@@ -662,7 +788,7 @@ describe('text_sprite_cache: hostile and partial metrics', () => {
       ...OUTLINED,
       font: 'small-caps Georgia',
     });
-    expect(unsized.sprites[0].height).toBe(24); // (12 + 4) + ceil(3.6) + 4
+    expect(unsized.sprites[0].height).toBe(44); // (12 + 14) + ceil(3.6) + 14
   });
 });
 
@@ -714,11 +840,11 @@ describe('text_sprite_cache: metrics fallback', () => {
     cache.draw(targetContext(trace), 'AB', 100, 50, OUTLINED);
 
     // width 12 -> left = right = 6; ascent falls back to the 12px font size and
-    // descent to 0.3 of it (3.6). pad = 4.
+    // descent to 0.3 of it (3.6). pad = 14.
     const sprite = trace.sprites[0];
-    expect(sprite.width).toBe(20); // (6 + 4) + 6 + 4
-    expect(sprite.height).toBe(24); // (12 + 4) + ceil(3.6) + 4
-    expect(trace.blits).toEqual([{ sprite, dx: 90, dy: 34 }]);
+    expect(sprite.width).toBe(40); // (6 + 14) + 6 + 14
+    expect(sprite.height).toBe(44); // (12 + 14) + ceil(3.6) + 14
+    expect(trace.blits).toEqual([{ sprite, dx: 80, dy: 24 }]);
     // Still wide enough to hold a centered label: the anchor sits at least half
     // the advance width in from the left edge.
     expect(100 - trace.blits[0].dx).toBeGreaterThanOrEqual(6);
@@ -733,10 +859,10 @@ describe('text_sprite_cache: metrics fallback', () => {
     cache.draw(targetContext(trace), 'AB', 100, 50, OUTLINED);
 
     // Nothing to measure: width falls back to 0 so left = right = 0, ascent to
-    // the 12px font size and descent to 0.3 of it. pad = 4.
+    // the 12px font size and descent to 0.3 of it. pad = 14.
     const sprite = trace.sprites[0];
-    expect(sprite.width).toBe(8); // 4 + 0 + 4
-    expect(sprite.height).toBe(24); // (12 + 4) + ceil(3.6) + 4
-    expect(trace.blits).toEqual([{ sprite, dx: 96, dy: 34 }]);
+    expect(sprite.width).toBe(28); // 14 + 0 + 14
+    expect(sprite.height).toBe(44); // (12 + 14) + ceil(3.6) + 14
+    expect(trace.blits).toEqual([{ sprite, dx: 86, dy: 24 }]);
   });
 });

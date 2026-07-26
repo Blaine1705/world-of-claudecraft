@@ -73,7 +73,9 @@ interface TextInk {
  *  arithmetic against those sources, so raising a cap fails there first):
  *
  *    150  ally names   (server/social.ts FRIEND_LIMIT 50 + GUILD_MEMBER_LIMIT 100)
- *     96  badge digits (one per quest in the content tables)
+ *     96  badge digits (nothing caps the active quest log, but a badge number is
+ *                       an index into it and it is keyed by quest id, so the
+ *                       count of quests in the content tables is the ceiling)
  *     11  POI labels   (the widest zone)
  *      3  portal names (the zone with the most dungeon doors)
  *      1  zone title
@@ -82,14 +84,40 @@ interface TextInk {
  *    263, rounded up for headroom.
  *
  *  The budget is a ceiling, not a working set: ordinary play resides at a couple
- *  of dozen sprites. Even the pathological set costs well under 2MB of backing
- *  store (an ally name rasterizes to roughly 80x20px, about 6KB; badge digits are
- *  a fraction of that), the same class as one cached zone terrain canvas. */
+ *  of dozen sprites, and nothing releases them before then (there is deliberately
+ *  no clear-on-close, since keeping them is what makes reopening the map free;
+ *  the LRU trim is what bounds them, and `clear` exists only for a language
+ *  switch, where every key is dead at once). Measured in Chrome at the sizes this
+ *  actually rasterizes: a 16-character ally name 126x43px (21KB of backing
+ *  store), a POI label 162x45 (29KB), a portal name 138x44 (24KB), the zone title
+ *  154x49 (30KB), a quest-giver glyph 34x48 (6KB), a badge digit 12x20 (1KB). So
+ *  the ordinary couple of dozen is around half a megabyte, the 263-label
+ *  pathological mix is 3.7MB, and 320 sprites all of them ally names, which
+ *  nothing can actually ask for, would be 6.6MB: the same class as a handful of
+ *  cached zone terrain canvases. */
 export const TEXT_SPRITE_LIMIT = 320;
 
 // Slack around the measured ink on every side, so glyph antialiasing is never
-// clipped. The outline adds half its width on top (a stroke straddles the path).
+// clipped. The outline's own reach is added on top (see SPRITE_MITER_LIMIT).
 const SPRITE_PADDING = 2;
+// The outline's join style, capped, and the ONLY reason the padding below is not
+// simply half the line width. A stroke straddles its path, so a straight run
+// reaches lineWidth/2 past the ink measureText reports, but a MITERED join at a
+// sharp glyph apex reaches miterLimit/2 line widths: at the canvas default of 10
+// that is 15px for a 3px outline, which would cost 17px of padding on every side
+// of every sprite to hold, so the box was sized for the straight run and clipped
+// the apex right off instead. Measured in Chrome, an uncapped 'M' lost 5px of its
+// apex at bold 13px sans-serif and 3px at bold 13px Arial. This is not
+// hypothetical on the fonts the map names, because they carry no generic fallback
+// (bold 13px Georgia, not Georgia, serif), so a platform without Georgia (Android,
+// most Linux) substitutes its default standard font, which is a sans.
+// Capping at 8 leaves Georgia at every size the map uses BIT-IDENTICAL to an
+// uncapped strokeText (its worst extension is 7px, ratio 4.7, over every ASCII
+// letter plus Cyrillic, CJK and diacritics), and so are Times New Roman, Verdana
+// and Tahoma. Only the sharper substituted-sans apex changes, and it changes from
+// clipped to bevelled, which is the better of the two. The reach is then bounded
+// at exactly what the padding reserves, so no font can clip its own outline.
+const SPRITE_MITER_LIMIT = 8;
 // Fallbacks for platforms whose TextMetrics omits the actualBoundingBox* family
 // (older WebKit, and the fake contexts the tests drive this with): derive the
 // box from the advance width plus the font's px size. Georgia's descender sits
@@ -191,6 +219,14 @@ export class TextSpriteCache {
   }
 }
 
+// The outline width a style actually draws at, which is what both the key and the
+// padding must agree on. A canvas IGNORES `lineWidth = 0` (it is not a valid
+// value), leaving the context default of 1, so a style that names a stroke but no
+// width strokes at 1px and has to be padded and keyed for 1px, not for 0.
+function outlineWidth(style: TextSpriteStyle): number {
+  return style.stroke === undefined ? 0 : (style.lineWidth ?? 1);
+}
+
 // The cache key. `text` goes LAST so no separator collision is possible whatever
 // the label says, and the separator is a newline because neither a font
 // shorthand nor a resolved CSS color can contain one (a space could:
@@ -199,7 +235,7 @@ export class TextSpriteCache {
 function spriteKey(text: string, style: TextSpriteStyle): string {
   const outlined = style.stroke === undefined ? 'flat' : 'outlined';
   const stroke = style.stroke ?? '';
-  return [style.font, style.fill, outlined, stroke, style.lineWidth ?? 0, text].join('\n');
+  return [style.font, style.fill, outlined, stroke, outlineWidth(style), text].join('\n');
 }
 
 // Rasterize one label into its own canvas, or null when the 2D context fails.
@@ -207,10 +243,11 @@ function rasterize(text: string, style: TextSpriteStyle): TextSprite | null {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;
-  const outline = style.stroke === undefined ? 0 : (style.lineWidth ?? 0);
-  // A stroke straddles the path, so it reaches half its width past the fill ink
-  // that measureText reports.
-  const pad = Math.ceil(outline / 2) + SPRITE_PADDING;
+  const outline = outlineWidth(style);
+  // How far the outline can reach past the fill ink measureText reports: half the
+  // line width for a straight run, and up to SPRITE_MITER_LIMIT halves at a
+  // mitered glyph apex, which is the case that actually governs.
+  const pad = Math.ceil((outline * SPRITE_MITER_LIMIT) / 2) + SPRITE_PADDING;
   const ink = measureInk(ctx, text, style.font);
   // originX/originY are where the caller's anchor sits inside the sprite: the ink
   // box grown by the padding on the left and above.
@@ -225,7 +262,10 @@ function rasterize(text: string, style: TextSpriteStyle): TextSprite | null {
   ctx.textBaseline = SPRITE_BASELINE;
   if (style.stroke !== undefined) {
     ctx.strokeStyle = style.stroke;
-    ctx.lineWidth = style.lineWidth ?? 0;
+    ctx.lineWidth = outline;
+    // Cap the join BEFORE stroking: this is what makes `pad` above a real bound
+    // rather than a hope, so the two must never drift apart.
+    ctx.miterLimit = SPRITE_MITER_LIMIT;
     ctx.strokeText(text, originX, originY);
   }
   ctx.fillStyle = style.fill;
