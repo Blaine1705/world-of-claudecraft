@@ -239,9 +239,18 @@ const RAW_WRITES: ReadonlyArray<readonly [string, RegExp]> = [
   ['.setProperty', /\.setProperty\b/g],
   ['.innerHTML', /\.innerHTML\b/g],
   ['.dataset', /\.dataset\b/g],
+  // The same class as .innerHTML / .setAttribute, all zero across the scanned buckets today,
+  // which is exactly when to add them: each is a raw mutation the nine above do not name, so
+  // reaching for one was free until now.
+  ['.outerHTML', /\.outerHTML\b/g],
+  ['.insertAdjacentHTML', /\.insertAdjacentHTML\b/g],
+  ['.insertAdjacentText', /\.insertAdjacentText\b/g],
+  ['.cssText', /\.cssText\b/g],
+  ['.toggleAttribute', /\.toggleAttribute\b/g],
+  ['.setAttributeNS', /\.setAttributeNS\b/g],
   [
     "['computed']",
-    /\[\s*['"](?:style|textContent|classList|className|setAttribute|removeAttribute|setProperty|innerHTML|dataset)['"]\s*\]/g,
+    /\[\s*['"](?:style|textContent|classList|className|setAttribute|removeAttribute|setProperty|innerHTML|dataset|outerHTML|insertAdjacentHTML|cssText|toggleAttribute)['"]\s*\]/g,
   ],
 ];
 
@@ -282,7 +291,7 @@ const FORCED_REFLOW_READS: ReadonlyArray<readonly [string, RegExp]> = [
   ['.innerText', /\.innerText\b/g],
   ['.getBoundingClientRect', /\.getBoundingClientRect\b/g],
   ['.getClientRects', /\.getClientRects\b/g],
-  ['getComputedStyle', /(?<![\w$])getComputedStyle\s*\(/g],
+  ['getComputedStyle', /(?<![\w$])getComputedStyle\b/g],
   // A PROXY token, and the only honest answer to this scan being per-file. `getUiScale`
   // (src/ui/ui_scale.ts) pays a getComputedStyle one hop away, which no per-file count can
   // see: party_below_target's comment already concedes the hop, and talents_window has the
@@ -468,10 +477,12 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
 // roughly half of them: spellbook_window's tickOpen() runs EVERY FRAME while the window is
 // open and says so in its own comments; arena, dungeon_finder, vale_cup and card_duel are
 // render()ed on the 250ms medium band behind only a display check; social, market, mailbox,
-// bank, bags, deeds, professions and calendar get refreshIfChanged() on the 500ms band; and
-// town_focus, crafting and loot_settings are repainted behind invalidation signatures. The
-// repo's actual window pattern is POLL CHEAPLY, REBUILD ON A SIGNATURE CHANGE, and the
-// signature guard lives inside the module where no per-file scan can see it.
+// bank, bags, deeds, professions and calendar get refreshIfChanged() on the 500ms band;
+// crafting and loot_settings are repainted behind invalidation signatures; and town_focus is
+// repainted on the 500ms band behind an OPEN check and nothing else. The repo's INTENDED
+// window pattern is POLL CHEAPLY, REBUILD ON A SIGNATURE CHANGE, the guard lives inside the
+// module where no per-file scan can see it, and town_focus is the standing proof that this is
+// a convention rather than something anything enforces.
 //
 // So this bucket claims nothing about cadence. What it does is hold the two contracts that
 // are true whatever the cadence turns out to be, at the same exact counts every other bucket
@@ -1026,9 +1037,21 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     expect(CANVAS_CONTEXT_RE.test('const ctx = new AudioContext();')).toBe(false);
     expect(CANVAS_DRAW_RE.test('ctx.fillText(label, 0, 0);')).toBe(true);
     // `.fill(` and `.stroke(` are deliberately OUT of the vocabulary: they collide with
-    // Array.prototype.fill and with ordinary field names.
+    // Array.prototype.fill and with ordinary field names, both of which are live in this tree
+    // (`this.fill` in xp_bar_painter, `mine.fill` in yumi_match_painter, `els.fill` in
+    // deed_tracker_painter). Every arm is a CALL, so a property read of the same name is not a
+    // draw either.
     expect(CANVAS_DRAW_RE.test('rows.fill(0);')).toBe(false);
     expect(CANVAS_DRAW_RE.test('this.bar.stroke();')).toBe(false);
+    expect(CANVAS_DRAW_RE.test('const p = marker.moveTo;')).toBe(false);
+    // The vocabulary itself is pinned, not just sampled. Fixtures alone would let it be
+    // trimmed to a couple of arms and still pass, since a canvas painter that draws at all
+    // usually draws several ways; only perf_graph_painter, which has neither fillText nor
+    // drawImage, would notice, and one file is too thin a thread to hang the proof on.
+    expect(CANVAS_DRAW_RE.source).toBe(
+      '\\.(?:beginPath|closePath|moveTo|lineTo|arcTo|ellipse|quadraticCurveTo|bezierCurveTo|fillRect|strokeRect|clearRect|fillText|strokeText|drawImage|createLinearGradient|createRadialGradient|createPattern|putImageData|getImageData|createImageData|measureText|setLineDash|roundRect)\\s*\\(',
+    );
+    expect(CANVAS_CONTEXT_RE.source).toBe('\\b(?:Offscreen)?CanvasRenderingContext2D\\b');
     // bags_window is the control on purpose, since it is exactly the shape of module that
     // would be parked in CANVAS_PAINTERS to escape both gates.
     const control = painterSource('bags_window.ts');
@@ -1051,6 +1074,12 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       ['.setProperty', "el.style.setProperty('--x', v);", 'bag.setPropertyBag(x);'],
       ['.innerHTML', "el.innerHTML = '';", 'const h = el.innerHTMLCache;'],
       ['.dataset', 'canvas.dataset.portrait = url;', 'const d = row.datasetKey;'],
+      ['.outerHTML', "el.outerHTML = '<b></b>';", 'const s = node.outerHTMLCache;'],
+      ['.insertAdjacentHTML', "el.insertAdjacentHTML('beforeend', h);", 'el.insertAdjacent(h);'],
+      ['.insertAdjacentText', "el.insertAdjacentText('beforeend', t);", 'el.insertAdjacent(t);'],
+      ['.cssText', "el.style.cssText = 'width:1px';", 'const c = sheet.cssTextOf;'],
+      ['.toggleAttribute', "el.toggleAttribute('hidden', on);", 'el.toggleAttributeShim(a);'],
+      ['.setAttributeNS', "el.setAttributeNS(ns, 'x', v);", 'el.setAttributeNSShim(a);'],
       ["['computed']", "el['textContent'] = name;", 'const k = map["textContentish"];'],
     ] as const) {
       const re = writes.get(label);
@@ -1075,9 +1104,15 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       ['.setProperty', /\.setProperty\b/g],
       ['.innerHTML', /\.innerHTML\b/g],
       ['.dataset', /\.dataset\b/g],
+      ['.outerHTML', /\.outerHTML\b/g],
+      ['.insertAdjacentHTML', /\.insertAdjacentHTML\b/g],
+      ['.insertAdjacentText', /\.insertAdjacentText\b/g],
+      ['.cssText', /\.cssText\b/g],
+      ['.toggleAttribute', /\.toggleAttribute\b/g],
+      ['.setAttributeNS', /\.setAttributeNS\b/g],
       [
         "['computed']",
-        /\[\s*['"](?:style|textContent|classList|className|setAttribute|removeAttribute|setProperty|innerHTML|dataset)['"]\s*\]/g,
+        /\[\s*['"](?:style|textContent|classList|className|setAttribute|removeAttribute|setProperty|innerHTML|dataset|outerHTML|insertAdjacentHTML|cssText|toggleAttribute)['"]\s*\]/g,
       ],
     ]);
     expect(FORCED_REFLOW_READS).toEqual([
@@ -1095,7 +1130,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       ['.innerText', /\.innerText\b/g],
       ['.getBoundingClientRect', /\.getBoundingClientRect\b/g],
       ['.getClientRects', /\.getClientRects\b/g],
-      ['getComputedStyle', /(?<![\w$])getComputedStyle\s*\(/g],
+      ['getComputedStyle', /(?<![\w$])getComputedStyle\b/g],
       ['getUiScale(', /(?<![\w$])getUiScale\s*\(/g],
     ]);
     expect(FRAME_DRIVERS).toEqual([

@@ -792,7 +792,11 @@ describe('curated bare-named pure cores (cross-check)', () => {
 // next module of the same shape would have had to remember to copy.
 //
 // This sweep makes the classification total. Every src/ui/**/*.ts lands in
-// exactly one bucket:
+// exactly one of THIS sweep's buckets. That is a statement about which gate
+// owns a module here, not a claim that no other gate also covers it: a
+// *_window.ts is deliberately covered twice, by this sweep as a module and by
+// the painter gate as a painter, and the two answer different questions.
+// The buckets:
 //
 //   pure core       *_view / *_core, or a bare name registered in UI_PURE_CORES
 //                   -> the pure-core sweeps above
