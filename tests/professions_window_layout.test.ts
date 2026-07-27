@@ -42,6 +42,13 @@ interface WorldState {
     amendsRequired: number;
   };
   gathering: { professionId: string; skill: number; maxSkill: number }[];
+  toolEffects?: {
+    professionId: string;
+    effectId: string;
+    charges: number;
+    maxCharges: number;
+    confirmMode: 'always' | 'prompt';
+  }[];
 }
 
 // An attuned, tiered identity so the window opens in full mode (hero band,
@@ -102,6 +109,7 @@ function makeWindow(
         gatheringProficiency: Object.fromEntries(
           state.gathering.map((row) => [row.professionId, row.skill]),
         ),
+        toolEffectSlots: state.toolEffects ?? [],
       }) as never,
     closeOthers: () => {},
     hideTooltip: () => {},
@@ -285,6 +293,70 @@ describe('ProfessionsWindow: gathering rows', () => {
     const { el } = makeWindow(state);
     expect(el.querySelectorAll('.prof-gather-row')).toHaveLength(0);
     expect(el.querySelector('.prof-gathering')).toBeNull();
+  });
+});
+
+describe('ProfessionsWindow: the slotted tool effect row', () => {
+  const slotted = (over: Record<string, unknown> = {}) => {
+    const state = baseState();
+    state.toolEffects = [
+      {
+        professionId: 'mining',
+        effectId: 'gatherers_cache',
+        charges: 12,
+        maxCharges: 30,
+        confirmMode: 'always',
+        ...over,
+      } as WorldState['toolEffects'] extends (infer R)[] | undefined ? R : never,
+    ];
+    return state;
+  };
+
+  it('paints NO effect line for a player with no slot, which is every player today', () => {
+    // The default surface. An always-present "no effect" line would be three
+    // permanent rows of absence in a window that is otherwise all progress.
+    const { el } = makeWindow(baseState());
+    expect(el.querySelectorAll('.prof-effect')).toHaveLength(0);
+  });
+
+  it('paints one line under the slotted profession only, never under the others', () => {
+    const { el } = makeWindow(slotted());
+    const lines = el.querySelectorAll('.prof-effect');
+    expect(lines).toHaveLength(1);
+    // It must sit INSIDE the mining row, not loose in the section: a line under
+    // the wrong bar would tell the player the wrong tool is affected.
+    const rows = [...el.querySelectorAll('.prof-gather-row')];
+    const owning = rows.filter((r) => r.querySelector('.prof-effect'));
+    expect(owning).toHaveLength(1);
+    expect(owning[0].querySelector('.prof-craft-name')?.textContent).toBe('Mining');
+    expect(lines[0].querySelector('.prof-effect-name')?.textContent).toBe("Gatherer's Cache");
+    expect(lines[0].querySelector('.prof-effect-charges')?.textContent).toBe('12 of 30 charges');
+  });
+
+  it('says a spent slot is spent in words rather than showing 0 of 30', () => {
+    // A bare zero reads like a broken tool. The tool is fine; only the effect
+    // is spent, and it recharges.
+    const { el } = makeWindow(slotted({ charges: 0 }));
+    const line = el.querySelector('.prof-effect');
+    expect(line?.classList.contains('prof-effect-spent')).toBe(true);
+    expect(line?.querySelector('.prof-effect-charges')?.textContent).toBe(
+      'Spent, needs recharging',
+    );
+    expect(el.innerHTML).not.toContain('0 of 30 charges');
+  });
+
+  it('shows the prompt-on-use chip only when the owner chose it', () => {
+    expect(makeWindow(slotted()).el.querySelector('.prof-effect-prompt')).toBeNull();
+    const { el } = makeWindow(slotted({ confirmMode: 'prompt' }));
+    expect(el.querySelector('.prof-effect-prompt')?.textContent).toBe('Asks before each use');
+  });
+
+  it('paints nothing for an effect id the name table does not know', () => {
+    // A persisted slot can name an effect a later content change retired; the
+    // row must render nothing rather than print a raw id at a player.
+    const { el } = makeWindow(slotted({ effectId: 'retired_effect' }));
+    expect(el.querySelectorAll('.prof-effect')).toHaveLength(0);
+    expect(el.innerHTML).not.toContain('retired_effect');
   });
 });
 

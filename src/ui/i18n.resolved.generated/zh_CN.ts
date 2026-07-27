@@ -2326,13 +2326,13 @@ export const zh_CN: EnTranslations = {
       "ceilingRare": "稀有品质上限",
       "ceilingCommon": "普通品质上限",
       "skillValue": "{skill} / {max}",
-      "toolEffectCharges": "{charges} of {max} charges",
-      "toolEffectSpent": "Spent, needs recharging",
-      "toolEffectPrompts": "Asks before each use",
+      "toolEffectCharges": "剩余 {charges} / {max} 次",
+      "toolEffectSpent": "已耗尽，需要充能",
+      "toolEffectPrompts": "每次使用前询问",
       "toolEffectName": {
-        "gatherersCache": "Gatherer's Cache",
-        "artisansEye": "Artisan's Eye",
-        "quickeningCharm": "Springback Charm"
+        "gatherersCache": "采集者储囊",
+        "artisansEye": "匠人之眼",
+        "quickeningCharm": "回春符"
       },
       "tierPipAria": "阶级 {tier}",
       "nextUnlockTier": "距离下一阶级还差 {points} 点：打造大师之作的几率将提升",
@@ -3959,7 +3959,7 @@ export const zh_CN: EnTranslations = {
       "nodesHeading": "各区域节点",
       "nodesNote": "节点的位置、阶级、所需工具与产出；每个节点在你采集后{respawn}秒才会为你本人刷新。",
       "toolsHeading": "工具",
-      "toolsNote": "Every node needs its trade's tool in your bags, tier 1 included: no pick, no ore, and no pole, no fish. The vendor ladder covers tiers 1 to 3, and each hub stocks only the tiers its own ground uses, so the tier-1 tool is sold at every zone hub while the rungs above it are sold where the veins that need them are. Merchants also ask for proficiency in the tool's own trade before they will sell those rungs, {tier2Prof} for tier 2 and {tier3Prof} for tier 3, and the row names the requirement. A tool just has to be in your bags, there is no equip slot and no durability, so each is a one-time purchase, and anything you already own keeps working. Only the tier matters to the gate: a rarer tool of the same tier opens nothing extra. Rarity is not only colour, though. It makes a slotted tool effect last longer, and on a rod it widens the reel window.\n\nA better tool buys three things, not two. It opens higher-tier ground, it shortens the cast, and it improves what comes out: work a vein with a tool ranked ABOVE the zone's own material and the harvest yields the fine grade of it instead of the plain one. The vein has to be one of the zone's full-grade ones, so the easier veins a zone keeps for travellers still yield the ordinary material. Fine materials are what the crafted tool recipes consume, and a fine grade counts as its ordinary version anywhere a recipe or a work order asks for one, so upgrading never strands you: it just means your copper ore arrives as Fine Copper Ore.\n\nAbove the vendor ladder each trade has two crafted tools, tier 4 and tier 5, made at the toolworks by engineers, or bought with Delve Marks at the Drowned Litany counter. No merchant ever sells them for coin. Fishing has its own pair, and they are learned from the toolmaker rather than known from the start. No node and no water today needs more than tier 3, so the top two rungs buy speed, grade and a kinder reel window rather than access, and they will be the entry ticket when higher-tier ground arrives.",
+      "toolsNote": "每处资源点都需要对应行业的工具放在背包里，第 1 级也不例外：没有镐就采不到矿，没有鱼竿就钓不到鱼。商人阶梯覆盖第 1 到 3 级，每个聚落只出售自己周边地形用得上的等级，因此第 1 级工具在每个区域聚落都有售，更高的等级则在需要它们的矿脉附近出售。购买这些更高等级时，商人还会要求你在该行业中具备熟练度，第 2 级需要 {tier2Prof}，第 3 级需要 {tier3Prof}，商品行会注明该要求。工具只需放在背包中即可，没有装备栏也没有耐久度，因此每件都是一次性购买，你已经拥有的工具会一直有效。只有等级会影响限制：同等级中更稀有的工具并不会多开放任何东西。不过稀有度并不只是颜色，它会让镶嵌的工具效果持续更久，装在鱼竿上还会加宽收线时机。\n\n更好的工具带来三样东西，而不是两样。它开放更高等级的地形，缩短采集时间，还会提升产出：用等级高于该区域自身材料的工具开采矿脉，收获的将是精制品级而非普通品级。该矿脉必须是这个区域的完整品级矿脉，因此区域为旅行者保留的简易矿脉依然产出普通材料。精制材料正是制作工具配方所消耗的东西，而且在任何配方或工单要求普通版本的地方，精制品级都可以顶替，所以升级永远不会让你陷入困境：只是你的铜矿石会以精制铜矿石的形式到手。\n\n在商人阶梯之上，每个行业还有两件制作工具，第 4 级和第 5 级，由工程师在工具工坊制作，或在溺诵秘所的柜台用秘境印记购买。任何商人都不会用金币出售它们。钓鱼有自己的一对鱼竿，它们需要向工具匠学习，而非一开始就会。目前没有任何资源点或水域需要超过第 3 级，因此最高的两级买到的是速度、品级和更宽松的收线时机而非准入资格，等更高等级的地形出现时，它们将成为入场券。",
       "toolCrafted": "制作获得（{craft}）",
       "toolVendor": "{name}（{hub}）",
       "toolUnavailable": "无出售",

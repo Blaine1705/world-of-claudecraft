@@ -148,42 +148,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectPrompts",
     "hudChrome.professions.toolEffectSpent"
   ],
-  "zh_CN": [
-    "guide.profPages.toolsNote",
-    "hudChrome.professions.toolEffectCharges",
-    "hudChrome.professions.toolEffectName.artisansEye",
-    "hudChrome.professions.toolEffectName.gatherersCache",
-    "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
-    "hudChrome.professions.toolEffectSpent"
-  ],
-  "zh_TW": [
-    "guide.profPages.toolsNote",
-    "hudChrome.professions.toolEffectCharges",
-    "hudChrome.professions.toolEffectName.artisansEye",
-    "hudChrome.professions.toolEffectName.gatherersCache",
-    "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
-    "hudChrome.professions.toolEffectSpent"
-  ],
-  "ko_KR": [
-    "guide.profPages.toolsNote",
-    "hudChrome.professions.toolEffectCharges",
-    "hudChrome.professions.toolEffectName.artisansEye",
-    "hudChrome.professions.toolEffectName.gatherersCache",
-    "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
-    "hudChrome.professions.toolEffectSpent"
-  ],
-  "ja_JP": [
-    "guide.profPages.toolsNote",
-    "hudChrome.professions.toolEffectCharges",
-    "hudChrome.professions.toolEffectName.artisansEye",
-    "hudChrome.professions.toolEffectName.gatherersCache",
-    "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
-    "hudChrome.professions.toolEffectSpent"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -207,15 +175,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectPrompts",
     "hudChrome.professions.toolEffectSpent"
   ],
-  "ru_RU": [
-    "guide.profPages.toolsNote",
-    "hudChrome.professions.toolEffectCharges",
-    "hudChrome.professions.toolEffectName.artisansEye",
-    "hudChrome.professions.toolEffectName.gatherersCache",
-    "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
-    "hudChrome.professions.toolEffectSpent"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",

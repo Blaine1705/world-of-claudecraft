@@ -34,6 +34,16 @@ interface WorldState {
     amendsRequired: number;
   };
   gathering: { professionId: string; skill: number; maxSkill: number }[];
+  // The viewer's slotted tool effects (IWorld `toolEffectSlots`). Defaults to
+  // empty, which is what every player reads today, so the existing cases keep
+  // asserting the no-effect surface.
+  toolEffects?: {
+    professionId: string;
+    effectId: string;
+    charges: number;
+    maxCharges: number;
+    confirmMode: 'always' | 'prompt';
+  }[];
 }
 
 // An attuned, tiered identity so the window opens in full mode (ring, ten
@@ -83,6 +93,7 @@ function makeWindow(
         gatheringProficiency: Object.fromEntries(
           state.gathering.map((row) => [row.professionId, row.skill]),
         ),
+        toolEffectSlots: state.toolEffects ?? [],
       }) as never,
     closeOthers: () => {},
     hideTooltip: () => {},

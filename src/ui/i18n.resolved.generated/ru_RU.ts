@@ -2326,13 +2326,13 @@ export const ru_RU: EnTranslations = {
       "ceilingRare": "Потолок редкого",
       "ceilingCommon": "Потолок обычного качества",
       "skillValue": "{skill} / {max}",
-      "toolEffectCharges": "{charges} of {max} charges",
-      "toolEffectSpent": "Spent, needs recharging",
-      "toolEffectPrompts": "Asks before each use",
+      "toolEffectCharges": "Осталось зарядов: {charges} из {max}",
+      "toolEffectSpent": "Израсходовано, нужна подзарядка",
+      "toolEffectPrompts": "Спрашивать перед каждым применением",
       "toolEffectName": {
-        "gatherersCache": "Gatherer's Cache",
-        "artisansEye": "Artisan's Eye",
-        "quickeningCharm": "Springback Charm"
+        "gatherersCache": "Сумка собирателя",
+        "artisansEye": "Глаз ремесленника",
+        "quickeningCharm": "Оберег возрождения"
       },
       "tierPipAria": "Ранг {tier}",
       "nextUnlockTier": "До следующего ранга {points} навыка: шанс шедевра повысится",
@@ -3959,7 +3959,7 @@ export const ru_RU: EnTranslations = {
       "nodesHeading": "Залежи по зонам",
       "nodesNote": "Где лежат залежи, их уровень, нужный инструмент и добыча; каждая залежь возрождается лично для вас через {respawn} секунд после вашего сбора.",
       "toolsHeading": "Инструменты",
-      "toolsNote": "Every node needs its trade's tool in your bags, tier 1 included: no pick, no ore, and no pole, no fish. The vendor ladder covers tiers 1 to 3, and each hub stocks only the tiers its own ground uses, so the tier-1 tool is sold at every zone hub while the rungs above it are sold where the veins that need them are. Merchants also ask for proficiency in the tool's own trade before they will sell those rungs, {tier2Prof} for tier 2 and {tier3Prof} for tier 3, and the row names the requirement. A tool just has to be in your bags, there is no equip slot and no durability, so each is a one-time purchase, and anything you already own keeps working. Only the tier matters to the gate: a rarer tool of the same tier opens nothing extra. Rarity is not only colour, though. It makes a slotted tool effect last longer, and on a rod it widens the reel window.\n\nA better tool buys three things, not two. It opens higher-tier ground, it shortens the cast, and it improves what comes out: work a vein with a tool ranked ABOVE the zone's own material and the harvest yields the fine grade of it instead of the plain one. The vein has to be one of the zone's full-grade ones, so the easier veins a zone keeps for travellers still yield the ordinary material. Fine materials are what the crafted tool recipes consume, and a fine grade counts as its ordinary version anywhere a recipe or a work order asks for one, so upgrading never strands you: it just means your copper ore arrives as Fine Copper Ore.\n\nAbove the vendor ladder each trade has two crafted tools, tier 4 and tier 5, made at the toolworks by engineers, or bought with Delve Marks at the Drowned Litany counter. No merchant ever sells them for coin. Fishing has its own pair, and they are learned from the toolmaker rather than known from the start. No node and no water today needs more than tier 3, so the top two rungs buy speed, grade and a kinder reel window rather than access, and they will be the entry ticket when higher-tier ground arrives.",
+      "toolsNote": "Для каждой залежи нужен инструмент её ремесла в сумках, включая 1-й уровень: нет кирки, нет руды, нет удочки, нет рыбы. Торговая лестница охватывает уровни с 1-го по 3-й, и каждый узел держит только те уровни, которых требует его собственная земля, поэтому инструмент 1-го уровня продаётся в узле каждой зоны, а ступени выше продаются там, где лежат жилы, которым они нужны. За эти ступени торговцы спрашивают ещё и мастерство в самом ремесле инструмента: {tier2Prof} для 2-го уровня и {tier3Prof} для 3-го, и строка называет это требование. Инструменту достаточно лежать в сумках, ячейки экипировки и прочности у него нет, так что каждый покупается один раз, а то, чем вы уже владеете, продолжает работать. На ограничение влияет только уровень: более редкий инструмент того же уровня не открывает ничего сверх того. Но редкость не только цвет. Она продлевает вставленный эффект инструмента, а на удочке расширяет окно подсечки.\n\nХороший инструмент даёт три вещи, а не две. Он открывает землю более высокого уровня, сокращает сбор и улучшает то, что выходит: обработайте жилу инструментом рангом ВЫШЕ собственного материала зоны, и добыча даст тонкий сорт вместо обычного. Жила должна быть одной из полносортных жил зоны, поэтому лёгкие жилы, которые зона хранит для странников, по-прежнему дают обычный материал. Тонкие материалы — это то, что потребляют рецепты кованых инструментов, и тонкий сорт считается своей обычной версией всюду, где рецепт или наряд просит обычную, так что улучшение никогда не заводит в тупик: ваша медная руда просто приходит как тонкая медная руда.\n\nВыше торговой лестницы у каждого ремесла есть два кованых инструмента, 4-го и 5-го уровня, сделанные инженерами в мастерской инструментов или купленные за метки вылазок у стойки Утонувшей литании. Ни один торговец не продаёт их за монету. У рыбалки своя пара, и ей учат у мастера инструментов, а не знают с самого начала. Сегодня ни одна залежь и ни одна вода не требуют больше 3-го уровня, поэтому две верхние ступени покупают скорость, сорт и более щадящее окно подсечки, а не доступ, и они станут входным билетом, когда появится земля более высокого уровня.",
       "toolCrafted": "Создается ({craft})",
       "toolVendor": "{name} ({hub})",
       "toolUnavailable": "Не продается",

@@ -2326,13 +2326,13 @@ export const ko_KR: EnTranslations = {
       "ceilingRare": "희귀 상한",
       "ceilingCommon": "일반 상한",
       "skillValue": "{skill} / {max}",
-      "toolEffectCharges": "{charges} of {max} charges",
-      "toolEffectSpent": "Spent, needs recharging",
-      "toolEffectPrompts": "Asks before each use",
+      "toolEffectCharges": "{charges} / {max}회 남음",
+      "toolEffectSpent": "모두 소모됨, 재충전 필요",
+      "toolEffectPrompts": "사용할 때마다 확인",
       "toolEffectName": {
-        "gatherersCache": "Gatherer's Cache",
-        "artisansEye": "Artisan's Eye",
-        "quickeningCharm": "Springback Charm"
+        "gatherersCache": "채집가의 주머니",
+        "artisansEye": "장인의 눈",
+        "quickeningCharm": "회복의 부적"
       },
       "tierPipAria": "티어 {tier}",
       "nextUnlockTier": "다음 티어까지 숙련도 {points} 남음: 걸작 확률이 높아집니다",
@@ -3959,7 +3959,7 @@ export const ko_KR: EnTranslations = {
       "nodesHeading": "지역별 채집물",
       "nodesNote": "채집물의 위치, 티어, 필요한 도구, 산출물. 각 채집물은 내가 채집한 뒤 {respawn}초가 지나야 나에게 다시 생겨난다.",
       "toolsHeading": "도구",
-      "toolsNote": "Every node needs its trade's tool in your bags, tier 1 included: no pick, no ore, and no pole, no fish. The vendor ladder covers tiers 1 to 3, and each hub stocks only the tiers its own ground uses, so the tier-1 tool is sold at every zone hub while the rungs above it are sold where the veins that need them are. Merchants also ask for proficiency in the tool's own trade before they will sell those rungs, {tier2Prof} for tier 2 and {tier3Prof} for tier 3, and the row names the requirement. A tool just has to be in your bags, there is no equip slot and no durability, so each is a one-time purchase, and anything you already own keeps working. Only the tier matters to the gate: a rarer tool of the same tier opens nothing extra. Rarity is not only colour, though. It makes a slotted tool effect last longer, and on a rod it widens the reel window.\n\nA better tool buys three things, not two. It opens higher-tier ground, it shortens the cast, and it improves what comes out: work a vein with a tool ranked ABOVE the zone's own material and the harvest yields the fine grade of it instead of the plain one. The vein has to be one of the zone's full-grade ones, so the easier veins a zone keeps for travellers still yield the ordinary material. Fine materials are what the crafted tool recipes consume, and a fine grade counts as its ordinary version anywhere a recipe or a work order asks for one, so upgrading never strands you: it just means your copper ore arrives as Fine Copper Ore.\n\nAbove the vendor ladder each trade has two crafted tools, tier 4 and tier 5, made at the toolworks by engineers, or bought with Delve Marks at the Drowned Litany counter. No merchant ever sells them for coin. Fishing has its own pair, and they are learned from the toolmaker rather than known from the start. No node and no water today needs more than tier 3, so the top two rungs buy speed, grade and a kinder reel window rather than access, and they will be the entry ticket when higher-tier ground arrives.",
+      "toolsNote": "모든 채집물에는 해당 전문 기술의 도구가 가방에 있어야 하며, 1단계도 예외가 아닙니다. 곡괭이가 없으면 광석도 없고, 낚싯대가 없으면 물고기도 없습니다. 상인 사다리는 1단계부터 3단계까지를 다루고, 각 거점은 자기 지역이 필요로 하는 단계만 취급합니다. 그래서 1단계 도구는 모든 지역 거점에서 팔리지만, 그 위 단계는 그것을 필요로 하는 광맥이 있는 곳에서 팔립니다. 상인은 그 단계를 팔기 전에 해당 전문 기술의 숙련도도 요구합니다. 2단계는 {tier2Prof}, 3단계는 {tier3Prof}가 필요하며, 판매 항목에 그 조건이 표시됩니다. 도구는 가방에 있기만 하면 되고 장비 칸도 내구도도 없으므로 한 번만 사면 되며, 이미 가진 도구는 계속 쓸 수 있습니다. 제한에 관여하는 것은 단계뿐입니다. 같은 단계에서 더 희귀한 도구라고 해서 더 열리는 것은 없습니다. 다만 희귀도가 색깔만인 것은 아닙니다. 장착한 도구 효과가 더 오래가고, 낚싯대라면 낚아채는 시간도 넓어집니다.\n\n더 좋은 도구는 두 가지가 아니라 세 가지를 줍니다. 더 높은 단계의 지형을 열고, 채집 시간을 줄이고, 나오는 것을 좋게 합니다. 그 지역 자체의 재료보다 높은 단계의 도구로 광맥을 캐면 평범한 재료 대신 고급 등급이 나옵니다. 대상은 그 지역의 완전 등급 광맥이어야 하므로, 여행자를 위해 남겨둔 쉬운 광맥에서는 여전히 평범한 재료가 나옵니다. 고급 재료는 제작 도구 제조법이 소모하는 것이며, 제조법이나 작업 지시가 평범한 판본을 요구하는 곳이라면 어디서든 고급 등급이 그것을 대신합니다. 그러니 장비를 올린다고 막히는 일은 없습니다. 구리 광석이 고급 구리 광석으로 들어올 뿐입니다.\n\n상인 사다리 위로는 각 전문 기술마다 4단계와 5단계의 제작 도구가 둘 있습니다. 기술자가 도구 공방에서 만들거나, 익사한 연도의 상점에서 탐굴 증표로 살 수 있습니다. 어떤 상인도 동전으로는 팔지 않습니다. 낚시에는 자체 한 쌍이 있으며, 처음부터 아는 것이 아니라 도구 장인에게서 배웁니다. 지금은 3단계를 넘게 요구하는 채집물도 물도 없으므로, 최상위 두 단계가 사는 것은 접근 권한이 아니라 속도와 등급과 넉넉한 낚아채기 시간입니다. 더 높은 단계의 지형이 나오면 그것들이 입장권이 될 것입니다.",
       "toolCrafted": "제작({craft})",
       "toolVendor": "{name}({hub})",
       "toolUnavailable": "판매 없음",

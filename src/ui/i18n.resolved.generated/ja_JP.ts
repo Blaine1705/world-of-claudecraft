@@ -2326,13 +2326,13 @@ export const ja_JP: EnTranslations = {
       "ceilingRare": "レア上限",
       "ceilingCommon": "コモン上限",
       "skillValue": "{skill} / {max}",
-      "toolEffectCharges": "{charges} of {max} charges",
-      "toolEffectSpent": "Spent, needs recharging",
-      "toolEffectPrompts": "Asks before each use",
+      "toolEffectCharges": "残り {charges} / {max} 回",
+      "toolEffectSpent": "使い切りました。再充填が必要です",
+      "toolEffectPrompts": "使用のたびに確認する",
       "toolEffectName": {
-        "gatherersCache": "Gatherer's Cache",
-        "artisansEye": "Artisan's Eye",
-        "quickeningCharm": "Springback Charm"
+        "gatherersCache": "採集者の貯蔵袋",
+        "artisansEye": "職人の眼",
+        "quickeningCharm": "早戻りの護符"
       },
       "tierPipAria": "ティア {tier}",
       "nextUnlockTier": "次のティアまであと {points}：傑作の成功率が上がります",
@@ -3959,7 +3959,7 @@ export const ja_JP: EnTranslations = {
       "nodesHeading": "ゾーン別ノード",
       "nodesNote": "ノードの場所・ティア・必要な道具・産出の一覧です。各ノードはあなたの採集から{respawn}秒後に、あなた専用に再出現します。",
       "toolsHeading": "道具",
-      "toolsNote": "Every node needs its trade's tool in your bags, tier 1 included: no pick, no ore, and no pole, no fish. The vendor ladder covers tiers 1 to 3, and each hub stocks only the tiers its own ground uses, so the tier-1 tool is sold at every zone hub while the rungs above it are sold where the veins that need them are. Merchants also ask for proficiency in the tool's own trade before they will sell those rungs, {tier2Prof} for tier 2 and {tier3Prof} for tier 3, and the row names the requirement. A tool just has to be in your bags, there is no equip slot and no durability, so each is a one-time purchase, and anything you already own keeps working. Only the tier matters to the gate: a rarer tool of the same tier opens nothing extra. Rarity is not only colour, though. It makes a slotted tool effect last longer, and on a rod it widens the reel window.\n\nA better tool buys three things, not two. It opens higher-tier ground, it shortens the cast, and it improves what comes out: work a vein with a tool ranked ABOVE the zone's own material and the harvest yields the fine grade of it instead of the plain one. The vein has to be one of the zone's full-grade ones, so the easier veins a zone keeps for travellers still yield the ordinary material. Fine materials are what the crafted tool recipes consume, and a fine grade counts as its ordinary version anywhere a recipe or a work order asks for one, so upgrading never strands you: it just means your copper ore arrives as Fine Copper Ore.\n\nAbove the vendor ladder each trade has two crafted tools, tier 4 and tier 5, made at the toolworks by engineers, or bought with Delve Marks at the Drowned Litany counter. No merchant ever sells them for coin. Fishing has its own pair, and they are learned from the toolmaker rather than known from the start. No node and no water today needs more than tier 3, so the top two rungs buy speed, grade and a kinder reel window rather than access, and they will be the entry ticket when higher-tier ground arrives.",
+      "toolsNote": "どの採集ポイントにも、その専門の道具をバッグに入れておく必要があります。ティア1も例外ではありません。つるはしがなければ鉱石は採れず、釣り竿がなければ魚も釣れません。商人のはしごはティア1から3までを扱い、各拠点は自分の土地で使うティアだけを置いています。そのためティア1の道具はどの地域拠点でも売られていますが、その上の段は、それを必要とする鉱脈のある場所で売られます。その段を買うには、商人はその専門の熟練度も求めます。ティア2には {tier2Prof}、ティア3には {tier3Prof} が必要で、商品欄にその条件が示されます。道具はバッグに入っていればよく、装備枠も耐久度もありません。ですから購入は一度きりで、すでに持っている道具はそのまま使えます。条件に関わるのはティアだけです。同じティアでレアリティが高い道具でも、開けるものが増えるわけではありません。ただしレアリティは色だけのものではありません。差し込んだ道具効果の持ちが長くなり、釣り竿ならリールの猶予も広がります。\n\n良い道具が買うものは二つではなく三つです。より高いティアの土地を開き、採集時間を縮め、採れるものを良くします。その地域の素材より上のティアの道具で鉱脈を掘ると、通常の素材ではなく上質級が手に入ります。対象はその地域の完全品級の鉱脈に限られるため、旅人向けに残された易しい鉱脈からは通常の素材が出ます。上質素材は道具のレシピが消費するものであり、レシピや依頼が通常版を求めるところではどこでも上質級がその代わりになります。ですから強化して行き詰まることはありません。銅鉱石が上質な銅鉱石として手に入るようになるだけです。\n\n商人のはしごの上には、各専門にティア4とティア5の製作道具が二つあります。技師が道具工房で作るか、溺れた連祷のカウンターで探索の印を使って購入します。硬貨でこれらを売る商人はいません。釣りには専用の一対があり、最初から知っているのではなく道具職人から習います。今のところティア3を超えて必要とする採集ポイントも水域もないため、最上位の二段が買うのは入場条件ではなく、速さと品級と優しいリールの猶予です。より高いティアの土地が現れたとき、それらが入場券になります。",
       "toolCrafted": "製作品（{craft}）",
       "toolVendor": "{name}（{hub}）",
       "toolUnavailable": "非売品",
