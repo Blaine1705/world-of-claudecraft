@@ -31,6 +31,7 @@ const entrySource = `
   export { ZONE3_MOBS } from './src/sim/content/zone3.ts';
   export { TEMPLE_MOBS } from './src/sim/content/temple.ts';
   export { DELVE_COMPANIONS, DELVE_AFFIXES } from './src/sim/content/delves/index.ts';
+  export { DELVE_SHOPS } from './src/sim/content/delves/shop.ts';
   export { DEEDS, DEED_ORDER } from './src/sim/content/deeds.ts';
   export { DEED_IMAGE_IDS } from './src/ui/deed_image_ids.ts';
   export { VISUALS, visualKeyFor } from './src/render/characters/manifest.ts';
@@ -109,6 +110,7 @@ const {
   NPCS,
   DELVE_COMPANIONS,
   DELVE_AFFIXES,
+  DELVE_SHOPS,
   DEEDS,
   DEED_ORDER,
   DEED_IMAGE_IDS,
@@ -610,6 +612,17 @@ const craftedByCraft = (itemId) => {
   const recipe = ALL_RECIPES.find((r) => r.resultItemId === itemId);
   return recipe ? recipe.professionId : null;
 };
+// The Delve Marks price, for a tool a delve counter stocks. Without this the
+// Source column reads "Crafted (Engineering)" for the eight top tools while the
+// prose directly above the table promises a Marks route, which is the table
+// contradicting its own page.
+const marksPriceFor = (itemId) => {
+  for (const entries of Object.values(DELVE_SHOPS)) {
+    const row = entries.find((e) => e.itemId === itemId);
+    if (row) return row.marks;
+  }
+  return null;
+};
 const toolRow = (itemId, tier) => {
   const def = ITEMS[itemId];
   const vendors = toolVendors(itemId);
@@ -621,6 +634,7 @@ const toolRow = (itemId, tier) => {
     priceCopper: def.buyValue ?? null,
     vendors,
     ...(craftedBy ? { craftedBy } : {}),
+    ...(marksPriceFor(itemId) !== null ? { priceMarks: marksPriceFor(itemId) } : {}),
   };
 };
 const toolLadderFor = (professionId) => {
@@ -1019,6 +1033,8 @@ export interface GuideProfTool {
   priceCopper: number | null;
   vendors: { name: string; hub: string }[];
   craftedBy?: string;
+  /** Delve Marks price, for a tool a delve counter stocks. Absent otherwise. */
+  priceMarks?: number;
 }
 
 export interface GuideProfNodeRow {

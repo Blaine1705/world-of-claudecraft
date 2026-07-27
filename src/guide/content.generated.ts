@@ -161,6 +161,8 @@ export interface GuideProfTool {
   priceCopper: number | null;
   vendors: { name: string; hub: string }[];
   craftedBy?: string;
+  /** Delve Marks price, for a tool a delve counter stocks. Absent otherwise. */
+  priceMarks?: number;
 }
 
 export interface GuideProfNodeRow {
@@ -6979,7 +6981,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "rare",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 24
       },
       {
         "name": "Glyphsteel Mining Pick",
@@ -6987,7 +6990,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "epic",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 56
       }
     ],
     "nodes": [
@@ -7104,7 +7108,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "rare",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 24
       },
       {
         "name": "Highpine Axe",
@@ -7112,7 +7117,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "epic",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 56
       }
     ],
     "nodes": [
@@ -7229,7 +7235,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "rare",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 24
       },
       {
         "name": "Sunpetal Sickle",
@@ -7237,7 +7244,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "epic",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 56
       }
     ],
     "nodes": [
@@ -7358,7 +7366,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "rare",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 24
       },
       {
         "name": "Tidewrought Fishing Rod",
@@ -7366,7 +7375,8 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "quality": "epic",
         "priceCopper": null,
         "vendors": [],
-        "craftedBy": "engineering"
+        "craftedBy": "engineering",
+        "priceMarks": 56
       }
     ],
     "fishing": {

@@ -243,9 +243,13 @@ export interface ProfessionsViewInput {
    *  gathering row by professionId. Injected as the flat seam list rather than
    *  pre-joined, so this core owns the join and a Vitest can drive it with a
    *  row that has no matching profession. Empty for every player who has never
-   *  slotted an effect; optional so a caller that predates the field is
-   *  unchanged. */
-  toolEffects?: readonly {
+   *  slotted an effect.
+   *
+   *  REQUIRED rather than optional: there is one production caller, so
+   *  optionality bought nothing and cost the compile-time proof. A second
+   *  caller that forgot the field would silently paint no effect row instead
+   *  of failing tsc. */
+  toolEffects: readonly {
     professionId: string;
     effectId: string;
     charges: number;
@@ -433,6 +437,14 @@ export function professionsRefreshSig(
     // The slot rows ride the signature too, so spending a charge on a harvest
     // repaints the row. Without this the count would freeze at whatever it read
     // when some OTHER field last moved the signature.
+    //
+    // Note this hashes EVERY slot row, including one the join above drops for
+    // naming a profession with no gathering row. A charge spent on such a slot
+    // therefore moves the signature and triggers a rebuild that changes nothing
+    // visible. Bounded (at most a handful of gathering professions, on the cold
+    // 500 ms band) and deliberately not filtered: the alternative couples the
+    // signature to the join's drop rule, and a signature that can MISS a repaint
+    // is a worse failure than one that occasionally does a spare one.
     (input.toolEffects ?? []).map((row) => [
       row.professionId,
       row.effectId,

@@ -176,7 +176,11 @@ describe('Drowned Litany shop stock (data pins)', () => {
     const craftedTools = Object.values(ITEMS).filter(
       (def) => def.use?.type === 'gatherTool' && def.use.tier > 3,
     );
-    expect(craftedTools).toHaveLength(8);
+    // At-least, not exactly: a ninth crafted tool added WITH its Marks row is
+    // a legitimate content addition, and an exact pin would red on it with a
+    // misleading message. The per-tool loop below is what actually guards the
+    // claim, and the literal stock pin above already fixes today's count.
+    expect(craftedTools.length).toBeGreaterThanOrEqual(8);
     const rows = new Map(DELVE_SHOPS.drowned_litany.map((e) => [e.itemId, e]));
     for (const tool of craftedTools) {
       const row = rows.get(tool.id);

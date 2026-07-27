@@ -8923,6 +8923,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ノードの場所・ティア・必要な道具・産出の一覧です。各ノードはあなたの採集から{respawn}秒後に、あなた専用に再出現します。',
   'guide.profPages.toolsHeading': '道具',
   'guide.profPages.toolCrafted': '製作品（{craft}）',
+  'guide.profPages.toolCraftedOrMarks': '{craft}で製作、または探索の印 {marks} で購入',
   'guide.profPages.toolVendor': '{name}（{hub}）',
   'guide.profPages.toolUnavailable': '非売品',
   'guide.profPages.priceNone': '非売品',

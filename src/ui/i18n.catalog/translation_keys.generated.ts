@@ -4091,6 +4091,7 @@ export type TranslationKeyFlat =
   | 'guide.profPages.stationLabel'
   | 'guide.profPages.stationNone'
   | 'guide.profPages.toolCrafted'
+  | 'guide.profPages.toolCraftedOrMarks'
   | 'guide.profPages.toolTierReq'
   | 'guide.profPages.toolUnavailable'
   | 'guide.profPages.toolVendor'

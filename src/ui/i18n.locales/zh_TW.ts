@@ -8505,6 +8505,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '節點的位置、階級、所需工具與產出；每個節點在你採集後{respawn}秒才會為你本人重生。',
   'guide.profPages.toolsHeading': '工具',
   'guide.profPages.toolCrafted': '製作獲得（{craft}）',
+  'guide.profPages.toolCraftedOrMarks': '由{craft}製作，或用 {marks} 祕境印記購買',
   'guide.profPages.toolVendor': '{name}（{hub}）',
   'guide.profPages.toolUnavailable': '無販售',
   'guide.profPages.priceNone': '無販售',

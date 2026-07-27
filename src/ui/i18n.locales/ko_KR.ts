@@ -8916,6 +8916,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '채집물의 위치, 티어, 필요한 도구, 산출물. 각 채집물은 내가 채집한 뒤 {respawn}초가 지나야 나에게 다시 생겨난다.',
   'guide.profPages.toolsHeading': '도구',
   'guide.profPages.toolCrafted': '제작({craft})',
+  'guide.profPages.toolCraftedOrMarks': '{craft}(으)로 제작하거나 탐굴 증표 {marks}개로 구매',
   'guide.profPages.toolVendor': '{name}({hub})',
   'guide.profPages.toolUnavailable': '판매 없음',
   'guide.profPages.priceNone': '판매 없음',

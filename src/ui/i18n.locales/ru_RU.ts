@@ -9093,6 +9093,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Где лежат залежи, их уровень, нужный инструмент и добыча; каждая залежь возрождается лично для вас через {respawn} секунд после вашего сбора.',
   'guide.profPages.toolsHeading': 'Инструменты',
   'guide.profPages.toolCrafted': 'Создается ({craft})',
+  'guide.profPages.toolCraftedOrMarks': 'Изготовление ({craft}) или {marks} меток вылазок',
   'guide.profPages.toolVendor': '{name} ({hub})',
   'guide.profPages.toolUnavailable': 'Не продается',
   'guide.profPages.priceNone': 'Не продается',

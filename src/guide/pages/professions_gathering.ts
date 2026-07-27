@@ -32,10 +32,18 @@ export function gatheringById(id: string): GuideProfGathering | undefined {
 }
 
 function toolRow(tool: GuideProfTool): string {
+  // Both routes when a tool has both: the eight top tools are crafted at the
+  // toolworks OR bought with Delve Marks, and naming only the craft made the
+  // table contradict the prose above it.
   const source = tool.craftedBy
-    ? t('guide.profPages.toolCrafted', {
-        craft: t(`hudChrome.craftName.${tool.craftedBy}` as TranslationKey),
-      })
+    ? tool.priceMarks != null
+      ? t('guide.profPages.toolCraftedOrMarks', {
+          craft: t(`hudChrome.craftName.${tool.craftedBy}` as TranslationKey),
+          marks: formatNumber(tool.priceMarks),
+        })
+      : t('guide.profPages.toolCrafted', {
+          craft: t(`hudChrome.craftName.${tool.craftedBy}` as TranslationKey),
+        })
     : tool.vendors.length > 0
       ? t('guide.profPages.toolVendor', { name: tool.vendors[0].name, hub: tool.vendors[0].hub })
       : t('guide.profPages.toolUnavailable');

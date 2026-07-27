@@ -561,6 +561,14 @@ describe('the one rarity ladder both bonuses read', () => {
     expect(rarityLadderIndex(undefined)).toBe(0);
   });
 
+  it('pins the charge rung to a literal, so both sides cannot move together', () => {
+    // Without this, every assertion phrased as `epic - common === BONUS * 3` is
+    // a constant-self-comparison: changing 10 to 25 moves both sides and the
+    // suite stays green. The reel-window constant is pinned the same way, via
+    // the literal tick widths in tests/gathering_rhythm.test.ts.
+    expect(RARITY_DURABILITY_BONUS).toBe(10);
+  });
+
   it('the floor is load-bearing for charges, not just for the reel window', () => {
     // The same -1 would have minted a poor-quality tool's slot with FEWER
     // charges than a common one's. Asserted through the real consumer so the

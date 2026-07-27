@@ -73,7 +73,7 @@ const attunedIdentity = identity({
 });
 
 function view(id: CraftingIdentityView, gathering: ProfessionsViewInput['gathering'] = []) {
-  return buildProfessionsView({ identity: id, gathering });
+  return buildProfessionsView({ identity: id, gathering, toolEffects: [] });
 }
 
 function craftRow(model: ReturnType<typeof buildProfessionsView>, craftId: string) {
@@ -569,6 +569,7 @@ describe('professionsRefreshSig', () => {
     return {
       identity: identity({ craftSkills: { ...ZERO_SKILLS, cooking: 30 }, ...over }),
       gathering,
+      toolEffects: [],
     };
   }
 
@@ -588,7 +589,11 @@ describe('professionsRefreshSig', () => {
     // Pre-sync ClientWorld records may omit zero-skill keys entirely; the
     // CRAFT_RING enumeration with ?? 0 must make {} and explicit zeros equal.
     expect(
-      professionsRefreshSig({ identity: identity({ craftSkills: { cooking: 30 } }), gathering }),
+      professionsRefreshSig({
+        identity: identity({ craftSkills: { cooking: 30 } }),
+        gathering,
+        toolEffects: [],
+      }),
     ).toBe(professionsRefreshSig(input()));
   });
 
