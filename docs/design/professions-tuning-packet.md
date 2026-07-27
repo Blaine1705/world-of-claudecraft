@@ -261,6 +261,29 @@ here: the icons are NOT procedural (the compositor is unreachable for a
 non-weapon item, so each grade ships committed derived art plus provenance),
 and eight of the nine names trip M16, so all nine carry non-Latin fills.
 
+Open after review, deliberately not resolved in this phase:
+
+- **The gather-node tooltip does not preview the grade.** A player standing at
+  a vein cannot see whether their tool will upgrade it. Everything the check
+  needs is already in the tooltip's view core, so it is one boolean plus one
+  copy line, but it ADDS a player-facing readout rather than closing a gap in
+  what shipped, and the discoverability complaint it answers is now covered
+  from two other directions (the item tooltip hint says what a fine grade is
+  and where it comes from, the guide tools note states the rule). Left as a
+  maintainer call, and a natural fit beside phase 7's tool-facing UI.
+- **Two guide prose keys were reworded, which stales their translations in all
+  20 locales with no gate able to see it:** `guide.profPages.toolsNote` and
+  `guide.profPages.craftProse.engineering.materialsBody`. Both need a refresh
+  at the release-time locale fill. The English was factually wrong (it named
+  the retired reagents) so leaving it was not an option.
+- **Work-order economics get worse for an out-tooled player.** The three
+  repeatable work orders pay a fixed copper reward derived from the BASE
+  material's sell value, and a player who can only supply the fine grade hands
+  over twice the vendor value for the same coin. They are never blocked (the
+  grade substitutes), and base-first consumption spends any plain stock they
+  hold first, but the trade is worse than it was. A tuning question, not a
+  defect.
+
 - Nine `fine_` variants, one per zone and type. A tool one tier above the node
   yields the fine version.
 - The six tool recipes are re-specced to consume them, so a better tool is the

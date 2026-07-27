@@ -376,6 +376,12 @@ describe('station reagent sourcing (prog_tools_of_the_trade completability)', ()
       // like its base and no counter carries it either. Derived from the grade
       // table rather than listed, so a tenth material cannot ship with its
       // fine grade looking sourceless.
+      //
+      // Scope note: this guard answers "does the chain reach a live source",
+      // not "can the player who needs it actually reach that source". The tool
+      // tier a fine grade demands, and the fact that no tool recipe asks for a
+      // grade its own output would be needed to gather, are pinned separately
+      // in tests/material_grades.test.ts (the no-closed-circuit case).
       const fineItemId = fineMaterialFor(row.itemId);
       if (fineItemId) nodeYields.add(fineItemId);
     }
