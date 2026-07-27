@@ -222,10 +222,11 @@ export function autoLootForParty(ctx: SimContext, mobId: number, triggerPid: num
  * #1142 semantics: empty or covering every tagged component spreads across
  * every tag (the #1141 behavior); picking fewer concentrates the effort for
  * a higher tier per component, per resolveCorpseFocusHarvest in
- * professions/gathering.ts. Repeats in that array are collapsed before any of
- * it is read (#2474, effectiveFocusComponents): a family is harvested at most
- * once per corpse, so `['hide','hide']` is exactly `['hide']` here and in the
- * pre-claim capacity gate below.
+ * professions/gathering.ts. That array is sanitized before any of it is read
+ * (effectiveFocusComponents): repeats collapse (#2474) and tags this corpse
+ * does not carry drop out (#2504), so `['hide','hide']` and `['hide','junk']`
+ * are both exactly `['hide']` here and in the pre-claim capacity gate below,
+ * and a pick of nothing but junk is exactly the empty pick (it spreads).
  */
 export function harvestCorpse(
   ctx: SimContext,

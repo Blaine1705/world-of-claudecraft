@@ -275,15 +275,22 @@ describe('effectiveFocusComponents collapses a repeated tag (#2474)', () => {
     expect(effectiveFocusComponents(['hide', 'fang'], ['hide'])).toEqual(['hide']);
   });
 
-  it('a pick of repeated JUNK harvests nothing, as a single junk tag already did', () => {
+  it('a pick of repeated JUNK lands wherever a single junk tag lands', () => {
     // The knock-on the padding fix carries, pinned so it reads as intended
     // rather than as a side effect: repeats of a tag that is not on the corpse
-    // also used to clear the threshold and spread the whole corpse. One junk
-    // tag has always yielded nothing (the arm above it), so collapsing the
-    // repeat is what makes the two agree.
+    // also used to clear the threshold and spread the whole corpse, while one
+    // junk tag stayed under it and yielded nothing. The pre-#2474 body really
+    // did split the same intent by how many junk strings the frame carried:
     expect(legacyEffective(['hide', 'fang'], ['zzz', 'zzz'])).toEqual(['hide', 'fang']);
-    expect(effectiveFocusComponents(['hide', 'fang'], ['zzz', 'zzz'])).toEqual([]);
-    expect(effectiveFocusComponents(['hide', 'fang'], ['zzz'])).toEqual([]);
+    expect(legacyEffective(['hide', 'fang'], ['zzz'])).toEqual([]);
+    // Making the two agree is #2474's business and still holds. WHICH value
+    // they agree on is #2504's: an invalid tag is now dropped before either
+    // length test, so an all-junk pick is the empty pick, and the empty pick
+    // spreads (the #1141 default). Superseded, not quietly deleted: both lines
+    // read `.toEqual([])` until #2504, and the argument for the move lives on
+    // effectiveFocusComponents beside the ruling itself.
+    expect(effectiveFocusComponents(['hide', 'fang'], ['zzz', 'zzz'])).toEqual(['hide', 'fang']);
+    expect(effectiveFocusComponents(['hide', 'fang'], ['zzz'])).toEqual(['hide', 'fang']);
   });
 
   it('keeps first-occurrence ORDER, the order yields, grants and ledger entries land in', () => {
@@ -298,18 +305,32 @@ describe('effectiveFocusComponents collapses a repeated tag (#2474)', () => {
     ]);
   });
 
-  it('is identical to the pre-#2474 result for EVERY duplicate-free pick', () => {
+  it('is identical to the pre-#2474 result for EVERY duplicate-free pick naming a real tag', () => {
     // The no-regression half of the acceptance criteria, swept rather than
-    // sampled: every subset of a four-tag corpse, in two orders, plus the
-    // off-corpse tag and the empty pick. A dedupe that touched a
+    // sampled: every subset of a four-tag corpse, in two orders, plus a pick
+    // padded with an off-corpse tag and the empty pick. A dedupe that touched a
     // duplicate-free array at all would fail here.
     const picks = subsets(TAGS).flatMap((s) => [s, [...s].reverse()]);
-    picks.push(['hide', 'not_a_real_tag'], ['not_a_real_tag'], []);
+    picks.push(['hide', 'not_a_real_tag'], []);
     for (const pick of picks) {
       expect(effectiveFocusComponents(TAGS, pick), `pick ${JSON.stringify(pick)}`).toEqual(
         legacyEffective(TAGS, pick),
       );
     }
+    // The one pick that left this sweep, carved out in the open rather than
+    // dropped: #2504 ruled that a pick naming nothing the corpse carries IS the
+    // empty pick, so it spreads where the pre-#2474 body yielded nothing.
+    // Asserted right here, at the sweep it came out of, so the carve-out cannot
+    // pass unread.
+    expect(legacyEffective(TAGS, ['not_a_real_tag'])).toEqual([]);
+    expect(effectiveFocusComponents(TAGS, ['not_a_real_tag'])).toEqual(TAGS);
+    // And this fixture's blind spot, which is why #2504 sweeps narrower corpses
+    // in its own describe below: a two-entry pick can only reach the spread
+    // threshold on a corpse with two tags or fewer, so on these four tags
+    // `['hide','not_a_real_tag']` stays on the filter arm in BOTH bodies and
+    // the padding class #2504 closes is invisible from here.
+    expect(effectiveFocusComponents(TAGS, ['hide', 'not_a_real_tag'])).toEqual(['hide']);
+    expect(legacyEffective(['hide', 'fang'], ['hide', 'not_a_real_tag'])).toEqual(['hide', 'fang']);
   });
 
   it('makes a repeated pick draw and yield EXACTLY what its deduped twin does', () => {
@@ -347,6 +368,223 @@ describe('effectiveFocusComponents collapses a repeated tag (#2474)', () => {
   });
 
   function drawCount(tagged: string[], chosen: string[], seed: number): number {
+    const rng = new Rng(seed);
+    let draws = 0;
+    rng.setObserver(() => {
+      draws++;
+    });
+    resolveCorpseFocusHarvest(tagged, chosen, rng);
+    return draws;
+  }
+});
+
+// #2504: the focus pick is a set of THIS corpse's families. `chosen` arrives
+// straight off the wire (server/game.ts type-filters the array and forwards it),
+// so an entry naming no tag on the corpse is a client-supplied value the sim
+// must not act on. Measured against the raw count it still padded the pick past
+// the `>= taggedComponents.length` spread threshold, so a caller who named one
+// real family plus one junk string harvested the WHOLE corpse at bonus 0,
+// including a family they never named. Same shape as #2474 one step over: an
+// unsanitized array deciding which arm runs, through `.length`.
+describe('effectiveFocusComponents drops a tag the corpse does not carry (#2504)', () => {
+  // The pre-#2504 body, verbatim (the #2474 dedupe, filtering AFTER both length
+  // tests), kept as an independent reference so every claim below compares
+  // against real prior behavior rather than against the function under test.
+  function legacy2503(tagged: readonly string[], chosen: readonly string[]): readonly string[] {
+    const picked = [...new Set(chosen)];
+    return picked.length === 0 || picked.length >= tagged.length
+      ? tagged
+      : picked.filter((c) => tagged.includes(c));
+  }
+
+  function subsets<T>(items: readonly T[]): T[][] {
+    return items.reduce<T[][]>((acc, item) => acc.concat(acc.map((s) => [...s, item])), [[]]);
+  }
+
+  // Corpse widths chosen for their ARMS, not for variety: a two-entry pick
+  // clears `>= tagged.length` on WOLF and stays under it on BOAR, so the two
+  // rows are the padding arm and the filter arm of the same function. WOLF and
+  // BOAR mirror real content (forest_wolf, wild_boar); tests/mob_component_tags
+  // and the sim-level #2504 cases pin them against MOBS.
+  const SOLO = ['hide'];
+  const WOLF = ['hide', 'fang'];
+  const BOAR = ['hide', 'tusk', 'meat'];
+  const WIDE = ['hide', 'fang', 'claw', 'horn'];
+  const CORPSES = [SOLO, WOLF, BOAR, WIDE];
+  const JUNK = ['junk', 'zzz', 'not_a_real_tag'];
+
+  it('the issue case: one junk entry no longer spreads a one-family pick', () => {
+    // forest_wolf's two tags, the corpse the issue reproduces on. The fang line
+    // is the decisive one: it is the family the caller never named, and the
+    // whole harm is that it used to be granted anyway, at the zero
+    // concentration bonus a real two-tag pick earns.
+    expect(legacy2503(WOLF, ['hide', 'junk'])).toEqual(['hide', 'fang']);
+    expect(effectiveFocusComponents(WOLF, ['hide', 'junk'])).toEqual(['hide']);
+    expect(effectiveFocusComponents(WOLF, ['hide'])).toEqual(['hide']);
+    // Same frame one tag map over, so the pin is not a property of 'hide'.
+    expect(effectiveFocusComponents(WOLF, ['fang', 'junk'])).toEqual(['fang']);
+  });
+
+  it('junk is INERT: a pick means exactly what the same pick without junk means', () => {
+    // The contract as one property, and the general statement the case above is
+    // a single instance of. Swept over every corpse width, every subset of its
+    // tags, every subset of three junk strings, and three placements of that
+    // junk (before, after, interleaved), so neither pick length nor pick order
+    // can leave junk load-bearing anywhere.
+    for (const tags of CORPSES) {
+      for (const valid of subsets(tags)) {
+        const expected = effectiveFocusComponents(tags, valid);
+        for (const junk of subsets(JUNK)) {
+          const placements = [
+            [...valid, ...junk],
+            [...junk, ...valid],
+            valid
+              .flatMap((v, i) => (junk[i] === undefined ? [v] : [junk[i], v]))
+              .concat(junk.slice(valid.length)),
+          ];
+          for (const pick of placements) {
+            const label = `tags ${JSON.stringify(tags)} pick ${JSON.stringify(pick)}`;
+            expect(effectiveFocusComponents(tags, pick), label).toEqual(expected);
+          }
+        }
+      }
+    }
+    // Not a sweep of vacuous equalities: the property covers both arms, and
+    // these are the two values it is holding fixed on the corpse that has both.
+    expect(effectiveFocusComponents(WOLF, ['hide'])).toEqual(['hide']);
+    expect(effectiveFocusComponents(WOLF, [])).toEqual(['hide', 'fang']);
+  });
+
+  it('an all-junk pick IS the empty pick, at every junk length (the settled ruling)', () => {
+    // The ordering consequence the issue asked to settle before fixing:
+    // filtering ahead of the length tests sends an all-invalid pick to the
+    // `length === 0` arm. Ruled for spreading, and pinned here. "Ignored
+    // entirely" is then one rule with no exception at the boundary, a junk
+    // string is never the difference between two outcomes, and a client whose
+    // tag vocabulary has drifted from the server's content degrades to the
+    // #1141 default instead of burning a single-use corpse for nothing.
+    //
+    // What it supersedes, shown rather than described: the pre-#2504 body split
+    // the same intent by junk COUNT, spreading at or above the threshold and
+    // yielding nothing below it. There was no coherent prior behavior to keep.
+    expect(legacy2503(WOLF, ['junk'])).toEqual([]);
+    expect(legacy2503(WOLF, ['junk', 'zzz'])).toEqual(['hide', 'fang']);
+    for (const tags of CORPSES) {
+      for (const pick of [['junk'], ['junk', 'zzz'], ['junk', 'zzz', 'qqq'], ['junk', 'junk']]) {
+        const label = `tags ${JSON.stringify(tags)} pick ${JSON.stringify(pick)}`;
+        expect(effectiveFocusComponents(tags, pick), label).toEqual(tags);
+        expect(effectiveFocusComponents(tags, pick), `${label} vs empty`).toEqual(
+          effectiveFocusComponents(tags, []),
+        );
+      }
+    }
+  });
+
+  it('never returns anything the corpse does not carry, on any pick', () => {
+    // The invariant that survives every arm: whatever comes back is a subset of
+    // the corpse's own tags, so a junk string can never reach the grant loop as
+    // an unmapped component.
+    for (const tags of CORPSES) {
+      for (const junk of subsets(JUNK)) {
+        for (const valid of subsets(tags)) {
+          const out = effectiveFocusComponents(tags, [...valid, ...junk]);
+          expect(
+            out.filter((c) => !tags.includes(c)),
+            JSON.stringify([tags, valid, junk]),
+          ).toEqual([]);
+        }
+      }
+    }
+  });
+
+  it('is idempotent: feeding a result back in returns it unchanged', () => {
+    // The sanitize is a fixed point, which is what lets the pre-claim capacity
+    // gate and the roll call it independently and always agree.
+    for (const tags of CORPSES) {
+      for (const junk of subsets(JUNK)) {
+        for (const valid of subsets(tags)) {
+          const once = effectiveFocusComponents(tags, [...valid, ...junk]);
+          expect(effectiveFocusComponents(tags, once), JSON.stringify([tags, valid, junk])).toEqual(
+            once,
+          );
+        }
+      }
+    }
+  });
+
+  it('keeps first-occurrence ORDER once the junk is gone', () => {
+    // Order is load-bearing (#2457): pick order is yield order is chat-line
+    // order. Dropping an entry from the middle must close the gap, not reorder
+    // what is left.
+    expect(effectiveFocusComponents(WIDE, ['fang', 'junk', 'hide'])).toEqual(['fang', 'hide']);
+    expect(effectiveFocusComponents(WIDE, ['junk', 'horn', 'zzz', 'claw'])).toEqual([
+      'horn',
+      'claw',
+    ]);
+    // A pick that covers every tag still spreads in CONTENT order, not pick
+    // order, exactly as it did before this change.
+    expect(effectiveFocusComponents(WOLF, ['fang', 'hide'])).toEqual(['hide', 'fang']);
+    expect(effectiveFocusComponents(WOLF, ['fang', 'hide', 'junk'])).toEqual(['hide', 'fang']);
+  });
+
+  it('composes with the #2474 dedupe: repeats and junk in the same frame', () => {
+    // Both sanitizers run before both length tests, so a frame carrying both
+    // shapes collapses to the same one family, and neither shape can pad the
+    // other past the threshold.
+    expect(legacy2503(WOLF, ['hide', 'hide', 'junk'])).toEqual(['hide', 'fang']);
+    expect(effectiveFocusComponents(WOLF, ['hide', 'hide', 'junk'])).toEqual(['hide']);
+    expect(effectiveFocusComponents(WOLF, ['junk', 'hide', 'junk', 'hide'])).toEqual(['hide']);
+    expect(effectiveFocusComponents(BOAR, ['meat', 'junk', 'meat', 'hide'])).toEqual([
+      'meat',
+      'hide',
+    ]);
+  });
+
+  it('leaves every duplicate-free pick of REAL tags exactly where #2474 left it', () => {
+    // The no-regression half of the acceptance criteria, swept on the corpse
+    // widths that actually have a spread threshold to cross (the #2474 sweep
+    // runs on four tags, where a short pick can never reach it). Every subset of
+    // every corpse, in both orders: if this fix moved anything other than the
+    // junk-bearing picks, it fails here.
+    for (const tags of CORPSES) {
+      for (const pick of subsets(tags).flatMap((s) => [s, [...s].reverse()])) {
+        const label = `tags ${JSON.stringify(tags)} pick ${JSON.stringify(pick)}`;
+        expect(effectiveFocusComponents(tags, pick), label).toEqual(legacy2503(tags, pick));
+      }
+    }
+  });
+
+  it('makes a junk-padded pick draw and yield EXACTLY what its stripped twin does', () => {
+    // End of the pure path: same seed, same yields, same number of draws. The
+    // draw count is the decisive half, since spreading is what a padded pick
+    // used to spend its extra rolls on.
+    const pairs: [readonly string[], string[], string[]][] = [
+      [WOLF, ['hide', 'junk'], ['hide']],
+      [WOLF, ['junk', 'hide'], ['hide']],
+      [WOLF, ['hide', 'junk', 'zzz'], ['hide']],
+      [BOAR, ['meat', 'hide', 'junk'], ['meat', 'hide']],
+      [WOLF, ['junk', 'zzz'], []],
+    ];
+    for (const [tags, padded, stripped] of pairs) {
+      for (let seed = 1; seed <= 20; seed++) {
+        const label = `${JSON.stringify(tags)} ${JSON.stringify(padded)} @${seed}`;
+        expect(resolveCorpseFocusHarvest(tags, padded, new Rng(seed)), label).toEqual(
+          resolveCorpseFocusHarvest(tags, stripped, new Rng(seed)),
+        );
+        expect(drawCount(tags, padded, seed), `${label} draws`).toBe(
+          drawCount(tags, stripped, seed),
+        );
+      }
+    }
+    // Absolute literals under those equalities, so two equal-but-wrong counts
+    // cannot pass: one family costs one tier roll, the wolf spread costs two.
+    // The padded pick used to cost two here; the all-junk pick used to cost 0.
+    expect(drawCount(WOLF, ['hide', 'junk'], 3)).toBe(1);
+    expect(drawCount(WOLF, ['hide'], 3)).toBe(1);
+    expect(drawCount(WOLF, ['junk', 'zzz'], 3)).toBe(2);
+  });
+
+  function drawCount(tagged: readonly string[], chosen: string[], seed: number): number {
     const rng = new Rng(seed);
     let draws = 0;
     rng.setObserver(() => {
