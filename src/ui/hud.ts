@@ -11875,6 +11875,17 @@ export class Hud {
    *  the in-town flag, the budget and a row per component). */
   private lastTownFocusSig = '';
 
+  // Standalone trapping window (#2525): the train / unbind shape, one
+  // windowFocus bridge plus one opener field. The panel was the last window
+  // outside the shared focus system and not one of the two documented opt-outs
+  // (#bags and #bank-window, which pair with another window and must stay
+  // Tab-passable), so it had no Tab trap and no return-to-opener. Invisible
+  // while the panel rebuilt itself twice a second, because focus never survived
+  // long enough to be handed back; #2500 fixed the rebuild, which is what made
+  // the gap reachable.
+  private readonly townFocusWindowFocus = this.windowFocus('#town-focus-window');
+  private townFocusOpenerFocus: HTMLElement | null = null;
+
   private isInTown(): boolean {
     const pos = this.sim.player.pos;
     return isInTownZone(pos, zoneAt(pos.z));
@@ -11889,6 +11900,10 @@ export class Hud {
     this.closeOtherWindows('#town-focus-window');
     this.townFocusDraft = { ...this.sim.townFocus };
     this.renderTownFocus();
+    // AFTER the first paint, the train / unbind ordering: captureFocus records
+    // the opener (the minimap button) and installs the trap over a root that is
+    // by then populated and displayed.
+    this.townFocusOpenerFocus = this.townFocusWindowFocus.captureFocus();
   }
 
   private renderTownFocus(): void {
@@ -11939,10 +11954,16 @@ export class Hud {
     this.renderTownFocus();
   }
 
+  /** The ONE close path: the X and Save go through onClose/onSave, Escape and
+   *  the gamepad go through closeAll -> closeManagedWindow's `town-focus-window`
+   *  case, and the toggle re-press comes straight here. So releasing the trap and
+   *  handing focus back once, here, covers every one of them. */
   closeTownFocus(): void {
     $('#town-focus-window').style.display = 'none';
     this.townFocusDraft = null;
     this.hideTooltip();
+    this.townFocusWindowFocus.restoreFocus(this.townFocusOpenerFocus);
+    this.townFocusOpenerFocus = null;
   }
 
   get townFocusOpen(): boolean {

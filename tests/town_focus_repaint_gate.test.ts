@@ -28,13 +28,22 @@
 //  5. The wiring source pins for the three edges (the slow band, the paint
 //     re-arm, the language switch), each anchored to the REGION it has to live
 //     in rather than to the whole file.
+//
+// Section 6 is issue #2525, the other half of the same story. The panel was the
+// one HUD window never wired into the shared FocusManager, so it had no Tab
+// trap, no return-to-opener and no dialog role. That gap was unreachable while
+// the panel rebuilt itself at 2Hz (focus never survived long enough to be handed
+// back), which is why it lands here, against the same painter and the same Hud
+// methods, rather than in a file of its own.
 
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
 import { FOCUS_POINT_BUDGET } from '../src/sim/professions/focus';
+import { FOCUSABLE_SELECTOR, FocusManager } from '../src/ui/focus_manager';
 import { Hud } from '../src/ui/hud';
+import { t } from '../src/ui/i18n';
 import {
   buildTownFocusView,
   TOWN_FOCUS_COMPONENTS,
@@ -42,6 +51,7 @@ import {
   townFocusRenderSig,
 } from '../src/ui/town_focus_view';
 import { renderTownFocusWindow } from '../src/ui/town_focus_window';
+import { makeWindowFocus, type WindowFocusBridge } from '../src/ui/window_focus';
 
 const COMPONENT = TOWN_FOCUS_COMPONENTS[0];
 const OTHER_COMPONENT = TOWN_FOCUS_COMPONENTS[1];
@@ -742,5 +752,341 @@ describe('Town Focus repaint-gate wiring (source pins)', () => {
       'private previewResolvedAbility(',
     );
     expect(relocalize).toContain('if (this.townFocusOpen) this.renderTownFocus();');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 6. The shared focus system (issue #2525).
+//
+// The panel was absent from every windowFocus(rootSel) call site in hud.ts, was
+// not one of the two documented opt-outs (#bags and #bank-window, which pair
+// with a second window and must stay Tab-passable), and never called
+// markDialogRoot: no Tab trap, no return-to-opener, no role=dialog. Everything
+// below is driven over the REAL bridge (src/ui/window_focus.ts) and a REAL
+// FocusManager, the same two pieces the Hud field initializer wires, so none of
+// it is asserted against a stand-in for the shipped glue.
+// ---------------------------------------------------------------------------
+
+interface TownFocusFocusHarness {
+  sim: { townFocus: Record<string, number>; setTownFocus(next: Record<string, number>): void };
+  townFocusDraft: Record<string, number> | null;
+  lastTownFocusSig: string;
+  townFocusWindowFocus: WindowFocusBridge;
+  townFocusOpenerFocus: HTMLElement | null;
+  isInTown(): boolean;
+  renderTownFocus(): void;
+  toggleTownFocus(): void;
+  closeTownFocus(): void;
+  closeManagedWindow(el: HTMLElement): void;
+  closeContextMenu(): void;
+  hideTooltip(): void;
+  readonly townFocusOpen: boolean;
+}
+
+function makeFocusHud(allocation: Record<string, number> = { [COMPONENT]: 2 }): {
+  hud: TownFocusFocusHarness;
+  el: HTMLElement;
+  opener: HTMLButtonElement;
+} {
+  document.body.innerHTML = '';
+  // The real opener: the minimap button whose click handler calls toggleTownFocus.
+  const opener = document.createElement('button');
+  opener.id = 'mm-town-focus';
+  document.body.appendChild(opener);
+  const el = document.createElement('div');
+  el.id = 'town-focus-window';
+  el.className = 'window panel';
+  document.body.appendChild(el);
+
+  const hud = Object.create(Hud.prototype) as unknown as TownFocusFocusHarness;
+  hud.sim = {
+    townFocus: { ...allocation },
+    setTownFocus: vi.fn(),
+  } as unknown as TownFocusFocusHarness['sim'];
+  hud.townFocusDraft = null;
+  hud.lastTownFocusSig = '';
+  // Object.create skips field initializers, so build the bridge by hand out of
+  // the SAME two pieces the field declares: makeWindowFocus over a FocusManager.
+  hud.townFocusWindowFocus = makeWindowFocus(new FocusManager(), () => el);
+  hud.townFocusOpenerFocus = null;
+  hud.isInTown = () => true;
+  hud.closeContextMenu = vi.fn() as unknown as TownFocusFocusHarness['closeContextMenu'];
+  hud.hideTooltip = vi.fn() as unknown as TownFocusFocusHarness['hideTooltip'];
+  return { hud, el, opener };
+}
+
+function pressTab(shift = false): KeyboardEvent {
+  const ev = new KeyboardEvent('keydown', {
+    key: 'Tab',
+    shiftKey: shift,
+    bubbles: true,
+    cancelable: true,
+  });
+  document.dispatchEvent(ev);
+  return ev;
+}
+
+describe('the Town Focus panel is wired into the shared focus system', () => {
+  let restoreRects: () => void;
+
+  beforeEach(() => {
+    // FocusManager.restore defers focus a tick (window.setTimeout 0) so it wins
+    // over a close handler still settling the DOM.
+    vi.useFakeTimers();
+    // jsdom lays nothing out, so every element reports ZERO client rects and the
+    // manager (which reads getClientRects().length to mean "rendered, therefore
+    // focusable") would refuse every candidate, opener included. Report one rect
+    // for this section; the manager only ever reads `.length`. It also means the
+    // manager's self-heal never fires here, which is what makes the release
+    // assertions below decisive: a leaked trap stays leaked instead of being
+    // quietly popped on the next Tab.
+    const spy = vi
+      .spyOn(Element.prototype, 'getClientRects')
+      .mockReturnValue([{}] as unknown as DOMRectList);
+    restoreRects = () => spy.mockRestore();
+  });
+
+  afterEach(() => {
+    restoreRects();
+    vi.useRealTimers();
+    document.body.innerHTML = '';
+  });
+
+  it('captures the opener at open and hands focus back on close', () => {
+    const { hud, el, opener } = makeFocusHud();
+    opener.focus();
+    hud.toggleTownFocus();
+    expect(hud.townFocusOpen).toBe(true);
+    const plus = stepButton(el, COMPONENT, 'inc');
+    plus.focus();
+    expect(document.activeElement).toBe(plus);
+    hud.closeTownFocus();
+    expect(hud.townFocusOpen).toBe(false);
+    // Deferred, not synchronous: before the tick the old focus is still standing.
+    expect(document.activeElement).not.toBe(opener);
+    vi.runAllTimers();
+    expect(document.activeElement).toBe(opener);
+  });
+
+  it('drops the recorded opener after the hand-back, so a later close cannot re-steal focus', () => {
+    const { hud, el, opener } = makeFocusHud();
+    opener.focus();
+    hud.toggleTownFocus();
+    stepButton(el, COMPONENT, 'inc').focus();
+    hud.closeTownFocus();
+    vi.runAllTimers();
+    expect(document.activeElement).toBe(opener);
+    expect(hud.townFocusOpenerFocus).toBeNull();
+    // Without the null the stale opener survives, and the next close (a
+    // closeAll sweep, a second toggle) yanks the player off whatever they moved
+    // to and back onto the minimap button.
+    const elsewhere = document.createElement('button');
+    document.body.appendChild(elsewhere);
+    elsewhere.focus();
+    hud.closeTownFocus();
+    vi.runAllTimers();
+    expect(document.activeElement).toBe(elsewhere);
+  });
+
+  it('cycles Tab inside the open panel instead of letting it reach the game world', () => {
+    const { hud, el, opener } = makeFocusHud();
+    opener.focus();
+    hud.toggleTownFocus();
+    const focusables = [...el.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)];
+    // The X, at least one live stepper pair and Save: enough stops that a cycle
+    // is distinguishable from doing nothing.
+    expect(focusables.length).toBeGreaterThan(2);
+    focusables[0].focus();
+    for (let i = 1; i < focusables.length; i++) {
+      expect(pressTab().defaultPrevented).toBe(true);
+      expect(document.activeElement).toBe(focusables[i]);
+    }
+    // ...and WRAPS at the end rather than escaping into the world behind it.
+    expect(pressTab().defaultPrevented).toBe(true);
+    expect(document.activeElement).toBe(focusables[0]);
+    // Shift+Tab wraps backwards off the same edge.
+    expect(pressTab(true).defaultPrevented).toBe(true);
+    expect(document.activeElement).toBe(focusables[focusables.length - 1]);
+  });
+
+  it('leaves Tab alone while focus is OUTSIDE the panel, so the game keeps its target key', () => {
+    const { hud, opener } = makeFocusHud();
+    opener.focus();
+    hud.toggleTownFocus();
+    // Opening records the opener and installs the trap; it does NOT pull focus
+    // in (the train / unbind shape). So the player is still on the minimap
+    // button, outside the panel, where Tab is target-nearest and must not be
+    // swallowed.
+    expect(document.activeElement).toBe(opener);
+    const ev = pressTab();
+    expect(ev.defaultPrevented).toBe(false);
+    expect(document.activeElement).toBe(opener);
+  });
+
+  it('keeps the trap installed across the rebuild the step ladder drives', () => {
+    const { hud, el, opener } = makeFocusHud();
+    opener.focus();
+    hud.toggleTownFocus();
+    const plus = stepButton(el, COMPONENT, 'inc');
+    plus.focus();
+    hud.townFocusDraft = { [COMPONENT]: 3 };
+    hud.renderTownFocus();
+    // The #2500 ladder hands focus to the REBUILT equivalent of the control the
+    // player was on...
+    const rebuilt = stepButton(el, COMPONENT, 'inc');
+    expect(rebuilt).not.toBe(plus);
+    expect(document.activeElement).toBe(rebuilt);
+    // ...and that in-window refocus must not tear the trap down. The ladder
+    // reaches focus() directly and makeWindowFocus's in-window arm exists for
+    // the same reason: a refocus inside an OPEN window is not a close.
+    expect(pressTab().defaultPrevented).toBe(true);
+    expect(el.contains(document.activeElement)).toBe(true);
+  });
+
+  it('returns focus to the opener through Save', () => {
+    const { hud, el, opener } = makeFocusHud();
+    opener.focus();
+    hud.toggleTownFocus();
+    const save = el.querySelector<HTMLButtonElement>('.town-focus-save');
+    expect(save).not.toBeNull();
+    save?.focus();
+    save?.click();
+    vi.runAllTimers();
+    expect(hud.sim.setTownFocus).toHaveBeenCalled();
+    expect(hud.townFocusOpen).toBe(false);
+    expect(document.activeElement).toBe(opener);
+  });
+
+  it('returns focus to the opener through the X button', () => {
+    const { hud, el, opener } = makeFocusHud();
+    opener.focus();
+    hud.toggleTownFocus();
+    const close = el.querySelector<HTMLButtonElement>('[data-close]');
+    expect(close).not.toBeNull();
+    close?.focus();
+    close?.click();
+    vi.runAllTimers();
+    expect(hud.townFocusOpen).toBe(false);
+    expect(document.activeElement).toBe(opener);
+  });
+
+  it('returns focus to the opener through closeManagedWindow, the Escape / closeAll route', () => {
+    const { hud, el, opener } = makeFocusHud();
+    opener.focus();
+    hud.toggleTownFocus();
+    stepButton(el, COMPONENT, 'inc').focus();
+    // Escape and the gamepad both land in closeAll -> closeManagedWindow, whose
+    // `town-focus-window` case is the only thing standing between them and a
+    // focus drop to <body>.
+    hud.closeManagedWindow(el);
+    vi.runAllTimers();
+    expect(hud.townFocusOpen).toBe(false);
+    expect(document.activeElement).toBe(opener);
+  });
+
+  it('returns focus to the opener when the toggle is pressed a second time', () => {
+    const { hud, el, opener } = makeFocusHud();
+    opener.focus();
+    hud.toggleTownFocus();
+    stepButton(el, COMPONENT, 'inc').focus();
+    hud.toggleTownFocus();
+    vi.runAllTimers();
+    expect(hud.townFocusOpen).toBe(false);
+    expect(document.activeElement).toBe(opener);
+  });
+
+  it('releases the trap on close, over repeated open/close cycles', () => {
+    const { hud, el, opener } = makeFocusHud();
+    for (let i = 0; i < 2; i++) {
+      opener.focus();
+      hud.toggleTownFocus();
+      stepButton(el, COMPONENT, 'inc').focus();
+      hud.closeTownFocus();
+      vi.runAllTimers();
+    }
+    // A closed panel is hidden, not emptied, and jsdom lays nothing out, so its
+    // controls can still take focus. If ANY of those opens leaked a trap, this
+    // Tab would be swallowed and cycled instead of falling through to the game.
+    const plus = stepButton(el, COMPONENT, 'inc');
+    plus.focus();
+    expect(pressTab().defaultPrevented).toBe(false);
+    expect(document.activeElement).toBe(plus);
+  });
+
+  it('marks the root as a dialog with exactly ONE accessible name', () => {
+    const { hud, el, opener } = makeFocusHud();
+    opener.focus();
+    hud.toggleTownFocus();
+    expect(el.getAttribute('role')).toBe('dialog');
+    expect(el.getAttribute('aria-modal')).toBe('false');
+    expect(el.getAttribute('tabindex')).toBe('-1');
+    const title = t('hudChrome.townFocus.title');
+    expect(title.length).toBeGreaterThan(0);
+    expect(el.getAttribute('aria-label')).toBe(title);
+    // aria-labelledby SHADOWS aria-label, so a root carrying both is ambiguous:
+    // exactly one, which is what markDialogRoot guarantees.
+    expect(el.hasAttribute('aria-labelledby')).toBe(false);
+    // ...and the name a screen reader announces is the name on screen, off the
+    // same key, so the two cannot drift.
+    expect(el.querySelector('.panel-title span')?.textContent).toBe(title);
+  });
+
+  it('keeps the dialog root itself out of the Tab cycle it wraps', () => {
+    const { hud, el, opener } = makeFocusHud();
+    opener.focus();
+    hud.toggleTownFocus();
+    // tabindex="-1" is programmatically focusable but deliberately OUT of the
+    // Tab sequence. A root written with tabindex="0" would match here and become
+    // an extra stop between the last control and the first.
+    expect(el.matches(FOCUSABLE_SELECTOR)).toBe(false);
+    const focusables = [...el.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)];
+    expect(focusables).not.toContain(el);
+    focusables[focusables.length - 1].focus();
+    pressTab();
+    expect(document.activeElement).toBe(focusables[0]);
+  });
+});
+
+describe('Town Focus focus-system wiring (source pins)', () => {
+  it('declares ONE windowFocus bridge for the panel root, plus its opener field', () => {
+    // Both harnesses build the Hud with Object.create, which skips field
+    // initializers and seeds these by hand, so no behavioral test in this file
+    // can see the DECLARED wiring. Pin it, or the panel could be trapped against
+    // some other root with everything above still green.
+    expect(hudSrc).toContain(
+      "private readonly townFocusWindowFocus = this.windowFocus('#town-focus-window');",
+    );
+    expect(hudSrc).toContain('private townFocusOpenerFocus: HTMLElement | null = null;');
+  });
+
+  it('captures the opener AFTER the first paint, the train / unbind ordering', () => {
+    const toggle = region('toggleTownFocus(): void {', 'private renderTownFocus(): void {');
+    const painted = toggle.indexOf('this.renderTownFocus();');
+    const captured = toggle.indexOf(
+      'this.townFocusOpenerFocus = this.townFocusWindowFocus.captureFocus();',
+    );
+    expect(painted).toBeGreaterThan(-1);
+    expect(captured).toBeGreaterThan(painted);
+  });
+
+  it('releases the trap and hands focus back in the ONE close path', () => {
+    // Scoped to the method: every close route (X, Save, Escape, the toggle
+    // re-press) funnels here, so this is the single place the hand-back has to
+    // live. Moving it into one caller would silently drop the others.
+    const close = region('closeTownFocus(): void {', 'get townFocusOpen(): boolean {');
+    expect(close).toContain('this.townFocusWindowFocus.restoreFocus(this.townFocusOpenerFocus);');
+    expect(close).toContain('this.townFocusOpenerFocus = null;');
+  });
+
+  it('routes the managed close (Escape / closeAll / gamepad) through that one path', () => {
+    const arm = region("case 'town-focus-window':", "case 'crafting-window':");
+    expect(arm).toContain('this.closeTownFocus();');
+    // Not a bare hide, which is what the arm would have to become for the
+    // hand-back to be skipped while the window still closed.
+    expect(arm).not.toContain("style.display = 'none'");
+  });
+
+  it('marks the dialog root from the painter, so every repaint re-asserts it', () => {
+    expect(painterSrc).toContain("markDialogRoot(el, { label: t('hudChrome.townFocus.title') });");
   });
 });
