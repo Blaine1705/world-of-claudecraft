@@ -7,7 +7,12 @@ import { registerPreload } from './assets/preload';
 import { GFX, SUN_DIR, sharedUniforms } from './gfx';
 import { idleSlot, runIdleQueue } from './idle_queue';
 import { waterNormalish, waterNormalMaps } from './textures';
-import { shoreDepthAt } from './water_core';
+import {
+  shoreDepthAt,
+  shoreSlopeAt,
+  WATER_FOAM_WIDTH_YARDS,
+  WATER_SEABED_CLAMP_YARDS,
+} from './water_core';
 import { WaterSimulation, type WaterWaveUniforms } from './water_simulation';
 
 // Water for the whole zone strip.
@@ -48,6 +53,25 @@ const WATER_VERTEX_ROWS = Array.from({ length: SEGMENTS_PER_ZONE + 1 }, (_, row)
 // so the apron sits between the sky and the default 0 band.
 const WATER_APRON_RENDER_ORDER = -1;
 const WATER_SURFACE_RENDER_ORDER = 0;
+
+// Surface look, tuned against a 30 sample survey of the real coastline
+// (tests/water_shore_shape.test.ts pins the geometry these assume).
+/** Light extinction per yard of depth; ~0.96 opacity at the seabed clamp. */
+const WATER_EXTINCTION_PER_YARD = 0.55;
+/** Foam is an analytic sine with no mip chain, so fade it out with range. */
+const WATER_FOAM_DISTANCE_FADE = 0.0055;
+/** View distance over which the sea grades to open-ocean colour. */
+const WATER_DEEP_NEAR_YARDS = 25;
+const WATER_DEEP_FAR_YARDS = 240;
+const WATER_DEEP_DISTANCE_STRENGTH = 0.8;
+/** GLSL needs a decimal point on every float literal. */
+const glsl = (n: number): string => (Number.isInteger(n) ? `${n}.0` : String(n));
+/**
+ * Seabed slope carried by the horizon apron. The apron has no terrain under it,
+ * and foam is depth/slope, so a small slope against its constant deep reading
+ * puts it far past the surf band: open water, never foam.
+ */
+const APRON_SHORE_SLOPE = 1;
 
 // Real water normal maps, fetched at module import and gated by the boot
 // preload only for the shader tier. Low/mobile uses generated canvas water
@@ -152,6 +176,7 @@ const WAVE_SAMPLE_GLSL = /* glsl */ `
 
 const WATER_VERT = /* glsl */ `
   attribute float aShoreDepth;
+  attribute float aShoreSlope;
   uniform float uTime;
   uniform sampler2D uWaveState;
   uniform float uWaveEnabled;
@@ -159,6 +184,7 @@ const WATER_VERT = /* glsl */ `
   uniform float uWaveSize;
   varying vec3 vWPos;
   varying float vShoreDepth;
+  varying float vShoreSlope;
   #include <fog_pars_vertex>
   ${WAVE_SAMPLE_GLSL}
   void main() {
@@ -169,6 +195,7 @@ const WATER_VERT = /* glsl */ `
       if (waveSampleAt(pos.xz, wave)) pos.y += wave.r * uWaveEnabled;
     }
     vShoreDepth = aShoreDepth;
+    vShoreSlope = aShoreSlope;
     vec4 wp = modelMatrix * vec4(pos, 1.0);
     vWPos = wp.xyz;
     vec4 mvPosition = viewMatrix * wp;
@@ -193,6 +220,7 @@ const WATER_FRAG = /* glsl */ `
   uniform float uWaveSize;
   varying vec3 vWPos;
   varying float vShoreDepth;
+  varying float vShoreSlope;
   #include <common>
   #include <fog_pars_fragment>
   ${WAVE_SAMPLE_GLSL}
@@ -220,8 +248,17 @@ const WATER_FRAG = /* glsl */ `
     vec3 N = normalize(vec3(nm + waveSlope * 9.5, 3.1).xzy);
     vec3 V = normalize(cameraPosition - vWPos);
     float fresnel = 0.05 + 0.95 * pow(1.0 - max(dot(N, V), 0.0), 4.0);
-    float depth = clamp(vShoreDepth / 6.0, 0.0, 1.0);
+    // The seabed is hard clamped at ${WATER_SEABED_CLAMP_YARDS} yards, so a linear ramp over that
+    // range spends the whole palette in the shallows and flattens beyond it.
+    // Exponential extinction (how water actually absorbs light) keeps a
+    // gradient across the entire usable range and reaches ~0.96 at the clamp,
+    // so the apron's constant depth stops reading as a different surface.
+    float depth = 1.0 - exp(-vShoreDepth * ${glsl(WATER_EXTINCTION_PER_YARD)});
     vec3 col = mix(uShallow, uDeep, depth);
+    // A 6 yard seabed cannot supply open-ocean depth, so grade toward deep with
+    // VIEW DISTANCE the way real water does. This is what makes the far sea read
+    // as ocean rather than as an endless shallow, and it hides the apron seam.
+    col = mix(col, uDeep, smoothstep(${glsl(WATER_DEEP_NEAR_YARDS)}, ${glsl(WATER_DEEP_FAR_YARDS)}, camDist) * ${glsl(WATER_DEEP_DISTANCE_STRENGTH)});
     // dappled shimmer that fades with distance so it never reads as speckle
     float shimmer = max(n1.x * 0.7 + n2.y * 0.55, 0.0) * exp(-camDist * 0.022);
     col *= 0.92 + 0.4 * shimmer;
@@ -233,12 +270,21 @@ const WATER_FRAG = /* glsl */ `
     col += uSunColor * pow(sunAlign, 130.0) * 2.6;                   // sparkle glints (>1 -> bloom)
     col += uSunColor * pow(sunAlign, 28.0) * 0.30;                   // wider lobe: survives steep cameras
     col += uSunColor * pow(sunAlign, 6.0) * 0.05;                    // faint warm sheen sunward
-    // shoreline foam: wide animated band hugging the waterline (the shore
-    // attribute is per-vertex at ~2u, so the band must span several units)
-    float foamBand = smoothstep(3.2, 0.1, vShoreDepth + n1.x * 0.7);
+    // Shoreline foam keyed on HORIZONTAL distance to the waterline, recovered
+    // as depth / seabed slope, NOT on depth. Measured shelves range from 3.2
+    // yards of depth in 4 yards of run to 0.2 yards of depth sustained over 40,
+    // so any depth threshold either floods a flat bay or vanishes on a steep
+    // one. Distance to shore is the same signal on both.
+    float shoreDist = vShoreDepth / vShoreSlope;
+    float foamBand = smoothstep(${glsl(WATER_FOAM_WIDTH_YARDS)}, 0.0, shoreDist + n1.x * 0.6);
     foamBand *= foamBand;
-    float foamWave = 0.62 + 0.38 * sin(uTime * 1.7 + vWPos.x * 1.2 + vWPos.z * 0.95 + n2.y * 6.0);
-    float foam = foamBand * foamWave;
+    // Two decorrelated sines so the band stops reading as one set of wallpaper
+    // stripes, faded with range because it is an analytic function with no mip
+    // chain and aliases hard at grazing angles.
+    float foamWave = 0.55
+      + 0.25 * sin(uTime * 1.7 + vWPos.x * 1.2 + vWPos.z * 0.95 + n2.y * 6.0)
+      + 0.20 * sin(uTime * 0.9 - vWPos.x * 0.41 + vWPos.z * 0.63 + n1.y * 4.0);
+    float foam = foamBand * foamWave * exp(-camDist * ${glsl(WATER_FOAM_DISTANCE_FADE)});
     // disturbed water reads brighter and skyward, the way a real wake does
     float contactSheen = smoothstep(0.025, 0.13, waveEnergy) * exp(-camDist * 0.022);
     col = mix(col, mix(uShallow, uSkyColor, 0.52), contactSheen * 0.24);
@@ -325,6 +371,8 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     const pos = geo.attributes.position as THREE.BufferAttribute;
     const deep = new Float32Array(pos.count).fill(8);
     geo.setAttribute('aShoreDepth', new THREE.BufferAttribute(deep, 1));
+    const apronSlope = new Float32Array(pos.count).fill(APRON_SHORE_SLOPE);
+    geo.setAttribute('aShoreSlope', new THREE.BufferAttribute(apronSlope, 1));
     geo.computeBoundingSphere();
     const apron = new THREE.Mesh(geo, material);
     apron.position.y = waterLevel() - 0.06;
@@ -333,6 +381,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     group.add(apron);
     refits.push(() => {
       (geo.attributes.aShoreDepth as THREE.BufferAttribute).needsUpdate = true;
+      (geo.attributes.aShoreSlope as THREE.BufferAttribute).needsUpdate = true;
       apron.position.y = waterLevel() - 0.06;
     });
   }
@@ -353,12 +402,14 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     geo.translate((x0 + x1) / 2, 0, (zone.zMin + zone.zMax) / 2);
     const pos = geo.attributes.position as THREE.BufferAttribute;
     const shoreDepth = new Float32Array(pos.count);
+    const shoreSlope = new Float32Array(pos.count);
     const columns = SEGMENTS_PER_ZONE + 1;
     const fillRow = (row: number): void => {
       const start = row * columns;
       const end = Math.min(pos.count, start + columns);
       for (let i = start; i < end; i++) {
         shoreDepth[i] = shoreDepthAt(pos.getX(i), pos.getZ(i), seed);
+        shoreSlope[i] = shoreSlopeAt(pos.getX(i), pos.getZ(i), seed);
       }
     };
     const fill = (): void => {
@@ -373,6 +424,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       fill();
     }
     geo.setAttribute('aShoreDepth', new THREE.BufferAttribute(shoreDepth, 1));
+    geo.setAttribute('aShoreSlope', new THREE.BufferAttribute(shoreSlope, 1));
     geo.computeBoundingBox();
     geo.computeBoundingSphere();
     const mesh = new THREE.Mesh(geo, material);
@@ -387,6 +439,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     refits.push(() => {
       fill();
       (geo.attributes.aShoreDepth as THREE.BufferAttribute).needsUpdate = true;
+      (geo.attributes.aShoreSlope as THREE.BufferAttribute).needsUpdate = true;
       mesh.position.y = waterLevel();
     });
     return mesh;

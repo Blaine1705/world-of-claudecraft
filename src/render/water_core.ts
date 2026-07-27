@@ -122,3 +122,40 @@ export function advanceWaterSchedule(
 export function shoreDepthAt(x: number, z: number, seed: number): number {
   return waterLevel() - terrainHeight(x, z, seed);
 }
+
+/**
+ * Deepest the terrain generator ever puts the seabed below the water line.
+ * Measured across a 30 sample coastline survey: every sample tops out at
+ * exactly this, and depth 15 is reached by none of them. The colour ramp
+ * therefore cannot be widened, there is no deeper water to grade into.
+ */
+export const WATER_SEABED_CLAMP_YARDS = 6;
+/** Width of the surf band measured ALONG THE GROUND from the waterline. */
+export const WATER_FOAM_WIDTH_YARDS = 4.5;
+
+// Half-width of the central difference used for the seabed gradient, in yards.
+// The zone plane bakes at ~2 yard vertex spacing, so sampling wider than that
+// would smear a cove's slope into its neighbour's.
+const SHORE_SLOPE_SAMPLE_HALF_WIDTH = 1.5;
+// Below this the seabed is flat enough that depth carries no direction, and
+// dividing by it would explode the derived shoreline distance.
+const MIN_SHORE_SLOPE = 1e-3;
+
+/**
+ * Magnitude of the seabed gradient at (x, z): yards of depth gained per yard
+ * travelled. Pairs with shoreDepthAt to recover the HORIZONTAL distance to the
+ * waterline (depth / slope), which is the only shore signal that behaves the
+ * same on a steep shelf and a flat one.
+ *
+ * Measured motivation (30 coastline samples): the seabed is hard clamped at 6
+ * yards, and shelves range from reaching 3.2 yards in 4 yards of run to sitting
+ * at 0.2 yards deep for 40 yards. A single depth threshold cannot serve both,
+ * so foam keyed on depth alone either floods a flat bay or vanishes on a steep
+ * one.
+ */
+export function shoreSlopeAt(x: number, z: number, seed: number): number {
+  const h = SHORE_SLOPE_SAMPLE_HALF_WIDTH;
+  const dx = shoreDepthAt(x + h, z, seed) - shoreDepthAt(x - h, z, seed);
+  const dz = shoreDepthAt(x, z + h, seed) - shoreDepthAt(x, z - h, seed);
+  return Math.max(Math.hypot(dx, dz) / (2 * h), MIN_SHORE_SLOPE);
+}
