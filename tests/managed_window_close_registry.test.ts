@@ -6,7 +6,7 @@
 // `el.style.display = 'none'` plus `hideTooltip()`. So membership in that selector is what
 // enrols a window, and a `case` is what gives it a real teardown. Nothing connected the two:
 // `#lockpick-panel` sat on the default arm for its whole life, leaking a 100ms countdown and
-// a focus trap on every Escape and every gamepad escape, and no test could notice.
+// a focus trap on every gamepad escape, and no test could notice.
 //
 // This is the connection. Every id in the family is classified exactly once, and a new
 // `.window.panel` in the markup fails the suite until its author says which bucket it is in.
@@ -48,7 +48,9 @@ const CODE_BUILT: Record<string, string> = {
 const CLOSED_BEFORE_THE_SCAN: Record<string, string> = {
   'delve-rite-panel':
     "closeAll's `$('#delve-rite-panel').style.display === 'block'` arm routes it to " +
-    'closeRitePanel -> RiteController.close(), which releases its focus trap.',
+    'closeRitePanel -> RiteController.close(), which releases its focus trap. That arm is its ' +
+    'ONLY teardown, so the ordering pin below is what defends it: move the arm under the scan ' +
+    'and the panel falls to the default hide with its trap still armed, the #2517 defect.',
 };
 
 /**
@@ -64,13 +66,20 @@ const NO_MANAGED_TEARDOWN: Record<string, string> = {
     "Hud.update()'s mediumHud band behind a display === 'block' gate, so the hide stops it, " +
     'and the mapPing / mapZoneOverride the toggle clears are re-seeded by the next open.',
   'report-window':
-    "Its X and Cancel buttons are literally `el.style.display = 'none'`. No trap, no timer; " +
-    'the panel is rebuilt by innerHTML on every open, so an in-flight submit that resolves ' +
-    'against the hidden window cannot survive into the next one.',
+    "Its X and Cancel buttons are literally `el.style.display = 'none'` and nothing else, so " +
+    'the default arm is a strict superset of its own close path. No trap, no timer; the panel ' +
+    'is rebuilt by innerHTML on every open, so an in-flight submit that resolves against the ' +
+    'hidden window cannot survive into the next one.',
 };
 
-/** The `case '<id>':` labels of the switch inside `Hud.closeManagedWindow`. */
-function readCloseManagedWindowCases(source: string): string[] {
+/**
+ * The switch inside `Hud.closeManagedWindow`: what it keys on, and its `case '<id>':` labels.
+ *
+ * The discriminant comes back too, because the case labels only mean "a window id" for as long
+ * as the switch is still keyed on one. Rewritten to switch on a class or a state enum, the
+ * labels would parse exactly the same and every diff below would compare two unrelated sets.
+ */
+function readCloseManagedWindowSwitch(source: string): { on: string; cases: string[] } {
   const file = ts.createSourceFile('hud.ts', source, ts.ScriptTarget.Latest, true);
   let method: ts.MethodDeclaration | null = null;
   const findMethod = (node: ts.Node): void => {
@@ -80,27 +89,31 @@ function readCloseManagedWindowCases(source: string): string[] {
   ts.forEachChild(file, findMethod);
   if (!method) throw new Error('closeManagedWindow not found in the source');
   // The switch this method OWNS, not one nested inside a callback it happens to contain.
-  let block: ts.CaseBlock | null = null;
+  let found: ts.SwitchStatement | null = null;
   const findSwitch = (node: ts.Node): void => {
-    if (block) return;
+    if (found) return;
     if (ts.isSwitchStatement(node)) {
-      block = node.caseBlock;
+      found = node;
       return;
     }
     ts.forEachChild(node, findSwitch);
   };
   ts.forEachChild((method as ts.MethodDeclaration).body as ts.Block, findSwitch);
-  if (!block) throw new Error('closeManagedWindow has no switch statement');
-  return (block as ts.CaseBlock).clauses
-    .filter(ts.isCaseClause)
-    .map((clause) => (ts.isStringLiteral(clause.expression) ? clause.expression.text : ''))
-    .filter((id) => id !== '');
+  if (!found) throw new Error('closeManagedWindow has no switch statement');
+  const stmt = found as ts.SwitchStatement;
+  return {
+    on: stmt.expression.getText(),
+    cases: stmt.caseBlock.clauses
+      .filter(ts.isCaseClause)
+      .map((clause) => (ts.isStringLiteral(clause.expression) ? clause.expression.text : ''))
+      .filter((id) => id !== ''),
+  };
 }
 
-/** Every `id` carrying BOTH the `window` and `panel` classes, in markup order. */
+/** Every `id` carrying BOTH the `window` and `panel` classes, whatever the tag. */
 function readPanelIds(html: string): string[] {
   const ids: string[] = [];
-  for (const tag of html.match(/<div\b[^>]*>/g) ?? []) {
+  for (const tag of html.match(/<[a-z][a-z0-9-]*\b[^>]*>/gi) ?? []) {
     const id = tag.match(/\bid="([^"]+)"/)?.[1];
     const cls = tag.match(/\bclass="([^"]+)"/)?.[1];
     if (!id || !cls) continue;
@@ -110,13 +123,20 @@ function readPanelIds(html: string): string[] {
   return ids;
 }
 
-const caseIds = readCloseManagedWindowCases(hudTs);
-const markupIds = readPanelIds(indexHtml);
+const closeSwitch = readCloseManagedWindowSwitch(hudTs);
+const caseIds = closeSwitch.cases;
+// The UNION of both game shells. tests/entry_window_parity.test.ts owns the index-vs-play
+// comparison and is where a divergence is reported; taking the union here means this registry
+// still classifies every reachable window while that guard is red, rather than silently
+// excusing a play.html-only window because index.html never mentioned it.
+const markupIds = [...new Set([...readPanelIds(indexHtml), ...readPanelIds(playHtml)])];
 
 describe('closeManagedWindow case registry', () => {
   it('reads the real switch, not a `case` label from anywhere else in the file', () => {
     // Without this the walk could be silently returning [] (or the cases of some other
     // switch) and every diff below would pass by agreeing on nothing.
+    // The labels are window ids only while the switch is still keyed on the id.
+    expect(closeSwitch.on).toBe('el.id');
     expect(caseIds).toContain('confirm-dialog');
     expect(caseIds).toContain('lockpick-panel');
     expect(caseIds.length).toBeGreaterThan(30);
@@ -124,7 +144,7 @@ describe('closeManagedWindow case registry', () => {
 
     // A synthetic source with the same shapes the real file has: a decoy case in another
     // method, one in a nested callback switch, and one inside a string and a comment.
-    const planted = readCloseManagedWindowCases(`
+    const planted = readCloseManagedWindowSwitch(`
       class Hud {
         private other(el: HTMLElement): void {
           switch (el.id) {
@@ -154,15 +174,23 @@ describe('closeManagedWindow case registry', () => {
         }
       }
     `);
-    expect(planted).toEqual(['real-one', 'real-two']);
+    expect(planted).toEqual({ on: 'el.id', cases: ['real-one', 'real-two'] });
   });
 
-  it('finds the same panel family in both game shells', () => {
-    // index.html and play.html are two entries onto the one HUD; a window that exists in
-    // only one of them is a window Escape closes differently depending on how you loaded
-    // the game.
-    expect(readPanelIds(playHtml).slice().sort()).toEqual(markupIds.slice().sort());
+  it('scrapes the real panel family out of the shells', () => {
+    // A markup change that broke the scrape would empty this set, and an empty set makes
+    // every classification below pass by having nothing to classify.
     expect(markupIds.length).toBeGreaterThan(30);
+    expect(markupIds).toContain('lockpick-panel');
+    expect(markupIds).toContain('bags');
+    // Tags other than <div> count, and extra classes and attribute order are tolerated.
+    expect(readPanelIds('<section id="a" class="window panel dev">')).toEqual(['a']);
+    expect(readPanelIds('<div class="panel window" id="b">')).toEqual(['b']);
+    // A panel that is not a window (#ctx-menu's shape) is NOT in the family: closeAll's scan
+    // is `.window.panel`, and mistaking those for members would demand cases for elements it
+    // can never hand to closeManagedWindow.
+    expect(readPanelIds('<div id="c" class="panel">')).toEqual([]);
+    expect(readPanelIds('<div id="d" class="window">')).toEqual([]);
   });
 
   it('classifies every `.window .panel` exactly once', () => {
@@ -176,6 +204,8 @@ describe('closeManagedWindow case registry', () => {
     }));
     // Named rather than counted, so the failure message says WHICH window is unclassified.
     expect(buckets.filter((b) => b.in.length === 0).map((b) => b.id)).toEqual([]);
+    // The direction people forget: an excused id that later grew a real case keeps a stale
+    // excuse, and the next reader trusts the excuse instead of the code.
     expect(
       buckets.filter((b) => b.in.length > 1).map((b) => `${b.id}: ${b.in.join(' + ')}`),
     ).toEqual([]);
