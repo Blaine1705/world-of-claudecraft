@@ -15,6 +15,7 @@ import type { BiomeId, ZoneDef } from '../sim/types';
 import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { type ChunkGrid, type GroundPendingAt, orderCellsForEntry } from './chunk_residency_core';
 import { GFX } from './gfx';
 import { idleSlot } from './idle_queue';
 import { impactCraterTerrainBlend } from './impact_terrain';
@@ -1176,6 +1177,15 @@ export interface TerrainView {
     opts?: EnsureZoneOptions,
   ): Promise<void>;
   isZoneLoaded(zoneId: string): boolean;
+  /**
+   * The chunk lattice this view builds on, plus whether a given cell still owes
+   * geometry. The outdoor fog clamp reads ground residency through this narrow
+   * accessor (never through the renderer's zone-level `preparedZones`), so it
+   * stops at the nearest UNBUILT CHUNK rather than the nearest unprepared zone
+   * rectangle, and so retiring zone residency later is one implementation swap.
+   * The returned object is stable across calls: it is read every frame.
+   */
+  groundResidency(): { grid: ChunkGrid; isPending: GroundPendingAt };
   /** hides chunks that sit entirely past the fog far plane */
   update(camX: number, camZ: number, fogFar: number): void;
   /**
@@ -1220,6 +1230,20 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   const worldDepth = WORLD_MAX_Z - WORLD_MIN_Z;
   const chunksX = Math.ceil((WORLD_MAX_X * 2) / CHUNK_SIZE);
   const chunksZ = Math.ceil(worldDepth / CHUNK_SIZE);
+  const grid: ChunkGrid = {
+    size: CHUNK_SIZE,
+    countX: chunksX,
+    countZ: chunksZ,
+    originX: -WORLD_MAX_X,
+    originZ: WORLD_MIN_Z,
+  };
+  // 1 = this cell is owed terrain geometry and has not attached it yet, which
+  // is the only state that may clamp the outdoor fog. Seeded from cell
+  // OWNERSHIP below, so cells no zone rectangle covers stay 0 from the start:
+  // the rects do not tile (96 of the 792 cells are unowned), those cells can
+  // never be built, and clamping the view against a hole that will never fill
+  // would be worse than the zone clamp this replaces.
+  const groundPending = new Uint8Array(chunksX * chunksZ);
   // x/z/half feed the per-frame fog cull; x0/z0/size/spacing are the exact
   // buildChunkGeometry inputs, kept so an editor rebuild re-runs the same build.
   const chunks: {
@@ -1291,6 +1315,22 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     // for the rest of the session.
     mesh.updateMatrixWorld(true);
     mesh.matrixAutoUpdate = false;
+    // Ground residency flips HERE, where the mesh actually joins the scene, and
+    // never at the point the cell is claimed for building: `built` below is set
+    // BEFORE the (idle-paced, possibly multi-second) geometry build is awaited,
+    // so keying the fog off it would open the view over ground that has not
+    // arrived. A far-band super-chunk covers a 2x2 block, hence the span.
+    const span = Math.max(1, Math.round(size / CHUNK_SIZE));
+    const cx0 = Math.round((x0 + WORLD_MAX_X) / CHUNK_SIZE);
+    const cz0 = Math.round((z0 - WORLD_MIN_Z) / CHUNK_SIZE);
+    for (let dz = 0; dz < span; dz++) {
+      for (let dx = 0; dx < span; dx++) {
+        const cx = cx0 + dx;
+        const cz = cz0 + dz;
+        if (cx < 0 || cx >= chunksX || cz < 0 || cz >= chunksZ) continue;
+        groundPending[cz * chunksX + cx] = 0;
+      }
+    }
     chunks.push({
       mesh,
       x: x0 + size / 2,
@@ -1362,6 +1402,15 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       )?.id ?? null
     );
   };
+  for (let cz = 0; cz < chunksZ; cz++) {
+    for (let cx = 0; cx < chunksX; cx++) {
+      if (cellOwnerId(cx, cz) !== null) groundPending[cz * chunksX + cx] = 1;
+    }
+  }
+  const residency = {
+    grid,
+    isPending: (cx: number, cz: number): boolean => groundPending[cz * chunksX + cx] === 1,
+  };
   const zoneCells = (zone: ZoneDef): [number, number][] => {
     const out: [number, number][] = [];
     for (let cz = 0; cz < chunksZ; cz++) {
@@ -1408,31 +1457,15 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     // 60 yd build or the old four-mesh subdivision workaround.
     const cellsPerSlice = 4;
     const task = (async () => {
-      const cells = zoneCells(zone);
-      // A player can enter a zone anywhere, not just at its hub (a returning
-      // character's logout spot, a walked boundary crossing), so row-major
-      // order alone can leave them standing on not-yet-built terrain. Pull the
-      // cells around the actual entry point (this call's priority, falling
-      // back to the view's construction point) to the front, sorted by
-      // distance, so the chunk directly underfoot builds first. Only that
-      // bounded neighbourhood is reordered: the rest keeps row-major order so
-      // the far-band 2x2 super-chunk merge still forms.
-      const entryPoint = opts?.priority ?? priorityPoint;
-      if (entryPoint) {
-        const cellDist = ([cx, cz]: [number, number]): number =>
-          Math.hypot(
-            -WORLD_MAX_X + (cx + 0.5) * CHUNK_SIZE - entryPoint.x,
-            WORLD_MIN_Z + (cz + 0.5) * CHUNK_SIZE - entryPoint.z,
-          );
-        const nearby = cells.filter((cell) => cellDist(cell) <= CHUNK_SIZE * 3);
-        if (nearby.length > 0) {
-          nearby.sort((a, b) => cellDist(a) - cellDist(b));
-          const nearbySet = new Set(nearby);
-          const rest = cells.filter((cell) => !nearbySet.has(cell));
-          cells.length = 0;
-          cells.push(...nearby, ...rest);
-        }
-      }
+      // Build order is the "which chunk next" seam, and it lives in the pure
+      // core so a later globally nearest-first queue replaces one function
+      // instead of the zone lane around it.
+      const cells = orderCellsForEntry(
+        zoneCells(zone),
+        grid,
+        opts?.priority ?? priorityPoint,
+        CHUNK_SIZE * 3,
+      );
       const normalBounds = normalTex ? normalBoundsFor(zone) : null;
       const rowsPerSlice = 12;
       const normalSlices = normalBounds
@@ -1512,6 +1545,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     group,
     ensureZone,
     isZoneLoaded: (zoneId: string) => loadedZones.has(zoneId),
+    groundResidency: () => residency,
     cancelStreaming(): void {
       cancelled = true;
     },

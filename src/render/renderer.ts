@@ -100,6 +100,7 @@ import {
 } from './characters/skin_attack';
 import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_policy';
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
+import { fogFarForBuiltGround } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
 import {
@@ -285,7 +286,6 @@ import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
 import {
-  fogFarForPreparedZones,
   INITIAL_SKY_PREWARM_RADIUS,
   MAX_OUTDOOR_FOG_FAR,
   ZONE_STREAM_RECHECK_DISTANCE,
@@ -2294,6 +2294,40 @@ export class Renderer {
   }
 
   /**
+   * The sky/IBL half of a zone prepare: the realm's HDRI plus its prefiltered
+   * environment. Its own lane, because it is 30 to 70 percent of a prepare and
+   * a neighbouring realm's IBL has nothing to do with whether the player can
+   * see ground (the fog clamp reads attached terrain chunks). Sky is still
+   * needed to RENDER that realm's sky, so zone residency continues to wait for
+   * it; only the terrain build was let off the leash.
+   */
+  private async prepareZoneSky(
+    zone: ZoneDef,
+    x: number,
+    z: number,
+    idlePace: boolean,
+  ): Promise<void> {
+    await ensureSkyAssetsAt(x, z);
+    const envSource = this.skyView.envTexture(zone.biome);
+    const domeSource = this.skyView.domeTexture(zone.biome);
+    if (!idlePace) {
+      // Initial entry/teleport is already covered by an opaque loading screen.
+      this.ensureEnvironmentBiome(zone.biome);
+      this.prewarmTexture(envSource);
+      this.prewarmTexture(domeSource);
+      return;
+    }
+    // A DataTexture upload is synchronous even from requestIdleCallback.
+    // Split HDRIs into bounded row batches, then run the much smaller 512px
+    // PMREM between idle slots. This keeps background zone preparation from
+    // turning a future biome's sky into one 30+ MB gameplay frame.
+    await this.prewarmTextureInIdle(envSource);
+    await idleSlot(IDLE_PREWARM_TIMEOUT_MS);
+    this.ensureEnvironmentBiome(zone.biome);
+    await this.prewarmTextureInIdle(domeSource);
+  }
+
+  /**
    * Materialize the terrain, water and bespoke render layer for one overworld
    * zone. Calls for an already-loaded (or currently-loading) zone are cheap and
    * share the same promise, so teleports and boundary jitter cannot duplicate
@@ -2317,29 +2351,30 @@ export class Renderer {
     const pending = this.pendingZonePrepares.get(zoneId);
     if (pending) return pending;
     const zone = zoneAt(x, z);
+    const idlePace = opts?.pace === 'idle';
     const task = (async () => {
       const started = performance.now();
       onProgress?.(0, 100);
-      await ensureSkyAssetsAt(x, z);
-      const envSource = this.skyView.envTexture(zone.biome);
-      const domeSource = this.skyView.domeTexture(zone.biome);
-      if (opts?.pace === 'idle') {
-        // A DataTexture upload is synchronous even from requestIdleCallback.
-        // Split HDRIs into bounded row batches, then run the much smaller 512px
-        // PMREM between idle slots. This keeps background zone preparation from
-        // turning a future biome's sky into one 30+ MB gameplay frame.
-        await this.prewarmTextureInIdle(envSource);
-        await idleSlot(IDLE_PREWARM_TIMEOUT_MS);
-        this.ensureEnvironmentBiome(zone.biome);
-        await this.prewarmTextureInIdle(domeSource);
-      } else {
-        // Initial entry/teleport is already covered by an opaque loading screen.
-        this.ensureEnvironmentBiome(zone.biome);
-        this.prewarmTexture(envSource);
-        this.prewarmTexture(domeSource);
-      }
-      const skyDone = performance.now();
+      let skyMs = 0;
+      const skyLane = (async () => {
+        await this.prepareZoneSky(zone, x, z, idlePace);
+        skyMs = Math.round((performance.now() - started) * 10) / 10;
+      })();
+      // Mark the lane handled the moment it exists. A background terrain build
+      // below can run for tens of seconds, and a rejection sitting un-awaited
+      // across that window is reported as an unhandledrejection (the client's
+      // fatal overlay) long before the join at the end could catch it.
+      void skyLane.catch(() => {});
+      // A BACKGROUND prepare does not let sky hold up ground. HDRI plus PMREM
+      // is 30 to 70 percent of a prepare (Drakelands measured skyMs 6083 of
+      // totalMs 8982) and a NEIGHBOURING realm's IBL has nothing to do with
+      // whether the player can see ground: the fog clamp keys off attached
+      // terrain chunks, so starting terrain now is what opens the view. The
+      // gating path still takes sky first: the player is arriving INTO that
+      // sky behind an opaque loading screen, and its bar stays monotonic.
+      if (!idlePace) await skyLane;
       onProgress?.(5, 100);
+      const terrainStarted = performance.now();
       await this.terrainView.ensureZone(
         zone,
         (done, total) => onProgress?.(5 + Math.round((done / Math.max(1, total)) * 83), 100),
@@ -2382,16 +2417,24 @@ export class Renderer {
         }
       }
       const featuresDone = performance.now();
+      // Zone RESIDENCY still means the whole zone, sky included: the HUD map
+      // prewarm and the warmup gate both key off it. Only the fog was
+      // decoupled, and it now reads chunk residency instead.
+      await skyLane;
+      const prepareDone = performance.now();
       this.preparedZones.add(zone.id);
       // Presentation layers beyond the renderer (main.ts wires the HUD's map
       // background prewarm here) piggyback on zone residency, so their own
       // caches are warm before the player can interact with the new zone.
       this.onZonePrepared?.(zone.id);
+      // On a background prepare skyMs OVERLAPS terrainMs (the lanes run
+      // concurrently), so the stages no longer sum to totalMs. Each is still
+      // its own lane's wall time, which is what the pacing work reads them for.
       this.lastZonePrepareStats = {
         zoneId: zone.id,
-        totalMs: Math.round((featuresDone - started) * 10) / 10,
-        skyMs: Math.round((skyDone - started) * 10) / 10,
-        terrainMs: Math.round((terrainDone - skyDone) * 10) / 10,
+        totalMs: Math.round((prepareDone - started) * 10) / 10,
+        skyMs,
+        terrainMs: Math.round((terrainDone - terrainStarted) * 10) / 10,
         waterMs: Math.round((waterDone - terrainDone) * 10) / 10,
         featuresMs: Math.round((featuresDone - waterDone) * 10) / 10,
       };
@@ -6370,9 +6413,15 @@ export class Renderer {
       const k = 1 - Math.exp(-dt * 1.5);
       const requestedFar = preset.far * (this.lowGfx ? 1 : g.farScale);
       this.lastRequestedFogFar = requestedFar;
-      const targetFar = fogFarForPreparedZones(
-        ZONES,
-        this.preparedZones,
+      // Residency is read per CHUNK, through the terrain view's own accessor.
+      // Asking per ZONE meant an unprepared 36-to-54 chunk rectangle within
+      // ~53 yd pinned the view at the floor until that entire rectangle (and
+      // its HDRI) finished: 198 s of 45-yard wall after a Drakelands portal.
+      // Read live rather than cached: an editor rebuildTerrain swaps the view.
+      const ground = this.terrainView.groundResidency();
+      const targetFar = fogFarForBuiltGround(
+        ground.grid,
+        ground.isPending,
         this.camera.position.x,
         this.camera.position.z,
         requestedFar,
