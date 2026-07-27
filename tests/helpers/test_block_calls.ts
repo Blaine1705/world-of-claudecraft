@@ -255,7 +255,7 @@ export interface DuplicateBlock {
 }
 
 /**
- * Every block in `source` whose text repeats an earlier SIBLING's, byte for byte.
+ * Every block in `blocks` whose text repeats an earlier SIBLING's, byte for byte.
  *
  * Byte-identical, and deliberately not a similarity measure: the defect this
  * detects is a merge re-inserting a block verbatim (#2506, and a1a8cfd56 before
@@ -264,9 +264,13 @@ export interface DuplicateBlock {
  * `tests/professions_crafting.test.ts` names two DIFFERENT blocks
  * `self-gathered crafting bonus (#1145)`, which is a naming question, not a
  * duplicated block.
+ *
+ * Takes ALREADY-PARSED blocks rather than a source, so a caller that also wants
+ * the block list or the unresolved chains pays for one parse instead of two. The
+ * guard over `tests/` wants all three, and parsing 1600 sources twice is what put
+ * it over vitest's per-case timeout in the first place.
  */
-export function duplicateSiblingBlocks(source: string, fileName?: string): DuplicateBlock[] {
-  const { blocks } = testBlockCalls(source, fileName);
+export function duplicatesAmong(blocks: readonly TestBlockCall[]): DuplicateBlock[] {
   const seen = new Map<string, TestBlockCall>();
   const out: DuplicateBlock[] = [];
   for (const block of blocks) {
@@ -284,4 +288,13 @@ export function duplicateSiblingBlocks(source: string, fileName?: string): Dupli
     });
   }
   return out;
+}
+
+/**
+ * {@link duplicatesAmong} over a source string, for a caller that wants nothing
+ * else from the parse. The paired test drives this form; the `tests/` guard uses
+ * the block-taking form above, since it needs the blocks anyway.
+ */
+export function duplicateSiblingBlocks(source: string, fileName?: string): DuplicateBlock[] {
+  return duplicatesAmong(testBlockCalls(source, fileName).blocks);
 }

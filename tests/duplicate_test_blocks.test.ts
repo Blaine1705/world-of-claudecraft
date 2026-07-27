@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
-import { duplicateSiblingBlocks, testBlockCalls } from './helpers/test_block_calls';
+import { duplicatesAmong, testBlockCalls } from './helpers/test_block_calls';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
 // #2506: no test file may register the same block twice.
@@ -25,9 +25,10 @@ import { tsFilesUnder } from './helpers/ts_files_under';
 // recurses, over every `.ts` under `tests/`, and takes no view about which files
 // are allowed to hold blocks. `tests/` is genuinely deep (server/, admin/,
 // parity/, helpers/, progression/, browser/, util/), so the recursion is pinned
-// twice over: directly, by a file-count floor and a per-subdirectory check over
-// the real tree, and structurally, by a fixture that drives this file's OWN
-// producer over a nested tree.
+// three ways: by a file-count floor set deliberately ABOVE what a flat
+// top-level-only walk of this tree returns, by a depth and per-subdirectory
+// check over the real tree, and structurally, by a fixture that drives this
+// file's OWN producer over a nested tree.
 
 /** The scan root, as a parameter rather than a constant: the fixture case below
  *  drives this exact function over a temp tree, which is what pins the recursion
@@ -47,19 +48,20 @@ interface Offender {
  * One pass over `root`: every file's blocks, its duplicates, and the chains the
  * head resolver did not recognize.
  *
- * ONE pass on purpose. Parsing 1600-odd sources is the whole cost of this guard,
- * so a second producer beside this one is not just waste: the first cut ran the
- * duplicate sweep inside its own case and the block sweep at collection, and the
- * doubled work blew vitest's 5-second per-case timeout whenever the machine was
- * loaded, which is the state CI runs in. Every case below reads this one result.
+ * ONE parse per file, which is why the duplicates come from `duplicatesAmong` on
+ * blocks already in hand rather than from the source-taking wrapper, which would
+ * parse the file a second time. Parsing 1600-odd sources is this guard's whole
+ * cost: the first cut did it twice over, once at collection and once inside the
+ * offender case, and the doubled work blew vitest's 5-second per-case timeout
+ * whenever the machine was loaded, which is the state CI runs in.
  */
 const scanUnder = (root: string) =>
   tsFilesUnder(root).map(({ file, full }) => {
-    const source = readFileSync(full, 'utf8');
+    const parsed = testBlockCalls(readFileSync(full, 'utf8'), file);
     return {
       file,
-      ...testBlockCalls(source, file),
-      duplicates: duplicateSiblingBlocks(source, file).map((d): Offender => ({ file, ...d })),
+      ...parsed,
+      duplicates: duplicatesAmong(parsed.blocks).map((d): Offender => ({ file, ...d })),
     };
   });
 
