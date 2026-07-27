@@ -71,6 +71,26 @@ describe('gatherToolTooltipLines: fishing implements', () => {
       '<div class="tt-desc">Unlocks richer catch tables at fishing skill 200 and above.</div>',
     );
   });
+
+  it('the crafted rods keep scaling their bonuses and stop claiming a band they do not open', () => {
+    // There are three catch bands and a rod of tier T opens band T - 1, so
+    // tier 3 already reaches the last one. The band index used to be clamped,
+    // which made every rod above tier 3 repeat "skill 200 and above": a line
+    // that is true of the rod BELOW it and tells the owner of a crafted rod
+    // they bought something they already had. The bite and reel lines are the
+    // real gains and must still scale.
+    const stormreel = gatherToolTooltipLines(ITEMS.stormreel_fishing_rod);
+    expect(stormreel).toContain('<div class="tt-sub">Fishing rod (tier 4)</div>');
+    expect(stormreel).toContain('<div class="tt-desc">Fish bite up to 4.5s sooner.</div>');
+    expect(stormreel).toContain('<div class="tt-desc">Extends the reel window by 2.25s.</div>');
+    expect(stormreel).not.toContain('Unlocks richer catch tables');
+
+    const tidewrought = gatherToolTooltipLines(ITEMS.tidewrought_fishing_rod);
+    expect(tidewrought).toContain('<div class="tt-sub">Fishing rod (tier 5)</div>');
+    expect(tidewrought).toContain('<div class="tt-desc">Fish bite up to 6s sooner.</div>');
+    expect(tidewrought).toContain('<div class="tt-desc">Extends the reel window by 3s.</div>');
+    expect(tidewrought).not.toContain('Unlocks richer catch tables');
+  });
 });
 
 describe('gatherToolTooltipLines: everything else', () => {

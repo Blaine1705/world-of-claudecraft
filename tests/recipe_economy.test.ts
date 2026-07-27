@@ -10,7 +10,13 @@
 // plus an output sellValue re-price), so the frozen list below is EMPTY.
 import { describe, expect, it } from 'vitest';
 import { STATION_TYPE_BY_CRAFT } from '../src/sim/content/professions';
-import { ALL_RECIPES, COMBO_RECIPES, LADDER_RECIPES, recipeById } from '../src/sim/content/recipes';
+import {
+  ALL_RECIPES,
+  COMBO_RECIPES,
+  LADDER_RECIPES,
+  ROD_RECIPES,
+  recipeById,
+} from '../src/sim/content/recipes';
 import { ITEMS, NPCS, STATIONS } from '../src/sim/data';
 import { requiredReagentCountFor } from '../src/sim/professions/crafting';
 import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
@@ -254,8 +260,11 @@ describe('REFERENTIAL INTEGRITY', () => {
         ).toBeDefined();
       }
     }
-    // The 54 ladder recipes plus the 3 grandfathered combos all carry 'trainer'.
-    expect(trainerRecipes).toBe(LADDER_RECIPES.length + COMBO_RECIPES.length);
+    // The 54 ladder recipes plus the 3 grandfathered combos all carry
+    // 'trainer', and so do the two crafted rods: the pre-training id list is
+    // frozen, so anything authored after that switch has to be learned.
+    expect(trainerRecipes).toBe(LADDER_RECIPES.length + COMBO_RECIPES.length + ROD_RECIPES.length);
+    expect(ROD_RECIPES).toHaveLength(2);
   });
 
   it('the three station-free combo recipes resolve a home via professionId, not stationType', () => {

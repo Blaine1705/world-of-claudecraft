@@ -9200,6 +9200,12 @@ export const ru_RU: EnTranslations = {
       "fine_sunpetal_herb": {
         "name": "Отборная трава солнцелепест"
       },
+      "stormreel_fishing_rod": {
+        "name": "Stormreel Fishing Rod"
+      },
+      "tidewrought_fishing_rod": {
+        "name": "Tidewrought Fishing Rod"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },

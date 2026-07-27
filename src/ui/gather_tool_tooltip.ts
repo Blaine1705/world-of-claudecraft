@@ -83,15 +83,23 @@ export function gatherToolTooltipLines(item: ItemDef): string {
           }),
         }),
       );
-      const bandIndex = Math.min(tiersAbove, PROFICIENCY_BAND_THRESHOLDS.length - 1);
-      html += line(
-        'tt-desc',
-        t('hudChrome.gathering.toolTooltip.rodBand', {
-          skill: formatNumber(PROFICIENCY_BAND_THRESHOLDS[bandIndex], {
-            maximumFractionDigits: 0,
+      // The band line is only true while the rod actually raises the ceiling.
+      // A rod of tier T unlocks catch band T - 1, and there are three bands,
+      // so tier 3 reaches the last one and tiers 4 and 5 unlock no band at
+      // all. Clamping the index instead (which is what this did) made every
+      // rod above tier 3 repeat the tier-3 rod's claim, telling the owner of a
+      // crafted rod it unlocks something the rod below it already had. Their
+      // real gains are the two bonus lines above, which do keep scaling.
+      if (use.tier <= PROFICIENCY_BAND_THRESHOLDS.length) {
+        html += line(
+          'tt-desc',
+          t('hudChrome.gathering.toolTooltip.rodBand', {
+            skill: formatNumber(PROFICIENCY_BAND_THRESHOLDS[tiersAbove], {
+              maximumFractionDigits: 0,
+            }),
           }),
-        }),
-      );
+        );
+      }
     }
     return html;
   }

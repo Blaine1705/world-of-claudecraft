@@ -2393,6 +2393,16 @@
         "fine_goldleaf_herb",
         "fine_sunpetal_herb"
       ]
+    },
+    {
+      "source": "scripts/assets/rod_tier_icons.mjs (deterministic derivation from silverstream_fishing_rod.webp in this same directory)",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "the shipped Silverstream Fishing Rod icon, so the whole rod ladder keeps one silhouette",
+      "commonPrompt": "No prompt: the two crafted rods are tier treatments of the top vendor rod, cold drained storm steel for tier 4 and lit tidal violet under a gold rim for tier 5. Unlike a fine material grade this is a convenience rather than the correct answer (a Stormreel is a different rod, not a better-worked Silverstream), so painted originals may replace these two files without touching anything else. Re-derive with `node scripts/assets/rod_tier_icons.mjs`; verify with --check.",
+      "itemIds": [
+        "stormreel_fishing_rod",
+        "tidewrought_fishing_rod"
+      ]
     }
   ]
 }

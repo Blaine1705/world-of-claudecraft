@@ -9200,6 +9200,12 @@ export const ko_KR: EnTranslations = {
       "fine_sunpetal_herb": {
         "name": "상급 태양꽃잎 약초"
       },
+      "stormreel_fishing_rod": {
+        "name": "Stormreel Fishing Rod"
+      },
+      "tidewrought_fishing_rod": {
+        "name": "Tidewrought Fishing Rod"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },

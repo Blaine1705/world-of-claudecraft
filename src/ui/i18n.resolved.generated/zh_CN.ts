@@ -9200,6 +9200,12 @@ export const zh_CN: EnTranslations = {
       "fine_sunpetal_herb": {
         "name": "优质阳瓣草"
       },
+      "stormreel_fishing_rod": {
+        "name": "Stormreel Fishing Rod"
+      },
+      "tidewrought_fishing_rod": {
+        "name": "Tidewrought Fishing Rod"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },

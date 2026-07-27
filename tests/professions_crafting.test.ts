@@ -5,6 +5,7 @@ import {
   COMBO_RECIPES,
   COMMON_RECIPES,
   LADDER_RECIPES,
+  ROD_RECIPES,
   recipeById,
   TOOL_RECIPES,
 } from '../src/sim/content/recipes';
@@ -408,6 +409,7 @@ describe('craftItem command (#1127)', () => {
     const allIds = [
       ...COMMON_RECIPES,
       ...TOOL_RECIPES,
+      ...ROD_RECIPES,
       ...CASTER_HUB_RECIPES,
       ...COMBO_RECIPES,
       ...LADDER_RECIPES,
@@ -417,6 +419,7 @@ describe('craftItem command (#1127)', () => {
     expect(sim.recipeList.length).toBe(
       COMMON_RECIPES.length +
         TOOL_RECIPES.length +
+        ROD_RECIPES.length +
         CASTER_HUB_RECIPES.length +
         COMBO_RECIPES.length +
         LADDER_RECIPES.length,

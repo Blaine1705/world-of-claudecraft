@@ -9200,6 +9200,12 @@ export const ja_JP: EnTranslations = {
       "fine_sunpetal_herb": {
         "name": "上質なサンペタル草"
       },
+      "stormreel_fishing_rod": {
+        "name": "Stormreel Fishing Rod"
+      },
+      "tidewrought_fishing_rod": {
+        "name": "Tidewrought Fishing Rod"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },

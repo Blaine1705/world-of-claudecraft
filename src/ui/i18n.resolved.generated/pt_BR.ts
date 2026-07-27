@@ -9200,6 +9200,12 @@ export const pt_BR: EnTranslations = {
       "fine_sunpetal_herb": {
         "name": "Fine Sunpetal Herb"
       },
+      "stormreel_fishing_rod": {
+        "name": "Stormreel Fishing Rod"
+      },
+      "tidewrought_fishing_rod": {
+        "name": "Tidewrought Fishing Rod"
+      },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"
       },

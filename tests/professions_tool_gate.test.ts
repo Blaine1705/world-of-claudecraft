@@ -240,17 +240,35 @@ describe('gate table completeness', () => {
     expect(tools.length).toBe(9);
   });
 
-  it('no fishing implement is gated: rods belong to the fishing work, not this ladder', () => {
-    // Deliberate, not an oversight. Fishing has no world nodes to express
-    // either the threshold derivation or the hub-stocking rule against, and it
-    // counts to 200 rather than 100, so these numbers would not mean the same
-    // thing on that ladder.
+  it('no fishing implement is gated: the water paces the rods, not the counter', () => {
+    // SETTLED, where this used to be deferred. Rod access is paced by the
+    // water: each zone names the rod tier it takes and refuses a cast without
+    // it (professions/fishing_zones.ts), and fishing over your band pays in
+    // empty hooks whatever rod you hold. A proficiency gate on the counter on
+    // top of that would be a second lock on the same door, and it would put a
+    // level-6 fishing quest (q_the_codfather, Mirefen water) behind a
+    // proficiency grind for no design gain. Fishing also counts to 200 rather
+    // than 100, so the land thresholds would not mean the same thing here.
     const rods = Object.entries(ITEMS).filter(
       ([, def]) => def.use?.type === 'gatherTool' && def.use.professionId === 'fishing',
     );
-    expect(rods.length).toBe(2);
+    expect(rods.length).toBe(4);
     for (const [itemId] of rods) expect(VENDOR_ROW_GATES[itemId], itemId).toBeUndefined();
     expect(VENDOR_ROW_GATES.simple_fishing_pole).toBeUndefined();
+    // Split the claim, because the two halves are true for different reasons
+    // and a merged count would let one hide behind the other: the two PRICED
+    // rods are ungated by ruling, the two crafted ones have no vendor row to
+    // gate in the first place.
+    const priced = rods.filter(([, def]) => typeof def.buyValue === 'number');
+    const crafted = rods.filter(([, def]) => def.buyValue === undefined);
+    expect(priced.map(([id]) => id).sort()).toEqual([
+      'ironreel_fishing_rod',
+      'silverstream_fishing_rod',
+    ]);
+    expect(crafted.map(([id]) => id).sort()).toEqual([
+      'stormreel_fishing_rod',
+      'tidewrought_fishing_rod',
+    ]);
   });
 
   it('the gated tools stay transferable, which is what the open-routes note rests on', () => {

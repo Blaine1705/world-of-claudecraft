@@ -1383,18 +1383,41 @@ describe('Guide professions gathering accuracy', () => {
       }
     }
     // The rod ladder: simple pole tier 1, Ironreel t2 at 60c, Silverstream t3
-    // at 150c, all at Trader Wilkes.
+    // at 150c, all bought; Stormreel t4 and Tidewrought t5 crafted, so they
+    // carry no price at all.
     const fishing = GUIDE_PROF_GATHERING.find((g) => g.id === 'fishing');
     expect(fishing?.tools.map((tool) => [tool.name, tool.tier, tool.priceCopper])).toEqual([
       ['Simple Fishing Pole', 1, 20],
       ['Ironreel Fishing Rod', 2, 60],
       ['Silverstream Fishing Rod', 3, 150],
+      ['Stormreel Fishing Rod', 4, null],
+      ['Tidewrought Fishing Rod', 5, null],
     ]);
+    // Every rung says where it comes from, and the two routes are exclusive:
+    // a bought rod names a counter, a crafted one names the craft that makes
+    // it. Before the crafted rods existed this loop demanded a vendor for
+    // every row, which a crafted rod can never satisfy.
+    let bought = 0;
+    let crafted = 0;
     for (const rod of fishing?.tools ?? []) {
-      expect(
-        rod.vendors.some((v) => v.name === 'Trader Wilkes' || v.name === 'Fisherman Brandt'),
-      ).toBe(true);
+      if (rod.priceCopper === null) {
+        expect(rod.vendors, `${rod.name} is crafted and must be on no counter`).toEqual([]);
+        // The published row carries no item id, so the recipe is resolved
+        // through the display name the row does carry.
+        expect(rod.craftedBy, `${rod.name} must name its craft`).toBe(
+          ALL_RECIPES.find((r) => ITEMS[r.resultItemId]?.name === rod.name)?.professionId,
+        );
+        expect(rod.craftedBy).toBe('engineering');
+        crafted += 1;
+      } else {
+        expect(
+          rod.vendors.some((v) => v.name === 'Trader Wilkes' || v.name === 'Fisherman Brandt'),
+          `${rod.name} must name its stockist`,
+        ).toBe(true);
+        bought += 1;
+      }
     }
+    expect([bought, crafted]).toEqual([3, 2]);
   });
 
   it('publishes the tool-gate thresholds through placeholders in EVERY locale', () => {

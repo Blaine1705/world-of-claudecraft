@@ -217,6 +217,17 @@ describe('toolless-state helpers (#2343)', () => {
     // tiered rod) both satisfy the implement gate.
     expect(hasFishingImplement([{ itemId: 'simple_fishing_pole', count: 1 }], ITEMS)).toBe(true);
     expect(hasFishingImplement([{ itemId: 'ironreel_fishing_rod', count: 1 }], ITEMS)).toBe(true);
+    // Derived over EVERY fishing implement the world ships, so a new rod
+    // cannot arrive outside this gate by simply not being listed here.
+    const tackle = Object.values(ITEMS).filter(
+      (def) =>
+        def.use?.type === 'fishing' ||
+        (def.use?.type === 'gatherTool' && def.use.professionId === 'fishing'),
+    );
+    expect(tackle.length).toBe(5); // the pole plus four tiered rods
+    for (const def of tackle) {
+      expect(hasFishingImplement([{ itemId: def.id, count: 1 }], ITEMS), def.id).toBe(true);
+    }
     // A non-fishing gatherTool is not tackle.
     expect(hasFishingImplement([{ itemId: 'copper_mining_pick', count: 1 }], ITEMS)).toBe(false);
   });
@@ -473,6 +484,19 @@ describe('sim-level node access gating (Professions 2.0)', () => {
     expect(
       bestOwnedAnyGatherToolTier([{ itemId: 'silverstream_fishing_rod', count: 1 }], ITEMS),
     ).toBe(3);
+    // ACCEPTED CONSEQUENCE, pinned so it is a decision rather than a surprise:
+    // this is the CORPSE-harvest gate's input, and it deliberately reads any
+    // gathering tool, so the crafted rods raise what their owner can recover
+    // from a corpse to tier 4 and tier 5. That follows the shipped rule (a
+    // monster material has no owning profession, so any tool counts), and the
+    // rods that reach it are a trainer-taught craft off a Thornpeak-gated
+    // catch rather than a counter purchase.
+    expect(bestOwnedAnyGatherToolTier([{ itemId: 'stormreel_fishing_rod', count: 1 }], ITEMS)).toBe(
+      4,
+    );
+    expect(
+      bestOwnedAnyGatherToolTier([{ itemId: 'tidewrought_fishing_rod', count: 1 }], ITEMS),
+    ).toBe(5);
   });
 
   it('the tiered fishing rods are vendor gatherTool content, now off the pick pricing ladder', () => {
@@ -522,7 +546,20 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
     const mining = [ITEMS.thorium_mining_pick, ITEMS.arcanite_mining_pick];
     const logging = [ITEMS.ashwood_axe, ITEMS.elderwood_axe];
     const herbalism = [ITEMS.goldleaf_sickle, ITEMS.sunpetal_sickle];
-    const craftedIds = new Set([...mining, ...logging, ...herbalism].map((item) => item.id));
+    const fishing = [ITEMS.stormreel_fishing_rod, ITEMS.tidewrought_fishing_rod];
+    // DERIVED, not hand-listed: every gatherTool above tier 3, whatever its
+    // profession. The four lists are the readable statement of what that set
+    // is today, and the cross-check is what makes a future crafted tool land
+    // inside this guard instead of quietly outside it. The fishing rods did
+    // exactly that until this change: nothing here would have caught a
+    // crafted rod landing on a counter.
+    const craftedFromContent = Object.values(ITEMS).filter(
+      (def) => def.use?.type === 'gatherTool' && def.use.tier > 3,
+    );
+    const craftedIds = new Set(
+      [...mining, ...logging, ...herbalism, ...fishing].map((item) => item.id),
+    );
+    expect([...craftedIds].sort()).toEqual(craftedFromContent.map((d) => d.id).sort());
     // Direct scan of every NPC's vendorItems list, not just the buyValue
     // convention: makes the "never vendor-sold" claim self-contained instead
     // of leaning on buyValue and vendorItems always staying in lockstep.
@@ -535,6 +572,7 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
       ['mining', mining],
       ['logging', logging],
       ['herbalism', herbalism],
+      ['fishing', fishing],
     ] as const) {
       expect(tools.every(Boolean)).toBe(true);
       const tiers = tools.map((item) => gatherToolTier(item, profession));

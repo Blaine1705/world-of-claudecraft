@@ -340,6 +340,86 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
+// The crafted fishing rods, tier 4 and tier 5 (D9).
+//
+// A SEPARATE LIST FROM TOOL_RECIPES, deliberately. TOOL_RECIPES carries one
+// invariant that is the whole reason it exists: every member consumes a FINE
+// gathered grade plus the tool one rung down, which is what makes that ladder
+// self-gating (the grade only drops for a player whose tool already outclasses
+// it). Fishing has no world nodes, so it has no fine grades, and folding these
+// two rows in would turn that invariant into "a fine grade OR a rare catch",
+// a disjunction the six land recipes could then quietly stop satisfying while
+// the sweep stayed green on the rods. A weaker shared claim is worth less than
+// two strong separate ones, so the rod ladder states its own
+// (tests/professions_rod_recipes.test.ts) and leaves TOOL_RECIPES alone.
+//
+// HOW FAR THE SELF-GATE ACTUALLY REACHES, stated plainly rather than implied.
+// Each rung consumes the rod below it, same as the land ladder. The rest
+// diverges:
+//
+// - The tier-4 rung is paced, not gated. Its reagent is the rare catch, whose
+//   weight is 1 / 3 / 6 by proficiency band (content/items.ts), so a capped
+//   angler farms it six times faster than a beginner. A beginner CAN still
+//   land one, which is the deliberate difference from a fine grade: the koi
+//   is also the low-level thrill and a deed target, and gating it behind
+//   fishing's 200 cap would have put the tier-4 rod behind the end of the
+//   climb rather than partway up it, which is not where the land tier-4 tools
+//   sit.
+// - The tier-5 rung IS hard-gated, and that is what the Slatefin Carp is
+//   doing in it. Carp is a Thornpeak-only catch, and Thornpeak water takes a
+//   tier-3 rod (professions/fishing_zones.ts), so the reagent cannot be
+//   fished at all without the rung this recipe's own input descends from.
+//
+// Neither rung joins the counterfactually-vendor-fed set in
+// tests/recipe_economy.test.ts, because the koi carries no buyValue and no
+// counter stocks it. That is a property of the reagent, not an exemption.
+//
+// Both carry `acquisition: ['trainer']`: the pre-training recipe list is a
+// frozen historical record and must not grow, so anything authored after that
+// switch is learned from a master. Tinker Gizzel at the Eastbrook toolworks
+// teaches them, without a content edit, because the trainer's list derives
+// from the crafts its station serves.
+//
+// SKILL REQUIREMENTS ARE BOTH INSIDE ENGINEERING'S CAP (125), unlike the
+// tier-5 land tools at 75/150. 150 resolves to tier 6 while the cap resolves
+// to tier 5, and a trainer only teaches a recipe whose tier the learner has
+// reached, so a trainer-taught recipe at 150 would be permanently unlearnable
+// rather than merely expensive. The land tools escape that only because they
+// predate training and are grandfathered known.
+export const ROD_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_stormreel_fishing_rod',
+    professionId: 'engineering',
+    resultItemId: 'stormreel_fishing_rod',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'glimmerfin_koi', count: 4 },
+      { itemId: 'silverstream_fishing_rod', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+  {
+    id: 'recipe_tidewrought_fishing_rod',
+    professionId: 'engineering',
+    resultItemId: 'tidewrought_fishing_rod',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'glimmerfin_koi', count: 2 },
+      { itemId: 'raw_stonescale_carp', count: 8 },
+      { itemId: 'stormreel_fishing_rod', count: 1 },
+    ],
+    skillReq: 125,
+    itemLevelBudget: 30,
+    level: 20,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+];
+
 // Station-tier caster-stat (int/spi) recipes (crafting content follow-up to
 // the COMMON_RECIPES caster pieces above): one per tailoring/leatherworking/
 // armorcrafting, at the same osmium tier as TOOL_RECIPES, each bound to its
@@ -1376,6 +1456,7 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
 export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...COMMON_RECIPES,
   ...TOOL_RECIPES,
+  ...ROD_RECIPES,
   ...CASTER_HUB_RECIPES,
   ...COMBO_RECIPES,
   ...LADDER_RECIPES,

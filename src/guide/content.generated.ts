@@ -4320,6 +4320,70 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 200,
           "zeroAt": 225
         }
+      },
+      {
+        "id": "recipe_stormreel_fishing_rod",
+        "name": "Stormreel Fishing Rod",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "name": "Sunglint Koi",
+            "count": 4
+          },
+          {
+            "name": "Silverstream Fishing Rod",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Stormreel Fishing Rod",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
+      },
+      {
+        "id": "recipe_tidewrought_fishing_rod",
+        "name": "Tidewrought Fishing Rod",
+        "skillReq": 125,
+        "tier": 5,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 160000,
+        "materials": [
+          {
+            "name": "Sunglint Koi",
+            "count": 2
+          },
+          {
+            "name": "Raw Slatefin Carp",
+            "count": 8
+          },
+          {
+            "name": "Stormreel Fishing Rod",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Tidewrought Fishing Rod",
+          "count": 1,
+          "quality": "epic"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 150,
+          "minimalAt": 175,
+          "zeroAt": 200
+        }
       }
     ]
   },
@@ -7279,6 +7343,22 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
             "hub": "Eastbrook"
           }
         ]
+      },
+      {
+        "name": "Stormreel Fishing Rod",
+        "tier": 4,
+        "quality": "rare",
+        "priceCopper": null,
+        "vendors": [],
+        "craftedBy": "engineering"
+      },
+      {
+        "name": "Tidewrought Fishing Rod",
+        "tier": 5,
+        "quality": "epic",
+        "priceCopper": null,
+        "vendors": [],
+        "craftedBy": "engineering"
       }
     ],
     "fishing": {

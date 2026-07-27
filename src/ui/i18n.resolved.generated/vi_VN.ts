@@ -9200,6 +9200,12 @@ export const vi_VN: EnTranslations = {
       "fine_sunpetal_herb": {
         "name": "Fine Sunpetal Herb"
       },
+      "stormreel_fishing_rod": {
+        "name": "Stormreel Fishing Rod"
+      },
+      "tidewrought_fishing_rod": {
+        "name": "Tidewrought Fishing Rod"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },

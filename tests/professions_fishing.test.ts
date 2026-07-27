@@ -35,7 +35,7 @@ import { bagCapacity } from '../src/sim/bags';
 import { updateCasting } from '../src/sim/combat/casting_lifecycle';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { FISHING_TABLES, FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
-import { DEEPFEN_SHALLOWS_LAKE, LAKE } from '../src/sim/data';
+import { DEEPFEN_SHALLOWS_LAKE, ITEMS, LAKE } from '../src/sim/data';
 import {
   completeFishing,
   FISHING_BAND_THRESHOLDS,
@@ -923,8 +923,19 @@ describe('fishing band tool cap (Professions 2.0)', () => {
     expect(sim.player.castingAbility).toBe(null);
   });
 
-  it('useItem on each new rod starts the standard fishing cast', () => {
-    for (const rodId of ['ironreel_fishing_rod', 'silverstream_fishing_rod']) {
+  it('useItem on every tiered rod starts the standard fishing cast', () => {
+    // Derived over the live item table rather than a hand list, so a rod
+    // added later cannot skip this by not being written down here.
+    const rodIds = Object.values(ITEMS)
+      .filter((def) => def.use?.type === 'gatherTool' && def.use.professionId === 'fishing')
+      .map((def) => def.id);
+    expect(rodIds.sort()).toEqual([
+      'ironreel_fishing_rod',
+      'silverstream_fishing_rod',
+      'stormreel_fishing_rod',
+      'tidewrought_fishing_rod',
+    ]);
+    for (const rodId of rodIds) {
       const sim = makeSim(4242);
       // South shore of the vale lake, facing the center (the pin-10 idiom).
       const pz = LAKE.z - LAKE.radius - 2;

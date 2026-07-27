@@ -698,6 +698,36 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     use: { type: 'gatherTool', professionId: 'herbalism', tier: 5 },
     sellValue: 150,
   },
+  // The crafted rods, tier 4 and 5 (D9). Same shape, pricing and
+  // never-vendor-sold rule as the six land tools above, and made at the same
+  // toolworks, but their ladder is built out of what a rod CATCHES rather than
+  // out of fine gathered grades: fishing has no world nodes, so no fine
+  // material exists for it (professions/material_grades.ts owns the nine that
+  // do). See ROD_RECIPES in content/recipes.ts for what each rung consumes and
+  // why that is a weaker self-gate than the land ladder's.
+  //
+  // What the top two rungs actually buy: no new catch band (there are three
+  // bands and tier 3 already reaches the last one) and no new zone (there are
+  // three zones and tier 3 already opens the deepest). They buy the minigame
+  // itself, a shorter worst-case wait and a wider reel window, plus the
+  // standing they read as. Tier 5 sits flat on the bite-delay floor, which is
+  // the ladder ending rather than a rounding error.
+  stormreel_fishing_rod: {
+    id: 'stormreel_fishing_rod',
+    name: 'Stormreel Fishing Rod',
+    kind: 'tool',
+    quality: 'rare',
+    use: { type: 'gatherTool', professionId: 'fishing', tier: 4 },
+    sellValue: 60,
+  },
+  tidewrought_fishing_rod: {
+    id: 'tidewrought_fishing_rod',
+    name: 'Tidewrought Fishing Rod',
+    kind: 'tool',
+    quality: 'epic',
+    use: { type: 'gatherTool', professionId: 'fishing', tier: 5 },
+    sellValue: 150,
+  },
   // Tier 4/5 crafting reagents for the tools directly above (#1135's
   // `TOOL_RECIPE_STUBS`, de-stubbed into src/sim/content/recipes.ts once
   // #1127's crafting action existed to consume them). `kind: 'junk'`, same
