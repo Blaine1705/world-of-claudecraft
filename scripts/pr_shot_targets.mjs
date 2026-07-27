@@ -3106,7 +3106,12 @@ export const TARGETS = [
   {
     key: 'p13-bag-actions',
     label: 'Bag item action menu (disenchant / salvage / apply enchant)',
-    when: ['bag_item_context_menu', 'bag_item_action_menu', 'enchant_apply_view'],
+    when: [
+      'bag_item_context_menu',
+      'bag_item_action_menu',
+      'enchant_apply_view',
+      'item_slot_labels',
+    ],
     // Four states of the bag-action surface: the desktop right-click menu, the same
     // menu from a mobile tap (the mobile arm), the stronger
     // destruction warning (the only held copy is signed masterwork), and the
@@ -3127,6 +3132,17 @@ export const TARGETS = [
       { key: 'targets', targets: true },
       { key: 'targets-mobile', targets: true, mobile: true },
       { key: 'targets-dualwield', targets: true, dualWield: true, charClass: 'rogue' },
+      // #2466: the two holdings that painted two rows with ONE accessible name.
+      // A heroic variant renders its BASE item's display name (classic
+      // behavior), so a plain base beside a plain heroic copy was two rows of
+      // identical text; and both fingers share the one "Finger" slot label, so
+      // identical rings worn on each hand read alike. Each is its own scene
+      // because they land in different families (bagged vs worn) and carry
+      // different discriminators.
+      { key: 'targets-heroic', targets: true, heroicPair: true },
+      { key: 'targets-heroic-mobile', targets: true, heroicPair: true, mobile: true },
+      { key: 'targets-rings', targets: true, rings: true, drill: 'Ring' },
+      { key: 'targets-rings-mobile', targets: true, rings: true, drill: 'Ring', mobile: true },
       // The #2415 replace flow: already-enchanted copies list as FLAGGED
       // replace rows (worn and bagged families both, the meta naming the
       // enchant a confirm would destroy, the same-enchant row disabled), and
@@ -3154,10 +3170,44 @@ export const TARGETS = [
         document.querySelector('.gpu-notice-dismiss')?.click();
       });
       const staged = await page.evaluate(
-        (wantsConfirm, wantsPicker, wantsTargets, wantsDualWield, wantsReplace) => {
+        (
+          wantsConfirm,
+          wantsPicker,
+          wantsTargets,
+          wantsDualWield,
+          wantsReplace,
+          wantsHeroicPair,
+          wantsRings,
+        ) => {
           const game = window.__game;
           const sim = game?.sim;
           if (!game || !sim?.player) return { ok: false, reason: 'offline world unavailable' };
+          if (wantsHeroicPair) {
+            // #2466: a base item and its HEROIC variant, two ids that resolve to
+            // ONE display name. Both copies stay PLAIN, which is the worst case:
+            // no state tag separates them either, so the heroic mark is the only
+            // thing between the two rows. Real content ids, never a hand-written
+            // name.
+            sim.addItem('gravewyrm_thornmaul', 1);
+            sim.addItem('heroic_gravewyrm_thornmaul', 1);
+            sim.addItem('arcane_dust', 6);
+            return { ok: true, itemName: 'Chime Dust' };
+          }
+          if (wantsRings) {
+            // #2466: one ring id worn on BOTH fingers. ring1 and ring2 share the
+            // single "Finger" label, so the two rows were identical down to the
+            // byte and both stayed activatable. The rings are epic and carry a
+            // level requirement, so the player is levelled first (the ladder
+            // target's own idiom) or equipItem refuses them.
+            const p = sim.entities.get(sim.playerId);
+            if (p) p.level = 60;
+            sim.addItem('iron_vow_band', 1);
+            sim.equipItemToSlot('iron_vow_band', 'ring1');
+            sim.addItem('iron_vow_band', 1);
+            sim.equipItemToSlot('iron_vow_band', 'ring2');
+            sim.addItem('arcane_dust', 6);
+            return { ok: true, itemName: 'Chime Dust' };
+          }
           if (wantsReplace) {
             // The #2415 scene: a WORN enchanted copy (the in-place replace
             // target), a bagged copy carrying a DIFFERENT enchant (the flagged
@@ -3231,6 +3281,8 @@ export const TARGETS = [
         Boolean(variant?.targets),
         Boolean(variant?.dualWield),
         Boolean(variant?.replace),
+        Boolean(variant?.heroicPair),
+        Boolean(variant?.rings),
       );
       if (!staged.ok) throw new Error(staged.reason);
       await page.evaluate(() => {
@@ -3287,13 +3339,16 @@ export const TARGETS = [
           // Drill one step further into the TARGET list by clicking the weapon
           // enchant's own row (matched by its localized name, so a reordered
           // enchant table cannot silently shoot the wrong step).
-          const drilled = await page.evaluate(() => {
+          // Matched by the enchant's own localized name, so a reordered enchant
+          // table cannot silently shoot the wrong step. The ring scenes need a
+          // RING enchant rather than the weapon default.
+          const drilled = await page.evaluate((match) => {
             const rows = [...document.querySelectorAll('#ctx-menu .ctx-item[data-act]')];
-            const row = rows.find((r) => (r.textContent ?? '').includes('Might')) ?? rows[0];
+            const row = rows.find((r) => (r.textContent ?? '').includes(match)) ?? rows[0];
             if (!row) return false;
             row.click();
             return true;
-          });
+          }, variant?.drill ?? 'Might');
           if (!drilled) throw new Error('no affordable enchant row to drill into');
           await wait(500);
           if (!(await pollForSize(page, '#ctx-menu')))

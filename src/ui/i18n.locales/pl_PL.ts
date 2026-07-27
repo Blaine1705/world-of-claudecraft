@@ -9296,6 +9296,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Zaklęcia wyższe',
   'hudChrome.enchanting.tier.runed': 'Zaklęcia runiczne',
   'hudChrome.enchanting.wornTag': 'Założone ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Założone ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Oczekiwane materiały:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': 'od {min} do {max} {item}',

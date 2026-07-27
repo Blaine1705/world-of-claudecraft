@@ -9277,6 +9277,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Pháp Khắc Cao Cấp',
   'hudChrome.enchanting.tier.runed': 'Pháp Khắc Phù Văn',
   'hudChrome.enchanting.wornTag': 'Đang Trang Bị ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Đang Trang Bị ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Nguyên liệu dự kiến:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': '{min} đến {max} {item}',

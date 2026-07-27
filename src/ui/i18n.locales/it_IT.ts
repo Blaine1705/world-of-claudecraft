@@ -9402,6 +9402,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Incanti Superiori',
   'hudChrome.enchanting.tier.runed': 'Incanti Runici',
   'hudChrome.enchanting.wornTag': 'Indossato ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Indossato ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Materiali previsti:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': 'Da {min} a {max} {item}',

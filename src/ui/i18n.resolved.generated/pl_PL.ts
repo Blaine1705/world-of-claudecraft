@@ -2477,6 +2477,7 @@ export const pl_PL: EnTranslations = {
       "noEnchants": "Brak zaklinania używającego tego składnika.",
       "noTargets": "Brak kwalifikującego się przedmiotu do zaklinania.",
       "wornTag": "Założone ({slot})",
+      "wornTagIndexed": "Założone ({slot} {index})",
       "tier": {
         "base": "Zaklęcia podstawowe",
         "runed": "Zaklęcia runiczne",

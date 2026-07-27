@@ -2477,6 +2477,7 @@ export const ko_KR: EnTranslations = {
       "noEnchants": "이 재료를 사용하는 마법부여가 없습니다.",
       "noTargets": "마법부여할 수 있는 아이템이 없습니다.",
       "wornTag": "착용 중 ({slot})",
+      "wornTagIndexed": "착용 중 ({slot} {index})",
       "tier": {
         "base": "기본 마법부여",
         "runed": "룬 마법부여",

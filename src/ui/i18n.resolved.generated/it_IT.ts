@@ -2477,6 +2477,7 @@ export const it_IT: EnTranslations = {
       "noEnchants": "Nessun incantesimo utilizza questo reagente.",
       "noTargets": "Nessun oggetto idoneo da incantare.",
       "wornTag": "Indossato ({slot})",
+      "wornTagIndexed": "Indossato ({slot} {index})",
       "tier": {
         "base": "Incanti Base",
         "runed": "Incanti Runici",

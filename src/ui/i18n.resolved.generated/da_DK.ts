@@ -2477,6 +2477,7 @@ export const da_DK: EnTranslations = {
       "noEnchants": "Ingen fortryllelse bruger dette reagens.",
       "noTargets": "Ingen berettiget genstand at fortryle.",
       "wornTag": "Båret ({slot})",
+      "wornTagIndexed": "Båret ({slot} {index})",
       "tier": {
         "base": "Basisfortryllelser",
         "runed": "Runede Fortryllelser",

@@ -2829,9 +2829,16 @@ export const hudChromeStrings = {
     // enchanted in place, so it lists alongside the bagged copies and needs to
     // say which equipment slot it is on ({slot} resolves through the shared
     // itemUi.slots labels, so Main Hand and Off Hand separate a dual-wielded
-    // pair). Both rings share the one "Finger" label there, which is fine: two
-    // eligible identical rings take the same enchant either way.
+    // pair).
     wornTag: 'Worn ({slot})',
+    // The same tag for an equipment key whose slot label is SHARED with another
+    // key: both fingers read "Finger", so two rings listed at once produced two
+    // identical rows and the player could not tell which finger a tap would
+    // change (#2466). {index} is the 1-based position inside the shared-label
+    // group (enchant_apply_view.ts slotIndex), so this reads "Worn (Finger 1)"
+    // and "Worn (Finger 2)". One key, never the plain tag with a number glued
+    // on: the order of a slot name and its ordinal is the translator's call.
+    wornTagIndexed: 'Worn ({slot} {index})',
     // The Apply Enchant picker's three section headers, in ladder order. The
     // tier is derived from the reagents alone (enchant_apply_view.ts
     // enchantTier), so these headers name the same ladder content/enchants.ts

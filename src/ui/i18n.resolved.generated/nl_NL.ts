@@ -2477,6 +2477,7 @@ export const nl_NL: EnTranslations = {
       "noEnchants": "Geen betovering gebruikt dit reagens.",
       "noTargets": "Geen geschikt voorwerp om te betoveren.",
       "wornTag": "Gedragen ({slot})",
+      "wornTagIndexed": "Gedragen ({slot} {index})",
       "tier": {
         "base": "Basisbetoveringen",
         "runed": "Gerunede betoveringen",

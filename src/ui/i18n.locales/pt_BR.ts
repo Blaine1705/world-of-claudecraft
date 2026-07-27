@@ -9361,6 +9361,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Encantamentos Superiores',
   'hudChrome.enchanting.tier.runed': 'Encantamentos Rúnicos',
   'hudChrome.enchanting.wornTag': 'Equipado ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Equipado ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Materiais esperados:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': '{min} a {max} {item}',

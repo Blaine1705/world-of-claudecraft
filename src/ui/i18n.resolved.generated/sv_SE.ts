@@ -2477,6 +2477,7 @@ export const sv_SE: EnTranslations = {
       "noEnchants": "Inget förtrollning använder det reagnset.",
       "noTargets": "Inget behörigt föremål att förtrylla.",
       "wornTag": "Buren ({slot})",
+      "wornTagIndexed": "Buren ({slot} {index})",
       "tier": {
         "base": "Basförtrollningar",
         "runed": "Runristade förtrollningar",
