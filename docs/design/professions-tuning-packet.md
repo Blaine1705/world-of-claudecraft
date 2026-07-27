@@ -454,13 +454,50 @@ Its own phase because it is the only one that touches persistence and the wire.
   its USE is gated on is the open purchase-versus-use ruling; the clears gate is
   what paces these rows today, and it is a content gate rather than a profession
   one, so nothing presumes an answer.
-- **OPEN: the effects have no acquisition path.** `TOOL_EFFECTS` is catalog only
-  (no item, no recipe, no `ItemUse` variant, no dev command), so the slot
-  command is fully wired and validated but no player can obtain an effect yet,
-  and every HUD row is empty today. That was a deliberate scope call: the cost
-  list above names the wiring and not a content source, and minting the three
-  effects would open the first enchanting recipes in the game and brush the
-  deferred work-order economics. The natural next step is that craft.
+- **OPEN: the effects have no acquisition path, and the wire command is
+  DEV-GATED until they do.** `TOOL_EFFECTS` is catalog only (no item, no
+  recipe, no `ItemUse` variant), so no player can obtain an effect and every
+  HUD row is empty today. That was a deliberate scope call: the cost list above
+  names the wiring and not a content source, and minting the three effects
+  would open the first enchanting recipes in the game and brush the deferred
+  work-order economics.
+
+  The first draft of that claim was FALSE, and six reviewers caught it. Wiring
+  `slot_tool_effect` into the server dispatch made the command itself the
+  acquisition path: it consumed no item, no copper, no recipe, no station and
+  no cooldown, re-sending it refilled the charges, and the bonus is live on the
+  harvest path (+1 unit, or +1 to the grade tier that decides fine yields). One
+  hand-built frame bought a permanent free bonus and made the entire
+  `rechargeCost` / `rechargeEffect` economy unreachable by construction. The
+  absence of a HUD button was never a gate.
+
+  The dispatch case is therefore gated on `ALLOW_DEV_COMMANDS`, which is never
+  set in production, and `tests/professions_tool_effect_slot_online.test.ts`
+  pins BOTH directions so the gate cannot rot into a no-op. Remove it in the
+  same change that ships the craft.
+
+- **`prompt` mode is refused until a confirmation flow exists.** `resolveHarvest`
+  passes `confirmed: true` unconditionally, so a `prompt` slot would fire and
+  spend a charge on every harvest while telling its owner it asks first.
+  Accepting the mode is what would make that comment in `gathering.ts` false,
+  so `resolveSlotToolEffect` refuses it and the HUD badge that advertised it
+  was removed. The machinery in `resolveToolEffectUse` stays, ready for the
+  flow.
+
+- **`craftedBy` is left unset at slot time.** Its documented meaning is whoever
+  produced the effect through the production craft that made it, and no such
+  craft exists. Recording the slotter instead would be a lie AND a permanent
+  original-crafter recharge discount for every self-slotted effect, and it
+  would persist an entity id, which restarts at 1 on every boot and therefore
+  stops matching its owner and eventually matches whoever inherits it.
+
+- **Rollback caveat, recorded while it is still cheap.** `saveCharacterState`
+  writes the whole `characters.state` blob rather than merging, so a binary
+  that predates `toolEffectSlots` erases the key on its first autosave. Harmless
+  today (nothing can mint a slot on a production realm, and the field is absent
+  for everyone), but it becomes real player-value loss the moment an
+  acquisition craft with a material cost ships. Whoever lands that craft owns
+  this.
 - **`guide.profPages.toolsNote` was already stale in all 18 locale overlays, and
   nothing could see it.** The English gained a whole paragraph earlier in this
   packet (`523acb0dd`) and the overlays were not refilled, so every localized
