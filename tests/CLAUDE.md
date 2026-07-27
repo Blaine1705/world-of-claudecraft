@@ -35,7 +35,9 @@ Subdirectories (plus one shared fixture):
   and `css_tree_under.ts`, the two source walks, `scan_guard_self_audit.ts`, the pin that
   keeps a guard from re-growing its own directory read, `method_call_sites.ts`, the
   `ts.createSourceFile` walk that reports the calls a class method evaluates, each with the
-  `if` chain guarding each, `alloc_probe.ts`).
+  `if` chain guarding each, `test_block_calls.ts`, the `ts.createSourceFile` walk that reports
+  every `describe`/`it`/`test`/`suite` call in a source tagged with the block enclosing it,
+  `alloc_probe.ts`).
 - `global_setup.ts`: runs on every vitest invocation (`vite.config.ts` `test.globalSetup`);
   mints the SFX Studio temp root (`WOC_SFX_STUDIO_TEST_ROOT`).
 
@@ -106,6 +108,15 @@ use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
   painter-side helper, which then may only mint its own canvas and must stay deterministic and
   colorless) or in `UI_DOM_MODULES` (it owns browser state), and anything unregistered must touch
   no browser global at all.
+- **Never register the same block twice.** `duplicate_test_blocks.test.ts` walks every `.ts`
+  under `tests/` and fails on any `describe`/`it`/`test`/`suite` call whose source text repeats
+  an earlier SIBLING's byte for byte. Vitest runs duplicate titles silently, so nothing else
+  can say so, and this defect arrives through MERGES: #2506 deleted the same two
+  `gathering.test.ts` blocks that `a1a8cfd56` had already deleted once. Byte-identical and
+  sibling-scoped on purpose: the same body under two different describes is ordinary (each
+  parent brings its own setup), and a same-TITLE rule would be a different, red guard
+  (`professions_crafting.test.ts` names two distinct blocks `self-gathered crafting bonus
+  (#1145)`). A duplicate is always deleted, never renamed apart.
 - `guide.test.ts` is the wiki freshness gate: new/changed player-facing content in
   `src/sim/content/` fails it until `npm run wiki:content` regenerates (auto in `pretest`).
 - `css_corpus.test.ts` guards the CSS union corpus + brace balance (a dropped closing

@@ -321,11 +321,15 @@ export function harvestCorpse(
   // than being re-argued away.
   //
   // This also covers the DERIVED pick, not just an explicit one: an omitted
-  // `components` resolves through meta.townFocus, and set_town_focus does not
-  // validate that a key is a real component tag (#2511), so a persisted
-  // `{ claw: 5 }` makes the plain interact press take this arm too. Refusing
-  // is the better outcome there as well: the corpse survives for a pick that
-  // can pay out, instead of being burned by a focus the player cannot see.
+  // `components` resolves through meta.townFocus, so a persisted `{ claw: 5 }`
+  // makes the plain interact press take this arm too. Refusing is the better
+  // outcome there as well: the corpse survives for a pick that can pay out,
+  // instead of being burned by a focus the player cannot see. #2511 has since
+  // closed the route that could WRITE such a focus (set_town_focus rejects a
+  // key outside HARVEST_COMPONENT_ITEMS, and the load arm drops one an older
+  // save carries), so this arm is now defense in depth on the derived pick
+  // rather than a reachable path; tests/corpse_harvest_sim.test.ts still
+  // drives it by poking meta directly, which is what a pre-#2511 save was.
   if (forfeitsEveryMappedYield(componentTags ?? [], chosen)) {
     ctx.error(meta.entityId, 'Nothing you selected can be harvested from that corpse.');
     return;
