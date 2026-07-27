@@ -19,7 +19,7 @@ import {
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Aura, Entity } from '../src/sim/types';
+import type { Aura, Entity, SimEvent } from '../src/sim/types';
 
 type AnyEntity = Entity & Record<string, any>;
 
@@ -62,6 +62,10 @@ function awareMob(sim: Sim, threatOn: number[]): AnyEntity {
   for (const id of threatOn) mob.threat.set(id, 10);
   (sim as any).addEntity(mob);
   return mob;
+}
+
+function isHeal2Event(event: SimEvent): event is Extract<SimEvent, { type: 'heal2' }> {
+  return event.type === 'heal2';
 }
 
 describe('heal: healingTakenMult (Mortal Wound)', () => {
@@ -242,6 +246,36 @@ describe('heal: applyHeal', () => {
     expect(tgt.hp).toBe(5000); // clamped to maxHp
     const ev = sim.drainEvents().find((e) => e.type === 'heal2') as any;
     expect(ev.amount).toBe(100); // only the effective (non-overheal) portion
+  });
+
+  it('emits a real zero-amount landing on a full-health out-of-combat player without threat', () => {
+    const sim = makeSim();
+    const src = addHealer(sim);
+    const tgt = sim.player as AnyEntity;
+    const mob = awareMob(sim, [tgt.id]);
+    tgt.hp = tgt.maxHp;
+    src.stats.int = -1000; // no crit, so the emitted landing is stable.
+
+    sim.drainEvents();
+    const healed = applyHeal(sim.ctx, src, tgt, 1000, 'Lesser Heal');
+
+    expect(healed).toBe(0);
+    expect(tgt.hp).toBe(tgt.maxHp);
+    expect(tgt.inCombat).toBe(false);
+    const ev = sim.drainEvents().find(isHeal2Event);
+    if (!ev) throw new Error('expected heal2 landing event');
+    expect(ev).toEqual(
+      expect.objectContaining({
+        type: 'heal2',
+        sourceId: src.id,
+        targetId: tgt.id,
+        amount: 0,
+        crit: false,
+        ability: 'Lesser Heal',
+      }),
+    );
+    expect(ev.cueOnly).toBeUndefined();
+    expect(mob.threat.has(src.id)).toBe(false);
   });
 
   it('chains crit * hex(source) * mortalWound(target) before the absorb soak', () => {

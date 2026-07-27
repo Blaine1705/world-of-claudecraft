@@ -225,6 +225,7 @@ import { ERROR_LOG_COLOR, shouldMirrorErrorToast } from './error_toast_log';
 import { esc } from './esc';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
+import { shouldShowHealLanding } from './heal_landing_feedback_core';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
 import {
   PARTY_FRAME_POS_KEY,
@@ -9927,7 +9928,7 @@ export class Hud {
           break;
         case 'heal2': {
           const tgt = sim.entities.get(ev.targetId);
-          if (tgt && ev.amount > 0) {
+          if (tgt && shouldShowHealLanding(ev)) {
             const shape = fctSpawnShape({
               type: 'heal',
               crit: ev.crit,
