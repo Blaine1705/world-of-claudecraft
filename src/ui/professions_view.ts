@@ -274,9 +274,6 @@ export interface GatheringToolEffectModel {
    *  untouched, and a recharge can restore it. The row says "spent" rather
    *  than showing a bare 0, because 0 of 30 reads like a broken tool. */
   spent: boolean;
-  /** True when the slot only fires on an explicit per-use confirmation, which
-   *  is a thing the owner chose and must be able to see. */
-  prompts: boolean;
 }
 
 export interface ProfessionsGatheringRow {
@@ -383,7 +380,6 @@ export function buildProfessionsView(input: ProfessionsViewInput): ProfessionsVi
             charges: slot.charges,
             maxCharges: slot.maxCharges,
             spent: slot.charges <= 0,
-            prompts: slot.confirmMode === 'prompt',
           }
         : null,
     };

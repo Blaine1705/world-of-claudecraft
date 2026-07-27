@@ -2328,7 +2328,6 @@ export const ja_JP: EnTranslations = {
       "skillValue": "{skill} / {max}",
       "toolEffectCharges": "残り {charges} / {max} 回",
       "toolEffectSpent": "使い切りました。再充填が必要です",
-      "toolEffectPrompts": "使用のたびに確認する",
       "toolEffectName": {
         "gatherersCache": "採集者の貯蔵袋",
         "artisansEye": "職人の眼",

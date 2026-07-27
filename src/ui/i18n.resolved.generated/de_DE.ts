@@ -2328,7 +2328,6 @@ export const de_DE: EnTranslations = {
       "skillValue": "{skill} / {max}",
       "toolEffectCharges": "{charges} of {max} charges",
       "toolEffectSpent": "Spent, needs recharging",
-      "toolEffectPrompts": "Asks before each use",
       "toolEffectName": {
         "gatherersCache": "Gatherer's Cache",
         "artisansEye": "Artisan's Eye",

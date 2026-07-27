@@ -125,7 +125,6 @@ describe('buildProfessionsView: model construction', () => {
         charges: 12,
         maxCharges: 30,
         spent: false,
-        prompts: false,
       });
       // The OTHER row must stay null, so the join is a join and not a broadcast.
       expect(byId.get('logging')?.effect).toBeNull();
@@ -144,15 +143,6 @@ describe('buildProfessionsView: model construction', () => {
         toolEffects: [slot({ charges: 1 })],
       });
       expect(oneLeft.gathering[0].effect?.spent).toBe(false);
-    });
-
-    it('surfaces prompt-on-use, so the owner can see why it is not firing', () => {
-      const model = buildProfessionsView({
-        identity: attunedIdentity,
-        gathering,
-        toolEffects: [slot({ confirmMode: 'prompt' })],
-      });
-      expect(model.gathering[0].effect?.prompts).toBe(true);
     });
 
     it('DROPS an effect naming a profession with no row, rather than painting an orphan', () => {

@@ -2588,9 +2588,6 @@ export const hudChromeStrings = {
     // Said in words rather than as "0 of 30": a bare zero reads like a broken
     // tool, and the tool is fine. Only the effect is spent, and it recharges.
     toolEffectSpent: 'Spent, needs recharging',
-    // Shown only when the owner chose prompt-on-use, so the row explains why
-    // the effect is not firing on every harvest.
-    toolEffectPrompts: 'Asks before each use',
     // The three slottable effects, by catalog id (src/sim/content/professions.ts
     // TOOL_EFFECTS). The sim is language-agnostic and emits the id; these are
     // where it becomes a name.

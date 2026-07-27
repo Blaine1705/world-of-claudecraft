@@ -4438,17 +4438,27 @@ export class GameServer {
         if (typeof msg.recipe === 'string') sim.trainRecipe(msg.recipe, pid);
         break;
       case 'slot_tool_effect':
-        // Every field is re-validated inside the sim against live content
-        // (Sim.slotToolEffect: known profession id, known effect id, and a real
-        // tool for that profession actually carried), so the only job here is
-        // the shape check every other command does. `mode` is optional and an
-        // unrecognized value is dropped rather than passed through, which keeps
-        // a malformed message from reaching the sim's default and silently
-        // becoming 'always'. The resulting slot rides the per-tick tslot diff,
-        // so no dirty-marking is needed.
-        if (typeof msg.profession === 'string' && typeof msg.effect === 'string') {
-          const mode = msg.mode === 'prompt' || msg.mode === 'always' ? msg.mode : undefined;
-          sim.slotToolEffect(msg.profession, msg.effect, mode, pid);
+        // DEV-GATED, and this gate is the whole reason the command is safe to
+        // ship ahead of its content. Slotting mints a permanent, live harvest
+        // bonus (+1 unit, or +1 to the grade tier that decides fine yields) and
+        // costs nothing: no item, no copper, no recipe, no station, no
+        // cooldown, and re-sending refills the charges. There is no acquisition
+        // craft yet, so an ungated case would BE the acquisition path, free and
+        // unlimited, for any client that can send a frame. The sim-side command
+        // stays fully wired and tested; only the wire door is shut. Remove this
+        // gate in the same change that gives the effects a real source.
+        //
+        // `mode` is passed THROUGH unchanged rather than normalized here: the
+        // sim's guard is the single definition of what a legal mode is, and
+        // laundering an unrecognized value into `undefined` would hand it the
+        // default and turn a refusal into a success (the two hosts would then
+        // disagree about the same message).
+        if (
+          process.env.ALLOW_DEV_COMMANDS === '1' &&
+          typeof msg.profession === 'string' &&
+          typeof msg.effect === 'string'
+        ) {
+          sim.slotToolEffect(msg.profession, msg.effect, msg.mode as never, pid);
         }
         break;
       case 'sell_all_junk':

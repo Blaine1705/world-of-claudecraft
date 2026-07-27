@@ -6917,11 +6917,10 @@
   .prof-effect-spent {
     opacity: 0.65;
   }
-  .prof-effect-prompt {
-    padding: 0 5px;
-    border: 1px solid var(--color-border-default);
-    border-radius: 999px;
-    font-size: 10px;
+  /* Tabular figures so a ticking charge count does not jitter its own row,
+     matching .prof-skill-value directly above it. */
+  .prof-effect-charges {
+    font-variant-numeric: tabular-nums;
   }
   .prof-pips {
     display: inline-flex;

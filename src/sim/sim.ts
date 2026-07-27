@@ -349,11 +349,8 @@ import { healDisplayRoundedProficiency } from './professions/proficiency_display
 import { type SalvageResult, salvageItem as salvageItemImpl } from './professions/salvage';
 import { normalizeTierMailOnLoad, updateTierMail } from './professions/tier_mail';
 import {
-  bestOwnedGatherToolFor,
-  bestOwnedGatherToolTierOrNone,
-  NO_TOOL_OWNED,
   normalizeToolEffectSlots,
-  slotEffect,
+  resolveSlotToolEffect,
   structuredCloneToolEffectSlots,
   type ToolEffectConfirmMode,
   type ToolEffectSlot,
@@ -9728,8 +9725,13 @@ export class Sim {
       });
     }
     // GATHERING_PROFESSION_IDS is already a stable content order, but the sort
-    // is what the signature contract actually promises, so state it.
-    return rows.sort((a, b) => a.professionId.localeCompare(b.professionId));
+    // is what the signature contract actually promises, so state it. A plain
+    // codepoint compare, never localeCompare: this runs per tick per session on
+    // the snapshot path, and an ICU collation inside the deterministic core
+    // would make the wire order depend on the host's locale data.
+    return rows.sort((a, b) =>
+      a.professionId < b.professionId ? -1 : a.professionId > b.professionId ? 1 : 0,
+    );
   }
 
   get toolEffectSlots(): readonly ToolEffectSlotView[] {
@@ -9755,27 +9757,26 @@ export class Sim {
   ): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;
-    if (!(GATHERING_PROFESSION_IDS as readonly string[]).includes(professionId)) return;
-    if (!Object.hasOwn(TOOL_EFFECTS, effectId)) return;
-    if (confirmMode !== 'always' && confirmMode !== 'prompt') return;
-    const profession = professionId as GatheringProfessionId;
-    const best = bestOwnedGatherToolFor(r.meta.inventory, profession, ITEMS);
-    if (bestOwnedGatherToolTierOrNone(r.meta.inventory, profession, ITEMS) === NO_TOOL_OWNED) {
-      return;
-    }
-    // Charges are minted from the BEST OWNED tool's rarity, which is the one
-    // place rarity buys durability (professions/tools.ts startingDurabilityFor).
-    // Re-slotting resets to full, same as installing a fresh effect.
-    const slot = slotEffect(effectId as ToolEffectId, {
-      craftedBy: String(r.meta.entityId),
+    // The whole decision (four refusals, the owned-tool scan, the rarity the
+    // charges are minted from) lives in professions/tools.ts, the resolveTrain
+    // shape: this coordinator only applies what the resolver returned. Refusals
+    // are SILENT and emit no event, which is safe only because nothing
+    // player-reachable can call this today (see the dev gate on the wire
+    // command in server/game.ts). An acquisition craft must add a result event
+    // before this becomes reachable, or a refused slot is invisible.
+    const resolved = resolveSlotToolEffect(
+      r.meta.inventory,
+      professionId,
+      effectId,
       confirmMode,
-      toolRarity: best.rarity,
-    });
+      ITEMS,
+    );
+    if (!resolved) return;
     // Created lazily HERE, never in makeMeta: the absent-by-default field is
     // what keeps a player who has never slotted an effect byte-identical in
     // the parity digest.
     r.meta.toolEffectSlots ??= {};
-    r.meta.toolEffectSlots[profession] = slot;
+    r.meta.toolEffectSlots[resolved.professionId] = resolved.slot;
   }
 
   delveShopOffers(delveId: string): DelveShopOffer[] {

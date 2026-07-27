@@ -8,9 +8,19 @@
 // moved every golden in the suite for a feature no scenario uses. Several arms
 // below assert absence specifically, not emptiness.
 import { describe, expect, it } from 'vitest';
-import { GATHERING_PROFESSION_IDS, TOOL_EFFECTS } from '../src/sim/content/professions';
-import { RARITY_DURABILITY_BONUS, startingDurabilityFor } from '../src/sim/professions/tools';
+import {
+  GATHERING_PROFESSION_IDS,
+  TOOL_EFFECT_IDS,
+  TOOL_EFFECTS,
+} from '../src/sim/content/professions';
+import {
+  normalizeToolEffectSlots,
+  RARITY_DURABILITY_BONUS,
+  startingDurabilityFor,
+} from '../src/sim/professions/tools';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
+import { hasTranslation } from '../src/ui/i18n';
+import { TOOL_EFFECT_NAME_KEYS } from '../src/ui/tool_effect_name';
 
 const makeSim = (seed = 11) => new Sim({ seed, playerClass: 'warrior', autoEquip: false });
 const metaOf = (sim: Sim): PlayerMeta => sim.meta(sim.playerId) as PlayerMeta;
@@ -108,41 +118,58 @@ describe('slotting mints charges from the best owned tool rarity', () => {
     expect(sim.toolEffectSlots[0].effectId).toBe('artisans_eye');
   });
 
-  it('honors confirmMode, defaulting to always and rejecting a bogus mode', () => {
+  it('defaults to always, and refuses every other mode including prompt', () => {
     const sim = simHolding('copper_mining_pick');
     sim.slotToolEffect('mining', 'gatherers_cache');
     expect(sim.toolEffectSlots[0].confirmMode).toBe('always');
+    // 'prompt' is refused FOR NOW, and that is a correctness fix rather than an
+    // omission: resolveHarvest passes `confirmed: true` unconditionally because
+    // no confirmation flow exists, so a prompt slot would fire and spend a
+    // charge on every harvest while claiming it asks first.
     sim.slotToolEffect('mining', 'gatherers_cache', 'prompt');
-    expect(sim.toolEffectSlots[0].confirmMode).toBe('prompt');
-    // A mode outside the union refuses outright rather than silently becoming
-    // 'always', so a malformed command cannot quietly downgrade a player's
-    // explicit prompt-on-use choice.
+    expect(sim.toolEffectSlots[0].confirmMode).toBe('always');
+    // A mode outside the union is refused the same way.
     sim.slotToolEffect('mining', 'gatherers_cache', 'sometimes' as never);
-    expect(sim.toolEffectSlots[0].confirmMode).toBe('prompt');
+    expect(sim.toolEffectSlots[0].confirmMode).toBe('always');
+    // And the refusals really refused: still exactly one slot, still full.
+    expect(sim.toolEffectSlots).toHaveLength(1);
   });
 });
 
 describe('the read surface is one row per profession, sorted, and identity-free', () => {
   it('projects one row per slotted profession, sorted by profession id', () => {
+    // FOUR real tools, one per gathering profession. A one-row fixture cannot
+    // see a sort at all: `expect(rows).toEqual([...rows].sort())` on a single
+    // element is a tautology, and an earlier version of this test bought
+    // exactly that by reaching for two ids that are not gathering tools
+    // (`rusty_hatchet` is a weapon, `herb_pouch` does not exist, and addItem
+    // accepts an unknown id silently).
     const sim = simHolding('copper_mining_pick');
-    sim.addItem('rusty_hatchet', 1);
-    sim.addItem('herb_pouch', 1);
-    // Only the professions the player actually has a tool for can be slotted,
-    // so derive rather than assume which ones took.
+    for (const id of ['handaxe', 'gathering_sickle', 'ironreel_fishing_rod']) {
+      sim.addItem(id, 1);
+    }
     for (const professionId of GATHERING_PROFESSION_IDS) {
       sim.slotToolEffect(professionId, 'gatherers_cache');
     }
-    const rows = sim.toolEffectSlots;
-    expect(rows.length).toBeGreaterThan(0);
-    expect(rows.map((r) => r.professionId)).toEqual([...rows.map((r) => r.professionId)].sort());
+    // A LITERAL expected order, never a self-sort. GATHERING_PROFESSION_IDS is
+    // mining/logging/herbalism/fishing, so alphabetical genuinely reorders and
+    // deleting the sort reddens this.
+    expect(sim.toolEffectSlots.map((r) => r.professionId)).toEqual([
+      'fishing',
+      'herbalism',
+      'logging',
+      'mining',
+    ]);
   });
 
   it('never projects craftedBy, so no other player identity reaches the client', () => {
     const sim = simHolding('copper_mining_pick');
     sim.slotToolEffect('mining', 'gatherers_cache');
-    // The sim-side slot DOES record it (it decides the recharge discount)...
-    expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBeDefined();
-    // ...and the projection deliberately drops it.
+    // Left UNSET at slot time: its documented meaning is whoever produced the
+    // effect through a production craft, and no such craft exists, so recording
+    // the slotter would be both a lie and a permanent recharge discount.
+    expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBeUndefined();
+    // And the projection drops it regardless.
     expect(Object.keys(sim.toolEffectSlots[0]).sort()).toEqual([
       'charges',
       'confirmMode',
@@ -160,6 +187,12 @@ describe('the read surface is one row per profession, sorted, and identity-free'
     // changing the stream: it never affects the returned value or the state.
     const drawn: number[] = [];
     sim.rng.setObserver((v) => drawn.push(v));
+    // POSITIVE CONTROL FIRST: prove the observer is actually watching the Rng
+    // the slot path would reach. Without it, `drawn` staying empty is equally
+    // consistent with a no-op observer or the wrong instance.
+    sim.rng.next();
+    expect(drawn, 'the observer must see a real draw').toHaveLength(1);
+    drawn.length = 0;
     sim.slotToolEffect('mining', 'gatherers_cache');
     sim.slotToolEffect('mining', 'artisans_eye');
     sim.slotToolEffect('nope', 'gatherers_cache');
@@ -180,7 +213,7 @@ describe('persistence: absent stays absent, present round-trips', () => {
 
   it('writes the slot and restores it on load', () => {
     const sim = simHolding('arcanite_mining_pick');
-    sim.slotToolEffect('mining', 'artisans_eye', 'prompt');
+    sim.slotToolEffect('mining', 'artisans_eye');
     const state = sim.serializeCharacter(sim.playerId) as CharacterState;
     expect(state.toolEffectSlots?.mining?.effectId).toBe('artisans_eye');
 
@@ -191,8 +224,7 @@ describe('persistence: absent stays absent, present round-trips', () => {
       effectId: 'artisans_eye',
       durability: startingDurabilityFor('artisans_eye', 'epic'),
       maxDurability: startingDurabilityFor('artisans_eye', 'epic'),
-      craftedBy: expect.any(String),
-      confirmMode: 'prompt',
+      confirmMode: 'always',
     });
   });
 
@@ -263,5 +295,100 @@ describe('persistence: absent stays absent, present round-trips', () => {
     const meta = reloaded.meta(pid) as PlayerMeta;
     expect(meta.toolEffectSlots?.mining?.durability).toBe(0);
     expect(meta.toolEffectSlots?.logging?.durability).toBe(30);
+  });
+});
+
+describe('the id tables and the load normalizer, directly', () => {
+  it('names every effect the catalog ships, and no id it does not', () => {
+    // The drift that costs a player something is the ADD direction: a fourth
+    // effect in TOOL_EFFECTS with no key here renders no HUD row at all,
+    // silently and forever, because the painter treats an unknown id as
+    // "render nothing". Mirrors the sibling guard for the gathering-profession
+    // name table in tests/gather_event_i18n.test.ts.
+    expect(Object.keys(TOOL_EFFECT_NAME_KEYS).sort()).toEqual([...TOOL_EFFECT_IDS].sort());
+    for (const id of TOOL_EFFECT_IDS) {
+      expect(hasTranslation(TOOL_EFFECT_NAME_KEYS[id]), `name key for ${id}`).toBe(true);
+    }
+  });
+
+  it('drops a saved row whose PROFESSION no longer exists, not just a retired effect', () => {
+    // The retirement path the per-profession keying makes possible. Structural
+    // (the normalizer iterates GATHERING_PROFESSION_IDS rather than the saved
+    // keys), but nothing pinned it.
+    const out = normalizeToolEffectSlots({
+      skinning: {
+        effectId: 'gatherers_cache',
+        durability: 5,
+        maxDurability: 20,
+        confirmMode: 'always',
+      },
+    } as never);
+    expect(out).toBeUndefined();
+  });
+
+  it('falls back to the catalog value for every unusable maxDurability, negatives included', () => {
+    // The negative arm is the one a `Math.floor(x) || catalog` idiom gets
+    // wrong: -5 is truthy, so it short-circuits past the fallback and a
+    // Math.max(1, ...) floor hands back a ONE-charge slot instead.
+    const base = TOOL_EFFECTS.gatherers_cache.startingDurability;
+    for (const bad of [0, -5, Number.NaN, undefined]) {
+      const out = normalizeToolEffectSlots({
+        mining: {
+          effectId: 'gatherers_cache',
+          durability: 5,
+          maxDurability: bad,
+          confirmMode: 'always',
+        },
+      } as never);
+      expect(out?.mining?.maxDurability, `maxDurability ${String(bad)}`).toBe(base);
+      expect(out?.mining?.durability, `durability beside ${String(bad)}`).toBe(5);
+    }
+    // A usable stored max is kept verbatim, including one ABOVE the catalog
+    // value: it must survive a future rebalance downward, which is the whole
+    // reason it is stored rather than re-derived.
+    const kept = normalizeToolEffectSlots({
+      mining: {
+        effectId: 'gatherers_cache',
+        durability: 60,
+        maxDurability: 50,
+        confirmMode: 'always',
+      },
+    } as never);
+    expect(kept?.mining?.maxDurability).toBe(50);
+  });
+
+  it('refuses a corrupt confirmMode and a non-string craftedBy', () => {
+    const out = normalizeToolEffectSlots({
+      mining: {
+        effectId: 'gatherers_cache',
+        durability: 5,
+        maxDurability: 20,
+        confirmMode: 'nonsense',
+        craftedBy: 42,
+      },
+    } as never);
+    expect(out?.mining?.confirmMode).toBe('always');
+    // The docblock promises every row is checked; craftedBy was the one field
+    // passing through unvalidated, and it re-serializes on the next save.
+    expect(out?.mining?.craftedBy).toBeUndefined();
+  });
+
+  it('deep-copies EVERY slotted profession on save, not just the first', () => {
+    // A one-row fixture cannot see a loop that copies the first entry and
+    // aliases the rest.
+    const sim = simHolding('copper_mining_pick');
+    sim.addItem('handaxe', 1);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    sim.slotToolEffect('logging', 'gatherers_cache');
+    const state = sim.serializeCharacter(sim.playerId) as CharacterState;
+    const saved = {
+      mining: state.toolEffectSlots?.mining?.durability,
+      logging: state.toolEffectSlots?.logging?.durability,
+    };
+    const live = metaOf(sim).toolEffectSlots;
+    if (live?.mining) live.mining.durability -= 3;
+    if (live?.logging) live.logging.durability -= 4;
+    expect(state.toolEffectSlots?.mining?.durability).toBe(saved.mining);
+    expect(state.toolEffectSlots?.logging?.durability).toBe(saved.logging);
   });
 });

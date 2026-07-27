@@ -6453,7 +6453,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.professions.toolEffectName.artisansEye'
   | 'hudChrome.professions.toolEffectName.gatherersCache'
   | 'hudChrome.professions.toolEffectName.quickeningCharm'
-  | 'hudChrome.professions.toolEffectPrompts'
   | 'hudChrome.professions.toolEffectSpent'
   | 'hudChrome.professions.tutorialLine'
   | 'hudChrome.professions.unattunedIdentity'

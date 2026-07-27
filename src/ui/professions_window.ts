@@ -459,13 +459,10 @@ export class ProfessionsWindow {
           charges: this.fmt(effect.charges),
           max: this.fmt(effect.maxCharges),
         });
-    const prompt = effect.prompts
-      ? `<span class="prof-effect-prompt">${esc(t('hudChrome.professions.toolEffectPrompts'))}</span>`
-      : '';
     return (
       `<div class="prof-effect${effect.spent ? ' prof-effect-spent' : ''}">` +
       `<span class="prof-effect-name">${esc(t(nameKey))}</span>` +
-      `<span class="prof-effect-charges">${esc(charges)}</span>${prompt}</div>`
+      `<span class="prof-effect-charges">${esc(charges)}</span></div>`
     );
   }
 

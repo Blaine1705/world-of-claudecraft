@@ -8506,7 +8506,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectName.quickeningCharm': '早戻りの護符',
   'hudChrome.professions.toolEffectName.artisansEye': '職人の眼',
   'hudChrome.professions.toolEffectName.gatherersCache': '採集者の貯蔵袋',
-  'hudChrome.professions.toolEffectPrompts': '使用のたびに確認する',
   'hudChrome.professions.toolEffectSpent': '使い切りました。再充填が必要です',
   'hudChrome.professions.toolEffectCharges': '残り {charges} / {max} 回',
   'entities.items.resonant_thread.name': '共鳴の糸',

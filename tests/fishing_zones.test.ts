@@ -658,6 +658,9 @@ describe('the session cap always outlasts a legal reel window', () => {
 
   it('covers the worst legal session over every shipped rod tier, with a tick to spare', () => {
     const capTicks = Math.round(FISHING_SESSION_CAP_SEC / DT);
+    // The cap side pinned to a literal: without it BOTH sides of the budget are
+    // derived, and a trim to 14.5 s still satisfies every inequality below.
+    expect(capTicks, 'the session cap is 300 ticks').toBe(300);
     // ONE loop, over the rod held at the BITE. The bite delay is drawn against
     // the rod held at the CAST and the window is measured against the rod held
     // at the BITE, and since a better rod only ever SHORTENS the delay, the
@@ -735,9 +738,10 @@ describe('the session cap always outlasts a legal reel window', () => {
     }
     // The window is the WIDEST the world can produce, pinned as its own
     // number. Without this, a regression that scanned the cast-time rod
-    // instead of the bite-time rod would arm 50 ticks instead of 110, the loop
+    // instead of the bite-time rod would arm 50 ticks instead of 125, the loop
     // below would simply run fewer iterations, and every assertion would still
-    // pass on a much weaker budget.
+    // pass on a much weaker budget. (125, not 110: 110 is the tier-5 window at
+    // COMMON, and the best shipped rod is epic.)
     const widestWindowTicks = Math.ceil(
       fishReelWindowSecFor(isGatherToolUse(bestRod.use) ? bestRod.use.tier : 1, bestRod.quality) /
         DT,

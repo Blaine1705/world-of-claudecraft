@@ -8098,7 +8098,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectName.quickeningCharm': '回春符',
   'hudChrome.professions.toolEffectName.artisansEye': '匠人之眼',
   'hudChrome.professions.toolEffectName.gatherersCache': '采集者储囊',
-  'hudChrome.professions.toolEffectPrompts': '每次使用前询问',
   'hudChrome.professions.toolEffectSpent': '已耗尽，需要充能',
   'hudChrome.professions.toolEffectCharges': '剩余 {charges} / {max} 次',
   'entities.items.resonant_thread.name': '共鸣丝线',

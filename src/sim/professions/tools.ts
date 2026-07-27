@@ -119,9 +119,23 @@ export function bestOwnedGatherToolTier(
 export interface OwnedGatherTool {
   /** Same number `bestOwnedGatherToolTier` returns, bare-hands floor included. */
   tier: number;
-  /** The winning tool's `quality`, or 'common' when the tier came from the
-   *  bare-hands floor rather than from a def. */
-  rarity: MaterialRarity;
+  /**
+   * The same scan WITHOUT the bare-hands floor: NO_TOOL_OWNED when no matching
+   * tool is carried, exactly as `bestOwnedGatherToolTierOrNone` reports it.
+   * Carried alongside `tier` so a caller that must distinguish "no tool" from
+   * "tier 1" (the node gate's rule, and the slot gate's) gets both answers from
+   * ONE bag walk instead of scanning twice.
+   */
+  ownedTier: number;
+  /**
+   * The winning tool's `quality`, or 'common' when the tier came from the
+   * bare-hands floor rather than from a def. Typed as the full `ItemDef`
+   * quality union rather than `MaterialRarity`, because a def may legitimately
+   * carry `'poor'` or omit `quality` entirely, and both are values
+   * `MaterialRarity` excludes. Every consumer routes through
+   * `rarityLadderIndex`, which floors them at the common rung.
+   */
+  rarity: ItemDef['quality'];
 }
 
 // The rarity-carrying twin of `bestOwnedGatherToolTier`, for the one bonus that
@@ -141,17 +155,21 @@ export function bestOwnedGatherToolFor(
   professionId: GatheringProfessionId,
   items: Readonly<Record<string, ItemDef>>,
 ): OwnedGatherTool {
-  let best: OwnedGatherTool = { tier: BARE_HANDS_TOOL_TIER, rarity: 'common' };
+  let best: OwnedGatherTool = {
+    tier: BARE_HANDS_TOOL_TIER,
+    ownedTier: NO_TOOL_OWNED,
+    rarity: 'common',
+  };
   for (const slot of inventory) {
     const def = items[slot.itemId];
     const tier = gatherToolTier(def, professionId);
     if (tier === undefined) continue;
-    const rarity = (def?.quality ?? 'common') as MaterialRarity;
+    const rarity = def?.quality ?? 'common';
     if (
-      tier > best.tier ||
-      (tier === best.tier && rarityLadderIndex(rarity) > rarityLadderIndex(best.rarity))
+      tier > best.ownedTier ||
+      (tier === best.ownedTier && rarityLadderIndex(rarity) > rarityLadderIndex(best.rarity))
     ) {
-      best = { tier, rarity };
+      best = { tier: Math.max(BARE_HANDS_TOOL_TIER, tier), ownedTier: tier, rarity };
     }
   }
   return best;
@@ -258,7 +276,7 @@ export function slotEffect(
   options: {
     craftedBy?: string;
     confirmMode?: ToolEffectConfirmMode;
-    toolRarity?: MaterialRarity;
+    toolRarity?: ItemDef['quality'];
   } = {},
 ): ToolEffectSlot {
   const { craftedBy, confirmMode = 'always', toolRarity = 'common' } = options;
@@ -269,6 +287,64 @@ export function slotEffect(
     maxDurability: durability,
     craftedBy,
     confirmMode,
+  };
+}
+
+/**
+ * Resolve one slot request into the slot it should mint, or null to refuse.
+ *
+ * The whole decision lives here rather than on the Sim coordinator, matching
+ * what `resolveTrain` does for `Sim.trainRecipe`: none of these gates need the
+ * coordinator's private mutable state, they need an inventory and an item
+ * table, and this module already takes both as parameters. That also makes
+ * every refusal arm unit-testable without constructing a Sim.
+ *
+ * Four refusals, all before any mutation and all draw-free:
+ *   - a profession id that is not a gathering profession
+ *   - an effect id absent from the live catalog
+ *   - any confirm mode other than 'always'. A malformed value is refused
+ *     OUTRIGHT rather than falling back, and 'prompt' is refused too, for now:
+ *     `resolveHarvest` passes `confirmed: true` unconditionally because no
+ *     confirmation flow exists, so a 'prompt' slot would fire and spend a
+ *     charge on every harvest while telling its owner it asks first. Accepting
+ *     it here is what would make that comment in gathering.ts false. The
+ *     'prompt' machinery in `resolveToolEffectUse` stays, ready for the flow.
+ *   - no REAL tool carried for that profession. Reads
+ *     `bestOwnedGatherToolTierOrNone`, which returns NO_TOOL_OWNED rather than
+ *     the bare-hands floor, so carrying nothing is not carrying a tier-1 tool.
+ *
+ * The owned-tool scan runs ONCE and answers both the refusal and the rarity the
+ * charges are minted from, so a player with no tool is refused before any work
+ * that only a success needs.
+ *
+ * `craftedBy` is deliberately LEFT UNSET. Its documented meaning is whoever
+ * produced the effect through the production craft that made it, and no such
+ * craft exists yet; recording the slotter instead would be both a lie and a
+ * permanent 50 percent recharge discount for every self-slotted effect
+ * (`isOriginalCrafter`). It would also persist a value that cannot survive:
+ * entity ids restart at 1 every boot, so a stored one stops matching its owner
+ * and eventually matches whoever inherits the id. The un-discounted generic
+ * rate is the documented default for a slot with no recorded crafter.
+ */
+export function resolveSlotToolEffect(
+  inventory: readonly InvSlot[],
+  professionId: string,
+  effectId: string,
+  confirmMode: ToolEffectConfirmMode,
+  items: Readonly<Record<string, ItemDef>>,
+): { professionId: GatheringProfessionId; slot: ToolEffectSlot } | null {
+  if (!(GATHERING_PROFESSION_IDS as readonly string[]).includes(professionId)) return null;
+  if (!Object.hasOwn(TOOL_EFFECTS, effectId)) return null;
+  if (confirmMode !== 'always') return null;
+  const profession = professionId as GatheringProfessionId;
+  const best = bestOwnedGatherToolFor(inventory, profession, items);
+  if (best.ownedTier === NO_TOOL_OWNED) return null;
+  return {
+    professionId: profession,
+    slot: slotEffect(effectId as ToolEffectId, {
+      confirmMode,
+      toolRarity: best.rarity,
+    }),
   };
 }
 
@@ -315,19 +391,30 @@ export function normalizeToolEffectSlots(
   for (const professionId of GATHERING_PROFESSION_IDS) {
     const row = saved[professionId];
     if (!row || !Object.hasOwn(TOOL_EFFECTS, row.effectId)) continue;
-    // A stored maxDurability below 1 would make a recharge restore a dead
-    // slot, so the floor is the catalog's own starting value; durability is
-    // then clamped INTO that range, which also repairs a negative counter.
-    const maxDurability = Math.max(
-      1,
-      Math.floor(row.maxDurability) || TOOL_EFFECTS[row.effectId].startingDurability,
-    );
+    // A stored maxDurability that is not a usable positive integer falls back
+    // to the catalog's own starting value, because a recharge restores TO this
+    // number and a dead one would make the slot permanently useless.
+    //
+    // The test explicitly: `Math.floor(x) || catalog` is NOT enough, because
+    // Math.floor(-5) is -5, which is truthy, so a negative short-circuits past
+    // the fallback and a Math.max(1, ...) floor then hands back a ONE-charge
+    // slot rather than the catalog value. Zero and NaN take the fallback but a
+    // negative did not, which is the kind of split the `||` idiom hides.
+    //
+    // Deliberately one-sided: there is no upper clamp, because the stored max
+    // must survive a future catalog rebalance DOWNWARD (that is the whole
+    // reason it is stored rather than re-derived).
+    const storedMax = Math.floor(row.maxDurability);
+    const maxDurability =
+      Number.isFinite(storedMax) && storedMax > 0
+        ? storedMax
+        : TOOL_EFFECTS[row.effectId].startingDurability;
     out ??= {};
     out[professionId] = {
       effectId: row.effectId,
       durability: Math.min(maxDurability, Math.max(0, Math.floor(row.durability) || 0)),
       maxDurability,
-      craftedBy: row.craftedBy,
+      craftedBy: typeof row.craftedBy === 'string' ? row.craftedBy : undefined,
       confirmMode: row.confirmMode === 'prompt' ? 'prompt' : 'always',
     };
   }
@@ -425,7 +512,10 @@ export function rarityLadderIndex(rarity: ItemDef['quality']): number {
 export const RARITY_DURABILITY_BONUS = 10;
 
 /** The charges a fresh slot of `effectId` gets on a tool of `toolRarity`. */
-export function startingDurabilityFor(effectId: ToolEffectId, toolRarity: MaterialRarity): number {
+export function startingDurabilityFor(
+  effectId: ToolEffectId,
+  toolRarity: ItemDef['quality'],
+): number {
   return (
     TOOL_EFFECTS[effectId].startingDurability +
     RARITY_DURABILITY_BONUS * rarityLadderIndex(toolRarity)

@@ -2328,7 +2328,6 @@ export const zh_TW: EnTranslations = {
       "skillValue": "{skill} / {max}",
       "toolEffectCharges": "剩餘 {charges} / {max} 次",
       "toolEffectSpent": "已耗盡，需要充能",
-      "toolEffectPrompts": "每次使用前詢問",
       "toolEffectName": {
         "gatherersCache": "採集者儲囊",
         "artisansEye": "匠人之眼",

@@ -29,7 +29,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
     "hudChrome.professions.toolEffectSpent"
   ],
   "es_ES": [
@@ -52,7 +51,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
     "hudChrome.professions.toolEffectSpent"
   ],
   "fr_FR": [
@@ -75,7 +73,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
     "hudChrome.professions.toolEffectSpent"
   ],
   "fr_CA": [
@@ -98,7 +95,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
     "hudChrome.professions.toolEffectSpent"
   ],
   "en_CA": [],
@@ -122,7 +118,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
     "hudChrome.professions.toolEffectSpent"
   ],
   "de_DE": [
@@ -145,7 +140,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
     "hudChrome.professions.toolEffectSpent"
   ],
   "zh_CN": [],
@@ -172,7 +166,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
     "hudChrome.professions.toolEffectSpent"
   ],
   "ru_RU": [],
@@ -196,7 +189,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
     "hudChrome.professions.toolEffectSpent"
   ],
   "nl_NL": [
@@ -219,7 +211,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
     "hudChrome.professions.toolEffectSpent"
   ],
   "pl_PL": [
@@ -242,7 +233,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
     "hudChrome.professions.toolEffectSpent"
   ],
   "id_ID": [
@@ -265,7 +255,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
     "hudChrome.professions.toolEffectSpent"
   ],
   "tr_TR": [
@@ -288,7 +277,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
     "hudChrome.professions.toolEffectSpent"
   ],
   "sv_SE": [
@@ -311,7 +299,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
     "hudChrome.professions.toolEffectSpent"
   ],
   "vi_VN": [
@@ -334,7 +321,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
     "hudChrome.professions.toolEffectSpent"
   ],
   "da_DK": [
@@ -357,7 +343,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.artisansEye",
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
-    "hudChrome.professions.toolEffectPrompts",
     "hudChrome.professions.toolEffectSpent"
   ]
 };

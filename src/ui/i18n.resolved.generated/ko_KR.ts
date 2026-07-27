@@ -2328,7 +2328,6 @@ export const ko_KR: EnTranslations = {
       "skillValue": "{skill} / {max}",
       "toolEffectCharges": "{charges} / {max}회 남음",
       "toolEffectSpent": "모두 소모됨, 재충전 필요",
-      "toolEffectPrompts": "사용할 때마다 확인",
       "toolEffectName": {
         "gatherersCache": "채집가의 주머니",
         "artisansEye": "장인의 눈",

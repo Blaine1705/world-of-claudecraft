@@ -8496,7 +8496,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectName.quickeningCharm': '회복의 부적',
   'hudChrome.professions.toolEffectName.artisansEye': '장인의 눈',
   'hudChrome.professions.toolEffectName.gatherersCache': '채집가의 주머니',
-  'hudChrome.professions.toolEffectPrompts': '사용할 때마다 확인',
   'hudChrome.professions.toolEffectSpent': '모두 소모됨, 재충전 필요',
   'hudChrome.professions.toolEffectCharges': '{charges} / {max}회 남음',
   'entities.items.resonant_thread.name': '공명의 실',

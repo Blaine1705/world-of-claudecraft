@@ -345,12 +345,6 @@ describe('ProfessionsWindow: the slotted tool effect row', () => {
     expect(el.innerHTML).not.toContain('0 of 30 charges');
   });
 
-  it('shows the prompt-on-use chip only when the owner chose it', () => {
-    expect(makeWindow(slotted()).el.querySelector('.prof-effect-prompt')).toBeNull();
-    const { el } = makeWindow(slotted({ confirmMode: 'prompt' }));
-    expect(el.querySelector('.prof-effect-prompt')?.textContent).toBe('Asks before each use');
-  });
-
   it('paints nothing for an effect id the name table does not know', () => {
     // A persisted slot can name an effect a later content change retired; the
     // row must render nothing rather than print a raw id at a player.

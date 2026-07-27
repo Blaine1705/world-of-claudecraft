@@ -581,6 +581,7 @@ describe('the one rarity ladder both bonuses read', () => {
     // exists.
     expect(bestOwnedGatherToolFor(bag('stormreel_fishing_rod'), 'fishing', ITEMS)).toEqual({
       tier: 4,
+      ownedTier: 4,
       rarity: 'rare',
     });
     expect(
@@ -589,7 +590,7 @@ describe('the one rarity ladder both bonuses read', () => {
         'fishing',
         ITEMS,
       ),
-    ).toEqual({ tier: 5, rarity: 'epic' });
+    ).toEqual({ tier: 5, ownedTier: 5, rarity: 'epic' });
     // Bag ORDER must not decide it: the same two rods the other way round.
     expect(
       bestOwnedGatherToolFor(
@@ -597,7 +598,7 @@ describe('the one rarity ladder both bonuses read', () => {
         'fishing',
         ITEMS,
       ),
-    ).toEqual({ tier: 5, rarity: 'epic' });
+    ).toEqual({ tier: 5, ownedTier: 5, rarity: 'epic' });
   });
 
   it('prefers the higher tier even when the lower one is rarer', () => {
@@ -624,6 +625,7 @@ describe('the one rarity ladder both bonuses read', () => {
     };
     expect(bestOwnedGatherToolFor(bag('shiny_low', 'plain_high'), 'mining', items)).toEqual({
       tier: 5,
+      ownedTier: 5,
       rarity: 'common',
     });
     // And WITHIN one tier, the rarer copy wins, which is the tie-break arm.
@@ -642,13 +644,18 @@ describe('the one rarity ladder both bonuses read', () => {
   it('floors at bare hands with common rarity when no matching tool is carried', () => {
     // Matches bestOwnedGatherToolTier's own floor, and the rarity floor is
     // what keeps a toolless angler on the base reel window.
+    // ownedTier is NO_TOOL_OWNED, not the floored tier: that distinction is
+    // what lets one bag walk answer both the node gate's "a real tool" rule and
+    // the bare-hands-tolerant surfaces.
     expect(bestOwnedGatherToolFor([], 'fishing', ITEMS)).toEqual({
       tier: BARE_HANDS_TOOL_TIER,
+      ownedTier: NO_TOOL_OWNED,
       rarity: 'common',
     });
     // A pick is not a rod: a tool of ANOTHER profession never counts here.
     expect(bestOwnedGatherToolFor(bag('arcanite_mining_pick'), 'fishing', ITEMS)).toEqual({
       tier: BARE_HANDS_TOOL_TIER,
+      ownedTier: NO_TOOL_OWNED,
       rarity: 'common',
     });
     // The tier it reports never disagrees with the tier-only scan every gate
@@ -656,6 +663,9 @@ describe('the one rarity ladder both bonuses read', () => {
     for (const held of [[], bag('stormreel_fishing_rod'), bag('tidewrought_fishing_rod')]) {
       expect(bestOwnedGatherToolFor(held, 'fishing', ITEMS).tier).toBe(
         bestOwnedGatherToolTier(held, 'fishing', ITEMS),
+      );
+      expect(bestOwnedGatherToolFor(held, 'fishing', ITEMS).ownedTier).toBe(
+        bestOwnedGatherToolTierOrNone(held, 'fishing', ITEMS),
       );
     }
   });

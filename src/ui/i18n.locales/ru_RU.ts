@@ -8668,7 +8668,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectName.quickeningCharm': 'Оберег возрождения',
   'hudChrome.professions.toolEffectName.artisansEye': 'Глаз ремесленника',
   'hudChrome.professions.toolEffectName.gatherersCache': 'Сумка собирателя',
-  'hudChrome.professions.toolEffectPrompts': 'Спрашивать перед каждым применением',
   'hudChrome.professions.toolEffectSpent': 'Израсходовано, нужна подзарядка',
   'hudChrome.professions.toolEffectCharges': 'Осталось зарядов: {charges} из {max}',
   'entities.items.resonant_thread.name': 'Резонирующая нить',

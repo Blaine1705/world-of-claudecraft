@@ -2328,7 +2328,6 @@ export const ru_RU: EnTranslations = {
       "skillValue": "{skill} / {max}",
       "toolEffectCharges": "Осталось зарядов: {charges} из {max}",
       "toolEffectSpent": "Израсходовано, нужна подзарядка",
-      "toolEffectPrompts": "Спрашивать перед каждым применением",
       "toolEffectName": {
         "gatherersCache": "Сумка собирателя",
         "artisansEye": "Глаз ремесленника",
