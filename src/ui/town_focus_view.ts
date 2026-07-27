@@ -7,7 +7,7 @@
 // can give one back) and the remaining-point count. Rendering lives in
 // town_focus_window.ts.
 
-import { HARVEST_COMPONENT_ITEMS } from '../sim/professions/gathering';
+import { TOWN_FOCUS_COMPONENTS } from '../sim/professions/focus';
 
 export interface TownFocusRow {
   component: string;
@@ -26,7 +26,10 @@ export interface TownFocusView {
 }
 
 // Every currently-harvestable component type (#1140/#1142), stable order.
-export const TOWN_FOCUS_COMPONENTS: readonly string[] = Object.keys(HARVEST_COMPONENT_ITEMS);
+// Re-exported from the sim rather than derived here a second time (#2511):
+// this is the exact set setTownFocus accepts, so a row the panel offers can
+// never be a key the command boundary rejects.
+export { TOWN_FOCUS_COMPONENTS };
 
 export function buildTownFocusView(
   allocation: Readonly<Record<string, number>>,

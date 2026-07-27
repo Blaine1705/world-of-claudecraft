@@ -1,10 +1,35 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+// Mock the db layer so no Postgres is needed. Only the command-dispatch hop is
+// under test here (the #2511 wire pin at the bottom of this file); everything
+// else drives a bare Sim.
+vi.mock('../server/db', () => ({
+  pool: { query: vi.fn(async () => ({ rows: [] })) },
+  saveCharacterState: vi.fn(async () => {}),
+  openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
+  closePlaySession: vi.fn(async () => {}),
+  insertChatLogs: vi.fn(async () => {}),
+  walletForAccount: vi.fn(async () => null),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
+  markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  setAccountWeaponSkinLoadout: vi.fn(async () => ({
+    completedQuestIds: [],
+    mechChromaIds: [],
+    weaponSkinIds: [],
+    weaponSkinLoadout: {},
+  })),
+}));
+
+import { GameServer } from '../server/game';
 import { MOBS, ZONES } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
-import { POINTS_PER_TIER_BONUS } from '../src/sim/professions/focus';
+import { FOCUS_POINT_BUDGET, POINTS_PER_TIER_BONUS } from '../src/sim/professions/focus';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { stepTownFocus } from '../src/ui/town_focus_view';
 
 // #1143: persistent, town-set focus allocation, applied on top of the #1142
 // per-corpse harvest roll. Two properties matter end-to-end:
@@ -63,6 +88,103 @@ describe('setTownFocus: gated on standing in the town hub', () => {
     const { sim, internals, a } = setup();
     sim.setTownFocus({ hide: 999 }, a);
     expect(internals.players.get(a)?.townFocus).toEqual({});
+  });
+});
+
+// #2511, the persistence half: the pure validator now refuses an unknown key
+// (tests/focus.test.ts owns that rule), and the load arm drops one an older
+// save already carries. These drive the real Sim end to end, because the whole
+// harm of the issue was in what reached PlayerMeta.townFocus and survived a
+// save/load round trip.
+describe('an unknown allocation key never reaches the character save (#2511)', () => {
+  function errorsOf(sim: Sim): string[] {
+    return sim
+      .drainEvents()
+      .filter((e): e is Extract<typeof e, { type: 'error' }> => e.type === 'error')
+      .map((e) => e.text);
+  }
+
+  it('refuses the issue frame in town, leaving the stored allocation untouched', () => {
+    const { sim, internals, a } = setup();
+    sim.setTownFocus({ hide: 4 }, a);
+    sim.drainEvents();
+    sim.setTownFocus({ not_a_real_tag: 5 }, a);
+    expect(internals.players.get(a)?.townFocus).toEqual({ hide: 4 });
+    expect(errorsOf(sim)).toEqual(['Invalid focus allocation.']);
+  });
+
+  it('survives the save/load round trip as the rejection, not as stored junk', () => {
+    const { sim, internals, a } = setup();
+    sim.setTownFocus({ hide: 4, not_a_real_tag: 5 }, a);
+    expect(internals.players.get(a)?.townFocus).toEqual({});
+    const state = sim.serializeCharacter(a);
+    expect(state?.townFocus).toEqual({});
+
+    const reloaded = new Sim({ seed: 21, playerClass: 'warrior', noPlayer: true });
+    const b = reloaded.addPlayer('warrior', 'Alpha', { state: state ?? undefined });
+    expect((reloaded as unknown as SimInternals).players.get(b)?.townFocus).toEqual({});
+  });
+
+  it('drops an unknown key an OLDER save already carries, and re-saves without it', () => {
+    // Back-compat, the leg the command boundary cannot reach. The junk here is
+    // the exact shape shipped in tests/fixtures/v025_warrior_character.json.
+    const { sim, a } = setup();
+    const state = sim.serializeCharacter(a);
+    expect(state).not.toBeNull();
+    const junked = { ...state!, townFocus: { hide: 3, eastbrook: 4, gills: 1 } };
+
+    const reloaded = new Sim({ seed: 21, playerClass: 'warrior', noPlayer: true });
+    const b = reloaded.addPlayer('warrior', 'Alpha', { state: junked });
+    const meta = (reloaded as unknown as SimInternals).players.get(b);
+    expect(meta?.townFocus).toEqual({ hide: 3 });
+    // The legitimate points are kept, and the junk does not come back out of
+    // the next serialize either.
+    expect(reloaded.serializeCharacter(b)?.townFocus).toEqual({ hide: 3 });
+  });
+
+  it('unlocks the panel a junked save would otherwise have jammed shut', () => {
+    // Why the load arm is load-bearing rather than tidy-up. The panel seeds its
+    // draft from the stored allocation and stepTownFocus spreads that whole
+    // draft forward on every +/-, so without the drop the unknown key would
+    // ride back into the next Save and be refused, with no control anywhere
+    // that could delete it: the character could never change focus again.
+    const { sim, a } = setup();
+    const junked = { ...sim.serializeCharacter(a)!, townFocus: { hide: 3, eastbrook: 4 } };
+    const reloaded = new Sim({ seed: 21, playerClass: 'warrior', noPlayer: true });
+    const b = reloaded.addPlayer('warrior', 'Alpha', { state: junked });
+    const internals = reloaded as unknown as SimInternals;
+    const e = internals.entities.get(b)!;
+    e.pos = { x: ZONE1.hub.x, y: 0, z: ZONE1.hub.z };
+    e.prevPos = { ...e.pos };
+    reloaded.tick();
+    reloaded.drainEvents();
+
+    // Exactly what the panel posts: the draft it was seeded with, plus a step.
+    const draft = stepTownFocus(reloaded.townFocusFor(b), 'hide', 1, FOCUS_POINT_BUDGET);
+    reloaded.setTownFocus(draft, b);
+    expect(internals.players.get(b)?.townFocus).toEqual({ hide: 4 });
+    expect(errorsOf(reloaded)).toEqual([]);
+  });
+
+  it('stops a junk-only save from paying out the first-focus-point deed', () => {
+    // townFocusPoints sums the allocation blind, so before the drop a single
+    // fabricated key earned soc_civic_duty with no real focus allocated.
+    const { sim, a } = setup();
+    const junked = { ...sim.serializeCharacter(a)!, townFocus: { eastbrook: 4 } };
+    const reloaded = new Sim({ seed: 21, playerClass: 'warrior', noPlayer: true });
+    const b = reloaded.addPlayer('warrior', 'Alpha', { state: junked });
+    for (let i = 0; i < 5; i++) reloaded.tick();
+    const earned = () =>
+      (reloaded as unknown as SimInternals).players.get(b)!.deedsEarned.has('soc_civic_duty');
+    expect(earned()).toBe(false);
+
+    // Not vacuous: one real point in town earns it on the same rig.
+    const e = (reloaded as unknown as SimInternals).entities.get(b)!;
+    e.pos = { x: ZONE1.hub.x, y: 0, z: ZONE1.hub.z };
+    e.prevPos = { ...e.pos };
+    reloaded.setTownFocus({ hide: 1 }, b);
+    for (let i = 0; i < 5; i++) reloaded.tick();
+    expect(earned()).toBe(true);
   });
 });
 
@@ -183,5 +305,40 @@ describe('harvestCorpse omitted-components town-focus default', () => {
     const explicitFang = harvestWith({ hide: POINTS_PER_TIER_BONUS }, ['fang']);
     expect(explicitFang.fang).toBeGreaterThanOrEqual(1);
     expect(explicitFang.hide).toBe(0);
+  });
+});
+
+// The #2511 fix sits at the SIM boundary, not in server/game.ts, and this is
+// the pin that says so on purpose: the offline browser Sim and the headless RL
+// env reach setTownFocus through IWorld without ever passing the server's
+// dispatch switch, so validating keys there would have left both hosts open.
+// If a future change starts filtering on the server too, this test is the one
+// to re-argue rather than quietly delete.
+describe('the server forwards a set_town_focus allocation verbatim (#2511)', () => {
+  it('passes the unknown key straight through to the sim, which is what refuses it', () => {
+    const server = new GameServer();
+    const session = server.join(
+      { readyState: 1, send: () => {} } as never,
+      97,
+      97,
+      'Alpha',
+      'warrior',
+      null,
+    );
+    if ('error' in session) throw new Error(session.error);
+    session.blockListLoaded = true;
+    const raw = JSON.stringify({
+      t: 'cmd',
+      cmd: 'set_town_focus',
+      allocation: { hide: 4, not_a_real_tag: 5 },
+    });
+    const spy = vi.spyOn(server.sim, 'setTownFocus').mockImplementation(() => {});
+    (server as unknown as { dispatchMessage: (...a: unknown[]) => void }).dispatchMessage(
+      session,
+      JSON.parse(raw),
+      raw,
+      0,
+    );
+    expect(spy).toHaveBeenCalledWith({ hide: 4, not_a_real_tag: 5 }, session.pid);
   });
 });
