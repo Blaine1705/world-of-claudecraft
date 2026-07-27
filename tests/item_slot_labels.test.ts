@@ -10,6 +10,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { ALL_EQUIP_SLOTS, type EquipSlot, type ItemSlot } from '../src/sim/types';
+import { PAPERDOLL_LEFT_SLOTS, PAPERDOLL_RIGHT_SLOTS } from '../src/ui/char_view';
 import {
   ITEM_SLOT_LABEL_KEYS,
   itemSlotLabel,
@@ -59,6 +60,26 @@ describe('item_slot_labels: sharedSlotLabelIndex', () => {
     expect(sharedSlotLabelIndex('ring2')).toBe(2);
     for (const slot of ['mainhand', 'offhand', 'chest', 'legs', 'neck'] as EquipSlot[]) {
       expect(sharedSlotLabelIndex(slot), `${slot} names its own slot`).toBeUndefined();
+    }
+  });
+
+  it('numbers the fingers in the order the PAPERDOLL paints them', () => {
+    // An ordinal is only readable if it points at something the player can see.
+    // The character sheet paints ring1 above ring2 in its right column, so
+    // "Finger 1" is the upper ring cell; the numbering comes from
+    // ALL_EQUIP_SLOTS, a different list, so the two agreeing is a fact worth
+    // holding rather than assuming. A paperdoll reorder that put ring2 first
+    // would leave the tag pointing at the wrong cell with nothing else failing.
+    const fingers = PAPERDOLL_RIGHT_SLOTS.filter(
+      (slot) => sharedSlotLabelIndex(slot) !== undefined,
+    );
+    expect(fingers).toEqual(['ring1', 'ring2']);
+    expect(fingers.map((slot) => sharedSlotLabelIndex(slot))).toEqual([1, 2]);
+    // Neither column numbers anything else, so no other cell gains an ordinal
+    // the paperdoll cannot account for.
+    for (const slot of [...PAPERDOLL_LEFT_SLOTS, ...PAPERDOLL_RIGHT_SLOTS]) {
+      if (slot === 'ring1' || slot === 'ring2') continue;
+      expect(sharedSlotLabelIndex(slot), `${slot} is unnumbered`).toBeUndefined();
     }
   });
 

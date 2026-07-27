@@ -55,7 +55,13 @@ export function itemSlotLabel(slot: ItemSlot): string {
  *  a locale-independent fact about the table and the cores that read it need no
  *  translator. Swept over ALL_EQUIP_SLOTS, not over the table's own keys, so the
  *  item-side 'ring' kind (never a worn position) is not counted as a third
- *  finger. */
+ *  finger.
+ *
+ *  ALL_EQUIP_SLOTS order is also what makes the number READABLE: the character
+ *  sheet paints ring1 above ring2 (char_view PAPERDOLL_RIGHT_SLOTS), so "Finger 1"
+ *  is the upper ring cell. The two lists agreeing is a fact, not a coincidence to
+ *  rely on quietly, so tests/item_slot_labels.test.ts pins it: a paperdoll reorder
+ *  would otherwise leave the tag pointing at the wrong cell. */
 function sharedSlotLabelIndices(): Partial<Record<EquipSlot, number>> {
   const byKey = new Map<TranslationKey, EquipSlot[]>();
   for (const slot of ALL_EQUIP_SLOTS) {
