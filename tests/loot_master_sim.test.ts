@@ -465,11 +465,11 @@ describe('the master looter reconcile surface (#2526)', () => {
 });
 
 // #2505. The pid list reaching assignMasterLoot is client-supplied and the
-// masterAssign wire case validates that pids is a non-empty array of numbers
-// and nothing about the values, so a hand-crafted frame can name the same
-// eligible candidate twice. Every case below runs the repeat against the
-// equivalent duplicate-free request on the SAME seed: the repeat must be
-// indistinguishable in bags, chat, prompts, and rng stream position.
+// masterAssign wire case validates that pids is a non-empty numeric array no
+// longer than a full raid roster (#2524) and nothing about the values, so a
+// hand-crafted frame can still name the same candidate twice. Every case runs the
+// repeat against the equivalent duplicate-free request on the SAME seed: the
+// repeat must be indistinguishable in bags, chat, prompts, and rng stream position.
 describe('a repeated pid in a master-loot assignment (#2505)', () => {
   // Every rng draw `fn` spends, counted through the parity harness's own
   // observer seam. A no-new-draws guard, NOT the determinism arm: the extra
@@ -669,6 +669,46 @@ describe('a repeated pid in a master-loot assignment (#2505)', () => {
     const pids = openMasterRoll().candidates.map((cand) => cand.pid);
     expect(pids).toHaveLength(3); // the whole party, so the check has something to catch
     expect(new Set(pids).size).toBe(3);
+  });
+
+  it('opens the master roll with a roster scoped to the tapping party', () => {
+    // The other half of that invariant, and now load-bearing in a second place:
+    // server/game.ts bounds the masterAssign pid list at RAID_MAX (#2524) purely
+    // because the candidate roster is a subset of one party, which partyAccept and
+    // the finder seam both cap. A bystander standing on the corpse is the way that
+    // could quietly stop being true, so pin it with one present: a count-only
+    // assertion on an all-party fixture would pass either way.
+    const { sim, a } = openMasterRoll();
+    const bystander = sim.addPlayer('hunter', 'Nosy');
+    teleportTo(sim, 21, 21, bystander); // right on the corpse, in no party
+    expect(sim.partyOf(bystander)).toBeNull();
+
+    const rosterFor = (mobId: number) => {
+      const mob = createMob(mobId, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
+      mob.dead = true;
+      mob.lootable = true;
+      mob.tappedById = a;
+      mob.loot = { copper: 0, items: [{ itemId: PREMIUM, count: 1 }] };
+      sim.entities.set(mob.id, mob);
+      sim.events.length = 0;
+      sim.lootCorpse(mob.id, a);
+      const opened = sim.events.find((e) => e.type === 'masterLoot');
+      expect(opened).toBeTruthy();
+      return (opened as { candidates: { pid: number }[] }).candidates.map((c) => c.pid);
+    };
+
+    const outside = rosterFor(990501);
+    const members = sim.partyOf(a)?.members ?? [];
+    expect(outside.length).toBeGreaterThan(1); // a real roll, not an empty one
+    expect(outside.filter((pid) => !members.includes(pid))).toEqual([]);
+    expect(outside).not.toContain(bystander);
+
+    // The control that makes it a statement about MEMBERSHIP rather than distance:
+    // nothing about where they stand changes, they simply join, and the very same
+    // corpse position now puts them on the roster.
+    sim.partyInvite(bystander, a);
+    sim.partyAccept(bystander);
+    expect(rosterFor(990502)).toContain(bystander);
   });
 
   it('routes a departed [X, X] target down the same fallback [X] takes', () => {

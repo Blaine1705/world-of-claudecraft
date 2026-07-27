@@ -653,10 +653,11 @@ export function assignMasterLoot(
   if (r.meta.entityId !== roll.masterLooter) return; // only the master looter decides
   // Keep only still-eligible targets, each counted once; ignore anyone no longer
   // a candidate. The pid list is client-supplied (the masterAssign wire case
-  // checks that pids is a non-empty array of numbers and nothing about the
-  // values), and a pid named twice would send that player two lootRoll prompts,
-  // print their reveal line twice, and can put one player in tiedWinners twice,
-  // drawing a tie-break ctx.rng.int the honest single-candidate case never draws.
+  // checks that pids is a non-empty numeric array no longer than a full raid
+  // roster, and nothing about the values), and a pid named twice would send that
+  // player two lootRoll prompts, print their reveal line twice, and can put one
+  // player in tiedWinners twice, drawing a tie-break ctx.rng.int the honest
+  // single-candidate case never draws.
   // What is load-bearing is deduping BEFORE the length tests below, so [X, X]
   // takes the direct-grant arm exactly like [X] instead of converting to a
   // one-player need/greed roll (the dedupe and the filter commute, so their
