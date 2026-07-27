@@ -22,10 +22,16 @@ import type { SimContext } from '../sim_context';
 import { DEFAULT_PARTY_LOOT_STRATEGIES } from '../types';
 
 // Group caps (classic 5-player party, 10-player raid as 2 subgroups of 5). Moved
-// from sim.ts with the only code that reads them; do NOT inline new numbers.
+// from sim.ts with the code that reads them; do NOT inline new numbers.
 const PARTY_MAX = 5;
 const RAID_MIN = 5;
-const RAID_MAX = 10;
+// The largest roster any group can hold, enforced at every join site below
+// (partyInvite, partyAccept, and the Dungeon Finder formation seam). The one cap
+// with a reader outside this file: it is also the honest ceiling on how many
+// players a client-supplied group-wide pid list can name, so server/game.ts
+// imports it to bound the masterAssign wire case (#2524). Raising it widens that
+// wire bound too, which is the intent.
+export const RAID_MAX = 10;
 const RAID_GROUP_MAX = 5;
 
 // One indivisible Dungeon Finder unit as the formation seam receives it: a

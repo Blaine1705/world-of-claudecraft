@@ -108,6 +108,37 @@ describe('PartyMachine: dungeon finder formation', () => {
     expect(formed!.members).toEqual([leader, member, solo]);
     expect(inherited).toEqual([solo]);
   });
+
+  it('refuses to form a raid one member over RAID_MAX, and forms it at RAID_MAX', () => {
+    // The formation seam is the SECOND way a roster grows (partyAccept is the
+    // other, pinned in tests/social.test.ts by an eleventh raider bouncing off a
+    // full raid). Both had to stay capped for server/game.ts to bound the
+    // masterAssign pid list at RAID_MAX (#2524): a roster the finder could push
+    // past ten would make that wire cap start rejecting honest frames, silently.
+    // Both sides of the boundary, since a refusal alone cannot tell a cap of ten
+    // from a cap of two.
+    const form = (size: number) => {
+      const t = makeCtx();
+      const pids = Array.from({ length: size }, (_, i) => t.addPlayer(i + 1, `P${i}`));
+      (t.ctx as any).entities = { has: () => true };
+      const party = new PartyMachine(t.ctx);
+      const formed = party.formDungeonFinderGroup(
+        pids.map((pid) => ({ partyId: null, leaderPid: pid, members: [pid] })),
+        { raid: true },
+      );
+      return { formed, pids, party };
+    };
+
+    const over = form(11); // RAID_MAX + 1
+    expect(over.formed).toBeNull();
+    // Refused BEFORE anything mutated: nobody is left holding a half-built group.
+    for (const pid of over.pids) expect(over.party.partyOf(pid)).toBeNull();
+
+    const at = form(10); // RAID_MAX exactly
+    expect(at.formed).not.toBeNull();
+    expect(at.formed!.members).toEqual(at.pids);
+    expect(at.formed!.raid).toBe(true);
+  });
 });
 
 describe('PartyMachine: formation', () => {
