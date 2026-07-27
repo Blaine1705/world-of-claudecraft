@@ -1684,14 +1684,14 @@ export function pathCrossesFence(
 // Camera occlusion — third-person chase-cam pull-in
 // ---------------------------------------------------------------------------
 // The renderer sweeps a ray from the player's head (`a`) toward the desired
-// camera position (`b`) and pulls the camera in to the surface of the first
-// static obstacle in between, so the chase cam never sits inside a wall.
-// Pure XZ math against the SAME colliders movement uses (what you see is what
-// you collide with). Returns the fraction of the a->b segment the camera may
-// travel before the first occluder (1 = unobstructed). Open-world colliders
-// carry precomputed `cameraTopY` values, so large rocks still pull the camera
-// in only when the ray passes below their visual top. Hideable props are
-// flagged `camGhost` and skipped entirely (the renderer hides them instead).
+// camera position (`b`) while the player is inside an instanced dungeon,
+// delve, or maze and pulls the camera in to the first static obstacle. This
+// keeps the chase cam out of enclosing walls and roofs. Exterior scenery must
+// never drive zoom merely because the player walks past it: hideable props
+// disappear through the render path, and every other exterior collider leaves
+// the requested camera distance unchanged. The sweep is pure XZ math against
+// the SAME colliders movement uses and returns the fraction before the first
+// enclosing occluder (1 = unobstructed).
 
 // First entry param t along a->b for a circle (radius already padded).
 // Infinity = no hit; we also bail when `a` is already inside (never slam the
@@ -1794,11 +1794,12 @@ function sweepColliders(
   return best;
 }
 
-// Fraction of the head->camera segment the chase cam may travel before the
-// first static occluder. `a` is the look-at pivot (player head), `b` the
-// desired camera position. Mirrors resolvePosition's region split.
+// Fraction of the head->camera segment the chase cam may travel inside an
+// enclosed instance before the first static occluder. `a` is the look-at
+// pivot (player head), `b` the desired camera position. Exterior positions
+// return 1 so passing scenery never changes zoom.
 export function cameraOcclusion(
-  seed: number,
+  _seed: number,
   ax: number,
   ay: number,
   az: number,
@@ -1858,25 +1859,13 @@ export function cameraOcclusion(
     const colliders = interiorCollidersFor(dungeonId, interior);
     return sweepColliders(colliders, ax - ox, ay, az - oz, bx - ox, by, bz - oz, pad, true);
   }
-  const grid = gridFor(seed);
-  const gx0 = Math.floor(Math.min(ax, bx) / GRID_CELL),
-    gx1 = Math.floor(Math.max(ax, bx) / GRID_CELL);
-  const gz0 = Math.floor(Math.min(az, bz) / GRID_CELL),
-    gz1 = Math.floor(Math.max(az, bz) / GRID_CELL);
-  let best = 1;
-  for (let gx = gx0; gx <= gx1; gx++) {
-    for (let gz = gz0; gz <= gz1; gz++) {
-      const list = grid.cells.get(cellKey(gx, gz));
-      if (list) best = Math.min(best, sweepColliders(list, ax, ay, az, bx, by, bz, pad, false));
-    }
-  }
-  return best;
+  return 1;
 }
 
 // Eye height (yards above the ground) for the spell line-of-sight ray. An
-// open-world obstacle whose visual top (`cameraTopY`, the same precomputed top
-// the camera occlusion uses) sits at or below the sight line no longer blocks a
-// cast: a campfire (top 1.45), a crate (1.35), or a small rock is something you
+// open-world obstacle whose precomputed visual top (`cameraTopY`) sits at or
+// below the sight line no longer blocks a cast: a campfire (top 1.45), a crate
+// (1.35), or a small rock is something you
 // see and cast OVER, while buildings, trees, tents, and fences still block.
 // Colliders without a known top (the interior wall layouts) always block, the
 // conservative default, and MOVEMENT collision is untouched everywhere.
