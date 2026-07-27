@@ -4529,6 +4529,80 @@ function professionsGather(seed = 1): Scenario {
   };
 }
 
+// The fine-material branch (D8). professionsGather above deliberately runs
+// tier-1 tools on tier-1 veins, so `yieldsFineGrade` is false on all 102 of its
+// harvests and no golden walks the upgrade path at all: its unchanged digest
+// proves the OLD behavior is unmoved, which is the important half, but says
+// nothing about the new one. This scenario records the other side, so a future
+// draw-position slip on the fine branch is caught by the gate rather than by a
+// single hand-written observer count in a unit test.
+//
+// Mirefen is the useful ground because it ships BOTH tiers of vein for one
+// material, so a single tool sits above the material at one vein and not at the
+// other with no content edit.
+function professionsGatherFine(seed = 1): Scenario {
+  // Tier-3 pick on a tier-2 vein: two tiers above the node, so the cast is
+  // shorter than the base. Use the worst case anyway; surplus ticks are plain
+  // world ticks.
+  const castTicks = Math.ceil(gatherCastDurationSec(1, 1, 0) / DT) + 1;
+  return {
+    name: 'professions_gather_fine',
+    coverage: [
+      'class:warrior (out-tooled gatherer)',
+      'tool STRICTLY above the material tier at a full-grade vein: fine grade granted',
+      'same tool at the zone lower-tier vein: plain grade, so the base stays gatherable',
+      'wrong-profession tool never upgrades: tier-3 pick beside a tier-2 sickle at a herb patch',
+      'fine grant costs no extra rng draw (two per granted harvest, unchanged)',
+      'gatherResult itemId carries the resolved grade',
+    ],
+    sampleEvery: 500,
+    build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const pid = sim.playerId as number;
+      const p = sim.player as AnyEntity;
+
+      for (const e of (sim.entities as Map<number, AnyEntity>).values()) {
+        if (e.kind !== 'mob') continue;
+        e.dead = true;
+        e.hp = 0;
+        e.aiState = 'dead';
+        e.respawnTimer = 9999;
+        e.corpseTimer = 9999;
+        e.inCombat = false;
+      }
+
+      // A tier-3 pick (above mirefen ore) and a tier-2 sickle (only AT the
+      // mirefen herb tier). The pair is the cross-profession control: the pick
+      // outclasses the herb too, but it is not the herb's tool.
+      sim.addItem('mithril_mining_pick', 1, pid);
+      sim.addItem('bronze_sickle', 1, pid);
+
+      // Step 1: the full-grade vein upgrades.
+      teleport(sim, p, 48, 352); // ore_mirefen_t2, tier 2
+      sim.harvestNode('ore_mirefen_t2', pid);
+      rec.tick(castTicks);
+      rec.snapshot('fine-grade-at-full-tier-vein');
+      rec.tick(2);
+
+      // Step 2: the SAME tool at the zone's tier-1 vein still yields plain.
+      teleport(sim, p, 40, 340); // ore_mirefen_1, tier 1
+      sim.harvestNode('ore_mirefen_1', pid);
+      rec.tick(castTicks);
+      rec.snapshot('plain-grade-at-lower-tier-vein');
+      rec.tick(2);
+
+      // Step 3: the herb patch, worked by a sickle that is only AT its tier.
+      // The tier-3 pick in the same bags must not leak across professions.
+      teleport(sim, p, 34, 406); // herb_mirefen_t2, tier 2
+      sim.harvestNode('herb_mirefen_t2', pid);
+      rec.tick(castTicks);
+      rec.snapshot('wrong-profession-tool-does-not-upgrade');
+      rec.tick(2);
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -4586,4 +4660,5 @@ export const SCENARIOS: Scenario[] = [
   chatSocial(),
   professionsCraft(),
   professionsGather(),
+  professionsGatherFine(),
 ];

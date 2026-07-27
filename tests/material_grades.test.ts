@@ -210,9 +210,14 @@ describe('downward substitution', () => {
     ]);
     expect(planGradeRemoval('copper_ore', 0, fineOnly)).toEqual([]);
     expect(planGradeRemoval('copper_ore', 3, () => 0)).toEqual([]);
-    // A negative available (a caller bug) is clamped, never turned into a
-    // negative removal that would mint items.
+    // A negative available (a caller bug) yields no line. Note this arm passes
+    // with or without the Math.max clamp in planGradeRemoval, because the
+    // `take <= 0` guard already covers it: the clamp there is a defensive
+    // default, not a behavior this can pin. The clamp in countAcrossGrades IS
+    // behavioral, and is pinned right below.
     expect(planGradeRemoval('copper_ore', 3, () => -5)).toEqual([]);
+    // Removing that clamp returns -10 here instead of 0.
+    expect(countAcrossGrades('copper_ore', () => -5)).toBe(0);
   });
 });
 
@@ -321,6 +326,28 @@ describe('the tool ladder the grades exist to build', () => {
         ).toBe(false);
       }
     }
+  });
+});
+
+describe('the pure-leaf contract material_tier.ts depends on', () => {
+  it('material_grades.ts imports nothing at all', () => {
+    // material_tier.ts builds MATERIAL_TIER_BY_ITEM at MODULE EVALUATION time by
+    // calling fineMaterialFor. That is safe only because this module has no
+    // imports and therefore cannot participate in a cycle. Give it one that
+    // transitively reaches material_tier.ts and MATERIAL_GRADES is in its
+    // temporal dead zone during that top-level build, so the module throws on
+    // import. The file header asserts the property; this makes it enforceable.
+    const here = path.dirname(fileURLToPath(import.meta.url));
+    const src = readFileSync(
+      path.join(here, '..', 'src/sim/professions/material_grades.ts'),
+      'utf8',
+    );
+    // Strip block and line comments first: the header discusses imports in
+    // prose, and a raw scan would match that instead of real code.
+    const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    expect(code.match(/^\s*import\b/m), 'material_grades.ts must stay import-free').toBeNull();
+    // Teeth check: the stripped source is still real code, not an empty string.
+    expect(code).toContain('export function harvestGradeItemId');
   });
 });
 
