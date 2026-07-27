@@ -590,7 +590,7 @@ export function removePlayerFromLootRolls(ctx: SimContext, pid: number): void {
 // resolveLootRoll above.
 export function revokeMasterLooterAuthority(ctx: SimContext, pid: number): void {
   for (const roll of ctx.pendingLootRolls.values()) {
-    if (roll.masterLooter === pid) convertMasterRollToNeedGreed(ctx, roll, roll.candidates);
+    if (roll.masterLooter === pid) convertMasterRollToNeedGreed(ctx, roll, [...roll.candidates]);
   }
 }
 
@@ -610,6 +610,19 @@ export function assignMasterLoot(
   const roll = ctx.pendingLootRolls.get(rollId);
   if (!roll || roll.masterLooter === undefined) return;
   if (r.meta.entityId !== roll.masterLooter) return; // only the master looter decides
+  // Defense in depth against the party-collapse exploit: a kick/leave that
+  // shrinks the party to just the master looter disbands it (see
+  // removeFromParty), which leaves `roll.masterLooter` still set with no other
+  // member left to stop a self-assign. Re-check live party membership here,
+  // not just the stale masterLooter field, so the same collapse is closed
+  // regardless of which membership-mutating path caused it (kick, leave, or
+  // disconnect). Treat a lost party the same as an explicit revoke: convert
+  // to need/greed rather than silently deny, so the corpse stays distributable.
+  const party = ctx.partyOf(roll.masterLooter);
+  if (!party || party.members.length <= 1) {
+    convertMasterRollToNeedGreed(ctx, roll, roll.candidates);
+    return;
+  }
   // Keep only still-eligible targets; ignore anyone no longer a candidate.
   const targets = targetPids.filter((p) => roll.candidates.includes(p));
   if (targets.length === 0) return; // nothing valid selected: leave the prompt open

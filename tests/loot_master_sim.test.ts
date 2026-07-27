@@ -179,6 +179,51 @@ describe('master loot', () => {
     expect(sim.countItem(PREMIUM, a)).toBe(1);
   });
 
+  it('blocks a self-assign after the leader/master-looter kicks every other member and the party disbands', () => {
+    const sim = makeSim();
+    const { a, b, mob } = partyOnCorpse(sim, PREMIUM);
+    const c = sim.addPlayer('rogue', 'Cara');
+    sim.partyInvite(c, a);
+    sim.partyAccept(c);
+    teleportTo(sim, 21, 21, c);
+    sim.setPartyLootMaster(true, 0, 'uncommon', a); // leader a is master looter
+    sim.lootCorpse(mob.id, a);
+    const rollId = sim.events.find((e) => e.type === 'masterLoot')?.rollId;
+    if (rollId === undefined) throw new Error('expected master loot prompt');
+
+    sim.partyKick(b, a);
+    sim.partyKick(c, a); // party collapses to just `a` and disbands
+
+    // Even though `a` still nominally holds roll.masterLooter, the party is
+    // gone: a self-assign must not grant the item.
+    sim.assignMasterLoot(rollId, [a], a);
+    expect(sim.countItem(PREMIUM, a)).toBe(0);
+
+    // The roll falls back to a normal need/greed prompt for the original
+    // candidates instead of staying stuck or self-assignable.
+    expect(sim.activeLootRolls(a).map((p) => p.rollId)).toContain(rollId);
+  });
+
+  it('blocks a self-assign after the leader/master-looter is the last one left when everyone else leaves', () => {
+    const sim = makeSim();
+    const { a, b, mob } = partyOnCorpse(sim, PREMIUM);
+    const c = sim.addPlayer('rogue', 'Cara');
+    sim.partyInvite(c, a);
+    sim.partyAccept(c);
+    teleportTo(sim, 21, 21, c);
+    sim.setPartyLootMaster(true, 0, 'uncommon', a); // leader a is master looter
+    sim.lootCorpse(mob.id, a);
+    const rollId = sim.events.find((e) => e.type === 'masterLoot')?.rollId;
+    if (rollId === undefined) throw new Error('expected master loot prompt');
+
+    sim.partyLeave(b);
+    sim.partyLeave(c); // party collapses to just `a` and disbands
+
+    sim.assignMasterLoot(rollId, [a], a);
+    expect(sim.countItem(PREMIUM, a)).toBe(0);
+    expect(sim.activeLootRolls(a).map((p) => p.rollId)).toContain(rollId);
+  });
+
   it('rejects assignment from anyone other than the master looter', () => {
     const sim = makeSim();
     const { a, b, mob } = partyOnCorpse(sim, PREMIUM);
