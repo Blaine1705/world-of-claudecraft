@@ -51,17 +51,23 @@ export function enchantNameKey(enchantId: string): TranslationKey {
  *  naming it here is what lets the picker rows say the same thing. */
 export const HEROIC_TAG_KEY: TranslationKey = 'hudChrome.itemHeroicTag';
 
-/** Whether `itemId` is a heroic upgraded variant (content/heroic_variants.ts).
- *  Such a variant shares its base item's display NAME by design (classic: a
- *  heroic drop reads the same as its normal counterpart, entity_i18n
- *  itemDisplayName), so a base and its heroic twin are two different ids that
- *  render one string. Every row family carries this so the picker can paint the
- *  mark and keep the two rows' accessible names apart (#2466). Unconditional,
- *  not collision-gated: it is a true fact about the copy either way, it is what
- *  the tooltip already says, and a tag that blinks in and out depending on what
- *  else the player happens to hold would be the harder thing to trust. */
-function isHeroicVariant(itemId: string): boolean {
-  return ITEMS[itemId]?.heroicOf !== undefined;
+/** Whether `itemId` is a heroic item, on the SAME condition the item tooltip's
+ *  own [HEROIC] tag uses (hud.ts: `heroicOf || heroic`), so the one tag never
+ *  means two different things on two surfaces. Both arms matter for a different
+ *  reason: a generated `heroicOf` variant shares its base item's display NAME by
+ *  design (classic: a heroic drop reads the same as its normal counterpart,
+ *  entity_i18n itemDisplayName), which is the collision #2466 is about, while a
+ *  bespoke `heroic` piece keeps its own name key and needs no discriminator, but
+ *  would look unmarked here beside the tooltip that marks it.
+ *
+ *  Every row family carries this so the picker can paint the mark and keep the
+ *  two rows' accessible names apart. Unconditional, not collision-gated: it is a
+ *  true fact about the copy either way, and a tag that blinks in and out
+ *  depending on what else the player happens to hold would be the harder thing
+ *  to trust. */
+function isHeroicItem(itemId: string): boolean {
+  const def = ITEMS[itemId];
+  return def?.heroicOf !== undefined || def?.heroic === true;
 }
 
 /** Total held count of an item id across every stack (fungible + instanced).
@@ -372,7 +378,7 @@ export interface EnchantTargetRow {
    *  on an ordinary item. The thin consumer paints the heroic mark from this,
    *  which is what keeps a base row and its heroic twin's row from rendering one
    *  identical accessible name: itemDisplayName resolves both to the base item's
-   *  name by design, and the picker had no other mark. See isHeroicVariant. */
+   *  name by design, and the picker had no other mark. See isHeroicItem. */
   heroic?: true;
   /** Present iff this is a flagged REPLACE row (#2415): the target copies are
    *  already enchanted, activation runs the confirm dialog, and the apply is
@@ -473,7 +479,7 @@ export function enchantTargets(
   // row are one string told apart by nothing a player or a screen reader can
   // reach. One sweep over the finished rows, the mixedHolding idiom above, so
   // the two families cannot pick it up differently.
-  for (const row of rows) if (isHeroicVariant(row.itemId)) row.heroic = true;
+  for (const row of rows) if (isHeroicItem(row.itemId)) row.heroic = true;
   return rows;
 }
 
@@ -547,7 +553,7 @@ export function wornEnchantTargets(
   // The two name discriminators (#2466), one sweep over the finished rows so the
   // replace arm and the plain arm cannot pick them up differently.
   for (const row of rows) {
-    if (isHeroicVariant(row.itemId)) row.heroic = true;
+    if (isHeroicItem(row.itemId)) row.heroic = true;
     const slotIndex = sharedSlotLabelIndex(row.slot);
     if (slotIndex !== undefined) row.slotIndex = slotIndex;
   }

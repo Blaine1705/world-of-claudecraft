@@ -5550,7 +5550,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.vaels_mist_staff.name': 'Vaelova mlžná hůl',
   'entities.items.vale_carving_knife.name': 'Řezbářský nůž z údolí',
   'entities.items.valeborn_spellblade.name': 'Kouzelná čepel zrozená v údolí',
-  'entities.items.valespun_robe.name': 'Údolně tkané roucho',
+  'entities.items.valespun_robe.name': 'Údolně předené roucho',
   'entities.items.vanguard_azure_armor_plate.name': 'Předvojová azurová',
   'entities.items.vanguard_chrome_armor_plate.name': 'Předvojová chromová',
   'entities.items.varric_shadow_cowl.name': 'Varricova stínová kápě',

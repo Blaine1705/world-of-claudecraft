@@ -13,15 +13,17 @@ import { ENCHANTS } from '../src/sim/content/enchants';
 import { ITEMS } from '../src/sim/data';
 import { slotAcceptsItem } from '../src/sim/equipment_rules';
 import { isDisenchantable } from '../src/sim/professions/enchanting';
-import { ALL_EQUIP_SLOTS, type InvSlot, type ItemDef } from '../src/sim/types';
+import { ALL_EQUIP_SLOTS, type EquipSlot, type InvSlot, type ItemDef } from '../src/sim/types';
 import {
   BagItemActionMenu,
   CTX_ITEM_DANGER_CLASS,
   CTX_MENU_PICKER_CLASS,
 } from '../src/ui/bag_item_action_menu';
 import { disenchantYieldLines } from '../src/ui/disenchant_yield_view';
-import { enchantSectionsForReagent } from '../src/ui/enchant_apply_view';
+import { enchantSectionsForReagent, HEROIC_TAG_KEY } from '../src/ui/enchant_apply_view';
 import { itemDisplayName } from '../src/ui/entity_i18n';
+import { t } from '../src/ui/i18n';
+import { itemNumber } from '../src/ui/item_instance_tooltip';
 import { itemSlotLabel } from '../src/ui/item_slot_labels';
 import type { IWorld } from '../src/world_api';
 
@@ -937,8 +939,21 @@ describe('BagItemActionMenu target step: unique accessible names (#2466)', () =>
   const RING_ENCHANT = 'enchant_ring_spirit';
   const SWORD = 'eastbrook_arming_sword';
   const WEAPON_ENCHANT = 'enchant_weapon_might';
-  /** The heroic mark's English text, the item tooltip's own instrument. */
-  const HEROIC_TAG = '[HEROIC]';
+  /** The heroic mark, resolved through the KEY the painter is required to use
+   *  rather than restated as an English literal. AC 2 of #2466 is "the
+   *  discriminator is a t() key, not a concatenation", and a literal pin is
+   *  satisfied by a painter that hardcodes '[HEROIC]' and ships English to all 18
+   *  locales. Resolving the same key the core exports is what makes the wiring,
+   *  not just the bytes, the thing under test. */
+  const HEROIC_TAG = t(HEROIC_TAG_KEY);
+  /** Likewise the indexed worn tag: t() with BOTH placeholders, so folding the
+   *  ordinal into wornTag's {slot} (English-identical, and it takes the slot /
+   *  ordinal order away from every translator) fails here. */
+  const wornIndexed = (slot: EquipSlot, index: number): string =>
+    t('hudChrome.enchanting.wornTagIndexed', {
+      slot: itemSlotLabel(slot),
+      index: itemNumber(index),
+    });
 
   /** A live base/heroic pair in an enchant-eligible slot, from real content. */
   function heroicPair(slot: string): { base: string; heroic: string; name: string } {
@@ -1023,6 +1038,10 @@ describe('BagItemActionMenu target step: unique accessible names (#2466)', () =>
     // Both fingers share the one "Finger" label, which is the collision; the
     // ordinal is what the rows now carry instead.
     expect(itemSlotLabel('ring1')).toBe(itemSlotLabel('ring2'));
+    expect(rows[0].text).toBe(`${name}${wornIndexed('ring1', 1)}`);
+    expect(rows[1].text).toBe(`${name}${wornIndexed('ring2', 2)}`);
+    // ...and the English those keys resolve to, so a catalog reword that broke
+    // the wording (rather than the wiring) is caught by the same test.
     expect(rows[0].text).toBe(`${name}Worn (Finger 1)`);
     expect(rows[1].text).toBe(`${name}Worn (Finger 2)`);
     // The row a player picks still drives its OWN finger, so the label and the
@@ -1045,9 +1064,53 @@ describe('BagItemActionMenu target step: unique accessible names (#2466)', () =>
     h.openTargets(RING_ENCHANT);
     const rows = h.rows();
     expect(rows.map((row) => row.act)).toEqual([null, null]);
-    expect(rows[0].metas.map((meta) => meta.text)).toEqual(['Worn (Finger 1)', 'Already applied']);
-    expect(rows[1].metas.map((meta) => meta.text)).toEqual(['Worn (Finger 2)', 'Already applied']);
+    expect(rows[0].metas.map((meta) => meta.text)).toEqual([
+      wornIndexed('ring1', 1),
+      'Already applied',
+    ]);
+    expect(rows[1].metas.map((meta) => meta.text)).toEqual([
+      wornIndexed('ring2', 2),
+      'Already applied',
+    ]);
     expect(rows[0].text).not.toBe(rows[1].text);
+  });
+
+  it('numbers a LONE finger too, so the tag never depends on what else is worn', () => {
+    // The other arm of the unconditional decision: with one ring on one finger
+    // there is nothing to disambiguate from, and the row still says which finger
+    // it is. That is deliberate, and it is what keeps the tag trustworthy: a mark
+    // that appeared only when a second copy happened to be worn would leave a
+    // player unable to read a single row as a statement about their character.
+    const ringId = (Object.values(ITEMS).find((def) => def.slot === 'ring') as ItemDef).id;
+    const h = harness(768, {
+      inventory: [{ itemId: DUST, count: 99 }],
+      equipment: { ring2: ringId },
+    });
+    h.openTargets(RING_ENCHANT);
+    const [row] = h.rows();
+    expect(row.act).toBe('worn:ring2');
+    // The ordinal names the finger it is actually on, not "1" because it is the
+    // only row: the index comes from the equipment key, never from row order.
+    expect(row.metas.map((meta) => meta.text)).toEqual([wornIndexed('ring2', 2)]);
+    expect(row.text).toContain('Finger 2');
+  });
+
+  it('paints the heroic mark on a WORN row too, ahead of its worn tag', () => {
+    // The worn arm sets the flag in its own pass, so it needs its own paint
+    // fixture: a discriminator wired on the bagged family alone is the bug again,
+    // one family narrower.
+    const { heroic, name } = heroicPair('mainhand');
+    const h = harness(768, {
+      inventory: [{ itemId: DUST, count: 99 }],
+      equipment: { mainhand: heroic },
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    const [row] = h.rows();
+    expect(row.act).toBe('worn:mainhand');
+    // Identity first, then location: the mark belongs to the item, the worn tag
+    // to where the copy sits.
+    expect(row.metas.map((meta) => meta.text)).toEqual([HEROIC_TAG, 'Worn (Main Hand)']);
+    expect(row.text).toBe(`${name}${HEROIC_TAG}Worn (Main Hand)`);
   });
 
   it('numbers nothing on a dual-wielded pair, whose slot labels already differ', () => {
@@ -1084,8 +1147,11 @@ describe('BagItemActionMenu target step: unique accessible names (#2466)', () =>
   // and both hands enter the list at once).
   it('never paints two rows of one target list with the same accessible name', () => {
     const enchantIds = Object.keys(ENCHANTS);
-    let heroicShapes = 0;
-    let multiWornShapes = 0;
+    // Counted so the sweep cannot go quietly vacuous. Each counts a shape that
+    // must actually occur, not merely a loop iteration: a base/heroic pair whose
+    // two ids render ONE name, and two equipment keys that share ONE slot label.
+    let sharedNameShapes = 0;
+    let sharedLabelShapes = 0;
     let sweptLists = 0;
     for (const enchantId of enchantIds) {
       const itemSlot = ENCHANTS[enchantId].itemSlot;
@@ -1102,8 +1168,13 @@ describe('BagItemActionMenu target step: unique accessible names (#2466)', () =>
       const ids = heroicDef
         ? [heroicDef.heroicOf as string, heroicDef.id]
         : slotDefs.slice(0, 2).map((def) => def.id);
-      if (heroicDef) heroicShapes += 1;
       expect(ids.length, `content carries an item for ${itemSlot}`).toBeGreaterThan(0);
+      // Counted on the RENDERED names, not on the pair's existence: the shape
+      // this sweep needs is two ids that resolve to one string, which is the
+      // premise a heroic pair happens to satisfy, not the pair itself.
+      if (ids.length > 1 && itemDisplayName(ITEMS[ids[0]]) === itemDisplayName(ITEMS[ids[1]])) {
+        sharedNameShapes += 1;
+      }
       const inventory: InvSlot[] = [{ itemId: DUST, count: 99 }];
       for (const itemId of ids) {
         inventory.push({ itemId, count: 2 });
@@ -1113,7 +1184,12 @@ describe('BagItemActionMenu target step: unique accessible names (#2466)', () =>
       // ring1+ring2 and mainhand+offhand both land in one list.
       const wornSlots = ALL_EQUIP_SLOTS.filter((slot) => slotAcceptsItem(ITEMS[ids[0]], slot));
       expect(wornSlots.length, `${ids[0]} fits an equipment key`).toBeGreaterThan(0);
-      if (wornSlots.length > 1) multiWornShapes += 1;
+      // Counted on the LABELS, not on the key count: mainhand + offhand is two
+      // keys and no collision at all, so counting "more than one worn slot" would
+      // have let the finger coverage lapse while still reading as covered.
+      if (new Set(wornSlots.map((slot) => itemSlotLabel(slot))).size < wornSlots.length) {
+        sharedLabelShapes += 1;
+      }
       // Twice: worn copies all PLAIN, then all carrying one identical enchant,
       // which is the pair whose rows are otherwise byte-identical.
       for (const wornEnchant of [undefined, otherEnchant]) {
@@ -1138,10 +1214,13 @@ describe('BagItemActionMenu target step: unique accessible names (#2466)', () =>
         sweptLists += 1;
       }
     }
-    // Non-vacuity: both collision shapes really occur in the sweep, so a fixture
-    // that quietly stopped producing them cannot leave this green.
-    expect(sweptLists).toBe(enchantIds.length * 2);
-    expect(heroicShapes, 'some enchant slot has a base/heroic pair').toBeGreaterThan(0);
-    expect(multiWornShapes, 'some enchant slot fills two equipment keys').toBeGreaterThan(0);
+    // Non-vacuity: both collision shapes really occur in the sweep, and it really
+    // drove a meaningful number of lists, so a fixture that quietly stopped
+    // producing them cannot leave this green. The list floor is a LITERAL rather
+    // than enchantIds.length * 2, which would have compared the loop against
+    // itself and passed on an empty ENCHANTS table.
+    expect(sweptLists).toBeGreaterThanOrEqual(80);
+    expect(sharedNameShapes, 'some slot has two ids rendering ONE name').toBeGreaterThan(0);
+    expect(sharedLabelShapes, 'some slot fills two keys sharing ONE label').toBeGreaterThan(0);
   });
 });

@@ -8144,7 +8144,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Eastbrookská kroužková vesta"
       },
       "valespun_robe": {
-        "name": "Údolně tkané roucho"
+        "name": "Údolně předené roucho"
       },
       "tanned_leather_jerkin": {
         "name": "Kazajka z vydělané kůže"

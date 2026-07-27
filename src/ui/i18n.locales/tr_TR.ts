@@ -3492,7 +3492,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.vaels_mist_staff.name': "Vael'in Sis Asası",
   'entities.items.vale_carving_knife.name': 'Vadi Oyma Bıçağı',
   'entities.items.valeborn_spellblade.name': 'Vadidoğumlu Büyü Kılıcı',
-  'entities.items.valespun_robe.name': 'Vadidokuma Cübbesi',
+  'entities.items.valespun_robe.name': 'Vadieğirme Cübbesi',
   'entities.items.vanguard_azure_armor_plate.name': 'Öncü Birlik Gök Mavisi',
   'entities.items.vanguard_chrome_armor_plate.name': 'Öncü Birlik Krom',
   'entities.items.varric_shadow_cowl.name': "Varric'in Gölge Başlığı",

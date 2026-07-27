@@ -14462,8 +14462,9 @@ function resourceDisplayName(resourceType: ResourceType | null): string {
   return t(RESOURCE_LABEL_KEYS[resourceType ?? 'mana']);
 }
 
-// itemSlotName moved to ./item_slot_labels (imported above as itemSlotLabel), so
-// the pure view cores can read the same shared-label facts the HUD does (#2466).
+// itemSlotName moved to ./item_slot_labels as itemSlotLabel (imported above under
+// its old name here), so the pure view cores can read the same shared-label facts
+// the HUD does (#2466).
 
 function itemQualityLabel(quality: ItemDef['quality']): string {
   return t(ITEM_QUALITY_LABEL_KEYS[quality ?? 'common']);
