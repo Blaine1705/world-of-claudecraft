@@ -7,7 +7,7 @@
 // can give one back) and the remaining-point count. Rendering lives in
 // town_focus_window.ts.
 
-import { HARVEST_COMPONENT_ITEMS } from '../sim/professions/gathering';
+import { isTownFocusComponent, TOWN_FOCUS_COMPONENTS } from '../sim/professions/focus';
 
 export interface TownFocusRow {
   component: string;
@@ -26,7 +26,10 @@ export interface TownFocusView {
 }
 
 // Every currently-harvestable component type (#1140/#1142), stable order.
-export const TOWN_FOCUS_COMPONENTS: readonly string[] = Object.keys(HARVEST_COMPONENT_ITEMS);
+// Re-exported from the sim rather than derived here a second time (#2511):
+// this is the exact set setTownFocus accepts, so a row the panel offers can
+// never be a key the command boundary rejects.
+export { TOWN_FOCUS_COMPONENTS };
 
 export function buildTownFocusView(
   allocation: Readonly<Record<string, number>>,
@@ -81,14 +84,37 @@ export function townFocusRenderSig(view: TownFocusView): string {
   return `${view.inTown ? 1 : 0}/${view.budget}/${view.remaining}/${rows}`;
 }
 
-/** Applies a single +1/-1 step to `component`, clamped at 0 and at the budget. */
+/**
+ * Applies a single +1/-1 step to `component`, clamped at 0 and at the budget.
+ *
+ * Built from TOWN_FOCUS_COMPONENTS rather than by spreading `allocation`
+ * forward (#2511), so the payload the panel posts is a function of the rows it
+ * actually draws. A spread carried any key buildTownFocusView never rendered
+ * into every Save, where the command boundary now rejects the whole request
+ * and the panel offers no control that could remove it. The sim closes that
+ * from its own side by dropping unknown keys on load; this keeps the view core
+ * from emitting a model it does not render in the first place. Inert for every
+ * legitimate allocation, because both the row list and the budget sum here
+ * already read TOWN_FOCUS_COMPONENTS and nothing else.
+ *
+ * `component` is filtered too, not just the allocation carried forward, or the
+ * one key the caller names would be the single way back around the projection.
+ * The panel only ever steps a row it drew, so this is unreachable from the
+ * shipped client; it is here so the guarantee above holds for the function
+ * rather than for its current caller.
+ */
 export function stepTownFocus(
   allocation: Readonly<Record<string, number>>,
   component: string,
   delta: 1 | -1,
   budget: number,
 ): Record<string, number> {
-  const next: Record<string, number> = { ...allocation };
+  const next: Record<string, number> = {};
+  for (const c of TOWN_FOCUS_COMPONENTS) {
+    const points = Math.max(0, allocation[c] ?? 0);
+    if (points > 0) next[c] = points;
+  }
+  if (!isTownFocusComponent(component)) return next;
   const current = Math.max(0, next[component] ?? 0);
   const totalSpent = TOWN_FOCUS_COMPONENTS.reduce((sum, c) => sum + Math.max(0, next[c] ?? 0), 0);
   if (delta > 0 && totalSpent >= budget) return next;
