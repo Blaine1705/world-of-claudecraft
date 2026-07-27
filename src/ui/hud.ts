@@ -2737,6 +2737,15 @@ export class Hud {
       case 'delve-board':
         this.closeDelveBoard();
         break;
+      case 'lockpick-panel':
+        // Withdraw from a live lock, or dismiss the ante selector: the same arm the
+        // panel's own X button and its Escape handler pick (#2517). The gamepad escape
+        // arrives here (main.ts dispatchGamepadAction -> closeAll) with no DOM event for
+        // the controller's capture-phase keydown handler to intercept, so the default
+        // arm's bare hide left the 100ms countdown repainting a hidden subtree, the focus
+        // trap armed on an invisible panel, and the session live on the server.
+        this.lockpickController.requestClose();
+        break;
       case 'loot-settings-window':
         this.closeLootSettings();
         break;

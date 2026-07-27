@@ -98,6 +98,24 @@ export class LockpickController {
     this.flushEvents();
   }
 
+  /** The panel's ONE dismissal funnel: withdraw from a live lock, or just close the ante
+   *  selector when there is nothing to withdraw from. Both of the panel's own affordances
+   *  already mean exactly this (the board's X is wired to onAbort, the ante selector's to
+   *  onClose), and the capture-phase Escape handler below picks the same arm.
+   *
+   *  It is a named method rather than inline because a THIRD caller needs it and cannot
+   *  reach the handler: `Hud.closeManagedWindow`'s `lockpick-panel` case. A gamepad escape
+   *  goes `main.ts dispatchGamepadAction('escape') -> hud.closeAll()` with no DOM event for
+   *  a keydown listener to intercept, so before #2517 that path fell to the managed-window
+   *  `default:` arm (a bare `display: none`), leaving the 100ms countdown running against a
+   *  hidden subtree, the focus trap armed on an invisible panel, and the session live on the
+   *  server. Withdrawing here is what stops the clock; the trap is released when the
+   *  resulting lockpickEnd lands in `end()`, exactly as on the keyboard path. */
+  requestClose(): void {
+    if (this.deps.getState()) this.submitAbort();
+    else this.close();
+  }
+
   close(restoreFocus = true): void {
     this.deps.panel.style.display = 'none';
     this.window.close();
@@ -124,8 +142,7 @@ export class LockpickController {
       if (event.key === 'Escape') {
         event.preventDefault();
         event.stopImmediatePropagation();
-        if (live) this.submitAbort();
-        else this.close();
+        this.requestClose();
         return;
       }
       if (!live || event.repeat) return;
