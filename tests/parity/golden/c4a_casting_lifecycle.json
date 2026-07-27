@@ -15,8 +15,8 @@
     "cancelCast fishing arm via dealDamage (FISHING_CAST_ID, not pushback)",
     "multi-class casters: mage/priest/warlock"
   ],
-  "draws": 1096,
-  "drawDigest": "c0b3bfe5",
+  "draws": 1093,
+  "drawDigest": "8990e75f",
   "frames": [
     {
       "tick": 0,
@@ -793,8 +793,8 @@
       "state": "91efc174",
       "events": "741638a5",
       "rng": {
-        "draws": 551,
-        "digest": "c8833627"
+        "draws": 552,
+        "digest": "48f2b112"
       }
     },
     {
@@ -804,8 +804,8 @@
       "state": "4a8b50ce",
       "events": "741638a5",
       "rng": {
-        "draws": 584,
-        "digest": "072ab695"
+        "draws": 585,
+        "digest": "b8b67b2f"
       }
     },
     {
@@ -815,8 +815,8 @@
       "state": "930f9f92",
       "events": "741638a5",
       "rng": {
-        "draws": 617,
-        "digest": "eb2f5f38"
+        "draws": 618,
+        "digest": "d38908e7"
       }
     },
     {
@@ -826,63 +826,63 @@
       "state": "16f59f81",
       "events": "741638a5",
       "rng": {
-        "draws": 633,
-        "digest": "6f9a5c2d"
+        "draws": 634,
+        "digest": "e512e742"
       }
     },
     {
       "tick": 165,
       "time": 8.25,
       "nextId": 419,
-      "state": "c8dd1765",
-      "events": "00fcaa25",
+      "state": "6c823601",
+      "events": "6e129253",
       "rng": {
-        "draws": 663,
-        "digest": "e2d1d5e5"
+        "draws": 667,
+        "digest": "49c21e71"
       }
     },
     {
       "tick": 170,
       "time": 8.5,
       "nextId": 419,
-      "state": "0d0ba60f",
+      "state": "80308f1f",
       "events": "741638a5",
       "rng": {
-        "draws": 696,
-        "digest": "889ffeff"
+        "draws": 697,
+        "digest": "448f738c"
       }
     },
     {
       "tick": 175,
       "time": 8.75,
       "nextId": 419,
-      "state": "3a10a00b",
+      "state": "40f85f9b",
       "events": "741638a5",
       "rng": {
-        "draws": 736,
-        "digest": "91dfc695"
+        "draws": 734,
+        "digest": "166ac8d2"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 419,
-      "state": "09e10298",
+      "state": "d92eabb0",
       "events": "741638a5",
       "rng": {
-        "draws": 768,
-        "digest": "d95bb565"
+        "draws": 767,
+        "digest": "38d4d011"
       }
     },
     {
       "tick": 184,
       "time": 9.2,
       "nextId": 419,
-      "state": "6ecca018",
+      "state": "46504fe0",
       "events": "741638a5",
       "rng": {
-        "draws": 785,
-        "digest": "c09c70a6"
+        "draws": 783,
+        "digest": "4e690b34"
       },
       "label": "mage-queued",
       "players": [
@@ -902,7 +902,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 67,
-            "damageTaken": 104
+            "damageTaken": 106
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -1130,7 +1130,7 @@
           "facing": 0.563278,
           "fallStartY": -0.371544,
           "fiveSecondRule": 5.25,
-          "hp": 19896,
+          "hp": 19894,
           "id": 415,
           "inCombat": true,
           "kind": "player",
@@ -1354,52 +1354,52 @@
       "tick": 185,
       "time": 9.25,
       "nextId": 419,
-      "state": "ca5fd45f",
+      "state": "48bd51b7",
       "events": "741638a5",
       "rng": {
-        "draws": 793,
-        "digest": "71129613"
+        "draws": 792,
+        "digest": "1a4e9dde"
       }
     },
     {
       "tick": 190,
       "time": 9.5,
       "nextId": 419,
-      "state": "12397b57",
+      "state": "5b46f2ef",
       "events": "741638a5",
       "rng": {
-        "draws": 830,
-        "digest": "a7f9e309"
+        "draws": 829,
+        "digest": "1808e301"
       }
     },
     {
       "tick": 195,
       "time": 9.75,
       "nextId": 419,
-      "state": "acc06194",
-      "events": "e205d856",
+      "state": "d6d791f4",
+      "events": "21b74278",
       "rng": {
-        "draws": 864,
-        "digest": "7a8de421"
+        "draws": 865,
+        "digest": "2d92a8a3"
       }
     },
     {
       "tick": 200,
       "time": 10,
       "nextId": 419,
-      "state": "bb5503d2",
+      "state": "23790c72",
       "events": "741638a5",
       "rng": {
-        "draws": 899,
-        "digest": "e4f393d9"
+        "draws": 900,
+        "digest": "6ec8ad80"
       }
     },
     {
       "tick": 205,
       "time": 10.25,
       "nextId": 419,
-      "state": "b51e58ca",
-      "events": "db93299b",
+      "state": "d7e05dc4",
+      "events": "e2bff7be",
       "rng": {
         "draws": 922,
         "digest": "b9f4bdf5"
@@ -1409,11 +1409,11 @@
       "tick": 206,
       "time": 10.3,
       "nextId": 419,
-      "state": "164fe2e8",
+      "state": "d1a57456",
       "events": "8ae6a691",
       "rng": {
-        "draws": 929,
-        "digest": "62827a13"
+        "draws": 934,
+        "digest": "d7c0ee21"
       },
       "label": "priest-silence-cancel",
       "players": [
@@ -1432,14 +1432,14 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 134,
-            "damageTaken": 118
+            "damageDealt": 136,
+            "damageTaken": 121
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 134
+              "damageDealt": 136
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1662,7 +1662,7 @@
           "fallStartY": -0.371544,
           "fiveSecondRule": 0.8,
           "gcdRemaining": 0.7,
-          "hp": 19882,
+          "hp": 19879,
           "id": 415,
           "inCombat": true,
           "kind": "player",
@@ -1842,7 +1842,7 @@
           "fallStartY": -0.371544,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199866,
+          "hp": 199864,
           "id": 418,
           "inCombat": true,
           "kind": "mob",
@@ -1877,7 +1877,7 @@
           "threat": [
             [
               415,
-              135
+              137
             ]
           ],
           "wanderTarget": {
@@ -1898,55 +1898,55 @@
       "tick": 210,
       "time": 10.5,
       "nextId": 419,
-      "state": "5d41bc51",
+      "state": "9b7aa0d7",
       "events": "257d1cbd",
       "rng": {
-        "draws": 953,
-        "digest": "e8dc99bd"
+        "draws": 957,
+        "digest": "7abd165d"
       }
     },
     {
       "tick": 215,
       "time": 10.75,
       "nextId": 419,
-      "state": "e7c35fe2",
+      "state": "8fa512ec",
       "events": "741638a5",
       "rng": {
-        "draws": 979,
-        "digest": "020ecbcf"
+        "draws": 982,
+        "digest": "ecc4539d"
       }
     },
     {
       "tick": 220,
       "time": 11,
       "nextId": 419,
-      "state": "717241c9",
+      "state": "083fd38f",
       "events": "741638a5",
       "rng": {
-        "draws": 1001,
-        "digest": "979ee173"
+        "draws": 1002,
+        "digest": "07c60c83"
       }
     },
     {
       "tick": 225,
       "time": 11.25,
       "nextId": 419,
-      "state": "98d5a283",
+      "state": "e3946661",
       "events": "741638a5",
       "rng": {
-        "draws": 1015,
-        "digest": "7bc4f38d"
+        "draws": 1023,
+        "digest": "59472c19"
       }
     },
     {
       "tick": 228,
       "time": 11.4,
       "nextId": 419,
-      "state": "9e3e30c7",
+      "state": "2ec45431",
       "events": "a3844ac2",
       "rng": {
-        "draws": 1032,
-        "digest": "b76a0235"
+        "draws": 1037,
+        "digest": "424650f4"
       },
       "label": "warlock-channel-pushback",
       "players": [
@@ -1965,14 +1965,14 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 134,
-            "damageTaken": 118
+            "damageDealt": 136,
+            "damageTaken": 121
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 134
+              "damageDealt": 136
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -2196,7 +2196,7 @@
           "facing": 0.563278,
           "fallStartY": -0.371544,
           "fiveSecondRule": 1.9,
-          "hp": 19882,
+          "hp": 19879,
           "id": 415,
           "inCombat": true,
           "kind": "player",
@@ -2386,7 +2386,7 @@
           "fallStartY": -0.371544,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199866,
+          "hp": 199864,
           "id": 418,
           "inCombat": true,
           "kind": "mob",
@@ -2421,7 +2421,7 @@
           "threat": [
             [
               415,
-              135
+              137
             ]
           ],
           "wanderTarget": {
@@ -2442,18 +2442,18 @@
       "tick": 230,
       "time": 11.5,
       "nextId": 419,
-      "state": "b568cf9f",
+      "state": "b20ebe85",
       "events": "de843151",
       "rng": {
-        "draws": 1044,
-        "digest": "63cd904b"
+        "draws": 1047,
+        "digest": "81c990f7"
       }
     },
     {
       "tick": 235,
       "time": 11.75,
       "nextId": 419,
-      "state": "a2202699",
+      "state": "e85c5e28",
       "events": "d1b1693c",
       "rng": {
         "draws": 1069,
@@ -2464,11 +2464,11 @@
       "tick": 236,
       "time": 11.8,
       "nextId": 419,
-      "state": "e2227988",
+      "state": "837a8613",
       "events": "3003ac5d",
       "rng": {
-        "draws": 1076,
-        "digest": "519b1c66"
+        "draws": 1074,
+        "digest": "df3913f0"
       },
       "label": "warlock-fishing-cancel",
       "players": [
@@ -2487,14 +2487,14 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 136,
-            "damageTaken": 118
+            "damageDealt": 138,
+            "damageTaken": 121
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 136
+              "damageDealt": 138
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -2721,7 +2721,7 @@
           "facing": 0.563278,
           "fallStartY": -0.371544,
           "fiveSecondRule": 2.3,
-          "hp": 19882,
+          "hp": 19879,
           "id": 415,
           "inCombat": true,
           "kind": "player",
@@ -2904,7 +2904,7 @@
           "fallStartY": -0.371544,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199851,
+          "hp": 199849,
           "id": 418,
           "inCombat": true,
           "kind": "mob",
@@ -2939,7 +2939,7 @@
           "threat": [
             [
               415,
-              137
+              139
             ],
             [
               417,
@@ -2964,22 +2964,22 @@
       "tick": 240,
       "time": 12,
       "nextId": 419,
-      "state": "d84a8e15",
+      "state": "3237b036",
       "events": "741638a5",
       "rng": {
-        "draws": 1090,
-        "digest": "437bf583"
+        "draws": 1085,
+        "digest": "ed70cd48"
       }
     },
     {
       "tick": 241,
       "time": 12.05,
       "nextId": 419,
-      "state": "91b1b4e1",
+      "state": "ec1d8240",
       "events": "741638a5",
       "rng": {
-        "draws": 1096,
-        "digest": "c0b3bfe5"
+        "draws": 1093,
+        "digest": "8990e75f"
       },
       "label": "final",
       "players": [
@@ -2998,14 +2998,14 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 136,
-            "damageTaken": 118
+            "damageDealt": 138,
+            "damageTaken": 121
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 136
+              "damageDealt": 138
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -3232,7 +3232,7 @@
           "facing": 0.563278,
           "fallStartY": -0.371544,
           "fiveSecondRule": 2.55,
-          "hp": 19882,
+          "hp": 19879,
           "id": 415,
           "inCombat": true,
           "kind": "player",
@@ -3417,7 +3417,7 @@
           "fallStartY": -0.371544,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199851,
+          "hp": 199849,
           "id": 418,
           "inCombat": true,
           "kind": "mob",
@@ -3452,7 +3452,7 @@
           "threat": [
             [
               415,
-              137
+              139
             ],
             [
               417,

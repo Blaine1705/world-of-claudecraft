@@ -32,6 +32,7 @@ import {
 } from '../src/sim/data';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
+import { GATHER_NODE_BODIES } from '../src/sim/prop_layout';
 import { INTERACT_RANGE } from '../src/sim/types';
 import {
   DECORATION_MAX_SLOPE,
@@ -126,6 +127,22 @@ function steepestInReach(x: number, z: number): number {
   return worst;
 }
 
+/**
+ * How far from a node's own centre the nearest standable ground can legitimately
+ * sit when NOTHING foreign is in the way. An ore vein and a wood pile are solid
+ * bodies centred on their own coordinate, so a player is pushed clear by the
+ * node's radius plus their own; the extra sweep step is because nearestStandSpot
+ * samples on a 0.5yd ring and so cannot report a finer distance than that.
+ *
+ * ONE definition, read by both the arm and its counter-example. They used to
+ * compute it separately, which meant loosening the arm left the counter-example
+ * still passing against its own private copy: a mutation pass caught exactly
+ * that, so the number lives here and nowhere else.
+ */
+function selfClearanceFor(nodeType: string): number {
+  return (GATHER_NODE_BODIES[nodeType]?.r ?? 0) + PLAYER_BODY_RADIUS + SWEEP_STEP;
+}
+
 /** The closest spot inside the harvest reach a player can stand on, or null. */
 function nearestStandSpot(x: number, z: number): { x: number; z: number; r: number } | null {
   if (canStand(x, z)) return { x, z, r: 0 };
@@ -170,8 +187,35 @@ function rideHeight(x: number, z: number): number {
  * further than a 0.5-yard flood), and it refuses a blocked step where movement
  * would slide along the collider.
  */
+/**
+ * Is a FLOOD CELL passable, as opposed to its exact centre point? These are not
+ * the same question once small world bodies exist. A gather node's own body is
+ * a 0.44yd circle, which with the player's 0.5yd radius blocks a 0.94yd disc,
+ * and probing only the cell centre therefore blanks a whole 2yd cell because a
+ * rock sits in the middle of it. A player walks past that rock; the flood has
+ * to be able to as well, or every ore and wood node on an even coordinate
+ * reports itself unreachable.
+ *
+ * So the cell is passable when ANY of nine samples is: the centre plus a ring
+ * at 0.8yd offsets. The 0.8 is chosen against the shipped radii rather than
+ * picked: the four diagonal samples sit 1.13yd from the centre, clear of the
+ * 0.94yd disc a node's own body can block, while staying inside the cell's own
+ * 1.0yd half-width. Anything big enough to be a real wall still blanks all
+ * nine. This is one more divergence in the PERMISSIVE direction, which is the
+ * only direction this flood is allowed to differ in (see stepAllowed below).
+ */
+const CELL_PROBE_OFFSET = 0.8;
+function cellPassable(x: number, z: number): boolean {
+  for (const dx of [0, -CELL_PROBE_OFFSET, CELL_PROBE_OFFSET]) {
+    for (const dz of [0, -CELL_PROBE_OFFSET, CELL_PROBE_OFFSET]) {
+      if (!isBlocked(WORLD_SEED, x + dx, z + dz, PLAYER_BODY_RADIUS)) return true;
+    }
+  }
+  return false;
+}
+
 function stepAllowed(fromX: number, fromZ: number, toX: number, toZ: number): boolean {
-  if (isBlocked(WORLD_SEED, toX, toZ, PLAYER_BODY_RADIUS)) return false;
+  if (!cellPassable(toX, toZ)) return false;
   const h0 = rideHeight(fromX, fromZ);
   const h1 = rideHeight(toX, toZ);
   const run = Math.hypot(toX - fromX, toZ - fromZ);
@@ -242,6 +286,12 @@ const IN_GLIMMERMERE_SHALLOWS = { x: -55, z: 765 }; // where wood_thornpeak_1 us
 const ON_EAST_RIM_WALL = { x: 165, z: 0 };
 const ON_SOWFIELD_STAND = { x: -41, z: -137 }; // groundHeight adds the stand lift here
 const INSIDE_A_TOWN_COLLIDER = { x: -29, z: 0 };
+// Genuinely enclosed, not merely overlapping: the nearest ground a player
+// can hold is 4.5yd away, three times the widest clearance a node's own
+// body can account for, and still inside the harvest reach the sweep
+// searches so the fixture fails on distance rather than on running out of
+// room. This is the counter-example the buried-in-geometry arm needs.
+const DEEP_INSIDE_A_BUILDING = { x: 17, z: -6 };
 
 describe('gather node placement: every node sits on ground a player can work', () => {
   it('dry land: no node sits at or under a declared water surface', () => {
@@ -317,12 +367,31 @@ describe('gather node placement: every node sits on ground a player can work', (
   });
 
   it('no collider overlap: no node is buried inside a building, trunk or fence', () => {
+    // An ore vein and a wood pile are THEMSELVES solid standable bodies
+    // (prop_layout.ts GATHER_NODE_BODIES, turned into colliders by
+    // colliders.ts), so a player cannot stand on a node's own centre and
+    // `isBlocked` at that centre is true BY DESIGN for every ore and wood
+    // node. Asking whether the centre is clear would therefore fail 43 of the
+    // 54 shipped nodes and could never be satisfied by moving any of them.
+    //
+    // The question that still means something is whether anything FOREIGN
+    // buries the node. A node blocked only by its own body clears as soon as
+    // you step past its radius plus the player's; a node inside a building or
+    // a trunk has no clear ground anywhere near it. So the arm bounds HOW FAR
+    // the nearest unblocked ground is, and the bound is built from the shipped
+    // radii rather than picked: own body radius plus PLAYER_BODY_RADIUS, plus
+    // one sweep step of slack because nearestStandSpot samples on a 0.5yd ring
+    // and therefore cannot report a distance finer than that.
     for (const node of GATHER_NODES) {
       const { x, z } = node.pos;
+      const selfClearance = selfClearanceFor(node.type);
+      const spot = nearestStandSpot(x, z);
+      expect(spot, `${node.id} at (${x},${z}) has no unblocked ground in reach`).not.toBeNull();
+      if (!spot) continue;
       expect(
-        isBlocked(WORLD_SEED, x, z, PLAYER_BODY_RADIUS),
-        `${node.id} at (${x},${z}) overlaps a static collider`,
-      ).toBe(false);
+        spot.r,
+        `${node.id} at (${x},${z}) is buried in foreign geometry: nearest standable ground is ${spot.r.toFixed(2)}yd out, past its own ${selfClearance.toFixed(2)}yd body clearance`,
+      ).toBeLessThanOrEqual(selfClearance);
     }
   });
 
@@ -330,6 +399,34 @@ describe('gather node placement: every node sits on ground a player can work', (
     expect(
       isBlocked(WORLD_SEED, INSIDE_A_TOWN_COLLIDER.x, INSIDE_A_TOWN_COLLIDER.z, PLAYER_BODY_RADIUS),
     ).toBe(true);
+    // Blocked alone no longer fails the arm, because every ore and wood node is
+    // blocked at its own centre by its own body. What the arm actually reads is
+    // the DISTANCE to the nearest standable ground, so the counter-example has
+    // to fail on THAT measure or it stops being one.
+    //
+    // The town-collider point above does not: it sits just inside a wall, and
+    // standable ground is about a yard away, inside the self-clearance any ore
+    // node already claims. That is worth stating rather than hiding, because it
+    // marks exactly how much this arm can see: it catches ENCLOSED, not merely
+    // overlapping. DEEP_INSIDE_A_BUILDING is the point that genuinely is
+    // enclosed, and both facts are asserted so neither can rot.
+    const widestSelfClearance = Math.max(...GATHER_NODE_TYPES.map(selfClearanceFor));
+    const shallow = nearestStandSpot(INSIDE_A_TOWN_COLLIDER.x, INSIDE_A_TOWN_COLLIDER.z);
+    expect(shallow, 'the shallow fixture must still be standable-adjacent').not.toBeNull();
+    expect(shallow?.r ?? Number.POSITIVE_INFINITY).toBeLessThanOrEqual(widestSelfClearance);
+
+    const buried = nearestStandSpot(DEEP_INSIDE_A_BUILDING.x, DEEP_INSIDE_A_BUILDING.z);
+    expect(
+      buried === null || buried.r > widestSelfClearance,
+      'the buried fixture must fail the arm, or the arm proves nothing',
+    ).toBe(true);
+    // Still measurable rather than merely absent: the nearest standable ground
+    // is inside the harvest reach the sweep searches, so this fixture fails on
+    // DISTANCE and not because the sweep simply ran out of room.
+    expect(buried).not.toBeNull();
+    expect(buried?.r ?? 0).toBeLessThanOrEqual(REACH);
+    // And the bound is tight enough to be worth having.
+    expect(widestSelfClearance).toBeLessThan(REACH);
   });
 
   it('a stand spot: every node can be worked from a spot that is itself reachable', () => {
