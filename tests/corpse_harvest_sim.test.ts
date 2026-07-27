@@ -2800,9 +2800,11 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
   });
 
   it('refuses the DERIVED pick too, when a persisted town focus names only unmapped families', () => {
-    // set_town_focus does not validate that a key is a real component tag
-    // (#2511) and the allocation persists into the save, so an omitted
-    // `components` can resolve to an all-unmapped pick with no client involved.
+    // An omitted `components` resolves to the persisted town focus, so it can
+    // be an all-unmapped pick with no client involved. #2511 has since closed
+    // the write route (set_town_focus rejects an unmapped key and the load arm
+    // drops one an older save carries), so the direct meta poke below stands
+    // in for exactly that: a save written before the key check existed.
     // Pre-fix that burned the corpse on a plain interact press, with no picker
     // open and no line printed. The refusal covers this path for the same
     // reason it covers the explicit one: the yield is still being forfeited.

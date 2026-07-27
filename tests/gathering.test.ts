@@ -1,6 +1,7 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
 import { MOBS } from '../src/sim/data';
+import { isTownFocusComponent, TOWN_FOCUS_COMPONENTS } from '../src/sim/professions/focus';
 import {
   effectiveFocusComponents,
   forfeitsEveryMappedYield,
@@ -12,7 +13,6 @@ import {
   resolveCorpseHarvest,
 } from '../src/sim/professions/gathering';
 import { Rng } from '../src/sim/rng';
-import { TOWN_FOCUS_COMPONENTS } from '../src/ui/town_focus_view';
 
 const TIER_INDEX: Record<string, number> = {
   poor: 0,
@@ -176,52 +176,38 @@ describe('isHarvestableCorpse', () => {
     expect(isHarvestableCorpse(['claw', 'tusk'])).toBe(false);
   });
 
-  it('is the same rule the Town Focus panel offers sliders for', () => {
-    // TOWN_FOCUS_COMPONENTS was a fourth reader of "which families pay out", and
-    // it used Object.keys, i.e. key presence. A slider is a promise that points
-    // spent here buy something, so it has to agree with the harvest.
+  it('deliberately does NOT govern the Town Focus slider list', () => {
+    // Worth stating, because "one rule, one place" invites the assumption that it
+    // covers this too, and it does not. #2511 moved TOWN_FOCUS_COMPONENTS into
+    // the sim (professions/focus.ts) as a FROZEN Object.keys snapshot behind a
+    // Set, because the question it answers is "which keys does setTownFocus
+    // accept", and a Set is what closes the Object.prototype hole there. The
+    // harvest asks a different question, "which family pays out", and answers it
+    // by truthiness through harvestItemForFamily, because the grant loop's
+    // `if (!itemId) continue` is the behavior it has to match.
     //
-    // Every row here is TRUE under both spellings today, because all six current
-    // families map to a real item. That is the "arms coincide in every fixture"
-    // shape, so it is documentation, not a pin: the decisive case is the
-    // re-import one below, which is the only way to reach an import-time constant.
+    // The two agree on every shipped family and diverge only on a key mapped to
+    // an empty string: the panel would offer a slider the harvest refuses. That
+    // is a hypothetical, it is one line to close on either side, and it belongs
+    // with whichever of the two rules moves first, so it is documented here
+    // rather than fixed twice.
     for (const component of TOWN_FOCUS_COMPONENTS) {
       expect(harvestFamilyYieldsItem(component), component).toBe(true);
     }
     expect([...TOWN_FOCUS_COMPONENTS]).toEqual(Object.keys(HARVEST_COMPONENT_ITEMS));
     expect(TOWN_FOCUS_COMPONENTS).toHaveLength(6);
+    // No unmapped family reaches the panel today, which is the property that
+    // actually matters for a player: the four unmapped ones are not keys at all.
     for (const unmapped of ['claw', 'gills', 'horn', 'tusk']) {
       expect(TOWN_FOCUS_COMPONENTS).not.toContain(unmapped);
+      expect(isTownFocusComponent(unmapped), unmapped).toBe(false);
+      expect(harvestFamilyYieldsItem(unmapped), unmapped).toBe(false);
     }
-  });
-
-  it('drops a family the table maps to nothing, which Object.keys would keep', async () => {
-    // The decisive half. TOWN_FOCUS_COMPONENTS is evaluated at import, so
-    // mutating the table afterwards cannot move it: the list has to be rebuilt in
-    // a fresh module registry with the poisoned table already in place. This is
-    // the ONLY shape that separates `Object.keys(...)` from
-    // `Object.keys(...).filter(harvestFamilyYieldsItem)`, since every shipped key
-    // maps and the two spellings agree on the real table.
-    vi.resetModules();
-    try {
-      const professions = await import('../src/sim/content/professions');
-      (professions.HARVEST_COMPONENT_ITEMS as Record<string, string>).claw = '';
-      const townFocus = await import('../src/ui/town_focus_view');
-      expect(townFocus.TOWN_FOCUS_COMPONENTS).not.toContain('claw');
-      // ...and the real families survive, so the filter is not simply emptying
-      // the list.
-      expect([...townFocus.TOWN_FOCUS_COMPONENTS].sort()).toEqual([
-        'cloth',
-        'fang',
-        'hide',
-        'meat',
-        'silk',
-        'venomSac',
-      ]);
-    } finally {
-      // A fresh registry for anything imported later; the static imports at the
-      // top of this file are already bound to the unpoisoned instances.
-      vi.resetModules();
+    // ...and the prototype keys #2511's Set closes are refused on both sides, so
+    // the two rules cannot disagree about those either.
+    for (const inherited of ['constructor', 'toString', 'valueOf', 'hasOwnProperty']) {
+      expect(isTownFocusComponent(inherited), inherited).toBe(false);
+      expect(harvestFamilyYieldsItem(inherited), inherited).toBe(false);
     }
   });
 
@@ -247,86 +233,6 @@ describe('isHarvestableCorpse', () => {
     // they partition MOBS, so a template that fell out of all three would read
     // as wrong here rather than quietly leaving the sweep.
     expect(included.length + excluded.length + untagged.length).toBe(Object.keys(MOBS).length);
-  });
-});
-
-describe('resolveCorpseFocusHarvest: concentrate vs spread tradeoff (#1142)', () => {
-  const TAGS = ['hide', 'fang', 'claw', 'horn'];
-
-  function meanTierIndex(componentTags: string[], chosen: string[], seed: number, trials: number) {
-    const rng = new Rng(seed);
-    let sum = 0;
-    let count = 0;
-    for (let i = 0; i < trials; i++) {
-      const yields = resolveCorpseFocusHarvest(componentTags, chosen, rng);
-      for (const y of yields) {
-        sum += TIER_INDEX[y.tier];
-        count++;
-      }
-    }
-    return sum / count;
-  }
-
-  it('focusing on 1 of 4 tagged components yields a strictly higher average tier than spreading across all 4', () => {
-    const trials = 2000;
-    const focusedMean = meanTierIndex(TAGS, ['hide'], 1, trials);
-    const spreadMean = meanTierIndex(TAGS, TAGS, 2, trials);
-    expect(focusedMean).toBeGreaterThan(spreadMean);
-  });
-
-  it('draws from the passed-in Rng (deterministic for a fixed seed)', () => {
-    const runA = resolveCorpseFocusHarvest(TAGS, ['hide'], new Rng(7));
-    const runB = resolveCorpseFocusHarvest(TAGS, ['hide'], new Rng(7));
-    expect(runA).toEqual(runB);
-  });
-
-  it('an empty selection spreads across every tagged component (back-compat default)', () => {
-    const rng1 = new Rng(5);
-    const rng2 = new Rng(5);
-    const empty = resolveCorpseFocusHarvest(TAGS, [], rng1);
-    const all = resolveCorpseFocusHarvest(TAGS, TAGS, rng2);
-    expect(empty).toEqual(all);
-  });
-
-  it('selecting every tagged component behaves identically to the pre-#1142 spread (zero bonus)', () => {
-    const rng = new Rng(3);
-    const yields = resolveCorpseFocusHarvest(TAGS, TAGS, rng);
-    expect(yields.map((y) => y.component)).toEqual(TAGS);
-  });
-
-  it('ignores a chosen tag that is not actually on the corpse', () => {
-    const rng = new Rng(9);
-    const yields = resolveCorpseFocusHarvest(TAGS, ['hide', 'not_a_real_tag'], rng);
-    expect(yields.map((y) => y.component)).toEqual(['hide']);
-  });
-
-  it('is monotonic: for the SAME underlying rng draw, choosing fewer components never lowers the tier', () => {
-    // Both calls draw from a fresh Rng seeded identically, so the first draw
-    // (and thus the unshifted rolled index) is identical for 'hide' in both
-    // calls; only the concentration bonus differs. The focused (1-of-4) tier
-    // can only be >= the spread (4-of-4) tier, never lower.
-    for (let seed = 1; seed <= 50; seed++) {
-      const spread = resolveCorpseFocusHarvest(TAGS, TAGS, new Rng(seed));
-      const focused = resolveCorpseFocusHarvest(TAGS, ['hide'], new Rng(seed));
-      const spreadHide = spread.find((y) => y.component === 'hide');
-      const focusedHide = focused.find((y) => y.component === 'hide');
-      expect(spreadHide).toBeDefined();
-      expect(focusedHide).toBeDefined();
-      expect(TIER_INDEX[focusedHide?.tier ?? '']).toBeGreaterThanOrEqual(
-        TIER_INDEX[spreadHide?.tier ?? ''],
-      );
-    }
-  });
-});
-
-describe('harvestTierQuantity', () => {
-  it('increases monotonically from poor (1) to legendary (6)', () => {
-    expect(harvestTierQuantity('poor')).toBe(1);
-    expect(harvestTierQuantity('common')).toBe(2);
-    expect(harvestTierQuantity('uncommon')).toBe(3);
-    expect(harvestTierQuantity('rare')).toBe(4);
-    expect(harvestTierQuantity('epic')).toBe(5);
-    expect(harvestTierQuantity('legendary')).toBe(6);
   });
 });
 

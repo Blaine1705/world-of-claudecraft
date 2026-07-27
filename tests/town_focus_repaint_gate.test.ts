@@ -66,6 +66,10 @@ describe('townFocusRenderSig', () => {
     const ids = Object.keys(HARVEST_COMPONENT_ITEMS);
     expect(ids.length).toBeGreaterThan(1);
     for (const id of ids) expect(id).not.toMatch(/[:|/]/);
+    // Since #2511 the panel re-exports the sim's single definition rather than
+    // deriving its own, so this line no longer proves two derivations agree,
+    // only that the one definition is still the content table's key order. The
+    // membership itself is pinned against literals in tests/focus.test.ts.
     expect([...TOWN_FOCUS_COMPONENTS]).toEqual(ids);
     // The painter's focus keys share ONE flat namespace with the two singleton
     // keys, so a component literally named `save` or `close` would route the
