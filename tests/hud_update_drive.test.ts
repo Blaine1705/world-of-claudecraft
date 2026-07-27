@@ -578,7 +578,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
       module: 'spellbook_window.ts',
       proof: 'if (SpellbookWindow.knownSig(this.deps.world().known) !== this.lastKnownSig) {',
     },
-    why: 'the ONLY window on the per-frame band; the sig gates the rebuild, the fall-through hotbar-control refresh runs every frame',
+    why: 'the ONLY window on the per-frame band, and since #2519 BOTH of its halves are gated: the sig proved below gates the rebuild, and the fall-through hotbar-control refresh takes its own change check (takeControlChange) over the three bar inputs its toggles render, so an unchanged frame makes no query, no allocation and no DOM write',
   },
   {
     call: 'this.actionBarPainter.paint',

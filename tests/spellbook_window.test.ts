@@ -69,7 +69,10 @@ describe('spellbook_window: the pinned Attack row', () => {
     expect(code.indexOf('this.appendAttackRow(list')).toBeLessThan(
       code.indexOf('for (const row of view.rows) this.appendRow(list, row)'),
     );
-    expect(code).toContain('attackOnBar: this.deps.attackOnBar()');
+    // The Attack state reaches the view through the latch takeControlChange() fills at
+    // the top of render(), not a second deps.attackOnBar() read (#2519).
+    expect(code).toContain('attackOnBar: this.lastAttackOnBar');
+    expect(code).toContain('const attackOnBar = this.deps.attackOnBar()');
   });
 
   it('reuses the existing Attack name/tooltip keys (no new player strings)', () => {
@@ -84,7 +87,12 @@ describe('spellbook_window: the pinned Attack row', () => {
   });
 
   it('keeps the per-frame refresh syncing the Attack toggle (options can flip it)', () => {
-    expect(code).toContain("querySelector<HTMLButtonElement>('[data-attack-toggle]')");
+    // The ref is COLLECTED as appendAttackRow builds the button, not re-found by its
+    // marker on every frame (#2519); the marker itself stays, since the drag/drop path
+    // and the stylesheet both key off it. The behavior is driven in
+    // tests/spellbook_tick_repaint.test.ts.
+    expect(code).toContain('this.attackToggle = toggle');
+    expect(code).toContain('const attackBtn = this.attackToggle');
     expect(code).toContain("attackBtn.setAttribute('aria-pressed'");
   });
 });
@@ -109,8 +117,12 @@ describe('spellbook_window: the Attack row is draggable onto the action bar', ()
 });
 
 describe('spellbook_window: mobile action-ring page label (Phase 4, touch-only)', () => {
-  it('feeds abilityIdByBarSlot through to the pure view core', () => {
-    expect(code).toContain('abilityIdByBarSlot: this.deps.abilityIdByBarSlot()');
+  it('feeds the per-slot ability ids through to the pure view core', () => {
+    // Derived from the bar's live slot array at render time rather than taken as its own
+    // allocating dep, since the per-frame change check walks the same array (#2519).
+    expect(code).toContain('abilityIdByBarSlot: this.lastSlotIds');
+    expect(code).toContain('this.lastSlotIds.push(slotAbilityId(action))');
+    expect(code).toMatch(/slotAbilityId\(action: HotbarAction\): string \| null/);
   });
 
   it('gates the page label on both a non-null mobilePage AND touch mode', () => {
@@ -144,25 +156,36 @@ describe('spellbook_window: hud.update() refresh call site', () => {
   it('drives the open spellbook from hud.update() through tickOpen while displayed', () => {
     // Pin the hud.ts call site so a refactor cannot silently stop the open
     // spellbook from tracking action-bar AND talent changes. tickOpen re-renders
-    // on a resolved-numbers change, else falls back to the cheap toggle refresh.
+    // on a resolved-numbers change, else falls back to the gated toggle refresh.
     expect(hud).toContain('if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();');
+  });
+
+  it('gates the per-frame fall-through behind its own change check (#2519)', () => {
+    // The fall-through used to repaint unconditionally. Both entry points survive and
+    // are different contracts: tickOpen takes the gated one, and Hud keeps the forced
+    // one for the bar changes it makes itself (the login layout restore, reset-form-bar).
+    // What either one DOES is driven in tests/spellbook_tick_repaint.test.ts; these two
+    // pins only keep the per-frame call site pointed at the gated variant.
+    expect(code).toContain('this.refreshHotbarControlsIfChanged()');
+    expect(code).toContain('if (!this.takeControlChange()) return');
+    expect(hud).toContain('this.spellbookWindow.refreshHotbarControls();');
   });
 
   it('keeps the in-place refresh updating the aria-pressed + disabled state per toggle', () => {
     // The call-site guard above proves the refresh fires; this pins what it WRITES.
-    // refreshHotbarControls keys off `btn` (vs appendRow's `toggle`), so the row
+    // paintHotbarControls keys off `btn` (vs appendRow's `toggle`), so the row
     // guard does not cover this path: without these, the open spellbook's toggles
     // would stop tracking the bar (the whole reason this path is not-cold).
     expect(code).toContain("btn.setAttribute('aria-pressed'");
-    expect(code).toContain('btn.disabled = !onBar && !hasFree');
+    expect(code).toContain('const disabled = !onBar && !hasFree');
+    expect(code).toContain('if (btn.disabled !== disabled) btn.disabled = disabled');
   });
 
-  it('elides the per-frame toggle writes to on-bar flips only (this runs every frame)', () => {
-    // refreshHotbarControls fires on EVERY animation frame while the window is open, so
-    // the +/- text, the remove class, the aria-pressed, and the i18n-backed aria-label
-    // are gated on an actual on-bar membership flip (read from aria-pressed, which
-    // appendRow seeds), not rewritten unconditionally. Only `disabled` stays per-frame
-    // (it depends on hasFree). A revert to unconditional writes drops this guard.
+  it('elides the toggle writes to on-bar flips only, per row', () => {
+    // A repaint fires when any of the three bar inputs moves, so the +/- text, the
+    // remove class, the aria-pressed, and the i18n-backed aria-label are gated on an
+    // actual on-bar membership flip (read from aria-pressed, which appendRow seeds),
+    // not rewritten for every row. A revert to unconditional writes drops this guard.
     expect(code).toContain("(btn.getAttribute('aria-pressed') === 'true') !== onBar");
   });
 });
