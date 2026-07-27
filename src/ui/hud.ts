@@ -75,7 +75,6 @@ import type {
   HonorReason,
   InvSlot,
   ItemInstancePayload,
-  ItemSlot,
   MailResultCode,
   MotdResultCode,
   PetMode,
@@ -380,6 +379,7 @@ import {
   itemStatName,
 } from './item_instance_tooltip';
 import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
+import { itemSlotLabel as itemSlotName } from './item_slot_labels';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { isCombatFlavorLog } from './log_event_route';
@@ -824,23 +824,6 @@ const PET_MODE_DESC_KEYS: Record<PetMode, TranslationKey> = {
   aggressive: 'hud.pet.aggressiveDesc',
 };
 type ItemQuality = NonNullable<ItemDef['quality']>;
-const ITEM_SLOT_LABEL_KEYS: Record<ItemSlot, TranslationKey> = {
-  mainhand: 'itemUi.slots.mainhand',
-  offhand: 'itemUi.slots.offhand',
-  helmet: 'itemUi.slots.helmet',
-  neck: 'itemUi.slots.neck',
-  shoulder: 'itemUi.slots.shoulder',
-  chest: 'itemUi.slots.chest',
-  waist: 'itemUi.slots.waist',
-  legs: 'itemUi.slots.legs',
-  gloves: 'itemUi.slots.gloves',
-  feet: 'itemUi.slots.feet',
-  // The three ring forms share one player-facing label ("Finger"): items
-  // declare 'ring', the paperdoll cells are the concrete ring1/ring2 keys.
-  ring: 'itemUi.slots.ring',
-  ring1: 'itemUi.slots.ring',
-  ring2: 'itemUi.slots.ring',
-};
 const ITEM_QUALITY_LABEL_KEYS: Record<ItemQuality, TranslationKey> = {
   poor: 'itemUi.quality.poor',
   common: 'itemUi.quality.common',
@@ -14479,9 +14462,8 @@ function resourceDisplayName(resourceType: ResourceType | null): string {
   return t(RESOURCE_LABEL_KEYS[resourceType ?? 'mana']);
 }
 
-function itemSlotName(slot: ItemSlot): string {
-  return t(ITEM_SLOT_LABEL_KEYS[slot]);
-}
+// itemSlotName moved to ./item_slot_labels (imported above as itemSlotLabel), so
+// the pure view cores can read the same shared-label facts the HUD does (#2466).
 
 function itemQualityLabel(quality: ItemDef['quality']): string {
   return t(ITEM_QUALITY_LABEL_KEYS[quality ?? 'common']);

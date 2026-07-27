@@ -9176,6 +9176,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Velké okouzlení',
   'hudChrome.enchanting.tier.runed': 'Runové okouzlení',
   'hudChrome.enchanting.wornTag': 'Vybaveno ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Vybaveno ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Očekávané materiály:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': '{min} až {max} {item}',

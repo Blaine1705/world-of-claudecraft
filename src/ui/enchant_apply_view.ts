@@ -12,7 +12,11 @@
 // carrying what the confirm dialog must name: the doomed enchant id (or a
 // legacy victim's raw stats), plus what the swap does NOT destroy
 // (preservedReplaceTraits, #2421) and whether the row shares its item name with
-// a plain twin (mixedHolding, #2421). The enchant content is static
+// a plain twin (mixedHolding, #2421). Every row also carries the two
+// discriminators that keep NO TWO ROWS OF ONE LIST sharing an accessible name
+// (#2466): `heroic`, because itemDisplayName resolves a heroic variant to its
+// base item's name, and `slotIndex`, because ring1 and ring2 share one slot
+// label. The enchant content is static
 // (content/enchants.ts, identical in both worlds), so both steps are a plain
 // read of world.inventory; no wire round trip. enchant_apply_view never
 // decides an outcome: world.applyEnchant does, server-authoritative.
@@ -33,11 +37,31 @@ import {
   type ItemInstancePayload,
 } from '../sim/types';
 import type { TranslationKey } from './i18n.catalog';
+import { sharedSlotLabelIndex } from './item_slot_labels';
 
 /** The localized-name key for one enchant id (hudChrome.enchantName.<id>): its
  *  first render sink. */
 export function enchantNameKey(enchantId: string): TranslationKey {
   return `hudChrome.enchantName.${enchantId}` as TranslationKey;
+}
+
+/** The localized key for the heroic mark, the ONE discriminator between a heroic
+ *  upgraded variant and the base item it borrows its name from. Already the
+ *  item tooltip's own instrument (hud.ts paints it on the quality/kind line);
+ *  naming it here is what lets the picker rows say the same thing. */
+export const HEROIC_TAG_KEY: TranslationKey = 'hudChrome.itemHeroicTag';
+
+/** Whether `itemId` is a heroic upgraded variant (content/heroic_variants.ts).
+ *  Such a variant shares its base item's display NAME by design (classic: a
+ *  heroic drop reads the same as its normal counterpart, entity_i18n
+ *  itemDisplayName), so a base and its heroic twin are two different ids that
+ *  render one string. Every row family carries this so the picker can paint the
+ *  mark and keep the two rows' accessible names apart (#2466). Unconditional,
+ *  not collision-gated: it is a true fact about the copy either way, it is what
+ *  the tooltip already says, and a tag that blinks in and out depending on what
+ *  else the player happens to hold would be the harder thing to trust. */
+function isHeroicVariant(itemId: string): boolean {
+  return ITEMS[itemId]?.heroicOf !== undefined;
 }
 
 /** Total held count of an item id across every stack (fungible + instanced).
@@ -344,6 +368,12 @@ export interface EnchantTargetRow {
   /** How many eligible copies are held: enchantable copies for a plain row,
    *  already-enchanted copies for a replace row. */
   count: number;
+  /** Set iff the item is a HEROIC upgraded variant (#2466). ABSENT, never false,
+   *  on an ordinary item. The thin consumer paints the heroic mark from this,
+   *  which is what keeps a base row and its heroic twin's row from rendering one
+   *  identical accessible name: itemDisplayName resolves both to the base item's
+   *  name by design, and the picker had no other mark. See isHeroicVariant. */
+  heroic?: true;
   /** Present iff this is a flagged REPLACE row (#2415): the target copies are
    *  already enchanted, activation runs the confirm dialog, and the apply is
    *  sent with confirmReplace. Describes the PINNED victim (the sim's
@@ -363,22 +393,21 @@ export interface EnchantTargetRow {
    *  (the consumer does); with none passed the flag describes the bagged pair
    *  alone.
    *
-   *  NOT a general duplicate-NAME flag, and deliberately not claimed as one:
-   *  itemDisplayName resolves a heroic variant to its base item's name
-   *  (entity_i18n, classic behavior), so a base and its heroic twin are two
-   *  DIFFERENT ids that still render one string. Keying on the rendered name
-   *  would need the name resolver in this core and a discriminator the picker
-   *  does not have today (the heroic mark lives on the tooltip's quality line),
-   *  so that collision predates this change and stays open as #2466.
+   *  Still keyed on the item ID, and correctly so: it reports a difference of
+   *  STATE between two copies of ONE item, which is a different question from
+   *  whether two rows render the same name. The name collisions are handled at
+   *  their own root by their own discriminators (`heroic` here, `slotIndex` on
+   *  the worn row, #2466), so this flag never had to grow into a duplicate-name
+   *  flag; widening it would have tagged "Not enchanted" onto rows that differ
+   *  by something else entirely.
    *
    *  Nor is it a LOCATION flag. A plain bagged copy beside a plain WORN copy of
    *  the same id is left bare on purpose: both are unenchanted, so "Not
    *  enchanted" would say nothing that told them apart, and the worn row already
-   *  states where it is. Closing that one needs a bag-side counterpart to the
-   *  Worn tag, not this flag. Same class as two rings of one id both reading
-   *  "Worn (Finger)", the settled #2415 limit.
-   *  tests/enchant_apply_view.test.ts pins both limits so neither can be
-   *  mistaken for coverage. */
+   *  states where it is, so the two accessible names already differ. Saying
+   *  where the bagged copy is wants a bag-side counterpart to the Worn tag, not
+   *  this flag; it stays an accepted limit, pinned in
+   *  tests/enchant_apply_view.test.ts so it cannot be mistaken for coverage. */
   mixedHolding?: true;
 }
 
@@ -439,6 +468,12 @@ export function enchantTargets(
   for (const row of worn) if (row.replace !== undefined) enchantedIds.add(row.itemId);
   const mixed = new Set([...enchantedIds].filter((itemId) => byItem.has(itemId)));
   for (const row of rows) if (mixed.has(row.itemId)) row.mixedHolding = true;
+  // The heroic mark, on every family and unconditionally (#2466): a heroic
+  // variant renders its BASE item's name, so without it a base row and a heroic
+  // row are one string told apart by nothing a player or a screen reader can
+  // reach. One sweep over the finished rows, the mixedHolding idiom above, so
+  // the two families cannot pick it up differently.
+  for (const row of rows) if (isHeroicVariant(row.itemId)) row.heroic = true;
   return rows;
 }
 
@@ -452,6 +487,20 @@ export interface WornEnchantTargetRow {
    *  row, confirm-gated exactly like the bagged family. No victim pin is
    *  needed here: the slot IS the discriminator. */
   replace?: EnchantReplaceTargetInfo;
+  /** Set iff the item is a HEROIC upgraded variant (#2466), exactly as on the
+   *  bagged row: the worn family shares the one list and the one name resolver,
+   *  so a heroic ring on one finger and its base twin on the other collide the
+   *  same way a bagged pair does. */
+  heroic?: true;
+  /** 1-based position of `slot` inside the group of equipment keys that share
+   *  ONE label (sharedSlotLabelIndex), present only for such a key (#2466).
+   *  ring1 and ring2 both read "Finger", so the slot that discriminates the
+   *  DISPATCH did not discriminate the label: two fingers wearing identical
+   *  copies rendered two byte-identical rows that both stayed activatable, and
+   *  the player could not tell which finger they were about to change. The thin
+   *  consumer paints the indexed worn tag from this and the plain one otherwise,
+   *  so nothing is numbered where a label already names its slot alone. */
+  slotIndex?: number;
 }
 
 /** The WORN copies eligible as the enchant target, one row per equipment slot,
@@ -463,7 +512,9 @@ export interface WornEnchantTargetRow {
  *  already-enchanted worn copy surfaces as a FLAGGED replace row (#2415)
  *  rather than being hidden, in the same slot-order pass. Both rings and both
  *  hands list separately when each holds an eligible copy, since each is its
- *  own target.
+ *  own target, and each carries what its LABEL needs to stand apart from the
+ *  other: `slotIndex` where two equipment keys share one slot label, `heroic`
+ *  where the item borrows its name from a base item (#2466).
  *
  *  `equipment` and `equippedInstances` are read straight off the two worlds'
  *  shared surfaces (IWorld.equipment and the self entity mirror
@@ -492,6 +543,13 @@ export function wornEnchantTargets(
       continue;
     }
     rows.push({ itemId, slot });
+  }
+  // The two name discriminators (#2466), one sweep over the finished rows so the
+  // replace arm and the plain arm cannot pick them up differently.
+  for (const row of rows) {
+    if (isHeroicVariant(row.itemId)) row.heroic = true;
+    const slotIndex = sharedSlotLabelIndex(row.slot);
+    if (slotIndex !== undefined) row.slotIndex = slotIndex;
   }
   return rows;
 }

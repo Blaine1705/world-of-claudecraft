@@ -2477,6 +2477,7 @@ export const en: EnTranslations = {
       "noEnchants": "No enchant uses this reagent.",
       "noTargets": "No eligible item to enchant.",
       "wornTag": "Worn ({slot})",
+      "wornTagIndexed": "Worn ({slot} {index})",
       "tier": {
         "base": "Base Enchants",
         "runed": "Runed Enchants",

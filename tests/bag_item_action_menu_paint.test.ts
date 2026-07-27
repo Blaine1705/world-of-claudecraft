@@ -11,8 +11,9 @@
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { ITEMS } from '../src/sim/data';
+import { slotAcceptsItem } from '../src/sim/equipment_rules';
 import { isDisenchantable } from '../src/sim/professions/enchanting';
-import type { InvSlot, ItemDef } from '../src/sim/types';
+import { ALL_EQUIP_SLOTS, type InvSlot, type ItemDef } from '../src/sim/types';
 import {
   BagItemActionMenu,
   CTX_ITEM_DANGER_CLASS,
@@ -20,6 +21,8 @@ import {
 } from '../src/ui/bag_item_action_menu';
 import { disenchantYieldLines } from '../src/ui/disenchant_yield_view';
 import { enchantSectionsForReagent } from '../src/ui/enchant_apply_view';
+import { itemDisplayName } from '../src/ui/entity_i18n';
+import { itemSlotLabel } from '../src/ui/item_slot_labels';
 import type { IWorld } from '../src/world_api';
 
 const DUST = 'arcane_dust';
@@ -98,7 +101,11 @@ function harness(innerHeight: number, stubOrInventory: WorldStub | InvSlot[] = {
     confirmDialog: (title, body, ok, cancel, onOk) => {
       confirms.push({ title, body, ok, cancel, onOk });
     },
-    slotName: (slot) => slot,
+    // The REAL resolver the HUD injects, not the raw slot key: ring1 and ring2
+    // resolve to one "Finger" label on purpose, and a stub that echoed the key
+    // would hand every worn row a unique label for free, quietly making the
+    // #2466 pins below pass on a fixture the game never produces.
+    slotName: itemSlotLabel,
     isMobileLayout: () => false,
     afterAction: () => {
       afterActions += 1;
@@ -388,9 +395,8 @@ describe('BagItemActionMenu target step: worn rows', () => {
     const acts = h.rows().map((row) => row.act);
     // The worn target and the bagged one are BOTH offered; the worn row leads.
     expect(acts).toEqual(['worn:mainhand', `target:${SWORD}`]);
-    // slotName is stubbed to the raw slot key in this harness, so the tag shows
-    // the localized "Worn (...)" wrapper around it.
-    expect(h.rows()[0].text).toContain('Worn (mainhand)');
+    // The real slot resolver, so the tag reads exactly what a player sees.
+    expect(h.rows()[0].text).toContain('Worn (Main Hand)');
     expect(h.rows()[1].text).not.toContain('Worn');
   });
 
@@ -698,10 +704,10 @@ describe('BagItemActionMenu target step: destructive-path communication (#2421)'
     h.openTargets(WEAPON_ENCHANT);
     const [worn, bagged] = h.rows();
     // The worn row carries BOTH kinds of sub-line, which is the whole point:
-    // "Worn (mainhand)" is informational and must stay muted, while the replace
+    // "Worn (Main Hand)" is informational and must stay muted, while the replace
     // flag beside it promises to destroy an enchant.
     expect(worn.metas.map((meta) => meta.text)).toEqual([
-      'Worn (mainhand)',
+      'Worn (Main Hand)',
       'Replaces Enchant Weapon - Agility',
     ]);
     expect(worn.metas[0].classes).toEqual([CTX_ITEM_META_CLASS]);
@@ -774,7 +780,7 @@ describe('BagItemActionMenu target step: destructive-path communication (#2421)'
     const rows = h.rows();
     expect(rows.map((row) => row.act)).toEqual(['worn:mainhand', `target:${SWORD}`]);
     expect(rows[0].text).toBe(
-      'Eastbrook Arming SwordWorn (mainhand)Replaces Enchant Weapon - Agility',
+      'Eastbrook Arming SwordWorn (Main Hand)Replaces Enchant Weapon - Agility',
     );
     expect(rows[1].text).toBe('Eastbrook Arming SwordNot enchanted');
     expect(rows[1].metas[0].classes).toEqual([CTX_ITEM_META_CLASS]);
@@ -916,5 +922,226 @@ describe('BagItemActionMenu target step: destructive-path communication (#2421)'
     // A legacy copy is enchanted precisely BECAUSE it carries no masterwork
     // flag, so that trait can never appear on this arm.
     expect(lines[2]).not.toContain('Masterwork');
+  });
+});
+
+// #2466: a picker row is a role=button whose accessible name is computed from
+// its contents, so two rows whose contents match are told apart by nothing a
+// player or a screen reader can reach: the only difference is an invisible
+// data-act. Two live content shapes produced exactly that. A heroic variant
+// renders its BASE item's display name (classic behavior, entity_i18n), and
+// ring1/ring2 share the one "Finger" slot label.
+describe('BagItemActionMenu target step: unique accessible names (#2466)', () => {
+  const CHEST_ENCHANT = 'enchant_chest_stamina';
+  const OTHER_CHEST_ENCHANT = 'enchant_chest_spirit';
+  const RING_ENCHANT = 'enchant_ring_spirit';
+  const SWORD = 'eastbrook_arming_sword';
+  const WEAPON_ENCHANT = 'enchant_weapon_might';
+  /** The heroic mark's English text, the item tooltip's own instrument. */
+  const HEROIC_TAG = '[HEROIC]';
+
+  /** A live base/heroic pair in an enchant-eligible slot, from real content. */
+  function heroicPair(slot: string): { base: string; heroic: string; name: string } {
+    const heroic = Object.keys(ITEMS).find((id) => {
+      const def = ITEMS[id];
+      return def.heroicOf !== undefined && ITEMS[def.heroicOf]?.slot === slot;
+    });
+    expect(heroic, `content carries a heroic ${slot} variant`).toBeDefined();
+    const base = ITEMS[heroic as string].heroicOf as string;
+    // The premise, asserted rather than assumed: ONE rendered name, two ids.
+    expect(itemDisplayName(ITEMS[heroic as string])).toBe(itemDisplayName(ITEMS[base]));
+    return { base, heroic: heroic as string, name: itemDisplayName(ITEMS[base]) };
+  }
+
+  it('separates a plain base copy from its plain HEROIC twin', () => {
+    // The issue's headline scene: two bagged copies, both unenchanted, two ids,
+    // one name. Nothing at all distinguished them before.
+    const { base, heroic, name } = heroicPair('chest');
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        { itemId: base, count: 1 },
+        { itemId: heroic, count: 1 },
+      ],
+    });
+    h.openTargets(CHEST_ENCHANT);
+    const rows = h.rows();
+    expect(rows.map((row) => row.act)).toEqual([`target:${base}`, `target:${heroic}`]);
+    // Pinned WHOLE, not by toContain: the requirement is that the two accessible
+    // names differ, and that the base row is left exactly as it was.
+    expect(rows[0].text).toBe(name);
+    expect(rows[1].text).toBe(`${name}${HEROIC_TAG}`);
+    // The mark is IDENTITY, not state, so it takes the muted informational
+    // style; spending the destructive modifier on it would flatten the one
+    // distinction the replace flag exists to carry.
+    expect(rows[1].metas.map((meta) => meta.text)).toEqual([HEROIC_TAG]);
+    expect(rows[1].metas[0].classes).toEqual([CTX_ITEM_META_CLASS]);
+    expect(rows[0].metas).toEqual([]);
+  });
+
+  it('separates a base REPLACE row from a heroic twin carrying the SAME enchant', () => {
+    // The worst case, and the one the #2421 state tags could never reach: both
+    // rows name the same doomed enchant, so both read "<name>Replaces <x>", and
+    // both stay activatable.
+    const { base, heroic, name } = heroicPair('chest');
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        { itemId: base, count: 1, instance: { enchant: OTHER_CHEST_ENCHANT } },
+        { itemId: heroic, count: 1, instance: { enchant: OTHER_CHEST_ENCHANT } },
+      ],
+    });
+    h.openTargets(CHEST_ENCHANT);
+    const rows = h.rows();
+    expect(rows.map((row) => row.act)).toEqual([`replace:${base}`, `replace:${heroic}`]);
+    const replaceTag = 'Replaces Enchant Chest - Spirit';
+    expect(rows[0].text).toBe(`${name}${replaceTag}`);
+    expect(rows[1].text).toBe(`${name}${HEROIC_TAG}${replaceTag}`);
+    // The mark leads the state tags: identity first, then what the row will do.
+    expect(rows[1].metas.map((meta) => meta.text)).toEqual([HEROIC_TAG, replaceTag]);
+    // And activating the heroic row confirms against the heroic copy, so the
+    // discriminator is not cosmetic: it names which id the send carries.
+    h.click(`replace:${heroic}`);
+    h.confirms[0].onOk();
+    expect(h.applied).toEqual([
+      { itemId: heroic, enchantId: CHEST_ENCHANT, slot: undefined, confirmReplace: true },
+    ]);
+  });
+
+  it('numbers the two FINGERS, so identical rings worn on both stand apart', () => {
+    const ring = Object.values(ITEMS).find((def) => def.slot === 'ring');
+    expect(ring, 'content carries a ring').toBeDefined();
+    const ringId = (ring as ItemDef).id;
+    const name = itemDisplayName(ring as ItemDef);
+    const h = harness(768, {
+      inventory: [{ itemId: DUST, count: 99 }],
+      equipment: { ring1: ringId, ring2: ringId },
+    });
+    h.openTargets(RING_ENCHANT);
+    const rows = h.rows();
+    expect(rows.map((row) => row.act)).toEqual(['worn:ring1', 'worn:ring2']);
+    // Both fingers share the one "Finger" label, which is the collision; the
+    // ordinal is what the rows now carry instead.
+    expect(itemSlotLabel('ring1')).toBe(itemSlotLabel('ring2'));
+    expect(rows[0].text).toBe(`${name}Worn (Finger 1)`);
+    expect(rows[1].text).toBe(`${name}Worn (Finger 2)`);
+    // The row a player picks still drives its OWN finger, so the label and the
+    // dispatch agree: an ordinal on the wrong row would be worse than none.
+    h.click('worn:ring2');
+    expect(h.applied).toEqual([{ itemId: ringId, enchantId: RING_ENCHANT, slot: 'ring2' }]);
+  });
+
+  it('numbers both fingers on the inert same-enchant pair too', () => {
+    // Disabled, but still on screen and still read before anything is clicked.
+    const ringId = (Object.values(ITEMS).find((def) => def.slot === 'ring') as ItemDef).id;
+    const h = harness(768, {
+      inventory: [{ itemId: DUST, count: 99 }],
+      equipment: { ring1: ringId, ring2: ringId },
+      equippedInstances: {
+        ring1: { enchant: RING_ENCHANT },
+        ring2: { enchant: RING_ENCHANT },
+      },
+    });
+    h.openTargets(RING_ENCHANT);
+    const rows = h.rows();
+    expect(rows.map((row) => row.act)).toEqual([null, null]);
+    expect(rows[0].metas.map((meta) => meta.text)).toEqual(['Worn (Finger 1)', 'Already applied']);
+    expect(rows[1].metas.map((meta) => meta.text)).toEqual(['Worn (Finger 2)', 'Already applied']);
+    expect(rows[0].text).not.toBe(rows[1].text);
+  });
+
+  it('numbers nothing on a dual-wielded pair, whose slot labels already differ', () => {
+    // The selectivity half: Main Hand and Off Hand name themselves, so an
+    // ordinal here would be noise on every list in the game.
+    const h = harness(768, {
+      inventory: [{ itemId: DUST, count: 99 }],
+      equipment: { mainhand: SWORD, offhand: SWORD },
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    const rows = h.rows();
+    expect(rows.map((row) => row.metas[0].text)).toEqual(['Worn (Main Hand)', 'Worn (Off Hand)']);
+    for (const row of rows) expect(row.text).not.toMatch(/\d/);
+  });
+
+  it('leaves an ordinary single-copy list unmarked: the marks are not decoration', () => {
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        { itemId: SWORD, count: 1 },
+      ],
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    const [row] = h.rows();
+    expect(row.text).toBe('Eastbrook Arming Sword');
+    expect(row.metas).toEqual([]);
+  });
+
+  // The whole acceptance criterion, over real content rather than one fixture:
+  // NO two rows of one target list may share an accessible name, in any family.
+  // Every enchant is driven twice, against the most collision-prone holding its
+  // slot allows: a base/heroic pair held plain AND already enchanted, plus every
+  // equipment key that structurally accepts the piece (which is how both fingers
+  // and both hands enter the list at once).
+  it('never paints two rows of one target list with the same accessible name', () => {
+    const enchantIds = Object.keys(ENCHANTS);
+    let heroicShapes = 0;
+    let multiWornShapes = 0;
+    let sweptLists = 0;
+    for (const enchantId of enchantIds) {
+      const itemSlot = ENCHANTS[enchantId].itemSlot;
+      // A DIFFERENT enchant of the same slot, so the enchanted copies paint
+      // replace rows rather than the inert same-enchant one; falls back to the
+      // picked enchant when a slot has only one.
+      const otherEnchant =
+        enchantIds.find((id) => id !== enchantId && ENCHANTS[id].itemSlot === itemSlot) ??
+        enchantId;
+      const slotDefs = Object.values(ITEMS).filter((def) => def.slot === itemSlot);
+      const heroicDef = slotDefs.find(
+        (def) => def.heroicOf !== undefined && ITEMS[def.heroicOf]?.slot === itemSlot,
+      );
+      const ids = heroicDef
+        ? [heroicDef.heroicOf as string, heroicDef.id]
+        : slotDefs.slice(0, 2).map((def) => def.id);
+      if (heroicDef) heroicShapes += 1;
+      expect(ids.length, `content carries an item for ${itemSlot}`).toBeGreaterThan(0);
+      const inventory: InvSlot[] = [{ itemId: DUST, count: 99 }];
+      for (const itemId of ids) {
+        inventory.push({ itemId, count: 2 });
+        inventory.push({ itemId, count: 1, instance: { enchant: otherEnchant } });
+      }
+      // Every equipment key the piece structurally fits, the sim's own rule, so
+      // ring1+ring2 and mainhand+offhand both land in one list.
+      const wornSlots = ALL_EQUIP_SLOTS.filter((slot) => slotAcceptsItem(ITEMS[ids[0]], slot));
+      expect(wornSlots.length, `${ids[0]} fits an equipment key`).toBeGreaterThan(0);
+      if (wornSlots.length > 1) multiWornShapes += 1;
+      // Twice: worn copies all PLAIN, then all carrying one identical enchant,
+      // which is the pair whose rows are otherwise byte-identical.
+      for (const wornEnchant of [undefined, otherEnchant]) {
+        const equipment: Record<string, string> = {};
+        const equippedInstances: Record<string, unknown> = {};
+        for (const slot of wornSlots) {
+          equipment[slot] = ids[0];
+          if (wornEnchant !== undefined) equippedInstances[slot] = { enchant: wornEnchant };
+        }
+        const h = harness(768, { inventory, equipment, equippedInstances });
+        h.openTargets(enchantId);
+        const texts = h.rows().map((row) => row.text);
+        expect(texts.length, `${enchantId} paints rows`).toBeGreaterThan(1);
+        // The failure message names the duplicate rather than only its count.
+        const seen = new Set<string>();
+        for (const text of texts) {
+          expect(seen.has(text), `${enchantId}: duplicate row name ${JSON.stringify(text)}`).toBe(
+            false,
+          );
+          seen.add(text);
+        }
+        sweptLists += 1;
+      }
+    }
+    // Non-vacuity: both collision shapes really occur in the sweep, so a fixture
+    // that quietly stopped producing them cannot leave this green.
+    expect(sweptLists).toBe(enchantIds.length * 2);
+    expect(heroicShapes, 'some enchant slot has a base/heroic pair').toBeGreaterThan(0);
+    expect(multiWornShapes, 'some enchant slot fills two equipment keys').toBeGreaterThan(0);
   });
 });

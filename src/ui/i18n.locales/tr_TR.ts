@@ -9253,6 +9253,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Daha İyi Büyüler',
   'hudChrome.enchanting.tier.runed': 'Runlu Büyüler',
   'hudChrome.enchanting.wornTag': 'Kuşanılı ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Kuşanılı ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Beklenen malzemeler:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': '{min} ile {max} arası {item}',

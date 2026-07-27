@@ -2477,6 +2477,7 @@ export const cs_CZ: EnTranslations = {
       "noEnchants": "Žádné okouzlení nepoužívá tuto reagencii.",
       "noTargets": "Žádný způsobilý předmět k okouzlení.",
       "wornTag": "Vybaveno ({slot})",
+      "wornTagIndexed": "Vybaveno ({slot} {index})",
       "tier": {
         "base": "Základní okouzlení",
         "runed": "Runové okouzlení",

@@ -2477,6 +2477,7 @@ export const vi_VN: EnTranslations = {
       "noEnchants": "Không có phép khắc nào dùng nguyên liệu này.",
       "noTargets": "Không có vật phẩm nào hợp lệ để pháp khắc.",
       "wornTag": "Đang Trang Bị ({slot})",
+      "wornTagIndexed": "Đang Trang Bị ({slot} {index})",
       "tier": {
         "base": "Pháp Khắc Cơ Bản",
         "runed": "Pháp Khắc Phù Văn",

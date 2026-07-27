@@ -2477,6 +2477,7 @@ export const de_DE: EnTranslations = {
       "noEnchants": "Keine Verzauberung verwendet dieses Reagenz.",
       "noTargets": "Kein geeigneter Gegenstand zum Verzaubern.",
       "wornTag": "Angelegt ({slot})",
+      "wornTagIndexed": "Angelegt ({slot} {index})",
       "tier": {
         "base": "Basisverzauberungen",
         "runed": "Runen-Verzauberungen",

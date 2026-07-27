@@ -9359,6 +9359,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Grotere betoveringen',
   'hudChrome.enchanting.tier.runed': 'Gerunede betoveringen',
   'hudChrome.enchanting.wornTag': 'Gedragen ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Gedragen ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Verwachte materialen:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': '{min} tot {max} {item}',

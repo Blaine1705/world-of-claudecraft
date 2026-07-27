@@ -2477,6 +2477,7 @@ export const tr_TR: EnTranslations = {
       "noEnchants": "Hiçbir büyü bu malzemeyi kullanmıyor.",
       "noTargets": "Büyülenecek uygun eşya yok.",
       "wornTag": "Kuşanılı ({slot})",
+      "wornTagIndexed": "Kuşanılı ({slot} {index})",
       "tier": {
         "base": "Temel Büyüler",
         "runed": "Runlu Büyüler",

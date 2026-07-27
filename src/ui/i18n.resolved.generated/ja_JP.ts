@@ -2477,6 +2477,7 @@ export const ja_JP: EnTranslations = {
       "noEnchants": "この素材を使うエンチャントはありません。",
       "noTargets": "エンチャントできるアイテムがありません。",
       "wornTag": "装備中 ({slot})",
+      "wornTagIndexed": "装備中 ({slot}{index})",
       "tier": {
         "base": "基本エンチャント",
         "runed": "ルーンエンチャント",
