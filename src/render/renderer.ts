@@ -3382,11 +3382,8 @@ export class Renderer {
       this.updateKeyLight(pp);
     }
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
-    // The dome rides the camera, so it also serves Orkadia's open-air field.
-    this.sky.visible =
-      this.fogState === 'outdoor' ||
-      this.fogState === 'orkadiaField' ||
-      this.fogState === 'wildheartField';
+    // The dome rides the camera, so it also serves Wildheart's open-air field.
+    this.sky.visible = this.fogState === 'outdoor' || this.fogState === 'wildheartField';
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       this.skyView.setDayNight(this.dnGrade.sky);
@@ -5811,7 +5808,6 @@ export class Renderer {
     | 'underwater'
     | 'rift'
     | 'practice'
-    | 'orkadiaField'
     | 'wildheartField'
     | 'lastkeep' = 'outdoor';
 
@@ -6143,9 +6139,8 @@ export class Renderer {
       inside && !inDelve && !inYumiMaze && !isArenaPos(px) ? dungeonAt(px)?.interior : null;
     const inTemple = interior === 'temple';
     const inNythraxis = interior === 'nythraxis';
-    // Orkadia is an OPEN-AIR war-camp, not a closed room: it keeps the sky dome
-    // and the daylight rig and only swaps in its own ashen field haze.
-    const inOrkadiaField = interior === 'orkadia';
+    // Wildheart is an OPEN-AIR jungle caldera, not a closed room: it keeps the
+    // sky dome and the daylight rig and only swaps in its own field haze.
     const inWildheartField = interior === 'wildheart';
     const inLastKeep = interior === 'lastkeep';
     const desired = inPractice
@@ -6158,17 +6153,15 @@ export class Renderer {
             ? 'temple'
             : inNythraxis
               ? 'nythraxis'
-              : inOrkadiaField
-                ? 'orkadiaField'
-                : inWildheartField
-                  ? 'wildheartField'
-                  : inLastKeep
-                    ? 'lastkeep'
-                    : inside
-                      ? 'dungeon'
-                      : camY < waterLevelAt(px, pz) - 0.05
-                        ? 'underwater'
-                        : 'outdoor';
+              : inWildheartField
+                ? 'wildheartField'
+                : inLastKeep
+                  ? 'lastkeep'
+                  : inside
+                    ? 'dungeon'
+                    : camY < waterLevelAt(px, pz) - 0.05
+                      ? 'underwater'
+                      : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
@@ -6216,12 +6209,6 @@ export class Renderer {
         fog.color.setHex(0x020106);
         fog.near = 20;
         fog.far = 80;
-      } else if (desired === 'orkadiaField') {
-        // the open-air war-camp reads under a real sky: an ashen volcanic haze
-        // pushed past the boss end of the ~160yd field, not the room murk
-        fog.color.setHex(0x27301f);
-        fog.near = 45;
-        fog.far = 230;
       } else if (desired === 'wildheartField') {
         // Sunlit humid depth keeps the full caldera readable while the rear
         // shrine and limestone shell settle into a warm green atmospheric veil.
@@ -7872,11 +7859,8 @@ export class Renderer {
     worldStart = markWorldPhase('shadows', worldStart);
     // sky dome + sun disc ride along with the camera
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
-    // The dome rides the camera, so it also serves Orkadia's open-air field.
-    this.sky.visible =
-      this.fogState === 'outdoor' ||
-      this.fogState === 'orkadiaField' ||
-      this.fogState === 'wildheartField';
+    // The dome rides the camera, so it also serves Wildheart's open-air field.
+    this.sky.visible = this.fogState === 'outdoor' || this.fogState === 'wildheartField';
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       this.skyView.setDayNight(this.dnGrade.sky);
