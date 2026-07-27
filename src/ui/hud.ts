@@ -225,7 +225,6 @@ import { ERROR_LOG_COLOR, shouldMirrorErrorToast } from './error_toast_log';
 import { esc } from './esc';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
-import { shouldShowHealLanding } from './heal_landing_feedback_core';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
 import {
   PARTY_FRAME_POS_KEY,
@@ -248,6 +247,7 @@ import {
   grantQtyText,
   harvestLineKey,
 } from './grant_line_view';
+import { shouldShowHealLanding } from './heal_landing_feedback_core';
 import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
 import {
   handleShiftClearContextMenu,
