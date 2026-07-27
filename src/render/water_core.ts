@@ -29,6 +29,15 @@ export const WATER_SCHEDULE_SLEEP = 2;
 // plus the horizon apron), so the field is a camera-anchored WINDOW rather than
 // one texture per lake: sized for a ~1 yard character wake to read clearly.
 export const WATER_FIELD_CELL_SIZE = 0.7;
+// Fraction of the field, in UV, over which its contribution ramps from nothing
+// to full at the window border. The field is a WINDOW, not the whole sea, so
+// something has to happen at its edge. Cutting it off hard puts a step in the
+// surface NORMAL (the slope drives N with a large gain), and because the window
+// is a camera-anchored square that step draws straight-edged seams across open
+// water that travel with the camera and survive any amount of colour tuning.
+// Feathering costs a band of reduced wake detail at ~34 yards (high tier) where
+// a character wake is already sub-pixel, and buys a seamless sea.
+export const WATER_FIELD_EDGE_FEATHER_UV = 0.12;
 // Re-anchor once the camera has drifted this fraction of the field half-size.
 // Hysteresis matters: re-anchoring every frame would scroll the state every
 // frame, and each scroll costs a full-field pass.
