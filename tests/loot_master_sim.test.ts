@@ -321,12 +321,20 @@ describe('the master looter reconcile surface (#2526)', () => {
     ]);
     expect(sim.activeMasterLootRolls(a)[0].candidates.map((cand) => cand.pid)).toEqual([a, b, c]);
     expect(sim.activeMasterLootRolls(a)[0].expiresAt).toBeCloseTo(sim.time + 300, 5);
-    // Names come from the live roster, so the checkbox list is labelled.
+    // Names come from the live roster, so the checkbox list is labelled. Pinned to
+    // literals: reading sim.meta(a).name here would compare the implementation
+    // against its own source and could not fail.
     expect(sim.activeMasterLootRolls(a)[0].candidates.map((cand) => cand.name)).toEqual([
-      sim.meta(a)?.name,
+      'Adventurer',
       'Bert',
       'Cara',
     ]);
+
+    // The zero-argument arm, which is the ONLY one production reaches: IWorld
+    // declares activeMasterLootRolls() with no parameter, so the HUD always calls
+    // it bare and Sim's `pid = this.playerId` default carries the viewer.
+    expect(sim.playerId).toBe(a);
+    expect(sim.activeMasterLootRolls().map((p) => p.rollId)).toEqual([rollId]);
 
     // The AC that the fix must not break: a candidate sees the curate-phase roll
     // on NO surface, neither as an assignment prompt nor as a need/greed one.
@@ -383,6 +391,7 @@ describe('the master looter reconcile surface (#2526)', () => {
 
   it('drops the prompt when the looter releases the roll to a need/greed subset', () => {
     const { sim, a, b, c, rollId } = openMasterRoll();
+    expect(sim.activeMasterLootRolls(a)).toHaveLength(1); // the surface had it to lose
 
     sim.assignMasterLoot(rollId, [b, c], a);
 
@@ -420,6 +429,7 @@ describe('the master looter reconcile surface (#2526)', () => {
 
   it('converts rather than stranding when the master looter themselves logs out', () => {
     const { sim, a, b, c, rollId } = openMasterRoll();
+    expect(sim.activeMasterLootRolls(a)).toHaveLength(1); // the surface had it to lose
 
     sim.removePlayer(a);
 

@@ -52,6 +52,16 @@ function bareClient(pid: number): ClientWorld {
   return c;
 }
 
+// A hand-built frame, the untrusted shape a client actually sends, parsed and
+// dispatched exactly as a socket message is. `t: 'cmd'` is the real envelope
+// (ClientWorld.rawCmd); without it the dispatcher drops the frame as a protocol
+// anomaly and a test would pass on a command that never ran.
+function sendCmd(server: GameServer, session: any, frame: Record<string, unknown>): string {
+  const raw = JSON.stringify({ t: 'cmd', ...frame });
+  (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
+  return raw;
+}
+
 describe('loot roll self-snapshot parity', () => {
   it('rides the self snapshot and the online client mirrors it', () => {
     const server = new GameServer();
@@ -94,6 +104,99 @@ describe('loot roll self-snapshot parity', () => {
     (client as any).applySnapshot(snapB);
     expect(client.activeLootRolls().map((p) => p.itemId)).toContain('greyjaw_hide_boots');
   });
+
+  // #2526, the whole chain end to end: setPartyLootMaster -> lootCorpse ->
+  // maybe('mloot', activeMasterLootRolls) -> applySnapshot -> the HUD read. The
+  // sim suite drives Sim directly and the snapshot suite hand-pokes
+  // pendingLootRolls, so this is the only place the real server produces the key.
+  it('rides the self snapshot to the master looter only, and survives a refused assignment', () => {
+    const server = new GameServer();
+    const fa = fakeWs();
+    const fb = fakeWs();
+    const sa = server.join(fa.ws as any, 21, 21, 'Aaa', 'warrior', null) as any;
+    const sb = server.join(fb.ws as any, 22, 22, 'Bbb', 'mage', null) as any;
+    sa.blockListLoaded = true;
+    sb.blockListLoaded = true;
+    const a = sa.pid,
+      b = sb.pid;
+    const sim = server.sim;
+    const pa = sim.entities.get(a)!,
+      pb = sim.entities.get(b)!;
+    pa.pos = { x: 20, y: 0, z: 20 };
+    pa.prevPos = { ...pa.pos };
+    pb.pos = { x: 21, y: 0, z: 20 };
+    pb.prevPos = { ...pb.pos };
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    sim.setPartyLootMaster(true, 0, 'uncommon', a); // 0 = the leader curates
+
+    const mobId = [...sim.entities.keys()].reduce((max, k) => (k > max ? k : max), 0) + 1;
+    const mob = createMob(mobId, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.tappedById = a;
+    mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
+    sim.entities.set(mob.id, mob);
+
+    sim.lootCorpse(mob.id, a);
+    const rollId = sim.events.find((e) => e.type === 'masterLoot')!.rollId;
+    sim.tick();
+    (server as any).broadcastSnapshots();
+
+    // The looter's snapshot carries the curate prompt; the candidate's carries an
+    // empty one, and NEITHER carries it as a need/greed roll.
+    const snapA = lastSnap(fa.sent);
+    const snapB = lastSnap(fb.sent);
+    expect(snapA.self.mloot).toEqual([
+      {
+        rollId,
+        itemId: 'greyjaw_hide_boots',
+        itemName: 'Greyjaw Hide Boots',
+        quality: 'uncommon',
+        expiresAt: snapA.self.mloot[0].expiresAt,
+        candidates: [
+          { pid: a, name: 'Aaa' },
+          { pid: b, name: 'Bbb' },
+        ],
+      },
+    ]);
+    expect(snapB.self.mloot).toEqual([]);
+    expect(snapA.self.lroll).toEqual([]);
+    expect(snapB.self.lroll).toEqual([]);
+
+    const clientA = bareClient(a);
+    const clientB = bareClient(b);
+    (clientA as any).applySnapshot(snapA);
+    (clientB as any).applySnapshot(snapB);
+    expect(clientA.activeMasterLootRolls().map((p) => p.rollId)).toEqual([rollId]);
+    expect(clientB.activeMasterLootRolls()).toEqual([]);
+
+    // The refusal arm over the wire: a pid that is not a candidate leaves the
+    // roll curating, so the surface is UNCHANGED and the delta encoder therefore
+    // omits the key entirely. The mirror must keep its prior value, which is what
+    // lets the HUD restore the row after the grace.
+    fa.sent.length = 0;
+    sendCmd(server, sa, { cmd: 'masterAssign', rollId, pids: [999999] });
+    sim.tick();
+    (server as any).broadcastSnapshots();
+    const snapA2 = lastSnap(fa.sent);
+    expect(snapA2.self).not.toHaveProperty('mloot');
+    (clientA as any).applySnapshot(snapA2);
+    expect(clientA.activeMasterLootRolls().map((p) => p.rollId)).toEqual([rollId]);
+    expect(sim.countItem('greyjaw_hide_boots', b)).toBe(0);
+
+    // And it really was still assignable: the accepted assignment lands and the
+    // surface empties, so the pins above are not just a stuck mirror.
+    fa.sent.length = 0;
+    sendCmd(server, sa, { cmd: 'masterAssign', rollId, pids: [b] });
+    sim.tick();
+    (server as any).broadcastSnapshots();
+    const snapA3 = lastSnap(fa.sent);
+    expect(snapA3.self.mloot).toEqual([]);
+    (clientA as any).applySnapshot(snapA3);
+    expect(clientA.activeMasterLootRolls()).toEqual([]);
+    expect(sim.countItem('greyjaw_hide_boots', b)).toBe(1);
+  });
 });
 
 // #2505 over the wire. `pids` is a client-supplied array the authoritative
@@ -107,16 +210,6 @@ describe('loot roll self-snapshot parity', () => {
 // WORLD_SEED (asserted below, not assumed), so two runs generate the identical
 // world and any difference in the result is the pid list.
 describe('a repeated pid in a masterAssign frame, through a real GameServer (#2505)', () => {
-  // A hand-built frame, the untrusted shape the issue reproduces with, parsed
-  // and dispatched exactly as a socket message is. `t: 'cmd'` is the real
-  // envelope (ClientWorld.rawCmd); without it the dispatcher drops the frame as
-  // a protocol anomaly and a test would pass on a command that never ran.
-  function sendCmd(server: GameServer, session: any, frame: Record<string, unknown>): string {
-    const raw = JSON.stringify({ t: 'cmd', ...frame });
-    (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
-    return raw;
-  }
-
   function serverAssign(pids: (ids: { a: number; b: number }) => number[]) {
     const server = new GameServer();
     const sa = server.join(fakeWs().ws as any, 11, 11, 'Aaa', 'warrior', null) as any;

@@ -362,6 +362,26 @@ describe('LootRollController', () => {
     ).toEqual(['need', 'greed', 'pass']);
   });
 
+  it('brings back the same-item master row closeForItem over-cleared, and only that one', () => {
+    const test = harness();
+    // Two corpses can drop the same item, so two master rolls can be open at once.
+    // closeForItem matches on ITEM ID, not roll id, so resolving one clears both
+    // rows. Only the resolved roll leaves the surface, so the survivor is restored
+    // on the next frame; it was never a local intent, so no grace applies to it.
+    test.controller.showMasterRoll({ type: 'masterLoot', ...masterPrompt(undefined, 7) });
+    test.controller.showMasterRoll({ type: 'masterLoot', ...masterPrompt(undefined, 8) });
+    expect(test.root.querySelectorAll('.master')).toHaveLength(2);
+
+    test.controller.closeForItem('Aki assigned [[i:greyjaw_hide_boots]] to Bex.');
+    expect(test.root.querySelectorAll('.master')).toHaveLength(0);
+
+    test.setMasterOpen([masterPrompt(undefined, 8)]);
+    test.controller.update(test.now());
+
+    const restored = test.root.querySelectorAll<HTMLElement>('.master');
+    expect(restored.map((row) => row.dataset.rollId)).toEqual(['8']);
+  });
+
   it('elides a repeated timer fraction while still writing real time progress', () => {
     const test = harness();
     test.setOpen([prompt()]);
