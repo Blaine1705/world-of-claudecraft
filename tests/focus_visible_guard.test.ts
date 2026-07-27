@@ -27,6 +27,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { cssTreeUnder } from './helpers/css_tree_under';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 
 const STYLES_DIR = fileURLToPath(new URL('../src/styles/', import.meta.url));
 
@@ -133,6 +134,12 @@ describe(':focus-visible ring is steady and visible (the FB lesson)', () => {
   it('never animates / blurs / transitions the drawn outline ring on any :focus-visible block', () => {
     const offenders = unsteadyRingOffenders(files);
     expect(offenders, `animated/blurred focus rings:\n${offenders.join('\n')}`).toEqual([]);
+  });
+
+  it('reads src/styles through the shared walker, with no flat reader beside it', () => {
+    // The fixture below pins the READER; this pins that nothing else in the file
+    // opens the directory, which no assertion over today's flat tree could tell.
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['css_tree_under']);
   });
 
   it("scans a stylesheet in a SUBDIRECTORY, through this guard's own reader", () => {

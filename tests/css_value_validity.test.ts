@@ -15,6 +15,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { cssTreeUnder } from './helpers/css_tree_under';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 
 const STYLES_DIR = fileURLToPath(new URL('../src/styles/', import.meta.url));
 
@@ -66,6 +67,14 @@ describe('src/styles CSS value validity', () => {
       expect(hits, `malformed color value(s) in ${file}: ${hits.join(' | ')}`).toEqual([]);
     },
   );
+
+  it('reads src/styles through the shared walker, with no flat reader beside it', () => {
+    // The fixture above pins the PRODUCER; this pins that nothing else in the
+    // file opens the directory. A second reader hand-rolled beside it would
+    // return the same 10 sheets today, so no assertion here could notice it, and
+    // the two could then drift apart exactly as css_corpus's pair did.
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['css_tree_under']);
+  });
 
   it("scans a module in a SUBDIRECTORY, through this guard's own producer", () => {
     // The recursion pin. src/styles is flat today, so this is the only thing that

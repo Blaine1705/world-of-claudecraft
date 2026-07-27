@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { cssTreeUnder } from './helpers/css_tree_under';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 
 // Section-by-section completeness guard for the game-HUD CSS, the floor the CSS
 // extraction regresses against. That extraction relocates CSS section by
@@ -359,6 +360,14 @@ describe('css_corpus src/styles read is flat BY RULING, and refuses instead of n
 
   afterEach(() => {
     rmSync(root, { recursive: true, force: true });
+  });
+
+  it('is the only reader of src/styles in this file', () => {
+    // The collapse of the two independently-flat reads into one STYLE_SHEETS is
+    // the part of this guard that nothing else can pin: a re-added reader in the
+    // brace-balance case would return the same 10 sheets today, every assertion
+    // would stay green, and the two would be free to drift apart again.
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['css_tree_under']);
   });
 
   it('reads the top-level sheets of a flat root', () => {
