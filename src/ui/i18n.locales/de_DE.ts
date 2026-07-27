@@ -5694,6 +5694,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.compass.SW': 'SW',
   'hudChrome.compass.W': 'W',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Dieser Kadaver wurde bereits verwertet.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'An diesem Kadaver gibt es nichts aus deiner Auswahl zu verwerten.',
   'hudChrome.corpseHarvest.componentAria': '{component} verwerten',
   'hudChrome.corpseHarvest.components.claw': 'Klaue',
   'hudChrome.corpseHarvest.components.fang': 'Fangzahn',

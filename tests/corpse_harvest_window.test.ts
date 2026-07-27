@@ -23,6 +23,7 @@ function view(overrides: Partial<CorpseHarvestViewModel> = {}): CorpseHarvestVie
     ],
     harvestDisabled: false,
     concentrated: true,
+    forfeitsEveryYield: false,
     ...overrides,
   };
 }
@@ -95,5 +96,117 @@ describe('renderCorpseHarvestPicker: picker section', () => {
     );
     container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.click();
     expect(onHarvest).toHaveBeenLastCalledWith([]);
+  });
+});
+
+// #2509: the picker's mirror of the command-boundary refusal. Checking only
+// families with no harvest item behind them (claw, tusk, gills, horn) is a
+// command the sim refuses pre-claim, so the button goes dead and the section
+// says why IN PLACE: a `disabled` button takes no pointer events and leaves the
+// tab order (src/ui/focus_manager.ts), so a tooltip on it is unreachable.
+describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#2509)', () => {
+  // old_greyjaw's real tags. Only claw is unmapped.
+  const GREYJAW = ['hide', 'fang', 'claw'];
+  const rowsFor = (tags: string[], checked: string[] = []) =>
+    tags.map((tag) => ({ tag, checked: checked.includes(tag) }));
+
+  function render(tags: string[], checked: string[] = []) {
+    const container = document.createElement('div');
+    const onHarvest = vi.fn();
+    const attachTooltip = vi.fn();
+    const forfeits = checked.length > 0 && checked.every((t) => t === 'claw' || t === 'horn');
+    renderCorpseHarvestPicker(
+      container,
+      view({
+        rows: rowsFor(tags, checked),
+        harvestDisabled: forfeits,
+        concentrated: checked.length > 0 && checked.length < tags.length,
+        forfeitsEveryYield: forfeits,
+      }),
+      { onHarvest, attachTooltip },
+    );
+    const boxes = [...container.querySelectorAll<HTMLInputElement>('.corpse-harvest-check')];
+    return {
+      container,
+      onHarvest,
+      attachTooltip,
+      boxes,
+      btn: container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')!,
+      warning: container.querySelector<HTMLElement>('.corpse-harvest-warning')!,
+      // The real user gesture. Setting `.checked` fires no `change`, so a test
+      // that mutated the property directly would assert a stale button and
+      // pass whatever the handler did.
+      toggle(tag: string) {
+        const box = boxes.find((b) => b.value === tag)!;
+        box.checked = !box.checked;
+        box.dispatchEvent(new Event('change', { bubbles: true }));
+      },
+    };
+  }
+
+  it('hides the reason line while the selection can still yield something', () => {
+    const t = render(GREYJAW, ['hide']);
+    expect(t.btn.disabled).toBe(false);
+    expect(t.warning.hidden).toBe(true);
+    expect(t.btn.getAttribute('aria-label')).toBeNull();
+  });
+
+  it('kills the button and states why when the last mapped box is unchecked', () => {
+    const t = render(GREYJAW, ['hide', 'claw']);
+    expect(t.btn.disabled).toBe(false);
+    t.toggle('hide');
+    expect(t.btn.disabled).toBe(true);
+    expect(t.warning.hidden).toBe(false);
+    expect(t.warning.textContent).toBe('Nothing you selected can be harvested from this corpse.');
+    // The WHY also rides in the accessible name, the crafting-window idiom.
+    expect(t.btn.getAttribute('aria-label')).toBe(
+      'Harvest. Nothing you selected can be harvested from this corpse.',
+    );
+    // The dead button really is dead: a click submits nothing.
+    t.btn.click();
+    expect(t.onHarvest).not.toHaveBeenCalled();
+  });
+
+  it('comes back to life the moment a mapped family is checked again', () => {
+    const t = render(GREYJAW, ['claw']);
+    expect(t.btn.disabled).toBe(true);
+    expect(t.warning.hidden).toBe(false);
+    t.toggle('fang');
+    expect(t.btn.disabled).toBe(false);
+    expect(t.warning.hidden).toBe(true);
+    expect(t.btn.getAttribute('aria-label')).toBeNull();
+    t.btn.click();
+    expect(t.onHarvest).toHaveBeenLastCalledWith(['fang', 'claw']);
+  });
+
+  it('never disables on the way back to an empty selection, which spreads', () => {
+    const t = render(GREYJAW, ['claw']);
+    expect(t.btn.disabled).toBe(true);
+    t.toggle('claw');
+    expect(t.btn.disabled).toBe(false);
+    expect(t.warning.hidden).toBe(true);
+    t.btn.click();
+    expect(t.onHarvest).toHaveBeenLastCalledWith([]);
+  });
+
+  it('leaves an all-unmapped corpse clickable, exactly as the sim leaves it', () => {
+    // fen_troll (claw, tusk) forfeits nothing whatever is checked, so the
+    // picker must keep submitting there.
+    const t = render(['claw', 'tusk'], []);
+    t.toggle('claw');
+    expect(t.btn.disabled).toBe(false);
+    expect(t.warning.hidden).toBe(true);
+    t.btn.click();
+    expect(t.onHarvest).toHaveBeenLastCalledWith(['claw']);
+  });
+
+  it('registers the tooltip exactly once, however many times the selection changes', () => {
+    // Hud.attachTooltip binds a fresh listener set per call, so re-attaching
+    // per toggle would stack them silently.
+    const t = render(GREYJAW, ['hide']);
+    t.toggle('hide');
+    t.toggle('claw');
+    t.toggle('claw');
+    expect(t.attachTooltip.mock.calls.filter(([target]) => target === t.btn)).toHaveLength(1);
   });
 });

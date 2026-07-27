@@ -788,9 +788,11 @@ export interface FocusHarvestYield {
  * nothing), which was itself only ever true BELOW the threshold: above it, the
  * same frame already spread. Scope, so the sentence above is not read as more
  * than it is: this covers a tag the corpse does not CARRY. A tag it carries
- * that HARVEST_COMPONENT_ITEMS does not map (claw, tusk, gills, horn) still
- * spends the claim for nothing, is reachable from the shipped picker, and is
- * tracked separately as #2509.
+ * that HARVEST_COMPONENT_ITEMS does not map (claw, tusk, gills, horn) is a
+ * different case and is handled a different way: it stays in the pick here,
+ * because dropping it would move the concentration-bonus denominator below,
+ * and the command boundary REFUSES the harvest pre-claim when the surviving
+ * pick maps to no item at all (#2509, src/sim/interaction.ts harvestCorpse).
  *
  * First occurrence wins (Set iteration is insertion-ordered) and the narrowing
  * preserves that order, so tag ORDER is untouched: it is the order the yields,

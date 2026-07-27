@@ -9,7 +9,7 @@
 
 import { esc } from '../../esc';
 import { type TranslationKey, t } from '../../i18n';
-import type { CorpseHarvestViewModel } from './corpse_harvest_view';
+import { type CorpseHarvestViewModel, corpseHarvestView } from './corpse_harvest_view';
 
 export interface CorpseHarvestPainterDeps {
   /** Called with the checked component tags (may be empty = spread across all). */
@@ -71,17 +71,62 @@ export function renderCorpseHarvestPicker(
     list.appendChild(label);
   }
   section.appendChild(list);
+  // #2509: the reason a Harvest can be refused, stated in place rather than in
+  // the button's tooltip. A `disabled` button takes no pointer events and
+  // leaves the tab order (src/ui/focus_manager.ts), so a tooltip on it would
+  // never be reachable by hover, touch, or keyboard; a line in the section is.
+  // Reuses the .corpse-harvest-hint metrics via its own class so only the
+  // color differs, and rides in the DOM right before the button it explains.
+  const warning = document.createElement('div');
+  warning.className = 'corpse-harvest-warning';
+  warning.textContent = t('hudChrome.corpseHarvest.nothingSelectedYields');
+  section.appendChild(warning);
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'btn corpse-harvest-btn';
-  btn.textContent = t('hudChrome.corpseHarvest.harvestButton');
+  const harvestLabel = t('hudChrome.corpseHarvest.harvestButton');
+  btn.textContent = harvestLabel;
+  // Attached ONCE, at build: Hud.attachTooltip registers a fresh listener set
+  // per call, so re-attaching it on every toggle would stack them.
   deps.attachTooltip(btn, () => esc(t('hudChrome.corpseHarvest.harvestTooltip')));
-  btn.disabled = view.harvestDisabled;
-  btn.addEventListener('click', () => {
-    const chosen = [...list.querySelectorAll<HTMLInputElement>('.corpse-harvest-check')]
+  const chosenTags = (): string[] =>
+    [...list.querySelectorAll<HTMLInputElement>('.corpse-harvest-check')]
       .filter((c) => c.checked)
       .map((c) => c.value);
-    deps.onHarvest(chosen);
+  // The button state, the reason line and the accessible name all come from
+  // ONE model, so they cannot drift apart. The WHY rides in the accessible
+  // name as well as the visible line, the crafting-window idiom
+  // (src/ui/crafting_window.ts): a reader that reaches the button through the
+  // section rather than the tab order still hears it.
+  const apply = (model: CorpseHarvestViewModel): void => {
+    btn.disabled = model.harvestDisabled;
+    warning.hidden = !model.forfeitsEveryYield;
+    if (model.forfeitsEveryYield) {
+      btn.setAttribute(
+        'aria-label',
+        `${harvestLabel}. ${t('hudChrome.corpseHarvest.nothingSelectedYields')}`,
+      );
+    } else {
+      btn.removeAttribute('aria-label');
+    }
+  };
+  // Initial state is the caller's model, so the view-core stays the single
+  // source of the picker's decisions; every later state is that same core
+  // re-run over the live checkbox set. A discrete change listener, not a
+  // repeating driver: the picker is a cold window
+  // (tests/hud_perf_budget.test.ts) and this handler reads no geometry, so
+  // neither cold contract is touched.
+  apply(view);
+  list.addEventListener('change', () => {
+    apply(
+      corpseHarvestView(
+        view.rows.map((row) => row.tag),
+        new Set(chosenTags()),
+      ),
+    );
+  });
+  btn.addEventListener('click', () => {
+    deps.onHarvest(chosenTags());
   });
   section.appendChild(btn);
   container.appendChild(section);

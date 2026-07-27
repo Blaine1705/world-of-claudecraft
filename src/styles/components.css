@@ -741,6 +741,13 @@
     font-size: 12px;
     cursor: pointer;
   }
+  /* #2509: why Harvest is refused, stated in place. A disabled button takes no
+     pointer events and leaves the tab order, so its tooltip is unreachable. */
+  .corpse-harvest-warning {
+    font-size: 11px;
+    color: var(--color-text-error);
+    margin-bottom: 6px;
+  }
   .corpse-harvest-btn {
     width: 100%;
   }
