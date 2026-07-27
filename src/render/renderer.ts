@@ -285,6 +285,7 @@ import { Weather } from './weather';
 import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './world_audio';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
+import { type FeatureFootprint, isZoneFeatureVisible } from './zone_feature_visibility_core';
 import {
   INITIAL_SKY_PREWARM_RADIUS,
   MAX_OUTDOOR_FOG_FAR,
@@ -984,6 +985,21 @@ function localRenderDiagnosticsEnabled(): boolean {
     params.get('perf_trace') === '1' ||
     params.get('renderTrace') === '1'
   );
+}
+
+/**
+ * The world-space XZ footprint of a static feature group, for the per-frame
+ * distance cull (see zone_feature_visibility_core.ts). Measured once, right
+ * after the group is frozen: these groups never move again, so re-deriving
+ * bounds every frame would be pure waste. Null when the group has no
+ * measurable geometry, which the caller treats as "always visible".
+ */
+function measureFeatureFootprint(root: THREE.Object3D): FeatureFootprint | null {
+  const box = new THREE.Box3().setFromObject(root);
+  if (box.isEmpty()) return null;
+  const center = box.getCenter(new THREE.Vector3());
+  const size = box.getSize(new THREE.Vector3());
+  return { centerX: center.x, centerZ: center.z, halfX: size.x / 2, halfZ: size.z / 2 };
 }
 
 function setRenderCategory(obj: THREE.Object3D, category: RenderDiagnosticsCategory): void {
@@ -2650,6 +2666,11 @@ export class Renderer {
   // new biome's bespoke feature shaders never first-draw inside a live frame.
   private lastAttachedFeatureGroups: THREE.Group[] = [];
 
+  // Every attached feature group with its world XZ footprint, for the
+  // per-frame distance cull in updateZoneFeatureVisibility. Measured ONCE here:
+  // these groups are static and matrix-frozen, so the bounds never move.
+  private zoneFeatureGroups: { group: THREE.Group; footprint: FeatureFootprint | null }[] = [];
+
   private attachZoneFeature(
     view: { group: THREE.Group; glowLights?: THREE.PointLight[] },
     freeze = true,
@@ -2660,6 +2681,22 @@ export class Renderer {
     for (const light of view.glowLights ?? []) this.fireLights.push(light);
     this.lightRankDirty = true;
     this.lastAttachedFeatureGroups.push(view.group);
+    this.zoneFeatureGroups.push({
+      group: view.group,
+      footprint: measureFeatureFootprint(view.group),
+    });
+  }
+
+  // Hide feature groups the fog has already swallowed. Terrain and foliage both
+  // did this; zone features never did, so ~40M triangles of towns, mazes and
+  // flora for zones the player could not see were submitted every frame (see
+  // zone_feature_visibility_core.ts for the measurements).
+  private updateZoneFeatureVisibility(fogFar: number): void {
+    const camX = this.camera.position.x;
+    const camZ = this.camera.position.z;
+    for (const entry of this.zoneFeatureGroups) {
+      entry.group.visible = isZoneFeatureVisible(entry.footprint, camX, camZ, fogFar);
+    }
   }
 
   private ensureZoneFeatures(zone: ZoneDef): void {
@@ -3377,6 +3414,7 @@ export class Renderer {
       fogFar,
     );
     this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
+    this.updateZoneFeatureVisibility(fogFar);
     this.propsView.update(
       this.camera.position.x,
       this.camera.position.y,
@@ -7869,6 +7907,7 @@ export class Renderer {
     const fogNear = (this.scene.fog as THREE.Fog).near;
     this.queueVisibleZonePrepares(Math.max(fogFar, this.lastRequestedFogFar));
     this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
+    this.updateZoneFeatureVisibility(fogFar);
     worldStart = markWorldPhase('terrain', worldStart);
     this.propsView.update(
       this.camera.position.x,
