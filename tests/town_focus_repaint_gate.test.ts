@@ -29,11 +29,11 @@
 //     re-arm, the language switch), each anchored to the REGION it has to live
 //     in rather than to the whole file.
 //
-// Section 6 is issue #2525, the other half of the same story. The panel was the
-// one HUD window never wired into the shared FocusManager, so it had no Tab
-// trap, no return-to-opener and no dialog role. That gap was unreachable while
-// the panel rebuilt itself at 2Hz (focus never survived long enough to be handed
-// back), which is why it lands here, against the same painter and the same Hud
+// Section 6 is issue #2525, the other half of the same story. The panel was
+// outside the shared FocusManager entirely, so it had no Tab trap, no
+// return-to-opener and no dialog role. That gap was unreachable while the panel
+// rebuilt itself at 2Hz (focus never survived long enough to be handed back),
+// which is why it lands here, against the same painter and the same Hud
 // methods, rather than in a file of its own.
 
 import { readFileSync } from 'node:fs';
@@ -1011,6 +1011,35 @@ describe('the Town Focus panel is wired into the shared focus system', () => {
     plus.focus();
     expect(pressTab().defaultPrevented).toBe(false);
     expect(document.activeElement).toBe(plus);
+  });
+
+  it('declines to focus an opener that went away, and still releases the trap', () => {
+    // The panel is deliberately readable OUT of town while #mm-town-focus hides
+    // out of town, so a player can open it in town, walk out, and close it with
+    // the opener no longer rendered. FocusManager's canFocus refuses a
+    // zero-rect element ON PURPOSE: moving focus somewhere invisible is a WCAG
+    // 2.4.11 failure, not a fix. So the hand-back no-ops. That is the shared
+    // bridge's behavior for any window whose opener can vanish (closeTrain and
+    // closeUnbind hand back to a gossip button that is already gone by then),
+    // and it is exactly the pre-#2525 outcome, never worse.
+    const { hud, el, opener } = makeFocusHud();
+    opener.focus();
+    hud.toggleTownFocus();
+    const plus = stepButton(el, COMPONENT, 'inc');
+    plus.focus();
+    // A per-element override: the blanket stub in beforeEach reports one rect
+    // for everything, which is what makes this case unrepresentable by default.
+    vi.spyOn(opener, 'getClientRects').mockReturnValue([] as unknown as DOMRectList);
+    hud.closeTownFocus();
+    vi.runAllTimers();
+    // jsdom does not blur on display:none, so focus is simply left standing
+    // where it was; a real browser drops it to <body> at the same moment.
+    // Either way it is NOT moved onto the hidden button.
+    expect(document.activeElement).toBe(plus);
+    expect(document.activeElement).not.toBe(opener);
+    // ...and the trap is released regardless, so a no-op hand-back never leaves
+    // the player Tab-trapped inside a closed panel.
+    expect(pressTab().defaultPrevented).toBe(false);
   });
 
   it('marks the root as a dialog with exactly ONE accessible name', () => {

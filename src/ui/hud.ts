@@ -11876,13 +11876,14 @@ export class Hud {
   private lastTownFocusSig = '';
 
   // Standalone trapping window (#2525): the train / unbind shape, one
-  // windowFocus bridge plus one opener field. The panel was the last window
-  // outside the shared focus system and not one of the two documented opt-outs
-  // (#bags and #bank-window, which pair with another window and must stay
-  // Tab-passable), so it had no Tab trap and no return-to-opener. Invisible
-  // while the panel rebuilt itself twice a second, because focus never survived
-  // long enough to be handed back; #2500 fixed the rebuild, which is what made
-  // the gap reachable.
+  // windowFocus bridge plus one opener field. The panel was outside the shared
+  // focus system entirely: absent from every windowFocus(rootSel) call site and
+  // not one of the two documented opt-outs (#bags and #bank-window, which pair
+  // with a second window and must stay Tab-passable), so it had no Tab trap and
+  // no return-to-opener. It is not the last one out (vendor, crafting, trade,
+  // map and report still are); it is the one that became REACHABLE, because
+  // #2500 stopped the panel rebuilding itself twice a second and focus started
+  // surviving long enough for the missing hand-back to matter.
   private readonly townFocusWindowFocus = this.windowFocus('#town-focus-window');
   private townFocusOpenerFocus: HTMLElement | null = null;
 
@@ -11957,7 +11958,21 @@ export class Hud {
   /** The ONE close path: the X and Save go through onClose/onSave, Escape and
    *  the gamepad go through closeAll -> closeManagedWindow's `town-focus-window`
    *  case, and the toggle re-press comes straight here. So releasing the trap and
-   *  handing focus back once, here, covers every one of them. */
+   *  handing focus back once, here, covers every one of them.
+   *
+   *  Deliberately NOT guarded on `townFocusOpen` the way closeTrain/closeUnbind
+   *  guard on their npc id: those hold open state in a field, this panel reads
+   *  it off the DOM, every caller is already guarded, and a redundant call is a
+   *  no-op (the opener is nulled below, and releasing a released trap does
+   *  nothing). A guard would also make the "a later close cannot re-steal focus"
+   *  test pass for the wrong reason.
+   *
+   *  KNOWN EDGE, shared with the whole windowFocus family: FocusManager refuses
+   *  to focus an element reporting no client rects, so an opener that went away
+   *  between open and close (walk out of town and #mm-town-focus hides) gets no
+   *  hand-back. Focus is left where it is rather than moved somewhere the player
+   *  cannot see, which is the pre-#2525 outcome and never worse; the trap is
+   *  still released either way. */
   closeTownFocus(): void {
     $('#town-focus-window').style.display = 'none';
     this.townFocusDraft = null;
