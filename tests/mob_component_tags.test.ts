@@ -87,12 +87,12 @@ describe('mob component-type tags', () => {
     // `expectedQty` mirrors two rules it cannot import: harvestTierQuantity's
     // `index + 1`, and rollFocusTier's clamp at the top tier. Both are pinned
     // against the shipped accessors here, so a change to either reds this guard
-    // instead of leaving it quietly checking the wrong threshold.
+    // instead of leaving it quietly checking the wrong threshold. Every index,
+    // not just the endpoints: a non-linear quantity table with the same first
+    // and last values (say [1, 2, 2, 4, 5, 6]) would leave an endpoint pin
+    // green while the threshold arithmetic below drifted.
     expect(HARVEST_TIERS).toHaveLength(BASE_TIER_WEIGHTS.length);
-    expect(harvestTierQuantity(HARVEST_TIERS[0])).toBe(1);
-    expect(harvestTierQuantity(HARVEST_TIERS[HARVEST_TIERS.length - 1])).toBe(
-      BASE_TIER_WEIGHTS.length,
-    );
+    expect(HARVEST_TIERS.map(harvestTierQuantity)).toEqual(BASE_TIER_WEIGHTS.map((_, i) => i + 1));
     let mixedSeen = 0;
     for (const mob of tagged) {
       const tags = mob.componentTags ?? [];

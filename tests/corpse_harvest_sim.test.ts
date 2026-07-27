@@ -3215,6 +3215,18 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     expect(spent + refused).toBe(86);
   });
 
+  // The six mapped families and their item ids, spelled out. Deriving them from
+  // HARVEST_COMPONENT_ITEMS would compare the table with itself and pass
+  // against an empty one; this is the tests/gathering.test.ts idiom.
+  const EXPECTED_FAMILY_ITEMS: Record<string, string> = {
+    hide: 'rough_hide',
+    fang: 'wolf_fang',
+    silk: 'spider_silk',
+    venomSac: 'venom_gland',
+    meat: 'game_meat',
+    cloth: 'homespun_cloth',
+  };
+
   it('every family a harvest extracts has an item behind it (#2514)', () => {
     // Both `if (!itemId) continue` arms in harvestCorpse (the pre-claim
     // capacity gate and the grant loop) are unreachable by construction as of
@@ -3237,15 +3249,15 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
         const label = `${id} ${JSON.stringify(selected)}`;
         if (selected.some((t) => !harvestFamilyYieldsItem(t))) unmappedOffered++;
         const expectedSet = yieldingFocusComponents(tags, selected);
-        // The item ids the extracted set resolves to, as literals off the
-        // shipped table rather than `toBeTruthy` over the same accessor the
-        // filter used, which could only ever re-assert the filter against its
-        // own definition.
+        // The item ids the extracted set resolves to, against a LITERAL map.
+        // Comparing the accessor to the table it reads would be a tautology
+        // (the accessor returns that table's value verbatim once hasOwn
+        // passes), and it would stay green against an empty table, which is
+        // the exact failure mode this row exists to rule out.
         for (const family of expectedSet) {
-          expect(HARVEST_COMPONENT_ITEMS[family], `${label} ${family}`).toBe(
-            harvestItemForFamily(family),
+          expect(harvestItemForFamily(family), `${label} ${family}`).toBe(
+            EXPECTED_FAMILY_ITEMS[family],
           );
-          expect(typeof harvestItemForFamily(family), `${label} ${family} id`).toBe('string');
         }
         const r = harvestAt(id, selected);
         if (r.claimedBy === null) continue;
@@ -3270,7 +3282,7 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
           .filter((y) => y.kind !== 'specimen')
           .map((y) => y.itemId);
         expect(new Set(component), `${label} component ids`).toEqual(
-          new Set(expectedSet.map((f) => harvestItemForFamily(f))),
+          new Set(expectedSet.map((f) => EXPECTED_FAMILY_ITEMS[f])),
         );
         expect(expectedSet.length, `${label} extracted <= mapped`).toBeLessThanOrEqual(
           mapped.length,

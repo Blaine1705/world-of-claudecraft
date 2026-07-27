@@ -111,7 +111,9 @@ export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = [
 //    pick does extract (professions/gathering.ts harvestConcentrationBonus).
 // So wiring a new family here is neither a yield-only nor a local change. It
 // re-enables the harvest affordance on every template carrying that tag with no
-// code change, AND it re-tunes every mixed template's bonus back down. The same
+// code change, AND it re-tunes the bonus back down on every MIXED template
+// carrying that same tag (wiring `gills` moves the three murlocs and leaves
+// old_greyjaw alone, whose unmapped family is `claw`). The same
 // runs the other way: adding a decorative unlisted tag to a mob widens that
 // mob's bonus denominator, which is a balance edit. The bound that keeps it
 // honest (a corpse never out-pays the tag list it advertises) is a checked

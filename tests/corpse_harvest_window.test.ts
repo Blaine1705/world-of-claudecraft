@@ -11,7 +11,7 @@
 // timed harvest in professions/gathering, so the mapping is the "timing" the brief
 // requires stay untouched), the harvest-disabled state, and the empty short-circuit.
 
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import {
@@ -401,9 +401,17 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // from the client: the sim scores this pick exactly as it scores ['hide'].
     t.toggle('claw');
     expect(section.classList.contains('is-concentrated')).toBe(true);
-    // Naming both mapped families is the widest pick this corpse offers, so it
-    // is not a concentrate even though two of three boxes are unchecked-to-one.
+    // The discriminating state, and the reason this case exists: naming both
+    // MAPPED families is the widest pick this corpse offers, so it is not a
+    // concentrate even though only two of the three boxes are checked. The
+    // retired box-count definition called exactly this a concentrate, so a
+    // painter still keyed off a count reds right here.
+    t.toggle('claw');
     t.toggle('fang');
+    expect(t.boxes.filter((b) => b.checked).map((b) => b.value)).toEqual(['hide', 'fang']);
+    expect(section.classList.contains('is-concentrated')).toBe(false);
+    // Checking every box is the same world again, by the same rule.
+    t.toggle('claw');
     expect(section.classList.contains('is-concentrated')).toBe(false);
     // ...and a dead pick is never "concentrated", though its raw bonus is the
     // whole tag count.
@@ -417,13 +425,27 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // Same argument as the reason-line rule below: these classes are otherwise
     // pinned only by this file's own querySelector, so renaming one side would
     // leave the mark rendering as ordinary body text with every test green.
-    // The muted TOKEN is asserted rather than an opacity: a stacked opacity put
-    // the note at 2.97:1 on the parchment preset, under the 4.5:1 AA floor, and
-    // tests/theme.test.ts cannot see a loss that happens in a stylesheet.
-    const css = readFileSync(
-      path.resolve(process.cwd(), 'src/styles/components.css'),
-      'utf8',
-    ).replace(/\/\*[\s\S]*?\*\//g, '');
+    // The muted TOKEN is asserted rather than an opacity: a stacked opacity
+    // composited the note to 2.97:1 on the parchment preset, and
+    // tests/theme.test.ts structurally cannot see a loss that happens in a
+    // stylesheet rather than in a token. The token is not a 4.5:1 guarantee
+    // either (theme.ts repairs it to the 3:1 tier); what it buys is a floor the
+    // composite did not have, and the mark's meaning rides on the note TEXT.
+    //
+    // Read over the WHOLE styles directory, not one file: every negative below
+    // is a statement about the shipped stylesheet, and a rule re-added in
+    // hud.css, shell.css or hud.mobile.css would satisfy a single-file scan
+    // while re-breaking exactly what these pins protect.
+    const stripComments = (text: string) => text.replace(/\/\*[\s\S]*?\*\//g, '');
+    const stylesDir = path.resolve(process.cwd(), 'src/styles');
+    const allCss = readdirSync(stylesDir)
+      .filter((f) => f.endsWith('.css'))
+      .map((f) => stripComments(readFileSync(path.join(stylesDir, f), 'utf8')))
+      .join('\n');
+    expect(allCss.length).toBeGreaterThan(10000);
+    const css = stripComments(
+      readFileSync(path.resolve(process.cwd(), 'src/styles/components.css'), 'utf8'),
+    );
     const noteRule = /\.corpse-harvest-note\s*\{([^}]*)\}/.exec(css);
     expect(noteRule, '.corpse-harvest-note has no rule in components.css').not.toBeNull();
     expect(noteRule?.[1]).toContain('var(--color-text-muted)');
@@ -433,27 +455,44 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     expect(rowRule?.[1]).toContain('var(--color-text-muted)');
     // Scoped to the row's TEXT: dimming the whole label would dim the checkbox,
     // and a greyed checkbox is this HUD's disabled idiom, so a deliberately
-    // live control would read as a dead one.
-    expect(css).not.toMatch(/\.corpse-harvest-row-no-yield\s*\{/);
+    // live control would read as a dead one. Every selector mentioning the
+    // class must therefore end in `> span`, anywhere in the styles directory,
+    // which also rejects `.corpse-harvest-row-no-yield input` and a
+    // `body.mobile-touch` re-dim.
+    for (const [, selector] of allCss.matchAll(
+      /([^{};]*\.corpse-harvest-row-no-yield[^{};]*)\{/g,
+    )) {
+      expect(selector.trim(), 'dim must stay scoped to the row text').toMatch(/>\s*span$/);
+    }
     const hintRule = /\.corpse-harvest\.is-concentrated\s+\.corpse-harvest-hint\s*\{([^}]*)\}/.exec(
       css,
     );
     expect(hintRule, '.corpse-harvest.is-concentrated has no rule').not.toBeNull();
-    // Weight, not colour alone.
-    expect(hintRule?.[1]).toContain('font-weight');
+    // The whole cue is the opacity lift out of the .corpse-harvest-hint default,
+    // and it must stay metric-free: this block sits ABOVE the checkboxes and
+    // re-renders on every toggle, so a weight, a border or a padding could
+    // rewrap a long locale and shove the Harvest button under the player's
+    // finger mid-press.
+    expect(hintRule?.[1]).toContain('opacity: 1');
+    expect(hintRule?.[1]).not.toMatch(/font-weight|font-size|padding|margin|border/);
     // The picker rows are deliberately NOT in the mobile 40px touch-floor list,
     // and that is a decision worth pinning rather than leaving as an absence:
     // raising them pushes the Harvest button below the fold at the in-game
-    // landscape metrics, where the popup already stands 374 of 390 CSS px. The
-    // reasoning lives beside the rule in hud.mobile.css; this asserts the state
-    // it argues for, so re-adding the floor without redoing the layout reds.
-    const mobile = readFileSync(
-      path.resolve(process.cwd(), 'src/styles/hud.mobile.css'),
-      'utf8',
-    ).replace(/\/\*[\s\S]*?\*\//g, '');
-    expect(mobile).not.toMatch(/\.corpse-harvest-row[^{]*\{[^}]*min-height/);
+    // landscape metrics, where the popup is already pinned at its 350px cap on
+    // a 390px viewport. The reasoning lives beside the rule in hud.mobile.css;
+    // this asserts the state it argues for, so re-adding a floor without
+    // redoing the layout reds. Any height-shaped property, not just
+    // min-height, and across every stylesheet.
+    for (const [, selector, body] of allCss.matchAll(
+      /([^{};]*\.corpse-harvest-(?:row|check)[^{};]*)\{([^}]*)\}/g,
+    )) {
+      expect(
+        body,
+        `no height floor on ${selector.trim()} until the popup layout is redone`,
+      ).not.toMatch(/min-height|min-block-size|(^|;)\s*height\s*:|padding-block|padding-top/);
+    }
     // ...and the rule the floor DOES cover on this window is still there, so
-    // the assertion above is about the rows and not about an empty stylesheet.
-    expect(mobile).toContain('body.mobile-touch #loot-window .btn');
+    // the sweep above is about the rows and not about an empty stylesheet.
+    expect(allCss).toContain('body.mobile-touch #loot-window .btn');
   });
 });

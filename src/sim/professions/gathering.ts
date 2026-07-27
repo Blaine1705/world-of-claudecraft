@@ -791,9 +791,16 @@ export function resolveCorpseHarvest(currentClaimedBy: number | null, pid: numbe
 // Per-corpse focus picker (#1142): concentrate vs spread tradeoff.
 //
 // At a harvestable corpse the player chooses which tagged component(s) to
-// extract. Choosing FEWER components concentrates the effort and yields a
+// extract. Extracting FEWER components concentrates the effort and yields a
 // measurably higher tier per component than spreading across every tagged
 // type on the same corpse.
+//
+// "Extracting", not "choosing", and the difference is #2514's whole ruling: a
+// tagged family with no item behind it is never extracted, so checking or
+// unchecking it changes nothing. On a corpse carrying exactly ONE mapped
+// family that leaves no choice at all, and every legal pick there lands the
+// same outcome. harvestConcentrationBonus below owns that rule and states it
+// in full.
 
 /** Component yield tiers, worst to best. Independent of `ItemDef['quality']`
  * (a harvest yield is a raw material, not necessarily an equippable item),
@@ -845,8 +852,11 @@ export interface FocusHarvestYield {
  *     roll two signed yields (#2474).
  *   - A tag the corpse does not carry counts for NOTHING. Measured against the
  *     raw count it padded the pick past the `>= taggedComponents.length` spread
- *     threshold, so `['hide','junk']` on a two-tag corpse spread across every
- *     family at bonus 0 where `['hide']` concentrates on hide (#2504).
+ *     threshold, so `['hide','junk']` on a two-tag ALL-MAPPED corpse spread
+ *     across every family at bonus 0 where `['hide']` concentrates on hide
+ *     (#2504). The bonus-0 half of that is archaeology on a mixed corpse, where
+ *     the spread carries a bonus of its own (#2514); the sanitization it
+ *     describes is unchanged on every shape.
  * After the narrowing that second test can only ever be an equality: `picked`
  * is a deduped subset of the tags, so it can exceed their count only if the
  * tags themselves repeat, which tests/mob_component_tags.test.ts forbids. That

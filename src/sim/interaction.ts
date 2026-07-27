@@ -221,9 +221,11 @@ export function autoLootForParty(ctx: SimContext, mobId: number, triggerPid: num
  * player's persistent town focus: the corpse tags holding allocation points
  * (none focused falls through to the spread). An EXPLICIT array keeps the
  * #1142 semantics: empty or covering every tagged component spreads across
- * every tag (the #1141 behavior); picking fewer concentrates the effort for
+ * every tag (the #1141 behavior); extracting fewer concentrates the effort for
  * a higher tier per component, per resolveCorpseFocusHarvest in
- * professions/gathering.ts. That array is sanitized before any of it is read
+ * professions/gathering.ts. Extracting, not picking: an unmapped family is
+ * never extracted, so on a corpse carrying one mapped family there is no
+ * choice to make (#2514, see below). That array is sanitized before any of it is read
  * (effectiveFocusComponents): repeats collapse (#2474) and tags this corpse
  * does not carry drop out (#2504), so `['hide','hide']` and `['hide','junk']`
  * are both exactly `['hide']` here and in the pre-claim capacity gate below,

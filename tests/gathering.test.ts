@@ -202,6 +202,12 @@ describe('isHarvestableCorpse', () => {
       // the family is back in the roll and back in both dead arms.
       expect(emptyMappingDraws).toBe(1);
       expect(emptyMappingYields.map((y) => y.component)).toEqual(['hide']);
+      // The other rewrite the same reader has to survive, matching the
+      // Object.prototype sweep two cases above: a BARE lookup is still
+      // truthiness, so the empty-string rows above cannot see it, and it would
+      // put an inherited key back into the one set that feeds the tier roll.
+      expect(yieldingFocusComponents(['hide', 'constructor'], [])).toEqual(['hide']);
+      expect(harvestConcentrationBonus(['hide', 'constructor'], [])).toBe(1);
     } finally {
       delete table.claw;
     }

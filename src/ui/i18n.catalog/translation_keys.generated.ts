@@ -4110,7 +4110,7 @@ export type TranslationKeyFlat =
   | 'guide.professions.focusTitle'
   | 'guide.professions.gatherHubBody'
   | 'guide.professions.gatherHubHeading'
-  | 'guide.professions.harvestBody'
+  | 'guide.professions.harvestBodyChoice'
   | 'guide.professions.harvestTitle'
   | 'guide.professions.intro'
   | 'guide.professions.masterCellFmt'
