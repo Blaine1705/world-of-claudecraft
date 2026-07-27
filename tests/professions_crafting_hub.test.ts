@@ -29,6 +29,7 @@ import { ZONE3_ZONE } from '../src/sim/content/zone3';
 import { ITEMS, NPCS } from '../src/sim/data';
 import { craftItem, resolveCraft } from '../src/sim/professions/crafting';
 import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import { fineMaterialFor } from '../src/sim/professions/material_grades';
 import {
   isStationActive,
   placeMobileStationForPlayer,
@@ -196,7 +197,9 @@ describe('resolveCraft station gate (position-only, per type)', () => {
   const recipeId = 'recipe_thorium_mining_pick'; // engineering -> toolworks
 
   function grantPickReagents(sim: Sim, pid: number) {
-    grantItem(sim, 'thorium_ore', 4, pid);
+    // fine_iron_ore since D8: the tier-4 pick consumes the mirefen fine grade,
+    // which only a tier-3 pick can gather, so the tool below is the route up.
+    grantItem(sim, 'fine_iron_ore', 4, pid);
     grantItem(sim, 'mithril_mining_pick', 1, pid);
   }
 
@@ -211,7 +214,7 @@ describe('resolveCraft station gate (position-only, per type)', () => {
     expect(result.ok).toBe(false);
     expect(result.reason).toBe('station_required');
     // no side effect: reagents untouched on denial
-    expect(sim.countItem('thorium_ore', pid)).toBe(4);
+    expect(sim.countItem('fine_iron_ore', pid)).toBe(4);
     expect(sim.countItem('mithril_mining_pick', pid)).toBe(1);
   });
 
@@ -238,7 +241,7 @@ describe('resolveCraft station gate (position-only, per type)', () => {
     const result = resolveCraft((sim as any).ctx, pid, recipeId);
 
     expect(result.ok).toBe(true);
-    expect(sim.countItem('thorium_ore', pid)).toBe(0);
+    expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
     expect(sim.countItem('thorium_mining_pick', pid)).toBe(1);
   });
 
@@ -366,7 +369,16 @@ describe('station reagent sourcing (prog_tools_of_the_trade completability)', ()
   // premium reagents it is the ONLY one.
   const nodeYields = new Set<string>();
   for (const byZone of Object.values(NODE_MATERIAL_TABLE)) {
-    for (const row of Object.values(byZone)) nodeYields.add(row.itemId);
+    for (const row of Object.values(byZone)) {
+      nodeYields.add(row.itemId);
+      // A fine grade is the SAME node's yield to a player whose tool
+      // outclasses the material (D8), so it bottoms out at gathering exactly
+      // like its base and no counter carries it either. Derived from the grade
+      // table rather than listed, so a tenth material cannot ship with its
+      // fine grade looking sourceless.
+      const fineItemId = fineMaterialFor(row.itemId);
+      if (fineItemId) nodeYields.add(fineItemId);
+    }
   }
 
   function acquirable(itemId: string, seen: Set<string> = new Set()): boolean {
@@ -493,16 +505,17 @@ describe('station reagent sourcing (prog_tools_of_the_trade completability)', ()
     const anySim = sim as any;
     const meta = anySim.players.get(pid);
 
-    // Standing in for the harvest: thorium_ore is a live node yield (pinned
-    // above), so this models the only source a player now has for it.
-    grantItem(sim, 'thorium_ore', 4, pid);
+    // Standing in for the harvest: fine_iron_ore is a live node yield (pinned
+    // above) to a player whose pick outclasses mirefen, so this models the
+    // only source a player now has for it.
+    grantItem(sim, 'fine_iron_ore', 4, pid);
     grantItem(sim, 'mithril_mining_pick', 1, pid);
 
     placeAt(sim, pid, toolworks.pos);
     const result = craftItem(anySim.ctx, 'recipe_thorium_mining_pick', false, pid);
     expect(result.ok).toBe(true);
     expect(sim.countItem('thorium_mining_pick', pid)).toBe(1);
-    expect(sim.countItem('thorium_ore', pid)).toBe(0);
+    expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
     // The deed's real trigger: one station-bound craft, at any station.
     expect(meta.deedStats.counters.hubCraftsPerformed).toBe(1);
     sim.tick();

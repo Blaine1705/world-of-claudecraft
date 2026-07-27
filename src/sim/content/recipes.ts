@@ -226,6 +226,32 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
 // first station-bound recipes: real tier-4/5 gear already tier-gated well
 // past the common free floor, unlike COMMON_RECIPES/COMBO_RECIPES above
 // (both free-field-craftable, deliberately left ungated here).
+//
+// Every gathered reagent below is a FINE grade (D8,
+// professions/material_grades.ts), which is what turns this list from a
+// shopping list into a ladder: a fine material only drops for a player whose
+// tool is already strictly above it, and each recipe also consumes the tool
+// one rung down, so the rung below is the only route to the rung above. The
+// counts and the previous-tool reagent are unchanged; only the grade moved.
+//
+// Two rungs needed a decision rather than a swap, and both are recorded here
+// because the reagent lists alone do not show why they differ:
+//
+// - The tier-4 PICK could not simply take fine_thorium_ore. Osmium is the
+//   thornpeak (tier-3) yield, so its fine grade needs a tier-4 pick, which is
+//   this recipe's own output: a closed circuit with no entry. It is re-pointed
+//   onto fine_iron_ore, the mirefen (tier-2) yield, whose fine grade needs the
+//   tier-3 pick this recipe already consumes. That is exactly the shape the
+//   axe and sickle lines already had, so all three tier-4 recipes now read the
+//   same way instead of the pick being the odd one out.
+// - The tier-5 PICK has no node material at all: arcanite_bar is refined and
+//   vendor-only by locked ruling, and is consumed by nothing else, so
+//   re-pointing off it would strand both the bar and its vendor rows. It KEEPS
+//   the bar and GAINS fine_thorium_ore x2, matching the other two tier-5
+//   recipes (two units of the thornpeak fine grade plus the tier-4 tool) and
+//   giving fine_thorium_ore the consumer it would otherwise lack. It is the
+//   one rung that got more expensive rather than equivalent; that is the
+//   point, since it was the one rung still buyable off a counter.
 export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
   {
     id: 'recipe_thorium_mining_pick',
@@ -233,7 +259,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'thorium_mining_pick',
     resultCount: 1,
     reagents: [
-      { itemId: 'thorium_ore', count: 4 },
+      { itemId: 'fine_iron_ore', count: 4 },
       { itemId: 'mithril_mining_pick', count: 1 },
     ],
     skillReq: 75,
@@ -248,6 +274,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     resultCount: 1,
     reagents: [
       { itemId: 'arcanite_bar', count: 2 },
+      { itemId: 'fine_thorium_ore', count: 2 },
       { itemId: 'thorium_mining_pick', count: 1 },
     ],
     skillReq: 150,
@@ -261,7 +288,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'ashwood_axe',
     resultCount: 1,
     reagents: [
-      { itemId: 'ashwood_log', count: 4 },
+      { itemId: 'fine_ashwood_log', count: 4 },
       { itemId: 'ironbark_axe', count: 1 },
     ],
     skillReq: 75,
@@ -275,7 +302,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'elderwood_axe',
     resultCount: 1,
     reagents: [
-      { itemId: 'elderwood_log', count: 2 },
+      { itemId: 'fine_elderwood_log', count: 2 },
       { itemId: 'ashwood_axe', count: 1 },
     ],
     skillReq: 150,
@@ -289,7 +316,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'goldleaf_sickle',
     resultCount: 1,
     reagents: [
-      { itemId: 'goldleaf_herb', count: 4 },
+      { itemId: 'fine_goldleaf_herb', count: 4 },
       { itemId: 'silverleaf_sickle', count: 1 },
     ],
     skillReq: 75,
@@ -303,7 +330,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'sunpetal_sickle',
     resultCount: 1,
     reagents: [
-      { itemId: 'sunpetal_herb', count: 2 },
+      { itemId: 'fine_sunpetal_herb', count: 2 },
       { itemId: 'goldleaf_sickle', count: 1 },
     ],
     skillReq: 150,

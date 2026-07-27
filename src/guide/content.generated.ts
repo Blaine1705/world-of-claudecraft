@@ -4147,7 +4147,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Osmium Ore",
+            "name": "Fine Iron Ore",
             "count": 4
           },
           {
@@ -4181,6 +4181,10 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 2
           },
           {
+            "name": "Fine Osmium Ore",
+            "count": 2
+          },
+          {
             "name": "Osmium Mining Pick",
             "count": 1
           }
@@ -4207,7 +4211,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Ashwood Log",
+            "name": "Fine Ashwood Log",
             "count": 4
           },
           {
@@ -4237,7 +4241,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Highpine Log",
+            "name": "Fine Highpine Log",
             "count": 2
           },
           {
@@ -4267,7 +4271,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Goldleaf Herb",
+            "name": "Fine Goldleaf Herb",
             "count": 4
           },
           {
@@ -4297,7 +4301,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Sunpetal Herb",
+            "name": "Fine Sunpetal Herb",
             "count": 2
           },
           {

@@ -356,7 +356,7 @@ describe('the craft output arms each stand their hub line down', () => {
     if (!meta) throw new Error('missing player meta');
     meta.knownRecipes.add('recipe_thorium_mining_pick');
     meta.craftSkills.toolworks = 75;
-    sim.addItem('thorium_ore', 4, pid);
+    sim.addItem('fine_iron_ore', 4, pid);
     sim.addItem('mithril_mining_pick', 1, pid);
     placeAtStationFor(sim, pid, 'toolworks');
     sim.tick(); // drain the (loud) reagent grants

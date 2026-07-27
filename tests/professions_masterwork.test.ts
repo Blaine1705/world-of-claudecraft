@@ -27,6 +27,7 @@ import {
   masterworkBumpedQuality,
   masterworkProcChance,
 } from '../src/sim/professions/masterwork';
+import { fineMaterialFor, MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import {
   MASTERWORK_MATERIAL_TIER_CHANCE,
   MATERIAL_TIER_BY_ITEM,
@@ -626,11 +627,17 @@ describe('material-tier masterwork feed (material_tier.ts)', () => {
     expect(MASTERWORK_MATERIAL_TIER_CHANCE).toBe(0.01);
     expect(MATERIAL_TIER_BY_ITEM).toEqual({
       iron_ore: 1,
+      fine_iron_ore: 1,
       ashwood_log: 1,
+      fine_ashwood_log: 1,
       goldleaf_herb: 1,
+      fine_goldleaf_herb: 1,
       thorium_ore: 1,
+      fine_thorium_ore: 1,
       elderwood_log: 2,
+      fine_elderwood_log: 2,
       sunpetal_herb: 2,
+      fine_sunpetal_herb: 2,
       arcanite_bar: 2,
     });
     // An id absent from the table is tier 0: the baseline mob drops, the
@@ -639,6 +646,43 @@ describe('material-tier masterwork feed (material_tier.ts)', () => {
     expect(materialTierForItem('copper_ore')).toBe(0);
     expect(materialTierForItem('mithril_mining_pick')).toBe(0);
     expect(materialTierForItem('no_such_item')).toBe(0);
+  });
+
+  it('every fine grade inherits its base band, including absence', () => {
+    // The literal above says WHAT the table holds; this arm says WHY, over the
+    // whole grade catalog rather than the seven rows that happen to be listed.
+    // Derived from MATERIAL_GRADES, so a tenth material added later is covered
+    // the day it lands instead of quietly shipping on tier 0.
+    const graded = Object.keys(MATERIAL_GRADES);
+    expect(graded).toHaveLength(9);
+    for (const baseItemId of graded) {
+      const fineItemId = fineMaterialFor(baseItemId);
+      expect(fineItemId, baseItemId).toBeDefined();
+      expect(materialTierForItem(fineItemId as string), fineItemId).toBe(
+        materialTierForItem(baseItemId),
+      );
+    }
+    // Both sides of "including absence" are live, so the loop above is not a
+    // sweep over one uniform case: the eastbrook grades inherit tier 0 (kept
+    // out of the table entirely, protecting the golden-safety arm below), the
+    // other six inherit a real band.
+    const absent = graded.filter((id) => materialTierForItem(id) === 0);
+    const present = graded.filter((id) => materialTierForItem(id) > 0);
+    expect(absent.sort()).toEqual(['copper_ore', 'ironbark_log', 'silverleaf_herb']);
+    expect(present).toHaveLength(6);
+    for (const baseItemId of absent) {
+      expect(MATERIAL_TIER_BY_ITEM[fineMaterialFor(baseItemId) as string]).toBeUndefined();
+    }
+  });
+
+  it('the fine re-spec left every tool recipe proc chance where it was', () => {
+    // The D8 swap moved reagent ids only. Pinned as literals rather than as a
+    // before/after comparison, so a future re-tier that moved BOTH grades
+    // together could not slide through by staying self-consistent.
+    expect(materialTierBonusForReagents(recipeById('recipe_ashwood_axe')!.reagents)).toBe(0.01);
+    expect(materialTierBonusForReagents(recipeById('recipe_goldleaf_sickle')!.reagents)).toBe(0.01);
+    expect(materialTierBonusForReagents(recipeById('recipe_elderwood_axe')!.reagents)).toBe(0.02);
+    expect(materialTierBonusForReagents(recipeById('recipe_sunpetal_sickle')!.reagents)).toBe(0.02);
   });
 
   it('a tier-0-only reagent list resolves to exactly 0 (the golden-safety arm)', () => {
