@@ -27,7 +27,7 @@ vi.mock('../server/db', () => ({
 import { type ClientSession, GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import type { InvSlot, PlayerClass, SimEvent } from '../src/sim/types';
+import type { Entity, InvSlot, PlayerClass, SimEvent } from '../src/sim/types';
 
 const RARE_WEAPON = 'moggers_copper_cudgel'; // rare mace -> resonant_steel
 const COMMON_WEAPON = 'eastbrook_arming_sword';
@@ -43,6 +43,58 @@ type WireMsg = {
   list?: SimEvent[];
   self?: Record<string, unknown>;
   [k: string]: unknown;
+};
+
+type SnapMsg = WireMsg & {
+  t: 'snap';
+  self: Record<string, unknown>;
+};
+
+type BareClientWorldState = {
+  cfg: { seed: number; playerClass: PlayerClass };
+  entities: Map<number, Entity>;
+  playerId: number;
+  ownPlayerId: number;
+  ownPlayerClass: PlayerClass;
+  spectating: null;
+  cupInfo: null;
+  lastVcupRemainder: null;
+  lastVcupShared: null;
+  sportRole: null;
+  moveInput: Record<string, never>;
+  inventory: InvSlot[];
+  vendorBuyback: InvSlot[];
+  equipment: Record<string, never>;
+  accountCosmetics: { completedQuestIds: string[]; mechChromaIds: string[] };
+  copper: number;
+  honor: number;
+  lifetimeHonor: number;
+  xp: number;
+  known: string[];
+  questLog: Map<string, unknown>;
+  questsDone: Set<string>;
+  pendingQuestCommands: Map<string, unknown>;
+  partyInfo: null;
+  selectedDungeonDifficulty: 'normal';
+  tradeInfo: null;
+  duelInfo: null;
+  lastSnapAt: number;
+  snapInterval: number;
+  serverTickHz: null;
+  missingSince: Map<number, number>;
+  pendingFacingDelta: number;
+  connected: boolean;
+  eventQueue: SimEvent[];
+  mouselookFacing: null;
+  lastInputSentAt: number;
+  lastInputSig: string;
+  inputSeq: number;
+  pendingInputSeqSentAt: Map<number, number>;
+  ackedInputSeq: number;
+  inputEchoSamples: unknown[];
+  spectateFacingPending: boolean;
+  pendingSpectateFacing: null;
+  nodeCooldowns: Map<string, number>;
 };
 
 function fakeWs(): { sent: WireMsg[]; ws: unknown } {
@@ -63,13 +115,11 @@ function joinServer(
 }
 
 function placeAt(server: GameServer, pid: number, pos: { x: number; z: number }): void {
-  const entity = (
-    server.sim as unknown as { entities: Map<number, { pos: any; prevPos?: any }> }
-  ).entities.get(pid);
+  const entity = (server.sim as unknown as { entities: Map<number, Entity> }).entities.get(pid);
   if (!entity) throw new Error(`no entity for pid ${pid}`);
   entity.pos.x = pos.x;
   entity.pos.z = pos.z;
-  entity.prevPos = { x: pos.x, z: pos.z };
+  entity.prevPos = { ...entity.pos };
 }
 
 function routeTick(server: GameServer): void {
@@ -80,8 +130,15 @@ function broadcast(server: GameServer): void {
   (server as unknown as { broadcastSnapshots(): void }).broadcastSnapshots();
 }
 
-function lastSnap(sent: WireMsg[]): { self: Record<string, unknown> } | null {
-  for (let i = sent.length - 1; i >= 0; i--) if (sent[i].t === 'snap') return sent[i] as any;
+function isSnapMsg(msg: WireMsg): msg is SnapMsg {
+  return msg.t === 'snap' && typeof msg.self === 'object' && msg.self !== null;
+}
+
+function lastSnap(sent: WireMsg[]): SnapMsg | null {
+  for (let i = sent.length - 1; i >= 0; i--) {
+    const msg = sent[i];
+    if (isSnapMsg(msg)) return msg;
+  }
   return null;
 }
 
@@ -123,13 +180,12 @@ function grantVestMaterials(sim: Sim, pid: number): void {
 function craftedVestSlotIndex(sim: Sim, pid: number): number {
   return simInv(sim, pid).findIndex(
     (slot) =>
-      slot.itemId === CRAFTED_COMMON_ARMOR &&
-      slot.craftedRecipeId === CRAFTED_COMMON_ARMOR_RECIPE,
+      slot.itemId === CRAFTED_COMMON_ARMOR && slot.craftedRecipeId === CRAFTED_COMMON_ARMOR_RECIPE,
   );
 }
 
 function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
+  const c = Object.create(ClientWorld.prototype) as BareClientWorldState;
   c.cfg = { seed: 20061, playerClass };
   c.entities = new Map();
   c.playerId = pid;
@@ -174,7 +230,7 @@ function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWo
   c.spectateFacingPending = false;
   c.pendingSpectateFacing = null;
   c.nodeCooldowns = new Map();
-  return c;
+  return c as unknown as ClientWorld;
 }
 
 function applySnap(client: ClientWorld, snap: unknown): void {

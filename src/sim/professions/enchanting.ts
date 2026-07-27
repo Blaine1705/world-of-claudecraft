@@ -416,8 +416,7 @@ export function resolveDisenchant(
     ? consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex)
     : undefined;
   if (selected === null) return { ok: false, itemId, reason: 'not_held' };
-  let consumed: ConsumedDisenchantUnit | undefined =
-    selected === undefined ? undefined : selected;
+  let consumed: ConsumedDisenchantUnit | undefined = selected === undefined ? undefined : selected;
   if (slotIndex !== undefined && meta) ctx.onInventoryChangedForQuests(meta);
   if (slotIndex === undefined) {
     consumed = meta ? consumePreferredDisenchantVictim(meta.inventory, itemId) : undefined;
