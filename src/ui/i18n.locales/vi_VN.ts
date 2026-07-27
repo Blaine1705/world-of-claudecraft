@@ -2074,6 +2074,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.title': 'Lịch Sự Kiện',
   'hudChrome.calendar.titlePlaceholder': 'Tiêu đề sự kiện',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Xác này đã bị thu hoạch rồi.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Không thể thu hoạch bộ phận nào bạn đã chọn từ xác này.',
   'hudChrome.corpseHarvest.componentAria': 'Thu hoạch {component}',
   'hudChrome.corpseHarvest.components.claw': 'Móng Vuốt',
   'hudChrome.corpseHarvest.components.fang': 'Nanh',

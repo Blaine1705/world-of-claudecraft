@@ -1464,6 +1464,7 @@ export const cs_CZ: EnTranslations = {
       "harvestButton": "Sklidit",
       "harvestTooltip": "Sbírá zaškrtnuté součásti. Každou mrtvolu lze sklidit pouze jednou, kdo dřív přijde. Nepobírá kořist.",
       "concentrateHint": "Méně vybraných komponent dá každé vyšší stupeň.",
+      "nothingSelectedYields": "Z této mrtvoly nelze sklidit nic z vybraných komponent.",
       "alreadyHarvested": "Tato mrtvola už byla sklizena.",
       "componentAria": "Sklidit {component}",
       "components": {

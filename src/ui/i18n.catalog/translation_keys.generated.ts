@@ -5411,6 +5411,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.corpseHarvest.concentrateHint'
   | 'hudChrome.corpseHarvest.harvestButton'
   | 'hudChrome.corpseHarvest.harvestTooltip'
+  | 'hudChrome.corpseHarvest.nothingSelectedYields'
   | 'hudChrome.corpseHarvest.title'
   | 'hudChrome.craftName.alchemy'
   | 'hudChrome.craftName.armorcrafting'
