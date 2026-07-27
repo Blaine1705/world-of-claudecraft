@@ -2025,8 +2025,8 @@ export const zh_TW: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "世界市場待領取物品",
-      "tip": "有金幣或物品正在商人處等待你領取。"
+      "aria": "世界市場收益或物品待領取",
+      "tip": "銷售收益或退回物品正在商人處等待你領取。"
     },
     "noticeboard": {
       "empty": "看起來沒有張貼任何內容。"

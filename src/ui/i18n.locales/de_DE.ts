@@ -9118,6 +9118,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmTitle': 'Den Hüterzoll annehmen?',
   'hudChrome.gathering.gatherLine': 'Sie sammeln: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Sie sammeln: {name} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Ihr häutet: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Ihr häutet: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Ihr erhaltet außerdem {name}.',
   'hudChrome.mobile.professions': 'Berufe',
   'hudChrome.options.showThirdActionBar': 'Dritte Aktionsleiste anzeigen',
   'hudChrome.playerMenu.streamerBadgeTitle': 'Verifizierter Streamer',
@@ -9443,8 +9446,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} bis {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Verzaubert',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Verzaubert)',
-  'hudChrome.marketIndicator.aria': 'Abholung auf dem Weltmarkt wartet',
-  'hudChrome.marketIndicator.tip': 'Gold oder Gegenstände warten beim Händler auf dich.',
+  'hudChrome.marketIndicator.aria': 'Weltmarkt-Erlöse oder Gegenstände warten',
+  'hudChrome.marketIndicator.tip':
+    'Verkaufserlöse oder zurückgegebene Gegenstände warten beim Händler auf dich.',
   'hudChrome.materialHint.arcaneDust':
     'Verzauberungsreagenz. Entzaubert aus gewöhnlicher und ungewöhnlicher Ausrüstung.',
   'hudChrome.materialHint.arcaneEssence':
@@ -9482,4 +9486,16 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Ersetzt {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Dieser Gegenstand hat diese Verzauberung bereits.',
   'hudChrome.enchanting.sameEnchantTag': 'Bereits angewendet',
+  'hudChrome.crafting.craftedToastQty': 'Hergestellt: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Du entzauberst {item} zu {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Du entzauberst {item} zu {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Du gewinnst außerdem {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Du gewinnst außerdem {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Du zerlegst {item} zu {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Du zerlegst {item} zu {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Nicht verzaubert',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Bleibt erhalten: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Zeichen des Herstellers',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Meisterwerkbonus',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Auftragsbindung',
 };

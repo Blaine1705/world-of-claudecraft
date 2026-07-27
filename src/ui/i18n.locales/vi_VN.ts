@@ -9109,6 +9109,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmTitle': 'Chấp nhận Cái Giá của Người Canh Giữ?',
   'hudChrome.gathering.gatherLine': 'Bạn tập hợp: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Bạn tập hợp: {name} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Bạn thu hoạch: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Bạn thu hoạch: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Bạn cũng thu được {name}.',
   'hudChrome.mobile.professions': 'Nghề nghiệp',
   'hudChrome.options.showThirdActionBar': 'Hiển thị thanh hành động thứ ba',
   'hudChrome.playerMenu.streamerBadgeTitle': 'Người phát trực tiếp đã được xác minh',
@@ -9279,8 +9282,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} đến {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Đã Pháp Khắc',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Đã Pháp Khắc)',
-  'hudChrome.marketIndicator.aria': 'Có hàng chờ thu tại Chợ Thế Giới',
-  'hudChrome.marketIndicator.tip': 'Vàng hoặc vật phẩm đang chờ bạn tại Thương Nhân.',
+  'hudChrome.marketIndicator.aria': 'Tiền bán hoặc vật phẩm Chợ Thế Giới đang chờ',
+  'hudChrome.marketIndicator.tip':
+    'Tiền bán hàng hoặc vật phẩm bị trả lại đang chờ bạn tại Thương Nhân.',
   'hudChrome.materialHint.arcaneDust':
     'Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị phổ thông và khác thường.',
   'hudChrome.materialHint.arcaneEssence':
@@ -9318,4 +9322,16 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Thay Thế {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Vật phẩm đó đã có phép khắc đó rồi.',
   'hudChrome.enchanting.sameEnchantTag': 'Đã Áp Dụng',
+  'hudChrome.crafting.craftedToastQty': 'Đã chế tác: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Bạn hủy pháp khắc {item} thành {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Bạn hủy pháp khắc {item} thành {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Bạn cũng thu hồi {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Bạn cũng thu hồi {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Bạn tháo dỡ {item} thành {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Bạn tháo dỡ {item} thành {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Chưa pháp khắc',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Giữ lại: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Dấu người chế tạo',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Thưởng tuyệt phẩm',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Ràng buộc ủy thác',
 };

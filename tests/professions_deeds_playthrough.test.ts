@@ -259,7 +259,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
   });
 
   // Raised timeout (the climb_slope idiom): this beat drives thousands of
-  // REAL world ticks (15 bite-and-reel sessions plus bounded combat waits),
+  // REAL world ticks (dozens of bite-and-reel sessions plus bounded combat waits),
   // which overruns the 5s default under CI/core contention; every loop is
   // guard-bounded, so a genuine hang still terminates into a failed pin.
   it('beat 11: the koi lands through the REAL bite-and-reel loop and the deed fires on the catch', {
@@ -300,8 +300,8 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       }
     }
     // Hunted literal (seed 4242, after every beat above): the koi bites on
-    // session index 14.
-    expect(koiSession).toBe(14);
+    // session index 55.
+    expect(koiSession).toBe(55);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -323,18 +323,18 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Hunted literals (seed 4242, after every beat above): the harvest index
     // where each flavor's 1-in-90 event fires under the shared stream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 66 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 98 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 16,
+        hitAt: 133,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 227,
+        hitAt: 94,
       },
     ];
     for (const hunt of hunts) {
@@ -392,8 +392,8 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       if (sim.countItem('pristine_hide', pid) > 0) hitAt = i;
     }
     // Hunted literal (seed 4242, after every beat above): the rare-or-better
-    // rarity roll that mints the signed specimen lands on attempt index 9.
-    expect(hitAt).toBe(9);
+    // rarity roll that mints the signed specimen lands on attempt index 1.
+    expect(hitAt).toBe(1);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);

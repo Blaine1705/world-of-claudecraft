@@ -9311,6 +9311,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmTitle': 'Accepter le Glas du Veilleur ?',
   'hudChrome.gathering.gatherLine': 'Vous rassemblez : {name}.',
   'hudChrome.gathering.gatherLineQty': 'Vous rassemblez : {name} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Vous dépècez : {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Vous dépècez : {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Vous récupérez aussi {name}.',
   'hudChrome.mobile.professions': 'Métiers',
   'hudChrome.options.showThirdActionBar': "Afficher la troisième barre d'action",
   'hudChrome.playerMenu.streamerBadgeTitle': 'Streamer vérifié',
@@ -9489,8 +9492,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} à {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Enchanté',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Enchanté)',
-  'hudChrome.marketIndicator.aria': 'Collecte du Marché mondial en attente',
-  'hudChrome.marketIndicator.tip': "De l'or ou des objets vous attendent chez le Marchand.",
+  'hudChrome.marketIndicator.aria': 'Produit ou objets du Marché mondial en attente',
+  'hudChrome.marketIndicator.tip':
+    'Le produit de vos ventes ou des objets retournés vous attendent chez le Marchand.',
   'hudChrome.materialHint.arcaneDust':
     "Réactif d'enchantement. Obtenu en désenchantant de l'équipement commun et peu commun.",
   'hudChrome.materialHint.arcaneEssence':
@@ -9528,4 +9532,16 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Remplace {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Cet objet a déjà cet enchantement.',
   'hudChrome.enchanting.sameEnchantTag': 'Déjà appliqué',
+  'hudChrome.crafting.craftedToastQty': 'Fabriqué : {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Vous désenchantez {item} en {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Vous désenchantez {item} en {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Vous récupérez aussi {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Vous récupérez aussi {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Vous récupérez {item} en {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Vous récupérez {item} en {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Non enchanté',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Conservé : {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Marque du fabricant',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': "Bonus d'ouvrage de maître",
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Lien de commande',
 };

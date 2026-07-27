@@ -9191,6 +9191,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmTitle': 'De Tol van de Hoeder accepteren?',
   'hudChrome.gathering.gatherLine': 'Jij verzamelt: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Je verzamelt: {name} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Je oogst: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Je oogst: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Je krijgt ook {name}.',
   'hudChrome.mobile.professions': 'Beroepen',
   'hudChrome.options.showThirdActionBar': 'Derde actiebalk tonen',
   'hudChrome.playerMenu.streamerBadgeTitle': 'Geverifieerde streamer',
@@ -9361,8 +9364,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} tot {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Betoverd',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Betoverd)',
-  'hudChrome.marketIndicator.aria': 'Ophaling wacht bij de Wereldmarkt',
-  'hudChrome.marketIndicator.tip': 'Goud of voorwerpen wachten op je bij de Koopman.',
+  'hudChrome.marketIndicator.aria': 'Wereldmarkt-opbrengst of voorwerpen wachten',
+  'hudChrome.marketIndicator.tip':
+    'Verkoopopbrengst of teruggekeerde voorwerpen wachten op je bij de Koopman.',
   'hudChrome.materialHint.arcaneDust':
     'Betoveringsreagens. Verkregen door het onbetoveren van gewone en ongewone uitrusting.',
   'hudChrome.materialHint.arcaneEssence':
@@ -9400,4 +9404,16 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Vervangt {enchant}',
   'hudChrome.enchanting.sameEnchant': 'Dat voorwerp heeft die betovering al.',
   'hudChrome.enchanting.sameEnchantTag': 'Al toegepast',
+  'hudChrome.crafting.craftedToastQty': 'Gemaakt: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Je onbetoverd {item} tot {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Je onbetoverd {item} tot {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Je krijgt ook {material} terug.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Je krijgt ook {material} x{qty} terug.',
+  'hudChrome.enchanting.salvagedYield': 'Je salvaged {item} tot {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Je salvaged {item} tot {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Niet betoverd',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Behouden: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Makersmerk',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Meesterwerkbonus',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Opdrachtbinding',
 };
