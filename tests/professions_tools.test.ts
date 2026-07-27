@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
+import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { TOOL_EFFECTS } from '../src/sim/content/professions';
 import { VENDOR_ROW_GATES } from '../src/sim/content/vendor_row_gates';
 import { GATHER_NODES, ITEMS, NPCS } from '../src/sim/data';
@@ -660,7 +662,7 @@ describe('the one rarity ladder both bonuses read', () => {
 });
 
 describe('crafted higher-tier base tools and monster-material gating (#1135)', () => {
-  it('crafted tier-4 and tier-5 tools exist for each gathering profession, never vendor-sold', () => {
+  it('crafted tier-4 and tier-5 tools exist for each gathering profession, never sold for copper', () => {
     const mining = [ITEMS.thorium_mining_pick, ITEMS.arcanite_mining_pick];
     const logging = [ITEMS.ashwood_axe, ITEMS.elderwood_axe];
     const herbalism = [ITEMS.goldleaf_sickle, ITEMS.sunpetal_sickle];
@@ -678,13 +680,35 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
       [...mining, ...logging, ...herbalism, ...fishing].map((item) => item.id),
     );
     expect([...craftedIds].sort()).toEqual(craftedFromContent.map((d) => d.id).sort());
-    // Direct scan of every NPC's vendorItems list, not just the buyValue
-    // convention: makes the "never vendor-sold" claim self-contained instead
-    // of leaning on buyValue and vendorItems always staying in lockstep.
+    // THE CLAIM IS "NEVER FOR COPPER", NOT "NEVER ON A COUNTER". Marks are a
+    // delve currency you can only earn by running the delve, so a Marks row is
+    // a route through content rather than a shopping trip, and ruling 5 allows
+    // it. Copper is the thing that would make the tool ladder buyable.
+    //
+    // The sweep below covers all THREE stock tables, not just NPCS. It used to
+    // read NPCS[*].vendorItems alone, which was a hole rather than a
+    // technicality: NPCS.heroic_quartermaster carries `vendorItems: undefined`
+    // and keeps its real stock in HEROIC_VENDOR_STOCK, and the delve counters
+    // keep theirs in DELVE_SHOPS, so BOTH were invisible here. A crafted tool
+    // added to either would have passed this guard untouched.
     for (const npc of Object.values(NPCS)) {
       for (const stockedId of npc.vendorItems ?? []) {
-        expect(craftedIds.has(stockedId)).toBe(false);
+        expect(craftedIds.has(stockedId), `${stockedId} on a copper counter`).toBe(false);
       }
+    }
+    // The heroic quartermaster's counter is Marks-priced too, but no tool is
+    // stocked there (they live in the delve shop, see content/delves/shop.ts).
+    for (const offer of HEROIC_VENDOR_STOCK) {
+      expect(craftedIds.has(offer.itemId), `${offer.itemId} on the heroic counter`).toBe(false);
+    }
+    // The hole this guard could not see, now asserted from the other side: the
+    // delve shop DOES stock every one of them, and every such row is priced in
+    // Marks with no copper price anywhere on the def.
+    const delveStocked = new Set(
+      Object.values(DELVE_SHOPS).flatMap((entries) => entries.map((e) => e.itemId)),
+    );
+    for (const id of craftedIds) {
+      expect(delveStocked.has(id), `${id} needs a Marks route`).toBe(true);
     }
     for (const [profession, tools] of [
       ['mining', mining],
@@ -695,9 +719,24 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
       expect(tools.every(Boolean)).toBe(true);
       const tiers = tools.map((item) => gatherToolTier(item, profession));
       expect(tiers).toEqual([4, 5]);
-      // Crafted tools are produced by a profession, not bought: no vendor price.
+      // Produced by a profession or bought with Marks, never with coin: no
+      // buyValue is what makes "not for copper" true of the item itself, so a
+      // future counter row cannot quietly price one.
       for (const item of tools) expect(item.buyValue).toBeUndefined();
     }
+  });
+
+  it('the copper sweep is non-vacuous: the counters it reads really do stock things', () => {
+    // Without this, emptying vendorItems (or the guard reading the wrong field)
+    // would leave the sweep above passing over nothing at all.
+    const copperStocked = Object.values(NPCS).flatMap((npc) => npc.vendorItems ?? []);
+    expect(copperStocked.length).toBeGreaterThan(10);
+    expect(HEROIC_VENDOR_STOCK.length).toBeGreaterThan(0);
+    expect(Object.values(DELVE_SHOPS).flat().length).toBeGreaterThan(0);
+    // And a copper counter really does sell the LOWER tools, so "no tier-4/5
+    // tool on a copper counter" is a boundary rather than "no tool anywhere".
+    expect(copperStocked).toContain('copper_mining_pick');
+    expect(ITEMS.copper_mining_pick.buyValue).toBeGreaterThan(0);
   });
 
   it('a tier-3 tool cannot access a tier-4 monster material, a tier-4 tool can', () => {

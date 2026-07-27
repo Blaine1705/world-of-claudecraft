@@ -11,6 +11,8 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
+import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { FISHING_RARE_ID, FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import { craftMaxSkillFor } from '../src/sim/content/professions';
 import { ALL_RECIPES, ROD_RECIPES, TOOL_RECIPES } from '../src/sim/content/recipes';
@@ -172,7 +174,7 @@ describe('the crafted rod ladder', () => {
     }
   });
 
-  it('both rods are craft-only: no counter stocks them and neither carries a price', () => {
+  it('neither rod is ever sold for copper, on any of the three stock tables', () => {
     for (const recipe of ROD_RECIPES) {
       expect(ITEMS[recipe.resultItemId].buyValue).toBeUndefined();
       // The price convention alone is not the claim in the title: sweep the
@@ -183,6 +185,28 @@ describe('the crafted rod ladder', () => {
           recipe.resultItemId,
         );
       }
+      // The two tables an NPCS-only sweep cannot see. The heroic
+      // quartermaster's vendorItems is undefined and its real stock lives in
+      // HEROIC_VENDOR_STOCK, so this arm was blind to the counter most likely
+      // to be handed a top-tier item.
+      expect(
+        HEROIC_VENDOR_STOCK.map((o) => o.itemId),
+        `the heroic counter stocks ${recipe.resultItemId}`,
+      ).not.toContain(recipe.resultItemId);
+    }
+  });
+
+  it('both rods ARE reachable without engineering, priced in Marks', () => {
+    // The other half of the restated claim. "Craft-only" stopped being true
+    // when the delve counter gained a Marks route, and a guard that only ever
+    // says where a thing is absent cannot notice that its one source vanished.
+    const delveRows = Object.values(DELVE_SHOPS).flat();
+    for (const recipe of ROD_RECIPES) {
+      const row = delveRows.find((e) => e.itemId === recipe.resultItemId);
+      expect(row, `${recipe.resultItemId} needs a non-crafter route`).toBeDefined();
+      expect(row?.marks).toBeGreaterThan(0);
+      // Marks, and still no copper price on the def itself.
+      expect(ITEMS[recipe.resultItemId].buyValue).toBeUndefined();
     }
   });
 });
