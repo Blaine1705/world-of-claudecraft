@@ -1101,6 +1101,12 @@ function driveProblems(declared: readonly DriveRow[], observed: readonly CallSit
   return problems.sort();
 }
 
+/**
+ * A callee whose own name says it is a window. Case-sensitive on purpose, so the global
+ * `window.setTimeout` is not swept in with `this.arenaWindow.render`.
+ */
+const NAMES_A_WINDOW = /\.\w*(?:Window|Popup)\b/;
+
 /** The per-row shape rules, which nothing about a green diff would otherwise enforce. */
 function rowShapeProblems(declared: readonly DriveRow[]): string[] {
   const problems: string[] = [];
@@ -1116,6 +1122,16 @@ function rowShapeProblems(declared: readonly DriveRow[]): string[] {
     }
     if (row.guard?.kind === 'none' && !row.guard.why.trim()) {
       problems.push(`${at} (guard kind "none" must record WHY there is none)`);
+    }
+    // The cheapest way out of the guard requirement is to relabel the row rather than fix
+    // it, and mutation testing found exactly that: flipping card_duel_window's row to
+    // `chrome` dropped its guard with the whole suite green. A name is not proof a call
+    // touches a window, but it IS proof of what the author called it, so where the callee
+    // says window or popup the classification is not a judgment any more.
+    if (NAMES_A_WINDOW.test(row.call) && row.surface !== 'window') {
+      problems.push(
+        `${at} (a callee named Window/Popup is a window row: it cannot be relabelled ${row.surface} to shed its guard)`,
+      );
     }
   }
   return problems;
@@ -1219,10 +1235,18 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     const problems = rowShapeProblems(HUD_UPDATE_DRIVES);
     expect(problems, `malformed registry row(s):\n${problems.join('\n')}`).toEqual([]);
     expect(HUD_UPDATE_DRIVES.length).toBeGreaterThan(100);
-    // A floor on the WINDOW rows specifically, so a future edit cannot answer the diff by
-    // reclassifying the whole family to chrome and keeping everything green.
+    // The surface split is pinned EXACTLY, not floored. A floor is what let mutation
+    // testing relabel one window row as chrome and shed its guard with the suite green:
+    // dropping one of thirty-odd sits comfortably above any floor worth setting. Adding a
+    // call to update() already costs a row here, so it costing a number here too is
+    // proportionate, and it forces the surface question to be answered out loud.
+    const bySurface: Record<Surface, number> = { window: 0, chrome: 0, none: 0 };
+    for (const row of HUD_UPDATE_DRIVES) bySurface[row.surface]++;
+    expect(
+      bySurface,
+      "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
+    ).toEqual({ window: 37, chrome: 67, none: 9 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
-    expect(windows.length, 'the window rows vanished from the registry').toBeGreaterThan(25);
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.renderTownFocus');
   });
@@ -1354,6 +1378,7 @@ describe('the drive registry checks themselves have teeth', () => {
         },
         { call: 'this.d', band: 'frame', gate: '', surface: 'none', why: '' },
         { call: 'this.e', band: 'frame', gate: '', sites: 0, surface: 'none', why: 'x' },
+        { call: 'this.someWindow.render', band: 'frame', gate: '', surface: 'chrome', why: 'x' },
       ]),
     ).toEqual([
       'this.a|frame| (a window row must name its invalidation guard)',
@@ -1361,7 +1386,14 @@ describe('the drive registry checks themselves have teeth', () => {
       'this.c|frame| (guard kind "none" must record WHY there is none)',
       'this.d|frame| (why is empty: say what it repaints)',
       'this.e|frame| (sites must be at least 1)',
+      'this.someWindow.render|frame| (a callee named Window/Popup is a window row: it cannot be relabelled chrome to shed its guard)',
     ]);
+    // The global `window.` object is lowercase and must not be swept in with it.
+    expect(
+      rowShapeProblems([
+        { call: 'window.setTimeout', band: 'frame', gate: '', surface: 'chrome', why: 'x' },
+      ]),
+    ).toEqual([]);
     expect(
       rowShapeProblems([
         {
