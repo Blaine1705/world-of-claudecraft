@@ -65,6 +65,66 @@ describe('testBlockCalls', () => {
     }
   });
 
+  it('records the outer call of a TAGGED-TEMPLATE each, the other spelling of a table', () => {
+    // `describe.each` and `it.each` also take a template-literal table, and that
+    // spelling reaches two arms nothing else here does: the tagged-template arm
+    // of the head resolver, and the tagged-template arm of the callee-link test.
+    // Both are deletable while the whole suite is green today, because the repo
+    // happens to use only the array form. It is the same false-positive shape as
+    // the array case one door over: two blocks sharing a table are identical up
+    // to the closing backtick, so a walk that recorded the TAG instead of the
+    // call would report them as duplicates of each other.
+    const source = [
+      'describe.each`',
+      '  a    | b',
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: the table row is the fixture
+      '  ${1} | ${2}',
+      "`('first $a', ({ a }) => {",
+      '  expect(a).toBe(1);',
+      '});',
+      'describe.each`',
+      '  a    | b',
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: the table row is the fixture
+      '  ${1} | ${2}',
+      "`('second $a', ({ a }) => {",
+      '  expect(a).toBe(1);',
+      '});',
+    ].join('\n');
+    const { blocks } = testBlockCalls(source);
+    expect(blocks.map((b) => `${b.head}.${b.chain.join('.')} ${b.line}-${b.endLine}`)).toEqual([
+      'describe.each 1-6',
+      'describe.each 7-12',
+    ]);
+    expect(duplicateSiblingBlocks(source)).toEqual([]);
+    // ...and the same block twice, table and all, is still caught.
+    const lines = source.split('\n').slice(0, 6);
+    expect(
+      duplicateSiblingBlocks(`${lines.join('\n')}\n${lines.join('\n')}`).map((d) => d.repeat),
+    ).toEqual(['7-12']);
+  });
+
+  it('records a block whose result is used, not the property access on it', () => {
+    // The third callee-link arm: a call whose PARENT is a property access. It
+    // matters more since the walk started threading the parent by hand instead of
+    // reading `node.parent`, because the arm now depends on this module passing
+    // the right node rather than on the compiler having set one.
+    const source = [
+      "const handle = describe('outer', () => {",
+      "  it('inner', () => {",
+      '    expect(1).toBe(1);',
+      '  });',
+      '}).id;',
+    ].join('\n');
+    const { blocks } = testBlockCalls(source);
+    // The describe is still one block spanning its whole call, and the `.id`
+    // access does not turn it into a link that gets skipped.
+    expect(blocks.map((b) => `${b.head} ${b.line}-${b.endLine}`)).toEqual([
+      'describe 1-5',
+      'it 2-4',
+    ]);
+    expect(blocks[1].parent).not.toBe('root');
+  });
+
   it('records the OUTER call of a modifier chain, never the inner one', () => {
     // `it.each(table)('name', fn)` holds two CallExpressions. Recording the inner
     // one reads `it.each([0, 2])` as the whole block, so two cases that merely

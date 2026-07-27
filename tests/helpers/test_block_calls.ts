@@ -57,8 +57,14 @@ export const BLOCK_HEADS: readonly string[] = ['describe', 'it', 'test', 'suite'
  * rest are vitest's remaining modifiers, listed because a MISSING one fails
  * silently: the head stops resolving, those blocks leave the scan, and the guard
  * stays green over a smaller surface. `duplicate_test_blocks.test.ts` pins the
- * chains this list does NOT resolve, so a modifier arriving in a vitest upgrade
- * fails loudly instead.
+ * chains this list does NOT resolve, which turns that into a loud failure, but
+ * only for a modifier used WITH A CALLBACK, since that is how the diagnostic
+ * below keeps the rig calls out. A modifier that only ever appears without one
+ * (`it.todo('name')` is the realistic case) would still drop its blocks quietly.
+ * That residue is small on purpose rather than by oversight: a `todo` registers
+ * no body, so it cannot be half of a duplicated pair worth catching, and
+ * admitting no-callback calls to the diagnostic would bury a real signal under
+ * rig accessors that take a string, like `test.root.querySelector('.master')`.
  */
 export const BLOCK_MODIFIERS: readonly string[] = [
   'concurrent',
@@ -146,15 +152,46 @@ function resolveHead(expr: ts.Expression, chain: string[]): string | null {
  * inner call is just `it.each([0, 2])`, so two cases sharing a table are
  * byte-identical there while their real bodies differ completely. That single
  * mistake produced 45 of the 47 findings the first cut of this scan reported.
+ *
+ * Being the CALLEE is the whole test, and a third clause for "the parent is a
+ * property access" was tried and removed. It never fired over the real tree, and
+ * when a fixture finally reached it, it was wrong: `describe('x', fn).id` is a
+ * block whose result is read, not a link in a chain, and that clause dropped the
+ * describe and every case inside it. A modifier chain always puts the property
+ * access BEFORE the call (`it.skip.each(t)(...)`), so the two clauses below cover
+ * it and the third could only ever misfire.
+ *
+ * `parent` is threaded down from the walk rather than read off `node.parent`,
+ * which is why this module can parse with `setParentNodes` OFF. That flag is not
+ * a detail here: it roughly doubles the cost of `createSourceFile`, and the guard
+ * built on this walk parses every one of the repo's 1600-odd test sources. With
+ * it on, the scan ran long enough to blow vitest's 5-second per-case timeout
+ * whenever the machine was busy, which is exactly when CI runs it.
  */
-function isCalleeLink(node: ts.CallExpression): boolean {
-  const parent = node.parent;
-  if (!parent) return false;
+function isCalleeLink(node: ts.CallExpression, parent: ts.Node | null): boolean {
+  if (parent === null) return false;
   if (ts.isCallExpression(parent) && parent.expression === node) return true;
-  if (ts.isTaggedTemplateExpression(parent) && parent.tag === node) return true;
-  return ts.isPropertyAccessExpression(parent);
+  return ts.isTaggedTemplateExpression(parent) && parent.tag === node;
 }
 
+/**
+ * Whether a call carries an inline function argument, the shape every real block
+ * has and no rig accessor does. It is what narrows the unresolved diagnostic to
+ * something readable.
+ *
+ * THE COST, written down rather than left to be rediscovered. The diagnostic is
+ * the only thing that turns a silently narrowing head resolver into a loud
+ * failure, and this narrowing puts two shapes outside it:
+ *   - a block whose callback is a NAMED reference (`it.newModifier('x', run)`),
+ *     since only an inline arrow or function expression counts here;
+ *   - a chain broken by an element access (`test.confirmations[0].onOk()`),
+ *     which makes `resolveHead` return null before the diagnostic is reached at
+ *     all. Three such calls exist in the tree today, all of them rig accessors.
+ * Either would stop being a block and raise nothing. Both are accepted: widening
+ * to no-callback calls buries the signal under rig accessors that take a string
+ * (`test.root.querySelector('.master')` and dozens like it), which is the state
+ * this narrowing exists to escape.
+ */
 const takesCallback = (node: ts.CallExpression): boolean =>
   node.arguments.some((a) => ts.isArrowFunction(a) || ts.isFunctionExpression(a));
 
@@ -168,26 +205,28 @@ export function testBlockCalls(
   source: string,
   fileName = 'source.test.ts',
 ): { blocks: TestBlockCall[]; unresolved: UnresolvedBlockCall[] } {
-  const sf = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true);
+  const sf = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, false);
   const blocks: TestBlockCall[] = [];
   const unresolved: UnresolvedBlockCall[] = [];
   const lineOf = (pos: number) => sf.getLineAndCharacterOfPosition(pos).line + 1;
 
-  const visit = (node: ts.Node, parent: string): void => {
+  const visit = (node: ts.Node, astParent: ts.Node | null, parent: string): void => {
     let childParent = parent;
-    if (ts.isCallExpression(node) && !isCalleeLink(node)) {
+    if (ts.isCallExpression(node) && !isCalleeLink(node, astParent)) {
       const chain: string[] = [];
       const head = resolveHead(node.expression, chain);
       if (head !== null && BLOCK_HEADS.includes(head)) {
+        // `node.pos` includes the leading trivia, so the block text would start
+        // at the blank line above it and no two copies would ever match.
         const start = node.getStart(sf);
         if (chain.every(isModifier)) {
           blocks.push({
             head,
             chain,
             parent,
-            text: source.slice(start, node.getEnd()),
+            text: source.slice(start, node.end),
             line: lineOf(start),
-            endLine: lineOf(node.getEnd() - 1),
+            endLine: lineOf(node.end - 1),
           });
           // Blocks nested inside this one are siblings of each other, not of
           // this block's own siblings.
@@ -197,9 +236,9 @@ export function testBlockCalls(
         }
       }
     }
-    ts.forEachChild(node, (child) => visit(child, childParent));
+    ts.forEachChild(node, (child) => visit(child, node, childParent));
   };
-  visit(sf, 'root');
+  visit(sf, null, 'root');
   return { blocks, unresolved };
 }
 

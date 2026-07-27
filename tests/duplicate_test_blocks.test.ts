@@ -43,32 +43,45 @@ interface Offender {
   readonly repeat: string;
 }
 
-/** Every byte-identical duplicated sibling block under `root`, file-labeled. */
-const duplicatesUnder = (root: string): Offender[] =>
-  tsFilesUnder(root).flatMap(({ file, full }) =>
-    duplicateSiblingBlocks(readFileSync(full, 'utf8'), file).map((d) => ({ file, ...d })),
-  );
-
-/** Every block under `root`, and the chains the head resolver did not recognize. */
-const blocksUnder = (root: string) =>
-  tsFilesUnder(root).map(({ file, full }) => ({
-    file,
-    ...testBlockCalls(readFileSync(full, 'utf8'), file),
-  }));
+/**
+ * One pass over `root`: every file's blocks, its duplicates, and the chains the
+ * head resolver did not recognize.
+ *
+ * ONE pass on purpose. Parsing 1600-odd sources is the whole cost of this guard,
+ * so a second producer beside this one is not just waste: the first cut ran the
+ * duplicate sweep inside its own case and the block sweep at collection, and the
+ * doubled work blew vitest's 5-second per-case timeout whenever the machine was
+ * loaded, which is the state CI runs in. Every case below reads this one result.
+ */
+const scanUnder = (root: string) =>
+  tsFilesUnder(root).map(({ file, full }) => {
+    const source = readFileSync(full, 'utf8');
+    return {
+      file,
+      ...testBlockCalls(source, file),
+      duplicates: duplicateSiblingBlocks(source, file).map((d): Offender => ({ file, ...d })),
+    };
+  });
 
 const describeOffender = (o: Offender): string =>
   `${o.file} lines ${o.repeat} repeat lines ${o.first} verbatim: ${o.title}`;
 
 describe('no test file registers the same block twice (#2506)', () => {
-  const scanned = tsFilesUnder(TESTS_ROOT);
-  const perFile = blocksUnder(TESTS_ROOT);
+  // ONE corpus, read once, and every case below measures THAT list. Deliberately
+  // not a second `tsFilesUnder` call beside the scan: if the offender sweep and
+  // the floors walked separately, a narrowing applied inside the sweep alone (a
+  // stray `.filter(f => f.file.endsWith('.test.ts'))`, say) would leave every
+  // floor, the subdirectory pin and the fixture green while the sweep quietly
+  // covered less. The floors can only vouch for the sweep if they are counting
+  // the same files it read.
+  const perFile = scanUnder(TESTS_ROOT);
   const allBlocks = perFile.flatMap((f) => f.blocks);
 
   it('finds no block that repeats a sibling verbatim', () => {
     // The whole point of the guard. A repeat is always a defect: vitest runs
     // both copies, so the suite pays for the second one, and a reader has no way
     // to tell which copy the next case belongs in.
-    expect(duplicatesUnder(TESTS_ROOT).map(describeOffender)).toEqual([]);
+    expect(perFile.flatMap((f) => f.duplicates).map(describeOffender)).toEqual([]);
   });
 
   it('scanned a corpus the size of the real suite, not a handful of files', () => {
@@ -76,42 +89,76 @@ describe('no test file registers the same block twice (#2506)', () => {
     // OFFENDERS, so every way it can break quietly ends in an empty scan. A walk
     // that stopped recursing, a parse that threw and was swallowed, a filter that
     // matched nothing: all of them pass the assertion above with an empty list.
-    // The floors sit under the real counts (1624 files, 23352 blocks as of
-    // #2506) with room for ordinary churn in both directions, but far enough
-    // above zero that losing a whole subdirectory fails here.
-    expect(scanned.length).toBeGreaterThan(1400);
-    expect(allBlocks.length).toBeGreaterThan(20_000);
+    //
+    // The floors sit just ABOVE what a flat, top-level-only walk of `tests/`
+    // returns, which is what makes them decisive rather than decorative. Almost
+    // all of this repo's tests sit at the top level, so a floor set the usual
+    // comfortable distance below the real total is satisfied by a walk that never
+    // descends at all: the recursion this guard depends on would be gone with
+    // this case still green. Sitting above the flat count costs headroom for
+    // churn, and that is the trade being made on purpose. No literal count in the
+    // prose, since those rot inside a release; the two numbers below are the only
+    // ones that mean anything, and both may only ever be raised.
+    expect(perFile.length).toBeGreaterThan(1600);
+    expect(allBlocks.length).toBeGreaterThan(23_000);
   });
 
-  it('reaches every subdirectory of tests/, so the deep suites are really covered', () => {
+  it('parses every test file to at least one block', () => {
+    // The other way a scan goes quiet: `ts.createSourceFile` does not throw on a
+    // malformed source, it returns a partial tree. A file the parser gave up on
+    // contributes no blocks, cannot hold a duplicate, and leaves the scan with
+    // nothing to show for it. Every `*.test.ts` in the tree registers at least
+    // one block today, so nothing yet excuses a zero, and a regression in the
+    // head resolver that hit a whole file family would land here first.
+    const empty = perFile.filter((f) => /\.test\.ts$/.test(f.file) && f.blocks.length === 0);
+    expect(empty.map((f) => f.file)).toEqual([]);
+  });
+
+  it('reaches every subdirectory of tests/, at full depth', () => {
     // The direct recursion pin over the REAL tree, which `tests/` can carry and
-    // a flat root cannot: most of this repo's tests sit at the top level, so a
-    // single-level read would still scan 1452 files and look entirely healthy
-    // while `tests/server/` (139 files) left the guard's coverage silently.
+    // a flat root cannot.
+    //
+    // A SUPERSET check, not an exact set, and that is the failure direction
+    // talking: what harms this guard is a directory LEAVING the scan, which fails
+    // here. A directory arriving does not, because the walk is generic and
+    // already covers it, and pinning the set exactly would turn this red on the
+    // unrelated PR that puts the first `.ts` file into `tests/fixtures/`.
     const dirs = new Set(
-      scanned.map((f) => f.file.split('/')[0]).filter((d) => d.endsWith('.ts') === false),
+      perFile.map((f) => f.file.split('/')[0]).filter((d) => d.endsWith('.ts') === false),
     );
-    expect([...dirs].sort()).toEqual([
-      'admin',
-      'browser',
-      'helpers',
-      'parity',
-      'progression',
-      'server',
-      'util',
-    ]);
+    for (const dir of ['admin', 'browser', 'helpers', 'parity', 'progression', 'server', 'util']) {
+      expect(dirs.has(dir), `tests/${dir}/ left the scan`).toBe(true);
+    }
+    // Depth, not just breadth. The check above is satisfied by a walk that
+    // descends exactly one level, and `tests/` is really three deep, so a
+    // depth-capped walk would pass it while dropping a subtree. This is also why
+    // the mkdtemp fixture below plants its offender three levels down: both
+    // numbers track the real tree, and neither should be lowered.
+    expect(Math.max(...perFile.map((f) => f.file.split('/').length))).toBeGreaterThanOrEqual(3);
     // ...and that those subdirectories really contribute blocks, not just files.
     const nested = perFile.filter((f) => f.file.includes('/') && f.blocks.length > 0);
     expect(nested.length).toBeGreaterThan(100);
   });
 
-  it('covers the two files #2506 fixed, so the guard holds the fix it shipped with', () => {
-    // Named explicitly: a floor over 1600 files cannot notice these two leaving,
-    // and they are the only files whose duplicates this guard has ever seen.
-    for (const file of ['gathering.test.ts', 'fixes.test.ts']) {
+  it('holds the fix it shipped with: each repaired block survives exactly once', () => {
+    // Not "the file is present and has some blocks", which both files would pass
+    // with every one of these blocks deleted outright. The guard can only ever
+    // notice a REPEAT, so the surviving copies need their own pin: each of the
+    // four titles #2506 de-duplicated appears exactly once in its file, which
+    // fails on a re-duplicating merge AND on a deletion.
+    const titles: Array<[string, string]> = [
+      ['gathering.test.ts', "describe('resolveCorpseFocusHarvest: concentrate vs spread"],
+      ['gathering.test.ts', "describe('harvestTierQuantity'"],
+      ['fixes.test.ts', "describe('mob tap rights'"],
+      ['fixes.test.ts', "describe('pet heel warp'"],
+    ];
+    for (const [file, title] of titles) {
       const found = perFile.find((f) => f.file === file);
       expect(found, `${file} left the scan`).toBeDefined();
-      expect(found?.blocks.length ?? 0, `${file} contributed no blocks`).toBeGreaterThan(5);
+      expect(
+        (found?.blocks ?? []).filter((b) => b.text.startsWith(title)).length,
+        `${file} should hold exactly one ${title}...`,
+      ).toBe(1);
     }
   });
 
@@ -127,6 +174,13 @@ describe('no test file registers the same block twice (#2506)', () => {
     // A THIRD entry means one of two things: a new rig accessor that takes a
     // callback (add it here), or a vitest modifier missing from BLOCK_MODIFIERS
     // (add it there, and the blocks it was hiding rejoin the scan).
+    //
+    // The removal direction, since an exact set fails on that too: these chains
+    // live in `tests/loot_window_controller.test.ts` and
+    // `tests/fiesta_controller.test.ts`, so rewriting either rig turns this case
+    // red on an unrelated PR. That is expected and the fix is to delete the row,
+    // not to loosen the assertion; the exact set is what makes a silently
+    // narrowing resolver visible at all.
     const chains = perFile.flatMap((f) => f.unresolved.map((u) => `${u.head}.${u.chain}`));
     expect([...new Set(chains)].sort()).toEqual([
       'test.attachTooltip.mock.calls.find',
@@ -168,8 +222,15 @@ describe('no test file registers the same block twice (#2506)', () => {
         path.join(fixture, 'top.test.ts'),
         "describe('kept', () => {\n  it('only once', () => {\n    expect(1).toBe(1);\n  });\n});\n",
       );
-      expect(duplicatesUnder(fixture).map((o) => `${o.file} ${o.first} ${o.repeat}`)).toEqual([
-        'nested/deeper/deepest/deep.test.ts 1-5 7-11',
+      // Reported through `describeOffender`, the real failure message, not a
+      // private restatement of it. This is the only case that ever runs that
+      // formatter: the real-tree assertion maps an EMPTY list through it on every
+      // green run, so a swapped first/repeat, a dropped file label or a throw
+      // inside it would surface only on a red run, at the moment it is being
+      // relied on most. The message is the whole product of this guard.
+      const found = scanUnder(fixture).flatMap((f) => f.duplicates);
+      expect(found.map(describeOffender)).toEqual([
+        "nested/deeper/deepest/deep.test.ts lines 7-11 repeat lines 1-5 verbatim: describe('a', () => {",
       ]);
     } finally {
       rmSync(fixture, { recursive: true, force: true });
