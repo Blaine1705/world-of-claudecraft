@@ -331,6 +331,85 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(evs.some((e) => e.type === 'loot' && /Everyone passed/.test(String(e.text)))).toBe(true);
   });
 
+  it('master_loot: looter-only prompt, both direct-grant arms, subset conversion, and the tie-break draw', () => {
+    const scenario = SCENARIOS.find((s) => s.name === 'master_loot');
+    if (!scenario) throw new Error('no scenario master_loot');
+    // Recorded directly (not via run()) because the per-frame draw COUNT, not just
+    // the event stream, is what this scenario exists to pin.
+    const { trace, rec } = record(scenario);
+    const sim = rec.sim as any;
+    const evs = rec.allEvents as Ev[];
+    const { a, b, c, d } = rec.notes.pids as Record<string, number>;
+    const rollIds = rec.notes.rollIds as number[];
+    const text = (e: Ev) => String(e.text);
+
+    // The leader-only switch fired both of its message arms, each to the whole
+    // party: enabling master loot, then moving the threshold down onto the drop.
+    const byPid = (pids: number[]) => [...pids].sort((x, y) => x - y);
+    const logsSaying = (re: RegExp) =>
+      byPid(evs.filter((e) => e.type === 'log' && re.test(text(e))).map((e) => e.pid as number));
+    expect(logsSaying(/^Loot method set to Master Loot\. Master Looter: Aaa\.$/)).toEqual(
+      byPid([a, b, c, d]),
+    );
+    expect(logsSaying(/^Loot threshold set to uncommon\.$/)).toEqual(byPid([a, b, c, d]));
+
+    // Three threshold-meeting drops each opened a curate-phase master roll, and
+    // the prompt went to the master looter ALONE (never to a candidate).
+    const prompts = evs.filter((e) => e.type === 'masterLoot');
+    expect(rollIds.length).toBe(3);
+    expect(prompts.length).toBe(3);
+    expect([...new Set(prompts.map((e) => e.pid))]).toEqual([a]);
+    expect(prompts[0].candidates.map((cand: { pid: number }) => cand.pid)).toEqual([a, b, c, d]);
+
+    // Arms 1 + 2: two direct grants, each announced to all four members exactly
+    // once. A duplicate pid that failed to dedupe would either double c's line or
+    // convert the roll instead of granting it, so both counts below are decisive.
+    const assigned = evs.filter((e) => e.type === 'loot' && / assigned /.test(text(e)));
+    expect(assigned.length).toBe(8); // 2 grants x 4 party members
+    expect([...new Set(assigned.map((e) => e.pid))].sort((x, y) => x - y)).toEqual([a, b, c, d]);
+    // Where the three copies ended up: b and c took one each by direct grant and
+    // one of them took a second by winning the contest below, while the master
+    // looter kept none and the low roller (d) won nothing.
+    const held = (pid: number) => sim.countItem('greyjaw_hide_boots', pid) as number;
+    expect(held(a)).toBe(0);
+    expect(held(d)).toBe(0);
+    expect(held(b) + held(c)).toBe(3);
+    expect(Math.max(held(b), held(c))).toBe(2);
+    // The deduped assignment never reopened as a roll.
+    expect(evs.some((e) => e.type === 'lootRoll' && e.rollId === rollIds[1])).toBe(false);
+
+    // Arm 3: the conversion prompted exactly the assigned SUBSET, not every
+    // candidate (the master looter a was not among the targets).
+    const converted = evs.filter((e) => e.type === 'lootRoll' && e.rollId === rollIds[2]);
+    expect(converted.map((e) => e.pid).sort((x, y) => x - y)).toEqual([b, c, d]);
+
+    // The three need rolls TIED at the top, which is the only thing that makes
+    // resolveLootRoll draw its tie-break int, and a winner was announced.
+    const needRolls = evs
+      .filter((e) => e.type === 'loot' && e.pid === a && /^Need Roll - /.test(text(e)))
+      .map((e) => Number(/^Need Roll - (\d+)/.exec(text(e))?.[1]));
+    expect(needRolls.length).toBe(3);
+    const top = Math.max(...needRolls);
+    expect(needRolls.filter((n) => n === top).length).toBeGreaterThan(1);
+    expect(evs.some((e) => e.type === 'loot' && e.pid === a && / wins /.test(text(e)))).toBe(true);
+
+    // The golden's draw-order log across an assignment and a resolution: opening
+    // the rolls and all three assignments draw NOTHING, and the resolution draws
+    // exactly four (one int(1,100) per need submit + the tie-break int).
+    const frame = (label: string) => {
+      const f = trace.frames.find((fr) => fr.label === label);
+      if (!f) throw new Error(`no frame ${label}`);
+      return f;
+    };
+    expect(frame('assigned-converted').rng.draws - frame('master-rolls-open').rng.draws).toBe(0);
+    expect(frame('roll-resolved').rng.draws - frame('assigned-converted').rng.draws).toBe(4);
+    // The refused curate-phase vote in particular bailed before its draw and
+    // moved no player or entity state (the three counted votes above are the
+    // other half of that: the refusal did not consume d's answer).
+    expect(frame('curate-phase-vote-refused').rng.draws).toBe(frame('master-rolls-open').rng.draws);
+    expect(frame('curate-phase-vote-refused').state).toBe(frame('master-rolls-open').state);
+  });
+
   it('entity_roster: despawn branches drop, delayed drain runs, ghost release + healer resurrect', () => {
     const rec = run('entity_roster');
     const ents = entities(rec);
