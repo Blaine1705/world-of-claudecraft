@@ -915,3 +915,132 @@ describe('node tool gating over the live server', () => {
     expect(client.nodeHarvestableByMe('ore_mirefen_1')).toBe(true);
   });
 });
+
+// The fine-material axis (D8) through the LIVE harvest path: the pure rule is
+// pinned in tests/material_grades.test.ts, this is the wiring that makes a
+// real harvest hand over the other id. The mirefen ore family is the useful
+// fixture because that zone ships both a tier-1 vein and a tier-2 one for the
+// SAME material, so one tool can be above the material at one vein and not at
+// the other without any content edit.
+describe('fine material grades on the live harvest path', () => {
+  const MIREFEN_T1 = 'ore_mirefen_1';
+  const MIREFEN_T2 = 'ore_mirefen_t2';
+
+  function harvestWith(nodeId: string, toolId: string) {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem(toolId, 1, pid);
+    teleportOntoNode(sim, pid, nodeId);
+    expect(castAndComplete(sim, nodeId, pid)).toBe(true);
+    return { sim, pid };
+  }
+
+  it('the fixture nodes are the two tiers of one material, as the cases assume', () => {
+    expect(mustNode(MIREFEN_T1).tier).toBe(1);
+    expect(mustNode(MIREFEN_T2).tier).toBe(2);
+    expect(mustNode(MIREFEN_T1).zoneId).toBe('mirefen_marsh');
+    expect(mustNode(MIREFEN_T2).zoneId).toBe('mirefen_marsh');
+    expect(nodeMaterialFor('ore', 'mirefen_marsh').itemId).toBe('iron_ore');
+  });
+
+  it('a tool AT the material tier yields the plain grade, even at the full-grade vein', () => {
+    const { sim, pid } = harvestWith(MIREFEN_T2, 'iron_mining_pick'); // tier 2
+    expect(sim.countItem('iron_ore', pid)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
+  });
+
+  it('a tool ABOVE the material tier yields the fine grade at the full-grade vein', () => {
+    const { sim, pid } = harvestWith(MIREFEN_T2, 'mithril_mining_pick'); // tier 3
+    expect(sim.countItem('fine_iron_ore', pid)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem('iron_ore', pid)).toBe(0);
+  });
+
+  it('the same tool still yields the plain grade at the zone LOWER-tier vein', () => {
+    // The arm that keeps the base material gatherable by the player who
+    // out-tooled it: mirefen and thornpeak both keep low-tier veins on purpose.
+    const { sim, pid } = harvestWith(MIREFEN_T1, 'mithril_mining_pick'); // tier 3
+    expect(sim.countItem('iron_ore', pid)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
+  });
+
+  it('the upgrade costs no extra rng draw: still exactly two per granted harvest', () => {
+    // The pinned two-draw contract has to survive the grade choice, which is
+    // why the choice is a pure bag scan and not a roll.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('mithril_mining_pick', 1, pid);
+    teleportOntoNode(sim, pid, MIREFEN_T2);
+    let draws = 0;
+    (sim as any).rng.setObserver(() => {
+      draws++;
+    });
+    expect(castAndComplete(sim, MIREFEN_T2, pid)).toBe(true);
+    expect(sim.countItem('fine_iron_ore', pid)).toBeGreaterThanOrEqual(1);
+    expect(draws).toBe(2);
+  });
+
+  it('the full-bag pre-gate reserves room for the grade it is about to grant', () => {
+    // The pre-gate runs before both draws, so it must name the SAME id the
+    // grant mints. The fixture is the discriminating one: every slot is used,
+    // but one holds a PARTIAL plain-grade stack. There is room for another
+    // plain iron ore (stack top-up) and none at all for the fine grade, so a
+    // gate still checking the plain id would wave this harvest through.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('mithril_mining_pick', 1, pid);
+    const meta = mustMeta(sim, pid);
+    const capacity = bagCapacity(meta.bags);
+    const fillerStack = ITEMS.bone_fragments.stackSize ?? 20;
+    while (meta.inventory.length < capacity - 1) sim.addItem('bone_fragments', fillerStack, pid);
+    sim.addItem('iron_ore', 1, pid); // the partial stack, in the last free slot
+    expect(meta.inventory.length).toBe(capacity);
+    // The premise, asserted rather than assumed: plain fits, fine does not.
+    expect(sim.ctx.canAddItem('iron_ore', 1, pid)).toBe(true);
+    expect(sim.ctx.canAddItem('fine_iron_ore', 1, pid)).toBe(false);
+
+    teleportOntoNode(sim, pid, MIREFEN_T2);
+    let draws = 0;
+    (sim as any).rng.setObserver(() => {
+      draws++;
+    });
+    // Denied at the pre-gate, before the cast even starts, and rng-free.
+    expect(sim.harvestNode(MIREFEN_T2, pid)).toBe(false);
+    expect(draws).toBe(0);
+    expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
+    // The denial did not spend the player's timer either.
+    expect(sim.nodeHarvestableByMeFor(MIREFEN_T2, pid)).toBe(true);
+  });
+
+  it('the bags can fill DURING the cast, and completion re-gates on the fine grade', () => {
+    // completeGatherCast re-checks capacity because the world moves during a
+    // cast. It has to re-check it against the GRADE, not the plain id: the
+    // grant hub never capacity-caps, so a completion gate that asked about
+    // plain ore would wave this through and mint a fine ore into a full bag.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('mithril_mining_pick', 1, pid);
+    teleportOntoNode(sim, pid, MIREFEN_T2);
+
+    // Room for everything at cast start, so the cast really does begin.
+    expect(sim.harvestNode(MIREFEN_T2, pid)).toBe(true);
+
+    // Now fill the bags mid-cast, leaving a PARTIAL plain-grade stack: room
+    // for more plain ore, no room at all for the fine grade.
+    const meta = mustMeta(sim, pid);
+    const capacity = bagCapacity(meta.bags);
+    const fillerStack = ITEMS.bone_fragments.stackSize ?? 20;
+    while (meta.inventory.length < capacity - 1) sim.addItem('bone_fragments', fillerStack, pid);
+    sim.addItem('iron_ore', 1, pid);
+    expect(meta.inventory.length).toBe(capacity);
+    expect(sim.ctx.canAddItem('iron_ore', 1, pid)).toBe(true);
+    expect(sim.ctx.canAddItem('fine_iron_ore', 1, pid)).toBe(false);
+
+    completeCastNow(sim, pid);
+    sim.tick();
+
+    // Refused, and nothing was minted past capacity.
+    expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
+    expect(sim.countItem('iron_ore', pid)).toBe(1);
+    expect(meta.inventory.length).toBe(capacity);
+  });
+});

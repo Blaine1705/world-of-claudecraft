@@ -1,0 +1,310 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { describe, expect, it } from 'vitest';
+import { GATHER_NODE_TYPES, GATHER_NODES } from '../src/sim/content/gather_nodes';
+import { ALL_RECIPES, TOOL_RECIPES } from '../src/sim/content/recipes';
+import { ITEMS } from '../src/sim/data';
+import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import {
+  baseMaterialFor,
+  countAcrossGrades,
+  fineMaterialFor,
+  gatherMaterialTier,
+  harvestGradeItemId,
+  MATERIAL_GRADES,
+  materialGradeIds,
+  planGradeRemoval,
+  yieldsFineGrade,
+} from '../src/sim/professions/material_grades';
+import { isGatherToolUse } from '../src/sim/professions/tools';
+
+// The fine-material axis (D8): a harvest whose tool outclasses the material
+// grants a fine grade of it instead of the plain one, and the crafted tool
+// recipes consume that grade, so the tool one rung down is the only route up.
+// This file owns the pure module; the live harvest path is pinned in
+// tests/gather_node_harvest.test.ts and the consumption substitution in
+// tests/material_grade_substitution.test.ts.
+
+const ZONES = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'] as const;
+
+describe('MATERIAL_GRADES table', () => {
+  it('covers exactly the nine node yields, one grade pair each', () => {
+    const liveYields = new Set<string>();
+    for (const byZone of Object.values(NODE_MATERIAL_TABLE)) {
+      for (const row of Object.values(byZone)) liveYields.add(row.itemId);
+    }
+    // Derived from the live table, not a second literal: a tenth node yield
+    // would fail here rather than silently ship with no fine grade.
+    expect(Object.keys(MATERIAL_GRADES).sort()).toEqual([...liveYields].sort());
+    expect(Object.keys(MATERIAL_GRADES)).toHaveLength(9);
+  });
+
+  it('every fine id is a real, distinct, common-quality ItemDef', () => {
+    const fineIds = Object.values(MATERIAL_GRADES).map((row) => row.fineItemId);
+    expect(new Set(fineIds).size, 'two materials must never share a fine grade').toBe(9);
+    for (const [baseItemId, row] of Object.entries(MATERIAL_GRADES)) {
+      const def = ITEMS[row.fineItemId];
+      expect(def, `${row.fineItemId} must be a shipped item`).toBeDefined();
+      expect(def.id).toBe(row.fineItemId);
+      expect(def.kind).toBe('junk');
+      // Never 'poor', or sellAllJunk would vendor a crafting reagent.
+      expect(def.quality, `${row.fineItemId} quality`).toBe('common');
+      // The grade is worth more than what it replaces, or the axis pays nothing.
+      expect(def.sellValue, `${row.fineItemId} sellValue`).toBeGreaterThan(
+        ITEMS[baseItemId].sellValue,
+      );
+      // buyValue is the economy basis reagentUnitValue reads
+      // (tests/recipe_economy.test.ts), on the delisted-material 4x convention.
+      expect(def.buyValue, `${row.fineItemId} buyValue`).toBe(def.sellValue * 4);
+    }
+  });
+
+  it('no NPC stocks a fine grade (the ruling is about the stock row, not the price)', async () => {
+    const { NPCS } = await import('../src/sim/data');
+    const stocked = new Set<string>();
+    for (const npc of Object.values(NPCS)) for (const id of npc.vendorItems ?? []) stocked.add(id);
+    // Non-vacuity: the set is real and does carry priced goods, so the
+    // assertions below are a discrimination rather than an empty sweep.
+    expect(stocked.size).toBeGreaterThan(0);
+    expect(stocked.has('arcanite_bar'), 'the refined reagent IS stocked').toBe(true);
+    for (const row of Object.values(MATERIAL_GRADES)) {
+      expect(stocked.has(row.fineItemId), `${row.fineItemId} must not be on any counter`).toBe(
+        false,
+      );
+    }
+  });
+
+  it('gatherTier IS the highest node tier its zone carries (content cannot drift off the gate)', () => {
+    // The whole point of keying the gate on the MATERIAL rather than the node.
+    // Derived from GATHER_NODES, so re-tiering a vein without revisiting the
+    // grade table fails here instead of quietly moving who can farm a grade.
+    const highestTierIn = (zoneId: string, type: string) =>
+      Math.max(
+        ...GATHER_NODES.filter((n) => n.zoneId === zoneId && n.type === type).map((n) => n.tier),
+      );
+    let checked = 0;
+    for (const type of GATHER_NODE_TYPES) {
+      for (const zoneId of ZONES) {
+        const itemId = NODE_MATERIAL_TABLE[type][zoneId].itemId;
+        expect(gatherMaterialTier(itemId), `${type}/${zoneId}`).toBe(highestTierIn(zoneId, type));
+        checked += 1;
+      }
+    }
+    expect(checked).toBe(9);
+    // And the ladder really is a ladder: the three zones sit at three tiers,
+    // so the loop above is not nine copies of one number.
+    expect(gatherMaterialTier('copper_ore')).toBe(1);
+    expect(gatherMaterialTier('iron_ore')).toBe(2);
+    expect(gatherMaterialTier('thorium_ore')).toBe(3);
+  });
+
+  it('resolves both directions, and refuses ids that have no grade', () => {
+    expect(fineMaterialFor('thorium_ore')).toBe('fine_thorium_ore');
+    expect(baseMaterialFor('fine_thorium_ore')).toBe('thorium_ore');
+    for (const [baseItemId, row] of Object.entries(MATERIAL_GRADES)) {
+      expect(baseMaterialFor(row.fineItemId)).toBe(baseItemId);
+    }
+    // Grades do not stack, and non-materials have none.
+    expect(fineMaterialFor('fine_thorium_ore')).toBeUndefined();
+    expect(baseMaterialFor('thorium_ore')).toBeUndefined();
+    expect(fineMaterialFor('arcanite_bar')).toBeUndefined();
+    expect(fineMaterialFor('mithril_mining_pick')).toBeUndefined();
+    expect(gatherMaterialTier('no_such_item')).toBeUndefined();
+  });
+});
+
+describe('yieldsFineGrade: both arms carry weight', () => {
+  it('the tool must be STRICTLY above the material, not merely able to work it', () => {
+    // gatherTier 2 (mirefen), a full-grade tier-2 vein.
+    expect(yieldsFineGrade(2, 2, 1)).toBe(false); // below: cannot even gather it
+    expect(yieldsFineGrade(2, 2, 2)).toBe(false); // exactly at: unlocks, never upgrades
+    expect(yieldsFineGrade(2, 2, 3)).toBe(true); // above: the upgrade
+    expect(yieldsFineGrade(2, 2, 5)).toBe(true);
+  });
+
+  it('the vein must carry the material grade, so lower-tier veins keep yielding plain', () => {
+    // A tier-3 pick in mirefen: fine at the tier-2 veins, plain at the tier-1
+    // ones the zone deliberately keeps for travelling starter tools. This arm
+    // is what keeps the base material gatherable by its own owner.
+    expect(yieldsFineGrade(2, 1, 3)).toBe(false);
+    expect(yieldsFineGrade(2, 2, 3)).toBe(true);
+    // Thornpeak with a tier-4 pick: plain at tier 1 and 2, fine only at tier 3.
+    expect(yieldsFineGrade(3, 1, 4)).toBe(false);
+    expect(yieldsFineGrade(3, 2, 4)).toBe(false);
+    expect(yieldsFineGrade(3, 3, 4)).toBe(true);
+  });
+
+  it('eastbrook is the one zone with no plain fallback, and that is why substitution exists', () => {
+    // Every eastbrook node is tier 1 and the material is tier 1, so any tier-2
+    // tool turns the WHOLE zone fine. Pinned as the premise the downward
+    // substitution rests on: if a future content edit gave eastbrook a
+    // sub-material-tier vein, this expectation is where that shows up.
+    const eastbrookOreTiers = GATHER_NODES.filter(
+      (n) => n.zoneId === 'eastbrook_vale' && n.type === 'ore',
+    ).map((n) => n.tier);
+    expect(eastbrookOreTiers.length).toBeGreaterThan(0);
+    expect([...new Set(eastbrookOreTiers)]).toEqual([1]);
+    for (const tier of eastbrookOreTiers) expect(yieldsFineGrade(1, tier, 2)).toBe(true);
+  });
+});
+
+describe('harvestGradeItemId', () => {
+  it('swaps the id only when both arms pass, and never invents one', () => {
+    expect(harvestGradeItemId('copper_ore', 1, 1)).toBe('copper_ore');
+    expect(harvestGradeItemId('copper_ore', 1, 2)).toBe('fine_copper_ore');
+    expect(harvestGradeItemId('thorium_ore', 1, 4)).toBe('thorium_ore');
+    expect(harvestGradeItemId('thorium_ore', 3, 4)).toBe('fine_thorium_ore');
+    // No tool at all (NO_TOOL_OWNED is 0) never upgrades anything.
+    expect(harvestGradeItemId('copper_ore', 1, 0)).toBe('copper_ore');
+    // An id with no grade degrades to itself rather than throwing, so a future
+    // zone whose material row lands before its grade row still harvests.
+    expect(harvestGradeItemId('arcanite_bar', 3, 5)).toBe('arcanite_bar');
+    expect(harvestGradeItemId('no_such_item', 3, 5)).toBe('no_such_item');
+  });
+});
+
+describe('downward substitution', () => {
+  it('a fine grade satisfies its base, and the base never satisfies the fine', () => {
+    expect(materialGradeIds('copper_ore')).toEqual(['copper_ore', 'fine_copper_ore']);
+    // The one-directional half: this is what makes the fine grade a real gate
+    // on the tool recipes rather than a cosmetic relabel.
+    expect(materialGradeIds('fine_copper_ore')).toEqual(['fine_copper_ore']);
+    expect(materialGradeIds('smithing_flux')).toEqual(['smithing_flux']);
+  });
+
+  it('counts across grades, and the count never promises what the plan cannot take', () => {
+    const bags: Record<string, number> = { copper_ore: 3, fine_copper_ore: 4 };
+    const have = (id: string) => bags[id] ?? 0;
+    expect(countAcrossGrades('copper_ore', have)).toBe(7);
+    // Asked for the fine grade specifically, only the fine grade counts.
+    expect(countAcrossGrades('fine_copper_ore', have)).toBe(4);
+    // The read and the plan agree at, below and above the holding.
+    for (const want of [1, 3, 4, 7]) {
+      const planned = planGradeRemoval('copper_ore', want, have).reduce((n, t) => n + t.count, 0);
+      expect(planned, `want ${want}`).toBe(Math.min(want, countAcrossGrades('copper_ore', have)));
+    }
+  });
+
+  it('spends the base grade first so the premium copies survive', () => {
+    const have = (id: string) => (id === 'copper_ore' ? 3 : id === 'fine_copper_ore' ? 4 : 0);
+    expect(planGradeRemoval('copper_ore', 2, have)).toEqual([{ itemId: 'copper_ore', count: 2 }]);
+    expect(planGradeRemoval('copper_ore', 3, have)).toEqual([{ itemId: 'copper_ore', count: 3 }]);
+    // Spills into the fine grade only once the base is exhausted.
+    expect(planGradeRemoval('copper_ore', 5, have)).toEqual([
+      { itemId: 'copper_ore', count: 3 },
+      { itemId: 'fine_copper_ore', count: 2 },
+    ]);
+  });
+
+  it('emits no zero-count lines, and short holdings plan what is there', () => {
+    const fineOnly = (id: string) => (id === 'fine_copper_ore' ? 2 : 0);
+    // The base line is skipped entirely rather than emitted as count 0, so a
+    // caller applying the plan never calls removeItem for a slot it lacks.
+    expect(planGradeRemoval('copper_ore', 2, fineOnly)).toEqual([
+      { itemId: 'fine_copper_ore', count: 2 },
+    ]);
+    expect(planGradeRemoval('copper_ore', 5, fineOnly)).toEqual([
+      { itemId: 'fine_copper_ore', count: 2 },
+    ]);
+    expect(planGradeRemoval('copper_ore', 0, fineOnly)).toEqual([]);
+    expect(planGradeRemoval('copper_ore', 3, () => 0)).toEqual([]);
+    // A negative available (a caller bug) is clamped, never turned into a
+    // negative removal that would mint items.
+    expect(planGradeRemoval('copper_ore', 3, () => -5)).toEqual([]);
+  });
+});
+
+describe('the tool ladder the grades exist to build', () => {
+  it('every crafted tool recipe consumes a fine grade and the tool one rung down', () => {
+    expect(TOOL_RECIPES).toHaveLength(6);
+    for (const recipe of TOOL_RECIPES) {
+      const reagentIds = recipe.reagents.map((r) => r.itemId);
+      const fineReagents = reagentIds.filter((id) => baseMaterialFor(id) !== undefined);
+      expect(fineReagents.length, `${recipe.id} must consume a fine grade`).toBeGreaterThan(0);
+      // And a plain node material never sneaks back in beside it.
+      const plainReagents = reagentIds.filter((id) => fineMaterialFor(id) !== undefined);
+      expect(plainReagents, `${recipe.id} still consumes a plain node yield`).toEqual([]);
+      // The rung below: every tool recipe consumes a gathering tool.
+      const toolReagents = reagentIds.filter((id) => isGatherToolUse(ITEMS[id]?.use));
+      expect(toolReagents, `${recipe.id} must consume the tool one rung down`).toHaveLength(1);
+    }
+  });
+
+  it('no tool recipe is a closed circuit: its fine reagent needs a LOWER tier tool', () => {
+    // The fork the pick line forced. A recipe whose fine reagent needs a tool
+    // at or above the recipe's own output is unreachable from a cold start.
+    for (const recipe of TOOL_RECIPES) {
+      const outputUse = ITEMS[recipe.resultItemId].use;
+      const outputTier = isGatherToolUse(outputUse) ? outputUse.tier : undefined;
+      expect(outputTier, `${recipe.id} output tier`).toBeDefined();
+      for (const reagent of recipe.reagents) {
+        const baseItemId = baseMaterialFor(reagent.itemId);
+        if (baseItemId === undefined) continue;
+        // Gathering the fine grade needs a tool strictly above its material.
+        const toolNeeded = (gatherMaterialTier(baseItemId) as number) + 1;
+        expect(
+          toolNeeded,
+          `${recipe.id} needs a tier-${toolNeeded} tool to gather ${reagent.itemId}, ` +
+            `but only produces tier ${outputTier}`,
+        ).toBeLessThan(outputTier as number);
+      }
+    }
+  });
+
+  it('the tier-4 pick was re-pointed off the circuit it used to sit in', () => {
+    // Pinned as a literal, because the general rule above would also pass on a
+    // recipe that simply dropped its gathered reagent.
+    const pick = TOOL_RECIPES.find((r) => r.id === 'recipe_thorium_mining_pick');
+    expect(pick?.reagents.map((r) => r.itemId).sort()).toEqual([
+      'fine_iron_ore',
+      'mithril_mining_pick',
+    ]);
+    // fine_thorium_ore would have needed the tier-4 pick this recipe makes.
+    expect(gatherMaterialTier('thorium_ore')).toBe(3);
+    const pickUse = ITEMS.thorium_mining_pick.use;
+    expect(isGatherToolUse(pickUse) && pickUse.tier).toBe(4);
+    // The tier-5 pick keeps the refined bar AND gained the thornpeak grade.
+    const arcanite = TOOL_RECIPES.find((r) => r.id === 'recipe_arcanite_mining_pick');
+    expect(arcanite?.reagents.map((r) => r.itemId).sort()).toEqual([
+      'arcanite_bar',
+      'fine_thorium_ore',
+      'thorium_mining_pick',
+    ]);
+  });
+
+  it('a fine grade is only ever a tool-recipe reagent (nothing else was re-specced)', () => {
+    const fineIds = new Set(Object.values(MATERIAL_GRADES).map((row) => row.fineItemId));
+    const toolRecipeIds = new Set(TOOL_RECIPES.map((r) => r.id));
+    for (const recipe of ALL_RECIPES) {
+      if (toolRecipeIds.has(recipe.id)) continue;
+      for (const reagent of recipe.reagents) {
+        expect(
+          fineIds.has(reagent.itemId),
+          `${recipe.id} consumes the fine grade ${reagent.itemId}; only TOOL_RECIPES should`,
+        ).toBe(false);
+      }
+    }
+  });
+});
+
+describe('committed art', () => {
+  it('the icon derivation script covers exactly the nine grade pairs', () => {
+    // The script cannot import the TS module, so it carries its own pair list.
+    // This is the tie that keeps the two from drifting: art for eight of nine
+    // would otherwise only surface as a red icon guard with no explanation.
+    const here = path.dirname(fileURLToPath(import.meta.url));
+    const src = readFileSync(
+      path.join(here, '..', 'scripts/assets/fine_material_icons.mjs'),
+      'utf8',
+    );
+    const table = src.slice(src.indexOf('const GRADE_PAIRS'), src.indexOf('// The rim:'));
+    const pairs = [...table.matchAll(/\['([a-z_]+)', '([a-z_]+)'\]/g)].map((m) => [m[1], m[2]]);
+    expect(pairs).toHaveLength(9);
+    expect(Object.fromEntries(pairs)).toEqual(
+      Object.fromEntries(
+        Object.entries(MATERIAL_GRADES).map(([baseItemId, row]) => [baseItemId, row.fineItemId]),
+      ),
+    );
+  });
+});

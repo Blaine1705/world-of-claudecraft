@@ -36,6 +36,7 @@ import {
   GATHER_RARE_EVENT_YIELD_MULT,
   rollGatherRareEvent,
 } from './gather_events';
+import { harvestGradeItemId } from './material_grades';
 import { gatherActionXp } from './profession_xp';
 import { proficiencyBandFor } from './proficiency_bands';
 import { bestOwnedGatherToolTierOrNone, canGatherTier, NO_TOOL_OWNED } from './tools';
@@ -120,6 +121,32 @@ export function nodeMaterialFor(
 ): { itemId: string; qtyByRarity: Record<MaterialRarity, number> } {
   const byZone = NODE_MATERIAL_TABLE[type];
   return byZone[zoneId] ?? byZone.eastbrook_vale;
+}
+
+/** The item id a harvest of `node` grants a player whose best matching tool is
+ *  `ownedToolTier`: the zone row's material, upgraded to its fine grade when
+ *  that tool outclasses the material at a full-grade vein (D8, the rule and
+ *  its two arms live in professions/material_grades.ts). Signature kept
+ *  separate from nodeMaterialFor, whose (type, zoneId) shape is depended on by
+ *  the quest-objective and placement suites and carries no player. */
+export function harvestYieldItemIdFor(node: GatherNodeDef, ownedToolTier: number): string {
+  return harvestGradeItemId(
+    nodeMaterialFor(node.type, node.zoneId).itemId,
+    node.tier,
+    ownedToolTier,
+  );
+}
+
+/** The same resolution from a player's bags. One pure bag scan, no rng, so
+ *  every caller can ask BEFORE drawing: the capacity pre-gates at both ends of
+ *  the cast and the grant itself all resolve the id this way, and they must
+ *  agree or a pre-gate would clear room for an item the grant does not mint. */
+export function harvestYieldItemId(meta: PlayerMeta, node: GatherNodeDef): string {
+  const professionId = NODE_HARVEST_TABLE[node.type].professionId;
+  return harvestYieldItemIdFor(
+    node,
+    bestOwnedGatherToolTierOrNone(meta.inventory, professionId, ITEMS),
+  );
 }
 
 export function gatherNodeById(nodeId: string): GatherNodeDef | undefined {
@@ -264,6 +291,16 @@ export function resolveHarvest(
   const rarity = rollMaterialRarity(meta.gatheringProficiency[entry.professionId], rng);
   const rareEvent = rollGatherRareEvent(rng, node.type);
   const material = nodeMaterialFor(node.type, node.zoneId);
+  // Grade resolution (D8): a pure bag scan against the node, AFTER both draws
+  // so it cannot move them, and unit counts come from the base row either way
+  // (a fine grade is a quality change, never a rate one). Read here, at the
+  // grant, rather than carried from the cast start: the tool GATE is
+  // deliberately a start-time check that completeGatherCast does not re-run,
+  // but the grade is about what the player is holding when the ore comes out,
+  // and pinning it at start would need transient cast state on Entity for a
+  // difference only a player who gained or lost a tool mid-cast could see.
+  // Losing the tool mid-cast costs the upgrade, never the harvest.
+  const itemId = harvestYieldItemId(meta, node);
   const qty = material.qtyByRarity[rarity] * (rareEvent ? GATHER_RARE_EVENT_YIELD_MULT : 1);
   const signed = rareEvent !== null || isSignableMaterialRarity(rarity);
   // The queued gain is node-tier-relative (gatherNodeGainMultiplier
@@ -276,7 +313,7 @@ export function resolveHarvest(
   );
   return {
     granted: true,
-    itemId: material.itemId,
+    itemId,
     professionId: entry.professionId,
     rarity,
     qty,
@@ -374,11 +411,13 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
     return false;
   }
   // Capacity pre-gate on the material this zone's node actually grants. The
-  // item id is known BEFORE any rng draw (zone x type lookup, no roll), so a
-  // full-bag denial here happens before the rng stream is touched and cannot
-  // shift the world's draw order.
-  const material = nodeMaterialFor(node.type, node.zoneId);
-  if (!ctx.canAddItem(material.itemId, 1, meta.entityId)) {
+  // item id is known BEFORE any rng draw (zone x type lookup plus the D8 grade
+  // comparison, both pure), so a full-bag denial here happens before the rng
+  // stream is touched and cannot shift the world's draw order. It reuses the
+  // ownedToolTier already scanned for the gate above, so the grade costs no
+  // second bag walk here.
+  const yieldItemId = harvestYieldItemIdFor(node, ownedToolTier);
+  if (!ctx.canAddItem(yieldItemId, 1, meta.entityId)) {
     ctx.error(meta.entityId, 'Your bags are full.');
     return false;
   }
@@ -483,8 +522,10 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
     ctx.error(meta.entityId, 'This resource node has not respawned for you yet.');
     return;
   }
-  const material = nodeMaterialFor(node.type, node.zoneId);
-  if (!ctx.canAddItem(material.itemId, 1, meta.entityId)) {
+  // Same grade resolution resolveHarvest is about to make, one line later and
+  // with no inventory mutation in between, so the room this gate checks is
+  // room for the id the grant actually mints.
+  if (!ctx.canAddItem(harvestYieldItemId(meta, node), 1, meta.entityId)) {
     ctx.error(meta.entityId, 'Your bags are full.');
     return;
   }

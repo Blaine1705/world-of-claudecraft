@@ -111,11 +111,18 @@ describe('gather rare events: cadence knob + flavor mapping', () => {
 describe('resolveHarvest two-draw order pin', () => {
   const node = mustNode('ore_eastbrook_1');
 
+  // The tier-1 pick is load-bearing, not decoration: resolveHarvest resolves
+  // the material GRADE off the bags (D8), so an inventory-less fixture no
+  // longer models a real harvester. A tier-1 tool at this tier-1 eastbrook
+  // vein is the plain-grade case, which is what these draw-order pins are
+  // about; the fine-grade arm has its own coverage in
+  // tests/material_grades.test.ts.
   function freshMeta(): PlayerMeta {
     return {
       gatheringProficiency: { mining: 0, logging: 0, herbalism: 0 },
       nodeHarvestReadyAt: {},
       pendingGatherGrants: [],
+      inventory: [{ itemId: 'copper_mining_pick', count: 1 }],
     } as unknown as PlayerMeta;
   }
 

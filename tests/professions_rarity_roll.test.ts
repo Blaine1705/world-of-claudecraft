@@ -52,10 +52,13 @@ describe('material rarity roll (#1122)', () => {
     const node = GATHER_NODES[0];
     // Only the fields resolveHarvest touches; the full PlayerMeta shape is not
     // needed for this leaf-level pin (same convention as AnySim/AnyEntity).
+    // `inventory` is one of those fields since D8: the material grade is
+    // resolved from the player's best matching tool.
     const meta = {
       gatheringProficiency: { mining: 50, logging: 50, herbalism: 50 },
       nodeHarvestReadyAt: { [node.id]: 1000 },
       pendingGatherGrants: [],
+      inventory: [{ itemId: 'copper_mining_pick', count: 1 }],
     } as unknown as PlayerMeta;
     let draws = 0;
     const rng = new Rng(1);
