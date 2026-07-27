@@ -630,7 +630,7 @@ describe('the session cap always outlasts a legal reel window', () => {
           (isGatherToolUse(b.use) ? b.use.tier : 0) - (isGatherToolUse(a.use) ? a.use.tier : 0),
       )[0];
     sim.addItem(bestRod.id, 1);
-    // Run the real tick phase to the bite, then to the last tick of the window.
+    // Run the real tick loop to the bite, then to the last tick of the window.
     for (let tick = startTick + 1; tick <= p.fishBiteAtTick; tick++) {
       sim.tickCount = tick;
       updateCasting(sim.ctx, p, meta);

@@ -2219,7 +2219,8 @@ export const vi_VN: EnTranslations = {
         "unlocks": {
           "mining": "Cần thiết để khai thác các mạch quặng đến bậc {tier}.",
           "logging": "Cần thiết để đốn hạ các cụm cây gỗ đến bậc {tier}.",
-          "herbalism": "Cần thiết để thu hái các khóm thảo dược đến bậc {tier}."
+          "herbalism": "Cần thiết để thu hái các khóm thảo dược đến bậc {tier}.",
+          "fishing": "Required to fish waters up to tier {tier}."
         },
         "use": {
           "mining": "Sử dụng: Khai thác mạch quặng gần đó.",

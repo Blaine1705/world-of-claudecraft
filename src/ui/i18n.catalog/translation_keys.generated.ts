@@ -6048,6 +6048,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.gathering.toolTooltip.rodReel'
   | 'hudChrome.gathering.toolTooltip.rodRequired'
   | 'hudChrome.gathering.toolTooltip.speed'
+  | 'hudChrome.gathering.toolTooltip.unlocks.fishing'
   | 'hudChrome.gathering.toolTooltip.unlocks.herbalism'
   | 'hudChrome.gathering.toolTooltip.unlocks.logging'
   | 'hudChrome.gathering.toolTooltip.unlocks.mining'

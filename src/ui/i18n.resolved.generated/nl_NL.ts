@@ -2219,7 +2219,8 @@ export const nl_NL: EnTranslations = {
         "unlocks": {
           "mining": "Vereist om ertsaders tot en met rang {tier} te ontginnen.",
           "logging": "Vereist om houtopstanden tot en met rang {tier} te vellen.",
-          "herbalism": "Vereist om kruidenvelden tot en met rang {tier} te oogsten."
+          "herbalism": "Vereist om kruidenvelden tot en met rang {tier} te oogsten.",
+          "fishing": "Required to fish waters up to tier {tier}."
         },
         "use": {
           "mining": "Gebruik: ontgin een nabijgelegen ertsader.",

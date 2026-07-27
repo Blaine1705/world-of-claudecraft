@@ -2219,7 +2219,8 @@ export const cs_CZ: EnTranslations = {
         "unlocks": {
           "mining": "Nutný k těžbě rudných žil až do {tier}. úrovně.",
           "logging": "Nutná ke kácení skupin stromů až do {tier}. úrovně.",
-          "herbalism": "Nutný ke sběru porostů bylin až do {tier}. úrovně."
+          "herbalism": "Nutný ke sběru porostů bylin až do {tier}. úrovně.",
+          "fishing": "Required to fish waters up to tier {tier}."
         },
         "use": {
           "mining": "Použití: Vytěží blízkou rudnou žílu.",

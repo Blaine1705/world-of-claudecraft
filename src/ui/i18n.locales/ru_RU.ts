@@ -7414,6 +7414,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.unlocks.logging': 'Нужен для валки древостоев до {tier} уровня.',
   'hudChrome.gathering.toolTooltip.unlocks.herbalism':
     'Нужен для сбора зарослей трав до {tier} уровня.',
+  'hudChrome.gathering.toolTooltip.unlocks.fishing': 'Нужна для рыбалки в водах до {tier} уровня.',
   'hudChrome.gathering.toolTooltip.use.mining': 'Использование: добыть руду из ближайшей жилы.',
   'hudChrome.gathering.toolTooltip.use.logging': 'Использование: срубить ближайший древостой.',
   'hudChrome.gathering.toolTooltip.use.herbalism':

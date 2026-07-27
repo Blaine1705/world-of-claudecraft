@@ -14,10 +14,10 @@
 
 import type { GatheringProfessionId } from '../sim/content/professions';
 import {
-  FISH_BITE_DELAY_MAX_SEC,
-  FISH_BITE_DELAY_MIN_SEC,
-  FISH_BITE_DELAY_ROD_REDUCTION_SEC,
-  FISH_REEL_WINDOW_ROD_BONUS_SEC,
+  FISH_REEL_WINDOW_SEC,
+  fishBiteSavedSecFor,
+  fishingRodBandFor,
+  fishReelWindowSecFor,
 } from '../sim/professions/fishing';
 import { PROFICIENCY_BAND_THRESHOLDS } from '../sim/professions/proficiency_bands';
 import { isGatherToolUse } from '../sim/professions/tools';
@@ -36,6 +36,7 @@ const UNLOCKS_KEYS: Partial<Record<GatheringProfessionId, TranslationKey>> = {
   mining: 'hudChrome.gathering.toolTooltip.unlocks.mining',
   logging: 'hudChrome.gathering.toolTooltip.unlocks.logging',
   herbalism: 'hudChrome.gathering.toolTooltip.unlocks.herbalism',
+  fishing: 'hudChrome.gathering.toolTooltip.unlocks.fishing',
 };
 
 const USE_KEYS: Partial<Record<GatheringProfessionId, TranslationKey>> = {
@@ -67,45 +68,41 @@ export function gatherToolTooltipLines(item: ItemDef): string {
   if (use.professionId === 'fishing') {
     html += line('tt-desc', t('itemUi.tooltip.useFishing'));
     html += line('tt-desc', t('hudChrome.gathering.toolTooltip.rodRequired'));
+    // What the tier actually opens, said on the item that satisfies it, the
+    // same way a pick names the vein tiers it can work.
+    const unlocksFishing = UNLOCKS_KEYS.fishing;
+    if (unlocksFishing) html += line('tt-desc', t(unlocksFishing, { tier }));
     if (use.tier > 1) {
       const tiersAbove = use.tier - 1;
-      // CLAMPED, because the sim clamps. The bite window is
-      // [MIN, max(MIN, MAX - reduction * tiersAbove)], so once the reduction
-      // would push the ceiling under the floor the rod stops buying seconds:
-      // at tier 5 the raw product is 6 but the real improvement is 5, and the
-      // unclamped number told a player the rod was a second better than it is.
-      const biteSaved =
-        FISH_BITE_DELAY_MAX_SEC -
-        Math.max(
-          FISH_BITE_DELAY_MIN_SEC,
-          FISH_BITE_DELAY_MAX_SEC - FISH_BITE_DELAY_ROD_REDUCTION_SEC * tiersAbove,
-        );
+      // Both numbers come from the sim's own functions rather than from a
+      // second copy of its arithmetic. The copy is what shipped a tier-5 rod
+      // advertising a second the bite clamp never gives.
       html += line(
         'tt-desc',
         t('hudChrome.gathering.toolTooltip.rodBite', {
-          seconds: formatNumber(biteSaved, { maximumFractionDigits: 2 }),
+          seconds: formatNumber(fishBiteSavedSecFor(use.tier), { maximumFractionDigits: 2 }),
         }),
       );
       html += line(
         'tt-desc',
         t('hudChrome.gathering.toolTooltip.rodReel', {
-          seconds: formatNumber(FISH_REEL_WINDOW_ROD_BONUS_SEC * tiersAbove, {
+          seconds: formatNumber(fishReelWindowSecFor(use.tier) - FISH_REEL_WINDOW_SEC, {
             maximumFractionDigits: 2,
           }),
         }),
       );
-      // The band line is only true while the rod actually raises the ceiling.
-      // A rod of tier T unlocks catch band T - 1, and there are three bands,
-      // so tier 3 reaches the last one and tiers 4 and 5 unlock no band at
-      // all. Clamping the index instead (which is what this did) made every
-      // rod above tier 3 repeat the tier-3 rod's claim, telling the owner of a
-      // crafted rod it unlocks something the rod below it already had. Their
-      // real gains are the two bonus lines above, which do keep scaling.
-      if (use.tier <= PROFICIENCY_BAND_THRESHOLDS.length) {
+      // The band line is only true while the rod actually raises the ceiling,
+      // and where the ceiling is comes from the sim's own fishingRodBandFor
+      // rather than from the threshold array's length: the engine caps the
+      // band with that function, so reading anything else here is how the two
+      // ends drift. A rod that opens no NEW band says nothing about bands;
+      // clamping the index instead (which is what this did) made every rod
+      // above tier 3 repeat the tier-3 rod's claim back at its owner.
+      if (fishingRodBandFor(use.tier) > fishingRodBandFor(use.tier - 1)) {
         html += line(
           'tt-desc',
           t('hudChrome.gathering.toolTooltip.rodBand', {
-            skill: formatNumber(PROFICIENCY_BAND_THRESHOLDS[tiersAbove], {
+            skill: formatNumber(PROFICIENCY_BAND_THRESHOLDS[fishingRodBandFor(use.tier)], {
               maximumFractionDigits: 0,
             }),
           }),

@@ -2219,7 +2219,8 @@ export const sv_SE: EnTranslations = {
         "unlocks": {
           "mining": "Krävs för att bryta malmådror upp till tier {tier}.",
           "logging": "Krävs för att fälla timmerbestånd upp till tier {tier}.",
-          "herbalism": "Krävs för att samla örtfläckar upp till tier {tier}."
+          "herbalism": "Krävs för att samla örtfläckar upp till tier {tier}.",
+          "fishing": "Required to fish waters up to tier {tier}."
         },
         "use": {
           "mining": "Använd: Bryt en malmåder i närheten.",

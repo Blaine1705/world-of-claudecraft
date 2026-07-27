@@ -11,6 +11,7 @@ import {
   FISH_BITE_DELAY_MAX_SEC,
   FISH_BITE_DELAY_MIN_SEC,
   FISH_BITE_DELAY_ROD_REDUCTION_SEC,
+  fishingRodBandFor,
 } from '../src/sim/professions/fishing';
 import { gatherToolTooltipLines } from '../src/ui/gather_tool_tooltip';
 
@@ -60,6 +61,10 @@ describe('gatherToolTooltipLines: fishing implements', () => {
     expect(html).toContain('<div class="tt-sub">Fishing rod (tier 2)</div>');
     expect(html).toContain('<div class="tt-desc">Use: Fish in nearby waters.</div>');
     expect(html).toContain('<div class="tt-desc">Required to fish.</div>');
+    // The access line, the same statement a pick makes about vein tiers. Its
+    // absence was the reason a player could only learn the water refuses them
+    // by being refused.
+    expect(html).toContain('<div class="tt-desc">Required to fish waters up to tier 2.</div>');
     expect(html).toContain('<div class="tt-desc">Fish bite up to 1.5s sooner.</div>');
     expect(html).toContain('<div class="tt-desc">Extends the reel window by 0.75s.</div>');
     expect(html).toContain(
@@ -70,6 +75,7 @@ describe('gatherToolTooltipLines: fishing implements', () => {
   it('the tier-3 rod scales every bonus (3s bite, 1.5s reel, skill 200)', () => {
     const html = gatherToolTooltipLines(ITEMS.silverstream_fishing_rod);
     expect(html).toContain('<div class="tt-sub">Fishing rod (tier 3)</div>');
+    expect(html).toContain('<div class="tt-desc">Required to fish waters up to tier 3.</div>');
     expect(html).toContain('<div class="tt-desc">Fish bite up to 3s sooner.</div>');
     expect(html).toContain('<div class="tt-desc">Extends the reel window by 1.5s.</div>');
     expect(html).toContain(
@@ -86,6 +92,7 @@ describe('gatherToolTooltipLines: fishing implements', () => {
     // real gains and must still scale.
     const stormreel = gatherToolTooltipLines(ITEMS.stormreel_fishing_rod);
     expect(stormreel).toContain('<div class="tt-sub">Fishing rod (tier 4)</div>');
+    expect(stormreel).toContain('<div class="tt-desc">Required to fish waters up to tier 4.</div>');
     expect(stormreel).toContain('<div class="tt-desc">Fish bite up to 4.5s sooner.</div>');
     expect(stormreel).toContain('<div class="tt-desc">Extends the reel window by 2.25s.</div>');
     expect(stormreel).not.toContain('Unlocks richer catch tables');
@@ -107,6 +114,25 @@ describe('gatherToolTooltipLines: fishing implements', () => {
     );
     expect(tidewrought).toContain('<div class="tt-desc">Extends the reel window by 3s.</div>');
     expect(tidewrought).not.toContain('Unlocks richer catch tables');
+  });
+
+  it('the band line appears exactly where the sim says a rod raises the ceiling', () => {
+    // The tooltip and the engine now read ONE function for where the ladder
+    // ends, so this walks every shipped rod tier and asserts they agree,
+    // rather than trusting two copies of "there are three bands".
+    let sawLine = 0;
+    let sawNone = 0;
+    for (const def of Object.values(ITEMS)) {
+      const use = def.use;
+      if (use?.type !== 'gatherTool' || use.professionId !== 'fishing') continue;
+      const raises = fishingRodBandFor(use.tier) > fishingRodBandFor(use.tier - 1);
+      const html = gatherToolTooltipLines(def);
+      expect(html.includes('Unlocks richer catch tables'), `${def.id} band line`).toBe(raises);
+      if (raises) sawLine += 1;
+      else sawNone += 1;
+    }
+    // Both arms are live: two rods raise the ceiling, two do not.
+    expect([sawLine, sawNone]).toEqual([2, 2]);
   });
 });
 

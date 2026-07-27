@@ -2219,7 +2219,8 @@ export const da_DK: EnTranslations = {
         "unlocks": {
           "mining": "Kræves for at høste malmårer op til niveau {tier}.",
           "logging": "Kræves for at fælde tømmerlunde op til niveau {tier}.",
-          "herbalism": "Kræves for at samle urtepletter op til niveau {tier}."
+          "herbalism": "Kræves for at samle urtepletter op til niveau {tier}.",
+          "fishing": "Required to fish waters up to tier {tier}."
         },
         "use": {
           "mining": "Brug: Høst en nærliggende malmåre.",

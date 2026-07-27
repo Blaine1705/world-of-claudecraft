@@ -2219,7 +2219,8 @@ export const fr_CA: EnTranslations = {
         "unlocks": {
           "mining": "Nécessaire pour exploiter les filons de minerai jusqu'au palier {tier}.",
           "logging": "Nécessaire pour abattre les bosquets de bois jusqu'au palier {tier}.",
-          "herbalism": "Nécessaire pour collecter les parcelles de plantes jusqu'au palier {tier}."
+          "herbalism": "Nécessaire pour collecter les parcelles de plantes jusqu'au palier {tier}.",
+          "fishing": "Required to fish waters up to tier {tier}."
         },
         "use": {
           "mining": "Utilisation : exploiter un filon de minerai à proximité.",

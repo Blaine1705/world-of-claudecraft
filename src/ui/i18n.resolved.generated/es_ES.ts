@@ -2219,7 +2219,8 @@ export const es_ES: EnTranslations = {
         "unlocks": {
           "mining": "Necesaria para extraer vetas de mineral hasta el nivel {tier}.",
           "logging": "Necesaria para talar arboledas hasta el nivel {tier}.",
-          "herbalism": "Necesaria para recoger matas de hierbas hasta el nivel {tier}."
+          "herbalism": "Necesaria para recoger matas de hierbas hasta el nivel {tier}.",
+          "fishing": "Required to fish waters up to tier {tier}."
         },
         "use": {
           "mining": "Uso: extraer una veta de mineral cercana.",

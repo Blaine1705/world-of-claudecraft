@@ -6921,6 +6921,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.unlocks.mining': '开采最高{tier}阶的矿脉所需。',
   'hudChrome.gathering.toolTooltip.unlocks.logging': '砍伐最高{tier}阶的林木所需。',
   'hudChrome.gathering.toolTooltip.unlocks.herbalism': '采集最高{tier}阶的草药丛所需。',
+  'hudChrome.gathering.toolTooltip.unlocks.fishing': '在最高{tier}阶的水域垂钓所需。',
   'hudChrome.gathering.toolTooltip.use.mining': '使用：开采附近的矿脉。',
   'hudChrome.gathering.toolTooltip.use.logging': '使用：砍伐附近的林木。',
   'hudChrome.gathering.toolTooltip.use.herbalism': '使用：采集附近的草药丛。',

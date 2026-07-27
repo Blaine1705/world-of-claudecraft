@@ -71,6 +71,44 @@ export const FISH_BITE_DELAY_ROD_REDUCTION_SEC = 1.5;
 export const FISH_REEL_WINDOW_SEC = 2.5;
 export const FISH_REEL_WINDOW_ROD_BONUS_SEC = 0.75;
 
+// The three things a rod tier buys, as functions rather than as a formula
+// every reader re-derives. The tooltip used to recompute all three and got the
+// bite one wrong, promising a second the clamp does not give; a shared
+// definition is the only thing that stops that happening again. All pure, all
+// draw-free.
+
+/** The longest bite delay a rod of this tier can draw, floored at MIN. */
+export function fishBiteMaxSecFor(rodTier: number): number {
+  return Math.max(
+    FISH_BITE_DELAY_MIN_SEC,
+    FISH_BITE_DELAY_MAX_SEC - FISH_BITE_DELAY_ROD_REDUCTION_SEC * (rodTier - 1),
+  );
+}
+
+/** How many seconds off the worst wait a rod of this tier actually buys. The
+ *  clamp is why this is not simply the reduction times the tier. */
+export function fishBiteSavedSecFor(rodTier: number): number {
+  return FISH_BITE_DELAY_MAX_SEC - fishBiteMaxSecFor(rodTier);
+}
+
+/** The reel window a rod of this tier opens at the bite. Unclamped by design:
+ *  a wider window is the top of the ladder's whole reward. */
+export function fishReelWindowSecFor(rodTier: number): number {
+  return FISH_REEL_WINDOW_SEC + FISH_REEL_WINDOW_ROD_BONUS_SEC * (rodTier - 1);
+}
+
+/** The highest catch band a rod of this tier unlocks. Band b takes tool tier
+ *  b + 1, and there are three bands, so tier 3 reaches the last one and every
+ *  tier above it unlocks nothing further. The engine's own cap below reads
+ *  this, so the tooltip and the table can never disagree about where the
+ *  ladder ends. */
+export function fishingRodBandFor(rodTier: number): 0 | 1 | 2 {
+  let band: 0 | 1 | 2 = 0;
+  if (canGatherTier(rodTier, 2)) band = 1;
+  if (canGatherTier(rodTier, 3)) band = 2;
+  return band;
+}
+
 // Which catch table band a given fishing proficiency selects. Pure state (no
 // rng), so it never perturbs the one-draw-per-catch rng contract; NaN falls
 // to band 0 (see proficiencyBandFor).
@@ -245,10 +283,7 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // rod pulling the max down only. Stored in TICKS on hidden Entity state
   // (ceil, the lockpick deadline precedent), NEVER on castTotal/castRemaining:
   // those broadcast in dynamicFields and must carry no bite information.
-  const effMax = Math.max(
-    FISH_BITE_DELAY_MIN_SEC,
-    FISH_BITE_DELAY_MAX_SEC - FISH_BITE_DELAY_ROD_REDUCTION_SEC * (ownedRodTier - 1),
-  );
+  const effMax = fishBiteMaxSecFor(ownedRodTier);
   const delaySec = FISH_BITE_DELAY_MIN_SEC + ctx.rng.next() * (effMax - FISH_BITE_DELAY_MIN_SEC);
   p.fishBiteAtTick = ctx.tickCount + Math.ceil(delaySec / DT);
   p.fishReelDeadlineTick = 0;
@@ -293,9 +328,7 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   // who is over-rodded for where they stand, never one whose rod is illegal
   // for the water: that case was already refused, in words, before the cast.
   const rodTier = bestOwnedGatherToolTier(meta.inventory, 'fishing', ITEMS);
-  let allowedBand: 0 | 1 | 2 = 0;
-  if (canGatherTier(rodTier, 2)) allowedBand = 1;
-  if (canGatherTier(rodTier, 3)) allowedBand = 2;
+  const allowedBand = fishingRodBandFor(rodTier);
   const profBand = fishingBandFor(meta.gatheringProficiency.fishing ?? 0);
   const bandTables = FISHING_TABLES_BY_BAND[Math.min(profBand, allowedBand) as 0 | 1 | 2];
   const table = bandTables[zoneAt(p.pos.z).id] ?? bandTables.eastbrook_vale;

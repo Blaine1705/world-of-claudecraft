@@ -2219,7 +2219,8 @@ export const it_IT: EnTranslations = {
         "unlocks": {
           "mining": "Necessario per estrarre dai filoni di minerale fino al livello {tier}.",
           "logging": "Necessaria per abbattere i boschetti di alberi fino al livello {tier}.",
-          "herbalism": "Necessaria per raccogliere le aiuole d'erbe fino al livello {tier}."
+          "herbalism": "Necessaria per raccogliere le aiuole d'erbe fino al livello {tier}.",
+          "fishing": "Required to fish waters up to tier {tier}."
         },
         "use": {
           "mining": "Uso: estrai da un filone di minerale vicino.",

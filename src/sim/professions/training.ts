@@ -40,8 +40,9 @@ import { type CraftSkills, tierForSkill } from './wheel';
 //
 // The top two rungs are LIVE now, and they were not when this table was
 // written. The two crafted fishing rods (content/recipes.ts ROD_RECIPES) are
-// the first trainer-taught recipes to reach them: skillReq 75 lands on tier 3
-// at 4 gold and skillReq 125 on tier 4 at 16 gold. Everything else taught by a
+// the first trainer-taught recipes to reach them: skillReq 75 lands on recipe
+// tier 3 and pays 4 gold, and skillReq 125 lands on recipe tier 5, which is
+// past the end of this table and so clamps to its last entry, 16 gold. Everything else taught by a
 // trainer still sits at 0, 25 silver or 1 gold, and the six crafted LAND tools
 // escape the table entirely because they predate training and carry no
 // acquisition list, so they are known rather than learned. Whether a capstone

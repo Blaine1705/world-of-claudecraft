@@ -3947,8 +3947,11 @@ export type SimEvent = { pid?: number } & (
   // Gathering tool-gate denial (Professions 2.0, extended by #2343): the
   // player lacks a matching tool of at least `requiredTier` for a node
   // harvest (bare hands never harvest: requiredTier 1 means "no tool owned
-  // at all"), for a corpse harvest's premium (signed/specimen) arm, or lacks
-  // any fishing implement when casting a line (surface 'fishing'). Personal
+  // at all"), or for a corpse harvest's premium (signed/specimen) arm. The
+  // 'fishing' surface carries BOTH fishing refusals and the client splits
+  // them on requiredTier exactly like the node arm: tier 1 is "no tackle at
+  // all" (the implement gate) and tier 2 and up is "this water takes a better
+  // rod" (the per-zone gate, professions/fishing_zones.ts). Personal
   // (pid = the gatherer) and text-free on purpose (like gatherResult above):
   // the client composes its own localized copy off the structured fields.
   // `professionId` is present exactly when surface === 'node' or 'fishing'

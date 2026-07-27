@@ -1130,7 +1130,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       // The peaks take a tier-3 rod (professions/fishing_zones.ts): the same
       // rule the land tools above follow, now that fishing water has a tier of
       // its own. Trader Wilkes keeps the whole rod ladder as the one place you
-      // can buy ahead; these two rows are so you never have to.
+      // can buy ahead; this row is so you never have to.
       'silverstream_fishing_rod',
       // Tier 4/5 station-recipe reagents (items.ts): Bree is the Highwatch
       // trade-goods vendor, but she carries only arcanite_bar, the one premium

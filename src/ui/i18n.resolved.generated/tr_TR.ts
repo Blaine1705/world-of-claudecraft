@@ -2219,7 +2219,8 @@ export const tr_TR: EnTranslations = {
         "unlocks": {
           "mining": "Kademe {tier} ve altındaki cevher damarlarını kazmak için gereklidir.",
           "logging": "Kademe {tier} ve altındaki ağaç kümelerini devirmek için gereklidir.",
-          "herbalism": "Kademe {tier} ve altındaki ot öbeklerini toplamak için gereklidir."
+          "herbalism": "Kademe {tier} ve altındaki ot öbeklerini toplamak için gereklidir.",
+          "fishing": "Required to fish waters up to tier {tier}."
         },
         "use": {
           "mining": "Kullanım: Yakındaki bir cevher damarını kazar.",

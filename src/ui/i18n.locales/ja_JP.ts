@@ -7287,6 +7287,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.unlocks.logging': 'ティア{tier}までの立木の伐採に必要です。',
   'hudChrome.gathering.toolTooltip.unlocks.herbalism':
     'ティア{tier}までの薬草の群生地の採取に必要です。',
+  'hudChrome.gathering.toolTooltip.unlocks.fishing': 'ティア{tier}までの水域での釣りに必要です。',
   'hudChrome.gathering.toolTooltip.use.mining': '使用：近くの鉱脈を採掘する。',
   'hudChrome.gathering.toolTooltip.use.logging': '使用：近くの立木を伐り倒す。',
   'hudChrome.gathering.toolTooltip.use.herbalism': '使用：近くの薬草の群生地から採取する。',

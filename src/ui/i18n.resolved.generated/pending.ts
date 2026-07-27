@@ -37,6 +37,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
     "hudChrome.gathering.toolTierUnmet.fishing",
+    "hudChrome.gathering.toolTooltip.unlocks.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "es_ES": [
@@ -67,6 +68,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
     "hudChrome.gathering.toolTierUnmet.fishing",
+    "hudChrome.gathering.toolTooltip.unlocks.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "fr_FR": [
@@ -97,6 +99,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
     "hudChrome.gathering.toolTierUnmet.fishing",
+    "hudChrome.gathering.toolTooltip.unlocks.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "fr_CA": [
@@ -127,6 +130,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
     "hudChrome.gathering.toolTierUnmet.fishing",
+    "hudChrome.gathering.toolTooltip.unlocks.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "en_CA": [],
@@ -158,6 +162,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
     "hudChrome.gathering.toolTierUnmet.fishing",
+    "hudChrome.gathering.toolTooltip.unlocks.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "de_DE": [
@@ -188,6 +193,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
     "hudChrome.gathering.toolTierUnmet.fishing",
+    "hudChrome.gathering.toolTooltip.unlocks.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "zh_CN": [],
@@ -222,6 +228,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
     "hudChrome.gathering.toolTierUnmet.fishing",
+    "hudChrome.gathering.toolTooltip.unlocks.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "ru_RU": [],
@@ -253,6 +260,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
     "hudChrome.gathering.toolTierUnmet.fishing",
+    "hudChrome.gathering.toolTooltip.unlocks.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "nl_NL": [
@@ -283,6 +291,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
     "hudChrome.gathering.toolTierUnmet.fishing",
+    "hudChrome.gathering.toolTooltip.unlocks.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "pl_PL": [
@@ -313,6 +322,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
     "hudChrome.gathering.toolTierUnmet.fishing",
+    "hudChrome.gathering.toolTooltip.unlocks.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "id_ID": [
@@ -343,6 +353,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
     "hudChrome.gathering.toolTierUnmet.fishing",
+    "hudChrome.gathering.toolTooltip.unlocks.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "tr_TR": [
@@ -373,6 +384,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
     "hudChrome.gathering.toolTierUnmet.fishing",
+    "hudChrome.gathering.toolTooltip.unlocks.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "sv_SE": [
@@ -403,6 +415,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
     "hudChrome.gathering.toolTierUnmet.fishing",
+    "hudChrome.gathering.toolTooltip.unlocks.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "vi_VN": [
@@ -433,6 +446,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
     "hudChrome.gathering.toolTierUnmet.fishing",
+    "hudChrome.gathering.toolTooltip.unlocks.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "da_DK": [
@@ -463,6 +477,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
     "hudChrome.gathering.toolTierUnmet.fishing",
+    "hudChrome.gathering.toolTooltip.unlocks.fishing",
     "hudChrome.materialHint.fineGrade"
   ]
 };

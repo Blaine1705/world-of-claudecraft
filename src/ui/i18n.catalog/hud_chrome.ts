@@ -2443,6 +2443,12 @@ export const hudChromeStrings = {
         mining: 'Required to mine ore veins up to tier {tier}.',
         logging: 'Required to fell timber stands up to tier {tier}.',
         herbalism: 'Required to gather herb patches up to tier {tier}.',
+        // The rod arm says WATER rather than nodes: fishing has no nodes, and
+        // what a rod tier opens is which zones will take a line at all
+        // (professions/fishing_zones.ts). Without this the rod was the one
+        // tool family whose tooltip never named the access it buys, so the
+        // only way to learn the water refuses you was to be refused.
+        fishing: 'Required to fish waters up to tier {tier}.',
       },
       use: {
         mining: 'Use: Mine a nearby ore vein.',

@@ -2219,7 +2219,8 @@ export const id_ID: EnTranslations = {
         "unlocks": {
           "mining": "Diperlukan untuk menambang urat bijih hingga tingkat {tier}.",
           "logging": "Diperlukan untuk menebang tegakan pohon hingga tingkat {tier}.",
-          "herbalism": "Diperlukan untuk mengumpulkan petak herba hingga tingkat {tier}."
+          "herbalism": "Diperlukan untuk mengumpulkan petak herba hingga tingkat {tier}.",
+          "fishing": "Required to fish waters up to tier {tier}."
         },
         "use": {
           "mining": "Gunakan: Menambang urat bijih terdekat.",

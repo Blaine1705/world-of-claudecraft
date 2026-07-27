@@ -2219,7 +2219,8 @@ export const en: EnTranslations = {
         "unlocks": {
           "mining": "Required to mine ore veins up to tier {tier}.",
           "logging": "Required to fell timber stands up to tier {tier}.",
-          "herbalism": "Required to gather herb patches up to tier {tier}."
+          "herbalism": "Required to gather herb patches up to tier {tier}.",
+          "fishing": "Required to fish waters up to tier {tier}."
         },
         "use": {
           "mining": "Use: Mine a nearby ore vein.",

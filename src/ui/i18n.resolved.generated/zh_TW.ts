@@ -2219,7 +2219,8 @@ export const zh_TW: EnTranslations = {
         "unlocks": {
           "mining": "開採最高{tier}階的礦脈所需。",
           "logging": "砍伐最高{tier}階的林木所需。",
-          "herbalism": "採集最高{tier}階的草藥叢所需。"
+          "herbalism": "採集最高{tier}階的草藥叢所需。",
+          "fishing": "在最高{tier}階的水域垂釣所需。"
         },
         "use": {
           "mining": "使用：開採附近的礦脈。",

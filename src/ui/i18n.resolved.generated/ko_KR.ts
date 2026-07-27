@@ -2219,7 +2219,8 @@ export const ko_KR: EnTranslations = {
         "unlocks": {
           "mining": "{tier}티어까지의 광맥을 캐는 데 필요합니다.",
           "logging": "{tier}티어까지의 벌목 나무를 베는 데 필요합니다.",
-          "herbalism": "{tier}티어까지의 약초 군락을 채집하는 데 필요합니다."
+          "herbalism": "{tier}티어까지의 약초 군락을 채집하는 데 필요합니다.",
+          "fishing": "{tier}티어까지의 수역에서 낚시하는 데 필요합니다."
         },
         "use": {
           "mining": "사용: 근처의 광맥을 캡니다.",

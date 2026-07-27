@@ -2219,7 +2219,8 @@ export const pl_PL: EnTranslations = {
         "unlocks": {
           "mining": "Wymagany do wydobywania żył rudy do poziomu {tier}.",
           "logging": "Wymagana do ścinania drzewostanów do poziomu {tier}.",
-          "herbalism": "Wymagany do zbierania kęp ziół do poziomu {tier}."
+          "herbalism": "Wymagany do zbierania kęp ziół do poziomu {tier}.",
+          "fishing": "Required to fish waters up to tier {tier}."
         },
         "use": {
           "mining": "Użycie: wydobądź rudę z pobliskiej żyły.",

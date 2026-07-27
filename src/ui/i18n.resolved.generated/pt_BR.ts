@@ -2219,7 +2219,8 @@ export const pt_BR: EnTranslations = {
         "unlocks": {
           "mining": "Necessária para extrair veios de minério até o nível {tier}.",
           "logging": "Necessário para derrubar arvoredos até o nível {tier}.",
-          "herbalism": "Necessária para colher canteiros de ervas até o nível {tier}."
+          "herbalism": "Necessária para colher canteiros de ervas até o nível {tier}.",
+          "fishing": "Required to fish waters up to tier {tier}."
         },
         "use": {
           "mining": "Uso: extrai um veio de minério próximo.",

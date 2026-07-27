@@ -63,7 +63,7 @@ const ROD_TREATMENTS = [
     // Tidewrought: swung off blue into deep tidal violet and lit from inside,
     // with a gold rim, which is as far from storm steel as one silhouette can
     // be taken while still reading as sea tackle.
-    modulate: { brightness: 1.16, saturation: 1.45, hue: 52 },
+    modulate: { brightness: 1.14, saturation: 1.22, hue: 34 },
     linear: [1.08, 6],
     rim: { inner: '#ffdf94', outer: '#e08a2c', opacity: 0.62 },
   },

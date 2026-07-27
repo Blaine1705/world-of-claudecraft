@@ -356,6 +356,11 @@ export const TARGETS = [
               p.castRemaining = 0;
               p.fishBiteAtTick = 0;
               p.fishReelDeadlineTick = 0;
+              // Remembered so the press below can put the angler back exactly
+              // here: the world keeps ticking through the banner wait, and a
+              // shoreline slide into the water answers with the swimming arm
+              // instead of the rod one.
+              window.__shotSpot = { x, z, y: p.pos.y, facing: p.facing };
               found = true;
             }
           }
@@ -366,8 +371,25 @@ export const TARGETS = [
         try {
           sim.addItem('ironreel_fishing_rod', 1);
         } catch {}
+        // Lay the shore pack to rest BEFORE the banner wait as well as at the
+        // press: the peaks put ogres on this water, and a level-1 angler
+        // standing still for five seconds photographs a death screen.
+        for (const e of sim.entities.values()) {
+          if (e.kind !== 'mob' || e.dead) continue;
+          e.dead = true;
+          e.aiState = 'dead';
+          e.hp = 0;
+          e.respawnTimer = 9999;
+          e.corpseTimer = 9999;
+        }
+        p.inCombat = false;
+        p.combatTimer = 0;
+        p.hp = p.maxHp ?? p.hp;
       });
-      await wait(400);
+      // Long enough for the zone-entry banner to fade before the toast fires,
+      // short enough that the live world does not drown or kill a level-1
+      // angler standing on a Thornpeak shore while it waits.
+      await wait(2600);
       // Combat is cleared in the SAME evaluate as the press: the world keeps
       // ticking between evaluates, and a shore pack re-tags the angler inside
       // that gap, which captures the combat arm instead of the rod arm.
@@ -385,6 +407,19 @@ export const TARGETS = [
         }
         p.inCombat = false;
         p.combatTimer = 0;
+        p.dead = false;
+        p.hp = p.maxHp ?? p.hp;
+        const spot = window.__shotSpot;
+        if (spot) {
+          p.pos.x = spot.x;
+          p.pos.z = spot.z;
+          // The HEIGHT too: restoring x and z alone leaves the angler at swim
+          // depth after a shoreline slide, and the swimming arm answers first.
+          p.pos.y = spot.y;
+          p.prevPos = { ...p.pos };
+          p.facing = spot.facing;
+          p.swimming = false;
+        }
         try {
           sim.useItem('ironreel_fishing_rod');
         } catch {}

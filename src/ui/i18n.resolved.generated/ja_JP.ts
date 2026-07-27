@@ -2219,7 +2219,8 @@ export const ja_JP: EnTranslations = {
         "unlocks": {
           "mining": "ティア{tier}までの鉱脈の採掘に必要です。",
           "logging": "ティア{tier}までの立木の伐採に必要です。",
-          "herbalism": "ティア{tier}までの薬草の群生地の採取に必要です。"
+          "herbalism": "ティア{tier}までの薬草の群生地の採取に必要です。",
+          "fishing": "ティア{tier}までの水域での釣りに必要です。"
         },
         "use": {
           "mining": "使用：近くの鉱脈を採掘する。",

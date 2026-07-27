@@ -7269,6 +7269,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{tier}티어까지의 벌목 나무를 베는 데 필요합니다.',
   'hudChrome.gathering.toolTooltip.unlocks.herbalism':
     '{tier}티어까지의 약초 군락을 채집하는 데 필요합니다.',
+  'hudChrome.gathering.toolTooltip.unlocks.fishing':
+    '{tier}티어까지의 수역에서 낚시하는 데 필요합니다.',
   'hudChrome.gathering.toolTooltip.use.mining': '사용: 근처의 광맥을 캡니다.',
   'hudChrome.gathering.toolTooltip.use.logging': '사용: 근처의 벌목 나무를 벱니다.',
   'hudChrome.gathering.toolTooltip.use.herbalism': '사용: 근처의 약초 군락에서 채집합니다.',

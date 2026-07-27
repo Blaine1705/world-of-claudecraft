@@ -2219,7 +2219,8 @@ export const de_DE: EnTranslations = {
         "unlocks": {
           "mining": "Erforderlich, um Erzadern bis Stufe {tier} abzubauen.",
           "logging": "Erforderlich, um Baumgruppen bis Stufe {tier} zu fällen.",
-          "herbalism": "Erforderlich, um Kräuterpflanzen bis Stufe {tier} zu sammeln."
+          "herbalism": "Erforderlich, um Kräuterpflanzen bis Stufe {tier} zu sammeln.",
+          "fishing": "Required to fish waters up to tier {tier}."
         },
         "use": {
           "mining": "Benutzen: Baut eine Erzader in der Nähe ab.",
