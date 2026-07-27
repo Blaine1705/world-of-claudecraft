@@ -26,9 +26,10 @@ export interface LockpickControllerDeps {
 export class LockpickController {
   private trap: FocusTrapHandle | null = null;
   private keyHandler: ((event: KeyboardEvent) => void) | null = null;
-  /** The session `requestClose` has already asked the server to withdraw from, so a repeat
-   *  request closes the panel instead of sending a second abort. Keyed on the id rather than
-   *  a bare flag so a fresh engage can never inherit a stale one. */
+  /** The session `requestClose` has already asked the server to withdraw from. A repeat
+   *  request for that same session re-sends the abort ONCE as a hedge and then closes,
+   *  rather than withdrawing and waiting forever on an answer that may never come. Keyed on
+   *  the id rather than a bare flag so a fresh engage can never inherit a stale one. */
   private withdrawnSessionId: string | null = null;
   private readonly window: LockpickWindow;
 
@@ -102,11 +103,12 @@ export class LockpickController {
     this.flushEvents();
   }
 
-  /** The panel's ONE dismissal funnel: withdraw from a live lock, or just close the ante
-   *  selector when there is nothing left to withdraw from. Both of the panel's own
-   *  affordances already mean exactly this (the board's X and Withdraw are wired to onAbort,
-   *  the ante selector's X to onClose), and the capture-phase Escape handler below picks the
-   *  same arm.
+  /** The dismissal funnel for every caller that has to CHOOSE an arm: withdraw from a live
+   *  lock, or just close the ante selector when there is nothing left to withdraw from. The
+   *  panel's own buttons do not come through here and do not need to, because each one is
+   *  bound to the arm its markup already implies (the board's X and Withdraw to onAbort, the
+   *  ante selector's X to onClose); the capture-phase Escape handler below and the HUD's
+   *  managed-window case are the callers that face either markup, and they share this.
    *
    *  It is a named method rather than inline because a THIRD caller needs it and cannot
    *  reach the handler: `Hud.closeManagedWindow`'s `lockpick-panel` case. A gamepad escape
@@ -116,17 +118,18 @@ export class LockpickController {
    *  hidden subtree, the focus trap armed on an invisible panel, and the session live on the
    *  server, which then burned the tries out and FORFEITED the chest a withdrawal preserves.
    *
-   *  WITHDRAW ONCE, THEN CLOSE, and the second half is not politeness about duplicate
-   *  commands. `submitAbort()` deliberately does not hide the panel: the close comes from the
-   *  authoritative lockpickEnd, which offline the sim emits and `flushEvents()` drains inside
-   *  this very call, but ONLINE is a wire command whose answer is a frame away. So online the
-   *  panel is still up when `requestClose` returns, and a caller that asks again would send a
-   *  second abort forever. `SkinEventController.open()` is exactly that caller: it sweeps
-   *  `for (i < 20 && closeTop())` to clear the stack before a roll reveal, and without the
-   *  latch it would spin all 20 iterations here and never reach the windows underneath.
-   *  Latching also unwedges the panel when the answer never comes at all:
+   *  WITHDRAW, THEN RE-SEND ONCE AND CLOSE. `submitAbort()` deliberately does not hide the
+   *  panel: the close comes from the authoritative lockpickEnd, which offline the sim emits
+   *  and `flushEvents()` drains inside this very call, but ONLINE is a wire command whose
+   *  answer is a frame away. So online the panel is still up when `requestClose` returns, and
+   *  a caller that asks again would withdraw forever. `SkinEventController.open()` is exactly
+   *  that caller: it sweeps `for (i < 20 && closeTop())` to clear the stack before a roll
+   *  reveal, and without the latch it would spin all 20 iterations here and never reach the
+   *  windows underneath. Latching also unwedges the panel when the answer never comes at all:
    *  `ClientWorld.lockpickState` is rebuilt purely from events and is not reset on reconnect,
-   *  so a stale one would otherwise leave a board that no input could dismiss. */
+   *  so a stale one would otherwise leave a board that no input could dismiss. The repeat arm
+   *  hedges with a second abort before it closes, because a dropped first send and one still
+   *  in flight look identical from here; see the comment on that arm for why. */
   requestClose(): void {
     const live = this.deps.getState();
     if (live && live.sessionId !== this.withdrawnSessionId) {
@@ -141,10 +144,15 @@ export class LockpickController {
     // on a closed socket with no queue and no retry. Closing without asking again in that
     // second case hides a board the server still considers live and lets the per-step clock
     // burn the tries down to lockpickFail, which is #2517's forfeited chest arriving by the
-    // other road. So ask once more, then close regardless, which is what keeps the repeat
-    // callers (the closeTop sweep) advancing. Bounded at two commands per dismissal.
-    if (live) this.submitAbort();
+    // other road. So close, then ask once more, which keeps the repeat callers (the closeTop
+    // sweep) advancing at a cost of two commands per dismissal on this path.
+    //
+    // CLOSE FIRST, and the order is load-bearing rather than tidy: submitAbort ends in
+    // flushEvents, which runs the whole Hud.handleEvents switch, and two of its arms
+    // (lockpickOffer, lockpickSession) call openPanel and put this panel back up. Closing
+    // afterwards would tear down a board the drain had just legitimately opened.
     this.close();
+    if (live) this.submitAbort();
   }
 
   close(restoreFocus = true): void {
@@ -160,13 +168,13 @@ export class LockpickController {
   }
 
   private openPanel(): void {
-    // A fresh ante selector or board is a fresh dismissal. Belt to the id keying's braces,
-    // and NO test reaches it: every ordinary re-engage already gets a different sessionId,
-    // so the comparison in requestClose alone would do. What this covers is the one case it
-    // cannot, an id COLLISION: the sim mints `lp_${objectId}_${ctx.tickCount}`, so a
-    // withdraw and a re-engage on the same chest inside one tick produce the same string,
-    // and the latch would swallow the second withdrawal, which is #2517's forfeiture again.
-    // Said here rather than pinned by a case that could only assert it vacuously.
+    // A fresh ante selector or board is a fresh dismissal. Belt to the id keying's braces:
+    // every ordinary re-engage already gets a different sessionId, so the comparison in
+    // requestClose alone would do. What this covers is the one case it cannot, an id
+    // COLLISION: the sim mints `lp_${objectId}_${ctx.tickCount}`, so a withdraw and a
+    // re-engage on the same chest inside one tick produce the same string. Without the reset
+    // that second board would take the REPEAT arm on its very first dismissal, closing
+    // optimistically instead of withdrawing and waiting for the server to confirm.
     this.withdrawnSessionId = null;
     if (this.deps.panel.style.display !== 'block') this.trap = this.deps.openFocusTrap();
     this.deps.panel.style.display = 'block';

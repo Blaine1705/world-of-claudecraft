@@ -14,8 +14,8 @@
 // rather than the silent default of having forgotten.
 //
 // The case list is read with the TypeScript compiler API rather than a regex over the source
-// text. `src/ui/hud.ts` carries about a hundred regex literals in its server-text matchers,
-// several holding apostrophes and escaped slashes, and a hand-rolled scan over it has already
+// text. `src/ui/hud.ts` carries dozens of regex literals in its server-text matchers, some
+// holding an apostrophe or an escaped slash, and a hand-rolled scan over it has already
 // been wrong twice invisibly (see tests/helpers/method_call_sites.ts). A `case '...'` inside
 // one of the file's other switches, or inside a comment or a string, must not count.
 
@@ -34,7 +34,10 @@ const playHtml = readFileSync(`${root}play.html`, 'utf8');
 /**
  * `.window.panel` ids that are built in code instead of shipped in the markup, so
  * `topmostOpenWindow()` still selects them but no HTML entry lists them. Value = the module
- * that creates the element. An unlisted fourth creation site fails the count pin below.
+ * that creates the element. A fourth site written as `className = '...'` or
+ * `classList.add(...)` fails the count pin below; a panel minted through innerHTML,
+ * setAttribute('class', ...), or `className +=` is out of that scan's reach and would need
+ * its own row here.
  */
 const CODE_BUILT: Record<string, string> = {
   'confirm-dialog': 'src/ui/hud.ts (confirmDialog + inputDialog share the one id)',
@@ -51,7 +54,8 @@ const CLOSED_BEFORE_THE_SCAN: Record<string, string> = {
   'delve-rite-panel':
     "closeAll's `$('#delve-rite-panel').style.display === 'block'` arm routes it to " +
     'closeRitePanel -> RiteController.close(), which releases its focus trap. That arm is its ' +
-    'ONLY teardown, so the ordering pin below is what defends it: move the arm under the scan ' +
+    'only teardown ON THE closeAll PATH (its own X, choose(), and the delveRitePulse handler ' +
+    'close it otherwise), so the ordering pin below is what defends it: move the arm under the scan ' +
     'and the panel falls to the default hide with its trap still armed, the #2517 defect.',
 };
 
@@ -137,8 +141,8 @@ function readCloseManagedWindowSwitch(source: string): {
 function readPanelIds(html: string): string[] {
   const ids: string[] = [];
   for (const tag of html.match(/<[a-z][a-z0-9-]*\b[^>]*>/gi) ?? []) {
-    const id = tag.match(/\bid="([^"]+)"/)?.[1];
-    const cls = tag.match(/\bclass="([^"]+)"/)?.[1];
+    const id = tag.match(/\bid=("|')([^"']+)\1/)?.[2];
+    const cls = tag.match(/\bclass=("|')([^"']+)\1/)?.[2];
     if (!id || !cls) continue;
     const classes = cls.split(/\s+/);
     if (classes.includes('window') && classes.includes('panel')) ids.push(id);
@@ -247,9 +251,12 @@ describe('closeManagedWindow case registry', () => {
     // TOKEN-exact, not substring: `classes.includes(...)` and `cls.includes(...)` agree on
     // every input above and part company here.
     expect(readPanelIds('<div id="g" class="windowed paneling">')).toEqual([]);
+    // Single-quoted attributes count too: both shells use double quotes today, so without
+    // this a quote-style change would drop panels out of the family unnoticed.
+    expect(readPanelIds(`<div id='h' class='window panel'>`)).toEqual(['h']);
   });
 
-  it('classifies every `.window .panel` exactly once', () => {
+  it('classifies every `.window.panel` exactly once', () => {
     const buckets = markupIds.map((id) => ({
       id,
       in: [

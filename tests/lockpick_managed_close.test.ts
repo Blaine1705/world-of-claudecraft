@@ -2,7 +2,7 @@
 
 // The lockpick panel's managed-window close path (#2517).
 //
-// `#lockpick-panel` is a `.window .panel`, so `Hud.closeAll()` picks it up through
+// `#lockpick-panel` is a `.window.panel`, so `Hud.closeAll()` picks it up through
 // `topmostOpenWindow()` and hands it to `closeManagedWindow`. With no `case` for its id it
 // fell to the `default:` arm, which is `el.style.display = 'none'` and nothing else: the
 // 100ms countdown interval kept firing into a hidden subtree for the rest of the attempt,
@@ -109,8 +109,10 @@ function harness(initial: LockpickView | null, host: 'online' | 'offline' = 'onl
       pending = [];
       return out;
     },
-    // The one arm of Hud.handleEvents this path reaches: lockpickEnd -> endLockpick ->
-    // controller.end(outcome), pinned as a source fact in the registry suite.
+    // The one arm of Hud.handleEvents this path reaches, transcribed from
+    // src/ui/hud.ts's `case 'lockpickEnd': this.endLockpick(...)` -> controller.end(outcome).
+    // Transcribed, NOT pinned: no guard ties this fake to that switch, so a rewrite there
+    // would leave these cases green against a mapping the client no longer has.
     handleEvents: (events) => {
       for (const ev of events) if (ev.type === 'lockpickEnd') controller.end(ev.outcome);
     },
@@ -162,6 +164,9 @@ describe('lockpick panel: Hud.closeAll (the gamepad escape path)', () => {
   });
   afterEach(() => {
     for (const controller of built.splice(0)) controller.close(false);
+    // Not the inline mockRestore()s a failing expect would skip: a spy left on the shared
+    // jsdom window turns one red case into a cascade in every case after it.
+    vi.restoreAllMocks();
     vi.useRealTimers();
     document.body.innerHTML = '';
   });
@@ -203,6 +208,10 @@ describe('lockpick panel: Hud.closeAll (the gamepad escape path)', () => {
     expect(h.panel.style.display, 'still up until lockpickEnd lands').toBe('block');
     // The arm owes its own tooltip hide, since close() (which would have done it) has not run.
     expect(h.hudHideTooltip).toHaveBeenCalledTimes(1);
+    expect(
+      h.depsHideTooltip,
+      'close() has not run, so the controller owed no hide',
+    ).not.toHaveBeenCalled();
   });
 
   it('completes the teardown offline, inside the one closeAll call', () => {
@@ -224,7 +233,7 @@ describe('lockpick panel: Hud.closeAll (the gamepad escape path)', () => {
     expect(h.hud.topmostOpenWindow()).not.toBe(h.panel);
   });
 
-  it('withdraws once, then closes, so a repeat closeAll cannot wedge on the panel', () => {
+  it('withdraws, re-sends once, then closes, so a repeat closeAll cannot wedge on the panel', () => {
     // SkinEventController.open() sweeps `for (i < 20 && closeTop())` to clear the stack before
     // a roll reveal, and closeTop IS closeAll. Online the withdrawal leaves the panel up, so
     // without the per-session latch this spins all 20 iterations here, fires 20 aborts, and
@@ -267,6 +276,48 @@ describe('lockpick panel: Hud.closeAll (the gamepad escape path)', () => {
     h.controller.openBoard();
     h.hud.closeAll();
     expect(h.abort, 'a fresh session withdraws on its own').toHaveBeenCalledTimes(2);
+    // The count alone stopped separating the arms once the repeat arm started re-sending:
+    // both send an abort. What still tells them apart is that the FRESH arm defers the close.
+    expect(h.panel.style.display, 'a fresh session withdraws and waits, it does not close').toBe(
+      'block',
+    );
+    expect(h.release, 'and its trap survives until lockpickEnd').not.toHaveBeenCalled();
+  });
+
+  it('re-arms after a same-id re-engage, which the id keying alone cannot catch', () => {
+    // The collision openPanel's reset exists for. The sim mints
+    // `lp_${objectId}_${ctx.tickCount}`, so a withdraw and a re-engage on one chest inside a
+    // tick reuse the string. Reachable here, and NOT vacuous: without the reset the reopened
+    // board takes the repeat arm on its first dismissal and closes optimistically.
+    const h = harness(LIVE);
+    h.controller.openBoard();
+    h.hud.closeAll();
+    expect(h.abort).toHaveBeenCalledTimes(1);
+
+    // Same session id, fresh board.
+    h.controller.openBoard();
+    h.hud.closeAll();
+    expect(h.panel.style.display, 'the reopened board withdraws and waits').toBe('block');
+    expect(h.release, 'no optimistic close on a re-engaged board').not.toHaveBeenCalled();
+  });
+
+  it('routes the keyboard Escape through the same funnel, latch included', () => {
+    // The fix's central claim is that the key handler and the managed-window case share one
+    // method. Nothing pinned it: reverting bindKeys to its old inline
+    // `if (live) this.submitAbort(); else this.close();` left all cases green, because a
+    // FIRST dismissal is identical either way. The latch is what separates them, so press
+    // Escape twice and require the second press to behave like requestClose's repeat arm.
+    const h = harness(LIVE);
+    h.controller.openBoard();
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', cancelable: true }));
+    expect(h.abort).toHaveBeenCalledTimes(1);
+    expect(h.panel.style.display, 'the first Escape withdraws and waits').toBe('block');
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', cancelable: true }));
+    expect(h.abort, 'the second hedges the re-send').toHaveBeenCalledTimes(2);
+    expect(h.panel.style.display, 'and closes').toBe('none');
+    expect(h.release).toHaveBeenCalledWith(true);
   });
 
   it('dismisses the ante selector outright, releasing the trap and returning focus', () => {
@@ -299,7 +350,6 @@ describe('lockpick panel: Hud.closeAll (the gamepad escape path)', () => {
     // The registration is on the CAPTURE phase, which is what lets the controller beat
     // src/game/input.ts's bubble listener; unbinding without that flag is a silent no-op.
     expect(remove).toHaveBeenCalledWith('keydown', expect.any(Function), true);
-    remove.mockRestore();
 
     // And the behavioral half: with the panel shown again, a surviving listener WOULD act,
     // so this distinguishes "unbound" from "merely short-circuited by the display guard".
@@ -320,7 +370,6 @@ describe('lockpick panel: Hud.closeAll (the gamepad escape path)', () => {
       add.mock.calls.filter(([type]) => type === 'keydown'),
       'the reopened panel rebinds its keyboard',
     ).toHaveLength(1);
-    add.mockRestore();
   });
 
   it('produces the same teardown as the Escape key, live board and ante selector alike', () => {

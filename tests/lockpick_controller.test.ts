@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { FocusTrapHandle } from '../src/ui/focus_manager';
 import { LockpickController } from '../src/ui/hud/delve/lockpick_controller';
+import { t } from '../src/ui/i18n';
 import type { LockpickView } from '../src/world_api';
 import { FakeDocument, FakeWindow } from './helpers/fake_dom';
 
@@ -148,7 +149,9 @@ describe('LockpickController', () => {
     test.controller.end('abandoned');
 
     expect(test.showBanner, 'a withdrawal is not an achievement').not.toHaveBeenCalled();
-    expect(test.log).toHaveBeenCalledWith(expect.any(String), '#ccc');
+    // The KEY, not just the colour: swapping the abandoned and fail summaries (or wiring
+    // this arm to the fail key) leaves an `expect.any(String)` version of this green.
+    expect(test.log).toHaveBeenCalledWith(t('lockpickUi.summary.abandoned'), '#ccc');
     expect(test.panel.style.display).toBe('none');
     expect(test.release).toHaveBeenCalledWith(true);
   });
