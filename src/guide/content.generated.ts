@@ -2025,14 +2025,6 @@ export const GUIDE_DUNGEONS: GuideDungeon[] = [
     "name": "The Drowned Temple"
   },
   {
-    "id": "orkadia",
-    "isRaid": false,
-    "suggestedPlayers": 5,
-    "min": 18,
-    "max": 20,
-    "name": "Orkadia"
-  },
-  {
     "id": "gravewyrm_sanctum",
     "isRaid": false,
     "suggestedPlayers": 5,
@@ -4676,20 +4668,6 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 10,
     "feat": false,
     "crest": "/ui/deeds/soc_salvage_50.webp"
-  },
-  {
-    "id": "dgn_orkadia",
-    "name": "Warbreaker of Orkadia",
-    "category": "dungeon",
-    "renown": 10,
-    "feat": false
-  },
-  {
-    "id": "dgn_orkadia_heroic",
-    "name": "Heroic: Orkadia",
-    "category": "dungeon",
-    "renown": 10,
-    "feat": false
   },
   {
     "id": "dgn_wildheart_basin",
