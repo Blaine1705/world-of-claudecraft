@@ -87,11 +87,19 @@ export function renderTownFocusWindow(
     el.appendChild(notInTown);
   }
 
+  // Formatted, not spliced: t()'s interpolate() ends in a bare String(value),
+  // which is JavaScript's own fixed number-to-string spelling and never reaches
+  // Intl, so a raw number here renders the same digits for every player
+  // whatever language they picked (#2530). Same option bag as the tier hint
+  // above, which is the whole point: two adjacent lines rendering counts must
+  // not disagree about how a count is spelled. Invisible for the shipped
+  // 0..FOCUS_POINT_BUDGET range, which is exactly why it was easy to write the
+  // other way.
   const budget = document.createElement('div');
   budget.className = 'town-focus-budget';
   budget.textContent = t('hudChrome.townFocus.budgetLabel', {
-    remaining: view.remaining,
-    budget: view.budget,
+    remaining: formatNumber(view.remaining, { maximumFractionDigits: 0 }),
+    budget: formatNumber(view.budget, { maximumFractionDigits: 0 }),
   });
   el.appendChild(budget);
 
@@ -102,7 +110,12 @@ export function renderTownFocusWindow(
     );
     const rowEl = document.createElement('div');
     rowEl.className = 'town-focus-row';
-    rowEl.innerHTML = `<span class="tf-name">${esc(componentName)}</span><span class="tf-points">${row.points}</span>`;
+    // esc() as well as formatNumber, matching the name beside it: no separator
+    // any supported locale emits is HTML-special (they are U+002C, U+002E,
+    // U+00A0, U+202F), so this is a no-op today and stays one for the file's
+    // "every interpolation is escaped" rule rather than being an exception a
+    // reader has to re-derive.
+    rowEl.innerHTML = `<span class="tf-name">${esc(componentName)}</span><span class="tf-points">${esc(formatNumber(row.points, { maximumFractionDigits: 0 }))}</span>`;
 
     const dec = document.createElement('button');
     dec.type = 'button';
