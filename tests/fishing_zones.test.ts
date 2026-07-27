@@ -574,6 +574,12 @@ describe('a rod rarity rung widens the reel window', () => {
     // holding the tier fixed is the only thing that can tell the two apart.
     const tier = 3;
     const common = fishReelWindowSecFor(tier, 'common');
+    // NON-VACUITY FIRST. The per-rung assertion below computes its expected
+    // value FROM the constant, so at a constant of 0 both sides are 0 and every
+    // row passes while the bonus buys nothing. A mutation pass zeroing the
+    // constant survived this test until these two lines existed.
+    expect(FISH_REEL_WINDOW_RARITY_BONUS_SEC).toBeGreaterThan(0);
+    expect(fishReelWindowSecFor(tier, 'epic')).toBeGreaterThan(common);
     for (const [rarity, rungs] of [
       ['uncommon', 1],
       ['rare', 2],
@@ -584,6 +590,14 @@ describe('a rod rarity rung widens the reel window', () => {
         FISH_REEL_WINDOW_RARITY_BONUS_SEC * rungs,
         10,
       );
+      // And each rung is strictly wider than the one below it, stated against
+      // the window rather than against the constant, so the ladder cannot
+      // collapse to a single step while the arithmetic above still agrees.
+      if (rungs > 1) {
+        expect(fishReelWindowSecFor(tier, rarity)).toBeGreaterThan(
+          common + FISH_REEL_WINDOW_RARITY_BONUS_SEC,
+        );
+      }
     }
   });
 
