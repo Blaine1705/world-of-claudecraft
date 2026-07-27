@@ -336,6 +336,16 @@ describe('closeManagedWindow case registry', () => {
     // as tsFilesUnder today and diverges the day a panel module moves down a level, which is
     // the silent narrowing this pin exists to stop (#2485, #2489, #2502).
     expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
+    // The shared audit proves the walker is IMPORTED and that nothing reads a directory
+    // directly. It cannot see a scan that keeps the import and hard-codes its file list
+    // again, which is the exact revert this file has to survive, so count the call too.
+    // The needle is split, or this assertion line would satisfy itself (the trap
+    // helpers/scan_guard_self_audit.ts documents as its own first mistake).
+    const self = readFileSync(fileURLToPath(import.meta.url), 'utf8');
+    expect(
+      self.split(`tsFilesUnder${'('}`).length - 1,
+      'the walker is called, not just imported',
+    ).toBe(1);
   });
 
   it('routes #lockpick-panel through the controller, not a bare hide (#2517)', () => {
