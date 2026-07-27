@@ -39,7 +39,13 @@ import {
 import { harvestGradeItemId } from './material_grades';
 import { gatherActionXp } from './profession_xp';
 import { proficiencyBandFor } from './proficiency_bands';
-import { bestOwnedGatherToolTierOrNone, canGatherTier, NO_TOOL_OWNED } from './tools';
+import {
+  applyEffectBonus,
+  bestOwnedGatherToolTierOrNone,
+  canGatherTier,
+  NO_TOOL_OWNED,
+  resolveToolEffectUse,
+} from './tools';
 import type { PlayerProfessionSkill } from './types';
 import { tierProgressMultiplier } from './wheel';
 
@@ -143,10 +149,32 @@ export function harvestYieldItemIdFor(node: GatherNodeDef, ownedToolTier: number
  *  agree or a pre-gate would clear room for an item the grant does not mint. */
 export function harvestYieldItemId(meta: PlayerMeta, node: GatherNodeDef): string {
   const professionId = NODE_HARVEST_TABLE[node.type].professionId;
-  return harvestYieldItemIdFor(
-    node,
-    bestOwnedGatherToolTierOrNone(meta.inventory, professionId, ITEMS),
-  );
+  return harvestYieldItemIdFor(node, effectiveGradeToolTier(meta, professionId));
+}
+
+/**
+ * The tool tier the FINE-GRADE comparison should read for this player: their
+ * best owned tool, plus whatever a slotted quality effect adds.
+ *
+ * Runs the bonus through `applyEffectBonus`, the same function the grant path
+ * uses, rather than re-deriving "+1 if a quality effect is slotted" here. That
+ * is deliberate: a second copy of a bonus rule is exactly how a tooltip once
+ * promised a second the sim's clamp never gave. One definition, three readers
+ * (this pre-gate, the grant, and the tooltip).
+ *
+ * Pure and draw-free, and it never spends a charge: spending belongs to the
+ * grant alone (`resolveHarvest`), so asking what a harvest WOULD yield costs
+ * the player nothing.
+ */
+export function effectiveGradeToolTier(
+  meta: PlayerMeta,
+  professionId: GatheringProfessionId,
+): number {
+  const owned = bestOwnedGatherToolTierOrNone(meta.inventory, professionId, ITEMS);
+  return applyEffectBonus(meta.toolEffectSlots?.[professionId], {
+    quantity: 0,
+    gradeToolTier: owned,
+  }).gradeToolTier;
 }
 
 export function gatherNodeById(nodeId: string): GatherNodeDef | undefined {
@@ -300,8 +328,23 @@ export function resolveHarvest(
   // and pinning it at start would need transient cast state on Entity for a
   // difference only a player who gained or lost a tool mid-cast could see.
   // Losing the tool mid-cast costs the upgrade, never the harvest.
-  const itemId = harvestYieldItemId(meta, node);
-  const qty = material.qtyByRarity[rarity] * (rareEvent ? GATHER_RARE_EVENT_YIELD_MULT : 1);
+  // The slotted tool effect (D10), applied AFTER both draws and drawing
+  // nothing itself, which is what lets it sit inside the two-draw contract
+  // above. A quantity effect raises the units; a quality effect raises only
+  // the tier the GRADE comparison reads, never the tier the access gate reads,
+  // so an effect can improve what a vein yields and can never open one.
+  // `confirmed` is true because no confirmation flow exists yet: every shipped
+  // slot is 'always' mode, for which the flag is ignored outright.
+  const effect = resolveToolEffectUse(
+    meta.toolEffectSlots?.[entry.professionId],
+    {
+      quantity: material.qtyByRarity[rarity] * (rareEvent ? GATHER_RARE_EVENT_YIELD_MULT : 1),
+      gradeToolTier: bestOwnedGatherToolTierOrNone(meta.inventory, entry.professionId, ITEMS),
+    },
+    true,
+  );
+  const itemId = harvestYieldItemIdFor(node, effect.outcome.gradeToolTier);
+  const qty = effect.outcome.quantity;
   const signed = rareEvent !== null || isSignableMaterialRarity(rarity);
   // The queued gain is node-tier-relative (gatherNodeGainMultiplier
   // above), read off the proficiency at the moment of harvest; a gray harvest

@@ -6,6 +6,7 @@ import {
   resolveHarvest,
   rollMaterialRarity,
 } from '../src/sim/professions/gathering';
+import { canGatherTier, slotEffect, type ToolEffectSlot } from '../src/sim/professions/tools';
 import { Rng } from '../src/sim/rng';
 import type { PlayerMeta } from '../src/sim/sim';
 
@@ -153,5 +154,89 @@ describe('material rarity roll (#1122)', () => {
       const tier = rollMaterialRarity(50, rng);
       expect(TIERS).toContain(tier);
     }
+  });
+});
+
+// A slotted tool effect must be invisible to the rng stream. The harvest path
+// is pinned at exactly two draws per granted harvest and zero on a denial, and
+// that pin is only worth having if it holds for EVERY player: an effect that
+// spent a draw would mean two players standing at the same vein walked
+// different streams depending on what one of them had slotted.
+describe('a slotted tool effect changes the yield and never the draw stream', () => {
+  const ORE_NODE = GATHER_NODES.find((n) => n.type === 'ore' && n.zoneId === 'eastbrook_vale');
+
+  function metaWith(slot?: ToolEffectSlot): PlayerMeta {
+    return {
+      gatheringProficiency: { mining: 50, logging: 50, herbalism: 50 },
+      nodeHarvestReadyAt: {},
+      pendingGatherGrants: [],
+      inventory: [{ itemId: 'copper_mining_pick', count: 1 }],
+      ...(slot ? { toolEffectSlots: { mining: slot } } : {}),
+    } as unknown as PlayerMeta;
+  }
+
+  function drawsFor(slot: ToolEffectSlot | undefined, seed: number): number[] {
+    const values: number[] = [];
+    const rng = new Rng(seed);
+    rng.setObserver((v) => values.push(v));
+    resolveHarvest(metaWith(slot), ORE_NODE!, 0, rng);
+    rng.setObserver(null);
+    return values;
+  }
+
+  it('draws the same VALUES, not merely the same count, with and without a slot', () => {
+    if (!ORE_NODE) throw new Error('no eastbrook ore node');
+    const without = drawsFor(undefined, 4242);
+    expect(without).toHaveLength(2); // the pinned contract itself
+    for (const effectId of ['gatherers_cache', 'artisans_eye', 'quickening_charm'] as const) {
+      const withSlot = drawsFor(slotEffect(effectId, { toolRarity: 'epic' }), 4242);
+      expect(withSlot, `${effectId} moved the stream`).toEqual(without);
+    }
+  });
+
+  it('a denial still draws nothing when an effect is slotted', () => {
+    if (!ORE_NODE) throw new Error('no eastbrook ore node');
+    const meta = metaWith(slotEffect('gatherers_cache'));
+    meta.nodeHarvestReadyAt[ORE_NODE.id] = 1000;
+    let draws = 0;
+    const rng = new Rng(7);
+    rng.setObserver(() => {
+      draws += 1;
+    });
+    const result = resolveHarvest(meta, ORE_NODE, 0, rng);
+    rng.setObserver(null);
+    expect(result.granted).toBe(false);
+    expect(draws).toBe(0);
+    // And the refused harvest spent no charge either.
+    expect(meta.toolEffectSlots?.mining?.durability).toBe(slotEffect('gatherers_cache').durability);
+  });
+
+  it('a quantity effect adds units and spends exactly one charge per granted harvest', () => {
+    if (!ORE_NODE) throw new Error('no eastbrook ore node');
+    const plain = resolveHarvest(metaWith(), ORE_NODE, 0, new Rng(4242));
+    const slot = slotEffect('gatherers_cache', { toolRarity: 'rare' });
+    const before = slot.durability;
+    const meta = metaWith(slot);
+    const bonused = resolveHarvest(meta, ORE_NODE, 0, new Rng(4242));
+    expect(bonused.qty).toBe((plain.qty ?? 0) + 1);
+    expect(slot.durability).toBe(before - 1);
+  });
+
+  it('a quality effect yields the fine grade, and still opens no node the tool cannot', () => {
+    if (!ORE_NODE) throw new Error('no eastbrook ore node');
+    // A tier-1 pick at a tier-1 Eastbrook vein does NOT outclass the material,
+    // so the plain grade is what it yields. The quality effect is what tips it.
+    const plain = resolveHarvest(metaWith(), ORE_NODE, 0, new Rng(4242));
+    expect(plain.itemId).toBe('copper_ore');
+    const withEye = resolveHarvest(
+      metaWith(slotEffect('artisans_eye')),
+      ORE_NODE,
+      0,
+      new Rng(4242),
+    );
+    expect(withEye.itemId).toBe('fine_copper_ore');
+    // Access is untouched: the effect raises only the grade comparison, so a
+    // tier-1 tool still cannot work a tier-2 vein.
+    expect(canGatherTier(1, 2)).toBe(false);
   });
 });
