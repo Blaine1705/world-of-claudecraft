@@ -10,6 +10,13 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.dungeons.dawnhold_castle.enterText",
+    "entities.dungeons.dawnhold_castle.leaveText",
+    "entities.dungeons.dawnhold_castle.name",
+    "entities.items.dawnhold_posy.name",
+    "hudChrome.dawnholdMap.story.ground",
+    "hudChrome.dawnholdMap.story.solar",
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.story.residence",
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
@@ -23,6 +30,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "es_ES": [
+    "entities.dungeons.dawnhold_castle.enterText",
+    "entities.dungeons.dawnhold_castle.leaveText",
+    "entities.dungeons.dawnhold_castle.name",
+    "entities.items.dawnhold_posy.name",
+    "hudChrome.dawnholdMap.story.ground",
+    "hudChrome.dawnholdMap.story.solar",
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.story.residence",
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
@@ -36,6 +50,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "fr_FR": [
+    "entities.dungeons.dawnhold_castle.enterText",
+    "entities.dungeons.dawnhold_castle.leaveText",
+    "entities.dungeons.dawnhold_castle.name",
+    "entities.items.dawnhold_posy.name",
+    "hudChrome.dawnholdMap.story.ground",
+    "hudChrome.dawnholdMap.story.solar",
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.story.residence",
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
@@ -49,6 +70,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "fr_CA": [
+    "entities.dungeons.dawnhold_castle.enterText",
+    "entities.dungeons.dawnhold_castle.leaveText",
+    "entities.dungeons.dawnhold_castle.name",
+    "entities.items.dawnhold_posy.name",
+    "hudChrome.dawnholdMap.story.ground",
+    "hudChrome.dawnholdMap.story.solar",
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.story.residence",
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
@@ -63,6 +91,13 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.dungeons.dawnhold_castle.enterText",
+    "entities.dungeons.dawnhold_castle.leaveText",
+    "entities.dungeons.dawnhold_castle.name",
+    "entities.items.dawnhold_posy.name",
+    "hudChrome.dawnholdMap.story.ground",
+    "hudChrome.dawnholdMap.story.solar",
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.story.residence",
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
@@ -76,6 +111,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "de_DE": [
+    "entities.dungeons.dawnhold_castle.enterText",
+    "entities.dungeons.dawnhold_castle.leaveText",
+    "entities.dungeons.dawnhold_castle.name",
+    "entities.items.dawnhold_posy.name",
+    "hudChrome.dawnholdMap.story.ground",
+    "hudChrome.dawnholdMap.story.solar",
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.story.residence",
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
@@ -89,18 +131,29 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "zh_CN": [
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.title"
   ],
   "zh_TW": [
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.title"
   ],
   "ko_KR": [
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.title"
   ],
   "ja_JP": [
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.title"
   ],
   "pt_BR": [
+    "entities.dungeons.dawnhold_castle.enterText",
+    "entities.dungeons.dawnhold_castle.leaveText",
+    "entities.dungeons.dawnhold_castle.name",
+    "entities.items.dawnhold_posy.name",
+    "hudChrome.dawnholdMap.story.ground",
+    "hudChrome.dawnholdMap.story.solar",
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.story.residence",
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
@@ -114,9 +167,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "ru_RU": [
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.title"
   ],
   "cs_CZ": [
+    "entities.dungeons.dawnhold_castle.enterText",
+    "entities.dungeons.dawnhold_castle.leaveText",
+    "entities.dungeons.dawnhold_castle.name",
+    "entities.items.dawnhold_posy.name",
+    "hudChrome.dawnholdMap.story.ground",
+    "hudChrome.dawnholdMap.story.solar",
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.story.residence",
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
@@ -130,6 +191,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "nl_NL": [
+    "entities.dungeons.dawnhold_castle.enterText",
+    "entities.dungeons.dawnhold_castle.leaveText",
+    "entities.dungeons.dawnhold_castle.name",
+    "entities.items.dawnhold_posy.name",
+    "hudChrome.dawnholdMap.story.ground",
+    "hudChrome.dawnholdMap.story.solar",
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.story.residence",
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
@@ -143,6 +211,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "pl_PL": [
+    "entities.dungeons.dawnhold_castle.enterText",
+    "entities.dungeons.dawnhold_castle.leaveText",
+    "entities.dungeons.dawnhold_castle.name",
+    "entities.items.dawnhold_posy.name",
+    "hudChrome.dawnholdMap.story.ground",
+    "hudChrome.dawnholdMap.story.solar",
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.story.residence",
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
@@ -156,6 +231,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "id_ID": [
+    "entities.dungeons.dawnhold_castle.enterText",
+    "entities.dungeons.dawnhold_castle.leaveText",
+    "entities.dungeons.dawnhold_castle.name",
+    "entities.items.dawnhold_posy.name",
+    "hudChrome.dawnholdMap.story.ground",
+    "hudChrome.dawnholdMap.story.solar",
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.story.residence",
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
@@ -169,6 +251,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "tr_TR": [
+    "entities.dungeons.dawnhold_castle.enterText",
+    "entities.dungeons.dawnhold_castle.leaveText",
+    "entities.dungeons.dawnhold_castle.name",
+    "entities.items.dawnhold_posy.name",
+    "hudChrome.dawnholdMap.story.ground",
+    "hudChrome.dawnholdMap.story.solar",
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.story.residence",
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
@@ -182,6 +271,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "sv_SE": [
+    "entities.dungeons.dawnhold_castle.enterText",
+    "entities.dungeons.dawnhold_castle.leaveText",
+    "entities.dungeons.dawnhold_castle.name",
+    "entities.items.dawnhold_posy.name",
+    "hudChrome.dawnholdMap.story.ground",
+    "hudChrome.dawnholdMap.story.solar",
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.story.residence",
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
@@ -195,6 +291,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "vi_VN": [
+    "entities.dungeons.dawnhold_castle.enterText",
+    "entities.dungeons.dawnhold_castle.leaveText",
+    "entities.dungeons.dawnhold_castle.name",
+    "entities.items.dawnhold_posy.name",
+    "hudChrome.dawnholdMap.story.ground",
+    "hudChrome.dawnholdMap.story.solar",
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.story.residence",
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",
@@ -208,6 +311,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "da_DK": [
+    "entities.dungeons.dawnhold_castle.enterText",
+    "entities.dungeons.dawnhold_castle.leaveText",
+    "entities.dungeons.dawnhold_castle.name",
+    "entities.items.dawnhold_posy.name",
+    "hudChrome.dawnholdMap.story.ground",
+    "hudChrome.dawnholdMap.story.solar",
+    "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.story.residence",
     "hudChrome.lastkeepMap.story.state",
     "hudChrome.lastkeepMap.story.tower",

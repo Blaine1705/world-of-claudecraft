@@ -957,6 +957,13 @@ export const ko_KR: EnTranslations = {
         "tower": "망루"
       }
     },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "정원층",
+        "solar": "일광실"
+      }
+    },
     "compass": {
       "N": "북",
       "NE": "북동",
@@ -12222,6 +12229,9 @@ export const ko_KR: EnTranslations = {
       "pristine_claw": {
         "name": "온전한 발톱"
       },
+      "dawnhold_posy": {
+        "name": "던홀드 정원 꽃다발"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -16705,6 +16715,11 @@ export const ko_KR: EnTranslations = {
         "name": "마지막 요새",
         "enterText": "마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.",
         "leaveText": "요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다."
+      },
+      "dawnhold_castle": {
+        "name": "던홀드 성",
+        "enterText": "꽃향기 가득한 던홀드 성의 따뜻한 홀 안으로 들어섭니다.",
+        "leaveText": "햇살 가득한 정원 잔디밭으로 다시 나옵니다."
       },
       "drowned_temple": {
         "name": "익사한 신전",

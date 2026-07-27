@@ -28,8 +28,12 @@ import type { IWorld } from '../world_api';
 import { dungeonDisplayName } from './entity_i18n';
 import { type TranslationKey, t } from './i18n';
 import {
+  buildDawnholdMinimapModel,
+  buildDawnholdWorldMapModel,
   buildLastKeepMinimapModel,
   buildLastKeepWorldMapModel,
+  type DawnholdStoryId,
+  dawnholdPlanSvg,
   type LastKeepMapModel,
   type LastKeepStoryId,
   lastKeepPlanSvg,
@@ -81,20 +85,54 @@ type LastKeepColors = Record<keyof typeof LASTKEEP_COLOR_TOKENS, string>;
 
 type PlateState = HTMLImageElement | 'loading';
 
+/** The per-castle pieces the shared painter composes: which dungeon names the
+ * title, which baked plates to blit (and the matching SVG fallback source),
+ * the title/story t() key prefix, and the two pure-core model builders. */
+export interface CastleMapPainterSpec {
+  dungeonId: string;
+  /** public/map_bg/<plateBase>_<story>.webp */
+  plateBase: string;
+  /** hudChrome.<titlePrefix>.title + hudChrome.<titlePrefix>.story.<id> */
+  titlePrefix: string;
+  planSvg: (storyId: string) => string;
+  buildMinimap: (world: IWorld, size: number, pxPerYard: number) => LastKeepMapModel | null;
+  buildWorldMap: (world: IWorld, size: number, pad: number) => LastKeepMapModel | null;
+}
+
+export const LASTKEEP_MAP_PAINTER_SPEC: CastleMapPainterSpec = {
+  dungeonId: 'the_last_keep',
+  plateBase: 'lastkeep',
+  titlePrefix: 'lastkeepMap',
+  planSvg: (storyId) => lastKeepPlanSvg(storyId as LastKeepStoryId),
+  buildMinimap: buildLastKeepMinimapModel,
+  buildWorldMap: buildLastKeepWorldMapModel,
+};
+
+export const DAWNHOLD_MAP_PAINTER_SPEC: CastleMapPainterSpec = {
+  dungeonId: 'dawnhold_castle',
+  plateBase: 'dawnhold',
+  titlePrefix: 'dawnholdMap',
+  planSvg: (storyId) => dawnholdPlanSvg(storyId as DawnholdStoryId),
+  buildMinimap: buildDawnholdMinimapModel,
+  buildWorldMap: buildDawnholdWorldMapModel,
+};
+
 /**
- * Owns painting the keep floor plan onto the minimap and world-map canvases.
- * One instance is built by Hud with the write-elision facet (for '#zone-label')
- * and the class-color resolver (party discs), the DelveMapPainter shape.
+ * Owns painting a castle floor plan onto the minimap and world-map canvases.
+ * One instance per castle is built by Hud with the write-elision facet (for
+ * '#zone-label') and the class-color resolver (party discs), the
+ * DelveMapPainter shape. Defaults to The Last Keep's spec.
  */
 export class LastKeepMapPainter {
   // Decoded story plates. An entry is the image once it is safe to draw
   // (loaded), 'loading' while the webp (or its SVG fallback) decodes.
-  private readonly plates = new Map<LastKeepStoryId, PlateState>();
+  private readonly plates = new Map<string, PlateState>();
   private colors: LastKeepColors | null = null;
 
   constructor(
     private readonly writers: PainterHostWriters,
     private readonly classColor: (cls: string) => string,
+    private readonly spec: CastleMapPainterSpec = LASTKEEP_MAP_PAINTER_SPEC,
   ) {}
 
   /** Resolve the color tokens in one getComputedStyle pass and cache them
@@ -115,7 +153,7 @@ export class LastKeepMapPainter {
   /** The decoded plate for a story, or null while it loads. First call kicks
    *  off the webp decode; a load error swaps in the SVG-source data URL, so
    *  the plan still renders (identical vector source) without the file. */
-  private plateFor(storyId: LastKeepStoryId): HTMLImageElement | null {
+  private plateFor(storyId: string): HTMLImageElement | null {
     const state = this.plates.get(storyId);
     if (state instanceof HTMLImageElement) return state;
     if (state === 'loading') return null;
@@ -126,17 +164,17 @@ export class LastKeepMapPainter {
     };
     img.onerror = () => {
       img.onerror = null; // the data URL cannot fail; never loop
-      img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(lastKeepPlanSvg(storyId))}`;
+      img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(this.spec.planSvg(storyId))}`;
     };
-    img.src = `/map_bg/lastkeep_${storyId}.webp`;
+    img.src = `/map_bg/${this.spec.plateBase}_${storyId}.webp`;
     return null;
   }
 
-  /** The localized "The Last Keep: Story" title for a story. */
-  private title(storyId: LastKeepStoryId): string {
-    return t('hudChrome.lastkeepMap.title', {
-      keep: dungeonDisplayName('the_last_keep'),
-      story: t(`hudChrome.lastkeepMap.story.${storyId}` as TranslationKey),
+  /** The localized "Castle: Story" title for a story. */
+  private title(storyId: string): string {
+    return t(`hudChrome.${this.spec.titlePrefix}.title` as TranslationKey, {
+      keep: dungeonDisplayName(this.spec.dungeonId),
+      story: t(`hudChrome.${this.spec.titlePrefix}.story.${storyId}` as TranslationKey),
     });
   }
 
@@ -205,7 +243,7 @@ export class LastKeepMapPainter {
     size: number,
     zoom: number,
   ): void {
-    const model = buildLastKeepMinimapModel(world, size, MINIMAP_BASE_SCALE * zoom);
+    const model = this.spec.buildMinimap(world, size, MINIMAP_BASE_SCALE * zoom);
     if (!model) return;
     this.writers.setText(zoneLabelEl, this.title(model.storyId));
     const colors = this.resolveColors();
@@ -242,7 +280,7 @@ export class LastKeepMapPainter {
    */
   paintWorldMap(ctx: CanvasRenderingContext2D, world: IWorld, size: number): string {
     const pad = Math.round(size * WORLD_MAP_PAD_RATIO);
-    const model = buildLastKeepWorldMapModel(world, size, pad);
+    const model = this.spec.buildWorldMap(world, size, pad);
     if (!model) return '';
     const colors = this.resolveColors();
     const plate = this.plateFor(model.storyId);

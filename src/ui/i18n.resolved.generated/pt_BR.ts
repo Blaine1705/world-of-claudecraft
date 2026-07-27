@@ -957,6 +957,13 @@ export const pt_BR: EnTranslations = {
         "tower": "The Watch Tower"
       }
     },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "N",
       "NE": "NE",
@@ -12222,6 +12229,9 @@ export const pt_BR: EnTranslations = {
       "pristine_claw": {
         "name": "Garra Imaculada"
       },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
+      },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"
       },
@@ -16705,6 +16715,11 @@ export const pt_BR: EnTranslations = {
         "name": "O Último Reduto",
         "enterText": "Você entra nos salões frios e silenciosos do Último Reduto.",
         "leaveText": "Você fecha o portão do reduto e volta para o vento das Drakelands."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "O Templo Afogado",

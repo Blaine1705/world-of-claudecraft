@@ -54,6 +54,7 @@ import { dungeonInstanceAt, INTERIOR_LAYOUTS } from './dungeon_floor';
 import {
   ARENA_LAYOUT,
   CRYPT_LAYOUT,
+  DAWNHOLD_LAYOUT,
   DROWNED_COURT_LAYOUT,
   LASTKEEP_LAYOUT,
   layoutColliders,
@@ -1257,6 +1258,9 @@ function bandSlotColliders(): Collider[] {
 // authoredColliders). Seated on DUNGEON_FLOOR_Y like every derived interior
 // set below, so its standable tops read in the same frame.
 const LASTKEEP_COLLIDERS: Collider[] = layoutColliders(LASTKEEP_LAYOUT, undefined, DUNGEON_FLOOR_Y);
+// Dawnhold Castle: the Evergarden garden palace, same authored room-graph
+// derivation as The Last Keep (walls minus doorways plus decor footprints).
+const DAWNHOLD_COLLIDERS: Collider[] = layoutColliders(DAWNHOLD_LAYOUT, undefined, DUNGEON_FLOOR_Y);
 
 // Wildheart follows the same open-field contract, but its walkable bridges and
 // water ribbons are heightfield surfaces rather than blocking props.
@@ -1297,6 +1301,7 @@ export function arenaCollidersForSlot(slot: number): Collider[] {
 const STATIC_INTERIOR_COLLIDERS: Record<string, Collider[]> = {
   wildheart: WILDHEART_COLLIDERS,
   lastkeep: LASTKEEP_COLLIDERS,
+  dawnhold: DAWNHOLD_COLLIDERS,
 };
 
 // Per-DUNGEON interior sets: dungeons sharing a room plan (Hollow Crypt and

@@ -957,6 +957,13 @@ export const en_XA: EnTranslations = {
         "tower": "[Ţĥé Ŵáţçĥ Ţóŵéŕ]"
       }
     },
+    "dawnholdMap": {
+      "title": "[{keep}: {story}]",
+      "story": {
+        "ground": "[Ţĥé Ĝáŕðéñ Ƒļóóŕ]",
+        "solar": "[Ţĥé Šóļáŕ]"
+      }
+    },
     "compass": {
       "N": "[Ñ]",
       "NE": "[ÑÉ]",
@@ -12222,6 +12229,9 @@ export const en_XA: EnTranslations = {
       "pristine_claw": {
         "name": "[Þŕíšţíñé Çļáŵ]"
       },
+      "dawnhold_posy": {
+        "name": "[Ðáŵñĥóļð Ĝáŕðéñ Þóšý]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },
@@ -16705,6 +16715,11 @@ export const en_XA: EnTranslations = {
         "name": "[Ţĥé Ļášţ Ķééþ]",
         "enterText": "[Ýóú šţéþ íñţó ţĥé çóļð, šíļéñţ ĥáļļš óƒ ţĥé Ļášţ Ķééþ.]",
         "leaveText": "[Ýóú þúļļ ţĥé ķééþ ðóóŕ šĥúţ áñð šţéþ ƀáçķ íñţó ţĥé Ðŕáķéļáñðš ŵíñð.]"
+      },
+      "dawnhold_castle": {
+        "name": "[Ðáŵñĥóļð Çášţļé]",
+        "enterText": "[Ýóú šţéþ íñţó ţĥé ŵáŕɱ, ƒļóŵéŕ-šçéñţéð ĥáļļš óƒ Ðáŵñĥóļð Çášţļé.]",
+        "leaveText": "[Ýóú šļíþ ƀáçķ óúţ óñţó ţĥé šúñļíţ ĝáŕðéñ ļáŵñ.]"
       },
       "drowned_temple": {
         "name": "[Ţĥé Ðŕóŵñéð Ţéɱþļé]",

@@ -442,6 +442,10 @@ export function enterDungeon(
   ctx.emit({ type: 'log', text: dungeon.enterText, color: '#b9f', pid: r.meta.entityId });
   // Stepping through the moongate is a Chronicle task.
   if (dungeonId === 'drowned_temple') ctx.markVisited(r.meta, 'dungeon:drowned_temple');
+  // The walk-in castles record their visit deeds on entry (markVisited draws
+  // no rng and only marks the deeds pass dirty).
+  if (dungeonId === 'the_last_keep') ctx.markVisited(r.meta, 'dungeon:the_last_keep');
+  if (dungeonId === 'dawnhold_castle') ctx.markVisited(r.meta, 'dungeon:dawnhold_castle');
   return true;
 }
 

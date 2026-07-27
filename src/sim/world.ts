@@ -42,7 +42,7 @@ import {
 } from './dawnhold_layout';
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
 import { dungeonFloorLift } from './dungeon_floor';
-import { lastKeepLiftAt } from './dungeon_layout';
+import { dawnholdKeepLiftAt, lastKeepLiftAt } from './dungeon_layout';
 import {
   EMBER_FLAT_POOLS,
   EMBER_LAVA_LINKS,
@@ -3936,6 +3936,13 @@ export function groundHeight(x: number, z: number, seed: number): number {
       // authoredLiftAt field, so what you climb is what you stand on.
       const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
       return DUNGEON_FLOOR_Y + lastKeepLiftAt(x - origin.x, z - origin.z);
+    }
+    if (dungeon?.interior === 'dawnhold') {
+      // Dawnhold Castle's interior rides the same authored-lift idiom as the
+      // Last Keep: the solar story and its stair ramps come from the shared
+      // room plan (src/sim/dungeon_layout.ts).
+      const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
+      return DUNGEON_FLOOR_Y + dawnholdKeepLiftAt(x - origin.x, z - origin.z);
     }
     // Every other interior is the flat room floor plus the raised boss dais
     // where its room plan stacks one (dungeon_floor.ts).

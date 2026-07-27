@@ -957,6 +957,13 @@ export const vi_VN: EnTranslations = {
         "tower": "The Watch Tower"
       }
     },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "B",
       "NE": "ĐB",
@@ -12222,6 +12229,9 @@ export const vi_VN: EnTranslations = {
       "pristine_claw": {
         "name": "Móng Vuốt Nguyên Vẹn"
       },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },
@@ -16705,6 +16715,11 @@ export const vi_VN: EnTranslations = {
         "name": "Pháo Đài Cuối Cùng",
         "enterText": "Bạn bước vào những đại sảnh lạnh lẽo, tĩnh lặng của Last Keep.",
         "leaveText": "Bạn kéo cánh cửa pháo đài đóng sập lại và bước trở về với cơn gió của Drakelands."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "Ngôi Đền Chết Chìm",

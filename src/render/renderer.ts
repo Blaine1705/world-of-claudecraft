@@ -888,6 +888,18 @@ const LASTKEEP_RIM_BOOST = 1.9;
 const LASTKEEP_SUN_COLOR = 0xffd9a8;
 const LASTKEEP_HEMI_SKY_COLOR = 0xffe4c4;
 const LASTKEEP_HEMI_GROUND_COLOR = 0x4a3826;
+// Dawnhold Castle: the Evergarden garden palace. BRIGHTER and greener-warm
+// than the Last Keep's rig: this is daylight through a garden palace, not
+// torchlit stone, so the key and ambient sit well above the keep's and the
+// bounce reads off sunlit lawn instead of dark timber. Scoped to interior
+// 'dawnhold' only.
+const DAWNHOLD_SUN_INTENSITY = 0.95;
+const DAWNHOLD_HEMI_INTENSITY = 0.72;
+const DAWNHOLD_ENV_INTENSITY = 0.26;
+const DAWNHOLD_RIM_BOOST = 1.6;
+const DAWNHOLD_SUN_COLOR = 0xffe4b0;
+const DAWNHOLD_HEMI_SKY_COLOR = 0xf2fadc;
+const DAWNHOLD_HEMI_GROUND_COLOR = 0x53603a;
 const RENDERER_PHASE_SAMPLE_LIMIT = 720;
 const RENDER_DIAGNOSTICS_SAMPLE_MS = 2000;
 const RENDER_DIAGNOSTICS_IDLE_TIMEOUT_MS = 1000;
@@ -9395,7 +9407,8 @@ export class Renderer {
     | 'rift'
     | 'practice'
     | 'wildheartField'
-    | 'lastkeep' = 'outdoor';
+    | 'lastkeep'
+    | 'dawnhold' = 'outdoor';
 
   /** Drop a retired interior's scene nodes and prune its lights/flames out of
    * the per-frame registries. See riftInteriorGroups for why nothing here
@@ -9925,6 +9938,7 @@ export class Renderer {
     // sky dome and the daylight rig and only swaps in its own field haze.
     const inWildheartField = interior === 'wildheart';
     const inLastKeep = interior === 'lastkeep';
+    const inDawnhold = interior === 'dawnhold';
     const desired = inPractice
       ? 'practice'
       : inDelve
@@ -9941,17 +9955,19 @@ export class Renderer {
                   ? 'wildheartField'
                   : inLastKeep
                     ? 'lastkeep'
-                    : inside
-                      ? 'dungeon'
-                      : camY <
-                          waterLevelAt(
-                            this.camera.position.x,
-                            this.camera.position.z,
-                            this.sim.cfg.seed,
-                          ) -
-                            0.05
-                        ? 'underwater'
-                        : 'outdoor';
+                    : inDawnhold
+                      ? 'dawnhold'
+                      : inside
+                        ? 'dungeon'
+                        : camY <
+                            waterLevelAt(
+                              this.camera.position.x,
+                              this.camera.position.z,
+                              this.sim.cfg.seed,
+                            ) -
+                              0.05
+                          ? 'underwater'
+                          : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
@@ -10012,6 +10028,13 @@ export class Renderer {
         fog.color.setHex(0x241610);
         fog.near = 30;
         fog.far = 150;
+      } else if (desired === 'dawnhold') {
+        // Dawnhold Castle: brighter and greener-warm than the keep's hearth
+        // murk: a pale sage-gold air pushed even further back, so the garden
+        // palace reads sunlit end to end.
+        fog.color.setHex(0x3d422a);
+        fog.near = 40;
+        fog.far = 190;
       } else if (desired === 'delve') {
         // the collapsed reliquary breathes a warm ember murk, dried-blood
         // charcoal, tighter than the overworld crypt's cold near-black, so the
@@ -10063,6 +10086,7 @@ export class Renderer {
         const mazeNight = desired === 'yumiMaze';
         const wildheartSun = desired === 'wildheartField';
         const keepHearth = desired === 'lastkeep';
+        const dawnholdDay = desired === 'dawnhold';
         const underground =
           desired === 'dungeon' ||
           desired === 'temple' ||
@@ -10077,36 +10101,44 @@ export class Renderer {
             ? WILDHEART_SUN_INTENSITY
             : keepHearth
               ? LASTKEEP_SUN_INTENSITY
-              : underground
-                ? DUNGEON_SUN_INTENSITY
-                : SUN_INTENSITY * this.dnGrade.lightScale;
+              : dawnholdDay
+                ? DAWNHOLD_SUN_INTENSITY
+                : underground
+                  ? DUNGEON_SUN_INTENSITY
+                  : SUN_INTENSITY * this.dnGrade.lightScale;
         this.hemi.intensity = mazeNight
           ? YUMI_MAZE_HEMI_INTENSITY
           : wildheartSun
             ? WILDHEART_HEMI_INTENSITY
             : keepHearth
               ? LASTKEEP_HEMI_INTENSITY
-              : underground
-                ? DUNGEON_HEMI_INTENSITY
-                : hemiOutdoorIntensity() * this.dnGrade.ambientScale;
+              : dawnholdDay
+                ? DAWNHOLD_HEMI_INTENSITY
+                : underground
+                  ? DUNGEON_HEMI_INTENSITY
+                  : hemiOutdoorIntensity() * this.dnGrade.ambientScale;
         this.scene.environmentIntensity = mazeNight
           ? YUMI_MAZE_ENV_INTENSITY
           : wildheartSun
             ? WILDHEART_ENV_INTENSITY
             : keepHearth
               ? LASTKEEP_ENV_INTENSITY
-              : underground
-                ? DUNGEON_ENV_INTENSITY
-                : this.envOutdoorIntensity * this.dnGrade.ambientScale;
+              : dawnholdDay
+                ? DAWNHOLD_ENV_INTENSITY
+                : underground
+                  ? DUNGEON_ENV_INTENSITY
+                  : this.envOutdoorIntensity * this.dnGrade.ambientScale;
         sharedUniforms.uRimBoost.value = mazeNight
           ? YUMI_MAZE_RIM_BOOST
           : wildheartSun
             ? WILDHEART_RIM_BOOST
             : keepHearth
               ? LASTKEEP_RIM_BOOST
-              : underground
-                ? DUNGEON_RIM_BOOST
-                : 1;
+              : dawnholdDay
+                ? DAWNHOLD_RIM_BOOST
+                : underground
+                  ? DUNGEON_RIM_BOOST
+                  : 1;
         if (wildheartSun) {
           this.sun.color.setHex(0xffd48c);
           this.hemi.color.setHex(0xd8ebca);
@@ -10117,6 +10149,12 @@ export class Renderer {
           this.sun.color.setHex(LASTKEEP_SUN_COLOR);
           this.hemi.color.setHex(LASTKEEP_HEMI_SKY_COLOR);
           this.hemi.groundColor.setHex(LASTKEEP_HEMI_GROUND_COLOR);
+        } else if (dawnholdDay) {
+          // garden daylight: gold key over a pale green sky bounce and a
+          // lawn-green ground bounce; re-graded outdoors the same way
+          this.sun.color.setHex(DAWNHOLD_SUN_COLOR);
+          this.hemi.color.setHex(DAWNHOLD_HEMI_SKY_COLOR);
+          this.hemi.groundColor.setHex(DAWNHOLD_HEMI_GROUND_COLOR);
         }
       }
       return;
