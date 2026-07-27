@@ -1463,10 +1463,12 @@ export const tr_TR: EnTranslations = {
       "title": "Toplama",
       "harvestButton": "Topla",
       "harvestTooltip": "İşaretlenmiş bileşenleri toplar. Her leş yalnızca bir kez toplanabilir, ilk gelen alır. Yağmayı almaz.",
-      "concentrateHint": "Ne kadar az parça seçersen, her biri o kadar yüksek kademede olur.",
+      "yieldTierHint": "Bir toplama ne kadar az bileşen alırsa, her birinin kademesi o kadar yüksek olur.",
       "nothingSelectedYields": "Bu leşten seçtiklerinin hiçbiri toplanamaz.",
       "alreadyHarvested": "Bu leş zaten toplandı.",
       "componentAria": "{component} topla",
+      "componentNoYield": "henüz verim yok",
+      "componentAriaNoYield": "{component} topla: {note}",
       "components": {
         "hide": "Post",
         "fang": "Diş",
@@ -3743,7 +3745,7 @@ export const tr_TR: EnTranslations = {
     "professions": {
       "intro": "Dünya seni savaşın ve görevlerin ötesinde, toprağı ve ocağı işlediğin için de ödüllendirir: ham madde toplamak, on ayrı zanaat kolunda onları teçhizata ve mallara dönüştürmek ve bu zanaatların temsil ettiği on arketipten birinin kimliğine yerleşmek.",
       "harvestTitle": "Avın kendisini hasat etmek",
-      "harvestBody": "Toplama düğümlerde durmaz. Öldürülen pek çok canavardan birer kez hasat yapılabilir, ilk gelen alır; cesedin olağan ganimetiyle birlikte doğrudan cesetten post, diş, ipek ve et elde edilir; tek bir basışla her ikisi de açılır. Her seferinde seçim sizindir: cesedin sunduğu her şeyi alın ya da daha az bileşene odaklanın ve aldığınız şeyin ölçülebilir biçimde daha kaliteli bir derecesini kazanın.\n\nOrnek taşıyan bir ailede nadir veya daha iyi hasat turunda ayrıca imzalı mükemmel bir örnek (Bozulmamış Post, Bozulmamış İpek, Bozulmamış Zehir Bezi veya Birinci Kalite Et) olağan verimin üstüne gelir ve Yiğitlikler Kitabına Mükemmel Örnek kaydedilir. Her karakter hasat yapabilir, eğitim gerekmez; sahip olduğunuz herhangi bir toplama aleti hangi zanaata ait olursa olsun premium kolu sayılır.",
+      "harvestBodyChoice": "Toplama düğümlerde durmaz. Öldürülen pek çok canavardan birer kez hasat yapılabilir, ilk gelen alır; cesedin olağan ganimetiyle birlikte doğrudan cesetten post, diş, ipek ve et elde edilir; tek bir basışla her ikisi de açılır. Bir canavar birden fazla işlenebilir bileşen taşıyorsa seçim sizindir: verebileceği her şeyi alın ya da daha az bileşene odaklanın ve aldığınız şeyin ölçülebilir biçimde daha kaliteli bir derecesini kazanın.\n\nOrnek taşıyan bir ailede nadir veya daha iyi hasat turunda ayrıca imzalı mükemmel bir örnek (Bozulmamış Post, Bozulmamış İpek, Bozulmamış Zehir Bezi veya Birinci Kalite Et) olağan verimin üstüne gelir ve Yiğitlikler Kitabına Mükemmel Örnek kaydedilir. Her karakter hasat yapabilir, eğitim gerekmez; sahip olduğunuz herhangi bir toplama aleti hangi zanaata ait olursa olsun premium kolu sayılır.",
       "focusTitle": "Kasaba Odağı",
       "focusBody": "Her merkez kasaba, uğrayan toplayıcılar için bir Kasaba Odağı paneli tutar: kasabada dur, onu mini haritanın yanından aç ve küçük bir odak puanı bütçesini önemsediğin bileşen türlerine yönelt. Bir bileşene ne kadar çok odak verirsen, sonraki her cesetten o kadar ince ve zengin çıkar; dağılımın karakterini nereye giderse takip eder ve kasabaya sonraki her uğrayışında onu ücretsiz yeniden düzenleyebilirsin.",
       "craftHowTitle": "Üretim penceresi",

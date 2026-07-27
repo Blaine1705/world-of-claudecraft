@@ -767,6 +767,25 @@
     opacity: 0.75;
     margin-bottom: 6px;
   }
+  /* #2514: the current selection earns a tier the widest pick on this corpse
+     would not, so the rule the hint states is live right now. Lifting it out of
+     the muted default is the whole cue: it adds information the player can act
+     on (keep the boxes as they are) and takes none away, and it is what makes
+     the view model's `concentrated` a rendered decision rather than a field
+     nothing reads.
+     Opacity ONLY, and that is load-bearing rather than timid. This hint sits
+     ABOVE the checkbox list and the Harvest button, and it re-renders on every
+     toggle, so any metric-changing emphasis (a heavier weight, a border, a
+     padding) can flip a long locale from two wrapped lines to three and shove
+     the controls down at the exact moment the player is reaching for them. That
+     is the hazard corpse_harvest_window.ts already argues for the reason line,
+     and it is worse here because this block precedes the controls. Opacity
+     changes no box. The cue is supplementary in any case: the rule it
+     emphasizes is the sentence itself, which is always present and always
+     legible. */
+  .corpse-harvest.is-concentrated .corpse-harvest-hint {
+    opacity: 1;
+  }
   .corpse-harvest-list {
     display: flex;
     flex-direction: column;
@@ -776,9 +795,46 @@
   .corpse-harvest-row {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 6px;
     font-size: 12px;
     cursor: pointer;
+  }
+  /* The name and the mark wrap instead of widening the fixed-width popup: the
+     longest localized pair ("Venom Sac" beside id_ID "belum ada hasil") would
+     otherwise push the row past the 230px window and turn .window's
+     overflow-y:auto into a horizontal scrollbar. */
+  .corpse-harvest-row > span {
+    min-width: 0;
+  }
+  /* #2514: a component family with no harvest item behind it yet. The row is
+     still offered and still CHECKABLE (the sim ignores it either way), so the
+     mark is the muted name plus the .corpse-harvest-note text beside it, never
+     colour alone.
+     Scoped to the row's text, deliberately: dimming the whole label would dim
+     the checkbox too, and a greyed checkbox is this HUD's disabled idiom
+     (.btn:disabled above), so a live control would read as a dead one in the
+     one place this change exists to make honest.
+     A themed token rather than an opacity, and the reason is measurement, not
+     taste: a stacked opacity composited the mark to 2.97:1 on the parchment
+     preset, and tests/theme.test.ts structurally cannot see a loss that happens
+     in a stylesheet rather than in a token. --color-text-muted is the house
+     treatment for muted 10-11px chrome (78 sibling rules across this file,
+     hud.css and shell.css) and theme.ts repairs it to the 3:1 large-text tier
+     against the panel base, which is a floor the composite did not have; it is
+     an improvement on every preset and it moves with the theme. It is NOT a
+     4.5:1 guarantee, and on parchment it measures 4.92:1 at the panel top and
+     3.60:1 in the gradient's edge band. That gap is systemic to the token
+     rather than introduced here, and it is not what carries the row's meaning:
+     the mark is the .corpse-harvest-note TEXT, whose sentence is also in the
+     checkbox's accessible name, so nothing is conveyed by contrast alone. */
+  .corpse-harvest-row-no-yield > span {
+    color: var(--color-text-muted);
+  }
+  .corpse-harvest-note {
+    font-size: 10px;
+    font-style: italic;
+    color: var(--color-text-muted);
   }
   .corpse-harvest-btn {
     width: 100%;
