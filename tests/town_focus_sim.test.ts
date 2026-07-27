@@ -191,6 +191,15 @@ describe('an unknown allocation key never reaches the character save (#2511)', (
     // A decrement to zero still removes the row, and still emits nothing junk.
     expect(stepTownFocus(stale, 'hide', -1, FOCUS_POINT_BUDGET)).toEqual({ hide: 1 });
     expect(stepTownFocus({ hide: 1, eastbrook: 4 }, 'hide', -1, FOCUS_POINT_BUDGET)).toEqual({});
+    // Stepping a component that is not a real family is a no-op, in both
+    // directions. Without this the named key would be the one way back around
+    // the projection, since it is written after the carried-forward rows.
+    expect(stepTownFocus({ hide: 2 }, 'eastbrook', 1, FOCUS_POINT_BUDGET)).toEqual({ hide: 2 });
+    expect(stepTownFocus({ hide: 2 }, 'constructor', 1, FOCUS_POINT_BUDGET)).toEqual({ hide: 2 });
+    expect(stepTownFocus({}, 'not_a_real_tag', 1, FOCUS_POINT_BUDGET)).toEqual({});
+    expect(stepTownFocus({ hide: 2, gills: 3 }, 'gills', -1, FOCUS_POINT_BUDGET)).toEqual({
+      hide: 2,
+    });
   });
 
   it('stops a junk-only save from paying out the first-focus-point deed', () => {

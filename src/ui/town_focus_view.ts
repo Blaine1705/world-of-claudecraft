@@ -7,7 +7,7 @@
 // can give one back) and the remaining-point count. Rendering lives in
 // town_focus_window.ts.
 
-import { TOWN_FOCUS_COMPONENTS } from '../sim/professions/focus';
+import { isTownFocusComponent, TOWN_FOCUS_COMPONENTS } from '../sim/professions/focus';
 
 export interface TownFocusRow {
   component: string;
@@ -96,6 +96,12 @@ export function townFocusRenderSig(view: TownFocusView): string {
  * from emitting a model it does not render in the first place. Inert for every
  * legitimate allocation, because both the row list and the budget sum here
  * already read TOWN_FOCUS_COMPONENTS and nothing else.
+ *
+ * `component` is filtered too, not just the allocation carried forward, or the
+ * one key the caller names would be the single way back around the projection.
+ * The panel only ever steps a row it drew, so this is unreachable from the
+ * shipped client; it is here so the guarantee above holds for the function
+ * rather than for its current caller.
  */
 export function stepTownFocus(
   allocation: Readonly<Record<string, number>>,
@@ -108,6 +114,7 @@ export function stepTownFocus(
     const points = Math.max(0, allocation[c] ?? 0);
     if (points > 0) next[c] = points;
   }
+  if (!isTownFocusComponent(component)) return next;
   const current = Math.max(0, next[component] ?? 0);
   const totalSpent = TOWN_FOCUS_COMPONENTS.reduce((sum, c) => sum + Math.max(0, next[c] ?? 0), 0);
   if (delta > 0 && totalSpent >= budget) return next;
