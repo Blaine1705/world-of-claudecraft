@@ -32,7 +32,7 @@ import { fineMaterialFor } from './material_grades';
 import type { ProfessionReagent } from './types';
 
 // The base rows. An id absent here is tier 0.
-const BASE_MATERIAL_TIERS: Readonly<Record<string, number>> = {
+const BASE_MATERIAL_TIERS: Readonly<Record<string, number>> = Object.freeze({
   iron_ore: 1,
   ashwood_log: 1,
   goldleaf_herb: 1,
@@ -40,7 +40,7 @@ const BASE_MATERIAL_TIERS: Readonly<Record<string, number>> = {
   elderwood_log: 2,
   sunpetal_herb: 2,
   arcanite_bar: 2,
-};
+});
 
 // Pinned per-material tier table (tests/professions_masterwork.test.ts pins
 // every row literally). An id absent here is tier 0.

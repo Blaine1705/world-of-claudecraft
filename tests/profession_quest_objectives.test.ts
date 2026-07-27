@@ -142,3 +142,52 @@ describe('gather quest objectives', () => {
     expect(qp.counts).toEqual([1, 1]);
   });
 });
+
+// D8: a harvest grants the FINE grade of the zone material once the player's
+// tool outclasses it, so an objective keyed on the base item id has to accept
+// the grade or it silently stops crediting for everyone who upgraded. No
+// shipped quest uses the itemId arm today, which is exactly why it would rot
+// unnoticed: the four live gather objectives all key on nodeType.
+describe('gather quest objectives across material grades', () => {
+  it('an itemId-keyed objective credits when the tool upgrades the yield', () => {
+    const baseItemId = nodeMaterialFor('ore', 'eastbrook_vale').itemId;
+    const { sim, pid, qp } = trackedSim([
+      { type: 'gather', itemId: baseItemId, count: 1, label: 'Ore material gathered' },
+    ]);
+    // A tier-2 pick: eastbrook is all tier-1 veins at material tier 1, so this
+    // player can no longer produce the plain grade anywhere in the zone.
+    sim.addItem('iron_mining_pick', 1, pid);
+    const ore = GATHER_NODES.find(
+      (node) => node.zoneId === 'eastbrook_vale' && node.type === 'ore',
+    )!;
+    teleportOntoNode(sim, pid, ore.id);
+
+    expect(sim.harvestNode(ore.id, pid)).toBe(true);
+    completeCastNow(sim, pid);
+
+    // The premise: the grant really was the fine grade, not the base id.
+    expect(sim.countItem(baseItemId, pid)).toBe(0);
+    expect(sim.countItem(`fine_${baseItemId}`, pid)).toBeGreaterThanOrEqual(1);
+    // And the objective still moved.
+    expect(qp.counts).toEqual([1]);
+  });
+
+  it('an itemId-keyed objective still refuses an unrelated material', () => {
+    // The negative arm: grade-awareness widens the match to the SAME material's
+    // grades, not to anything a node happens to drop.
+    const { sim, pid, qp } = trackedSim([
+      { type: 'gather', itemId: 'copper_ore', count: 1, label: 'Ore material gathered' },
+    ]);
+    sim.addItem('handaxe', 1, pid);
+    const wood = GATHER_NODES.find(
+      (node) => node.zoneId === 'eastbrook_vale' && node.type === 'wood',
+    )!;
+    teleportOntoNode(sim, pid, wood.id);
+
+    expect(sim.harvestNode(wood.id, pid)).toBe(true);
+    completeCastNow(sim, pid);
+
+    expect(sim.countItem('ironbark_log', pid)).toBeGreaterThanOrEqual(1);
+    expect(qp.counts).toEqual([0]);
+  });
+});

@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -234,6 +235,7 @@ describe('the tool ladder the grades exist to build', () => {
   it('no tool recipe is a closed circuit: its fine reagent needs a LOWER tier tool', () => {
     // The fork the pick line forced. A recipe whose fine reagent needs a tool
     // at or above the recipe's own output is unreachable from a cold start.
+    let gradedReagentsChecked = 0;
     for (const recipe of TOOL_RECIPES) {
       const outputUse = ITEMS[recipe.resultItemId].use;
       const outputTier = isGatherToolUse(outputUse) ? outputUse.tier : undefined;
@@ -241,6 +243,7 @@ describe('the tool ladder the grades exist to build', () => {
       for (const reagent of recipe.reagents) {
         const baseItemId = baseMaterialFor(reagent.itemId);
         if (baseItemId === undefined) continue;
+        gradedReagentsChecked += 1;
         // Gathering the fine grade needs a tool strictly above its material.
         const toolNeeded = (gatherMaterialTier(baseItemId) as number) + 1;
         expect(
@@ -250,6 +253,39 @@ describe('the tool ladder the grades exist to build', () => {
         ).toBeLessThan(outputTier as number);
       }
     }
+    // Self-standing non-vacuity: the loop skips non-graded reagents, so without
+    // this it would pass on a TOOL_RECIPES that had dropped its fine reagents
+    // entirely rather than on one whose circuits are open.
+    expect(gradedReagentsChecked).toBe(6);
+  });
+
+  it('no recipe declares a base AND its fine grade (the pools must stay disjoint)', () => {
+    // hasRecipeMaterials checks each reagent independently against the WHOLE
+    // bag, with no reservation across reagents. Before grades that was safe
+    // because reagent ids were disjoint; now materialGradeIds('iron_ore') and
+    // materialGradeIds('fine_iron_ore') overlap on fine_iron_ore, so a recipe
+    // declaring both would pass the gate on a bag that cannot pay both lines
+    // and planGradeRemoval would drain the shared pool on the first one. The
+    // same disjointness is what lets the craft capacity scratch walk recompute
+    // required counts against a pristine inventory while the real loop
+    // recomputes against a shrinking one.
+    let checked = 0;
+    for (const recipe of ALL_RECIPES) {
+      const pools = recipe.reagents.map((r) => new Set(materialGradeIds(r.itemId)));
+      for (let i = 0; i < pools.length; i++) {
+        for (let j = i + 1; j < pools.length; j++) {
+          const shared = [...pools[i]].filter((id) => pools[j].has(id));
+          expect(
+            shared,
+            `${recipe.id} declares reagents sharing a grade pool: ` +
+              `${recipe.reagents[i].itemId} and ${recipe.reagents[j].itemId}`,
+          ).toEqual([]);
+          checked += 1;
+        }
+      }
+    }
+    // Non-vacuity: multi-reagent recipes exist, so the pair loop really ran.
+    expect(checked).toBeGreaterThan(50);
   });
 
   it('the tier-4 pick was re-pointed off the circuit it used to sit in', () => {
@@ -289,6 +325,23 @@ describe('the tool ladder the grades exist to build', () => {
 });
 
 describe('committed art', () => {
+  it('the committed fine icons still match their derivation from the base art', () => {
+    // The script's --check arm was documented as the thing that keeps the
+    // derivation honest after a base icon is repainted, but nothing invoked
+    // it, so a stale derived icon passed every guard in item_icons.test.ts (it
+    // decodes, it is wired, it has provenance, it is 128px, it is byte-distinct
+    // from every other icon: none of those notice it came from the OLD base).
+    // Running it here gives that claim teeth.
+    const here = path.dirname(fileURLToPath(import.meta.url));
+    const root = path.join(here, '..');
+    expect(() =>
+      execFileSync('node', ['scripts/assets/fine_material_icons.mjs', '--check'], {
+        cwd: root,
+        stdio: 'pipe',
+      }),
+    ).not.toThrow();
+  }, 30000);
+
   it('the icon derivation script covers exactly the nine grade pairs', () => {
     // The script cannot import the TS module, so it carries its own pair list.
     // This is the tie that keeps the two from drifting: art for eight of nine

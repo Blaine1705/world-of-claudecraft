@@ -13,7 +13,7 @@
 // browser, and the headless RL env.
 
 import { QUESTS } from '../data';
-import { countAcrossGrades } from '../professions/material_grades';
+import { countAcrossGrades, materialGradeIds } from '../professions/material_grades';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -96,7 +96,15 @@ export function onNodeGatheredForQuests(
   creditDiscreteQuestObjectives(ctx, meta, (objective) => {
     if (objective.type !== 'gather') return false;
     if (objective.nodeType !== undefined && objective.nodeType !== node.type) return false;
-    if (objective.itemId !== undefined && objective.itemId !== itemId) return false;
+    // Grade-aware like the collect arm below (D8): `itemId` is the id the
+    // harvest actually granted, which is the FINE grade whenever the player's
+    // tool outclasses the material, so matching the declared id alone would
+    // silently stop crediting an item-keyed gather objective for exactly the
+    // players who upgraded. No shipped objective uses this arm today (all four
+    // key on nodeType), which is precisely why it would have rotted unnoticed.
+    if (objective.itemId !== undefined && !materialGradeIds(objective.itemId).includes(itemId)) {
+      return false;
+    }
     return true;
   });
 }

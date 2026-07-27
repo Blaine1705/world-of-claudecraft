@@ -963,6 +963,40 @@ describe('fine material grades on the live harvest path', () => {
     expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
   });
 
+  it("the grade reads the tool of the NODE's profession, not the best tool in the bag", () => {
+    // A mixed toolbox is the discriminating case, and nothing else in the suite
+    // has one: every other fixture is single-profession or gives all three
+    // tools at the same tier, so a mining/logging/herbalism mix-up would read
+    // identically. Here a tier-2 sickle works the tier-2 mirefen herb patch
+    // (so the harvest is granted) while a tier-3 PICK sits in the same bag. The
+    // pick outclasses the herb, but it is not the herb's tool.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('bronze_sickle', 1, pid); // herbalism tier 2
+    sim.addItem('mithril_mining_pick', 1, pid); // mining tier 3, wrong profession
+    teleportOntoNode(sim, pid, 'herb_mirefen_t2');
+    expect(castAndComplete(sim, 'herb_mirefen_t2', pid)).toBe(true);
+
+    // The sickle is AT the material tier, so the plain grade, and the pick's
+    // tier must not leak across professions.
+    expect(sim.countItem('goldleaf_herb', pid)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem('fine_goldleaf_herb', pid)).toBe(0);
+  });
+
+  it('the same patch DOES upgrade once the herbalism tool itself outclasses it', () => {
+    // The positive control for the case above: swapping only the sickle tier
+    // flips the grade, so the previous test is about the PROFESSION, not about
+    // mirefen herb patches never upgrading.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('silverleaf_sickle', 1, pid); // herbalism tier 3
+    teleportOntoNode(sim, pid, 'herb_mirefen_t2');
+    expect(castAndComplete(sim, 'herb_mirefen_t2', pid)).toBe(true);
+
+    expect(sim.countItem('fine_goldleaf_herb', pid)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem('goldleaf_herb', pid)).toBe(0);
+  });
+
   it('the upgrade costs no extra rng draw: still exactly two per granted harvest', () => {
     // The pinned two-draw contract has to survive the grade choice, which is
     // why the choice is a pure bag scan and not a roll.

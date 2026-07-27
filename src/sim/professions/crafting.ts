@@ -222,12 +222,22 @@ export function holdsSelfSignedInstance(
 
 /** Whether `meta` holds an inventory slot for `itemId` carrying a signed
  *  instance stamped with `meta`'s OWN name (a self-gathered signed material).
- *  Spans the reagent's grades (professions/material_grades.ts) because the
- *  consumption below does: a self-gathered FINE copper ore is what a
- *  copper_ore reagent is about to be paid with, so it earns the same #1145
- *  discount the plain grade would. Checking only the declared id would make
- *  the perk quietly stop firing for exactly the players who out-tooled the
- *  material. */
+ *
+ *  Spans the reagent's grades (professions/material_grades.ts). The reason is
+ *  that the fine grade REPLACES the plain yield, so past the tier-1 tool a
+ *  player's self-gathered copper ore IS fine copper ore, and checking the
+ *  declared id alone would quietly stop the #1145 discount firing for exactly
+ *  the players who upgraded: using the better tool would cost them a perk.
+ *
+ *  Note the semantic this inherits and does not change: the discount is
+ *  keyed on HOLDING a self-signed copy, not on spending one, and
+ *  `planGradeRemoval` drains the base grade first. So a player holding both
+ *  grades earns the discount from the fine copy while the craft actually
+ *  spends plain ore. That hold-not-spend behavior predates the grades (the
+ *  check was always a `some`, and removeItem walks end-backward, so the
+ *  signed copy was never guaranteed to be the consumed one); the widening
+ *  extends it to a second id rather than introducing it. Pinned in
+ *  tests/material_grade_substitution.test.ts so the ruling is on record. */
 function hasSelfSignedInstance(meta: PlayerMeta, itemId: string): boolean {
   return materialGradeIds(itemId).some((gradeId) =>
     holdsSelfSignedInstance(meta.inventory, meta.name, gradeId),
@@ -239,16 +249,17 @@ function hasSelfSignedInstance(meta: PlayerMeta, itemId: string): boolean {
  *  masterwork proc's signed-reagent term (2026-07-17 ruling); the #1145
  *  quantity discount keeps using the self-only check above.
  *
- *  Deliberately NOT grade-spanning, unlike its sibling. The sibling widened
- *  because a player who out-tooled a material would otherwise lose the #1145
- *  discount FOR having the better tool, which inverts the whole point of the
- *  fine grades, and `selfSignedBonusApplied` on CraftResult makes that
- *  provable. This one only shifts masterwork proc odds, and no fixture in the
- *  suite can observe that for a fine grade: no masterwork-capable recipe
- *  consumes a material that has one. Widening it would be an unpinned
- *  behavior change, so it stays on the declared id until a case can prove it. */
+ *  Spans the reagent's grades for the same reason its sibling does. 26 shipped
+ *  masterwork-capable recipes declare a material that has a fine grade
+ *  (ironedge_longsword, thoriumscale_cuirass, goldweave_robe and the rest), and
+ *  a fine grade carries a signer exactly like its base: resolveHarvest mints
+ *  the signed instance on the RESOLVED id (gathering.ts). So a player who
+ *  out-tooled the material, holding only signed fine copies, would pay the
+ *  reagent line with one and still lose MASTERWORK_SIGNED_CHANCE, which is the
+ *  same inversion the sibling exists to prevent. */
 function hasSignedInstance(meta: PlayerMeta, itemId: string): boolean {
-  return meta.inventory.some((s) => s.itemId === itemId && !!s.instance?.signer);
+  const gradeIds = materialGradeIds(itemId);
+  return meta.inventory.some((s) => gradeIds.includes(s.itemId) && !!s.instance?.signer);
 }
 
 /** The result of resolving one reagent's required quantity: the final count

@@ -52,7 +52,7 @@ export interface MaterialGradeRow {
  * NODE_YIELDS literal in tests/recipe_economy.test.ts, and a fine grade is
  * not a tenth node yield, it is a second grade of an existing one.
  */
-export const MATERIAL_GRADES: Readonly<Record<string, MaterialGradeRow>> = Object.freeze({
+const MATERIAL_GRADE_ROWS: Record<string, MaterialGradeRow> = {
   copper_ore: { fineItemId: 'fine_copper_ore', gatherTier: 1 },
   ironbark_log: { fineItemId: 'fine_ironbark_log', gatherTier: 1 },
   silverleaf_herb: { fineItemId: 'fine_silverleaf_herb', gatherTier: 1 },
@@ -62,7 +62,16 @@ export const MATERIAL_GRADES: Readonly<Record<string, MaterialGradeRow>> = Objec
   thorium_ore: { fineItemId: 'fine_thorium_ore', gatherTier: 3 },
   elderwood_log: { fineItemId: 'fine_elderwood_log', gatherTier: 3 },
   sunpetal_herb: { fineItemId: 'fine_sunpetal_herb', gatherTier: 3 },
-});
+};
+
+// Frozen ROW BY ROW, not just at the top level: Object.freeze is shallow, and a
+// shallow freeze here would leave every { fineItemId, gatherTier } mutable at
+// runtime while looking protected.
+export const MATERIAL_GRADES: Readonly<Record<string, MaterialGradeRow>> = Object.freeze(
+  Object.fromEntries(
+    Object.entries(MATERIAL_GRADE_ROWS).map(([itemId, row]) => [itemId, Object.freeze(row)]),
+  ),
+);
 
 // Reverse index, built once from the table above so the two directions can
 // never fall out of step the way two hand-written literals would.

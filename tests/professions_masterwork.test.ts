@@ -4,7 +4,7 @@
 // determinism contract over a real Sim (one rng draw per successful craft,
 // zero on denial, proc occurrences reproducible by seed).
 import { describe, expect, it } from 'vitest';
-import { PERK_THRESHOLDS } from '../src/sim/content/professions';
+import { PERK_THRESHOLDS, STATIONS } from '../src/sim/content/professions';
 import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import { PRIMARY_STATS, primaryStatBudget } from '../src/sim/item_budget';
@@ -34,6 +34,7 @@ import {
   materialTierBonusForReagents,
   materialTierForItem,
 } from '../src/sim/professions/material_tier';
+import { type StationType, stationsOfType } from '../src/sim/professions/stations';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import type { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
@@ -567,6 +568,62 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
     expect(traded.ok).toBe(true);
     expect(traded.selfSignedBonusApplied).toBe(false);
     expect(traded.masterwork).toBe(true);
+  });
+
+  it('a signed FINE grade feeds the proc chance for a recipe declaring its base', () => {
+    // D8: 26 shipped masterwork-capable recipes declare a material that has a
+    // fine grade, and resolveHarvest mints the signed instance on the RESOLVED
+    // id, so a player who out-tooled the material holds signed FINE copies and
+    // pays the base reagent line with them. Without hasSignedInstance spanning
+    // grades that player silently loses MASTERWORK_SIGNED_CHANCE for having
+    // used the better tool.
+    //
+    // Seed 69 again, hunted on this recipe: the single proc draw lands where
+    // the 2 percent signed-reagent term alone decides the outcome. Spares on
+    // record: 117, 185, 319, 322.
+    const SEED = 69;
+    const craftLongsword = (setup: (sim: Sim, pid: number) => void) => {
+      const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: false });
+      const pid = sim.playerId;
+      const recipe = recipeById('recipe_ironedge_longsword')!;
+      const station = stationsOfType(STATIONS, recipe.stationType as StationType)[0];
+      const e = (sim as any).entities.get(pid);
+      e.pos.x = station.pos.x;
+      e.pos.z = station.pos.z;
+      e.prevPos = { ...e.pos };
+      // Trainer-acquired recipe: grant knowledge directly, the same way the
+      // other live-craft cases in this file reach a gated recipe.
+      (sim as any).players.get(pid)?.knownRecipes?.add(recipe.id);
+      setup(sim, pid);
+      sim.craftItem(recipe.id, false, pid);
+      return { ...(sim as any).lastCraftResult };
+    };
+    const reagentsExceptOre = (sim: Sim, pid: number) => {
+      for (const g of recipeById('recipe_ironedge_longsword')!.reagents) {
+        if (g.itemId === 'iron_ore') continue;
+        for (let i = 0; i < g.count + 2; i++) sim.addItem(g.itemId, 1, pid);
+      }
+    };
+    const ORE_COUNT =
+      (recipeById('recipe_ironedge_longsword')!.reagents.find((g) => g.itemId === 'iron_ore')
+        ?.count ?? 0) + 2;
+    expect(ORE_COUNT).toBeGreaterThan(2); // the recipe really does declare iron_ore
+
+    const signedFine = craftLongsword((sim, pid) => {
+      reagentsExceptOre(sim, pid);
+      sim.addItemInstance('fine_iron_ore', { signer: 'Gatherer Friend' }, pid, ORE_COUNT);
+    });
+    expect(signedFine.ok).toBe(true);
+    expect(signedFine.masterwork).toBe(true);
+
+    // Control at the SAME seed: identical bag, plain unsigned fine copies. The
+    // draw is the same and must miss, so the proc above is the signed term.
+    const plainFine = craftLongsword((sim, pid) => {
+      reagentsExceptOre(sim, pid);
+      for (let i = 0; i < ORE_COUNT; i++) sim.addItem('fine_iron_ore', 1, pid);
+    });
+    expect(plainFine.ok).toBe(true);
+    expect(plainFine.masterwork).toBeUndefined();
   });
 
   it('a count-1 signed reagent feeds the proc chance (decoupled from the quantity-discount flag)', () => {

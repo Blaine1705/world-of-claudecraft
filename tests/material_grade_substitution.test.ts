@@ -7,6 +7,7 @@ import { hasRecipeMaterials, resolveCraft } from '../src/sim/professions/craftin
 import { stationsOfType } from '../src/sim/professions/stations';
 import { turnInQuestCore } from '../src/sim/quests/quest_commands';
 import { Sim } from '../src/sim/sim';
+import type { QuestDef } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 // Downward grade substitution (D8): a fine grade satisfies a requirement for
@@ -240,6 +241,65 @@ describe('quest collect credit spans the grades', () => {
     expect(sim.countItem('copper_ore', pid)).toBe(0);
     expect(sim.countItem('fine_copper_ore', pid)).toBe(2);
     expect(meta.questsDone.has(ORDER)).toBe(true);
+  });
+
+  it('the reward-capacity gate frees the room the hand-in actually frees', () => {
+    // turnInQuest simulates the hand-in on a scratch copy to decide whether an
+    // item reward fits AFTER the collect items leave, and that simulation has
+    // to take the same grades the real consumption takes. NO shipped quest
+    // pairs a graded collect objective with an item reward today (the three
+    // work orders pay copper only), so the path is latent: injecting the quest
+    // is what makes the branch reachable at all, and without this a revert of
+    // the scratch walk's grade plan would leave the whole suite green.
+    const TEST_ID = 'q_test_graded_reward';
+    const original = QUESTS[TEST_ID];
+    try {
+      QUESTS[TEST_ID] = {
+        id: TEST_ID,
+        name: 'Graded Reward Test',
+        giverNpcId: 'forgemistress_darva',
+        turnInNpcId: 'forgemistress_darva',
+        text: 'Test only.',
+        completionText: 'Test complete.',
+        objectives: [
+          { type: 'collect', itemId: 'copper_ore', count: 8, label: 'Copper Ore delivered' },
+        ],
+        xpReward: 0,
+        copperReward: 0,
+        itemRewards: {
+          warrior: 'greyjaw_pelt_cloak',
+          mage: 'greyjaw_pelt_cloak',
+          rogue: 'greyjaw_pelt_cloak',
+        },
+        retired: true,
+      } as QuestDef;
+
+      const sim = makeSim();
+      const pid = sim.playerId;
+      const meta = (sim as any).players.get(pid);
+      placeAtQuestGiver(sim, pid, 'forgemistress_darva');
+
+      // Eight fine copies in ONE slot the hand-in empties completely, then every
+      // remaining slot filled, so the reward can only fit on the room the
+      // hand-in frees. A scratch walk that removed the plain id would free
+      // nothing here and deny.
+      grantItem(sim, 'fine_copper_ore', 8, pid);
+      const capacity = bagCapacity(meta.bags);
+      const fillerStack = ITEMS.bone_fragments.stackSize ?? 20;
+      while (meta.inventory.length < capacity) sim.addItem('bone_fragments', fillerStack, pid);
+      expect(meta.inventory.length).toBe(capacity);
+      expect(sim.ctx.canAddItem('greyjaw_pelt_cloak', 1, pid)).toBe(false);
+
+      meta.questLog.set(TEST_ID, { questId: TEST_ID, counts: [8], state: 'ready' });
+      sim.turnInQuest(TEST_ID, pid);
+
+      expect(meta.questsDone.has(TEST_ID), 'turn-in was refused').toBe(true);
+      expect(sim.countItem('fine_copper_ore', pid)).toBe(0);
+      expect(sim.countItem('greyjaw_pelt_cloak', pid)).toBe(1);
+    } finally {
+      if (original) QUESTS[TEST_ID] = original;
+      else delete QUESTS[TEST_ID];
+    }
   });
 
   it('seven fine copies do NOT satisfy an eight-unit objective', () => {
