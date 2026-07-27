@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
+  saveCharacterAndMarketState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
@@ -114,15 +115,19 @@ describe('an unknown allocation key never reaches the character save (#2511)', (
   });
 
   it('survives the save/load round trip as the rejection, not as stored junk', () => {
+    // Seeded with a real allocation FIRST so the round trip carries a value:
+    // an all-empty version of this would be {} equalling {} at all three
+    // checkpoints, which the unfixed load arm satisfies just as well.
     const { sim, internals, a } = setup();
+    sim.setTownFocus({ hide: 4 }, a);
     sim.setTownFocus({ hide: 4, not_a_real_tag: 5 }, a);
-    expect(internals.players.get(a)?.townFocus).toEqual({});
+    expect(internals.players.get(a)?.townFocus).toEqual({ hide: 4 });
     const state = sim.serializeCharacter(a);
-    expect(state?.townFocus).toEqual({});
+    expect(state?.townFocus).toEqual({ hide: 4 });
 
     const reloaded = new Sim({ seed: 21, playerClass: 'warrior', noPlayer: true });
     const b = reloaded.addPlayer('warrior', 'Alpha', { state: state ?? undefined });
-    expect((reloaded as unknown as SimInternals).players.get(b)?.townFocus).toEqual({});
+    expect((reloaded as unknown as SimInternals).players.get(b)?.townFocus).toEqual({ hide: 4 });
   });
 
   it('drops an unknown key an OLDER save already carries, and re-saves without it', () => {
@@ -143,11 +148,18 @@ describe('an unknown allocation key never reaches the character save (#2511)', (
   });
 
   it('unlocks the panel a junked save would otherwise have jammed shut', () => {
-    // Why the load arm is load-bearing rather than tidy-up. The panel seeds its
-    // draft from the stored allocation and stepTownFocus spreads that whole
-    // draft forward on every +/-, so without the drop the unknown key would
-    // ride back into the next Save and be refused, with no control anywhere
-    // that could delete it: the character could never change focus again.
+    // Why the load arm is load-bearing rather than tidy-up. A client seeds its
+    // draft from the stored allocation and carries that whole draft forward on
+    // every +/-, so without the drop the unknown key rides back into the next
+    // Save and is refused, with no control anywhere that could delete it: the
+    // character could never change focus again.
+    //
+    // Posts a RAW spread of the stored allocation on purpose, NOT stepTownFocus.
+    // The shipped view core now projects its output onto TOWN_FOCUS_COMPONENTS,
+    // which would strip the junk client-side and make this test pass with the
+    // load arm deleted. This drives the sim's own guarantee instead, which is
+    // the one that has to hold for any client, including a cached older bundle
+    // that still spreads.
     const { sim, a } = setup();
     const junked = { ...sim.serializeCharacter(a)!, townFocus: { hide: 3, eastbrook: 4 } };
     const reloaded = new Sim({ seed: 21, playerClass: 'warrior', noPlayer: true });
@@ -159,11 +171,26 @@ describe('an unknown allocation key never reaches the character save (#2511)', (
     reloaded.tick();
     reloaded.drainEvents();
 
-    // Exactly what the panel posts: the draft it was seeded with, plus a step.
-    const draft = stepTownFocus(reloaded.townFocusFor(b), 'hide', 1, FOCUS_POINT_BUDGET);
-    reloaded.setTownFocus(draft, b);
+    reloaded.setTownFocus({ ...reloaded.townFocusFor(b), hide: 4 }, b);
     expect(internals.players.get(b)?.townFocus).toEqual({ hide: 4 });
     expect(errorsOf(reloaded)).toEqual([]);
+  });
+
+  it('has the panel post only rows it renders, so a stale draft cannot jam it either', () => {
+    // The client half of the same guarantee (stepTownFocus projects onto
+    // TOWN_FOCUS_COMPONENTS instead of spreading its input), driven against the
+    // real Sim rather than as a view-core unit: a draft carrying a key the
+    // panel never drew still commits.
+    const { sim, internals, a } = setup();
+    const stale = { hide: 2, eastbrook: 4, constructor: 1 };
+    const draft = stepTownFocus(stale, 'hide', 1, FOCUS_POINT_BUDGET);
+    expect(draft).toEqual({ hide: 3 });
+    sim.setTownFocus(draft, a);
+    expect(internals.players.get(a)?.townFocus).toEqual({ hide: 3 });
+    expect(errorsOf(sim)).toEqual([]);
+    // A decrement to zero still removes the row, and still emits nothing junk.
+    expect(stepTownFocus(stale, 'hide', -1, FOCUS_POINT_BUDGET)).toEqual({ hide: 1 });
+    expect(stepTownFocus({ hide: 1, eastbrook: 4 }, 'hide', -1, FOCUS_POINT_BUDGET)).toEqual({});
   });
 
   it('stops a junk-only save from paying out the first-focus-point deed', () => {
@@ -309,13 +336,14 @@ describe('harvestCorpse omitted-components town-focus default', () => {
 });
 
 // The #2511 fix sits at the SIM boundary, not in server/game.ts, and this is
-// the pin that says so on purpose: the offline browser Sim and the headless RL
-// env reach setTownFocus through IWorld without ever passing the server's
-// dispatch switch, so validating keys there would have left both hosts open.
-// If a future change starts filtering on the server too, this test is the one
-// to re-argue rather than quietly delete.
-describe('the server forwards a set_town_focus allocation verbatim (#2511)', () => {
-  it('passes the unknown key straight through to the sim, which is what refuses it', () => {
+// the pin that says so on purpose: the offline browser Sim reaches
+// setTownFocus through IWorld without ever passing the server's dispatch
+// switch, so validating keys there would have left that host open. (The
+// headless RL env is NOT a second reason: it exposes no town-focus action at
+// all, and never loads a CharacterState.) If a future change starts filtering
+// on the server too, this test is the one to re-argue rather than delete.
+describe('the server forwards a set_town_focus allocation key verbatim (#2511)', () => {
+  it('passes the unknown key straight through, unfiltered', () => {
     const server = new GameServer();
     const session = server.join(
       { readyState: 1, send: () => {} } as never,
@@ -340,5 +368,27 @@ describe('the server forwards a set_town_focus allocation verbatim (#2511)', () 
       0,
     );
     expect(spy).toHaveBeenCalledWith({ hide: 4, not_a_real_tag: 5 }, session.pid);
+
+    // "Verbatim" is true of the KEY channel only, which is the channel #2511 is
+    // about. The dispatch does pre-filter VALUES on `typeof v === 'number'`, so
+    // a non-numeric value arrives at the sim as an absent entry rather than as
+    // a rejection: a silent partial accept the key rule deliberately does not
+    // have. Pinned rather than left implicit, because the source comment in
+    // professions/focus.ts scopes its whole-request rule against exactly this,
+    // and closing it means moving a decision into the dispatch, which is the
+    // opposite of what this describe argues.
+    spy.mockClear();
+    const stringValued = JSON.stringify({
+      t: 'cmd',
+      cmd: 'set_town_focus',
+      allocation: { hide: 4, fang: 'x' },
+    });
+    (server as unknown as { dispatchMessage: (...a: unknown[]) => void }).dispatchMessage(
+      session,
+      JSON.parse(stringValued),
+      stringValued,
+      0,
+    );
+    expect(spy).toHaveBeenCalledWith({ hide: 4 }, session.pid);
   });
 });

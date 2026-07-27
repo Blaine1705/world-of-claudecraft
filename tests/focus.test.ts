@@ -185,6 +185,10 @@ describe('setTownFocus rejects a key that is not a real component family (#2511)
       expect(isTownFocusComponent(name)).toBe(false);
       rejects({ [name]: 1 });
     }
+    // `__proto__` never reaches the sim as an own key (the server's copy loop
+    // assigns through the prototype setter, which ignores a number), so it gets
+    // the allowlist assertion without a request arm.
+    expect(isTownFocusComponent('__proto__')).toBe(false);
   });
 
   it('refuses the numeric-string keys an array payload decays to', () => {
@@ -205,8 +209,15 @@ describe('setTownFocus rejects a key that is not a real component family (#2511)
     // Precedence is decided, not incidental: the key check returns from inside
     // the entry loop and the budget test runs after it. Pinned so a future
     // reorder has to argue with a test.
-    const result = setTownFocus(PREVIOUS, { leather: FOCUS_POINT_BUDGET + 999 }, true);
+    const result = setTownFocus(PREVIOUS, { not_a_real_tag: FOCUS_POINT_BUDGET + 999 }, true);
     expect(result.reason).toBe('invalid_allocation');
+    expect(result.allocation).toEqual(PREVIOUS);
+    // The bad key AFTER a real one that already blew the budget. A separate arm:
+    // the first case only proves the key check beats the post-loop budget test,
+    // while this one also proves it is not sitting below the `total +=`
+    // accumulation for an earlier entry. A reorder can break one without the
+    // other, and a single-key fixture cannot tell those two edits apart.
+    rejects({ hide: FOCUS_POINT_BUDGET + 999, not_a_real_tag: 1 });
     // Contrast, same shape and the same over-budget total on a REAL family, so
     // this pin cannot pass by answering invalid_allocation to everything.
     expect(setTownFocus(PREVIOUS, { hide: FOCUS_POINT_BUDGET + 999 }, true).reason).toBe(
@@ -220,15 +231,43 @@ describe('setTownFocus rejects a key that is not a real component family (#2511)
     expect(result.allocation).toEqual(PREVIOUS);
   });
 
+  it('is exactly the six item-mapped families, and the panel exports that same binding', () => {
+    // Pinned to LITERALS, not re-derived. `Object.keys(HARVEST_COMPONENT_ITEMS)`
+    // compared against a constant DEFINED as that expression is a constant
+    // self-comparison: it holds however the item map changes, so it cannot
+    // catch the allowlist silently widening or shrinking, and `venomSac` would
+    // otherwise never be named anywhere in this suite.
+    expect([...TOWN_FOCUS_COMPONENTS]).toEqual([
+      'hide',
+      'fang',
+      'silk',
+      'venomSac',
+      'meat',
+      'cloth',
+    ]);
+    // And each really is a mapped family, pinned by item id rather than by
+    // truthiness, so widening the item map cannot quietly widen the allowlist
+    // without this line moving too.
+    expect({ ...HARVEST_COMPONENT_ITEMS }).toEqual({
+      hide: 'rough_hide',
+      fang: 'wolf_fang',
+      silk: 'spider_silk',
+      venomSac: 'venom_gland',
+      meat: 'game_meat',
+      cloth: 'homespun_cloth',
+    });
+    // ONE definition, stated as the identity it is: the panel re-exports the
+    // sim's binding (src/ui/town_focus_view.ts), so this reds the moment the UI
+    // derives its own list at all, faithfully or not. A structural toEqual
+    // would not: a faithful re-derivation would still pass.
+    expect(PANEL_COMPONENTS).toBe(TOWN_FOCUS_COMPONENTS);
+  });
+
   it('accepts every component the shipped panel can offer', () => {
-    // The contract that matters to a real player, and the reason the allowlist
-    // has ONE definition (src/ui/town_focus_view.ts re-exports the sim's):
-    // no row the panel renders can be a key the command boundary refuses.
-    // Driven from the PANEL's export against the real validator, so a future
-    // change that re-derives the list separately has to red this rather than
-    // compare a constant with itself.
-    expect(PANEL_COMPONENTS.length).toBeGreaterThan(1);
-    expect([...PANEL_COMPONENTS]).toEqual([...TOWN_FOCUS_COMPONENTS]);
+    // The contract that matters to a real player: no row the panel renders can
+    // be a key the command boundary refuses. Driven from the PANEL's export
+    // through the REAL validator, which is the non-self-referential half (the
+    // membership itself is pinned against literals in the test above).
     for (const component of PANEL_COMPONENTS) {
       expect(isTownFocusComponent(component)).toBe(true);
       const result = setTownFocus({}, { [component]: 1 }, true);
@@ -239,15 +278,6 @@ describe('setTownFocus rejects a key that is not a real component family (#2511)
     // budget-exact re-spec off a previous allocation is untouched.
     const spread = { hide: 4, fang: 3, silk: 3 };
     expect(setTownFocus({ meat: 10 }, spread, true)).toEqual({ ok: true, allocation: spread });
-  });
-
-  it('has no key the allowlist admits that the item table does not map', () => {
-    // The other direction, so the allowlist cannot quietly widen: every member
-    // maps to a real harvest item, which is what makes focus on it do anything.
-    for (const component of TOWN_FOCUS_COMPONENTS) {
-      expect(HARVEST_COMPONENT_ITEMS[component], component).toBeTruthy();
-    }
-    expect(isTownFocusComponent('__proto__')).toBe(false);
   });
 });
 
@@ -267,6 +297,12 @@ describe('normalizeTownFocusOnLoad: an older save self-heals (#2511)', () => {
     expect(normalizeTownFocusOnLoad(undefined)).toEqual({});
     expect(normalizeTownFocusOnLoad(null)).toEqual({});
     expect(normalizeTownFocusOnLoad({})).toEqual({});
+    // FRESH is the load-bearing word, and toEqual({}) alone does not say it: a
+    // shared EMPTY_FOCUS_ALLOCATION on the early-return path would pass that
+    // and alias one mutable object across every character loaded without a
+    // townFocus.
+    expect(normalizeTownFocusOnLoad(undefined)).not.toBe(normalizeTownFocusOnLoad(undefined));
+    expect(normalizeTownFocusOnLoad(undefined)).not.toBe(EMPTY_FOCUS_ALLOCATION);
   });
 
   it('normalizes to the shape setTownFocus commits: positive integers only', () => {
@@ -295,13 +331,36 @@ describe('normalizeTownFocusOnLoad: an older save self-heals (#2511)', () => {
     expect(saved.hide).toBe(4);
   });
 
-  it('never returns a key setTownFocus would then refuse', () => {
-    // The two halves of the fix agree by construction, pinned by driving both.
-    const junked = { hide: 3, eastbrook: 4, '': 1, constructor: 2, gills: 5 };
+  it('never returns anything setTownFocus would then refuse', () => {
+    // The two halves of the fix agree, pinned by driving both. The fixture
+    // carries a bad VALUE as well as bad keys, which is the second, independent
+    // pin on the value dimension: drop the integer or positivity guard and
+    // `silk: 1.5` / `fang: -2` survive into an allocation setTownFocus rejects,
+    // so this reds through a completely different path than the exact-shape
+    // assertion above.
+    const junked = { hide: 3, eastbrook: 4, '': 1, constructor: 2, gills: 5, silk: 1.5, fang: -2 };
     const loaded = normalizeTownFocusOnLoad(junked);
+    expect(loaded).toEqual({ hide: 3 });
     expect(setTownFocus({}, loaded, true).ok).toBe(true);
     // ...and the raw save would NOT have been accepted, so this is not vacuous.
     expect(setTownFocus({}, junked, true).ok).toBe(false);
+  });
+
+  it('leaves a committed allocation untouched through a load: the round trip is a fixed point', () => {
+    // The other composition, and the one nothing else pins. The commit loop
+    // keeps any `points > 0` with no integer re-check, while this normalizer
+    // also demands Number.isInteger; they agree only because the boundary
+    // already rejected non-integers upstream. Driven over every family so a
+    // future divergence in either loop's value predicate has to red here.
+    for (const component of TOWN_FOCUS_COMPONENTS) {
+      const committed = setTownFocus({}, { [component]: FOCUS_POINT_BUDGET }, true);
+      expect(committed.ok, component).toBe(true);
+      expect(normalizeTownFocusOnLoad(committed.allocation), component).toEqual(
+        committed.allocation,
+      );
+    }
+    const spread = setTownFocus({}, { hide: 4, fang: 3, silk: 3 }, true);
+    expect(normalizeTownFocusOnLoad(spread.allocation)).toEqual(spread.allocation);
   });
 });
 

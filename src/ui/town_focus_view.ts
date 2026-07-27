@@ -84,14 +84,30 @@ export function townFocusRenderSig(view: TownFocusView): string {
   return `${view.inTown ? 1 : 0}/${view.budget}/${view.remaining}/${rows}`;
 }
 
-/** Applies a single +1/-1 step to `component`, clamped at 0 and at the budget. */
+/**
+ * Applies a single +1/-1 step to `component`, clamped at 0 and at the budget.
+ *
+ * Built from TOWN_FOCUS_COMPONENTS rather than by spreading `allocation`
+ * forward (#2511), so the payload the panel posts is a function of the rows it
+ * actually draws. A spread carried any key buildTownFocusView never rendered
+ * into every Save, where the command boundary now rejects the whole request
+ * and the panel offers no control that could remove it. The sim closes that
+ * from its own side by dropping unknown keys on load; this keeps the view core
+ * from emitting a model it does not render in the first place. Inert for every
+ * legitimate allocation, because both the row list and the budget sum here
+ * already read TOWN_FOCUS_COMPONENTS and nothing else.
+ */
 export function stepTownFocus(
   allocation: Readonly<Record<string, number>>,
   component: string,
   delta: 1 | -1,
   budget: number,
 ): Record<string, number> {
-  const next: Record<string, number> = { ...allocation };
+  const next: Record<string, number> = {};
+  for (const c of TOWN_FOCUS_COMPONENTS) {
+    const points = Math.max(0, allocation[c] ?? 0);
+    if (points > 0) next[c] = points;
+  }
   const current = Math.max(0, next[component] ?? 0);
   const totalSpent = TOWN_FOCUS_COMPONENTS.reduce((sum, c) => sum + Math.max(0, next[c] ?? 0), 0);
   if (delta > 0 && totalSpent >= budget) return next;

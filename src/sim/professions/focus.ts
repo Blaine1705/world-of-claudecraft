@@ -11,8 +11,15 @@
 // is evaluated by the caller (Sim, which knows the player's zone/position) and
 // passed in as a plain boolean, so this module never reaches into world state.
 
+// HARVEST_COMPONENT_ITEMS comes from the content leaf, not through
+// gathering.ts's compatibility re-export: it is read at MODULE-EVALUATION time
+// below (Object.keys, then new Set), so routing it through a sibling would
+// turn any future gathering -> focus edge into an import-time TDZ
+// ReferenceError on all three hosts rather than a subtle bug. HARVEST_TIERS is
+// only ever read inside a function body, so it keeps the sibling import.
+import { HARVEST_COMPONENT_ITEMS } from '../content/professions';
 import type { ZoneDef } from '../types';
-import { HARVEST_COMPONENT_ITEMS, HARVEST_TIERS, type HarvestTier } from './gathering';
+import { HARVEST_TIERS, type HarvestTier } from './gathering';
 
 /** Total focus points a player may allocate across every component type at once. */
 export const FOCUS_POINT_BUDGET = 10;
@@ -56,8 +63,21 @@ export const EMPTY_FOCUS_ALLOCATION: FocusAllocation = {};
  * plain interact press on a murloc take the #2509 all-forfeit refusal. Keeping
  * the unmapped families out of the allocation is what makes that unreachable
  * rather than merely unlikely.
+ *
+ * Being derived from content, this is a live-save contract and not just a
+ * table: renaming or retiring a HARVEST_COMPONENT_ITEMS key silently drops
+ * every existing character's points under the old key the next time they load
+ * (normalizeTownFocusOnLoad below), with no log and no refund. That is
+ * acceptable because focus points are a free, freely re-allocatable budget
+ * with no spent-points ledger, but it means such a rename is a save mutation,
+ * not a data edit. Frozen so the guarantee in the paragraph above is a real
+ * one: `Object.keys` hands back a live mutable array, and the Set is
+ * snapshotted at module init, so a push through a cast would leave the panel
+ * offering a row the validator refuses.
  */
-export const TOWN_FOCUS_COMPONENTS: readonly string[] = Object.keys(HARVEST_COMPONENT_ITEMS);
+export const TOWN_FOCUS_COMPONENTS: readonly string[] = Object.freeze(
+  Object.keys(HARVEST_COMPONENT_ITEMS),
+);
 
 // A Set, NOT a truthy `HARVEST_COMPONENT_ITEMS[key]` lookup. The map is a
 // plain object literal, so `constructor`, `toString`, `hasOwnProperty` and
@@ -159,6 +179,15 @@ export function setTownFocus(
     // with the character, so a hand-crafted frame could park arbitrary strings
     // (a 16 KiB one, or `constructor`) in a save and keep them there.
     //
+    // Scope of the whole-request rule below: the KEY channel. The value
+    // channel does not follow it, because server/game.ts pre-filters entries
+    // on `typeof v === 'number'` before this function ever sees them, so a
+    // non-number value arrives as an absent entry rather than as a rejection.
+    // Left alone deliberately: it is pre-existing, self-affecting, and
+    // unreachable from the shipped client, and changing it means moving a
+    // decision into the server dispatch, which is the opposite of where this
+    // fix argues validation belongs.
+    //
     // This WIDENS the empty-string check it replaces rather than adding a
     // behavior mode: '' was already rejected right here, and '' is just the
     // degenerate unknown key. Rejecting outright, over silently dropping the
@@ -195,6 +224,11 @@ export function setTownFocus(
  * Rebuild a persisted allocation into the shape setTownFocus commits: known
  * families only, each mapped to a positive integer (#2511 back-compat).
  *
+ * This is the whole population, not most of it: the only other writer of
+ * meta.townFocus is the validated setTownFocus commit, and a build change is a
+ * process restart, so no live character can be holding junk written by an
+ * older binary once this arm has run.
+ *
  * The command boundary above cannot repair a save that already carries junk,
  * and that junk is not inert once loaded: it is mirrored to the client in the
  * `tfocus` snapshot field, summed by the townFocusPoints deed meter, and read
@@ -212,13 +246,33 @@ export function setTownFocus(
  *
  * Same normalize-on-load shape as professions/tier_mail.ts
  * normalizeTierMailOnLoad and cadence.ts clampCadenceOnLoad, and it keeps the
- * sim.ts load arm thin. A total over FOCUS_POINT_BUDGET is deliberately NOT
- * re-checked here: a budget lowered by later tuning must not silently delete a
- * legitimate allocation, and the next set_town_focus re-validates the whole
- * request against the current budget anyway.
+ * sim.ts load arm thin. Unlike cadence, it needs no serialize-side
+ * counterpart: the fixed point holds by construction because the only writers
+ * of meta.townFocus are the fresh init, this arm, and the validated
+ * setTownFocus commit. Re-derive that if a fourth writer ever appears.
+ *
+ * A total over FOCUS_POINT_BUDGET is deliberately NOT re-checked here: a
+ * budget lowered by later tuning must not silently delete a legitimate
+ * allocation, and the next set_town_focus re-validates the whole request
+ * against the current budget anyway. The consequence, stated rather than
+ * discovered later: a save that somehow carries `{ hide: 40 }` keeps paying
+ * the uncapped applyFocusBonus yield on it. Unreachable through the command
+ * boundary, which caps the total at FOCUS_POINT_BUDGET and always did, even
+ * when it was counting unknown keys toward it.
+ *
+ * One stated behavior change for an affected character, not a side effect:
+ * dropping a real-but-unmapped corpse tag (claw/tusk/gills/horn) changes the
+ * DERIVED harvest pick from that single tag to the empty pick, so a plain
+ * interact press that used to hit the #2509 all-forfeit refusal and draw
+ * nothing now spreads and draws. That is the corpse paying out instead of
+ * refusing, it is deterministic and identical on all three hosts, and no
+ * parity scenario allocates a town focus.
+ *
+ * Takes `unknown` values on purpose: this reads a JSONB blob, so the runtime
+ * type guard below is load-bearing rather than decorative.
  */
 export function normalizeTownFocusOnLoad(
-  saved: Readonly<Record<string, number>> | undefined | null,
+  saved: Readonly<Record<string, unknown>> | undefined | null,
 ): Record<string, number> {
   const allocation: Record<string, number> = {};
   if (!saved) return allocation;
