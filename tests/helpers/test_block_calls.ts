@@ -231,7 +231,7 @@ export function duplicateSiblingBlocks(source: string, fileName?: string): Dupli
   const seen = new Map<string, TestBlockCall>();
   const out: DuplicateBlock[] = [];
   for (const block of blocks) {
-    const key = `${block.parent} ${block.text}`;
+    const key = `${block.parent} ${block.text}`;
     const first = seen.get(key);
     if (first === undefined) {
       seen.set(key, block);

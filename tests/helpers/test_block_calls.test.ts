@@ -14,10 +14,38 @@ import {
 // broke. Only planted sources reach those arms.
 
 describe('testBlockCalls', () => {
+  it('names every vitest head and modifier, pinned to literals', () => {
+    // The lists themselves, before anything iterates them. A sweep `for (const
+    // head of BLOCK_HEADS)` cannot notice a name LEAVING the list, it just runs
+    // one case fewer and stays green: the mutation battery for this guard
+    // dropped `suite` and nothing failed. That is the constant-self-comparison
+    // trap, and only literals close it.
+    //
+    // Losing a head or a modifier is a silent narrowing, not a crash: the calls
+    // it used to resolve stop being blocks, leave the duplicate scan, and take
+    // their duplicates with them.
+    expect([...BLOCK_HEADS]).toEqual(['describe', 'it', 'test', 'suite']);
+    expect([...BLOCK_MODIFIERS]).toEqual([
+      'concurrent',
+      'each',
+      'extend',
+      'fails',
+      'for',
+      'only',
+      'runIf',
+      'scoped',
+      'sequential',
+      'skip',
+      'skipIf',
+      'todo',
+    ]);
+  });
+
   it('resolves every head and modifier it claims to', () => {
     // Each element of both exported lists put to a source that uses it, so a
-    // name added to either list without a real spelling behind it fails here,
-    // and one silently deleted takes its case with it.
+    // name added to either list without a real spelling behind it fails here.
+    // The literal pin above is what makes this sweep decisive in the other
+    // direction, by fixing the list it walks.
     for (const head of BLOCK_HEADS) {
       const { blocks } = testBlockCalls(`${head}('x', () => {\n  expect(1).toBe(1);\n});\n`);
       expect(
