@@ -359,22 +359,36 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(rollIds.length).toBe(3);
     expect(prompts.length).toBe(3);
     expect([...new Set(prompts.map((e) => e.pid))]).toEqual([a]);
-    expect(prompts[0].candidates.map((cand: { pid: number }) => cand.pid)).toEqual([a, b, c, d]);
+    // Every prompt's roster, not just the first: a candidate set that went wrong on
+    // only the second or third drop would hide behind a first-member-only check.
+    for (const prompt of prompts) {
+      expect(prompt.candidates.map((cand: { pid: number }) => cand.pid)).toEqual([a, b, c, d]);
+    }
 
-    // Arms 1 + 2: two direct grants, each announced to all four members exactly
-    // once. A duplicate pid that failed to dedupe would either double c's line or
-    // convert the roll instead of granting it, so both counts below are decisive.
-    const assigned = evs.filter((e) => e.type === 'loot' && / assigned /.test(text(e)));
-    expect(assigned.length).toBe(8); // 2 grants x 4 party members
-    expect([...new Set(assigned.map((e) => e.pid))].sort((x, y) => x - y)).toEqual([a, b, c, d]);
-    // Where the three copies ended up: b and c took one each by direct grant and
-    // one of them took a second by winning the contest below, while the master
-    // looter kept none and the low roller (d) won nothing.
+    // Arms 1 + 2: two direct grants, announced PER GRANTEE to all four members
+    // exactly once. Naming the grantee is what makes this decisive: a plain count
+    // of 8 assign lines survives both a redistribution of the two grants and a
+    // duplicate pid printed twice to half the party.
+    const assignedTo = (name: string) =>
+      byPid(
+        evs
+          .filter(
+            (e) =>
+              e.type === 'loot' && text(e) === `Aaa assigned [[i:greyjaw_hide_boots]] to ${name}.`,
+          )
+          .map((e) => e.pid as number),
+      );
+    expect(assignedTo('Bbb')).toEqual(byPid([a, b, c, d]));
+    expect(assignedTo('Ccc')).toEqual(byPid([a, b, c, d]));
+    expect(evs.filter((e) => e.type === 'loot' && / assigned /.test(text(e))).length).toBe(8);
+    // Where the three copies ended up, per player rather than in aggregate: a sum
+    // plus a max is satisfied by a materially wrong distribution (both grants to c
+    // with b winning the contest reads identically), so pin each holder.
     const held = (pid: number) => sim.countItem('greyjaw_hide_boots', pid) as number;
-    expect(held(a)).toBe(0);
-    expect(held(d)).toBe(0);
-    expect(held(b) + held(c)).toBe(3);
-    expect(Math.max(held(b), held(c))).toBe(2);
+    expect(held(a)).toBe(0); // the master looter assigned all three away
+    expect(held(b)).toBe(1); // direct grant only
+    expect(held(c)).toBe(2); // direct grant + the contest win below
+    expect(held(d)).toBe(0); // rolled below the tie, so won nothing
     // The deduped assignment never reopened as a roll.
     expect(evs.some((e) => e.type === 'lootRoll' && e.rollId === rollIds[1])).toBe(false);
 
@@ -384,14 +398,22 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(converted.map((e) => e.pid).sort((x, y) => x - y)).toEqual([b, c, d]);
 
     // The three need rolls TIED at the top, which is the only thing that makes
-    // resolveLootRoll draw its tie-break int, and a winner was announced.
+    // resolveLootRoll draw its tie-break int. Pinned to the literal numbers the
+    // scenario comment documents, so that when a future stream change dissolves
+    // the tie the failure names the seed's actual rolls instead of just reporting
+    // that some count moved.
     const needRolls = evs
       .filter((e) => e.type === 'loot' && e.pid === a && /^Need Roll - /.test(text(e)))
       .map((e) => Number(/^Need Roll - (\d+)/.exec(text(e))?.[1]));
-    expect(needRolls.length).toBe(3);
-    const top = Math.max(...needRolls);
-    expect(needRolls.filter((n) => n === top).length).toBeGreaterThan(1);
-    expect(evs.some((e) => e.type === 'loot' && e.pid === a && / wins /.test(text(e)))).toBe(true);
+    expect(needRolls).toEqual([97, 97, 43]); // b and c tie at the top, d below
+    // The tie-break picked c, and that outcome is the one observable effect of the
+    // master-loot-only draw, so it is pinned by name and by winning roll.
+    expect(
+      evs.filter(
+        (e) =>
+          e.type === 'loot' && text(e) === `Ccc wins [[i:greyjaw_hide_boots]] (${needRolls[1]})`,
+      ).length,
+    ).toBe(4); // announced once to each party member
 
     // The golden's draw-order log across an assignment and a resolution: opening
     // the rolls and all three assignments draw NOTHING, and the resolution draws
@@ -401,13 +423,22 @@ describe('coverage: each scenario fires its subsystem', () => {
       if (!f) throw new Error(`no frame ${label}`);
       return f;
     };
+    // Absolute, not just relative: setup draws nothing at all and the whole
+    // scenario spends exactly the four master-loot draws, which is the property
+    // that makes this scenario a near-pure instrument for the slice. A delta-only
+    // check would not notice setup or the trailing ticks starting to draw.
+    expect(frame('master-rolls-open').rng.draws).toBe(0);
+    expect(trace.draws).toBe(4);
     expect(frame('assigned-converted').rng.draws - frame('master-rolls-open').rng.draws).toBe(0);
     expect(frame('roll-resolved').rng.draws - frame('assigned-converted').rng.draws).toBe(4);
-    // The refused curate-phase vote in particular bailed before its draw and
-    // moved no player or entity state (the three counted votes above are the
-    // other half of that: the refusal did not consume d's answer).
-    expect(frame('curate-phase-vote-refused').rng.draws).toBe(frame('master-rolls-open').rng.draws);
-    expect(frame('curate-phase-vote-refused').state).toBe(frame('master-rolls-open').state);
+    // The two refused curate-phase votes bailed before any draw...
+    expect(frame('curate-phase-vote-refused').rng.draws).toBe(0);
+    // ...and, the half the draw log cannot see, neither was RECORDED. A guard that
+    // admitted a vote but drew nothing (a 'pass', or a 'need' whose draw moved)
+    // leaves draws, digests and every sampled field identical, because
+    // convertMasterRollToNeedGreed wipes `choices` moments later and
+    // pendingLootRolls is never sampled. This is the only assertion that sees it.
+    expect(rec.notes.refusedChoiceCount).toBe(0);
   });
 
   it('entity_roster: despawn branches drop, delayed drain runs, ghost release + healer resurrect', () => {

@@ -1513,8 +1513,8 @@ function l1LootDistribution(): Scenario {
 }
 
 // Master loot: a 4-member party on master loot over a corpse carrying three
-// copies of a threshold-meeting drop, driving every arm the master-loot slice
-// owns AND both places master loot reaches the shared rng stream (#2523: nothing
+// copies of a threshold-meeting drop, driving the three assignment arms below
+// AND both places master loot reaches the shared rng stream (#2523: nothing
 // in this file used to touch assignMasterLoot / setPartyLootMaster at all, so a
 // reordered master-loot draw was invisible to the draw-order digest):
 //  - DIRECT GRANT: a single assigned target takes the item, drawing NOTHING;
@@ -1538,6 +1538,12 @@ function l1LootDistribution(): Scenario {
 // that the WHOLE scenario
 // draws exactly four times, all four of them master-loot draws, so its draw
 // digest is a near-pure instrument for this slice.
+// NOT driven here, and all zero-draw, so they would need a state-side pin rather
+// than a draw delta (tests/loot_master_sim.test.ts covers each directly): the
+// empty-target refusal that leaves the prompt open (#2526), the rejection of a
+// caller who is not the master looter, the departed-single-target convert, the
+// MASTER_LOOT_TIMEOUT convert in resolveLootRoll, removePlayerFromLootRolls's
+// master-looter convert, and setPartyLootMaster's non-leader error arm.
 function masterLoot(): Scenario {
   return {
     name: 'master_loot',
@@ -1599,7 +1605,20 @@ function masterLoot(): Scenario {
       // by submitLootRoll's master-loot guard, and refused BEFORE the int(1,100)
       // draw. This frame pins that the attempt costs zero draws, so hoisting that
       // draw above the guard (the classic early-bail reorder) reddens the gate.
-      if (rollIds[2] !== undefined) sim.submitLootRoll(rollIds[2], 'need', d);
+      // BOTH choice kinds are tried: a 'need' would draw if the guard let it
+      // through (so the rng stream detects that), but a 'pass' never draws at any
+      // callsite, so nothing in the trace would notice a guard that admitted one.
+      // The recorded choice count below is what covers that second arm; it is read
+      // from pendingLootRolls, which the trace deliberately never samples.
+      if (rollIds[2] !== undefined) {
+        sim.submitLootRoll(rollIds[2], 'need', d);
+        sim.submitLootRoll(rollIds[2], 'pass', b);
+        const pending = (sim as any).pendingLootRolls as Map<
+          number,
+          { choices: Map<number, unknown> }
+        >;
+        rec.notes.refusedChoiceCount = pending.get(rollIds[2])?.choices.size ?? -1;
+      }
       rec.snapshot('curate-phase-vote-refused');
       // Arm 1: one target -> direct grant to b. No rng draw.
       if (rollIds[0] !== undefined) sim.assignMasterLoot(rollIds[0], [b], a);
