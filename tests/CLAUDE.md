@@ -65,15 +65,26 @@ transport (see `social_system.test.ts`) rather than mocking. REST/RouteDef endpo
 use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
 
 ## Coverage & guards
-- **A guard that scans a directory of sources walks it with `helpers/ts_files_under.ts`,
-  never its own `readdirSync`.** A single-level read is a defect, not a style choice: the
+- **A guard that scans a directory of sources walks it with a shared walker, never its own
+  `readdirSync`:** `helpers/ts_files_under.ts` for `.ts`, `helpers/css_tree_under.ts` for
+  the `src/styles` sheets. A single-level read is a defect, not a style choice: the
   day the scanned root grows a subdirectory, everything inside leaves the scan and the
-  guard stays green over a quietly smaller surface (#2485, then #2489 three times over).
-  Apart from `src/ui`, every scan root is flat today, so no assertion over the real tree
-  can tell a recursive walk from a flat one: pin the recursion with a `mkdtemp` fixture
-  that drives the guard's OWN producer, and keep the vacuity floor near the real count (a
-  floor sitting under it is what lets a moved file hide). Where the root IS deep, a
-  file-count floor over the real tree pins it directly, as `mobile_window_coverage` does.
+  guard stays green over a quietly smaller surface (#2485, then #2489 three times over,
+  then #2502 four more). Apart from `src/ui`, every scan root is flat today, so no
+  assertion over the real tree can tell a recursive walk from a flat one: pin the
+  recursion with a `mkdtemp` fixture that drives the guard's OWN producer, and keep the
+  vacuity floor near the real count (a floor sitting under it is what lets a moved file
+  hide, and `it.each` over an empty list registers no cases at all). Where the root IS
+  deep, a file-count floor over the real tree pins it directly, as
+  `mobile_window_coverage` does.
+- **A scan that stays single-level BY DECISION says so where the read is, and checks its
+  own premise.** The `src/styles` case: a guard that models the sheets an entry LOADS
+  (`css_corpus`'s section corpus, `mobile_window_coverage`'s mobile-rule text) must not
+  credit a sheet parked in a subfolder, so it filters to the top level and THROWS on
+  `cssTreeUnder(...).dirs`, from the same read, naming the directory. A guard whose miss
+  is a silent pass (`css_value_validity`, `focus_visible_guard`) recurses instead. Either
+  way the reasoning is written at the read, and a subdirectory fails loudly rather than
+  narrowing the scan (#2499, #2502).
 - `tests/parity/` is the golden-trace gate: ANY sim behavior change turns it red by
   design. Read `tests/parity/CLAUDE.md` first; regenerate only deliberately via
   `UPDATE_PARITY=1 npx vitest run tests/parity`, in its own reviewed commit.
