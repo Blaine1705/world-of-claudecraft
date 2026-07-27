@@ -1057,11 +1057,7 @@ export function buildDoorBody(
     1,
   );
   body.add(portal);
-  if (isOrkadia) {
-    // The orc war-gate is monumental next to the other dungeon doors: same
-    // arch and membrane, scaled up (the walk trigger is sim-side, unchanged).
-    body.scale.setScalar(1.55);
-  } else if (isWildheart) {
+  if (isWildheart) {
     if (!wildheartGate) body.scale.setScalar(1.65);
   }
   return { body, portal };
