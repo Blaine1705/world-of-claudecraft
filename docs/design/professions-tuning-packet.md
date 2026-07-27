@@ -358,6 +358,15 @@ session cap would have to rise. It did not: see the closeout below.
   (the rod is a counter purchase in the same zone), and the set is derived in
   `tests/fishing_zones.test.ts` rather than recited, so a new fishing deed joins
   it automatically.
+- **A corpse harvest does not yield a fine grade, and now that is only
+  implicit.** The grade table is keyed to the nine node materials
+  (`professions/material_grades.ts`), and corpse yields resolve through
+  `HARVEST_COMPONENT_ITEMS` instead, so the two paths never meet. That was
+  obvious while the fine axis was the newest thing in the tree; after the
+  release merge brought the corpse-harvest work alongside it, a reader can
+  reasonably wonder whether the omission is a decision or a gap. It is a
+  decision: a monster material has no zone tier to outclass, which is the whole
+  input to the grade rule.
 - **The rod icons are derived art, not paintings.** `scripts/assets/rod_tier_icons.mjs`
   renders both crafted rods as tier treatments of the Silverstream art, which is
   a weaker fit than the fine-material derivation it copies (a Stormreel is a
