@@ -781,7 +781,15 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
     }
   });
 
-  it('rarity (quality) is separate from tier and never affects gating, for nodes or monster materials', () => {
+  // The title used to say rarity was "separate from tier", which is two claims
+  // and only one of them survived. GATING is what this pins, and that half is
+  // permanent. The other half is now false twice over: rarity is a COARSENING
+  // of tier rather than an independent axis (every shipped tool's rarity
+  // follows its tier, and tiers 1 and 2 are both common), and it is no longer
+  // inert, since it buys effect charges and a rod's reel window. The last arm
+  // below asserts that it really does buy something, so this test cannot be
+  // read as "rarity does nothing".
+  it('rarity (quality) never affects GATING, for nodes or monster materials', () => {
     const commonTierThree: ItemDef = {
       id: 'test_common_tier3_pick',
       name: 'Test Common Tier-3 Pick',
@@ -814,6 +822,13 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
     // tier-only gating check above is meaningful and not vacuously true.
     expect(ITEMS.mithril_mining_pick.quality).toBe('uncommon');
     expect(ITEMS.thorium_mining_pick.quality).toBe('rare');
+    // And rarity is NOT inert, which is the half of the old title that died:
+    // the same two rarities that change no gate above do change what a slotted
+    // effect is worth. Stated here so a reader cannot take the gating pin as
+    // proof that rarity does nothing at all.
+    expect(startingDurabilityFor('gatherers_cache', 'rare')).toBeGreaterThan(
+      startingDurabilityFor('gatherers_cache', 'uncommon'),
+    );
   });
 });
 

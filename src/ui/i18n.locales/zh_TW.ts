@@ -8497,8 +8497,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.nodesNote':
     '節點的位置、階級、所需工具與產出；每個節點在你採集後{respawn}秒才會為你本人重生。',
   'guide.profPages.toolsHeading': '工具',
-  'guide.profPages.toolsNote':
-    '每一處節點都需要背包中備有對應行業的工具，1階節點也不例外：沒有採礦鎬就採不到礦石，沒有魚竿就釣不上魚。商人階梯涵蓋1階到3階，而每座主城只備貨自身地形用得上的階級：1階工具在任一區域主城皆有販售，更高的階級則在需要它們的礦脈所在之處販售。購買那些更高階級時，商人還會要求你在該工具對應行業上的熟練度，2階需要{tier2Prof}，3階需要{tier3Prof}，貨架那一行會寫明條件。工具只要放在背包裡即可，沒有裝備欄位，也沒有耐久度，因此每件都只需購買一次，已經擁有的工具照常可用。門檻只看階級：工具的稀有度顏色純屬外觀。\n\n商人階梯之上還有兩件製作工具，4階與5階，由工程師在工坊打造，任何NPC都不販售。目前沒有任何節點需要超過3階的工具，因此它們現階段的價值在於速度：頂階工具能把低階節點的施法時間壓到下限；等更高階的地域開放時，它們便是入場券。',
   'guide.profPages.toolCrafted': '製作獲得（{craft}）',
   'guide.profPages.toolVendor': '{name}（{hub}）',
   'guide.profPages.toolUnavailable': '無販售',

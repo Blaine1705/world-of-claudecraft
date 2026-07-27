@@ -1,6 +1,10 @@
 # Professions tuning packet
 
-Status: planned, not started. Base: `release/v0.31.0`.
+Status: all seven phases built, on one branch, gate green. Base:
+`release/v0.32.0` (re-synced; the packet was planned against `release/v0.31.0`).
+Two rulings remain open and are recorded where they bite rather than here: the
+two rod training fees (phase 6 closeout) and purchase-versus-use tool gating
+(phase 7 closeout).
 
 One packet, seven phases. This document is the agreed scope and the record of
 what was measured, so the phases can be built and reviewed against it without
@@ -397,13 +401,105 @@ Its own phase because it is the only one that touches persistence and the wire.
   `IWorld` member implemented in both hosts with the parity pin updated, a delta
   field with the snapshot pin updated, a slot command, and a HUD row.
 
+#### What phase 7 settled, and what it left open
+
+- **The slot is keyed per GATHERING PROFESSION, not per tool item.** The
+  per-instance route was re-examined on the merged tree's facts rather than on
+  the stale note that used to sit in `tools.ts` (`ItemInstancePayload` does now
+  carry `charges`, is deep-cloned, and ships over the wire). It still loses, for
+  a reason that has nothing to do with availability: the live harvest path
+  resolves a tool TIER and never a tool, because
+  `bestOwnedGatherToolTierOrNone` returns a number and its callers are the node
+  gate, the corpse gate and fishing's band cap. Keying per item would mean
+  widening all three to carry an item through, and a slot bought for a tier-4
+  pick would go inert the moment its owner crafted the tier-5 one. The
+  consequence is honored in the UI: a player owning two picks shares ONE mining
+  slot, so the window shows one row per profession and never a list per item.
+- **Rarity is a COARSENING of tier, not a second axis.** Every shipped gathering
+  tool's rarity follows its tier, and tiers 1 and 2 are both common. For LAND
+  tools that makes the charge bonus a genuine step function. For RODS it is
+  perfectly collinear (2 common, 3 uncommon, 4 rare, 5 epic), so the reel-window
+  bonus IS a tier bonus wearing rarity's coat. Both modules say so outright
+  rather than leaving a reader to discover it, and the test that proves the reel
+  term is real holds the TIER FIXED, since every shipped rod would also pass a
+  tier-only implementation.
+- **The reel-window rung was sized by the session cap, not by feel.** The cap is
+  300 ticks and the worst legal session was 271, leaving 29. At 0.25 s per
+  rarity rung the epic rod's three steps cost 15 ticks, landing the worst
+  session at 286. 0.5 would not have fitted, and a mutation pass confirms the
+  budget reddens at that value rather than silently letting the cap eat a legal
+  reel window. Both former inline copies of the window formula in
+  `tests/fishing_zones.test.ts` now call `fishReelWindowSecFor`; the budget one
+  mattered, because adding the term to the function alone would have widened the
+  live world while the budget kept measuring the old sum and stayed green.
+- **The tools land on the delve counter, not the heroic quartermaster's.**
+  `HEROIC_VENDOR_ITEMS` is a self-contained `ItemDef` registry that never reads
+  `ITEMS`, so a tool row there means duplicating a def that already exists, and
+  its stock is budget-enforced level-20 jewelry whose stated identity is being
+  the only source of necks and rings. A `DelveShopEntry` resolves into `ITEMS`
+  directly, and `delveShopGateUnlocked` is already shared by the authoritative
+  buy and the client lock badge, so the new rows needed no new gate logic. They
+  reuse the shop's existing top two price rungs rather than inventing one,
+  because the Litany ladder is pinned as a straight 2x of the Reliquary's tiers.
+- **The never-sold guard had a real hole, wider than the packet assumed.** Both
+  guards swept `NPCS[*].vendorItems` alone. `NPCS.heroic_quartermaster` carries
+  `vendorItems: undefined` and keeps its real stock in `HEROIC_VENDOR_STOCK`,
+  and the delve counters keep theirs in `DELVE_SHOPS`, so BOTH tables were
+  invisible and a crafted tool added to either would have passed untouched. The
+  claim is now "never sold for COPPER", which is what ruling 5 says, and both
+  guards sweep all three tables.
+- **OPEN, and deliberately not answered here: the delve rows carry no
+  proficiency gate,** unlike the tier-2 and tier-3 copper rows on the ordinary
+  counters. Whether a tool's PURCHASE should be gated on the same proficiency
+  its USE is gated on is the open purchase-versus-use ruling; the clears gate is
+  what paces these rows today, and it is a content gate rather than a profession
+  one, so nothing presumes an answer.
+- **OPEN: the effects have no acquisition path.** `TOOL_EFFECTS` is catalog only
+  (no item, no recipe, no `ItemUse` variant, no dev command), so the slot
+  command is fully wired and validated but no player can obtain an effect yet,
+  and every HUD row is empty today. That was a deliberate scope call: the cost
+  list above names the wiring and not a content source, and minting the three
+  effects would open the first enchanting recipes in the game and brush the
+  deferred work-order economics. The natural next step is that craft.
+- **`guide.profPages.toolsNote` was already stale in all 18 locale overlays, and
+  nothing could see it.** The English gained a whole paragraph earlier in this
+  packet (`523acb0dd`) and the overlays were not refilled, so every localized
+  reader was getting two paragraphs where English has three, missing the
+  fine-material axis entirely, plus the "rarity colour is cosmetic" line ruling
+  4 falsifies. A reworded English value does not mark its translations stale, so
+  the gate was blind to it. The 18 stale rows were REMOVED rather than left: the
+  key now falls back to accurate English and re-enters the `pending` set, which
+  the release-tier gate hard-fails on, so the release-time locale fill will
+  catch it. Wrong text in a player's own language is worse than right text in
+  English.
+
 ## Test and invariant obligations
 
 - **Parity.** No phase changes rng draw order or count except phase 7, which is
   why depletion is deterministic. Phase 6 was expected to re-record one golden
-  for the session cap and did not need to: the cap held, so every golden is
-  byte-identical. Note that the parity suite covers no fishing SESSION at all
-  (see tests/parity/CLAUDE.md), so green there is not evidence about fishing.
+  for the session cap and did not need to: the cap held.
+
+  The claim here used to be "every golden is byte-identical", which is FALSE of
+  the tree and would make the next reader misattribute the release's own churn
+  to this packet. The verified numbers: the parkour physics engine (#2527,
+  commit `5eb1410bd`) re-recorded **13** goldens, and it is an ancestor of this
+  branch's merge base, so it is release-owned and nothing to do with us. **19**
+  goldens moved across the whole v0.31.0 cycle for the same reason. This branch
+  touched **6** golden files: four combat traces re-recorded in `69a6c9a99`
+  (the world gained a solid body at every ore and wood node, so mob pathing
+  differs, which is geometry moving the stream rather than draw order changing),
+  `professions_gather` re-recorded by the node expansion, and
+  `professions_gather_fine`, which is a NEW golden this branch added.
+
+  The honest statement is therefore: **no golden moved for a draw-order reason,
+  and phase 7 moved none at all.** That last part is load-bearing and is why
+  `PlayerMeta.toolEffectSlots` is left ABSENT rather than initialized to `{}`:
+  an empty object still serializes into the parity state digest. A mutation
+  pass confirmed it, initializing the field at construction reddens 62 parity
+  tests including the goldens.
+
+  Note also that the parity suite covers no fishing SESSION at all (see
+  tests/parity/CLAUDE.md), so green there is not evidence about fishing.
 - **The gathering two-draw contract** (2 per granted harvest, 0 on denial) is
   golden-pinned and must hold everywhere.
 - **Fishing draws** stay at 2 per landed session, 1 on a miss.

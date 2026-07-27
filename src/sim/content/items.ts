@@ -641,15 +641,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // Crafted base tools, tier 4 and 5 (#1135). Same shape and gating as the
   // vendor tools above (infinite-durability, `use.tier` gates node AND
   // monster-material tier access via src/sim/professions/tools.ts), but these
-  // are produced by a profession (see COMMON_RECIPES in content/recipes.ts),
-  // never sold by any vendor: no `buyValue` and deliberately absent from
-  // every NPC `vendorItems` list. `quality` (rarity) is independent of
-  // `use.tier` and never affects gating: only the tool's `use.tier` value is
-  // read by the gate.
-  // are produced by a profession, never sold by any vendor: no `buyValue` and
-  // deliberately absent from every NPC `vendorItems` list. `quality` (rarity)
-  // is independent of `use.tier` and never affects gating: only the tool's
-  // `use.tier` value is read by the gate.
+  // are produced by a profession (see COMMON_RECIPES in content/recipes.ts) or
+  // bought with delve Marks, and NEVER sold for copper: no `buyValue`, and
+  // deliberately absent from every NPC `vendorItems` list and from
+  // HEROIC_VENDOR_STOCK. The Marks rows live in content/delves/shop.ts and are
+  // what gives a non-crafter a route to the top of the ladder.
+  //
+  // `quality` (rarity) never affects GATING: only `use.tier` is read by the
+  // gate, and that is the part which must never change. It is no longer
+  // value-only, though. Rarity now buys narrow bonuses that cannot affect
+  // access: charges on a slotted effect (professions/tools.ts
+  // startingDurabilityFor) and, on a rod, a wider reel window
+  // (professions/fishing.ts fishReelWindowSecFor). An epic tool opens no node a
+  // common tool of the same tier cannot.
   thorium_mining_pick: {
     id: 'thorium_mining_pick',
     name: 'Osmium Mining Pick',
