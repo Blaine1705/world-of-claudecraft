@@ -18,6 +18,7 @@ import {
 } from '../sim/professions/combo_eligibility';
 import { isCommissionEligible } from '../sim/professions/commission';
 import { holdsSelfSignedInstance, requiredReagentCountFor } from '../sim/professions/crafting';
+import { countAcrossGrades, materialGradeIds } from '../sim/professions/material_grades';
 import { type StationType, stationsOfType, stationTypeForCraft } from '../sim/professions/stations';
 import { MINIMAL_TIER_MULTIPLIER, REDUCED_TIER_MULTIPLIER } from '../sim/professions/wheel';
 import type { InvSlot, ItemDef, StationDef } from '../sim/types';
@@ -168,8 +169,19 @@ export function buildCraftingView(
     let facts = reagentFacts.get(itemId);
     if (!facts) {
       facts = {
-        have: countInInventory(inventory, itemId),
-        selfSigned: playerName !== null && holdsSelfSignedInstance(inventory, playerName, itemId),
+        // Counted across the reagent's material grades, exactly as the sim's
+        // hasRecipeMaterials does (D8, professions/material_grades.ts). A fine
+        // grade satisfies a requirement for its base, so counting the declared
+        // id alone would grey the Craft button out for a craft the sim would
+        // perform: eastbrook_vale is all tier-1 veins, so any tier-2 tool stops
+        // the plain grade dropping and every recipe naming it would go
+        // unbuildable through the window while resolveCraft accepted it.
+        have: countAcrossGrades(itemId, (gradeId) => countInInventory(inventory, gradeId)),
+        selfSigned:
+          playerName !== null &&
+          materialGradeIds(itemId).some((gradeId) =>
+            holdsSelfSignedInstance(inventory, playerName, gradeId),
+          ),
       };
       reagentFacts.set(itemId, facts);
     }
@@ -181,7 +193,8 @@ export function buildCraftingView(
       // The requirement the sim actually charges: the SAME shared
       // requiredReagentCountFor the resolver's availability check and
       // consumption use (crafting.ts, #1134 specialization discount composed
-      // with the #1145 self-signed reduction), so the displayed count and the
+      // with the #1145 self-signed reduction), fed the same grade-spanning
+      // self-signed fact the sim feeds it, so the displayed count and the
       // Craft gate can never diverge from what a craft consumes.
       const required = requiredReagentCountFor(
         selfSigned,
@@ -263,8 +276,14 @@ export function buildCraftingView(
 // hosts serve ALL_RECIPES verbatim as IWorld#recipeList (src/sim/sim.ts,
 // src/net/online.ts), and reagent ids are authored literals, so this set can
 // never miss a reagent the window might row.
+// Grades included: three of the nine fine grades (the eastbrook ones) are
+// reagents in NO recipe, so a declared-id-only set would let a player gather
+// them all afternoon without the open window ever re-converging, which is the
+// #2375 failure mode this signature exists to close.
 const REAGENT_ITEM_IDS: ReadonlySet<string> = new Set(
-  ALL_RECIPES.flatMap((recipe) => recipe.reagents.map((reagent) => reagent.itemId)),
+  ALL_RECIPES.flatMap((recipe) =>
+    recipe.reagents.flatMap((reagent) => materialGradeIds(reagent.itemId)),
+  ),
 );
 
 /**
