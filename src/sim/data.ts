@@ -266,7 +266,7 @@ import {
   ZONE3_ROADS,
   ZONE3_ZONE,
 } from './content/zone3';
-import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from './dungeon_layout';
+import { DUNGEON_WALL_HW } from './dungeon_layout';
 import { EASTBROOK_LAYOUT } from './eastbrook_layout';
 import { JAIL_BLOCKERS, JAIL_TERRAIN_EDITS } from './jail';
 
@@ -879,13 +879,6 @@ export function dungeonByIndex(index: number): DungeonDef | null {
 }
 
 // Which dungeon a far-off instance position belongs to, by x-band.
-// Dungeons occupy the instance x-band from the first slot up to (but not
-// including) the delve band. The Ashen Coliseum sits at a half-slot inside that
-// range (ARENA_X, between dungeon index 5 and 6), so its own tight band is
-// excluded explicitly. This lets the Orkadia slot (index 6, instance origin
-// ARENA_X + 300: past the arena footprint, west of the delve band) resolve as a
-// dungeon instead of being swallowed by the old `x >= ARENA_X_MIN` cutoff, which
-// left its interior unbuilt and its colliders unresolved (a pitch-black room).
 export function dungeonAt(x: number): DungeonDef | null {
   if (x >= DUNGEON_OVERFLOW_X_BASE - 300) {
     const index = DUNGEON_OVERFLOW_INDEX + Math.round((x - DUNGEON_OVERFLOW_X_BASE) / 600);
@@ -906,16 +899,10 @@ export function dungeonAt(x: number): DungeonDef | null {
 // ---------------------------------------------------------------------------
 
 export const ARENA_X = INSTANCE_X_BASE + 4200; // arena instances share this x; slots stack along z
-// Include the complete west wall plus one yard of routing headroom. Collision,
-// line of sight, camera sweeps, and dungeon lookup all select their instance
-// geometry through this boundary, so using the centreline would leave the
-// arena's entire west half attached to the neighboring dungeon band.
-export const ARENA_X_MIN = ARENA_X - (DUNGEON_WALL_X + DUNGEON_WALL_HW + 1);
-// The band's EAST bound stays tight: the gap east of the arena holds the
-// Orkadia dungeon slot (index 6, origin ARENA_X + 300), which must classify
-// as a dungeon, not the arena. The bound sits at the midpoint between the
-// arena and the Orkadia slot so each footprint stays comfortably on its own
-// side.
+export const ARENA_X_MIN = ARENA_X; // x at/after this = an arena instance, not a dungeon
+// The arena band is a TIGHT column bracketing ARENA_X (all slots share this x;
+// the pit footprint is only ~±24u). It deliberately does NOT stretch to the
+// delve band.
 export const ARENA_X_MAX = ARENA_X + 150; // x at/after this = past the arena band
 export const ARENA_SLOT_COUNT = 4; // concurrent 1v1 matches the world can host
 const ARENA_Z0 = -1250;
@@ -926,7 +913,7 @@ export function arenaOrigin(slot: number): { x: number; z: number } {
 }
 
 export function isArenaPos(x: number): boolean {
-  return x >= ARENA_X_MIN && x < ARENA_X_MAX;
+  return x >= ARENA_X_MIN && x < DELVE_BAND_X_MIN;
 }
 
 // Nearest arena instance origin to a far-off position, matched by z-band (the
