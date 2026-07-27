@@ -1774,6 +1774,7 @@ export const cs_CZ: EnTranslations = {
       "enchantedFallback": "Okouzlený"
     },
     "materialHint": {
+      "fineGrade": "Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.",
       "arcaneDust": "Reagencie k okouzlení. Získává se rozzačarováním běžné a neobvyklé výbavy.",
       "arcaneEssence": "Reagencie k okouzlení. Získává se rozzačarováním vzácné výbavy.",
       "arcaneShard": "Reagencie k okouzlení. Získává se rozzačarováním epické a legendární výbavy.",

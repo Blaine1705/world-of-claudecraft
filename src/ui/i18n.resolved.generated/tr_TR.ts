@@ -1774,6 +1774,7 @@ export const tr_TR: EnTranslations = {
       "enchantedFallback": "Büyülü"
     },
     "materialHint": {
+      "fineGrade": "Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.",
       "arcaneDust": "Sıradan ve az bulunur eşyalardan büyü bozularak elde edilen büyü malzemesi.",
       "arcaneEssence": "Nadir eşyalardan büyü bozularak elde edilen büyü malzemesi.",
       "arcaneShard": "Destansı ve efsanevi eşyalardan büyü bozularak elde edilen büyü malzemesi.",

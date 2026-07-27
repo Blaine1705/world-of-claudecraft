@@ -6193,6 +6193,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.materialHint.arcaneDust'
   | 'hudChrome.materialHint.arcaneEssence'
   | 'hudChrome.materialHint.arcaneShard'
+  | 'hudChrome.materialHint.fineGrade'
   | 'hudChrome.materialHint.resonantHide'
   | 'hudChrome.materialHint.resonantLinks'
   | 'hudChrome.materialHint.resonantSteel'

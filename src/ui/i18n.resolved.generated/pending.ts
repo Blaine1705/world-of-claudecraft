@@ -33,7 +33,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.materialHint.fineGrade"
   ],
   "es_ES": [
     "entities.items.fine_ashwood_log.name",
@@ -59,7 +60,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.materialHint.fineGrade"
   ],
   "fr_FR": [
     "entities.items.fine_ashwood_log.name",
@@ -85,7 +87,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.materialHint.fineGrade"
   ],
   "fr_CA": [
     "entities.items.fine_ashwood_log.name",
@@ -111,7 +114,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.materialHint.fineGrade"
   ],
   "en_CA": [],
   "it_IT": [
@@ -138,7 +142,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.materialHint.fineGrade"
   ],
   "de_DE": [
     "entities.items.fine_ashwood_log.name",
@@ -164,7 +169,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.materialHint.fineGrade"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -194,7 +200,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.materialHint.fineGrade"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -221,7 +228,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.materialHint.fineGrade"
   ],
   "nl_NL": [
     "entities.items.fine_ashwood_log.name",
@@ -247,7 +255,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.materialHint.fineGrade"
   ],
   "pl_PL": [
     "entities.items.fine_ashwood_log.name",
@@ -273,7 +282,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.materialHint.fineGrade"
   ],
   "id_ID": [
     "entities.items.fine_ashwood_log.name",
@@ -299,7 +309,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.materialHint.fineGrade"
   ],
   "tr_TR": [
     "entities.items.fine_ashwood_log.name",
@@ -325,7 +336,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.materialHint.fineGrade"
   ],
   "sv_SE": [
     "entities.items.fine_ashwood_log.name",
@@ -351,7 +363,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.materialHint.fineGrade"
   ],
   "vi_VN": [
     "entities.items.fine_ashwood_log.name",
@@ -377,7 +390,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.materialHint.fineGrade"
   ],
   "da_DK": [
     "entities.items.fine_ashwood_log.name",
@@ -403,6 +417,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.salvagedYieldQty",
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
-    "hudChrome.gathering.harvestSpecimenLine"
+    "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.materialHint.fineGrade"
   ]
 };

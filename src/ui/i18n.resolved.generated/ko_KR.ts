@@ -1774,6 +1774,7 @@ export const ko_KR: EnTranslations = {
       "enchantedFallback": "마법부여됨"
     },
     "materialHint": {
+      "fineGrade": "상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.",
       "arcaneDust": "마법부여 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.",
       "arcaneEssence": "마법부여 재료. 희귀 장비의 마력을 추출해 얻습니다.",
       "arcaneShard": "마법부여 재료. 영웅과 전설 장비의 마력을 추출해 얻습니다.",

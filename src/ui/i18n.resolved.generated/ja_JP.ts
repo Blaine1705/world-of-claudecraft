@@ -1774,6 +1774,7 @@ export const ja_JP: EnTranslations = {
       "enchantedFallback": "エンチャント済み"
     },
     "materialHint": {
+      "fineGrade": "上質な等級。素材より上位の道具で満位の採取地から採ったもので、通常版が求められる場所ではそのまま代用できます。",
       "arcaneDust": "エンチャントの材料。一般と良質の装備を魔力分解して得られる。",
       "arcaneEssence": "エンチャントの材料。レアの装備を魔力分解して得られる。",
       "arcaneShard": "エンチャントの材料。エピックと伝説の装備を魔力分解して得られる。",

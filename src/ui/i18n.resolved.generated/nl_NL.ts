@@ -1774,6 +1774,7 @@ export const nl_NL: EnTranslations = {
       "enchantedFallback": "Betoverd"
     },
     "materialHint": {
+      "fineGrade": "Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.",
       "arcaneDust": "Betoveringsreagens. Verkregen door het onbetoveren van gewone en ongewone uitrusting.",
       "arcaneEssence": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame uitrusting.",
       "arcaneShard": "Betoveringsreagens. Verkregen door het onbetoveren van epische en legendarische uitrusting.",

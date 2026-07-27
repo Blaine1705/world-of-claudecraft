@@ -1774,6 +1774,7 @@ export const zh_CN: EnTranslations = {
       "enchantedFallback": "已附魔"
     },
     "materialHint": {
+      "fineGrade": "优质品级。以等级高于该材料的工具在满级矿脉采集所得，在任何需要普通版本的地方均可替代使用。",
       "arcaneDust": "附魔材料。分解普通和优秀品质的装备可得。",
       "arcaneEssence": "附魔材料。分解精良品质的装备可得。",
       "arcaneShard": "附魔材料。分解史诗和传说品质的装备可得。",

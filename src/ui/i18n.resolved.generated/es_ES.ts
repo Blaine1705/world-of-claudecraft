@@ -1774,6 +1774,7 @@ export const es_ES: EnTranslations = {
       "enchantedFallback": "Encantado"
     },
     "materialHint": {
+      "fineGrade": "Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.",
       "arcaneDust": "Reactivo de encantamiento. Se obtiene desencantando equipo común y poco común.",
       "arcaneEssence": "Reactivo de encantamiento. Se obtiene desencantando equipo raro.",
       "arcaneShard": "Reactivo de encantamiento. Se obtiene desencantando equipo épico y legendario.",

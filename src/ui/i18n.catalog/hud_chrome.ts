@@ -1875,6 +1875,10 @@ export const hudChromeStrings = {
   // own routing: DISENCHANT_MATERIAL_BY_QUALITY for the three arcane tiers,
   // ARMOR_SECONDARY_BY_TYPE / TIMBER_WEAPON_TYPES for the five resonants.
   materialHint: {
+    // One key shared by all nine fine grades: the sentence is true of every
+    // one of them, and nine copies would be nine chances to drift.
+    fineGrade:
+      'Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.',
     arcaneDust: 'Enchanting reagent. Disenchanted from common and uncommon gear.',
     arcaneEssence: 'Enchanting reagent. Disenchanted from rare gear.',
     arcaneShard: 'Enchanting reagent. Disenchanted from epic and legendary gear.',

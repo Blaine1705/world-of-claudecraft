@@ -1774,6 +1774,7 @@ export const pl_PL: EnTranslations = {
       "enchantedFallback": "Zaklęty"
     },
     "materialHint": {
+      "fineGrade": "Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.",
       "arcaneDust": "Składnik do zaklinania. Pozyskiwany z rozbrajania pospolitego i niezwykłego ekwipunku.",
       "arcaneEssence": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkiego ekwipunku.",
       "arcaneShard": "Składnik do zaklinania. Pozyskiwany z rozbrajania epickiego i legendarnego ekwipunku.",

@@ -1774,6 +1774,7 @@ export const vi_VN: EnTranslations = {
       "enchantedFallback": "Đã Pháp Khắc"
     },
     "materialHint": {
+      "fineGrade": "Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.",
       "arcaneDust": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị phổ thông và khác thường.",
       "arcaneEssence": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị hiếm.",
       "arcaneShard": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị sử thi và huyền thoại.",

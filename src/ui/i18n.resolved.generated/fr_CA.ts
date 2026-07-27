@@ -1774,6 +1774,7 @@ export const fr_CA: EnTranslations = {
       "enchantedFallback": "Enchanté"
     },
     "materialHint": {
+      "fineGrade": "Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.",
       "arcaneDust": "Réactif d'enchantement. Obtenu en désenchantant de l'équipement commun et peu commun.",
       "arcaneEssence": "Réactif d'enchantement. Obtenu en désenchantant de l'équipement rare.",
       "arcaneShard": "Réactif d'enchantement. Obtenu en désenchantant de l'équipement épique et légendaire.",

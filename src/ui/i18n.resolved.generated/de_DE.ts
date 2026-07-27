@@ -1774,6 +1774,7 @@ export const de_DE: EnTranslations = {
       "enchantedFallback": "Verzaubert"
     },
     "materialHint": {
+      "fineGrade": "Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.",
       "arcaneDust": "Verzauberungsreagenz. Entzaubert aus gewöhnlicher und ungewöhnlicher Ausrüstung.",
       "arcaneEssence": "Verzauberungsreagenz. Entzaubert aus seltener Ausrüstung.",
       "arcaneShard": "Verzauberungsreagenz. Entzaubert aus epischer und legendärer Ausrüstung.",

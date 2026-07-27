@@ -1774,6 +1774,7 @@ export const da_DK: EnTranslations = {
       "enchantedFallback": "Fortryllet"
     },
     "materialHint": {
+      "fineGrade": "Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.",
       "arcaneDust": "Fortryllelsesreagens. Fås ved affortryllelse af almindeligt og ualmindeligt udstyr.",
       "arcaneEssence": "Fortryllelsesreagens. Fås ved affortryllelse af sjældent udstyr.",
       "arcaneShard": "Fortryllelsesreagens. Fås ved affortryllelse af episk og legendarisk udstyr.",

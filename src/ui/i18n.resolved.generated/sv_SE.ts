@@ -1774,6 +1774,7 @@ export const sv_SE: EnTranslations = {
       "enchantedFallback": "Förtrollad"
     },
     "materialHint": {
+      "fineGrade": "Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.",
       "arcaneDust": "Förtrollningsreagens. Fås genom avförtrollning av vanlig och ovanlig utrustning.",
       "arcaneEssence": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt utrustning.",
       "arcaneShard": "Förtrollningsreagens. Fås genom avförtrollning av episk och legendarisk utrustning.",

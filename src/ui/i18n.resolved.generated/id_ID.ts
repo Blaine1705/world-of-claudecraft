@@ -1774,6 +1774,7 @@ export const id_ID: EnTranslations = {
       "enchantedFallback": "Dimantrai"
     },
     "materialHint": {
+      "fineGrade": "Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.",
       "arcaneDust": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan umum dan tak biasa.",
       "arcaneEssence": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan langka.",
       "arcaneShard": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan epik dan legendaris.",
