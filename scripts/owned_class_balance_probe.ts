@@ -36,6 +36,7 @@ export interface OwnedClassCombatOutcomes {
   miss: number;
   dodge: number;
   parry: number;
+  block: number;
   resist: number;
   crit: number;
 }
@@ -692,6 +693,7 @@ export function runOwnedClassDpsProbe(
     miss: 0,
     dodge: 0,
     parry: 0,
+    block: 0,
     resist: 0,
     crit: 0,
   };
@@ -786,6 +788,7 @@ export function averageOwnedClassDpsProbe(
       miss: average(runs.map((run) => run.outcomes.miss)),
       dodge: average(runs.map((run) => run.outcomes.dodge)),
       parry: average(runs.map((run) => run.outcomes.parry)),
+      block: average(runs.map((run) => run.outcomes.block)),
       resist: average(runs.map((run) => run.outcomes.resist)),
       crit: average(runs.map((run) => run.outcomes.crit)),
     },

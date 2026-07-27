@@ -667,7 +667,7 @@ export const ru_RU: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "Скидка 20%",
+      "railWocDiscount": "Скидка {percent}%",
       "railWocUnavailable": "Цена WOC сейчас недоступна.",
       "railNativeUnavailable": "SOL/WOC недоступны",
       "amountLabel": "Количество",
@@ -1465,6 +1465,7 @@ export const ru_RU: EnTranslations = {
       "harvestButton": "Собрать",
       "harvestTooltip": "Собирает отмеченные компоненты. Каждый труп можно обработать только один раз, кто успел первым. Добычу при этом не забирает.",
       "concentrateHint": "Чем меньше выбрано компонентов, тем выше их качество.",
+      "nothingSelectedYields": "С этого трупа нельзя собрать ничего из выбранного.",
       "alreadyHarvested": "Этот труп уже был собран.",
       "componentAria": "Собрать {component}",
       "components": {
@@ -2027,8 +2028,8 @@ export const ru_RU: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Ожидает получения на Мировом рынке",
-      "tip": "Золото или предметы ждут вас у Торговца."
+      "aria": "Выручка или предметы с Мирового рынка ожидают",
+      "tip": "Выручка от продаж или возвращенные предметы ждут вас у Торговца."
     },
     "noticeboard": {
       "empty": "Похоже, здесь ничего не опубликовано."
@@ -2172,6 +2173,9 @@ export const ru_RU: EnTranslations = {
       "notReady": "Этот ресурсный узел еще не восстановился для вас.",
       "gatherLine": "Вы добываете: {name}.",
       "gatherLineQty": "Вы добываете: {name} x{qty}.",
+      "harvestLine": "Вы собираете: {name}.",
+      "harvestLineQty": "Вы собираете: {name} x{qty}.",
+      "harvestSpecimenLine": "Вы также получаете {name}.",
       "catchLine": "Вы выуживаете: {name}",
       "biteLine": "Что-то клюнуло!",
       "gotAwayLine": "Добыча сорвалась.",
@@ -2489,9 +2493,14 @@ export const ru_RU: EnTranslations = {
       "sameEnchant": "На этом предмете уже есть эти чары.",
       "replaceTag": "Заменяет «{enchant}»",
       "sameEnchantTag": "Уже наложено",
+      "plainTag": "Без чар",
       "replaceConfirmTitle": "Заменить чары на {item}?",
       "replaceConfirmBody": "Чары «{old}» на {item} будут заменены на «{new}».",
       "replaceConfirmNoRefund": "Старые чары уничтожаются, их материалы не возвращаются. Это действие нельзя отменить.",
+      "replaceConfirmKeeps": "Без изменений: {kept}",
+      "replaceConfirmKeepsSigner": "Клеймо создателя",
+      "replaceConfirmKeepsMasterwork": "Бонус шедевра",
+      "replaceConfirmKeepsBond": "Привязка изделия на заказ",
       "replaceConfirmCost": "Стоимость: {cost}",
       "replaceConfirmCostItem": "{name}: {count}",
       "replaceConfirmAccept": "Заменить"

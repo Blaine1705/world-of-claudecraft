@@ -667,7 +667,7 @@ export const id_ID: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "Diskon 20%.",
+      "railWocDiscount": "Diskon {percent}%.",
       "railWocUnavailable": "Harga WOC tidak tersedia saat ini.",
       "railNativeUnavailable": "SOL/WOC tidak tersedia.",
       "amountLabel": "Jumlah",
@@ -1465,6 +1465,7 @@ export const id_ID: EnTranslations = {
       "harvestButton": "Panen",
       "harvestTooltip": "Mengumpulkan komponen yang dicentang. Setiap bangkai hanya bisa dipanen sekali, siapa cepat dia dapat. Tidak mengambil jarahan.",
       "concentrateHint": "Semakin sedikit bagian yang dipilih, semakin tinggi tingkat mutu tiap bagian.",
+      "nothingSelectedYields": "Tidak ada pilihanmu yang bisa dipanen dari bangkai ini.",
       "alreadyHarvested": "Bangkai ini sudah dipanen.",
       "componentAria": "Panen {component}",
       "components": {
@@ -2027,8 +2028,8 @@ export const id_ID: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Pengambilan Pasar Dunia menanti",
-      "tip": "Emas atau barang menantimu di Sang Pedagang."
+      "aria": "Hasil atau barang Pasar Dunia menanti",
+      "tip": "Hasil penjualan atau barang yang dikembalikan menantimu di Sang Pedagang."
     },
     "noticeboard": {
       "empty": "Sepertinya tidak ada yang ditempel."
@@ -2172,6 +2173,9 @@ export const id_ID: EnTranslations = {
       "notReady": "Simpul sumber daya ini belum muncul kembali untukmu.",
       "gatherLine": "Anda mengumpulkan: {name}.",
       "gatherLineQty": "Anda mengumpulkan: {name} x{qty}.",
+      "harvestLine": "Anda memanen: {name}.",
+      "harvestLineQty": "Anda memanen: {name} x{qty}.",
+      "harvestSpecimenLine": "Anda juga mendapatkan {name}.",
       "catchLine": "Kamu menarik: {name}",
       "biteLine": "Sesuatu menggigit umpannya!",
       "gotAwayLine": "Ikannya kabur.",
@@ -2353,7 +2357,7 @@ export const id_ID: EnTranslations = {
       "empty": "Belum ada resep yang diketahui.",
       "resultAria": "Kerajinan {name}",
       "craftedToast": "Dibuat: {name}",
-      "craftedToastQty": "Crafted: {name} x{qty}",
+      "craftedToastQty": "Dibuat: {name} x{qty}",
       "insufficientMaterials": "Anda tidak memiliki bahan untuk itu.",
       "unknownRecipe": "Resep itu tidak ada.",
       "comboRequirementUnmet": "Kamu tidak memiliki kedua keahlian yang diperlukan pada tingkat yang disyaratkan untuk resep itu.",
@@ -2446,13 +2450,13 @@ export const id_ID: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Kamu menghancurkan pemantraan {item}.",
-      "disenchantedYield": "You disenchant {item} into {material}.",
-      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
-      "disenchantedAlso": "You also recover {material}.",
-      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
+      "disenchantedYield": "Kamu menghancurkan pemantraan {item} menjadi {material}.",
+      "disenchantedYieldQty": "Kamu menghancurkan pemantraan {item} menjadi {material} x{qty}.",
+      "disenchantedAlso": "Kamu juga memulihkan {material}.",
+      "disenchantedAlsoQty": "Kamu juga memulihkan {material} x{qty}.",
       "salvagedLine": "Kamu menyalvasi {item}.",
-      "salvagedYield": "You salvage {item} into {material}.",
-      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
+      "salvagedYield": "Kamu menyalvasi {item} menjadi {material}.",
+      "salvagedYieldQty": "Kamu menyalvasi {item} menjadi {material} x{qty}.",
       "enchantAppliedLine": "Kamu memantrai {item} dengan {enchant}.",
       "notHeld": "Kamu tidak memiliki barang itu.",
       "notDisenchantable": "Kamu tidak bisa menghancurkan pemantraan itu.",
@@ -2489,9 +2493,14 @@ export const id_ID: EnTranslations = {
       "sameEnchant": "Barang itu sudah memiliki mantra itu.",
       "replaceTag": "Menggantikan {enchant}",
       "sameEnchantTag": "Sudah diterapkan",
+      "plainTag": "Belum dimantrai",
       "replaceConfirmTitle": "Ganti mantra pada {item}?",
       "replaceConfirmBody": "Ini mengganti {old} pada {item} dengan {new}.",
       "replaceConfirmNoRefund": "Mantra lama dihancurkan. Bahannya tidak dikembalikan. Tindakan ini tidak dapat dibatalkan.",
+      "replaceConfirmKeeps": "Dipertahankan: {kept}",
+      "replaceConfirmKeepsSigner": "Tanda pembuat",
+      "replaceConfirmKeepsMasterwork": "Bonus mahakarya",
+      "replaceConfirmKeepsBond": "Ikatan komisi",
       "replaceConfirmCost": "Biaya: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Ganti"

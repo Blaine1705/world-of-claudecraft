@@ -667,7 +667,7 @@ export const ko_KR: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% 할인",
+      "railWocDiscount": "{percent}% 할인",
       "railWocUnavailable": "현재 WOC 가격을 이용할 수 없습니다.",
       "railNativeUnavailable": "SOL/WOC 사용 불가",
       "amountLabel": "수량",
@@ -1465,6 +1465,7 @@ export const ko_KR: EnTranslations = {
       "harvestButton": "채집",
       "harvestTooltip": "선택한 부위를 채집합니다. 각 시체는 선착순으로 한 번만 채집할 수 있습니다. 전리품은 가져가지 않습니다.",
       "concentrateHint": "선택한 부위가 적을수록 부위당 등급이 더 높아집니다.",
+      "nothingSelectedYields": "선택한 부위는 이 시체에서 채집할 수 없습니다.",
       "alreadyHarvested": "이 시체는 이미 채집되었습니다.",
       "componentAria": "{component} 채집",
       "components": {
@@ -2027,8 +2028,8 @@ export const ko_KR: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "세계 시장 수령 대기",
-      "tip": "골드나 아이템이 상인에게서 수령을 기다리고 있습니다."
+      "aria": "세계 시장 판매 대금이나 아이템 수령 대기",
+      "tip": "판매 대금이나 반송된 아이템이 상인에게서 수령을 기다리고 있습니다."
     },
     "noticeboard": {
       "empty": "게시된 내용이 없는 것 같습니다."
@@ -2172,6 +2173,9 @@ export const ko_KR: EnTranslations = {
       "notReady": "이 자원 채집지는 아직 당신을 위해 재생성되지 않았습니다.",
       "gatherLine": "{name}을(를) 채집했습니다.",
       "gatherLineQty": "{name}을(를) {qty}개 채집했습니다.",
+      "harvestLine": "{name}을(를) 채취했습니다.",
+      "harvestLineQty": "{name}을(를) {qty}개 채취했습니다.",
+      "harvestSpecimenLine": "추가로 {name}을(를) 얻었습니다.",
       "catchLine": "{name}을(를) 낚아 올렸습니다",
       "biteLine": "무언가 미끼를 물었습니다!",
       "gotAwayLine": "놓쳐 버렸습니다.",
@@ -2489,9 +2493,14 @@ export const ko_KR: EnTranslations = {
       "sameEnchant": "해당 아이템에는 이미 같은 마법부여가 되어 있습니다.",
       "replaceTag": "{enchant} 대체",
       "sameEnchantTag": "이미 적용됨",
+      "plainTag": "마법부여 없음",
       "replaceConfirmTitle": "{item}의 마법부여를 대체하시겠습니까?",
       "replaceConfirmBody": "{item}의 {old}을(를) {new}(으)로 대체합니다.",
       "replaceConfirmNoRefund": "기존 마법부여는 파괴되며 재료는 환불되지 않습니다. 되돌릴 수 없습니다.",
+      "replaceConfirmKeeps": "유지: {kept}",
+      "replaceConfirmKeepsSigner": "제작자 각인",
+      "replaceConfirmKeepsMasterwork": "걸작 보너스",
+      "replaceConfirmKeepsBond": "주문 제작품 귀속",
       "replaceConfirmCost": "비용: {cost}",
       "replaceConfirmCostItem": "{name} {count}개",
       "replaceConfirmAccept": "대체"

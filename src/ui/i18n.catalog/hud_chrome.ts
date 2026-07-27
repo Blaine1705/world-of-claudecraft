@@ -238,7 +238,7 @@ export const hudChromeStrings = {
     railSol: 'SOL',
     railUsdc: 'USDC',
     railWoc: 'WOC',
-    railWocDiscount: '20% off',
+    railWocDiscount: '{percent}% off',
     railWocUnavailable: 'WOC pricing is unavailable right now.',
     railNativeUnavailable: 'Crypto off.',
     amountLabel: 'Amount',
@@ -1210,10 +1210,10 @@ export const hudChromeStrings = {
   // count is auto-supplied as {count}. Keep all four categories present per base.
   plurals: {
     guildMembers: {
-      one: 'you are {rank}, {count} member',
-      few: 'you are {rank}, {count} members',
-      many: 'you are {rank}, {count} members',
-      other: 'you are {rank}, {count} members',
+      one: 'your guild rank is {rank}; {count} member',
+      few: 'your guild rank is {rank}; {count} members',
+      many: 'your guild rank is {rank}; {count} members',
+      other: 'your guild rank is {rank}; {count} members',
     },
     finderPartySize: {
       one: '{count} player',
@@ -1409,6 +1409,11 @@ export const hudChromeStrings = {
     harvestTooltip:
       'Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.',
     concentrateHint: 'Fewer chosen components yield a higher tier each.',
+    // #2509: claw, tusk, gills and horn are tagged on corpses but no harvest
+    // item is wired to them yet, so a selection of nothing but those would
+    // spend the single-use corpse for nothing. The command refuses it and the
+    // picker says why, in place: a disabled button's tooltip is unreachable.
+    nothingSelectedYields: 'Nothing you selected can be harvested from this corpse.',
     alreadyHarvested: 'This corpse has already been harvested.',
     componentAria: 'Harvest {component}',
     components: {
@@ -2152,8 +2157,8 @@ export const hudChromeStrings = {
   // visible while sale proceeds or returned items wait at the Merchant.
   // (Wordy, M16: the five non-Latin fills land in this same change.)
   marketIndicator: {
-    aria: 'World Market collection waiting',
-    tip: 'Gold or items are waiting for you at the Merchant.',
+    aria: 'World Market proceeds or items waiting',
+    tip: 'Sale proceeds or returned items are waiting for you at the Merchant.',
   },
   noticeboard: {
     empty: 'Nothing seems posted.',
@@ -2336,6 +2341,26 @@ export const hudChromeStrings = {
     // pin: tests/gather_event_i18n.test.ts).
     gatherLine: 'You gather: {name}.',
     gatherLineQty: 'You gather: {name} x{qty}.',
+    // Corpse-harvest feedback lines (#2457), rendered from the id-based
+    // harvestResult SimEvent. One line per DISTINCT item the harvest granted,
+    // and the SOLE lines for those grants: corpse harvest reaches the grant
+    // hub from six call sites and every one of them now stands its
+    // "You receive:" line down (the loot event's callerLogs flag), where it
+    // used to print one line and one ding per component. Like gatherLine
+    // above, these carry the quantity and splice {name} as a clickable,
+    // quality-colored item link, and stay worded APART from the loot family
+    // whose "You receive:" wording Hud.localizeLootText still matches on
+    // (contract pin: tests/gather_event_i18n.test.ts).
+    harvestLine: 'You harvest: {name}.',
+    harvestLineQty: 'You harvest: {name} x{qty}.',
+    // The Pristine specimen jackpot (#1145) takes its own line: it is a pure
+    // extra granted BESIDE its family's own plain component, so folding it
+    // into the line above would read as the same yield reported twice. The
+    // wording follows the rare-or-better disenchant's typed secondary
+    // (hudChrome.enchanting.disenchantedAlso), the shipped precedent for a
+    // second distinct yield on its own line. Always exactly one unit, so this
+    // family has no Qty sibling.
+    harvestSpecimenLine: 'You also recover {name}.',
     // Reel-in feedback line (Professions 2.0), rendered from the
     // id-based fishingResult SimEvent. Like gatherLine above, the sole line
     // for a landed catch and worded apart from both the loot family and the
@@ -2838,10 +2863,37 @@ export const hudChromeStrings = {
     sameEnchant: 'That item already has that enchant.',
     replaceTag: 'Replaces {enchant}',
     sameEnchantTag: 'Already applied',
+    // The tag on the PLAIN twin of a mixed holding (#2421): one item id held
+    // both plain and enchanted emits two rows under one item name, and without
+    // this the pair differs only by the replace row HAVING a sub-line. Painted
+    // on that twin alone (enchant_apply_view.ts mixedHolding), never on an
+    // unambiguous plain row, so an ordinary target list stays tag-free.
+    plainTag: 'Not enchanted',
     replaceConfirmTitle: 'Replace the enchant on {item}?',
     replaceConfirmBody: 'This replaces {old} on {item} with {new}.',
     replaceConfirmNoRefund:
       'The old enchant is destroyed. Its materials are not refunded. This cannot be undone.',
+    // What the swap does NOT destroy (#2421). The sim's replace payload carries
+    // the signature, the masterwork roll, and the bind state through
+    // byte-identical, and the dialog previously named only what dies; {kept}
+    // joins the trait labels below, and the whole line is omitted when the
+    // victim carries none of them (a plain copy is never told its signature is
+    // safe). One label per trait rather than one key per combination, the
+    // replaceConfirmCost / replaceConfirmCostItem shape next door. Each label
+    // reuses the vocabulary its own surface already taught the player: the
+    // maker's mark from makersMark, the seal from masterworkSeal, and the bond
+    // from the commission lines, never a raw ItemInstancePayload field name.
+    replaceConfirmKeeps: 'Kept: {kept}',
+    replaceConfirmKeepsSigner: "Maker's mark",
+    replaceConfirmKeepsMasterwork: 'Masterwork bonus',
+    // ONE label for both bind states. An armed lock (bindOnTrade) and an applied
+    // one (boundTo) are the same bond, and this line says what the swap leaves
+    // alone, not which state the bond is in; the item tooltip's commissionBound
+    // / commissionUnbound lines own that distinction. Named for the mechanic the
+    // tooltip and the unbind window already call it, so a player recognizes the
+    // thing being preserved; it never names WHO it is bound to (boundTo is an
+    // entity id, not a stable identity).
+    replaceConfirmKeepsBond: 'Commission bond',
     replaceConfirmCost: 'Cost: {cost}',
     replaceConfirmCostItem: '{name} x{count}',
     replaceConfirmAccept: 'Replace',
