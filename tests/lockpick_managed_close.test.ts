@@ -89,7 +89,12 @@ function harness(initial: LockpickView | null, host: 'online' | 'offline' = 'onl
   const depsHideTooltip = vi.fn();
   let state: LockpickView | null = initial;
   let pending: SimEvent[] = [];
+  const queued: SimEvent[] = [];
   const abort = vi.fn(() => {
+    if (queued.length > 0) {
+      pending.push(...queued.splice(0));
+      return;
+    }
     if (host !== 'offline') return;
     // What src/sim/delves/lockpick_controller.ts does: ABANDON the session and emit, both
     // synchronously, so drainEvents returns it inside the same call stack.
@@ -114,7 +119,12 @@ function harness(initial: LockpickView | null, host: 'online' | 'offline' = 'onl
     // Transcribed, NOT pinned: no guard ties this fake to that switch, so a rewrite there
     // would leave these cases green against a mapping the client no longer has.
     handleEvents: (events) => {
-      for (const ev of events) if (ev.type === 'lockpickEnd') controller.end(ev.outcome);
+      for (const ev of events) {
+        if (ev.type === 'lockpickEnd') controller.end(ev.outcome);
+        // hud.ts's `case 'lockpickSession': this.openLockpickBoard()`. Faithful because the
+        // repeat arm's statement ORDER depends on it: a drained event can re-open this panel.
+        if (ev.type === 'lockpickSession') controller.openBoard();
+      }
     },
     showBanner: vi.fn(),
     log: vi.fn(),
@@ -139,6 +149,10 @@ function harness(initial: LockpickView | null, host: 'online' | 'offline' = 'onl
     bar: () => panel.querySelector<HTMLElement>('.lp-timer-bar'),
     setState(next: LockpickView | null): void {
       state = next;
+    },
+    /** Make the NEXT abort's flushEvents drain carry these events. */
+    queueOnAbort(...events: SimEvent[]): void {
+      queued.push(...events);
     },
   };
 }
@@ -282,6 +296,26 @@ describe('lockpick panel: Hud.closeAll (the gamepad escape path)', () => {
       'block',
     );
     expect(h.release, 'and its trap survives until lockpickEnd').not.toHaveBeenCalled();
+  });
+
+  it("does not clobber a board that the withdrawal's own event drain re-opened", () => {
+    // Why the repeat arm closes BEFORE it re-sends. submitAbort ends in flushEvents, which
+    // runs the whole handleEvents switch, and its lockpickSession / lockpickOffer arms call
+    // openPanel. With the statements the other way round the close lands last and tears down
+    // a board the drain had just legitimately opened, leaving the player staring at nothing
+    // while the server believes a fresh lock is live.
+    const h = harness(LIVE);
+    h.controller.openBoard();
+    h.hud.closeAll(); // withdraw, latch set, panel still up (online shape)
+    expect(h.abort).toHaveBeenCalledTimes(1);
+
+    // The next abort's drain carries a fresh session, the way a re-engage would.
+    h.queueOnAbort({ type: 'lockpickSession', sessionId: 'lp_9_2' } as SimEvent);
+
+    h.hud.closeAll(); // repeat arm: close, then re-send, whose drain re-opens the board
+
+    expect(h.abort).toHaveBeenCalledTimes(2);
+    expect(h.panel.style.display, 'the re-opened board survives the dismissal').toBe('block');
   });
 
   it('re-arms after a same-id re-engage, which the id keying alone cannot catch', () => {
