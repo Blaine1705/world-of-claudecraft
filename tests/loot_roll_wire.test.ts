@@ -139,7 +139,12 @@ describe('loot roll self-snapshot parity', () => {
     sim.entities.set(mob.id, mob);
 
     sim.lootCorpse(mob.id, a);
-    const rollId = sim.events.find((e) => e.type === 'masterLoot')!.rollId;
+    const opened = sim.events.find((e) => e.type === 'masterLoot')!;
+    const rollId = opened.rollId;
+    // The deadline the EVENT announced, so the wire field below is pinned against
+    // an independent producer rather than fed its own value back as its expectation.
+    const expiresAt = (opened as { expiresAt: number }).expiresAt;
+    expect(expiresAt).toBeGreaterThan(0);
     sim.tick();
     (server as any).broadcastSnapshots();
 
@@ -153,7 +158,7 @@ describe('loot roll self-snapshot parity', () => {
         itemId: 'greyjaw_hide_boots',
         itemName: 'Greyjaw Hide Boots',
         quality: 'uncommon',
-        expiresAt: snapA.self.mloot[0].expiresAt,
+        expiresAt,
         candidates: [
           { pid: a, name: 'Aaa' },
           { pid: b, name: 'Bbb' },
@@ -176,7 +181,13 @@ describe('loot roll self-snapshot parity', () => {
     // omits the key entirely. The mirror must keep its prior value, which is what
     // lets the HUD restore the row after the grace.
     fa.sent.length = 0;
+    // Spied through (not stubbed): every assertion below also holds if the frame
+    // were rejected by the masterAssign wire validation and the sim never ran, so
+    // pin that the refusal really happened at the SIM boundary.
+    const assignSpy = vi.spyOn(sim, 'assignMasterLoot');
     sendCmd(server, sa, { cmd: 'masterAssign', rollId, pids: [999999] });
+    expect(assignSpy).toHaveBeenCalledWith(rollId, [999999], a);
+    assignSpy.mockRestore();
     sim.tick();
     (server as any).broadcastSnapshots();
     const snapA2 = lastSnap(fa.sent);

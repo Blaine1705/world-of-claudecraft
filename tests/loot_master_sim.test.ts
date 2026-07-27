@@ -344,6 +344,30 @@ describe('the master looter reconcile surface (#2526)', () => {
     expect(sim.lootRollGroupStatus(b)).toEqual([]);
   });
 
+  it('returns every curate-phase roll the looter owns, not just the first', () => {
+    const { sim, a, b, c, mob, rollId } = openMasterRoll();
+    // A second corpse dropping a second threshold item: the read loops the whole
+    // pending map and pushes every match, and nothing else in this file opens two
+    // at once, so a first-match-only read would pass every other case here.
+    const second = createMob(mob.id + 1, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
+    second.dead = true;
+    second.lootable = true;
+    second.tappedById = a;
+    second.loot = { copper: 0, items: [{ itemId: PREMIUM, count: 1 }] };
+    sim.entities.set(second.id, second);
+    sim.lootCorpse(second.id, a);
+    const secondRollId = sim.events.find((e) => e.type === 'masterLoot')!.rollId;
+    expect(secondRollId).not.toBe(rollId);
+
+    expect(sim.activeMasterLootRolls(a).map((p) => p.rollId)).toEqual([rollId, secondRollId]);
+    expect(sim.activeMasterLootRolls(b)).toEqual([]);
+    expect(sim.activeMasterLootRolls(c)).toEqual([]);
+
+    // Consuming one leaves the other, so the two are tracked independently.
+    sim.assignMasterLoot(rollId, [b], a);
+    expect(sim.activeMasterLootRolls(a).map((p) => p.rollId)).toEqual([secondRollId]);
+  });
+
   it('keeps the prompt, minus the departed pid, when the only named target has left', () => {
     const { sim, a, b, c, rollId } = openMasterRoll();
     // The reachable way a named pid stops being a candidate mid-window: an explicit
@@ -416,7 +440,7 @@ describe('the master looter reconcile surface (#2526)', () => {
     expect(sim.activeLootRolls(c).map((p) => p.rollId)).toEqual([rollId]);
   });
 
-  it('hands the surface to the new master looter after a leader handoff', () => {
+  it('keeps an open prompt with its original looter across a leader handoff', () => {
     const { sim, a, b, rollId } = openMasterRoll();
     // The roll captured `a` as its master looter at open time, so promoting `b`
     // must NOT move an already-open curate prompt: the surface follows the roll,

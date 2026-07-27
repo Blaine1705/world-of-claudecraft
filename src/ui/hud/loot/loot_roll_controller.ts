@@ -16,6 +16,10 @@ import {
 type LootRollEvent = Extract<SimEvent, { type: 'lootRoll' }>;
 type MasterLootEvent = Extract<SimEvent, { type: 'masterLoot' }>;
 type TimedRoll<T> = { event: T; receivedAt: number; durationMs: number };
+// A master row cleared by a local intent (an assignment, or the local timer): when
+// it was cleared, plus the clock the cleared row was running on so a restore can
+// resume it rather than restart it.
+type DismissedMasterRoll = { at: number; receivedAt: number; durationMs: number };
 
 type LootRollWorld = Pick<
   IWorld,
@@ -41,6 +45,13 @@ export interface LootRollControllerDeps {
 const LOOT_ROLL_DURATION_MS = 60_000;
 const MASTER_LOOT_DURATION_MS = 300_000;
 
+// Identity of a master roll's candidate list, for spotting a roster change on a row
+// that is already up. Name included, not just pid: a candidate can be renamed by the
+// live-roster lookup falling back to the roll's open-time snapshot.
+function candidateKey(candidates: { pid: number; name: string }[]): string {
+  return candidates.map((candidate) => `${candidate.pid}:${candidate.name}`).join('|');
+}
+
 /** Owns loot-roll prompt state, authoritative reconciliation, timers, and DOM. */
 export class LootRollController {
   private readonly activeRolls = new Map<number, TimedRoll<LootRollEvent>>();
@@ -54,7 +65,14 @@ export class LootRollController {
   // on purpose: a master roll keeps its id when the sim converts it to need/greed,
   // so one shared dismissed set would let the assignment that opened the roll
   // suppress the need/greed prompt the same id then arrives as.
-  private readonly dismissedMasterRolls = new Map<number, number>();
+  //
+  // It carries the row's ORIGINAL clock alongside the dismissal time, unlike the
+  // need/greed map, so a restored row resumes its countdown instead of restarting
+  // it. That asymmetry is deliberate: a need/greed row is only ever restored a
+  // couple of seconds into a 60s window, while a master row can be refused and
+  // restored at any point in a 300s one, so restarting there would show a bar that
+  // is wrong by up to five minutes.
+  private readonly dismissedMasterRolls = new Map<number, DismissedMasterRoll>();
   private confirmedMasterRolls = new Set<number>();
 
   constructor(private readonly deps: LootRollControllerDeps) {}
@@ -126,6 +144,7 @@ export class LootRollController {
 
   private assign(rollId: number, targetPids: number[]): void {
     this.deps.world().assignMasterLoot(rollId, targetPids);
+    const cleared = this.activeMasterRolls.get(rollId);
     this.activeMasterRolls.delete(rollId);
     // Clearing the row is a LOCAL intent, exactly as in submit() above, so record
     // when it happened rather than forgetting the roll: the sim refuses an
@@ -133,8 +152,24 @@ export class LootRollController {
     // leaves the roll in its curate phase, and a plain delete stranded the looter
     // there until the 300s timeout (#2526). reconcileMasterRolls restores the row
     // from the authoritative surface once the roll has stayed open past the grace.
-    this.dismissedMasterRolls.set(rollId, this.deps.now());
+    this.rememberDismissedMaster(rollId, this.deps.now(), cleared);
     this.render();
+  }
+
+  // Record a locally cleared master row: when it went, and the clock it was on, so
+  // a restore of the SAME roll picks the countdown back up where it left off. A
+  // roll with no record (the reconnect case, where the client never saw the row)
+  // legitimately falls back to a fresh full window on restore.
+  private rememberDismissedMaster(
+    rollId: number,
+    at: number,
+    cleared: TimedRoll<MasterLootEvent> | undefined,
+  ): void {
+    this.dismissedMasterRolls.set(rollId, {
+      at,
+      receivedAt: cleared?.receivedAt ?? at,
+      durationMs: cleared?.durationMs ?? MASTER_LOOT_DURATION_MS,
+    });
   }
 
   private reconcileRolls(): void {
@@ -186,7 +221,10 @@ export class LootRollController {
   //
   // The re-shown row is rebuilt from the PROMPT, never from the retained event, so
   // a candidate who left during the window is gone from the checkbox list and the
-  // looter cannot re-pick the pid that was just refused.
+  // looter cannot re-pick the pid that was just refused. A row that is ALREADY up
+  // is refreshed the same way whenever the roster moves, which is what keeps the
+  // looter from having to eat a refusal at all; render() carries the surviving
+  // checked pids across that repaint.
   private reconcileMasterRolls(): void {
     const open = this.deps.world().activeMasterLootRolls();
     if (
@@ -199,7 +237,7 @@ export class LootRollController {
     }
     const promptById = new Map(open.map((prompt) => [prompt.rollId, prompt] as const));
     const dismissedAt: Record<number, number> = {};
-    for (const [rollId, at] of this.dismissedMasterRolls) dismissedAt[rollId] = at;
+    for (const [rollId, entry] of this.dismissedMasterRolls) dismissedAt[rollId] = entry.at;
     const decision = reconcileLootRolls({
       open: open.map((prompt) => prompt.rollId),
       shown: [...this.activeMasterRolls.keys()],
@@ -218,11 +256,36 @@ export class LootRollController {
     for (const rollId of decision.toShow) {
       const prompt = promptById.get(rollId);
       if (!prompt) continue;
+      // Resume the cleared row's clock rather than restarting it, so a row restored
+      // four minutes into a curate window does not paint a full five-minute bar.
+      //
+      // A clock that has ALREADY run out is not resumable: that is the row the
+      // local timer retired while the sim still lists the roll open, so the local
+      // estimate was simply wrong and carries no information. Resuming it there
+      // would expire the row again inside this same update() and leave the two
+      // halves trading the roll back and forth every grace period forever.
+      const dismissed = this.dismissedMasterRolls.get(rollId);
+      const prior =
+        dismissed && dismissed.receivedAt + dismissed.durationMs > this.deps.now()
+          ? dismissed
+          : null;
       this.activeMasterRolls.set(rollId, {
         event: { type: 'masterLoot', ...prompt },
-        receivedAt: this.deps.now(),
-        durationMs: MASTER_LOOT_DURATION_MS,
+        receivedAt: prior?.receivedAt ?? this.deps.now(),
+        durationMs: prior?.durationMs ?? MASTER_LOOT_DURATION_MS,
       });
+      changed = true;
+    }
+    // A shown row the pure core deliberately leaves alone (it only decides
+    // show/retire/prune) still has to follow the roster: the surface rebuilds
+    // `candidates` from the roll's live candidate list, so a candidate who logs out
+    // mid-window must leave the checkbox list while the row is up. Keep the row's
+    // existing clock; only the payload moves.
+    for (const [rollId, shown] of this.activeMasterRolls) {
+      const prompt = promptById.get(rollId);
+      if (!prompt || candidateKey(prompt.candidates) === candidateKey(shown.event.candidates))
+        continue;
+      shown.event = { type: 'masterLoot', ...prompt };
       changed = true;
     }
     if (changed) this.render();
@@ -271,11 +334,11 @@ export class LootRollController {
     for (const [rollId, roll] of this.activeMasterRolls) {
       if (now - roll.receivedAt >= roll.durationMs) {
         this.activeMasterRolls.delete(rollId);
-        // Same reason submit()'s sibling loop above records the local expiry: the
-        // local clock is an estimate of the sim's deadline, so a row retired here
-        // while the sim still lists the roll open must wait out the grace before
-        // the mirror is allowed to bring it back.
-        this.dismissedMasterRolls.set(rollId, now);
+        // Recorded for the same reason the need/greed loop directly above records
+        // its own local expiry: the local clock only estimates the sim's deadline,
+        // so a row retired here while the sim still lists the roll open must wait
+        // out the grace before the mirror is allowed to bring it back.
+        this.rememberDismissedMaster(rollId, now, roll);
         changed = true;
       }
     }
@@ -320,8 +383,28 @@ export class LootRollController {
     </div>`;
   }
 
+  // The pids currently checked on each master row, keyed by rollId. render() tears
+  // the whole loot-roll root down and rebuilds it, so without this any repaint (a
+  // vote-strip change, another roll opening, a roster refresh) silently clears a
+  // half-made selection the looter is still working on.
+  private checkedMasterPids(): Map<number, Set<number>> {
+    const out = new Map<number, Set<number>>();
+    const root = this.deps.document.getElementById('loot-rolls');
+    if (!root) return out;
+    for (const row of root.querySelectorAll<HTMLElement>('.loot-roll')) {
+      if (!row.dataset.master) continue;
+      const checked = new Set<number>();
+      for (const pick of row.querySelectorAll<HTMLInputElement>('.ml-pick')) {
+        if (pick.checked) checked.add(Number(pick.value));
+      }
+      if (checked.size > 0) out.set(Number(row.dataset.rollId), checked);
+    }
+    return out;
+  }
+
   private render(): void {
     const root = this.root();
+    const checkedByRoll = this.checkedMasterPids();
     if (
       this.activeRolls.size === 0 &&
       this.activeMasterRolls.size === 0 &&
@@ -335,7 +418,7 @@ export class LootRollController {
     root.innerHTML = '';
     const statusByRoll = new Map(this.statusRows.map((row) => [row.rollId, row]));
     for (const [rollId, roll] of this.activeMasterRolls) {
-      this.renderMasterRow(root, rollId, roll.event);
+      this.renderMasterRow(root, rollId, roll.event, checkedByRoll.get(rollId));
     }
     for (const [rollId, roll] of this.activeRolls) {
       const event = roll.event;
@@ -402,7 +485,12 @@ export class LootRollController {
     }
   }
 
-  private renderMasterRow(root: HTMLElement, rollId: number, event: MasterLootEvent): void {
+  private renderMasterRow(
+    root: HTMLElement,
+    rollId: number,
+    event: MasterLootEvent,
+    checked?: Set<number>,
+  ): void {
     const item = ITEMS[event.itemId];
     const itemName = item ? itemDisplayName(item) : event.itemName;
     const quality = item?.quality ?? event.quality ?? 'common';
@@ -442,11 +530,20 @@ export class LootRollController {
       root.appendChild(row);
       return;
     }
+    // Carry a selection made before this repaint. Only pids still on the roster
+    // survive: a candidate the sim has dropped must not come back checked, which is
+    // the whole reason the roster refresh exists.
+    if (checked) {
+      for (const pick of pickElements) pick.checked = checked.has(Number(pick.value));
+    }
     const syncRoll = (): void => {
-      const checked = pickElements.filter((pick) => pick.checked).length;
-      rollButton.disabled = checked === 0;
-      selectAll.checked = pickElements.length > 0 && checked === pickElements.length;
+      const picked = pickElements.filter((pick) => pick.checked).length;
+      rollButton.disabled = picked === 0;
+      selectAll.checked = pickElements.length > 0 && picked === pickElements.length;
     };
+    // A carried selection has to re-derive the button and select-all state, or the
+    // row comes back with boxes ticked and Roll still greyed out.
+    if (checked) syncRoll();
     selectAll.addEventListener('change', () => {
       for (const pick of pickElements) pick.checked = selectAll.checked;
       syncRoll();

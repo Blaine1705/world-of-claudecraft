@@ -1,25 +1,30 @@
-// Screenshot harness for #2526: what the master looter sees when the sim REFUSES
-// an assignment. Boots the offline world, forms a three-person party with master
-// loot on, opens a REAL curate-phase roll off a real corpse, drops one candidate
-// out of the roll, then assigns to exactly that departed candidate through the
-// actual checkbox + Roll button.
+// Screenshot harness for #2526: what the master looter sees when a candidate leaves
+// during the curate window. Boots the offline world, forms a three-person party with
+// master loot on, and opens a REAL curate-phase roll off a real corpse; every state
+// change below goes through the sim and the shipped controls, nothing is faked into
+// the HUD.
 //
-// Shoots the same fixed region three times so the branch and the base produce
-// comparable frames:
-//   1-prompt   the curate prompt, open (identical on both)
-//   2-refused  immediately after the refused assignment: the row is gone
-//   3-restored past the re-show grace. On this branch the reconcile surface has
-//              brought the prompt back, minus the departed candidate. On the base
-//              tree it stays empty until the 300s timeout, which IS the bug.
+// Shoots the same fixed region three times, so the branch and the base produce
+// directly comparable frames:
+//   1-prompt       the curate prompt, open with all three candidates. Identical on
+//                  both trees.
+//   2-roster       a candidate has logged out and NOTHING has been clicked. On this
+//                  branch the row has followed the roll's roster and dropped her; on
+//                  the base tree the checkbox list is still the open-time snapshot,
+//                  which is what lets the looter pick someone the sim will refuse.
+//   3-after-grace  after a refusal that IS still reachable (the candidate leaves in
+//                  the same frame as the click, staged atomically here) and past the
+//                  re-show grace. On this branch the prompt is back; on the base tree
+//                  it stays gone until the 300s timeout, which IS the bug.
 //
-// Every frame is captured with the row state read in the SAME step and printed, so
-// the artifact says what it contains rather than being trusted. That matters here:
-// at ?gfx=ultra a swiftshader frame can take longer than the 2s re-show grace, and a
-// screenshot that waits for one silently captures the wrong moment.
+// Every frame reads the row state before AND after the raster and refuses to write a
+// frame the two disagree on. That guard is load-bearing: page.screenshot waits for a
+// composited frame, and under swiftshader that wait runs to several seconds, so a
+// capture aimed at a short-lived state can silently raster a later one. All three
+// states above are deliberately stable ones for that reason.
 //
-// Needs a dev server (default :5173, override GAME_URL). Renders at ?gfx=medium,
-// deliberately: the subject is a DOM panel, and a cheap frame is what keeps the
-// "row is gone" capture honest.
+// Needs a dev server (default :5173, override GAME_URL). Renders at ?gfx=medium: the
+// subject is a DOM panel, so 3D richness buys nothing and costs raster time.
 // Output prefix defaults to tmp/master-loot-refusal-, override SHOT_PREFIX.
 
 import fs from 'node:fs';
@@ -117,51 +122,67 @@ const clip = {
   width: box.width + 32,
   height: box.height + 32,
 };
-// Reads the row state and shoots in one step, and reports both, so a frame that
-// drifted past the moment it is named for cannot pass unnoticed.
+// Reads the row state, shoots, and reads it AGAIN, so a frame that drifted past
+// the moment it is named for cannot pass unnoticed. The second read is the
+// load-bearing one: page.screenshot waits for a composited frame, and under
+// swiftshader that wait can outlast the 2s re-show grace, so a capture taken while
+// the row is legitimately gone can still raster the row on its way back.
 const shots = [];
-async function capture(name) {
-  const state = await page.evaluate(() => {
+const rowState = () =>
+  page.evaluate(() => {
     const row = document.querySelector('#loot-rolls .loot-roll.master');
     if (!row) return { shown: false, candidates: [] };
     return { shown: true, candidates: [...row.querySelectorAll('.ml-pick')].map((p) => p.value) };
   });
+
+async function capture(name) {
+  const before = await rowState();
+  const startedAt = Date.now();
   await page.screenshot({ path: `${PREFIX}${name}.png`, clip });
-  shots.push({ name, ...state });
-  return state;
+  const rasterMs = Date.now() - startedAt;
+  const after = await rowState();
+  if (JSON.stringify(before) !== JSON.stringify(after)) {
+    throw new Error(
+      `${name}: the row changed during a ${rasterMs}ms raster (${JSON.stringify(before)} -> ` +
+        `${JSON.stringify(after)}), so the frame cannot be trusted`,
+    );
+  }
+  shots.push({ name, rasterMs, ...after });
+  return after;
 }
 
 await capture('1-prompt');
 
-// Cara logs out during the curate window, so the sim drops her from the roll while
-// the already-rendered checkbox list still offers her.
+// Cara logs out mid-window. The sim drops her from the roll immediately; whether the
+// on-screen checkbox list follows is the difference between the two trees.
 await page.evaluate((cara) => window.__game.sim.removePlayer(cara), staged.cara);
-await sleep(400);
+await sleep(1500);
+await capture('2-roster');
 
-// Assign to exactly that departed candidate, through the real controls.
-const clicked = await page.evaluate(() => {
+// The refusal that survives the roster refresh: the candidate leaves in the SAME
+// frame as the click. Staged atomically in one evaluate, so no HUD frame runs
+// between checking Berta, the sim dropping her, and the Roll button firing. This is
+// the real race, not a synthetic call: the click goes through the shipped button.
+const clicked = await page.evaluate((berta) => {
   const row = document.querySelector('#loot-rolls .loot-roll.master');
   if (!row) return { ok: false, reason: 'no master row on screen' };
-  const picks = [...row.querySelectorAll('.ml-pick')];
-  const target = picks[picks.length - 1];
-  if (!target) return { ok: false, reason: 'no candidate checkboxes' };
+  const target = [...row.querySelectorAll('.ml-pick')].find((p) => Number(p.value) === berta);
+  if (!target) return { ok: false, reason: 'the intended candidate is not on the row' };
   target.checked = true;
   target.dispatchEvent(new Event('change'));
   const roll = row.querySelector('.ml-roll');
   if (!roll || roll.disabled) return { ok: false, reason: 'roll button stayed disabled' };
+  window.__game.sim.removePlayer(berta); // she leaves before the command lands
   roll.click();
   return { ok: true, pid: target.value };
-});
+}, staged.berta);
 if (!clicked.ok) throw new Error(clicked.reason);
-await sleep(150);
-const refused = await capture('2-refused');
-if (refused.shown) throw new Error('the row was still up when the refused frame was taken');
 
 // Past the re-show grace (LOOT_ROLL_REGRACE_MS is 2s), with frames still running.
 // On the base tree this stays empty until MASTER_LOOT_TIMEOUT, which is the bug.
 await sleep(4000);
-await capture('3-restored');
+await capture('3-after-grace');
 
 await browser.close();
-console.log(`assigned to the departed pid ${clicked.pid}`);
+console.log(`assigned to pid ${clicked.pid}, who left in the same frame as the click`);
 for (const shot of shots) console.log(`  ${PREFIX}${shot.name}.png`, JSON.stringify(shot));

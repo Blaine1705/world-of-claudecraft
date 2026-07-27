@@ -98,9 +98,12 @@ function harness() {
   const submitLootRoll = vi.fn();
   const assignMasterLoot = vi.fn();
   const writerCounts = { writes: 0, skips: 0 };
+  // Retained so a test can read back the elided style props the painter wrote
+  // (the timer fraction is only ever a CSS custom property).
+  const stylePropCache = new Map<HTMLElement, Map<string, string>>();
   const writers = makeWriterFacet(
     new Map(),
-    new Map(),
+    stylePropCache,
     new Map(),
     new Map(),
     () => writerCounts.writes++,
@@ -151,6 +154,8 @@ function harness() {
     },
     now: () => now,
     writerCounts,
+    timerFrac: (element: HTMLElement | null) =>
+      element ? Number(stylePropCache.get(element)?.get('--loot-roll-frac')) : Number.NaN,
   };
 }
 
@@ -380,6 +385,137 @@ describe('LootRollController', () => {
 
     const restored = test.root.querySelectorAll<HTMLElement>('.master');
     expect(restored.map((row) => row.dataset.rollId)).toEqual(['8']);
+  });
+
+  it('resumes the restored row on its original clock instead of restarting the bar', () => {
+    const test = harness();
+    test.setMasterOpen([masterPrompt()]);
+    test.controller.showMasterRoll({ type: 'masterLoot', ...masterPrompt() });
+    // Four minutes into the five-minute curate window, the looter's assignment is
+    // refused. The restored row must show the ~1 minute that is actually left, not
+    // a fresh five.
+    test.advance(240_000);
+    test.controller.update(test.now());
+    const row = test.root.querySelector<HTMLElement>('.master') as unknown as LootElement | null;
+    const picks = row?.querySelectorAll<HTMLInputElement>('.ml-pick') ?? [];
+    picks[1].checked = true;
+    picks[1].dispatchEvent(new Event('change'));
+    row?.querySelector<HTMLButtonElement>('.ml-roll')?.dispatchEvent(new Event('click'));
+
+    test.advance(LOOT_ROLL_REGRACE_MS);
+    test.controller.update(test.now());
+    const restored = test.root.querySelector<HTMLElement>('.master');
+    expect(restored).not.toBeNull();
+    // 242s of a 300s window spent, so roughly a fifth of the bar is left. A
+    // restarted clock would paint 1.000 here.
+    const frac = test.timerFrac(restored);
+    expect(frac).toBeGreaterThan(0.15);
+    expect(frac).toBeLessThan(0.25);
+  });
+
+  it('refreshes a roster change on a row that is already up, keeping the selection', () => {
+    const test = harness();
+    const roster = [
+      { pid: 2, name: 'Aki' },
+      { pid: 3, name: 'Bex' },
+      { pid: 4, name: 'Cai' },
+    ];
+    test.setMasterOpen([masterPrompt(roster)]);
+    test.controller.showMasterRoll({ type: 'masterLoot', ...masterPrompt(roster) });
+    const row = test.root.querySelector<HTMLElement>('.master') as unknown as LootElement | null;
+    const picks = row?.querySelectorAll<HTMLInputElement>('.ml-pick') ?? [];
+    picks[0].checked = true; // the looter is mid-selection on Aki
+    picks[0].dispatchEvent(new Event('change'));
+
+    // Bex logs out. The surface drops her immediately, and the row must follow it
+    // WITHOUT a click, so the looter never gets the chance to be refused at all.
+    test.setMasterOpen([masterPrompt([roster[0], roster[2]])]);
+    test.controller.update(test.now());
+
+    const fresh = test.root.querySelector<HTMLElement>('.master') as unknown as LootElement | null;
+    const freshPicks = fresh?.querySelectorAll<HTMLInputElement>('.ml-pick') ?? [];
+    expect(freshPicks.map((pick) => pick.value)).toEqual(['2', '4']);
+    // The half-made selection survived the repaint, and the Roll button with it.
+    expect(freshPicks.filter((pick) => pick.checked).map((pick) => pick.value)).toEqual(['2']);
+    expect(fresh?.querySelector<HTMLButtonElement>('.ml-roll')?.disabled).toBe(false);
+  });
+
+  it('drops a departed pid from the carried selection rather than re-checking it', () => {
+    const test = harness();
+    const roster = [
+      { pid: 2, name: 'Aki' },
+      { pid: 3, name: 'Bex' },
+    ];
+    test.setMasterOpen([masterPrompt(roster)]);
+    test.controller.showMasterRoll({ type: 'masterLoot', ...masterPrompt(roster) });
+    const row = test.root.querySelector<HTMLElement>('.master') as unknown as LootElement | null;
+    const picks = row?.querySelectorAll<HTMLInputElement>('.ml-pick') ?? [];
+    picks[1].checked = true; // Bex is checked...
+    picks[1].dispatchEvent(new Event('change'));
+
+    test.setMasterOpen([masterPrompt([roster[0]])]); // ...and then Bex leaves
+    test.controller.update(test.now());
+
+    const fresh = test.root.querySelector<HTMLElement>('.master') as unknown as LootElement | null;
+    const freshPicks = fresh?.querySelectorAll<HTMLInputElement>('.ml-pick') ?? [];
+    expect(freshPicks.map((pick) => pick.value)).toEqual(['2']);
+    expect(freshPicks.filter((pick) => pick.checked)).toHaveLength(0);
+    // Nothing is selected any more, so the button goes back to disabled rather than
+    // staying live over a selection that no longer exists.
+    expect(fresh?.querySelector<HTMLButtonElement>('.ml-roll')?.disabled).toBe(true);
+  });
+
+  it('holds an event-shown master row that the mirror has not confirmed yet', () => {
+    const test = harness();
+    // The masterLoot event lands a frame or two before the roll reaches the mirror.
+    // Retiring on "absent from the mirror" alone would kill the prompt instantly,
+    // which is exactly what the confirmed set exists to prevent.
+    test.controller.showMasterRoll({ type: 'masterLoot', ...masterPrompt() });
+    test.setMasterOpen([]);
+
+    test.controller.update(test.now());
+    test.controller.update(test.now());
+    expect(test.root.querySelector('.master')).not.toBeNull();
+
+    // Once the mirror HAS confirmed it, a later absence is real and retires it.
+    test.setMasterOpen([masterPrompt()]);
+    test.controller.update(test.now());
+    test.setMasterOpen([]);
+    test.controller.update(test.now());
+    expect(test.root.querySelector('.master')).toBeNull();
+  });
+
+  it('lets the local curate timer retire a master row, then recover it past the grace', () => {
+    const test = harness();
+    test.setMasterOpen([masterPrompt()]);
+    test.controller.showMasterRoll({ type: 'masterLoot', ...masterPrompt() });
+    test.controller.update(test.now());
+    expect(test.root.querySelector('.master')).not.toBeNull();
+
+    // The local 300s estimate of the sim's deadline runs out first (a lagging
+    // server, or a client clock that ran fast). The row retires...
+    test.advance(300_000);
+    test.controller.update(test.now());
+    expect(test.root.querySelector('.master')).toBeNull();
+
+    // ...and stays retired through the grace, rather than re-flashing immediately.
+    test.controller.update(test.now());
+    expect(test.root.querySelector('.master')).toBeNull();
+
+    // Past the grace, the still-open sim roll brings it back: the local clock was
+    // only an estimate, and the sim is the authority on when the window closes.
+    test.advance(LOOT_ROLL_REGRACE_MS);
+    test.controller.update(test.now());
+    expect(test.root.querySelector('.master')).not.toBeNull();
+
+    // And it STAYS back. Restoring on the exhausted clock would re-expire the row
+    // inside the same update() and leave the timer and the mirror handing the roll
+    // back and forth once per grace period for as long as the sim holds it open.
+    for (let i = 0; i < 5; i++) {
+      test.advance(LOOT_ROLL_REGRACE_MS);
+      test.controller.update(test.now());
+      expect(test.root.querySelector('.master')).not.toBeNull();
+    }
   });
 
   it('elides a repeated timer fraction while still writing real time progress', () => {

@@ -3897,6 +3897,11 @@ describe('delta-key contract pins (anti-drift)', () => {
       atitle: 'activeTitle',
       deeds: 'deedsEarned',
       dstats: 'deedStats',
+      // Two loot-roll surfaces whose terse keys look interchangeable: mloot is the
+      // master-looter curate prompt, lroll the need/greed one, and swapping either
+      // right-hand side would pass every other check in this test.
+      lroll: 'lootRollPrompts',
+      mloot: 'masterLootPrompts',
     };
     for (const [terse, iworld] of Object.entries(required)) {
       expect(TERSE_TO_IWORLD[terse], `rename ${terse} -> ${iworld} drifted`).toBe(iworld);
