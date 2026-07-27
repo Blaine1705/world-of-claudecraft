@@ -21,6 +21,7 @@ import {
   bagCapacity,
   bagsFullError,
   canGrantItemInstance,
+  countFit,
   equipBag as equipBagCmd,
 } from './bags';
 import { ITEMS } from './data';
@@ -58,6 +59,71 @@ import {
 import { vendorStackSize } from './vendor_stack';
 
 const VENDOR_BUYBACK_LIMIT = 12;
+
+interface EquippedInventoryUnit {
+  instance: ItemInstancePayload | undefined;
+  craftedRecipeId: string | undefined;
+}
+
+function consumeEquippedInventoryUnit(meta: PlayerMeta, itemId: string): EquippedInventoryUnit {
+  for (let i = meta.inventory.length - 1; i >= 0; i--) {
+    const slot = meta.inventory[i];
+    if (slot.itemId !== itemId) continue;
+    const instance =
+      slot.instance && slot.count > 1 ? cloneItemInstancePayload(slot.instance) : slot.instance;
+    const craftedRecipeId = slot.craftedRecipeId;
+    slot.count -= 1;
+    if (slot.count <= 0) meta.inventory.splice(i, 1);
+    return { instance, craftedRecipeId };
+  }
+  return { instance: undefined, craftedRecipeId: undefined };
+}
+
+function equipmentPayloadFor(unit: EquippedInventoryUnit): ItemInstancePayload | undefined {
+  if (!unit.instance && unit.craftedRecipeId === undefined) return undefined;
+  return {
+    ...(unit.instance ? cloneItemInstancePayload(unit.instance) : {}),
+    ...(unit.craftedRecipeId === undefined ? {} : { craftedRecipeId: unit.craftedRecipeId }),
+  };
+}
+
+function payloadWithoutCraftedRecipeId(
+  payload: ItemInstancePayload,
+): ItemInstancePayload | undefined {
+  const { craftedRecipeId: _craftedRecipeId, ...instance } = payload;
+  return Object.keys(instance).length > 0 ? instance : undefined;
+}
+
+function returnEquippedItemToBags(
+  meta: PlayerMeta,
+  itemId: string,
+  payload?: ItemInstancePayload,
+): void {
+  const craftedRecipeId = payload?.craftedRecipeId;
+  const instance = payload ? payloadWithoutCraftedRecipeId(payload) : undefined;
+  if (instance || craftedRecipeId !== undefined) {
+    meta.inventory.push({
+      itemId,
+      count: 1,
+      ...(instance ? { instance } : {}),
+      ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
+    });
+    return;
+  }
+  addItemSilent(itemId, 1, meta);
+}
+
+function canReturnEquippedItemToBags(
+  meta: PlayerMeta,
+  itemId: string,
+  payload?: ItemInstancePayload,
+): boolean {
+  const craftedRecipeId = payload?.craftedRecipeId;
+  const instance = payload ? payloadWithoutCraftedRecipeId(payload) : undefined;
+  return (
+    countFit(meta.inventory, bagCapacity(meta.bags), itemId, 1, instance, craftedRecipeId) >= 1
+  );
+}
 
 function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | null {
   const def = ITEMS[itemId];
@@ -248,7 +314,7 @@ export function equipItem(
   if (displacedSlot && displacedId) {
     // Removing the incoming item frees one bag slot. If this equip also returns
     // the replaced item, the displaced other hand needs one additional slot.
-    if (old && !ctx.canAddItem(displacedId, 1, meta.entityId)) {
+    if (old && !canReturnEquippedItemToBags(meta, displacedId, displacedInstance)) {
       bagsFullError(ctx, meta.entityId);
       return;
     }
@@ -263,27 +329,24 @@ export function equipItem(
   // the highest-index match: loot another plain copy afterward and the plain
   // one gets equipped instead. Deterministic, acceptable for v1, but a future
   // picker UI should not assume the enchanted copy is always favored.
-  const consumed = ctx.removeItem(itemId, 1, meta.entityId);
+  const consumed = consumeEquippedInventoryUnit(meta, itemId);
+  ctx.onInventoryChangedForQuests(meta);
   if (old) {
     // Return the piece that was worn: if it carried an enchant, give it back
     // its own instanced slot (never merged into a plain stack, which would
     // silently drop the enchant; worn kinds are 1-per-slot, so the
     // identical-payload merge arm of addItemInstance could
     // never apply here anyway).
-    if (oldInstance) meta.inventory.push({ itemId: old, count: 1, instance: oldInstance });
-    else addItemSilent(old, 1, meta);
+    returnEquippedItemToBags(meta, old, oldInstance);
   }
   if (displacedId) {
-    if (displacedInstance) {
-      meta.inventory.push({ itemId: displacedId, count: 1, instance: displacedInstance });
-    } else {
-      addItemSilent(displacedId, 1, meta);
-    }
+    returnEquippedItemToBags(meta, displacedId, displacedInstance);
   }
   meta.equipment[slot] = itemId;
-  if (consumed[0]) {
+  const equippedPayload = equipmentPayloadFor(consumed);
+  if (equippedPayload) {
     meta.equipmentInstance ??= {};
-    meta.equipmentInstance[slot] = consumed[0];
+    meta.equipmentInstance[slot] = equippedPayload;
   } else if (meta.equipmentInstance) {
     delete meta.equipmentInstance[slot];
   }
@@ -309,8 +372,7 @@ export function revalidateOffhandForSpec(ctx: SimContext, pid?: number): void {
   const instance = meta.equipmentInstance?.offhand;
   delete meta.equipment.offhand;
   if (meta.equipmentInstance) delete meta.equipmentInstance.offhand;
-  if (instance) meta.inventory.push({ itemId: offhandId, count: 1, instance });
-  else addItemSilent(offhandId, 1, meta);
+  returnEquippedItemToBags(meta, offhandId, instance);
   ctx.markDeedsDirty(meta.entityId);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   ctx.emit({
@@ -331,11 +393,11 @@ export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boo
   const { meta, e: p } = r;
   const itemId = meta.equipment[slot];
   if (!itemId) return false;
-  if (!ctx.canAddItem(itemId, 1, meta.entityId)) {
+  const instance = meta.equipmentInstance?.[slot];
+  if (!canReturnEquippedItemToBags(meta, itemId, instance)) {
     bagsFullError(ctx, meta.entityId);
     return false;
   }
-  const instance = meta.equipmentInstance?.[slot];
   delete meta.equipment[slot];
   if (meta.equipmentInstance) delete meta.equipmentInstance[slot];
   // The all-slots deed reads equipment, so re-check this player's triggers.
@@ -344,8 +406,7 @@ export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boo
   // not a fresh acquisition, so it must not fire collect-quest credit. No quest
   // today keys on an unequip, so there is nothing to award here regardless. An
   // enchanted piece gets its own instanced slot instead, so its enchant survives.
-  if (instance) meta.inventory.push({ itemId, count: 1, instance });
-  else addItemSilent(itemId, 1, meta);
+  returnEquippedItemToBags(meta, itemId, instance);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   const def = ITEMS[itemId];
   ctx.emit({

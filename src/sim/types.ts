@@ -918,6 +918,10 @@ export interface ItemInstancePayload {
    *  isEnchantedInstance). Legacy enchanted copies predate this field and are
    *  detected by bare rolled.stats WITHOUT rolled.masterwork instead. */
   enchant?: string;
+  /** Recipe id that minted this copy while it is worn. Inventory stacks keep
+   *  the same marker on InvSlot.craftedRecipeId so common crafted gear can
+   *  stack normally in bags; equip/unequip bridges it through this payload. */
+  craftedRecipeId?: string;
   /** Player id (Entity id) this specific copy is bound to. */
   boundTo?: number;
   /** Arms the bind-on-trade lock: a copy carrying this binds to the recipient
@@ -936,7 +940,7 @@ export interface InvSlot {
   /** Additive, optional per-instance payload (#1165). Absent for ordinary fungible stacks. */
   instance?: ItemInstancePayload;
   /** Recipe id that minted this stack when crafting provenance matters but the
-   *  item stays a plain bag good. Kept off ItemInstancePayload so common
+   *  item stays a plain bag good. Kept on the slot while in bags so common
    *  crafted gear does not gain a signer/masterwork/enchant identity. */
   craftedRecipeId?: string;
   /** The bag CELL this stack was dragged into (the manual arrangement). Absent for a

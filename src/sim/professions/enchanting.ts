@@ -254,6 +254,7 @@ interface ConsumedDisenchantUnit {
 function isCraftedDisenchantVictim(consumed: ConsumedDisenchantUnit | undefined): boolean {
   return (
     consumed?.craftedRecipeId !== undefined ||
+    consumed?.instance?.craftedRecipeId !== undefined ||
     !!consumed?.instance?.signer ||
     !!consumed?.instance?.rolled?.masterwork
   );

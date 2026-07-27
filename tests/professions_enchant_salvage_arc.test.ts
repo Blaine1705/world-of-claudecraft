@@ -269,6 +269,55 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
     expect(meta.craftSkills.enchanting).toBe(0);
   });
 
+  it('crafted Eastbrook Chainmail Vest replacement keeps provenance before disenchant', () => {
+    const sim = new Sim({ seed: 20260728, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = metaFor(sim, pid);
+
+    grantVestMaterials(sim, pid);
+    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    expect(sim.lastCraftResult?.ok).toBe(true);
+    const craftedSlotIndex = craftedVestSlotIndex(sim, pid);
+    expect(craftedSlotIndex).toBeGreaterThanOrEqual(0);
+
+    sim.equipItem(CRAFTED_COMMON_ARMOR, pid);
+    expect(meta.equipment.chest).toBe(CRAFTED_COMMON_ARMOR);
+    expect(meta.equipmentInstance.chest?.craftedRecipeId).toBe(CRAFTED_COMMON_ARMOR_RECIPE);
+    expect(craftedVestSlotIndex(sim, pid)).toBe(-1);
+
+    sim.equipItem('recruit_tunic', pid);
+    expect(meta.equipment.chest).toBe('recruit_tunic');
+    const returnedSlotIndex = craftedVestSlotIndex(sim, pid);
+    expect(returnedSlotIndex).toBeGreaterThanOrEqual(0);
+
+    const dustBefore = sim.countItem(DUST, pid);
+    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, returnedSlotIndex);
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    expect(sim.countItem(DUST, pid)).toBeGreaterThan(dustBefore);
+    expect(sim.countItem(CRAFTED_COMMON_ARMOR, pid)).toBe(0);
+    expect(meta.craftSkills.enchanting).toBe(0);
+  });
+
+  it('crafted Eastbrook Chainmail Vest unequip keeps provenance before disenchant', () => {
+    const sim = new Sim({ seed: 20260729, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = metaFor(sim, pid);
+
+    grantVestMaterials(sim, pid);
+    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    expect(sim.lastCraftResult?.ok).toBe(true);
+
+    sim.equipItem(CRAFTED_COMMON_ARMOR, pid);
+    expect(meta.equipmentInstance.chest?.craftedRecipeId).toBe(CRAFTED_COMMON_ARMOR_RECIPE);
+    expect(sim.unequipItem('chest', pid)).toBe(true);
+    const returnedSlotIndex = craftedVestSlotIndex(sim, pid);
+    expect(returnedSlotIndex).toBeGreaterThanOrEqual(0);
+
+    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, returnedSlotIndex);
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    expect(meta.craftSkills.enchanting).toBe(0);
+  });
+
   it('a non-crafted eligible item still gains Enchanting skill when disenchanted', () => {
     const sim = new Sim({ seed: 20260727, playerClass: 'warrior', autoEquip: false });
     const pid = sim.playerId;
