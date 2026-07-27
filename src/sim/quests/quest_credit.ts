@@ -13,6 +13,7 @@
 // browser, and the headless RL env.
 
 import { QUESTS } from '../data';
+import { countAcrossGrades } from '../professions/material_grades';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -110,7 +111,17 @@ export function onInventoryChangedForQuests(ctx: SimContext, meta: PlayerMeta): 
     quest.objectives.forEach((obj, i) => {
       if (obj.type === 'collect' && obj.itemId) {
         const required = questObjectiveRequired(quest, qp, i);
-        const have = Math.min(required, ctx.countItem(obj.itemId, meta.entityId));
+        // Counted across the objective's material grades (D8,
+        // professions/material_grades.ts): a fine grade IS its base material,
+        // worked with a better tool, and the turn-in spends it the same way.
+        // Without this a player carrying any tier-2 tool would watch a
+        // "Copper Ore delivered" objective sit at 0 while their bags filled
+        // with fine copper ore, since eastbrook_vale is all tier-1 nodes and
+        // the plain grade stops dropping for them entirely.
+        const have = Math.min(
+          required,
+          countAcrossGrades(obj.itemId, (id) => ctx.countItem(id, meta.entityId)),
+        );
         if (have !== qp.counts[i]) {
           if (have > qp.counts[i]) meta.counters.questProgress += have - qp.counts[i];
           qp.counts[i] = have;

@@ -68,7 +68,7 @@
 // game/net imports, no Math.random/Date.now, host-agnostic so it runs
 // offline, on the server, and in the headless RL env unchanged.
 
-import { bagCapacity, fitsAll, removeStacked } from '../bags';
+import { bagCapacity, countStacked, fitsAll, removeStacked } from '../bags';
 import { CRAFT_GOLD_SINK_COPPER_PER_BUDGET } from '../content/professions';
 import { recipeById } from '../content/recipes';
 import { ITEMS } from '../data';
@@ -81,6 +81,7 @@ import { comboEligibility } from './combo_eligibility';
 import { isCommissionEligible } from './commission';
 import { isSignableMaterialRarity, type MaterialRarity } from './gathering';
 import { masterworkBonusStats, masterworkBumpedQuality, masterworkProcChance } from './masterwork';
+import { countAcrossGrades, materialGradeIds, planGradeRemoval } from './material_grades';
 import { materialTierBonusForReagents } from './material_tier';
 import { isStationActive } from './mobile_station';
 import { craftActionXp } from './profession_xp';
@@ -220,15 +221,32 @@ export function holdsSelfSignedInstance(
 }
 
 /** Whether `meta` holds an inventory slot for `itemId` carrying a signed
- *  instance stamped with `meta`'s OWN name (a self-gathered signed material). */
+ *  instance stamped with `meta`'s OWN name (a self-gathered signed material).
+ *  Spans the reagent's grades (professions/material_grades.ts) because the
+ *  consumption below does: a self-gathered FINE copper ore is what a
+ *  copper_ore reagent is about to be paid with, so it earns the same #1145
+ *  discount the plain grade would. Checking only the declared id would make
+ *  the perk quietly stop firing for exactly the players who out-tooled the
+ *  material. */
 function hasSelfSignedInstance(meta: PlayerMeta, itemId: string): boolean {
-  return holdsSelfSignedInstance(meta.inventory, meta.name, itemId);
+  return materialGradeIds(itemId).some((gradeId) =>
+    holdsSelfSignedInstance(meta.inventory, meta.name, gradeId),
+  );
 }
 
 /** Whether `meta` holds an inventory slot for `itemId` carrying a signed
  *  instance with ANY signer (the crafter's own name included). Feeds the
  *  masterwork proc's signed-reagent term (2026-07-17 ruling); the #1145
- *  quantity discount keeps using the self-only check above. */
+ *  quantity discount keeps using the self-only check above.
+ *
+ *  Deliberately NOT grade-spanning, unlike its sibling. The sibling widened
+ *  because a player who out-tooled a material would otherwise lose the #1145
+ *  discount FOR having the better tool, which inverts the whole point of the
+ *  fine grades, and `selfSignedBonusApplied` on CraftResult makes that
+ *  provable. This one only shifts masterwork proc odds, and no fixture in the
+ *  suite can observe that for a fine grade: no masterwork-capable recipe
+ *  consumes a material that has one. Widening it would be an unpinned
+ *  behavior change, so it stays on the declared id until a case can prove it. */
 function hasSignedInstance(meta: PlayerMeta, itemId: string): boolean {
   return meta.inventory.some((s) => s.itemId === itemId && !!s.instance?.signer);
 }
@@ -301,7 +319,10 @@ export function hasRecipeMaterials(
   const craftSkills = meta ? meta.craftSkills : {};
   return recipe.reagents.every(
     (r) =>
-      ctx.countItem(r.itemId, pid) >=
+      // Counted across the reagent's grades, in the same order the
+      // consumption below spends them, so the gate can never promise units the
+      // removal would not find.
+      countAcrossGrades(r.itemId, (id) => ctx.countItem(id, pid)) >=
       requiredReagentCount(meta, r, craftSkills, recipe.professionId).count,
   );
 }
@@ -449,7 +470,15 @@ export function resolveCraftForRecipe(
     const scratch = meta.inventory.map((s) => ({ ...s }));
     for (const reagent of recipe.reagents) {
       const required = requiredReagentCount(meta, reagent, craftSkills, recipe.professionId);
-      removeStacked(scratch, reagent.itemId, required.count);
+      // The SAME grade plan the real consumption applies below, computed from
+      // the scratch copy so a multi-reagent recipe sees earlier lines already
+      // taken. Modelling only the declared id would leave the gate reserving
+      // room against slots the craft never actually frees.
+      for (const take of planGradeRemoval(reagent.itemId, required.count, (id) =>
+        countStacked(scratch, id),
+      )) {
+        removeStacked(scratch, take.itemId, take.count);
+      }
     }
     // The grant shapes, mirroring the grant arms below field for field so the
     // modeled payloads merge exactly like the minted ones.
@@ -512,7 +541,11 @@ export function resolveCraftForRecipe(
     const required = requiredReagentCount(meta, reagent, craftSkills, recipe.professionId);
     if (required.selfSignedBonusApplied) selfSignedBonusApplied = true;
     if (meta && hasSignedInstance(meta, reagent.itemId)) signedReagentUsed = true;
-    ctx.removeItem(reagent.itemId, required.count, pid);
+    for (const take of planGradeRemoval(reagent.itemId, required.count, (id) =>
+      ctx.countItem(id, pid),
+    )) {
+      ctx.removeItem(take.itemId, take.count, pid);
+    }
   }
   // Masterwork proc draw: the single output-side rng draw, at the
   // exact position the retired quality roll occupied so the world's draw

@@ -23,11 +23,12 @@
 // render/ui/game/net/DOM/Three, no Math.random/Date.now), so it runs unchanged in
 // Node, the browser, and the headless RL env.
 
-import { bagCapacity, bagsFullError, countFit, removeStacked } from '../bags';
+import { bagCapacity, bagsFullError, countFit, countStacked, removeStacked } from '../bags';
 import { QUESTS, questRewardItemId } from '../data';
 import { formatMoney } from '../format_money';
 import type { ArchetypeState } from '../professions/archetype';
 import { armCadence, cadenceBlockedKeys } from '../professions/cadence';
+import { planGradeRemoval } from '../professions/material_grades';
 import { questFallbackGrants } from '../quest_fallback';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -287,7 +288,15 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
     for (const obj of quest.objectives) {
       if (obj.type === 'collect' && obj.itemId) {
         const index = quest.objectives.indexOf(obj);
-        removeStacked(scratch, obj.itemId, questObjectiveRequired(quest, qp, index));
+        // The same grade plan turnInQuestCore applies, against the scratch
+        // copy, so the room this gate frees is the room the hand-in frees.
+        for (const take of planGradeRemoval(
+          obj.itemId,
+          questObjectiveRequired(quest, qp, index),
+          (id) => countStacked(scratch, id),
+        )) {
+          removeStacked(scratch, take.itemId, take.count);
+        }
       }
     }
     if (countFit(scratch, bagCapacity(meta.bags), rewardItem, 1) < 1) {
@@ -316,7 +325,15 @@ export function turnInQuestCore(
   if (!applyProfessionQuestEffect(ctx, quest, qp, meta)) return false;
   for (const [index, obj] of quest.objectives.entries()) {
     if (obj.type === 'collect' && obj.itemId) {
-      ctx.removeItem(obj.itemId, questObjectiveRequired(quest, qp, index), meta.entityId);
+      // Base grade first, then the fine grade, so a player holding both hands
+      // over the plain ore and keeps the premium copies.
+      for (const take of planGradeRemoval(
+        obj.itemId,
+        questObjectiveRequired(quest, qp, index),
+        (id) => ctx.countItem(id, meta.entityId),
+      )) {
+        ctx.removeItem(take.itemId, take.count, meta.entityId);
+      }
     }
   }
   qp.state = 'done';

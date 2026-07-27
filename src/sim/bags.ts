@@ -211,6 +211,17 @@ export function addStacked(
   }
 }
 
+/** Units of `itemId` a scratch inventory holds, instanced slots included: the
+ *  read half of removeStacked below, for a capacity simulation that has to
+ *  decide HOW MUCH it can take from the scratch copy before taking it (the
+ *  grade-spanning craft consumption in professions/crafting.ts). Mirrors the
+ *  Sim hub's countItem, which sums the same slots. */
+export function countStacked(inventory: readonly InvSlot[], itemId: string): number {
+  let total = 0;
+  for (const s of inventory) if (s.itemId === itemId) total += s.count;
+  return total;
+}
+
 /** Stack-aware removal mirroring the Sim hub's removeItem walk (from the end,
  *  instanced slots included, exactly like removeItem), for capacity simulations
  *  on a scratch copy (e.g. "after handing in the collect items, does the quest
