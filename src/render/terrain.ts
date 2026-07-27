@@ -21,10 +21,12 @@ import { idleSlot } from './idle_queue';
 import { impactCraterTerrainBlend } from './impact_terrain';
 import {
   beginChunkGeometry,
+  type ChunkGeometryArrays,
   type ChunkGeometryBuildState,
   fillChunkIndexRow,
   fillChunkVertexRow,
 } from './terrain_chunk_build';
+import { terrainChunkPool } from './terrain_chunk_pool';
 import { chunkIntersectsRegion, normalTexelBounds } from './terrain_region_core';
 import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textures';
 
@@ -146,7 +148,7 @@ const NORMAL_TEX_STRENGTH = 1.35;
 // Ground colors per biome; boundaries blend across the same window as the
 // heightfield's shape blend. This is the tint layer the splat albedo
 // multiplies into (splat textures are authored near mid-gray).
-function finishChunkGeometry(state: ChunkGeometryBuildState): THREE.BufferGeometry {
+function finishChunkGeometry(state: ChunkGeometryArrays): THREE.BufferGeometry {
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(state.positions, 3));
   geo.setAttribute('normal', new THREE.BufferAttribute(state.normals, 3));
@@ -168,8 +170,9 @@ function buildChunkGeometry(
   seed: number,
   withSplat: boolean,
   skirtSpan: number,
+  lowShade: boolean,
 ): THREE.BufferGeometry {
-  const state = beginChunkGeometry(x0, z0, size, spacing, seed, withSplat, skirtSpan);
+  const state = beginChunkGeometry(x0, z0, size, spacing, seed, withSplat, skirtSpan, lowShade);
   for (let row = 0; row < state.gh; row++) fillChunkVertexRow(state, row);
   for (let row = 0; row < state.gh - 1; row++) fillChunkIndexRow(state, row);
   return finishChunkGeometry(state);
@@ -185,10 +188,11 @@ async function buildChunkGeometryIdle(
   seed: number,
   withSplat: boolean,
   skirtSpan: number,
+  lowShade: boolean,
   yieldSlice: () => Promise<void>,
   cancelled: () => boolean,
 ): Promise<THREE.BufferGeometry | null> {
-  const state = beginChunkGeometry(x0, z0, size, spacing, seed, withSplat, skirtSpan);
+  const state = beginChunkGeometry(x0, z0, size, spacing, seed, withSplat, skirtSpan, lowShade);
   const drainRows = async (rows: number, fill: (row: number) => void): Promise<boolean> => {
     let row = 0;
     while (row < rows) {
@@ -596,6 +600,9 @@ export interface TerrainView {
 
 export function buildTerrain(seed: number, priorityPoint?: { x: number; z: number }): TerrainView {
   const lowGfx = !GFX.terrainSplat || !hasTerrainSplatAssets();
+  // Resolved here, not inside the generator: gfx.ts reads document/navigator, so
+  // a worker running the same generator would resolve a different tier.
+  const lowShade = GFX.lowPlus && !GFX.terrainSplat;
   const brush = makeBrushUniforms();
   const normalTex = lowGfx ? null : terrainNormalTexture();
   const mat = normalTex ? buildSplatMaterial(normalTex, brush) : buildLambertMaterial(brush);
@@ -719,12 +726,47 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   };
   const addChunk = (x0: number, z0: number, size: number, spacing: number): void => {
     attachChunk(
-      buildChunkGeometry(x0, z0, size, spacing, seed, !lowGfx, skirtSpan),
+      buildChunkGeometry(x0, z0, size, spacing, seed, !lowGfx, skirtSpan, lowShade),
       x0,
       z0,
       size,
       spacing,
     );
+  };
+  // One pool per view, torn down with it. Null wherever module workers are
+  // unavailable (Vitest under Node, an old WebView, a blocked CSP), in which
+  // case every build below takes the main-thread path exactly as before.
+  let pool: ReturnType<typeof terrainChunkPool> | null | undefined;
+  const chunkPool = (): ReturnType<typeof terrainChunkPool> => {
+    if (pool === undefined) pool = terrainChunkPool();
+    return pool;
+  };
+  // A background chunk built OFF-THREAD. Generation is pure arithmetic, so the
+  // only reason the idle path yields constantly is to protect frames; with no
+  // frame to protect it runs flat out. Returns false only when the caller
+  // should fall back, never on cancellation, which the caller checks itself.
+  const addChunkInWorker = async (
+    x0: number,
+    z0: number,
+    size: number,
+    spacing: number,
+  ): Promise<boolean> => {
+    const active = chunkPool();
+    if (!active) return false;
+    const arrays = await active.build({
+      x0,
+      z0,
+      size,
+      spacing,
+      seed,
+      withSplat: !lowGfx,
+      skirtSpan,
+      lowShade,
+    });
+    if (!arrays) return false;
+    if (cancelled) return true; // discarded view: drop the result, do not attach
+    attachChunk(finishChunkGeometry(arrays), x0, z0, size, spacing);
+    return true;
   };
   const addChunkIdle = async (
     x0: number,
@@ -733,6 +775,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     spacing: number,
     yieldSlice: () => Promise<void>,
   ): Promise<boolean> => {
+    if (await addChunkInWorker(x0, z0, size, spacing)) return !cancelled;
     const geo = await buildChunkGeometryIdle(
       x0,
       z0,
@@ -741,6 +784,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       seed,
       !lowGfx,
       skirtSpan,
+      lowShade,
       yieldSlice,
       () => cancelled,
     );
@@ -923,6 +967,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     groundResidency: () => residency,
     cancelStreaming(): void {
       cancelled = true;
+      pool?.dispose();
     },
     update(camX: number, camZ: number, fogFar: number): void {
       // fully-fogged chunks are pure overdraw; drop them before the frustum
@@ -947,6 +992,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
           seed,
           !lowGfx,
           skirtSpan,
+          lowShade,
         );
         chunk.mesh.geometry.dispose();
         chunk.mesh.geometry = geo; // bounding box/sphere already computed by the build

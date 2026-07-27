@@ -35,7 +35,6 @@ import {
 import { fbm2 } from '../sim/rng';
 import type { BiomeId } from '../sim/types';
 import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
-import { GFX } from './gfx';
 import { impactCraterTerrainBlend } from './impact_terrain';
 
 const SKIRT_DROP = 0.3;
@@ -309,7 +308,7 @@ function lerpSplat(w: [number, number, number, number], layer: 0 | 1 | 2 | 3, t:
 
 // One terrain sample: height, analytic normal, legacy tint color and splat
 // weights. Both tiers use the color; only the splat tier consumes weights.
-function sampleVertex(x: number, z: number, seed: number): VertexSample {
+function sampleVertex(x: number, z: number, seed: number, lowShade: boolean): VertexSample {
   const h = terrainHeight(x, z, seed);
   const hx = terrainHeight(x + SLOPE_EPS, z, seed) - terrainHeight(x - SLOPE_EPS, z, seed);
   const hz = terrainHeight(x, z + SLOPE_EPS, seed) - terrainHeight(x, z - SLOPE_EPS, seed);
@@ -497,7 +496,7 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
   }
   // mud rides the dirt layer wherever the marsh palette is active
   const mud = marshWeightAt(x, z);
-  if (GFX.lowPlus && !GFX.terrainSplat) {
+  if (lowShade) {
     const ridge = clamp01((slope - 0.22) * 1.6);
     const lowland = clamp01((wl + 7 - h) / 12);
     const upland = clamp01((h - 8) / 22);
@@ -520,7 +519,22 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
 // vertices sit on the chunk border but 0.3u lower, hiding LOD cracks.
 // ---------------------------------------------------------------------------
 
-export interface ChunkGeometryBuildState {
+/**
+ * The generator's whole output: plain typed arrays and nothing else. This is
+ * the payload that crosses a worker boundary (every buffer is transferable),
+ * and it is all finishChunkGeometry needs to build a BufferGeometry.
+ */
+export interface ChunkGeometryArrays {
+  positions: Float32Array;
+  normals: Float32Array;
+  colors: Float32Array;
+  uvs: Float32Array;
+  splats: Float32Array | null;
+  extras: Float32Array | null;
+  indices: Uint32Array;
+}
+
+export interface ChunkGeometryBuildState extends ChunkGeometryArrays {
   nx: number;
   nz: number;
   gw: number;
@@ -532,13 +546,9 @@ export interface ChunkGeometryBuildState {
   seed: number;
   skirtSpan: number;
   worldDepth: number;
-  positions: Float32Array;
-  normals: Float32Array;
-  colors: Float32Array;
-  uvs: Float32Array;
-  splats: Float32Array | null;
-  extras: Float32Array | null;
-  indices: Uint32Array;
+  /** GFX.lowPlus && !GFX.terrainSplat, resolved by the CALLER: gfx.ts reads
+   *  document/navigator, so a worker would resolve a different tier. */
+  lowShade: boolean;
   sampleCache: Map<number, VertexSample>;
 }
 
@@ -550,6 +560,7 @@ export function beginChunkGeometry(
   seed: number,
   withSplat: boolean,
   skirtSpan: number,
+  lowShade: boolean,
 ): ChunkGeometryBuildState {
   const nx = Math.max(4, Math.round(size / spacing));
   const nz = nx;
@@ -580,6 +591,7 @@ export function beginChunkGeometry(
     seed,
     skirtSpan,
     worldDepth: WORLD_MAX_Z - WORLD_MIN_Z,
+    lowShade,
     positions,
     normals,
     colors,
@@ -592,7 +604,7 @@ export function beginChunkGeometry(
 }
 
 export function fillChunkVertexRow(state: ChunkGeometryBuildState, gj: number): void {
-  const { nx, nz, gw, x0, z0, stepX, stepZ, seed, skirtSpan, worldDepth } = state;
+  const { nx, nz, gw, x0, z0, stepX, stepZ, seed, skirtSpan, worldDepth, lowShade } = state;
   for (let gi = 0; gi < gw; gi++) {
     const i = gi - 1,
       j = gj - 1; // interior indices; -1 / n+1 are skirt
@@ -605,7 +617,7 @@ export function fillChunkVertexRow(state: ChunkGeometryBuildState, gj: number): 
     const cacheKey = cj * gw + ci;
     let s = state.sampleCache.get(cacheKey);
     if (!s) {
-      s = sampleVertex(x, z, seed);
+      s = sampleVertex(x, z, seed, lowShade);
       state.sampleCache.set(cacheKey, s);
     }
     const vi = gj * gw + gi;
