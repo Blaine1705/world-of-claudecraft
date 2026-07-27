@@ -272,6 +272,87 @@ beforeEach(() => {
   document.body.innerHTML = '';
 });
 
+describe('the DOM watcher records every channel it claims', () => {
+  // A SELF-AUDIT, and it is not ceremony. Every assertion in this file that matters is
+  // "this channel stayed EMPTY", and a count of zero cannot notice a watcher arm that
+  // records nothing: an arm the window never exercises today (querySelectorAll, className,
+  // removeAttribute, a style write) would ship dead and take the very regression it exists
+  // for with it. So each arm gets a fixture here, exercised directly, and the mutation that
+  // guts it fails HERE rather than nowhere.
+  it('records every write, read and lookup arm, on a fixture per arm', () => {
+    const watch = watchDom();
+    const el = document.createElement('div');
+    const btn = document.createElement('button');
+    el.appendChild(btn);
+    document.body.appendChild(el);
+
+    el.setAttribute('data-x', '1');
+    el.removeAttribute('data-x');
+    el.classList.add('a');
+    el.classList.remove('a');
+    el.classList.toggle('b', true);
+    el.textContent = 'text';
+    el.innerHTML = '<span></span>';
+    el.className = 'cls';
+    btn.disabled = true;
+    el.style.display = 'block';
+
+    void el.getAttribute('data-x');
+    void btn.disabled;
+
+    void el.querySelector('span');
+    void el.querySelectorAll('span');
+    void document.querySelector('div');
+    void document.querySelectorAll('div');
+    void document.getElementById('nope');
+    watch.stop();
+
+    expect(watch.writes).toEqual([
+      'setAttribute(data-x)',
+      'removeAttribute(data-x)',
+      'add(a)',
+      'remove(a)',
+      'toggle(b)',
+      'textContent',
+      'innerHTML',
+      'className',
+      'disabled',
+      'style.display',
+    ]);
+    // The `disabled` write above also goes through its getter internally in jsdom, so the
+    // read channel is asserted by membership rather than by an exact sequence.
+    expect(watch.reads).toContain('getAttribute(data-x)');
+    expect(watch.reads).toContain('disabled');
+    expect(watch.queries).toEqual([
+      'querySelector(span)',
+      'querySelectorAll(span)',
+      'querySelector(div)',
+      'querySelectorAll(div)',
+      'getElementById(nope)',
+    ]);
+  });
+
+  it('puts every prototype back, so the spies cannot leak into another test', () => {
+    const before = {
+      setAttribute: Element.prototype.setAttribute,
+      querySelectorAll: Element.prototype.querySelectorAll,
+      getAttribute: Element.prototype.getAttribute,
+      textContent: Object.getOwnPropertyDescriptor(Node.prototype, 'textContent'),
+      style: Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'style'),
+    };
+    const watch = watchDom();
+    expect(Element.prototype.setAttribute).not.toBe(before.setAttribute);
+    watch.stop();
+    expect(Element.prototype.setAttribute).toBe(before.setAttribute);
+    expect(Element.prototype.querySelectorAll).toBe(before.querySelectorAll);
+    expect(Element.prototype.getAttribute).toBe(before.getAttribute);
+    expect(Object.getOwnPropertyDescriptor(Node.prototype, 'textContent')).toEqual(
+      before.textContent,
+    );
+    expect(Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'style')).toEqual(before.style);
+  });
+});
+
 describe('spellbook per-frame tick: an unchanged frame costs nothing', () => {
   it('makes no DOM query, no DOM read and no DOM write across repeated identical frames', () => {
     const h = harness();
