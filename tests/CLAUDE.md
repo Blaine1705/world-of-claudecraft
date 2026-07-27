@@ -34,7 +34,7 @@ Subdirectories (plus one shared fixture):
   hand-rolled fake DOM for controller suites, `i18n_determinism.ts`, `ts_files_under.ts`
   and `css_tree_under.ts`, the two source walks, `scan_guard_self_audit.ts`, the pin that
   keeps a guard from re-growing its own directory read, `method_call_sites.ts`, the
-  `ts.createSourceFile` walk that reports a class method's statement-position calls with the
+  `ts.createSourceFile` walk that reports the calls a class method evaluates, each with the
   `if` chain guarding each, `alloc_probe.ts`).
 - `global_setup.ts`: runs on every vitest invocation (`vite.config.ts` `test.globalSetup`);
   mints the SFX Studio temp root (`WOC_SFX_STUDIO_TEST_ROOT`).
@@ -121,7 +121,7 @@ use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
   window is cold, which this tree contradicts, but because a COUNT cannot tell a build-time
   write from a repeated one; see the bucket 3 comment for the cadences involved.
 - `hud_update_drive.test.ts` answers the cadence question that gate refuses to: one
-  hand-written row per call `Hud.update()` makes, carrying its band
+  hand-written row per call `Hud.update()` evaluates, carrying its band
   (`frame`/`fast`/`medium`/`slow`), the exact condition text gating it, what it repaints, and
   for a window the source line its invalidation guard is spelled on. Diffed BOTH ways against
   a `ts.createSourceFile` walk (`helpers/method_call_sites.ts`), so adding, deleting,

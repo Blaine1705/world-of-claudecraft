@@ -1,9 +1,8 @@
 import ts from 'typescript';
 
-// The statement-level call walk a coordinator gate needs: given one TypeScript source
-// and the name of a method on a class inside it, return every call that method makes AT
-// STATEMENT POSITION, each tagged with the chain of `if` conditions that must hold for
-// it to run.
+// The call walk a coordinator gate needs: given one TypeScript source and the name of a
+// method on a class inside it, return every call that method EVALUATES DIRECTLY, each
+// tagged with the chain of conditions that must hold for it to run.
 //
 // It exists because #2498 asked a question no per-file source scan can answer: which
 // windows does `Hud.update()` actually drive, and how often? The cadence is not a
@@ -13,15 +12,20 @@ import ts from 'typescript';
 // the `if (mediumHud)` wrapping it, and it also finds the identical call inside
 // `openArena()`, which is an event handler and not a poll at all.
 //
-// THE UNIT IS A STATEMENT, NOT A LINE. Three distinctions carry the whole gate:
-//   - STATEMENT POSITION. `this.actionBarPainter.paint(this.actionBarView.tick(...))`
-//     is ONE drive, not two: the inner `tick` is an argument the painter consumes. A
-//     call inside a callback (`setTimeout(() => this.foo(), 8000)`) is not a drive of
-//     `update()` at all, it is a one-shot the callback owns, so the walk descends into
-//     statement containers and never into a function body.
+// THE UNIT IS AN EVALUATED EXPRESSION, NOT A LINE. Three distinctions carry the gate:
+//   - WHAT THE STATEMENT EVALUATES, which is narrower than "every call in the method"
+//     and wider than "the statement head". `this.painter.paint(this.view.tick(...))` is
+//     ONE drive, not two: the inner `tick` is an argument the painter consumes. A call
+//     inside a callback (`setTimeout(() => this.foo(), 8000)`) is not a drive of
+//     `update()` at all, it is a one-shot the callback owns. But `const music =
+//     this.instanceMusic.update({...})` IS a drive, and the head-only version of this
+//     walk missed it, along with the `this.lastFoo = this.someWindow.render()` shape a
+//     repaint uses to sneak past a registry. See `visitExpression` for where the line
+//     falls and why a value slot admits only a call on `this`.
 //   - THE CONDITION CHAIN, outermost first. `mediumHud` alone is the band; the
 //     `$('#arena-window').style.display === 'block'` nested inside it is the gate. The
-//     gate is the interesting half, and dropping either one loses the meaning.
+//     gate is the interesting half, and dropping either one loses the meaning. `&&`,
+//     `||`, `??` and a ternary contribute their test the same way an `if` does.
 //   - THE `else` ARM, recorded as `!(cond)`. `update()` paints the target frame in the
 //     consequent and hides it in the alternate; a walk that merged the two would claim
 //     the frame is painted unconditionally.
@@ -131,13 +135,6 @@ function calleeChain(expr: ts.Expression, sf: ts.SourceFile): string | null {
   return null;
 }
 
-/** Unwrap the wrappers that can sit between a statement and the call it makes. */
-function callOf(expr: ts.Expression): ts.CallExpression | null {
-  if (ts.isCallExpression(expr)) return expr;
-  if (ts.isAwaitExpression(expr) || ts.isVoidExpression(expr)) return callOf(expr.expression);
-  return null;
-}
-
 interface Walk {
   readonly sf: ts.SourceFile;
   readonly out: CallSite[];
@@ -147,13 +144,119 @@ function lineOf(w: Walk, node: ts.Node): number {
   return w.sf.getLineAndCharacterOfPosition(node.getStart(w.sf)).line + 1;
 }
 
+/** The assignment operators, whose LEFT side is a write target rather than a call. */
+const ASSIGNMENT_OPS = new Set<ts.SyntaxKind>([
+  ts.SyntaxKind.EqualsToken,
+  ts.SyntaxKind.PlusEqualsToken,
+  ts.SyntaxKind.MinusEqualsToken,
+  ts.SyntaxKind.AsteriskEqualsToken,
+  ts.SyntaxKind.SlashEqualsToken,
+  ts.SyntaxKind.PercentEqualsToken,
+  ts.SyntaxKind.AmpersandAmpersandEqualsToken,
+  ts.SyntaxKind.BarBarEqualsToken,
+  ts.SyntaxKind.QuestionQuestionEqualsToken,
+]);
+
+/**
+ * Whether the expression IS the statement's purpose (`effect`) or produces a value the
+ * statement then stores (`value`): a declaration's initializer, an assignment's right side,
+ * a `return`/`throw` operand.
+ */
+type Slot = 'effect' | 'value';
+
+/**
+ * Visit one expression the statement evaluates, carrying the conditions guarding it.
+ *
+ * WHERE THE LINE IS, because "record every call in the method" and "record only the
+ * statement head" are both wrong.
+ *
+ * The walk follows the operators that decide WHETHER a call runs: `&&`, `||`, `??` and a
+ * ternary each contribute their test to the condition chain, exactly as an enclosing `if`
+ * does. It does NOT follow into a call's ARGUMENTS (`painter.paint(view.tick(x))` is one
+ * drive, not two: the tick produces the paint's input), nor into an operand of a comparison
+ * or arithmetic, nor into a function or arrow body (a different cadence with a different
+ * owner), nor into a control-flow HEADER. That last one is not a gap: an `if` or loop
+ * condition is already pinned verbatim in the condition chain of everything it guards, so
+ * recording it again would double-count it.
+ *
+ * IN A `value` SLOT ONLY A CALL ON `this` IS RECORDED, and the asymmetry is the point. A
+ * statement whose whole purpose is a call is a side effect whatever its callee, so it is
+ * recorded. A value slot is different: `const bar = xpBarView({...})` and `const zone =
+ * zoneAt(p.pos.z)` are pure producers, the same shape as the arguments this walk already
+ * declines, and registering them would bury the question the registry exists to answer under
+ * two dozen rows of formatters. `this.<anything>()` in that same slot is the coordinator
+ * doing something, which is exactly the question: `const music =
+ * this.instanceMusic.update({...})` is a real drive that a head-only walk missed, and
+ * `this.lastFoo = this.someWindow.render()` is how a repaint sneaks past one.
+ */
+function visitExpression(
+  w: Walk,
+  expr: ts.Expression,
+  conditions: readonly string[],
+  slot: Slot,
+): void {
+  if (
+    ts.isParenthesizedExpression(expr) ||
+    ts.isAwaitExpression(expr) ||
+    ts.isVoidExpression(expr) ||
+    ts.isNonNullExpression(expr) ||
+    ts.isAsExpression(expr) ||
+    ts.isSatisfiesExpression(expr)
+  ) {
+    visitExpression(w, expr.expression, conditions, slot);
+    return;
+  }
+  if (ts.isBinaryExpression(expr)) {
+    const op = expr.operatorToken.kind;
+    if (ASSIGNMENT_OPS.has(op)) {
+      visitExpression(w, expr.right, conditions, 'value');
+      return;
+    }
+    if (op === ts.SyntaxKind.CommaToken) {
+      visitExpression(w, expr.left, conditions, slot);
+      visitExpression(w, expr.right, conditions, slot);
+      return;
+    }
+    const test = normalizeCondition(expr.left.getText(w.sf));
+    if (op === ts.SyntaxKind.AmpersandAmpersandToken) {
+      visitExpression(w, expr.left, conditions, slot);
+      visitExpression(w, expr.right, [...conditions, test], slot);
+      return;
+    }
+    if (op === ts.SyntaxKind.BarBarToken) {
+      visitExpression(w, expr.left, conditions, slot);
+      visitExpression(w, expr.right, [...conditions, `!(${test})`], slot);
+      return;
+    }
+    if (op === ts.SyntaxKind.QuestionQuestionToken) {
+      visitExpression(w, expr.left, conditions, slot);
+      visitExpression(w, expr.right, [...conditions, `${test} == null`], slot);
+      return;
+    }
+    return;
+  }
+  if (ts.isConditionalExpression(expr)) {
+    const test = normalizeCondition(expr.condition.getText(w.sf));
+    visitExpression(w, expr.condition, conditions, 'value');
+    visitExpression(w, expr.whenTrue, [...conditions, test], slot);
+    visitExpression(w, expr.whenFalse, [...conditions, `!(${test})`], slot);
+    return;
+  }
+  if (!ts.isCallExpression(expr)) return;
+  const chain = calleeChain(expr.expression, w.sf);
+  if (chain === null) return;
+  if (slot === 'value' && chain !== 'this' && !chain.startsWith('this.')) return;
+  w.out.push({ call: chain, line: lineOf(w, expr), conditions: [...conditions] });
+}
+
 /**
  * Visit ONE statement, carrying the conditions that guard it.
  *
- * Descends only through STATEMENT containers. A function or arrow body reached from an
- * expression is a different cadence with a different owner, so it is deliberately out
- * of reach here; a module that arms its own repeating driver is the painter gate's
- * business (`FRAME_DRIVERS` in `tests/hud_perf_budget.test.ts`), not this walk's.
+ * Descends only through STATEMENT containers, then hands each value slot to
+ * {@link visitExpression}. A function or arrow body reached from an expression is a
+ * different cadence with a different owner, so it is deliberately out of reach here; a
+ * module that arms its own repeating driver is the painter gate's business
+ * (`FRAME_DRIVERS` in `tests/hud_perf_budget.test.ts`), not this walk's.
  */
 function visitStatement(w: Walk, stmt: ts.Statement, conditions: readonly string[]): void {
   if (ts.isBlock(stmt)) {
@@ -190,11 +293,17 @@ function visitStatement(w: Walk, stmt: ts.Statement, conditions: readonly string
     return;
   }
   if (ts.isExpressionStatement(stmt)) {
-    const call = callOf(stmt.expression);
-    if (!call) return;
-    const chain = calleeChain(call.expression, w.sf);
-    if (chain === null) return;
-    w.out.push({ call: chain, line: lineOf(w, stmt), conditions: [...conditions] });
+    visitExpression(w, stmt.expression, conditions, 'effect');
+    return;
+  }
+  if (ts.isVariableStatement(stmt)) {
+    for (const decl of stmt.declarationList.declarations) {
+      if (decl.initializer) visitExpression(w, decl.initializer, conditions, 'value');
+    }
+    return;
+  }
+  if ((ts.isReturnStatement(stmt) || ts.isThrowStatement(stmt)) && stmt.expression) {
+    visitExpression(w, stmt.expression, conditions, 'value');
   }
 }
 

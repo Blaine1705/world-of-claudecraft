@@ -29,7 +29,7 @@ const sitesIn = (body: string) => readMethodCallSites('w.ts', wrap(body), 'Widge
 const ARM_FIXTURES: ReadonlyArray<readonly [string, string, string[]]> = [
   ['isClassDeclaration', 'this.a();', ['this.a']],
   ['isMethodDeclaration', 'this.a();', ['this.a']],
-  ['isExpressionStatement', 'this.a();\nconst x = this.notAStatementHead();', ['this.a']],
+  ['isExpressionStatement', 'this.a();\nfreeFn();', ['this.a', 'freeFn']],
   ['isBlock', '{\n  this.a();\n}', ['this.a']],
   ['isIfStatement', 'if (open) this.a();', ['this.a']],
   ['isForStatement', 'for (let i = 0; i < 3; i++) this.a();', ['this.a']],
@@ -48,6 +48,11 @@ const ARM_FIXTURES: ReadonlyArray<readonly [string, string, string[]]> = [
     'switch (k) {\n  case 1:\n    this.a();\n    break;\n  default:\n    this.b();\n}',
     ['this.a', 'this.b'],
   ],
+  ['isVariableStatement', 'const v = this.build();', ['this.build']],
+  ['isReturnStatement', 'return this.build();', ['this.build']],
+  ['isThrowStatement', 'throw this.buildError();', ['this.buildError']],
+  ['isBinaryExpression', 'this.last = this.marker.mark(x);', ['this.marker.mark']],
+  ['isConditionalExpression', 'const v = ok ? this.a() : this.b();', ['this.a', 'this.b']],
   ['isIdentifier', 'freeFunction();', ['freeFunction']],
   ['isPropertyAccessExpression', 'this.win.render();', ['this.win.render']],
   ['isElementAccessExpression', "this.rows['first'].paint();", ['this.rows[].paint']],
@@ -60,6 +65,8 @@ const ARM_FIXTURES: ReadonlyArray<readonly [string, string, string[]]> = [
   ['isParenthesizedExpression', '(this.win).render();', ['this.win.render']],
   ['isAwaitExpression', 'await this.save();', ['this.save']],
   ['isVoidExpression', 'void this.probe();', ['this.probe']],
+  ['isAsExpression', 'const v = this.build() as string;', ['this.build']],
+  ['isSatisfiesExpression', 'const v = this.build() satisfies string;', ['this.build']],
   // Not a `ts.is*` call in the helper (the root is matched on SyntaxKind), so it is listed
   // in ROOT_ARMS below and pinned the same way.
   ['ThisKeyword', 'this.a();', ['this.a']],
@@ -85,16 +92,10 @@ describe('readMethodCallSites: statement position', () => {
     expect(callsIn('list.forEach(function (e) {\n  this.paint(e);\n});')).toEqual(['list.forEach']);
   });
 
-  it('ignores a statement whose head is not a call', () => {
+  it('ignores a statement that evaluates no call', () => {
     expect(
       callsIn(
-        [
-          'this.lastZone = zone.id;',
-          "this.el.innerHTML = '';",
-          'const v = this.build();',
-          'let n = 1;',
-          'return;',
-        ].join('\n'),
+        ['this.lastZone = zone.id;', "this.el.innerHTML = '';", 'let n = 1;', 'return;'].join('\n'),
       ),
     ).toEqual([]);
   });
@@ -117,6 +118,67 @@ describe('readMethodCallSites: statement position', () => {
     const [only] = readMethodCallSites('w.ts', src, 'Widget', 'update').sites;
     expect(only.line).toBe(4);
     expect(src.split('\n')[only.line - 1]).toContain('this.a();');
+  });
+});
+
+describe('readMethodCallSites: value slots', () => {
+  it('records a call the statement stores, not only one it makes for effect', () => {
+    // The hole that shipped in the first cut of this walk: `const musicState =
+    // this.instanceMusic.update({...})` in Hud.update() is a real drive, and a head-only
+    // walk saw nothing. So is `this.lastFoo = this.someWindow.render()`, which is how a
+    // repaint sneaks past a registry that only reads statement heads.
+    expect(callsIn('const music = this.music.update({ now: 1 });')).toEqual(['this.music.update']);
+    expect(callsIn('this.lastText = this.marker.mark(text);')).toEqual(['this.marker.mark']);
+    expect(callsIn('return this.win.render();')).toEqual(['this.win.render']);
+  });
+
+  it('records ONLY a call on `this` in a value slot', () => {
+    // A bare producer in a value slot is the same shape as an argument, which this walk
+    // already declines: registering `xpBarView({...})` and `zoneAt(z)` would bury the
+    // question the registry exists to answer under two dozen rows of formatters. A call on
+    // `this` in that same slot is the coordinator doing something, which IS the question.
+    expect(callsIn('const bar = xpBarView({ level: 1 });')).toEqual([]);
+    expect(callsIn('const zone = zoneAt(p.pos.z);')).toEqual([]);
+    expect(callsIn('const e = sim.entities.get(id);')).toEqual([]);
+    expect(callsIn('const t = this.fxTier();')).toEqual(['this.fxTier']);
+    // ...but a statement whose whole purpose IS the call is a side effect whatever its
+    // callee, so the effect slot keeps the wider rule.
+    expect(callsIn("document.body.classList.toggle('x', on);")).toEqual([
+      'document.body.classList.toggle',
+    ]);
+  });
+
+  it('adds a short-circuit or ternary test to the condition chain', () => {
+    // `&&` / `||` / `??` / `?:` decide WHETHER the call runs, exactly as an enclosing `if`
+    // does, so they belong in the chain rather than being flattened away. Without this,
+    // `open && this.win.render()` would register as an unconditional per-frame repaint.
+    expect(sitesIn('open && this.win.render();')[0].conditions).toEqual(['open']);
+    expect(sitesIn('cached || this.win.render();')[0].conditions).toEqual(['!(cached)']);
+    expect(sitesIn('const v = cached ?? this.win.render();')[0].conditions).toEqual([
+      'cached == null',
+    ]);
+    expect(sitesIn('if (slowHud) open && this.win.render();')[0].conditions).toEqual([
+      'slowHud',
+      'open',
+    ]);
+    const both = sitesIn('ok ? this.a() : this.b();');
+    expect(both.map((s) => [s.call, s.conditions])).toEqual([
+      ['this.a', ['ok']],
+      ['this.b', ['!(ok)']],
+    ]);
+  });
+
+  it('does not follow a call argument, a comparison operand, or a loop header', () => {
+    expect(callsIn('this.painter.paint(this.view.tick(x));')).toEqual(['this.painter.paint']);
+    expect(callsIn('const changed = this.sigOf(a) !== this.last;')).toEqual([]);
+    expect(callsIn('for (const e of this.sim.entities.values()) this.paint(e);')).toEqual([
+      'this.paint',
+    ]);
+    // An `if` header is not a gap: it is already pinned verbatim in the condition chain of
+    // everything it guards, so recording it again would double-count it.
+    expect(sitesIn('if (this.isOpen()) this.win.render();')).toEqual([
+      { call: 'this.win.render', line: 3, conditions: ['this.isOpen()'] },
+    ]);
   });
 });
 
@@ -274,7 +336,13 @@ describe('the fixture list covers every walker arm', () => {
       fileURLToPath(new URL('./method_call_sites.ts', import.meta.url)),
       'utf8',
     );
-    const guards = [...helper.matchAll(/ts\.is([A-Za-z]+)\(/g)].map((m) => `is${m[1]}`);
+    // Comments stripped FIRST: a doc comment that names a guard the walker deliberately
+    // does NOT call would otherwise demand a fixture for an arm that does not exist, and a
+    // guard mentioned only in prose would satisfy the pin with no arm behind it. This repo
+    // has shipped the un-stripped version of that pin before (#2499).
+    const guards = [...normalizeCondition(helper).matchAll(/ts\.is([A-Za-z]+)\(/g)].map(
+      (m) => `is${m[1]}`,
+    );
     expect(
       guards.length,
       'the walker stopped using ts.is* guards: re-derive this pin',

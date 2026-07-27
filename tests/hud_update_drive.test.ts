@@ -25,9 +25,9 @@
 // windows would repeat the mistake #2497 refused to ship (a declaration naming a handful of
 // windows when half the family qualifies reads as a complete classification and is not one),
 // and it would hand a new repaint a free way out: name it `syncFoo()` and it is not a window.
-// Every statement-position call is registered; the `surface` field is what answers the window
-// question. The cost is real and is the point: a new line in `update()` is now a diff line
-// here too.
+// Every call `update()` evaluates is registered; the `surface` field is what answers the
+// window question. The cost is real and is the point: a new line in `update()` is now a diff
+// line here too.
 //
 // WHERE ITS TEETH STOP, stated rather than implied:
 //   - It sees `update()`'s OWN body. A repaint two hops down a `Hud` private method is named
@@ -35,6 +35,12 @@
 //     but the walk does not follow it, so a NEW repaint added inside an ALREADY-registered
 //     method is invisible here. The `surface` and `guard` fields are what a reviewer reads;
 //     the diff is what a machine enforces.
+//   - In a VALUE slot (a declaration's initializer, an assignment's right side, a `return`)
+//     only a call on `this` is registered, so `const bar = xpBarView({...})` is not a row
+//     while `const music = this.instanceMusic.update({...})` is. A repaint written as a call
+//     on a LOCAL in a value slot would escape; the whole registry is about what the
+//     coordinator drives, and registering every pure producer would bury that under two
+//     dozen rows of formatters. `helpers/method_call_sites.ts` states the full rule.
 //   - A `guard` proof is a source-text pin. It fails when the guard is DELETED, which is the
 //     criterion #2498 asked for, and it cannot tell a guard that was neutered while its field
 //     survived. The instrument for THAT is behavioral (render, poll unchanged, assert zero
@@ -176,6 +182,13 @@ const VIEW_SIG_BLOCK = 'if (view.sig !== this.lastSig) {';
  */
 const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
+    call: 'this.fxTier',
+    band: 'frame',
+    gate: '',
+    surface: 'none',
+    why: 'reads the STATIC graphics-preset stamp that tiers several cadences below it; no DOM write',
+  },
+  {
     call: 'this.reconcileSfx',
     band: 'fast',
     gate: '',
@@ -296,6 +309,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the unspent-talent-points glow on the desktop and mobile talent buttons',
   },
   {
+    call: 'this.isInTown',
+    band: 'slow',
+    gate: '',
+    surface: 'none',
+    why: 'the zone read behind the Town Focus button and the open panel gate; no DOM write',
+  },
+  {
     call: 'this.renderTownFocus',
     band: 'slow',
     gate: 'this.townFocusOpen',
@@ -388,6 +408,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: 'cadenceDue(this.lastBuffBarPaintAt, now, auraRefreshIntervalMs(fxTier))',
     surface: 'chrome',
     why: 'the debuff row, on the same latch as the buff row',
+  },
+  {
+    call: 'this.targetReannounce.mark',
+    band: 'frame',
+    gate: "target && target.kind !== 'object' && target.id !== this.lastAnnouncedTargetId",
+    surface: 'chrome',
+    why: 'marks the target-name announcement so a same-named re-target still re-reads; its result is written straight to the target live region, deliberately NOT through the elided writer, and the id gate makes that an event write rather than a per-frame one',
   },
   {
     call: 'this.targetFramePainter.paint',
@@ -668,6 +695,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: 'subzone !== this.lastSubzone && subzone',
     surface: 'chrome',
     why: 'the subzone banner on a landmark crossing',
+  },
+  {
+    call: 'this.instanceMusic.update',
+    band: 'medium',
+    gate: '',
+    surface: 'none',
+    why: 'the zone/combat/boss music state machine, and the source of the inCombat and atSowfield reads under it; audio only',
   },
   {
     call: 'this.toggleClass',
@@ -1155,9 +1189,17 @@ function guardProblems(
     if (!guard || (guard.kind !== 'module' && guard.kind !== 'hud')) continue;
     const module = guard.kind === 'hud' ? 'hud.ts' : guard.module;
     checked.push(`${module}: ${guard.proof}`);
-    if (!normalizeCondition(read(module)).includes(normalizeCondition(guard.proof))) {
+    // Counted, not merely present. Every proof is unique in its module today, which is what
+    // makes deleting the guard fail this; the day a second copy appears somewhere else in the
+    // file, "contains it" would stay true with the real one gone and the pin would weaken
+    // with no diff to notice. An exact count turns that into a loud failure whose fix is to
+    // choose a proof line that is still unique.
+    const hits = normalizeCondition(read(module)).split(normalizeCondition(guard.proof)).length - 1;
+    if (hits !== 1) {
       problems.push(
-        `${row.call}: ${module} no longer contains its invalidation guard \`${guard.proof}\``,
+        hits === 0
+          ? `${row.call}: ${module} no longer contains its invalidation guard \`${guard.proof}\``
+          : `${row.call}: ${module} contains \`${guard.proof}\` ${hits}x, so the pin no longer identifies one guard`,
       );
     }
   }
@@ -1245,7 +1287,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 37, chrome: 67, none: 9 });
+    ).toEqual({ window: 37, chrome: 68, none: 12 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.renderTownFocus');

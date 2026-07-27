@@ -88,7 +88,7 @@ Per-frame HUD code (anything reached from `Hud.update()`) holds these:
   it repaints on the open check alone, which is the standing proof that the signature guard is
   a convention rather than something enforced.
   **WHICH windows those are is now a registry**, not folklore: `tests/hud_update_drive.test.ts`
-  holds a row per call `Hud.update()` makes, with its cadence band, the exact condition text
+  holds a row per call `Hud.update()` EVALUATES, with its cadence band, the exact condition text
   gating it, what it repaints, and (for a window) the source line its invalidation guard is
   spelled on, diffed BOTH ways against a TypeScript AST walk of the real method. Adding,
   removing, re-banding or re-gating a call in `update()` fails it, and so does deleting a

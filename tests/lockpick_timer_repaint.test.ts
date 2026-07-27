@@ -35,7 +35,7 @@ const VIEW: LockpickView = {
   tries: 2,
   triesTotal: 2,
   lootTier: 'premium',
-  allowed: ['set', 'up', 'down'],
+  allowed: ['set', 'steady', 'ease'],
   visible: [],
   stepTimeoutMs: 15000,
 };
@@ -79,13 +79,39 @@ describe('lockpick countdown repaint', () => {
   it('paints the bar without re-querying the panel on every tick', () => {
     const h = harness();
     h.win.openBoard();
-    const spy = vi.spyOn(h.panel, 'querySelector');
+    // All three resolvers, not just the injected panel's: `panel()` itself falls back to
+    // `document.getElementById`, so an instance-scoped spy alone would miss a regression
+    // that re-queried through the document instead.
+    const spies = [
+      vi.spyOn(h.panel, 'querySelector'),
+      vi.spyOn(document, 'querySelector'),
+      vi.spyOn(document, 'getElementById'),
+    ];
     tick(5);
-    // The three walks per tick this fix removes. The refs come from the board paint, so a
-    // steady-state tick resolves nothing at all.
-    expect(spy).not.toHaveBeenCalled();
+    for (const spy of spies) expect(spy).not.toHaveBeenCalled();
     expect(h.bar()?.style.width).not.toBe('');
-    spy.mockRestore();
+    for (const spy of spies) spy.mockRestore();
+  });
+
+  it('re-applies the urgent class after a rebuild that happens WHILE urgent', () => {
+    // The two arms of the latch only meet here: the rebuild case above happens at 13s
+    // (never urgent) and the latch case below never rebuilds, so neither notices if
+    // cacheTimerEls stops resetting lastUrgent. It would then stay true against fresh
+    // markup that carries no urgent class, and the player loses the cue for the rest of
+    // the attempt.
+    const h = harness();
+    h.win.openBoard();
+    tick(130); // past the 3s threshold
+    expect(h.wrap()?.classList.contains('lp-timer-urgent')).toBe(true);
+
+    h.set({ ...VIEW, row: 3 });
+    h.win.repaintIfChanged();
+    expect(h.wrap()?.classList.contains('lp-timer-urgent'), 'fresh markup starts clean').toBe(
+      false,
+    );
+
+    tick(1);
+    expect(h.wrap()?.classList.contains('lp-timer-urgent')).toBe(true);
   });
 
   it('keeps painting the LIVE nodes after a rebuild that does not restart the clock', () => {
@@ -132,25 +158,44 @@ describe('lockpick countdown repaint', () => {
     toggle.mockRestore();
   });
 
-  it('drops its refs when the ante selector replaces the board, and when the panel closes', () => {
+  it('stops writing the detached nodes when the ante selector replaces the board', () => {
+    // Asserted as "the stale node stops moving", not as "nothing throws": writing into a
+    // detached subtree throws nothing at all, so the no-throw version of this passes with
+    // forgetTimerEls() deleted. renderAnte deliberately does NOT stop the interval, which
+    // is what makes this reachable.
     const h = harness();
     h.win.openBoard();
-    expect(h.bar()).not.toBeNull();
+    const stale = h.bar() as HTMLElement;
+    tick(20);
+    const frozen = stale.style.width;
+    expect(frozen).not.toBe('100%');
 
     h.win.renderAnte(1, false);
     expect(h.bar(), 'the ante markup carries no countdown').toBeNull();
-    // The interval is still armed here (renderAnte does not stop it), so a tick must be a
-    // no-op rather than a throw on a ref into the replaced subtree.
-    expect(() => tick(5)).not.toThrow();
+    tick(20);
+    expect(stale.style.width, 'the replaced node must stop being painted').toBe(frozen);
+  });
 
-    h.win.close();
-    expect(() => tick(5)).not.toThrow();
+  it('drops its refs when the board repaints with no authoritative state left', () => {
+    // renderBoard's one exit that does not touch the subtree: state went null, so it calls
+    // deps.onClose() and returns. The module drops the refs there itself rather than relying
+    // on the caller routing that back into close().
+    const h = harness();
+    h.win.openBoard();
+    const stale = h.bar() as HTMLElement;
+    tick(20);
+    const frozen = stale.style.width;
+
+    h.set(null);
+    h.win.onStep('advanced');
+    tick(20);
+    expect(stale.style.width).toBe(frozen);
   });
 
   it('paints nothing when the board carries no per-step budget', () => {
     const h = harness({ ...VIEW, stepTimeoutMs: null });
     h.win.openBoard();
-    expect(h.wrap()).toBeNull();
+    expect(h.wrap(), 'no budget means no timer block is emitted').toBeNull();
     expect(() => tick(5)).not.toThrow();
   });
 });

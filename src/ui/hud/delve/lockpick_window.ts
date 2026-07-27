@@ -56,6 +56,9 @@ export interface LockpickWindowDeps {
 }
 
 const NUM0 = { maximumFractionDigits: 0 } as const;
+// The countdown's one decimal. `toFixed(1)` rendered `12.3` in every locale, where ru_RU and
+// de want a comma; English output is byte-identical through formatNumber either way.
+const NUM1 = { minimumFractionDigits: 1, maximumFractionDigits: 1, useGrouping: false } as const;
 
 /** The three countdown nodes `renderBoard` emits, resolved once per board paint. */
 interface TimerEls {
@@ -182,6 +185,10 @@ export class LockpickWindow {
     if (!el) return;
     const view = this.deps.getState();
     if (!view) {
+      // The one exit from renderBoard that leaves the subtree alone: drop the refs anyway,
+      // so the module upholds "the refs are dropped wherever they stop being current" by
+      // itself rather than relying on the caller routing onClose back into close().
+      this.forgetTimerEls();
       this.deps.onClose();
       return;
     }
@@ -228,7 +235,7 @@ export class LockpickWindow {
     const timerBlock =
       timerSecs != null
         ? `<div class="lp-timer" aria-label="${esc(t('lockpickUi.timerAria'))}"><div class="lp-timer-track"><div class="lp-timer-bar" id="lp-timer-bar" style="width:100%"></div></div>` +
-          `<span class="lp-timer-value" id="lp-timer-value">${esc(t('lockpickUi.seconds', { seconds: timerSecs.toFixed(1) }))}</span></div>`
+          `<span class="lp-timer-value" id="lp-timer-value">${esc(t('lockpickUi.seconds', { seconds: formatNumber(timerSecs, NUM1) }))}</span></div>`
         : '';
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('lockpickUi.boardTitle', { tier: this.deps.tierName(view.lootTier) }))}</span>` +
@@ -260,15 +267,26 @@ export class LockpickWindow {
    * per-step budget emits no timer block, so the refs go null and paintTimer writes nothing.
    */
   private cacheTimerEls(el: HTMLElement): void {
-    const bar = el.querySelector<HTMLElement>('#lp-timer-bar');
-    const value = el.querySelector<HTMLElement>('#lp-timer-value');
+    // By CLASS, not by the ids the markup also carries: this window is
+    // instance-parameterized on deps.panel, so a second panel would make the ids collide
+    // while a query scoped to the panel's own class stays correct.
+    const bar = el.querySelector<HTMLElement>('.lp-timer-bar');
+    const value = el.querySelector<HTMLElement>('.lp-timer-value');
     const wrap = el.querySelector<HTMLElement>('.lp-timer');
     this.timerEls = bar && value && wrap ? { bar, value, wrap } : null;
     // The fresh markup carries no urgent class, so the latch starts from that.
     this.lastUrgent = false;
   }
 
-  /** Drop the refs when the subtree they point into is gone or replaced. */
+  /**
+   * Drop the refs when the subtree they point into is gone or replaced.
+   *
+   * From `close()` this is reference hygiene rather than a behavior: `close()` stops the
+   * clock first, so nothing can paint afterwards and no test can observe the difference.
+   * From `renderAnte()` and the state-less `renderBoard()` exit it IS observable, because
+   * both leave a running interval behind, and `tests/lockpick_timer_repaint.test.ts` pins
+   * those two.
+   */
   private forgetTimerEls(): void {
     this.timerEls = null;
     this.lastUrgent = false;
@@ -325,7 +343,7 @@ export class LockpickWindow {
     const els = this.timerEls;
     if (!els) return;
     els.bar.style.width = `${(remaining / seconds) * 100}%`;
-    els.value.textContent = t('lockpickUi.seconds', { seconds: remaining.toFixed(1) });
+    els.value.textContent = t('lockpickUi.seconds', { seconds: formatNumber(remaining, NUM1) });
     const urgent = remaining < 3;
     if (urgent !== this.lastUrgent) {
       this.lastUrgent = urgent;
