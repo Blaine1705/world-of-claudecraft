@@ -3001,12 +3001,17 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
   });
 
   it('refuses the DERIVED pick too, whatever a persisted town focus names', () => {
-    // An omitted `components` resolves through meta.townFocus, and
-    // set_town_focus does not validate that a key is a real component tag
-    // (#2511). Pre-fix a `{ claw: 5 }` allocation burned this corpse on a plain
-    // interact press with no picker open and no line printed. The corpse-level
-    // gate fires before the pick is even derived, so every focus shape lands
-    // the same refusal: a mapped focus, an unmapped one, and none at all.
+    // An omitted `components` resolves through meta.townFocus, so a persisted
+    // allocation is the pick. #2511 has since closed the route that could WRITE
+    // an unmapped key (set_town_focus rejects one and the load arm drops one an
+    // older save carries), so the direct meta poke in the rig stands in for
+    // exactly that: a save written before the key check existed. Pre-fix a
+    // `{ claw: 5 }` allocation burned this corpse on a plain interact press with
+    // no picker open and no line printed. The corpse-level gate fires before the
+    // pick is even derived, which is why every focus shape lands the same
+    // refusal here: a mapped focus, an unmapped one, junk, and none at all. That
+    // insensitivity to the focus is the point, and it is what makes this gate
+    // independent of #2511 rather than relying on it.
     const focuses: (Record<string, number> | undefined)[] = [
       undefined,
       { claw: 5 },
