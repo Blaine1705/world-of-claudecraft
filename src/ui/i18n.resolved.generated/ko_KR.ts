@@ -948,6 +948,15 @@ export const ko_KR: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "지하 저장고",
+        "state": "의전층",
+        "residence": "주거층",
+        "tower": "망루"
+      }
+    },
     "compass": {
       "N": "북",
       "NE": "북동",

@@ -447,58 +447,33 @@ export function buildCastleFeatures(): CastleFeaturesView {
         });
       }
     }
-    // the stair cuts: wide stone steps down from the terrace, over a solid
-    // wedge whose TOP is the ramp surface castlePadTarget authors (the mesh
-    // leaves the cuts out with the rest of the ward, so this carries them)
+    // the stair cuts: broad stepped treads built from exact slabs over the
+    // ramp (the kcas stairs module never fit the cut geometry: either its
+    // treads read backwards or it sank into the ramp mass). Each tread top
+    // meets the walk surface at its middle, so feet stay within a quarter
+    // yard of the visible stone.
     for (const cut of WARD_STEPS) {
       const cx = (cut.x0 + cut.x1) / 2;
-      // kcasStairsWide climbs toward -z at rot 0 (the wall-flight foot treads
-      // below set the convention: rot PI climbs +z, -PI/2 climbs +x). This cut
-      // rises from the bailey at z1+run UP to the terrace at z1, i.e. toward -z,
-      // so the tread faces must point -z; the authored PI had the whole flight
-      // reversed (players read the steps as leading the wrong way off the
-      // terrace). The wedge below is symmetric, so only the mesh yaw was wrong.
-      // Nudged a touch south (+z, toward the bailey) off the terrace edge so the
-      // flight's high back no longer buries itself in the terrace face.
-      put('kcasStairsWide', {
-        x: cx,
-        y: padY,
-        z: w.z1 + WARD_STEP_RUN / 2 + WARD_STEP_MESH_PUSH,
-        rot: 0,
-        s: 0.62,
-      });
-      const z0 = w.z1;
-      const z1 = w.z1 + WARD_STEP_RUN;
-      const base = padY - 0.4;
-      const v: number[] = [];
-      const quad = (
-        p0: [number, number, number],
-        p1: [number, number, number],
-        p2: [number, number, number],
-        p3: [number, number, number],
-      ): void => {
-        v.push(...p0, ...p1, ...p2, ...p0, ...p2, ...p3);
-      };
-      // top (the ramp: w.h at the terrace edge down to padY at the run's end)
-      quad([cut.x0, w.h, z0], [cut.x1, w.h, z0], [cut.x1, padY, z1], [cut.x0, padY, z1]);
-      for (const [sx, dir] of [
-        [cut.x0, -1],
-        [cut.x1, 1],
-      ] as const) {
-        const side: [number, number, number][] = [
-          [sx, w.h, z0],
-          [sx, base, z0],
-          [sx, base, z1],
-          [sx, padY, z1],
-        ];
-        if (dir < 0) quad(side[0], side[1], side[2], side[3]);
-        else quad(side[3], side[2], side[1], side[0]);
+      const width = cut.x1 - cut.x0;
+      // the cut ramp is REAL rendered terrain (castlePadTarget), so each
+      // tread rides proud of the slope: top flush with the ramp at its
+      // back edge plus a hair, stepping down in eight fine treads (feet
+      // sink at most a third of a yard at each lip)
+      const treads = 8;
+      const run = WARD_STEP_RUN / treads;
+      const drop = (w.h - padY) / treads;
+      for (let ti = 0; ti < treads; ti++) {
+        const zBack = w.z1 + ti * run;
+        const topY = w.h - ti * drop + 0.04;
+        slab(cx, zBack + run / 2, width, run + 0.06, topY, 0.42, capMat);
       }
-      quad([cut.x0, w.h, z0], [cut.x0, base, z0], [cut.x1, base, z0], [cut.x1, w.h, z0]);
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(v), 3));
-      geo.computeVertexNormals();
-      const mesh = new THREE.Mesh(geo, wedgeMat);
+      // sloped mass under the walk surface so the cut reads solid
+      const mesh = new THREE.Mesh(
+        new THREE.BoxGeometry(cut.x1 - cut.x0, 1.0, WARD_STEP_RUN + 0.8),
+        slabMat,
+      );
+      mesh.position.set(cx, padY + rise / 2 - 0.2, w.z1 + WARD_STEP_RUN / 2);
+      mesh.rotation.x = Math.atan2(rise, WARD_STEP_RUN);
       mesh.castShadow = true;
       mesh.receiveShadow = true;
       group.add(mesh);
@@ -520,13 +495,14 @@ export function buildCastleFeatures(): CastleFeaturesView {
     const kz = 2001.5;
     // the side turrets tuck INTO the keep's upper mass (small offsets, low
     // seats) so they read as corbelled bartizans, not floating drums; a
-    // stone corbel block bridges each one into the keep body
-    put('hexrTowerA', { x: kx - 3.2, y: wardY + 16.5, z: kz - 2.6, rot: 0.4, s: 4.4 });
-    put('hexrTowerA', { x: kx + 3.2, y: wardY + 18.5, z: kz + 2.6, rot: 2.2, s: 4.4 });
-    put('hexrTowerA', { x: kx, y: wardY + 25, z: kz, rot: 1.1, s: 5.2 });
-    slab(kx - 3.2, kz - 2.6, 3.4, 3.4, wardY + 17.2, 2.4, slabMat);
-    slab(kx + 3.2, kz + 2.6, 3.4, 3.4, wardY + 19.2, 2.4, slabMat);
-    put('kcasBannerRedTriple', { x: kx, y: wardY + 36.5, z: kz + 1.2, rot: Math.PI, s: 1.6 });
+    // stone corbel block bridges each one into the keep body (seats track
+    // the keep's 9.5 scale)
+    put('hexrTowerA', { x: kx - 3.4, y: wardY + 17.5, z: kz - 2.8, rot: 0.4, s: 4.6 });
+    put('hexrTowerA', { x: kx + 3.4, y: wardY + 19.5, z: kz + 2.8, rot: 2.2, s: 4.6 });
+    put('hexrTowerA', { x: kx, y: wardY + 26.5, z: kz, rot: 1.1, s: 5.4 });
+    slab(kx - 3.4, kz - 2.8, 3.6, 3.6, wardY + 18.2, 2.4, slabMat);
+    slab(kx + 3.4, kz + 2.8, 3.6, 3.6, wardY + 20.2, 2.4, slabMat);
+    put('kcasBannerRedTriple', { x: kx, y: wardY + 38.5, z: kz + 1.2, rot: Math.PI, s: 1.6 });
   }
 
   // ---- gate dressing ----

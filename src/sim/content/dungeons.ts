@@ -882,12 +882,15 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     // Overflow band: indexes 0..7 are taken (temple 3, orkadia 6, wildheart 7),
     // so the keep claims 8 (instanceOrigin: DUNGEON_OVERFLOW_X_BASE + 600).
     index: 8,
-    // Directly in front of the keep model's own door, on its axis (the
-    // keep sits at 421,2001.5 r 8.5, facing +z): the portal reads as the
-    // castle door, the leave-drop (z - 4) lands just clear of the keep's
-    // decor collider, and both ward step tops stay outside the 2yd door
-    // trigger (castle_layout)
-    doorPos: { x: 421, z: 2014.5 },
+    // FLUSH against the keep model's facade on its door axis (the keep
+    // sits at 421,2001.5 at scale 9.5, face at z 2012.2, facing +z): the
+    // portal arch emerges from the stone and reads as the castle's own
+    // door. Leaving therefore drops the player FORWARD onto the terrace
+    // (leaveOffset +z) instead of the default z - 4, which would land
+    // inside the keep's decor collider (castle_layout)
+    doorPos: { x: 421, z: 2012.3 },
+    leaveOffset: { x: 0, z: 3.5 },
+    staticDoor: true,
     // Arrival just inside the entrance hall's south end, 4yd north of the exit
     // portal so zoning in never lands inside the exit's 2yd door trigger.
     entry: { x: 0, z: -5 },

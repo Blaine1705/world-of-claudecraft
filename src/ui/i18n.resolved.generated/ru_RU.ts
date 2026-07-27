@@ -948,6 +948,15 @@ export const ru_RU: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "Подклет",
+        "state": "Парадный этаж",
+        "residence": "Жилой этаж",
+        "tower": "Дозорная башня"
+      }
+    },
     "compass": {
       "N": "С",
       "NE": "СВ",

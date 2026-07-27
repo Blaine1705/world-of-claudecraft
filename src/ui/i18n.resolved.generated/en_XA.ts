@@ -948,6 +948,15 @@ export const en_XA: EnTranslations = {
       "clockMs": "[{minutes}:{seconds}]",
       "clockHms": "[{hours}:{minutes}:{seconds}]"
     },
+    "lastkeepMap": {
+      "title": "[{keep}: {story}]",
+      "story": {
+        "undercroft": "[Ţĥé Úñðéŕçŕóƒţ]",
+        "state": "[Ţĥé Šţáţé Ƒļóóŕ]",
+        "residence": "[Ţĥé Ŕéšíðéñçé]",
+        "tower": "[Ţĥé Ŵáţçĥ Ţóŵéŕ]"
+      }
+    },
     "compass": {
       "N": "[Ñ]",
       "NE": "[ÑÉ]",

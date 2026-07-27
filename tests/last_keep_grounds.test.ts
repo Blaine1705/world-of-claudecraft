@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { CASTLE, CASTLE_BUILDINGS, CASTLE_GATES, castleLift } from '../src/sim/castle_layout';
+import { DUNGEONS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { groundHeight } from '../src/sim/world';
 import { EMPTY_TEST_WORLD } from './sim_shared';
@@ -190,17 +191,28 @@ describe('the Last Keep castle grounds', () => {
     }
   });
 
-  it('the keep door spot and its leave-drop are open terrace ground on the keep axis', () => {
-    // doorPos in content/dungeons.ts sits on the keep's own door axis
-    // (x 421); the leave teleport lands at z - 4, just clear of the keep's
-    // decor collider (r 8.5 at 421,2001.5)
-    for (const z of [2014.5, 2010.5]) {
-      expect(castleLift(421, z)).toBe(0);
-      expect(Math.abs(groundHeight(421, z, SEED) - CASTLE.ward.h)).toBeLessThan(0.1);
-    }
+  it('the keep door sits flush on the keep axis; the leave-drop lands clear in front', () => {
+    const def = DUNGEONS.the_last_keep;
     const keep = CASTLE_BUILDINGS.find((b) => b.key === 'hexrCastle');
     if (!keep) throw new Error('no keep');
-    expect(Math.hypot(421 - keep.x, 2010.5 - keep.z)).toBeGreaterThan(keep.r + 0.4);
+    // flush: the portal stands on the keep's door axis at the model face
+    // (half the native 2.26 depth at the authored scale)
+    expect(def.doorPos.x).toBe(keep.x);
+    const face = keep.z + (2.26 * keep.scale) / 2;
+    expect(Math.abs(def.doorPos.z - face)).toBeLessThan(0.5);
+    // both the door spot and the leave-drop are open terrace ground, and
+    // the drop lands OUTSIDE the keep's decor collider
+    const drop = def.leaveOffset ?? { x: 0, z: -4 };
+    for (const [x, z] of [
+      [def.doorPos.x, def.doorPos.z],
+      [def.doorPos.x + drop.x, def.doorPos.z + drop.z],
+    ] as const) {
+      expect(castleLift(x, z)).toBe(0);
+      expect(Math.abs(groundHeight(x, z, SEED) - CASTLE.ward.h)).toBeLessThan(0.1);
+    }
+    expect(
+      Math.hypot(def.doorPos.x + drop.x - keep.x, def.doorPos.z + drop.z - keep.z),
+    ).toBeGreaterThan(keep.r + 0.4);
   });
 
   it('the doorway module keeps a separable door leaf (the open-arch filter depends on it)', () => {

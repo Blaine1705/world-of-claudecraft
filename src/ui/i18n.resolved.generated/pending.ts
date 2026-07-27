@@ -10,6 +10,11 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.lastkeepMap.story.residence",
+    "hudChrome.lastkeepMap.story.state",
+    "hudChrome.lastkeepMap.story.tower",
+    "hudChrome.lastkeepMap.story.undercroft",
+    "hudChrome.lastkeepMap.title",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -18,6 +23,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "es_ES": [
+    "hudChrome.lastkeepMap.story.residence",
+    "hudChrome.lastkeepMap.story.state",
+    "hudChrome.lastkeepMap.story.tower",
+    "hudChrome.lastkeepMap.story.undercroft",
+    "hudChrome.lastkeepMap.title",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -26,6 +36,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "fr_FR": [
+    "hudChrome.lastkeepMap.story.residence",
+    "hudChrome.lastkeepMap.story.state",
+    "hudChrome.lastkeepMap.story.tower",
+    "hudChrome.lastkeepMap.story.undercroft",
+    "hudChrome.lastkeepMap.title",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -34,6 +49,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "fr_CA": [
+    "hudChrome.lastkeepMap.story.residence",
+    "hudChrome.lastkeepMap.story.state",
+    "hudChrome.lastkeepMap.story.tower",
+    "hudChrome.lastkeepMap.story.undercroft",
+    "hudChrome.lastkeepMap.title",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -43,6 +63,11 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.lastkeepMap.story.residence",
+    "hudChrome.lastkeepMap.story.state",
+    "hudChrome.lastkeepMap.story.tower",
+    "hudChrome.lastkeepMap.story.undercroft",
+    "hudChrome.lastkeepMap.title",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -51,6 +76,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "de_DE": [
+    "hudChrome.lastkeepMap.story.residence",
+    "hudChrome.lastkeepMap.story.state",
+    "hudChrome.lastkeepMap.story.tower",
+    "hudChrome.lastkeepMap.story.undercroft",
+    "hudChrome.lastkeepMap.title",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -58,11 +88,24 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.progressLabel",
     "hudChrome.otaUpdate.title"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.lastkeepMap.title"
+  ],
+  "zh_TW": [
+    "hudChrome.lastkeepMap.title"
+  ],
+  "ko_KR": [
+    "hudChrome.lastkeepMap.title"
+  ],
+  "ja_JP": [
+    "hudChrome.lastkeepMap.title"
+  ],
   "pt_BR": [
+    "hudChrome.lastkeepMap.story.residence",
+    "hudChrome.lastkeepMap.story.state",
+    "hudChrome.lastkeepMap.story.tower",
+    "hudChrome.lastkeepMap.story.undercroft",
+    "hudChrome.lastkeepMap.title",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -70,8 +113,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.progressLabel",
     "hudChrome.otaUpdate.title"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.lastkeepMap.title"
+  ],
   "cs_CZ": [
+    "hudChrome.lastkeepMap.story.residence",
+    "hudChrome.lastkeepMap.story.state",
+    "hudChrome.lastkeepMap.story.tower",
+    "hudChrome.lastkeepMap.story.undercroft",
+    "hudChrome.lastkeepMap.title",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -80,6 +130,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "nl_NL": [
+    "hudChrome.lastkeepMap.story.residence",
+    "hudChrome.lastkeepMap.story.state",
+    "hudChrome.lastkeepMap.story.tower",
+    "hudChrome.lastkeepMap.story.undercroft",
+    "hudChrome.lastkeepMap.title",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -88,6 +143,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "pl_PL": [
+    "hudChrome.lastkeepMap.story.residence",
+    "hudChrome.lastkeepMap.story.state",
+    "hudChrome.lastkeepMap.story.tower",
+    "hudChrome.lastkeepMap.story.undercroft",
+    "hudChrome.lastkeepMap.title",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -96,6 +156,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "id_ID": [
+    "hudChrome.lastkeepMap.story.residence",
+    "hudChrome.lastkeepMap.story.state",
+    "hudChrome.lastkeepMap.story.tower",
+    "hudChrome.lastkeepMap.story.undercroft",
+    "hudChrome.lastkeepMap.title",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -104,6 +169,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "tr_TR": [
+    "hudChrome.lastkeepMap.story.residence",
+    "hudChrome.lastkeepMap.story.state",
+    "hudChrome.lastkeepMap.story.tower",
+    "hudChrome.lastkeepMap.story.undercroft",
+    "hudChrome.lastkeepMap.title",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -112,6 +182,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "sv_SE": [
+    "hudChrome.lastkeepMap.story.residence",
+    "hudChrome.lastkeepMap.story.state",
+    "hudChrome.lastkeepMap.story.tower",
+    "hudChrome.lastkeepMap.story.undercroft",
+    "hudChrome.lastkeepMap.title",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -120,6 +195,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "vi_VN": [
+    "hudChrome.lastkeepMap.story.residence",
+    "hudChrome.lastkeepMap.story.state",
+    "hudChrome.lastkeepMap.story.tower",
+    "hudChrome.lastkeepMap.story.undercroft",
+    "hudChrome.lastkeepMap.title",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
@@ -128,6 +208,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.otaUpdate.title"
   ],
   "da_DK": [
+    "hudChrome.lastkeepMap.story.residence",
+    "hudChrome.lastkeepMap.story.state",
+    "hudChrome.lastkeepMap.story.tower",
+    "hudChrome.lastkeepMap.story.undercroft",
+    "hudChrome.lastkeepMap.title",
     "hudChrome.otaUpdate.applying",
     "hudChrome.otaUpdate.continueAnyway",
     "hudChrome.otaUpdate.downloading",
