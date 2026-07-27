@@ -795,6 +795,98 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 4,
   },
+  // Fine grades of the nine node materials (D8, the fine-material axis). A
+  // harvest yields one of these INSTEAD of its base id when the player's tool
+  // is strictly above the material's zone tier at a full-grade vein
+  // (professions/material_grades.ts); same unit count, same rarity roll, same
+  // two rng draws. The six crafted tool recipes consume the fine grade, which
+  // is what makes the tool below each rung the only route to it.
+  //
+  // Priced at twice the base sellValue, with the delisted-material
+  // convention's 4x buyValue on top. Both halves are deliberate:
+  // - Doubling the sell price is the whole reward for a harvest that a
+  //   worse tool would have spent on the plain grade.
+  // - buyValue is the ECONOMY BASIS, not a stock row, exactly as
+  //   docs/design/professions.md restates the ruling and
+  //   tests/professions_master_stock.test.ts pins it for the delisted five.
+  //   No NPC stocks any of these. Omitting it would silently drop three
+  //   re-specced tool recipes out of the counterfactually-vendor-fed set in
+  //   tests/recipe_economy.test.ts, which is the tighter of the two economy
+  //   bounds: the loop would keep passing over a smaller set, which is the
+  //   failure mode that arm was rewritten to prevent.
+  // Common quality like every other reagent, or sellAllJunk would vendor them.
+  fine_copper_ore: {
+    id: 'fine_copper_ore',
+    name: 'Fine Copper Ore',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 8,
+    buyValue: 32,
+  },
+  fine_iron_ore: {
+    id: 'fine_iron_ore',
+    name: 'Fine Iron Ore',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 16,
+    buyValue: 64,
+  },
+  fine_thorium_ore: {
+    id: 'fine_thorium_ore',
+    name: 'Fine Osmium Ore',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 30,
+    buyValue: 120,
+  },
+  fine_ironbark_log: {
+    id: 'fine_ironbark_log',
+    name: 'Fine Ironbark Log',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 8,
+    buyValue: 32,
+  },
+  fine_ashwood_log: {
+    id: 'fine_ashwood_log',
+    name: 'Fine Ashwood Log',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 30,
+    buyValue: 120,
+  },
+  fine_elderwood_log: {
+    id: 'fine_elderwood_log',
+    name: 'Fine Highpine Log',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 80,
+    buyValue: 320,
+  },
+  fine_silverleaf_herb: {
+    id: 'fine_silverleaf_herb',
+    name: 'Fine Sheenleaf Herb',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 8,
+    buyValue: 32,
+  },
+  fine_goldleaf_herb: {
+    id: 'fine_goldleaf_herb',
+    name: 'Fine Goldleaf Herb',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 30,
+    buyValue: 120,
+  },
+  fine_sunpetal_herb: {
+    id: 'fine_sunpetal_herb',
+    name: 'Fine Sunpetal Herb',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 80,
+    buyValue: 320,
+  },
   // Cosmetic event reward: using it rolls a rarity rank (server-side) and opens
   // the skin-select overlay. See src/sim/content/skins.ts. Dev-grant for now.
   event_skin_token: {

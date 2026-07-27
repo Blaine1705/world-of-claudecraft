@@ -4242,6 +4242,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.elderwood_log.name': 'Бревно горной сосны',
   'entities.items.goldleaf_herb.name': 'Трава золотолист',
   'entities.items.sunpetal_herb.name': 'Трава солнцелепест',
+  // Отборные материалы: добываются инструментом выше уровня материала (D8).
+  // Прилагательное согласовано с родом существительного: руда/трава (ж), бревно (ср).
+  'entities.items.fine_copper_ore.name': 'Отборная медная руда',
+  'entities.items.fine_iron_ore.name': 'Отборная железная руда',
+  'entities.items.fine_thorium_ore.name': 'Отборная осмиевая руда',
+  'entities.items.fine_ironbark_log.name': 'Отборное бревно железнокорого дерева',
+  'entities.items.fine_ashwood_log.name': 'Отборное бревно пепельного дерева',
+  'entities.items.fine_elderwood_log.name': 'Отборное бревно горной сосны',
+  'entities.items.fine_silverleaf_herb.name': 'Отборная трава глянцелист',
+  'entities.items.fine_goldleaf_herb.name': 'Отборная трава золотолист',
+  'entities.items.fine_sunpetal_herb.name': 'Отборная трава солнцелепест',
   'entities.items.copper_ore.name': 'Медная руда',
   'entities.items.iron_ore.name': 'Железная руда',
   'entities.items.ironbark_log.name': 'Бревно железнокорого дерева',

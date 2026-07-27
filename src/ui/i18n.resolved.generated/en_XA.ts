@@ -9170,6 +9170,33 @@ export const en_XA: EnTranslations = {
       "resonant_timber": {
         "name": "[Ŕéšóñáñţ Ţíɱƀéŕ]"
       },
+      "fine_copper_ore": {
+        "name": "[Ƒíñé Çóþþéŕ Óŕé]"
+      },
+      "fine_iron_ore": {
+        "name": "[Ƒíñé Íŕóñ Óŕé]"
+      },
+      "fine_thorium_ore": {
+        "name": "[Ƒíñé Óšɱíúɱ Óŕé]"
+      },
+      "fine_ironbark_log": {
+        "name": "[Ƒíñé Íŕóñƀáŕķ Ļóĝ]"
+      },
+      "fine_ashwood_log": {
+        "name": "[Ƒíñé Ášĥŵóóð Ļóĝ]"
+      },
+      "fine_elderwood_log": {
+        "name": "[Ƒíñé Ĥíĝĥþíñé Ļóĝ]"
+      },
+      "fine_silverleaf_herb": {
+        "name": "[Ƒíñé Šĥééñļéáƒ Ĥéŕƀ]"
+      },
+      "fine_goldleaf_herb": {
+        "name": "[Ƒíñé Ĝóļðļéáƒ Ĥéŕƀ]"
+      },
+      "fine_sunpetal_herb": {
+        "name": "[Ƒíñé Šúñþéţáļ Ĥéŕƀ]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

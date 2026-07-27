@@ -9170,6 +9170,33 @@ export const ru_RU: EnTranslations = {
       "resonant_timber": {
         "name": "Резонирующая древесина"
       },
+      "fine_copper_ore": {
+        "name": "Отборная медная руда"
+      },
+      "fine_iron_ore": {
+        "name": "Отборная железная руда"
+      },
+      "fine_thorium_ore": {
+        "name": "Отборная осмиевая руда"
+      },
+      "fine_ironbark_log": {
+        "name": "Отборное бревно железнокорого дерева"
+      },
+      "fine_ashwood_log": {
+        "name": "Отборное бревно пепельного дерева"
+      },
+      "fine_elderwood_log": {
+        "name": "Отборное бревно горной сосны"
+      },
+      "fine_silverleaf_herb": {
+        "name": "Отборная трава глянцелист"
+      },
+      "fine_goldleaf_herb": {
+        "name": "Отборная трава золотолист"
+      },
+      "fine_sunpetal_herb": {
+        "name": "Отборная трава солнцелепест"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },

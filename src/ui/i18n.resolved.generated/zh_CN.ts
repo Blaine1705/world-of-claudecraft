@@ -9170,6 +9170,33 @@ export const zh_CN: EnTranslations = {
       "resonant_timber": {
         "name": "共鸣木材"
       },
+      "fine_copper_ore": {
+        "name": "优质铜矿石"
+      },
+      "fine_iron_ore": {
+        "name": "优质铁矿石"
+      },
+      "fine_thorium_ore": {
+        "name": "优质锇矿石"
+      },
+      "fine_ironbark_log": {
+        "name": "优质铁皮木原木"
+      },
+      "fine_ashwood_log": {
+        "name": "优质灰木原木"
+      },
+      "fine_elderwood_log": {
+        "name": "优质高松原木"
+      },
+      "fine_silverleaf_herb": {
+        "name": "优质润光叶草"
+      },
+      "fine_goldleaf_herb": {
+        "name": "优质金叶草"
+      },
+      "fine_sunpetal_herb": {
+        "name": "优质阳瓣草"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },

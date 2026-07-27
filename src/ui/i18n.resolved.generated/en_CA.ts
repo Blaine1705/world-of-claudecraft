@@ -9170,6 +9170,33 @@ export const en_CA: EnTranslations = {
       "resonant_timber": {
         "name": "Resonant Timber"
       },
+      "fine_copper_ore": {
+        "name": "Fine Copper Ore"
+      },
+      "fine_iron_ore": {
+        "name": "Fine Iron Ore"
+      },
+      "fine_thorium_ore": {
+        "name": "Fine Osmium Ore"
+      },
+      "fine_ironbark_log": {
+        "name": "Fine Ironbark Log"
+      },
+      "fine_ashwood_log": {
+        "name": "Fine Ashwood Log"
+      },
+      "fine_elderwood_log": {
+        "name": "Fine Highpine Log"
+      },
+      "fine_silverleaf_herb": {
+        "name": "Fine Sheenleaf Herb"
+      },
+      "fine_goldleaf_herb": {
+        "name": "Fine Goldleaf Herb"
+      },
+      "fine_sunpetal_herb": {
+        "name": "Fine Sunpetal Herb"
+      },
       "conjured_water4": {
         "name": "Conjured Springwater"
       },

@@ -9170,6 +9170,33 @@ export const ja_JP: EnTranslations = {
       "resonant_timber": {
         "name": "共鳴の木材"
       },
+      "fine_copper_ore": {
+        "name": "上質な銅鉱石"
+      },
+      "fine_iron_ore": {
+        "name": "上質な鉄鉱石"
+      },
+      "fine_thorium_ore": {
+        "name": "上質なオスミウム鉱石"
+      },
+      "fine_ironbark_log": {
+        "name": "上質なアイアンバークの丸太"
+      },
+      "fine_ashwood_log": {
+        "name": "上質なアッシュウッドの丸太"
+      },
+      "fine_elderwood_log": {
+        "name": "上質な高嶺松の丸太"
+      },
+      "fine_silverleaf_herb": {
+        "name": "上質な艶葉草"
+      },
+      "fine_goldleaf_herb": {
+        "name": "上質なゴールドリーフ草"
+      },
+      "fine_sunpetal_herb": {
+        "name": "上質なサンペタル草"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },

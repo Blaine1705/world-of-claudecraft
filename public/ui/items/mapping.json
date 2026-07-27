@@ -2376,6 +2376,23 @@
         "zense_meridian",
         "zyzzs_deathless_signet"
       ]
+    },
+    {
+      "source": "scripts/assets/fine_material_icons.mjs (deterministic derivation from the base material art in this same directory)",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "each fine grade derives from its own base material icon, so the pair stays one painting",
+      "commonPrompt": "No prompt: a fine grade is the same material worked with a better tool, so the icon is its base art under a fixed warm highlight lift, saturation gain and luminous rim. Re-derive with `node scripts/assets/fine_material_icons.mjs`; verify with --check.",
+      "itemIds": [
+        "fine_copper_ore",
+        "fine_iron_ore",
+        "fine_thorium_ore",
+        "fine_ironbark_log",
+        "fine_ashwood_log",
+        "fine_elderwood_log",
+        "fine_silverleaf_herb",
+        "fine_goldleaf_herb",
+        "fine_sunpetal_herb"
+      ]
     }
   ]
 }

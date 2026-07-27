@@ -9170,6 +9170,33 @@ export const ko_KR: EnTranslations = {
       "resonant_timber": {
         "name": "공명의 목재"
       },
+      "fine_copper_ore": {
+        "name": "상급 구리 광석"
+      },
+      "fine_iron_ore": {
+        "name": "상급 철 광석"
+      },
+      "fine_thorium_ore": {
+        "name": "상급 오스뮴 광석"
+      },
+      "fine_ironbark_log": {
+        "name": "상급 무쇠껍질나무 통나무"
+      },
+      "fine_ashwood_log": {
+        "name": "상급 잿빛나무 통나무"
+      },
+      "fine_elderwood_log": {
+        "name": "상급 고산솔 통나무"
+      },
+      "fine_silverleaf_herb": {
+        "name": "상급 윤광잎 약초"
+      },
+      "fine_goldleaf_herb": {
+        "name": "상급 금빛잎 약초"
+      },
+      "fine_sunpetal_herb": {
+        "name": "상급 태양꽃잎 약초"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
