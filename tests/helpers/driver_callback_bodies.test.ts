@@ -18,15 +18,20 @@ describe('readDriverCallbacks: which call sites it finds', () => {
       setInterval(() => {}, 100);
       window.setInterval(() => {}, 200);
       requestAnimationFrame(() => {});
+      window.requestAnimationFrame(() => {});
+      requestIdleCallback(() => {});
       window.requestIdleCallback(() => {});
       clearInterval(handle);
       cancelAnimationFrame(handle);
+      cancelIdleCallback(handle);
       setTimeout(() => {}, 100);
     `);
     expect(found.map((f) => f.driver)).toEqual([
       'setInterval',
       'setInterval',
       'requestAnimationFrame',
+      'requestAnimationFrame',
+      'requestIdleCallback',
       'requestIdleCallback',
     ]);
   });
@@ -39,6 +44,24 @@ describe('readDriverCallbacks: which call sites it finds', () => {
       requestAnimationFrame(() => {});
     `);
     expect(found.map((f) => f.delayMs)).toEqual([100, 15000, null, null]);
+  });
+
+  // A cadence hoisted into a constant still resolves, which is what keeps the pin from being
+  // escapable by a one-line refactor. src/ui/reconnect_overlay.ts already writes this shape.
+  it('resolves a cadence hoisted into a module-level const', () => {
+    const found = read(`
+      const TICK_MS = 250;
+      const SLOW_MS = 30_000;
+      setInterval(render, TICK_MS);
+      setInterval(render, SLOW_MS);
+      function render(): void {}
+    `);
+    expect(found.map((f) => f.delayMs)).toEqual([250, 30000]);
+  });
+
+  it('reports the line of the driver call, so a failure can be found', () => {
+    const found = read('const a = 1;\n\nsetInterval(() => {}, 10);');
+    expect(found[0]?.line).toBe(3);
   });
 
   it('finds a driver armed anywhere in the file, not only at top level', () => {
@@ -152,6 +175,47 @@ describe('readDriverCallbacks: what one tick reaches', () => {
     expect(both[0]?.code).toContain('from B');
   });
 
+  // THE SAME-MODULE ESCAPES, each of which resolved to nothing before they were closed. All
+  // three are one keystroke away from the shape the walk already followed, which is exactly the
+  // kind of gap a gate ships with and never notices: a NEW driver written this way would pass
+  // with an empty allowance and a wholly unscanned tick.
+  it('follows a call through a local bound to `this`', () => {
+    const found = read(`
+      export class W {
+        private arm(): void {
+          const self = this;
+          setInterval(() => { self.paintTimer(); }, 100);
+        }
+        private paintTimer(): void { this.el.style.width = '1px'; }
+      }
+    `);
+    expect(found[0]?.reached).toEqual(['paintTimer']);
+    expect(found[0]?.code).toContain("style.width = '1px'");
+  });
+
+  it('follows a COMPUTED call on `this`, the escape every write family already closes', () => {
+    const found = read(`
+      export class W {
+        private arm(): void { setInterval(() => { this['paintTimer'](); }, 100); }
+        private paintTimer(): void { this.el.textContent = 'computed callee'; }
+      }
+    `);
+    expect(found[0]?.reached).toEqual(['paintTimer']);
+    expect(found[0]?.code).toContain('computed callee');
+  });
+
+  it('follows an object-literal method', () => {
+    const found = read(`
+      const ui = {
+        paint(): void { node.textContent = 'from an object literal'; },
+        fmt: () => 'x',
+      };
+      setInterval(() => { ui.paint(); }, 100);
+    `);
+    expect(found[0]?.reached).toEqual(['paint']);
+    expect(found[0]?.code).toContain('from an object literal');
+  });
+
   it('does not leave this module: a call through an injected dep is out of reach', () => {
     const found = read(`
       export class W {
@@ -159,6 +223,30 @@ describe('readDriverCallbacks: what one tick reaches', () => {
       }
     `);
     expect(found[0]?.reached).toEqual([]);
+  });
+
+  // The limits the header states, pinned as the CURRENT behavior rather than left as prose a
+  // reader has to trust. If a later change closes one of these, this test is where it is
+  // noticed, and the header paragraph moves with it.
+  it('records the stated limits: a dynamic key and a detached method reference', () => {
+    expect(
+      read(`
+        export class W {
+          private arm(): void { setInterval(() => { this[key](); }, 10); }
+          private paint(): void { this.el.textContent = 'unreachable through a dynamic key'; }
+        }
+      `)[0]?.reached,
+    ).toEqual([]);
+    expect(
+      read(`
+        export class W {
+          private arm(): void {
+            const fn = this.deps.paint;
+            setInterval(() => { fn(); }, 10);
+          }
+        }
+      `)[0]?.reached,
+    ).toEqual([]);
   });
 });
 
@@ -220,6 +308,18 @@ describe('readDriverCallbacks: it refuses rather than scanning nothing', () => {
 
   it('throws when the driver is armed with no callback at all', () => {
     expect(() => read('setInterval();')).toThrow(/armed with no callback argument/);
+  });
+
+  it('scans EVERY body when the callback reference itself is ambiguous', () => {
+    const found = read(`
+      export class A { tick(): void { this.el.textContent = 'from A'; } }
+      export class B { tick(): void { this.el.innerHTML = 'from B'; } }
+      export class C { arm(): void { setInterval(this.tick, 10); } }
+    `);
+    // Both, for the same reason an ambiguous CALLEE pulls in both: picking one would silently
+    // scan the wrong tick, and over-scanning is the safe direction for a budget.
+    expect(found[0]?.code).toContain('from A');
+    expect(found[0]?.code).toContain('from B');
   });
 
   it('resolves a reference to a same-module function, and does not re-add it as its own callee', () => {

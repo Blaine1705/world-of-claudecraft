@@ -107,7 +107,10 @@ Per-frame HUD code (anything reached from `Hud.update()`) holds these:
   count of raw writes, element re-queries and IDL-property writes one tick performs. The unit
   is not the callback body, which is empty in every live case and would have been green on the
   defect that prompted the rule: it is the body PLUS every same-module function the tick can
-  reach (`tests/helpers/driver_callback_bodies.ts`). `lockpick_window` re-resolved three element
+  reach (`tests/helpers/driver_callback_bodies.ts`). Its REACH is the gate's, so read it with
+  the same limit: only the three sanctioned adapter filenames are swept, so a driver in a
+  bare-named module (`reconnect_overlay.ts`, `icon_prewarm.ts`, `hud.ts`) is outside it, the
+  same way those modules are already outside the per-file painter scans. `lockpick_window` re-resolved three element
   refs on a 100ms tick until #2498, and the fix had to re-resolve them per board REBUILD
   rather than once at construction, because `renderBoard` replaces that subtree on a signature
   the clock does not restart on (`tests/lockpick_timer_repaint.test.ts` pins both halves).

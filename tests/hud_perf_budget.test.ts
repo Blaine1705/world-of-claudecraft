@@ -343,7 +343,7 @@ const FRAME_DRIVERS: ReadonlyArray<readonly [string, RegExp]> = [
 // The element RE-QUERY vocabulary, the third matcher family and the one the tables above
 // lacked entirely. A re-query is neither a write nor a layout read, so `querySelector` was in
 // none of the three families and the gate could not see it at any cadence: `lockpick_window`
-// walked the panel subtree three times per 100ms tick until #2516 and nothing said a word.
+// walked the panel subtree three times per 100ms tick until #2498 and nothing said a word.
 // A repeated query is a subtree walk whose result the module already had, which is the
 // canonical src/ui/CLAUDE.md violation ("resolve element refs ONCE into a field").
 //
@@ -366,10 +366,12 @@ const ELEMENT_QUERIES: ReadonlyArray<readonly [string, RegExp]> = [
   ['.getElementById', /\.getElementById\b/g],
   ['.getElementsByClassName', /\.getElementsByClassName\b/g],
   ['.getElementsByTagName', /\.getElementsByTagName\b/g],
+  ['.getElementsByTagNameNS', /\.getElementsByTagNameNS\b/g],
+  ['.getElementsByName', /\.getElementsByName\b/g],
   ['.closest', /\.closest\b/g],
   [
     "['computed' query]",
-    /\[\s*['"](?:querySelector|querySelectorAll|getElementById|getElementsByClassName|getElementsByTagName|closest)['"]\s*\]/g,
+    /\[\s*['"](?:querySelector|querySelectorAll|getElementById|getElementsByClassName|getElementsByTagName|getElementsByTagNameNS|getElementsByName|closest)['"]\s*\]/g,
   ],
 ];
 
@@ -402,9 +404,16 @@ const IDL_WRITES: ReadonlyArray<readonly [string, RegExp]> = [
   ['.readOnly', /\.readOnly\b/g],
   ['.indeterminate', /\.indeterminate\b/g],
   ['.srcset', /\.srcset\b/g],
+  // The two a11y-carrying IDL writes, in for a reason the collision argument above does not
+  // cover: a per-tick `ariaLabel` or `tabIndex` write is the shape that most deserves counting,
+  // since it churns the accessibility tree rather than just a pixel. `.title`, `.alt` and
+  // `.placeholder` stay OUT with `.value` and `.src`: all three are ordinary record field names
+  // in this tree (yumi_match_painter alone writes `.title` three times as data).
+  ['.ariaLabel', /\.ariaLabel\b/g],
+  ['.tabIndex', /\.tabIndex\b/g],
   [
     "['computed' idl]",
-    /\[\s*['"](?:disabled|hidden|checked|selected|readOnly|indeterminate|srcset)['"]\s*\]/g,
+    /\[\s*['"](?:disabled|hidden|checked|selected|readOnly|indeterminate|srcset|ariaLabel|tabIndex)['"]\s*\]/g,
   ],
 ];
 
@@ -502,6 +511,12 @@ interface DriverCallbackAllowance {
   readonly queryAllow: TokenAllowance;
   /** Counted IDL_WRITES allowance over everything the tick reaches. */
   readonly idlAllow: TokenAllowance;
+  /**
+   * Counted FORCED_REFLOW_READS allowance over everything the tick reaches. Separate from the
+   * per-FILE reflowAllow beside it, and not redundant with it: that one says the module makes N
+   * layout reads, this one says how many of them happen on a tick.
+   */
+  readonly reflowAllow: TokenAllowance;
 }
 
 interface ScannedPainter {
@@ -696,11 +711,12 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
         writeAllow: { '.style': 1 },
         queryAllow: {},
         idlAllow: {},
+        reflowAllow: {},
       },
       {
         driver: 'setInterval',
         everyMs: 30_000,
-        why: 'the countdown tick: rewrite the "ends in" labels so the open window does not show a stale time. Reaches paintCountdowns + remainingText and nothing else.',
+        why: 'the countdown tick: rewrite the "ends in" labels so the open window does not show a stale time. Reaches the `isOpen` guard plus paintCountdowns and its remainingText formatter.',
         // `.style` is the isOpen guard again; `.textContent` is the countdown label, which
         // genuinely differs every tick, so it is an unelided write ON PURPOSE at 30s cadence;
         // `.dataset` is the read of the reset timestamp off each node.
@@ -710,6 +726,7 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
         // that is cheap, and the count is what makes a second one a conscious act.
         queryAllow: { '.querySelectorAll': 1 },
         idlAllow: {},
+        reflowAllow: {},
       },
     ],
   },
@@ -732,12 +749,16 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
         // urgent class flips at most once per attempt and rides `lastUrgent` rather than a
         // blind per-tick toggle. Anything beyond these three repeats 10x a second.
         writeAllow: { '.style': 1, '.textContent': 1, '.classList': 1 },
-        // ZERO, and this is the entry the whole gate is for. Before #2516 this tick walked the
+        // ZERO, and this is the entry the whole gate is for. Before #2498 this tick walked the
         // panel subtree four times (three querySelector + the getElementById behind panel())
         // to re-find nodes it already had, ten times a second. The refs are now resolved once
         // per board rebuild, at the one innerHTML site that destroys them.
         queryAllow: {},
         idlAllow: {},
+        // Zero, and worth stating: the countdown writes a width but never READS one back. A
+        // layout read here would flush pending layout ten times a second, the same thrash the
+        // per-file scan bans on a redraw, only faster.
+        reflowAllow: {},
       },
     ],
   },
@@ -807,8 +828,12 @@ function countMatches(code: string, re: RegExp): number {
   return (code.match(re) ?? []).length;
 }
 
+function painterRawSource(file: string): string {
+  return readFileSync(new URL(`../src/ui/${file}`, import.meta.url), 'utf8');
+}
+
 function painterSource(file: string): string {
-  return stripComments(readFileSync(new URL(`../src/ui/${file}`, import.meta.url), 'utf8'));
+  return stripComments(painterRawSource(file));
 }
 
 // The painter half of the src/ui classification: these two suffixes are what make a module
@@ -909,10 +934,17 @@ interface DriverHost {
   readonly drivers?: ReadonlyArray<DriverCallbackAllowance>;
 }
 
+// All FOUR families, and the reflow one is here for the same reason the whole gate is. A
+// granted per-file `reflowAllow` says a module makes N layout reads and, exactly like a granted
+// driver before #2518, implies nothing about WHEN: a read granted for a rebuild can migrate
+// into a 100ms tick and move no count anywhere. It is free today, because no entry has both a
+// non-empty reflowAllow and a non-empty driverAllow, which is precisely when to add it rather
+// than after the first module that has both.
 const DRIVER_BODY_FAMILIES = [
   ['writeAllow', RAW_WRITES],
   ['queryAllow', ELEMENT_QUERIES],
   ['idlAllow', IDL_WRITES],
+  ['reflowAllow', FORCED_REFLOW_READS],
 ] as const;
 
 function sweepDriverBodies(
@@ -934,7 +966,15 @@ function sweepDriverBodies(
     drivers.forEach((grant, index) => {
       if (countMismatch) return;
       // Resolved once PER ENTRY with only that entry's cuts, so one grant's declared stop
-      // cannot silently shrink a sibling grant's closure in the same module.
+      // cannot silently shrink a sibling grant's closure in the same module. Pinned by the
+      // two-driver synthetic in the positive control, where entry #0 cuts a method entry #1
+      // must still be scanned through.
+      //
+      // The source handed in is RAW, never comment-stripped: stripComments is a regex whose
+      // `//` arm would truncate a line at a `//` inside a string or a template literal, and
+      // ts.createSourceFile does not throw on the broken tree that results, it just silently
+      // loses a call site. The parse gets real source; only the RESOLVED tick corpus is
+      // stripped, below.
       const found = readDriverCallbacks(
         file,
         source,
@@ -951,6 +991,7 @@ function sweepDriverBodies(
       const callback = found[index] as (typeof found)[number];
       resolved += 1;
       scanned.push(`${file}#${index}`);
+      const at = `${file}#${index} (${callback.driver} every ${callback.delayMs}ms, line ${callback.line})`;
       if (callback.driver !== grant.driver) {
         violations.push(
           `${file}#${index}: the source arms ${callback.driver}, the allowance declares ${grant.driver}`,
@@ -978,9 +1019,7 @@ function sweepDriverBodies(
           checked.add(token);
           observed += actual;
           if (actual !== expected) {
-            violations.push(
-              `${file}#${index} (${callback.driver} every ${callback.delayMs}ms): ${token} appears ${actual}x on the tick, expected ${expected}`,
-            );
+            violations.push(`${at}: ${token} appears ${actual}x on the tick, expected ${expected}`);
           }
         }
       }
@@ -1175,11 +1214,20 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
   // #2518: a granted driver allowance now costs something. The sweep above says a module
   // repaints on a cadence; this one says what it is allowed to DO on that cadence.
   it('a granted repeating driver does only its documented work on each tick', () => {
-    const sweep = sweepDriverBodies(DRIVER_HOSTS, painterSource);
+    const sweep = sweepDriverBodies(DRIVER_HOSTS, painterRawSource);
     expect(sweep.checked, 'the driver-body sweep skipped part of the vocabulary').toEqual([
       ...labelsOf(RAW_WRITES),
       ...labelsOf(ELEMENT_QUERIES),
       ...labelsOf(IDL_WRITES),
+      ...labelsOf(FORCED_REFLOW_READS),
+    ]);
+    // ...and the family table itself is pinned, so the loop above cannot be satisfied by a
+    // table that quietly lost the family it was supposed to walk.
+    expect(DRIVER_BODY_FAMILIES.map(([kind]) => kind)).toEqual([
+      'writeAllow',
+      'queryAllow',
+      'idlAllow',
+      'reflowAllow',
     ]);
     // NON-VACUITY, and it needs three separate pins because each covers a different way this
     // sweep could scan nothing while reporting a clean bill of health.
@@ -1188,6 +1236,12 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     // That is the join between the two gates: FRAME_DRIVERS counts a name, this resolves a
     // call, and a name that is not a resolvable call (an alias, a driver armed through a
     // helper) fails here instead of quietly scanning one fewer callback.
+    // A CONSTRAINT THIS JOIN IMPOSES, stated so it is a decision rather than a trap: driverAllow
+    // counts NAME occurrences while this counts CALL SITES, so a module that mentions a driver
+    // name without calling it (`typeof requestAnimationFrame === 'function'`) would need more
+    // granted names than it has call sites and could not satisfy both halves. No such module
+    // exists in src/ui, and the strictness is what makes an unresolvable driver loud; the day
+    // one does, this is the join that gets a documented exception rather than a quiet loosening.
     const grantedDrivers = DRIVER_HOSTS.reduce(
       (total, host) =>
         total +
@@ -1215,6 +1269,18 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       sweep.observed,
       'the driver-body sweep matched nothing at all: it read no real source, or the matchers went blind',
     ).toBeGreaterThan(0);
+    // The hot and canvas buckets contribute ZERO callbacks today, so narrowing DRIVER_HOSTS to
+    // the cold bucket alone would keep every other assertion here green while a future
+    // hot-bucket driver grant went unscanned. Pinned by length, both ways.
+    expect(DRIVER_HOSTS.length).toBe(
+      HOT_PAINTERS.length + CANVAS_PAINTERS.length + COLD_PAINTER_ALLOWANCES.length,
+    );
+    expect(DRIVER_HOSTS.map((h) => h.file)).toContain('xp_bar_painter.ts');
+    expect(DRIVER_HOSTS.map((h) => h.file)).toContain('minimap_painter.ts');
+    // THE CUT REGISTRY, and it is doing more work than it looks. `stopsAt` is the one knob here
+    // that could re-open #2518 a level up (name the method that does the work, zero the budget),
+    // and this exact-list pin is what stops it being cheap: a cut added anywhere in any bucket
+    // shows up as a new row and fails until it is argued for in the diff.
     expect(sweep.cuts, 'the one declared reachability cut stopped reaching anything').toEqual([
       'daily_rewards_window.ts: renderCurrent',
     ]);
@@ -1253,6 +1319,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       writeAllow: {},
       queryAllow: {},
       idlAllow: {},
+      reflowAllow: {},
       ...over,
     });
     const read = () => leaky;
@@ -1261,8 +1328,8 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     // callees: both hits are inside `paint()`, not inside the callback.
     const unbudgeted = sweepDriverBodies(host([grant()]), read);
     expect(unbudgeted.violations).toEqual([
-      'leaky_window.ts#0 (setInterval every 100ms): .style appears 1x on the tick, expected 0',
-      'leaky_window.ts#0 (setInterval every 100ms): .querySelector appears 1x on the tick, expected 0',
+      'leaky_window.ts#0 (setInterval every 100ms, line 4): .style appears 1x on the tick, expected 0',
+      'leaky_window.ts#0 (setInterval every 100ms, line 4): .querySelector appears 1x on the tick, expected 0',
     ]);
     expect(unbudgeted.resolved).toBe(1);
     expect(unbudgeted.observed).toBe(2);
@@ -1283,7 +1350,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
         read,
       ).violations,
     ).toEqual([
-      'leaky_window.ts#0 (setInterval every 100ms): .querySelector appears 1x on the tick, expected 2',
+      'leaky_window.ts#0 (setInterval every 100ms, line 4): .querySelector appears 1x on the tick, expected 2',
     ]);
 
     // The declared cadence is pinned against the literal in the source, so re-tuning a clock
@@ -1326,7 +1393,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       sweepDriverBodies(host([grant()]), () => 'setInterval(() => { btn.disabled = true; }, 100);')
         .violations,
     ).toEqual([
-      'leaky_window.ts#0 (setInterval every 100ms): .disabled appears 1x on the tick, expected 0',
+      'leaky_window.ts#0 (setInterval every 100ms, line 1): .disabled appears 1x on the tick, expected 0',
     ]);
 
     // A driver whose callback cannot be resolved REFUSES rather than scanning nothing. That
@@ -1335,6 +1402,87 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     expect(() =>
       sweepDriverBodies(host([grant()]), () => 'setInterval(makeTick(this), 100);'),
     ).toThrow(/does not resolve to a function in this module/);
+
+    // A layout read on a tick is reported too. On the real tree that family counts zero for
+    // every granted driver, so nothing else here would notice it going dead.
+    expect(
+      sweepDriverBodies(
+        host([grant()]),
+        () => 'setInterval(() => { void el.getBoundingClientRect(); }, 100);',
+      ).violations,
+    ).toEqual([
+      'leaky_window.ts#0 (setInterval every 100ms, line 1): .getBoundingClientRect appears 1x on the tick, expected 0',
+    ]);
+
+    // A COMMENT inside the tick is not source. The corpus is stripped before counting, so
+    // prose about a `querySelector` the module no longer makes cannot fail the budget, and a
+    // banned call cannot be smuggled past a reviewer's eye in a commented-out line either.
+    expect(
+      sweepDriverBodies(
+        host([grant()]),
+        () => 'setInterval(() => { /* querySelector */ void 0; }, 100);',
+      ).violations,
+    ).toEqual([]);
+
+    // ONE GRANT'S CUT MUST NOT SHRINK ITS SIBLING'S CLOSURE. Two call sites in one module,
+    // both reaching the same method: entry #0 cuts it, entry #1 does not, so the query inside
+    // it must still be reported against entry #1. Resolving once with the UNION of every
+    // entry's cuts would silence it, and on the real tree that shortcut is invisible because
+    // the 30s poll happens not to reach what the 15s poll cuts.
+    const twoDrivers = `
+      export class W {
+        private arm(): void {
+          setInterval(() => this.paint(), 100);
+          setInterval(() => this.paint(), 200);
+        }
+        private paint(): void { void this.root.querySelector('.bar'); }
+      }`;
+    const siblings = sweepDriverBodies(
+      [
+        {
+          file: 'two_window.ts',
+          drivers: [
+            grant({ stopsAt: { paint: 'synthetic reason' } }),
+            grant({ everyMs: 200, queryAllow: {} }),
+          ],
+        },
+      ],
+      () => twoDrivers,
+    );
+    expect(siblings.violations).toEqual([
+      'two_window.ts#1 (setInterval every 200ms, line 5): .querySelector appears 1x on the tick, expected 0',
+    ]);
+    expect(siblings.cuts).toEqual(['two_window.ts: paint']);
+
+    // The `everyMs: null` arm of the cadence comparator, which no live entry exercises: a
+    // driver with no delay argument matches null, and a null against a number reports.
+    const rafSource = 'requestAnimationFrame(() => { void el.querySelector("x"); });';
+    expect(
+      sweepDriverBodies(
+        host([
+          grant({
+            driver: 'requestAnimationFrame',
+            everyMs: null,
+            queryAllow: { '.querySelector': 1 },
+          }),
+        ]),
+        () => rafSource,
+      ).violations,
+    ).toEqual([]);
+    expect(
+      sweepDriverBodies(
+        host([
+          grant({
+            driver: 'requestAnimationFrame',
+            everyMs: 16,
+            queryAllow: { '.querySelector': 1 },
+          }),
+        ]),
+        () => rafSource,
+      ).violations,
+    ).toEqual([
+      'leaky_window.ts#0: requestAnimationFrame is armed every nullms, the allowance declares 16ms',
+    ]);
 
     // A host with no `drivers` list contributes nothing, which is what makes the real-tree
     // `scanned` pin above load-bearing rather than incidental.
@@ -1450,6 +1598,18 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
               writeAllow: { nope: 1 },
               queryAllow: {},
               idlAllow: {},
+              reflowAllow: {},
+            },
+            // A setInterval grant that declares no cadence, so the counts beside it would be
+            // per nothing.
+            {
+              driver: 'setInterval',
+              everyMs: null,
+              why: 'synthetic',
+              writeAllow: {},
+              queryAllow: {},
+              idlAllow: {},
+              reflowAllow: {},
             },
           ],
         },
@@ -1460,17 +1620,18 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
       'b_painter.ts (CANVAS_PAINTERS: classified twice)',
       'c_painter.ts (COLD_PAINTER_ALLOWANCES: not a cold painter, so nothing reads it)',
       'b_painter.ts (drivers: 1 driver(s) granted by driverAllow, 0 callback allowance(s) declared)',
-      'live_window.ts (drivers: 0 driver(s) granted by driverAllow, 1 callback allowance(s) declared)',
+      'live_window.ts (drivers: 0 driver(s) granted by driverAllow, 2 callback allowance(s) declared)',
       'live_window.ts#0 (drivers: "setTimeout" is not a driver label)',
       'live_window.ts#0 (drivers: the granted cadence says what it is for)',
       'live_window.ts#0 (stopsAt: "render" cuts the walk with no reason)',
+      'live_window.ts#1 (drivers: a setInterval grant must declare its cadence; hoist the delay to a literal or a module-level const so it can be pinned)',
       'b_painter.ts (allow: "offsetWidth" is not a matcher label, so nothing reads it)',
       'live_window.ts (reflowAllow: "notAToken" is not a matcher label, so nothing reads it)',
       'live_window.ts#0 (writeAllow: "nope" is not a matcher label, so nothing reads it)',
     ]);
     // ...and it stays silent on a well-formed set, so it is not simply always noisy. The
     // well-formed driver entry keys all THREE new allowance maps with real labels, which is
-    // what keeps each of the three label sets load-bearing: point `queryAllow` at the
+    // what keeps each of the four label sets load-bearing: point `queryAllow` at the
     // raw-write labels and this arm goes red.
     expect(
       registrationProblems(
@@ -1492,6 +1653,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
                 writeAllow: { '.style': 1 },
                 queryAllow: { '.querySelector': 1 },
                 idlAllow: { '.disabled': 1 },
+                reflowAllow: { '.scrollTop': 1 },
               },
             ],
           },
@@ -1568,6 +1730,16 @@ function registrationProblems(
         if (!grant.why.trim()) {
           problems.push(`${host.file}#${index} (drivers: the granted cadence says what it is for)`);
         }
+        // A `setInterval` grant must name a cadence, because the counts beside it are per tick
+        // and a `null` would make them per nothing. `delayOf` resolves a literal OR a
+        // module-level const, so the honest way to reach null here is a delay computed at run
+        // time; that is the point at which a reviewer should be asked, not waved through.
+        // requestAnimationFrame / requestIdleCallback take no delay and are legitimately null.
+        if (grant.driver === 'setInterval' && grant.everyMs === null) {
+          problems.push(
+            `${host.file}#${index} (drivers: a setInterval grant must declare its cadence; hoist the delay to a literal or a module-level const so it can be pinned)`,
+          );
+        }
         for (const [name, reason] of Object.entries(grant.stopsAt ?? {})) {
           if (!reason.trim()) {
             problems.push(
@@ -1600,6 +1772,7 @@ function registrationProblems(
           ['writeAllow', `${host.file}#${index}`, grant.writeAllow] as const,
           ['queryAllow', `${host.file}#${index}`, grant.queryAllow] as const,
           ['idlAllow', `${host.file}#${index}`, grant.idlAllow] as const,
+          ['reflowAllow', `${host.file}#${index}`, grant.reflowAllow] as const,
         ]),
       ),
     ];
@@ -1815,6 +1988,12 @@ describe('hud_perf_budget ARM 1 (cont.): the matchers themselves', () => {
       ['.getElementById', "document.getElementById('lockpick-panel')", 'doc.getElementByIdish(x)'],
       ['.getElementsByClassName', "root.getElementsByClassName('lp')", 'el.getElementsByClass(x)'],
       ['.getElementsByTagName', "root.getElementsByTagName('li')", 'el.getElementsByTag(x)'],
+      [
+        '.getElementsByTagNameNS',
+        "root.getElementsByTagNameNS(ns, 'g')",
+        'el.getElementsByTagNS(x)',
+      ],
+      ['.getElementsByName', "document.getElementsByName('q')", 'doc.getElementsByNamed(x)'],
       ['.closest', "target.closest('.window.panel')", 'const closest = nearestTarget(p);'],
       ["['computed' query]", "el['querySelector']('.bar')", "el['querySelectorish']()"],
     ];
@@ -1840,7 +2019,7 @@ describe('hud_perf_budget ARM 1 (cont.): the matchers themselves', () => {
       ).toBe(1);
     }
     // NON-VACUITY against the live tree for the arm that motivated the family: the
-    // pre-#2516 lockpick clock re-queried its refs three times per tick, and
+    // pre-#2498 lockpick clock re-queried its refs three times per tick, and
     // daily_rewards' countdown poll still walks the subtree once per tick today. If the
     // querySelectorAll arm were re-narrowed it would count 0 here and pass quietly.
     const qsa = queries.get('.querySelectorAll');
@@ -1855,6 +2034,8 @@ describe('hud_perf_budget ARM 1 (cont.): the matchers themselves', () => {
       ['.readOnly', 'input.readOnly = true;', 'const r = opts.readOnlyish;'],
       ['.indeterminate', 'box.indeterminate = true;', 'const i = x.indeterminateish;'],
       ['.srcset', 'img.srcset = urls;', 'const s = img.srcsetOf;'],
+      ['.ariaLabel', 'btn.ariaLabel = label;', 'const a = row.ariaLabelKey;'],
+      ['.tabIndex', 'el.tabIndex = -1;', 'const t = row.tabIndexOf;'],
       ["['computed' idl]", "btn['disabled'] = true;", "btn['disabledAt'] = 1;"],
     ];
     for (const [label, positive, negative] of idlFixtures) {
@@ -1875,8 +2056,12 @@ describe('hud_perf_budget ARM 1 (cont.): the matchers themselves', () => {
     // to a reader to notice. Both collide with ordinary field names in this very tree
     // (`els.value` is the lockpick countdown node), so an allowance counting them would
     // document a fiction. If a future case needs them, this is the assertion to argue with.
-    expect(labelsOf(IDL_WRITES)).not.toContain('.value');
-    expect(labelsOf(IDL_WRITES)).not.toContain('.src');
+    for (const excluded of ['.value', '.src', '.title', '.alt', '.placeholder']) {
+      expect(labelsOf(IDL_WRITES), `${excluded} is excluded by decision`).not.toContain(excluded);
+    }
+    // `.matches` is out of the query family for the same reason, and worse: `matchMedia().matches`
+    // and a regex `.matches` are both live here.
+    expect(labelsOf(ELEMENT_QUERIES)).not.toContain('.matches');
 
     // COVERAGE OF THE FIXTURE TABLES THEMSELVES, which is the hole all three loops share:
     // each walks the FIXTURE list and looks the regex up by label, so an arm added to a family
@@ -1952,10 +2137,12 @@ describe('hud_perf_budget ARM 1 (cont.): the matchers themselves', () => {
       ['.getElementById', /\.getElementById\b/g],
       ['.getElementsByClassName', /\.getElementsByClassName\b/g],
       ['.getElementsByTagName', /\.getElementsByTagName\b/g],
+      ['.getElementsByTagNameNS', /\.getElementsByTagNameNS\b/g],
+      ['.getElementsByName', /\.getElementsByName\b/g],
       ['.closest', /\.closest\b/g],
       [
         "['computed' query]",
-        /\[\s*['"](?:querySelector|querySelectorAll|getElementById|getElementsByClassName|getElementsByTagName|closest)['"]\s*\]/g,
+        /\[\s*['"](?:querySelector|querySelectorAll|getElementById|getElementsByClassName|getElementsByTagName|getElementsByTagNameNS|getElementsByName|closest)['"]\s*\]/g,
       ],
     ]);
     expect(IDL_WRITES).toEqual([
@@ -1966,9 +2153,11 @@ describe('hud_perf_budget ARM 1 (cont.): the matchers themselves', () => {
       ['.readOnly', /\.readOnly\b/g],
       ['.indeterminate', /\.indeterminate\b/g],
       ['.srcset', /\.srcset\b/g],
+      ['.ariaLabel', /\.ariaLabel\b/g],
+      ['.tabIndex', /\.tabIndex\b/g],
       [
         "['computed' idl]",
-        /\[\s*['"](?:disabled|hidden|checked|selected|readOnly|indeterminate|srcset)['"]\s*\]/g,
+        /\[\s*['"](?:disabled|hidden|checked|selected|readOnly|indeterminate|srcset|ariaLabel|tabIndex)['"]\s*\]/g,
       ],
     ]);
   });
