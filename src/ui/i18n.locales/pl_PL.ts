@@ -6229,6 +6229,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.title': 'Kontroler',
   'hudChrome.controller.vibration': 'Wibracje',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Z tego truchła już wszystko zebrano.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Z tego truchła nie zbierzesz żadnej z wybranych części.',
   'hudChrome.corpseHarvest.componentAria': 'Zbierz: {component}',
   'hudChrome.corpseHarvest.components.claw': 'Pazur',
   'hudChrome.corpseHarvest.components.fang': 'Kieł',

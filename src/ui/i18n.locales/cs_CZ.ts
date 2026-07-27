@@ -4098,6 +4098,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.leaderboard.tabsLabel': 'Žebříčky nejlepších skóre',
   'hudChrome.leaderboard.topLevel': 'Nejvyšší',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Tato mrtvola už byla sklizena.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Z této mrtvoly nelze sklidit nic z vybraných komponent.',
   'hudChrome.corpseHarvest.componentAria': 'Sklidit {component}',
   'hudChrome.corpseHarvest.components.claw': 'Dráp',
   'hudChrome.corpseHarvest.components.fang': 'Tesák',

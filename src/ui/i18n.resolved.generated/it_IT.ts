@@ -1464,6 +1464,7 @@ export const it_IT: EnTranslations = {
       "harvestButton": "Raccogli",
       "harvestTooltip": "Raccoglie i componenti selezionati. Ogni carcassa puo essere raccolta una volta, chi prima arriva. Non prende il bottino.",
       "concentrateHint": "Meno componenti scegli, più alta sarà la qualità di ciascuno.",
+      "nothingSelectedYields": "Questo cadavere non ha nulla da raccogliere tra i componenti selezionati.",
       "alreadyHarvested": "Questo cadavere è già stato raccolto.",
       "componentAria": "Raccogli {component}",
       "components": {

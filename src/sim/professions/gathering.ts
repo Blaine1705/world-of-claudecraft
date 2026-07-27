@@ -788,9 +788,11 @@ export interface FocusHarvestYield {
  * nothing), which was itself only ever true BELOW the threshold: above it, the
  * same frame already spread. Scope, so the sentence above is not read as more
  * than it is: this covers a tag the corpse does not CARRY. A tag it carries
- * that HARVEST_COMPONENT_ITEMS does not map (claw, tusk, gills, horn) still
- * spends the claim for nothing, is reachable from the shipped picker, and is
- * tracked separately as #2509.
+ * that HARVEST_COMPONENT_ITEMS does not map (claw, tusk, gills, horn) is a
+ * different case and is handled a different way: it stays in the pick here,
+ * because dropping it would move the concentration-bonus denominator below,
+ * and the command boundary REFUSES the harvest pre-claim when the surviving
+ * pick maps to no item at all (#2509, src/sim/interaction.ts harvestCorpse).
  *
  * First occurrence wins (Set iteration is insertion-ordered) and the narrowing
  * preserves that order, so tag ORDER is untouched: it is the order the yields,
@@ -813,6 +815,41 @@ export function effectiveFocusComponents(
   return picked.length === 0 || picked.length >= taggedComponents.length
     ? taggedComponents
     : picked;
+}
+
+/**
+ * #2509: does this pick throw away EVERYTHING the corpse had to give? True when
+ * the effective set maps to no item at all while the corpse carries at least
+ * one family that does, i.e. a different pick on the same corpse would have
+ * paid out. The command boundary refuses on it (src/sim/interaction.ts
+ * harvestCorpse, pre-claim and rng-free) and the picker's view-core disables
+ * Harvest on it (src/ui/hud/loot/corpse_harvest_view.ts), so this is the ONE
+ * place the rule is written: a mirror stated twice is a mirror that can drift,
+ * and the spread threshold it depends on lives in effectiveFocusComponents
+ * above rather than in either caller.
+ *
+ * Both halves matter. Without the first, a pick that yields something would be
+ * refused. Without the second, a corpse whose families ALL map to nothing
+ * (fen_troll: claw, tusk) would become permanently unharvestable instead of
+ * keeping its documented zero-yield path: no pick forfeits anything there,
+ * because no pick could have paid out.
+ *
+ * Pure and rng-free, so the refusal it drives draws nothing.
+ *
+ * `yields` is a TRUTHINESS test, not `!== undefined`, to stay byte-equivalent
+ * to the `if (!itemId) continue` the grant loop and the capacity gate already
+ * use. An empty-string mapping would otherwise read as yieldable here and as
+ * grantable nowhere, which is the exact bug this refuses.
+ */
+export function forfeitsEveryMappedYield(
+  taggedComponents: readonly string[],
+  chosen: readonly string[],
+): boolean {
+  const yields = (component: string) => !!HARVEST_COMPONENT_ITEMS[component];
+  return (
+    !effectiveFocusComponents(taggedComponents, chosen).some(yields) &&
+    taggedComponents.some(yields)
+  );
 }
 
 /**

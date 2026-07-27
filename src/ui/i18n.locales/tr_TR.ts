@@ -2052,6 +2052,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.title': 'Etkinlik Takvimi',
   'hudChrome.calendar.titlePlaceholder': 'Etkinlik başlığı',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Bu leş zaten toplandı.',
+  'hudChrome.corpseHarvest.nothingSelectedYields': 'Bu leşten seçtiklerinin hiçbiri toplanamaz.',
   'hudChrome.corpseHarvest.componentAria': '{component} topla',
   'hudChrome.corpseHarvest.components.claw': 'Pençe',
   'hudChrome.corpseHarvest.components.fang': 'Diş',

@@ -1464,6 +1464,7 @@ export const es: EnTranslations = {
       "harvestButton": "Recolectar",
       "harvestTooltip": "Recoge los componentes marcados. Cada cadáver puede recolectarse una vez, el primero en llegar.",
       "concentrateHint": "Cuantos menos componentes elijas, mayor será la calidad de cada uno.",
+      "nothingSelectedYields": "Nada de lo que has seleccionado se puede recolectar de este cadáver.",
       "alreadyHarvested": "Este cadáver ya ha sido recolectado.",
       "componentAria": "Recolectar {component}",
       "components": {

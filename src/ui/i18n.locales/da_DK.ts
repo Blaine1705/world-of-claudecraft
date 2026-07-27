@@ -6090,6 +6090,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.title': 'Controller',
   'hudChrome.controller.vibration': 'Vibration',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Dette kadaver er allerede blevet høstet.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Intet af det du har valgt kan høstes fra dette kadaver.',
   'hudChrome.corpseHarvest.componentAria': 'Høst {component}',
   'hudChrome.corpseHarvest.components.claw': 'Klo',
   'hudChrome.corpseHarvest.components.fang': 'Hugtand',

@@ -7371,6 +7371,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.mining': 'Gruvdrift',
   'hudChrome.gathering.title': 'Insamling',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Det här kadavret har redan skördats.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Inget du valt kan skördas från det här kadavret.',
   'hudChrome.corpseHarvest.componentAria': 'Skörda {component}',
   'hudChrome.corpseHarvest.components.claw': 'Klo',
   'hudChrome.corpseHarvest.components.fang': 'Huggtand',

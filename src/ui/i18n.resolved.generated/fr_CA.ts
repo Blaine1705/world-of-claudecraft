@@ -1464,6 +1464,7 @@ export const fr_CA: EnTranslations = {
       "harvestButton": "Dépecer",
       "harvestTooltip": "Récupère les composants cochés. Chaque cadavre ne peut être dépecé qu'une fois, premier arrivé. Ne prend pas le butin.",
       "concentrateHint": "Moins vous choisissez de composants, plus la qualité de chacun est élevée.",
+      "nothingSelectedYields": "Ce cadavre n'a rien à dépecer parmi les composants cochés.",
       "alreadyHarvested": "Ce cadavre a déjà été dépecé.",
       "componentAria": "Prélever {component}",
       "components": {

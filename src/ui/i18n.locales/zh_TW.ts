@@ -751,6 +751,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestButton': '採集',
   'hudChrome.corpseHarvest.concentrateHint': '選擇的部位越少，每個部位的品質越高。',
   'hudChrome.corpseHarvest.alreadyHarvested': '這具屍體已經被採集過了。',
+  'hudChrome.corpseHarvest.nothingSelectedYields': '你選擇的部位都無法從這具屍體上採集。',
   'hudChrome.corpseHarvest.harvestTooltip':
     '採集勾選的部位。每具屍體只能被採集一次，先到先得。不會拾取戰利品。',
   'hudChrome.corpseHarvest.componentAria': '採集{component}',
