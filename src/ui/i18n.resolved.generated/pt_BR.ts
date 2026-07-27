@@ -1468,7 +1468,7 @@ export const pt_BR: EnTranslations = {
       "alreadyHarvested": "Este cadáver já foi coletado.",
       "componentAria": "Coletar {component}",
       "componentNoYield": "nada ainda",
-      "componentAriaNoYield": "Coletar {component}: ainda não há nada para retirar",
+      "componentAriaNoYield": "Coletar {component}: {note}",
       "components": {
         "hide": "Pele",
         "fang": "Presa",

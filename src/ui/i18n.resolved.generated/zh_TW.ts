@@ -1468,7 +1468,7 @@ export const zh_TW: EnTranslations = {
       "alreadyHarvested": "這具屍體已經被採集過了。",
       "componentAria": "採集{component}",
       "componentNoYield": "尚無產出",
-      "componentAriaNoYield": "採集{component}：目前還無法從中取得任何東西",
+      "componentAriaNoYield": "採集{component}：{note}",
       "components": {
         "hide": "獸皮",
         "fang": "尖牙",

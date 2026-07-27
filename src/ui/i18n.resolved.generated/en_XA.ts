@@ -1468,7 +1468,7 @@ export const en_XA: EnTranslations = {
       "alreadyHarvested": "[Ţĥíš çóŕþšé ĥáš áļŕéáðý ƀééñ ĥáŕʋéšţéð.]",
       "componentAria": "[Ĥáŕʋéšţ {component}]",
       "componentNoYield": "[ñóţĥíñĝ ýéţ]",
-      "componentAriaNoYield": "[Ĥáŕʋéšţ {component}: ñóţĥíñĝ ţó ţáķé ƒŕóɱ íţ ýéţ]",
+      "componentAriaNoYield": "[Ĥáŕʋéšţ {component}: {note}]",
       "components": {
         "hide": "[Ĥíðé]",
         "fang": "[Ƒáñĝ]",

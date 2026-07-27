@@ -781,7 +781,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Собирает отмеченные компоненты. Каждый труп можно обработать только один раз, кто успел первым. Добычу при этом не забирает.',
   'hudChrome.corpseHarvest.componentAria': 'Собрать {component}',
   'hudChrome.corpseHarvest.componentNoYield': 'пока ничего',
-  'hudChrome.corpseHarvest.componentAriaNoYield': 'Собрать {component}: пока нечего взять',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Собрать {component}: {note}',
   'hudChrome.corpseHarvest.yieldTierHint':
     'Чем меньше компонентов забирает сбор, тем выше качество каждого из них.',
   'hudChrome.corpseHarvest.components.hide': 'Шкура',

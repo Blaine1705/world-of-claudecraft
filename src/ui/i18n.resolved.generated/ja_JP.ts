@@ -1468,7 +1468,7 @@ export const ja_JP: EnTranslations = {
       "alreadyHarvested": "この死体はすでに採取されています。",
       "componentAria": "{component}を採取",
       "componentNoYield": "まだ産出なし",
-      "componentAriaNoYield": "{component}を採取：まだ何も取れません",
+      "componentAriaNoYield": "{component}を採取：{note}",
       "components": {
         "hide": "毛皮",
         "fang": "牙",

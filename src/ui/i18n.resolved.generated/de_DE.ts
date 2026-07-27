@@ -1468,7 +1468,7 @@ export const de_DE: EnTranslations = {
       "alreadyHarvested": "Dieser Kadaver wurde bereits verwertet.",
       "componentAria": "{component} verwerten",
       "componentNoYield": "noch nichts",
-      "componentAriaNoYield": "{component} verwerten: daraus gibt es noch nichts zu holen",
+      "componentAriaNoYield": "{component} verwerten: {note}",
       "components": {
         "hide": "Haut",
         "fang": "Fangzahn",

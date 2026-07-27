@@ -6233,8 +6233,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Z tego truchła nie zbierzesz żadnej z wybranych części.',
   'hudChrome.corpseHarvest.componentAria': 'Zbierz: {component}',
   'hudChrome.corpseHarvest.componentNoYield': 'jeszcze nic',
-  'hudChrome.corpseHarvest.componentAriaNoYield':
-    'Zbierz: {component}, jeszcze nie ma z tego nic do wzięcia',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Zbierz: {component}, {note}',
   'hudChrome.corpseHarvest.yieldTierHint':
     'Im mniej części faktycznie zabierze zbieranie, tym wyższa jakość każdej z nich.',
   'hudChrome.corpseHarvest.components.claw': 'Pazur',

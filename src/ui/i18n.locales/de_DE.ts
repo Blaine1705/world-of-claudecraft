@@ -5698,8 +5698,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'An diesem Kadaver gibt es nichts aus deiner Auswahl zu verwerten.',
   'hudChrome.corpseHarvest.componentAria': '{component} verwerten',
   'hudChrome.corpseHarvest.componentNoYield': 'noch nichts',
-  'hudChrome.corpseHarvest.componentAriaNoYield':
-    '{component} verwerten: daraus gibt es noch nichts zu holen',
+  'hudChrome.corpseHarvest.componentAriaNoYield': '{component} verwerten: {note}',
   'hudChrome.corpseHarvest.yieldTierHint':
     'Je weniger Teile eine Verwertung tatsächlich entnimmt, desto höher ist die Qualitätsstufe jedes einzelnen Teils.',
   'hudChrome.corpseHarvest.components.claw': 'Klaue',

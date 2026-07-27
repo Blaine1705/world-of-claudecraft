@@ -1468,7 +1468,7 @@ export const vi_VN: EnTranslations = {
       "alreadyHarvested": "Xác này đã bị thu hoạch rồi.",
       "componentAria": "Thu hoạch {component}",
       "componentNoYield": "chưa có gì",
-      "componentAriaNoYield": "Thu hoạch {component}: chưa có gì để lấy từ bộ phận này",
+      "componentAriaNoYield": "Thu hoạch {component}: {note}",
       "components": {
         "hide": "Da",
         "fang": "Nanh",

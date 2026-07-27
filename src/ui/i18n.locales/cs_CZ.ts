@@ -4102,7 +4102,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Z této mrtvoly nelze sklidit nic z vybraných komponent.',
   'hudChrome.corpseHarvest.componentAria': 'Sklidit {component}',
   'hudChrome.corpseHarvest.componentNoYield': 'zatím nic',
-  'hudChrome.corpseHarvest.componentAriaNoYield': 'Sklidit {component}: zatím z toho není co vzít',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Sklidit {component}: {note}',
   'hudChrome.corpseHarvest.yieldTierHint':
     'Čím méně komponent sklizeň skutečně odebere, tím vyšší stupeň má každá z nich.',
   'hudChrome.corpseHarvest.components.claw': 'Dráp',

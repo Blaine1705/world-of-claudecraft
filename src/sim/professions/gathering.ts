@@ -1013,16 +1013,26 @@ export function yieldingFocusComponents(
  *     nothing (`(['hide','fang','claw'], ['claw'])`, or any pick on an
  *     all-unmapped corpse) it answers `tags.length`, one above the bound, and
  *     resolveCorpseFocusHarvest then rolls nothing at all with it.
- *   - No pick gets worse. `extracted` is a subset of the effective pick, so the
- *     new bonus is >= the old one for every pick on every corpse.
+ *   - No pick's EXPECTED value gets worse. `extracted` is a subset of the
+ *     effective pick, so the new bonus is >= the old one for every pick on
+ *     every corpse. Per-seed outcomes are a different statement and a weaker
+ *     one: the draw position moves (next bullet), so a given seed can land a
+ *     smaller plain stack than it used to. One of the re-measured literals is
+ *     exactly that (mudfin_murloc at seed 5: rough_hide 4 and no specimen
+ *     before, rough_hide 3 plus a signed pristine_hide after).
  *   - The eight all-mapped tagged templates and the 101 untagged ones do not
  *     move at all: with nothing to filter, `extracted` IS the effective pick.
  *   - Only tier QUANTITY moves. The signed/specimen jackpot comes from
  *     rollCorpseMaterialRarity, a fixed-baseline roll this bonus never feeds,
  *     and it is already drawn once per granted family. What does move is the
- *     draw POSITION, since an unmapped family no longer burns a tier roll, so
- *     which harvests happen to mint a specimen is reshuffled (symmetrically)
- *     rather than made more or less likely.
+ *     draw POSITION: an unmapped family no longer burns a tier roll, and
+ *     ctx.rng is the WORLD's single stream, not a per-corpse one, so the first
+ *     mixed-corpse harvest after this ships re-phases every draw that follows
+ *     it in that world. Determinism is untouched (same seed plus same command
+ *     sequence gives the same world) and no golden or replay drives
+ *     harvestCorpse, so nothing downstream is pinned to the old phase; what it
+ *     means in practice is that which harvests happen to mint a specimen is
+ *     reshuffled symmetrically rather than made more or less likely.
  *   - It is self-healing. The day claw/tusk/gills/horn get items, every number
  *     returns to today's, with no code change.
  *
@@ -1054,8 +1064,12 @@ export function harvestConcentrationBonus(
   );
 }
 
-/** The clamp itself, shared so the exported reader and the roll below cannot
- *  compute the bonus two ways. */
+/** The clamp itself, so the exported reader above and any future caller cannot
+ *  write two copies of the tier ceiling. The NUMERATOR is not shared here: the
+ *  roll below asks harvestConcentrationBonus itself, which is what actually
+ *  keeps the client's `concentrated` hint and the sim's bonus from diverging.
+ *  Sharing only the clamp would let a second exclusion reason land in one and
+ *  not the other, with nothing to red. */
 function concentrationBonusFor(taggedCount: number, extractedCount: number): number {
   return Math.max(0, Math.min(HARVEST_TIERS.length - 1, taggedCount - extractedCount));
 }
@@ -1095,7 +1109,11 @@ export function resolveCorpseFocusHarvest(
   rng: Rng,
 ): FocusHarvestYield[] {
   const extracted = yieldingFocusComponents(taggedComponents, chosen);
-  const bonus = concentrationBonusFor(taggedComponents.length, extracted.length);
+  // The exported reader, not a second numerator that happens to agree today:
+  // its one other caller is the picker's view-core, and a hint that disagreed
+  // with the roll would be a lie with nothing to red. One extra pure call on a
+  // cold command path, no rng touched.
+  const bonus = harvestConcentrationBonus(taggedComponents, chosen);
   return extracted.map((component) => ({ component, tier: rollFocusTier(rng, bonus) }));
 }
 

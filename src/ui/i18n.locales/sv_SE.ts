@@ -7375,7 +7375,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Inget du valt kan skördas från det här kadavret.',
   'hudChrome.corpseHarvest.componentAria': 'Skörda {component}',
   'hudChrome.corpseHarvest.componentNoYield': 'inget än',
-  'hudChrome.corpseHarvest.componentAriaNoYield': 'Skörda {component}: inget att ta från den än',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Skörda {component}: {note}',
   'hudChrome.corpseHarvest.yieldTierHint':
     'Ju färre komponenter en skörd faktiskt tar, desto högre kvalitetsnivå får var och en.',
   'hudChrome.corpseHarvest.components.claw': 'Klo',

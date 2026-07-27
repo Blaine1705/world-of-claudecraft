@@ -1468,7 +1468,7 @@ export const ko_KR: EnTranslations = {
       "alreadyHarvested": "이 시체는 이미 채집되었습니다.",
       "componentAria": "{component} 채집",
       "componentNoYield": "아직 없음",
-      "componentAriaNoYield": "{component} 채집: 아직 채집할 것이 없습니다",
+      "componentAriaNoYield": "{component} 채집: {note}",
       "components": {
         "hide": "가죽",
         "fang": "송곳니",

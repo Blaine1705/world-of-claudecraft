@@ -1468,7 +1468,7 @@ export const it_IT: EnTranslations = {
       "alreadyHarvested": "Questo cadavere è già stato raccolto.",
       "componentAria": "Raccogli {component}",
       "componentNoYield": "ancora nulla",
-      "componentAriaNoYield": "Raccogli {component}: non c'è ancora nulla da prendere",
+      "componentAriaNoYield": "Raccogli {component}: {note}",
       "components": {
         "hide": "Pelle",
         "fang": "Zanna",

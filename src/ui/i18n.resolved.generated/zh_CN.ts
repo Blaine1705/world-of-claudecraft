@@ -1468,7 +1468,7 @@ export const zh_CN: EnTranslations = {
       "alreadyHarvested": "这具尸体已经被采集过了。",
       "componentAria": "采集{component}",
       "componentNoYield": "暂无产出",
-      "componentAriaNoYield": "采集{component}：暂时无法从中取得任何东西",
+      "componentAriaNoYield": "采集{component}：{note}",
       "components": {
         "hide": "兽皮",
         "fang": "尖牙",

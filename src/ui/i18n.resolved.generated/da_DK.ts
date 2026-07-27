@@ -1468,7 +1468,7 @@ export const da_DK: EnTranslations = {
       "alreadyHarvested": "Dette kadaver er allerede blevet høstet.",
       "componentAria": "Høst {component}",
       "componentNoYield": "intet endnu",
-      "componentAriaNoYield": "Høst {component}: der er endnu intet at tage herfra",
+      "componentAriaNoYield": "Høst {component}: {note}",
       "components": {
         "hide": "Skind",
         "fang": "Hugtand",

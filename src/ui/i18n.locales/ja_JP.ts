@@ -781,7 +781,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'チェックした部位を採取します。各死体は早い者勝ちで一度だけ採取できます。戦利品は取りません。',
   'hudChrome.corpseHarvest.componentAria': '{component}を採取',
   'hudChrome.corpseHarvest.componentNoYield': 'まだ産出なし',
-  'hudChrome.corpseHarvest.componentAriaNoYield': '{component}を採取：まだ何も取れません',
+  'hudChrome.corpseHarvest.componentAriaNoYield': '{component}を採取：{note}',
   'hudChrome.corpseHarvest.yieldTierHint':
     '一度の採取で実際に取れる部位が少ないほど、各部位の品質が高くなります。',
   'hudChrome.corpseHarvest.components.hide': '毛皮',

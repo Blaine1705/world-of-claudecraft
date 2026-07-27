@@ -754,7 +754,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '采集勾选的部位。每具尸体只能被采集一次，先到先得。不会拾取战利品。',
   'hudChrome.corpseHarvest.componentAria': '采集{component}',
   'hudChrome.corpseHarvest.componentNoYield': '暂无产出',
-  'hudChrome.corpseHarvest.componentAriaNoYield': '采集{component}：暂时无法从中取得任何东西',
+  'hudChrome.corpseHarvest.componentAriaNoYield': '采集{component}：{note}',
   'hudChrome.corpseHarvest.yieldTierHint': '一次采集实际取得的部位越少，每个部位的品质越高。',
   'hudChrome.corpseHarvest.components.hide': '兽皮',
   'hudChrome.corpseHarvest.components.fang': '尖牙',

@@ -5616,8 +5616,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Nada do que você selecionou pode ser coletado deste cadáver.',
   'hudChrome.corpseHarvest.componentAria': 'Coletar {component}',
   'hudChrome.corpseHarvest.componentNoYield': 'nada ainda',
-  'hudChrome.corpseHarvest.componentAriaNoYield':
-    'Coletar {component}: ainda não há nada para retirar',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Coletar {component}: {note}',
   'hudChrome.corpseHarvest.yieldTierHint':
     'Quanto menos componentes uma coleta retirar, maior a qualidade de cada um.',
   'hudChrome.corpseHarvest.components.claw': 'Garra',

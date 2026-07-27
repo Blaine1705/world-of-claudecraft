@@ -2986,8 +2986,10 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
 // so this corpse takes the same path as the 101 templates that carry no
 // component tags at all. No new string (the pre-existing localized
 // error.corpseNothingToHarvest), no new event, no wire or IWorld change, and
-// nothing moves on a MIXED corpse: the describe below still holds every one of
-// its pre-#2509 literals.
+// nothing moves on a MIXED corpse. That last clause used to say the describe
+// below still held every one of its pre-#2509 literals; #2514 has since moved
+// those literals on purpose, so what is unchanged on a mixed corpse is the
+// #2509 refusal itself and this corpse-level gate, not the yields.
 describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2513)', () => {
   const harvestAt = (
     templateId: string,
@@ -3235,12 +3237,25 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
         const label = `${id} ${JSON.stringify(selected)}`;
         if (selected.some((t) => !harvestFamilyYieldsItem(t))) unmappedOffered++;
         const expectedSet = yieldingFocusComponents(tags, selected);
+        // The item ids the extracted set resolves to, as literals off the
+        // shipped table rather than `toBeTruthy` over the same accessor the
+        // filter used, which could only ever re-assert the filter against its
+        // own definition.
         for (const family of expectedSet) {
-          expect(harvestItemForFamily(family), `${label} ${family}`).toBeTruthy();
+          expect(HARVEST_COMPONENT_ITEMS[family], `${label} ${family}`).toBe(
+            harvestItemForFamily(family),
+          );
+          expect(typeof harvestItemForFamily(family), `${label} ${family} id`).toBe('string');
         }
         const r = harvestAt(id, selected);
         if (r.claimedBy === null) continue;
         extracted += expectedSet.length;
+        // One tier roll per extracted family and one rarity roll per grant, so
+        // an unmapped family costs NOTHING. Swept here rather than left to the
+        // seed-5 literal cases, since "no draw for a family that cannot pay" is
+        // the property that makes the two arms dead at the roll rather than
+        // merely at the lookup.
+        expect(r.draws, `${label} draws`).toBe(2 * expectedSet.length);
         // The ledger's distinct item ids are exactly the extracted families'
         // items, plus whatever specimens rode along. Never an id from a family
         // outside the extracted set, and never one short of it.

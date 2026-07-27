@@ -7632,8 +7632,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Van dit kadaver valt niets uit je selectie te oogsten.',
   'hudChrome.corpseHarvest.componentAria': 'Oogst {component}',
   'hudChrome.corpseHarvest.componentNoYield': 'nog niets',
-  'hudChrome.corpseHarvest.componentAriaNoYield':
-    'Oogst {component}: hieruit valt nog niets te halen',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Oogst {component}: {note}',
   'hudChrome.corpseHarvest.yieldTierHint':
     'Hoe minder delen een oogst daadwerkelijk oplevert, hoe hoger de kwaliteit van elk deel.',
   'hudChrome.corpseHarvest.components.hide': 'Huid',

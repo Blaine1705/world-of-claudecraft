@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { MOBS } from '../src/sim/data';
 import {
   BASE_TIER_WEIGHTS,
+  HARVEST_TIERS,
   harvestFamilyYieldsItem,
+  harvestTierQuantity,
   isHarvestableCorpse,
 } from '../src/sim/professions/gathering';
 
@@ -82,6 +84,15 @@ describe('mob component-type tags', () => {
     // The formula really does reward concentration, or every row below would
     // pass against a flat curve.
     expect(expectedQty(1)).toBeGreaterThan(expectedQty(0));
+    // `expectedQty` mirrors two rules it cannot import: harvestTierQuantity's
+    // `index + 1`, and rollFocusTier's clamp at the top tier. Both are pinned
+    // against the shipped accessors here, so a change to either reds this guard
+    // instead of leaving it quietly checking the wrong threshold.
+    expect(HARVEST_TIERS).toHaveLength(BASE_TIER_WEIGHTS.length);
+    expect(harvestTierQuantity(HARVEST_TIERS[0])).toBe(1);
+    expect(harvestTierQuantity(HARVEST_TIERS[HARVEST_TIERS.length - 1])).toBe(
+      BASE_TIER_WEIGHTS.length,
+    );
     let mixedSeen = 0;
     for (const mob of tagged) {
       const tags = mob.componentTags ?? [];

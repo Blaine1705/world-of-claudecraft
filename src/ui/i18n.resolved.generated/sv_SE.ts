@@ -1468,7 +1468,7 @@ export const sv_SE: EnTranslations = {
       "alreadyHarvested": "Det här kadavret har redan skördats.",
       "componentAria": "Skörda {component}",
       "componentNoYield": "inget än",
-      "componentAriaNoYield": "Skörda {component}: inget att ta från den än",
+      "componentAriaNoYield": "Skörda {component}: {note}",
       "components": {
         "hide": "Hud",
         "fang": "Huggtand",

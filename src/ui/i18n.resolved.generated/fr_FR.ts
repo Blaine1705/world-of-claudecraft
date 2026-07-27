@@ -1468,7 +1468,7 @@ export const fr_FR: EnTranslations = {
       "alreadyHarvested": "Ce cadavre a déjà été dépecé.",
       "componentAria": "Prélever {component}",
       "componentNoYield": "rien pour l'instant",
-      "componentAriaNoYield": "Prélever {component} : rien à en tirer pour l'instant",
+      "componentAriaNoYield": "Prélever {component} : {note}",
       "components": {
         "hide": "Peau",
         "fang": "Croc",

@@ -1426,11 +1426,16 @@ export const hudChromeStrings = {
     componentAria: 'Harvest {component}',
     // #2514: the same four families, on a corpse that ALSO carries one that
     // pays. The row stays offered (the corpse does carry it) and checking it is
-    // now free, so this marks it rather than explaining a refusal. Two keys
-    // because the visible tag sits beside the component name and the screen
-    // reader needs the component name inside the label; never concatenated.
+    // now free, so this marks it rather than explaining a refusal.
+    //
+    // Two keys, and the aria one takes the visible mark as a SECOND
+    // placeholder rather than restating it. Never concatenated, and it also
+    // makes WCAG 2.2 SC 2.5.3 (Label in Name) structural: the accessible name
+    // contains the text the row shows, in every locale, instead of depending on
+    // each translator happening to reuse their own phrasing across two
+    // independent strings. Keep {note} as a placeholder if this is reworded.
     componentNoYield: 'nothing yet',
-    componentAriaNoYield: 'Harvest {component}: nothing to take from it yet',
+    componentAriaNoYield: 'Harvest {component}: {note}',
     components: {
       hide: 'Hide',
       fang: 'Fang',

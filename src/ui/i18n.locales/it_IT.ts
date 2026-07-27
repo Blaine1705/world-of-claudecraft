@@ -5653,8 +5653,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.nothingSelectedYields':
     'Questo cadavere non ha nulla da raccogliere tra i componenti selezionati.',
   'hudChrome.corpseHarvest.componentAria': 'Raccogli {component}',
-  'hudChrome.corpseHarvest.componentAriaNoYield':
-    "Raccogli {component}: non c'è ancora nulla da prendere",
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Raccogli {component}: {note}',
   'hudChrome.corpseHarvest.componentNoYield': 'ancora nulla',
   'hudChrome.corpseHarvest.yieldTierHint':
     'Meno componenti prende una raccolta, più alta sarà la qualità di ciascuno.',

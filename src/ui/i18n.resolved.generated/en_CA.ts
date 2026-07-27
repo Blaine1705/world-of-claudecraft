@@ -1468,7 +1468,7 @@ export const en_CA: EnTranslations = {
       "alreadyHarvested": "This corpse has already been harvested.",
       "componentAria": "Harvest {component}",
       "componentNoYield": "nothing yet",
-      "componentAriaNoYield": "Harvest {component}: nothing to take from it yet",
+      "componentAriaNoYield": "Harvest {component}: {note}",
       "components": {
         "hide": "Hide",
         "fang": "Fang",

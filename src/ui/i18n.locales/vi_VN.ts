@@ -2077,8 +2077,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.nothingSelectedYields':
     'Không thể thu hoạch bộ phận nào bạn đã chọn từ xác này.',
   'hudChrome.corpseHarvest.componentAria': 'Thu hoạch {component}',
-  'hudChrome.corpseHarvest.componentAriaNoYield':
-    'Thu hoạch {component}: chưa có gì để lấy từ bộ phận này',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Thu hoạch {component}: {note}',
   'hudChrome.corpseHarvest.componentNoYield': 'chưa có gì',
   'hudChrome.corpseHarvest.yieldTierHint':
     'Một lần thu hoạch lấy được càng ít bộ phận, bậc chất lượng của mỗi bộ phận càng cao.',

@@ -370,6 +370,11 @@ export function harvestCorpse(
     if (existing) existing.count += maxQty;
     else wanted.push({ itemId: wantedItemId, count: maxQty });
   }
+  // The third dead-by-construction guard on this path, named beside its two
+  // siblings above so the set is auditable rather than one-of-three documented:
+  // both gates upstream guarantee yieldingFocusComponents is non-empty, so
+  // `wanted` always holds at least one row and the short-circuit's false arm is
+  // unreachable. Dead since #2513, kept for the same reason the others are.
   if (wanted.length > 0 && !fitsAll(meta.inventory, bagCapacity(meta.bags), wanted)) {
     ctx.error(meta.entityId, 'Your bags are full.');
     return;

@@ -7505,8 +7505,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Nada de lo que has seleccionado se puede recolectar de este cadáver.',
   'hudChrome.corpseHarvest.componentAria': 'Recolectar {component}',
   'hudChrome.corpseHarvest.componentNoYield': 'aún nada',
-  'hudChrome.corpseHarvest.componentAriaNoYield':
-    'Recolectar {component}: aún no hay nada que extraer',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Recolectar {component}: {note}',
   'hudChrome.corpseHarvest.yieldTierHint':
     'Cuantos menos componentes extraiga una recolección, mayor será la calidad de cada uno.',
   'hudChrome.corpseHarvest.components.claw': 'Garra',

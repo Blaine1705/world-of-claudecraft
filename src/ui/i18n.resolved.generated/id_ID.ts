@@ -1468,7 +1468,7 @@ export const id_ID: EnTranslations = {
       "alreadyHarvested": "Bangkai ini sudah dipanen.",
       "componentAria": "Panen {component}",
       "componentNoYield": "belum ada hasil",
-      "componentAriaNoYield": "Panen {component}: belum ada yang bisa diambil darinya",
+      "componentAriaNoYield": "Panen {component}: {note}",
       "components": {
         "hide": "Kulit",
         "fang": "Taring",

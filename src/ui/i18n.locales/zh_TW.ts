@@ -755,7 +755,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '採集勾選的部位。每具屍體只能被採集一次，先到先得。不會拾取戰利品。',
   'hudChrome.corpseHarvest.componentAria': '採集{component}',
   'hudChrome.corpseHarvest.componentNoYield': '尚無產出',
-  'hudChrome.corpseHarvest.componentAriaNoYield': '採集{component}：目前還無法從中取得任何東西',
+  'hudChrome.corpseHarvest.componentAriaNoYield': '採集{component}：{note}',
   'hudChrome.corpseHarvest.yieldTierHint': '一次採集實際取得的部位越少，每個部位的品質就越高。',
   'hudChrome.corpseHarvest.components.hide': '獸皮',
   'hudChrome.corpseHarvest.components.fang': '尖牙',

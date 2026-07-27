@@ -6111,8 +6111,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Ce cadavre n'a rien à dépecer parmi les composants cochés.",
   'hudChrome.corpseHarvest.componentAria': 'Prélever {component}',
   'hudChrome.corpseHarvest.componentNoYield': "rien pour l'instant",
-  'hudChrome.corpseHarvest.componentAriaNoYield':
-    "Prélever {component} : rien à en tirer pour l'instant",
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Prélever {component} : {note}',
   'hudChrome.corpseHarvest.yieldTierHint':
     'Moins un dépeçage prélève de composants, plus le palier de chacun est élevé.',
   'hudChrome.corpseHarvest.components.claw': 'Griffe',

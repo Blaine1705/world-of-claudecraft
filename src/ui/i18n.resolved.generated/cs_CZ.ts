@@ -1468,7 +1468,7 @@ export const cs_CZ: EnTranslations = {
       "alreadyHarvested": "Tato mrtvola už byla sklizena.",
       "componentAria": "Sklidit {component}",
       "componentNoYield": "zatím nic",
-      "componentAriaNoYield": "Sklidit {component}: zatím z toho není co vzít",
+      "componentAriaNoYield": "Sklidit {component}: {note}",
       "components": {
         "hide": "Kůže",
         "fang": "Tesák",

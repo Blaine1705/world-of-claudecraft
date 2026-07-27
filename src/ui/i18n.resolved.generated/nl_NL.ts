@@ -1468,7 +1468,7 @@ export const nl_NL: EnTranslations = {
       "alreadyHarvested": "Dit kadaver is al geoogst.",
       "componentAria": "Oogst {component}",
       "componentNoYield": "nog niets",
-      "componentAriaNoYield": "Oogst {component}: hieruit valt nog niets te halen",
+      "componentAriaNoYield": "Oogst {component}: {note}",
       "components": {
         "hide": "Huid",
         "fang": "Tand",

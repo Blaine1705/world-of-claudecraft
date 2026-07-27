@@ -779,7 +779,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '선택한 부위를 채집합니다. 각 시체는 선착순으로 한 번만 채집할 수 있습니다. 전리품은 가져가지 않습니다.',
   'hudChrome.corpseHarvest.componentAria': '{component} 채집',
   'hudChrome.corpseHarvest.componentNoYield': '아직 없음',
-  'hudChrome.corpseHarvest.componentAriaNoYield': '{component} 채집: 아직 채집할 것이 없습니다',
+  'hudChrome.corpseHarvest.componentAriaNoYield': '{component} 채집: {note}',
   'hudChrome.corpseHarvest.yieldTierHint':
     '채집에서 실제로 얻는 부위가 적을수록 각 부위의 등급이 더 높아집니다.',
   'hudChrome.corpseHarvest.components.hide': '가죽',

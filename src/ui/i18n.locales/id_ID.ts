@@ -2066,8 +2066,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Tidak ada pilihanmu yang bisa dipanen dari bangkai ini.',
   'hudChrome.corpseHarvest.componentAria': 'Panen {component}',
   'hudChrome.corpseHarvest.componentNoYield': 'belum ada hasil',
-  'hudChrome.corpseHarvest.componentAriaNoYield':
-    'Panen {component}: belum ada yang bisa diambil darinya',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Panen {component}: {note}',
   'hudChrome.corpseHarvest.yieldTierHint':
     'Semakin sedikit bagian yang benar-benar diambil dalam satu panen, semakin tinggi tingkat mutu tiap bagian.',
   'hudChrome.corpseHarvest.components.claw': 'Cakar',

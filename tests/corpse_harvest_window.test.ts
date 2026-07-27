@@ -320,7 +320,7 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     const rows = [...t.container.querySelectorAll<HTMLElement>('.corpse-harvest-row')];
     expect(rows).toHaveLength(3);
     // Only claw is marked, and it is marked in TEXT, not colour alone.
-    expect(rows.map((r) => r.classList.contains('corpse-harvest-row-inert'))).toEqual([
+    expect(rows.map((r) => r.classList.contains('corpse-harvest-row-no-yield'))).toEqual([
       false,
       false,
       true,
@@ -354,9 +354,19 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     const t = render(GREYJAW, []);
     const label = (tag: string) => t.boxes.find((b) => b.value === tag)?.getAttribute('aria-label');
     expect(label('hide')).toBe('Harvest Hide');
-    expect(label('claw')).toBe('Harvest Claw: nothing to take from it yet');
+    expect(label('claw')).toBe('Harvest Claw: nothing yet');
     const note = t.container.querySelector<HTMLElement>('.corpse-harvest-note')!;
     expect(note.getAttribute('aria-hidden')).toBe('true');
+    // WCAG 2.2 SC 2.5.3, Label in Name: the accessible name must CONTAIN the
+    // text the row presents visually, or a speech-input user reading the row
+    // aloud misses. Asserted as containment of the visible node's own text, not
+    // as a second literal, so it holds in every locale: the aria key takes the
+    // mark as a {note} placeholder rather than restating it, which is what
+    // makes that structural instead of a translator convention.
+    expect(label('claw')).toContain(note.textContent);
+    // ...and the row's visible name is still in there too, so the containment
+    // above cannot be satisfied by a label that dropped the component.
+    expect(label('claw')).toContain('Claw');
   });
 
   it('marks nothing on an all-mapped corpse', () => {
@@ -364,7 +374,7 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // marks every row.
     const t = render(['hide', 'fang'], []);
     expect(t.container.querySelectorAll('.corpse-harvest-note')).toHaveLength(0);
-    expect(t.container.querySelectorAll('.corpse-harvest-row-inert')).toHaveLength(0);
+    expect(t.container.querySelectorAll('.corpse-harvest-row-no-yield')).toHaveLength(0);
   });
 
   it('states the tier rule in terms of what a harvest TAKES (#2514)', () => {
@@ -375,5 +385,75 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     expect(t.container.querySelector('.corpse-harvest-hint')?.textContent).toBe(
       'The fewer components a harvest takes, the higher the tier of each.',
     );
+  });
+
+  it('emphasizes that hint exactly while the pick concentrates (#2514)', () => {
+    // The render sink for the view model's `concentrated`, which the picker
+    // computed and no painter read before this. It must follow the SIM's bonus,
+    // not a box count: on this corpse the widest pick already carries a bonus,
+    // so naming both mapped families is not a concentrate and naming one is.
+    const t = render(GREYJAW, []);
+    const section = t.container.querySelector<HTMLElement>('.corpse-harvest')!;
+    expect(section.classList.contains('is-concentrated')).toBe(false);
+    t.toggle('hide');
+    expect(section.classList.contains('is-concentrated')).toBe(true);
+    // Ticking the unmapped box changes nothing, which is the whole ruling seen
+    // from the client: the sim scores this pick exactly as it scores ['hide'].
+    t.toggle('claw');
+    expect(section.classList.contains('is-concentrated')).toBe(true);
+    // Naming both mapped families is the widest pick this corpse offers, so it
+    // is not a concentrate even though two of three boxes are unchecked-to-one.
+    t.toggle('fang');
+    expect(section.classList.contains('is-concentrated')).toBe(false);
+    // ...and a dead pick is never "concentrated", though its raw bonus is the
+    // whole tag count.
+    t.toggle('hide');
+    t.toggle('fang');
+    expect(t.btn.disabled).toBe(true);
+    expect(section.classList.contains('is-concentrated')).toBe(false);
+  });
+
+  it('carries a stylesheet rule for every class the mark relies on', () => {
+    // Same argument as the reason-line rule below: these classes are otherwise
+    // pinned only by this file's own querySelector, so renaming one side would
+    // leave the mark rendering as ordinary body text with every test green.
+    // The muted TOKEN is asserted rather than an opacity: a stacked opacity put
+    // the note at 2.97:1 on the parchment preset, under the 4.5:1 AA floor, and
+    // tests/theme.test.ts cannot see a loss that happens in a stylesheet.
+    const css = readFileSync(
+      path.resolve(process.cwd(), 'src/styles/components.css'),
+      'utf8',
+    ).replace(/\/\*[\s\S]*?\*\//g, '');
+    const noteRule = /\.corpse-harvest-note\s*\{([^}]*)\}/.exec(css);
+    expect(noteRule, '.corpse-harvest-note has no rule in components.css').not.toBeNull();
+    expect(noteRule?.[1]).toContain('var(--color-text-muted)');
+    expect(noteRule?.[1]).not.toContain('opacity');
+    const rowRule = /\.corpse-harvest-row-no-yield\s*>\s*span\s*\{([^}]*)\}/.exec(css);
+    expect(rowRule, '.corpse-harvest-row-no-yield > span has no rule').not.toBeNull();
+    expect(rowRule?.[1]).toContain('var(--color-text-muted)');
+    // Scoped to the row's TEXT: dimming the whole label would dim the checkbox,
+    // and a greyed checkbox is this HUD's disabled idiom, so a deliberately
+    // live control would read as a dead one.
+    expect(css).not.toMatch(/\.corpse-harvest-row-no-yield\s*\{/);
+    const hintRule = /\.corpse-harvest\.is-concentrated\s+\.corpse-harvest-hint\s*\{([^}]*)\}/.exec(
+      css,
+    );
+    expect(hintRule, '.corpse-harvest.is-concentrated has no rule').not.toBeNull();
+    // Weight, not colour alone.
+    expect(hintRule?.[1]).toContain('font-weight');
+    // The picker rows are deliberately NOT in the mobile 40px touch-floor list,
+    // and that is a decision worth pinning rather than leaving as an absence:
+    // raising them pushes the Harvest button below the fold at the in-game
+    // landscape metrics, where the popup already stands 374 of 390 CSS px. The
+    // reasoning lives beside the rule in hud.mobile.css; this asserts the state
+    // it argues for, so re-adding the floor without redoing the layout reds.
+    const mobile = readFileSync(
+      path.resolve(process.cwd(), 'src/styles/hud.mobile.css'),
+      'utf8',
+    ).replace(/\/\*[\s\S]*?\*\//g, '');
+    expect(mobile).not.toMatch(/\.corpse-harvest-row[^{]*\{[^}]*min-height/);
+    // ...and the rule the floor DOES cover on this window is still there, so
+    // the assertion above is about the rows and not about an empty stylesheet.
+    expect(mobile).toContain('body.mobile-touch #loot-window .btn');
   });
 });

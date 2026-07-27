@@ -2055,8 +2055,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.nothingSelectedYields': 'Bu leşten seçtiklerinin hiçbiri toplanamaz.',
   'hudChrome.corpseHarvest.componentAria': '{component} topla',
   'hudChrome.corpseHarvest.componentNoYield': 'henüz verim yok',
-  'hudChrome.corpseHarvest.componentAriaNoYield':
-    '{component} topla: bundan henüz alınacak bir şey yok',
+  'hudChrome.corpseHarvest.componentAriaNoYield': '{component} topla: {note}',
   'hudChrome.corpseHarvest.yieldTierHint':
     'Bir toplama ne kadar az bileşen alırsa, her birinin kademesi o kadar yüksek olur.',
   'hudChrome.corpseHarvest.components.claw': 'Pençe',

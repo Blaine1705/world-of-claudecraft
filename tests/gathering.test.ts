@@ -180,6 +180,28 @@ describe('isHarvestableCorpse', () => {
       // ...and now `tusk` alone really does forfeit something, which is the row
       // that was insensitive while claw mapped to nothing.
       expect(forfeitsEveryMappedYield(['claw', 'tusk'], ['tusk'])).toBe(true);
+      // #2514's readers belong in THIS rig and nowhere else. The two
+      // `if (!itemId) continue` arms in harvestCorpse are unreachable only
+      // because yieldingFocusComponents filters on the same TRUTHINESS the
+      // grant loop tests, and an empty-string mapping is the one input that
+      // separates truthiness from `in` and from `!== undefined`. Rewrite that
+      // filter as `c in HARVEST_COMPONENT_ITEMS` and every row below flips
+      // while the shipped-content sweeps stay green, because no shipped family
+      // maps to ''.
+      table.claw = '';
+      expect(yieldingFocusComponents(['hide', 'claw'], [])).toEqual(['hide']);
+      expect(harvestConcentrationBonus(['hide', 'claw'], [])).toBe(1);
+      const emptyMappingRng = new Rng(5);
+      let emptyMappingDraws = 0;
+      emptyMappingRng.setObserver(() => {
+        emptyMappingDraws++;
+      });
+      const emptyMappingYields = resolveCorpseFocusHarvest(['hide', 'claw'], [], emptyMappingRng);
+      emptyMappingRng.setObserver(null);
+      // One tier roll, for hide alone: an empty mapping must cost no draw, or
+      // the family is back in the roll and back in both dead arms.
+      expect(emptyMappingDraws).toBe(1);
+      expect(emptyMappingYields.map((y) => y.component)).toEqual(['hide']);
     } finally {
       delete table.claw;
     }

@@ -1468,7 +1468,7 @@ export const pl_PL: EnTranslations = {
       "alreadyHarvested": "Z tego truchła już wszystko zebrano.",
       "componentAria": "Zbierz: {component}",
       "componentNoYield": "jeszcze nic",
-      "componentAriaNoYield": "Zbierz: {component}, jeszcze nie ma z tego nic do wzięcia",
+      "componentAriaNoYield": "Zbierz: {component}, {note}",
       "components": {
         "hide": "Skóra",
         "fang": "Kieł",

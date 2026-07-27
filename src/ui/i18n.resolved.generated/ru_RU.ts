@@ -1468,7 +1468,7 @@ export const ru_RU: EnTranslations = {
       "alreadyHarvested": "Этот труп уже был собран.",
       "componentAria": "Собрать {component}",
       "componentNoYield": "пока ничего",
-      "componentAriaNoYield": "Собрать {component}: пока нечего взять",
+      "componentAriaNoYield": "Собрать {component}: {note}",
       "components": {
         "hide": "Шкура",
         "fang": "Клык",

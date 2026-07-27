@@ -1468,7 +1468,7 @@ export const tr_TR: EnTranslations = {
       "alreadyHarvested": "Bu leş zaten toplandı.",
       "componentAria": "{component} topla",
       "componentNoYield": "henüz verim yok",
-      "componentAriaNoYield": "{component} topla: bundan henüz alınacak bir şey yok",
+      "componentAriaNoYield": "{component} topla: {note}",
       "components": {
         "hide": "Post",
         "fang": "Diş",
