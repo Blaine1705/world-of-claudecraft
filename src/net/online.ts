@@ -114,6 +114,7 @@ import {
   type RaidLockout,
   type RecipeDef,
   type SocialInfo,
+  type ToolEffectSlotView,
   type TradeInfo,
   type VcSharedCupInfo,
   type VcViewerReadout,
@@ -1440,6 +1441,11 @@ export class ClientWorld implements IWorld {
   // from the `gprof` self-wire delta below (the real read surface; see
   // professionsState below for crafting/secondary professions).
   gatheringProficiency: Record<string, number> = {};
+  // Slotted tool effects, one row per gathering profession that has one,
+  // mirrored from the `tslot` self-wire delta. Empty for every player who has
+  // never slotted an effect, which is the server's own default: the sim leaves
+  // the backing PlayerMeta field absent and projects [] for it.
+  toolEffectSlots: readonly ToolEffectSlotView[] = [];
   // Per-delve clears (key `${delveId}:${tierId}`), mirrored from the self-wire so
   // delveShopOffers can resolve the shop lock badge client-side.
   delveClears: Record<string, number> = {};
@@ -2995,6 +3001,7 @@ export class ClientWorld implements IWorld {
       if (s.ench !== undefined) this.lastEnchantResult = s.ench ?? null;
       if (s.salv !== undefined) this.lastSalvageResult = s.salv ?? null;
       if (s.gprof !== undefined) this.gatheringProficiency = s.gprof ?? {};
+      if (s.tslot !== undefined) this.toolEffectSlots = s.tslot ?? [];
       if (s.prof !== undefined) this.professionsState = s.prof ?? { skills: [] };
       if (s.cprof !== undefined && s.cprof) {
         const cprof = s.cprof as CraftingIdentityView;
@@ -3421,6 +3428,25 @@ export class ClientWorld implements IWorld {
   // trainResult event; the learned set mirrors back via the cprof delta.
   trainRecipe(recipeId: string): void {
     this.cmd({ cmd: 'train_recipe', recipe: recipeId });
+  }
+  // Tool effect slotting: command only, never predicted. The server
+  // re-validates the profession id, the effect id and that a real tool for that
+  // profession is carried; the resulting slot mirrors back via the tslot delta,
+  // so nothing is written here optimistically.
+  slotToolEffect(professionId: string, effectId: string, confirmMode?: 'always' | 'prompt'): void {
+    // The craftItem `commission` precedent: an omitted optional sends a wire
+    // message byte-identical to the pre-feature form rather than an explicit
+    // default the server would have applied anyway.
+    if (confirmMode === undefined) {
+      this.cmd({ cmd: 'slot_tool_effect', profession: professionId, effect: effectId });
+      return;
+    }
+    this.cmd({
+      cmd: 'slot_tool_effect',
+      profession: professionId,
+      effect: effectId,
+      mode: confirmMode,
+    });
   }
   // Enchanting profession commands (Professions 2.0): command only,
   // never predicted. The server re-validates ownership/eligibility/throttle in

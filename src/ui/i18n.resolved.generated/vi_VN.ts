@@ -2326,6 +2326,14 @@ export const vi_VN: EnTranslations = {
       "ceilingRare": "Mũ hiếm",
       "ceilingCommon": "Mũ chung",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} of {max} charges",
+      "toolEffectSpent": "Spent, needs recharging",
+      "toolEffectPrompts": "Asks before each use",
+      "toolEffectName": {
+        "gatherersCache": "Gatherer's Cache",
+        "artisansEye": "Artisan's Eye",
+        "quickeningCharm": "Springback Charm"
+      },
       "tierPipAria": "Cấp {tier}",
       "nextUnlockTier": "{points} chỉ ra cấp độ tiếp theo: tỷ lệ thành công được cải thiện",
       "nextUnlockSpecialized": "{points} chỉ vào Chuyên ngành: giảm chi phí nguyên vật liệu",

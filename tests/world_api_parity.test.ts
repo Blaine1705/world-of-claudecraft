@@ -311,6 +311,10 @@ export const IWORLD_MEMBERS = [
   { name: 'lastSalvageResult', kind: 'data' },
   // Maker's Bond unbind service (Professions 2.0).
   { name: 'unbindItem', kind: 'method' },
+  // Tool effect slotting: one read row per gathering profession that has a
+  // slotted effect, plus the command that installs one.
+  { name: 'toolEffectSlots', kind: 'data' },
+  { name: 'slotToolEffect', kind: 'method' },
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
   { name: 'setDungeonDifficulty', kind: 'method' },
@@ -468,9 +472,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // plus the release's Card Duel facet, the Professions 2.0 identity
     // surface, the mobile-station pair (placeMobileStation +
     // activeMobileStationCraft), and the commissions unbindItem command.
-    expect(IWORLD_MEMBERS.length).toBe(257);
-    expect(DATA_MEMBERS.length).toBe(69);
-    expect(METHOD_MEMBERS.length).toBe(188);
+    expect(IWORLD_MEMBERS.length).toBe(259);
+    expect(DATA_MEMBERS.length).toBe(70);
+    expect(METHOD_MEMBERS.length).toBe(189);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -699,6 +703,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setPetMode',
       'setSpec',
       'setTownFocus',
+      'slotToolEffect',
       'socialInfo',
       'spinDailyReward',
       'startAutoAttack',
@@ -715,6 +720,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'targetEntity',
       'targetNearestFriendly',
       'toggleWeaponStow',
+      'toolEffectSlots',
       'townFocus',
       'tradeAccept',
       'tradeCancel',
@@ -807,6 +813,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'talentRole',
       'talentSpec',
       'talents',
+      'toolEffectSlots',
       'townFocus',
       'tradeInfo',
       'unlockedMilestones',
@@ -976,6 +983,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setPetMode',
       'setSpec',
       'setTownFocus',
+      'slotToolEffect',
       'spinDailyReward',
       'startAutoAttack',
       'stopAutoAttack',
@@ -1435,6 +1443,8 @@ const FACET_PROFESSIONS = [
   'lastEnchantResult',
   'lastSalvageResult',
   'unbindItem',
+  'toolEffectSlots',
+  'slotToolEffect',
 ] as const satisfies readonly (keyof IWorldProfessions)[];
 type _ExhaustProfessions = AssertNever<
   Exclude<keyof IWorldProfessions, (typeof FACET_PROFESSIONS)[number]>
@@ -1522,8 +1532,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 28 fa
 
   it('the union of the facets equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(257);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(257);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(259);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(259);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

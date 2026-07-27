@@ -2326,6 +2326,14 @@ export const nl_NL: EnTranslations = {
       "ceilingRare": "Zeldzame begrenzing",
       "ceilingCommon": "Gewone begrenzing",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} of {max} charges",
+      "toolEffectSpent": "Spent, needs recharging",
+      "toolEffectPrompts": "Asks before each use",
+      "toolEffectName": {
+        "gatherersCache": "Gatherer's Cache",
+        "artisansEye": "Artisan's Eye",
+        "quickeningCharm": "Springback Charm"
+      },
       "tierPipAria": "Niveau {tier}",
       "nextUnlockTier": "Nog {points} punten tot het volgende niveau: de kans op meesterwerk stijgt",
       "nextUnlockSpecialized": "Nog {points} punten tot Gespecialiseerd: materiaalkosten dalen",

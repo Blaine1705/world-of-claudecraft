@@ -23,12 +23,14 @@ import {
   buildProfessionsView,
   type CraftNextUnlock,
   type ProfessionsCraftRow,
+  type ProfessionsGatheringRow,
   type ProfessionsViewInput,
   type ProfessionsViewModel,
   professionsRefreshSig,
   type RingArc,
   type RingLayout,
 } from './professions_view';
+import { TOOL_EFFECT_NAME_KEYS } from './tool_effect_name';
 import { svgIcon } from './ui_icons';
 
 // Ring node distance from the container center, in percent of the box
@@ -164,6 +166,13 @@ export class ProfessionsWindow {
         professionId: row.professionId,
         skill: row.skill,
         maxSkill: row.maxSkill,
+      })),
+      toolEffects: world.toolEffectSlots.map((row) => ({
+        professionId: row.professionId,
+        effectId: row.effectId,
+        charges: row.charges,
+        maxCharges: row.maxCharges,
+        confirmMode: row.confirmMode,
       })),
     };
   }
@@ -422,12 +431,42 @@ export class ProfessionsWindow {
               max: this.fmt(row.bar.maxSkill),
             }),
           )}</span></div>` +
-          `<div class="prof-bar-wrap"><span class="prof-bar"><span class="prof-bar-fill" style="width:${pct}%"></span></span></div></div></li>`
+          `<div class="prof-bar-wrap"><span class="prof-bar"><span class="prof-bar-fill" style="width:${pct}%"></span></span></div>` +
+          this.gatherEffectHtml(row) +
+          `</div></li>`
         );
       })
       .join('');
     if (rows === '') return '';
     return `<section class="prof-gathering"><h3 class="prof-section-header">${esc(t('hudChrome.professions.gatheringHeader'))}</h3><ul class="prof-list" role="list">${rows}</ul></section>`;
+  }
+
+  // The slotted tool effect, under its profession's skill bar. Renders NOTHING
+  // when the profession has no slot, which is every profession for every player
+  // until an acquisition source ships: an always-present "no effect" line would
+  // be three permanent rows of absence in a window that is otherwise all
+  // progress.
+  private gatherEffectHtml(row: ProfessionsGatheringRow): string {
+    const effect = row.effect;
+    if (!effect) return '';
+    const nameKey = TOOL_EFFECT_NAME_KEYS[effect.effectId];
+    if (nameKey === undefined) return '';
+    // Spent says so in words rather than showing "0 / 30", which reads like a
+    // broken tool rather than a rechargeable one that has done its work.
+    const charges = effect.spent
+      ? t('hudChrome.professions.toolEffectSpent')
+      : t('hudChrome.professions.toolEffectCharges', {
+          charges: this.fmt(effect.charges),
+          max: this.fmt(effect.maxCharges),
+        });
+    const prompt = effect.prompts
+      ? `<span class="prof-effect-prompt">${esc(t('hudChrome.professions.toolEffectPrompts'))}</span>`
+      : '';
+    return (
+      `<div class="prof-effect${effect.spent ? ' prof-effect-spent' : ''}">` +
+      `<span class="prof-effect-name">${esc(t(nameKey))}</span>` +
+      `<span class="prof-effect-charges">${esc(charges)}</span>${prompt}</div>`
+    );
   }
 
   private wire(el: HTMLElement): void {

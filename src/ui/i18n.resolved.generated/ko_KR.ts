@@ -2326,6 +2326,14 @@ export const ko_KR: EnTranslations = {
       "ceilingRare": "희귀 상한",
       "ceilingCommon": "일반 상한",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} of {max} charges",
+      "toolEffectSpent": "Spent, needs recharging",
+      "toolEffectPrompts": "Asks before each use",
+      "toolEffectName": {
+        "gatherersCache": "Gatherer's Cache",
+        "artisansEye": "Artisan's Eye",
+        "quickeningCharm": "Springback Charm"
+      },
       "tierPipAria": "티어 {tier}",
       "nextUnlockTier": "다음 티어까지 숙련도 {points} 남음: 걸작 확률이 높아집니다",
       "nextUnlockSpecialized": "전문화까지 숙련도 {points} 남음: 재료 소모가 줄어듭니다",

@@ -2326,6 +2326,14 @@ export const en_XA: EnTranslations = {
       "ceilingRare": "[Ŕáŕé çáþ]",
       "ceilingCommon": "[Çóɱɱóñ çáþ]",
       "skillValue": "[{skill} / {max}]",
+      "toolEffectCharges": "[{charges} óƒ {max} çĥáŕĝéš]",
+      "toolEffectSpent": "[Šþéñţ, ñééðš ŕéçĥáŕĝíñĝ]",
+      "toolEffectPrompts": "[Ášķš ƀéƒóŕé éáçĥ úšé]",
+      "toolEffectName": {
+        "gatherersCache": "[Ĝáţĥéŕéŕ'š Çáçĥé]",
+        "artisansEye": "[Áŕţíšáñ'š Éýé]",
+        "quickeningCharm": "[Šþŕíñĝƀáçķ Çĥáŕɱ]"
+      },
       "tierPipAria": "[Ţíéŕ {tier}]",
       "nextUnlockTier": "[{points} þóíñţš ţó ţĥé ñéẋţ ţíéŕ: ɱášţéŕŵóŕķ óððš íɱþŕóʋé]",
       "nextUnlockSpecialized": "[{points} þóíñţš ţó Šþéçíáļížéð: ɱáţéŕíáļ çóšţš ðŕóþ]",

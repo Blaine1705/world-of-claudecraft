@@ -2326,6 +2326,14 @@ export const zh_TW: EnTranslations = {
       "ceilingRare": "精良品質上限",
       "ceilingCommon": "普通品質上限",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} of {max} charges",
+      "toolEffectSpent": "Spent, needs recharging",
+      "toolEffectPrompts": "Asks before each use",
+      "toolEffectName": {
+        "gatherersCache": "Gatherer's Cache",
+        "artisansEye": "Artisan's Eye",
+        "quickeningCharm": "Springback Charm"
+      },
       "tierPipAria": "階級 {tier}",
       "nextUnlockTier": "距離下一階級還差 {points} 點：打造大師之作的機率將提升",
       "nextUnlockSpecialized": "距離專精還差 {points} 點：材料消耗將降低",

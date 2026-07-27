@@ -2326,6 +2326,14 @@ export const da_DK: EnTranslations = {
       "ceilingRare": "Sjælden begrænsning",
       "ceilingCommon": "Almindelig begrænsning",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} of {max} charges",
+      "toolEffectSpent": "Spent, needs recharging",
+      "toolEffectPrompts": "Asks before each use",
+      "toolEffectName": {
+        "gatherersCache": "Gatherer's Cache",
+        "artisansEye": "Artisan's Eye",
+        "quickeningCharm": "Springback Charm"
+      },
       "tierPipAria": "Niveau {tier}",
       "nextUnlockTier": "{points} point til næste niveau: mesterværk odds forbedres",
       "nextUnlockSpecialized": "{points} point til Specialiseret: materialeomkostningerne falder",

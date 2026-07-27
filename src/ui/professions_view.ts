@@ -239,6 +239,19 @@ export interface ProfessionsViewInput {
    *  professionsState); nothing here hardcodes the id set, so the
    *  fishing row flows through unchanged. */
   gathering: readonly GatheringSkillInput[];
+  /** The viewer's slotted tool effects (IWorld `toolEffectSlots`), keyed to a
+   *  gathering row by professionId. Injected as the flat seam list rather than
+   *  pre-joined, so this core owns the join and a Vitest can drive it with a
+   *  row that has no matching profession. Empty for every player who has never
+   *  slotted an effect; optional so a caller that predates the field is
+   *  unchanged. */
+  toolEffects?: readonly {
+    professionId: string;
+    effectId: string;
+    charges: number;
+    maxCharges: number;
+    confirmMode: 'always' | 'prompt';
+  }[];
 }
 
 export interface ProfessionsCraftRow {
@@ -249,9 +262,30 @@ export interface ProfessionsCraftRow {
   nextUnlock: CraftNextUnlock;
 }
 
+/** The slotted tool effect a gathering row shows, already reduced to what the
+ *  row paints. `null` on a profession with no slot, which is every profession
+ *  for every player until an acquisition source ships. */
+export interface GatheringToolEffectModel {
+  /** A ToolEffectId; the row resolves its display name from the catalog. */
+  effectId: string;
+  charges: number;
+  maxCharges: number;
+  /** True once the charges are spent: the bonus stops, the base tool is
+   *  untouched, and a recharge can restore it. The row says "spent" rather
+   *  than showing a bare 0, because 0 of 30 reads like a broken tool. */
+  spent: boolean;
+  /** True when the slot only fires on an explicit per-use confirmation, which
+   *  is a thing the owner chose and must be able to see. */
+  prompts: boolean;
+}
+
 export interface ProfessionsGatheringRow {
   professionId: string;
   bar: SkillBarModel;
+  /** ONE effect per profession, never a list: the slot is keyed per gathering
+   *  profession rather than per tool, so a player owning two picks shares one
+   *  mining slot. */
+  effect: GatheringToolEffectModel | null;
 }
 
 export interface SwitchCostModel {
@@ -331,12 +365,29 @@ export function buildProfessionsView(input: ProfessionsViewInput): ProfessionsVi
       nextUnlock: craftNextUnlock(row.craftId, row.skill),
     }),
   );
-  const gathering = input.gathering.map(
-    (row): ProfessionsGatheringRow => ({
+  // Join the flat effect list onto the gathering rows by profession id. An
+  // effect naming a profession with no row is DROPPED rather than rendered
+  // loose: the row is the only place a slot is meaningful, and a stray entry
+  // would otherwise paint an orphan line with no skill bar above it.
+  const effectByProfession = new Map(
+    (input.toolEffects ?? []).map((row) => [row.professionId, row]),
+  );
+  const gathering = input.gathering.map((row): ProfessionsGatheringRow => {
+    const slot = effectByProfession.get(row.professionId);
+    return {
       professionId: row.professionId,
       bar: buildSkillBar(row.skill, row.maxSkill),
-    }),
-  );
+      effect: slot
+        ? {
+            effectId: slot.effectId,
+            charges: slot.charges,
+            maxCharges: slot.maxCharges,
+            spent: slot.charges <= 0,
+            prompts: slot.confirmMode === 'prompt',
+          }
+        : null,
+    };
+  });
   const anyTier = identity.skills.some((row) => row.tier >= 1);
   const mode: ProfessionsWindowMode =
     identity.state === 'syncing' || (identity.state !== 'attuned' && !anyTier)
@@ -383,6 +434,16 @@ export function professionsRefreshSig(
     id.amendsRequired,
     CRAFT_RING.map((craft) => id.craftSkills[craft.id] ?? 0),
     input.gathering.map((row) => [row.professionId, row.skill, row.maxSkill]),
+    // The slot rows ride the signature too, so spending a charge on a harvest
+    // repaints the row. Without this the count would freeze at whatever it read
+    // when some OTHER field last moved the signature.
+    (input.toolEffects ?? []).map((row) => [
+      row.professionId,
+      row.effectId,
+      row.charges,
+      row.maxCharges,
+      row.confirmMode,
+    ]),
     [...local],
   ]);
 }

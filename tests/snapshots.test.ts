@@ -3161,6 +3161,7 @@ const ALL_DELTA_KEYS = [
   'tal',
   'tfocus',
   'trade',
+  'tslot',
   'vcup',
   'vcupb',
   'weapon',
@@ -3228,6 +3229,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   salv: 'lastSalvageResult',
   sport: 'sportRole',
   tfocus: 'townFocus',
+  tslot: 'toolEffectSlots',
 };
 
 // Year ~2223 in epoch ms. Beats selfWireJson's `until > Date.now()` lockout
@@ -3854,9 +3856,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 57 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(57);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(57);
+  it('ALL_DELTA_KEYS contains exactly 58 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(58);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(58);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -3875,7 +3877,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
     expect(scraped.has('vcupb')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
-    expect(scraped.size).toBe(57);
+    expect(scraped.size).toBe(58);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

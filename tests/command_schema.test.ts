@@ -30,9 +30,11 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // (card_queue_join/leave, play_card, card_forfeit), and Professions 2.0's
 // place_mobile_station, train_recipe, the three enchanting actions
 // (disenchant_item, apply_enchant, salvage_item), and unbind_item (the
-// Maker's Bond unbind service).
-const EXPECTED_SEND_COUNT = 164;
-const EXPECTED_DISPATCH_COUNT = 173;
+// Maker's Bond unbind service), plus slot_tool_effect (attach a catalog effect
+// to one gathering profession's tool, keyed per profession rather than per tool
+// item because the live harvest path resolves a tier and never a tool).
+const EXPECTED_SEND_COUNT = 165;
+const EXPECTED_DISPATCH_COUNT = 174;
 const EXPECTED_DISPATCH_ONLY_COUNT = 9;
 
 // The chat sub-channel routing switch (server/game.ts `switch

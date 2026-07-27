@@ -2326,6 +2326,14 @@ export const cs_CZ: EnTranslations = {
       "ceilingRare": "Omezení na vzácné",
       "ceilingCommon": "Omezení na běžné",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} of {max} charges",
+      "toolEffectSpent": "Spent, needs recharging",
+      "toolEffectPrompts": "Asks before each use",
+      "toolEffectName": {
+        "gatherersCache": "Gatherer's Cache",
+        "artisansEye": "Artisan's Eye",
+        "quickeningCharm": "Springback Charm"
+      },
       "tierPipAria": "Úroveň {tier}",
       "nextUnlockTier": "{points} bodů do další úrovně: šance na mistrovské dílo se zvýší",
       "nextUnlockSpecialized": "{points} bodů do specializace: náklady na materiál klesnou",

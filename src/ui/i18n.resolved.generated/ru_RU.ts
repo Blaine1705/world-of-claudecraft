@@ -2326,6 +2326,14 @@ export const ru_RU: EnTranslations = {
       "ceilingRare": "Потолок редкого",
       "ceilingCommon": "Потолок обычного качества",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} of {max} charges",
+      "toolEffectSpent": "Spent, needs recharging",
+      "toolEffectPrompts": "Asks before each use",
+      "toolEffectName": {
+        "gatherersCache": "Gatherer's Cache",
+        "artisansEye": "Artisan's Eye",
+        "quickeningCharm": "Springback Charm"
+      },
       "tierPipAria": "Ранг {tier}",
       "nextUnlockTier": "До следующего ранга {points} навыка: шанс шедевра повысится",
       "nextUnlockSpecialized": "До специализации {points} навыка: расход материалов снизится",

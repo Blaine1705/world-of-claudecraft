@@ -2326,6 +2326,14 @@ export const de_DE: EnTranslations = {
       "ceilingRare": "Seltene Grenze",
       "ceilingCommon": "Gewöhnliche Grenze",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} of {max} charges",
+      "toolEffectSpent": "Spent, needs recharging",
+      "toolEffectPrompts": "Asks before each use",
+      "toolEffectName": {
+        "gatherersCache": "Gatherer's Cache",
+        "artisansEye": "Artisan's Eye",
+        "quickeningCharm": "Springback Charm"
+      },
       "tierPipAria": "Stufe {tier}",
       "nextUnlockTier": "Noch {points} Punkte bis zur nächsten Stufe: Meisterwerkchance steigt",
       "nextUnlockSpecialized": "Noch {points} Punkte bis zur Spezialisierung: Materialkosten sinken",

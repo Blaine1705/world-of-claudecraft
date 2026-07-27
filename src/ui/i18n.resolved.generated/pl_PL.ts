@@ -2326,6 +2326,14 @@ export const pl_PL: EnTranslations = {
       "ceilingRare": "Rzadka czapka",
       "ceilingCommon": "Wspólna czapka",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} of {max} charges",
+      "toolEffectSpent": "Spent, needs recharging",
+      "toolEffectPrompts": "Asks before each use",
+      "toolEffectName": {
+        "gatherersCache": "Gatherer's Cache",
+        "artisansEye": "Artisan's Eye",
+        "quickeningCharm": "Springback Charm"
+      },
       "tierPipAria": "Poziom {tier}",
       "nextUnlockTier": "{points} wskazuje na następny poziom: zwiększają się szanse na arcydzieło",
       "nextUnlockSpecialized": "{points} wskazuje na Specjalistyczne: spadają koszty materiałów",

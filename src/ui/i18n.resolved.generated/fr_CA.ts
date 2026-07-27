@@ -2326,6 +2326,14 @@ export const fr_CA: EnTranslations = {
       "ceilingRare": "Plafond rare",
       "ceilingCommon": "Plafond commun",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} of {max} charges",
+      "toolEffectSpent": "Spent, needs recharging",
+      "toolEffectPrompts": "Asks before each use",
+      "toolEffectName": {
+        "gatherersCache": "Gatherer's Cache",
+        "artisansEye": "Artisan's Eye",
+        "quickeningCharm": "Springback Charm"
+      },
       "tierPipAria": "Niveau {tier}",
       "nextUnlockTier": "{points} pointe vers le niveau suivant : les chances de chef-d'œuvre s'améliorent",
       "nextUnlockSpecialized": "{points} points avant la spécialisation : les coûts des matériaux diminuent",

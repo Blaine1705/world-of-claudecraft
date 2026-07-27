@@ -23,7 +23,13 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.tidewrought_fishing_rod.name",
     "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.gathering.toolTooltip.unlocks.fishing",
-    "hudChrome.materialHint.fineGrade"
+    "hudChrome.materialHint.fineGrade",
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
   ],
   "es_ES": [
     "entities.items.fine_ashwood_log.name",
@@ -39,7 +45,13 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.tidewrought_fishing_rod.name",
     "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.gathering.toolTooltip.unlocks.fishing",
-    "hudChrome.materialHint.fineGrade"
+    "hudChrome.materialHint.fineGrade",
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
   ],
   "fr_FR": [
     "entities.items.fine_ashwood_log.name",
@@ -55,7 +67,13 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.tidewrought_fishing_rod.name",
     "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.gathering.toolTooltip.unlocks.fishing",
-    "hudChrome.materialHint.fineGrade"
+    "hudChrome.materialHint.fineGrade",
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
   ],
   "fr_CA": [
     "entities.items.fine_ashwood_log.name",
@@ -71,7 +89,13 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.tidewrought_fishing_rod.name",
     "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.gathering.toolTooltip.unlocks.fishing",
-    "hudChrome.materialHint.fineGrade"
+    "hudChrome.materialHint.fineGrade",
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
   ],
   "en_CA": [],
   "it_IT": [
@@ -88,7 +112,13 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.tidewrought_fishing_rod.name",
     "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.gathering.toolTooltip.unlocks.fishing",
-    "hudChrome.materialHint.fineGrade"
+    "hudChrome.materialHint.fineGrade",
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
   ],
   "de_DE": [
     "entities.items.fine_ashwood_log.name",
@@ -104,12 +134,46 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.tidewrought_fishing_rod.name",
     "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.gathering.toolTooltip.unlocks.fishing",
-    "hudChrome.materialHint.fineGrade"
+    "hudChrome.materialHint.fineGrade",
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
+  ],
+  "zh_TW": [
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
+  ],
+  "ko_KR": [
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
+  ],
+  "ja_JP": [
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
+  ],
   "pt_BR": [
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -124,9 +188,22 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.tidewrought_fishing_rod.name",
     "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.gathering.toolTooltip.unlocks.fishing",
-    "hudChrome.materialHint.fineGrade"
+    "hudChrome.materialHint.fineGrade",
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
+  ],
   "cs_CZ": [
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -141,7 +218,13 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.tidewrought_fishing_rod.name",
     "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.gathering.toolTooltip.unlocks.fishing",
-    "hudChrome.materialHint.fineGrade"
+    "hudChrome.materialHint.fineGrade",
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
   ],
   "nl_NL": [
     "entities.items.fine_ashwood_log.name",
@@ -157,7 +240,13 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.tidewrought_fishing_rod.name",
     "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.gathering.toolTooltip.unlocks.fishing",
-    "hudChrome.materialHint.fineGrade"
+    "hudChrome.materialHint.fineGrade",
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
   ],
   "pl_PL": [
     "entities.items.fine_ashwood_log.name",
@@ -173,7 +262,13 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.tidewrought_fishing_rod.name",
     "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.gathering.toolTooltip.unlocks.fishing",
-    "hudChrome.materialHint.fineGrade"
+    "hudChrome.materialHint.fineGrade",
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
   ],
   "id_ID": [
     "entities.items.fine_ashwood_log.name",
@@ -189,7 +284,13 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.tidewrought_fishing_rod.name",
     "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.gathering.toolTooltip.unlocks.fishing",
-    "hudChrome.materialHint.fineGrade"
+    "hudChrome.materialHint.fineGrade",
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
   ],
   "tr_TR": [
     "entities.items.fine_ashwood_log.name",
@@ -205,7 +306,13 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.tidewrought_fishing_rod.name",
     "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.gathering.toolTooltip.unlocks.fishing",
-    "hudChrome.materialHint.fineGrade"
+    "hudChrome.materialHint.fineGrade",
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
   ],
   "sv_SE": [
     "entities.items.fine_ashwood_log.name",
@@ -221,7 +328,13 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.tidewrought_fishing_rod.name",
     "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.gathering.toolTooltip.unlocks.fishing",
-    "hudChrome.materialHint.fineGrade"
+    "hudChrome.materialHint.fineGrade",
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
   ],
   "vi_VN": [
     "entities.items.fine_ashwood_log.name",
@@ -237,7 +350,13 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.tidewrought_fishing_rod.name",
     "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.gathering.toolTooltip.unlocks.fishing",
-    "hudChrome.materialHint.fineGrade"
+    "hudChrome.materialHint.fineGrade",
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
   ],
   "da_DK": [
     "entities.items.fine_ashwood_log.name",
@@ -253,6 +372,12 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.tidewrought_fishing_rod.name",
     "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.gathering.toolTooltip.unlocks.fishing",
-    "hudChrome.materialHint.fineGrade"
+    "hudChrome.materialHint.fineGrade",
+    "hudChrome.professions.toolEffectCharges",
+    "hudChrome.professions.toolEffectName.artisansEye",
+    "hudChrome.professions.toolEffectName.gatherersCache",
+    "hudChrome.professions.toolEffectName.quickeningCharm",
+    "hudChrome.professions.toolEffectPrompts",
+    "hudChrome.professions.toolEffectSpent"
   ]
 };

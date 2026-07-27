@@ -2326,6 +2326,14 @@ export const es_ES: EnTranslations = {
       "ceilingRare": "Tope de calidad rara",
       "ceilingCommon": "Tope de calidad común",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} of {max} charges",
+      "toolEffectSpent": "Spent, needs recharging",
+      "toolEffectPrompts": "Asks before each use",
+      "toolEffectName": {
+        "gatherersCache": "Gatherer's Cache",
+        "artisansEye": "Artisan's Eye",
+        "quickeningCharm": "Springback Charm"
+      },
       "tierPipAria": "Nivel {tier}",
       "nextUnlockTier": "{points} apunta al siguiente nivel: las probabilidades de obra maestra mejoran",
       "nextUnlockSpecialized": "{points} apunta a Specialized: bajan los costes de materiales",

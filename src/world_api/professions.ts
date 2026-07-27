@@ -145,6 +145,36 @@ export interface ApplyEnchantResultView {
     | 'same_enchant';
 }
 
+// One gathering profession's slotted tool effect, as the HUD reads it.
+//
+// PER PROFESSION, NOT PER TOOL. The live harvest path resolves a tool TIER and
+// never a tool (professions/tools.ts bestOwnedGatherToolTierOrNone returns a
+// number), so there is nothing on it holding the particular pick that satisfied
+// the gate; and a slot bought for a tier-4 pick would go inert the moment its
+// owner crafted the tier-5 one, which inverts the point of chasing a better
+// tool. The consequence the UI must honor: a player owning two picks shares ONE
+// mining slot, so this is a row per profession and never a list per item.
+//
+// Ids and numbers only, per the string-free seam rule: the effect's display
+// name lives in the i18n catalog, keyed by `effectId`. `craftedBy` is
+// deliberately NOT projected here; it exists on the sim-side slot only to
+// decide the original-crafter recharge discount, and the HUD has no use for
+// another player's identity.
+export interface ToolEffectSlotView {
+  /** A GatheringProfessionId. An identifier, never localized text. */
+  professionId: string;
+  /** A ToolEffectId (see src/sim/content/professions.ts TOOL_EFFECTS). */
+  effectId: string;
+  /** Charges left. 0 means slotted but spent: the bonus stops, the base tool
+   *  is untouched, and a recharge can restore it. */
+  charges: number;
+  /** What a recharge restores to. Minted from the rarity of the tool the
+   *  effect was slotted onto, so it is stored rather than re-derived. */
+  maxCharges: number;
+  /** 'prompt' spends a charge only on an explicit per-use confirmation. */
+  confirmMode: 'always' | 'prompt';
+}
+
 // The professions read-surface facet (#1164, extended by #1121/#1127/#1129). `Sim`
 // (src/sim/sim.ts `professionsState`/`professionsStateFor`) and `ClientWorld`
 // (src/net/online.ts, mirrored from the `prof` wire delta) both implement
@@ -267,4 +297,24 @@ export interface IWorldProfessions {
   lastDisenchantResult: DisenchantResultView | null;
   lastEnchantResult: ApplyEnchantResultView | null;
   lastSalvageResult: SalvageResultView | null;
+  // The viewer's slotted tool effects, one row per gathering profession that
+  // has one, SORTED by professionId so the JSON form is a stable delta
+  // signature (the knownRecipes precedent). EMPTY for a player who has never
+  // slotted an effect, which is every player until an acquisition craft ships:
+  // the backing PlayerMeta field is left ABSENT rather than initialized,
+  // because an empty object still serializes and initializing it moved every
+  // parity golden. Offline this reads the live PlayerMeta slot; online it
+  // mirrors the server's `tslot` self-delta.
+  toolEffectSlots: readonly ToolEffectSlotView[];
+  // Slot `effectId` onto the viewer's `professionId` tool, at the charges that
+  // profession's BEST OWNED tool's rarity mints (professions/tools.ts
+  // startingDurabilityFor). Re-slotting resets to full, same as a fresh
+  // install. Server-authoritative: the Sim re-validates the profession id, the
+  // effect id and that a real tool for that profession is actually carried, and
+  // nothing is trusted from the client; ClientWorld sends the
+  // slot_tool_effect command and never decides the outcome.
+  //
+  // `confirmMode` defaults to 'always' (#1136's behaviour) when omitted, so the
+  // wire message for a caller that never touches it stays minimal.
+  slotToolEffect(professionId: string, effectId: string, confirmMode?: 'always' | 'prompt'): void;
 }

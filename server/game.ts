@@ -4437,6 +4437,20 @@ export class GameServer {
         // of craftingIdentityFor's JSON), so no dirty-marking is needed here.
         if (typeof msg.recipe === 'string') sim.trainRecipe(msg.recipe, pid);
         break;
+      case 'slot_tool_effect':
+        // Every field is re-validated inside the sim against live content
+        // (Sim.slotToolEffect: known profession id, known effect id, and a real
+        // tool for that profession actually carried), so the only job here is
+        // the shape check every other command does. `mode` is optional and an
+        // unrecognized value is dropped rather than passed through, which keeps
+        // a malformed message from reaching the sim's default and silently
+        // becoming 'always'. The resulting slot rides the per-tick tslot diff,
+        // so no dirty-marking is needed.
+        if (typeof msg.profession === 'string' && typeof msg.effect === 'string') {
+          const mode = msg.mode === 'prompt' || msg.mode === 'always' ? msg.mode : undefined;
+          sim.slotToolEffect(msg.profession, msg.effect, mode, pid);
+        }
+        break;
       case 'sell_all_junk':
         sim.sellAllJunk(pid);
         break;
@@ -6076,6 +6090,14 @@ export class GameServer {
     // shape used by the `/dev gather` chat cheat and existing consumers. Wire
     // key `gprof`; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
     maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
+    // Slotted tool effects (IWorld `toolEffectSlots`). Wire key `tslot`; see
+    // TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts. Empty for
+    // every player who has never slotted one, so after the first snapshot of a
+    // session (which carries `"tslot":[]`, as every registered key does while
+    // lastSent is empty) the key delta-elides away for almost everyone. The
+    // charge counter moves only on a harvest that actually spends one, so this
+    // is a cheap diff rather than a per-tick churn.
+    maybe('tslot', this.sim.toolEffectSlotsFor(anchorSession.pid));
     // Book of Deeds: the Renown total and the selected title id, cheap
     // scalars diffed per tick (grants land from sim sites that never mark
     // this session dirty, and the title echo must not wait on the heavy gate).

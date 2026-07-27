@@ -92,7 +92,98 @@ describe('buildProfessionsView: model construction', () => {
     expect(model.crafts.map((c) => c.identity.craftId)).toEqual(RING_ORDER);
     // Bars derive from the same skill the identity row carries.
     for (const row of model.crafts) expect(row.bar.skill).toBe(row.identity.skill);
-    expect(model.gathering).toEqual([{ professionId: 'mining', bar: buildSkillBar(30, 100) }]);
+    // `effect: null` for an input with no toolEffects, which is the default and
+    // the state every player is in until an acquisition source ships.
+    expect(model.gathering).toEqual([
+      { professionId: 'mining', bar: buildSkillBar(30, 100), effect: null },
+    ]);
+  });
+
+  describe('the slotted tool effect joins onto its gathering row', () => {
+    const gathering = [
+      { professionId: 'mining', skill: 30, maxSkill: 100 },
+      { professionId: 'logging', skill: 10, maxSkill: 100 },
+    ];
+    const slot = (over: Partial<Record<string, unknown>> = {}) => ({
+      professionId: 'mining',
+      effectId: 'gatherers_cache',
+      charges: 12,
+      maxCharges: 30,
+      confirmMode: 'always' as const,
+      ...over,
+    });
+
+    it('attaches to the matching profession and leaves the others null', () => {
+      const model = buildProfessionsView({
+        identity: attunedIdentity,
+        gathering,
+        toolEffects: [slot()],
+      });
+      const byId = new Map(model.gathering.map((r) => [r.professionId, r]));
+      expect(byId.get('mining')?.effect).toEqual({
+        effectId: 'gatherers_cache',
+        charges: 12,
+        maxCharges: 30,
+        spent: false,
+        prompts: false,
+      });
+      // The OTHER row must stay null, so the join is a join and not a broadcast.
+      expect(byId.get('logging')?.effect).toBeNull();
+    });
+
+    it('marks a zero-charge slot spent, and only a zero-charge one', () => {
+      const spent = buildProfessionsView({
+        identity: attunedIdentity,
+        gathering,
+        toolEffects: [slot({ charges: 0 })],
+      });
+      expect(spent.gathering[0].effect?.spent).toBe(true);
+      const oneLeft = buildProfessionsView({
+        identity: attunedIdentity,
+        gathering,
+        toolEffects: [slot({ charges: 1 })],
+      });
+      expect(oneLeft.gathering[0].effect?.spent).toBe(false);
+    });
+
+    it('surfaces prompt-on-use, so the owner can see why it is not firing', () => {
+      const model = buildProfessionsView({
+        identity: attunedIdentity,
+        gathering,
+        toolEffects: [slot({ confirmMode: 'prompt' })],
+      });
+      expect(model.gathering[0].effect?.prompts).toBe(true);
+    });
+
+    it('DROPS an effect naming a profession with no row, rather than painting an orphan', () => {
+      const model = buildProfessionsView({
+        identity: attunedIdentity,
+        gathering,
+        toolEffects: [slot({ professionId: 'fishing' })],
+      });
+      for (const row of model.gathering) expect(row.effect).toBeNull();
+    });
+
+    it('the refresh signature moves when a charge is spent', () => {
+      // Without the slot rows in the signature the count would freeze at
+      // whatever it read when some OTHER field last moved it.
+      const before = professionsRefreshSig({
+        identity: attunedIdentity,
+        gathering,
+        toolEffects: [slot()],
+      });
+      const after = professionsRefreshSig({
+        identity: attunedIdentity,
+        gathering,
+        toolEffects: [slot({ charges: 11 })],
+      });
+      expect(after).not.toBe(before);
+      // And it does NOT move for an identical read, so the window is not
+      // repainting every frame.
+      expect(
+        professionsRefreshSig({ identity: attunedIdentity, gathering, toolEffects: [slot()] }),
+      ).toBe(before);
+    });
   });
 
   it('builds a coherent syncing model from the pre-cprof ClientWorld shape', () => {

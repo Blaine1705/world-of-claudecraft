@@ -272,6 +272,68 @@ export function slotEffect(
   };
 }
 
+/**
+ * Deep-copy slots on the way OUT to a save, so the persisted snapshot can never
+ * alias the live counters. `depleteEffect` mutates `durability` IN PLACE on
+ * every harvest, so a shallow spread would hand the save layer the same objects
+ * the sim keeps decrementing.
+ */
+export function structuredCloneToolEffectSlots(
+  slots: Partial<Record<GatheringProfessionId, ToolEffectSlot>>,
+): Partial<Record<GatheringProfessionId, ToolEffectSlot>> {
+  const out: Partial<Record<GatheringProfessionId, ToolEffectSlot>> = {};
+  for (const professionId of GATHERING_PROFESSION_IDS) {
+    const slot = slots[professionId];
+    if (slot) out[professionId] = { ...slot };
+  }
+  return out;
+}
+
+/**
+ * Re-validate persisted tool-effect slots on the way IN, returning undefined
+ * when nothing usable survives.
+ *
+ * Undefined rather than `{}` is the contract, and it is load-bearing: the
+ * caller assigns the PlayerMeta field only when this returns a value, so a
+ * character who has never slotted an effect keeps the field ABSENT. An empty
+ * object still serializes into the parity state digest, and initialising it
+ * moved every golden in the suite for a feature no scenario uses.
+ *
+ * Persisted JSONB is data the process wrote, not data a client sent, but it can
+ * still be older than the content it names: retiring an effect id or a
+ * gathering profession would otherwise load a slot that no catalog lookup can
+ * resolve, and `TOOL_EFFECTS[slot.effectId]` is a bare index that would hand
+ * `applyEffectBonus` an undefined def and throw on the next harvest. Every row
+ * is therefore checked against live content and every counter clamped, rather
+ * than trusted because it came from our own save.
+ */
+export function normalizeToolEffectSlots(
+  saved: Partial<Record<string, ToolEffectSlot>> | undefined,
+): Partial<Record<GatheringProfessionId, ToolEffectSlot>> | undefined {
+  if (!saved) return undefined;
+  let out: Partial<Record<GatheringProfessionId, ToolEffectSlot>> | undefined;
+  for (const professionId of GATHERING_PROFESSION_IDS) {
+    const row = saved[professionId];
+    if (!row || !Object.hasOwn(TOOL_EFFECTS, row.effectId)) continue;
+    // A stored maxDurability below 1 would make a recharge restore a dead
+    // slot, so the floor is the catalog's own starting value; durability is
+    // then clamped INTO that range, which also repairs a negative counter.
+    const maxDurability = Math.max(
+      1,
+      Math.floor(row.maxDurability) || TOOL_EFFECTS[row.effectId].startingDurability,
+    );
+    out ??= {};
+    out[professionId] = {
+      effectId: row.effectId,
+      durability: Math.min(maxDurability, Math.max(0, Math.floor(row.durability) || 0)),
+      maxDurability,
+      craftedBy: row.craftedBy,
+      confirmMode: row.confirmMode === 'prompt' ? 'prompt' : 'always',
+    };
+  }
+  return out;
+}
+
 // The outcome shape a harvest produces, in the axes the LIVE harvest path
 // actually has (professions/gathering.ts resolveHarvest). It used to carry
 // `{quantity, quality, respawnTicks}`, which was authored before there was a

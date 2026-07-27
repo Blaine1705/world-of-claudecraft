@@ -14,6 +14,7 @@ import type {
   DelveRunInfo,
   LockpickView,
   PlayerProfessionsView,
+  ToolEffectSlotView,
 } from '../world_api';
 import * as bagsMod from './bags';
 import {
@@ -103,7 +104,12 @@ import { ensureWarriorStance } from './combat/warrior_stances';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
-import type { GatheringProfessionId } from './content/professions';
+import {
+  GATHERING_PROFESSION_IDS,
+  type GatheringProfessionId,
+  TOOL_EFFECTS,
+  type ToolEffectId,
+} from './content/professions';
 import { PTR_DEV_VENDOR_DEF } from './content/ptr_dev_vendor';
 import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
 import {
@@ -342,7 +348,16 @@ import { updateProfNudges } from './professions/prof_nudges';
 import { healDisplayRoundedProficiency } from './professions/proficiency_display_heal';
 import { type SalvageResult, salvageItem as salvageItemImpl } from './professions/salvage';
 import { normalizeTierMailOnLoad, updateTierMail } from './professions/tier_mail';
-import type { ToolEffectSlot } from './professions/tools';
+import {
+  bestOwnedGatherToolFor,
+  bestOwnedGatherToolTierOrNone,
+  NO_TOOL_OWNED,
+  normalizeToolEffectSlots,
+  slotEffect,
+  structuredCloneToolEffectSlots,
+  type ToolEffectConfirmMode,
+  type ToolEffectSlot,
+} from './professions/tools';
 import { grandfatherKnownRecipes, resolveTrain, type TrainResult } from './professions/training';
 import type { ProfessionRecipeRecord as RecipeDef } from './professions/types';
 import {
@@ -1312,6 +1327,13 @@ export interface CharacterState {
   // prefer `gatheringProficiency` and fall back to `professions`.
   professions?: Partial<Record<string, number>>;
   gatheringProficiency?: Partial<Record<string, number>>;
+  // Slotted tool effects, keyed by gathering profession id (JSONB). OPTIONAL,
+  // and written only when the player actually has one: a slot is rare, so an
+  // always-present `{}` would add a key to every character row in the realm to
+  // say nothing. Absent loads to an absent PlayerMeta field, which is the
+  // default the parity digest depends on, so a save written before this field
+  // existed loads byte-identically.
+  toolEffectSlots?: Partial<Record<string, ToolEffectSlot>>;
   copper: number;
   hp: number;
   resource: number;
@@ -2350,6 +2372,15 @@ export class Sim {
       meta.gatheringProficiency = normalizeGatheringProficiency(
         s.gatheringProficiency ?? s.professions,
       );
+      // Slotted tool effects. Only assigned when the save actually carries a
+      // usable row, so the field stays ABSENT for the overwhelming majority of
+      // characters and the parity digest is unchanged for them. Every row is
+      // re-validated on the way in rather than trusted: a stored profession id
+      // or effect id that no longer exists in content is dropped, and the
+      // counters are clamped, so retiring an effect cannot resurrect it or
+      // load a negative charge count.
+      const savedSlots = normalizeToolEffectSlots(s.toolEffectSlots);
+      if (savedSlots) meta.toolEffectSlots = savedSlots;
       if (s.unlockedMilestones)
         for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
       meta.copper = s.copper;
@@ -3038,6 +3069,12 @@ export class Sim {
       totalPlayedSeconds: meta.totalPlayedSeconds + Math.max(0, this.time - meta.joinedAt),
       professions: { ...meta.gatheringProficiency },
       gatheringProficiency: { ...meta.gatheringProficiency },
+      // Spread ONLY when a slot exists, so the key is absent from the saved
+      // JSONB for every character who has never slotted an effect rather than
+      // writing `{}` into every row in the realm.
+      ...(meta.toolEffectSlots
+        ? { toolEffectSlots: structuredCloneToolEffectSlots(meta.toolEffectSlots) }
+        : {}),
       copper: meta.copper,
       hp: e.hp,
       // A druid saved while shifted runs on rage/energy with its mana parked in
@@ -9665,6 +9702,80 @@ export class Sim {
 
   get gatheringProficiency(): Record<string, number> {
     return this.gatheringProficiencyFor(this.primaryId);
+  }
+
+  // The viewer's slotted tool effects, projected for the seam. Takes an
+  // explicit pid (the gatheringProficiencyFor precedent) so the server can
+  // build one player's delta while the offline getter below reads the primary.
+  //
+  // Returns [] for the absent field, which is the default and must stay that
+  // way: an empty object still serializes into the parity state digest, so
+  // initialising the map would move every golden for a feature no scenario
+  // uses. Sorted by professionId so the JSON form is a stable delta signature.
+  toolEffectSlotsFor(pid: number): ToolEffectSlotView[] {
+    const slots = this.players.get(pid)?.toolEffectSlots;
+    if (!slots) return [];
+    const rows: ToolEffectSlotView[] = [];
+    for (const professionId of GATHERING_PROFESSION_IDS) {
+      const slot = slots[professionId];
+      if (!slot) continue;
+      rows.push({
+        professionId,
+        effectId: slot.effectId,
+        charges: slot.durability,
+        maxCharges: slot.maxDurability,
+        confirmMode: slot.confirmMode,
+      });
+    }
+    // GATHERING_PROFESSION_IDS is already a stable content order, but the sort
+    // is what the signature contract actually promises, so state it.
+    return rows.sort((a, b) => a.professionId.localeCompare(b.professionId));
+  }
+
+  get toolEffectSlots(): readonly ToolEffectSlotView[] {
+    return this.toolEffectSlotsFor(this.primaryId);
+  }
+
+  // Slot an effect onto one gathering profession's tool. Server-authoritative
+  // and draw-free: every arm below is a validation or a plain assignment, so
+  // this can never move the rng stream a harvest walks.
+  //
+  // The three refusals are all silent, matching the deny-before-mutate shape
+  // resolveTrain uses: an unknown profession id, an unknown effect id, and not
+  // carrying a real tool for that profession. The last one is the one that
+  // matters for balance, and it reads the SAME owned-tool scan the node gate
+  // reads (bestOwnedGatherToolTierOrNone, which returns NO_TOOL_OWNED rather
+  // than the bare-hands floor), so an effect can never be slotted onto a
+  // profession the player has no tool for.
+  slotToolEffect(
+    professionId: string,
+    effectId: string,
+    confirmMode: ToolEffectConfirmMode = 'always',
+    pid?: number,
+  ): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    if (!(GATHERING_PROFESSION_IDS as readonly string[]).includes(professionId)) return;
+    if (!Object.hasOwn(TOOL_EFFECTS, effectId)) return;
+    if (confirmMode !== 'always' && confirmMode !== 'prompt') return;
+    const profession = professionId as GatheringProfessionId;
+    const best = bestOwnedGatherToolFor(r.meta.inventory, profession, ITEMS);
+    if (bestOwnedGatherToolTierOrNone(r.meta.inventory, profession, ITEMS) === NO_TOOL_OWNED) {
+      return;
+    }
+    // Charges are minted from the BEST OWNED tool's rarity, which is the one
+    // place rarity buys durability (professions/tools.ts startingDurabilityFor).
+    // Re-slotting resets to full, same as installing a fresh effect.
+    const slot = slotEffect(effectId as ToolEffectId, {
+      craftedBy: String(r.meta.entityId),
+      confirmMode,
+      toolRarity: best.rarity,
+    });
+    // Created lazily HERE, never in makeMeta: the absent-by-default field is
+    // what keeps a player who has never slotted an effect byte-identical in
+    // the parity digest.
+    r.meta.toolEffectSlots ??= {};
+    r.meta.toolEffectSlots[profession] = slot;
   }
 
   delveShopOffers(delveId: string): DelveShopOffer[] {

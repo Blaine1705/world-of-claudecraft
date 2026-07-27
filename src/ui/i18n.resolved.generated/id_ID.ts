@@ -2326,6 +2326,14 @@ export const id_ID: EnTranslations = {
       "ceilingRare": "Topi langka",
       "ceilingCommon": "Batasan umum",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} of {max} charges",
+      "toolEffectSpent": "Spent, needs recharging",
+      "toolEffectPrompts": "Asks before each use",
+      "toolEffectName": {
+        "gatherersCache": "Gatherer's Cache",
+        "artisansEye": "Artisan's Eye",
+        "quickeningCharm": "Springback Charm"
+      },
       "tierPipAria": "Tingkat {tier}",
       "nextUnlockTier": "{points} menunjuk ke tingkat berikutnya: peluang karya besar meningkat",
       "nextUnlockSpecialized": "{points} menunjuk ke Khusus: biaya material turun",

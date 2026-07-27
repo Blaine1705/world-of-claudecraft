@@ -2581,6 +2581,24 @@ export const hudChromeStrings = {
     ceilingRare: 'Rare cap',
     ceilingCommon: 'Common cap',
     skillValue: '{skill} / {max}',
+    // The slotted tool effect under a gathering row. Charges are shown as a
+    // fraction of what the slot was MINTED with, which depends on the rarity of
+    // the tool it went onto, so the denominator is per-slot and not a constant.
+    toolEffectCharges: '{charges} of {max} charges',
+    // Said in words rather than as "0 of 30": a bare zero reads like a broken
+    // tool, and the tool is fine. Only the effect is spent, and it recharges.
+    toolEffectSpent: 'Spent, needs recharging',
+    // Shown only when the owner chose prompt-on-use, so the row explains why
+    // the effect is not firing on every harvest.
+    toolEffectPrompts: 'Asks before each use',
+    // The three slottable effects, by catalog id (src/sim/content/professions.ts
+    // TOOL_EFFECTS). The sim is language-agnostic and emits the id; these are
+    // where it becomes a name.
+    toolEffectName: {
+      gatherersCache: "Gatherer's Cache",
+      artisansEye: "Artisan's Eye",
+      quickeningCharm: 'Springback Charm',
+    },
     tierPipAria: 'Tier {tier}',
     nextUnlockTier: '{points} points to the next tier: masterwork odds improve',
     nextUnlockSpecialized: '{points} points to Specialized: material costs drop',

@@ -2326,6 +2326,14 @@ export const tr_TR: EnTranslations = {
       "ceilingRare": "Nadir kapak",
       "ceilingCommon": "Ortak sınır",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} of {max} charges",
+      "toolEffectSpent": "Spent, needs recharging",
+      "toolEffectPrompts": "Asks before each use",
+      "toolEffectName": {
+        "gatherersCache": "Gatherer's Cache",
+        "artisansEye": "Artisan's Eye",
+        "quickeningCharm": "Springback Charm"
+      },
       "tierPipAria": "Seviye {tier}",
       "nextUnlockTier": "{points} bir sonraki aşamaya işaret ediyor: şaheser olma ihtimali artıyor",
       "nextUnlockSpecialized": "{points} Uzmanlaşmış'a işaret ediyor: malzeme maliyetlerinde düşüş",

@@ -2326,6 +2326,14 @@ export const ja_JP: EnTranslations = {
       "ceilingRare": "レア上限",
       "ceilingCommon": "コモン上限",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} of {max} charges",
+      "toolEffectSpent": "Spent, needs recharging",
+      "toolEffectPrompts": "Asks before each use",
+      "toolEffectName": {
+        "gatherersCache": "Gatherer's Cache",
+        "artisansEye": "Artisan's Eye",
+        "quickeningCharm": "Springback Charm"
+      },
       "tierPipAria": "ティア {tier}",
       "nextUnlockTier": "次のティアまであと {points}：傑作の成功率が上がります",
       "nextUnlockSpecialized": "専門化まであと {points}：素材コストが下がります",

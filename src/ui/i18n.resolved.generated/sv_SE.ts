@@ -2326,6 +2326,14 @@ export const sv_SE: EnTranslations = {
       "ceilingRare": "Sällsynt gräns",
       "ceilingCommon": "Vanlig gräns",
       "skillValue": "{skill} / {max}",
+      "toolEffectCharges": "{charges} of {max} charges",
+      "toolEffectSpent": "Spent, needs recharging",
+      "toolEffectPrompts": "Asks before each use",
+      "toolEffectName": {
+        "gatherersCache": "Gatherer's Cache",
+        "artisansEye": "Artisan's Eye",
+        "quickeningCharm": "Springback Charm"
+      },
       "tierPipAria": "Nivå {tier}",
       "nextUnlockTier": "{points} poäng till nästa nivå: mästerverksodds förbättras",
       "nextUnlockSpecialized": "{points} poäng till Specialiserad: materialkostnaderna sjunker",
