@@ -5852,35 +5852,45 @@ export class Renderer {
   // visible-zone streaming lane keeping neighbours resident before they can
   // be seen, the fog no longer has to hide unloaded regions itself, so the
   // sky and real vistas read again. fogFarForPreparedZones stays as the
-  // safety clamp for the brief window a build is still catching up. The
-  // near:far ratio is kept roughly constant per biome so the fog gradient
-  // itself does not change shape, and no far exceeds MAX_OUTDOOR_FOG_FAR
-  // (the rendering/culling envelope).
+  // safety clamp for the brief window a build is still catching up. No far
+  // exceeds MAX_OUTDOOR_FOG_FAR (the rendering/culling envelope).
+  //
+  // The MURKY realms (marsh, haunt, frost, ember, dusk, amber and the two
+  // paint-only caves) then got a readability pass: their `near` was where the
+  // "cannot see anything in front of me" reports came from, since the chase
+  // camera sits ~12 yd behind the player and a near of 45 puts the fog barely
+  // 30 yd ahead of the character. `near` moves out further than `far` here,
+  // which does steepen those gradients slightly, but it is the plane the
+  // complaint is actually about and it costs nothing to draw. `far` moves only
+  // enough to keep each realm's silhouette depth (fog far drives terrain,
+  // prop and foliage culling, so it is the expensive half). The clear realms
+  // (vale, peaks, fen, jungle, garden, gale and friends) were already open and
+  // are untouched.
   private static BIOME_FOG: Record<BiomeId, { color: number; near: number; far: number }> = {
     // The blue-sky biomes carry a deeper sky-blue haze (the old paler values
     // tonemapped to near white, so fully fogged distant trees and zones read
     // as white cutouts against the HDRI sky instead of far-off silhouettes).
     vale: { color: 0x7095bd, near: 55, far: MAX_OUTDOOR_FOG_FAR },
-    marsh: { color: 0xa3b294, near: 45, far: 110 },
+    marsh: { color: 0xa3b294, near: 75, far: 165 },
     peaks: { color: 0x8bb0d4, near: 55, far: MAX_OUTDOOR_FOG_FAR },
     beach: { color: 0x7ea6c9, near: 50, far: MAX_OUTDOOR_FOG_FAR },
     desert: { color: 0xd8c9a8, near: 50, far: MAX_OUTDOOR_FOG_FAR },
-    volcano: { color: 0x8a7468, near: 38, far: 100 },
-    cave: { color: 0x76807c, near: 32, far: 90 },
-    // permanent dusk: dense rose-mauve murk, the realm's signature
-    dusk: { color: 0xc9a3bd, near: 80, far: 375 },
+    volcano: { color: 0x8a7468, near: 60, far: 145 },
+    cave: { color: 0x76807c, near: 48, far: 125 },
+    // permanent dusk: rose-mauve murk, the realm's signature
+    dusk: { color: 0xc9a3bd, near: 115, far: 400 },
     // scorched haze south, thicker toward the volcanic north (looks pass)
-    ember: { color: 0x9a5844, near: 80, far: 360 },
-    // the Frostveil: dense icy mist, visibility closes right in
-    frost: { color: 0xa9bed2, near: 55, far: 285 },
+    ember: { color: 0x9a5844, near: 115, far: 385 },
+    // the Frostveil: icy mist, the coldest sightlines in the world
+    frost: { color: 0xa9bed2, near: 95, far: 325 },
     // the Amberfall: warm golden haze under an endless afternoon
-    amber: { color: 0xdec18e, near: 95, far: 405 },
+    amber: { color: 0xdec18e, near: 130, far: 430 },
     // the Willowfen: clear airy morning, the lightest fog in the world
     fen: { color: 0xcfe2dc, near: 140, far: 510 },
     // the Nightbloom: a soft lavender dream-haze over the violet downs
     night: { color: 0xbfb0e8, near: 130, far: 495 },
-    // the Wraithwood: dense dead-grey murk, sightlines close right in
-    haunt: { color: 0x454c46, near: 45, far: 225 },
+    // the Wraithwood: dead-grey murk, the tightest sightlines outdoors
+    haunt: { color: 0x454c46, near: 85, far: 265 },
     // the Palmreach: bright humid haze, the clearest air in the world
     jungle: { color: 0xd6efe2, near: 165, far: 600 },
     // the Evergarden: crystal parkland air with the faintest green cast
@@ -5890,8 +5900,10 @@ export class Renderer {
   };
   // Low tier trades view distance for draw count (its own perf knob, never a
   // gameplay one: entities draw within their own much shorter ranges on every
-  // tier, so fog distance sheds only cosmetic scenery).
-  private static LOW_FOG = { color: 0xa6c6e0, near: 90, far: 325 };
+  // tier, so fog distance sheds only cosmetic scenery). Takes the same
+  // readability pass on `near`, with `far` held nearly still so the tier keeps
+  // paying for itself.
+  private static LOW_FOG = { color: 0xa6c6e0, near: 115, far: 340 };
 
   // Per-biome outdoor light grade, eased alongside fog in updateAmbience.
   // The three original biomes keep the exact constants the lights were

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  ARRIVAL_NEIGHBOR_STREAM_RADIUS,
   distanceSqToZone,
   fogFarForPreparedZones,
   INITIAL_SKY_PREWARM_RADIUS,
@@ -132,5 +133,92 @@ describe('renderer zone-residency fog', () => {
       MAX_OUTDOOR_FOG_FAR,
     );
     expect(fogFarForPreparedZones(ZONES, all, 0, 0, 80)).toBe(80);
+  });
+});
+
+describe('teleport-arrival neighbourhood', () => {
+  // A realm portal into the Drakelands lands on the zone's western margin: the
+  // Frostveil rectangle is 37 yd away and the Wraithwood 51 yd, both well
+  // inside the clamp. Preparing only the destination there left the player
+  // looking at a 45-yard wall of ember haze until the idle-paced background
+  // lane finished a whole neighbouring zone.
+  const LANDING = { x: 217, z: 1871 };
+  // Bracket the ember preset's far rather than pinning it: this is a streaming
+  // policy test, and the biome table is the renderer's to retune.
+  const REQUESTS = [200, 385];
+
+  it('pins the landing at the floor when only the destination is resident', () => {
+    const destinationOnly = new Set(['drakelands']);
+    expect(zoneAt(LANDING.x, LANDING.z).id).toBe('drakelands');
+    for (const requested of REQUESTS) {
+      expect(fogFarForPreparedZones(ZONES, destinationOnly, LANDING.x, LANDING.z, requested)).toBe(
+        MIN_OUTDOOR_FOG_FAR,
+      );
+    }
+  });
+
+  it('reaches every neighbour that would clamp a border landing', () => {
+    const arrival = zonesWithinStreamingHorizon(
+      ZONES,
+      LANDING.x,
+      LANDING.z,
+      ARRIVAL_NEIGHBOR_STREAM_RADIUS,
+    );
+    expect([...arrival.map((zone) => zone.id)].sort()).toEqual([
+      'drakelands',
+      'frostveil',
+      'wraithwood',
+    ]);
+    // With those resident the clamp stops binding: every request is granted
+    // in full, so the landing view is the biome preset's, not the floor.
+    const resident = new Set(arrival.map((zone) => zone.id));
+    for (const requested of REQUESTS) {
+      expect(fogFarForPreparedZones(ZONES, resident, LANDING.x, LANDING.z, requested)).toBe(
+        requested,
+      );
+    }
+    // Even an unbounded request now clears the next rectangle (the Amberfall,
+    // 397 yd off) rather than collapsing to the floor.
+    expect(fogFarForPreparedZones(ZONES, resident, LANDING.x, LANDING.z, MAX_OUTDOOR_FOG_FAR)).toBe(
+      397 - UNPREPARED_ZONE_FOG_GUARD,
+    );
+  });
+
+  it('clears the wall for a login on the Thornpeak south edge', () => {
+    // Reported live: logging in at (-2, 580) put the player 40 yd from the
+    // Mirefen rectangle, so the peaks preset's 850-yard vista was pinned at the
+    // 45-yard floor for about a minute until the background lane caught up.
+    const login = { x: -2, z: 580 };
+    const PEAKS_FOG_FAR = MAX_OUTDOOR_FOG_FAR;
+    expect(zoneAt(login.x, login.z).id).toBe('thornpeak_heights');
+    const loginZoneOnly = new Set(['thornpeak_heights']);
+    expect(fogFarForPreparedZones(ZONES, loginZoneOnly, login.x, login.z, PEAKS_FOG_FAR)).toBe(
+      MIN_OUTDOOR_FOG_FAR,
+    );
+
+    const arrival = zonesWithinStreamingHorizon(
+      ZONES,
+      login.x,
+      login.z,
+      ARRIVAL_NEIGHBOR_STREAM_RADIUS,
+    );
+    expect([...arrival.map((zone) => zone.id)].sort()).toEqual([
+      'mirefen_marsh',
+      'thornpeak_heights',
+    ]);
+    // Not the full 850-yard vista (nothing short of preparing half the world
+    // buys that), but a playable view instead of a wall: the next rectangle
+    // out is the Willowfen at 178 yd.
+    const resident = new Set(arrival.map((zone) => zone.id));
+    const opened = fogFarForPreparedZones(ZONES, resident, login.x, login.z, PEAKS_FOG_FAR);
+    expect(opened).toBe(178 - UNPREPARED_ZONE_FOG_GUARD);
+    expect(opened).toBeGreaterThan(3 * MIN_OUTDOOR_FOG_FAR);
+  });
+
+  it('streams nothing extra for a landing in the middle of a rectangle', () => {
+    // The Eastbrook hearthstone: no other rectangle is within the radius, so
+    // the common arrival pays exactly what it paid before.
+    const arrival = zonesWithinStreamingHorizon(ZONES, 0, 0, ARRIVAL_NEIGHBOR_STREAM_RADIUS);
+    expect(arrival.map((zone) => zone.id)).toEqual(['eastbrook_vale']);
   });
 });

@@ -16,6 +16,17 @@ export const MAX_OUTDOOR_FOG_FAR = 850;
 export const MIN_OUTDOOR_FOG_FAR = 45;
 export const UNPREPARED_ZONE_FOG_GUARD = 8;
 export const ZONE_STREAM_RECHECK_DISTANCE = 24;
+// How much of the landing NEIGHBOURHOOD a blocking teleport (a realm portal, a
+// hearthstone, a dungeon door) materializes before the loading screen lifts.
+// Preparing the destination rectangle alone is not enough near a border:
+// fogFarForPreparedZones pins outdoor visibility at MIN_OUTDOOR_FOG_FAR while
+// any unprepared rectangle sits within a few dozen yards, and the background
+// lane that would clear it is idle-paced, so the player stares at a 45-yard
+// wall for as long as building a whole neighbouring zone takes. Deliberately
+// well under the rift-exit radius: zone rectangles are 360 yd across, so this
+// reaches the one or two borders a landing point is actually standing next to
+// rather than a whole ring of realms.
+export const ARRIVAL_NEIGHBOR_STREAM_RADIUS = 160;
 // GPU texture uploads are synchronous in WebGL. The loading-screen prewarm
 // covers only this immediate radius: enough for the first normal travel
 // transition without fetching the world's long tail of realm sky HDRIs.
