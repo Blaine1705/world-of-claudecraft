@@ -3038,9 +3038,15 @@ export interface Entity {
   // Profession harvest: single-use, first-come claim on this corpse's componentTags
   // yield. null = unharvested; once set to a player's entity id, every later attempt
   // (same tick or later) is denied. The opposite of a world gathering node (per-player).
-  // SERVER-PRIVATE today: no snapshot delta mirrors it, so the online ClientWorld
-  // always reads null (src/net/online.ts blankEntity). Mirror it over the wire
-  // before any UI/render consumer reads it through IWorld.
+  // MIRRORED over the wire as the sparse `hcb` key (server/game.ts wireEntity,
+  // decoded in src/net/online.ts applyWire), so the online ClientWorld reads the
+  // real claim and the client-side availability gate
+  // (src/game/corpse_loot_availability.ts) is authoritative-consistent. This note
+  // used to say server-private; it stopped being true when `hcb` landed.
+  // Whether the corpse is harvestable AT ALL is a separate question and is not
+  // wired: it is answered from content by isHarvestableCorpse
+  // (src/sim/professions/gathering.ts), which the client resolves locally off
+  // `tid` (#2513).
   harvestClaimedBy: number | null;
   despawnTimer?: number;
   damageIdleDespawnTimer?: number;
@@ -4002,7 +4008,14 @@ export type SimEvent = { pid?: number } & (
   //
   // `yields` is never empty: the emit is skipped entirely when a harvest
   // landed nothing (the gatherResult "granted path only" rule), so the client
-  // never renders a cue for a no-op. Entries record what LANDED, so a
+  // never renders a cue for a no-op. As of #2513 that skip is unreachable by
+  // construction rather than merely rare: harvestCorpse refuses a corpse with no
+  // mapped family and refuses a pick that names none, so every command that
+  // reaches the roll grants at least one item. The guard stays as dead defensive
+  // code and the contract is now pinned as a property instead
+  // (tests/corpse_harvest_sim.test.ts "every command that spends the claim
+  // reports at least one yield"), because an unreachable arm cannot be pinned by
+  // a fixture. Entries record what LANDED, so a
   // downgraded signed grant appears as 'plain' and a refused specimen does not
   // appear at all; the gatherDowngrade toast above still owns that half.
   | {

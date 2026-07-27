@@ -7,7 +7,7 @@
 // can give one back) and the remaining-point count. Rendering lives in
 // town_focus_window.ts.
 
-import { HARVEST_COMPONENT_ITEMS } from '../sim/professions/gathering';
+import { HARVEST_COMPONENT_ITEMS, harvestFamilyYieldsItem } from '../sim/professions/gathering';
 
 export interface TownFocusRow {
   component: string;
@@ -26,7 +26,17 @@ export interface TownFocusView {
 }
 
 // Every currently-harvestable component type (#1140/#1142), stable order.
-export const TOWN_FOCUS_COMPONENTS: readonly string[] = Object.keys(HARVEST_COMPONENT_ITEMS);
+//
+// Filtered through the sim's own harvestFamilyYieldsItem rather than left as a
+// bare Object.keys (#2513): a focus slider is a promise that allocating to this
+// family buys something, and the harvest reads the table by TRUTHINESS, so a key
+// mapped to an empty string yields nothing while still being a key. Object.keys
+// is the fourth place that asked "which families pay out", and the other three
+// now share one predicate; this one joins them so a table edit cannot offer a
+// slider for a family the harvest refuses. No shipped row changes: all six
+// current keys map to a real item id.
+export const TOWN_FOCUS_COMPONENTS: readonly string[] =
+  Object.keys(HARVEST_COMPONENT_ITEMS).filter(harvestFamilyYieldsItem);
 
 export function buildTownFocusView(
   allocation: Readonly<Record<string, number>>,

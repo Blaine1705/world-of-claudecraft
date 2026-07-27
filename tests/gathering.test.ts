@@ -1,14 +1,18 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
+import { MOBS } from '../src/sim/data';
 import {
   effectiveFocusComponents,
   forfeitsEveryMappedYield,
+  harvestFamilyYieldsItem,
+  harvestItemForFamily,
   harvestTierQuantity,
   isHarvestableCorpse,
   resolveCorpseFocusHarvest,
   resolveCorpseHarvest,
 } from '../src/sim/professions/gathering';
 import { Rng } from '../src/sim/rng';
+import { TOWN_FOCUS_COMPONENTS } from '../src/ui/town_focus_view';
 
 const TIER_INDEX: Record<string, number> = {
   poor: 0,
@@ -68,8 +72,181 @@ describe('isHarvestableCorpse', () => {
     expect(isHarvestableCorpse([])).toBe(false);
   });
 
-  it('is true with at least one component tag', () => {
+  it('is true with at least one MAPPED component tag', () => {
     expect(isHarvestableCorpse(['hide'])).toBe(true);
+    // ...and a mapped family beside unmapped ones still qualifies: a mixed
+    // corpse keeps its picker, its claim and its yields untouched (#2509 owns
+    // the pick-level refusal there, not this predicate).
+    expect(isHarvestableCorpse(['claw', 'hide', 'tusk'])).toBe(true);
+  });
+
+  it('is false when every tag is carried but unmapped (#2513)', () => {
+    // The tag COUNT answer was a lie on exactly this shape: it advertised a
+    // harvest that could never pay, and the command spent the single-use claim
+    // and reported nothing at all. Answering on mapped families instead puts
+    // such a corpse on the same path as an untagged one.
+    expect(isHarvestableCorpse(['claw'])).toBe(false);
+    expect(isHarvestableCorpse(['claw', 'tusk'])).toBe(false);
+    expect(isHarvestableCorpse(['gills', 'horn'])).toBe(false);
+    // Not merely "a short list is false": the same LENGTH with one family
+    // swapped for a mapped one flips it, so the predicate is reading the table
+    // and not the count.
+    expect(isHarvestableCorpse(['claw', 'hide'])).toBe(true);
+  });
+
+  it('reads the real yield table, so a family gaining an item retires the case', () => {
+    // Both sides literal, the tests/corpse_harvest_sim.test.ts idiom: deriving
+    // the unmapped list from HARVEST_COMPONENT_ITEMS alone would pass against
+    // any table, including an empty one.
+    expect(Object.keys(HARVEST_COMPONENT_ITEMS).sort()).toEqual([
+      'cloth',
+      'fang',
+      'hide',
+      'meat',
+      'silk',
+      'venomSac',
+    ]);
+    for (const mapped of ['cloth', 'fang', 'hide', 'meat', 'silk', 'venomSac']) {
+      expect(harvestFamilyYieldsItem(mapped), mapped).toBe(true);
+      expect(isHarvestableCorpse([mapped]), mapped).toBe(true);
+    }
+    for (const unmapped of ['claw', 'gills', 'horn', 'tusk']) {
+      expect(harvestFamilyYieldsItem(unmapped), unmapped).toBe(false);
+      expect(isHarvestableCorpse([unmapped]), unmapped).toBe(false);
+    }
+    // A tag no template carries at all is unmapped too, so a drifted client's
+    // vocabulary cannot make a corpse look harvestable.
+    expect(harvestFamilyYieldsItem('not_a_family')).toBe(false);
+    // ...and neither can an INHERITED key. HARVEST_COMPONENT_ITEMS is a plain
+    // object literal, so a bare `table[component]` answers with Object.prototype
+    // here and, worse, in the grant loop, which would try to grant an item id
+    // that is a function. The shared harvestItemForFamily accessor guards it once
+    // for every reader; guarding the predicate alone would just move the
+    // disagreement instead of closing it.
+    for (const inherited of ['constructor', 'toString', 'valueOf', 'hasOwnProperty']) {
+      expect(harvestItemForFamily(inherited), inherited).toBeUndefined();
+      expect(harvestFamilyYieldsItem(inherited), inherited).toBe(false);
+      expect(isHarvestableCorpse([inherited]), inherited).toBe(false);
+      expect(forfeitsEveryMappedYield(['hide', inherited], [inherited]), inherited).toBe(true);
+    }
+    // `__proto__` is its own case: it is an accessor on Object.prototype, so a
+    // bare lookup answers with the prototype OBJECT rather than a function.
+    expect(harvestItemForFamily('__proto__')).toBeUndefined();
+    expect(isHarvestableCorpse(['__proto__'])).toBe(false);
+    // The accessor returns the real id for a real family, so the guard above is
+    // not simply refusing everything.
+    expect(harvestItemForFamily('hide')).toBe('rough_hide');
+  });
+
+  it('tests TRUTHINESS, not key presence, everywhere the yield table is read', () => {
+    // The one detail of #2513 that must never be refactored. The grant loop and
+    // the pre-claim capacity gate both do `if (!itemId) continue` over the same
+    // accessor, so an empty-string mapping grants nothing. Written as `in` or
+    // `!== undefined`, the predicate would call such a family harvestable, the
+    // corpse-level gate would pass, the grant loop would skip it anyway, and the
+    // claim would be spent for zero items with no event: the exact bug,
+    // reintroduced. Every row below is chosen to FLIP under that rewrite; the
+    // table is Readonly by TYPE only, which is what lets this case exist at all,
+    // and it is restored in a finally.
+    const table = HARVEST_COMPONENT_ITEMS as Record<string, string>;
+    expect('claw' in table).toBe(false);
+    try {
+      table.claw = '';
+      expect('claw' in table).toBe(true);
+      expect(harvestItemForFamily('claw')).toBe('');
+      expect(harvestFamilyYieldsItem('claw')).toBe(false);
+      expect(isHarvestableCorpse(['claw', 'tusk'])).toBe(false);
+      // The sibling predicate reads the SAME accessor, so the two cannot disagree
+      // about what an empty mapping means. Both rows are sensitive: with `claw`
+      // treated as yieldable the first flips to false and the second to true.
+      expect(forfeitsEveryMappedYield(['claw', 'tusk'], ['tusk'])).toBe(false);
+      expect(forfeitsEveryMappedYield(['hide', 'claw'], ['claw'])).toBe(true);
+      // A non-empty mapping on the same key flips all of it, so the case is about
+      // the VALUE and not about the key being freshly added.
+      table.claw = 'rough_hide';
+      expect(harvestFamilyYieldsItem('claw')).toBe(true);
+      expect(isHarvestableCorpse(['claw', 'tusk'])).toBe(true);
+      // ...and now `tusk` alone really does forfeit something, which is the row
+      // that was insensitive while claw mapped to nothing.
+      expect(forfeitsEveryMappedYield(['claw', 'tusk'], ['tusk'])).toBe(true);
+    } finally {
+      delete table.claw;
+    }
+    expect('claw' in table).toBe(false);
+    expect(isHarvestableCorpse(['claw', 'tusk'])).toBe(false);
+  });
+
+  it('is the same rule the Town Focus panel offers sliders for', () => {
+    // TOWN_FOCUS_COMPONENTS was a fourth reader of "which families pay out", and
+    // it used Object.keys, i.e. key presence. A slider is a promise that points
+    // spent here buy something, so it has to agree with the harvest.
+    //
+    // Every row here is TRUE under both spellings today, because all six current
+    // families map to a real item. That is the "arms coincide in every fixture"
+    // shape, so it is documentation, not a pin: the decisive case is the
+    // re-import one below, which is the only way to reach an import-time constant.
+    for (const component of TOWN_FOCUS_COMPONENTS) {
+      expect(harvestFamilyYieldsItem(component), component).toBe(true);
+    }
+    expect([...TOWN_FOCUS_COMPONENTS]).toEqual(Object.keys(HARVEST_COMPONENT_ITEMS));
+    expect(TOWN_FOCUS_COMPONENTS).toHaveLength(6);
+    for (const unmapped of ['claw', 'gills', 'horn', 'tusk']) {
+      expect(TOWN_FOCUS_COMPONENTS).not.toContain(unmapped);
+    }
+  });
+
+  it('drops a family the table maps to nothing, which Object.keys would keep', async () => {
+    // The decisive half. TOWN_FOCUS_COMPONENTS is evaluated at import, so
+    // mutating the table afterwards cannot move it: the list has to be rebuilt in
+    // a fresh module registry with the poisoned table already in place. This is
+    // the ONLY shape that separates `Object.keys(...)` from
+    // `Object.keys(...).filter(harvestFamilyYieldsItem)`, since every shipped key
+    // maps and the two spellings agree on the real table.
+    vi.resetModules();
+    try {
+      const professions = await import('../src/sim/content/professions');
+      (professions.HARVEST_COMPONENT_ITEMS as Record<string, string>).claw = '';
+      const townFocus = await import('../src/ui/town_focus_view');
+      expect(townFocus.TOWN_FOCUS_COMPONENTS).not.toContain('claw');
+      // ...and the real families survive, so the filter is not simply emptying
+      // the list.
+      expect([...townFocus.TOWN_FOCUS_COMPONENTS].sort()).toEqual([
+        'cloth',
+        'fang',
+        'hide',
+        'meat',
+        'silk',
+        'venomSac',
+      ]);
+    } finally {
+      // A fresh registry for anything imported later; the static imports at the
+      // top of this file are already bound to the unpoisoned instances.
+      vi.resetModules();
+    }
+  });
+
+  it('answers for every shipped template, and fen_troll is the one it now excludes', () => {
+    // Derived from content: a retag that leaves another template with no mapped
+    // family lands in this list instead of going untested.
+    const excluded = Object.entries(MOBS)
+      .filter(([, m]) => (m.componentTags?.length ?? 0) > 0)
+      .filter(([, m]) => !isHarvestableCorpse(m.componentTags))
+      .map(([id]) => id);
+    expect(excluded).toEqual(['fen_troll']);
+    // The complement is asserted too, so an always-false predicate could not
+    // pass the row above by making the sweep vacuous.
+    const included = Object.entries(MOBS).filter(([, m]) => isHarvestableCorpse(m.componentTags));
+    expect(included).toHaveLength(17);
+    // ...and the untagged templates are counted rather than assumed: 101 of them
+    // ship, all excluded before this change and all excluded after it, which is
+    // the path fen_troll now joins instead of getting one of its own.
+    const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
+    expect(untagged).toHaveLength(101);
+    for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
+    // The three literals above are the load-bearing ones; this sum states that
+    // they partition MOBS, so a template that fell out of all three would read
+    // as wrong here rather than quietly leaving the sweep.
+    expect(included.length + excluded.length + untagged.length).toBe(Object.keys(MOBS).length);
   });
 });
 
