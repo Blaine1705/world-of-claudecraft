@@ -6,6 +6,7 @@ import {
   applyEffectBonus,
   BARE_HANDS_TOOL_TIER,
   bestOwnedAnyGatherToolTier,
+  bestOwnedGatherToolFor,
   bestOwnedGatherToolTier,
   bestOwnedGatherToolTierOrNone,
   canGatherTier,
@@ -17,10 +18,13 @@ import {
   isGatherToolUse,
   isOriginalCrafter,
   NO_TOOL_OWNED,
+  RARITY_DURABILITY_BONUS,
+  rarityLadderIndex,
   rechargeCost,
   rechargeEffect,
   resolveToolEffectUse,
   slotEffect,
+  startingDurabilityFor,
 } from '../src/sim/professions/tools';
 import { Sim } from '../src/sim/sim';
 import type { InvSlot, ItemDef } from '../src/sim/types';
@@ -537,6 +541,121 @@ describe('sim-level node access gating (Professions 2.0)', () => {
     // the bare-hands floor once it satisfies the #2343 implement gate (so a
     // pole in bags never changes any draw or catch sequence).
     expect(ITEMS.simple_fishing_pole.use).toEqual({ type: 'fishing' });
+  });
+});
+
+describe('the one rarity ladder both bonuses read', () => {
+  const bag = (...itemIds: string[]): InvSlot[] => itemIds.map((itemId) => ({ itemId, count: 1 }));
+
+  it('indexes the ladder from common, and floors every off-ladder quality at it', () => {
+    expect(rarityLadderIndex('common')).toBe(0);
+    expect(rarityLadderIndex('uncommon')).toBe(1);
+    expect(rarityLadderIndex('rare')).toBe(2);
+    expect(rarityLadderIndex('epic')).toBe(3);
+    expect(rarityLadderIndex('legendary')).toBe(4);
+    // The two inputs a real def can present that are not on the ladder. Both
+    // used to come back -1, which SUBTRACTED a rung from every consumer.
+    expect(rarityLadderIndex('poor')).toBe(0);
+    expect(rarityLadderIndex(undefined)).toBe(0);
+  });
+
+  it('the floor is load-bearing for charges, not just for the reel window', () => {
+    // The same -1 would have minted a poor-quality tool's slot with FEWER
+    // charges than a common one's. Asserted through the real consumer so the
+    // floor cannot be removed from the ladder and left passing here.
+    const common = startingDurabilityFor('gatherers_cache', 'common');
+    expect(
+      startingDurabilityFor('gatherers_cache', 'poor' as never),
+      'a poor tool must not mint fewer charges than a common one',
+    ).toBe(common);
+    expect(startingDurabilityFor('gatherers_cache', 'epic')).toBe(
+      common + RARITY_DURABILITY_BONUS * 3,
+    );
+  });
+
+  it('resolves the best owned tool by TIER first, with rarity only as the tie-break', () => {
+    // Tidewrought is tier 5 epic, stormreel tier 4 rare. Tier must win even
+    // though both axes agree here, which is why the synthetic case below
+    // exists.
+    expect(bestOwnedGatherToolFor(bag('stormreel_fishing_rod'), 'fishing', ITEMS)).toEqual({
+      tier: 4,
+      rarity: 'rare',
+    });
+    expect(
+      bestOwnedGatherToolFor(
+        bag('tidewrought_fishing_rod', 'stormreel_fishing_rod'),
+        'fishing',
+        ITEMS,
+      ),
+    ).toEqual({ tier: 5, rarity: 'epic' });
+    // Bag ORDER must not decide it: the same two rods the other way round.
+    expect(
+      bestOwnedGatherToolFor(
+        bag('stormreel_fishing_rod', 'tidewrought_fishing_rod'),
+        'fishing',
+        ITEMS,
+      ),
+    ).toEqual({ tier: 5, rarity: 'epic' });
+  });
+
+  it('prefers the higher tier even when the lower one is rarer', () => {
+    // No shipped pair inverts the two axes, so this is the only way to show
+    // tier is read FIRST rather than the comparison merely agreeing with
+    // rarity everywhere. A local registry, never a mutation of ITEMS.
+    const items: Record<string, ItemDef> = {
+      plain_high: {
+        id: 'plain_high',
+        name: 'Plain High Pick',
+        kind: 'tool',
+        quality: 'common',
+        use: { type: 'gatherTool', professionId: 'mining', tier: 5 },
+        sellValue: 1,
+      },
+      shiny_low: {
+        id: 'shiny_low',
+        name: 'Shiny Low Pick',
+        kind: 'tool',
+        quality: 'legendary',
+        use: { type: 'gatherTool', professionId: 'mining', tier: 2 },
+        sellValue: 1,
+      },
+    };
+    expect(bestOwnedGatherToolFor(bag('shiny_low', 'plain_high'), 'mining', items)).toEqual({
+      tier: 5,
+      rarity: 'common',
+    });
+    // And WITHIN one tier, the rarer copy wins, which is the tie-break arm.
+    const sameTier: Record<string, ItemDef> = {
+      a: { ...items.plain_high, id: 'a' },
+      b: {
+        ...items.plain_high,
+        id: 'b',
+        quality: 'epic',
+      },
+    };
+    expect(bestOwnedGatherToolFor(bag('a', 'b'), 'mining', sameTier).rarity).toBe('epic');
+    expect(bestOwnedGatherToolFor(bag('b', 'a'), 'mining', sameTier).rarity).toBe('epic');
+  });
+
+  it('floors at bare hands with common rarity when no matching tool is carried', () => {
+    // Matches bestOwnedGatherToolTier's own floor, and the rarity floor is
+    // what keeps a toolless angler on the base reel window.
+    expect(bestOwnedGatherToolFor([], 'fishing', ITEMS)).toEqual({
+      tier: BARE_HANDS_TOOL_TIER,
+      rarity: 'common',
+    });
+    // A pick is not a rod: a tool of ANOTHER profession never counts here.
+    expect(bestOwnedGatherToolFor(bag('arcanite_mining_pick'), 'fishing', ITEMS)).toEqual({
+      tier: BARE_HANDS_TOOL_TIER,
+      rarity: 'common',
+    });
+    // The tier it reports never disagrees with the tier-only scan every gate
+    // still reads, which is what keeps a bonus axis from becoming a gate axis.
+    for (const held of [[], bag('stormreel_fishing_rod'), bag('tidewrought_fishing_rod')]) {
+      expect(bestOwnedGatherToolFor(held, 'fishing', ITEMS).tier).toBe(
+        bestOwnedGatherToolTier(held, 'fishing', ITEMS),
+      );
+    }
   });
 });
 

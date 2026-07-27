@@ -114,6 +114,49 @@ export function bestOwnedGatherToolTier(
   );
 }
 
+/** The best owned tool as BOTH of the axes a bonus can read: its tier and its
+ *  own rarity. */
+export interface OwnedGatherTool {
+  /** Same number `bestOwnedGatherToolTier` returns, bare-hands floor included. */
+  tier: number;
+  /** The winning tool's `quality`, or 'common' when the tier came from the
+   *  bare-hands floor rather than from a def. */
+  rarity: MaterialRarity;
+}
+
+// The rarity-carrying twin of `bestOwnedGatherToolTier`, for the one bonus that
+// reads a tool's rarity off the LIVE path (the rod reel window). Kept beside it
+// rather than folded into it because every other caller wants the bare number,
+// and widening the three tier-only gates to carry a rarity they never read is
+// exactly the coupling the per-profession slot decision avoided.
+//
+// Ordered by tier FIRST and rarity only as the tie-break, so it can never
+// prefer a shinier low-tier tool over a plainer high-tier one. No shipped
+// content reaches the tie-break: every gathering tool's rarity is a function of
+// its tier, so no two tools of one profession share a tier at different
+// rarities. It is here so that a future pair which does share a tier resolves
+// deterministically instead of by bag order, which is player-controlled.
+export function bestOwnedGatherToolFor(
+  inventory: readonly InvSlot[],
+  professionId: GatheringProfessionId,
+  items: Readonly<Record<string, ItemDef>>,
+): OwnedGatherTool {
+  let best: OwnedGatherTool = { tier: BARE_HANDS_TOOL_TIER, rarity: 'common' };
+  for (const slot of inventory) {
+    const def = items[slot.itemId];
+    const tier = gatherToolTier(def, professionId);
+    if (tier === undefined) continue;
+    const rarity = (def?.quality ?? 'common') as MaterialRarity;
+    if (
+      tier > best.tier ||
+      (tier === best.tier && rarityLadderIndex(rarity) > rarityLadderIndex(best.rarity))
+    ) {
+      best = { tier, rarity };
+    }
+  }
+  return best;
+}
+
 // True when the player carries ANY fishing implement: the simple pole
 // (use.type 'fishing') or a tiered fishing-profession gatherTool rod. The
 // startFishing implement gate (#2343: casting a line always needs tackle in
@@ -280,11 +323,26 @@ export function applyEffectBonus(
 
 // The standard rarity ladder (MaterialRarity: common/uncommon/rare/epic/
 // legendary, see gathering.ts), read here as a tool's own rarity (ItemDef
-// `quality`). It is the only input to the charge ladder below.
+// `quality`). It is the only input to the charge ladder below AND to the rod
+// reel-window bonus (professions/fishing.ts fishReelWindowSecFor), which is why
+// it is exported: two bonuses keyed to the same ladder must not each carry
+// their own copy of the rung order.
 const RARITY_ORDER: readonly MaterialRarity[] = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
 
-function rarityTierIndex(rarity: MaterialRarity): number {
-  return RARITY_ORDER.indexOf(rarity);
+/**
+ * The rung a tool's rarity sits on, 0 for common. Takes the full `ItemDef`
+ * quality union rather than `MaterialRarity`, so the two off-ladder inputs a
+ * real item def can present resolve to the common rung instead of to -1:
+ * `undefined` (a def that omits `quality` entirely) and `'poor'` (the one
+ * quality `MaterialRarity` excludes). Both used to fall through `indexOf` as
+ * -1, which SUBTRACTED a rung: a poor-quality tool would have minted a slot
+ * with ten charges FEWER than a common one, and would now also open a reel
+ * window narrower than the base. Nothing ships at either value today, so this
+ * is a floor rather than a fix for live content.
+ */
+export function rarityLadderIndex(rarity: ItemDef['quality']): number {
+  const rung = RARITY_ORDER.indexOf(rarity as MaterialRarity);
+  return rung < 0 ? 0 : rung;
 }
 
 // How many extra charges each rung of tool rarity buys a slotted effect.
@@ -308,7 +366,7 @@ export const RARITY_DURABILITY_BONUS = 10;
 export function startingDurabilityFor(effectId: ToolEffectId, toolRarity: MaterialRarity): number {
   return (
     TOOL_EFFECTS[effectId].startingDurability +
-    RARITY_DURABILITY_BONUS * rarityTierIndex(toolRarity)
+    RARITY_DURABILITY_BONUS * rarityLadderIndex(toolRarity)
   );
 }
 

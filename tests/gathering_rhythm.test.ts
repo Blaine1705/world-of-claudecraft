@@ -178,10 +178,18 @@ describe('bite delay draw contract and rod-tiered bounds', () => {
   });
 
   it('the reel window arms at bite time with the rod-widened width', () => {
+    // Literal tick widths, deliberately not re-derived from the sim's own
+    // function: these are what the live loop must actually produce.
+    //   pole      tier 1 common   2.50s -> 50
+    //   ironreel  tier 2 common   3.25s -> 65  (tier rung only, rarity is 0)
+    //   silver.   tier 3 uncommon 4.25s -> 85  (two tier rungs plus one rarity)
+    // The silverstream row is 85 rather than 80 because a rod's own rarity
+    // widens the window too, and it is the row that separates a rarity-reading
+    // implementation from a tier-only one.
     for (const [rod, windowTicks] of [
       [null, 50],
       ['ironreel_fishing_rod', 65],
-      ['silverstream_fishing_rod', 80],
+      ['silverstream_fishing_rod', 85],
     ] as [string | null, number][]) {
       const sim = makeSim(4242);
       const meta = mustMeta(sim, sim.playerId);
@@ -722,7 +730,10 @@ describe('the reel window follows the rod held at BITE time, not cast start', ()
     sim.addItem('silverstream_fishing_rod', 1);
     sim.tickCount = p.fishBiteAtTick;
     updateCasting(sim.ctx, p, meta);
-    expect(p.fishReelDeadlineTick - sim.tickCount).toBe(80);
+    // 85: the tier-3 rod's two tier rungs plus its UNCOMMON rarity rung. The
+    // re-scan therefore has to pick up both axes off the rod acquired
+    // mid-session, not just its tier.
+    expect(p.fishReelDeadlineTick - sim.tickCount).toBe(85);
   });
 });
 

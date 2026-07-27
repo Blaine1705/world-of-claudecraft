@@ -7,8 +7,11 @@
 // the gather cast sheds GATHER_CAST_TOOL_TIER_REDUCTION_SEC per owned tier
 // above the node's, a rod pulls the bite-delay ceiling down by
 // FISH_BITE_DELAY_ROD_REDUCTION_SEC and widens the reel window by
-// FISH_REEL_WINDOW_ROD_BONUS_SEC per tier above 1, and catch band b needs
-// rod tier b + 1 (completeFishing), so band thresholds index by tier - 1.
+// FISH_REEL_WINDOW_ROD_BONUS_SEC per tier above 1 PLUS
+// FISH_REEL_WINDOW_RARITY_BONUS_SEC per rarity rung above common (which is why
+// the reel line is handed this def's own `quality` and not just its tier), and
+// catch band b needs rod tier b + 1 (completeFishing), so band thresholds
+// index by tier - 1.
 // The dormant tool-effect slotting (tools.ts, parked) is deliberately NOT
 // advertised here.
 
@@ -83,12 +86,19 @@ export function gatherToolTooltipLines(item: ItemDef): string {
           seconds: formatNumber(fishBiteSavedSecFor(use.tier), { maximumFractionDigits: 2 }),
         }),
       );
+      // Passed THIS def's own quality, not the common default: the rod's
+      // rarity widens the window too, so a tooltip reading the tier alone
+      // would under-promise every rod above ironreel by a quarter second per
+      // rung. The line still states one number, the total the rod buys over
+      // the base window, because a player holds one rod and cares what it is
+      // worth, not how the sum was assembled.
       html += line(
         'tt-desc',
         t('hudChrome.gathering.toolTooltip.rodReel', {
-          seconds: formatNumber(fishReelWindowSecFor(use.tier) - FISH_REEL_WINDOW_SEC, {
-            maximumFractionDigits: 2,
-          }),
+          seconds: formatNumber(
+            fishReelWindowSecFor(use.tier, item.quality) - FISH_REEL_WINDOW_SEC,
+            { maximumFractionDigits: 2 },
+          ),
         }),
       );
       // The band line is only true while the rod actually raises the ceiling,

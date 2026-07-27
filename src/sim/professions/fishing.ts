@@ -26,12 +26,24 @@ import { onFishCaughtForDeeds } from '../deeds';
 import { PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { DT, type Entity, FISHING_CAST_ID, FISHING_SESSION_CAP_SEC, isConsuming } from '../types';
+import {
+  DT,
+  type Entity,
+  FISHING_CAST_ID,
+  FISHING_SESSION_CAP_SEC,
+  type ItemDef,
+  isConsuming,
+} from '../types';
 import { groundHeight, waterLevelAt } from '../world';
 import { rodTierRequiredForZone } from './fishing_zones';
 import { queueGatheringGrant } from './gathering';
 import { PROFICIENCY_BAND_THRESHOLDS, proficiencyBandFor } from './proficiency_bands';
-import { bestOwnedGatherToolTier, canGatherTier, hasFishingImplement } from './tools';
+import {
+  bestOwnedGatherToolTier,
+  canGatherTier,
+  hasFishingImplement,
+  rarityLadderIndex,
+} from './tools';
 
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH; // ground this far under the water line = deep water
 // Facing-forward sample ring the fishable-water check walks. Exported so
@@ -56,8 +68,9 @@ export const FISHING_BAND_THRESHOLDS = PROFICIENCY_BAND_THRESHOLDS;
 // [3, 3] floor, which is the ladder's top rung by design rather than by
 // accident: past tier 4.3 the reduction has nothing left to take). The reel
 // window opens at the bite and lasts WINDOW plus ROD_BONUS per rod tier above
-// 1 (tier 3 reaches 4.0 s, tier 5 reaches 5.5 s), re-scanning the rod at bite
-// time. Named constants so the tests pin the rod synergy directly.
+// 1 plus RARITY_BONUS per rarity rung above common (tier 3 uncommon reaches
+// 4.25 s, tier 5 epic reaches 6.25 s), re-scanning the rod at bite time.
+// Named constants so the tests pin the rod synergy directly.
 //
 // The reel window is 2.50 rather than the 3.00 it shipped at: a light trim
 // only, and deliberately not the place the difficulty lives. Fishing's
@@ -70,6 +83,32 @@ export const FISH_BITE_DELAY_MAX_SEC = 8;
 export const FISH_BITE_DELAY_ROD_REDUCTION_SEC = 1.5;
 export const FISH_REEL_WINDOW_SEC = 2.5;
 export const FISH_REEL_WINDOW_ROD_BONUS_SEC = 0.75;
+
+// What a ROD's own rarity adds to the window, per rung above common (the
+// shared ladder, tools.ts rarityLadderIndex). The land tools' rarity buys
+// charges on a slotted effect instead; this is the rod half of the same
+// ruling, that rarity may grant narrow bonuses which never affect access.
+//
+// SAY IT PLAINLY: for every rod that ships, this is a TIER bonus wearing
+// rarity's coat. Rod rarity is perfectly collinear with rod tier (ironreel 2
+// common, silverstream 3 uncommon, stormreel 4 rare, tidewrought 5 epic, and
+// the pole floors at tier 1 common), so nothing in the world today can move
+// one without the other, and a reader comparing this to
+// FISH_REEL_WINDOW_ROD_BONUS_SEC should understand the two as one ladder read
+// twice rather than as two independent axes. It is expressed as rarity anyway
+// because the RULING is about rarity, and because the land tools' charge bonus
+// is genuinely NOT collinear (tiers 1 and 2 are both common), so one ladder
+// serving both is what keeps them from drifting into two.
+//
+// SIZED BY THE SESSION CAP, not by feel. The cap is 300 ticks
+// (FISHING_SESSION_CAP_SEC at DT) and the worst legal session before this was
+// 271: a worst bite of 160 ticks, the tier-5 window of 110, and the one tick
+// the miss arm fires on. That left 29 ticks, so the epic rung's three steps had
+// to fit inside 1.45 s and 0.25 buys 0.75 of it, landing the worst session at
+// 286 with 14 ticks still spare. tests/fishing_zones.test.ts re-derives that
+// budget rather than restating it, so a wider rung fails there instead of
+// silently letting the cap eat a legal reel window.
+export const FISH_REEL_WINDOW_RARITY_BONUS_SEC = 0.25;
 
 // The three things a rod tier buys, as functions rather than as a formula
 // every reader re-derives. The tooltip used to recompute all three and got the
@@ -91,10 +130,23 @@ export function fishBiteSavedSecFor(rodTier: number): number {
   return FISH_BITE_DELAY_MAX_SEC - fishBiteMaxSecFor(rodTier);
 }
 
-/** The reel window a rod of this tier opens at the bite. Unclamped by design:
- *  a wider window is the top of the ladder's whole reward. */
-export function fishReelWindowSecFor(rodTier: number): number {
-  return FISH_REEL_WINDOW_SEC + FISH_REEL_WINDOW_ROD_BONUS_SEC * (rodTier - 1);
+/** The reel window a rod of this tier and rarity opens at the bite. Unclamped
+ *  by design: a wider window is the top of the ladder's whole reward.
+ *
+ *  THE one definition. `rodRarity` defaults to common, so a caller that has
+ *  only a tier (the band arithmetic, a test walking tiers) gets the pre-rarity
+ *  number unchanged rather than a compile error, and no caller has an excuse to
+ *  re-derive the sum. Both former inline copies of this formula in
+ *  tests/fishing_zones.test.ts now call it. */
+export function fishReelWindowSecFor(
+  rodTier: number,
+  rodRarity: ItemDef['quality'] = 'common',
+): number {
+  return (
+    FISH_REEL_WINDOW_SEC +
+    FISH_REEL_WINDOW_ROD_BONUS_SEC * (rodTier - 1) +
+    FISH_REEL_WINDOW_RARITY_BONUS_SEC * rarityLadderIndex(rodRarity)
+  );
 }
 
 /** The highest catch band a rod of this tier unlocks. Band b takes tool tier

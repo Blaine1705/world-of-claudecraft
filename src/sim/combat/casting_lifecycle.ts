@@ -33,7 +33,7 @@ import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
 import { instanceInfoAt } from '../instances/dungeons';
 import { fishReelWindowSecFor } from '../professions/fishing';
-import { bestOwnedGatherToolTier } from '../professions/tools';
+import { bestOwnedGatherToolFor } from '../professions/tools';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -302,8 +302,13 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       // so the widened window follows the rod actually held at the bite.
       ctx.emit({ type: 'fishingBite', pid: p.id });
       p.fishBiteAtTick = 0;
-      const rodTier = bestOwnedGatherToolTier(meta.inventory, 'fishing', ITEMS);
-      p.fishReelDeadlineTick = ctx.tickCount + Math.ceil(fishReelWindowSecFor(rodTier) / DT);
+      // Both axes of the rod held at the BITE: its tier and its own rarity.
+      // Draw-free, same as the tier-only scan it replaces, so the bite arm
+      // still moves no rng and the two-draws-per-landed-session contract is
+      // untouched.
+      const rod = bestOwnedGatherToolFor(meta.inventory, 'fishing', ITEMS);
+      p.fishReelDeadlineTick =
+        ctx.tickCount + Math.ceil(fishReelWindowSecFor(rod.tier, rod.rarity) / DT);
     } else if (p.fishReelDeadlineTick > 0 && ctx.tickCount > p.fishReelDeadlineTick) {
       // The miss ("it got away"), firing at deadline + 1: the reel re-press
       // stays valid while tickCount <= deadline (startFishing's reel arm).

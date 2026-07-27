@@ -18,8 +18,10 @@ import {
   FISH_BITE_DELAY_MAX_SEC,
   FISH_BITE_DELAY_MIN_SEC,
   FISH_BITE_DELAY_ROD_REDUCTION_SEC,
+  FISH_REEL_WINDOW_RARITY_BONUS_SEC,
   FISH_REEL_WINDOW_ROD_BONUS_SEC,
   FISH_REEL_WINDOW_SEC,
+  fishReelWindowSecFor,
   startFishing,
 } from '../src/sim/professions/fishing';
 import {
@@ -29,7 +31,13 @@ import {
 } from '../src/sim/professions/fishing_zones';
 import { isGatherToolUse } from '../src/sim/professions/tools';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import { DT, FISHING_CAST_ID, FISHING_SESSION_CAP_SEC, type SimEvent } from '../src/sim/types';
+import {
+  DT,
+  FISHING_CAST_ID,
+  FISHING_SESSION_CAP_SEC,
+  type ItemDef,
+  type SimEvent,
+} from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 const ZONE_IDS = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'];
@@ -559,18 +567,79 @@ describe('the zone rod gate at the cast', () => {
   });
 });
 
+describe('a rod rarity rung widens the reel window', () => {
+  it('widens on rarity with the tier HELD FIXED, so the term is not tier in disguise', () => {
+    // The decisive arm. Rod rarity is collinear with rod tier in shipped
+    // content, so every real rod would also pass a tier-only implementation;
+    // holding the tier fixed is the only thing that can tell the two apart.
+    const tier = 3;
+    const common = fishReelWindowSecFor(tier, 'common');
+    for (const [rarity, rungs] of [
+      ['uncommon', 1],
+      ['rare', 2],
+      ['epic', 3],
+      ['legendary', 4],
+    ] as const) {
+      expect(fishReelWindowSecFor(tier, rarity) - common, `${rarity} at tier ${tier}`).toBeCloseTo(
+        FISH_REEL_WINDOW_RARITY_BONUS_SEC * rungs,
+        10,
+      );
+    }
+  });
+
+  it('leaves the tier ladder intact, and defaults an omitted rarity to common', () => {
+    // Rarity ADDS to the tier ladder rather than replacing it: the pre-rarity
+    // behaviour is still exactly what a common rod gets.
+    for (let tier = 1; tier <= 5; tier++) {
+      expect(fishReelWindowSecFor(tier, 'common')).toBeCloseTo(
+        FISH_REEL_WINDOW_SEC + FISH_REEL_WINDOW_ROD_BONUS_SEC * (tier - 1),
+        10,
+      );
+      // The default is the common rung, so a tier-only caller is unchanged.
+      expect(fishReelWindowSecFor(tier)).toBe(fishReelWindowSecFor(tier, 'common'));
+    }
+  });
+
+  it('never NARROWS the window for an off-ladder quality', () => {
+    // 'poor' is the one quality MaterialRarity excludes and undefined is a def
+    // with no quality at all. Both used to index to -1 and would have
+    // subtracted a rung from the base window.
+    for (const quality of ['poor', undefined] as const) {
+      expect(fishReelWindowSecFor(3, quality)).toBe(fishReelWindowSecFor(3, 'common'));
+    }
+  });
+
+  it('the shipped rods really do span the rarity ladder, so the bonus is reachable', () => {
+    // Vacuity guard: if every rod were common the term above would be dead
+    // content, and the budget below would be measuring a case no player holds.
+    const rodQualities = Object.values(ITEMS)
+      .filter((def) => isGatherToolUse(def.use) && def.use.professionId === 'fishing')
+      .map((def) => def.quality);
+    expect(new Set(rodQualities).size).toBeGreaterThan(1);
+    expect(rodQualities).toContain('epic');
+  });
+});
+
 describe('the session cap always outlasts a legal reel window', () => {
   // The fairness defect this guards: the cap arm and the miss arm emit the
   // IDENTICAL pair (fishingGotAway plus a failed castStop), so if the cap ever
   // expired while a reel window was still open, the fish would get away with
   // the window still on screen and nothing downstream could tell the two
   // apart. Budgeted in TICKS, because both legs ceil and the cap decays on DT.
-  const shippedRodTiers = (): number[] => {
-    const tiers = Object.values(ITEMS)
+  // Every shipped rod as BOTH axes the window reads. Tier alone is no longer
+  // enough: rarity widens the window too, so a budget walking bare tiers would
+  // under-count the real worst case by the epic rung and pass on a window the
+  // world can actually beat.
+  const shippedRods = (): { tier: number; quality: ItemDef['quality'] }[] => {
+    const rods = Object.values(ITEMS)
       .filter((def) => isGatherToolUse(def.use) && def.use.professionId === 'fishing')
-      .map((def) => (isGatherToolUse(def.use) ? def.use.tier : 0));
-    // Tier 1 is the pole and the bare-hands floor, which no rod def carries.
-    return [1, ...tiers];
+      .map((def) => ({
+        tier: isGatherToolUse(def.use) ? def.use.tier : 0,
+        quality: def.quality,
+      }));
+    // Tier 1 is the pole and the bare-hands floor, which no rod def carries;
+    // the floor is common, matching bestOwnedGatherToolFor's own default.
+    return [{ tier: 1, quality: 'common' as const }, ...rods];
   };
 
   it('covers the worst legal session over every shipped rod tier, with a tick to spare', () => {
@@ -584,18 +653,30 @@ describe('the session cap always outlasts a legal reel window', () => {
     const worstBiteTicks = Math.ceil(FISH_BITE_DELAY_MAX_SEC / DT);
     let checked = 0;
     let worstNeedTicks = 0;
-    for (const biteTimeTier of shippedRodTiers()) {
-      const windowSec = FISH_REEL_WINDOW_SEC + FISH_REEL_WINDOW_ROD_BONUS_SEC * (biteTimeTier - 1);
+    for (const rod of shippedRods()) {
+      // The sim's own function, never a second copy of its arithmetic. This
+      // line used to re-derive the sum inline, which meant the budget could
+      // stay green while the live window grew past it: adding the rarity term
+      // to fishReelWindowSecFor alone would have moved the world and left this
+      // measuring the old formula.
+      const windowSec = fishReelWindowSecFor(rod.tier, rod.quality);
       const needTicks = worstBiteTicks + Math.ceil(windowSec / DT) + 1;
       worstNeedTicks = Math.max(worstNeedTicks, needTicks);
       expect(
         capTicks,
-        `a pole cast into a tier-${biteTimeTier} bite needs ${needTicks} ticks`,
+        `a pole cast into a tier-${rod.tier} ${rod.quality} bite needs ${needTicks} ticks`,
       ).toBeGreaterThan(needTicks);
       checked += 1;
     }
-    expect(checked).toBe(shippedRodTiers().length);
+    expect(checked).toBe(shippedRods().length);
     expect(checked).toBeGreaterThanOrEqual(5);
+    // The rarity term is really IN the worst case, not merely available to it:
+    // the widest shipped rod must beat the widest bare-tier window, or this
+    // whole budget would be re-deriving the pre-rarity number and calling it
+    // covered.
+    expect(worstNeedTicks).toBeGreaterThan(
+      worstBiteTicks + Math.ceil(fishReelWindowSecFor(5) / DT) + 1,
+    );
     // The budget is LIVE, not a formality: the worst legal session really does
     // consume most of the cap, so a cap trimmed for looks would red here.
     expect(worstNeedTicks).toBeGreaterThan(capTicks * 0.8);
@@ -606,8 +687,10 @@ describe('the session cap always outlasts a legal reel window', () => {
         FISH_BITE_DELAY_MIN_SEC,
         FISH_BITE_DELAY_MAX_SEC - FISH_BITE_DELAY_ROD_REDUCTION_SEC * (tier - 1),
       );
-    for (const tier of shippedRodTiers()) {
-      expect(effMaxFor(tier), `tier ${tier} bite ceiling`).toBeLessThanOrEqual(effMaxFor(1));
+    for (const rod of shippedRods()) {
+      expect(effMaxFor(rod.tier), `tier ${rod.tier} bite ceiling`).toBeLessThanOrEqual(
+        effMaxFor(1),
+      );
     }
   });
 
@@ -642,9 +725,7 @@ describe('the session cap always outlasts a legal reel window', () => {
     // below would simply run fewer iterations, and every assertion would still
     // pass on a much weaker budget.
     const widestWindowTicks = Math.ceil(
-      (FISH_REEL_WINDOW_SEC +
-        FISH_REEL_WINDOW_ROD_BONUS_SEC *
-          ((isGatherToolUse(bestRod.use) ? bestRod.use.tier : 1) - 1)) /
+      fishReelWindowSecFor(isGatherToolUse(bestRod.use) ? bestRod.use.tier : 1, bestRod.quality) /
         DT,
     );
     expect(p.fishReelDeadlineTick - sim.tickCount, 'the bite armed the widest window').toBe(
