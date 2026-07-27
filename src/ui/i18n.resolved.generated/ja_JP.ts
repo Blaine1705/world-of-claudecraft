@@ -2195,7 +2195,7 @@ export const ja_JP: EnTranslations = {
         "mining": "この鉱脈を採掘するにはティア{tier}の採掘ピッケルが必要です。",
         "logging": "この立木を伐り倒すにはティア{tier}の伐採斧が必要です。",
         "herbalism": "この群生地を採取するにはティア{tier}の薬草鎌が必要です。",
-        "fishing": "You need a tier {tier} fishing rod to fish these waters."
+        "fishing": "この水域で釣るにはティア{tier}の釣り竿が必要です。"
       },
       "toolRequired": {
         "mining": "この鉱脈を採掘するには採掘ピッケルが必要です。",
@@ -9201,10 +9201,10 @@ export const ja_JP: EnTranslations = {
         "name": "上質なサンペタル草"
       },
       "stormreel_fishing_rod": {
-        "name": "Stormreel Fishing Rod"
+        "name": "嵐リールの釣り竿"
       },
       "tidewrought_fishing_rod": {
-        "name": "Tidewrought Fishing Rod"
+        "name": "潮鍛えの釣り竿"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

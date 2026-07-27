@@ -36,9 +36,19 @@ import { type CraftSkills, tierForSkill } from './wheel';
 // copper: common (tier 0) is free, uncommon (tier 1) is 25 silver, rare
 // (tier 2) is 1 gold, then a 4x geometric step per tier: tier 3 is 4 gold,
 // tier 4 is 16 gold. Tiers beyond the table still
-// clamp to the last entry. Behavior-neutral for shipped wave-one content: no
-// trainer-taught recipe sits above tier 2 (the skillReq 75/150 recipes are
-// all grandfathered pre-training entries with no 'trainer' acquisition).
+// clamp to the last entry.
+//
+// The top two rungs are LIVE now, and they were not when this table was
+// written. The two crafted fishing rods (content/recipes.ts ROD_RECIPES) are
+// the first trainer-taught recipes to reach them: skillReq 75 lands on tier 3
+// at 4 gold and skillReq 125 on tier 4 at 16 gold. Everything else taught by a
+// trainer still sits at 0, 25 silver or 1 gold, and the six crafted LAND tools
+// escape the table entirely because they predate training and carry no
+// acquisition list, so they are known rather than learned. Whether a capstone
+// rod should cost sixteen times the next dearest lesson is a balance call the
+// packet records as open (docs/design/professions-tuning-packet.md); the fee
+// itself is derived, not authored per recipe, so moving it means moving this
+// curve or the recipe's skillReq, never a special case.
 export const TRAINING_FEE_BY_TIER: readonly number[] = Object.freeze([
   0, 2500, 10000, 40000, 160000,
 ]);

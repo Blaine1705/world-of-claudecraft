@@ -259,7 +259,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
   });
 
   // Raised timeout (the climb_slope idiom): this beat drives thousands of
-  // REAL world ticks (17 bite-and-reel sessions plus bounded combat waits),
+  // REAL world ticks (15 bite-and-reel sessions plus bounded combat waits),
   // which overruns the 5s default under CI/core contention; every loop is
   // guard-bounded, so a genuine hang still terminates into a failed pin.
   it('beat 11: the koi lands through the REAL bite-and-reel loop and the deed fires on the catch', {
@@ -392,7 +392,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       if (sim.countItem('pristine_hide', pid) > 0) hitAt = i;
     }
     // Hunted literal (seed 4242, after every beat above): the rare-or-better
-    // rarity roll that mints the signed specimen lands on attempt index 20.
+    // rarity roll that mints the signed specimen lands on attempt index 9.
     expect(hitAt).toBe(9);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);

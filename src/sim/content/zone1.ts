@@ -561,8 +561,11 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       // tier-2 or tier-3 land tool opens nothing here; the marsh and the peaks
       // sell the rungs their own veins need, and this counter used to be the
       // one place in the world that sold the whole ladder at the front door.
-      // The tiered rods stay: fishing has no nodes for the rule to speak of,
-      // and Wilkes has always been their only stockist.
+      // The tiered rods stay, and Wilkes is now the one counter carrying the
+      // WHOLE rod ladder rather than the only one carrying any of it: each
+      // zone's water has a required rod tier of its own now
+      // (professions/fishing_zones.ts), so the marsh and the peaks stock the
+      // rung they ask for and this counter is where you buy ahead.
       'copper_mining_pick',
       'handaxe',
       'gathering_sickle',

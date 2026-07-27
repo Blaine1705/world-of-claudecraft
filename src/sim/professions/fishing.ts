@@ -189,18 +189,36 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
     });
     return;
   }
+  if (!hasFishableWaterAhead(ctx, p)) {
+    ctx.error(meta.entityId, 'You need to face fishable water.');
+    return;
+  }
   // Zone rod gate (D9, the skill-versus-spot axis): each zone's water names
   // the rod tier it takes (professions/fishing_zones.ts), read through the
-  // same canGatherTier comparator every node gate uses. Sits immediately
-  // BESIDE the implement gate above, so the two tackle checks stay together
-  // and both answer before the water check and before the one bite-delay
-  // draw: a denial is rng-free, starts no cast, and names the real blocker
-  // wherever the player is standing. The zone comes from the SAME expression
-  // completeFishing resolves its catch table with (zoneAt(p.pos.z)), so a
-  // player can never be denied for one zone's requirement and then fished
-  // against another zone's table.
+  // same canGatherTier comparator every node gate uses. Draw-free like every
+  // arm above it, so where it sits changes no seed; it sits AFTER the water
+  // check on purpose, so it only ever answers a real attempt to fish. Ahead
+  // of it a player facing dry ground in the peaks would be told to go and buy
+  // a better rod when the thing actually missing is the water.
+  //
+  // The zone comes from the SAME expression completeFishing resolves its
+  // catch table with (zoneAt(p.pos.z)), so a player is never denied for one
+  // zone's requirement and then fished against another zone's table. What
+  // makes that hold across the session, rather than just at this instant, is
+  // that movement cancels a fishing cast (sim/player_motion.ts) and so does a
+  // hit: there is no way to be carried into another zone mid-cast. A future
+  // move that does NOT cancel (a taxi, a knockback with no damage) would
+  // break it, and the fix then is to re-resolve the tier at the reel.
+  //
+  // zoneAt SATURATES at the world edges (any z past the last zone resolves to
+  // thornpeak_heights), and instanced spaces are laid out along z, so a
+  // dungeon slot would inherit whatever zone its origin lands in. Harmless
+  // today because waterLevelAt returns -Infinity outside a declared lake and
+  // every lake is in the overworld, so the water check above refuses first.
+  // Author fishable water inside an instance and this needs a real answer.
   const requiredRodTier = rodTierRequiredForZone(zoneAt(p.pos.z).id);
-  if (!canGatherTier(bestOwnedGatherToolTier(meta.inventory, 'fishing', ITEMS), requiredRodTier)) {
+  const ownedRodTier = bestOwnedGatherToolTier(meta.inventory, 'fishing', ITEMS);
+  if (!canGatherTier(ownedRodTier, requiredRodTier)) {
     ctx.emit({
       type: 'gatherDenied',
       pid: meta.entityId,
@@ -208,10 +226,6 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
       professionId: 'fishing',
       requiredTier: requiredRodTier,
     });
-    return;
-  }
-  if (!hasFishableWaterAhead(ctx, p)) {
-    ctx.error(meta.entityId, 'You need to face fishable water.');
     return;
   }
   if (p.sitting) ctx.standUp(p);
@@ -231,10 +245,9 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // rod pulling the max down only. Stored in TICKS on hidden Entity state
   // (ceil, the lockpick deadline precedent), NEVER on castTotal/castRemaining:
   // those broadcast in dynamicFields and must carry no bite information.
-  const rodTier = bestOwnedGatherToolTier(meta.inventory, 'fishing', ITEMS);
   const effMax = Math.max(
     FISH_BITE_DELAY_MIN_SEC,
-    FISH_BITE_DELAY_MAX_SEC - FISH_BITE_DELAY_ROD_REDUCTION_SEC * (rodTier - 1),
+    FISH_BITE_DELAY_MAX_SEC - FISH_BITE_DELAY_ROD_REDUCTION_SEC * (ownedRodTier - 1),
   );
   const delaySec = FISH_BITE_DELAY_MIN_SEC + ctx.rng.next() * (effMax - FISH_BITE_DELAY_MIN_SEC);
   p.fishBiteAtTick = ctx.tickCount + Math.ceil(delaySec / DT);

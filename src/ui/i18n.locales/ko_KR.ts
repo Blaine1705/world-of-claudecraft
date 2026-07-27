@@ -4133,6 +4133,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.glimmerfin_koi.name': '윤슬 코이',
   'entities.items.ironreel_fishing_rod.name': '쇠릴 낚싯대',
   'entities.items.silverstream_fishing_rod.name': '은빛 시내 낚싯대',
+  'entities.items.stormreel_fishing_rod.name': '폭풍릴 낚싯대',
+  'entities.items.tidewrought_fishing_rod.name': '조수벼림 낚싯대',
   'entities.items.raw_bog_eel.name': '날 늪지 뱀장어',
   'entities.items.raw_frostgill_trout.name': '날 서리아가미 송어',
   'entities.items.raw_marsh_pike.name': '날 늪지 강꼬치고기',
@@ -7244,6 +7246,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 나무를 베려면 {tier}티어 벌목 도끼가 필요합니다.',
   'hudChrome.gathering.toolTierUnmet.herbalism':
     '이 군락을 채집하려면 {tier}티어 약초 낫이 필요합니다.',
+  'hudChrome.gathering.toolTierUnmet.fishing':
+    '이 수역에서 낚시하려면 {tier}티어 낚싯대가 필요합니다.',
   'hudChrome.gathering.toolTierUnmetCorpse':
     '최상급 재료를 회수하려면 {tier}티어 채집 도구가 필요합니다.',
   'hudChrome.gathering.requiresTool.mining': '채광 곡괭이 필요',

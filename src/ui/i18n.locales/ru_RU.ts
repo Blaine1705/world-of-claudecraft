@@ -4182,6 +4182,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.glimmerfin_koi.name': 'Кои солнечного блика',
   'entities.items.ironreel_fishing_rod.name': 'Удочка с железной катушкой',
   'entities.items.silverstream_fishing_rod.name': 'Удочка серебряного ручья',
+  'entities.items.stormreel_fishing_rod.name': 'Удочка со штормовой катушкой',
+  'entities.items.tidewrought_fishing_rod.name': 'Удочка приливной ковки',
   'entities.items.raw_bog_eel.name': 'Сырой болотный угорь',
   'entities.items.raw_frostgill_trout.name': 'Сырая морозожаберная форель',
   'entities.items.raw_marsh_pike.name': 'Сырая болотная щука',
@@ -7389,6 +7391,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Чтобы срубить этот древостой, нужен лесорубный топор {tier} уровня.',
   'hudChrome.gathering.toolTierUnmet.herbalism':
     'Чтобы собрать эти заросли, нужен серп травника {tier} уровня.',
+  'hudChrome.gathering.toolTierUnmet.fishing':
+    'Чтобы рыбачить в этих водах, нужна удочка {tier} уровня.',
   'hudChrome.gathering.toolTierUnmetCorpse':
     'Чтобы добыть лучшие материалы, нужен инструмент сбора {tier} уровня.',
   'hudChrome.gathering.requiresTool.mining': 'Требуется шахтерская кирка',

@@ -7,6 +7,11 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
+import {
+  FISH_BITE_DELAY_MAX_SEC,
+  FISH_BITE_DELAY_MIN_SEC,
+  FISH_BITE_DELAY_ROD_REDUCTION_SEC,
+} from '../src/sim/professions/fishing';
 import { gatherToolTooltipLines } from '../src/ui/gather_tool_tooltip';
 
 describe('gatherToolTooltipLines: picks, axes, sickles', () => {
@@ -87,7 +92,19 @@ describe('gatherToolTooltipLines: fishing implements', () => {
 
     const tidewrought = gatherToolTooltipLines(ITEMS.tidewrought_fishing_rod);
     expect(tidewrought).toContain('<div class="tt-sub">Fishing rod (tier 5)</div>');
-    expect(tidewrought).toContain('<div class="tt-desc">Fish bite up to 6s sooner.</div>');
+    // 5s, not the 6s the raw 1.5-per-tier product gives: the sim floors the
+    // bite window at FISH_BITE_DELAY_MIN_SEC, so the fifth rung's last 1.5
+    // seconds buy nothing and the copy must not sell them.
+    expect(tidewrought).toContain('<div class="tt-desc">Fish bite up to 5s sooner.</div>');
+    expect(tidewrought).not.toContain('Fish bite up to 6s sooner.');
+    // Tier 4 still lands strictly inside the clamp, so the two arms of the
+    // clamp are both live rather than one being dead.
+    expect(FISH_BITE_DELAY_MAX_SEC - FISH_BITE_DELAY_ROD_REDUCTION_SEC * 3).toBeGreaterThan(
+      FISH_BITE_DELAY_MIN_SEC,
+    );
+    expect(FISH_BITE_DELAY_MAX_SEC - FISH_BITE_DELAY_ROD_REDUCTION_SEC * 4).toBeLessThan(
+      FISH_BITE_DELAY_MIN_SEC,
+    );
     expect(tidewrought).toContain('<div class="tt-desc">Extends the reel window by 3s.</div>');
     expect(tidewrought).not.toContain('Unlocks richer catch tables');
   });

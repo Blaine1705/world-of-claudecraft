@@ -7329,6 +7329,10 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
           {
             "name": "Trader Wilkes",
             "hub": "Eastbrook"
+          },
+          {
+            "name": "Provisioner Hale",
+            "hub": "Fenbridge"
           }
         ]
       },
@@ -7341,6 +7345,10 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
           {
             "name": "Trader Wilkes",
             "hub": "Eastbrook"
+          },
+          {
+            "name": "Quartermaster Bree",
+            "hub": "Highwatch"
           }
         ]
       },

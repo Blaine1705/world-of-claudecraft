@@ -2195,7 +2195,7 @@ export const ru_RU: EnTranslations = {
         "mining": "Чтобы разработать эту жилу, нужна шахтерская кирка {tier} уровня.",
         "logging": "Чтобы срубить этот древостой, нужен лесорубный топор {tier} уровня.",
         "herbalism": "Чтобы собрать эти заросли, нужен серп травника {tier} уровня.",
-        "fishing": "You need a tier {tier} fishing rod to fish these waters."
+        "fishing": "Чтобы рыбачить в этих водах, нужна удочка {tier} уровня."
       },
       "toolRequired": {
         "mining": "Чтобы разработать эту жилу, нужна шахтерская кирка.",
@@ -9201,10 +9201,10 @@ export const ru_RU: EnTranslations = {
         "name": "Отборная трава солнцелепест"
       },
       "stormreel_fishing_rod": {
-        "name": "Stormreel Fishing Rod"
+        "name": "Удочка со штормовой катушкой"
       },
       "tidewrought_fishing_rod": {
-        "name": "Tidewrought Fishing Rod"
+        "name": "Удочка приливной ковки"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

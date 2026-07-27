@@ -666,7 +666,7 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
       'reedwoven_trousers',
       // Gathering tools (#2343: every node harvest needs a matching tool, so
       // each zone hub stocks the tiers its own nodes use; Mirefen has tier-1
-      // and tier-2 nodes). Tiered rods stay a Trader Wilkes exclusive.
+      // and tier-2 nodes), and the rod its own water takes.
       'copper_mining_pick',
       'iron_mining_pick',
       'handaxe',
@@ -674,6 +674,12 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
       'gathering_sickle',
       'bronze_sickle',
       'simple_fishing_pole',
+      // The marsh's own water takes a tier-2 rod (professions/fishing_zones.ts),
+      // so the hub rule finally speaks to fishing: sell the rung this zone's
+      // water needs, where that water is. Without this the marsh is the one
+      // place in the world that demands a tool no local counter carries, and
+      // the Codfather sends a level-6 angler back to Eastbrook for it.
+      'ironreel_fishing_rod',
     ],
     greeting:
       'Dry boots, dry bread, dry powder — at Fenbridge you get two of the three on a good day.',

@@ -149,12 +149,11 @@ function catchSequenceLive(sim: Sim, meta: PlayerMeta, n: number): (string | nul
   return out;
 }
 
-// The literal band-0 catch sequence at seed 4242 under the shipped LIVE
-// loop (re-recorded from the shipped drive by the bite-hunt scratch script,
-// then spot-audited): each session consumes TWO draws, draw 2i the hidden
-// bite delay and draw 2i+1 the table walk against the SHIPPED Vale rows
-// (trout 45 / perch 30 / weed 12 / koi 3 / null 10). Any accidental extra
-// draw, band-boundary change, or band-0 table drift breaks this pin.
+// The literal band-0 catch sequence at seed 4242 under the LIVE loop: each
+// session consumes TWO draws, draw 2i the hidden bite delay and draw 2i+1 the
+// table walk against the band-0 Vale rows (trout 46 / perch 31 / weed 12 /
+// koi 1 / null 10). Any accidental extra draw, band-boundary change, or
+// band-0 table drift breaks this pin.
 const B0_SEQ_4242: (string | null)[] = [
   PERCH,
   TROUT,
@@ -189,10 +188,13 @@ const B0_SEQ_4242: (string | null)[] = [
 ];
 
 // The literal band-1 live-loop sequence for the SAME seed with fishing
-// proficiency 150 (band-1 Vale weights trout 48 / perch 33 / weed 8 / koi 3 /
+// proficiency 150 (band-1 Vale weights trout 49 / perch 32 / weed 8 / koi 3 /
 // null 8). It diverges from B0_SEQ_4242 at index 0 (trout, not perch), so
-// matching it proves the live path actually switched tables; index 22 is the
-// hunted band DISCRIMINATOR against band 2 (koi here, tangled weed there).
+// matching it proves the live path actually switched tables; index 10 is the
+// hunted band DISCRIMINATOR against band 2 (tangled weed here, the koi
+// there, because the koi row rises 3 to 6 across that band step). The
+// divergence is asserted rather than described: see the discriminator pin
+// below, which fails if the two walks ever collapse onto each other.
 const B1_SEQ_4242: (string | null)[] = [
   TROUT,
   TROUT,
@@ -221,14 +223,13 @@ const B1_SEQ_4242: (string | null)[] = [
 ];
 
 // The literal band-2 live-loop sequence for the SAME seed with fishing
-// proficiency 200 (band-2 Vale weights trout 51 / perch 36 / weed 4 / koi 3 /
+// proficiency 200 (band-2 Vale weights trout 50 / perch 34 / weed 4 / koi 6 /
 // null 6) against the same interleaved stream. It diverges from the band-0
-// walk at index 0 and, decisively, from the BAND-1 walk at index 22: that
-// table draw lands where band 1 yields the koi but band 2 yields tangled
-// weed (the hunted divergence index under the two-draw stream), so matching
-// this sequence proves the live path resolved FISHING_TABLES_BY_BAND[2], not
-// a band-1 collapse (the top-band wiring was previously unpinned on the
-// live path).
+// walk at index 0 and, decisively, from the BAND-1 walk at index 10: that
+// table draw lands where band 1 yields tangled weed but band 2 yields the
+// koi, so matching this sequence proves the live path resolved
+// FISHING_TABLES_BY_BAND[2], not a band-1 collapse (the top-band wiring was
+// previously unpinned on the live path).
 const B2_SEQ_4242: (string | null)[] = [
   TROUT,
   TROUT,
@@ -774,6 +775,24 @@ describe('fishing table structure (pin 5)', () => {
     }
   });
 
+  it('the three literal walks really do diverge, at the indices their comments name', () => {
+    // The band pins below are only decisive because these sequences differ.
+    // Asserting WHERE they differ turns that from a comment into a test: a
+    // reweight that collapsed band 1 onto band 2 would leave every toEqual
+    // above green on identical arrays and prove nothing about band selection.
+    expect(B0_SEQ_4242.slice(0, 24)).not.toEqual(B1_SEQ_4242);
+    expect(B1_SEQ_4242).not.toEqual(B2_SEQ_4242);
+    expect(B0_SEQ_4242[0]).not.toBe(B1_SEQ_4242[0]);
+    expect(B1_SEQ_4242[10]).not.toBe(B2_SEQ_4242[10]);
+    // And index 10 is the ONLY cell where the two upper bands part, which is
+    // why every comment naming a different index is a defect rather than a
+    // harmless nit.
+    const differing = B1_SEQ_4242.map((v, i) => (v === B2_SEQ_4242[i] ? -1 : i)).filter(
+      (i) => i >= 0,
+    );
+    expect(differing).toEqual([10]);
+  });
+
   it('FISHING_TABLES is the identical band-0 object (alias identity, not a copy)', () => {
     expect(FISHING_TABLES).toBe(FISHING_TABLES_BY_BAND[0]);
   });
@@ -813,8 +832,8 @@ describe('fishing band selection liveness (pin 6)', () => {
     // Band 2 needs the tier-3 rod (band b requires tool tier b + 1).
     sim.addItem('silverstream_fishing_rod', 1);
     teleportToValeShore(sim);
-    // Index 22 sits in the hunted band-discriminating window (weed here where
-    // the band-1 table yields the koi; see the B2_SEQ_4242 derivation
+    // Index 10 is the hunted band-discriminating cell (the koi here, where
+    // the band-1 table yields tangled weed; see the B2_SEQ_4242 derivation
     // comment), so this match proves the live path resolved the TOP band,
     // not a band-1 collapse.
     expect(catchSequenceLive(sim, meta, 24)).toEqual(B2_SEQ_4242);
@@ -844,16 +863,16 @@ describe('fishing band tool cap (Professions 2.0)', () => {
     expect(catchSequenceLive(sim, meta, 12)).toEqual(B0_SEQ_4242.slice(0, 12));
   });
 
-  it('proficiency 250 with the tier-2 rod stays band 1: the discriminator window yields the koi', () => {
+  it('proficiency 250 with the tier-2 rod stays band 1: the discriminator cell yields weed', () => {
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.fishing = 250;
     sim.addItem('ironreel_fishing_rod', 1);
     teleportToValeShore(sim);
     // Index 0 (trout, not band 0's perch) proves the walk left band 0; index
-    // 22 is the hunted band DISCRIMINATOR: that table draw lands where band 1
-    // yields the koi but band 2 yields tangled weed (the B2_SEQ_4242
-    // derivation comment), so the koi there proves the tier-2 rod held the
+    // 10 is the hunted band DISCRIMINATOR: that table draw lands where band 1
+    // yields tangled weed but band 2 yields the koi (the B2_SEQ_4242
+    // derivation comment), so the weed there proves the tier-2 rod held the
     // walk at band 1 despite band-2 proficiency.
     expect(catchSequenceLive(sim, meta, 24)).toEqual(B1_SEQ_4242);
   });

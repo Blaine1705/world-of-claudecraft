@@ -14,6 +14,8 @@
 
 import type { GatheringProfessionId } from '../sim/content/professions';
 import {
+  FISH_BITE_DELAY_MAX_SEC,
+  FISH_BITE_DELAY_MIN_SEC,
   FISH_BITE_DELAY_ROD_REDUCTION_SEC,
   FISH_REEL_WINDOW_ROD_BONUS_SEC,
 } from '../sim/professions/fishing';
@@ -67,12 +69,21 @@ export function gatherToolTooltipLines(item: ItemDef): string {
     html += line('tt-desc', t('hudChrome.gathering.toolTooltip.rodRequired'));
     if (use.tier > 1) {
       const tiersAbove = use.tier - 1;
+      // CLAMPED, because the sim clamps. The bite window is
+      // [MIN, max(MIN, MAX - reduction * tiersAbove)], so once the reduction
+      // would push the ceiling under the floor the rod stops buying seconds:
+      // at tier 5 the raw product is 6 but the real improvement is 5, and the
+      // unclamped number told a player the rod was a second better than it is.
+      const biteSaved =
+        FISH_BITE_DELAY_MAX_SEC -
+        Math.max(
+          FISH_BITE_DELAY_MIN_SEC,
+          FISH_BITE_DELAY_MAX_SEC - FISH_BITE_DELAY_ROD_REDUCTION_SEC * tiersAbove,
+        );
       html += line(
         'tt-desc',
         t('hudChrome.gathering.toolTooltip.rodBite', {
-          seconds: formatNumber(FISH_BITE_DELAY_ROD_REDUCTION_SEC * tiersAbove, {
-            maximumFractionDigits: 2,
-          }),
+          seconds: formatNumber(biteSaved, { maximumFractionDigits: 2 }),
         }),
       );
       html += line(

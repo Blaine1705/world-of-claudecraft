@@ -2195,7 +2195,7 @@ export const zh_TW: EnTranslations = {
         "mining": "你需要{tier}階採礦鎬才能開採這條礦脈。",
         "logging": "你需要{tier}階伐木斧才能砍伐這片林木。",
         "herbalism": "你需要{tier}階草藥鐮才能採集這片草藥叢。",
-        "fishing": "You need a tier {tier} fishing rod to fish these waters."
+        "fishing": "你需要{tier}階釣竿才能在這片水域垂釣。"
       },
       "toolRequired": {
         "mining": "你需要採礦鎬才能開採這條礦脈。",
@@ -9201,10 +9201,10 @@ export const zh_TW: EnTranslations = {
         "name": "優質陽瓣草"
       },
       "stormreel_fishing_rod": {
-        "name": "Stormreel Fishing Rod"
+        "name": "風暴輪釣竿"
       },
       "tidewrought_fishing_rod": {
-        "name": "Tidewrought Fishing Rod"
+        "name": "潮鑄釣竿"
       },
       "conjured_water4": {
         "name": "魔法泉水"

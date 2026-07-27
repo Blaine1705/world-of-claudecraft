@@ -137,7 +137,8 @@ parity goldens are untouched.
 ## Phases
 
 Each phase is independently shippable and revertible, and gated with
-`npm run gate`. Only phase 6 moves a parity golden.
+`npm run gate`. No phase moved a parity golden in the end: phase 6 was expected
+to and did not, for the reason recorded under it.
 
 ### Phase 0: readout and banner
 
@@ -302,7 +303,8 @@ Open after review, deliberately not resolved in this phase:
 
 ### Phase 6: fishing
 
-The only phase that moves a parity golden, and only because of the session cap.
+Planned as the only phase that moves a parity golden, on the assumption the
+session cap would have to rise. It did not: see the closeout below.
 
 - Per-zone minimum rod tier, checked beside the existing implement gate and
   denied through the existing text-free denial event. Pre-draw and rng-free.
@@ -322,6 +324,46 @@ The only phase that moves a parity golden, and only because of the session cap.
 - Tier-4 and tier-5 rods. Note the pre-training recipe list is frozen, so these
   route through trainer acquisition, and the tier-5 recipe must sit at a skill
   requirement inside engineering's cap.
+
+#### What phase 6 settled, and what it left open
+
+- **The parity golden did NOT move, and did not need to.** The premise above was
+  that raising the session cap would re-record one trace. The cap held at 15
+  seconds: with the reel window trimmed to 2.50 the worst legal session is 271
+  ticks of a 300-tick cap, even counting the cross-tier case (cast on the pole,
+  pick up the tier-5 rod before the bite). So the cap became a GUARDED constant
+  rather than a moved one, and `tests/fishing_zones.test.ts` budgets it in ticks
+  against every shipped rod tier. No golden in `tests/parity/` changed.
+  Related: a green parity run says nothing about fishing either way, because no
+  scenario there ever drives a real cast. That gap is now written down in
+  `tests/parity/CLAUDE.md` so the next reader does not mistake green for cover.
+- **OPEN, needs a ruling: the two rod training fees.** `trainingFeeFor` is derived
+  from the recipe's skill tier, so skillReq 75 bills 4 gold and skillReq 125
+  bills 16 gold. These are the first trainer-taught recipes in the game to reach
+  either rung: everything else costs 0, 25 silver or 1 gold, and the six crafted
+  LAND tools dodge the question entirely by predating training. 16 gold for a
+  capstone rod may be exactly right or may be sixteen times too much; it is a
+  balance call, not an implementation one. Moving it means moving the fee curve
+  or the skillReq, never a per-recipe exception.
+- **Rod access is paced by the WATER, not by the counter.** Phase 4 deferred rod
+  gating to this phase, and the answer is that no rod carries a vendor
+  proficiency gate. The zone requirement decides where a rod matters and the
+  empty-hook schedule decides what skill is worth there, so a purchase gate on
+  top would be a third lock on one door. Fenbridge and Highwatch now stock the
+  rung their own water asks for, so no zone demands tackle no local counter
+  sells.
+- **What the gate now sits in front of, beyond the Codfather:** the Mirefen and
+  Thornpeak per-zone fishing deeds, the collection deed that needs both, and the
+  cooking recipes fed by marsh and peak fish. All are paced rather than blocked
+  (the rod is a counter purchase in the same zone), and the set is derived in
+  `tests/fishing_zones.test.ts` rather than recited, so a new fishing deed joins
+  it automatically.
+- **The rod icons are derived art, not paintings.** `scripts/assets/rod_tier_icons.mjs`
+  renders both crafted rods as tier treatments of the Silverstream art, which is
+  a weaker fit than the fine-material derivation it copies (a Stormreel is a
+  different rod, not a better-worked Silverstream). Deterministic, `--check`ed in
+  CI, and byte-distinct. Replacing either file with a painted original changes
+  nothing else.
 
 ### Phase 7: tool effects and rare tools
 
@@ -349,8 +391,10 @@ Its own phase because it is the only one that touches persistence and the wire.
 ## Test and invariant obligations
 
 - **Parity.** No phase changes rng draw order or count except phase 7, which is
-  why depletion is deterministic. Phase 6 re-records one golden for the session
-  cap; prove the diff is confined to the cast timing fields.
+  why depletion is deterministic. Phase 6 was expected to re-record one golden
+  for the session cap and did not need to: the cap held, so every golden is
+  byte-identical. Note that the parity suite covers no fishing SESSION at all
+  (see tests/parity/CLAUDE.md), so green there is not evidence about fishing.
 - **The gathering two-draw contract** (2 per granted harvest, 0 on denial) is
   golden-pinned and must hold everywhere.
 - **Fishing draws** stay at 2 per landed session, 1 on a miss.

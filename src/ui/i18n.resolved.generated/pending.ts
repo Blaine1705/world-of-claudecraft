@@ -190,26 +190,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
-  "zh_CN": [
-    "entities.items.stormreel_fishing_rod.name",
-    "entities.items.tidewrought_fishing_rod.name",
-    "hudChrome.gathering.toolTierUnmet.fishing"
-  ],
-  "zh_TW": [
-    "entities.items.stormreel_fishing_rod.name",
-    "entities.items.tidewrought_fishing_rod.name",
-    "hudChrome.gathering.toolTierUnmet.fishing"
-  ],
-  "ko_KR": [
-    "entities.items.stormreel_fishing_rod.name",
-    "entities.items.tidewrought_fishing_rod.name",
-    "hudChrome.gathering.toolTierUnmet.fishing"
-  ],
-  "ja_JP": [
-    "entities.items.stormreel_fishing_rod.name",
-    "entities.items.tidewrought_fishing_rod.name",
-    "hudChrome.gathering.toolTierUnmet.fishing"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -240,11 +224,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
-  "ru_RU": [
-    "entities.items.stormreel_fishing_rod.name",
-    "entities.items.tidewrought_fishing_rod.name",
-    "hudChrome.gathering.toolTierUnmet.fishing"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",

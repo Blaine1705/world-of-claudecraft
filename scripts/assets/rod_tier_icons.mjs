@@ -46,7 +46,7 @@ const webpOptions = { quality: 82, alphaQuality: 100, smartSubsample: true, effo
 const BASE_ROD_ID = 'silverstream_fishing_rod';
 
 // Derived id -> its treatment. Mirrors the fishing gatherTool tiers in
-// src/sim/content/items.ts; tests/rod_tier_icons.test.ts pins that this list
+// src/sim/content/items.ts; tests/professions_rod_recipes.test.ts pins that this list
 // and the item table name the same two rods, so a third crafted rod cannot
 // ship with art for two.
 const ROD_TREATMENTS = [

@@ -4150,6 +4150,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.glimmerfin_koi.name': '日映えの錦鯉',
   'entities.items.ironreel_fishing_rod.name': '鉄リールの釣り竿',
   'entities.items.silverstream_fishing_rod.name': '銀流の釣り竿',
+  'entities.items.stormreel_fishing_rod.name': '嵐リールの釣り竿',
+  'entities.items.tidewrought_fishing_rod.name': '潮鍛えの釣り竿',
   'entities.items.raw_bog_eel.name': '生の沼ウナギ',
   'entities.items.raw_frostgill_trout.name': '生の霜エラマス',
   'entities.items.raw_marsh_pike.name': '生の沼カワカマス',
@@ -7264,6 +7266,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'この立木を伐り倒すにはティア{tier}の伐採斧が必要です。',
   'hudChrome.gathering.toolTierUnmet.herbalism':
     'この群生地を採取するにはティア{tier}の薬草鎌が必要です。',
+  'hudChrome.gathering.toolTierUnmet.fishing': 'この水域で釣るにはティア{tier}の釣り竿が必要です。',
   'hudChrome.gathering.toolTierUnmetCorpse':
     '最高の素材を回収するにはティア{tier}の採集道具が必要です。',
   'hudChrome.gathering.requiresTool.mining': '採掘ピッケルが必要',

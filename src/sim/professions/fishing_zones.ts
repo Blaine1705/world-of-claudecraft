@@ -57,37 +57,10 @@ export function rodTierRequiredForZone(zoneId: string): number {
   return FISHING_ZONE_ROD_TIERS[zoneId] ?? DEFAULT_FISHING_ROD_TIER;
 }
 
-/**
- * The catch band a zone's water is written for: the band the zone's required
- * rod unlocks, which is rodTier - 1 under the shipped band gate. A player
- * whose proficiency band falls short of this is fishing above their skill, and
- * the zone's tables pay them in empty hooks and junk for it
- * (content/items.ts FISHING_TABLES_BY_BAND).
- */
-export function fishingRequiredBandForZone(zoneId: string): 0 | 1 | 2 {
-  const band = rodTierRequiredForZone(zoneId) - 1;
-  return Math.min(2, Math.max(0, band)) as 0 | 1 | 2;
-}
-
-/**
- * How many bands short of the zone's requirement a given catch band is, 0 when
- * it meets or beats it. This is the ONE number the empty-hook and junk
- * schedules read: at 0 the water fishes normally, at 1 and 2 it turns
- * progressively barren. Clamped at both ends so a future fourth band or a
- * fourth zone cannot index off the schedule.
- */
-export function fishingBandShortfall(zoneId: string, band: number): 0 | 1 | 2 {
-  const short = fishingRequiredBandForZone(zoneId) - band;
-  return Math.min(2, Math.max(0, short)) as 0 | 1 | 2;
-}
-
-/**
- * How many bands ABOVE the zone's requirement a given catch band sits, 0 when
- * it is short or exactly at it. The mirror of fishingBandShortfall: the two
- * are never both positive, and together they place a (zone, band) cell on the
- * one axis the catch tables are authored against.
- */
-export function fishingBandSurplus(zoneId: string, band: number): 0 | 1 | 2 {
-  const over = band - fishingRequiredBandForZone(zoneId);
-  return Math.min(2, Math.max(0, over)) as 0 | 1 | 2;
-}
+// WHY THE BAND SIDE OF THIS LADDER IS NOT EXPORTED. A zone's required BAND is
+// rodTier - 1, and how far a given band falls short of it is what the nine
+// catch-table cells are authored against (content/items.ts). None of that has
+// a runtime consumer: the engine reads the table it is handed and never asks
+// how the numbers in it were chosen. Exporting the arithmetic anyway would put
+// production code in src/sim/ whose only caller is a test, so the schedule
+// lives beside the cells it checks, in tests/fishing_zones.test.ts.

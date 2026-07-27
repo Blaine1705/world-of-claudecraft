@@ -254,6 +254,135 @@ export const TARGETS = [
     },
   },
   {
+    key: 'fishing-rod-ladder',
+    label: 'The rod ladder in the bags, with the top rung hovered',
+    when: ['professions/fishing', 'fishing_zones', 'gather_tool_tooltip', 'content/recipes'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        for (const id of [
+          'simple_fishing_pole',
+          'ironreel_fishing_rod',
+          'silverstream_fishing_rod',
+          'stormreel_fishing_rod',
+          'tidewrought_fishing_rod',
+          'glimmerfin_koi',
+          'raw_stonescale_carp',
+        ]) {
+          try {
+            sim?.addItem(id, id === 'glimmerfin_koi' ? 4 : id === 'raw_stonescale_carp' ? 8 : 1);
+          } catch {}
+        }
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      await wait(500);
+      // Hover the top rung through the REAL pointer path so the tooltip is the
+      // one a player sees, not a hand-built string.
+      await page.evaluate(() => {
+        // Find the top rung's cell by the art it paints, which is the one
+        // thing every bag-cell implementation has in common.
+        const cells = [...document.querySelectorAll('#bags *')];
+        const el = cells.find((c) => {
+          const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
+          const img = c.querySelector?.('img');
+          return (
+            (bg && bg.includes('tidewrought_fishing_rod')) ||
+            (img && img.getAttribute('src')?.includes('tidewrought_fishing_rod'))
+          );
+        });
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        for (const type of [
+          'pointerenter',
+          'pointerover',
+          'mouseenter',
+          'mouseover',
+          'pointermove',
+          'mousemove',
+        ]) {
+          el.dispatchEvent(
+            new MouseEvent(type, {
+              bubbles: true,
+              clientX: r.left + r.width / 2,
+              clientY: r.top + r.height / 2,
+            }),
+          );
+        }
+      });
+      await wait(600);
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'fishing-zone-denial',
+    label: 'Casting into Thornpeak water with a rod the water does not take',
+    when: ['professions/fishing', 'fishing_zones', 'gathering_view'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const p = sim?.player;
+        if (!p) return;
+        // Lay the local pack to rest first: fishing refuses in combat, and the
+        // peaks put ogres on the shore, so without this the shot captures the
+        // combat arm instead of the rod arm. Stagecraft, not the subject.
+        for (const e of sim.entities.values()) {
+          if (e.kind !== 'mob' || e.dead) continue;
+          e.dead = true;
+          e.aiState = 'dead';
+          e.hp = 0;
+          e.respawnTimer = 9999;
+          e.corpseTimer = 9999;
+        }
+        p.inCombat = false;
+        p.combatTimer = 0;
+        p.hp = p.maxHp ?? p.hp;
+        // Only the tier-2 rod: legal tackle, and legal in the marsh, but the
+        // peaks ask for tier 3.
+        try {
+          sim.addItem('ironreel_fishing_rod', 1);
+        } catch {}
+        // The Glimmermere, Thornpeak's fishable water, approached from its
+        // south shore facing the centre.
+        const lake = { x: -70, z: 760, radius: 18 };
+        p.pos.x = lake.x;
+        p.pos.z = lake.z - lake.radius - 2;
+        p.pos.y = sim.groundHeight ? sim.groundHeight(p.pos.x, p.pos.z) : p.pos.y;
+        p.prevPos = { ...p.pos };
+        p.facing = Math.atan2(0, lake.radius + 2);
+      });
+      await wait(400);
+      // Drive the real item use, which is the same path the hotbar press takes.
+      // Combat is cleared in the SAME evaluate as the press: the world keeps
+      // ticking between evaluates, and a shore pack re-tags the angler inside
+      // that gap, which captures the combat arm instead of the rod arm.
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const p = sim?.player;
+        if (!p) return;
+        for (const e of sim.entities.values()) {
+          if (e.kind !== 'mob' || e.dead) continue;
+          e.dead = true;
+          e.aiState = 'dead';
+          e.hp = 0;
+          e.respawnTimer = 9999;
+          e.corpseTimer = 9999;
+        }
+        p.inCombat = false;
+        p.combatTimer = 0;
+        try {
+          sim.useItem('ironreel_fishing_rod');
+        } catch {}
+      });
+      await wait(400);
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'corpse-unified-press',
     label: 'Unified corpse press: one interact loots AND harvests (Professions 2.0)',
     when: [

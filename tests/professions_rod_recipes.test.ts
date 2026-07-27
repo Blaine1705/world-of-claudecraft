@@ -14,7 +14,7 @@ import { describe, expect, it } from 'vitest';
 import { FISHING_RARE_ID, FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import { craftMaxSkillFor } from '../src/sim/content/professions';
 import { ALL_RECIPES, ROD_RECIPES, TOOL_RECIPES } from '../src/sim/content/recipes';
-import { ITEMS } from '../src/sim/data';
+import { ITEMS, NPCS } from '../src/sim/data';
 import { rodTierRequiredForZone } from '../src/sim/professions/fishing_zones';
 import { baseMaterialFor } from '../src/sim/professions/material_grades';
 import { isGatherToolUse } from '../src/sim/professions/tools';
@@ -93,6 +93,17 @@ describe('the crafted rod ladder', () => {
     }
     expect([...zonesHolding]).toEqual(['thornpeak_heights']);
     expect(rodTierRequiredForZone('thornpeak_heights')).toBe(3);
+    // And the water is the ONLY route to it, which is what makes the two
+    // facts above compose into a gate. A vendor row, a mob drop, or another
+    // recipe's output would open the ladder with the rest of this test green.
+    expect(ITEMS[gatedCatch].buyValue).toBeUndefined();
+    for (const npc of Object.values(NPCS)) {
+      expect(npc.vendorItems ?? [], `${npc.id} stocks the gated catch`).not.toContain(gatedCatch);
+    }
+    expect(
+      ALL_RECIPES.filter((r) => r.resultItemId === gatedCatch),
+      'the gated catch must not be craftable',
+    ).toEqual([]);
   });
 
   it('the tier-4 rung is PACED, not gated, and says so: the koi is landable at every band', () => {
@@ -164,6 +175,14 @@ describe('the crafted rod ladder', () => {
   it('both rods are craft-only: no counter stocks them and neither carries a price', () => {
     for (const recipe of ROD_RECIPES) {
       expect(ITEMS[recipe.resultItemId].buyValue).toBeUndefined();
+      // The price convention alone is not the claim in the title: sweep the
+      // real vendor lists too, the way tests/professions_tools.test.ts does
+      // for the crafted land tools.
+      for (const npc of Object.values(NPCS)) {
+        expect(npc.vendorItems ?? [], `${npc.id} stocks ${recipe.resultItemId}`).not.toContain(
+          recipe.resultItemId,
+        );
+      }
     }
   });
 });
@@ -178,7 +197,11 @@ describe('the derived rod art stays honest', () => {
   it('the derivation script names exactly the rods the item table crafts', () => {
     // The fine-material precedent: the script and the content table must name
     // the same set, so a third crafted rod cannot ship with art for two.
-    const named = [...scriptSrc.matchAll(/itemId: '([a-z_]+)'/g)].map((m) => m[1]);
+    // Whole-line // comments stripped first: the script's header names both
+    // rods in prose, and a scan that counted those would pass on a script that
+    // had stopped rendering one of them (the comment-gameable trap).
+    const code = scriptSrc.replace(/^\s*\/\/.*$/gm, '');
+    const named = [...code.matchAll(/itemId: '([a-z_]+)'/g)].map((m) => m[1]);
     expect(named.sort()).toEqual(ROD_RECIPES.map((r) => r.resultItemId).sort());
   });
 

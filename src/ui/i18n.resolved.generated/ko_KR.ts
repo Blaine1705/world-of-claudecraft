@@ -2195,7 +2195,7 @@ export const ko_KR: EnTranslations = {
         "mining": "이 광맥을 캐려면 {tier}티어 채광 곡괭이가 필요합니다.",
         "logging": "이 나무를 베려면 {tier}티어 벌목 도끼가 필요합니다.",
         "herbalism": "이 군락을 채집하려면 {tier}티어 약초 낫이 필요합니다.",
-        "fishing": "You need a tier {tier} fishing rod to fish these waters."
+        "fishing": "이 수역에서 낚시하려면 {tier}티어 낚싯대가 필요합니다."
       },
       "toolRequired": {
         "mining": "이 광맥을 캐려면 채광 곡괭이가 필요합니다.",
@@ -9201,10 +9201,10 @@ export const ko_KR: EnTranslations = {
         "name": "상급 태양꽃잎 약초"
       },
       "stormreel_fishing_rod": {
-        "name": "Stormreel Fishing Rod"
+        "name": "폭풍릴 낚싯대"
       },
       "tidewrought_fishing_rod": {
-        "name": "Tidewrought Fishing Rod"
+        "name": "조수벼림 낚싯대"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

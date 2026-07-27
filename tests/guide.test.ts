@@ -1416,6 +1416,20 @@ describe('Guide professions gathering accuracy', () => {
         ).toBe(true);
         bought += 1;
       }
+      // Each bought rung above the first is also sold in the zone whose water
+      // asks for it, so no zone demands tackle no local counter carries.
+      if (rod.tier === 2) {
+        expect(
+          rod.vendors.some((v) => v.name === 'Provisioner Hale'),
+          'the marsh must stock the rod its own water takes',
+        ).toBe(true);
+      }
+      if (rod.tier === 3) {
+        expect(
+          rod.vendors.some((v) => v.name === 'Quartermaster Bree'),
+          'the peaks must stock the rod their own water takes',
+        ).toBe(true);
+      }
     }
     expect([bought, crafted]).toEqual([3, 2]);
   });
