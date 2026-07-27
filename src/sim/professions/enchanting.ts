@@ -246,14 +246,18 @@ export function enchantGainTier(enchant: EnchantDef): number {
   return tier;
 }
 
-/** The shared post-success bookkeeping every enchanting action performs, in one
- *  place because all three arms (disenchant, apply-to-bagged, apply-to-worn) do
- *  exactly this and only the input tier differs: the quality-tiered
- *  'enchanting' skill gain (soft-clamped to the archetype ceiling and run
- *  through the four-state mastery curve; a zero gray gain never blocks the
- *  action), the shared action-throttle stamp, and the deed re-check the skill
- *  gain's craftSkill triggers need (the crafting.ts craftItem contract: the
- *  gaining site marks the player dirty itself). */
+function isCraftedDisenchantVictim(instance: ItemInstancePayload | undefined): boolean {
+  return !!instance?.signer || !!instance?.rolled?.masterwork;
+}
+
+/** The shared post-success bookkeeping every skill-granting enchanting action
+ *  performs, in one place because all skill-granting arms do exactly this and
+ *  only the input tier differs: the quality-tiered 'enchanting' skill gain
+ *  (soft-clamped to the archetype ceiling and run through the four-state
+ *  mastery curve; a zero gray gain never blocks the action), the shared
+ *  action-throttle stamp, and the deed re-check the skill gain's craftSkill
+ *  triggers need (the crafting.ts craftItem contract: the gaining site marks
+ *  the player dirty itself). */
 function grantEnchantingSkill(ctx: SimContext, meta: PlayerMeta, inputTier: number): void {
   gainCraftSkill(
     meta.craftSkills,
@@ -374,10 +378,15 @@ export function resolveDisenchant(
     ? consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex)
     : undefined;
   if (selected === null) return { ok: false, itemId, reason: 'not_held' };
+  let consumedInstance: ItemInstancePayload | undefined =
+    selected === undefined ? undefined : selected;
   if (slotIndex !== undefined && meta) ctx.onInventoryChangedForQuests(meta);
   if (slotIndex === undefined) {
-    if (ctx.countEnchantableItem(itemId, pid) >= 1) ctx.removeEnchantableItem(itemId, 1, pid);
-    else ctx.removeItem(itemId, 1, pid);
+    if (ctx.countEnchantableItem(itemId, pid) >= 1) {
+      [consumedInstance] = ctx.removeEnchantableItem(itemId, 1, pid);
+    } else {
+      [consumedInstance] = ctx.removeItem(itemId, 1, pid);
+    }
   }
   // Yield model: sub-rare (common/uncommon) stays byte-identical to
   // today, a single rng draw (disenchantYield's +0/+1 bonus) over a rolled
@@ -421,8 +430,14 @@ export function resolveDisenchant(
       });
     }
   }
-  // Quality-tiered gain: the disenchanted item's def quality is the input tier.
-  if (meta) grantEnchantingSkill(ctx, meta, ENCHANTING_GAIN_TIER_BY_QUALITY[quality]);
+  if (meta) {
+    // Quality-tiered gain: the disenchanted item's def quality is the input
+    // tier. Crafted-provenance copies still yield materials and spend the
+    // shared throttle, but they do not teach enchanting, preventing a craft
+    // then disenchant loop from double-dipping profession progression.
+    if (isCraftedDisenchantVictim(consumedInstance)) recordAction(meta);
+    else grantEnchantingSkill(ctx, meta, ENCHANTING_GAIN_TIER_BY_QUALITY[quality]);
+  }
   const result: DisenchantResult = { ok: true, itemId, materialItemId, count };
   if (secondaryItemId && secondaryCount) {
     result.secondaryItemId = secondaryItemId;
