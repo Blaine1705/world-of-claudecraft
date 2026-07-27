@@ -3023,6 +3023,7 @@ export const it_IT: EnTranslations = {
     "seeker": {
       "native_only": "Seeker entitlement is available only in the native app.",
       "attestation_failed": "Device verification failed. Please try again.",
+      "solana_artifact_required": "Use the Solana Store app to continue.",
       "wallet_required": "Link and verify a wallet first.",
       "genesis_token_required": "A verified Seeker Genesis Token is required.",
       "genesis_token_claimed": "That Seeker Genesis Token has already been claimed.",

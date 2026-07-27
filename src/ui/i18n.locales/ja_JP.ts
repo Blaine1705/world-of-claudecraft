@@ -8111,6 +8111,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ウォレット認証の有効期限が切れたか、確認できませんでした。もう一度お試しください。',
   'apiError.seeker.native_only': 'Seeker資格はネイティブアプリでのみ利用できます。',
   'apiError.seeker.attestation_failed': '端末の検証に失敗しました。もう一度お試しください。',
+  'apiError.seeker.solana_artifact_required': 'Solana Store版アプリを使用して続行してください。',
   'apiError.seeker.wallet_required': '先にウォレットを連携して検証してください。',
   'apiError.seeker.genesis_token_required': '検証済みのSeeker Genesis Tokenが必要です。',
   'apiError.seeker.genesis_token_claimed': 'そのSeeker Genesis Tokenはすでに取得されています。',

@@ -34,6 +34,7 @@ import {
 } from './http/middleware/require_internal_secret';
 import type { Ctx, Middleware, RouteDef } from './http/types';
 import { json, readBody } from './http_util';
+import { verifySeekerSolanaArtifactAttestation } from './native_attestation';
 import { requestIp } from './ratelimit';
 import { REALM } from './realm';
 import { verifyCurrentSeekerEntitlement } from './seeker_entitlement';
@@ -1487,6 +1488,18 @@ function internalAuthorized(req: http.IncomingMessage): boolean {
 
 export const dailyRewardService = new DailyRewardService();
 
+let seekerSpinArtifactVerifier = verifySeekerSolanaArtifactAttestation;
+
+export function setDailyRewardSeekerArtifactVerifierForTests(
+  verifier: typeof verifySeekerSolanaArtifactAttestation,
+): void {
+  seekerSpinArtifactVerifier = verifier;
+}
+
+export function resetDailyRewardSeekerArtifactVerifierForTests(): void {
+  seekerSpinArtifactVerifier = verifySeekerSolanaArtifactAttestation;
+}
+
 // main.ts wires this into bustBoardCaches: the board cache is instance-scoped
 // on the module singleton above, so a bust exported from the cache module
 // itself would hold no handle to the live instance.
@@ -1508,6 +1521,20 @@ export async function handleDailyRewardApi(
     !(await admitLegacySeekerSpin(req, res, accountId))
   ) {
     return;
+  }
+  if (nativeSpin) {
+    const body = await readBody(req);
+    const attestation = await seekerSpinArtifactVerifier(
+      req,
+      body.nativeAttestation,
+      'seeker-spin',
+    );
+    if (!attestation) {
+      return json(res, 403, {
+        error: 'Solana Store app verification required',
+        code: 'seeker.solana_artifact_required',
+      });
+    }
   }
   if (isNativeAppRequest(req) && !(await dailyRewardGuardDb().hasSeekerEntitlement(accountId))) {
     return json(res, 403, {
@@ -1656,8 +1683,8 @@ export async function handleDailyRewardInternalApi(
 // the ladder serves (handleDailyRewardApi / handleDailyRewardInternalApi)
 // UNCHANGED, so every body, the in-family 404 'unknown endpoint', the lenient
 // Number(...)|| limit decodes, and mark-payout's validation prose are
-// byte-identical with zero dual-edit drift. No withBody anywhere: spin reads no
-// body (a body reader would invent 400/413 behavior legacy does not have) and
+// byte-identical with zero dual-edit drift. No withBody anywhere: native Seeker
+// spins self-read their artifact proof while web spins remain body-free, and
 // mark-payout SELF-READS via the core's un-caught readBody (the
 // dailyRewardsOpsBodyValidationRemap deviation). Off-table shapes (wrong
 // method, unknown subpath, the no-slash '/api/daily-rewardsX' sibling, HEAD)

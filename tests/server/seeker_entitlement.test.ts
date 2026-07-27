@@ -26,8 +26,9 @@ afterEach(() => resetSeekerEntitlementRuntimeForTests());
 describe('Seeker entitlement claim', () => {
   it('verifies native attestation, linked wallet, SGT ownership, and permanent claim', async () => {
     const claim = vi.fn().mockResolvedValue('claimed');
+    const verifyArtifact = vi.fn().mockResolvedValue({ nonce: 'nonce' });
     setSeekerEntitlementRuntimeForTests({
-      verifyNativeAttestationChallenge: vi.fn().mockResolvedValue({ nonce: 'nonce' }),
+      verifySeekerSolanaArtifactAttestation: verifyArtifact,
       walletForAccount: vi.fn().mockResolvedValue({
         pubkey: 'wallet',
         linked_at: '2026-01-01T00:00:00Z',
@@ -47,6 +48,11 @@ describe('Seeker entitlement claim', () => {
 
     expect(res.statusCode).toBe(200);
     expect(JSON.parse(res.body)).toEqual({ entitled: true });
+    expect(verifyArtifact).toHaveBeenCalledWith(
+      req,
+      { challengeId: 'id', token: 'token' },
+      'seeker-claim',
+    );
     expect(claim).toHaveBeenCalledWith({
       mint: 'unique-mint',
       accountId: 42,
@@ -75,7 +81,7 @@ describe('Seeker entitlement claim', () => {
     });
 
     setSeekerEntitlementRuntimeForTests({
-      verifyNativeAttestationChallenge: vi.fn().mockResolvedValue(null),
+      verifySeekerSolanaArtifactAttestation: vi.fn().mockResolvedValue(null),
     });
     const invalidRes = new FakeRes();
     await handleSeekerEntitlementClaim(
@@ -90,12 +96,12 @@ describe('Seeker entitlement claim', () => {
     );
     expect(invalidRes.statusCode).toBe(403);
     expect(JSON.parse(invalidRes.body)).toEqual({
-      error: 'native attestation failed',
-      code: 'seeker.attestation_failed',
+      error: 'Solana Store app verification required',
+      code: 'seeker.solana_artifact_required',
     });
 
     setSeekerEntitlementRuntimeForTests({
-      verifyNativeAttestationChallenge: vi.fn().mockResolvedValue({ nonce: 'nonce' }),
+      verifySeekerSolanaArtifactAttestation: vi.fn().mockResolvedValue({ nonce: 'nonce' }),
       walletForAccount: vi.fn().mockResolvedValue(null),
     });
     const walletRes = new FakeRes();
@@ -116,7 +122,7 @@ describe('Seeker entitlement claim', () => {
     });
 
     setSeekerEntitlementRuntimeForTests({
-      verifyNativeAttestationChallenge: vi.fn().mockResolvedValue({ nonce: 'nonce' }),
+      verifySeekerSolanaArtifactAttestation: vi.fn().mockResolvedValue({ nonce: 'nonce' }),
       walletForAccount: vi.fn().mockResolvedValue({
         pubkey: 'wallet',
         linked_at: '2026-01-01T00:00:00Z',
@@ -141,7 +147,7 @@ describe('Seeker entitlement claim', () => {
     });
 
     setSeekerEntitlementRuntimeForTests({
-      verifyNativeAttestationChallenge: vi.fn().mockResolvedValue({ nonce: 'nonce' }),
+      verifySeekerSolanaArtifactAttestation: vi.fn().mockResolvedValue({ nonce: 'nonce' }),
       walletForAccount: vi.fn().mockResolvedValue({
         pubkey: 'wallet',
         linked_at: '2026-01-01T00:00:00Z',

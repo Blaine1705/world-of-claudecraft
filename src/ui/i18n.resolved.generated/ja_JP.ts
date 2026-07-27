@@ -3023,6 +3023,7 @@ export const ja_JP: EnTranslations = {
     "seeker": {
       "native_only": "Seeker資格はネイティブアプリでのみ利用できます。",
       "attestation_failed": "端末の検証に失敗しました。もう一度お試しください。",
+      "solana_artifact_required": "Solana Store版アプリを使用して続行してください。",
       "wallet_required": "先にウォレットを連携して検証してください。",
       "genesis_token_required": "検証済みのSeeker Genesis Tokenが必要です。",
       "genesis_token_claimed": "そのSeeker Genesis Tokenはすでに取得されています。",

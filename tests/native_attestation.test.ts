@@ -6,6 +6,7 @@ import {
   nativeAttestationRequired,
   verifyNativeAttestation,
   verifyNativeAttestationChallenge,
+  verifySeekerSolanaArtifactAttestation,
 } from '../server/native_attestation';
 
 const originalEnv = { ...process.env };
@@ -94,5 +95,124 @@ describe('native attestation', () => {
     expect(androidAppIntegrityAllowed(dappStoreVerdict, [], true)).toBe(false);
     expect(androidAppIntegrityAllowed(dappStoreVerdict, ['attacker-cert'], true)).toBe(false);
     expect(androidAppIntegrityAllowed(dappStoreVerdict, ['release-cert'], false)).toBe(false);
+  });
+
+  it('accepts only the configured Solana artifact, Android platform, nonce, and action', async () => {
+    const request = req({ origin: 'capacitor://localhost' });
+    const env = {
+      SEEKER_SOLANA_INTEGRITY_PACKAGE_NAME: 'com.worldofclaudecraft',
+      SEEKER_SOLANA_INTEGRITY_CERT_DIGESTS: 'solana-release-cert',
+    };
+    const challenge = createNativeAttestationChallenge(request, 'seeker-claim');
+    const decodeIntegrityToken = async () => ({
+      requestDetails: {
+        nonce: challenge.nonce,
+        requestPackageName: 'com.worldofclaudecraft',
+      },
+      appIntegrity: {
+        packageName: 'com.worldofclaudecraft',
+        appRecognitionVerdict: 'UNRECOGNIZED_VERSION',
+        certificateSha256Digest: ['solana-release-cert'],
+      },
+      deviceIntegrity: {
+        deviceRecognitionVerdict: ['MEETS_DEVICE_INTEGRITY'],
+      },
+    });
+
+    await expect(
+      verifySeekerSolanaArtifactAttestation(
+        request,
+        {
+          platform: 'android',
+          challengeId: challenge.challengeId,
+          token: 'integrity-token',
+        },
+        'seeker-claim',
+        { decodeIntegrityToken, env },
+      ),
+    ).resolves.toEqual({ nonce: challenge.nonce });
+
+    const iosChallenge = createNativeAttestationChallenge(request, 'seeker-claim');
+    await expect(
+      verifySeekerSolanaArtifactAttestation(
+        request,
+        {
+          platform: 'ios',
+          challengeId: iosChallenge.challengeId,
+          token: 'device-check-token',
+        },
+        'seeker-claim',
+        { decodeIntegrityToken, env },
+      ),
+    ).resolves.toBeNull();
+
+    const wrongAction = createNativeAttestationChallenge(request, 'seeker-claim');
+    await expect(
+      verifySeekerSolanaArtifactAttestation(
+        request,
+        {
+          platform: 'android',
+          challengeId: wrongAction.challengeId,
+          token: 'integrity-token',
+        },
+        'seeker-spin',
+        { decodeIntegrityToken, env },
+      ),
+    ).resolves.toBeNull();
+  });
+
+  it('fails closed for missing Solana allowlists and rejects Play signing certificates', async () => {
+    const request = req({ origin: 'http://localhost' });
+    const challenge = createNativeAttestationChallenge(request, 'seeker-spin');
+    const proof = {
+      platform: 'android',
+      challengeId: challenge.challengeId,
+      token: 'integrity-token',
+    };
+    const decodeIntegrityToken = async () => ({
+      requestDetails: {
+        nonce: challenge.nonce,
+        requestPackageName: 'com.worldofclaudecraft',
+      },
+      appIntegrity: {
+        packageName: 'com.worldofclaudecraft',
+        appRecognitionVerdict: 'PLAY_RECOGNIZED',
+        certificateSha256Digest: ['google-play-signing-cert'],
+      },
+      deviceIntegrity: {
+        deviceRecognitionVerdict: ['MEETS_DEVICE_INTEGRITY'],
+      },
+    });
+
+    await expect(
+      verifySeekerSolanaArtifactAttestation(request, proof, 'seeker-spin', {
+        decodeIntegrityToken,
+        env: {
+          SEEKER_SOLANA_INTEGRITY_PACKAGE_NAME: 'com.worldofclaudecraft',
+        },
+      }),
+    ).resolves.toBeNull();
+
+    const playChallenge = createNativeAttestationChallenge(request, 'seeker-spin');
+    await expect(
+      verifySeekerSolanaArtifactAttestation(
+        request,
+        { ...proof, challengeId: playChallenge.challengeId },
+        'seeker-spin',
+        {
+          decodeIntegrityToken: async () => ({
+            ...(await decodeIntegrityToken()),
+            requestDetails: {
+              nonce: playChallenge.nonce,
+              requestPackageName: 'com.worldofclaudecraft',
+            },
+          }),
+          env: {
+            SEEKER_SOLANA_INTEGRITY_PACKAGE_NAME: 'com.worldofclaudecraft',
+            SEEKER_SOLANA_INTEGRITY_CERT_DIGESTS: 'solana-release-cert',
+          },
+        },
+      ),
+    ).resolves.toBeNull();
   });
 });

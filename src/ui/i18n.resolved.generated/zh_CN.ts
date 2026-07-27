@@ -3023,6 +3023,7 @@ export const zh_CN: EnTranslations = {
     "seeker": {
       "native_only": "Seeker 权益仅可在原生应用中使用。",
       "attestation_failed": "设备验证失败。请重试。",
+      "solana_artifact_required": "请使用 Solana Store 版应用继续。",
       "wallet_required": "请先关联并验证钱包。",
       "genesis_token_required": "需要已验证的 Seeker Genesis Token。",
       "genesis_token_claimed": "该 Seeker Genesis Token 已被领取。",

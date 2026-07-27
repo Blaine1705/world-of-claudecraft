@@ -32,6 +32,17 @@ interface GoogleTokenCache {
   expiresAt: number;
 }
 
+export interface AndroidIntegrityPayload {
+  requestDetails?: Record<string, unknown>;
+  appIntegrity?: Record<string, unknown>;
+  deviceIntegrity?: Record<string, unknown>;
+}
+
+export interface SeekerSolanaAttestationDeps {
+  decodeIntegrityToken(packageName: string, token: string): Promise<AndroidIntegrityPayload | null>;
+  env?: NodeJS.ProcessEnv;
+}
+
 const challenges = new Map<string, NativeChallenge>();
 let googleTokenCache: GoogleTokenCache | null = null;
 
@@ -172,6 +183,71 @@ export async function verifyNativeAttestationChallenge(
   return { nonce: challenge.nonce };
 }
 
+function csvValues(raw: string | undefined): string[] {
+  return String(raw ?? '')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean);
+}
+
+function seekerSolanaArtifactConfig(env: NodeJS.ProcessEnv): {
+  packageName: string;
+  certificateDigests: string[];
+  deviceVerdict: string;
+} | null {
+  const packageName = String(env.SEEKER_SOLANA_INTEGRITY_PACKAGE_NAME ?? '').trim();
+  const certificateDigests = csvValues(env.SEEKER_SOLANA_INTEGRITY_CERT_DIGESTS);
+  if (!packageName || certificateDigests.length === 0) return null;
+  return {
+    packageName,
+    certificateDigests,
+    deviceVerdict:
+      String(env.SEEKER_SOLANA_INTEGRITY_DEVICE_VERDICT ?? '').trim() || 'MEETS_DEVICE_INTEGRITY',
+  };
+}
+
+export async function verifySeekerSolanaArtifactAttestation(
+  req: IncomingMessage,
+  proof: unknown,
+  expectedAction: 'seeker-claim' | 'seeker-spin',
+  deps: SeekerSolanaAttestationDeps = {
+    decodeIntegrityToken: decodeAndroidIntegrityToken,
+  },
+): Promise<{ nonce: string } | null> {
+  if (!isNativeAppRequest(req) || !proof || typeof proof !== 'object') return null;
+  const src = proof as NativeAttestationProof;
+  if (
+    src.platform !== 'android' ||
+    typeof src.challengeId !== 'string' ||
+    typeof src.token !== 'string'
+  ) {
+    return null;
+  }
+  const config = seekerSolanaArtifactConfig(deps.env ?? process.env);
+  if (!config) return null;
+  const challenge = consumeChallenge(src.challengeId, req);
+  if (!challenge || challenge.action !== expectedAction) return null;
+  const payload = await deps.decodeIntegrityToken(config.packageName, src.token).catch(() => null);
+  if (!payload) return null;
+  const requestDetails = payload.requestDetails;
+  const appIntegrity = payload.appIntegrity;
+  const deviceIntegrity = payload.deviceIntegrity;
+  if (
+    normalizeBase64Url(requestDetails?.nonce) !== normalizeBase64Url(challenge.nonce) ||
+    requestDetails?.requestPackageName !== config.packageName ||
+    appIntegrity?.packageName !== config.packageName
+  ) {
+    return null;
+  }
+  if (!androidAppIntegrityAllowed(appIntegrity, config.certificateDigests, true)) return null;
+  const deviceVerdicts = Array.isArray(deviceIntegrity?.deviceRecognitionVerdict)
+    ? deviceIntegrity.deviceRecognitionVerdict.filter(
+        (value): value is string => typeof value === 'string',
+      )
+    : [];
+  return deviceVerdicts.includes(config.deviceVerdict) ? { nonce: challenge.nonce } : null;
+}
+
 async function googleAccessToken(): Promise<string | null> {
   if (googleTokenCache && googleTokenCache.expiresAt - nowMs() > 60_000)
     return googleTokenCache.accessToken;
@@ -221,14 +297,12 @@ async function googleAccessToken(): Promise<string | null> {
   return googleTokenCache.accessToken;
 }
 
-async function verifyAndroidIntegrity(
+async function decodeAndroidIntegrityToken(
+  packageName: string,
   token: string,
-  challenge: NativeChallenge,
-  allowExpectedNonPlayBuild = false,
-): Promise<boolean> {
+): Promise<AndroidIntegrityPayload | null> {
   const accessToken = await googleAccessToken();
-  const packageName = process.env.GOOGLE_PLAY_INTEGRITY_PACKAGE_NAME || DEFAULT_PACKAGE_NAME;
-  if (!accessToken) return false;
+  if (!accessToken) return null;
   const res = await fetch(
     `https://playintegrity.googleapis.com/v1/${packageName}:decodeIntegrityToken`,
     {
@@ -241,13 +315,28 @@ async function verifyAndroidIntegrity(
       signal: AbortSignal.timeout(7000),
     },
   );
-  if (!res.ok) return false;
+  if (!res.ok) return null;
   const data = (await res.json().catch(() => null)) as Record<string, unknown> | null;
   const payload = data?.tokenPayloadExternal as Record<string, unknown> | undefined;
+  if (!payload) return null;
+  return {
+    requestDetails: payload.requestDetails as Record<string, unknown> | undefined,
+    appIntegrity: payload.appIntegrity as Record<string, unknown> | undefined,
+    deviceIntegrity: payload.deviceIntegrity as Record<string, unknown> | undefined,
+  };
+}
+
+async function verifyAndroidIntegrity(
+  token: string,
+  challenge: NativeChallenge,
+  allowExpectedNonPlayBuild = false,
+): Promise<boolean> {
+  const packageName = process.env.GOOGLE_PLAY_INTEGRITY_PACKAGE_NAME || DEFAULT_PACKAGE_NAME;
+  const payload = await decodeAndroidIntegrityToken(packageName, token);
   if (!payload) return false;
-  const requestDetails = payload.requestDetails as Record<string, unknown> | undefined;
-  const appIntegrity = payload.appIntegrity as Record<string, unknown> | undefined;
-  const deviceIntegrity = payload.deviceIntegrity as Record<string, unknown> | undefined;
+  const requestDetails = payload.requestDetails;
+  const appIntegrity = payload.appIntegrity;
+  const deviceIntegrity = payload.deviceIntegrity;
   const verdictNonce = typeof requestDetails?.nonce === 'string' ? requestDetails.nonce : '';
   const normalizedVerdictNonce = normalizeBase64Url(verdictNonce);
   const normalizedExpectedNonce = normalizeBase64Url(challenge.nonce);

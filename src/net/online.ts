@@ -138,6 +138,7 @@ import type {
 } from '../world_api/professions';
 import { computeBackoffDelay } from './backoff';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
+import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
@@ -4867,13 +4868,16 @@ export class ClientWorld implements IWorld {
   }
 
   async spinDailyReward(): Promise<DailyRewardSpinResult> {
+    const nativeAttestation = NATIVE_APP
+      ? await createNativeAttestationProof(this.base, 'seeker-spin')
+      : undefined;
     const res = await fetch(apiUrl('/api/daily-rewards/spin', this.base), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.token}`,
       },
-      body: '{}',
+      body: JSON.stringify({ nativeAttestation }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error ?? 'daily spin unavailable');

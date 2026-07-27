@@ -5,7 +5,7 @@ import { type BearerActiveGuardDb, createActiveGuard } from './http/middleware/b
 import { rateLimit, WALLET_LINK_POLICY } from './http/middleware/rate_limit';
 import type { Ctx, Middleware, RouteDef } from './http/types';
 import { json, readBody } from './http_util';
-import { verifyNativeAttestationChallenge } from './native_attestation';
+import { verifySeekerSolanaArtifactAttestation } from './native_attestation';
 import {
   claimSeekerEntitlement,
   hasSeekerEntitlement,
@@ -24,7 +24,7 @@ interface SeekerEntitlementRuntime {
   claimSeekerEntitlement: typeof claimSeekerEntitlement;
   hasSeekerEntitlement: typeof hasSeekerEntitlement;
   seekerEntitlementForAccount: typeof seekerEntitlementForAccount;
-  verifyNativeAttestationChallenge: typeof verifyNativeAttestationChallenge;
+  verifySeekerSolanaArtifactAttestation: typeof verifySeekerSolanaArtifactAttestation;
 }
 
 const REAL_RUNTIME: SeekerEntitlementRuntime = {
@@ -33,7 +33,7 @@ const REAL_RUNTIME: SeekerEntitlementRuntime = {
   claimSeekerEntitlement,
   hasSeekerEntitlement,
   seekerEntitlementForAccount,
-  verifyNativeAttestationChallenge,
+  verifySeekerSolanaArtifactAttestation,
 };
 
 let runtime = REAL_RUNTIME;
@@ -116,15 +116,15 @@ export async function handleSeekerEntitlementClaim(
     return;
   }
   const body = await readBody(req);
-  const attestation = await runtime.verifyNativeAttestationChallenge(
+  const attestation = await runtime.verifySeekerSolanaArtifactAttestation(
     req,
     body.nativeAttestation,
-    'seeker',
+    'seeker-claim',
   );
   if (!attestation) {
     json(res, 403, {
-      error: 'native attestation failed',
-      code: 'seeker.attestation_failed',
+      error: 'Solana Store app verification required',
+      code: 'seeker.solana_artifact_required',
     });
     return;
   }

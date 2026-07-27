@@ -127,6 +127,7 @@ export const API_ERROR_KEYS = {
   'ota_updates.invalid_input': 'apiError.ota_updates.invalid_input',
   'seeker.native_only': 'apiError.seeker.native_only',
   'seeker.attestation_failed': 'apiError.seeker.attestation_failed',
+  'seeker.solana_artifact_required': 'apiError.seeker.solana_artifact_required',
   'seeker.wallet_required': 'apiError.seeker.wallet_required',
   'seeker.genesis_token_required': 'apiError.seeker.genesis_token_required',
   'seeker.genesis_token_claimed': 'apiError.seeker.genesis_token_claimed',

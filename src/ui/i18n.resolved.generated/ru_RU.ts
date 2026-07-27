@@ -3023,6 +3023,7 @@ export const ru_RU: EnTranslations = {
     "seeker": {
       "native_only": "Права Seeker доступны только в нативном приложении.",
       "attestation_failed": "Не удалось подтвердить устройство. Повторите попытку.",
+      "solana_artifact_required": "Продолжите в версии приложения из Solana Store.",
       "wallet_required": "Сначала привяжите и подтвердите кошелек.",
       "genesis_token_required": "Требуется подтвержденный Seeker Genesis Token.",
       "genesis_token_claimed": "Этот Seeker Genesis Token уже был зарегистрирован.",

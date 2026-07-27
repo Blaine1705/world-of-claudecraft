@@ -213,6 +213,7 @@ export const ERROR_CODES = deepFreeze({
   // seeker: native distribution, attestation, wallet, token, and entitlement failures.
   'seeker.native_only': { params: [] },
   'seeker.attestation_failed': { params: [] },
+  'seeker.solana_artifact_required': { params: [] },
   'seeker.wallet_required': { params: [] },
   'seeker.genesis_token_required': { params: [] },
   'seeker.genesis_token_claimed': { params: [] },

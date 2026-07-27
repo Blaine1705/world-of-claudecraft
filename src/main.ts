@@ -7974,7 +7974,7 @@ async function completeWalletVerifyFlow(address: string): Promise<void> {
     const result = await api.linkWallet(address, signature, nonce);
     linkedWalletPubkey = result.pubkey;
     if (NATIVE_APP) {
-      const attestation = await createNativeAttestationProof(api.base, 'seeker');
+      const attestation = await createNativeAttestationProof(api.base, 'seeker-claim');
       if (!attestation || !(await api.claimSeekerEntitlement(attestation))) {
         throw new Error('Seeker entitlement verification failed');
       }

@@ -3023,6 +3023,7 @@ export const en_XA: EnTranslations = {
     "seeker": {
       "native_only": "[Šééķéŕ éñţíţļéɱéñţ íš áʋáíļáƀļé óñļý íñ ţĥé ñáţíʋé áþþ.]",
       "attestation_failed": "[Ðéʋíçé ʋéŕíƒíçáţíóñ ƒáíļéð. Þļéášé ţŕý áĝáíñ.]",
+      "solana_artifact_required": "[Úšé ţĥé Šóļáñá Šţóŕé áþþ ţó çóñţíñúé.]",
       "wallet_required": "[Ļíñķ áñð ʋéŕíƒý á ŵáļļéţ ƒíŕšţ.]",
       "genesis_token_required": "[Á ʋéŕíƒíéð Šééķéŕ Ĝéñéšíš Ţóķéñ íš ŕéɋúíŕéð.]",
       "genesis_token_claimed": "[Ţĥáţ Šééķéŕ Ĝéñéšíš Ţóķéñ ĥáš áļŕéáðý ƀééñ çļáíɱéð.]",

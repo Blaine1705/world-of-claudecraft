@@ -8239,6 +8239,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Срок действия авторизации кошелька истек или ее не удалось проверить. Повторите попытку.',
   'apiError.seeker.native_only': 'Права Seeker доступны только в нативном приложении.',
   'apiError.seeker.attestation_failed': 'Не удалось подтвердить устройство. Повторите попытку.',
+  'apiError.seeker.solana_artifact_required': 'Продолжите в версии приложения из Solana Store.',
   'apiError.seeker.wallet_required': 'Сначала привяжите и подтвердите кошелек.',
   'apiError.seeker.genesis_token_required': 'Требуется подтвержденный Seeker Genesis Token.',
   'apiError.seeker.genesis_token_claimed': 'Этот Seeker Genesis Token уже был зарегистрирован.',

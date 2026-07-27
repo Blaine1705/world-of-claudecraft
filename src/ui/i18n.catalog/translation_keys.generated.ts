@@ -151,6 +151,7 @@ export type TranslationKeyFlat =
   | 'apiError.seeker.genesis_token_claimed'
   | 'apiError.seeker.genesis_token_required'
   | 'apiError.seeker.native_only'
+  | 'apiError.seeker.solana_artifact_required'
   | 'apiError.seeker.wallet_required'
   | 'apiError.steam.account_taken'
   | 'apiError.steam.already_linked'

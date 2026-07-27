@@ -7746,6 +7746,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.wallet.handoff_invalid': '錢包授權已過期或無法驗證。請再試一次。',
   'apiError.seeker.native_only': 'Seeker 權益僅可在原生應用程式中使用。',
   'apiError.seeker.attestation_failed': '裝置驗證失敗。請再試一次。',
+  'apiError.seeker.solana_artifact_required': '請使用 Solana Store 版應用程式繼續。',
   'apiError.seeker.wallet_required': '請先連結並驗證錢包。',
   'apiError.seeker.genesis_token_required': '需要已驗證的 Seeker Genesis Token。',
   'apiError.seeker.genesis_token_claimed': '該 Seeker Genesis Token 已被領取。',
