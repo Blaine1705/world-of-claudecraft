@@ -47,6 +47,8 @@ export interface VendorBuybackRow {
   /** Present when this row carries a masterwork/signed payload the buyback
    *  will restore, so it can be told apart from a plain row of the same item. */
   instance?: ItemInstancePayload;
+  /** Present when this row carries crafted provenance used by disenchant. */
+  craftedRecipeId?: string;
 }
 
 export interface VendorView {
@@ -99,6 +101,7 @@ export function buildVendorView(
       price: item.sellValue,
       index,
       ...(slot.instance && { instance: slot.instance }),
+      ...(slot.craftedRecipeId === undefined ? {} : { craftedRecipeId: slot.craftedRecipeId }),
     });
   });
   return {

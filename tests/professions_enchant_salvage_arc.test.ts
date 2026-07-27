@@ -28,6 +28,7 @@ import { type ClientSession, GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity, InvSlot, PlayerClass, SimEvent } from '../src/sim/types';
+import { terrainHeight } from '../src/sim/world';
 
 const RARE_WEAPON = 'moggers_copper_cudgel'; // rare mace -> resonant_steel
 const COMMON_WEAPON = 'eastbrook_arming_sword';
@@ -237,6 +238,17 @@ function applySnap(client: ClientWorld, snap: unknown): void {
   (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot(snap);
 }
 
+function moveToVendor(sim: Sim): void {
+  const trader = [...sim.ctx.entities.values()].find((e) => e.templateId === 'trader_wilkes');
+  if (!trader) throw new Error('missing trader_wilkes');
+  const player = sim.ctx.entities.get(sim.playerId);
+  if (!player) throw new Error('missing player');
+  player.pos.x = trader.pos.x + 2;
+  player.pos.z = trader.pos.z;
+  player.pos.y = terrainHeight(player.pos.x, player.pos.z, sim.cfg.seed);
+  player.prevPos = { ...player.pos };
+}
+
 describe('offline Sim end-to-end (IWorld surface)', () => {
   it('crafted Eastbrook Chainmail Vest stacks yield materials but never teach Enchanting', () => {
     const sim = new Sim({ seed: 20260726, playerClass: 'warrior', autoEquip: false });
@@ -315,6 +327,39 @@ describe('offline Sim end-to-end (IWorld surface)', () => {
 
     sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, returnedSlotIndex);
     expect(sim.lastDisenchantResult?.ok).toBe(true);
+    expect(meta.craftSkills.enchanting).toBe(0);
+  });
+
+  it('crafted Eastbrook Chainmail Vest buyback keeps provenance before disenchant', () => {
+    const sim = new Sim({ seed: 20260730, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = metaFor(sim, pid);
+    moveToVendor(sim);
+
+    grantVestMaterials(sim, pid);
+    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    expect(sim.lastCraftResult?.ok).toBe(true);
+    const craftedSlotIndex = craftedVestSlotIndex(sim, pid);
+    expect(craftedSlotIndex).toBeGreaterThanOrEqual(0);
+    expect(simInv(sim, pid)[craftedSlotIndex].instance).toBeUndefined();
+
+    sim.sellItem(CRAFTED_COMMON_ARMOR, 1, pid);
+    expect(sim.countItem(CRAFTED_COMMON_ARMOR, pid)).toBe(0);
+    expect(meta.vendorBuyback[0]).toMatchObject({
+      itemId: CRAFTED_COMMON_ARMOR,
+      count: 1,
+      craftedRecipeId: CRAFTED_COMMON_ARMOR_RECIPE,
+    });
+
+    sim.buyBackItem(CRAFTED_COMMON_ARMOR, 0, undefined, CRAFTED_COMMON_ARMOR_RECIPE);
+    const boughtBackSlotIndex = craftedVestSlotIndex(sim, pid);
+    expect(boughtBackSlotIndex).toBeGreaterThanOrEqual(0);
+
+    const dustBefore = sim.countItem(DUST, pid);
+    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, boughtBackSlotIndex);
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    expect(sim.countItem(DUST, pid)).toBeGreaterThan(dustBefore);
+    expect(sim.countItem(CRAFTED_COMMON_ARMOR, pid)).toBe(0);
     expect(meta.craftSkills.enchanting).toBe(0);
   });
 

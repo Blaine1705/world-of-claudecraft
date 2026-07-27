@@ -4294,6 +4294,7 @@ export class GameServer {
             typeof msg.index === 'number' ? msg.index : undefined,
             msg.instance && typeof msg.instance === 'object' ? msg.instance : undefined,
             pid,
+            typeof msg.craftedRecipeId === 'string' ? msg.craftedRecipeId : undefined,
           );
         break;
       case 'harvest_node':

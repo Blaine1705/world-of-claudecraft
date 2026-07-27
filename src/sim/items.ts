@@ -16,14 +16,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts). This region draws NO rng.
 
-import {
-  addStacked,
-  bagCapacity,
-  bagsFullError,
-  canGrantItemInstance,
-  countFit,
-  equipBag as equipBagCmd,
-} from './bags';
+import { addStacked, bagCapacity, bagsFullError, countFit, equipBag as equipBagCmd } from './bags';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import {
@@ -61,6 +54,11 @@ import { vendorStackSize } from './vendor_stack';
 const VENDOR_BUYBACK_LIMIT = 12;
 
 interface EquippedInventoryUnit {
+  instance: ItemInstancePayload | undefined;
+  craftedRecipeId: string | undefined;
+}
+
+interface VendorRemovedUnit {
   instance: ItemInstancePayload | undefined;
   craftedRecipeId: string | undefined;
 }
@@ -211,6 +209,48 @@ export function removePreferFungible(
   // so a decoupled test ctx that models inventory but omits the hook (its own
   // removeItem does the same) is not forced to stub it; the live SimContext
   // always provides it.
+  ctx.onInventoryChangedForQuests?.(meta);
+  return consumed;
+}
+
+function removeVendorSellUnits(
+  ctx: SimContext,
+  itemId: string,
+  count: number,
+  pid: number,
+  skip?: (instance: ItemInstancePayload) => boolean,
+): VendorRemovedUnit[] {
+  const r = ctx.resolve(pid);
+  if (!r) return [];
+  const { meta } = r;
+  const consumed: VendorRemovedUnit[] = [];
+  let left = count;
+  for (let i = meta.inventory.length - 1; i >= 0 && left > 0; i--) {
+    const s = meta.inventory[i];
+    if (s.itemId !== itemId || s.instance) continue;
+    const take = Math.min(s.count, left);
+    for (let unit = 0; unit < take; unit++) {
+      consumed.push({ instance: undefined, craftedRecipeId: s.craftedRecipeId });
+    }
+    s.count -= take;
+    left -= take;
+    if (s.count <= 0) meta.inventory.splice(i, 1);
+  }
+  for (let i = meta.inventory.length - 1; i >= 0 && left > 0; i--) {
+    const s = meta.inventory[i];
+    if (s.itemId !== itemId || !s.instance || skip?.(s.instance)) continue;
+    const take = Math.min(s.count, left);
+    for (let unit = 0; unit < take; unit++) {
+      const finalUnitOfSlot = take >= s.count && unit === take - 1;
+      consumed.push({
+        instance: finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance),
+        craftedRecipeId: s.craftedRecipeId,
+      });
+    }
+    s.count -= take;
+    left -= take;
+    if (s.count <= 0) meta.inventory.splice(i, 1);
+  }
   ctx.onInventoryChangedForQuests?.(meta);
   return consumed;
 }
@@ -668,9 +708,13 @@ function recordVendorBuyback(
   itemId: string,
   count: number,
   instance?: ItemInstancePayload,
+  craftedRecipeId?: string,
 ): void {
   const existingIndex = meta.vendorBuyback.findIndex(
-    (s) => s.itemId === itemId && canStackInstancePayloads(s.instance, instance),
+    (s) =>
+      s.itemId === itemId &&
+      canStackInstancePayloads(s.instance, instance) &&
+      s.craftedRecipeId === craftedRecipeId,
   );
   if (existingIndex >= 0) {
     const [existing] = meta.vendorBuyback.splice(existingIndex, 1);
@@ -681,6 +725,7 @@ function recordVendorBuyback(
       itemId,
       count,
       ...(instance && { instance: cloneItemInstancePayload(instance) }),
+      ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
     });
   }
   while (meta.vendorBuyback.length > VENDOR_BUYBACK_LIMIT) meta.vendorBuyback.pop();
@@ -744,16 +789,16 @@ export function sellItem(ctx: SimContext, itemId: string, count = 1, pid?: numbe
   // units get their own per-unit rows so buyback can restore the exact
   // payload sold instead of silently minting a generic copy (the #2207
   // sibling gap social/trade.ts's grantOffer fix left open, see its comment).
-  const consumedInstances = removePreferFungible(
+  const consumedUnits = removeVendorSellUnits(
     ctx,
     itemId,
     sellableCount,
     meta.entityId,
     (instance) => instance.boundTo !== undefined,
   );
-  const plainSoldCount = sellableCount - consumedInstances.length;
-  if (plainSoldCount > 0) recordVendorBuyback(meta, itemId, plainSoldCount);
-  for (const instance of consumedInstances) recordVendorBuyback(meta, itemId, 1, instance);
+  for (const unit of consumedUnits) {
+    recordVendorBuyback(meta, itemId, 1, unit.instance, unit.craftedRecipeId);
+  }
   const payout = def.sellValue * sellableCount;
   meta.copper += payout;
   ctx.emit({ type: 'vendor', action: 'sell', itemId, pid: meta.entityId });
@@ -830,16 +875,16 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
     // unbound instanced poor-quality copy (e.g. a signed junk drop) just as
     // easily as a single sellItem sale, so it must not silently wash its
     // payload the way a plain-only recordVendorBuyback call would.
-    const consumedInstances = removePreferFungible(
+    const consumedUnits = removeVendorSellUnits(
       ctx,
       itemId,
       count,
       meta.entityId,
       (instance) => instance.boundTo !== undefined,
     );
-    const plainCount = count - consumedInstances.length;
-    if (plainCount > 0) recordVendorBuyback(meta, itemId, plainCount);
-    for (const instance of consumedInstances) recordVendorBuyback(meta, itemId, 1, instance);
+    for (const unit of consumedUnits) {
+      recordVendorBuyback(meta, itemId, 1, unit.instance, unit.craftedRecipeId);
+    }
     total += def.sellValue * count;
     soldCount += count;
   }
@@ -872,6 +917,7 @@ export function buyBackItem(
   index?: number,
   pid?: number,
   expectedInstance?: ItemInstancePayload,
+  expectedCraftedRecipeId?: string,
 ): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -879,13 +925,18 @@ export function buyBackItem(
   const def = ITEMS[itemId];
   const indexed = index !== undefined ? meta.vendorBuyback[index] : undefined;
   const indexedMatches =
-    indexed?.itemId === itemId && itemInstancePayloadsEqual(indexed.instance, expectedInstance);
+    indexed?.itemId === itemId &&
+    itemInstancePayloadsEqual(indexed.instance, expectedInstance) &&
+    indexed.craftedRecipeId === expectedCraftedRecipeId;
   const slot =
     (indexedMatches ? indexed : undefined) ??
     meta.vendorBuyback.find(
-      (s) => s.itemId === itemId && itemInstancePayloadsEqual(s.instance, expectedInstance),
+      (s) =>
+        s.itemId === itemId &&
+        itemInstancePayloadsEqual(s.instance, expectedInstance) &&
+        s.craftedRecipeId === expectedCraftedRecipeId,
     ) ??
-    (expectedInstance === undefined
+    (expectedInstance === undefined && expectedCraftedRecipeId === undefined
       ? meta.vendorBuyback.find((s) => s.itemId === itemId)
       : undefined);
   if (!def || !slot || slot.count <= 0) {
@@ -909,22 +960,29 @@ export function buyBackItem(
   // merge rule addStacked itself uses below, #2139-class gap): preflight the
   // regrant with the row's own instance instead of always checking room for
   // a generic plain copy.
-  const fits = slot.instance
-    ? canGrantItemInstance(meta.inventory, bagCapacity(meta.bags), itemId, slot.instance)
-    : ctx.canAddItem(itemId, 1, meta.entityId);
+  const fits =
+    countFit(
+      meta.inventory,
+      bagCapacity(meta.bags),
+      itemId,
+      1,
+      slot.instance,
+      slot.craftedRecipeId,
+    ) >= 1;
   if (!fits) {
     bagsFullError(ctx, meta.entityId);
     return;
   }
   meta.copper -= def.sellValue;
   const instance = slot.instance;
+  const craftedRecipeId = slot.craftedRecipeId;
   slot.count -= 1;
   if (slot.count <= 0) meta.vendorBuyback = meta.vendorBuyback.filter((s) => s !== slot);
   // A row recorded with an instance payload (a masterwork/signed piece sold
   // unbound, #2207 sibling gap) re-grants that exact payload instead of a
   // generic plain copy; addStacked deep-clones it into the new/topped-up
   // inventory slot, so the buyback row's own copy is never aliased.
-  addItemSilent(itemId, 1, meta, instance);
+  addItemSilent(itemId, 1, meta, instance, craftedRecipeId);
   // The silent add bypasses the inventory hub, so credit the discovery
   // ledger here (an acquisition like any other; the mark is idempotent).
   ctx.markItemDiscovered(meta, itemId, instance?.rolled?.quality);
@@ -942,6 +1000,7 @@ function addItemSilent(
   count: number,
   meta: PlayerMeta,
   instance?: ItemInstancePayload,
+  craftedRecipeId?: string,
 ): void {
-  addStacked(meta.inventory, itemId, count, instance);
+  addStacked(meta.inventory, itemId, count, instance, craftedRecipeId);
 }

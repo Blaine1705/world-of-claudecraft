@@ -7101,9 +7101,26 @@ export class Sim {
     itemId: string,
     index?: number,
     expectedInstance?: ItemInstancePayload,
+    expectedCraftedRecipeId?: string,
+  ): void;
+  buyBackItem(
+    itemId: string,
+    index?: number,
+    expectedInstance?: ItemInstancePayload,
     pid?: number,
+    expectedCraftedRecipeId?: string,
+  ): void;
+  buyBackItem(
+    itemId: string,
+    index?: number,
+    expectedInstance?: ItemInstancePayload,
+    pidOrCraftedRecipeId?: number | string,
+    expectedCraftedRecipeId?: string,
   ): void {
-    items.buyBackItem(this.ctx, itemId, index, pid, expectedInstance);
+    const pid = typeof pidOrCraftedRecipeId === 'number' ? pidOrCraftedRecipeId : undefined;
+    const craftedRecipeId =
+      typeof pidOrCraftedRecipeId === 'string' ? pidOrCraftedRecipeId : expectedCraftedRecipeId;
+    items.buyBackItem(this.ctx, itemId, index, pid, expectedInstance, craftedRecipeId);
   }
 
   // Gather-node harvest (#1121): a thin delegate onto
