@@ -213,10 +213,7 @@ const MOB_IDS = [
   'rift_pact_acolyte',
   'rift_boss_ritualist',
   'rift_boss_pitlord',
-  // The Orkadia orc war-camp dungeon (src/sim/content/orkadia.ts).
-  'orkadia_grunt',
-  'orkadia_marauder',
-  'orkadia_warlord',
+  // The Wildheart Basin jungle dungeon (src/sim/content/wildheart.ts).
   'wildheart_stalker',
   'wildheart_ravager',
   'wildheart_hexcaller',
@@ -559,7 +556,6 @@ const DUNGEON_IDS = [
   'gravewyrm_sanctum',
   'nythraxis_crypt',
   'nythraxis_boss_arena',
-  'orkadia',
   'wildheart_basin',
   'the_last_keep',
 ] as const;

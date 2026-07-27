@@ -64,7 +64,6 @@ import {
   DRAKELANDS_ZONE,
 } from './content/drakelands';
 import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
-import { ORKADIA_DUNGEON_DEFS, ORKADIA_MOBS } from './content/orkadia';
 import {
   EVERGARDEN_CAMPS,
   EVERGARDEN_ITEMS,
@@ -366,7 +365,6 @@ export const MOBS: Record<string, MobTemplate> = {
   ...YUMI_MOBS,
   ...REALM_MOBS,
   ...DRAKELANDS_MOBS,
-  ...ORKADIA_MOBS,
   ...WILDHEART_MOBS,
   ...FROSTVEIL_MOBS,
   ...AMBERFALL_MOBS,
@@ -868,7 +866,6 @@ export function instanceSlotForZ(z: number): number {
 export const DUNGEONS: Record<string, DungeonDef> = {
   ...DUNGEON_DEFS,
   ...TEMPLE_DUNGEON_DEFS,
-  ...ORKADIA_DUNGEON_DEFS,
   ...WILDHEART_DUNGEON_DEFS,
 };
 
