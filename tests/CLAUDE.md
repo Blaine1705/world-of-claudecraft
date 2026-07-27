@@ -33,7 +33,9 @@ Subdirectories (plus one shared fixture):
 - `helpers/` + `util/`: shared cross-suite utilities (`fake_dom.ts`, the reusable
   hand-rolled fake DOM for controller suites, `i18n_determinism.ts`, `ts_files_under.ts`
   and `css_tree_under.ts`, the two source walks, `scan_guard_self_audit.ts`, the pin that
-  keeps a guard from re-growing its own directory read, `alloc_probe.ts`).
+  keeps a guard from re-growing its own directory read, `method_call_sites.ts`, the
+  `ts.createSourceFile` walk that reports the calls a class method evaluates, each with the
+  `if` chain guarding each, `alloc_probe.ts`).
 - `global_setup.ts`: runs on every vitest invocation (`vite.config.ts` `test.globalSetup`);
   mints the SFX Studio temp root (`WOC_SFX_STUDIO_TEST_ROOT`).
 
@@ -118,6 +120,15 @@ use the `tests/server/helpers/` fakes (see Map), not a bespoke GameServer rig.
   driver of its own, at any cadence). The raw-write scan is waived for cold NOT because a
   window is cold, which this tree contradicts, but because a COUNT cannot tell a build-time
   write from a repeated one; see the bucket 3 comment for the cadences involved.
+- `hud_update_drive.test.ts` answers the cadence question that gate refuses to: one
+  hand-written row per call `Hud.update()` evaluates, carrying its band
+  (`frame`/`fast`/`medium`/`slow`), the exact condition text gating it, what it repaints, and
+  for a window the source line its invalidation guard is spelled on. Diffed BOTH ways against
+  a `ts.createSourceFile` walk (`helpers/method_call_sites.ts`), so adding, deleting,
+  re-banding or re-gating a call in `update()` fails until the table says so, and deleting a
+  guard it names fails too. It registers the WHOLE body rather than only the windows on
+  purpose: a table naming a handful when half the family qualifies reads as a complete
+  classification and is not one. Touching `update()` means touching this file.
 - SFX gates: the `sfx_*` suites (`sfx_conform`, `sfx_studio_server_security`,
   `tests/server/static_sfx_serving`, ...) mirror `npm run sfx:check`.
 - `malware_scan.test.ts` is the release-gate backstop (signatures from `scripts/malware_scan.mjs`,
