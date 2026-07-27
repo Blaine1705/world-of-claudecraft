@@ -1,7 +1,7 @@
 // Pure, host-agnostic view model for the town-focus allocation panel (#1143).
 //
-// DOM/i18n-free so tests/town_focus_view.test.ts can drive it directly against
-// either a Sim- or ClientWorld-shaped input. Owns the one thing worth testing
+// DOM/i18n-free so tests/town_focus_repaint_gate.test.ts can drive it directly
+// against either a Sim- or ClientWorld-shaped input. Owns the one thing worth testing
 // without a DOM: turning a raw townFocus allocation + budget into per-component
 // rows (current points, whether it can still take another point, whether it
 // can give one back) and the remaining-point count. Rendering lives in
@@ -48,6 +48,37 @@ export function buildTownFocusView(
     };
   });
   return { rows, totalSpent, budget, remaining, inTown };
+}
+
+/**
+ * The compact repaint signature for an open panel (#2500).
+ *
+ * Hud polls this on the slow band and rebuilds only when it moves, the
+ * "poll cheaply, rebuild on a signature change" shape the rest of the window
+ * family already uses. Before it existed the panel discarded and rebuilt its
+ * whole subtree twice a second on the open check alone, which restored
+ * scrollTop but destroyed the keyboard user's focused control on a timer.
+ *
+ * Built from the VIEW rather than from the raw allocation so completeness is
+ * checkable by inspection: renderTownFocusWindow reads `inTown`, `budget`,
+ * `remaining` and each row's `component` / `points` / `canIncrease` /
+ * `canDecrease`, and every one of those is a term here. `totalSpent` is the
+ * one view field it deliberately omits, because nothing renders it (and
+ * `remaining` is derived from it anyway); tests/town_focus_repaint_gate.test.ts
+ * pins that set against the painter's real source, and refuses an alias that
+ * would read a field past the scan, so a future row that starts rendering
+ * another field cannot leave the gate behind.
+ *
+ * Language is deliberately NOT a term. A switch never moves the allocation, so
+ * it is converged by Hud.refreshLocalizedDynamicUi() forcing one rebuild, the
+ * same arm the arena / Vale Cup surfaces use for their text-independent
+ * signatures.
+ */
+export function townFocusRenderSig(view: TownFocusView): string {
+  const rows = view.rows
+    .map((r) => `${r.component}:${r.points}:${r.canIncrease ? 1 : 0}${r.canDecrease ? 1 : 0}`)
+    .join('|');
+  return `${view.inTown ? 1 : 0}/${view.budget}/${view.remaining}/${rows}`;
 }
 
 /** Applies a single +1/-1 step to `component`, clamped at 0 and at the budget. */

@@ -83,10 +83,11 @@ Per-frame HUD code (anything reached from `Hud.update()`) holds these:
   `HOT_PAINTERS` / `CANVAS_PAINTERS`, not every module `update()` touches. `Hud.update()` also
   polls about half the `*_window.ts` painters (`spellbook_window.tickOpen()` runs every frame
   while open; arena / dungeon_finder / vale_cup / card_duel `render()` on the 250ms band; the
-  rest get `refreshIfChanged()` on the 500ms band). MOST of those rebuild behind their own
-  invalidation signature, which no per-file scan can see, and `town_focus_window` does not:
-  it repaints on the open check alone, which is the standing proof that the signature guard is
-  a convention rather than something enforced.
+  rest get `refreshIfChanged()` on the 500ms band). Those rebuild behind their own invalidation
+  signature, which no per-file scan can see: it lives either inside the window module or on the
+  `Hud` method that polls it (`refreshOpenTownFocusIfChanged`). `town_focus_window` was the
+  standing counter-example until #2500 gave it one; a window polled from `update()` with no
+  signature is a defect, not a style choice.
   **WHICH windows those are is now a registry**, not folklore: `tests/hud_update_drive.test.ts`
   holds a row per call `Hud.update()` EVALUATES, with its cadence band, the exact condition text
   gating it, what it repaints, and (for a window) the source line its invalidation guard is
