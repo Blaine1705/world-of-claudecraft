@@ -1291,14 +1291,73 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.renderTownFocus');
+    // The guard KINDS are pinned the same way and for the same reason: `kind` is otherwise a
+    // free-text opt-out, so a row could keep `surface: 'window'`, keep the counts above
+    // intact, and swap `module` for a plausible-sounding `none` while the real guard was
+    // deleted from the tree.
+    const byKind: Record<string, number> = {};
+    for (const row of HUD_UPDATE_DRIVES)
+      if (row.guard) byKind[row.guard.kind] = (byKind[row.guard.kind] ?? 0) + 1;
+    expect(byKind, 'a guard kind changed: say why in the PR, not only in the table').toEqual({
+      module: 19,
+      hud: 4,
+      callsite: 9,
+      none: 5,
+    });
+    // ...and the honest-exception list by NAME, because that is the one that should never
+    // grow quietly: every entry is a window this repo knows has no invalidation guard.
+    expect(
+      HUD_UPDATE_DRIVES.filter((r) => r.guard?.kind === 'none')
+        .map((r) => r.call)
+        .sort(),
+    ).toEqual([
+      'this.lootRolls.update',
+      'this.lootWindow.updateProximity',
+      'this.questDialog.updateProximity',
+      'this.renderTownFocus',
+      'this.updateMapWindow',
+    ]);
   });
 
   it('still finds every invalidation guard the window rows name', () => {
     const { problems, checked } = guardProblems(HUD_UPDATE_DRIVES, readUi);
+    // PINNED EXACTLY, module and proof together, and this is the assertion that carries the
+    // whole guard half of the gate. A floor here was the hole mutation testing found twice
+    // over: a window row could downgrade its guard to `kind: 'none'` with a plausible
+    // sentence, or repoint its `module` at any of the seven other files that spell the proof
+    // identically, and both left the count comfortably above any floor while a real guard was
+    // deleted from the tree. `if (sig === this.lastSig) return;` appears in seven modules, so
+    // the module a row NAMES has to be part of the pin, not just the line it looks for.
     expect(
-      checked.length,
-      'the guard sweep proved nothing: no row named a source guard',
-    ).toBeGreaterThan(15);
+      [...checked].sort(),
+      'the resolved guard list moved. A row changed which module it points at, which line it looks for, or dropped to a guard kind that names no source at all.',
+    ).toEqual(
+      [
+        'arena_window.ts: if (view.sig === this.lastSig) return;',
+        'bags_window.ts: if (!bagsMoneyRowStale(el.style.display, this.deps.world().copper, this.lastMoneyCopper)) return;',
+        'bank_window.ts: if (sig === this.lastSig) return;',
+        'calendar_window.ts: if (sig === this.lastSig) return;',
+        'card_duel_window.ts: if (sig === this.lastSig) return;',
+        'deeds_window.ts: if (sig === this.lastSig) return;',
+        'dungeon_finder_proposal_popup.ts: if (view.sig !== this.lastSig) {',
+        'dungeon_finder_window.ts: if (sig === this.lastSig) {',
+        'hud.ts: if (craftingReagentSig(this.sim.inventory, this.sim.player.name) === this.lastCraftingReagentSig) return;',
+        'hud.ts: if (sig !== this.lastLootSettingsSig) {',
+        'hud.ts: if (sig === this.lastProfessionSurfaceSig) return;',
+        'hud.ts: if (sig === this.lastTradeSig) return;',
+        'hud/delve/lockpick_window.ts: if (lockpickRenderSig(view) !== this.lastSig) this.renderBoard();',
+        'hud/quest/quest_dialog_controller.ts: if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible) this.refresh();',
+        'mailbox_window.ts: if (sig === this.lastSig) return;',
+        'market_window.ts: if (sig === this.lastSig) return;',
+        'meters.ts: if (!this.isOpen || now - this.lastRender < 250) return;',
+        'professions_window.ts: if (sig === this.lastSig) return;',
+        'social_window.ts: if (struct !== this.lastStruct) {',
+        'spellbook_window.ts: if (SpellbookWindow.knownSig(this.deps.world().known) !== this.lastKnownSig) {',
+        'vale_cup_betting.ts: if (view.sig !== this.lastSig) {',
+        'vale_cup_briefing.ts: if (view.sig !== this.lastSig) {',
+        'vale_cup_window.ts: if (view.sig === this.lastSig) return;',
+      ].sort(),
+    );
     expect(
       problems,
       `a window on a poll rebuilds only because a signature guard says nothing changed. Deleting one turns a full innerHTML rebuild into a 2 Hz (or per-frame) rebuild that moves no number in any other gate. Restore the guard, or update the row to say where it went:\n${problems.join('\n')}`,
@@ -1358,6 +1417,13 @@ describe('the drive registry checks themselves have teeth', () => {
     expect(splitBand(['(a || b)'])).toEqual({ band: 'frame', gate: '(a || b)' });
     // An identifier that merely CONTAINS a band token is not one.
     expect(splitBand(['lastSlowHudAt > 0'])).toEqual({ band: 'frame', gate: 'lastSlowHudAt > 0' });
+    // A `&&` inside a BRACKET is not a top-level separator either. No live condition in
+    // `update()` uses an index access today, so without this the bracket half of the depth
+    // counter matches nothing and could be deleted with the suite green.
+    expect(splitBand(['slowHud && rows[a && b].open'])).toEqual({
+      band: 'slow',
+      gate: 'rows[a && b].open',
+    });
   });
 
   // The positive control for the diff. Everything the real assertions do is "expect an array
@@ -1421,6 +1487,10 @@ describe('the drive registry checks themselves have teeth', () => {
         { call: 'this.d', band: 'frame', gate: '', surface: 'none', why: '' },
         { call: 'this.e', band: 'frame', gate: '', sites: 0, surface: 'none', why: 'x' },
         { call: 'this.someWindow.render', band: 'frame', gate: '', surface: 'chrome', why: 'x' },
+        // The Popup alternate matches exactly ONE live row, which already passes, so nothing
+        // else ever drives it in the reporting direction: the dead-arm shape this repo has
+        // shipped twice.
+        { call: 'this.somePopup.render', band: 'frame', gate: '', surface: 'chrome', why: 'x' },
       ]),
     ).toEqual([
       'this.a|frame| (a window row must name its invalidation guard)',
@@ -1429,11 +1499,17 @@ describe('the drive registry checks themselves have teeth', () => {
       'this.d|frame| (why is empty: say what it repaints)',
       'this.e|frame| (sites must be at least 1)',
       'this.someWindow.render|frame| (a callee named Window/Popup is a window row: it cannot be relabelled chrome to shed its guard)',
+      'this.somePopup.render|frame| (a callee named Window/Popup is a window row: it cannot be relabelled chrome to shed its guard)',
     ]);
-    // The global `window.` object is lowercase and must not be swept in with it.
+    // The three negatives that pin the rest of the matcher, none of which the positives
+    // above can reach. The global `window.` object is lowercase (so the alternation itself
+    // rejects it); `windowManager` has no leading dot before the word, which is what the
+    // `\.` anchor is for; and `windowed` continues past the word, which is what `\b` is for.
     expect(
       rowShapeProblems([
         { call: 'window.setTimeout', band: 'frame', gate: '', surface: 'chrome', why: 'x' },
+        { call: 'windowManager.tick', band: 'frame', gate: '', surface: 'chrome', why: 'x' },
+        { call: 'this.windowed.paint', band: 'frame', gate: '', surface: 'chrome', why: 'x' },
       ]),
     ).toEqual([]);
     expect(

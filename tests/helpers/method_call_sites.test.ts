@@ -36,7 +36,7 @@ const ARM_FIXTURES: ReadonlyArray<readonly [string, string, string[]]> = [
   ['isForOfStatement', 'for (const e of list) this.a();', ['this.a']],
   ['isForInStatement', 'for (const k in map) this.a();', ['this.a']],
   ['isWhileStatement', 'while (go) this.a();', ['this.a']],
-  ['isDoStatement', 'do { this.a(); } while (go);', ['this.a']],
+  ['isDoStatement', 'do { this.doOnce(); } while (go);', ['this.doOnce']],
   ['isLabeledStatement', 'outer: { this.a(); }', ['this.a']],
   [
     'isTryStatement',
@@ -73,7 +73,23 @@ const ARM_FIXTURES: ReadonlyArray<readonly [string, string, string[]]> = [
 ];
 
 /** Arms the helper matches by `SyntaxKind` rather than through a `ts.is*` guard. */
-const ROOT_ARMS = ['ThisKeyword'];
+function rootArms(helperSource: string): string[] {
+  // The `node.kind === ts.SyntaxKind.X` shape specifically, which is how a callee-chain arm
+  // gets matched without a `ts.is*` guard and so without needing a fixture. A bare
+  // `ts.SyntaxKind.X` is a different thing (an operator kind compared against
+  // `operatorToken.kind`, or a member of the ASSIGNMENT_OPS set), and those arms have their
+  // own cases below rather than an entry in this list.
+  return [
+    ...new Set([...helperSource.matchAll(/\.kind === ts\.SyntaxKind\.(\w+)/g)].map((m) => m[1])),
+  ];
+}
+
+/**
+ * The bodies every fixture shares because EVERY case exercises them: a class, a method and
+ * the `this` root. Any OTHER two arms sharing a body means one of them is not being driven,
+ * which is what let a fixture be replaced by a copy-paste and stay green.
+ */
+const STRUCTURAL_ARMS = ['isClassDeclaration', 'isMethodDeclaration', 'ThisKeyword'];
 
 describe('readMethodCallSites: statement position', () => {
   it('records the statement head and NOT the calls nested inside it', () => {
@@ -229,6 +245,9 @@ describe('readMethodCallSites: the condition chain', () => {
     expect(broken).toEqual(inline);
     expect(broken).toEqual(['sigOf(a, b) !== this.last']);
     expect(sitesIn('if (a /* why */ && b) this.render();')[0].conditions).toEqual(['a && b']);
+    // The BRACKET halves of the two padding rules, and the trailing-comma rule, match nothing
+    // in the live tree, so each could be deleted with everything green.
+    expect(normalizeCondition('rows[\n  i,\n] && f(\n  a ,\n)')).toBe('rows[i] && f(a)');
   });
 
   it('normalizeCondition leaves a URL protocol alone', () => {
@@ -299,9 +318,7 @@ describe('readMethodCallSites: refusals and counts', () => {
     expect(
       readMethodCallSites('w.ts', wrap('this.a();\nthis.b();'), 'Widget', 'update').bodyLines,
     ).toBe(4);
-    expect(readMethodCallSites('w.ts', wrap('this.a();'), 'Widget', 'update').declarationLine).toBe(
-      2,
-    );
+    expect(readMethodCallSites('w.ts', wrap('this.a();'), 'Widget', 'update').bodyLines).toBe(3);
   });
 
   it('walks a body holding regex literals with quotes and escaped slashes', () => {
@@ -347,8 +364,47 @@ describe('the fixture list covers every walker arm', () => {
       guards.length,
       'the walker stopped using ts.is* guards: re-derive this pin',
     ).toBeGreaterThan(15);
-    expect([...new Set([...guards, ...ROOT_ARMS])].sort()).toEqual(
+    expect([...new Set([...guards, ...rootArms(normalizeCondition(helper))])].sort()).toEqual(
       [...new Set(ARM_FIXTURES.map(([label]) => label))].sort(),
     );
+  });
+
+  it("gives each arm its OWN fixture body, not a copy of another arm's", () => {
+    // The label-to-body binding is otherwise decorative: swap the `isDoStatement` body for
+    // `this.a();`, keep the label, and the completeness pin above still passes while the arm
+    // goes unexercised. Same class as a matcher pinned by label rather than by identity.
+    const bodies = ARM_FIXTURES.filter(([label]) => !STRUCTURAL_ARMS.includes(label)).map(
+      ([, body]) => body,
+    );
+    expect(new Set(bodies).size, 'two arms share a fixture body: one of them is not driven').toBe(
+      bodies.length,
+    );
+    // ...and the three allowed to share are pinned by name, so the exemption cannot widen.
+    expect(
+      ARM_FIXTURES.filter(([label]) => STRUCTURAL_ARMS.includes(label)).map(([label]) => label),
+    ).toEqual(STRUCTURAL_ARMS);
+  });
+
+  it('records the right side of EVERY assignment operator it lists', () => {
+    // Eight of the nine ASSIGNMENT_OPS entries match nothing in the live tree, so the set
+    // could be cut to `=` alone with everything green, and a repaint written as
+    // `this.total += this.paintAndCount()` would leave the registry entirely.
+    const operators = ['=', '+=', '-=', '*=', '/=', '%=', '&&=', '||=', '??='];
+    for (const op of operators) {
+      expect(callsIn(`this.n ${op} this.compute();`), `the ${op} arm`).toEqual(['this.compute']);
+    }
+    // The comma arm is the same shape and equally unexercised by the live tree: without a
+    // case, deleting it loses the second call of a sequence expression silently.
+    expect(callsIn('this.a(), this.b();')).toEqual(['this.a', 'this.b']);
+    const helper = readFileSync(
+      fileURLToPath(new URL('./method_call_sites.ts', import.meta.url)),
+      'utf8',
+    );
+    const from = helper.indexOf('ASSIGNMENT_OPS = new Set');
+    const listed = helper.slice(from, helper.indexOf(']);', from));
+    expect(
+      (listed.match(/ts\.SyntaxKind\./g) ?? []).length,
+      'ASSIGNMENT_OPS grew or shrank: give every operator in it a case above',
+    ).toBe(operators.length);
   });
 });

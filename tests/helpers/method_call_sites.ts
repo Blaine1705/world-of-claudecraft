@@ -81,8 +81,6 @@ export interface MethodScan {
   readonly classMembers: number;
   /** Lines spanned by the method body, braces included. */
   readonly bodyLines: number;
-  /** 1-based line the method's own declaration starts on. */
-  readonly declarationLine: number;
 }
 
 /**
@@ -245,7 +243,7 @@ function visitExpression(
   if (!ts.isCallExpression(expr)) return;
   const chain = calleeChain(expr.expression, w.sf);
   if (chain === null) return;
-  if (slot === 'value' && chain !== 'this' && !chain.startsWith('this.')) return;
+  if (slot === 'value' && !chain.startsWith('this.')) return;
   w.out.push({ call: chain, line: lineOf(w, expr), conditions: [...conditions] });
 }
 
@@ -347,10 +345,5 @@ export function readMethodCallSites(
   for (const stmt of method.body.statements) visitStatement(w, stmt, []);
   const bodyStart = sf.getLineAndCharacterOfPosition(method.body.getStart(sf)).line;
   const bodyEnd = sf.getLineAndCharacterOfPosition(method.body.getEnd()).line;
-  return {
-    sites: w.out,
-    classMembers: cls.members.length,
-    bodyLines: bodyEnd - bodyStart + 1,
-    declarationLine: lineOf(w, method),
-  };
+  return { sites: w.out, classMembers: cls.members.length, bodyLines: bodyEnd - bodyStart + 1 };
 }

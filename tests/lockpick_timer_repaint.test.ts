@@ -138,6 +138,12 @@ describe('lockpick countdown repaint', () => {
     expect(after?.style.width).not.toBe(midWidth);
     // ...and the stale node is not being written any more.
     expect(before?.style.width).toBe(midWidth);
+    // The LABEL is half the countdown and nothing else in the repo touches #lp-timer-value.
+    // Deleting the textContent write, or reverting formatNumber back to toFixed(1), was
+    // green before this. The literal pins the one decimal `NUM1` exists for.
+    // 15s budget, 4s of ticks on the one uninterrupted interval: the rebuild resets the
+    // BAR to full markup but not the clock's end, so the label keeps counting down.
+    expect(h.value()?.textContent).toContain('11.0');
   });
 
   it('writes the urgent class only when it flips', () => {
@@ -156,6 +162,17 @@ describe('lockpick countdown repaint', () => {
     tick(10); // still urgent: no second write
     expect(toggle).toHaveBeenCalledTimes(1);
     toggle.mockRestore();
+  });
+
+  it('flips urgent at 3s, not somewhere in a ten-second band', () => {
+    // The case above samples 13s then 2s, so any threshold in (0, 13) satisfies it. This
+    // straddles the real boundary instead.
+    const h = harness();
+    h.win.openBoard();
+    tick(119); // 3.1s remaining
+    expect(h.wrap()?.classList.contains('lp-timer-urgent')).toBe(false);
+    tick(2); // 2.9s remaining
+    expect(h.wrap()?.classList.contains('lp-timer-urgent')).toBe(true);
   });
 
   it('stops writing the detached nodes when the ante selector replaces the board', () => {
@@ -229,5 +246,24 @@ describe('lockpick countdown repaint', () => {
     h.win.openBoard();
     expect(h.wrap(), 'no budget means no timer block is emitted').toBeNull();
     expect(() => tick(5)).not.toThrow();
+  });
+
+  it('goes quiet when a rebuild drops the timer block out from under a running clock', () => {
+    // The one path that reaches cacheTimerEls' null fallback with an interval still armed,
+    // and the reason the fallback is a null rather than three non-null assertions. Opening
+    // with a budget arms the clock; dropping stepTimeoutMs while moving `row` changes
+    // lockpickRenderSig (so renderBoard runs and emits no timer block) but NOT
+    // lockpickTimerKey (so syncTimer neither restarts nor stops the interval).
+    const h = harness();
+    h.win.openBoard();
+    const stale = h.bar() as HTMLElement;
+    tick(20);
+    const frozen = stale.style.width;
+
+    h.set({ ...VIEW, stepTimeoutMs: null, row: 3 });
+    h.win.repaintIfChanged();
+    expect(h.wrap(), 'the rebuilt board carries no countdown').toBeNull();
+    expect(() => tick(20)).not.toThrow();
+    expect(stale.style.width, 'the dropped node must stop being painted').toBe(frozen);
   });
 });
