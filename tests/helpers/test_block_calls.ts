@@ -200,11 +200,20 @@ const takesCallback = (node: ts.CallExpression): boolean =>
  * calls rooted at a block head whose property chain this module does not resolve.
  *
  * `fileName` is only a label for the parser; nothing is read from disk.
+ *
+ * A source the parser cannot make sense of does NOT throw: `createSourceFile`
+ * recovers and returns a partial tree, so a malformed file yields fewer blocks,
+ * or none, with nothing to say about it. That is the silent-pass direction for
+ * every caller, which is why the `tests/` guard requires each test file to
+ * produce at least one block rather than trusting this to fail loudly.
  */
 export function testBlockCalls(
   source: string,
   fileName = 'source.test.ts',
 ): { blocks: TestBlockCall[]; unresolved: UnresolvedBlockCall[] } {
+  // The trailing `false` is `setParentNodes`, off deliberately: see isCalleeLink,
+  // which takes the parent from the walk below instead so this stays affordable
+  // across 1600 sources.
   const sf = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, false);
   const blocks: TestBlockCall[] = [];
   const unresolved: UnresolvedBlockCall[] = [];
