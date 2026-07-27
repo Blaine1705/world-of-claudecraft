@@ -105,12 +105,12 @@ Per-frame HUD code (anything reached from `Hud.update()`) holds these:
   correct `lastKnownSig` its cheap branch still walked the subtree, allocated, and wrote a
   property per row on every frame. Every branch a per-frame entry point takes needs its own
   change check, so an unchanged frame does nothing at all. That module is also the worked
-  answer to "should a per-frame window move to `HOT_PAINTERS`", and it is NO here for a
-  measured reason: the full write contract is a per-FILE count and the file carries 42
-  build-time raw writes, so pinning them exactly churns on every ordinary edit and never
-  moves when a build-time write starts repeating; and the facet's writers elide through Maps
-  keyed by ELEMENT, so a window that replaces its whole row set per rebuild would strand a
-  cache entry per destroyed node. What holds a per-frame window instead is a behavioral test
+  answer to "should a per-frame window move to `HOT_PAINTERS`", and it is NO here for two
+  reasons, neither of them "windows are cold": the full write contract is a per-FILE token
+  count pinned exactly, which churns on every ordinary markup edit while saying nothing about
+  CADENCE (it cannot tell a repaint write from a build-time one in the same file), and the
+  facet's writers elide through Maps keyed by ELEMENT, so a window that replaces its whole row
+  set per rebuild would strand a cache entry per destroyed node. What holds a per-frame window instead is a behavioral test
   that drives it across repeated identical frames and asserts zero queries, reads and writes
   (`tests/spellbook_tick_repaint.test.ts`); note the READ half, since once every write is
   elided per row an ungated repaint still writes nothing and only the elision checks show up.

@@ -18,27 +18,37 @@
 // (tests/hud_update_drive.test.ts records it as such), so the per-frame contract in
 // src/ui/CLAUDE.md applies to `tickOpen` and everything it reaches: refs resolved
 // once, no per-frame allocation, every repeated write elided. An unchanged frame
-// costs two in-place comparisons and makes no subtree query, no allocation and no
+// costs two in-place comparisons and makes no element lookup, no allocation and no
 // DOM write at all. The two gates that buy that are `knownChanged` (rebuild the
 // rows only when a resolved ability's numbers moved) and `takeControlChange`
 // (repaint the +/- toggles only when the bar state they render moved). Both compare
 // retained values in place rather than through a derived id list or a joined
 // signature string: a gate that allocates to decide it has nothing to do keeps most
-// of the cost it was meant to save.
+// of the cost it was meant to save. What is NOT inside that claim, since it sits at
+// the Hud call site rather than in here: the `isOpen` check that decides whether to
+// tick at all still resolves `#spellbook` by id every frame.
 //
 // It stays a COLD painter in tests/hud_perf_budget.test.ts rather than moving into
-// HOT_PAINTERS, and #2519 settled that on a measurement rather than a preference.
-// The full write contract is a per-FILE count, and this file carries 42 raw writes
-// (.setAttribute 12, .className 7, .textContent 6, .classList 5, .dataset 5,
-// .style 4, .innerHTML 3), every one of them a BUILD-TIME write in render() /
-// appendRow(). Pinning those at exact counts would churn on every ordinary edit
-// while moving no number when the real hazard (a build-time write starting to
-// repeat) lands, which is the argument the cold bucket already settled. The other
-// half of that contract does not fit either: the PainterHost writers elide through
-// Maps KEYED BY ELEMENT, and this window replaces its whole row set on every
-// rebuild, so routing build-time writes through the facet would strand a cache
-// entry per destroyed node. The instrument that does answer the question here is
-// behavioral, and it is tests/spellbook_tick_repaint.test.ts.
+// HOT_PAINTERS, and #2519 settled that rather than leaving it open. Two reasons,
+// neither of them "windows are cold":
+//   - The hot bucket's write contract is a per-FILE token count pinned EXACTLY, and
+//     the count cannot tell CADENCE, which is the only thing #2519 was about. Most
+//     of this file's raw-write tokens are build-time writes in render() /
+//     appendAttackRow() / appendRow(), a minority are the repaint writes in
+//     paintHotbarControls, and several are not writes at all (the style.display
+//     read in isOpen, the classList.contains reads that pick a refocus target).
+//     Pinning the total makes every ordinary edit to the markup a diff line in the
+//     gate while saying nothing about which bucket a given write is in. Re-derive
+//     the numbers with the gate's own instrument (stripComments plus RAW_WRITES in
+//     tests/hud_perf_budget.test.ts) rather than from a figure quoted here, which
+//     would rot: this comment quoted one for exactly one commit before the change
+//     it describes deleted the per-row `dataset` read and falsified it.
+//   - The other half of the contract does not fit at all: the PainterHost writers
+//     elide through Maps KEYED BY ELEMENT, and this window replaces its whole row
+//     set on every rebuild, so routing its build-time writes through the facet
+//     would strand a cache entry per destroyed node.
+// The instrument that does answer a cadence question is behavioral, and it is
+// tests/spellbook_tick_repaint.test.ts.
 
 import { audio } from '../game/audio';
 import { ABILITIES, CLASSES } from '../sim/data';
@@ -179,6 +189,17 @@ export class SpellbookWindow {
    * Walks in place against the retained copy and returns at the first difference,
    * so an unchanged frame costs a bounded run of primitive comparisons and no
    * allocation at all.
+   *
+   * The length check is not redundant with the id compare below it: a set that
+   * SHRANK at the tail leaves every surviving index matching, so without it an
+   * unlearned last ability would keep its row (and its live +/- toggle) for the
+   * rest of the session.
+   *
+   * What it covers is the RESOLVED ABILITY, which is what the summary is built
+   * from, and no more. `deps.abilitySummary` also folds in live player state (the
+   * resource type, spell haste), so a change to those alone does not rebuild here.
+   * That limit predates this gate (the signature string it replaced covered the
+   * same five fields) and is left as it was.
    */
   private knownChanged(known: readonly ResolvedAbility[]): boolean {
     if (known.length !== this.knownIds.length) return true;
@@ -301,7 +322,10 @@ export class SpellbookWindow {
       abilities: [...kit, ...grantedExtra],
       known: world.known,
       // Both bar views are derived from the one latched slot list: one allocation
-      // per rebuild, where the per-frame path pays none.
+      // per rebuild, where the per-frame path pays none. abilityIdByBarSlot feeds
+      // the touch-only "Page N" chip, which appendRow emits at BUILD time and no
+      // repaint touches, so moving an ability between bar slots leaves that chip
+      // until the next rebuild. Pre-existing, and left as it was.
       barAbilityIds: this.lastSlotIds.filter((id): id is string => id !== null),
       abilityIdByBarSlot: this.lastSlotIds,
       hasFreeSlot: this.lastHasFree,

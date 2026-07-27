@@ -88,9 +88,15 @@ describe('spellbook_window: the pinned Attack row', () => {
 
   it('keeps the per-frame refresh syncing the Attack toggle (options can flip it)', () => {
     // The ref is COLLECTED as appendAttackRow builds the button, not re-found by its
-    // marker on every frame (#2519); the marker itself stays, since the drag/drop path
-    // and the stylesheet both key off it. The behavior is driven in
+    // marker on every frame (#2519). The behavior is driven in
     // tests/spellbook_tick_repaint.test.ts.
+    //
+    // The `data-attack-toggle` marker stays, and its remaining readers are worth naming
+    // because none of them is in src/: the styling keys off the `.spell-hotbar-toggle`
+    // CLASS, and the drag path carries HOTBAR_ATTACK_MIME on the row, so after this
+    // change the marker is read only by scripts/spellbook_attack_shot.mjs (the Attack-row
+    // screenshot probe) and by the tests/spellbook_tick_repaint.test.ts harness. Both
+    // break silently if the dataset write is removed as dead.
     expect(code).toContain('this.attackToggle = toggle');
     expect(code).toContain('const attackBtn = this.attackToggle');
     expect(code).toContain("attackBtn.setAttribute('aria-pressed'");
@@ -123,6 +129,18 @@ describe('spellbook_window: mobile action-ring page label (Phase 4, touch-only)'
     expect(code).toContain('abilityIdByBarSlot: this.lastSlotIds');
     expect(code).toContain('this.lastSlotIds.push(slotAbilityId(action))');
     expect(code).toMatch(/slotAbilityId\(action: HotbarAction\): string \| null/);
+  });
+
+  it('takes the bar as Hud LIVE slot array, with no copy in between', () => {
+    // The per-frame change check walks whatever this dep returns, so a defensive copy on
+    // the Hud side would put a fresh 33-element array back on every frame the window is
+    // open, which is the allocation #2519 removed. Nothing behavioral can see that (a copy
+    // compares equal), so the wiring is pinned here.
+    expect(hud).toContain('barActions: () => this.hotbarActions');
+    expect(hud, 'the two allocating derived bar deps should be gone').not.toContain(
+      'barAbilityIds:',
+    );
+    expect(hud).not.toContain('abilityIdByBarSlot:');
   });
 
   it('gates the page label on both a non-null mobilePage AND touch mode', () => {
@@ -169,6 +187,20 @@ describe('spellbook_window: hud.update() refresh call site', () => {
     expect(code).toContain('this.refreshHotbarControlsIfChanged()');
     expect(code).toContain('if (!this.takeControlChange()) return');
     expect(hud).toContain('this.spellbookWindow.refreshHotbarControls();');
+    // The change check walks the slot array IN PLACE. A derived list here would allocate on
+    // every frame the window is open, and no behavioral test can see it (the derived list
+    // compares the same), so the shape is pinned: an index loop over `actions`, no map /
+    // filter / spread.
+    expect(code).toContain('for (let i = 0; i < actions.length; i++)');
+    const movedStart = code.indexOf('private controlsMoved(');
+    const movedBody = code.slice(
+      movedStart,
+      code.indexOf('private paintHotbarControls(', movedStart),
+    );
+    expect(movedStart, 'controlsMoved went missing').toBeGreaterThan(-1);
+    for (const alloc of ['.map(', '.filter(', '.flatMap(', '.concat(', 'new Set(', '...']) {
+      expect(movedBody, `controlsMoved allocates via ${alloc}`).not.toContain(alloc);
+    }
   });
 
   it('keeps the in-place refresh updating the aria-pressed + disabled state per toggle', () => {

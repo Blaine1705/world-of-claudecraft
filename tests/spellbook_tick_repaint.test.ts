@@ -18,20 +18,24 @@
 // build-time write from a per-frame one in any case. Driving the real window across repeated
 // identical frames can, so that is what this file does.
 //
-// WHAT IS ASSERTED, and what is not. An unchanged frame is held to zero DOM queries, zero DOM
-// reads, zero DOM writes, and exactly four dep reads, all of which return a primitive or the
-// caller's own live slot array (asserted by reference). That is the observable half of "no
-// per-frame allocation": Node cannot count allocations, so the claim rests on the window
-// reading nothing per frame that has to be built, and on both gates comparing retained values
-// in place instead of through a derived list or a joined signature string.
+// WHAT IS ASSERTED, and what is not. An unchanged frame is held to zero DOM lookups, zero DOM
+// reads, zero DOM writes, exactly four dep reads, and zero allocating array operations
+// (`watchAlloc` below, which sees `map`/`filter`/`flatMap`/`slice`/`concat`/`join`/`Array.from`
+// plus `@@iterator`, so `for...of`, spread and `new Set(array)` all count). Node cannot count
+// heap allocations directly, so that array watch is the honest approximation and its limit is
+// stated where it lives: a closure or a template literal built inside the tick is invisible to
+// it, which is why both comparison paths are also written as index loops a reader can check.
 //
 // The rebuild gate that got cheaper is still held to what it always covered, and per FIELD:
-// the last describe below drives one talent-shaped change at a time, because a comparison that
-// quietly stopped looking at `cooldown` moves no other assertion in this file.
+// one describe below drives one talent-shaped change at a time, because a comparison that
+// quietly stopped looking at `cooldown` (or at the tail of the list) moves no other assertion
+// in this file.
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ResolvedAbility } from '../src/sim/sim';
+import { tEntity } from '../src/ui/entity_i18n';
 import type { HotbarAction } from '../src/ui/hud/action_bar/hotbar';
+import { t } from '../src/ui/i18n';
 import { SpellbookWindow, type SpellbookWindowDeps } from '../src/ui/spellbook_window';
 
 // jsdom ships no 2D canvas, so the procedural ability-icon compositor cannot run
@@ -63,6 +67,11 @@ function slot(abilityId: string): HotbarAction {
   return { type: 'ability', id: abilityId };
 }
 
+/** An ITEM bar slot. The bar holds these too, and they are not ability ids. */
+function itemSlot(itemId: string): HotbarAction {
+  return { type: 'item', id: itemId };
+}
+
 interface Harness {
   win: SpellbookWindow;
   root: HTMLElement;
@@ -87,7 +96,9 @@ function harness(): Harness {
   const root = document.getElementById('spellbook') as HTMLElement;
   const state = {
     known: KNOWN_IDS.map((id) => resolved(id)),
-    bar: [null, null, null] as HotbarAction[],
+    // Slot 3 holds an ITEM from the start, so the ability/item discrimination in
+    // slotAbilityId is exercised by every case in this file rather than by one.
+    bar: [null, null, null, itemSlot('minor_healing_potion')] as HotbarAction[],
     hasFree: true,
     attackOnBar: true,
   };
@@ -262,6 +273,50 @@ function watchDom(): { writes: string[]; reads: string[]; queries: string[]; sto
   };
 }
 
+/**
+ * Count the array operations that ALLOCATE, at the prototype level.
+ *
+ * "No per-frame allocation" is the half of the acceptance criterion Node cannot measure
+ * directly, and the assertion it replaced (that the harness's own stub hands back the
+ * harness's own array) was true by construction and could not fail for any state of the
+ * window. This can: the shapes that reintroduce the garbage are all array operations, and
+ * `Symbol.iterator` covers `for...of`, spread, and `new Set(array)`, which is the exact
+ * construct the fall-through used to run every frame.
+ *
+ * A LIMIT, stated rather than implied: it sees array work only. A closure allocated inside
+ * the tick, a boxed number, or a template literal is invisible to it, which is why the
+ * comparison paths are also written as index loops that a reader can check by eye.
+ */
+function watchAlloc(): { calls: string[]; stop(): void } {
+  const calls: string[] = [];
+  const undo: Array<() => void> = [];
+  const wrap = (target: object, key: string | symbol, label: string): void => {
+    const original = Reflect.get(target, key) as (...args: unknown[]) => unknown;
+    if (typeof original !== 'function') throw new Error(`watchAlloc: ${label} is not a method`);
+    Reflect.set(target, key, function (this: unknown, ...args: unknown[]) {
+      calls.push(label);
+      return original.apply(this, args);
+    });
+    undo.push(() => {
+      Reflect.set(target, key, original);
+    });
+  };
+  for (const name of ['map', 'filter', 'flatMap', 'slice', 'concat', 'join'] as const) {
+    wrap(Array.prototype, name, `Array#${name}`);
+  }
+  wrap(Array.prototype, Symbol.iterator, 'Array#@@iterator');
+  wrap(Array, 'from', 'Array.from');
+  return {
+    calls,
+    // An INDEX loop, not `for...of`: this teardown runs while the @@iterator spy is
+    // still installed, so iterating here would record a call of its own and the
+    // watcher would report one allocation the code under test never made.
+    stop(): void {
+      for (let i = undo.length - 1; i >= 0; i--) undo[i]();
+    },
+  };
+}
+
 /** Open the window and settle it: after this the retained state matches what was painted. */
 function open(h: Harness): void {
   h.win.toggle();
@@ -411,19 +466,29 @@ describe('spellbook per-frame tick: an unchanged frame costs nothing', () => {
     );
   });
 
-  it('reads only primitives and the caller-owned slot array, four dep calls a frame', () => {
-    // The observable half of "no per-frame allocation": nothing the tick reads has to be
-    // built for it. `barActions` hands back the SAME array the harness owns (the derived id
-    // lists it replaced allocated 34 arrays per call), and the other three are booleans and
-    // the world handle.
+  it('reads exactly four deps a frame, and allocates no array while doing it', () => {
     const h = harness();
     open(h);
     h.resetCalls();
+    const alloc = watchAlloc();
+    for (let i = 0; i < 5; i++) h.win.tickOpen();
+    alloc.stop();
+    expect(h.calls).toEqual({ world: 5, attackOnBar: 5, hasFreeSlot: 5, barActions: 5 });
+    expect(alloc.calls, `the tick allocated: ${[...new Set(alloc.calls)].join(', ')}`).toEqual([]);
+  });
+
+  it('THE ALLOC WATCHER HAS TEETH: a rebuild frame does allocate, and is seen', () => {
+    // Same failure mode as the DOM watcher: a channel only ever asserted EMPTY needs a case
+    // that fills it. render() maps the kit and filters the slot list, so a rebuild is the
+    // natural positive fixture.
+    const h = harness();
+    open(h);
+    const alloc = watchAlloc();
+    h.state.known = KNOWN_IDS.map((id) => resolved(id, id === 'charge' ? { cost: 5 } : {}));
     h.win.tickOpen();
-    expect(h.calls).toEqual({ world: 1, attackOnBar: 1, hasFreeSlot: 1, barActions: 1 });
-    expect(h.deps.barActions(), 'barActions must hand back the live array, not a copy').toBe(
-      h.state.bar,
-    );
+    alloc.stop();
+    expect(alloc.calls).toContain('Array#map');
+    expect(alloc.calls).toContain('Array#filter');
   });
 
   it('does not re-resolve the window root on the fall-through', () => {
@@ -443,6 +508,7 @@ describe('spellbook per-frame tick: a changed frame paints, without walking the 
     open(h);
     const before = h.toggle('charge') as HTMLButtonElement;
     expect(before.getAttribute('aria-pressed')).toBe('false');
+    const label = before.getAttribute('aria-label');
     const watch = watchDom();
     h.state.bar[0] = slot('charge');
     h.win.tickOpen();
@@ -451,6 +517,19 @@ describe('spellbook per-frame tick: a changed frame paints, without walking the 
     expect(before.getAttribute('aria-pressed')).toBe('true');
     expect(before.textContent).toBe('-');
     expect(before.classList.contains('remove')).toBe(true);
+    // The ACCESSIBLE NAME has to move with the state, or a screen reader announces a
+    // pressed control that still says "Add ... to action bar" (WCAG 4.1.2). Asserted as
+    // "it changed, and it now reads as the remove action", not against a literal English
+    // string, since the copy is a t() key.
+    const after = before.getAttribute('aria-label');
+    expect(after, 'the toggle kept its add-state accessible name after going on-bar').not.toBe(
+      label,
+    );
+    expect(after).toBe(
+      t('hudChrome.spellbook.removeFromBarAria', {
+        name: tEntity({ kind: 'ability', id: 'charge', field: 'name' }),
+      }),
+    );
   });
 
   it('writes ONLY the row that flipped, not its neighbours', () => {
@@ -498,6 +577,38 @@ describe('spellbook per-frame tick: a changed frame paints, without walking the 
     expect(off.disabled).toBe(false);
   });
 
+  it('ignores an ITEM moving between bar slots (it is not an ability id)', () => {
+    // The bar holds items too, and the slot reader has to discriminate. Without the type
+    // check an item id lands in the latched slot list, so every potion drag reports a bar
+    // change and repaints every row: exactly the per-event work this change removed. Worse,
+    // the day an item id collides with an ability id, that row would render as on-bar.
+    const h = harness();
+    open(h);
+    const watch = watchDom();
+    h.state.bar[3] = null;
+    h.state.bar[1] = itemSlot('minor_healing_potion');
+    h.win.tickOpen();
+    watch.stop();
+    expect(
+      watch.writes,
+      `moving an item between bar slots repainted: ${watch.writes.join(', ')}`,
+    ).toEqual([]);
+    expect(watch.reads).toEqual([]);
+  });
+
+  it('does not treat an item id as an on-bar ability', () => {
+    // The collision arm, driven directly rather than left to the id namespaces staying
+    // disjoint: an item slot whose id happens to equal an ability's must leave that
+    // ability's row reading as off-bar.
+    const h = harness();
+    open(h);
+    h.state.bar[0] = itemSlot('charge');
+    h.win.tickOpen();
+    const toggle = h.toggle('charge') as HTMLButtonElement;
+    expect(toggle.getAttribute('aria-pressed')).toBe('false');
+    expect(toggle.textContent).toBe('+');
+  });
+
   it('tracks the Attack toggle when only the showAttackButton setting flips', () => {
     // The Attack row's state comes from an Interface setting, not from the bar, so it is the
     // third independent input. The options window can flip it while the spellbook is open.
@@ -505,10 +616,18 @@ describe('spellbook per-frame tick: a changed frame paints, without walking the 
     open(h);
     const attack = h.attackToggle() as HTMLButtonElement;
     expect(attack.getAttribute('aria-pressed')).toBe('true');
+    expect(attack.classList.contains('remove')).toBe(true);
     h.state.attackOnBar = false;
     h.win.tickOpen();
     expect(attack.getAttribute('aria-pressed')).toBe('false');
     expect(attack.textContent).toBe('+');
+    // Its own arm of every write the row toggles get. `remove` is mobile-only styling
+    // (hud.mobile.css), so a stale class leaves a button that adds wearing the remove
+    // colors; and the accessible name is the same WCAG 4.1.2 pairing as the rows.
+    expect(attack.classList.contains('remove')).toBe(false);
+    expect(attack.getAttribute('aria-label')).toBe(
+      t('hudChrome.spellbook.addToBarAria', { name: t('abilityUi.actionBar.attackName') }),
+    );
   });
 });
 
@@ -644,6 +763,22 @@ describe('spellbook per-frame tick: the rebuild gate still watches every summary
     h.win.tickOpen();
     expect(h.toggle('charge')).not.toBe(before);
     expect(h.toggle('execute')).not.toBeNull();
+  });
+
+  it('rebuilds when the LAST known ability goes away', () => {
+    // The one case only the length check catches, and the reason it is not redundant with
+    // the id compare beside it. Drop from the TAIL and every surviving index still matches
+    // positionally, so without the length guard the comparison reports no change and the
+    // window keeps rendering an ability the player no longer has, with a live +/- toggle,
+    // for the rest of the session. Dropping from the MIDDLE shifts the ids and is caught
+    // either way, which is why that case cannot stand in for this one.
+    const h = harness();
+    open(h);
+    const last = KNOWN_IDS[KNOWN_IDS.length - 1];
+    expect(h.toggle(last), 'the fixture must start with the tail ability on screen').not.toBeNull();
+    h.state.known = h.state.known.slice(0, -1);
+    h.win.tickOpen();
+    expect(h.toggle(last), 'an unlearned tail ability kept its action-bar toggle').toBeNull();
   });
 
   it('rebuilds when the SAME numbers arrive on a different ability id', () => {
