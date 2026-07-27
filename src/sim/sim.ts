@@ -6858,13 +6858,13 @@ export class Sim {
     itemId: string,
     count: number,
     pid?: number,
-    opts?: { silent?: boolean; callerLogs?: boolean },
+    opts?: { silent?: boolean; callerLogs?: boolean; craftedRecipeId?: string },
   ): void {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta } = r;
     const def = ITEMS[itemId];
-    addStacked(meta.inventory, itemId, count);
+    addStacked(meta.inventory, itemId, count, undefined, opts?.craftedRecipeId);
     // Every grant that reaches the hub is an acquisition for the Book of
     // Deeds discovery ledger (loot, craft, quest reward, vendor, mail, trade).
     deedsMod.markItemDiscovered(this.ctx, meta, itemId);
@@ -6905,7 +6905,7 @@ export class Sim {
     instance: ItemInstancePayload,
     pid?: number,
     count = 1,
-    opts?: { silent?: boolean; callerLogs?: boolean },
+    opts?: { silent?: boolean; callerLogs?: boolean; craftedRecipeId?: string },
   ): void {
     const r = this.resolve(pid);
     if (!r) return;
@@ -6916,7 +6916,10 @@ export class Sim {
     for (let i = 0; i < count; i++) {
       const mergeTarget = meta.inventory.find(
         (s) =>
-          s.itemId === itemId && s.count < stack && canStackInstancePayloads(s.instance, instance),
+          s.itemId === itemId &&
+          s.count < stack &&
+          s.craftedRecipeId === opts?.craftedRecipeId &&
+          canStackInstancePayloads(s.instance, instance),
       );
       if (mergeTarget) mergeTarget.count += 1;
       // The first pushed slot holds the caller's payload object (the shipped
@@ -6928,6 +6931,7 @@ export class Sim {
           itemId,
           count: 1,
           instance: i === 0 ? instance : cloneItemInstancePayload(instance),
+          ...(opts?.craftedRecipeId === undefined ? {} : { craftedRecipeId: opts.craftedRecipeId }),
         });
     }
     // Discovery ledger: the instance's rolled quality (gathered rares) beats
@@ -7127,9 +7131,26 @@ export class Sim {
     itemId: string,
     index?: number,
     expectedInstance?: ItemInstancePayload,
+    expectedCraftedRecipeId?: string,
+  ): void;
+  buyBackItem(
+    itemId: string,
+    index?: number,
+    expectedInstance?: ItemInstancePayload,
     pid?: number,
+    expectedCraftedRecipeId?: string,
+  ): void;
+  buyBackItem(
+    itemId: string,
+    index?: number,
+    expectedInstance?: ItemInstancePayload,
+    pidOrCraftedRecipeId?: number | string,
+    expectedCraftedRecipeId?: string,
   ): void {
-    items.buyBackItem(this.ctx, itemId, index, pid, expectedInstance);
+    const pid = typeof pidOrCraftedRecipeId === 'number' ? pidOrCraftedRecipeId : undefined;
+    const craftedRecipeId =
+      typeof pidOrCraftedRecipeId === 'string' ? pidOrCraftedRecipeId : expectedCraftedRecipeId;
+    items.buyBackItem(this.ctx, itemId, index, pid, expectedInstance, craftedRecipeId);
   }
 
   // Gather-node harvest (#1121): a thin delegate onto

@@ -116,6 +116,13 @@ describe('buildVendorView buyback', () => {
     ]);
   });
 
+  it('carries crafted provenance so buyback clicks can echo the exact row identity', () => {
+    const items = table(item('vest', { sellValue: 12 }));
+    const buyback: InvSlot[] = [{ itemId: 'vest', count: 1, craftedRecipeId: 'recipe_vest' }];
+    const view = buildVendorView([], buyback, items, RICH);
+    expect(view.buyback[0].craftedRecipeId).toBe('recipe_vest');
+  });
+
   it('skips slots whose item no longer exists or whose count is not positive', () => {
     const items = table(item('sword', { sellValue: 12 }));
     const buyback: InvSlot[] = [

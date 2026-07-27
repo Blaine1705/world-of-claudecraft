@@ -39,5 +39,10 @@ export interface IWorldInventory {
   // (VendorView.buyback[].instance): the server only honors the index when
   // the row still carries this exact payload, so a stale index that now
   // points at a different same-itemId row cannot redeem the wrong copy (#2398).
-  buyBackItem(itemId: string, index?: number, instance?: ItemInstancePayload): void;
+  buyBackItem(
+    itemId: string,
+    index?: number,
+    instance?: ItemInstancePayload,
+    craftedRecipeId?: string,
+  ): void;
 }
