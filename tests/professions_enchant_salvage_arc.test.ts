@@ -31,9 +31,12 @@ import type { InvSlot, PlayerClass, SimEvent } from '../src/sim/types';
 
 const RARE_WEAPON = 'moggers_copper_cudgel'; // rare mace -> resonant_steel
 const COMMON_WEAPON = 'eastbrook_arming_sword';
+const CRAFTED_COMMON_ARMOR = 'eastbrook_chain_vest';
+const CRAFTED_COMMON_ARMOR_RECIPE = 'recipe_eastbrook_chain_vest';
 const ENCHANT = 'enchant_weapon_runed_edge'; // essence x2 + resonant_steel x1
 const ESSENCE = 'arcane_essence';
 const SECONDARY = 'resonant_steel';
+const DUST = 'arcane_dust';
 
 type WireMsg = {
   t: string;
@@ -106,6 +109,25 @@ function simInv(sim: Sim, pid: number): InvSlot[] {
   return meta.inventory;
 }
 
+function metaFor(sim: Sim, pid: number): PlayerMeta {
+  const meta = (sim as unknown as { players: Map<number, PlayerMeta> }).players.get(pid);
+  if (!meta) throw new Error(`no meta for pid ${pid}`);
+  return meta;
+}
+
+function grantVestMaterials(sim: Sim, pid: number): void {
+  sim.addItem('copper_ore', 4, pid);
+  sim.addItem('smithing_flux', 9, pid);
+}
+
+function craftedVestSlotIndex(sim: Sim, pid: number): number {
+  return simInv(sim, pid).findIndex(
+    (slot) =>
+      slot.itemId === CRAFTED_COMMON_ARMOR &&
+      slot.craftedRecipeId === CRAFTED_COMMON_ARMOR_RECIPE,
+  );
+}
+
 function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
   const c: any = Object.create(ClientWorld.prototype);
   c.cfg = { seed: 20061, playerClass };
@@ -160,6 +182,50 @@ function applySnap(client: ClientWorld, snap: unknown): void {
 }
 
 describe('offline Sim end-to-end (IWorld surface)', () => {
+  it('crafted Eastbrook Chainmail Vest stacks yield materials but never teach Enchanting', () => {
+    const sim = new Sim({ seed: 20260726, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = metaFor(sim, pid);
+
+    grantVestMaterials(sim, pid);
+    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    expect(sim.lastCraftResult?.ok).toBe(true);
+    const firstSlotIndex = craftedVestSlotIndex(sim, pid);
+    expect(firstSlotIndex).toBeGreaterThanOrEqual(0);
+    expect(simInv(sim, pid)[firstSlotIndex].instance).toBeUndefined();
+
+    const dustBefore = sim.countItem(DUST, pid);
+    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, firstSlotIndex);
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    expect(sim.countItem(DUST, pid)).toBeGreaterThan(dustBefore);
+    expect(sim.countItem(CRAFTED_COMMON_ARMOR, pid)).toBe(0);
+    expect(meta.craftSkills.enchanting).toBe(0);
+
+    grantVestMaterials(sim, pid);
+    sim.craftItem(CRAFTED_COMMON_ARMOR_RECIPE, false, pid);
+    expect(sim.lastCraftResult?.ok).toBe(true);
+    const secondSlotIndex = craftedVestSlotIndex(sim, pid);
+    expect(secondSlotIndex).toBeGreaterThanOrEqual(0);
+
+    sim.disenchantItem(CRAFTED_COMMON_ARMOR, pid, secondSlotIndex);
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    expect(sim.countItem(CRAFTED_COMMON_ARMOR, pid)).toBe(0);
+    expect(meta.craftSkills.enchanting).toBe(0);
+  });
+
+  it('a non-crafted eligible item still gains Enchanting skill when disenchanted', () => {
+    const sim = new Sim({ seed: 20260727, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = metaFor(sim, pid);
+
+    sim.addItem(COMMON_WEAPON, 1, pid);
+    sim.disenchantItem(COMMON_WEAPON, pid);
+
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    expect(sim.countItem(COMMON_WEAPON, pid)).toBe(0);
+    expect(meta.craftSkills.enchanting).toBe(1);
+  });
+
   it('disenchants a rare (typed secondary), applies a Runed enchant, salvages, with lastX mirrors', () => {
     const sim = new Sim({ seed: 20260721, playerClass: 'warrior', autoEquip: false });
     const inv = () => sim.ctx.resolve()?.meta.inventory ?? [];

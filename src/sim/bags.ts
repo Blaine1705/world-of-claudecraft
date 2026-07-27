@@ -104,12 +104,18 @@ export function countFit(
   itemId: string,
   count: number,
   instance?: ItemInstancePayload,
+  craftedRecipeId?: string,
 ): number {
   const def = ITEMS[itemId];
   const stack = stackSizeOf(def);
   let room = 0;
   for (const s of inventory) {
-    if (s.itemId === itemId && canStackInstancePayloads(s.instance, instance) && s.count < stack) {
+    if (
+      s.itemId === itemId &&
+      canStackInstancePayloads(s.instance, instance) &&
+      s.craftedRecipeId === craftedRecipeId &&
+      s.count < stack
+    ) {
       room += stack - s.count;
     }
   }
@@ -181,8 +187,9 @@ export function fitsAll(
 ): boolean {
   const scratch = inventory.map((s) => ({ ...s }));
   for (const a of adds) {
-    if (countFit(scratch, capacity, a.itemId, a.count, a.instance) < a.count) return false;
-    addStacked(scratch, a.itemId, a.count, a.instance);
+    if (countFit(scratch, capacity, a.itemId, a.count, a.instance, a.craftedRecipeId) < a.count)
+      return false;
+    addStacked(scratch, a.itemId, a.count, a.instance, a.craftedRecipeId);
   }
   return true;
 }
@@ -201,13 +208,19 @@ export function addStacked(
   itemId: string,
   count: number,
   instance?: ItemInstancePayload,
+  craftedRecipeId?: string,
 ): void {
   const def = ITEMS[itemId];
   const stack = stackSizeOf(def);
   let remaining = count;
   for (const s of inventory) {
     if (remaining <= 0) return;
-    if (s.itemId !== itemId || !canStackInstancePayloads(s.instance, instance) || s.count >= stack)
+    if (
+      s.itemId !== itemId ||
+      !canStackInstancePayloads(s.instance, instance) ||
+      s.craftedRecipeId !== craftedRecipeId ||
+      s.count >= stack
+    )
       continue;
     const take = Math.min(stack - s.count, remaining);
     s.count += take;
@@ -218,11 +231,11 @@ export function addStacked(
     // A charge-bearing payload stays one-per-slot; every fresh instanced slot
     // carries its own deep clone so two slots never alias one mutable payload.
     const take = instance && !mergeable ? 1 : Math.min(stack, remaining);
-    inventory.push(
-      instance
-        ? { itemId, count: take, instance: cloneItemInstancePayload(instance) }
-        : { itemId, count: take },
-    );
+    const slot: InvSlot = instance
+      ? { itemId, count: take, instance: cloneItemInstancePayload(instance) }
+      : { itemId, count: take };
+    if (craftedRecipeId !== undefined) slot.craftedRecipeId = craftedRecipeId;
+    inventory.push(slot);
     remaining -= take;
   }
 }
