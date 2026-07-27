@@ -2160,96 +2160,121 @@ export interface FishingEntry {
 // out of the junk rows (tangled_weed / soggy_boot) and the empty-hook null row
 // and into the zone's food-fish rows (the cooking inputs). The moves are
 // strictly monotonic per band step (each food fish non-decreasing, each junk /
-// null row non-increasing), the rare glimmerfin_koi weight is deliberately flat
-// across every band (its odds never scale with skill), every band still sums to
-// exactly 100, and the empty-hook null row is always present with weight >= 1.
-// Band boundaries and selection live in src/sim/professions/fishing.ts
-// (fishingBandFor); FISHING_TABLES_BY_BAND[band][zoneId] is the resolved table,
-// with the eastbrook_vale row as the fallback for any zone without its own.
+// null row non-increasing), every band still sums to exactly 100, and the
+// empty-hook null row is always present with weight >= 1. Band boundaries and
+// selection live in src/sim/professions/fishing.ts (fishingBandFor);
+// FISHING_TABLES_BY_BAND[band][zoneId] is the resolved table, with the
+// eastbrook_vale row as the fallback for any zone without its own.
+//
+// THE AXIS THESE NINE CELLS ARE AUTHORED AGAINST (D9). A cell is not "how good
+// is this angler", it is "how far is this angler from what this water asks".
+// Each zone names a required band (professions/fishing_zones.ts, derived from
+// the rod tier its water takes), and a cell's whole character follows from the
+// distance between that and the band the cell is for:
+//
+//   empty hook   at the requirement 10, one band above 8, two above 6;
+//                one band SHORT 35, two short 55
+//   rare koi     1 / 3 / 6 by band, in every zone: the one row that reads
+//                skill alone, because it is the rod ladder's reagent and a
+//                seasoned angler should be the one who farms it
+//   junk         carries the zone's own flavor (the marsh keeps its boots) and
+//                swells with the shortfall, roughly doubling or worse against
+//                the same zone's at-requirement cell
+//   food fish    whatever is left, split in each zone's shipped proportion
+//
+// So Eastbrook, which asks for nothing, keeps its shipped shape, and Thornpeak
+// at band 0 pays 55 empty hooks and 28 junk out of 100 to a level-1 angler who
+// borrowed a rod good enough to cast there. That is the whole point: the water
+// is the difficulty, not the reel click. tests/fishing_zones.test.ts derives
+// every number above from the schedule and fails on a cell edited past it.
 export const FISHING_TABLES_BY_BAND: Record<string, FishingEntry[]>[] = [
-  // Band 0 (proficiency 0-99): byte-identical to the shipped starter tables, so
-  // every existing seed reproduces the exact same catch sequence.
+  // Band 0 (proficiency 0-99). Eastbrook asks for band 0, so its cell is the
+  // shipped starter table with the koi row moved onto the skill scale; the two
+  // zones above it are where a band-0 angler pays for fishing over their head.
   {
     eastbrook_vale: [
-      { itemId: 'raw_mirror_trout', weight: 45 },
-      { itemId: 'raw_river_perch', weight: 30 },
+      { itemId: 'raw_mirror_trout', weight: 46 },
+      { itemId: 'raw_river_perch', weight: 31 },
       { itemId: 'tangled_weed', weight: 12 },
-      { itemId: 'glimmerfin_koi', weight: 3 },
+      { itemId: 'glimmerfin_koi', weight: 1 },
       { itemId: null, weight: 10 },
     ],
     mirefen_marsh: [
-      { itemId: 'raw_marsh_pike', weight: 40 },
-      { itemId: 'raw_bog_eel', weight: 30 },
-      { itemId: 'soggy_boot', weight: 8 },
-      { itemId: 'tangled_weed', weight: 9 },
-      { itemId: 'glimmerfin_koi', weight: 3 },
-      { itemId: null, weight: 10 },
+      { itemId: 'raw_marsh_pike', weight: 22 },
+      { itemId: 'raw_bog_eel', weight: 17 },
+      { itemId: 'soggy_boot', weight: 12 },
+      { itemId: 'tangled_weed', weight: 13 },
+      { itemId: 'glimmerfin_koi', weight: 1 },
+      { itemId: null, weight: 35 },
     ],
     thornpeak_heights: [
-      { itemId: 'raw_frostgill_trout', weight: 40 },
-      { itemId: 'raw_stonescale_carp', weight: 30 },
-      { itemId: 'tangled_weed', weight: 14 },
-      { itemId: 'glimmerfin_koi', weight: 4 },
-      { itemId: null, weight: 12 },
+      { itemId: 'raw_frostgill_trout', weight: 9 },
+      { itemId: 'raw_stonescale_carp', weight: 7 },
+      { itemId: 'tangled_weed', weight: 28 },
+      { itemId: 'glimmerfin_koi', weight: 1 },
+      { itemId: null, weight: 55 },
     ],
   },
-  // Band 1 (proficiency 100-199): junk and empty hooks give way to more food fish.
+  // Band 1 (proficiency 100-199): Mirefen's own band. Its water fishes
+  // normally now, Eastbrook is one band over and thins further, and Thornpeak
+  // is still one band short.
   {
     eastbrook_vale: [
-      { itemId: 'raw_mirror_trout', weight: 48 },
-      { itemId: 'raw_river_perch', weight: 33 },
+      { itemId: 'raw_mirror_trout', weight: 49 },
+      { itemId: 'raw_river_perch', weight: 32 },
       { itemId: 'tangled_weed', weight: 8 },
       { itemId: 'glimmerfin_koi', weight: 3 },
       { itemId: null, weight: 8 },
     ],
     mirefen_marsh: [
-      { itemId: 'raw_marsh_pike', weight: 43 },
-      { itemId: 'raw_bog_eel', weight: 33 },
+      { itemId: 'raw_marsh_pike', weight: 42 },
+      { itemId: 'raw_bog_eel', weight: 32 },
       { itemId: 'soggy_boot', weight: 6 },
       { itemId: 'tangled_weed', weight: 7 },
       { itemId: 'glimmerfin_koi', weight: 3 },
-      { itemId: null, weight: 8 },
-    ],
-    thornpeak_heights: [
-      { itemId: 'raw_frostgill_trout', weight: 43 },
-      { itemId: 'raw_stonescale_carp', weight: 33 },
-      { itemId: 'tangled_weed', weight: 10 },
-      { itemId: 'glimmerfin_koi', weight: 4 },
       { itemId: null, weight: 10 },
     ],
+    thornpeak_heights: [
+      { itemId: 'raw_frostgill_trout', weight: 27 },
+      { itemId: 'raw_stonescale_carp', weight: 20 },
+      { itemId: 'tangled_weed', weight: 15 },
+      { itemId: 'glimmerfin_koi', weight: 3 },
+      { itemId: null, weight: 35 },
+    ],
   },
-  // Band 2 (proficiency 200+): a seasoned angler; food fish dominate, an empty
-  // hook is rare but never impossible.
+  // Band 2 (proficiency 200, fishing's cap): Thornpeak's own band, and the
+  // only place every zone fishes at or above what it asks. Food fish
+  // dominate, an empty hook is rare but never impossible, and the koi finally
+  // pays out at the rate its recipes are priced against.
   {
     eastbrook_vale: [
-      { itemId: 'raw_mirror_trout', weight: 51 },
-      { itemId: 'raw_river_perch', weight: 36 },
+      { itemId: 'raw_mirror_trout', weight: 50 },
+      { itemId: 'raw_river_perch', weight: 34 },
       { itemId: 'tangled_weed', weight: 4 },
-      { itemId: 'glimmerfin_koi', weight: 3 },
+      { itemId: 'glimmerfin_koi', weight: 6 },
       { itemId: null, weight: 6 },
     ],
     mirefen_marsh: [
-      { itemId: 'raw_marsh_pike', weight: 46 },
-      { itemId: 'raw_bog_eel', weight: 36 },
+      { itemId: 'raw_marsh_pike', weight: 43 },
+      { itemId: 'raw_bog_eel', weight: 34 },
       { itemId: 'soggy_boot', weight: 4 },
       { itemId: 'tangled_weed', weight: 5 },
-      { itemId: 'glimmerfin_koi', weight: 3 },
-      { itemId: null, weight: 6 },
+      { itemId: 'glimmerfin_koi', weight: 6 },
+      { itemId: null, weight: 8 },
     ],
     thornpeak_heights: [
-      { itemId: 'raw_frostgill_trout', weight: 46 },
-      { itemId: 'raw_stonescale_carp', weight: 36 },
+      { itemId: 'raw_frostgill_trout', weight: 44 },
+      { itemId: 'raw_stonescale_carp', weight: 34 },
       { itemId: 'tangled_weed', weight: 6 },
-      { itemId: 'glimmerfin_koi', weight: 4 },
-      { itemId: null, weight: 8 },
+      { itemId: 'glimmerfin_koi', weight: 6 },
+      { itemId: null, weight: 10 },
     ],
   },
 ];
 
 // The band-0 tables, kept under the original export name so existing
 // consumers (the deeds zone-key guard in tests/deeds_content.test.ts) resolve
-// unchanged. Identical object as FISHING_TABLES_BY_BAND[0], so its rows are the
-// shipped rows byte for byte.
+// unchanged. The SAME object as FISHING_TABLES_BY_BAND[0], never a copy.
 export const FISHING_TABLES: Record<string, FishingEntry[]> = FISHING_TABLES_BY_BAND[0];
 
 // The rare catch worth a celebratory shout in the combat log.

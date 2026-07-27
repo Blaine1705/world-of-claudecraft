@@ -179,14 +179,14 @@ describe('bite delay draw contract and rod-tiered bounds', () => {
 
   it('the reel window arms at bite time with the rod-widened width', () => {
     for (const [rod, windowTicks] of [
-      [null, 60],
-      ['ironreel_fishing_rod', 75],
-      ['silverstream_fishing_rod', 90],
+      [null, 50],
+      ['ironreel_fishing_rod', 65],
+      ['silverstream_fishing_rod', 80],
     ] as [string | null, number][]) {
       const sim = makeSim(4242);
       const meta = mustMeta(sim, sim.playerId);
       // #2343 implement gate: the base arm carries the tier-1 pole (identical
-      // to the old bare hands), so the base 60-tick window literal holds.
+      // to the old bare hands), so the base 50-tick window literal holds.
       sim.addItem(rod ?? 'simple_fishing_pole', 1);
       teleportToValeShore(sim);
       const p = sim.player;
@@ -706,7 +706,7 @@ describe('the reel window follows the rod held at BITE time, not cast start', ()
     sim.removeItem('silverstream_fishing_rod', 1);
     sim.tickCount = p.fishBiteAtTick;
     updateCasting(sim.ctx, p, meta);
-    expect(p.fishReelDeadlineTick - sim.tickCount).toBe(60);
+    expect(p.fishReelDeadlineTick - sim.tickCount).toBe(50);
   });
 
   it('a rod picked up between cast start and the bite widens the window', () => {
@@ -722,7 +722,7 @@ describe('the reel window follows the rod held at BITE time, not cast start', ()
     sim.addItem('silverstream_fishing_rod', 1);
     sim.tickCount = p.fishBiteAtTick;
     updateCasting(sim.ctx, p, meta);
-    expect(p.fishReelDeadlineTick - sim.tickCount).toBe(90);
+    expect(p.fishReelDeadlineTick - sim.tickCount).toBe(80);
   });
 });
 

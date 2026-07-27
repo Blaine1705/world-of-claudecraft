@@ -2194,7 +2194,8 @@ export const es: EnTranslations = {
       "toolTierUnmet": {
         "mining": "Necesitas un pico de minería de nivel {tier} para extraer esta veta.",
         "logging": "Necesitas un hacha de tala de nivel {tier} para talar este rodal.",
-        "herbalism": "Necesitas una hoz de herboristería de nivel {tier} para recolectar esta parcela."
+        "herbalism": "Necesitas una hoz de herboristería de nivel {tier} para recolectar esta parcela.",
+        "fishing": "You need a tier {tier} fishing rod to fish these waters."
       },
       "toolRequired": {
         "mining": "Necesitas un pico de minero para explotar esta veta.",

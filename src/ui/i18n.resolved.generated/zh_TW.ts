@@ -2194,7 +2194,8 @@ export const zh_TW: EnTranslations = {
       "toolTierUnmet": {
         "mining": "你需要{tier}階採礦鎬才能開採這條礦脈。",
         "logging": "你需要{tier}階伐木斧才能砍伐這片林木。",
-        "herbalism": "你需要{tier}階草藥鐮才能採集這片草藥叢。"
+        "herbalism": "你需要{tier}階草藥鐮才能採集這片草藥叢。",
+        "fishing": "You need a tier {tier} fishing rod to fish these waters."
       },
       "toolRequired": {
         "mining": "你需要採礦鎬才能開採這條礦脈。",

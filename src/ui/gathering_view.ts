@@ -124,16 +124,24 @@ export function buildGatherNodeTooltip(
 
 /** The i18n key the gatherDenied SimEvent's error toast resolves (the sim is
  *  text-free: the client composes its own copy off surface + professionId +
- *  requiredTier). Surface 'fishing' is the startFishing implement gate
- *  (#2343); surface 'node' with requiredTier 1 means "no tool owned at all"
- *  so the tierless line is used; anything unexpected falls back to the
+ *  requiredTier). Surface 'fishing' carries BOTH fishing denials and splits on
+ *  requiredTier exactly like the node arm below: tier 1 is the startFishing
+ *  implement gate (#2343, no tackle at all, so no tier is named), tier 2 and
+ *  up is the zone rod gate (D9, this water takes a better rod, so the tier IS
+ *  named). Without the split a player standing in Thornpeak holding a tier-2
+ *  rod would be told to go and get a fishing pole they are already carrying.
+ *  Surface 'node' splits the same way; anything unexpected falls back to the
  *  profession-neutral corpse line. */
 export function gatherDeniedLineKey(
   surface: 'node' | 'corpse' | 'fishing',
   professionId?: GatheringProfessionId,
   requiredTier?: number,
 ): TranslationKey {
-  if (surface === 'fishing') return 'hudChrome.gathering.toolRequired.fishing';
+  if (surface === 'fishing') {
+    return requiredTier !== undefined && requiredTier > 1
+      ? 'hudChrome.gathering.toolTierUnmet.fishing'
+      : 'hudChrome.gathering.toolRequired.fishing';
+  }
   if (surface === 'node') {
     if (professionId === 'mining' || professionId === 'logging' || professionId === 'herbalism') {
       return requiredTier !== undefined && requiredTier <= 1

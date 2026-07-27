@@ -166,7 +166,7 @@ const B0_SEQ_4242: (string | null)[] = [
   TROUT,
   PERCH,
   TROUT,
-  KOI,
+  WEED,
   TROUT,
   TROUT,
   TROUT,
@@ -240,7 +240,7 @@ const B2_SEQ_4242: (string | null)[] = [
   TROUT,
   PERCH,
   TROUT,
-  WEED,
+  KOI,
   TROUT,
   TROUT,
   TROUT,
@@ -252,8 +252,8 @@ const B2_SEQ_4242: (string | null)[] = [
   TROUT,
   TROUT,
   TROUT,
-  WEED,
-  TROUT,
+  KOI,
+  PERCH,
 ];
 
 // Probe candidate shore spots around the Deepfen Shallows lake with the REAL
@@ -290,9 +290,11 @@ function codfatherSim(): { sim: Sim; meta: PlayerMeta } {
   const sim = makeSim();
   const meta = sim.meta(sim.playerId)!;
   // The shore probe drives the REAL startFishing, whose implement gate
-  // (#2343) needs tackle in bags. The pole is not a gatherTool (tier still
-  // floors to 1), so it changes no draw and no deadline.
-  sim.addItem('simple_fishing_pole', 1);
+  // (#2343) needs tackle in bags AND whose zone gate needs a rod the water
+  // takes. The Deepfen Shallows sit in Mirefen, which asks for tier 2, so the
+  // simple pole alone can no longer reach this quest's water: the Ironreel is
+  // the tackle the Codfather now costs. Pinned on its own below.
+  sim.addItem('ironreel_fishing_rod', 1);
   meta.questLog.set('q_the_codfather', {
     questId: 'q_the_codfather',
     counts: [0],
@@ -664,30 +666,33 @@ describe('fishing band function (pin 4)', () => {
   });
 });
 
-// Literal shipped band-0 rows (order included). NEVER derive these from the
-// content table: the whole point is to red-flag drift in the source.
-const SHIPPED_B0_ROWS: Record<string, { itemId: string | null; weight: number }[]> = {
+// Literal band-0 rows (order included). NEVER derive these from the content
+// table: the whole point is to red-flag drift in the source. Eastbrook asks
+// for band 0, so its row is the starter table it has always been apart from
+// the koi, which moved onto the skill scale; Mirefen and Thornpeak are what a
+// band-0 angler gets for fishing one and two bands over their head.
+const B0_ROWS: Record<string, { itemId: string | null; weight: number }[]> = {
   eastbrook_vale: [
-    { itemId: TROUT, weight: 45 },
-    { itemId: PERCH, weight: 30 },
+    { itemId: TROUT, weight: 46 },
+    { itemId: PERCH, weight: 31 },
     { itemId: WEED, weight: 12 },
-    { itemId: KOI, weight: 3 },
+    { itemId: KOI, weight: 1 },
     { itemId: null, weight: 10 },
   ],
   mirefen_marsh: [
-    { itemId: 'raw_marsh_pike', weight: 40 },
-    { itemId: 'raw_bog_eel', weight: 30 },
-    { itemId: 'soggy_boot', weight: 8 },
-    { itemId: WEED, weight: 9 },
-    { itemId: KOI, weight: 3 },
-    { itemId: null, weight: 10 },
+    { itemId: 'raw_marsh_pike', weight: 22 },
+    { itemId: 'raw_bog_eel', weight: 17 },
+    { itemId: 'soggy_boot', weight: 12 },
+    { itemId: WEED, weight: 13 },
+    { itemId: KOI, weight: 1 },
+    { itemId: null, weight: 35 },
   ],
   thornpeak_heights: [
-    { itemId: 'raw_frostgill_trout', weight: 40 },
-    { itemId: 'raw_stonescale_carp', weight: 30 },
-    { itemId: WEED, weight: 14 },
-    { itemId: KOI, weight: 4 },
-    { itemId: null, weight: 12 },
+    { itemId: 'raw_frostgill_trout', weight: 9 },
+    { itemId: 'raw_stonescale_carp', weight: 7 },
+    { itemId: WEED, weight: 28 },
+    { itemId: KOI, weight: 1 },
+    { itemId: null, weight: 55 },
   ],
 };
 
@@ -702,11 +707,10 @@ const JUNK_ROWS: Record<string, string[]> = {
   mirefen_marsh: ['soggy_boot', WEED],
   thornpeak_heights: [WEED],
 };
-const KOI_WEIGHT: Record<string, number> = {
-  eastbrook_vale: 3,
-  mirefen_marsh: 3,
-  thornpeak_heights: 4,
-};
+// The rare catch is the one row that reads SKILL alone: identical in every
+// zone, rising with the band, because it is the rod ladder's reagent and the
+// angler who earned the band should be the one who farms it.
+const KOI_WEIGHT_BY_BAND = [1, 3, 6];
 
 function weightOf(band: number, zoneId: string, itemId: string | null): number {
   const row = FISHING_TABLES_BY_BAND[band][zoneId].find((r) => r.itemId === itemId);
@@ -715,10 +719,10 @@ function weightOf(band: number, zoneId: string, itemId: string | null): number {
 }
 
 describe('fishing table structure (pin 5)', () => {
-  it('band 0 rows for all three zones literally equal the shipped rows, in order', () => {
+  it('band 0 rows for all three zones literally equal the authored rows, in order', () => {
     expect(FISHING_TABLES_BY_BAND).toHaveLength(3);
     for (const zoneId of ZONE_IDS) {
-      expect(FISHING_TABLES_BY_BAND[0][zoneId]).toEqual(SHIPPED_B0_ROWS[zoneId]);
+      expect(FISHING_TABLES_BY_BAND[0][zoneId]).toEqual(B0_ROWS[zoneId]);
     }
   });
 
@@ -734,12 +738,17 @@ describe('fishing table structure (pin 5)', () => {
     }
   });
 
-  it('glimmerfin_koi weight never scales with skill: literally 3/3/4 per zone in every band', () => {
+  it('glimmerfin_koi weight scales with SKILL and nothing else: literally 1/3/6 in every zone', () => {
     for (let band = 0; band < 3; band++) {
       for (const zoneId of ZONE_IDS) {
-        expect(weightOf(band, zoneId, KOI), `${zoneId} band ${band} koi`).toBe(KOI_WEIGHT[zoneId]);
+        expect(weightOf(band, zoneId, KOI), `${zoneId} band ${band} koi`).toBe(
+          KOI_WEIGHT_BY_BAND[band],
+        );
       }
     }
+    // The row really moves, so the loop above is not three copies of one
+    // number, and it moves UP: this is the only row a shortfall never touches.
+    expect(KOI_WEIGHT_BY_BAND[0]).toBeLessThan(KOI_WEIGHT_BY_BAND[2]);
   });
 
   it('band steps are monotonic: food fish never lose weight, junk and empty hooks never gain', () => {
@@ -769,9 +778,9 @@ describe('fishing table structure (pin 5)', () => {
     expect(FISHING_TABLES).toBe(FISHING_TABLES_BY_BAND[0]);
   });
 
-  it('no band introduces an item id outside the shipped band-0 set (zero new items)', () => {
+  it('no band introduces an item id outside the band-0 set (zero new items)', () => {
     for (const zoneId of ZONE_IDS) {
-      const shipped = new Set(SHIPPED_B0_ROWS[zoneId].map((r) => r.itemId));
+      const shipped = new Set(B0_ROWS[zoneId].map((r) => r.itemId));
       for (let band = 0; band < 3; band++) {
         for (const row of FISHING_TABLES_BY_BAND[band][zoneId]) {
           expect(shipped.has(row.itemId), `${zoneId} band ${band} id ${row.itemId}`).toBe(true);
@@ -1005,10 +1014,15 @@ describe('fishingResult event (pin 7)', () => {
   it('quality mirrors the caught ItemDef (poor for weed, uncommon for koi); silent on no-bite', () => {
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
+    // Band 2, because the koi is a skill-scaled row now: at band 0 it is one
+    // weight in a hundred and a short walk would not reach one. The event
+    // shape under test is band-agnostic; only how long you wait is not.
+    meta.gatheringProficiency.fishing = 200;
+    sim.addItem('silverstream_fishing_rod', 1);
     let weedEvent: FishingResultEvent | undefined;
     let koiEvent: FishingResultEvent | undefined;
     let sawNoBite = false;
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 32; i++) {
       const { caught, events } = castOnce(sim, meta);
       const results = fishingResultsIn(events);
       if (caught === null) {
@@ -1024,7 +1038,8 @@ describe('fishingResult event (pin 7)', () => {
         if (caught === KOI) koiEvent = results[0];
       }
     }
-    // The seed 4242 run covers all three arms (see B0_SEQ_4242).
+    // The seed 4242 band-2 run covers all three arms: koi at 16, weed at 22,
+    // empty hook at 31.
     expect(sawNoBite).toBe(true);
     expect(weedEvent?.quality).toBe('poor');
     expect(koiEvent?.quality).toBe('uncommon');
@@ -1148,14 +1163,17 @@ describe('fishing deeds through the extracted module path (pin 9)', () => {
     // Acceptance criterion 3: the rare catch and its deed complete unchanged
     // through the extracted module path. col_glimmerfin is a collectItems
     // trigger riding the addItem collection path, so a real completeFishing
-    // koi (B0_SEQ_4242 index 21) must credit it end to end.
+    // koi must credit it end to end. Driven at band 2, the band the koi row is
+    // now weighted for; the deed itself has no band condition.
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
+    meta.gatheringProficiency.fishing = 200;
+    sim.addItem('silverstream_fishing_rod', 1);
     let koiAt = -1;
-    for (let i = 0; i < 22; i++) {
+    for (let i = 0; i < 17; i++) {
       if (castOnce(sim, meta).caught === KOI) koiAt = i;
     }
-    expect(koiAt).toBe(21);
+    expect(koiAt).toBe(16);
     expect(sim.events).toContainEqual(
       expect.objectContaining({
         type: 'log',

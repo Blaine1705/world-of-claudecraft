@@ -2194,7 +2194,8 @@ export const nl_NL: EnTranslations = {
       "toolTierUnmet": {
         "mining": "Je hebt een rang {tier} mijnhouweel nodig om deze ader te oogsten.",
         "logging": "Je hebt een rang {tier} kapbijl nodig om deze opstand te kappen.",
-        "herbalism": "Je hebt een rang {tier} kruidenkunde-sikkel nodig om dit veld te verzamelen."
+        "herbalism": "Je hebt een rang {tier} kruidenkunde-sikkel nodig om dit veld te verzamelen.",
+        "fishing": "You need a tier {tier} fishing rod to fish these waters."
       },
       "toolRequired": {
         "mining": "Je hebt een mijnhouweel nodig om deze ertsader te ontginnen.",

@@ -2194,7 +2194,8 @@ export const vi_VN: EnTranslations = {
       "toolTierUnmet": {
         "mining": "Bạn cần cuốc khai khoáng bậc {tier} để khai thác mạch này.",
         "logging": "Bạn cần rìu đốn gỗ bậc {tier} để đốn bãi này.",
-        "herbalism": "Bạn cần liềm hái thảo dược bậc {tier} để thu hoạch bụi này."
+        "herbalism": "Bạn cần liềm hái thảo dược bậc {tier} để thu hoạch bụi này.",
+        "fishing": "You need a tier {tier} fishing rod to fish these waters."
       },
       "toolRequired": {
         "mining": "Bạn cần cuốc khai khoáng để khai thác mạch quặng này.",

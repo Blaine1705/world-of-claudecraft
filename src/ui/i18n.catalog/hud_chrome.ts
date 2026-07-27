@@ -2399,11 +2399,14 @@ export const hudChromeStrings = {
       logging: 'Requires a logging axe',
       herbalism: 'Requires a herbalism sickle',
     },
-    // gatherDenied error toast, surface 'node', worded per node family.
+    // gatherDenied error toast for a named tier: surface 'node' worded per
+    // node family, plus the fishing arm, which is the ZONE rod gate (this
+    // water takes a better rod than the one you carry) rather than a node.
     toolTierUnmet: {
       mining: 'You need a tier {tier} mining pick to harvest this vein.',
       logging: 'You need a tier {tier} logging axe to fell this stand.',
       herbalism: 'You need a tier {tier} herbalism sickle to gather this patch.',
+      fishing: 'You need a tier {tier} fishing rod to fish these waters.',
     },
     // gatherDenied error toast for requiredTier 1 (#2343): the player owns no
     // matching tool at all, so no tier number is named. The fishing arm is

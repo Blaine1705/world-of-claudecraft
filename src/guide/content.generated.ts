@@ -7285,7 +7285,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
       "biteMinSec": 3,
       "biteMaxSec": 8,
       "rodBiteReductionSec": 1.5,
-      "reelWindowSec": 3,
+      "reelWindowSec": 2.5,
       "reelRodBonusSec": 0.75,
       "sessionCapSec": 15,
       "schedule": [
@@ -7319,12 +7319,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Mirror Trout",
-                  "pct": 45,
+                  "pct": 46,
                   "quality": "common"
                 },
                 {
                   "name": "Raw River Perch",
-                  "pct": 30,
+                  "pct": 31,
                   "quality": "common"
                 },
                 {
@@ -7334,7 +7334,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 3,
+                  "pct": 1,
                   "quality": "uncommon"
                 },
                 {
@@ -7349,32 +7349,32 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Marsh Pike",
-                  "pct": 40,
+                  "pct": 22,
                   "quality": "common"
                 },
                 {
                   "name": "Raw Bog Eel",
-                  "pct": 30,
+                  "pct": 17,
                   "quality": "common"
                 },
                 {
                   "name": "Soggy Boot",
-                  "pct": 8,
+                  "pct": 12,
                   "quality": "poor"
                 },
                 {
                   "name": "Tangled Weed",
-                  "pct": 9,
+                  "pct": 13,
                   "quality": "poor"
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 3,
+                  "pct": 1,
                   "quality": "uncommon"
                 },
                 {
                   "name": null,
-                  "pct": 10,
+                  "pct": 35,
                   "quality": null
                 }
               ]
@@ -7384,27 +7384,27 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Frostgill Trout",
-                  "pct": 40,
+                  "pct": 9,
                   "quality": "common"
                 },
                 {
                   "name": "Raw Slatefin Carp",
-                  "pct": 30,
+                  "pct": 7,
                   "quality": "common"
                 },
                 {
                   "name": "Tangled Weed",
-                  "pct": 14,
+                  "pct": 28,
                   "quality": "poor"
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 4,
+                  "pct": 1,
                   "quality": "uncommon"
                 },
                 {
                   "name": null,
-                  "pct": 12,
+                  "pct": 55,
                   "quality": null
                 }
               ]
@@ -7421,12 +7421,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Mirror Trout",
-                  "pct": 48,
+                  "pct": 49,
                   "quality": "common"
                 },
                 {
                   "name": "Raw River Perch",
-                  "pct": 33,
+                  "pct": 32,
                   "quality": "common"
                 },
                 {
@@ -7451,12 +7451,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Marsh Pike",
-                  "pct": 43,
+                  "pct": 42,
                   "quality": "common"
                 },
                 {
                   "name": "Raw Bog Eel",
-                  "pct": 33,
+                  "pct": 32,
                   "quality": "common"
                 },
                 {
@@ -7476,7 +7476,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                 },
                 {
                   "name": null,
-                  "pct": 8,
+                  "pct": 10,
                   "quality": null
                 }
               ]
@@ -7486,27 +7486,27 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Frostgill Trout",
-                  "pct": 43,
+                  "pct": 27,
                   "quality": "common"
                 },
                 {
                   "name": "Raw Slatefin Carp",
-                  "pct": 33,
+                  "pct": 20,
                   "quality": "common"
                 },
                 {
                   "name": "Tangled Weed",
-                  "pct": 10,
+                  "pct": 15,
                   "quality": "poor"
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 4,
+                  "pct": 3,
                   "quality": "uncommon"
                 },
                 {
                   "name": null,
-                  "pct": 10,
+                  "pct": 35,
                   "quality": null
                 }
               ]
@@ -7523,12 +7523,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Mirror Trout",
-                  "pct": 51,
+                  "pct": 50,
                   "quality": "common"
                 },
                 {
                   "name": "Raw River Perch",
-                  "pct": 36,
+                  "pct": 34,
                   "quality": "common"
                 },
                 {
@@ -7538,7 +7538,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 3,
+                  "pct": 6,
                   "quality": "uncommon"
                 },
                 {
@@ -7553,12 +7553,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Marsh Pike",
-                  "pct": 46,
+                  "pct": 43,
                   "quality": "common"
                 },
                 {
                   "name": "Raw Bog Eel",
-                  "pct": 36,
+                  "pct": 34,
                   "quality": "common"
                 },
                 {
@@ -7573,12 +7573,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 3,
+                  "pct": 6,
                   "quality": "uncommon"
                 },
                 {
                   "name": null,
-                  "pct": 6,
+                  "pct": 8,
                   "quality": null
                 }
               ]
@@ -7588,12 +7588,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
               "rows": [
                 {
                   "name": "Raw Frostgill Trout",
-                  "pct": 46,
+                  "pct": 44,
                   "quality": "common"
                 },
                 {
                   "name": "Raw Slatefin Carp",
-                  "pct": 36,
+                  "pct": 34,
                   "quality": "common"
                 },
                 {
@@ -7603,12 +7603,12 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                 },
                 {
                   "name": "Sunglint Koi",
-                  "pct": 4,
+                  "pct": 6,
                   "quality": "uncommon"
                 },
                 {
                   "name": null,
-                  "pct": 8,
+                  "pct": 10,
                   "quality": null
                 }
               ]

@@ -2194,7 +2194,8 @@ export const pl_PL: EnTranslations = {
       "toolTierUnmet": {
         "mining": "Potrzebujesz kilofika górniczego {tier} poziomu, by zebrać tę żyłę.",
         "logging": "Potrzebujesz siekiery drwala {tier} poziomu, by ściąć ten drzewostan.",
-        "herbalism": "Potrzebujesz sierpa zielarskiego {tier} poziomu, by zebrać ten łan."
+        "herbalism": "Potrzebujesz sierpa zielarskiego {tier} poziomu, by zebrać ten łan.",
+        "fishing": "You need a tier {tier} fishing rod to fish these waters."
       },
       "toolRequired": {
         "mining": "Potrzebujesz kilofa górniczego, aby wydobyć rudę z tej żyły.",

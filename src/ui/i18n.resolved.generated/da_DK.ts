@@ -2194,7 +2194,8 @@ export const da_DK: EnTranslations = {
       "toolTierUnmet": {
         "mining": "Du har brug for en niveau {tier} mineøkse for at høste denne åre.",
         "logging": "Du har brug for en niveau {tier} skovhuggeøkse for at fælde denne lund.",
-        "herbalism": "Du har brug for en niveau {tier} urtesegl for at samle denne plette."
+        "herbalism": "Du har brug for en niveau {tier} urtesegl for at samle denne plette.",
+        "fishing": "You need a tier {tier} fishing rod to fish these waters."
       },
       "toolRequired": {
         "mining": "Du har brug for en minehakke for at høste denne åre.",

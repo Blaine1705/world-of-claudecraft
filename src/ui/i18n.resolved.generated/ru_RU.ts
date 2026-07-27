@@ -2194,7 +2194,8 @@ export const ru_RU: EnTranslations = {
       "toolTierUnmet": {
         "mining": "Чтобы разработать эту жилу, нужна шахтерская кирка {tier} уровня.",
         "logging": "Чтобы срубить этот древостой, нужен лесорубный топор {tier} уровня.",
-        "herbalism": "Чтобы собрать эти заросли, нужен серп травника {tier} уровня."
+        "herbalism": "Чтобы собрать эти заросли, нужен серп травника {tier} уровня.",
+        "fishing": "You need a tier {tier} fishing rod to fish these waters."
       },
       "toolRequired": {
         "mining": "Чтобы разработать эту жилу, нужна шахтерская кирка.",

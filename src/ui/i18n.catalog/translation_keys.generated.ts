@@ -6032,6 +6032,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.gathering.toolRequired.herbalism'
   | 'hudChrome.gathering.toolRequired.logging'
   | 'hudChrome.gathering.toolRequired.mining'
+  | 'hudChrome.gathering.toolTierUnmet.fishing'
   | 'hudChrome.gathering.toolTierUnmet.herbalism'
   | 'hudChrome.gathering.toolTierUnmet.logging'
   | 'hudChrome.gathering.toolTierUnmet.mining'

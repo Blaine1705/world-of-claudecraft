@@ -2194,7 +2194,8 @@ export const cs_CZ: EnTranslations = {
       "toolTierUnmet": {
         "mining": "K vytěžení této žíly potřebuješ krumpáč úrovně {tier}.",
         "logging": "K pokácení tohoto porostu potřebuješ dřevorubeckou sekeru úrovně {tier}.",
-        "herbalism": "K sesbírání tohoto záhonu potřebuješ bylinkářský srp úrovně {tier}."
+        "herbalism": "K sesbírání tohoto záhonu potřebuješ bylinkářský srp úrovně {tier}.",
+        "fishing": "You need a tier {tier} fishing rod to fish these waters."
       },
       "toolRequired": {
         "mining": "K vytěžení této žíly potřebuješ hornický krumpáč.",

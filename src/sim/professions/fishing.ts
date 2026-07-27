@@ -10,7 +10,9 @@
 // proficiency grant on the tick path like any other gathering harvest, and
 // the accrued proficiency selects a catch rarity band (fishingBandFor) whose
 // per-zone table shifts weight out of junk/empty-hook rows and into food fish
-// as skill rises. Draw contract: a normal session draws one rng
+// as skill rises. Where a zone's water sits on that ladder, and which rod it
+// takes to cast there at all, live in professions/fishing_zones.ts.
+// Draw contract: a normal session draws one rng
 // value at cast start (the bite delay) and one more at a landed reel (the
 // table); a miss stays at one; the codfather reel draws nothing (early
 // return); a bags-full reel still draws the table (capacity gates after the
@@ -26,6 +28,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { DT, type Entity, FISHING_CAST_ID, FISHING_SESSION_CAP_SEC, isConsuming } from '../types';
 import { groundHeight, waterLevelAt } from '../world';
+import { rodTierRequiredForZone } from './fishing_zones';
 import { queueGatheringGrant } from './gathering';
 import { PROFICIENCY_BAND_THRESHOLDS, proficiencyBandFor } from './proficiency_bands';
 import { bestOwnedGatherToolTier, canGatherTier, hasFishingImplement } from './tools';
@@ -49,14 +52,23 @@ export const FISHING_BAND_THRESHOLDS = PROFICIENCY_BAND_THRESHOLDS;
 // Bite minigame timing (Professions 2.0), all in seconds. The
 // hidden bite delay is ONE seeded draw in [MIN, effMax]; a better rod (tier
 // above 1) pulls effMax down by ROD_REDUCTION per tier and never moves MIN
-// (tier 2 covers [3, 6.5], tier 3 covers [3, 5]). The reel window opens at
-// the bite and lasts WINDOW plus ROD_BONUS per rod tier above 1 (tier 3
-// reaches 4.5 s), re-scanning the rod at bite time. Named constants so the
-// tests pin the rod synergy directly.
+// (tier 2 covers [3, 6.5], tier 3 covers [3, 5], and tier 5 sits flat on the
+// [3, 3] floor, which is the ladder's top rung by design rather than by
+// accident: past tier 4.3 the reduction has nothing left to take). The reel
+// window opens at the bite and lasts WINDOW plus ROD_BONUS per rod tier above
+// 1 (tier 3 reaches 4.0 s, tier 5 reaches 5.5 s), re-scanning the rod at bite
+// time. Named constants so the tests pin the rod synergy directly.
+//
+// The reel window is 2.50 rather than the 3.00 it shipped at: a light trim
+// only, and deliberately not the place the difficulty lives. Fishing's
+// difficulty is skill versus spot (D9, professions/fishing_zones.ts), and
+// every further second cut off this window is a platform tax rather than a
+// skill test, since a mobile player pays 50 ms of tick quantization plus a
+// network round trip out of it before their thumb has moved.
 export const FISH_BITE_DELAY_MIN_SEC = 3;
 export const FISH_BITE_DELAY_MAX_SEC = 8;
 export const FISH_BITE_DELAY_ROD_REDUCTION_SEC = 1.5;
-export const FISH_REEL_WINDOW_SEC = 3;
+export const FISH_REEL_WINDOW_SEC = 2.5;
 export const FISH_REEL_WINDOW_ROD_BONUS_SEC = 0.75;
 
 // Which catch table band a given fishing proficiency selects. Pure state (no
@@ -177,6 +189,27 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
     });
     return;
   }
+  // Zone rod gate (D9, the skill-versus-spot axis): each zone's water names
+  // the rod tier it takes (professions/fishing_zones.ts), read through the
+  // same canGatherTier comparator every node gate uses. Sits immediately
+  // BESIDE the implement gate above, so the two tackle checks stay together
+  // and both answer before the water check and before the one bite-delay
+  // draw: a denial is rng-free, starts no cast, and names the real blocker
+  // wherever the player is standing. The zone comes from the SAME expression
+  // completeFishing resolves its catch table with (zoneAt(p.pos.z)), so a
+  // player can never be denied for one zone's requirement and then fished
+  // against another zone's table.
+  const requiredRodTier = rodTierRequiredForZone(zoneAt(p.pos.z).id);
+  if (!canGatherTier(bestOwnedGatherToolTier(meta.inventory, 'fishing', ITEMS), requiredRodTier)) {
+    ctx.emit({
+      type: 'gatherDenied',
+      pid: meta.entityId,
+      surface: 'fishing',
+      professionId: 'fishing',
+      requiredTier: requiredRodTier,
+    });
+    return;
+  }
   if (!hasFishableWaterAhead(ctx, p)) {
     ctx.error(meta.entityId, 'You need to face fishable water.');
     return;
@@ -231,6 +264,21 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   // band-capped catch. All of this is pure
   // state resolved before the single rng draw below, so the one-draw-per-catch
   // contract and every existing seed's catch sequence are untouched.
+  //
+  // TWO ROD RULES, KEPT SEPARATE ON PURPOSE, because they answer different
+  // questions and a player reads them differently. The zone gate in
+  // startFishing decides ACCESS and DENIES out loud (no cast, a named tier in
+  // the toast). This cap decides QUALITY and stays silent (the cast lands, one
+  // band lower). Folding them into one rule breaks whichever half it adopts: a
+  // silent zone gate would leave a player casting forever into water that can
+  // never pay them, and a loud quality cap would refuse the cast of anyone
+  // whose proficiency has outrun their rod in their OWN water, which is the
+  // ordinary state of every angler mid-climb. What keeps them from overlapping
+  // is that the zone gate already forces rodTier >= the zone's tier, so the
+  // effective band can only fall short of the zone's own band through
+  // PROFICIENCY. In other words the silent cap can only ever cost a player
+  // who is over-rodded for where they stand, never one whose rod is illegal
+  // for the water: that case was already refused, in words, before the cast.
   const rodTier = bestOwnedGatherToolTier(meta.inventory, 'fishing', ITEMS);
   let allowedBand: 0 | 1 | 2 = 0;
   if (canGatherTier(rodTier, 2)) allowedBand = 1;

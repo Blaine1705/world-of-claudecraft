@@ -2194,7 +2194,8 @@ export const tr_TR: EnTranslations = {
       "toolTierUnmet": {
         "mining": "Bu damarı işlemek için {tier}. kademe madenci kazmasına ihtiyacınız var.",
         "logging": "Bu korulugu devirmek için {tier}. kademe odun kesme baltasına ihtiyacınız var.",
-        "herbalism": "Bu tarlayı toplamak için {tier}. kademe bitkicilik orakına ihtiyacınız var."
+        "herbalism": "Bu tarlayı toplamak için {tier}. kademe bitkicilik orakına ihtiyacınız var.",
+        "fishing": "You need a tier {tier} fishing rod to fish these waters."
       },
       "toolRequired": {
         "mining": "Bu cevher damarını kazmak için bir madenci kazmasına ihtiyacınız var.",

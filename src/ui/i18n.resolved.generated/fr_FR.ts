@@ -2194,7 +2194,8 @@ export const fr_FR: EnTranslations = {
       "toolTierUnmet": {
         "mining": "Vous avez besoin d'un pic de mineur de palier {tier} pour exploiter ce filon.",
         "logging": "Vous avez besoin d'une hache de bûcheron de palier {tier} pour abattre ce bosquet.",
-        "herbalism": "Vous avez besoin d'une serpe d'herboristerie de palier {tier} pour collecter cette parcelle."
+        "herbalism": "Vous avez besoin d'une serpe d'herboristerie de palier {tier} pour collecter cette parcelle.",
+        "fishing": "You need a tier {tier} fishing rod to fish these waters."
       },
       "toolRequired": {
         "mining": "Vous avez besoin d'un pic de mineur pour exploiter ce filon.",

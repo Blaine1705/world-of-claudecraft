@@ -2194,7 +2194,8 @@ export const id_ID: EnTranslations = {
       "toolTierUnmet": {
         "mining": "Kamu membutuhkan beliung pertambangan tingkat {tier} untuk memanen urat ini.",
         "logging": "Kamu membutuhkan kapak penebangan tingkat {tier} untuk menebang rumpun ini.",
-        "herbalism": "Kamu membutuhkan arit herbalisme tingkat {tier} untuk mengumpulkan petak ini."
+        "herbalism": "Kamu membutuhkan arit herbalisme tingkat {tier} untuk mengumpulkan petak ini.",
+        "fishing": "You need a tier {tier} fishing rod to fish these waters."
       },
       "toolRequired": {
         "mining": "Kamu membutuhkan beliung penambangan untuk menambang urat ini.",

@@ -2194,7 +2194,8 @@ export const ko_KR: EnTranslations = {
       "toolTierUnmet": {
         "mining": "이 광맥을 캐려면 {tier}티어 채광 곡괭이가 필요합니다.",
         "logging": "이 나무를 베려면 {tier}티어 벌목 도끼가 필요합니다.",
-        "herbalism": "이 군락을 채집하려면 {tier}티어 약초 낫이 필요합니다."
+        "herbalism": "이 군락을 채집하려면 {tier}티어 약초 낫이 필요합니다.",
+        "fishing": "You need a tier {tier} fishing rod to fish these waters."
       },
       "toolRequired": {
         "mining": "이 광맥을 캐려면 채광 곡괭이가 필요합니다.",

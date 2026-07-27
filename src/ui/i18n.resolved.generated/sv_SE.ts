@@ -2194,7 +2194,8 @@ export const sv_SE: EnTranslations = {
       "toolTierUnmet": {
         "mining": "Du behöver en tier {tier} gruvhacka för att bryta den här ådern.",
         "logging": "Du behöver en tier {tier} skogsavverkningsyxa för att fälla det här beståndet.",
-        "herbalism": "Du behöver en tier {tier} örtinsamlingsskära för att samla den här fläcken."
+        "herbalism": "Du behöver en tier {tier} örtinsamlingsskära för att samla den här fläcken.",
+        "fishing": "You need a tier {tier} fishing rod to fish these waters."
       },
       "toolRequired": {
         "mining": "Du behöver en gruvhacka för att bryta den här ådern.",

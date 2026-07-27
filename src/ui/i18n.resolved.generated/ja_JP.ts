@@ -2194,7 +2194,8 @@ export const ja_JP: EnTranslations = {
       "toolTierUnmet": {
         "mining": "この鉱脈を採掘するにはティア{tier}の採掘ピッケルが必要です。",
         "logging": "この立木を伐り倒すにはティア{tier}の伐採斧が必要です。",
-        "herbalism": "この群生地を採取するにはティア{tier}の薬草鎌が必要です。"
+        "herbalism": "この群生地を採取するにはティア{tier}の薬草鎌が必要です。",
+        "fishing": "You need a tier {tier} fishing rod to fish these waters."
       },
       "toolRequired": {
         "mining": "この鉱脈を採掘するには採掘ピッケルが必要です。",

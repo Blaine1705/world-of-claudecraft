@@ -196,8 +196,24 @@ describe('tool-tier lock dimension', () => {
     );
     // A missing requiredTier stays on the tiered line (never claims "no tool").
     expect(gatherDeniedLineKey('node', 'mining')).toBe('hudChrome.gathering.toolTierUnmet.mining');
-    // The startFishing implement gate (#2343): surface 'fishing'.
+    // The startFishing implement gate (#2343): surface 'fishing' at tier 1
+    // means no tackle at all, so no tier is named.
     expect(gatherDeniedLineKey('fishing', 'fishing', 1)).toBe(
+      'hudChrome.gathering.toolRequired.fishing',
+    );
+    // The ZONE rod gate (D9) rides the same surface at tier 2 and up, and MUST
+    // take the tiered line: on the tierless one a player standing in Thornpeak
+    // holding an Ironreel is told to fetch a fishing pole they already carry.
+    // Both live requirements are covered, not just the boundary.
+    expect(gatherDeniedLineKey('fishing', 'fishing', 2)).toBe(
+      'hudChrome.gathering.toolTierUnmet.fishing',
+    );
+    expect(gatherDeniedLineKey('fishing', 'fishing', 3)).toBe(
+      'hudChrome.gathering.toolTierUnmet.fishing',
+    );
+    // A missing requiredTier on the fishing surface stays on the tierless
+    // line: the tiered copy interpolates {tier} and would render a hole.
+    expect(gatherDeniedLineKey('fishing', 'fishing')).toBe(
       'hudChrome.gathering.toolRequired.fishing',
     );
     expect(gatherDeniedLineKey('corpse', undefined, 2)).toBe(

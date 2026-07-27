@@ -2194,7 +2194,8 @@ export const pt_BR: EnTranslations = {
       "toolTierUnmet": {
         "mining": "Você precisa de uma picareta de mineração de nível {tier} para extrair este veio.",
         "logging": "Você precisa de um machado de lenharia de nível {tier} para derrubar este arvoredo.",
-        "herbalism": "Você precisa de uma foice de herborismo de nível {tier} para colher este canteiro."
+        "herbalism": "Você precisa de uma foice de herborismo de nível {tier} para colher este canteiro.",
+        "fishing": "You need a tier {tier} fishing rod to fish these waters."
       },
       "toolRequired": {
         "mining": "Você precisa de uma picareta de mineração para extrair este veio.",

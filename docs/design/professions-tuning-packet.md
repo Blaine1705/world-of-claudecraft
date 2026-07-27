@@ -271,11 +271,15 @@ Open after review, deliberately not resolved in this phase:
   from two other directions (the item tooltip hint says what a fine grade is
   and where it comes from, the guide tools note states the rule). Left as a
   maintainer call, and a natural fit beside phase 7's tool-facing UI.
-- **Two guide prose keys were reworded, which stales their translations in all
-  20 locales with no gate able to see it:** `guide.profPages.toolsNote` and
-  `guide.profPages.craftProse.engineering.materialsBody`. Both need a refresh
-  at the release-time locale fill. The English was factually wrong (it named
-  the retired reagents) so leaving it was not an option.
+- **Five guide prose keys were reworded, which stales their translations in all
+  20 locales with no gate able to see it:** `guide.profPages.toolsNote`,
+  `guide.profPages.craftProse.engineering.materialsBody`,
+  `guide.profPages.fish.startBody`, `guide.profPages.fish.biteBody` and
+  `guide.profPages.fish.tablesNote`. All five need a refresh at the
+  release-time locale fill. In every case the English had become factually
+  wrong (the first two named retired reagents; the fishing three said any
+  water works in every zone, quoted the pre-trim reel windows, and called the
+  rare catch flat across bands), so leaving them was not an option.
 - **Work-order economics get worse for an out-tooled player.** The three
   repeatable work orders pay a fixed copper reward derived from the BASE
   material's sell value, and a player who can only supply the fine grade hands

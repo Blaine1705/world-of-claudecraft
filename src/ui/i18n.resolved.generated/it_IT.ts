@@ -2194,7 +2194,8 @@ export const it_IT: EnTranslations = {
       "toolTierUnmet": {
         "mining": "Hai bisogno di un piccone da estrazione di livello {tier} per raccogliere questo filone.",
         "logging": "Hai bisogno di un'ascia da taglio di livello {tier} per abbattere questo boschetto.",
-        "herbalism": "Hai bisogno di una falce da erbalismo di livello {tier} per raccogliere quest'aiuola."
+        "herbalism": "Hai bisogno di una falce da erbalismo di livello {tier} per raccogliere quest'aiuola.",
+        "fishing": "You need a tier {tier} fishing rod to fish these waters."
       },
       "toolRequired": {
         "mining": "Hai bisogno di un piccone da estrazione per raccogliere questo filone.",

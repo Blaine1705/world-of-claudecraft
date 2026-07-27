@@ -34,6 +34,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "es_ES": [
@@ -61,6 +62,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "fr_FR": [
@@ -88,6 +90,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "fr_CA": [
@@ -115,6 +118,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "en_CA": [],
@@ -143,6 +147,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "de_DE": [
@@ -170,12 +175,21 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.gathering.toolTierUnmet.fishing"
+  ],
+  "zh_TW": [
+    "hudChrome.gathering.toolTierUnmet.fishing"
+  ],
+  "ko_KR": [
+    "hudChrome.gathering.toolTierUnmet.fishing"
+  ],
+  "ja_JP": [
+    "hudChrome.gathering.toolTierUnmet.fishing"
+  ],
   "pt_BR": [
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -201,9 +215,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.gathering.toolTierUnmet.fishing"
+  ],
   "cs_CZ": [
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -229,6 +246,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "nl_NL": [
@@ -256,6 +274,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "pl_PL": [
@@ -283,6 +302,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "id_ID": [
@@ -310,6 +330,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "tr_TR": [
@@ -337,6 +358,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "sv_SE": [
@@ -364,6 +386,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "vi_VN": [
@@ -391,6 +414,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.materialHint.fineGrade"
   ],
   "da_DK": [
@@ -418,6 +442,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.harvestLine",
     "hudChrome.gathering.harvestLineQty",
     "hudChrome.gathering.harvestSpecimenLine",
+    "hudChrome.gathering.toolTierUnmet.fishing",
     "hudChrome.materialHint.fineGrade"
   ]
 };

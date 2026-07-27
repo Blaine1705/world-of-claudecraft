@@ -1454,7 +1454,7 @@ describe('Guide professions gathering accuracy', () => {
     expect(f.biteMinSec).toBe(3);
     expect(f.biteMaxSec).toBe(8);
     expect(f.rodBiteReductionSec).toBe(1.5);
-    expect(f.reelWindowSec).toBe(3);
+    expect(f.reelWindowSec).toBe(2.5);
     expect(f.reelRodBonusSec).toBe(0.75);
     expect(f.sessionCapSec).toBe(15);
     expect(f.schedule).toEqual(
@@ -1490,14 +1490,17 @@ describe('Guide professions gathering accuracy', () => {
         expect(pubZone?.rows.reduce((sum, r) => sum + r.pct, 0)).toBe(100);
       }
     }
-    // The koi odds stay flat across bands: 3 percent in the Vale and marsh,
-    // 4 in Thornpeak (its odds never scale with skill).
-    for (const band of f.bandTables) {
-      for (const zone of band.zones) {
+    // The koi odds are the one row that reads skill and nothing else: the same
+    // 1 / 3 / 6 percent in every zone, rising with the band.
+    let koiRowsChecked = 0;
+    for (const [band, published] of f.bandTables.entries()) {
+      for (const zone of published.zones) {
         const koi = zone.rows.find((r) => r.name === 'Sunglint Koi');
-        expect(koi?.pct).toBe(zone.zone === 'Thornpeak Heights' ? 4 : 3);
+        expect(koi?.pct, `${zone.zone} band ${band}`).toBe([1, 3, 6][band]);
+        koiRowsChecked += 1;
       }
     }
+    expect(koiRowsChecked).toBe(9);
   });
 
   it('publishes the exact shared curve, cast, and rare-event numbers', () => {

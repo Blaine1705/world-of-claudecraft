@@ -2194,7 +2194,8 @@ export const de_DE: EnTranslations = {
       "toolTierUnmet": {
         "mining": "Du brauchst eine Bergbau-Spitzhacke der Stufe {tier}, um diese Ader abzubauen.",
         "logging": "Du brauchst eine Holzfäller-Axt der Stufe {tier}, um diesen Stand zu fällen.",
-        "herbalism": "Du brauchst eine Kräuterkunde-Sichel der Stufe {tier}, um diese Pflanze zu sammeln."
+        "herbalism": "Du brauchst eine Kräuterkunde-Sichel der Stufe {tier}, um diese Pflanze zu sammeln.",
+        "fishing": "You need a tier {tier} fishing rod to fish these waters."
       },
       "toolRequired": {
         "mining": "Du brauchst eine Bergbau-Spitzhacke, um diese Ader abzubauen.",
