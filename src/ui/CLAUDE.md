@@ -100,7 +100,21 @@ Per-frame HUD code (anything reached from `Hud.update()`) holds these:
   callee adds. So a window on a poll is now NAMED by the gate and still held to the
   write-elision standard by review: give it a signature guard and keep it, and if you add a
   genuinely per-frame write path, route it through the facet and move the module into
-  `HOT_PAINTERS`. A module that arms its own repeating driver owes the same care INSIDE the
+  `HOT_PAINTERS`. **A signature over the REBUILD does not cover the fall-through**, which is
+  the hole #2519 closed in `spellbook_window` (the one window on the frame band): behind a
+  correct `lastKnownSig` its cheap branch still walked the subtree, allocated, and wrote a
+  property per row on every frame. Every branch a per-frame entry point takes needs its own
+  change check, so an unchanged frame does nothing at all. That module is also the worked
+  answer to "should a per-frame window move to `HOT_PAINTERS`", and it is NO here for two
+  reasons, neither of them "windows are cold": the full write contract is a per-FILE token
+  count pinned exactly, which churns on every ordinary markup edit while saying nothing about
+  CADENCE (it cannot tell a repaint write from a build-time one in the same file), and the
+  facet's writers elide through Maps keyed by ELEMENT, so a window that replaces its whole row
+  set per rebuild would strand a cache entry per destroyed node. What holds a per-frame window instead is a behavioral test
+  that drives it across repeated identical frames and asserts zero queries, reads and writes
+  (`tests/spellbook_tick_repaint.test.ts`); note the READ half, since once every write is
+  elided per row an ungated repaint still writes nothing and only the elision checks show up.
+  A module that arms its own repeating driver owes the same care INSIDE the
   callback, and since #2518 that is a scanned contract too: granting a driver in
   `tests/hud_perf_budget.test.ts` now costs a `drivers` entry per call site recording the
   cadence (pinned against the literal in the source), why the driver exists, and the EXACT
@@ -144,6 +158,11 @@ The contract above is the WHAT; reach for the matching one when you build a hot 
 (each names its exemplar):
 - **Resolve element refs ONCE** into a field at construction, never `$()`/`querySelector` from
   a per-frame path (a re-query every frame was a real leak; `hud.ts` caches `xpbarEl` etc.).
+  For a window whose nodes are REBUILT, "at construction" is wrong and re-resolving at the
+  rebuild is the fix (`lockpick_window`, above). Better still when the module mints the nodes
+  itself: COLLECT the ref as the node is created and clear the collection at the top of the
+  rebuild, which costs zero queries even on a rebuild and carries each node's key with it
+  (`spellbook_window`'s toggle list, which no longer reads `dataset` per row either).
 - **Pool + keyed-reconcile, never per-frame `innerHTML` / `createElement`.** For a per-event or
   per-entity collection (FCT, auras, party), keep a persistent node pool, reconcile a keyed list
   with minimal `insertBefore` moves, recycle departed nodes, and CAP the live count (FIFO-evict
