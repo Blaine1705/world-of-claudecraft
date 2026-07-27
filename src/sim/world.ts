@@ -896,6 +896,7 @@ export function reachPalmSpots(seed: number): ReachPalm[] {
       if (roadDistance(x, z) < 4) continue;
       if (Math.hypot(x + 300, z - 820) < 18) continue; // Drifthaven's lanes stay open
       if (!propClear(x, z)) continue;
+      if (isCliffFace(x, z, seed)) continue;
       // a few of the strand's palms grow into towering elders
       const grand = hash2(x + 3, z, seed + 5161) < 0.09 ? 1.4 : 1;
       push(x, z, y, (0.85 + hash2(x, z, seed + 5131) * 0.5) * grand);
@@ -915,6 +916,7 @@ export function reachPalmSpots(seed: number): ReachPalm[] {
       if (reachRiverDistance(x, z) < 9) continue;
       if (Math.hypot(x + 300, z - 820) < 22) continue;
       if (!propClear(x, z)) continue;
+      if (isCliffFace(x, z, seed)) continue;
       const grand = hash2(x + 5, z, seed + 5162) < 0.12 ? 1.35 : 1;
       push(x, z, y, (0.95 + hash2(x, z, seed + 5131) * 0.6) * grand);
     }
@@ -3920,6 +3922,14 @@ export function biomeAt(x: number, z: number): BiomeId {
 // Pinned as a literal by tests/fixes.test.ts.
 export const DECORATION_MAX_SLOPE = 1.5;
 
+/** True where the ground is too steep to anchor a surface prop: the shared gate
+ * for every scatter that snaps to terrainHeight (the generic tree/rock props
+ * below, the Palmreach palms and their coconut clusters). Four heightfield
+ * samples, so callers check it LAST, after their cheaper gates. */
+export function isCliffFace(x: number, z: number, seed: number): boolean {
+  return terrainSteepness(x, z, seed) > DECORATION_MAX_SLOPE;
+}
+
 const DECORATION_STEP = 10;
 const DECORATION_X_START = -(WORLD_MAX_X - 14);
 const DECORATION_X_END = WORLD_MAX_X - 14;
@@ -4071,7 +4081,7 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
   // off the wall (and large ones would be phantom colliders). Checked last,
   // after the cheaper gates, so the four-sample steepness only runs for
   // candidates that survive everything else.
-  if (terrainSteepness(x, z, seed) > DECORATION_MAX_SLOPE) return null;
+  if (isCliffFace(x, z, seed)) return null;
   return {
     kind,
     x,
