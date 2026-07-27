@@ -136,11 +136,18 @@ describe('spellbook_window: mobile action-ring page label (Phase 4, touch-only)'
     // the Hud side would put a fresh 33-element array back on every frame the window is
     // open, which is the allocation #2519 removed. Nothing behavioral can see that (a copy
     // compares equal), so the wiring is pinned here.
-    expect(hud).toContain('barActions: () => this.hotbarActions');
-    expect(hud, 'the two allocating derived bar deps should be gone').not.toContain(
-      'barAbilityIds:',
+    //
+    // Scoped to the spellbook's own deps bag rather than the whole of hud.ts: the negative
+    // half would otherwise fire on any UNRELATED window that happens to take a dep by one
+    // of these names.
+    const bagStart = hud.indexOf('new SpellbookWindow({');
+    expect(bagStart, 'the spellbook deps bag moved or was renamed').toBeGreaterThan(-1);
+    const bag = hud.slice(bagStart, hud.indexOf('  });', bagStart));
+    expect(bag).toContain('barActions: () => this.hotbarActions');
+    expect(bag, 'the two allocating derived bar deps should be gone').not.toContain(
+      'barAbilityIds',
     );
-    expect(hud).not.toContain('abilityIdByBarSlot:');
+    expect(bag).not.toContain('abilityIdByBarSlot');
   });
 
   it('gates the page label on both a non-null mobilePage AND touch mode', () => {
