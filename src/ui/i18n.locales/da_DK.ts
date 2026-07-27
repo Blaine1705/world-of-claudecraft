@@ -7791,6 +7791,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunder_armor.description':
     'Flænger målets rustning og sænker den med {damage}% pr. anvendelse. Stakker op til 5 gange. Skaber en stor mængde trussel.',
   'entities.mobs.training_dummy.name': 'Træningsdukke',
+  'entities.mobs.healing_dummy.name': 'Helbredelsesdukke',
   'entities.mobs.yumi_cat.name': 'Yumi',
   'guide.arenaPage.yumiBody':
     'Beskyt Yumi er en holdbaseret måltilstand, der spilles i en labyrint: hver side vogter sin egen katfølgesvend, mens den jager modstanderens. Med jævne mellemrum blinker begge katte til nye hjørner af labyrinten, så kampen svinger mellem at forsvare, jage og kapløbet om at finde dem igen. Stil op som tre mod tre eller fem mod fem; at falde i kamp sætter dig kun på bænken et øjeblik.',

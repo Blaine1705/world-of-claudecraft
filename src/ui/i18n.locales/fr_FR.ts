@@ -8357,6 +8357,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunder_armor.description':
     "Cisaille l'armure de la cible, la réduisant de {damage}% par application. Cumulable jusqu'à 5 fois. Génère beaucoup de menace.",
   'entities.mobs.training_dummy.name': "Mannequin d'entraînement",
+  'entities.mobs.healing_dummy.name': 'Mannequin de soins',
   'entities.mobs.yumi_cat.name': 'Yumi',
   'entities.mobs.water_elemental.name': "Élémentaire d'eau",
   'guide.arenaPage.yumiBody':

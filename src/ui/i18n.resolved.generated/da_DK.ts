@@ -9974,6 +9974,9 @@ export const da_DK: EnTranslations = {
       "training_dummy": {
         "name": "Træningsdukke"
       },
+      "healing_dummy": {
+        "name": "Helbredelsesdukke"
+      },
       "ridge_stalker": {
         "name": "Bjergkamssniger"
       },

@@ -9974,6 +9974,9 @@ export const ru_RU: EnTranslations = {
       "training_dummy": {
         "name": "Тренировочный манекен"
       },
+      "healing_dummy": {
+        "name": "Манекен для исцеления"
+      },
       "ridge_stalker": {
         "name": "Хребтовый охотник"
       },

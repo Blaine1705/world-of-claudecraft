@@ -2355,6 +2355,7 @@ export type TranslationKeyFlat =
   | 'entities.mobs.gravecaller_summoner.name'
   | 'entities.mobs.grix_the_tunnelking.name'
   | 'entities.mobs.grubjaw.name'
+  | 'entities.mobs.healing_dummy.name'
   | 'entities.mobs.hollow_acolyte.name'
   | 'entities.mobs.ironvein_foreman.name'
   | 'entities.mobs.ironvein_sapper.name'

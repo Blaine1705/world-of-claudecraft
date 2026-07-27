@@ -9974,6 +9974,9 @@ export const vi_VN: EnTranslations = {
       "training_dummy": {
         "name": "Hình Nộm Tập Luyện"
       },
+      "healing_dummy": {
+        "name": "Hình Nộm Luyện Hồi Máu"
+      },
       "ridge_stalker": {
         "name": "Kẻ Rình Sườn Núi"
       },

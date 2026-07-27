@@ -1162,6 +1162,9 @@ export interface MobTemplate {
   // combat and heals to full a few seconds after the last hit. Guarded in
   // enterCombat (sim.ts) and updateMob (mob/locomotion.ts).
   dummy?: boolean;
+  // Healer practice dummy: an inert mob-shaped target that friendly spells can
+  // select and heal, but hostile combat paths must still treat as non-hostile.
+  friendlyPracticeTarget?: boolean;
   // Boss mechanic: periodic AoE pulse around the mob while in combat.
   aoePulse?: {
     min: number;

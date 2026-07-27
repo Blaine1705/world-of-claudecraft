@@ -7629,6 +7629,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.goldleaf_herb.name': 'Zlatolist',
   'entities.items.sunpetal_herb.name': 'Sluncokvět',
   'entities.mobs.training_dummy.name': 'Cvičný panák',
+  'entities.mobs.healing_dummy.name': 'Léčitelský cvičný panák',
   'entities.mobs.yumi_cat.name': 'Yumi',
   'guide.arenaPage.yumiBody':
     'Ochraňte Yumi je týmový objektivní režim, který se hraje v bludišti: každá strana hlídá svého vlastního kočičího společníka a zároveň loví toho druhého. Čas od času se obě kočky přenesou do nových koutů bludiště, takže se boj přelévá mezi obranou, lovem a závodem o to, kdo je najde dřív. Zařaď se do fronty jako tři na tři nebo pět na pět; pád v boji tě odstaví jen na okamžik.',

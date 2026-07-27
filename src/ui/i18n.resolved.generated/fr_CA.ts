@@ -9974,6 +9974,9 @@ export const fr_CA: EnTranslations = {
       "training_dummy": {
         "name": "Mannequin d'entraînement"
       },
+      "healing_dummy": {
+        "name": "Mannequin de soins"
+      },
       "ridge_stalker": {
         "name": "Traqueur de crête"
       },

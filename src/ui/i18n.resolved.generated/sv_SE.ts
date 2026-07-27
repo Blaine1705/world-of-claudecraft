@@ -9974,6 +9974,9 @@ export const sv_SE: EnTranslations = {
       "training_dummy": {
         "name": "Träningsdocka"
       },
+      "healing_dummy": {
+        "name": "Läkningsdocka"
+      },
       "ridge_stalker": {
         "name": "Åssmygare"
       },

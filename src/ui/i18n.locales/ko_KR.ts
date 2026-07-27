@@ -3283,6 +3283,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gravecaller_summoner.name': '무덤부름 소환사',
   'entities.mobs.deacon_voss.name': '부제 보스',
   'entities.mobs.training_dummy.name': '훈련용 허수아비',
+  'entities.mobs.healing_dummy.name': '치유 연습용 허수아비',
   'entities.mobs.ridge_stalker.name': '산등성이 추적자',
   'entities.mobs.deeprock_kobold.name': '깊은바위 굴꾼',
   'entities.mobs.thornpeak_ogre.name': '쏜피크 오우거',

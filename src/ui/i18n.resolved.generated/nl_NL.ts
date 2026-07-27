@@ -9974,6 +9974,9 @@ export const nl_NL: EnTranslations = {
       "training_dummy": {
         "name": "Oefenpop"
       },
+      "healing_dummy": {
+        "name": "Geneesoefenpop"
+      },
       "ridge_stalker": {
         "name": "Bergkam-Sluiper"
       },

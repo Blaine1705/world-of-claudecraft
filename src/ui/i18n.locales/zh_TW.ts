@@ -3171,6 +3171,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gravecaller_summoner.name': '喚墓者召喚師',
   'entities.mobs.deacon_voss.name': '執事沃斯',
   'entities.mobs.training_dummy.name': '訓練假人',
+  'entities.mobs.healing_dummy.name': '治療訓練假人',
   'entities.mobs.ridge_stalker.name': '山脊潛獵者',
   'entities.mobs.deeprock_kobold.name': '深岩鑿道者',
   'entities.mobs.thornpeak_ogre.name': '荊峰食人魔',

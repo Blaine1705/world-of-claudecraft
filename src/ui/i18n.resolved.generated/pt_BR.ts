@@ -9974,6 +9974,9 @@ export const pt_BR: EnTranslations = {
       "training_dummy": {
         "name": "Boneco de Treino"
       },
+      "healing_dummy": {
+        "name": "Boneco de Cura"
+      },
       "ridge_stalker": {
         "name": "Rastreador da crista"
       },

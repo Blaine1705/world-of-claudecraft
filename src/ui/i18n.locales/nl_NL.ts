@@ -7889,6 +7889,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunder_armor.description':
     'Scheurt het pantser van het doelwit open en verlaagt het met {damage}% per toepassing. Stapelt tot 5 keer. Genereert veel dreiging.',
   'entities.mobs.training_dummy.name': 'Oefenpop',
+  'entities.mobs.healing_dummy.name': 'Geneesoefenpop',
   'entities.mobs.yumi_cat.name': 'Yumi',
   'guide.arenaPage.yumiBody':
     'Bescherm Yumi is een teamdoelspel dat in een doolhof wordt gespeeld: elke kant bewaakt zijn eigen kattenmetgezel terwijl hij die van de ander bejaagt. Zo nu en dan flitsen beide katten naar nieuwe hoeken van het doolhof, zodat het gevecht heen en weer gaat tussen verdedigen, jagen en de race om ze opnieuw te vinden. Sluit aan als drie tegen drie of vijf tegen vijf; sneuvelen in de strijd zet je maar even op de bank.',

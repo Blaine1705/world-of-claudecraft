@@ -9974,6 +9974,9 @@ export const en: EnTranslations = {
       "training_dummy": {
         "name": "Training Dummy"
       },
+      "healing_dummy": {
+        "name": "Healing Dummy"
+      },
       "ridge_stalker": {
         "name": "Ridge Stalker"
       },

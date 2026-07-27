@@ -95,6 +95,27 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     dummy: true,
     respawnSeconds: 10,
   },
+  healing_dummy: {
+    id: 'healing_dummy',
+    name: 'Healing Dummy',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'humanoid',
+    hpBase: 999999,
+    hpPerLevel: 0,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 2.0,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1.4,
+    color: 0x74c476,
+    dummy: true,
+    friendlyPracticeTarget: true,
+    respawnSeconds: 10,
+  },
   ridge_stalker: {
     id: 'ridge_stalker',
     name: 'Ridge Stalker',
@@ -1969,8 +1990,9 @@ export const ZONE3_QUEST_ORDER = [
 // ---------------------------------------------------------------------------
 
 export const ZONE3_CAMPS: CampDef[] = [
-  // Training dummy: a single fixed practice target on the hill above Highwatch.
+  // Training dummies: fixed practice targets on the hill above Highwatch.
   { mobId: 'training_dummy', center: { x: -40, z: 648 }, radius: 0, count: 1 },
+  { mobId: 'healing_dummy', center: { x: -34, z: 648 }, radius: 0, count: 1 },
   // Ridge stalkers: the ridge flanking the road from the pass
   { mobId: 'ridge_stalker', center: { x: -50, z: 590 }, radius: 22, count: 7 },
   { mobId: 'ridge_stalker', center: { x: 45, z: 600 }, radius: 20, count: 6 },

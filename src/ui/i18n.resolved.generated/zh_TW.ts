@@ -9974,6 +9974,9 @@ export const zh_TW: EnTranslations = {
       "training_dummy": {
         "name": "訓練假人"
       },
+      "healing_dummy": {
+        "name": "治療訓練假人"
+      },
       "ridge_stalker": {
         "name": "山脊潛獵者"
       },

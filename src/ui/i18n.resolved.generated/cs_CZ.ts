@@ -9974,6 +9974,9 @@ export const cs_CZ: EnTranslations = {
       "training_dummy": {
         "name": "Cvičný panák"
       },
+      "healing_dummy": {
+        "name": "Léčitelský cvičný panák"
+      },
       "ridge_stalker": {
         "name": "Hřebenový slídil"
       },
