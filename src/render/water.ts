@@ -37,6 +37,17 @@ const SEGMENTS_PER_ZONE = 180; // ~2u vertex spacing, enough for the foam band
 const WATER_ROWS_PER_IDLE_SLICE = 4;
 const WATER_IDLE_TIMEOUT_MS = 200;
 const WATER_VERTEX_ROWS = Array.from({ length: SEGMENTS_PER_ZONE + 1 }, (_, row) => row);
+// The apron runs UNDER every zone plane and both ride one transparent material
+// with depthWrite off, so the depth buffer cannot arbitrate between them: the
+// surface that paints LAST wins the blend outright. Left to three.js's
+// transparent sort that order comes from each object's bounding-sphere centre,
+// and the apron's is a world-scale sheet near the origin, so merely orbiting
+// the camera reorders them and swaps the sea between the apron's constant deep
+// colour and the zone plane's shallow tint plus foam band. Pin the order so it
+// can never depend on where the camera happens to be. The sky dome holds -10,
+// so the apron sits between the sky and the default 0 band.
+const WATER_APRON_RENDER_ORDER = -1;
+const WATER_SURFACE_RENDER_ORDER = 0;
 
 // Real water normal maps, fetched at module import and gated by the boot
 // preload only for the shader tier. Low/mobile uses generated canvas water
@@ -317,6 +328,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     geo.computeBoundingSphere();
     const apron = new THREE.Mesh(geo, material);
     apron.position.y = waterLevel() - 0.06;
+    apron.renderOrder = WATER_APRON_RENDER_ORDER;
     meshes.push(apron);
     group.add(apron);
     refits.push(() => {
@@ -365,6 +377,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     geo.computeBoundingSphere();
     const mesh = new THREE.Mesh(geo, material);
     mesh.position.y = waterLevel();
+    mesh.renderOrder = WATER_SURFACE_RENDER_ORDER;
     // The renderer compiles a background zone's material while this mesh is
     // hidden, then reveals it. Adding it visible here lets the next rAF draw
     // (and synchronously upload/link) it before prepareZoneAt can prewarm it.
