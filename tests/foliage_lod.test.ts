@@ -4,6 +4,8 @@ import {
   type BucketWindowInput,
   bucketVisible,
   fogBlendAt,
+  foliageDistanceScale,
+  foliageFogLimit,
   IMPOSTOR_MIN_FOG_BLEND,
   LOD_HIGH,
   LOD_LOW,
@@ -11,10 +13,24 @@ import {
   treeDetailDistance,
 } from '../src/render/foliage_lod';
 
-// The worst distanceScale the high tier can reach: 0.72 + 0.28 * modelQuality
-// with the adaptive budget's foliage lever pinned to the floor (render_budget.ts).
-const WORST_SCALE = 0.72;
-const BEST_SCALE = 1;
+// The adaptive budget's foliage lever spans [0, 1]; the distance scale and the
+// fog cull both derive from it, so tests must move them as the one dial they
+// are. 0 is the starved floor (high-tier scale 0.72), 1 the rested ceiling.
+const QUALITY_LEVELS = [0, 0.35, 0.5, 0.72, 1];
+const WORST_SCALE = foliageDistanceScale(0, false);
+const BEST_SCALE = foliageDistanceScale(1, false);
+
+/** The live update() pairing of (distanceScale, fogLimit, detailFar) at one governor level. */
+function detailAt(
+  fog: { near: number; far: number },
+  modelQuality: number,
+  leanFoliage = false,
+): { detailFar: number; fogLimit: number } {
+  const fogLimit = foliageFogLimit(fog.far, modelQuality);
+  const base = lodDistsFor(leanFoliage).treeDetailFar;
+  const scale = foliageDistanceScale(modelQuality, leanFoliage);
+  return { detailFar: treeDetailDistance(base, fog.near, fog.far, scale, fogLimit), fogLimit };
+}
 
 // The shipped per-biome fog, parsed from the renderer rather than restated here,
 // so a new zone (or a widened view distance) is covered by these tests the day it
@@ -50,13 +66,29 @@ const impostors = (centerDist: number, over: Partial<BucketWindowInput> = {}) =>
   windowFor({ centerDist, minAtDetail: true, ...over });
 
 describe('foliage LOD: the far-tree impostor never stands in clear air', () => {
-  it.each(shippedBiomeFog())(
-    'biome $biome: the swap only happens under heavy fog',
-    ({ near, far }) => {
-      // Worst case for the player: a starved frame budget, which used to drag the
-      // swap toward the camera.
-      const detailFar = treeDetailDistance(LOD_HIGH.treeDetailFar, near, far, WORST_SCALE);
-      expect(fogBlendAt(detailFar, near, far)).toBeGreaterThanOrEqual(IMPOSTOR_MIN_FOG_BLEND);
+  const qualityCases = shippedBiomeFog().flatMap((fog) =>
+    QUALITY_LEVELS.flatMap((q) => [
+      { ...fog, q, lean: false },
+      { ...fog, q, lean: true },
+    ]),
+  );
+
+  it.each(qualityCases)(
+    'biome $biome at quality $q (lean $lean): swap under heavy fog, never past the cull',
+    ({ near, far, q, lean }) => {
+      const { detailFar, fogLimit } = detailAt({ near, far }, q, lean);
+      // Real trees must never be drawn past the line the fog cull drops them at.
+      expect(detailFar).toBeLessThanOrEqual(fogLimit);
+      // A starved budget can never drag the swap into clear air: the floor (or,
+      // when even the floor is culled, the cull line itself) always holds.
+      const fogFloor = near + IMPOSTOR_MIN_FOG_BLEND * (far - near);
+      expect(detailFar).toBeGreaterThanOrEqual(Math.min(fogFloor, fogLimit));
+      // Where an impostor band exists at all, it starts inside the murk.
+      if (detailFar < fogLimit) {
+        expect(fogBlendAt(detailFar, near, far)).toBeGreaterThanOrEqual(
+          IMPOSTOR_MIN_FOG_BLEND - 1e-9,
+        );
+      }
     },
   );
 
@@ -67,7 +99,7 @@ describe('foliage LOD: the far-tree impostor never stands in clear air', () => {
     const vale = { near: 130, far: 470 };
     expect(fogBlendAt(300, vale.near, vale.far)).toBeLessThan(IMPOSTOR_MIN_FOG_BLEND);
 
-    const fixed = treeDetailDistance(LOD_HIGH.treeDetailFar, vale.near, vale.far, BEST_SCALE);
+    const { detailFar: fixed } = detailAt(vale, 1);
     expect(fixed).toBeGreaterThan(LOD_HIGH.treeDetailFar);
     expect(fogBlendAt(fixed, vale.near, vale.far)).toBeGreaterThanOrEqual(IMPOSTOR_MIN_FOG_BLEND);
   });
@@ -76,23 +108,52 @@ describe('foliage LOD: the far-tree impostor never stands in clear air', () => {
     // The "cones until they load" half of the report: nothing is loading. The
     // budget dips while assets decode and shaders compile, the detail radius
     // shrank with it (300 * 0.72 = 216u), and the cones marched in until it
-    // recovered.
+    // recovered. Starved, the swap may only move OUT (to the mq-0 fog cull,
+    // where no impostor band exists at all), never in toward clear air.
     const vale = { near: 130, far: 470 };
-    const starved = treeDetailDistance(LOD_HIGH.treeDetailFar, vale.near, vale.far, WORST_SCALE);
-    const rested = treeDetailDistance(LOD_HIGH.treeDetailFar, vale.near, vale.far, BEST_SCALE);
+    const starved = detailAt(vale, 0);
+    const rested = detailAt(vale, 1);
 
-    expect(starved).toBeGreaterThan(LOD_HIGH.treeDetailFar * WORST_SCALE);
-    expect(starved).toBe(rested); // fog floor dominates: no visible pop either way
-    expect(fogBlendAt(starved, vale.near, vale.far)).toBeGreaterThanOrEqual(IMPOSTOR_MIN_FOG_BLEND);
+    expect(starved.detailFar).toBeGreaterThan(LOD_HIGH.treeDetailFar * WORST_SCALE);
+    // rested: the fog floor (368u); starved: capped by the mq-0 cull just below
+    expect(rested.detailFar).toBe(130 + IMPOSTOR_MIN_FOG_BLEND * (470 - 130));
+    // the Vale's mq-0 cull (366.6u) sits just under its fog floor (368u): the
+    // starved swap parks ON the cull line, so no impostor band and no cones
+    expect(starved.detailFar).toBe(starved.fogLimit);
+    expect(starved.detailFar).toBe(Math.min(rested.detailFar, starved.fogLimit));
   });
 
-  it('costs nothing in a short-fog zone: the radius never grows past the old constant', () => {
-    // Cave fog closes at 190u, so the fog floor lands below the old 300u radius
-    // and the cheaper build-time value must win. This is what stops the fix from
-    // paying to draw real trees nobody can see.
+  it('short-fog realms finally hand their far band to impostors', () => {
+    // The marsh closes at 165u while the budgeted radius is 216-300u, so the
+    // swap used to land past the fog cull at EVERY governor level: the impostor
+    // window was empty and real trees were drawn right up to the line that
+    // culled them (measured live: core 1.36M triangles, impostors 0 buckets).
+    const marsh = { near: 75, far: 165 };
+    const floor = marsh.near + IMPOSTOR_MIN_FOG_BLEND * (marsh.far - marsh.near); // 138
+
+    for (const q of [0.5, 0.72, 1]) {
+      const { detailFar, fogLimit } = detailAt(marsh, q);
+      expect(detailFar, `quality ${q} must leave an impostor band`).toBeLessThan(fogLimit);
+      expect(detailFar).toBe(floor);
+    }
+    // At the starved floor the cull line sits under the fog floor: no band, and
+    // real trees run to the cull rather than past it.
+    const starved = detailAt(marsh, 0);
+    expect(starved.detailFar).toBe(starved.fogLimit);
+  });
+
+  it('the cave keeps its swap cheap AND gains a band', () => {
+    // Pre-fix pin: best-scale cave detail was the flat 300u constant, 110u past
+    // its own 190u fog wall. The retreat rule pulls it to the fog floor, which
+    // is BOTH cheaper than the old constant and inside the cull for the first
+    // time, so the cave's far band goes to cones like everywhere else.
     const cave = { near: 45, far: 190 };
-    expect(treeDetailDistance(LOD_HIGH.treeDetailFar, cave.near, cave.far, BEST_SCALE)).toBe(300);
-    expect(treeDetailDistance(LOD_HIGH.treeDetailFar, cave.near, cave.far, WORST_SCALE)).toBe(216);
+    const floor = cave.near + IMPOSTOR_MIN_FOG_BLEND * (cave.far - cave.near); // 146.5
+    for (const q of QUALITY_LEVELS) {
+      const { detailFar, fogLimit } = detailAt(cave, q);
+      expect(detailFar).toBe(Math.min(floor, fogLimit));
+      expect(detailFar).toBeLessThanOrEqual(300);
+    }
   });
 });
 

@@ -35,6 +35,8 @@ import {
 import {
   type BucketWindowInput,
   bucketVisible,
+  foliageDistanceScale,
+  foliageFogLimit,
   type LodDists,
   lodDistsFor,
   treeDetailDistance,
@@ -2389,15 +2391,14 @@ export function buildFoliage(seed: number): FoliageView {
       // zone's fog rather than a build-time constant, so a cone is never caught
       // standing in clear air), are decided in foliage_lod.ts and unit-tested
       // there.
-      const distanceScale = !GFX.leanFoliage
-        ? 0.72 + 0.28 * modelQuality
-        : 0.56 + 0.44 * modelQuality;
-      const fogLimit = fogFar * (0.78 + 0.22 * modelQuality);
+      const distanceScale = foliageDistanceScale(modelQuality, GFX.leanFoliage);
+      const fogLimit = foliageFogLimit(fogFar, modelQuality);
       const detailFar = treeDetailDistance(
         lodDists().treeDetailFar,
         fogNear,
         fogFar,
         distanceScale,
+        fogLimit,
       );
       modelVisibleBuckets = 0;
       modelVisibleDraws = 0;
