@@ -155,6 +155,38 @@ describe('crafting accepts the fine grade for a plain reagent', () => {
     expect(sim.countItem('fine_copper_ore', pid)).toBe(0);
   });
 
+  it('the discount is keyed on HOLDING a signed copy, not on spending one', () => {
+    // The semantic the widening inherits and does not change, recorded here
+    // because the code comment asserts it. requiredReagentCount asks whether a
+    // self-signed copy is held; planGradeRemoval then drains the BASE grade
+    // first. So a player who keeps one signed fine copy back earns the -1 on
+    // every craft of that material while spending plain ore, indefinitely.
+    // That predates the grades (the check was always a `some`, and removeItem
+    // walks end-backward), but the grades make it worth stating: the fine copy
+    // is exactly the one a player is incentivised to hoard.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = (sim as any).players.get(pid);
+    grantItem(sim, 'copper_ore', 6, pid);
+    sim.addItemInstance('fine_copper_ore', { signer: meta.name }, pid, 1);
+    grantItem(sim, 'smithing_flux', 20, pid);
+
+    const first = resolveCraft((sim as any).ctx, pid, VEST);
+    expect(first.ok).toBe(true);
+    expect(first.selfSignedBonusApplied).toBe(true);
+    // 3 spent, not the listed 4, and all three came from the plain stack.
+    expect(sim.countItem('copper_ore', pid)).toBe(3);
+    expect(sim.countItem('fine_copper_ore', pid)).toBe(1);
+
+    // And again: the kept copy is still there, so the discount fires a second
+    // time. This is the arm that makes it a HOARD rather than a one-off.
+    const second = resolveCraft((sim as any).ctx, pid, VEST);
+    expect(second.ok).toBe(true);
+    expect(second.selfSignedBonusApplied).toBe(true);
+    expect(sim.countItem('copper_ore', pid)).toBe(0);
+    expect(sim.countItem('fine_copper_ore', pid)).toBe(1);
+  });
+
   it("someone ELSE's signed fine copy earns no quantity discount", () => {
     // The self-only half of the rule survives the widening: three traded
     // copies are still one short of the listed four.
