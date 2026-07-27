@@ -19,7 +19,12 @@ type TimedRoll<T> = { event: T; receivedAt: number; durationMs: number };
 
 type LootRollWorld = Pick<
   IWorld,
-  'activeLootRolls' | 'assignMasterLoot' | 'lootRollGroupStatus' | 'playerId' | 'submitLootRoll'
+  | 'activeLootRolls'
+  | 'activeMasterLootRolls'
+  | 'assignMasterLoot'
+  | 'lootRollGroupStatus'
+  | 'playerId'
+  | 'submitLootRoll'
 >;
 
 export interface LootRollControllerDeps {
@@ -45,6 +50,12 @@ export class LootRollController {
   private statusFingerprint = '';
   private readonly watchTimers = new Map<number, number>();
   private readonly activeMasterRolls = new Map<number, TimedRoll<MasterLootEvent>>();
+  // The master-loot twin of dismissedRolls/confirmedRolls, kept SEPARATE from them
+  // on purpose: a master roll keeps its id when the sim converts it to need/greed,
+  // so one shared dismissed set would let the assignment that opened the roll
+  // suppress the need/greed prompt the same id then arrives as.
+  private readonly dismissedMasterRolls = new Map<number, number>();
+  private confirmedMasterRolls = new Set<number>();
 
   constructor(private readonly deps: LootRollControllerDeps) {}
 
@@ -69,6 +80,7 @@ export class LootRollController {
 
   update(now: number): void {
     this.reconcileRolls();
+    this.reconcileMasterRolls();
     this.reconcileStatus(now);
     this.updateTimers(now);
   }
@@ -115,6 +127,13 @@ export class LootRollController {
   private assign(rollId: number, targetPids: number[]): void {
     this.deps.world().assignMasterLoot(rollId, targetPids);
     this.activeMasterRolls.delete(rollId);
+    // Clearing the row is a LOCAL intent, exactly as in submit() above, so record
+    // when it happened rather than forgetting the roll: the sim refuses an
+    // assignment whose every named pid is no longer a candidate and deliberately
+    // leaves the roll in its curate phase, and a plain delete stranded the looter
+    // there until the 300s timeout (#2526). reconcileMasterRolls restores the row
+    // from the authoritative surface once the roll has stayed open past the grace.
+    this.dismissedMasterRolls.set(rollId, this.deps.now());
     this.render();
   }
 
@@ -153,6 +172,56 @@ export class LootRollController {
         event: { type: 'lootRoll', ...prompt },
         receivedAt: this.deps.now(),
         durationMs: LOOT_ROLL_DURATION_MS,
+      });
+      changed = true;
+    }
+    if (changed) this.render();
+  }
+
+  // The master-looter arm of the same three-way reconcile (open vs shown vs
+  // dismissed), against IWorld.activeMasterLootRolls instead of activeLootRolls.
+  // Same pure core, same grace, separate state; the rows it drives are the master
+  // curate prompt, which only ever reaches the master looter because the surface
+  // itself is filtered server-side to `masterLooter === pid`.
+  //
+  // The re-shown row is rebuilt from the PROMPT, never from the retained event, so
+  // a candidate who left during the window is gone from the checkbox list and the
+  // looter cannot re-pick the pid that was just refused.
+  private reconcileMasterRolls(): void {
+    const open = this.deps.world().activeMasterLootRolls();
+    if (
+      open.length === 0 &&
+      this.activeMasterRolls.size === 0 &&
+      this.dismissedMasterRolls.size === 0 &&
+      this.confirmedMasterRolls.size === 0
+    ) {
+      return;
+    }
+    const promptById = new Map(open.map((prompt) => [prompt.rollId, prompt] as const));
+    const dismissedAt: Record<number, number> = {};
+    for (const [rollId, at] of this.dismissedMasterRolls) dismissedAt[rollId] = at;
+    const decision = reconcileLootRolls({
+      open: open.map((prompt) => prompt.rollId),
+      shown: [...this.activeMasterRolls.keys()],
+      dismissed: [...this.dismissedMasterRolls.keys()],
+      confirmed: [...this.confirmedMasterRolls],
+      dismissedAt,
+      nowMs: this.deps.now(),
+    });
+    this.confirmedMasterRolls = new Set(decision.confirmed);
+    for (const rollId of decision.toPrune) this.dismissedMasterRolls.delete(rollId);
+    let changed = false;
+    for (const rollId of decision.toRetire) {
+      this.activeMasterRolls.delete(rollId);
+      changed = true;
+    }
+    for (const rollId of decision.toShow) {
+      const prompt = promptById.get(rollId);
+      if (!prompt) continue;
+      this.activeMasterRolls.set(rollId, {
+        event: { type: 'masterLoot', ...prompt },
+        receivedAt: this.deps.now(),
+        durationMs: MASTER_LOOT_DURATION_MS,
       });
       changed = true;
     }
@@ -202,6 +271,11 @@ export class LootRollController {
     for (const [rollId, roll] of this.activeMasterRolls) {
       if (now - roll.receivedAt >= roll.durationMs) {
         this.activeMasterRolls.delete(rollId);
+        // Same reason submit()'s sibling loop above records the local expiry: the
+        // local clock is an estimate of the sim's deadline, so a row retired here
+        // while the sim still lists the roll open must wait out the grace before
+        // the mirror is allowed to bring it back.
+        this.dismissedMasterRolls.set(rollId, now);
         changed = true;
       }
     }

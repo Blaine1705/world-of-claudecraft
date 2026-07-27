@@ -58,6 +58,7 @@ import {
   type LootRollChoice,
   type LootRollGroupStatus,
   type LootRollPrompt,
+  type MasterLootPrompt,
   type MasterLootThreshold,
   type MoveInput,
   type PlayerClass,
@@ -1513,6 +1514,10 @@ export class ClientWorld implements IWorld {
   private lootRollPrompts: LootRollPrompt[] = []; // open need-greed rolls, mirrored from the self-wire
   // group-visible choices on the open rolls (the vote strip), mirrored from the self-wire
   private lootRollGroup: LootRollGroupStatus[] = [];
+  // curate-phase master-loot assignments this player is the master looter of,
+  // mirrored from the self-wire. Server-filtered to the master looter, so an
+  // ordinary candidate's mirror is always empty.
+  private masterLootPrompts: MasterLootPrompt[] = [];
   // bumped whenever a fresh social snapshot lands, so an open panel re-renders
   private socialDirty = false;
   // snapshot interpolation
@@ -2970,6 +2975,7 @@ export class ClientWorld implements IWorld {
       if (s.atitle !== undefined) this.activeTitle = s.atitle ?? null;
       if (s.lroll !== undefined) this.lootRollPrompts = s.lroll ?? [];
       if (s.lrollg !== undefined) this.lootRollGroup = s.lrollg ?? [];
+      if (s.mloot !== undefined) this.masterLootPrompts = s.mloot ?? [];
       if (s.drun !== undefined) this.delveRun = s.drun;
       if (s.dcompanion !== undefined) this.companionState = s.dcompanion;
       if (s.dmarks !== undefined) this.delveMarks = s.dmarks ?? 0;
@@ -3332,6 +3338,9 @@ export class ClientWorld implements IWorld {
   }
   lootRollGroupStatus(): LootRollGroupStatus[] {
     return this.lootRollGroup;
+  }
+  activeMasterLootRolls(): MasterLootPrompt[] {
+    return this.masterLootPrompts;
   }
   pickUpObject(id: number): Promise<boolean> {
     return this.cmdWithOutcome({ cmd: 'pickup', id });
