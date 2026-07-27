@@ -392,7 +392,15 @@ const ELEMENT_QUERIES: ReadonlyArray<readonly [string, RegExp]> = [
 //   - Adding `.disabled` to RAW_WRITES would ALSO not have caught the case #2518 cites.
 //     `spellbook_window` is a COLD painter, and cold takes no raw-write scan at all, so the
 //     arm would have been added to a scan that never runs over the module in question. That
-//     one is #2519's, and it needs the cadence answer, not a new token.
+//     one was #2519's, and it needed the cadence answer, not a new token. #2519 has since
+//     landed and confirmed it from the other side: the per-row `.disabled` write it was
+//     about is gone because the whole per-frame fall-through is gated now, the module STAYS
+//     cold (promoting it would pin that file's whole raw-write vocabulary at exact counts,
+//     mostly build-time writes in its three row builders, which is the churn the cold bucket
+//     already argued against, and the count still could not tell those from the repaint
+//     writes beside them), and what holds the contract is a behavioral test that drives the
+//     open window across repeated identical frames, tests/spellbook_tick_repaint.test.ts.
+//     A token in a per-file count was never the instrument for a per-frame question.
 // Inside a driver callback the corpus is a few hundred characters and hand-checkable, which
 // is the condition #2518 named, so the collision-prone middle of the list stays out and the
 // rest is counted exactly, like every other allowance here.

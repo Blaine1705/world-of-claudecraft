@@ -4167,13 +4167,13 @@ export class Hud {
         playerSpellHasteFrac(this.sim.player),
       ),
     abilityTooltip: (known) => this.abilityTooltip(known),
-    barAbilityIds: () =>
-      this.hotbarActions.flatMap((a) => (a && a.type === 'ability' ? [a.id] : [])),
-    // Index 0 = barSlot 1 (hotbarActions' own index = barSlot-1 convention), used
-    // to derive each row's mobile action-ring page (Phase 4). Non-ability slots
-    // (empty or an item) map to null, never mistaken for an ability id.
-    abilityIdByBarSlot: () =>
-      this.hotbarActions.map((a) => (a && a.type === 'ability' ? a.id : null)),
+    // The bar's LIVE slot array (index 0 = barSlot 1, hotbarActions' own index =
+    // barSlot-1 convention), handed over as-is. It used to be two DERIVED id lists
+    // (a flatMap for the on-bar ids, a map for the per-slot ids the mobile action-
+    // ring page label reads), and the spellbook's per-frame refresh called the
+    // first one every frame the window was open, allocating 34 arrays each time.
+    // The window derives both views itself now, at render time (#2519).
+    barActions: () => this.hotbarActions,
     hasFreeSlot: () => this.actionBarController.hasFreeSlot(),
     attackOnBar: () => this.attackSlotIsAttack(),
     // Routes through the Interface showAttackButton setting, the same state the
