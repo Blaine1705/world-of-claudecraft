@@ -216,11 +216,6 @@ const MOB_IDS = [
   // The Orkadia orc war-camp dungeon (src/sim/content/orkadia.ts).
   'orkadia_grunt',
   'orkadia_marauder',
-  'orkadia_axethrower',
-  'orkadia_fel_shaman',
-  'orkadia_beast_handler',
-  'orkadia_siege_brute',
-  'orkadia_banner_captain',
   'orkadia_warlord',
   'wildheart_stalker',
   'wildheart_ravager',

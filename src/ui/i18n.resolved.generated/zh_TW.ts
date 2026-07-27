@@ -10975,21 +10975,6 @@ export const zh_TW: EnTranslations = {
       "orkadia_marauder": {
         "name": "鐵皮劫掠者"
       },
-      "orkadia_axethrower": {
-        "name": "血牙擲斧手"
-      },
-      "orkadia_fel_shaman": {
-        "name": "灰骨邪能薩滿"
-      },
-      "orkadia_beast_handler": {
-        "name": "鐵皮戰獸馴獸師"
-      },
-      "orkadia_siege_brute": {
-        "name": "奧卡迪亞攻城蠻兵"
-      },
-      "orkadia_banner_captain": {
-        "name": "黑旗隊長"
-      },
       "orkadia_warlord": {
         "name": "督軍格羅莫克·碎顱者"
       },

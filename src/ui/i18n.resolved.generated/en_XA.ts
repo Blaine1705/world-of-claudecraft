@@ -10975,21 +10975,6 @@ export const en_XA: EnTranslations = {
       "orkadia_marauder": {
         "name": "[Íŕóñĥíðé Ɱáŕáúðéŕ]"
       },
-      "orkadia_axethrower": {
-        "name": "[Ɓļóóðţúšķ Áẋéţĥŕóŵéŕ]"
-      },
-      "orkadia_fel_shaman": {
-        "name": "[Ášĥéñƀóñé Ƒéļ Šĥáɱáñ]"
-      },
-      "orkadia_beast_handler": {
-        "name": "[Íŕóñĥíðé Ŵáŕƀéášţ Ĥáñðļéŕ]"
-      },
-      "orkadia_siege_brute": {
-        "name": "[Óŕķáðíá Šíéĝé Ɓŕúţé]"
-      },
-      "orkadia_banner_captain": {
-        "name": "[Ɓļáçķ Ɓáññéŕ Çáþţáíñ]"
-      },
       "orkadia_warlord": {
         "name": "[Ŵáŕļóŕð Ĝŕóɱɱóķ Šķúļļçļéáʋéŕ]"
       },

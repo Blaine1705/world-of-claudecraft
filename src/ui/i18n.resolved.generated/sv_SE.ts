@@ -10975,21 +10975,6 @@ export const sv_SE: EnTranslations = {
       "orkadia_marauder": {
         "name": "Ironhide Marauder"
       },
-      "orkadia_axethrower": {
-        "name": "Bloodtusk Axethrower"
-      },
-      "orkadia_fel_shaman": {
-        "name": "Ashenbone Fel Shaman"
-      },
-      "orkadia_beast_handler": {
-        "name": "Ironhide Warbeast Handler"
-      },
-      "orkadia_siege_brute": {
-        "name": "Orkadia Siege Brute"
-      },
-      "orkadia_banner_captain": {
-        "name": "Black Banner Captain"
-      },
       "orkadia_warlord": {
         "name": "Warlord Grommok Skullcleaver"
       },

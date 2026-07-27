@@ -10975,21 +10975,6 @@ export const ru_RU: EnTranslations = {
       "orkadia_marauder": {
         "name": "Мародёр Железношкурый"
       },
-      "orkadia_axethrower": {
-        "name": "Метатель топоров Кровавого Клыка"
-      },
-      "orkadia_fel_shaman": {
-        "name": "Шаман Пепельной Кости"
-      },
-      "orkadia_beast_handler": {
-        "name": "Укротитель боевых зверей Железной Шкуры"
-      },
-      "orkadia_siege_brute": {
-        "name": "Осадный громила Оркадии"
-      },
-      "orkadia_banner_captain": {
-        "name": "Капитан Чёрного Знамени"
-      },
       "orkadia_warlord": {
         "name": "Полководец Громмок Черепокол"
       },

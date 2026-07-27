@@ -10975,21 +10975,6 @@ export const ja_JP: EnTranslations = {
       "orkadia_marauder": {
         "name": "鉄皮の略奪者"
       },
-      "orkadia_axethrower": {
-        "name": "血牙の斧投げ"
-      },
-      "orkadia_fel_shaman": {
-        "name": "灰骨のフェルシャーマン"
-      },
-      "orkadia_beast_handler": {
-        "name": "鉄皮の戦獣使い"
-      },
-      "orkadia_siege_brute": {
-        "name": "オルカディアの攻城兵"
-      },
-      "orkadia_banner_captain": {
-        "name": "黒旗の隊長"
-      },
       "orkadia_warlord": {
         "name": "軍団長グロモク・スカルクリーヴァー"
       },
