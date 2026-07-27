@@ -359,11 +359,11 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned for the v0.31 physics merge: renderer.ts and
-      // eastbrook_layout.ts are fingerprinted inputs and both changed (the
-      // landing fall-speed reset; the graveyard walk threading the headstone
-      // gap), and the after-evidence was recaptured against them.
-      fingerprint: 'dcdeb35bd1d7b11b365070da061f9235e5dfd3d1fc550df7f3bb777b1b2392cc',
+      // Deliberately re-pinned for the 0.31.0 version sync: package-lock.json
+      // is in every Eastbrook source inventory, so the release version bump
+      // moved the town, mailbox, and noticeboard fingerprints (and the GLBs
+      // they stamp) even though no pipeline input changed. No recapture.
+      fingerprint: '3dd5c2b4807e25e0b9526db949dda9ce901215cb1f7dfeab6f88cc6ff127c128',
       components: {
         captureContract: {
           id: 'polish-v2',

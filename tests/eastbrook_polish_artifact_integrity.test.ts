@@ -1408,11 +1408,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
       fingerprint.update('\0');
     }
     expect(acceptedFiles).toHaveLength(4);
-    // Deliberately re-pinned for the v0.31 physics merge: the after evidence
-    // was recaptured (renderer.ts and eastbrook_layout.ts are provenance
-    // inputs and both changed), so the accepted byte-for-byte set moved.
+    // Deliberately re-pinned for the 0.31.0 version sync: package-lock.json is
+    // in every Eastbrook source inventory, so the release version bump moved
+    // the composite provenance these records carry. No capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '7d31845976984ad4e403528176a0180707b660be3c4286dc178f7507400aef8a',
+      'efa3499a134315a5a17ee82b87297aa5c72c9b7a9a0b4a111157c78357f37f66',
     );
   });
 
