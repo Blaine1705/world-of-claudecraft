@@ -297,6 +297,10 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   kcasBannerRedA: { url: '/models/biome/kcas_banner_red_a.glb', kit: 'kcas' },
   kcasBannerRedShield: { url: '/models/biome/kcas_banner_red_shield.glb', kit: 'kcas' },
   kcasBannerRedTriple: { url: '/models/biome/kcas_banner_red_triple.glb', kit: 'kcas' },
+  // the green colorway for Dawnhold (already-shipped dungeon-kit exports)
+  kcasBannerGreenA: { url: '/models/dungeon/banner_green.glb', kit: 'kcas' },
+  kcasBannerGreenShield: { url: '/models/dungeon/banner_shield_green.glb', kit: 'kcas' },
+  kcasBannerGreenTriple: { url: '/models/dungeon/banner_triple_green.glb', kit: 'kcas' },
   kcasTorch: { url: '/models/biome/kcas_torch.glb', kit: 'kcas' },
   kcasTorchMounted: { url: '/models/biome/kcas_torch_mounted.glb', kit: 'kcas' },
   kcasRubbleLarge: { url: '/models/biome/kcas_rubble_large.glb', kit: 'kcas' },

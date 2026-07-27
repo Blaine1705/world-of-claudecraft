@@ -1,0 +1,410 @@
+// Dawnhold Castle's render assembly (render-only): the same fortification
+// idiom as the Last Keep's castle_features, dressed for the Evergarden:
+// stone kcas walls under GREEN banners, green-roofed bailey buildings on
+// the decorProps path, a tiled path from the gate to the keep door, and
+// benches around the courtyard parterres. The walls the player climbs are
+// dawnholdLift terrain (sim/dawnhold_layout.ts); every walkable lift
+// surface gets a visible floor cap, every gate renders as an OPEN doorway
+// arch whose opening the lift span sits inside, and tower shells get
+// solid cores (lift terrain is invisible, the masses must be built).
+import * as THREE from 'three';
+import {
+  DAWNHOLD,
+  DAWNHOLD_BEDS,
+  DAWNHOLD_GATES,
+  DAWNHOLD_RAMPS,
+  DAWNHOLD_TOWERS,
+} from '../sim/dawnhold_layout';
+import { loadGltf } from './assets/loader';
+import { registerPreload } from './assets/preload';
+import { surfaceMat } from './gfx';
+import { PROP_ASSET_DEFS } from './props';
+
+const DAWNHOLD_KEYS = [
+  'kcasWall',
+  'kcasWallHalf',
+  'kcasWallDoorway',
+  'kcasWallWindow',
+  'kcasWallPillar',
+  'kcasBarrier',
+  'kcasBarrierHalf',
+  'kcasBannerGreenA',
+  'kcasBannerGreenShield',
+  'kcasBannerGreenTriple',
+  'kcasTorch',
+  'kcasTorchMounted',
+  'kcasFloorLarge',
+  'kcasFoundation',
+  'kcasBench',
+] as const;
+type DawnholdKey = (typeof DAWNHOLD_KEYS)[number];
+
+const scenes: Partial<Record<DawnholdKey, THREE.Group>> = {};
+for (const key of DAWNHOLD_KEYS) {
+  registerPreload(
+    loadGltf(PROP_ASSET_DEFS[key].url).then((gltf) => {
+      scenes[key] = gltf.scene;
+    }),
+  );
+}
+
+export const dawnholdFeaturesPreloadInternalsForTest = {
+  propUrls: DAWNHOLD_KEYS.map((k) => PROP_ASSET_DEFS[k].url),
+};
+
+/** wall module scale (the KayKit wall is 4 units long; module is 7) */
+const S = DAWNHOLD.module / 4;
+
+interface Placement {
+  x: number;
+  y: number;
+  z: number;
+  rot: number;
+  s?: number;
+}
+
+// the doorway module's door leaf stays out so gates render open (the
+// castle_features rule; lift spans match the arch openings)
+const SKIP_PARTS: Partial<Record<DawnholdKey, RegExp>> = {
+  kcasWallDoorway: /_door$/i,
+};
+
+// Meshopt-quantized attributes must bake to floats BEFORE applyMatrix4
+// (the castle_features guard: normalized int16 clamps to a 2-unit cube).
+function attributeToFloat(geo: THREE.BufferGeometry, name: string): void {
+  const attr = geo.getAttribute(name);
+  if (!attr || (attr.array instanceof Float32Array && !attr.normalized)) return;
+  const out = new Float32Array(attr.count * attr.itemSize);
+  for (let i = 0; i < attr.count; i++) {
+    for (let c = 0; c < attr.itemSize; c++) out[i * attr.itemSize + c] = attr.getComponent(i, c);
+  }
+  geo.setAttribute(name, new THREE.BufferAttribute(out, attr.itemSize));
+}
+
+function extractParts(
+  scene: THREE.Group,
+  skip?: RegExp,
+): { geo: THREE.BufferGeometry; mat: THREE.Material }[] {
+  scene.updateMatrixWorld(true);
+  const parts: { geo: THREE.BufferGeometry; mat: THREE.Material }[] = [];
+  scene.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    if (skip && (skip.test(mesh.name) || (mesh.parent && skip.test(mesh.parent.name)))) return;
+    const geo = mesh.geometry.clone();
+    attributeToFloat(geo, 'position');
+    attributeToFloat(geo, 'normal');
+    geo.applyMatrix4(mesh.matrixWorld);
+    parts.push({ geo, mat: mesh.material as THREE.Material });
+  });
+  const box = new THREE.Box3();
+  for (const p of parts) {
+    p.geo.computeBoundingBox();
+    box.union(p.geo.boundingBox as THREE.Box3);
+  }
+  const cx = (box.min.x + box.max.x) / 2;
+  const cz = (box.min.z + box.max.z) / 2;
+  for (const p of parts) {
+    p.geo.translate(-cx, -box.min.y, -cz);
+    p.geo.computeBoundingBox();
+    p.geo.computeBoundingSphere();
+  }
+  return parts;
+}
+
+export interface DawnholdFeaturesView {
+  group: THREE.Group;
+  glowLights: THREE.PointLight[];
+}
+
+export function buildDawnholdFeatures(): DawnholdFeaturesView {
+  const group = new THREE.Group();
+  group.name = 'dawnhold-features';
+  const glowLights: THREE.PointLight[] = [];
+  const padY = DAWNHOLD.pad.h;
+  const walkY = DAWNHOLD.walkAbs;
+
+  const spots = new Map<DawnholdKey, Placement[]>();
+  const put = (key: DawnholdKey, p: Placement): void => {
+    let list = spots.get(key);
+    if (!list) {
+      list = [];
+      spots.set(key, list);
+    }
+    list.push(p);
+  };
+
+  const slabMat = surfaceMat({ color: 0x8d8272, roughness: 0.95 });
+  const capMat = surfaceMat({ color: 0x9a8f7c, roughness: 0.9 });
+  const slab = (
+    cx: number,
+    cz: number,
+    sx: number,
+    sz: number,
+    topY: number,
+    thick = 0.36,
+    mat = capMat,
+  ): void => {
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(sx, thick, sz), mat);
+    mesh.position.set(cx, topY - thick / 2, cz);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    group.add(mesh);
+  };
+
+  // ---- curtain walls: double-skinned module rows, grid-anchored, gates
+  // as open doorway modules ----
+  interface WallRun {
+    axis: 'x' | 'z';
+    line: number;
+    a0: number;
+    a1: number;
+    gate: { a0: number; a1: number } | null;
+    outerSide: -1 | 1;
+  }
+  const hw = DAWNHOLD.towerHw;
+  const runs: WallRun[] = [
+    {
+      axis: 'z',
+      line: DAWNHOLD.wx0,
+      a0: DAWNHOLD.wz0 + hw,
+      a1: DAWNHOLD.wz1 - hw,
+      gate: null,
+      outerSide: -1,
+    },
+    {
+      axis: 'z',
+      line: DAWNHOLD.wx1,
+      a0: DAWNHOLD.wz0 + hw,
+      a1: DAWNHOLD.wz1 - hw,
+      gate: DAWNHOLD_GATES.main,
+      outerSide: 1,
+    },
+    {
+      axis: 'x',
+      line: DAWNHOLD.wz0,
+      a0: DAWNHOLD.wx0 + hw,
+      a1: DAWNHOLD.wx1 - hw,
+      gate: null,
+      outerSide: -1,
+    },
+    {
+      axis: 'x',
+      line: DAWNHOLD.wz1,
+      a0: DAWNHOLD.wx0 + hw,
+      a1: DAWNHOLD.wx1 - hw,
+      gate: DAWNHOLD_GATES.postern,
+      outerSide: 1,
+    },
+  ];
+  const M = DAWNHOLD.module;
+  const skinOff = DAWNHOLD.wallTh / 2 - 0.85;
+  const place = (run: WallRun, along: number, key: DawnholdKey, s = S): void => {
+    for (const face of [-1, 1] as const) {
+      const x = run.axis === 'z' ? run.line + face * skinOff : along;
+      const z = run.axis === 'z' ? along : run.line + face * skinOff;
+      put(key, { x, y: padY, z, rot: run.axis === 'z' ? Math.PI / 2 : 0, s });
+    }
+  };
+  for (const run of runs) {
+    const count = Math.round((run.a1 - run.a0) / M);
+    for (let k = 0; k < count; k++) {
+      const c = run.a0 + M / 2 + k * M;
+      if (run.gate && c > run.gate.a0 - 1 && c < run.gate.a1 + 1) {
+        place(run, c, 'kcasWallDoorway');
+        continue;
+      }
+      const v = Math.abs(Math.round(c * 7 + run.line)) % 9;
+      place(run, c, v === 2 ? 'kcasWallWindow' : 'kcasWall');
+    }
+    // battlements outside, guard rail inside, both parted over gates
+    const off = DAWNHOLD.wallTh / 2 - 0.2;
+    const bat = 0.4;
+    for (let c = run.a0 + 0.8; c <= run.a1 - 0.8; c += 4 * bat) {
+      if (run.gate && c > run.gate.a0 - 1 && c < run.gate.a1 + 1) continue;
+      const x = run.axis === 'z' ? run.line + run.outerSide * off : c;
+      const z = run.axis === 'z' ? c : run.line + run.outerSide * off;
+      put('kcasWall', { x, y: walkY - 0.04, z, rot: run.axis === 'z' ? Math.PI / 2 : 0, s: bat });
+    }
+    for (let c = run.a0 + 1; c <= run.a1 - 1; c += 2 * S) {
+      if (run.gate && c > run.gate.a0 - 1 && c < run.gate.a1 + 1) continue;
+      const x = run.axis === 'z' ? run.line - run.outerSide * off : c;
+      const z = run.axis === 'z' ? c : run.line - run.outerSide * off;
+      put('kcasBarrierHalf', { x, y: walkY, z, rot: run.axis === 'z' ? Math.PI / 2 : 0 });
+    }
+    // the visible walk floor, parted at gates
+    const segs: [number, number][] = run.gate
+      ? [
+          [run.a0, run.gate.a0],
+          [run.gate.a1, run.a1],
+        ]
+      : [[run.a0, run.a1]];
+    for (const [s0, s1] of segs) {
+      if (s1 - s0 < 1) continue;
+      const mid = (s0 + s1) / 2;
+      const len = s1 - s0;
+      if (run.axis === 'z') slab(run.line, mid, DAWNHOLD.wallTh + 0.2, len, walkY - 0.02);
+      else slab(mid, run.line, len, DAWNHOLD.wallTh + 0.2, walkY - 0.02);
+    }
+  }
+
+  // ---- towers: shells, solid cores, caps; the NE watch gets a windowed
+  // storey and the green triple banner ----
+  for (const t of DAWNHOLD_TOWERS) {
+    const thw = t.hw;
+    const faces = [
+      { x: t.x, z: t.z - thw, rot: 0 },
+      { x: t.x, z: t.z + thw, rot: 0 },
+      { x: t.x - thw, z: t.z, rot: Math.PI / 2 },
+      { x: t.x + thw, z: t.z, rot: Math.PI / 2 },
+    ];
+    const shellScale = (thw * 2) / 4;
+    for (const f of faces) put('kcasWall', { x: f.x, y: padY, z: f.z, rot: f.rot, s: shellScale });
+    const core = new THREE.Mesh(
+      new THREE.BoxGeometry(thw * 2 - 0.4, t.hAbs - padY, thw * 2 - 0.4),
+      slabMat,
+    );
+    core.position.set(t.x, padY + (t.hAbs - padY) / 2, t.z);
+    core.castShadow = true;
+    core.receiveShadow = true;
+    group.add(core);
+    slab(t.x, t.z, thw * 2 + 0.5, thw * 2 + 0.5, t.hAbs - 0.02);
+    if (t.tall) {
+      const storeyY = padY + 4 * shellScale - 0.1;
+      const ws = Math.max(0.6, (t.hAbs - storeyY + 0.08) / 4);
+      put('kcasWallWindow', { x: t.x, y: storeyY, z: t.z - thw, rot: 0, s: ws });
+      put('kcasWallWindow', { x: t.x, y: storeyY, z: t.z + thw, rot: 0, s: ws });
+      put('kcasWallWindow', { x: t.x + thw, y: storeyY, z: t.z, rot: Math.PI / 2, s: ws });
+      put('kcasWallWindow', { x: t.x - thw, y: storeyY, z: t.z, rot: Math.PI / 2, s: ws });
+      put('kcasBannerGreenTriple', {
+        x: t.x + thw - 0.4,
+        y: t.hAbs + 0.1,
+        z: t.z,
+        rot: -Math.PI / 2,
+        s: 1.4,
+      });
+      put('kcasTorch', { x: t.x, y: t.hAbs, z: t.z, rot: 0, s: 1.5 });
+    } else {
+      for (const f of faces) {
+        put('kcasBarrier', { x: f.x, y: t.hAbs, z: f.z, rot: f.rot, s: shellScale });
+      }
+      put('kcasBannerGreenShield', { x: t.x, y: t.hAbs, z: t.z, rot: Math.PI / 4, s: 1.4 });
+    }
+  }
+
+  // ---- gate dressing: green banners flanking the main arch, torch light,
+  // a mounted torch at the garden postern ----
+  const gm = (DAWNHOLD_GATES.main.a0 + DAWNHOLD_GATES.main.a1) / 2;
+  for (const side of [-1, 1] as const) {
+    put('kcasBannerGreenA', {
+      x: DAWNHOLD.wx1 + 1.5,
+      y: padY + 2.8,
+      z: gm + side * (M / 2 + 1.5),
+      rot: Math.PI / 2,
+      s: 1.5,
+    });
+    put('kcasTorchMounted', {
+      x: DAWNHOLD.wx1 + 1.3,
+      y: padY + 2.2,
+      z: gm + side * 4.4,
+      rot: -Math.PI / 2,
+      s: 1.4,
+    });
+  }
+  const pm = (DAWNHOLD_GATES.postern.a0 + DAWNHOLD_GATES.postern.a1) / 2;
+  put('kcasTorchMounted', { x: pm - 2.2, y: padY + 2.2, z: DAWNHOLD.wz1 + 1.3, rot: 0, s: 1.4 });
+  const gateLight = new THREE.PointLight(0xffd98a, 4.5, 16, 2);
+  gateLight.position.set(DAWNHOLD.wx1 + 1, padY + 3.2, gm);
+  gateLight.userData.baseIntensity = 4.5;
+  glowLights.push(gateLight);
+  group.add(gateLight);
+
+  // ---- the stair flight: a solid wedge pier (lift terrain is invisible) ----
+  const wedgeMat = slabMat.clone();
+  wedgeMat.side = THREE.DoubleSide;
+  for (const rmp of DAWNHOLD_RAMPS) {
+    const baseY = padY - 0.4;
+    const pxz = (a: number, b: number): [number, number] => (rmp.axis === 'x' ? [a, b] : [b, a]);
+    const verts: number[] = [];
+    const c = (a: number, b: number, y: number): [number, number, number] => {
+      const [x, z] = pxz(a, b);
+      return [x, y, z];
+    };
+    const quad = (
+      p0: [number, number, number],
+      p1: [number, number, number],
+      p2: [number, number, number],
+      p3: [number, number, number],
+    ): void => {
+      verts.push(...p0, ...p1, ...p2, ...p0, ...p2, ...p3);
+    };
+    const { a0, a1, b0, b1, h0, h1 } = rmp;
+    quad(c(a0, b0, h0), c(a1, b0, h1), c(a1, b1, h1), c(a0, b1, h0));
+    quad(c(a0, b0, baseY), c(a1, b0, baseY), c(a1, b0, h1), c(a0, b0, h0));
+    quad(c(a0, b1, h0), c(a1, b1, h1), c(a1, b1, baseY), c(a0, b1, baseY));
+    quad(c(a0, b0, h0), c(a0, b1, h0), c(a0, b1, baseY), c(a0, b0, baseY));
+    quad(c(a1, b0, baseY), c(a1, b1, baseY), c(a1, b1, h1), c(a1, b0, h1));
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(verts), 3));
+    geo.computeVertexNormals();
+    const mesh = new THREE.Mesh(geo, wedgeMat);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    group.add(mesh);
+  }
+
+  // ---- the courtyard: a tiled path from the gate arch to the keep door,
+  // benches facing the parterre beds, torch light among the flowers ----
+  for (let px = 262; px <= 288; px += M) {
+    put('kcasFloorLarge', { x: px, y: padY + 0.02, z: gm, rot: 0 });
+  }
+  for (let pz = 892; pz >= 888; pz -= M) {
+    put('kcasFloorLarge', { x: 258, y: padY + 0.02, z: pz, rot: 0 });
+  }
+  for (const [bi, bed] of DAWNHOLD_BEDS.entries()) {
+    for (const side of [-1, 1] as const) {
+      put('kcasBench', {
+        x: bed.x + side * 7,
+        y: padY,
+        z: bed.z + (bi === 0 ? 1.5 : -1.5),
+        rot: side === -1 ? Math.PI / 2 : -Math.PI / 2,
+        s: 1.3,
+      });
+    }
+    const bedLight = new THREE.PointLight(0xffe2a8, 3, 12, 2);
+    bedLight.position.set(bed.x, padY + 2.4, bed.z);
+    bedLight.userData.baseIntensity = 3;
+    glowLights.push(bedLight);
+    group.add(bedLight);
+  }
+  put('kcasTorch', { x: 250, z: 894, y: padY, rot: 0, s: 1.5 });
+  put('kcasTorch', { x: 284, z: 902, y: padY, rot: 0, s: 1.5 });
+
+  // ---- instance every placed piece ----
+  const m4 = new THREE.Matrix4();
+  const q = new THREE.Quaternion();
+  const up = new THREE.Vector3(0, 1, 0);
+  const v = new THREE.Vector3();
+  const sc = new THREE.Vector3();
+  for (const [key, list] of spots) {
+    const scene = scenes[key];
+    if (!scene || list.length === 0) continue;
+    for (const part of extractParts(scene, SKIP_PARTS[key])) {
+      const mesh = new THREE.InstancedMesh(part.geo, part.mat, list.length);
+      list.forEach((p, i) => {
+        const s = p.s ?? S;
+        q.setFromAxisAngle(up, p.rot);
+        v.set(p.x, p.y, p.z);
+        sc.set(s, s, s);
+        mesh.setMatrixAt(i, m4.compose(v, q, sc));
+      });
+      mesh.instanceMatrix.needsUpdate = true;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      mesh.computeBoundingSphere();
+      group.add(mesh);
+    }
+  }
+
+  return { group, glowLights };
+}

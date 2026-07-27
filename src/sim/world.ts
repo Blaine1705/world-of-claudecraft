@@ -34,6 +34,12 @@ import {
   ZONES,
   zoneAt,
 } from './data';
+import {
+  DAWNHOLD_BEDS,
+  dawnholdLift,
+  dawnholdPadTarget,
+  dawnholdPadWeight,
+} from './dawnhold_layout';
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
 import { dungeonFloorLift } from './dungeon_floor';
 import { lastKeepLiftAt } from './dungeon_layout';
@@ -1263,6 +1269,9 @@ const bedGroup = (ax: number, az: number, r: number, sats: [number, number][]): 
   ...sats.map(([x, z]) => ({ x, z, r: 3.25, ax, az })),
 ];
 export const GARDEN_BED_PADS: readonly GardenBedPad[] = [
+  // Dawnhold Castle's courtyard parterres (anchors from the castle plan;
+  // the castle pad already levels this ground, so these pads sit flush)
+  ...DAWNHOLD_BEDS.map((b) => ({ x: b.x, z: b.z, r: 5.5, ax: b.x, az: b.z })),
   ...bedGroup(322, 878, 10, [
     [322, 892.8],
     [322, 863.2],
@@ -2559,6 +2568,14 @@ function applyLastSpringBank(x: number, z: number, h: number): number {
   const w = castleSkirtWeight(x, z) * (1 - smoothstep(b.rim - b.ease, b.rim, d));
   if (w <= 0) return h;
   return h + (target - h) * w;
+}
+
+// Dawnhold Castle's graded grounds in the Evergarden (the same idiom at a
+// smaller scale; the plan lives in dawnhold_layout.ts).
+function applyDawnholdPad(x: number, z: number, h: number): number {
+  const w = dawnholdPadWeight(x, z);
+  if (w <= 0) return h;
+  return h + (dawnholdPadTarget() - h) * w;
 }
 
 // ---------------------------------------------------------------------------
@@ -3938,7 +3955,11 @@ export function groundHeight(x: number, z: number, seed: number): number {
   // (castleLift): the wall mass is a sheer riser the climb gate refuses,
   // and its flat top is the wall-walk.
   const terrain =
-    terrainHeight(x, z, seed) + sowfieldStandLift(x, z) + beaconSpiralLift(x, z) + castleLift(x, z);
+    terrainHeight(x, z, seed) +
+    sowfieldStandLift(x, z) +
+    beaconSpiralLift(x, z) +
+    castleLift(x, z) +
+    dawnholdLift(x, z);
   return Math.max(terrain, dockSurfaceHeight(x, z, seed));
 }
 
@@ -3975,6 +3996,8 @@ function applyTerrainPads(x: number, z: number, seed: number, h0: number): numbe
   // after the shore grading that forms them (see REACH_POOL_RIM_EASE for the freeze
   // it closes and REACH_POOL_DECK_TIE_IN for the one-way edge it closes).
   h = applyReachPoolWalkwayBed(x, z, h);
+  // Dawnhold Castle's garden pad, same late application.
+  h = applyDawnholdPad(x, z, h);
   // Level pads under the Evergarden's modeled flower beds, applied over the
   // FINISHED height (the garden seam reshapes the lawn per position, so an
   // early flatten would drift apart again): each bed ensemble sits flush on
@@ -3987,7 +4010,12 @@ function applyTerrainPads(x: number, z: number, seed: number, h0: number): numbe
       const padGate = pad.r + 4;
       if (dx * dx + dz * dz >= padGate * padGate) continue;
       const d = Math.sqrt(dx * dx + dz * dz);
-      const ch = terrainHeightUnpadded(pad.ax, pad.az, seed);
+      // the anchor height honors Dawnhold's castle pad (the courtyard
+      // parterres must sit on the graded bailey, not dig back down to the
+      // raw lawn beneath it); beds outside the pad are unaffected (w 0)
+      let ch = terrainHeightUnpadded(pad.ax, pad.az, seed);
+      const dw = dawnholdPadWeight(pad.ax, pad.az);
+      if (dw > 0) ch = ch + (dawnholdPadTarget() - ch) * dw;
       const blend = smoothstep(pad.r + 1, pad.r + 4, d);
       h = h * blend + ch * (1 - blend);
     }
@@ -5083,8 +5111,10 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     kind = r < 0.1 ? 'tree' : r < 0.5 ? 'tree2' : 'rock';
   } else if (biome === 'garden') {
     // open parkland: sparse specimen trees on the lawns, and the maze
-    // keeps its corridors clear (the hedges are terrain, not dressing)
+    // keeps its corridors clear (the hedges are terrain, not dressing);
+    // Dawnhold's graded grounds take no wild scatter either
     if (inGardenMaze(gx, gz)) return null;
+    if (dawnholdPadWeight(gx, gz) > 0) return null;
     if (r > 0.3) return null;
     kind = r < 0.16 ? 'tree' : r < 0.2 ? 'tree2' : 'rock';
   } else if (biome === 'gale') {

@@ -194,6 +194,7 @@ import {
   showsStaticFarMesh,
 } from './crowd_lod';
 import { daisVisualLift } from './dais_lift';
+import { buildDawnholdFeatures, type DawnholdFeaturesView } from './dawnhold_features';
 import { currentDayNightPhase, currentLunarPhase, dayNightPhaseOverride } from './day_night_clock';
 import {
   aboveHorizon,
@@ -1807,6 +1808,7 @@ export class Renderer {
   private realmFlora: RealmFloraView | null = null;
   private emberFeatures: EmberFeaturesView | null = null;
   private castleFeatures: CastleFeaturesView | null = null;
+  private dawnholdFeatures: DawnholdFeaturesView | null = null;
   private frostSky: FrostSkyView | null = null;
   private fenFeatures: FenFeaturesView | null = null;
   private amberFeatures: AmberFeaturesView | null = null;
@@ -4256,6 +4258,10 @@ export class Renderer {
         if (!this.gardenFeatures) {
           this.gardenFeatures = buildGardenFeatures(this.sim.cfg.seed);
           this.attachZoneFeature(this.gardenFeatures);
+        }
+        if (!this.dawnholdFeatures) {
+          this.dawnholdFeatures = buildDawnholdFeatures();
+          this.attachZoneFeature(this.dawnholdFeatures);
         }
         break;
       case 'gale':
