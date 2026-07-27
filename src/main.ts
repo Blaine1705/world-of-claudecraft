@@ -183,6 +183,7 @@ import {
   resumeRoute,
   savePlayMarker,
 } from './net/resume_play';
+import { createSeekerEntitlementSync } from './net/seeker_entitlement_sync';
 import { openStripeCheckout } from './net/stripe_checkout';
 import type { WalletOption, WalletPickerMode, WalletPickerResult } from './net/wallet';
 import { resolveWalletCapability } from './net/wallet_capability';
@@ -4355,6 +4356,15 @@ async function startOffline(
 // ---------------------------------------------------------------------------
 
 const api = new Api();
+const seekerEntitlementSync = createSeekerEntitlementSync({
+  entitlement: () => api.seekerEntitlement(),
+  createClaimProof: () => createNativeAttestationProof(api.base, 'seeker-claim'),
+  claim: (proof) => api.claimSeekerEntitlement(proof),
+  onPermanentFailure: (error) => {
+    console.error('[wallet] Seeker entitlement sync was rejected', error);
+    flashWalletError(userFacingApiError(error));
+  },
+});
 
 // Referral capture: a visitor who arrives from a shared player card link
 // (?ref=<slug>) carries the referrer's slug into registration. Read it once at
@@ -7906,6 +7916,7 @@ function clearDiscordChoice(): void {
 
 async function refreshWalletLinkStatus(): Promise<void> {
   if (!(await walletCapabilityReady)) {
+    seekerEntitlementSync.reset();
     linkedWalletPubkey = null;
     linkedWocBalance = null;
     connectedWocBalance = null;
@@ -7915,6 +7926,7 @@ async function refreshWalletLinkStatus(): Promise<void> {
     return;
   }
   if (!api.token) {
+    seekerEntitlementSync.reset();
     linkedWalletPubkey = null;
     linkedWocBalance = null;
     desktopWalletBrowserSessionActive = false;
@@ -7941,6 +7953,13 @@ async function refreshWalletLinkStatus(): Promise<void> {
   }
   updateWalletButton();
   const pubkey = linkedWalletPubkey;
+  if (statusKnown) {
+    await seekerEntitlementSync.sync({
+      accountKey: api.username ?? '',
+      walletPubkey: pubkey,
+      eligible: NATIVE_APP && WALLET_ENABLED,
+    });
+  }
   if (pubkey && WALLET_ENABLED) {
     try {
       const wallet = await loadWallet();

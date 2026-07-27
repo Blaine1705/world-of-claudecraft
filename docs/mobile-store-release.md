@@ -73,6 +73,161 @@ VITE_API_ORIGIN=http://192.168.1.247 npm run native:sync
 Replace the IP with the Mac's current Wi-Fi/LAN address. Do not use
 `localhost` for a physical phone; that resolves to the phone itself.
 
+## Android Distribution Flavors, Signing, and Play Integrity
+
+Android has two distribution flavors with different packaged capabilities:
+
+| Variant | Distribution | Native Solana / MWA code |
+|---|---|---|
+| `playRelease` | Google Play | Excluded |
+| `solanaStoreRelease` | Solana dApp Store | Included |
+
+`BuildConfig.SOLANA_MOBILE_DISTRIBUTION`, Seeker model checks, and native plugin
+availability control client UI and packaged code. They are not server
+authorization evidence. Seeker entitlement claim and native Daily Rewards spin
+are authorized separately by a purpose-specific Play Integrity verdict and
+server-side SGT ownership verification.
+
+### Release signing contract
+
+Prepare two distinct production signing identities:
+
+- Google Play installs are signed with the **Google Play App Signing
+  certificate**. This is not necessarily the upload-key certificate.
+- Solana dApp Store releases are signed with a dedicated **Solana Store release
+  certificate**.
+
+The server allowlist must contain only the base64url SHA-256 digest of the
+Solana Store release certificate. Do not add the Google Play App Signing
+certificate, Play upload certificate, or an Android Debug certificate.
+
+The certificate distinction is security-critical. If both artifacts use the
+same package name and signing certificate, the server cannot cryptographically
+distinguish the Play artifact from the Solana Store artifact. Debug variants
+normally share the Android Debug certificate and therefore cannot prove this
+production boundary.
+
+Android permits an installed app to be updated only by an artifact signed by a
+compatible signing identity. Because the two store artifacts intentionally use
+different signing certificates, switching between the Play and Solana Store
+tracks is not an in-place update. It normally requires uninstalling the
+existing app first, which removes local app data. Document this limitation in
+store and support guidance before release.
+
+Keep every keystore, key password, service-account credential, and signing
+configuration secret out of Git, build logs, screenshots, PR descriptions, and
+release notes. A certificate fingerprint is public metadata, but the keystore
+and its private key are secrets.
+
+### Play Integrity project
+
+Play Integrity requires a Google Cloud project with the Play Integrity API
+enabled. For the Solana Store artifact, which is distributed outside Google
+Play, set that project's numeric project number before building:
+
+PowerShell:
+
+```powershell
+$env:PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER="REPLACE_WITH_PROJECT_NUMBER"
+npm.cmd run native:sync
+npm.cmd run native:open:android
+```
+
+POSIX shell:
+
+```sh
+export PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER=REPLACE_WITH_PROJECT_NUMBER
+npm run native:sync
+npm run native:open:android
+```
+
+The value is compiled into the Android artifact through
+`BuildConfig.PLAY_INTEGRITY_CLOUD_PROJECT_NUMBER`. Changing it requires a new
+native build and reinstall; changing only the server environment does not
+update an existing APK. Launch Android Studio from the same environment, or set
+the variable in the release build environment; an already-running Android
+Studio process does not inherit later shell changes.
+
+The server must authenticate `decodeIntegrityToken` with a service account from
+the same Cloud project. Configure the deployment secret through
+`GOOGLE_PLAY_INTEGRITY_SERVICE_ACCOUNT_JSON`, or through the separately
+supported client-email and signing-PEM environment variables. Never commit
+these values. The server also requires:
+
+```env
+SEEKER_SOLANA_INTEGRITY_PACKAGE_NAME=com.worldofclaudecraft
+SEEKER_SOLANA_INTEGRITY_CERT_DIGESTS=<SOLANA_STORE_RELEASE_CERT_BASE64URL_SHA256>
+SEEKER_SOLANA_INTEGRITY_DEVICE_VERDICT=MEETS_DEVICE_INTEGRITY
+```
+
+Missing service-account credentials, package configuration, or certificate
+allowlist intentionally fails Seeker claim and native spin closed with
+`seeker.solana_artifact_required`.
+
+Play Integrity verifies the signed artifact and device signals; it does not
+prove that the APK was downloaded from the Solana dApp Store. A correctly
+signed and allowlisted Solana Store APK remains valid when sideloaded.
+
+### Generate and inspect the signed artifacts
+
+Run `npm run native:sync`, open the Android project, and use Android Studio's
+**Generate Signed Bundle / APK** workflow. Select the intended flavor and its
+matching signing identity:
+
+- `playRelease`: build the artifact intended for Google Play. The final
+  certificate used for the installed artifact is the Play App Signing
+  certificate shown by Play Console.
+- `solanaStoreRelease`: build an APK signed with the dedicated Solana Store
+  release keystore.
+
+Do not treat an unsigned `assembleSolanaStoreRelease` output as a shippable
+artifact. Verify the actual APK that will be uploaded:
+
+```powershell
+$buildTools = Get-ChildItem "$env:LOCALAPPDATA\Android\Sdk\build-tools" -Directory |
+  Sort-Object Name -Descending |
+  Select-Object -First 1
+$apkSigner = Join-Path $buildTools.FullName "apksigner.bat"
+$apkPath = Resolve-Path ".\android\app\build\outputs\apk\solanaStore\release\app-solanaStore-release.apk"
+
+& $apkSigner verify --print-certs $apkPath
+```
+
+If Android Studio wrote the signed APK elsewhere, replace `$apkPath` with that
+exact artifact path. Convert the reported hexadecimal SHA-256 certificate
+digest to the base64url representation returned by Play Integrity:
+
+```powershell
+$hexDigest = "REPLACE_WITH_APKSIGNER_SHA256_HEX"
+node -e "console.log(Buffer.from(process.argv[1].replaceAll(':', ''), 'hex').toString('base64url'))" $hexDigest
+```
+
+Set the resulting value in
+`SEEKER_SOLANA_INTEGRITY_CERT_DIGESTS`, restart the server, and verify a decoded
+production verdict before release. Do not copy a hexadecimal fingerprint
+directly into the base64url allowlist.
+
+### Android release checks
+
+Before shipping:
+
+- Confirm the Play runtime dependency graph, DEX/class inventory, merged
+  manifest, and Capacitor registration contain no Solana/MWA implementation or
+  `NativeSolanaMobilePlugin`.
+- Confirm the Solana Store artifact contains the intended MWA dependencies and
+  native plugin.
+- Confirm the final Play App Signing and Solana Store release certificate
+  digests are different.
+- Confirm only the Solana Store release digest is configured in the Seeker
+  server allowlist.
+- Confirm no Debug certificate digest or private signing material is present in
+  production configuration.
+- Confirm a Solana Store artifact with the allowlisted signature can claim
+  entitlement, while iOS, the Play artifact, missing proof, a mismatched
+  package, and a mismatched certificate fail closed.
+- Confirm native Daily Rewards spin requires a fresh `seeker-spin` proof,
+  existing entitlement, and current ownership of the claimed SGT mint.
+
 ## Native Discord Authentication
 
 Discord login and account linking open the system browser, return through the
