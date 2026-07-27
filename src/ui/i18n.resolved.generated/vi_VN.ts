@@ -1463,10 +1463,12 @@ export const vi_VN: EnTranslations = {
       "title": "Thu Hoạch",
       "harvestButton": "Thu Hoạch",
       "harvestTooltip": "Thu thập các bộ phận đã chọn. Mỗi xác chỉ có thể thu hoạch một lần, ai đến trước được trước. Không lấy chiến lợi phẩm.",
-      "concentrateHint": "Chọn càng ít bộ phận, mỗi bộ phận thu được sẽ có bậc chất lượng càng cao.",
+      "yieldTierHint": "Một lần thu hoạch lấy được càng ít bộ phận, bậc chất lượng của mỗi bộ phận càng cao.",
       "nothingSelectedYields": "Không thể thu hoạch bộ phận nào bạn đã chọn từ xác này.",
       "alreadyHarvested": "Xác này đã bị thu hoạch rồi.",
       "componentAria": "Thu hoạch {component}",
+      "componentNoYield": "chưa có gì",
+      "componentAriaNoYield": "Thu hoạch {component}: chưa có gì để lấy từ bộ phận này",
       "components": {
         "hide": "Da",
         "fang": "Nanh",

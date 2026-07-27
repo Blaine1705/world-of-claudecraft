@@ -1463,10 +1463,12 @@ export const ko_KR: EnTranslations = {
       "title": "채집",
       "harvestButton": "채집",
       "harvestTooltip": "선택한 부위를 채집합니다. 각 시체는 선착순으로 한 번만 채집할 수 있습니다. 전리품은 가져가지 않습니다.",
-      "concentrateHint": "선택한 부위가 적을수록 부위당 등급이 더 높아집니다.",
+      "yieldTierHint": "채집에서 실제로 얻는 부위가 적을수록 각 부위의 등급이 더 높아집니다.",
       "nothingSelectedYields": "선택한 부위는 이 시체에서 채집할 수 없습니다.",
       "alreadyHarvested": "이 시체는 이미 채집되었습니다.",
       "componentAria": "{component} 채집",
+      "componentNoYield": "아직 없음",
+      "componentAriaNoYield": "{component} 채집: 아직 채집할 것이 없습니다",
       "components": {
         "hide": "가죽",
         "fang": "송곳니",

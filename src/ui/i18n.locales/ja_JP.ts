@@ -774,13 +774,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.masterOption': '分配担当：{name}',
   'hudChrome.corpseHarvest.title': '採取',
   'hudChrome.corpseHarvest.harvestButton': '採取',
-  'hudChrome.corpseHarvest.concentrateHint': '選ぶ部位が少ないほど、各部位の品質が高くなります。',
   'hudChrome.corpseHarvest.alreadyHarvested': 'この死体はすでに採取されています。',
   'hudChrome.corpseHarvest.nothingSelectedYields':
     '選んだ部位はどれも、この死体から採取できません。',
   'hudChrome.corpseHarvest.harvestTooltip':
     'チェックした部位を採取します。各死体は早い者勝ちで一度だけ採取できます。戦利品は取りません。',
   'hudChrome.corpseHarvest.componentAria': '{component}を採取',
+  'hudChrome.corpseHarvest.componentNoYield': 'まだ産出なし',
+  'hudChrome.corpseHarvest.componentAriaNoYield': '{component}を採取：まだ何も取れません',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    '一度の採取で実際に取れる部位が少ないほど、各部位の品質が高くなります。',
   'hudChrome.corpseHarvest.components.hide': '毛皮',
   'hudChrome.corpseHarvest.components.fang': '牙',
   'hudChrome.corpseHarvest.components.silk': '絹糸',

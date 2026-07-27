@@ -1463,10 +1463,12 @@ export const de_DE: EnTranslations = {
       "title": "Verwerten",
       "harvestButton": "Verwerten",
       "harvestTooltip": "Verwirft die markierten Komponenten. Jeder Kadaver kann einmal verwertet werden, wer zuerst kommt. Nimmt nicht die Beute.",
-      "concentrateHint": "Je weniger Teile du wählst, desto höher ist die Qualitätsstufe jedes einzelnen Teils.",
+      "yieldTierHint": "Je weniger Teile eine Verwertung tatsächlich entnimmt, desto höher ist die Qualitätsstufe jedes einzelnen Teils.",
       "nothingSelectedYields": "An diesem Kadaver gibt es nichts aus deiner Auswahl zu verwerten.",
       "alreadyHarvested": "Dieser Kadaver wurde bereits verwertet.",
       "componentAria": "{component} verwerten",
+      "componentNoYield": "noch nichts",
+      "componentAriaNoYield": "{component} verwerten: daraus gibt es noch nichts zu holen",
       "components": {
         "hide": "Haut",
         "fang": "Fangzahn",

@@ -2065,6 +2065,11 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.nothingSelectedYields':
     'Tidak ada pilihanmu yang bisa dipanen dari bangkai ini.',
   'hudChrome.corpseHarvest.componentAria': 'Panen {component}',
+  'hudChrome.corpseHarvest.componentNoYield': 'belum ada hasil',
+  'hudChrome.corpseHarvest.componentAriaNoYield':
+    'Panen {component}: belum ada yang bisa diambil darinya',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Semakin sedikit bagian yang benar-benar diambil dalam satu panen, semakin tinggi tingkat mutu tiap bagian.',
   'hudChrome.corpseHarvest.components.claw': 'Cakar',
   'hudChrome.corpseHarvest.components.fang': 'Taring',
   'hudChrome.corpseHarvest.components.gills': 'Insang',
@@ -2073,8 +2078,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Sutra',
   'hudChrome.corpseHarvest.components.tusk': 'Gading',
   'hudChrome.corpseHarvest.components.venomSac': 'Kantung Bisa',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Semakin sedikit bagian yang dipilih, semakin tinggi tingkat mutu tiap bagian.',
   'hudChrome.corpseHarvest.harvestButton': 'Panen',
   'hudChrome.corpseHarvest.harvestTooltip':
     'Mengumpulkan komponen yang dicentang. Setiap bangkai hanya bisa dipanen sekali, siapa cepat dia dapat. Tidak mengambil jarahan.',

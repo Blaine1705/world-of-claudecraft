@@ -1463,10 +1463,12 @@ export const en_XA: EnTranslations = {
       "title": "[Ĥáŕʋéšţ]",
       "harvestButton": "[Ĥáŕʋéšţ]",
       "harvestTooltip": "[Ĝáţĥéŕš ţĥé çĥéçķéð çóɱþóñéñţš. Éáçĥ çóŕþšé çáñ ƀé ĥáŕʋéšţéð óñçé, ƒíŕšţ çóɱé. Ðóéš ñóţ ţáķé ţĥé ļóóţ.]",
-      "concentrateHint": "[Ƒéŵéŕ çĥóšéñ çóɱþóñéñţš ýíéļð á ĥíĝĥéŕ ţíéŕ éáçĥ.]",
+      "yieldTierHint": "[Ţĥé ƒéŵéŕ çóɱþóñéñţš á ĥáŕʋéšţ ţáķéš, ţĥé ĥíĝĥéŕ ţĥé ţíéŕ óƒ éáçĥ.]",
       "nothingSelectedYields": "[Ñóţĥíñĝ ýóú šéļéçţéð çáñ ƀé ĥáŕʋéšţéð ƒŕóɱ ţĥíš çóŕþšé.]",
       "alreadyHarvested": "[Ţĥíš çóŕþšé ĥáš áļŕéáðý ƀééñ ĥáŕʋéšţéð.]",
       "componentAria": "[Ĥáŕʋéšţ {component}]",
+      "componentNoYield": "[ñóţĥíñĝ ýéţ]",
+      "componentAriaNoYield": "[Ĥáŕʋéšţ {component}: ñóţĥíñĝ ţó ţáķé ƒŕóɱ íţ ýéţ]",
       "components": {
         "hide": "[Ĥíðé]",
         "fang": "[Ƒáñĝ]",

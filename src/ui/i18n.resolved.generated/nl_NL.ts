@@ -1463,10 +1463,12 @@ export const nl_NL: EnTranslations = {
       "title": "Oogsten",
       "harvestButton": "Oogsten",
       "harvestTooltip": "Verzamelt de aangevinkte onderdelen. Elk lijk kan eenmaal worden geoogst, wie het eerst komt. Neemt de buit niet mee.",
-      "concentrateHint": "Hoe minder delen je kiest, hoe hoger de kwaliteit van elk deel.",
+      "yieldTierHint": "Hoe minder delen een oogst daadwerkelijk oplevert, hoe hoger de kwaliteit van elk deel.",
       "nothingSelectedYields": "Van dit kadaver valt niets uit je selectie te oogsten.",
       "alreadyHarvested": "Dit kadaver is al geoogst.",
       "componentAria": "Oogst {component}",
+      "componentNoYield": "nog niets",
+      "componentAriaNoYield": "Oogst {component}: hieruit valt nog niets te halen",
       "components": {
         "hide": "Huid",
         "fang": "Tand",

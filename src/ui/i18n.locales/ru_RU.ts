@@ -774,14 +774,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.masterOption': 'Мастер добычи: {name}',
   'hudChrome.corpseHarvest.title': 'Сбор',
   'hudChrome.corpseHarvest.harvestButton': 'Собрать',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Чем меньше выбрано компонентов, тем выше их качество.',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Этот труп уже был собран.',
   'hudChrome.corpseHarvest.nothingSelectedYields':
     'С этого трупа нельзя собрать ничего из выбранного.',
   'hudChrome.corpseHarvest.harvestTooltip':
     'Собирает отмеченные компоненты. Каждый труп можно обработать только один раз, кто успел первым. Добычу при этом не забирает.',
   'hudChrome.corpseHarvest.componentAria': 'Собрать {component}',
+  'hudChrome.corpseHarvest.componentNoYield': 'пока ничего',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Собрать {component}: пока нечего взять',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Чем меньше компонентов забирает сбор, тем выше качество каждого из них.',
   'hudChrome.corpseHarvest.components.hide': 'Шкура',
   'hudChrome.corpseHarvest.components.fang': 'Клык',
   'hudChrome.corpseHarvest.components.silk': 'Шелк',

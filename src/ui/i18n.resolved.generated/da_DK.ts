@@ -1463,10 +1463,12 @@ export const da_DK: EnTranslations = {
       "title": "Høst",
       "harvestButton": "Høst",
       "harvestTooltip": "Indsamler de markerede komponenter. Hvert kadaver kan kun hostes en gang, og det gælder for den første der kommer. Tager ikke byttet.",
-      "concentrateHint": "Jo færre dele du vælger, desto højere kvalitetsgrad får hver enkelt.",
+      "yieldTierHint": "Jo færre komponenter en høst tager, desto højere kvalitetsgrad får hver enkelt.",
       "nothingSelectedYields": "Intet af det du har valgt kan høstes fra dette kadaver.",
       "alreadyHarvested": "Dette kadaver er allerede blevet høstet.",
       "componentAria": "Høst {component}",
+      "componentNoYield": "intet endnu",
+      "componentAriaNoYield": "Høst {component}: der er endnu intet at tage herfra",
       "components": {
         "hide": "Skind",
         "fang": "Hugtand",

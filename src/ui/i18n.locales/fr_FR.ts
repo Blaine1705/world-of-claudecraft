@@ -6110,6 +6110,11 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.nothingSelectedYields':
     "Ce cadavre n'a rien à dépecer parmi les composants cochés.",
   'hudChrome.corpseHarvest.componentAria': 'Prélever {component}',
+  'hudChrome.corpseHarvest.componentNoYield': "rien pour l'instant",
+  'hudChrome.corpseHarvest.componentAriaNoYield':
+    "Prélever {component} : rien à en tirer pour l'instant",
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Moins un dépeçage prélève de composants, plus le palier de chacun est élevé.',
   'hudChrome.corpseHarvest.components.claw': 'Griffe',
   'hudChrome.corpseHarvest.components.fang': 'Croc',
   'hudChrome.corpseHarvest.components.gills': 'Branchies',
@@ -6118,8 +6123,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Soie',
   'hudChrome.corpseHarvest.components.tusk': 'Défense',
   'hudChrome.corpseHarvest.components.venomSac': 'Sac à venin',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Moins vous choisissez de composants, plus la qualité de chacun est élevée.',
   'hudChrome.corpseHarvest.harvestButton': 'Dépecer',
   'hudChrome.corpseHarvest.harvestTooltip':
     "Récupère les composants cochés. Chaque cadavre ne peut être dépecé qu'une fois, premier arrivé. Ne prend pas le butin.",

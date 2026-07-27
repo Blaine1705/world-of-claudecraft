@@ -1463,10 +1463,12 @@ export const ja_JP: EnTranslations = {
       "title": "採取",
       "harvestButton": "採取",
       "harvestTooltip": "チェックした部位を採取します。各死体は早い者勝ちで一度だけ採取できます。戦利品は取りません。",
-      "concentrateHint": "選ぶ部位が少ないほど、各部位の品質が高くなります。",
+      "yieldTierHint": "一度の採取で実際に取れる部位が少ないほど、各部位の品質が高くなります。",
       "nothingSelectedYields": "選んだ部位はどれも、この死体から採取できません。",
       "alreadyHarvested": "この死体はすでに採取されています。",
       "componentAria": "{component}を採取",
+      "componentNoYield": "まだ産出なし",
+      "componentAriaNoYield": "{component}を採取：まだ何も取れません",
       "components": {
         "hide": "毛皮",
         "fang": "牙",

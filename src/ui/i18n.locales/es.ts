@@ -7504,6 +7504,11 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.nothingSelectedYields':
     'Nada de lo que has seleccionado se puede recolectar de este cadáver.',
   'hudChrome.corpseHarvest.componentAria': 'Recolectar {component}',
+  'hudChrome.corpseHarvest.componentNoYield': 'aún nada',
+  'hudChrome.corpseHarvest.componentAriaNoYield':
+    'Recolectar {component}: aún no hay nada que extraer',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Cuantos menos componentes extraiga una recolección, mayor será la calidad de cada uno.',
   'hudChrome.corpseHarvest.components.claw': 'Garra',
   'hudChrome.corpseHarvest.components.fang': 'Colmillo',
   'hudChrome.corpseHarvest.components.gills': 'Agallas',
@@ -7512,8 +7517,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Seda',
   'hudChrome.corpseHarvest.components.tusk': 'Colmillo',
   'hudChrome.corpseHarvest.components.venomSac': 'Saco de veneno',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Cuantos menos componentes elijas, mayor será la calidad de cada uno.',
   'hudChrome.corpseHarvest.harvestButton': 'Recolectar',
   'hudChrome.corpseHarvest.title': 'Recolectar',
   'hudChrome.gathering.herbalism': 'Herboristería',

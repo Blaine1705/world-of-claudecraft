@@ -780,6 +780,18 @@
     font-size: 12px;
     cursor: pointer;
   }
+  /* #2514: a component family with no harvest item behind it yet. The row is
+     still offered and still checkable (the sim ignores it either way), so the
+     mark is the muted name plus the .corpse-harvest-note text beside it, never
+     colour alone. */
+  .corpse-harvest-row-inert {
+    opacity: 0.6;
+  }
+  .corpse-harvest-note {
+    font-size: 10px;
+    font-style: italic;
+    opacity: 0.85;
+  }
   .corpse-harvest-btn {
     width: 100%;
   }

@@ -2077,6 +2077,11 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.nothingSelectedYields':
     'Không thể thu hoạch bộ phận nào bạn đã chọn từ xác này.',
   'hudChrome.corpseHarvest.componentAria': 'Thu hoạch {component}',
+  'hudChrome.corpseHarvest.componentAriaNoYield':
+    'Thu hoạch {component}: chưa có gì để lấy từ bộ phận này',
+  'hudChrome.corpseHarvest.componentNoYield': 'chưa có gì',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Một lần thu hoạch lấy được càng ít bộ phận, bậc chất lượng của mỗi bộ phận càng cao.',
   'hudChrome.corpseHarvest.components.claw': 'Móng Vuốt',
   'hudChrome.corpseHarvest.components.fang': 'Nanh',
   'hudChrome.corpseHarvest.components.gills': 'Mang',
@@ -2085,8 +2090,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Tơ',
   'hudChrome.corpseHarvest.components.tusk': 'Ngà',
   'hudChrome.corpseHarvest.components.venomSac': 'Túi Độc',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Chọn càng ít bộ phận, mỗi bộ phận thu được sẽ có bậc chất lượng càng cao.',
   'hudChrome.corpseHarvest.harvestButton': 'Thu Hoạch',
   'hudChrome.corpseHarvest.harvestTooltip':
     'Thu thập các bộ phận đã chọn. Mỗi xác chỉ có thể thu hoạch một lần, ai đến trước được trước. Không lấy chiến lợi phẩm.',

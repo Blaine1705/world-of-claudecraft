@@ -5697,6 +5697,11 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.nothingSelectedYields':
     'An diesem Kadaver gibt es nichts aus deiner Auswahl zu verwerten.',
   'hudChrome.corpseHarvest.componentAria': '{component} verwerten',
+  'hudChrome.corpseHarvest.componentNoYield': 'noch nichts',
+  'hudChrome.corpseHarvest.componentAriaNoYield':
+    '{component} verwerten: daraus gibt es noch nichts zu holen',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Je weniger Teile eine Verwertung tatsächlich entnimmt, desto höher ist die Qualitätsstufe jedes einzelnen Teils.',
   'hudChrome.corpseHarvest.components.claw': 'Klaue',
   'hudChrome.corpseHarvest.components.fang': 'Fangzahn',
   'hudChrome.corpseHarvest.components.gills': 'Kiemen',
@@ -5705,8 +5710,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Seide',
   'hudChrome.corpseHarvest.components.tusk': 'Stoßzahn',
   'hudChrome.corpseHarvest.components.venomSac': 'Giftsack',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Je weniger Teile du wählst, desto höher ist die Qualitätsstufe jedes einzelnen Teils.',
   'hudChrome.corpseHarvest.harvestButton': 'Verwerten',
   'hudChrome.corpseHarvest.title': 'Verwerten',
   'hudChrome.emoteEditor.done': 'Fertig',

@@ -4101,6 +4101,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.nothingSelectedYields':
     'Z této mrtvoly nelze sklidit nic z vybraných komponent.',
   'hudChrome.corpseHarvest.componentAria': 'Sklidit {component}',
+  'hudChrome.corpseHarvest.componentNoYield': 'zatím nic',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Sklidit {component}: zatím z toho není co vzít',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Čím méně komponent sklizeň skutečně odebere, tím vyšší stupeň má každá z nich.',
   'hudChrome.corpseHarvest.components.claw': 'Dráp',
   'hudChrome.corpseHarvest.components.fang': 'Tesák',
   'hudChrome.corpseHarvest.components.gills': 'Žábry',
@@ -4109,7 +4113,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Hedvábí',
   'hudChrome.corpseHarvest.components.tusk': 'Kly',
   'hudChrome.corpseHarvest.components.venomSac': 'Jedový váček',
-  'hudChrome.corpseHarvest.concentrateHint': 'Méně vybraných komponent dá každé vyšší stupeň.',
   'hudChrome.corpseHarvest.harvestButton': 'Sklidit',
   'hudChrome.corpseHarvest.harvestTooltip':
     'Sbírá zaškrtnuté součásti. Každou mrtvolu lze sklidit pouze jednou, kdo dřív přijde. Nepobírá kořist.',

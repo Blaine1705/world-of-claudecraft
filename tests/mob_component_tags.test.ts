@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { MOBS } from '../src/sim/data';
-import { isHarvestableCorpse } from '../src/sim/professions/gathering';
+import {
+  BASE_TIER_WEIGHTS,
+  harvestFamilyYieldsItem,
+  isHarvestableCorpse,
+} from '../src/sim/professions/gathering';
 
 // Profession harvesting (issue #1140): mob content records may carry an optional
 // `componentTags` list (skinning/salvage component types like 'hide', 'horn',
@@ -47,6 +51,54 @@ describe('mob component-type tags', () => {
     // The complement, so an always-false predicate could not pass the row above
     // by emptying the sweep.
     expect(tagged.filter((mob) => isHarvestableCorpse(mob.componentTags))).toHaveLength(17);
+  });
+
+  it('never lets a template out-pay the tag list it advertises (#2514)', () => {
+    // The knock-on of the #2514 ruling, made a checked property instead of an
+    // accident of current content. The concentration bonus counts families the
+    // harvest could not EXTRACT, and the denominator is the corpse's advertised
+    // tag count, so an unmapped tag is worth a tier to whoever concentrates.
+    // That widens the default harvest on a mixed corpse, and it is bounded only
+    // by shape: the default pick extracts `mapped` families at bonus
+    // `tags - mapped`, while the same corpse with every tag mapped would extract
+    // `tags` at bonus 0. Below M=3 the first is the smaller number; at 3 mapped
+    // families beside 1 unmapped it overtakes, and a template shaped that way
+    // would quietly pay MORE for missing content than for shipped content.
+    //
+    // No shipped template has that shape (the widest mixed one is 2 mapped
+    // beside 1 unmapped), so this reds on the first one that does, which is the
+    // moment the ruling owes a second look rather than a silent buff. Derived
+    // from BASE_TIER_WEIGHTS, so a weight tune moves the threshold with it
+    // instead of leaving a stale hand-computed number behind.
+    const expectedQty = (bonus: number) => {
+      const total = BASE_TIER_WEIGHTS.reduce((sum, w) => sum + w, 0);
+      // qty is tier index + 1, and the bonus shifts the index up, clamped at
+      // the top tier (rollFocusTier + harvestTierQuantity).
+      return BASE_TIER_WEIGHTS.reduce(
+        (sum, w, i) => sum + (w / total) * (Math.min(BASE_TIER_WEIGHTS.length - 1, i + bonus) + 1),
+        0,
+      );
+    };
+    // The formula really does reward concentration, or every row below would
+    // pass against a flat curve.
+    expect(expectedQty(1)).toBeGreaterThan(expectedQty(0));
+    let mixedSeen = 0;
+    for (const mob of tagged) {
+      const tags = mob.componentTags ?? [];
+      const mapped = tags.filter((t) => harvestFamilyYieldsItem(t));
+      if (mapped.length === 0 || mapped.length === tags.length) continue;
+      mixedSeen++;
+      const defaultPick = mapped.length * expectedQty(tags.length - mapped.length);
+      const fullyMapped = tags.length * expectedQty(0);
+      expect(defaultPick, `${mob.id} (${tags.join(', ')})`).toBeLessThanOrEqual(fullyMapped);
+    }
+    // ...over the mixed templates, all nine of them, so an emptied sweep reads
+    // as wrong rather than as a pass.
+    expect(mixedSeen).toBe(9);
+    // And the threshold really is where the comment says it is, stated as a
+    // hypothetical shape rather than waiting for content to author one.
+    expect(3 * expectedQty(1)).toBeGreaterThan(4 * expectedQty(0));
+    expect(2 * expectedQty(1)).toBeLessThanOrEqual(3 * expectedQty(0));
   });
 
   it('lists which mobs are tagged so the sample stays visible in test output', () => {

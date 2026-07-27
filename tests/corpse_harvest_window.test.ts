@@ -23,8 +23,8 @@ import { renderCorpseHarvestPicker } from '../src/ui/hud/loot/corpse_harvest_win
 function view(overrides: Partial<CorpseHarvestViewModel> = {}): CorpseHarvestViewModel {
   return {
     rows: [
-      { tag: 'hide', checked: true },
-      { tag: 'fang', checked: false },
+      { tag: 'hide', checked: true, yieldsItem: true },
+      { tag: 'fang', checked: false, yieldsItem: true },
     ],
     harvestDisabled: false,
     concentrated: true,
@@ -103,7 +103,7 @@ describe('renderCorpseHarvestPicker: picker section', () => {
     const onHarvest = vi.fn();
     renderCorpseHarvestPicker(
       container,
-      view({ rows: [{ tag: 'hide', checked: false }], concentrated: false }),
+      view({ rows: [{ tag: 'hide', checked: false, yieldsItem: true }], concentrated: false }),
       { onHarvest, attachTooltip: () => {} },
     );
     container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.click();
@@ -119,8 +119,6 @@ describe('renderCorpseHarvestPicker: picker section', () => {
 describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#2509)', () => {
   // old_greyjaw's real tags. Only claw is unmapped.
   const GREYJAW = ['hide', 'fang', 'claw'];
-  const rowsFor = (tags: string[], checked: string[] = []) =>
-    tags.map((tag) => ({ tag, checked: checked.includes(tag) }));
 
   function render(tags: string[], checked: string[] = []) {
     const container = document.createElement('div');
@@ -270,7 +268,7 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     const container = document.createElement('div');
     renderCorpseHarvestPicker(
       container,
-      view({ rows: [{ tag: 'hide', checked: false }], corpseHarvestable: false }),
+      view({ rows: [{ tag: 'hide', checked: false, yieldsItem: true }], corpseHarvestable: false }),
       { onHarvest: () => {}, attachTooltip: () => {} },
     );
     expect(container.querySelector('.corpse-harvest')).toBeNull();
@@ -279,7 +277,7 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     const on = document.createElement('div');
     renderCorpseHarvestPicker(
       on,
-      view({ rows: [{ tag: 'hide', checked: false }], corpseHarvestable: true }),
+      view({ rows: [{ tag: 'hide', checked: false, yieldsItem: true }], corpseHarvestable: true }),
       { onHarvest: () => {}, attachTooltip: () => {} },
     );
     expect(on.querySelector('.corpse-harvest')).not.toBeNull();
@@ -309,5 +307,73 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     t.toggle('claw');
     t.toggle('claw');
     expect(t.attachTooltip.mock.calls.filter(([target]) => target === t.btn)).toHaveLength(1);
+  });
+
+  // #2514: after the sim stopped charging for an unmapped box, the box became a
+  // control with no effect at all. That is better than a tax, but it must not
+  // be silent: a checked box that changes nothing reads as a bug. The row is
+  // marked instead of hidden or disabled, so the corpse still says what it
+  // carries and the #2509 refusal above stays reachable from the shipped
+  // picker.
+  it('marks the rows with no item behind them, and leaves them checkable', () => {
+    const t = render(GREYJAW, []);
+    const rows = [...t.container.querySelectorAll<HTMLElement>('.corpse-harvest-row')];
+    expect(rows).toHaveLength(3);
+    // Only claw is marked, and it is marked in TEXT, not colour alone.
+    expect(rows.map((r) => r.classList.contains('corpse-harvest-row-inert'))).toEqual([
+      false,
+      false,
+      true,
+    ]);
+    const notes = [...t.container.querySelectorAll<HTMLElement>('.corpse-harvest-note')];
+    expect(notes).toHaveLength(1);
+    expect(notes[0].textContent).toBe('nothing yet');
+    expect(rows[2].contains(notes[0])).toBe(true);
+    // Still a live control: the sim ignores it either way, so the picker must
+    // not pretend it cannot be pressed, and the pick still goes over the wire
+    // verbatim (the sim boundary is what interprets it, never the client).
+    const claw = t.boxes.find((b) => b.value === 'claw')!;
+    expect(claw.disabled).toBe(false);
+    t.toggle('hide');
+    t.toggle('claw');
+    expect(t.btn.disabled).toBe(false);
+    t.btn.click();
+    expect(t.onHarvest).toHaveBeenLastCalledWith(['hide', 'claw']);
+    // ...and checking it ALONE is still the #2509 refusal, which is the state a
+    // filtered row list would have made unreachable from this picker.
+    t.toggle('hide');
+    expect(t.btn.disabled).toBe(true);
+    expect(t.warning.hidden).toBe(false);
+  });
+
+  it('folds the mark into the checkbox label rather than announcing it twice', () => {
+    // A screen reader would otherwise read the component name, then the note,
+    // as two separate labelled nodes. The visible note is aria-hidden and the
+    // whole sentence lives in the checkbox's own label, which is also why it is
+    // a separate key and not the base label with a clause appended.
+    const t = render(GREYJAW, []);
+    const label = (tag: string) => t.boxes.find((b) => b.value === tag)?.getAttribute('aria-label');
+    expect(label('hide')).toBe('Harvest Hide');
+    expect(label('claw')).toBe('Harvest Claw: nothing to take from it yet');
+    const note = t.container.querySelector<HTMLElement>('.corpse-harvest-note')!;
+    expect(note.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('marks nothing on an all-mapped corpse', () => {
+    // The negative arm, so the case above is not passing against a painter that
+    // marks every row.
+    const t = render(['hide', 'fang'], []);
+    expect(t.container.querySelectorAll('.corpse-harvest-note')).toHaveLength(0);
+    expect(t.container.querySelectorAll('.corpse-harvest-row-inert')).toHaveLength(0);
+  });
+
+  it('states the tier rule in terms of what a harvest TAKES (#2514)', () => {
+    // The retired concentrateHint said "fewer CHOSEN components", which the new
+    // rule makes false in both directions on a mixed corpse: checking one more
+    // unmapped row lowers nothing and unchecking one raises nothing.
+    const t = render(GREYJAW, []);
+    expect(t.container.querySelector('.corpse-harvest-hint')?.textContent).toBe(
+      'The fewer components a harvest takes, the higher the tier of each.',
+    );
   });
 });

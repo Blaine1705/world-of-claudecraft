@@ -1463,10 +1463,12 @@ export const ru_RU: EnTranslations = {
       "title": "Сбор",
       "harvestButton": "Собрать",
       "harvestTooltip": "Собирает отмеченные компоненты. Каждый труп можно обработать только один раз, кто успел первым. Добычу при этом не забирает.",
-      "concentrateHint": "Чем меньше выбрано компонентов, тем выше их качество.",
+      "yieldTierHint": "Чем меньше компонентов забирает сбор, тем выше качество каждого из них.",
       "nothingSelectedYields": "С этого трупа нельзя собрать ничего из выбранного.",
       "alreadyHarvested": "Этот труп уже был собран.",
       "componentAria": "Собрать {component}",
+      "componentNoYield": "пока ничего",
+      "componentAriaNoYield": "Собрать {component}: пока нечего взять",
       "components": {
         "hide": "Шкура",
         "fang": "Клык",

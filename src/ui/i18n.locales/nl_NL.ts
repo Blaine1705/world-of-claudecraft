@@ -7627,12 +7627,15 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.title': 'Verzamelen',
   'hudChrome.corpseHarvest.title': 'Oogsten',
   'hudChrome.corpseHarvest.harvestButton': 'Oogsten',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Hoe minder delen je kiest, hoe hoger de kwaliteit van elk deel.',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Dit kadaver is al geoogst.',
   'hudChrome.corpseHarvest.nothingSelectedYields':
     'Van dit kadaver valt niets uit je selectie te oogsten.',
   'hudChrome.corpseHarvest.componentAria': 'Oogst {component}',
+  'hudChrome.corpseHarvest.componentNoYield': 'nog niets',
+  'hudChrome.corpseHarvest.componentAriaNoYield':
+    'Oogst {component}: hieruit valt nog niets te halen',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Hoe minder delen een oogst daadwerkelijk oplevert, hoe hoger de kwaliteit van elk deel.',
   'hudChrome.corpseHarvest.components.hide': 'Huid',
   'hudChrome.corpseHarvest.components.fang': 'Tand',
   'hudChrome.corpseHarvest.components.silk': 'Zijde',

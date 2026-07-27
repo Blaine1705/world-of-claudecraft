@@ -1463,10 +1463,12 @@ export const en: EnTranslations = {
       "title": "Harvest",
       "harvestButton": "Harvest",
       "harvestTooltip": "Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.",
-      "concentrateHint": "Fewer chosen components yield a higher tier each.",
+      "yieldTierHint": "The fewer components a harvest takes, the higher the tier of each.",
       "nothingSelectedYields": "Nothing you selected can be harvested from this corpse.",
       "alreadyHarvested": "This corpse has already been harvested.",
       "componentAria": "Harvest {component}",
+      "componentNoYield": "nothing yet",
+      "componentAriaNoYield": "Harvest {component}: nothing to take from it yet",
       "components": {
         "hide": "Hide",
         "fang": "Fang",

@@ -1463,10 +1463,12 @@ export const pl_PL: EnTranslations = {
       "title": "Zbieranie",
       "harvestButton": "Zbierz",
       "harvestTooltip": "Zbiera zaznaczone komponenty. Każde zwloki można zebrać raz, pierwszemu podejdzie. Nie zabiera łupów.",
-      "concentrateHint": "Im mniej części wybierzesz, tym wyższa jakość każdej z nich.",
+      "yieldTierHint": "Im mniej części faktycznie zabierze zbieranie, tym wyższa jakość każdej z nich.",
       "nothingSelectedYields": "Z tego truchła nie zbierzesz żadnej z wybranych części.",
       "alreadyHarvested": "Z tego truchła już wszystko zebrano.",
       "componentAria": "Zbierz: {component}",
+      "componentNoYield": "jeszcze nic",
+      "componentAriaNoYield": "Zbierz: {component}, jeszcze nie ma z tego nic do wzięcia",
       "components": {
         "hide": "Skóra",
         "fang": "Kieł",

@@ -6093,6 +6093,11 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.nothingSelectedYields':
     'Intet af det du har valgt kan høstes fra dette kadaver.',
   'hudChrome.corpseHarvest.componentAria': 'Høst {component}',
+  'hudChrome.corpseHarvest.componentAriaNoYield':
+    'Høst {component}: der er endnu intet at tage herfra',
+  'hudChrome.corpseHarvest.componentNoYield': 'intet endnu',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Jo færre komponenter en høst tager, desto højere kvalitetsgrad får hver enkelt.',
   'hudChrome.corpseHarvest.components.claw': 'Klo',
   'hudChrome.corpseHarvest.components.fang': 'Hugtand',
   'hudChrome.corpseHarvest.components.gills': 'Gæller',
@@ -6101,8 +6106,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Silke',
   'hudChrome.corpseHarvest.components.tusk': 'Stødtand',
   'hudChrome.corpseHarvest.components.venomSac': 'Giftsæk',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Jo færre dele du vælger, desto højere kvalitetsgrad får hver enkelt.',
   'hudChrome.corpseHarvest.harvestButton': 'Høst',
   'hudChrome.corpseHarvest.harvestTooltip':
     'Indsamler de markerede komponenter. Hvert kadaver kan kun hostes en gang, og det gælder for den første der kommer. Tager ikke byttet.',

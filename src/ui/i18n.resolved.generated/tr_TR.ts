@@ -1463,10 +1463,12 @@ export const tr_TR: EnTranslations = {
       "title": "Toplama",
       "harvestButton": "Topla",
       "harvestTooltip": "İşaretlenmiş bileşenleri toplar. Her leş yalnızca bir kez toplanabilir, ilk gelen alır. Yağmayı almaz.",
-      "concentrateHint": "Ne kadar az parça seçersen, her biri o kadar yüksek kademede olur.",
+      "yieldTierHint": "Bir toplama ne kadar az bileşen alırsa, her birinin kademesi o kadar yüksek olur.",
       "nothingSelectedYields": "Bu leşten seçtiklerinin hiçbiri toplanamaz.",
       "alreadyHarvested": "Bu leş zaten toplandı.",
       "componentAria": "{component} topla",
+      "componentNoYield": "henüz verim yok",
+      "componentAriaNoYield": "{component} topla: bundan henüz alınacak bir şey yok",
       "components": {
         "hide": "Post",
         "fang": "Diş",

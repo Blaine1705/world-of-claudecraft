@@ -58,7 +58,7 @@ export function renderCorpseHarvestPicker(
   const section = document.createElement('div');
   section.className = 'corpse-harvest';
   section.innerHTML = `<div class="corpse-harvest-title">${esc(t('hudChrome.corpseHarvest.title'))}</div>
-    <div class="corpse-harvest-hint">${esc(t('hudChrome.corpseHarvest.concentrateHint'))}</div>`;
+    <div class="corpse-harvest-hint">${esc(t('hudChrome.corpseHarvest.yieldTierHint'))}</div>`;
   const list = document.createElement('div');
   list.className = 'corpse-harvest-list';
   for (const row of view.rows) {
@@ -69,14 +69,34 @@ export function renderCorpseHarvestPicker(
     box.className = 'corpse-harvest-check';
     box.checked = row.checked;
     box.value = row.tag;
+    // #2514: a family with no harvest item behind it is marked, not hidden and
+    // not disabled. The sim ignores it outright now (yieldingFocusComponents),
+    // so the box costs the player nothing either way; what it must not be is
+    // silent, since a checked box that changes no outcome reads as a bug. The
+    // mark is a text node, never colour alone, and it rides in the checkbox's
+    // own aria-label rather than as a second labelled node, so the label is
+    // read once. A whole SEPARATE key, not the base one plus an appended
+    // clause: rendered text never concatenates.
     box.setAttribute(
       'aria-label',
-      t('hudChrome.corpseHarvest.componentAria', { component: componentLabel(row.tag) }),
+      row.yieldsItem
+        ? t('hudChrome.corpseHarvest.componentAria', { component: componentLabel(row.tag) })
+        : t('hudChrome.corpseHarvest.componentAriaNoYield', { component: componentLabel(row.tag) }),
     );
     const span = document.createElement('span');
     span.textContent = componentLabel(row.tag);
     label.appendChild(box);
     label.appendChild(span);
+    if (!row.yieldsItem) {
+      label.classList.add('corpse-harvest-row-inert');
+      const note = document.createElement('span');
+      note.className = 'corpse-harvest-note';
+      // The aria-label above already carries this sentence for assistive tech,
+      // so the visible copy is hidden from it rather than announced twice.
+      note.setAttribute('aria-hidden', 'true');
+      note.textContent = t('hudChrome.corpseHarvest.componentNoYield');
+      label.appendChild(note);
+    }
     list.appendChild(label);
   }
   section.appendChild(list);

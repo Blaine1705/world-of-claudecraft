@@ -1463,10 +1463,12 @@ export const zh_CN: EnTranslations = {
       "title": "采集",
       "harvestButton": "采集",
       "harvestTooltip": "采集勾选的部位。每具尸体只能被采集一次，先到先得。不会拾取战利品。",
-      "concentrateHint": "选择的部位越少，每个部位的品质越高。",
+      "yieldTierHint": "一次采集实际取得的部位越少，每个部位的品质越高。",
       "nothingSelectedYields": "你选择的部位都无法从这具尸体上采集。",
       "alreadyHarvested": "这具尸体已经被采集过了。",
       "componentAria": "采集{component}",
+      "componentNoYield": "暂无产出",
+      "componentAriaNoYield": "采集{component}：暂时无法从中取得任何东西",
       "components": {
         "hide": "兽皮",
         "fang": "尖牙",

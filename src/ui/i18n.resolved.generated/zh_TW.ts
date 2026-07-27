@@ -1463,10 +1463,12 @@ export const zh_TW: EnTranslations = {
       "title": "採集",
       "harvestButton": "採集",
       "harvestTooltip": "採集勾選的部位。每具屍體只能被採集一次，先到先得。不會拾取戰利品。",
-      "concentrateHint": "選擇的部位越少，每個部位的品質越高。",
+      "yieldTierHint": "一次採集實際取得的部位越少，每個部位的品質就越高。",
       "nothingSelectedYields": "你選擇的部位都無法從這具屍體上採集。",
       "alreadyHarvested": "這具屍體已經被採集過了。",
       "componentAria": "採集{component}",
+      "componentNoYield": "尚無產出",
+      "componentAriaNoYield": "採集{component}：目前還無法從中取得任何東西",
       "components": {
         "hide": "獸皮",
         "fang": "尖牙",

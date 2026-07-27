@@ -1463,10 +1463,12 @@ export const pt_BR: EnTranslations = {
       "title": "Coleta",
       "harvestButton": "Coletar",
       "harvestTooltip": "Coleta os componentes selecionados. Cada cadáver pode ser coletado uma vez, quem chegar primeiro. Não pega o saque.",
-      "concentrateHint": "Quanto menos componentes você escolher, maior a qualidade de cada um.",
+      "yieldTierHint": "Quanto menos componentes uma coleta retirar, maior a qualidade de cada um.",
       "nothingSelectedYields": "Nada do que você selecionou pode ser coletado deste cadáver.",
       "alreadyHarvested": "Este cadáver já foi coletado.",
       "componentAria": "Coletar {component}",
+      "componentNoYield": "nada ainda",
+      "componentAriaNoYield": "Coletar {component}: ainda não há nada para retirar",
       "components": {
         "hide": "Pele",
         "fang": "Presa",

@@ -7374,6 +7374,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.nothingSelectedYields':
     'Inget du valt kan skördas från det här kadavret.',
   'hudChrome.corpseHarvest.componentAria': 'Skörda {component}',
+  'hudChrome.corpseHarvest.componentNoYield': 'inget än',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Skörda {component}: inget att ta från den än',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Ju färre komponenter en skörd faktiskt tar, desto högre kvalitetsnivå får var och en.',
   'hudChrome.corpseHarvest.components.claw': 'Klo',
   'hudChrome.corpseHarvest.components.fang': 'Huggtand',
   'hudChrome.corpseHarvest.components.gills': 'Gälar',
@@ -7382,8 +7386,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Silke',
   'hudChrome.corpseHarvest.components.tusk': 'Bete',
   'hudChrome.corpseHarvest.components.venomSac': 'Giftsäck',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Ju färre delar du väljer, desto högre kvalitetsnivå får var och en.',
   'hudChrome.corpseHarvest.harvestButton': 'Skörda',
   'hudChrome.corpseHarvest.harvestTooltip':
     'Samlar de markerade komponenterna. Varje kadaver kan skördas en gång, den som är först. Tar inte bytet.',

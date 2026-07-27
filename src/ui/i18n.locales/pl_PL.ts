@@ -6232,6 +6232,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.nothingSelectedYields':
     'Z tego truchła nie zbierzesz żadnej z wybranych części.',
   'hudChrome.corpseHarvest.componentAria': 'Zbierz: {component}',
+  'hudChrome.corpseHarvest.componentNoYield': 'jeszcze nic',
+  'hudChrome.corpseHarvest.componentAriaNoYield':
+    'Zbierz: {component}, jeszcze nie ma z tego nic do wzięcia',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Im mniej części faktycznie zabierze zbieranie, tym wyższa jakość każdej z nich.',
   'hudChrome.corpseHarvest.components.claw': 'Pazur',
   'hudChrome.corpseHarvest.components.fang': 'Kieł',
   'hudChrome.corpseHarvest.components.gills': 'Skrzela',
@@ -6240,8 +6245,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Jedwab',
   'hudChrome.corpseHarvest.components.tusk': 'Cios',
   'hudChrome.corpseHarvest.components.venomSac': 'Worek jadowy',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Im mniej części wybierzesz, tym wyższa jakość każdej z nich.',
   'hudChrome.corpseHarvest.harvestButton': 'Zbierz',
   'hudChrome.corpseHarvest.harvestTooltip':
     'Zbiera zaznaczone komponenty. Każde zwloki można zebrać raz, pierwszemu podejdzie. Nie zabiera łupów.',

@@ -1463,10 +1463,12 @@ export const id_ID: EnTranslations = {
       "title": "Panen",
       "harvestButton": "Panen",
       "harvestTooltip": "Mengumpulkan komponen yang dicentang. Setiap bangkai hanya bisa dipanen sekali, siapa cepat dia dapat. Tidak mengambil jarahan.",
-      "concentrateHint": "Semakin sedikit bagian yang dipilih, semakin tinggi tingkat mutu tiap bagian.",
+      "yieldTierHint": "Semakin sedikit bagian yang benar-benar diambil dalam satu panen, semakin tinggi tingkat mutu tiap bagian.",
       "nothingSelectedYields": "Tidak ada pilihanmu yang bisa dipanen dari bangkai ini.",
       "alreadyHarvested": "Bangkai ini sudah dipanen.",
       "componentAria": "Panen {component}",
+      "componentNoYield": "belum ada hasil",
+      "componentAriaNoYield": "Panen {component}: belum ada yang bisa diambil darinya",
       "components": {
         "hide": "Kulit",
         "fang": "Taring",

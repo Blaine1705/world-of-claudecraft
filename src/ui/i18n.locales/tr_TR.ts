@@ -2054,6 +2054,11 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.alreadyHarvested': 'Bu leş zaten toplandı.',
   'hudChrome.corpseHarvest.nothingSelectedYields': 'Bu leşten seçtiklerinin hiçbiri toplanamaz.',
   'hudChrome.corpseHarvest.componentAria': '{component} topla',
+  'hudChrome.corpseHarvest.componentNoYield': 'henüz verim yok',
+  'hudChrome.corpseHarvest.componentAriaNoYield':
+    '{component} topla: bundan henüz alınacak bir şey yok',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Bir toplama ne kadar az bileşen alırsa, her birinin kademesi o kadar yüksek olur.',
   'hudChrome.corpseHarvest.components.claw': 'Pençe',
   'hudChrome.corpseHarvest.components.fang': 'Diş',
   'hudChrome.corpseHarvest.components.gills': 'Solungaç',
@@ -2062,8 +2067,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'İpek',
   'hudChrome.corpseHarvest.components.tusk': 'Azı Dişi',
   'hudChrome.corpseHarvest.components.venomSac': 'Zehir Kesesi',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Ne kadar az parça seçersen, her biri o kadar yüksek kademede olur.',
   'hudChrome.corpseHarvest.harvestButton': 'Topla',
   'hudChrome.corpseHarvest.harvestTooltip':
     'İşaretlenmiş bileşenleri toplar. Her leş yalnızca bir kez toplanabilir, ilk gelen alır. Yağmayı almaz.',

@@ -5653,6 +5653,11 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.nothingSelectedYields':
     'Questo cadavere non ha nulla da raccogliere tra i componenti selezionati.',
   'hudChrome.corpseHarvest.componentAria': 'Raccogli {component}',
+  'hudChrome.corpseHarvest.componentAriaNoYield':
+    "Raccogli {component}: non c'è ancora nulla da prendere",
+  'hudChrome.corpseHarvest.componentNoYield': 'ancora nulla',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Meno componenti prende una raccolta, più alta sarà la qualità di ciascuno.',
   'hudChrome.corpseHarvest.components.claw': 'Artiglio',
   'hudChrome.corpseHarvest.components.fang': 'Zanna',
   'hudChrome.corpseHarvest.components.gills': 'Branchie',
@@ -5661,8 +5666,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Seta',
   'hudChrome.corpseHarvest.components.tusk': 'Zanna',
   'hudChrome.corpseHarvest.components.venomSac': 'Sacca di veleno',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Meno componenti scegli, più alta sarà la qualità di ciascuno.',
   'hudChrome.corpseHarvest.harvestButton': 'Raccogli',
   'hudChrome.corpseHarvest.harvestTooltip':
     'Raccoglie i componenti selezionati. Ogni carcassa puo essere raccolta una volta, chi prima arriva. Non prende il bottino.',
