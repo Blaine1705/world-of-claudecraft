@@ -81,8 +81,10 @@ function harness(initial: LockpickView | null, host: 'online' | 'offline' = 'onl
   const panel = document.getElementById('lockpick-panel') as HTMLElement;
   const release = vi.fn();
   const trap: FocusTrapHandle = { focusFirst: vi.fn(), release };
-  // Separate spies: the Hud arm owes its own hideTooltip (the trade-window precedent) and
-  // the controller owes one from close(). One shared spy could not tell them apart.
+  // Two spies for ATTRIBUTION only. Production wires the dep as
+  // `hideTooltip: () => this.hideTooltip()` where the controller is built, so in the client
+  // these ARE one call; splitting them here lets a case say which caller owed the hide, and
+  // never claims the two can diverge.
   const hudHideTooltip = vi.fn();
   const depsHideTooltip = vi.fn();
   let state: LockpickView | null = initial;
@@ -235,8 +237,12 @@ describe('lockpick panel: Hud.closeAll (the gamepad escape path)', () => {
     expect(h.abort).toHaveBeenCalledTimes(1);
     expect(h.panel.style.display).toBe('block');
 
-    expect(h.hud.closeAll(), 'second: close').toBe(true);
-    expect(h.abort, 'no second abort for the same session').toHaveBeenCalledTimes(1);
+    expect(h.hud.closeAll(), 'second: re-send, then close').toBe(true);
+    // Two, not one and not one per iteration. ClientWorld.rawCmd drops on a closed socket
+    // with no queue and no retry, so a repeat request has to hedge that the first abort was
+    // never sent; closing on the assumption it landed would hide a live board and forfeit
+    // the chest. Closing anyway on the same pass is what bounds it at two.
+    expect(h.abort, 'one hedge re-send, not one per sweep pass').toHaveBeenCalledTimes(2);
     expect(h.panel.style.display).toBe('none');
     expect(h.release).toHaveBeenCalledWith(true);
 
@@ -303,11 +309,28 @@ describe('lockpick panel: Hud.closeAll (the gamepad escape path)', () => {
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', cancelable: true }));
     expect(h.release, 'no handler is left on the window').not.toHaveBeenCalled();
     expect(h.abort).not.toHaveBeenCalled();
+
+    // The FIELD was cleared alongside the unbind, which neither assertion above can see.
+    // bindKeys() early-returns on a non-null keyHandler, so dropping just the
+    // `this.keyHandler = null` line leaves the next open with no Escape and no pick hotkeys
+    // at all, while the removeEventListener spy stays perfectly green.
+    const add = vi.spyOn(window, 'addEventListener');
+    h.controller.openAnte(9);
+    expect(
+      add.mock.calls.filter(([type]) => type === 'keydown'),
+      'the reopened panel rebinds its keyboard',
+    ).toHaveLength(1);
+    add.mockRestore();
   });
 
   it('produces the same teardown as the Escape key, live board and ante selector alike', () => {
     // The two paths are the same funnel or they drift: the keyboard one aborts a live
     // session and closes an idle one, and the pad must not do something else.
+    //
+    // SCOPED to what `teardown()` reads. The paths are NOT byte-identical: the managed-window
+    // arm adds its own `this.hideTooltip()`, which the controller's keydown handler has no
+    // way to reach. That difference is deliberate (the arm owes the hide the default arm used
+    // to guarantee) and is pinned in the live case above, not here.
     for (const initial of [LIVE, null]) {
       const viaKey = harness(initial);
       if (initial) viaKey.controller.openBoard();

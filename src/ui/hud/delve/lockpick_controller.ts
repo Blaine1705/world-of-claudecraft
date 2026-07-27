@@ -134,6 +134,16 @@ export class LockpickController {
       this.submitAbort();
       return;
     }
+    // A repeat request for a session we already asked to withdraw from means the answer
+    // never came, and only one of the two reasons is benign. Either the abort is still in
+    // flight (the re-send is a server-side no-op: the sim's lockpickAbort returns early once
+    // run.lockpick is null), or it was never sent at all, because ClientWorld.rawCmd DROPS
+    // on a closed socket with no queue and no retry. Closing without asking again in that
+    // second case hides a board the server still considers live and lets the per-step clock
+    // burn the tries down to lockpickFail, which is #2517's forfeited chest arriving by the
+    // other road. So ask once more, then close regardless, which is what keeps the repeat
+    // callers (the closeTop sweep) advancing. Bounded at two commands per dismissal.
+    if (live) this.submitAbort();
     this.close();
   }
 
