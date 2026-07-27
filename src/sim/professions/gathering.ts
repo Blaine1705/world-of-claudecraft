@@ -818,6 +818,41 @@ export function effectiveFocusComponents(
 }
 
 /**
+ * #2509: does this pick throw away EVERYTHING the corpse had to give? True when
+ * the effective set maps to no item at all while the corpse carries at least
+ * one family that does, i.e. a different pick on the same corpse would have
+ * paid out. The command boundary refuses on it (src/sim/interaction.ts
+ * harvestCorpse, pre-claim and rng-free) and the picker's view-core disables
+ * Harvest on it (src/ui/hud/loot/corpse_harvest_view.ts), so this is the ONE
+ * place the rule is written: a mirror stated twice is a mirror that can drift,
+ * and the spread threshold it depends on lives in effectiveFocusComponents
+ * above rather than in either caller.
+ *
+ * Both halves matter. Without the first, a pick that yields something would be
+ * refused. Without the second, a corpse whose families ALL map to nothing
+ * (fen_troll: claw, tusk) would become permanently unharvestable instead of
+ * keeping its documented zero-yield path: no pick forfeits anything there,
+ * because no pick could have paid out.
+ *
+ * Pure and rng-free, so the refusal it drives draws nothing.
+ *
+ * `yields` is a TRUTHINESS test, not `!== undefined`, to stay byte-equivalent
+ * to the `if (!itemId) continue` the grant loop and the capacity gate already
+ * use. An empty-string mapping would otherwise read as yieldable here and as
+ * grantable nowhere, which is the exact bug this refuses.
+ */
+export function forfeitsEveryMappedYield(
+  taggedComponents: readonly string[],
+  chosen: readonly string[],
+): boolean {
+  const yields = (component: string) => !!HARVEST_COMPONENT_ITEMS[component];
+  return (
+    !effectiveFocusComponents(taggedComponents, chosen).some(yields) &&
+    taggedComponents.some(yields)
+  );
+}
+
+/**
  * Resolve a per-corpse focus harvest: one independent tier roll per chosen
  * component, each roll's weight table shifted upward by a concentration bonus.
  *

@@ -11,6 +11,8 @@
 // timed harvest in professions/gathering, so the mapping is the "timing" the brief
 // requires stay untouched), the harvest-disabled state, and the empty short-circuit.
 
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import type { CorpseHarvestViewModel } from '../src/ui/hud/loot/corpse_harvest_view';
 import { renderCorpseHarvestPicker } from '../src/ui/hud/loot/corpse_harvest_window';
@@ -56,6 +58,12 @@ describe('renderCorpseHarvestPicker: picker section', () => {
       attachTooltip: () => {},
     });
     expect(container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.disabled).toBe(true);
+    // The ONE fixture where the two model fields disagree, so it is the only
+    // place that can tell which field each write reads. `harvestDisabled` is
+    // true here and `forfeitsEveryYield` is false, so the reason line must
+    // stay hidden: a painter that keyed the line off `harvestDisabled` would
+    // be invisible to every other case, where the two always coincide.
+    expect(container.querySelector<HTMLElement>('.corpse-harvest-warning')?.hidden).toBe(true);
   });
 
   it('exposes what Harvest does via the shared tooltip idiom, distinct from Take Loot', () => {
@@ -148,7 +156,6 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     const t = render(GREYJAW, ['hide']);
     expect(t.btn.disabled).toBe(false);
     expect(t.warning.hidden).toBe(true);
-    expect(t.btn.getAttribute('aria-label')).toBeNull();
   });
 
   it('kills the button and states why when the last mapped box is unchecked', () => {
@@ -158,13 +165,46 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     expect(t.btn.disabled).toBe(true);
     expect(t.warning.hidden).toBe(false);
     expect(t.warning.textContent).toBe('Nothing you selected can be harvested from this corpse.');
-    // The WHY also rides in the accessible name, the crafting-window idiom.
-    expect(t.btn.getAttribute('aria-label')).toBe(
-      'Harvest. Nothing you selected can be harvested from this corpse.',
-    );
     // The dead button really is dead: a click submits nothing.
     t.btn.click();
     expect(t.onHarvest).not.toHaveBeenCalled();
+  });
+
+  it('announces the reason, since the button silently leaves the tab order', () => {
+    // A `disabled` button takes no pointer events and is not focusable, so
+    // neither the shared tooltip nor an aria-label on it is reachable at the
+    // moment the action dies. The live region is what carries the why.
+    const t = render(GREYJAW, ['hide']);
+    expect(t.warning.getAttribute('role')).toBe('status');
+    expect(t.warning.getAttribute('aria-live')).toBe('polite');
+    // Said once, not twice: the sentence lives on the line alone, never also
+    // on the button, so browse mode does not read it back to back.
+    t.toggle('hide');
+    t.toggle('claw');
+    expect(t.warning.hidden).toBe(false);
+    expect(t.btn.getAttribute('aria-label')).toBeNull();
+  });
+
+  it('keeps the reason line BELOW the button, so showing it never moves the control', () => {
+    // The line appears and disappears on a checkbox toggle. Above the button
+    // it would shove Harvest down at the exact moment the player is reaching
+    // for it; below, only the popup's bottom edge moves. Pinned because the
+    // whole layout-stability argument is invisible to every other assertion.
+    const t = render(GREYJAW, ['claw']);
+    expect(t.btn.nextElementSibling).toBe(t.warning);
+  });
+
+  it('styles the reason line as an error, from the shared token', () => {
+    // The class is otherwise pinned only by this file's own querySelector, so
+    // renaming it on one side would leave the line rendering as ordinary body
+    // text with every test still green.
+    const css = readFileSync(
+      path.resolve(process.cwd(), 'src/styles/components.css'),
+      'utf8',
+    ).replace(/\/\*[\s\S]*?\*\//g, '');
+    const rule = /\.corpse-harvest-warning\s*\{([^}]*)\}/.exec(css);
+    expect(rule, '.corpse-harvest-warning has no rule in components.css').not.toBeNull();
+    expect(rule?.[1]).toContain('var(--color-text-error)');
   });
 
   it('comes back to life the moment a mapped family is checked again', () => {
@@ -174,7 +214,6 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     t.toggle('fang');
     expect(t.btn.disabled).toBe(false);
     expect(t.warning.hidden).toBe(true);
-    expect(t.btn.getAttribute('aria-label')).toBeNull();
     t.btn.click();
     expect(t.onHarvest).toHaveBeenLastCalledWith(['fang', 'claw']);
   });

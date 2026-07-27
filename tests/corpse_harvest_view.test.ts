@@ -13,6 +13,7 @@
 import { describe, expect, it } from 'vitest';
 import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
 import { MOBS } from '../src/sim/data';
+import { effectiveFocusComponents } from '../src/sim/professions/gathering';
 import { corpseHarvestView } from '../src/ui/hud/loot/corpse_harvest_view';
 
 const pick = (...tags: string[]) => new Set(tags);
@@ -128,21 +129,30 @@ describe('corpseHarvestView: a selection that forfeits every yield (#2509)', () 
   it('agrees with the sim on every subset of every shipped corpse', () => {
     // The mirror stated as the property it has to hold rather than as a list
     // of hand-picked rows: for every tagged template and every subset of its
-    // tags, the picker disables exactly when the sim's own gate would refuse
-    // (`no effective component maps` AND `the corpse has a mapped family`),
-    // with effectiveFocusComponents' spread rule applied the same way.
+    // tags, the picker disables exactly when the sim's own gate would refuse.
+    // The oracle calls the REAL effectiveFocusComponents rather than restating
+    // its spread rule, so moving that threshold in
+    // src/sim/professions/gathering.ts reds this sweep instead of quietly
+    // letting the picker and the command drift apart. (It deliberately does
+    // NOT call forfeitsEveryMappedYield, which the view itself now calls: that
+    // would be the predicate compared against itself.)
+    let disabledSeen = 0;
     for (const m of Object.values(MOBS)) {
       const tags = m.componentTags;
       if (!tags?.length) continue;
       const mappedOnCorpse = tags.some((t) => HARVEST_COMPONENT_ITEMS[t]);
       for (let mask = 0; mask < 1 << tags.length; mask++) {
         const selected = tags.filter((_, i) => mask & (1 << i));
-        // effectiveFocusComponents: an empty pick or a full cover spreads.
-        const effective = selected.length === 0 || selected.length >= tags.length ? tags : selected;
+        const effective = effectiveFocusComponents(tags, selected);
         const simWouldRefuse = !effective.some((t) => HARVEST_COMPONENT_ITEMS[t]) && mappedOnCorpse;
         const view = corpseHarvestView(tags, new Set(selected));
         expect(view.harvestDisabled, `${m.id} ${JSON.stringify(selected)}`).toBe(simWouldRefuse);
+        if (simWouldRefuse) disabledSeen++;
       }
     }
+    // The sweep has to actually VISIT the disabled arm. A content retag that
+    // left no mixed template would otherwise pass it all-false with the mirror
+    // never exercised at all.
+    expect(disabledSeen).toBe(11);
   });
 });

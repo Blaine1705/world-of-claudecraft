@@ -9,7 +9,7 @@
 // core only builds the row list + the harvest-button label state, it never
 // rolls or picks a tier itself.
 
-import { HARVEST_COMPONENT_ITEMS } from '../../../sim/content/professions';
+import { forfeitsEveryMappedYield } from '../../../sim/professions/gathering';
 
 export interface CorpseHarvestRow {
   readonly tag: string;
@@ -55,12 +55,13 @@ export function corpseHarvestView(
   const tags = [...new Set(componentTags)];
   const rows = tags.map((tag) => ({ tag, checked: selected.has(tag) }));
   const checked = rows.filter((r) => r.checked);
-  const yields = (tag: string) => HARVEST_COMPONENT_ITEMS[tag] !== undefined;
-  // An empty selection spreads across every tag, so it forfeits nothing; a
-  // selection covering every tag spreads too, and cannot be all-unmapped
-  // unless the corpse itself is (the third term).
-  const forfeitsEveryYield =
-    checked.length > 0 && !checked.some((r) => yields(r.tag)) && tags.some(yields);
+  // The sim's own predicate, imported rather than restated: the command
+  // boundary refuses exactly this, and a mirror written twice is a mirror that
+  // drifts the first time effectiveFocusComponents' spread rule moves.
+  const forfeitsEveryYield = forfeitsEveryMappedYield(
+    tags,
+    checked.map((r) => r.tag),
+  );
   return {
     rows,
     harvestDisabled: tags.length === 0 || forfeitsEveryYield,

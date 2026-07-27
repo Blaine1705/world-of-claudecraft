@@ -95,6 +95,11 @@ const baseEnTable = {
   // #2509: the pick named only component families this corpse carries but that
   // no harvest item is wired to yet, on a corpse that DOES carry a mapped one.
   // Refused pre-claim, so the corpse survives for a pick that can pay out.
+  // "THAT corpse" deliberately, matching corpseNothingToHarvest above: this is
+  // a toast about a target out in the world. The picker's own in-place line
+  // (hudChrome.corpseHarvest.nothingSelectedYields) says "this corpse", because
+  // the window is open on it, the same deixis split alreadyHarvested already
+  // has. Two keys, so the EXACT reverse table sees no collision.
   'error.corpseSelectionNothingToHarvest':
     'Nothing you selected can be harvested from that corpse.',
   'error.gatherNodeMissing': 'That resource node does not exist.',

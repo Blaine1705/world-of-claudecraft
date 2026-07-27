@@ -71,44 +71,47 @@ export function renderCorpseHarvestPicker(
     list.appendChild(label);
   }
   section.appendChild(list);
-  // #2509: the reason a Harvest can be refused, stated in place rather than in
-  // the button's tooltip. A `disabled` button takes no pointer events and
-  // leaves the tab order (src/ui/focus_manager.ts), so a tooltip on it would
-  // never be reachable by hover, touch, or keyboard; a line in the section is.
-  // Reuses the .corpse-harvest-hint metrics via its own class so only the
-  // color differs, and rides in the DOM right before the button it explains.
-  const warning = document.createElement('div');
-  warning.className = 'corpse-harvest-warning';
-  warning.textContent = t('hudChrome.corpseHarvest.nothingSelectedYields');
-  section.appendChild(warning);
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'btn corpse-harvest-btn';
-  const harvestLabel = t('hudChrome.corpseHarvest.harvestButton');
-  btn.textContent = harvestLabel;
+  btn.textContent = t('hudChrome.corpseHarvest.harvestButton');
   // Attached ONCE, at build: Hud.attachTooltip registers a fresh listener set
   // per call, so re-attaching it on every toggle would stack them.
   deps.attachTooltip(btn, () => esc(t('hudChrome.corpseHarvest.harvestTooltip')));
+  section.appendChild(btn);
+  // #2509: the reason a Harvest is refused, stated in place rather than in the
+  // button's tooltip. A `disabled` button takes no pointer events and leaves
+  // the tab order (src/ui/focus_manager.ts), so a tooltip on it is unreachable
+  // by hover, touch and keyboard alike, and an aria-label on it is read only
+  // in browse mode. A live region is reachable by all of them.
+  //
+  // BELOW the button, not above it, and that is load-bearing: this line
+  // appears and disappears as the player toggles boxes, so placing it above
+  // would shove the Harvest button ~17px down at the exact moment they are
+  // reaching for it, and pull it back up when they undo. Below, the only thing
+  // that moves is the popup's own bottom edge.
+  //
+  // role=status + aria-live=polite because the state change is what has to be
+  // announced: the button silently leaves the tab order, and nothing else
+  // would say why. The sentence lives ONLY here, never also on the button, so
+  // browse mode reads it once (the crafting-window pairing of an aria-label
+  // with an aria-hidden note is the other way to do it; one or the other, and
+  // this one needs no locale-specific sentence separator).
+  const warning = document.createElement('div');
+  warning.className = 'corpse-harvest-warning';
+  warning.setAttribute('role', 'status');
+  warning.setAttribute('aria-live', 'polite');
+  warning.textContent = t('hudChrome.corpseHarvest.nothingSelectedYields');
+  section.appendChild(warning);
   const chosenTags = (): string[] =>
     [...list.querySelectorAll<HTMLInputElement>('.corpse-harvest-check')]
       .filter((c) => c.checked)
       .map((c) => c.value);
-  // The button state, the reason line and the accessible name all come from
-  // ONE model, so they cannot drift apart. The WHY rides in the accessible
-  // name as well as the visible line, the crafting-window idiom
-  // (src/ui/crafting_window.ts): a reader that reaches the button through the
-  // section rather than the tab order still hears it.
+  // The button state and the reason line come from ONE model, so they cannot
+  // drift apart.
   const apply = (model: CorpseHarvestViewModel): void => {
     btn.disabled = model.harvestDisabled;
     warning.hidden = !model.forfeitsEveryYield;
-    if (model.forfeitsEveryYield) {
-      btn.setAttribute(
-        'aria-label',
-        `${harvestLabel}. ${t('hudChrome.corpseHarvest.nothingSelectedYields')}`,
-      );
-    } else {
-      btn.removeAttribute('aria-label');
-    }
   };
   // Initial state is the caller's model, so the view-core stays the single
   // source of the picker's decisions; every later state is that same core
@@ -128,6 +131,5 @@ export function renderCorpseHarvestPicker(
   btn.addEventListener('click', () => {
     deps.onHarvest(chosenTags());
   });
-  section.appendChild(btn);
   container.appendChild(section);
 }
