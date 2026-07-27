@@ -176,20 +176,52 @@ describe('lockpick countdown repaint', () => {
     expect(stale.style.width, 'the replaced node must stop being painted').toBe(frozen);
   });
 
-  it('drops its refs when the board repaints with no authoritative state left', () => {
-    // renderBoard's one exit that does not touch the subtree: state went null, so it calls
-    // deps.onClose() and returns. The module drops the refs there itself rather than relying
-    // on the caller routing that back into close().
+  it('stops painting when the authoritative state goes null', () => {
+    // NAMED for what it actually pins. renderBoard's state-less exit also drops the refs,
+    // but syncTimer stops the clock on the very next line, so that teardown is reference
+    // hygiene no test can observe (same as close()'s). What IS observable, and what this
+    // holds, is that the countdown goes quiet the moment the sim says the lock is over.
     const h = harness();
     h.win.openBoard();
-    const stale = h.bar() as HTMLElement;
+    const bar = h.bar() as HTMLElement;
     tick(20);
-    const frozen = stale.style.width;
+    const frozen = bar.style.width;
 
     h.set(null);
     h.win.onStep('advanced');
     tick(20);
-    expect(stale.style.width).toBe(frozen);
+    expect(bar.style.width).toBe(frozen);
+  });
+
+  it('paints its OWN panel when a second window instance exists', () => {
+    // What the class-scoped lookup buys, and the reason it is not an id lookup: the window
+    // is instance-parameterized on deps.panel, so two instances must not fight over one
+    // pair of element ids. Without this the id-versus-class choice is unpinned either way.
+    document.body.innerHTML =
+      '<div id="lockpick-panel" style="display:block"></div><div id="second-panel" style="display:block"></div>';
+    const first = document.getElementById('lockpick-panel') as HTMLElement;
+    const second = document.getElementById('second-panel') as HTMLElement;
+    const make = (panel: HTMLElement): LockpickWindow =>
+      new LockpickWindow({
+        panel: () => panel,
+        getState: () => VIEW,
+        tierName: (tier) => tier,
+        onEngage: () => {},
+        onAction: () => {},
+        onAbort: () => {},
+        onClose: () => {},
+      });
+    const a = make(first);
+    const b = make(second);
+    a.openBoard();
+    b.openBoard();
+    tick(20);
+
+    const barA = first.querySelector<HTMLElement>('.lp-timer-bar') as HTMLElement;
+    const barB = second.querySelector<HTMLElement>('.lp-timer-bar') as HTMLElement;
+    expect(barA).not.toBe(barB);
+    expect(barA.style.width).not.toBe('100%');
+    expect(barB.style.width, 'the second instance must paint its own node').toBe(barA.style.width);
   });
 
   it('paints nothing when the board carries no per-step budget', () => {

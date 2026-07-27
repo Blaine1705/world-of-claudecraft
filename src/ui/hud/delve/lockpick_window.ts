@@ -185,9 +185,11 @@ export class LockpickWindow {
     if (!el) return;
     const view = this.deps.getState();
     if (!view) {
-      // The one exit from renderBoard that leaves the subtree alone: drop the refs anyway,
-      // so the module upholds "the refs are dropped wherever they stop being current" by
-      // itself rather than relying on the caller routing onClose back into close().
+      // The one exit from renderBoard that leaves the subtree alone. Dropping the refs here
+      // is hygiene rather than behavior, like close()'s: every caller runs syncTimer() next,
+      // which stops the clock on a null state, so nothing can paint afterwards. It is here
+      // so the module upholds "the refs go wherever they stop being current" by itself
+      // rather than leaning on that ordering.
       this.forgetTimerEls();
       this.deps.onClose();
       return;
@@ -281,11 +283,12 @@ export class LockpickWindow {
   /**
    * Drop the refs when the subtree they point into is gone or replaced.
    *
-   * From `close()` this is reference hygiene rather than a behavior: `close()` stops the
-   * clock first, so nothing can paint afterwards and no test can observe the difference.
-   * From `renderAnte()` and the state-less `renderBoard()` exit it IS observable, because
-   * both leave a running interval behind, and `tests/lockpick_timer_repaint.test.ts` pins
-   * those two.
+   * From `renderAnte()` this is a real behavior and is pinned: the ante selector replaces
+   * the board's subtree and deliberately does NOT stop the clock, so stale refs would keep
+   * being painted. From `close()` and from `renderBoard()`'s state-less exit it is hygiene
+   * only, because both stop the clock (directly, or via the `syncTimer()` that follows), so
+   * nothing can paint afterwards and no test can tell the difference. Said here rather than
+   * left for the next reader to re-derive from three call sites.
    */
   private forgetTimerEls(): void {
     this.timerEls = null;
