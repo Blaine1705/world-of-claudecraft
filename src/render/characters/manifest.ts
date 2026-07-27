@@ -1224,7 +1224,6 @@ const MOB_KEYS: Record<string, string> = {
   // (docs/prd/protect-yumi-assets.md item 1, delivered).
   yumi_cat: 'mob_yumi_cat',
   training_dummy: 'mob_training_dummy',
-  healing_dummy: 'mob_training_dummy',
   emberkin: 'mob_demon',
   water_elemental: 'mob_water_elemental',
   gloomshade: 'mob_demon',

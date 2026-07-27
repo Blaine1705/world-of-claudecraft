@@ -7777,7 +7777,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunder_armor.description':
     'Cizalla la armadura del objetivo y la reduce un {damage}% por aplicación. Se acumula hasta 5 veces. Genera una gran cantidad de amenaza.',
   'entities.mobs.training_dummy.name': 'Muñeco de entrenamiento',
-  'entities.mobs.healing_dummy.name': 'Muñeco de sanación',
   'entities.mobs.yumi_cat.name': 'Yumi',
   'entities.mobs.water_elemental.name': 'Elemental de agua',
   'guide.arenaPage.yumiBody':

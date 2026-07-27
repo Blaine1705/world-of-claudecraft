@@ -7912,7 +7912,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunder_armor.description':
     "Lacera l'armatura del bersaglio, riducendola del {damage}% per applicazione. Si accumula fino a 5 volte. Genera una grande quantità di minaccia.",
   'entities.mobs.training_dummy.name': "Manichino d'allenamento",
-  'entities.mobs.healing_dummy.name': 'Manichino di cura',
   'entities.mobs.yumi_cat.name': 'Yumi',
   'entities.mobs.water_elemental.name': "Elementale dell'Acqua",
   'guide.arenaPage.yumiBody':

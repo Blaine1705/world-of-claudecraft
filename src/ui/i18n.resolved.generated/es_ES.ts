@@ -9974,9 +9974,6 @@ export const es_ES: EnTranslations = {
       "training_dummy": {
         "name": "Muñeco de entrenamiento"
       },
-      "healing_dummy": {
-        "name": "Muñeco de sanación"
-      },
       "ridge_stalker": {
         "name": "Acechador de la cresta"
       },

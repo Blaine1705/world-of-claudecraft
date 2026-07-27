@@ -9974,9 +9974,6 @@ export const id_ID: EnTranslations = {
       "training_dummy": {
         "name": "Boneka Latihan"
       },
-      "healing_dummy": {
-        "name": "Boneka Latihan Penyembuhan"
-      },
       "ridge_stalker": {
         "name": "Pengintai Punggung Bukit"
       },

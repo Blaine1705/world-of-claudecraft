@@ -9974,9 +9974,6 @@ export const ja_JP: EnTranslations = {
       "training_dummy": {
         "name": "訓練用ダミー"
       },
-      "healing_dummy": {
-        "name": "回復訓練用ダミー"
-      },
       "ridge_stalker": {
         "name": "尾根の追跡者"
       },

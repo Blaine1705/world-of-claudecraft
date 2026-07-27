@@ -7859,7 +7859,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sunder_armor.description':
     'Spaltet die Rüstung des Ziels und verringert sie pro Anwendung um {damage}%. Stapelt sich bis zu 5-mal. Erzeugt sehr viel Bedrohung.',
   'entities.mobs.training_dummy.name': 'Trainingspuppe',
-  'entities.mobs.healing_dummy.name': 'Heilungspuppe',
   'entities.mobs.yumi_cat.name': 'Yumi',
   'entities.mobs.water_elemental.name': 'Wasserelementar',
   'guide.arenaPage.yumiBody':

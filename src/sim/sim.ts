@@ -2011,9 +2011,23 @@ export class Sim {
       this.addEntity(board);
     }
 
+    if (cfg.noPlayer && this.devCommands) this.spawnHealerPracticeDummy();
+
     if (!cfg.noPlayer) {
       this.addPlayer(this.cfg.playerClass, this.cfg.playerName, { autoEquip: this.cfg.autoEquip });
     }
+  }
+
+  private spawnHealerPracticeDummy(): void {
+    const pos = this.groundPos(-34, 648);
+    const dummy = createMob(this.nextId++, MOBS.training_dummy, 20, pos);
+    dummy.name = 'Healing Dummy';
+    dummy.color = 0x74c476;
+    dummy.hostile = false;
+    dummy.friendlyPracticeTarget = true;
+    dummy.facing = 0;
+    dummy.prevFacing = 0;
+    this.addEntity(dummy);
   }
 
   private lockoutNowMs(): number {
@@ -7787,7 +7801,7 @@ export class Sim {
     // A Protect Yumi cat is heal/shield-targetable only by its own team.
     if (target.kind === 'mob' && yumiMod.isYumiCat(target))
       return yumiMod.yumiCatFriendlyTo(this.ctx, caster, target);
-    if (target.kind === 'mob' && MOBS[target.templateId]?.friendlyPracticeTarget) return true;
+    if (target.kind === 'mob' && target.friendlyPracticeTarget) return true;
     if (target.kind === 'mob' && target.ownerId !== null) {
       const owner = this.entities.get(target.ownerId);
       return !!owner && owner.kind === 'player' && !this.isHostileTo(caster, owner);

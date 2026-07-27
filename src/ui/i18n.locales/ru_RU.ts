@@ -3328,7 +3328,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gravecaller_summoner.name': 'Призыватель Могильного Зова',
   'entities.mobs.deacon_voss.name': 'Дьякон Восс',
   'entities.mobs.training_dummy.name': 'Тренировочный манекен',
-  'entities.mobs.healing_dummy.name': 'Манекен для исцеления',
   'entities.mobs.ridge_stalker.name': 'Хребтовый охотник',
   'entities.mobs.deeprock_kobold.name': 'Глубокоскальный туннельщик',
   'entities.mobs.thornpeak_ogre.name': 'Огр Терновых Пиков',

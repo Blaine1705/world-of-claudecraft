@@ -9974,9 +9974,6 @@ export const ko_KR: EnTranslations = {
       "training_dummy": {
         "name": "훈련용 허수아비"
       },
-      "healing_dummy": {
-        "name": "치유 연습용 허수아비"
-      },
       "ridge_stalker": {
         "name": "산등성이 추적자"
       },

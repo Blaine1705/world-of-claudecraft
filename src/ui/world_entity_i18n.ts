@@ -48,7 +48,6 @@ const MOB_IDS = [
   'gravecaller_mender',
   'deacon_voss',
   'training_dummy',
-  'healing_dummy',
   'ridge_stalker',
   'deeprock_kobold',
   'thornpeak_ogre',

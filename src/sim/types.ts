@@ -1162,9 +1162,6 @@ export interface MobTemplate {
   // combat and heals to full a few seconds after the last hit. Guarded in
   // enterCombat (sim.ts) and updateMob (mob/locomotion.ts).
   dummy?: boolean;
-  // Healer practice dummy: an inert mob-shaped target that friendly spells can
-  // select and heal, but hostile combat paths must still treat as non-hostile.
-  friendlyPracticeTarget?: boolean;
   // Boss mechanic: periodic AoE pulse around the mob while in combat.
   aoePulse?: {
     min: number;
@@ -3103,6 +3100,8 @@ export interface Entity extends ClientMirroredEntityFields {
   devGod?: boolean;
   /** Owner of a mob created by /dev spawn. Server-private and never persisted. */
   devSpawnOwnerId?: number;
+  /** Dev/test healer target: friendly-selectable inert dummy instance. */
+  friendlyPracticeTarget?: boolean;
   /** Moderation-jailed player: prisoners are mutually hostile (the jail brawl,
    *  see isHostileTo). Server-set via setJailed on jail/unjail and at join
    *  restore; never true offline, never user-settable. */

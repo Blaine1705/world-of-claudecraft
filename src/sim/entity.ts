@@ -684,7 +684,7 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   e.templateId = template.id;
   e.name = template.name;
   e.level = level;
-  e.hostile = !template.friendlyPracticeTarget;
+  e.hostile = true;
   // Elite scaling, classic-style: ~2.3x health, ~1.5x damage.
   const hpMult = template.elite ? 2.3 : 1;
   const dmgMult = template.elite ? 1.5 : 1;

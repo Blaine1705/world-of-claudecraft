@@ -9974,9 +9974,6 @@ export const tr_TR: EnTranslations = {
       "training_dummy": {
         "name": "Antrenman Kuklası"
       },
-      "healing_dummy": {
-        "name": "Şifa Antrenman Kuklası"
-      },
       "ridge_stalker": {
         "name": "Sırt Sinsisi"
       },

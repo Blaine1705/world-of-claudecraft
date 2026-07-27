@@ -12,7 +12,7 @@ type RebucketSim = Sim & {
 };
 
 function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, devCommands: true });
 }
 
 function dummyOf(sim: Sim): Entity {
@@ -22,7 +22,7 @@ function dummyOf(sim: Sim): Entity {
 }
 
 function healingDummyOf(sim: Sim): Entity {
-  const d = [...sim.entities.values()].find((e) => e.templateId === 'healing_dummy' && !e.dead);
+  const d = [...sim.entities.values()].find((e) => e.friendlyPracticeTarget && !e.dead);
   if (!d) throw new Error('healing dummy not spawned');
   return d;
 }
@@ -209,6 +209,8 @@ describe('Highwatch training dummy', () => {
     const priest = entityById(sim, pid);
 
     expect(d.hostile).toBe(false);
+    expect(d.templateId).toBe('training_dummy');
+    expect(d.name).toBe('Healing Dummy');
     expect(d.aiState).toBe('idle');
     expect(Math.round(d.pos.x)).toBe(-34);
     expect(Math.round(d.pos.z)).toBe(648);

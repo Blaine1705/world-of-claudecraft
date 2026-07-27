@@ -9974,9 +9974,6 @@ export const en_XA: EnTranslations = {
       "training_dummy": {
         "name": "[Ţŕáíñíñĝ Ðúɱɱý]"
       },
-      "healing_dummy": {
-        "name": "[Ĥéáļíñĝ Ðúɱɱý]"
-      },
       "ridge_stalker": {
         "name": "[Ŕíðĝé Šţáļķéŕ]"
       },
