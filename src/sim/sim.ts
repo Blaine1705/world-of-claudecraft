@@ -248,8 +248,8 @@ import { Market, type MarketListing, type MarketSave } from './market';
 import { defaultMarketQuery, type MarketQuery } from './market_query';
 import {
   mobCombatProfile as mobCombatProfileFn,
-  mobEffectiveMeleeRange as mobEffectiveMeleeRangeFn,
-  tryMobMeleeSwingInRange as tryMobMeleeSwingInRangeFn,
+  mobEffectiveMeleeRange as mobEffectiveMeleeRangeImpl,
+  tryMobMeleeSwingInRange as tryMobMeleeSwingInRangeImpl,
 } from './mob/combat_profile';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
 import * as lifecycle from './mob/lifecycle';
@@ -498,6 +498,7 @@ import {
   type CrowdControlDrState,
   cloneInvSlot,
   cloneItemInstancePayload,
+  type DamageEventKind,
   DELVE_COMPANION_HEAL_INTERVAL,
   type DeedStats,
   type DelveDef,
@@ -3196,7 +3197,7 @@ export class Sim {
    *  re-resolve the active skin against the equipped mainhand. Cosmetic only. */
   setWeaponSkinLoadout(pid: number, loadout: WeaponSkinLoadout): void {
     const e = this.entities.get(pid);
-    if (!e || e.kind !== 'player') return;
+    if (e?.kind !== 'player') return;
     const next: WeaponSkinLoadout = {};
     for (const [t, skinId] of Object.entries(loadout)) {
       if (typeof skinId !== 'string') continue;
@@ -3227,7 +3228,7 @@ export class Sim {
    *  the loadout changed. */
   setWeaponSkin(pid: number, skinId: string | null, weaponType?: WeaponSkinType): boolean {
     const e = this.entities.get(pid);
-    if (!e || e.kind !== 'player') return false;
+    if (e?.kind !== 'player') return false;
     const cls = e.templateId;
     if (skinId !== null) {
       const def = WEAPON_SKINS[skinId];
@@ -3411,10 +3412,14 @@ export class Sim {
     return this.primaryId;
   }
   get player(): Entity {
-    return this.entities.get(this.primaryId)!;
+    const player = this.entities.get(this.primaryId);
+    if (!player) throw new Error(`Primary player entity ${this.primaryId} is missing`);
+    return player;
   }
   private get primary(): PlayerMeta {
-    return this.players.get(this.primaryId)!;
+    const primary = this.players.get(this.primaryId);
+    if (!primary) throw new Error(`Primary player meta ${this.primaryId} is missing`);
+    return primary;
   }
   get moveInput(): MoveInput {
     return this.primary.moveInput;
@@ -4791,7 +4796,7 @@ export class Sim {
   // L1 loot distribution moved to loot/loot_roll.ts (behind SimContext). Sim keeps a
   // thin delegate for partyLootCandidatesForMob because dead_party_loot.test.ts reaches
   // it via cast; the strategy resolvers it used have no other caller and moved fully.
-  private partyLootCandidatesForMob(mob: Entity): PlayerMeta[] {
+  partyLootCandidatesForMob(mob: Entity): PlayerMeta[] {
     return partyLootCandidatesForMobImpl(this.ctx, mob);
   }
   // Body moved to player_motion.ts (MV1). The ghost/aura math is host-agnostic
@@ -5313,12 +5318,12 @@ export class Sim {
     return hexOutputMultImpl(this.ctx, source);
   }
 
-  private consumeHealAbsorb(target: Entity, healed: number): number {
-    return consumeHealAbsorbImpl(this.ctx, target, healed);
-  }
-
   private critVulnBonus(target: Entity): number {
     return critVulnBonusImpl(this.ctx, target);
+  }
+
+  consumeHealAbsorb(target: Entity, healed: number): number {
+    return consumeHealAbsorbImpl(this.ctx, target, healed);
   }
 
   private applyHeal(
@@ -5778,7 +5783,7 @@ export class Sim {
     updatePlayerAutoAttackImpl(this.ctx, p, meta);
   }
 
-  private rangedSwing(
+  rangedSwing(
     attacker: Entity,
     target: Entity,
     ranged: { min: number; max: number; speed: number; wand?: boolean; school?: string },
@@ -5815,7 +5820,7 @@ export class Sim {
     crit: boolean,
     school: string,
     ability: string | null,
-    kind: 'hit' | 'miss' | 'dodge',
+    kind: DamageEventKind,
     noRage = false,
     threatOpts?: { flat?: number; mult?: number },
     direct = true,
@@ -5949,6 +5954,14 @@ export class Sim {
   // Mob AI
   // -------------------------------------------------------------------------
 
+  mobEffectiveMeleeRange(mob: Entity): number {
+    return mobEffectiveMeleeRangeImpl(mob);
+  }
+
+  tryMobMeleeSwingInRange(mob: Entity, target: Entity): boolean {
+    return tryMobMeleeSwingInRangeImpl(this.ctx, mob, target);
+  }
+
   private refreshMobLeashFromAction(source: Entity | null, target: Entity): void {
     if (
       !source ||
@@ -5977,7 +5990,7 @@ export class Sim {
   // highestThreatTarget moved to mob/targeting.ts (M1); retargetMob/updateMobTarget
   // call it there. No Sim delegate: it had no caller outside those two methods.
 
-  private updateMobTarget(mob: Entity): void {
+  updateMobTarget(mob: Entity): void {
     updateMobTargetFn(this.ctx, mob);
   }
 
@@ -5991,14 +6004,6 @@ export class Sim {
 
   private mobCombatProfile(mob: Entity): MobCombatProfile {
     return mobCombatProfileFn(mob);
-  }
-
-  private mobEffectiveMeleeRange(mob: Entity): number {
-    return mobEffectiveMeleeRangeFn(mob);
-  }
-
-  private tryMobMeleeSwingInRange(mob: Entity, target: Entity): boolean {
-    return tryMobMeleeSwingInRangeFn(this.ctx, mob, target);
   }
 
   aggroMob(mob: Entity, target: Entity, social: boolean): void {
@@ -6156,11 +6161,12 @@ export class Sim {
     dmg *= this.petDamageMult(mob);
     const rawDmg = dmg; // pre-armor, post-crit/enrage — basis for cleave splash
     dmg *= 1 - armorReduction(this.effectiveArmor(target), mob.level);
-    if (blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance) {
+    const blocked = blockChance > 0 && roll < missChance + dodgeChance + parryChance + blockChance;
+    if (blocked) {
       dmg = Math.max(1, dmg - target.blockValue);
     }
     const dealt = Math.max(1, Math.round(dmg));
-    this.dealDamage(mob, target, dealt, crit, 'physical', null, 'hit');
+    this.dealDamage(mob, target, dealt, crit, 'physical', null, blocked ? 'block' : 'hit');
     runMobSwingAffixes(this.ctx, mob, target, { dealt, crit, rawDmg });
   }
 
@@ -6366,6 +6372,7 @@ export class Sim {
   // every tick while the boss is in combat; thresholds fire once per pull
   // and reset on evade/respawn.
   private updateBossMechanics(mob: Entity): void {
+    if (mob.dead || mob.hp <= 0) return;
     const tmpl = MOBS[mob.templateId];
     if (
       !tmpl ||
@@ -6851,13 +6858,13 @@ export class Sim {
     itemId: string,
     count: number,
     pid?: number,
-    opts?: { silent?: boolean; callerLogs?: boolean },
+    opts?: { silent?: boolean; callerLogs?: boolean; craftedRecipeId?: string },
   ): void {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta } = r;
     const def = ITEMS[itemId];
-    addStacked(meta.inventory, itemId, count);
+    addStacked(meta.inventory, itemId, count, undefined, opts?.craftedRecipeId);
     // Every grant that reaches the hub is an acquisition for the Book of
     // Deeds discovery ledger (loot, craft, quest reward, vendor, mail, trade).
     deedsMod.markItemDiscovered(this.ctx, meta, itemId);
@@ -6898,7 +6905,7 @@ export class Sim {
     instance: ItemInstancePayload,
     pid?: number,
     count = 1,
-    opts?: { silent?: boolean; callerLogs?: boolean },
+    opts?: { silent?: boolean; callerLogs?: boolean; craftedRecipeId?: string },
   ): void {
     const r = this.resolve(pid);
     if (!r) return;
@@ -6909,7 +6916,10 @@ export class Sim {
     for (let i = 0; i < count; i++) {
       const mergeTarget = meta.inventory.find(
         (s) =>
-          s.itemId === itemId && s.count < stack && canStackInstancePayloads(s.instance, instance),
+          s.itemId === itemId &&
+          s.count < stack &&
+          s.craftedRecipeId === opts?.craftedRecipeId &&
+          canStackInstancePayloads(s.instance, instance),
       );
       if (mergeTarget) mergeTarget.count += 1;
       // The first pushed slot holds the caller's payload object (the shipped
@@ -6921,6 +6931,7 @@ export class Sim {
           itemId,
           count: 1,
           instance: i === 0 ? instance : cloneItemInstancePayload(instance),
+          ...(opts?.craftedRecipeId === undefined ? {} : { craftedRecipeId: opts.craftedRecipeId }),
         });
     }
     // Discovery ledger: the instance's rolled quality (gathered rares) beats
@@ -7116,8 +7127,30 @@ export class Sim {
     items.sellAllJunk(this.ctx, pid);
   }
 
-  buyBackItem(itemId: string, pid?: number): void {
-    items.buyBackItem(this.ctx, itemId, pid);
+  buyBackItem(
+    itemId: string,
+    index?: number,
+    expectedInstance?: ItemInstancePayload,
+    expectedCraftedRecipeId?: string,
+  ): void;
+  buyBackItem(
+    itemId: string,
+    index?: number,
+    expectedInstance?: ItemInstancePayload,
+    pid?: number,
+    expectedCraftedRecipeId?: string,
+  ): void;
+  buyBackItem(
+    itemId: string,
+    index?: number,
+    expectedInstance?: ItemInstancePayload,
+    pidOrCraftedRecipeId?: number | string,
+    expectedCraftedRecipeId?: string,
+  ): void {
+    const pid = typeof pidOrCraftedRecipeId === 'number' ? pidOrCraftedRecipeId : undefined;
+    const craftedRecipeId =
+      typeof pidOrCraftedRecipeId === 'string' ? pidOrCraftedRecipeId : expectedCraftedRecipeId;
+    items.buyBackItem(this.ctx, itemId, index, pid, expectedInstance, craftedRecipeId);
   }
 
   // Gather-node harvest (#1121): a thin delegate onto
@@ -7337,8 +7370,14 @@ export class Sim {
 
   // Enchanting profession commands (IWorldProfessions): same thin-
   // delegate/stash-result/emit shape as salvageItem/craftItem above.
-  disenchantItem(itemId: string, pid?: number): void {
-    const result = disenchantItemImpl(this.ctx, itemId, pid);
+  disenchantItem(
+    itemId: string,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): void {
+    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+    const targetSlotIndex = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const result = disenchantItemImpl(this.ctx, itemId, pid, targetSlotIndex);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastDisenchantResult = result;
     this.emit({
@@ -8424,7 +8463,8 @@ export class Sim {
     pid: number,
     team: 'A' | 'B',
   ): import('../world_api').FiestaMatchInfo {
-    const f = match.fiesta!;
+    const f = match.fiesta;
+    if (!f) throw new Error(`Fiesta match ${match.id} is missing fiesta state`);
     const origin = arenaOrigin(match.slot);
     const meta = this.players.get(pid);
     const offer = f.offers.get(pid);

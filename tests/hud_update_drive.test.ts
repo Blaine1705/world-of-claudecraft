@@ -588,6 +588,20 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the desktop action bar, facet-routed',
   },
   {
+    call: 'this.currentMobileActionPage',
+    band: 'frame',
+    gate: 'this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter',
+    surface: 'none',
+    why: 'selects the active source page for the touch action ring; no DOM write',
+  },
+  {
+    call: 'this.mobileActionSourceSlotCount',
+    band: 'frame',
+    gate: 'this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter',
+    surface: 'none',
+    why: 'counts the source slots that determine the touch action ring pagination; no DOM write',
+  },
+  {
     call: 'this.mobileActionRingPainter.paint',
     band: 'frame',
     gate: 'this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter',
@@ -1284,7 +1298,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 37, chrome: 68, none: 12 });
+    ).toEqual({ window: 37, chrome: 68, none: 14 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

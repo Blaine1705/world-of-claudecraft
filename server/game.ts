@@ -4297,7 +4297,14 @@ export class GameServer {
         }
         break;
       case 'buyback':
-        if (typeof msg.item === 'string') sim.buyBackItem(msg.item, pid);
+        if (typeof msg.item === 'string')
+          sim.buyBackItem(
+            msg.item,
+            typeof msg.index === 'number' ? msg.index : undefined,
+            msg.instance && typeof msg.instance === 'object' ? msg.instance : undefined,
+            pid,
+            typeof msg.craftedRecipeId === 'string' ? msg.craftedRecipeId : undefined,
+          );
         break;
       case 'harvest_node':
         this.sendCommandOutcome(
@@ -4324,7 +4331,10 @@ export class GameServer {
       // why `enchantResult` is itself a HEAVY_SELF_EVENTS member (the unbindResult
       // precedent): otherwise the spent reagents would linger in the bag mirror.
       case 'disenchant_item':
-        if (typeof msg.item === 'string') sim.disenchantItem(msg.item, pid);
+        if (typeof msg.item === 'string') {
+          const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
+          sim.disenchantItem(msg.item, pid, slot);
+        }
         break;
       case 'apply_enchant':
         if (typeof msg.item === 'string' && typeof msg.enchant === 'string') {
@@ -5733,6 +5743,8 @@ export class GameServer {
       sh: p.spellHaste,
       crit: p.critChance,
       dodge: p.dodgeChance,
+      blk: p.blockChance,
+      bval: p.blockValue,
       crat: p.critRating,
       hrat: p.hasteRating,
       hirat: p.hitRating,

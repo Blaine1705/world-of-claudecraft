@@ -30,6 +30,18 @@ type SimInternals = {
   players: Map<number, PlayerMeta>;
 };
 
+function entityOf(internals: SimInternals, pid: number): Entity {
+  const entity = internals.entities.get(pid);
+  if (!entity) throw new Error(`missing entity ${pid}`);
+  return entity;
+}
+
+function metaOf(internals: SimInternals, pid: number): PlayerMeta {
+  const meta = internals.players.get(pid);
+  if (!meta) throw new Error(`missing player meta ${pid}`);
+  return meta;
+}
+
 function setup(seed: number, templateId = 'forest_wolf') {
   const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
   const internals = sim as unknown as SimInternals;
@@ -37,7 +49,7 @@ function setup(seed: number, templateId = 'forest_wolf') {
   const b = sim.addPlayer('warrior', 'Bravo');
   sim.tick();
   for (const pid of [a, b]) {
-    const e = internals.entities.get(pid)!;
+    const e = entityOf(internals, pid);
     e.pos = { x: 0, y: 0, z: 0 };
     e.prevPos = { x: 0, y: 0, z: 0 };
   }
@@ -54,7 +66,7 @@ function setup(seed: number, templateId = 'forest_wolf') {
 // Fill every free slot with distinct 1-per-slot gear so the next add has
 // nowhere to go (the tests/bags.test.ts fillBags idiom, per-player).
 function fillBags(sim: Sim, internals: SimInternals, pid: number): void {
-  const m = internals.players.get(pid)!;
+  const m = metaOf(internals, pid);
   const cap = bagCapacity(m.bags);
   const gearIds = Object.values(ITEMS)
     .filter((d) => d.kind === 'weapon' || d.kind === 'armor')
@@ -150,14 +162,14 @@ describe('one harvestResult per harvest command (#2457)', () => {
     });
     const markLost = setup(5);
     fillBags(markLost.sim, markLost.internals, markLost.a);
-    markLost.internals.players.get(markLost.a)!.inventory[0] = { itemId: 'wolf_fang', count: 1 };
+    metaOf(markLost.internals, markLost.a).inventory[0] = { itemId: 'wolf_fang', count: 1 };
     arms.push({
       name: 'full-bag mark loss',
       loots: harvest(markLost.sim, markLost.mob.id, ['fang'], markLost.a).loots,
     });
     const findLost = setup(5);
     fillBags(findLost.sim, findLost.internals, findLost.a);
-    findLost.internals.players.get(findLost.a)!.inventory[0] = { itemId: 'rough_hide', count: 1 };
+    metaOf(findLost.internals, findLost.a).inventory[0] = { itemId: 'rough_hide', count: 1 };
     arms.push({
       name: 'full-bag specimen truncation',
       loots: harvest(findLost.sim, findLost.mob.id, ['hide'], findLost.a).loots,
@@ -231,9 +243,11 @@ describe('the four grant arms each report themselves (#2457)', () => {
     expect(results[0].yields.map((y) => y.qty)).toEqual([1, 2]);
   });
 
-  it('signed non-specimen family: the fang reports the signed arm at its rolled rarity', () => {
+  it('signed non-specimen family: the fang reports the signed arm at its landed count', () => {
     // fang has no Pristine specimen (HARVEST_COMPONENT_SPECIMENS), so a
-    // rare-or-better roll signs the component itself (#1145).
+    // rare-or-better roll signs the component itself (#1145). A signed
+    // multi-unit roll lands all units that fit, and the ledger reports that
+    // count rather than the one-slot gate probe.
     const { sim, internals, a, mob } = setup(30);
     const { results } = harvest(sim, mob.id, undefined, a);
     expect(results[0].yields).toEqual([
@@ -244,7 +258,7 @@ describe('the four grant arms each report themselves (#2457)', () => {
     ]);
     // The arm identity: a signed instance really did land, stamped with the
     // harvester's name, so 'signed' is not just a label on a plain grant.
-    const meta = internals.players.get(a)!;
+    const meta = metaOf(internals, a);
     expect(meta.inventory.find((s) => s.itemId === 'wolf_fang')?.instance?.signer).toBe('Alpha');
   });
 
@@ -258,7 +272,7 @@ describe('the four grant arms each report themselves (#2457)', () => {
       { itemId: 'wolf_fang', qty: 1, rarity: 'uncommon', kind: 'plain' },
       { itemId: 'pristine_hide', qty: 1, rarity: 'rare', kind: 'specimen' },
     ]);
-    const meta = internals.players.get(a)!;
+    const meta = metaOf(internals, a);
     expect(meta.inventory.find((s) => s.itemId === 'pristine_hide')?.instance?.signer).toBe(
       'Alpha',
     );
@@ -284,7 +298,7 @@ describe('the four grant arms each report themselves (#2457)', () => {
     // toast is what tells them the signature is the thing that got away.
     const { sim, internals, a, mob } = setup(5);
     fillBags(sim, internals, a);
-    const m = internals.players.get(a)!;
+    const m = metaOf(internals, a);
     m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
     expect(m.inventory.length).toBe(bagCapacity(m.bags));
     const { results, events } = harvest(sim, mob.id, ['fang'], a);
@@ -303,7 +317,7 @@ describe('the four grant arms each report themselves (#2457)', () => {
     // whole of that half of the feedback.
     const { sim, internals, a, mob } = setup(5);
     fillBags(sim, internals, a);
-    const m = internals.players.get(a)!;
+    const m = metaOf(internals, a);
     m.inventory[0] = { itemId: 'rough_hide', count: 1 };
     expect(m.inventory.length).toBe(bagCapacity(m.bags));
     const { results, events } = harvest(sim, mob.id, ['hide'], a);
@@ -418,6 +432,6 @@ describe('corpse LOOT is untouched by the harvest fix (#2457)', () => {
       expect(ev.callerLogs).toBeUndefined();
       expect(ev.text).toContain('You receive:');
     }
-    expect(internals.players.get(a)!.inventory.length).toBeGreaterThan(0);
+    expect(internals.players.get(a)?.inventory.length).toBeGreaterThan(0);
   });
 });

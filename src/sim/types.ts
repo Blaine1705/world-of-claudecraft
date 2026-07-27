@@ -918,6 +918,10 @@ export interface ItemInstancePayload {
    *  isEnchantedInstance). Legacy enchanted copies predate this field and are
    *  detected by bare rolled.stats WITHOUT rolled.masterwork instead. */
   enchant?: string;
+  /** Recipe id that minted this copy while it is worn. Inventory stacks keep
+   *  the same marker on InvSlot.craftedRecipeId so common crafted gear can
+   *  stack normally in bags; equip/unequip bridges it through this payload. */
+  craftedRecipeId?: string;
   /** Player id (Entity id) this specific copy is bound to. */
   boundTo?: number;
   /** Arms the bind-on-trade lock: a copy carrying this binds to the recipient
@@ -935,6 +939,10 @@ export interface InvSlot {
   count: number;
   /** Additive, optional per-instance payload (#1165). Absent for ordinary fungible stacks. */
   instance?: ItemInstancePayload;
+  /** Recipe id that minted this stack when crafting provenance matters but the
+   *  item stays a plain bag good. Kept on the slot while in bags so common
+   *  crafted gear does not gain a signer/masterwork/enchant identity. */
+  craftedRecipeId?: string;
   /** The bag CELL this stack was dragged into (the manual arrangement). Absent for a
    *  stack that was never placed by hand, which the layout drops into the first free
    *  cell (src/sim/inventory_order.ts). Additive and advisory: an unusable value (a
@@ -3298,6 +3306,8 @@ export interface PendingResurrection {
   expiresAt: number;
 }
 
+export type DamageEventKind = 'hit' | 'miss' | 'dodge' | 'parry' | 'block' | 'resist';
+
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
 export type SimEvent = { pid?: number } & (
@@ -3309,7 +3319,7 @@ export type SimEvent = { pid?: number } & (
       crit: boolean;
       school: string;
       ability: string | null;
-      kind: 'hit' | 'miss' | 'dodge' | 'parry' | 'resist';
+      kind: DamageEventKind;
       absorbed?: number;
       // Presentation-only correlation: this hit belongs to a ranged shot whose
       // one-shot animation already began at projectile launch.

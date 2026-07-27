@@ -9232,6 +9232,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmTitle': 'Accettare il Mal di resurrezione?',
   'hudChrome.gathering.gatherLine': 'Raccogli: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Raccogli: {name} x {qty}.',
+  'hudChrome.gathering.harvestLine': 'Scuoi: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Scuoi: {name} x {qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Recuperi anche {name}.',
   'hudChrome.mobile.professions': 'Professioni',
   'hudChrome.options.showThirdActionBar': 'Mostra la terza barra delle azioni',
   'hudChrome.playerMenu.streamerBadgeTitle': 'Streamer verificato',
@@ -9404,8 +9407,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': 'Da {min} a {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Incantato',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Incantato)',
-  'hudChrome.marketIndicator.aria': 'Ritiro in attesa dal Mercato Mondiale',
-  'hudChrome.marketIndicator.tip': 'Oro o oggetti ti aspettano al Mercante.',
+  'hudChrome.marketIndicator.aria': 'Ricavi o oggetti del Mercato Mondiale in attesa',
+  'hudChrome.marketIndicator.tip':
+    'Ricavi di vendita o oggetti restituiti ti aspettano dal Mercante.',
   'hudChrome.materialHint.arcaneDust':
     "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento comune e non comune.",
   'hudChrome.materialHint.arcaneEssence':
@@ -9443,4 +9447,16 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceTag': 'Sostituisce {enchant}',
   'hudChrome.enchanting.sameEnchant': "Quell'oggetto ha già quell'incantesimo.",
   'hudChrome.enchanting.sameEnchantTag': 'Già applicato',
+  'hudChrome.crafting.craftedToastQty': 'Realizzato: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Disincanti {item} in {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Disincanti {item} in {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Recuperi anche {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Recuperi anche {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Smantelli {item} in {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Smantelli {item} in {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Non incantato',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Conserva: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Marchio del creatore',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Bonus capolavoro',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Vincolo di commissione',
 };

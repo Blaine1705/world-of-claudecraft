@@ -62,6 +62,8 @@ interface FakeClient {
   ws: any;
 }
 
+type SnapshotApplier = { applySnapshot(snapshot: unknown): void };
+
 function fakeWs(): FakeClient {
   const sent: any[] = [];
   return { sent, ws: { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) } };
@@ -150,6 +152,34 @@ function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWo
 }
 
 describe('self stat wire round-trip', () => {
+  it('mirrors Warrior shield block stats from the live equip command path', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Cedric', 'warrior');
+    server.sim.addItem('eastbrook_buckler', 1, session.pid);
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'equip', item: 'eastbrook_buckler', slot: 'offhand' }),
+    );
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.equip.offhand).toBe('eastbrook_buckler');
+    expect(snap.self.stats.armor).toBeGreaterThan(0);
+    expect(snap.self.stats.sta).toBeGreaterThan(0);
+    expect(snap.self.blk).toBeGreaterThan(0);
+    expect(snap.self.bval).toBe(6);
+
+    const client = bareClient(session.pid, 'warrior');
+    const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
+    internals.applySnapshot(snap);
+    expect(client.player.offhandItemId).toBe('eastbrook_buckler');
+    expect(client.player.equippedItems.offhand).toBe('eastbrook_buckler');
+    expect(client.player.stats.armor).toBe(snap.self.stats.armor);
+    expect(client.player.stats.sta).toBe(snap.self.stats.sta);
+    expect(client.player.blockChance).toBe(snap.self.blk);
+    expect(client.player.blockValue).toBe(6);
+  });
+
   it('mirrors crit/haste rating from the self snapshot onto the paper-doll entity', () => {
     const client = bareClient(1);
     const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
@@ -844,6 +874,53 @@ describe('delta snapshots', () => {
     const client = bareClient(session.pid);
     (client as any).applySnapshot(snap);
     expect(client.player.potionCdRemaining).toBeCloseTo(95.5, 1);
+  });
+
+  it('mirrors Hallowed Wall armor from the live Protection cast-slot path', () => {
+    const paladinServer = new GameServer();
+    const paladinFc = fakeWs();
+    const paladinSession = joinServer(paladinServer, paladinFc, 20, 'Holytest', 'paladin');
+    paladinServer.sim.setPlayerLevel(20, paladinSession.pid);
+    expect(paladinServer.sim.setSpec('protection', paladinSession.pid)).toBe(true);
+
+    const player = paladinServer.sim.entities.get(paladinSession.pid)!;
+    player.resource = player.maxResource;
+    player.hp = player.maxHp;
+    const baseArmor = player.stats.armor;
+    const target = createMob(9001, MOBS.deeprock_kobold, 20, {
+      x: player.pos.x,
+      y: player.pos.y,
+      z: player.pos.z + 12,
+    });
+    target.maxHp = target.hp = 1_000_000;
+    (paladinServer.sim as unknown as { addEntity(e: typeof target): void }).addEntity(target);
+    player.targetId = target.id;
+
+    const known = paladinServer.sim.meta(paladinSession.pid)!.known;
+    const slot = known.findIndex((entry) => entry.def.id === 'holy_shield');
+    expect(slot).toBeGreaterThanOrEqual(0);
+
+    paladinServer.handleMessage(
+      paladinSession,
+      JSON.stringify({ t: 'cmd', cmd: 'castSlot', slot }),
+    );
+    for (let i = 0; i < 200 && paladinServer.sim.ctx.pendingProjectiles.length > 0; i++) {
+      paladinServer.sim.tick();
+    }
+
+    broadcast(paladinServer);
+    const snap = lastSnap(paladinFc.sent);
+    expect(snap.self.auras).toContainEqual(
+      expect.objectContaining({ id: 'holy_shield', kind: 'buff_armor', value: 150 }),
+    );
+    expect(snap.self.stats.armor).toBe(baseArmor + 150);
+
+    const client = bareClient(paladinSession.pid, 'paladin');
+    (client as unknown as SnapshotApplier).applySnapshot(snap);
+    expect(client.player.auras).toContainEqual(
+      expect.objectContaining({ id: 'holy_shield', kind: 'buff_armor', value: 150 }),
+    );
+    expect(client.player.stats.armor).toBe(baseArmor + 150);
   });
 
   it('includes live aura and movement diagnostics in admin online rows', () => {
@@ -3104,7 +3181,9 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   atitle: 'activeTitle',
   bags: 'bags',
   bank: 'bankInfo',
+  blk: 'blockChance',
   buyback: 'vendorBuyback',
+  bval: 'blockValue',
   cds: 'cooldowns',
   cosmetics: 'accountCosmetics',
   cprof: 'craftingIdentity',
@@ -3798,7 +3877,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     // reviewable change landing in alphabetical order
     expect(Object.keys(TERSE_TO_IWORLD)).toEqual([...Object.keys(TERSE_TO_IWORLD)].sort());
     // every entry is either a delta key or one of the always-present self scalars
-    const SELF_SCALARS = new Set(['res', 'mres', 'rtype', 'lxp', 'rxp', 'prk']);
+    const SELF_SCALARS = new Set(['blk', 'bval', 'res', 'mres', 'rtype', 'lxp', 'rxp', 'prk']);
     for (const terse of Object.keys(TERSE_TO_IWORLD)) {
       expect(
         (ALL_DELTA_KEYS as readonly string[]).includes(terse) || SELF_SCALARS.has(terse),

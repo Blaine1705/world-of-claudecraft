@@ -2024,8 +2024,8 @@ export const zh_CN: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "世界市场待领取物品",
-      "tip": "有金币或物品正在商人处等待你领取。"
+      "aria": "世界市场收益或物品待领取",
+      "tip": "销售收益或退回物品正在商人处等待你领取。"
     },
     "noticeboard": {
       "empty": "看起来没有张贴任何内容。"
