@@ -783,7 +783,10 @@ interface TownFocusFocusHarness {
   readonly townFocusOpen: boolean;
 }
 
-function makeFocusHud(allocation: Record<string, number> = { [COMPONENT]: 2 }): {
+function makeFocusHud(
+  allocation: Record<string, number> = { [COMPONENT]: 2 },
+  inTown = true,
+): {
   hud: TownFocusFocusHarness;
   el: HTMLElement;
   opener: HTMLButtonElement;
@@ -807,9 +810,13 @@ function makeFocusHud(allocation: Record<string, number> = { [COMPONENT]: 2 }): 
   hud.lastTownFocusSig = '';
   // Object.create skips field initializers, so build the bridge by hand out of
   // the SAME two pieces the field declares: makeWindowFocus over a FocusManager.
+  // Two things this seeding cannot see, both covered by source pins below
+  // instead: WHICH root the bridge is built over, and that the shipped
+  // `windowFocus` helper resolves the ONE manager shared by every window rather
+  // than minting a private one per window as this harness does.
   hud.townFocusWindowFocus = makeWindowFocus(new FocusManager(), () => el);
   hud.townFocusOpenerFocus = null;
-  hud.isInTown = () => true;
+  hud.isInTown = () => inTown;
   hud.closeContextMenu = vi.fn() as unknown as TownFocusFocusHarness['closeContextMenu'];
   hud.hideTooltip = vi.fn() as unknown as TownFocusFocusHarness['hideTooltip'];
   return { hud, el, opener };
@@ -836,10 +843,21 @@ describe('the Town Focus panel is wired into the shared focus system', () => {
     // jsdom lays nothing out, so every element reports ZERO client rects and the
     // manager (which reads getClientRects().length to mean "rendered, therefore
     // focusable") would refuse every candidate, opener included. Report one rect
-    // for this section; the manager only ever reads `.length`. It also means the
-    // manager's self-heal never fires here, which is what makes the release
-    // assertions below decisive: a leaked trap stays leaked instead of being
-    // quietly popped on the next Tab.
+    // for this section; the manager only ever reads `.length`.
+    //
+    // Two consequences worth stating, because both are load-bearing. First, a
+    // leaked trap's root keeps reporting rects, so the manager's self-heal (which
+    // pops traps whose root has gone unfocusable) cannot quietly paper over one:
+    // that is what makes every "the trap was released" assertion below decisive.
+    // Second, the stub is per-PROTOTYPE, so a `display: none` element still reads
+    // as focusable and the whole class of "the return target vanished" cases is
+    // unrepresentable by default; the one test that needs it overrides
+    // getClientRects on a single ELEMENT.
+    //
+    // The self-heal is not dead in this file, though: the four tests that never
+    // close the panel leave a live trap and a live document listener behind, and
+    // it is afterEach's document.body.innerHTML wipe that detaches their roots so
+    // the next test's first Tab pops them. Isolation depends on that wipe.
     const spy = vi
       .spyOn(Element.prototype, 'getClientRects')
       .mockReturnValue([{}] as unknown as DOMRectList);
@@ -888,14 +906,24 @@ describe('the Town Focus panel is wired into the shared focus system', () => {
     expect(document.activeElement).toBe(elsewhere);
   });
 
-  it('cycles Tab inside the open panel instead of letting it reach the game world', () => {
+  it('cycles Tab inside the open panel, and preventDefaults it', () => {
+    // NOT "instead of letting it reach the game world": the manager only
+    // cancels the default, and src/game/input.ts listens on `window` without
+    // checking defaultPrevented, so in the real client the same Tab press also
+    // runs target-nearest. That is true of every window in this family (no
+    // windowFocus window is in Hud.isModalOpen()), it is not something this
+    // change introduced, and nothing here covers it. Claim only what is driven.
     const { hud, el, opener } = makeFocusHud();
     opener.focus();
     hud.toggleTownFocus();
     const focusables = [...el.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)];
-    // The X, at least one live stepper pair and Save: enough stops that a cycle
-    // is distinguishable from doing nothing.
+    // This list is derived from the manager's OWN selector, so it pins order,
+    // wrapping and preventDefault but says nothing about MEMBERSHIP: a Save
+    // button that stopped rendering would leave the loop green. Pin the two ends
+    // by identity so the cycle is known to span the real panel, X to Save.
     expect(focusables.length).toBeGreaterThan(2);
+    expect(focusables[0]).toBe(el.querySelector('[data-close]'));
+    expect(focusables[focusables.length - 1]).toBe(el.querySelector('.town-focus-save'));
     focusables[0].focus();
     for (let i = 1; i < focusables.length; i++) {
       expect(pressTab().defaultPrevented).toBe(true);
@@ -936,11 +964,50 @@ describe('the Town Focus panel is wired into the shared focus system', () => {
     const rebuilt = stepButton(el, COMPONENT, 'inc');
     expect(rebuilt).not.toBe(plus);
     expect(document.activeElement).toBe(rebuilt);
-    // ...and that in-window refocus must not tear the trap down. The ladder
-    // reaches focus() directly and makeWindowFocus's in-window arm exists for
-    // the same reason: a refocus inside an OPEN window is not a close.
+    // ...and that in-window refocus must not tear the trap down. Note WHY it
+    // does not: the ladder reaches candidate.focus() directly inside the painter
+    // and never touches the bridge, so nothing releases the trap. It is not
+    // makeWindowFocus's in-window arm catching it; that arm is never entered for
+    // this window, and nothing in the repo drives it here. This is still the
+    // regression guard the criterion wants, since a rebuild that DID release
+    // would fail it.
     expect(pressTab().defaultPrevented).toBe(true);
     expect(el.contains(document.activeElement)).toBe(true);
+  });
+
+  it('cycles a shorter Tab ring out of town, where Save disables out of the set', () => {
+    // Out of town every stepper and Save render disabled, and a disabled button
+    // is out of FOCUSABLE_SELECTOR: the ring collapses to the X alone. Worth
+    // driving rather than assuming, because a one-element ring is the case where
+    // nextFocusIndex could plausibly return -1 and let Tab escape the panel.
+    const { hud, el, opener } = makeFocusHud({ [COMPONENT]: 2 }, false);
+    opener.focus();
+    hud.toggleTownFocus();
+    const focusables = [...el.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)];
+    expect(el.querySelector<HTMLButtonElement>('.town-focus-save')?.disabled).toBe(true);
+    expect(focusables).not.toContain(el.querySelector('.town-focus-save'));
+    expect(focusables).toEqual([el.querySelector('[data-close]')]);
+    focusables[0].focus();
+    expect(pressTab().defaultPrevented).toBe(true);
+    expect(document.activeElement).toBe(focusables[0]);
+  });
+
+  it('captures a null opener when nothing was focused, and still releases the trap', () => {
+    // The WebKit path, and the default one there: Safari and iOS do not focus a
+    // <button> on click, so activeFocusable() returns null at capture and the
+    // opener field is null at close. The bridge must still take its
+    // release-the-trap branch rather than treating null as an in-window refocus.
+    const { hud, el } = makeFocusHud();
+    expect(document.activeElement).toBe(document.body);
+    hud.toggleTownFocus();
+    expect(hud.townFocusOpenerFocus).toBeNull();
+    const plus = stepButton(el, COMPONENT, 'inc');
+    plus.focus();
+    hud.closeTownFocus();
+    vi.runAllTimers();
+    expect(hud.townFocusOpen).toBe(false);
+    plus.focus();
+    expect(pressTab().defaultPrevented).toBe(false);
   });
 
   it('returns focus to the opener through Save', () => {
@@ -952,7 +1019,7 @@ describe('the Town Focus panel is wired into the shared focus system', () => {
     save?.focus();
     save?.click();
     vi.runAllTimers();
-    expect(hud.sim.setTownFocus).toHaveBeenCalled();
+    expect(hud.sim.setTownFocus).toHaveBeenCalledWith({ [COMPONENT]: 2 });
     expect(hud.townFocusOpen).toBe(false);
     expect(document.activeElement).toBe(opener);
   });
@@ -1050,7 +1117,11 @@ describe('the Town Focus panel is wired into the shared focus system', () => {
     expect(el.getAttribute('aria-modal')).toBe('false');
     expect(el.getAttribute('tabindex')).toBe('-1');
     const title = t('hudChrome.townFocus.title');
-    expect(title.length).toBeGreaterThan(0);
+    // Both sides of the comparison below resolve the SAME key, so the pin is a
+    // discriminator for key IDENTITY (a painter that named itself off another
+    // key reds it) and not for the value. Pin the value to its literal too, the
+    // standard mitigation, so the triangle has a second independent vertex.
+    expect(title).toBe('Town Focus');
     expect(el.getAttribute('aria-label')).toBe(title);
     // aria-labelledby SHADOWS aria-label, so a root carrying both is ambiguous:
     // exactly one, which is what markDialogRoot guarantees.
@@ -1060,19 +1131,34 @@ describe('the Town Focus panel is wired into the shared focus system', () => {
     expect(el.querySelector('.panel-title span')?.textContent).toBe(title);
   });
 
+  it('re-asserts the dialog attributes on every repaint, not just the first', () => {
+    // The painter marks the root before its own innerHTML wipe, so a rebuild
+    // cannot strip the attributes; this pins that placement behaviorally rather
+    // than trusting the source pin below, which only proves the call exists.
+    const { hud, el, opener } = makeFocusHud();
+    opener.focus();
+    hud.toggleTownFocus();
+    el.removeAttribute('role');
+    el.removeAttribute('aria-label');
+    hud.townFocusDraft = { [COMPONENT]: 3 };
+    hud.renderTownFocus();
+    expect(el.getAttribute('role')).toBe('dialog');
+    expect(el.getAttribute('aria-label')).toBe(t('hudChrome.townFocus.title'));
+    expect(el.getAttribute('tabindex')).toBe('-1');
+  });
+
   it('keeps the dialog root itself out of the Tab cycle it wraps', () => {
     const { hud, el, opener } = makeFocusHud();
     opener.focus();
     hud.toggleTownFocus();
     // tabindex="-1" is programmatically focusable but deliberately OUT of the
-    // Tab sequence. A root written with tabindex="0" would match here and become
-    // an extra stop between the last control and the first.
+    // Tab sequence. This match is the WHOLE test: the manager derives its ring
+    // from root.querySelectorAll, which can never return the root itself, so a
+    // root written with tabindex="0" would NOT join the manager's cycle. What it
+    // would join is the browser's NATIVE Tab order, which is what a mouse user
+    // tabbing away and back, and every assistive technology, actually walks.
     expect(el.matches(FOCUSABLE_SELECTOR)).toBe(false);
-    const focusables = [...el.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)];
-    expect(focusables).not.toContain(el);
-    focusables[focusables.length - 1].focus();
-    pressTab();
-    expect(document.activeElement).toBe(focusables[0]);
+    expect(el.getAttribute('tabindex')).toBe('-1');
   });
 });
 
@@ -1086,6 +1172,21 @@ describe('Town Focus focus-system wiring (source pins)', () => {
       "private readonly townFocusWindowFocus = this.windowFocus('#town-focus-window');",
     );
     expect(hudSrc).toContain('private townFocusOpenerFocus: HTMLElement | null = null;');
+  });
+
+  it('builds that bridge over the ONE FocusManager every window shares', () => {
+    // The harness above mints a private FocusManager per panel, which is the one
+    // thing about the shipped wiring it cannot model. It matters: the stack is
+    // what makes closing a window reactivate the one beneath it, so rewriting
+    // this helper to `new FocusManager()` would give every window its own stack
+    // and leave all twelve behavioral tests green.
+    const helper = region(
+      'private windowFocus(rootSel: string): {',
+      'private refreshLocalizedDynamicUi(): void {',
+    );
+    expect(helper).toContain('return makeWindowFocus(this.focusManager, () => $(rootSel));');
+    expect(helper).not.toContain('new FocusManager(');
+    expect(hudSrc).toContain('private readonly focusManager = new FocusManager();');
   });
 
   it('captures the opener AFTER the first paint, the train / unbind ordering', () => {
@@ -1108,14 +1209,30 @@ describe('Town Focus focus-system wiring (source pins)', () => {
   });
 
   it('routes the managed close (Escape / closeAll / gamepad) through that one path', () => {
+    // The end anchor leans on `crafting-window` being the very next case (it is).
+    // A case inserted between them widens the region, which reds the negative
+    // half LOUDLY rather than passing it vacuously, so this is maintenance cost
+    // and not a coverage hole.
     const arm = region("case 'town-focus-window':", "case 'crafting-window':");
     expect(arm).toContain('this.closeTownFocus();');
-    // Not a bare hide, which is what the arm would have to become for the
-    // hand-back to be skipped while the window still closed.
+    // Pure belt, and worth naming as such so nobody upgrades it thinking it is
+    // the gate: the refusal has obvious dead alternates (`el.hidden = true`, a
+    // class toggle, a different spacing). What actually kills every spelling is
+    // the behavioral closeManagedWindow test above.
     expect(arm).not.toContain("style.display = 'none'");
   });
 
-  it('marks the dialog root from the painter, so every repaint re-asserts it', () => {
-    expect(painterSrc).toContain("markDialogRoot(el, { label: t('hudChrome.townFocus.title') });");
+  it('marks the dialog root INSIDE the painter, so every repaint re-asserts it', () => {
+    // Scoped to renderTownFocusWindow's body: the behavioral repaint test proves
+    // the attributes come back, and this proves WHERE from, so a call relocated
+    // to a one-shot open path (where a re-open would miss it) cannot satisfy it.
+    const start = painterSrc.indexOf('export function renderTownFocusWindow(');
+    expect(start).toBeGreaterThan(-1);
+    const end = painterSrc.indexOf('function restoreFocus(', start);
+    expect(end).toBeGreaterThan(start);
+    const painter = painterSrc.slice(start, end);
+    expect(painter).toContain("markDialogRoot(el, { label: t('hudChrome.townFocus.title') });");
+    // ...and BEFORE the wipe, which is what makes it survive innerHTML.
+    expect(painter.indexOf('markDialogRoot(')).toBeLessThan(painter.indexOf('el.innerHTML ='));
   });
 });

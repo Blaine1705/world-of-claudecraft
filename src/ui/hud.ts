@@ -11903,7 +11903,13 @@ export class Hud {
     this.renderTownFocus();
     // AFTER the first paint, the train / unbind ordering: captureFocus records
     // the opener (the minimap button) and installs the trap over a root that is
-    // by then populated and displayed.
+    // by then populated and displayed. The one case where AFTER would be worse
+    // than BEFORE is unreachable: if the paint could leave focus INSIDE the
+    // panel, captureFocus would record an in-window opener and the bridge's
+    // in-window arm would then decline to release the trap on close. It cannot,
+    // because the root is display:none until this paint, so a browser has
+    // already blurred its stale children to <body>, and activeFocusable()
+    // rejects <body>.
     this.townFocusOpenerFocus = this.townFocusWindowFocus.captureFocus();
   }
 
@@ -11967,12 +11973,21 @@ export class Hud {
    *  nothing). A guard would also make the "a later close cannot re-steal focus"
    *  test pass for the wrong reason.
    *
-   *  KNOWN EDGE, shared with the whole windowFocus family: FocusManager refuses
-   *  to focus an element reporting no client rects, so an opener that went away
-   *  between open and close (walk out of town and #mm-town-focus hides) gets no
-   *  hand-back. Focus is left where it is rather than moved somewhere the player
-   *  cannot see, which is the pre-#2525 outcome and never worse; the trap is
-   *  still released either way. */
+   *  KNOWN EDGE, NOT fixed here, and the obvious local fix is a trap. The panel
+   *  is deliberately readable out of town while the slow band hides
+   *  #mm-town-focus out of town, so a player can open it in town, walk out, and
+   *  close with the opener no longer rendered. FocusManager then refuses the
+   *  hand-back (no client rects: moving focus somewhere invisible is a WCAG
+   *  2.4.11 failure), focus is left standing, and the browser drops it to <body>
+   *  with the panel. That is the pre-#2525 outcome, never worse, and the trap is
+   *  released either way.
+   *  Do NOT "fix" it by keeping the button visible while townFocusOpen: the
+   *  hand-back lands, then the next slow tick (<=500ms later) hides the button
+   *  again now that the panel is closed, and focus drops anyway. A flicker
+   *  instead of a loss. The real fix is a fallback destination, which
+   *  makeWindowFocus passes for NO window (closeTrain / closeUnbind hand back to
+   *  a gossip button that is already gone), so it belongs to the bridge and the
+   *  whole family, not to this one caller. */
   closeTownFocus(): void {
     $('#town-focus-window').style.display = 'none';
     this.townFocusDraft = null;
