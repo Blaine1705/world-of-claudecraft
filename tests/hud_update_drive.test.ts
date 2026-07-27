@@ -102,7 +102,8 @@ function splitTopLevelAnd(cond: string): string[] {
  * The band token can share its condition with a real gate (`slowHud && this.bankWindow
  * .isOpen`), so the token is removed from the condition that carries it and whatever remains
  * joins the gate. A part holding a top-level `||` is parenthesized on the way in, because
- * joining `!npc || dist2d(...) > 8` onto a preceding condition with a bare ` && ` would print
+ * joining `!npc || dist2d(...) > NPC_WINDOW_CLOSE_RANGE` onto a preceding condition with a bare
+ * ` && ` would print
  * a gate that reads as a different expression than the source it came from.
  */
 function splitBand(conditions: readonly string[]): { band: Band; gate: string } {
@@ -886,7 +887,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.closeVendor',
     band: 'medium',
-    gate: 'this.openVendorNpcId !== null && (!npc || dist2d(p.pos, npc.pos) > 8)',
+    gate: 'this.openVendorNpcId !== null && (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE)',
     surface: 'window',
     guard: { kind: 'callsite' },
     why: 'closes the vendor window out of range',
@@ -894,7 +895,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.closeHeroicVendor',
     band: 'medium',
-    gate: 'this.openHeroicVendorNpcId !== null && (!npc || dist2d(p.pos, npc.pos) > 8)',
+    gate: 'this.openHeroicVendorNpcId !== null && (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE)',
     surface: 'window',
     guard: { kind: 'callsite' },
     why: 'closes the heroic vendor window out of range',
@@ -902,7 +903,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.closeTrain',
     band: 'medium',
-    gate: 'this.openTrainNpcId !== null && (!npc || dist2d(p.pos, npc.pos) > 8)',
+    gate: 'this.openTrainNpcId !== null && (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE)',
     surface: 'window',
     guard: { kind: 'callsite' },
     why: 'closes the trainer window out of range',
@@ -910,7 +911,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.closeUnbind',
     band: 'medium',
-    gate: 'this.openUnbindNpcId !== null && (!npc || dist2d(p.pos, npc.pos) > 8)',
+    gate: 'this.openUnbindNpcId !== null && (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE)',
     surface: 'window',
     guard: { kind: 'callsite' },
     why: 'closes the unbind window out of range',
