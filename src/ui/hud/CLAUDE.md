@@ -30,7 +30,9 @@ and performance rules.
   (`tests/hud_perf_budget.test.ts`). A `*_controller.ts` holds the same cold contract a
   `*_window.ts` does: no forced-reflow layout read and no repeating driver of its own,
   beyond a documented, counted allowance. Three carry one today
-  (`chat_geometry_controller`, `chat_window_controller`, `fiesta_controller`). Renaming
+  (`chat_geometry_controller`, `chat_window_controller`, `fiesta_controller`). A granted
+  driver also declares what one tick may do, counted over everything that tick reaches
+  (#2518), so arming a clock means saying what it repaints and how often. Renaming
   between the adapter names therefore sheds nothing, which is the point: name by role.
 - Domain tests import the owning module directly and assert behavior, not source
   line placement.
