@@ -289,6 +289,181 @@ describe('master loot', () => {
   });
 });
 
+// #2526. assignMasterLoot REFUSES a selection whose every named pid is no longer
+// (or never was) a candidate, and deliberately leaves the roll in its curate phase.
+// The looter's client cleared the row on the click, and the two need/greed
+// reconcile reads skip a curate-phase master roll by design, so nothing could
+// restore the prompt: the looter waited out the 300s timeout with no way back in.
+// activeMasterLootRolls is the missing half, and every arm below is written so an
+// EMPTY surface (what a consumed roll looks like) fails it.
+describe('the master looter reconcile surface (#2526)', () => {
+  // A three-member party (a = leader = master looter) on a corpse holding PREMIUM,
+  // with the curate prompt already open.
+  function openMasterRoll() {
+    const sim = makeSim();
+    const { a, b, mob } = partyOnCorpse(sim, PREMIUM);
+    const c = sim.addPlayer('rogue', 'Cara');
+    sim.partyInvite(c, a);
+    sim.partyAccept(c);
+    teleportTo(sim, 21, 21, c);
+    sim.setPartyLootMaster(true, 0, 'uncommon', a);
+    sim.lootCorpse(mob.id, a);
+    const rollId = sim.events.find((e) => e.type === 'masterLoot')!.rollId;
+    sim.events.length = 0;
+    return { sim, a, b, c, mob, rollId };
+  }
+
+  it('reaches the master looter only, and never a candidate, while the roll curates', () => {
+    const { sim, a, b, c, rollId } = openMasterRoll();
+
+    expect(sim.activeMasterLootRolls(a)).toMatchObject([
+      { rollId, itemId: PREMIUM, itemName: 'Greyjaw Hide Boots', quality: 'uncommon' },
+    ]);
+    expect(sim.activeMasterLootRolls(a)[0].candidates.map((cand) => cand.pid)).toEqual([a, b, c]);
+    expect(sim.activeMasterLootRolls(a)[0].expiresAt).toBeCloseTo(sim.time + 300, 5);
+    // Names come from the live roster, so the checkbox list is labelled. Pinned to
+    // literals: reading sim.meta(a).name here would compare the implementation
+    // against its own source and could not fail.
+    expect(sim.activeMasterLootRolls(a)[0].candidates.map((cand) => cand.name)).toEqual([
+      'Adventurer',
+      'Bert',
+      'Cara',
+    ]);
+
+    // The zero-argument arm, which is the ONLY one production reaches: IWorld
+    // declares activeMasterLootRolls() with no parameter, so the HUD always calls
+    // it bare and Sim's `pid = this.playerId` default carries the viewer.
+    expect(sim.playerId).toBe(a);
+    expect(sim.activeMasterLootRolls().map((p) => p.rollId)).toEqual([rollId]);
+
+    // The AC that the fix must not break: a candidate sees the curate-phase roll
+    // on NO surface, neither as an assignment prompt nor as a need/greed one.
+    expect(sim.activeMasterLootRolls(b)).toEqual([]);
+    expect(sim.activeMasterLootRolls(c)).toEqual([]);
+    expect(sim.activeLootRolls(b)).toEqual([]);
+    expect(sim.lootRollGroupStatus(b)).toEqual([]);
+  });
+
+  it('returns every curate-phase roll the looter owns, not just the first', () => {
+    const { sim, a, b, c, mob, rollId } = openMasterRoll();
+    // A second corpse dropping a second threshold item: the read loops the whole
+    // pending map and pushes every match, and nothing else in this file opens two
+    // at once, so a first-match-only read would pass every other case here.
+    const second = createMob(mob.id + 1, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
+    second.dead = true;
+    second.lootable = true;
+    second.tappedById = a;
+    second.loot = { copper: 0, items: [{ itemId: PREMIUM, count: 1 }] };
+    sim.entities.set(second.id, second);
+    sim.lootCorpse(second.id, a);
+    const secondRollId = sim.events.find((e) => e.type === 'masterLoot')!.rollId;
+    expect(secondRollId).not.toBe(rollId);
+
+    expect(sim.activeMasterLootRolls(a).map((p) => p.rollId)).toEqual([rollId, secondRollId]);
+    expect(sim.activeMasterLootRolls(b)).toEqual([]);
+    expect(sim.activeMasterLootRolls(c)).toEqual([]);
+
+    // Consuming one leaves the other, so the two are tracked independently.
+    sim.assignMasterLoot(rollId, [b], a);
+    expect(sim.activeMasterLootRolls(a).map((p) => p.rollId)).toEqual([secondRollId]);
+  });
+
+  it('keeps the prompt, minus the departed pid, when the only named target has left', () => {
+    const { sim, a, b, c, rollId } = openMasterRoll();
+    // The reachable way a named pid stops being a candidate mid-window: an explicit
+    // logout, which runs removePlayerFromLootRolls and shrinks roll.candidates.
+    sim.removePlayer(c);
+
+    sim.assignMasterLoot(rollId, [c], a);
+
+    // The decisive pair. The item went nowhere AND the roll is still curating: an
+    // absence-only assertion cannot tell "refused, prompt held" from "consumed".
+    expect(sim.countItem(PREMIUM, a) + sim.countItem(PREMIUM, b)).toBe(0);
+    expect(sim.activeMasterLootRolls(a).map((p) => p.rollId)).toEqual([rollId]);
+    // Rebuilt from the CURRENT roster, so the looter cannot re-pick the pid that
+    // was just refused and loop until the timeout.
+    expect(sim.activeMasterLootRolls(a)[0].candidates.map((cand) => cand.pid)).toEqual([a, b]);
+    expect(sim.events.filter((e) => e.type === 'lootRoll')).toHaveLength(0); // not converted
+
+    // And the restored prompt is live, not a husk: assigning again lands.
+    sim.assignMasterLoot(rollId, [b], a);
+    expect(sim.countItem(PREMIUM, b)).toBe(1);
+    expect(sim.activeMasterLootRolls(a)).toEqual([]);
+  });
+
+  it('keeps the prompt when the named pid was never a candidate at all', () => {
+    const { sim, a, b, c, rollId } = openMasterRoll();
+
+    sim.assignMasterLoot(rollId, [99999], a);
+
+    expect(sim.activeMasterLootRolls(a).map((p) => p.rollId)).toEqual([rollId]);
+    expect(sim.activeMasterLootRolls(a)[0].candidates.map((cand) => cand.pid)).toEqual([a, b, c]);
+    expect(sim.countItem(PREMIUM, b)).toBe(0);
+    sim.assignMasterLoot(rollId, [b], a);
+    expect(sim.countItem(PREMIUM, b)).toBe(1);
+  });
+
+  it('drops the prompt off the surface the moment a direct assignment lands', () => {
+    const { sim, a, b, rollId } = openMasterRoll();
+    expect(sim.activeMasterLootRolls(a)).toHaveLength(1); // not vacuously empty
+
+    sim.assignMasterLoot(rollId, [b], a);
+
+    expect(sim.activeMasterLootRolls(a)).toEqual([]);
+    expect(sim.countItem(PREMIUM, b)).toBe(1);
+  });
+
+  it('drops the prompt when the looter releases the roll to a need/greed subset', () => {
+    const { sim, a, b, c, rollId } = openMasterRoll();
+    expect(sim.activeMasterLootRolls(a)).toHaveLength(1); // the surface had it to lose
+
+    sim.assignMasterLoot(rollId, [b, c], a);
+
+    // The roll KEEPS its id but is no longer a master roll, so it moves from the
+    // master surface to the need/greed one for exactly the chosen subset.
+    expect(sim.activeMasterLootRolls(a)).toEqual([]);
+    expect(sim.activeLootRolls(b).map((p) => p.rollId)).toEqual([rollId]);
+    expect(sim.activeLootRolls(c).map((p) => p.rollId)).toEqual([rollId]);
+    expect(sim.activeLootRolls(a)).toEqual([]); // a excluded themselves
+  });
+
+  it('drops the prompt when the uncurated window times out into a need/greed roll', () => {
+    const { sim, a, b, c, rollId } = openMasterRoll();
+    const expiresAt = sim.activeMasterLootRolls(a)[0].expiresAt;
+
+    sim.time = expiresAt - 0.5;
+    for (let i = 0; i < 40; i++) sim.tick();
+
+    expect(sim.activeMasterLootRolls(a)).toEqual([]);
+    expect(sim.activeLootRolls(a).map((p) => p.rollId)).toEqual([rollId]);
+    expect(sim.activeLootRolls(b).map((p) => p.rollId)).toEqual([rollId]);
+    expect(sim.activeLootRolls(c).map((p) => p.rollId)).toEqual([rollId]);
+  });
+
+  it('keeps an open prompt with its original looter across a leader handoff', () => {
+    const { sim, a, b, rollId } = openMasterRoll();
+    // The roll captured `a` as its master looter at open time, so promoting `b`
+    // must NOT move an already-open curate prompt: the surface follows the roll,
+    // not the live party setting.
+    sim.partyPromote(b, a);
+
+    expect(sim.activeMasterLootRolls(a).map((p) => p.rollId)).toEqual([rollId]);
+    expect(sim.activeMasterLootRolls(b)).toEqual([]);
+  });
+
+  it('converts rather than stranding when the master looter themselves logs out', () => {
+    const { sim, a, b, c, rollId } = openMasterRoll();
+    expect(sim.activeMasterLootRolls(a)).toHaveLength(1); // the surface had it to lose
+
+    sim.removePlayer(a);
+
+    // No orphaned curate prompt is left behind on the surface for anyone.
+    expect(sim.activeMasterLootRolls(b)).toEqual([]);
+    expect(sim.activeMasterLootRolls(c)).toEqual([]);
+    expect(sim.activeLootRolls(b).map((p) => p.rollId)).toEqual([rollId]);
+  });
+});
+
 // #2505. The pid list reaching assignMasterLoot is client-supplied and the
 // masterAssign wire case validates that pids is a non-empty array of numbers
 // and nothing about the values, so a hand-crafted frame can name the same
