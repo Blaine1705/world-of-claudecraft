@@ -666,7 +666,7 @@ export const zh_CN: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "优惠 20%",
+      "railWocDiscount": "优惠 {percent}%",
       "railWocUnavailable": "WOC 定价暂时不可用。",
       "railNativeUnavailable": "SOL/WOC 不可用",
       "amountLabel": "数量",
@@ -1464,6 +1464,7 @@ export const zh_CN: EnTranslations = {
       "harvestButton": "采集",
       "harvestTooltip": "采集勾选的部位。每具尸体只能被采集一次，先到先得。不会拾取战利品。",
       "concentrateHint": "选择的部位越少，每个部位的品质越高。",
+      "nothingSelectedYields": "你选择的部位都无法从这具尸体上采集。",
       "alreadyHarvested": "这具尸体已经被采集过了。",
       "componentAria": "采集{component}",
       "components": {
@@ -2023,8 +2024,8 @@ export const zh_CN: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "世界市场待领取物品",
-      "tip": "有金币或物品正在商人处等待你领取。"
+      "aria": "世界市场收益或物品待领取",
+      "tip": "销售收益或退回物品正在商人处等待你领取。"
     },
     "noticeboard": {
       "empty": "看起来没有张贴任何内容。"
@@ -2168,6 +2169,9 @@ export const zh_CN: EnTranslations = {
       "notReady": "这个资源节点尚未为你重新生成。",
       "gatherLine": "你采集了：{name}。",
       "gatherLineQty": "你采集了：{name} x{qty}。",
+      "harvestLine": "你剥取了：{name}。",
+      "harvestLineQty": "你剥取了：{name} x{qty}。",
+      "harvestSpecimenLine": "你还获得了{name}。",
       "catchLine": "你钓上了：{name}",
       "biteLine": "有东西上钩了！",
       "gotAwayLine": "它跑掉了。",
@@ -2485,9 +2489,14 @@ export const zh_CN: EnTranslations = {
       "sameEnchant": "那件物品已经拥有该附魔。",
       "replaceTag": "替换{enchant}",
       "sameEnchantTag": "已施加",
+      "plainTag": "未附魔",
       "replaceConfirmTitle": "替换{item}上的附魔？",
       "replaceConfirmBody": "这会将{item}上的{old}替换为{new}。",
       "replaceConfirmNoRefund": "旧附魔将被摧毁，材料不予退还。此操作无法撤销。",
+      "replaceConfirmKeeps": "保留：{kept}",
+      "replaceConfirmKeepsSigner": "制作者印记",
+      "replaceConfirmKeepsMasterwork": "杰作加成",
+      "replaceConfirmKeepsBond": "委托绑定",
       "replaceConfirmCost": "费用：{cost}",
       "replaceConfirmCostItem": "{name} {count} 个",
       "replaceConfirmAccept": "替换"
@@ -6721,6 +6730,7 @@ export const zh_CN: EnTranslations = {
       "filterTypeAll": "全部类型",
       "filterTypeWeapon": "武器",
       "filterTypeArmor": "护甲",
+      "filterTypeBag": "背包",
       "filterTypeConsumable": "消耗品",
       "filterTypeMaterial": "材料",
       "filterTypeCosmetic": "外观",
@@ -6734,6 +6744,8 @@ export const zh_CN: EnTranslations = {
       "armorMail": "锁甲",
       "filterWeaponType": "武器类型",
       "filterWeaponAll": "全部武器",
+      "filterBagSize": "背包容量",
+      "filterBagAll": "全部背包",
       "filterPrimaryStat": "主属性",
       "filterPrimaryStatAll": "任意主属性",
       "filterRarity": "稀有度",
