@@ -23,6 +23,8 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const hudTs = readFileSync(`${root}src/ui/hud.ts`, 'utf8');
@@ -67,9 +69,10 @@ const NO_MANAGED_TEARDOWN: Record<string, string> = {
     'and the mapPing / mapZoneOverride the toggle clears are re-seeded by the next open.',
   'report-window':
     "Its X and Cancel buttons are literally `el.style.display = 'none'` and nothing else, so " +
-    'the default arm is a strict superset of its own close path. No trap, no timer; the panel ' +
-    'is rebuilt by innerHTML on every open, so an in-flight submit that resolves against the ' +
-    'hidden window cannot survive into the next one.',
+    'the default arm is a strict superset of its own close path. No trap, no timer, and the ' +
+    'reason dropdown lives on a node the next open replaces. (Its in-flight submit closure ' +
+    'captures the PANEL, which persists, so a stale resolve can still touch a reopened ' +
+    'window: pre-existing on every close path alike, and no business of this arm.)',
 };
 
 /**
@@ -79,7 +82,14 @@ const NO_MANAGED_TEARDOWN: Record<string, string> = {
  * as the switch is still keyed on one. Rewritten to switch on a class or a state enum, the
  * labels would parse exactly the same and every diff below would compare two unrelated sets.
  */
-function readCloseManagedWindowSwitch(source: string): { on: string; cases: string[] } {
+function readCloseManagedWindowSwitch(source: string): {
+  on: string;
+  cases: string[];
+  /** Each case label mapped to its OWN statements, comments excluded by construction. */
+  bodies: Record<string, string[]>;
+  /** The `default:` arm, the premise every NO_MANAGED_TEARDOWN row leans on. */
+  fallback: string[];
+} {
   const file = ts.createSourceFile('hud.ts', source, ts.ScriptTarget.Latest, true);
   let method: ts.MethodDeclaration | null = null;
   const findMethod = (node: ts.Node): void => {
@@ -101,13 +111,26 @@ function readCloseManagedWindowSwitch(source: string): { on: string; cases: stri
   ts.forEachChild((method as ts.MethodDeclaration).body as ts.Block, findSwitch);
   if (!found) throw new Error('closeManagedWindow has no switch statement');
   const stmt = found as ts.SwitchStatement;
-  return {
-    on: stmt.expression.getText(),
-    cases: stmt.caseBlock.clauses
-      .filter(ts.isCaseClause)
-      .map((clause) => (ts.isStringLiteral(clause.expression) ? clause.expression.text : ''))
-      .filter((id) => id !== ''),
-  };
+  const cases: string[] = [];
+  const bodies: Record<string, string[]> = {};
+  let fallback: string[] = [];
+  for (const clause of stmt.caseBlock.clauses) {
+    if (ts.isDefaultClause(clause)) {
+      fallback = clause.statements.map((s) => s.getText());
+      continue;
+    }
+    // REFUSE rather than skip. Rewriting `case 'lockpick-panel':` to `case LOCKPICK_ID:`
+    // would otherwise make the id vanish from the list instead of failing the parse, and a
+    // registry whose reader can silently return less is the shape this file exists to stop.
+    if (!ts.isStringLiteral(clause.expression))
+      throw new Error(
+        `closeManagedWindow case is not a string literal: ${clause.expression.getText()}`,
+      );
+    const label = clause.expression.text;
+    cases.push(label);
+    bodies[label] = clause.statements.map((s) => s.getText());
+  }
+  return { on: stmt.expression.getText(), cases, bodies, fallback };
 }
 
 /** Every `id` carrying BOTH the `window` and `panel` classes, whatever the tag. */
@@ -122,6 +145,12 @@ function readPanelIds(html: string): string[] {
   }
   return ids;
 }
+
+// The two populations on the day this was written. They are equal by coincidence, not by
+// construction (37 cases = 34 markup panels with a case + 3 code-built; 37 markup ids = those
+// 34 + the 3 without one), so they get two names and must be bumped independently.
+const CASE_COUNT = 37;
+const MARKUP_COUNT = 37;
 
 const closeSwitch = readCloseManagedWindowSwitch(hudTs);
 const caseIds = closeSwitch.cases;
@@ -139,7 +168,9 @@ describe('closeManagedWindow case registry', () => {
     expect(closeSwitch.on).toBe('el.id');
     expect(caseIds).toContain('confirm-dialog');
     expect(caseIds).toContain('lockpick-panel');
-    expect(caseIds.length).toBeGreaterThan(30);
+    // AT the real count on the day this was written, not under it: a floor sitting below is
+    // what lets a case quietly leave (tests/CLAUDE.md). Bump it when the family grows.
+    expect(caseIds.length).toBeGreaterThanOrEqual(CASE_COUNT);
     expect(new Set(caseIds).size, 'no duplicate case labels').toBe(caseIds.length);
 
     // A synthetic source with the same shapes the real file has: a decoy case in another
@@ -174,13 +205,32 @@ describe('closeManagedWindow case registry', () => {
         }
       }
     `);
-    expect(planted).toEqual({ on: 'el.id', cases: ['real-one', 'real-two'] });
+    expect(planted.on).toBe('el.id');
+    expect(planted.cases).toEqual(['real-one', 'real-two']);
+    // Statements, not raw text: the decoy comment and string above are not in any body.
+    expect(planted.bodies['real-one']).toEqual(['this.a();', 'break;']);
+    expect(planted.fallback).toEqual(['break;']);
+
+    // A computed label must REFUSE, not quietly shrink the list.
+    expect(() =>
+      readCloseManagedWindowSwitch(`
+        class Hud {
+          private closeManagedWindow(el: HTMLElement): void {
+            switch (el.id) {
+              case LOCKPICK_PANEL_ID:
+                break;
+            }
+          }
+        }
+      `),
+    ).toThrow(/not a string literal/);
   });
 
   it('scrapes the real panel family out of the shells', () => {
     // A markup change that broke the scrape would empty this set, and an empty set makes
-    // every classification below pass by having nothing to classify.
-    expect(markupIds.length).toBeGreaterThan(30);
+    // every classification below pass by having nothing to classify. Floored AT the real
+    // count for the same reason as the case list.
+    expect(markupIds.length).toBeGreaterThanOrEqual(MARKUP_COUNT);
     expect(markupIds).toContain('lockpick-panel');
     expect(markupIds).toContain('bags');
     // Tags other than <div> count, and extra classes and attribute order are tolerated.
@@ -191,6 +241,12 @@ describe('closeManagedWindow case registry', () => {
     // can never hand to closeManagedWindow.
     expect(readPanelIds('<div id="c" class="panel">')).toEqual([]);
     expect(readPanelIds('<div id="d" class="window">')).toEqual([]);
+    // PER TAG, not a document-wide scrape: the two classes must sit on ONE element. Every
+    // decoy above is a single tag, so they cannot tell the two implementations apart.
+    expect(readPanelIds('<div id="e" class="window"><div id="f" class="panel">')).toEqual([]);
+    // TOKEN-exact, not substring: `classes.includes(...)` and `cls.includes(...)` agree on
+    // every input above and part company here.
+    expect(readPanelIds('<div id="g" class="windowed paneling">')).toEqual([]);
   });
 
   it('classifies every `.window .panel` exactly once', () => {
@@ -243,31 +299,69 @@ describe('closeManagedWindow case registry', () => {
     }
   });
 
-  it('pins the three code-built panels so a fourth has to be classified', () => {
-    // These carry no markup entry, so the markup sweep above cannot see them. An exact
-    // count (not a floor) is what makes a new one a failure instead of a silent addition.
-    const sites = [
-      ...hudTs.matchAll(/className = 'window panel'/g),
-      ...readFileSync(`${root}src/ui/profession_tutorial_window.ts`, 'utf8').matchAll(
-        /className = 'window panel'/g,
-      ),
-      ...readFileSync(`${root}src/ui/dev_command_window.ts`, 'utf8').matchAll(
-        /className = 'window panel[^']*'/g,
-      ),
-    ];
-    expect(sites).toHaveLength(4); // two share #confirm-dialog
+  it('pins the code-built panels so a fourth module has to be classified', () => {
+    // These carry no markup entry, so the shell sweep cannot see them. The claim in
+    // CODE_BUILT's doc comment is that a NEW creation site fails here, and that only holds
+    // if the scan reads the whole tree: three hard-coded readFileSync calls would miss a
+    // panel minted in src/ui/foo_window.ts entirely, leaving it unclassified AND unseen.
+    const sites: Record<string, number> = {};
+    for (const { file, full } of tsFilesUnder(`${root}src`)) {
+      const code = readFileSync(full, 'utf8')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/(^|[^:])\/\/.*$/gm, '$1');
+      // Both spellings, and extra classes tolerated in each: an exact 'window panel' regex
+      // is blind to `className = 'window panel dev-tool'`, which is how the third one is
+      // already written, and to the classList form nothing uses yet.
+      const n =
+        [...code.matchAll(/className = (['"`])([^'"`]*)\1/g)].filter(([, , cls]) => {
+          const tokens = cls.split(/\s+/);
+          return tokens.includes('window') && tokens.includes('panel');
+        }).length +
+        [...code.matchAll(/classList\.add\(([^)]*)\)/g)].filter(
+          ([, args]) => /['"`]window['"`]/.test(args) && /['"`]panel['"`]/.test(args),
+        ).length;
+      if (n > 0) sites[file] = n;
+    }
+    // EXACT, not a floor: a floor cannot notice a new module joining.
+    expect(sites).toEqual({
+      'ui/dev_command_window.ts': 1,
+      'ui/hud.ts': 2, // confirmDialog + inputDialog share the one #confirm-dialog id
+      'ui/profession_tutorial_window.ts': 1,
+    });
     for (const id of Object.keys(CODE_BUILT)) expect(caseIds).toContain(id);
+  });
+
+  it('reads the tree through the shared walker', () => {
+    // tests/CLAUDE.md's shared-walker rule. A hand-rolled readdirSync returns the same list
+    // as tsFilesUnder today and diverges the day a panel module moves down a level, which is
+    // the silent narrowing this pin exists to stop (#2485, #2489, #2502).
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
   });
 
   it('routes #lockpick-panel through the controller, not a bare hide (#2517)', () => {
     // The regression this registry was written for. The behavioral proof lives in
     // tests/lockpick_managed_close.test.ts; this is the source-level half, so deleting the
     // case fails here even if someone also deletes that suite's harness.
-    const start = hudTs.indexOf('private closeManagedWindow(');
-    const switchBody = hudTs.slice(start, hudTs.indexOf('\n  private ', start + 1));
-    const arm = switchBody.slice(switchBody.indexOf("case 'lockpick-panel':"));
-    expect(arm.slice(0, arm.indexOf('break;'))).toContain(
+    //
+    // Over the parsed STATEMENTS, not a raw slice of the source. A slice from the label to
+    // the first `break;` swallows the arm's own comment, so the pin would be satisfiable by
+    // a comment that merely quotes the call while the call itself is gone.
+    expect(closeSwitch.bodies['lockpick-panel']).toEqual([
       'this.lockpickController.requestClose();',
-    );
+      'this.hideTooltip();',
+      'break;',
+    ]);
+  });
+
+  it('keeps the `default:` arm the bare hide the no-teardown rows assume', () => {
+    // Both NO_MANAGED_TEARDOWN rows are justified by "the default arm is a strict superset
+    // of that window's own close path". Nothing else in the repo pins what the default arm
+    // DOES, so swapping it for an el.remove(), or dropping the tooltip hide, would falsify
+    // both excuses with every other assertion here still green.
+    expect(closeSwitch.fallback).toEqual([
+      "el.style.display = 'none';",
+      'this.hideTooltip();',
+      'break;',
+    ]);
   });
 });

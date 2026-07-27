@@ -19,6 +19,7 @@
 // REAL window, and pin that the two dismissal paths produce the same observable teardown.
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { SimEvent } from '../src/sim/types';
 import type { FocusTrapHandle } from '../src/ui/focus_manager';
 import { Hud } from '../src/ui/hud';
 import { LockpickController } from '../src/ui/hud/delve/lockpick_controller';
@@ -62,7 +63,15 @@ interface CloseAllHarness {
 // stopImmediatePropagation eats the next case's Escape before the new controller sees it.
 const built: LockpickController[] = [];
 
-function harness(initial: LockpickView | null) {
+/**
+ * @param host which IWorld the deps model, and the distinction is the whole point.
+ *   'online' (the default): `abort` only sends, so `getState()` keeps returning the live view
+ *   and the panel is still up when requestClose returns, exactly like ClientWorld waiting on
+ *   the server's lockpickEnd. 'offline': `abort` does what Sim does, emitting lockpickEnd
+ *   into the drain that `submitAbort`'s own `flushEvents()` reads, so the whole teardown
+ *   lands inside the one closeAll call.
+ */
+function harness(initial: LockpickView | null, host: 'online' | 'offline' = 'online') {
   // closeAll reads #ctx-menu and #delve-rite-panel before it ever reaches the topmost
   // scan, and `$` returns null for a missing id, so both must exist.
   document.body.innerHTML =
@@ -72,9 +81,19 @@ function harness(initial: LockpickView | null) {
   const panel = document.getElementById('lockpick-panel') as HTMLElement;
   const release = vi.fn();
   const trap: FocusTrapHandle = { focusFirst: vi.fn(), release };
-  const abort = vi.fn();
-  const hideTooltip = vi.fn();
+  // Separate spies: the Hud arm owes its own hideTooltip (the trade-window precedent) and
+  // the controller owes one from close(). One shared spy could not tell them apart.
+  const hudHideTooltip = vi.fn();
+  const depsHideTooltip = vi.fn();
   let state: LockpickView | null = initial;
+  let pending: SimEvent[] = [];
+  const abort = vi.fn(() => {
+    if (host !== 'offline') return;
+    // What src/sim/delves/lockpick_controller.ts does: ABANDON the session and emit, both
+    // synchronously, so drainEvents returns it inside the same call stack.
+    state = null;
+    pending.push({ type: 'lockpickEnd', sessionId: LIVE.sessionId, outcome: 'abandoned' });
+  });
   const controller = new LockpickController({
     panel,
     keyboardTarget: window,
@@ -83,11 +102,19 @@ function harness(initial: LockpickView | null) {
     engage: vi.fn(),
     act: vi.fn(),
     abort,
-    drainEvents: () => null,
-    handleEvents: vi.fn(),
+    drainEvents: () => {
+      const out = pending;
+      pending = [];
+      return out;
+    },
+    // The one arm of Hud.handleEvents this path reaches: lockpickEnd -> endLockpick ->
+    // controller.end(outcome), pinned as a source fact in the registry suite.
+    handleEvents: (events) => {
+      for (const ev of events) if (ev.type === 'lockpickEnd') controller.end(ev.outcome);
+    },
     showBanner: vi.fn(),
     log: vi.fn(),
-    hideTooltip,
+    hideTooltip: depsHideTooltip,
   });
   built.push(controller);
   const hud = Object.create(Hud.prototype) as unknown as CloseAllHarness;
@@ -96,13 +123,15 @@ function harness(initial: LockpickView | null) {
   hud.playerCard = { isOpen: false };
   hud.emoteWheelOpen = false;
   hud.syncAnyWindowOpenState = vi.fn();
-  hud.hideTooltip = hideTooltip;
+  hud.hideTooltip = hudHideTooltip;
   return {
     controller,
     hud,
     panel,
     release,
     abort,
+    hudHideTooltip,
+    depsHideTooltip,
     bar: () => panel.querySelector<HTMLElement>('.lp-timer-bar'),
     setState(next: LockpickView | null): void {
       state = next;
@@ -164,6 +193,69 @@ describe('lockpick panel: Hud.closeAll (the gamepad escape path)', () => {
     expect(vi.getTimerCount(), 'the countdown interval is cleared').toBe(0);
     tick(20);
     expect(bar.style.width, 'the hidden subtree stops being repainted').toBe(frozen);
+
+    // The post-condition a reader most needs, and it is deliberate rather than a shortfall:
+    // the withdrawal does NOT close. Online the panel stands and the trap stays armed until
+    // the server's lockpickEnd, which is what the offline case below drives to completion.
+    expect(h.release, 'the trap is released by end(), not by the withdraw').not.toHaveBeenCalled();
+    expect(h.panel.style.display, 'still up until lockpickEnd lands').toBe('block');
+    // The arm owes its own tooltip hide, since close() (which would have done it) has not run.
+    expect(h.hudHideTooltip).toHaveBeenCalledTimes(1);
+  });
+
+  it('completes the teardown offline, inside the one closeAll call', () => {
+    // The other host. Sim.lockpickAbort emits lockpickEnd synchronously and submitAbort's own
+    // flushEvents drains it, so end() -> close() runs before closeAll returns. Without this
+    // case every assertion in the suite describes only the online (deferred) shape.
+    const h = harness(LIVE, 'offline');
+    h.controller.openBoard();
+    expect(vi.getTimerCount()).toBe(1);
+
+    expect(h.hud.closeAll()).toBe(true);
+
+    expect(h.abort).toHaveBeenCalledTimes(1);
+    expect(h.panel.style.display, 'the round trip landed in the same stack').toBe('none');
+    expect(h.release).toHaveBeenCalledTimes(1);
+    expect(h.release).toHaveBeenCalledWith(true);
+    expect(vi.getTimerCount()).toBe(0);
+    // Nothing is left selectable, so a repeat sweep moves on to the next window.
+    expect(h.hud.topmostOpenWindow()).not.toBe(h.panel);
+  });
+
+  it('withdraws once, then closes, so a repeat closeAll cannot wedge on the panel', () => {
+    // SkinEventController.open() sweeps `for (i < 20 && closeTop())` to clear the stack before
+    // a roll reveal, and closeTop IS closeAll. Online the withdrawal leaves the panel up, so
+    // without the per-session latch this spins all 20 iterations here, fires 20 aborts, and
+    // never reaches the windows underneath. Three calls, not two: the third proves the panel
+    // has actually left the scan rather than merely stopped aborting.
+    const h = harness(LIVE);
+    h.controller.openBoard();
+
+    expect(h.hud.closeAll(), 'first: withdraw').toBe(true);
+    expect(h.abort).toHaveBeenCalledTimes(1);
+    expect(h.panel.style.display).toBe('block');
+
+    expect(h.hud.closeAll(), 'second: close').toBe(true);
+    expect(h.abort, 'no second abort for the same session').toHaveBeenCalledTimes(1);
+    expect(h.panel.style.display).toBe('none');
+    expect(h.release).toHaveBeenCalledWith(true);
+
+    expect(h.hud.topmostOpenWindow(), 'the sweep can move on').not.toBe(h.panel);
+    expect(h.hud.closeAll(), 'nothing left for this harness to close').toBe(false);
+  });
+
+  it('re-arms the withdrawal for a NEW session, so the latch cannot silence a real abort', () => {
+    // The latch is keyed on sessionId rather than a bare flag for exactly this: pick one lock,
+    // withdraw, then engage another, and the second withdraw must still reach the server.
+    const h = harness(LIVE);
+    h.controller.openBoard();
+    h.hud.closeAll();
+    expect(h.abort).toHaveBeenCalledTimes(1);
+
+    h.setState({ ...LIVE, sessionId: 'lp_9_1' });
+    h.controller.openBoard();
+    h.hud.closeAll();
+    expect(h.abort, 'a fresh session withdraws on its own').toHaveBeenCalledTimes(2);
   });
 
   it('dismisses the ante selector outright, releasing the trap and returning focus', () => {
@@ -184,13 +276,28 @@ describe('lockpick panel: Hud.closeAll (the gamepad escape path)', () => {
   });
 
   it('drops the capture-phase key handler, so a later Escape cannot re-fire on a closed panel', () => {
+    // NAMED for the listener, and it has to be probed AS the listener. The obvious version
+    // (close, dispatch Escape, assert nothing happened) is worthless: close() sets
+    // display:none BEFORE it unbinds, and the handler's own first line bails on
+    // `display !== 'block'`, so a stale listener is silent anyway and the case stays green
+    // with the whole removeEventListener block deleted.
+    const remove = vi.spyOn(window, 'removeEventListener');
     const h = harness(null);
     h.controller.openAnte(9);
     h.hud.closeAll();
-    h.release.mockClear();
+    // The registration is on the CAPTURE phase, which is what lets the controller beat
+    // src/game/input.ts's bubble listener; unbinding without that flag is a silent no-op.
+    expect(remove).toHaveBeenCalledWith('keydown', expect.any(Function), true);
+    remove.mockRestore();
 
+    // And the behavioral half: with the panel shown again, a surviving listener WOULD act,
+    // so this distinguishes "unbound" from "merely short-circuited by the display guard".
+    h.panel.style.display = 'block';
+    h.release.mockClear();
+    h.abort.mockClear();
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', cancelable: true }));
-    expect(h.release, 'the listener was removed with the panel').not.toHaveBeenCalled();
+    expect(h.release, 'no handler is left on the window').not.toHaveBeenCalled();
+    expect(h.abort).not.toHaveBeenCalled();
   });
 
   it('produces the same teardown as the Escape key, live board and ante selector alike', () => {
@@ -214,8 +321,14 @@ describe('lockpick panel: Hud.closeAll (the gamepad escape path)', () => {
       expect(padResult, `gamepad and keyboard must agree (live=${initial !== null})`).toEqual(
         keyResult,
       );
-      // Guard against both paths being vacuously identical no-ops.
-      expect(keyResult.aborts + keyResult.releases).toBeGreaterThan(0);
+      // The comparison alone is RELATIVE: both paths run the same funnel, so it survives any
+      // change made to the funnel itself, including inverting it (close a live board, abort an
+      // idle one) which keeps the two sides equal and non-empty. Pin the absolute shape too.
+      expect(keyResult, `the shape itself (live=${initial !== null})`).toEqual(
+        initial
+          ? { aborts: 1, releases: 0, timers: 0, display: 'block' }
+          : { aborts: 0, releases: 1, timers: 0, display: 'none' },
+      );
     }
   });
 });

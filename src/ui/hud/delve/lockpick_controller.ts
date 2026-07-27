@@ -26,6 +26,10 @@ export interface LockpickControllerDeps {
 export class LockpickController {
   private trap: FocusTrapHandle | null = null;
   private keyHandler: ((event: KeyboardEvent) => void) | null = null;
+  /** The session `requestClose` has already asked the server to withdraw from, so a repeat
+   *  request closes the panel instead of sending a second abort. Keyed on the id rather than
+   *  a bare flag so a fresh engage can never inherit a stale one. */
+  private withdrawnSessionId: string | null = null;
   private readonly window: LockpickWindow;
 
   constructor(private readonly deps: LockpickControllerDeps) {
@@ -99,9 +103,10 @@ export class LockpickController {
   }
 
   /** The panel's ONE dismissal funnel: withdraw from a live lock, or just close the ante
-   *  selector when there is nothing to withdraw from. Both of the panel's own affordances
-   *  already mean exactly this (the board's X is wired to onAbort, the ante selector's to
-   *  onClose), and the capture-phase Escape handler below picks the same arm.
+   *  selector when there is nothing left to withdraw from. Both of the panel's own
+   *  affordances already mean exactly this (the board's X and Withdraw are wired to onAbort,
+   *  the ante selector's X to onClose), and the capture-phase Escape handler below picks the
+   *  same arm.
    *
    *  It is a named method rather than inline because a THIRD caller needs it and cannot
    *  reach the handler: `Hud.closeManagedWindow`'s `lockpick-panel` case. A gamepad escape
@@ -109,11 +114,27 @@ export class LockpickController {
    *  a keydown listener to intercept, so before #2517 that path fell to the managed-window
    *  `default:` arm (a bare `display: none`), leaving the 100ms countdown running against a
    *  hidden subtree, the focus trap armed on an invisible panel, and the session live on the
-   *  server. Withdrawing here is what stops the clock; the trap is released when the
-   *  resulting lockpickEnd lands in `end()`, exactly as on the keyboard path. */
+   *  server, which then burned the tries out and FORFEITED the chest a withdrawal preserves.
+   *
+   *  WITHDRAW ONCE, THEN CLOSE, and the second half is not politeness about duplicate
+   *  commands. `submitAbort()` deliberately does not hide the panel: the close comes from the
+   *  authoritative lockpickEnd, which offline the sim emits and `flushEvents()` drains inside
+   *  this very call, but ONLINE is a wire command whose answer is a frame away. So online the
+   *  panel is still up when `requestClose` returns, and a caller that asks again would send a
+   *  second abort forever. `SkinEventController.open()` is exactly that caller: it sweeps
+   *  `for (i < 20 && closeTop())` to clear the stack before a roll reveal, and without the
+   *  latch it would spin all 20 iterations here and never reach the windows underneath.
+   *  Latching also unwedges the panel when the answer never comes at all:
+   *  `ClientWorld.lockpickState` is rebuilt purely from events and is not reset on reconnect,
+   *  so a stale one would otherwise leave a board that no input could dismiss. */
   requestClose(): void {
-    if (this.deps.getState()) this.submitAbort();
-    else this.close();
+    const live = this.deps.getState();
+    if (live && live.sessionId !== this.withdrawnSessionId) {
+      this.withdrawnSessionId = live.sessionId;
+      this.submitAbort();
+      return;
+    }
+    this.close();
   }
 
   close(restoreFocus = true): void {
@@ -129,6 +150,9 @@ export class LockpickController {
   }
 
   private openPanel(): void {
+    // A fresh ante selector or board is a fresh dismissal: never inherit the latch from the
+    // session before it (openAnte and openBoard are the only ways the panel is shown).
+    this.withdrawnSessionId = null;
     if (this.deps.panel.style.display !== 'block') this.trap = this.deps.openFocusTrap();
     this.deps.panel.style.display = 'block';
     this.bindKeys();
