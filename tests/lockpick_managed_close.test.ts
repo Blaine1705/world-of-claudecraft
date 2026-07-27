@@ -245,8 +245,13 @@ describe('lockpick panel: Hud.closeAll (the gamepad escape path)', () => {
   });
 
   it('re-arms the withdrawal for a NEW session, so the latch cannot silence a real abort', () => {
-    // The latch is keyed on sessionId rather than a bare flag for exactly this: pick one lock,
-    // withdraw, then engage another, and the second withdraw must still reach the server.
+    // Pick one lock, withdraw, engage another: the second withdraw must still reach the
+    // server, or the latch would have converted #2517's forfeiture into a subtler one.
+    //
+    // Honest about what this can and cannot separate: the id keying and openPanel's reset
+    // BOTH satisfy it, and no reachable input tells them apart (openBoard runs openPanel on
+    // every lockpickSession). It pins the behavior, not the mechanism; the reset carries its
+    // own comment saying which case it is really there for.
     const h = harness(LIVE);
     h.controller.openBoard();
     h.hud.closeAll();

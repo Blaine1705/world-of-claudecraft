@@ -150,8 +150,13 @@ export class LockpickController {
   }
 
   private openPanel(): void {
-    // A fresh ante selector or board is a fresh dismissal: never inherit the latch from the
-    // session before it (openAnte and openBoard are the only ways the panel is shown).
+    // A fresh ante selector or board is a fresh dismissal. Belt to the id keying's braces,
+    // and NO test reaches it: every ordinary re-engage already gets a different sessionId,
+    // so the comparison in requestClose alone would do. What this covers is the one case it
+    // cannot, an id COLLISION: the sim mints `lp_${objectId}_${ctx.tickCount}`, so a
+    // withdraw and a re-engage on the same chest inside one tick produce the same string,
+    // and the latch would swallow the second withdrawal, which is #2517's forfeiture again.
+    // Said here rather than pinned by a case that could only assert it vacuously.
     this.withdrawnSessionId = null;
     if (this.deps.panel.style.display !== 'block') this.trap = this.deps.openFocusTrap();
     this.deps.panel.style.display = 'block';
