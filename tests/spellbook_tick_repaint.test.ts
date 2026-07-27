@@ -19,12 +19,15 @@
 // identical frames can, so that is what this file does.
 //
 // WHAT IS ASSERTED, and what is not. An unchanged frame is held to zero DOM queries, zero DOM
-// writes, and exactly four dep reads, all of which return a primitive or the caller's own live
-// slot array (asserted by reference). That is the observable half of "no per-frame
-// allocation": Node cannot count allocations, so the claim rests on the window reading nothing
-// per frame that has to be built. The one remaining per-frame allocation is deliberate and
-// named where it lives: `knownSig` still concatenates a signature string, which is the rebuild
-// gate the issue calls correct.
+// reads, zero DOM writes, and exactly four dep reads, all of which return a primitive or the
+// caller's own live slot array (asserted by reference). That is the observable half of "no
+// per-frame allocation": Node cannot count allocations, so the claim rests on the window
+// reading nothing per frame that has to be built, and on both gates comparing retained values
+// in place instead of through a derived list or a joined signature string.
+//
+// The rebuild gate that got cheaper is still held to what it always covered, and per FIELD:
+// the last describe below drives one talent-shaped change at a time, because a comparison that
+// quietly stopped looking at `cooldown` moves no other assertion in this file.
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ResolvedAbility } from '../src/sim/sim';
@@ -531,5 +534,62 @@ describe('spellbook per-frame tick: the forced refresh Hud drives', () => {
     h.state.bar[2] = slot('charge');
     toggle.click();
     expect(h.state.bar.some((a) => a?.type === 'ability' && a.id === 'charge')).toBe(false);
+  });
+});
+
+describe('spellbook per-frame tick: the rebuild gate still watches every summary field', () => {
+  // ONE case per field a row summary paints, because they are checked independently and a
+  // comparison that stopped looking at any one of them moves nothing else in this file. Each
+  // asserts node IDENTITY: a rebuild replaces the rows, and `toEqual` on the markup would
+  // pass on a wipe-and-identical-rebuild, which is the opposite of the question.
+  const FIELDS = ['rank', 'cost', 'castTime', 'cooldown'] as const;
+
+  for (const field of FIELDS) {
+    it(`rebuilds the rows when a talent moves \`${field}\` alone`, () => {
+      const h = harness();
+      open(h);
+      const before = h.toggle('charge') as HTMLButtonElement;
+      h.state.known = KNOWN_IDS.map((id) => resolved(id, id === 'charge' ? { [field]: 99 } : {}));
+      h.win.tickOpen();
+      expect(h.toggle('charge'), `a ${field} change did not rebuild the rows`).not.toBe(before);
+    });
+  }
+
+  it('rebuilds when an ability is learned or unlearned', () => {
+    const h = harness();
+    open(h);
+    const before = h.toggle('charge') as HTMLButtonElement;
+    h.state.known = [...h.state.known, resolved('execute')];
+    h.win.tickOpen();
+    expect(h.toggle('charge')).not.toBe(before);
+    expect(h.toggle('execute')).not.toBeNull();
+  });
+
+  it('rebuilds when the SAME numbers arrive on a different ability id', () => {
+    // The online mirror rebuilds world.known every snapshot, so identity says nothing; the id
+    // has to be part of the comparison or a spec swap would paint the wrong rows.
+    const h = harness();
+    open(h);
+    const before = h.toggle('charge') as HTMLButtonElement;
+    h.state.known = h.state.known.map((k) =>
+      k.def.id === 'charge' ? resolved('thunder_clap') : k,
+    );
+    h.win.tickOpen();
+    expect(h.toggle('charge')).toBeNull();
+    expect(h.toggle('thunder_clap')).not.toBeNull();
+    expect(before.isConnected, 'the old row should be detached').toBe(false);
+  });
+
+  it('CONTROL: a fresh world.known array with identical numbers rebuilds nothing', () => {
+    // The case reference equality would get wrong every frame online.
+    const h = harness();
+    open(h);
+    const before = h.toggle('charge') as HTMLButtonElement;
+    h.state.known = KNOWN_IDS.map((id) => resolved(id));
+    const watch = watchDom();
+    h.win.tickOpen();
+    watch.stop();
+    expect(h.toggle('charge')).toBe(before);
+    expect(watch.writes, `a no-op snapshot repainted: ${watch.writes.join(', ')}`).toEqual([]);
   });
 });

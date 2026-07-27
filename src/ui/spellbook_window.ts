@@ -18,11 +18,13 @@
 // (tests/hud_update_drive.test.ts records it as such), so the per-frame contract in
 // src/ui/CLAUDE.md applies to `tickOpen` and everything it reaches: refs resolved
 // once, no per-frame allocation, every repeated write elided. An unchanged frame
-// costs three primitive reads and a walk of the bar's slot array, and makes no
-// subtree query, no allocation and no DOM write at all. The two gates that buy
-// that are `lastKnownSig` (rebuild the rows only when a resolved ability's numbers
-// moved) and `takeControlChange` (repaint the +/- toggles only when the bar state
-// they render moved).
+// costs two in-place comparisons and makes no subtree query, no allocation and no
+// DOM write at all. The two gates that buy that are `knownChanged` (rebuild the
+// rows only when a resolved ability's numbers moved) and `takeControlChange`
+// (repaint the +/- toggles only when the bar state they render moved). Both compare
+// retained values in place rather than through a derived id list or a joined
+// signature string: a gate that allocates to decide it has nothing to do keeps most
+// of the cost it was meant to save.
 //
 // It stays a COLD painter in tests/hud_perf_budget.test.ts rather than moving into
 // HOT_PAINTERS, and #2519 settled that on a measurement rather than a preference.
@@ -122,11 +124,24 @@ interface RowToggle {
 
 export class SpellbookWindow {
   private openerFocus: HTMLElement | null = null;
-  // Signature of the resolved abilities the last render painted (id/rank/cost/
-  // cast/cooldown). Talent allocation while the window is open reassigns
-  // world.known with new numbers; comparing this per frame lets tickOpen rebuild
-  // the row summaries so their cost/cast/cooldown never go stale (tooltip parity).
-  private lastKnownSig = '';
+  // The resolved abilities the last render painted, as the fields a row summary
+  // displays: one id per ability in `knownIds`, and its rank / cost / castTime /
+  // cooldown packed four to an ability in `knownNums`. Talent allocation while the
+  // window is open reassigns world.known with new numbers; comparing this per frame
+  // lets tickOpen rebuild the row summaries so their cost/cast/cooldown never go
+  // stale (tooltip parity).
+  //
+  // Two retained arrays rather than the joined signature STRING this started as,
+  // for the same reason the bar state below is compared in place: the comparison
+  // runs on every frame the window is open, and building a signature over every
+  // known ability allocated a string of a thousand-odd characters per frame only to
+  // throw it away on the (overwhelmingly common) unchanged one. Comparing in place
+  // also stops at the first field that moved instead of always walking the whole
+  // set. Reference equality on world.known would be cheaper still and is WRONG: the
+  // online mirror rebuilds that array every snapshot, so only the VALUES tell us a
+  // talent actually changed a number.
+  private readonly knownIds: string[] = [];
+  private readonly knownNums: number[] = [];
   // The +/- toggles the last render painted, COLLECTED AS THOSE ROWS ARE BUILT
   // rather than re-queried from the tick. Before #2519 the per-frame refresh ran a
   // querySelector for the Attack toggle plus a querySelectorAll subtree walk over
@@ -155,13 +170,38 @@ export class SpellbookWindow {
 
   constructor(private readonly deps: SpellbookWindowDeps) {}
 
-  // Cheap content signature of the fields a row summary displays. Reference
-  // equality on world.known will not do: the online mirror rebuilds that array
-  // every snapshot, so only the VALUES tell us a talent actually changed a number.
-  private static knownSig(known: readonly ResolvedAbility[]): string {
-    let sig = '';
-    for (const k of known) sig += `${k.def.id}:${k.rank}:${k.cost}:${k.castTime}:${k.cooldown}|`;
-    return sig;
+  /** Number fields packed per known ability in `knownNums`: rank, cost, castTime, cooldown. */
+  private static readonly KNOWN_FIELDS = 4;
+
+  /**
+   * Did any field a row summary displays move since the last render?
+   *
+   * Walks in place against the retained copy and returns at the first difference,
+   * so an unchanged frame costs a bounded run of primitive comparisons and no
+   * allocation at all.
+   */
+  private knownChanged(known: readonly ResolvedAbility[]): boolean {
+    if (known.length !== this.knownIds.length) return true;
+    for (let i = 0; i < known.length; i++) {
+      const k = known[i];
+      if (k.def.id !== this.knownIds[i]) return true;
+      const at = i * SpellbookWindow.KNOWN_FIELDS;
+      if (k.rank !== this.knownNums[at]) return true;
+      if (k.cost !== this.knownNums[at + 1]) return true;
+      if (k.castTime !== this.knownNums[at + 2]) return true;
+      if (k.cooldown !== this.knownNums[at + 3]) return true;
+    }
+    return false;
+  }
+
+  /** Latch the resolved-ability numbers this render is painting. */
+  private captureKnown(known: readonly ResolvedAbility[]): void {
+    this.knownIds.length = 0;
+    this.knownNums.length = 0;
+    for (const k of known) {
+      this.knownIds.push(k.def.id);
+      this.knownNums.push(k.rank, k.cost, k.castTime, k.cooldown);
+    }
   }
 
   get isOpen(): boolean {
@@ -205,7 +245,7 @@ export class SpellbookWindow {
   // resolve live regardless (see appendRow), so this covers the always-visible row
   // text, not the tooltip.
   tickOpen(): void {
-    if (SpellbookWindow.knownSig(this.deps.world().known) !== this.lastKnownSig) {
+    if (this.knownChanged(this.deps.world().known)) {
       this.rerenderPreservingView();
       return;
     }
@@ -239,7 +279,7 @@ export class SpellbookWindow {
   render(): void {
     const el = this.deps.root();
     const world = this.deps.world();
-    this.lastKnownSig = SpellbookWindow.knownSig(world.known);
+    this.captureKnown(world.known);
     // Drop the toggle refs BEFORE the innerHTML write below destroys their nodes,
     // and re-latch the bar state this paint is about to render from, so the next
     // tick compares against what actually went on screen rather than repainting a

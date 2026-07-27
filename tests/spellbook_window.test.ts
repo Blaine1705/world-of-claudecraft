@@ -192,19 +192,23 @@ describe('spellbook_window: hud.update() refresh call site', () => {
 
 describe('spellbook_window: tooltip/summary reflect talent changes (tooltip parity)', () => {
   it('re-renders the open window only when a resolved ability number changed', () => {
-    // tickOpen compares a content signature (id/rank/cost/cast/cooldown) of
-    // world.known, not its array identity: the online mirror rebuilds that array
-    // every snapshot, so reference equality would rebuild the DOM every frame. A
-    // real change (e.g. a talent dropping Wicked Slash cost 45 -> 40) rebuilds the
-    // row summaries; an unchanged frame falls back to the cheap toggle refresh.
+    // tickOpen compares the CONTENT of world.known (id/rank/cost/cast/cooldown), not
+    // its array identity: the online mirror rebuilds that array every snapshot, so
+    // reference equality would rebuild the DOM every frame. A real change (e.g. a
+    // talent dropping Wicked Slash cost 45 -> 40) rebuilds the row summaries; an
+    // unchanged frame falls through to the gated toggle refresh.
     expect(code).toContain('tickOpen()');
-    expect(code).toContain(
-      'SpellbookWindow.knownSig(this.deps.world().known) !== this.lastKnownSig',
-    );
-    expect(code).toContain('this.lastKnownSig = SpellbookWindow.knownSig(world.known)');
-    // the signature carries the numbers a row summary paints, so a cost/cooldown
-    // change flips it (a bare id:rank would miss a same-rank talent cost cut).
-    expect(code).toMatch(/knownSig[\s\S]*k\.def\.id.*k\.rank.*k\.cost.*k\.castTime.*k\.cooldown/);
+    expect(code).toContain('if (this.knownChanged(this.deps.world().known)) {');
+    expect(code).toContain('this.captureKnown(world.known)');
+    // The comparison carries every number a row summary paints, so a cost/cooldown
+    // change flips it (a bare id/rank check would miss a same-rank talent cost cut).
+    // Field-by-field on purpose (#2519): the joined signature string this replaced
+    // was rebuilt on every frame the window was open.
+    for (const field of ['k.rank', 'k.cost', 'k.castTime', 'k.cooldown']) {
+      expect(code, `knownChanged stopped comparing ${field}`).toContain(`${field} !== this.known`);
+    }
+    expect(code).toContain('k.def.id !== this.knownIds[i]');
+    expect(code).toContain('this.knownNums.push(k.rank, k.cost, k.castTime, k.cooldown)');
   });
 
   it('preserves scroll position and keyboard focus across the talent-driven rebuild', () => {
