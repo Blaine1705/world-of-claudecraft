@@ -323,40 +323,51 @@ export const TARGETS = [
     variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
     async capture(page) {
       await page.evaluate(() => {
-        const game = window.__game;
-        const sim = game?.sim;
+        const sim = window.__game?.sim;
         const p = sim?.player;
         if (!p) return;
-        // Lay the local pack to rest first: fishing refuses in combat, and the
-        // peaks put ogres on the shore, so without this the shot captures the
-        // combat arm instead of the rod arm. Stagecraft, not the subject.
-        for (const e of sim.entities.values()) {
-          if (e.kind !== 'mob' || e.dead) continue;
-          e.dead = true;
-          e.aiState = 'dead';
-          e.hp = 0;
-          e.respawnTimer = 9999;
-          e.corpseTimer = 9999;
+        // The Glimmermere, Thornpeak's fishable water. The shore is PROBED
+        // rather than assumed: the zone rod gate answers after the water
+        // check, so a spot that is merely near the lake would capture the
+        // water line instead of the denial under test. The probe casts with a
+        // rod the peaks accept, keeps the first spot that starts a session,
+        // then puts the angler back on the tier-2 rod.
+        const lake = { x: -70, z: 760, radius: 18 };
+        try {
+          sim.addItem('silverstream_fishing_rod', 1);
+        } catch {}
+        let found = false;
+        for (let r = lake.radius * 0.7; r <= lake.radius + 10 && !found; r += 1) {
+          for (let i = 0; i < 72 && !found; i++) {
+            const a = (i / 72) * Math.PI * 2;
+            const x = lake.x + Math.cos(a) * r;
+            const z = lake.z + Math.sin(a) * r;
+            p.pos.x = x;
+            p.pos.z = z;
+            p.prevPos = { ...p.pos };
+            p.facing = Math.atan2(lake.x - x, lake.z - z);
+            p.inCombat = false;
+            p.combatTimer = 0;
+            try {
+              sim.useItem('silverstream_fishing_rod');
+            } catch {}
+            if (p.castingAbility) {
+              p.castingAbility = null;
+              p.castRemaining = 0;
+              p.fishBiteAtTick = 0;
+              p.fishReelDeadlineTick = 0;
+              found = true;
+            }
+          }
         }
-        p.inCombat = false;
-        p.combatTimer = 0;
-        p.hp = p.maxHp ?? p.hp;
-        // Only the tier-2 rod: legal tackle, and legal in the marsh, but the
-        // peaks ask for tier 3.
+        try {
+          sim.removeItem('silverstream_fishing_rod', 1);
+        } catch {}
         try {
           sim.addItem('ironreel_fishing_rod', 1);
         } catch {}
-        // The Glimmermere, Thornpeak's fishable water, approached from its
-        // south shore facing the centre.
-        const lake = { x: -70, z: 760, radius: 18 };
-        p.pos.x = lake.x;
-        p.pos.z = lake.z - lake.radius - 2;
-        p.pos.y = sim.groundHeight ? sim.groundHeight(p.pos.x, p.pos.z) : p.pos.y;
-        p.prevPos = { ...p.pos };
-        p.facing = Math.atan2(0, lake.radius + 2);
       });
       await wait(400);
-      // Drive the real item use, which is the same path the hotbar press takes.
       // Combat is cleared in the SAME evaluate as the press: the world keeps
       // ticking between evaluates, and a shore pack re-tags the angler inside
       // that gap, which captures the combat arm instead of the rod arm.
