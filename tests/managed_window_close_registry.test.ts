@@ -64,7 +64,7 @@ const NO_MANAGED_TEARDOWN: Record<string, string> = {
     "Hud.update()'s mediumHud band behind a display === 'block' gate, so the hide stops it, " +
     'and the mapPing / mapZoneOverride the toggle clears are re-seeded by the next open.',
   'report-window':
-    'Its X and Cancel buttons are literally `el.style.display = \'none\'`. No trap, no timer; ' +
+    "Its X and Cancel buttons are literally `el.style.display = 'none'`. No trap, no timer; " +
     'the panel is rebuilt by innerHTML on every open, so an in-flight submit that resolves ' +
     'against the hidden window cannot survive into the next one.',
 };
@@ -74,8 +74,7 @@ function readCloseManagedWindowCases(source: string): string[] {
   const file = ts.createSourceFile('hud.ts', source, ts.ScriptTarget.Latest, true);
   let method: ts.MethodDeclaration | null = null;
   const findMethod = (node: ts.Node): void => {
-    if (ts.isMethodDeclaration(node) && node.name.getText() === 'closeManagedWindow')
-      method = node;
+    if (ts.isMethodDeclaration(node) && node.name.getText() === 'closeManagedWindow') method = node;
     else ts.forEachChild(node, findMethod);
   };
   ts.forEachChild(file, findMethod);
@@ -177,9 +176,9 @@ describe('closeManagedWindow case registry', () => {
     }));
     // Named rather than counted, so the failure message says WHICH window is unclassified.
     expect(buckets.filter((b) => b.in.length === 0).map((b) => b.id)).toEqual([]);
-    expect(buckets.filter((b) => b.in.length > 1).map((b) => `${b.id}: ${b.in.join(' + ')}`)).toEqual(
-      [],
-    );
+    expect(
+      buckets.filter((b) => b.in.length > 1).map((b) => `${b.id}: ${b.in.join(' + ')}`),
+    ).toEqual([]);
   });
 
   it('keeps every case pointed at a window that still exists', () => {
