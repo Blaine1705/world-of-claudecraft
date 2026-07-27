@@ -771,9 +771,12 @@ export interface FocusHarvestYield {
  *     raw count it padded the pick past the `>= taggedComponents.length` spread
  *     threshold, so `['hide','junk']` on a two-tag corpse spread across every
  *     family at bonus 0 where `['hide']` concentrates on hide (#2504).
- * After the narrowing that second test can only ever be an equality (`picked`
- * is a deduped subset of the tags); it stays `>=` as the plain statement of
- * "the pick covers every tagged component".
+ * After the narrowing that second test can only ever be an equality: `picked`
+ * is a deduped subset of the tags, so it can exceed their count only if the
+ * tags themselves repeat, which tests/mob_component_tags.test.ts forbids. That
+ * cross-file pin is what makes the `>` half unreachable; the comparator stays
+ * `>=` as the plain statement of "the pick covers every tagged component", and
+ * degrades safely rather than silently if the pin ever loosens.
  *
  * Consequence, decided rather than inherited: a pick whose entries are ALL
  * invalid sanitizes to the empty pick, so it spreads, exactly as sending no
@@ -783,16 +786,24 @@ export interface FocusHarvestYield {
  * to the #1141 default instead of burning a single-use corpse for nothing.
  * This supersedes the narrower #2474 knock-on (an all-junk pick yielded
  * nothing), which was itself only ever true BELOW the threshold: above it, the
- * same frame already spread.
+ * same frame already spread. Scope, so the sentence above is not read as more
+ * than it is: this covers a tag the corpse does not CARRY. A tag it carries
+ * that HARVEST_COMPONENT_ITEMS does not map (claw, tusk, gills, horn) still
+ * spends the claim for nothing, is reachable from the shipped picker, and is
+ * tracked separately as #2509.
  *
  * First occurrence wins (Set iteration is insertion-ordered) and the narrowing
  * preserves that order, so tag ORDER is untouched: it is the order the yields,
  * the grants and the harvestResult ledger entries land in (#2457). Same
  * order-preserving idiom the picker's own view-core (`corpseHarvestView`)
- * already applied to the tags it renders, which is why no shipped client can
- * produce either shape in the first place.
- * `taggedComponents` needs no dedupe of its own; content uniqueness is pinned
- * by tests/mob_component_tags.test.ts.
+ * already applied to the tags it renders, which is why no CURRENT shipped
+ * client produces either shape. "Current" is load-bearing and not hedging: a
+ * cached desktop or native bundle whose content predates a retag can still
+ * name a tag this server no longer carries, which is the realistic path to the
+ * junk shape and the reason the ruling above is decided the way it is.
+ * `taggedComponents` needs no dedupe of its own: content uniqueness is pinned
+ * by tests/mob_component_tags.test.ts, the same cross-file pin the `>=`
+ * argument above leans on.
  */
 export function effectiveFocusComponents(
   taggedComponents: readonly string[],
