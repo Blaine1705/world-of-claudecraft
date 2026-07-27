@@ -5612,6 +5612,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.compass.SW': 'SO',
   'hudChrome.compass.W': 'O',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Este cadáver já foi coletado.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Nada do que você selecionou pode ser coletado deste cadáver.',
   'hudChrome.corpseHarvest.componentAria': 'Coletar {component}',
   'hudChrome.corpseHarvest.components.claw': 'Garra',
   'hudChrome.corpseHarvest.components.fang': 'Presa',

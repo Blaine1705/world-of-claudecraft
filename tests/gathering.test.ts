@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
 import {
   effectiveFocusComponents,
+  forfeitsEveryMappedYield,
   harvestTierQuantity,
   isHarvestableCorpse,
   resolveCorpseFocusHarvest,
@@ -593,4 +595,52 @@ describe('effectiveFocusComponents drops a tag the corpse does not carry (#2504)
     resolveCorpseFocusHarvest(tagged, chosen, rng);
     return draws;
   }
+});
+
+// #2509: the one place the "this pick can never yield anything" rule is
+// written. The command boundary refuses on it (src/sim/interaction.ts
+// harvestCorpse) and the picker's view-core disables Harvest on it
+// (src/ui/hud/loot/corpse_harvest_view.ts), so a bug here is a bug in both.
+describe('forfeitsEveryMappedYield (#2509)', () => {
+  // Anchored to the real table on both sides, with LITERAL sets so the cases
+  // below cannot be measuring the table against itself.
+  const MAPPED = ['hide', 'fang', 'silk', 'venomSac', 'meat', 'cloth'];
+  const UNMAPPED = ['claw', 'tusk', 'gills', 'horn'];
+
+  it('is stated against the families the content really maps', () => {
+    expect(Object.keys(HARVEST_COMPONENT_ITEMS).sort()).toEqual([...MAPPED].sort());
+    for (const tag of UNMAPPED) expect(HARVEST_COMPONENT_ITEMS[tag]).toBeUndefined();
+  });
+
+  it('is true only for a strict pick of nothing but unmapped families', () => {
+    const GREYJAW = ['hide', 'fang', 'claw'];
+    expect(forfeitsEveryMappedYield(GREYJAW, ['claw'])).toBe(true);
+    // ...and false for each of the three ways out, one per term.
+    expect(forfeitsEveryMappedYield(GREYJAW, ['claw', 'hide'])).toBe(false); // a mapped family is in
+    expect(forfeitsEveryMappedYield(GREYJAW, [])).toBe(false); // empty spreads
+    expect(forfeitsEveryMappedYield(['claw', 'tusk'], ['claw'])).toBe(false); // nothing to forfeit
+  });
+
+  it('reads the pick through effectiveFocusComponents, not raw', () => {
+    // A full cover spreads, so it always reaches the mapped families...
+    expect(forfeitsEveryMappedYield(['hide', 'fang', 'claw'], ['hide', 'fang', 'claw'])).toBe(
+      false,
+    );
+    // ...an uncarried tag sanitizes away, so junk alone is the empty pick (#2504)...
+    expect(forfeitsEveryMappedYield(['hide', 'fang', 'claw'], ['junk'])).toBe(false);
+    // ...but a carried unmapped tag survives, so junk beside it changes nothing (#2504 + #2509).
+    expect(forfeitsEveryMappedYield(['hide', 'fang', 'claw'], ['claw', 'junk'])).toBe(true);
+    // ...and a repeat collapses to one (#2474).
+    expect(forfeitsEveryMappedYield(['hide', 'fang', 'claw'], ['claw', 'claw'])).toBe(true);
+  });
+
+  it('needs a corpse with something to give AND a pick that takes none of it', () => {
+    // The two-tag shape, where a single entry is the whole refusal.
+    expect(forfeitsEveryMappedYield(['gills', 'hide'], ['gills'])).toBe(true);
+    expect(forfeitsEveryMappedYield(['gills', 'hide'], ['hide'])).toBe(false);
+    // A corpse of nothing but mapped families can never trip it, whatever the pick.
+    for (const pick of [[], ['hide'], ['fang'], ['hide', 'fang']]) {
+      expect(forfeitsEveryMappedYield(['hide', 'fang'], pick), JSON.stringify(pick)).toBe(false);
+    }
+  });
 });
