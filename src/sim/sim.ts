@@ -233,6 +233,7 @@ import type { Ante, PickAction } from './lockpick';
 // Sim keeps thin same-named delegates that call these.
 import {
   activeLootRolls as activeLootRollsImpl,
+  activeMasterLootRolls as activeMasterLootRollsImpl,
   assignMasterLoot as assignMasterLootImpl,
   lootRollGroupStatus as lootRollGroupStatusImpl,
   type PendingLootRoll,
@@ -527,6 +528,7 @@ import {
   type LootRollPrompt,
   type LootStrategies,
   MAX_LEVEL,
+  type MasterLootPrompt,
   type MasterLootThreshold,
   MELEE_RANGE,
   type MobFamily,
@@ -5943,6 +5945,10 @@ export class Sim {
 
   lootRollGroupStatus(pid = this.playerId): LootRollGroupStatus[] {
     return lootRollGroupStatusImpl(this.ctx, pid);
+  }
+
+  activeMasterLootRolls(pid = this.playerId): MasterLootPrompt[] {
+    return activeMasterLootRollsImpl(this.ctx, pid);
   }
 
   submitLootRoll(rollId: number, choice: LootRollChoice, pid?: number): void {

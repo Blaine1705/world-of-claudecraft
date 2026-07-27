@@ -9441,6 +9441,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Große Verzauberungen',
   'hudChrome.enchanting.tier.runed': 'Runen-Verzauberungen',
   'hudChrome.enchanting.wornTag': 'Angelegt ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Angelegt ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Erwartete Materialien:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': '{min} bis {max} {item}',

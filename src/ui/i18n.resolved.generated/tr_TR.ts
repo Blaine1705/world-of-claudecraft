@@ -2480,6 +2480,7 @@ export const tr_TR: EnTranslations = {
       "noEnchants": "Hiçbir büyü bu malzemeyi kullanmıyor.",
       "noTargets": "Büyülenecek uygun eşya yok.",
       "wornTag": "Kuşanılı ({slot})",
+      "wornTagIndexed": "Kuşanılı ({slot} {index})",
       "tier": {
         "base": "Temel Büyüler",
         "runed": "Runlu Büyüler",
@@ -8146,7 +8147,7 @@ export const tr_TR: EnTranslations = {
         "name": "Doğudere Zincir Zırh Yeleği"
       },
       "valespun_robe": {
-        "name": "Vadidokuma Cübbesi"
+        "name": "Vadieğirme Cübbesi"
       },
       "tanned_leather_jerkin": {
         "name": "Tabaklanmış Deri Ceket"

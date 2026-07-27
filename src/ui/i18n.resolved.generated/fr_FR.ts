@@ -2480,6 +2480,7 @@ export const fr_FR: EnTranslations = {
       "noEnchants": "Aucun enchantement n'utilise ce réactif.",
       "noTargets": "Aucun objet éligible à enchanter.",
       "wornTag": "Équipé ({slot})",
+      "wornTagIndexed": "Équipé ({slot} {index})",
       "tier": {
         "base": "Enchantements de base",
         "runed": "Enchantements Runiques",

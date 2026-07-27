@@ -6032,6 +6032,14 @@ export class GameServer {
     // so every party member's roll frame shows the live vote strip and stays up
     // after they answer. Per-tick for the same reason as lroll.
     maybe('lrollg', this.sim.lootRollGroupStatus(anchorSession.pid));
+    // curate-phase master-loot assignments this player is the MASTER LOOTER of,
+    // so a refused assignment (the sim leaves the roll open) or a missed
+    // masterLoot event can restore the prompt inside the 300s window instead of
+    // stranding the looter (#2526). Empty for every non-looter, so after the first
+    // snapshot of a session (which carries `"mloot":[]`, as every registered key
+    // does while lastSent is empty) the key delta-elides away for them. Per-tick
+    // like lroll, and like lroll it costs one pendingLootRolls scan per session.
+    maybe('mloot', this.sim.activeMasterLootRolls(anchorSession.pid));
     maybe('drun', this.sim.delveRunWire(anchorSession.pid));
     maybe('dcompanion', this.sim.delveCompanionWire(anchorSession.pid));
     maybe('dmarks', this.sim.delveMarksFor(anchorSession.pid));

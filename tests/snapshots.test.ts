@@ -3147,6 +3147,7 @@ const ALL_DELTA_KEYS = [
   'marks',
   'milestones',
   'mktU',
+  'mloot',
   'mst',
   'ncd',
   'party',
@@ -3213,6 +3214,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   marks: 'markers',
   milestones: 'unlockedMilestones',
   mktU: 'marketCollectPending',
+  mloot: 'masterLootPrompts',
   mres: 'maxResource',
   mst: 'activeMobileStationCraft',
   party: 'partyInfo',
@@ -3403,6 +3405,25 @@ function dirtyEveryDeltaField(): {
     candidates: [lp],
     partyMembers: [lp, mp],
     choices: new Map(),
+  });
+  // `mloot`: a SECOND roll, still in its master-loot curate phase with the leader
+  // as the master looter. Deliberately distinct from the need/greed roll above so
+  // the two surfaces cannot be confused: activeLootRolls/lootRollGroupStatus skip
+  // this one (masterLooter set) and activeMasterLootRolls skips that one.
+  (sim as any).pendingLootRolls.set(2, {
+    id: 2,
+    itemId: 'greyjaw_hide_boots',
+    itemName: 'Greyjaw Hide Boots',
+    quality: 'uncommon',
+    expiresAt: 9999,
+    candidates: [lp, mp],
+    candidateNames: new Map([
+      [lp, 'Alld'],
+      [mp, 'Memb'],
+    ]),
+    partyMembers: [lp, mp],
+    choices: new Map(),
+    masterLooter: lp,
   });
 
   // Enchanting-action outcomes (Professions 2.0): poke the exact
@@ -3604,6 +3625,22 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
     expect(client.activeLootRolls().map((r) => r.rollId)).toEqual([1]); // lroll -> lootRollPrompts
+    // mloot -> masterLootPrompts, via the activeMasterLootRolls() accessor. Roll 2
+    // only: the curate-phase master roll is master-looter-only, and roll 1 (a plain
+    // need/greed roll) must never leak onto it.
+    expect(client.activeMasterLootRolls()).toEqual([
+      {
+        rollId: 2,
+        itemId: 'greyjaw_hide_boots',
+        itemName: 'Greyjaw Hide Boots',
+        quality: 'uncommon',
+        expiresAt: 9999,
+        candidates: [
+          { pid: leader.pid, name: 'Alld' },
+          { pid: memberPid, name: 'Memb' },
+        ],
+      },
+    ]);
     // lrollg -> lootRollGroup, via the lootRollGroupStatus() accessor
     expect(client.lootRollGroupStatus()).toEqual([
       {
@@ -3817,9 +3854,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 56 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(56);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(56);
+  it('ALL_DELTA_KEYS contains exactly 57 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(57);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(57);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -3838,7 +3875,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
     expect(scraped.has('vcupb')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
-    expect(scraped.size).toBe(56);
+    expect(scraped.size).toBe(57);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -3860,6 +3897,11 @@ describe('delta-key contract pins (anti-drift)', () => {
       atitle: 'activeTitle',
       deeds: 'deedsEarned',
       dstats: 'deedStats',
+      // Two loot-roll surfaces whose terse keys look interchangeable: mloot is the
+      // master-looter curate prompt, lroll the need/greed one, and swapping either
+      // right-hand side would pass every other check in this test.
+      lroll: 'lootRollPrompts',
+      mloot: 'masterLootPrompts',
     };
     for (const [terse, iworld] of Object.entries(required)) {
       expect(TERSE_TO_IWORLD[terse], `rename ${terse} -> ${iworld} drifted`).toBe(iworld);

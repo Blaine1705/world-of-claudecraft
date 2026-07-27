@@ -9352,6 +9352,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Mantra Unggul',
   'hudChrome.enchanting.tier.runed': 'Mantra Bersura',
   'hudChrome.enchanting.wornTag': 'Dipakai ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Dipakai ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Bahan yang diharapkan:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': '{min} hingga {max} {item}',

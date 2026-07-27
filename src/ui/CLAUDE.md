@@ -101,7 +101,16 @@ Per-frame HUD code (anything reached from `Hud.update()`) holds these:
   write-elision standard by review: give it a signature guard and keep it, and if you add a
   genuinely per-frame write path, route it through the facet and move the module into
   `HOT_PAINTERS`. A module that arms its own repeating driver owes the same care INSIDE the
-  callback, which is a contract nothing scans yet: `lockpick_window` re-resolved three element
+  callback, and since #2518 that is a scanned contract too: granting a driver in
+  `tests/hud_perf_budget.test.ts` now costs a `drivers` entry per call site recording the
+  cadence (pinned against the literal in the source), why the driver exists, and the EXACT
+  count of raw writes, element re-queries and IDL-property writes one tick performs. The unit
+  is not the callback body, which is empty in every live case and would have been green on the
+  defect that prompted the rule: it is the body PLUS every same-module function the tick can
+  reach (`tests/helpers/driver_callback_bodies.ts`). Its REACH is the gate's, so read it with
+  the same limit: only the three sanctioned adapter filenames are swept, so a driver in a
+  bare-named module (`reconnect_overlay.ts`, `icon_prewarm.ts`, `hud.ts`) is outside it, the
+  same way those modules are already outside the per-file painter scans. `lockpick_window` re-resolved three element
   refs on a 100ms tick until #2498, and the fix had to re-resolve them per board REBUILD
   rather than once at construction, because `renderBoard` replaces that subtree on a signature
   the clock does not restart on (`tests/lockpick_timer_repaint.test.ts` pins both halves).
@@ -243,9 +252,12 @@ follow the root `extract-and-test` skill for the move-not-rewrite mechanics. The
     The two contracts that hold whatever the cadence are enforced: **no forced-reflow layout
     read** and **no repeating driver of its own** (`requestAnimationFrame` /
     `requestIdleCallback`, or a `setInterval` beyond a documented, counted allowance recording
-    its cadence). A window that grows a genuinely per-frame write path moves into
-    `HOT_PAINTERS` and takes the raw-write scan with it, keeping the driver scan, which every
-    bucket runs.
+    its cadence). Granting one is not free: the allowance also declares, per call site, what
+    ONE TICK is allowed to do, counted exactly over the callback body plus every same-module
+    function it reaches (raw writes, element re-queries such as `querySelector`, and
+    IDL-property writes such as `.disabled`). A window that grows a genuinely per-frame write
+    path moves into `HOT_PAINTERS` and takes the raw-write scan with it, keeping the driver
+    scan, which every bucket runs.
   The gate sweeps all three DOM-adapter names, `*_painter.ts`, `*_window.ts` and
   `*_controller.ts`, so renaming between them sheds no contract. Two limits remain, so neither
   reads as more than it is: the scans are per FILE, so a layout read one hop away in a shared

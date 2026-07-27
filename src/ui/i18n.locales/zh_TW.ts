@@ -8769,4 +8769,5 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': '沒有該 ID 的物品。',
   'devCommand.kitCurrentSpec': '目前專精',
   'hudChrome.enchanting.wornTag': '已裝備（{slot}）',
+  'hudChrome.enchanting.wornTagIndexed': '已裝備（{slot}{index}）',
 };

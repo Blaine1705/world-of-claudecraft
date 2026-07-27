@@ -9243,6 +9243,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Högre förtrollningar',
   'hudChrome.enchanting.tier.runed': 'Runristade förtrollningar',
   'hudChrome.enchanting.wornTag': 'Buren ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Buren ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Förväntade material:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': '{min} till {max} {item}',

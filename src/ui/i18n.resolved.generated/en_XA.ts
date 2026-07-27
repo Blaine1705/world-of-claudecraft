@@ -2480,6 +2480,7 @@ export const en_XA: EnTranslations = {
       "noEnchants": "[Ñó éñçĥáñţ úšéš ţĥíš ŕéáĝéñţ.]",
       "noTargets": "[Ñó éļíĝíƀļé íţéɱ ţó éñçĥáñţ.]",
       "wornTag": "[Ŵóŕñ ({slot})]",
+      "wornTagIndexed": "[Ŵóŕñ ({slot} {index})]",
       "tier": {
         "base": "[Ɓášé Éñçĥáñţš]",
         "runed": "[Ŕúñéð Éñçĥáñţš]",

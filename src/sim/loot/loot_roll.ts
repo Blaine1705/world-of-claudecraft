@@ -49,6 +49,7 @@ import type {
   LootRollPrompt,
   LootSlot,
   LootStrategies,
+  MasterLootPrompt,
   MasterLootThreshold,
 } from '../types';
 import { dist2d, PARTY_XP_RANGE } from '../types';
@@ -522,6 +523,54 @@ export function lootRollGroupStatus(ctx: SimContext, pid: number): LootRollGroup
         pid: candidate,
         name: ctx.players.get(candidate)?.name ?? 'Unknown',
         choice: roll.choices.get(candidate)?.choice ?? null,
+      })),
+    });
+  }
+  return out;
+}
+
+// The master looter's half of the reconcile surface: every roll still in its
+// curate phase that THIS player is the master looter of, with the current
+// candidate roster to assign from. Where the two reads above drop every roll with
+// `masterLooter !== undefined`, so a candidate never sees a curate-phase roll as a
+// need/greed prompt, this one keeps only `masterLooter === pid`, so a candidate
+// reading it gets nothing (a plain `!==` covers the undefined case too, since `pid`
+// is always a number). Not a partition of the three: a curate-phase roll belonging
+// to a DIFFERENT master looter is in none of them for this player, which is the
+// point.
+//
+// Without this the `masterLoot` event was the ONLY delivery of the prompt, so an
+// assignment the sim refuses (assignMasterLoot's `targets.length === 0` arm, which
+// deliberately leaves the roll open) stranded the looter until MASTER_LOOT_TIMEOUT:
+// the client had already cleared the row and had nothing authoritative to restore
+// it from (#2526). A reconnect or a dropped frame during the 300s window lost the
+// prompt the same way.
+//
+// `candidates` is rebuilt per read rather than replayed from the event's open-time
+// snapshot: removePlayerFromLootRolls shrinks roll.candidates when a player logs
+// out mid-window, and that shrink is exactly what makes an assignment refusable,
+// so a restored prompt must show the survivors instead of re-offering the pid that
+// was just rejected.
+export function activeMasterLootRolls(ctx: SimContext, pid: number): MasterLootPrompt[] {
+  const out: MasterLootPrompt[] = [];
+  for (const roll of ctx.pendingLootRolls.values()) {
+    if (roll.masterLooter !== pid) continue;
+    out.push({
+      rollId: roll.id,
+      itemId: roll.itemId,
+      itemName: roll.itemName,
+      quality: roll.quality,
+      expiresAt: roll.expiresAt,
+      // Live name first, open-time snapshot second: the same fallback chain
+      // resolveLootRoll uses. Both later arms are unreachable here rather than
+      // load-bearing: preparePlayerLeave runs removePlayerFromLootRolls BEFORE the
+      // ctx.players entry goes, so a pid still in roll.candidates always has a live
+      // record. Kept for the shape resolveLootRoll needs (it reads candidates AFTER
+      // a leave), and matching lootRollGroupStatus above, which ships the same
+      // literal on the same kind of surface.
+      candidates: roll.candidates.map((candidate) => ({
+        pid: candidate,
+        name: ctx.players.get(candidate)?.name ?? roll.candidateNames.get(candidate) ?? 'Unknown',
       })),
     });
   }

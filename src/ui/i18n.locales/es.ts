@@ -9413,6 +9413,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Encantamientos Mayores',
   'hudChrome.enchanting.tier.runed': 'Encantamientos Rúnicos',
   'hudChrome.enchanting.wornTag': 'Equipado ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Equipado ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Materiales esperados:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': '{min} a {max} {item}',

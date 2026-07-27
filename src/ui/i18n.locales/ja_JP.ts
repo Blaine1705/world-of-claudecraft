@@ -9198,4 +9198,5 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'devCommand.itemUnknown': 'そのIDのアイテムはありません。',
   'devCommand.kitCurrentSpec': '現在のスペック',
   'hudChrome.enchanting.wornTag': '装備中 ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': '装備中 ({slot}{index})',
 };

@@ -9233,6 +9233,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.tier.greater': 'Større Fortryllelser',
   'hudChrome.enchanting.tier.runed': 'Runede Fortryllelser',
   'hudChrome.enchanting.wornTag': 'Båret ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Båret ({slot} {index})',
   'hudChrome.enchanting.yieldHeader': 'Forventede materialer:',
   'hudChrome.enchanting.yieldLineExact': '{count} {item}',
   'hudChrome.enchanting.yieldLineRange': '{min} til {max} {item}',

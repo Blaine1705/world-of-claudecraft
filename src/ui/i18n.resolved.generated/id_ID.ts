@@ -2480,6 +2480,7 @@ export const id_ID: EnTranslations = {
       "noEnchants": "Tidak ada mantrai yang menggunakan reagen ini.",
       "noTargets": "Tidak ada barang yang memenuhi syarat untuk dimantrai.",
       "wornTag": "Dipakai ({slot})",
+      "wornTagIndexed": "Dipakai ({slot} {index})",
       "tier": {
         "base": "Mantra Dasar",
         "runed": "Mantra Bersura",

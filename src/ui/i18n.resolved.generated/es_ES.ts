@@ -2480,6 +2480,7 @@ export const es_ES: EnTranslations = {
       "noEnchants": "Ningún encantamiento usa este reactivo.",
       "noTargets": "No hay ningún objeto elegible para encantar.",
       "wornTag": "Equipado ({slot})",
+      "wornTagIndexed": "Equipado ({slot} {index})",
       "tier": {
         "base": "Encantamientos base",
         "runed": "Encantamientos Rúnicos",

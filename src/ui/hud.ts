@@ -75,7 +75,6 @@ import type {
   HonorReason,
   InvSlot,
   ItemInstancePayload,
-  ItemSlot,
   MailResultCode,
   MotdResultCode,
   PetMode,
@@ -380,6 +379,7 @@ import {
   itemStatName,
 } from './item_instance_tooltip';
 import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
+import { itemSlotLabel as itemSlotName } from './item_slot_labels';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { isCombatFlavorLog } from './log_event_route';
@@ -832,23 +832,6 @@ type ItemQuality = NonNullable<ItemDef['quality']>;
  *  firing an identical gold banner to a real level-up is a known cause of
  *  players reading routine gathering progress as leveling. */
 export type BannerVariant = 'default' | 'deed';
-const ITEM_SLOT_LABEL_KEYS: Record<ItemSlot, TranslationKey> = {
-  mainhand: 'itemUi.slots.mainhand',
-  offhand: 'itemUi.slots.offhand',
-  helmet: 'itemUi.slots.helmet',
-  neck: 'itemUi.slots.neck',
-  shoulder: 'itemUi.slots.shoulder',
-  chest: 'itemUi.slots.chest',
-  waist: 'itemUi.slots.waist',
-  legs: 'itemUi.slots.legs',
-  gloves: 'itemUi.slots.gloves',
-  feet: 'itemUi.slots.feet',
-  // The three ring forms share one player-facing label ("Finger"): items
-  // declare 'ring', the paperdoll cells are the concrete ring1/ring2 keys.
-  ring: 'itemUi.slots.ring',
-  ring1: 'itemUi.slots.ring',
-  ring2: 'itemUi.slots.ring',
-};
 const ITEM_QUALITY_LABEL_KEYS: Record<ItemQuality, TranslationKey> = {
   poor: 'itemUi.quality.poor',
   common: 'itemUi.quality.common',
@@ -11909,6 +11892,18 @@ export class Hud {
    *  the in-town flag, the budget and a row per component). */
   private lastTownFocusSig = '';
 
+  // Standalone trapping window (#2525): the train / unbind shape, one
+  // windowFocus bridge plus one opener field. The panel was outside the shared
+  // focus system entirely: absent from every windowFocus(rootSel) call site and
+  // not one of the two documented opt-outs (#bags and #bank-window, which pair
+  // with a second window and must stay Tab-passable), so it had no Tab trap and
+  // no return-to-opener. It is not the last one out (vendor, crafting, trade,
+  // map and report still are); it is the one that became REACHABLE, because
+  // #2500 stopped the panel rebuilding itself twice a second and focus started
+  // surviving long enough for the missing hand-back to matter.
+  private readonly townFocusWindowFocus = this.windowFocus('#town-focus-window');
+  private townFocusOpenerFocus: HTMLElement | null = null;
+
   private isInTown(): boolean {
     const pos = this.sim.player.pos;
     return isInTownZone(pos, zoneAt(pos.z));
@@ -11923,6 +11918,16 @@ export class Hud {
     this.closeOtherWindows('#town-focus-window');
     this.townFocusDraft = { ...this.sim.townFocus };
     this.renderTownFocus();
+    // AFTER the first paint, the train / unbind ordering: captureFocus records
+    // the opener (the minimap button) and installs the trap over a root that is
+    // by then populated and displayed. The one case where AFTER would be worse
+    // than BEFORE is unreachable: if the paint could leave focus INSIDE the
+    // panel, captureFocus would record an in-window opener and the bridge's
+    // in-window arm would then decline to release the trap on close. It cannot,
+    // because the root is display:none until this paint, so a browser has
+    // already blurred its stale children to <body>, and activeFocusable()
+    // rejects <body>.
+    this.townFocusOpenerFocus = this.townFocusWindowFocus.captureFocus();
   }
 
   private renderTownFocus(): void {
@@ -11973,10 +11978,39 @@ export class Hud {
     this.renderTownFocus();
   }
 
+  /** The ONE close path: the X and Save go through onClose/onSave, Escape and
+   *  the gamepad go through closeAll -> closeManagedWindow's `town-focus-window`
+   *  case, and the toggle re-press comes straight here. So releasing the trap and
+   *  handing focus back once, here, covers every one of them.
+   *
+   *  Deliberately NOT guarded on `townFocusOpen` the way closeTrain/closeUnbind
+   *  guard on their npc id: those hold open state in a field, this panel reads
+   *  it off the DOM, every caller is already guarded, and a redundant call is a
+   *  no-op (the opener is nulled below, and releasing a released trap does
+   *  nothing). A guard would also make the "a later close cannot re-steal focus"
+   *  test pass for the wrong reason.
+   *
+   *  KNOWN EDGE, NOT fixed here, and the obvious local fix is a trap. The panel
+   *  is deliberately readable out of town while the slow band hides
+   *  #mm-town-focus out of town, so a player can open it in town, walk out, and
+   *  close with the opener no longer rendered. FocusManager then refuses the
+   *  hand-back (no client rects: moving focus somewhere invisible is a WCAG
+   *  2.4.11 failure), focus is left standing, and the browser drops it to <body>
+   *  with the panel. That is the pre-#2525 outcome, never worse, and the trap is
+   *  released either way.
+   *  Do NOT "fix" it by keeping the button visible while townFocusOpen: the
+   *  hand-back lands, then the next slow tick (<=500ms later) hides the button
+   *  again now that the panel is closed, and focus drops anyway. A flicker
+   *  instead of a loss. The real fix is a fallback destination, which
+   *  makeWindowFocus passes for NO window (closeTrain / closeUnbind hand back to
+   *  a gossip button that is already gone), so it belongs to the bridge and the
+   *  whole family, not to this one caller. */
   closeTownFocus(): void {
     $('#town-focus-window').style.display = 'none';
     this.townFocusDraft = null;
     this.hideTooltip();
+    this.townFocusWindowFocus.restoreFocus(this.townFocusOpenerFocus);
+    this.townFocusOpenerFocus = null;
   }
 
   get townFocusOpen(): boolean {
@@ -14531,9 +14565,9 @@ function resourceDisplayName(resourceType: ResourceType | null): string {
   return t(RESOURCE_LABEL_KEYS[resourceType ?? 'mana']);
 }
 
-function itemSlotName(slot: ItemSlot): string {
-  return t(ITEM_SLOT_LABEL_KEYS[slot]);
-}
+// itemSlotName moved to ./item_slot_labels as itemSlotLabel (imported above under
+// its old name here), so the pure view cores can read the same shared-label facts
+// the HUD does (#2466).
 
 function itemQualityLabel(quality: ItemDef['quality']): string {
   return t(ITEM_QUALITY_LABEL_KEYS[quality ?? 'common']);

@@ -5,6 +5,7 @@
 // orchestrator (open/close + cross-window coordination).
 
 import { MAX_FOCUS_TIER_BONUS, POINTS_PER_TIER_BONUS } from '../sim/professions/focus';
+import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import { formatNumber, t } from './i18n';
 import type { TownFocusView } from './town_focus_view';
@@ -46,6 +47,17 @@ export function renderTownFocusWindow(
   const active = document.activeElement;
   const focusKey =
     active instanceof HTMLElement && el.contains(active) ? (active.dataset.focusKey ?? null) : null;
+  // Dialog semantics for the trapped root (#2525). Hud installs the Tab trap and
+  // the return-to-opener through windowFocus('#town-focus-window'); a trapped
+  // window also has to ANNOUNCE itself, or a screen-reader user is cycling inside
+  // an unnamed <div>. Set before the wipe, the deeds / professions ordering: these
+  // attributes live on the root, which the innerHTML below never touches, and the
+  // one accessible name comes from the SAME key as the visible title, so the two
+  // can never drift. markDialogRoot also writes tabindex="-1", which is
+  // deliberately NOT a Tab stop: FOCUSABLE_SELECTOR excludes tabindex="-1" from
+  // every clause, so the root stays programmatically focusable (the focus-first
+  // fallback) without joining the cycle.
+  markDialogRoot(el, { label: t('hudChrome.townFocus.title') });
   el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.townFocus.title'))}</span><button type="button" class="x-btn" data-close data-focus-key="${CLOSE_FOCUS_KEY}" aria-label="${esc(t('itemUi.vendor.close'))}">${svgIcon('close')}</button></div>`;
 
   const hint = document.createElement('div');
