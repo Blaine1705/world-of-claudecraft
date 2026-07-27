@@ -114,7 +114,48 @@ completion re-validates exactly range, respawn, and capacity. Using a
 pick/axe/sickle from the bags starts the standard gather cast on the
 nearest matching in-range node (`useGatherToolItem`,
 `src/sim/professions/gathering.ts`), preferring a ready node, and emits
-the text-free `gatherToolNoNode` event when nothing is in reach. Skill gain follows the four-state curve
+the text-free `gatherToolNoNode` event when nothing is in reach.
+
+A better tool also yields a better MATERIAL, which is the third thing the
+tool ladder buys after access and cast speed (`material_grades.ts`). Each
+of the nine node materials has a `fine_` grade, and a harvest grants it
+instead of the plain one when the player's tool is STRICTLY above the
+material's zone tier AND the vein carries that tier. Both arms are
+load-bearing: strictness keeps the tool that merely unlocks a material from
+also improving it (and keeps the parity gather scenario on its shipped
+yields), and the vein arm keeps the deliberate lower-tier veins in Mirefen
+and Thornpeak yielding the plain material, so the base stays gatherable by
+the player who out-tooled the zone. The gate reads the MATERIAL's tier, not
+the node's, because `NODE_MATERIAL_TABLE` resolves a yield from (type, zone)
+alone: all three tiers of Thornpeak vein grant the same id, so a literal
+"one tier above the node" rule would put the tier-4 pick's reagent on the
+easiest vein in the zone. Note this is a DIFFERENT ladder from
+`MATERIAL_TIER_BY_ITEM` (`material_tier.ts`), which is a price band feeding
+the masterwork proc and where the Eastbrook yields are deliberately tier 0.
+Grade resolution is a pure bag scan placed after both rng draws, so the
+two-draw contract is untouched, and it is read at the grant rather than
+carried from the cast start.
+
+The six crafted tool recipes consume the fine grade, so the tool one rung
+down is the only route to the rung above. Two rungs are shaped differently
+and the reason is recorded at `TOOL_RECIPES`: the tier-4 pick is re-pointed
+onto the Mirefen fine ore because the Thornpeak grade would have needed the
+pick that recipe produces, and the tier-5 pick keeps its refined
+`arcanite_bar` (re-pointing off it would strand the bar and its vendor rows)
+while gaining the Thornpeak fine grade.
+
+Substitution runs DOWNWARD only: a fine grade satisfies a requirement for
+its base, the base never satisfies a requirement for the fine grade. That
+asymmetry is what keeps the fine grade a real gate on the tool recipes, and
+the downward half is not a courtesy: the fine grade REPLACES the plain
+yield and Eastbrook is all tier-1 veins, so without it a player carrying any
+tier-2 tool could no longer gather `copper_ore`, `ironbark_log` or
+`silverleaf_herb` at all, taking two shipped repeatable work orders and
+every tier-1 recipe fed by those three with it. The base grade is spent
+first. One pure planner serves both the craft capacity simulation and the
+real consumption, since those must make the identical decision twice.
+
+Skill gain follows the four-state curve
 (`tierProgressMultiplier`, `src/sim/professions/wheel.ts`: 1 / 0.5 / 0.25 / 0
 by tiers below capability, every tier included, no free floor), with
 deterministic fractional gains and never a skill-up roll. Caps are enforced
@@ -420,7 +461,10 @@ must be re-derived if either number is ever tuned on its own.
   basis the rule above reads (`reagentUnitValue` falls back to `sellValue`, and
   every gathered material is priced at exactly 4x, so dropping the field would
   flip 28 recipes gold-positive against the rule rather than tighten it).
-  `arcanite_bar` is refined, not gathered, and stays stocked.
+  `arcanite_bar` is refined, not gathered, and stays stocked. The nine
+  `fine_` grades follow the same shape: node-gathered only, on no
+  `vendorItems` row anywhere, and priced with the same 4x `buyValue` for the
+  same reason.
 - Market: gold buys MATERIALS, never skill. Fungible materials stay
   listable; the curve, the shared throttle, and material volume are the
   sanctioned brake on purchased progress.
@@ -510,6 +554,9 @@ must be re-derived if either number is ever tuned on its own.
   means Runed): a novel reagent mix silently lands in the base bucket, so
   re-derive the sweep's tier mapping when introducing one.
 - New gather node or fish: `NODE_MATERIAL_TABLE` / `NODE_HARVEST_TABLE`
+  (a new node material also needs its `fine_` grade row in `MATERIAL_GRADES`,
+  its own committed icon, and its item-name row; the grade table is pinned
+  against the live material table so a missing row fails loudly)
   (`src/sim/professions/gathering.ts`) or `FISHING_TABLES_BY_BAND`
   (`fishing.ts`), preserving the draw-count contracts above; new node tiers
   compose with the tool gate and the curve automatically.

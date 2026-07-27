@@ -18,6 +18,12 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   VIEWER: two players can see the same node differently.
 - `gather_events.ts`: the per-node-type rare events (always signed, five
   times yield) and the zone soft-broadcast `emitToZonePlayers`.
+- `material_grades.ts`: the fine-material axis. Pure leaf owning the nine
+  base/`fine_` grade pairs, the ZONE tier ladder the upgrade compares against
+  (NOT `material_tier.ts`'s price band, which is a different ladder and puts
+  the Eastbrook yields at 0), and the downward substitution planner the craft
+  and quest consumption paths share. Upgrade needs the tool STRICTLY above the
+  material AND a vein carrying that tier; substitution runs downward only.
 - `fishing.ts`: the fourth gathering row (bite delay, reel window,
   `FISHING_TABLES_BY_BAND`); hidden per-cast state lives in three transient
   Entity fields, never wired, never persisted.

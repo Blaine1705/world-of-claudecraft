@@ -229,6 +229,38 @@ and a ghost-run chain is safe because mobs skip dead entities.
 
 Pure state change, zero new rng draws.
 
+Five forks were settled while building it; recorded here so they are not
+re-opened.
+
+1. **Zone tier, not node tier.** The upgrade compares the tool against the
+   MATERIAL's zone tier (Eastbrook 1, Mirefen 2, Thornpeak 3), with a second
+   arm requiring the vein to carry that tier. Node tier alone would have made
+   the tier-4 pick's reagent farmable off a Thornpeak tier-1 vein, and the
+   vein arm is what keeps the deliberate lower-tier veins yielding the plain
+   material. The tier column is derived from `GATHER_NODES` in the tests.
+2. **Completion, not cast start.** The grade is read at the grant. Cast start
+   would have needed transient cast state on `Entity` for a difference only a
+   mid-cast tool change could see; losing the tool mid-cast costs the upgrade,
+   never the harvest.
+3. **The tier-4 pick is re-pointed, not exempted.** It consumes the Mirefen
+   fine ore, gated on the tier-3 pick it already consumes, which is the shape
+   the axe and sickle lines already had.
+4. **The tier-5 pick keeps `arcanite_bar` and GAINS the Thornpeak fine
+   grade.** Re-pointing off the bar would strand it and its vendor rows; it
+   was also the one rung still buyable off a counter.
+5. **Downward substitution, a fork the packet did not anticipate.** The fine
+   grade replaces the plain yield, and Eastbrook is all tier-1 veins, so a
+   tier-2 tool would have made `copper_ore`, `ironbark_log` and
+   `silverleaf_herb` ungatherable, blocking two shipped repeatable work orders
+   and roughly 19 tier-1 recipes. A fine grade now satisfies a requirement for
+   its base (never the reverse) in the craft gate, the craft capacity
+   simulation, the craft consumption, and quest collect credit and turn-in.
+
+Two premises in the original scope did not survive contact and are corrected
+here: the icons are NOT procedural (the compositor is unreachable for a
+non-weapon item, so each grade ships committed derived art plus provenance),
+and eight of the nine names trip M16, so all nine carry non-Latin fills.
+
 - Nine `fine_` variants, one per zone and type. A tool one tier above the node
   yields the fine version.
 - The six tool recipes are re-specced to consume them, so a better tool is the
