@@ -80,6 +80,13 @@ describe('cssTreeUnder', () => {
     // returning raw readdir order would have to be lucky to pass. CI is ext4
     // (readdir in hash order) and a dev checkout is APFS (byte-lexicographic),
     // so an unsorted walk pins a list that holds on one machine only.
+    //
+    // Which means this case is decisive on CI and NOT on a macOS checkout:
+    // APFS hands back byte-lexicographic order, so deleting the sort still
+    // passes locally, on this fixture or any other. Short of stubbing the fs
+    // there is no local fixture that fails, and the failure a missing sort
+    // causes is a cross-platform flake rather than a silent narrowing, so the
+    // case is kept and its reach written down instead of overstated.
     write('zulu.css');
     write('alpha.css');
     write('mike/zulu.css');
@@ -143,6 +150,21 @@ describe('cssTreeUnder', () => {
     write('real/module.css');
     symlinkSync(path.join(root, 'real', 'module.css'), path.join(root, 'linked.css'));
     expect(cssTreeUnder(root).files.map((f) => f.file)).toEqual(['linked.css', 'real/module.css']);
+  });
+
+  it('returns a BROKEN symlink named .css instead of dropping it from the scan', () => {
+    // The arm behind `throwIfNoEntry: false`, and the reason it is written that
+    // way: a dangling link resolves to neither a file nor a directory, so it
+    // comes back as a file and the consumer's own readFileSync fails loudly.
+    // Drop the option and statSync throws instead, which turns every guard's
+    // failure mode from "this one sheet is broken" into "the walk died", with
+    // nothing red to say the contract changed.
+    write('real/module.css');
+    symlinkSync(path.join(root, 'real', 'gone.css'), path.join(root, 'dangling.css'));
+    expect(cssTreeUnder(root).files.map((f) => f.file)).toEqual([
+      'dangling.css',
+      'real/module.css',
+    ]);
   });
 
   it('is empty for an empty root rather than throwing', () => {
