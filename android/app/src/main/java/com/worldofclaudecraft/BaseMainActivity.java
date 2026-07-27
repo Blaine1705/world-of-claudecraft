@@ -6,12 +6,12 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import com.getcapacitor.BridgeActivity;
 
-public class MainActivity extends BridgeActivity {
+public abstract class BaseMainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(NativeAttestationPlugin.class);
         registerPlugin(NativeAppUpdatePlugin.class);
-        registerPlugin(NativeSolanaMobilePlugin.class);
+        registerDistributionPlugins();
         super.onCreate(savedInstanceState);
         enterImmersiveMode();
     }
@@ -31,4 +31,6 @@ public class MainActivity extends BridgeActivity {
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
         controller.hide(WindowInsetsCompat.Type.systemBars());
     }
+
+    protected abstract void registerDistributionPlugins();
 }
