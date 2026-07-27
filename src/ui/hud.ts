@@ -2737,6 +2737,16 @@ export class Hud {
       case 'delve-board':
         this.closeDelveBoard();
         break;
+      case 'lockpick-panel':
+        // Withdraw from a live lock, else dismiss the ante selector. The reachability
+        // story and why this is not a bare hide live on LockpickController.requestClose
+        // (#2517); do not restate them here, the two copies drifted once already.
+        // The hide is this arm's own, the trade-window precedent above: the withdrawal
+        // does not close the panel, so nothing else would retire a tooltip left standing
+        // over another surface until the server answers.
+        this.lockpickController.requestClose();
+        this.hideTooltip();
+        break;
       case 'loot-settings-window':
         this.closeLootSettings();
         break;
