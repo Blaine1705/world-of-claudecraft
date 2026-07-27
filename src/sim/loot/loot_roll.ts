@@ -315,6 +315,14 @@ export function rollLoot(
     mob.lootable = true;
     // start the owner-lock countdown: after LOOT_FFA_DELAY the tap opens to all.
     mob.lootFfaTimer = LOOT_FFA_DELAY;
+  } else if (isHarvestableCorpse(template.componentTags)) {
+    // The regular loot table rolled empty (chance-based entries, no guaranteed
+    // copper/item), but the corpse still owes a harvest. isHarvestableCorpse is
+    // the single source of truth pruneCorpseLoot already uses to re-derive
+    // lootable once existing loot empties out (#2513); this mirrors that here
+    // so a zero-loot kill isn't permanently un-lootable before pruneCorpseLoot
+    // ever runs. mob.loot stays null: no copper/items to show, just the harvest.
+    mob.lootable = true;
   }
 }
 
