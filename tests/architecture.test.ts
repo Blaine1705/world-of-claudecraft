@@ -278,6 +278,7 @@ const RENDER_PURE_CORES = [
   'src/render/race_line_core.ts',
   'src/render/terrain_region_core.ts',
   'src/render/water_core.ts',
+  'src/render/water_flora_core.ts',
   'src/render/day_night_core.ts',
   'src/render/authored_walls_core.ts',
   'src/render/garden_maze_core.ts',

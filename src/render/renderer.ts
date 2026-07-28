@@ -1866,17 +1866,17 @@ export class Renderer {
     );
     setRenderCategory(props.group, 'props');
     this.scene.add(props.group);
-    // world-spanning modeled dressing, all static: the Duskfall cave mouths,
+    // World-spanning modeled dressing, all static: the Duskfall cave mouths,
     // lily-and-reed water flora on every temperate lake, and the Farshore's
-    // palm strand (each module is a no-op away from its ground)
+    // palm strand. Attached like the per-zone features so the distance cull
+    // applies: the gates and the palm strand have compact footprints of their
+    // own, and water flora registers one cull child per zone.
     for (const staticFeature of [
       buildHollowGates(this.sim.cfg.seed),
       buildWaterFlora(this.sim.cfg.seed),
       buildFarshoreFeatures(this.sim.cfg.seed),
     ]) {
-      setRenderCategory(staticFeature.group, 'props');
-      this.scene.add(staticFeature.group);
-      freezeStaticMatrices(staticFeature.group);
+      this.attachZoneFeature(staticFeature);
     }
     this.flames = props.flames;
     this.windmillFans = props.windmillFans;
@@ -2675,7 +2675,7 @@ export class Renderer {
   private zoneFeatureGroups: { group: THREE.Group; footprint: FeatureFootprint | null }[] = [];
 
   private attachZoneFeature(
-    view: { group: THREE.Group; glowLights?: THREE.PointLight[] },
+    view: { group: THREE.Group; glowLights?: THREE.PointLight[]; cullGroups?: THREE.Group[] },
     freeze = true,
   ): void {
     setRenderCategory(view.group, 'props');
@@ -2684,10 +2684,15 @@ export class Renderer {
     for (const light of view.glowLights ?? []) this.fireLights.push(light);
     this.lightRankDirty = true;
     this.lastAttachedFeatureGroups.push(view.group);
-    this.zoneFeatureGroups.push({
-      group: view.group,
-      footprint: measureFeatureFootprint(view.group),
-    });
+    // A view spanning several regions registers each child for the distance
+    // cull instead of the whole group: one world-wide footprint can never be
+    // culled (water-flora was 10.96M triangles submitted from every realm).
+    for (const cullGroup of view.cullGroups ?? [view.group]) {
+      this.zoneFeatureGroups.push({
+        group: cullGroup,
+        footprint: measureFeatureFootprint(cullGroup),
+      });
+    }
   }
 
   // Hide feature groups the fog has already swallowed. Terrain and foliage both
