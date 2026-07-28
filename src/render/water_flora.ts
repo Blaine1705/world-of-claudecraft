@@ -38,6 +38,11 @@ export const waterFloraPreloadInternalsForTest = {
   propUrls: Object.values(FLORA_URLS),
 };
 
+// One extraction per prop model, shared by every region group: extraction
+// CLONES geometry, and per-region extraction would upload a duplicate GPU
+// buffer set for each lake-bearing zone.
+const partsCache = new Map<FloraKey, { geo: THREE.BufferGeometry; mat: THREE.Material }[]>();
+
 function extractParts(scene: THREE.Group): { geo: THREE.BufferGeometry; mat: THREE.Material }[] {
   scene.updateMatrixWorld(true);
   const parts: { geo: THREE.BufferGeometry; mat: THREE.Material }[] = [];
@@ -71,7 +76,12 @@ export function buildWaterFlora(seed: number): WaterFloraView {
   const instanceProp = (parent: THREE.Group, key: FloraKey, spots: WaterFloraPlacement[]): void => {
     const scene = floraScenes[key];
     if (!scene || spots.length === 0) return;
-    for (const part of extractParts(scene)) {
+    let parts = partsCache.get(key);
+    if (!parts) {
+      parts = extractParts(scene);
+      partsCache.set(key, parts);
+    }
+    for (const part of parts) {
       const mesh = new THREE.InstancedMesh(part.geo, part.mat, spots.length);
       const m = new THREE.Matrix4();
       const q = new THREE.Quaternion();

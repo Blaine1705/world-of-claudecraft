@@ -1866,6 +1866,9 @@ export class Renderer {
     );
     setRenderCategory(props.group, 'props');
     this.scene.add(props.group);
+    // The light budget must exist BEFORE any attachZoneFeature call: a static
+    // feature that ships glowLights pushes into it during the loop below.
+    this.fireLights = props.fireLights;
     // World-spanning modeled dressing, all static: the Duskfall cave mouths,
     // lily-and-reed water flora on every temperate lake, and the Farshore's
     // palm strand. Attached like the per-zone features so the distance cull
@@ -1887,7 +1890,6 @@ export class Renderer {
     freezeStaticMatrices(props.group);
     for (const flame of this.flames) flame.matrixAutoUpdate = true;
     for (const fan of this.windmillFans) fan.matrixAutoUpdate = true;
-    this.fireLights = props.fireLights;
     // The impact-site light rides the campfire point-light budget so the visible
     // point-light count stays constant as the player travels (constant
     // numPointLights -> materials never recompile for a light-count change).
@@ -2667,6 +2669,8 @@ export class Renderer {
   // Groups attachZoneFeature added during the current ensureZoneFeatures pass:
   // a background prepare precompiles their programs (see prepareZoneAt), so a
   // new biome's bespoke feature shaders never first-draw inside a live frame.
+  // Constructor-time attaches (the world-spanning dressing) land here too but
+  // are reset before the first prepare: those compile with the boot warmup.
   private lastAttachedFeatureGroups: THREE.Group[] = [];
 
   // Every attached feature group with its world XZ footprint, for the
@@ -2713,6 +2717,10 @@ export class Renderer {
         if (!this.realmFlora) {
           this.realmFlora = buildRealmFlora(this.sim.cfg.seed);
           this.attachZoneFeature(this.realmFlora);
+          // the freeze above stills the whole subtree; foam swell and mist
+          // drift move via object transforms, so they get their motion back
+          // (the props.flames idiom)
+          for (const moving of this.realmFlora.animated) moving.matrixAutoUpdate = true;
         }
         break;
       case 'ember':

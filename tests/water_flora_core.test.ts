@@ -28,6 +28,20 @@ describe('water flora placement core', () => {
     expect(waterFloraRegions(SEED)).toEqual(regions);
   });
 
+  it('reproduces the pre-split placement walk exactly (the move pin)', () => {
+    // The walk moved verbatim out of water_flora.ts; this census pins it so a
+    // future edit cannot silently reshape the world's water dressing. Minted
+    // from the shipped walk at seed 42; re-mint only for a deliberate,
+    // reviewed placement change.
+    expect(regions.length).toBe(9);
+    expect(regions.reduce((n, r) => n + r.lilies.length, 0)).toBe(72);
+    expect(regions.reduce((n, r) => n + r.reeds.length, 0)).toBe(126);
+    const first = regions[0].lilies[0] ?? regions[0].reeds[0];
+    expect(first.x).toBeCloseTo(-97.7536, 3);
+    expect(first.z).toBeCloseTo(98.1021, 3);
+    expect(regions[regions.length - 1].zoneId).toBe('galecrest');
+  });
+
   it('places flora on the temperate lakes', () => {
     expect(regions.length).toBeGreaterThan(2);
     const spots = regions.reduce((n, r) => n + r.lilies.length + r.reeds.length, 0);
