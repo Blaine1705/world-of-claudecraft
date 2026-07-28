@@ -732,6 +732,19 @@ export function queueGatheringGrant(
   meta.pendingGatherGrants.push({ professionId, amount });
 }
 
+// One clamp rule for applying a queued grant to a proficiency record, shared
+// by the tick drain and the save-time fold below so the two can never disagree
+// about the cap.
+function applyGrantClamped(record: GatheringProficiency, grant: PendingGatherGrant): void {
+  record[grant.professionId] = Math.max(
+    0,
+    Math.min(
+      GATHERING_PROFESSIONS[grant.professionId].maxSkill,
+      record[grant.professionId] + grant.amount,
+    ),
+  );
+}
+
 // Drains one player's queued grants, applying each additively to that
 // profession's own counter only. Called once per player per tick (sim.ts
 // `tick()`), so a grant issued this tick is visible starting next tick, the
@@ -742,15 +755,24 @@ export function queueGatheringGrant(
 export function drainGatheringGrants(meta: PlayerMeta): void {
   if (meta.pendingGatherGrants.length === 0) return;
   for (const grant of meta.pendingGatherGrants) {
-    meta.gatheringProficiency[grant.professionId] = Math.max(
-      0,
-      Math.min(
-        GATHERING_PROFESSIONS[grant.professionId].maxSkill,
-        meta.gatheringProficiency[grant.professionId] + grant.amount,
-      ),
-    );
+    applyGrantClamped(meta.gatheringProficiency, grant);
   }
   meta.pendingGatherGrants.length = 0;
+}
+
+// The proficiency record a SAVE should carry: the live counters with any
+// still-queued grants folded in, under the same clamp the tick drain applies.
+// A leave-time save can run between the tick that queued a grant (a completed
+// harvest, a reel-landed catch) and the tick that drains it; without this fold
+// that save would silently lose the grant. Pure: the live meta is untouched,
+// so the queue still drains ONLY on the deterministic tick path, and the
+// folded snapshot equals what the drain will produce one tick later.
+export function foldPendingGatherGrants(
+  meta: Pick<PlayerMeta, 'gatheringProficiency' | 'pendingGatherGrants'>,
+): GatheringProficiency {
+  const out = { ...meta.gatheringProficiency };
+  for (const grant of meta.pendingGatherGrants) applyGrantClamped(out, grant);
+  return out;
 }
 
 // Projects the internal per-profession counter onto the settled

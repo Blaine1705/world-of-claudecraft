@@ -325,6 +325,7 @@ import {
   completeGatherCast as completeGatherCastImpl,
   drainGatheringGrants,
   emptyGatheringProficiency,
+  foldPendingGatherGrants,
   gatheringSkillsView,
   gatherNodeById,
   harvestNode as harvestNodeImpl,
@@ -1034,8 +1035,11 @@ export interface PlayerMeta {
   // additive counters, one per profession: granting one never changes another.
   // Persisted in CharacterState. See src/sim/professions/gathering.ts.
   gatheringProficiency: Record<GatheringProfessionId, number>;
-  // Grants queued by the `/dev gather` cheat, drained once per player per tick
-  // (see drainGatheringGrants). Session-only, never persisted.
+  // Grants queued by harvests, catches, and the `/dev gather` cheat, drained
+  // once per player per tick (see drainGatheringGrants). The queue itself is
+  // session-only (never persisted as a queue), but a save FOLDS any
+  // still-queued grants into the persisted proficiency
+  // (foldPendingGatherGrants), so a leave-time save cannot lose one.
   pendingGatherGrants: { professionId: GatheringProfessionId; amount: number }[];
   // The slotted tool effect for each gathering profession, if any. Keyed by
   // PROFESSION rather than by tool item: the harvest path resolves a tool
@@ -3079,8 +3083,13 @@ export class Sim {
       // PlayerMeta.totalPlayedSeconds); /playtime reads the running total the
       // same way without waiting for a save.
       totalPlayedSeconds: meta.totalPlayedSeconds + Math.max(0, this.time - meta.joinedAt),
-      professions: { ...meta.gatheringProficiency },
-      gatheringProficiency: { ...meta.gatheringProficiency },
+      // Both keys carry the SAVE-time proficiency: the live counters plus any
+      // still-queued grants (foldPendingGatherGrants), so a leave-time save
+      // landing between the tick that queued a grant and the tick that drains
+      // it cannot lose the grant. The live meta is untouched; the queue still
+      // drains only on the tick path.
+      professions: foldPendingGatherGrants(meta),
+      gatheringProficiency: foldPendingGatherGrants(meta),
       // Spread ONLY when a slot exists, so the key is absent from the saved
       // JSONB for every character who has never slotted an effect rather than
       // writing `{}` into every row in the realm.
