@@ -120,6 +120,32 @@ export function treeDetailDistance(
   return Math.min(fogFloor, fogLimit);
 }
 
+/**
+ * Per-instance collapse windows for the foliage vertex shaders
+ * (foliage_collapse.ts). Buckets are ~540x240u slabs, so the bucket tests
+ * below can only ever be a coarse pre-filter: a "visible" slab still holds
+ * trees hundreds of units past the fog wall, which is exactly the floating
+ * silhouettes players report in the murky realms. The shader collapses each
+ * INSTANCE against these windows instead, so the bucket tests only need to
+ * answer "could any instance of this mesh be alive", never "are all of them".
+ *
+ * Real tree parts live in [0, treeMax); impostors in [impostorMin, fogCull).
+ * treeMax and impostorMin are the same number by construction: the windows
+ * stay exact complements per instance, never drawn together, never both
+ * dropped, which is the same contract the old bucket-level swap had.
+ */
+export interface InstanceCullWindows {
+  treeMax: number;
+  impostorMin: number;
+  fogCull: number;
+}
+
+export function instanceCullWindows(detailFar: number, fogLimit: number): InstanceCullWindows {
+  const fogCull = Math.max(0, fogLimit);
+  const treeMax = Math.min(detailFar, fogCull);
+  return { treeMax, impostorMin: treeMax, fogCull };
+}
+
 export interface BucketWindowInput {
   /** distance from the camera to the bucket's CENTER */
   centerDist: number;
@@ -155,11 +181,15 @@ export interface BucketWindowInput {
  * edge would keep every bucket alive for another half-bucket past its cap and
  * quietly multiply the triangles they exist to cut.
  *
- * The tree-detail swap is the exception: it is measured from the NEAR EDGE. Keyed
- * on the center, a bucket you are standing at the edge of could already have
- * flipped to impostors, putting cones a few strides away. Both sides of the swap
- * read that same quantity, so a species' real-model and impostor windows stay
- * exact complements: never drawn together, never both dropped.
+ * The tree-detail swap is the exception: its two arms are COVERAGE tests, not a
+ * partition. The real model draws while any part of the bucket is inside the
+ * swap (near edge), the impostor while any part is outside it (far edge), so a
+ * bucket straddling the boundary draws both meshes and the per-instance windows
+ * (instanceCullWindows, enforced in the vertex shader) split the trees exactly.
+ * Keyed on the center, a bucket you are standing at the edge of could already
+ * have flipped to impostors, putting cones a few strides away; keyed near-edge
+ * only, as this was before the shader owned the boundary, every tree in a
+ * 540x240u slab drew at full detail until the whole slab left the swap.
  */
 export function bucketVisible(w: BucketWindowInput): boolean {
   const nearEdge = w.centerDist - w.radius;
@@ -171,7 +201,7 @@ export function bucketVisible(w: BucketWindowInput): boolean {
       : w.maxDist * w.distanceScale * w.revealScale;
   if (w.centerDist < minCap || w.centerDist >= maxCap) return false;
 
-  if (w.minAtDetail && nearEdge < w.detailFar) return false;
+  if (w.minAtDetail && w.centerDist + w.radius < w.detailFar) return false;
   if (w.maxAtDetail && nearEdge >= w.detailFar) return false;
 
   return nearEdge < w.fogLimit;

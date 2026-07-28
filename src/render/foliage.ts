@@ -27,6 +27,11 @@ import {
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import {
+  applyInstanceCollapse,
+  type CollapseRole,
+  updateCollapseUniforms,
+} from './foliage_collapse';
+import {
   eastbrookGrassExclusions,
   insideDressingExclusion,
   insideEastbrookGrassExclusion,
@@ -37,6 +42,7 @@ import {
   bucketVisible,
   foliageDistanceScale,
   foliageFogLimit,
+  instanceCullWindows,
   type LodDists,
   lodDistsFor,
   treeDetailDistance,
@@ -141,6 +147,19 @@ const FOLIAGE_MODEL_URLS_LOW = {
   mushroom: [`${MODEL_DIR}mushroom.glb`],
 };
 const MODEL_URLS = GFX.leanFoliage ? FOLIAGE_MODEL_URLS_LOW : FOLIAGE_MODEL_URLS_HIGH;
+
+// Which per-instance collapse window a model's materials take: tree species
+// end at the real-model/impostor swap; everything else (rocks, dressing) runs
+// to the fog cull. Keyed by source URL so a future kit reusing one material
+// name across a tree and a bush still gets each usage its own window.
+const TREE_MODEL_URLS: ReadonlySet<string> = new Set([
+  ...MODEL_URLS.pine,
+  ...MODEL_URLS.oak,
+  ...MODEL_URLS.twisted,
+  ...MODEL_URLS.dead,
+]);
+const collapseRoleForUrl = (url: string): CollapseRole =>
+  TREE_MODEL_URLS.has(url) ? 'tree' : 'plain';
 
 // kick off fetches at import; buildFoliage assumes the cache is populated
 const loadedModels = new Map<string, GLTF>();
@@ -501,12 +520,19 @@ interface ModelPart {
   isLeaf: boolean;
 }
 
-// one shared material per source-material name (dedupes textures across the
-// 5 pine / 5 oak files which all reference the same bark + leaf sheets)
+// one shared material per (collapse role, source-material name): dedupes
+// textures across the 5 pine / 5 oak files which all reference the same bark +
+// leaf sheets, while a tree material can never share an instance (and so a
+// collapse window) with a dressing one
 const materialCache = new Map<string, THREE.Material>();
 
-function foliageMaterial(src: THREE.Material, hasVertexColors: boolean): THREE.Material {
-  const cached = materialCache.get(src.name);
+function foliageMaterial(
+  src: THREE.Material,
+  hasVertexColors: boolean,
+  role: CollapseRole,
+): THREE.Material {
+  const key = `${role}:${src.name}`;
+  const cached = materialCache.get(key);
   if (cached) return cached;
   const std = src as THREE.MeshStandardMaterial;
   const pol = MAT_POLICY[src.name] ?? DEFAULT_POLICY;
@@ -526,7 +552,8 @@ function foliageMaterial(src: THREE.Material, hasVertexColors: boolean): THREE.M
       })
     : new THREE.MeshLambertMaterial(common);
   if (pol.windMul > 0) addWind(mat, TREE_WIND_STRENGTH * pol.windMul);
-  materialCache.set(src.name, mat);
+  applyInstanceCollapse(mat, role);
+  materialCache.set(key, mat);
   return mat;
 }
 
@@ -570,7 +597,11 @@ function extractParts(url: string): ModelPart[] {
     const geometry = bakeGeometry(mesh);
     parts.push({
       geometry,
-      material: foliageMaterial(srcMat, geometry.getAttribute('color') !== undefined),
+      material: foliageMaterial(
+        srcMat,
+        geometry.getAttribute('color') !== undefined,
+        collapseRoleForUrl(url),
+      ),
       isLeaf: (MAT_POLICY[srcMat.name] ?? DEFAULT_POLICY).leaf,
     });
   });
@@ -707,6 +738,7 @@ function farTreeProxyMaterial(shape: SpeciesSpec['proxyShape']): THREE.Material 
     fog: true,
   });
   mat.name = `foliage:far-${shape}`;
+  applyInstanceCollapse(mat, 'impostor');
   farTreeProxyMatCache.set(shape, mat);
   return mat;
 }
@@ -1094,6 +1126,8 @@ function buildTrees(
   // the colorways are inert. (Safe to clone: rocks take no wind hook.)
   const rockMat = (rockParts[0][0].material as THREE.MeshStandardMaterial).clone();
   rockMat.vertexColors = true;
+  // clone() drops shader hooks, so the clone re-takes its collapse window
+  applyInstanceCollapse(rockMat, 'plain');
   const colorway = (tint: THREE.Color): THREE.BufferGeometry[] => {
     const singles = rockParts.map((parts) => bakeTopTint(parts[0].geometry.clone(), tint));
     const member = (
@@ -2400,6 +2434,10 @@ export function buildFoliage(seed: number): FoliageView {
         distanceScale,
         fogLimit,
       );
+      // The vertex shaders enforce these same boundaries per INSTANCE, so a
+      // surviving slab no longer drags its whole tree population along with it
+      // (foliage_collapse.ts; the windows themselves are instanceCullWindows).
+      updateCollapseUniforms(instanceCullWindows(detailFar, fogLimit));
       modelVisibleBuckets = 0;
       modelVisibleDraws = 0;
       modelVisibleTriangles = 0;

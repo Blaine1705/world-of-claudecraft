@@ -7,6 +7,7 @@ import {
   foliageDistanceScale,
   foliageFogLimit,
   IMPOSTOR_MIN_FOG_BLEND,
+  instanceCullWindows,
   LOD_HIGH,
   LOD_LOW,
   lodDistsFor,
@@ -157,19 +158,32 @@ describe('foliage LOD: the far-tree impostor never stands in clear air', () => {
   });
 });
 
-describe('foliage LOD: the real-model and impostor windows partition the world', () => {
+describe('foliage LOD: the real-model and impostor windows cover the world', () => {
   const detailFar = 368; // the Vale's fog-derived swap
 
-  it('exactly one of the two draws at every distance, for every bucket depth', () => {
+  it('every distance is covered; the two overlap exactly while a bucket straddles the swap', () => {
     for (const radius of [0, 60, 120]) {
       for (let d = radius; d <= 900; d += 7) {
         const drawn = [
           realTrees(d, { detailFar, radius }),
           impostors(d, { detailFar, radius }),
         ].filter(bucketVisible).length;
-        // 2 = the same tree drawn twice (z-fighting); 0 = a hole in the forest.
-        expect(drawn, `radius ${radius}, distance ${d}`).toBe(1);
+        // A bucket overlapping the swap draws both meshes and the per-instance
+        // windows (instanceCullWindows, enforced in the vertex shader) split
+        // its trees exactly; everywhere else exactly one mesh draws. 0 is a
+        // hole in the forest; 2 outside the straddle is a double-drawn tree.
+        const straddles = d - radius < detailFar && d + radius >= detailFar;
+        expect(drawn, `radius ${radius}, distance ${d}`).toBe(straddles ? 2 : 1);
       }
+    }
+  });
+
+  it('a zero-depth bucket keeps the exact one-LOD partition', () => {
+    for (let d = 0; d <= 900; d += 7) {
+      const drawn = [realTrees(d, { detailFar }), impostors(d, { detailFar })].filter(
+        bucketVisible,
+      ).length;
+      expect(drawn, `distance ${d}`).toBe(1);
     }
   });
 
@@ -180,11 +194,17 @@ describe('foliage LOD: the real-model and impostor windows partition the world',
     const radius = 120;
     const straddling = detailFar + 60; // center past the swap, near edge well inside
     expect(bucketVisible(realTrees(straddling, { detailFar, radius }))).toBe(true);
-    expect(bucketVisible(impostors(straddling, { detailFar, radius }))).toBe(false);
+    // its far half already belongs to the impostor mesh (instances inside the
+    // swap collapse in the shader), so the same bucket draws impostors too
+    expect(bucketVisible(impostors(straddling, { detailFar, radius }))).toBe(true);
 
     const wellPast = detailFar + radius + 1; // the whole bucket is past the swap
     expect(bucketVisible(realTrees(wellPast, { detailFar, radius }))).toBe(false);
     expect(bucketVisible(impostors(wellPast, { detailFar, radius }))).toBe(true);
+
+    const wellInside = detailFar - radius - 1; // the whole bucket is inside it
+    expect(bucketVisible(realTrees(wellInside, { detailFar, radius }))).toBe(true);
+    expect(bucketVisible(impostors(wellInside, { detailFar, radius }))).toBe(false);
   });
 
   it('the near-fill half still culls at its own cap, and grows no impostor there', () => {
@@ -234,6 +254,31 @@ describe('foliage LOD: the real-model and impostor windows partition the world',
     const rock = windowFor({ centerDist: 200, maxDist: LOD_HIGH.rockFar, distanceScale: 0.5 });
     expect(bucketVisible(rock)).toBe(false);
     expect(bucketVisible({ ...rock, distanceScale: 1 })).toBe(true);
+  });
+});
+
+describe('foliage LOD: per-instance collapse windows', () => {
+  it('real and impostor windows are exact complements at the swap', () => {
+    const w = instanceCullWindows(368, 418.15);
+    expect(w.treeMax).toBe(368);
+    expect(w.impostorMin).toBe(w.treeMax);
+    expect(w.fogCull).toBe(418.15);
+  });
+
+  it('a swap at the cull line leaves no impostor band but stays complementary', () => {
+    // The mq-0 short-fog case: treeDetailDistance parks the swap ON the cull.
+    const w = instanceCullWindows(146.85, 146.85);
+    expect(w.treeMax).toBe(146.85);
+    expect(w.impostorMin).toBe(146.85);
+    expect(w.fogCull).toBe(146.85);
+  });
+
+  it('a stale over-cull swap can never push real trees past the fog cull', () => {
+    // Defense in depth: even handed a detailFar past the cull (the pre-fix
+    // arithmetic), the tree window clamps to the cull line.
+    const w = instanceCullWindows(258, 146.85);
+    expect(w.treeMax).toBe(146.85);
+    expect(w.impostorMin).toBe(w.treeMax);
   });
 });
 
