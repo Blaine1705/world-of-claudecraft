@@ -122,3 +122,6 @@ dist-bot/
 /scripts/hunter_agents.sh
 /scripts/gravewyrm_trio.mjs
 /TESTING-TALENTS-2-0.md
+
+# test artifacts: per-pid probe symlinks from tests/sfx_studio_server_security.test.ts
+public/models/sfx-studio-security-*.glb
