@@ -146,6 +146,10 @@ export interface Config {
   // account, so pruning the oldest rows never invalidates a page it can still
   // return. 0 keeps them forever.
   readonly chatViolationRetentionDays: number;
+  // How many days a CLOSED, fully-disposed $WOC Exchange listing (and, via
+  // FK cascade, its bids and settlements) is kept. Sales are the permanent
+  // provenance record and never prune. 0 keeps listings forever.
+  readonly wocMarketListingsRetentionDays: number;
   // The two sweep knobs follow the maxPlayersPerRealm trimmed-read contract
   // instead, because for them a whitespace-derived 0 is fail-DANGEROUS: hour 0
   // moves the sweep to 00:00 UTC, next to the nightly 03:15 UTC pg_dump window
@@ -206,6 +210,7 @@ const DEFAULT_EMAIL_LOG_RETENTION_DAYS = 90;
 const DEFAULT_PLAYER_REPORT_RETENTION_DAYS = 180;
 const DEFAULT_BUG_REPORT_RETENTION_DAYS = 90;
 const DEFAULT_CHAT_VIOLATION_RETENTION_DAYS = 90;
+const DEFAULT_WOC_MARKET_LISTINGS_RETENTION_DAYS = 180;
 // PROVISIONAL: two hours after the nightly 03:15 UTC pg_dump window, pending real
 // traffic-curve evidence of the quietest hour; revisit when that evidence lands.
 const DEFAULT_RETENTION_SWEEP_UTC_HOUR = 5;
@@ -420,6 +425,10 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     chatViolationRetentionDays: numberOr(
       env.CHAT_VIOLATION_RETENTION_DAYS,
       DEFAULT_CHAT_VIOLATION_RETENTION_DAYS,
+    ),
+    wocMarketListingsRetentionDays: numberOr(
+      env.WOC_MARKET_LISTINGS_RETENTION_DAYS,
+      DEFAULT_WOC_MARKET_LISTINGS_RETENTION_DAYS,
     ),
     // An hour outside 0..23 is garbage, not a preference; fall back like numberOr does.
     retentionSweepUtcHour:

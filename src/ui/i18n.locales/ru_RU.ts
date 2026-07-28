@@ -8675,6 +8675,49 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.letters.woc_market_sold.subject': 'Ваш лот на бирже продан',
   'entities.letters.woc_market_sold.body':
     'Ваш лот продан, и покупатель полностью рассчитался. Выручка за вычетом биржевого сбора отправлена на ваш привязанный кошелёк прямо в расчётной транзакции; биржа никогда не держала ваши деньги.\n\nЗапись о сделке хранится в биржевой книге.\n\n- Биржевой маклер',
+  'apiError.woc_market.invalid_input': 'Недопустимый ввод.',
+  'apiError.woc_market.disabled': 'Биржа $WOC недоступна в этом мире.',
+  'apiError.woc_market.paused':
+    'Торги на бирже приостановлены до восстановления цен. Отсчёт аукционов продолжается.',
+  'apiError.woc_market.wallet_required':
+    'Перед торговлей на бирже привяжите и подтвердите кошелёк.',
+  'apiError.woc_market.terms_required': 'Чтобы продолжить, примите условия расчётов биржи.',
+  'apiError.woc_market.totp_required':
+    'Для этой суммы требуется двухфакторная аутентификация. Включите её в настройках аккаунта и введите код.',
+  'apiError.woc_market.totp_invalid':
+    'Этот код двухфакторной аутентификации не подтвердился. Попробуйте ещё раз.',
+  'apiError.woc_market.suspended':
+    'Ваши ставки на бирже приостановлены из-за неоплаченных расчётов.',
+  'apiError.woc_market.character_invalid':
+    'Войдите в игру персонажем, от имени которого выставляете лот, и попробуйте снова.',
+  'apiError.woc_market.not_found': 'Эта запись биржи больше не существует.',
+  'apiError.woc_market.not_yours': 'Эта запись биржи больше не существует.',
+  'apiError.woc_market.not_active': 'Этот лот больше не принимает такое действие.',
+  'apiError.woc_market.own_listing': 'Нельзя делать ставки на собственный лот или покупать его.',
+  'apiError.woc_market.has_bids':
+    'Лот со ставками нельзя отозвать. Если отмена необходима, обратитесь в поддержку.',
+  'apiError.woc_market.bid_too_low':
+    'Ваша ставка не превышает текущую ставку плюс минимальный шаг.',
+  'apiError.woc_market.already_pending':
+    'Сначала подтвердите или отмените свою незавершённую ставку на этот лот.',
+  'apiError.woc_market.insufficient_balance':
+    'В вашем кошельке недостаточно $WOC для этой ставки и её залога.',
+  'apiError.woc_market.quote_unavailable':
+    'Сейчас не удалось получить котировку. Попробуйте чуть позже.',
+  'apiError.woc_market.quote_expired': 'Эта котировка истекла. Запросите новую.',
+  'apiError.woc_market.not_pending': 'Эта ставка больше не ожидает залога.',
+  'apiError.woc_market.confirm_failed':
+    'Не удалось подтвердить транзакцию. Запросите новую котировку и повторите попытку.',
+  'apiError.woc_market.buy_now_locked':
+    'Другой покупатель завершает эту покупку. Попробуйте чуть позже.',
+  'apiError.woc_market.no_buy_now': 'У этого лота нет цены мгновенной покупки.',
+  'apiError.woc_market.cap_reached': 'Вы достигли лимита лотов на бирже.',
+  'apiError.woc_market.stale_item':
+    'Этот предмет изменился или был перемещён. Выберите его заново и повторите попытку.',
+  'apiError.woc_market.not_eligible': 'Этот предмет нельзя выставить на биржу $WOC.',
+  'apiError.woc_market.invalid_params':
+    'Проверьте стартовую ставку, резервную цену, цену выкупа и длительность.',
+  'apiError.woc_market.signature_reused': 'Эта транзакция уже была отправлена.',
   'hudChrome.calendar.title': 'Календарь событий',
   'hudChrome.calendar.close': 'Закрыть календарь',
   'hudChrome.calendar.keybindLabel': 'Календарь событий',

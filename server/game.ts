@@ -6048,6 +6048,34 @@ export class GameServer {
     return state ? state.level : null;
   }
 
+  // $WOC Exchange custody primitives: the narrow, logic-free bridge the
+  // marketplace custody module (server/woc_market_custody.ts) builds on. The
+  // custody LOGIC lives there; these only surface the live session identity
+  // and the serialized mail write, and the mail write deliberately rides the
+  // market/mail serial queue (a custody parcel must never interleave with the
+  // atomic leave-path escrow flush) and PROPAGATES failure, unlike saveMail's
+  // logging arm: the custodian holds a settlement in 'delivering' until this
+  // resolves, so a swallowed error would fake durability.
+  wocCustodySession(characterId: number): {
+    pid: number;
+    accountId: number;
+    name: string;
+    leaseNonce: string | undefined;
+  } | null {
+    const session = this.sessionByCharacterId(characterId);
+    if (!session || session.left) return null;
+    return {
+      pid: session.pid,
+      accountId: session.accountId,
+      name: session.name,
+      leaseNonce: session.leaseNonce,
+    };
+  }
+
+  async persistMailBlob(): Promise<void> {
+    await this.enqueueMarketWrite(() => saveMailState(this.sim.serializeMail()));
+  }
+
   // Force-close every live session for the account. A bearer token is a reusable
   // wire credential, not a per-socket identity: an earlier revision tried to spare
   // the caller's own session by comparing the live socket's auth token against the

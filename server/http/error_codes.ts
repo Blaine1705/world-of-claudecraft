@@ -223,6 +223,70 @@ export const ERROR_CODES = deepFreeze({
   'seeker.genesis_token_claimed': { params: [] },
   'seeker.entitlement_required': { params: [] },
   'seeker.current_ownership_required': { params: [] },
+
+  // --- $WOC Exchange family codes (server/woc_market_routes.ts). The whole
+  // surface is config-gated: with WOC_MARKET_ENABLED unset every mutating
+  // route answers woc_market.disabled. ---
+
+  // Request failed schema validation (400).
+  'woc_market.invalid_input': { params: [] },
+  // The marketplace is not enabled on this server (feature-off 403).
+  'woc_market.disabled': { params: [] },
+  // The economy service or its price oracle is down; purchases and
+  // settlements are suspended while auctions keep counting down (503).
+  'woc_market.paused': { params: [] },
+  // A verified wallet link is required for this action (403).
+  'woc_market.wallet_required': { params: [] },
+  // The variable-token settlement terms must be accepted first (403).
+  'woc_market.terms_required': { params: [] },
+  // 2FA is required at or above the configured USD threshold (403).
+  'woc_market.totp_required': { params: [] },
+  // The provided 2FA code did not verify (403).
+  'woc_market.totp_invalid': { params: [] },
+  // The account is under a marketplace suspension from settlement defaults (403).
+  'woc_market.suspended': { params: [] },
+  // The character does not exist on this realm under this account, or the
+  // seller is not online to escrow the copy (400).
+  'woc_market.character_invalid': { params: [] },
+  // No such listing, bid, settlement, or sale (404).
+  'woc_market.not_found': { params: [] },
+  // The resource belongs to a different account (404, anti-enumeration).
+  'woc_market.not_yours': { params: [] },
+  // The listing or settlement is no longer open for this action (409).
+  'woc_market.not_active': { params: [] },
+  // Sellers cannot bid on or buy their own listings (403).
+  'woc_market.own_listing': { params: [] },
+  // A listing with a standing or pending bid cannot be cancelled (409).
+  'woc_market.has_bids': { params: [] },
+  // The bid does not clear the standing bid plus its increment (400).
+  'woc_market.bid_too_low': { params: [] },
+  // One unconfirmed bid per listing per account at a time (409).
+  'woc_market.already_pending': { params: [] },
+  // The wallet's $WOC balance does not cover the bid plus its bond (400).
+  'woc_market.insufficient_balance': { params: [] },
+  // The economy service could not issue a quote right now (503).
+  'woc_market.quote_unavailable': { params: [] },
+  // The quote or settlement window has expired; request a fresh one (409).
+  'woc_market.quote_expired': { params: [] },
+  // The bid is no longer awaiting its bond (409).
+  'woc_market.not_pending': { params: [] },
+  // The chain transaction was refused or did not match the quote (409).
+  'woc_market.confirm_failed': { params: [] },
+  // Another buyer holds the short buy-now lock on this listing (409).
+  'woc_market.buy_now_locked': { params: [] },
+  // The listing has no buy-now price (400).
+  'woc_market.no_buy_now': { params: [] },
+  // The per-account active-listing cap is reached (409).
+  'woc_market.cap_reached': { params: [] },
+  // The referenced inventory copy changed or moved; re-select it (409).
+  'woc_market.stale_item': { params: [] },
+  // The item is not eligible for the $WOC Exchange under this server's
+  // policy (soulbound, bound, quest, below the quality floor, excluded) (400).
+  'woc_market.not_eligible': { params: [] },
+  // Listing parameters out of range (start/reserve/buy-now/duration) (400).
+  'woc_market.invalid_params': { params: [] },
+  // That transaction signature was already submitted (409).
+  'woc_market.signature_reused': { params: [] },
 } as const);
 
 /** A stable error code: one of the keys of ERROR_CODES. */

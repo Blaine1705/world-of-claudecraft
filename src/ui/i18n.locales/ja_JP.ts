@@ -8557,6 +8557,48 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.letters.woc_market_sold.subject': '取引所への出品が売れました',
   'entities.letters.woc_market_sold.body':
     '出品した品が売れ、買い手が全額を支払いました。取引所手数料を差し引いた売上金は、決済トランザクションの中で直接あなたの連携ウォレットへ送られました。取引所があなたのお金を預かることは一度もありません。\n\nこの取引の記録は取引所の台帳に残ります。\n\n- 取引所仲買人',
+  'apiError.woc_market.invalid_input': '入力が無効です。',
+  'apiError.woc_market.disabled': 'このレルムでは $WOC 取引所を利用できません。',
+  'apiError.woc_market.paused':
+    '価格情報が回復するまで取引所の取引は一時停止中です。オークションのカウントダウンは続行されます。',
+  'apiError.woc_market.wallet_required':
+    '取引所で取引する前に、ウォレットを連携して認証してください。',
+  'apiError.woc_market.terms_required': '続行するには取引所の決済条件に同意してください。',
+  'apiError.woc_market.totp_required':
+    'この金額には二要素認証が必要です。アカウント設定で有効にしてからコードを入力してください。',
+  'apiError.woc_market.totp_invalid':
+    'その二要素認証コードは確認できませんでした。もう一度お試しください。',
+  'apiError.woc_market.suspended': '未払いの決済があったため、取引所での入札が停止されています。',
+  'apiError.woc_market.character_invalid':
+    '出品する予定のキャラクターでプレイしてから、もう一度お試しください。',
+  'apiError.woc_market.not_found': 'その取引所の項目はもう存在しません。',
+  'apiError.woc_market.not_yours': 'その取引所の項目はもう存在しません。',
+  'apiError.woc_market.not_active': 'その出品ではこの操作を受け付けていません。',
+  'apiError.woc_market.own_listing': '自分の出品に入札したり購入したりすることはできません。',
+  'apiError.woc_market.has_bids':
+    '入札のある出品は取り下げられません。どうしても必要な場合はサポートに連絡してください。',
+  'apiError.woc_market.bid_too_low': '入札額が現在の入札額に最低増額を加えた金額に届いていません。',
+  'apiError.woc_market.already_pending':
+    'この出品に対する保留中の入札を先に確定するか破棄してください。',
+  'apiError.woc_market.insufficient_balance':
+    'ウォレットの $WOC がこの入札とその保証金に足りません。',
+  'apiError.woc_market.quote_unavailable':
+    '現在、価格見積もりを発行できません。しばらくしてからもう一度お試しください。',
+  'apiError.woc_market.quote_expired':
+    'その見積もりは期限切れです。新しい見積もりを取得してください。',
+  'apiError.woc_market.not_pending': 'その入札はもう保証金を待っている状態ではありません。',
+  'apiError.woc_market.confirm_failed':
+    'トランザクションを確認できませんでした。新しい見積もりを取得して、もう一度お試しください。',
+  'apiError.woc_market.buy_now_locked':
+    '別の買い手がこの購入を進めています。しばらくしてからもう一度お試しください。',
+  'apiError.woc_market.no_buy_now': 'この出品には即決価格がありません。',
+  'apiError.woc_market.cap_reached': '取引所への出品数の上限に達しています。',
+  'apiError.woc_market.stale_item':
+    'そのアイテムは変更または移動されました。選び直してから、もう一度お試しください。',
+  'apiError.woc_market.not_eligible': 'そのアイテムは $WOC 取引所に出品できません。',
+  'apiError.woc_market.invalid_params':
+    '開始価格、最低落札価格、即決価格、期間を確認してください。',
+  'apiError.woc_market.signature_reused': 'そのトランザクションは既に送信されています。',
   'hudChrome.calendar.title': 'イベントカレンダー',
   'hudChrome.calendar.close': 'カレンダーを閉じる',
   'hudChrome.calendar.keybindLabel': 'イベントカレンダー',

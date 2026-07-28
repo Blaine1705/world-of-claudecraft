@@ -53,8 +53,14 @@ import {
   WALLET_LINK_MAX_PER_MINUTE,
   WINDOW_MS,
   WOC_BALANCE_MAX_PER_MINUTE,
+  WOC_MARKET_BID_MAX_PER_MINUTE,
+  WOC_MARKET_CONFIRM_MAX_PER_MINUTE,
+  WOC_MARKET_LIST_MAX_PER_MINUTE,
+  WOC_MARKET_QUOTE_MAX_PER_MINUTE,
+  type WocMarketMutationAction,
   walletLinkRateLimited,
   wocBalanceRateLimited,
+  wocMarketMutationRateLimited,
 } from '../../ratelimit';
 import { attackSignalSink } from '../attack_signals';
 import { ctxAccountId } from '../context';
@@ -327,6 +333,45 @@ export const CLAUDIUM_SPEND_POLICY: RateLimitPolicy = claudiumMutationPolicy(
   'claudium_spend',
   'spend',
   CLAUDIUM_SPEND_MAX_PER_MINUTE,
+);
+
+// The $WOC Exchange policies: the Claudium model verbatim (per-action fused
+// ip+account buckets, mounted BEHIND the auth guard). Limits single-sourced
+// from server/ratelimit.ts so the two dispatch arms cannot drift.
+function wocMarketMutationPolicy(
+  name: string,
+  action: WocMarketMutationAction,
+  limit: number,
+): RateLimitPolicy {
+  return {
+    name,
+    keyClass: 'ip+account',
+    limit,
+    windowSeconds: WINDOW_SECONDS,
+    tier1: (ctx) => wocMarketMutationRateLimited(ctx.req, ctxAccountId(ctx), action),
+    tier2: 'global',
+  };
+}
+
+export const WOC_MARKET_LIST_POLICY: RateLimitPolicy = wocMarketMutationPolicy(
+  'woc_market_list',
+  'list',
+  WOC_MARKET_LIST_MAX_PER_MINUTE,
+);
+export const WOC_MARKET_BID_POLICY: RateLimitPolicy = wocMarketMutationPolicy(
+  'woc_market_bid',
+  'bid',
+  WOC_MARKET_BID_MAX_PER_MINUTE,
+);
+export const WOC_MARKET_QUOTE_POLICY: RateLimitPolicy = wocMarketMutationPolicy(
+  'woc_market_quote',
+  'quote',
+  WOC_MARKET_QUOTE_MAX_PER_MINUTE,
+);
+export const WOC_MARKET_CONFIRM_POLICY: RateLimitPolicy = wocMarketMutationPolicy(
+  'woc_market_confirm',
+  'confirm',
+  WOC_MARKET_CONFIRM_MAX_PER_MINUTE,
 );
 
 // The character-mutation policies. Each is 'ip+account' (so it must be

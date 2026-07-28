@@ -80,6 +80,56 @@ describe('mailSystemParcel', () => {
   });
 });
 
+describe('custodyRef book-once dedupe', () => {
+  it('books a referenced parcel once and refuses the duplicate', () => {
+    const sim = makeWorld();
+    const items: InvSlot[] = [{ itemId: 'rusty_hatchet', count: 1, instance: { signer: 'A' } }];
+    const first = sim.postOffice.mailSystemParcel(
+      { key: '9', name: 'Buyer' },
+      WOC_MARKET_DELIVERY_LETTER,
+      items,
+      'woc_settlement:41',
+    );
+    const second = sim.postOffice.mailSystemParcel(
+      { key: '9', name: 'Buyer' },
+      WOC_MARKET_DELIVERY_LETTER,
+      items,
+      'woc_settlement:41',
+    );
+    expect(first).toBe(true);
+    expect(second).toBe(false);
+    expect(
+      sim.postOffice.mail.filter((m) => m.custodyRef === 'woc_settlement:41'),
+    ).toHaveLength(1);
+    expect(sim.postOffice.hasCustodyParcel('woc_settlement:41')).toBe(true);
+    expect(sim.postOffice.hasCustodyParcel('woc_settlement:42')).toBe(false);
+  });
+
+  it('keeps the reference through the persistence round trip', () => {
+    const sim = makeWorld();
+    sim.postOffice.mailSystemParcel(
+      { key: '9', name: 'Buyer' },
+      WOC_MARKET_DELIVERY_LETTER,
+      [{ itemId: 'rusty_hatchet', count: 1 }],
+      'woc_settlement:41',
+    );
+    const save = JSON.parse(JSON.stringify(sim.postOffice.serializeMail()));
+    const sim2 = makeWorld();
+    sim2.postOffice.loadMail(save);
+    expect(sim2.postOffice.hasCustodyParcel('woc_settlement:41')).toBe(true);
+    // The dedupe holds across the reload: reconciliation after a restart
+    // must not book a second copy.
+    expect(
+      sim2.postOffice.mailSystemParcel(
+        { key: '9', name: 'Buyer' },
+        WOC_MARKET_DELIVERY_LETTER,
+        [{ itemId: 'rusty_hatchet', count: 1 }],
+        'woc_settlement:41',
+      ),
+    ).toBe(false);
+  });
+});
+
 describe('taking an instanced parcel', () => {
   it('grants the exact copy into the bags (instance survives the take)', () => {
     const sim = makeWorld();

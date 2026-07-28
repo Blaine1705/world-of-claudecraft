@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { Pool, type QueryResult } from 'pg';
+import { Pool, type PoolClient, type QueryResult } from 'pg';
 import {
   type AccountFlair,
   EMPTY_ACCOUNT_FLAIR,
@@ -66,6 +66,7 @@ import { SEEKER_ENTITLEMENT_SCHEMA } from './seeker_entitlement_db';
 import { SOCIAL_SCHEMA } from './social_db';
 import { UNSTUCK_SCHEMA } from './unstuck_db';
 import { USER_ASSETS_SCHEMA } from './user_assets_db';
+import { WOC_MARKET_SCHEMA } from './woc_market_db';
 
 // The realm-market key helpers and the backfill marker key live in
 // server/market_backfill.ts (a *_db-style module with no db.ts dependency, so
@@ -1280,6 +1281,9 @@ export async function ensureSchema(): Promise<void> {
     // block, unblock). FK-references accounts(id), so it runs after SCHEMA.
     // Applied unconditionally (idempotent), like the other schema modules.
     await client.query(CONTENT_MODERATION_SCHEMA);
+    // After SCHEMA: every marketplace table FKs accounts(id), and the custody
+    // model rides characters + world_state (the escrow combined save).
+    await client.query(WOC_MARKET_SCHEMA);
     // Seed the chat-filter word lists + config on first boot only (idempotent).
     // Runs under the same advisory lock so concurrent realm boots don't race.
     await seedChatFilterDefaults(client);
@@ -3693,6 +3697,38 @@ export async function loadGuildBankRows(): Promise<GuildBankRow[]> {
     if (res.rows.length < GUILD_BANK_BOOT_BATCH) return out;
     lastId = Number(res.rows[res.rows.length - 1].guild_id);
   }
+}
+
+// The character-save arm of the escrow transactions above, reusable inside a
+// caller-owned transaction (the $WOC Exchange listing escrow in
+// woc_market_db.ts commits a character UPDATE and a listing INSERT together,
+// the saveCharacterAndMarketState rationale). Same sanitize + lease fence as
+// saveCharacterState; the caller owns BEGIN/COMMIT/ROLLBACK and any timeout
+// raise. Returns false when the fence matched no row (a displaced session).
+export async function saveCharacterStateOnClient(
+  client: PoolClient,
+  characterId: number,
+  level: number,
+  state: CharacterState,
+  leaseNonce?: string,
+): Promise<boolean> {
+  const cleanState = sanitizeRemovedZone1Content(state).state;
+  const res =
+    leaseNonce === undefined
+      ? await client.query(
+          'UPDATE characters SET level = $2, state = $3, updated_at = now() WHERE id = $1',
+          [characterId, level, JSON.stringify(cleanState)],
+        )
+      : await client.query(
+          `UPDATE characters SET level = $2, state = $3, updated_at = now()
+            WHERE id = $1
+              AND EXISTS (
+                SELECT 1 FROM character_leases
+                 WHERE character_id = $1 AND holder = $4 AND nonce = $5
+              )`,
+          [characterId, level, JSON.stringify(cleanState), PROCESS_LEASE_HOLDER, leaseNonce],
+        );
+  return leaseNonce === undefined ? true : (res.rowCount ?? 0) > 0;
 }
 
 export async function isAdminAccount(accountId: number): Promise<boolean> {

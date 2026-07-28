@@ -738,6 +738,61 @@ export function resetClaudiumMutationRateLimits(): void {
   claudiumPreAuthIpAttempts.clear();
 }
 
+// $WOC Exchange writes create listings (a custody escrow), place bids, request
+// on-chain quotes, or poll a settlement verifier. The Claudium model applies
+// verbatim: each action gets its own fused per-IP AND per-account bucket so
+// no marketplace action can starve another, and confirm is the roomiest
+// because the client retries pending chain finality. Quotes are capped well
+// under the economy-service call budget (the proxy also caches estimates).
+export const WOC_MARKET_LIST_MAX_PER_MINUTE = 10;
+export const WOC_MARKET_BID_MAX_PER_MINUTE = 20;
+export const WOC_MARKET_QUOTE_MAX_PER_MINUTE = 30;
+export const WOC_MARKET_CONFIRM_MAX_PER_MINUTE = 60;
+
+export type WocMarketMutationAction = 'list' | 'bid' | 'quote' | 'confirm';
+
+const wocMarketMutationIpAttempts = new Map<string, number[]>();
+const wocMarketMutationAccountAttempts = new Map<string, number[]>();
+
+export function wocMarketMutationLimit(action: WocMarketMutationAction): number {
+  switch (action) {
+    case 'list':
+      return WOC_MARKET_LIST_MAX_PER_MINUTE;
+    case 'bid':
+      return WOC_MARKET_BID_MAX_PER_MINUTE;
+    case 'quote':
+      return WOC_MARKET_QUOTE_MAX_PER_MINUTE;
+    case 'confirm':
+      return WOC_MARKET_CONFIRM_MAX_PER_MINUTE;
+  }
+}
+
+/** Fused per-IP and per-account throttle for one marketplace mutation action. */
+export function wocMarketMutationRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+  action: WocMarketMutationAction,
+): RateLimitOutcome {
+  const limit = wocMarketMutationLimit(action);
+  const ip = recordSlidingWindowAttempt(
+    wocMarketMutationIpAttempts,
+    `${action}:${requestIp(req)}`,
+    limit,
+  );
+  const account = recordSlidingWindowAttempt(
+    wocMarketMutationAccountAttempts,
+    `${action}:${accountId}`,
+    limit,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+/** Reset $WOC Exchange mutation throttles. Test-only. */
+export function resetWocMarketMutationRateLimits(): void {
+  wocMarketMutationIpAttempts.clear();
+  wocMarketMutationAccountAttempts.clear();
+}
+
 // Player-report creation had no dedicated limiter (it was gated only by the full
 // session plus the per-target 12h duplicate-report window in moderation_db). This
 // adds a coarse per-account create limiter so a single account cannot flood the

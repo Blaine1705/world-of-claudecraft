@@ -116,10 +116,12 @@ import {
   handleDailyRewardInternalApi,
 } from './daily_rewards';
 import { pruneDailyRewardEventsBatch } from './daily_rewards_db';
+import type { AccountRow } from './db';
 import {
   type ArenaLeaderRow,
   accountAndScopeForToken,
   accountById,
+  accountTwoFactorEnabled,
   acquireCharacterLease,
   type BgLeaderRow,
   bankBonusFactsForAccount,
@@ -140,6 +142,7 @@ import {
   getCharacter,
   getCharacterById,
   getCharactersCount,
+  getTotpState,
   guildNameForCharacter,
   isAdminAccount,
   lifetimeXpRankForCharacter,
@@ -174,6 +177,7 @@ import {
   topGuilds,
   topLifetimeXp,
   touchLogin,
+  walletForAccount,
 } from './db';
 import { configureDeedsRuntime } from './deeds';
 import {
@@ -360,7 +364,13 @@ import {
   handleWalletUnlink,
 } from './wallet';
 import { allowedCorsOrigin, isWebClientRequest } from './web_login_guard';
-import { handleWocBalance, parseWocBalanceQuery } from './woc_balance';
+import { cachedWocBalance, handleWocBalance, parseWocBalanceQuery } from './woc_balance';
+import { WocMarketService } from './woc_market';
+import { createWocMarketCustody } from './woc_market_custody';
+import { PgWocMarketDb, pruneClosedWocListingsBatch } from './woc_market_db';
+import { createDevWocMarketEconomy, createWocMarketEconomyProxy } from './woc_market_proxy';
+import { configureWocMarketRuntime, wocMarketConfig } from './woc_market_routes';
+import { createWocMarketSweep } from './woc_market_sweep';
 import { createWsAuth } from './ws_auth';
 import { bufferHandshakeMessages } from './ws_buffer';
 
@@ -2729,6 +2739,45 @@ configureReliquaryRuntime({
   reliquaryRarity: getReliquaryRarity,
 });
 
+// The $WOC Exchange service (docs/prd/woc/marketplace.md): Postgres rows via
+// PgWocMarketDb, quotes/confirmations via the economy service (or the
+// in-memory dev economy, which requires BOTH dev flags and is therefore
+// impossible to reach in production), and item custody through the live
+// GameServer (lazily via liveGame(): the game boots after module load).
+// Feature config is read once at boot; WOC_MARKET_ENABLED=0 leaves every
+// mutating route answering woc_market.disabled and the sweep unstarted.
+const wocMarketEconomy =
+  process.env.ALLOW_DEV_COMMANDS === '1' && process.env.WOC_MARKET_DEV_SERVICE === '1'
+    ? createDevWocMarketEconomy()
+    : createWocMarketEconomyProxy();
+const wocMarketService = new WocMarketService({
+  db: new PgWocMarketDb(pool),
+  economy: wocMarketEconomy,
+  custody: createWocMarketCustody({
+    get sim() {
+      return liveGame().sim;
+    },
+    wocCustodySession: (characterId) => liveGame().wocCustodySession(characterId),
+    persistMailBlob: () => liveGame().persistMailBlob(),
+  }),
+  verifiedWallet: async (account) => (await walletForAccount(account))?.pubkey ?? null,
+  balanceTokens: (pubkey) => cachedWocBalance(pubkey),
+  totpEnabled: (account) => accountTwoFactorEnabled(account),
+  totpVerify: async (account, code) => {
+    // verifyLoginTwoFactor wants the login-path AccountRow; the TOTP arm only
+    // reads id, totp_secret and totp_last_window, which getTotpState carries.
+    const state = await getTotpState(account);
+    if (!state?.secret) return false;
+    return verifyLoginTwoFactor(
+      { id: account, totp_secret: state.secret, totp_last_window: state.lastWindow } as AccountRow,
+      code,
+      '',
+    );
+  },
+  config: wocMarketConfig(),
+});
+configureWocMarketRuntime({ service: wocMarketService });
+
 // Inject the main.ts runtime the ported auth handlers (server/auth_routes.ts) need
 // but cannot import without a cycle: the live IP-block gate off the GameServer, the
 // one Turnstile / native-attestation decision, and the request-metadata stamp. Done
@@ -3430,6 +3479,16 @@ export async function startServer(): Promise<http.Server> {
         name: 'chat_violations',
         pruneBatch: (n) => pruneChatViolationsBatch(config.chatViolationRetentionDays, n),
       },
+      {
+        // Closed, fully-disposed $WOC Exchange listings (bids + settlements
+        // cascade; sales are provenance and never prune). LAST in the array on
+        // purpose: a rebase auto-merge has twice spliced this entry into the
+        // preceding object's body, producing duplicate name/pruneBatch keys, and
+        // the tail is the one position with no following sibling to merge into.
+        name: 'woc_market_listings',
+        pruneBatch: (n) =>
+          pruneClosedWocListingsBatch(pool, config.wocMarketListingsRetentionDays, n),
+      },
     ],
     // The fold precondition makes sample pruning lossless; skip the whole group
     // when retention is off so quiet configs write nothing to world_state.
@@ -3445,6 +3504,17 @@ export async function startServer(): Promise<http.Server> {
   });
   retentionSweep.start();
 
+  // The $WOC Exchange sweep: auction closes, settlement expiry and cascades,
+  // delivery/return reconciliation, bond refunds. Per-realm advisory-locked,
+  // seconds-scale poll; never started when the marketplace is disabled.
+  const wocMarketSweep = createWocMarketSweep({
+    realm: REALM,
+    connect: () => pool.connect(),
+    pass: () => wocMarketService.sweepPass(),
+    onError: (err) => console.error('[woc_market] sweep pass failed:', err),
+  });
+  if (wocMarketConfig().enabled) wocMarketSweep.start();
+
   const shutdown = async () => {
     // Flip readiness to draining FIRST so /readyz answers 503 and a load balancer
     // sheds new traffic before we stop the loop and persist (in-flight requests and
@@ -3459,6 +3529,7 @@ export async function startServer(): Promise<http.Server> {
     // Same rationale for the retention sweep: an in-flight prune batch must not
     // race the pool close below.
     await retentionSweep.stop();
+    await wocMarketSweep.stop();
     game.stop();
     await game.saveAll('shutdown');
     await game.saveMarket();

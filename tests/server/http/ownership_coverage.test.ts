@@ -69,6 +69,13 @@ import {
   setUserAssetsGuardDbForTests,
   setUserAssetsServiceForTests,
 } from '../../../server/user_assets_routes';
+import type { WocMarketService } from '../../../server/woc_market';
+import {
+  configureWocMarketRuntime,
+  resetWocMarketGuardDbForTests,
+  resetWocMarketRuntimeForTests,
+  setWocMarketGuardDbForTests,
+} from '../../../server/woc_market_routes';
 import { fakeCtx } from '../helpers/fake_ctx';
 import type { FakeRes } from '../helpers/fake_http';
 
@@ -215,6 +222,20 @@ describe('ownership coverage: registry-wide deny-by-default sweep', () => {
     installDenyingCharacterDb();
     installFakeRuntime();
     installDenyingMapsAndAssets();
+    // The woc_market owned loaders deny through the service seam: absent and
+    // non-owned both read as null (the same anti-enumeration 404). The bearer
+    // guard reads through the same fake bundle the character sweep installs.
+    setWocMarketGuardDbForTests({
+      accountAndScopeForToken: async () => ({ accountId: 7, scope: 'full' as const }),
+      moderationStatusForAccount: async () => NOT_LOCKED,
+    });
+    configureWocMarketRuntime({
+      service: {
+        ownedListing: async () => null,
+        ownedBid: async () => null,
+        ownedSettlement: async () => null,
+      } as unknown as WocMarketService,
+    });
   });
 
   afterEach(() => {
@@ -224,6 +245,8 @@ describe('ownership coverage: registry-wide deny-by-default sweep', () => {
     resetMapsServiceForTests();
     resetUserAssetsGuardDbForTests();
     resetUserAssetsServiceForTests();
+    resetWocMarketRuntimeForTests();
+    resetWocMarketGuardDbForTests();
     vi.restoreAllMocks();
   });
 

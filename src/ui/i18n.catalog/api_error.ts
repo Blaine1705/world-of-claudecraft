@@ -210,4 +210,38 @@ export const apiErrorStrings = {
     entitlement_required: 'Verified Seeker entitlement is required.',
     current_ownership_required: 'Current Seeker Genesis Token ownership is required.',
   },
+  // woc_market: the config-gated $WOC Exchange family
+  // (server/woc_market_routes.ts). USD-denominated auctions settled in $WOC;
+  // every code here is a player-actionable refusal.
+  woc_market: {
+    invalid_input: 'Invalid input.',
+    disabled: 'The $WOC Exchange is not available on this realm.',
+    paused: 'Exchange trading is paused while pricing recovers. Auctions keep counting down.',
+    wallet_required: 'Link and verify a wallet before trading on the Exchange.',
+    terms_required: 'Accept the Exchange settlement terms to continue.',
+    totp_required:
+      'This amount requires two-factor authentication. Enable it in account settings, then enter your code.',
+    totp_invalid: 'That two-factor code did not verify. Try again.',
+    suspended: 'Your Exchange bidding is suspended after unpaid settlements.',
+    character_invalid: 'Play the character you are listing from, and try again.',
+    not_found: 'That Exchange entry no longer exists.',
+    not_yours: 'That Exchange entry no longer exists.',
+    not_active: 'That listing is no longer open for this action.',
+    own_listing: 'You cannot bid on or buy your own listing.',
+    has_bids: 'A listing with bids cannot be withdrawn. Contact support if you must cancel.',
+    bid_too_low: 'Your bid does not clear the current bid plus its increment.',
+    already_pending: 'Confirm or abandon your pending bid on this listing first.',
+    insufficient_balance: 'Your wallet does not hold enough $WOC for this bid and its bond.',
+    quote_unavailable: 'A price quote could not be issued right now. Try again shortly.',
+    quote_expired: 'That quote expired. Request a fresh one.',
+    not_pending: 'That bid is no longer awaiting its bond.',
+    confirm_failed: 'The transaction could not be confirmed. Request a fresh quote and try again.',
+    buy_now_locked: 'Another buyer is completing this purchase. Try again in a moment.',
+    no_buy_now: 'This listing has no buy-now price.',
+    cap_reached: 'You have reached your Exchange listing limit.',
+    stale_item: 'That item changed or moved. Re-select it and try again.',
+    not_eligible: 'That item cannot be listed on the $WOC Exchange.',
+    invalid_params: 'Check the starting bid, reserve, buy-now price, and duration.',
+    signature_reused: 'That transaction was already submitted.',
+  },
 };

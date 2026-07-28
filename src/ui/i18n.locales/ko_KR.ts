@@ -8531,6 +8531,44 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.letters.woc_market_sold.subject': '거래소 등록 물품이 판매되었습니다',
   'entities.letters.woc_market_sold.body':
     '등록하신 물품이 판매되었고 구매자가 대금을 전액 치렀습니다. 거래소 수수료를 제한 판매 대금은 정산 트랜잭션 안에서 곧바로 연동된 지갑으로 전송되었습니다. 거래소는 당신의 돈을 결코 보관하지 않습니다.\n\n이 거래의 기록은 거래소 장부에 남습니다.\n\n- 거래소 중개인',
+  'apiError.woc_market.invalid_input': '입력이 잘못되었습니다.',
+  'apiError.woc_market.disabled': '이 서버에서는 $WOC 거래소를 이용할 수 없습니다.',
+  'apiError.woc_market.paused':
+    '가격 정보가 복구될 때까지 거래소 거래가 일시 중지됩니다. 경매 카운트다운은 계속됩니다.',
+  'apiError.woc_market.wallet_required': '거래소에서 거래하기 전에 지갑을 연동하고 인증하세요.',
+  'apiError.woc_market.terms_required': '계속하려면 거래소 정산 약관에 동의하세요.',
+  'apiError.woc_market.totp_required':
+    '이 금액에는 2단계 인증이 필요합니다. 계정 설정에서 활성화한 뒤 코드를 입력하세요.',
+  'apiError.woc_market.totp_invalid': '2단계 인증 코드를 확인할 수 없습니다. 다시 시도하세요.',
+  'apiError.woc_market.suspended': '미결제 정산으로 인해 거래소 입찰이 정지되었습니다.',
+  'apiError.woc_market.character_invalid': '등록하려는 캐릭터로 접속한 뒤 다시 시도하세요.',
+  'apiError.woc_market.not_found': '해당 거래소 항목이 더 이상 존재하지 않습니다.',
+  'apiError.woc_market.not_yours': '해당 거래소 항목이 더 이상 존재하지 않습니다.',
+  'apiError.woc_market.not_active': '해당 등록은 더 이상 이 작업을 받을 수 없습니다.',
+  'apiError.woc_market.own_listing': '자신의 등록 물품에는 입찰하거나 구매할 수 없습니다.',
+  'apiError.woc_market.has_bids':
+    '입찰이 있는 등록은 철회할 수 없습니다. 꼭 취소해야 한다면 고객 지원에 문의하세요.',
+  'apiError.woc_market.bid_too_low':
+    '입찰가가 현재 입찰가에 최소 증가액을 더한 금액에 미치지 못합니다.',
+  'apiError.woc_market.already_pending':
+    '이 등록에 대한 대기 중인 입찰을 먼저 확정하거나 포기하세요.',
+  'apiError.woc_market.insufficient_balance':
+    '지갑의 $WOC가 이 입찰과 보증금을 감당하기에 부족합니다.',
+  'apiError.woc_market.quote_unavailable':
+    '지금은 가격 견적을 발급할 수 없습니다. 잠시 후 다시 시도하세요.',
+  'apiError.woc_market.quote_expired': '해당 견적이 만료되었습니다. 새 견적을 요청하세요.',
+  'apiError.woc_market.not_pending': '해당 입찰은 더 이상 보증금을 기다리는 상태가 아닙니다.',
+  'apiError.woc_market.confirm_failed':
+    '트랜잭션을 확인할 수 없습니다. 새 견적을 받아 다시 시도하세요.',
+  'apiError.woc_market.buy_now_locked':
+    '다른 구매자가 이 구매를 진행 중입니다. 잠시 후 다시 시도하세요.',
+  'apiError.woc_market.no_buy_now': '이 등록에는 즉시 구매가가 없습니다.',
+  'apiError.woc_market.cap_reached': '거래소 등록 한도에 도달했습니다.',
+  'apiError.woc_market.stale_item':
+    '해당 아이템이 변경되었거나 이동했습니다. 다시 선택한 뒤 시도하세요.',
+  'apiError.woc_market.not_eligible': '해당 아이템은 $WOC 거래소에 등록할 수 없습니다.',
+  'apiError.woc_market.invalid_params': '시작가, 최저가, 즉시 구매가, 기간을 확인하세요.',
+  'apiError.woc_market.signature_reused': '해당 트랜잭션은 이미 제출되었습니다.',
   'hudChrome.calendar.title': '이벤트 달력',
   'hudChrome.calendar.close': '달력 닫기',
   'hudChrome.calendar.keybindLabel': '이벤트 달력',

@@ -86,6 +86,12 @@ export interface MailMessage {
   // parcels hold Infinity while attachments remain (their expiry exemption).
   expiresAt: number;
   read: boolean;
+  // Opaque broker reference on custody parcels (the $WOC Exchange delivery /
+  // return letters): the server-side custodian books each reference AT MOST
+  // ONCE (mailSystemParcel refuses a duplicate), so a crash-retry between
+  // "letter booked" and "settlement row advanced" reconciles to exactly one
+  // delivery. Absent on every other letter. Persisted.
+  custodyRef?: string;
   // The one return-to-sender cycle has run. The sweep's delete arm requires
   // this flag, so attachments are never destroyed without a return flight.
   returned?: boolean;
@@ -113,6 +119,7 @@ export interface MailSave {
     deliverIn: number; // seconds until delivery (0 = already delivered)
     secondsLeft: number; // seconds until expiry; -1 = never expires
     read: boolean;
+    custodyRef?: string; // broker book-once reference; absent off custody mail
     returned?: boolean; // the return cycle has run; absent = false
   }[];
   nextMailId: number;
@@ -705,12 +712,17 @@ export class PostOffice {
   // and its advisory bag cell dropped: the copy is entering the book, not a
   // bag. System parcels hold Infinity expiry while attachments remain, so a
   // returned or delivered copy is never destroyed by the sweep.
+  // Returns false (booking nothing) when `custodyRef` is already in the book:
+  // the custodian's crash-retry reconciliation counts on that dedupe.
   mailSystemParcel(
     recipient: { key: string; name: string },
     letter: LetterDef,
     items: InvSlot[],
-  ): void {
+    custodyRef?: string,
+  ): boolean {
+    if (custodyRef !== undefined && this.hasCustodyParcel(custodyRef)) return false;
     this.book({
+      custodyRef,
       recipientKey: recipient.key,
       recipientName: recipient.name,
       senderName: letter.senderName,
@@ -726,6 +738,13 @@ export class PostOffice {
       }),
       delaySeconds: letter.delaySeconds ?? 0,
     });
+    return true;
+  }
+
+  // True when a custody parcel with this broker reference is in the book
+  // (delivered, still in flight, or already emptied but not yet deleted).
+  hasCustodyParcel(custodyRef: string): boolean {
+    return this.mail.some((m) => m.custodyRef === custodyRef);
   }
 
   // The one-time service letter; the caller flips meta.mailWelcomed.
@@ -770,6 +789,7 @@ export class PostOffice {
     copper: number;
     items: InvSlot[];
     delaySeconds: number;
+    custodyRef?: string;
   }): void {
     const hasAttachments = opts.copper > 0 || opts.items.length > 0;
     // Player parcels ride the attachment window (one return cycle, then the
@@ -795,6 +815,7 @@ export class PostOffice {
       deliverAt: this.ctx.time + Math.max(0, opts.delaySeconds),
       expiresAt,
       read: false,
+      ...(opts.custodyRef === undefined ? {} : { custodyRef: opts.custodyRef }),
       announced: false,
     };
     this.mail.push(msg);
@@ -994,6 +1015,7 @@ export class PostOffice {
         deliverIn: Math.max(0, Math.round(m.deliverAt - now)),
         secondsLeft: Number.isFinite(m.expiresAt) ? Math.max(0, Math.round(m.expiresAt - now)) : -1,
         read: m.read,
+        custodyRef: m.custodyRef,
         returned: m.returned,
       })),
       nextMailId: this.nextMailId,
@@ -1108,6 +1130,7 @@ export class PostOffice {
         deliverAt: this.ctx.time + deliverIn,
         expiresAt,
         read: m.read === true,
+        ...(typeof m.custodyRef === 'string' ? { custodyRef: m.custodyRef } : {}),
         returned: m.returned === true,
         // Already-delivered letters never re-toast after a restart.
         announced: deliverIn <= 0,
