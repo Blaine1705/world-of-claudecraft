@@ -16,7 +16,7 @@ import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/wo
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { type ChunkGrid, type GroundPendingAt, orderCellsForEntry } from './chunk_residency_core';
-import { GFX } from './gfx';
+import { GFX, SUN_DIR } from './gfx';
 import { idleSlot } from './idle_queue';
 import { impactCraterTerrainBlend } from './impact_terrain';
 import {
@@ -94,6 +94,11 @@ if (GFX.terrainSplat) {
   kickTerrainTex('sandN', 'Ground080_NormalGL.jpg', false);
   kickTerrainTex('mudC', 'Ground071_Color.jpg', true); // marsh wet mud (dirt variant)
   kickTerrainTex('snowC', 'Snow010A_Color.jpg', true);
+  // The packs' authored AO maps, packed offline into one RGBA texture
+  // (R grass, G dirt, B rock, A sand) by scripts — one sampler instead of
+  // four keeps the splat material under the 16-sampler fragment limit.
+  // Linear cavity data: cavity = dark, open surface = bright.
+  kickTerrainTex('groundAO', 'GroundAO_Packed.png', false);
 }
 
 export function hasTerrainSplatAssets(): boolean {
@@ -107,7 +112,8 @@ export function hasTerrainSplatAssets(): boolean {
       TERRAIN_TEX.sandC &&
       TERRAIN_TEX.sandN &&
       TERRAIN_TEX.mudC &&
-      TERRAIN_TEX.snowC,
+      TERRAIN_TEX.snowC &&
+      TERRAIN_TEX.groundAO,
   );
 }
 
@@ -347,26 +353,53 @@ vec3 wocBrushRing(vec2 p) {
 }
 `;
 
-// Fragment-only parallax offset mapping for the splat ground. The painted
-// albedo doubles as the height field: its luminance already tracks the clods,
-// pebbles and grass mats in the source photos, so the relief costs no new
-// texture, no render target and no draw call, just a few taps. Vertex
+// Fragment-only relief for the splat ground: offset parallax plus a cavity
+// shading term, both driven by the packs' authored AO maps (packed offline
+// into one RGBA texture: R grass, G dirt, B rock, A sand). Vertex
 // displacement is deliberately not an option here, at any amplitude: selection
 // rings, feet placement and water shorelines all sample the analytic height
 // field in src/sim, and moving the visual mesh off it breaks them.
-const GROUND_PARALLAX_GLSL = /* glsl */ `
-const float WOC_PARALLAX_SCALE = 0.085;
-const float WOC_PARALLAX_CLAMP = 0.05;   // UV units, ~0.23 world: past this it swims
-const float WOC_PARALLAX_MID = 0.45;     // luma that reads as the unmoved surface
-// Splat-weighted albedo luma as a height proxy, at the same tiling the albedo
-// itself uses so the relief lands on the features you can see. Sand and snow
-// contribute the flat mid value: dunes and drifts have no clods to displace.
+//
+// The previous proxy used splat albedo luminance centred on 0.45 — but the
+// albedo samplers are sRGB, so the shader receives LINEAR values whose real
+// means are 0.06-0.18. The 0.28-0.39 DC bias ate the whole parallax clamp:
+// at the default chase-camera pitch, dirt and rock produced a constant UV
+// slide with zero relief modulation. The AO channels below are centred on
+// their measured means instead, so the signal is zero-mean by construction —
+// and mip averaging returns it to zero with distance, fading both parallax
+// and cavity out for free.
+// One clod-scale step toward the sun in ground-UV space, inlined into the
+// micro-shadow branch at material build (tuv = xz * 0.22 maps +uv straight
+// onto +world-xz, so the sun azimuth needs no basis change).
+const SUN_UV_STEP = (() => {
+  const h = Math.hypot(SUN_DIR.x, SUN_DIR.z) || 1;
+  return {
+    x: ((SUN_DIR.x / h) * 0.016).toFixed(5),
+    y: ((SUN_DIR.z / h) * 0.016).toFixed(5),
+  };
+})();
+
+const GROUND_RELIEF_GLSL = /* glsl */ `
+const float WOC_PARALLAX_SCALE = 0.14;
+const float WOC_PARALLAX_CLAMP = 0.04;   // UV units, ~0.18 world: past this it swims
 float wocGroundHeight(vec2 uv, vec4 sw) {
-  const vec3 L = vec3(0.2126, 0.7152, 0.0722);
-  return dot(texture2D(uGrass, uv).rgb, L) * sw.x
-       + dot(texture2D(uDirt, uv * 0.8).rgb, L) * sw.y
-       + dot(texture2D(uRock, uv * 0.6).rgb, L) * sw.z
-       + WOC_PARALLAX_MID * sw.w;
+  vec4 aoBase = texture2D(uGroundAO, uv);      // grass + sand share the base tiling
+  float aoDirt = texture2D(uGroundAO, uv * 0.8).g;
+  float aoRock = texture2D(uGroundAO, uv * 0.6).b;
+  return (aoBase.r - 0.812) * sw.x
+       + (aoDirt - 0.814) * sw.y
+       + (aoRock - 0.892) * sw.z
+       + (aoBase.a - 0.883) * sw.w;
+}
+// Coarse soil-clump octave, one repeat per ~28 yards. The fine cavity above
+// lives at the texture's native tiling, where mip averaging pulls it to zero
+// within chase-camera distance — this octave's features are ~6x larger, so
+// they keep shading the mid-field where the player actually looks. Uses the
+// dirt channel for every layer: grass's own AO is near-uniform (sd 0.018),
+// and BSL-style ground reads come from soil structure under the grass, not
+// from the grass sheet itself.
+float wocGroundMacroRelief(vec2 uv) {
+  return texture2D(uGroundAO, uv * 0.16).g - 0.814;
 }
 `;
 
@@ -401,6 +434,7 @@ function buildSplatMaterial(
       uMud: { value: t.mudC },
       uSnow: { value: t.snowC },
       uMacro: { value: macro },
+      uGroundAO: { value: t.groundAO },
     });
     sh.vertexShader = sh.vertexShader
       .replace(
@@ -429,8 +463,8 @@ function buildSplatMaterial(
         varying vec4 vExtra;
         varying vec3 vWPos;
         varying vec3 vWNorm;
-        uniform sampler2D uGrass, uGrassN, uDirt, uDirtN, uRock, uRockN, uSand, uSandN, uMud, uSnow, uMacro;
-        ${GROUND_PARALLAX_GLSL}
+        uniform sampler2D uGrass, uGrassN, uDirt, uDirtN, uRock, uRockN, uSand, uSandN, uMud, uSnow, uMacro, uGroundAO;
+        ${GROUND_RELIEF_GLSL}
         ${BRUSH_RING_GLSL}`,
       )
       .replace(
@@ -443,19 +477,20 @@ function buildSplatMaterial(
         `
         vec2 tuv = vWPos.xz * 0.22;
         // Offset parallax: slide the ground UVs along the view ray by the
-        // albedo height proxy, so the painted clods and stones stand up at
+        // AO height proxy, so the painted clods and stones stand up at
         // grazing angles instead of reading as a decal on flat ground. Rock and
-        // dirt carry it hardest, grass takes a light pass, sand and snow none.
-        // Faded by slope (planar-XZ UVs stretch on cliffs, the same reason the
-        // detail normals fade below) and by distance, where mips have averaged
-        // the relief away and an offset would only shimmer. Everything below
+        // dirt carry it hardest, grass and sand take a light pass. Faded by
+        // slope (planar-XZ UVs stretch on cliffs, the same reason the detail
+        // normals fade below) and by distance, where mips have averaged the
+        // relief away and an offset would only shimmer. Everything below
         // reuses tuv, so the detail normals follow the same height proxy and
         // lighting agrees with the displacement.
         vec3 pRay = cameraPosition - vWPos;
         float pDist = length(pRay);
-        float pRelief = (vSplat.x * 0.45 + vSplat.y + vSplat.z * 0.85)
+        float upW = normalize(vWNorm).y;
+        float pRelief = (vSplat.x * 0.55 + vSplat.y + vSplat.z * 0.9 + vSplat.w * 0.35)
           * (1.0 - vExtra.y)
-          * smoothstep(0.55, 0.85, normalize(vWNorm).y)
+          * smoothstep(0.55, 0.85, upW)
           * (1.0 - smoothstep(16.0, 44.0, pDist));
         if (pRelief > 0.015) {
           // planar-XZ UVs put the tangent frame on world x/z with world y as
@@ -463,18 +498,50 @@ function buildSplatMaterial(
           // floor is the grazing-angle limiter (an unclamped 1/y diverges)
           vec2 pDir = pRay.xz / max(pRay.y, pDist * 0.3);
           vec2 pOff = clamp(
-            pDir * (wocGroundHeight(tuv, vSplat) - WOC_PARALLAX_MID) * WOC_PARALLAX_SCALE * pRelief,
+            pDir * wocGroundHeight(tuv, vSplat) * WOC_PARALLAX_SCALE * pRelief,
             -WOC_PARALLAX_CLAMP, WOC_PARALLAX_CLAMP);
           ${
-            GFX.tier === 'high' || GFX.tier === 'ultra'
+            GFX.tier === 'ultra'
               ? `// second iteration: re-read the height where the first offset
           // landed, which keeps steep clod edges from overshooting
           pOff = clamp(
-            pDir * (wocGroundHeight(tuv + pOff, vSplat) - WOC_PARALLAX_MID) * WOC_PARALLAX_SCALE * pRelief,
+            pDir * wocGroundHeight(tuv + pOff, vSplat) * WOC_PARALLAX_SCALE * pRelief,
             -WOC_PARALLAX_CLAMP, WOC_PARALLAX_CLAMP);`
               : ''
           }
           tuv += pOff;
+        }
+        // Cavity shading: the same zero-mean AO signal, applied to the diffuse
+        // directly. Unlike the parallax it is view-independent, so the clods
+        // and stones still read from the high pitched-down chase camera where
+        // a grazing-angle offset does nothing. Mip averaging pulls the signal
+        // to zero with distance, so the far field keeps its painted colour.
+        float cavH = wocGroundHeight(tuv, vSplat);
+        float cavW = (1.0 - vExtra.y) * smoothstep(0.35, 0.7, upW);
+        // fine pores + coarse soil clumps: the macro octave carries the read
+        // out past the distance where mips flatten the fine one, and grass
+        // (whose own AO sheet is near-uniform) takes it at full weight so
+        // meadows undulate instead of rendering as one green wash
+        float relief = cavH * 3.4 + wocGroundMacroRelief(tuv) * (0.5 + vSplat.x * 0.5) * 2.8;
+        // turf lip: where grass feathers into bare soil (roads, patches),
+        // shade the transition band so paths sit INTO the meadow as worn
+        // hollows instead of lying on it as paint
+        float rim = vSplat.y * (1.0 - vSplat.y) * 4.0;
+        float groundShade = mix(1.0, clamp(1.0 + relief, 0.42, 1.25) * (1.0 - rim * 0.16), cavW);
+        ${
+          GFX.tier === 'ultra'
+            ? `// micro sun-shadow: terrain never casts real shadows at any
+        // scale, so march the height proxy two steps toward the sun and shade
+        // texels whose sunward neighbourhood sits higher — clod-scale
+        // self-shadowing that gives the relief a lit and a shade side.
+        {
+          vec2 sunStep = vec2(${SUN_UV_STEP.x}, ${SUN_UV_STEP.y});
+          float occl = max(
+            wocGroundHeight(tuv + sunStep, vSplat) - cavH - 0.02,
+            (wocGroundHeight(tuv + sunStep * 2.2, vSplat) - cavH) * 0.55 - 0.02);
+          groundShade *= 1.0 - min(max(occl, 0.0) * 4.5, 0.42) * cavW;
+        }`
+            : ''
         }
         // grass blends two scales so the 1K photo source never reads as tile
         vec3 grassAlb = mix(texture2D(uGrass, tuv).rgb, texture2D(uGrass, tuv * 0.31).rgb, 0.42);
@@ -513,7 +580,7 @@ function buildSplatMaterial(
         // (vColor was authored as a full sRGB ground color, so re-centre it
         // around 1.0 before using it as a multiplier.)
         vec3 vtint = clamp(vColor.rgb * 2.0, 0.0, 2.0);
-        diffuseColor.rgb *= alb * mix(vec3(1.0), vtint, 0.35) * macro;`,
+        diffuseColor.rgb *= alb * mix(vec3(1.0), vtint, 0.35) * macro * groundShade;`,
       )
       .replace(
         '#include <color_fragment>',
@@ -550,11 +617,22 @@ function buildSplatMaterial(
         vec2 fineSoft = texture2D(uGrassN, tuv * 4.0).xy * 2.0 - 1.0;
         // wet mud lumps smoothly where dry dirt crumbles
         float dirtDetail = 1.0 - vExtra.x * 0.35;
-        vec2 detN = (gN.xy + fineSoft * 0.55) * vSplat.x * 0.85
-                  + (dN.xy + fineHard * 0.55) * vSplat.y * 1.25 * dirtDetail
-                  + (rN.xy + fineHard * 0.55) * vSplat.z * 1.35 * (1.0 - wallW)
-                  + (sN.xy + fineSoft * 0.55) * vSplat.w * 0.55;
+        vec2 detN = (gN.xy + fineSoft * 0.75) * vSplat.x * 1.15
+                  + (dN.xy + fineHard * 0.75) * vSplat.y * 1.45 * dirtDetail
+                  + (rN.xy + fineHard * 0.75) * vSplat.z * 1.35 * (1.0 - wallW)
+                  + (sN.xy + fineSoft * 0.75) * vSplat.w * 0.8;
         detN *= 1.0 - vExtra.y * 0.7; // snow softens the relief beneath it
+        // recessed turf lip (see groundShade): tilt the shading normal away
+        // from the path centreline across the grass->soil feather, so the sun
+        // lights the far lip and shades the near one. The derivative gradient
+        // of the interpolated splat weight points toward increasing dirt in
+        // world space; per-triangle constancy is invisible on noisy ground.
+        float rimN = vSplat.y * (1.0 - vSplat.y) * 4.0;
+        if (rimN > 0.05) {
+          vec2 rimGrad = dFdx(vSplat.y) * dFdx(vWPos.xz) + dFdy(vSplat.y) * dFdy(vWPos.xz);
+          float rimGl = length(rimGrad);
+          if (rimGl > 1e-5) detN += (-rimGrad / rimGl) * rimN * 0.35;
+        }
         // Planar-XZ UVs stretch on steep faces and the detail normals smear
         // into vertical streaks there; fade them out by slope and let the
         // wall projection below own the cliff relief.

@@ -78,6 +78,16 @@ export interface GfxSettings {
   readonly autoGovernor: boolean;
   /** post-processing chain (N8AO + bloom + grade) */
   readonly composer: boolean;
+  /**
+   * Grade-only mini composer (RenderPass -> OutputPass -> grade) for tiers
+   * without the full chain. Costs one fullscreen pass; brings the cinematic
+   * lift/gain/vignette to medium, which otherwise renders raw ACES and reads
+   * washed-bright next to the graded tiers. Implied by `composer`; only
+   * meaningful when `composer` is false. NOTE: emissive intensities across
+   * the codebase key off `composer` (it means "bloom exists") — this flag
+   * deliberately does not change them.
+   */
+  readonly gradePass: boolean;
   /** N8AO screen-space ambient occlusion pass */
   readonly ao: boolean;
   /** MSAA samples on the composer's HalfFloat target (WebGL2) */
@@ -693,10 +703,15 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     budget: GFX_BUDGETS[tier],
     autoGovernor: shouldUseAutoGovernor(tier, hints?.search ?? ''),
     composer: !nativeIosMemoryProfile && (tier === 'high' || tier === 'ultra'),
+    gradePass:
+      !nativeIosMemoryProfile && (tier === 'medium' || tier === 'high' || tier === 'ultra'),
     // N8AO runs on both composer tiers: half-res + Low quality on high keeps
     // it ~1ms-class on real GPUs; ultra gets full-res Medium
     ao: !nativeIosMemoryProfile && (tier === 'high' || tier === 'ultra'),
-    msaaSamples: (tier === 'high' || tier === 'ultra') && !constrainedMemory ? 4 : 0,
+    // medium included: its grade-only composer target needs the MSAA storage
+    // the direct-to-canvas path used to get from the context itself
+    msaaSamples:
+      (tier === 'medium' || tier === 'high' || tier === 'ultra') && !constrainedMemory ? 4 : 0,
     pixelRatioCap: nativeIosMemoryProfile
       ? 1.25
       : constrainedMemory
@@ -766,6 +781,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
       settings = {
         ...settings,
         composer: false,
+        gradePass: false,
         ao: false,
         msaaSamples: 0,
         maxPointLights: Math.min(settings.maxPointLights, 3),
@@ -1139,7 +1155,12 @@ export const sharedUniforms = {
 // The one sun. Everything that needs the sun's position/direction (key light,
 // shadow frustum offset, sky glow lobe, water glints, god rays) reads these —
 // editing one consumer used to silently desync the others.
-export const SUN_ANCHOR = new THREE.Vector3(90, 140, 50);
+// 31° elevation (was 53.7°): a permanent late-afternoon key. Long raking
+// shadows and a standing golden warm on the light are what make the sun FELT;
+// the old near-noon angle shortened every shadow and left the world reading
+// evenly lit. Azimuth unchanged, so the per-biome HDRI sun alignment in
+// sky.ts and the water glint direction stay correct without retuning.
+export const SUN_ANCHOR = new THREE.Vector3(90, 62, 50);
 export const SUN_DIR = SUN_ANCHOR.clone().normalize();
 
 // Emissive tiers. Bloom is a luma high-pass at post.ts BLOOM_THRESHOLD (1.32)

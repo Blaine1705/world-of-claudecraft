@@ -320,11 +320,19 @@ export function groundGrassColorAt(
   out: THREE.Color,
 ): THREE.Color {
   paletteAt(x, z);
-  const v = fbm2(x * 0.045, z * 0.045, seed + 53, 3);
+  const v = groundLushnessAt(x, z, seed);
   out.copy(grassC).lerp(grassDarkC, v);
   const v2 = fbm2(x * 0.16, z * 0.16, seed + 59, 2);
   out.lerp(grassYellowC, v2 * 0.35);
   return out;
+}
+
+// The dark-patch weight of the grass palette (0 = yellowed open ground,
+// 1 = deep lush green), exposed so grass PLACEMENT can follow the same
+// noise the ground colour does: dense tall stands on the lush patches,
+// thinning to bare ground between them.
+export function groundLushnessAt(x: number, z: number, seed: number): number {
+  return fbm2(x * 0.045, z * 0.045, seed + 53, 3);
 }
 
 function sampleVertex(x: number, z: number, seed: number, lowShade: boolean): VertexSample {

@@ -48,20 +48,24 @@ const HDRI_TUNE: Record<SkyKey, { gain: number; clamp: number; contrast?: number
   // tops do not just feed the bloom smear instead
   vale: { gain: 0.6, clamp: 2.0, contrast: 1.25 },
   marsh: { gain: 0.6, clamp: 2.2 },
-  peaks: { gain: 0.48, clamp: 1.7 },
+  peaks: { gain: 0.48, clamp: 1.7, contrast: 1.15 },
   // Paint-only biomes reuse the closest shipped sky (no new HDRI downloads).
-  beach: { gain: 0.6, clamp: 2.6 },
+  beach: { gain: 0.6, clamp: 2.6, contrast: 1.15 },
   desert: { gain: 0.55, clamp: 2.2 },
   volcano: { gain: 0.5, clamp: 2.0 },
   cave: { gain: 0.55, clamp: 2.0 },
   // the five realm skies are project-generated with their moods baked in
   // (storm-dark ember, dim frost twilight), so their gains sit close to the
-  // vale's day instead of re-dimming an already-graded image
+  // vale's day instead of re-dimming an already-graded image.
+  // The day skies take the vale's contrast treatment (pivot 0.8 in the dome
+  // shader): it deepens the zenith against the horizon so the sky reads as a
+  // gradient with a sun in it rather than one flat blue; the mood-dark skies
+  // (ember, haunt, frost) are left alone so their murk stays lifted.
   dusk: { gain: 0.55, clamp: 2.2 },
   ember: { gain: 0.5, clamp: 2.0 },
   frost: { gain: 0.5, clamp: 2.0 },
-  amber: { gain: 0.55, clamp: 2.2 },
-  fen: { gain: 0.6, clamp: 2.6 },
+  amber: { gain: 0.55, clamp: 2.2, contrast: 1.1 },
+  fen: { gain: 0.6, clamp: 2.6, contrast: 1.15 },
   // the Nightbloom's dream sky is project-generated like its siblings
   night: { gain: 0.55, clamp: 2.2 },
   // the Wraithwood's storm gloom is project-generated with the darkness
@@ -69,13 +73,13 @@ const HDRI_TUNE: Record<SkyKey, { gain: number; clamp: number; contrast?: number
   haunt: { gain: 0.6, clamp: 1.8 },
   // the Palmreach's own tropical day sky (skies_in/palmreach.png), graded
   // like the fen's bright day
-  jungle: { gain: 0.62, clamp: 2.6 },
+  jungle: { gain: 0.62, clamp: 2.6, contrast: 1.15 },
   // the Evergarden's own day sky (skies_in/evergarden.png)
-  garden: { gain: 0.6, clamp: 2.6 },
+  garden: { gain: 0.6, clamp: 2.6, contrast: 1.15 },
   // the Galecrest's own storm-light sky (skies_in/galecrest.png)
-  gale: { gain: 0.6, clamp: 2.6 },
+  gale: { gain: 0.6, clamp: 2.6, contrast: 1.1 },
   // the Farshore's own day sky and the Vale Cup practice sky, graded bright
-  farshore: { gain: 0.6, clamp: 2.6 },
+  farshore: { gain: 0.6, clamp: 2.6, contrast: 1.15 },
   vale_cup: { gain: 0.6, clamp: 2.6 },
 };
 

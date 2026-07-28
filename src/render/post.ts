@@ -1,11 +1,11 @@
+import { N8AOPass } from 'n8ao';
 import * as THREE from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
-import { N8AOPass } from 'n8ao';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { GFX, sharedUniforms } from './gfx';
 
 // Post chain: RenderPass -> N8AO (high: half-res Low, ultra: full-res Medium)
@@ -57,7 +57,7 @@ const GradeShader = {
       // Dimension comes from the tone curve, not from chroma: a gentle S around
       // the midtones separates lit from shaded so the grade can stay near
       // neutral saturation instead of pushing colour to fake depth.
-      c = mix(c, c * c * (3.0 - 2.0 * c), 0.14);
+      c = mix(c, c * c * (3.0 - 2.0 * c), 0.18);
       float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
       c = mix(vec3(l), c, 1.09);                                  // saturation
       vec2 d = vUv - 0.5;
@@ -70,7 +70,7 @@ const GradeShader = {
 
 export interface PostPipeline {
   composer: EffectComposer;
-  bloom: UnrealBloomPass;
+  bloom: UnrealBloomPass | null; // null on the grade-only path
   ao: N8AOPass | null;
   grade: ShaderPass;
   setSize(width: number, height: number): void;
@@ -83,19 +83,26 @@ export function buildComposer(
   camera: THREE.Camera,
   width: number,
   height: number,
+  opts?: { gradeOnly?: boolean },
 ): PostPipeline {
+  // Grade-only mini chain for the medium tier: RenderPass -> OutputPass ->
+  // GradePass, one fullscreen pass over the direct path. No AO, no bloom, no
+  // SMAA — but the display-space grade (lift/gain/S-curve/vignette) is what
+  // separates "cinematic" from "raw ACES wash", and medium was the only
+  // daylight tier shipping without it.
+  const gradeOnly = opts?.gradeOnly === true;
   const size = webgl.getDrawingBufferSize(new THREE.Vector2());
   // HDR target; HalfFloat keeps >1 colors for bloom. MSAA only helps when a
   // RenderPass draws the scene into this target — with N8AO that never
   // happens, so skip the multisample storage + resolve cost there.
   const target = new THREE.WebGLRenderTarget(size.x, size.y, {
-    samples: webgl.capabilities.isWebGL2 && !GFX.ao ? GFX.msaaSamples : 0,
+    samples: webgl.capabilities.isWebGL2 && !(GFX.ao && !gradeOnly) ? GFX.msaaSamples : 0,
     type: THREE.HalfFloatType,
   });
   const composer = new EffectComposer(webgl, target);
 
   let ao: N8AOPass | null = null;
-  if (GFX.ao) {
+  if (GFX.ao && !gradeOnly) {
     // N8AOPass REPLACES RenderPass: it renders the scene into its own
     // HalfFloat beauty+depth target (a separate RenderPass would be a
     // discarded full scene draw). Trade-off: the composer's MSAA target
@@ -108,8 +115,11 @@ export function buildComposer(
     ao.configuration.distanceFalloff = 3.6;
     // 2.4 crushed every dense alphaTest card cluster (grass tufts, sapling
     // canopies) to a black clump: overlapping cards read as deep cavities at
-    // this radius. 1.0 keeps contact grounding without voiding vegetation.
-    ao.configuration.intensity = 1.0;
+    // this radius. 1.0 fixed that but also removed the canopy interior depth;
+    // 1.45 restores contact grounding and inner-canopy shadowing now that
+    // leaf albedo is back at authored levels (the black-clump look was the
+    // AO multiplying an already-dark un-lifted atlas, not the AO alone).
+    ao.configuration.intensity = 1.45;
     // mid-chain: the buffer must stay linear for bloom/OutputPass (autoset
     // guesses from renderToScreen, but be explicit — a gamma-lifted frame
     // here washes the whole image out)
@@ -133,8 +143,11 @@ export function buildComposer(
     composer.addPass(new RenderPass(scene, camera));
   }
 
-  const bloom = new UnrealBloomPass(size.clone(), BLOOM_STRENGTH, BLOOM_RADIUS, BLOOM_THRESHOLD);
-  composer.addPass(bloom);
+  let bloom: UnrealBloomPass | null = null;
+  if (!gradeOnly) {
+    bloom = new UnrealBloomPass(size.clone(), BLOOM_STRENGTH, BLOOM_RADIUS, BLOOM_THRESHOLD);
+    composer.addPass(bloom);
+  }
   composer.addPass(new OutputPass());
 
   const grade = new ShaderPass(GradeShader);

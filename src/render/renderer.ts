@@ -449,11 +449,18 @@ const SELF_MOTION_HANDOFF_RATE = 15;
 // dome.
 // composer tiers get the full key/fill contrast (the grade lifts their
 // shadows); without the composer the same fill crushes shaded timber to
-// near-black, so non-composer tiers ride a higher floor.
+// near-black, so non-composer tiers ride a higher floor. The grade-only
+// medium tier sits between: its grade supplies the shadow lift but it has
+// no AO/bloom softening the extremes.
 const HEMI_INTENSITY_COMPOSER = 0.33;
+const HEMI_INTENSITY_GRADE = 0.37;
 const HEMI_INTENSITY_FLAT = 0.42;
 const hemiOutdoorIntensity = (): number =>
-  GFX.composer ? HEMI_INTENSITY_COMPOSER : HEMI_INTENSITY_FLAT;
+  GFX.composer
+    ? HEMI_INTENSITY_COMPOSER
+    : GFX.gradePass
+      ? HEMI_INTENSITY_GRADE
+      : HEMI_INTENSITY_FLAT;
 const SUN_INTENSITY = 3.1;
 const ENV_INTENSITY = 0.45;
 // dungeon interiors: kill the daylight so torchlight carries the scene
@@ -1562,7 +1569,7 @@ export class Renderer {
       this.captureGlIdentity();
     });
     initGfxTier(this.webgl); // software-GL autodetect needs the live context
-    if (GFX.composer) {
+    if (GFX.composer || GFX.gradePass) {
       // three r165's render() resets info per pass (after the shadow pass, see
       // draw_stats_core.ts header), so with the composer's multiple passes every
       // post-frame reader saw only the final fullscreen pass (1 call/1 triangle).
@@ -1601,7 +1608,11 @@ export class Renderer {
       this.webgl.debug.checkShaderErrors = false;
     }
     this.webgl.shadowMap.enabled = GFX.dynamicShadows;
-    this.webgl.shadowMap.type = THREE.PCFSoftShadowMap;
+    // PCF (not PCFSoft): in three 0.165 shadow.radius is only honoured by the
+    // plain PCF kernel — PCFSoft ignores it and uses a fixed texel-sized
+    // kernel, so the sun's radius=3 softening was silently a no-op and every
+    // shadow edge rendered near-hard regardless of tuning.
+    this.webgl.shadowMap.type = THREE.PCFShadowMap;
     this.webgl.toneMapping = THREE.ACESFilmicToneMapping; // OutputPass reads this on the composer path
     this.webgl.toneMappingExposure = this.baseExposure;
     // Only worth gating view draws on compileAsync when programs can link OFF the
@@ -1695,7 +1706,11 @@ export class Renderer {
       this.scene.environmentIntensity = this.envOutdoorIntensity;
     }
 
-    const hemi = new THREE.HemisphereLight(0xdcefff, 0x465f39, LOW_GFX ? 0.98 : hemiOutdoorIntensity());
+    const hemi = new THREE.HemisphereLight(
+      0xdcefff,
+      0x465f39,
+      LOW_GFX ? 0.98 : hemiOutdoorIntensity(),
+    );
     this.scene.add(hemi);
     this.hemi = hemi;
     // Golden key light: warmer than the old near-white cream so daylight reads
@@ -1709,16 +1724,21 @@ export class Renderer {
     sun.shadow.mapSize.set(GFX.shadowMap, GFX.shadowMap);
     sun.shadow.camera.near = 30;
     sun.shadow.camera.far = 480;
-    // 95u half-extent: the whole mid-ground shadows (a 50u box left every
-    // tree/house past it on uniformly lit grass); ~4.6cm texels at 4096
-    const S = LOW_GFX ? 75 : 95;
+    // 105u half-extent: the 31° sun throws shadows ~1.7x an object's height,
+    // so the frustum must reach further sunward than the old 95 to catch
+    // off-screen casters; ~5.1cm texels at 4096, which the PCF radius below
+    // softens over anyway. (115 cost real shadow-pass draw calls at ultra;
+    // 105 keeps most of the reach.)
+    const S = LOW_GFX ? 85 : 105;
     sun.shadow.camera.left = -S;
     sun.shadow.camera.right = S;
     sun.shadow.camera.top = S;
     sun.shadow.camera.bottom = -S;
     sun.shadow.bias = -0.0006;
-    sun.shadow.normalBias = LOW_GFX ? 0.02 : 0.05;
-    sun.shadow.radius = 2.5;
+    // 0.05 pushed contact shadows clean off clod/prop-scale relief; 0.035
+    // still clears acne on the low-poly facets
+    sun.shadow.normalBias = LOW_GFX ? 0.02 : 0.035;
+    sun.shadow.radius = 3;
     this.scene.add(sun);
     this.scene.add(sun.target);
     this.sun = sun;
@@ -2187,14 +2207,17 @@ export class Renderer {
     // ambient precipitation: biome-driven snow/rain that rides with the camera
     this.weather = new Weather(this.scene, this.lowGfx);
 
-    // post chain (bloom + grade, GTAO on ultra); low renders direct
-    if (GFX.composer)
+    // post chain (bloom + grade, GTAO on ultra); medium gets the grade-only
+    // mini chain so the cinematic grade stops being a high-tier privilege;
+    // low renders direct
+    if (GFX.composer || GFX.gradePass)
       this.post = buildComposer(
         this.webgl,
         this.scene,
         this.camera,
         this.viewport.width,
         this.viewport.height,
+        { gradeOnly: !GFX.composer },
       );
 
     const resize = () => this.resizeViewport();
@@ -6008,13 +6031,18 @@ export class Renderer {
     // The blue-sky biomes carry a deeper sky-blue haze (the old paler values
     // tonemapped to near white, so fully fogged distant trees and zones read
     // as white cutouts against the HDRI sky instead of far-off silhouettes).
-    vale: { color: 0x7095bd, near: 55, far: MAX_OUTDOOR_FOG_FAR },
+    // 700 (not the 850 cap) on the open blue-sky realms: at 850 the last
+    // visible hills sat almost fully outside the haze and the horizon read
+    // cutout-crisp — the same saturation at 400 yd as at 40. 700 puts real
+    // aerial perspective on the far third while costing nothing near (and
+    // fog-far drives culling, so the trim is a small draw-count win too).
+    vale: { color: 0x7095bd, near: 55, far: 700 },
     // pale sage matched to the marsh horizon sky: the dome renders fog-free,
     // so a darker murk left every fully fogged silhouette as a cutout band
     marsh: { color: 0xc2cbb6, near: 75, far: 165 },
-    peaks: { color: 0x8bb0d4, near: 55, far: MAX_OUTDOOR_FOG_FAR },
-    beach: { color: 0x7ea6c9, near: 50, far: MAX_OUTDOOR_FOG_FAR },
-    desert: { color: 0xd8c9a8, near: 50, far: MAX_OUTDOOR_FOG_FAR },
+    peaks: { color: 0x8bb0d4, near: 55, far: 700 },
+    beach: { color: 0x7ea6c9, near: 50, far: 700 },
+    desert: { color: 0xd8c9a8, near: 50, far: 700 },
     volcano: { color: 0x8a7468, near: 60, far: 145 },
     cave: { color: 0x76807c, near: 48, far: 125 },
     // permanent dusk: rose-mauve murk, the realm's signature
@@ -6026,17 +6054,21 @@ export class Renderer {
     // the Amberfall: warm golden haze under an endless afternoon
     amber: { color: 0xdec18e, near: 130, far: 430 },
     // the Willowfen: clear airy morning, the lightest fog in the world
-    fen: { color: 0xcfe2dc, near: 140, far: 510 },
-    // the Nightbloom: a soft lavender dream-haze over the violet downs
-    night: { color: 0xbfb0e8, near: 130, far: 495 },
+    // (deepened from 0xcfe2dc: the near-white haze tonemapped to a white
+    // cutout band on the horizon instead of reading as distance — same
+    // lesson as the blue-sky biomes above)
+    fen: { color: 0xb7d0c6, near: 140, far: 510 },
+    // the Nightbloom: a lavender dream-haze over the violet downs, deepened
+    // to twilight with the realm's new dimmed light level
+    night: { color: 0x8d7fc0, near: 110, far: 460 },
     // the Wraithwood: dead-grey murk, the tightest sightlines outdoors
     haunt: { color: 0x454c46, near: 85, far: 265 },
     // the Palmreach: bright humid haze, the clearest air in the world
-    jungle: { color: 0xd6efe2, near: 165, far: 600 },
+    jungle: { color: 0xc2e0d0, near: 165, far: 600 },
     // the Evergarden: crystal parkland air with the faintest green cast
-    garden: { color: 0xdcefdc, near: 175, far: 630 },
+    garden: { color: 0xc6ddc6, near: 175, far: 630 },
     // the Galecrest: scrubbed salt air, dawn-lit haze off the sea
-    gale: { color: 0xe2dee4, near: 170, far: 645 },
+    gale: { color: 0xccc9d8, near: 170, far: 645 },
   };
   // Low tier trades view distance for draw count (its own perf knob, never a
   // gameplay one: entities draw within their own much shorter ranges on every
@@ -6048,10 +6080,20 @@ export class Renderer {
   // Per-biome outdoor light grade, eased alongside fog in updateAmbience.
   // The three original biomes keep the exact constants the lights were
   // created with; the dusk realm warms the sun to late-evening orange and
-  // turns the sky bounce rose over violet ground.
+  // turns the sky bounce rose over violet ground. The optional sun/hemi/env
+  // scales multiply the rig intensities, so a realm's mood can finally live
+  // in light LEVEL as well as hue (gloom via color luminance alone left the
+  // Nightbloom's canopies rendering in full daylight green).
   private static BIOME_LIGHT: Record<
     BiomeId,
-    { hemiSky: number; hemiGround: number; sun: number }
+    {
+      hemiSky: number;
+      hemiGround: number;
+      sun: number;
+      sunScale?: number;
+      hemiScale?: number;
+      envScale?: number;
+    }
   > = {
     vale: { hemiSky: 0xdcefff, hemiGround: 0x465f39, sun: 0xffedd0 },
     marsh: { hemiSky: 0xdcefff, hemiGround: 0x465f39, sun: 0xffedd0 },
@@ -6061,12 +6103,21 @@ export class Renderer {
     frost: { hemiSky: 0x9cb6d6, hemiGround: 0x66748a, sun: 0xccdaea },
     amber: { hemiSky: 0xffe2b0, hemiGround: 0x5a4a30, sun: 0xffc86a },
     fen: { hemiSky: 0xdceeff, hemiGround: 0x51704e, sun: 0xfff0d2 },
-    // the Nightbloom: dreamlight. A rose-white sun over lavender sky bounce
-    // and deep violet ground, bright as day but nothing like it
-    night: { hemiSky: 0xd8ccff, hemiGround: 0x564a80, sun: 0xffe6f0 },
-    // the Wraithwood: sickly grey light strangled by the canopy (the rig has
-    // no intensity knob, so the gloom lives in the color luminance)
-    haunt: { hemiSky: 0x4d564c, hemiGround: 0x0e120e, sun: 0x6e7a66 },
+    // the Nightbloom: dreamlight. A cool rose sun over lavender sky bounce
+    // and deep violet ground — luminous, but at a twilight level: at full
+    // day strength its canopies and downs rendered in ordinary daylight
+    // green under the starfield sky
+    night: {
+      hemiSky: 0xc0b2f0,
+      hemiGround: 0x463a6e,
+      sun: 0xe6d4ff,
+      sunScale: 0.6,
+      hemiScale: 0.95,
+      envScale: 0.7,
+    },
+    // the Wraithwood: sickly grey light strangled by the canopy — dim as
+    // well as grey now that the rig has an intensity knob
+    haunt: { hemiSky: 0x4d564c, hemiGround: 0x0e120e, sun: 0x6e7a66, sunScale: 0.8, envScale: 0.8 },
     // the Palmreach: hard tropical daylight over deep green bounce
     jungle: { hemiSky: 0xeafcff, hemiGround: 0x3a6a42, sun: 0xfff4d8 },
     // the Evergarden: soft perfect afternoon over clipped lawns
@@ -6079,7 +6130,7 @@ export class Renderer {
     beach: { hemiSky: 0xdcefff, hemiGround: 0x465f39, sun: 0xffedd0 },
     desert: { hemiSky: 0xffe2b0, hemiGround: 0x5a4a30, sun: 0xffc86a },
     volcano: { hemiSky: 0xe89070, hemiGround: 0x422424, sun: 0xff7440 },
-    cave: { hemiSky: 0x4d564c, hemiGround: 0x0e120e, sun: 0x6e7a66 },
+    cave: { hemiSky: 0x4d564c, hemiGround: 0x0e120e, sun: 0x6e7a66, sunScale: 0.8, envScale: 0.8 },
   };
 
   private outdoorFogPreset(): { color: number; near: number; far: number } {
@@ -6193,14 +6244,30 @@ export class Renderer {
     // Nightbloom, the Veiled Hollow, ...) keep their look instead of gaining a
     // hard noon sun. The moon keeps a higher floor since it suits most realms.
     const amp = REALM_DAYNIGHT_AMPLITUDE[biome];
-    const sd = sunDirection(phase);
-    const md = moonDirection(phase);
-    this.sunDir.set(sd[0], sd[1], sd[2]);
-    this.moonDir.set(md[0], md[1], md[2]);
-    this.sunUp = aboveHorizon(sd[1]) * amp;
-    this.moonUp = aboveHorizon(md[1]) * Math.max(amp, 0.6);
-    // stars follow the global cycle (not per-realm), fading in past dusk
-    this.starAmt = nightStarAmount(gday);
+    if (DAY_ONLY && dayNightPhaseOverride() === null) {
+      // DAY ONLY pins the GRADE above, but the sun DIRECTION used to keep
+      // riding the real 12-hour clock: at world-night the key light eased to
+      // the moon's azimuth at full daylight strength with both the golden and
+      // moonlight color ramps gated to zero — flat white light from an
+      // arbitrary angle, different depending on when the player logs in. Pin
+      // the whole celestial rig to the golden anchor instead, so the authored
+      // late-afternoon key (long shadows, standing warm) is a constant and
+      // the water glints / sky-dome sun stay aligned by construction.
+      this.sunDir.copy(SUN_DIR);
+      this.moonDir.set(0, -1, 0);
+      this.sunUp = aboveHorizon(SUN_DIR.y) * amp;
+      this.moonUp = 0;
+      this.starAmt = 0; // signature night skies (Nightbloom) live in their HDRIs
+    } else {
+      const sd = sunDirection(phase);
+      const md = moonDirection(phase);
+      this.sunDir.set(sd[0], sd[1], sd[2]);
+      this.moonDir.set(md[0], md[1], md[2]);
+      this.sunUp = aboveHorizon(sd[1]) * amp;
+      this.moonUp = aboveHorizon(md[1]) * Math.max(amp, 0.6);
+      // stars follow the global cycle (not per-realm), fading in past dusk
+      this.starAmt = nightStarAmount(gday);
+    }
     if (isDelvePos(px) && !inPractice) {
       this.ensureDelveInteriorsNear(px, pz);
     } else if (inside && isYumiMazePos(px)) {
@@ -6525,7 +6592,10 @@ export class Renderer {
       let hi = (sunElev - 0.08) / 0.5;
       hi = hi < 0 ? 0 : hi > 1 ? 1 : hi;
       const lowness = 1 - hi * hi * (3 - 2 * hi);
-      const warmAmt = aboveHorizon(sunElev) * (0.34 + lowness * 0.45);
+      // 0.42 base: with the key pinned at 31° the warm never ramps through
+      // the old near-horizon band, so the standing gold has to come from the
+      // base term — this is the golden-hour read at the permanent day angle
+      const warmAmt = aboveHorizon(sunElev) * (0.42 + lowness * 0.45);
       this.dnColorScratch.setHex(light.sun);
       this.dnColorScratch.lerp(this.dnMoonScratch.setHex(WARM_SUN_COLOR), warmAmt);
       this.dnColorScratch.lerp(
@@ -6543,8 +6613,10 @@ export class Renderer {
         .setHex(light.hemiGround)
         .lerp(this.dnMoonScratch.setHex(MOON_HEMI_GROUND_COLOR), g.nightAmt * NIGHT_HEMI_COOL);
       this.hemi.groundColor.lerp(this.dnColorScratch, k);
-      this.sun.intensity += (SUN_INTENSITY * g.lightScale - this.sun.intensity) * k;
-      this.hemi.intensity += (hemiOutdoorIntensity() * g.lightScale - this.hemi.intensity) * k;
+      this.sun.intensity +=
+        (SUN_INTENSITY * g.lightScale * (light.sunScale ?? 1) - this.sun.intensity) * k;
+      this.hemi.intensity +=
+        (hemiOutdoorIntensity() * g.lightScale * (light.hemiScale ?? 1) - this.hemi.intensity) * k;
     }
   }
 
@@ -6555,15 +6627,26 @@ export class Renderer {
     if (this.lowGfx || this.envRTs.size < 2) return;
     const blend = this.skyView.biomeAt(this.camera.position.x, this.camera.position.z);
     const dominant = blend.t < 0.5 ? blend.from : blend.to;
+    // the biome's light-level scale applies to the IBL too, or a dimmed realm
+    // (Nightbloom twilight) would keep full-daylight ambient from its HDRI.
+    // `dominant` is a SkyKey: the place-keyed skies (farshore, vale_cup) have
+    // no BIOME_LIGHT row and take the neutral 1.
+    const envScale =
+      dominant in Renderer.BIOME_LIGHT
+        ? (Renderer.BIOME_LIGHT[dominant as BiomeId].envScale ?? 1)
+        : 1;
     if (dominant !== this.envBiome && this.envRTs.has(dominant)) {
       this.envBiome = dominant;
       this.scene.environment = this.envRTs.get(dominant)?.texture ?? null;
       this.scene.environmentRotation.y = this.skyView.envRotationY(dominant);
-      this.scene.environmentIntensity = this.envOutdoorIntensity * 0.4 * this.dnGrade.lightScale;
+      this.scene.environmentIntensity =
+        this.envOutdoorIntensity * 0.4 * this.dnGrade.lightScale * envScale;
     }
     const k = 1 - Math.exp(-dt * 1.5);
     this.scene.environmentIntensity +=
-      (this.envOutdoorIntensity * this.dnGrade.lightScale - this.scene.environmentIntensity) * k;
+      (this.envOutdoorIntensity * this.dnGrade.lightScale * envScale -
+        this.scene.environmentIntensity) *
+      k;
   }
 
   // Aim the key light (sun by day, moon by night) at the player. On the low tier

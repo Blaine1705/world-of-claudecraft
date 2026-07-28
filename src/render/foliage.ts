@@ -56,7 +56,7 @@ import {
   parterreFlowerTintAt,
 } from './garden_parterre_core';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
-import { groundGrassColorAt } from './terrain_chunk_build';
+import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 import { type FlowerKind, flowerTuftTexture, grassTuftTexture } from './textures';
 
 // Vegetation: trees, rocks, ground dressing and the grass ring.
@@ -120,11 +120,13 @@ const GRASS_CHUNK_CACHE_LIMIT_LOW = 96;
 const GRASS_CHUNK_CACHE_LIMIT_HIGH = 128;
 const TREE_WIND_STRENGTH = 0.08;
 const GRASS_WIND_STRENGTH = 0.16;
-// how far leaf normals bend toward world up (see addWind); 0 keeps the raw
-// canopy normals and their crushed-black backlit sides. This is the lit-side
-// half of the ambient-floor tradeoff: it lifts shaded leaves through the sky
-// term (which the sun still overrides) rather than through constant emissive.
-const LEAF_UP_NORMAL_BLEND = 0.62;
+// how far leaf normals bend toward the canopy-sphere direction (see addWind);
+// 0 keeps the raw card normals and their crushed-black backlit sides. The old
+// straight-up bend at this strength pulled every leaf to the same near-peak
+// N·L under a high sun and flattened whole canopies into one value; the
+// sphere target keeps the shaded side lit through the sky term while giving
+// the canopy a real lit side and shade side.
+const LEAF_UP_NORMAL_BLEND = 0.7;
 // two x-halves x 240u z-bands: bucket count x variants-per-bucket is the
 // foliage draw budget — see the perBucket caps in the species specs
 const BUCKET_DEPTH = 240;
@@ -540,18 +542,33 @@ function addWind(mat: THREE.Material, strength: number, upNormalBlend = 0): void
     sh.uniforms.uTime = sharedUniforms.uTime;
     sh.uniforms.uWindStrength = { value: GFX.windSway ? strength : 0 };
     sh.uniforms.uUpNormalBlend = { value: upNormalBlend };
+    // canopy pivot accumulated from the leaf parts' bounding boxes during
+    // extraction (userData is final by first render, which is when this runs)
+    const pivot = mat.userData as { canopyPivotSum?: number; canopyPivotN?: number };
+    sh.uniforms.uCanopyPivotY = {
+      value: pivot.canopyPivotN ? (pivot.canopyPivotSum ?? 0) / pivot.canopyPivotN : 0,
+    };
     sh.vertexShader = sh.vertexShader
       .replace(
         '#include <common>',
         `#include <common>
         uniform float uTime;
         uniform float uWindStrength;
-        uniform float uUpNormalBlend;`,
+        uniform float uUpNormalBlend;
+        uniform float uCanopyPivotY;`,
       )
       .replace(
         '#include <beginnormal_vertex>',
         `#include <beginnormal_vertex>
-        objectNormal = normalize(mix(objectNormal, vec3(0.0, 1.0, 0.0), uUpNormalBlend));`,
+        // Bend leaf normals toward the direction from the canopy pivot
+        // through the vertex, biased upward. The canopy then shades as a lit
+        // volume — sun side bright, shade side dimming through the sky term —
+        // where a straight-up bend gave every card the same N·L and flattened
+        // the whole tree to one value. Model-local position: tree base at the
+        // origin, so no instance transform is needed for the pivot.
+        vec3 canopyRad = vec3(position.x, (position.y - uCanopyPivotY) * 0.75 + 0.55, position.z);
+        vec3 canopyDir = canopyRad / max(length(canopyRad), 1e-4);
+        objectNormal = normalize(mix(objectNormal, canopyDir, uUpNormalBlend));`,
       )
       .replace(
         '#include <begin_vertex>',
@@ -651,6 +668,9 @@ function foliageMaterial(
         metalness: 0,
       })
     : new THREE.MeshLambertMaterial(common);
+  // keep the source material's name: the albedo-lift loops and the canopy
+  // pivot accumulation both key off it after the rebuild
+  mat.name = src.name;
   const upBlend = pol.leaf ? LEAF_UP_NORMAL_BLEND : 0;
   if (pol.windMul > 0 || upBlend > 0) addWind(mat, TREE_WIND_STRENGTH * pol.windMul, upBlend);
   if (pol.leaf && std.map) {
@@ -718,6 +738,20 @@ function extractParts(url: string): ModelPart[] {
     });
   });
   if (parts.length === 0) throw new Error(`foliage model has no meshes: ${url}`);
+  // Accumulate the canopy pivot (mean leaf-bbox centre) on the shared
+  // material for the sphere-normal bend in addWind. Materials are shared per
+  // (role, name) across a species' GLB variants, so the pivot is a running
+  // average over every variant that uses the sheet — close enough for a
+  // shading direction.
+  for (const part of parts) {
+    if (!part.isLeaf) continue;
+    part.geometry.computeBoundingBox();
+    const bb = part.geometry.boundingBox;
+    if (!bb) continue;
+    const ud = part.material.userData as { canopyPivotSum?: number; canopyPivotN?: number };
+    ud.canopyPivotSum = (ud.canopyPivotSum ?? 0) + (bb.min.y + bb.max.y) / 2;
+    ud.canopyPivotN = (ud.canopyPivotN ?? 0) + 1;
+  }
   // draw barks before leaves: opaque first is kinder to early-z
   parts.sort((a, b) => Number(a.isLeaf) - Number(b.isLeaf));
   // The baked float geometry and converted materials are the renderer-owned
@@ -1198,15 +1232,17 @@ function buildTrees(
     proxyShape: 'pine',
     cullBarkFar: true, // pine canopies start ~2u up: no proxy needed in fog
   };
-  // The oak leaf atlas averages ~0.012 linear albedo (the pine atlas does
-  // not), so oaks rendered as near-black clumps at every scale; small vale
-  // oaks were the "black tufts" on the open meadow. Same material-level lift
-  // as the bush/fern dressing; oak materials are cached per url and used only
-  // by this species.
+  // Mild oak leaf lift. The old 6.5x here was calibrated on a whole-atlas
+  // average (~0.012) that was both diluted ~3.4x by fully-transparent texels
+  // and attributed to the wrong atlas — measured over the texels alphaTest
+  // keeps, oak is (0.099, 0.197, 0.000) linear, already 2-3x BRIGHTER than
+  // pine. At 6.5x the visible green albedo passed 1.0 (brighter than white)
+  // and canopies read as neon lime with no shading left. 1.35x keeps oaks a
+  // touch brighter than pine without erasing their lit/shade gradation.
   const oakSets = MODEL_URLS.oak.map(extractParts);
   for (const parts of oakSets) {
     for (const part of parts) {
-      if (part.isLeaf) (part.material as THREE.MeshStandardMaterial).color.setRGB(6.5, 5.5, 4.0);
+      if (part.isLeaf) (part.material as THREE.MeshStandardMaterial).color.setRGB(1.35, 1.25, 1.1);
     }
   }
   const oakSpec: SpeciesSpec = {
@@ -1586,21 +1622,23 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
     fern: extractParts(MODEL_URLS.fern[0]),
     mushroom: extractParts(MODEL_URLS.mushroom[0]),
   };
-  // The bush/fern kit textures average ~0.012-0.017 linear albedo, roughly a
-  // tenth of the meadow splat under them, so they rendered as near-black
-  // clumps no instance tint could recover. Lift the material itself (color is
-  // a linear multiplier over the map); the ground-keyed instance tint below
-  // then lands them in the meadow's own palette. Materials here are cached
-  // per GLB url and used only by dressing, so nothing else brightens.
+  // Mild dressing lift. Like the oak lift above, the old 6.5x here came from
+  // a transparent-texel-diluted atlas average; over visible texels the bush
+  // canopy is (0.000, 0.139, 0.025) linear and fern (0.221, 0.260, 0.067).
+  // The old loop was also unfiltered, so the 'Flowers' material — already at
+  // (0.79, 0.58, 0.56) — reached 5.2/3.2/2.2 and flowering bushes were the
+  // most blown-out surface in the world. Leaves get a gentle lift; Flowers
+  // get none (their authored albedo is correct).
   const albedoLift: Partial<Record<DressKind, [number, number, number]>> = {
-    bush: [6.5, 5.5, 4.0],
-    bushFlowers: [6.5, 5.5, 4.0],
-    fern: [6.5, 5.5, 4.0],
+    bush: [1.6, 1.5, 1.35],
+    bushFlowers: [1.6, 1.5, 1.35],
+    fern: [1.15, 1.15, 1.15],
   };
   for (const kind of ['bush', 'bushFlowers', 'fern'] as const) {
     const lift = albedoLift[kind];
     if (!lift) continue;
     for (const part of kindParts[kind]) {
+      if (part.material.name === 'Flowers') continue;
       (part.material as THREE.MeshStandardMaterial).color.setRGB(lift[0], lift[1], lift[2]);
     }
   }
@@ -2177,9 +2215,16 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         // and slightly past its hedge line, and across the meadow patches a
         // little beyond where the flowers stop
         const gardenBedTuft = tuftBiome === 'garden' && gardenLushGrassAt(x, z);
+        // Meadow patchiness: the same soil noise that darkens the ground
+        // palette decides where grass actually grows. Dense stands on the
+        // lush dark-green patches thin to near-bare yellowed ground between
+        // them, so the meadow reads as growth following the soil instead of
+        // a uniform scatter of models. Squaring hardens the patch edges.
+        const lushness = groundLushnessAt(x, z, seed);
         const density =
           (lush ? GRASS_DENSITY_HIGH : GRASS_DENSITY_LOW) *
-          (gardenBedTuft ? 0.9 : (GRASS_BIOME_DENSITY[tuftBiome] ?? 1));
+          (gardenBedTuft ? 0.9 : (GRASS_BIOME_DENSITY[tuftBiome] ?? 1)) *
+          (0.25 + 1.7 * lushness * lushness);
         if (r > density) continue;
         const h = terrainHeight(x, z, seed);
         if (h < WATER_LEVEL + 1.6) continue;
@@ -2198,8 +2243,11 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         const fenTuft = tuftBiome === 'fen';
         if (!fenTuft) {
           // r is the density hash, so it only ever reaches the density cap:
-          // the lush scale tops out near 0.95 rather than sprouting monsters
-          const s = (lush ? 0.55 : 0.45) + r * (lush ? 0.8 : 1);
+          // the lush scale tops out near 0.95 rather than sprouting monsters.
+          // Patch cores grow tall, patch edges stay short — with the sparse
+          // areas' accepted hashes skewing small, stragglers between patches
+          // come out smallest of all.
+          const s = ((lush ? 0.55 : 0.45) + r * (lush ? 0.8 : 1)) * (0.72 + lushness * 0.55);
           q.setFromAxisAngle(up, r * 12.4);
           m.compose(v.set(x, h, z), q, sv.set(s, s, s));
           im.setMatrixAt(n, m);
