@@ -118,7 +118,7 @@ describe('shield block', () => {
     sim.drainEvents();
     sim.mobSwing(mob, player);
 
-    const blocked = damageEvents(sim.drainEvents()).find((e) => e.kind === 'hit');
+    const blocked = damageEvents(sim.drainEvents()).find((e) => e.kind === 'block');
     expect(blocked?.amount).toBe(74); // 100 * 80% - blockValue 6
 
     player.hp = player.maxHp;
@@ -153,7 +153,7 @@ describe('shield block', () => {
     sim.drainEvents();
     sim.mobSwing(mob, player);
 
-    const blocked = damageEvents(sim.drainEvents()).find((e) => e.kind === 'hit');
+    const blocked = damageEvents(sim.drainEvents()).find((e) => e.kind === 'block');
     expect(blocked?.amount).toBe(94); // 100 - blockValue 6
   });
 
