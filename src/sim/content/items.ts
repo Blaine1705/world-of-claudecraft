@@ -541,11 +541,12 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // Where a minted copy CAN go, stated truthfully: the bank is open (it is
   // the player's own storage), and direct trade is open BY RULING (R10, a
   // deliberate transfer route). Vendor, market, and mail are closed. The
-  // MINT itself is bounded at the source: the accept-time re-grant predicate
-  // (quests/quest_item_presence.ts) spans bags, bank, mail, and market
-  // escrow, so banking a tool no longer conjures another on re-accept, and
-  // the quest's repeatCadenceTicks bounds the turn-in loop that trade could
-  // otherwise drain through.
+  // accept-time re-grant predicate (quests/quest_item_presence.ts) spans
+  // bags, bank, mail, and market escrow, so banking a tool no longer
+  // conjures another on re-accept; the quest's repeatCadenceTicks bounds the
+  // TURN-IN loop only (the cadence arms at turn-in, never at abandon), so
+  // the trade route still mints one copy per accept-abandon cycle, and the
+  // flags above are what cap that supply's value at zero copper.
   //
   // handaxe is flagged for SYMMETRY, not because it closes anything: no quest
   // has a wood objective, so no quest ever grants it. Three tier-1 tools that

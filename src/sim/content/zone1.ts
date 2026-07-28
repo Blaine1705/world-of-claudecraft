@@ -1399,10 +1399,13 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     shareable: false,
     // The same 30-minute window its four work-order siblings carry. The iron
     // gate on the tool mint is the accept-time presence predicate
-    // (quests/quest_item_presence.ts, spanning bank/mail/escrow); the cadence
-    // bounds the TURN-IN loop, so the one transfer route left deliberately
-    // open (direct trade, R10) moves at most one sickle per window instead of
-    // one per accept-abandon cycle.
+    // (quests/quest_item_presence.ts, spanning bank/mail/escrow). The cadence
+    // bounds ONLY the turn-in loop (armCadence fires in turnInQuestCore;
+    // abandoning arms nothing), so the one transfer route left deliberately
+    // open (direct trade, R10) still moves one sickle per accept-abandon
+    // cycle. What actually bounds that route is the value ceiling: the tools
+    // carry noVendorSell and noMarketList, so a traded copy has no route to
+    // copper (guarded in tests/professions_starter_tools.test.ts).
     repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
     // Also a herb objective, so also the sickle. This is the repeatable one, so
     // it is the reason the tier-1 tools carry noVendorSell (items.ts): without

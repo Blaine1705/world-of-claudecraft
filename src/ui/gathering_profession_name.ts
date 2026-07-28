@@ -1,10 +1,6 @@
-// The one map from a gathering profession id to its localized display-name key.
-//
-// Extracted on the third consumer (root CLAUDE.md: extract on the rule of
-// three, not before). It shipped duplicated byte for byte as the module-private
-// GATHERING_PROFESSION_LABEL_KEY in char_window.ts and GATHERING_NAME_KEYS in
-// professions_window.ts; the locked vendor row that names the proficiency a
-// tool requires is the third, so the table lands here and those two consume it.
+// The one map from a gathering profession id to its localized display-name key,
+// shared by the character window, the professions window, and the locked
+// vendor row that names the proficiency a tool requires.
 //
 // String-keyed rather than keyed on GatheringProfessionId, exactly as both
 // originals were: every caller looks the id up off wire-mirrored or content

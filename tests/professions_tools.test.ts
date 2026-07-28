@@ -105,8 +105,8 @@ describe('gathering tool tier gating (#1123)', () => {
   it('the zone 2 and zone 3 hubs stock the tool tiers their own nodes use (#2343)', () => {
     // Load-bearing content under the always-require-tool rule: without these
     // rows a toolless traveler could not gather anywhere outside Eastbrook.
-    // The two ROD rows are load-bearing the same way (the phase 6 no-strand
-    // story): each hub's own water demands that rung
+    // The two ROD rows are load-bearing the same way (the no-strand story in
+    // docs/design/professions-tuning-packet.md): each hub's own water demands that rung
     // (professions/fishing_zones.ts), so without the row the marsh or the
     // peaks would be the one place demanding a tool no local counter carries.
     // They are pinned HERE because two stale comments used to invite exactly

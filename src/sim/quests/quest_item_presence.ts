@@ -1,6 +1,3 @@
-import type { PlayerMeta } from '../sim';
-import type { SimContext } from '../sim_context';
-
 // Where a quest-required item still counts as HELD for the accept-time
 // re-grant (finalizeQuestAccept -> questFallbackGrants).
 //
@@ -10,15 +7,30 @@ import type { SimContext } from '../sim_context';
 // or leave it escrowed on the market or unclaimed in the mailbox, abandon,
 // re-accept, and the fallback hands over another copy every time. Each place
 // this predicate adds is one the player can recover the item FROM by
-// themselves (bank withdrawal, listing reclaim, mailTake), so the quest stays
-// completable without a fresh copy.
+// themselves (bank withdrawal, listing reclaim, mailTake). The mail read
+// counts IN-FLIGHT letters too (mailTake requires delivery), a deliberate
+// asymmetry: during the delivery window the copy is neither retrievable nor
+// re-grantable, which errs toward no duplicate.
+//
+// KNOWN-UNCOVERED stores, deliberately: the vendor buy-back list, the
+// expired-listing market collection (an expired listing is spliced OUT of
+// marketListings before the player claims it), and equipment slots. None is
+// reachable today, because every requiredItems item is quest-kind or carries
+// noVendorSell plus noMarketList, and the sweep in
+// tests/professions_starter_tools.test.ts keeps that true: a future quest
+// requiring a sellable, listable, or equippable item must widen this
+// predicate first. Today only the bags and bank arms can fire for live
+// content; mail and escrow are the defense in depth for that future.
 //
 // A traded-away copy is genuinely gone and DOES re-grant: direct trade stays
-// an open transfer route by ruling (R10), bounded by the quest's own repeat
-// cadence rather than by this predicate.
+// an open transfer route by ruling (R10). The quest cadence bounds only the
+// turn-in loop, so the trade route's real bound is the granted items' zero
+// value, not this predicate.
 //
 // The narrow Pick keeps the read surface explicit and the unit tests honest:
 // a fake ctx implements exactly these four members and nothing else.
+import type { PlayerMeta } from '../sim';
+import type { SimContext } from '../sim_context';
 export type QuestItemPresenceCtx = Pick<
   SimContext,
   'countItem' | 'mailboxHoldsItem' | 'marketListings' | 'marketListingBelongsTo'

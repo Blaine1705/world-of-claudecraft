@@ -9739,13 +9739,13 @@ export class Sim {
   // and draw-free: every arm below is a validation or a plain assignment, so
   // this can never move the rng stream a harvest walks.
   //
-  // The three refusals are all silent, matching the deny-before-mutate shape
-  // resolveTrain uses: an unknown profession id, an unknown effect id, and not
-  // carrying a real tool for that profession. The last one is the one that
-  // matters for balance, and it reads the SAME owned-tool scan the node gate
-  // reads (bestOwnedGatherToolTierOrNone, which returns NO_TOOL_OWNED rather
-  // than the bare-hands floor), so an effect can never be slotted onto a
-  // profession the player has no tool for.
+  // The refusals are all silent, matching the deny-before-mutate shape
+  // resolveTrain uses; the full set (five today) lives in
+  // resolveSlotToolEffect (professions/tools.ts), not here. The owned-tool
+  // arm is the one that matters for balance: it reads the SAME owned-tool
+  // scan the node gate reads (bestOwnedGatherToolTierOrNone, which returns
+  // NO_TOOL_OWNED rather than the bare-hands floor), so an effect can never
+  // be slotted onto a profession the player has no tool for.
   slotToolEffect(
     professionId: string,
     effectId: string,

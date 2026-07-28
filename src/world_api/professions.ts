@@ -318,7 +318,7 @@ export interface IWorldProfessions {
   // wire message for a caller that never touches it stays minimal. The type
   // deliberately admits ONLY 'always': every host silently refuses 'prompt'
   // today (resolveSlotToolEffect, no confirmation flow exists), so the seam
-  // must not advertise a mode no world honors. Phase 12's confirm flow
-  // re-widens this to 'always' | 'prompt' when the flow ships.
+  // must not advertise a mode no world honors. The acquisition craft's
+  // confirm flow re-widens this to 'always' | 'prompt' when it ships.
   slotToolEffect(professionId: string, effectId: string, confirmMode?: 'always'): void;
 }

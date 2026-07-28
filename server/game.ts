@@ -50,6 +50,7 @@ import {
   partyFrameIncomingHeals,
   partyFrameRole,
 } from '../src/sim/party_frame_info';
+import type { ToolEffectConfirmMode } from '../src/sim/professions/tools';
 import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { RAID_MAX } from '../src/sim/social/party';
@@ -4453,13 +4454,15 @@ export class GameServer {
         // sim's guard is the single definition of what a legal mode is, and
         // laundering an unrecognized value into `undefined` would hand it the
         // default and turn a refusal into a success (the two hosts would then
-        // disagree about the same message).
+        // disagree about the same message). The cast names the sim's own
+        // union rather than `never` so the compiler keeps tracking the
+        // parameter type; the runtime pass-through is identical.
         if (
           process.env.ALLOW_DEV_COMMANDS === '1' &&
           typeof msg.profession === 'string' &&
           typeof msg.effect === 'string'
         ) {
-          sim.slotToolEffect(msg.profession, msg.effect, msg.mode as never, pid);
+          sim.slotToolEffect(msg.profession, msg.effect, msg.mode as ToolEffectConfirmMode, pid);
         }
         break;
       case 'sell_all_junk':

@@ -9,7 +9,7 @@
 // 20 Hz tick loop (sim.ts `tick()`, next to `updateRested`), so a grant only
 // ever takes effect on the deterministic tick path, never out of band.
 
-import { bagCapacity, countFit } from '../bags';
+import { bagCapacity, bagsFullError, countFit } from '../bags';
 import { GATHER_NODES } from '../content/gather_nodes';
 import {
   GATHERING_PROFESSION_IDS,
@@ -161,8 +161,8 @@ export function harvestYieldItemId(meta: PlayerMeta, node: GatherNodeDef): strin
  * is deliberate: a second copy of a bonus rule is exactly how a tooltip once
  * promised a second the sim's clamp never gave. One definition, two live
  * readers (the capacity gates at both ends of the cast, through
- * harvestYieldItemId, and the grant); the phase 14 grade-preview tooltip
- * (the review worklist's UX phase) becomes the third when it ships, and it
+ * harvestYieldItemId, and the grant); the grade-preview tooltip planned in
+ * the review worklist's UX pass becomes the third when it ships, and it
  * must read THIS function too.
  *
  * Pure and draw-free, and it never spends a charge: spending belongs to the
@@ -468,7 +468,7 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
   // per tick), the price of one resolver instead of two.
   const yieldItemId = harvestYieldItemId(meta, node);
   if (!ctx.canAddItem(yieldItemId, 1, meta.entityId)) {
-    ctx.error(meta.entityId, 'Your bags are full.');
+    bagsFullError(ctx, meta.entityId);
     return false;
   }
   // Start the gather cast: every gate above is rng-free, so a
@@ -576,7 +576,7 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
   // with no inventory mutation in between, so the room this gate checks is
   // room for the id the grant actually mints.
   if (!ctx.canAddItem(harvestYieldItemId(meta, node), 1, meta.entityId)) {
-    ctx.error(meta.entityId, 'Your bags are full.');
+    bagsFullError(ctx, meta.entityId);
     return;
   }
   const result = resolveHarvest(meta, node, ctx.time, ctx.rng);

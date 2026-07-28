@@ -54,10 +54,10 @@
 // purchase gates become advisory, and enforcement moves to the harvest gate,
 // which closes every transfer route above at the moment of use instead of at
 // the counter. Owners are never stripped: a pre-gate tool stays in the bags
-// and wields once its owner reaches the threshold. That lands with the review
-// worklist's phase 13; UNTIL IT DOES, the shipped behavior is exactly what
-// this file implements, so describe the live gate as pacing what a merchant
-// will sell you, never as pacing tool access.
+// and wields once its owner reaches the threshold. That lands with the
+// review worklist's content pass; UNTIL IT DOES, the shipped behavior is
+// exactly what this file implements, so describe the live gate as pacing
+// what a merchant will sell you, never as pacing tool access.
 //
 // DOM-free, rng-free and host-agnostic (src/sim purity, tests/architecture.test.ts).
 

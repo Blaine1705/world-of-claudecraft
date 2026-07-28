@@ -152,7 +152,7 @@ describe('the real seams', () => {
 
   it("another player's mailed copy is NOT mine: the ownership conjunct is live", () => {
     // Dropping belongsTo from mailboxHoldsItem would leave every other arm
-    // green while any stranger\'s mailed sickle suppressed MY re-grant,
+    // green while any stranger's mailed sickle suppressed MY re-grant,
     // silently blocking a player from a required tool.
     const sim = new Sim({ seed: 33, playerClass: 'warrior', autoEquip: false });
     const meta = sim.players.get(sim.playerId) as PlayerMeta;
@@ -179,7 +179,7 @@ describe('the real seams', () => {
     // The unit arms fake marketListingBelongsTo; this one lists through the
     // real Market book so the seller-key comparison itself is on the hook.
     // The tier-1 tools carry noMarketList, so the stand-in is a listable id:
-    // the predicate is item-generic and serves every quest\'s fallback grants.
+    // the predicate is item-generic and serves every quest's fallback grants.
     const LISTABLE = 'iron_ore';
     const sim = new Sim({ seed: 34, playerClass: 'warrior', autoEquip: false });
     const pid = sim.playerId;
