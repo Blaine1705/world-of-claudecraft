@@ -1648,6 +1648,18 @@ export const hudChromeStrings = {
     freeCast: 'Your next cast costs nothing',
     instantCast: 'Your next spell with a cast time is instant',
     cheapCast: 'Your next spell costs {pct}% less',
+    // Rogue spec-engine states; wordy (M16): filled in the five non-Latin
+    // locales in this change.
+    venomRitual:
+      'Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend',
+    gloam:
+      'Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil',
+    redline:
+      'Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it',
+    veilstrikeWindow:
+      'Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%',
+    veiledEdge: "Your next Lurker's Strike strikes for double",
+    duskEconomy: 'Abilities cost {pct}% less energy',
     increase: {
       ap: 'Increases attack power by {value}',
       sp: 'Increases spell power by {value}',

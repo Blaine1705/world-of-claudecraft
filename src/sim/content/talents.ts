@@ -80,6 +80,10 @@ export interface AbilityModEffect {
   critPct?: number;
   castWhileMoving?: boolean;
   damagePushbackImmune?: boolean;
+  // Cheap Trick (rogue row): the resolved ability no longer requires stealth.
+  // Baked onto KnownAbility beside castWhileMoving; consumed at the
+  // requiresStealth gate in casting_lifecycle.
+  ignoreStealthRequirement?: boolean;
   bonusCharges?: number;
   addEffects?: AbilityEffect[];
 }
@@ -144,6 +148,20 @@ export interface GlobalModEffect {
   // a stacking burn (combat/fire_mage.ts igniteOnCrit copies the resolved
   // amount). Scales with level like every spec mastery.
   ignitionPct?: number;
+  // Rogue v0.29 rows (docs/design/rogue-v029-class-design.md):
+  // Kill Chain: combo points granted on a killing blow (refreshes, never banks
+  // past the combo cap) and 1 to refresh Smokestep's cooldown on a kill.
+  onKillCombo?: number;
+  onKillVanishReset?: number;
+  // Second Shadow: fraction of a 5-combo Dirt Nap's resolved damage repeated
+  // as a shadow echo (combat/effect_dispatch.ts finisherDamage case).
+  secondShadowPct?: number;
+  // Dusk Economy: fraction cut from energy costs while a stealth aura or the
+  // 6 sec dusk_economy linger aura is worn (combat/rogue_talents.ts).
+  duskEconomyPct?: number;
+  // Foul Play: 1 when the caster's own dot ticks never break the caster's own
+  // incapacitates (combat/damage.ts CC break).
+  foulPlayGuard?: number;
 }
 
 export type ProcTrigger =
@@ -315,6 +333,7 @@ export interface ResolvedAbilityMod {
   critPct: number;
   castWhileMoving: boolean;
   damagePushbackImmune: boolean;
+  ignoreStealthRequirement: boolean;
   bonusCharges: number;
   addEffects: AbilityEffect[];
 }
@@ -578,6 +597,11 @@ function zeroGlobal(): Required<GlobalModEffect> {
     blinkCast: 0,
     convergence: 0,
     ignitionPct: 0,
+    onKillCombo: 0,
+    onKillVanishReset: 0,
+    secondShadowPct: 0,
+    duskEconomyPct: 0,
+    foulPlayGuard: 0,
   };
 }
 
@@ -594,6 +618,7 @@ function zeroAbilityMod(): ResolvedAbilityMod {
     critPct: 0,
     castWhileMoving: false,
     damagePushbackImmune: false,
+    ignoreStealthRequirement: false,
     bonusCharges: 0,
     addEffects: [],
   };
@@ -681,6 +706,11 @@ export function accumulateTalentEffect(
     target.blinkCast += (source.blinkCast ?? 0) * multiplier;
     target.convergence += (source.convergence ?? 0) * multiplier;
     target.ignitionPct += (source.ignitionPct ?? 0) * multiplier;
+    target.onKillCombo += (source.onKillCombo ?? 0) * multiplier;
+    target.onKillVanishReset += (source.onKillVanishReset ?? 0) * multiplier;
+    target.secondShadowPct += (source.secondShadowPct ?? 0) * multiplier;
+    target.duskEconomyPct += (source.duskEconomyPct ?? 0) * multiplier;
+    target.foulPlayGuard += (source.foulPlayGuard ?? 0) * multiplier;
   }
   for (const ability of effect.ability ?? []) {
     const target = modifiers.abilities[ability.ability] ?? zeroAbilityMod();
@@ -700,6 +730,7 @@ export function accumulateTalentEffect(
     target.bonusCharges += (ability.bonusCharges ?? 0) * multiplier;
     if (ability.castWhileMoving) target.castWhileMoving = true;
     if (ability.damagePushbackImmune) target.damagePushbackImmune = true;
+    if (ability.ignoreStealthRequirement) target.ignoreStealthRequirement = true;
     if (ability.addEffects) target.addEffects.push(...ability.addEffects);
   }
   if (effect.grant) {

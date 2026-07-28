@@ -16,6 +16,12 @@
 //   - tongues: value multiplies casting time (m = max(m, value)); > 1 = slower casts.
 //   - mortal_wound/cost_tax/critvuln/vulnerability/spellvuln/expose/buff_dodge:
 //     value is a 0..1 fraction shown as a percent.
+import {
+  GLOAM_STAGES,
+  KNOCKOUT_PER_PIP,
+  REDLINE_MAX_DEPTH,
+  VENOM_RITUAL_STAGES,
+} from '../sim/combat/rogue_engines';
 import type { AuraKind } from '../sim/types';
 import {
   FAERIE_FIRE_ARMOR_PCT,
@@ -84,6 +90,37 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
   if (a.kind === 'hunter_ferocity') {
     const stacks = Math.min(3, Math.max(0, Math.trunc(a.stacks ?? a.value)));
     return { key: `${KEY}.hunterFerocity`, nums: { stacks, pct: stacks * 10 } };
+  }
+  // Rogue spec-engine states (combat/rogue_engines.ts): the tooltip must teach
+  // the interaction, not just name the buff (owner playtest: players should
+  // never need the design doc to know what a stage or pip is for).
+  if (a.id === 'venom_ritual' && a.kind === 'venom_ritual') {
+    return {
+      key: `${KEY}.venomRitual`,
+      nums: { stacks: a.stacks ?? 1, max: VENOM_RITUAL_STAGES },
+    };
+  }
+  if (a.id === 'gloam' && a.kind === 'gloam') {
+    return { key: `${KEY}.gloam`, nums: { stacks: a.stacks ?? 1, max: GLOAM_STAGES } };
+  }
+  if (a.id === 'redline' && a.kind === 'redline') {
+    return {
+      key: `${KEY}.redline`,
+      nums: {
+        stacks: a.stacks ?? 1,
+        max: REDLINE_MAX_DEPTH,
+        pct: pctFromFrac(KNOCKOUT_PER_PIP),
+      },
+    };
+  }
+  if (a.id === 'veilstrike' && a.kind === 'buff_dmg_done') {
+    return { key: `${KEY}.veilstrikeWindow`, nums: { pct: pctFromFrac(a.value) } };
+  }
+  if (a.id === 'veiled_edge' && a.kind === 'veiled_edge') {
+    return { key: `${KEY}.veiledEdge`, nums: {} };
+  }
+  if (a.kind === 'dusk_economy') {
+    return { key: `${KEY}.duskEconomy`, nums: { pct: pctFromFrac(a.value) } };
   }
   switch (a.kind) {
     case 'dot':

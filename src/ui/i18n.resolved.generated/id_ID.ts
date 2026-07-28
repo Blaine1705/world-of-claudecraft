@@ -1620,6 +1620,12 @@ export const id_ID: EnTranslations = {
       "freeCast": "Rapalan berikutmu tidak membutuhkan biaya",
       "instantCast": "Mantra berikutmu yang memiliki waktu rapalan menjadi seketika",
       "cheapCast": "Mantra berikutmu menghabiskan {pct}% lebih sedikit mana",
+      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
+      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
+      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
+      "veiledEdge": "Your next Lurker's Strike strikes for double",
+      "duskEconomy": "Abilities cost {pct}% less energy",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "sp": "Meningkatkan daya mantra sebesar {value}",
@@ -7979,6 +7985,10 @@ export const id_ID: EnTranslations = {
         "name": "Sumur Eter",
         "description": "Restaura mana rápidamente. (talenta mage)"
       },
+      "flurry_of_knives": {
+        "name": "Rentetan Pisau",
+        "description": "Menyabet semua musuh dalam radius 6 m dengan pisau lempar, menimbulkan {damage} kerusakan fisik dan memberi 2 poin combo. (talenta Rogue)"
+      },
       "frenzied_regeneration": {
         "name": "Pemulihan Liar",
         "description": "Memulihkan 180 nyawa selama 10 detik. Hanya dalam Bentuk Beruang. (talenta Druid)"
@@ -8143,9 +8153,33 @@ export const id_ID: EnTranslations = {
         "name": "Kunci Mantra",
         "description": "Membungkam target saat sedang merapal dan mencegah perapalan dari aliran sihir itu selama 5 detik."
       },
+      "thieves_chorus": {
+        "name": "Paduan Suara Pencuri",
+        "description": "Sinyal siulan memacu kelompokmu: kecepatan serangan, rapalan, dan kanal meningkat 10% selama 10 detik. Sekutu yang baru saja terkena lonjakan percepatan kelompok terlalu lelah untuk mendapat manfaat. (talenta Rogue)"
+      },
       "tranquility": {
         "name": "Lagu Rimba",
         "description": "Menyalurkan energi pemulihan selama 4 detik, memulihkan 42 sampai 52 nyawa sekutu dalam jarak 30 m setiap detik. (talenta Druid)"
+      },
+      "venom_dart": {
+        "name": "Damak Bisa",
+        "description": "Melontarkan damak beracun sebesar {damage} kerusakan alam. Memberi 1 poin combo. Knifework: memperpanjang luka Koyak Bisa Anda 6 detik, hingga 20 detik."
+      },
+      "body_blow": {
+        "name": "Pukulan Tubuh",
+        "description": "Pukulan berat sebesar 130% kerusakan senjata plus 10 yang memberikan 2 poin combo dan memperdalam Redline satu tingkat. (mesin Thuggery)"
+      },
+      "knockout_blow": {
+        "name": "Pukulan Nokaut",
+        "description": "Akhiri Redline dengan nokaut: menghantam sebesar 45 plus 35 per poin combo, 25% lebih keras per tingkat Redline, dan memulihkan 25 energi. (mesin Thuggery)"
+      },
+      "veilstrike": {
+        "name": "Hantaman Tabir",
+        "description": "Melahap simpanan Remang untuk menyelubungi dirimu dalam bayangan selama 6 detik: pembuka senyapmu bekerja di tempat terbuka dan kerusakanmu meningkat 25%. (mesin Skulduggery)"
+      },
+      "venomrend": {
+        "name": "Koyak Bisa",
+        "description": "Melahap Ritual Bisa: menghantam sebesar 22 tambah 26 per poin combo, meledakkan sisa kerusakan pendarahanmu, dan memulihkan 25 energi. (mesin Knifework)"
       },
       "typhoon": {
         "name": "Topan",

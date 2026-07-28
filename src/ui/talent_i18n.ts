@@ -81,6 +81,14 @@ type DisplayGlobalKey = Exclude<
   | 'ignitionPct'
   | 'manaPct'
   | 'manaRegenPct'
+  // Rogue v0.29 rows: bespoke mechanics whose options carry hand-authored
+  // descriptions (docs/design/rogue-v029-class-design.md), never generated
+  // stat labels.
+  | 'onKillCombo'
+  | 'onKillVanishReset'
+  | 'secondShadowPct'
+  | 'duskEconomyPct'
+  | 'foulPlayGuard'
 >;
 
 const NON_DISPLAY_GLOBALS = new Set<GlobalKey>([
@@ -106,6 +114,11 @@ const NON_DISPLAY_GLOBALS = new Set<GlobalKey>([
   'ignitionPct',
   'manaPct',
   'manaRegenPct',
+  'onKillCombo',
+  'onKillVanishReset',
+  'secondShadowPct',
+  'duskEconomyPct',
+  'foulPlayGuard',
 ]);
 
 export interface TalentLocaleText {
@@ -10366,7 +10379,17 @@ function procDescription(proc: ProcDef, lang: SupportedLanguage, text: TalentLoc
 type DescribedAddedEffect = Extract<
   AbilityEffect,
   {
-    type: 'root' | 'aoeRoot' | 'slow' | 'absorb' | 'dot' | 'extendDot' | 'interrupt' | 'consumeDot';
+    type:
+      | 'root'
+      | 'aoeRoot'
+      | 'slow'
+      | 'absorb'
+      | 'dot'
+      | 'extendDot'
+      | 'interrupt'
+      | 'consumeDot'
+      | 'selfBuff'
+      | 'debuffTargetSource';
   }
 >;
 
@@ -10379,7 +10402,9 @@ function assertDescribedAddedEffect(effect: AbilityEffect): asserts effect is De
     effect.type !== 'dot' &&
     effect.type !== 'extendDot' &&
     effect.type !== 'interrupt' &&
-    effect.type !== 'consumeDot'
+    effect.type !== 'consumeDot' &&
+    effect.type !== 'selfBuff' &&
+    effect.type !== 'debuffTargetSource'
   ) {
     throw new Error(`Unsupported talent rider effect: ${effect.type}`);
   }
@@ -10414,6 +10439,13 @@ function addedEffectDescription(
       return `${name}: ${t('hudChrome.auraEffect.lockout')} (${seconds(effect.lockout, lang)}).`;
     case 'consumeDot':
       return `${name} -> ${abilityName(effect.dot)}: ${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s.`;
+    // Fraction-valued rider buffs (rogue v0.29): Ghostfoot Ward's damage cut on
+    // the caster and the Marked Prey / Grave Brand vulnerability brands on the
+    // target. Rendered in the same compact spec-line notation as the rest.
+    case 'selfBuff':
+      return `${name}: -${formatPercent(effect.value, lang)} ${text.statLabels.damage} (${seconds(effect.duration, lang)}).`;
+    case 'debuffTargetSource':
+      return `${name}: +${formatPercent(effect.value, lang)} ${text.statLabels.damage} (${seconds(effect.duration, lang)}).`;
   }
 }
 

@@ -33,6 +33,7 @@ function modsFor(
     buffPct: 0,
     castWhileMoving: false,
     damagePushbackImmune: false,
+    ignoreStealthRequirement: false,
     bonusCharges: 0,
     addEffects: [],
     ...mod,

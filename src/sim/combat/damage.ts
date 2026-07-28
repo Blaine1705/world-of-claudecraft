@@ -81,6 +81,7 @@ import {
   priestOnVigilTriggered,
 } from './priest/talents';
 import { vespersEchoDamage, vespersOnEntityDeath } from './priest/vespers';
+import { foulPlayGuardsBreak } from './rogue_talents';
 import { clearSpiritmendCurrents, UNLEASH_WEAPON_GUARD_ID } from './shaman_spiritmend';
 import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
@@ -751,6 +752,11 @@ export function dealDamage(
     for (let i = target.auras.length - 1; i >= 0; i--) {
       const breakable = target.auras[i];
       if (breakable.breaksOnDamage && !isUnbreakableControlAura(breakable)) {
+        // Foul Play (rogue row, docs/design/rogue-v029-class-design.md): the
+        // caster's own dot ticks never break the caster's own incapacitate.
+        if (foulPlayGuardsBreak(ctx, source, breakable.kind, breakable.sourceId, direct)) {
+          continue;
+        }
         if (breakable.breakThreshold !== undefined && breakable.breakThreshold > amount) {
           breakable.breakThreshold -= amount;
           continue;
@@ -1298,6 +1304,16 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
             school: 'physical',
           });
         }
+        // Kill Chain (rogue row, docs/design/rogue-v029-class-design.md):
+        // killing blows refresh Smokestep and refill combo points. Refreshes,
+        // never banks past the combo cap; draws no rng.
+        if (killMods.onKillCombo > 0) {
+          creditEntity.comboPoints = Math.min(
+            5,
+            creditEntity.comboPoints + Math.round(killMods.onKillCombo),
+          );
+        }
+        if (killMods.onKillVanishReset > 0) creditEntity.cooldowns.delete('vanish');
         if (killMods.bloodbathPct > 0) {
           const existing = creditEntity.auras.find((aura) => aura.kind === 'bloodbath');
           if (existing) {

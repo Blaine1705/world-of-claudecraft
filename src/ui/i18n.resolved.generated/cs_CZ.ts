@@ -1620,6 +1620,12 @@ export const cs_CZ: EnTranslations = {
       "freeCast": "Tvoje příští seslání nestojí nic",
       "instantCast": "Tvoje příští kouzlo s dobou sesílání je okamžité",
       "cheapCast": "Tvoje příští kouzlo stojí o {pct} % méně",
+      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
+      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
+      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
+      "veiledEdge": "Your next Lurker's Strike strikes for double",
+      "duskEconomy": "Abilities cost {pct}% less energy",
       "increase": {
         "ap": "Zvyšuje sílu útoku o {value}",
         "sp": "Zvyšuje sílu kouzel o {value}",
@@ -7979,6 +7985,10 @@ export const cs_CZ: EnTranslations = {
         "name": "Éterická studna",
         "description": "Restaura manu rápidamente. (mágovský talent)"
       },
+      "flurry_of_knives": {
+        "name": "Smršť nožů",
+        "description": "Šlehá všechny nepřátele do 6 m vrhacími noži, způsobuje {damage} fyzického poškození a dává 2 body komba. (lotrovský talent)"
+      },
       "frenzied_regeneration": {
         "name": "Divoké zacelení",
         "description": "Během 10 s obnoví 180 bodů zdraví. Pouze v Medvědí podobě. (druidský talent)"
@@ -8143,9 +8153,33 @@ export const cs_CZ: EnTranslations = {
         "name": "Příkaz mlčet",
         "description": "Umlčí cíl během sesílání a na 5 s mu znemožní kouzla stejné školy."
       },
+      "thieves_chorus": {
+        "name": "Sbor zlodějů",
+        "description": "Hvízdnutý signál povzbudí tvou skupinu: rychlost útoku, sesílání a kanálování se zvýší o 10% na 10 s. Spojenci nedávno zasažení skupinovým zrychlením jsou příliš vyčerpaní, aby z toho těžili. (lotrovský talent)"
+      },
       "tranquility": {
         "name": "Píseň háje",
         "description": "Po dobu 4 s usměrňuje léčivou energii a každou sekundu vyléčí spojence do 30 m o 42 až 52. (druidský talent)"
+      },
+      "venom_dart": {
+        "name": "Jedová šipka",
+        "description": "Vymrští otrávenou šipku za {damage} přírodního poškození. Uděluje 1 combo bod. Knifework: prodlužuje ránu vaší Jedové trhliny o 6 s, nejvýše na 20 s."
+      },
+      "body_blow": {
+        "name": "Úder na tělo",
+        "description": "Těžký úder za 130 % poškození zbraně plus 10, který uděluje 2 combo body a prohlubuje Redline o jeden dílek. (engine Thuggery)"
+      },
+      "knockout_blow": {
+        "name": "Nokautující úder",
+        "description": "Ukončí Redline nokautem: zasáhne za 45 plus 35 za každý combo bod, o 25 % tvrději za každý dílek Redline, a obnoví 25 energie. (engine Thuggery)"
+      },
+      "veilstrike": {
+        "name": "Úder závoje",
+        "description": "Pohltí zásobu Šera a zahalí tě na 6 s do stínu: tvé plíživé otvíráky fungují na otevřeném prostranství a působíš o 25% vyšší poškození. (engine Skulduggery)"
+      },
+      "venomrend": {
+        "name": "Jedová trhlina",
+        "description": "Pohltí Jedový rituál: udeří za 22 plus 26 za bod komba, odpálí zbývající poškození tvých krvácení a obnoví 25 energie. (engine Knifework)"
       },
       "typhoon": {
         "name": "Tajfun",

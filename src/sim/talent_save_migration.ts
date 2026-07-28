@@ -12,7 +12,13 @@ import { MAX_LEVEL, type PlayerClass } from './types';
 
 const TALENTS_V2_CONTENT_REVISION = 1;
 
-/** Latest production character-JSON content revision. */
+/**
+ * Latest production character-JSON revision. 1: the v0.26 Talents V2 rollout.
+ * 2: the v0.29 class redesigns (hunter, shaman, priest, and the rogue rows);
+ * changed option ids get a free row repick, and the repair scrubs retired row
+ * grants (for rogues: Contingency, Wraith Strike, Shadecloak) off saved bars.
+ * Untouched classes pass through unchanged and only advance the marker.
+ */
 export const CURRENT_CHARACTER_CONTENT_REVISION = 2;
 
 function migrationLevel(value: number): number {

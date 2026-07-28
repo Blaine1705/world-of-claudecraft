@@ -1620,6 +1620,12 @@ export const pt_BR: EnTranslations = {
       "freeCast": "Seu próximo lançamento não tem custo",
       "instantCast": "Seu próximo feitiço com tempo de lançamento é instantâneo",
       "cheapCast": "Seu próximo feitiço custa {pct}% menos",
+      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
+      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
+      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
+      "veiledEdge": "Your next Lurker's Strike strikes for double",
+      "duskEconomy": "Abilities cost {pct}% less energy",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "sp": "Aumenta o poder de feitiço em {value}",
@@ -7979,6 +7985,10 @@ export const pt_BR: EnTranslations = {
         "name": "Poço Etéreo",
         "description": "Restaura mana rápidamente. (talento de mago)"
       },
+      "flurry_of_knives": {
+        "name": "Rajada de Facas",
+        "description": "Açoita todos os inimigos num raio de 6 m com facas de arremesso, causando {damage} de dano físico e concedendo 2 pontos de combo. (talento de Ladino)"
+      },
       "frenzied_regeneration": {
         "name": "Remendo Selvagem",
         "description": "Restaura 180 de vida ao longo de 10 s. Somente em Forma de Urso. (talento de Druida)"
@@ -8143,9 +8153,33 @@ export const pt_BR: EnTranslations = {
         "name": "Ordem de Silêncio",
         "description": "Silencia o alvo durante a conjuração e impede lançar feitiços dessa escola por 5 s."
       },
+      "thieves_chorus": {
+        "name": "Coro dos Ladrões",
+        "description": "Um assobio de sinal incita seu grupo: velocidade de ataque, lançamento e canalização aumentada em 10% por 10 s. Aliados afetados há pouco por um surto de aceleração de grupo estão exaustos demais para se beneficiar. (talento de Ladino)"
+      },
       "tranquility": {
         "name": "Canto do Bosque",
         "description": "Canaliza energia restauradora por 4 s, curando os aliados num raio de 30 m em 42 a 52 a cada segundo. (talento de Druida)"
+      },
+      "venom_dart": {
+        "name": "Dardo Venenoso",
+        "description": "Arremessa um dardo envenenado que causa {damage} de dano de Natureza. Concede 1 ponto de combo. Knifework: prolonga sua ferida de Dilaceração Venenosa em 6 s, até 20 s."
+      },
+      "body_blow": {
+        "name": "Golpe no Corpo",
+        "description": "Um golpe pesado por 130% do dano da arma mais 10 que concede 2 pontos de combo e aprofunda a Redline em um nível. (motor de Thuggery)"
+      },
+      "knockout_blow": {
+        "name": "Golpe de Nocaute",
+        "description": "Encerre a Redline com um nocaute: golpeia por 45 mais 35 por ponto de combo, 25% mais forte por nível da Redline, e recupera 25 de energia. (motor de Thuggery)"
+      },
+      "veilstrike": {
+        "name": "Golpe do Véu",
+        "description": "Consome a reserva de Lusco para envolver-se em sombras por 6 s: suas aberturas furtivas funcionam a descoberto e você causa 25% mais dano. (motor de Skulduggery)"
+      },
+      "venomrend": {
+        "name": "Dilaceração Venenosa",
+        "description": "Consome o Ritual de Veneno: golpeia por 22 mais 26 por ponto de combo, detona o dano restante dos seus sangramentos e restaura 25 de energia. (motor de Knifework)"
       },
       "typhoon": {
         "name": "Tufão",

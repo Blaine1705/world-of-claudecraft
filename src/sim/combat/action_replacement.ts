@@ -6,13 +6,17 @@ import type { ResolvedAbility } from '../sim';
 import type { Entity } from '../types';
 
 export function resolveActionReplacement(base: ResolvedAbility, actor: Entity): ResolvedAbility {
-  const rule = base.def.actionReplacement;
-  if (!rule) return base;
-  const active = actor.auras.some(
-    (aura) => aura.kind === rule.auraKind && (aura.stacks ?? 1) >= (rule.minStacks ?? 1),
-  );
-  if (!active) return base;
-  return replaceResolvedAbility(base, rule.abilityId);
+  const rules = base.def.actionReplacement;
+  if (!rules) return base;
+  // A def may carry one rule per spec engine; the aura kinds are spec-gated,
+  // so at most one can be active. The first matching rule wins.
+  for (const rule of Array.isArray(rules) ? rules : [rules]) {
+    const active = actor.auras.some(
+      (aura) => aura.kind === rule.auraKind && (aura.stacks ?? 1) >= (rule.minStacks ?? 1),
+    );
+    if (active) return replaceResolvedAbility(base, rule.abilityId);
+  }
+  return base;
 }
 
 export function replaceResolvedAbility(

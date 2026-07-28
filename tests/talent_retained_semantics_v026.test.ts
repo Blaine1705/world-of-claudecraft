@@ -245,7 +245,7 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
 
   it.each([
     ['paladin', 17, 'pal_r17_ardent_defender', 180],
-    ['rogue', 17, 'rog_r17_cheat_death', 120],
+    ['rogue', 8, 'rog_r8_borrowed_breath', 120],
   ] as const)(
     '%s cheat death saves once, honors its %d-row ICD, and rearms deterministically',
     (cls, level, optionId, icd) => {

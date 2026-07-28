@@ -1620,6 +1620,12 @@ export const nl_NL: EnTranslations = {
       "freeCast": "Je volgende bezwering kost niets",
       "instantCast": "Je volgende spreuk met een bezweringstijd is direct",
       "cheapCast": "Je volgende spreuk kost {pct}% minder",
+      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
+      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
+      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
+      "veiledEdge": "Your next Lurker's Strike strikes for double",
+      "duskEconomy": "Abilities cost {pct}% less energy",
       "increase": {
         "ap": "Erhöht Angriffskraft um {value}",
         "sp": "Verhoogt spreukkracht met {value}",
@@ -7979,6 +7985,10 @@ export const nl_NL: EnTranslations = {
         "name": "Etherbron",
         "description": "Restaura mana rápidamente. (magiertalent)"
       },
+      "flurry_of_knives": {
+        "name": "Messenregen",
+        "description": "Geselt alle vijanden binnen 6 m met werpmessen, brengt {damage} fysieke schade toe en levert 2 combopunten op. (schurkentalent)"
+      },
       "frenzied_regeneration": {
         "name": "Wilde genezing",
         "description": "Herstelt 180 gezondheid gedurende 10 sec. Alleen in Berenvorm. (druïdetalent)"
@@ -8143,9 +8153,33 @@ export const nl_NL: EnTranslations = {
         "name": "Spreukverbod",
         "description": "Legt het doelwit tijdens een spreuk het zwijgen op en verhindert het 5 sec lang spreuken uit die magieschool uit te spreken."
       },
+      "thieves_chorus": {
+        "name": "Dievenkoor",
+        "description": "Een gefloten signaal vuurt je groep aan: aanvals-, wierp- en kanaliseersnelheid 10 sec. lang met 10% verhoogd. Bondgenoten die onlangs een groepsversnelling kregen, zijn te uitgeput om ervan te profiteren. (schurkentalent)"
+      },
       "tranquility": {
         "name": "Woudlied",
         "description": "Kanaliseert 4 sec. herstellende energie en geneest bondgenoten binnen 30 m elke seconde voor 42 tot 52. (druïdetalent)"
+      },
+      "venom_dart": {
+        "name": "Gifpijltje",
+        "description": "Schiet een vergiftigd pijltje voor {damage} natuurschade. Geeft 1 combopunt. Knifework: verlengt je Gifscheur-wond met 6 sec, tot 20 sec."
+      },
+      "body_blow": {
+        "name": "Lichaamsstoot",
+        "description": "Een zware stoot voor 130% wapenschade plus 10 die 2 combopunten geeft en de Redline één streepje verdiept. (Thuggery-motor)"
+      },
+      "knockout_blow": {
+        "name": "Knock-outslag",
+        "description": "Beëindig de Redline met een knock-out: slaat voor 45 plus 35 per combopunt, 25% harder per Redline-streepje, en herstelt 25 energie. (Thuggery-motor)"
+      },
+      "veilstrike": {
+        "name": "Sluierstoot",
+        "description": "Verteert de Schemervoorraad en hult je 6 sec. in schaduw: je sluipopeners werken in het open veld en je doet 25% meer schade. (Skulduggery-motor)"
+      },
+      "venomrend": {
+        "name": "Gifscheur",
+        "description": "Verteert het Gifritueel: raakt voor 22 plus 26 per combopunt, laat de resterende schade van je bloedingen ontploffen en herstelt 25 energie. (Knifework-motor)"
       },
       "typhoon": {
         "name": "Tyfoon",
