@@ -769,17 +769,19 @@ function vendorSellFrame(item: string, count: number): string {
 
 /** One granted node harvest, in the exact shape professions/gathering.ts emits.
  *  Typed through Extract rather than `as SimEvent`: a blanket cast would swallow
- *  a rename of the very field the counter reads, leaving the server booking
- *  every harvest as 'starter' with this test still green. */
+ *  a rename of the very field the counter reads (`nodeId` since the R3 zone
+ *  re-key), leaving the server booking every harvest under the first band with
+ *  this test still green. Real shipped node ids, because the band IS the
+ *  node's zone now. */
 type GatherResultEvent = Extract<SimEvent, { type: 'gatherResult' }>;
-function harvestEvent(itemId: string): SimEvent {
+function harvestEvent(nodeId: string): SimEvent {
   const event: GatherResultEvent = {
     type: 'gatherResult',
     pid: 999,
-    nodeId: 'node_test',
+    nodeId,
     nodeType: 'ore',
     professionId: 'mining',
-    itemId,
+    itemId: 'copper_ore',
     rarity: 'common',
     qty: 1,
     rareEvent: null,
@@ -858,20 +860,27 @@ describe('economy telemetry counters at their emission sites', () => {
     server.stop();
   });
 
-  it('counts each granted harvest under its own material band', () => {
+  it('counts each granted harvest under its own ZONE band (R3)', () => {
     const server = new GameServer();
     const rec = recordingSink();
     setGameMetricsCounters(rec.sink);
 
-    // The real observer pass over a tick's events, fed one harvest per band.
+    // The real observer pass over a tick's events, fed one harvest per zone.
+    // Bands are the node's zone since the R3 re-key: what it yields no longer
+    // decides anything, where it stands does.
     (server as unknown as Record<string, any>).detectActivity([
-      harvestEvent('copper_ore'),
-      harvestEvent('goldleaf_herb'),
-      harvestEvent('sunpetal_herb'),
-      harvestEvent('copper_ore'),
+      harvestEvent('ore_eastbrook_1'),
+      harvestEvent('ore_mirefen_t2'),
+      harvestEvent('ore_thornpeak_t3'),
+      harvestEvent('ore_eastbrook_1'),
     ]);
 
-    expect(rec.harvests).toEqual(['starter', 'mid', 'premium', 'starter']);
+    expect(rec.harvests).toEqual([
+      'eastbrook_vale',
+      'mirefen_marsh',
+      'thornpeak_heights',
+      'eastbrook_vale',
+    ]);
     server.stop();
   });
 
@@ -883,9 +892,9 @@ describe('economy telemetry counters at their emission sites', () => {
     // pid 999 has no ClientSession (a bot, or a player who left mid-tick). The
     // deed and levelup arms in this same loop filter on this.clients; the
     // harvest counter deliberately does not, because it measures the world.
-    (server as unknown as Record<string, any>).detectActivity([harvestEvent('thorium_ore')]);
+    (server as unknown as Record<string, any>).detectActivity([harvestEvent('ore_thornpeak_t3')]);
 
-    expect(rec.harvests).toEqual(['mid']);
+    expect(rec.harvests).toEqual(['thornpeak_heights']);
     server.stop();
   });
 });
