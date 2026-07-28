@@ -100,6 +100,7 @@ import {
 } from './characters/skin_attack';
 import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_policy';
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
+import { fogFarForBuiltGround } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
 import {
@@ -285,7 +286,11 @@ import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
 import {
-  fogFarForPreparedZones,
+  type FeatureFootprint,
+  hasUnseededInstanceMatrix,
+  isZoneFeatureVisible,
+} from './zone_feature_visibility_core';
+import {
   INITIAL_SKY_PREWARM_RADIUS,
   MAX_OUTDOOR_FOG_FAR,
   ZONE_STREAM_RECHECK_DISTANCE,
@@ -982,6 +987,21 @@ function localRenderDiagnosticsEnabled(): boolean {
   );
 }
 
+/**
+ * The world-space XZ footprint of a static feature group, for the per-frame
+ * distance cull (see zone_feature_visibility_core.ts). Measured once, right
+ * after the group is frozen: these groups never move again, so re-deriving
+ * bounds every frame would be pure waste. Null when the group has no
+ * measurable geometry, which the caller treats as "always visible".
+ */
+function measureFeatureFootprint(root: THREE.Object3D): FeatureFootprint | null {
+  const box = new THREE.Box3().setFromObject(root);
+  if (box.isEmpty()) return null;
+  const center = box.getCenter(new THREE.Vector3());
+  const size = box.getSize(new THREE.Vector3());
+  return { centerX: center.x, centerZ: center.z, halfX: size.x / 2, halfZ: size.z / 2 };
+}
+
 function setRenderCategory(obj: THREE.Object3D, category: RenderDiagnosticsCategory): void {
   obj.userData.renderCategory = category;
 }
@@ -1358,6 +1378,9 @@ export class Renderer {
   // clamped live fog would only start preparing a zone once its boundary is
   // already close enough to clamp the fog, i.e. too late.
   private lastRequestedFogFar = MAX_OUTDOOR_FOG_FAR;
+  // The authored preset near that pairs with it: together they are the
+  // ATMOSPHERIC fog the foliage swap follows (never the residency clamp).
+  private lastRequestedFogNear = 55;
   /** Fired whenever a zone becomes resident (any prepare path). Wired by
    *  main.ts so presentation caches outside the renderer (the HUD's world-map
    *  background) prewarm alongside the zone itself. */
@@ -1843,17 +1866,20 @@ export class Renderer {
     );
     setRenderCategory(props.group, 'props');
     this.scene.add(props.group);
-    // world-spanning modeled dressing, all static: the Duskfall cave mouths,
+    // The light budget must exist BEFORE any attachZoneFeature call: a static
+    // feature that ships glowLights pushes into it during the loop below.
+    this.fireLights = props.fireLights;
+    // World-spanning modeled dressing, all static: the Duskfall cave mouths,
     // lily-and-reed water flora on every temperate lake, and the Farshore's
-    // palm strand (each module is a no-op away from its ground)
+    // palm strand. Attached like the per-zone features so the distance cull
+    // applies: the gates and the palm strand have compact footprints of their
+    // own, and water flora registers one cull child per zone.
     for (const staticFeature of [
       buildHollowGates(this.sim.cfg.seed),
       buildWaterFlora(this.sim.cfg.seed),
       buildFarshoreFeatures(this.sim.cfg.seed),
     ]) {
-      setRenderCategory(staticFeature.group, 'props');
-      this.scene.add(staticFeature.group);
-      freezeStaticMatrices(staticFeature.group);
+      this.attachZoneFeature(staticFeature);
     }
     this.flames = props.flames;
     this.windmillFans = props.windmillFans;
@@ -1864,7 +1890,6 @@ export class Renderer {
     freezeStaticMatrices(props.group);
     for (const flame of this.flames) flame.matrixAutoUpdate = true;
     for (const fan of this.windmillFans) fan.matrixAutoUpdate = true;
-    this.fireLights = props.fireLights;
     // The impact-site light rides the campfire point-light budget so the visible
     // point-light count stays constant as the player travels (constant
     // numPointLights -> materials never recompile for a light-count change).
@@ -2290,6 +2315,40 @@ export class Renderer {
   }
 
   /**
+   * The sky/IBL half of a zone prepare: the realm's HDRI plus its prefiltered
+   * environment. Its own lane, because it is 30 to 70 percent of a prepare and
+   * a neighbouring realm's IBL has nothing to do with whether the player can
+   * see ground (the fog clamp reads attached terrain chunks). Sky is still
+   * needed to RENDER that realm's sky, so zone residency continues to wait for
+   * it; only the terrain build was let off the leash.
+   */
+  private async prepareZoneSky(
+    zone: ZoneDef,
+    x: number,
+    z: number,
+    idlePace: boolean,
+  ): Promise<void> {
+    await ensureSkyAssetsAt(x, z);
+    const envSource = this.skyView.envTexture(zone.biome);
+    const domeSource = this.skyView.domeTexture(zone.biome);
+    if (!idlePace) {
+      // Initial entry/teleport is already covered by an opaque loading screen.
+      this.ensureEnvironmentBiome(zone.biome);
+      this.prewarmTexture(envSource);
+      this.prewarmTexture(domeSource);
+      return;
+    }
+    // A DataTexture upload is synchronous even from requestIdleCallback.
+    // Split HDRIs into bounded row batches, then run the much smaller 512px
+    // PMREM between idle slots. This keeps background zone preparation from
+    // turning a future biome's sky into one 30+ MB gameplay frame.
+    await this.prewarmTextureInIdle(envSource);
+    await idleSlot(IDLE_PREWARM_TIMEOUT_MS);
+    this.ensureEnvironmentBiome(zone.biome);
+    await this.prewarmTextureInIdle(domeSource);
+  }
+
+  /**
    * Materialize the terrain, water and bespoke render layer for one overworld
    * zone. Calls for an already-loaded (or currently-loading) zone are cheap and
    * share the same promise, so teleports and boundary jitter cannot duplicate
@@ -2313,29 +2372,30 @@ export class Renderer {
     const pending = this.pendingZonePrepares.get(zoneId);
     if (pending) return pending;
     const zone = zoneAt(x, z);
+    const idlePace = opts?.pace === 'idle';
     const task = (async () => {
       const started = performance.now();
       onProgress?.(0, 100);
-      await ensureSkyAssetsAt(x, z);
-      const envSource = this.skyView.envTexture(zone.biome);
-      const domeSource = this.skyView.domeTexture(zone.biome);
-      if (opts?.pace === 'idle') {
-        // A DataTexture upload is synchronous even from requestIdleCallback.
-        // Split HDRIs into bounded row batches, then run the much smaller 512px
-        // PMREM between idle slots. This keeps background zone preparation from
-        // turning a future biome's sky into one 30+ MB gameplay frame.
-        await this.prewarmTextureInIdle(envSource);
-        await idleSlot(IDLE_PREWARM_TIMEOUT_MS);
-        this.ensureEnvironmentBiome(zone.biome);
-        await this.prewarmTextureInIdle(domeSource);
-      } else {
-        // Initial entry/teleport is already covered by an opaque loading screen.
-        this.ensureEnvironmentBiome(zone.biome);
-        this.prewarmTexture(envSource);
-        this.prewarmTexture(domeSource);
-      }
-      const skyDone = performance.now();
+      let skyMs = 0;
+      const skyLane = (async () => {
+        await this.prepareZoneSky(zone, x, z, idlePace);
+        skyMs = Math.round((performance.now() - started) * 10) / 10;
+      })();
+      // Mark the lane handled the moment it exists. A background terrain build
+      // below can run for tens of seconds, and a rejection sitting un-awaited
+      // across that window is reported as an unhandledrejection (the client's
+      // fatal overlay) long before the join at the end could catch it.
+      void skyLane.catch(() => {});
+      // A BACKGROUND prepare does not let sky hold up ground. HDRI plus PMREM
+      // is 30 to 70 percent of a prepare (Drakelands measured skyMs 6083 of
+      // totalMs 8982) and a NEIGHBOURING realm's IBL has nothing to do with
+      // whether the player can see ground: the fog clamp keys off attached
+      // terrain chunks, so starting terrain now is what opens the view. The
+      // gating path still takes sky first: the player is arriving INTO that
+      // sky behind an opaque loading screen, and its bar stays monotonic.
+      if (!idlePace) await skyLane;
       onProgress?.(5, 100);
+      const terrainStarted = performance.now();
       await this.terrainView.ensureZone(
         zone,
         (done, total) => onProgress?.(5 + Math.round((done / Math.max(1, total)) * 83), 100),
@@ -2378,16 +2438,24 @@ export class Renderer {
         }
       }
       const featuresDone = performance.now();
+      // Zone RESIDENCY still means the whole zone, sky included: the HUD map
+      // prewarm and the warmup gate both key off it. Only the fog was
+      // decoupled, and it now reads chunk residency instead.
+      await skyLane;
+      const prepareDone = performance.now();
       this.preparedZones.add(zone.id);
       // Presentation layers beyond the renderer (main.ts wires the HUD's map
       // background prewarm here) piggyback on zone residency, so their own
       // caches are warm before the player can interact with the new zone.
       this.onZonePrepared?.(zone.id);
+      // On a background prepare skyMs OVERLAPS terrainMs (the lanes run
+      // concurrently), so the stages no longer sum to totalMs. Each is still
+      // its own lane's wall time, which is what the pacing work reads them for.
       this.lastZonePrepareStats = {
         zoneId: zone.id,
-        totalMs: Math.round((featuresDone - started) * 10) / 10,
-        skyMs: Math.round((skyDone - started) * 10) / 10,
-        terrainMs: Math.round((terrainDone - skyDone) * 10) / 10,
+        totalMs: Math.round((prepareDone - started) * 10) / 10,
+        skyMs,
+        terrainMs: Math.round((terrainDone - terrainStarted) * 10) / 10,
         waterMs: Math.round((waterDone - terrainDone) * 10) / 10,
         featuresMs: Math.round((featuresDone - waterDone) * 10) / 10,
       };
@@ -2601,18 +2669,75 @@ export class Renderer {
   // Groups attachZoneFeature added during the current ensureZoneFeatures pass:
   // a background prepare precompiles their programs (see prepareZoneAt), so a
   // new biome's bespoke feature shaders never first-draw inside a live frame.
+  // Constructor-time attaches (the world-spanning dressing) land here too but
+  // are reset before the first prepare: those compile with the boot warmup.
   private lastAttachedFeatureGroups: THREE.Group[] = [];
 
+  // Every attached feature group with its world XZ footprint, for the
+  // per-frame distance cull in updateZoneFeatureVisibility. Measured ONCE here:
+  // these groups are static and matrix-frozen, so the bounds never move.
+  private zoneFeatureGroups: { group: THREE.Group; footprint: FeatureFootprint | null }[] = [];
+
   private attachZoneFeature(
-    view: { group: THREE.Group; glowLights?: THREE.PointLight[] },
+    view: { group: THREE.Group; glowLights?: THREE.PointLight[]; cullGroups?: THREE.Group[] },
     freeze = true,
   ): void {
     setRenderCategory(view.group, 'props');
     this.scene.add(view.group);
+    // Point lights ride the fireLights budget, NEVER the cull-toggled group
+    // (the Sowfield brazier rule). A light left inside the group leaves the
+    // render light list whenever the distance cull hides its ancestor, so the
+    // pinned numPointLights changes and every lit material recompiles: the
+    // open-world travel freeze the budget exists to prevent. Reparent every
+    // PointLight descendant to the scene mechanically, so the NEXT feature
+    // builder that parents a glow into its group cannot reintroduce it.
+    const strandedLights: THREE.PointLight[] = [];
+    view.group.traverse((obj) => {
+      if ((obj as THREE.PointLight).isLight) strandedLights.push(obj as THREE.PointLight);
+    });
+    for (const light of strandedLights) {
+      light.getWorldPosition(this.tmpV);
+      this.scene.add(light); // add() detaches from the old parent
+      light.position.copy(this.tmpV);
+    }
     if (freeze) freezeStaticMatrices(view.group);
     for (const light of view.glowLights ?? []) this.fireLights.push(light);
     this.lightRankDirty = true;
     this.lastAttachedFeatureGroups.push(view.group);
+    // A view spanning several regions registers each child for the distance
+    // cull instead of the whole group: one world-wide footprint can never be
+    // culled (water-flora was 10.96M triangles submitted from every realm).
+    for (const cullGroup of view.cullGroups ?? [view.group]) {
+      // Footprints are measured ONCE at attach, so an InstancedMesh whose
+      // matrices are still factory zeros poisons the measurement silently
+      // (the seabird flock parked a footprint at the world origin this way).
+      cullGroup.traverse((obj) => {
+        const inst = obj as THREE.InstancedMesh;
+        if (!inst.isInstancedMesh) return;
+        if (hasUnseededInstanceMatrix(inst.instanceMatrix.array, inst.count)) {
+          console.error(
+            `attachZoneFeature: "${cullGroup.name}" holds an InstancedMesh with unseeded ` +
+              'instance matrices; seed placements before attach or its cull footprint is wrong',
+          );
+        }
+      });
+      this.zoneFeatureGroups.push({
+        group: cullGroup,
+        footprint: measureFeatureFootprint(cullGroup),
+      });
+    }
+  }
+
+  // Hide feature groups the fog has already swallowed. Terrain and foliage both
+  // did this; zone features never did, so ~40M triangles of towns, mazes and
+  // flora for zones the player could not see were submitted every frame (see
+  // zone_feature_visibility_core.ts for the measurements).
+  private updateZoneFeatureVisibility(fogFar: number): void {
+    const camX = this.camera.position.x;
+    const camZ = this.camera.position.z;
+    for (const entry of this.zoneFeatureGroups) {
+      entry.group.visible = isZoneFeatureVisible(entry.footprint, camX, camZ, fogFar);
+    }
   }
 
   private ensureZoneFeatures(zone: ZoneDef): void {
@@ -2621,6 +2746,10 @@ export class Renderer {
         if (!this.realmFlora) {
           this.realmFlora = buildRealmFlora(this.sim.cfg.seed);
           this.attachZoneFeature(this.realmFlora);
+          // the freeze above stills the whole subtree; foam swell and mist
+          // drift move via object transforms, so they get their motion back
+          // (the props.flames idiom)
+          for (const moving of this.realmFlora.animated) moving.matrixAutoUpdate = true;
         }
         break;
       case 'ember':
@@ -3330,6 +3459,7 @@ export class Renderer {
       fogFar,
     );
     this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
+    this.updateZoneFeatureVisibility(fogFar);
     this.propsView.update(
       this.camera.position.x,
       this.camera.position.y,
@@ -3360,6 +3490,8 @@ export class Renderer {
       this.cameraLookAt.z,
       fogNear,
       fogFar,
+      this.lastRequestedFogNear,
+      this.lastRequestedFogFar,
     );
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.vfx.update(dt);
@@ -5844,35 +5976,47 @@ export class Renderer {
   // visible-zone streaming lane keeping neighbours resident before they can
   // be seen, the fog no longer has to hide unloaded regions itself, so the
   // sky and real vistas read again. fogFarForPreparedZones stays as the
-  // safety clamp for the brief window a build is still catching up. The
-  // near:far ratio is kept roughly constant per biome so the fog gradient
-  // itself does not change shape, and no far exceeds MAX_OUTDOOR_FOG_FAR
-  // (the rendering/culling envelope).
+  // safety clamp for the brief window a build is still catching up. No far
+  // exceeds MAX_OUTDOOR_FOG_FAR (the rendering/culling envelope).
+  //
+  // The MURKY realms (marsh, haunt, frost, ember, dusk, amber and the two
+  // paint-only caves) then got a readability pass: their `near` was where the
+  // "cannot see anything in front of me" reports came from, since the chase
+  // camera sits ~12 yd behind the player and a near of 45 puts the fog barely
+  // 30 yd ahead of the character. `near` moves out further than `far` here,
+  // which does steepen those gradients slightly, but it is the plane the
+  // complaint is actually about and it costs nothing to draw. `far` moves only
+  // enough to keep each realm's silhouette depth (fog far drives terrain,
+  // prop and foliage culling, so it is the expensive half). The clear realms
+  // (vale, peaks, fen, jungle, garden, gale and friends) were already open and
+  // are untouched.
   private static BIOME_FOG: Record<BiomeId, { color: number; near: number; far: number }> = {
     // The blue-sky biomes carry a deeper sky-blue haze (the old paler values
     // tonemapped to near white, so fully fogged distant trees and zones read
     // as white cutouts against the HDRI sky instead of far-off silhouettes).
     vale: { color: 0x7095bd, near: 55, far: MAX_OUTDOOR_FOG_FAR },
-    marsh: { color: 0xa3b294, near: 45, far: 110 },
+    // pale sage matched to the marsh horizon sky: the dome renders fog-free,
+    // so a darker murk left every fully fogged silhouette as a cutout band
+    marsh: { color: 0xc2cbb6, near: 75, far: 165 },
     peaks: { color: 0x8bb0d4, near: 55, far: MAX_OUTDOOR_FOG_FAR },
     beach: { color: 0x7ea6c9, near: 50, far: MAX_OUTDOOR_FOG_FAR },
     desert: { color: 0xd8c9a8, near: 50, far: MAX_OUTDOOR_FOG_FAR },
-    volcano: { color: 0x8a7468, near: 38, far: 100 },
-    cave: { color: 0x76807c, near: 32, far: 90 },
-    // permanent dusk: dense rose-mauve murk, the realm's signature
-    dusk: { color: 0xc9a3bd, near: 80, far: 375 },
+    volcano: { color: 0x8a7468, near: 60, far: 145 },
+    cave: { color: 0x76807c, near: 48, far: 125 },
+    // permanent dusk: rose-mauve murk, the realm's signature
+    dusk: { color: 0xc9a3bd, near: 115, far: 400 },
     // scorched haze south, thicker toward the volcanic north (looks pass)
-    ember: { color: 0x9a5844, near: 80, far: 360 },
-    // the Frostveil: dense icy mist, visibility closes right in
-    frost: { color: 0xa9bed2, near: 55, far: 285 },
+    ember: { color: 0x9a5844, near: 115, far: 385 },
+    // the Frostveil: icy mist, the coldest sightlines in the world
+    frost: { color: 0xa9bed2, near: 95, far: 325 },
     // the Amberfall: warm golden haze under an endless afternoon
-    amber: { color: 0xdec18e, near: 95, far: 405 },
+    amber: { color: 0xdec18e, near: 130, far: 430 },
     // the Willowfen: clear airy morning, the lightest fog in the world
     fen: { color: 0xcfe2dc, near: 140, far: 510 },
     // the Nightbloom: a soft lavender dream-haze over the violet downs
     night: { color: 0xbfb0e8, near: 130, far: 495 },
-    // the Wraithwood: dense dead-grey murk, sightlines close right in
-    haunt: { color: 0x454c46, near: 45, far: 225 },
+    // the Wraithwood: dead-grey murk, the tightest sightlines outdoors
+    haunt: { color: 0x454c46, near: 85, far: 265 },
     // the Palmreach: bright humid haze, the clearest air in the world
     jungle: { color: 0xd6efe2, near: 165, far: 600 },
     // the Evergarden: crystal parkland air with the faintest green cast
@@ -5882,8 +6026,10 @@ export class Renderer {
   };
   // Low tier trades view distance for draw count (its own perf knob, never a
   // gameplay one: entities draw within their own much shorter ranges on every
-  // tier, so fog distance sheds only cosmetic scenery).
-  private static LOW_FOG = { color: 0xa6c6e0, near: 90, far: 325 };
+  // tier, so fog distance sheds only cosmetic scenery). Takes the same
+  // readability pass on `near`, with `far` held nearly still so the tier keeps
+  // paying for itself.
+  private static LOW_FOG = { color: 0xa6c6e0, near: 115, far: 340 };
 
   // Per-biome outdoor light grade, eased alongside fog in updateAmbience.
   // The three original biomes keep the exact constants the lights were
@@ -6327,9 +6473,16 @@ export class Renderer {
       const k = 1 - Math.exp(-dt * 1.5);
       const requestedFar = preset.far * (this.lowGfx ? 1 : g.farScale);
       this.lastRequestedFogFar = requestedFar;
-      const targetFar = fogFarForPreparedZones(
-        ZONES,
-        this.preparedZones,
+      this.lastRequestedFogNear = preset.near;
+      // Residency is read per CHUNK, through the terrain view's own accessor.
+      // Asking per ZONE meant an unprepared 36-to-54 chunk rectangle within
+      // ~53 yd pinned the view at the floor until that entire rectangle (and
+      // its HDRI) finished: 198 s of 45-yard wall after a Drakelands portal.
+      // Read live rather than cached: an editor rebuildTerrain swaps the view.
+      const ground = this.terrainView.groundResidency();
+      const targetFar = fogFarForBuiltGround(
+        ground.grid,
+        ground.isPending,
         this.camera.position.x,
         this.camera.position.z,
         requestedFar,
@@ -7777,6 +7930,7 @@ export class Renderer {
     const fogNear = (this.scene.fog as THREE.Fog).near;
     this.queueVisibleZonePrepares(Math.max(fogFar, this.lastRequestedFogFar));
     this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
+    this.updateZoneFeatureVisibility(fogFar);
     worldStart = markWorldPhase('terrain', worldStart);
     this.propsView.update(
       this.camera.position.x,
@@ -7817,6 +7971,8 @@ export class Renderer {
       this.cameraLookAt.z,
       fogNear,
       fogFar,
+      this.lastRequestedFogNear,
+      this.lastRequestedFogFar,
     );
     worldStart = markWorldPhase('foliage', worldStart);
     this.fish.update(p.pos.x, p.pos.z, dt);
@@ -8184,6 +8340,16 @@ export class Renderer {
   /** The terrain chunk group, for the editor to raycast/rebuild. */
   get terrainGroup(): THREE.Group {
     return this.terrainView.group;
+  }
+
+  /**
+   * Stop terrain streaming and tear down its worker pool. rebuildTerrain does
+   * this for a replaced view; a host that discards the whole renderer (the
+   * editor viewport) must call it too, or every teardown leaks the pool's
+   * module workers.
+   */
+  cancelTerrainStreaming(): void {
+    this.terrainView.cancelStreaming();
   }
 
   /**
