@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { paintTerrainRows, mapCanvasHeight, type MapRegion } from '../src/ui/map_terrain';
-import { ZONES, WORLD_MIN_X, WORLD_MAX_X, zoneAt } from '../src/sim/data';
+import { WORLD_MAX_X, WORLD_MIN_X, ZONES, zoneAt } from '../src/sim/data';
 import { zoneBiomeAt } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
+import { type MapRegion, mapCanvasHeight, paintTerrainRows } from '../src/ui/map_terrain';
 
-const SEED = 20061;
+const SEED = WORLD_SEED;
 
 function zoneRegion(zoneId: string): MapRegion {
   const zone = ZONES.find((z) => z.id === zoneId) ?? ZONES[0];
@@ -19,7 +20,12 @@ function renderFull(W: number, region: MapRegion, seed: number): Uint8ClampedArr
 }
 
 // Render the same canvas in row-band slices, the way the idle prewarm does.
-function renderChunked(W: number, region: MapRegion, seed: number, rowsPerSlice: number): Uint8ClampedArray {
+function renderChunked(
+  W: number,
+  region: MapRegion,
+  seed: number,
+  rowsPerSlice: number,
+): Uint8ClampedArray {
   const H = mapCanvasHeight(W, region);
   const data = new Uint8ClampedArray(W * H * 4);
   for (let row = 0; row < H; row += rowsPerSlice) {

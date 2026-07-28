@@ -50,6 +50,14 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 
 // The live shipped seed (src/sim/world_seed.ts, the one both hosts build
 // from), never a copy: every geometry assertion below is about THE world.
+//
+// One literal pin, deliberately: every suite now derives from the shared
+// constant, so without this line a seed change would reshuffle the whole
+// persistent world with a fully green suite (the constant-self-comparison
+// trap). Moving the shipped seed must be a decision that reddens a test.
+it('the shipped world seed is pinned to its literal', () => {
+  expect(WORLD_SEED).toBe(20061);
+});
 
 // Freeboard a node needs above the local water surface. The NUMBER is not a new
 // one: generateDecorations (world.ts) refuses to anchor a tree or boulder below

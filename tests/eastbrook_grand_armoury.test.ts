@@ -1,3 +1,4 @@
+import { WORLD_SEED } from '../src/sim/world_seed';
 // Eastbrook Grand Armoury integration contract. The visual landmark keeps its
 // measured southeast lot while the rebuilt town gives the rest role to a real inn.
 // These tests pin the shared authored footprint before the Three adapter and
@@ -41,7 +42,7 @@ import { isResting } from '../src/sim/progression/xp';
 import type { BuildingDef, Entity } from '../src/sim/types';
 import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
 
-const SEED = 20061;
+const SEED = WORLD_SEED;
 const ALTERNATE_SEED = 4717;
 
 afterEach(() => setActiveWorldContent(null));

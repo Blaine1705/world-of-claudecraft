@@ -36,8 +36,9 @@ import {
   terrainWallStandoff,
   WATER_LEVEL,
 } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
-const SEED = 20061;
+const SEED = WORLD_SEED;
 
 function makeSim(cls: 'warrior' | 'mage' | 'hunter' = 'warrior') {
   return new Sim({ seed: SEED, playerClass: cls });

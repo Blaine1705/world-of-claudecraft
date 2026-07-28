@@ -71,6 +71,7 @@ import {
   type VcNationId,
   type WeaponSkinType,
 } from '../sim/types';
+import { WORLD_SEED } from '../sim/world_seed';
 import {
   type AccountCosmetics,
   type ActiveFrostRing,
@@ -1642,7 +1643,9 @@ export class ClientWorld implements IWorld {
     this.base = normalizeOrigin(base) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
     this.clientSeed = clientSeed;
     this.ownPlayerClass = cls;
-    this.cfg = { seed: 20061, playerClass: cls };
+    // Placeholder until the server's hello supplies the authoritative seed;
+    // seeded from the shipped constant so the two can never silently diverge.
+    this.cfg = { seed: WORLD_SEED, playerClass: cls };
     this.openSocket();
     // unconditional input stream beat; constants + gate shared with the
     // cadence-model matrix via input_send_cadence.ts (R13)

@@ -17,6 +17,7 @@ import {
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { virtualLevel } from '../src/sim/types';
+import { WORLD_SEED } from '../src/sim/world_seed';
 import {
   type DeedsLeaderboardEntry,
   type DeedsLeaderboardSelf,
@@ -430,7 +431,7 @@ function initialCharacterState(
   name: string,
   skin: number,
 ): import('../src/sim/sim').CharacterState {
-  const sim = new Sim({ seed: 20061, playerClass: cls, playerName: name });
+  const sim = new Sim({ seed: WORLD_SEED, playerClass: cls, playerName: name });
   sim.setPlayerSkin(sim.playerId, skin);
   const character = sim.serializeCharacter(sim.playerId);
   if (!character) throw new Error('failed to serialize initial character');

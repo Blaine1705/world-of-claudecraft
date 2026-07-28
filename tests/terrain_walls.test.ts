@@ -11,6 +11,7 @@ import {
   VC_STAND_TIER_HEIGHTS,
 } from '../src/sim/vale_cup_layout';
 import { groundHeight, terrainSteepness } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 // The mountain walls of the world (the inter-zone ridges and the outer rim) are
 // meant to be impassable: every crossing outside the road pass must somewhere be
@@ -18,7 +19,6 @@ import { groundHeight, terrainSteepness } from '../src/sim/world';
 // slope gates in sim.ts actually stop the player. This file pins that terrain
 // contract; tests/climb_slope.test.ts pins the movement gates themselves.
 
-const WORLD_SEED = 20061; // the fixed production seed (src/main.ts, server/game.ts)
 const CLIMB_LIMIT = 1.5;
 const WALL_MARGIN = 1.7; // walls must beat the limit with headroom, not by a hair
 const PASS_HALF_WIDTH = 10;
