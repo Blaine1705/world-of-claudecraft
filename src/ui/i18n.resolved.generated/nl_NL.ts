@@ -7785,7 +7785,7 @@ export const nl_NL: EnTranslations = {
       },
       "chain_heal": {
         "name": "Kettinggenezing",
-        "description": "Heal a friendly target for {damage}, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)"
+        "description": "Geneest een bevriend doelwit voor {damage} en springt daarna over naar maximaal 2 bondgenoten binnen 12 meter. Elke sprong geneest voor 50% van het vorige doelwit. Elke bereikte bondgenoot verbruikt je resterende Herstelstroom en geneest onmiddellijk voor 125% van de verbruikte hoeveelheid. De eerste genezing neemt toe met spreukkracht. (Herstel-kenmerk)"
       },
       "galeheart_weapon": {
         "name": "Stormhartwapen",
@@ -8109,7 +8109,7 @@ export const nl_NL: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Laatste gebed",
-        "description": "Instantly heals you for 30% of maximum health."
+        "description": "Geneest je onmiddellijk voor 30% van je maximale gezondheid."
       },
       "deterrence": {
         "name": "Borstelwacht",

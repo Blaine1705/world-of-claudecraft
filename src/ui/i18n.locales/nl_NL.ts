@@ -8280,6 +8280,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Hoog op Doorntop verzamelt de storm boven Stormcrag soms een gedaante. Thunzharr, de Ontwakende Piek verrijst daar met een vast ritme, een elementaal met de kracht van een raid, bevochten in de open wereld door wie de roep beantwoordt, en hij wordt machtiger naarmate meer uitdagers tegen hem opstaan. Iedereen die zich in het gevecht mengt, verdient zijn eigen worp van zijn buit, geëerd op raidlockout-voorwaarden, en zijn val blijft lang genoeg hangen zodat de gevallenen kunnen terugrennen om hun deel op te eisen. Verzamel meer zwaarden dan je denkt nodig te hebben.',
   'guide.worldPage.worldBossTitle': 'Wanneer de piek ontwaakt: de wereldbaas',
   'entities.abilities.chain_heal.name': 'Kettinggenezing',
+  'entities.abilities.chain_heal.description':
+    'Geneest een bevriend doelwit voor {damage} en springt daarna over naar maximaal 2 bondgenoten binnen 12 meter. Elke sprong geneest voor 50% van het vorige doelwit. Elke bereikte bondgenoot verbruikt je resterende Herstelstroom en geneest onmiddellijk voor 125% van de verbruikte hoeveelheid. De eerste genezing neemt toe met spreukkracht. (Herstel-kenmerk)',
+  'entities.abilities.desperate_prayer.description':
+    'Geneest je onmiddellijk voor 30% van je maximale gezondheid.',
   'entities.abilities.counter_shot.description':
     'Een snel schot dat de spreuk van het doelwit onderbreekt en die magieschool 4 sec vergrendelt.',
   'entities.abilities.counter_shot.name': 'Dempingsschot',

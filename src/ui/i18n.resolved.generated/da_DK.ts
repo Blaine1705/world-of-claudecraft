@@ -7785,7 +7785,7 @@ export const da_DK: EnTranslations = {
       },
       "chain_heal": {
         "name": "Kædeheling",
-        "description": "Heal a friendly target for {damage}, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)"
+        "description": "Helbreder et venligt mål for {damage} og springer derefter videre til op til 2 allierede inden for 12 meter. Hvert spring helbreder for 50% af det forrige mål. Hver allieret der nås, forbruger din resterende Lapningsstrøm og helbreder øjeblikkeligt for 125% af den forbrugte mængde. Den indledende helbredelse øges med besværgelseskraft. (Genoprettelsessignatur)"
       },
       "galeheart_weapon": {
         "name": "Stormhjertevåben",
@@ -8109,7 +8109,7 @@ export const da_DK: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Sidste bøn",
-        "description": "Instantly heals you for 30% of maximum health."
+        "description": "Helbreder dig øjeblikkeligt for 30% af dit maksimale helbred."
       },
       "deterrence": {
         "name": "Børsteværn",

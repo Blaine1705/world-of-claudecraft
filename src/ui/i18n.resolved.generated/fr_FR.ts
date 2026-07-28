@@ -7785,7 +7785,7 @@ export const fr_FR: EnTranslations = {
       },
       "chain_heal": {
         "name": "Salve de guérison",
-        "description": "Heal a friendly target for {damage}, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)"
+        "description": "Soigne une cible alliée de {damage}, puis rebondit sur 2 alliés au plus dans un rayon de 12 mètres. Chaque bond soigne de 50% de la cible précédente. Chaque allié atteint consomme votre Courant réparateur restant et soigne immédiatement de 125% de la quantité consommée. Le soin initial augmente avec la puissance des sorts. (signature Restauration)"
       },
       "galeheart_weapon": {
         "name": "Arme Cœur-de-bourrasque",
@@ -8109,7 +8109,7 @@ export const fr_FR: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Dernière prière",
-        "description": "Instantly heals you for 30% of maximum health."
+        "description": "Vous soigne instantanément de 30% des points de vie maximum."
       },
       "deterrence": {
         "name": "Garde-hérissée",

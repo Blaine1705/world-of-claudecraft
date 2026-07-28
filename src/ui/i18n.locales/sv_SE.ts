@@ -8060,6 +8060,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Högt uppe på Törntoppen samlar stormen över Stormcrag ibland en skepnad. Thunzharr, det vaknande berget reser sig där i en jämn rytm, en elementar av raidstyrka som bekämpas i den öppna världen av vem som än svarar på uppropet, och han växer sig mäktigare ju fler utmanare som står emot honom. Alla som ansluter till striden förtjänar sin egen kastning på hans byte, hedrad på raidspärrens villkor, och hans fall dröjer kvar länge nog för de fallna att springa tillbaka och kräva sitt. Samla fler svärd än du tror du behöver.',
   'guide.worldPage.worldBossTitle': 'När berget vaknar: världsbossen',
   'entities.abilities.chain_heal.name': 'Kedjeläkning',
+  'entities.abilities.chain_heal.description':
+    'Läker ett vänligt mål för {damage} och hoppar sedan vidare till upp till 2 allierade inom 12 meter. Varje hopp läker för 50% av föregående mål. Varje nådd allierad förbrukar din återstående Lagningsström och läker omedelbart för 125% av den förbrukade mängden. Den inledande läkningen ökar med besvärjelsekraft. (Återställningssignatur)',
+  'entities.abilities.desperate_prayer.description':
+    'Läker dig omedelbart för 30% av din maximala hälsa.',
   'entities.abilities.counter_shot.description':
     'Ett snabbt skott som avbryter målets besvärjelse och låser den magiskolan i 4 sek.',
   'entities.abilities.counter_shot.name': 'Dämpande Skott',

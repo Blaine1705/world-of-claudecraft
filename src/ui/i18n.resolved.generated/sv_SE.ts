@@ -7785,7 +7785,7 @@ export const sv_SE: EnTranslations = {
       },
       "chain_heal": {
         "name": "Kedjeläkning",
-        "description": "Heal a friendly target for {damage}, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)"
+        "description": "Läker ett vänligt mål för {damage} och hoppar sedan vidare till upp till 2 allierade inom 12 meter. Varje hopp läker för 50% av föregående mål. Varje nådd allierad förbrukar din återstående Lagningsström och läker omedelbart för 125% av den förbrukade mängden. Den inledande läkningen ökar med besvärjelsekraft. (Återställningssignatur)"
       },
       "galeheart_weapon": {
         "name": "Stormhjärtevapen",
@@ -8109,7 +8109,7 @@ export const sv_SE: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Sista bön",
-        "description": "Instantly heals you for 30% of maximum health."
+        "description": "Läker dig omedelbart för 30% av din maximala hälsa."
       },
       "deterrence": {
         "name": "Borstvakt",

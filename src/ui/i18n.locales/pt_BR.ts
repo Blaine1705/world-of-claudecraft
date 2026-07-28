@@ -8150,6 +8150,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'No alto de Thornpeak, a tempestade sobre Stormcrag às vezes toma forma. Thunzharr, o Pico Desperto se ergue ali em um ritmo constante, um elemental com força de raide enfrentado no mundo aberto por quem quer que atenda ao chamado, e ele fica mais poderoso quanto mais desafiantes se erguem contra ele. Cada um que entra na luta ganha o próprio sorteio dos despojos dele, honrado nos termos do bloqueio de raide, e sua queda perdura o bastante para que os tombados corram de volta e reivindiquem o que lhes cabe. Reúna mais espadas do que você acha que precisa.',
   'guide.worldPage.worldBossTitle': 'Quando o pico desperta: o chefe mundial',
   'entities.abilities.chain_heal.name': 'Cura em Cadeia',
+  'entities.abilities.chain_heal.description':
+    'Cura um alvo aliado em {damage} e então salta para até 2 aliados num raio de 12 metros. Cada salto cura 50% do alvo anterior. Cada aliado alcançado consome sua Corrente Restauradora restante e cura imediatamente 125% da quantidade consumida. A cura inicial aumenta com o poder mágico. (assinatura Restauração)',
+  'entities.abilities.desperate_prayer.description':
+    'Cura você instantaneamente em 30% da vida máxima.',
   'entities.abilities.counter_shot.description':
     'Um disparo rápido que interrompe a conjuração do alvo e bloqueia essa escola por 4 s.',
   'entities.abilities.counter_shot.name': 'Tiro Silenciador',

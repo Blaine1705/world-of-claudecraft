@@ -9,70 +9,25 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "entities.abilities.chain_heal.description",
-    "entities.abilities.desperate_prayer.description"
-  ],
-  "es_ES": [
-    "entities.abilities.chain_heal.description",
-    "entities.abilities.desperate_prayer.description"
-  ],
-  "fr_FR": [
-    "entities.abilities.chain_heal.description",
-    "entities.abilities.desperate_prayer.description"
-  ],
-  "fr_CA": [
-    "entities.abilities.chain_heal.description",
-    "entities.abilities.desperate_prayer.description"
-  ],
+  "es": [],
+  "es_ES": [],
+  "fr_FR": [],
+  "fr_CA": [],
   "en_CA": [],
-  "it_IT": [
-    "entities.abilities.chain_heal.description",
-    "entities.abilities.desperate_prayer.description"
-  ],
-  "de_DE": [
-    "entities.abilities.chain_heal.description",
-    "entities.abilities.desperate_prayer.description"
-  ],
+  "it_IT": [],
+  "de_DE": [],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [
-    "entities.abilities.chain_heal.description",
-    "entities.abilities.desperate_prayer.description"
-  ],
+  "pt_BR": [],
   "ru_RU": [],
-  "cs_CZ": [
-    "entities.abilities.chain_heal.description",
-    "entities.abilities.desperate_prayer.description"
-  ],
-  "nl_NL": [
-    "entities.abilities.chain_heal.description",
-    "entities.abilities.desperate_prayer.description"
-  ],
-  "pl_PL": [
-    "entities.abilities.chain_heal.description",
-    "entities.abilities.desperate_prayer.description"
-  ],
-  "id_ID": [
-    "entities.abilities.chain_heal.description",
-    "entities.abilities.desperate_prayer.description"
-  ],
-  "tr_TR": [
-    "entities.abilities.chain_heal.description",
-    "entities.abilities.desperate_prayer.description"
-  ],
-  "sv_SE": [
-    "entities.abilities.chain_heal.description",
-    "entities.abilities.desperate_prayer.description"
-  ],
-  "vi_VN": [
-    "entities.abilities.chain_heal.description",
-    "entities.abilities.desperate_prayer.description"
-  ],
-  "da_DK": [
-    "entities.abilities.chain_heal.description",
-    "entities.abilities.desperate_prayer.description"
-  ]
+  "cs_CZ": [],
+  "nl_NL": [],
+  "pl_PL": [],
+  "id_ID": [],
+  "tr_TR": [],
+  "sv_SE": [],
+  "vi_VN": [],
+  "da_DK": []
 };

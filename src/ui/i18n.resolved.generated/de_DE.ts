@@ -7785,7 +7785,7 @@ export const de_DE: EnTranslations = {
       },
       "chain_heal": {
         "name": "Kettenheilung",
-        "description": "Heal a friendly target for {damage}, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)"
+        "description": "Heilt ein verbündetes Ziel um {damage} und springt dann auf bis zu 2 Verbündete im Umkreis von 12 Metern über. Jeder Sprung heilt um 50% des vorherigen Ziels. Jeder erreichte Verbündete verbraucht Eure verbleibende Flickströmung und heilt sofort um 125% der verbrauchten Menge. Die anfängliche Heilung steigt mit Zaubermacht. (Wiederherstellungs-Signatur)"
       },
       "galeheart_weapon": {
         "name": "Sturmherzwaffe",
@@ -8109,7 +8109,7 @@ export const de_DE: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Letztes Gebet",
-        "description": "Instantly heals you for 30% of maximum health."
+        "description": "Heilt Euch sofort um 30% der maximalen Gesundheit."
       },
       "deterrence": {
         "name": "Borstenwacht",

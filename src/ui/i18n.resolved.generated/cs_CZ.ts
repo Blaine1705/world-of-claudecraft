@@ -7785,7 +7785,7 @@ export const cs_CZ: EnTranslations = {
       },
       "chain_heal": {
         "name": "Řetězové léčení",
-        "description": "Heal a friendly target for {damage}, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)"
+        "description": "Vyléčí přátelský cíl za {damage} a pak přeskočí až na 2 spojence do 12 metrů. Každý skok léčí za 50% předchozího cíle. Každý zasažený spojenec spotřebuje tvůj zbývající Léčivý proud a okamžitě se vyléčí za 125% spotřebovaného množství. Počáteční léčení roste se silou kouzel. (Signatura Zhojení duchem)"
       },
       "galeheart_weapon": {
         "name": "Zbraň srdce vichru",
@@ -8109,7 +8109,7 @@ export const cs_CZ: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Poslední modlitba",
-        "description": "Instantly heals you for 30% of maximum health."
+        "description": "Okamžitě tě vyléčí za 30% maximálního zdraví."
       },
       "deterrence": {
         "name": "Štětinová stráž",

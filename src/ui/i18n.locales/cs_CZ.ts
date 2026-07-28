@@ -7752,6 +7752,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.swiftmend.description':
     'Spotřebuje průběžné léčení na spojeneckém cíli a vyléčí ho za {damage}. (klíčová schopnost Obnovy)',
   'entities.abilities.chain_heal.name': 'Řetězové léčení',
+  'entities.abilities.chain_heal.description':
+    'Vyléčí přátelský cíl za {damage} a pak přeskočí až na 2 spojence do 12 metrů. Každý skok léčí za 50% předchozího cíle. Každý zasažený spojenec spotřebuje tvůj zbývající Léčivý proud a okamžitě se vyléčí za 125% spotřebovaného množství. Počáteční léčení roste se silou kouzel. (Signatura Zhojení duchem)',
+  'entities.abilities.desperate_prayer.description':
+    'Okamžitě tě vyléčí za 30% maximálního zdraví.',
   'entities.items.chunk_of_ore.name': 'Kus rudy',
   'entities.quests.q_prof_intro.title': 'Řemeslo pro každou ruku',
   'entities.quests.q_prof_amends_apothecary.completion':

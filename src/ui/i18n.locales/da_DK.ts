@@ -8215,6 +8215,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Højt oppe på Tornetop samler stormen over Stormcrag sig undertiden til en skikkelse. Thunzharr, den Vågnende Tind rejser sig der i en fast rytme, en elementar af raidstyrke, der bekæmpes i den åbne verden af hvem end der svarer på kaldet, og han vokser sig mægtigere, jo flere udfordrere der stiller op mod ham. Alle, der slutter sig til kampen, tjener deres eget kast om hans bytte, hædret på raidspærrings-vilkår, og hans fald varer længe nok til, at de faldne kan løbe tilbage og gøre krav på deres del. Saml flere sværd, end du tror, du har brug for.',
   'guide.worldPage.worldBossTitle': 'Når tinden vågner: verdensbossen',
   'entities.abilities.chain_heal.name': 'Kædeheling',
+  'entities.abilities.chain_heal.description':
+    'Helbreder et venligt mål for {damage} og springer derefter videre til op til 2 allierede inden for 12 meter. Hvert spring helbreder for 50% af det forrige mål. Hver allieret der nås, forbruger din resterende Lapningsstrøm og helbreder øjeblikkeligt for 125% af den forbrugte mængde. Den indledende helbredelse øges med besværgelseskraft. (Genoprettelsessignatur)',
+  'entities.abilities.desperate_prayer.description':
+    'Helbreder dig øjeblikkeligt for 30% af dit maksimale helbred.',
   'entities.abilities.counter_shot.description':
     'Et hurtigt skud, der afbryder målets besværgelse og låser den pågældende magiskole i 4 sek.',
   'entities.abilities.counter_shot.name': 'Dæmpende Skud',

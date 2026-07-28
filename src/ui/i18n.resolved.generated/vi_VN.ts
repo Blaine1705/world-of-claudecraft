@@ -7785,7 +7785,7 @@ export const vi_VN: EnTranslations = {
       },
       "chain_heal": {
         "name": "Hồi Máu Liên Hoàn",
-        "description": "Heal a friendly target for {damage}, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)"
+        "description": "Hồi máu cho một mục tiêu đồng minh {damage}, sau đó nhảy sang tối đa 2 đồng minh trong phạm vi 12 mét. Mỗi lần nhảy hồi 50% so với mục tiêu trước. Mỗi đồng minh được chạm tới tiêu Dòng Chữa Lành còn lại của bạn và lập tức hồi 125% lượng đã tiêu. Lượng hồi ban đầu tăng theo sức mạnh phép thuật. (đặc trưng của Phục Hồi)"
       },
       "galeheart_weapon": {
         "name": "Vũ Khí Tâm Phong",
@@ -8109,7 +8109,7 @@ export const vi_VN: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Lời Cầu Cuối",
-        "description": "Instantly heals you for 30% of maximum health."
+        "description": "Lập tức hồi cho bạn 30% lượng máu tối đa."
       },
       "deterrence": {
         "name": "Hộ Vệ Gai",

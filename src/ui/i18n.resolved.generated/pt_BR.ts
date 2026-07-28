@@ -7785,7 +7785,7 @@ export const pt_BR: EnTranslations = {
       },
       "chain_heal": {
         "name": "Cura em Cadeia",
-        "description": "Heal a friendly target for {damage}, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)"
+        "description": "Cura um alvo aliado em {damage} e então salta para até 2 aliados num raio de 12 metros. Cada salto cura 50% do alvo anterior. Cada aliado alcançado consome sua Corrente Restauradora restante e cura imediatamente 125% da quantidade consumida. A cura inicial aumenta com o poder mágico. (assinatura Restauração)"
       },
       "galeheart_weapon": {
         "name": "Arma Coração de Vendaval",
@@ -8109,7 +8109,7 @@ export const pt_BR: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Última Prece",
-        "description": "Instantly heals you for 30% of maximum health."
+        "description": "Cura você instantaneamente em 30% da vida máxima."
       },
       "deterrence": {
         "name": "Guarda Espinhosa",

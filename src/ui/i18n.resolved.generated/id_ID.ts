@@ -7785,7 +7785,7 @@ export const id_ID: EnTranslations = {
       },
       "chain_heal": {
         "name": "Penyembuhan Berantai",
-        "description": "Heal a friendly target for {damage}, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)"
+        "description": "Menyembuhkan sasaran kawan sebesar {damage}, lalu melompat ke hingga 2 sekutu dalam radius 12 meter. Setiap lompatan menyembuhkan sebesar 50% dari sasaran sebelumnya. Setiap sekutu yang terjangkau menghabiskan sisa Arus Pemulihmu dan langsung menyembuhkan sebesar 125% dari jumlah yang dihabiskan. Penyembuhan awal meningkat dengan kekuatan mantra. (ciri khas Pemulihan)"
       },
       "galeheart_weapon": {
         "name": "Senjata Hati Badai",
@@ -8109,7 +8109,7 @@ export const id_ID: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Doa Terakhir",
-        "description": "Instantly heals you for 30% of maximum health."
+        "description": "Langsung menyembuhkanmu sebesar 30% dari nyawa maksimum."
       },
       "deterrence": {
         "name": "Penjaga Duri",

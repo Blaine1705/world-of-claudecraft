@@ -8258,6 +8258,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Hoch auf dem Thornpeak nimmt der Sturm über Stormcrag zuweilen Gestalt an. Thunzharr, der Erwachende Gipfel erhebt sich dort in stetigem Rhythmus, ein Elementar von Schlachtzugsstärke, in der offenen Welt von allen bekämpft, die dem Ruf folgen, und er wird umso mächtiger, je mehr Herausforderer sich ihm entgegenstellen. Jeder, der sich dem Kampf anschließt, verdient seinen eigenen Wurf auf seine Beute, nach den Regeln der Schlachtzugssperre gewährt, und sein Fall währt lange genug, dass die Gefallenen zurücklaufen und ihr Recht einfordern können. Sammle mehr Schwerter, als du zu brauchen glaubst.',
   'guide.worldPage.worldBossTitle': 'Wenn der Gipfel erwacht: der Weltboss',
   'entities.abilities.chain_heal.name': 'Kettenheilung',
+  'entities.abilities.chain_heal.description':
+    'Heilt ein verbündetes Ziel um {damage} und springt dann auf bis zu 2 Verbündete im Umkreis von 12 Metern über. Jeder Sprung heilt um 50% des vorherigen Ziels. Jeder erreichte Verbündete verbraucht Eure verbleibende Flickströmung und heilt sofort um 125% der verbrauchten Menge. Die anfängliche Heilung steigt mit Zaubermacht. (Wiederherstellungs-Signatur)',
+  'entities.abilities.desperate_prayer.description':
+    'Heilt Euch sofort um 30% der maximalen Gesundheit.',
   'entities.abilities.counter_shot.description':
     'Ein schneller Schuss, der das Zauberwirken des Ziels unterbricht und es 4 Sek. lang daran hindert, Zauber dieser Schule zu wirken.',
   'entities.abilities.counter_shot.name': 'Schweigeschuss',

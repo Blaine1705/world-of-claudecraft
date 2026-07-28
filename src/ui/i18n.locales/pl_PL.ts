@@ -8245,6 +8245,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Wysoko na Ciernistym Szczycie burza nad Stormcrag czasem przybiera kształt. Thunzharr, Budzący się Szczyt powstaje tam w stałym rytmie, żywiołak o sile rajdowej zwalczany w otwartym świecie przez każdego, kto odpowie na wezwanie, i staje się tym potężniejszy, im więcej wyzywających staje przeciw niemu. Każdy, kto dołączy do walki, otrzymuje własne losowanie jego zdobyczy, honorowane na zasadach blokady rajdowej, a jego upadek trwa dość długo, by polegli zdążyli wrócić po swoje. Zbierz więcej mieczy, niż sądzisz, że potrzebujesz.',
   'guide.worldPage.worldBossTitle': 'Gdy szczyt się budzi: boss świata',
   'entities.abilities.chain_heal.name': 'Leczenie Łańcuchowe',
+  'entities.abilities.chain_heal.description':
+    'Leczy przyjazny cel za {damage}, a następnie przeskakuje na maksymalnie 2 sojuszników w promieniu 12 metrów. Każdy przeskok leczy za 50% poprzedniego celu. Każdy objęty sojusznik zużywa twój pozostały Nurt Cerowania i natychmiast leczy się za 125% zużytej ilości. Początkowe leczenie rośnie wraz z mocą zaklęć. (sygnatura Odnowienia)',
+  'entities.abilities.desperate_prayer.description':
+    'Natychmiast leczy cię za 30% maksymalnego zdrowia.',
   'entities.abilities.counter_shot.description':
     'Szybki strzał, który przerywa rzucanie zaklęć celu i blokuje tę szkołę na 4 sekundy.',
   'entities.abilities.counter_shot.name': 'Uciszający Strzał',

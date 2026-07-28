@@ -7785,7 +7785,7 @@ export const pl_PL: EnTranslations = {
       },
       "chain_heal": {
         "name": "Leczenie Łańcuchowe",
-        "description": "Heal a friendly target for {damage}, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)"
+        "description": "Leczy przyjazny cel za {damage}, a następnie przeskakuje na maksymalnie 2 sojuszników w promieniu 12 metrów. Każdy przeskok leczy za 50% poprzedniego celu. Każdy objęty sojusznik zużywa twój pozostały Nurt Cerowania i natychmiast leczy się za 125% zużytej ilości. Początkowe leczenie rośnie wraz z mocą zaklęć. (sygnatura Odnowienia)"
       },
       "galeheart_weapon": {
         "name": "Broń Serca Wichru",
@@ -8109,7 +8109,7 @@ export const pl_PL: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Ostatnia Modlitwa",
-        "description": "Instantly heals you for 30% of maximum health."
+        "description": "Natychmiast leczy cię za 30% maksymalnego zdrowia."
       },
       "deterrence": {
         "name": "Kolczasta Straż",

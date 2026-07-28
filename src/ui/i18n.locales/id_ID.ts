@@ -8199,6 +8199,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Tinggi di Thornpeak, badai di atas Stormcrag kadang menghimpun sebuah wujud. Thunzharr, sang Puncak yang Terjaga bangkit di sana dengan irama tetap, sesosok elemental sekuat raid yang dilawan di dunia terbuka oleh siapa pun yang menjawab panggilan, dan ia tumbuh makin perkasa makin banyak penantang yang berdiri melawannya. Setiap orang yang bergabung dalam pertarungan memperoleh undian rampasannya sendiri, dihormati dengan ketentuan kunci raid, dan kejatuhannya bertahan cukup lama bagi yang gugur untuk berlari kembali dan menuntut haknya. Kumpulkan lebih banyak pedang daripada yang kamu kira kamu butuhkan.',
   'guide.worldPage.worldBossTitle': 'Saat puncak terjaga: sang bos dunia',
   'entities.abilities.chain_heal.name': 'Penyembuhan Berantai',
+  'entities.abilities.chain_heal.description':
+    'Menyembuhkan sasaran kawan sebesar {damage}, lalu melompat ke hingga 2 sekutu dalam radius 12 meter. Setiap lompatan menyembuhkan sebesar 50% dari sasaran sebelumnya. Setiap sekutu yang terjangkau menghabiskan sisa Arus Pemulihmu dan langsung menyembuhkan sebesar 125% dari jumlah yang dihabiskan. Penyembuhan awal meningkat dengan kekuatan mantra. (ciri khas Pemulihan)',
+  'entities.abilities.desperate_prayer.description':
+    'Langsung menyembuhkanmu sebesar 30% dari nyawa maksimum.',
   'entities.abilities.counter_shot.description':
     'Sebuah tembakan yang mengganggu perapalan mantra target dan mengunci sekolah itu selama 4 detik.',
   'entities.abilities.counter_shot.name': 'Tembakan Penangkal',

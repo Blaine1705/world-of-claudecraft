@@ -8305,6 +8305,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "In alto su Thornpeak, la tempesta sopra Stormcrag a volte prende forma. Thunzharr, la Vetta Risvegliata si erge lì con un ritmo costante, un elementale della potenza di un'incursione affrontato nel mondo aperto da chiunque risponda alla chiamata, e diventa più possente quanto più sfidanti gli si oppongono. Chiunque si unisca allo scontro guadagna il proprio tiro sul suo bottino, onorato secondo le regole di blocco d'incursione, e la sua caduta indugia abbastanza a lungo perché i caduti possano tornare di corsa a reclamare il dovuto. Raduna più spade di quante pensi ti servano.",
   'guide.worldPage.worldBossTitle': 'Quando la vetta si desta: il boss del mondo',
   'entities.abilities.chain_heal.name': 'Guarigione a Catena',
+  'entities.abilities.chain_heal.description':
+    'Cura un bersaglio alleato di {damage}, poi rimbalza su un massimo di 2 alleati entro 12 metri. Ogni rimbalzo cura del 50% del bersaglio precedente. Ogni alleato raggiunto consuma la tua Corrente Risanatrice residua e cura immediatamente del 125% della quantità consumata. La cura iniziale aumenta con il potere magico. (firma Ripristino)',
+  'entities.abilities.desperate_prayer.description':
+    'Ti cura istantaneamente del 30% della salute massima.',
   'entities.abilities.counter_shot.description':
     "Un tiro rapido che interrompe il lancio dell'incantesimo del bersaglio e blocca quella scuola per 4 s.",
   'entities.abilities.counter_shot.name': 'Tiro Silenziante',

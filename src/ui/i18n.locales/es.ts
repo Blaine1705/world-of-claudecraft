@@ -8171,6 +8171,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'En lo alto de Thornpeak, la tormenta sobre Stormcrag a veces cobra forma. Thunzharr, la Cima Despierta se alza allí con un ritmo constante, un elemental con fuerza de banda al que se combate en el mundo abierto por quienquiera que responda a la llamada, y se vuelve más poderoso cuantos más retadores se le enfrentan. Cada quien que se une al combate gana su propia tirada de su botín, respetada según las reglas de bloqueo de banda, y su caída perdura lo bastante para que los caídos vuelvan corriendo y reclamen lo suyo. Reúne más espadas de las que crees necesitar.',
   'guide.worldPage.worldBossTitle': 'Cuando la cima despierta: el jefe del mundo',
   'entities.abilities.chain_heal.name': 'Sanación en cadena',
+  'entities.abilities.chain_heal.description':
+    'Sana a un objetivo amistoso por {damage} y luego salta hasta a 2 aliados en un radio de 12 metros. Cada salto sana por un 50% del objetivo anterior. Cada aliado alcanzado consume tu Corriente Sanadora restante y sana de inmediato por un 125% de la cantidad consumida. La sanación inicial aumenta con el poder con hechizos. (Distintivo de Restauración)',
+  'entities.abilities.desperate_prayer.description':
+    'Te sana instantáneamente por un 30% de la salud máxima.',
   'entities.abilities.counter_shot.description':
     'Un disparo rápido que interrumpe el lanzamiento de hechizos del objetivo y bloquea esa escuela durante 4 s.',
   'entities.abilities.counter_shot.name': 'Disparo silenciador',

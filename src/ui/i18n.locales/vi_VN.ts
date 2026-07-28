@@ -8148,6 +8148,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Cao trên Đỉnh Gai, cơn bão trên Stormcrag đôi khi tụ lại thành một hình hài. Thunzharr, Đỉnh Núi Thức Giấc trỗi dậy nơi đó theo một nhịp đều đặn, một nguyên tố mạnh cỡ raid được chiến đấu giữa thế giới mở bởi bất kỳ ai đáp lời, và hắn càng lúc càng hùng mạnh hơn khi càng nhiều người thách đấu đứng lên chống lại. Mọi người tham gia trận chiến đều kiếm được lượt bốc chiến lợi phẩm của riêng mình từ hắn, theo lệ khóa lượt raid, và cái chết của hắn nán lại đủ lâu để những người đã ngã xuống chạy về và nhận phần của mình. Hãy tụ hội nhiều gươm đao hơn bạn nghĩ mình cần.',
   'guide.worldPage.worldBossTitle': 'Khi đỉnh núi thức giấc: con trùm thế giới',
   'entities.abilities.chain_heal.name': 'Hồi Máu Liên Hoàn',
+  'entities.abilities.chain_heal.description':
+    'Hồi máu cho một mục tiêu đồng minh {damage}, sau đó nhảy sang tối đa 2 đồng minh trong phạm vi 12 mét. Mỗi lần nhảy hồi 50% so với mục tiêu trước. Mỗi đồng minh được chạm tới tiêu Dòng Chữa Lành còn lại của bạn và lập tức hồi 125% lượng đã tiêu. Lượng hồi ban đầu tăng theo sức mạnh phép thuật. (đặc trưng của Phục Hồi)',
+  'entities.abilities.desperate_prayer.description': 'Lập tức hồi cho bạn 30% lượng máu tối đa.',
   'entities.abilities.counter_shot.description':
     'Một phát bắn nhanh làm gián đoạn quá trình niệm phép của mục tiêu và khóa hệ phép đó trong 4 giây.',
   'entities.abilities.counter_shot.name': 'Phát Bắn Phản Đòn',

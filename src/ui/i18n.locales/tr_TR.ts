@@ -8036,6 +8036,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Dikenzirve'nin yükseklerinde, Fırtınakaya'nın üzerindeki fırtına bazen bir biçim toplar. Uyanan Zirve Thunzharr orada düzenli bir ritimle yükselir; açık dünyada, çağrıya yanıt veren herkesçe dövüşülen, akın gücünde bir elemental ve karşısına ne kadar çok meydan okuyan dikilirse o kadar güçlenir. Dövüşe katılan herkes, akın kilidi koşullarında saygı gören kendi ganimet payını kazanır ve düşüşü, devrilenlerin geri koşup hakkını almasına yetecek kadar sürer. İhtiyacın olduğunu düşündüğünden daha fazla kılıç topla.",
   'guide.worldPage.worldBossTitle': 'Zirve uyandığında: dünya şefi',
   'entities.abilities.chain_heal.name': 'Zincirleme İyileştirme',
+  'entities.abilities.chain_heal.description':
+    'Dost bir hedefi {damage} kadar iyileştirir, ardından 12 metre içindeki en fazla 2 müttefike sıçrar. Her sıçrama önceki hedefin 50% kadarıyla iyileştirir. Ulaşılan her müttefik kalan Onarım Akıntını tüketir ve tüketilen miktarın 125% kadarıyla anında iyileştirir. İlk iyileştirme büyü gücüyle artar. (Onarım imzası)',
+  'entities.abilities.desperate_prayer.description':
+    'Seni azami canının 30% kadarıyla anında iyileştirir.',
   'entities.abilities.counter_shot.description':
     'Hedefin büyüsünü kesintiye uğratan ve okulu 4 saniyeliğine kilitleyen anlık atış.',
   'entities.abilities.counter_shot.name': 'Karşı Atış',

@@ -7785,7 +7785,7 @@ export const tr_TR: EnTranslations = {
       },
       "chain_heal": {
         "name": "Zincirleme İyileştirme",
-        "description": "Heal a friendly target for {damage}, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)"
+        "description": "Dost bir hedefi {damage} kadar iyileştirir, ardından 12 metre içindeki en fazla 2 müttefike sıçrar. Her sıçrama önceki hedefin 50% kadarıyla iyileştirir. Ulaşılan her müttefik kalan Onarım Akıntını tüketir ve tüketilen miktarın 125% kadarıyla anında iyileştirir. İlk iyileştirme büyü gücüyle artar. (Onarım imzası)"
       },
       "galeheart_weapon": {
         "name": "Fırtına Yüreği Silahı",
@@ -8109,7 +8109,7 @@ export const tr_TR: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Son Dua",
-        "description": "Instantly heals you for 30% of maximum health."
+        "description": "Seni azami canının 30% kadarıyla anında iyileştirir."
       },
       "deterrence": {
         "name": "Diken Muhafızı",

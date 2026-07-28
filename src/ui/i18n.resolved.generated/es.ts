@@ -7785,7 +7785,7 @@ export const es: EnTranslations = {
       },
       "chain_heal": {
         "name": "Sanación en cadena",
-        "description": "Heal a friendly target for {damage}, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)"
+        "description": "Sana a un objetivo amistoso por {damage} y luego salta hasta a 2 aliados en un radio de 12 metros. Cada salto sana por un 50% del objetivo anterior. Cada aliado alcanzado consume tu Corriente Sanadora restante y sana de inmediato por un 125% de la cantidad consumida. La sanación inicial aumenta con el poder con hechizos. (Distintivo de Restauración)"
       },
       "galeheart_weapon": {
         "name": "Arma Corazón de Vendaval",
@@ -8109,7 +8109,7 @@ export const es: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Última Plegaria",
-        "description": "Instantly heals you for 30% of maximum health."
+        "description": "Te sana instantáneamente por un 30% de la salud máxima."
       },
       "deterrence": {
         "name": "Guardia de Zarzas",
