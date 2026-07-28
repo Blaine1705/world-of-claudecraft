@@ -188,6 +188,7 @@ import {
   type WorldContent,
 } from './sim/types';
 import { zoneBiomeAt } from './sim/world';
+import { WORLD_SEED } from './sim/world_seed';
 import { startSitePresence } from './site_presence';
 import {
   accountPortalModel,
@@ -304,7 +305,6 @@ import {
 } from './ui/wallet_balance';
 import { buildWalletConnectionView } from './ui/wallet_connection_view';
 import { formatXp } from './ui/xp_bar';
-import { WORLD_SEED } from './sim/world_seed';
 import type { IWorld, LeaderboardEntry } from './world_api';
 
 const CLICK_MOVE_TURN_RATE = 4.2; // rad/sec; responsive turning while the camera stays decoupled from click spam

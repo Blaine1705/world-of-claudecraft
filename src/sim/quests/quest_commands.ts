@@ -30,7 +30,6 @@ import type { ArchetypeState } from '../professions/archetype';
 import { armCadence, cadenceBlockedKeys } from '../professions/cadence';
 import { planGradeRemoval } from '../professions/material_grades';
 import { questFallbackGrants } from '../quest_fallback';
-import { playerHoldsQuestItem } from './quest_item_presence';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -49,6 +48,7 @@ import {
   resolvedQuestObjectiveCounts,
   validateProfessionQuestSelection,
 } from './profession_quest_effects';
+import { playerHoldsQuestItem } from './quest_item_presence';
 
 // Pure quest-state computation, shared by the sim and the network client. Relocated
 // from sim.ts (W4) and re-exported from sim.ts so the ClientWorld import

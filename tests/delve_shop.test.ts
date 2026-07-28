@@ -78,7 +78,8 @@ describe('delve shop, buying', () => {
     meta.delveMarks = 100;
     const capacity = bagCapacity(meta.bags);
     const fillerStack = ITEMS.bone_fragments.stackSize ?? 20;
-    while (meta.inventory.length < capacity) sim.addItem('bone_fragments', fillerStack, sim.playerId);
+    while (meta.inventory.length < capacity)
+      sim.addItem('bone_fragments', fillerStack, sim.playerId);
     expect(meta.inventory.length).toBe(capacity);
     expect(sim.ctx.canAddItem(availableEntry.itemId, 1, sim.playerId)).toBe(false);
 

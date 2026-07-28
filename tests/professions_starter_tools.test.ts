@@ -271,9 +271,9 @@ describe('the tier-1 starter tools have no route to value', () => {
     expect(meta.questLog.has(questId), 'the accept itself must still succeed').toBe(true);
     // No duplicate: bags stay empty, the bank still holds exactly one.
     expect(sim.countItem(tool, pid)).toBe(0);
-    expect(
-      meta.bank.inventory.filter((s: { itemId: string }) => s.itemId === tool),
-    ).toHaveLength(1);
+    expect(meta.bank.inventory.filter((s: { itemId: string }) => s.itemId === tool)).toHaveLength(
+      1,
+    );
   });
 
   it('the repeatable hobby switch carries the work-order cadence window', () => {
