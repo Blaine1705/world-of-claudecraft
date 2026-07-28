@@ -641,7 +641,14 @@ export const GALECREST_PROPS: ZonePropsDef = {
     [432, 361], // the square's fire, in the lee of the market hall
     [196, 434], // the Windway's waycamp
     [455, 363], // the dockers' brazier behind the boardwalk
-    [498, 313], // Keeper Bram's brazier at the Beacon's foot
+    // Keeper Bram's brazier at the Beacon's foot: out on the lawn at d 8.5
+    // from the tower axis, clear of the spiral stair's footprint. Anywhere
+    // inside beaconSpiralLift's reach the brazier would sit UNDER the raised
+    // stair (props seat on terrainHeight, the stair on groundHeight), buried
+    // in the plinth masonry, and its collider (which has no height) would
+    // pinch the flight it stands beneath. It also stays off the stair-foot
+    // approach, which comes in around bearing 116 to 138 degrees.
+    [498, 316.5],
     [362, 633], // Salvager Edda's camp above the Wreckfields
   ],
   tents: [
