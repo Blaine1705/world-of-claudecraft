@@ -299,9 +299,11 @@ export function slotEffect(
  * table, and this module already takes both as parameters. That also makes
  * every refusal arm unit-testable without constructing a Sim.
  *
- * Four refusals, all before any mutation and all draw-free:
+ * Five refusals, all before any mutation and all draw-free:
  *   - a profession id that is not a gathering profession
  *   - an effect id absent from the live catalog
+ *   - a pair the slot POLICY refuses (`slotToolEffectRefused` below: the
+ *     Springback Charm everywhere, every effect on fishing)
  *   - any confirm mode other than 'always'. A malformed value is refused
  *     OUTRIGHT rather than falling back, and 'prompt' is refused too, for now:
  *     `resolveHarvest` passes `confirmed: true` unconditionally because no
@@ -335,6 +337,7 @@ export function resolveSlotToolEffect(
 ): { professionId: GatheringProfessionId; slot: ToolEffectSlot } | null {
   if (!(GATHERING_PROFESSION_IDS as readonly string[]).includes(professionId)) return null;
   if (!Object.hasOwn(TOOL_EFFECTS, effectId)) return null;
+  if (slotToolEffectRefused(professionId, effectId)) return null;
   if (confirmMode !== 'always') return null;
   const profession = professionId as GatheringProfessionId;
   const best = bestOwnedGatherToolFor(inventory, profession, items);
@@ -346,6 +349,30 @@ export function resolveSlotToolEffect(
       toolRarity: best.rarity,
     }),
   };
+}
+
+/**
+ * Slot policy (R9): pairs refused even though the catalog knows the effect.
+ * Two arms, both wire-it-then-widen rather than ship-it-inert:
+ *
+ * - `quickening_charm` (Springback Charm), on every profession: its
+ *   respawnSpeed bonus arm is a deliberate no-op (`applyEffectBonus` returns
+ *   the outcome unchanged, pinned in tests/professions_tools.test.ts) while
+ *   depletion runs unconditionally, so a slotted charm burns charges for zero
+ *   benefit and the catalog description still promises respawn shortening.
+ *   Refused until the bonus arm is wired for real.
+ * - fishing, for every effect: `completeFishing` never consults the effect
+ *   system, so a fishing slot would be mintable, HUD-rendered, and inert:
+ *   never fires, never spends. Refused until an effect has real fishing
+ *   behavior (wiring one needs its own draw-order review; the catch-table
+ *   draw sits ahead of the grant).
+ *
+ * Consulted by BOTH arms so they cannot drift: `resolveSlotToolEffect` (the
+ * mint) and `normalizeToolEffectSlots` (the load), where a persisted row
+ * minted before this policy existed drops exactly like a retired id.
+ */
+export function slotToolEffectRefused(professionId: string, effectId: string): boolean {
+  return professionId === 'fishing' || effectId === 'quickening_charm';
 }
 
 /**
@@ -381,7 +408,9 @@ export function structuredCloneToolEffectSlots(
  * resolve, and `TOOL_EFFECTS[slot.effectId]` is a bare index that would hand
  * `applyEffectBonus` an undefined def and throw on the next harvest. Every row
  * is therefore checked against live content and every counter clamped, rather
- * than trusted because it came from our own save.
+ * than trusted because it came from our own save. Rows the slot POLICY refuses
+ * (`slotToolEffectRefused`) drop the same way: a row minted before the policy
+ * existed must not outlive it through a restart.
  */
 export function normalizeToolEffectSlots(
   saved: Partial<Record<string, ToolEffectSlot>> | undefined,
@@ -391,6 +420,7 @@ export function normalizeToolEffectSlots(
   for (const professionId of GATHERING_PROFESSION_IDS) {
     const row = saved[professionId];
     if (!row || !Object.hasOwn(TOOL_EFFECTS, row.effectId)) continue;
+    if (slotToolEffectRefused(professionId, row.effectId)) continue;
     // A stored maxDurability that is not a usable positive integer falls back
     // to the catalog's own starting value, because a recharge restores TO this
     // number and a dead one would make the slot permanently useless.

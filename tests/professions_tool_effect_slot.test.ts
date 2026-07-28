@@ -8,11 +8,7 @@
 // moved every golden in the suite for a feature no scenario uses. Several arms
 // below assert absence specifically, not emptiness.
 import { describe, expect, it } from 'vitest';
-import {
-  GATHERING_PROFESSION_IDS,
-  TOOL_EFFECT_IDS,
-  TOOL_EFFECTS,
-} from '../src/sim/content/professions';
+import { TOOL_EFFECT_IDS, TOOL_EFFECTS } from '../src/sim/content/professions';
 import {
   normalizeToolEffectSlots,
   RARITY_DURABILITY_BONUS,
@@ -57,6 +53,31 @@ describe('the slot is absent until a player actually slots something', () => {
     // not a broken fixture.
     withTool.slotToolEffect('mining', 'gatherers_cache');
     expect(metaOf(withTool).toolEffectSlots?.mining).toBeDefined();
+  });
+
+  it('the R9 policy refuses Springback Charm on every profession, at the resolver', () => {
+    // The charm's respawnSpeed bonus arm is a deliberate no-op while depletion
+    // runs unconditionally: a slotted charm would burn charges for zero
+    // benefit while its description promises respawn shortening. Refused until
+    // the bonus arm is wired.
+    const sim = simHolding('copper_mining_pick');
+    sim.slotToolEffect('mining', 'quickening_charm');
+    expect(metaOf(sim).toolEffectSlots).toBeUndefined();
+    // Positive control: the same sim slots a live effect fine.
+    sim.slotToolEffect('mining', 'artisans_eye');
+    expect(metaOf(sim).toolEffectSlots?.mining?.effectId).toBe('artisans_eye');
+  });
+
+  it('the R9 policy refuses every effect on fishing, rod carried or not', () => {
+    // completeFishing never consults the effect system, so a fishing slot
+    // would be mintable, HUD-rendered, and fully inert: it never fires and
+    // never spends. The rod in the bag proves this is the policy refusing,
+    // not the no-tool gate.
+    const sim = simHolding('ironreel_fishing_rod');
+    for (const effectId of TOOL_EFFECT_IDS) {
+      sim.slotToolEffect('fishing', effectId);
+    }
+    expect(metaOf(sim).toolEffectSlots).toBeUndefined();
   });
 
   it('refuses a profession the player owns no REAL tool for, bare hands included', () => {
@@ -138,24 +159,24 @@ describe('slotting mints charges from the best owned tool rarity', () => {
 
 describe('the read surface is one row per profession, sorted, and identity-free', () => {
   it('projects one row per slotted profession, sorted by profession id', () => {
-    // FOUR real tools, one per gathering profession. A one-row fixture cannot
-    // see a sort at all: `expect(rows).toEqual([...rows].sort())` on a single
-    // element is a tautology, and an earlier version of this test bought
-    // exactly that by reaching for two ids that are not gathering tools
-    // (`rusty_hatchet` is a weapon, `herb_pouch` does not exist, and addItem
-    // accepts an unknown id silently).
+    // THREE real tools, one per land gathering profession (fishing is refused
+    // by the R9 slot policy, so it cannot participate). A one-row fixture
+    // cannot see a sort at all: `expect(rows).toEqual([...rows].sort())` on a
+    // single element is a tautology, and an earlier version of this test
+    // bought exactly that by reaching for two ids that are not gathering
+    // tools (`rusty_hatchet` is a weapon, `herb_pouch` does not exist, and
+    // addItem accepts an unknown id silently).
     const sim = simHolding('copper_mining_pick');
-    for (const id of ['handaxe', 'gathering_sickle', 'ironreel_fishing_rod']) {
+    for (const id of ['handaxe', 'gathering_sickle']) {
       sim.addItem(id, 1);
     }
-    for (const professionId of GATHERING_PROFESSION_IDS) {
+    for (const professionId of ['mining', 'logging', 'herbalism']) {
       sim.slotToolEffect(professionId, 'gatherers_cache');
     }
-    // A LITERAL expected order, never a self-sort. GATHERING_PROFESSION_IDS is
-    // mining/logging/herbalism/fishing, so alphabetical genuinely reorders and
+    // A LITERAL expected order, never a self-sort. The slot order above is
+    // mining/logging/herbalism, so alphabetical genuinely reorders and
     // deleting the sort reddens this.
     expect(sim.toolEffectSlots.map((r) => r.professionId)).toEqual([
-      'fishing',
       'herbalism',
       'logging',
       'mining',
@@ -309,6 +330,48 @@ describe('the id tables and the load normalizer, directly', () => {
     for (const id of TOOL_EFFECT_IDS) {
       expect(hasTranslation(TOOL_EFFECT_NAME_KEYS[id]), `name key for ${id}`).toBe(true);
     }
+  });
+
+  it('drops a persisted row the R9 policy refuses, exactly like a retired id', () => {
+    // A row minted before the policy existed (or hand-written into the JSONB)
+    // must not outlive the policy through a restart: the load arm consults
+    // slotToolEffectRefused, so the mint refusal and the load refusal cannot
+    // drift apart.
+    const charm = normalizeToolEffectSlots({
+      mining: {
+        effectId: 'quickening_charm',
+        durability: 5,
+        maxDurability: 20,
+        confirmMode: 'always',
+      },
+    } as never);
+    expect(charm).toBeUndefined();
+    const fishing = normalizeToolEffectSlots({
+      fishing: {
+        effectId: 'gatherers_cache',
+        durability: 5,
+        maxDurability: 20,
+        confirmMode: 'always',
+      },
+    } as never);
+    expect(fishing).toBeUndefined();
+    // And a refused row beside a live one drops ALONE: the live row survives.
+    const mixed = normalizeToolEffectSlots({
+      mining: {
+        effectId: 'gatherers_cache',
+        durability: 5,
+        maxDurability: 20,
+        confirmMode: 'always',
+      },
+      fishing: {
+        effectId: 'gatherers_cache',
+        durability: 5,
+        maxDurability: 20,
+        confirmMode: 'always',
+      },
+    } as never);
+    expect(mixed?.mining?.effectId).toBe('gatherers_cache');
+    expect(mixed && 'fishing' in mixed).toBe(false);
   });
 
   it('drops a saved row whose PROFESSION no longer exists, not just a retired effect', () => {
