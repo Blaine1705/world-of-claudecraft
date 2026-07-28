@@ -362,7 +362,7 @@ describe('committed art', () => {
     const here = path.dirname(fileURLToPath(import.meta.url));
     const root = path.join(here, '..');
     expect(() =>
-      execFileSync('node', ['scripts/assets/fine_material_icons.mjs', '--check'], {
+      execFileSync(process.execPath, ['scripts/assets/fine_material_icons.mjs', '--check'], {
         cwd: root,
         stdio: 'pipe',
       }),

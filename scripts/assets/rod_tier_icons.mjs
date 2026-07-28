@@ -22,13 +22,17 @@
 //
 // This is a PRE-COMMIT tool like scripts/assets/fine_material_icons.mjs, not a
 // build step: the .webp files it writes are committed and nothing re-encodes
-// in CI. It is deterministic (same input, same bytes), so --check asserts the
-// committed art still matches its source, which is what keeps the derivation
-// honest if the Silverstream art is ever repainted.
+// in CI. It is deterministic per machine, but sharp does not render identical
+// bytes across platforms, so --check asserts the committed art still matches
+// its source STRUCTURALLY (byte fast path, then the pixel bounds in
+// derived_icon_check.mjs), which is what keeps the derivation honest if the
+// Silverstream art is ever repainted without redding CI on a foreign platform.
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
+
+import { derivedIconStale } from './derived_icon_check.mjs';
 
 const root = process.cwd();
 const itemsDir = path.join(root, 'public/ui/items');
@@ -111,9 +115,8 @@ async function main() {
         stale.push(`${treatment.itemId}.webp is missing`);
         continue;
       }
-      if (!committed.equals(rendered)) {
-        stale.push(`${treatment.itemId}.webp differs from its derivation`);
-      }
+      const reason = await derivedIconStale(committed, rendered);
+      if (reason) stale.push(`${treatment.itemId}.webp ${reason}`);
       continue;
     }
     writeFileSync(out, rendered);

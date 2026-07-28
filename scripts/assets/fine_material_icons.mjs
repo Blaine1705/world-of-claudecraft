@@ -13,9 +13,11 @@
 //
 // This is a PRE-COMMIT tool like scripts/convert_item_icons_webp.mjs, not a
 // build step: the .webp files it writes are committed, and nothing re-encodes
-// in CI. It is deterministic (same inputs, same bytes), so --check can assert
-// the committed art still matches its sources, which is what keeps the
-// derivation honest after a base icon is ever repainted.
+// in CI. It is deterministic per machine, but sharp does not render identical
+// bytes across platforms, so --check asserts the committed art still matches
+// its sources STRUCTURALLY (byte fast path, then the pixel bounds in
+// derived_icon_check.mjs), which is what keeps the derivation honest after a
+// base icon is ever repainted without redding CI on a foreign platform.
 //
 // Encode options are copied from convert_item_icons_webp.mjs so the derived
 // files sit in the same quality band as the rest of the catalog.
@@ -23,6 +25,8 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
+
+import { derivedIconStale } from './derived_icon_check.mjs';
 
 const root = process.cwd();
 const itemsDir = path.join(root, 'public/ui/items');
@@ -93,7 +97,8 @@ async function main() {
         stale.push(`${fineId}.webp is missing`);
         continue;
       }
-      if (!committed.equals(rendered)) stale.push(`${fineId}.webp differs from its derivation`);
+      const reason = await derivedIconStale(committed, rendered);
+      if (reason) stale.push(`${fineId}.webp ${reason}`);
       continue;
     }
     writeFileSync(out, rendered);
