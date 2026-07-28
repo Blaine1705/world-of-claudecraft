@@ -477,11 +477,17 @@ export const GATHER_NODES: GatherNodeDef[] = [
     level: 10,
     tier: 2,
   },
+  // Moved off the north road surface (R11): it shipped at (2, 342), 0.3yd
+  // from the road center line, standing in the roadway the moment nodes
+  // became solid bodies. The new spot is the nearest legal ground west of
+  // the road (11.5yd clear, dry, standable; measured against the same
+  // world.ts predicates the placement suite runs), and it left the road-band
+  // exemption set in tests/gather_node_placement.test.ts with it.
   {
     id: 'wood_mirefen_t2',
     zoneId: 'mirefen_marsh',
     type: 'wood',
-    pos: { x: 2, z: 342 },
+    pos: { x: -10, z: 340 },
     level: 10,
     tier: 2,
   },

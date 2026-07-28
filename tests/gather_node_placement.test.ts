@@ -757,15 +757,17 @@ describe('gather node placement: every node sits on ground a player can work', (
     }
   });
 
-  it('the road band holds exactly the five nodes it held before this file existed', () => {
+  it('the road band holds exactly the four deliberately-exempt nodes', () => {
     // The trailing comment at the bottom of this file explains why road clearance
     // is NOT an arm: generateDecorations screens world props at 5 yards from a
-    // road, and five shipped nodes sit inside that, two of them the Copper Dig ore
+    // road, and four shipped nodes sit inside that, two of them the Copper Dig ore
     // deliberately placed beside the mine road and pinned there. Leaving that as
-    // prose meant a relocation could quietly add a sixth. Pinning the exception
+    // prose meant a relocation could quietly add a fifth. Pinning the exception
     // SET keeps the decision where it belongs (a human adding to this list) while
     // making a new violation mechanical rather than invisible. This is not the
     // clearance rule; it is the record of who is exempt from one.
+    // wood_mirefen_t2 left this set when R11 moved it off the road surface: it
+    // was the one member whose exemption recorded a defect, not a decision.
     const inBand = GATHER_NODES.filter((n) => roadDistance(n.pos.x, n.pos.z) < 5)
       .map((n) => n.id)
       .sort();
@@ -774,7 +776,6 @@ describe('gather node placement: every node sits on ground a player can work', (
       'ore_eastbrook_1',
       'ore_eastbrook_3',
       'ore_mirefen_2',
-      'wood_mirefen_t2',
     ]);
   });
 
@@ -895,14 +896,15 @@ describe('gather node placement: every node sits on ground a player can work', (
 // threshold exists. One does, in exactly the form the water margin above was
 // taken from: generateDecorations refuses to anchor a world prop within 5 yards
 // of a road (world.ts, `roadDistance(x, z) < 5`). Adopting it here would fail
-// five nodes that ship today: wood_mirefen_t2 at 0.3yd (effectively standing in
-// the road), ore_eastbrook_1 at 1.7, ore_eastbrook_3 at 3.3, herb_thornpeak_2 at
-// 3.8, and ore_mirefen_2 at 4.0.
+// four nodes that ship today: ore_eastbrook_1 at 1.7yd, ore_eastbrook_3 at 3.3,
+// herb_thornpeak_2 at 3.8, and ore_mirefen_2 at 4.0.
 //
 // Two of those are the Copper Dig ore trio, deliberately placed beside the road
 // that serves the mine and pinned there by tests/gather_nodes.test.ts, so the
 // rule would fight an intentional placement as well as force relocations this
 // change is not scoped to make. That is a content decision needing its own pass,
-// not something to settle as a side effect, and wood_mirefen_t2 sitting on the
-// road surface looks like a real defect worth raising separately. Recorded here
-// so the omission reads as a decision rather than an oversight.
+// not something to settle as a side effect. Recorded here so the omission reads
+// as a decision rather than an oversight. The fifth former member,
+// wood_mirefen_t2 at 0.3yd (standing in the road surface), WAS a real defect
+// and R11 moved it to legal ground; the exemption pin above is what made that
+// relocation a deliberate edit instead of a drift.
