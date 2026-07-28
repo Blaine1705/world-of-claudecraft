@@ -1,7 +1,7 @@
 import type { HotbarAction } from './hotbar';
 import { hotbarActionsEqual } from './hotbar';
 
-type OwnedClass = 'hunter' | 'shaman' | 'priest';
+type OwnedClass = 'hunter' | 'shaman' | 'priest' | 'druid';
 
 const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
   Record<OwnedClass, Readonly<Record<string, readonly string[]>>>
@@ -163,10 +163,97 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
       'power_word_fortitude',
     ],
   },
+  druid: {
+    balance: [
+      'moonkin_form',
+      'wrath',
+      'starfire',
+      'moonseed',
+      'moonfire',
+      'barkskin',
+      'entangling_roots',
+      'faerie_fire',
+      'healing_touch',
+      'rejuvenation',
+      'regrowth',
+      'travel_form',
+    ],
+    feral: [
+      'cat_form',
+      'bear_form',
+      'feral_charge',
+      'barkskin',
+      'primal_reflexes',
+      'travel_form',
+      'healing_touch',
+      'rejuvenation',
+      'mark_of_the_wild',
+      'thorns',
+      'faerie_fire',
+    ],
+    restoration: [
+      'rejuvenation',
+      'regrowth',
+      'healing_touch',
+      'swiftmend',
+      'barkskin',
+      'entangling_roots',
+      'moonfire',
+      'wrath',
+      'mark_of_the_wild',
+      'thorns',
+      'travel_form',
+    ],
+  },
 };
 
 function isOwnedClass(playerClass: string): playerClass is OwnedClass {
-  return playerClass === 'hunter' || playerClass === 'shaman' || playerClass === 'priest';
+  return (
+    playerClass === 'hunter' ||
+    playerClass === 'shaman' ||
+    playerClass === 'priest' ||
+    playerClass === 'druid'
+  );
+}
+
+const DRUID_FORM_DEFAULTS: Readonly<Record<'bear' | 'cat', readonly string[]>> = {
+  bear: [
+    'maul',
+    'swipe',
+    'demoralizing_roar',
+    'growl',
+    'bash',
+    'bear_charge',
+    'enrage',
+    'feral_charge',
+    'barkskin',
+    'primal_reflexes',
+    'cat_form',
+    'travel_form',
+  ],
+  cat: [
+    'rake',
+    'rip',
+    'claw',
+    'ferocious_bite',
+    'tigers_fury',
+    'dash',
+    'prowl',
+    'feral_charge',
+    'barkskin',
+    'primal_reflexes',
+    'bear_form',
+    'travel_form',
+  ],
+};
+
+export function ownedDruidFormDefaultAbilityIds(
+  playerClass: string,
+  form: string,
+  knownAbilityIds: ReadonlySet<string>,
+): string[] | null {
+  if (playerClass !== 'druid' || (form !== 'bear' && form !== 'cat')) return null;
+  return DRUID_FORM_DEFAULTS[form].filter((abilityId) => knownAbilityIds.has(abilityId));
 }
 
 export function ownedClassSpecDefaultAbilityIds(

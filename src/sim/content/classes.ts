@@ -463,6 +463,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'healing_touch',
       'mark_of_the_wild',
       'moonfire',
+      'moonseed',
       'rejuvenation',
       'thorns',
       'entangling_roots',
@@ -4843,10 +4844,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
         castTime: 2.0,
         effects: [{ type: 'directDamage', min: 24, max: 29 }],
       },
-      { rank: 3, level: 14, cost: 48, effects: [{ type: 'directDamage', min: 38, max: 45 }] },
-      { rank: 4, level: 20, cost: 70, effects: [{ type: 'directDamage', min: 60, max: 71 }] },
+      { rank: 3, level: 14, cost: 48, effects: [{ type: 'directDamage', min: 70, max: 84 }] },
+      { rank: 4, level: 20, cost: 70, effects: [{ type: 'directDamage', min: 100, max: 118 }] },
     ],
-    description: 'Hurls a bolt of nature energy for $d Nature damage.',
+    description:
+      'Hurls a bolt of nature energy for $d Nature damage. In Moonwing Form, completed casts build Moontide. At full Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake.',
   },
   healing_touch: {
     id: 'healing_touch',
@@ -4916,12 +4918,40 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 16,
         cost: 60,
         effects: [
-          { type: 'directDamage', min: 28, max: 34 },
-          { type: 'dot', total: 40, duration: 12, interval: 3 },
+          { type: 'directDamage', min: 50, max: 60 },
+          { type: 'dot', total: 70, duration: 12, interval: 3 },
         ],
       },
     ],
-    description: 'Burns the enemy with moonfire for $d Arcane damage plus damage over time.',
+    description:
+      'Burns the enemy with moonfire for $d Arcane damage plus damage over time. Moongrove: keep it burning; Moonseed extends it by 6 sec.',
+  },
+  moonseed: {
+    id: 'moonseed',
+    name: 'Moonseed',
+    class: 'druid',
+    specs: ['balance'],
+    learnLevel: 10,
+    cost: 35,
+    castTime: 0,
+    cooldown: 8,
+    range: 30,
+    school: 'arcane',
+    requiresTarget: true,
+    requiresAuraKind: 'form_moonkin',
+    consumesRequiredAura: false,
+    actionReplacement: {
+      abilityId: 'moonlash',
+      auraKind: 'moontide',
+      minStacks: 3,
+      actorAuraKind: 'form_moonkin',
+    },
+    effects: [
+      { type: 'directDamage', min: 20, max: 26 },
+      { type: 'extendDot', dot: 'moonfire', seconds: 6, maxBonus: 6 },
+    ],
+    description:
+      'Moonwing Form only. Strikes for $d Arcane damage, adds one Moontide stage, and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At full Moontide, Moonseed becomes Moonsurge.',
   },
   rejuvenation: {
     id: 'rejuvenation',
@@ -4956,7 +4986,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'hot', total: 168, duration: 12, interval: 3 }],
       },
     ],
-    description: 'Heals the target for $d over 12 sec.',
+    description:
+      'Heals the target for $d over 12 sec. Groveheart: planting a NEW bloom adds Verdance; at 5, Swiftmend becomes Overbloom.',
   },
   thorns: {
     id: 'thorns',
@@ -5061,6 +5092,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresForm: 'bear',
     threat: { flat: 35 }, // classic 180 at rank 7/level 58, scaled to the 1-20 band
     effects: [{ type: 'weaponDamage', bonus: 18 }],
+    actionReplacement: { abilityId: 'marrowbreak', auraKind: 'old_blood', minStacks: 3 },
     ranks: [
       {
         rank: 2,
@@ -5071,7 +5103,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'A mauling attack that increases melee damage by $d and causes a high amount of threat. Activates on your next swing. Bruin Form only.',
+      'A mauling attack that increases melee damage by $d and causes a high amount of threat. Wildfang: landed hits bank Old Blood; at 3, Bonecrush becomes Marrowbreak. Activates on your next swing. Bruin Form only.',
   },
   growl: {
     id: 'growl',
@@ -5158,10 +5190,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     awardsCombo: 1,
     requiresForm: 'cat',
-    requiresStealth: true,
     effects: [
       { type: 'weaponStrike', bonus: 8 },
-      { type: 'dot', total: 30, duration: 9, interval: 3 },
+      { type: 'dot', total: 30, duration: 18, interval: 3 },
     ],
     ranks: [
       {
@@ -5169,17 +5200,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 18,
         cost: 35,
         effects: [
-          { type: 'weaponStrike', bonus: 12 },
-          { type: 'dot', total: 48, duration: 9, interval: 3 },
+          { type: 'weaponStrike', bonus: 45 },
+          { type: 'dot', total: 130, duration: 18, interval: 3 },
         ],
       },
     ],
     description:
-      'A stealth opener that rakes the enemy for weapon damage plus $d and causes bleeding damage over 9 sec. Awards 1 combo point. Wolf Form only.',
+      'Flense the enemy for weapon damage plus $d and cause bleeding damage over 18 sec. Awards 1 combo point. Wildfang: landed hits bank Old Blood. Wolf Form only.',
   },
   claw: {
     id: 'claw',
-    name: 'Claw',
+    name: 'Rendclaw',
     class: 'druid',
     learnLevel: 5,
     cost: 45,
@@ -5190,9 +5221,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     awardsCombo: 1,
     requiresForm: 'cat',
-    effects: [{ type: 'weaponStrike', bonus: 12 }],
-    ranks: [{ rank: 2, level: 18, cost: 45, effects: [{ type: 'weaponStrike', bonus: 20 }] }],
-    description: 'Claw the enemy for weapon damage plus $d. Awards 1 combo point. Wolf Form only.',
+    effects: [{ type: 'weaponStrike', bonus: 25 }],
+    ranks: [{ rank: 2, level: 18, cost: 45, effects: [{ type: 'weaponStrike', bonus: 72 }] }],
+    description:
+      'Claw the enemy for weapon damage plus $d. Awards 1 combo point. Wildfang: landed hits bank Old Blood. Wolf Form only.',
   },
   ferocious_bite: {
     id: 'ferocious_bite',
@@ -5207,8 +5239,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     spendsCombo: true,
     requiresForm: 'cat',
-    effects: [{ type: 'finisherDamage', base: 10, perCombo: 14, variance: 6 }],
-    description: 'Finishing move that causes $d. Wolf Form only.',
+    effects: [{ type: 'finisherDamage', base: 45, perCombo: 39, variance: 8 }],
+    actionReplacement: { abilityId: 'redharvest', auraKind: 'old_blood', minStacks: 3 },
+    description:
+      'Finishing move that causes $d. Wildfang: landed hits bank Old Blood; at 3, Gorebite becomes Redharvest. Wolf Form only.',
   },
   swipe: {
     id: 'swipe',
@@ -5225,7 +5259,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     threat: { mult: 1.75 }, // classic: swipe damage causes 1.75x threat
     effects: [{ type: 'aoeDamage', min: 12, max: 15, radius: 5 }],
     description:
-      'Sweep your claws through nearby enemies for $d damage. Causes extra threat. Bruin Form only.',
+      'Sweep your claws through nearby enemies for $d damage. Causes extra threat. Wildfang: landed hits bank Old Blood. Bruin Form only.',
   },
   regrowth: {
     id: 'regrowth',
@@ -5254,7 +5288,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         ],
       },
     ],
-    description: 'Heals a friendly target for $d and an additional amount over 21 sec.',
+    description:
+      'Heals a friendly target for $d and an additional amount over 21 sec. Groveheart: planting a NEW bloom adds Verdance.',
   },
   barkskin: {
     id: 'barkskin',
@@ -5304,8 +5339,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'arcane',
     requiresTarget: true,
-    effects: [{ type: 'directDamage', min: 80, max: 112 }],
-    description: 'Calls down a bolt of stellar fire, causing $d Arcane damage.',
+    effects: [{ type: 'directDamage', min: 135, max: 185 }],
+    actionReplacement: {
+      abilityId: 'sunlance',
+      auraKind: 'moontide',
+      minStacks: 3,
+      actorAuraKind: 'form_moonkin',
+    },
+    description:
+      'Calls down a bolt of stellar fire, causing $d Arcane damage. In Moonwing Form, completed casts build Moontide. At full Moontide, Skyfall becomes Sunwake.',
   },
   travel_form: {
     id: 'travel_form',
@@ -5446,7 +5488,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   rip: {
     id: 'rip',
-    name: 'Rip',
+    name: 'Bloodrift',
     class: 'druid',
     learnLevel: 14,
     cost: 30,
@@ -5457,9 +5499,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     spendsCombo: true,
     requiresForm: 'cat',
-    effects: [{ type: 'dot', total: 60, duration: 12, interval: 2 }],
+    effects: [{ type: 'dot', total: 156, duration: 24, interval: 2 }],
     description:
-      'Finishing move that causes $d Bleed damage over 12 sec. Consumes combo points. Wolf Form only.',
+      'Finishing move that causes $d Bleed damage over 24 sec. Consumes combo points. Wildfang: the landed hit banks Old Blood. Wolf Form only.',
   },
 
   // ============== TALENT-GRANTED (Warrior) ==============
@@ -6280,8 +6322,122 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'consumeAura', auraKind: 'hot', heal: { min: 105, max: 125 } }],
+    actionReplacement: { abilityId: 'overbloom', auraKind: 'verdance', minStacks: 5 },
     description:
-      'Consumes a heal-over-time effect on a friendly target to heal them for $d. (Restoration signature)',
+      'Consumes a heal-over-time effect on a friendly target to heal them for $d. Completed Wildbloom and Second Bloom casts build Verdance; at 5 Verdance, Swiftmend becomes Overbloom. (Groveheart signature)',
+  },
+  moonlash: {
+    id: 'moonlash',
+    name: 'Moonsurge',
+    class: 'druid',
+    specs: ['balance'],
+    learnLevel: 10,
+    cost: 80,
+    castTime: 0,
+    cooldown: 0,
+    range: 30,
+    school: 'arcane',
+    requiresTarget: true,
+    // The Moontide-3 gate lives on the Skyfall transform rules, the only
+    // path to this def; the form guard blocks a stale out-of-form resolve
+    // and must never eat the form itself.
+    requiresAuraKind: 'form_moonkin',
+    consumesRequiredAura: false,
+    effects: [{ type: 'directDamage', min: 240, max: 285 }],
+    description:
+      'Consumes 3 Moontide for a heavy Arcane strike: the damage choice. Spends the same bank as Sunwake, so pick one.',
+  },
+  sunlance: {
+    id: 'sunlance',
+    name: 'Sunwake',
+    class: 'druid',
+    specs: ['balance'],
+    learnLevel: 10,
+    cost: 45,
+    castTime: 0,
+    cooldown: 0,
+    range: 30,
+    school: 'nature',
+    requiresTarget: true,
+    // Same contract as Moonlash: the transform rules own the Moontide-3
+    // gate, the def guards only the form and must never eat it.
+    requiresAuraKind: 'form_moonkin',
+    consumesRequiredAura: false,
+    effects: [
+      { type: 'directDamage', min: 160, max: 190 },
+      { type: 'dot', total: 75, duration: 9, interval: 3 },
+      { type: 'gainResource', amount: 35 },
+    ],
+    description:
+      'Consumes 3 Moontide for a Nature strike and burn and restores 35 mana: the economy choice. Spends the same bank as Moonsurge, so pick one.',
+  },
+  redharvest: {
+    id: 'redharvest',
+    name: 'Redharvest',
+    class: 'druid',
+    specs: ['feral'],
+    learnLevel: 10,
+    cost: 35,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    requiresForm: 'cat',
+    requiresAuraKind: 'old_blood',
+    requiresAuraStacks: 3,
+    spendsCombo: true,
+    comboOptional: true,
+    effects: [
+      { type: 'finisherDamage', base: 91, perCombo: 55, variance: 10 },
+      { type: 'consumeDot', dot: 'rake' },
+      { type: 'consumeDot', dot: 'rip' },
+      { type: 'gainResource', amount: 30 },
+    ],
+    description:
+      'Consumes 3 Old Blood, detonates all remaining Flense and Bloodrift damage you own on the target, and restores 30 energy. Any combo points held strengthen the bite but are never required.',
+  },
+  marrowbreak: {
+    id: 'marrowbreak',
+    name: 'Marrowbreak',
+    class: 'druid',
+    specs: ['feral'],
+    learnLevel: 10,
+    cost: 15,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    requiresForm: 'bear',
+    requiresAuraKind: 'old_blood',
+    requiresAuraStacks: 3,
+    threat: { flat: 110, mult: 2 },
+    effects: [
+      { type: 'directDamage', min: 78, max: 96 },
+      { type: 'druidMarrowbreakGuard', belowFrac: 0.5, absorbPctMaxHp: 0.18, rage: 15 },
+    ],
+    description:
+      'Consumes 3 Old Blood for a heavy, high-threat strike. Below half health, instead absorbs 18% of maximum health for 8 sec and restores 15 rage.',
+  },
+  overbloom: {
+    id: 'overbloom',
+    name: 'Overbloom',
+    class: 'druid',
+    specs: ['restoration'],
+    learnLevel: 10,
+    cost: 55,
+    castTime: 0,
+    cooldown: 8,
+    range: 30,
+    school: 'nature',
+    requiresTarget: true,
+    targetType: 'friendly',
+    requiresAuraKind: 'verdance',
+    requiresAuraStacks: 5,
+    effects: [{ type: 'druidOverbloom', harvestPct: 0.6 }],
+    description:
+      'Consumes 5 Verdance. Harvests every heal over time you own on all allies for 60% of its remaining healing, removes those effects, and plants a fresh Wildbloom on the target.',
   },
 
   // Baseline class interrupts: every caster-pressuring class trains a short-cooldown
@@ -6998,7 +7154,7 @@ function scaleEffect(
 // Fold precomputed talent modifiers into one resolved ability (FR-5.3). Global
 // melee/spell/heal mults apply to every ability of the right school; per-ability
 // mods stack on top and also tune cost / cast time / cooldown.
-function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
+export function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
   const am = mods.abilities[entry.def.id];
   const physical = entry.def.school === 'physical';
   const globalDmg = physical ? mods.global.meleeDmgPct : mods.global.spellDmgPct;

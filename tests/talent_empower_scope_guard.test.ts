@@ -45,7 +45,7 @@ describe('talent empowerNext scoping', () => {
     // and the rogue row redesign together). A deliberate proc addition or
     // removal must update this sentinel, while a refactor that drops rows
     // from ROW_TREES cannot silently weaken the scoping audit.
-    expect(scanned).toBe(14);
+    expect(scanned).toBe(7);
     expect(offenders).toEqual([]);
   });
 });

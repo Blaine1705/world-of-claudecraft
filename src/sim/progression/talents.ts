@@ -33,6 +33,7 @@
 // (enforced by tests/architecture.test.ts).
 
 import { stripTemporalEchoes } from '../combat/chronomancy';
+import { cleanDruidEngineState } from '../combat/druid_engines';
 import { clearFieldcraftState } from '../combat/hunter_fieldcraft';
 import { clearPacklordState } from '../combat/hunter_packlord';
 import { clearHunterTalentState } from '../combat/hunter_shared';
@@ -197,6 +198,7 @@ function recomputeTalents(ctx: SimContext, meta: PlayerMeta): void {
   if (e) {
     cleanRemovedProcState(ctx, e, previousMods, meta.talentMods);
     cleanRogueEngineState(ctx, e, previousMods.spec, meta.talentMods.spec);
+    cleanDruidEngineState(ctx, e, previousMods.spec, meta.talentMods.spec);
     normalizeAbilityCharges(e, meta, previousChargeCaps);
     stripOrphanedFormAuras(ctx, meta, e);
   }

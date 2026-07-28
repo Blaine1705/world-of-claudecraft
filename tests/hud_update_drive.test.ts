@@ -189,6 +189,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'reads the STATIC graphics-preset stamp that tiers several cadences below it; no DOM write',
   },
   {
+    call: 'this.resolvePendingLoadoutBar',
+    band: 'frame',
+    gate: '',
+    surface: 'none',
+    why: 'applies a server-acked loadout bar swap the moment activeLoadout confirms (v0.29 class stack); early-returns to bookkeeping only on ordinary frames, no DOM write',
+  },
+  {
     call: 'this.reconcileSfx',
     band: 'fast',
     gate: '',
@@ -1298,7 +1305,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 37, chrome: 68, none: 14 });
+    ).toEqual({ window: 37, chrome: 68, none: 15 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

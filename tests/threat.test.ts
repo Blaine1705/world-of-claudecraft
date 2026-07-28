@@ -1461,7 +1461,7 @@ describe('druid forms', () => {
     expect(wolf.threat.get(sim.playerId)).toBeGreaterThan(0);
   });
 
-  it('wolf form gains agility/AP and supports prowl into rake bleed opener', () => {
+  it('wolf form gains agility/AP and can build with Flense outside stealth', () => {
     const sim = makeSim('druid');
     sim.setPlayerLevel(12);
     expect(sim.known.map((k) => k.def.id)).toEqual(
@@ -1477,24 +1477,13 @@ describe('druid forms', () => {
 
     for (let i = 0; i < 32; i++) sim.tick();
     sim.player.resource = 100;
-    sim.castAbility('rake');
-    const events = sim.tick();
-    expect(events.some((e) => e.type === 'error' && /stealthed/.test(e.text))).toBe(true);
-    for (let i = 0; i < 32; i++) sim.tick();
-    sim.castAbility('prowl');
-    sim.tick();
-    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(true);
-
     const wolf = nearestMob(sim, 'forest_wolf');
     beefUp(wolf);
     teleport(sim, sim.player, wolf.pos.x + 2, wolf.pos.z);
     sim.targetEntity(wolf.id);
     sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
-    for (let i = 0; i < 32; i++) sim.tick();
-    sim.player.resource = 100;
     sim.castAbility('rake');
     sim.tick();
-    expect(sim.player.auras.some((a) => a.kind === 'stealth')).toBe(false);
     expect(wolf.auras.some((a) => a.id === 'rake' && a.kind === 'dot')).toBe(true);
     expect(sim.player.comboPoints).toBeGreaterThanOrEqual(1);
   });

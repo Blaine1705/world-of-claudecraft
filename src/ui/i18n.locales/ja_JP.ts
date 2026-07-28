@@ -2893,7 +2893,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象に灼ける影を即座に叩き込み、{damage} の暗黒ダメージを与えます。',
   'entities.abilities.wrath.name': '野生の稲妻',
   'entities.abilities.wrath.description':
-    '自然エネルギーの矢を放ち、{damage} の自然ダメージを与えます。',
+    '自然エネルギーの矢を放ち、{damage} の自然ダメージを与えます。月翼形態では、詠唱の完了で月潮が溜まります。月潮が最大のときはそれを消費します：月の種はムーンサージに、天墜は陽醒に変化します。',
   'entities.abilities.healing_touch.name': '野生の癒し',
   'entities.abilities.healing_touch.description': '味方対象の体力を {damage} 回復します。',
   'entities.abilities.mark_of_the_wild.name': 'ワイルドワード',
@@ -2901,9 +2901,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '味方対象にワイルドワードを付与し、30分間アーマーを{buff}増加させます。',
   'entities.abilities.moonfire.name': '月の嵐',
   'entities.abilities.moonfire.description':
-    '月の炎で敵を焼き、{damage} の秘術ダメージと継続ダメージを与えます。',
+    '月の炎で敵を焼き、{damage} の秘術ダメージと継続ダメージを与えます。ムーングローヴ:燃やし続けること。月の種が効果を6秒延長します。',
   'entities.abilities.rejuvenation.name': '野生の芽吹き',
-  'entities.abilities.rejuvenation.description': '12秒間で対象の体力を {damage} 回復します。',
+  'entities.abilities.rejuvenation.description':
+    '12秒間で対象の体力を {damage} 回復します。グローヴハート:新しい花を植えると翠成が溜まり、5になるとスウィフトメンドが満開に変化します。',
   'entities.abilities.thorns.name': '茨の守り',
   'entities.abilities.thorns.description':
     '対象から棘が生えます。近接攻撃者は{buff}の自然ダメージを受けます。',
@@ -2914,25 +2915,25 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '熊に変身します。アーマー +130%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。再度使用すると術者形態に戻ります。',
   'entities.abilities.maul.name': '骨砕き',
   'entities.abilities.maul.description':
-    '近接ダメージを {damage} 増加させ、大量の脅威を発生させる猛攻です。次のスイングで発動します。ブルーインフォーム専用。',
+    '近接ダメージを {damage} 増加させ、大量の脅威を発生させる猛攻です。ワイルドファング:命中した攻撃が古き血を蓄え、3になると骨砕きが骨髄砕きに変化します。次のスイングで発動します。ブルーインフォーム専用。',
   'entities.abilities.growl.name': '威嚇',
   'entities.abilities.growl.description':
     '対象に唸ります。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。ブルーインフォーム専用。',
   'entities.abilities.cat_form.name': 'ウルフフォーム',
   'entities.abilities.cat_form.description':
-    '狼に変身します。攻撃力はレベルに応じて上昇し、攻撃はエネルギーとコンボポイントを使い、脅威生成が29%低下します。再度使用すると術者形態に戻ります。',
-  'entities.abilities.claw.name': 'クロー',
+    '狼に変身します。敏捷性はレベルに応じて上昇し、攻撃力は8にレベルごとに2を加えた分だけ増加します。攻撃はエネルギーとコンボポイントを使い、脅威生成が29%低下します。再度使用すると術者形態に戻ります。',
+  'entities.abilities.claw.name': '裂き爪',
   'entities.abilities.claw.description':
-    '敵を引っかき、武器ダメージに {damage} を加えたダメージを与えます。コンボポイントを1獲得します。ウルフフォーム専用。',
+    '敵を引っかき、武器ダメージに {damage} を加えたダメージを与えます。コンボポイントを1獲得します。ワイルドファング:命中した攻撃が古き血を蓄えます。ウルフフォーム専用。',
   'entities.abilities.ferocious_bite.name': '血噛み',
   'entities.abilities.ferocious_bite.description':
-    '{damage}を与えるフィニッシュムーブです。ウルフフォーム専用。',
+    '{damage}を与えるフィニッシュムーブです。ワイルドファング:命中した攻撃が古き血を蓄え、3になると血噛みが血の収穫に変化します。ウルフフォーム専用。',
   'entities.abilities.swipe.name': '薙ぎ払う爪',
   'entities.abilities.swipe.description':
-    '周囲の敵を薙ぎ払い、{damage} のダメージを与えます。追加の脅威を発生させます。ブルーインフォーム専用。',
+    '周囲の敵を薙ぎ払い、{damage} のダメージを与えます。追加の脅威を発生させます。ワイルドファング:命中した攻撃が古き血を蓄えます。ブルーインフォーム専用。',
   'entities.abilities.regrowth.name': '二度目の開花',
   'entities.abilities.regrowth.description':
-    '味方対象の体力を {damage} 回復し、さらに21秒間追加で回復します。',
+    '味方対象の体力を {damage} 回復し、さらに21秒間追加で回復します。グローヴハート:新しい花を植えると翠成が溜まります。',
   'entities.abilities.barkskin.name': '樫の肌',
   'entities.abilities.barkskin.description':
     '肌が樹皮のように硬くなり、15秒間アーマーが150増加します。',
@@ -2944,7 +2945,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '本能が研ぎ澄まされ、6秒間、回避率が50%上昇します。',
   'entities.abilities.starfire.name': '天墜',
   'entities.abilities.starfire.description':
-    '星の炎を呼び下ろし、{damage} の秘術ダメージを与えます。',
+    '星の炎を呼び下ろし、{damage} の秘術ダメージを与えます。月翼形態では、詠唱の完了で月潮が溜まります。月潮が最大のとき、天墜は陽醒に変化します。',
   'entities.abilities.travel_form.name': 'フリートフォーム',
   'entities.abilities.travel_form.description':
     '素早いフリートフォームに即座に変身し、移動速度を40%上昇させます。変身中は他のアビリティを使用できませんが、戦闘中でも戦闘外でも変身を切り替えられるため、逃走に最適です。',
@@ -2970,9 +2971,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tigers_fury.name': '狼の血',
   'entities.abilities.tigers_fury.description':
     '攻撃力を{duration}秒間{buff}上昇させます。ウルフフォーム専用。',
-  'entities.abilities.rip.name': 'リップ',
+  'entities.abilities.rip.name': '血の亀裂',
   'entities.abilities.rip.description':
-    '12秒かけて{damage}の出血ダメージを与えるフィニッシュムーブです。コンボポイントを消費します。ウルフフォーム専用。',
+    '24秒かけて{damage}の出血ダメージを与えるフィニッシュムーブです。コンボポイントを消費します。ワイルドファング:命中した一撃が古き血を蓄えます。ウルフフォーム専用。',
   'entities.abilities.mortal_strike.name': '重傷の一撃',
   'entities.abilities.mortal_strike.description':
     '凶悪な一撃で武器ダメージに加えて {damage} のダメージを与えます。（武器シグネチャー）',
@@ -3020,7 +3021,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ウルフフォーム中にステルス状態に入り、移動速度が50%低下する。戦闘中は使用できない。',
   'entities.abilities.rake.name': '皮剥ぎ',
   'entities.abilities.rake.description':
-    'ステルス状態からの先制攻撃で、武器ダメージに加えて{damage}のダメージを与え、9秒かけて出血ダメージを与える。コンボポイントを1獲得する。ウルフフォーム時のみ使用可能。',
+    '敵の皮を剥ぎ、武器ダメージに加えて{damage}のダメージを与え、18秒かけて出血ダメージを与える。コンボポイントを1獲得する。ワイルドファング:命中した攻撃が古き血を蓄える。ウルフフォーム時のみ使用可能。',
   'entities.abilities.revive_pet.name': '応急処置',
   'entities.abilities.revive_pet.description':
     'ペットを応急処置する。生存している場合は12秒間、3秒ごとに回復し、合計{overTime}の体力を回復する。死亡している場合は体力35%で蘇生する。',
@@ -3083,7 +3084,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵に突撃し、1秒間足止めします。射程8-25ヤード。（フェラル特性のシグネチャ）',
   'entities.abilities.swiftmend.name': 'スウィフトメンド',
   'entities.abilities.swiftmend.description':
-    '味方にかかった継続回復効果を消費し、体力を{damage}回復します。（レストレーション特性のシグネチャ）',
+    '味方にかかった継続回復効果を消費し、体力を{damage}回復します。野生の芽吹きと二度目の開花の詠唱を完了すると翠成が溜まり、翠成が5のとき、スウィフトメンドは満開に変化します。（回復特性のシグネチャ）',
   'entities.abilities.crusader_strike.name': 'クルセイダー ストライク',
   'entities.abilities.crusader_strike.description':
     '対象を攻撃し、武器ダメージに加えて {damage} の聖なるダメージを与えます。（パラディンのタレント）',
@@ -9330,4 +9331,29 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': '武器解放',
   'entities.abilities.unleash_weapon.description':
     '有効な武器付与を解放する。火焔烙印は54から64の火炎ダメージを与え、魔力の30%が加算され、雷鳴を2得る。疾風は武器で攻撃し、戦霊の律動を進め、6秒間攻撃速度を20%上昇させる。石縛は武器ダメージの75%を与え、対象を強制的に自分へ攻撃させ、4秒間受けるダメージを20%軽減する。命泉は癒しの水流を消費し、残りの回復量の125%を即時に回復し、8秒以内の次の一撃を実際の回復量の50%分軽減する。',
+  'hudChrome.auraEffect.moontide':
+    '月潮：{stacks}/{max}段階。月翼形態で野生の稲妻・天墜・月の種の詠唱が段階を進めます。{max}で月の種がムーンサージに、天墜が陽醒に変化し、どちらを使っても消費されます',
+  'hudChrome.auraEffect.oldBlood':
+    '古き血：{stacks}/{max}段階。狼と熊の命中攻撃で共有され、{max}で血噛みまたは骨砕きが変化します',
+  'hudChrome.auraEffect.verdance':
+    '翠成：{stacks}/{max}段階。野生の芽吹きと二度目の開花の完了で進み、{max}でスウィフトメンドが満開に変化します',
+  'entities.abilities.moonseed.name': '月の種',
+  'entities.abilities.moonseed.description':
+    '月翼形態専用。{damage}の秘術ダメージを与え、月潮を1段階進め、月の嵐を6秒延長します。1回の付与につき最大6秒です。月潮が最大のとき、月の種はムーンサージに変化します。',
+  'guide.abilityHook.moonseed': '月翼形態中、月潮を1段階進め、月の嵐の効果時間を延長します。',
+  'entities.abilities.moonlash.name': 'ムーンサージ',
+  'entities.abilities.moonlash.description':
+    '月潮を3消費して強力な秘術攻撃を放つ、ダメージ重視の選択肢です。陽醒と同じ月潮を消費するため、どちらか一方だけ使えます。',
+  'entities.abilities.sunlance.name': '陽醒',
+  'entities.abilities.sunlance.description':
+    '月潮を3消費して自然攻撃と炎上を与え、マナを35回復する、マナ重視の選択肢です。ムーンサージと同じ月潮を消費するため、どちらか一方だけ使えます。',
+  'entities.abilities.redharvest.name': '血の収穫',
+  'entities.abilities.redharvest.description':
+    '古き血を3消費し、対象に残る自身の皮剥ぎと血の亀裂のダメージを爆発させ、エネルギーを30回復します。保持しているコンボポイントは噛みつきを強化しますが、必須ではありません。',
+  'entities.abilities.marrowbreak.name': '骨髄砕き',
+  'entities.abilities.marrowbreak.description':
+    '古き血を3消費して高脅威の重撃を与えます。体力が半分未満なら、代わりに最大体力の18%を吸収する盾を8秒得て、怒りを15回復します。',
+  'entities.abilities.overbloom.name': '満開',
+  'entities.abilities.overbloom.description':
+    '翠成を5消費します。全味方にある自身の継続回復を収穫し、残り回復量の60%を即時回復して効果を除去し、対象に新しい野生の芽吹きを植えます。',
 };

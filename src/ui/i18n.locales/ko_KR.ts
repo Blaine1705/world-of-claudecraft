@@ -2872,7 +2872,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '즉시 대상에게 타오르는 어둠을 폭발시켜 {damage}의 암흑 피해를 입힙니다.',
   'entities.abilities.wrath.name': '야생 벼락',
   'entities.abilities.wrath.description':
-    '자연 에너지의 화살을 던져 {damage}의 자연 피해를 입힙니다.',
+    '자연 에너지의 화살을 던져 {damage}의 자연 피해를 입힙니다. 달날개 형상에서 시전을 완료하면 달물결이 쌓입니다. 달물결 최대 단계에서 이를 소모합니다: 달씨앗이 달의 격동으로, 창공 낙하가 해돋움으로 변합니다.',
   'entities.abilities.healing_touch.name': '야생 치유',
   'entities.abilities.healing_touch.description': '아군 대상의 생명력을 {damage}만큼 회복시킵니다.',
   'entities.abilities.mark_of_the_wild.name': '야생의 수호',
@@ -2880,10 +2880,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '아군 대상에게 야생의 수호를 걸어 30분 동안 방어도를 {buff}만큼 증가시킵니다.',
   'entities.abilities.moonfire.name': '달빛 폭풍',
   'entities.abilities.moonfire.description':
-    '달빛불로 적을 태워 {damage}의 비전 피해와 지속 피해를 입힙니다.',
+    '달빛불로 적을 태워 {damage}의 비전 피해와 지속 피해를 입힙니다. 조화: 계속 타오르게 유지합니다. 달씨앗이 지속시간을 6초 연장합니다.',
   'entities.abilities.rejuvenation.name': '야생 개화',
   'entities.abilities.rejuvenation.description':
-    '12초에 걸쳐 대상의 생명력을 {damage}만큼 회복시킵니다.',
+    '12초에 걸쳐 대상의 생명력을 {damage}만큼 회복시킵니다. 회복: 새로 심는 개화가 푸른 생장을 쌓으며, 5단계에서 신속한 치유가 만개로 변합니다.',
   'entities.abilities.thorns.name': '가시 수호',
   'entities.abilities.thorns.description':
     '대상에게 가시가 돋아 근접 공격자가 {buff}의 자연 피해를 받습니다.',
@@ -2894,25 +2894,25 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '곰으로 변신합니다. 방어도 +130%, 전투력이 크게 증가하고, 공격이 분노와 30% 더 많은 위협 수준을 생성합니다. 다시 시전하면 시전자 형태로 돌아갑니다.',
   'entities.abilities.maul.name': '뼈 분쇄',
   'entities.abilities.maul.description':
-    '근접 피해를 {damage}만큼 증가시키고 많은 위협 수준을 생성하는 난폭한 공격입니다. 다음 무기 공격 시 발동됩니다. 큰곰 변신 전용.',
+    '근접 피해를 {damage}만큼 증가시키고 많은 위협 수준을 생성하는 난폭한 공격입니다. 야성: 적중한 공격이 오랜 피를 쌓으며, 3단계에서 뼈 분쇄가 골수분쇄로 변합니다. 다음 무기 공격 시 발동됩니다. 큰곰 변신 전용.',
   'entities.abilities.growl.name': '위협',
   'entities.abilities.growl.description':
     '대상에게 으르렁거립니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다. 큰곰 변신 전용.',
   'entities.abilities.cat_form.name': '늑대 변신',
   'entities.abilities.cat_form.description':
-    '늑대로 변신합니다. 전투력이 레벨에 따라 증가하고 공격이 기력과 연계 점수를 사용하며 위협 수준 생성량이 29% 감소합니다. 다시 시전하면 시전자 형태로 돌아갑니다.',
-  'entities.abilities.claw.name': '할퀴기',
+    '늑대로 변신합니다. 민첩성이 레벨에 따라 증가하고 전투력이 8에 레벨당 2를 더한 만큼 증가합니다. 공격이 기력과 연계 점수를 사용하며 위협 수준 생성량이 29% 감소합니다. 다시 시전하면 시전자 형태로 돌아갑니다.',
+  'entities.abilities.claw.name': '가르는 발톱',
   'entities.abilities.claw.description':
-    '적을 할퀴어 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다. 늑대 변신 전용.',
+    '적을 할퀴어 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다. 야성: 적중한 공격이 오랜 피를 쌓습니다. 늑대 변신 전용.',
   'entities.abilities.ferocious_bite.name': '유혈 물어뜯기',
   'entities.abilities.ferocious_bite.description':
-    '결정타로 {damage}의 피해를 입힙니다. 늑대 변신 전용.',
+    '결정타로 {damage}의 피해를 입힙니다. 야성: 적중한 공격이 오랜 피를 쌓으며, 3단계에서 유혈 물어뜯기가 피의 수확으로 변합니다. 늑대 변신 전용.',
   'entities.abilities.swipe.name': '휩쓰는 발톱',
   'entities.abilities.swipe.description':
-    '주위 적을 휘둘러 {damage}의 피해를 입힙니다. 추가 위협 수준을 생성합니다. 큰곰 변신 전용.',
+    '주위 적을 휘둘러 {damage}의 피해를 입힙니다. 추가 위협 수준을 생성합니다. 야성: 적중한 공격이 오랜 피를 쌓습니다. 큰곰 변신 전용.',
   'entities.abilities.regrowth.name': '두 번째 개화',
   'entities.abilities.regrowth.description':
-    '아군 대상의 생명력을 {damage}만큼 회복시키고 21초에 걸쳐 추가로 회복시킵니다.',
+    '아군 대상의 생명력을 {damage}만큼 회복시키고 21초에 걸쳐 추가로 회복시킵니다. 회복: 새로 심는 개화가 푸른 생장을 쌓습니다.',
   'entities.abilities.barkskin.name': '참나무 가죽',
   'entities.abilities.barkskin.description':
     '피부가 나무껍질처럼 단단해져 15초 동안 방어도가 150만큼 증가합니다.',
@@ -2924,7 +2924,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '본능이 예리해져 6초 동안 회피율이 50% 증가합니다.',
   'entities.abilities.starfire.name': '창공 낙하',
   'entities.abilities.starfire.description':
-    '별의 불꽃을 불러 내려 {damage}의 비전 피해를 입힙니다.',
+    '별의 불꽃을 불러 내려 {damage}의 비전 피해를 입힙니다. 달날개 형상에서 시전을 완료하면 달물결이 쌓입니다. 달물결 최대 단계에서 창공 낙하가 해돋움으로 변합니다.',
   'entities.abilities.travel_form.name': '쾌속 형태',
   'entities.abilities.travel_form.description':
     '즉시 날렵한 쾌속 형태로 변신하여 이동 속도가 40% 증가합니다. 변신 중에는 다른 능력을 사용할 수 없지만 전투 중에도 자유롭게 변신할 수 있어 도주에 이상적입니다.',
@@ -2950,9 +2950,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tigers_fury.name': '늑대의 피',
   'entities.abilities.tigers_fury.description':
     '전투력을 {duration}초 동안 {buff}만큼 증가시킵니다. 늑대 변신 전용.',
-  'entities.abilities.rip.name': '찢기',
+  'entities.abilities.rip.name': '피의 균열',
   'entities.abilities.rip.description':
-    '12초에 걸쳐 {damage}의 출혈 피해를 입히는 결정타입니다. 연계 점수를 소모합니다. 늑대 변신 전용.',
+    '24초에 걸쳐 {damage}의 출혈 피해를 입히는 결정타입니다. 연계 점수를 소모합니다. 야성: 적중한 공격이 오랜 피를 쌓습니다. 늑대 변신 전용.',
   'entities.abilities.mortal_strike.name': '불구의 일격',
   'entities.abilities.mortal_strike.description':
     '잔혹한 일격으로 무기 피해에 {damage}의 피해를 더합니다. (무기 특화 대표 기술)',
@@ -3000,7 +3000,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '늑대 변신 상태에서 은신하고 이동 속도가 50% 감소합니다. 전투 중에는 사용할 수 없습니다.',
   'entities.abilities.rake.name': '저미기',
   'entities.abilities.rake.description':
-    '은신 상태에서 적을 할퀴어 무기 피해에 더해 {damage}의 피해를 입히고 9초에 걸쳐 출혈 피해를 줍니다. 연계 점수 1을 부여합니다. 늑대 변신 상태에서만 사용 가능.',
+    '적을 저며 무기 피해에 더해 {damage}의 피해를 입히고 18초에 걸쳐 출혈 피해를 줍니다. 연계 점수 1을 부여합니다. 야성: 적중한 공격이 오랜 피를 쌓습니다. 늑대 변신 상태에서만 사용 가능.',
   'entities.abilities.revive_pet.name': '응급 처치',
   'entities.abilities.revive_pet.description':
     '소환수를 응급 처치합니다. 살아 있으면 12초에 걸쳐 3초마다 생명력을 회복해 총 {overTime}의 생명력을 회복합니다. 죽어 있으면 35%의 생명력으로 되살립니다.',
@@ -3063,7 +3063,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적에게 돌진하고 1초 동안 묶습니다. 8-25미터 거리. (야성 전문화 상징)',
   'entities.abilities.swiftmend.name': '신속한 치유',
   'entities.abilities.swiftmend.description':
-    '아군 대상의 지속 치유 효과를 소모하여 생명력을 {damage}만큼 회복시킵니다. (복원 전문화 상징)',
+    '아군 대상의 지속 치유 효과를 소모하여 생명력을 {damage}만큼 회복시킵니다. 야생 개화와 두 번째 개화 시전을 완료하면 푸른 생장이 쌓이며, 푸른 생장 5단계에서 신속한 치유가 만개로 변합니다. (회복 전문화 상징)',
   'entities.abilities.crusader_strike.name': '성전사의 일격',
   'entities.abilities.crusader_strike.description':
     '대상을 공격해 무기 피해에 추가로 {damage}의 신성 피해를 줍니다. (성기사 특성)',
@@ -9325,4 +9325,30 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': '무기 해방',
   'entities.abilities.unleash_weapon.description':
     '활성화된 무기 마법을 해방합니다. 화염낙인은 54에서 64의 화염 피해를 입히고 주문력의 30%가 추가되며 천둥을 2 얻습니다. 질풍은 무기로 공격하고 전령의 박자를 진행하며 6초 동안 공격 속도를 20% 높입니다. 바위결속은 무기 피해의 75%를 입히고 대상이 자신을 공격하게 하며 4초 동안 받는 피해를 20% 줄입니다. 생명의 샘은 치유의 물결을 소모해 남은 치유량의 125%를 즉시 회복하고 8초 안에 받는 다음 피해를 실제 회복량의 50%만큼 줄입니다.',
+  'hudChrome.auraEffect.moontide':
+    '달물결: {stacks}/{max}단계. 달날개 형상에서 야생 벼락, 창공 낙하, 달씨앗 시전이 단계를 쌓습니다. {max}단계에서 달씨앗이 달의 격동으로, 창공 낙하가 해돋움으로 변하며, 어느 쪽을 써도 소모됩니다',
+  'hudChrome.auraEffect.oldBlood':
+    '오랜 피: {stacks}/{max}단계. 늑대와 곰의 적중 공격이 이 저장량을 공유하며, {max}단계에서 유혈 물어뜯기 또는 뼈 분쇄가 변합니다',
+  'hudChrome.auraEffect.verdance':
+    '푸른 생장: {stacks}/{max}단계. 야생 개화와 두 번째 개화 시전 완료로 쌓이며, {max}단계에서 신속한 치유가 만개로 변합니다',
+  'entities.abilities.moonseed.name': '달씨앗',
+  'entities.abilities.moonseed.description':
+    '달날개 형상 전용입니다. {damage}의 비전 피해를 주고 달물결을 1단계 올리며 달빛 폭풍을 6초 연장합니다. 적용 한 번당 최대 6초입니다. 달물결 최대 단계에서 달씨앗이 달의 격동으로 변합니다.',
+  'guide.abilityHook.moonseed':
+    '달날개 형상일 때 달물결을 1단계 진행시키고 달빛 폭풍 지속시간을 연장합니다.',
+  'entities.abilities.moonlash.name': '달의 격동',
+  'entities.abilities.moonlash.description':
+    '달물결 3단계를 소모해 강력한 비전 공격을 하는 피해 특화 선택지입니다. 해돋움과 같은 달물결을 소모하므로 하나만 선택할 수 있습니다.',
+  'entities.abilities.sunlance.name': '해돋움',
+  'entities.abilities.sunlance.description':
+    '달물결 3단계를 소모해 자연 공격과 화상을 입히고 마나를 35 회복하는 마나 특화 선택지입니다. 달의 격동과 같은 달물결을 소모하므로 하나만 선택할 수 있습니다.',
+  'entities.abilities.redharvest.name': '피의 수확',
+  'entities.abilities.redharvest.description':
+    '오랜 피 3단계를 소모해 대상에게 남은 자신의 저미기와 피의 균열 피해를 폭발시키고 기력 30을 회복합니다. 보유한 연계 점수는 물어뜯기를 강화하지만 필수는 아닙니다.',
+  'entities.abilities.marrowbreak.name': '골수분쇄',
+  'entities.abilities.marrowbreak.description':
+    '오랜 피 3단계를 소모해 위협 수준이 높은 강타를 가합니다. 생명력이 절반 미만이면 대신 8초 동안 최대 생명력의 18%를 흡수하고 분노 15를 회복합니다.',
+  'entities.abilities.overbloom.name': '만개',
+  'entities.abilities.overbloom.description':
+    '푸른 생장 5단계를 소모합니다. 모든 아군에게 남은 자신의 지속 치유량 중 60%를 즉시 회복시키고 해당 효과를 제거한 뒤 대상에게 새로운 야생 개화를 심습니다.',
 };

@@ -4602,6 +4602,130 @@ function shamanEngines(): Scenario {
   };
 }
 
+// Druid v0.29: action replacement and visible bank state for all three spec
+// engines, driven through normal casts and melee hit resolution.
+function druidEngines(): Scenario {
+  return {
+    name: 'druid_engines',
+    coverage: [
+      'class:druid (Moongrove, Wildfang, Groveheart)',
+      'Moontide and Sunwake action replacements with Moonlash and Sunlance phase flips',
+      'Old Blood landed-strike bank across Wolf and Bruin with both payoffs',
+      'Verdance completed-HoT bank and Overbloom harvest',
+    ],
+    build: () => new Sim({ seed: 2930, playerClass: 'druid', noPlayer: true, autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const moonId = sim.addPlayer('druid', 'Moonbank');
+      const fangId = sim.addPlayer('druid', 'Bloodbank');
+      const groveId = sim.addPlayer('druid', 'Gardenbank');
+      for (const pid of [moonId, fangId, groveId]) sim.setPlayerLevel(20, pid);
+      sim.setSpec('balance', moonId);
+      sim.setSpec('feral', fangId);
+      sim.setSpec('restoration', groveId);
+      const moon = sim.entities.get(moonId) as AnyEntity;
+      const fang = sim.entities.get(fangId) as AnyEntity;
+      const grove = sim.entities.get(groveId) as AnyEntity;
+      const dummy = spawnMob(sim, 'training_dummy', 1, moon.pos.x, moon.pos.y, moon.pos.z + 3);
+      beef(dummy, 1_000_000);
+      rec.track(dummy.id);
+
+      sim.targetEntity(dummy.id, moonId);
+      face(moon, dummy);
+      moon.resource = moon.maxResource;
+      sim.castAbility('moonkin_form', moonId);
+      rec.tick(35);
+      for (let cast = 0; cast < 3; cast++) {
+        moon.resource = moon.maxResource;
+        moon.gcdRemaining = 0;
+        sim.castAbility('wrath', moonId);
+        rec.tick(50);
+      }
+      rec.notes.moonlashArmed = sim.resolvedAbility('moonseed', moonId)?.def.id === 'moonlash';
+      rec.notes.sunlanceArmedToo = sim.resolvedAbility('starfire', moonId)?.def.id === 'sunlance';
+      // Choose the moon: the Moonseed button fires Moonsurge and spends the bank.
+      moon.resource = moon.maxResource;
+      moon.gcdRemaining = 0;
+      sim.castAbility('moonseed', moonId);
+      rec.tick(20);
+      for (let cast = 0; cast < 3; cast++) {
+        moon.resource = moon.maxResource;
+        moon.gcdRemaining = 0;
+        sim.castAbility('wrath', moonId);
+        rec.tick(50);
+      }
+      // Choose the sun: the Skyfall button fires Sunwake this time.
+      rec.notes.sunlanceArmed = sim.resolvedAbility('starfire', moonId)?.def.id === 'sunlance';
+      moon.resource = moon.maxResource;
+      moon.gcdRemaining = 0;
+      sim.castAbility('starfire', moonId);
+      rec.tick(20);
+      rec.snapshot('moongrove-choice');
+
+      teleport(sim, fang, dummy.pos.x, dummy.pos.z - 2);
+      sim.targetEntity(dummy.id, fangId);
+      face(fang, dummy);
+      fang.resource = fang.maxResource;
+      sim.castAbility('cat_form', fangId);
+      rec.tick(35);
+      for (let cast = 0; cast < 8; cast++) {
+        fang.resource = fang.maxResource;
+        fang.gcdRemaining = 0;
+        sim.castAbility('claw', fangId);
+        rec.tick(35);
+      }
+      rec.notes.redharvestArmed =
+        sim.resolvedAbility('ferocious_bite', fangId)?.def.id === 'redharvest';
+      fang.resource = fang.maxResource;
+      fang.gcdRemaining = 0;
+      sim.castAbility('ferocious_bite', fangId);
+      rec.tick(5);
+      for (let cast = 0; cast < 8; cast++) {
+        fang.resource = fang.maxResource;
+        fang.gcdRemaining = 0;
+        sim.castAbility('claw', fangId);
+        rec.tick(35);
+      }
+      fang.gcdRemaining = 0;
+      sim.castAbility('bear_form', fangId);
+      rec.tick(35);
+      rec.notes.marrowbreakArmed = sim.resolvedAbility('maul', fangId)?.def.id === 'marrowbreak';
+      fang.hp = Math.round(fang.maxHp * 0.75);
+      fang.resource = fang.maxResource;
+      fang.gcdRemaining = 0;
+      sim.castAbility('maul', fangId);
+      rec.tick(5);
+      rec.snapshot('wildfang-spend');
+
+      grove.hp = Math.round(grove.maxHp * 0.25);
+      moon.hp = Math.round(moon.maxHp * 0.5);
+      fang.hp = Math.round(fang.maxHp * 0.5);
+      const plantTargets = [groveId, groveId, moonId, moonId, fangId];
+      const plantAbilities = [
+        'rejuvenation',
+        'regrowth',
+        'rejuvenation',
+        'regrowth',
+        'rejuvenation',
+      ];
+      for (let cast = 0; cast < plantTargets.length; cast++) {
+        sim.targetEntity(plantTargets[cast], groveId);
+        grove.resource = grove.maxResource;
+        grove.gcdRemaining = 0;
+        sim.castAbility(plantAbilities[cast], groveId);
+        rec.tick(plantAbilities[cast] === 'rejuvenation' ? 35 : 50);
+      }
+      rec.notes.overbloomArmed = sim.resolvedAbility('swiftmend', groveId)?.def.id === 'overbloom';
+      sim.targetEntity(groveId, groveId);
+      grove.resource = grove.maxResource;
+      grove.gcdRemaining = 0;
+      sim.castAbility('swiftmend', groveId);
+      rec.tick(5);
+      rec.snapshot('groveheart-harvest');
+    },
+  };
+}
+
 // Priest Codex baseline loops: all three specializations execute through the
 // shared Sim host, including source-owned links, attached Vigil, Effigy echoes,
 // the Gloomtithe bank, autonomous Tithefiend strikes, and respec cleanup.
@@ -4803,5 +4927,6 @@ export const SCENARIOS: Scenario[] = [
   professionsCraft(),
   professionsGather(),
   shamanEngines(),
+  druidEngines(),
   priestCodex(),
 ];

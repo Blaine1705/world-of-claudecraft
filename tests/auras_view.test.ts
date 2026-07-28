@@ -307,6 +307,10 @@ describe('createAurasView: derivation per mode', () => {
       'shaman_flow_state_ready',
       'shaman_thunder_charges',
       'shaman_warspirit_cadence',
+      'moontide',
+      'sunwake',
+      'old_blood',
+      'verdance',
     ]) {
       expect(
         v.tick(entity([aura({ id, kind: 'internal_cd', remaining: 86_400 })])).slots[0]
@@ -332,6 +336,12 @@ describe('createAurasView: derivation per mode', () => {
     expect(v.tick(entity([aura({ id: 'a', stacks: undefined })])).slots[0].stacksText).toBe('');
     expect(v.tick(entity([aura({ id: 'a', stacks: 1 })])).slots[0].stacksText).toBe('');
     expect(v.tick(entity([aura({ id: 'a', stacks: 4 })])).slots[0].stacksText).toBe('4');
+  });
+
+  it('always badges Druid engine stages, including zero and one', () => {
+    const v = createAurasView('all', deps());
+    expect(v.tick(entity([aura({ id: 'moontide', stacks: 0 })])).slots[0].stacksText).toBe('0');
+    expect(v.tick(entity([aura({ id: 'old_blood', stacks: 1 })])).slots[0].stacksText).toBe('1');
   });
 
   it('badges remaining charges (shown even at 1) and prefers charges over stacks', () => {

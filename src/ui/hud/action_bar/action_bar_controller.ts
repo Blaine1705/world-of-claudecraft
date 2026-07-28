@@ -30,6 +30,7 @@ import {
 } from './hotbar';
 import {
   ownedClassSpecDefaultAbilityIds,
+  ownedDruidFormDefaultAbilityIds,
   shouldSeedOwnedSpecDefault,
 } from './owned_class_spec_defaults';
 
@@ -302,7 +303,9 @@ export class ActionBarController {
   }
 
   formKitAbilityIds(form: HotbarForm): string[] {
-    return this.deps.knownAbilityIds().filter((id) => this.shouldAutoPlaceOnForm(id, form));
+    const known = this.deps.knownAbilityIds();
+    const curated = ownedDruidFormDefaultAbilityIds(this.deps.playerClass, form, new Set(known));
+    return curated ?? known.filter((id) => this.shouldAutoPlaceOnForm(id, form));
   }
 
   classHasFormBars(): boolean {

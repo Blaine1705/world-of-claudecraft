@@ -335,7 +335,9 @@ describe('Talents V2 stasis and resource-sap primitives', () => {
   it('Lifesap ticks the current resource every two seconds and is stilled by hard control', () => {
     const sim = new Sim({ seed: 10, playerClass: 'druid', autoEquip: true });
     sim.setPlayerLevel(20);
-    expect(sim.applyTalents({ spec: null, rows: { 11: 'dru_r11_innervate' } })).toBe(true);
+    expect(sim.applyTalents({ spec: null, rows: { 17: 'dru_r17_survival_of_the_fittest' } })).toBe(
+      true,
+    );
     sim.player.inCombat = true;
     sim.player.fiveSecondRule = 0;
     sim.castAbility('innervate');

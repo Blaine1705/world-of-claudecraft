@@ -91,7 +91,7 @@ function effect<T extends AbilityEffect['type']>(
 }
 
 describe('retained v0.26 all-class Talents V2 semantics', () => {
-  it('resolves the retained Twin Verdicts, Bruin Rebound, and Warlock content values', () => {
+  it('resolves the retained Twin Verdicts, Concussive Economy, and Warlock content values', () => {
     const rowOption = (cls: PlayerClass, id: string) => {
       const option = ROW_TREES[cls].flatMap((row) => row.options).find((o) => o.id === id);
       if (!option) throw new Error(`missing row option ${cls}:${id}`);
@@ -106,10 +106,10 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     expect(verdict.cooldown).toBeCloseTo(8);
     expect(verdict.bonusCharges ?? 0).toBe(0);
 
-    const bruin = rowOption('druid', 'dru_r8_brutal_bash');
-    expect(bruin.name).toBe('Bruin Rebound');
-    expect(bruin.effect.proc?.name).toBe('Bruin Rebound');
-    expect(bruin.effect.proc?.responses).toEqual([
+    const concussive = rowOption('druid', 'dru_r11_improved_mark');
+    expect(concussive.name).toBe('Concussive Economy');
+    expect(concussive.effect.proc?.name).toBe('Concussive Economy');
+    expect(concussive.effect.proc?.responses).toEqual([
       { kind: 'resource', amount: 15, resourceType: 'rage' },
       { kind: 'cooldownRefund', ability: 'bash', seconds: 20 },
     ]);

@@ -23,6 +23,23 @@ function entities(rec: Recorder): any[] {
 }
 
 describe('coverage: each scenario fires its subsystem', () => {
+  it('druid_engines: all three live buttons arm and their payoffs fire', () => {
+    const rec = run('druid_engines');
+    expect(rec.notes.moonlashArmed).toBe(true);
+    expect(rec.notes.sunlanceArmed).toBe(true);
+    expect(rec.notes.redharvestArmed).toBe(true);
+    expect(rec.notes.marrowbreakArmed).toBe(true);
+    expect(rec.notes.overbloomArmed).toBe(true);
+    const abilities = (rec.allEvents as Ev[])
+      .filter((event) => event.type === 'damage' || event.type === 'heal2')
+      .map((event) => event.ability);
+    expect(abilities).toContain('Moonsurge');
+    expect(abilities).toContain('Sunwake');
+    expect(abilities).toContain('Redharvest');
+    expect(abilities).toContain('Marrowbreak');
+    expect(abilities).toContain('Overbloom');
+  });
+
   it('solo_warrior: auto-attack + mobSwing both ways, mob death -> rollLoot produced loot', () => {
     const rec = run('solo_warrior');
     const pid = (rec.sim as any).playerId;

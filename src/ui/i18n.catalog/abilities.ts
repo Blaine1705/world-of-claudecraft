@@ -1300,7 +1300,11 @@ const classAbilityNamesEn = {
         'Duskfire',
         'Instantly blasts the target with searing shadow for {damage} Shadow damage.',
       ],
-      ['wrath', 'Wildbolt', 'Hurls a bolt of nature energy for {damage} Nature damage.'],
+      [
+        'wrath',
+        'Wildbolt',
+        'Hurls a bolt of nature energy for {damage} Nature damage. In Moonwing Form, completed casts build Moontide. At full Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake.',
+      ],
       ['healing_touch', 'Wildmend', 'Heals a friendly target for {damage}.'],
       [
         'mark_of_the_wild',
@@ -1310,9 +1314,18 @@ const classAbilityNamesEn = {
       [
         'moonfire',
         'Lunar Tempest',
-        'Burns the enemy with moonfire for {damage} Arcane damage plus damage over time.',
+        'Burns the enemy with moonfire for {damage} Arcane damage plus damage over time. Moongrove: keep it burning; Moonseed extends it by 6 sec.',
       ],
-      ['rejuvenation', 'Wildbloom', 'Heals the target for {damage} over 12 sec.'],
+      [
+        'moonseed',
+        'Moonseed',
+        'Moonwing Form only. Strikes for {damage} Arcane damage, adds one Moontide stage, and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At full Moontide, Moonseed becomes Moonsurge.',
+      ],
+      [
+        'rejuvenation',
+        'Wildbloom',
+        'Heals the target for {damage} over 12 sec. Groveheart: planting a NEW bloom adds Verdance; at 5, Swiftmend becomes Overbloom.',
+      ],
       [
         'thorns',
         'Briarguard',
@@ -1327,7 +1340,7 @@ const classAbilityNamesEn = {
       [
         'maul',
         'Bonecrush',
-        'A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.',
+        'A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Wildfang: landed hits bank Old Blood; at 3, Bonecrush becomes Marrowbreak. Activates on your next swing. Bruin Form only.',
       ],
       [
         'growl',
@@ -1337,23 +1350,27 @@ const classAbilityNamesEn = {
       [
         'cat_form',
         'Wolf Form',
-        'Shapeshift into a wolf: attack power rises with your level, your attacks use energy and combo points, and you generate 29% less threat. Cast again to return to caster form.',
+        'Shapeshift into a wolf: agility rises with your level, attack power +8 plus 2 per level, your attacks use energy and combo points, and you generate 29% less threat. Cast again to return to caster form.',
       ],
       [
         'claw',
-        'Claw',
-        'Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.',
+        'Rendclaw',
+        'Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wildfang: landed hits bank Old Blood. Wolf Form only.',
       ],
-      ['ferocious_bite', 'Gorebite', 'Finishing move that causes {damage}. Wolf Form only.'],
+      [
+        'ferocious_bite',
+        'Gorebite',
+        'Finishing move that causes {damage}. Wildfang: landed hits bank Old Blood; at 3, Gorebite becomes Redharvest. Wolf Form only.',
+      ],
       [
         'swipe',
         'Sweeping Claws',
-        'Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only.',
+        'Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Wildfang: landed hits bank Old Blood. Bruin Form only.',
       ],
       [
         'regrowth',
         'Second Bloom',
-        'Heals a friendly target for {damage} and an additional amount over 21 sec.',
+        'Heals a friendly target for {damage} and an additional amount over 21 sec. Groveheart: planting a NEW bloom adds Verdance.',
       ],
       ['barkskin', 'Oakhide', 'Your skin hardens like bark, increasing armor by 150 for 15 sec.'],
       // Tank defensive cooldowns (paladin / druid), one distinct mechanic each.
@@ -1367,7 +1384,11 @@ const classAbilityNamesEn = {
         'Primal Reflexes',
         'Your instincts sharpen, increasing your chance to dodge by 50% for 6 sec.',
       ],
-      ['starfire', 'Skyfall', 'Calls down a bolt of stellar fire, causing {damage} Arcane damage.'],
+      [
+        'starfire',
+        'Skyfall',
+        'Calls down a bolt of stellar fire, causing {damage} Arcane damage. In Moonwing Form, completed casts build Moontide. At full Moontide, Skyfall becomes Sunwake.',
+      ],
       [
         'travel_form',
         'Fleet Form',
@@ -1407,8 +1428,8 @@ const classAbilityNamesEn = {
       ],
       [
         'rip',
-        'Rip',
-        'Finishing move that causes {damage} Bleed damage over 12 sec. Consumes combo points. Wolf Form only.',
+        'Bloodrift',
+        'Finishing move that causes {damage} Bleed damage over 24 sec. Consumes combo points. Wildfang: the landed hit banks Old Blood. Wolf Form only.',
       ],
       [
         'mortal_strike',
@@ -1593,7 +1614,32 @@ const classAbilityNamesEn = {
       [
         'swiftmend',
         'Swiftmend',
-        'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. (Restoration signature)',
+        'Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Completed Wildbloom and Second Bloom casts build Verdance; at 5 Verdance, Swiftmend becomes Overbloom. (Groveheart signature)',
+      ],
+      [
+        'moonlash',
+        'Moonsurge',
+        'Consumes 3 Moontide for a heavy Arcane strike: the damage choice. Spends the same bank as Sunwake, so pick one.',
+      ],
+      [
+        'sunlance',
+        'Sunwake',
+        'Consumes 3 Moontide for a Nature strike and burn and restores 35 mana: the economy choice. Spends the same bank as Moonsurge, so pick one.',
+      ],
+      [
+        'redharvest',
+        'Redharvest',
+        'Consumes 3 Old Blood, detonates all remaining Flense and Bloodrift damage you own on the target, and restores 30 energy. Any combo points held strengthen the bite but are never required.',
+      ],
+      [
+        'marrowbreak',
+        'Marrowbreak',
+        'Consumes 3 Old Blood for a heavy, high-threat strike. Below half health, instead absorbs 18% of maximum health for 8 sec and restores 15 rage.',
+      ],
+      [
+        'overbloom',
+        'Overbloom',
+        'Consumes 5 Verdance. Harvests every heal over time you own on all allies for 60% of its remaining healing, removes those effects, and plants a fresh Wildbloom on the target.',
       ],
       [
         'summon_imp',
