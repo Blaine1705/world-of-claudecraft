@@ -157,8 +157,55 @@ New rulings, settled with the maintainer 2026-07-28 (do not re-litigate):
 Structural decisions, same sitting: the phase numbering in this file
 supersedes the old 8-to-13 numbering everywhere; fishing telemetry rides
 phase 10 so data accumulates early; the acquisition-craft design decisions
-(recharge material identity, prompt-flow timing) are settled at the
-rulings checkpoint before phase 12.
+(recharge material identity, prompt-flow timing) were settled at the
+rulings checkpoint before phase 12 (R39, R40 below).
+
+Rulings checkpoint additions, settled with the maintainer 2026-07-28
+(the checkpoint sitting; do not re-litigate):
+
+- **R39. Recharge prices in the arcane material of the tool's rarity
+  rung, with the count scaled to the charges restored.** The material
+  identity reuses the disenchant ladder keyed on the R30-resolved tool
+  rarity (dust for common and uncommon tools, essence for rare, shard
+  for epic); the count derives from the fill size (roughly 2 to 5), and
+  both existing discounts compose into the count unchanged. Exact
+  constants are build-time tuning; the shape is the ruling. The arcane
+  family is the identity because all three effects are Enchanter work,
+  none of its materials is vendor-stocked (no copper bypass), and the
+  shard gains its needed second sink.
+- **R40. The prompt confirm flow ships with phase 14, WHOLE.** Phase 12
+  ships the craft always-only. Phase 14 ships the resolver widening
+  (the one-line mode refusal), the `IWorld` facet widening plus the
+  parity pin, the confirm wire surface in both worlds, and the HUD
+  dialog with its mobile, gamepad, and accessibility treatment, in one
+  change; it also retouches the two comments that tie the re-widening
+  to the acquisition craft (`src/world_api/professions.ts` and the
+  design record). No inert half ships.
+- **R41. An absorbed hit still counts against a live gather or fishing
+  session: cancel AND displace.** A knockback-carrying hit that is
+  fully absorbed cancels the session exactly as an unabsorbed hit does,
+  and its displacement stands; no absorb-conditional physics branch.
+  Closes the shield-and-gather-through-mobs hole the R31 acceptance
+  otherwise leans on.
+- **R42. Charge depletion is conditional on the bonus mattering.** A
+  charge is spent only when the effect actually changed the outcome
+  (the extra unit really granted, the grade outcome really different),
+  computed from the same rng draw with no extra draws; R39 pricing
+  assumes no waste.
+- **R43. `deleteCharacter` purges the deleted character's world-state
+  footprint, in this packet.** Market listings, escrow collection, and
+  mail must not stay in the realm blob permanently uncollectable
+  (`deleteCharacter` in `server/db.ts` today touches none of them).
+  Elevated from a phase 9 QA follow-up to packet scope by the
+  maintainer; lands in phase 10.
+- **R44. Linkdead sessions stop accruing playtime points, in this
+  packet.** The activity window and the disconnect grace are both
+  exactly five minutes and `lastInputAt` is never written on socket
+  drop, so a linkdead player earns the durable grant for essentially
+  the whole window; the fix direction (write `lastInputAt` on drop, or
+  gate the grant on a live socket) is the build's choice. Elevated from
+  a phase 9 QA follow-up to packet scope by the maintainer; lands in
+  phase 10.
 
 ---
 
@@ -341,12 +388,36 @@ yield together, value-neutral).
 
 ## Rulings checkpoint (before phase 10)
 
-One sitting, no build: confirm the R24 to R38 encodings against the
-phase 8/9 diffs, and settle the two scheduled acquisition-craft decisions
-(the recharge MATERIAL identity, and whether the prompt confirm flow ships
-with phase 12 or phase 14). Anything phases 10 to 17 discover that needs a
-new ruling gets an R-number here rather than an inline decision; this
-ledger is the channel pass 2 found missing.
+RUN 2026-07-28, one sitting, no build. Preamble: origin fetched, the
+latest release was still `release/v0.32.0` with its tip already an
+ancestor of the branch (no merge, nothing for the release-merge audit),
+and the full gate was green at the entry tip before checkpoint work.
+
+Encodings: all fifteen of R24 to R38 were verified against the shipped
+branch, one adversarial verifier per ruling, ZERO mismatches. Three are
+encoded-correct in the shipped work with their remainders correctly
+scheduled (R31: zone-keyed telemetry plus both no-skilling-dead pins
+shipped, the node-tier label rides phase 10; R32: camp untouched, the
+direction fix in phase 13 and the danger hint in phase 17; R37: the
+derived rollout guard with per-table non-vacuity and the per-zone flip
+shipped, the active-content unification rides phase 10). The other
+twelve are correctly scheduled with their code premises re-verified in
+the tree (R24 to R29 in phase 10, R30 in phase 12, R33 in phase 13,
+R34 in phase 11, R35 in phase 15, R36 in phase 16, R38 in phase 14).
+One comment-truth note for the phase 10 build was recorded on its
+item 5.
+
+Decisions: R39 (recharge material identity), R40 (prompt confirm flow
+placement), R41 (the absorb rule phase 10 item 7 awaited), and R42
+(the depletion arm phase 12 item 5 awaited) were settled with the
+maintainer; R43 and R44 were added when the maintainer elevated the two
+phase 9 QA follow-ups (the `deleteCharacter` world-state orphan and the
+linkdead playtime-points grant) into packet scope, both landing in
+phase 10. Full text in the rulings ledger above.
+
+Anything phases 10 to 17 discover that needs a new ruling still gets an
+R-number in the ledger rather than an inline decision; this ledger is
+the channel pass 2 found missing.
 
 ---
 
@@ -369,11 +440,15 @@ Implements R24 through R29 on the executable paths:
 5. Session cancellation on every teleport and `/follow` zone crossing
    (R28): dungeon/delve entry, jail, revive; one shared cancel helper, not
    five copies. The rod gate reads the water's zone at the PROBE POINT,
-   closing the 24-yard cross-boundary cast.
+   closing the 24-yard cross-boundary cast. While there, rewrite the
+   over-claiming comment in `src/sim/professions/fishing.ts` that says
+   there is no way to be carried into another zone mid-cast; `/follow`
+   refutes it (checkpoint-verified).
 6. Queued-spell buffer clears on session start (R29).
 7. A fully-absorbed hit skips the cast cancel but its knockback still
-   displaces the caster; make absorb consistent with the cancel rule
-   (whichever way the checkpoint rules, displacement and cancel agree).
+   displaces the caster; per R41 the hit counts both ways: the absorbed
+   hit cancels the session AND its displacement stands, with no
+   absorb-conditional physics branch.
 8. Hobby-switch integrity: exclude `q_prof_hobby_switch` from pair
    transitions so a banked selection cannot go stale, and stop the
    make-amends return from silently discarding an explicitly quested
@@ -392,6 +467,16 @@ Implements R24 through R29 on the executable paths:
     label on the harvest counter (zones x 3): the R31 watch premise wants
     to separate a level-1 traveler on the Thornpeak tier-1 faucet from a
     capped player working t2/t3, and the zone band alone cannot.
+11. Linkdead playtime-points fix (R44): a linkdead player must stop
+    accruing the durable playtime grant across the disconnect grace
+    (today the activity window and the grace are both exactly five
+    minutes and `lastInputAt` is never written on socket drop); the
+    mechanism is the build's choice, with a server-rig test either way.
+12. `deleteCharacter` world-state purge (R43): deleting a character
+    also removes its market listings, escrow collection, and mail from
+    the realm blob (today it touches none of them, leaving that state
+    permanently uncollectable); migration-safety and
+    database-performance review both apply.
 
 ---
 
@@ -437,13 +522,18 @@ Pass-1 phase 10 scope plus the pass-2 constraints:
 2. ONE validation authority: the resolver policy check runs at slot time
    AND load time (phase 8's 8a.2 arm), and the craft mints through the
    same resolver, so no path can mint what another path refuses.
-3. Recharge pricing in a MATERIAL IDENTITY per the checkpoint ruling; the
-   flat 4-count spans a 20x value range and cannot ship.
+3. Recharge pricing per R39: the arcane material of the R30-resolved
+   tool rarity rung (dust for common and uncommon, essence for rare,
+   shard for epic), count scaled to the charges restored, both existing
+   discounts composing into the count; the flat 4-count spanned a 20x
+   value range and could not ship. The craft's own mint reagent cost
+   must exceed the generic recharge, because re-slotting resets charges
+   to full for free and would otherwise bypass recharging entirely.
 4. Charge economics per R30: slot-time mint stands, recharge re-derives
    the maximum from currently-owned tools.
-5. `always`-mode waste (charges burned when the bonus changes nothing):
-   make depletion conditional on the bonus mattering, or price charges
-   assuming waste, per the checkpoint ruling.
+5. `always`-mode waste, per R42: depletion becomes conditional on the
+   bonus mattering (the same-draw counterfactual, no extra rng draws);
+   R39 pricing assumes no waste.
 6. The rollback caveat becomes real player value here: phase 9's shared
    rollback note is re-checked and the release notes carry it.
 7. Remove the dev gate and its two-direction pin in the same change; the
@@ -508,7 +598,10 @@ session (fresh-eyes coverage over every surface).
 
 Pass-1 phase 12 scope (gather-node tooltip grade preview; respawn
 countdown in the node tooltip; last-charge signal; the prompt confirm
-flow if the checkpoint placed it here; professions window `maxSkill`
+flow, placed HERE per R40 and shipping WHOLE: resolver widening, facet
+widening plus the parity pin, the confirm wire surface in both worlds,
+the dialog with its mobile, gamepad, and accessibility treatment, and
+the two comment retouches R40 names; professions window `maxSkill`
 sourcing; the mobile audit of every professions flow) plus:
 
 1. Banner queueing per R38 (small design note, then the queue).
