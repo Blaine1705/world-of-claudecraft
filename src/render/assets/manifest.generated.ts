@@ -790,7 +790,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/enchanting_altar.glb": "/media/models/props/enchanting_altar.a121d96eb97d.glb",
   "models/props/engineering_workbench.glb": "/media/models/props/engineering_workbench.9e12c9fe4667.glb",
   "models/props/fallback_crate.glb": "/media/models/props/fallback_crate.b469bf8d1ba3.glb",
-  "models/props/fallen_coconuts.glb": "/media/models/props/fallen_coconuts.da4d416c603a.glb",
+  "models/props/fallen_coconuts.glb": "/media/models/props/fallen_coconuts.c2b1f8c57e51.glb",
   "models/props/farmcrate_apple.glb": "/media/models/props/farmcrate_apple.18a006c1149b.glb",
   "models/props/fen_lilies.glb": "/media/models/props/fen_lilies.3106052ca7fc.glb",
   "models/props/fen_log.glb": "/media/models/props/fen_log.3c032f1567fa.glb",
