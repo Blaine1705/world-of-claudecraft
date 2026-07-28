@@ -1,4 +1,5 @@
 import { stoneboundThreatMultiplier } from '../src/sim/combat/shaman_warspirit';
+import type { TalentAllocation } from '../src/sim/content/talents';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { updateMobTarget } from '../src/sim/mob/targeting';
@@ -35,6 +36,7 @@ export interface OwnedClassCombatOutcomes {
   miss: number;
   dodge: number;
   parry: number;
+  block: number;
   resist: number;
   crit: number;
 }
@@ -54,6 +56,8 @@ export interface OwnedClassBalanceResult {
   castsByAbility: Record<string, number>;
   cooldownUses: Record<string, number>;
   buttonsPressed: number;
+  readyIdleSeconds: number;
+  dualWielding: boolean;
   resource: {
     type: string | null;
     start: number;
@@ -66,6 +70,7 @@ export interface OwnedClassBalanceResult {
     spellPower: number;
   };
   equipment: Record<string, string | null>;
+  talents: TalentAllocation;
 }
 
 export interface OwnedHealerBalanceResult {
@@ -87,6 +92,30 @@ export interface OwnedHealerBalanceResult {
   castsByAbility: Record<string, number>;
   resource: { start: number; end: number; max: number };
   equipment: Record<string, string | null>;
+  talents: TalentAllocation;
+}
+
+export interface OwnedClassDpsAverage {
+  spec: OwnedDpsSpec;
+  scenario: OwnedClassBalanceScenario;
+  seeds: readonly number[];
+  dps: number;
+  resourceEnd: number;
+  buttonsPressed: number;
+  readyIdleSeconds: number;
+  outcomes: OwnedClassCombatOutcomes;
+}
+
+export interface OwnedHealerAverage {
+  spec: OwnedHealerSpec;
+  allies: 1 | 3;
+  seeds: readonly number[];
+  hps: number;
+  dps: number;
+  overhealPct: number;
+  absorbedDamage: number;
+  emergencyRecoverySeconds: number;
+  resourceEnd: number;
 }
 
 export interface WarspiritOfftankResult {
@@ -124,6 +153,7 @@ interface RunState {
   castsByAbility: Record<string, number>;
   cooldownUses: Record<string, number>;
   buttonsPressed: number;
+  readyIdleTicks: number;
 }
 
 export const OWNED_CLASS_BALANCE_SCENARIOS: readonly OwnedClassBalanceScenario[] = [
@@ -132,6 +162,14 @@ export const OWNED_CLASS_BALANCE_SCENARIOS: readonly OwnedClassBalanceScenario[]
   { targets: 3, seconds: 15, window: 'burst' },
   { targets: 3, seconds: 60, window: 'sustained' },
 ] as const;
+
+export const OWNED_CLASS_LEVEL_20_BOSS_SCENARIO: OwnedClassBalanceScenario = {
+  targets: 1,
+  seconds: 120,
+  window: 'raid',
+  targetLevel: 20,
+  targetTemplateId: 'nythraxis_scourge_of_thornpeak',
+};
 
 export const OWNED_CLASS_RAID_SCENARIOS: readonly OwnedClassBalanceScenario[] = [
   {
@@ -248,6 +286,85 @@ export const OWNED_CLASS_PBE_LOADOUTS: Readonly<Record<OwnedDpsSpec, PbeLoadout>
   warspirit: WARSPIRIT_PBE_LOADOUT,
   vespers: VESPERS_PBE_LOADOUT,
 };
+
+// Fixed PBE builds keep balance evidence reproducible and make each profile use
+// the talents that support its intended role. Hunter remains on its separately
+// approved baseline fixture until its choice-row balance pass is specified.
+export const OWNED_CLASS_PBE_TALENTS: Readonly<
+  Partial<Record<OwnedDpsSpec | OwnedHealerSpec, TalentAllocation>>
+> = {
+  thundercall: {
+    spec: 'elemental',
+    rows: {
+      5: 'sha_r5_imbue_mastery',
+      8: 'sha_r8_frost_bind',
+      11: 'sha_r11_ancestral_guidance',
+      14: 'sha_r14_improved_flame_shock',
+      17: 'sha_r17_earthbind',
+      20: 'sha_r20_elemental_fury',
+    },
+  },
+  warspirit: {
+    spec: 'enhancement',
+    rows: {
+      5: 'sha_r5_concussion',
+      8: 'sha_r8_shock_efficiency',
+      11: 'sha_r11_ancestral_guidance',
+      14: 'sha_r14_improved_flame_shock',
+      17: 'sha_r17_earthbind',
+      20: 'sha_r20_tidal_waves',
+    },
+  },
+  spiritmend: {
+    spec: 'restoration',
+    rows: {
+      5: 'sha_r5_imbue_mastery',
+      8: 'sha_r8_improved_earth_shock',
+      11: 'sha_r11_ancestral_guidance',
+      14: 'sha_r14_improved_flame_shock',
+      17: 'sha_r17_earthbind',
+      20: 'sha_r20_bloodlust',
+    },
+  },
+  doctrine: {
+    spec: 'discipline',
+    rows: {
+      5: 'pri_r5_improved_renew',
+      8: 'pri_r8_improved_shield',
+      11: 'pri_r11_vampiric_embrace',
+      14: 'pri_r11_meditation',
+      17: 'pri_r17_anointing',
+      20: 'pri_r20_twin_covenant',
+    },
+  },
+  benison: {
+    spec: 'holy',
+    rows: {
+      5: 'pri_r5_improved_renew',
+      8: 'pri_r17_inner_fire',
+      11: 'pri_r11_vampiric_embrace',
+      14: 'pri_r11_meditation',
+      17: 'pri_r17_choir_of_deliverance',
+      20: 'pri_r20_second_verse',
+    },
+  },
+  vespers: {
+    spec: 'shadow',
+    rows: {
+      5: 'pri_r5_twisted_faith',
+      8: 'pri_r17_inner_fire',
+      11: 'pri_r8_psychic_scream',
+      14: 'pri_r14_pain_and_suffering',
+      17: 'pri_r17_anointing',
+      20: 'pri_r20_incarnate_spirit',
+    },
+  },
+};
+
+function pbeTalents(spec: OwnedDpsSpec | OwnedHealerSpec, talentSpec: string): TalentAllocation {
+  const profile = OWNED_CLASS_PBE_TALENTS[spec] ?? { spec: talentSpec, rows: {} };
+  return { spec: profile.spec, rows: { ...profile.rows } };
+}
 
 function equipPbeLoadout(sim: Sim, spec: OwnedDpsSpec): void {
   equipExactLoadout(sim, OWNED_CLASS_PBE_LOADOUTS[spec]);
@@ -426,6 +543,7 @@ function castFieldcraft(state: RunState): void {
 function castThundercall(state: RunState): void {
   const thunder =
     state.sim.player.auras.find((aura) => aura.id === 'shaman_thunder_charges')?.stacks ?? 0;
+  if (tryCast(state, 'primal_exaltation')) return;
   if (tryCast(state, 'elemental_mastery')) return;
   if (thunder >= 5) {
     if (state.targets.length === 3 && tryCast(state, 'earthquake', state.primary, true)) return;
@@ -440,6 +558,7 @@ function castThundercall(state: RunState): void {
 }
 
 function castWarspirit(state: RunState): void {
+  if (tryCast(state, 'primal_exaltation')) return;
   if (hasAura(state.sim.player, 'shaman_stormcast') && tryCast(state, 'lightning_bolt')) return;
   if (tryCast(state, 'stormstrike')) return;
   if (!ownAura(state.primary, 'flame_shock', state.sim.playerId)) {
@@ -449,6 +568,7 @@ function castWarspirit(state: RunState): void {
 }
 
 function castVespers(state: RunState): void {
+  if (tryCast(state, 'power_infusion', state.sim.player)) return;
   if (fullStacks(state.sim.player, 'gloomtithe', 5) && tryCast(state, 'summon_tithefiend')) return;
   const missingDirge = state.targets.find((target) => {
     const dirge = ownAura(target, 'shadow_word_pain', state.sim.playerId);
@@ -488,6 +608,7 @@ function prepare(state: RunState): void {
   state.castsByAbility = {};
   state.cooldownUses = {};
   state.buttonsPressed = 0;
+  state.readyIdleTicks = 0;
 }
 
 function ownedByPlayer(sim: Sim, sourceId: number, playerId: number): boolean {
@@ -539,7 +660,8 @@ export function runOwnedClassDpsProbe(
   const sim = new Sim({ seed, playerClass: fixture.cls, autoEquip: false }) as ProbeSim;
   sim.setPlayerLevel(20);
   anchorProbeInOpenField(sim);
-  if (!sim.applyTalents({ spec: fixture.talentSpec, rows: {} } as never)) {
+  const talents = pbeTalents(spec, fixture.talentSpec);
+  if (!sim.applyTalents(talents)) {
     throw new Error(`failed to apply ${fixture.talentSpec}`);
   }
   equipPbeLoadout(sim, spec);
@@ -559,6 +681,7 @@ export function runOwnedClassDpsProbe(
     castsByAbility: {},
     cooldownUses: {},
     buttonsPressed: 0,
+    readyIdleTicks: 0,
   };
   prepare(state);
 
@@ -570,12 +693,20 @@ export function runOwnedClassDpsProbe(
     miss: 0,
     dodge: 0,
     parry: 0,
+    block: 0,
     resist: 0,
     crit: 0,
   };
   let totalDamage = 0;
   for (let tick = 0; tick < scenario.seconds * 20; tick++) {
+    const wasReady =
+      !sim.player.dead &&
+      !sim.player.castingAbility &&
+      sim.player.gcdRemaining <= 0.001 &&
+      sim.player.chargeTargetId === null;
+    const buttonsBefore = state.buttonsPressed;
     runRotation(state);
+    if (wasReady && state.buttonsPressed === buttonsBefore) state.readyIdleTicks++;
     totalDamage += collectDamage(state, sim.tick(), damageByTarget, damageBySource, outcomes);
   }
   const meta = sim.players.get(sim.playerId);
@@ -595,6 +726,8 @@ export function runOwnedClassDpsProbe(
     castsByAbility: state.castsByAbility,
     cooldownUses: state.cooldownUses,
     buttonsPressed: state.buttonsPressed,
+    readyIdleSeconds: state.readyIdleTicks / 20,
+    dualWielding: sim.player.dualWielding,
     resource: {
       type: sim.player.resourceType,
       start: resourceStart,
@@ -607,6 +740,7 @@ export function runOwnedClassDpsProbe(
       spellPower: sim.player.spellPower,
     },
     equipment: { ...meta.equipment },
+    talents,
   };
 }
 
@@ -628,6 +762,37 @@ export function runOwnedClassRaidMatrix(
   return OWNED_DPS_SPECS.flatMap((spec) =>
     OWNED_CLASS_RAID_SCENARIOS.map((scenario) => runOwnedClassDpsProbe(spec, scenario, seed, head)),
   );
+}
+
+function average(values: readonly number[]): number {
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+export function averageOwnedClassDpsProbe(
+  spec: OwnedDpsSpec,
+  scenario: OwnedClassBalanceScenario,
+  seeds: readonly number[],
+): OwnedClassDpsAverage {
+  if (seeds.length === 0) throw new Error('DPS balance average requires at least one seed');
+  const runs = seeds.map((seed) => runOwnedClassDpsProbe(spec, scenario, seed));
+  return {
+    spec,
+    scenario,
+    seeds: [...seeds],
+    dps: average(runs.map((run) => run.dps)),
+    resourceEnd: average(runs.map((run) => run.resource.end)),
+    buttonsPressed: average(runs.map((run) => run.buttonsPressed)),
+    readyIdleSeconds: average(runs.map((run) => run.readyIdleSeconds)),
+    outcomes: {
+      hit: average(runs.map((run) => run.outcomes.hit)),
+      miss: average(runs.map((run) => run.outcomes.miss)),
+      dodge: average(runs.map((run) => run.outcomes.dodge)),
+      parry: average(runs.map((run) => run.outcomes.parry)),
+      block: average(runs.map((run) => run.outcomes.block)),
+      resist: average(runs.map((run) => run.outcomes.resist)),
+      crit: average(runs.map((run) => run.outcomes.crit)),
+    },
+  };
 }
 
 function healerFixture(spec: OwnedHealerSpec): {
@@ -682,6 +847,7 @@ function runHealerRotation(
   const lowest = lowestHealth(allies);
   const injured = allies.filter((ally) => ally.hp / ally.maxHp < 0.82).length;
   if (spec === 'spiritmend') {
+    if (healerCast(sim, healer, 'primal_exaltation', healer, castsByAbility)) return;
     const prepared = allies.filter((ally) =>
       ally.auras.some(
         (aura) => aura.id === 'shaman_mending_current' && aura.sourceId === healer.id,
@@ -697,10 +863,16 @@ function runHealerRotation(
     return;
   }
   if (spec === 'doctrine') {
-    const linked = allies.some((ally) =>
-      ally.auras.some((aura) => aura.id === 'priest_doctrine' && aura.sourceId === healer.id),
+    if (healerCast(sim, healer, 'power_infusion', healer, castsByAbility)) return;
+    const unlinked = allies.filter(
+      (ally) =>
+        !ally.auras.some((aura) => aura.id === 'priest_doctrine' && aura.sourceId === healer.id),
     );
-    if (!linked && healerCast(sim, healer, 'power_word_shield', lowest, castsByAbility)) return;
+    if (unlinked.length > 0) {
+      if (healerCast(sim, healer, 'power_word_shield', lowestHealth(unlinked), castsByAbility)) {
+        return;
+      }
+    }
     if (lowest.hp / lowest.maxHp < 0.42) {
       if (healerCast(sim, healer, 'scouring_mercy', lowest, castsByAbility)) return;
       if (healerCast(sim, healer, 'flash_heal', lowest, castsByAbility)) return;
@@ -712,6 +884,9 @@ function runHealerRotation(
     ally.auras.some((aura) => aura.id === 'seraphic_vigil' && aura.sourceId === healer.id),
   );
   if (!watched && healerCast(sim, healer, 'seraphic_vigil', lowest, castsByAbility)) return;
+  if (allies.length === 3 && injured >= 2) {
+    if (healerCast(sim, healer, 'choir_of_deliverance', healer, castsByAbility)) return;
+  }
   if (allies.length === 3 && injured >= 2) {
     if (healerCast(sim, healer, 'prayer_of_healing', healer, castsByAbility)) return;
   }
@@ -731,7 +906,8 @@ export function runOwnedHealerProbe(
   const sim = new Sim({ seed, playerClass: fixture.cls, autoEquip: false }) as ProbeSim;
   sim.setPlayerLevel(20);
   anchorProbeInOpenField(sim);
-  if (!sim.applyTalents({ spec: fixture.talentSpec, rows: {} } as never)) {
+  const talents = pbeTalents(spec, fixture.talentSpec);
+  if (!sim.applyTalents(talents)) {
     throw new Error(`failed to apply ${fixture.talentSpec}`);
   }
   equipExactLoadout(sim, fixture.loadout);
@@ -791,6 +967,7 @@ export function runOwnedHealerProbe(
         castsByAbility,
         cooldownUses: {},
         buttonsPressed: 0,
+        readyIdleTicks: 0,
       },
       events,
       { target_1: 0 },
@@ -858,6 +1035,29 @@ export function runOwnedHealerProbe(
     castsByAbility,
     resource: { start: resourceStart, end: healer.resource, max: healer.maxResource },
     equipment: { ...meta.equipment },
+    talents,
+  };
+}
+
+export function averageOwnedHealerProbe(
+  spec: OwnedHealerSpec,
+  allies: 1 | 3,
+  seeds: readonly number[],
+): OwnedHealerAverage {
+  if (seeds.length === 0) throw new Error('healer balance average requires at least one seed');
+  const runs = seeds.map((seed) => runOwnedHealerProbe(spec, allies, seed));
+  return {
+    spec,
+    allies,
+    seeds: [...seeds],
+    hps: average(runs.map((run) => run.hps)),
+    dps: average(runs.map((run) => run.dps)),
+    overhealPct: average(runs.map((run) => run.overhealPct)),
+    absorbedDamage: average(runs.map((run) => run.absorbedDamage)),
+    emergencyRecoverySeconds: average(
+      runs.map((run) => run.emergencyRecoverySeconds ?? run.seconds),
+    ),
+    resourceEnd: average(runs.map((run) => run.resource.end)),
   };
 }
 

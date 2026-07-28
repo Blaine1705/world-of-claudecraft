@@ -2059,7 +2059,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     channel: { duration: 3, ticks: 6 },
     effects: [{ type: 'aoeDamage', min: 12, max: 16, radius: 8 }],
     description:
-      'Rains arrows on the target area for 3 sec, dealing $d damage every 0.5 sec to enemies caught in it.',
+      'Rain arrows over an 8-yard area for 3 sec. Enemies in the area take $d Physical damage every 0.5 sec. Damage increases with Ranged Attack Power.',
   },
   hurricane: {
     id: 'hurricane',
@@ -2093,7 +2093,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetMode: 'position',
     effects: [{ type: 'groundAoE', min: 13, max: 17, radius: 8, duration: 6, interval: 1.5 }],
     description:
-      'Shake an 8-yard area for 6 sec, dealing $d Nature damage every 1.5 sec. Thundercall empowers it at full Thunder.',
+      'Shake an 8-yard area for 6 sec, dealing $d Nature damage every 1.5 sec. Damage increases with Spell Power. Thundercall: at 5 Thunder, deal 100% more damage and consume all Thunder.',
   },
   scorch: {
     id: 'scorch',
@@ -3341,7 +3341,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'hot', total: 240, duration: 12, interval: 3 }],
     description:
-      'Patch up your companion, restoring 240 health over 12 sec if it is alive. If it is dead, revive it at 35% health.',
+      'Restore $o health to your living companion over 12 sec. Healing increases with Spell Power. If your companion is dead, revive it with 35% health instead.',
   },
   raptor_strike: {
     id: 'raptor_strike',
@@ -3374,7 +3374,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         rank: 4,
         level: 20,
         cost: 0,
-        effects: [{ type: 'weaponStrike', bonus: 4, weaponMult: 0.1 }],
+        effects: [{ type: 'weaponStrike', bonus: 10, weaponMult: 0.1 }],
       },
     ],
     description:
@@ -3416,16 +3416,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       {
         type: 'unleashBeast',
-        primaryMin: 83,
-        primaryMax: 105,
-        clapMin: 26,
-        clapMax: 34,
+        primaryMin: 42,
+        primaryMax: 53,
+        clapMin: 57,
+        clapMax: 75,
+        secondaryClapMult: 1.5,
         radius: 6,
         frenzyDuration: 8,
       },
     ],
     description:
-      "Consume 3 Pack Ferocity after your pet strikes for 83 to 105 Physical damage and claps every enemy within 6 yards for 26 to 34. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 nearby enemies.",
+      "Consume 3 Pack Ferocity after your pet strikes for 42 to 53 Physical damage and claps every enemy within 6 yards for 57 to 75. The clap deals 50% more damage to enemies other than the main target. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 enemies within 5 yards of the target.",
   },
   stampede: {
     id: 'stampede',
@@ -3469,7 +3470,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     scalesWith: 'ranged',
     requiresTarget: true,
     effects: [
-      { type: 'directDamage', min: 22, max: 28 },
+      { type: 'directDamage', min: 26, max: 33 },
       { type: 'gainResource', amount: 20 },
     ],
     description:
@@ -3502,7 +3503,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 50, duration: 1800 }],
       },
     ],
-    description: 'Take on the aspect of the hawk, increasing attack power by $b for 30 min.',
+    description: "Adopt Harrier's Guise, increasing your Attack Power by $b for 30 min.",
   },
   serpent_sting: {
     id: 'serpent_sting',
@@ -3532,7 +3533,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'dot', total: 55, duration: 15, interval: 3 }],
       },
     ],
-    description: 'Stings the target, dealing $d Nature damage over 15 sec.',
+    description:
+      'Deal $d total Nature damage over 15 sec, once every 3 sec. Damage increases with Ranged Attack Power.',
   },
   arcane_shot: {
     id: 'arcane_shot',
@@ -3552,7 +3554,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 2, level: 12, cost: 25, effects: [{ type: 'directDamage', min: 24, max: 30 }] },
       { rank: 3, level: 18, cost: 25, effects: [{ type: 'directDamage', min: 38, max: 47 }] },
     ],
-    description: 'An instant shot that deals $d Arcane damage.',
+    description:
+      'Shoot the target for $d Arcane damage. Damage increases with Ranged Attack Power.',
   },
   concussive_shot: {
     id: 'concussive_shot',
@@ -3574,7 +3577,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'directDamage', min: 4, max: 6 },
       { type: 'slow', mult: 0.5, duration: 4 },
     ],
-    description: 'Dazes the target for $d damage, slowing movement by 50% for 4 sec.',
+    description:
+      'Shoot the target for $d Physical damage and slow it by 50% for 4 sec. Damage increases with Ranged Attack Power.',
   },
   mongoose_bite: {
     id: 'mongoose_bite',
@@ -3588,17 +3592,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: true,
-    effects: [{ type: 'weaponStrike', bonus: 12 }],
+    effects: [{ type: 'weaponStrike', bonus: 22, weaponMult: 0.45 }],
     ranks: [
       {
         rank: 2,
         level: 16,
         cost: 30,
-        effects: [{ type: 'weaponStrike', bonus: 24 }],
+        effects: [{ type: 'weaponStrike', bonus: 48, weaponMult: 0.45 }],
       },
     ],
     description:
-      'Strike for weapon damage plus $d. If the target has your Bloodhook Wound, deal 1 wound tick immediately and refresh the wound to 12 sec. Damage increases with Attack Power through weapon damage.',
+      'Strike for 45% weapon damage plus $d. If the target has your Bloodhook Wound, deal 1 wound tick immediately and refresh the wound to 12 sec. Damage increases with Attack Power through weapon damage.',
   },
   hunting_momentum: {
     id: 'hunting_momentum',
@@ -3649,7 +3653,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'directDamage', min: 3, max: 5 },
       { type: 'slow', mult: 0.6, duration: 10 },
     ],
-    description: 'Inflicts a wound for $d damage, slowing the enemy by 40% for 10 sec.',
+    description:
+      'Slash the target for $d Physical damage and slow it by 40% for 10 sec. Damage increases with Attack Power.',
   },
   aspect_of_the_monkey: {
     id: 'aspect_of_the_monkey',
@@ -3664,7 +3669,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     exclusiveGroup: 'aspect',
     effects: [{ type: 'selfBuff', kind: 'buff_dodge', value: 0.08, duration: 1800 }],
-    description: 'Take on the aspect of the monkey, increasing your dodge chance by 8% for 30 min.',
+    description: "Adopt Marten's Guise, increasing your dodge chance by 8% for 30 min.",
   },
   aspect_of_the_cheetah: {
     id: 'aspect_of_the_cheetah',
@@ -3679,7 +3684,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     exclusiveGroup: 'aspect',
     effects: [{ type: 'selfBuff', kind: 'buff_speed', value: 1.3, duration: 1800 }],
-    description: 'Take on the aspect of the cheetah, increasing movement speed by 30% for 30 min.',
+    description: "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min.",
   },
   pack_rally: {
     id: 'pack_rally',
@@ -3698,7 +3703,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'hunterPackRally', duration: 10, radius: 30 },
     ],
     description:
-      "Adopt Courser's Guise and rally nearby allies with 30% movement speed and 10% attack and cast speed for 10 sec.",
+      "Adopt Courser's Guise. You, your companion, and group or raid allies within 30 yards gain 30% movement speed and 10% attack, casting, and channeling speed for 10 sec.",
   },
   aimed_shot: {
     id: 'aimed_shot',
@@ -3715,7 +3720,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: true, // a fired shot: damage resolves when the arrow lands
     scalesWith: 'ranged',
     requiresTarget: true,
-    effects: [{ type: 'directDamage', min: 52, max: 64 }],
+    effects: [{ type: 'directDamage', min: 61, max: 75 }],
     description:
       'Shoot the target for $d Physical damage. Damage increases with Ranged Attack Power.',
   },
@@ -3736,7 +3741,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: true,
     scalesWith: 'ranged',
     requiresTarget: true,
-    effects: [{ type: 'directDamage', min: 11, max: 15 }],
+    effects: [{ type: 'directDamage', min: 13, max: 18 }],
     description:
       'Fire 6 shots over 2.4 sec while moving. Each shot deals $d Physical damage and increases with Ranged Attack Power.',
   },
@@ -3785,7 +3790,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'hunter_bloodtrail', value: 1, duration: 12 }],
     description:
-      'For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 nearby enemies, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards, deals 25% more base damage to its main target, and triggers 50% more wound damage.',
+      'For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 enemies within 5 yards, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards of radius, deals 25% more base damage to its main target, and triggers 50% more wound damage.',
   },
   trailbreak: {
     id: 'trailbreak',
@@ -3890,7 +3895,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Deal $d Holy damage. Doctrine heals each linked ally for 30% of the damage. With no linked ally, it heals the lowest-health party member for 15%.',
+      'Deal $d Holy damage. Damage increases with Spell Power. Doctrine: heal each linked ally for 30% of the damage. If no ally is linked, heal the lowest-health party member for 15%.',
   },
   lesser_heal: {
     id: 'lesser_heal',
@@ -3910,7 +3915,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 12, cost: 65, effects: [{ type: 'heal', min: 110, max: 132 }] },
       { rank: 4, level: 20, cost: 85, effects: [{ type: 'heal', min: 160, max: 192 }] },
     ],
-    description: 'Heals a friendly target for $d.',
+    description: 'Heal a friendly target for $d. Healing increases with Spell Power.',
   },
   power_word_fortitude: {
     id: 'power_word_fortitude',
@@ -3925,7 +3930,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'buffTarget', kind: 'buff_sta_pct', value: 5, duration: 1800, party: true }],
-    description: 'Increases the Stamina of all party members by $b% for 30 min.',
+    description: 'Increase the Stamina of every party member by $b% for 30 min.',
   },
   shadow_word_pain: {
     id: 'shadow_word_pain',
@@ -3954,7 +3959,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Deal $d total Shadow damage over 18 sec, once every 3 sec. Vespers increases this damage by 25%. Each tick on your Effigy grants 1 Gloomtithe.',
+      'Deal $d total Shadow damage over 18 sec, once every 3 sec. Damage increases with Spell Power. Vespers: deal 25% more damage, and each tick on your Effigy grants 1 Gloomtithe.',
   },
   power_word_shield: {
     id: 'power_word_shield',
@@ -4004,7 +4009,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'hot', total: 205, duration: 15, interval: 3 }],
       },
     ],
-    description: 'Heals the target for $d over 15 sec.',
+    description:
+      'Heal the target for $d over 15 sec, once every 3 sec. Healing increases with Spell Power.',
   },
   mind_blast: {
     id: 'mind_blast',
@@ -4039,7 +4045,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 165, max: 195 }],
     ranks: [{ rank: 2, level: 20, cost: 130, effects: [{ type: 'heal', min: 335, max: 390 }] }],
-    description: 'A slow but powerful prayer that heals a friendly target for $d.',
+    description: 'Heal a friendly target for $d. Healing increases with Spell Power.',
   },
   mind_flay: {
     id: 'mind_flay',
@@ -4055,7 +4061,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'drainTick', min: 12, max: 12, healFrac: 0 }],
     description:
-      "Assaults the target's mind with Shadow energy, causing $d Shadow damage each second for 3 sec.",
+      'Channel for 3 sec, dealing $d Shadow damage each second. Damage increases with Spell Power.',
   },
   flash_heal: {
     id: 'flash_heal',
@@ -4070,7 +4076,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 174, max: 206 }],
-    description: 'A fast prayer that heals a friendly target for $d.',
+    description: 'Heal a friendly target for $d. Healing increases with Spell Power.',
   },
 
   // ====================== SHAMAN ======================
@@ -4110,7 +4116,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'directDamage', min: 75, max: 85 }],
       },
     ],
-    description: 'Deal $d Nature damage. Thundercall: a hit grants 1 Thunder.',
+    description:
+      'Deal $d Nature damage. Damage increases with Spell Power. Thundercall: a hit grants 1 Thunder.',
   },
   thunder_reservoir: {
     id: 'thunder_reservoir',
@@ -4180,7 +4187,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)',
+      'Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)',
   },
   stormsurge: {
     id: 'stormsurge',
@@ -4231,7 +4238,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: false,
     effects: [],
     description:
-      'Unleash your active weapon enchant. Pyrebrand deals 54 to 64 Fire damage, gains 30% of Spell Power, and grants 2 Thunder. Galeheart strikes with your weapon, advances Warspirit Cadence, and grants 20% attack speed for 6 sec. Stonebound strikes for 75% weapon damage, forces the target to attack you, and reduces damage taken by 20% for 4 sec. Lifespring consumes your Mending Current, heals for 125% of its remaining healing, and reduces the next hit within 8 sec by 50% of the health restored.',
+      'Trigger your active weapon enchant. Pyrebrand: deal 54 to 64 Fire damage plus 30% of your Spell Power and gain 2 Thunder. Galeheart: strike with your weapon, advance Warspirit Cadence, and gain 20% attack speed for 6 sec. Stonebound: strike for 75% weapon damage, force the target to attack you for 3 sec, and take 20% less damage for 4 sec. Lifespring: consume Mending Current, heal for 125% of its remaining healing, and reduce the next hit within 8 sec by 50% of the health restored.',
   },
   // Restoration Shaman signature, granted only by the Spiritmend spec.
   chain_heal: {
@@ -4248,7 +4255,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'chainHeal', min: 120, max: 145, jumps: 2, falloff: 0.5, radius: 12 }],
     description:
-      'Heal a friendly target for 120 to 145, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)',
+      'Heal a friendly target for $d, then jump to up to 2 allies within 12 yards. Each jump heals for 50% of the previous target. Each ally reached consumes your remaining Mending Current and immediately heals for 125% of the amount consumed. The initial heal increases with Spell Power. (Spiritmend signature)',
   },
   ancestor_return: {
     id: 'ancestor_return',
@@ -4306,7 +4313,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      "Heal a friendly target for $d. Spiritmend stores 50% of the healing calculated before overhealing as Mending Current for 12 sec, up to 30% of the target's maximum health.",
+      "Heal a friendly target for $d. Healing increases with Spell Power. Spiritmend: store 50% of the full heal before overhealing as Mending Current for 12 sec, up to 30% of the target's maximum health.",
   },
   tidecall: {
     id: 'tidecall',
@@ -4324,7 +4331,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'heal', min: 58, max: 72 }],
     description:
-      "Heal a friendly target for 58 to 72. The heal increases with Spell Power. Add the same healing calculated before overhealing to Mending Current, up to 30% of the target's maximum health.",
+      "Heal a friendly target for $d. Healing increases with Spell Power. Add the full heal before overhealing to Mending Current, up to 30% of the target's maximum health.",
   },
   earth_shock: {
     id: 'earth_shock',
@@ -4343,7 +4350,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 16, cost: 65, effects: [{ type: 'directDamage', min: 54, max: 61 }] },
     ],
     description:
-      'Deal $d Nature damage. Thundercall empowers it at full Thunder. Stonebound forces the target to attack you.',
+      'Deal $d Nature damage. Damage increases with Spell Power. Thundercall: at 5 Thunder, deal 125% more damage and consume all Thunder. Stonebound: force the target to attack you for 3 sec.',
   },
   lightning_shield: {
     id: 'lightning_shield',
@@ -4399,7 +4406,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Surrounds you with crackling lightning: melee attackers take $b Nature damage, up to 3 charges and at most once every 5 seconds.',
+      'Surround yourself with lightning for 10 min. The next 3 melee attacks against you deal $b Nature damage to the attacker, at most once every 5 sec.',
   },
   flame_shock: {
     id: 'flame_shock',
@@ -4427,7 +4434,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         ],
       },
     ],
-    description: 'Sears the target with fire for $d damage plus $o over 12 sec.',
+    description:
+      'Deal $d Fire damage, then $o Fire damage over 12 sec. The initial hit increases with Spell Power.',
   },
   flametongue_weapon: {
     id: 'flametongue_weapon',
@@ -4463,7 +4471,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'slow', mult: 0.5, duration: 8 },
     ],
     description:
-      'Instantly shocks the target with frost for $d Frost damage and slows its movement by 50% for 8 sec.',
+      'Deal $d Frost damage and slow the target by 50% for 8 sec. Damage increases with Spell Power.',
   },
   frostbrand_weapon: {
     id: 'frostbrand_weapon',
@@ -4496,7 +4504,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'buff_speed', value: 1.4, duration: 3600 }],
     description:
-      'Turns you into a Shadewolf, increasing movement speed by 40%. Cast again to return to normal form.',
+      'Become a Shadewolf and move 40% faster. Cast again to return to your normal form.',
   },
   stormstrike: {
     id: 'stormstrike',
@@ -6009,7 +6017,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'aoeAllyAttackPower', apPct: 10, duration: 1800, radius: 30 }],
     description:
-      'Inspires nearby allies, increasing attack power by 10% for 30 min. (Marksmanship signature)',
+      'Increase the Attack Power of allies within 30 yards by 10% for 30 min. (Marksmanship signature)',
   },
   wyvern_sting: {
     id: 'wyvern_sting',
@@ -6361,8 +6369,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     scalesWith: 'ranged',
     requiresTarget: true,
     effects: [{ type: 'interrupt', lockout: 4 }],
-    description:
-      'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Hunter talent)',
+    description: 'Interrupt the target and prevent spells from that school for 4 sec.',
   },
   counterspell: {
     id: 'counterspell',

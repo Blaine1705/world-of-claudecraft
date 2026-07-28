@@ -1169,8 +1169,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.voidfeast.description':
     'Dévore un effet magique (un effet bénéfique sur un ennemi ou un effet néfaste sur un allié) et vous rend 6 % de votre maximum de points de vie.',
   'hudChrome.abilityError.shieldRequired': 'Vous devez équiper un bouclier.',
-  'entities.abilities.chain_heal.description':
-    'Rend une grande quantité de points de vie à une cible alliée, puis rebondit sur un maximum de 2 autres alliés proches, avec des soins réduits de 50 % à chaque rebond. (signature Restauration)',
   'entities.abilities.chain_heal.name': 'Salve de guérison',
   'entities.abilities.counter_shot.description':
     'Un tir vif qui interrompt l’incantation de la cible et bloque cette école de magie pendant 4 s.',
@@ -8784,8 +8782,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Frappe l'ennemi et lui inflige {damage} points de dégâts d'Ombre, puis l'horrifie pendant 3 s. (talent de Démoniste)",
   'entities.abilities.deep_freeze.description':
     'Congela profundamente a cible, inflige {damage} de daño de Givre y lo aturde durante 4 s. (talent de mage)',
-  'entities.abilities.desperate_prayer.description':
-    'Vous rend instantanément {damage} points de vie. (talent de Prêtre)',
   'entities.abilities.deterrence.description':
     "Augmente vos chances d'esquiver de 50 points de pourcentage pendant 10 s. (talent de Chasseur)",
   'entities.abilities.earthbind.description':

@@ -275,6 +275,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.death_coil.name': '墓所の螺旋',
   'entities.abilities.deep_freeze.name': '死霜',
   'entities.abilities.desperate_prayer.name': '最後の祈り',
+  'entities.abilities.desperate_prayer.description': '最大体力の30%を即座に回復します。',
   'entities.abilities.deterrence.name': '針毛の守り',
   'entities.abilities.earthbind.name': '大地の縛り',
   'entities.abilities.evocation.name': 'エーテルの井戸',
@@ -2948,7 +2949,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_wave.description': '味方対象の体力を {damage} 回復します。',
   'entities.abilities.chain_heal.name': '流転の癒し',
   'entities.abilities.chain_heal.description':
-    '味方1体の体力を120から145回復し、近くの味方最大2体に連鎖します。連鎖ごとに回復量は半減し、届いた味方ごとに癒しの水流を消費して追加回復を発生させます。（スピリットメンド固有）',
+    '味方1体の体力を{damage}回復し、12ヤード以内の味方最大2体に連鎖します。連鎖するたびに回復量は直前の対象の50%になります。届いた味方ごとに残りの癒しの水流を消費し、消費量の125%を即座に回復します。最初の回復量はスペルパワーで増加します。（スピリットメンド固有）',
   'entities.abilities.galeheart_weapon.name': '疾風の武器',
   'entities.abilities.galeheart_weapon.description':
     '武器に疾風を宿します。3回目の命中ごとに武器攻撃が2度反響し、ストームキャストを発動します。',
@@ -2963,7 +2964,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '味方1体を6チャージで60秒間守ります。ダメージを受けると1チャージを消費し、3秒に1回、最大体力の5%を回復します。（シャーマンのタレント）',
   'entities.abilities.tidecall.name': '潮呼び',
   'entities.abilities.tidecall.description':
-    '素早い癒しの潮を呼び、味方1体を回復して計算後の回復量を癒しの水流に加えます。',
+    '味方1体の体力を{damage}回復します。回復量はスペルパワーで増加します。オーバーヒール前の回復量を癒しの水流に加えます。上限は対象の最大体力の30%です。',
   'entities.abilities.earth_shock.name': '大地の衝撃',
   'entities.abilities.earth_shock.description':
     '衝撃の力で対象を即座に打ち、{damage} の自然ダメージを与えます。',
@@ -8251,8 +8252,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵に{damage}の闇属性ダメージを与え、その後3秒間恐怖状態にする。（ウォーロックのタレント）',
   'entities.abilities.deep_freeze.description':
     '対象を深く凍らせ、{damage} の冷気ダメージを与えて 4 秒間気絶させる。（メイジタレント）',
-  'entities.abilities.desperate_prayer.description':
-    '自分の体力を即座に{damage}回復する。（プリーストのタレント）',
   'entities.abilities.deterrence.description':
     '回避率を50パーセントポイント上昇させる。効果時間10秒。（ハンターのタレント）',
   'entities.abilities.earthbind.description':
@@ -8737,7 +8736,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.martyrs_aegis.description': '味方1体が受けるダメージを8秒間40%軽減する。',
   'entities.abilities.choir_of_deliverance.name': '救済の聖歌隊',
   'entities.abilities.choir_of_deliverance.description':
-    '6秒間詠唱し、2秒ごとに周囲のパーティメンバーを回復する。',
+    '6秒間チャネルし、30ヤード以内のパーティメンバーを2秒ごとに{damage}回復します。回復量はスペルパワーで増加します。',
   'entities.items.resonant_thread.name': '共鳴の糸',
   'entities.items.resonant_hide.name': '共鳴の獣皮',
   'entities.items.resonant_links.name': '共鳴の鎖',

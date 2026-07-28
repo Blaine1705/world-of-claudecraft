@@ -7785,7 +7785,7 @@ export const ko_KR: EnTranslations = {
       },
       "chain_heal": {
         "name": "쇄도하는 치유",
-        "description": "아군 대상의 생명력을 120~145 회복시킨 후 근처 아군 최대 2명에게 도약하며, 도약할 때마다 치유량이 절반으로 줄어듭니다. 영향을 받은 아군마다 치유의 물결을 소모해 추가로 회복시킵니다. (영혼 치유 고유)"
+        "description": "아군 대상의 생명력을 {damage}만큼 회복시킨 후 12야드 안의 아군 최대 2명에게 도약합니다. 도약할 때마다 이전 대상의 50%만큼 치유합니다. 영향을 받은 아군마다 남은 치유의 물결을 소모해 소모량의 125%만큼 즉시 회복시킵니다. 첫 치유량은 주문력에 따라 증가합니다. (영혼 치유 고유)"
       },
       "galeheart_weapon": {
         "name": "질풍의 무기",
@@ -7817,7 +7817,7 @@ export const ko_KR: EnTranslations = {
       },
       "tidecall": {
         "name": "해일 부름",
-        "description": "빠른 회복의 해일을 불러 아군을 치유하고 계산된 치유량을 치유의 물결에 더합니다."
+        "description": "아군 대상의 생명력을 {damage}만큼 회복시킵니다. 치유량은 주문력에 따라 증가합니다. 초과 치유 전의 전체 치유량을 치유의 물결에 더하며, 대상 최대 생명력의 30%까지 저장합니다."
       },
       "metamorphosis": {
         "name": "악마 변신",
@@ -8109,7 +8109,7 @@ export const ko_KR: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "마지막 기도",
-        "description": "즉시 생명력을 {damage}만큼 회복합니다. (사제 특성)"
+        "description": "최대 생명력의 30%를 즉시 회복합니다."
       },
       "deterrence": {
         "name": "가시수호",
@@ -8345,7 +8345,7 @@ export const ko_KR: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "구원의 성가대",
-        "description": "6초 동안 정신을 집중해 2초마다 주위 파티원을 치유합니다."
+        "description": "6초 동안 정신을 집중해 30야드 안의 파티원을 2초마다 {damage}만큼 치유합니다. 치유량은 주문력에 따라 증가합니다."
       },
       "bear_charge": {
         "name": "큰곰 돌진",

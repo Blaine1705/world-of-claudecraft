@@ -312,7 +312,7 @@ const SHAMAN_SPECS: SpecDef[] = [
     'A healer using ancestral waves and efficient nature magic.',
     'chain_heal',
     'Cleansing Tides',
-    'Your healing spells cost 20% less mana.',
+    'Mending Waters and Cascading Mend cost 20% less Mana.',
     {
       ability: [
         { ability: 'chain_heal', costPct: -0.2 },

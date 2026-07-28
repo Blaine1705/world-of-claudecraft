@@ -8198,8 +8198,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     'Tinggi di Thornpeak, badai di atas Stormcrag kadang menghimpun sebuah wujud. Thunzharr, sang Puncak yang Terjaga bangkit di sana dengan irama tetap, sesosok elemental sekuat raid yang dilawan di dunia terbuka oleh siapa pun yang menjawab panggilan, dan ia tumbuh makin perkasa makin banyak penantang yang berdiri melawannya. Setiap orang yang bergabung dalam pertarungan memperoleh undian rampasannya sendiri, dihormati dengan ketentuan kunci raid, dan kejatuhannya bertahan cukup lama bagi yang gugur untuk berlari kembali dan menuntut haknya. Kumpulkan lebih banyak pedang daripada yang kamu kira kamu butuhkan.',
   'guide.worldPage.worldBossTitle': 'Saat puncak terjaga: sang bos dunia',
-  'entities.abilities.chain_heal.description':
-    'Menyembuhkan target sekutu dalam jumlah besar, lalu melompat ke hingga 2 sekutu terdekat lainnya dengan penyembuhan 50% lebih sedikit pada setiap lompatan. (Kemampuan khas Pemulihan)',
   'entities.abilities.chain_heal.name': 'Penyembuhan Berantai',
   'entities.abilities.counter_shot.description':
     'Sebuah tembakan yang mengganggu perapalan mantra target dan mengunci sekolah itu selama 4 detik.',
@@ -8579,8 +8577,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menghantam musuh dengan {damage} kerusakan Bayangan, lalu membuatnya ketakutan selama 3 detik. (talenta Warlock)',
   'entities.abilities.deep_freeze.description':
     'Congela profundamente a target, inflige {damage} de daño de Es y lo aturde durante 4 detik. (talenta mage)',
-  'entities.abilities.desperate_prayer.description':
-    'Langsung memulihkan {damage} nyawamu. (talenta Priest)',
   'entities.abilities.deterrence.description':
     'Meningkatkan peluang menghindarmu sebesar 50 poin persentase selama 10 detik. (talenta Hunter)',
   'entities.abilities.earthbind.description':

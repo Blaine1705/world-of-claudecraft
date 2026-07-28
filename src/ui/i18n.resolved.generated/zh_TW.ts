@@ -7785,7 +7785,7 @@ export const zh_TW: EnTranslations = {
       },
       "chain_heal": {
         "name": "湧流癒合",
-        "description": "為一個友方目標恢復120至145點生命值，隨後跳躍至多2個附近盟友，每次跳躍的治療量減半。每個被波及的盟友都會消耗你的癒合水流，造成額外治療。（靈癒招牌）"
+        "description": "為一個友方目標恢復{damage}點生命值，隨後跳躍至12碼內最多2個盟友。每次跳躍的治療量為上一個目標的50%。每個被波及的盟友都會消耗其剩餘的癒合水流，並立即恢復所消耗數值125%的生命值。初始治療量隨法術強度提高。（靈癒招牌）"
       },
       "galeheart_weapon": {
         "name": "風心武器",
@@ -7817,7 +7817,7 @@ export const zh_TW: EnTranslations = {
       },
       "tidecall": {
         "name": "潮汐召喚",
-        "description": "召來迅捷的復甦潮汐，治療一名盟友，並將計算後的治療量注入癒合水流。"
+        "description": "為一個友方目標恢復{damage}點生命值。治療量隨法術強度提高。將過量治療前的完整治療量加入癒合水流，最多為目標最大生命值的30%。"
       },
       "metamorphosis": {
         "name": "惡魔變形",
@@ -8109,7 +8109,7 @@ export const zh_TW: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "最後祈禱",
-        "description": "立即為你恢復{damage}點生命值。（牧師天賦）"
+        "description": "立即恢復你最大生命值的30%。"
       },
       "deterrence": {
         "name": "鬃刺守衛",
@@ -8345,7 +8345,7 @@ export const zh_TW: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "救贖聖詠團",
-        "description": "引導 6 秒，每 2 秒為附近的隊伍成員恢復生命值。"
+        "description": "引導6秒，每2秒為30碼內的隊伍成員恢復{damage}點生命值。治療量隨法術強度提高。"
       },
       "bear_charge": {
         "name": "巨熊衝鋒",

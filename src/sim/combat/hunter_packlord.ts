@@ -256,6 +256,7 @@ export function runUnleashBeast(
     primaryMax: number;
     clapMin: number;
     clapMax: number;
+    secondaryClapMult?: number;
     radius: number;
     frenzyDuration: number;
   },
@@ -279,12 +280,14 @@ export function runUnleashBeast(
     .filter((enemy) => !enemy.dead && ctx.hasLineOfSight(pet, enemy))
     .sort((a, b) => dist2d(a.pos, pet.pos) - dist2d(b.pos, pet.pos) || a.id - b.id);
   for (const enemy of targets) {
+    const clapMultiplier =
+      enemy.id === target.id ? multiplier : multiplier * (effect.secondaryClapMult ?? 1);
     petStrike(
       ctx,
       pet,
       enemy,
-      effect.clapMin * multiplier,
-      effect.clapMax * multiplier,
+      effect.clapMin * clapMultiplier,
+      effect.clapMax * clapMultiplier,
       `${abilityName} Clap`,
       false,
     );

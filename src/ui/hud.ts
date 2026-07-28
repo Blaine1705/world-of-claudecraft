@@ -14739,6 +14739,7 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
       case 'directDamage':
       case 'aoeDamage':
       case 'aoeHeal':
+      case 'chainHeal':
       case 'aoeRoot':
       case 'chainDamage':
       case 'groundAoE':

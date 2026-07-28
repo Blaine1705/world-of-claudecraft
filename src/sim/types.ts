@@ -1941,6 +1941,7 @@ export type AbilityEffect =
       primaryMax: number;
       clapMin: number;
       clapMax: number;
+      secondaryClapMult?: number;
       radius: number;
       frenzyDuration: number;
     }

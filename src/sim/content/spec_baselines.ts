@@ -80,8 +80,9 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       global: { healPct: 0.08 },
       ability: [
         { ability: 'lesser_heal', dmgPct: 0.18, costPct: -0.16 },
-        { ability: 'heal', dmgPct: 0.18, costPct: -0.16, castPct: -0.2 },
+        { ability: 'heal', dmgPct: 0.18, costPct: -0.3, castPct: -0.2 },
         { ability: 'flash_heal', costPct: -0.16 },
+        { ability: 'prayer_of_healing', costPct: -0.15 },
         { ability: 'smite', castPct: -0.1 },
       ],
     },
@@ -113,8 +114,9 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       // stays below Elemental's; melee AP is retained.
       stats: { int: 2, ap: 24 },
       ability: [
-        { ability: 'lightning_bolt', costPct: -0.1 },
-        { ability: 'earth_shock', costPct: -0.1 },
+        { ability: 'lightning_bolt', costPct: -0.2 },
+        { ability: 'earth_shock', costPct: -0.2 },
+        { ability: 'flame_shock', costPct: -0.2 },
         { ability: 'rockbiter_weapon', dmgPct: 0.4 },
         { ability: 'stormstrike', dmgPct: 0.25 },
       ],

@@ -5620,8 +5620,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Zasáhne nepřítele za {damage} bodů stínového poškození a poté ho na 3 s vyděsí. (černokněžnický talent)',
   'entities.abilities.deep_freeze.description':
     'Congela profundamente a cíl, inflige {damage} de daño de Mrazu y lo aturde durante 4 s. (mágovský talent)',
-  'entities.abilities.desperate_prayer.description':
-    'Okamžitě vás vyléčí o {damage}. (kněžský talent)',
   'entities.abilities.deterrence.description':
     'Na 10 s zvýší vaši šanci na úhyb o 50 procentních bodů. (lovecký talent)',
   'entities.abilities.earthbind.description':
@@ -8161,8 +8159,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     'Vysoko na Thornpeaku bouře nad Bouřným skalním štítem občas nabere tvar. Thunzharr, Probouzející se štít tam povstává v pravidelném rytmu, elementál o síle raidu, s nímž v otevřeném světě bojuje kdokoli odpoví na volání, a čím víc vyzyvatelů se proti němu postaví, tím je mocnější. Každý, kdo se do boje zapojí, získá vlastní hod o jeho kořist, ctěný za podmínek raidového zámku, a jeho pád doznívá dost dlouho, aby padlí stihli doběhnout zpět a nárokovat, co jim náleží. Sesbírej víc mečů, než si myslíš, že potřebuješ.',
   'guide.worldPage.worldBossTitle': 'Když se štít probudí: světový boss',
-  'entities.abilities.chain_heal.description':
-    'Vyléčí spojenecký cíl za velké množství zdraví, poté přeskočí až na 2 další blízké spojence. Každý další skok léčí o 50 % méně. (klíčová schopnost Obnovy)',
   'entities.abilities.holy_taunt.description':
     'Vyzve cíl: tvoje hrozba se zvýší na úroveň jeho nejnenáviděnějšího nepřítele a cíl je donucen tě 3 s útočit.',
   'entities.abilities.holy_taunt.name': 'Posvátná výzva',

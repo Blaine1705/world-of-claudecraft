@@ -151,6 +151,9 @@ describe('spec masteries', () => {
     expect(TALENTS.priest?.specs.find((s) => s.id === 'shadow')?.mastery.effect).toEqual({
       global: { dotDmgPct: 0.15, spellDmgPct: 0.1 },
     });
+    expect(TALENTS.shaman?.specs.find((s) => s.id === 'elemental')?.mastery.effect).toEqual({
+      global: { spellDmgPct: 0.15, spellHastePct: 0.1 },
+    });
     expect(TALENTS.shaman?.specs.find((s) => s.id === 'enhancement')?.mastery.effect).toEqual({
       global: { meleeHastePct: 0.1, meleeDmgPct: 0.1 },
     });

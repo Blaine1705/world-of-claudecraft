@@ -1,13 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import {
+  averageOwnedClassDpsProbe,
+  averageOwnedHealerProbe,
   OWNED_CLASS_BALANCE_SCENARIOS,
+  OWNED_CLASS_LEVEL_20_BOSS_SCENARIO,
   OWNED_CLASS_PBE_LOADOUTS,
+  OWNED_CLASS_PBE_TALENTS,
   OWNED_DPS_SPECS,
   runOwnedClassDpsMatrix,
   runOwnedClassDpsProbe,
   runOwnedHealerProbe,
   runWarspiritOfftankProbe,
 } from '../scripts/owned_class_balance_probe';
+
+const BALANCE_SEEDS = [29_930, 29_931, 29_932, 29_933, 29_934] as const;
 
 describe('owned-class level 20 balance harness', () => {
   it('defines the required one-target and three-target burst and sustained scenarios', () => {
@@ -38,6 +44,9 @@ describe('owned-class level 20 balance harness', () => {
       expect(result.resource.end).toBeLessThanOrEqual(result.resource.max);
       expect(Object.keys(result.equipment).length).toBeGreaterThan(0);
       expect(result.equipment).toEqual(OWNED_CLASS_PBE_LOADOUTS[result.spec]);
+      const talents = OWNED_CLASS_PBE_TALENTS[result.spec];
+      if (talents) expect(result.talents).toEqual(talents);
+      expect(result.dualWielding).toBe(result.spec === 'warspirit');
     }
     const vespersArea = results.find(
       (result) =>
@@ -92,6 +101,34 @@ describe('owned-class level 20 balance harness', () => {
     expect(vespers.dps).toBeLessThanOrEqual(thundercall.dps * 1.15);
   }, 30_000);
 
+  it('keeps the fixed Shaman and Vespers builds inside their sustained role bands', () => {
+    const single = OWNED_CLASS_BALANCE_SCENARIOS[1];
+    const area = OWNED_CLASS_BALANCE_SCENARIOS[3];
+    const thundercall = averageOwnedClassDpsProbe('thundercall', single, BALANCE_SEEDS);
+    const warspiritSingle = averageOwnedClassDpsProbe('warspirit', single, BALANCE_SEEDS);
+    const warspiritArea = averageOwnedClassDpsProbe('warspirit', area, BALANCE_SEEDS);
+    const vespersSingle = averageOwnedClassDpsProbe('vespers', single, BALANCE_SEEDS);
+    const vespersArea = averageOwnedClassDpsProbe('vespers', area, BALANCE_SEEDS);
+    const warspiritBoss = averageOwnedClassDpsProbe(
+      'warspirit',
+      OWNED_CLASS_LEVEL_20_BOSS_SCENARIO,
+      BALANCE_SEEDS,
+    );
+    const vespersBoss = averageOwnedClassDpsProbe(
+      'vespers',
+      OWNED_CLASS_LEVEL_20_BOSS_SCENARIO,
+      BALANCE_SEEDS,
+    );
+
+    expect(thundercall.dps).toBeGreaterThanOrEqual(vespersSingle.dps * 0.85);
+    expect(thundercall.dps).toBeLessThanOrEqual(vespersSingle.dps * 1.1);
+    expect(warspiritArea.dps / warspiritSingle.dps).toBeGreaterThanOrEqual(1.1);
+    expect(warspiritArea.dps / warspiritSingle.dps).toBeLessThanOrEqual(1.2);
+    expect(vespersArea.dps / vespersSingle.dps).toBeGreaterThanOrEqual(1.25);
+    expect(warspiritBoss.dps / vespersBoss.dps).toBeGreaterThanOrEqual(0.95);
+    expect(warspiritBoss.dps / vespersBoss.dps).toBeLessThanOrEqual(1.1);
+  }, 60_000);
+
   it.each(['spiritmend', 'doctrine', 'benison'] as const)(
     'records the fixed one-ally and three-ally %s healing profiles',
     (spec) => {
@@ -107,10 +144,34 @@ describe('owned-class level 20 balance harness', () => {
         expect(result.resource.end).toBeGreaterThanOrEqual(0);
         expect(Object.keys(result.castsByAbility).length).toBeGreaterThan(0);
         expect(Object.keys(result.equipment).length).toBeGreaterThan(0);
+        expect(result.talents).toEqual(OWNED_CLASS_PBE_TALENTS[spec]);
       }
     },
     30_000,
   );
+
+  it('keeps each healer build inside its five-seed role and mana contract', () => {
+    const spiritmendSingle = averageOwnedHealerProbe('spiritmend', 1, BALANCE_SEEDS);
+    const spiritmendGroup = averageOwnedHealerProbe('spiritmend', 3, BALANCE_SEEDS);
+    const doctrineSingle = averageOwnedHealerProbe('doctrine', 1, BALANCE_SEEDS);
+    const doctrineGroup = averageOwnedHealerProbe('doctrine', 3, BALANCE_SEEDS);
+    const benisonSingle = averageOwnedHealerProbe('benison', 1, BALANCE_SEEDS);
+    const benisonGroup = averageOwnedHealerProbe('benison', 3, BALANCE_SEEDS);
+
+    expect(benisonGroup.emergencyRecoverySeconds).toBeLessThan(
+      spiritmendGroup.emergencyRecoverySeconds,
+    );
+    expect(benisonGroup.hps).toBeGreaterThanOrEqual(spiritmendGroup.hps * 0.8);
+    expect(benisonSingle.resourceEnd).toBeGreaterThanOrEqual(250);
+    expect(benisonGroup.resourceEnd).toBeGreaterThanOrEqual(250);
+    expect(spiritmendGroup.resourceEnd).toBeGreaterThanOrEqual(1_200);
+    expect(doctrineSingle.hps + doctrineSingle.dps).toBeGreaterThanOrEqual(140);
+    expect(
+      doctrineGroup.hps + doctrineGroup.dps + doctrineGroup.absorbedDamage / 60,
+    ).toBeGreaterThanOrEqual(120);
+    expect(doctrineGroup.resourceEnd).toBeGreaterThanOrEqual(150);
+    expect(spiritmendSingle.hps).toBeGreaterThan(0);
+  }, 60_000);
 
   it('runs Priest healer pressure through shields and Seraphic Vigil', () => {
     const doctrine = runOwnedHealerProbe('doctrine', 3, 29_912);

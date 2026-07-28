@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { anchorProbeInOpenField } from '../scripts/probe_anchor';
 import { lineOfSightClear } from '../src/sim/colliders';
 import { dealDamage } from '../src/sim/combat/damage';
 import { MOBS } from '../src/sim/data';
@@ -316,6 +317,7 @@ describe('Hunter v0.29 choice-row mechanics', () => {
 
   it('Fang Chorus echoes every spender and turns the third echo into a clap', () => {
     const sim = hunter('marksmanship', { 20: 'hun_r20_fang_chorus' }, 2935);
+    anchorProbeInOpenField(sim);
     addPet(sim);
     const primary = addMob(sim, 20);
     const nearby = addMob(sim, 21);
