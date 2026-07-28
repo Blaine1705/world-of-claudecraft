@@ -1570,3 +1570,180 @@ describe('fishing over the live server (pin 8)', () => {
     expect(angler.castingAbility).toBe(FISHING_CAST_ID);
   });
 });
+
+describe('the reel is exempt from the in-combat gate', () => {
+  it('aggro during the bite wait no longer eats a valid reel', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      startFishing(sim.ctx, p, meta); // the bite-delay draw
+      expect(p.castingAbility).toBe(FISHING_CAST_ID);
+      sim.tickCount = p.fishBiteAtTick;
+      updateCasting(sim.ctx, p, meta); // fires the bite, arms the reel window
+      expect(p.fishReelDeadlineTick).toBeGreaterThan(0);
+      // Something aggroes during the wait: proximity aggro sets inCombat
+      // with no landed hit, so the armed reel is still valid.
+      p.inCombat = true;
+      sim.events = [];
+      startFishing(sim.ctx, p, meta); // the reel: the table draw
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    // The catch LANDS: session ended cleanly, the table draw was spent, and
+    // no combat denial fired.
+    expect(p.castingAbility).toBeNull();
+    expect(draws).toBe(2);
+    expect(
+      sim.events.some(
+        (e) => (e as { type: string; success?: boolean }).type === 'castStop' && (e as { success?: boolean }).success === true,
+      ),
+    ).toBe(true);
+    expect(
+      sim.events.some(
+        (e) =>
+          (e as { type: string; text?: string }).type === 'error' &&
+          (e as { text?: string }).text === "You can't do that while in combat.",
+      ),
+    ).toBe(false);
+    p.inCombat = false;
+  });
+
+  it('in combat with NO armed reel, the cast is still denied (order pin)', () => {
+    // Pre-bite: the session runs but the deadline is unarmed, so a re-press
+    // falls through the reel arm and the combat denial still fires (it sits
+    // above the plain busy arm exactly as before).
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    startFishing(sim.ctx, p, meta);
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    expect(p.fishReelDeadlineTick).toBe(0);
+    p.inCombat = true;
+    sim.events = [];
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      startFishing(sim.ctx, p, meta);
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    expect(
+      sim.events.some(
+        (e) =>
+          (e as { type: string; text?: string }).type === 'error' &&
+          (e as { text?: string }).text === "You can't do that while in combat.",
+      ),
+    ).toBe(true);
+    // The session itself is untouched and no draw was spent.
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    expect(draws).toBe(0);
+    p.inCombat = false;
+  });
+
+  it('a reel past the deadline still gets the busy error, in combat or not', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    startFishing(sim.ctx, p, meta);
+    sim.tickCount = p.fishBiteAtTick;
+    updateCasting(sim.ctx, p, meta);
+    // One past the deadline: the miss arm owns this tick, not the reel.
+    sim.tickCount = p.fishReelDeadlineTick + 1;
+    sim.events = [];
+    startFishing(sim.ctx, p, meta);
+    expect(
+      sim.events.some(
+        (e) =>
+          (e as { type: string; text?: string }).type === 'error' &&
+          (e as { text?: string }).text === 'You are busy.',
+      ),
+    ).toBe(true);
+  });
+});
+
+describe('fishing breaks stealth and action-locked forms refuse it', () => {
+  it('an action-locked form refuses with the shapeshifted literal and zero draws', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    p.auras.push({
+      id: 'fireball_form',
+      name: 'Ember Form',
+      kind: 'form_fireball',
+      value: 0,
+      remaining: 600,
+      duration: 600,
+      sourceId: p.id,
+      school: 'physical',
+    } as Entity['auras'][number]);
+    sim.events = [];
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      startFishing(sim.ctx, sim.player, meta);
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    expect(
+      sim.events.some(
+        (e) =>
+          (e as { type: string; text?: string }).type === 'error' &&
+          (e as { text?: string }).text === "You can't do that while shapeshifted.",
+      ),
+    ).toBe(true);
+    expect(sim.events.some((e) => (e as { type: string }).type === 'castStart')).toBe(false);
+    expect(draws).toBe(0);
+    // Shift out in the SAME fixture: the form was the operative cause.
+    p.auras.splice(0, p.auras.length);
+    startFishing(sim.ctx, sim.player, meta);
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+  });
+
+  it('casting a line breaks stealth; a denied cast does not', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    const p = sim.player;
+    const stealthAura = () =>
+      ({
+        id: 'stealth',
+        name: 'Stealth',
+        kind: 'stealth',
+        value: 0,
+        remaining: 600,
+        duration: 600,
+        sourceId: p.id,
+        school: 'physical',
+      }) as Entity['auras'][number];
+    // Denied first (toolless: the implement gate refuses): stealth survives.
+    teleportToValeShore(sim);
+    p.auras.push(stealthAura());
+    p.stealthed = true;
+    startFishing(sim.ctx, p, meta);
+    expect(p.castingAbility).toBeNull();
+    expect(p.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    // Granted next: the cast start breaks it, still exactly one draw.
+    sim.addItem('simple_fishing_pole', 1);
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      startFishing(sim.ctx, p, meta);
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    expect(p.auras.some((a) => a.kind === 'stealth')).toBe(false);
+    expect(p.stealthed).toBe(false);
+    expect(draws).toBe(1);
+  });
+});

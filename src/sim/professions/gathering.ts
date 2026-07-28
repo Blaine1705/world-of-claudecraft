@@ -10,6 +10,7 @@
 // ever takes effect on the deterministic tick path, never out of band.
 
 import { bagCapacity, bagsFullError, countFit } from '../bags';
+import { isActionLockingFormAuraKind } from '../combat/forms';
 import { GATHER_NODES } from '../content/gather_nodes';
 import {
   GATHERING_PROFESSION_IDS,
@@ -405,8 +406,10 @@ export function gatherCastDurationSec(
 // path (dispatched from a wire command the same tick it arrives, per the
 // other immediate-interaction commands like `buyItem`), never off-tick.
 // Denies (no side effect, rng-free) if the requesting player is dead
-// (matching the vendor family's dead gate, items.ts buyItem/useItem), busy
-// (already casting or consuming), the node id is unknown, the player is too
+// (matching the vendor family's dead gate, items.ts buyItem/useItem), in
+// combat or swimming (the same pair startFishing enforces, byte-identical
+// literals so the existing client matcher rows cover both), busy (already
+// casting or consuming), the node id is unknown, the player is too
 // far away, their own timer for the node has not elapsed, they lack the tool
 // tier, or their bags are full (matching the pickupObject capacity
 // pre-check, interaction.ts); a denial never touches another player's state,
@@ -421,10 +424,30 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
     ctx.error(meta.entityId, "You can't do that while dead.");
     return false;
   }
-  // Busy gate (right after the dead gate): a running cast or a
-  // consume blocks starting a gather cast, the startFishing busy literal.
+  // In-combat and swimming denials, mirroring startFishing's order (dead,
+  // combat, swim, busy): land harvesting refuses exactly where fishing does,
+  // so the two gathering surfaces are explainable as one rule. Both are
+  // rng-free and state-free, and both literals already have matcher rows.
+  if (p.inCombat) {
+    ctx.error(meta.entityId, "You can't do that while in combat.");
+    return false;
+  }
+  if (ctx.isSwimming(p)) {
+    ctx.error(meta.entityId, "You can't do that while swimming.");
+    return false;
+  }
+  // Busy gate: a running cast or a consume blocks starting a gather cast,
+  // the startFishing busy literal.
   if (p.castingAbility || isConsuming(p)) {
     ctx.error(meta.entityId, 'You are busy.');
+    return false;
+  }
+  // Action-locked shapeshift forms refuse harvesting, the exact gate and
+  // literal castAbility applies to the normal kit (a Bruin druid cannot mine
+  // any more than it can cast). Moonkin/shadow keep the normal kit and pass;
+  // the classic rule is the sim's own action-locked set, not "any form".
+  if (p.auras.some((a) => isActionLockingFormAuraKind(a.kind))) {
+    ctx.error(meta.entityId, "You can't do that while shapeshifted.");
     return false;
   }
   const node = gatherNodeById(nodeId);
@@ -479,6 +502,9 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
   // Start the gather cast: every gate above is rng-free, so a
   // denial draws nothing and starts no cast. The draws and the grant moved
   // to completeGatherCast below, routed by the cast lifecycle on completion.
+  // Starting the cast is a deliberate action and breaks stealth (rng-free),
+  // AFTER every deny arm: a refused attempt never reveals the player.
+  ctx.breakStealth(p);
   if (p.sitting) ctx.standUp(p);
   const duration = gatherCastDurationSec(
     node.tier,
@@ -491,6 +517,11 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
   p.castTargetId = null;
   p.channeling = false;
   p.gatherCastNodeId = node.id;
+  // Drop any GCD-held queued spell press: a session's end paths never call
+  // fireQueuedCast, so a slot that survived into the session would fire
+  // unprompted one tick after it ends (updateCasting's retry arm).
+  p.queuedCastAbility = null;
+  p.queuedCastAim = null;
   ctx.emit({
     type: 'castStart',
     entityId: p.id,

@@ -644,8 +644,11 @@ export function castAbility(
       // Non-spell casts (fishing/gather) are exempt (like the silence/lockout
       // guards above): their completion paths never call fireQueuedCast, so a
       // press queued against one would strand and misfire on a later, unrelated
-      // cast. Demon Heal is deliberately NOT folded: its channel completion
-      // fires the queue, so queuing against it works today.
+      // cast. The session starts also clear any GCD-held slot loaded just
+      // before them (harvestNode/startFishing), closing the one load path
+      // that could survive into a session. Demon Heal is deliberately NOT
+      // folded: its channel completion fires the queue, so queuing against
+      // it works today.
       if (p.castRemaining <= CAST_QUEUE_WINDOW_SEC && !isNonSpellCast(p.castingAbility)) {
         p.queuedCastAbility = abilityId;
         p.queuedCastAim = aim ?? null;

@@ -35,9 +35,10 @@ import {
   NODE_HARVEST_TABLE,
   nodeMaterialFor,
 } from '../src/sim/professions/gathering';
+import { PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
-import { terrainHeight } from '../src/sim/world';
+import { type Entity, xpForLevel } from '../src/sim/types';
+import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
 
 function mustMeta(sim: Sim, pid: number) {
   const meta = sim.players.get(pid);
@@ -63,13 +64,33 @@ function mustNode(nodeId: string) {
 
 // Teleports a player entity onto a node's exact (x, z) so the distance check
 // always passes; matches the teleportTo helper convention in sim.test.ts.
+// Waterline nodes (herb_eastbrook_1 sits in swim-deep lake water) are
+// harvested WADING beside the node, the way a real player must since the
+// swimming denial landed: when the node's own spot is swim-deep, walk a
+// deterministic ring inside INTERACT_RANGE for the nearest standable point.
 function teleportOntoNode(sim: Sim, pid: number, nodeId: string) {
   const node = GATHER_NODES.find((n) => n.id === nodeId);
   if (!node) throw new Error(`missing node ${nodeId}`);
   const p = mustEntity(sim, pid);
-  p.pos.x = node.pos.x;
-  p.pos.z = node.pos.z;
-  p.pos.y = terrainHeight(node.pos.x, node.pos.z, sim.cfg.seed);
+  const seed = sim.cfg.seed;
+  const swimDeep = (x: number, z: number) =>
+    groundHeight(x, z, seed) < waterLevelAt(x, z) - PLAYER_SWIM_DEPTH;
+  let spot = { x: node.pos.x, z: node.pos.z };
+  if (swimDeep(spot.x, spot.z)) {
+    outer: for (let d = 0.5; d <= 4.5; d += 0.5) {
+      for (let a = 0; a < 16; a++) {
+        const x = node.pos.x + Math.cos((a * Math.PI) / 8) * d;
+        const z = node.pos.z + Math.sin((a * Math.PI) / 8) * d;
+        if (!swimDeep(x, z)) {
+          spot = { x, z };
+          break outer;
+        }
+      }
+    }
+  }
+  p.pos.x = spot.x;
+  p.pos.z = spot.z;
+  p.pos.y = terrainHeight(spot.x, spot.z, seed);
   p.prevPos = { ...p.pos };
 }
 
@@ -1230,5 +1251,209 @@ describe('fine material grades on the live harvest path', () => {
     p.dead = false;
     p.hp = p.maxHp;
     expect(sim.harvestNode(MIREFEN_T2, pid)).toBe(true);
+  });
+});
+
+describe('harvest denies in combat and while swimming (the startFishing pair)', () => {
+  const MIREFEN_T2 = 'ore_mirefen_t2';
+
+  it('in combat: exact literal, zero draws, timer untouched, then the live control grants', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('iron_mining_pick', 1, pid);
+    teleportOntoNode(sim, pid, MIREFEN_T2);
+    const p = mustEntity(sim, pid);
+    p.inCombat = true;
+    let draws = 0;
+    (sim as any).rng.setObserver(() => draws++);
+    sim.drainEvents();
+    expect(sim.harvestNode(MIREFEN_T2, pid)).toBe(false);
+    (sim as any).rng.setObserver(null);
+    const ev = sim.drainEvents();
+    expect(
+      ev.some((e) => e.type === 'error' && e.text === "You can't do that while in combat."),
+    ).toBe(true);
+    expect(p.castingAbility).toBeNull();
+    expect(draws).toBe(0);
+    expect(sim.nodeHarvestableByMeFor(MIREFEN_T2, pid)).toBe(true);
+    // Live control in the SAME fixture: combat was the operative cause.
+    p.inCombat = false;
+    expect(sim.harvestNode(MIREFEN_T2, pid)).toBe(true);
+  });
+
+  it('swimming: exact literal, zero draws, then the live control grants', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('copper_mining_pick', 1, pid);
+    const p = mustEntity(sim, pid);
+    // Vale lake center: deep water, the professions_fishing swim-deny spot.
+    p.pos.x = -92;
+    p.pos.z = 88;
+    p.pos.y = terrainHeight(-92, 88, sim.cfg.seed);
+    p.prevPos = { ...p.pos };
+    expect(sim.ctx.isSwimming(p)).toBe(true);
+    let draws = 0;
+    (sim as any).rng.setObserver(() => draws++);
+    sim.drainEvents();
+    expect(sim.harvestNode(NODE_ID, pid)).toBe(false);
+    (sim as any).rng.setObserver(null);
+    const ev = sim.drainEvents();
+    expect(
+      ev.some((e) => e.type === 'error' && e.text === "You can't do that while swimming."),
+    ).toBe(true);
+    expect(p.castingAbility).toBeNull();
+    expect(draws).toBe(0);
+    // Live control: back on dry land at the node, the harvest starts.
+    teleportOntoNode(sim, pid, NODE_ID);
+    expect(sim.ctx.isSwimming(p)).toBe(false);
+    expect(sim.harvestNode(NODE_ID, pid)).toBe(true);
+  });
+
+  it('a waterline herb denies from its swim-deep center and grants from the wading spot', () => {
+    // herb_eastbrook_1 sits in swim-deep lake water: standing exactly on it
+    // is swimming (denied), wading beside it inside INTERACT_RANGE is not.
+    // This is the shipped-content acceptance shape of the swimming denial:
+    // the node stays farmable, the swim route does not.
+    const WATERLINE = 'herb_eastbrook_1';
+    const node = mustNode(WATERLINE);
+    expect(
+      groundHeight(node.pos.x, node.pos.z, 42) <
+        waterLevelAt(node.pos.x, node.pos.z) - PLAYER_SWIM_DEPTH,
+    ).toBe(true);
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Wader');
+    sim.addItem('gathering_sickle', 1, pid);
+    const p = mustEntity(sim, pid);
+    p.pos.x = node.pos.x;
+    p.pos.z = node.pos.z;
+    p.pos.y = terrainHeight(node.pos.x, node.pos.z, sim.cfg.seed);
+    p.prevPos = { ...p.pos };
+    expect(sim.ctx.isSwimming(p)).toBe(true);
+    sim.drainEvents();
+    expect(sim.harvestNode(WATERLINE, pid)).toBe(false);
+    expect(
+      sim
+        .drainEvents()
+        .some((e) => e.type === 'error' && e.text === "You can't do that while swimming."),
+    ).toBe(true);
+    // The wading spot (teleportOntoNode's ring walk) grants the same node.
+    teleportOntoNode(sim, pid, WATERLINE);
+    expect(sim.ctx.isSwimming(p)).toBe(false);
+    expect(sim.harvestNode(WATERLINE, pid)).toBe(true);
+  });
+});
+
+describe('harvest breaks stealth and action-locked forms refuse it', () => {
+  it('an action-locked form refuses with the shapeshifted literal, zero draws, and shifting out grants', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Shifter');
+    sim.addItem('copper_mining_pick', 1, pid);
+    teleportOntoNode(sim, pid, NODE_ID);
+    const p = mustEntity(sim, pid);
+    p.auras.push({
+      id: 'bear_form',
+      name: 'Bruin Form',
+      kind: 'form_bear',
+      value: 0,
+      remaining: 600,
+      duration: 600,
+      sourceId: pid,
+      school: 'physical',
+    } as Entity['auras'][number]);
+    let draws = 0;
+    (sim as any).rng.setObserver(() => draws++);
+    sim.drainEvents();
+    expect(sim.harvestNode(NODE_ID, pid)).toBe(false);
+    (sim as any).rng.setObserver(null);
+    const ev = sim.drainEvents();
+    expect(
+      ev.some((e) => e.type === 'error' && e.text === "You can't do that while shapeshifted."),
+    ).toBe(true);
+    expect(p.castingAbility).toBeNull();
+    expect(draws).toBe(0);
+    expect(sim.nodeHarvestableByMeFor(NODE_ID, pid)).toBe(true);
+    // Shift out in the SAME fixture: the form was the operative cause.
+    p.auras.splice(0, p.auras.length);
+    expect(sim.harvestNode(NODE_ID, pid)).toBe(true);
+  });
+
+  it('starting a harvest breaks stealth at the cast START', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('rogue', 'Shade');
+    const meta = mustMeta(sim, pid);
+    (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + 10, meta); // level 3, knows stealth
+    sim.castAbility('stealth', pid);
+    const p = mustEntity(sim, pid);
+    expect(p.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    sim.addItem('copper_mining_pick', 1, pid);
+    teleportOntoNode(sim, pid, NODE_ID);
+    sim.drainEvents();
+    let draws = 0;
+    (sim as any).rng.setObserver(() => draws++);
+    expect(sim.harvestNode(NODE_ID, pid)).toBe(true);
+    (sim as any).rng.setObserver(null);
+    // Broken at cast START, before any completion: aura gone, cache cleared,
+    // the aura-lost event emitted, and the start still draws nothing.
+    expect(p.castingAbility).not.toBeNull();
+    expect(p.auras.some((a) => a.kind === 'stealth')).toBe(false);
+    expect(p.stealthed).toBe(false);
+    expect(sim.drainEvents().some((e) => e.type === 'aura' && e.gained === false)).toBe(true);
+    expect(draws).toBe(0);
+  });
+
+  it('a DENIED harvest never breaks stealth', () => {
+    // Bare hands: the tool gate refuses, and the refusal must not reveal the
+    // player (a denial has no side effects).
+    const sim = makeWorld();
+    const pid = sim.addPlayer('rogue', 'Shade');
+    const meta = mustMeta(sim, pid);
+    (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + 10, meta);
+    sim.castAbility('stealth', pid);
+    const p = mustEntity(sim, pid);
+    expect(p.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    teleportOntoNode(sim, pid, NODE_ID);
+    sim.drainEvents();
+    expect(sim.harvestNode(NODE_ID, pid)).toBe(false);
+    expect(p.auras.some((a) => a.kind === 'stealth')).toBe(true);
+  });
+
+  it('a prowling druid shape is refused and its stealth survives', () => {
+    // Cat form plus stealth (Stalk): the form refusal fires FIRST and the
+    // denial leaves the stealth untouched.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prowler');
+    sim.addItem('copper_mining_pick', 1, pid);
+    teleportOntoNode(sim, pid, NODE_ID);
+    const p = mustEntity(sim, pid);
+    p.auras.push(
+      {
+        id: 'cat_form',
+        name: 'Wolf Form',
+        kind: 'form_cat',
+        value: 0,
+        remaining: 600,
+        duration: 600,
+        sourceId: pid,
+        school: 'physical',
+      } as Entity['auras'][number],
+      {
+        id: 'prowl',
+        name: 'Stalk',
+        kind: 'stealth',
+        value: 0,
+        remaining: 600,
+        duration: 600,
+        sourceId: pid,
+        school: 'physical',
+      } as Entity['auras'][number],
+    );
+    sim.drainEvents();
+    expect(sim.harvestNode(NODE_ID, pid)).toBe(false);
+    expect(
+      sim
+        .drainEvents()
+        .some((e) => e.type === 'error' && e.text === "You can't do that while shapeshifted."),
+    ).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'stealth')).toBe(true);
   });
 });

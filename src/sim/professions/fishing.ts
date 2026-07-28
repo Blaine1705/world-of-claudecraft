@@ -4,7 +4,7 @@
 // src/sim/items.ts) and draws ONE hidden seeded bite delay; the cast
 // lifecycle (src/sim/combat/casting_lifecycle.ts) fires the bite and the
 // got-away miss off hidden tick deadlines; a pole RE-press inside the armed
-// reel window (the reel arm in startFishing's busy gate) lands the catch
+// reel window (the reel arm at the top of startFishing) lands the catch
 // through completeFishing's single table draw. Fishing is a full gathering
 // proficiency (GATHERING_PROFESSIONS.fishing): a landed catch queues a
 // proficiency grant on the tick path like any other gathering harvest, and
@@ -20,6 +20,7 @@
 // draw-free.
 
 import { FISHING_RARE_ID, FISHING_TABLES_BY_BAND } from '../content/items';
+import { isActionLockingFormAuraKind } from '../combat/forms';
 import { DEEPFEN_SHALLOWS_LAKE } from '../content/zone2';
 import { ITEMS, zoneAt } from '../data';
 import { onFishCaughtForDeeds } from '../deeds';
@@ -228,6 +229,35 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
     ctx.error(meta.entityId, "You can't do that while dead.");
     return;
   }
+  // The reel: re-pressing the pole during one's own fishing
+  // session, inside the armed server-authoritative reaction window, lands
+  // the catch. The re-press reaches here through the same useItem fishing
+  // arms as the original cast (items.ts routes them to startFishing BEFORE
+  // its generic busy guard), so the wire command census is unchanged. The
+  // arm sits ABOVE the in-combat denial on purpose: casting stays
+  // combat-gated below, but a bite answered inside the window lands even if
+  // something aggroed during the wait. Proximity aggro sets inCombat with no
+  // landed hit, so a valid armed reel plus inCombat is an ordinary state; a
+  // LANDED hit cancels the session outright (combat/damage.ts), which zeroes
+  // fishReelDeadlineTick and makes this arm unsatisfiable. The condition
+  // fully self-guards (only an armed fishing session passes), so hoisting it
+  // cannot swallow any other busy state. A re-press BEFORE the bite or AFTER
+  // the deadline falls through to the busy error below.
+  // Boundary contract (pinned): the reel is valid while ctx.tickCount <=
+  // fishReelDeadlineTick; the miss fires at deadline + 1 in the tick phase.
+  if (
+    p.castingAbility === FISHING_CAST_ID &&
+    p.fishReelDeadlineTick > 0 &&
+    ctx.tickCount <= p.fishReelDeadlineTick
+  ) {
+    p.castingAbility = null;
+    p.castRemaining = 0;
+    p.fishBiteAtTick = 0;
+    p.fishReelDeadlineTick = 0;
+    ctx.emit({ type: 'castStop', entityId: p.id, success: true });
+    completeFishing(ctx, p, meta);
+    return;
+  }
   if (p.inCombat) {
     ctx.error(meta.entityId, "You can't do that while in combat.");
     return;
@@ -237,28 +267,16 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
     return;
   }
   if (p.castingAbility || isConsuming(p)) {
-    // The reel: re-pressing the pole during one's own fishing
-    // session, inside the armed server-authoritative reaction window, lands
-    // the catch. The re-press reaches here through the same useItem fishing
-    // arms as the original cast (items.ts routes them to startFishing BEFORE
-    // its generic busy guard), so the wire command census is unchanged. A
-    // re-press BEFORE the bite or AFTER the deadline keeps the busy error.
-    // Boundary contract (pinned): the reel is valid while ctx.tickCount <=
-    // fishReelDeadlineTick; the miss fires at deadline + 1 in the tick phase.
-    if (
-      p.castingAbility === FISHING_CAST_ID &&
-      p.fishReelDeadlineTick > 0 &&
-      ctx.tickCount <= p.fishReelDeadlineTick
-    ) {
-      p.castingAbility = null;
-      p.castRemaining = 0;
-      p.fishBiteAtTick = 0;
-      p.fishReelDeadlineTick = 0;
-      ctx.emit({ type: 'castStop', entityId: p.id, success: true });
-      completeFishing(ctx, p, meta);
-      return;
-    }
     ctx.error(meta.entityId, 'You are busy.');
+    return;
+  }
+  // Action-locked shapeshift forms refuse casting a line, the exact gate and
+  // literal castAbility applies to the normal kit. Sits BELOW the reel arm
+  // (unreachable-different: a mid-session shapeshift is refused by the
+  // castAbility busy guard, so an armed reel can never arrive shapeshifted)
+  // and ABOVE the implement gate, so a denial stays rng-free.
+  if (p.auras.some((a) => isActionLockingFormAuraKind(a.kind))) {
+    ctx.error(meta.entityId, "You can't do that while shapeshifted.");
     return;
   }
   // Implement gate (#2343, the always-require-a-tool rule's fishing arm):
@@ -318,12 +336,21 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
     });
     return;
   }
+  // Casting a line is a deliberate action and breaks stealth (rng-free),
+  // AFTER every deny arm above: a refused attempt never reveals the player.
+  ctx.breakStealth(p);
   if (p.sitting) ctx.standUp(p);
   p.castingAbility = FISHING_CAST_ID;
   p.castTotal = FISHING_SESSION_CAP_SEC;
   p.castRemaining = FISHING_SESSION_CAP_SEC;
   p.castTargetId = null;
   p.channeling = false;
+  // Drop any GCD-held queued spell press (fresh-start path only; the reel
+  // arm above ends a session rather than starting one): a session's end
+  // paths never call fireQueuedCast, so a slot that survived into the
+  // session would fire unprompted one tick after it ends.
+  p.queuedCastAbility = null;
+  p.queuedCastAim = null;
   ctx.emit({
     type: 'castStart',
     entityId: p.id,
