@@ -265,6 +265,23 @@ export class WocMarketWindow {
     return formatNumber(cents / 100, { style: 'currency', currency: 'USD' });
   }
 
+  /** Multi-unit countdown (days/hours/minutes/seconds through the Intl unit
+   *  formatter): auction and settlement windows span days, and a raw
+   *  formatDuration would render them as tens of thousands of seconds. */
+  private countdown(seconds: number): string {
+    const s = Math.max(0, Math.ceil(seconds));
+    if (s >= 172_800) {
+      return formatNumber(Math.floor(s / 86_400), { style: 'unit', unit: 'day', unitDisplay: 'long' });
+    }
+    if (s >= 3_600) {
+      return formatNumber(Math.floor(s / 3_600), { style: 'unit', unit: 'hour', unitDisplay: 'long' });
+    }
+    if (s >= 60) {
+      return formatNumber(Math.floor(s / 60), { style: 'unit', unit: 'minute', unitDisplay: 'long' });
+    }
+    return formatDuration(s);
+  }
+
   private tokens(value: number): string {
     return formatNumber(value, { maximumFractionDigits: 2 });
   }
@@ -385,7 +402,7 @@ export class WocMarketWindow {
           `<td>${esc(r.sellerName)}</td>` +
           `<td>${r.currentCents === null ? esc(t('hudChrome.wocMarket.detailNoBids')) : esc(this.usd(r.currentCents))}${badge}</td>` +
           `<td>${r.buyNowCents === null ? '' : esc(this.usd(r.buyNowCents))}</td>` +
-          `<td>${esc(formatDuration(Math.ceil(r.remainingMs / 1000)))}</td></tr>`
+          `<td>${esc(this.countdown(r.remainingMs / 1000))}</td></tr>`
         );
       })
       .join('');
@@ -503,7 +520,7 @@ export class WocMarketWindow {
       `<p class="wm-note">${esc(t('hudChrome.wocMarket.variableTokenWarning'))}</p>` +
       `<p class="wm-note">${esc(
         t('hudChrome.wocMarket.settlementDeadlineNote', {
-          duration: formatDuration(model.settlementWindowSeconds),
+          duration: this.countdown(model.settlementWindowSeconds),
         }),
       )}</p>` +
       `<button type="button" class="wm-primary" data-action="place-bid" data-listing="${listingId}" ${disabled} ` +
@@ -649,7 +666,7 @@ export class WocMarketWindow {
             : '';
         const deadline =
           s.state === 'offered' || s.state === 'failed'
-            ? ` <span>${esc(t('hudChrome.wocMarket.activityDeadline', { duration: formatDuration(Math.ceil(s.deadlineRemainingMs / 1000)) }))}</span>`
+            ? ` <span>${esc(t('hudChrome.wocMarket.activityDeadline', { duration: this.countdown(s.deadlineRemainingMs / 1000) }))}</span>`
             : '';
         return `<li><span>${esc(this.usd(s.amountCents))}</span> <span>${esc(t(settlementKey(s.state)))}</span>${deadline}${pay}</li>`;
       })
@@ -658,7 +675,7 @@ export class WocMarketWindow {
       a.strikes > 0
         ? `<p class="wm-strikes">${esc(t('hudChrome.wocMarket.activityStrikes', { count: formatNumber(a.strikes) }))}</p>` +
           (a.suspendedRemainingMs !== null
-            ? `<p class="wm-strikes">${esc(t('hudChrome.wocMarket.activitySuspended', { duration: formatDuration(Math.ceil(a.suspendedRemainingMs / 1000)) }))}</p>`
+            ? `<p class="wm-strikes">${esc(t('hudChrome.wocMarket.activitySuspended', { duration: this.countdown(a.suspendedRemainingMs / 1000) }))}</p>`
             : '')
         : '';
     return (

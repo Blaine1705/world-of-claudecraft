@@ -1,0 +1,387 @@
+import { describe, expect, it } from 'vitest';
+import {
+  antiSnipeExtendedEndMs,
+  bondCents,
+  listingEligibility,
+  listingReturnCustodyRef,
+  listingSoldNoticeCustodyRef,
+  minIncrementCents,
+  minNextBidCents,
+  settlementCustodyRef,
+  strikeSuspensionMs,
+  validListingParams,
+  validSettlementTransition,
+  WOC_MARKET_MAX_PRICE_CENTS,
+  WOC_MARKET_MIN_PRICE_CENTS,
+  WOC_MARKET_RESTRICTED_POLICY,
+  type WocEligibilityPolicy,
+  type WocListingParams,
+  type WocSettlementState,
+} from '../server/woc_market_rules';
+import type { ItemDef, ItemInstancePayload } from '../src/sim/types';
+
+// Pure, IO-free decision core: every case here is a plain input-to-output pin,
+// no clocks, no DB, no fetch (the module takes injected timestamps).
+
+const DAY_MS = 24 * 3600 * 1000;
+
+describe('minIncrementCents: the increment ladder band edges', () => {
+  // Band edges belong to the HIGHER band (the doc comment's contract), so both
+  // sides of every boundary are pinned.
+  it.each([
+    [999, 25],
+    [1000, 100],
+    [4999, 100],
+    [5000, 500],
+    [19999, 500],
+    [20000, 1000],
+  ])('current %i cents steps by %i cents', (current, step) => {
+    expect(minIncrementCents(current)).toBe(step);
+  });
+});
+
+describe('minNextBidCents', () => {
+  it('is the start price when no bid is standing', () => {
+    expect(minNextBidCents(null, 2500)).toBe(2500);
+  });
+
+  it('is the standing bid plus its own ladder increment', () => {
+    expect(minNextBidCents(999, 25)).toBe(999 + 25);
+    expect(minNextBidCents(5000, 25)).toBe(5000 + 500);
+    expect(minNextBidCents(20000, 25)).toBe(20000 + 1000);
+  });
+});
+
+describe('antiSnipeExtendedEndMs', () => {
+  it('does not extend for a bid outside the final window', () => {
+    // 120_001 ms before the end: one ms outside the 120 s window.
+    expect(antiSnipeExtendedEndMs(879_999, 1_000_000, 1_000_000)).toBeNull();
+  });
+
+  it('extends an in-window bid to bidAtMs + 120 s', () => {
+    expect(antiSnipeExtendedEndMs(940_000, 1_000_000, 1_000_000)).toBe(940_000 + 120_000);
+  });
+
+  it('caps the extension at exactly baseEndsAtMs + 1800 s', () => {
+    // The auction has already been extended to 2_750_000; a late bid would
+    // reach 2_820_000 but the cap from the ORIGINAL end (1_000_000) clamps it.
+    expect(antiSnipeExtendedEndMs(2_700_000, 2_750_000, 1_000_000)).toBe(1_000_000 + 1_800_000);
+  });
+
+  it('does not extend a bid landing at or after the end', () => {
+    expect(antiSnipeExtendedEndMs(1_000_000, 1_000_000, 1_000_000)).toBeNull();
+    expect(antiSnipeExtendedEndMs(1_000_001, 1_000_000, 1_000_000)).toBeNull();
+  });
+
+  it('does not move the end backward when the cap is already spent', () => {
+    // endsAtMs already sits at the cap; the would-be extension clamps to the
+    // same instant, which is not forward, so the bid does not extend.
+    expect(antiSnipeExtendedEndMs(2_750_000, 2_800_000, 1_000_000)).toBeNull();
+  });
+
+  it('does not re-issue an end the auction already has (bid + 120 s == end)', () => {
+    // The window admits a bid exactly 120 s out, but its extension lands
+    // exactly ON the current end: equal is not forward, so null.
+    expect(antiSnipeExtendedEndMs(880_000, 1_000_000, 5_000_000)).toBeNull();
+  });
+});
+
+describe('bondCents: 5% clamped to $1 .. $50, never above the bid', () => {
+  it('takes 5% mid-range', () => {
+    expect(bondCents(10_000)).toBe(500);
+  });
+
+  it('clamps up to the $1 minimum', () => {
+    expect(bondCents(1000)).toBe(100);
+  });
+
+  it('clamps down to the $50 maximum', () => {
+    expect(bondCents(2_000_000)).toBe(5000);
+  });
+
+  it('never exceeds the bid itself', () => {
+    expect(bondCents(50)).toBe(50);
+  });
+});
+
+describe('strikeSuspensionMs: the progressive suspension ladder', () => {
+  it.each([
+    [1, 0],
+    [2, 3 * DAY_MS],
+    [3, 14 * DAY_MS],
+    [4, 90 * DAY_MS],
+    [5, 365 * DAY_MS],
+    [9, 365 * DAY_MS],
+  ])('strike %i suspends for %i ms', (strikes, ms) => {
+    expect(strikeSuspensionMs(strikes)).toBe(ms);
+  });
+});
+
+describe('validListingParams', () => {
+  const params = (over: Partial<WocListingParams> = {}): WocListingParams => ({
+    format: 'auction',
+    startCents: 1000,
+    reserveCents: null,
+    buyNowCents: null,
+    durationHours: 24,
+    offerNext: false,
+    ...over,
+  });
+
+  it('refuses an unknown format', () => {
+    expect(validListingParams(params({ format: 'dutch' as WocListingParams['format'] }))).toEqual({
+      ok: false,
+      reason: 'bad_format',
+    });
+  });
+
+  it('refuses a start below the price floor', () => {
+    expect(validListingParams(params({ startCents: WOC_MARKET_MIN_PRICE_CENTS - 1 }))).toEqual({
+      ok: false,
+      reason: 'bad_start',
+    });
+  });
+
+  it('refuses a start above the price ceiling', () => {
+    expect(validListingParams(params({ startCents: WOC_MARKET_MAX_PRICE_CENTS + 1 }))).toEqual({
+      ok: false,
+      reason: 'bad_start',
+    });
+  });
+
+  it('refuses a non-integer start (values are integer cents)', () => {
+    expect(validListingParams(params({ startCents: 100.5 }))).toEqual({
+      ok: false,
+      reason: 'bad_start',
+    });
+  });
+
+  it('refuses a duration off the fixed allowlist', () => {
+    expect(validListingParams(params({ durationHours: 10 }))).toEqual({
+      ok: false,
+      reason: 'bad_duration',
+    });
+  });
+
+  it('refuses a buy-now format with no buy-now price', () => {
+    expect(validListingParams(params({ format: 'buy_now', buyNowCents: null }))).toEqual({
+      ok: false,
+      reason: 'bad_buy_now',
+    });
+    expect(validListingParams(params({ format: 'auction_buy_now', buyNowCents: null }))).toEqual({
+      ok: false,
+      reason: 'bad_buy_now',
+    });
+  });
+
+  it('refuses a buy-now price on a plain auction', () => {
+    expect(validListingParams(params({ format: 'auction', buyNowCents: 2000 }))).toEqual({
+      ok: false,
+      reason: 'bad_buy_now',
+    });
+  });
+
+  it('refuses a buy-now price below max(start, reserve)', () => {
+    expect(
+      validListingParams(
+        params({
+          format: 'auction_buy_now',
+          startCents: 1000,
+          reserveCents: 2000,
+          buyNowCents: 1500,
+        }),
+      ),
+    ).toEqual({ ok: false, reason: 'bad_buy_now' });
+    expect(
+      validListingParams(params({ format: 'buy_now', startCents: 1000, buyNowCents: 500 })),
+    ).toEqual({ ok: false, reason: 'bad_buy_now' });
+  });
+
+  it('refuses a reserve below the starting bid', () => {
+    expect(validListingParams(params({ startCents: 1000, reserveCents: 500 }))).toEqual({
+      ok: false,
+      reason: 'bad_reserve',
+    });
+  });
+
+  it('refuses a reserve on a pure buy-now listing', () => {
+    expect(
+      validListingParams(params({ format: 'buy_now', reserveCents: 1000, buyNowCents: 1000 })),
+    ).toEqual({ ok: false, reason: 'bad_reserve' });
+  });
+
+  it('accepts a plain auction, with and without a reserve at or above the start', () => {
+    expect(validListingParams(params())).toEqual({ ok: true });
+    expect(validListingParams(params({ reserveCents: 1000 }))).toEqual({ ok: true });
+    expect(validListingParams(params({ reserveCents: 2500 }))).toEqual({ ok: true });
+  });
+
+  it('accepts a pure buy-now listing (no reserve, price at the start floor)', () => {
+    expect(
+      validListingParams(
+        params({ format: 'buy_now', startCents: 1000, buyNowCents: 1000, durationHours: 12 }),
+      ),
+    ).toEqual({ ok: true });
+  });
+
+  it('accepts an auction with buy-now at or above both the start and the reserve', () => {
+    expect(
+      validListingParams(
+        params({
+          format: 'auction_buy_now',
+          startCents: 1000,
+          reserveCents: 2000,
+          buyNowCents: 2000,
+          durationHours: 168,
+        }),
+      ),
+    ).toEqual({ ok: true });
+  });
+});
+
+describe('listingEligibility', () => {
+  // Minimal synthetic defs: each case flips exactly one property off an
+  // otherwise-eligible epic chest piece, so the refusal reason is decisive.
+  const equipDef = (over: Record<string, unknown> = {}): ItemDef =>
+    ({
+      id: 'syn_plate',
+      name: 'Synthetic Plate',
+      kind: 'armor',
+      armorType: 'plate',
+      slot: 'chest',
+      quality: 'epic',
+      sellValue: 10,
+      ...over,
+    }) as unknown as ItemDef;
+
+  const policy = WOC_MARKET_RESTRICTED_POLICY;
+
+  it('accepts eligible epic equipment', () => {
+    expect(listingEligibility(equipDef(), undefined, policy)).toEqual({ ok: true });
+  });
+
+  it('refuses an unknown item', () => {
+    expect(listingEligibility(undefined, undefined, policy)).toEqual({
+      ok: false,
+      reason: 'unknown_item',
+    });
+  });
+
+  it('refuses a soulbound def', () => {
+    expect(listingEligibility(equipDef({ soulbound: true }), undefined, policy)).toEqual({
+      ok: false,
+      reason: 'soulbound',
+    });
+  });
+
+  it('refuses a quest item', () => {
+    expect(listingEligibility(equipDef({ kind: 'quest' }), undefined, policy)).toEqual({
+      ok: false,
+      reason: 'quest_item',
+    });
+  });
+
+  it('refuses a def barred from market listing', () => {
+    expect(listingEligibility(equipDef({ noMarketList: true }), undefined, policy)).toEqual({
+      ok: false,
+      reason: 'no_market_list',
+    });
+  });
+
+  it('refuses a character-bound copy via instance.boundTo', () => {
+    const instance: ItemInstancePayload = { boundTo: 7 };
+    expect(listingEligibility(equipDef(), instance, policy)).toEqual({
+      ok: false,
+      reason: 'bound_copy',
+    });
+  });
+
+  it('refuses an item on the policy exclusion list', () => {
+    const excluding: WocEligibilityPolicy = {
+      allowEquipment: true,
+      equipmentQualityFloor: 'epic',
+      excludedItemIds: new Set(['syn_plate']),
+    };
+    expect(listingEligibility(equipDef(), undefined, excluding)).toEqual({
+      ok: false,
+      reason: 'excluded_item',
+    });
+  });
+
+  it('refuses a def with no equip slot as not an eligible category', () => {
+    expect(
+      listingEligibility(
+        equipDef({ kind: 'tool', slot: undefined, armorType: undefined }),
+        undefined,
+        policy,
+      ),
+    ).toEqual({ ok: false, reason: 'not_eligible_category' });
+  });
+
+  it('refuses rare equipment under an epic floor', () => {
+    expect(listingEligibility(equipDef({ quality: 'rare' }), undefined, policy)).toEqual({
+      ok: false,
+      reason: 'below_quality_floor',
+    });
+  });
+
+  it('lets a rolled epic quality beat a rare def quality', () => {
+    const instance: ItemInstancePayload = { rolled: { quality: 'epic' } };
+    expect(listingEligibility(equipDef({ quality: 'rare' }), instance, policy)).toEqual({
+      ok: true,
+    });
+  });
+
+  it('lets a rolled rare quality drop an epic def below the floor', () => {
+    const instance: ItemInstancePayload = { rolled: { quality: 'rare' } };
+    expect(listingEligibility(equipDef(), instance, policy)).toEqual({
+      ok: false,
+      reason: 'below_quality_floor',
+    });
+  });
+});
+
+describe('validSettlementTransition', () => {
+  const allowed: Array<[WocSettlementState, WocSettlementState]> = [
+    ['offered', 'confirming'],
+    ['offered', 'expired'],
+    ['confirming', 'confirmed'],
+    ['confirming', 'failed'],
+    ['confirming', 'offered'],
+    ['confirmed', 'delivering'],
+    ['delivering', 'delivered'],
+    ['failed', 'offered'],
+    ['failed', 'expired'],
+  ];
+
+  it.each(allowed)('allows %s to %s', (from, to) => {
+    expect(validSettlementTransition(from, to)).toBe(true);
+  });
+
+  const forbidden: Array<[WocSettlementState, WocSettlementState]> = [
+    // delivered is terminal: it may go nowhere.
+    ['delivered', 'offered'],
+    ['delivered', 'confirming'],
+    ['delivered', 'confirmed'],
+    ['delivered', 'delivering'],
+    ['delivered', 'expired'],
+    ['delivered', 'failed'],
+    // confirmation cannot be skipped, and expiry is terminal.
+    ['offered', 'confirmed'],
+    ['expired', 'offered'],
+  ];
+
+  it.each(forbidden)('forbids %s to %s', (from, to) => {
+    expect(validSettlementTransition(from, to)).toBe(false);
+  });
+});
+
+describe('custody references: the PostOffice book-once dedupe keys', () => {
+  // Pinned as literals: these strings are persisted dedupe keys, so any drift
+  // would double-book or orphan a custody parcel.
+  it('pins the exact literal shapes for id 7', () => {
+    expect(settlementCustodyRef(7)).toBe('woc_settlement:7');
+    expect(listingReturnCustodyRef(7)).toBe('woc_listing_return:7');
+    expect(listingSoldNoticeCustodyRef(7)).toBe('woc_listing_sold:7');
+  });
+});

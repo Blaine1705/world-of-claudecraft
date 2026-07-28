@@ -363,17 +363,30 @@ export function buildWocMarketView(input: WocMarketViewInput): WocMarketViewMode
 }
 
 /**
+ * A countdown's signature bucket: second resolution inside the final two
+ * minutes (the anti-snipe window, where the display ticks in seconds) and
+ * minute resolution beyond it, so a page of far-off auctions does not force
+ * a rebuild on every slow-band poll.
+ */
+export function countdownSigBucket(remainingMs: number): number {
+  return remainingMs < 120_000
+    ? Math.floor(remainingMs / 1000)
+    : 120 + Math.floor(remainingMs / 60_000);
+}
+
+/**
  * The repaint signature: a digest of the DATA the painter renders, so the
  * poll rebuilds only on change (the lastSig family). Text-independent by
- * design; the language fan-out calls relocalize() instead. Second-resolution
- * countdowns are folded in so open auctions tick without a self-armed driver.
+ * design; the language fan-out calls relocalize() instead. Countdowns fold
+ * in through countdownSigBucket so open auctions tick without a self-armed
+ * driver.
  */
 export function wocMarketViewSig(model: WocMarketViewModel): string {
   if (model.kind !== 'ready') return model.kind;
   const rows = model.browse.rows
     .map(
       (r) =>
-        `${r.id}:${r.currentCents}:${r.buyNowLocked ? 1 : 0}:${r.reserveBadge}:${Math.floor(r.remainingMs / 1000)}:${r.selected ? 1 : 0}`,
+        `${r.id}:${r.currentCents}:${r.buyNowLocked ? 1 : 0}:${r.reserveBadge}:${countdownSigBucket(r.remainingMs)}:${r.selected ? 1 : 0}`,
     )
     .join(',');
   const detail = model.browse.detail
@@ -392,7 +405,7 @@ export function wocMarketViewSig(model: WocMarketViewModel): string {
         model.activity.settlements
           .map(
             (s) =>
-              `${s.id}:${s.state}:${Math.floor(s.deadlineRemainingMs / 1000)}:${Math.floor((s.quoteRemainingMs ?? -1000) / 1000)}`,
+              `${s.id}:${s.state}:${countdownSigBucket(s.deadlineRemainingMs)}:${Math.floor((s.quoteRemainingMs ?? -1000) / 1000)}`,
           )
           .join(','),
         `${model.activity.strikes}:${model.activity.suspendedRemainingMs === null ? '' : Math.floor(model.activity.suspendedRemainingMs / 60_000)}:${model.activity.termsAccepted ? 1 : 0}`,
