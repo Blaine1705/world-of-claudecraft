@@ -233,20 +233,6 @@ export function eastbrookMaterialUsesAtlas(
 type MaterialCache = Map<string, THREE.Material>;
 const convertedMaterials = new WeakMap<THREE.Material, MaterialCache>();
 
-// The Grand Armoury's lit glass is the only Eastbrook GLB emissive that
-// survives this path, authored around intensity 1.05-1.15 against emissive
-// colors of luma ~0.52-0.56. That lands well under post.ts BLOOM_THRESHOLD,
-// so the panes read as flat paint next to a sunlit wall. Scaling (rather than
-// flattening to EMISSIVE_GLOW) keeps the GLB's relative authoring between the
-// warm and arcane panes. Black emissives are left untouched so they keep
-// sharing one cached surfaceMat entry.
-const GLASS_EMISSIVE_BOOST = 3;
-
-function emissiveIntensityFor(standard: THREE.MeshStandardMaterial): number {
-  if (standard.emissive.getHex() === 0x000000) return standard.emissiveIntensity;
-  return standard.emissiveIntensity * GLASS_EMISSIVE_BOOST;
-}
-
 /** Preserve source maps/factors; texture-free Eastbrook materials share the one atlas map. */
 export function eastbrookSurfaceMaterial(
   source: THREE.Material,
@@ -275,7 +261,7 @@ export function eastbrookSurfaceMaterial(
     metalness: standard.metalness,
     flatShading: !GFX.standardMaterials || standard.flatShading,
     emissive: standard.emissive.getHex(),
-    emissiveIntensity: emissiveIntensityFor(standard),
+    emissiveIntensity: standard.emissiveIntensity,
     side: standard.side,
   }).clone();
   converted.name = standard.name;
