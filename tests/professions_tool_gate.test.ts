@@ -510,9 +510,13 @@ describe('the HUD actually feeds the viewer proficiency into the view', () => {
     // `(p.pos, npc.pos)` spelling and a count floor cannot notice an extra
     // check, so a fifth window closing on `dist2d(p.pos, merchant.pos) > 30`
     // would sail past it. No dist2d comparison in this file may use a numeric
-    // literal at all; the shipped file has none.
+    // literal in EITHER direction: the old greater-than-only sweep missed the
+    // market-NPC `<= 8` for the file's whole life (a hand-inlined copy of the
+    // value NPC_WINDOW_CLOSE_RANGE names, since renamed onto the constant),
+    // and its argument class could not span a nested call like
+    // `dist2d(worldPos(a), b.pos)`, so one paren level is allowed now.
     expect(
-      [...source.matchAll(/dist2d\([^)]*\)\s*>=?\s*[0-9]/g)].map((m) => m[0]),
+      [...source.matchAll(/dist2d\((?:[^()]|\([^()]*\))*\)\s*[<>]=?\s*[0-9]/g)].map((m) => m[0]),
       'a dist2d range compared against a bare number',
     ).toEqual([]);
   });

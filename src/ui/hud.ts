@@ -12332,7 +12332,13 @@ export class Hud {
   private nearbyMarketNpc(): Entity | null {
     const p = this.sim.player;
     for (const e of this.sim.entities.values()) {
-      if (e.kind === 'npc' && NPCS[e.templateId]?.market && dist2d(p.pos, e.pos) <= 8) return e;
+      if (
+        e.kind === 'npc' &&
+        NPCS[e.templateId]?.market &&
+        dist2d(p.pos, e.pos) <= NPC_WINDOW_CLOSE_RANGE
+      ) {
+        return e;
+      }
     }
     return null;
   }
