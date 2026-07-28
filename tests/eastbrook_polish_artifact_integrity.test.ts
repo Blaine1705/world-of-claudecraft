@@ -1412,7 +1412,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // in every Eastbrook source inventory, so the release version bump moved
     // the composite provenance these records carry. No capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      'efa3499a134315a5a17ee82b87297aa5c72c9b7a9a0b4a111157c78357f37f66',
+      '3f60c67862d976f32c2a334e6543fa9ea25bbf085b93cf0263a36d05417f87b3',
     );
   });
 

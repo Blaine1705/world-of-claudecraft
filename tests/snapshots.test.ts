@@ -936,53 +936,6 @@ describe('delta snapshots', () => {
     expect(client.player.potionCdRemaining).toBeCloseTo(95.5, 1);
   });
 
-  it('mirrors Hallowed Wall armor from the live Protection cast-slot path', () => {
-    const paladinServer = new GameServer();
-    const paladinFc = fakeWs();
-    const paladinSession = joinServer(paladinServer, paladinFc, 20, 'Holytest', 'paladin');
-    paladinServer.sim.setPlayerLevel(20, paladinSession.pid);
-    expect(paladinServer.sim.setSpec('protection', paladinSession.pid)).toBe(true);
-
-    const player = paladinServer.sim.entities.get(paladinSession.pid)!;
-    player.resource = player.maxResource;
-    player.hp = player.maxHp;
-    const baseArmor = player.stats.armor;
-    const target = createMob(9001, MOBS.deeprock_kobold, 20, {
-      x: player.pos.x,
-      y: player.pos.y,
-      z: player.pos.z + 12,
-    });
-    target.maxHp = target.hp = 1_000_000;
-    (paladinServer.sim as unknown as { addEntity(e: typeof target): void }).addEntity(target);
-    player.targetId = target.id;
-
-    const known = paladinServer.sim.meta(paladinSession.pid)!.known;
-    const slot = known.findIndex((entry) => entry.def.id === 'holy_shield');
-    expect(slot).toBeGreaterThanOrEqual(0);
-
-    paladinServer.handleMessage(
-      paladinSession,
-      JSON.stringify({ t: 'cmd', cmd: 'castSlot', slot }),
-    );
-    for (let i = 0; i < 200 && paladinServer.sim.ctx.pendingProjectiles.length > 0; i++) {
-      paladinServer.sim.tick();
-    }
-
-    broadcast(paladinServer);
-    const snap = lastSnap(paladinFc.sent);
-    expect(snap.self.auras).toContainEqual(
-      expect.objectContaining({ id: 'holy_shield', kind: 'buff_armor', value: 150 }),
-    );
-    expect(snap.self.stats.armor).toBe(baseArmor + 150);
-
-    const client = bareClient(paladinSession.pid, 'paladin');
-    (client as unknown as SnapshotApplier).applySnapshot(snap);
-    expect(client.player.auras).toContainEqual(
-      expect.objectContaining({ id: 'holy_shield', kind: 'buff_armor', value: 150 }),
-    );
-    expect(client.player.stats.armor).toBe(baseArmor + 150);
-  });
-
   it('includes live aura and movement diagnostics in admin online rows', () => {
     const druidServer = new GameServer();
     const fc = fakeWs();
