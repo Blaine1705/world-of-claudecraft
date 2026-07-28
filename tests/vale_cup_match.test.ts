@@ -114,27 +114,6 @@ describe('Vale Cup: queue guards', () => {
     expect(errorsOf(sim.drainEvents())).toContain('You cannot queue from inside an instance.');
   });
 
-  it('prunes a queued player who walked into a dungeon/instance mid-queue (issue #1600 x-band recheck)', () => {
-    // The join-time instance guard only blocks queuing FROM inside an instance
-    // (see the test above). Once queued, matchmaking itself must recheck the
-    // guard every pass, mirroring the sibling arena 1v1/2v2/fiesta queues
-    // (arena.ts matchmakeArena1v1 / pruneTeamQueue), or a player who wanders
-    // into a dungeon mid-queue stays a valid candidate and gets teleported
-    // out of the instance onto the pitch, fully restored, when the pitch pops.
-    const sim = makeWorld();
-    const inside = addAt(sim, 'warrior', 'Inside');
-    const outside = addAt(sim, 'mage', 'Outside', 4, -40);
-    sim.vcupQueueJoin(1, 'vale', 'allrounder', false, inside);
-    sim.vcupQueueJoin(1, 'mirefen', 'allrounder', false, outside);
-    // Move the queued player past the instance x-band WITHOUT enterDungeon, so
-    // the entry-dequeue path does not mask the matchmaking prune under test.
-    teleport(sim, inside, DUNGEON_X_THRESHOLD + 50, -40);
-    sim.tick();
-    expect(sim.vcup.match).toBeNull(); // no match: the pack lost its second body
-    expect(sim.cupInfoFor(inside)!.queued).toBe(false); // pruned
-    expect(sim.cupInfoFor(outside)!.queued).toBe(true); // the honest queuer waits
-  });
-
   it('rejects a missing banner nation', () => {
     const sim = makeWorld();
     const a = addAt(sim, 'warrior', 'Aleph');

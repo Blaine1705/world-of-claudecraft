@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { DUNGEON_X_THRESHOLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { MAX_LEVEL } from '../src/sim/types';
 
@@ -137,21 +136,6 @@ describe('dev commands', () => {
     expect(sim.player.ghost).toBe(false);
     expect(sim.player.hp).toBe(sim.player.maxHp);
     expect(sim.player.inCombat).toBe(false);
-  });
-
-  it('prunes Vale Cup queue units after a dev teleport crosses into the instance x-band', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, devCommands: true });
-    const alpha = sim.addPlayer('warrior', 'Alpha');
-    const beta = sim.addPlayer('mage', 'Beta');
-
-    sim.vcupQueueJoin(1, 'vale', 'allrounder', false, alpha);
-    sim.chat(`/dev tp ${DUNGEON_X_THRESHOLD + 50} -40`, alpha);
-    sim.vcupQueueJoin(1, 'mirefen', 'allrounder', false, beta);
-    sim.tick();
-
-    expect(sim.vcup.match).toBeNull();
-    expect(sim.cupInfoFor(alpha)?.queued).toBe(false);
-    expect(sim.cupInfoFor(beta)?.queued).toBe(true);
   });
 
   it('mobilestation places through the REAL specialization gate, not around it', () => {

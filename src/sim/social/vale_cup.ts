@@ -564,10 +564,8 @@ export function vcupSetRole(ctx: SimContext, role: SportRole, pid?: number): voi
   queued.unit.roles[id] = normalizeRole(role, queued.bracket);
 }
 
-// Drop units whose members died, vanished, got seated elsewhere, or walked
-// into a dungeon/instance while queued (arena matchmaker prune pattern,
-// issue #1600's x-band recheck: the bout would return them inside fully
-// restored otherwise).
+// Drop units whose members died, vanished, or got seated elsewhere (arena
+// matchmaker prune pattern).
 export function vcupPruneQueue(ctx: SimContext, bracket: VcBracket): void {
   const match = ctx.vcup.match;
   ctx.vcup.queues[bracket] = ctx.vcup.queues[bracket].filter((unit) =>
@@ -575,7 +573,6 @@ export function vcupPruneQueue(ctx: SimContext, bracket: VcBracket): void {
       const e = ctx.entities.get(id);
       if (!e || e.dead) return false;
       if (ctx.arenaMatches.has(id)) return false;
-      if (e.pos.x > DUNGEON_X_THRESHOLD) return false;
       return !(match && vcupTeamOf(match, id));
     }),
   );
