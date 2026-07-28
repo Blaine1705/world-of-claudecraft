@@ -1077,4 +1077,60 @@ describe('fine material grades on the live harvest path', () => {
     expect(sim.countItem('iron_ore', pid)).toBe(1);
     expect(meta.inventory.length).toBe(capacity);
   });
+
+  it('the pre-gate reads the SLOTTED quality effect, not the raw tool tier (deny arm)', () => {
+    // A tier-2 pick AT the material tier would mint plain ore, but a slotted
+    // Artisan's Eye lifts the effective tier to 3, so the grant mints FINE.
+    // The fixture leaves room for plain and none for fine: a pre-gate reading
+    // the raw tool tier resolves the plain id, waves the cast through, and the
+    // player eats the whole cast for a late "Your bags are full." The gate
+    // must resolve through the effect, the same resolver the grant uses.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('iron_mining_pick', 1, pid); // tier 2, AT the material tier
+    sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
+    const meta = mustMeta(sim, pid);
+    expect(meta.toolEffectSlots?.mining?.effectId).toBe('artisans_eye');
+    const capacity = bagCapacity(meta.bags);
+    const fillerStack = ITEMS.bone_fragments.stackSize ?? 20;
+    while (meta.inventory.length < capacity - 1) sim.addItem('bone_fragments', fillerStack, pid);
+    sim.addItem('iron_ore', 1, pid); // partial plain stack in the last slot
+    expect(meta.inventory.length).toBe(capacity);
+    // The premise, asserted rather than assumed: plain fits, fine does not.
+    expect(sim.ctx.canAddItem('iron_ore', 1, pid)).toBe(true);
+    expect(sim.ctx.canAddItem('fine_iron_ore', 1, pid)).toBe(false);
+
+    teleportOntoNode(sim, pid, MIREFEN_T2);
+    let draws = 0;
+    (sim as any).rng.setObserver(() => {
+      draws++;
+    });
+    // Denied at the pre-gate, before the cast starts, rng-free, timer intact.
+    expect(sim.harvestNode(MIREFEN_T2, pid)).toBe(false);
+    expect(draws).toBe(0);
+    expect(sim.nodeHarvestableByMeFor(MIREFEN_T2, pid)).toBe(true);
+  });
+
+  it('the pre-gate reads the SLOTTED quality effect (allow arm: room for fine only)', () => {
+    // The mirror case: every plain stack is FULL (no room for plain ore) but a
+    // partial FINE stack can top up. A raw-tool pre-gate resolves the plain id
+    // and falsely denies a harvest whose grant fits. With the effect-aware
+    // resolver the cast starts, completes, and mints the fine grade.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('iron_mining_pick', 1, pid); // tier 2, AT the material tier
+    sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
+    const meta = mustMeta(sim, pid);
+    const capacity = bagCapacity(meta.bags);
+    const oreStack = ITEMS.iron_ore.stackSize ?? 20;
+    while (meta.inventory.length < capacity - 1) sim.addItem('iron_ore', oreStack, pid);
+    sim.addItem('fine_iron_ore', 1, pid); // partial fine stack in the last slot
+    expect(meta.inventory.length).toBe(capacity);
+    expect(sim.ctx.canAddItem('iron_ore', 1, pid)).toBe(false);
+    expect(sim.ctx.canAddItem('fine_iron_ore', 1, pid)).toBe(true);
+
+    teleportOntoNode(sim, pid, MIREFEN_T2);
+    expect(castAndComplete(sim, MIREFEN_T2, pid)).toBe(true);
+    expect(sim.countItem('fine_iron_ore', pid)).toBeGreaterThanOrEqual(2);
+  });
 });

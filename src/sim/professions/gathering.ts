@@ -456,10 +456,14 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
   // Capacity pre-gate on the material this zone's node actually grants. The
   // item id is known BEFORE any rng draw (zone x type lookup plus the D8 grade
   // comparison, both pure), so a full-bag denial here happens before the rng
-  // stream is touched and cannot shift the world's draw order. It reuses the
-  // ownedToolTier already scanned for the gate above, so the grade costs no
-  // second bag walk here.
-  const yieldItemId = harvestYieldItemIdFor(node, ownedToolTier);
+  // stream is touched and cannot shift the world's draw order. It resolves
+  // through the slotted quality effect (harvestYieldItemId), the SAME resolver
+  // the completion gate and the grant use, so the three sites cannot disagree
+  // about which id needs room: a raw-tool read here once passed a harvest the
+  // grant would refuse (room for plain, none for fine) and refused the mirror
+  // case. That re-walks the bags once more per cast START (a command, never
+  // per tick), the price of one resolver instead of two.
+  const yieldItemId = harvestYieldItemId(meta, node);
   if (!ctx.canAddItem(yieldItemId, 1, meta.entityId)) {
     ctx.error(meta.entityId, 'Your bags are full.');
     return false;
