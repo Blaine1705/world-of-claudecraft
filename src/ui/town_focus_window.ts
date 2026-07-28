@@ -157,15 +157,15 @@ export function renderTownFocusWindow(
   close?.addEventListener('click', () => deps.onClose());
   el.style.display = 'block';
   el.scrollTop = scrollTop;
-  // Scroll FIRST, then focus, and deliberately WITHOUT { preventScroll: true }.
-  // `focus()` scrolls its target into view, so this order lets a degraded
+  // Scroll FIRST, then focus. `focus()` scrolls its target into view (the
+  // helper calls it bare, and states why there), so this order lets a degraded
   // target (Save or Close, when the control the player was on came back
   // disabled) win over the restored offset. That is the wanted outcome: focus
   // must be visible (WCAG 2.4.11), and the common case cannot conflict, since
   // the control being refocused is the one the player was already looking at,
-  // so it is in view and `focus()` scrolls nothing. Reversing the two, or
-  // passing preventScroll, would trade a visible focus ring for an offset the
-  // player can no longer see the focus in.
+  // so it is in view and `focus()` scrolls nothing. Reversing the two would
+  // trade a visible focus ring for an offset the player can no longer see the
+  // focus in.
   if (focusKey !== null) restoreFocus(focusKey, steppers, save, close);
 }
 
