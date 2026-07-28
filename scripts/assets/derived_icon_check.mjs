@@ -53,16 +53,28 @@ export async function derivedIconStale(committed, rendered) {
   const px = a.info.width * a.info.height;
   let maxDelta = 0;
   let sum = 0;
+  let visible = 0;
   for (let i = 0; i < px; i++) {
     const o = i * 4;
     let d = Math.abs(a.data[o + 3] - b.data[o + 3]);
-    if (a.data[o + 3] > 0 || b.data[o + 3] > 0) {
+    if (a.data[o + 3] > 0 || b.data[o + 3] > 0) visible++;
+    // RGB participates only where BOTH sides are visible: under a fully
+    // transparent matte on either side the RGB is encoder-arbitrary, and an
+    // alpha-rounding difference at a matte edge must not read the garbage
+    // channel as a 200-unit edit (a real silhouette change still trips
+    // through the alpha term, which always participates).
+    if (a.data[o + 3] > 0 && b.data[o + 3] > 0) {
       for (let c = 0; c < 3; c++) d = Math.max(d, Math.abs(a.data[o + c] - b.data[o + c]));
     }
     if (d > maxDelta) maxDelta = d;
     sum += d;
   }
-  const meanDelta = sum / px;
+  // The mean is over pixels visible on EITHER side, not the whole canvas:
+  // signal lives only where art exists, and a transparent matte would
+  // otherwise dilute a real whole-icon repaint below the bound. The shipped
+  // derived icons are fully opaque today, so this denominator equals the one
+  // the platform envelope was measured with.
+  const meanDelta = visible > 0 ? sum / visible : 0;
   if (maxDelta > MAX_CHANNEL_DELTA || meanDelta > MAX_MEAN_DELTA) {
     return `differs from its derivation (max channel delta ${maxDelta}, mean ${meanDelta.toFixed(2)}; bounds ${MAX_CHANNEL_DELTA} / ${MAX_MEAN_DELTA})`;
   }

@@ -115,7 +115,15 @@ async function main() {
         stale.push(`${treatment.itemId}.webp is missing`);
         continue;
       }
-      const reason = await derivedIconStale(committed, rendered);
+      // A corrupt or truncated committed file must land in the stale list as
+      // its own named entry, not abort the sweep with an unnamed decode throw
+      // that leaves the remaining icons unchecked.
+      let reason = null;
+      try {
+        reason = await derivedIconStale(committed, rendered);
+      } catch (err) {
+        reason = `could not be decoded (${err instanceof Error ? err.message : String(err)})`;
+      }
       if (reason) stale.push(`${treatment.itemId}.webp ${reason}`);
       continue;
     }
