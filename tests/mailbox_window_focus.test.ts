@@ -62,6 +62,21 @@ const FANG = 'wolf_fang';
 const control = <T extends HTMLElement>(root: HTMLElement, role: string): T =>
   root.querySelector<T>(`[data-focus-key="${FANG}:${role}"]`) as T;
 
+/**
+ * Force a parcel-list rebuild without touching focus, for the two cases that assert
+ * focus does NOT move. `-` and not `+`: the parcel is staged at its owned ceiling, so
+ * `+` comes back disabled and a disabled button dispatches no click at all, which would
+ * make these two cases pass against any implementation (the rebuild would never run).
+ */
+function rebuildParcels(root: HTMLElement): void {
+  const minus = control<HTMLButtonElement>(root, 'minus');
+  expect(minus.disabled).toBe(false);
+  const before = control<HTMLInputElement>(root, 'qty');
+  minus.click();
+  // Proof the wipe really happened: the qty input is a fresh node.
+  expect(control<HTMLInputElement>(root, 'qty')).not.toBe(before);
+}
+
 describe('the mailbox parcel list carries keyboard focus across its own rebuild', () => {
   it('hands focus back to the rebuilt equivalent of the stepper that was pressed', () => {
     // Owned 4, staged at 4, so pressing `-` goes 4 -> 3 and `-` is still enabled on the
@@ -108,8 +123,30 @@ describe('the mailbox parcel list carries keyboard focus across its own rebuild'
     const root = stagedParcel(FANG, 4);
     const to = root.querySelector<HTMLInputElement>('#mail-to') as HTMLInputElement;
     to.focus();
-    control<HTMLButtonElement>(root, 'plus').click();
+    rebuildParcels(root);
     expect(document.activeElement).toBe(to);
+  });
+
+  it('captures against the PARCEL LIST, not the whole mailbox window', () => {
+    // The root argument is a contract, not a detail: renderParcels rebuilds only
+    // #mail-parcels, so passing the window root would widen what gets captured to the
+    // whole compose form, whose nodes this repaint does not touch. The case above
+    // cannot see that (the recipient field carries no key, so both roots capture
+    // nothing), so plant a keyed control inside the window and OUTSIDE the parcel list.
+    // With the parcel list as the root this is not captured and focus stays put; with
+    // the window root it is, and the repaint drags the player into a list they had
+    // already left.
+    const root = stagedParcel(FANG, 4);
+    const elsewhere = document.createElement('button');
+    elsewhere.dataset.focusKey = `${FANG}:plus`;
+    root.appendChild(elsewhere);
+    expect(root.querySelector('#mail-parcels')?.contains(elsewhere)).toBe(false);
+    elsewhere.focus();
+    rebuildParcels(root);
+    // The rung the widened root would have resolved to really is available, so this is
+    // a refusal to capture and not just an empty ladder.
+    expect(control<HTMLButtonElement>(root, 'plus').disabled).toBe(false);
+    expect(document.activeElement).toBe(elsewhere);
   });
 
   it('never reads a focus key off a control OUTSIDE the window', () => {
