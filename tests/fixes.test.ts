@@ -21,6 +21,7 @@ import {
   zoneAt,
   zoneWelcomeText,
 } from '../src/sim/data';
+import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
 import { EASTBROOK_BUILDINGS_BY_ID, localToWorld } from '../src/sim/eastbrook_layout';
 import { createMob } from '../src/sim/entity';
 import { ACTIONS, encodeObs } from '../src/sim/obs';
@@ -230,6 +231,39 @@ describe('collision & terrain', () => {
 
     const overhead = cameraOcclusion(SEED, front.x, eyeY, front.z, rear.x, eyeY + 24, rear.z, 0.35);
     expect(overhead).toBe(1);
+  });
+
+  it('only pulls the chase camera in inside enclosed instances', () => {
+    const bench = PROPS.benches?.[0];
+    expect(bench).toBeDefined();
+    if (!bench) throw new Error('expected an exterior bench fixture');
+    const benchY = groundHeight(bench.x, bench.z, SEED) + 0.5;
+
+    const exterior = cameraOcclusion(
+      SEED,
+      bench.x - 8,
+      benchY,
+      bench.z,
+      bench.x + 8,
+      benchY,
+      bench.z,
+      0.35,
+    );
+    expect(exterior).toBe(1);
+
+    const dungeon = DUNGEON_LIST[0];
+    const origin = instanceOrigin(dungeon.index, 0);
+    const interior = cameraOcclusion(
+      SEED,
+      origin.x,
+      2,
+      origin.z,
+      origin.x + DUNGEON_WALL_X + 4,
+      2,
+      origin.z,
+      0.1,
+    );
+    expect(interior).toBeLessThan(1);
   });
 
   it('camera ghosts through campfires while movement still collides', () => {
