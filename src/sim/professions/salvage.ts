@@ -142,7 +142,12 @@ export function resolveSalvage(ctx: SimContext, pid: number, itemId: string): Sa
   const riftInstance = consumedInstance?.rift ? consumedInstance : null;
   if (riftInstance) {
     const count = riftSalvageYield(riftInstance);
-    ctx.addItem(RIFT_ESSENCE_ITEM_ID, count, pid);
+    // silent + callerLogs, exactly like the material branch below: this arm
+    // returns a salvageResult too, so the salvage cue and the yield-naming
+    // salvage line already own both halves of the feedback (#2430). Without
+    // the flags a rift salvage stacked the generic loot ding and the hub's
+    // "You receive:" line on top of its own.
+    ctx.addItem(RIFT_ESSENCE_ITEM_ID, count, pid, { silent: true, callerLogs: true });
     // A rift salvage is still a salvage: it spends the same throttle budget
     // and feeds the lifetime counter, drawing zero rng on this branch.
     if (meta) {
@@ -152,10 +157,13 @@ export function resolveSalvage(ctx: SimContext, pid: number, itemId: string): Sa
     return { ok: true, itemId, materialItemId: RIFT_ESSENCE_ITEM_ID, count };
   }
   const count = salvageYield(def, ctx.rng);
-  // silent: the salvageResult event fires its own dedicated cue
-  // (audio.salvage in src/game/audio.ts); the generic loot ding would
-  // otherwise stack on top of it for every salvage.
-  ctx.addItem(materialItemId, count, pid, { silent: true });
+  // silent + callerLogs: the salvageResult event owns BOTH halves of the
+  // player feedback. It fires its own dedicated cue (audio.salvage in
+  // src/game/audio.ts), so the generic loot ding would stack on top of it,
+  // and it logs the yield-naming, item-linked salvage line off
+  // materialItemId/count, so the hub's "You receive:" line would repeat what
+  // that line already says (#2430).
+  ctx.addItem(materialItemId, count, pid, { silent: true, callerLogs: true });
   if (meta) {
     recordAction(meta);
     // The lifetime salvage counter (soc_first_salvage /

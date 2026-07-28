@@ -692,7 +692,7 @@ export const nl_NL: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% korting",
+      "railWocDiscount": "{percent}% korting",
       "railWocUnavailable": "WOC-prijzen zijn momenteel niet beschikbaar.",
       "railNativeUnavailable": "SOL/WOC staat uit.",
       "amountLabel": "Hoeveelheid",
@@ -1545,6 +1545,7 @@ export const nl_NL: EnTranslations = {
       "harvestButton": "Oogsten",
       "harvestTooltip": "Verzamelt de aangevinkte onderdelen. Elk lijk kan eenmaal worden geoogst, wie het eerst komt. Neemt de buit niet mee.",
       "concentrateHint": "Hoe minder delen je kiest, hoe hoger de kwaliteit van elk deel.",
+      "nothingSelectedYields": "Van dit kadaver valt niets uit je selectie te oogsten.",
       "alreadyHarvested": "Dit kadaver is al geoogst.",
       "componentAria": "Oogst {component}",
       "components": {
@@ -2108,8 +2109,8 @@ export const nl_NL: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Ophaling wacht bij de Wereldmarkt",
-      "tip": "Goud of voorwerpen wachten op je bij de Koopman."
+      "aria": "Wereldmarkt-opbrengst of voorwerpen wachten",
+      "tip": "Verkoopopbrengst of teruggekeerde voorwerpen wachten op je bij de Koopman."
     },
     "noticeboard": {
       "empty": "Er lijkt niets opgehangen te zijn."
@@ -2253,6 +2254,9 @@ export const nl_NL: EnTranslations = {
       "notReady": "Dit grondstoffenpunt is voor jou nog niet teruggekeerd.",
       "gatherLine": "Jij verzamelt: {name}.",
       "gatherLineQty": "Je verzamelt: {name} x{qty}.",
+      "harvestLine": "Je oogst: {name}.",
+      "harvestLineQty": "Je oogst: {name} x{qty}.",
+      "harvestSpecimenLine": "Je krijgt ook {name}.",
       "catchLine": "Je trekt in: {name}",
       "biteLine": "Er hapt iets naar het aas!",
       "gotAwayLine": "Hij ontsnapte.",
@@ -2434,6 +2438,7 @@ export const nl_NL: EnTranslations = {
       "empty": "Nog geen recepten bekend.",
       "resultAria": "Ambacht {name}",
       "craftedToast": "Gemaakt: {name}",
+      "craftedToastQty": "Gemaakt: {name} x{qty}",
       "insufficientMaterials": "Daar heb je de materialen niet voor.",
       "unknownRecipe": "Dat recept bestaat niet.",
       "comboRequirementUnmet": "Je hebt niet beide vereiste ambachten op het vereiste niveau voor dat recept.",
@@ -2526,7 +2531,13 @@ export const nl_NL: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Je onbetoverd {item}.",
+      "disenchantedYield": "Je onbetoverd {item} tot {material}.",
+      "disenchantedYieldQty": "Je onbetoverd {item} tot {material} x{qty}.",
+      "disenchantedAlso": "Je krijgt ook {material} terug.",
+      "disenchantedAlsoQty": "Je krijgt ook {material} x{qty} terug.",
       "salvagedLine": "Je salvaged {item}.",
+      "salvagedYield": "Je salvaged {item} tot {material}.",
+      "salvagedYieldQty": "Je salvaged {item} tot {material} x{qty}.",
       "enchantAppliedLine": "Je betoverd {item} met {enchant}.",
       "notHeld": "Je hebt dat voorwerp niet.",
       "notDisenchantable": "Je kunt dat niet onbetoveren.",
@@ -2563,9 +2574,14 @@ export const nl_NL: EnTranslations = {
       "sameEnchant": "Dat voorwerp heeft die betovering al.",
       "replaceTag": "Vervangt {enchant}",
       "sameEnchantTag": "Al toegepast",
+      "plainTag": "Niet betoverd",
       "replaceConfirmTitle": "Betovering op {item} vervangen?",
       "replaceConfirmBody": "Dit vervangt {old} op {item} door {new}.",
       "replaceConfirmNoRefund": "De oude betovering wordt vernietigd. De materialen worden niet teruggegeven. Dit kan niet ongedaan worden gemaakt.",
+      "replaceConfirmKeeps": "Behouden: {kept}",
+      "replaceConfirmKeepsSigner": "Makersmerk",
+      "replaceConfirmKeepsMasterwork": "Meesterwerkbonus",
+      "replaceConfirmKeepsBond": "Opdrachtbinding",
       "replaceConfirmCost": "Kosten: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Vervangen"
@@ -6940,6 +6956,7 @@ export const nl_NL: EnTranslations = {
       "filterTypeAll": "Alle types",
       "filterTypeWeapon": "Wapens",
       "filterTypeArmor": "Pantser",
+      "filterTypeBag": "Tassen",
       "filterTypeConsumable": "Verbruiksartikelen",
       "filterTypeMaterial": "Materialen",
       "filterTypeCosmetic": "Cosmetica",
@@ -6953,6 +6970,8 @@ export const nl_NL: EnTranslations = {
       "armorMail": "Maliën",
       "filterWeaponType": "Wapentype",
       "filterWeaponAll": "Alle wapens",
+      "filterBagSize": "Tasgrootte",
+      "filterBagAll": "Alle tassen",
       "filterPrimaryStat": "Primaire eigenschap",
       "filterPrimaryStatAll": "Elke eigenschap",
       "filterRarity": "Zeldzaamheid",
