@@ -278,7 +278,25 @@ Pass-1 items (unused imports, `Object.hasOwn`, narrow the
 
 Build: Fable xhigh. QA: ultracode, new session.
 
-BUILT 2026-07-28 (QA pending). What each item settled:
+BUILT 2026-07-28. QA COMPLETE 2026-07-28 (ultracode, new session): the
+full-range pass ran qa-checklist, cross-platform-sync,
+database-performance, privacy-security, and test-coverage reviewers plus
+five fresh lenses (two correctness deep-dives found nothing) with
+per-finding adversarial verification; zero behavior defects. Every
+finding was applied (1 test-pin blocking: the mastery-reset drop guard's
+flag-ABSENT arm, the shape every real pre-curve save has, was untested;
+plus should-fix and nit rounds), 16 mutations were each killed by the
+arm built for them, and the fix round itself was re-reviewed by three
+fresh lenses (one false comment invariant caught and corrected: the
+transition rule's prune and baseline commute). Notable QA additions: the
+shared `applyPairTransitionTierMail` extraction, the write-versus-load
+respawn-ceiling coupling sweep with its 240 s coincidence guard and
+record-size tripwire, the blob sweep's `equipmentInstance` column, the
+corrected linkdead narrative (the ~30 s autosave covers linkdead
+sessions; the cast-in-flight crash corner rolls back timer and yield
+together, value-neutral), and DEPLOY.md's professions rollback bullet.
+
+What each item settled:
 
 D6 landed as scoped: `src/sim/professions/node_persist.ts` (remaining-time
 deltas, the `cooldown_persist.ts` scheme) plus the optional zero-default

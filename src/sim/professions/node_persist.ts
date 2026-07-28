@@ -21,10 +21,11 @@
 // smaller than reality (modulo the two-decimal rounding below, which can
 // shave under 5 ms), so the error direction is a longer wait. The one
 // corner outside that guarantee: a gather cast still in flight at the drop
-// resolves during grace and writes its timer only to live memory, so a crash
-// before the next save loses that timer WITH the harvest's yield and
-// proficiency grant; the whole harvest rolls back together, value-neutral,
-// never a free reset that keeps the loot.
+// resolves during grace and writes its timer to live memory, durable only at
+// the next save (which a deed unlock on the same harvest can force
+// immediately); a crash before that save loses the timer WITH the harvest's
+// yield and proficiency grant. Yield, proficiency, and timer roll back
+// together, value-neutral, never a free reset that keeps the loot.
 //
 // Readiness stays strictly per-player (one player's timer never touches
 // another's; see the D6 ruling in docs/design/professions-tuning-packet.md).
