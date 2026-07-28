@@ -2536,8 +2536,14 @@ export class Sim {
       // Then pruned to the CURRENT majors (the archetype state normalized
       // above), healing any stale entry a pre-prune save carried, so a
       // return to a once-held pair re-baselines instead of mailing
-      // retroactively (see pruneTierMailToActiveMajors).
-      meta.tierMailSent = normalizeTierMailOnLoad(s.tierMailSent);
+      // retroactively (see pruneTierMailToActiveMajors). A save the one-time
+      // mastery reset just fired on drops its record entirely: the reset
+      // zeroed the skills, so a kept acknowledgement would sit ABOVE the
+      // zeroed tier and silently swallow the whole re-climb's letters; the
+      // next sweep re-baselines at the reset tiers instead.
+      meta.tierMailSent = normalizeTierMailOnLoad(
+        s.masteryResetApplied !== true ? undefined : s.tierMailSent,
+      );
       pruneTierMailToActiveMajors(meta);
       meta.profTierTutorialSent = s.profTierTutorialSent === true;
       meta.delveMarks = s.delveMarks ?? 0;

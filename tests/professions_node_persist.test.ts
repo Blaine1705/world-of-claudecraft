@@ -33,6 +33,16 @@ describe('the pure remaining-delta round trip (no Sim)', () => {
     expect(serializeNodeReadiness({ [NODE.id]: 3 }, 9)).toBeUndefined();
   });
 
+  it('rounds a persisted remaining to two decimals (the ncd wire precision)', () => {
+    // sim.time is an accumulated DT sum, so a raw delta serializes at up to
+    // 18 characters; persistence carries wire precision instead.
+    expect(serializeNodeReadiness({ [NODE.id]: 219.44999999999973 }, 0)).toEqual({
+      [NODE.id]: 219.45,
+    });
+    // A remaining that rounds to zero omits rather than writing a dead key.
+    expect(serializeNodeReadiness({ [NODE.id]: 0.004 }, 0)).toBeUndefined();
+  });
+
   it('re-anchors a saved delta onto the loading clock', () => {
     expect(applyNodeReadiness({ [NODE.id]: 30 }, 100)).toEqual({ [NODE.id]: 130 });
   });

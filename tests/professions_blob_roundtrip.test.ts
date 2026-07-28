@@ -133,6 +133,11 @@ describe('the professions blob round-trip sweep', () => {
     // anywhere in the blob, professions or not. One-time load transforms
     // (grandfather unions, deed retro grants, position migration) are allowed
     // to fire on the FIRST load; s2 is the settled state and must be exact.
+    // Scope note: every arm here runs at sim.time 0, so for
+    // nodeHarvestCooldowns this pins the fixed point at a FIXED clock; the
+    // production behavior at a later clock (the remaining legitimately
+    // shrinks, monotonically, flooring at field omission) is what
+    // tests/professions_node_persist.test.ts owns.
     const third = makeSim(23);
     const pid3 = third.addPlayer('warrior', 'Sweep2', { state: s2 });
     const s3 = third.serializeCharacter(pid3) as CharacterState;

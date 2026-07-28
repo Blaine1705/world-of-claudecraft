@@ -124,6 +124,13 @@ in live sim time, so the grace-expiry save overwrites that snapshot with the
 smaller remaining; only a crash inside the grace window leaves the drop-time
 freeze durable, and it errs toward a longer wait, never a free reset.
 
+The freeze is more player-visible on a 240 s node than on an ability
+cooldown: a player who logs out mid-route and returns days later still owes
+up to 240 s on every node they last worked, a wait staying online would have
+run out. Accepted: it is the anti-exploit direction, and the only one
+available in a clock-agnostic sim short of adding a wall-clock stamp to the
+save.
+
 Shared depletion was considered and rejected for this packet. It would reverse a
 deliberate documented position (`src/sim/professions/gathering.ts` states the
 per-viewer model exists so there is no gather rush or node camping), it degrades
@@ -588,6 +595,12 @@ Its own phase because it is the only one that touches persistence and the wire.
     key, which resets node respawn timers, so the relog exploit D6 closes
     reopens for the duration of the rollback window. No player value is
     lost; noted so the reopened exploit is a known trade, not a surprise.
+  - The inverse direction, recorded here for completeness because it is the
+    one irreversible UPGRADE in the set: the `tierMailSent` prune. The first
+    load by a pruning binary permanently drops non-major acknowledgements
+    from the row (intended: they are what caused retroactive letters), and
+    with no down-migration the only recovery is a database backup. A
+    conscious one-way heal, not an accident.
 - **`guide.profPages.toolsNote` was already stale in all 18 locale overlays, and
   nothing could see it.** The English gained a whole paragraph earlier in this
   packet (`523acb0dd`) and the overlays were not refilled, so every localized

@@ -49,7 +49,13 @@ export function serializeNodeReadiness(
   const out: Record<string, number> = {};
   let any = false;
   for (const [nodeId, readyAt] of Object.entries(nodeHarvestReadyAt)) {
-    const remaining = readyAt - now;
+    // Two-decimal rounding, the ncd wire's round2 applied to persistence: a
+    // remaining is (accumulated DT sum) minus (accumulated DT sum), so the
+    // raw float serializes at up to 18 characters and an all-nodes record
+    // doubles in size for precision no reader uses (sub-centisecond error on
+    // a 240 second timer). Rounding is idempotent, so the round trip stays a
+    // fixed point.
+    const remaining = Math.round((readyAt - now) * 100) / 100;
     if (positive(remaining)) {
       out[nodeId] = remaining;
       any = true;

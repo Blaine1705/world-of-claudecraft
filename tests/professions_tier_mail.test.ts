@@ -399,6 +399,38 @@ describe('tier-crossing master mail (Professions 2.0)', () => {
     expect(unattuned.tierMailSent.size).toBe(0);
   });
 
+  it('the one-time mastery reset drops saved acknowledgements, so the re-climb mails again', () => {
+    // The reset zeroes craft skills on load; a kept acknowledgement would sit
+    // ABOVE the zeroed tier, and updateTierMailFor only mails on
+    // currentTier > acknowledged, so the whole re-climb through previously
+    // held tiers would pass in silence. Dropping the record re-baselines at
+    // the reset tiers and the re-climb congratulates again.
+    const sim = makeSim();
+    const meta = attunedMeta(sim);
+    meta.craftSkills[PRIMARY] = tierSkill(3);
+    baselineActivePairTierMail(meta); // PRIMARY acknowledged at 3
+    const saved = sim.serializeCharacter(sim.playerId)!;
+    expect(saved.tierMailSent).toMatchObject({ [PRIMARY]: 3 });
+    // A save written by pre-curve code: the flag absent triggers the one-time
+    // reset on load (skills zero) and must take the acknowledgements with it.
+    saved.masteryResetApplied = false;
+
+    const reloaded = makeSim(5155);
+    const pid = reloaded.addPlayer('warrior', 'Reset', { state: saved });
+    const reloadedMeta = reloaded.players.get(pid)!;
+    expect(reloadedMeta.craftSkills[PRIMARY]).toBe(0); // the reset fired
+    expect(reloadedMeta.tierMailSent.size).toBe(0); // acknowledgements went with it
+
+    // First sweep re-baselines at the reset tier silently; the re-climb's
+    // first crossing books its letter instead of being swallowed.
+    const baseline = recordingCtx();
+    expect(updateTierMailFor(reloadedMeta, baseline.ctx)).toBe(false);
+    reloadedMeta.craftSkills[PRIMARY] = tierSkill(1);
+    const recross = recordingCtx();
+    expect(updateTierMailFor(reloadedMeta, recross.ctx)).toBe(true);
+    expect(recross.booked).toEqual([MASTER_TIER_LETTERS[PAIR][1]]);
+  });
+
   it('normalizeTierMailOnLoad keeps only KNOWN ring craft ids with valid tiers', () => {
     expect(normalizeTierMailOnLoad(undefined).size).toBe(0);
     expect([
