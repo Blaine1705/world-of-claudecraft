@@ -12,6 +12,7 @@ import { TOOL_EFFECT_IDS, TOOL_EFFECTS } from '../src/sim/content/professions';
 import {
   normalizeToolEffectSlots,
   RARITY_DURABILITY_BONUS,
+  slotToolEffectRefused,
   startingDurabilityFor,
 } from '../src/sim/professions/tools';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
@@ -55,17 +56,45 @@ describe('the slot is absent until a player actually slots something', () => {
     expect(metaOf(withTool).toolEffectSlots?.mining).toBeDefined();
   });
 
-  it('the R9 policy refuses Springback Charm on every profession, at the resolver', () => {
+  it('the R9 policy refuses Springback Charm on every land profession, at the resolver', () => {
     // The charm's respawnSpeed bonus arm is a deliberate no-op while depletion
     // runs unconditionally: a slotted charm would burn charges for zero
     // benefit while its description promises respawn shortening. Refused until
-    // the bonus arm is wired.
-    const sim = simHolding('copper_mining_pick');
-    sim.slotToolEffect('mining', 'quickening_charm');
-    expect(metaOf(sim).toolEffectSlots).toBeUndefined();
-    // Positive control: the same sim slots a live effect fine.
-    sim.slotToolEffect('mining', 'artisans_eye');
-    expect(metaOf(sim).toolEffectSlots?.mining?.effectId).toBe('artisans_eye');
+    // the bonus arm is wired. Each profession carries its own real tool so the
+    // refusal is provably the policy, not the no-tool gate.
+    for (const [professionId, toolId] of [
+      ['mining', 'copper_mining_pick'],
+      ['logging', 'handaxe'],
+      ['herbalism', 'gathering_sickle'],
+    ] as const) {
+      const sim = simHolding(toolId);
+      sim.slotToolEffect(professionId, 'quickening_charm');
+      expect(metaOf(sim).toolEffectSlots, professionId).toBeUndefined();
+      // Positive control: the same sim slots a live effect fine.
+      sim.slotToolEffect(professionId, 'artisans_eye');
+      expect(metaOf(sim).toolEffectSlots?.[professionId]?.effectId).toBe('artisans_eye');
+    }
+  });
+
+  it('the charm refusal is keyed off the catalog kind, so a rename cannot dodge it', () => {
+    // resolveSlotToolEffect checks Object.hasOwn(TOOL_EFFECTS, id) BEFORE the
+    // policy, so a bare id literal in the policy would go dead the day the
+    // charm is renamed: the old name would be refused as unknown while the
+    // renamed charm minted freely. Walk the catalog for every respawnSpeed
+    // effect instead, whatever its id.
+    const parked = TOOL_EFFECT_IDS.filter((id) => TOOL_EFFECTS[id].kind === 'respawnSpeed');
+    expect(parked.length).toBeGreaterThan(0); // non-vacuity: the parked kind exists
+    for (const effectId of parked) {
+      expect(slotToolEffectRefused('mining', effectId), effectId).toBe(true);
+      expect(slotToolEffectRefused('logging', effectId), effectId).toBe(true);
+      expect(slotToolEffectRefused('herbalism', effectId), effectId).toBe(true);
+    }
+    // And the policy refuses nothing else on land: every non-respawnSpeed
+    // effect stays mintable.
+    for (const effectId of TOOL_EFFECT_IDS) {
+      if (parked.includes(effectId)) continue;
+      expect(slotToolEffectRefused('mining', effectId), effectId).toBe(false);
+    }
   });
 
   it('the R9 policy refuses every effect on fishing, rod carried or not', () => {

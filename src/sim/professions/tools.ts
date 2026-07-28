@@ -355,12 +355,14 @@ export function resolveSlotToolEffect(
  * Slot policy (R9): pairs refused even though the catalog knows the effect.
  * Two arms, both wire-it-then-widen rather than ship-it-inert:
  *
- * - `quickening_charm` (Springback Charm), on every profession: its
- *   respawnSpeed bonus arm is a deliberate no-op (`applyEffectBonus` returns
- *   the outcome unchanged, pinned in tests/professions_tools.test.ts) while
- *   depletion runs unconditionally, so a slotted charm burns charges for zero
- *   benefit and the catalog description still promises respawn shortening.
- *   Refused until the bonus arm is wired for real.
+ * - Every respawnSpeed-kind effect (today Springback Charm), on every
+ *   profession: that bonus arm is a deliberate no-op (`applyEffectBonus`
+ *   returns the outcome unchanged, pinned in tests/professions_tools.test.ts)
+ *   while depletion runs unconditionally, so a slotted charm burns charges
+ *   for zero benefit and the catalog description still promises respawn
+ *   shortening. Keyed off the catalog KIND, not the id, so a renamed charm
+ *   cannot slip past the policy while the unknown-id arm refuses the old
+ *   name. Refused until the bonus arm is wired for real.
  * - fishing, for every effect: `completeFishing` never consults the effect
  *   system, so a fishing slot would be mintable, HUD-rendered, and inert:
  *   never fires, never spends. Refused until an effect has real fishing
@@ -372,7 +374,11 @@ export function resolveSlotToolEffect(
  * minted before this policy existed drops exactly like a retired id.
  */
 export function slotToolEffectRefused(professionId: string, effectId: string): boolean {
-  return professionId === 'fishing' || effectId === 'quickening_charm';
+  if (professionId === 'fishing') return true;
+  return (
+    Object.hasOwn(TOOL_EFFECTS, effectId) &&
+    TOOL_EFFECTS[effectId as ToolEffectId].kind === 'respawnSpeed'
+  );
 }
 
 /**
