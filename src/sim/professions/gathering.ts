@@ -126,6 +126,9 @@ export function nodeMaterialFor(
   zoneId: string,
 ): { itemId: string; qtyByRarity: Record<MaterialRarity, number> } {
   const byZone = NODE_MATERIAL_TABLE[type];
+  // Bare index on purpose, unlike rodTierRequiredForZone's Object.hasOwn:
+  // zoneId here is static GATHER_NODES content, never a map-doc-authored
+  // string, so a prototype key cannot reach this lookup.
   return byZone[zoneId] ?? byZone.eastbrook_vale;
 }
 

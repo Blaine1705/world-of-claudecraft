@@ -44,8 +44,13 @@ const ORE_BODY = GATHER_NODE_BODIES.ore;
 const MOB_BODY_RADIUS = PLAYER_BODY_RADIUS;
 
 const EASTBROOK_ID = 'eastbrook_vale';
-// zone1.ts pois: the landmark q_prof_intro sends a level 1 miner to.
-const COPPER_DIG = { x: -84, z: -64 };
+// The landmark q_prof_intro sends a level 1 miner to, read from the live POI
+// table so a relocation moves this fixture with it instead of failing it.
+const COPPER_DIG = (() => {
+  const poi = ZONES.find((z) => z.id === EASTBROOK_ID)?.pois.find((p) => p.id === 'copper_dig');
+  if (!poi) throw new Error('the copper_dig POI left the zone table');
+  return { x: poi.x, z: poi.z };
+})();
 // tests/gather_nodes.test.ts holds every Eastbrook vein inside this ring of the
 // landmark; reused here only to pin that the six veins found ARE the dig field.
 const DIG_RING = 20;
@@ -95,6 +100,12 @@ describe('the Copper Dig vein field stays walkable content (solid gather nodes)'
     const veins = eastbrookOreVeins();
     expect(veins).toHaveLength(6);
     expect(ORE_BODY).not.toBeNull();
+    // Literal pin: every clearance threshold in this file derives from this
+    // body on BOTH sides of its comparison, so shrinking the radius would
+    // shrink the thresholds with it and pass trivially. A body change must
+    // consciously touch this line.
+    expect(ORE_BODY!.r).toBe(0.44);
+    expect(ORE_BODY!.top).toBeCloseTo(0.84, 10);
     const nodeR = ORE_BODY!.r;
     // Non-vacuity: these six ARE the dig field, not ore scattered zone-wide.
     for (const v of veins) expect(dist(v.pos, COPPER_DIG)).toBeLessThanOrEqual(DIG_RING);
@@ -139,6 +150,18 @@ describe('the Copper Dig vein field stays walkable content (solid gather nodes)'
     //     cannot be blamed on an illegal fixture.
     expect(isBlocked(WORLD_SEED, stand.x, stand.z, PLAYER_BODY_RADIUS)).toBe(false);
     expect(isBlocked(WORLD_SEED, start.x, start.z, MOB_BODY_RADIUS)).toBe(false);
+    // (d) The premise itself, in this file: the vein bodies really ARE wired
+    //     into the collider set. Without this, deleting the gather-node
+    //     collider loop would leave every arm below green (the mob just walks
+    //     straight through and reaches melee sooner).
+    expect(isBlocked(WORLD_SEED, anchor.pos.x, anchor.pos.z, PLAYER_BODY_RADIUS)).toBe(true);
+    expect(isBlocked(WORLD_SEED, neighbour.pos.x, neighbour.pos.z, PLAYER_BODY_RADIUS)).toBe(true);
+    // (e) Fixture dependency, named: the mob start must sit inside the
+    //     pursuer's EFFECTIVE aggro reach (template aggroRadius plus the
+    //     level-delta scaling in mob/locomotion.ts). If a content tune ever
+    //     shrinks that below this distance, the aggroTick assert below fails
+    //     as a FIXTURE limit, not a pathing regression: shorten APPROACH.
+    expect(dist(start, stand)).toBeLessThan(MAX_AGGRO_RADIUS);
 
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
     const player = sim.entities.get(sim.playerId)!;
@@ -190,8 +213,15 @@ describe('the Copper Dig vein field stays walkable content (solid gather nodes)'
     let aggroTick = -1;
     let meleeTick = -1;
     let hitTick = -1;
+    // Sampled EVERY tick, not just at the end: tunnelling is a mid-path
+    // event, and a mob that stepped through a body and came out the other
+    // side would look legal in a final-position-only check.
+    let minVeinClearance = Number.POSITIVE_INFINITY;
     for (let tick = 1; tick <= MAX_TICKS; tick++) {
       sim.tick();
+      for (const v of veins) {
+        minVeinClearance = Math.min(minVeinClearance, dist(mob.pos, v.pos));
+      }
       if (aggroTick < 0 && mob.aiState !== 'idle') aggroTick = tick;
       if (meleeTick < 0 && dist(mob.pos, player.pos) <= MELEE_RANGE) meleeTick = tick;
       if (hitTick < 0 && player.hp < player.maxHp) hitTick = tick;
@@ -205,8 +235,12 @@ describe('the Copper Dig vein field stays walkable content (solid gather nodes)'
     expect(mob.aggroTargetId).toBe(player.id);
     expect(dist(mob.pos, player.pos)).toBeLessThanOrEqual(MELEE_RANGE);
     expect(hitTick).toBeGreaterThan(0); // swinging, not merely parked in reach
-    // It rounded the veins rather than tunnelling through one.
-    for (const v of veins) expect(dist(mob.pos, v.pos)).toBeGreaterThan(nodeR + MOB_BODY_RADIUS);
+    // It rounded the veins rather than tunnelling through one, at every
+    // sampled step of the chase, not just where it ended up. Rounding means
+    // sliding in CONTACT with the body, which sits exactly ON the two-radius
+    // sum up to float error, so allow an epsilon: a real pass-through samples
+    // deep inside the disc, far below it.
+    expect(minVeinClearance).toBeGreaterThan(nodeR + MOB_BODY_RADIUS - 1e-9);
     // And the player held the pocket: the solid veins never shoved them out.
     expect(dist(player.pos, stand)).toBeLessThan(0.05);
   });

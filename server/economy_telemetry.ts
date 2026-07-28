@@ -120,7 +120,9 @@ export function copperFlowSourceForCommand(command: string): CopperFlowSource {
  * players actually reach the later zones' ground) and scales with V3 by
  * construction: a new ZoneDef extends the label set, and the exporter
  * pre-seeds every member to zero, so cardinality stays bounded at the zone
- * count.
+ * count. Extending is deliberate, not frictionless: a new zone reddens the
+ * band membership pins and the professions rollout ledger until its nodes
+ * exist, the same forced decision R37's guard makes everywhere else.
  *
  * The bound is enforced at runtime, not by the type: ZoneDef.id is plain
  * string, so HarvestBand below is string too, and the exporter's harvest()

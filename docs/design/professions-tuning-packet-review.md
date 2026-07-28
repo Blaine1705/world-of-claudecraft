@@ -352,7 +352,10 @@ Implements R24 through R29 on the executable paths:
     payments. Bounded label sets, pre-seeded to zero, riding the existing
     exporter; check multi-realm label behavior while wiring it. R4, R8,
     and the shared-depletion deferral all gate their revisits on this
-    data existing.
+    data existing. While in the exporter, consider a bounded node-tier
+    label on the harvest counter (zones x 3): the R31 watch premise wants
+    to separate a level-1 traveler on the Thornpeak tier-1 faucet from a
+    capped player working t2/t3, and the zone band alone cannot.
 
 ---
 

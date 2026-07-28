@@ -102,11 +102,13 @@ describe('harvest band classification (zone-keyed, R3)', () => {
   it('counts an unknown node id in the first zone rather than dropping it', () => {
     // The safe direction for a counter: a retired node named by a stale event
     // is counted, in the first band, never dropped and never a new series.
-    expect(harvestBandForNode('not_a_real_node')).toBe(HARVEST_BANDS[0]);
+    expect(harvestBandForNode('not_a_real_node')).toBe('eastbrook_vale');
     // Prototype keys degrade the same way: the map is a real Map, so
-    // 'constructor' and friends miss and take the fallback.
+    // 'constructor' and friends miss and take the fallback. Literal, not
+    // HARVEST_BANDS[0], so a reordering of ZONES cannot silently move where
+    // the fallback lands.
     for (const key of ['toString', 'constructor', 'valueOf', '__proto__']) {
-      expect(harvestBandForNode(key), key).toBe(HARVEST_BANDS[0]);
+      expect(harvestBandForNode(key), key).toBe('eastbrook_vale');
     }
   });
 });

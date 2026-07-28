@@ -241,7 +241,15 @@ function deriveMastery(pool: ProfessionRecipeRecord[], attunement: Attunement): 
     let bestGathered = Number.POSITIVE_INFINITY;
     let bestTotal = Number.POSITIVE_INFINITY;
     for (const recipe of pool) {
-      const known = isRecipeKnown(undefined, recipe) || teachTierMet(recipe, skills);
+      // Availability mirrors production's acquisition model, not just its
+      // tier check: a non-grandfathered recipe is learnable only through a
+      // trainer (teachTierMet gates the tier; the acquisition list gates the
+      // ROUTE). Without the route check, flipping a climb recipe to
+      // drop-acquired would leave this model walking a recipe no player can
+      // learn while reporting its hours as authoritative.
+      const known =
+        isRecipeKnown(undefined, recipe) ||
+        (teachTierMet(recipe, skills) && (recipe.acquisition?.includes('trainer') ?? false));
       if (!known) continue;
       if (!meetsComboRequirement(skills, recipe, activeArchetype, pairedMajor, hobbyCraft))
         continue;
@@ -457,10 +465,11 @@ describe('armorcrafting mastery derives from the live tables (R13)', () => {
     // figure would jump and this arm names why.
     expect(RUN.nonGatheredUnits).toBeGreaterThan(0);
     // Every gathered line in the bill reached the hour total and nothing else
-    // did. Recomputed from RUN.bill rather than re-summing the same map the
-    // total came from, which would compare the total against itself: this
-    // catches a material silently dropped from (or double-counted in) the
-    // hour breakdown while the bill still lists it.
+    // did. Scope stated honestly: both sides of this equality derive from the
+    // model's own loop, so it checks deriveMastery's INTERNAL consistency (a
+    // material dropped from or double-counted in the hour map while the bill
+    // lists it), never production. The production-facing teeth are the
+    // mechanism literals in the pin arm below.
     const sources = gatheredSources();
     const billed = [...RUN.bill.keys()].filter((itemId) => sources.has(itemId));
     expect(new Set(gathered)).toEqual(new Set(billed));
@@ -533,5 +542,43 @@ describe('armorcrafting mastery derives from the live tables (R13)', () => {
       halvedDensityHours += casts / (harvestsPerHour(source) / 2);
     }
     expect(halvedDensityHours).toBeGreaterThan(MAX_GATHER_HOURS);
+  });
+
+  it('pins the mechanisms the window is too wide to feel', () => {
+    // The [5, 10] window is a balance ALARM, not a mechanism guard: removing
+    // the specialization material discount lands the model at 8.61 hours and
+    // deleting the tier gain curve lands it at 5.56, both comfortably inside
+    // the window (hand-run mutations, QA round). These literals are the
+    // mechanism teeth. A deliberate retune updates them consciously; a
+    // silently deleted mechanic reddens them.
+    //
+    // Discount ON: the specialized rungs charge the discounted thorium bill.
+    expect(RUN.bill.get('thorium_ore')).toBe(450);
+    // Gain curve ON: the top rung takes its full-then-reduced craft count.
+    const topRung = Math.max(...ARMORCRAFTING_RECIPES.map((r) => r.skillReq));
+    const topRungCrafts = [...RUN.recipeUse.entries()]
+      .filter(([id]) => ARMORCRAFTING_RECIPES.find((r) => r.id === id)?.skillReq === topRung)
+      .reduce((n, [, uses]) => n + uses, 0);
+    expect(topRungCrafts).toBe(75);
+    // And the dominant gathered line reaches the hour total through a real
+    // per-material figure (the split assertion above only checks the model's
+    // own internal consistency; this is the production-facing number).
+    expect(RUN.gatherHoursByMaterial.get('thorium_ore')).toBeCloseTo(5.0, 2);
+  });
+
+  it('the self-signed reduction the model deliberately skips is itself alive', () => {
+    // The walk prices hasSelfSigned false everywhere (a stated UP bias), so
+    // nothing in the derivation would notice the #1145 reduction being
+    // deleted. Pin the reduction directly: a self-signed crafter pays one
+    // unit less on a multi-unit reagent, never below one.
+    const recipe = ARMORCRAFTING_RECIPES.find((r) =>
+      r.reagents.some((reagent) => reagent.count > 1),
+    );
+    expect(recipe, 'a multi-unit reagent recipe exists').toBeDefined();
+    const reagent = recipe!.reagents.find((r) => r.count > 1)!;
+    const skills = emptyCraftSkills();
+    const withSigned = requiredReagentCountFor(true, reagent, skills, CRAFT).count;
+    const without = requiredReagentCountFor(false, reagent, skills, CRAFT).count;
+    expect(withSigned).toBe(without - 1);
   });
 });
