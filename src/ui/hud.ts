@@ -507,6 +507,7 @@ import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
+import { tradeOfferCeiling } from './trade_view';
 import { TutorialOverlay } from './tutorial';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
@@ -14141,7 +14142,7 @@ export class Hud {
   addItemToTrade(itemId: string): void {
     if (!this.tradeOpen || this.stagedTrade.items.length >= 6) return;
     const existing = this.stagedTrade.items.find((s) => s.itemId === itemId);
-    const have = this.sim.inventory.find((s) => s.itemId === itemId)?.count ?? 0;
+    const have = tradeOfferCeiling(this.sim.inventory, itemId);
     if (existing) {
       if (existing.count < have) existing.count++;
     } else {
