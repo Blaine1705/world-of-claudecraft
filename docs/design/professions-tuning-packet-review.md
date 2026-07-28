@@ -1,614 +1,629 @@
-# Professions tuning packet: review findings and the road to done
+# Professions tuning packet: the road to done (phases 8 to 18)
 
-Status: findings recorded and direction SETTLED with the maintainer
-(2026-07-27). This file is the worklist for phases 8 through 13, all landing
-on `feature/professions-tuning-packet`; the branch merges only when
-everything here is done. As each phase lands, strike its items and record
-what it settled, the same way `professions-tuning-packet.md` does.
+Status: worklist SETTLED with the maintainer (2026-07-28) after TWO review
+passes. This file is the canonical worklist for phases 8 through 18, all
+landing on `feature/professions-tuning-packet`; the branch merges only when
+everything here is done, and the whole packet lands BEFORE the new maps
+(past zone 3) release. As each phase lands, strike its items and record what
+it settled, the same way `professions-tuning-packet.md` does. Each phase is
+followed by its own QA packet run in a NEW session (phase N, then phase N
+QA, then phase N+1).
 
-Provenance: whole-packet review run 2026-07-27 against the full branch diff
-(merge-base with `release/v0.32.0` through HEAD), after all seven phases were
-built and gate-green. Method: 31 review agents across 12 claim-verification
-and cross-phase groups with adversarial verification of every consequential
-finding, plus the four repo domain reviewers (architecture,
-cross-platform-sync, privacy-security, test-coverage). Every finding below
-either survived an independent refutation attempt or was verified by hand
-against the executable code path. "Confirmed Nx" counts fully independent
-discoveries of the same defect by separate reviewers.
+Provenance: pass 1 ran 2026-07-27 (31 agents plus the four domain
+reviewers) and produced the original phases 8 to 13. Pass 2 ran the same
+day against the committed worklist: 5 finder rounds to dry, 3-lens
+adversarial verification (228 agents over three resumed runs), a
+completeness critic, plus a live track pass 1 never had (real desktop and
+mobile boots with screenshots, the /wiki rendered end to end, an online
+smoke over the real WebSocket protocol). Result: 86 additional confirmed
+findings (2 blocking, ~33 should-fix, ~51 nits), one refuted, all folded
+into the phases below. Per the standing rule, EVERY finding is addressed:
+blocking, should-fix, and nits alike. Machine-readable verdicts with full
+evidence lived in the review session; the work items below carry their own
+anchors and rationale.
 
-## The packet in one paragraph
+## How to run a phase (applies to EVERY phase below)
 
-Professions shipped with three compounding problems: crafting mastery was a
-vendor shopping trip, gathering tools bought nothing a player could feel, and
-fishing had no failure state, while the character sheet made proficiency read
-as levels. The packet turns gathering and fishing into real progression:
-materials come from the world instead of a counter (phase 1 delist), the
-world can support that (phases 2 and 3, placement validator and 54 nodes),
-tools are earned and matter (phase 4 gate, phase 5 fine materials), fishing
-difficulty lives in skill versus water (phase 6), and rare-tool effects are
-wired for a future acquisition craft (phase 7, dev-gated). All of it without
-touching an XP or gain constant (D12) or a pinned draw contract.
+1. **Sync the base first.** `git fetch origin`, then merge the LATEST
+   `release/**` branch (today `release/v0.32.0`; take the newest if a
+   later one exists) into `feature/professions-tuning-packet`. Resolve
+   conflicts, then run the `release-merge-audit` skill over the merge, and
+   get `npm run gate` green BEFORE starting phase work. The project moves
+   fast; never build on a stale base. (Pass 2 found the branch a full
+   release generation stale with no re-sync scheduled anywhere; this
+   preamble is the fix.)
+2. **Model and effort.** Each phase header names the recommended build
+   session mode (Fable at the stated effort, or ultracode) and the QA
+   session mode. Never `max` effort; it overthinks structured work.
+3. **QA cadence.** The QA phase runs in a NEW session, reads this doc and
+   the phase's diff, and applies the full gate: `/qa`, the named domain
+   reviewers, and an adversarial what-is-missing pass. Its findings are
+   ALL applied (blocking, should-fix, nits), then the fixes themselves are
+   reviewed (fixes are unreviewed code until they are).
+4. **Screenshots** for any visual change, desktop and mobile, committed
+   under `docs/screenshots/` per the repo rule.
 
-## Vision and settled direction (maintainer, 2026-07-27)
+## Old to new phase numbering
 
-The target: a unique feature that sits between WoW and RuneScape, beautifully
-designed, with an incredible experience on desktop and mobile. Nothing grants
-mastery right away; professions carry a player through the entire game, and
-the game is about to grow past its current 3 zones and level 20 cap.
+| Old (pass-1 doc) | New | Notes |
+|---|---|---|
+| 8 (closeout) | 8 | Same identity, scope amended, 8c extracted to 17 |
+| 9 (D6) | 9 | Widened to the whole professions blob |
+| 10 (acquisition craft) | 12 | After the rulings checkpoint and compat work |
+| 11 (content/zones) | 13 | Gains the onboarding and direction work |
+| 12 (UX) | 14 | Gains gamepad and accessibility |
+| 13 (perf) | 16 | Load rig acknowledged as from-scratch |
+| (new) | 10 | Sim lifecycle + fishing telemetry |
+| (new) | 11 | Stale-client and rollout compatibility |
+| (new) | 15 | Ops: GM tooling and the activity feed |
+| (new) | 17 | The wiki truth pass + the release locale fill |
+| (new) | 18 | Final gate |
 
-- V1. **Everything lands on this branch.** Phases 8 through 13 all build
-  here; the branch merges once the whole worklist is done.
-- V2. **Skill identity is content-unique, not mechanics-unique.** Mining,
-  logging, herbalism, and fishing keep the shared gather core; uniqueness
-  comes from each skill's own nodes, tools, materials, recipes, and deeds.
-  No new per-skill minigames or interaction models. (This re-confirms the
-  packet's earlier rejection of a gathering strike minigame.)
-- V3. **The proficiency cap rises with zones.** Today's 100 (fishing 200) is
-  correct for 3 zones; each new zone tier ships a longer bar together with
-  its own node tier, materials, fine grades, and tool rung. The old deferral
-  ("nothing exists to put in the back half of a longer bar") is retired: the
-  fine-material axis is that content. See phase 11 for the expansion
-  checklist that makes this mechanical.
-- V4. **Performance is engineered against 1,000 concurrent players** (10x
-  today's 100). Professions-specific budgets and benchmarks pin it; see
-  phase 13.
+## Vision (unchanged from pass 1)
 
-## What the review established as sound (do not re-audit)
+The target: a unique feature that sits between WoW and RuneScape,
+beautifully designed, with an incredible experience on desktop and mobile.
+V1 everything lands on this branch. V2 skill identity is content-unique,
+not mechanics-unique. V3 the proficiency cap rises with zones. V4
+performance is engineered against 1,000 concurrent players.
 
-- Every diagnosis number in the design record still holds at HEAD: exactly
-  three node levels across all 54 nodes, the 3 to 53 XP harvest range, five
-  `grantXp` sites with fishing not among them, and D12 (the
-  `profession_xp.ts` diff against the merge-base is empty).
-- No determinism break. Exactly one rng call site changed in the entire diff,
-  and it is a removal with no live caller (`depleteEffect`'s old roll). The
-  six moved parity goldens are geometry and expansion driven, verified
-  key-by-key; the solid node bodies came from the release (PR #2527), not
-  this branch.
-- Wire and IWorld parity are fully verified: the tool-effect slot member is
-  real in both worlds, pinned, and driven through a live encode-to-decode
-  test; both `ncd` arms agree; the RL surface is untouched.
-- Server authority holds on every new bonus; the vendor gate fails closed on
-  malformed input on both arms; grade substitution cannot double-spend; the
-  telemetry band map derives fine grades from their base family (not the
-  unmapped-item defect class of #2514).
-- The balance ladder is coherent: first-zone income covers the tool prices,
-  the Marks route is a multi-session goal, recipes stay gold-negative with
-  fine grades priced at 2x sell and 4x buyValue basis, and a hand derivation
-  puts post-delist armorcrafting mastery at roughly 8 to 14 hours, inside the
-  stated 10 to 20 hour target.
+## What the two passes established as sound (do not re-audit)
 
-## Known-open items, acknowledged, not findings
+- Every diagnosis number in the design record holds at HEAD; no
+  determinism break (exactly one rng call site changed in the whole diff,
+  a dead removal); wire and IWorld parity fully verified; server authority
+  holds on every new bonus; grade substitution cannot double-spend.
+- Server hot paths are clean and bounded: per-viewer `ncd` capped at the
+  node count and allocation-free when unchanged, layered rate limits on
+  every packet command, bounded telemetry cardinality, denied requests do
+  linear bounded work.
+- Persistence normalization is robust against malformed blobs (verified on
+  the real load path); the packet's own new guard tests were spot-checked
+  as mutation-decisive (vendor gate, env gate).
+- The balance ladder is coherent; the rod tooltip's reel numbers are
+  CORRECT (0.75 s per tier plus 0.25 s per rarity rung); `sellAllJunk`
+  sweeps quality `poor` only, so fine grades are safe from the Sell Junk
+  button (guarded by `tests/crafting_materials_quality.test.ts`).
+- The live track saw the vendor gate, delve shop, tool-effect row,
+  professions window, Book of Deeds rows, fine-material icons/tooltips,
+  and the whole /wiki render correctly on desktop and mobile.
 
-The effects have no acquisition path (wire command dev-gated until phase 10),
-the release-time locale fill (sized in 8c.4), and the `toolEffectSlots`
-whole-blob rollback caveat (owned by phase 10). The two former open rulings
-(rod fees, purchase-versus-use) are now settled; see the rulings ledger.
+## Rulings ledger
+
+R1 through R23: unchanged from pass 1; see the ledger at the bottom of
+this file. The two former open rulings (rod fees R8, purchase-versus-use
+R7 as amended by R22) stay CLOSED.
+
+New rulings, settled with the maintainer 2026-07-28 (do not re-litigate):
+
+- **R24. Signed specimens are spent LAST.** Quest turn-in consumption
+  prefers plain stacks and takes instanced (signed) copies only when no
+  plain copy remains, mirroring `removeVendorSellUnits` and
+  `removePreferFungible`.
+- **R25. Land harvesting gains the in-combat and swimming denials** that
+  `startFishing` already enforces. The asymmetry is unexplainable to a
+  player.
+- **R26. The reel press is exempt from the in-combat gate.** Casting stays
+  combat-gated; a bite answered inside the window lands even if something
+  aggroed during the wait. (The cast itself still breaks on damage.)
+- **R27. Harvesting and fishing break stealth, and action-locked
+  shapeshift forms refuse both.** Classic behavior.
+- **R28. A live gather or fishing session cancels on every teleport**
+  (dungeon/delve entry, jail, revive) and when `/follow` tows the player
+  across a zone line. The rod-tier gate reads the WATER'S zone, not the
+  caster's, so a cross-boundary cast cannot dodge it.
+- **R29. The queued-spell buffer clears when a gather or fishing session
+  starts.** No spell fires unprompted when the session ends.
+- **R30. Recharge re-derives the charge maximum** from the best tool the
+  owner holds AT RECHARGE TIME. The slot-time mint stands as-is, so a
+  borrowed epic pick buys one inflated fill at most, never a permanent
+  ceiling.
+- **R31. The Thornpeak tier-1 faucet is ACCEPTED and recorded** as a
+  deliberate traveler reward: bounded by six nodes, the 240 s respawn, and
+  a zone that is lethal to a level-1 while alive. Watched via the
+  zone-keyed harvest telemetry. Additionally: no skilling while dead
+  (already enforced; gains an explicit test pin so it cannot rot).
+- **R32. The Copper Dig camp stays exactly as shipped.** Leveling up
+  before working the dig is the intended path; no placement guarantee for
+  the intro quest. The southwest-to-southeast direction fixes still land
+  (quest text and wiki). Veto-able default: the wiki "Where to start"
+  wording gains a soft danger hint in phase 17; the quest text does not
+  change.
+- **R33. Tier-3 danger placements are deliberate** (the vein near the
+  world boss spawn, `wood_thornpeak_t3b` inside Marrowlord Varkas's
+  aggro): allowlisted in the placement-margin test with a comment naming
+  the intent. The Grix-adjacent tutorial veins are the exception and get
+  spacing fixes, because Grix's level-scaled aggro means those veins force
+  the named fight at ANY level, which is not "level up first".
+- **R34. Stale clients get GUARDS, not a version floor.** Old clients
+  degrade gracefully; the iOS binary ships before this packet deploys; a
+  hard version floor is a separate later decision.
+- **R35. GM tooling v1 is the minimal pair:** inspect a player's
+  professions state, restore a lost item or slot row. Nothing more yet.
+- **R36. The 1,000-concurrent baseline is recorded on the maintainer's
+  Mac**, with the hardware named in the baseline file. No prod-shaped
+  validation run in this packet.
+- **R37. Editor and custom-map professions are DEFERRED.** The new maps
+  (past zone 3) ship with no professions content at all until the zone-4
+  design pass. A derived guard asserts that no zone or map beyond the
+  built-in three carries professions nodes or stations; the phase 13
+  new-zone checklist is what flips that guard from assert-absent to
+  assert-complete when a future zone ships its professions content.
+- **R38. Banners QUEUE instead of last-write-wins** (about 2.5 s each,
+  level-up first, then deeds). Pass 2 confirmed live that a fresh
+  character's very first level-up banner is replaced by the First Steps
+  deed banner.
+
+Structural decisions, same sitting: the phase numbering in this file
+supersedes the old 8-to-13 numbering everywhere; fishing telemetry rides
+phase 10 so data accumulates early; the acquisition-craft design decisions
+(recharge material identity, prompt-flow timing) are settled at the
+rulings checkpoint before phase 12.
 
 ---
 
-## Phase 8: review closeout
+## Phase 8: base repair and review closeout
 
-No new design decisions required; everything here corrects the packet against
-what it already decided, plus the small work items the rulings ledger
-created. Shippable as one phase with six workstreams.
+Build: Fable xhigh. QA: ultracode, new session.
 
-### 8a. Sim correctness
+The phase that makes the branch trustworthy: CI actually green off-mac,
+base re-synced, and every pass-1 closeout item with its pass-2 scope
+corrections.
 
-1. **Cast-start capacity pre-gate disagrees with the grant** (confirmed 6x).
-   `harvestNode`'s pre-gate resolves the yield id from the raw
-   `bestOwnedGatherToolTierOrNone` result while the completion gate and the
-   grant resolve through the slotted quality effect
-   (`effectiveGradeToolTier`). This falsifies the agreement contract written
-   above `harvestYieldItemId` in `src/sim/professions/gathering.ts` and the
-   twin claim in `src/sim/professions/material_grades.ts`. With a quality
-   effect slotted: room-for-base-but-not-fine passes the start gate and eats
-   the whole cast before a late "Your bags are full."; room-for-fine-but-not-
-   base is falsely denied at start. Latent until the acquisition craft ships.
-   Fix: resolve the start gate through `harvestYieldItemId(meta, node)` (note
-   it re-walks the bags, so update the no-second-bag-walk comment) or thread
-   the effective tier through. Check: a test combining a slotted quality
-   effect with each capacity gate; none exists today.
-2. **Refuse Springback Charm at the slot resolver** (ruling R9). Its bonus
-   arm is a deliberate no-op while depletion runs unconditionally, and the
-   catalog description still promises respawn shortening.
-   `resolveSlotToolEffect` accepts any catalog id today. Check: slot refusal
-   pinned, and a harvest spends nothing.
-3. **Refuse fishing at the slot resolver** (ruling R9). Fishing slots are
-   mintable, HUD-rendered, and inert: `completeFishing` never consults the
-   effect system, so a fishing slot never fires and never spends, and the
-   phase 7 tests actively pin the inert row as expected output. Refused
-   until an effect has real fishing behavior (wiring one instead needs its
-   own draw-order review; the catch-table draw sits ahead of the grant).
-   Check: refusal pinned in both directions.
-4. **Starter-tool mint: add a repeat cadence and a truthful comment**
-   (ruling R10). `q_prof_hobby_switch` is repeatable with no
-   `repeatCadenceTicks`, so the tool mint is unbounded; give it the cadence
-   its four work-order siblings carry. Direct trade stays OPEN by ruling.
-   Rewrite the `src/sim/content/items.ts` comment block to enumerate
-   truthfully: bank and trade open, vendor, market, and mail closed (the
-   current comment claims "no route to value at all" and also names mail as
-   open, both wrong; the attach path refuses via `noMarketList`).
+### 8.0 Unbreak CI and the base (do these first)
 
-### 8b. Guard and pin work (tests only)
+1. **Icon `--check` platform strategy** (BLOCKING). The fine-material and
+   rod icon checks do byte-equality against a fresh sharp render
+   (`scripts/assets/fine_material_icons.mjs`,
+   `scripts/assets/rod_tier_icons.mjs`), and sharp/libvips renders
+   different bytes on linux-x64 than the committed darwin bytes
+   (empirically reproduced in a linux/amd64 container with the identical
+   sharp/libvips versions; 6 of 11 icons differ).
+   `tests/material_grades.test.ts` and
+   `tests/professions_rod_recipes.test.ts` execFileSync the checks
+   unguarded and CI runs `npm test` on ubuntu-latest, so the FIRST PUSH of
+   this branch reds CI. Pick and implement one: platform-keyed committed
+   bytes, a CI-side regeneration step, or a structural-equality check
+   (decode and compare pixels within tolerance) instead of byte equality.
+   While there: unify the two checks' node spawn (one uses `'node'` from
+   PATH, the other `process.execPath`).
+2. **Release re-sync now, and every phase hereafter** per the How-to-run
+   preamble (the branch is currently a full release generation stale).
+3. **The R37 guard**: a derived test asserting no zone or map beyond the
+   built-in three carries professions nodes, stations, catch tables, or
+   vendor professions rows. Written so the phase 13 checklist can flip it
+   per-zone to assert-complete later.
 
-1. **Widen the D2 material never-stocked sweeps to all three stock tables.**
-   `professions_master_stock.test.ts` (`stockedByNpc`) and the fine-grade
-   sweep in `material_grades.test.ts` read `NPCS[*].vendorItems` only, blind
-   to `HEROIC_VENDOR_STOCK` and `DELVE_SHOPS`, the exact hole phase 7
-   documented and fixed for the two tool guards. Sharpest consequence today:
-   a delve row for `glimmerfin_koi` would sell the tier-4 rod reagent with
-   every test green, and every fine grade carries a live buyValue so a
-   single stock row anywhere sells it. Mirror the union the tool guard uses,
-   with per-table non-vacuity arms.
-2. **Pin the hub rod rows.** Fenbridge's ironreel and Highwatch's
-   silverstream rows (the phase 6 no-strand story) have no test, and two
-   stale comments actively invite their deletion (see 8d). Add both rows to
-   the hub-stock sweep in `professions_tools.test.ts`.
-3. **Give the tier-ramp placement arm a non-vacuity counter.** Its discovery
-   regex empties silently on an id rename; every other arm in
-   `gather_node_placement.test.ts` counts. Assert the six zone/type groups
-   that must participate.
-4. **Fix the one-directional `dist2d` sweep** in
-   `professions_tool_gate.test.ts`: it matches only greater-than
-   comparisons, its comment ("the shipped file has none") is disproven by
-   the market-NPC range check in `hud.ts` (a hand-inlined 8 duplicating the
-   value `NPC_WINDOW_CLOSE_RANGE` names), and its character class cannot
-   span a nested call. Widen the class, allow one nested paren level, name
-   the 8.
-5. **Pin the tool-less fine-grade boundary.** A bare-handed harvest with a
-   quality effect stays below the fine threshold by exactly one point
-   (bonus 1 against a minimum gather tier of 1); a future bonus-2 effect
-   would mint fine grades with no tool. One boundary test plus a comment.
-6. **Replace the vacuous access pin** in `professions_rarity_roll.test.ts`
-   (it exercises `canGatherTier` in isolation, which stays true under the
-   regression it names). Real pin: drive `harvestNode` at a tier-2 node with
-   a tier-1 pick and a slotted quality effect, assert `gatherDenied`.
-7. **Add the derived crafts-to-mastery test** (ruling R13). The 10-to-20
-   hour target is prose only; derive crafts-to-cap and the material bill
-   from the live recipe and gain tables the way the tier-1 ceiling test
-   derives its bound, so a reagent or curve edit moves it loudly. The hand
-   derivation to reproduce: roughly 8 to 14 hours for armorcrafting,
-   gathering-dominated.
-8. **Add the Copper Dig pathing arm** (ruling R14). Nothing asserts a
-   starter-camp mob can still reach a player standing among the six
-   now-solid veins, or that no camp spawn ring intersects a node body.
-   Radii are small (~0.44 yd) and the re-recorded combat goldens suggest
-   pathing works; make it an assertion instead of an inference.
+### 8a Sim correctness (amended)
 
-### 8c. i18n repair
+1. Cast-start capacity pre-gate resolves through the slotted quality
+   effect (`harvestYieldItemId`) so start and grant agree (pass-1 8a.1,
+   confirmed 6x).
+2. Refuse Springback Charm and fishing slots at `resolveSlotToolEffect`
+   (pass-1 8a.2/8a.3) AND at load: `normalizeToolEffectSlots` validates
+   against the catalog but never consults resolver policy, so persisted
+   refused rows would survive a restart. The refusal needs both arms, and
+   the load arm drops the row the same way retired ids are dropped.
+3. Starter-tool mint (pass-1 8a.4, RE-SCOPED): the cadence alone cannot
+   bound the mint, because the grant fires in `finalizeQuestAccept`
+   whenever the bags-only count is zero and cadence arms only in
+   `turnInQuestCore`, so bank-the-tool, abandon, re-accept loops forever.
+   The fix gates the re-grant on a predicate spanning bank, mail, and
+   market escrow (exactly what the `items.ts` comment already prescribed),
+   plus the cadence for the turn-in loop, plus the truthful comment
+   rewrite.
+4. `delveBuy` gains the `canAddItem` capacity gate its sibling `buyItem`
+   has (pre-existing; the packet newly pointed tools at it).
 
-1. **Un-strand the four reworded guide keys** (confirmed; no remediation
-   path exists). `guide.profPages.craftProse.engineering.materialsBody`,
-   `fish.startBody`, `fish.biteBody`, and `fish.tablesNote` kept pre-reword
-   overlays in all 18 locale files; the release fill reads pending rows only
-   and a reword never pends. The stale rows teach the old recipes and deny
-   the packet's own mechanics (the German materialsBody says Gizzel sells
-   all six reagents; current English says fine materials are sold nowhere).
-   Apply the packet's own toolsNote precedent: delete the stale rows so the
-   keys re-enter pending, refill the non-Latin locales in the same change
-   (M16, these are wordy values).
-2. **Fix `koiBody`'s English**, which is itself outgrown: it still says the
-   koi odds are a flat 3 percent (4 in Thornpeak) at every band; the shipped
-   table is 1/3/6 by band, identical across zones, and the sibling
-   `tablesNote` on the same wiki page already says so. Then give it the same
-   remove-and-refill treatment (fixing English re-stales its overlays).
-3. **Fix `biteBody`'s Silverstream number** (ruling R12): it quotes 4
-   seconds; the shipped rod is uncommon and reaches 4.25 through the rarity
-   rung. Same remove-and-refill treatment rides along with item 1 (biteBody
-   is already in that set).
-4. **Scope the craft-overview line** that says the tier 4 and 5 tools are
-   ones "no vendor will ever stock": the delve counter stocks all eight for
-   Marks. Reword to the never-for-copper form the tests pin.
-5. **Release-fill accounting note:** the true pending set is 315 rows, 21
-   keys across 15 locale rows each (13 Latin bases plus es_ES/fr_CA through
-   the dialect chain), not "13 toolsNote rows". Record it wherever the fill
-   is scoped so the job is sized right.
+### 8b Guard and pin work (amended)
 
-### 8d. Prose, comments, and doc corrections
+Pass-1 items 8b.1 through 8b.8 unchanged (stock-table sweeps, hub rod
+rows, tier-ramp non-vacuity, dist2d sweep, tool-less fine boundary, real
+access pin, derived crafts-to-mastery, Copper Dig pathing arm). Added:
 
-Design record (`professions-tuning-packet.md`):
+9. Pin the slot-owner two-draw contract at the COMMAND boundary (drive
+   `harvestNode` with a slotted effect owner and count draws), not only at
+   the unit level.
+10. Deduplicate the placement test's re-declared threshold constants so a
+    content change cannot silently diverge from the guard.
+11. Pin no-skilling-while-dead (R31) for harvest and fishing both.
+12. The R37 guard from 8.0 item 3 lands with per-table non-vacuity arms.
 
-1. The Phases intro sentence "No phase moved a parity golden in the end" is
-   false as written; replace with the draw-order form the parity section
-   already uses. While there, the parity section attributes the
-   `professions_gather` re-record to the node expansion alone; it was
-   re-recorded twice (phase 2 relocations, then phase 3 expansion).
-2. D6 and the bug table: phase 9 builds D6, so the row stays but gains a
-   "built in phase 9" pointer until it lands; the status header should name
-   the phase 8 to 13 worklist (this file) instead of implying the packet is
-   finished. Restate the header's open-rulings line against the rulings
-   ledger below (ruling R16): the two old rulings are settled, and the two
-   phase 5 maintainer calls (gather-tooltip grade preview, out-tooled
-   work-order economics) are now owned by phases 12 and 11 respectively.
-3. "Nine procedural icon entries" contradicts the correction two paragraphs
-   above it; reword to committed derived art.
-4. "A better tool is the only path to the next tool up" was outgrown by the
-   phase 7 Marks route; scope it to the craft path. Same fix in the two code
-   copies: the `material_grades.ts` module header and the
-   `material_grades.test.ts` file header.
-5. Phase 3 asserts the circuit-idle premise the branch's own measurement
-   falsified (true only of Eastbrook; both later zones got slightly worse),
-   and "holding the existing harvests-per-hour ceiling flat" is false for
-   two of three zones (360 to 270 is a 25 percent cut; the placement test
-   states it honestly). Phase 3 is the only phase without a closeout
-   section; add one quoting the measured table that today lives only in the
-   `gather_nodes.ts` comment.
-6. Small stale numbers: the phase 6 empty-hook plan range (8 to 12) versus
-   the shipped 10/8/6 surplus taper, and the phase 6 closeout's 271-tick
-   worst session, which phase 7's rarity rung moved to 286.
-7. **Record the blessed trades** (rulings R4, R17, R18): the koi band-0
-   weight cut to 1 is deliberate skill-scaling; the reel-window trim's 17
-   percent cost to a tier-1 angler is the accepted mobile-latency price; the
-   Marks-to-copper conversion through delve-bought tools (vendor 60/150) is
-   blessed as a bounded, loss-making conversion (closing it would flag the
-   shared item defs crafted tools use too).
-8. **Record the map-doc policy** (ruling R15): D2 governs shipped content;
-   custom map documents (an editor-only surface today) can stock any item id
-   and are outside the guard. One line in the design record beside D2.
+### 8d Prose, comments, and doc corrections (amended)
 
-Other docs and comments:
+The enumerated pass-1 list (items 1 through 14) stands, MINUS the items
+this rewrite already fixed in place (the six-goldens wording, the 8c.4
+pointer, the three-versus-four site count, the phase 11 checklist
+clarifying clause). Added, and the acceptance criterion CHANGES: finish
+with a grep-based sweep for superseded phrasings (purchase-gate language,
+"Wilkes exclusive", "parked, do not wire", "no trainer fee", "sells
+osmium/thorium ore", rng-consumption wording), not just the enumerated
+list. New known sites the sweep must catch:
 
-9. `docs/design/professions.md` constants table still lists the reel window
-   as 3 / 0.75 with no rarity-bonus row; the packet edited adjacent rows of
-   that same table. Update to 2.5 / 0.75 / 0.25.
-10. Two comment blocks in `src/sim/content/professions.ts` still describe
-    the deleted rng-rolled consumption curve and cite the dead symbol
-    `effectConsumptionChance`; the deterministic-depletion ruling itself
-    required these updates in the same change. Rewrite both.
-11. Stale rod-exclusivity prose: the zone3 Highwatch comment ("Tiered rods
-    stay a Wilkes exclusive.") is disproven by the silverstream row in its
-    own array, and the `professions_tools.test.ts` comment ("fishing has no
-    nodes for the hub rule to be expressed against") was superseded by
-    phase 6. Reword both to the buy-ahead framing zone1/zone3 already use.
-12. `src/sim/professions/CLAUDE.md` still says tool effects are parked
-    ("do not wire"); this packet wired them. Update, and add the missing
-    `fishing_zones.ts` row to its module map.
-13. `effectiveGradeToolTier`'s comment claims three readers including a
-    tooltip that does not exist yet (phase 12 builds it); trim to the two
-    real readers, or point forward to phase 12.
-14. A test comment counts the Eastbrook de-stock as "six rows"; it was six
-    item ids across twelve vendor rows. Reword to avoid the literal count.
+- The third stale rod-rule comment in `tests/professions_tool_gate.test.ts`
+  (pass-1 8d.11 said "reword both"; there are three).
+- `src/sim/professions/training.ts` still cites the rod-fee ruling as
+  open; R8 closed it.
+- `src/ui/npc_service_range.ts` claims the vendor window is never
+  repainted; the packet's own vendor work disproves it.
+- The deleted `GATHERING_NAME_KEYS` symbol named in
+  `tests/professions_window_focus.test.ts`.
+- The two recipe comments claiming Darva and Hesk sell tool reagents
+  (`src/sim/content/recipes.ts`, the tannery and forge blocks); phase 1
+  delisted those rows.
+- The 5,300 c solo income figure: re-derive it with a stated exclusion
+  set, or replace the literal with the derivation (pass 2 could only
+  reproduce it under an inconsistent set).
+- D7's text and the two `docs/design/professions.md` passages that still
+  describe the superseded purchase-gate-only model (R22 changed it).
 
-### 8e. Hygiene
+### 8e Hygiene (amended)
 
-1. Drop the unused `TOOL_EFFECTS` / `ToolEffectId` imports from
-   `src/sim/sim.ts` (biome warning; survives the gate, which fails only on
-   errors).
-2. Harden `rodTierRequiredForZone` with `Object.hasOwn`, matching the
-   sibling `resolveVendorRowGate` which cites the same map-doc-authored
-   string door (traced benign today; both worlds converge on the denial).
-3. Narrow the `IWorld.slotToolEffect` signature to the modes a host accepts
-   (today it advertises `'prompt'`, which every host silently refuses);
-   re-widen when phase 12 ships the confirm flow.
-4. `VENDOR_ROW_GATES` is `Readonly`-typed but never frozen; its packet
-   siblings freeze. Freeze it.
+Pass-1 items (unused imports, `Object.hasOwn`, narrow the
+`IWorld.slotToolEffect` signature, freeze `VENDOR_ROW_GATES`) plus:
 
-### 8f. Content and telemetry (from the rulings)
+5. Record as ACCEPTED: the offline console handle can call
+   `slotToolEffect` ungated (a player cheating their own offline world is
+   /dev-equivalent; no gate, one comment).
 
-1. **Move `wood_mirefen_t2` off the road surface** (ruling R11). It stands
-   at 0.3 yd, grandfathered by the road-band exemption pin the placement
-   test carries; the test's own comment calls it a real defect. Move it to
-   legal ground, drop it from the exemption set, and note: nodes are solid
-   bodies now, so a move can shift mob pathing and re-record a combat
-   golden; if one moves, document the geometry cause in the commit, matching
-   the packet's precedent.
-2. **Re-key the harvest telemetry bands by zone tier** (ruling R3):
-   starter/mid/premium becomes Eastbrook/Mirefen/Thornpeak by the node's
-   zone rather than the material's price tier, so the series answers the
-   question it exists for ("do players reach the top rung") and scales with
-   V3 as new zones ship. Update `harvestBandForItem` (or key from the node
-   rather than the item), its pre-seeded label set, and the derivation
-   tests; keep the label set bounded and pre-seeded to zero.
+### 8f Content and telemetry (unchanged)
 
-## Phase 9: build D6 (node-readiness persistence). GO.
+1. Move `wood_mirefen_t2` off the road (R11), with the combat-golden
+   caveat recorded in pass 1.
+2. Re-key the harvest telemetry bands by zone tier (R3).
 
-Settled: build it (V-series direction; the doc must stop promising what the
-code lacks, and the code is the right side to move). The design record lists
-"Relog resets every node timer" first under "the real bugs this packet
-closes" and D6 says "persist node readiness", but no phase scheduled the
-work: `nodeHarvestReadyAt` is session-only, reset on every `addPlayer`, never
-written by `serializeCharacter`; the `ncd` wire block only displays it. The
-packet made the exploit worth more while not closing it: phase 3's 240-second
-respawn doubled what a relog erases, and phase 1's delist made harvests the
-only supply of the five materials the new tool recipes demand. The fast cycle
-is the explicit logout frame; a linkdead drop resumes and does not reset.
+---
 
-Scope, verified small:
+## Phase 9: node persistence and blob integrity
 
-- One optional remaining-deltas field on `CharacterState`, written
-  future-only and omitted when empty, following the `cooldown_persist.ts`
-  pattern the design record itself cites (freeze remaining time across
-  logout, resume on load).
-- Re-anchor in `addPlayer` from the persisted deltas, filtered to live
-  `GATHER_NODES` ids (drops retired nodes on load, the same shape
-  `normalizeToolEffectSlots` uses).
-- Comment updates at the three "session-only, never persisted" sites
-  (`sim.ts` twice, `gathering.ts`, `gather_nodes.ts`).
-- Zero wire changes (`ncd` re-derives from live meta every broadcast; the
-  client mirror is already correct), zero golden movement (no parity
-  scenario round-trips `serializeCharacter`), no offline work (the offline
-  world has no character persistence; an offline relog is a page reload that
-  rebuilds the Sim), and no existing test pins the session-only behavior.
-- New coverage: a persistence round-trip test for the field, a
-  freeze-across-logout behavior test, and a retired-node-id drop test.
+Build: Fable xhigh. QA: ultracode, new session.
 
-## Phase 10: the acquisition craft (needs its own design rulings first)
+D6 as scoped in pass 1 (remaining-deltas field, `addPlayer` re-anchor
+filtered to live ids, comment updates at the FOUR session-only sites,
+round-trip plus freeze-across-logout plus retired-id tests), WIDENED to
+the whole professions blob:
 
-Already the packet's declared next step (it drops the dev gate). The review
-adds constraints the craft's author must satisfy, recorded here so they are
-not rediscovered:
+1. A blob-wide round-trip sweep test: every professions field on
+   `CharacterState` survives save/load byte-faithfully or through its
+   documented normalizer.
+2. The proficiency clamp-on-load makes a future V3 cap raise
+   rollback-destructive (an old binary would clamp raised values on first
+   save). Record it beside the `toolEffectSlots` rollback caveat and give
+   both one shared "rollback erases newer fields" doc note; the mechanical
+   fix rides the first cap raise.
+3. A leave-time save can run before the tick that applies a reel-landed
+   proficiency grant (`pendingGatherGrants` shape), losing it. Flush or
+   apply pending grants before serialize-on-leave.
+4. `tierMailSent` survives an archetype pair switch, so the return
+   baseline never fires and a retroactive letter sends. Reset it on pair
+   transitions.
+5. The `craftThrottle` analogy comment beside the persistence sites gets
+   the same session-only correction (pass-2 duplicate of a pass-1 item;
+   folded here).
 
-- The capacity pre-gate fix (8a.1) must land before or with it; the
-  divergence becomes player-facing the day an effect is obtainable.
-- Price the recharge in a material identity, not a bare count.
-  `RechargeCost.materials` is a flat 4 with no item id anywhere; a charge's
-  value spans roughly 4 to 80 copper depending on effect, zone, and tool, a
-  20x spread against one flat cost. If the material lands near staple
-  prices, a 50-charge fine-tier refill is a strongly positive loop.
-  Recommendation: price in the fine grade of the profession's own top
-  material, or per effect.
-- `always`-mode quality effects burn a charge even when the bonus changes
-  nothing (non-qualifying vein, already-fine yield); either make depletion
-  conditional on the bonus mattering, ship the prompt flow (phase 12), or
-  price charges assuming waste.
-- The rollback caveat (whole-blob save erasing `toolEffectSlots` under an
-  older binary) turns into real player-value loss here; the acquisition
-  change owns it.
-- Remove the dev gate and its two-direction test pin in the same change, per
-  the packet record.
+---
 
-## Phase 11: content uniqueness, zone progression, and expansion readiness (V2, V3)
+## Rulings checkpoint (before phase 10)
 
-The vision phase for "each skill has its own unique nodes, tools, and
-materials, fun and worthwhile, carrying through the whole game", within the
-settled content-unique-only frame (no new mechanics).
+One sitting, no build: confirm the R24 to R38 encodings against the
+phase 8/9 diffs, and settle the two scheduled acquisition-craft decisions
+(the recharge MATERIAL identity, and whether the prompt confirm flow ships
+with phase 12 or phase 14). Anything phases 10 to 17 discover that needs a
+new ruling gets an R-number here rather than an inline decision; this
+ledger is the channel pass 2 found missing.
 
-### Zone-progression audit (run 2026-07-27, traced through the executable code)
+---
 
-The maintainer's requirement: each zone is a progression (better fish, ores,
-herbs up the ladder), and a player must not be able to do everything in
-zone 1. Verdicts per axis:
+## Phase 10: sim correctness and session lifecycle (+ fishing telemetry)
 
-- **Gathering: STRONG, already as desired.** Yields are zone-keyed and
-  strictly better up the ladder (ore 4/8/15, wood and herb 4/15/40 copper
-  sell); tier-1 nodes stop teaching at exactly 75 of 100 (derived and
-  pinned), so the cap requires Mirefen t2 or Thornpeak t3 veins; the fine
-  grades the tool recipes consume only mint from later-zone veins; zone 1
-  stocks only tier-1 tools. Caveats: zone 3 is the fast finish, not a hard
-  requirement for the cap (Mirefen t2 trickles to 100 at quarter gain);
-  rare events and material signing are zone-agnostic by construction.
-- **Fishing: catches STRONG, climb was NONE.** Every zone's fish are
-  exclusive and strictly better (food value, coin, recipe demand;
-  Slatefin Carp is Thornpeak-only), and the rod gate holds. But
-  proficiency gain had no zone input: zone-1 water taught to the 200 cap
-  and was mathematically the OPTIMAL grind spot (best food-fish density at
-  every band, ~3,740 casts to cap at Mirror Lake), and the whole rod ladder
-  is buyable in zone 1 at Wilkes. Fixed by ruling R19 below.
-- **Crafting: PARTIAL, defensible.** Leatherworking is genuinely anchored
-  to Fenbridge and alchemy to Highwatch (stations and trainers, 19
-  zone-locked recipes); tanning agent and glass vial are later-zone counter
-  exclusives. Engineering (the whole tool and rod ladder) crafts and trains
-  entirely at the Eastbrook toolworks with its pull carried by the reagent
-  side; the World Market lets a funded buyer purchase every later-zone pull
-  from Eastbrook Square (accepted under R7; R22 later closed the
-  tool-wielding half of that bypass, materials remain tradeable);
-  specialization (75) in any
-  craft is grindable in zone 1 off field recipes, but training the real
-  ladder still requires the zone-anchored trainers.
-- One containment is airtight by design: fishing grants zero character XP,
-  so zone-1 fishing can never substitute for combat leveling.
+Build: ultracode (many interacting exit paths; fan out per path and
+adversarially verify). QA: ultracode, new session.
 
-### Zone-progression work items (from rulings R19 to R21)
+Implements R24 through R29 on the executable paths:
 
-- **The fishing teaching ceiling (R19).** Give fishing the land
-  professions' tier-falloff shape: the water's zone tier feeds the gain
-  curve, so tier-1 water grays out around 100 of 200, tier-2 around 150,
-  and tier-3 teaches to the cap. Exact thresholds are a design pass,
-  derived from live constants and pinned by a derived test exactly like the
-  75 land ceiling. Implementation notes, verified in the audit: gain is
-  draw-free, so the fishing draw contract (2/1/0) is untouched; the parity
-  suite drives no fishing session, so no golden moves; this deliberately
-  extends the packet's D12 scope with maintainer authorization, and the
-  design record must say so. Sequencing: this rewords the fishing guide
-  prose again, so land it BEFORE the release locale fill, and if it
-  rewords keys 8c already refilled, repeat the remove-and-refill for the
-  affected keys (the reword-staleness gate cannot see it otherwise).
-- **The missing Thornpeak gatherer deed (R21).** The per-zone gatherer deed
-  line stops at zone 2: `completeGatherCast` already writes
-  `gather:thornpeak_heights:*` visit marks and no deed consumes them, so
-  the deed pull outward goes silent exactly where the t3 veins are. Author
-  the zone-3 gatherer chronicle per `docs/design/deeds.md` (cosmetic only)
-  and update the `tests/deeds_content.test.ts` pins.
-- **Tool use requirements (R22).** The RuneScape-shaped gate: the harvest
-  path's tool resolution becomes "best owned tool the player can USE"
-  (`bestOwnedGatherToolTierOrNone` learns the proficiency input), with a
-  text-free denial event plus a matcher-keyed requirement message, tooltip
-  and vendor requirement lines updated, and the guide reworded. The
-  authoritative vendor buy-deny relaxes to advisory display (re-mint the
-  phase 4 purchase-deny pins as wield-deny pins; the derived-ceiling test
-  now derives USE requirements). Draw contracts untouched (pre-draw
-  denial). Sequencing: rides with R19 in this phase since both reword the
-  professions guide prose; land both before the release locale fill.
-- **Rare-event and signing zone flavor (audit consideration, optional).**
-  Both systems pay identically in every zone today (type-keyed flavor,
-  flat 1/90, proficiency-keyed signing). Decide inside the per-skill
-  richness audit whether later zones earn zone-flavored rare moments;
-  content-only if so.
-- **Crafting-anchor consideration.** Record engineering's all-Eastbrook
-  station and trainer placement as the deliberate hub design (pull rides
-  the reagents), or give a later zone a station-side stake in the audit;
-  and note the later-zone work-order economy is thin (one order each for
-  zones 2 and 3 versus four in zone 1), a fill candidate.
+1. Turn-in spend order (R24): instanced-last consumption at
+   `turnInQuestCore`, reusing the vendor-sell pattern; a mixed-stack test
+   proves a signed specimen survives a turn-in that plain copies can pay.
+2. `harvestNode` in-combat and swimming gates (R25), with the same
+   text-free denial idiom fishing uses, matcher keys included.
+3. Reel exemption from the combat gate (R26): reorder the reel arm above
+   the combat check in `startFishing`; pin that aggro during the bite no
+   longer eats a valid reel.
+4. Stealth breaks on harvest/cast; action-locked forms refuse (R27).
+5. Session cancellation on every teleport and `/follow` zone crossing
+   (R28): dungeon/delve entry, jail, revive; one shared cancel helper, not
+   five copies. The rod gate reads the water's zone at the PROBE POINT,
+   closing the 24-yard cross-boundary cast.
+6. Queued-spell buffer clears on session start (R29).
+7. A fully-absorbed hit skips the cast cancel but its knockback still
+   displaces the caster; make absorb consistent with the cancel rule
+   (whichever way the checkpoint rules, displacement and cancel agree).
+8. Hobby-switch integrity: exclude `q_prof_hobby_switch` from pair
+   transitions so a banked selection cannot go stale, and stop the
+   make-amends return from silently discarding an explicitly quested
+   hobby choice.
+9. Unify the builtin-versus-swappable content reads: the rod gate resolves
+   builtin `ZONES` while water reads the active (swappable) content, and
+   station COLLIDERS use static `STATIONS` while the station gate and
+   visuals use the active bundle (`ClientWorld` pins the static list too).
+   All three read the active content, which also serves R37.
+10. **Fishing telemetry** (pulled forward from ops): casts, catches,
+    got-aways, and koi by band and zone; empty-hook rate; rod-fee
+    payments. Bounded label sets, pre-seeded to zero, riding the existing
+    exporter; check multi-realm label behavior while wiring it. R4, R8,
+    and the shared-depletion deferral all gate their revisits on this
+    data existing.
 
-- **Per-skill richness audit.** Build the matrix per skill (mining, logging,
-  herbalism, fishing): nodes per zone and tier, tool ladder rungs and where
-  each is obtained, base and fine materials, recipes consuming them, deeds,
-  work orders, and the skill's signature moments (rare events, signed
-  specimens, the koi). Find and fill the asymmetries: fishing has no fine
-  analog (the koi and Slatefin are its specials; decide whether that is its
-  stated identity and write it down), herbalism/logging/mining are today
-  symmetric by construction (verify that is true through deeds and work
-  orders too, not just nodes). Every fill is content-as-data plus its Book
-  of Deeds records and wiki prose, per the repo's content rules.
-- **The out-tooled work-order economics** (a phase 5 open item) lands here:
-  either re-derive the reward from what the player actually hands over, or
-  record the flat reward as deliberate friction. It is a content-tuning
-  call inside this audit's scope.
-- **The new-zone authoring checklist, derived-tested.** V3 makes the cap
-  rise with zones, so a new zone must be mechanically complete on arrival:
-  six nodes per type on legal ground, a tier assignment, materials plus
-  fine grades with icons and i18n, a tool or rod rung if the zone opens a
-  new tier, per-band catch tables that sum to 100, hub stocking per the
-  hub rule, use requirements under the derived teaching ceiling (R22), and
-  deeds and wiki prose keys. Per R23, the zone's TOP tool rung also names
-  its content source (raid, dungeon, world boss, or their currency) and
-  its hub deliberately does not stock it; the checklist asserts both. Write the checklist in this doc's successor AND encode
-  it as a derived test over the zone registry, so shipping an incomplete
-  zone reds the gate instead of relying on memory. This is the packet's
-  guard philosophy applied to the future.
-- **Cap-scaling design note.** Specify how `GATHERING_PROFESSIONS` caps
-  derive from shipped zone tiers when zone 4 arrives (so the cap rise is a
-  content consequence, not a constant edit), and what the character-sheet
-  denominator, the gate ceilings, and the empty-hook schedule each do at
-  the new cap. Design note in this phase; implementation rides the first
-  new zone.
+---
 
-## Phase 12: UX polish, desktop and mobile (V-vision)
+## Phase 11: stale-client and rollout compatibility
 
-The "beautifully designed, incredible user experience" phase. Every item is
-a small, already-identified gap; all visual changes carry before/after
-screenshots (desktop and mobile) per the repo rule.
+Build: Fable xhigh. QA: Fable xhigh, new session (verify against the real
+merge-base bundle via git show, the way pass 2 did).
 
-- **Gather-node tooltip grade preview** (phase 5 left it open): a player at
-  a vein sees whether their tool upgrades the yield. Everything needed is
-  in the tooltip's view core; one boolean plus one copy line, plus the
-  `effectiveGradeToolTier` comment gains its promised third reader.
-- **Respawn countdown in the node tooltip** (phase 3 deliberately deferred
-  it): needs an `IWorld` member, the parity pin, and an i18n key; the `ncd`
-  wire already carries the data.
-- **Last-charge signal**: the resolve result's `depleted` flag is discarded
-  today, so an effect expires silently. Surface it (FCT line or toast).
-- **The prompt confirm flow** for tool effects, un-refusing `'prompt'` mode
-  end to end (widen the seam signature back, wire the confirmation, update
-  the HUD badge that was removed). Can ride with phase 10 if that is more
-  natural.
-- **Professions window `maxSkill`** (the phase 0 follow-up): it still
-  renders the wire-sourced value and carries the "12 / 0" malformed-row
-  exposure the character sheet was cured of. Same denominator sourcing fix.
-- **Mobile audit of every professions flow**: vendor locked rows and their
-  requirement lines, the crafting window's grade display, gathering cast
-  and denial feedback, the fishing reel press timing feel at mobile
-  latency, and tooltip reachability on touch. Fix what the audit finds;
-  screenshots per surface.
-- **Banner queueing** (phase 0 recorded ruling: a deed banner in the same
-  tick replaces a level-up banner, last-write-wins): decide queue-or-keep
-  and implement if queued. Behavior change, so it needs its own small
-  design note.
+R34 scope: guards, not a floor.
 
-## Phase 13: performance at 1,000 concurrent (V4)
+1. Guard the trade-window unknown-item path at HEAD (the old client
+   throws in `itemIcon` on any unknown id and the early-set signature
+   freezes the offer display; the same unguarded pattern exists at HEAD,
+   so every FUTURE item addition re-breaks old clients). Fallback icon
+   plus raw-id label, never a throw.
+2. Unknown-id fallbacks everywhere a stale bundle renders server truth:
+   bag cells (currently invisible with a counted slot), grant lines,
+   vendor prices (old bundles show 60/150 c against the server's 120/400
+   charge), and the rod-zone denial copy. Where a graceful fallback is
+   impossible client-side, record the arm as accepted stale-client
+   cosmetics in this doc.
+3. The reverse arm: 7 relocated node ids brick Eastbrook herbalism for a
+   NEW client on an OLD server mid-deploy; write the deploy runbook note
+   (server first, then clients; the iOS binary ships before deploy per
+   R34) and verify the order suffices for every packet surface.
+4. Phantom/missing nodes, BOTH directions: a stale client renders nodes
+   the current server moved (invisible walls, phantom props), and a new
+   client against an old server advertises nodes and minimap blobs the
+   server denies. Both accepted and recorded (they resolve once both
+   sides are current), with the runbook note naming them and the deploy
+   order bounding the window.
 
-Professions must stay flat-per-player at 10x today's population with more
-zones coming. The whole-backend evaluation already found large headroom;
-this phase pins the professions share of it with budgets and benchmarks, on
-the server perf seams (`server/CLAUDE.md` "Hot paths").
+---
 
-- **Budgets, asserted in tests**: `ncd` and `tslot` bytes per player per
-  tick under the delta rules (only-while-cooling, absent-keeps-prior); the
-  per-command cost of the gather and fishing paths; per-player
-  `nodeHarvestReadyAt` map size as node count grows with zones (bounded by
-  live node ids); the D6 blob growth (deltas only for cooling nodes).
-- **A load benchmark**: drive the authoritative server with synthetic
-  gathering/fishing sessions at 1,000 connected players (extend the
-  existing load rig) and record tick-time and broadcast-size percentiles as
-  a checked-in baseline, so a future regression has a number to red
-  against.
-- **Zone-scaling projection**: assert the per-zone structures (nodes,
-  catch tables, cluster map circles, vendor gates) grow linearly with zone
-  count and none is rebuilt per-viewer per-tick without a cache; anything
-  viewer-identical rides the cached-read seam.
-- **Client side**: the professions HUD surfaces (vendor window, crafting
-  grades, gathering readout, tooltip additions from phase 12) stay inside
-  the per-frame budget in `tests/hud_perf_budget.test.ts`, on both painter
-  buckets.
+## Phase 12: the acquisition craft
 
-## Rulings ledger (settled 2026-07-27)
+Build: ultracode (the free-grant incident lived exactly here; adversarial
+verification is mandatory). QA: ultracode, new session.
 
-Settled by the maintainer directly:
+Pass-1 phase 10 scope plus the pass-2 constraints:
 
-- R1. **Branch**: everything lands on this branch; merge when the worklist
-  is done. (V1)
-- R2. **Skill identity**: content-unique only; no per-skill mechanics. (V2)
-- R3. **Telemetry bands**: re-key by zone tier. Work item 8f.2.
-- R4. **Koi odds**: 1/3/6 by band blessed; record the low-band trade as
-  deliberate (8d.7).
-- R5. **Cap**: rises with zones; checklist and cap-derivation in phase 11.
-  (V3)
-- R6. **Perf target**: 1,000 concurrent. (V4, phase 13)
-- R7. **Purchase-versus-use** (open since phase 4): purchase-gate only.
-  CLOSED, then AMENDED the same day by R22 after the zone-progression
-  audit: the use-never-gated arm is reversed for land tools; the
-  acquisition-stays-open arm survives (market, trade, mail, delve Marks,
-  and now the counters themselves all sell freely; the wield is the gate).
-- R8. **Rod training fees** (open since phase 6): the derived 4g/16g fees
-  stand; the curve stays exception-free and more recipes will reach those
-  rungs as the cap rises. Revisit only on telemetry. CLOSED.
-- R19. **Fishing gets a teaching ceiling, mirroring the land curve.** The
-  water's zone tier feeds the gain falloff so the climb itself pulls a
-  player to better water; exact thresholds derived and pinned in phase 11.
-  This authorizes extending the packet's D12 no-gain-changes scope for that
-  one mechanic.
-- R20. **The rod ladder stays fully buyable at Wilkes** (the phase 6
-  buy-ahead fork is re-confirmed); rods stay proficiency-ungated. The
-  teaching ceiling, not the counter, is what restores fishing progression.
-- R21. **Author the missing Thornpeak gatherer deed** (phase 11); the marks
-  are already written and unconsumed.
-- R23. **Future-zone tools are unlocked through content, not counters**
-  (direction for the expansion era, recorded 2026-07-27). When new zones
-  ship their tool tiers, acquisition runs through raids, dungeons, world
-  bosses, and their currencies (the shipped delve-shop route, clears gates
-  plus Marks, is the prototype), because a tool you earned is more fun than
-  a tool you bought. Shape questions deliberately left for the zone-4
-  design pass, not decided now: whether content drops the tool itself or
-  the recipe/reagent (the latter keeps engineering's craft ladder alive,
-  the classic recipe-drop pattern); whether a craft route always coexists
-  so pure gatherers are not forced into raid lockouts to progress their
-  profession; and tradeability of earned tools (R22's use requirements
-  make even tradeable trophies safe for the ladder). The new-zone
-  checklist in phase 11 carries this: a future zone's top tool rung names
-  its content source, and its hub deliberately does NOT stock it.
-- R22. **Land tools gain USE requirements** (ruled later the same day,
-  superseding R7's use-never-gated arm; R7's acquisition-stays-open arm
-  survives and is strengthened). Tier-2/3 land tools require gathering
-  40/70 to wield; tier-4/5 requirements are derived in-phase under the
-  knife-edge rule (each requirement reachable on the previous tier's
-  ground, derived and pinned like the 40/70 ceiling test). Rods stay
-  exempt: the zone water gate plus the R19 ceiling are fishing's pacing.
-  The vendor purchase gates become advisory display (every counter sells
-  ahead freely, like Wilkes); enforcement moves to the harvest gate. This
-  closes the audit's traded-tool bypass. Live-realm note: players who
-  bought tier-2/3 tools before any gate keep them but must reach 40/70 to
-  wield, amending phase 4's never-confiscated patch note; both thresholds
-  are reachable entirely in zone 1.
+1. The capacity pre-gate fix (8a.1) must already be in (it is, phase 8).
+2. ONE validation authority: the resolver policy check runs at slot time
+   AND load time (phase 8's 8a.2 arm), and the craft mints through the
+   same resolver, so no path can mint what another path refuses.
+3. Recharge pricing in a MATERIAL IDENTITY per the checkpoint ruling; the
+   flat 4-count spans a 20x value range and cannot ship.
+4. Charge economics per R30: slot-time mint stands, recharge re-derives
+   the maximum from currently-owned tools.
+5. `always`-mode waste (charges burned when the bonus changes nothing):
+   make depletion conditional on the bonus mattering, or price charges
+   assuming waste, per the checkpoint ruling.
+6. The rollback caveat becomes real player value here: phase 9's shared
+   rollback note is re-checked and the release notes carry it.
+7. Remove the dev gate and its two-direction pin in the same change; the
+   enchanting guide prose decision (what the page promises) is made here
+   and HANDED to phase 17 for the wording.
+8. `craftedBy` starts being written by the production craft; the
+   original-crafter discount goes live with it.
 
-Applied as maintainer-direction defaults (veto by striking the item):
+---
 
-- R9. Fishing slots and Springback Charm: refuse at the resolver until real
-  behavior exists (8a.2, 8a.3).
-- R10. Starter tools: repeat cadence plus truthful comment; trade stays
-  open (8a.4).
-- R11. `wood_mirefen_t2`: move it off the road (8f.1).
-- R12. `biteBody`: fix the Silverstream number (8c.3).
-- R13. Derived crafts-to-mastery test: yes (8b.7).
-- R14. Copper Dig pathing arm: yes (8b.8).
-- R15. Map-doc D2 policy note: yes (8d.8).
-- R16. Restate the design record's open-rulings header: yes (8d.2).
-- R17. Marks-to-copper conversion via delve tools: blessed as bounded and
-  loss-making; record it (8d.7).
-- R18. Reel-window cost to tier-1 anglers: blessed (mobile latency
-  rationale); record it (8d.7).
+## Phase 13: content, zone progression, and onboarding
 
-## Still open after all of the above
+Build: ultracode (widest surface: derived tests, R22 carve-outs, content
+authoring). QA: ultracode, new session.
 
-Only the phase 10 design rulings (the acquisition craft's shape, its
-recharge material identity, and the prompt-flow timing) and the release-time
-locale fill (sized at 21 keys, 315 rows, see 8c.5).
+Pass-1 phase 11 scope (R19 fishing teaching ceiling with its D12 scope
+note; R21 Thornpeak gatherer deed; the per-skill richness audit; the
+out-tooled work-order economics call; the new-zone checklist encoded as a
+derived test; the cap-scaling design note) plus:
+
+1. **R22 wield gates with per-caller rulings.** The shared resolver feeds
+   the node gate, the fine-grade tier, the corpse arm, and the FISHING
+   band cap; rods are R22-exempt, so the proficiency-aware resolution
+   must carve fishing out (parameter or split resolver) and the grade and
+   corpse arms get explicit decisions recorded here. Re-mint the phase 4
+   purchase-deny pins as wield-deny pins; derived-ceiling test now derives
+   USE requirements.
+2. **Onboarding and direction truth:** fix the Copper Dig direction in
+   the quest text (southeast, not southwest) and its wiki twin; the
+   Codfather quest names the rod its water actually takes; the apothecary
+   (east meadow, boars are west) and outfitter (western woods, spiders
+   are east) directions. R32: the camp itself does not change.
+3. **Placement-margin arm** in the placement suite: named-mob and boss
+   aggro radii (level-scaled where applicable) against every node's
+   harvest disc, with the R33 allowlist naming the deliberate t3 dangers;
+   fix the two Grix tutorial veins' spacing.
+4. The zone-progression audit numbers that pass 2 could not reproduce are
+   re-derived, not trusted (the two it did re-run both broke).
+5. The crafting-anchor record includes the documented mobile-station
+   bypass; the later-zone work-order thinness (one order each in zones 2
+   and 3) is filled or recorded as deliberate.
+6. Economy note: per-player node timers mean no cross-player scarcity, so
+   fine-grade market depth floats free of supply pressure; record the
+   consequence and what telemetry would trigger a revisit.
+7. The new-zone checklist carries R23 and R37: a future zone's top rung
+   names its content source, its hub does not stock it (the hub rule
+   applies BELOW the top rung), and the R37 guard flips per-zone from
+   assert-absent to assert-complete.
+
+---
+
+## Phase 14: UX polish (desktop, mobile, gamepad, accessibility)
+
+Build: Fable xhigh (screenshot-driven, serial). QA: ultracode, new
+session (fresh-eyes coverage over every surface).
+
+Pass-1 phase 12 scope (gather-node tooltip grade preview; respawn
+countdown in the node tooltip; last-charge signal; the prompt confirm
+flow if the checkpoint placed it here; professions window `maxSkill`
+sourcing; the mobile audit of every professions flow) plus:
+
+1. Banner queueing per R38 (small design note, then the queue).
+2. **Touch hotbar for rods**: the touch drag path gains the action-slot
+   arm (`resolveDropTargetAt` has none), so mobile anglers stop reeling
+   via bags-row taps inside a 2.5 s window.
+3. **Gamepad**: the controller panel offers Crafting but the dispatch
+   drops it (wire it); the pad reel path gets a first-class answer
+   instead of cursor bag clicks with the B-button interact/close
+   conflict.
+4. **Accessibility bullets** (new to the phase): colorblind-safe channels
+   for node lock/tier state and the deed-versus-level banner distinction
+   (shape or label, not hue alone); minimap lock state gains a non-hue
+   cue; audit against the interface standard in `DESIGN.md`.
+5. Empty-hook reel feedback: the correctly-timed reel on an empty hook
+   gets an SFX cue and FCT line beside its grey log line.
+6. Fine grades stop reading as "Junk" in the tooltip kind line
+  (presentation only; the kind stays `junk` internally).
+7. Crafting window signals when a craft will consume fine grades because
+   base stock ran short (today it substitutes silently at 2x value).
+8. Collect objectives for node-yield materials draw map guidance (the
+   gather-objective circles exist; collect objectives have none), and
+   hand-verify the gather-quest circle renders (pass 2's accepted-quest
+   map capture showed none; determine why).
+9. Node props gain tier differentiation in the 3D world (pass-2 nit:
+   tier is tooltip-only today); low-preset fog's effect on node spotting
+   plus the bobber's low/native bite splash get a professions
+   fairness-guard test naming what is cosmetic and what is actionable.
+10. The removed prompt-mode HUD badge leftovers check (pass-1 item)
+    rides along.
+
+---
+
+## Phase 15: ops (GM tooling and the activity feed)
+
+Build: Fable xhigh. QA: Fable xhigh, new session.
+
+1. R35 GM minimal pair on the admin dashboard: inspect a player's
+   professions state (proficiencies, slots, node timers), restore a lost
+   item or slot row. Admin surface strings are player-visible i18n per
+   the repo rule (operators are users).
+2. Discord activity feed: professions moments (first koi, masterwork,
+   deed titles) become feed-visible where the rareloot detector today
+   cannot see them; fix the pre-existing vale_cup empty-embed render in
+   `bot/logic.ts` while in the file.
+3. Multi-realm metric labeling double-check for every professions series
+   (single-exporter registration, per-realm labels), building on the
+   phase 10 wiring.
+
+---
+
+## Phase 16: performance at 1,000 concurrent
+
+Build: Fable xhigh (measurement discipline beats fan-out). QA: Fable
+xhigh, new session.
+
+Pass-1 phase 13 scope, honestly re-scoped:
+
+1. The professions load rig is a FROM-SCRATCH build:
+   `scripts/load_players.mjs` contains zero professions verbs. Synthetic
+   gathering and fishing sessions at 1,000 connections, tick-time and
+   broadcast-size percentiles checked in as the baseline, hardware named
+   per R36 (the maintainer's Mac).
+2. Budgets split into two families: CI-assertable pins (bytes per player
+   per tick for `ncd`/`tslot` under the delta rules, allocation counts,
+   blob growth bounds) versus Mac-baseline measured numbers (tick time,
+   broadcast percentiles). The legacy per-tick `ncd` arm that pre-stable
+   clients ride is measured too, not just the delta arm.
+3. Zone-scaling projection: per-zone structures grow linearly, nothing
+   viewer-identical is rebuilt per tick uncached; client side covers the
+   painter budgets AND zone-scaling of node meshes, colliders, and
+   minimap markers.
+4. Character-blob growth measurement (node timers plus slots plus
+   proficiency) lands here with a bound asserted.
+
+---
+
+## Phase 17: the wiki truth pass and the release locale fill
+
+Build: ultracode (per-page and per-locale verification is fan-out
+shaped). QA: ultracode, new session.
+
+Runs LAST before the final gate, once every string-affecting decision has
+landed, so English is reworded exactly once and the overlays re-fill
+exactly once.
+
+1. **The full guide accuracy sweep** against the live sim, every
+   professions-related page. Known-falsified keys to fix (beyond the
+   pass-1 8c set of engineering.materialsBody, fish.startBody,
+   fish.biteBody, fish.tablesNote, koiBody, toolsNote, and the
+   craft-overview never-stocked line):
+   - The engineering five: `ladderBody` ("no trainer fee ever"),
+     `trainingBody` (renders under a contradicting table now),
+     `identityBody` ("only through an engineer", the Marks route exists),
+     `faq.a6` (wrong rungs and fees), `econ.trainingNote` ("higher tiers
+     wait for future content").
+   - The osmium three: weaponcrafting/armorcrafting/leatherworking
+     `materialsBody` still selling the Darva/Hesk shopping trip.
+   - `gainBody` ("the one tier 3 node"; there are two per trade).
+   - `faq.a7` ("bare hands count as tier 1"; every harvest needs a tool).
+   - Enchanting `identityBody` per the phase 12 decision.
+   - The packet's own reword calling the Glyphsteel Bar Bree-only
+     (Gizzel stocks it at the toolworks).
+   - `fish.startBody` "rather than bought" (the Marks route).
+   - `bandsBody`'s cast-shave claim rendering on the fishing page where
+     bands shave nothing.
+   - The tool table gains the delve CLEARS gates beside the Marks prices.
+   - `scheduleNote` joins the remove-and-refill set (the R19 reword
+     stales it; pass 2 found the pass-1 refill scope missed it).
+   - R32's veto-able soft danger hint in "Where to start".
+2. Every reword follows the remove-and-refill protocol (stale overlays
+   deleted so keys re-pend; non-Latin fills for M16-wordy values in the
+   same change), because the gate cannot see reword staleness.
+3. Re-size the release fill AFTER the sweep (the 21-key/315-row figure is
+   already stale) and record the new count here.
+4. The release-tier locale fill (`I18N_RELEASE_TIER=1` green) is this
+   phase's closing act, via the i18n-locale-fill skill.
+
+---
+
+## Phase 18: final gate
+
+Build/review: ultracode. No separate QA (this IS the QA).
+
+1. A fresh whole-branch review in the shape of pass 2: finder fan-out to
+   dry, adversarial verification, a completeness critic, AND a live track
+   (desktop, mobile, wiki, online smoke), run by a session with no
+   authorship stake in any phase.
+2. The release-malware-audit skill over the working tree.
+3. Screenshots refreshed for every visual surface, committed and linked.
+4. `npm run gate` at release tier, the deploy runbook check (server
+   first, iOS binary shipped per R34), then the merge decision with the
+   maintainer.
+
+---
+
+## Deferred and accepted, with reasons (pass-2 additions)
+
+- Thornpeak t1 faucet: accepted, telemetry-watched (R31).
+- Copper Dig camp danger: intended; level first (R32).
+- Tier-3 danger placements: deliberate, allowlisted (R33).
+- Offline console `slotToolEffect`: /dev-equivalent, recorded (8e.5).
+- Stale-client cosmetic arms without a graceful fallback: recorded in
+  phase 11 as accepted.
+- Editor/custom-map professions, including the editor 2D canvas's node
+  blindness and the 3D viewport's terrain re-seat: deferred behind R37
+  until the zone-4 design pass.
+- A hard client version floor: separate later decision (R34).
+- Pass-1 deferrals stand: shared node depletion (telemetry-gated), the
+  strike minigame (rejected), the quest XP curve (out of scope).
+
+## Rulings R1 to R23 (pass 1, unchanged)
+
+R1 branch, R2 content-unique identity, R3 telemetry re-key, R4 koi odds,
+R5 cap rises with zones, R6 perf target, R7 purchase-versus-use as
+amended by R22, R8 rod fees stand, R9 refuse inert slots, R10 starter
+tool cadence plus truthful comment, R11 move wood_mirefen_t2, R12
+biteBody number, R13 derived mastery test, R14 Copper Dig pathing arm,
+R15 map-doc D2 note, R16 header restate, R17 Marks-to-copper conversion
+blessed, R18 reel-window trim blessed, R19 fishing teaching ceiling, R20
+rod ladder stays buyable at Wilkes, R21 Thornpeak gatherer deed, R22 land
+tool USE requirements (rods exempt), R23 future-zone tools through
+content. Full text in this file's git history (pass-1 revision).
