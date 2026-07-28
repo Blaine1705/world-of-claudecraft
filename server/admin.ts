@@ -49,6 +49,7 @@ import {
   updateFilterConfig,
   type WordTier,
 } from './chat_filter_db';
+import { cleanContentModerationReason } from './content_moderation_db';
 import { currentDailyRewardDay } from './daily_rewards';
 import {
   accountAndScopeForToken,
@@ -791,16 +792,25 @@ export async function handleAdminApi(
 
     // Map editor moderation: force a published map back to private, and
     // block/unblock an uploaded GLB asset (blocked assets 404 on the public
-    // byte GET and reject re-uploads of the same hash).
+    // byte GET and reject re-uploads of the same hash). Both write a
+    // content_moderation_actions audit row (content_moderation_db.ts).
     const mapUnpublishMatch = /^\/admin\/api\/maps\/(\d+)\/unpublish$/.exec(path);
     if (req.method === 'POST' && mapUnpublishMatch) {
-      const done = await adminMapsDb().setStatus(Number(mapUnpublishMatch[1]), null, 'private');
+      const body = await readBody(req);
+      const done = await adminMapsDb().adminUnpublish(Number(mapUnpublishMatch[1]), {
+        adminAccountId: accountId,
+        reason: cleanContentModerationReason(body.reason),
+      });
       return done ? ok(res, { ok: true }) : fail(res, 404, 'map_not_found');
     }
     const assetBlockMatch = /^\/admin\/api\/user-assets\/(\d+)\/(block|unblock)$/.exec(path);
     if (req.method === 'POST' && assetBlockMatch) {
       const status = assetBlockMatch[2] === 'block' ? 'blocked' : 'active';
-      const done = await adminUserAssetsDb().setStatus(Number(assetBlockMatch[1]), status);
+      const body = await readBody(req);
+      const done = await adminUserAssetsDb().adminSetStatus(Number(assetBlockMatch[1]), status, {
+        adminAccountId: accountId,
+        reason: cleanContentModerationReason(body.reason),
+      });
       return done ? ok(res, { ok: true }) : fail(res, 404, 'asset_not_found');
     }
 
@@ -2081,16 +2091,24 @@ async function adminUserAssetsListHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, { rows, total, page, limit });
 }
 
-/** POST /admin/api/maps/:id/unpublish: force a published map back to private. */
+/** POST /admin/api/maps/:id/unpublish: force a published map back to private, audited. */
 async function adminMapUnpublishHandler(ctx: Ctx): Promise<void> {
-  const done = await adminMapsDb().setStatus(adminTargetId(ctx), null, 'private');
+  const body = await readBody(ctx.req);
+  const done = await adminMapsDb().adminUnpublish(adminTargetId(ctx), {
+    adminAccountId: adminIdentityOf(ctx).accountId,
+    reason: cleanContentModerationReason(body.reason),
+  });
   return done ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'map_not_found');
 }
 
-/** POST /admin/api/user-assets/:id/(block|unblock): flip an upload's moderation flag. */
+/** POST /admin/api/user-assets/:id/(block|unblock): flip an upload's moderation flag, audited. */
 function adminAssetStatusHandler(status: 'blocked' | 'active') {
   return async (ctx: Ctx): Promise<void> => {
-    const done = await adminUserAssetsDb().setStatus(adminTargetId(ctx), status);
+    const body = await readBody(ctx.req);
+    const done = await adminUserAssetsDb().adminSetStatus(adminTargetId(ctx), status, {
+      adminAccountId: adminIdentityOf(ctx).accountId,
+      reason: cleanContentModerationReason(body.reason),
+    });
     return done ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'asset_not_found');
   };
 }
