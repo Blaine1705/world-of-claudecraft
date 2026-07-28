@@ -1,10 +1,16 @@
 # Professions tuning packet
 
-Status: all seven phases built, on one branch, gate green. Base:
+Status: all seven build phases landed, on one branch, gate green. Base:
 `release/v0.32.0` (re-synced; the packet was planned against `release/v0.31.0`).
-Two rulings remain open and are recorded where they bite rather than here: the
-two rod training fees (phase 6 closeout) and purchase-versus-use tool gating
-(phase 7 closeout).
+The packet is NOT finished: the whole-packet review produced the active
+worklist, `professions-tuning-packet-review.md` (phases 8 to 18 plus the
+rulings ledger), and this record is corrected as those phases land. The two
+rulings this header once listed as open are settled there: the derived rod
+training fees stand (R8), and purchase-versus-use tool gating closed as
+advisory purchase gates with wield-time enforcement (R22, superseding R7's
+use arm). The two phase 5 maintainer calls are owned by the worklist too:
+the gather-tooltip grade preview by its phase 14 (UX) and the out-tooled
+work-order economics by its phase 13 (content).
 
 One packet, seven phases. This document is the agreed scope and the record of
 what was measured, so the phases can be built and reviewed against it without
@@ -70,7 +76,7 @@ takeable back to back.
 | D4 | Add a node placement validation test and fix the misplaced nodes. |
 | D5 | Expand nodes for coverage, target 6 per type per zone. |
 | D6 | Close the relog exploit by persisting node readiness. Respawn stays **per-player**. |
-| D7 | Gate tool purchase on gathering proficiency, on the vendor row. |
+| D7 | Gate tool purchase on gathering proficiency, on the vendor row. AMENDED BY R22: the purchase gate becomes advisory and enforcement moves to wield time (the harvest gate); see the phase 7 closeout. |
 | D8 | Better tools yield better materials: 9 new `fine_` variants. |
 | D9 | Fishing difficulty is skill-versus-zone, not reaction time. |
 | D10 | Wire the parked `TOOL_EFFECTS` system as the rare-tool hook. |
@@ -92,7 +98,17 @@ implementable; "no NPC ever stocks it" is, and it is what the ruling means.
 (`smithing_flux`, `spool_of_thread`, `tanning_agent`, `cooking_salt`,
 `glass_vial`) keep theirs (vendor-only by design, no node, no drop, no recipe).
 
+Scope note (review ruling R15): D2 governs SHIPPED content. A custom map
+document (an editor-only surface today) can put any item id on an NPC's
+counter and sits outside the never-stocked guards by design; the R37 rollout
+guard keeps shipped zones and maps inside the ruling.
+
 ### D6: why per-player, not shared
+
+BUILT IN PHASE 9 of the review worklist, not by the original seven phases:
+the pass-1 review found no phase had scheduled the persistence work while
+this section promised it, and phase 3's 240 s respawn had doubled what a
+relog erases. Until phase 9 lands, `nodeHarvestReadyAt` is session-only.
 
 `src/sim/cooldown_persist.ts` already solved this exact bug class for ability
 cooldowns, and states the pattern: persist remaining-time deltas, not wall-clock
@@ -129,7 +145,7 @@ parity goldens are untouched.
 
 | Bug | Detail |
 |---|---|
-| Relog resets every node timer | `nodeHarvestReadyAt` is session-only and reset on every `addPlayer` |
+| Relog resets every node timer | `nodeHarvestReadyAt` is session-only and reset on every `addPlayer`. Built in phase 9 of the review worklist (D6 below); OPEN until that phase lands |
 | Level-1 Thornpeak fishing faucet | Catch table is keyed on zone alone, no level or rod requirement |
 | Tier-3 rod is inert | Band 2 requires proficiency 200, which is fishing's cap, so tier-2 and tier-3 rods take an identical number of casts to cap |
 | Misplaced nodes | Several sit below the waterline, including all three Eastbrook herb patches on a lake floor; one sits on a near-vertical slope. No test validates a node coordinate |
@@ -141,8 +157,12 @@ parity goldens are untouched.
 ## Phases
 
 Each phase is independently shippable and revertible, and gated with
-`npm run gate`. No phase moved a parity golden in the end: phase 6 was expected
-to and did not, for the reason recorded under it.
+`npm run gate`. No phase moved a golden for a DRAW-ORDER reason (the parity
+section under "Test and invariant obligations" carries the full accounting):
+the branch's golden movement is geometry (solid node bodies shifting mob
+paths) plus one new golden, `professions_gather` was re-recorded twice along
+the way (phase 2 relocations, then the phase 3 expansion), and phase 6 was
+expected to re-record one and did not, for the reason recorded under it.
 
 ### Phase 0: readout and banner
 
@@ -197,12 +217,31 @@ Content only. Still per-player timers.
   deliberately below the mob-camp figure.
 - Keep at least one tier-1 node per type per zone, so a traveler with the
   quest-granted starter tool can still gather outside the first zone.
-- Respawn moves to 240 seconds alongside 6 nodes per type, holding the existing
-  harvests-per-hour ceiling flat. The expansion buys world density and a longer
-  circuit, not faster farming. Today every zone circuit is shorter than the
-  respawn, so a large fraction of a gathering session is spent standing still.
+- Respawn moves to 240 seconds alongside 6 nodes per type. That holds
+  EASTBROOK's harvests-per-hour ceiling flat (9 nodes at 120 s and 18 at
+  240 s are both 270 per hour) and CUTS the two later zones by 25 percent
+  (12 nodes at 120 s was 360; all three land on one 270 ceiling, which the
+  placement suite pins as one number per zone). The expansion buys world
+  density and a longer circuit, not faster farming. The planning premise
+  "every zone circuit is shorter than the respawn, so a large fraction of a
+  session is spent standing still" survived measurement only for Eastbrook;
+  see the phase 3 closeout below.
 - Replace the per-node circle loop in the quest-objective map painter with the
   enclosing-circle pattern already in that file, or the map carpets.
+
+#### What phase 3 measured (closeout)
+
+The circuit-idle premise was measured after the build (the full table lives
+above the node table in `src/sim/content/gather_nodes.ts` and this is its
+summary). Modelling a circuit as a nearest-neighbour tour at run speed plus
+the cast ceiling, working all of a zone's nodes: Eastbrook went from a 69 s
+circuit at 43 percent idle to 160 s at 33 percent; Mirefen from 109 s at 9
+percent idle to 207 s at 14; Thornpeak from 113 s at 6 percent to 197 s at
+18. So the starting zone, where the complaint came from, improves; the two
+later zones get slightly worse, because their circuits were already nearly
+respawn-length and the premise was only substantially true of Eastbrook. The
+density half of the goal is real everywhere; the idle half is delivered only
+in zone 1.
 
 ### Phase 4: the tool gate
 
@@ -220,11 +259,20 @@ both hosts.
 - Ship a derived-ceiling test that computes the tier-1 teaching ceiling from the
   live constants and asserts every gate sits below it, so a future change fails
   loudly instead.
-- Prices 120 and 400. A solo player's realistic entire first-zone quest income is
-  around 5,300 copper, so thousands would be a wall.
+- Prices 120 and 400. A solo player's entire first-zone quest income, summing
+  every zone-1 `copperReward` that is neither repeatable nor group-suggested
+  (`suggestedPlayers > 1` excludes the Hollow, the Sexton, and Mogger), is
+  3,745 copper, so thousands for a tool would be a wall. This line used to
+  quote "around 5,300", a figure that reproduces only if two group quests are
+  counted as solo income.
 - Zone stocking follows the "hub sells the tiers its own nodes use" rule the
   later zones already follow. Only the first zone over-stocks today.
 - Owned tools are never confiscated when a gate arrives. Patch-note line.
+  AMENDED BY R22 (built by the review worklist's phase 13): tools stay in
+  the bags, but land tools GAIN use requirements (tier 2/3 wield at
+  gathering 40/70), so a pre-gate owner keeps the tool and must reach the
+  threshold to wield it, and the purchase gates become advisory. The patch
+  note carries both halves when that phase ships.
 
 Gating on zone alone does not work and is not attempted: there is no level gate,
 no quest gate and no travel cost anywhere, the inter-zone ridge has a road pass,
@@ -274,14 +322,17 @@ Open after review, deliberately not resolved in this phase:
   copy line, but it ADDS a player-facing readout rather than closing a gap in
   what shipped, and the discoverability complaint it answers is now covered
   from two other directions (the item tooltip hint says what a fine grade is
-  and where it comes from, the guide tools note states the rule). Left as a
-  maintainer call, and a natural fit beside phase 7's tool-facing UI.
+  and where it comes from, the guide tools note states the rule). The call
+  landed: the review worklist's phase 14 (UX) builds the preview.
 - **Five guide prose keys were reworded, which stales their translations in all
   20 locales with no gate able to see it:** `guide.profPages.toolsNote`,
   `guide.profPages.craftProse.engineering.materialsBody`,
   `guide.profPages.fish.startBody`, `guide.profPages.fish.biteBody` and
-  `guide.profPages.fish.tablesNote`. All five need a refresh at the
-  release-time locale fill. In every case the English had become factually
+  `guide.profPages.fish.tablesNote`. The release fill CANNOT see them on its
+  own (it reads pending rows only, and a reword never pends), so the review
+  worklist's phase 17 deletes the stale overlay rows to re-pend the keys and
+  refills the non-Latin locales; only `toolsNote` got that treatment in the
+  packet itself. In every case the English had become factually
   wrong (the first two named retired reagents; the fishing three said any
   water works in every zone, quoted the pre-trim reel windows, and called the
   rare catch flat across bands), so leaving them was not an option.
@@ -291,19 +342,24 @@ Open after review, deliberately not resolved in this phase:
   over twice the vendor value for the same coin. They are never blocked (the
   grade substitutes), and base-first consumption spends any plain stock they
   hold first, but the trade is worse than it was. A tuning question, not a
-  defect.
+  defect; owned by the review worklist's phase 13 (content).
 
 - Nine `fine_` variants, one per zone and type. A tool one tier above the node
   yields the fine version.
-- The six tool recipes are re-specced to consume them, so a better tool is the
-  only path to the next tool up. Zero new recipes.
+- The six tool recipes are re-specced to consume them, so on the CRAFT path a
+  better tool is the only way to the next tool up (phase 7's delve counter
+  later added the Marks route beside it). Zero new recipes.
 - Naming: `fine_` is a plain English quality adjective. It avoids the `pristine_`
   specimen family, avoids the rare-event flavor vocabulary
   (`pristine_vein` / `ancient_heartwood` / `moonlit_bloom`), and is not a
   distinctive coin of another property. Verify against `tests/ip_scrub.test.ts`
   and `tests/originality_renames.test.ts` before authoring.
-- Nine procedural icon entries. `tests/shipped_item_ids.test.ts` is append-only,
-  so these ids are permanent once shipped.
+- Nine committed derived-art icons (the base painting under the fine
+  treatment, rendered by `scripts/assets/fine_material_icons.mjs` and checked
+  structurally by its --check arm; the not-procedural correction above states
+  why).
+  `tests/shipped_item_ids.test.ts` is append-only, so these ids are permanent
+  once shipped.
 
 ### Phase 6: fishing
 
@@ -312,9 +368,10 @@ session cap would have to rise. It did not: see the closeout below.
 
 - Per-zone minimum rod tier, checked beside the existing implement gate and
   denied through the existing text-free denial event. Pre-draw and rng-free.
-- Empty-hook weight scales on proficiency versus the zone requirement: roughly
-  8 to 12 percent at or above, around 35 percent one tier under, around 55
-  percent two tiers under.
+- Empty-hook weight scales on proficiency versus the zone requirement.
+  Planned here as roughly 8 to 12 percent at or above; SHIPPED as the 10/8/6
+  surplus taper (at requirement, one band over, two bands over), around 35
+  percent one tier under and around 55 two tiers under.
 - Junk roughly doubles at low skill and thins as you climb. Every band row must
   still sum to 100 and stay monotone.
 - Reel window 3.00 to 2.50 seconds. A light trim only: the difficulty lives in
@@ -333,22 +390,23 @@ session cap would have to rise. It did not: see the closeout below.
 
 - **The parity golden did NOT move, and did not need to.** The premise above was
   that raising the session cap would re-record one trace. The cap held at 15
-  seconds: with the reel window trimmed to 2.50 the worst legal session is 271
-  ticks of a 300-tick cap, even counting the cross-tier case (cast on the pole,
-  pick up the tier-5 rod before the bite). So the cap became a GUARDED constant
+  seconds: with the reel window trimmed to 2.50 the worst legal session was 271
+  ticks of a 300-tick cap as of this phase, even counting the cross-tier case
+  (cast on the pole, pick up the tier-5 rod before the bite); phase 7's rarity
+  rung later moved the worst case to 286, still inside the cap (its closeout
+  below carries the arithmetic). So the cap became a GUARDED constant
   rather than a moved one, and `tests/fishing_zones.test.ts` budgets it in ticks
   against every shipped rod tier. No golden in `tests/parity/` changed.
   Related: a green parity run says nothing about fishing either way, because no
   scenario there ever drives a real cast. That gap is now written down in
   `tests/parity/CLAUDE.md` so the next reader does not mistake green for cover.
-- **OPEN, needs a ruling: the two rod training fees.** `trainingFeeFor` is derived
-  from the recipe's skill tier, so skillReq 75 bills 4 gold and skillReq 125
-  bills 16 gold. These are the first trainer-taught recipes in the game to reach
-  either rung: everything else costs 0, 25 silver or 1 gold, and the six crafted
-  LAND tools dodge the question entirely by predating training. 16 gold for a
-  capstone rod may be exactly right or may be sixteen times too much; it is a
-  balance call, not an implementation one. Moving it means moving the fee curve
-  or the skillReq, never a per-recipe exception.
+- **SETTLED (R8): the two rod training fees stand as derived.** `trainingFeeFor`
+  is derived from the recipe's skill tier, so skillReq 75 bills 4 gold and
+  skillReq 125 bills 16 gold. These are the first trainer-taught recipes in
+  the game to reach either rung: everything else costs 0, 25 silver or 1 gold,
+  and the six crafted LAND tools dodge the question entirely by predating
+  training. The ruling keeps the curve exception-free: moving a fee means
+  moving the fee curve or the skillReq, never a per-recipe exception.
 - **Rod access is paced by the WATER, not by the counter.** Phase 4 deferred rod
   gating to this phase, and the answer is that no rod carries a vendor
   proficiency gate. The zone requirement decides where a rod matters and the
@@ -448,12 +506,14 @@ Its own phase because it is the only one that touches persistence and the wire.
   invisible and a crafted tool added to either would have passed untouched. The
   claim is now "never sold for COPPER", which is what ruling 5 says, and both
   guards sweep all three tables.
-- **OPEN, and deliberately not answered here: the delve rows carry no
-  proficiency gate,** unlike the tier-2 and tier-3 copper rows on the ordinary
-  counters. Whether a tool's PURCHASE should be gated on the same proficiency
-  its USE is gated on is the open purchase-versus-use ruling; the clears gate is
-  what paces these rows today, and it is a content gate rather than a profession
-  one, so nothing presumes an answer.
+- **SETTLED (R22, superseding R7's use arm): purchase gates are ADVISORY and
+  enforcement moves to the wield.** Land tools gain RuneScape-shaped use
+  requirements (tier 2/3 at gathering 40/70; tiers 4/5 derived in-phase under
+  the knife-edge rule) built by the review worklist's phase 13; every counter,
+  the delve rows included, sells ahead freely, and the harvest gate is what
+  refuses an unearned tool, which also closes the traded-tool bypass. Rods
+  stay exempt (the water gate plus the R19 teaching ceiling pace fishing),
+  so the delve rows' clears gate remains their only lock, correctly.
 - **OPEN: the effects have no acquisition path, and the wire command is
   DEV-GATED until they do.** `TOOL_EFFECTS` is catalog only (no item, no
   recipe, no `ItemUse` variant), so no player can obtain an effect and every
@@ -525,8 +585,9 @@ Its own phase because it is the only one that touches persistence and the wire.
   touched **6** golden files: four combat traces re-recorded in `69a6c9a99`
   (the world gained a solid body at every ore and wood node, so mob pathing
   differs, which is geometry moving the stream rather than draw order changing),
-  `professions_gather` re-recorded by the node expansion, and
-  `professions_gather_fine`, which is a NEW golden this branch added.
+  `professions_gather` re-recorded TWICE (the phase 2 relocations first, then
+  the phase 3 expansion), and `professions_gather_fine`, which is a NEW golden
+  this branch added.
 
   The honest statement is therefore: **no golden moved for a draw-order reason,
   and phase 7 moved none at all.** That last part is load-bearing and is why
@@ -566,16 +627,31 @@ Settled with the maintainer during planning. Do not re-litigate.
    to say so.
 6. The delist lands in one move rather than staged behind telemetry, with the
    telemetry counters shipping alongside in the same phase.
+7. Three review-blessed trades, recorded so nobody re-opens them as bugs
+   (review rulings R4, R17, R18): the koi's band-0 weight cut to 1 is
+   deliberate skill-scaling, not a nerf to walk back; the reel-window trim's
+   roughly 17 percent cost to a tier-1 angler is the accepted price of mobile
+   latency headroom; and the Marks-to-copper conversion through delve-bought
+   tools (vendor sell 60/150) is a blessed, bounded, loss-making conversion,
+   because closing it would flag the shared item defs the crafted tools use
+   too.
+8. Map-document scope (review ruling R15): D2 governs SHIPPED content. A
+   custom map document (an editor-only surface today) can stock any item id
+   and sits outside the never-stocked guards; the R37 rollout guard is what
+   keeps shipped zones and maps inside the ruling.
 
 ## Deferred, with reasons
 
 - **Shared node depletion.** Rejected for this packet, see D6. Revisit scoped to
   tier 2 and 3 only, gated on telemetry.
 - **A gathering strike minigame.** The fine-material axis answers the same
-  complaint with far less surface. Revisit only if tools still feel flat after
-  phase 5.
-- **Raising the gathering skill cap.** Nothing exists to put in the back half of
-  a longer bar until node yields vary by tier.
+  complaint with far less surface. The rejection is now PERMANENT by the
+  review's vision ruling (skill identity is content-unique, never
+  mechanics-unique), not merely deferred.
+- **Raising the gathering skill cap.** The "nothing for a longer bar"
+  deferral is RETIRED by the review's vision ruling: the cap rises with
+  zones, and fine grades are that content. The rise itself ships with future
+  zones, not with this packet.
 - **Springback Charm.** See phase 7.
 - **The quest XP curve.** The non-repeatable quests alone pay more than the whole
   level climb, which is the actual reason leveling is fast. Out of scope here.

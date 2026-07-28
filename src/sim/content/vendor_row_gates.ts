@@ -49,13 +49,15 @@
 //    transfer through different doors: none of the six carries `soulbound` or
 //    `bindOnTrade` either.
 //
-// The open ruling is NOT "should these be listable". Framed that way it looks
-// like a one-line content edit; the real choice is whether tool tier should
-// gate at USE time instead of at purchase, which would strand every player who
-// already owns a tool above their proficiency and make 70 a hard prerequisite
-// for the tier-4 recipes. That is the maintainer's call, and deferring it is
-// the conservative side. Until it is made, do not describe this as pacing tool
-// ACCESS; it paces what a merchant will sell you.
+// The ruling is SETTLED (R22, docs/design/professions-tuning-packet-review.md):
+// tool tier WILL gate at wield time (tier 2/3 at gathering 40/70), these
+// purchase gates become advisory, and enforcement moves to the harvest gate,
+// which closes every transfer route above at the moment of use instead of at
+// the counter. Owners are never stripped: a pre-gate tool stays in the bags
+// and wields once its owner reaches the threshold. That lands with the review
+// worklist's phase 13; UNTIL IT DOES, the shipped behavior is exactly what
+// this file implements, so describe the live gate as pacing what a merchant
+// will sell you, never as pacing tool access.
 //
 // DOM-free, rng-free and host-agnostic (src/sim purity, tests/architecture.test.ts).
 

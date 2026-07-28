@@ -375,7 +375,7 @@ guards.
 | vendor land-tool buyValue by tier | src/sim/content/items.ts | 20 / 120 / 400 (tiers 1 to 3) |
 | tiered rod buyValue by tier | src/sim/content/items.ts | 60 / 150 (tiers 2 and 3) |
 | FISH_BITE_DELAY_MIN / MAX / ROD_REDUCTION (sec) | src/sim/professions/fishing.ts | 3 / 8 / 1.5 |
-| FISH_REEL_WINDOW_SEC / ROD_BONUS_SEC | src/sim/professions/fishing.ts | 3 / 0.75 |
+| FISH_REEL_WINDOW_SEC / _ROD_BONUS_SEC / _RARITY_BONUS_SEC | src/sim/professions/fishing.ts | 2.5 / 0.75 / 0.25 |
 | FISHING_SESSION_CAP_SEC | src/sim/types.ts | 15 |
 | FISHING_GAIN_SCHEDULE | src/sim/professions/fishing.ts | 1 below 50, 0.5 below 100, 0.1 below 150, 0.02 below 200 |
 | FISHING_JUNK_GAIN_CUTOFF_PROFICIENCY | src/sim/professions/fishing.ts | 100 |
@@ -419,7 +419,9 @@ rule below can be expressed for them.
 
 Which hub stocks which tier is content, not a constant: each hub sells only the
 tiers its own nodes use (Eastbrook tier 1, Fenbridge tiers 1 to 2, Highwatch
-tiers 1 to 3), with the tiered rods a standing exception at Trader Wilkes.
+tiers 1 to 3). Rods follow the same shape against WATER tiers: Fenbridge and
+Highwatch each stock the rung their own water demands, and Trader Wilkes keeps
+the whole rod ladder as the one buy-ahead counter (review ruling R20).
 
 The gate is a PURCHASE gate on the NPC counter, not a use-time gate. What a tool
 can work is decided solely by `canGatherTier` (`src/sim/professions/tools.ts`),
@@ -434,13 +436,18 @@ player-to-player transfer by market, direct trade or mail attachment, since none
 of the six carries `noMarketList`, `soulbound` or `bindOnTrade`, and the tier-4
 tool recipes consume the tier-3 tools as reagents.
 
-**Open ruling, and it is bigger than it looks.** The question is not "should
-these be listable", which reads like a one-line content edit. It is whether tool
-tier should gate at USE time rather than at purchase. That would strand every
-player already holding a tool above their proficiency and turn 70 into a hard
-prerequisite for the tier-4 recipes, so deferring is the conservative side.
-Until it is settled, describe the gate as pacing what a merchant will sell,
-never as pacing tool access.
+**SETTLED (review ruling R22, superseding the purchase-gate-only model).**
+The question was whether tool tier should gate at USE time rather than at
+purchase, and the answer is USE: land tools gain RuneScape-shaped wield
+requirements (tier 2/3 at gathering 40/70, tiers 4/5 derived under the
+knife-edge rule), the vendor purchase gates become advisory (counters sell
+ahead freely), and enforcement moves to the harvest gate, which also closes
+the traded-tool bypass. Rods are exempt: the water gate and the fishing
+teaching ceiling pace them. Pre-gate owners keep their tools and reach the
+threshold to wield them; nothing is confiscated. Built by the review
+worklist's phase 13; until that phase lands, the shipped behavior is still
+purchase-gate pacing, so describe the LIVE gate as pacing what a merchant
+will sell and the settled DESIGN as wield-time.
 
 One knock-on worth naming: the tier-4 engineering tool recipes consume the
 tier-3 land tools, so buying that reagent from a counter now needs 70 in the

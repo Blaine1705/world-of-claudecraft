@@ -159,8 +159,11 @@ export function harvestYieldItemId(meta: PlayerMeta, node: GatherNodeDef): strin
  * Runs the bonus through `applyEffectBonus`, the same function the grant path
  * uses, rather than re-deriving "+1 if a quality effect is slotted" here. That
  * is deliberate: a second copy of a bonus rule is exactly how a tooltip once
- * promised a second the sim's clamp never gave. One definition, three readers
- * (this pre-gate, the grant, and the tooltip).
+ * promised a second the sim's clamp never gave. One definition, two live
+ * readers (the capacity gates at both ends of the cast, through
+ * harvestYieldItemId, and the grant); the phase 14 grade-preview tooltip
+ * (the review worklist's UX phase) becomes the third when it ships, and it
+ * must read THIS function too.
  *
  * Pure and draw-free, and it never spends a charge: spending belongs to the
  * grant alone (`resolveHarvest`), so asking what a harvest WOULD yield costs

@@ -63,8 +63,13 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
 - `tools.ts` / `stations.ts` / `focus.ts` / `mobile_station.ts`: pure-leaf
   gates and bonuses (gather-tool tier, per-type crafting stations
   (superseding the retired level-20 hub), town focus allocation, field
-  crafting station). Tool effects/charges in `tools.ts` are PARKED dormant:
-  do not wire, do not delete.
+  crafting station). Tool effects/charges in `tools.ts` are LIVE (the tuning
+  packet wired them: slot command, quality/quantity bonuses on the harvest
+  path, deterministic depletion, recharge); the R9 slot policy
+  (`slotToolEffectRefused`) keeps Springback and fishing slots refused until
+  their arms have real behavior.
+- `fishing_zones.ts`: the per-zone rod-tier ladder (`rodTierRequiredForZone`,
+  water gated by the WATER's zone) the cast gate and the vendor rows read.
 - `mastery_reset.ts`: the one-time skill reset behind `masteryResetApplied`;
   `normalizeArchetypeState` must keep running BEFORE `applyMasteryReset`
   (the single load-time reader of pre-reset values).

@@ -534,8 +534,9 @@ describe('the gated tools are stocked somewhere a gated row can be seen', () => 
   });
 
   it('no hub anywhere stocks a land tool above its own zone node tier', () => {
-    // The rule that justifies taking six rows off Eastbrook, DERIVED rather
-    // than enumerated. The hand-written arms in tests/professions_tools.test.ts
+    // The rule that justifies the Eastbrook tool de-stock (the higher-tier
+    // ids came off every counter that carried them), DERIVED rather than
+    // enumerated. The hand-written arms in tests/professions_tools.test.ts
     // are a lower bound per zone ("Fenbridge stocks at least these"), so they
     // could not have caught the bug this change fixes: Eastbrook broke this
     // rule for its whole life and shipped green, and dropping a tier-3 axe onto
@@ -558,8 +559,11 @@ describe('the gated tools are stocked somewhere a gated row can be seen', () => 
     for (const npc of Object.values(NPCS)) {
       for (const itemId of npc.vendorItems ?? []) {
         const use = ITEMS[itemId]?.use;
-        // Land tools only: fishing has no nodes, so the rule cannot be stated
-        // for rods and they are a documented standing exception.
+        // Land tools only: rods pace against WATER tiers, not node tiers
+        // (professions/fishing_zones.ts), and Wilkes deliberately keeps the
+        // whole rod ladder as the buy-ahead counter (R20), so the
+        // node-ceiling rule this arm derives is a land-tool rule; the rod
+        // hub rows have their own pins in professions_tools.test.ts.
         if (use?.type !== 'gatherTool' || use.professionId === 'fishing') continue;
         const zone = zoneAt(npc.pos.z);
         // zoneAt SATURATES: it walks bands by zMax and falls back to the last

@@ -453,9 +453,11 @@ export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'leatherworking',
     resultItemId: 'duskhide_wraps',
     resultCount: 1,
-    // Hide volume (pristine plus rough) tanned at the vats; osmium studs
-    // carry the value (tanner_hesk sells both reagents at the tannery).
-    // Input 461 vs output 420.
+    // Hide volume (pristine plus rough) tanned at the vats; the thorium
+    // studs carry the value. Nothing here is counter-bought since the
+    // delist: thorium is harvest-only (Thornpeak mining), the hides are mob
+    // drops, and tanning_agent is the zone-2 vendor staple. Input 461 vs
+    // output 420 (buyValue basis; delisted materials keep theirs).
     reagents: [
       { itemId: 'thorium_ore', count: 6 },
       { itemId: 'pristine_hide', count: 3 },
@@ -472,8 +474,9 @@ export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'armorcrafting',
     resultItemId: 'sootscale_mantle',
     resultCount: 1,
-    // Ore stays (mail theme) plus smithing_flux volume (both sold by
-    // forgemistress_darva at the forge). Listed input 520 vs output 280:
+    // Ore stays (mail theme) plus smithing_flux volume. Only the flux is
+    // Darva's counter staple; the thorium is harvest-only since the delist.
+    // Listed input 520 vs output 280 (buyValue basis):
     // the output sits below even the cheapest specialized-plus-self-signed
     // consumption (300, the discount-aware economy arm) so the all-vendor
     // loop can never print copper.

@@ -45,11 +45,11 @@ import { type CraftSkills, tierForSkill } from './wheel';
 // past the end of this table and so clamps to its last entry, 16 gold. Everything else taught by a
 // trainer still sits at 0, 25 silver or 1 gold, and the six crafted LAND tools
 // escape the table entirely because they predate training and carry no
-// acquisition list, so they are known rather than learned. Whether a capstone
-// rod should cost sixteen times the next dearest lesson is a balance call the
-// packet records as open (docs/design/professions-tuning-packet.md); the fee
-// itself is derived, not authored per recipe, so moving it means moving this
-// curve or the recipe's skillReq, never a special case.
+// acquisition list, so they are known rather than learned. The derived rod
+// fees (4 gold and 16 gold) are SETTLED (ruling R8 in
+// docs/design/professions-tuning-packet-review.md): the curve stays
+// exception-free, so moving a fee means moving this curve or the recipe's
+// skillReq, never a special case.
 export const TRAINING_FEE_BY_TIER: readonly number[] = Object.freeze([
   0, 2500, 10000, 40000, 160000,
 ]);

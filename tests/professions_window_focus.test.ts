@@ -223,11 +223,12 @@ describe('ProfessionsWindow: mode and row gating', () => {
   });
 
   it('renders no gathering row for an unknown profession id', () => {
-    // Fishing joined GATHERING_NAME_KEYS with Professions 2.0, so
-    // the unknown-id example is skinning (documented in gathering.ts as
-    // deliberately NOT a gathering profession): an id with no
-    // GATHERING_NAME_KEYS entry renders no row BY DESIGN, while the known
-    // ids beside it still render.
+    // Fishing joined the name table with Professions 2.0, so the unknown-id
+    // example is skinning (documented in gathering.ts as deliberately NOT a
+    // gathering profession): an id with no GATHERING_PROFESSION_NAME_KEYS
+    // entry (src/ui/gathering_profession_name.ts, the extracted shared
+    // table) renders no row BY DESIGN, while the known ids beside it still
+    // render.
     const state = baseState();
     state.gathering = [
       { professionId: 'mining', skill: 30, maxSkill: 300 },
