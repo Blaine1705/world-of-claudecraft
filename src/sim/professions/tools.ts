@@ -487,6 +487,12 @@ export function applyEffectBonus(
     case 'quantity':
       return { ...outcome, quantity: outcome.quantity + def.bonus };
     case 'quality':
+      // The shipped bonus of 1 over bare hands (NO_TOOL_OWNED, 0) lands ON
+      // the strict fine threshold, not past it (yieldsFineGrade requires
+      // strictly-above), so a tool-less player cannot mint fine grades. That
+      // margin is exactly one point and is pinned in
+      // tests/professions_tools.test.ts; a bonus above 1 needs a real-tool
+      // floor in the grade resolver first.
       return { ...outcome, gradeToolTier: outcome.gradeToolTier + def.bonus };
     case 'respawnSpeed':
       // Deliberately inert, and this arm is the record of why rather than an

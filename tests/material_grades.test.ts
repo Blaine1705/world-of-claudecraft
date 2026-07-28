@@ -61,13 +61,26 @@ describe('MATERIAL_GRADES table', () => {
     }
   });
 
-  it('no NPC stocks a fine grade (the ruling is about the stock row, not the price)', async () => {
+  it('no counter ANYWHERE stocks a fine grade (the ruling is about the stock row, not the price)', async () => {
     const { NPCS } = await import('../src/sim/data');
+    const { HEROIC_VENDOR_STOCK } = await import('../src/sim/content/heroic_vendor');
+    const { DELVE_SHOPS } = await import('../src/sim/content/delves/shop');
+    // All THREE stock tables, not just NPCS: the heroic quartermaster keeps
+    // its real stock in HEROIC_VENDOR_STOCK (its vendorItems is undefined)
+    // and the delve counters keep theirs in DELVE_SHOPS, so an NPCS-only read
+    // was blind to both. Every fine grade carries a live 4x buyValue, so a
+    // single stock row on any table sells it, whatever the currency.
     const stocked = new Set<string>();
     for (const npc of Object.values(NPCS)) for (const id of npc.vendorItems ?? []) stocked.add(id);
-    // Non-vacuity: the set is real and does carry priced goods, so the
-    // assertions below are a discrimination rather than an empty sweep.
-    expect(stocked.size).toBeGreaterThan(0);
+    for (const offer of HEROIC_VENDOR_STOCK) stocked.add(offer.itemId);
+    for (const entries of Object.values(DELVE_SHOPS)) {
+      for (const entry of entries) stocked.add(entry.itemId);
+    }
+    // Per-table non-vacuity: each table really carries rows, so the sweep is a
+    // discrimination over all three rather than an empty read of a renamed one.
+    expect(Object.values(NPCS).flatMap((n) => n.vendorItems ?? []).length).toBeGreaterThan(0);
+    expect(HEROIC_VENDOR_STOCK.length).toBeGreaterThan(0);
+    expect(Object.values(DELVE_SHOPS).flat().length).toBeGreaterThan(0);
     expect(stocked.has('arcanite_bar'), 'the refined reagent IS stocked').toBe(true);
     for (const row of Object.values(MATERIAL_GRADES)) {
       expect(stocked.has(row.fineItemId), `${row.fineItemId} must not be on any counter`).toBe(

@@ -374,6 +374,38 @@ describe('fishing draw contract (pin 2, the bite-and-reel shape)', () => {
     expect(outcomes.some((c) => c !== null)).toBe(true);
   });
 
+  it('no skilling while dead: a dead player cannot start a fishing session (R31)', () => {
+    // Already enforced (the dead gate at the top of startFishing); pinned
+    // beside the harvest twin (tests/gather_node_harvest.test.ts) so the pair
+    // cannot rot apart: R31 leans on death actually stopping the skilling.
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    p.dead = true;
+    p.hp = 0;
+    sim.events = [];
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      startFishing(sim.ctx, p, meta);
+      expect(p.castingAbility).toBeNull();
+      expect(draws).toBe(0);
+      expect(sim.events).toContainEqual(
+        expect.objectContaining({ type: 'error', text: "You can't do that while dead." }),
+      );
+      // The positive control: the same fixture alive really can cast, so the
+      // refusal above is the dead gate and not a broken shore or missing pole.
+      p.dead = false;
+      p.hp = 1;
+      startFishing(sim.ctx, p, meta);
+      expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    } finally {
+      sim.rng.setObserver(null);
+    }
+  });
+
   it('a missed reel window draws nothing more: one draw total, and only the cast is lost', () => {
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;

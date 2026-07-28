@@ -1133,4 +1133,60 @@ describe('fine material grades on the live harvest path', () => {
     expect(castAndComplete(sim, MIREFEN_T2, pid)).toBe(true);
     expect(sim.countItem('fine_iron_ore', pid)).toBeGreaterThanOrEqual(2);
   });
+
+  it('a slotted-effect owner still draws exactly two at the COMMAND boundary', () => {
+    // The unit-level pin (professions_rarity_roll.test.ts) drives
+    // resolveHarvest directly, so a draw added on the command path AROUND it
+    // (the pre-gate resolver, the depletion arm, the cast lifecycle) would
+    // slip past. Drive the real command with an effect slotted: the whole
+    // harvestNode -> cast -> completeGatherCast chain must stay at the pinned
+    // two draws, and the charge spend proves the effect actually fired
+    // (deterministic depletion, not a third roll).
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('iron_mining_pick', 1, pid);
+    sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
+    const meta = mustMeta(sim, pid);
+    const chargesBefore = meta.toolEffectSlots?.mining?.durability ?? 0;
+    expect(chargesBefore).toBeGreaterThan(0);
+    teleportOntoNode(sim, pid, MIREFEN_T2);
+    let draws = 0;
+    (sim as any).rng.setObserver(() => {
+      draws++;
+    });
+    expect(sim.harvestNode(MIREFEN_T2, pid)).toBe(true);
+    completeCastNow(sim, pid);
+    expect(draws).toBe(2);
+    expect(sim.countItem('fine_iron_ore', pid)).toBeGreaterThanOrEqual(1);
+    expect(meta.toolEffectSlots?.mining?.durability).toBe(chargesBefore - 1);
+  });
+
+  it('no skilling while dead: a dead player cannot start a harvest at all (R31)', () => {
+    // Already enforced (the vendor-family dead gate at the top of
+    // harvestNode); pinned here so it cannot rot, because R31 records the
+    // Thornpeak tier-1 faucet as ACCEPTED partly on the strength of "a zone
+    // lethal to a level-1 while ALIVE", which assumes death really stops the
+    // farming.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('iron_mining_pick', 1, pid);
+    teleportOntoNode(sim, pid, MIREFEN_T2);
+    const p = mustEntity(sim, pid);
+    p.dead = true;
+    p.hp = 0;
+    let draws = 0;
+    (sim as any).rng.setObserver(() => {
+      draws++;
+    });
+    sim.drainEvents();
+    expect(sim.harvestNode(MIREFEN_T2, pid)).toBe(false);
+    const ev = sim.drainEvents();
+    expect(ev.some((e) => e.type === 'error' && e.text === "You can't do that while dead.")).toBe(
+      true,
+    );
+    expect(p.castingAbility).toBeNull();
+    expect(draws).toBe(0);
+    // And the denial spent nothing: the personal respawn timer is untouched.
+    expect(sim.nodeHarvestableByMeFor(MIREFEN_T2, pid)).toBe(true);
+  });
 });

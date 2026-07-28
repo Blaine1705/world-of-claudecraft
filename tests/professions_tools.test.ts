@@ -4,6 +4,7 @@ import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { TOOL_EFFECTS } from '../src/sim/content/professions';
 import { VENDOR_ROW_GATES } from '../src/sim/content/vendor_row_gates';
 import { GATHER_NODES, ITEMS, NPCS } from '../src/sim/data';
+import { MATERIAL_GRADES, yieldsFineGrade } from '../src/sim/professions/material_grades';
 import {
   applyEffectBonus,
   BARE_HANDS_TOOL_TIER,
@@ -93,8 +94,9 @@ describe('gathering tool tier gating (#1123)', () => {
     ]) {
       expect(eastbrook, `${toolId} is above Eastbrook's own node tier`).not.toContain(toolId);
     }
-    // The tiered rods are the deliberate exception and stay at Wilkes: fishing
-    // has no nodes for the hub rule to be expressed against.
+    // Wilkes keeps the WHOLE rod ladder as the one buy-ahead counter (R20):
+    // fishing water has a tier of its own (professions/fishing_zones.ts), and
+    // the hubs each stock the rung their own water needs (pinned below).
     expect(NPCS.trader_wilkes.vendorItems).toContain('ironreel_fishing_rod');
     expect(NPCS.trader_wilkes.vendorItems).toContain('silverstream_fishing_rod');
   });
@@ -102,6 +104,12 @@ describe('gathering tool tier gating (#1123)', () => {
   it('the zone 2 and zone 3 hubs stock the tool tiers their own nodes use (#2343)', () => {
     // Load-bearing content under the always-require-tool rule: without these
     // rows a toolless traveler could not gather anywhere outside Eastbrook.
+    // The two ROD rows are load-bearing the same way (the phase 6 no-strand
+    // story): each hub's own water demands that rung
+    // (professions/fishing_zones.ts), so without the row the marsh or the
+    // peaks would be the one place demanding a tool no local counter carries.
+    // They are pinned HERE because two stale comments used to invite exactly
+    // their deletion.
     const fenbridge = NPCS.provisioner_hale.vendorItems ?? [];
     for (const toolId of [
       'copper_mining_pick',
@@ -110,6 +118,7 @@ describe('gathering tool tier gating (#1123)', () => {
       'felling_axe',
       'gathering_sickle',
       'bronze_sickle',
+      'ironreel_fishing_rod',
     ]) {
       expect(fenbridge).toContain(toolId);
     }
@@ -124,6 +133,7 @@ describe('gathering tool tier gating (#1123)', () => {
       'gathering_sickle',
       'bronze_sickle',
       'silverleaf_sickle',
+      'silverstream_fishing_rod',
     ]) {
       expect(highwatch).toContain(toolId);
     }
@@ -871,6 +881,23 @@ describe('tool effect slotting, on the axes the live harvest path has', () => {
     const bonused = applyEffectBonus(slot, baseOutcome);
     expect(bonused.gradeToolTier).toBe(baseOutcome.gradeToolTier + 1);
     expect(bonused.quantity).toBe(baseOutcome.quantity);
+  });
+
+  it('a quality effect over BARE HANDS misses the fine threshold by exactly one point', () => {
+    // NO_TOOL_OWNED is 0 and the lowest gatherTier in the grade table is 1,
+    // so the shipped bonus of 1 lands the effective tier ON the strict
+    // threshold (1 > 1 is false) and a tool-less player can never mint a
+    // fine grade. The margin is exactly ONE point: a future bonus-2 quality
+    // effect would clear it and mint fine grades bare-handed, so if a bigger
+    // bonus ever ships, the grade resolver needs a real-tool floor first.
+    const slot = slotEffect('artisans_eye');
+    const boosted = applyEffectBonus(slot, { quantity: 1, gradeToolTier: NO_TOOL_OWNED });
+    const minGatherTier = Math.min(...Object.values(MATERIAL_GRADES).map((row) => row.gatherTier));
+    expect(minGatherTier).toBe(1);
+    expect(boosted.gradeToolTier).toBe(1);
+    expect(yieldsFineGrade(minGatherTier, minGatherTier, boosted.gradeToolTier)).toBe(false);
+    // The counterfactual that names the margin: one more point flips it.
+    expect(yieldsFineGrade(minGatherTier, minGatherTier, boosted.gradeToolTier + 1)).toBe(true);
   });
 
   it('the quality effect raises what comes OUT of a vein, never which veins open', () => {

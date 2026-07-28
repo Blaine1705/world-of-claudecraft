@@ -8,6 +8,8 @@
 // material keeps its buyValue, which is the basis reagentUnitValue reads in
 // tests/recipe_economy.test.ts. That split is pinned below in both directions.
 import { describe, expect, it } from 'vitest';
+import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
+import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import {
   HARVEST_COMPONENT_ITEMS,
@@ -51,17 +53,44 @@ function liveFishingCatches(): string[] {
   return [...ids].sort();
 }
 
-/** Every id any NPC anywhere stocks, mapped to the NPCs stocking it. */
-function stockedByNpc(): Map<string, string[]> {
+/**
+ * Every id ANY counter anywhere stocks (copper NPCs, the heroic
+ * quartermaster's Marks counter, the delve shops), mapped to its sellers.
+ * The union is the point: NPCS.heroic_quartermaster carries `vendorItems:
+ * undefined` and keeps its real stock in HEROIC_VENDOR_STOCK, and the delve
+ * counters keep theirs in DELVE_SHOPS, so an NPCS-only read was blind to
+ * both (the exact hole the phase-7 tool guard closed). Every fine grade and
+ * every material carries a live buyValue, so ONE stock row on ANY of the
+ * three tables sells it; the ruling is about the row, whatever the currency.
+ */
+function stockedAnywhere(): Map<string, string[]> {
   const stocked = new Map<string, string[]>();
+  const add = (itemId: string, seller: string) => {
+    const sellers = stocked.get(itemId);
+    if (sellers) sellers.push(seller);
+    else stocked.set(itemId, [seller]);
+  };
   for (const [npcId, npc] of Object.entries(NPCS)) {
-    for (const itemId of npc.vendorItems ?? []) {
-      const sellers = stocked.get(itemId);
-      if (sellers) sellers.push(npcId);
-      else stocked.set(itemId, [npcId]);
-    }
+    for (const itemId of npc.vendorItems ?? []) add(itemId, `npc:${npcId}`);
+  }
+  for (const offer of HEROIC_VENDOR_STOCK) add(offer.itemId, 'heroic_quartermaster');
+  for (const [delveId, entries] of Object.entries(DELVE_SHOPS)) {
+    for (const entry of entries) add(entry.itemId, `delve:${delveId}`);
   }
   return stocked;
+}
+
+/** Per-table teeth for every sweep below: each of the three tables is
+ *  non-empty AND the union really folded it (a broken iteration, a renamed
+ *  field, or an emptied table all fail here rather than reading as a pass). */
+function assertAllThreeTablesFolded(stocked: Map<string, string[]>): void {
+  const sellers = [...stocked.values()].flat();
+  expect(sellers.filter((s) => s.startsWith('npc:')).length).toBeGreaterThan(20);
+  expect(HEROIC_VENDOR_STOCK.length).toBeGreaterThan(0);
+  expect(Object.values(DELVE_SHOPS).flat().length).toBeGreaterThan(0);
+  expect(stocked.get(HEROIC_VENDOR_STOCK[0].itemId)).toContain('heroic_quartermaster');
+  const [firstDelveId, firstEntries] = Object.entries(DELVE_SHOPS)[0];
+  expect(stocked.get(firstEntries[0].itemId)).toContain(`delve:${firstDelveId}`);
 }
 
 /** The live node yields, derived from the content table so the list cannot rot. */
@@ -80,30 +109,31 @@ function stockOf(npcs: Record<string, { vendorItems?: readonly string[] }>, id: 
 }
 
 describe('the no-NPC-stocks-a-gathered-material ruling', () => {
-  it('no NPC anywhere stocks any live node yield', () => {
-    const stocked = stockedByNpc();
+  it('no counter anywhere stocks any live node yield', () => {
+    const stocked = stockedAnywhere();
     const yields = liveNodeYields();
     // Non-vacuity: the scan must have a real corpus on both sides, or a broken
     // table read would pass this by finding nothing to check.
     expect(yields.length).toBe(9);
-    expect(stocked.size).toBeGreaterThan(20);
+    assertAllThreeTablesFolded(stocked);
     for (const itemId of yields) {
-      expect(stocked.get(itemId) ?? [], `${itemId} is stocked by an NPC`).toEqual([]);
+      expect(stocked.get(itemId) ?? [], `${itemId} is stocked by a counter`).toEqual([]);
     }
   });
 
   it('the scan is live: arcanite_bar, refined and never gathered, IS still stocked', () => {
     // The counterexample that makes the sweep above decisive. Without it a
-    // stockedByNpc() that silently returned an empty map would read as a pass.
-    const stocked = stockedByNpc();
+    // stockedAnywhere() that silently returned an empty map would read as a pass.
+    const stocked = stockedAnywhere();
     expect(stocked.get(REFINED_PREMIUM_REAGENT) ?? []).not.toEqual([]);
     expect(liveNodeYields()).not.toContain(REFINED_PREMIUM_REAGENT);
   });
 
-  it('no NPC stocks a monster material, a specimen, or anything a cast lands', () => {
-    const stocked = stockedByNpc();
+  it('no counter stocks a monster material, a specimen, or anything a cast lands', () => {
+    const stocked = stockedAnywhere();
     const monster = liveMonsterMaterials();
     const catches = liveFishingCatches();
+    assertAllThreeTablesFolded(stocked);
     // Non-vacuity, and a live-corpus floor rather than an exact count: these are
     // derived from content that is expected to GROW, and a pin that has to be
     // edited on every addition is a pin that gets edited without thought.
@@ -117,7 +147,7 @@ describe('the no-NPC-stocks-a-gathered-material ruling', () => {
     for (const itemId of [...monster, ...catches]) {
       // An id with no ItemDef would make its own row vacuously pass.
       expect(ITEMS[itemId], `${itemId} has no ItemDef`).toBeDefined();
-      expect(stocked.get(itemId) ?? [], `${itemId} is stocked by an NPC`).toEqual([]);
+      expect(stocked.get(itemId) ?? [], `${itemId} is stocked by a counter`).toEqual([]);
     }
   });
 

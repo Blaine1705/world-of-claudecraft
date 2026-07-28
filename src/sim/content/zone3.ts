@@ -1116,7 +1116,9 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'windguard_leggings',
       // Gathering tools (#2343: every node harvest needs a matching tool, so
       // each zone hub stocks the tiers its own nodes use; Thornpeak has
-      // tier-1 through tier-3 nodes). Tiered rods stay a Wilkes exclusive.
+      // tier-1 through tier-3 nodes). Rods follow the same rule now that
+      // water has a tier: the silverstream row below is this hub's rung, and
+      // Wilkes keeps the whole ladder as the buy-ahead counter (R20).
       'copper_mining_pick',
       'iron_mining_pick',
       'mithril_mining_pick',

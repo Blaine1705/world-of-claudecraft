@@ -8,7 +8,7 @@ import {
 } from '../src/sim/professions/gathering';
 import { canGatherTier, slotEffect, type ToolEffectSlot } from '../src/sim/professions/tools';
 import { Rng } from '../src/sim/rng';
-import type { PlayerMeta } from '../src/sim/sim';
+import { type PlayerMeta, Sim } from '../src/sim/sim';
 
 const TIERS: MaterialRarity[] = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
 
@@ -235,8 +235,31 @@ describe('a slotted tool effect changes the yield and never the draw stream', ()
       new Rng(4242),
     );
     expect(withEye.itemId).toBe('fine_copper_ore');
-    // Access is untouched: the effect raises only the grade comparison, so a
-    // tier-1 tool still cannot work a tier-2 vein.
+    // Access is untouched, proven through the REAL command rather than the
+    // helper in isolation: the old pin here called canGatherTier(1, 2), which
+    // stays false even if harvestNode started feeding the BOOSTED tier into
+    // the access gate, the exact regression it claimed to guard. Drive the
+    // command: a tier-1 pick with a slotted quality effect at a tier-2 vein
+    // must be denied at harvestNode, with the denial naming the real tier.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Access');
+    sim.addItem('copper_mining_pick', 1, pid);
+    sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
+    const slotted = (sim.players.get(pid) as PlayerMeta).toolEffectSlots?.mining;
+    expect(slotted?.effectId, 'the effect really is slotted').toBe('artisans_eye');
+    const t2 = GATHER_NODES.find((n) => n.id === 'ore_mirefen_t2');
+    if (!t2) throw new Error('missing ore_mirefen_t2');
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error('missing player entity');
+    p.pos.x = t2.pos.x;
+    p.pos.z = t2.pos.z;
+    p.prevPos = { ...p.pos };
+    sim.drainEvents();
+    expect(sim.harvestNode(t2.id, pid)).toBe(false);
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
+      { type: 'gatherDenied', pid, surface: 'node', professionId: 'mining', requiredTier: 2 },
+    ]);
+    // The helper-level statement of the same separation still holds.
     expect(canGatherTier(1, 2)).toBe(false);
   });
 });
