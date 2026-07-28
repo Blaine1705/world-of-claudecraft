@@ -1439,27 +1439,47 @@ export const ZONE1_QUEST_ORDER = [
 // rendered world and the corrected map both put -x on your right).
 // ---------------------------------------------------------------------------
 
+// STARTER PACING: every packed camp whose disc reaches within 100 yd of the town
+// hub is spaced so adjacent mobs stand at least 11.5 yd apart (radius / sqrt(count),
+// camp_scatter.ts), no two camp discs interleave, and no disc comes closer than
+// 38 yd to the hub. Below that the packs chain-pull: aggro radii here run 9-13 yd,
+// so a camp scattered tighter than its own aggro radius drags neighbours onto a
+// level-1 player. The lever is spacing only; aggroRadius and the social-aggro
+// flee-rally (src/sim/mob/social_aggro.ts) are deliberately unchanged. Camps were
+// pushed OUTWARD along their existing bearing so each stays in its own subzone.
+// Guarded by tests/eastbrook_camp_spacing.test.ts. Row ORDER is a determinism
+// contract (see the CAMPS merge in data.ts): edit values, never reorder.
 export const ZONE1_CAMPS: CampDef[] = [
   // Wolves: north woods
-  { mobId: 'forest_wolf', center: { x: -15, z: 55 }, radius: 22, count: 7 },
-  { mobId: 'forest_wolf', center: { x: 20, z: 70 }, radius: 20, count: 6 },
-  { mobId: 'old_greyjaw', center: { x: 0, z: 95 }, radius: 8, count: 1 },
+  { mobId: 'forest_wolf', center: { x: -25, z: 65 }, radius: 31, count: 7 },
+  { mobId: 'forest_wolf', center: { x: 28, z: 70 }, radius: 29, count: 6 },
+  // Nudged north to stay ahead of the widened wolf runs (q_greyjaw sends the
+  // player to "the deep woods north of the wolf runs").
+  { mobId: 'old_greyjaw', center: { x: 0, z: 100 }, radius: 8, count: 1 },
   // Boars: east meadow
-  { mobId: 'wild_boar', center: { x: 55, z: 12 }, radius: 22, count: 6 },
-  { mobId: 'wild_boar', center: { x: 80, z: -15 }, radius: 18, count: 5 },
+  { mobId: 'wild_boar', center: { x: 64, z: 22 }, radius: 29, count: 6 },
+  { mobId: 'wild_boar', center: { x: 80, z: -26 }, radius: 26, count: 5 },
   { mobId: 'mogger', center: { x: 118, z: -26 }, radius: 5, count: 1 },
   // Spiders: western woods
-  { mobId: 'webwood_spider', center: { x: -60, z: 5 }, radius: 22, count: 7 },
-  // Murlocs: lake shore northwest — camp straddles the waterline
+  { mobId: 'webwood_spider', center: { x: -69, z: 5 }, radius: 31, count: 7 },
+  // Murlocs: lake shore northwest, camp straddles the waterline. NOT widened, on
+  // purpose: the terrain flatten disc is radius * 1.8, so a radius that reaches
+  // 11.5 yd spacing for 8 mobs drags a 59 yd flatten across Mirror Lake and lifts
+  // its bed above swim depth (the lake stops needing a swim and stops painting as
+  // water). Measured ceiling with the lake intact is radius ~16.5, about 5.8 yd
+  // spacing, so spacing cannot fix this camp; a lower count would. See the
+  // exemption and the lake-integrity guard in tests/eastbrook_camp_spacing.test.ts.
   { mobId: 'mudfin_murloc', center: { x: -75, z: 57 }, radius: 14, count: 8 },
-  // Kobolds: mine southwest
-  { mobId: 'tunnel_rat', center: { x: -82, z: -62 }, radius: 20, count: 9 },
-  // Bandits: southeast camp
-  { mobId: 'vale_bandit', center: { x: 65, z: -65 }, radius: 24, count: 7 },
+  // Kobolds: mine southwest. Held in place (the mine and its colliders are here);
+  // only the scatter radius opens up.
+  { mobId: 'tunnel_rat', center: { x: -82, z: -62 }, radius: 35, count: 9 },
+  // Bandits: southeast camp. Shifted off its own campfire collider and away from
+  // the boar meadow; the tents, crates and supply drops all stay inside the disc.
+  { mobId: 'vale_bandit', center: { x: 52, z: -69 }, radius: 31, count: 7 },
   { mobId: 'vale_bandit', center: { x: 90, z: -90 }, radius: 16, count: 5 },
   { mobId: 'gorrak', center: { x: 92, z: -92 }, radius: 2, count: 1 },
   // Undead: ruins northeast
-  { mobId: 'restless_bones', center: { x: 80, z: 78 }, radius: 18, count: 8 },
+  { mobId: 'restless_bones', center: { x: 82, z: 78 }, radius: 33, count: 8 },
   { mobId: 'captain_verlan', center: { x: 92, z: 90 }, radius: 4, count: 1 },
 ];
 
