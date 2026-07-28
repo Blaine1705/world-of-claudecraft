@@ -27,13 +27,14 @@ describe('Seeker entitlement claim', () => {
   it('verifies native attestation, linked wallet, SGT ownership, and permanent claim', async () => {
     const claim = vi.fn().mockResolvedValue('claimed');
     const verifyArtifact = vi.fn().mockResolvedValue({ nonce: 'nonce' });
+    const findToken = vi.fn().mockResolvedValue({ mint: 'unique-mint', slot: 123 });
     setSeekerEntitlementRuntimeForTests({
       verifySeekerSolanaArtifactAttestation: verifyArtifact,
       walletForAccount: vi.fn().mockResolvedValue({
         pubkey: 'wallet',
         linked_at: '2026-01-01T00:00:00Z',
       }),
-      findSeekerGenesisToken: vi.fn().mockResolvedValue({ mint: 'unique-mint', slot: 123 }),
+      findSeekerGenesisToken: findToken,
       claimSeekerEntitlement: claim,
     });
     const req = makeReq({
@@ -60,6 +61,7 @@ describe('Seeker entitlement claim', () => {
       proofVersion: 'sgt-v1',
       verificationSlot: 123,
     });
+    expect(findToken).toHaveBeenCalledWith('wallet', undefined, expect.any(AbortSignal));
   });
 
   it('fails closed for web calls, invalid attestation, missing SGT, and consumed mint', async () => {
@@ -197,5 +199,36 @@ describe('Seeker entitlement claim', () => {
       findSeekerGenesisToken: vi.fn().mockResolvedValue({ mint: 'different-mint', slot: 456 }),
     });
     await expect(verifyCurrentSeekerEntitlement(42)).resolves.toBe(false);
+  });
+
+  it('coalesces duplicate ownership hydration and RPC work for one account', async () => {
+    let release!: (value: { mint: string; slot: number } | null) => void;
+    const claimForAccount = vi
+      .fn()
+      .mockResolvedValue({ mint: 'claimed-mint', claimantWallet: 'original-wallet' });
+    const walletForAccount = vi.fn().mockResolvedValue({
+      pubkey: 'current-primary-wallet',
+      linked_at: '2026-01-01T00:00:00Z',
+    });
+    const findToken = vi.fn(
+      () =>
+        new Promise<{ mint: string; slot: number } | null>((resolve) => {
+          release = resolve;
+        }),
+    );
+    setSeekerEntitlementRuntimeForTests({
+      seekerEntitlementForAccount: claimForAccount,
+      walletForAccount,
+      findSeekerGenesisToken: findToken,
+    });
+
+    const first = verifyCurrentSeekerEntitlement(42);
+    const second = verifyCurrentSeekerEntitlement(42);
+    await vi.waitFor(() => expect(findToken).toHaveBeenCalledTimes(1));
+    expect(claimForAccount).toHaveBeenCalledTimes(1);
+    expect(walletForAccount).toHaveBeenCalledTimes(1);
+    release({ mint: 'claimed-mint', slot: 456 });
+
+    await expect(Promise.all([first, second])).resolves.toEqual([true, true]);
   });
 });

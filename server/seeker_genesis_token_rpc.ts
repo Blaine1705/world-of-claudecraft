@@ -189,9 +189,12 @@ export async function findSeekerGenesisToken(
   walletAddress: string,
   rpcUrl = process.env.SOLANA_RPC_URL ?? '',
   signal?: AbortSignal,
+  requiredMint?: string,
 ): Promise<VerifiedSeekerGenesisToken | null> {
   const owner = canonicalPublicKey(walletAddress);
-  if (!rpcUrl || !owner) return null;
+  const canonicalRequiredMint =
+    requiredMint === undefined ? undefined : canonicalPublicKey(requiredMint);
+  if (!rpcUrl || !owner || (requiredMint !== undefined && !canonicalRequiredMint)) return null;
 
   let mints: string[];
   let slot: number | null;
@@ -208,7 +211,12 @@ export async function findSeekerGenesisToken(
     )) as TokenAccountsResult;
     const addresses = boundedPositiveTokenMintAddresses(result?.value);
     if (!addresses) return null;
-    mints = addresses;
+    if (canonicalRequiredMint) {
+      if (!addresses.includes(canonicalRequiredMint)) return null;
+      mints = [canonicalRequiredMint];
+    } else {
+      mints = [...addresses].sort();
+    }
     slot = Number.isSafeInteger(result?.context?.slot) ? (result.context?.slot as number) : null;
   } catch {
     return null;

@@ -16,6 +16,7 @@ import {
   createSeekerOwnershipVerifier,
   type SeekerOwnershipVerifier,
 } from './seeker_ownership_verifier';
+import { seekerRpcExecutor } from './seeker_rpc_executor';
 import { isNativeAppRequest } from './web_login_guard';
 
 interface SeekerEntitlementRuntime {
@@ -43,8 +44,8 @@ function makeCurrentOwnershipVerifier(): SeekerOwnershipVerifier {
   return createSeekerOwnershipVerifier({
     claimForAccount: (accountId) => runtime.seekerEntitlementForAccount(accountId),
     walletForAccount: (accountId) => runtime.walletForAccount(accountId),
-    findToken: (walletAddress, signal) =>
-      runtime.findSeekerGenesisToken(walletAddress, undefined, signal),
+    findToken: (walletAddress, signal, requiredMint) =>
+      runtime.findSeekerGenesisToken(walletAddress, undefined, signal, requiredMint),
   });
 }
 
@@ -100,7 +101,9 @@ export async function handleSeekerEntitlementStatus(
 }
 
 export async function verifyCurrentSeekerEntitlement(accountId: number): Promise<boolean> {
-  return currentOwnershipVerifier.verify(accountId);
+  return seekerRpcExecutor
+    .run(`ownership:${accountId}`, (signal) => currentOwnershipVerifier.verify(accountId, signal))
+    .catch(() => false);
 }
 
 export async function handleSeekerEntitlementClaim(
@@ -128,15 +131,29 @@ export async function handleSeekerEntitlementClaim(
     });
     return;
   }
-  const wallet = await runtime.walletForAccount(accountId);
-  if (!wallet) {
+  const verification = await seekerRpcExecutor
+    .run(`claim:${accountId}`, async (signal) => {
+      const wallet = await runtime.walletForAccount(accountId);
+      if (!wallet || signal.aborted) return { wallet, token: null };
+      const token = await runtime.findSeekerGenesisToken(wallet.pubkey, undefined, signal);
+      return { wallet, token };
+    })
+    .catch(() => null);
+  if (!verification) {
+    json(res, 403, {
+      error: 'verified Seeker Genesis Token required',
+      code: 'seeker.genesis_token_required',
+    });
+    return;
+  }
+  if (!verification.wallet) {
     json(res, 409, {
       error: 'link and verify a wallet first',
       code: 'seeker.wallet_required',
     });
     return;
   }
-  const token = await runtime.findSeekerGenesisToken(wallet.pubkey);
+  const { token, wallet } = verification;
   if (!token) {
     json(res, 403, {
       error: 'verified Seeker Genesis Token required',

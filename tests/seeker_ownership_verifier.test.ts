@@ -2,46 +2,30 @@ import { describe, expect, it, vi } from 'vitest';
 import { createSeekerOwnershipVerifier } from '../server/seeker_ownership_verifier';
 
 describe('Seeker ownership verifier', () => {
-  it('coalesces concurrent verification for the same account into one RPC call', async () => {
-    let release!: (value: { mint: string } | null) => void;
-    const findToken = vi.fn(
-      () =>
-        new Promise<{ mint: string } | null>((resolve) => {
-          release = resolve;
-        }),
-    );
+  it('checks only the persisted mint using the executor deadline', async () => {
+    const findToken = vi.fn(async () => ({ mint: 'sgt' }));
     const verifier = createSeekerOwnershipVerifier({
       claimForAccount: vi.fn(async () => ({ mint: 'sgt' })),
       walletForAccount: vi.fn(async () => ({ pubkey: 'wallet' })),
       findToken,
     });
 
-    const first = verifier.verify(42);
-    const second = verifier.verify(42);
-    await vi.waitFor(() => expect(findToken).toHaveBeenCalledTimes(1));
-    release({ mint: 'sgt' });
-
-    await expect(Promise.all([first, second])).resolves.toEqual([true, true]);
-    expect(findToken).toHaveBeenCalledTimes(1);
+    const signal = AbortSignal.timeout(1_000);
+    await expect(verifier.verify(42, signal)).resolves.toBe(true);
+    expect(findToken).toHaveBeenCalledWith('wallet', signal, 'sgt');
   });
 
-  it('aborts a stalled RPC and fails closed', async () => {
-    const findToken = vi.fn(
-      (_wallet: string, signal: AbortSignal) =>
-        new Promise<{ mint: string } | null>((_resolve, reject) => {
-          signal.addEventListener('abort', () => reject(signal.reason), { once: true });
-        }),
-    );
-    const verifier = createSeekerOwnershipVerifier(
-      {
-        claimForAccount: vi.fn(async () => ({ mint: 'sgt' })),
-        walletForAccount: vi.fn(async () => ({ pubkey: 'wallet' })),
-        findToken,
-      },
-      10,
-    );
+  it('fails closed when the bounded RPC executor rejects', async () => {
+    const findToken = vi.fn(async () => {
+      throw new Error('RPC unavailable');
+    });
+    const verifier = createSeekerOwnershipVerifier({
+      claimForAccount: vi.fn(async () => ({ mint: 'sgt' })),
+      walletForAccount: vi.fn(async () => ({ pubkey: 'wallet' })),
+      findToken,
+    });
 
-    await expect(verifier.verify(42)).resolves.toBe(false);
+    await expect(verifier.verify(42, AbortSignal.timeout(1_000))).resolves.toBe(false);
     expect(findToken).toHaveBeenCalledTimes(1);
   });
 });

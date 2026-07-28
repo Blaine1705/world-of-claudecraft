@@ -1,44 +1,37 @@
 export interface SeekerOwnershipVerifierDeps {
   claimForAccount(accountId: number): Promise<{ mint: string } | null>;
   walletForAccount(accountId: number): Promise<{ pubkey: string } | null>;
-  findToken(walletAddress: string, signal: AbortSignal): Promise<{ mint: string } | null>;
+  findToken(
+    walletAddress: string,
+    signal: AbortSignal,
+    requiredMint: string,
+  ): Promise<{ mint: string } | null>;
 }
 
 export interface SeekerOwnershipVerifier {
-  verify(accountId: number): Promise<boolean>;
+  verify(accountId: number, signal: AbortSignal): Promise<boolean>;
 }
 
 /**
- * Verify current SGT ownership before a spin. Concurrent requests for one account
- * share one RPC flight, and the abort signal bounds the underlying HTTP work.
+ * Verify current SGT ownership before a spin. Admission, single-flight, and the
+ * request deadline are owned by the caller's process-wide bounded executor.
  */
 export function createSeekerOwnershipVerifier(
   deps: SeekerOwnershipVerifierDeps,
-  timeoutMs = 5_000,
 ): SeekerOwnershipVerifier {
-  const flights = new Map<number, Promise<boolean>>();
-
   return {
-    verify(accountId) {
-      const existing = flights.get(accountId);
-      if (existing) return existing;
-
-      const signal = AbortSignal.timeout(timeoutMs);
-      const flight = Promise.all([
-        deps.claimForAccount(accountId),
-        deps.walletForAccount(accountId),
-      ])
-        .then(async ([claim, wallet]) => {
-          if (!claim || !wallet) return false;
-          const token = await deps.findToken(wallet.pubkey, signal);
-          return token?.mint === claim.mint;
-        })
-        .catch(() => false)
-        .finally(() => {
-          if (flights.get(accountId) === flight) flights.delete(accountId);
-        });
-      flights.set(accountId, flight);
-      return flight;
+    async verify(accountId, signal) {
+      try {
+        const [claim, wallet] = await Promise.all([
+          deps.claimForAccount(accountId),
+          deps.walletForAccount(accountId),
+        ]);
+        if (!claim || !wallet || signal.aborted) return false;
+        const token = await deps.findToken(wallet.pubkey, signal, claim.mint);
+        return token?.mint === claim.mint;
+      } catch {
+        return false;
+      }
     },
   };
 }
