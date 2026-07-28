@@ -452,8 +452,12 @@ const SELF_MOTION_HANDOFF_RATE = 15;
 // near-black, so non-composer tiers ride a higher floor. The grade-only
 // medium tier sits between: its grade supplies the shadow lift but it has
 // no AO/bloom softening the extremes.
-const HEMI_INTENSITY_COMPOSER = 0.33;
-const HEMI_INTENSITY_GRADE = 0.37;
+// Shadow DARKNESS is the other half of felt sunlight: at hemi 0.33 +
+// env 0.45 the fill lifted building and hill shadows until they read as
+// dirt-colour variation, not shade (BSL-class looks run visibly darker,
+// cooler shadow regions). Key up / both fills down buys the contrast.
+const HEMI_INTENSITY_COMPOSER = 0.3;
+const HEMI_INTENSITY_GRADE = 0.35;
 const HEMI_INTENSITY_FLAT = 0.42;
 const hemiOutdoorIntensity = (): number =>
   GFX.composer
@@ -461,8 +465,8 @@ const hemiOutdoorIntensity = (): number =>
     : GFX.gradePass
       ? HEMI_INTENSITY_GRADE
       : HEMI_INTENSITY_FLAT;
-const SUN_INTENSITY = 3.1;
-const ENV_INTENSITY = 0.45;
+const SUN_INTENSITY = 3.35;
+const ENV_INTENSITY = 0.4;
 // dungeon interiors: kill the daylight so torchlight carries the scene
 // (env at 0.15 still lit rigs sky-blue against the pitch-dark crypt)
 const DUNGEON_SUN_INTENSITY = 0.3;

@@ -418,7 +418,7 @@ function buildSplatMaterial(
     roughness: 1.0,
     metalness: 0,
     normalMap: normalTex,
-    normalScale: new THREE.Vector2(0.85, 0.85),
+    normalScale: new THREE.Vector2(1.15, 1.15),
   });
   mat.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, brush);
@@ -522,12 +522,16 @@ function buildSplatMaterial(
         // out past the distance where mips flatten the fine one, and grass
         // (whose own AO sheet is near-uniform) takes it at full weight so
         // meadows undulate instead of rendering as one green wash
-        float relief = cavH * 3.4 + wocGroundMacroRelief(tuv) * (0.5 + vSplat.x * 0.5) * 2.8;
+        float relief = cavH * 5.0 + wocGroundMacroRelief(tuv) * (0.5 + vSplat.x * 0.5) * 4.2;
         // turf lip: where grass feathers into bare soil (roads, patches),
         // shade the transition band so paths sit INTO the meadow as worn
-        // hollows instead of lying on it as paint
-        float rim = vSplat.y * (1.0 - vSplat.y) * 4.0;
-        float groundShade = mix(1.0, clamp(1.0 + relief, 0.42, 1.25) * (1.0 - rim * 0.16), cavW);
+        // hollows instead of lying on it as paint. Broken up by the fine AO
+        // signal so the lip reads as crumbled soil edge, not a drawn contour
+        // (a clean contour also traces the coarse vertex splat into visible
+        // triangle steps — the earlier derivative-based normal tilt made the
+        // same triangulation read as hard facets and is gone for that reason).
+        float rim = vSplat.y * (1.0 - vSplat.y) * 4.0 * clamp(0.55 + cavH * 4.0, 0.2, 1.2);
+        float groundShade = mix(1.0, clamp(1.0 + relief, 0.38, 1.28) * (1.0 - rim * 0.17), cavW);
         ${
           GFX.tier === 'ultra'
             ? `// micro sun-shadow: terrain never casts real shadows at any
@@ -617,22 +621,11 @@ function buildSplatMaterial(
         vec2 fineSoft = texture2D(uGrassN, tuv * 4.0).xy * 2.0 - 1.0;
         // wet mud lumps smoothly where dry dirt crumbles
         float dirtDetail = 1.0 - vExtra.x * 0.35;
-        vec2 detN = (gN.xy + fineSoft * 0.75) * vSplat.x * 1.15
-                  + (dN.xy + fineHard * 0.75) * vSplat.y * 1.45 * dirtDetail
-                  + (rN.xy + fineHard * 0.75) * vSplat.z * 1.35 * (1.0 - wallW)
-                  + (sN.xy + fineSoft * 0.75) * vSplat.w * 0.8;
+        vec2 detN = (gN.xy + fineSoft * 0.9) * vSplat.x * 1.5
+                  + (dN.xy + fineHard * 0.9) * vSplat.y * 1.8 * dirtDetail
+                  + (rN.xy + fineHard * 0.9) * vSplat.z * 1.5 * (1.0 - wallW)
+                  + (sN.xy + fineSoft * 0.9) * vSplat.w * 1.1;
         detN *= 1.0 - vExtra.y * 0.7; // snow softens the relief beneath it
-        // recessed turf lip (see groundShade): tilt the shading normal away
-        // from the path centreline across the grass->soil feather, so the sun
-        // lights the far lip and shades the near one. The derivative gradient
-        // of the interpolated splat weight points toward increasing dirt in
-        // world space; per-triangle constancy is invisible on noisy ground.
-        float rimN = vSplat.y * (1.0 - vSplat.y) * 4.0;
-        if (rimN > 0.05) {
-          vec2 rimGrad = dFdx(vSplat.y) * dFdx(vWPos.xz) + dFdy(vSplat.y) * dFdy(vWPos.xz);
-          float rimGl = length(rimGrad);
-          if (rimGl > 1e-5) detN += (-rimGrad / rimGl) * rimN * 0.35;
-        }
         // Planar-XZ UVs stretch on steep faces and the detail normals smear
         // into vertical streaks there; fade them out by slope and let the
         // wall projection below own the cliff relief.
@@ -876,6 +869,12 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   ): void => {
     const mesh = new THREE.Mesh(geo, mat);
     mesh.receiveShadow = true;
+    // Terrain casts too: without this no hill can shade its own lee side or
+    // the valley under it, and open country reads shadow-flat however the
+    // rig is tuned — form shadows are the difference between painted dunes
+    // and lit ones. Chunks outside the 105u shadow frustum are culled from
+    // the depth pass, so the cost is a dozen static meshes re-drawn there.
+    mesh.castShadow = GFX.dynamicShadows;
     group.add(mesh);
     // A chunk's transform never changes after this point (its shape lives in
     // the geometry, not the mesh matrix), so it can freeze immediately rather
