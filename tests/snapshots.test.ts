@@ -2028,6 +2028,36 @@ describe('client-side delta merge', () => {
     expect(aura?.stacks, 'client should mirror the wire stack count').toBe(3);
   });
 
+  it('always wires Druid engine bank stages, including zero and one', () => {
+    // The sparsity rule omits stacks below 2, but the engine banks teach their
+    // live stage (auras_view badge + aura_effect tooltip) at 0 and 1 too, and
+    // the decode side cannot tell "absent because 1" from "absent because 0".
+    const sim = new Sim({ seed: 33, playerClass: 'druid', autoEquip: true });
+    for (const stacks of [0, 1] as const) {
+      sim.player.auras = [
+        {
+          id: 'moontide',
+          name: 'Moontide',
+          kind: 'moontide',
+          remaining: 3600,
+          duration: 3600,
+          value: 0,
+          stacks,
+          sourceId: sim.playerId,
+          school: 'nature',
+        },
+      ];
+      const wire = wireEntity(sim.player) as { auras?: { id: string; stacks?: number }[] };
+      const wired = wire.auras?.find((a) => a.id === 'moontide');
+      expect(wired?.stacks, `the wire must carry the ${stacks}-stage bank`).toBe(stacks);
+
+      const client = bareClient(sim.playerId + 1000);
+      (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(sim.player)] });
+      const mirrored = client.entities.get(sim.playerId)?.auras.find((a) => a.id === 'moontide');
+      expect(mirrored?.stacks, `the mirror must read the ${stacks}-stage bank`).toBe(stacks);
+    }
+  });
+
   it('reconstructs charge-limited aura charges from the wire (Thunder Ward)', () => {
     const client = bareClient(1);
     (client as any).applySnapshot({
