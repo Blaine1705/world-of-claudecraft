@@ -476,6 +476,21 @@ function buildSplatMaterial(
         '#include <map_fragment>',
         `
         vec2 tuv = vWPos.xz * 0.22;
+        // Fragment-side splat reshape: the vertex-interpolated dirt weight
+        // crosses triangles linearly, so a path edge is a chain of straight
+        // segments that reads as sawtooth triangles the moment shading
+        // contrast lands on it. Re-thresholding against AO noise moves the
+        // boundary at texel scale instead: crisper, and it wanders like a
+        // real worn margin instead of tracing the mesh. The other layers
+        // give up weight pro rata so the four still sum to one.
+        vec4 vSplatR = vSplat;
+        {
+          float bn = texture2D(uGroundAO, tuv * 0.5).g - 0.814;
+          float shaped = smoothstep(0.32, 0.68, vSplat.y + bn * 1.1);
+          float rest = max(1.0 - vSplat.y, 1e-4);
+          float restScale = (1.0 - shaped) / rest;
+          vSplatR = vec4(vSplat.x * restScale, shaped, vSplat.z * restScale, vSplat.w * restScale);
+        }
         // Offset parallax: slide the ground UVs along the view ray by the
         // AO height proxy, so the painted clods and stones stand up at
         // grazing angles instead of reading as a decal on flat ground. Rock and
@@ -488,7 +503,7 @@ function buildSplatMaterial(
         vec3 pRay = cameraPosition - vWPos;
         float pDist = length(pRay);
         float upW = normalize(vWNorm).y;
-        float pRelief = (vSplat.x * 0.55 + vSplat.y + vSplat.z * 0.9 + vSplat.w * 0.35)
+        float pRelief = (vSplatR.x * 0.55 + vSplatR.y + vSplatR.z * 0.9 + vSplatR.w * 0.35)
           * (1.0 - vExtra.y)
           * smoothstep(0.55, 0.85, upW)
           * (1.0 - smoothstep(16.0, 44.0, pDist));
@@ -498,14 +513,14 @@ function buildSplatMaterial(
           // floor is the grazing-angle limiter (an unclamped 1/y diverges)
           vec2 pDir = pRay.xz / max(pRay.y, pDist * 0.3);
           vec2 pOff = clamp(
-            pDir * wocGroundHeight(tuv, vSplat) * WOC_PARALLAX_SCALE * pRelief,
+            pDir * wocGroundHeight(tuv, vSplatR) * WOC_PARALLAX_SCALE * pRelief,
             -WOC_PARALLAX_CLAMP, WOC_PARALLAX_CLAMP);
           ${
             GFX.tier === 'ultra'
               ? `// second iteration: re-read the height where the first offset
           // landed, which keeps steep clod edges from overshooting
           pOff = clamp(
-            pDir * wocGroundHeight(tuv + pOff, vSplat) * WOC_PARALLAX_SCALE * pRelief,
+            pDir * wocGroundHeight(tuv + pOff, vSplatR) * WOC_PARALLAX_SCALE * pRelief,
             -WOC_PARALLAX_CLAMP, WOC_PARALLAX_CLAMP);`
               : ''
           }
@@ -516,13 +531,16 @@ function buildSplatMaterial(
         // and stones still read from the high pitched-down chase camera where
         // a grazing-angle offset does nothing. Mip averaging pulls the signal
         // to zero with distance, so the far field keeps its painted colour.
-        float cavH = wocGroundHeight(tuv, vSplat);
-        float cavW = (1.0 - vExtra.y) * smoothstep(0.35, 0.7, upW);
+        float cavH = wocGroundHeight(tuv, vSplatR);
+        // tighter slope fade than before: the AO/relief signal lives in the
+        // planar-XZ projection, which stretches on banks — full-strength
+        // cavity there amplified the stretch into vertical streaking
+        float cavW = (1.0 - vExtra.y) * smoothstep(0.62, 0.88, upW);
         // fine pores + coarse soil clumps: the macro octave carries the read
         // out past the distance where mips flatten the fine one, and grass
         // (whose own AO sheet is near-uniform) takes it at full weight so
         // meadows undulate instead of rendering as one green wash
-        float relief = cavH * 5.0 + wocGroundMacroRelief(tuv) * (0.5 + vSplat.x * 0.5) * 4.2;
+        float relief = cavH * 5.0 + wocGroundMacroRelief(tuv) * (0.5 + vSplatR.x * 0.5) * 4.2;
         // turf lip: where grass feathers into bare soil (roads, patches),
         // shade the transition band so paths sit INTO the meadow as worn
         // hollows instead of lying on it as paint. Broken up by the fine AO
@@ -530,7 +548,7 @@ function buildSplatMaterial(
         // (a clean contour also traces the coarse vertex splat into visible
         // triangle steps — the earlier derivative-based normal tilt made the
         // same triangulation read as hard facets and is gone for that reason).
-        float rim = vSplat.y * (1.0 - vSplat.y) * 4.0 * clamp(0.55 + cavH * 4.0, 0.2, 1.2);
+        float rim = vSplatR.y * (1.0 - vSplatR.y) * 4.0 * clamp(0.55 + cavH * 4.0, 0.2, 1.2);
         float groundShade = mix(1.0, clamp(1.0 + relief, 0.38, 1.28) * (1.0 - rim * 0.17), cavW);
         ${
           GFX.tier === 'ultra'
@@ -541,31 +559,40 @@ function buildSplatMaterial(
         {
           vec2 sunStep = vec2(${SUN_UV_STEP.x}, ${SUN_UV_STEP.y});
           float occl = max(
-            wocGroundHeight(tuv + sunStep, vSplat) - cavH - 0.02,
-            (wocGroundHeight(tuv + sunStep * 2.2, vSplat) - cavH) * 0.55 - 0.02);
+            wocGroundHeight(tuv + sunStep, vSplatR) - cavH - 0.02,
+            (wocGroundHeight(tuv + sunStep * 2.2, vSplatR) - cavH) * 0.55 - 0.02);
           groundShade *= 1.0 - min(max(occl, 0.0) * 4.5, 0.42) * cavW;
         }`
             : ''
         }
         // grass blends two scales so the 1K photo source never reads as tile
         vec3 grassAlb = mix(texture2D(uGrass, tuv).rgb, texture2D(uGrass, tuv * 0.31).rgb, 0.42);
-        // marsh swaps packed dirt for wet mud (roads, hub discs included)
-        vec3 dirtAlb = mix(texture2D(uDirt, tuv * 0.8).rgb, texture2D(uMud, tuv * 0.8).rgb, vExtra.x);
         // rock: top-down projection smears into vertical streaks on cliffs,
         // so steep faces blend toward wall-planar (world XY/ZY) samples
         vec3 an = abs(normalize(vWNorm));
         float wallW = clamp(1.0 - an.y * 1.45, 0.0, 1.0);
         float axisW = an.x / max(1e-4, an.x + an.z);
+        // dirt smears the same way and shows it sooner (paths climb banks the
+        // player stands right next to), so it takes its own wall blend with a
+        // gentler onset than rock's cliff threshold
+        float dirtWallW = smoothstep(0.1, 0.42, 1.0 - an.y);
+        vec3 dirtFlat = mix(texture2D(uDirt, tuv * 0.8).rgb, texture2D(uMud, tuv * 0.8).rgb, vExtra.x);
+        vec3 dirtWall = mix(
+          texture2D(uDirt, vWPos.xy * 0.176).rgb,
+          texture2D(uDirt, vWPos.zy * 0.176).rgb,
+          axisW);
+        // marsh swaps packed dirt for wet mud (roads, hub discs included)
+        vec3 dirtAlb = mix(dirtFlat, dirtWall, dirtWallW);
         vec3 rockFlat = texture2D(uRock, tuv * 0.6).rgb;
         vec3 rockWall = mix(
           texture2D(uRock, vWPos.xy * 0.132).rgb,
           texture2D(uRock, vWPos.zy * 0.132).rgb,
           axisW);
         vec3 rockAlb = mix(rockFlat, rockWall, wallW);
-        vec3 alb = grassAlb * vSplat.x
-                 + dirtAlb * vSplat.y
-                 + rockAlb * vSplat.z
-                 + texture2D(uSand, tuv).rgb * vSplat.w;
+        vec3 alb = grassAlb * vSplatR.x
+                 + dirtAlb * vSplatR.y
+                 + rockAlb * vSplatR.z
+                 + texture2D(uSand, tuv).rgb * vSplatR.w;
         // snow cover on the peaks/rim, by baked per-vertex weight
         alb = mix(alb, texture2D(uSnow, tuv * 0.7).rgb, vExtra.y);
         // macro brightness swing breaks distant tiling
@@ -598,9 +625,9 @@ function buildSplatMaterial(
         // The macro swing doubles as a per-material surface break-up: loose
         // layers (dirt, sand) take it strongly so they read as damp/dry
         // patches, rock takes little so stone stays tight and specular.
-        float roughBreak = (macro - 1.0) * (vSplat.y * 1.4 + vSplat.z * 0.4 + vSplat.w * 0.9);
+        float roughBreak = (macro - 1.0) * (vSplatR.y * 1.4 + vSplatR.z * 0.4 + vSplatR.w * 0.9);
         float roughnessFactor = roughness * clamp(mix(
-          dot(vSplat, vec4(${ROUGH_GRASS}, mix(${ROUGH_DIRT}, ${ROUGH_MUD}, vExtra.x), ${ROUGH_ROCK}, ${ROUGH_SAND})),
+          dot(vSplatR, vec4(${ROUGH_GRASS}, mix(${ROUGH_DIRT}, ${ROUGH_MUD}, vExtra.x), ${ROUGH_ROCK}, ${ROUGH_SAND})),
           ${ROUGH_SNOW}, vExtra.y) + roughBreak, 0.35, 1.0);`,
       )
       .replace(
@@ -621,15 +648,15 @@ function buildSplatMaterial(
         vec2 fineSoft = texture2D(uGrassN, tuv * 4.0).xy * 2.0 - 1.0;
         // wet mud lumps smoothly where dry dirt crumbles
         float dirtDetail = 1.0 - vExtra.x * 0.35;
-        vec2 detN = (gN.xy + fineSoft * 0.9) * vSplat.x * 1.5
-                  + (dN.xy + fineHard * 0.9) * vSplat.y * 1.8 * dirtDetail
-                  + (rN.xy + fineHard * 0.9) * vSplat.z * 1.5 * (1.0 - wallW)
-                  + (sN.xy + fineSoft * 0.9) * vSplat.w * 1.1;
+        vec2 detN = (gN.xy + fineSoft * 0.9) * vSplatR.x * 1.5
+                  + (dN.xy + fineHard * 0.9) * vSplatR.y * 1.8 * dirtDetail
+                  + (rN.xy + fineHard * 0.9) * vSplatR.z * 1.5 * (1.0 - wallW)
+                  + (sN.xy + fineSoft * 0.9) * vSplatR.w * 1.1;
         detN *= 1.0 - vExtra.y * 0.7; // snow softens the relief beneath it
         // Planar-XZ UVs stretch on steep faces and the detail normals smear
         // into vertical streaks there; fade them out by slope and let the
         // wall projection below own the cliff relief.
-        detN *= smoothstep(0.35, 0.7, vWNorm.y);
+        detN *= smoothstep(0.5, 0.82, vWNorm.y);
         normal = normalize(normal + tbn * vec3(detN, 0.0));
         // cliffs: wall-projected rock normal so steep faces get real relief
         // (approximate world-space tangent frames per projection plane; the

@@ -100,7 +100,9 @@ const GRASS_DENSITY_HIGH = 0.5;
 // Per-biome grass density multipliers over the base above. The Reach is bare
 // snow (no blades, and with them no ground flowers); the Wraithwood's floor is
 // deep grass instead of flowers, so its forest reads lush, not decorated.
-const GRASS_BIOME_DENSITY: Partial<Record<BiomeId, number>> = {
+// Exported: the near-field blade carpet (blade_grass.ts) follows the same
+// per-biome bare/lush rules as the card tufts.
+export const GRASS_BIOME_DENSITY: Partial<Record<BiomeId, number>> = {
   frost: 0,
   ember: 0, // the Drakelands are scorched waste: no blades in the cinders
   haunt: 1.55,

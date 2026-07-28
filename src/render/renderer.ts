@@ -195,6 +195,7 @@ import {
 } from './mage_barrier_visual';
 import { MageGroundFx } from './mage_ground_fx';
 import { buildMailboxPillar } from './mailbox';
+import { type BladeGrassView, buildBladeGrass } from './blade_grass';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
 import { mountBobY, mountVisualSpec } from './mount_visuals';
@@ -1324,6 +1325,7 @@ export class Renderer {
   private foliage: FoliageView;
   private fish: FishView;
   private motes: MotesView;
+  private bladeGrass: BladeGrassView;
   private birds: BirdsView;
   private impactSite: ImpactSiteView;
   private realmFlora: RealmFloraView | null = null;
@@ -1894,6 +1896,9 @@ export class Renderer {
     this.scene.add(this.fish.group);
     this.motes = buildMotes(this.sim.cfg.seed);
     this.scene.add(this.motes.group);
+    // near-field solid-blade carpet; the card tufts own the mid/far field
+    this.bladeGrass = buildBladeGrass(this.sim.cfg.seed);
+    this.scene.add(this.bladeGrass.group);
     this.birds = buildBirds(this.sim.cfg.seed);
     this.scene.add(this.birds.group);
     this.impactSite = buildImpactSite(this.sim.cfg.seed);
@@ -8078,6 +8083,7 @@ export class Renderer {
     worldStart = markWorldPhase('foliage', worldStart);
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.motes.update(p.pos.x, p.pos.z, dt);
+    this.bladeGrass.update(p.pos.x, p.pos.z);
     this.realmFlora?.update(this.time);
     this.emberFeatures?.update(this.time);
     this.frostSky?.update(this.time, this.camera.position.x, this.camera.position.z);
