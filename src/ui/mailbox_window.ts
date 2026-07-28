@@ -18,6 +18,7 @@ import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
+import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
 import { formatMoney, formatNumber, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import {
@@ -625,10 +626,11 @@ export class MailboxWindow {
     if (!parcels) return;
     // A +/- click rebuilds this whole container, which would otherwise drop
     // keyboard focus to <body>; remember which control (by item + role) had
-    // it so the rebuilt equivalent can reclaim it below.
-    const focusedEl = document.activeElement as HTMLElement | null;
-    const focusKey =
-      focusedEl && parcels.contains(focusedEl) ? (focusedEl.dataset.focusKey ?? null) : null;
+    // it so the rebuilt equivalent can reclaim it below. The shared helper
+    // (#2528) narrows activeElement and does the containment check; the
+    // container passed is the PARCEL LIST, not the window root, so focus
+    // sitting anywhere else in the mailbox is correctly left alone.
+    const focusKey = captureFocusKey(parcels);
     parcels.innerHTML = '';
     if (this.attachments.length === 0) {
       const hint = document.createElement('span');
@@ -769,14 +771,19 @@ export class MailboxWindow {
         : undefined;
       // The just-activated control (or its whole item) can vanish on rebuild
       // (disabled at a bound, or the stepper dropped once owned <= 1): fall
-      // back to the nearest still-focusable control for the same item.
-      let target: HTMLButtonElement | HTMLInputElement | undefined;
-      if (preferred && !preferred.disabled) target = preferred;
-      else if (controls?.qty) target = controls.qty;
-      else if (controls?.minus && !controls.minus.disabled) target = controls.minus;
-      else if (controls?.plus && !controls.plus.disabled) target = controls.plus;
-      else target = controls?.remove;
-      target?.focus();
+      // back to the nearest still-focusable control for the same item. This
+      // ladder is the panel's own; the shared helper (#2528) owns only the
+      // walk, skipping any candidate that is absent or came back disabled.
+      // Note that the qty input and Remove are never disabled in this painter,
+      // so the skip changes nothing for them: they are the two rungs the old
+      // hand-rolled chain took without a disabled check.
+      restoreFirstEnabled([
+        preferred,
+        controls?.qty,
+        controls?.minus,
+        controls?.plus,
+        controls?.remove,
+      ]);
     }
   }
 }
