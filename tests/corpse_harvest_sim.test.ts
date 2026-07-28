@@ -293,11 +293,12 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
 // single component so the harvest draws exactly one tier roll and one rarity
 // roll, keeping the seed choice legible. Seeds below are pre-verified against
 // this exact setup() shape (two players, seeded before the harvest's rolls)
-// to land on each side of the rarity floor; re-hunted after the
-// procedural-dungeons merge shifted the camp-driven world-gen draw sequence.
+// to land on each side of the rarity floor; the rare-or-better seed was
+// re-recorded from 10 to 2 after the Eastbrook camp respacing thinned the
+// zone-1 camp counts and shifted the camp-driven world-gen draw sequence.
 describe('signed Pristine specimens (#1145)', () => {
-  it('a rare-or-better harvest grants the signed specimen PLUS the plain component (seed 10)', () => {
-    const { sim, internals, a, mob } = setup(10);
+  it('a rare-or-better harvest grants the signed specimen PLUS the plain component (seed 2)', () => {
+    const { sim, internals, a, mob } = setup(2);
     sim.drainEvents();
     sim.harvestCorpse(mob.id, ['hide'], a);
     // The signed jackpot landed signed: no downgrade notice fires.
@@ -326,12 +327,14 @@ describe('signed Pristine specimens (#1145)', () => {
     expect(slot?.instance).toBeUndefined();
     // This seed's focus-tier roll lands above the poor floor, so the fungible
     // grant is more than a single unit (harvestTierQuantity(tier), #1142).
-    expect(sim.countItem('rough_hide', a)).toBe(2);
+    // Quantity re-recorded after the Eastbrook camp respacing thinned the
+    // zone-1 camp counts (was 2).
+    expect(sim.countItem('rough_hide', a)).toBe(3);
     expect(sim.countItem('pristine_hide', a)).toBe(0);
   });
 
-  it('a specimen-less family (fang) keeps the signed-component behavior at rare-or-better (seed 10)', () => {
-    const { sim, internals, a, mob } = setup(10);
+  it('a specimen-less family (fang) keeps the signed-component behavior at rare-or-better (seed 2)', () => {
+    const { sim, internals, a, mob } = setup(2);
     sim.harvestCorpse(mob.id, ['fang'], a);
     const meta = internals.players.get(a)!;
     const slot = meta.inventory.find((s) => s.itemId === 'wolf_fang');
@@ -340,11 +343,11 @@ describe('signed Pristine specimens (#1145)', () => {
     expect(sim.countItem('wolf_fang', a)).toBe(1);
   });
 
-  it('every other specimen family grants its own jackpot beside the plain component (seed 10)', () => {
+  it('every other specimen family grants its own jackpot beside the plain component (seed 2)', () => {
     // The hide row is exercised above; this sweeps the remaining three
     // specimen rows behaviorally (silk and venomSac via webwood_spider, meat
     // via wild_boar), so a mistargeted HARVEST_COMPONENT_SPECIMENS row cannot
-    // hide behind hide-only coverage. Seed 10's rarity roll clears the
+    // hide behind hide-only coverage. Seed 2's rarity roll clears the
     // signable floor for a single focused component regardless of family
     // (the roll's draw position is identical).
     const families: { templateId: string; focus: string; plain: string; specimen: string }[] = [
@@ -363,7 +366,7 @@ describe('signed Pristine specimens (#1145)', () => {
       { templateId: 'wild_boar', focus: 'meat', plain: 'game_meat', specimen: 'prime_cut' },
     ];
     for (const f of families) {
-      const { sim, internals, a } = setup(10);
+      const { sim, internals, a } = setup(2);
       const template = MOBS[f.templateId];
       const corpse = createMob(7776, template, template.maxLevel, { x: 0, y: 0, z: 0 });
       corpse.dead = true;
@@ -382,8 +385,8 @@ describe('signed Pristine specimens (#1145)', () => {
     }
   });
 
-  it('the cloth family (no specimen) grants the signed component at rare-or-better (seed 10)', () => {
-    const { sim, internals, a } = setup(10);
+  it('the cloth family (no specimen) grants the signed component at rare-or-better (seed 2)', () => {
+    const { sim, internals, a } = setup(2);
     const template = MOBS.vale_bandit;
     const corpse = createMob(7775, template, template.maxLevel, { x: 0, y: 0, z: 0 });
     corpse.dead = true;
@@ -399,13 +402,13 @@ describe('signed Pristine specimens (#1145)', () => {
     expect(sim.countItem('homespun_cloth', a)).toBe(1);
   });
 
-  it('a slot-full signed-family harvest falls back to the plain stack, never over capacity (seed 10)', () => {
+  it('a slot-full signed-family harvest falls back to the plain stack, never over capacity (seed 2)', () => {
     // The pre-gate reserves plain-stack room only, so a partial stack lets it
     // pass while a signed instance would still need a fresh slot. The rare+
     // arm must then fall back to the plain fungible top-up (the signature
     // truncates, the yield does not), same free-slot contract as the
     // specimen arm.
-    const { sim, internals, a, mob } = setup(10);
+    const { sim, internals, a, mob } = setup(2);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
@@ -417,7 +420,7 @@ describe('signed Pristine specimens (#1145)', () => {
     expect(m.inventory.length).toBeLessThanOrEqual(cap);
     const signed = m.inventory.find((s) => s.itemId === 'wolf_fang' && s.instance?.signer);
     expect(signed).toBeUndefined();
-    // Seed 10's rarity roll clears the signable floor with this exact draw
+    // Seed 2's rarity roll clears the signable floor with this exact draw
     // sequence (proven by the unfixed code overflowing here), so the count
     // above the seeded 1 proves the plain fallback delivered the yield.
     expect(sim.countItem('wolf_fang', a)).toBeGreaterThan(1);
@@ -428,11 +431,11 @@ describe('signed Pristine specimens (#1145)', () => {
     ]);
   });
 
-  it('a slot-full specimen harvest truncates the specimen and keeps the plain yield (seed 10)', () => {
+  it('a slot-full specimen harvest truncates the specimen and keeps the plain yield (seed 2)', () => {
     // Plain grant tops up the partial stack without opening a slot, so the
     // specimen guard sees a full bag: the jackpot truncates rather than
     // overflowing, and the plain component still arrives.
-    const { sim, internals, a, mob } = setup(10);
+    const { sim, internals, a, mob } = setup(2);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
@@ -518,11 +521,13 @@ describe('two-specimen-family harvest capacity contract', () => {
     return boar;
   }
 
-  it('with a genuinely spare slot the jackpot still lands beside both plain yields (seed 6)', () => {
-    // Seed 6 pre-verified: the hide rarity roll clears the signable floor with
+  it('with a genuinely spare slot the jackpot still lands beside both plain yields (seed 24)', () => {
+    // Seed 24 pre-verified: the hide rarity roll clears the signable floor with
     // this exact draw sequence (the rolls are inventory-independent, so this
     // arm also proves the two-free-slot arm below EARNED its jackpot).
-    const { sim, internals, a } = setup(6);
+    // Re-recorded from seed 6 after the Eastbrook camp respacing thinned the
+    // zone-1 camp counts and shifted the camp-driven world-gen draw sequence.
+    const { sim, internals, a } = setup(24);
     const boar = addBoarCorpse(internals);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
@@ -537,11 +542,11 @@ describe('two-specimen-family harvest capacity contract', () => {
     expect(specimen?.instance?.signer).toBe('Alpha');
   });
 
-  it('with exactly the reserved free slots the jackpot truncates, never the plain yield (seed 6)', () => {
+  it('with exactly the reserved free slots the jackpot truncates, never the plain yield (seed 24)', () => {
     // Two free slots = exactly the pre-gate's reservation for the two plain
     // stacks. The unfixed code granted pristine_hide into the slot reserved
     // for game_meat and spilled the meat stack past capacity (17 of 16).
-    const { sim, internals, a } = setup(6);
+    const { sim, internals, a } = setup(24);
     const boar = addBoarCorpse(internals);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
@@ -613,12 +618,12 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     throw new Error('no seed with a signable fang roll within 200');
   });
 
-  it('a slot-full bag with a same-signer stack WITH room keeps the signature: the grant merges (seed 10)', () => {
-    // Seed 10's fang roll clears the signable floor (pre-verified above). Slot
+  it('a slot-full bag with a same-signer stack WITH room keeps the signature: the grant merges (seed 2)', () => {
+    // Seed 2's fang roll clears the signable floor (pre-verified above). Slot
     // 0 is the plain partial stack the pre-gate reserves against (and the
     // would-be fallback target); slot 1 is the byte-equal same-signer stack
     // whose room the merge-aware guard must accept with zero free slots.
-    const { sim, internals, a, mob } = setup(10);
+    const { sim, internals, a, mob } = setup(2);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
@@ -640,11 +645,11 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toHaveLength(0);
   });
 
-  it('a slot-full bag with the same-signer stack AT its cap still falls back plain, at the boundary (seed 10)', () => {
+  it('a slot-full bag with the same-signer stack AT its cap still falls back plain, at the boundary (seed 2)', () => {
     // The boundary tick: the same-signer stack sits EXACTLY at stackSizeOf,
     // so it offers zero merge room and the guard must refuse, top up the
     // plain stack, and emit the mark-lost downgrade, never overflow.
-    const { sim, internals, a, mob } = setup(10);
+    const { sim, internals, a, mob } = setup(2);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
@@ -665,12 +670,12 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     ]);
   });
 
-  it('a slot-full specimen jackpot merges into a same-signer specimen stack instead of truncating (seed 10)', () => {
+  it('a slot-full specimen jackpot merges into a same-signer specimen stack instead of truncating (seed 2)', () => {
     // The specimen arm shares the merge-aware guard: with the plain component
     // topping up its own partial stack, the jackpot's only room is the
     // byte-equal same-signer specimen stack, and it must land there signed
     // (the pre-merge contract truncated it outright, lost: 'find').
-    const { sim, internals, a, mob } = setup(10);
+    const { sim, internals, a, mob } = setup(2);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
@@ -762,8 +767,8 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     expect(canHarvestMonsterMaterial(2, 2)).toBe(true);
   });
 
-  it('bare hands still earn the signed specimen on real content: tier-1 families never gate (seed 10)', () => {
-    const { sim, internals, a, mob } = setup(10);
+  it('bare hands still earn the signed specimen on real content: tier-1 families never gate (seed 2)', () => {
+    const { sim, internals, a, mob } = setup(2);
     const meta = internals.players.get(a)!;
     // Genuinely bare-handed: the starting kit resolves to the tier-1 floor.
     expect(bestOwnedAnyGatherToolTier(meta.inventory, ITEMS)).toBe(1);
@@ -775,10 +780,12 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     expect(sim.countItem('rough_hide', a)).toBeGreaterThanOrEqual(1);
   });
 
-  it('a denied premium pull downgrades to the plain grant: same qty, same claim, same draws (seed 45)', () => {
-    // Baseline arm, unmutated: seed 45's rarity roll clears the signable floor,
-    // so the specimen jackpot lands beside the plain component.
-    const base = soloRig(45);
+  it('a denied premium pull downgrades to the plain grant: same qty, same claim, same draws (seed 4)', () => {
+    // Baseline arm, unmutated: seed 4's rarity roll clears the signable floor,
+    // so the specimen jackpot lands beside the plain component. Re-recorded
+    // from seed 45 after the Eastbrook camp respacing thinned the zone-1 camp
+    // counts and shifted the camp-driven world-gen draw sequence.
+    const base = soloRig(4);
     let baseDraws = 0;
     base.sim.rng.setObserver(() => baseDraws++);
     try {
@@ -791,7 +798,7 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     expect(base.sim.countItem('pristine_hide', base.a)).toBe(1);
 
     // Denied arm: hide raised to tier 2, same seed, same rig, same draws.
-    const { sim, internals, a, mob } = soloRig(45);
+    const { sim, internals, a, mob } = soloRig(4);
     sim.drainEvents();
     let draws = 0;
     withTier('hide', 2, () => {
@@ -821,11 +828,11 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     ]);
   });
 
-  it('an owned tier-2 tool restores the premium pull at a raised family tier (seed 45)', () => {
+  it('an owned tier-2 tool restores the premium pull at a raised family tier (seed 4)', () => {
     // The canHarvestMonsterMaterial SUCCESS branch with a real tool: the
     // deny/downgrade arms above never prove a tool actually re-opens the
     // premium pull once a family tier rises.
-    const { sim, internals, a, mob } = soloRig(45);
+    const { sim, internals, a, mob } = soloRig(4);
     sim.addItem('mithril_mining_pick', 1, a); // any-profession owned-best covers tier 2
     sim.drainEvents();
     let draws = 0;
@@ -847,12 +854,14 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     expect(mob.harvestClaimedBy).toBe(a);
   });
 
-  it('at most ONE gatherDenied per harvest command, even with several denied families (seed 23)', () => {
-    // Seed 23 pre-verified against soloRig: BOTH wolf families (hide and
+  it('at most ONE gatherDenied per harvest command, even with several denied families (seed 31)', () => {
+    // Seed 31 pre-verified against soloRig: BOTH wolf families (hide and
     // fang) roll signable on an untagged harvest, so raising both tiers
     // denies two yields in one command; the dedupe flag must emit exactly one
-    // event, tiered off the FIRST failing family.
-    const base = soloRig(23);
+    // event, tiered off the FIRST failing family. Re-recorded from seed 23
+    // after the Eastbrook camp respacing thinned the zone-1 camp counts and
+    // shifted the camp-driven world-gen draw sequence.
+    const base = soloRig(31);
     base.sim.harvestCorpse(base.mob.id, undefined, base.a);
     const baseMeta = base.internals.players.get(base.a)!;
     expect(base.sim.countItem('pristine_hide', base.a)).toBe(1);
@@ -860,7 +869,7 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
       baseMeta.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance?.signer === 'Alpha'),
     ).toBe(true);
 
-    const { sim, internals, a, mob } = soloRig(23);
+    const { sim, internals, a, mob } = soloRig(31);
     sim.drainEvents();
     withTier('hide', 2, () => {
       withTier('fang', 2, () => {
@@ -878,12 +887,15 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     expect(mob.harvestClaimedBy).toBe(a);
   });
 
-  it('the single event is tiered off the FIRST failing family in yield order (seed 63)', () => {
+  it('the single event is tiered off the FIRST failing family in yield order (seed 42)', () => {
     // hide precedes fang in the wolf's yield order, so asymmetric raised
     // tiers discriminate FIRST from min/max/last: (hide 2, fang 3) emits 2
     // (ruling out max and last), the mirror (hide 3, fang 2) emits 3 (ruling
-    // out min). Same pre-hunted seed-63 rig as the dedupe arm above.
-    const first = soloRig(63);
+    // out min). Same pre-hunted both-families-signable soloRig shape as the
+    // dedupe arm above. Re-recorded from seed 63 after the Eastbrook camp
+    // respacing thinned the zone-1 camp counts and shifted the camp-driven
+    // world-gen draw sequence.
+    const first = soloRig(42);
     first.sim.drainEvents();
     withTier('hide', 2, () => {
       withTier('fang', 3, () => {
@@ -893,7 +905,7 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     expect(first.sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
       { type: 'gatherDenied', pid: first.a, surface: 'corpse', requiredTier: 2 },
     ]);
-    const mirror = soloRig(63);
+    const mirror = soloRig(42);
     mirror.sim.drainEvents();
     withTier('hide', 3, () => {
       withTier('fang', 2, () => {
