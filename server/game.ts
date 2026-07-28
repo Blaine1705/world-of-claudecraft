@@ -9,6 +9,7 @@ import {
   wireStreamerLinks,
 } from '../src/sim/account_flair';
 import { verifyChallenge } from '../src/sim/client_challenge';
+import { WORLD_SEED } from '../src/sim/world_seed';
 import { damageTakenWithin } from '../src/sim/combat/damage_history';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
@@ -224,7 +225,6 @@ import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { holderInfoForPubkey } from './woc_balance';
 import { isBackpressureExceeded } from './ws_backpressure';
 
-const WORLD_SEED = 20061;
 const ALDRIC_METEOR_QUEST_ID = 'q_aldrics_fallen_star';
 // Interest management: the client renders entities out to 80yd, so new
 // entities enter interest just past that, and known entities persist a

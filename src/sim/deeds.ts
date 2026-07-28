@@ -228,7 +228,9 @@ const SAUL_TALKS_REQUIRED = 9;
 
 // How close (yards) a POI sweep counts a visit, and the witness radius for
 // chr_peaks_waking_witness (inside interest scope, pinned literal).
-const POI_VISIT_RADIUS = 20;
+// Exported for the placement suite's mirror-lake standability arm, which used
+// to carry its own copy of this number and could drift silently.
+export const POI_VISIT_RADIUS = 20;
 const THUNZHARR_WITNESS_RADIUS = 100;
 
 // ---------------------------------------------------------------------------

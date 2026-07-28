@@ -30,6 +30,7 @@ import {
   ZONES,
   zoneAt,
 } from '../src/sim/data';
+import { POI_VISIT_RADIUS } from '../src/sim/deeds';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
 import { GATHER_NODE_BODIES } from '../src/sim/prop_layout';
@@ -45,8 +46,10 @@ import {
   terrainSteepnessAt,
   waterLevelAt,
 } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
-const WORLD_SEED = 20061; // src/main.ts WORLD_SEED, server/game.ts WORLD_SEED
+// The live shipped seed (src/sim/world_seed.ts, the one both hosts build
+// from), never a copy: every geometry assertion below is about THE world.
 
 // Freeboard a node needs above the local water surface. The NUMBER is not a new
 // one: generateDecorations (world.ts) refuses to anchor a tree or boulder below
@@ -784,6 +787,7 @@ describe('gather node placement: every node sits on ground a player can work', (
     // ore pair predates the rule and inverts it. Unpinned, the rule drifted once
     // already during authoring: the Mirefen ore pair was tiered the wrong way
     // round until this arm's numbers were measured.
+    let groupsChecked = 0;
     for (const zone of ZONES) {
       for (const type of GATHER_NODE_TYPES) {
         const added = GATHER_NODES.filter(
@@ -800,8 +804,14 @@ describe('gather node placement: every node sits on ground a player can work', (
           hubDist(highest),
           `${highest.id} (tier ${highest.tier}) is ${hubDist(highest).toFixed(1)}yd from the ${zone.id} hub but ${lowest.id} (tier ${lowest.tier}) is ${hubDist(lowest).toFixed(1)}`,
         ).toBeGreaterThan(hubDist(lowest));
+        groupsChecked += 1;
       }
     }
+    // Non-vacuity: the discovery regex empties SILENTLY on an id rename
+    // (every other arm in this file counts its corpus; this one did not), so
+    // pin the zone/type groups that actually reached the comparison. Six
+    // today: both later zones ramp all three types.
+    expect(groupsChecked).toBe(6);
   });
 
   it('every zone lands on one harvest ceiling, which is why both levers moved', () => {
@@ -852,7 +862,7 @@ describe('gather node placement: every node sits on ground a player can work', (
     const poi = ZONES[0].pois.find((p) => p.id === 'mirror_lake');
     expect(poi, 'mirror_lake POI missing from eastbrook_vale').toBeDefined();
     if (!poi) return;
-    const VISIT_RADIUS = 20; // src/sim/deeds.ts POI_VISIT_RADIUS, not exported
+    const VISIT_RADIUS = POI_VISIT_RADIUS; // the live deeds constant, no copy to drift
     let best = Number.NEGATIVE_INFINITY;
     for (let dx = -VISIT_RADIUS; dx <= VISIT_RADIUS; dx += 0.5) {
       for (let dz = -VISIT_RADIUS; dz <= VISIT_RADIUS; dz += 0.5) {
