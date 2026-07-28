@@ -90,6 +90,20 @@ export function captureFocusKey(root: HTMLElement): string | null {
  * "that control does not exist in the rebuilt tree" are live at the call sites:
  * `querySelector` returns null, a `Map.get` miss and an unset optional field return
  * undefined.
+ *
+ * A bare `focus()`, deliberately NOT `focus({ preventScroll: true })`, and this is now
+ * the ONE place that decision is spelled: every hand-rolled copy already agreed on the
+ * bare call, but only town_focus_window recorded why. The reason is that a caller
+ * restores its scroll offset before calling here, and `focus()` scrolling its target
+ * into view is what lets a DEGRADED target (a rung further down the ladder, which the
+ * player may not be looking at) win over that offset. Focus must be visible (WCAG
+ * 2.4.11), and the common case cannot conflict: the control being refocused is the one
+ * the player was already on, so it is in view and `focus()` scrolls nothing.
+ *
+ * SYNCHRONOUS on purpose, unlike FocusManager.restore, which defers a tick to win
+ * against a browser's own post-close focus move. There is no competing move here: the
+ * caller has just finished rebuilding its own subtree, and deferring would let a Tab
+ * press in between land on <body>.
  */
 export function restoreFirstEnabled(
   candidates: ReadonlyArray<FocusRestoreCandidate | null | undefined>,
