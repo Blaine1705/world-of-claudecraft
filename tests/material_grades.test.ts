@@ -76,11 +76,15 @@ describe('MATERIAL_GRADES table', () => {
     for (const entries of Object.values(DELVE_SHOPS)) {
       for (const entry of entries) stocked.add(entry.itemId);
     }
-    // Per-table non-vacuity: each table really carries rows, so the sweep is a
-    // discrimination over all three rather than an empty read of a renamed one.
+    // Per-table FOLD teeth, not just length: each table is non-empty AND the
+    // union provably contains a member of it, so a renamed field or a broken
+    // loop fails here instead of leaving the sweep vacuous for that table
+    // (the arcanite_bar line below is the NPCS fold tooth).
     expect(Object.values(NPCS).flatMap((n) => n.vendorItems ?? []).length).toBeGreaterThan(0);
     expect(HEROIC_VENDOR_STOCK.length).toBeGreaterThan(0);
     expect(Object.values(DELVE_SHOPS).flat().length).toBeGreaterThan(0);
+    expect(stocked.has(HEROIC_VENDOR_STOCK[0].itemId), 'heroic fold tooth').toBe(true);
+    expect(stocked.has(Object.values(DELVE_SHOPS).flat()[0].itemId), 'delve fold tooth').toBe(true);
     expect(stocked.has('arcanite_bar'), 'the refined reagent IS stocked').toBe(true);
     for (const row of Object.values(MATERIAL_GRADES)) {
       expect(stocked.has(row.fineItemId), `${row.fineItemId} must not be on any counter`).toBe(

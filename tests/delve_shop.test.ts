@@ -83,10 +83,16 @@ describe('delve shop, buying', () => {
     expect(meta.inventory.length).toBe(capacity);
     expect(sim.ctx.canAddItem(availableEntry.itemId, 1, sim.playerId)).toBe(false);
 
+    sim.drainEvents();
     sim.delveBuyShopItem('collapsed_reliquary', availableEntry.itemId);
     expect(countOf(sim, availableEntry.itemId)).toBe(0);
     expect(sim.delveMarks, 'the Marks must survive the refusal').toBe(100);
     expect(meta.inventory.length).toBe(capacity);
+    // The refusal is TOLD to the player, the same bags-full idiom buyItem
+    // uses: a silent early return would keep every absence assert above green
+    // while the counter just ate the click.
+    const ev = sim.drainEvents();
+    expect(ev.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(true);
   });
 
   it('rejects a locked clears:3 item until the clears requirement is met', () => {

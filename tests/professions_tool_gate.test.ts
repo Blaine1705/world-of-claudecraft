@@ -9,7 +9,7 @@
 // tier-1 tool, so a threshold at or above that ceiling is unreachable by the
 // only means a new player has: the ladder would dead-end with no test failing.
 
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { GATHERING_PROFESSIONS, type GatheringProfessionId } from '../src/sim/content/professions';
@@ -124,6 +124,18 @@ describe('vendor row gate resolver', () => {
     // resolver are not all content-authored.
     for (const key of ['constructor', 'toString', '__proto__', 'hasOwnProperty']) {
       expect(resolveVendorRowGate(key, {}), key).toEqual({ locked: false });
+    }
+  });
+
+  it('the gate table and every row are actually frozen, not just Readonly-typed', () => {
+    // The freeze is the runtime half of the two-world desync argument the
+    // module comment makes: a mutated row would change buy denials on one
+    // host only. Dropping the Object.freeze calls must redden here.
+    expect(Object.isFrozen(VENDOR_ROW_GATES)).toBe(true);
+    const rows = Object.values(VENDOR_ROW_GATES);
+    expect(rows.length).toBeGreaterThan(0); // non-vacuity
+    for (const row of rows) {
+      expect(Object.isFrozen(row)).toBe(true);
     }
   });
 
@@ -495,30 +507,73 @@ describe('the HUD actually feeds the viewer proficiency into the view', () => {
     // the separation while the HUD still reads it too. Replacing the proximity
     // literals with a bare number leaves the constant at 8, the arm green, and
     // the stale-lock hole re-opened, so pin the read itself.
-    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8')
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/(^|\s)\/\/.*$/gm, '$1');
-    // Every service-window proximity check compares against the constant.
-    const checks = [...source.matchAll(/dist2d\(p\.pos, npc\.pos\) > ([A-Za-z_0-9.]+)/g)];
-    expect(checks.length, 'the proximity checks are still there').toBeGreaterThanOrEqual(4);
-    for (const [, operand] of checks) {
-      expect(operand, 'proximity check compares against the shared constant').toBe(
-        'NPC_WINDOW_CLOSE_RANGE',
-      );
+    //
+    // The corpus is hud.ts PLUS every module under src/ui/hud/: the repo is
+    // actively extracting HUD domains into that tree, and a consumer already
+    // lives there (the quest dialog controller), so a hud.ts-only walk would
+    // silently shrink the day a close check moves into a domain module.
+    const stripped = (file: string) =>
+      readFileSync(path.resolve(process.cwd(), file), 'utf8')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/(^|\s)\/\/.*$/gm, '$1');
+    const corpus: { file: string; source: string }[] = [
+      { file: 'src/ui/hud.ts', source: stripped('src/ui/hud.ts') },
+    ];
+    for (const entry of readdirSync(path.resolve(process.cwd(), 'src/ui/hud'), {
+      recursive: true,
+    })) {
+      const rel = String(entry);
+      if (!rel.endsWith('.ts')) continue;
+      corpus.push({ file: `src/ui/hud/${rel}`, source: stripped(`src/ui/hud/${rel}`) });
     }
+    expect(corpus.length, 'the hud domain tree is in the corpus').toBeGreaterThan(5);
+
+    // Every service-window proximity check compares against the constant.
+    const checkRe = /dist2d\((?:p|world\.player)\.pos, npc\.pos\) > ([A-Za-z_0-9.]+)/g;
+    let checks = 0;
+    let questControllerChecks = 0;
+    for (const { file, source } of corpus) {
+      for (const [, operand] of source.matchAll(checkRe)) {
+        checks++;
+        if (file.includes('quest_dialog_controller')) questControllerChecks++;
+        expect(operand, `${file}: proximity check compares against the shared constant`).toBe(
+          'NPC_WINDOW_CLOSE_RANGE',
+        );
+      }
+    }
+    expect(checks, 'the proximity checks are still there').toBeGreaterThanOrEqual(5);
+    // Floor on the out-of-hud.ts consumer: if the corpus walk regresses to
+    // hud.ts only, this is the assertion that reddens.
+    expect(questControllerChecks, 'the quest dialog controller read is seen').toBeGreaterThan(0);
+
     // Invariant-shaped, not spelling-shaped: the loop above only sees the
-    // `(p.pos, npc.pos)` spelling and a count floor cannot notice an extra
-    // check, so a fifth window closing on `dist2d(p.pos, merchant.pos) > 30`
-    // would sail past it. No dist2d comparison in this file may use a numeric
-    // literal in EITHER direction: the old greater-than-only sweep missed the
+    // `.pos, npc.pos` spellings and a count floor cannot notice an extra
+    // check, so a window closing on `dist2d(p.pos, merchant.pos) > 30` would
+    // sail past it. No dist2d comparison in the corpus may use a numeric
+    // literal on either side: the old greater-than-only sweep missed the
     // market-NPC `<= 8` for the file's whole life (a hand-inlined copy of the
     // value NPC_WINDOW_CLOSE_RANGE names, since renamed onto the constant),
     // and its argument class could not span a nested call like
     // `dist2d(worldPos(a), b.pos)`, so one paren level is allowed now.
-    expect(
-      [...source.matchAll(/dist2d\((?:[^()]|\([^()]*\))*\)\s*[<>]=?\s*[0-9]/g)].map((m) => m[0]),
-      'a dist2d range compared against a bare number',
-    ).toEqual([]);
+    const literalRight = /dist2d\((?:[^()]|\([^()]*\))*\)\s*[<>]=?\s*[0-9]/g;
+    const literalLeft = /[^A-Za-z_0-9.][0-9][0-9.]*\s*[<>]=?\s*dist2d\(/g;
+    // Self-audit first: a mistyped character class would match nothing and
+    // pass forever, which is the exact failure mode this arm was rewritten
+    // to fix. Prove the regexes still bite on synthetic violations.
+    expect('if (dist2d(p.pos, npc.pos) > 8) close();'.match(literalRight)).not.toBeNull();
+    expect('if (dist2d(a, b) <= 8) close();'.match(literalRight)).not.toBeNull();
+    expect('if (dist2d(worldPos(a), b.pos) < 30) close();'.match(literalRight)).not.toBeNull();
+    expect('if (8 >= dist2d(p.pos, npc.pos)) close();'.match(literalLeft)).not.toBeNull();
+    for (const { file, source } of corpus) {
+      expect(
+        [...source.matchAll(literalRight)].map((m) => `${file}: ${m[0]}`),
+        'a dist2d range compared against a bare number',
+      ).toEqual([]);
+      expect(
+        [...source.matchAll(literalLeft)].map((m) => `${file}: ${m[0]}`),
+        'a bare number compared against a dist2d range (Yoda order)',
+      ).toEqual([]);
+    }
   });
 });
 

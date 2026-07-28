@@ -1,17 +1,19 @@
 // The R37 rollout guard: professions content exists ONLY where a rollout row
 // says it does. The editor's new maps and every zone past the built-in three
 // ship with NO professions content at all until the zone-4 design pass gives
-// a future zone its content-sourced tool ladder (R23), and the phase 13
-// new-zone checklist is what flips a zone here from absent to complete.
+// a future zone its content-sourced tool ladder (R23), and the new-zone
+// checklist (docs/design/professions-tuning-packet-review.md) is what flips
+// a zone here from none to complete.
 //
-// The ledger below is the flip point. A zone id present maps to
-// assert-COMPLETE arms (it must carry nodes, a rod-tier row, a catch table in
-// every band, and hub vendor rows); a zone id absent maps to assert-ABSENT
-// (no swept table may reference it). Adding professions content to a new
-// zone without adding its rollout row fails loudly, and so does adding the
-// row without the content, which is exactly the two-sided guard R37 asks
-// for. Every sweep is DERIVED from the live tables with per-table
-// non-vacuity, never a hand-kept list of what exists.
+// The ledger below is the flip point, and EVERY shipped ZoneDef must carry a
+// row (the coverage arm enforces it): 'complete' maps to assert-COMPLETE arms
+// (the zone must carry nodes, a rod-tier row, a catch table in every band,
+// and hub vendor rows); 'none' maps to assert-ABSENT (no swept table may
+// reference the zone). Adding professions content to a new zone without
+// flipping its row to complete fails loudly, and so does flipping the row
+// without the content, which is exactly the two-sided guard R37 asks for.
+// Every sweep is DERIVED from the live tables with per-table non-vacuity,
+// never a hand-kept list of what exists.
 import { describe, expect, it } from 'vitest';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
@@ -25,16 +27,23 @@ import { FISHING_ZONE_ROD_TIERS } from '../src/sim/professions/fishing_zones';
 
 /**
  * The R37 ledger, and deliberately the ONLY hand-kept table in this file.
- * Phase 13's new-zone checklist flips a future zone in by ADDING its row,
- * which turns every assert-absent arm below into assert-complete for it.
+ * A future zone ships with an explicit 'none' row (professions-free until its
+ * design pass, the R37 default) and the new-zone checklist later flips that
+ * row to 'complete', which turns every assert-absent arm below into
+ * assert-complete for it. Shipping a ZoneDef with no row at all is refused by
+ * the coverage arm: the decision must be recorded here either way.
  */
-const PROFESSIONS_ZONE_ROLLOUT: Readonly<Record<string, 'complete'>> = {
+const PROFESSIONS_ZONE_ROLLOUT: Readonly<Record<string, 'complete' | 'none'>> = {
   eastbrook_vale: 'complete',
   mirefen_marsh: 'complete',
   thornpeak_heights: 'complete',
 };
 
-const ROLLED_OUT = new Set(Object.keys(PROFESSIONS_ZONE_ROLLOUT));
+const ROLLED_OUT = new Set(
+  Object.entries(PROFESSIONS_ZONE_ROLLOUT)
+    .filter(([, state]) => state === 'complete')
+    .map(([zoneId]) => zoneId),
+);
 
 /** Every professions implement in the item table (land tools and rods). */
 function professionToolIds(): Set<string> {
@@ -49,9 +58,11 @@ describe('the R37 professions zone-rollout guard', () => {
   it('the rollout ledger covers exactly the shipped ZONES (the flip point is deliberate)', () => {
     // Adding a fourth ZoneDef fails HERE first, by design: the author must
     // decide, in this file, whether the new zone ships professions content
-    // (add its row plus the content) or ships without (leave it absent and
-    // every sweep below enforces the absence).
-    expect([...ZONES.map((z) => z.id)].sort()).toEqual([...ROLLED_OUT].sort());
+    // (a 'complete' row plus the content) or ships without (an explicit
+    // 'none' row, and every sweep below enforces the absence).
+    expect([...ZONES.map((z) => z.id)].sort()).toEqual(
+      [...Object.keys(PROFESSIONS_ZONE_ROLLOUT)].sort(),
+    );
     expect(ZONES.length).toBe(3);
   });
 
@@ -84,8 +95,11 @@ describe('the R37 professions zone-rollout guard', () => {
 
   it('rod-tier rows and catch tables exist for every rolled-out zone and no other', () => {
     // The rod ladder (R19/R22 read this map) and the per-band catch tables
-    // are both zone-keyed; a future zone's water stays tier-1-by-default and
-    // catchless until its rollout row lands.
+    // are both zone-keyed. A future zone's water stays tier-1-by-default,
+    // but NOT catchless: the catch resolver falls back to the Vale rows for
+    // any zone without its own table (fishing.ts), so absence here means
+    // DEFAULT water, and the zone's own tables are part of what its
+    // 'complete' flip must author.
     expect([...Object.keys(FISHING_ZONE_ROD_TIERS)].sort()).toEqual([...ROLLED_OUT].sort());
     expect(FISHING_TABLES_BY_BAND.length).toBeGreaterThan(0);
     for (const [band, byZone] of FISHING_TABLES_BY_BAND.entries()) {
@@ -125,11 +139,16 @@ describe('the R37 professions zone-rollout guard', () => {
     expect(toolRowsSeen).toBeGreaterThan(10);
     // The two non-NPC counters are covered by their own sweeps
     // (tests/professions_tools.test.ts): pin here only that neither has
-    // sprouted a row this guard would need to zone-resolve.
+    // sprouted a row this guard would need to zone-resolve. Local non-vacuity
+    // for both, so an emptied or renamed table reads as a failure here, not
+    // as a vacuous pass delegated to another file.
+    expect(HEROIC_VENDOR_STOCK.length).toBeGreaterThan(0);
     expect(HEROIC_VENDOR_STOCK.some((offer) => tools.has(offer.itemId))).toBe(false);
+    let delveToolRows = 0;
     for (const [delveId, entries] of Object.entries(DELVE_SHOPS)) {
       for (const entry of entries) {
         if (!tools.has(entry.itemId)) continue;
+        delveToolRows += 1;
         // Delve counters DO stock the tier-4/5 crafted tools (the Marks
         // route); every delve lives in a rolled-out zone today, pinned by
         // the delve id naming convention staying within the shipped set.
@@ -139,5 +158,7 @@ describe('the R37 professions zone-rollout guard', () => {
         ).toBe(true);
       }
     }
+    // The Marks-route rows really exist, so the loop above discriminated.
+    expect(delveToolRows).toBeGreaterThan(0);
   });
 });

@@ -165,6 +165,16 @@ describe('the rod a zone takes', () => {
     expect(DEFAULT_FISHING_ROD_TIER).toBe(1);
   });
 
+  it('never resolves a prototype key as a zone row', () => {
+    // The tier map is an object literal, so a bare index would answer
+    // `constructor` and friends with a function, not a tier. The resolver
+    // guards with Object.hasOwn; this loop is what keeps that guard from
+    // rotting (its sibling resolveVendorRowGate carries the same pin).
+    for (const key of ['constructor', 'toString', '__proto__', 'hasOwnProperty']) {
+      expect(rodTierRequiredForZone(key), key).toBe(DEFAULT_FISHING_ROD_TIER);
+    }
+  });
+
   it('is reachable: every requirement names a rod the world actually contains', () => {
     const rodTiers = Object.values(ITEMS)
       .filter((def) => isGatherToolUse(def.use) && def.use.professionId === 'fishing')

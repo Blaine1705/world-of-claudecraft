@@ -5,8 +5,10 @@
 // The unit arms drive each store INDIVIDUALLY with every other store empty,
 // because a disjunction can pass an all-true fixture while reading the wrong
 // member; the all-false case pins the re-grant side. The Sim arms below prove
-// the two non-trivial seam reads (mailbox, real accept path) against the real
-// stores rather than fakes.
+// the three non-trivial seam reads (mailbox with its ownership scoping, the
+// bank, market escrow through the real Market book) against the real stores
+// rather than fakes; the real ACCEPT-path drive lives in
+// tests/professions_starter_tools.test.ts.
 import { describe, expect, it } from 'vitest';
 import type { MarketListing } from '../src/sim/market';
 import {
@@ -62,6 +64,11 @@ describe('playerHoldsQuestItem, one store at a time', () => {
     expect(
       playerHoldsQuestItem(fakeCtx(), fakeMeta([{ itemId: 'iron_ore', count: 5 }]), TOOL),
     ).toBe(false);
+    // A zeroed bank stack is not a copy: deleting the count conjunct must
+    // redden here, not stay green.
+    expect(playerHoldsQuestItem(fakeCtx(), fakeMeta([{ itemId: TOOL, count: 0 }]), TOOL)).toBe(
+      false,
+    );
   });
 
   it('a mailbox attachment counts', () => {
@@ -87,6 +94,36 @@ describe('playerHoldsQuestItem, one store at a time', () => {
       marketListingBelongsTo: () => true,
     });
     expect(playerHoldsQuestItem(other, fakeMeta(), TOOL)).toBe(false);
+    // An emptied-out listing of mine is not a copy either.
+    const drained = fakeCtx({
+      marketListings: [listing({ count: 0 })],
+      marketListingBelongsTo: () => true,
+    });
+    expect(playerHoldsQuestItem(drained, fakeMeta(), TOOL)).toBe(false);
+  });
+
+  it('short-circuits on the bags before touching the realm-global stores', () => {
+    // The mailbox read walks the realm-wide mail book and the escrow read
+    // walks the whole listing book. What keeps those scans off the common
+    // accept path is ORDER: bags first. A reorder would keep every arm above
+    // green while putting a whole-book walk on every quest accept.
+    let mailCalls = 0;
+    let marketCalls = 0;
+    const ctx = fakeCtx({
+      countItem: (id) => (id === TOOL ? 1 : 0),
+      mailboxHoldsItem: () => {
+        mailCalls++;
+        return false;
+      },
+      marketListings: [listing({})],
+      marketListingBelongsTo: () => {
+        marketCalls++;
+        return false;
+      },
+    });
+    expect(playerHoldsQuestItem(ctx, fakeMeta([{ itemId: TOOL, count: 1 }]), TOOL)).toBe(true);
+    expect(mailCalls).toBe(0);
+    expect(marketCalls).toBe(0);
   });
 });
 
@@ -111,5 +148,55 @@ describe('the real seams', () => {
     meta.bank.inventory.push({ itemId: TOOL, count: 1 });
     expect(playerHoldsQuestItem(sim.ctx, meta, TOOL)).toBe(true);
     expect(sim.countItem(TOOL, pid)).toBe(0);
+  });
+
+  it("another player's mailed copy is NOT mine: the ownership conjunct is live", () => {
+    // Dropping belongsTo from mailboxHoldsItem would leave every other arm
+    // green while any stranger\'s mailed sickle suppressed MY re-grant,
+    // silently blocking a player from a required tool.
+    const sim = new Sim({ seed: 33, playerClass: 'warrior', autoEquip: false });
+    const meta = sim.players.get(sim.playerId) as PlayerMeta;
+    sim.postOffice.mail.push({
+      id: 9001,
+      recipientKey: 'somebody-else-entirely',
+      recipientName: 'Somebody Else',
+      senderName: 'Postmaster',
+      kind: 'system',
+      subject: 'Tools',
+      body: '',
+      copper: 0,
+      items: [{ itemId: TOOL, count: 1 }],
+      deliverAt: 0,
+      expiresAt: Infinity,
+      read: false,
+      announced: false,
+    });
+    expect(sim.ctx.mailboxHoldsItem(meta, TOOL)).toBe(false);
+    expect(playerHoldsQuestItem(sim.ctx, meta, TOOL)).toBe(false);
+  });
+
+  it('sees a REAL market escrow through the real ownership check', () => {
+    // The unit arms fake marketListingBelongsTo; this one lists through the
+    // real Market book so the seller-key comparison itself is on the hook.
+    // The tier-1 tools carry noMarketList, so the stand-in is a listable id:
+    // the predicate is item-generic and serves every quest\'s fallback grants.
+    const LISTABLE = 'iron_ore';
+    const sim = new Sim({ seed: 34, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid) as PlayerMeta;
+    // marketList requires standing at the Merchant.
+    const merchant = [...sim.entities.values()].find((e) => e.templateId === 'the_merchant');
+    if (!merchant) throw new Error('no merchant entity in the world');
+    const player = sim.entities.get(meta.entityId);
+    if (!player) throw new Error('no player entity');
+    player.pos.x = merchant.pos.x;
+    player.pos.z = merchant.pos.z;
+    player.prevPos = { ...player.pos };
+    sim.addItem(LISTABLE, 1, pid);
+    expect(playerHoldsQuestItem(sim.ctx, meta, LISTABLE)).toBe(true); // in bags
+    sim.marketList(LISTABLE, 1, 25, pid);
+    expect(sim.countItem(LISTABLE, pid)).toBe(0); // escrowed out of the bags
+    expect(sim.marketListings.some((l) => l.itemId === LISTABLE)).toBe(true);
+    expect(playerHoldsQuestItem(sim.ctx, meta, LISTABLE)).toBe(true);
   });
 });

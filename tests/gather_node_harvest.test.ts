@@ -29,6 +29,8 @@ import { GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { completeFishing } from '../src/sim/professions/fishing';
 import {
+  gatherNodeById,
+  harvestYieldItemId,
   MATERIAL_RARITY_MAX_PROFICIENCY,
   NODE_HARVEST_TABLE,
   nodeMaterialFor,
@@ -1105,10 +1107,45 @@ describe('fine material grades on the live harvest path', () => {
     (sim as any).rng.setObserver(() => {
       draws++;
     });
-    // Denied at the pre-gate, before the cast starts, rng-free, timer intact.
+    // Denied at the pre-gate, before the cast starts, rng-free, timer intact,
+    // and denied FOR THE RIGHT REASON: pin the bags-full text so an unrelated
+    // future refusal cannot mask a regressed pre-gate.
+    sim.drainEvents();
     expect(sim.harvestNode(MIREFEN_T2, pid)).toBe(false);
+    const ev = sim.drainEvents();
+    expect(ev.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(true);
     expect(draws).toBe(0);
     expect(sim.nodeHarvestableByMeFor(MIREFEN_T2, pid)).toBe(true);
+  });
+
+  it('the pre-gate and the grant agree for every confirm mode a save can carry', () => {
+    // The pre-gate resolves through applyEffectBonus bare; the grant resolves
+    // through resolveToolEffectUse, which gates the bonus behind
+    // `confirmMode === 'prompt' && !confirmed`. They agree today because the
+    // grant passes confirmed: true unconditionally, and the mint refuses
+    // 'prompt', but normalizeToolEffectSlots PRESERVES a persisted 'prompt'
+    // row, so the moment a confirm flow passes confirmed variably the two
+    // could resolve different item ids: the exact pre-gate/grant divergence
+    // the one-resolver fix closed, reintroduced along the confirm axis. This
+    // arm reddens instead: for each loadable mode, the id the pre-gate
+    // reserves room for must be the id the grant actually mints.
+    for (const confirmMode of ['always', 'prompt'] as const) {
+      const sim = makeWorld();
+      const pid = sim.addPlayer('warrior', 'Prospector');
+      sim.addItem('iron_mining_pick', 1, pid);
+      sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
+      const meta = mustMeta(sim, pid);
+      const slot = meta.toolEffectSlots?.mining;
+      expect(slot).toBeDefined();
+      if (slot) slot.confirmMode = confirmMode; // as a persisted row would load
+      const node = gatherNodeById(MIREFEN_T2);
+      expect(node).toBeDefined();
+      if (!node) continue;
+      const reserved = harvestYieldItemId(meta, node);
+      teleportOntoNode(sim, pid, MIREFEN_T2);
+      expect(castAndComplete(sim, MIREFEN_T2, pid)).toBe(true);
+      expect(sim.countItem(reserved, pid), `mode ${confirmMode}`).toBeGreaterThanOrEqual(1);
+    }
   });
 
   it('the pre-gate reads the SLOTTED quality effect (allow arm: room for fine only)', () => {
@@ -1154,8 +1191,7 @@ describe('fine material grades on the live harvest path', () => {
     (sim as any).rng.setObserver(() => {
       draws++;
     });
-    expect(sim.harvestNode(MIREFEN_T2, pid)).toBe(true);
-    completeCastNow(sim, pid);
+    expect(castAndComplete(sim, MIREFEN_T2, pid)).toBe(true);
     expect(draws).toBe(2);
     expect(sim.countItem('fine_iron_ore', pid)).toBeGreaterThanOrEqual(1);
     expect(meta.toolEffectSlots?.mining?.durability).toBe(chargesBefore - 1);
@@ -1188,5 +1224,11 @@ describe('fine material grades on the live harvest path', () => {
     expect(draws).toBe(0);
     // And the denial spent nothing: the personal respawn timer is untouched.
     expect(sim.nodeHarvestableByMeFor(MIREFEN_T2, pid)).toBe(true);
+    // Live control in the SAME fixture: revive, and the identical harvest
+    // starts. Dead-ness was the operative cause, not a broken premise
+    // (wrong tool, wrong zone, spent timer) that would deny anybody.
+    p.dead = false;
+    p.hp = p.maxHp;
+    expect(sim.harvestNode(MIREFEN_T2, pid)).toBe(true);
   });
 });

@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
-import { TOOL_EFFECTS } from '../src/sim/content/professions';
+import { TOOL_EFFECT_IDS, TOOL_EFFECTS } from '../src/sim/content/professions';
 import { VENDOR_ROW_GATES } from '../src/sim/content/vendor_row_gates';
 import { GATHER_NODES, ITEMS, NPCS } from '../src/sim/data';
+import { rodTierRequiredForZone } from '../src/sim/professions/fishing_zones';
 import { MATERIAL_GRADES, yieldsFineGrade } from '../src/sim/professions/material_grades';
 import {
   applyEffectBonus,
@@ -136,6 +137,20 @@ describe('gathering tool tier gating (#1123)', () => {
       'silverstream_fishing_rod',
     ]) {
       expect(highwatch).toContain(toolId);
+    }
+    // Cross-pin the no-strand story itself: the rod each hub stocks must
+    // satisfy its own zone's water. The row pins above and the tier table in
+    // tests/fishing_zones.test.ts were two independent literals a coordinated
+    // retune could strand with both files green; this line ties them.
+    for (const [rodId, zoneId] of [
+      ['ironreel_fishing_rod', 'mirefen_marsh'],
+      ['silverstream_fishing_rod', 'thornpeak_heights'],
+    ] as const) {
+      const use = ITEMS[rodId].use;
+      if (!isGatherToolUse(use)) throw new Error(`${rodId} is not a gather tool`);
+      expect(use.tier, `${rodId} covers ${zoneId}`).toBeGreaterThanOrEqual(
+        rodTierRequiredForZone(zoneId),
+      );
     }
   });
 
@@ -898,6 +913,19 @@ describe('tool effect slotting, on the axes the live harvest path has', () => {
     expect(yieldsFineGrade(minGatherTier, minGatherTier, boosted.gradeToolTier)).toBe(false);
     // The counterfactual that names the margin: one more point flips it.
     expect(yieldsFineGrade(minGatherTier, minGatherTier, boosted.gradeToolTier + 1)).toBe(true);
+    // And the margin holds for EVERY quality effect the catalog carries, not
+    // just the one this fixture names: the bonus is data (def.bonus), so a
+    // new bonus-2 quality effect would be a pure content change that minted
+    // fine grades bare-handed with the arm above still green.
+    const qualityIds = TOOL_EFFECT_IDS.filter((id) => TOOL_EFFECTS[id].kind === 'quality');
+    expect(qualityIds.length).toBeGreaterThan(0); // non-vacuity
+    for (const id of qualityIds) {
+      const over = applyEffectBonus(slotEffect(id), { quantity: 1, gradeToolTier: NO_TOOL_OWNED });
+      expect(
+        yieldsFineGrade(minGatherTier, minGatherTier, over.gradeToolTier),
+        `${id} must not mint fine grades over bare hands`,
+      ).toBe(false);
+    }
   });
 
   it('the quality effect raises what comes OUT of a vein, never which veins open', () => {

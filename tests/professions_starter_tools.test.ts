@@ -184,7 +184,7 @@ describe('the gather quests grant the tool their own objective needs', () => {
   });
 });
 
-describe('the tier-1 starter tools have no route to value', () => {
+describe('the tier-1 starter tools have no route to copper or market value', () => {
   it('every tier-1 gathering tool carries BOTH flags, and no higher tier carries either', () => {
     for (const itemId of TIER_1_TOOLS) {
       // noVendorSell closes the copper mint; noMarketList closes the value
@@ -202,7 +202,33 @@ describe('the tier-1 starter tools have no route to value', () => {
     }
   });
 
-  it('a traded-away tool still re-grants (R10), so the tools must have no value route at all', () => {
+  it('every requiredItems quest anywhere keeps its item out of the stores the predicate cannot see', () => {
+    // The accept-time predicate reads bags, bank, mailbox, and LIVE market
+    // escrow. Two player-recoverable stores sit outside it: the vendor
+    // buy-back list and the expired-listing market collection (an expired
+    // listing is spliced OUT of marketListings before the player claims it).
+    // Today no required item can reach either store, because each is quest
+    // kind (refused by sellItem and the market alike) or carries both
+    // noVendorSell and noMarketList. This sweep is the fence: a FUTURE quest
+    // requiring a sellable, listable item re-opens the duplicate-mint loop
+    // through buy-back or the collection, and must widen the predicate first.
+    const swept = Object.values(QUESTS).filter((q) => (q.requiredItems?.length ?? 0) > 0);
+    expect(swept.length, 'the requiredItems quests exist').toBeGreaterThanOrEqual(5);
+    for (const quest of swept) {
+      for (const itemId of quest.requiredItems ?? []) {
+        const def = ITEMS[itemId];
+        expect(def, `${quest.id}: ${itemId} exists`).toBeDefined();
+        const fenced =
+          def.kind === 'quest' || (def.noVendorSell === true && def.noMarketList === true);
+        expect(
+          fenced,
+          `${quest.id}: ${itemId} must be unreachable from buy-back and collections`,
+        ).toBe(true);
+      }
+    }
+  });
+
+  it('a traded-away tool still re-grants (R10), so the copper and market routes stay closed', () => {
     // The reason both flags exist, stated as a test rather than as prose.
     // removeItem here stands in for a DIRECT TRADE, the one transfer route
     // left deliberately open by ruling (R10): the copy is genuinely gone from

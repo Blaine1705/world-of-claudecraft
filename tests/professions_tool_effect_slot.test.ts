@@ -323,6 +323,72 @@ describe('persistence: absent stays absent, present round-trips', () => {
     expect(Object.hasOwn(TOOL_EFFECTS, 'retired_effect')).toBe(false);
   });
 
+  it('drops policy-refused rows on the REAL load path and round-trips as a fixed point', () => {
+    // The normalizer-unit arms above cannot see a load-path regression (for
+    // example initializing the field to {} instead of leaving it undefined),
+    // which would put an empty-object blob into every save and move parity
+    // goldens. So: drive addPlayer with a persisted blob and pin the whole
+    // serialize-load-serialize cycle, the same fixed-point contract the
+    // cadence field carries in tests/professions_quest_cadence.test.ts.
+    const sim = makeSim();
+    const state = sim.serializeCharacter(sim.playerId) as CharacterState;
+    state.toolEffectSlots = {
+      mining: {
+        effectId: 'quickening_charm',
+        durability: 5,
+        maxDurability: 5,
+        confirmMode: 'always',
+      },
+      fishing: {
+        effectId: 'gatherers_cache',
+        durability: 3,
+        maxDurability: 30,
+        confirmMode: 'always',
+      },
+      logging: {
+        effectId: 'gatherers_cache',
+        durability: 7,
+        maxDurability: 30,
+        confirmMode: 'always',
+      },
+    } as CharacterState['toolEffectSlots'];
+    const reloaded = makeSim(16);
+    const pid = reloaded.addPlayer('warrior', 'Policy', { state });
+    const meta = reloaded.meta(pid) as PlayerMeta;
+    // The live row survives byte-faithful; both refused rows are gone.
+    expect(meta.toolEffectSlots).toEqual({
+      logging: {
+        effectId: 'gatherers_cache',
+        durability: 7,
+        maxDurability: 30,
+        confirmMode: 'always',
+      },
+    });
+    // Fixed point: a second save-load cycle changes nothing.
+    const resaved = reloaded.serializeCharacter(pid) as CharacterState;
+    const again = makeSim(17);
+    const pid2 = again.addPlayer('warrior', 'Policy2', { state: resaved });
+    expect(again.serializeCharacter(pid2)?.toolEffectSlots).toEqual(resaved.toolEffectSlots);
+  });
+
+  it('an all-refused blob loads AND re-saves with the field absent, never {}', () => {
+    const sim = makeSim();
+    const state = sim.serializeCharacter(sim.playerId) as CharacterState;
+    state.toolEffectSlots = {
+      fishing: {
+        effectId: 'gatherers_cache',
+        durability: 3,
+        maxDurability: 30,
+        confirmMode: 'always',
+      },
+    } as CharacterState['toolEffectSlots'];
+    const reloaded = makeSim(18);
+    const pid = reloaded.addPlayer('warrior', 'AllRefused', { state });
+    expect((reloaded.meta(pid) as PlayerMeta).toolEffectSlots).toBeUndefined();
+    const resaved = reloaded.serializeCharacter(pid) as CharacterState;
+    expect('toolEffectSlots' in resaved).toBe(false);
+  });
+
   it('clamps a corrupt counter instead of loading a negative or over-full charge', () => {
     const sim = makeSim();
     const state = sim.serializeCharacter(sim.playerId) as CharacterState;

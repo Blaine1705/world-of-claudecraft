@@ -1,5 +1,5 @@
-// Ruling R13 (docs/design/professions-tuning-packet-review.md, phase 8 item
-// 8b.7): the design record's time-to-master target is PROSE only.
+// Ruling R13 (docs/design/professions-tuning-packet-review.md, item 8b.7):
+// the design record's time-to-master target is PROSE only.
 // `docs/design/professions.md` states "craft mastery in 10 to 20 focused
 // hours" and `docs/design/professions-tuning-packet.md` records "Full
 // armorcrafting mastery is 150 crafts" against that target, and until now
@@ -48,16 +48,25 @@
 //    (gathering.ts writes meta.nodeHarvestReadyAt), so this ceiling is a
 //    personal rate, not a shared-server one.
 //
-// DELIBERATE SIMPLIFICATIONS, all of which make the result a FLOOR
-// - Common-rarity yields only. Every material row grants 1 unit on a common
-//   roll and 2 to 4 on a rarer one, so a real climb needs fewer casts than
-//   this. Assuming the common row is the honest pessimistic arm and keeps the
-//   derivation draw-free (no Rng, no seed hunting).
-// - Zero hours for vendor and mob-drop reagents. Those are a gold cost and a
-//   kill count, not a harvest rate. They are still summed and asserted
-//   non-empty, because a bill that became all-gathered or all-vendor would be
-//   a different game and should redden here.
-// - No travel, no node contention, no cast time. The respawn ceiling is the
+// DELIBERATE SIMPLIFICATIONS, each named with its bias DIRECTION (they do
+// not all point the same way; the per-bullet direction is what a tuner needs)
+// - Common-rarity yields only: biases the hours UP. Every material row grants
+//   1 unit on a common roll and 2 to 4 on a rarer one, so a real climb needs
+//   fewer casts than this. Assuming the common row is the honest pessimistic
+//   arm and keeps the derivation draw-free (no Rng, no seed hunting).
+// - No self-signed reduction: biases the bill (and hours) UP. Every
+//   requiredReagentCountFor call passes hasSelfSigned false, so the #1145
+//   reduction a real crafter holding their own signed work would enjoy is
+//   never applied.
+// - stationType is ignored entirely: direction DOWN, of a piece with the
+//   no-travel bullet below. Stations sit in hubs; reaching one costs walk
+//   time this model does not price.
+// - Zero hours for vendor and mob-drop reagents: biases DOWN. Those are a
+//   gold cost and a kill count, not a harvest rate. They are still summed and
+//   asserted non-empty, because a bill that became all-gathered or all-vendor
+//   would be a different game and should redden here.
+// - No travel, no node contention, no cast time: biases DOWN. The respawn
+//   ceiling is the
 //   binding term (450 thorium casts over six nodes is five hours of respawn
 //   against roughly nineteen minutes of casting at GATHER_CAST_BASE_SEC), so
 //   folding cast time in would move the total by a few percent and hide the
@@ -81,8 +90,9 @@
 // small tune does not redden it, and the bite arms measure both ends: tripling
 // the gathered half of every reagent list reaches 21.7 hours, trimming it to a
 // third reaches 1.7, and halving node density reaches 13.9. Note that 6.94
-// sits BELOW the prose target of 10 to 20 focused hours, which is what a floor
-// model should do and is the honest reading to argue balance from.
+// sits BELOW the prose target of 10 to 20 focused hours: the down-biased
+// bullets dominate, so the derived figure reads as an optimistic floor, and
+// the per-bullet directions above say which lever moves it which way.
 
 import { describe, expect, it } from 'vitest';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
@@ -153,6 +163,13 @@ function gatheredSources(): Map<string, GatheredSource> {
   const sources = new Map<string, GatheredSource>();
   for (const [type, byZone] of Object.entries(NODE_MATERIAL_TABLE)) {
     for (const [zoneId, row] of Object.entries(byZone)) {
+      // Keying by itemId assumes one granting zone per material. Refuse the
+      // day that stops being true instead of silently keeping whichever zone
+      // the iteration visits last (the cheapest zone might be the dropped
+      // one, quietly inflating every hour figure).
+      if (sources.has(row.itemId)) {
+        throw new Error(`${row.itemId} is granted by more than one zone; the inversion must pick`);
+      }
       sources.set(row.itemId, {
         type: type as GatherNodeType,
         zoneId,
@@ -359,6 +376,37 @@ describe('armorcrafting mastery derives from the live tables (R13)', () => {
     const result = resolveCraftForRecipe(ctxOf(sim), pid, recipe!);
     expect(result.ok, `calibration craft denied: ${JSON.stringify(result)}`).toBe(true);
     expect(meta.craftSkills[CRAFT]).toBe(BASE_GAIN_PER_CRAFT);
+
+    // Second calibration point, OFF the full-multiplier peak: the pin above
+    // only meets the real gain site where the multiplier is exactly 1, so a
+    // formula-shape change that coincides there but diverges below it (a
+    // floor, a rounding, a different gray-out curve) would slip past. Find
+    // the first skill where this recipe's multiplier is genuinely partial
+    // and pin the real craft's delta against the same product the model
+    // applies.
+    let partialSkill = -1;
+    let partial = 0;
+    for (let s = 1; s < craftMaxSkillFor(CRAFT); s++) {
+      const m = craftSkillGainMultiplier(
+        { ...meta.craftSkills, [CRAFT]: s },
+        ATTUNEMENT.activeArchetype,
+        ATTUNEMENT.pairedMajor,
+        CRAFT,
+        ATTUNEMENT.hobbyCraft,
+        recipe!.skillReq,
+      );
+      if (m > 0 && m < 1) {
+        partialSkill = s;
+        partial = m;
+        break;
+      }
+    }
+    expect(partialSkill, 'a partial-multiplier rung exists for the recipe').toBeGreaterThan(0);
+    meta.craftSkills[CRAFT] = partialSkill;
+    for (const reagent of recipe!.reagents) sim.addItem(reagent.itemId, reagent.count, pid);
+    const second = resolveCraftForRecipe(ctxOf(sim), pid, recipe!);
+    expect(second.ok, `partial-point craft denied: ${JSON.stringify(second)}`).toBe(true);
+    expect(meta.craftSkills[CRAFT]).toBeCloseTo(partialSkill + BASE_GAIN_PER_CRAFT * partial, 10);
   });
 
   it('the walk reaches the cap in a finite, non-trivial number of crafts', () => {

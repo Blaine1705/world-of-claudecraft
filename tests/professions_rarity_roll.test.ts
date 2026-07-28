@@ -188,6 +188,10 @@ describe('a slotted tool effect changes the yield and never the draw stream', ()
     if (!ORE_NODE) throw new Error('no eastbrook ore node');
     const without = drawsFor(undefined, 4242);
     expect(without).toHaveLength(2); // the pinned contract itself
+    // The charm row below builds a state the live game can no longer reach
+    // (R9 refuses it at the mint and drops it at load); it stays as defense
+    // in depth for the slotEffect leaf itself, not as live-path coverage, so
+    // do not delete it as dead or mistake it for one.
     for (const effectId of ['gatherers_cache', 'artisans_eye', 'quickening_charm'] as const) {
       const withSlot = drawsFor(slotEffect(effectId, { toolRarity: 'epic' }), 4242);
       expect(withSlot, `${effectId} moved the stream`).toEqual(without);
