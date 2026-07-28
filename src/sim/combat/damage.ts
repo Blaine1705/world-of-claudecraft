@@ -29,13 +29,14 @@ import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
+import { lockNormalDungeonResetOnBossKill } from '../instances/dungeons';
 import { pvpDamageMultiplier } from '../pvp';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { vcupBothSeated } from '../social/vale_cup';
-import { addThreat, clearThreat } from '../threat';
-import type { Entity } from '../types';
+import { addThreat, canDetectStealthedTarget, clearThreat } from '../threat';
+import type { DamageEventKind, Entity } from '../types';
 import {
   berserkerCritDamage,
   dist2d,
@@ -81,7 +82,7 @@ import {
 } from './priest/talents';
 import { vespersEchoDamage, vespersOnEntityDeath } from './priest/vespers';
 import { foulPlayGuardsBreak } from './rogue_talents';
-import { clearSpiritmendCurrents } from './shaman_spiritmend';
+import { clearSpiritmendCurrents, UNLEASH_WEAPON_GUARD_ID } from './shaman_spiritmend';
 import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
@@ -94,6 +95,7 @@ const VICTORY_RUSH_WINDOW = 20;
 const PURSUIT_SPEED_DURATION = 6;
 const BLOODBATH_DURATION = 8;
 const BLOODBATH_MAX_STACKS = 5;
+const PET_STEALTH_DETECTION_RADIUS = 50;
 
 // Baseline uninterruptible casts and a resolved talent modifier can each block
 // classic-era damage pushback. The resolved check is player-only and reads the
@@ -114,7 +116,7 @@ export function dealDamage(
   crit: boolean,
   school: string,
   ability: string | null,
-  kind: 'hit' | 'miss' | 'dodge',
+  kind: DamageEventKind,
   noRage = false,
   threatOpts?: { flat?: number; mult?: number },
   // Whether this is a DIRECT attack (auto-attack swing or a direct-hit spell) as
@@ -138,6 +140,13 @@ export function dealDamage(
   aoe = false,
 ): void {
   if (target.dead) return;
+  if (
+    source?.kind === 'mob' &&
+    source.ownerId !== null &&
+    target.kind === 'player' &&
+    !canDetectStealthedTarget(source, target, PET_STEALTH_DETECTION_RADIUS)
+  )
+    return;
   if (target.gm || target.devGod) return; // GMs and /dev god are invulnerable (every damage path funnels here)
   // Ice Block (Cold Coffin): while encased in stasis the mage is FULLY immune to
   // damage (owner 2026-07-13), so nothing gets through until it is cancelled or
@@ -155,7 +164,7 @@ export function dealDamage(
   // Cauterize (fire spec): +12% Fire damage to enemies while the caster is burning
   // (combat/fire_mage.ts). Returns 1x for everyone else and for the self-burn, so all
   // other damage is byte-identical.
-  amount = Math.round(amount * cauterizeFireDamageMult(source, target, school));
+  if (!alreadyFinal) amount = Math.round(amount * cauterizeFireDamageMult(source, target, school));
 
   // [dev] A god-mode player (/dev god) hits for 100x so a solo tester can chew
   // through raid bosses to inspect drops without one-shotting them past their phase
@@ -411,6 +420,10 @@ export function dealDamage(
       a.value -= soaked;
       amount -= soaked;
       totalAbsorbed += soaked;
+      // Unleash Weapon protects against one damage event only. Any unused
+      // protection falls away after that hit instead of behaving like a
+      // conventional multi-hit absorb shield.
+      if (a.id === UNLEASH_WEAPON_GUARD_ID) a.value = 0;
       if (a.value <= 0) {
         target.auras.splice(i, 1);
         ctx.emit({ type: 'aura', targetId: target.id, name: a.name, gained: false });
@@ -1019,7 +1032,7 @@ function reflectSpellWard(
   source: Entity | null,
   target: Entity,
   amount: number,
-  kind: 'hit' | 'miss' | 'dodge',
+  kind: DamageEventKind,
   school: string,
 ): void {
   if (source?.kind !== 'player' || source.id === target.id) return;
@@ -1062,7 +1075,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   e.ccDr.clear();
   e.castingAbility = null;
   e.castTargetId = null;
-  // Phase 12b hidden per-cast state: death ends any gather/fishing session, so
+  // Hidden per-cast state: death ends any gather/fishing session, so
   // the fields must return to inert here too (the parity samplers rely on them
   // being 0/'' at every sampled frame outside a live cast; cancelCast owns the
   // ordinary cancel paths, but a lethal non-hit tick reaches death directly).
@@ -1372,6 +1385,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // Settle the heroic reward and its realm-reset lockout together. This runs
     // even without player credit so the owning group cannot dodge the lockout;
     // only the participation snapshot above receives marks.
+    lockNormalDungeonResetOnBossKill(ctx, e);
     ctx.awardHeroicMarks(e, heroicRewardRecipients);
     // Nythraxis normal and heroic raid lockouts use a wider room sweep than
     // generic dungeon claims. Run it after heroic settlement so its lock stamp

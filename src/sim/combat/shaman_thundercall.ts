@@ -110,6 +110,7 @@ export function thundercallDamageMultiplier(
 ): number {
   if (!isThundercall(ctx, player)) return 1;
   const charges = thunderCharges(player);
+  if (charges < THUNDER_CHARGE_CAP) return 1;
   const primalBonus = player.auras.some((aura) => aura.id === PRIMAL_MASTERY_VENT_ID)
     ? PRIMAL_MASTERY_VENT_BONUS
     : 0;
@@ -146,6 +147,7 @@ export function consumeThunderVent(
 ): number {
   if (!isThundercall(ctx, player) || !THUNDER_VENTS.has(abilityId)) return 0;
   const charges = thunderCharges(player);
+  if (charges < THUNDER_CHARGE_CAP) return 0;
   const index = player.auras.findIndex((aura) => aura.id === THUNDER_CHARGES_ID);
   if (index >= 0) removeAuraAt(ctx, player, index);
   const primalVentIndex = player.auras.findIndex((aura) => aura.id === PRIMAL_MASTERY_VENT_ID);

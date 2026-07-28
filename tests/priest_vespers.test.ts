@@ -2,9 +2,15 @@ import { describe, expect, it } from 'vitest';
 import {
   addGloomtithe,
   GLOOMTITHE_GRACE,
+  MINDFRACTURE_SPELL_POWER_COEFF,
+  resolveVespersAbility,
+  TITHEFIEND_BASE_SPELL_POWER_COEFF,
   TITHEFIEND_ECHO_RATE,
   TITHEFIEND_MANA_RETURN_RATE,
+  TITHEFIEND_MAX_STACK_DAMAGE_MULT,
+  TITHEFIEND_MAX_STACK_SCALE,
   TITHEFIEND_STRIKE_ID,
+  VESPERS_DOT_DAMAGE_MULT,
   vespersAfterAbility,
   vespersEchoDamage,
   vespersOnDotTick,
@@ -68,6 +74,34 @@ function prepareEffigy(sim: Sim, priest: Entity, primary: Entity, secondary?: En
 }
 
 describe('Vespers baseline loop', () => {
+  it('raises Vespers Dirge damage by 25% and gives Mindfracture stronger Spell Power scaling', () => {
+    const { sim, priest } = vespersPriest();
+    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+    const meta = ctx.players.get(priest.id);
+    const dirge = sim.resolvedAbility('shadow_word_pain', priest.id);
+    const mindfracture = sim.resolvedAbility('mind_blast', priest.id);
+    if (!meta || !dirge || !mindfracture) throw new Error('Vespers abilities missing');
+
+    const baseDirge = {
+      ...dirge,
+      effects: dirge.effects.map((effect) =>
+        effect.type === 'dot' ? { ...effect, total: 84 } : effect,
+      ),
+    };
+    const resolvedDirge = resolveVespersAbility(baseDirge, meta);
+    const resolvedMindfracture = resolveVespersAbility(mindfracture, meta);
+    const dirgeDot = resolvedDirge.effects.find((effect) => effect.type === 'dot');
+    const mindfractureHit = resolvedMindfracture.effects.find(
+      (effect) => effect.type === 'directDamage',
+    );
+
+    expect(VESPERS_DOT_DAMAGE_MULT).toBe(1.25);
+    expect(dirgeDot?.type === 'dot' ? dirgeDot.total : 0).toBe(105);
+    expect(
+      mindfractureHit?.type === 'directDamage' ? mindfractureHit.spellPowerCoeff : undefined,
+    ).toBe(MINDFRACTURE_SPELL_POWER_COEFF);
+  });
+
   it('binds Effigy only through Mindfracture on the priest own Dirge', () => {
     const { sim, priest } = vespersPriest();
     const primary = addDummy(sim, 9900, priest.pos.x, priest.pos.z + 8);
@@ -373,6 +407,64 @@ describe('Vespers baseline loop', () => {
         (entity) => entity.ownerId === priest.id && entity.guardianState?.key === 'tithefiend',
       ),
     ).toBe(false);
+  });
+
+  it('makes a five-stack Tithefiend larger and scales its stronger strikes with Spell Power', () => {
+    const { sim, priest } = vespersPriest();
+    const primary = addDummy(sim, 9924, priest.pos.x, priest.pos.z + 8);
+    castAndSettle(sim, priest, primary, 'shadow_word_pain');
+    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+    addGloomtithe(ctx, priest, 5);
+
+    priest.gcdRemaining = 0;
+    priest.resource = priest.maxResource;
+    priest.cooldowns.delete('summon_tithefiend');
+    sim.castAbility('summon_tithefiend', priest.id);
+    sim.tick();
+
+    const guardian = [...sim.entities.values()].find(
+      (entity) => entity.ownerId === priest.id && entity.guardianState?.key === 'tithefiend',
+    );
+    expect(guardian?.scale).toBe(TITHEFIEND_MAX_STACK_SCALE);
+    expect(guardian?.guardianState?.minDamage).toBe(
+      Math.round((12 + 5 * 8) * TITHEFIEND_MAX_STACK_DAMAGE_MULT),
+    );
+    expect(guardian?.guardianState?.spellPowerCoeff).toBe(
+      TITHEFIEND_BASE_SPELL_POWER_COEFF * TITHEFIEND_MAX_STACK_DAMAGE_MULT,
+    );
+  });
+
+  it('adds the five-stack Tithefiend Spell Power bonus to each real strike', () => {
+    const strikeDamage = (spellPower: number): number => {
+      const { sim, priest } = vespersPriest();
+      const primary = addDummy(sim, 9925, priest.pos.x, priest.pos.z + 8);
+      primary.auras.push({
+        id: 'shadow_word_pain',
+        name: 'Dirge of Decay',
+        kind: 'dot',
+        remaining: 60,
+        duration: 60,
+        value: 1,
+        tickInterval: 60,
+        tickTimer: 60,
+        sourceId: priest.id,
+        school: 'shadow',
+      });
+      addGloomtithe((sim as unknown as { ctx: SimContext }).ctx, priest, 5);
+      priest.gcdRemaining = 0;
+      priest.resource = priest.maxResource;
+      priest.cooldowns.delete('summon_tithefiend');
+      sim.castAbility('summon_tithefiend', priest.id);
+      sim.tick();
+      priest.spellPower = spellPower;
+      const before = primary.hp;
+      for (let tick = 0; tick < 12; tick++) sim.tick();
+      return before - primary.hp;
+    };
+
+    expect(strikeDamage(100) - strikeDamage(0)).toBe(
+      Math.round(100 * TITHEFIEND_BASE_SPELL_POWER_COEFF * TITHEFIEND_MAX_STACK_DAMAGE_MULT),
+    );
   });
 
   it('dismisses Tithefiend when no Effigy or own-Dirge fallback remains', () => {

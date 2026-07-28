@@ -61,6 +61,8 @@ change.
 - Totem or ground placement cannot require pixel-precise targeting during the normal rotation.
 - Warspirit off-tanking must use a deliberate stance, imbue, or loadout decision rather than
   extra reactive buttons.
+- Unleash Weapon remains one shared action. Its effect follows the active specialization weapon
+  enhancement instead of adding another rotational button.
 
 ### Spec-specific weapon enhancements
 
@@ -81,10 +83,16 @@ Each specialization normally shows one relevant weapon-enhancement action. Warsp
 because selecting Galeheart or Stonebound is its explicit role decision. Applying one removes the
 other.
 
+Unleash Weapon is available to all three specializations at level 14 and requires one of these
+enhancements to be active. Pyrebrand deals Fire damage and grants Thunder. Galeheart makes a weapon
+strike, advances Warspirit Cadence, and briefly increases attack speed. Stonebound makes a smaller
+weapon strike, forces the target to attack the Shaman, and briefly reduces incoming damage.
+Lifespring consumes one owned Mending Current for an immediate heal and one-hit guard.
+
 ### Spec-specific action ownership
 
-Arc Bolt, Mending Waters, the three Jolts, Thunder Ward, and Shadewolf remain the shared class
-backbone. New rotation actions and specialization behavior are gated as follows:
+Arc Bolt, Mending Waters, the three Jolts, Thunder Ward, Shadewolf, and Unleash Weapon remain the
+shared class backbone. New rotation actions and specialization behavior are gated as follows:
 
 | Specialization | Exclusive actions and states |
 |---|---|
@@ -121,6 +129,7 @@ vent.
 4. Faultwake consumes the bank for prepared area damage.
 5. A full bank receives a persistent armed cue on both payoff actions.
 6. Primal Mastery creates a faster build-and-vent window using those same actions.
+7. Unleash Weapon turns active Pyrebrand into Fire damage and two Thunder charges.
 
 ### Player decision
 
@@ -156,6 +165,8 @@ three-step cadence through the existing auto-attack system; they do not create s
 5. Ancestral Strike advances the cadence by two steps and can trigger at most one Galeheart event.
 6. Stonebound keeps the instant-cast cadence but replaces Galeheart echoes with armor, threat,
    damage smoothing, and defensive shock or shield behavior.
+7. Unleash Weapon advances Galeheart pressure or provides a short Stonebound control and defense
+   window, depending on the active posture.
 
 ### Galeheart contract
 
@@ -214,10 +225,11 @@ then spends the stored current to answer sudden group damage.
 1. Mending Waters creates or enlarges a Mending Current healing pool on its target.
 2. Mending Current heals gradually while its remaining stored amount stays visible.
 3. Tidecall heals an ally immediately and increases the size of that ally's Mending Current.
-4. Cascading Mend follows its canonical bounce behavior and consumes the Mending Current on every ally it
+4. Unleash Weapon consumes one ally's Mending Current for an immediate heal and one-hit guard.
+5. Cascading Mend follows its canonical bounce behavior and consumes the Mending Current on every ally it
    reaches.
-5. Each consumed Mending Current immediately heals that ally for more than its remaining stored amount.
-6. The player chooses steady healing over time or a prepared Cascading Mend burst.
+6. Each consumed Mending Current immediately heals that ally for more than its remaining stored amount.
+7. The player chooses steady healing over time, a prepared single-target rescue, or a prepared group burst.
 
 ### Mending Current contract
 
@@ -231,6 +243,10 @@ Mending Current is a healing-over-time pool attached to an ally, not another res
   duration. Its cooldown, charges, and healing coefficient remain PBE values.
 - Lifespring Weapon increases the amount deposited by Mending Waters and the instant boost.
 - The party frame and ally presentation show the pool's relative size and remaining duration.
+
+Unleash Weapon consumes one owned Mending Current and immediately heals for 125% of its remaining
+amount. For 8 seconds, the next hit is reduced by 50% of the effective healing. Overhealing cannot
+inflate this guard, and any unused protection is lost after that hit.
 
 Mending Current may use calculated healing before overheal so the Shaman can prepare for expected damage,
 but the maximum-health cap prevents unlimited preloading. Exact deposit, tick, and cap values are
@@ -255,8 +271,9 @@ group burst, and overhealing risk.
 
 ### Player decision
 
-The player chooses whether to leave Mending Currents active for efficient healing over time, enlarge them
-for expected group damage, or consume them now through Cascading Mend to save endangered allies.
+The player chooses whether to leave Mending Currents active for efficient healing over time,
+consume one through Unleash Weapon to save a threatened ally, or consume several through
+Cascading Mend after group damage.
 
 ### Guardrails
 

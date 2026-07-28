@@ -56,6 +56,7 @@ damage smoothing take its place.
 | One-handed dual wield | Warspirit equipment permission. Each landed base swing from either hand adds one cadence step. |
 | Galeheart Weapon | Warspirit offensive enhancement. Every third landed melee attack triggers two echo strikes. |
 | Stonebound Weapon | Warspirit off-tank enhancement. Replaces Galeheart and enables the defensive package. |
+| Unleash Weapon | Shared Shaman action. Galeheart advances cadence and grants brief attack speed. Stonebound forces the target and grants brief damage reduction. |
 | Ancestral Strike | Existing signature melee strike. Counts as two steps toward the next cadence trigger. |
 | Stormcast | Twelve-second aura armed at the third cadence step. Makes the next Arc Bolt, Jolt, or Mending Waters instant and 50% cheaper. |
 | Earthen Jolt | Damage or control cast in Galeheart, snap threat and short forced-target effect in Stonebound. |
@@ -76,6 +77,7 @@ and earned-spell decision are required.
   safe off-hand sanitation path without deleting the item.
 - Warspirit has Galeheart Weapon and Stonebound Weapon available.
 - Applying one removes the other immediately.
+- Unleash Weapon follows the active posture and refuses the cast when neither enhancement is active.
 - The selected enhancement is visible on the weapon, character, aura list, and action state.
 - Changing specialization removes Warspirit-only weapon state cleanly.
 - Pyrebrand and Lifespring are not available while Warspirit is selected.

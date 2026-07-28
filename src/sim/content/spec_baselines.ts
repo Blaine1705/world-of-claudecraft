@@ -29,7 +29,11 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ],
     },
     protection: {
-      stats: { str: 6, dodge: 0.02, armorPct: 0.29 },
+      // staPct 0.35 (2026-07 tank parity): armor was already best-in-class,
+      // but with no stamina multiplier the paladin sat at 76% of the prot
+      // warrior's effective HP. This lands him at rough parity while the
+      // warrior keeps parry/block/stance as the pure-tank identity.
+      stats: { str: 6, dodge: 0.02, armorPct: 0.29, staPct: 0.35 },
       global: { threatPct: 0.2 },
       ability: [
         { ability: 'devotion_aura', buffPct: 0.4 },
@@ -104,8 +108,9 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       global: { healPct: 0.08 },
       ability: [
         { ability: 'lesser_heal', dmgPct: 0.18, costPct: -0.16 },
-        { ability: 'heal', dmgPct: 0.18, costPct: -0.16, castPct: -0.2 },
+        { ability: 'heal', dmgPct: 0.18, costPct: -0.3, castPct: -0.2 },
         { ability: 'flash_heal', costPct: -0.16 },
+        { ability: 'prayer_of_healing', costPct: -0.15 },
         { ability: 'smite', castPct: -0.1 },
       ],
     },
@@ -137,8 +142,9 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       // stays below Elemental's; melee AP is retained.
       stats: { int: 2, ap: 24 },
       ability: [
-        { ability: 'lightning_bolt', costPct: -0.1 },
-        { ability: 'earth_shock', costPct: -0.1 },
+        { ability: 'lightning_bolt', costPct: -0.2 },
+        { ability: 'earth_shock', costPct: -0.2 },
+        { ability: 'flame_shock', costPct: -0.2 },
         { ability: 'rockbiter_weapon', dmgPct: 0.4 },
         { ability: 'stormstrike', dmgPct: 0.25 },
       ],
@@ -193,7 +199,10 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ],
     },
     feral: {
-      stats: { armorPct: 0.23 },
+      // staPct 0.25 (2026-07 tank parity, with Sloth Form armor 1.9 -> 2.3):
+      // leather has no plate tier to grow into, so the form multiplier and
+      // the baseline carry the difference (the Dire Bear logic).
+      stats: { armorPct: 0.23, staPct: 0.25 },
       global: { threatPct: 0.2 },
       ability: [
         { ability: 'maul', dmgPct: 0.35 },

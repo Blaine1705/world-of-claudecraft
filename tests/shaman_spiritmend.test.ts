@@ -203,4 +203,52 @@ describe('Shaman v0.29 Spiritmend', () => {
 
     expect(healingFor(events, healerId, allyId)).toBeGreaterThan(0);
   });
+
+  it('unleashes one owned Mending Current into a burst and one-hit guard', () => {
+    const { sim, healer, healerId, ally, allyId } = setup(2826);
+    castAndResolve(sim, healer, 'lifespring_weapon', healerId, 1);
+    ally.hp = ally.maxHp - 300;
+    seedCurrent(ally, healerId, 200);
+
+    const events = castAndResolve(sim, healer, 'unleash_weapon', allyId, 1);
+
+    expect(currentFor(ally, healerId)).toBeUndefined();
+    expect(healingFor(events, healerId, allyId)).toBe(250);
+    const guard = ally.auras.find((aura) => aura.id === 'unleash_weapon' && aura.kind === 'absorb');
+    expect(guard?.value).toBe(125);
+
+    const beforeHit = ally.hp;
+    sim.ctx.dealDamage(null, ally, 175, false, 'physical', 'Test Hit', 'hit');
+    expect(ally.hp).toBe(beforeHit - 50);
+    expect(ally.auras.some((aura) => aura.id === 'unleash_weapon' && aura.kind === 'absorb')).toBe(
+      false,
+    );
+  });
+
+  it('bases the one-hit guard on effective healing and refuses an empty unleash', () => {
+    const { sim, healer, healerId, ally, allyId } = setup(2827);
+    castAndResolve(sim, healer, 'lifespring_weapon', healerId, 1);
+    ally.hp = ally.maxHp - 40;
+    seedCurrent(ally, healerId, 200);
+
+    castAndResolve(sim, healer, 'unleash_weapon', allyId, 1);
+
+    const guard = ally.auras.find((aura) => aura.id === 'unleash_weapon' && aura.kind === 'absorb');
+    expect(guard?.value).toBe(20);
+
+    healer.resource = healer.maxResource;
+    healer.gcdRemaining = 0;
+    healer.cooldowns.delete('unleash_weapon');
+    sim.targetEntity(allyId, healerId);
+    sim.drainEvents();
+    const manaBefore = healer.resource;
+    sim.castAbility('unleash_weapon', healerId);
+    expect(healer.resource).toBe(manaBefore);
+    expect(healer.cooldowns.has('unleash_weapon')).toBe(false);
+    expect(sim.drainEvents()).toContainEqual({
+      type: 'error',
+      text: 'That ability is not ready yet.',
+      pid: healerId,
+    });
+  });
 });

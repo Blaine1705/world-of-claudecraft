@@ -17,7 +17,7 @@ export type { ProcDef, ProcResponse, ProcTrigger } from '../content/talents';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { convergenceOnCast } from './convergence';
-import { PERSONAL_BARRIER_IDS } from './fire_mage';
+import { combustionRestokesCinderfall, PERSONAL_BARRIER_IDS } from './fire_mage';
 import { priestOnCastCompleted } from './priest/talents';
 import { rogueEngineOnCast } from './rogue_engines';
 import { onShamanCastCompleted } from './shaman_talents';
@@ -191,6 +191,9 @@ export function onCastCompleted(
   // here because every completed cast funnels through this hook. Draws no rng.
   convergenceOnCast(ctx, player, abilityId);
   onShamanCastCompleted(ctx, player, abilityId);
+  // Phoenix Trance restokes one Cinderfall charge (designer rule 2026-07-25);
+  // same reasoning: the one seam every completed cast passes. Draws no rng.
+  combustionRestokesCinderfall(ctx, player, abilityId);
   // Rogue spec engines (combat/rogue_engines.ts): Skulduggery banks Gloam
   // from Duskveil openers and the Red Ribbon rhythm. Same funnel, no rng.
   rogueEngineOnCast(ctx, player, abilityId, target);

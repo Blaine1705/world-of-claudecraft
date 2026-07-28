@@ -542,7 +542,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           id: 'hun_r5_predators_pace',
           name: "Predator's Pace",
           description:
-            'A successful Focus generator grants 20% movement speed for 3 sec. 8 sec internal cooldown.',
+            'A successful Pack Command, Measured Shot, or Gutting Strike grants 20% movement speed for 3 sec. 8 sec internal cooldown.',
           icon: 'measured_shot',
           effect: {
             ability: [{ ability: 'measured_shot' }],
@@ -642,7 +642,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           id: 'hun_r14_efficient_rhythm',
           name: 'Efficient Rhythm',
           description:
-            'After spending 75 Focus, your next Focus generator grants 20 additional Focus.',
+            'After spending 75 Focus, your next Pack Command, Measured Shot, or Gutting Strike grants 20 additional Focus.',
           icon: 'measured_shot',
           effect: {
             ability: [{ ability: 'measured_shot' }],
@@ -714,7 +714,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           id: 'hun_r17_pack_rally',
           name: 'Pack Rally',
           description:
-            "Courser's Guise can trigger Pack Rally, granting nearby allies 30% movement and 10% attack and cast speed for 10 sec. 90 sec cooldown.",
+            "Courser's Guise can trigger Pack Rally. You, your companion, and group or raid allies within 30 yards gain 30% movement speed and 10% attack, casting, and channeling speed for 10 sec. 90 sec cooldown.",
           icon: 'aspect_of_the_wild',
           effect: {
             ability: [{ ability: 'aspect_of_the_cheetah' }],
@@ -737,7 +737,7 @@ export const HUNTER_CHOICE_ROWS: ClassChoiceRows = {
           id: 'hun_r20_overdraw',
           name: 'Overdraw',
           description:
-            'Every 3rd Focus spender deals 35% more primary damage and cleaves 50% of that damage to 2 nearby enemies.',
+            'Every 3rd Fell Shot, Long Draw, or Woundrend deals 35% more damage to its target and 50% of that damage to up to 2 enemies within 5 yards.',
           icon: 'arcane_shot',
           effect: {
             ability: [{ ability: 'arcane_shot' }],
@@ -1299,7 +1299,7 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
           id: 'pri_r17_choir_of_deliverance',
           name: 'Choir of Deliverance',
           description:
-            'Learn Choir of Deliverance, which channels for 6 sec and heals nearby party members every 2 sec. 180 sec cooldown.',
+            'Learn Choir of Deliverance. Channel for 6 sec, healing party members within 30 yards every 2 sec. 180 sec cooldown.',
           icon: 'choir_of_deliverance',
           effect: { grant: { ability: 'choir_of_deliverance' } },
         },
@@ -1344,7 +1344,7 @@ export const PRIEST_CHOICE_ROWS: ClassChoiceRows = {
           id: 'pri_r20_incarnate_spirit',
           name: 'Incarnate Spirit',
           description:
-            'A fully consumed Psalm of Warding heals its target for 40% of the original absorb. Benison Vigil healing also heals up to 3 nearby party members for 40%. A 5-stack Vespers Tithefiend deals 50% more damage and lasts 50% longer.',
+            'A fully consumed Psalm of Warding heals its target for 40% of the original absorb. Benison Vigil healing also heals up to 3 party members within 15 yards for 40%. A 5-stack Vespers Tithefiend deals 50% more damage and lasts 50% longer.',
           icon: 'summon_tithefiend',
           effect: {
             intrinsic: {
@@ -1547,7 +1547,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'sha_r20_bloodlust',
           name: 'Deep Reservoir',
           description:
-            'Retains part of your specialization resource after a full payoff: 2 Thunder, 1 cadence step, or 25% reseeded Mending Current.',
+            'After Earthen Jolt or Faultwake consumes all Thunder, retain 2 Thunder. After a spell consumes Stormcast, retain 1 Warspirit Cadence step. After Cascading Mend consumes Mending Current, restore 25% of the amount consumed.',
           icon: 'lightning_bolt',
           effect: { runtime: { thunderCharges: 2, cadenceSteps: 1, reseedPercent: 25 } },
         },
@@ -1555,7 +1555,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'sha_r20_elemental_fury',
           name: 'Echoing Elements',
           description:
-            'A full vent repeats for 40% after 1 sec, a Stormcast spell repeats for 40%, and consumed Mending Current healing repeats for 40% after 2 sec. Echoes cannot trigger further effects.',
+            'After Earthen Jolt or Faultwake consumes all Thunder, repeat 40% of its damage after 1 sec. A spell that consumes Stormcast repeats at 40% strength. Healing from consumed Mending Current repeats at 40% strength after 2 sec. These repeats cannot trigger other effects.',
           icon: 'chain_lightning',
           effect: { runtime: { echoPercent: 40, damageDelay: 1, healingDelay: 2 } },
         },
@@ -1563,7 +1563,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'sha_r20_tidal_waves',
           name: 'Living Weapon',
           description:
-            "After a full vent, Pyrebrand makes the next Arc Bolt instant. Galeheart's final echo cleaves for 50% to 2 nearby enemies, Stonebound Stormcast grants an 8% maximum-health absorb, and Lifespring makes Tidecall deposit 50% into a nearby injured ally.",
+            "After Earthen Jolt or Faultwake consumes all Thunder, Pyrebrand makes the next Arc Bolt instant. Galeheart's final echo deals 50% damage to up to 2 enemies within 8 yards. A Stonebound spell that consumes Stormcast grants an absorb equal to 8% of your maximum health. With Lifespring active, Tidecall also adds 50% of its full heal to the most injured ally within 10 yards.",
           icon: 'rockbiter_weapon',
           effect: {
             runtime: {

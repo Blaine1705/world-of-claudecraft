@@ -10,7 +10,10 @@
 
 import { ABILITIES, ITEMS } from '../sim/data';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
+import { PROFESSION_IMAGE_IDS, professionImageUrl } from './profession_art';
 import { ITEM_WEAPON_VARIANTS } from './weapon_variants';
+
+export { PROFESSION_IMAGE_IDS, professionImageUrl } from './profession_art';
 
 export type IconKind = 'ability' | 'item' | 'aura' | 'crest';
 
@@ -2621,6 +2624,13 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   frostjaw_trap: r('frost', 'ice', ['fang', { p: 'tendrils', ...BR }], ['arcs', 'glow']),
   cold_focus: r('frost', 'steel', ['eye', { p: 'crosshair', ...BR }], ['sparkle']),
   bloodhook: r('blood', 'steel', ['fang', { p: 'tendrils', ...TR }], ['motion', 'drips']),
+  hunting_momentum: r('fury', 'blood', ['boot', { p: 'fang', ...TR }], ['motion', 'glow']),
+  fieldcraft_reentry: r(
+    'earth',
+    'ember',
+    ['tendrils', { p: 'claw_slash', ...BR }],
+    ['motion', 'crack'],
+  ),
   // the Vale Cup sport kit (boarball): the 'coin' disc reads as the ball
   sport_kick: r('earth', 'leather', ['coin', { p: 'boot', ...BR }]),
   sport_shoot: r('fury', 'ember', ['coin', { p: 'boot', ...BR }], ['motion']),
@@ -2651,7 +2661,11 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   flametongue_weapon: r('fire', 'ember', ['sword', { p: 'flame', s: 0.6 }], ['glow']),
   frostbrand_weapon: r('frost', 'ice', ['sword', { p: 'snowflake', s: 0.6 }], ['glow']),
   galeheart_weapon: r('storm', 'sky', ['sword', { p: 'lightning', ...TR }], ['motion', 'arcs']),
+  thunder_reservoir: r('storm', 'gold', ['gem', { p: 'lightning', ...TR }], ['arcs', 'glow']),
+  warspirit_cadence: r('storm', 'steel', ['fist', { p: 'sword', ...BR }], ['motion', 'arcs']),
+  stormsurge: r('storm', 'sky', ['lightning', { p: 'sunburst', ...BR }], ['glow', 'sparkle']),
   lifespring_weapon: r('nature', 'leafGreen', ['droplet', { p: 'heart', ...BR }], ['sparkle']),
+  unleash_weapon: r('nature', 'sky', ['sword', { p: 'droplet', ...BR }], ['arcs', 'glow']),
   tidecall: r('nature', 'sky', ['sunburst', { p: 'droplet', ...BR }], ['arcs']),
   stoneward: r('earth', 'earthBrown', ['shield', { p: 'gem', ...TR }], ['crack', 'glow']),
   primal_exaltation: r('storm', 'gold', ['sunburst', { p: 'lightning', ...BR }], ['glow', 'arcs']),
@@ -3555,7 +3569,7 @@ function itemFallback(id: string): IconRecipe | null {
       : r('drink', 'sky', ['waterskin']);
   }
   if (it.kind === 'potion' || it.kind === 'elixir') {
-    // Crafted consumables without curated art (the Phase 10 draughts and
+    // Crafted consumables without curated art (the trained-ladder draughts and
     // elixirs) render the flask, tinted by function, instead of falling
     // through to the trinket arm below.
     const pal: PaletteName = has(name, ['healing'])
@@ -3679,11 +3693,6 @@ export const QUALITY_COLOR: Record<string, string> = {
   legendary: '#ff8000',
 };
 
-// The house gold accent (--gold in src/styles/tokens.css, the masterwork seal
-// idiom): the named TS-side twin for painters that inline-style a color and
-// cannot read the CSS custom property. Keep the two values in lockstep.
-export const GOLD_ACCENT_COLOR = '#ffd100';
-
 // ---------------------------------------------------------------------------
 // Photographic weapon icons
 //
@@ -3734,10 +3743,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'consecration',
   'righteous_fury',
   'retribution_aura',
-  // hunter (CraftPix premium "RPG Archer skill icons" pack). The archer pack is
-  // arrows/bows/traps only — the beast/aspect-animal abilities (aspect_of_the_hawk,
-  // aspect_of_the_monkey, tame_beast, dismiss_pet, revive_pet) have no fitting art
-  // here and intentionally stay on their procedural recipes until a beast pack lands.
+  // hunter (CraftPix premium packs plus project-generated v0.29 class rework art).
   'raptor_strike',
   'mongoose_bite',
   'arcane_shot',
@@ -3745,10 +3751,27 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'concussive_shot',
   'aimed_shot',
   'rapid_fire',
+  'volley',
+  'counter_shot',
+  'bestial_wrath',
   'wing_clip',
   'aspect_of_the_cheetah',
-  // priest (CraftPix premium "RPG Priest skill icons" pack). The pack is all-holy —
-  // the shadow spells (shadow_word_pain, mind_flay) have no dark art and stay procedural.
+  'pack_command',
+  'stampede',
+  'unleash_beast',
+  'measured_shot',
+  'pack_rally',
+  'shrapnel_charge',
+  'bloodtrail_assault',
+  'trailbreak',
+  'wildheart',
+  'shellskin',
+  'frostjaw_trap',
+  'cold_focus',
+  'bloodhook',
+  'hunting_momentum',
+  'fieldcraft_reentry',
+  // priest (CraftPix premium packs plus project-generated v0.29 class rework art).
   'smite',
   'lesser_heal',
   'power_word_fortitude',
@@ -3757,6 +3780,16 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'mind_blast',
   'heal',
   'flash_heal',
+  'psychic_scream',
+  'prayer_of_healing',
+  'holy_nova',
+  'shadowform',
+  'veilstep',
+  'scouring_mercy',
+  'seraphic_vigil',
+  'summon_tithefiend',
+  'martyrs_aegis',
+  'choir_of_deliverance',
   // warlock (CraftPix premium "RPG Warlock skill icons" pack + "RPG Demon skill icons"
   // pack for the summons/life_tap/searing_pain that the warlock pack couldn't cover).
   'shadow_bolt',
@@ -3948,8 +3981,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'dash',
   'tigers_fury',
   'rip',
-  // shaman (no dedicated pack — matched against the two generic CraftPix "100 RPG/skill
-  // icon" packs + earth-magician for the earth abilities; aeromancer went unused). 11/11.
+  // shaman (CraftPix generic packs plus project-generated v0.29 class rework art).
   'lightning_bolt',
   'rockbiter_weapon',
   'healing_wave',
@@ -3961,6 +3993,21 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'frostbrand_weapon',
   'ghost_wolf',
   'stormstrike',
+  'chain_lightning',
+  'earthquake',
+  'bloodlust',
+  'elemental_mastery',
+  'chain_heal',
+  'galeheart_weapon',
+  'thunder_reservoir',
+  'warspirit_cadence',
+  'stormsurge',
+  'lifespring_weapon',
+  'unleash_weapon',
+  'tidecall',
+  'stoneward',
+  'primal_exaltation',
+  'ancestor_return',
   // cross-class fills from the two generic CraftPix "100 RPG/skill icon" packs — abilities
   // their own class pack couldn't cover but a generic icon fit. (warrior taunt completes warrior.)
   'aspect_of_the_hawk',
@@ -4017,10 +4064,13 @@ export function abilityImageUrl(id: string): string | null {
 }
 
 // Item ids with committed painted art under /ui/items/<id>.webp (curated from the CraftPix
-// resource/consumable AND armor/equipment packs; provenance + license in
-// public/ui/items/mapping.json). Served for kind 'item' (bags, tooltips, loot, vendor, the
-// /wiki guide). Covers everything except weapons, which keep their rendered-model thumbnails
-// via WEAPON_ICON_DIR; items not listed fall through to the procedural ITEM_RECIPES below.
+// resource/consumable and armor/equipment packs, the project-owned profession materials, and
+// the generated icon rebrand batches; provenance + license in public/ui/items/mapping.json).
+// Served for kind 'item' (bags, tooltips, loot, vendor, the /wiki guide). Every real non-weapon
+// item must ship a WebP: the derive loop below adds every non-weapon ITEMS id, so a new item
+// without art reds the gate instead of regressing to the procedural compositor. Weapons keep
+// their rendered-model thumbnails via WEAPON_ICON_DIR; procedural item recipes remain available
+// only for UI fallbacks and development-time unknown ids.
 // For armor the icon is purely cosmetic (rarity colour still comes from item.quality), and the
 // flashier icons are reserved for higher-rarity pieces. WebP only, like the skill icons. Add
 // art via `npm run assets:items`, then list the item id here. Guarded by tests/item_icons.test.ts.
@@ -4293,6 +4343,40 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'orange_steel_armor_plate',
   'silverleaf_sickle',
   'vanguard_chrome_armor_plate',
+  // profession materials
+  'arcane_dust',
+  'arcane_essence',
+  'arcane_shard',
+  'arcanite_bar',
+  'ashwood_log',
+  'cooking_salt',
+  'copper_ore',
+  'elderwood_log',
+  'game_meat',
+  'glass_vial',
+  'goldleaf_herb',
+  'homespun_cloth',
+  'iron_ore',
+  'ironbark_log',
+  'prime_cut',
+  'pristine_hide',
+  'pristine_silk',
+  'pristine_venom_gland',
+  'resonant_hide',
+  'resonant_links',
+  'resonant_steel',
+  'resonant_thread',
+  'resonant_timber',
+  'rough_hide',
+  'silverleaf_herb',
+  'smithing_flux',
+  'spider_leg',
+  'spider_silk',
+  'spool_of_thread',
+  'sunpetal_herb',
+  'tanning_agent',
+  'thorium_ore',
+  'venom_gland',
   // junk
   'bandit_bandana',
   'briny_idol',
@@ -4309,6 +4393,13 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'sanctum_key_shard',
   'unknown_alien_weaponry',
 ]);
+
+// The grouped literals above preserve the curated catalog's provenance history. Derive the
+// complete runtime set from live content so a newly added non-weapon item immediately enters the
+// filesystem and provenance gates instead of silently regressing to a procedural placeholder.
+for (const item of Object.values(ITEMS)) {
+  if (item.kind !== 'weapon') ITEM_IMAGE_IDS.add(item.id);
+}
 
 // UI-only icon ids that ship painted art under /ui/items/<id>.webp but are NOT ITEMS
 // records. `backpack` is the implicit 16-slot bag the bag bar draws first: it can never be
@@ -4435,8 +4526,8 @@ export function iconDataUrl(kind: IconKind, id: string, size: number = DEFAULT_I
 // ---------------------------------------------------------------------------
 // Profession icons (Professions 2.0): the ten craft-wheel crafts plus the
 // gathering skills, consumed by the professions window via professionIconUrl.
-// Ids follow docs/professions-2/asset-manifest.json (prof_<craftId>,
-// gather_<skill>). Committed painted art under public/ui/professions/
+// Ids follow the prof_<craftId> / gather_<skill> convention (see
+// docs/design/professions-asset-manifest.json). Committed painted art under public/ui/professions/
 // (PROFESSION_IMAGE_IDS, normalized by scripts/convert_profession_icons_webp.mjs)
 // wins over the procedural recipe, mirroring the item/deed image sets.
 // ---------------------------------------------------------------------------
@@ -4489,18 +4580,6 @@ const PROFESSION_RECIPES: Record<string, IconRecipe> = {
   ),
   gather_fishing: r('drink', 'sky', [{ p: 'fish' }], ['glow']),
 };
-
-// Painted profession art override (mirrors ITEM_IMAGE_IDS / DEED_IMAGE_IDS): ids
-// whose committed WebP under public/ui/professions/ wins over the procedural
-// recipe. Empty until painted art lands; tests/profession_icons.test.ts pins the
-// bijection with the committed files.
-export const PROFESSION_IMAGE_IDS = new Set<string>([]);
-
-const PROFESSION_ICON_DIR = '/ui/professions';
-/** Static URL of a profession icon's painted art, or null while unshipped. */
-export function professionImageUrl(id: string): string | null {
-  return PROFESSION_IMAGE_IDS.has(id) ? `${PROFESSION_ICON_DIR}/${id}.webp` : null;
-}
 
 /** True when `id` has an explicit profession recipe, as opposed to falling
  *  through to the generic fallback; lets a test pin every manifest id to a

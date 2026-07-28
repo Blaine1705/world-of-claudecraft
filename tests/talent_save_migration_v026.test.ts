@@ -34,7 +34,7 @@ describe('talent production save migrations', () => {
       class: 'warrior',
       note: 'Pinned representative stable-Warrior JSONB save; contains no account or player PII.',
     });
-    // Re-pinned for Phase 14: the fixture's active questLog ids became the
+    // Re-pinned: the fixture's active questLog ids became the
     // real q_spiders/q_wolves because the load arm now prunes unknown active
     // quest ids (tests/quest_log_normalization.test.ts owns that contract).
     expect(createHash('sha256').update(fixtureBytes).digest('hex')).toBe(
@@ -151,11 +151,19 @@ describe('talent production save migrations', () => {
     expect(first.bank).toEqual(fixture.state.bank);
     expect(first.equipment).toEqual(fixture.state.equipment);
     // The fixture's active questLog ids are REAL quests (q_spiders, q_wolves):
-    // since Phase 14 the load arm prunes unknown active quest ids
+    // the load arm prunes unknown active quest ids
     // (tests/quest_log_normalization.test.ts), while questsDone keeps its
     // synthetic q_fixture_done, pinning that done-history survives unknown ids.
     expect(first.questLog).toEqual(fixture.state.questLog);
     expect(first.questsDone).toEqual(fixture.state.questsDone);
+    // Same shape one field over (#2511): the fixture's townFocus is
+    // `{ eastbrook: 4 }`, a key that names no component family, and the load
+    // arm drops it so it cannot ride back out through the panel into a request
+    // the command boundary now rejects. Not vacuous, the fixture really does
+    // carry it, and the pure migration above still preserves it verbatim: the
+    // drop belongs to the load arm alone.
+    expect(fixture.state.townFocus).toEqual({ eastbrook: 4 });
+    expect(first.townFocus).toEqual({});
     expect(first.skin).toBe(3);
     expect(first.cooldowns).toEqual(fixture.state.cooldowns);
 

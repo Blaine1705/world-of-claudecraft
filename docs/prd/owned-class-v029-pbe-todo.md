@@ -305,6 +305,8 @@ Do not overwrite a player-customized bar.
 - [ ] Preserve the liked Mending Current loop.
 - [ ] Confirm Mending Waters creates an owned current on the healed ally.
 - [ ] Confirm Tidecall immediately heals and enlarges that current.
+- [x] Add Unleash Weapon as a 15-second single-target current consume with a tested one-hit guard.
+- [ ] PBE-tune Unleash Weapon's 125% burst and 50% effective-healing guard.
 - [ ] Confirm Cascading Mend consumes every owned current on every ally it reaches.
 - [ ] Keep another Shaman's currents separate.
 - [ ] Test the normal heal when an ally has no prepared current.
@@ -314,6 +316,10 @@ Do not overwrite a player-customized bar.
 
 - [x] Change weapon enhancement duration to 30 min.
 - [x] Fix Flow State so its ready state is shown without a timer and never survives a spec change.
+- [x] Put Unleash Weapon on all three default bars and resolve it through the active spec weapon
+      enhancement.
+- [ ] PBE-tune Pyrebrand damage, Galeheart attack speed, Stonebound mitigation, and Lifespring
+      healing without changing the shared action contract.
 - [ ] Rewrite every level 20 talent tooltip with exact spec-specific outcomes.
 - [ ] Retest weapon, Flow State, and talent state through relog and reconnect.
 

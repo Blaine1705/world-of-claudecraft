@@ -16,7 +16,7 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     school: 'shadow',
     requiresTarget: false,
     effects: [{ type: 'blinkForward', distance: 10 }],
-    description: 'Steps through the veil in the direction you are facing.',
+    description: 'Step 10 yards forward through the veil.',
   },
   scouring_mercy: {
     id: 'scouring_mercy',
@@ -70,7 +70,7 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     requiresAuraKind: 'gloomtithe',
     effects: [],
     description:
-      'Consume all Gloomtithe to summon a Tithefiend for 6, 8, 10, 12, or 15 sec at 1 to 5 stacks. It attacks every 2 sec for 20 to 24 Shadow damage, plus 8 per extra stack, and prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)',
+      'Consume all Gloomtithe to summon a Tithefiend. It lasts 6, 8, 10, 12, or 15 sec at 1 to 5 stacks and attacks every 2 sec. Each attack deals 20 to 24 Shadow damage plus 8 per extra stack and increases with your Spell Power. At 5 stacks, the fiend grows larger and deals 25% more damage. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% of its damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)',
   },
   martyrs_aegis: {
     id: 'martyrs_aegis',
@@ -85,14 +85,14 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'buffTarget', kind: 'shield_wall', value: 0.4, duration: 8 }],
-    description: 'Reduces one ally incoming damage by 40% for 8 sec.',
+    description: "Reduce one ally's incoming damage by 40% for 8 sec.",
   },
   choir_of_deliverance: {
     id: 'choir_of_deliverance',
     name: 'Choir of Deliverance',
     class: 'priest',
     learnLevel: 17,
-    cost: 150,
+    cost: 128,
     castTime: 0,
     channel: { duration: 6, ticks: 3 },
     cooldown: 180,
@@ -100,6 +100,7 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     school: 'holy',
     requiresTarget: false,
     effects: [{ type: 'aoeHeal', min: 90, max: 110, radius: 30 }],
-    description: 'Channels for 6 sec, healing nearby party members every 2 sec.',
+    description:
+      'Channel for 6 sec, healing party members within 30 yards for $d every 2 sec. Healing increases with Spell Power.',
   },
 };

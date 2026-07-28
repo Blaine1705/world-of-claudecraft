@@ -31,6 +31,7 @@ import { isDispellableAura } from '../aura_classify';
 import { ITEMS, isDelvePos, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
+import { instanceInfoAt } from '../instances/dungeons';
 import { FISH_REEL_WINDOW_ROD_BONUS_SEC, FISH_REEL_WINDOW_SEC } from '../professions/fishing';
 import { bestOwnedGatherToolTier } from '../professions/tools';
 import { scheduleProjectile } from '../projectile_travel';
@@ -106,6 +107,7 @@ import {
 } from './rogue_engines';
 import { combineCostMultipliers, duskCostMultiplier } from './rogue_talents';
 import { onShamanManaSpent, shamanCastTimeMultiplier, shamanManaCost } from './shaman_talents';
+import { resolveUnleashWeaponTarget, unleashWeaponCastError } from './shaman_unleash_weapon';
 import { onStormcastConsumed, STORMCAST_CHEAP_ID, STORMCAST_ID } from './shaman_warspirit';
 import {
   hasCastShield,
@@ -236,6 +238,34 @@ function hasAbilityCharge(
   return !!state && state.charges > 0;
 }
 
+type ActiveCastRestriction = 'combat' | 'instance';
+
+function activeCastRestriction(
+  ctx: SimContext,
+  player: Entity,
+  ability: AbilityDef,
+): ActiveCastRestriction | null {
+  if (ability.requiresOutOfCombat && player.inCombat) {
+    return 'combat';
+  }
+  if (ability.requiresOutsideInstance && instanceInfoAt(ctx, player.pos)) {
+    return 'instance';
+  }
+  return null;
+}
+
+function emitActiveCastRestrictionError(
+  ctx: SimContext,
+  playerId: number,
+  restriction: ActiveCastRestriction,
+): void {
+  if (restriction === 'combat') {
+    ctx.error(playerId, "You can't do that while in combat.");
+  } else {
+    ctx.error(playerId, 'Leave the dungeon first.');
+  }
+}
+
 export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (!p.castingAbility) {
     // a queued press held back by a still-running GCD (see fireQueuedCast) retries
@@ -249,6 +279,14 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     return;
   }
   const activeCast = ctx.resolvedAbility(p.castingAbility, p.id);
+  if (activeCast) {
+    const restriction = activeCastRestriction(ctx, p, activeCast.def);
+    if (restriction) {
+      cancelCast(ctx, p);
+      emitActiveCastRestrictionError(ctx, p.id, restriction);
+      return;
+    }
+  }
   if (activeCast && isMassResurrectionAbility(activeCast.def)) {
     if (p.inCombat) {
       cancelCast(ctx, p);
@@ -286,7 +324,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       return;
     }
   }
-  // Fishing bite minigame (Phase 12b): the hidden seeded bite and the
+  // Fishing bite minigame: the hidden seeded bite and the
   // server-authoritative reel deadline, resolved in sim ticks (the lockpick
   // stepDeadlineTick precedent; the client never reports a timeout). The
   // bite arm falls THROUGH to the generic decrement below, so a
@@ -366,7 +404,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     const castId = p.castingAbility;
     p.castingAbility = null;
     p.castRemaining = 0;
-    // Defensive fishing end (Phase 12b): the session cap is unreachable in
+    // Defensive fishing end: the session cap is unreachable in
     // real flow (max bite delay plus max reel window end every session well
     // before FISHING_SESSION_CAP_SEC), and a direct-assigned drive that
     // ticks a fishing cast out simply gets away, same shape as the miss arm
@@ -379,7 +417,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       return;
     }
     ctx.emit({ type: 'castStop', entityId: p.id, success: true });
-    // Gather cast completion (Phase 12b): route to the gathering module and
+    // Gather cast completion: route to the gathering module and
     // return before fireQueuedCast, like fishing above (a press can never
     // queue against a non-spell cast, see castAbility's queue exemption).
     // NOTE castStop success reflects the CAST finishing, not the grant: a
@@ -482,7 +520,7 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   // an interrupted cast never completed, so its queued follow-up is dropped too
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
-  // Phase 12b hidden per-cast state: unconditional inert writes (all three
+  // Hidden per-cast fishing/gather state: unconditional inert writes (all three
   // are already '' / 0 on every non-fishing/gather cancel path), so every
   // existing cancel stays byte-identical while a cancelled gather or fishing
   // cast can never leak a stale node id or bite deadline into a later cast.
@@ -548,6 +586,27 @@ function resolveDeadAllyTarget(
   if (!t || !t.dead || t.kind !== 'player') return null;
   const party = ctx.partyOf(p.id);
   return party && party.members.includes(t.id) ? t : null;
+}
+
+function vanishedLowBlowFallbackTarget(
+  ctx: SimContext,
+  p: Entity,
+  ability: AbilityDef,
+): Entity | null {
+  if (ability.id !== 'kidney_shot') return null;
+  if (p.targetId !== null) return null;
+  if (!p.auras.some((a) => a.kind === 'stealth')) return null;
+
+  let nearest: Entity | null = null;
+  let nearestDist = Infinity;
+  for (const entity of ctx.entities.values()) {
+    if (entity.id === p.id || entity.dead || !ctx.isHostileTo(p, entity)) continue;
+    const d = dist2d(p.pos, entity.pos);
+    if (d > MELEE_RANGE || d >= nearestDist) continue;
+    nearest = entity;
+    nearestDist = d;
+  }
+  return nearest;
 }
 
 export function castAbility(
@@ -647,6 +706,7 @@ export function castAbility(
   const sharedCooldown = isShamanShock(ability.id)
     ? SHAMAN_SHOCK_COOLDOWN_IDS.find((id) => p.cooldowns.has(id))
     : undefined;
+  const leavingRestrictedToggle = togglingOff && ability.requiresOutsideInstance;
   // Charge-limited abilities (the abilityCharges recharge model, driven by
   // bonusCharges: Double Charge, extra Blink/Frost Nova/Ice Block): a running
   // cooldown is only the RECHARGE timer; the cast is blocked only once every
@@ -758,8 +818,9 @@ export function castAbility(
     ctx.error(p.id, 'You must be stealthed.');
     return;
   }
-  if (ability.requiresOutOfCombat && p.inCombat) {
-    ctx.error(p.id, "You can't do that while in combat.");
+  const restriction = leavingRestrictedToggle ? null : activeCastRestriction(ctx, p, ability);
+  if (restriction) {
+    emitActiveCastRestrictionError(ctx, p.id, restriction);
     return;
   }
   if (isMassResurrectionAbility(ability) && !hasDeadGroupMember(ctx, p)) {
@@ -768,7 +829,23 @@ export function castAbility(
   }
 
   let target: Entity | null = null;
-  if (ability.requiresTarget && ability.targetsDead) {
+  if (ability.id === 'unleash_weapon') {
+    target = resolveUnleashWeaponTarget(ctx, p, castTargetId);
+    const error = unleashWeaponCastError(p, target);
+    if (error) {
+      ctx.error(p.id, error);
+      return;
+    }
+    if (!target) return;
+    if (dist2d(p.pos, target.pos) > ability.range) {
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    if (ctx.lineOfSightBlocked(p, target, ability)) {
+      ctx.error(p.id, 'Line of sight.');
+      return;
+    }
+  } else if (ability.requiresTarget && ability.targetsDead) {
     // Combat res: the target must be a DEAD group/raid member (no self-cast fallback).
     const dead = resolveDeadAllyTarget(ctx, p, castTargetId);
     if (!dead) {
@@ -821,7 +898,10 @@ export function castAbility(
       return;
     }
   } else if (ability.requiresTarget) {
-    target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
+    target =
+      p.targetId !== null
+        ? (ctx.entities.get(p.targetId) ?? null)
+        : vanishedLowBlowFallbackTarget(ctx, p, ability);
     if (!target || target.dead || !ctx.isHostileTo(p, target)) {
       ctx.error(p.id, 'You have no target.', target?.dead ? 'target_dead' : undefined);
       return;
@@ -1265,6 +1345,7 @@ const MAGE_DEFENSIVE_COOLDOWNS = [
   'blink',
   'ice_barrier',
   'blazing_barrier',
+  'temporal_barrier',
   'greater_invisibility',
 ] as const;
 const OVERFLOW_CAP_SECONDS = 10;
@@ -1719,7 +1800,23 @@ function applyAbility(
   }
 
   let target: Entity | null = null;
-  if (ability.requiresTarget && ability.targetsDead) {
+  if (ability.id === 'unleash_weapon') {
+    target = resolveUnleashWeaponTarget(ctx, p, castTarget);
+    const error = unleashWeaponCastError(p, target);
+    if (error) {
+      ctx.error(p.id, error);
+      return;
+    }
+    if (!target) return;
+    if (dist2d(p.pos, target.pos) > ability.range + 2) {
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    if (ctx.lineOfSightBlocked(p, target, ability)) {
+      ctx.error(p.id, 'Line of sight.');
+      return;
+    }
+  } else if (ability.requiresTarget && ability.targetsDead) {
     // Combat res finish: the dead ally's id was stored in castTarget at cast start
     // (it is auto-deselected from p.targetId once dead, so we cannot re-derive it).
     const dead = resolveDeadAllyTarget(ctx, p, castTarget);

@@ -6,6 +6,7 @@ import * as http from 'node:http';
 import * as path from 'node:path';
 import { WebSocketServer } from 'ws';
 import { DEEDS } from '../src/sim/content/deeds';
+import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
@@ -16,11 +17,12 @@ import {
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { virtualLevel } from '../src/sim/types';
-import type {
-  DeedsLeaderboardEntry,
-  DeedsLeaderboardSelf,
-  GuildLeaderboardEntry,
-  LeaderboardEntry,
+import {
+  type DeedsLeaderboardEntry,
+  type DeedsLeaderboardSelf,
+  type GuildLeaderboardEntry,
+  type LeaderboardEntry,
+  ONLINE_WORLD_AUTH_TYPE,
 } from '../src/world_api';
 import {
   configureAccountRuntime,
@@ -77,7 +79,7 @@ import { bankLedgerIdle } from './bank_ledger';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
 import { createCachedRead } from './cached_read';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
-import { configureCharactersRuntime } from './characters';
+import { buildCharacterList, configureCharactersRuntime } from './characters';
 import {
   claudiumPreAuthMutationRateLimited,
   configureClaudiumRuntime,
@@ -942,42 +944,21 @@ function toSheetRank(rank: { rank: number; total: number } | null): SheetRank | 
 
 // The character-list response shared by the full-session GET /api/characters and
 // the read-scoped GET /api/me/characters, so both stay byte-identical.
-function characterListPayload(chars: CharacterRow[]): {
-  realm: string;
-  characters: {
-    id: number;
-    name: string;
-    class: PlayerClass;
-    level: number;
-    skin: number;
-    online: boolean;
-    forceRename: boolean;
-    lastPlayed: string | null;
-    playtimeSeconds: number;
-    skinCatalog: 'class' | 'mech';
-    mainhandItemId: string | null;
-    offhandItemId: string | null;
-  }[];
-} {
-  return {
-    realm: REALM,
-    characters: chars.map((c) => ({
-      id: c.id,
-      name: c.name,
-      class: c.class,
-      level: c.level,
-      skin: c.state?.skin ?? 0,
-      online: [...liveGame().clients.values()].some((s) => s.characterId === c.id),
-      forceRename: c.force_rename,
-      lastPlayed: c.last_played ? new Date(c.last_played).toISOString() : null,
-      playtimeSeconds: Number(c.playtime_seconds ?? 0),
-      // Real appearance for the char-select 3D preview (the client renders the
-      // Combat Mech cosmetic body and both equipped hands, matching the world).
-      skinCatalog: c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
-      mainhandItemId: c.state?.equipment?.mainhand ?? null,
-      offhandItemId: c.state?.equipment?.offhand ?? null,
-    })),
-  };
+function characterListPayload(
+  chars: CharacterRow[],
+  weaponSkinLoadout: Record<string, string>,
+): unknown {
+  // Delegates to the RouteDef arm's shared builder (review follow-up on the
+  // weaponSkinId addition): one implementation means the retained legacy arm
+  // and the new pipeline CANNOT diverge in payload shape, and the behavioral
+  // route tests in tests/server/characters.test.ts cover both by construction.
+  // Only the online scan stays legacy-owned (the same live-session scan main
+  // injects into the RouteDef runtime as isCharacterOnline).
+  return buildCharacterList(
+    chars,
+    (characterId) => [...liveGame().clients.values()].some((s) => s.characterId === characterId),
+    weaponSkinLoadout,
+  );
 }
 
 async function bearerAccount(req: http.IncomingMessage): Promise<number | null> {
@@ -1471,13 +1452,27 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'GET' && url === '/api/me/characters') {
       const accountId = await bearerReadAccount(req, res);
       if (accountId === null) return;
-      return json(res, 200, characterListPayload(await listCharacters(accountId)));
+      return json(
+        res,
+        200,
+        characterListPayload(
+          await listCharacters(accountId),
+          (await loadAccountCosmetics(accountId)).weaponSkinLoadout,
+        ),
+      );
     }
     if (url === '/api/characters') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       if (req.method === 'GET') {
-        return json(res, 200, characterListPayload(await listCharacters(accountId)));
+        return json(
+          res,
+          200,
+          characterListPayload(
+            await listCharacters(accountId),
+            (await loadAccountCosmetics(accountId)).weaponSkinLoadout,
+          ),
+        );
       }
       if (req.method === 'POST') {
         const body = await readBody(req);
@@ -1880,6 +1875,13 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         players_cap: canonicalPlayersCap(),
         names: [...liveGame().clients.values()].map((s) => s.name),
         steam: { enabled: false },
+        // The /dev GUI capability advert. NOT hardcoded like steam.enabled above:
+        // the dev_* cheats ride the websocket dispatcher, which this arm serves
+        // exactly as the migrated one does, so advertising the real env here
+        // strands nobody. Dual-arm edit: the migrated statusHandler
+        // (server/leaderboard.ts) carries the same dev_commands field. Read live
+        // per request, mirroring the /api/perf gate just below.
+        dev_commands: process.env.ALLOW_DEV_COMMANDS === '1',
       });
     }
     // Dev-only world-loop perf profile (per-phase tick p95/max), for the load
@@ -3012,7 +3014,7 @@ export async function startServer(): Promise<http.Server> {
   server.listen(config.port, () => {
     console.log(`World of ClaudeCraft server listening on http://localhost:${config.port}`);
     console.log(`  REST: /api/register /api/login /api/characters /api/status`);
-    console.log(`  WS:   /ws, then first message {t:"auth",token,character}`);
+    console.log(`  WS:   /ws, then first message {t:"${ONLINE_WORLD_AUTH_TYPE}",token,character}`);
   });
 
   // Off-peak batched retention. The sweep self-clocks once per UTC day behind a

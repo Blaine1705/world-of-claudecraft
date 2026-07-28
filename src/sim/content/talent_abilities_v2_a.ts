@@ -458,8 +458,7 @@ export const TALENT_ABILITIES_V2_A = {
     school: 'shadow',
     requiresTarget: false,
     effects: [{ type: 'aoeFear', duration: 4, radius: 8 }],
-    description:
-      'Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)',
+    description: 'Frighten enemies within 8 yards for up to 4 sec. Damage may break the effect.',
   },
   inner_focus: {
     id: 'inner_focus',
@@ -505,7 +504,16 @@ export const TALENT_ABILITIES_V2_A = {
     school: 'holy',
     requiresTarget: false,
     effects: [{ type: 'aoeHeal', min: 100, max: 122, radius: 30 }],
-    description: 'Heals nearby allies for $d. (Priest talent)',
+    ranks: [
+      {
+        rank: 2,
+        level: 20,
+        cost: 170,
+        effects: [{ type: 'aoeHeal', min: 145, max: 177, radius: 30 }],
+      },
+    ],
+    description:
+      'Heal allies within 30 yards for $d. Healing increases with Spell Power. (Benison)',
   },
   mind_sear: {
     id: 'mind_sear',
@@ -522,7 +530,7 @@ export const TALENT_ABILITIES_V2_A = {
     targetMode: 'position',
     effects: [{ type: 'aoeDamage', min: 24, max: 28, radius: 8 }],
     description:
-      'Channels shadow energy at the target area, damaging nearby enemies each second for $d. (Priest talent)',
+      'Channel for 3 sec, dealing $d Shadow damage each second to enemies within 8 yards of the target area. Damage increases with Spell Power. (Priest talent)',
   },
 
   healing_stream: {
@@ -564,7 +572,7 @@ export const TALENT_ABILITIES_V2_A = {
       },
     ],
     description:
-      'Strike the target and jump to up to 2 enemies within 10 yards for $d Nature damage each. The cast grants 1 Thunder if it hits, not 1 per target. Damage increases with Spell Power. Primal Mastery can make this cast instant, and Primal Exaltation halves its cast time. (Thundercall)',
+      'Strike up to 3 enemies within 10 yards for $d Nature damage each. Thundercall: a hit grants 1 Thunder. Damage increases with Spell Power.',
   },
   earthbind: {
     id: 'earthbind',
@@ -640,6 +648,6 @@ export const TALENT_ABILITIES_V2_A = {
       },
     ],
     description:
-      'Whips your group or raid into a frenzy, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Storm Chorus or Temporal Acceleration are too exhausted to benefit. (Shaman talent)',
+      'Increase the attack, casting, and channeling speed of group or raid allies within 30 yards by 30% for 15 sec. Affected allies cannot benefit from Storm Chorus or Temporal Acceleration again for 10 min. (Shaman talent)',
   },
 } satisfies Record<string, AbilityDef>;

@@ -113,7 +113,12 @@ describe('Shaman v0.29 Warspirit', () => {
     sim.castAbility('healing_wave', shaman.id);
 
     expect(shaman.castingAbility).toBeNull();
-    expect(manaBefore - shaman.resource).toBeCloseTo((definition?.cost ?? 0) * 0.5, 5);
+    // The cast path has always CEILED a discounted cost (casting_lifecycle's
+    // `Math.ceil(res.cost * cheap)`), which only showed once Mending Waters resolved to
+    // an odd cost: the v0.31 healer rebalance moved it from 90 to 115, so half is 57.5
+    // and the sim charges 58. Assert the ceiling, not an exact half, so the pin holds at
+    // any cost parity.
+    expect(manaBefore - shaman.resource).toBe(Math.ceil((definition?.cost ?? 0) * 0.5));
     expect(shaman.auras.some((aura) => aura.id === STORMCAST_ID)).toBe(false);
   });
 
@@ -138,7 +143,7 @@ describe('Shaman v0.29 Warspirit', () => {
 
     sim.castAbility('healing_wave', shaman.id);
 
-    expect(manaBefore - shaman.resource).toBeCloseTo(definition.cost * 0.5, 5);
+    expect(manaBefore - shaman.resource).toBe(Math.ceil(definition.cost * 0.5));
     expect(shaman.auras.some((aura) => aura.id === 'set_clearcasting')).toBe(true);
     expect(shaman.auras.some((aura) => aura.id === STORMCAST_ID)).toBe(false);
     expect(shaman.auras.some((aura) => aura.id === STORMCAST_CHEAP_ID)).toBe(false);
@@ -191,6 +196,35 @@ describe('Shaman v0.29 Warspirit', () => {
       );
     expect(swings).toHaveLength(2);
     expect(warspiritCadence(shaman)).toBe(2);
+  });
+
+  it('does not add the generic dual-wield miss penalty to its cadence weapons', () => {
+    const { sim, shaman, target } = setup(2817);
+    sim.addItem('training_mace', 1, shaman.id);
+    sim.equipItem('training_mace', shaman.id);
+    expect(shaman.dualWielding).toBe(true);
+    castInstant(sim, shaman, GALEHEART_ID);
+
+    const meta = sim.meta(shaman.id);
+    if (!meta) throw new Error('missing Warspirit metadata');
+    shaman.hitBonus = 0;
+    sim.rng.next = () => 0.1;
+    shaman.autoAttack = true;
+    shaman.swingTimer = 0;
+    shaman.offhandSwingTimer = 0;
+    updatePlayerAutoAttack(sim.ctx, shaman, meta);
+
+    const swingKinds = sim
+      .drainEvents()
+      .flatMap((event) =>
+        event.type === 'damage' &&
+        event.sourceId === shaman.id &&
+        event.targetId === target.id &&
+        event.ability === null
+          ? [event.kind]
+          : [],
+      );
+    expect(swingKinds).toEqual(['hit', 'hit']);
   });
 
   it('makes Stonebound an exclusive defensive posture and removes every rider on exit', () => {

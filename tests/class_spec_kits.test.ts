@@ -32,7 +32,15 @@ const KITS = [
   },
   {
     spec: 'survival',
-    owns: ['bloodhook', 'raptor_strike', 'mongoose_bite', 'shrapnel_charge', 'bloodtrail_assault'],
+    owns: [
+      'bloodhook',
+      'raptor_strike',
+      'mongoose_bite',
+      'shrapnel_charge',
+      'bloodtrail_assault',
+      'hunting_momentum',
+      'fieldcraft_reentry',
+    ],
     excludes: [
       'pack_command',
       'bestial_wrath',
@@ -85,6 +93,17 @@ describe('Hunter v0.29 spec action ownership', () => {
     expect(knownFor('beast_mastery', 5)).not.toContain('raptor_strike');
     expect(knownFor('marksmanship', 5)).not.toContain('raptor_strike');
     expect(knownFor('survival', 5)).toContain('raptor_strike');
+  });
+
+  it('shows Fieldcraft mechanics as passives and uses 15 second movement cooldowns', () => {
+    const sim = new Sim({ seed: 2903, playerClass: 'hunter', autoEquip: false });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('survival')).toBe(true);
+
+    expect(sim.resolvedAbility('hunting_momentum')?.def.passive).toBe(true);
+    expect(sim.resolvedAbility('fieldcraft_reentry')?.def.passive).toBe(true);
+    expect(sim.resolvedAbility('bloodhook')?.cooldown).toBe(15);
+    expect(sim.resolvedAbility('trailbreak')?.cooldown).toBe(15);
   });
 
   it('re-specializing drops the old exclusive kit and keeps shared actions', () => {

@@ -98,6 +98,7 @@ const EXPECTED = {
     'earthquake',
     'frost_shock',
     'elemental_mastery',
+    'unleash_weapon',
     'lightning_shield',
     'healing_wave',
     'ghost_wolf',
@@ -106,6 +107,7 @@ const EXPECTED = {
   ],
   'shaman/enhancement': [
     'stormstrike',
+    'unleash_weapon',
     'earth_shock',
     'galeheart_weapon',
     'rockbiter_weapon',
@@ -120,6 +122,7 @@ const EXPECTED = {
   'shaman/restoration': [
     'healing_wave',
     'tidecall',
+    'unleash_weapon',
     'chain_heal',
     'ancestor_return',
     'lightning_shield',

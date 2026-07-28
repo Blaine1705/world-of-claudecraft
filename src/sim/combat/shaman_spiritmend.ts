@@ -22,6 +22,9 @@ export const MENDING_WATERS_DEPOSIT = 0.5;
 export const TIDECALL_DEPOSIT = 1;
 export const LIFESPRING_DEPOSIT_BONUS = 0.2;
 export const CURRENT_CONSUME_MULTIPLIER = 1.25;
+export const UNLEASH_WEAPON_GUARD_ID = 'unleash_weapon';
+export const UNLEASH_WEAPON_GUARD_FRACTION = 0.5;
+export const UNLEASH_WEAPON_GUARD_DURATION = 8;
 
 function isSpiritmend(ctx: SimContext, player: Entity): boolean {
   if (player.kind !== 'player') return false;
@@ -238,6 +241,49 @@ export function consumeMendingCurrent(ctx: SimContext, source: Entity, target: E
     }
   }
   return proposed;
+}
+
+/**
+ * Collapses one owned Mending Current into an immediate single-target rescue.
+ * The guard is based on effective healing, so overhealing cannot inflate it.
+ */
+export function unleashMendingCurrent(ctx: SimContext, source: Entity, target: Entity): number {
+  if (!isSpiritmend(ctx, source) || target.dead) return 0;
+  const index = currentIndex(target, source.id);
+  if (index < 0) return 0;
+  const current = removeAuraAt(ctx, target, index);
+  const proposed = Math.max(0, Math.round((current?.value ?? 0) * CURRENT_CONSUME_MULTIPLIER));
+  if (proposed <= 0) return 0;
+  const healed = ctx.applyHeal(
+    source,
+    target,
+    proposed,
+    'Unleash Weapon',
+    'unleash_weapon',
+    false,
+    false,
+  );
+  const guard = Math.max(0, Math.round(healed * UNLEASH_WEAPON_GUARD_FRACTION));
+  if (guard > 0) {
+    ctx.applyAura(target, {
+      id: UNLEASH_WEAPON_GUARD_ID,
+      name: 'Unleash Weapon',
+      kind: 'absorb',
+      value: guard,
+      remaining: UNLEASH_WEAPON_GUARD_DURATION,
+      duration: UNLEASH_WEAPON_GUARD_DURATION,
+      sourceId: source.id,
+      school: 'nature',
+    });
+  }
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: source.id,
+    targetId: target.id,
+    school: 'nature',
+    fx: 'echoBurst',
+  });
+  return healed;
 }
 
 export function clearSpiritmendCurrents(ctx: SimContext, sourceId: number): void {

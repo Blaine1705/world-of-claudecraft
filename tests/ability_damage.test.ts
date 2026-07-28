@@ -42,6 +42,10 @@ const SURVIVAL_MODS = computeTalentModifiers('hunter', {
   ...emptyAllocation(),
   spec: 'survival',
 } as never);
+const SPIRITMEND_MODS = computeTalentModifiers('shaman', {
+  ...emptyAllocation(),
+  spec: 'restoration',
+} as never);
 const PROT_MODS = computeTalentModifiers('warrior', {
   ...emptyAllocation(),
   spec: 'prot',
@@ -151,6 +155,17 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
     const eff = required(heal.effects.find((e) => e.type === 'heal'));
     expect(abilityDamageBonus(heal, eff, SC)).toBe(directHealBonus(SC.spellPower, heal.castTime));
     expect(abilityDamageBonus(heal, eff, SC)).toBeGreaterThan(0);
+  });
+
+  it('Cascading Mend shows the same Spell Power bonus as its first combat heal', () => {
+    const chain = known('shaman', 'chain_heal', SPIRITMEND_MODS);
+    const effect = required(chain.effects.find((candidate) => candidate.type === 'chainHeal'));
+    expect(abilityDamageBonus(chain, effect, { ...SC, spellPower: 0 })).toBe(0);
+    expect(abilityDamageBonus(chain, effect, { ...SC, spellPower: 100 })).toBe(
+      directHealBonus(100, chain.castTime),
+    );
+    expect(abilityEffectText(chain, { ...SC, spellPower: 0 })).toBe('120 to 145');
+    expect(abilityEffectText(chain, { ...SC, spellPower: 100 })).toMatch(/^120 to 145 \(\+\d+\)$/);
   });
 
   it('a personal mage barrier shows the same Spell Power bonus combat applies', () => {

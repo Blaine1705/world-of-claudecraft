@@ -2,13 +2,14 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {
-  CAMPS,
+  BUILTIN_WORLD,
   DUNGEON_X_THRESHOLD,
+  getActiveWorldContent,
   WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_Z,
-  ZONES,
 } from '../sim/data';
+import { ROCK_SINK_UNITS, rockHeightOf } from '../sim/decoration_dims';
 import type { BiomeId } from '../sim/types';
 import { isInSowfieldShell } from '../sim/vale_cup_layout';
 import type { Decoration } from '../sim/world';
@@ -22,6 +23,12 @@ import {
 } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import {
+  eastbrookGrassExclusions,
+  insideDressingExclusion,
+  insideEastbrookGrassExclusion,
+  insideGrassHubExclusion,
+} from './foliage_core';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
 import { grassTuftTexture } from './textures';
 
@@ -181,6 +188,7 @@ const ROCK_SNOWLINE_Y = 34; // terrain snow tint starts at h~34 (terrain.ts)
 // grass/dressing refuse cliff faces (mirrors ROCK_SLOPE_START in terrain.ts)
 const GRASS_MAX_SLOPE = 0.62;
 const GRASS_SLOPE_EPS = 1.2;
+const GRASS_BUILDING_PADDING = 0.35;
 
 export interface FoliageView {
   group: THREE.Group;
@@ -232,6 +240,25 @@ export interface FoliagePerfStats {
 }
 
 // deterministic 0..1 hash on integer grid cells / world coords
+// Model-space height of a rock geometry, cached per geometry: the renderer
+// solves each variant's vertical scale from it so every rock lands at exactly
+// the height the sim publishes (src/sim/decoration_dims.ts), whichever GLB
+// variant it draws.
+const rockNativeHeights = new WeakMap<THREE.BufferGeometry, number>();
+function rockNativeHeight(geo: THREE.BufferGeometry | undefined): number {
+  if (!geo) return 1; // fail soft: a missing variant must never break world entry
+  const cached = rockNativeHeights.get(geo);
+  if (cached !== undefined) return cached;
+  geo.computeBoundingBox();
+  // bb.max.y, NOT the box height: the instance is seated at the terrain minus
+  // the sink, so top-above-ground is (max.y - sink) * scale. The merged
+  // cluster archetype has a member below zero, so using the full height there
+  // would render clusters short of the collider top the sim publishes.
+  const h = geo.boundingBox ? geo.boundingBox.max.y : 1;
+  rockNativeHeights.set(geo, h);
+  return h;
+}
+
 function hashAt(a: number, b: number, k: number): number {
   const s = Math.sin(a * 127.1 + b * 311.7 + k * 74.7) * 43758.5453123;
   return s - Math.floor(s);
@@ -1044,10 +1071,16 @@ function buildTrees(
         r.biome === 'peaks' && terrainHeight(r.x, r.z, seed) > ROCK_SNOWLINE_Y;
       // 1 of the 3 single variants per bucket + the cluster archetype
       const singleSubset = variantSubset(1, 3, bucket.band, bucket.col, 71);
+      // Index against the set's ACTUAL length: the colorway is
+      // [singles..., cluster], and the low-tier model list ships fewer single
+      // variants than the high tier, so a hardcoded index (set[3]) resolved to
+      // undefined there and handed an undefined geometry to the instancer.
       const groupGeo = (r: Decoration): THREE.BufferGeometry => {
         const set = isSnowy(r) ? snowRocks : mossRocks;
-        if (isCluster(r)) return set[3];
-        return set[singleSubset[Math.floor(hashAt(r.x, r.z, 72) * singleSubset.length)]];
+        const singles = Math.max(1, set.length - 1); // last entry is the cluster
+        if (isCluster(r)) return set[set.length - 1];
+        const pick = singleSubset[Math.floor(hashAt(r.x, r.z, 72) * singleSubset.length)];
+        return set[Math.min(pick, singles - 1)];
       };
       const groups = new Map<THREE.BufferGeometry, Decoration[]>();
       for (const r of rocks) {
@@ -1067,14 +1100,19 @@ function buildTrees(
           // boulders, low slabs and tall stones depending on the draw
           const sxz1 = r.scale * 0.62 * (0.85 + h2 * 0.5);
           const sxz2 = r.scale * 0.62 * (0.85 + h1 * 0.45);
-          const maxH = Math.max(sxz1, sxz2);
-          const sy = Math.max(r.scale * 0.45 * (0.75 + h3 * 0.5), 0.55 * maxH);
-          const tiltAmp = maxH > 0.8 ? 0.12 : 0.26;
+          // Vertical scale is DERIVED from the sim's rock height so the stone
+          // you see is exactly the stone you collide with and stand on: solve
+          // for the sy that puts the model's top (its own height, less the
+          // 0.3 sink below) at rockHeight() above the terrain. The geometry is
+          // seated base-near-zero, so top-above-ground = (nativeH - 0.3) * sy.
+          const nativeTop = rockNativeHeight(geo);
+          const sy = rockHeightOf(r, seed) / Math.max(0.1, nativeTop - ROCK_SINK_UNITS);
+          const tiltAmp = Math.max(sxz1, sxz2) > 0.8 ? 0.12 : 0.26;
           q.setFromEuler(
             e.set((h1 - 0.5) * tiltAmp, r.variant * 1.7 + h3 * 2.0, (h2 - 0.5) * tiltAmp),
           );
           // sink so undersides bury on slopes (geometry base is near y=0)
-          m.compose(v.set(r.x, y - 0.3 * sy, r.z), q, sv.set(sxz1, sy, sxz2));
+          m.compose(v.set(r.x, y - ROCK_SINK_UNITS * sy, r.z), q, sv.set(sxz1, sy, sxz2));
           rockMesh.setMatrixAt(i, m);
           // low-altitude peaks rocks drop the icy blue-gray for a warm field
           // stone — pale rocks on green foothill grass read as eggs
@@ -1157,6 +1195,7 @@ function tooSteep(x: number, z: number, seed: number): boolean {
 
 function generateDressing(seed: number): DressingSpot[] {
   const out: DressingSpot[] = [];
+  const activeContent = getActiveWorldContent();
   const xHalf = WORLD_MAX_X - 16;
   const step = dressStep();
   const scaleBoost = GFX.leanFoliage ? DRESS_LOW_SCALE_BOOST : 1;
@@ -1168,21 +1207,7 @@ function generateDressing(seed: number): DressingSpot[] {
       if (r > density) continue;
       const x = gx + (hashAt(gx, gz, 42) - 0.5) * step;
       const z = gz + (hashAt(gx, gz, 43) - 0.5) * step;
-      let blocked = false;
-      for (const zone of ZONES) {
-        if (Math.hypot(x - zone.hub.x, z - zone.hub.z) < zone.hub.radius + 4) {
-          blocked = true;
-          break;
-        }
-      }
-      if (blocked) continue;
-      for (const camp of CAMPS) {
-        if (Math.hypot(x - camp.center.x, z - camp.center.z) < camp.radius + 2) {
-          blocked = true;
-          break;
-        }
-      }
-      if (blocked) continue;
+      if (insideDressingExclusion(activeContent.zones, activeContent.camps, x, z)) continue;
       if (roadDistance(x, z) < 4) continue;
       if (terrainHeight(x, z, seed) < waterLevelAt(x, z) + 1.2) continue;
       if (tooSteep(x, z, seed)) continue;
@@ -1411,6 +1436,15 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   const chunkHalfDiag = Math.SQRT2 * GRASS_CHUNK_SIZE * 0.5;
   const buildBudgetMs = GRASS_CHUNK_BUILD_BUDGET_MS;
   const cacheLimit = GFX.leanFoliage ? GRASS_CHUNK_CACHE_LIMIT_LOW : GRASS_CHUNK_CACHE_LIMIT_HIGH;
+  // Snapshot the active world's town exclusions once. The canonical Eastbrook
+  // layout is included only for the built-in world; editor/custom maps never
+  // inherit its fixed coordinates.
+  const activeContent = getActiveWorldContent();
+  const townExclusions = eastbrookGrassExclusions(
+    activeContent.props.buildings,
+    activeContent === BUILTIN_WORLD,
+    activeContent.services?.noticeboards ?? [],
+  );
 
   // high tier reads as a lush meadow: wider tufts with more blades; low keeps
   // the legacy sprite size
@@ -1512,15 +1546,9 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         if (h < waterLevelAt(x, z) + 1.6) continue;
         // no blades pasted onto cliff faces
         if (tooSteep(x, z, seed)) continue;
-        let nearHub = false;
-        for (const zn of ZONES) {
-          if (Math.hypot(x - zn.hub.x, z - zn.hub.z) < 15) {
-            nearHub = true;
-            break;
-          }
-        }
-        if (nearHub) continue;
+        if (insideGrassHubExclusion(activeContent.zones, x, z)) continue;
         if (roadDistance(x, z) < 3.2) continue;
+        if (insideEastbrookGrassExclusion(townExclusions, x, z, GRASS_BUILDING_PADDING)) continue;
         if (isInSowfieldShell(x, z)) continue; // the Sowfield is a mown pitch, not meadow
         const s = (lush ? 0.55 : 0.45) + r * (lush ? 1.1 : 1);
         q.setFromAxisAngle(up, r * 12.4);

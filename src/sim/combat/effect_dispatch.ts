@@ -16,7 +16,7 @@
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
 
 import { isDebuffAura, isDispellableAura } from '../aura_classify';
-import { ABILITIES, isDelvePos } from '../data';
+import { ABILITIES, isDelvePos, MOBS } from '../data';
 import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
@@ -33,7 +33,7 @@ import {
   hotTickBonus,
 } from '../spell_scaling';
 import { stunDrCategory } from '../stun_dr';
-import { addThreat } from '../threat';
+import { addThreat, dropThreat } from '../threat';
 import type { AbilityDef, Entity } from '../types';
 import {
   angleTo,
@@ -140,6 +140,7 @@ import {
   thundercallOnArcBoltImpact,
   thundercallOnChainLightningImpact,
 } from './shaman_thundercall';
+import { runUnleashWeapon } from './shaman_unleash_weapon';
 import {
   applyStoneboundJolt,
   applyWarspiritPosture,
@@ -175,6 +176,49 @@ function preservesStealth(ability: AbilityDef): boolean {
     ability.id === 'sap' ||
     ability.id === 'shadowstep'
   );
+}
+
+function dropsCombatOnStealth(ability: AbilityDef): boolean {
+  return ability.id === 'vanish';
+}
+
+function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): void {
+  p.combatTimer = 5;
+  p.inCombat = false;
+  p.autoAttack = false;
+  p.targetId = null;
+  p.queuedOnSwing = null;
+  delete p.queuedOnSwingFree;
+  delete p.queuedOnSwingCostMultiplier;
+
+  const pet = ctx.petOf(p.id);
+  const escapeIds = pet ? [p.id, pet.id] : [p.id];
+  if (pet) {
+    pet.combatTimer = 5;
+    pet.inCombat = false;
+    pet.aggroTargetId = null;
+    pet.targetId = null;
+  }
+
+  for (const entity of ctx.entities.values()) {
+    if (entity.kind !== 'mob' || entity.dead || !ctx.isHostileTo(p, entity)) continue;
+    let dropped = false;
+    for (const id of escapeIds) {
+      if (entity.threat.has(id) || entity.forcedTargetId === id) dropped = true;
+      dropThreat(entity, id);
+      if (entity.aggroTargetId === id) {
+        entity.aggroTargetId = null;
+        dropped = true;
+      }
+    }
+    if (!dropped) continue;
+    if (entity.ownerId !== null) {
+      if (entity.aggroTargetId === null) entity.inCombat = false;
+    } else if (entity.threat.size === 0 && entity.aggroTargetId === null) {
+      entity.aiState = 'evade';
+      entity.inCombat = false;
+    }
+  }
 }
 
 // Resolve the exclusiveGroup for an AURA id: either a plain ability id (a
@@ -294,6 +338,7 @@ export function runEffects(
   if (ability.id === 'primal_exaltation') applyPrimalExaltation(ctx, p);
   if (ability.id === 'stoneward' && target) applyStoneward(ctx, p, target);
   if (ability.id === 'lightning_shield') onThunderWardActivated(ctx, p);
+  if (ability.id === 'unleash_weapon') runUnleashWeapon(ctx, p, target);
 
   // Cleaving Blows (Fury passive): Red Harvest refunds one stored Twinstrike
   // use on the abilityCharges recharge model. A partial refund leaves the
@@ -341,6 +386,7 @@ export function runEffects(
 
   if (ability.requiresAuraKind) consumeAuraKind(ctx, p, ability.requiresAuraKind);
 
+  let targetBuffIndex = 0;
   for (const eff of res.effects) {
     switch (eff.type) {
       case 'temporalHourglass': {
@@ -447,7 +493,13 @@ export function runEffects(
         // Ranged AP for hunter shots, melee Attack Power for physical specials.
         // abilityScalingPower picks the rating; powerScale (inside directHitBonus)
         // applies the AP scale-down. A non-scaling effect just contributes 0.
-        dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
+        dmg += directHitBonus(
+          abilityScalingPower(p, ability),
+          ability,
+          res.castTime,
+          false,
+          eff.spellPowerCoeff,
+        );
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
         // Ice Lance against a frozen-counting target (combat/frost_mage.ts):
         // the per-cast resolution carries its 3x; 1 for every other cast.
@@ -1190,9 +1242,12 @@ export function runEffects(
       case 'drainTick':
         break; // handled per channel tick
       case 'buffTarget': {
+        const auraId =
+          targetBuffIndex === 0 ? ability.id : `${ability.id}_${eff.kind}_${targetBuffIndex}`;
+        targetBuffIndex += 1;
         const applyBuff = (e: Entity) =>
           ctx.applyAura(e, {
-            id: ability.id,
+            id: auraId,
             name: ability.name,
             kind: eff.kind,
             remaining: eff.duration,
@@ -2368,6 +2423,16 @@ export function runEffects(
               aura.kind === 'disarm' ||
               aura.kind === 'slow')
           ) {
+            // Product ruling (Avatar, the sole breakControl user): the break
+            // removes control from any source EXCEPT the caster itself and
+            // mobs whose template carries boss: true (final-boss templates).
+            // Encounter mobs without the flag are breakable; a source that
+            // cannot be resolved (despawned, since ctx.entities is the full
+            // authoritative roster here) defaults to breakable, the common
+            // case.
+            if (aura.sourceId === p.id) continue;
+            const source = ctx.entities.get(aura.sourceId);
+            if (source && MOBS[source.templateId]?.boss) continue;
             p.auras.splice(i, 1);
             ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
           }
@@ -2494,6 +2559,9 @@ export function runEffects(
           charges: eff.charges,
           icdMax: eff.internalCooldown,
         });
+        if (eff.kind === 'stealth' && dropsCombatOnStealth(ability)) {
+          dropSelfFromHostileFocus(ctx, p);
+        }
         recalcPlayerStats(
           p,
           meta.cls,

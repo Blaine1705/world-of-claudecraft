@@ -280,11 +280,12 @@ bar.
 | 6 | Faultwake |
 | 7 | Rime Jolt |
 | 8 | Primal Mastery |
-| 9 | Thunder Ward |
-| 10 | Mending Waters |
-| 11 | Shadewolf |
-| 12 | Storm Chorus |
-| 13 | Pyrebrand Weapon |
+| 9 | Unleash Weapon |
+| 10 | Thunder Ward |
+| 11 | Mending Waters |
+| 12 | Shadewolf |
+| 13 | Storm Chorus |
+| 14 | Pyrebrand Weapon |
 
 ### Warspirit
 
@@ -297,11 +298,12 @@ bar.
 | 5 | Earthen Jolt |
 | 6 | Galeheart Weapon |
 | 7 | Stonebound Weapon |
-| 8 | Rime Jolt |
-| 9 | Mending Waters |
-| 10 | Thunder Ward |
-| 11 | Shadewolf |
-| 12 | Storm Chorus |
+| 8 | Unleash Weapon |
+| 9 | Rime Jolt |
+| 10 | Mending Waters |
+| 11 | Thunder Ward |
+| 12 | Shadewolf |
+| 13 | Storm Chorus |
 
 Galeheart and Stonebound stay next to each other. The player always chooses the posture.
 
@@ -311,16 +313,17 @@ Galeheart and Stonebound stay next to each other. The player always chooses the 
 | ---: | --- |
 | 1 | Mending Waters |
 | 2 | Tidecall |
-| 3 | Cascading Mend |
-| 4 | Ancestors' Return |
-| 5 | Thunder Ward |
-| 6 | Shadewolf |
-| 7 | Earthen Jolt |
-| 8 | Rime Jolt |
-| 9 | Cinder Jolt |
-| 10 | Arc Bolt |
-| 11 | Lifespring Weapon |
-| 12 | Storm Chorus |
+| 3 | Unleash Weapon |
+| 4 | Cascading Mend |
+| 5 | Ancestors' Return |
+| 6 | Thunder Ward |
+| 7 | Shadewolf |
+| 8 | Earthen Jolt |
+| 9 | Rime Jolt |
+| 10 | Cinder Jolt |
+| 11 | Arc Bolt |
+| 12 | Lifespring Weapon |
+| 13 | Storm Chorus |
 
 ## Priest level 20 bars
 

@@ -7,6 +7,7 @@ import {
   hunterPetFerocityStage,
   hunterPetFrenzyActive,
   hunterPetVisualScale,
+  tithefiendEmpoweredActive,
 } from '../src/render/character_effects';
 import type { Entity } from '../src/sim/types';
 
@@ -176,6 +177,24 @@ describe('character visual effects', () => {
     expect(hunterPetFerocityStage(pet, owner)).toBe(0);
     expect(hunterPetFrenzyActive(pet, owner)).toBe(true);
     expect(hunterPetVisualScale(0, true)).toBe(1.1);
+  });
+
+  it('shows the shadow glow only on a living five-stack Tithefiend', () => {
+    expect(
+      tithefiendEmpoweredActive(
+        entity({ kind: 'mob', templateId: 'guardian_tithefiend', scale: 1.1 }),
+      ),
+    ).toBe(true);
+    expect(
+      tithefiendEmpoweredActive(
+        entity({ kind: 'mob', templateId: 'guardian_tithefiend', scale: 0.82 }),
+      ),
+    ).toBe(false);
+    expect(
+      tithefiendEmpoweredActive(
+        entity({ kind: 'mob', templateId: 'guardian_tithefiend', scale: 1.1, dead: true }),
+      ),
+    ).toBe(false);
   });
 
   it('keeps Stonebound structurally visible and gives it priority over color-only auras', () => {

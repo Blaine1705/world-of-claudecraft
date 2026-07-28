@@ -10,8 +10,8 @@
     "Spiritmend Tidecall deposit and Cascading Mend consumption",
     "Shaman spec state in deterministic headless snapshots"
   ],
-  "draws": 1172,
-  "drawDigest": "70edc3f0",
+  "draws": 1162,
+  "drawDigest": "653e99e6",
   "frames": [
     {
       "tick": 0,
@@ -32,7 +32,7 @@
       "time": 1,
       "nextId": 420,
       "state": "92ef4517",
-      "events": "03082f9d",
+      "events": "3b48370a",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -75,8 +75,8 @@
       "tick": 100,
       "time": 5,
       "nextId": 420,
-      "state": "1b03ac5e",
-      "events": "9d06f7eb",
+      "state": "e71808ca",
+      "events": "6112039f",
       "rng": {
         "draws": 251,
         "digest": "1e1e444d"
@@ -86,7 +86,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 420,
-      "state": "1b03ac5e",
+      "state": "e71808ca",
       "events": "741638a5",
       "rng": {
         "draws": 251,
@@ -109,13 +109,13 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 235
+            "damageDealt": 213
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 235
+              "dummyDamage": 213
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -459,6 +459,18 @@
         {
           "aiState": "idle",
           "attackPower": 74,
+          "auras": [
+            {
+              "duration": 86400,
+              "id": "shaman_thunder_charges",
+              "kind": "internal_cd",
+              "name": "Thunder Charges",
+              "remaining": 86400,
+              "school": "nature",
+              "sourceId": 415,
+              "stacks": 1
+            }
+          ],
           "castTotal": 2.181818,
           "combatTimer": 0.9,
           "comboUntil": -1,
@@ -700,7 +712,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999765,
+          "hp": 999787,
           "id": 419,
           "inCombat": true,
           "kind": "mob",
@@ -732,7 +744,7 @@
           "threat": [
             [
               415,
-              235
+              213
             ]
           ],
           "weapon": {
@@ -745,8 +757,8 @@
       "tick": 120,
       "time": 6,
       "nextId": 420,
-      "state": "cf3c0c5f",
-      "events": "03abc3c8",
+      "state": "e54b2ba1",
+      "events": "4ee67df5",
       "rng": {
         "draws": 352,
         "digest": "7b3e9bd9"
@@ -756,7 +768,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 420,
-      "state": "9b885f88",
+      "state": "ea1e61fe",
       "events": "741638a5",
       "rng": {
         "draws": 488,
@@ -767,33 +779,33 @@
       "tick": 160,
       "time": 8,
       "nextId": 420,
-      "state": "a0f2f7a1",
-      "events": "840f823c",
+      "state": "2c7f66b8",
+      "events": "a0714c0e",
       "rng": {
-        "draws": 620,
-        "digest": "454b7506"
+        "draws": 622,
+        "digest": "04eae676"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 420,
-      "state": "46c6f443",
+      "state": "16519ad2",
       "events": "741638a5",
       "rng": {
-        "draws": 760,
-        "digest": "31484b07"
+        "draws": 759,
+        "digest": "93472b6e"
       }
     },
     {
       "tick": 182,
       "time": 9.1,
       "nextId": 420,
-      "state": "f485ccdd",
+      "state": "a7c1096c",
       "events": "741638a5",
       "rng": {
-        "draws": 782,
-        "digest": "af910911"
+        "draws": 784,
+        "digest": "7f6b7d79"
       },
       "label": "warspirit-cadence",
       "players": [
@@ -812,13 +824,13 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 235
+            "damageDealt": 213
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 235
+              "dummyDamage": 213
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -907,13 +919,13 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 87
+            "damageDealt": 129
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 87
+              "dummyDamage": 129
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1167,6 +1179,18 @@
         {
           "aiState": "idle",
           "attackPower": 74,
+          "auras": [
+            {
+              "duration": 86400,
+              "id": "shaman_thunder_charges",
+              "kind": "internal_cd",
+              "name": "Thunder Charges",
+              "remaining": 86400,
+              "school": "nature",
+              "sourceId": 415,
+              "stacks": 1
+            }
+          ],
           "castTotal": 2.181818,
           "combatTimer": 5,
           "comboUntil": -1,
@@ -1473,7 +1497,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999678,
+          "hp": 999658,
           "id": 419,
           "inCombat": true,
           "kind": "mob",
@@ -1505,11 +1529,11 @@
           "threat": [
             [
               415,
-              235
+              213
             ],
             [
               416,
-              87
+              129
             ]
           ],
           "weapon": {
@@ -1522,55 +1546,55 @@
       "tick": 200,
       "time": 10,
       "nextId": 420,
-      "state": "a390387b",
-      "events": "fd2378a3",
+      "state": "490e1ad8",
+      "events": "2a481774",
       "rng": {
-        "draws": 897,
-        "digest": "290daee8"
+        "draws": 890,
+        "digest": "d5930bb3"
       }
     },
     {
       "tick": 220,
       "time": 11,
       "nextId": 420,
-      "state": "aa4c3e5c",
+      "state": "493493c7",
       "events": "741638a5",
       "rng": {
-        "draws": 981,
-        "digest": "7bb97f2f"
+        "draws": 976,
+        "digest": "6ce74cd8"
       }
     },
     {
       "tick": 240,
       "time": 12,
       "nextId": 420,
-      "state": "8ad4dace",
-      "events": "9b98aed1",
+      "state": "606c60bb",
+      "events": "4fb3f611",
       "rng": {
-        "draws": 1078,
-        "digest": "1d202abd"
+        "draws": 1055,
+        "digest": "e281650d"
       }
     },
     {
       "tick": 260,
       "time": 13,
       "nextId": 420,
-      "state": "8db0d6d9",
-      "events": "f95ee6e0",
+      "state": "da2e2af2",
+      "events": "ec37c314",
       "rng": {
-        "draws": 1153,
-        "digest": "66fff170"
+        "draws": 1139,
+        "digest": "a17457cb"
       }
     },
     {
       "tick": 264,
       "time": 13.2,
       "nextId": 420,
-      "state": "e25a7f5e",
+      "state": "961d1c35",
       "events": "741638a5",
       "rng": {
-        "draws": 1172,
-        "digest": "70edc3f0"
+        "draws": 1162,
+        "digest": "653e99e6"
       },
       "label": "spiritmend-consume",
       "players": [
@@ -1589,13 +1613,13 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 235
+            "damageDealt": 213
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 235
+              "dummyDamage": 213
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1684,13 +1708,13 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 162
+            "damageDealt": 213
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 162
+              "dummyDamage": 213
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1944,6 +1968,18 @@
         {
           "aiState": "idle",
           "attackPower": 74,
+          "auras": [
+            {
+              "duration": 86400,
+              "id": "shaman_thunder_charges",
+              "kind": "internal_cd",
+              "name": "Thunder Charges",
+              "remaining": 86400,
+              "school": "nature",
+              "sourceId": 415,
+              "stacks": 1
+            }
+          ],
           "castTotal": 2.181818,
           "combatTimer": 9.1,
           "comboUntil": -1,
@@ -2198,7 +2234,7 @@
           "dodgeChance": 0.0695,
           "fallStartY": 1.5,
           "fiveSecondRule": 112.2,
-          "hp": 675,
+          "hp": 715,
           "id": 418,
           "kind": "player",
           "level": 20,
@@ -2248,7 +2284,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999603,
+          "hp": 999574,
           "id": 419,
           "inCombat": true,
           "kind": "mob",
@@ -2280,11 +2316,11 @@
           "threat": [
             [
               415,
-              235
+              213
             ],
             [
               416,
-              162
+              213
             ]
           ],
           "weapon": {
@@ -2297,11 +2333,11 @@
       "tick": 264,
       "time": 13.2,
       "nextId": 420,
-      "state": "e25a7f5e",
+      "state": "961d1c35",
       "events": "741638a5",
       "rng": {
-        "draws": 1172,
-        "digest": "70edc3f0"
+        "draws": 1162,
+        "digest": "653e99e6"
       },
       "label": "final",
       "players": [
@@ -2320,13 +2356,13 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 235
+            "damageDealt": 213
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 235
+              "dummyDamage": 213
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -2415,13 +2451,13 @@
           "cls": "shaman",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 162
+            "damageDealt": 213
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 162
+              "dummyDamage": 213
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -2675,6 +2711,18 @@
         {
           "aiState": "idle",
           "attackPower": 74,
+          "auras": [
+            {
+              "duration": 86400,
+              "id": "shaman_thunder_charges",
+              "kind": "internal_cd",
+              "name": "Thunder Charges",
+              "remaining": 86400,
+              "school": "nature",
+              "sourceId": 415,
+              "stacks": 1
+            }
+          ],
           "castTotal": 2.181818,
           "combatTimer": 9.1,
           "comboUntil": -1,
@@ -2929,7 +2977,7 @@
           "dodgeChance": 0.0695,
           "fallStartY": 1.5,
           "fiveSecondRule": 112.2,
-          "hp": 675,
+          "hp": 715,
           "id": 418,
           "kind": "player",
           "level": 20,
@@ -2979,7 +3027,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 999603,
+          "hp": 999574,
           "id": 419,
           "inCombat": true,
           "kind": "mob",
@@ -3011,11 +3059,11 @@
           "threat": [
             [
               415,
-              235
+              213
             ],
             [
               416,
-              162
+              213
             ]
           ],
           "weapon": {

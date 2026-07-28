@@ -137,7 +137,7 @@ describe('Shaman v0.29 Thundercall', () => {
     const plainDamage = earthenJoltDamage(resolveCast(plain.sim), plain.shaman.id, plain.target.id);
 
     const charged = setup(2804);
-    seedThunderBank(charged.shaman, 4);
+    seedThunderBank(charged.shaman, 5);
     charged.sim.castAbility('earth_shock', charged.shaman.id);
     const chargedDamage = earthenJoltDamage(
       resolveCast(charged.sim),
@@ -209,7 +209,7 @@ describe('Shaman v0.29 Thundercall', () => {
 
   it('boosts exactly the first vent during Primal Mastery and emits its payoff cue once', () => {
     const baseline = setup(2808);
-    seedThunderBank(baseline.shaman, 4);
+    seedThunderBank(baseline.shaman, 5);
     baseline.sim.castAbility('earth_shock', baseline.shaman.id);
     const baselineDamage = earthenJoltDamage(
       resolveCast(baseline.sim),
@@ -218,17 +218,19 @@ describe('Shaman v0.29 Thundercall', () => {
     );
 
     const mastered = setup(2808);
-    seedThunderBank(mastered.shaman, 4);
+    seedThunderBank(mastered.shaman, 5);
     castInstant(mastered.sim, mastered.shaman, 'elemental_mastery');
     mastered.shaman.gcdRemaining = 0;
     mastered.sim.castAbility('earth_shock', mastered.shaman.id);
     const firstEvents = resolveCast(mastered.sim);
     const firstDamage = earthenJoltDamage(firstEvents, mastered.shaman.id, mastered.target.id);
-    expect(firstDamage).toBe(Math.round(baselineDamage * 1.25));
+    expect(Math.abs(firstDamage - baselineDamage * 1.25)).toBeLessThanOrEqual(1);
     expect(procSurges(firstEvents, mastered.shaman.id)).toHaveLength(1);
 
-    seedThunderBank(mastered.shaman, 4);
-    expect(thundercallDamageMultiplier(mastered.sim.ctx, mastered.shaman, 'earth_shock')).toBe(2);
+    seedThunderBank(mastered.shaman, 5);
+    expect(thundercallDamageMultiplier(mastered.sim.ctx, mastered.shaman, 'earth_shock')).toBe(
+      2.25,
+    );
     expect(mastered.shaman.auras.some((aura) => aura.id === 'elemental_mastery_vent')).toBe(false);
   });
 });

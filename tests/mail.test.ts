@@ -27,6 +27,14 @@ function moveToMailbox(sim: Sim, pid: number): void {
   sim.rebucket(p);
 }
 
+function moveAwayFromMailboxes(sim: Sim, pid: number): void {
+  const p = sim.entities.get(pid);
+  if (!p) throw new Error('missing player');
+  p.pos = sim.groundPos(50, 0);
+  p.prevPos = { ...p.pos };
+  sim.rebucket(p);
+}
+
 function tickFor(sim: Sim, seconds: number): SimEvent[] {
   const out: SimEvent[] = [];
   for (let i = 0; i < Math.ceil(seconds * 20); i++) out.push(...sim.tick());
@@ -116,6 +124,29 @@ describe('sending a letter', () => {
     ).toBe(true);
   });
 
+  it('streams older delivered mail beyond the first fifty rows so it can be opened', () => {
+    const sim = makeWorld();
+    const alice = sim.addPlayer('warrior', 'Alice');
+    const bob = sim.addPlayer('mage', 'Bob');
+    const aliceMeta = sim.meta(alice);
+    if (!aliceMeta) throw new Error('no meta');
+    aliceMeta.copper = 100_000;
+    moveToMailbox(sim, alice);
+
+    for (let i = 0; i < 60; i++) {
+      sim.mailSend('Bob', `Letter ${i}`, `Body ${i}`, 0, [], alice);
+    }
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    moveToMailbox(sim, bob);
+
+    const info = sim.mailInfoFor(bob);
+    expect(info).not.toBeNull();
+    expect(info?.totalCount).toBe(61);
+    expect(info?.messages).toHaveLength(61);
+    expect(info?.messages.some((m) => m.subject === 'Letter 0')).toBe(true);
+    expect(info?.messages.some((m) => m.subject === 'Letter 59')).toBe(true);
+  });
+
   it('refuses what the post refuses', () => {
     const sim = makeWorld();
     const alice = sim.addPlayer('warrior', 'Alice');
@@ -130,7 +161,9 @@ describe('sending a letter', () => {
       return r && r.type === 'mailResult' ? r.code : null;
     };
 
-    // Away from any mailbox.
+    // The rebuilt Eastbrook mailbox is intentionally close to the fresh start,
+    // so move to an explicit non-service point for the proximity denial.
+    moveAwayFromMailboxes(sim, alice);
     sim.mailSend('Alice', 'x', 'y', 0, [], alice);
     expect(lastCode()).toBe('tooFar');
 

@@ -1,8 +1,8 @@
-// Identical-payload stacking (Professions 2.0 Phase 12d): the one predicate
+// Identical-payload stacking (Professions 2.0): the one predicate
 // deciding when two inventory slots of the same itemId may share a stack.
-// Before Phase 12d every instanced slot (#1165) sat one-per-slot at count 1;
+// Before this predicate every instanced slot (#1165) sat one-per-slot at count 1;
 // now byte-equal payloads (same signer, same rolled quality/stats/masterwork,
-// same enchant, same boundTo) merge up to the item's stack cap. bags.ts
+// same enchant, same craftedRecipeId, same boundTo) merge up to the item's stack cap. bags.ts
 // countFit/addStacked, Sim.addItemInstance, bank.ts moveBetweenContainers,
 // and trade.ts fitsAfterSwap all consume canStackInstancePayloads below, so
 // the merge rule cannot drift between bags, bank, and trade.
@@ -34,7 +34,7 @@ function structurallyEqual(a: unknown, b: unknown): boolean {
 
 /** True when the two payloads are structurally identical over the full
  *  payload shape (signer, charges, rolled incl. quality/stats/masterwork,
- *  enchant, boundTo, and any persisted extra field). Two absent payloads are
+ *  enchant, craftedRecipeId, boundTo, and any persisted extra field). Two absent payloads are
  *  equal; a payload never equals no payload (a plain stack stays distinct
  *  from every instanced one, in both directions). */
 export function itemInstancePayloadsEqual(

@@ -94,13 +94,15 @@ This seam lands separately and cannot contain Packlord-specific tuning.
 | Stonebound Weapon | Reuse `rockbiter_weapon`, then hand it off to Warspirit at level 5 | Warspirit after level 5 |
 | Ancestral Strike | Reuse `stormstrike` and its signature grant | Warspirit |
 | Stormcast | New owner aura earned by the melee cadence | Warspirit |
+| Unleash Weapon | One shared action that dispatches through the active spec weapon enhancement | Shared Shaman |
 | Lifespring Weapon | New spec-gated enhancement ability | Spiritmend |
 | Mending Current | New owner-scoped healing pool on each prepared ally | Spiritmend |
 | Tidecall | New instant pool-building heal | Spiritmend |
 | Cascading Mend | Reuse `chain_heal`, rename its display, and retain the signature grant | Spiritmend |
 
-Arc Bolt, Mending Waters, Earthen Jolt, Cinder Jolt, Rime Jolt, Thunder Ward, and Shadewolf remain
-shared. Rimebound Weapon is retired from new acquisition but its shipped id remains defined.
+Arc Bolt, Mending Waters, Earthen Jolt, Cinder Jolt, Rime Jolt, Thunder Ward, Shadewolf, and Unleash
+Weapon remain shared. Rimebound Weapon is retired from new acquisition but its shipped id remains
+defined.
 
 ### Priest
 

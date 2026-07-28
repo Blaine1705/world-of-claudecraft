@@ -17,6 +17,9 @@ export const STONEBOUND_WEAPON_ID = 'rockbiter_weapon';
 export const WARSPIRIT_CADENCE_ID = 'shaman_warspirit_cadence';
 export const STORMCAST_ID = 'shaman_stormcast';
 export const STORMCAST_CHEAP_ID = 'shaman_stormcast_cheap';
+export const STORMSURGE_READY_ID = 'shaman_stormsurge_ready';
+export const STORMSURGE_CHANCE = 0.25;
+export const STORMSURGE_BAD_LUCK_CAP = 4;
 export const STONEBOUND_ARMOR_ID = 'shaman_stonebound_armor';
 export const STONEBOUND_DR_ID = 'shaman_stonebound_dr';
 export const STONEBOUND_WARD_SMOOTH_ID = 'shaman_stonebound_ward_smooth';
@@ -30,6 +33,8 @@ export const STONEBOUND_DAMAGE_REDUCTION = 0.1;
 export const STONEBOUND_THREAT_MULTIPLIER = 2;
 export const STONEBOUND_WARD_SMOOTH_REDUCTION = 0.1;
 export const STONEBOUND_WARD_SMOOTH_DURATION = 3;
+
+const STORMSURGE_FAILURE_COUNTER = 'shaman_stormsurge_failures';
 
 export const STORMCAST_ABILITIES: readonly string[] = [
   'lightning_bolt',
@@ -45,6 +50,7 @@ const WARSPIRIT_STATE_IDS: ReadonlySet<string> = new Set([
   WARSPIRIT_CADENCE_ID,
   STORMCAST_ID,
   STORMCAST_CHEAP_ID,
+  STORMSURGE_READY_ID,
   STONEBOUND_ARMOR_ID,
   STONEBOUND_DR_ID,
   STONEBOUND_WARD_SMOOTH_ID,
@@ -198,6 +204,43 @@ function armStormcast(ctx: SimContext, player: Entity): void {
   });
 }
 
+function setStormsurgeFailures(player: Entity, failures: number): void {
+  if (failures <= 0) {
+    if (player.procState) delete player.procState.counters[STORMSURGE_FAILURE_COUNTER];
+    return;
+  }
+  if (!player.procState) player.procState = { counters: {}, icds: {} };
+  player.procState.counters[STORMSURGE_FAILURE_COUNTER] = failures;
+}
+
+function tryProcStormsurge(ctx: SimContext, player: Entity): void {
+  if ((player.cooldowns.get('stormstrike') ?? 0) <= 0) return;
+  const failures = player.procState?.counters[STORMSURGE_FAILURE_COUNTER] ?? 0;
+  if (ctx.rng.chance(STORMSURGE_CHANCE) || failures + 1 >= STORMSURGE_BAD_LUCK_CAP) {
+    player.cooldowns.delete('stormstrike');
+    setStormsurgeFailures(player, 0);
+    ctx.applyAura(player, {
+      id: STORMSURGE_READY_ID,
+      name: 'Stormsurge',
+      kind: 'internal_cd',
+      value: 1,
+      remaining: 6,
+      duration: 6,
+      sourceId: player.id,
+      school: 'nature',
+    });
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: player.id,
+      targetId: player.id,
+      school: 'nature',
+      fx: 'procSurge',
+    });
+    return;
+  }
+  setStormsurgeFailures(player, failures + 1);
+}
+
 /**
  * Advances one shared cadence for either hand. `steps` is two for Ancestral
  * Strike and one for a landed base swing. Echoes copy resolved damage and draw
@@ -286,6 +329,7 @@ export function onStormcastConsumed(ctx: SimContext, player: Entity): void {
       school: 'nature',
     });
   }
+  tryProcStormsurge(ctx, player);
 }
 
 export function stoneboundThreatMultiplier(ctx: SimContext, player: Entity): number {
@@ -334,5 +378,6 @@ export function applyStoneboundWardSmoothing(
 
 export function clearWarspiritState(ctx: SimContext, player: Entity): void {
   removeOwnedAuras(ctx, player, WARSPIRIT_STATE_IDS);
+  setStormsurgeFailures(player, 0);
   clearStoneboundForcedTargets(ctx, player.id);
 }

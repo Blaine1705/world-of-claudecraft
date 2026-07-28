@@ -1,4 +1,4 @@
-import type { PlayerMeta } from '../../sim';
+import type { PlayerMeta, ResolvedAbility } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { type Aura, dist2d, type Entity } from '../../types';
 import { dismissOwnedGuardians, guardianOf, summonGuardian } from '../guardians';
@@ -13,6 +13,39 @@ export const TITHEFIEND_MANA_RETURN_RATE = 0.01;
 export const TITHEFIEND_KEY = 'tithefiend';
 export const TITHEFIEND_STRIKE_ID = 'tithefiend_strike';
 export const TITHEFIEND_MAX_RANGE = 35;
+export const VESPERS_DOT_DAMAGE_MULT = 1.25;
+export const MINDFRACTURE_SPELL_POWER_COEFF = 0.6;
+export const TITHEFIEND_BASE_SPELL_POWER_COEFF = 0.15;
+export const TITHEFIEND_MAX_STACK_DAMAGE_MULT = 1.25;
+export const TITHEFIEND_MAX_STACK_SCALE = 1.1;
+
+export function resolveVespersAbility(
+  resolved: ResolvedAbility,
+  meta: PlayerMeta,
+): ResolvedAbility {
+  if (meta.cls !== 'priest' || meta.talents.spec !== 'shadow') return resolved;
+  if (resolved.def.id === 'shadow_word_pain') {
+    return {
+      ...resolved,
+      effects: resolved.effects.map((effect) =>
+        effect.type === 'dot'
+          ? { ...effect, total: Math.round(effect.total * VESPERS_DOT_DAMAGE_MULT) }
+          : effect,
+      ),
+    };
+  }
+  if (resolved.def.id === 'mind_blast') {
+    return {
+      ...resolved,
+      effects: resolved.effects.map((effect) =>
+        effect.type === 'directDamage'
+          ? { ...effect, spellPowerCoeff: MINDFRACTURE_SPELL_POWER_COEFF }
+          : effect,
+      ),
+    };
+  }
+  return resolved;
+}
 
 function ownDirge(target: Entity, priestId: number): Aura | undefined {
   return target.auras.find(
@@ -141,15 +174,18 @@ function summonTithefiend(ctx: SimContext, priest: Entity, stacks: number): void
   if (stacks <= 0) return;
   const incarnate = stacks === 5 && hasPriestTalent(ctx, priest, PRIEST_TALENT_IDS.incarnateSpirit);
   const incarnateMult = incarnate ? 1.5 : 1;
+  const maxStackMult = stacks === GLOOMTITHE_MAX_STACKS ? TITHEFIEND_MAX_STACK_DAMAGE_MULT : 1;
+  const damageMult = incarnateMult * maxStackMult;
   summonGuardian(ctx, priest, {
     key: TITHEFIEND_KEY,
     name: 'Tithefiend',
     color: 0x6c258a,
-    scale: 0.82,
+    scale: stacks === GLOOMTITHE_MAX_STACKS ? TITHEFIEND_MAX_STACK_SCALE : 0.82,
     remaining: tithefiendDuration(stacks) * incarnateMult,
     attackInterval: 2,
-    minDamage: Math.round((12 + stacks * 8) * incarnateMult),
-    maxDamage: Math.round((16 + stacks * 8) * incarnateMult),
+    minDamage: Math.round((12 + stacks * 8) * damageMult),
+    maxDamage: Math.round((16 + stacks * 8) * damageMult),
+    spellPowerCoeff: TITHEFIEND_BASE_SPELL_POWER_COEFF * damageMult,
     school: 'shadow',
     abilityId: TITHEFIEND_STRIKE_ID,
     abilityName: 'Tithefiend Strike',

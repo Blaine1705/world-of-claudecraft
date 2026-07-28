@@ -36,15 +36,15 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   charge: [9, 1],
   bear_charge: [9, 1],
   // "30% more threat": the stance threat multiplier inside threatModifier.
-  // Bear form's "armor +90%" is the recalcPlayerStats multiplier (1.9) in
-  // entity.ts, not the form effect's value.
+  // Bear form's "armor +130%" is the recalcPlayerStats multiplier (2.3, the
+  // 2026-07 tank-parity pass) in entity.ts, not the form effect's value.
   defensive_stance: [30],
   // Battle Stance's rage multiplier is applied by resourceGainMultiplier.
   battle_stance: [10],
   // Valor Roar's Protection-only damage reduction is applied when the party
   // maximum-health aura is created, rather than stored on its shared effect.
   rallying_cry: [5],
-  bear_form: [30, 90],
+  bear_form: [30, 130],
   // "compelled to attack you for 3 sec": the taunt compel window in threat.ts.
   taunt: [3],
   holy_taunt: [3],
@@ -81,9 +81,15 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // Thundercall and Stonebound values live in their spec runtime modules.
   lightning_bolt: [1, 5],
   rockbiter_weapon: [3, 10],
-  earth_shock: [3, 25],
+  earth_shock: [3, 5, 125],
   // Spiritmend deposits are calculated after the direct heal resolves.
   healing_wave: [12, 30, 50],
+  // Unleash Weapon dispatches to four spec enchant implementations. Their
+  // values live in shaman_unleash_weapon.ts and shaman_spiritmend.ts rather
+  // than one shared ability effect array.
+  unleash_weapon: [54, 64, 30, 2, 20, 6, 75, 3, 4, 125, 8, 50],
+  // The shared Temporal Exhaustion gate is owned by combat/haste_burst.ts.
+  bloodlust: [10],
 };
 
 // Every resolved rank of every class ability (deduped by rank).

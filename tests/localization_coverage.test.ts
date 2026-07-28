@@ -127,7 +127,10 @@ describe('i18n Localization Key Coverage', () => {
     );
   });
 
-  const placeholderPattern = /\b(TODO|TBD|FIXME|PLACEHOLDER|TRANSLATE|LOREM)\b/i;
+  // Case-sensitive on purpose: leftover markers are uppercase by convention,
+  // and the case-insensitive form false-fails ordinary vocabulary in several
+  // locales (Spanish and Portuguese "todo").
+  const placeholderPattern = /\b(TODO|TBD|FIXME|PLACEHOLDER|TRANSLATE|LOREM)\b/;
   const shellKeys: TranslationKey[] = [
     'seo.title',
     'seo.description',
@@ -399,6 +402,7 @@ describe('i18n Localization Key Coverage', () => {
     price: '1g 20s',
     proceeds: '95s',
     quality: 'Rare',
+    quest: 'A Trade for Every Hand',
     rating: 1513,
     range: 30,
     rank: 2,
@@ -1030,7 +1034,7 @@ describe('i18n Localization Key Coverage', () => {
       Object.keys(DELVES).length * 3 +
       // Ravenpost authored letters: welcome + Heroic Marks reward + mastery
       // reset notice + quest letters + Guild trend letters + master tier
-      // letters (Phase 14, keyed pair -> tier), 3 fields each.
+      // letters (keyed pair -> tier), 3 fields each.
       (3 +
         Object.keys(QUEST_LETTERS).length +
         Object.keys(GUILD_TREND_LETTERS).length +
@@ -1295,7 +1299,9 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should provide deed content translations for every supported locale', () => {
     const deedEntries = deedTranslationManifest();
-    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 19);
+    // name + desc per deed, plus one title entry per title deed (30 as of
+    // Professions 2.0; tests/deeds_content.test.ts pins the count).
+    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 30);
 
     for (const lang of supportedLanguages) {
       setLanguage(lang);

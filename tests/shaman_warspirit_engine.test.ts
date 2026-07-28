@@ -4,10 +4,12 @@ import {
   applyStoneboundJolt,
   applyWarspiritPosture,
   clearWarspiritState,
+  onStormcastConsumed,
   STONEBOUND_ARMOR_ID,
   STONEBOUND_DR_ID,
   STORMCAST_CHEAP_ID,
   STORMCAST_ID,
+  STORMSURGE_READY_ID,
   warspiritCadence,
   warspiritPosture,
 } from '../src/sim/combat/shaman_warspirit';
@@ -56,6 +58,35 @@ describe('Warspirit engine', () => {
     expect(warspiritCadence(shaman)).toBe(0);
     advanceWarspiritCadence(sim.ctx, shaman, target, 100, 2);
     expect(warspiritCadence(shaman)).toBe(2);
+  });
+
+  it('can proc Stormsurge when Stormcast is consumed and Ancestral Strike is cooling down', () => {
+    const { sim, shaman } = setup();
+    shaman.cooldowns.set('stormstrike', 10);
+    sim.rng.next = () => 0;
+
+    onStormcastConsumed(sim.ctx, shaman);
+
+    expect(shaman.cooldowns.has('stormstrike')).toBe(false);
+    expect(shaman.auras.some((aura) => aura.id === STORMSURGE_READY_ID)).toBe(true);
+    expect(
+      sim.drainEvents().some((event) => event.type === 'spellfx' && event.fx === 'procSurge'),
+    ).toBe(true);
+  });
+
+  it('guarantees Stormsurge on the fourth chance after three misses', () => {
+    const { sim, shaman } = setup();
+    sim.rng.next = () => 0.99;
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+      shaman.cooldowns.set('stormstrike', 10);
+      onStormcastConsumed(sim.ctx, shaman);
+      expect(shaman.cooldowns.has('stormstrike')).toBe(true);
+    }
+
+    shaman.cooldowns.set('stormstrike', 10);
+    onStormcastConsumed(sim.ctx, shaman);
+    expect(shaman.cooldowns.has('stormstrike')).toBe(false);
   });
 
   it('makes Stonebound exclusive, respects taunt immunity, and cleans every rider', () => {

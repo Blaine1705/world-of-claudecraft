@@ -9,6 +9,8 @@ Parent design: [Shaman v0.29.0 Class Design](../design/shaman-v028-class-design.
 ## Specialization gate
 
 Lifespring Weapon, Mending Currents, Tidecall, Cascading Mend, and Ancestors' Return belong only to Spiritmend.
+Unleash Weapon is shared by all Shaman specializations, but its Lifespring outcome belongs only to
+Spiritmend.
 Cascading Mend retains the shipped `chain_heal` id and the core Chain Heal role; it is granted by
 the specialization rather than by a talent or Mending Waters morph. Selecting Thundercall or
 Warspirit removes every owned pool and exclusive action before the new specialization kit is
@@ -17,14 +19,15 @@ resolved.
 ## Outcome
 
 Spiritmend prepares healing as visible Mending Current pools. Mending Waters creates and enlarges
-those pools, Tidecall boosts one ally, and Cascading Mend consumes the Mending Current on every ally
-it reaches to release more than the remaining healing immediately.
+those pools, Tidecall boosts one ally, Unleash Weapon turns one pool into an emergency heal and
+one-hit guard, and Cascading Mend consumes the Mending Current on every ally it reaches to release
+more than the remaining healing immediately.
 
 ## Design goals
 
 - Give Spiritmend a unique prepare-and-collapse healing rhythm.
 - Keep Chain Heal as the specialization's baseline multi-target payoff rather than a talent morph.
-- Make Mending Waters, Tidecall, Cascading Mend, and Lifespring Weapon the complete core kit.
+- Make Mending Waters, Tidecall, Unleash Weapon, Cascading Mend, and Lifespring Weapon the complete core kit.
 - Let Mending Currents provide efficient healing over time before they are consumed.
 - Make Cascading Mend a large prepared burst without making it fail on unprepared allies.
 - Preserve Mana as the only resource bar.
@@ -44,8 +47,9 @@ it reaches to release more than the remaining healing immediately.
 
 Mending Waters places a visible current around an ally. Further preparation makes that current
 larger. The Tidecall action saves or prepares one target without a cast. The Shaman may
-allow the pools to heal efficiently over time, or cast Cascading Mend to collapse every Mending Current along
-its bounce path into one immediate group recovery event.
+allow the pools to heal efficiently over time, use Unleash Weapon to save one prepared ally, or
+cast Cascading Mend to collapse every Mending Current along its bounce path into one immediate
+group recovery event.
 
 The decision is whether to preserve efficient healing, enlarge the pools for expected damage, or
 consume them now before an ally dies.
@@ -58,6 +62,7 @@ consume them now before an ally dies.
 | Mending Waters | Canonical cast-time heal. Creates or enlarges a 12-second Mending Current pool. |
 | Mending Current pool | One stored healing-over-time pool per ally per Shaman, capped relative to maximum health. |
 | Tidecall | One instant Spiritmend action. Heals immediately, adds to the target's pool, and refreshes it. |
+| Unleash Weapon | Consumes one owned Mending Current for an instant 125% burst. For 8 seconds, the next hit is reduced by 50% of the effective healing. |
 | Cascading Mend (`chain_heal`) | Retained Chain Heal signature with its canonical initial heal and two bounces. Consumes every Mending Current reached for a proposed 125% of its remaining amount. |
 | Lifespring Weapon | Spiritmend-only enhancement that increases Mending Current deposits. |
 | Ancestors' Return | Seven-second, out-of-combat cast that offers every dead group or raid member a return with 30% health and mana. |
@@ -94,6 +99,18 @@ duration, and Mana costs prevent unlimited preloading.
 PBE may change the direct heal, contribution, charge count, or recharge. The instant must remain a
 pool-building tool rather than a separate unrelated emergency heal.
 
+## Unleash Weapon contract
+
+- Unleash Weapon is an instant shared Shaman action with a 15-second cooldown.
+- Spiritmend must have Lifespring Weapon active to use its friendly-target outcome.
+- It can only be used on a target carrying this Shaman's Mending Current.
+- It consumes the entire remaining pool and immediately heals for 125% of that amount.
+- The burst cannot critically heal or trigger another weapon proc.
+- For 8 seconds, the next damage event is reduced by 50% of the health actually restored.
+- Overhealing does not increase the one-hit guard.
+- Any unused guard is lost after that hit.
+- A missing or foreign-owned current refuses the cast before Mana or cooldown is spent.
+
 ## Cascading Mend consumption contract
 
 Cascading Mend preserves its canonical bounce selection and normal healing:
@@ -123,6 +140,7 @@ preparation and accepting the risk of spending efficient healing early.
 - Cascading Mend can consume a single prepared target even when no bounce target exists.
 - The healer is never required to damage enemies to sustain baseline healing.
 - Tidecall charges provide mobile emergency healing without removing cast-time healing decisions.
+- Unleash Weapon provides a prepared single-target rescue without replacing Cascading Mend's group role.
 - Cascading Mend without preparation remains useful and cannot become a dead signature.
 
 ## Presentation and accessibility
@@ -131,6 +149,7 @@ preparation and accepting the risk of spending efficient healing early.
 - The ally receives a water-current effect that grows through a small number of readable tiers.
 - Pool size is never communicated through visual scale or color alone.
 - Tidecall shows charges, recharge, and capped-target state on its action.
+- Unleash Weapon clearly shows its 15-second cooldown and one-hit guard.
 - Cascading Mend shows which reached allies consumed a pool through a distinct burst cue.
 - Reduced-motion mode retains static party-frame, aura, action, and consumption cues.
 - Mobile players can prepare and consume through ordinary ally targeting without ground input.
@@ -153,6 +172,7 @@ The exact 18 class-wide choices are defined in the parent Shaman design.
 - Canonical Mending Waters and bouncing Cascading Mend from `release/v0.29.0`.
 - One authoritative owner-scoped healing pool per Shaman and ally pair.
 - Deterministic ticking, addition, cap, refresh, expiry, and full consumption.
+- A single-target Unleash Weapon path that bases its guard on effective healing and consumes it on one hit.
 - Cascading Mend hooks that preserve canonical bounce selection and consume each reached pool once.
 - Party-frame, aura, action-bar, and ally presentation for pool size and consumption.
 - Offline, online, and headless parity for every stored and consumed value.
@@ -166,6 +186,7 @@ against `release/v0.29.0`.
 - Mending Waters deposit percentage and Mana efficiency.
 - Mending Current duration, tick interval, tick distribution, and maximum-health cap.
 - Tidecall direct heal, deposit, charge count, recharge, and Mana cost.
+- Unleash Weapon Mana cost, cooldown, burst multiplier, guard fraction, and guard duration.
 - Lifespring deposit multiplier.
 - Cascading Mend consumption multiplier, normal healing, bounce falloff, radius, and target count.
 - Pre-pull preparation, overhealing, and multi-Shaman interaction.
@@ -175,6 +196,8 @@ against `release/v0.29.0`.
 - Mending Waters creates and enlarges exactly one visible Mending Current pool per ally.
 - Mending Current ticks reduce the same remaining amount that Cascading Mend may consume.
 - The instant action creates or enlarges the pool without exceeding its cap.
+- Unleash Weapon consumes one owned pool, heals once, and protects against exactly one damage event.
+- Unleash Weapon's guard is based on effective healing rather than proposed healing.
 - Cascading Mend consumes the pool on every ally it reaches, not only its initial target.
 - Every consumed pool grants exactly the configured immediate multiplier once.
 - Allies without a pool receive canonical Cascading Mend behavior.

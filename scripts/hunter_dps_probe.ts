@@ -2,6 +2,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import { dist2d, type Entity, type SimEvent } from '../src/sim/types';
+import { anchorProbeInOpenField } from './probe_anchor';
 
 type HunterSpec = 'beast_mastery' | 'marksmanship' | 'survival';
 type ProbeSim = Sim & {
@@ -152,6 +153,7 @@ export function runHunterDpsProbe(
 ): HunterDpsResult {
   const sim = new Sim({ seed, playerClass: 'hunter', autoEquip: true }) as ProbeSim;
   sim.setPlayerLevel(20);
+  anchorProbeInOpenField(sim);
   if (!sim.applyTalents({ spec, rows: {} })) throw new Error(`failed to apply ${spec}`);
   const primary = addTarget(sim, 0, spec === 'survival' ? 12 : 20);
   for (let index = 1; index < targets; index++) {
