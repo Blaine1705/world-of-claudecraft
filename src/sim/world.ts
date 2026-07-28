@@ -1,5 +1,11 @@
 import { beaconSpiralLift } from './beacon_spiral';
-import { castleLift, castlePadTarget, castlePadWeight } from './castle_layout';
+import {
+  castleLift,
+  castlePadTarget,
+  castlePadWeight,
+  castleSkirtWeight,
+  LAST_SPRING,
+} from './castle_layout';
 import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
 import { PALMREACH_PROPS } from './content/palmreach';
 import {
@@ -2292,6 +2298,53 @@ function applyCastlePad(x: number, z: number, h: number): number {
   return h + (castlePadTarget(x, z) - h) * w;
 }
 
+// The pad's northeast apron meets the Last Spring pool, and the pad yields to
+// the pool over castlePadWeight's own ring: the bailey's level floor ends on an
+// arc about 16yd out from the pool center and the ground then falls to the pool
+// bed in about 5yd of run. That left a 1.85 rise/run face standing straight out
+// of the water (tests/world_edge_coast.test.ts swept it on the drake east
+// margin: 4.5 and 4.3yd per 2yd step at z 1990 and 1998).
+//
+// Grade the apron into the shore: fill the hollow between the arc and the water
+// with a straight bank, so the pad's skirt reaches the pool as a shore slope
+// instead of a lip (the near-shore band measures 1.58 rise/run after, 2.82
+// before). Three properties keep the castle out of it:
+//   - it RAISES ONLY, so no pad, courtyard, or grounds height can move down;
+//   - its rim stops inside the castle's closest masonry (the northeast
+//     bastion's outer face at x 440.2, 15.8yd from the pool center), so no
+//     wall, bastion, ramp, or flank-trap seal is ever in its reach;
+//   - its authority is the pad's OWN skirt (castleSkirtWeight), so the fill is
+//     the skirt meeting the water and dies out around the pool's far shores,
+//     which have no pad behind them and keep their natural bank.
+// The bank line dives under the pool bed inside the shallows and rises above
+// the natural apron outside it, so the fill releases to zero at both ends on
+// its own: no window edge to seam (tests/terrain_window_seams.test.ts).
+const LAST_SPRING_BANK = {
+  /** the bank's outer rim, measured from the pool center (castle_layout) */
+  rim: 15.5,
+  /** the bank's height at the rim, just under the apron it meets there */
+  rimH: 3.5,
+  /** rise/run of the bank plane, under PLAYER_MAX_CLIMB_SLOPE (the apron
+   *  ABOVE it is the pad's own yield ramp and stays as steep as it was) */
+  slope: 1.4,
+  /** the fill eases back to the natural apron over the last of the rim */
+  ease: 1.5,
+} as const;
+
+function applyLastSpringBank(x: number, z: number, h: number): number {
+  const b = LAST_SPRING_BANK;
+  const dx = x - LAST_SPRING.x;
+  const dz = z - LAST_SPRING.z;
+  if (dx < -b.rim || dx > b.rim || dz < -b.rim || dz > b.rim) return h;
+  const d = Math.hypot(dx, dz);
+  if (d >= b.rim) return h;
+  const target = b.rimH - b.slope * (b.rim - d);
+  if (target <= h) return h; // raises only: the apron above the bank never moves
+  const w = castleSkirtWeight(x, z) * (1 - smoothstep(b.rim - b.ease, b.rim, d));
+  if (w <= 0) return h;
+  return h + (target - h) * w;
+}
+
 // ---------------------------------------------------------------------------
 // Signature landforms: one distinctive terrain idea per northern realm, so
 // no two maps read alike. All of them yield to roads (every marked route
@@ -3252,6 +3305,10 @@ export function terrainHeight(x: number, z: number, seed: number): number {
   // sea shave runs late in the unpadded chain and was clipping the castle's
   // seaward corner; the castle plateau must win everywhere inside its walls).
   h = applyCastlePad(x, z, h);
+  // ...and the shore bank that carries that pad's northeast apron down into the
+  // Last Spring, applied straight after it: the hollow it fills is the one the
+  // pad's own pool yield opens, so it has to read the padded height.
+  h = applyLastSpringBank(x, z, h);
   // The Palmreach jungle-pool walkway's bed, over the FINISHED height: the
   // deck surfaces the movement kernel walks are anchored to this function, so
   // the rim the planks cover and the sand they land on have to be shaped here,

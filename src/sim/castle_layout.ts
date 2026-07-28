@@ -281,7 +281,7 @@ export function castleClear(x: number, z: number): boolean {
 // the Last Spring pool sits off the pad's northeast apron; the pad yields
 // to the lake's graded escape shore there (the fade completes before the
 // curtain wall corner, so the walls and courtyard stay dead level)
-const LAST_SPRING = { x: 456, z: 1988 } as const;
+export const LAST_SPRING = { x: 456, z: 1988 } as const;
 
 /**
  * The inner ward terrace's rise above the bailey floor: the full 2.6 inside
@@ -329,15 +329,28 @@ export function castlePadTarget(x: number, z: number): number {
   return CASTLE.pad.h + wardTerraceRise(x, z);
 }
 
-/** The graded pad weight: level grounds, gentle skirt back to the waste. */
-export function castlePadWeight(x: number, z: number): number {
+/**
+ * The pad SKIRT's own reach: 1 over the graded rect, easing out to nothing
+ * over the 9yd skirt, with no pool yield in it. Split out because the skirt's
+ * reach is also what bounds the shore bank world.ts grades into the Last
+ * Spring (applyLastSpringBank): the bank is the pad's skirt meeting the water,
+ * so it must stop exactly where the skirt does and nowhere else.
+ */
+export function castleSkirtWeight(x: number, z: number): number {
   const p = CASTLE.pad;
   const dx = Math.max(p.x0 - x, 0, x - p.x1);
   const dz = Math.max(p.z0 - z, 0, z - p.z1);
   const d = Math.hypot(dx, dz);
   if (d >= 9) return 0;
   const t = 1 - d / 9;
-  return t * t * (3 - 2 * t) * sstepv(11, 18, Math.hypot(x - LAST_SPRING.x, z - LAST_SPRING.z));
+  return t * t * (3 - 2 * t);
+}
+
+/** The graded pad weight: level grounds, gentle skirt back to the waste. */
+export function castlePadWeight(x: number, z: number): number {
+  const skirt = castleSkirtWeight(x, z);
+  if (skirt <= 0) return 0;
+  return skirt * sstepv(11, 18, Math.hypot(x - LAST_SPRING.x, z - LAST_SPRING.z));
 }
 
 const HT = CASTLE.wallTh / 2;

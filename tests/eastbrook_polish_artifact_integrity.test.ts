@@ -1408,14 +1408,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
       fingerprint.update('\0');
     }
     expect(acceptedFiles).toHaveLength(4);
-    // Deliberately re-pinned for the origin/main base merge: build_assets.mjs is
-    // in every Eastbrook source inventory, and #1584 added a mesh-island prune
-    // to it, so all three source fingerprints moved and the assets were
-    // re-stamped from the merged source. Geometry is byte-identical (same
-    // bytes, same triangle counts); only the embedded seal changed, and no
-    // capture was retaken.
+    // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
+    // performance evidence files, which carry the composite polish provenance.
+    // The chunk-streaming base merge moved src/render/renderer.ts, a
+    // fingerprinted input, so the two after-evidence files re-mint one digest
+    // pair each (renderer sha256 plus the composite fingerprint) and this seal
+    // follows. Every measured value (frame timings, draw stats, triangle and
+    // scenario numbers) is byte-identical, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '1a6a26d2c3c5d60fda68c944b62db7073843236545a5e7d4fee175f0113345ec',
+      '930468dbefb98b791d7b66cc4d047a48d21f9927a6cf7dd41f44ffa176dfe546',
     );
   });
 
