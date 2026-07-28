@@ -892,14 +892,24 @@ export function dealDamage(
       target.castingAbility &&
       source &&
       source.id !== target.id &&
-      amount > 0 &&
+      (amount > 0 || totalAbsorbed > 0) &&
       kind === 'hit'
     ) {
       // A non-spell cast (fishing/gather) cancels outright instead of pushing
-      // back. The Demon Heal channel is deliberately NOT folded in: it takes
-      // the normal channel pushback below, as today.
+      // back, and the hit counts even when a shield soaked ALL of it: an
+      // absorbed hit still landed, so it ends the session exactly like an
+      // unabsorbed one (its knockback displacement stands regardless; the
+      // physics never branched on absorb). Spell pushback keeps the classic
+      // rule: a fully absorbed hit pushes nothing back. The Demon Heal
+      // channel is deliberately NOT folded in: it takes the normal channel
+      // pushback below, as today.
       if (isNonSpellCast(target.castingAbility)) ctx.cancelCast(target);
-      else if (!ignoresDamagePushback(ctx, target, target.castingAbility)) ctx.pushbackCast(target);
+      else if (
+        amount > 0 &&
+        !ignoresDamagePushback(ctx, target, target.castingAbility)
+      ) {
+        ctx.pushbackCast(target);
+      }
     }
   }
 

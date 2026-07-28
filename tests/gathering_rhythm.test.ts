@@ -700,6 +700,92 @@ describe('interrupt immunity and damage-cancels-not-pushback', () => {
   });
 });
 
+describe('a fully absorbed hit still ends a session (and still pushes no spell back)', () => {
+  const absorbAura = (owner: number, value: number) =>
+    ({
+      id: 'test_absorb',
+      name: 'Test Barrier',
+      kind: 'absorb',
+      value,
+      remaining: 30,
+      duration: 30,
+      sourceId: owner,
+      school: 'arcane',
+    }) as Entity['auras'][number];
+
+  it('a fully absorbed hit cancels a gather cast; the shield soaks and the timer survives', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Shielded');
+    sim.addItem('copper_mining_pick', 1, pid);
+    teleportOntoNode(sim, pid, NODE.id);
+    expect(sim.harvestNode(NODE.id, pid)).toBe(true);
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error('missing entity');
+    p.auras.push(absorbAura(pid, 100));
+    const hpBefore = p.hp;
+    const template = MOBS.forest_wolf;
+    const wolf = createMob(999903, template, template.maxLevel, { ...p.pos });
+    sim.entities.set(wolf.id, wolf);
+    sim.drainEvents();
+    sim.dealDamage(wolf, p, 5, false, 'physical', null, 'hit', true);
+    // The hit counts both ways: the shield soaked ALL of it (no hp loss)
+    // and the session still ended, exactly like an unabsorbed hit.
+    expect(p.hp).toBe(hpBefore);
+    const shield = p.auras.find((a) => a.kind === 'absorb');
+    expect(shield?.value).toBe(95);
+    expect(p.castingAbility).toBe(null);
+    expect(p.gatherCastNodeId).toBe('');
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({ type: 'castStop', success: false }),
+    );
+    expect(sim.countItem(NODE_MATERIAL.itemId, pid)).toBe(0);
+    expect(sim.nodeHarvestableByMeFor(NODE.id, pid)).toBe(true);
+  });
+
+  it('a fully absorbed hit cancels a fishing session and zeroes the hidden reel state', () => {
+    const sim = makeSim();
+    const meta = mustMeta(sim, sim.playerId);
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    startFishing(sim.ctx, p, meta);
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    p.auras.push(absorbAura(p.id, 100));
+    const hpBefore = p.hp;
+    const template = MOBS.forest_wolf;
+    const wolf = createMob(999904, template, template.maxLevel, { ...p.pos });
+    sim.entities.set(wolf.id, wolf);
+    sim.dealDamage(wolf, p, 5, false, 'physical', null, 'hit', true);
+    expect(p.hp).toBe(hpBefore);
+    expect(p.castingAbility).toBe(null);
+    expect(p.fishBiteAtTick).toBe(0);
+    expect(p.fishReelDeadlineTick).toBe(0);
+  });
+
+  it('a fully absorbed hit still pushes no SPELL back (the classic rule survives the widening)', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Chanter');
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error('missing entity');
+    const template = MOBS.forest_wolf;
+    const wolf = createMob(999905, template, template.maxLevel, { ...p.pos });
+    sim.entities.set(wolf.id, wolf);
+    // Absorbed arm: a spell cast in flight, hit fully soaked: untouched.
+    p.castingAbility = 'fireball';
+    p.castTotal = 2;
+    p.castRemaining = 2;
+    p.auras.push(absorbAura(pid, 100));
+    sim.dealDamage(wolf, p, 5, false, 'physical', null, 'hit', true);
+    expect(p.castingAbility).toBe('fireball');
+    expect(p.castRemaining).toBe(2);
+    // Contrast arm: the same hit past the shield DOES push the cast back.
+    p.auras.length = 0;
+    sim.dealDamage(wolf, p, 5, false, 'physical', null, 'hit', true);
+    expect(p.castingAbility).toBe('fireball');
+    expect(p.castRemaining).toBeGreaterThan(2);
+  });
+});
+
 describe('the reel window follows the rod held at BITE time, not cast start', () => {
   // The window re-scans the rod when the bite fires (fishing.ts documents the
   // re-scan); these two arms kill a cached-at-cast-start implementation from
