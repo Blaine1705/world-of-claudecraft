@@ -253,6 +253,7 @@ const UI_PURE_CORES = [
   'src/ui/chat_bubble_style.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
+  'src/ui/trade_view.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Pure logic cores that live in src/render (the painter half is Three-side):
@@ -1042,6 +1043,7 @@ const UI_DOM_MODULES = [
   'src/ui/entry_guard_banner.ts',
   'src/ui/focus_manager.ts',
   'src/ui/focus_restore.ts',
+  'src/ui/form_draft.ts',
   'src/ui/gather_node_tooltip.ts',
   'src/ui/gpu_notice_toast.ts',
   'src/ui/hud.ts',
