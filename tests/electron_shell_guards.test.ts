@@ -164,8 +164,10 @@ describe('installDesktopAudioPolicy', () => {
   });
 
   it('is a no-op for missing commandLine stubs', () => {
+    const missingCommandLineStub = {} as unknown as Parameters<typeof installDesktopAudioPolicy>[0];
+
     expect(installDesktopAudioPolicy(null)).toBe(false);
-    expect(installDesktopAudioPolicy({})).toBe(false);
+    expect(installDesktopAudioPolicy(missingCommandLineStub)).toBe(false);
   });
 });
 
