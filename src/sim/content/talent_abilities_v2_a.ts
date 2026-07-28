@@ -303,7 +303,7 @@ export const TALENT_ABILITIES_V2_A = {
       { type: 'gainResource', amount: 20 },
     ],
     description:
-      'Consume the Venom Ritual: strike for 100 plus 55 per combo point, reopen your venom wound (120 damage over 20 sec), and detonate the previous wound plus any other bleeds for their remaining damage. Restores 20 energy. (Knifework engine)',
+      'Spends your 6 Venom Ritual: strike for 100 plus 55 per combo point, instantly deal all the damage your bleeds would still have dealt, then apply a fresh venom wound (120 damage over 20 sec). Restores 20 energy. (Knifework)',
   },
   body_blow: {
     id: 'body_blow',
@@ -322,7 +322,7 @@ export const TALENT_ABILITIES_V2_A = {
     // run by one pip (rogueEngineOnCast), feeding the Knockout cash-out.
     effects: [{ type: 'weaponStrike', bonus: 10, weaponMult: 1.3 }],
     description:
-      'A heavy blow for 130% weapon damage plus 10 that awards 2 combo points and deepens the Redline by one pip. (Thuggery engine)',
+      'A heavy blow for 130% weapon damage plus 10. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)',
   },
   knockout_blow: {
     id: 'knockout_blow',
@@ -345,7 +345,7 @@ export const TALENT_ABILITIES_V2_A = {
       { type: 'gainResource', amount: 25 },
     ],
     description:
-      'End the Redline with a knockout: strike for 45 plus 35 per combo point, hitting 25% harder per Redline pip, and recover 25 energy. (Thuggery engine)',
+      'Ends Redline with a knockout: strike for 45 plus 35 per combo point, hitting 25% harder for each Redline you built, and recover 25 energy. Use it before Redline runs out or the knockout is lost. (Thuggery)',
   },
   veilstrike: {
     id: 'veilstrike',
@@ -365,7 +365,7 @@ export const TALENT_ABILITIES_V2_A = {
     // and the Veiled Edge is applied by the same engine hook.
     effects: [{ type: 'selfBuff', kind: 'buff_dmg_done', value: 0.1, duration: 6 }],
     description:
-      "The detonated Gloam bank: for 6 sec your Duskveil openers work in the open from any angle, you deal 10% more damage, and the first Lurker's Strike of the veil strikes for double. (Skulduggery engine)",
+      "For 6 sec: your Duskveil openers work without stealth and from any angle, you deal 10% more damage, and your first Lurker's Strike inside it hits for double. (Skulduggery)",
   },
   preparation: {
     id: 'preparation',

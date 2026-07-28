@@ -923,7 +923,7 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 14,
       theme: 'kit_management',
-      decision: 'stealth economy vs poison economy vs builder rhythm',
+      decision: 'cheaper stealth play vs cheaper poisons vs a faster builder',
       options: [
         {
           id: 'rog_r14_dusk_economy',
@@ -1541,7 +1541,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 20,
       theme: 'capstone',
-      decision: 'shorter rebuild vs delayed payoff echo vs weapon-defined payoff',
+      decision: 'refill faster vs spend again sooner vs your weapon picks the spend',
       options: [
         {
           id: 'sha_r20_bloodlust',
@@ -1961,7 +1961,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 11,
       theme: 'control',
-      decision: 'area displacement, root ambush, or Concuss economy',
+      decision: 'area knockback, a root that arms a free cast, or a cheaper stun',
       options: [
         {
           id: 'dru_r11_innervate',
@@ -2019,14 +2019,14 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
         {
           id: 'dru_r14_savage_fury',
           name: 'Blooddrunk',
-          description: 'Each tick of your Flense and Bloodrift advances Old Blood by one stage.',
+          description: 'Each tick of your Flense and Bloodrift bleeds also adds 1 Old Blood.',
           icon: 'rip',
           effect: { intrinsic: { mechanic: 'druid_blooddrunk', metrics: {} } },
         },
         {
           id: 'dru_r14_moonfury',
           name: 'Highmoon Tithe',
-          description: 'Moonsurge and Sunwake each restore 15% of your maximum mana.',
+          description: 'Moonsurge and Sunwake each also restore 15% of your maximum mana.',
           icon: 'moonseed',
           effect: {
             intrinsic: { mechanic: 'druid_highmoon_tithe', metrics: { pct: 0.15 } },
@@ -2076,12 +2076,13 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 20,
       theme: 'engine_capstone',
-      decision: 'echo the next cycle, amplify the payoff, or gain resource while banking',
+      decision: 'a head start after spending, a stronger spend, or resource back while filling',
       options: [
         {
           id: 'dru_r20_improved_hurricane',
           name: "Nature's Echo",
-          description: 'After an engine payoff, begin its next cycle with one banked stage.',
+          description:
+            'After you spend Moontide, Old Blood, or Verdance, it starts refilling with 1 already gained.',
           icon: 'moonseed',
           effect: { intrinsic: { mechanic: 'druid_natures_echo', metrics: {} } },
         },
@@ -2097,7 +2098,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
           id: 'dru_r20_tranquility',
           name: 'Quickening',
           description:
-            'Each engine stage banked restores 2% maximum mana, 5 energy, or 3 rage, matching your current resource.',
+            'Every 1 of Moontide, Old Blood, or Verdance you gain restores 2% of your maximum mana, 5 energy, or 3 rage, matching your current form.',
           icon: 'innervate',
           effect: {
             intrinsic: {

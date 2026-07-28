@@ -218,6 +218,7 @@ import {
   salvageResultToast,
 } from './enchanting_view';
 import {
+  type AbilitySpecNoteField,
   classDisplayName,
   dungeonDisplayName,
   itemDisplayName,
@@ -5159,7 +5160,7 @@ export class Hud {
         t('abilityUi.tooltip.cooldownSeconds', { seconds: formatAbilityNumber(res.cooldown) }),
       );
     html += `<div class="tt-stat">${castLine.map(esc).join(' &nbsp; ')}</div>`;
-    html += `<div class="tt-desc">${esc(abilityDisplayDescription(res, damageText, scaling))}</div>`;
+    html += `<div class="tt-desc">${esc(abilityDisplayDescription(res, damageText, scaling, this.sim.talents.spec))}</div>`;
     // Resolved buff/aura effect line(s). Reads the RESOLVED effect value, so a buff's
     // tooltip reflects rank AND talents that strengthen it (Improved Devotion Aura /
     // Aspect of the Hawk / Fortitude via buffPct) - which the static description can't.
@@ -14413,6 +14414,7 @@ function abilityDisplayDescription(
   res: ResolvedAbility,
   damageText: string,
   scaling?: AbilityScaling,
+  spec?: string | null,
 ): string {
   const buff = abilityBuffValue(res);
   const duration = abilityDurationValue(res);
@@ -14424,7 +14426,7 @@ function abilityDisplayDescription(
     0,
   );
   const rageText = rageGained > 0 ? formatAbilityNumber(rageGained) : '';
-  return tEntity({
+  const text = tEntity({
     kind: 'ability',
     id: res.def.id,
     field: 'description',
@@ -14446,6 +14448,16 @@ function abilityDisplayDescription(
       rage: rageText,
     },
   });
+  // Spec-aware teaching line: a shared button explains its interaction ONLY
+  // for the player's current spec, so a new player never reads another
+  // spec's rules on their own tooltip.
+  const note = spec ? res.def.specNotes?.[spec] : undefined;
+  if (!note) return text;
+  return `${text} ${tEntity({
+    kind: 'ability',
+    id: res.def.id,
+    field: `specNote_${spec}` as AbilitySpecNoteField,
+  })}`;
 }
 
 function itemDisplayNameFromSource(name: string): string {

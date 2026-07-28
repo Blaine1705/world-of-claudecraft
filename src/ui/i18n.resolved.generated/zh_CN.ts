@@ -7172,15 +7172,20 @@ export const zh_CN: EnTranslations = {
       },
       "sinister_strike": {
         "name": "邪恶斩击",
-        "description": "立即攻击，造成武器伤害加 {damage}。奖励 1 个连击点。"
+        "description": "立即攻击，造成武器伤害加 {damage}。奖励 1 个连击点。",
+        "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
+        "specNote_combat": "While Redline is active, this button becomes Body Blow."
       },
       "eviscerate": {
         "name": "长眠",
-        "description": "终结技，造成 {damage}。"
+        "description": "终结技，造成 {damage}。",
+        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend.",
+        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec, changing both your attack buttons."
       },
       "backstab": {
         "name": "卑劣突刺",
-        "description": "背刺目标，造成 150% 武器伤害加 {damage}。必须位于目标背后。需要匕首。奖励 1 个连击点。"
+        "description": "背刺目标，造成 150% 武器伤害加 {damage}。必须位于目标背后。需要匕首。奖励 1 个连击点。",
+        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend."
       },
       "gouge": {
         "name": "戳眼",
@@ -7204,11 +7209,13 @@ export const zh_CN: EnTranslations = {
       },
       "ambush": {
         "name": "潜伏突袭",
-        "description": "伏击目标，造成 250% 武器伤害加 {damage}。必须处于潜行并位于目标背后。需要匕首。奖励 1 个连击点。"
+        "description": "伏击目标，造成 250% 武器伤害加 {damage}。必须处于潜行并位于目标背后。需要匕首。奖励 1 个连击点。",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
       },
       "stealth": {
         "name": "暮帷",
-        "description": "将你隐藏在阴影中：敌人几乎无法察觉你，但你的移动速度降低 50%。攻击或受到伤害会打破暮帷。再次施放可现身。"
+        "description": "将你隐藏在阴影中：敌人几乎无法察觉你，但你的移动速度降低 50%。攻击或受到伤害会打破暮帷。再次施放可现身。",
+        "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
       },
       "adrenaline_rush": {
         "name": "血脉疾涌",
@@ -7216,11 +7223,13 @@ export const zh_CN: EnTranslations = {
       },
       "garrote": {
         "name": "绞喉线",
-        "description": "勒住敌人的喉咙，立即造成 {damage} 点伤害，并使其流血，在 18 秒内受到 {overTime} 点伤害。必须处于潜行状态。奖励 1 个连击点。"
+        "description": "勒住敌人的喉咙，立即造成 {damage} 点伤害，并使其流血，在 18 秒内受到 {overTime} 点伤害。必须处于潜行状态。奖励 1 个连击点。",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "cheap_shot": {
         "name": "击腹拳",
-        "description": "攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。必须处于潜行状态。奖励 2 个连击点。"
+        "description": "攻击目标，造成 {damage} 点伤害，并使其昏迷 4 秒。必须处于潜行状态。奖励 2 个连击点。",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "sap": {
         "name": "闷棍",
@@ -7500,7 +7509,8 @@ export const zh_CN: EnTranslations = {
       },
       "wrath": {
         "name": "野性弹",
-        "description": "投掷一道自然能量箭，造成 {damage} 点自然伤害。在月翼形态下，完成施法会积累月潮。月潮满层时，将其消耗：月种变为月涌，天陨变为日醒。"
+        "description": "投掷一道自然能量箭，造成 {damage} 点自然伤害。在月翼形态下，完成施法会积累月潮。月潮满层时，将其消耗：月种变为月涌，天陨变为日醒。",
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
       },
       "healing_touch": {
         "name": "野性愈合",
@@ -7512,7 +7522,8 @@ export const zh_CN: EnTranslations = {
       },
       "moonfire": {
         "name": "月光风暴",
-        "description": "以月火灼烧敌人，造成 {damage} 点奥术伤害，并附加持续伤害。月林：让它持续燃烧；月种可将其延长 6 秒。"
+        "description": "以月火灼烧敌人，造成 {damage} 点奥术伤害，并附加持续伤害。月林：让它持续燃烧；月种可将其延长 6 秒。",
+        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
       },
       "moonseed": {
         "name": "月种",
@@ -7520,7 +7531,8 @@ export const zh_CN: EnTranslations = {
       },
       "rejuvenation": {
         "name": "野性绽放",
-        "description": "在 12 秒内为目标恢复 {damage} 点生命值。林心：种下新的绽放会积累繁茂；繁茂达到 5 层时，迅捷治愈变为盛放。"
+        "description": "在 12 秒内为目标恢复 {damage} 点生命值。林心：种下新的绽放会积累繁茂；繁茂达到 5 层时，迅捷治愈变为盛放。",
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
       },
       "thorns": {
         "name": "荆棘守护",
@@ -7536,7 +7548,8 @@ export const zh_CN: EnTranslations = {
       },
       "maul": {
         "name": "碎骨击",
-        "description": "一次猛击攻击，使近战伤害提高 {damage}，并产生大量威胁值。野牙：命中的攻击会储存古血；达到 3 层时，碎骨击变为碎髓。在你的下一次挥击时触发。仅限巨熊形态。"
+        "description": "一次猛击攻击，使近战伤害提高 {damage}，并产生大量威胁值。野牙：命中的攻击会储存古血；达到 3 层时，碎骨击变为碎髓。在你的下一次挥击时触发。仅限巨熊形态。",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak."
       },
       "growl": {
         "name": "威吓",
@@ -7548,19 +7561,23 @@ export const zh_CN: EnTranslations = {
       },
       "claw": {
         "name": "裂爪",
-        "description": "用利爪攻击敌人，造成武器伤害加 {damage}。奖励 1 个连击点。野牙：命中的攻击会储存古血。仅限狼形态。"
+        "description": "用利爪攻击敌人，造成武器伤害加 {damage}。奖励 1 个连击点。野牙：命中的攻击会储存古血。仅限狼形态。",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "ferocious_bite": {
         "name": "血噬",
-        "description": "终结技，造成 {damage}。野牙：命中的攻击会储存古血；达到 3 层时，血噬变为血收。仅限狼形态。"
+        "description": "终结技，造成 {damage}。野牙：命中的攻击会储存古血；达到 3 层时，血噬变为血收。仅限狼形态。",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest."
       },
       "swipe": {
         "name": "横扫利爪",
-        "description": "横扫附近敌人，造成 {damage} 点伤害。造成额外威胁值。野牙：命中的攻击会储存古血。仅限巨熊形态。"
+        "description": "横扫附近敌人，造成 {damage} 点伤害。造成额外威胁值。野牙：命中的攻击会储存古血。仅限巨熊形态。",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "regrowth": {
         "name": "二度绽放",
-        "description": "为一个友方目标恢复 {damage} 点生命值，并在 21 秒内额外恢复一定生命值。林心：种下新的绽放会积累繁茂。"
+        "description": "为一个友方目标恢复 {damage} 点生命值，并在 21 秒内额外恢复一定生命值。林心：种下新的绽放会积累繁茂。",
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
       },
       "barkskin": {
         "name": "橡树皮",
@@ -7576,7 +7593,8 @@ export const zh_CN: EnTranslations = {
       },
       "starfire": {
         "name": "天陨",
-        "description": "召下一道星辰之火，造成 {damage} 点奥术伤害。在月翼形态下，完成施法会积累月潮。月潮满层时，天陨变为日醒。"
+        "description": "召下一道星辰之火，造成 {damage} 点奥术伤害。在月翼形态下，完成施法会积累月潮。月潮满层时，天陨变为日醒。",
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake."
       },
       "travel_form": {
         "name": "迅捷形态",
@@ -7616,7 +7634,8 @@ export const zh_CN: EnTranslations = {
       },
       "rip": {
         "name": "血裂",
-        "description": "终结技，造成持续24秒共{damage}的流血伤害。消耗连击点数。野牙：命中的这一击会储存古血。仅限狼形态。"
+        "description": "终结技，造成持续24秒共{damage}的流血伤害。消耗连击点数。野牙：命中的这一击会储存古血。仅限狼形态。",
+        "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
       },
       "mortal_strike": {
         "name": "致残打击",
@@ -8192,7 +8211,8 @@ export const zh_CN: EnTranslations = {
       },
       "venom_dart": {
         "name": "毒镖",
-        "description": "弹出一枚毒镖，造成{damage}点自然伤害。获得1个连击点。刀工：使你的蚀毒撕裂伤口延长6秒，最多20秒。"
+        "description": "弹出一枚毒镖，造成{damage}点自然伤害。获得1个连击点。刀工：使你的蚀毒撕裂伤口延长6秒，最多20秒。",
+        "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
       },
       "body_blow": {
         "name": "击体重拳",
@@ -8256,7 +8276,8 @@ export const zh_CN: EnTranslations = {
       },
       "rake": {
         "name": "剐削",
-        "description": "以武器伤害外加{damage}剐削敌人，并造成持续18秒的流血伤害。获得1点连击点数。野牙：命中的攻击会储存古血。仅限狼形态使用。"
+        "description": "以武器伤害外加{damage}剐削敌人，并造成持续18秒的流血伤害。获得1点连击点数。野牙：命中的攻击会储存古血。仅限狼形态使用。",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "revive_pet": {
         "name": "修补",

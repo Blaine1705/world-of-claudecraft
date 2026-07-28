@@ -1652,21 +1652,21 @@ export const hudChromeStrings = {
     // Rogue spec-engine states; wordy (M16): filled in the five non-Latin
     // locales in this change.
     venomRitual:
-      'Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend',
+      'Venom Ritual {stacks}/{max}. Craven Thrust, Wicked Slash, and Venom Dart each add 1. At {max}, Dirt Nap becomes Venomrend',
     gloam:
-      'Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil',
+      'Gloam {stacks}/{max}. Openers used from Duskveil each add 1. At {max}, your openers work without stealth, and the next one is free, spends all 3, and starts the Shadow Veil',
     redline:
-      'Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it',
+      'Redline {stacks}/{max}. Each Body Blow adds 1. Knockout Blow hits {pct}% harder for each one and ends Redline. If the timer runs out first, the knockout is lost',
     veilstrikeWindow:
       'Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%',
     veiledEdge: "Your next Lurker's Strike strikes for double",
     duskEconomy: 'Abilities cost {pct}% less energy',
     moontide:
-      'Moontide: stage {stacks} of {max}. Wildbolt, Skyfall, and Moonseed casts build it in Moonwing Form; at {max}, Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and either spends it',
+      'Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3',
     oldBlood:
-      'Old Blood: stage {stacks} of {max}. Landed Wolf and Bruin strikes share this bank; at {max}, Gorebite or Bonecrush transforms',
+      'Old Blood {stacks}/{max}. Wolf and Bruin attacks that land each add 1. At {max}: Gorebite becomes Redharvest in Wolf Form, Bonecrush becomes Marrowbreak in Bruin Form',
     verdance:
-      'Verdance: stage {stacks} of {max}. Completed Wildbloom and Second Bloom casts build it; at {max}, Swiftmend becomes Overbloom',
+      'Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Swiftmend becomes Overbloom',
     increase: {
       ap: 'Increases attack power by {value}',
       sp: 'Increases spell power by {value}',

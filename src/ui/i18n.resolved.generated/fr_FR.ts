@@ -1621,15 +1621,15 @@ export const fr_FR: EnTranslations = {
       "freeCast": "Votre prochaine incantation ne coûte rien",
       "instantCast": "Votre prochain sort avec un temps d'incantation est instantané",
       "cheapCast": "Votre prochain sort coûte {pct} % de mana en moins",
-      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
-      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
-      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
+      "venomRitual": "Venom Ritual {stacks}/{max}. Craven Thrust, Wicked Slash, and Venom Dart each add 1. At {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam {stacks}/{max}. Openers used from Duskveil each add 1. At {max}, your openers work without stealth, and the next one is free, spends all 3, and starts the Shadow Veil",
+      "redline": "Redline {stacks}/{max}. Each Body Blow adds 1. Knockout Blow hits {pct}% harder for each one and ends Redline. If the timer runs out first, the knockout is lost",
       "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
       "veiledEdge": "Your next Lurker's Strike strikes for double",
       "duskEconomy": "Abilities cost {pct}% less energy",
-      "moontide": "Moontide: stage {stacks} of {max}. Wildbolt, Skyfall, and Moonseed casts build it in Moonwing Form; at {max}, Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and either spends it",
-      "oldBlood": "Old Blood: stage {stacks} of {max}. Landed Wolf and Bruin strikes share this bank; at {max}, Gorebite or Bonecrush transforms",
-      "verdance": "Verdance: stage {stacks} of {max}. Completed Wildbloom and Second Bloom casts build it; at {max}, Swiftmend becomes Overbloom",
+      "moontide": "Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3",
+      "oldBlood": "Old Blood {stacks}/{max}. Wolf and Bruin attacks that land each add 1. At {max}: Gorebite becomes Redharvest in Wolf Form, Bonecrush becomes Marrowbreak in Bruin Form",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Swiftmend becomes Overbloom",
       "increase": {
         "ap": "Augmente la puissance d'attaque de {value}",
         "sp": "Augmente la puissance des sorts de {value}",
@@ -7172,15 +7172,20 @@ export const fr_FR: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Taillade perfide",
-        "description": "Frappe instantanée infligeant les dégâts de l'arme plus {damage}. Confère 1 point de combo."
+        "description": "Frappe instantanée infligeant les dégâts de l'arme plus {damage}. Confère 1 point de combo.",
+        "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
+        "specNote_combat": "While Redline is active, this button becomes Body Blow."
       },
       "eviscerate": {
         "name": "Sommeil éternel",
-        "description": "Coup de grâce qui inflige {damage}."
+        "description": "Coup de grâce qui inflige {damage}.",
+        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend.",
+        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec, changing both your attack buttons."
       },
       "backstab": {
         "name": "Estoc lâche",
-        "description": "Poignarde la cible pour 150% des dégâts de l'arme plus {damage}. Vous devez être derrière la cible. Requiert une dague. Confère 1 point de combo."
+        "description": "Poignarde la cible pour 150% des dégâts de l'arme plus {damage}. Vous devez être derrière la cible. Requiert une dague. Confère 1 point de combo.",
+        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend."
       },
       "gouge": {
         "name": "Coup à l'œil",
@@ -7204,11 +7209,13 @@ export const fr_FR: EnTranslations = {
       },
       "ambush": {
         "name": "Frappe du rôdeur",
-        "description": "Prend la cible en embuscade pour 250% des dégâts de l'arme plus {damage}. Vous devez être camouflé et derrière la cible. Requiert une dague. Confère 1 point de combo."
+        "description": "Prend la cible en embuscade pour 250% des dégâts de l'arme plus {damage}. Vous devez être camouflé et derrière la cible. Requiert une dague. Confère 1 point de combo.",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
       },
       "stealth": {
         "name": "Voile du crépuscule",
-        "description": "Vous dissimule dans les ombres : les ennemis vous remarquent à peine, mais vous vous déplacez 50% plus lentement. Attaquer ou subir des dégâts interrompt Duskveil. Relancez pour sortir."
+        "description": "Vous dissimule dans les ombres : les ennemis vous remarquent à peine, mais vous vous déplacez 50% plus lentement. Attaquer ou subir des dégâts interrompt Duskveil. Relancez pour sortir.",
+        "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
       },
       "adrenaline_rush": {
         "name": "Sang vif",
@@ -7216,11 +7223,13 @@ export const fr_FR: EnTranslations = {
       },
       "garrote": {
         "name": "Fil étrangleur",
-        "description": "Garrotte l'ennemi, lui infligeant {damage} points de dégâts immédiats et le faisant saigner de {overTime} pendant 18 s. Vous devez être camouflé. Confère 1 point de combo."
+        "description": "Garrotte l'ennemi, lui infligeant {damage} points de dégâts immédiats et le faisant saigner de {overTime} pendant 18 s. Vous devez être camouflé. Confère 1 point de combo.",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "cheap_shot": {
         "name": "Coup au ventre",
-        "description": "Frappe la cible pour {damage} points de dégâts et l'étourdit pendant 4 s. Vous devez être camouflé. Confère 2 points de combo."
+        "description": "Frappe la cible pour {damage} points de dégâts et l'étourdit pendant 4 s. Vous devez être camouflé. Confère 2 points de combo.",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "sap": {
         "name": "Assommer",
@@ -7500,7 +7509,8 @@ export const fr_FR: EnTranslations = {
       },
       "wrath": {
         "name": "Trait sauvage",
-        "description": "Lance un trait d'énergie naturelle qui inflige {damage} points de dégâts de Nature."
+        "description": "Lance un trait d'énergie naturelle qui inflige {damage} points de dégâts de Nature.",
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
       },
       "healing_touch": {
         "name": "Soin sauvage",
@@ -7512,15 +7522,17 @@ export const fr_FR: EnTranslations = {
       },
       "moonfire": {
         "name": "Tempête lunaire",
-        "description": "Brûle l'ennemi par un feu lunaire pour {damage} points de dégâts des Arcanes plus des dégâts sur la durée."
+        "description": "Brûle l'ennemi par un feu lunaire pour {damage} points de dégâts des Arcanes plus des dégâts sur la durée.",
+        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
       },
       "moonseed": {
         "name": "Moonseed",
-        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds one Moontide stage, and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At full Moontide, Moonseed becomes Moonsurge."
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge."
       },
       "rejuvenation": {
         "name": "Floraison sauvage",
-        "description": "Rend {damage} points de vie à la cible en 12 s."
+        "description": "Rend {damage} points de vie à la cible en 12 s.",
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
       },
       "thorns": {
         "name": "Garde de ronces",
@@ -7536,7 +7548,8 @@ export const fr_FR: EnTranslations = {
       },
       "maul": {
         "name": "Brise-os",
-        "description": "Attaque dévastatrice qui augmente les dégâts de mêlée de {damage} et génère beaucoup de menace. S'active lors de votre prochaine frappe. Forme de Bruin uniquement."
+        "description": "Attaque dévastatrice qui augmente les dégâts de mêlée de {damage} et génère beaucoup de menace. S'active lors de votre prochaine frappe. Forme de Bruin uniquement.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak."
       },
       "growl": {
         "name": "Menacer",
@@ -7548,19 +7561,23 @@ export const fr_FR: EnTranslations = {
       },
       "claw": {
         "name": "Griffe",
-        "description": "Griffe l'ennemi pour les dégâts de l'arme plus {damage}. Confère 1 point de combo. Forme de loup uniquement."
+        "description": "Griffe l'ennemi pour les dégâts de l'arme plus {damage}. Confère 1 point de combo. Forme de loup uniquement.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "ferocious_bite": {
         "name": "Morsure sanglante",
-        "description": "Coup de grâce qui inflige {damage}. Forme de loup uniquement."
+        "description": "Coup de grâce qui inflige {damage}. Forme de loup uniquement.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest."
       },
       "swipe": {
         "name": "Griffes balayantes",
-        "description": "Balaye les ennemis proches pour {damage} points de dégâts. Génère de la menace supplémentaire. Forme de Bruin uniquement."
+        "description": "Balaye les ennemis proches pour {damage} points de dégâts. Génère de la menace supplémentaire. Forme de Bruin uniquement.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "regrowth": {
         "name": "Seconde floraison",
-        "description": "Rend {damage} points de vie à une cible alliée plus une quantité supplémentaire en 21 s."
+        "description": "Rend {damage} points de vie à une cible alliée plus une quantité supplémentaire en 21 s.",
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
       },
       "barkskin": {
         "name": "Peau de chêne",
@@ -7576,7 +7593,8 @@ export const fr_FR: EnTranslations = {
       },
       "starfire": {
         "name": "Chute céleste",
-        "description": "Fait tomber un trait de feu stellaire qui inflige {damage} points de dégâts des Arcanes."
+        "description": "Fait tomber un trait de feu stellaire qui inflige {damage} points de dégâts des Arcanes.",
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake."
       },
       "travel_form": {
         "name": "Forme de Fleet",
@@ -7616,7 +7634,8 @@ export const fr_FR: EnTranslations = {
       },
       "rip": {
         "name": "Lacération",
-        "description": "Coup de grâce qui inflige {damage} points de dégâts de saignement sur 12 s. Consomme les points de combo. Forme de loup uniquement."
+        "description": "Coup de grâce qui inflige {damage} points de dégâts de saignement sur 12 s. Consomme les points de combo. Forme de loup uniquement.",
+        "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
       },
       "mortal_strike": {
         "name": "Frappe mutilante",
@@ -7768,23 +7787,23 @@ export const fr_FR: EnTranslations = {
       },
       "moonlash": {
         "name": "Moonsurge",
-        "description": "Consumes 3 Moontide for a heavy Arcane strike: the damage choice. Spends the same bank as Sunwake, so pick one."
+        "description": "Spends your 3 Moontide for a heavy Arcane strike: the damage choice. Sunwake spends the same 3 Moontide, so pick one."
       },
       "sunlance": {
         "name": "Sunwake",
-        "description": "Consumes 3 Moontide for a Nature strike and burn and restores 35 mana: the economy choice. Spends the same bank as Moonsurge, so pick one."
+        "description": "Spends your 3 Moontide for a Nature strike and burn and restores 35 mana: the mana choice. Moonsurge spends the same 3 Moontide, so pick one."
       },
       "redharvest": {
         "name": "Redharvest",
-        "description": "Consumes 3 Old Blood, detonates all remaining Flense and Bloodrift damage you own on the target, and restores 30 energy. Any combo points held strengthen the bite but are never required."
+        "description": "Spends your 3 Old Blood: instantly deals all the damage your Flense and Bloodrift would still have dealt, removes both bleeds, and restores 30 energy. Works with zero combo points; any you have make the bite hit harder."
       },
       "marrowbreak": {
         "name": "Marrowbreak",
-        "description": "Consumes 3 Old Blood for a heavy, high-threat strike. Below half health, instead absorbs 18% of maximum health for 8 sec and restores 15 rage."
+        "description": "Spends your 3 Old Blood for a heavy, high-threat strike. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage."
       },
       "overbloom": {
         "name": "Overbloom",
-        "description": "Consumes 5 Verdance. Harvests every heal over time you own on all allies for 60% of its remaining healing, removes those effects, and plants a fresh Wildbloom on the target."
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for 60% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom."
       },
       "summon_imp": {
         "name": "Invoquer un Emberkin",
@@ -8192,7 +8211,8 @@ export const fr_FR: EnTranslations = {
       },
       "venom_dart": {
         "name": "Dard venimeux",
-        "description": "Projette un dard empoisonné infligeant {damage} points de dégâts de Nature. Confère 1 point de combo. Knifework : prolonge votre plaie de Déchirure venimeuse de 6 sec, jusqu’à 20 sec."
+        "description": "Projette un dard empoisonné infligeant {damage} points de dégâts de Nature. Confère 1 point de combo. Knifework : prolonge votre plaie de Déchirure venimeuse de 6 sec, jusqu’à 20 sec.",
+        "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
       },
       "body_blow": {
         "name": "Coup au corps",
@@ -8256,7 +8276,8 @@ export const fr_FR: EnTranslations = {
       },
       "rake": {
         "name": "Écorcher",
-        "description": "Une attaque d'ouverture en camouflage qui lacère l'ennemi pour les dégâts de l'arme plus {damage} et inflige des dégâts de saignement sur 9 sec. Octroie 1 point de combo. Forme de loup uniquement."
+        "description": "Une attaque d'ouverture en camouflage qui lacère l'ennemi pour les dégâts de l'arme plus {damage} et inflige des dégâts de saignement sur 9 sec. Octroie 1 point de combo. Forme de loup uniquement.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "revive_pet": {
         "name": "Rafistoler",

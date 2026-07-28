@@ -1621,15 +1621,15 @@ export const es: EnTranslations = {
       "freeCast": "Tu siguiente lanzamiento no cuesta nada",
       "instantCast": "Tu siguiente hechizo con tiempo de lanzamiento es instantáneo",
       "cheapCast": "Tu siguiente hechizo cuesta un {pct}% menos",
-      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
-      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
-      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
+      "venomRitual": "Venom Ritual {stacks}/{max}. Craven Thrust, Wicked Slash, and Venom Dart each add 1. At {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam {stacks}/{max}. Openers used from Duskveil each add 1. At {max}, your openers work without stealth, and the next one is free, spends all 3, and starts the Shadow Veil",
+      "redline": "Redline {stacks}/{max}. Each Body Blow adds 1. Knockout Blow hits {pct}% harder for each one and ends Redline. If the timer runs out first, the knockout is lost",
       "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
       "veiledEdge": "Your next Lurker's Strike strikes for double",
       "duskEconomy": "Abilities cost {pct}% less energy",
-      "moontide": "Moontide: stage {stacks} of {max}. Wildbolt, Skyfall, and Moonseed casts build it in Moonwing Form; at {max}, Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and either spends it",
-      "oldBlood": "Old Blood: stage {stacks} of {max}. Landed Wolf and Bruin strikes share this bank; at {max}, Gorebite or Bonecrush transforms",
-      "verdance": "Verdance: stage {stacks} of {max}. Completed Wildbloom and Second Bloom casts build it; at {max}, Swiftmend becomes Overbloom",
+      "moontide": "Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3",
+      "oldBlood": "Old Blood {stacks}/{max}. Wolf and Bruin attacks that land each add 1. At {max}: Gorebite becomes Redharvest in Wolf Form, Bonecrush becomes Marrowbreak in Bruin Form",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Swiftmend becomes Overbloom",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "sp": "Aumenta el poder con hechizos en {value}",
@@ -7172,15 +7172,20 @@ export const es: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Tajo Perverso",
-        "description": "Golpe instantáneo que inflige daño de arma más {damage}. Otorga 1 punto de combo."
+        "description": "Golpe instantáneo que inflige daño de arma más {damage}. Otorga 1 punto de combo.",
+        "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
+        "specNote_combat": "While Redline is active, this button becomes Body Blow."
       },
       "eviscerate": {
         "name": "Descanso Eterno",
-        "description": "Remate que causa {damage}."
+        "description": "Remate que causa {damage}.",
+        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend.",
+        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec, changing both your attack buttons."
       },
       "backstab": {
         "name": "Estocada Cobarde",
-        "description": "Apuñala al objetivo por un 150% de daño de arma más {damage}. Debes estar detrás del objetivo. Requiere una daga. Otorga 1 punto de combo."
+        "description": "Apuñala al objetivo por un 150% de daño de arma más {damage}. Debes estar detrás del objetivo. Requiere una daga. Otorga 1 punto de combo.",
+        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend."
       },
       "gouge": {
         "name": "Golpe al Ojo",
@@ -7204,11 +7209,13 @@ export const es: EnTranslations = {
       },
       "ambush": {
         "name": "Golpe del Acechador",
-        "description": "Embosca al objetivo por un 250% de daño de arma más {damage}. Debes estar en sigilo y detrás del objetivo. Requiere una daga. Otorga 1 punto de combo."
+        "description": "Embosca al objetivo por un 250% de daño de arma más {damage}. Debes estar en sigilo y detrás del objetivo. Requiere una daga. Otorga 1 punto de combo.",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
       },
       "stealth": {
         "name": "Velo Crepuscular",
-        "description": "Te oculta en las sombras: los enemigos apenas te detectan, pero te mueves un 50% más lento. Atacar o recibir daño rompe Duskveil. Lánzalo de nuevo para salir."
+        "description": "Te oculta en las sombras: los enemigos apenas te detectan, pero te mueves un 50% más lento. Atacar o recibir daño rompe Duskveil. Lánzalo de nuevo para salir.",
+        "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
       },
       "adrenaline_rush": {
         "name": "Sangre Acelerada",
@@ -7216,11 +7223,13 @@ export const es: EnTranslations = {
       },
       "garrote": {
         "name": "Alambre al Cuello",
-        "description": "Estrangula al enemigo con un garrote, infligiendo {damage} de daño de inmediato y haciéndolo sangrar {overTime} durante 18 s. Debes estar en sigilo. Otorga 1 punto de combo."
+        "description": "Estrangula al enemigo con un garrote, infligiendo {damage} de daño de inmediato y haciéndolo sangrar {overTime} durante 18 s. Debes estar en sigilo. Otorga 1 punto de combo.",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "cheap_shot": {
         "name": "Golpe al Vientre",
-        "description": "Golpea al objetivo por {damage} de daño y lo aturde durante 4 s. Debes estar en sigilo. Otorga 2 puntos de combo."
+        "description": "Golpea al objetivo por {damage} de daño y lo aturde durante 4 s. Debes estar en sigilo. Otorga 2 puntos de combo.",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "sap": {
         "name": "Pasmar",
@@ -7500,7 +7509,8 @@ export const es: EnTranslations = {
       },
       "wrath": {
         "name": "Descarga Silvestre",
-        "description": "Lanza una descarga de energía natural que inflige {damage} de daño de Naturaleza."
+        "description": "Lanza una descarga de energía natural que inflige {damage} de daño de Naturaleza.",
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
       },
       "healing_touch": {
         "name": "Cura Silvestre",
@@ -7512,15 +7522,17 @@ export const es: EnTranslations = {
       },
       "moonfire": {
         "name": "Tempestad Lunar",
-        "description": "Quema al enemigo con fuego lunar por {damage} de daño Arcano y daño en el tiempo."
+        "description": "Quema al enemigo con fuego lunar por {damage} de daño Arcano y daño en el tiempo.",
+        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
       },
       "moonseed": {
         "name": "Moonseed",
-        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds one Moontide stage, and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At full Moontide, Moonseed becomes Moonsurge."
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge."
       },
       "rejuvenation": {
         "name": "Floración Silvestre",
-        "description": "Sana al objetivo por {damage} durante 12 s."
+        "description": "Sana al objetivo por {damage} durante 12 s.",
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
       },
       "thorns": {
         "name": "Guardia de Zarzas",
@@ -7536,7 +7548,8 @@ export const es: EnTranslations = {
       },
       "maul": {
         "name": "Rompehuesos",
-        "description": "Ataque brutal que aumenta el daño cuerpo a cuerpo en {damage} y causa mucha amenaza. Se activa en tu siguiente golpe. Solo en forma de Bruin."
+        "description": "Ataque brutal que aumenta el daño cuerpo a cuerpo en {damage} y causa mucha amenaza. Se activa en tu siguiente golpe. Solo en forma de Bruin.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak."
       },
       "growl": {
         "name": "Amenazar",
@@ -7548,19 +7561,23 @@ export const es: EnTranslations = {
       },
       "claw": {
         "name": "Zarpa",
-        "description": "Araña al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma de lobo."
+        "description": "Araña al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma de lobo.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "ferocious_bite": {
         "name": "Mordisco Sangriento",
-        "description": "Remate que causa {damage}. Solo en Forma de lobo."
+        "description": "Remate que causa {damage}. Solo en Forma de lobo.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest."
       },
       "swipe": {
         "name": "Zarpas Barredoras",
-        "description": "Golpea a los enemigos cercanos por {damage} de daño. Causa amenaza adicional. Solo en forma de Bruin."
+        "description": "Golpea a los enemigos cercanos por {damage} de daño. Causa amenaza adicional. Solo en forma de Bruin.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "regrowth": {
         "name": "Segundo Florecer",
-        "description": "Sana a un objetivo amistoso por {damage} y una cantidad adicional durante 21 s."
+        "description": "Sana a un objetivo amistoso por {damage} y una cantidad adicional durante 21 s.",
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
       },
       "barkskin": {
         "name": "Piel de Roble",
@@ -7576,7 +7593,8 @@ export const es: EnTranslations = {
       },
       "starfire": {
         "name": "Caída Celeste",
-        "description": "Invoca una descarga de fuego estelar que causa {damage} de daño Arcano."
+        "description": "Invoca una descarga de fuego estelar que causa {damage} de daño Arcano.",
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake."
       },
       "travel_form": {
         "name": "Forma Fleet",
@@ -7616,7 +7634,8 @@ export const es: EnTranslations = {
       },
       "rip": {
         "name": "Desgarrar",
-        "description": "Remate que causa {damage} de daño de sangrado durante 12 s. Consume puntos de combo. Solo en Forma de lobo."
+        "description": "Remate que causa {damage} de daño de sangrado durante 12 s. Consume puntos de combo. Solo en Forma de lobo.",
+        "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
       },
       "mortal_strike": {
         "name": "Golpe Mutilador",
@@ -7768,23 +7787,23 @@ export const es: EnTranslations = {
       },
       "moonlash": {
         "name": "Moonsurge",
-        "description": "Consumes 3 Moontide for a heavy Arcane strike: the damage choice. Spends the same bank as Sunwake, so pick one."
+        "description": "Spends your 3 Moontide for a heavy Arcane strike: the damage choice. Sunwake spends the same 3 Moontide, so pick one."
       },
       "sunlance": {
         "name": "Sunwake",
-        "description": "Consumes 3 Moontide for a Nature strike and burn and restores 35 mana: the economy choice. Spends the same bank as Moonsurge, so pick one."
+        "description": "Spends your 3 Moontide for a Nature strike and burn and restores 35 mana: the mana choice. Moonsurge spends the same 3 Moontide, so pick one."
       },
       "redharvest": {
         "name": "Redharvest",
-        "description": "Consumes 3 Old Blood, detonates all remaining Flense and Bloodrift damage you own on the target, and restores 30 energy. Any combo points held strengthen the bite but are never required."
+        "description": "Spends your 3 Old Blood: instantly deals all the damage your Flense and Bloodrift would still have dealt, removes both bleeds, and restores 30 energy. Works with zero combo points; any you have make the bite hit harder."
       },
       "marrowbreak": {
         "name": "Marrowbreak",
-        "description": "Consumes 3 Old Blood for a heavy, high-threat strike. Below half health, instead absorbs 18% of maximum health for 8 sec and restores 15 rage."
+        "description": "Spends your 3 Old Blood for a heavy, high-threat strike. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage."
       },
       "overbloom": {
         "name": "Overbloom",
-        "description": "Consumes 5 Verdance. Harvests every heal over time you own on all allies for 60% of its remaining healing, removes those effects, and plants a fresh Wildbloom on the target."
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for 60% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom."
       },
       "summon_imp": {
         "name": "Invocar Emberkin",
@@ -8192,7 +8211,8 @@ export const es: EnTranslations = {
       },
       "venom_dart": {
         "name": "Dardo venenoso",
-        "description": "Lanzas un dardo envenenado que inflige {damage} de daño de naturaleza. Otorga 1 punto de combo. Knifework: prolonga tu herida de Desgarro venenoso 6 s, hasta 20 s."
+        "description": "Lanzas un dardo envenenado que inflige {damage} de daño de naturaleza. Otorga 1 punto de combo. Knifework: prolonga tu herida de Desgarro venenoso 6 s, hasta 20 s.",
+        "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
       },
       "body_blow": {
         "name": "Golpe al cuerpo",
@@ -8256,7 +8276,8 @@ export const es: EnTranslations = {
       },
       "rake": {
         "name": "Desollar",
-        "description": "Una apertura sigilosa que desgarra al enemigo causando el daño del arma más {damage} y provoca daño por sangrado durante 9 s. Otorga 1 punto de combo. Solo en Forma de lobo."
+        "description": "Una apertura sigilosa que desgarra al enemigo causando el daño del arma más {damage} y provoca daño por sangrado durante 9 s. Otorga 1 punto de combo. Solo en Forma de lobo.",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "revive_pet": {
         "name": "Remendar",

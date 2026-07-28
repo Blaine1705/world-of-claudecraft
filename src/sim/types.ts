@@ -2459,6 +2459,11 @@ export interface AbilityDef {
   effects: AbilityEffect[];
   ranks?: AbilityRank[]; // later ranks (sorted by level)
   description: string; // tooltip text, $d = damage placeholder
+  /** Per-spec tooltip sentences (internal spec id -> English), rendered ONLY
+   *  for the player's current spec so a shared button never carries another
+   *  spec's teaching text. Localized as
+   *  entities.abilities.<id>.specNote_<spec>. */
+  specNotes?: Readonly<Record<string, string>>;
 }
 
 // ---------------------------------------------------------------------------

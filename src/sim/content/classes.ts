@@ -2565,8 +2565,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // fourth rotational button, and the Venomrend wound kept expiring before
     // the next rend). The extension itself lives in rogueEngineOnCast.
     effects: [{ type: 'directDamage', min: 30, max: 40 }],
-    description:
-      'Flick a poisoned dart for $d Nature damage. Awards 1 combo point. Knifework: extends your Venomrend wound by 6 sec, up to 20 sec.',
+    description: 'Flick a poisoned dart for $d Nature damage. Awards 1 combo point.',
+    specNotes: {
+      assassination:
+        'Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec).',
+    },
   },
   sinister_strike: {
     id: 'sinister_strike',
@@ -2589,8 +2592,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 14, cost: 45, effects: [{ type: 'weaponStrike', bonus: 12 }] },
       { rank: 4, level: 20, cost: 45, effects: [{ type: 'weaponStrike', bonus: 18 }] },
     ],
-    description:
-      'An instant strike for weapon damage plus $d. Awards 1 combo point. Knifework: builds the Venom Ritual like Craven Thrust. Thuggery: becomes Body Blow while the Redline window runs.',
+    description: 'An instant strike for weapon damage plus $d. Awards 1 combo point.',
+    specNotes: {
+      assassination: 'Adds 1 Venom Ritual (max 6).',
+      combat: 'While Redline is active, this button becomes Body Blow.',
+    },
   },
   eviscerate: {
     id: 'eviscerate',
@@ -2629,8 +2635,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'finisherDamage', base: 14, perCombo: 18, variance: 9 }],
       },
     ],
-    description:
-      'Finishing move that causes $d. Knifework: becomes Venomrend at 6 Venom Ritual stages. Thuggery: landing this with 4 or more combo points opens the 8 sec Redline window, transforming your buttons.',
+    description: 'Finishing move that causes $d.',
+    specNotes: {
+      assassination: 'At 6 Venom Ritual, this button becomes Venomrend.',
+      combat:
+        'Landing this with 4 or more combo points starts Redline for 8 sec, changing both your attack buttons.',
+    },
   },
   backstab: {
     id: 'backstab',
@@ -2660,7 +2670,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      "Drive your dagger into the target's back for 150% weapon damage plus $d. Must be behind the target. Requires a dagger. Awards 1 combo point. Knifework: each strike adds a Venom Ritual stage and refunds 15 energy; at 6 stages Dirt Nap becomes Venomrend.",
+      "Drive your dagger into the target's back for 150% weapon damage plus $d. Must be behind the target. Requires a dagger. Awards 1 combo point.",
+    specNotes: {
+      assassination:
+        'Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend.',
+    },
   },
   gouge: {
     id: 'gouge',
@@ -2771,7 +2785,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresStealth: true,
     effects: [{ type: 'weaponStrike', bonus: 28, requiresBehind: true, weaponMult: 2.5 }],
     description:
-      'Strike from the shadows for 250% weapon damage plus $d. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point. Skulduggery: banks a Gloam stage when cast from Duskveil; with a full bank it is castable in the open from any angle FOR FREE, detonating the bank into a 6 sec shadow veil, and the first one of the veil strikes for double.',
+      'Strike from the shadows for 250% weapon damage plus $d. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.',
+    specNotes: {
+      subtlety:
+        'Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double.',
+    },
   },
   stealth: {
     id: 'stealth',
@@ -2788,7 +2806,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresOutOfCombat: true,
     effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.5, duration: 3600 }],
     description:
-      'Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out. Skulduggery: openers cast from Duskveil bank Gloam stages.',
+      'Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.',
+    specNotes: {
+      subtlety: 'Each opener you use from Duskveil adds 1 Gloam (max 3).',
+    },
   },
   adrenaline_rush: {
     id: 'adrenaline_rush',
@@ -2834,7 +2855,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      "Loop a wire around the enemy's throat, causing $d damage now and bleeding it for $o over 18 sec. Must be stealthed. Awards 1 combo point. Skulduggery: banks a Gloam stage when cast from Duskveil; with a full bank it is castable in the open FOR FREE, detonating the bank into a 6 sec shadow veil.",
+      "Loop a wire around the enemy's throat, causing $d damage now and bleeding it for $o over 18 sec. Must be stealthed. Awards 1 combo point.",
+    specNotes: {
+      subtlety:
+        'Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil.',
+    },
   },
   cheap_shot: {
     id: 'cheap_shot',
@@ -2854,7 +2879,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'stun', duration: 4 },
     ],
     description:
-      'Strike the target for $d damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points. Skulduggery: banks a Gloam stage when cast from Duskveil; with a full bank it is castable in the open FOR FREE, detonating the bank into a 6 sec shadow veil.',
+      'Strike the target for $d damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.',
+    specNotes: {
+      subtlety:
+        'Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil.',
+    },
   },
   sap: {
     id: 'sap',
@@ -4847,8 +4876,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { rank: 3, level: 14, cost: 48, effects: [{ type: 'directDamage', min: 70, max: 84 }] },
       { rank: 4, level: 20, cost: 70, effects: [{ type: 'directDamage', min: 100, max: 118 }] },
     ],
-    description:
-      'Hurls a bolt of nature energy for $d Nature damage. In Moonwing Form, completed casts build Moontide. At full Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake.',
+    description: 'Hurls a bolt of nature energy for $d Nature damage.',
+    specNotes: {
+      balance:
+        'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake.',
+    },
   },
   healing_touch: {
     id: 'healing_touch',
@@ -4923,8 +4955,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
         ],
       },
     ],
-    description:
-      'Burns the enemy with moonfire for $d Arcane damage plus damage over time. Moongrove: keep it burning; Moonseed extends it by 6 sec.',
+    description: 'Burns the enemy with moonfire for $d Arcane damage plus damage over time.',
+    specNotes: {
+      balance: 'Keep it burning: Moonseed extends it by 6 sec.',
+    },
   },
   moonseed: {
     id: 'moonseed',
@@ -4951,7 +4985,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'extendDot', dot: 'moonfire', seconds: 6, maxBonus: 6 },
     ],
     description:
-      'Moonwing Form only. Strikes for $d Arcane damage, adds one Moontide stage, and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At full Moontide, Moonseed becomes Moonsurge.',
+      'Moonwing Form only. Strikes for $d Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge.',
   },
   rejuvenation: {
     id: 'rejuvenation',
@@ -4986,8 +5020,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'hot', total: 168, duration: 12, interval: 3 }],
       },
     ],
-    description:
-      'Heals the target for $d over 12 sec. Groveheart: planting a NEW bloom adds Verdance; at 5, Swiftmend becomes Overbloom.',
+    description: 'Heals the target for $d over 12 sec.',
+    specNotes: {
+      restoration:
+        'Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom.',
+    },
   },
   thorns: {
     id: 'thorns',
@@ -5103,7 +5140,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'A mauling attack that increases melee damage by $d and causes a high amount of threat. Wildfang: landed hits bank Old Blood; at 3, Bonecrush becomes Marrowbreak. Activates on your next swing. Bruin Form only.',
+      'A mauling attack that increases melee damage by $d and causes a high amount of threat. Activates on your next swing. Bruin Form only.',
+    specNotes: {
+      feral:
+        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak.',
+    },
   },
   growl: {
     id: 'growl',
@@ -5206,7 +5247,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Flense the enemy for weapon damage plus $d and cause bleeding damage over 18 sec. Awards 1 combo point. Wildfang: landed hits bank Old Blood. Wolf Form only.',
+      'Flense the enemy for weapon damage plus $d and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.',
+    specNotes: {
+      feral: 'Each hit that lands adds 1 Old Blood (max 3).',
+    },
   },
   claw: {
     id: 'claw',
@@ -5223,8 +5267,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresForm: 'cat',
     effects: [{ type: 'weaponStrike', bonus: 25 }],
     ranks: [{ rank: 2, level: 18, cost: 45, effects: [{ type: 'weaponStrike', bonus: 72 }] }],
-    description:
-      'Claw the enemy for weapon damage plus $d. Awards 1 combo point. Wildfang: landed hits bank Old Blood. Wolf Form only.',
+    description: 'Claw the enemy for weapon damage plus $d. Awards 1 combo point. Wolf Form only.',
+    specNotes: {
+      feral: 'Each hit that lands adds 1 Old Blood (max 3).',
+    },
   },
   ferocious_bite: {
     id: 'ferocious_bite',
@@ -5241,8 +5287,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresForm: 'cat',
     effects: [{ type: 'finisherDamage', base: 45, perCombo: 39, variance: 8 }],
     actionReplacement: { abilityId: 'redharvest', auraKind: 'old_blood', minStacks: 3 },
-    description:
-      'Finishing move that causes $d. Wildfang: landed hits bank Old Blood; at 3, Gorebite becomes Redharvest. Wolf Form only.',
+    description: 'Finishing move that causes $d. Wolf Form only.',
+    specNotes: {
+      feral: 'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest.',
+    },
   },
   swipe: {
     id: 'swipe',
@@ -5259,7 +5307,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     threat: { mult: 1.75 }, // classic: swipe damage causes 1.75x threat
     effects: [{ type: 'aoeDamage', min: 12, max: 15, radius: 5 }],
     description:
-      'Sweep your claws through nearby enemies for $d damage. Causes extra threat. Wildfang: landed hits bank Old Blood. Bruin Form only.',
+      'Sweep your claws through nearby enemies for $d damage. Causes extra threat. Bruin Form only.',
+    specNotes: {
+      feral: 'Each hit that lands adds 1 Old Blood (max 3).',
+    },
   },
   regrowth: {
     id: 'regrowth',
@@ -5288,8 +5339,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
         ],
       },
     ],
-    description:
-      'Heals a friendly target for $d and an additional amount over 21 sec. Groveheart: planting a NEW bloom adds Verdance.',
+    description: 'Heals a friendly target for $d and an additional amount over 21 sec.',
+    specNotes: {
+      restoration: 'Planting a NEW bloom adds 1 Verdance (max 5).',
+    },
   },
   barkskin: {
     id: 'barkskin',
@@ -5346,8 +5399,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
       minStacks: 3,
       actorAuraKind: 'form_moonkin',
     },
-    description:
-      'Calls down a bolt of stellar fire, causing $d Arcane damage. In Moonwing Form, completed casts build Moontide. At full Moontide, Skyfall becomes Sunwake.',
+    description: 'Calls down a bolt of stellar fire, causing $d Arcane damage.',
+    specNotes: {
+      balance:
+        'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake.',
+    },
   },
   travel_form: {
     id: 'travel_form',
@@ -5501,7 +5557,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresForm: 'cat',
     effects: [{ type: 'dot', total: 156, duration: 24, interval: 2 }],
     description:
-      'Finishing move that causes $d Bleed damage over 24 sec. Consumes combo points. Wildfang: the landed hit banks Old Blood. Wolf Form only.',
+      'Finishing move that causes $d Bleed damage over 24 sec. Consumes combo points. Wolf Form only.',
+    specNotes: {
+      feral: 'The landed hit adds 1 Old Blood (max 3).',
+    },
   },
 
   // ============== TALENT-GRANTED (Warrior) ==============
@@ -6164,7 +6223,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'applyDebuff', kind: 'bleed_vuln', value: 0.4, duration: 12 },
     ],
     description:
-      'Strikes the enemy for weapon damage plus $d, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Skulduggery: every 2nd cast banks a Gloam stage. (Subtlety signature)',
+      'Strikes the enemy for weapon damage plus $d, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)',
   },
   power_infusion: {
     id: 'power_infusion',
@@ -6324,7 +6383,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'consumeAura', auraKind: 'hot', heal: { min: 105, max: 125 } }],
     actionReplacement: { abilityId: 'overbloom', auraKind: 'verdance', minStacks: 5 },
     description:
-      'Consumes a heal-over-time effect on a friendly target to heal them for $d. Completed Wildbloom and Second Bloom casts build Verdance; at 5 Verdance, Swiftmend becomes Overbloom. (Groveheart signature)',
+      'Consumes a heal-over-time effect on a friendly target to heal them for $d. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom. (Groveheart signature)',
   },
   moonlash: {
     id: 'moonlash',
@@ -6345,7 +6404,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     consumesRequiredAura: false,
     effects: [{ type: 'directDamage', min: 240, max: 285 }],
     description:
-      'Consumes 3 Moontide for a heavy Arcane strike: the damage choice. Spends the same bank as Sunwake, so pick one.',
+      'Spends your 3 Moontide for a heavy Arcane strike: the damage choice. Sunwake spends the same 3 Moontide, so pick one.',
   },
   sunlance: {
     id: 'sunlance',
@@ -6369,7 +6428,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'gainResource', amount: 35 },
     ],
     description:
-      'Consumes 3 Moontide for a Nature strike and burn and restores 35 mana: the economy choice. Spends the same bank as Moonsurge, so pick one.',
+      'Spends your 3 Moontide for a Nature strike and burn and restores 35 mana: the mana choice. Moonsurge spends the same 3 Moontide, so pick one.',
   },
   redharvest: {
     id: 'redharvest',
@@ -6395,7 +6454,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'gainResource', amount: 30 },
     ],
     description:
-      'Consumes 3 Old Blood, detonates all remaining Flense and Bloodrift damage you own on the target, and restores 30 energy. Any combo points held strengthen the bite but are never required.',
+      'Spends your 3 Old Blood: instantly deals all the damage your Flense and Bloodrift would still have dealt, removes both bleeds, and restores 30 energy. Works with zero combo points; any you have make the bite hit harder.',
   },
   marrowbreak: {
     id: 'marrowbreak',
@@ -6418,7 +6477,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'druidMarrowbreakGuard', belowFrac: 0.5, absorbPctMaxHp: 0.18, rage: 15 },
     ],
     description:
-      'Consumes 3 Old Blood for a heavy, high-threat strike. Below half health, instead absorbs 18% of maximum health for 8 sec and restores 15 rage.',
+      'Spends your 3 Old Blood for a heavy, high-threat strike. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage.',
   },
   overbloom: {
     id: 'overbloom',
@@ -6437,7 +6496,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresAuraStacks: 5,
     effects: [{ type: 'druidOverbloom', harvestPct: 0.6 }],
     description:
-      'Consumes 5 Verdance. Harvests every heal over time you own on all allies for 60% of its remaining healing, removes those effects, and plants a fresh Wildbloom on the target.',
+      'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for 60% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
   },
 
   // Baseline class interrupts: every caster-pressuring class trains a short-cooldown

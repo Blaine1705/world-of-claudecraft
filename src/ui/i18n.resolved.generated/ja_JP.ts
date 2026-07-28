@@ -7172,15 +7172,20 @@ export const ja_JP: EnTranslations = {
       },
       "sinister_strike": {
         "name": "邪悪な斬撃",
-        "description": "武器ダメージに {damage} を加えた即時攻撃です。コンボポイントを1獲得します。"
+        "description": "武器ダメージに {damage} を加えた即時攻撃です。コンボポイントを1獲得します。",
+        "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
+        "specNote_combat": "While Redline is active, this button becomes Body Blow."
       },
       "eviscerate": {
         "name": "永の眠り",
-        "description": "{damage}を与えるフィニッシュムーブです。"
+        "description": "{damage}を与えるフィニッシュムーブです。",
+        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend.",
+        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec, changing both your attack buttons."
       },
       "backstab": {
         "name": "卑劣な突き",
-        "description": "対象を背後から刺し、武器ダメージの150%に {damage} を加えたダメージを与えます。対象の背後にいる必要があります。ダガーが必要です。コンボポイントを1獲得します。"
+        "description": "対象を背後から刺し、武器ダメージの150%に {damage} を加えたダメージを与えます。対象の背後にいる必要があります。ダガーが必要です。コンボポイントを1獲得します。",
+        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend."
       },
       "gouge": {
         "name": "目潰し",
@@ -7204,11 +7209,13 @@ export const ja_JP: EnTranslations = {
       },
       "ambush": {
         "name": "潜伏者の一撃",
-        "description": "ステルス中に対象の背後から奇襲し、武器ダメージの250%に {damage} を加えたダメージを与えます。ダガーが必要です。コンボポイントを1獲得します。"
+        "description": "ステルス中に対象の背後から奇襲し、武器ダメージの250%に {damage} を加えたダメージを与えます。ダガーが必要です。コンボポイントを1獲得します。",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
       },
       "stealth": {
         "name": "ダスクヴェール",
-        "description": "影に身を隠します。敵にほとんど気づかれませんが、移動速度が50%低下します。攻撃するかダメージを受けるとダスクヴェールが解除されます。再度使用すると姿を現します。"
+        "description": "影に身を隠します。敵にほとんど気づかれませんが、移動速度が50%低下します。攻撃するかダメージを受けるとダスクヴェールが解除されます。再度使用すると姿を現します。",
+        "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
       },
       "adrenaline_rush": {
         "name": "滾る血潮",
@@ -7216,11 +7223,13 @@ export const ja_JP: EnTranslations = {
       },
       "garrote": {
         "name": "喉絞めの弦",
-        "description": "敵を絞め、即座に{damage}ダメージを与えるとともに、18秒かけて{overTime}の出血ダメージを与えます。ステルス状態でなければなりません。コンボポイントを1獲得します。"
+        "description": "敵を絞め、即座に{damage}ダメージを与えるとともに、18秒かけて{overTime}の出血ダメージを与えます。ステルス状態でなければなりません。コンボポイントを1獲得します。",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "cheap_shot": {
         "name": "みぞおち強打",
-        "description": "対象を打って{damage}ダメージを与え、4秒間スタンさせます。ステルス状態でなければなりません。コンボポイントを2獲得します。"
+        "description": "対象を打って{damage}ダメージを与え、4秒間スタンさせます。ステルス状態でなければなりません。コンボポイントを2獲得します。",
+        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "sap": {
         "name": "サップ",
@@ -7500,7 +7509,8 @@ export const ja_JP: EnTranslations = {
       },
       "wrath": {
         "name": "野生の稲妻",
-        "description": "自然エネルギーの矢を放ち、{damage} の自然ダメージを与えます。月翼形態では、詠唱の完了で月潮が溜まります。月潮が最大のときはそれを消費します：月の種はムーンサージに、天墜は陽醒に変化します。"
+        "description": "自然エネルギーの矢を放ち、{damage} の自然ダメージを与えます。月翼形態では、詠唱の完了で月潮が溜まります。月潮が最大のときはそれを消費します：月の種はムーンサージに、天墜は陽醒に変化します。",
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
       },
       "healing_touch": {
         "name": "野生の癒し",
@@ -7512,7 +7522,8 @@ export const ja_JP: EnTranslations = {
       },
       "moonfire": {
         "name": "月の嵐",
-        "description": "月の炎で敵を焼き、{damage} の秘術ダメージと継続ダメージを与えます。ムーングローヴ:燃やし続けること。月の種が効果を6秒延長します。"
+        "description": "月の炎で敵を焼き、{damage} の秘術ダメージと継続ダメージを与えます。ムーングローヴ:燃やし続けること。月の種が効果を6秒延長します。",
+        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
       },
       "moonseed": {
         "name": "月の種",
@@ -7520,7 +7531,8 @@ export const ja_JP: EnTranslations = {
       },
       "rejuvenation": {
         "name": "野生の芽吹き",
-        "description": "12秒間で対象の体力を {damage} 回復します。グローヴハート:新しい花を植えると翠成が溜まり、5になるとスウィフトメンドが満開に変化します。"
+        "description": "12秒間で対象の体力を {damage} 回復します。グローヴハート:新しい花を植えると翠成が溜まり、5になるとスウィフトメンドが満開に変化します。",
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
       },
       "thorns": {
         "name": "茨の守り",
@@ -7536,7 +7548,8 @@ export const ja_JP: EnTranslations = {
       },
       "maul": {
         "name": "骨砕き",
-        "description": "近接ダメージを {damage} 増加させ、大量の脅威を発生させる猛攻です。ワイルドファング:命中した攻撃が古き血を蓄え、3になると骨砕きが骨髄砕きに変化します。次のスイングで発動します。ブルーインフォーム専用。"
+        "description": "近接ダメージを {damage} 増加させ、大量の脅威を発生させる猛攻です。ワイルドファング:命中した攻撃が古き血を蓄え、3になると骨砕きが骨髄砕きに変化します。次のスイングで発動します。ブルーインフォーム専用。",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak."
       },
       "growl": {
         "name": "威嚇",
@@ -7548,19 +7561,23 @@ export const ja_JP: EnTranslations = {
       },
       "claw": {
         "name": "裂き爪",
-        "description": "敵を引っかき、武器ダメージに {damage} を加えたダメージを与えます。コンボポイントを1獲得します。ワイルドファング:命中した攻撃が古き血を蓄えます。ウルフフォーム専用。"
+        "description": "敵を引っかき、武器ダメージに {damage} を加えたダメージを与えます。コンボポイントを1獲得します。ワイルドファング:命中した攻撃が古き血を蓄えます。ウルフフォーム専用。",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "ferocious_bite": {
         "name": "血噛み",
-        "description": "{damage}を与えるフィニッシュムーブです。ワイルドファング:命中した攻撃が古き血を蓄え、3になると血噛みが血の収穫に変化します。ウルフフォーム専用。"
+        "description": "{damage}を与えるフィニッシュムーブです。ワイルドファング:命中した攻撃が古き血を蓄え、3になると血噛みが血の収穫に変化します。ウルフフォーム専用。",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest."
       },
       "swipe": {
         "name": "薙ぎ払う爪",
-        "description": "周囲の敵を薙ぎ払い、{damage} のダメージを与えます。追加の脅威を発生させます。ワイルドファング:命中した攻撃が古き血を蓄えます。ブルーインフォーム専用。"
+        "description": "周囲の敵を薙ぎ払い、{damage} のダメージを与えます。追加の脅威を発生させます。ワイルドファング:命中した攻撃が古き血を蓄えます。ブルーインフォーム専用。",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "regrowth": {
         "name": "二度目の開花",
-        "description": "味方対象の体力を {damage} 回復し、さらに21秒間追加で回復します。グローヴハート:新しい花を植えると翠成が溜まります。"
+        "description": "味方対象の体力を {damage} 回復し、さらに21秒間追加で回復します。グローヴハート:新しい花を植えると翠成が溜まります。",
+        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
       },
       "barkskin": {
         "name": "樫の肌",
@@ -7576,7 +7593,8 @@ export const ja_JP: EnTranslations = {
       },
       "starfire": {
         "name": "天墜",
-        "description": "星の炎を呼び下ろし、{damage} の秘術ダメージを与えます。月翼形態では、詠唱の完了で月潮が溜まります。月潮が最大のとき、天墜は陽醒に変化します。"
+        "description": "星の炎を呼び下ろし、{damage} の秘術ダメージを与えます。月翼形態では、詠唱の完了で月潮が溜まります。月潮が最大のとき、天墜は陽醒に変化します。",
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake."
       },
       "travel_form": {
         "name": "フリートフォーム",
@@ -7616,7 +7634,8 @@ export const ja_JP: EnTranslations = {
       },
       "rip": {
         "name": "血の亀裂",
-        "description": "24秒かけて{damage}の出血ダメージを与えるフィニッシュムーブです。コンボポイントを消費します。ワイルドファング:命中した一撃が古き血を蓄えます。ウルフフォーム専用。"
+        "description": "24秒かけて{damage}の出血ダメージを与えるフィニッシュムーブです。コンボポイントを消費します。ワイルドファング:命中した一撃が古き血を蓄えます。ウルフフォーム専用。",
+        "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
       },
       "mortal_strike": {
         "name": "重傷の一撃",
@@ -8192,7 +8211,8 @@ export const ja_JP: EnTranslations = {
       },
       "venom_dart": {
         "name": "毒針",
-        "description": "毒針を弾き飛ばし、{damage}の自然ダメージを与える。コンボポイントを1獲得する。ナイフワーク:毒裂きの傷を6秒延長する(最大20秒)。"
+        "description": "毒針を弾き飛ばし、{damage}の自然ダメージを与える。コンボポイントを1獲得する。ナイフワーク:毒裂きの傷を6秒延長する(最大20秒)。",
+        "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
       },
       "body_blow": {
         "name": "ボディブロー",
@@ -8256,7 +8276,8 @@ export const ja_JP: EnTranslations = {
       },
       "rake": {
         "name": "皮剥ぎ",
-        "description": "敵の皮を剥ぎ、武器ダメージに加えて{damage}のダメージを与え、18秒かけて出血ダメージを与える。コンボポイントを1獲得する。ワイルドファング:命中した攻撃が古き血を蓄える。ウルフフォーム時のみ使用可能。"
+        "description": "敵の皮を剥ぎ、武器ダメージに加えて{damage}のダメージを与え、18秒かけて出血ダメージを与える。コンボポイントを1獲得する。ワイルドファング:命中した攻撃が古き血を蓄える。ウルフフォーム時のみ使用可能。",
+        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "revive_pet": {
         "name": "応急処置",

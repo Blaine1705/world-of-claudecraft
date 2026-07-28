@@ -844,8 +844,12 @@ describe('i18n Localization Key Coverage', () => {
     const classAbilityEntries = entityTranslationManifest().filter(
       (entry) => entry.group === 'classAbility',
     );
+    const specNoteCount = Object.values(ABILITIES).reduce(
+      (count, ability) => count + Object.keys(ability.specNotes ?? {}).length,
+      0,
+    );
     expect(classAbilityEntries).toHaveLength(
-      Object.keys(CLASSES).length * 2 + Object.keys(ABILITIES).length * 2,
+      Object.keys(CLASSES).length * 2 + Object.keys(ABILITIES).length * 2 + specNoteCount,
     );
     const missingClassAbilities = missingEntityTranslationsForGroups(['classAbility']);
     expect(missingClassAbilities, JSON.stringify(missingClassAbilities, null, 2)).toHaveLength(0);
