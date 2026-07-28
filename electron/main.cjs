@@ -21,7 +21,6 @@ const {
   deriveOrigin,
   buildContentSecurityPolicy,
   extractInlineScriptHashes,
-  installDesktopAudioPolicy,
   withCspHeader,
   ALLOWED_PERMISSIONS,
 } = require('./shell_guards.cjs');
@@ -147,7 +146,6 @@ if (process.platform === 'linux' && process.env[PRIME_RELAUNCH_MARKER] === '1') 
 // electron/gpu_preference.cjs for the two levers and why the client-side
 // powerPreference:'high-performance' hint is not enough on Windows.
 forceHighPerformanceGpu({ app, log });
-installDesktopAudioPolicy(app.commandLine);
 
 // Player-visible strings for main-process dialogs (crash recovery): the
 // renderer pushes t()-localized values via 'desktop-set-strings'

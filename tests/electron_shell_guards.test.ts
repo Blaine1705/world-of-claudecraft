@@ -3,10 +3,8 @@ import {
   ALLOWED_PERMISSIONS,
   appNavigationOrigins,
   buildContentSecurityPolicy,
-  DESKTOP_AUDIO_AUTOPLAY_POLICY,
   deriveOrigin,
   extractInlineScriptHashes,
-  installDesktopAudioPolicy,
   isDevToolsToggleShortcut,
   isSoftwareRenderer,
   isTrustedSender,
@@ -149,28 +147,6 @@ describe('ALLOWED_PERMISSIONS (deny-by-default allow-list)', () => {
   });
 });
 
-describe('installDesktopAudioPolicy', () => {
-  it('sets Electron autoplay to the game-client policy before windows are created', () => {
-    const appended: Array<[string, string]> = [];
-    const installed = installDesktopAudioPolicy({
-      appendSwitch(name: string, value: string) {
-        appended.push([name, value]);
-      },
-    });
-
-    expect(installed).toBe(true);
-    expect(appended).toEqual([['autoplay-policy', DESKTOP_AUDIO_AUTOPLAY_POLICY]]);
-    expect(DESKTOP_AUDIO_AUTOPLAY_POLICY).toBe('no-user-gesture-required');
-  });
-
-  it('is a no-op for missing commandLine stubs', () => {
-    const missingCommandLineStub = {} as unknown as Parameters<typeof installDesktopAudioPolicy>[0];
-
-    expect(installDesktopAudioPolicy(null)).toBe(false);
-    expect(installDesktopAudioPolicy(missingCommandLineStub)).toBe(false);
-  });
-});
-
 describe('buildContentSecurityPolicy', () => {
   const csp = buildContentSecurityPolicy({
     apiOrigin: 'https://worldofclaudecraft.com',
@@ -210,7 +186,6 @@ describe('buildContentSecurityPolicy', () => {
   it('mirrors the web build: Google Fonts, worker blobs, and the Turnstile frame', () => {
     expect(csp).toContain("style-src 'self' 'unsafe-inline' https://fonts.googleapis.com");
     expect(csp).toContain("font-src 'self' https://fonts.gstatic.com");
-    expect(csp).toContain("media-src 'self'");
     expect(csp).toContain("worker-src 'self' blob:");
     expect(csp).toContain('frame-src https://challenges.cloudflare.com');
   });
