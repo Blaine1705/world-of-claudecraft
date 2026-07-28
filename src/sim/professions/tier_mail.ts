@@ -13,6 +13,10 @@
 // baseline arming both migrates already-attuned characters at deploy (no
 // retroactive spam) and baselines a freshly- or newly-majored craft at its
 // current tier, so the FIRST mail is only for a tier crossed AFTER attunement.
+// The same rule needs the record PRUNED on every pair transition
+// (pruneTierMailToActiveMajors below): an acknowledgement that outlived its
+// craft's major status would make a later RETURN to that pair skip the silent
+// re-baseline and mail a retroactive letter for tiers crossed while dormant.
 //
 // This module is `src/sim`-pure (see src/sim/CLAUDE.md): no DOM/render/ui/game/net
 // imports, no Math.random/Date.now, host-agnostic.
@@ -56,6 +60,28 @@ function activeMajors(meta: PlayerMeta): [string, string] | null {
   const { activeArchetype, pairedMajor } = meta.archetype;
   if (activeArchetype === null || pairedMajor === null) return null;
   return [activeArchetype, pairedMajor];
+}
+
+/** Drop every acknowledged-tier entry that does not belong to the CURRENT
+ *  active pair's majors (everything, for an unattuned character). Called on a
+ *  pair transition (both the quest attunement path and the legacy
+ *  switchArchetype command) and on load, so an entry only ever describes a
+ *  craft that is a major RIGHT NOW. Without the prune, an entry survives
+ *  switching away, and a RETURN to that pair skips the silent re-baseline arm:
+ *  a tier crossed while the pair was dormant would mail a retroactive letter
+ *  at the moment of return. Pruned, a return re-baselines at the current tier
+ *  (baselineActivePairTierMail on the quest path, or updateTierMailFor's
+ *  silent arm), so the first letter after a return is only for a tier crossed
+ *  after it. A craft that stays a major across the transition (adjacent pairs
+ *  share a craft) keeps its entry: its watch never lapsed, so no crossing is
+ *  swallowed. */
+export function pruneTierMailToActiveMajors(meta: PlayerMeta): void {
+  const majors = activeMajors(meta);
+  for (const craft of [...meta.tierMailSent.keys()]) {
+    if (!majors || (craft !== majors[0] && craft !== majors[1])) {
+      meta.tierMailSent.delete(craft);
+    }
+  }
 }
 
 /** Baseline-arm the active pair's two majors at their CURRENT tier without

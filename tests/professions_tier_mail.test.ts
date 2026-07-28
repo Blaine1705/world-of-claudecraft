@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { type LetterDef, MASTER_TIER_LETTERS } from '../src/sim/content/letters';
+import { requiredAmendsProgress } from '../src/sim/professions/archetype';
 import {
   baselineActivePairTierMail,
   normalizeTierMailOnLoad,
+  pruneTierMailToActiveMajors,
   updateTierMailFor,
 } from '../src/sim/professions/tier_mail';
+import { applyProfessionQuestEffect } from '../src/sim/quests/profession_quest_effects';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
+import type { QuestDef, QuestProgress } from '../src/sim/types';
 
 // The Smith pair (weaponcrafting + armorcrafting): the four wave-one masters are
 // the only pairs with tier letters, and this is Forgemistress Darva's.
@@ -268,6 +272,104 @@ describe('tier-crossing master mail (Professions 2.0)', () => {
     const sim = makeSim();
     const saved = sim.serializeCharacter(sim.playerId);
     expect(saved && 'tierMailSent' in saved).toBe(false);
+  });
+
+  it('a pair transition retires the outgoing majors and a return re-baselines silently', () => {
+    // The retroactive-letter bug: an acknowledgement that survives switching
+    // away makes a RETURN skip the silent re-baseline, so a tier crossed
+    // while the pair was dormant would mail at the moment of return. Driven
+    // through the REAL quest attunement path (applyProfessionQuestEffect).
+    const sim = makeSim();
+    const meta = attunedMeta(sim);
+    meta.craftSkills[PRIMARY] = tierSkill(2);
+    meta.craftSkills[SECONDARY] = tierSkill(1);
+    baselineActivePairTierMail(meta); // PRIMARY:2, SECONDARY:1
+    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+
+    // Attune AWAY to the adjacent pair that SHARES armorcrafting.
+    const away = { completionEffect: { type: 'attunePair', mode: 'new' } } as unknown as QuestDef;
+    const awayProgress = { selection: 'armorcrafting+engineering' } as unknown as QuestProgress;
+    expect(applyProfessionQuestEffect(ctx, away, awayProgress, meta)).toBe(true);
+    // The departing major's acknowledgement is retired; the shared major's
+    // watch never lapsed, so its entry (and any crossing it sees) survives.
+    expect(meta.tierMailSent.has(PRIMARY)).toBe(false);
+    expect(meta.tierMailSent.get(SECONDARY)).toBe(1);
+    // The newly-majored craft baselined at its current tier, silently.
+    expect(meta.tierMailSent.get('engineering')).toBe(0);
+
+    // While the Smith pair is dormant, its old primary crosses two tiers.
+    meta.craftSkills[PRIMARY] = tierSkill(4);
+
+    // RETURN to the Smith pair (mode 'return': the pair is in attunedPairs).
+    const back = {
+      completionEffect: { type: 'attunePair', mode: 'return' },
+    } as unknown as QuestDef;
+    const backProgress = { selection: PAIR } as unknown as QuestProgress;
+    expect(applyProfessionQuestEffect(ctx, back, backProgress, meta)).toBe(true);
+    // The return re-baselined at the CURRENT tier and dropped the pair-B major.
+    expect(meta.tierMailSent.get(PRIMARY)).toBe(4);
+    expect(meta.tierMailSent.has('engineering')).toBe(false);
+    // THE pin: the next sweep books nothing. No retroactive congratulations
+    // for tiers crossed while the pair was dormant.
+    const sweep = recordingCtx();
+    expect(updateTierMailFor(meta, sweep.ctx)).toBe(false);
+    expect(sweep.booked).toEqual([]);
+  });
+
+  it('the legacy switchArchetype command prunes exactly like the quest path', () => {
+    // The second transition entry point (the sim.ts IWorld command): a
+    // regression that wired the prune onto only the quest path stays green
+    // there and must red here.
+    const sim = makeSim();
+    const meta = attunedMeta(sim);
+    meta.craftSkills[PRIMARY] = tierSkill(2);
+    baselineActivePairTierMail(meta); // PRIMARY:2, SECONDARY:0
+    meta.archetype.amendsProgress = requiredAmendsProgress(meta.archetype.switchCount);
+    expect(sim.switchArchetype('alchemy', sim.playerId)).toBe(true);
+    // Neither outgoing major survives (alchemy pairs with engineering, so the
+    // Smith majors both left); the new majors baseline on the next sweep.
+    expect(meta.archetype.activeArchetype).toBe('alchemy');
+    expect(meta.tierMailSent.size).toBe(0);
+  });
+
+  it('load prunes a stale acknowledgement for a craft that is not a current major', () => {
+    const sim = makeSim();
+    const meta = attunedMeta(sim);
+    meta.craftSkills[PRIMARY] = tierSkill(2);
+    baselineActivePairTierMail(meta);
+    // A pre-prune save could carry an entry for a once-majored craft. DORMANT
+    // is a VALID ring id, so only the majors prune (not the unknown-id arm)
+    // can be what removes it on load.
+    meta.tierMailSent.set(DORMANT, 1);
+    const saved = sim.serializeCharacter(sim.playerId);
+    expect(saved?.tierMailSent).toMatchObject({ [DORMANT]: 1 }); // serialize passes it through
+
+    const reloaded = makeSim(5153);
+    const pid = reloaded.addPlayer('warrior', 'Pruned', { state: saved ?? undefined });
+    const reloadedMeta = reloaded.players.get(pid)!;
+    expect(reloadedMeta.tierMailSent.has(DORMANT)).toBe(false); // healed on load
+    expect(reloadedMeta.tierMailSent.get(PRIMARY)).toBe(2); // majors survive
+    expect(reloadedMeta.tierMailSent.get(SECONDARY)).toBe(0);
+  });
+
+  it('pruneTierMailToActiveMajors keeps majors only, and clears all for unattuned', () => {
+    const sim = makeSim();
+    const meta = attunedMeta(sim);
+    meta.tierMailSent.set(PRIMARY, 2);
+    meta.tierMailSent.set(SECONDARY, 1);
+    meta.tierMailSent.set(HOBBY, 3);
+    meta.tierMailSent.set(DORMANT, 3);
+    pruneTierMailToActiveMajors(meta);
+    expect([...meta.tierMailSent.entries()]).toEqual([
+      [PRIMARY, 2],
+      [SECONDARY, 1],
+    ]);
+
+    const simUnattuned = makeSim(5154);
+    const unattuned = simUnattuned.players.get(simUnattuned.playerId)!;
+    unattuned.tierMailSent.set(PRIMARY, 2);
+    pruneTierMailToActiveMajors(unattuned);
+    expect(unattuned.tierMailSent.size).toBe(0);
   });
 
   it('normalizeTierMailOnLoad keeps only KNOWN ring craft ids with valid tiers', () => {

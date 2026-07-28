@@ -344,7 +344,11 @@ import { applyNodeReadiness, serializeNodeReadiness } from './professions/node_p
 import { updateProfNudges } from './professions/prof_nudges';
 import { healDisplayRoundedProficiency } from './professions/proficiency_display_heal';
 import { type SalvageResult, salvageItem as salvageItemImpl } from './professions/salvage';
-import { normalizeTierMailOnLoad, updateTierMail } from './professions/tier_mail';
+import {
+  normalizeTierMailOnLoad,
+  pruneTierMailToActiveMajors,
+  updateTierMail,
+} from './professions/tier_mail';
 import {
   normalizeToolEffectSlots,
   resolveSlotToolEffect,
@@ -2523,7 +2527,12 @@ export class Sim {
       );
       // Acknowledged tiers: valid finite non-negative entries only; a
       // missing craft re-baselines silently on the next tier-mail sweep.
+      // Then pruned to the CURRENT majors (the archetype state normalized
+      // above), healing any stale entry a pre-prune save carried, so a
+      // return to a once-held pair re-baselines instead of mailing
+      // retroactively (see pruneTierMailToActiveMajors).
       meta.tierMailSent = normalizeTierMailOnLoad(s.tierMailSent);
+      pruneTierMailToActiveMajors(meta);
       meta.profTierTutorialSent = s.profTierTutorialSent === true;
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
@@ -9718,7 +9727,13 @@ export class Sim {
   switchArchetype(craftId: string, pid?: number): boolean {
     const r = this.resolve(pid);
     if (!r) return false;
-    return switchArchetypeImpl(this.ctx, r.meta.entityId, craftId);
+    const switched = switchArchetypeImpl(this.ctx, r.meta.entityId, craftId);
+    // Same pair-transition rule as the quest attunement path
+    // (quests/profession_quest_effects.ts): retire the outgoing majors'
+    // acknowledged tiers so a later return re-baselines silently instead of
+    // mailing retroactively. The new majors baseline on the next sweep.
+    if (switched) pruneTierMailToActiveMajors(r.meta);
+    return switched;
   }
 
   // Read-only gathering-profession proficiency surface for IWorld. Stubbed
