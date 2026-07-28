@@ -6442,6 +6442,8 @@ export const sv_SE: EnTranslations = {
       "joinParty": "Gå med i grupp",
       "guildInvite": "{name} bjuder in dig att gå med i {guild}.",
       "joinGuild": "Gå med i gille",
+      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
+      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
       "tradeRequest": "{name} vill byteshandla med dig.",
       "openTrade": "Öppna byteshandel",
       "duelRequest": "{name} har utmanat dig på en duell!",

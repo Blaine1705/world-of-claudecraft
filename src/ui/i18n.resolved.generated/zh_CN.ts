@@ -6442,6 +6442,8 @@ export const zh_CN: EnTranslations = {
       "joinParty": "加入队伍",
       "guildInvite": "{name} 邀请你加入 {guild}。",
       "joinGuild": "加入公会",
+      "guildInviteCancelled": "由于公会已重命名，一项待处理的公会邀请已取消。",
+      "guildRenamed": "你的公会已被管理团队重命名为 {name}。",
       "tradeRequest": "{name} 想与你交易。",
       "openTrade": "打开交易",
       "duelRequest": "{name} 向你发起了决斗挑战！",

@@ -220,6 +220,9 @@ export interface CharacterRow {
   level: number;
   accountId: number;
   username: string;
+  guildId: number | null;
+  guildName: string | null;
+  guildRank: string | null;
   copper: number;
   xp: number;
   createdAt: string;
@@ -231,6 +234,51 @@ export interface Paginated<T> {
   total: number;
   page: number;
   limit: number;
+}
+
+export interface GuildSummary {
+  id: number;
+  name: string;
+  realm: string;
+  createdAt: string;
+  memberCount: number;
+  leaderName: string | null;
+}
+
+export interface GuildDetailData {
+  guild: {
+    id: number;
+    name: string;
+    realm: string;
+    createdAt: string;
+    memberCount: number;
+  };
+  members: {
+    characterId: number;
+    characterName: string;
+    accountId: number;
+    username: string;
+    class: string;
+    level: number;
+    rank: string;
+    joinedAt: string;
+    lastLogin: string | null;
+    online: boolean;
+  }[];
+}
+
+export interface GuildRenameHistoryRow {
+  id: number;
+  oldName: string;
+  newName: string;
+  reason: string;
+  createdAt: string;
+  adminAccountId: number | null;
+  adminUsername: string | null;
+}
+
+export interface GuildRenameHistoryData {
+  rows: GuildRenameHistoryRow[];
 }
 
 export interface IpAssociationsData {
@@ -296,6 +344,9 @@ export interface AccountDetail {
     name: string;
     class: string;
     level: number;
+    guildId: number | null;
+    guildName: string | null;
+    guildRank: string | null;
     copper: number;
     xp: number;
     pos: { x: number; z: number } | null;

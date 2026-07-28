@@ -954,6 +954,9 @@ export interface AdminCharacterRow {
   xp: number;
   createdAt: string;
   updatedAt: string;
+  guildId: number | null;
+  guildName: string | null;
+  guildRank: string | null;
 }
 
 const CHARACTER_SORT_COLUMNS: Record<string, string> = {
@@ -974,19 +977,29 @@ export async function listCharacters(
 ): Promise<Paginated<AdminCharacterRow>> {
   const pattern = search ? `%${escapeLike(search)}%` : '%';
   const column = CHARACTER_SORT_COLUMNS[sort] ?? 'c.level';
+  const pageColumn = column.replace('c.', 'page.');
   const direction = dir === 'asc' ? 'ASC' : 'DESC';
   const offset = (page - 1) * limit;
   const [rows, total] = await Promise.all([
     pool.query(
-      `SELECT c.id, c.name, c.class, c.level, c.account_id, a.username,
-              COALESCE((c.state->>'copper')::bigint, 0) AS copper,
-              COALESCE((c.state->>'xp')::bigint, 0) AS xp,
-              c.created_at, c.updated_at
-       FROM characters c
-       JOIN accounts a ON a.id = c.account_id
-       WHERE c.name ILIKE $1
-       ORDER BY ${column} ${direction}, c.id
-       LIMIT $2 OFFSET $3`,
+      `WITH page AS MATERIALIZED (
+         SELECT c.id, c.name, c.class, c.level, c.account_id, c.realm,
+                c.state, c.created_at, c.updated_at
+           FROM characters c
+          WHERE c.name ILIKE $1
+          ORDER BY ${column} ${direction}, c.id
+          LIMIT $2 OFFSET $3
+       )
+       SELECT page.id, page.name, page.class, page.level, page.account_id, a.username,
+              COALESCE((page.state->>'copper')::bigint, 0) AS copper,
+              COALESCE((page.state->>'xp')::bigint, 0) AS xp,
+              page.created_at, page.updated_at,
+              g.id AS guild_id, g.name AS guild_name, gm.rank AS guild_rank
+         FROM page
+         JOIN accounts a ON a.id = page.account_id
+         LEFT JOIN guild_members gm ON gm.character_id = page.id
+         LEFT JOIN guilds g ON g.id = gm.guild_id AND g.realm = page.realm
+        ORDER BY ${pageColumn} ${direction}, page.id`,
       [pattern, limit, offset],
     ),
     pool.query(
@@ -1008,6 +1021,9 @@ export async function listCharacters(
       xp: Number(r.xp),
       createdAt: r.created_at,
       updatedAt: r.updated_at,
+      guildId: r.guild_id == null ? null : Number(r.guild_id),
+      guildName: r.guild_name ?? null,
+      guildRank: r.guild_rank ?? null,
     })),
     total: total.rows[0].total,
     page,
@@ -1048,6 +1064,9 @@ export interface AccountDetail {
     pos: { x: number; z: number } | null;
     createdAt: string;
     updatedAt: string;
+    guildId: number | null;
+    guildName: string | null;
+    guildRank: string | null;
   }[];
   recentSessions: {
     id: number;
@@ -1311,11 +1330,16 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
       ),
     ),
     pool.query(
-      `SELECT id, name, class, level,
-              COALESCE((state->>'copper')::bigint, 0) AS copper,
-              COALESCE((state->>'xp')::bigint, 0) AS xp,
-              state->'pos' AS pos, created_at, updated_at
-       FROM characters WHERE account_id = $1 ORDER BY level DESC, id`,
+      `SELECT c.id, c.name, c.class, c.level,
+              COALESCE((c.state->>'copper')::bigint, 0) AS copper,
+              COALESCE((c.state->>'xp')::bigint, 0) AS xp,
+              c.state->'pos' AS pos, c.created_at, c.updated_at,
+              g.id AS guild_id, g.name AS guild_name, gm.rank AS guild_rank
+       FROM characters c
+       LEFT JOIN guild_members gm ON gm.character_id = c.id
+       LEFT JOIN guilds g ON g.id = gm.guild_id AND g.realm = c.realm
+       WHERE c.account_id = $1
+       ORDER BY c.level DESC, c.id`,
       [accountId],
     ),
     pool.query(
@@ -1406,6 +1430,9 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
           : null,
       createdAt: c.created_at,
       updatedAt: c.updated_at,
+      guildId: c.guild_id == null ? null : Number(c.guild_id),
+      guildName: c.guild_name ?? null,
+      guildRank: c.guild_rank ?? null,
     })),
     recentSessions: sessions.rows.map((s) => ({
       id: s.id,

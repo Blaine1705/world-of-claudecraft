@@ -6442,6 +6442,8 @@ export const es: EnTranslations = {
       "joinParty": "Unirse al grupo",
       "guildInvite": "{name} te invita a unirte a {guild}.",
       "joinGuild": "Unirse a hermandad",
+      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
+      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
       "tradeRequest": "{name} quiere comerciar contigo.",
       "openTrade": "Abrir comercio",
       "duelRequest": "¡{name} te ha desafiado a un duelo!",

@@ -15,6 +15,19 @@ import {
   registrationsByDay,
   sessionsByDay,
 } from './admin_db';
+import {
+  type AdminGuildRenameError,
+  adminGuildDetail,
+  listAdminGuildHistory,
+  listAdminGuilds,
+  renameAdminGuild,
+} from './admin_guilds_db';
+import {
+  AdminGuildListBusyError,
+  type AdminGuildListRequest,
+  readAdminGuildList,
+} from './admin_guilds_read';
+import { parseAdminGuildSort } from './admin_guilds_sort';
 import { cleanIpAssociationLookup } from './admin_ip_association';
 import { readOverviewCounts } from './admin_overview_cache';
 import {
@@ -155,6 +168,23 @@ const STREAMER_FLAG_REQUIRED = 'streamer must be a boolean';
 const STREAMER_LINKS_REQUIRED = 'a links object is required';
 const ACCOUNT_FLAIR_FAILED = 'failed to update account flair';
 const DAILY_REWARD_EVENT_DAY_REQUIRED = 'a valid daily rewards date is required';
+
+function guildRenameFailure(error: AdminGuildRenameError): { status: number; message: string } {
+  switch (error) {
+    case 'not_found':
+      return { status: 404, message: 'guild not found' };
+    case 'name_taken':
+      return { status: 409, message: 'guild name is already taken' };
+    case 'same_name':
+      return { status: 400, message: 'guild name must change' };
+    case 'invalid_reason':
+      return { status: 400, message: 'a moderation reason is required (500 chars max)' };
+    case 'member_limit_exceeded':
+      return { status: 409, message: 'guild member limit exceeded' };
+    case 'invalid_name':
+      return { status: 400, message: 'guild name must be 3-24 letters with single spaces' };
+  }
+}
 
 async function dailyRewardEventDay(value: string | null): Promise<string | null> {
   if (value === null) return currentDailyRewardDay();
@@ -315,6 +345,21 @@ function ok(res: http.ServerResponse, data: unknown): void {
 
 function fail(res: http.ServerResponse, status: number, error: string): void {
   json(res, status, { success: false, data: null, error });
+}
+
+async function sendAdminGuildList(
+  res: http.ServerResponse,
+  request: AdminGuildListRequest,
+  load: () => Promise<unknown>,
+): Promise<void> {
+  try {
+    ok(res, await readAdminGuildList(request, load));
+  } catch (err) {
+    if (err instanceof AdminGuildListBusyError) {
+      return fail(res, 503, 'guild list busy, try again');
+    }
+    throw err;
+  }
 }
 
 export interface PageParams {
@@ -874,6 +919,32 @@ export async function handleAdminApi(
       }
     }
 
+    const guildRenameMatch = /^\/admin\/api\/guilds\/(\d+)\/rename$/.exec(path);
+    if (req.method === 'POST' && guildRenameMatch) {
+      const body = await readBody(req);
+      const renamed = await renameAdminGuild(
+        Number(guildRenameMatch[1]),
+        typeof body.name === 'string' ? body.name : '',
+        typeof body.reason === 'string' ? body.reason : '',
+        accountId,
+      );
+      if ('error' in renamed) {
+        const failure = guildRenameFailure(renamed.error);
+        return fail(res, failure.status, failure.message);
+      }
+      game.social.guildRenamed(
+        renamed.result.guildId,
+        renamed.result.oldName,
+        renamed.result.newName,
+        renamed.result.memberCharacterIds,
+      );
+      bustAdminGuildBoardCaches();
+      return ok(res, {
+        id: renamed.result.guildId,
+        name: renamed.result.newName,
+      });
+    }
+
     // Chat filter: word list + escalation config management. Every edit reloads
     // the live filter and pushes the new soft list to connected clients.
     if (req.method === 'POST' && path === '/admin/api/chat-filter/words') {
@@ -1062,6 +1133,32 @@ export async function handleAdminApi(
       const { page, limit } = parsePageParams(url.searchParams);
       const search = (url.searchParams.get('search') ?? '').slice(0, 64);
       return ok(res, await listAccounts(search, page, limit));
+    }
+    if (path === '/admin/api/guilds') {
+      const { page, limit } = parsePageParams(url.searchParams);
+      const search = url.searchParams.get('search') ?? '';
+      const { sort, dir } = parseAdminGuildSort(url.searchParams);
+      return await sendAdminGuildList(res, { search, page, limit, sort, dir }, () =>
+        listAdminGuilds(search, page, limit, sort, dir),
+      );
+    }
+    const guildHistoryMatch = /^\/admin\/api\/guilds\/(\d+)\/history$/.exec(path);
+    if (guildHistoryMatch) {
+      const rows = await listAdminGuildHistory(Number(guildHistoryMatch[1]));
+      return rows === null ? fail(res, 404, 'guild not found') : ok(res, { rows });
+    }
+    const guildDetailMatch = /^\/admin\/api\/guilds\/(\d+)$/.exec(path);
+    if (guildDetailMatch) {
+      const detail = await adminGuildDetail(Number(guildDetailMatch[1]));
+      if (!detail) return fail(res, 404, 'guild not found');
+      const onlineIds = game.liveCharacterIds();
+      return ok(res, {
+        guild: detail.guild,
+        members: detail.members.map((member) => ({
+          ...member,
+          online: onlineIds.has(member.characterId),
+        })),
+      });
     }
     if (path === '/admin/api/shared-ips') {
       const { page, limit } = parsePageParams(url.searchParams);
@@ -1290,6 +1387,7 @@ export type AdminRuntime = Pick<
   | 'isIpBlocked'
   | 'liveSharedIps'
   | 'liveAccountIds'
+  | 'liveCharacterIds'
   | 'disconnectAccount'
   | 'muteAccountChat'
   | 'liftChatMuteLive'
@@ -1304,6 +1402,7 @@ export type AdminRuntime = Pick<
   | 'applyAntibotConfig'
   | 'startPerfCapture'
   | 'perfCaptureStatus'
+  | 'social'
 >;
 
 let runtime: AdminRuntime | null = null;
@@ -1351,6 +1450,22 @@ function adminPlayersCap(): number {
   return playersCapSource ? playersCapSource() : 0;
 }
 
+let adminGuildBoardCacheBustSource: (() => void) | null = null;
+
+/** Inject the leaderboard cache invalidation hook used after a committed rename. */
+export function configureAdminGuildBoardCacheBust(fn: () => void): void {
+  adminGuildBoardCacheBustSource = fn;
+}
+
+/** Clear the leaderboard cache invalidation hook for unit tests. */
+export function resetAdminGuildBoardCacheBustForTests(): void {
+  adminGuildBoardCacheBustSource = null;
+}
+
+function bustAdminGuildBoardCaches(): void {
+  adminGuildBoardCacheBustSource?.();
+}
+
 // The DB reads/writes (plus the login-path auth + rate-limit primitives) the admin
 // route layer needs, bundled behind a test-only setter so they can be driven with a
 // fake and no Postgres; production never calls the setter. The same functions the
@@ -1372,6 +1487,10 @@ function makeRealAdminDb() {
     levelDistribution,
     listAccounts,
     listCharacters,
+    listAdminGuilds,
+    adminGuildDetail,
+    listAdminGuildHistory,
+    renameAdminGuild,
     listModerationActions,
     listSharedIps,
     onlineHistory,
@@ -1743,6 +1862,60 @@ async function accountsHandler(ctx: Ctx): Promise<void> {
   const { page, limit } = parsePageParams(ctx.url.searchParams);
   const search = (ctx.url.searchParams.get('search') ?? '').slice(0, 64);
   ok(ctx.res, await adminDb().listAccounts(search, page, limit));
+}
+
+/** GET /admin/api/guilds: current-realm guild search with bounded pagination. */
+async function guildsHandler(ctx: Ctx): Promise<void> {
+  const { page, limit } = parsePageParams(ctx.url.searchParams);
+  const search = ctx.url.searchParams.get('search') ?? '';
+  const { sort, dir } = parseAdminGuildSort(ctx.url.searchParams);
+  await sendAdminGuildList(ctx.res, { search, page, limit, sort, dir }, () =>
+    adminDb().listAdminGuilds(search, page, limit, sort, dir),
+  );
+}
+
+/** GET /admin/api/guilds/:id: minimal roster with a cheap live online merge. */
+async function guildDetailHandler(ctx: Ctx): Promise<void> {
+  const detail = await adminDb().adminGuildDetail(adminTargetId(ctx));
+  if (!detail) return fail(ctx.res, 404, 'guild not found');
+  const onlineIds = useAdminRuntime().liveCharacterIds();
+  ok(ctx.res, {
+    guild: detail.guild,
+    members: detail.members.map((member) => ({
+      ...member,
+      online: onlineIds.has(member.characterId),
+    })),
+  });
+}
+
+/** GET /admin/api/guilds/:id/history: retained moderation rename audit. */
+async function guildHistoryHandler(ctx: Ctx): Promise<void> {
+  const rows = await adminDb().listAdminGuildHistory(adminTargetId(ctx));
+  if (rows === null) return fail(ctx.res, 404, 'guild not found');
+  ok(ctx.res, { rows });
+}
+
+/** POST /admin/api/guilds/:id/rename: atomic rename, audit, then bounded live push. */
+async function guildRenameHandler(ctx: Ctx): Promise<void> {
+  const body = await readBody(ctx.req);
+  const renamed = await adminDb().renameAdminGuild(
+    adminTargetId(ctx),
+    typeof body.name === 'string' ? body.name : '',
+    typeof body.reason === 'string' ? body.reason : '',
+    ctxAccountId(ctx),
+  );
+  if ('error' in renamed) {
+    const failure = guildRenameFailure(renamed.error);
+    return fail(ctx.res, failure.status, failure.message);
+  }
+  useAdminRuntime().social.guildRenamed(
+    renamed.result.guildId,
+    renamed.result.oldName,
+    renamed.result.newName,
+    renamed.result.memberCharacterIds,
+  );
+  bustAdminGuildBoardCaches();
+  ok(ctx.res, { id: renamed.result.guildId, name: renamed.result.newName });
 }
 
 /** GET /admin/api/shared-ips: paged shared IPs; the online=1 branch reads live. */
@@ -2442,6 +2615,38 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin],
     meta: ADMIN_META,
     handler: accountsHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/guilds',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: guildsHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/guilds/:id',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('guild')],
+    meta: adminTargetMeta('guild'),
+    handler: guildDetailHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/guilds/:id/history',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('guild')],
+    meta: adminTargetMeta('guild'),
+    handler: guildHistoryHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/guilds/:id/rename',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('guild')],
+    meta: adminTargetMeta('guild'),
+    handler: guildRenameHandler,
   },
   {
     method: 'GET',

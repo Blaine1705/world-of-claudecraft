@@ -6442,6 +6442,8 @@ export const pt_BR: EnTranslations = {
       "joinParty": "Entrar no grupo",
       "guildInvite": "{name} convida você para entrar em {guild}.",
       "joinGuild": "Entrar na guilda",
+      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
+      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
       "tradeRequest": "{name} quer negociar com você.",
       "openTrade": "Abrir troca",
       "duelRequest": "{name} desafiou você para um duelo!",

@@ -6442,6 +6442,8 @@ export const en_XA: EnTranslations = {
       "joinParty": "[Ĵóíñ Þáŕţý]",
       "guildInvite": "[{name} íñʋíţéš ýóú ţó ĵóíñ {guild}.]",
       "joinGuild": "[Ĵóíñ Ĝúíļð]",
+      "guildInviteCancelled": "[Á þéñðíñĝ ĝúíļð íñʋíţáţíóñ ŵáš çáñçéļļéð ƀéçáúšé ţĥé ĝúíļð ŵáš ŕéñáɱéð.]",
+      "guildRenamed": "[Ýóúŕ ĝúíļð ĥáš ƀééñ ŕéñáɱéð ţó {name} ƀý ţĥé ɱóðéŕáţíóñ ţéáɱ.]",
       "tradeRequest": "[{name} ŵáñţš ţó ţŕáðé ŵíţĥ ýóú.]",
       "openTrade": "[Óþéñ Ţŕáðé]",
       "duelRequest": "[{name} ĥáš çĥáļļéñĝéð ýóú ţó á ðúéļ!]",

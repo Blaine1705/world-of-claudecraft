@@ -6442,6 +6442,8 @@ export const da_DK: EnTranslations = {
       "joinParty": "Tilslut gruppe",
       "guildInvite": "{name} inviterer dig til at slutte dig til {guild}.",
       "joinGuild": "Tilslut laug",
+      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
+      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
       "tradeRequest": "{name} vil handle med dig.",
       "openTrade": "Åbn handel",
       "duelRequest": "{name} har udfordret dig til en duel!",

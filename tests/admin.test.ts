@@ -35,6 +35,12 @@ vi.mock('../server/admin_db', async () => {
     clientPerfRaw: vi.fn(),
   };
 });
+vi.mock('../server/admin_guilds_db', () => ({
+  listAdminGuilds: vi.fn(),
+  adminGuildDetail: vi.fn(),
+  listAdminGuildHistory: vi.fn(),
+  renameAdminGuild: vi.fn(),
+}));
 vi.mock('../server/auth', () => ({
   verifyPassword: vi.fn(async () => false),
   newToken: vi.fn(() => 'b'.repeat(64)),
@@ -104,6 +110,13 @@ import {
   overviewCounts,
   type PerfRawRow,
 } from '../server/admin_db';
+import {
+  adminGuildDetail,
+  listAdminGuildHistory,
+  listAdminGuilds,
+  renameAdminGuild,
+} from '../server/admin_guilds_db';
+import { resetAdminGuildListReadsForTests } from '../server/admin_guilds_read';
 import { resetOverviewCacheForTests } from '../server/admin_overview_cache';
 import { hashPassword, verifyPassword } from '../server/auth';
 import type { CalibrationHistogram, SuspiciousPlayer } from '../server/bot_detector/contract';
@@ -221,6 +234,7 @@ const fakeGameState = {
     histograms: [] as CalibrationHistogram[],
   })),
   liveAccountIds: () => new Set([9]),
+  liveCharacterIds: () => new Set([8]),
   liveSharedIps: vi.fn<() => LiveSharedIp[]>(() => []),
   disconnectAccount: vi.fn(),
   muteAccountChat: vi.fn(),
@@ -230,6 +244,7 @@ const fakeGameState = {
   isIpBlocked: vi.fn(() => false),
   reloadBlockedIps: vi.fn(async () => {}),
   disconnectByIp: vi.fn(),
+  social: { guildRenamed: vi.fn() },
 };
 const fakeGame = fakeGameState as typeof fakeGameState & Parameters<typeof handleAdminApi>[2];
 
@@ -239,6 +254,7 @@ beforeEach(() => {
   // whose refresh IS the mocked overviewCounts here; start every test cold so one
   // test's cached value never leaks into the next.
   resetOverviewCacheForTests();
+  resetAdminGuildListReadsForTests();
   resetAdminPlayersCapForTests();
   // The per-account failed-login throttle (server/ratelimit.ts) is real, module-level
   // state; reset it so one test's failures never leak into the next.
@@ -1270,6 +1286,155 @@ describe('admin api auth', () => {
       9,
       'A moderator requires one of your characters to be renamed.',
     );
+  });
+});
+
+describe('legacy guild administration parity', () => {
+  function authenticate(roles: string[] = ['superadmin']): void {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue(fullToken(7));
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    vi.mocked(adminRolesForAccount).mockResolvedValue({ username: 'admin', roles } as never);
+  }
+
+  it('serves list, detail, and retained history with the legacy response shapes', async () => {
+    authenticate();
+    vi.mocked(listAdminGuilds).mockResolvedValue({
+      rows: [{ id: 4, name: 'Keepers' }],
+      total: 1,
+      page: 2,
+      limit: 10,
+    } as never);
+    vi.mocked(adminGuildDetail).mockResolvedValue({
+      guild: { id: 4, name: 'Keepers' },
+      members: [{ characterId: 8, characterName: 'Alice' }],
+    } as never);
+    vi.mocked(listAdminGuildHistory).mockResolvedValue([
+      { id: 1, oldName: 'Old Name', newName: 'Keepers' },
+    ] as never);
+
+    const list = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        token: VALID_TOKEN,
+        url: '/admin/api/guilds?search=Keep&page=2&limit=10&sort=created_at&dir=desc',
+      }),
+      list,
+      fakeGame,
+    );
+    expect(list.statusCode).toBe(200);
+    expect(listAdminGuilds).toHaveBeenCalledWith('Keep', 2, 10, 'created_at', 'desc');
+
+    const detail = fakeRes();
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds/4' }),
+      detail,
+      fakeGame,
+    );
+    expect(detail.body.data.members).toEqual([
+      { characterId: 8, characterName: 'Alice', online: true },
+    ]);
+
+    const historyResponse = fakeRes();
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds/4/history' }),
+      historyResponse,
+      fakeGame,
+    );
+    expect(historyResponse.body.data).toEqual({
+      rows: [{ id: 1, oldName: 'Old Name', newName: 'Keepers' }],
+    });
+  });
+
+  it('returns 503 before a third distinct legacy guild-list read can occupy the pool', async () => {
+    authenticate();
+    const resolvers: Array<
+      (value: { rows: never[]; total: number; page: number; limit: number }) => void
+    > = [];
+    vi.mocked(listAdminGuilds).mockImplementation(
+      async (_search, _page, _limit) =>
+        new Promise<{ rows: never[]; total: number; page: number; limit: number }>((resolve) => {
+          resolvers.push(resolve);
+        }) as never,
+    );
+
+    const firstResponse = fakeRes();
+    const first = handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds?page=1' }),
+      firstResponse,
+      fakeGame,
+    );
+    const secondResponse = fakeRes();
+    const second = handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds?page=2' }),
+      secondResponse,
+      fakeGame,
+    );
+    await vi.waitFor(() => expect(listAdminGuilds).toHaveBeenCalledTimes(2));
+
+    const rejected = fakeRes();
+    await handleAdminApi(
+      fakeReq({ token: VALID_TOKEN, url: '/admin/api/guilds?page=3' }),
+      rejected,
+      fakeGame,
+    );
+    expect(rejected.statusCode).toBe(503);
+    expect(rejected.body).toEqual({
+      success: false,
+      data: null,
+      error: 'guild list busy, try again',
+    });
+    expect(listAdminGuilds).toHaveBeenCalledTimes(2);
+
+    resolvers.forEach((resolve, index) => {
+      resolve({ rows: [], total: 0, page: index + 1, limit: 25 });
+    });
+    await Promise.all([first, second]);
+  });
+
+  it('renames through the legacy arm and denies a viewer before the write', async () => {
+    authenticate();
+    vi.mocked(renameAdminGuild).mockResolvedValue({
+      result: {
+        guildId: 4,
+        oldName: 'Old Name',
+        newName: 'Keepers',
+        memberCharacterIds: [8],
+      },
+    });
+
+    const renamed = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/guilds/4/rename',
+        body: { name: 'Keepers', reason: 'offensive name' },
+      }),
+      renamed,
+      fakeGame,
+    );
+    expect(renamed.statusCode).toBe(200);
+    expect(renameAdminGuild).toHaveBeenCalledWith(4, 'Keepers', 'offensive name', 7);
+    expect(fakeGame.social.guildRenamed).toHaveBeenCalledWith(4, 'Old Name', 'Keepers', [8]);
+
+    vi.mocked(renameAdminGuild).mockClear();
+    vi.mocked(adminRolesForAccount).mockResolvedValueOnce({
+      username: 'admin',
+      roles: ['viewer'],
+    });
+    const denied = fakeRes();
+    await handleAdminApi(
+      fakeReq({
+        method: 'POST',
+        token: VALID_TOKEN,
+        url: '/admin/api/guilds/4/rename',
+        body: { name: 'Denied Name', reason: 'reason' },
+      }),
+      denied,
+      fakeGame,
+    );
+    expect(denied.statusCode).toBe(403);
+    expect(renameAdminGuild).not.toHaveBeenCalled();
   });
 });
 

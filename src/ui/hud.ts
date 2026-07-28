@@ -1285,6 +1285,7 @@ export class Hud {
   private releaseSpiritBtnEl = $('#release-btn');
   private ghostPromptEl = $('#ghost-prompt');
   private resurrectionPromptEl: HTMLElement | null = null;
+  private guildInvitePromptEl: HTMLElement | null = null;
   private promptSequence = 0;
   private resurrectCorpseBtnEl = $('#resurrect-corpse-btn');
   private resurrectHealerBtnEl = $('#resurrect-healer-btn');
@@ -10963,16 +10964,42 @@ export class Hud {
           break;
         case 'guildInvite':
           audio.levelUp();
-          this.showPrompt(
+          this.guildInvitePromptEl?.remove();
+          this.guildInvitePromptEl = this.showPrompt(
             t('hud.prompts.guildInvite', {
               name: `<b>${esc(ev.fromName)}</b>`,
               guild: `<span class="gold">&lt;${esc(ev.guildName)}&gt;</span>`,
             }),
             t('hud.prompts.joinGuild'),
-            () => this.sim.guildAccept(),
-            () => this.sim.guildDecline(),
+            () => {
+              this.guildInvitePromptEl = null;
+              this.sim.guildAccept();
+            },
+            () => {
+              this.guildInvitePromptEl = null;
+              this.sim.guildDecline();
+            },
+            t('hud.prompts.decline'),
+            () => {
+              this.guildInvitePromptEl = null;
+              this.sim.guildDecline();
+            },
           );
           break;
+        case 'guildInviteCancelled': {
+          this.guildInvitePromptEl?.remove();
+          this.guildInvitePromptEl = null;
+          const message = t('hud.prompts.guildInviteCancelled');
+          this.showBanner(message);
+          this.log(message, '#dcd29f');
+          break;
+        }
+        case 'guildRenamed': {
+          const message = t('hud.prompts.guildRenamed', { name: ev.newName });
+          this.showBanner(message);
+          this.log(message, '#dcd29f');
+          break;
+        }
         case 'tradeRequest':
           audio.click();
           this.showPrompt(

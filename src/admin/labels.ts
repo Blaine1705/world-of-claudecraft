@@ -16,6 +16,18 @@ export function reasonLabel(reason: string): string {
   );
 }
 
+const GUILD_RANK_KEYS: Record<string, string> = {
+  leader: 'guilds.rank.leader',
+  officer: 'guilds.rank.officer',
+  member: 'guilds.rank.member',
+};
+
+export function guildRankLabel(rank: string | null): string {
+  if (!rank) return t('common.emptyValue');
+  const key = GUILD_RANK_KEYS[rank];
+  return key ? t(key) : rank;
+}
+
 // Audit-log action kind (server enum) -> localized label + badge variant. ONE table,
 // shared by the account-scoped ModerationHistory component and the realm-wide
 // ModerationHistoryPage, which each used to carry their own copy of this switch: a

@@ -2428,6 +2428,73 @@ describe('guild nameplate wire', () => {
     (client as any).applySnapshot({ t: 'snap', ents: [base] });
     expect(client.entities.get(7)?.guild).toBe('');
   });
+
+  it('patches only the matching social guild from a structured rename event', () => {
+    const client = bareClient(99);
+    client.socialInfo = {
+      friends: [],
+      blocks: [],
+      ignores: [],
+      guild: {
+        id: 7,
+        name: 'Silver Hand',
+        rank: 'member',
+        motd: '',
+        motdSetBy: '',
+        members: [],
+        events: [],
+      },
+    };
+    (client as any).socialDirty = false;
+    const internals = client as unknown as { onMessage(raw: string): void };
+
+    internals.onMessage(
+      JSON.stringify({
+        t: 'events',
+        list: [{ type: 'guildRenamed', guildId: 7, newName: 'Dawn Guard' }],
+      }),
+    );
+
+    expect(client.socialInfo.guild?.name).toBe('Dawn Guard');
+    expect(client.consumeSocialChanged()).toBe(true);
+
+    internals.onMessage(
+      JSON.stringify({
+        t: 'events',
+        list: [{ type: 'guildRenamed', guildId: 8, newName: 'Wrong Guild' }],
+      }),
+    );
+    expect(client.socialInfo.guild?.name).toBe('Dawn Guard');
+    expect(client.consumeSocialChanged()).toBe(false);
+  });
+
+  it('stamps the live server entity and emits one event without a social snapshot', () => {
+    const server = new GameServer();
+    const socialSnapshot = vi.spyOn(server as any, 'sendSocialSnapshot');
+    const socket = fakeWs();
+    const session = joinServer(server, socket, 71, 'Brae');
+    server.sim.setPlayerGuild(session.pid, 'Silver Hand');
+    socialSnapshot.mockClear();
+    socket.sent.length = 0;
+
+    server.social.guildRenamed(7, 'Silver Hand', 'Dawn Guard', [session.characterId]);
+
+    expect(server.sim.entities.get(session.pid)?.guild).toBe('Dawn Guard');
+    expect(socket.sent).toContainEqual({
+      t: 'events',
+      list: [{ type: 'guildRenamed', guildId: 7, newName: 'Dawn Guard' }],
+    });
+    expect(socialSnapshot).not.toHaveBeenCalled();
+  });
+
+  it('reports only socket-connected character ids to cheap admin reads', () => {
+    const server = new GameServer();
+    const connected = joinServer(server, fakeWs(), 81, 'Connected');
+    const linkdead = joinServer(server, fakeWs(), 82, 'Linkdead');
+    linkdead.linkdead = true;
+
+    expect(server.liveCharacterIds()).toEqual(new Set([connected.characterId]));
+  });
 });
 
 // The Book of Deeds active title rides the identity wire (key `title`, a deed

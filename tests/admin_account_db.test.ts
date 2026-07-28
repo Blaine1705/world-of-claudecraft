@@ -117,6 +117,68 @@ describe('admin account detail query', () => {
     // The ip-bans probe keeps an aged-out account-to-IP link visible through
     // the association-ledger arm after the raw play_sessions rows fold away.
     expect(mocks.query.mock.calls[4][0]).toContain('SELECT 1 FROM account_ip_associations assoc');
+    expect(mocks.query.mock.calls[1][0]).toContain(
+      'LEFT JOIN guild_members gm ON gm.character_id = c.id',
+    );
+    expect(mocks.query.mock.calls[1][0]).toContain(
+      'LEFT JOIN guilds g ON g.id = gm.guild_id AND g.realm = c.realm',
+    );
+  });
+
+  it('maps guild identity and rank onto account characters without extra reads', async () => {
+    mocks.query
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: 7,
+            username: 'alice',
+            created_at: '2026-01-01T00:00:00Z',
+            last_login: null,
+            is_admin: false,
+            banned_at: null,
+            suspended_until: null,
+            moderation_reason: '',
+            chat_muted_until: null,
+            chat_mute_reason: '',
+            chat_strikes: 0,
+            is_ai: false,
+            is_streamer: false,
+            streamer_links: {},
+            last_login_ip: null,
+            playtime_seconds: 0,
+          },
+        ],
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: 9,
+            name: 'Alice',
+            class: 'mage',
+            level: 12,
+            copper: 0,
+            xp: 0,
+            pos: null,
+            created_at: '2026-01-01T00:00:00Z',
+            updated_at: '2026-01-02T00:00:00Z',
+            guild_id: 4,
+            guild_name: 'Keepers',
+            guild_rank: 'leader',
+          },
+        ],
+      })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] });
+
+    const detail = await accountDetail(7);
+
+    expect(detail?.characters[0]).toMatchObject({
+      guildId: 4,
+      guildName: 'Keepers',
+      guildRank: 'leader',
+    });
+    expect(mocks.query).toHaveBeenCalledTimes(5);
   });
 
   it('lists accounts through the plain pool read with the lifetime playtime rollup term', async () => {
