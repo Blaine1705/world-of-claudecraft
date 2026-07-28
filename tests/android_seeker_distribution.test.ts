@@ -129,7 +129,7 @@ describe('Android Seeker distribution boundary', () => {
     expect(main).toContain("? t('wallet.seekerAppHelp')");
   });
 
-  it('promotes the existing rewards button below Chat only for an enabled Seeker', () => {
+  it('promotes the existing rewards button below Chat without covering mobile unit frames', () => {
     expect(main).toContain(
       "document.getElementById('mobile-combat-controls')?.appendChild(dailyRewardsButton)",
     );
@@ -139,6 +139,18 @@ describe('Android Seeker distribution boundary', () => {
     expect(mobileHudCss).toContain('url("/ui/daily-rewards/treasure_chest.webp")');
     expect(mobileHudCss).toContain('grid-column: 1;');
     expect(mobileHudCss).toContain('grid-row: 2;');
+    expect(mobileHudCss).toMatch(
+      /body\.mobile-touch\.seeker-wallet-enabled #target-frame \{[^}]*top: calc\(max\(8px, env\(safe-area-inset-top\)\) \+ 140px\);/,
+    );
+    expect(mobileHudCss).toMatch(
+      /body\.mobile-touch\.seeker-wallet-enabled #party-frames \{[^}]*top: calc\(max\(8px, env\(safe-area-inset-top\)\) \+ 142px\);/,
+    );
+    expect(mobileHudCss).toMatch(
+      /body\.mobile-touch\.seeker-wallet-enabled #target-frame \{[^}]*top: calc\(max\(6px, env\(safe-area-inset-top\)\) \+ 132px\);/,
+    );
+    expect(mobileHudCss).toMatch(
+      /body\.mobile-touch\.seeker-wallet-enabled #party-frames \{[^}]*top: calc\(max\(6px, env\(safe-area-inset-top\)\) \+ 134px\);/,
+    );
   });
 
   it('lays out the Seeker wallet as a header row above its actions', () => {
