@@ -37,7 +37,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { vcupBothSeated } from '../social/vale_cup';
 import { addThreat, canDetectStealthedTarget, clearThreat } from '../threat';
-import type { Entity } from '../types';
+import type { DamageEventKind, Entity } from '../types';
 import {
   berserkerCritDamage,
   dist2d,
@@ -112,7 +112,7 @@ export function dealDamage(
   crit: boolean,
   school: string,
   ability: string | null,
-  kind: 'hit' | 'miss' | 'dodge',
+  kind: DamageEventKind,
   noRage = false,
   threatOpts?: { flat?: number; mult?: number },
   // Whether this is a DIRECT attack (auto-attack swing or a direct-hit spell) as
@@ -1046,7 +1046,7 @@ function reflectSpellWard(
   source: Entity | null,
   target: Entity,
   amount: number,
-  kind: 'hit' | 'miss' | 'dodge',
+  kind: DamageEventKind,
   school: string,
 ): void {
   if (source?.kind !== 'player' || source.id === target.id) return;

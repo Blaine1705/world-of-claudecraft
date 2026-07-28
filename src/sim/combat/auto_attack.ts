@@ -527,10 +527,20 @@ export function meleeSwing(
   }
   const dealtAmount = Math.max(1, Math.round(dmg));
   const hpBefore = target.hp;
-  ctx.dealDamage(attacker, target, dealtAmount, crit, 'physical', abilityName, 'hit', false, {
-    flat: opts.threatFlat ?? 0,
-    mult: opts.threatMult ?? 1,
-  });
+  ctx.dealDamage(
+    attacker,
+    target,
+    dealtAmount,
+    crit,
+    'physical',
+    abilityName,
+    blocked ? 'block' : 'hit',
+    false,
+    {
+      flat: opts.threatFlat ?? 0,
+      mult: opts.threatMult ?? 1,
+    },
+  );
   opts.onDealt?.(dealtAmount);
   opts.onEffectiveDamage?.(Math.max(0, hpBefore - target.hp));
   if (opts.autoAttack) {
