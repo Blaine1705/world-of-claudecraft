@@ -80,8 +80,10 @@ The game side enforces what it can observe, and fails closed:
   marketplace suspends new purchases and settlements. Existing auctions keep
   counting down; no irreversible sale occurs until pricing recovers. This is
   the same graceful-degradation contract as `server/claudium_proxy.ts`.
-- Operators can hard-pause the whole marketplace at runtime (audited config,
-  the `antibot_config_db.ts` pattern).
+- Operators can hard-pause the whole marketplace by flipping
+  `WOC_MARKET_ENABLED` off (every mutating route refuses and the sweep stays
+  idle); an audited in-dashboard runtime pause switch (the
+  `antibot_config_db.ts` pattern) is a named follow-up.
 
 ### Bidding and bid bonds
 
@@ -188,7 +190,9 @@ Eligibility is a per-server policy, not a hardcoded rule set
 - Every settled sale lands in a public, per-item sales history (provenance);
   admins can exclude suspicious sales from public price statistics.
 - Marketplace strikes and progressive suspensions are account-scoped and
-  admin-visible; admin tooling can suspend listings and pause the marketplace.
+  admin-visible; operator endpoints can suspend listings, and the runtime
+  pause is the economy-service health signal plus the WOC_MARKET_ENABLED
+  flag (an audited runtime pause switch is a follow-up).
 - High-value bids and settlements require TOTP; thresholds are configuration.
 
 ### Platforms, realms, configuration
@@ -253,8 +257,11 @@ enabled on a production realm until they are reconciled:
 - Client: `src/net/woc_market_sdk.ts` (typed, never-throws),
   `src/ui/woc_market_view.ts` (pure core) + `src/ui/woc_market_window.ts`
   (painter shell), wallet signing through the existing Wallet Standard path.
-- Admin: marketplace moderation endpoints and dashboard page behind a new
-  admin permission.
+- Admin: operator moderation arms on the /admin/api surface (suspend a
+  listing, exclude a sale from public statistics, clear strikes, a per-seller
+  listings read) behind the existing moderation.read / moderation.act
+  permissions in server/admin_routes.ts. A dedicated dashboard page is a
+  follow-up; the endpoints stand alone.
 
 ## Open questions
 
