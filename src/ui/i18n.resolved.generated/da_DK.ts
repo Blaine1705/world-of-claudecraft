@@ -5519,6 +5519,7 @@ export const da_DK: EnTranslations = {
     },
     "augment": {
       "choose": "Vælg en Forstærkning",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Brutalitet",
         "desc": "Dine fysiske slag rammer 15% hårdere."

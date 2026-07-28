@@ -9,25 +9,65 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "fiesta.augment.cardAria"
+  ],
+  "es_ES": [
+    "fiesta.augment.cardAria"
+  ],
+  "fr_FR": [
+    "fiesta.augment.cardAria"
+  ],
+  "fr_CA": [
+    "fiesta.augment.cardAria"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "fiesta.augment.cardAria"
+  ],
+  "de_DE": [
+    "fiesta.augment.cardAria"
+  ],
+  "zh_CN": [
+    "fiesta.augment.cardAria"
+  ],
+  "zh_TW": [
+    "fiesta.augment.cardAria"
+  ],
+  "ko_KR": [
+    "fiesta.augment.cardAria"
+  ],
+  "ja_JP": [
+    "fiesta.augment.cardAria"
+  ],
+  "pt_BR": [
+    "fiesta.augment.cardAria"
+  ],
+  "ru_RU": [
+    "fiesta.augment.cardAria"
+  ],
+  "cs_CZ": [
+    "fiesta.augment.cardAria"
+  ],
+  "nl_NL": [
+    "fiesta.augment.cardAria"
+  ],
+  "pl_PL": [
+    "fiesta.augment.cardAria"
+  ],
+  "id_ID": [
+    "fiesta.augment.cardAria"
+  ],
+  "tr_TR": [
+    "fiesta.augment.cardAria"
+  ],
+  "sv_SE": [
+    "fiesta.augment.cardAria"
+  ],
+  "vi_VN": [
+    "fiesta.augment.cardAria"
+  ],
+  "da_DK": [
+    "fiesta.augment.cardAria"
+  ]
 };

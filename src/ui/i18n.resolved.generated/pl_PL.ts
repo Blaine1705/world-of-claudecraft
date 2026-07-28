@@ -5519,6 +5519,7 @@ export const pl_PL: EnTranslations = {
     },
     "augment": {
       "choose": "Wybierz wzmocnienie",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Brutalność",
         "desc": "Twoje fizyczne uderzenia ranią o 15% mocniej."
