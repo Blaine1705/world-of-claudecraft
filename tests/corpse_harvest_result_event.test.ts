@@ -366,15 +366,24 @@ describe('the worst case in shipped content (#2457)', () => {
     // four dings. It is still four ITEMS, so still four lines, but now one
     // event, one cue, and every line carries its rarity, count and link.
     expect(MOBS.mire_prowler.componentTags).toEqual(['hide', 'claw', 'meat']);
-    const { sim, a, mob } = setup(1, 'mire_prowler');
+    // Re-seeded from 1 to 11 by #2514, not re-recorded. mire_prowler is a MIXED
+    // corpse and claw no longer costs a tier roll, so every draw after the
+    // first shifted by one and seed 1 stopped rolling the double proc at all.
+    // This is the only fixture in shipped content that reaches the four-entry
+    // ledger through the real command, so a seed where it does not proc leaves
+    // the merge/append path untested rather than merely re-numbered.
+    const { sim, a, mob } = setup(11, 'mire_prowler');
     const { results, loots } = harvest(sim, mob.id, undefined, a);
     expect(results).toHaveLength(1);
     expect(results[0].yields).toEqual([
-      { itemId: 'rough_hide', qty: 2, rarity: 'rare', kind: 'plain' },
-      { itemId: 'game_meat', qty: 2, rarity: 'rare', kind: 'plain' },
+      { itemId: 'rough_hide', qty: 3, rarity: 'rare', kind: 'plain' },
+      { itemId: 'game_meat', qty: 3, rarity: 'rare', kind: 'plain' },
       { itemId: 'pristine_hide', qty: 1, rarity: 'rare', kind: 'specimen' },
       { itemId: 'prime_cut', qty: 1, rarity: 'rare', kind: 'specimen' },
     ]);
+    // Both specimens really rolled, which is what makes this the double-proc
+    // case rather than four entries reached some other way.
+    expect(results[0].yields.filter((y) => y.kind === 'specimen')).toHaveLength(2);
     // The 'claw' tag maps to no item, so it contributes neither a grant nor an
     // entry: four grants, four entries, never a phantom fifth line.
     expect(loots).toHaveLength(4);

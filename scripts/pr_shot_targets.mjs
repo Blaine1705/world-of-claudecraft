@@ -449,6 +449,12 @@ export const TARGETS = [
       // legibility pass renamed the corpse arm's button and added the footer
       // hint, both of which render on mobile too).
       { key: 'picker-preselected-mobile', picker: true, mobile: true },
+      // A MIXED corpse (#2514). forest_wolf's tags both map to an item, so its
+      // picker can never show a marked row: the wild boar carries `tusk` beside
+      // hide and meat, which is the shape the whole issue is about. Same rig,
+      // one template swapped, rather than a bespoke script.
+      { key: 'picker-mixed', picker: true, templateId: 'wild_boar' },
+      { key: 'picker-mixed-mobile', picker: true, templateId: 'wild_boar', mobile: true },
     ],
     async capture(page, variant) {
       await page.evaluate(() => {
@@ -456,20 +462,21 @@ export const TARGETS = [
         document.querySelector('.tut-skip')?.click();
         document.querySelector('.gpu-notice-dismiss')?.click();
       });
-      await page.evaluate(() => {
+      await page.evaluate((templateId) => {
         const game = window.__game;
         const sim = game?.sim;
         const p = sim?.player;
         if (!sim || !p) return;
         // Town focus first, while the fresh spawn still stands in the Eastbrook
-        // hub circle (the setter is in-town-only); hide drives both variants.
+        // hub circle (the setter is in-town-only); hide drives every variant,
+        // and both templates below carry it.
         try {
           sim.setTownFocus?.({ hide: 5 });
         } catch {}
         let wolf = null;
         let best = Infinity;
         for (const e of sim.entities.values()) {
-          if (e.kind !== 'mob' || e.templateId !== 'forest_wolf' || e.dead) continue;
+          if (e.kind !== 'mob' || e.templateId !== templateId || e.dead) continue;
           const dx = e.pos.x - p.pos.x;
           const dz = e.pos.z - p.pos.z;
           const d2 = dx * dx + dz * dz;
@@ -487,7 +494,7 @@ export const TARGETS = [
         sim.targetEntity?.(wolf.id);
         sim.startAutoAttack?.();
         window.__p12dShotWolfId = wolf.id;
-      });
+      }, variant?.templateId ?? 'forest_wolf');
       // One auto-attack swing at 1 hp kills the wolf; the live 20 Hz loop needs
       // real time for the swing timer and the death resolution.
       await wait(3000);

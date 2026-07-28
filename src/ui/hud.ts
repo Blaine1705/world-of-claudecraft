@@ -508,6 +508,7 @@ import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
+import { tradeOfferCeiling } from './trade_view';
 import { TutorialOverlay } from './tutorial';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
@@ -2745,6 +2746,16 @@ export class Hud {
       case 'delve-board':
         this.closeDelveBoard();
         break;
+      case 'lockpick-panel':
+        // Withdraw from a live lock, else dismiss the ante selector. The reachability
+        // story and why this is not a bare hide live on LockpickController.requestClose
+        // (#2517); do not restate them here, the two copies drifted once already.
+        // The hide is this arm's own, the trade-window precedent above: the withdrawal
+        // does not close the panel, so nothing else would retire a tooltip left standing
+        // over another surface until the server answers.
+        this.lockpickController.requestClose();
+        this.hideTooltip();
+        break;
       case 'loot-settings-window':
         this.closeLootSettings();
         break;
@@ -4165,13 +4176,13 @@ export class Hud {
         playerSpellHasteFrac(this.sim.player),
       ),
     abilityTooltip: (known) => this.abilityTooltip(known),
-    barAbilityIds: () =>
-      this.hotbarActions.flatMap((a) => (a && a.type === 'ability' ? [a.id] : [])),
-    // Index 0 = barSlot 1 (hotbarActions' own index = barSlot-1 convention), used
-    // to derive each row's mobile action-ring page (Phase 4). Non-ability slots
-    // (empty or an item) map to null, never mistaken for an ability id.
-    abilityIdByBarSlot: () =>
-      this.hotbarActions.map((a) => (a && a.type === 'ability' ? a.id : null)),
+    // The bar's LIVE slot array (index 0 = barSlot 1, hotbarActions' own index =
+    // barSlot-1 convention), handed over as-is. It used to be two DERIVED id lists
+    // (a flatMap for the on-bar ids, a map for the per-slot ids the mobile action-
+    // ring page label reads), and the spellbook's per-frame refresh called the
+    // first one every frame the window was open, allocating 34 arrays each time.
+    // The window derives both views itself now, at render time (#2519).
+    barActions: () => this.hotbarActions,
     hasFreeSlot: () => this.actionBarController.hasFreeSlot(),
     attackOnBar: () => this.attackSlotIsAttack(),
     // Routes through the Interface showAttackButton setting, the same state the
@@ -5037,7 +5048,10 @@ export class Hud {
     });
     this.refreshKeybindLabels();
     this.updateQuestTracker();
-    this.updateDelveTracker();
+    // NOT updateDelveTracker(): the tracker's own signature is ids + numbers, so
+    // a plain update() early-returns here and re-emits nothing. relocalize()
+    // clears it for exactly one rebuild (#2529).
+    this.delveTracker.relocalize();
     // The keyed-pool party rows reuse their DOM, so a rebuild never re-runs t() on
     // their badge tooltips / leave label; re-localize them in place on a switch.
     this.partyFramesPainter.relocalize();
@@ -5090,6 +5104,20 @@ export class Hud {
     this.vcupBriefing.relocalize();
     this.vcupCharge.relocalize();
     this.questDialog.relocalize();
+    // Same text-independent-sig contract, one surface at a time (#2529). Every
+    // one of these was rebuilding only when its own data moved, so an open one
+    // kept the previous locale until the player happened to change something.
+    // Each relocalize() is self-gated on its own window being open.
+    this.calendarWindow.relocalize();
+    this.mailboxWindow.relocalize();
+    this.socialWindow.relocalize();
+    this.cardDuelWindow.relocalize();
+    this.spellbookWindow.relocalize();
+    this.lockpickController.relocalize();
+    this.tutorial.relocalize(this.sim, this.keybinds);
+    // The ring latches its page indicator on the page/count pair; dropping the
+    // latch relabels it on the next paint (mobile layouts only build the ring).
+    this.mobileActionRingPainter?.relocalize();
   }
 
   // Prefers the live resolved entry when the player already knows it (rank +
@@ -8016,9 +8044,10 @@ export class Hud {
 
   private endLockpick(
     outcome: 'success' | 'fail' | 'abandoned',
-    tier?: 'premium' | 'medium' | 'low',
+    tier: 'premium' | 'medium' | 'low' | undefined,
+    sessionId: string,
   ): void {
-    this.lockpickController.end(outcome, tier);
+    this.lockpickController.end(outcome, tier, sessionId);
   }
 
   private openDelveLoot(chestId: number, items: { itemId: string; count: number }[]): void {
@@ -9988,6 +10017,15 @@ export class Hud {
           );
           break;
         case 'resurrectionOffer':
+          // An offer completing against a player who is no longer dead (they
+          // released, respawned, or accepted another healer's rez while this
+          // cast was in flight, all ordinary in online group play) is
+          // unanswerable: the sim keeps offers only for dead players. Showing
+          // it anyway painted the centred prompt for exactly one frame before
+          // the per-frame `!p.dead` closer below removed it, a split-second
+          // dark-panel flash. The guard reads the same mirror the closer does,
+          // so the two can never disagree.
+          if (!sim.player.dead) break;
           // Same "someone is asking you to respond to a prompt" vocabulary as
           // party/guild invite; questAccept() was retired, see invitePrompt().
           audio.invitePrompt();
@@ -10445,7 +10483,7 @@ export class Hud {
           break;
         }
         case 'lockpickEnd':
-          this.endLockpick(ev.outcome, ev.lootTier);
+          this.endLockpick(ev.outcome, ev.lootTier, ev.sessionId);
           if (ev.outcome === 'success') sfx.playUi('lockpick_end');
           break;
         case 'lockpickBonus': {
@@ -14156,7 +14194,7 @@ export class Hud {
   addItemToTrade(itemId: string): void {
     if (!this.tradeOpen || this.stagedTrade.items.length >= 6) return;
     const existing = this.stagedTrade.items.find((s) => s.itemId === itemId);
-    const have = this.sim.inventory.find((s) => s.itemId === itemId)?.count ?? 0;
+    const have = tradeOfferCeiling(this.sim.inventory, itemId);
     if (existing) {
       if (existing.count < have) existing.count++;
     } else {
@@ -14722,6 +14760,14 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
   if (!secondary) return '';
   switch (secondary.type) {
     case 'dot':
+      if (secondary.perCombo !== undefined) {
+        return (
+          t('abilityUi.tooltip.finisherDamage', {
+            base: formatAbilityNumber(secondary.total),
+            perCombo: formatAbilityNumber(secondary.perCombo),
+          }) + suffix(secondary)
+        );
+      }
       return formatAbilityNumber(secondary.total) + suffix(secondary);
     case 'hot':
       return formatAbilityNumber(secondary.total) + suffix(secondary);
@@ -14743,6 +14789,14 @@ function abilityOverTimeText(res: ResolvedAbility, scaling?: AbilityScaling): st
   const b = scaling ? abilityDamageBonus(res, eff, scaling) : 0;
   const bonus =
     b > 0 ? ` ${t('hudChrome.abilityScaling.bonus', { value: formatAbilityNumber(b) })}` : '';
+  if (eff.type === 'dot' && eff.perCombo !== undefined) {
+    return (
+      t('abilityUi.tooltip.finisherDamage', {
+        base: formatAbilityNumber(eff.total),
+        perCombo: formatAbilityNumber(eff.perCombo),
+      }) + bonus
+    );
+  }
   return formatAbilityNumber(eff.total) + bonus;
 }
 

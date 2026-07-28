@@ -21,6 +21,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_thorium_ore.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
+    "fiesta.augment.cardAria",
     "guide.profPages.toolCraftedOrMarks",
     "guide.profPages.toolsNote",
     "hudChrome.gathering.toolTierUnmet.fishing",
@@ -44,6 +45,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_thorium_ore.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
+    "fiesta.augment.cardAria",
     "guide.profPages.toolCraftedOrMarks",
     "guide.profPages.toolsNote",
     "hudChrome.gathering.toolTierUnmet.fishing",
@@ -67,6 +69,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_thorium_ore.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
+    "fiesta.augment.cardAria",
     "guide.profPages.toolCraftedOrMarks",
     "guide.profPages.toolsNote",
     "hudChrome.gathering.toolTierUnmet.fishing",
@@ -90,6 +93,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_thorium_ore.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
+    "fiesta.augment.cardAria",
     "guide.profPages.toolCraftedOrMarks",
     "guide.profPages.toolsNote",
     "hudChrome.gathering.toolTierUnmet.fishing",
@@ -114,6 +118,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_thorium_ore.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
+    "fiesta.augment.cardAria",
     "guide.profPages.toolCraftedOrMarks",
     "guide.profPages.toolsNote",
     "hudChrome.gathering.toolTierUnmet.fishing",
@@ -137,6 +142,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_thorium_ore.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
+    "fiesta.augment.cardAria",
     "guide.profPages.toolCraftedOrMarks",
     "guide.profPages.toolsNote",
     "hudChrome.gathering.toolTierUnmet.fishing",
@@ -148,10 +154,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.quickeningCharm",
     "hudChrome.professions.toolEffectSpent"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "fiesta.augment.cardAria"
+  ],
+  "zh_TW": [
+    "fiesta.augment.cardAria"
+  ],
+  "ko_KR": [
+    "fiesta.augment.cardAria"
+  ],
+  "ja_JP": [
+    "fiesta.augment.cardAria"
+  ],
   "pt_BR": [
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -164,6 +178,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_thorium_ore.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
+    "fiesta.augment.cardAria",
     "guide.profPages.toolCraftedOrMarks",
     "guide.profPages.toolsNote",
     "hudChrome.gathering.toolTierUnmet.fishing",
@@ -175,7 +190,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.quickeningCharm",
     "hudChrome.professions.toolEffectSpent"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "fiesta.augment.cardAria"
+  ],
   "cs_CZ": [
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -188,6 +205,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_thorium_ore.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
+    "fiesta.augment.cardAria",
     "guide.profPages.toolCraftedOrMarks",
     "guide.profPages.toolsNote",
     "hudChrome.gathering.toolTierUnmet.fishing",
@@ -211,6 +229,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_thorium_ore.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
+    "fiesta.augment.cardAria",
     "guide.profPages.toolCraftedOrMarks",
     "guide.profPages.toolsNote",
     "hudChrome.gathering.toolTierUnmet.fishing",
@@ -234,6 +253,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_thorium_ore.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
+    "fiesta.augment.cardAria",
     "guide.profPages.toolCraftedOrMarks",
     "guide.profPages.toolsNote",
     "hudChrome.gathering.toolTierUnmet.fishing",
@@ -257,6 +277,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_thorium_ore.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
+    "fiesta.augment.cardAria",
     "guide.profPages.toolCraftedOrMarks",
     "guide.profPages.toolsNote",
     "hudChrome.gathering.toolTierUnmet.fishing",
@@ -280,6 +301,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_thorium_ore.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
+    "fiesta.augment.cardAria",
     "guide.profPages.toolCraftedOrMarks",
     "guide.profPages.toolsNote",
     "hudChrome.gathering.toolTierUnmet.fishing",
@@ -303,6 +325,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_thorium_ore.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
+    "fiesta.augment.cardAria",
     "guide.profPages.toolCraftedOrMarks",
     "guide.profPages.toolsNote",
     "hudChrome.gathering.toolTierUnmet.fishing",
@@ -326,6 +349,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_thorium_ore.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
+    "fiesta.augment.cardAria",
     "guide.profPages.toolCraftedOrMarks",
     "guide.profPages.toolsNote",
     "hudChrome.gathering.toolTierUnmet.fishing",
@@ -349,6 +373,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.fine_thorium_ore.name",
     "entities.items.stormreel_fishing_rod.name",
     "entities.items.tidewrought_fishing_rod.name",
+    "fiesta.augment.cardAria",
     "guide.profPages.toolCraftedOrMarks",
     "guide.profPages.toolsNote",
     "hudChrome.gathering.toolTierUnmet.fishing",
