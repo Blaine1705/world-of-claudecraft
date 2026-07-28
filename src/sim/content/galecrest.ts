@@ -287,8 +287,12 @@ export const GALECREST_NPCS: Record<string, NpcDef> = {
     id: 'keeper_bram',
     name: 'Keeper Bram',
     title: 'Keeper of the Old Beacon',
-    pos: { x: 496, z: 310 },
-    facing: 2.6,
+    // on the Beacon's upper balcony (BEACON_SPIRAL deck2, +19), a couple of
+    // paces along the deck from where the second flight tops out, looking back
+    // at the stair head. Keep him clear of the tower column: inside coreR the
+    // ground snap hands out the plug height and he ends up on the roof cap.
+    pos: { x: 503, z: 309 },
+    facing: -0.46,
     color: 0xc8b06a,
     questIds: [
       'q_gc_keeper_of_the_flame',
