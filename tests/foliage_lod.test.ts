@@ -8,6 +8,7 @@ import {
   foliageFogLimit,
   IMPOSTOR_MIN_FOG_BLEND,
   instanceCullWindows,
+  instanceCullWindowsInto,
   LOD_HIGH,
   LOD_LOW,
   lodDistsFor,
@@ -35,19 +36,55 @@ function detailAt(
 
 // The shipped per-biome fog, parsed from the renderer rather than restated here,
 // so a new zone (or a widened view distance) is covered by these tests the day it
-// lands instead of the day someone remembers to update a fixture.
+// lands instead of the day someone remembers to update a fixture. `far` may be a
+// numeric literal OR the MAX_OUTDOOR_FOG_FAR constant (the open-sky realms), and
+// the row-count pin below makes a silently unparseable row a failure, not a
+// silently shrunken sweep.
+const rendererSrc = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+
+function maxOutdoorFogFar(): number {
+  const src = readFileSync(new URL('../src/render/zone_streaming.ts', import.meta.url), 'utf8');
+  const value = Number(/MAX_OUTDOOR_FOG_FAR = ([\d.]+)/.exec(src)?.[1]);
+  expect(value, 'MAX_OUTDOOR_FOG_FAR not found in zone_streaming.ts').toBeGreaterThan(0);
+  return value;
+}
+
 function shippedBiomeFog(): { biome: string; near: number; far: number }[] {
-  const src = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
-  const block = /BIOME_FOG[^{]*\{([\s\S]*?)\n {2}\};/.exec(src);
+  const maxFar = maxOutdoorFogFar();
+  const block = /BIOME_FOG[^{]*\{([\s\S]*?)\n {2}\};/.exec(rendererSrc);
   expect(block, 'BIOME_FOG table not found in renderer.ts').not.toBe(null);
-  const rows = [
-    ...(block as RegExpExecArray)[1].matchAll(
-      /(\w+):\s*\{[^}]*near:\s*([\d.]+),\s*far:\s*([\d.]+)/g,
-    ),
-  ].map((m) => ({ biome: m[1], near: Number(m[2]), far: Number(m[3]) }));
+  const body = (block as RegExpExecArray)[1];
+  const rows = [...body.matchAll(/(\w+):\s*\{[^}]*near:\s*([\d.]+),\s*far:\s*([\w.]+)/g)].map(
+    (m) => ({
+      biome: m[1],
+      near: Number(m[2]),
+      far: m[3] === 'MAX_OUTDOOR_FOG_FAR' ? maxFar : Number(m[3]),
+    }),
+  );
+  const declaredRows = body.match(/\w+:\s*\{\s*color:/g) ?? [];
+  expect(rows.length, 'a BIOME_FOG row failed to parse').toBe(declaredRows.length);
   expect(rows.length, 'parsed no fog rows out of BIOME_FOG').toBeGreaterThan(3);
+  for (const r of rows) {
+    expect(Number.isFinite(r.near) && Number.isFinite(r.far), `row ${r.biome}`).toBe(true);
+  }
   return rows;
 }
+
+// The one preset the lean tier ever sees: outdoorFogPreset() returns LOW_FOG on
+// the low tier, so the lean sweep runs against it rather than the biome table.
+function shippedLowFog(): { biome: string; near: number; far: number } {
+  const m = /LOW_FOG = \{ color: \w+, near: ([\d.]+), far: ([\d.]+) \}/.exec(rendererSrc);
+  expect(m, 'LOW_FOG preset not found in renderer.ts').not.toBe(null);
+  const [, near, far] = m as RegExpExecArray;
+  return { biome: 'low-tier', near: Number(near), far: Number(far) };
+}
+
+const FOG_ROWS = shippedBiomeFog();
+const fogOf = (biome: string): { near: number; far: number } => {
+  const row = FOG_ROWS.find((r) => r.biome === biome);
+  expect(row, `no shipped fog row for ${biome}`).toBeDefined();
+  return row as { near: number; far: number };
+};
 
 function windowFor(over: Partial<BucketWindowInput> & { centerDist: number }): BucketWindowInput {
   return {
@@ -67,12 +104,10 @@ const impostors = (centerDist: number, over: Partial<BucketWindowInput> = {}) =>
   windowFor({ centerDist, minAtDetail: true, ...over });
 
 describe('foliage LOD: the far-tree impostor never stands in clear air', () => {
-  const qualityCases = shippedBiomeFog().flatMap((fog) =>
-    QUALITY_LEVELS.flatMap((q) => [
-      { ...fog, q, lean: false },
-      { ...fog, q, lean: true },
-    ]),
-  );
+  const qualityCases = [
+    ...FOG_ROWS.flatMap((fog) => QUALITY_LEVELS.map((q) => ({ ...fog, q, lean: false }))),
+    ...QUALITY_LEVELS.map((q) => ({ ...shippedLowFog(), q, lean: true })),
+  ];
 
   it.each(qualityCases)(
     'biome $biome at quality $q (lean $lean): swap under heavy fog, never past the cull',
@@ -94,10 +129,11 @@ describe('foliage LOD: the far-tree impostor never stands in clear air', () => {
   );
 
   it('regression: a build-time 300u swap left cones half-clear in the long-fog zones', () => {
-    // This is the reported bug, not the fix's own arithmetic. The Vale opens to
-    // 470u; a flat 300u swap sits at 50% fog, i.e. plainly visible as a cone.
-    // Revert treeDetailDistance to a constant and this fails.
-    const vale = { near: 130, far: 470 };
+    // This is the reported bug, not the fix's own arithmetic. The open-sky Vale
+    // runs to MAX_OUTDOOR_FOG_FAR; a flat 300u swap sits far short of its fog
+    // floor, i.e. plainly visible as a cone. Revert treeDetailDistance to a
+    // constant and this fails.
+    const vale = fogOf('vale');
     expect(fogBlendAt(300, vale.near, vale.far)).toBeLessThan(IMPOSTOR_MIN_FOG_BLEND);
 
     const { detailFar: fixed } = detailAt(vale, 1);
@@ -109,19 +145,15 @@ describe('foliage LOD: the far-tree impostor never stands in clear air', () => {
     // The "cones until they load" half of the report: nothing is loading. The
     // budget dips while assets decode and shaders compile, the detail radius
     // shrank with it (300 * 0.72 = 216u), and the cones marched in until it
-    // recovered. Starved, the swap may only move OUT (to the mq-0 fog cull,
-    // where no impostor band exists at all), never in toward clear air.
-    const vale = { near: 130, far: 470 };
+    // recovered. In the shipped Vale the floor sits inside the cull at every
+    // quality, so starved and rested must land on the same fog-floor swap.
+    const vale = fogOf('vale');
     const starved = detailAt(vale, 0);
     const rested = detailAt(vale, 1);
 
     expect(starved.detailFar).toBeGreaterThan(LOD_HIGH.treeDetailFar * WORST_SCALE);
-    // rested: the fog floor (368u); starved: capped by the mq-0 cull just below
-    expect(rested.detailFar).toBe(130 + IMPOSTOR_MIN_FOG_BLEND * (470 - 130));
-    // the Vale's mq-0 cull (366.6u) sits just under its fog floor (368u): the
-    // starved swap parks ON the cull line, so no impostor band and no cones
-    expect(starved.detailFar).toBe(starved.fogLimit);
-    expect(starved.detailFar).toBe(Math.min(rested.detailFar, starved.fogLimit));
+    expect(rested.detailFar).toBe(vale.near + IMPOSTOR_MIN_FOG_BLEND * (vale.far - vale.near));
+    expect(starved.detailFar).toBe(rested.detailFar); // fog floor dominates: no pop either way
   });
 
   it('short-fog realms finally hand their far band to impostors', () => {
@@ -129,7 +161,7 @@ describe('foliage LOD: the far-tree impostor never stands in clear air', () => {
     // swap used to land past the fog cull at EVERY governor level: the impostor
     // window was empty and real trees were drawn right up to the line that
     // culled them (measured live: core 1.36M triangles, impostors 0 buckets).
-    const marsh = { near: 75, far: 165 };
+    const marsh = fogOf('marsh');
     const floor = marsh.near + IMPOSTOR_MIN_FOG_BLEND * (marsh.far - marsh.near); // 138
 
     for (const q of [0.5, 0.72, 1]) {
@@ -144,17 +176,67 @@ describe('foliage LOD: the far-tree impostor never stands in clear air', () => {
   });
 
   it('the cave keeps its swap cheap AND gains a band', () => {
-    // Pre-fix pin: best-scale cave detail was the flat 300u constant, 110u past
-    // its own 190u fog wall. The retreat rule pulls it to the fog floor, which
-    // is BOTH cheaper than the old constant and inside the cull for the first
+    // Pre-fix pin: best-scale cave detail was the flat 300u constant, far past
+    // its own fog wall. The retreat rule pulls it to the fog floor, which is
+    // BOTH cheaper than the old constant and inside the cull for the first
     // time, so the cave's far band goes to cones like everywhere else.
-    const cave = { near: 45, far: 190 };
-    const floor = cave.near + IMPOSTOR_MIN_FOG_BLEND * (cave.far - cave.near); // 146.5
+    const cave = fogOf('cave');
+    const floor = cave.near + IMPOSTOR_MIN_FOG_BLEND * (cave.far - cave.near);
     for (const q of QUALITY_LEVELS) {
       const { detailFar, fogLimit } = detailAt(cave, q);
       expect(detailFar).toBe(Math.min(floor, fogLimit));
       expect(detailFar).toBeLessThanOrEqual(300);
     }
+  });
+
+  it('a residency fog wall never pulls the swap toward the camera', () => {
+    // The streaming clamp can pin the LIVE fog at a 45u wall while the zone
+    // builds. The swap reads the ATMOSPHERIC fog (the update() contract), so
+    // during the wall it parks ON the live cull: real trees to the wall, no
+    // impostor band, no cones a few strides from the camera. Feeding the swap
+    // the clamped pair instead would retreat it to ~39u; this pins the split.
+    const garden = fogOf('garden');
+    for (const q of QUALITY_LEVELS) {
+      const liveCull = foliageFogLimit(45, q);
+      const detailFar = treeDetailDistance(
+        LOD_HIGH.treeDetailFar,
+        garden.near,
+        garden.far,
+        foliageDistanceScale(q, false),
+        liveCull,
+      );
+      expect(detailFar).toBe(liveCull);
+      expect(liveCull).toBeLessThanOrEqual(45);
+    }
+  });
+
+  it('a malformed near-past-far pair still cannot push trees past the cull', () => {
+    // Defense in depth for the degenerate arm: with fogFar <= fogNear the fog
+    // arithmetic is meaningless, and the budgeted radius must still respect
+    // the cull. Pre-fix this returned the raw 300u budget.
+    expect(treeDetailDistance(300, 175, 45, 1, foliageFogLimit(45, 1))).toBe(45);
+  });
+});
+
+describe('foliage LOD: the governor formulas are pinned', () => {
+  it('distance scale endpoints', () => {
+    expect([
+      foliageDistanceScale(0, false),
+      foliageDistanceScale(1, false),
+      foliageDistanceScale(0, true),
+      foliageDistanceScale(1, true),
+    ]).toEqual([0.72, 1, 0.56, 1]);
+  });
+
+  it('fog limit endpoints', () => {
+    expect(foliageFogLimit(100, 0)).toBe(78);
+    expect(foliageFogLimit(100, 1)).toBe(100);
+  });
+
+  it('the blend law constant', () => {
+    // Every impostor guarantee above is relative to this; a silent relaxation
+    // (0.7 -> 0.75 passed every relative test) must not slip through.
+    expect(IMPOSTOR_MIN_FOG_BLEND).toBe(0.7);
   });
 });
 
@@ -205,6 +287,18 @@ describe('foliage LOD: the real-model and impostor windows cover the world', () 
     const wellInside = detailFar - radius - 1; // the whole bucket is inside it
     expect(bucketVisible(realTrees(wellInside, { detailFar, radius }))).toBe(true);
     expect(bucketVisible(impostors(wellInside, { detailFar, radius }))).toBe(false);
+  });
+
+  it('a bucket whose far edge sits exactly on the swap still draws impostors', () => {
+    // The impostor arm is a strict <: an instance AT detailFar belongs to the
+    // impostor window ([treeMax, fogCull) includes its lower bound), so the
+    // bucket that could hold it must not be culled. <= here would drop that
+    // tree from both meshes.
+    const radius = 120;
+    const detailFar = 368;
+    const onBoundary = detailFar - radius; // far edge == detailFar exactly
+    expect(bucketVisible(impostors(onBoundary, { detailFar, radius }))).toBe(true);
+    expect(bucketVisible(impostors(onBoundary - 1, { detailFar, radius }))).toBe(false);
   });
 
   it('the near-fill half still culls at its own cap, and grows no impostor there', () => {
@@ -279,6 +373,13 @@ describe('foliage LOD: per-instance collapse windows', () => {
     const w = instanceCullWindows(258, 146.85);
     expect(w.treeMax).toBe(146.85);
     expect(w.impostorMin).toBe(w.treeMax);
+  });
+
+  it('the allocation-free variant fills identically', () => {
+    const out = { treeMax: -1, impostorMin: -1, fogCull: -1 };
+    const returned = instanceCullWindowsInto(368, 418.15, out);
+    expect(returned).toBe(out); // fills the caller-owned object, no allocation
+    expect(out).toEqual(instanceCullWindows(368, 418.15));
   });
 });
 

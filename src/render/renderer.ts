@@ -1378,6 +1378,9 @@ export class Renderer {
   // clamped live fog would only start preparing a zone once its boundary is
   // already close enough to clamp the fog, i.e. too late.
   private lastRequestedFogFar = MAX_OUTDOOR_FOG_FAR;
+  // The authored preset near that pairs with it: together they are the
+  // ATMOSPHERIC fog the foliage swap follows (never the residency clamp).
+  private lastRequestedFogNear = 55;
   /** Fired whenever a zone becomes resident (any prepare path). Wired by
    *  main.ts so presentation caches outside the renderer (the HUD's world-map
    *  background) prewarm alongside the zone itself. */
@@ -3445,6 +3448,8 @@ export class Renderer {
       this.cameraLookAt.z,
       fogNear,
       fogFar,
+      this.lastRequestedFogNear,
+      this.lastRequestedFogFar,
     );
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.vfx.update(dt);
@@ -6451,6 +6456,7 @@ export class Renderer {
       const k = 1 - Math.exp(-dt * 1.5);
       const requestedFar = preset.far * (this.lowGfx ? 1 : g.farScale);
       this.lastRequestedFogFar = requestedFar;
+      this.lastRequestedFogNear = preset.near;
       // Residency is read per CHUNK, through the terrain view's own accessor.
       // Asking per ZONE meant an unprepared 36-to-54 chunk rectangle within
       // ~53 yd pinned the view at the floor until that entire rectangle (and
@@ -7948,6 +7954,8 @@ export class Renderer {
       this.cameraLookAt.z,
       fogNear,
       fogFar,
+      this.lastRequestedFogNear,
+      this.lastRequestedFogFar,
     );
     worldStart = markWorldPhase('foliage', worldStart);
     this.fish.update(p.pos.x, p.pos.z, dt);

@@ -104,6 +104,16 @@ export function fogBlendAt(dist: number, fogNear: number, fogFar: number): numbe
  * retreats to the fog floor (the nearest point the blend law allows), and the
  * band between floor and cull goes to impostors. The result always satisfies
  * detailFar <= fogLimit.
+ *
+ * INPUT CONTRACT: `fogNear`/`fogFar` are the ATMOSPHERIC fog, the authored
+ * preset times the day-night scale, never the residency-clamped live values.
+ * The streaming clamp can pin the live view at a 45u wall (and briefly leave
+ * near above far while near eases after far snaps); fed those, the retreat
+ * would park impostor cones a few strides from the camera for the length of
+ * every streaming window. With atmospheric values the floor stays where the
+ * realm's real murk is, and the min() against `fogLimit` (which IS live) is
+ * what keeps the swap behind the wall meanwhile. The degenerate arm below is
+ * defense in depth for a malformed preset, not the clamp transient.
  */
 export function treeDetailDistance(
   base: number,
@@ -141,9 +151,21 @@ export interface InstanceCullWindows {
 }
 
 export function instanceCullWindows(detailFar: number, fogLimit: number): InstanceCullWindows {
+  return instanceCullWindowsInto(detailFar, fogLimit, { treeMax: 0, impostorMin: 0, fogCull: 0 });
+}
+
+/** Allocation-free variant for the per-frame caller (the nameplatePlanInto idiom). */
+export function instanceCullWindowsInto(
+  detailFar: number,
+  fogLimit: number,
+  out: InstanceCullWindows,
+): InstanceCullWindows {
   const fogCull = Math.max(0, fogLimit);
   const treeMax = Math.min(detailFar, fogCull);
-  return { treeMax, impostorMin: treeMax, fogCull };
+  out.treeMax = treeMax;
+  out.impostorMin = treeMax;
+  out.fogCull = fogCull;
+  return out;
 }
 
 export interface BucketWindowInput {

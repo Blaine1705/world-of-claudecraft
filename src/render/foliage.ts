@@ -42,7 +42,8 @@ import {
   bucketVisible,
   foliageDistanceScale,
   foliageFogLimit,
-  instanceCullWindows,
+  type InstanceCullWindows,
+  instanceCullWindowsInto,
   type LodDists,
   lodDistsFor,
   treeDetailDistance,
@@ -330,7 +331,14 @@ const GRASS_BUILDING_PADDING = 0.35;
 
 export interface FoliageView {
   group: THREE.Group;
-  /** per-frame: grass fade + ring rebuild, fog culling of far tree buckets */
+  /**
+   * Per-frame: grass fade + ring rebuild, fog culling of far tree buckets.
+   * `fogNear`/`fogFar` are the LIVE fog (residency-clamped): they drive the
+   * cull. `atmosFogNear`/`atmosFogFar` are the atmospheric fog (authored
+   * preset x day-night scale, pre-clamp): they drive the real-model/impostor
+   * swap, so a streaming fog wall never drags impostor cones toward the
+   * camera (see treeDetailDistance's input contract in foliage_lod.ts).
+   */
   update(
     px: number,
     pz: number,
@@ -342,6 +350,8 @@ export interface FoliageView {
     eyeZ: number,
     fogNear: number,
     fogFar: number,
+    atmosFogNear: number,
+    atmosFogFar: number,
   ): void;
   setGrassQuality(level: number): void;
   setModelQuality(level: number): void;
@@ -1003,13 +1013,16 @@ function placeSpecies(
           shadow.castShadow = true;
           shadow.receiveShadow = false;
           parent.add(shadow);
-          // The shadow pass does NOT follow the fog-extended detail distance: a
+          // The shadow pass does NOT follow the fog-EXTENDED detail distance: a
           // tree's shadow past the old radius contributes nothing the eye can
           // resolve, and re-drawing that geometry for the depth pass is what the
-          // extension would cost most. Keep it on the build-time radius.
+          // extension would cost most. Keep it on the build-time radius, but DO
+          // follow a fog-SHORTENED swap (maxAtDetail): the instance collapse
+          // cannot reach three's shadow depth material, so past-the-swap slabs
+          // must drop here or invisible trees keep casting.
           const shadowMax =
             maxDist === undefined ? treeDetailFar : Math.min(maxDist, treeDetailFar);
-          register(shadow, 'shadow', undefined, shadowMax);
+          register(shadow, 'shadow', undefined, shadowMax, { max: true });
         }
         if (GFX.standardMaterials && !part.isLeaf && spec.farTrunkProxy) {
           const proxy = cloneInstancedTo(im, farTrunkGeo(part.geometry), part.material);
@@ -2380,6 +2393,8 @@ export function buildFoliage(seed: number): FoliageView {
     revealScale: 1,
     fogLimit: 0,
   };
+  // Reused per frame for the same reason as bucketWindow above.
+  const collapseWindows: InstanceCullWindows = { treeMax: 0, impostorMin: 0, fogCull: 0 };
   buildTrees(group, seed, bucketMeshes, treeHideables);
   buildDressing(group, seed, bucketMeshes);
   for (const b of bucketMeshes) {
@@ -2417,6 +2432,8 @@ export function buildFoliage(seed: number): FoliageView {
       eyeZ: number,
       fogNear: number,
       fogFar: number,
+      atmosFogNear: number,
+      atmosFogFar: number,
     ): void {
       grass.update(px, pz);
       updateTreeHides(treeHideables, eyeX, eyeY, eyeZ, camX, camY, camZ);
@@ -2424,20 +2441,21 @@ export function buildFoliage(seed: number): FoliageView {
       // themselves, including the real-model -> impostor swap (which follows the
       // zone's fog rather than a build-time constant, so a cone is never caught
       // standing in clear air), are decided in foliage_lod.ts and unit-tested
-      // there.
+      // there. The cull tracks the LIVE fog; the swap tracks the ATMOSPHERE
+      // (see the update() doc above).
       const distanceScale = foliageDistanceScale(modelQuality, GFX.leanFoliage);
       const fogLimit = foliageFogLimit(fogFar, modelQuality);
       const detailFar = treeDetailDistance(
         lodDists().treeDetailFar,
-        fogNear,
-        fogFar,
+        atmosFogNear,
+        atmosFogFar,
         distanceScale,
         fogLimit,
       );
       // The vertex shaders enforce these same boundaries per INSTANCE, so a
       // surviving slab no longer drags its whole tree population along with it
       // (foliage_collapse.ts; the windows themselves are instanceCullWindows).
-      updateCollapseUniforms(instanceCullWindows(detailFar, fogLimit));
+      updateCollapseUniforms(instanceCullWindowsInto(detailFar, fogLimit, collapseWindows));
       modelVisibleBuckets = 0;
       modelVisibleDraws = 0;
       modelVisibleTriangles = 0;
@@ -2466,6 +2484,8 @@ export function buildFoliage(seed: number): FoliageView {
         bucketWindow.revealScale = revealScale;
         bucketWindow.fogLimit = fogLimit;
         b.mesh.visible = bucketVisible(bucketWindow);
+        // "Visible" counts SUBMITTED instances: shader-collapsed ones still
+        // count here (the collapse saves raster work, not submission).
         if (b.mesh.visible) {
           modelVisibleBuckets++;
           modelVisibleDraws += b.draws;

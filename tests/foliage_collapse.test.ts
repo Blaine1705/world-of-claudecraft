@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   applyInstanceCollapse,
@@ -35,15 +36,24 @@ describe('foliage collapse: shader injection', () => {
     const sh = compile(mat);
     expect(sh.vertexShader).toContain('uniform float uCollapseMin;');
     expect(sh.vertexShader).toContain('uniform float uCollapseMax;');
-    expect(sh.vertexShader).toContain('instanceMatrix[3][0]');
+    // camera-relative XZ distance to the instance's world base, nothing else
+    expect(sh.vertexShader).toContain(
+      'vec2 collapseOrigin = vec2(instanceMatrix[3][0], instanceMatrix[3][2]);',
+    );
+    expect(sh.vertexShader).toContain(
+      'float collapseDist = distance(collapseOrigin, cameraPosition.xz);',
+    );
     // window arithmetic: alive on [min, max)
     expect(sh.vertexShader).toContain(
       'transformed *= step(uCollapseMin, collapseDist) * (1.0 - step(uCollapseMax, collapseDist));',
     );
+    // uniform declarations must land in the prelude, not inside main()
+    const mainAt = sh.vertexShader.indexOf('void main()');
+    expect(sh.vertexShader.indexOf('uniform float uCollapseMin;')).toBeLessThan(mainAt);
     // the multiply must land before projection so it is the LAST transformed edit
     const collapseAt = sh.vertexShader.indexOf('transformed *=');
     const projectAt = sh.vertexShader.indexOf('#include <project_vertex>');
-    expect(collapseAt).toBeGreaterThan(-1);
+    expect(collapseAt).toBeGreaterThan(mainAt);
     expect(projectAt).toBeGreaterThan(collapseAt);
     // and stays harmless for a non-instanced draw of the same material
     expect(sh.vertexShader).toContain('#ifdef USE_INSTANCING');
@@ -83,10 +93,9 @@ describe('foliage collapse: shader injection', () => {
     const mat: CollapsibleMaterial = {
       onBeforeCompile(shader) {
         shader.uniforms.uWindStrength = windUniform;
-        shader.vertexShader = shader.vertexShader.replace(
-          '#include <begin_vertex>',
-          '#include <begin_vertex>\ntransformed.x += windAmt;',
-        );
+        shader.vertexShader = shader.vertexShader
+          .replace('#include <common>', '#include <common>\n// wind-pars-marker')
+          .replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed.x += windAmt;');
       },
     };
     applyInstanceCollapse(mat, 'tree');
@@ -96,6 +105,12 @@ describe('foliage collapse: shader injection', () => {
     const collapseAt = sh.vertexShader.indexOf('transformed *=');
     expect(windAt).toBeGreaterThan(-1);
     expect(collapseAt).toBeGreaterThan(windAt);
+    // and the previous hook ran FIRST: both hooks insert right after
+    // <common>, so wrapper-first ordering would leave the wind marker ahead
+    // of the collapse uniforms instead of behind them
+    expect(sh.vertexShader.indexOf('uniform float uCollapseMin;')).toBeLessThan(
+      sh.vertexShader.indexOf('// wind-pars-marker'),
+    );
   });
 
   it('program cache keys separate wind-composed materials from plain ones', () => {
@@ -118,5 +133,13 @@ describe('foliage collapse: shader injection', () => {
     // roles share GLSL (only the bound uniform objects differ), so they may
     // and should share a program
     expect(keyOf(windless)).toBe(keyOf(windlessToo));
+  });
+
+  it('stays runtime-import-free so plain fakes keep driving it', () => {
+    // Not a *_core (it mutates materials and holds shared uniform state), so
+    // the architecture sweep never scans it; this is the targeted equivalent.
+    // Type-only imports are fine: they erase at build.
+    const src = readFileSync(new URL('../src/render/foliage_collapse.ts', import.meta.url), 'utf8');
+    expect(src).not.toMatch(/^import (?!type )/m);
   });
 });

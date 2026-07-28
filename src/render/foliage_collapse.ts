@@ -14,6 +14,14 @@
 // arithmetic lives in foliage_lod.ts (instanceCullWindows); this module is only
 // the Three-side injection, kept import-free so tests can drive it with plain
 // fakes.
+//
+// COST MODEL: a collapsed instance still submits its vertices, so draw calls,
+// index bandwidth, vertex-shader work and the perf-stats triangle counts are
+// all unchanged; only rasterisation and fragment work are saved. This is a
+// correctness-at-the-boundary tool, not a triangle-budget lever (the bucket
+// culls remain that). The shadow depth pass is untouched too: three renders
+// shadows with its own depth material, so shadow reach is bounded at bucket
+// level (the shadow registers in foliage.ts), not per instance.
 
 import type { InstanceCullWindows } from './foliage_lod';
 
@@ -44,10 +52,15 @@ export interface CollapsibleMaterial {
   customProgramCacheKey?(): string;
 }
 
+// Finite seeds on purpose: GLSL ES leaves step() with an infinite edge
+// unspecified, and seeding the impostor window EMPTY ([seed, seed)) means a
+// frame rendered before the first update() draws exactly the old single-LOD
+// picture instead of double-drawing trees and cones.
+const FAR_SEED = 1e8;
 const ZERO: UniformValue = { value: 0 };
-const uTreeMax: UniformValue = { value: Number.POSITIVE_INFINITY };
-const uImpostorMin: UniformValue = { value: 0 };
-const uFogCull: UniformValue = { value: Number.POSITIVE_INFINITY };
+const uTreeMax: UniformValue = { value: FAR_SEED };
+const uImpostorMin: UniformValue = { value: FAR_SEED };
+const uFogCull: UniformValue = { value: FAR_SEED };
 
 /** Per-frame: push the windows every collapse-enabled material reads. */
 export function updateCollapseUniforms(w: InstanceCullWindows): void {
