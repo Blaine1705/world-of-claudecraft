@@ -50,6 +50,21 @@ describe('auraEffectDescriptor', () => {
     });
   });
 
+  it('teaches every visible Druid engine bank and its live stage', () => {
+    expect(desc({ id: 'moontide', kind: 'moontide', value: 0, stacks: 2 })).toEqual({
+      key: 'hudChrome.auraEffect.moontide',
+      nums: { stacks: 2, max: 3 },
+    });
+    expect(desc({ id: 'old_blood', kind: 'old_blood', value: 0, stacks: 3 })).toEqual({
+      key: 'hudChrome.auraEffect.oldBlood',
+      nums: { stacks: 3, max: 3 },
+    });
+    expect(desc({ id: 'verdance', kind: 'verdance', value: 0, stacks: 5 })).toEqual({
+      key: 'hudChrome.auraEffect.verdance',
+      nums: { stacks: 5, max: 5 },
+    });
+  });
+
   it('reports a movement slow as a percent reduction from the multiplier', () => {
     expect(desc({ kind: 'slow', value: 0.5 })).toEqual({
       key: 'hudChrome.auraEffect.slow',

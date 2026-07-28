@@ -86,6 +86,11 @@ export interface ActionBarAbility {
   /** Extra stored uses on the abilityCharges recharge model (e.g. Frost's second
    *  Ice Block); total max = 1 + bonusCharges. undefined = 0. */
   bonusCharges?: number;
+  /** Cooldown map key when a cooldown-carrying transform shares the base
+   *  button's clock (Swiftmend/Overbloom); the sweep must read the same key
+   *  the sim gate checks, or a running shared clock is invisible while the
+   *  button is transformed. */
+  cooldownId?: string;
 }
 
 /** The aura fields the bar reads to derive proc glows and next-cast empowerment. */
@@ -438,7 +443,7 @@ export function createActionBarView(
         // this guard mirrors the former `if (!known) continue` and narrows the type).
         if (ability === null) continue;
         const def = ability.def;
-        const cd = player.cooldowns.get(def.id) ?? 0;
+        const cd = player.cooldowns.get(ability.cooldownId ?? def.id) ?? 0;
         const gcdActive = !def.offGcd && player.gcdRemaining > 0;
         const shown = Math.max(cd, gcdActive ? player.gcdRemaining : 0);
         const denom = cd > 0 ? def.cooldown : GCD;

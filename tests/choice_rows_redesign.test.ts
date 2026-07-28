@@ -262,11 +262,14 @@ describe('druid Lifesap redesign', () => {
   it('restores 30 resource per classic tick for 10 sec, in combat', () => {
     // A mana user now also passively regenerates Spirit mana in combat (the mp5
     // change), so isolate Lifesap's contribution: run the same in-combat window with
-    // and without the sap and difference them.
+    // and without the sap and difference them. The v0.29 druid tree moved the
+    // Lifesap unlock to the row 17 pick.
     const run = (withSap: boolean): { resource: number; cd: number } => {
       const sim = new Sim({ seed: 11, playerClass: 'druid', autoEquip: true });
       sim.setPlayerLevel(20);
-      expect(sim.applyTalents({ spec: null, rows: { 11: 'dru_r11_innervate' } })).toBe(true);
+      expect(
+        sim.applyTalents({ spec: null, rows: { 17: 'dru_r17_survival_of_the_fittest' } }),
+      ).toBe(true);
       const p = sim.player;
       p.resource = 0;
       p.inCombat = true;
@@ -290,7 +293,9 @@ describe('druid Lifesap redesign', () => {
   it('carries across a form shift and fills Rage in Bruin Form', () => {
     const sim = new Sim({ seed: 11, playerClass: 'druid', autoEquip: true });
     sim.setPlayerLevel(20);
-    expect(sim.applyTalents({ spec: null, rows: { 11: 'dru_r11_innervate' } })).toBe(true);
+    expect(sim.applyTalents({ spec: null, rows: { 17: 'dru_r17_survival_of_the_fittest' } })).toBe(
+      true,
+    );
     const p = sim.player;
     sim.castAbility('innervate');
     sim.tick();

@@ -159,8 +159,8 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
 
   it('casts Typhoon in caster form and Red Haze after shifting', () => {
     const sim = simWithRows('druid', {
-      8: 'dru_r8_typhoon',
-      20: 'dru_r20_berserk',
+      11: 'dru_r11_innervate',
+      17: 'dru_r17_improved_barkskin',
     });
     const target = addTarget(sim);
     const distanceBefore = Math.hypot(

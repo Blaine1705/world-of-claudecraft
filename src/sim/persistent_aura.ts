@@ -13,6 +13,10 @@ const PERSISTENT_ENGINE_AURA_IDS: ReadonlySet<string> = new Set([
   'shaman_pyrebrand_mastery',
   'shaman_thunder_charges',
   'shaman_warspirit_cadence',
+  'moontide',
+  'sunwake',
+  'old_blood',
+  'verdance',
 ]);
 
 export function isPersistentEngineAura(auraId: string): boolean {

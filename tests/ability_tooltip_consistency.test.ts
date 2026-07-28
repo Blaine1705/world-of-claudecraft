@@ -58,6 +58,12 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   sunder_armor: [30],
   // "Conjures 2 ...": the stack size hardcoded in casting_lifecycle.ts.
   conjure_water: [2],
+  // Druid spec-engine interaction lines: the cited numbers are engine
+  // constants in combat/druid_engines.ts (the Moonseed extension seconds on
+  // the Lunar Tempest line, the Verdance stage cap on the Wildbloom line),
+  // not per-rank effect fields.
+  moonfire: [6],
+  rejuvenation: [5],
   // Rogue spec-engine interaction lines: the cited numbers are engine
   // constants in combat/rogue_engines.ts (ritual stages, stage refund, the
   // Redline window seconds and its 4+ combo opener, the shadow veil seconds,

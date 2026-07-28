@@ -53,6 +53,7 @@ import {
 import { drawWeapon } from '../weapon_stow';
 import { applyRageSpendCooldownRefund, spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isInStasis, isStunned } from './cc';
+import { druidEngineOnLandedStrike } from './druid_engines';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { baseSwingSpeed, rangedAutoProfile } from './form_swing';
@@ -206,6 +207,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   if (p.swingTimer <= 0) {
     let bonus = 0;
     let abilityName: string | null = null;
+    let abilityId: string | undefined;
     let threatFlat = 0;
     let threatMult = 1;
     if (p.queuedOnSwing) {
@@ -224,6 +226,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
           if (queued.def.cooldown > 0) p.cooldowns.set(queued.def.id, queued.def.cooldown);
           bonus = eff.bonus;
           abilityName = queued.def.name;
+          abilityId = queued.def.id;
           threatFlat = queued.threatFlat;
           threatMult = queued.threatMult;
         }
@@ -234,6 +237,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     }
     const connected = meleeSwing(ctx, p, t, bonus, abilityName, {
       autoAttackHand: 'mainhand',
+      abilityId,
       threatFlat,
       threatMult,
       whiteDualWieldPenalty: dualWieldWhiteMissPenalty && abilityName === null,
@@ -419,6 +423,7 @@ export function meleeSwing(
     // weaponStrike path threads it here so per-ability crit talents reach the
     // shared hit table.
     critBonus?: number;
+    abilityId?: string;
     onDealt?: (amount: number) => void;
     whiteDualWieldPenalty?: boolean;
   },
@@ -528,6 +533,7 @@ export function meleeSwing(
     },
   );
   opts.onDealt?.(dealtAmount);
+  druidEngineOnLandedStrike(ctx, attacker, opts.abilityId);
   // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND
   // the weaponStrike ability path, which resolves through this shell). Gated on
   // setProcs inside applySetProcs, so proc-less players draw no rng.

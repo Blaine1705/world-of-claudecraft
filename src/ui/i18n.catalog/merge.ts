@@ -3813,7 +3813,7 @@ const mergeExtraEn = {
     [
       'rake',
       'Flense',
-      'A stealth opener that rakes the enemy for weapon damage plus {damage} and causes bleeding damage over 9 sec. Awards 1 combo point. Wolf Form only.',
+      'Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wildfang: landed hits bank Old Blood. Wolf Form only.',
     ],
     [
       'revive_pet',

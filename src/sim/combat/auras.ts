@@ -44,6 +44,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { isStunned } from './cc';
+import { druidEngineOnBleedTick } from './druid_engines';
 import { priestOnAuraEnded } from './priest/talents';
 import { preservesGloomtithe, vespersOnDotTick } from './priest/vespers';
 import { tickMendingCurrent } from './shaman_spiritmend';
@@ -302,6 +303,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             a.finalDamage === true,
           );
           vespersOnDotTick(ctx, e, a);
+          druidEngineOnBleedTick(ctx, dotSource, a);
           if (a.leechPct !== undefined) {
             const src = dotSource;
             if (src && !src.dead) {
