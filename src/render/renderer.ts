@@ -447,8 +447,8 @@ const SELF_MOTION_HANDOFF_RATE = 15;
 // water.ts and sky.ts read the sun direction and their own tint
 // independently, so retinting this light seams the shoreline against the
 // dome.
-const HEMI_INTENSITY = 0.36;
-const SUN_INTENSITY = 2.9;
+const HEMI_INTENSITY = 0.33;
+const SUN_INTENSITY = 3.1;
 const ENV_INTENSITY = 0.45;
 // dungeon interiors: kill the daylight so torchlight carries the scene
 // (env at 0.15 still lit rigs sky-blue against the pitch-dark crypt)
@@ -1201,7 +1201,7 @@ export class Renderer {
   // Tone-mapping exposure at brightness 1.0. Applied in OutputPass, i.e.
   // AFTER bloom, so this trims the raised sun rig back to the old apparent
   // brightness without moving anything across BLOOM_THRESHOLD.
-  private baseExposure = 1.06;
+  private baseExposure = 1.03;
   private tmpV = new THREE.Vector3();
   private viewCandidates: ViewCandidate[] = [];
   // Persistent scratch for the sloppy-pick column build. pick() is also the
@@ -1712,7 +1712,7 @@ export class Renderer {
     sun.shadow.camera.bottom = -S;
     sun.shadow.bias = -0.0006;
     sun.shadow.normalBias = LOW_GFX ? 0.02 : 0.05;
-    sun.shadow.radius = 4;
+    sun.shadow.radius = 2.5;
     this.scene.add(sun);
     this.scene.add(sun.target);
     this.sun = sun;

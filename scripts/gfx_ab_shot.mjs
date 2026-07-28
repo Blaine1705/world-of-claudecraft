@@ -42,6 +42,10 @@ const LOCATIONS = [
   // Eastbrook civic center is world (0, 2): stand SE of it looking back at the
   // town square so windows/lamps/bloom on buildings are in frame.
   { name: 'eastbrook_town', x: 13, z: 15, yaw: 2.45, pitch: -0.2 },
+  // Player-style angles: high camera pitched down at the meadow, and a road
+  // closeup, both of which exposed the double-sided card blackout.
+  { name: 'topdown_meadow', x: 20, z: 40, yaw: 0.6, pitch: -0.62 },
+  { name: 'road_closeup', x: 2, z: 52, yaw: 0.4, pitch: -0.75 },
 ];
 
 const ONLY = process.env.SHOT_ONLY ? process.env.SHOT_ONLY.split(',') : null;

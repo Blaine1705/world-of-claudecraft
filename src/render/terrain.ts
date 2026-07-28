@@ -151,7 +151,7 @@ const NORMAL_TEX_W = 320;
 const NORMAL_TEX_H = 960;
 // nudged up from 1.35: at 3yd/texel the macro relief was reading flat next
 // to the strengthened per-material detail normals
-const NORMAL_TEX_STRENGTH = 1.45;
+const NORMAL_TEX_STRENGTH = 1.55;
 
 // Ground colors per biome; boundaries blend across the same window as the
 // heightfield's shape blend. This is the tint layer the splat albedo
@@ -492,10 +492,10 @@ function buildSplatMaterial(
         vec2 fineSoft = texture2D(uGrassN, tuv * 4.0).xy * 2.0 - 1.0;
         // wet mud lumps smoothly where dry dirt crumbles
         float dirtDetail = 1.0 - vExtra.x * 0.35;
-        vec2 detN = (gN.xy + fineSoft * 0.4) * vSplat.x * 0.7
-                  + (dN.xy + fineHard * 0.4) * vSplat.y * 1.0 * dirtDetail
-                  + (rN.xy + fineHard * 0.4) * vSplat.z * 1.15 * (1.0 - wallW)
-                  + (sN.xy + fineSoft * 0.4) * vSplat.w * 0.45;
+        vec2 detN = (gN.xy + fineSoft * 0.55) * vSplat.x * 0.85
+                  + (dN.xy + fineHard * 0.55) * vSplat.y * 1.25 * dirtDetail
+                  + (rN.xy + fineHard * 0.55) * vSplat.z * 1.35 * (1.0 - wallW)
+                  + (sN.xy + fineSoft * 0.55) * vSplat.w * 0.55;
         detN *= 1.0 - vExtra.y * 0.7; // snow softens the relief beneath it
         normal = normalize(normal + tbn * vec3(detN, 0.0));
         // cliffs: wall-projected rock normal so steep faces get real relief

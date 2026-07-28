@@ -559,6 +559,24 @@ function addWind(mat: THREE.Material, strength: number, upNormalBlend = 0): void
         transformed.x += windAmt;
         transformed.z += windAmt * 0.6;`,
       );
+    sh.fragmentShader = sh.fragmentShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        uniform float uUpNormalBlendF;`,
+      )
+      .replace(
+        '#include <normal_fragment_begin>',
+        `#include <normal_fragment_begin>
+        #ifdef DOUBLE_SIDED
+          // The up-bent vertex normal gets flipped toward DOWN on backfaces
+          // by the double-sided chunk, blacking out canopy reverse sides.
+          // Undo the flip in proportion to the bend so unbent materials keep
+          // stock behaviour.
+          normal = mix(normal, normal * faceDirection, uUpNormalBlendF);
+        #endif`,
+      );
+    sh.uniforms.uUpNormalBlendF = { value: upNormalBlend > 0 ? 1 : 0 };
   };
 }
 
@@ -1772,6 +1790,17 @@ function applyGrassShader(
         varying vec2 vTuftWorld;
         uniform vec2 uPlayerPos;
         uniform float uFadeFar;`,
+      )
+      .replace(
+        '#include <normal_fragment_begin>',
+        `#include <normal_fragment_begin>
+        #ifdef DOUBLE_SIDED
+          // The vertex stage forces up normals so cards shade like the
+          // meadow, but the double-sided chunk flips backfaces to a DOWN
+          // normal: every tuft viewed from its reverse side went black.
+          // faceDirection squared undoes the flip; up stays up on both faces.
+          normal *= faceDirection;
+        #endif`,
       )
       .replace(
         '#include <map_fragment>',
