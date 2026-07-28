@@ -390,6 +390,7 @@ const baseEnTable = {
   'aura.oldBlood': 'Old Blood',
   'aura.verdance': 'Verdance',
   'aura.lopingStride': 'Loping Stride',
+  'aura.marrowbreak': 'Marrowbreak',
   // Card Duel minigame (Card Master NPC, src/sim/social/card_duel.ts).
   'log.cardDuelQueued': 'You queue for a Card Duel.',
   'log.cardDuelLeftQueue': 'You leave the Card Duel queue.',
@@ -7032,6 +7033,9 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Old Blood': 'aura.oldBlood',
   Verdance: 'aura.verdance',
   'Loping Stride': 'aura.lopingStride',
+  // Marrowbreak's tank absorb guard (the absorb effect's aura in
+  // combat/effect_dispatch.ts carries the ability's display name).
+  Marrowbreak: 'aura.marrowbreak',
   // Bladed Gyre's armed echo buff (whirlwind's selfBuff auraName in
   // src/sim/content/classes.ts); shown on the buff bar and combat log.
   'Bladed Echo': 'aura.bladedEcho',

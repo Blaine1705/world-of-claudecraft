@@ -50,6 +50,7 @@ import {
   partyFrameIncomingHeals,
   partyFrameRole,
 } from '../src/sim/party_frame_info';
+import { isPersistentEngineAura } from '../src/sim/persistent_aura';
 import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import type { VcMatch } from '../src/sim/social/vale_cup';
@@ -1029,7 +1030,12 @@ function wireAura(a: Aura): WireAura {
   if (a.value3 !== undefined) w.value3 = a.value3;
   if (a.tickInterval !== undefined) w.tickInterval = a.tickInterval;
   if (a.school !== 'physical') w.school = a.school;
-  if (a.stacks && a.stacks > 1) w.stacks = a.stacks;
+  // Stacks are omitted below 2 as a sparsity rule, EXCEPT for the persistent
+  // engine banks (druid/shaman/hunter spec engines): their badge and tooltip
+  // teach the live stage including 0 and 1, and the decode side cannot tell
+  // "absent because 1" from "absent because 0", so the count is always sent.
+  if (isPersistentEngineAura(a.id)) w.stacks = a.stacks ?? 0;
+  else if (a.stacks && a.stacks > 1) w.stacks = a.stacks;
   // Carry the remaining charges only for a charge-limited aura (Lightning Shield), so the
   // buff icon can badge the count online exactly as offline; undefined for every other aura.
   if (a.charges !== undefined) w.charges = a.charges;
