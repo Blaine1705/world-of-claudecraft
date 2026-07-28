@@ -135,10 +135,6 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.marks': "Marques d'excavation : {count}",
   'delveUi.tracker.title': 'Excavation',
   'entities.abilities.blazing_barrier.name': 'Bouclier ardent',
-  'entities.abilities.chain_heal.description':
-    'Soigne une cible alliée de {damage}, puis rebondit sur 2 alliés au plus dans un rayon de 12 mètres. Chaque bond soigne de 50% de la cible précédente. Chaque allié atteint consomme votre Courant réparateur restant et soigne immédiatement de 125% de la quantité consommée. Le soin initial augmente avec la puissance des sorts. (signature Restauration)',
-  'entities.abilities.desperate_prayer.description':
-    'Vous soigne instantanément de 30% des points de vie maximum.',
   'entities.abilities.blazing_barrier.description':
     'Entoure-toi de feu et absorbe {damage} points de dégâts pendant 60 s. (Feu)',
   'entities.abilities.cold_snap.name': 'Rappel hivernal',

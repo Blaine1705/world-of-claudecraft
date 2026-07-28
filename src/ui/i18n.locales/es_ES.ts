@@ -185,10 +185,6 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.marks': 'Marcas de Profundidad: {count}',
   'delveUi.tracker.title': 'Profundidad',
   'entities.abilities.blazing_barrier.name': 'Barrera ardiente',
-  'entities.abilities.chain_heal.description':
-    'Sana a un objetivo amistoso por {damage} y luego salta hasta a 2 aliados en un radio de 12 metros. Cada salto sana por un 50% del objetivo anterior. Cada aliado alcanzado consume tu Corriente Sanadora restante y sana de inmediato por un 125% de la cantidad consumida. La sanación inicial aumenta con el poder con hechizos. (Distintivo de Restauración)',
-  'entities.abilities.desperate_prayer.description':
-    'Te sana instantáneamente por un 30% de la salud máxima.',
   'entities.abilities.blazing_barrier.description':
     'Rodéate de fuego para absorber {damage} de daño durante 60 s. (Fuego)',
   'entities.abilities.cold_snap.name': 'Llamada invernal',
