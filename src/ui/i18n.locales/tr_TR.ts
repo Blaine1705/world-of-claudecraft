@@ -9604,4 +9604,32 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Yapımcı işareti',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Ustalık bonusu',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Komisyon bağı',
+
+  // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
+  'entities.abilities.marrowbreak.name': 'İlik Kıran',
+  'entities.abilities.marrowbreak.description':
+    'Ağır, yüksek tehditli bir vuruş için 3 Kadim Kan tüketir. Canın yarısının altındayken bunun yerine 8 sn boyunca azami canın 18% kadarını emer ve 15 öfke geri kazandırır.',
+  'entities.abilities.moonlash.name': 'Ay Kabarışı',
+  'entities.abilities.moonlash.description':
+    'Ağır bir Gizem vuruşu için 3 Ay Gelgiti tüketir: hasar seçimi. Güneş İzi ile aynı birikimi harcar, o yüzden birini seç.',
+  'entities.abilities.moonseed.name': 'Ay Tohumu',
+  'entities.abilities.moonseed.description':
+    'Yalnızca Aykuşu Formunda. {damage} Gizem hasarı vurur, bir Ay Gelgiti aşaması ekler ve Ay Fırtınanı 6 sn uzatır, uygulama başına en fazla 6 sn. Ay Gelgiti doluyken Ay Tohumu, Ay Kabarışına dönüşür.',
+  'entities.abilities.overbloom.name': 'Taşkın Çiçeklenme',
+  'entities.abilities.overbloom.description':
+    '5 Yeşillik tüketir. Tüm müttefiklerdeki her süreli iyileştirmeni kalan iyileştirmesinin 60% kadarıyla hasat eder, o etkileri kaldırır ve hedefe taze bir Yaban Çiçeği eker.',
+  'entities.abilities.redharvest.name': 'Kızıl Hasat',
+  'entities.abilities.redharvest.description':
+    '3 Kadim Kan tüketir, hedefte sahip olduğun kalan tüm Deri Yüzme ve Parçalama hasarını patlatır ve 30 enerji geri kazandırır. Tutulan combo puanları ısırığı güçlendirir ama asla gerekli değildir.',
+  'entities.abilities.sunlance.name': 'Güneş İzi',
+  'entities.abilities.sunlance.description':
+    'Yanık veren bir Doğa vuruşu için 3 Ay Gelgiti tüketir ve 35 mana geri kazandırır: tasarruf seçimi. Ay Kabarışı ile aynı birikimi harcar, o yüzden birini seç.',
+  'guide.abilityHook.moonseed':
+    'Aykuşu Formundayken bir Ay Gelgiti aşaması ekler ve Ay Fırtınasını uzatır.',
+  'hudChrome.auraEffect.moontide':
+    'Ay Gelgiti: aşama {stacks} / {max}. Yaban Oku, Gök Düşüşü ve Ay Tohumu büyüleri Aykuşu Formunda onu doldurur; {max} olduğunda Ay Tohumu Ay Kabarışına, Gök Düşüşü Güneş İzine dönüşür ve ikisi de onu harcar',
+  'hudChrome.auraEffect.oldBlood':
+    'Kadim Kan: aşama {stacks} / {max}. İsabet eden Kurt ve Bruin vuruşları bu birikimi paylaşır; {max} olduğunda Kanlı Isırık veya Kemik Kıran dönüşür',
+  'hudChrome.auraEffect.verdance':
+    'Yeşillik: aşama {stacks} / {max}. Tamamlanan Yaban Çiçeği ve İkinci Çiçeklenme büyüleri onu doldurur; {max} olduğunda Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür',
 };

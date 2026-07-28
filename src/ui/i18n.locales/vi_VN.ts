@@ -9622,4 +9622,32 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Dấu người chế tạo',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Thưởng tuyệt phẩm',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Ràng buộc ủy thác',
+
+  // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
+  'entities.abilities.marrowbreak.name': 'Đoạn Tủy',
+  'entities.abilities.marrowbreak.description':
+    'Tiêu 3 Huyết Cổ cho một đòn đánh nặng với uy hiếp cao. Dưới nửa máu, thay vào đó hấp thụ 18% lượng máu tối đa trong 8 giây và hồi 15 nộ.',
+  'entities.abilities.moonlash.name': 'Nguyệt Trào',
+  'entities.abilities.moonlash.description':
+    'Tiêu 3 Triều Nguyệt cho một đòn Bí Thuật nặng: lựa chọn sát thương. Dùng chung một bể với Vệt Dương, nên hãy chọn một.',
+  'entities.abilities.moonseed.name': 'Nguyệt Chủng',
+  'entities.abilities.moonseed.description':
+    'Chỉ trong Dạng Cú Mặt Trăng. Đánh gây {damage} sát thương Bí Thuật, thêm một tầng Triều Nguyệt và kéo dài Bão Tố Nguyệt của bạn 6 giây, tối đa 6 giây mỗi lần. Khi Triều Nguyệt đầy, Nguyệt Chủng trở thành Nguyệt Trào.',
+  'entities.abilities.overbloom.name': 'Mãn Khai',
+  'entities.abilities.overbloom.description':
+    'Tiêu 5 Sắc Xanh. Thu hoạch mọi hồi máu theo thời gian của bạn trên tất cả đồng minh với 60% lượng hồi còn lại, gỡ bỏ các hiệu ứng đó và trồng một Hoa Nở Hoang Dã mới lên mục tiêu.',
+  'entities.abilities.redharvest.name': 'Thu Hoạch Đỏ',
+  'entities.abilities.redharvest.description':
+    'Tiêu 3 Huyết Cổ, kích nổ toàn bộ sát thương còn lại của Lóc Xé và Xé Rách của bạn trên mục tiêu và hồi 30 năng lượng. Điểm liên hoàn đang giữ làm cú cắn mạnh hơn nhưng không bao giờ bắt buộc.',
+  'entities.abilities.sunlance.name': 'Vệt Dương',
+  'entities.abilities.sunlance.description':
+    'Tiêu 3 Triều Nguyệt cho một đòn Tự Nhiên kèm thiêu đốt và hồi 35 mana: lựa chọn tiết kiệm. Dùng chung một bể với Nguyệt Trào, nên hãy chọn một.',
+  'guide.abilityHook.moonseed':
+    'Thêm một tầng Triều Nguyệt và kéo dài Bão Tố Nguyệt khi bạn ở Dạng Cú Mặt Trăng.',
+  'hudChrome.auraEffect.moontide':
+    'Triều Nguyệt: tầng {stacks} trên {max}. Các lần thi triển Tia Hoang Dã, Thiên Giáng và Nguyệt Chủng tích nó trong Dạng Cú Mặt Trăng; ở {max}, Nguyệt Chủng trở thành Nguyệt Trào và Thiên Giáng trở thành Vệt Dương, và đòn nào cũng tiêu nó',
+  'hudChrome.auraEffect.oldBlood':
+    'Huyết Cổ: tầng {stacks} trên {max}. Các đòn đánh trúng ở Hình Sói và Hình Bruin dùng chung bể này; ở {max}, Cắn Xé Máu hoặc Nghiền Xương biến đổi',
+  'hudChrome.auraEffect.verdance':
+    'Sắc Xanh: tầng {stacks} trên {max}. Các lần thi triển hoàn tất của Hoa Nở Hoang Dã và Nở Hoa Lần Hai tích nó; ở {max}, Hồi Phục Nhanh trở thành Mãn Khai',
 };

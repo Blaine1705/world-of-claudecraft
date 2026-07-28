@@ -9521,4 +9521,32 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Značka výrobce',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Bonus mistrovského díla',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Vazba zakázky',
+
+  // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
+  'entities.abilities.marrowbreak.name': 'Lámání morku',
+  'entities.abilities.marrowbreak.description':
+    'Spotřebuje 3 Staré krve na těžký úder s vysokou hrozbou. Pod polovinou zdraví místo toho pohltí 18% maximálního zdraví na 8 s a obnoví 15 zuřivosti.',
+  'entities.abilities.moonlash.name': 'Měsíční vzedmutí',
+  'entities.abilities.moonlash.description':
+    'Spotřebuje 3 Měsíčního přílivu na těžký tajemný úder: volba poškození. Čerpá ze stejné zásoby jako Sluneční brázda, vyber si tedy jednu.',
+  'entities.abilities.moonseed.name': 'Měsíční semeno',
+  'entities.abilities.moonseed.description':
+    'Pouze v Podobě měsíčního křídla. Zasáhne za {damage} tajemného poškození, přidá jeden stupeň Měsíčního přílivu a prodlouží tvou Měsíční bouři o 6 s, až o 6 s na použití. Při plném Měsíčním přílivu se Měsíční semeno mění v Měsíční vzedmutí.',
+  'entities.abilities.overbloom.name': 'Překvět',
+  'entities.abilities.overbloom.description':
+    'Spotřebuje 5 Zeleně. Sklidí každé tvé léčení v čase na všech spojencích za 60% zbývajícího léčení, odstraní tyto efekty a zasadí na cíl čerstvý Divoký květ.',
+  'entities.abilities.redharvest.name': 'Rudá sklizeň',
+  'entities.abilities.redharvest.description':
+    'Spotřebuje 3 Staré krve, odpálí veškeré zbývající poškození Stažení z kůže a Roztržení, které na cíli máš, a obnoví 30 energie. Držené combo body kousnutí posílí, ale nikdy nejsou vyžadovány.',
+  'entities.abilities.sunlance.name': 'Sluneční brázda',
+  'entities.abilities.sunlance.description':
+    'Spotřebuje 3 Měsíčního přílivu na přírodní úder s popálením a obnoví 35 many: volba úspory. Čerpá ze stejné zásoby jako Měsíční vzedmutí, vyber si tedy jednu.',
+  'guide.abilityHook.moonseed':
+    'Přidá stupeň Měsíčního přílivu a prodlouží Měsíční bouři, dokud jsi v Podobě měsíčního křídla.',
+  'hudChrome.auraEffect.moontide':
+    'Měsíční příliv: stupeň {stacks} z {max}. Sesílání Šípu divočiny, Pádu nebes a Měsíčního semene ho plní v Podobě měsíčního křídla; při {max} se Měsíční semeno mění v Měsíční vzedmutí a Pád nebes ve Sluneční brázdu a obojí ho čerpá',
+  'hudChrome.auraEffect.oldBlood':
+    'Stará krev: stupeň {stacks} z {max}. Zasažené vlčí a medvědí údery sdílejí tuto zásobu; při {max} se promění Krvavý skus nebo Drcení kostí',
+  'hudChrome.auraEffect.verdance':
+    'Zeleň: stupeň {stacks} z {max}. Dokončená sesílání Divokého květu a Druhého květu ji plní; při {max} se Rychlé zhojení mění v Překvět',
 };

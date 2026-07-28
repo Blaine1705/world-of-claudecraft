@@ -9838,4 +9838,32 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Marque du fabricant',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': "Bonus d'ouvrage de maître",
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Lien de commande',
+
+  // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
+  'entities.abilities.marrowbreak.name': 'Brise-moelle',
+  'entities.abilities.marrowbreak.description':
+    'Consomme 3 Sang ancien pour une frappe lourde à haute menace. Sous la moitié des points de vie, absorbe à la place 18% des points de vie maximum pendant 8 s et rend 15 points de rage.',
+  'entities.abilities.moonlash.name': 'Déferlante lunaire',
+  'entities.abilities.moonlash.description':
+    "Consomme 3 Marée lunaire pour une frappe d'Arcane lourde : le choix des dégâts. Dépense la même réserve que Sillage solaire, alors choisissez-en un.",
+  'entities.abilities.moonseed.name': 'Graine lunaire',
+  'entities.abilities.moonseed.description':
+    "Forme de sélénien uniquement. Frappe pour {damage} dégâts d'Arcane, ajoute un cran de Marée lunaire et prolonge votre Tempête lunaire de 6 s, jusqu'à 6 s par application. À Marée lunaire pleine, Graine lunaire devient Déferlante lunaire.",
+  'entities.abilities.overbloom.name': 'Surfloraison',
+  'entities.abilities.overbloom.description':
+    'Consomme 5 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour 60% de ses soins restants, retire ces effets et plante une Floraison sauvage fraîche sur la cible.',
+  'entities.abilities.redharvest.name': 'Moisson rouge',
+  'entities.abilities.redharvest.description':
+    "Consomme 3 Sang ancien, fait détoner tous les dégâts restants d'Écorcher et de Lacération que vous possédez sur la cible et rend 30 points d'énergie. Les points de combo détenus renforcent la morsure mais ne sont jamais requis.",
+  'entities.abilities.sunlance.name': 'Sillage solaire',
+  'entities.abilities.sunlance.description':
+    "Consomme 3 Marée lunaire pour une frappe de Nature avec brûlure et rend 35 points de mana : le choix de l'économie. Dépense la même réserve que Déferlante lunaire, alors choisissez-en un.",
+  'guide.abilityHook.moonseed':
+    'Ajoute un cran de Marée lunaire et prolonge Tempête lunaire tant que vous êtes en Forme de sélénien.',
+  'hudChrome.auraEffect.moontide':
+    "Marée lunaire : cran {stacks} sur {max}. Les incantations de Trait sauvage, Chute céleste et Graine lunaire la remplissent en Forme de sélénien ; à {max}, Graine lunaire devient Déferlante lunaire et Chute céleste devient Sillage solaire, et l'une ou l'autre la dépense",
+  'hudChrome.auraEffect.oldBlood':
+    'Sang ancien : cran {stacks} sur {max}. Les frappes portées en loup et en Bruin partagent cette réserve ; à {max}, Morsure sanglante ou Brise-os se transforme',
+  'hudChrome.auraEffect.verdance':
+    'Verdoyance : cran {stacks} sur {max}. Les incantations achevées de Floraison sauvage et de Seconde floraison la remplissent ; à {max}, Prompte guérison devient Surfloraison',
 };

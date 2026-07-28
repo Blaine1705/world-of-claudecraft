@@ -9647,4 +9647,32 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Znak twórcy',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Premia arcydzieła',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Więź zlecenia',
+
+  // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
+  'entities.abilities.marrowbreak.name': 'Łamacz szpiku',
+  'entities.abilities.marrowbreak.description':
+    'Zużywa 3 Starej Krwi na ciężki cios o wysokim zagrożeniu. Poniżej połowy zdrowia zamiast tego pochłania 18% maksymalnego zdrowia na 8 s i przywraca 15 szału.',
+  'entities.abilities.moonlash.name': 'Księżycowy przybór',
+  'entities.abilities.moonlash.description':
+    'Zużywa 3 Księżycowego przypływu na ciężki tajemny cios: wybór obrażeń. Czerpie z tej samej rezerwy co Słoneczny ślad, więc wybierz jeden.',
+  'entities.abilities.moonseed.name': 'Księżycowe nasienie',
+  'entities.abilities.moonseed.description':
+    'Tylko w Postaci księżycowej sowy. Uderza za {damage} obrażeń tajemnych, dodaje jeden stopień Księżycowego przypływu i przedłuża twoją Księżycową nawałnicę o 6 s, do 6 s na użycie. Przy pełnym Księżycowym przypływie Księżycowe nasienie staje się Księżycowym przyborem.',
+  'entities.abilities.overbloom.name': 'Nadrozkwit',
+  'entities.abilities.overbloom.description':
+    'Zużywa 5 Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za 60% pozostałego leczenia, usuwa te efekty i sadzi świeży Dziki rozkwit na celu.',
+  'entities.abilities.redharvest.name': 'Czerwone Żniwa',
+  'entities.abilities.redharvest.description':
+    'Zużywa 3 Starej Krwi, detonuje wszystkie pozostałe obrażenia Zdzierania i Rozszarpania, które masz na celu, i przywraca 30 energii. Trzymane punkty combo wzmacniają ukąszenie, ale nigdy nie są wymagane.',
+  'entities.abilities.sunlance.name': 'Słoneczny ślad',
+  'entities.abilities.sunlance.description':
+    'Zużywa 3 Księżycowego przypływu na cios natury z podpaleniem i przywraca 35 many: wybór ekonomiczny. Czerpie z tej samej rezerwy co Księżycowy przybór, więc wybierz jeden.',
+  'guide.abilityHook.moonseed':
+    'Dodaje stopień Księżycowego przypływu i przedłuża Księżycową nawałnicę, gdy jesteś w Postaci księżycowej sowy.',
+  'hudChrome.auraEffect.moontide':
+    'Księżycowy przypływ: stopień {stacks} z {max}. Rzucenia Dzikiego pocisku, Spadającego nieba i Księżycowego nasienia napełniają go w Postaci księżycowej sowy; przy {max} Księżycowe nasienie staje się Księżycowym przyborem, a Spadające niebo Słonecznym śladem, i oba go zużywają',
+  'hudChrome.auraEffect.oldBlood':
+    'Stara Krew: stopień {stacks} z {max}. Trafione ciosy wilka i Bruina dzielą tę rezerwę; przy {max} przemienia się Krwawe ukąszenie lub Kruszenie kości',
+  'hudChrome.auraEffect.verdance':
+    'Zieleń: stopień {stacks} z {max}. Ukończone rzucenia Dzikiego rozkwitu i Drugiego rozkwitu ją napełniają; przy {max} Szybkie uzdrowienie staje się Nadrozkwitem',
 };

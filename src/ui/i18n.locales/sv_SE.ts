@@ -9590,4 +9590,32 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Tillverkarens märke',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Mästerverksbonus',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Uppdragsbindning',
+
+  // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
+  'entities.abilities.marrowbreak.name': 'Märgbräckare',
+  'entities.abilities.marrowbreak.description':
+    'Förbrukar 3 Gammalt Blod för ett tungt slag med högt hot. Under halv hälsa absorberar det i stället 18% av maximal hälsa i 8 sek och återställer 15 raseri.',
+  'entities.abilities.moonlash.name': 'Månsvall',
+  'entities.abilities.moonlash.description':
+    'Förbrukar 3 Månflod för ett tungt arkant slag: skadevalet. Tär på samma förråd som Solspår, så välj ett.',
+  'entities.abilities.moonseed.name': 'Månfrö',
+  'entities.abilities.moonseed.description':
+    'Endast i Månugglaform. Slår för {damage} arkan skada, lägger till ett Månflod-steg och förlänger din Månstorm med 6 sek, upp till 6 sek per användning. Vid full Månflod blir Månfrö Månsvall.',
+  'entities.abilities.overbloom.name': 'Överblomning',
+  'entities.abilities.overbloom.description':
+    'Förbrukar 5 Grönska. Skördar varje läkning över tid du äger på alla allierade för 60% av dess återstående läkning, tar bort de effekterna och planterar en färsk Vildblomning på målet.',
+  'entities.abilities.redharvest.name': 'Röd Skörd',
+  'entities.abilities.redharvest.description':
+    'Förbrukar 3 Gammalt Blod, detonerar all återstående skada från Flå och Riv upp som du äger på målet och återställer 30 energi. Hållna kombopoäng stärker bettet men krävs aldrig.',
+  'entities.abilities.sunlance.name': 'Solspår',
+  'entities.abilities.sunlance.description':
+    'Förbrukar 3 Månflod för ett naturslag med brännskada och återställer 35 mana: sparvalet. Tär på samma förråd som Månsvall, så välj ett.',
+  'guide.abilityHook.moonseed':
+    'Lägger till ett Månflod-steg och förlänger Månstorm medan du är i Månugglaform.',
+  'hudChrome.auraEffect.moontide':
+    'Månflod: steg {stacks} av {max}. Vildbult-, Himlafall- och Månfrö-besvärjelser fyller den i Månugglaform; vid {max} blir Månfrö Månsvall och Himlafall Solspår, och båda tär på den',
+  'hudChrome.auraEffect.oldBlood':
+    'Gammalt Blod: steg {stacks} av {max}. Träffande Varg- och Bruin-slag delar detta förråd; vid {max} förvandlas Blodsbett eller Benkross',
+  'hudChrome.auraEffect.verdance':
+    'Grönska: steg {stacks} av {max}. Fullbordade besvärjelser av Vildblomning och Andra blomningen fyller den; vid {max} blir Snabb läkning Överblomning',
 };

@@ -1638,9 +1638,9 @@ export const fr_CA: EnTranslations = {
       "veilstrikeWindow": "Voile d'ombre : vos ouvertures du Voile crépusculaire sont utilisables à découvert sous tout angle, et les dégâts infligés augmentent de {pct}%",
       "veiledEdge": "Votre prochaine Frappe du rôdeur frappe deux fois plus fort",
       "duskEconomy": "Les capacités coûtent {pct}% d'énergie en moins",
-      "moontide": "Moontide: stage {stacks} of {max}. Wildbolt, Skyfall, and Moonseed casts build it in Moonwing Form; at {max}, Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and either spends it",
-      "oldBlood": "Old Blood: stage {stacks} of {max}. Landed Wolf and Bruin strikes share this bank; at {max}, Gorebite or Bonecrush transforms",
-      "verdance": "Verdance: stage {stacks} of {max}. Completed Wildbloom and Second Bloom casts build it; at {max}, Swiftmend becomes Overbloom",
+      "moontide": "Marée lunaire : cran {stacks} sur {max}. Les incantations de Trait sauvage, Chute céleste et Graine lunaire la remplissent en Forme de sélénien ; à {max}, Graine lunaire devient Déferlante lunaire et Chute céleste devient Sillage solaire, et l'une ou l'autre la dépense",
+      "oldBlood": "Sang ancien : cran {stacks} sur {max}. Les frappes portées en loup et en Bruin partagent cette réserve ; à {max}, Morsure sanglante ou Brise-os se transforme",
+      "verdance": "Verdoyance : cran {stacks} sur {max}. Les incantations achevées de Floraison sauvage et de Seconde floraison la remplissent ; à {max}, Prompte guérison devient Surfloraison",
       "increase": {
         "ap": "Accroît la puissance d'attaque de {value}",
         "sp": "Augmente la puissance des sorts de {value}",
@@ -3378,7 +3378,7 @@ export const fr_CA: EnTranslations = {
       "healing_touch": "Un gros soin sur une cible au temps d'incantation long, pour remettre quelqu'un d'aplomb.",
       "mark_of_the_wild": "Une bénédiction durable à poser sur vous-même ou un allié avant un combat.",
       "moonfire": "Frappe instantanément et laisse la cible en feu, pratique en déplacement.",
-      "moonseed": "Adds a Moontide stage and extends Lunar Tempest while you are in Moonwing Form.",
+      "moonseed": "Ajoute un cran de Marée lunaire et prolonge Tempête lunaire tant que vous êtes en Forme de sélénien.",
       "rejuvenation": "S'incante instantanément et soigne un allié dans la durée, pour continuer d'agir.",
       "thorns": "Protège un allié pour que les attaquants en mêlée se blessent en le frappant."
     },
@@ -7664,8 +7664,8 @@ export const fr_CA: EnTranslations = {
         "description": "Brûle l'ennemi par un feu lunaire pour {damage} points de dégâts des Arcanes plus des dégâts sur la durée."
       },
       "moonseed": {
-        "name": "Moonseed",
-        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds one Moontide stage, and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At full Moontide, Moonseed becomes Moonsurge."
+        "name": "Graine lunaire",
+        "description": "Forme de sélénien uniquement. Frappe pour {damage} dégâts d'Arcane, ajoute un cran de Marée lunaire et prolonge votre Tempête lunaire de 6 s, jusqu'à 6 s par application. À Marée lunaire pleine, Graine lunaire devient Déferlante lunaire."
       },
       "rejuvenation": {
         "name": "Floraison sauvage",
@@ -7912,24 +7912,24 @@ export const fr_CA: EnTranslations = {
         "description": "Consume un effet de soins sur la durée sur une cible alliée pour lui rendre {damage} points de vie. (signature Restauration)"
       },
       "moonlash": {
-        "name": "Moonsurge",
-        "description": "Consumes 3 Moontide for a heavy Arcane strike: the damage choice. Spends the same bank as Sunwake, so pick one."
+        "name": "Déferlante lunaire",
+        "description": "Consomme 3 Marée lunaire pour une frappe d'Arcane lourde : le choix des dégâts. Dépense la même réserve que Sillage solaire, alors choisissez-en un."
       },
       "sunlance": {
-        "name": "Sunwake",
-        "description": "Consumes 3 Moontide for a Nature strike and burn and restores 35 mana: the economy choice. Spends the same bank as Moonsurge, so pick one."
+        "name": "Sillage solaire",
+        "description": "Consomme 3 Marée lunaire pour une frappe de Nature avec brûlure et rend 35 points de mana : le choix de l'économie. Dépense la même réserve que Déferlante lunaire, alors choisissez-en un."
       },
       "redharvest": {
-        "name": "Redharvest",
-        "description": "Consumes 3 Old Blood, detonates all remaining Flense and Bloodrift damage you own on the target, and restores 30 energy. Any combo points held strengthen the bite but are never required."
+        "name": "Moisson rouge",
+        "description": "Consomme 3 Sang ancien, fait détoner tous les dégâts restants d'Écorcher et de Lacération que vous possédez sur la cible et rend 30 points d'énergie. Les points de combo détenus renforcent la morsure mais ne sont jamais requis."
       },
       "marrowbreak": {
-        "name": "Marrowbreak",
-        "description": "Consumes 3 Old Blood for a heavy, high-threat strike. Below half health, instead absorbs 18% of maximum health for 8 sec and restores 15 rage."
+        "name": "Brise-moelle",
+        "description": "Consomme 3 Sang ancien pour une frappe lourde à haute menace. Sous la moitié des points de vie, absorbe à la place 18% des points de vie maximum pendant 8 s et rend 15 points de rage."
       },
       "overbloom": {
-        "name": "Overbloom",
-        "description": "Consumes 5 Verdance. Harvests every heal over time you own on all allies for 60% of its remaining healing, removes those effects, and plants a fresh Wildbloom on the target."
+        "name": "Surfloraison",
+        "description": "Consomme 5 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour 60% de ses soins restants, retire ces effets et plante une Floraison sauvage fraîche sur la cible."
       },
       "summon_imp": {
         "name": "Invoquer un Emberkin",

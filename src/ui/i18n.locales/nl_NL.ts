@@ -9707,4 +9707,32 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Makersmerk',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Meesterwerkbonus',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Opdrachtbinding',
+
+  // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
+  'entities.abilities.marrowbreak.name': 'Mergbreker',
+  'entities.abilities.marrowbreak.description':
+    'Verbruikt 3 Oud Bloed voor een zware slag met hoge dreiging. Onder de helft van je gezondheid absorbeert hij in plaats daarvan 18% van je maximale gezondheid gedurende 8 sec en herstelt 15 woede.',
+  'entities.abilities.moonlash.name': 'Maangolf',
+  'entities.abilities.moonlash.description':
+    'Verbruikt 3 Maanvloed voor een zware Arcane-slag: de schadekeuze. Put uit dezelfde bank als Zonnespoor, dus kies er een.',
+  'entities.abilities.moonseed.name': 'Maanzaad',
+  'entities.abilities.moonseed.description':
+    'Alleen in Maanuilvorm. Slaat toe voor {damage} Arcane-schade, voegt een Maanvloed-stadium toe en verlengt je Maanstorm met 6 sec, tot 6 sec per toepassing. Bij volle Maanvloed wordt Maanzaad Maangolf.',
+  'entities.abilities.overbloom.name': 'Overbloei',
+  'entities.abilities.overbloom.description':
+    'Verbruikt 5 Groenkracht. Oogst elke genezing over tijd die je op alle bondgenoten hebt voor 60% van de resterende genezing, verwijdert die effecten en plant een verse Wildbloei op het doelwit.',
+  'entities.abilities.redharvest.name': 'Rode Oogst',
+  'entities.abilities.redharvest.description':
+    'Verbruikt 3 Oud Bloed, laat alle resterende schade van Villen en Verscheuren die je op het doelwit hebt ontploffen en herstelt 30 energie. Vastgehouden combopunten versterken de beet maar zijn nooit vereist.',
+  'entities.abilities.sunlance.name': 'Zonnespoor',
+  'entities.abilities.sunlance.description':
+    'Verbruikt 3 Maanvloed voor een Natuur-slag met brandwond en herstelt 35 mana: de zuinige keuze. Put uit dezelfde bank als Maangolf, dus kies er een.',
+  'guide.abilityHook.moonseed':
+    'Voegt een Maanvloed-stadium toe en verlengt Maanstorm zolang je in Maanuilvorm bent.',
+  'hudChrome.auraEffect.moontide':
+    'Maanvloed: stadium {stacks} van {max}. Wildbout-, Hemelval- en Maanzaad-spreuken vullen haar in Maanuilvorm; bij {max} wordt Maanzaad Maangolf en Hemelval Zonnespoor, en beide geven haar uit',
+  'hudChrome.auraEffect.oldBlood':
+    'Oud Bloed: stadium {stacks} van {max}. Gelande Wolfs- en Bruin-slagen delen deze bank; bij {max} transformeert Bloedbeet of Botverbrijzelen',
+  'hudChrome.auraEffect.verdance':
+    'Groenkracht: stadium {stacks} van {max}. Voltooide Wildbloei- en Tweede Bloei-spreuken vullen haar; bij {max} wordt Snelle genezing Overbloei',
 };

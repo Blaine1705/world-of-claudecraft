@@ -9711,4 +9711,32 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Marca do criador',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Bônus de obra-prima',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Vínculo da encomenda',
+
+  // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
+  'entities.abilities.marrowbreak.name': 'Quebra-Medula',
+  'entities.abilities.marrowbreak.description':
+    'Consome 3 de Sangue Antigo para um golpe pesado de alta ameaça. Abaixo de metade da vida, em vez disso absorve 18% da vida máxima por 8 s e restaura 15 de fúria.',
+  'entities.abilities.moonlash.name': 'Onda Lunar',
+  'entities.abilities.moonlash.description':
+    'Consome 3 de Maré Lunar para um golpe Arcano pesado: a escolha de dano. Gasta o mesmo banco que Esteira Solar, então escolha um.',
+  'entities.abilities.moonseed.name': 'Semente Lunar',
+  'entities.abilities.moonseed.description':
+    'Somente na Forma de Luniscante. Atinge por {damage} de dano Arcano, adiciona um estágio de Maré Lunar e estende sua Tempestade Lunar em 6 s, até 6 s por aplicação. Com a Maré Lunar cheia, Semente Lunar vira Onda Lunar.',
+  'entities.abilities.overbloom.name': 'Superflorescência',
+  'entities.abilities.overbloom.description':
+    'Consome 5 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por 60% da cura restante, remove esses efeitos e planta um Florescer Selvagem novo no alvo.',
+  'entities.abilities.redharvest.name': 'Colheita Vermelha',
+  'entities.abilities.redharvest.description':
+    'Consome 3 de Sangue Antigo, detona todo o dano restante de Esfolar e Rasgar que você possui no alvo e restaura 30 de energia. Pontos de combo retidos fortalecem a mordida, mas nunca são exigidos.',
+  'entities.abilities.sunlance.name': 'Esteira Solar',
+  'entities.abilities.sunlance.description':
+    'Consome 3 de Maré Lunar para um golpe de Natureza com queimadura e restaura 35 de mana: a escolha econômica. Gasta o mesmo banco que Onda Lunar, então escolha um.',
+  'guide.abilityHook.moonseed':
+    'Adiciona um estágio de Maré Lunar e estende Tempestade Lunar enquanto você está na Forma de Luniscante.',
+  'hudChrome.auraEffect.moontide':
+    'Maré Lunar: estágio {stacks} de {max}. Lançamentos de Raio Selvagem, Queda Celeste e Semente Lunar a enchem na Forma de Luniscante; com {max}, Semente Lunar vira Onda Lunar e Queda Celeste vira Esteira Solar, e qualquer uma a gasta',
+  'hudChrome.auraEffect.oldBlood':
+    'Sangue Antigo: estágio {stacks} de {max}. Golpes conectados de Lobo e Bruin compartilham este banco; com {max}, Mordida Sanguinária ou Esmaga-Ossos se transforma',
+  'hudChrome.auraEffect.verdance':
+    'Verdor: estágio {stacks} de {max}. Lançamentos completados de Florescer Selvagem e Segundo Florescer o enchem; com {max}, Recuperação Rápida vira Superflorescência',
 };

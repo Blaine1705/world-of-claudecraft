@@ -9793,4 +9793,32 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Zeichen des Herstellers',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Meisterwerkbonus',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Auftragsbindung',
+
+  // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
+  'entities.abilities.marrowbreak.name': 'Markbrecher',
+  'entities.abilities.marrowbreak.description':
+    'Verbraucht 3 Altes Blut für einen schweren Schlag mit hoher Bedrohung. Unter halber Gesundheit absorbiert er stattdessen 18% der maximalen Gesundheit für 8 Sek. und stellt 15 Wut wieder her.',
+  'entities.abilities.moonlash.name': 'Mondwoge',
+  'entities.abilities.moonlash.description':
+    'Verbraucht 3 Mondflut für einen schweren Arkanschlag: die Schadenswahl. Zehrt von derselben Bank wie Sonnenspur, also wählt eine.',
+  'entities.abilities.moonseed.name': 'Mondsaat',
+  'entities.abilities.moonseed.description':
+    'Nur in Mondkingestalt. Trifft für {damage} Arkanschaden, fügt eine Mondflut-Stufe hinzu und verlängert Euren Mondsturm um 6 Sek., bis zu 6 Sek. pro Anwendung. Bei voller Mondflut wird Mondsaat zu Mondwoge.',
+  'entities.abilities.overbloom.name': 'Überblüte',
+  'entities.abilities.overbloom.description':
+    'Verbraucht 5 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für 60% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Wildblüte auf das Ziel.',
+  'entities.abilities.redharvest.name': 'Rote Ernte',
+  'entities.abilities.redharvest.description':
+    'Verbraucht 3 Altes Blut, bringt allen verbleibenden Schinden- und Zerfetzen-Schaden, den Ihr auf dem Ziel besitzt, zur Detonation und stellt 30 Energie wieder her. Gehaltene Combopunkte stärken den Biss, sind aber nie erforderlich.',
+  'entities.abilities.sunlance.name': 'Sonnenspur',
+  'entities.abilities.sunlance.description':
+    'Verbraucht 3 Mondflut für einen Naturschlag mit Brand und stellt 35 Mana wieder her: die Sparwahl. Zehrt von derselben Bank wie Mondwoge, also wählt eine.',
+  'guide.abilityHook.moonseed':
+    'Fügt eine Mondflut-Stufe hinzu und verlängert Mondsturm, solange Ihr in Mondkingestalt seid.',
+  'hudChrome.auraEffect.moontide':
+    'Mondflut: Stufe {stacks} von {max}. Wildblitz-, Himmelssturz- und Mondsaat-Zauber füllen sie in Mondkingestalt; bei {max} wird Mondsaat zu Mondwoge und Himmelssturz zu Sonnenspur, und beide zehren von ihr',
+  'hudChrome.auraEffect.oldBlood':
+    'Altes Blut: Stufe {stacks} von {max}. Gelandete Wolfs- und Bruin-Schläge teilen sich diese Bank; bei {max} verwandelt sich Blutbiss oder Knochenmalmer',
+  'hudChrome.auraEffect.verdance':
+    'Grünkraft: Stufe {stacks} von {max}. Abgeschlossene Wildblüte- und Zweite-Blüte-Zauber füllen sie; bei {max} wird Rasche Heilung zu Überblüte',
 };

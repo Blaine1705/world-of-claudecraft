@@ -9579,4 +9579,32 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Skaberens mærke',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Mesterværksbonus',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Kommissionsbinding',
+
+  // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
+  'entities.abilities.marrowbreak.name': 'Marvbrækker',
+  'entities.abilities.marrowbreak.description':
+    'Forbruger 3 Gammelt Blod til et tungt slag med høj trussel. Under halvt helbred absorberer det i stedet 18% af maksimalt helbred i 8 sek. og gendanner 15 raseri.',
+  'entities.abilities.moonlash.name': 'Månebølge',
+  'entities.abilities.moonlash.description':
+    'Forbruger 3 Måneflod til et tungt arkant slag: skadesvalget. Tærer på samme forråd som Solspor, så vælg et.',
+  'entities.abilities.moonseed.name': 'Månefrø',
+  'entities.abilities.moonseed.description':
+    'Kun i Månekinform. Rammer for {damage} arkan skade, tilføjer et Måneflod-trin og forlænger din Månestorm med 6 sek., op til 6 sek. pr. anvendelse. Ved fuld Måneflod bliver Månefrø til Månebølge.',
+  'entities.abilities.overbloom.name': 'Overblomstring',
+  'entities.abilities.overbloom.description':
+    'Forbruger 5 Grønske. Høster hver af dine helbredelser over tid på alle allierede for 60% af den resterende helbredelse, fjerner de virkninger og planter en frisk Vildblomst på målet.',
+  'entities.abilities.redharvest.name': 'Rød Høst',
+  'entities.abilities.redharvest.description':
+    'Forbruger 3 Gammelt Blod, detonerer al resterende skade fra Flæns og Sønderriv, som du ejer på målet, og gendanner 30 energi. Holdte kombopoint styrker biddet, men kræves aldrig.',
+  'entities.abilities.sunlance.name': 'Solspor',
+  'entities.abilities.sunlance.description':
+    'Forbruger 3 Måneflod til et naturslag med forbrænding og gendanner 35 mana: sparevalget. Tærer på samme forråd som Månebølge, så vælg et.',
+  'guide.abilityHook.moonseed':
+    'Tilføjer et Måneflod-trin og forlænger Månestorm, mens du er i Månekinform.',
+  'hudChrome.auraEffect.moontide':
+    'Måneflod: trin {stacks} af {max}. Vildlyn-, Himmelfald- og Månefrø-besværgelser fylder den i Månekinform; ved {max} bliver Månefrø til Månebølge og Himmelfald til Solspor, og begge tærer på den',
+  'hudChrome.auraEffect.oldBlood':
+    'Gammelt Blod: trin {stacks} af {max}. Landede Ulve- og Bruin-slag deler dette forråd; ved {max} forvandles Blodbid eller Knogleknus',
+  'hudChrome.auraEffect.verdance':
+    'Grønske: trin {stacks} af {max}. Fuldførte besværgelser af Vildblomst og Anden Blomstring fylder den; ved {max} bliver Hurtig heling til Overblomstring',
 };

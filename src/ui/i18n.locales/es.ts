@@ -9757,4 +9757,32 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Marca del artesano',
   'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Bonificación de obra maestra',
   'hudChrome.enchanting.replaceConfirmKeepsBond': 'Vínculo de encargo',
+
+  // Druid v0.29 spec engines (#2568): banks, payoffs, and the teaching layer.
+  'entities.abilities.marrowbreak.name': 'Quiebramédula',
+  'entities.abilities.marrowbreak.description':
+    'Consume 3 de Sangre Antigua para un golpe pesado de alta amenaza. Por debajo de la mitad de salud, en su lugar absorbe un 18% de la salud máxima durante 8 s y restaura 15 de ira.',
+  'entities.abilities.moonlash.name': 'Oleada Lunar',
+  'entities.abilities.moonlash.description':
+    'Consume 3 de Marea Lunar para un golpe Arcano pesado: la opción de daño. Gasta el mismo banco que Estela Solar, así que elige una.',
+  'entities.abilities.moonseed.name': 'Semilla Lunar',
+  'entities.abilities.moonseed.description':
+    'Solo en Forma de lechúcico lunar. Golpea por {damage} de daño Arcano, añade una fase de Marea Lunar y extiende tu Tempestad Lunar 6 s, hasta 6 s por aplicación. Con la Marea Lunar llena, Semilla Lunar se convierte en Oleada Lunar.',
+  'entities.abilities.overbloom.name': 'Sobrefloración',
+  'entities.abilities.overbloom.description':
+    'Consume 5 de Verdor. Cosecha cada sanación periódica tuya en todos los aliados por un 60% de su sanación restante, elimina esos efectos y planta una Floración Silvestre nueva en el objetivo.',
+  'entities.abilities.redharvest.name': 'Cosecha Roja',
+  'entities.abilities.redharvest.description':
+    'Consume 3 de Sangre Antigua, detona todo el daño restante de Desollar y Desgarrar que tengas en el objetivo y restaura 30 de energía. Los puntos de combo retenidos refuerzan el mordisco, pero nunca son necesarios.',
+  'entities.abilities.sunlance.name': 'Estela Solar',
+  'entities.abilities.sunlance.description':
+    'Consume 3 de Marea Lunar para un golpe de Naturaleza con quemadura y restaura 35 de maná: la opción de economía. Gasta el mismo banco que Oleada Lunar, así que elige una.',
+  'guide.abilityHook.moonseed':
+    'Añade una fase de Marea Lunar y extiende Tempestad Lunar mientras estás en Forma de lechúcico lunar.',
+  'hudChrome.auraEffect.moontide':
+    'Marea Lunar: fase {stacks} de {max}. Los lanzamientos de Descarga Silvestre, Caída Celeste y Semilla Lunar la llenan en Forma de lechúcico lunar; con {max}, Semilla Lunar se convierte en Oleada Lunar y Caída Celeste en Estela Solar, y cualquiera de las dos la gasta',
+  'hudChrome.auraEffect.oldBlood':
+    'Sangre Antigua: fase {stacks} de {max}. Los golpes conectados de lobo y Bruin comparten este banco; con {max}, Mordisco Sangriento o Rompehuesos se transforma',
+  'hudChrome.auraEffect.verdance':
+    'Verdor: fase {stacks} de {max}. Los lanzamientos completados de Floración Silvestre y Segundo Florecer lo llenan; con {max}, Alivio presto se convierte en Sobrefloración',
 };
