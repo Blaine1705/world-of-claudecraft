@@ -2403,9 +2403,11 @@ export class Sim {
       // and pick up here, so a relog cannot reset them. A linkdead drop's
       // immediate safety-flush save freezes at drop time too, but the
       // character stays in the world with timers counting in live sim time,
-      // so the grace-expiry save overwrites it with the smaller remaining;
-      // only a crash inside the grace window leaves the drop-time freeze
-      // durable, and that freeze is never smaller than reality.
+      // so the autosave and then the grace-expiry save each overwrite it
+      // with a smaller remaining. For timers RUNNING at a save the freeze is
+      // never smaller than reality; the full story, including the
+      // cast-in-flight crash corner (which rolls back timer and yield
+      // together, value-neutral), lives in professions/node_persist.ts.
       meta.nodeHarvestReadyAt = applyNodeReadiness(s.nodeHarvestCooldowns, this.time);
       if (s.unlockedMilestones)
         for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
@@ -2540,10 +2542,20 @@ export class Sim {
       // mastery reset just fired on drops its record entirely: the reset
       // zeroed the skills, so a kept acknowledgement would sit ABOVE the
       // zeroed tier and silently swallow the whole re-climb's letters; the
-      // next sweep re-baselines at the reset tiers instead.
+      // next sweep re-baselines at the reset tiers instead. The drop guard
+      // reuses the reset gate's expression above VERBATIM (masteryResetApplied
+      // !== true) so the drop and the reset can never fire on different
+      // loads; keep the two textually identical.
       meta.tierMailSent = normalizeTierMailOnLoad(
         s.masteryResetApplied !== true ? undefined : s.tierMailSent,
       );
+      // Load runs the prune WITHOUT the transition sites' immediate baseline,
+      // deliberately: current majors keep their entries through the prune (so
+      // nothing acknowledgeable is dropped), a no-entry pre-deploy save is
+      // the intended silent migration baseline on the next 1 Hz sweep, and on
+      // a mastery-reset load the skills were just zeroed, so no crossing can
+      // land inside the sub-second window the transition-time baseline exists
+      // to close.
       pruneTierMailToActiveMajors(meta);
       meta.profTierTutorialSent = s.profTierTutorialSent === true;
       meta.delveMarks = s.delveMarks ?? 0;

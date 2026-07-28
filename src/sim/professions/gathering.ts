@@ -738,7 +738,11 @@ export function queueGatheringGrant(
 
 // One clamp rule for applying a queued grant to a proficiency record, shared
 // by the tick drain and the save-time fold below so the two can never disagree
-// about the cap.
+// about the cap. The GATHERING_PROFESSIONS lookup is deliberately unguarded:
+// every queue writer is typed (or validates via isGatheringProfessionId, the
+// /dev gather path). Note the fold puts this lookup on the SAVE path, so an
+// out-of-table id would fail the save (a retried leave flush), not just the
+// tick that drained it.
 function applyGrantClamped(record: GatheringProficiency, grant: PendingGatherGrant): void {
   record[grant.professionId] = Math.max(
     0,

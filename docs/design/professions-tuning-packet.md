@@ -120,9 +120,15 @@ expiry, so timers freeze across a logout and resume on load. Node readiness is
 the same shape. The freeze happens at the logout frame (the leave-time
 `serializeCharacter`). A linkdead drop's immediate safety-flush save freezes
 at drop time too, but the character stays in the world with timers counting
-in live sim time, so the grace-expiry save overwrites that snapshot with the
-smaller remaining; only a crash inside the grace window leaves the drop-time
-freeze durable, and it errs toward a longer wait, never a free reset.
+in live sim time, so the 30 s autosave (which covers linkdead sessions) and
+then the grace-expiry save each overwrite that snapshot with a smaller
+remaining; a crash inside the grace window makes whichever save landed last
+durable. For every timer running at a save, the freeze errs toward a longer
+wait. The one corner outside that guarantee: a gather cast still in flight
+at the drop resolves during grace, and a crash before the next save loses
+its timer together with the harvest's yield and proficiency grant, a
+value-neutral rollback of the whole harvest rather than a free reset that
+keeps the loot.
 
 The freeze is more player-visible on a 240 s node than on an ability
 cooldown: a player who logs out mid-route and returns days later still owes

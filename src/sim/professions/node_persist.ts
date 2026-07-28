@@ -14,10 +14,16 @@
 // the logout frame, where the character leaves the world through
 // serializeCharacter. A linkdead drop's immediate safety-flush save freezes at
 // drop time too, but the character stays in the world with its timers counting
-// in live sim time, so the grace-expiry save overwrites that snapshot with the
-// smaller remaining; only a crash inside the grace window leaves the drop-time
-// freeze durable, and a stale freeze is never smaller than reality, so the
-// error direction is a longer wait, never a free reset.
+// in live sim time, so the ~30 s autosave (which covers linkdead sessions) and
+// then the grace-expiry save each overwrite that snapshot with a smaller
+// remaining; a crash inside the grace window makes whichever save landed last
+// durable. For every timer RUNNING at a save, the frozen remaining is never
+// smaller than reality, so the error direction is a longer wait. The one
+// corner outside that guarantee: a gather cast still in flight at the drop
+// resolves during grace and writes its timer only to live memory, so a crash
+// before the next save loses that timer WITH the harvest's yield and
+// proficiency grant; the whole harvest rolls back together, value-neutral,
+// never a free reset that keeps the loot.
 //
 // Readiness stays strictly per-player (one player's timer never touches
 // another's; see the D6 ruling in docs/design/professions-tuning-packet.md).

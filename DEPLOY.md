@@ -226,6 +226,17 @@ For off-box safety, sync the directory to S3 occasionally:
   cannot honor future expiry times. Operators must either remove still-active timed bans
   before rollback or explicitly accept that they will become permanent until manually
   unbanned. Do not alter the nullable `expires_at` column during rollback.
+- **Professions rollback caveats**: `characters.state` is written whole, so rolling
+  back to a binary that predates a professions field erases that field on the first
+  autosave. Across the professions persistence release specifically: node respawn
+  timers (`nodeHarvestCooldowns`) are erased, which reopens the node relog exploit
+  for the rollback window (accepted trade, no player value lost); the tier-mail
+  acknowledgement prune is a one-way load heal whose only recovery is a database
+  backup; and any FUTURE proficiency or craft cap raise is rollback-destructive
+  (the old binary clamps raised values on load and persists the loss), so a
+  rollback across a cap change needs a restore-from-backup plan for professions
+  counters. Details: "Rollback erases newer fields" in
+  `docs/design/professions-tuning-packet.md`.
 - **Bank ledger audit**: `node scripts/bank_audit.mjs` (reads `DATABASE_URL` from the
   environment) replays the append-only `bank_ledger` against live character bank state
   and exits non-zero on any discrepancy. Run it after an economy incident or a restore.
