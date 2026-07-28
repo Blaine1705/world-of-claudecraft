@@ -53,7 +53,7 @@ import {
 import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { RAID_MAX } from '../src/sim/social/party';
-import type { VcMatch } from '../src/sim/social/vale_cup';
+import { VC_BRACKETS, type VcMatch, vcupPruneQueue } from '../src/sim/social/vale_cup';
 import {
   parseTalentAllocation,
   parseTalentLoadoutIndex,
@@ -5196,6 +5196,7 @@ export class GameServer {
             e.prevPos = { ...p };
             sim.grid.update(e);
             sim.playerGrid.update(e);
+            for (const bracket of VC_BRACKETS) vcupPruneQueue(sim.ctx, bracket);
           }
         }
         break;

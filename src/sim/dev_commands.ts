@@ -9,6 +9,7 @@ import { placeMobileStationForPlayer } from './professions/mobile_station';
 import { completeAllQuestsForDev } from './quests/dev_quest_commands';
 import type { SentChat } from './sim';
 import type { SimContext } from './sim_context';
+import { VC_BRACKETS, vcupPruneQueue } from './social/vale_cup';
 import { revivePlayerAt } from './spirit';
 import { MAX_LEVEL } from './types';
 
@@ -140,6 +141,7 @@ export function handleDevChat(
       entity.pos = pos;
       entity.prevPos = { ...pos };
       ctx.rebucket(entity);
+      for (const bracket of VC_BRACKETS) vcupPruneQueue(ctx, bracket);
       emitDevLog(ctx, pid, `[dev] Teleported to ${pos.x.toFixed(1)}, ${pos.z.toFixed(1)}.`);
     }
     return null;

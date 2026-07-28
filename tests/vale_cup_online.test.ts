@@ -35,6 +35,7 @@ import { dailyRewardService } from '../server/daily_rewards';
 import * as db from '../server/db';
 import { drainActivity } from '../server/discord_activity';
 import { type ClientSession, GameServer } from '../server/game';
+import { DUNGEON_X_THRESHOLD } from '../src/sim/data';
 import { VC_OVER_DELAY } from '../src/sim/social/vale_cup';
 import type { PlayerClass } from '../src/sim/types';
 import { PITCH_CENTER } from '../src/sim/vale_cup_layout';
@@ -181,6 +182,49 @@ describe('vale cup: online integration (GameServer)', () => {
     cmd(server, session, { cmd: 'vcup_leave' });
     advance(server);
     expect(eventsOf(fc, 'vcupUnqueued')).toHaveLength(1);
+  });
+
+  it('prunes a Vale Cup queuer after an online dev teleport crosses into the instance x-band', () => {
+    const prior = process.env.ALLOW_DEV_COMMANDS;
+    process.env.ALLOW_DEV_COMMANDS = '1';
+    const devServer = new GameServer();
+    try {
+      const fcA = fakeWs();
+      const alpha = joinServer(devServer, fcA, 240, 'Alpha');
+      const fcB = fakeWs();
+      const beta = joinServer(devServer, fcB, 241, 'Beta');
+      teleport(devServer.sim, alpha.pid, 0, -40);
+      teleport(devServer.sim, beta.pid, 4, -40);
+
+      cmd(devServer, alpha, {
+        cmd: 'vcup_queue',
+        bracket: 1,
+        nation: 'vale',
+        role: 'allrounder',
+      });
+      cmd(devServer, alpha, {
+        cmd: 'dev_teleport',
+        x: DUNGEON_X_THRESHOLD + 2450,
+        z: -40,
+      });
+      cmd(devServer, beta, {
+        cmd: 'vcup_queue',
+        bracket: 1,
+        nation: 'coliseum',
+        role: 'allrounder',
+      });
+      advance(devServer);
+
+      expect(devServer.sim.entities.get(alpha.pid)?.pos.x).toBe(DUNGEON_X_THRESHOLD + 2450);
+      expect(devServer.sim.vcup.match).toBeNull();
+      expect(devServer.sim.cupInfoFor(alpha.pid)?.queued).toBe(false);
+      expect(devServer.sim.cupInfoFor(beta.pid)?.queued).toBe(true);
+      expect(eventsOf(fcA, 'vcupFound')).toHaveLength(0);
+      expect(eventsOf(fcB, 'vcupFound')).toHaveLength(0);
+    } finally {
+      if (prior === undefined) delete process.env.ALLOW_DEV_COMMANDS;
+      else process.env.ALLOW_DEV_COMMANDS = prior;
+    }
   });
 
   it('derives liveHidden per viewer: a practicing player is shipped liveHidden, a participant is not', () => {
