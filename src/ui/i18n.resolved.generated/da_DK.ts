@@ -667,7 +667,7 @@ export const da_DK: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% rabat",
+      "railWocDiscount": "{percent}% rabat",
       "railWocUnavailable": "WOC-priser er ikke tilgængelige lige nu.",
       "railNativeUnavailable": "SOL/WOC er slået fra.",
       "amountLabel": "Beløb",
@@ -1473,6 +1473,7 @@ export const da_DK: EnTranslations = {
       "harvestButton": "Høst",
       "harvestTooltip": "Indsamler de markerede komponenter. Hvert kadaver kan kun hostes en gang, og det gælder for den første der kommer. Tager ikke byttet.",
       "concentrateHint": "Jo færre dele du vælger, desto højere kvalitetsgrad får hver enkelt.",
+      "nothingSelectedYields": "Intet af det du har valgt kan høstes fra dette kadaver.",
       "alreadyHarvested": "Dette kadaver er allerede blevet høstet.",
       "componentAria": "Høst {component}",
       "components": {
@@ -2044,8 +2045,8 @@ export const da_DK: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Afhentning fra Verdensmarkedet venter",
-      "tip": "Guld eller genstande venter på dig hos Købmanden."
+      "aria": "Verdensmarkedsprovenu eller genstande venter",
+      "tip": "Salgsprovenu eller returnerede genstande venter på dig hos Købmanden."
     },
     "noticeboard": {
       "empty": "Der ser ikke ud til at være slået noget op."
@@ -2189,6 +2190,9 @@ export const da_DK: EnTranslations = {
       "notReady": "Denne ressourcekilde er endnu ikke genskabt for dig.",
       "gatherLine": "Du samler: {name}.",
       "gatherLineQty": "Du samler: {name} x{qty}.",
+      "harvestLine": "Du høster: {name}.",
+      "harvestLineQty": "Du høster: {name} x{qty}.",
+      "harvestSpecimenLine": "Du får også {name}.",
       "catchLine": "Du hiver ind: {name}",
       "biteLine": "Noget tager madden!",
       "gotAwayLine": "Det slap væk.",
@@ -2370,7 +2374,7 @@ export const da_DK: EnTranslations = {
       "empty": "Ingen opskrifter kendt endnu.",
       "resultAria": "Håndværk {name}",
       "craftedToast": "Udformet: {name}",
-      "craftedToastQty": "Fremstillet: {name} x{qty}",
+      "craftedToastQty": "Udformet: {name} x{qty}",
       "insufficientMaterials": "Det har du ikke materialerne til.",
       "unknownRecipe": "Den opskrift findes ikke.",
       "comboRequirementUnmet": "Du har ikke begge de krævede håndværk på det krævede niveau til den opskrift.",
@@ -2465,11 +2469,11 @@ export const da_DK: EnTranslations = {
       "disenchantedLine": "Du affortrylles {item}.",
       "disenchantedYield": "Du affortryller {item} til {material}.",
       "disenchantedYieldQty": "Du affortryller {item} til {material} x{qty}.",
-      "disenchantedAlso": "Du får også {material} tilbage.",
-      "disenchantedAlsoQty": "Du får også {material} x{qty} tilbage.",
+      "disenchantedAlso": "Du genvinder også {material}.",
+      "disenchantedAlsoQty": "Du genvinder også {material} x{qty}.",
       "salvagedLine": "Du bjærger {item}.",
-      "salvagedYield": "Du bjærger {material} fra {item}.",
-      "salvagedYieldQty": "Du bjærger {material} x{qty} fra {item}.",
+      "salvagedYield": "Du bjærger {item} til {material}.",
+      "salvagedYieldQty": "Du bjærger {item} til {material} x{qty}.",
       "enchantAppliedLine": "Du fortrylles {item} med {enchant}.",
       "notHeld": "Du har ikke den genstand.",
       "notDisenchantable": "Du kan ikke affortrylle det.",
@@ -2506,9 +2510,14 @@ export const da_DK: EnTranslations = {
       "sameEnchant": "Den genstand har allerede den fortryllelse.",
       "replaceTag": "Erstatter {enchant}",
       "sameEnchantTag": "Allerede anvendt",
+      "plainTag": "Ikke fortryllet",
       "replaceConfirmTitle": "Erstat fortryllelsen på {item}?",
       "replaceConfirmBody": "Dette erstatter {old} på {item} med {new}.",
       "replaceConfirmNoRefund": "Den gamle fortryllelse ødelægges. Dens materialer refunderes ikke. Dette kan ikke fortrydes.",
+      "replaceConfirmKeeps": "Beholdes: {kept}",
+      "replaceConfirmKeepsSigner": "Skaberens mærke",
+      "replaceConfirmKeepsMasterwork": "Mesterværksbonus",
+      "replaceConfirmKeepsBond": "Kommissionsbinding",
       "replaceConfirmCost": "Pris: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Erstat"

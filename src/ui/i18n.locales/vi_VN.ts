@@ -2090,6 +2090,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.title': 'Lịch Sự Kiện',
   'hudChrome.calendar.titlePlaceholder': 'Tiêu đề sự kiện',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Xác này đã bị thu hoạch rồi.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Không thể thu hoạch bộ phận nào bạn đã chọn từ xác này.',
   'hudChrome.corpseHarvest.componentAria': 'Thu hoạch {component}',
   'hudChrome.corpseHarvest.components.claw': 'Móng Vuốt',
   'hudChrome.corpseHarvest.components.fang': 'Nanh',
@@ -8248,7 +8250,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Thẻ',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': 'Giảm 20%',
+  'hudChrome.claudium.railWocDiscount': 'Giảm {percent}%',
   'hudChrome.claudium.railWocUnavailable': 'Giá WOC hiện không có sẵn.',
   'hudChrome.claudium.showAmounts': 'Hiển thị tất cả số lượng Claudium',
   'hudChrome.claudium.skuRow': '{usd} đổi lấy {claudium} Claudium',
@@ -9125,6 +9127,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmTitle': 'Chấp nhận Cái Giá của Người Canh Giữ?',
   'hudChrome.gathering.gatherLine': 'Bạn tập hợp: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Bạn tập hợp: {name} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Bạn thu hoạch: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Bạn thu hoạch: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Bạn cũng thu được {name}.',
   'hudChrome.mobile.professions': 'Nghề nghiệp',
   'hudChrome.options.showThirdActionBar': 'Hiển thị thanh hành động thứ ba',
   'hudChrome.playerMenu.streamerBadgeTitle': 'Người phát trực tiếp đã được xác minh',
@@ -9295,8 +9300,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} đến {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Đã Pháp Khắc',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Đã Pháp Khắc)',
-  'hudChrome.marketIndicator.aria': 'Có hàng chờ thu tại Chợ Thế Giới',
-  'hudChrome.marketIndicator.tip': 'Vàng hoặc vật phẩm đang chờ bạn tại Thương Nhân.',
+  'hudChrome.marketIndicator.aria': 'Tiền bán hoặc vật phẩm Chợ Thế Giới đang chờ',
+  'hudChrome.marketIndicator.tip':
+    'Tiền bán hàng hoặc vật phẩm bị trả lại đang chờ bạn tại Thương Nhân.',
   'hudChrome.materialHint.arcaneDust':
     'Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị phổ thông và khác thường.',
   'hudChrome.materialHint.arcaneEssence':
@@ -9350,13 +9356,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paladin.ascensionLastAnnouncement': 'Thăng Thiên: lượt cuối',
   'hudChrome.paladin.ascensionSpenderAria':
     'Ô hành động {slot}: {ability}. Tiêu tốn một lượt Thăng Thiên.',
-  'hudChrome.crafting.craftedToastQty': 'Đã chế tạo: {name} x{qty}',
-  'hudChrome.enchanting.disenchantedAlso': 'Bạn cũng thu lại được {material}.',
-  'hudChrome.enchanting.disenchantedAlsoQty': 'Bạn cũng thu lại được {material} x{qty}.',
-  'hudChrome.enchanting.disenchantedYield': 'Bạn giải phù {item} và thu được {material}.',
-  'hudChrome.enchanting.disenchantedYieldQty': 'Bạn giải phù {item} và thu được {material} x{qty}.',
-  'hudChrome.enchanting.salvagedYield': 'Bạn tháo được {material} từ {item}.',
-  'hudChrome.enchanting.salvagedYieldQty': 'Bạn tháo được {material} x{qty} từ {item}.',
   'hudChrome.auraEffect.dawnsWrath':
     'BTN: mọi mức máu · +1 lượt dùng · Hồi chiêu 0 · +{pct}% sát thương',
   'hudChrome.auraEffect.duskEconomy': 'Kỹ năng tốn ít hơn {pct}% năng lượng',
@@ -9612,4 +9611,16 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Đi xuyên qua một nhóm để đánh dấu chúng, làm cùn sát thương của chúng lên bạn và ghim chặt mức đe dọa.',
   'guide.abilityHook.warspirit_cadence':
     'Biến nhịp vũ khí đều đặn thành Tiếng Vọng Tâm Phong và một cơ hội niệm phép tức thời.',
+  'hudChrome.crafting.craftedToastQty': 'Đã chế tác: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Bạn hủy pháp khắc {item} thành {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Bạn hủy pháp khắc {item} thành {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Bạn cũng thu hồi {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Bạn cũng thu hồi {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Bạn tháo dỡ {item} thành {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Bạn tháo dỡ {item} thành {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Chưa pháp khắc',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Giữ lại: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Dấu người chế tạo',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Thưởng tuyệt phẩm',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Ràng buộc ủy thác',
 };

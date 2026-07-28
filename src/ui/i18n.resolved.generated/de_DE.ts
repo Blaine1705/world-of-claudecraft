@@ -667,7 +667,7 @@ export const de_DE: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% Rabatt",
+      "railWocDiscount": "{percent}% Rabatt",
       "railWocUnavailable": "WOC-Preise sind derzeit nicht verfügbar.",
       "railNativeUnavailable": "SOL/WOC deaktiviert.",
       "amountLabel": "Menge",
@@ -1473,6 +1473,7 @@ export const de_DE: EnTranslations = {
       "harvestButton": "Verwerten",
       "harvestTooltip": "Verwirft die markierten Komponenten. Jeder Kadaver kann einmal verwertet werden, wer zuerst kommt. Nimmt nicht die Beute.",
       "concentrateHint": "Je weniger Teile du wählst, desto höher ist die Qualitätsstufe jedes einzelnen Teils.",
+      "nothingSelectedYields": "An diesem Kadaver gibt es nichts aus deiner Auswahl zu verwerten.",
       "alreadyHarvested": "Dieser Kadaver wurde bereits verwertet.",
       "componentAria": "{component} verwerten",
       "components": {
@@ -2044,8 +2045,8 @@ export const de_DE: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Abholung auf dem Weltmarkt wartet",
-      "tip": "Gold oder Gegenstände warten beim Händler auf dich."
+      "aria": "Weltmarkt-Erlöse oder Gegenstände warten",
+      "tip": "Verkaufserlöse oder zurückgegebene Gegenstände warten beim Händler auf dich."
     },
     "noticeboard": {
       "empty": "Hier scheint nichts ausgehängt zu sein."
@@ -2189,6 +2190,9 @@ export const de_DE: EnTranslations = {
       "notReady": "Dieser Ressourcenknoten ist fur dich noch nicht nachgewachsen.",
       "gatherLine": "Sie sammeln: {name}.",
       "gatherLineQty": "Sie sammeln: {name} x{qty}.",
+      "harvestLine": "Ihr häutet: {name}.",
+      "harvestLineQty": "Ihr häutet: {name} x{qty}.",
+      "harvestSpecimenLine": "Ihr erhaltet außerdem {name}.",
       "catchLine": "Du holst ein: {name}",
       "biteLine": "Etwas nimmt den Köder!",
       "gotAwayLine": "Es ist entkommen.",
@@ -2463,13 +2467,13 @@ export const de_DE: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Du entzauberst {item}.",
-      "disenchantedYield": "Ihr entzaubert {item} zu {material}.",
-      "disenchantedYieldQty": "Ihr entzaubert {item} zu {material} x{qty}.",
-      "disenchantedAlso": "Ihr erhaltet außerdem {material}.",
-      "disenchantedAlsoQty": "Ihr erhaltet außerdem {material} x{qty}.",
+      "disenchantedYield": "Du entzauberst {item} zu {material}.",
+      "disenchantedYieldQty": "Du entzauberst {item} zu {material} x{qty}.",
+      "disenchantedAlso": "Du gewinnst außerdem {material}.",
+      "disenchantedAlsoQty": "Du gewinnst außerdem {material} x{qty}.",
       "salvagedLine": "Du zerlegst {item}.",
-      "salvagedYield": "Ihr gewinnt {material} aus {item}.",
-      "salvagedYieldQty": "Ihr gewinnt {material} x{qty} aus {item}.",
+      "salvagedYield": "Du zerlegst {item} zu {material}.",
+      "salvagedYieldQty": "Du zerlegst {item} zu {material} x{qty}.",
       "enchantAppliedLine": "Du verzauberst {item} mit {enchant}.",
       "notHeld": "Du hast diesen Gegenstand nicht.",
       "notDisenchantable": "Du kannst das nicht entzaubern.",
@@ -2506,9 +2510,14 @@ export const de_DE: EnTranslations = {
       "sameEnchant": "Dieser Gegenstand hat diese Verzauberung bereits.",
       "replaceTag": "Ersetzt {enchant}",
       "sameEnchantTag": "Bereits angewendet",
+      "plainTag": "Nicht verzaubert",
       "replaceConfirmTitle": "Verzauberung auf {item} ersetzen?",
       "replaceConfirmBody": "Dies ersetzt {old} auf {item} durch {new}.",
       "replaceConfirmNoRefund": "Die alte Verzauberung wird zerstört. Ihre Materialien werden nicht erstattet. Dies kann nicht rückgängig gemacht werden.",
+      "replaceConfirmKeeps": "Bleibt erhalten: {kept}",
+      "replaceConfirmKeepsSigner": "Zeichen des Herstellers",
+      "replaceConfirmKeepsMasterwork": "Meisterwerkbonus",
+      "replaceConfirmKeepsBond": "Auftragsbindung",
       "replaceConfirmCost": "Kosten: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Ersetzen"

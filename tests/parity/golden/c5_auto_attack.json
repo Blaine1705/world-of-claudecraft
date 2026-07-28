@@ -288,22 +288,22 @@
       "tick": 120,
       "time": 6,
       "nextId": 425,
-      "state": "e2d0cf6e",
-      "events": "0e56ee29",
+      "state": "bcccce89",
+      "events": "c40b3cb4",
       "rng": {
-        "draws": 512,
-        "digest": "b0917a71"
+        "draws": 511,
+        "digest": "954f46bc"
       }
     },
     {
       "tick": 120,
       "time": 6,
       "nextId": 425,
-      "state": "e2d0cf6e",
+      "state": "bcccce89",
       "events": "741638a5",
       "rng": {
-        "draws": 512,
-        "digest": "b0917a71"
+        "draws": 511,
+        "digest": "954f46bc"
       },
       "label": "swings",
       "players": [
@@ -630,13 +630,13 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 21
+            "damageDealt": 20
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 21
+              "damageDealt": 20
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1234,7 +1234,7 @@
           "fallStartY": 2.551396,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499979,
+          "hp": 499980,
           "id": 424,
           "inCombat": true,
           "kind": "mob",
@@ -1269,7 +1269,7 @@
           "threat": [
             [
               419,
-              22
+              21
             ]
           ],
           "wanderTarget": {
@@ -1290,8 +1290,8 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 425,
-      "state": "d1b1d567",
-      "events": "ce4c6a2a",
+      "state": "16afee7a",
+      "events": "d249a6b8",
       "rng": {
         "draws": 553,
         "digest": "dc2eba52"
@@ -1301,7 +1301,7 @@
       "tick": 126,
       "time": 6.3,
       "nextId": 425,
-      "state": "5f1dbdcd",
+      "state": "6db0ddd2",
       "events": "741638a5",
       "rng": {
         "draws": 562,
@@ -1324,7 +1324,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 242,
+            "damageDealt": 243,
             "damageTaken": 23
           },
           "craftSkills": {},
@@ -1332,7 +1332,7 @@
           "deedStats": {
             "counters": {
               "crits": 1,
-              "damageDealt": 242
+              "damageDealt": 243
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1403,7 +1403,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 113,
-            "damageTaken": 27
+            "damageTaken": 26
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -1480,7 +1480,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 73,
-            "damageTaken": 39
+            "damageTaken": 38
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -1632,13 +1632,13 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 21
+            "damageDealt": 20
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 21
+              "damageDealt": 20
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -1777,7 +1777,7 @@
           "dualWielding": true,
           "fallStartY": -3.203049,
           "fiveSecondRule": 105.3,
-          "hp": 79973,
+          "hp": 79974,
           "id": 416,
           "inCombat": true,
           "kind": "player",
@@ -1840,7 +1840,7 @@
           "dodgeChance": 0.0835,
           "fallStartY": -3.063027,
           "fiveSecondRule": 105.3,
-          "hp": 79961,
+          "hp": 79962,
           "id": 417,
           "inCombat": true,
           "kind": "player",
@@ -2004,7 +2004,7 @@
           "fallStartY": -1.689975,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499758,
+          "hp": 499757,
           "id": 420,
           "inCombat": true,
           "kind": "mob",
@@ -2040,7 +2040,7 @@
           "threat": [
             [
               415,
-              480
+              481
             ]
           ],
           "weapon": {
@@ -2234,7 +2234,7 @@
           "fallStartY": 2.551396,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499979,
+          "hp": 499980,
           "id": 424,
           "inCombat": true,
           "kind": "mob",
@@ -2269,7 +2269,7 @@
           "threat": [
             [
               419,
-              22
+              21
             ]
           ],
           "wanderTarget": {
@@ -2290,7 +2290,7 @@
       "tick": 126,
       "time": 6.3,
       "nextId": 425,
-      "state": "5f1dbdcd",
+      "state": "6db0ddd2",
       "events": "741638a5",
       "rng": {
         "draws": 562,
@@ -2313,7 +2313,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 242,
+            "damageDealt": 243,
             "damageTaken": 23
           },
           "craftSkills": {},
@@ -2321,7 +2321,7 @@
           "deedStats": {
             "counters": {
               "crits": 1,
-              "damageDealt": 242
+              "damageDealt": 243
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -2392,7 +2392,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 113,
-            "damageTaken": 27
+            "damageTaken": 26
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -2469,7 +2469,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 73,
-            "damageTaken": 39
+            "damageTaken": 38
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -2621,13 +2621,13 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 21
+            "damageDealt": 20
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 21
+              "damageDealt": 20
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -2766,7 +2766,7 @@
           "dualWielding": true,
           "fallStartY": -3.203049,
           "fiveSecondRule": 105.3,
-          "hp": 79973,
+          "hp": 79974,
           "id": 416,
           "inCombat": true,
           "kind": "player",
@@ -2829,7 +2829,7 @@
           "dodgeChance": 0.0835,
           "fallStartY": -3.063027,
           "fiveSecondRule": 105.3,
-          "hp": 79961,
+          "hp": 79962,
           "id": 417,
           "inCombat": true,
           "kind": "player",
@@ -2993,7 +2993,7 @@
           "fallStartY": -1.689975,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499758,
+          "hp": 499757,
           "id": 420,
           "inCombat": true,
           "kind": "mob",
@@ -3029,7 +3029,7 @@
           "threat": [
             [
               415,
-              480
+              481
             ]
           ],
           "weapon": {
@@ -3223,7 +3223,7 @@
           "fallStartY": 2.551396,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499979,
+          "hp": 499980,
           "id": 424,
           "inCombat": true,
           "kind": "mob",
@@ -3258,7 +3258,7 @@
           "threat": [
             [
               419,
-              22
+              21
             ]
           ],
           "wanderTarget": {

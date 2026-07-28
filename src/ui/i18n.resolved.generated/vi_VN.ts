@@ -667,7 +667,7 @@ export const vi_VN: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "Giảm 20%",
+      "railWocDiscount": "Giảm {percent}%",
       "railWocUnavailable": "Giá WOC hiện không có sẵn.",
       "railNativeUnavailable": "SOL/WOC hiện không khả dụng.",
       "amountLabel": "Số lượng",
@@ -1473,6 +1473,7 @@ export const vi_VN: EnTranslations = {
       "harvestButton": "Thu Hoạch",
       "harvestTooltip": "Thu thập các bộ phận đã chọn. Mỗi xác chỉ có thể thu hoạch một lần, ai đến trước được trước. Không lấy chiến lợi phẩm.",
       "concentrateHint": "Chọn càng ít bộ phận, mỗi bộ phận thu được sẽ có bậc chất lượng càng cao.",
+      "nothingSelectedYields": "Không thể thu hoạch bộ phận nào bạn đã chọn từ xác này.",
       "alreadyHarvested": "Xác này đã bị thu hoạch rồi.",
       "componentAria": "Thu hoạch {component}",
       "components": {
@@ -2044,8 +2045,8 @@ export const vi_VN: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Có hàng chờ thu tại Chợ Thế Giới",
-      "tip": "Vàng hoặc vật phẩm đang chờ bạn tại Thương Nhân."
+      "aria": "Tiền bán hoặc vật phẩm Chợ Thế Giới đang chờ",
+      "tip": "Tiền bán hàng hoặc vật phẩm bị trả lại đang chờ bạn tại Thương Nhân."
     },
     "noticeboard": {
       "empty": "Có vẻ như chưa có gì được dán lên."
@@ -2189,6 +2190,9 @@ export const vi_VN: EnTranslations = {
       "notReady": "Điểm tài nguyên này chưa hồi sinh lại dành cho bạn.",
       "gatherLine": "Bạn tập hợp: {name}.",
       "gatherLineQty": "Bạn tập hợp: {name} x{qty}.",
+      "harvestLine": "Bạn thu hoạch: {name}.",
+      "harvestLineQty": "Bạn thu hoạch: {name} x{qty}.",
+      "harvestSpecimenLine": "Bạn cũng thu được {name}.",
       "catchLine": "Bạn giật cần: {name}",
       "biteLine": "Có thứ gì đó cắn mồi!",
       "gotAwayLine": "Nó thoát mất rồi.",
@@ -2370,7 +2374,7 @@ export const vi_VN: EnTranslations = {
       "empty": "Chưa có công thức nấu ăn nào được biết đến.",
       "resultAria": "Thủ công {name}",
       "craftedToast": "Đã chế tác: {name}",
-      "craftedToastQty": "Đã chế tạo: {name} x{qty}",
+      "craftedToastQty": "Đã chế tác: {name} x{qty}",
       "insufficientMaterials": "Bạn không có tài liệu cho việc đó.",
       "unknownRecipe": "Công thức đó không tồn tại.",
       "comboRequirementUnmet": "Bạn chưa có cả hai nghề chế tạo cần thiết ở bậc yêu cầu cho công thức đó.",
@@ -2463,13 +2467,13 @@ export const vi_VN: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Bạn hủy pháp khắc {item}.",
-      "disenchantedYield": "Bạn giải phù {item} và thu được {material}.",
-      "disenchantedYieldQty": "Bạn giải phù {item} và thu được {material} x{qty}.",
-      "disenchantedAlso": "Bạn cũng thu lại được {material}.",
-      "disenchantedAlsoQty": "Bạn cũng thu lại được {material} x{qty}.",
+      "disenchantedYield": "Bạn hủy pháp khắc {item} thành {material}.",
+      "disenchantedYieldQty": "Bạn hủy pháp khắc {item} thành {material} x{qty}.",
+      "disenchantedAlso": "Bạn cũng thu hồi {material}.",
+      "disenchantedAlsoQty": "Bạn cũng thu hồi {material} x{qty}.",
       "salvagedLine": "Bạn tháo dỡ {item}.",
-      "salvagedYield": "Bạn tháo được {material} từ {item}.",
-      "salvagedYieldQty": "Bạn tháo được {material} x{qty} từ {item}.",
+      "salvagedYield": "Bạn tháo dỡ {item} thành {material}.",
+      "salvagedYieldQty": "Bạn tháo dỡ {item} thành {material} x{qty}.",
       "enchantAppliedLine": "Bạn pháp khắc {item} với {enchant}.",
       "notHeld": "Bạn không có vật phẩm đó.",
       "notDisenchantable": "Bạn không thể hủy pháp khắc vật phẩm đó.",
@@ -2506,9 +2510,14 @@ export const vi_VN: EnTranslations = {
       "sameEnchant": "Vật phẩm đó đã có phép khắc đó rồi.",
       "replaceTag": "Thay Thế {enchant}",
       "sameEnchantTag": "Đã Áp Dụng",
+      "plainTag": "Chưa pháp khắc",
       "replaceConfirmTitle": "Thay Thế Pháp Khắc Trên {item}?",
       "replaceConfirmBody": "Thao tác này thay thế {old} trên {item} bằng {new}.",
       "replaceConfirmNoRefund": "Pháp khắc cũ sẽ bị phá hủy. Nguyên liệu của nó sẽ không được hoàn lại. Không thể hoàn tác.",
+      "replaceConfirmKeeps": "Giữ lại: {kept}",
+      "replaceConfirmKeepsSigner": "Dấu người chế tạo",
+      "replaceConfirmKeepsMasterwork": "Thưởng tuyệt phẩm",
+      "replaceConfirmKeepsBond": "Ràng buộc ủy thác",
       "replaceConfirmCost": "Chi phí: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Thay Thế"

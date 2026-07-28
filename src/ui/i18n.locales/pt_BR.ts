@@ -5629,6 +5629,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.compass.SW': 'SO',
   'hudChrome.compass.W': 'O',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Este cadáver já foi coletado.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Nada do que você selecionou pode ser coletado deste cadáver.',
   'hudChrome.corpseHarvest.componentAria': 'Coletar {component}',
   'hudChrome.corpseHarvest.components.claw': 'Garra',
   'hudChrome.corpseHarvest.components.fang': 'Presa',
@@ -8253,7 +8255,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Cartão',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20% de desconto',
+  'hudChrome.claudium.railWocDiscount': '{percent}% de desconto',
   'hudChrome.claudium.railWocUnavailable': 'O preço do WOC não está disponível no momento.',
   'hudChrome.claudium.showAmounts': 'Mostrar todos os valores de Claudium',
   'hudChrome.claudium.skuRow': '{claudium} Claudium por {usd}',
@@ -9065,6 +9067,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmTitle': 'Aceitar o Tributo do Guardião?',
   'hudChrome.gathering.gatherLine': 'Você coleta: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Você coleta: {name} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Você esfolou: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Você esfolou: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Você também recupera {name}.',
   'hudChrome.mobile.professions': 'Profissões',
   'hudChrome.options.showThirdActionBar': 'Mostrar terceira barra de ação',
   'hudChrome.playerMenu.streamerBadgeTitle': 'Streamer verificado',
@@ -9381,8 +9386,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} a {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Encantado',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Encantado)',
-  'hudChrome.marketIndicator.aria': 'Coleta do Mercado Mundial pendente',
-  'hudChrome.marketIndicator.tip': 'Há ouro ou itens esperando por você com o Mercador.',
+  'hudChrome.marketIndicator.aria': 'Receita ou itens do Mercado Mundial aguardam',
+  'hudChrome.marketIndicator.tip':
+    'Receita de vendas ou itens devolvidos estão esperando por você com o Mercador.',
   'hudChrome.materialHint.arcaneDust':
     'Reagente de encantamento. Desencantado de equipamento comum e incomum.',
   'hudChrome.materialHint.arcaneEssence':
@@ -9436,13 +9442,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paladin.ascensionLastAnnouncement': 'Ascensão: última carga',
   'hudChrome.paladin.ascensionSpenderAria':
     'Espaço de ação {slot}: {ability}. Consome uma carga de Ascensão.',
-  'hudChrome.crafting.craftedToastQty': 'Fabricado: {name} x{qty}',
-  'hudChrome.enchanting.disenchantedAlso': 'Você também recupera {material}.',
-  'hudChrome.enchanting.disenchantedAlsoQty': 'Você também recupera {material} x{qty}.',
-  'hudChrome.enchanting.disenchantedYield': 'Você desencanta {item} e obtém {material}.',
-  'hudChrome.enchanting.disenchantedYieldQty': 'Você desencanta {item} e obtém {material} x{qty}.',
-  'hudChrome.enchanting.salvagedYield': 'Você recupera {material} de {item}.',
-  'hudChrome.enchanting.salvagedYieldQty': 'Você recupera {material} x{qty} de {item}.',
   'hudChrome.auraEffect.dawnsWrath': 'MdI: qualquer vida · +1 uso · Recarga 0 · +{pct}% de dano',
   'hudChrome.auraEffect.duskEconomy': 'As habilidades custam {pct}% menos energia',
   'hudChrome.auraEffect.hunterFerocity':
@@ -9700,4 +9699,16 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Atravesse um grupo para marcá-lo, abrandar seu dano contra você e firmar a ameaça.',
   'guide.abilityHook.warspirit_cadence':
     'Transforma um ritmo de arma constante em Ecos do Coração de Vendaval e em uma oportunidade de magia instantânea.',
+  'hudChrome.crafting.craftedToastQty': 'Feito: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Você desencanta {item} em {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Você desencanta {item} em {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Você também recupera {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Você também recupera {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Você recupera {item} em {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Você recupera {item} em {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Sem encantamento',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Mantém: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Marca do criador',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Bônus de obra-prima',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Vínculo da encomenda',
 };

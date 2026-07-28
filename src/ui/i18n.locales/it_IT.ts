@@ -5666,6 +5666,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.compass.SW': 'SO',
   'hudChrome.compass.W': 'O',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Questo cadavere è già stato raccolto.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Questo cadavere non ha nulla da raccogliere tra i componenti selezionati.',
   'hudChrome.corpseHarvest.componentAria': 'Raccogli {component}',
   'hudChrome.corpseHarvest.components.claw': 'Artiglio',
   'hudChrome.corpseHarvest.components.fang': 'Zanna',
@@ -8406,7 +8408,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Carta',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20% di sconto',
+  'hudChrome.claudium.railWocDiscount': '{percent}% di sconto',
   'hudChrome.claudium.railWocUnavailable': 'I prezzi WOC non sono disponibili al momento.',
   'hudChrome.claudium.showAmounts': 'Mostra tutti gli importi di Claudium',
   'hudChrome.claudium.skuRow': '{usd} per {claudium} Claudium',
@@ -9249,6 +9251,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmTitle': 'Accettare il Mal di resurrezione?',
   'hudChrome.gathering.gatherLine': 'Raccogli: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Raccogli: {name} x {qty}.',
+  'hudChrome.gathering.harvestLine': 'Scuoi: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Scuoi: {name} x {qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Recuperi anche {name}.',
   'hudChrome.mobile.professions': 'Professioni',
   'hudChrome.options.showThirdActionBar': 'Mostra la terza barra delle azioni',
   'hudChrome.playerMenu.streamerBadgeTitle': 'Streamer verificato',
@@ -9421,8 +9426,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': 'Da {min} a {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Incantato',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Incantato)',
-  'hudChrome.marketIndicator.aria': 'Ritiro in attesa dal Mercato Mondiale',
-  'hudChrome.marketIndicator.tip': 'Oro o oggetti ti aspettano al Mercante.',
+  'hudChrome.marketIndicator.aria': 'Ricavi o oggetti del Mercato Mondiale in attesa',
+  'hudChrome.marketIndicator.tip':
+    'Ricavi di vendita o oggetti restituiti ti aspettano dal Mercante.',
   'hudChrome.materialHint.arcaneDust':
     "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento comune e non comune.",
   'hudChrome.materialHint.arcaneEssence':
@@ -9477,13 +9483,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paladin.ascensionLastAnnouncement': 'Ascensione: ultima carica',
   'hudChrome.paladin.ascensionSpenderAria':
     'Slot azione {slot}: {ability}. Consuma una carica di Ascensione.',
-  'hudChrome.crafting.craftedToastQty': 'Creato: {name} x{qty}',
-  'hudChrome.enchanting.disenchantedAlso': 'Recuperi anche {material}.',
-  'hudChrome.enchanting.disenchantedAlsoQty': 'Recuperi anche {material} x{qty}.',
-  'hudChrome.enchanting.disenchantedYield': 'Disincanti {item} ottenendo {material}.',
-  'hudChrome.enchanting.disenchantedYieldQty': 'Disincanti {item} ottenendo {material} x{qty}.',
-  'hudChrome.enchanting.salvagedYield': 'Recuperi {material} da {item}.',
-  'hudChrome.enchanting.salvagedYieldQty': 'Recuperi {material} x{qty} da {item}.',
   'hudChrome.auraEffect.dawnsWrath': 'MdI: qualsiasi salute · +1 uso · Recupero 0 · +{pct}% danni',
   'hudChrome.auraEffect.duskEconomy': 'Le abilità costano il {pct}% di energia in meno',
   'hudChrome.auraEffect.hunterFerocity':
@@ -9741,4 +9740,16 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Attraversa un gruppo per marchiarlo, smussarne i danni contro di te e assicurarti la minaccia.',
   'guide.abilityHook.warspirit_cadence':
     "Trasforma un ritmo d'arma costante in Echi del Cuore di Bufera e in un'occasione di incantesimo istantaneo.",
+  'hudChrome.crafting.craftedToastQty': 'Realizzato: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Disincanti {item} in {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Disincanti {item} in {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Recuperi anche {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Recuperi anche {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Smantelli {item} in {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Smantelli {item} in {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Non incantato',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Conserva: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Marchio del creatore',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Bonus capolavoro',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Vincolo di commissione',
 };

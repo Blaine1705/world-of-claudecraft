@@ -2078,6 +2078,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.title': 'Kalender Acara',
   'hudChrome.calendar.titlePlaceholder': 'Judul acara',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Bangkai ini sudah dipanen.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Tidak ada pilihanmu yang bisa dipanen dari bangkai ini.',
   'hudChrome.corpseHarvest.componentAria': 'Panen {component}',
   'hudChrome.corpseHarvest.components.claw': 'Cakar',
   'hudChrome.corpseHarvest.components.fang': 'Taring',
@@ -8301,7 +8303,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Kartu',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': 'Diskon 20%.',
+  'hudChrome.claudium.railWocDiscount': 'Diskon {percent}%.',
   'hudChrome.claudium.railWocUnavailable': 'Harga WOC tidak tersedia saat ini.',
   'hudChrome.claudium.showAmounts': 'Tampilkan semua jumlah Claudium',
   'hudChrome.claudium.skuRow': '{usd} untuk {claudium} Claudium',
@@ -9180,6 +9182,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.fishing': 'Memancing',
   'hudChrome.gathering.gatherLine': 'Anda mengumpulkan: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Anda mengumpulkan: {name} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Anda memanen: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Anda memanen: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Anda juga mendapatkan {name}.',
   'hudChrome.gathering.gotAwayLine': 'Ikannya kabur.',
   'hudChrome.gathering.nodeName.herb': 'Petak Herba',
   'hudChrome.gathering.nodeName.ore': 'Urat Bijih',
@@ -9370,8 +9375,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} hingga {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Dimantrai',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Dimantrai)',
-  'hudChrome.marketIndicator.aria': 'Pengambilan Pasar Dunia menanti',
-  'hudChrome.marketIndicator.tip': 'Emas atau barang menantimu di Sang Pedagang.',
+  'hudChrome.marketIndicator.aria': 'Hasil atau barang Pasar Dunia menanti',
+  'hudChrome.marketIndicator.tip':
+    'Hasil penjualan atau barang yang dikembalikan menantimu di Sang Pedagang.',
   'hudChrome.materialHint.arcaneDust':
     'Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan umum dan tak biasa.',
   'hudChrome.materialHint.arcaneEssence':
@@ -9426,14 +9432,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paladin.ascensionLastAnnouncement': 'Kenaikan: muatan terakhir',
   'hudChrome.paladin.ascensionSpenderAria':
     'Slot aksi {slot}: {ability}. Menghabiskan satu muatan Kenaikan.',
-  'hudChrome.crafting.craftedToastQty': 'Dibuat: {name} x{qty}',
-  'hudChrome.enchanting.disenchantedAlso': 'Kamu juga memperoleh kembali {material}.',
-  'hudChrome.enchanting.disenchantedAlsoQty': 'Kamu juga memperoleh kembali {material} x{qty}.',
-  'hudChrome.enchanting.disenchantedYield': 'Kamu melepas pesona {item} menjadi {material}.',
-  'hudChrome.enchanting.disenchantedYieldQty':
-    'Kamu melepas pesona {item} menjadi {material} x{qty}.',
-  'hudChrome.enchanting.salvagedYield': 'Kamu menyelamatkan {material} dari {item}.',
-  'hudChrome.enchanting.salvagedYieldQty': 'Kamu menyelamatkan {material} x{qty} dari {item}.',
   'hudChrome.auraEffect.dawnsWrath':
     'PM: berapa pun nyawa · +1 penggunaan · Jeda 0 · +{pct}% kerusakan',
   'hudChrome.auraEffect.duskEconomy': 'Kemampuan menghabiskan {pct}% lebih sedikit energi',
@@ -9691,4 +9689,18 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menembus satu kelompok untuk menandainya, menumpulkan kerusakannya terhadapmu, dan mengunci ancaman.',
   'guide.abilityHook.warspirit_cadence':
     'Mengubah irama senjata yang mantap menjadi Gema Hati Badai dan peluang mantra seketika.',
+  'hudChrome.crafting.craftedToastQty': 'Dibuat: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield':
+    'Kamu menghancurkan pemantraan {item} menjadi {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty':
+    'Kamu menghancurkan pemantraan {item} menjadi {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Kamu juga memulihkan {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Kamu juga memulihkan {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Kamu menyalvasi {item} menjadi {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Kamu menyalvasi {item} menjadi {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Belum dimantrai',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Dipertahankan: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Tanda pembuat',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Bonus mahakarya',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Ikatan komisi',
 };

@@ -667,7 +667,7 @@ export const pl_PL: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% zniżki",
+      "railWocDiscount": "{percent}% zniżki",
       "railWocUnavailable": "Ceny WOC są obecnie niedostępne.",
       "railNativeUnavailable": "SOL/WOC są obecnie niedostępne.",
       "amountLabel": "Kwota",
@@ -1473,6 +1473,7 @@ export const pl_PL: EnTranslations = {
       "harvestButton": "Zbierz",
       "harvestTooltip": "Zbiera zaznaczone komponenty. Każde zwloki można zebrać raz, pierwszemu podejdzie. Nie zabiera łupów.",
       "concentrateHint": "Im mniej części wybierzesz, tym wyższa jakość każdej z nich.",
+      "nothingSelectedYields": "Z tego truchła nie zbierzesz żadnej z wybranych części.",
       "alreadyHarvested": "Z tego truchła już wszystko zebrano.",
       "componentAria": "Zbierz: {component}",
       "components": {
@@ -2044,8 +2045,8 @@ export const pl_PL: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "Oczekujący odbiór z Rynku Świata",
-      "tip": "Złoto lub przedmioty czekają na ciebie u Kupca."
+      "aria": "Przychody lub przedmioty z Rynku Świata czekają",
+      "tip": "Przychody ze sprzedaży lub zwrócone przedmioty czekają na ciebie u Kupca."
     },
     "noticeboard": {
       "empty": "Wygląda na to, że nic tu nie wywieszono."
@@ -2189,6 +2190,9 @@ export const pl_PL: EnTranslations = {
       "notReady": "Ten węzeł zasobu jeszcze nie odrósł dla ciebie.",
       "gatherLine": "Zbierasz: {name}.",
       "gatherLineQty": "Zbierasz: {name} x{qty}.",
+      "harvestLine": "Oprawiasz: {name}.",
+      "harvestLineQty": "Oprawiasz: {name} x{qty}.",
+      "harvestSpecimenLine": "Otrzymujesz też {name}.",
       "catchLine": "Wyciągasz: {name}",
       "biteLine": "Coś wzięło przynętę!",
       "gotAwayLine": "Uciekło.",
@@ -2370,7 +2374,7 @@ export const pl_PL: EnTranslations = {
       "empty": "Nie są jeszcze znane żadne przepisy.",
       "resultAria": "Craft {name}",
       "craftedToast": "Wykonane: {name}",
-      "craftedToastQty": "Wytworzono: {name} x{qty}",
+      "craftedToastQty": "Wykonane: {name} x{qty}",
       "insufficientMaterials": "Nie masz na to materiałów.",
       "unknownRecipe": "Ten przepis nie istnieje.",
       "comboRequirementUnmet": "Nie masz obu wymaganych rzemiosł na wymaganym poziomie dla tego przepisu.",
@@ -2463,13 +2467,13 @@ export const pl_PL: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Rozbrajasz {item}.",
-      "disenchantedYield": "Odczarowujesz {item}, otrzymując {material}.",
-      "disenchantedYieldQty": "Odczarowujesz {item}, otrzymując {material} x{qty}.",
-      "disenchantedAlso": "Odzyskujesz również {material}.",
-      "disenchantedAlsoQty": "Odzyskujesz również {material} x{qty}.",
+      "disenchantedYield": "Rozbrajasz {item} na {material}.",
+      "disenchantedYieldQty": "Rozbrajasz {item} na {material} x{qty}.",
+      "disenchantedAlso": "Odzyskujesz też {material}.",
+      "disenchantedAlsoQty": "Odzyskujesz też {material} x{qty}.",
       "salvagedLine": "Odzyskujesz {item}.",
-      "salvagedYield": "Odzyskujesz {material} z {item}.",
-      "salvagedYieldQty": "Odzyskujesz {material} x{qty} z {item}.",
+      "salvagedYield": "Odzyskujesz {item} jako {material}.",
+      "salvagedYieldQty": "Odzyskujesz {item} jako {material} x{qty}.",
       "enchantAppliedLine": "Zaklinasz {item} za pomocą {enchant}.",
       "notHeld": "Nie posiadasz tego przedmiotu.",
       "notDisenchantable": "Nie możesz tego rozbroić.",
@@ -2506,9 +2510,14 @@ export const pl_PL: EnTranslations = {
       "sameEnchant": "Ten przedmiot już ma to zaklęcie.",
       "replaceTag": "Zastępuje {enchant}",
       "sameEnchantTag": "Już zastosowane",
+      "plainTag": "Bez zaklęcia",
       "replaceConfirmTitle": "Zastąpić zaklęcie na {item}?",
       "replaceConfirmBody": "Zastępuje {old} na {item} zaklęciem {new}.",
       "replaceConfirmNoRefund": "Stare zaklęcie zostaje zniszczone. Jego materiały nie są zwracane. Nie można tego cofnąć.",
+      "replaceConfirmKeeps": "Zachowane: {kept}",
+      "replaceConfirmKeepsSigner": "Znak twórcy",
+      "replaceConfirmKeepsMasterwork": "Premia arcydzieła",
+      "replaceConfirmKeepsBond": "Więź zlecenia",
       "replaceConfirmCost": "Koszt: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
       "replaceConfirmAccept": "Zastąp"

@@ -4114,6 +4114,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.leaderboard.tabsLabel': 'Žebříčky nejlepších skóre',
   'hudChrome.leaderboard.topLevel': 'Nejvyšší',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Tato mrtvola už byla sklizena.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Z této mrtvoly nelze sklidit nic z vybraných komponent.',
   'hudChrome.corpseHarvest.componentAria': 'Sklidit {component}',
   'hudChrome.corpseHarvest.components.claw': 'Dráp',
   'hudChrome.corpseHarvest.components.fang': 'Tesák',
@@ -8241,7 +8243,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Karta',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': 'Sleva 20 %',
+  'hudChrome.claudium.railWocDiscount': 'Sleva {percent} %',
   'hudChrome.claudium.railWocUnavailable': 'Cena ve WOC nyní není dostupná.',
   'hudChrome.claudium.showAmounts': 'Zobrazit všechny nabídky Claudium',
   'hudChrome.claudium.skuRow': '{claudium} Claudium za {usd}',
@@ -8956,6 +8958,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmTitle': 'Přijmout strážcovo mýto?',
   'hudChrome.gathering.gatherLine': 'Shromažďujete: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Shromažďujete: {name} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Sklízíte: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Sklízíte: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Také získáváte {name}.',
   'hudChrome.mobile.professions': 'Profese',
   'hudChrome.options.showThirdActionBar': 'Zobrazit třetí panel akcí',
   'hudChrome.playerMenu.streamerBadgeTitle': 'Ověřený streamer',
@@ -9194,8 +9199,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} až {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Okouzlený',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (okouzleno)',
-  'hudChrome.marketIndicator.aria': 'Čeká vyzvednutí ze Světového trhu',
-  'hudChrome.marketIndicator.tip': 'U Obchodníka na tebe čekají zlato nebo předměty.',
+  'hudChrome.marketIndicator.aria': 'Čekají výnosy nebo předměty ze Světového trhu',
+  'hudChrome.marketIndicator.tip':
+    'U Obchodníka na tebe čekají výnosy z prodeje nebo vrácené předměty.',
   'hudChrome.materialHint.arcaneDust':
     'Reagencie k okouzlení. Získává se rozzačarováním běžné a neobvyklé výbavy.',
   'hudChrome.materialHint.arcaneEssence':
@@ -9249,13 +9255,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paladin.ascensionLastAnnouncement': 'Vzestup: poslední náboj',
   'hudChrome.paladin.ascensionSpenderAria':
     'Slot akce {slot}: {ability}. Spotřebuje jeden náboj Vzestupu.',
-  'hudChrome.crafting.craftedToastQty': 'Vyrobeno: {name} x{qty}',
-  'hudChrome.enchanting.disenchantedAlso': 'Získáváš také {material}.',
-  'hudChrome.enchanting.disenchantedAlsoQty': 'Získáváš také {material} x{qty}.',
-  'hudChrome.enchanting.disenchantedYield': 'Odčaruješ {item} a získáš {material}.',
-  'hudChrome.enchanting.disenchantedYieldQty': 'Odčaruješ {item} a získáš {material} x{qty}.',
-  'hudChrome.enchanting.salvagedYield': 'Vytěžíš {material} z {item}.',
-  'hudChrome.enchanting.salvagedYieldQty': 'Vytěžíš {material} x{qty} z {item}.',
   'hudChrome.auraEffect.dawnsWrath':
     'KH: libovolné zdraví · +1 použití · Obnova 0 · +{pct}% poškození',
   'hudChrome.auraEffect.duskEconomy': 'Schopnosti stojí o {pct}% méně energie',
@@ -9510,4 +9509,16 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Projdi skupinou, abys ji označil, otupil její poškození vůči tobě a upevnil hrozbu.',
   'guide.abilityHook.warspirit_cadence':
     'Promění ustálený rytmus zbraně v Ozvěny srdce vichru a příležitost k okamžitému kouzlu.',
+  'hudChrome.crafting.craftedToastQty': 'Vyrobeno: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Rozzačaruješ {item} na {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Rozzačaruješ {item} na {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Získáš také {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Získáš také {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Rozebereš {item} na {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Rozebereš {item} na {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Bez okouzlení',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Zůstane: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Značka výrobce',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Bonus mistrovského díla',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Vazba zakázky',
 };

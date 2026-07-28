@@ -6255,6 +6255,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.title': 'Kontroler',
   'hudChrome.controller.vibration': 'Wibracje',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Z tego truchła już wszystko zebrano.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Z tego truchła nie zbierzesz żadnej z wybranych części.',
   'hudChrome.corpseHarvest.componentAria': 'Zbierz: {component}',
   'hudChrome.corpseHarvest.components.claw': 'Pazur',
   'hudChrome.corpseHarvest.components.fang': 'Kieł',
@@ -8346,7 +8348,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Karta',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20% zniżki',
+  'hudChrome.claudium.railWocDiscount': '{percent}% zniżki',
   'hudChrome.claudium.railWocUnavailable': 'Ceny WOC są obecnie niedostępne.',
   'hudChrome.claudium.showAmounts': 'Pokaż wszystkie ilości Claudium',
   'hudChrome.claudium.skuRow': '{usd} dla {claudium} Claudium',
@@ -9144,6 +9146,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmTitle': 'Przyjąć Myto Strażnika?',
   'hudChrome.gathering.gatherLine': 'Zbierasz: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Zbierasz: {name} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Oprawiasz: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Oprawiasz: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Otrzymujesz też {name}.',
   'hudChrome.mobile.professions': 'Zawody',
   'hudChrome.options.showThirdActionBar': 'Pokaż trzeci pasek akcji',
   'hudChrome.playerMenu.streamerBadgeTitle': 'Zweryfikowany streamer',
@@ -9315,8 +9320,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': 'od {min} do {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Zaklęty',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Zaklęty)',
-  'hudChrome.marketIndicator.aria': 'Oczekujący odbiór z Rynku Świata',
-  'hudChrome.marketIndicator.tip': 'Złoto lub przedmioty czekają na ciebie u Kupca.',
+  'hudChrome.marketIndicator.aria': 'Przychody lub przedmioty z Rynku Świata czekają',
+  'hudChrome.marketIndicator.tip':
+    'Przychody ze sprzedaży lub zwrócone przedmioty czekają na ciebie u Kupca.',
   'hudChrome.materialHint.arcaneDust':
     'Składnik do zaklinania. Pozyskiwany z rozbrajania pospolitego i niezwykłego ekwipunku.',
   'hudChrome.materialHint.arcaneEssence':
@@ -9371,14 +9377,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paladin.ascensionLastAnnouncement': 'Wzniesienie: ostatni ładunek',
   'hudChrome.paladin.ascensionSpenderAria':
     'Slot akcji {slot}: {ability}. Zużywa jeden ładunek Wzniesienia.',
-  'hudChrome.crafting.craftedToastQty': 'Wytworzono: {name} x{qty}',
-  'hudChrome.enchanting.disenchantedAlso': 'Odzyskujesz również {material}.',
-  'hudChrome.enchanting.disenchantedAlsoQty': 'Odzyskujesz również {material} x{qty}.',
-  'hudChrome.enchanting.disenchantedYield': 'Odczarowujesz {item}, otrzymując {material}.',
-  'hudChrome.enchanting.disenchantedYieldQty':
-    'Odczarowujesz {item}, otrzymując {material} x{qty}.',
-  'hudChrome.enchanting.salvagedYield': 'Odzyskujesz {material} z {item}.',
-  'hudChrome.enchanting.salvagedYieldQty': 'Odzyskujesz {material} x{qty} z {item}.',
   'hudChrome.auraEffect.dawnsWrath':
     'MG: dowolne zdrowie · +1 użycie · Odnowienie 0 · +{pct}% obrażeń',
   'hudChrome.auraEffect.duskEconomy': 'Umiejętności kosztują o {pct}% mniej energii',
@@ -9637,4 +9635,16 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przejdź przez grupę, aby ją napiętnować, stępić jej obrażenia wobec ciebie i przypieczętować zagrożenie.',
   'guide.abilityHook.warspirit_cadence':
     'Zamienia równy rytm broni w Echa Serca Wichru i okazję do natychmiastowego zaklęcia.',
+  'hudChrome.crafting.craftedToastQty': 'Wykonane: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Rozbrajasz {item} na {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Rozbrajasz {item} na {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Odzyskujesz też {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Odzyskujesz też {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Odzyskujesz {item} jako {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Odzyskujesz {item} jako {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Bez zaklęcia',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Zachowane: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Znak twórcy',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Premia arcydzieła',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Więź zlecenia',
 };

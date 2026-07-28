@@ -1408,8 +1408,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
       fingerprint.update('\0');
     }
     expect(acceptedFiles).toHaveLength(4);
+    // Deliberately re-pinned for the 0.31.0 version sync: package-lock.json is
+    // in every Eastbrook source inventory, so the release version bump moved
+    // the composite provenance these records carry. No capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '395069d14c58e4e61f537c294f3ecd4a0a8973d015c2da3bd01a9b050baa6dda',
+      '53ad3f3a34b9490d04205602454a7d8ef246dbc181b22bb433a5b3c6426189c7',
     );
   });
 

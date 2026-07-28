@@ -7398,6 +7398,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.mining': 'Gruvdrift',
   'hudChrome.gathering.title': 'Insamling',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Det här kadavret har redan skördats.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Inget du valt kan skördas från det här kadavret.',
   'hudChrome.corpseHarvest.componentAria': 'Skörda {component}',
   'hudChrome.corpseHarvest.components.claw': 'Klo',
   'hudChrome.corpseHarvest.components.fang': 'Huggtand',
@@ -8161,7 +8163,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Kort',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20% rabatt',
+  'hudChrome.claudium.railWocDiscount': '{percent}% rabatt',
   'hudChrome.claudium.railWocUnavailable': 'WOC-priser är inte tillgängliga just nu.',
   'hudChrome.claudium.showAmounts': 'Visa alla Claudium-belopp',
   'hudChrome.claudium.skuRow': '{usd} för {claudium} Claudium',
@@ -8982,6 +8984,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmTitle': 'Acceptera Väktartullen?',
   'hudChrome.gathering.gatherLine': 'Du samlar: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Du samlar in: {name} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Du skördar: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Du skördar: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Du får också {name}.',
   'hudChrome.mobile.professions': 'Yrken',
   'hudChrome.options.showThirdActionBar': 'Visa tredje åtgärdsfältet',
   'hudChrome.playerMenu.streamerBadgeTitle': 'Verifierad streamer',
@@ -9263,8 +9268,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldLineRange': '{min} till {max} {item}',
   'hudChrome.itemTooltip.enchantedFallback': 'Förtrollad',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Förtrollad)',
-  'hudChrome.marketIndicator.aria': 'Hämtning väntar vid Världsmarknaden',
-  'hudChrome.marketIndicator.tip': 'Guld eller föremål väntar på dig hos Köpmannen.',
+  'hudChrome.marketIndicator.aria': 'Världsmarknadsintäkter eller föremål väntar',
+  'hudChrome.marketIndicator.tip':
+    'Försäljningsintäkter eller returnerade föremål väntar på dig hos Köpmannen.',
   'hudChrome.materialHint.arcaneDust':
     'Förtrollningsreagens. Fås genom avförtrollning av vanlig och ovanlig utrustning.',
   'hudChrome.materialHint.arcaneEssence':
@@ -9319,14 +9325,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paladin.ascensionLastAnnouncement': 'Upphöjelse: sista laddningen',
   'hudChrome.paladin.ascensionSpenderAria':
     'Handlingsplats {slot}: {ability}. Förbrukar en upphöjelseladdning.',
-  'hudChrome.crafting.craftedToastQty': 'Tillverkat: {name} x{qty}',
-  'hudChrome.enchanting.disenchantedAlso': 'Du får även tillbaka {material}.',
-  'hudChrome.enchanting.disenchantedAlsoQty': 'Du får även tillbaka {material} x{qty}.',
-  'hudChrome.enchanting.disenchantedYield': 'Du förtrollar bort {item} och får {material}.',
-  'hudChrome.enchanting.disenchantedYieldQty':
-    'Du förtrollar bort {item} och får {material} x{qty}.',
-  'hudChrome.enchanting.salvagedYield': 'Du bärgar {material} ur {item}.',
-  'hudChrome.enchanting.salvagedYieldQty': 'Du bärgar {material} x{qty} ur {item}.',
   'hudChrome.auraEffect.dawnsWrath': 'VH: all hälsa · +1 användning · Nedkylning 0 · +{pct}% skada',
   'hudChrome.auraEffect.duskEconomy': 'Förmågor kostar {pct}% mindre energi',
   'hudChrome.auraEffect.hunterFerocity': '{stacks} Flockvildhet: ditt husdjur gör {pct}% mer skada',
@@ -9580,4 +9578,16 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Gå genom en grupp för att märka den, trubba av dess skada mot dig och låsa fast hotet.',
   'guide.abilityHook.warspirit_cadence':
     'Förvandlar en stadig vapenrytm till Stormhjärteekon och ett tillfälle till en omedelbar besvärjelse.',
+  'hudChrome.crafting.craftedToastQty': 'Tillverkad: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Du avförtrollar {item} till {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Du avförtrollar {item} till {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Du återvinner också {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Du återvinner också {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Du bärgar {item} till {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Du bärgar {item} till {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Inte förtrollad',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Behålls: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Tillverkarens märke',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Mästerverksbonus',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Uppdragsbindning',
 };
