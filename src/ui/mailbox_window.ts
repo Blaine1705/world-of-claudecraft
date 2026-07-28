@@ -777,6 +777,19 @@ export class MailboxWindow {
       // Note that the qty input and Remove are never disabled in this painter,
       // so the skip changes nothing for them: they are the two rungs the old
       // hand-rolled chain took without a disabled check.
+      // `minus` and `plus` are DEFENSIVE rungs, not reachable fallbacks, and
+      // were equally unreachable in the chain this replaced: all three stepper
+      // controls are minted together under `owned > 1` above and qty is never
+      // disabled, so qty always intercepts before them. They earn their place
+      // the day qty can be disabled, and they cost nothing meanwhile. The
+      // reachable rungs are the preferred control, qty, and Remove (the last
+      // only when the stepper vanishes because owned dropped under two).
+      // KNOWN GAP, pre-existing and not this ladder's to fix: pressing Remove
+      // itself lands on <body>, because the parcel is gone from `attachments`
+      // so every rung for that item resolves undefined (and with one parcel
+      // staged, the empty-list return above skips the restore entirely).
+      // Degrading to a surviving parcel, or to the parcels container, needs a
+      // cross-item fallback this per-item ladder does not have.
       restoreFirstEnabled([
         preferred,
         controls?.qty,

@@ -3,9 +3,20 @@
 // A painter that wipes its own subtree (`innerHTML = ''`, then a fresh createElement
 // pass) destroys every control the player could be standing on. A keyboard player who
 // pressed `+` has the button removed from under them and lands on <body>, unable to
-// press it again. About a dozen src/ui painters answer that by hand and every copy does
-// the same two things: before the wipe, remember WHICH control had focus; after it,
-// focus the rebuilt equivalent, skipping any that came back disabled (#2528).
+// press it again. About a dozen src/ui painters answer that by hand, and each does the
+// same two things in outline: before the wipe, remember WHICH control had focus; after
+// it, focus the rebuilt equivalent, skipping any that came back disabled (#2528).
+//
+// "In outline" is the honest phrasing, because only the two callers of this module key
+// their controls off `data-focus-key`. The others carry a different identity entirely:
+// deeds_window a priority-ordered selector over four attributes, spellbook_window a
+// four-branch chain (two class-plus-dataset pairs, then two bare attribute markers),
+// claudium_window a discriminated union, professions_window a bare boolean, bank_window a
+// boolean plus a caret pair for its search box. Two more resolve the identity from a click
+// handler's argument and never read activeElement at all (options_window, char_window).
+// Migrating one of those means changing its rendered markup or its capture shape, not
+// swapping a call, which is why #2528 scoped this to the pair that already shares the
+// attribute.
 //
 // What stays with the CALLER is the interesting half: which fresh control is the
 // role-equivalent of the one that had focus, and what to degrade to when that one came
@@ -18,12 +29,15 @@
 //
 // DOM-touching by design (`document.activeElement` and the `instanceof` narrowing), so
 // this is NOT a registered pure core and NOT a UI_PAINTER_HELPERS entry either (that
-// contract bars `instanceof HTMLElement` outright). It is registered in UI_DOM_MODULES
-// in tests/architecture.test.ts, following the src/ui/dialog_root.ts precedent for a
-// small DOM-touching micro-pattern lifted out of a dozen painters. Taking the document
-// (or the already-read activeElement) as a parameter would keep it out of every list,
-// and is deliberately not done: that hands the one line each copy got wrong back to the
-// copies.
+// contract bars `instanceof HTMLElement` outright). It is registered in UI_DOM_MODULES in
+// tests/architecture.test.ts, the way ./focus_manager.ts is and for the same stated
+// reason. Note that registration is unavoidable rather than a choice of style: even a
+// version taking the document (or the already-read activeElement) as a PARAMETER still
+// trips UI_DOM_CONSTRUCTOR_RE on the `instanceof HTMLElement` alone, so parameterizing
+// would buy no exemption and would hand the one line each copy got wrong back to the
+// copies. (./dialog_root.ts, the other micro-pattern lifted out of a dozen painters,
+// really is unregistered, but only because it takes its element as a parameter AND does
+// no narrowing.)
 //
 // Deliberately NOT FocusManager's focusability model. That manager's `canFocus` predicate
 // is `isConnected && getClientRects().length > 0`, which is both a forced-reflow layout
@@ -38,8 +52,24 @@
  * more than one element type: town_focus_window's ladder is all buttons, but
  * mailbox_window's runs through the parcel's `<input type=number>` quantity field,
  * which is the candidate it most wants to keep. `disabled` is optional so a focusable
- * non-form node (a `tabIndex = 0` chip) is a legal candidate too, and reads as
- * never-disabled.
+ * non-form node (a `tabIndex = 0` span, which several windows paint) is a legal
+ * candidate too, and reads as never-disabled.
+ *
+ * TWO BOUNDARIES ON THE PREDICATE, both the caller's to respect:
+ * - It is the IDL `disabled` property ONLY. `aria-disabled="true"` is a live idiom in
+ *   this tree (bags_window paints deliberately focusable no-op buttons that way), and
+ *   such a node reads as ENABLED here. A caller with aria-disabled rungs has to filter
+ *   them out before it calls.
+ * - Nothing checks whether a candidate is visible or attached. Both callers rebuild and
+ *   then pass nodes from that fresh subtree, so the question does not arise; a caller
+ *   that could pass a detached or hidden node would have `focus()` no-op on it and the
+ *   walk would stop there. (This is deliberately NOT FocusManager's `canFocus`: see the
+ *   header.)
+ *
+ * `focus(): void` and not `focus(options?: FocusOptions): void` on purpose. The seam's
+ * policy is the bare call (stated on restoreFirstEnabled below), and the narrow signature
+ * is what keeps a future caller from quietly reintroducing the per-window divergence
+ * #2528 exists to end.
  */
 export interface FocusRestoreCandidate {
   readonly disabled?: boolean;
@@ -67,6 +97,12 @@ export interface FocusRestoreCandidate {
  * `instanceof HTMLElement` rather than a cast: `document.activeElement` is typed
  * `Element | null`, and the `dataset` read is only sound on an HTMLElement (an
  * `Element` has no `dataset` at all). focus_manager.ts narrows the same way.
+ *
+ * The one value this does NOT normalize: `data-focus-key=""` returns the empty string,
+ * not null, because that is what the attribute says. No caller writes an empty key today,
+ * but the two guard the result differently (`if (focusKey)` versus
+ * `if (focusKey !== null)`), so a caller that could mint one must decide which it means
+ * rather than inherit whichever its guard happens to be.
  */
 export function captureFocusKey(root: HTMLElement): string | null {
   const active = document.activeElement;
