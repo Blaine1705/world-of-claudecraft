@@ -481,6 +481,8 @@ export type TranslationKeyFlat =
   | 'desktop.update.restart'
   | 'devCommand.actions.attune.description'
   | 'devCommand.actions.attune.label'
+  | 'devCommand.actions.biskit.description'
+  | 'devCommand.actions.biskit.label'
   | 'devCommand.actions.bot.description'
   | 'devCommand.actions.bot.label'
   | 'devCommand.actions.combatreset.description'

@@ -127,6 +127,10 @@ export const ja_JP: EnTranslations = {
         "label": "新規20キットを装備",
         "description": "指定したスペック向けのSanctum以前レベル20プリセットを装備します (バッグを先に)。装備品のみです。"
       },
+      "biskit": {
+        "label": "BIS-20キットを装備",
+        "description": "指定したスペック向けの最高のエピック装備を全部位に装備します。装備品のみです。"
+      },
       "gold": {
         "label": "ゴールドを追加",
         "description": "現在の所持金にゴールドを追加します。"

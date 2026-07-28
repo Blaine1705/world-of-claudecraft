@@ -9445,6 +9445,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterValueAria': '{label}: {value}',
   'devCommand.actions.kit.description':
     'Die Vor-Heiligtum-Voreinstellung für Stufe 20 einer Spezialisierung anlegen, zuerst die Taschen. Nur Ausrüstung.',
+  'devCommand.actions.biskit.label': 'BIS-20-Set anlegen',
+  'devCommand.actions.biskit.description':
+    'Das beste Epos-Set einer Spezialisierung in jedem Platz anlegen. Nur Ausrüstung.',
   'devCommand.actions.kit.label': 'Frisch-20-Set anlegen',
   'devCommand.fields.spec': 'Spezialisierung',
   'devCommand.itemChosen': 'Ausgewählt: {name}',

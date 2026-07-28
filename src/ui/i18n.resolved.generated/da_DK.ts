@@ -127,6 +127,10 @@ export const da_DK: EnTranslations = {
         "label": "Udrust frisk 20-sæt",
         "description": "Ifør den forudindstillede niveau 20-opsætning fra før Sanctum til en specialisering, tasker først. Kun udstyr."
       },
+      "biskit": {
+        "label": "Udrust BIS 20-sæt",
+        "description": "Ifør en specialiserings bedste episke sæt i hver plads. Kun udstyr."
+      },
       "gold": {
         "label": "Tilføj guld",
         "description": "Føj guld til den aktuelle pung."

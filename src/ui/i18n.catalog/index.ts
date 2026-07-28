@@ -173,6 +173,10 @@ export const en = {
         label: 'Equip fresh-20 kit',
         description: 'Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only.',
       },
+      biskit: {
+        label: 'Equip BIS-20 kit',
+        description: 'Wear the best-in-slot epic set for a spec across every slot. Gear only.',
+      },
       gold: { label: 'Add gold', description: 'Add gold to the current purse.' },
       quest: { label: 'Complete quest', description: 'Complete a specific quest by id.' },
       quests: {

@@ -9365,6 +9365,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterValueAria': '{label}: {value}',
   'devCommand.actions.kit.description':
     'Veste o predefinido de nível 20 pré-Santuário de uma especialização, começando pelas bolsas. Somente equipamento.',
+  'devCommand.actions.biskit.label': 'Equipar kit BIS de nível 20',
+  'devCommand.actions.biskit.description':
+    'Veste o conjunto épico ideal de uma especialização em todas as posições. Somente equipamento.',
   'devCommand.actions.kit.label': 'Equipar kit de nível 20',
   'devCommand.fields.spec': 'Especialização',
   'devCommand.itemChosen': 'Selecionado: {name}',

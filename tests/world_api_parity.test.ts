@@ -213,6 +213,7 @@ export const IWORLD_MEMBERS = [
   { name: 'duelAccept', kind: 'method' },
   { name: 'duelDecline', kind: 'method' },
   { name: 'realm', kind: 'data' },
+  { name: 'accountAdmin', kind: 'data' },
   { name: 'socialInfo', kind: 'data' },
   // --- social graph commands + async search ---
   { name: 'friendAdd', kind: 'method' },
@@ -469,8 +470,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // surface, the mobile-station pair (placeMobileStation +
     // activeMobileStationCraft), the commissions unbindItem command, and
     // Paladin Consecration ground-state projection.
-    expect(IWORLD_MEMBERS.length).toBe(257);
-    expect(DATA_MEMBERS.length).toBe(70);
+    expect(IWORLD_MEMBERS.length).toBe(258);
+    expect(DATA_MEMBERS.length).toBe(71);
     expect(METHOD_MEMBERS.length).toBe(187);
   });
   it('has no duplicate member names', () => {
@@ -486,6 +487,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'abandonQuest',
       'acceptLinkedQuest',
       'acceptQuest',
+      'accountAdmin',
       'accountCosmetics',
       'accountFlair',
       'activeConsecrations',
@@ -744,6 +746,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
 
   it('the sorted data-kind set is exactly the pinned list', () => {
     expect(DATA_MEMBERS.map((m) => m.name).sort()).toEqual([
+      'accountAdmin',
       'accountCosmetics',
       'activeConsecrations',
       'activeFrostRings',
@@ -1071,6 +1074,7 @@ const FACET_ENTITY_ROSTER = [
   'player',
   'moveInput',
   'realm',
+  'accountAdmin',
 ] as const satisfies readonly (keyof IWorldEntityRoster)[];
 type _ExhaustEntityRoster = AssertNever<
   Exclude<keyof IWorldEntityRoster, (typeof FACET_ENTITY_ROSTER)[number]>
@@ -1523,8 +1527,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 28 fa
 
   it('the union of the facets equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(257);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(257);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(258);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(258);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

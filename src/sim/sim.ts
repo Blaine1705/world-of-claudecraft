@@ -8212,6 +8212,8 @@ export class Sim {
   // and database, so they only exist in online play. The offline Sim satisfies
   // the IWorld surface with inert stubs.
   realm = '';
+  // Offline the player owns the world, so admin-gated dev surfaces are open.
+  accountAdmin = true;
   socialInfo: null = null;
   friendAdd(_name: string): void {}
   friendRemove(_name: string): void {}

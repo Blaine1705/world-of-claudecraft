@@ -127,6 +127,10 @@ export const nl_NL: EnTranslations = {
         "label": "Kit voor vers niveau 20 uitrusten",
         "description": "Rust de niveau-20-set van vóór het Heiligdom uit voor een spec, eerst de tassen. Alleen uitrusting."
       },
+      "biskit": {
+        "label": "BIS-kit voor niveau 20 uitrusten",
+        "description": "Rust de beste epische set van een spec uit in elk vak. Alleen uitrusting."
+      },
       "gold": {
         "label": "Goud toevoegen",
         "description": "Voeg goud toe aan de huidige beurs."

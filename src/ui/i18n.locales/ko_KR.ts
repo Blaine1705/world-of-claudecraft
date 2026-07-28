@@ -9424,6 +9424,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemTooltip.enchantedFallback': '마법부여됨',
   'devCommand.actions.kit.description':
     '특성에 맞는 성소 입장 전 20레벨 사전 설정 장비를 가방부터 착용합니다. 장비만 해당됩니다.',
+  'devCommand.actions.biskit.label': '20레벨 최고 장비 세트 착용',
+  'devCommand.actions.biskit.description':
+    '특성에 맞는 부위별 최고 에픽 장비를 모든 부위에 착용합니다. 장비만 해당됩니다.',
   'devCommand.actions.kit.label': '20레벨 초기 장비 세트 착용',
   'devCommand.fields.spec': '전문화',
   'devCommand.itemChosen': '선택됨: {name}',

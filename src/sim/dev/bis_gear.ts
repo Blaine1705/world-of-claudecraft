@@ -75,11 +75,14 @@ export function bestEpicGearFor(
 
 // Applies the picks to the caller: dev-only direct equipment write, cleared
 // crafted-instance payloads, one stat recalc. Returns the equipped count.
-export function equipBestInSlotForDev(ctx: SimContext, pid: number): number {
+// `spec` overrides the character's current spec so one character can be dressed
+// for any of its class's specs (the /dev bis [spec] and BIS-20 kit GUI path);
+// omitted, the current spec decides as before.
+export function equipBestInSlotForDev(ctx: SimContext, pid: number, spec?: string): number {
   const meta = ctx.players.get(pid);
   const player = ctx.entities.get(pid);
   if (!meta || !player) return 0;
-  const picks = bestEpicGearFor(meta.cls, meta.talents?.spec ?? null);
+  const picks = bestEpicGearFor(meta.cls, spec ?? meta.talents?.spec ?? null);
   let equipped = 0;
   for (const [slot, itemId] of Object.entries(picks) as [EquipSlot, string][]) {
     meta.equipment[slot] = itemId;

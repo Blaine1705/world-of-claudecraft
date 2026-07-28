@@ -127,6 +127,10 @@ export const pt_BR: EnTranslations = {
         "label": "Equipar kit de nível 20",
         "description": "Veste o predefinido de nível 20 pré-Santuário de uma especialização, começando pelas bolsas. Somente equipamento."
       },
+      "biskit": {
+        "label": "Equipar kit BIS de nível 20",
+        "description": "Veste o conjunto épico ideal de uma especialização em todas as posições. Somente equipamento."
+      },
       "gold": {
         "label": "Adicionar ouro",
         "description": "Adiciona ouro à bolsa atual."

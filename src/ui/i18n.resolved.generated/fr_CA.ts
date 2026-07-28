@@ -127,6 +127,10 @@ export const fr_CA: EnTranslations = {
         "label": "Équiper un kit de niveau 20 fraîchement atteint",
         "description": "Enfile le kit de spécialisation niveau 20 pré-Sanctuaire, sacs d'abord. Équipement seul."
       },
+      "biskit": {
+        "label": "Équiper un kit BIS niveau 20",
+        "description": "Enfile l'ensemble épique optimal d'une spécialisation, dans chaque emplacement. Équipement seul."
+      },
       "gold": {
         "label": "Ajouter de l’or",
         "description": "Ajoute de l’or à la bourse actuelle."

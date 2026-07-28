@@ -9299,6 +9299,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterValueAria': '{label}: {value}',
   'devCommand.actions.kit.description':
     'Załóż zestaw sprzed Sanktuarium na 20. poziom dla wybranej specjalizacji, najpierw torby. Tylko ekwipunek.',
+  'devCommand.actions.biskit.label': 'Załóż zestaw BIS na 20. poziom',
+  'devCommand.actions.biskit.description':
+    'Załóż najlepszy epicki zestaw wybranej specjalizacji we wszystkich miejscach. Tylko ekwipunek.',
   'devCommand.actions.kit.label': 'Załóż zestaw na 20. poziom',
   'devCommand.fields.spec': 'Specjalizacja',
   'devCommand.itemChosen': 'Wybrano: {name}',

@@ -127,6 +127,10 @@ export const cs_CZ: EnTranslations = {
         "label": "Vybavit sadu na 20. úroveň",
         "description": "Obleč přednastavenou sadu na 20. úroveň před Svatyní pro danou specializaci, nejprve batohy. Pouze výbava."
       },
+      "biskit": {
+        "label": "Vybavit BIS sadu na 20. úroveň",
+        "description": "Obleč nejlepší epickou výbavu dané specializace do všech pozic. Pouze výbava."
+      },
       "gold": {
         "label": "Přidat zlato",
         "description": "Přidej zlato do aktuálního měšce."

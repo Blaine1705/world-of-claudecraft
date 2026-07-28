@@ -9256,6 +9256,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterValueAria': '{label}: {value}',
   'devCommand.actions.kit.description':
     'Uzmanlık için Sanctum öncesi 20. seviye setini kuşandır, önce çantalara. Yalnızca teçhizat.',
+  'devCommand.actions.biskit.label': 'BIS-20 takımını kuşan',
+  'devCommand.actions.biskit.description':
+    'Uzmanlık için her yuvada en iyi epik seti kuşandır. Yalnızca teçhizat.',
   'devCommand.actions.kit.label': 'Taze 20 takımını kuşan',
   'devCommand.fields.spec': 'Uzmanlık',
   'devCommand.itemChosen': 'Seçildi: {name}',

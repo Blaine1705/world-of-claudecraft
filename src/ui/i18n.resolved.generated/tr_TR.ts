@@ -127,6 +127,10 @@ export const tr_TR: EnTranslations = {
         "label": "Taze 20 takımını kuşan",
         "description": "Uzmanlık için Sanctum öncesi 20. seviye setini kuşandır, önce çantalara. Yalnızca teçhizat."
       },
+      "biskit": {
+        "label": "BIS-20 takımını kuşan",
+        "description": "Uzmanlık için her yuvada en iyi epik seti kuşandır. Yalnızca teçhizat."
+      },
       "gold": {
         "label": "Altın ekle",
         "description": "Mevcut keseye altın ekle."

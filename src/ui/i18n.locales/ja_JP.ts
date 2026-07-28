@@ -9428,6 +9428,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemTooltip.enchantedFallback': 'エンチャント済み',
   'devCommand.actions.kit.description':
     '指定したスペック向けのSanctum以前レベル20プリセットを装備します (バッグを先に)。装備品のみです。',
+  'devCommand.actions.biskit.label': 'BIS-20キットを装備',
+  'devCommand.actions.biskit.description':
+    '指定したスペック向けの最高のエピック装備を全部位に装備します。装備品のみです。',
   'devCommand.actions.kit.label': '新規20キットを装備',
   'devCommand.fields.spec': 'スペック',
   'devCommand.itemChosen': '選択中: {name}',

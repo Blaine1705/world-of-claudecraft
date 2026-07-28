@@ -9354,6 +9354,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterValueAria': '{label}: {value}',
   'devCommand.actions.kit.description':
     'Kenakan preset level 20 pra-Sanktum untuk sebuah spesialisasi, tas dahulu. Hanya perlengkapan.',
+  'devCommand.actions.biskit.label': 'Kenakan kit BIS level 20',
+  'devCommand.actions.biskit.description':
+    'Kenakan set epik terbaik untuk sebuah spesialisasi di semua slot. Hanya perlengkapan.',
   'devCommand.actions.kit.label': 'Kenakan kit level 20 baru',
   'devCommand.fields.spec': 'Spesialisasi',
   'devCommand.itemChosen': 'Dipilih: {name}',

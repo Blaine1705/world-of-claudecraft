@@ -52,4 +52,26 @@ describe('dev bis gear', () => {
     expect(sim.player.stats.agi + sim.player.stats.sta).toBeGreaterThan(before);
     expect(sim.player.hp).toBe(sim.player.maxHp);
   });
+
+  it('dresses for an explicit spec override without respeccing (the BIS-20 kit path)', () => {
+    const sim = new Sim({ seed: 5, playerClass: 'rogue', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('assassination')).toBe(true);
+    const ctx = (sim as unknown as { ctx: Parameters<typeof equipBestInSlotForDev>[0] }).ctx;
+
+    // Overriding to combat must produce combat's picks, not the current spec's:
+    // combat is the one rogue spec that trades the dagger mainhand away.
+    const equipped = equipBestInSlotForDev(ctx, sim.player.id, 'combat');
+    expect(equipped).toBeGreaterThanOrEqual(8);
+    const combatPicks = bestEpicGearFor('rogue', 'combat');
+    const meta = sim.meta(sim.player.id);
+    expect(meta?.equipment.mainhand).toBe(combatPicks.mainhand);
+    // The character's chosen spec is untouched: gear only, like /dev kit.
+    expect(meta?.talents.spec).toBe('assassination');
+
+    // And back: an assassination override re-arms the dagger mainhand.
+    equipBestInSlotForDev(ctx, sim.player.id, 'assassination');
+    const knifePicks = bestEpicGearFor('rogue', 'assassination');
+    expect(sim.meta(sim.player.id)?.equipment.mainhand).toBe(knifePicks.mainhand);
+  });
 });

@@ -9617,6 +9617,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemTooltip.enchantedFallback': 'Зачаровано',
   'devCommand.actions.kit.description':
     'Надеть комплект уровня 20 (до Sanctum) для выбранной специализации, сначала сумки. Только снаряжение.',
+  'devCommand.actions.biskit.label': 'Экипировать комплект BIS 20 уровня',
+  'devCommand.actions.biskit.description':
+    'Надеть лучший эпический комплект для выбранной специализации во все ячейки. Только снаряжение.',
   'devCommand.actions.kit.label': 'Экипировать комплект свежего 20 уровня',
   'devCommand.fields.spec': 'Специализация',
   'devCommand.itemChosen': 'Выбрано: {name}',

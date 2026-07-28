@@ -127,6 +127,10 @@ export const ko_KR: EnTranslations = {
         "label": "20레벨 초기 장비 세트 착용",
         "description": "특성에 맞는 성소 입장 전 20레벨 사전 설정 장비를 가방부터 착용합니다. 장비만 해당됩니다."
       },
+      "biskit": {
+        "label": "20레벨 최고 장비 세트 착용",
+        "description": "특성에 맞는 부위별 최고 에픽 장비를 모든 부위에 착용합니다. 장비만 해당됩니다."
+      },
       "gold": {
         "label": "골드 추가",
         "description": "현재 소지금에 골드를 추가합니다."

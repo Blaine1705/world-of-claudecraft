@@ -127,6 +127,10 @@ export const zh_TW: EnTranslations = {
         "label": "裝備新手20級套裝",
         "description": "為指定專精穿上聖所前的20級預設裝備，優先裝備背包。僅限裝備。"
       },
+      "biskit": {
+        "label": "裝備20級最佳套裝",
+        "description": "為指定專精在所有欄位穿上最佳史詩裝備。僅限裝備。"
+      },
       "gold": {
         "label": "新增金幣",
         "description": "將金幣加入目前的錢袋。"

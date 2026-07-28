@@ -9404,6 +9404,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterValueAria': '{label}: {value}',
   'devCommand.actions.kit.description':
     'Equipaggia il preset di livello 20 pre-Santuario per una specializzazione, prima le borse. Solo equipaggiamento.',
+  'devCommand.actions.biskit.label': 'Equipaggia kit BIS livello 20',
+  'devCommand.actions.biskit.description':
+    'Equipaggia il set epico migliore di una specializzazione in ogni slot. Solo equipaggiamento.',
   'devCommand.actions.kit.label': 'Equipaggia kit livello 20',
   'devCommand.fields.spec': 'Specializzazione',
   'devCommand.itemChosen': 'Selezionato: {name}',

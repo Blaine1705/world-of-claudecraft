@@ -9247,6 +9247,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterValueAria': '{label}: {value}',
   'devCommand.actions.kit.description':
     'Ta på nivå 20-förvalet före Sanctum för en specialisering, väskor först. Endast utrustning.',
+  'devCommand.actions.biskit.label': 'Utrusta BIS nivå 20-kit',
+  'devCommand.actions.biskit.description':
+    'Ta på en specialiserings bästa episka set i varje plats. Endast utrustning.',
   'devCommand.actions.kit.label': 'Utrusta nivå 20-kit',
   'devCommand.fields.spec': 'Specialisering',
   'devCommand.itemChosen': 'Vald: {name}',

@@ -1306,6 +1306,9 @@ export class ClientWorld implements IWorld {
   moveInput: MoveInput = emptyMoveInput();
   known: ResolvedAbility[] = [];
   realm = '';
+  // Whether this session's account holds a staff/admin role, from the hello
+  // frame. Advert only: every admin-gated command is re-checked server-side.
+  accountAdmin = false;
   inventory: InvSlot[] = [];
   // Equipped bag sockets, mirrored from snapshot self ('bags'); capacity is
   // derived locally from the shared item data (same math as the sim's bags.ts).
@@ -1981,6 +1984,7 @@ export class ClientWorld implements IWorld {
       this.ownPlayerId = msg.pid;
       this.cfg.seed = msg.seed;
       if (typeof msg.realm === 'string') this.realm = msg.realm;
+      this.accountAdmin = msg.admin === true;
       if (Array.isArray(msg.softWords)) {
         this.profanityWords = msg.softWords.filter(
           (w: unknown): w is string => typeof w === 'string',

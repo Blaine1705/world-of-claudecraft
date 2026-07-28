@@ -9362,6 +9362,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterValueAria': '{label}: {value}',
   'devCommand.actions.kit.description':
     'Rust de niveau-20-set van vóór het Heiligdom uit voor een spec, eerst de tassen. Alleen uitrusting.',
+  'devCommand.actions.biskit.label': 'BIS-kit voor niveau 20 uitrusten',
+  'devCommand.actions.biskit.description':
+    'Rust de beste epische set van een spec uit in elk vak. Alleen uitrusting.',
   'devCommand.actions.kit.label': 'Kit voor vers niveau 20 uitrusten',
   'devCommand.fields.spec': 'Spec',
   'devCommand.itemChosen': 'Geselecteerd: {name}',

@@ -127,6 +127,10 @@ export const vi_VN: EnTranslations = {
         "label": "Trang bị bộ đồ cấp 20 mới",
         "description": "Mặc bộ trang bị mẫu cấp 20 trước Thánh Đường cho một hệ phái, ưu tiên vào túi đồ. Chỉ trang bị."
       },
+      "biskit": {
+        "label": "Trang bị bộ đồ BIS cấp 20",
+        "description": "Mặc bộ trang bị sử thi tốt nhất cho một hệ phái ở mọi ô. Chỉ trang bị."
+      },
       "gold": {
         "label": "Thêm vàng",
         "description": "Thêm vàng vào túi tiền hiện tại."

@@ -127,6 +127,10 @@ export const it_IT: EnTranslations = {
         "label": "Equipaggia kit livello 20",
         "description": "Equipaggia il preset di livello 20 pre-Santuario per una specializzazione, prima le borse. Solo equipaggiamento."
       },
+      "biskit": {
+        "label": "Equipaggia kit BIS livello 20",
+        "description": "Equipaggia il set epico migliore di una specializzazione in ogni slot. Solo equipaggiamento."
+      },
       "gold": {
         "label": "Aggiungi oro",
         "description": "Aggiunge oro alla borsa attuale."

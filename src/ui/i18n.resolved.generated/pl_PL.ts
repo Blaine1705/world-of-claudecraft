@@ -127,6 +127,10 @@ export const pl_PL: EnTranslations = {
         "label": "Załóż zestaw na 20. poziom",
         "description": "Załóż zestaw sprzed Sanktuarium na 20. poziom dla wybranej specjalizacji, najpierw torby. Tylko ekwipunek."
       },
+      "biskit": {
+        "label": "Załóż zestaw BIS na 20. poziom",
+        "description": "Załóż najlepszy epicki zestaw wybranej specjalizacji we wszystkich miejscach. Tylko ekwipunek."
+      },
       "gold": {
         "label": "Dodaj złoto",
         "description": "Dodaj złoto do obecnej sakiewki."

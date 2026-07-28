@@ -127,6 +127,10 @@ export const id_ID: EnTranslations = {
         "label": "Kenakan kit level 20 baru",
         "description": "Kenakan preset level 20 pra-Sanktum untuk sebuah spesialisasi, tas dahulu. Hanya perlengkapan."
       },
+      "biskit": {
+        "label": "Kenakan kit BIS level 20",
+        "description": "Kenakan set epik terbaik untuk sebuah spesialisasi di semua slot. Hanya perlengkapan."
+      },
       "gold": {
         "label": "Tambah emas",
         "description": "Tambahkan emas ke dompet saat ini."

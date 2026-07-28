@@ -9235,6 +9235,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterValueAria': '{label}: {value}',
   'devCommand.actions.kit.description':
     'Ifør den forudindstillede niveau 20-opsætning fra før Sanctum til en specialisering, tasker først. Kun udstyr.',
+  'devCommand.actions.biskit.label': 'Udrust BIS 20-sæt',
+  'devCommand.actions.biskit.description':
+    'Ifør en specialiserings bedste episke sæt i hver plads. Kun udstyr.',
   'devCommand.actions.kit.label': 'Udrust frisk 20-sæt',
   'devCommand.fields.spec': 'Specialisering',
   'devCommand.itemChosen': 'Valgt: {name}',

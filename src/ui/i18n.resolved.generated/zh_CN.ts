@@ -127,6 +127,10 @@ export const zh_CN: EnTranslations = {
         "label": "装备新晋20级预设",
         "description": "为该专精穿上圣所前20级预设装备，背包优先。仅限装备。"
       },
+      "biskit": {
+        "label": "装备20级最佳配装",
+        "description": "为该专精在所有槽位穿上最佳史诗装备。仅限装备。"
+      },
       "gold": {
         "label": "添加金币",
         "description": "向当前钱袋添加金币。"

@@ -9278,6 +9278,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterValueAria': '{label}: {value}',
   'devCommand.actions.kit.description':
     'Mặc bộ trang bị mẫu cấp 20 trước Thánh Đường cho một hệ phái, ưu tiên vào túi đồ. Chỉ trang bị.',
+  'devCommand.actions.biskit.label': 'Trang bị bộ đồ BIS cấp 20',
+  'devCommand.actions.biskit.description':
+    'Mặc bộ trang bị sử thi tốt nhất cho một hệ phái ở mọi ô. Chỉ trang bị.',
   'devCommand.actions.kit.label': 'Trang bị bộ đồ cấp 20 mới',
   'devCommand.fields.spec': 'Chuyên Môn',
   'devCommand.itemChosen': 'Đã chọn: {name}',

@@ -9178,6 +9178,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterValueAria': '{label}: {value}',
   'devCommand.actions.kit.description':
     'Obleč přednastavenou sadu na 20. úroveň před Svatyní pro danou specializaci, nejprve batohy. Pouze výbava.',
+  'devCommand.actions.biskit.label': 'Vybavit BIS sadu na 20. úroveň',
+  'devCommand.actions.biskit.description':
+    'Obleč nejlepší epickou výbavu dané specializace do všech pozic. Pouze výbava.',
   'devCommand.actions.kit.label': 'Vybavit sadu na 20. úroveň',
   'devCommand.fields.spec': 'Specializace',
   'devCommand.itemChosen': 'Vybráno: {name}',

@@ -9416,6 +9416,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterValueAria': '{label}: {value}',
   'devCommand.actions.kit.description':
     'Equipa el kit preestablecido de nivel 20 previo al Santuario para una especialización, primero las bolsas. Solo equipo.',
+  'devCommand.actions.biskit.label': 'Equipar kit BIS de nivel 20',
+  'devCommand.actions.biskit.description':
+    'Equipa el conjunto épico óptimo por ranura para una especialización, en todas las ranuras. Solo equipo.',
   'devCommand.actions.kit.label': 'Equipar kit de nivel 20 nuevo',
   'devCommand.fields.spec': 'Especialización',
   'devCommand.itemChosen': 'Seleccionado: {name}',

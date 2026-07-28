@@ -8989,6 +8989,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.itemAriaBound': '{item}，数量 {count}，已绑定的副本',
   'hudChrome.itemTooltip.enchantedFallback': '已附魔',
   'devCommand.actions.kit.description': '为该专精穿上圣所前20级预设装备，背包优先。仅限装备。',
+  'devCommand.actions.biskit.label': '装备20级最佳配装',
+  'devCommand.actions.biskit.description':
+    '为该专精在所有槽位穿上最佳史诗装备。仅限装备。',
   'devCommand.actions.kit.label': '装备新晋20级预设',
   'devCommand.fields.spec': '专精',
   'devCommand.itemChosen': '已选择：{name}',

@@ -127,6 +127,10 @@ export const de_DE: EnTranslations = {
         "label": "Frisch-20-Set anlegen",
         "description": "Die Vor-Heiligtum-Voreinstellung für Stufe 20 einer Spezialisierung anlegen, zuerst die Taschen. Nur Ausrüstung."
       },
+      "biskit": {
+        "label": "BIS-20-Set anlegen",
+        "description": "Das beste Epos-Set einer Spezialisierung in jedem Platz anlegen. Nur Ausrüstung."
+      },
       "gold": {
         "label": "Gold hinzufügen",
         "description": "Gold zum aktuellen Geldbeutel hinzufügen."

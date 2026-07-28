@@ -280,10 +280,27 @@ export function handleDevChat(
     return null;
   }
 
-  if (/^\/(?:dev\s+bis|devbis)\s*$/i.test(raw)) {
-    const equipped = equipBestInSlotForDev(ctx, pid);
+  // /dev bis [spec]: wear the deterministic best-in-slot epic set. Like /dev kit,
+  // the spec is optional and validated against this class's roles, so one
+  // character can be dressed for any of its specs without respeccing first.
+  const bisMatch = /^\/(?:dev\s+bis|devbis)(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (bisMatch) {
+    const meta = ctx.players.get(pid);
+    if (!meta) return null;
+    const spec = bisMatch[1];
+    if (spec && !devKitRole(meta.cls, spec)) {
+      const known = (DEV_KIT_ROLES[meta.cls] ?? []).map((role) => role.spec).join(', ');
+      ctx.error(pid, `[dev] '${spec}' is not a ${meta.cls} spec. Try: ${known}.`);
+      return null;
+    }
+    const equipped = equipBestInSlotForDev(ctx, pid, spec);
     if (equipped === 0) ctx.error(pid, '[dev] Could not outfit best-in-slot gear.');
-    else emitDevLog(ctx, pid, `[dev] Equipped ${equipped} best-in-slot epic pieces.`);
+    else
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Equipped ${equipped} best-in-slot epic pieces${spec ? ` for ${spec}` : ''}.`,
+      );
     return null;
   }
 

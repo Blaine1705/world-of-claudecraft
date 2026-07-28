@@ -127,6 +127,10 @@ export const sv_SE: EnTranslations = {
         "label": "Utrusta nivå 20-kit",
         "description": "Ta på nivå 20-förvalet före Sanctum för en specialisering, väskor först. Endast utrustning."
       },
+      "biskit": {
+        "label": "Utrusta BIS nivå 20-kit",
+        "description": "Ta på en specialiserings bästa episka set i varje plats. Endast utrustning."
+      },
       "gold": {
         "label": "Lägg till guld",
         "description": "Lägg till guld i den aktuella börsen."

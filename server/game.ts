@@ -2938,6 +2938,9 @@ export class GameServer {
       name,
       cls,
       realm: REALM,
+      // Staff advert for admin-gated client surfaces (the /dev Spawns tab).
+      // Every gated command is re-checked server-side, so a forged true is inert.
+      admin: session.isAdmin,
       // Soft (cosmetic) words the client masks locally when its profanity
       // filter is on. Hard words are never sent — they're enforced server-side.
       softWords: this.chatFilter.softWords(),
@@ -3025,6 +3028,7 @@ export class GameServer {
       name: session.name,
       cls,
       realm: REALM,
+      admin: session.isAdmin,
       softWords: this.chatFilter.softWords(),
       chatMutedUntil: session.chatMutedUntil ?? null,
     });
@@ -6773,6 +6777,18 @@ export class GameServer {
       }
       this.devTierPids.add(pid); // keep the chain refresh from clobbering it
       this.broadcastSystem(`[dev] ${session.name} $WOC holder tier → ${n}`);
+      return null;
+    }
+    // The spawn-control dev commands (spawn/despawn/killtarget) are staff-only
+    // even where ALLOW_DEV_COMMANDS is on: on a shared PBE realm any tester may
+    // self-serve gear and travel, but conjuring or deleting mobs reshapes the
+    // world every other tester is standing in. The client hides the Spawns tab
+    // for non-staff; this is the authoritative check behind that advert.
+    if (
+      /^\/(?:dev\s+(?:spawn|despawn|killtarget)|devspawn|devdespawn|devkilltarget)\b/i.test(text) &&
+      !session.isAdmin
+    ) {
+      this.sendChatNotice(session, '[dev] Spawn controls require an administrator account.');
       return null;
     }
     if (!text.startsWith('/')) {
