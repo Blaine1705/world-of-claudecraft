@@ -121,8 +121,10 @@ const GRASS_CHUNK_CACHE_LIMIT_HIGH = 128;
 const TREE_WIND_STRENGTH = 0.08;
 const GRASS_WIND_STRENGTH = 0.16;
 // how far leaf normals bend toward world up (see addWind); 0 keeps the raw
-// canopy normals and their crushed-black backlit sides
-const LEAF_UP_NORMAL_BLEND = 0.55;
+// canopy normals and their crushed-black backlit sides. This is the lit-side
+// half of the ambient-floor tradeoff: it lifts shaded leaves through the sky
+// term (which the sun still overrides) rather than through constant emissive.
+const LEAF_UP_NORMAL_BLEND = 0.62;
 // two x-halves x 240u z-bands: bucket count x variants-per-bucket is the
 // foliage draw budget — see the perBucket caps in the species specs
 const BUCKET_DEPTH = 240;
@@ -654,10 +656,13 @@ function foliageMaterial(
   if (pol.leaf && std.map) {
     // Texture-shaped ambient floor: a dense canopy shadow-maps itself into
     // darkness (worst on small meadow pines, which read as black clumps), and
-    // no diffuse-side tweak survives full shadow. Luma stays ~0.1, far under
-    // the 1.32 bloom threshold.
+    // no diffuse-side tweak survives full shadow. Kept deliberately faint: the
+    // floor is constant, so any more of it also lands on sunlit canopies and
+    // flattens their shading into neon. The shadowed side is carried mostly by
+    // the sky term through the up-bent leaf normals (LEAF_UP_NORMAL_BLEND),
+    // which falls off with light instead of glowing on its own.
     mat.emissiveMap = std.map;
-    mat.emissive.setRGB(0.32, 0.36, 0.28);
+    mat.emissive.setRGB(0.155, 0.175, 0.135);
   }
   applyInstanceCollapse(mat, role);
   materialCache.set(key, mat);

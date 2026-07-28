@@ -48,14 +48,18 @@ const GradeShader = {
     uniform sampler2D tDiffuse;
     uniform float uTime;
     varying vec2 vUv;
-    const vec3 LIFT = vec3(0.008, 0.009, 0.022);   // lifted cool shadows
-    const vec3 GAIN = vec3(1.09, 1.03, 0.955);     // warm highlights
-    const vec3 GAMMA = vec3(0.96);
+    const vec3 LIFT = vec3(0.006, 0.007, 0.018);   // lifted cool shadows
+    const vec3 GAIN = vec3(1.06, 1.025, 0.965);    // warm highlights
+    const vec3 GAMMA = vec3(0.975);
     void main() {
       vec3 c = texture2D(tDiffuse, vUv).rgb;
       c = pow(max(vec3(0.0), c * GAIN + LIFT), GAMMA);
+      // Dimension comes from the tone curve, not from chroma: a gentle S around
+      // the midtones separates lit from shaded so the grade can stay near
+      // neutral saturation instead of pushing colour to fake depth.
+      c = mix(c, c * c * (3.0 - 2.0 * c), 0.14);
       float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
-      c = mix(vec3(l), c, 1.16);                                  // saturation
+      c = mix(vec3(l), c, 1.09);                                  // saturation
       vec2 d = vUv - 0.5;
       c *= 1.0 - 0.20 * smoothstep(0.60, 0.95, dot(d, d) * 2.2);  // gentle vignette (0.32 crushed corners)
       c += (fract(sin(dot(vUv * 731.7 + uTime, vec2(12.9898, 78.233))) * 43758.5) - 0.5) * 0.012; // grain

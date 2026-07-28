@@ -347,6 +347,29 @@ vec3 wocBrushRing(vec2 p) {
 }
 `;
 
+// Fragment-only parallax offset mapping for the splat ground. The painted
+// albedo doubles as the height field: its luminance already tracks the clods,
+// pebbles and grass mats in the source photos, so the relief costs no new
+// texture, no render target and no draw call, just a few taps. Vertex
+// displacement is deliberately not an option here, at any amplitude: selection
+// rings, feet placement and water shorelines all sample the analytic height
+// field in src/sim, and moving the visual mesh off it breaks them.
+const GROUND_PARALLAX_GLSL = /* glsl */ `
+const float WOC_PARALLAX_SCALE = 0.085;
+const float WOC_PARALLAX_CLAMP = 0.05;   // UV units, ~0.23 world: past this it swims
+const float WOC_PARALLAX_MID = 0.45;     // luma that reads as the unmoved surface
+// Splat-weighted albedo luma as a height proxy, at the same tiling the albedo
+// itself uses so the relief lands on the features you can see. Sand and snow
+// contribute the flat mid value: dunes and drifts have no clods to displace.
+float wocGroundHeight(vec2 uv, vec4 sw) {
+  const vec3 L = vec3(0.2126, 0.7152, 0.0722);
+  return dot(texture2D(uGrass, uv).rgb, L) * sw.x
+       + dot(texture2D(uDirt, uv * 0.8).rgb, L) * sw.y
+       + dot(texture2D(uRock, uv * 0.6).rgb, L) * sw.z
+       + WOC_PARALLAX_MID * sw.w;
+}
+`;
+
 function buildSplatMaterial(
   normalTex: THREE.DataTexture,
   brush: BrushUniforms,
@@ -407,6 +430,7 @@ function buildSplatMaterial(
         varying vec3 vWPos;
         varying vec3 vWNorm;
         uniform sampler2D uGrass, uGrassN, uDirt, uDirtN, uRock, uRockN, uSand, uSandN, uMud, uSnow, uMacro;
+        ${GROUND_PARALLAX_GLSL}
         ${BRUSH_RING_GLSL}`,
       )
       .replace(
@@ -418,6 +442,40 @@ function buildSplatMaterial(
         '#include <map_fragment>',
         `
         vec2 tuv = vWPos.xz * 0.22;
+        // Offset parallax: slide the ground UVs along the view ray by the
+        // albedo height proxy, so the painted clods and stones stand up at
+        // grazing angles instead of reading as a decal on flat ground. Rock and
+        // dirt carry it hardest, grass takes a light pass, sand and snow none.
+        // Faded by slope (planar-XZ UVs stretch on cliffs, the same reason the
+        // detail normals fade below) and by distance, where mips have averaged
+        // the relief away and an offset would only shimmer. Everything below
+        // reuses tuv, so the detail normals follow the same height proxy and
+        // lighting agrees with the displacement.
+        vec3 pRay = cameraPosition - vWPos;
+        float pDist = length(pRay);
+        float pRelief = (vSplat.x * 0.45 + vSplat.y + vSplat.z * 0.85)
+          * (1.0 - vExtra.y)
+          * smoothstep(0.55, 0.85, normalize(vWNorm).y)
+          * (1.0 - smoothstep(16.0, 44.0, pDist));
+        if (pRelief > 0.015) {
+          // planar-XZ UVs put the tangent frame on world x/z with world y as
+          // the surface normal, so the ray projects without a TBN; the divisor
+          // floor is the grazing-angle limiter (an unclamped 1/y diverges)
+          vec2 pDir = pRay.xz / max(pRay.y, pDist * 0.3);
+          vec2 pOff = clamp(
+            pDir * (wocGroundHeight(tuv, vSplat) - WOC_PARALLAX_MID) * WOC_PARALLAX_SCALE * pRelief,
+            -WOC_PARALLAX_CLAMP, WOC_PARALLAX_CLAMP);
+          ${
+            GFX.tier === 'high' || GFX.tier === 'ultra'
+              ? `// second iteration: re-read the height where the first offset
+          // landed, which keeps steep clod edges from overshooting
+          pOff = clamp(
+            pDir * (wocGroundHeight(tuv + pOff, vSplat) - WOC_PARALLAX_MID) * WOC_PARALLAX_SCALE * pRelief,
+            -WOC_PARALLAX_CLAMP, WOC_PARALLAX_CLAMP);`
+              : ''
+          }
+          tuv += pOff;
+        }
         // grass blends two scales so the 1K photo source never reads as tile
         vec3 grassAlb = mix(texture2D(uGrass, tuv).rgb, texture2D(uGrass, tuv * 0.31).rgb, 0.42);
         // marsh swaps packed dirt for wet mud (roads, hub discs included)
