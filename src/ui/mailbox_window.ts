@@ -257,7 +257,7 @@ export class MailboxWindow {
     if (!this.opened) return;
     const root = this.deps.root();
     const draft = captureFormDraft(root);
-    this.render();
+    this.render({ revealBags: false });
     restoreFormDraft(root, draft);
     const info = this.deps.world().mailInfo;
     if (info) this.lastSig = this.sig(info);
@@ -273,7 +273,17 @@ export class MailboxWindow {
     return row.subject.length > 0 ? row.subject : t('hudChrome.mailbox.noSubject');
   }
 
-  render(): void {
+  /**
+   * Full rebuild of the window chrome plus its current tab.
+   *
+   * `revealBags` exists for the language fan-out and is the one thing a caller
+   * ever needs to turn off: the Send tab's paint normally REVEALS the bags
+   * window so parcels can be clicked straight onto the letter, and a language
+   * switch must not re-open a bags window the player deliberately closed. It is
+   * an argument rather than a mode flag on the instance so the decision is
+   * visible at the call site that makes it.
+   */
+  render({ revealBags = true }: { revealBags?: boolean } = {}): void {
     const el = this.deps.root();
     this.deps.hideTooltip();
     markDialogRoot(el, { label: t('hudChrome.mailbox.title') });
@@ -304,10 +314,10 @@ export class MailboxWindow {
         (this.deps.root().querySelector(`[data-tab="${next}"]`) as HTMLElement | null)?.focus();
       });
     });
-    this.renderContent();
+    this.renderContent(revealBags);
   }
 
-  private renderContent(): void {
+  private renderContent(revealBags: boolean): void {
     const body = this.deps.root().querySelector<HTMLElement>('#mailbox-body');
     if (!body) return;
     const view = buildMailboxView({
@@ -324,7 +334,7 @@ export class MailboxWindow {
       this.renderInbox(body, view.body);
       return;
     }
-    this.renderSend(body, view.body);
+    this.renderSend(body, view.body, revealBags);
   }
 
   private renderInbox(body: HTMLElement, view: MailInboxBody): void {
@@ -451,7 +461,7 @@ export class MailboxWindow {
     }
   }
 
-  private renderSend(body: HTMLElement, view: MailSendBody): void {
+  private renderSend(body: HTMLElement, view: MailSendBody, revealBags: boolean): void {
     window.clearTimeout(this.recipientSuggestTimer);
     this.recipientSuggest = { items: [], index: -1 };
     body.innerHTML =
@@ -480,7 +490,11 @@ export class MailboxWindow {
       `</div>`;
     this.renderParcels();
     // Bags ride alongside so parcels can be clicked straight onto the letter.
-    this.deps.syncBags(true);
+    // NOT on the relocalize path (revealBags false): syncBags(true) REVEALS the
+    // bags window, and a language switch must not re-open one the player closed.
+    // The fan-out re-renders an open bags window on its own arm, so an open one
+    // still lands in the new locale.
+    if (revealBags) this.deps.syncBags(true);
     // The coin inputs seed "0": select it on focus so typing replaces the value
     // (clicking into gold and typing 1 must mean 1g, not the 10 you get by
     // appending). The once-only mouseup swallow keeps the click-to-focus gesture

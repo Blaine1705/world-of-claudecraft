@@ -64,11 +64,14 @@ afterEach(() => {
  * English, which is exactly the state a missing translation leaves. The guard
  * belongs in the test rather than in review: the catalogs move every release.
  */
-function bilingual(key: TranslationKey): { en: string; other: string } {
+function bilingual(
+  key: TranslationKey,
+  values?: Record<string, string | number>,
+): { en: string; other: string } {
   setLanguage('en');
-  const english = t(key);
+  const english = t(key, values);
   setLanguage(OTHER);
-  const other = t(key);
+  const other = t(key, values);
   setLanguage('en');
   expect(
     other,
@@ -154,6 +157,41 @@ describe('#2529 mailbox: an open Send tab re-localizes without losing the letter
     expect(field<HTMLInputElement>('mail-g').value).toBe('2');
     expect(field<HTMLInputElement>('mail-s').value).toBe('30');
     expect(field<HTMLInputElement>('mail-c').value).toBe('7');
+  });
+
+  it('does not re-open a bags window the player closed, and keeps focus in the dialog', () => {
+    const root = mount('mailbox-window');
+    const bagsReveals: boolean[] = [];
+    const noop = (): void => {};
+    const win = new MailboxWindow({
+      itemIcon: () => '<span class="item-icon"></span>',
+      moneyHtml: () => '',
+      itemTooltip: () => '',
+      attachTooltip: noop,
+      root: () => root,
+      world: () => mailWorld(),
+      closeOthers: noop,
+      hideTooltip: noop,
+      captureFocus: () => null,
+      restoreFocus: noop,
+      showError: noop,
+      syncBags: (open) => bagsReveals.push(open),
+    });
+    win.open();
+    (root.querySelector('[data-tab="send"]') as HTMLElement).click();
+    expect(bagsReveals, 'opening the Send tab is what docks the bags window').toContain(true);
+
+    // The player closed bags; a language switch must not undo that.
+    bagsReveals.length = 0;
+    const sendTab = root.querySelector('[data-tab="send"]') as HTMLElement;
+    sendTab.focus();
+    setLanguage(OTHER);
+    win.relocalize();
+    expect(bagsReveals, 'the relocalize re-revealed the bags window').toEqual([]);
+    // Focus was on a button, not a text field: the window's Tab trap only arms
+    // while focus is inside its root, so dropping it to body would let the next
+    // Tab walk out of the dialog.
+    expect(document.activeElement).toBe(root.querySelector('[data-tab="send"]'));
   });
 
   it('re-latches the inbox signature so the next slow tick does not rebuild again', () => {
@@ -257,27 +295,32 @@ describe('#2529 calendar: an open month re-localizes without losing the booking 
 // 3. Social (named by #2529)
 // ---------------------------------------------------------------------------
 
+type CharacterHit = { name: string; cls: string; level: number };
+
 function socialWorld(
-  search: (q: string) => Promise<{ name: string; cls: string; level: number }[]>,
+  search: (q: string) => Promise<CharacterHit[]>,
+  guild: unknown = null,
 ): IWorld {
   return {
     playerId: 7,
     player: { id: 7, name: 'Aleron' },
     realm: 'Ashenvale',
     partyInfo: null,
-    socialInfo: { friends: [], ignores: [], blocks: [], guild: null },
+    socialInfo: { friends: [], ignores: [], blocks: [], guild },
     searchCharacters: search,
+    guildSetMotd: () => {},
   } as unknown as IWorld;
 }
 
 function openSocial(
-  search: (q: string) => Promise<{ name: string; cls: string; level: number }[]> = async () => [],
+  search: (q: string) => Promise<CharacterHit[]> = async () => [],
+  guild: unknown = null,
 ): { win: SocialWindow; root: HTMLElement } {
   const root = mount('social-window');
   const noop = (): void => {};
   const deps: SocialWindowDeps = {
     root: () => root,
-    world: () => socialWorld(search),
+    world: () => socialWorld(search, guild),
     closeOthers: noop,
     hideTooltip: noop,
     captureFocus: () => null,
@@ -317,6 +360,55 @@ describe('#2529 social: an open panel re-localizes without losing the typed name
     const kept = root.querySelector('input[data-field="friend"]');
     win.refreshIfChanged();
     expect(root.querySelector('input[data-field="friend"]'), 'the panel rebuilt again').toBe(kept);
+  });
+
+  it('carries the guild billboard draft, which refreshList could no longer read', () => {
+    // The subtle arm of the three: refreshList protects this draft by reading the
+    // LIVE input, but render() destroys `.soc-body` before calling refreshList, so
+    // by then there is nothing to read. relocalize has to capture first.
+    const heading = bilingual('hudChrome.social.billboard.inputLabel');
+    const { win, root } = openSocial(async () => [], {
+      name: 'Ashen Vow',
+      rank: 'leader',
+      members: [{ name: 'Aleron', cls: 'warrior', level: 60, online: true, rank: 'leader' }],
+      motd: 'Raid at eight',
+      events: [],
+    });
+    (root.querySelector('[data-tab="guild"]') as HTMLElement | null)?.click();
+    const motd = (): HTMLInputElement | null =>
+      root.querySelector<HTMLInputElement>('input[data-field="gmotd"]');
+    expect(motd(), 'the guild billboard never rendered: the arm proves nothing').not.toBeNull();
+    expect(motd()?.getAttribute('aria-label')).toBe(heading.en);
+    (motd() as HTMLInputElement).value = 'Raid at nine, bring fire resist';
+
+    setLanguage(OTHER);
+    win.relocalize();
+    expect(motd()?.getAttribute('aria-label')).toBe(heading.other);
+    expect(motd()?.value, 'the billboard draft was lost in the rebuild').toBe(
+      'Raid at nine, bring fire resist',
+    );
+  });
+
+  it('drops a search still in flight, so its results cannot land on the rebuilt DOM', async () => {
+    vi.useFakeTimers();
+    let searches = 0;
+    const { win, root } = openSocial(async () => {
+      searches++;
+      return [{ name: 'Mirabel', cls: 'mage', level: 12 }];
+    });
+    const input = root.querySelector<HTMLInputElement>(
+      'input[data-field="friend"]',
+    ) as HTMLInputElement;
+    input.value = 'Mir';
+    input.dispatchEvent(new Event('input'));
+
+    // Mid-debounce: the timer is armed and has NOT fired. relocalize must clear
+    // it, or the search resolves against a listbox that no longer exists.
+    setLanguage(OTHER);
+    win.relocalize();
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(searches, 'a search armed before the relocalize still ran after it').toBe(0);
+    expect(root.querySelectorAll('.soc-suggest .soc-sugg-item')).toHaveLength(0);
   });
 
   it('drops the pending suggestion list with the listbox the rebuild destroys', async () => {
@@ -461,6 +553,27 @@ describe('#2529 delve tracker: the fan-out arm was present but inert', () => {
     controller.update();
     expect(element.querySelector('.dt-header'), 'the tracker rebuilt again').toBe(kept);
   });
+
+  it('needs no open check: with no run it clears the strip instead of painting', () => {
+    // The one relocalize in the nine with no open guard of its own. It leans on
+    // update()'s no-run arm, so that arm is what has to be pinned.
+    const element = mount('delve-tracker', 'block');
+    element.innerHTML = 'stale';
+    const closeRitePanel = vi.fn();
+    const controller = new DelveTrackerController({
+      element,
+      world: () => ({ delveRun: null, delveMarks: 0 }) as Pick<IWorld, 'delveRun' | 'delveMarks'>,
+      delveName: () => 'Collapsed Reliquary',
+      mobName: () => 'Deacon Varric',
+      attachTooltip: () => {},
+      closeRitePanel,
+    });
+    setLanguage(OTHER);
+    controller.relocalize();
+    expect(element.innerHTML).toBe('');
+    expect(element.style.display).toBe('none');
+    expect(closeRitePanel).toHaveBeenCalledWith(false);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -484,34 +597,115 @@ const LOCK_VIEW: LockpickView = {
   stepTimeoutMs: 15000,
 };
 
-describe('#2529 lockpick: the open board re-localizes', () => {
-  it('ignores the per-frame repaint after a language switch and repaints on relocalize()', () => {
-    const panel = mount('lockpick-panel', 'block');
-    const win = new LockpickWindow({
-      panel: () => panel,
-      getState: () => LOCK_VIEW,
-      tierName: (tier) => tier,
-      onEngage: () => {},
-      onAction: () => {},
-      onAbort: () => {},
-      onClose: () => {},
-    });
+function lockpickHarness(state: () => LockpickView | null): {
+  win: LockpickWindow;
+  panel: HTMLElement;
+} {
+  const panel = mount('lockpick-panel', 'block');
+  const win = new LockpickWindow({
+    panel: () => panel,
+    getState: state,
+    tierName: (tier) => tier,
+    onEngage: () => {},
+    onAction: () => {},
+    onAbort: () => {},
+    onClose: () => {},
+  });
+  return { win, panel };
+}
+
+describe('#2529 lockpick: both halves of the panel re-localize', () => {
+  it('ignores the per-frame repaint after a language switch and repaints the board', () => {
+    // Captured BEFORE the window is touched, so beat 3 compares against an
+    // independently read value rather than re-resolving the same t() call the
+    // painter just made (which would be a near-tautology).
+    const title = bilingual('lockpickUi.boardTitle', { tier: LOCK_VIEW.lootTier });
+    const { win, panel } = lockpickHarness(() => LOCK_VIEW);
     win.openBoard();
     const heading = (): string => panel.querySelector('.panel-title span')?.textContent ?? '';
-    const english = heading();
-    expect(english.length).toBeGreaterThan(0);
+    expect(heading()).toBe(title.en);
 
     setLanguage(OTHER);
     win.repaintIfChanged();
     expect(heading(), 'the board repainted itself: this arm no longer proves the gap').toBe(
-      english,
+      title.en,
     );
 
     win.relocalize();
-    const other = heading();
-    expect(other).toBe(t('lockpickUi.boardTitle', { tier: LOCK_VIEW.lootTier }));
-    expect(other, 'the board title reads the same in both locales').not.toBe(english);
+    expect(heading()).toBe(title.other);
+
+    // relocalize() CLEARS lastSig here and leans on repaintIfChanged to re-latch
+    // inside the same call, which is a different mechanism from the re-latching
+    // siblings and the one worth pinning: a leaked clear would rebuild the board
+    // on every frame for the rest of the attempt.
+    const kept = panel.querySelector('.panel-title span');
+    win.repaintIfChanged();
+    expect(panel.querySelector('.panel-title span'), 'the board rebuilt again').toBe(kept);
     win.stopTimer();
+  });
+
+  it('leaves the countdown reading the live remaining, not a full budget', () => {
+    // renderBoard re-emits the bar at width:100% and the full-duration label, and
+    // syncTimer deliberately does not restart the clock (the timer key did not
+    // move), so a naive relocalize would show a full timer on a TIMED minigame
+    // until the running interval's next tick.
+    vi.useFakeTimers();
+    const { win, panel } = lockpickHarness(() => LOCK_VIEW);
+    win.openBoard();
+    const bar = (): string =>
+      (panel.querySelector('#lp-timer-bar') as HTMLElement | null)?.style.width ?? '';
+    expect(bar()).toBe('100%');
+    vi.advanceTimersByTime(9_000);
+    const midAttempt = bar();
+    expect(midAttempt, 'the countdown never advanced: the arm proves nothing').not.toBe('100%');
+
+    setLanguage(OTHER);
+    win.relocalize();
+    expect(bar(), 'the rebuild snapped the countdown back to a full budget').not.toBe('100%');
+    win.stopTimer();
+  });
+
+  it('repaints the ante selector, which has no signature and no driver at all', () => {
+    // The state BEFORE a session exists: the player opened the chest and has not
+    // chosen an ante, so getState() is null and the board path cannot reach it.
+    const heading = bilingual('lockpickUi.pickTitle');
+    const { win, panel } = lockpickHarness(() => null);
+    win.renderAnte(7, false);
+    const title = (): string => panel.querySelector('.panel-title span')?.textContent ?? '';
+    expect(title()).toBe(heading.en);
+
+    setLanguage(OTHER);
+    win.repaintIfChanged();
+    expect(title(), 'something already repaints the ante selector: the arm is moot').toBe(
+      heading.en,
+    );
+
+    win.relocalize();
+    expect(title()).toBe(heading.other);
+  });
+
+  it('drops the retained ante inputs once a board has painted over them', () => {
+    // The sequence that makes a stale retention visible: the selector paints, the
+    // player picks an ante and the board replaces it, then the session ends while
+    // the panel is still up (getState() goes null again). If renderBoard had not
+    // dropped the retained pair, the relocalize below would paint a dead ante
+    // selector back over whatever the panel is showing.
+    let state: LockpickView | null = null;
+    const { win, panel } = lockpickHarness(() => state);
+    win.renderAnte(7, false);
+    expect(panel.querySelector('[data-ante]')).not.toBeNull();
+    state = LOCK_VIEW;
+    win.openBoard();
+    win.stopTimer();
+    expect(panel.querySelector('[data-ante]')).toBeNull();
+
+    state = null;
+    setLanguage(OTHER);
+    win.relocalize();
+    expect(
+      panel.querySelector('[data-ante]'),
+      'a stale retained ante repainted the selector after the session ended',
+    ).toBeNull();
   });
 });
 
@@ -523,32 +717,143 @@ describe('#2529 lockpick: the open board re-localizes', () => {
 // 7. Tutorial overlay
 // ---------------------------------------------------------------------------
 
+function tutorialWorld(over: Record<string, unknown> = {}): IWorld {
+  return {
+    playerId: 7,
+    player: { id: 7, level: 1, name: 'Aleron', pos: { x: 0, y: 0, z: 0 } },
+    questsDone: new Set<string>(),
+    questLog: new Map(),
+    questState: () => null,
+    entities: new Map(),
+    ...over,
+  } as unknown as IWorld;
+}
+
+const FAKE_RENDERER = {
+  worldToScreen: () => ({ x: 0, y: 0, behind: false }),
+} as unknown as Renderer;
+const FAKE_KEYBINDS = {
+  primaryLabel: (id: string) => id.toUpperCase(),
+} as unknown as Keybinds;
+
 describe('#2529 tutorial: the coachmark card re-localizes mid-step', () => {
   it('holds the old locale through update() and repaints on relocalize()', () => {
     const heading = bilingual('hud.tutorial.moveTitle');
     mount('ui', 'block');
-    const world = {
-      playerId: 7,
-      player: { id: 7, level: 1, name: 'Aleron', pos: { x: 0, y: 0, z: 0 } },
-      questsDone: new Set<string>(),
-      questLog: new Map(),
-      questState: () => null,
-      entities: new Map(),
-    } as unknown as IWorld;
-    const renderer = {
-      worldToScreen: () => ({ x: 0, y: 0, behind: false }),
-    } as unknown as Renderer;
-    const keybinds = { primaryLabel: (id: string) => id.toUpperCase() } as unknown as Keybinds;
+    const world = tutorialWorld();
     const overlay = new TutorialOverlay();
-    overlay.update(world, renderer, keybinds);
+    overlay.update(world, FAKE_RENDERER, FAKE_KEYBINDS);
     const title = (): string => document.querySelector('.tut-title')?.textContent ?? '';
     expect(title(), 'the tutorial card never rendered: the arm proves nothing').toBe(heading.en);
 
     setLanguage(OTHER);
-    overlay.update(world, renderer, keybinds);
+    overlay.update(world, FAKE_RENDERER, FAKE_KEYBINDS);
     expect(title(), 'update() repainted on an unchanged step: the arm is moot').toBe(heading.en);
 
-    overlay.relocalize(world, keybinds);
+    overlay.relocalize(world, FAKE_KEYBINDS);
     expect(title()).toBe(heading.other);
+
+    // The card reuses its element refs rather than rebuilding, so idempotence is
+    // pinned on the node identity plus the text staying put across a follow-up
+    // update() with the step unchanged.
+    const card = document.querySelector('.tut-card');
+    overlay.update(world, FAKE_RENDERER, FAKE_KEYBINDS);
+    expect(document.querySelector('.tut-card')).toBe(card);
+    expect(title()).toBe(heading.other);
+  });
+
+  it('paints nothing before a step exists, so the fan-out can call it unconditionally', () => {
+    mount('ui', 'block');
+    const overlay = new TutorialOverlay();
+    setLanguage(OTHER);
+    overlay.relocalize(tutorialWorld(), FAKE_KEYBINDS);
+    expect(document.querySelector('.tut-card'), 'relocalize built a card with no step').toBeNull();
+  });
+
+  it('refuses a world with no player rather than throwing out of the fan-out', () => {
+    // update() and isFreshCharacter both guard this: player is TYPED as an Entity
+    // but is absent in the online pre-snapshot window, and renderPanel reads
+    // player.name. A throw here would skip every fan-out arm after the tutorial.
+    const heading = bilingual('hud.tutorial.moveTitle');
+    mount('ui', 'block');
+    const overlay = new TutorialOverlay();
+    overlay.update(tutorialWorld(), FAKE_RENDERER, FAKE_KEYBINDS);
+    const title = (): string => document.querySelector('.tut-title')?.textContent ?? '';
+    expect(title()).toBe(heading.en);
+
+    setLanguage(OTHER);
+    expect(() => overlay.relocalize(tutorialWorld({ player: null }), FAKE_KEYBINDS)).not.toThrow();
+    expect(title(), 'it painted from a world with no player').toBe(heading.en);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 8. The contract every one of them states: safe to call while closed
+// ---------------------------------------------------------------------------
+
+// Every relocalize doc comment in the change claims to be self-gated so the
+// fan-out can call it unconditionally, and the fan-out does exactly that. Only
+// the spellbook proved it (in its own suite), so a dropped `if (!this.opened)
+// return;` would paint into a hidden root and leave every other assertion in
+// this file green.
+describe('#2529 a closed surface paints nothing when the fan-out reaches it', () => {
+  const cases: ReadonlyArray<[string, () => HTMLElement]> = [
+    [
+      'calendar',
+      () => {
+        const { win, root } = openCalendar();
+        win.close();
+        root.innerHTML = '';
+        win.relocalize();
+        return root;
+      },
+    ],
+    [
+      'mailbox',
+      () => {
+        const { win, root } = openMailbox();
+        win.close();
+        root.innerHTML = '';
+        win.relocalize();
+        return root;
+      },
+    ],
+    [
+      'social',
+      () => {
+        const { win, root } = openSocial();
+        win.close();
+        root.innerHTML = '';
+        win.relocalize();
+        return root;
+      },
+    ],
+    [
+      'card duel',
+      () => {
+        const { win, root } = openCardDuel();
+        win.close();
+        root.innerHTML = '';
+        win.relocalize();
+        return root;
+      },
+    ],
+    [
+      'lockpick',
+      () => {
+        const { win, panel } = lockpickHarness(() => LOCK_VIEW);
+        win.openBoard();
+        win.stopTimer();
+        panel.style.display = 'none';
+        panel.innerHTML = '';
+        win.relocalize();
+        return panel;
+      },
+    ],
+  ];
+
+  it.each(cases)('%s', (_name, run) => {
+    setLanguage(OTHER);
+    expect(run().innerHTML).toBe('');
   });
 });

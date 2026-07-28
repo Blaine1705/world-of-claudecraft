@@ -47,6 +47,15 @@
 //   - Neither half says anything about a COLD window (rendered on open, no
 //     repaint driver at all). That is a different gap with a different answer
 //     and it is not what #2529 is about.
+//   - Half 1 registers STATEMENT-position calls. An arm added inside a callback
+//     (`queueMicrotask(() => this.foo.relocalize())`) is invisible to it, though
+//     deleting a registered arm is still caught.
+//   - The memo sweep requires the literal `private` modifier and a `this.`
+//     receiver, so a module-scoped `let lastSig` or a `#lastSig` would escape
+//     it. There is no such module in `src/ui` today; if one lands, widen
+//     MEMO_DECL rather than exempting the file.
+//   - The sweep covers `src/ui` only. A signature-gated text surface under
+//     `src/render/` would have to be caught in review.
 
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -306,16 +315,42 @@ const ANSWERED: readonly AnsweredSurface[] = [
  * guard green without fixing anything, so each one names the memo's contents
  * and says what moves it when the locale moves.
  */
-const NOT_A_LANGUAGE_GATE: Readonly<Record<string, string>> = {
-  'claudium_window.ts':
-    'paintedWalletMarkup retains the RESOLVED wallet markup and is compared against a freshly built walletConnectionHtml(), so a locale change moves both sides of the comparison and the repaint happens by itself. It is a write-elision memo, not a data signature.',
-  'daily_rewards_window.ts':
-    'paintedStoreBody / paintedStoreMarkup retain the RESOLVED store markup and the element it was written into, compared against freshly built markup in replaceStoreBody, so a locale change produces different markup and repaints. Same write-elision shape as claudium_window.',
-  'deed_tracker_painter.ts':
-    'lastChip gates only the header ARIA presence swap (aria-expanded / aria-controls / aria-haspopup), which carries no player-visible text. Every string in this painter goes through the elided writer facet, which compares resolved text, and the fan-out drives it through this.updateDeedTracker.',
-  'hud.ts':
-    'the coordinator itself. Its own signature-gated arms are individually answered inside refreshLocalizedDynamicUi, which half 1 above pins EXACTLY, so pinning its memo list here as well would only mean every unrelated hud.ts memo edit had to be re-approved in two places.',
-};
+const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
+  readonly file: string;
+  /**
+   * The memos the exemption was argued about, or 'coordinator' for hud.ts. Pinned
+   * for the same reason the ANSWERED rows are: an exemption is granted about
+   * SPECIFIC fields, and a module that later grows a real data signature must
+   * not inherit an answer that was given about a different one.
+   */
+  readonly memos: readonly string[] | 'coordinator';
+  readonly reason: string;
+}> = [
+  {
+    file: 'claudium_window.ts',
+    memos: ['paintedWalletMarkup'],
+    reason:
+      'paintedWalletMarkup retains the RESOLVED wallet markup and is compared against a freshly built walletConnectionHtml(), so a locale change moves both sides of the comparison and the repaint happens by itself. It is a write-elision memo, not a data signature.',
+  },
+  {
+    file: 'daily_rewards_window.ts',
+    memos: ['paintedStoreBody', 'paintedStoreMarkup'],
+    reason:
+      'paintedStoreBody / paintedStoreMarkup retain the RESOLVED store markup and the element it was written into, compared against freshly built markup in replaceStoreBody, so a locale change produces different markup and repaints. Same write-elision shape as claudium_window.',
+  },
+  {
+    file: 'deed_tracker_painter.ts',
+    memos: ['lastChip'],
+    reason:
+      'lastChip gates only the header ARIA presence swap (aria-expanded / aria-controls / aria-haspopup), which carries no player-visible text. Every string in this painter goes through the elided writer facet, which compares resolved text, and the fan-out drives it through this.updateDeedTracker.',
+  },
+  {
+    file: 'hud.ts',
+    memos: 'coordinator',
+    reason:
+      'the coordinator itself. Its own signature-gated arms are individually answered inside refreshLocalizedDynamicUi, which half 1 above pins EXACTLY, so pinning its two dozen unrelated memos here as well would only mean every hud.ts edit had to be re-approved in two places.',
+  },
+];
 
 // ---------------------------------------------------------------------------
 
@@ -326,6 +361,14 @@ describe('language fan-out: half 1, the arms of refreshLocalizedDynamicUi', () =
     // come back short: a walk that stopped parsing part way down the body.
     expect(scan.classMembers, 'the Hud class shrank past recognition').toBeGreaterThan(600);
     expect(observedArms.length, 'the fan-out walk came back short').toBeGreaterThan(30);
+  });
+
+  it('still has a producer for the event the whole fan-out hangs off', () => {
+    // Nothing else pins this, and the entire feature is dead without it: the
+    // listener below would be green while no switch ever reached it.
+    const main = stripComments(readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8'));
+    expect(main).toContain("document.dispatchEvent(new CustomEvent('woc:languagechange'");
+    expect(main).toContain('async function changeLanguage(');
   });
 
   it('wires the fan-out to the woc:languagechange event exactly once', () => {
@@ -364,11 +407,42 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
     expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
   });
 
+  // The corpus does not currently exercise every alternate in the two matchers
+  // (no discovered module is found ONLY by `prev`, `tPlural(` or `tEntity(`), so
+  // a narrowing that dropped one would pass every corpus assertion. Pin the
+  // matchers' own contract directly instead of pretending the tree covers it.
+  it('keeps every alternate in both matchers live', () => {
+    for (const decl of [
+      '  private lastSig = 1;',
+      '  private prevSkills = 1;',
+      '  private knownIds = [];',
+      '  private paintedMarkup = 1;',
+      '  private readonly lastKey = 1;',
+    ]) {
+      expect(new RegExp(MEMO_DECL.source).test(decl), `MEMO_DECL missed ${decl}`).toBe(true);
+    }
+    for (const decl of ['  private lastsig = 1;', '  lastSig = 1;', '  private sig = 1;']) {
+      expect(new RegExp(MEMO_DECL.source).test(decl), `MEMO_DECL over-matched ${decl}`).toBe(false);
+    }
+    for (const call of ["t('a.b')", "tPlural('a.b', 2)", "tEntity({ kind: 'x' })"]) {
+      expect(EMITS_TEXT.test(call), `EMITS_TEXT missed ${call}`).toBe(true);
+    }
+    // A word ending in `t` before a paren is the over-match to stay clear of.
+    for (const call of ['arr.at(3)', 'print(x)', 'format(x)']) {
+      expect(EMITS_TEXT.test(call), `EMITS_TEXT over-matched ${call}`).toBe(false);
+    }
+  });
+
   it('swept a real corpus (non-vacuity)', () => {
+    // src/ui is the one DEEP scan root in this repo, so the floor has to sit
+    // above what a NON-recursive read returns (about 300 top-level files today)
+    // or it cannot detect the failure its own message names.
+    const corpus = tsFilesUnder(uiRoot);
+    expect(corpus.length, 'the src/ui walk came back short').toBeGreaterThan(400);
     expect(
-      tsFilesUnder(uiRoot).length,
-      'the src/ui walk came back short: it stopped recursing',
-    ).toBeGreaterThan(150);
+      corpus.filter((f) => f.file.includes('/')).length,
+      'the src/ui walk returned only top-level files: it stopped recursing',
+    ).toBeGreaterThan(50);
     expect(
       discovered.length,
       'the signature sweep found almost nothing: its memo or text matcher stopped matching',
@@ -402,7 +476,7 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
 
   it('classifies every discovered module exactly once', () => {
     const answered = new Set(ANSWERED.map((s) => s.file));
-    const exempt = new Set(Object.keys(NOT_A_LANGUAGE_GATE));
+    const exempt = new Set(NOT_A_LANGUAGE_GATE.map((r) => r.file));
     const unclassified = discovered
       .map((m) => m.file)
       .filter((f) => !answered.has(f) && !exempt.has(f));
@@ -416,7 +490,7 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
   });
 
   it('keeps no stale rows for modules the sweep no longer finds', () => {
-    const rows = [...ANSWERED.map((s) => s.file), ...Object.keys(NOT_A_LANGUAGE_GATE)];
+    const rows = [...ANSWERED.map((s) => s.file), ...NOT_A_LANGUAGE_GATE.map((r) => r.file)];
     const stale = rows.filter((f) => !discoveredByFile.has(f));
     expect(
       stale,
@@ -456,13 +530,13 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
   it('holds every row to a written reason', () => {
     const thin: string[] = [];
     for (const row of ANSWERED) if (row.why.length < 40) thin.push(`ANSWERED ${row.file}`);
-    for (const [file, reason] of Object.entries(NOT_A_LANGUAGE_GATE)) {
+    for (const row of NOT_A_LANGUAGE_GATE) {
       // The exemption is the cheap way out, so it costs more prose than an answer.
-      if (reason.length < 120) thin.push(`NOT_A_LANGUAGE_GATE ${file}`);
+      if (row.reason.length < 120) thin.push(`NOT_A_LANGUAGE_GATE ${row.file}`);
     }
     expect(thin, `row(s) with no real reason written:\n${thin.join('\n')}`).toEqual([]);
     expect(
-      Object.keys(NOT_A_LANGUAGE_GATE).length,
+      NOT_A_LANGUAGE_GATE.length,
       'the exemption list grew. Every entry is a memo this repo has decided cannot hold player text; adding one should be argued in review, not absorbed by a floor.',
     ).toBe(4);
   });
@@ -473,9 +547,11 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
     // caller is dead code that reads like a working feature.
     const armCalls = new Set(scan.sites.map((s) => s.call));
     const uncalled: string[] = [];
+    const scanned: string[] = [];
     for (const { file, full } of tsFilesUnder(uiRoot)) {
       const source = stripComments(readFileSync(full, 'utf8'));
       if (!/^\s{2}relocalize\(/m.test(source)) continue;
+      scanned.push(file);
       const cls = /export class (\w+)/.exec(source)?.[1] ?? '';
       // Map the class back to the Hud field that holds it, then look for an arm
       // on that field. A module whose relocalize is reached through a wrapper
@@ -488,6 +564,15 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
         [...armCalls].some((c) => c.endsWith('.relocalize') && wrapperOwns(c, cls));
       if (!credited) uncalled.push(`${file} (${cls || 'unnamed class'})`);
     }
+    // The filter above is the whole test: an empty `uncalled` proves nothing if
+    // the relocalize matcher stopped matching (a reformat, an `async`, a
+    // `public`), so floor the set it actually walked.
+    expect(
+      scanned.length,
+      'the relocalize sweep matched almost nothing: its declaration matcher stopped matching',
+    ).toBeGreaterThan(20);
+    expect(scanned).toContain('card_duel_window.ts');
+    expect(scanned).toContain('hud/delve/lockpick_window.ts');
     expect(
       uncalled,
       'src/ui module(s) exposing a relocalize() that Hud.refreshLocalizedDynamicUi never calls. Wire it into the fan-out, or delete it: an uncalled relocalize is what let four windows look answered while they were not:\n' +

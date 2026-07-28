@@ -163,6 +163,11 @@ export class TutorialOverlay {
    */
   relocalize(world: IWorld, keybinds: Keybinds): void {
     if (this.completed || !this.engaged || this.step === null) return;
+    // The same defense update() and isFreshCharacter take: player is typed as an
+    // Entity but is absent in the online pre-snapshot window, and renderPanel
+    // reads player.name. A throw here would unwind the whole fan-out and skip
+    // every arm after this one.
+    if (!world.player) return;
     this.renderPanel(world, keybinds);
   }
 

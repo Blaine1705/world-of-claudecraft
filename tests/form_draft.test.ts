@@ -44,7 +44,7 @@ describe('form_draft: what it carries', () => {
     const root = mount('<input id="a" data-field="other">');
     (root.querySelector<HTMLInputElement>('#a') as HTMLInputElement).value = 'kept';
     const draft = captureFormDraft(root);
-    expect([...draft.values.keys()]).toEqual(['#a']);
+    expect([...draft.values.keys()]).toEqual(['[id="a"]']);
   });
 
   it('skips a field with no stable key rather than guessing at its position', () => {
@@ -52,7 +52,7 @@ describe('form_draft: what it carries', () => {
     root.querySelectorAll('input')[0].value = 'anonymous';
     (root.querySelector<HTMLInputElement>('#a') as HTMLInputElement).value = 'named';
     const draft = captureFormDraft(root);
-    expect([...draft.values.keys()]).toEqual(['#a']);
+    expect([...draft.values.keys()]).toEqual(['[id="a"]']);
 
     // Rebuilt in the OTHER order: an index-keyed restore would put "named" into
     // the anonymous field. Keying on identity cannot.
@@ -84,7 +84,38 @@ describe('form_draft: what it carries', () => {
     const inputs = root.querySelectorAll<HTMLInputElement>('input');
     inputs[0].value = 'first';
     inputs[1].value = 'second';
-    expect(captureFormDraft(root).values.get('#dup')).toBe('first');
+    expect(captureFormDraft(root).values.get('[id="dup"]')).toBe('first');
+  });
+
+  it('survives an id and a data-field that are not legal CSS identifiers', () => {
+    // A leading digit is a legal HTML id and an ILLEGAL CSS identifier, so an
+    // unescaped `#2fa` makes querySelector throw SyntaxError, and that throw
+    // would unwind out of relocalize and take the rest of the language fan-out
+    // with it. Same for a quote or a bracket inside a data-field value.
+    const root = mount('<input id="2fa" type="text"><input data-field=\'a"b]c\' type="text">');
+    (root.querySelector<HTMLInputElement>('input') as HTMLInputElement).value = 'code';
+    (root.querySelectorAll<HTMLInputElement>('input')[1] as HTMLInputElement).value = 'odd';
+    const draft = captureFormDraft(root);
+    expect(draft.values.size).toBe(2);
+
+    root.innerHTML = '<input id="2fa" type="text"><input data-field=\'a"b]c\' type="text">';
+    expect(() => restoreFormDraft(root, draft)).not.toThrow();
+    const rebuilt = root.querySelectorAll<HTMLInputElement>('input');
+    expect(rebuilt[0].value).toBe('code');
+    expect(rebuilt[1].value).toBe('odd');
+  });
+
+  it('falls back to a data attribute of any name, including a valueless one', () => {
+    // The windows key their controls on whatever data-* they already carry
+    // (data-tab, data-cal-day, data-close), not on data-field specifically.
+    const root = mount('<button data-close>x</button><input data-cal-day="2026-07-27">');
+    (root.querySelector<HTMLInputElement>('[data-cal-day]') as HTMLInputElement).value = 'noted';
+    const draft = captureFormDraft(root);
+    expect([...draft.values.keys()]).toEqual(['[data-cal-day="2026-07-27"]']);
+
+    root.innerHTML = '<button data-close>x</button><input data-cal-day="2026-07-27">';
+    restoreFormDraft(root, draft);
+    expect(root.querySelector<HTMLInputElement>('[data-cal-day]')?.value).toBe('noted');
   });
 
   it('drops a field the rebuild did not bring back rather than recreating it', () => {
@@ -94,6 +125,17 @@ describe('form_draft: what it carries', () => {
     root.innerHTML = '<div>read only now</div>';
     expect(() => restoreFormDraft(root, draft)).not.toThrow();
     expect(root.querySelector('#a')).toBeNull();
+  });
+
+  it('does not write a value onto a DIFFERENT element that reused the key', () => {
+    const root = mount('<input id="a" type="text">');
+    (root.querySelector<HTMLInputElement>('#a') as HTMLInputElement).value = 'typed';
+    const draft = captureFormDraft(root);
+    // The rebuild turned the editable field into read-only markup under the same
+    // id (the calendar does exactly this when management rights drop).
+    root.innerHTML = '<div id="a">read only now</div>';
+    restoreFormDraft(root, draft);
+    expect(root.querySelector('#a')?.textContent).toBe('read only now');
   });
 });
 
@@ -105,13 +147,29 @@ describe('form_draft: focus', () => {
     input.focus();
     input.setSelectionRange(3, 5);
     const draft = captureFormDraft(root);
-    expect(draft.focusKey).toBe('#a');
+    expect(draft.focusKey).toBe('[id="a"]');
 
     root.innerHTML = '<input id="a" type="text">';
     restoreFormDraft(root, draft);
     const rebuilt = root.querySelector<HTMLInputElement>('#a') as HTMLInputElement;
     expect(document.activeElement).toBe(rebuilt);
     expect([rebuilt.selectionStart, rebuilt.selectionEnd]).toEqual([3, 5]);
+  });
+
+  it('restores focus to a BUTTON, not only to a text field', () => {
+    // These windows install a Tab trap that only arms while focus is inside the
+    // root, so a rebuild that dropped focus to <body> would let the next Tab
+    // walk the player straight out of an open dialog.
+    const root = mount('<button data-tab="send">Send</button><input id="a" type="text">');
+    const button = root.querySelector('button') as HTMLButtonElement;
+    button.focus();
+    const draft = captureFormDraft(root);
+    expect(draft.focusKey).toBe('[data-tab="send"]');
+    expect(draft.selection, 'a button has no caret to record').toBeNull();
+
+    root.innerHTML = '<button data-tab="send">Enviar</button><input id="a" type="text">';
+    restoreFormDraft(root, draft);
+    expect(document.activeElement).toBe(root.querySelector('button'));
   });
 
   it('does NOT steal focus when the player was typing somewhere else', () => {
@@ -133,6 +191,27 @@ describe('form_draft: focus', () => {
     expect(document.activeElement).toBe(elsewhere);
   });
 
+  it('leaves focus alone when the rebuild dropped the field that had it', () => {
+    const root = mount('<input id="a" type="text">');
+    const input = root.querySelector<HTMLInputElement>('#a') as HTMLInputElement;
+    input.focus();
+    const draft = captureFormDraft(root);
+    root.innerHTML = '<div>gone</div>';
+    expect(() => restoreFormDraft(root, draft)).not.toThrow();
+    expect(document.activeElement).toBe(document.body);
+  });
+
+  it('records no caret for a number input, the shape the DOM reports as null', () => {
+    // The everyday jsdom/browser shape for a non-text input, distinct from the
+    // throwing shape below: selectionStart simply reads null.
+    const root = mount('<input id="g" type="number" value="0">');
+    const input = root.querySelector<HTMLInputElement>('#g') as HTMLInputElement;
+    input.focus();
+    const draft = captureFormDraft(root);
+    expect(draft.focusKey).toBe('[id="g"]');
+    expect(draft.selection).toBeNull();
+  });
+
   it('survives a focused number input, whose selection range the DOM refuses', () => {
     const root = mount('<input id="g" type="number" value="0">');
     const input = root.querySelector<HTMLInputElement>('#g') as HTMLInputElement;
@@ -146,7 +225,7 @@ describe('form_draft: focus', () => {
       },
     });
     const draft = captureFormDraft(root);
-    expect(draft.focusKey).toBe('#g');
+    expect(draft.focusKey).toBe('[id="g"]');
     expect(draft.selection).toBeNull();
 
     root.innerHTML = '<input id="g" type="number" value="0">';

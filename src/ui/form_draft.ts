@@ -22,8 +22,13 @@
 // FOCUS IS RESTORED ONLY IF IT WAS ALREADY INSIDE THIS ROOT. The language picker
 // lives in the Options window, so at the moment of a switch the player is
 // normally focused there; re-focusing a mailbox field would yank the caret out
-// from under them. Capturing the caret is still worth it because the two windows
-// CAN both be open (opening a window no longer closes its siblings).
+// from under them. Capturing it is still worth it because the two windows CAN
+// both be open (opening a window no longer closes its siblings), and focus is
+// tracked for ANY control under the root, not only the text fields: these
+// windows install a Tab trap that only arms while `root.contains(activeElement)`
+// (see focus_manager.ts), so a rebuild that dropped focus to `<body>` would let
+// the next Tab walk straight out of the window. The spellbook already restores
+// focus by selector across its own rebuild for the same reason.
 
 /** The `<input>` types whose `.value` is the text a player typed. A checkbox or
  *  radio carries its state in `.checked`, and a file/color/range input has no
@@ -34,11 +39,15 @@ type DraftField = HTMLInputElement | HTMLTextAreaElement;
 
 /** A window's live text, captured before a rebuild and written back after it. */
 export interface FormDraft {
-  /** Field key (`#id` or `[data-field="..."]`) to the value it held. */
+  /** Field key (`[id="..."]` or `[data-*="..."]`) to the value it held. */
   readonly values: ReadonlyMap<string, string>;
-  /** The key of the field that held focus, or null when focus was elsewhere. */
+  /**
+   * The key of the element that held focus, or null when focus was outside this
+   * root. NOT limited to the text fields in `values`: a focused button matters
+   * too, because losing it disarms the window's Tab trap.
+   */
   readonly focusKey: string | null;
-  /** The caret/selection of the focused field, when it exposes one. */
+  /** The caret/selection, when the focused element was a text field exposing one. */
   readonly selection: readonly [start: number, end: number] | null;
 }
 
@@ -48,12 +57,48 @@ function isDraftField(el: Element): el is DraftField {
   return TEXT_INPUT_TYPES.has((el as HTMLInputElement).type);
 }
 
-/** The selector that finds this field again in the rebuilt DOM, or null when it
- *  carries no stable identity to find it by. */
-function draftKey(el: DraftField): string | null {
-  if (el.id) return `#${el.id}`;
-  const field = el.dataset.field;
-  return field ? `[data-field="${field}"]` : null;
+/**
+ * The selector that finds this element again in the rebuilt DOM, or null when it
+ * carries no stable identity to find it by.
+ *
+ * Falls back to the first `data-*` attribute, which is how every window in this
+ * repo identifies its controls (`data-tab`, `data-cal-day`, `data-play`,
+ * `data-close`, `data-act`). An element with none of the three is skipped rather
+ * than guessed at: a wrong restore is worse than none.
+ */
+function elementKey(el: Element): string | null {
+  if (el.id) return `[id="${escapeSelectorString(el.id)}"]`;
+  for (const attr of el.attributes) {
+    if (attr.name.startsWith('data-'))
+      return `[${attr.name}="${escapeSelectorString(attr.value)}"]`;
+  }
+  return null;
+}
+
+/**
+ * Escape a value for use inside a quoted CSS attribute-selector string.
+ *
+ * The id key is written `[id="..."]` rather than `#...` on purpose. A leading
+ * digit is a legal HTML id and an ILLEGAL CSS identifier, so `#2fa` makes
+ * querySelector throw SyntaxError, and that throw would unwind out of the
+ * window's relocalize and out of the whole language fan-out, taking every
+ * later surface with it. A quoted attribute selector accepts any value, so the
+ * only escaping left is the two characters that would end the string early.
+ * (`CSS.escape` would solve the identifier form, but it is absent in the test
+ * DOM, and a fix that only holds in a browser is not a fix.)
+ */
+function escapeSelectorString(value: string): string {
+  return value.replace(/[\\"]/g, '\\$&');
+}
+
+/** `querySelector` that cannot throw: an unmatchable key skips its restore
+ *  rather than unwinding the caller. Belt for the escaping above. */
+function findByKey(root: ParentNode, key: string): Element | null {
+  try {
+    return root.querySelector(key);
+  } catch {
+    return null;
+  }
 }
 
 /** `selectionStart`/`setSelectionRange` throw on a number input in Chromium and
@@ -76,22 +121,22 @@ function readSelection(el: DraftField): readonly [number, number] | null {
  */
 export function captureFormDraft(root: ParentNode): FormDraft {
   const values = new Map<string, string>();
-  const active = typeof document === 'undefined' ? null : document.activeElement;
-  let focusKey: string | null = null;
-  let selection: readonly [number, number] | null = null;
   for (const el of root.querySelectorAll('input, textarea')) {
     if (!isDraftField(el)) continue;
-    const key = draftKey(el);
+    const key = elementKey(el);
     // First writer wins: a duplicate id restores through one querySelector
     // anyway, so recording the later one would write the wrong value back.
     if (key === null || values.has(key)) continue;
     values.set(key, el.value);
-    if (el === active) {
-      focusKey = key;
-      selection = readSelection(el);
-    }
   }
-  return { values, focusKey, selection };
+  const active = typeof document === 'undefined' ? null : document.activeElement;
+  const focused =
+    active !== null && active !== document.body && root.contains(active) ? active : null;
+  return {
+    values,
+    focusKey: focused ? elementKey(focused) : null,
+    selection: focused && isDraftField(focused) ? readSelection(focused) : null,
+  };
 }
 
 /**
@@ -100,14 +145,14 @@ export function captureFormDraft(root: ParentNode): FormDraft {
  */
 export function restoreFormDraft(root: ParentNode, draft: FormDraft): void {
   for (const [key, value] of draft.values) {
-    const el = root.querySelector(key);
+    const el = findByKey(root, key);
     if (el && isDraftField(el)) el.value = value;
   }
   if (draft.focusKey === null) return;
-  const target = root.querySelector(draft.focusKey);
-  if (!target || !isDraftField(target)) return;
+  const target = findByKey(root, draft.focusKey);
+  if (!(target instanceof HTMLElement)) return;
   target.focus();
-  if (draft.selection === null) return;
+  if (draft.selection === null || !isDraftField(target)) return;
   try {
     target.setSelectionRange(draft.selection[0], draft.selection[1]);
   } catch {
