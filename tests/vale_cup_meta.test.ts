@@ -400,6 +400,55 @@ describe('Vale Cup <-> Arena: mutual queue exclusion', () => {
     sim.tick(); // matchmakeArena1v1's prune re-checks vcupSeatedOrQueued
     expect(sim.arenaQueue1v1).not.toContain(a);
   });
+
+  // Review follow-up: startValeCupPractice is a THIRD entry point that seats a
+  // player straight into a Vale Cup instance, bypassing vcupQueueJoin. It only
+  // checked live arena matches, so an arena-QUEUED player could start practice
+  // and then be pulled into a bout from the queue they were still sitting in.
+  it('rejects starting a Vale Cup practice while waiting in the Arena queue', () => {
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Ada', 0, -40);
+    sim.arenaQueueJoin(a);
+    expect(sim.arenaQueue1v1).toContain(a);
+    sim.drainEvents();
+    sim.vcupPracticeStart(1, a);
+    expect(errorsOf(sim.drainEvents())).toContain('You are already in an arena match.');
+    expect(sim.vcupMatchOf(a)).toBeNull();
+    expect(sim.arenaQueue1v1).toContain(a); // the arena spot is kept, not dropped
+  });
+
+  it('rejects starting a Vale Cup practice while waiting in a Protect Yumi queue', () => {
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Ada', 0, -40);
+    sim.arenaQueueJoin(a, 'yumi3');
+    expect(sim.arenaQueueYumi3.some((u) => u.pids.includes(a))).toBe(true);
+    sim.drainEvents();
+    sim.vcupPracticeStart(1, a);
+    expect(errorsOf(sim.drainEvents())).toContain('You are already in an arena match.');
+    expect(sim.vcupMatchOf(a)).toBeNull();
+    expect(sim.arenaQueueYumi3.some((u) => u.pids.includes(a))).toBe(true);
+  });
+
+  it('defense in depth: the Protect Yumi prune drops a queued player who is also Vale Cup seated', () => {
+    // Mirrors the 1v1 prune test above for the yumi3/yumi5 arms: seat `a` onto
+    // an UNRELATED live match roster directly (no entity move), so only the
+    // vcupSeatedOrQueued arm of pruneYumiQueue can be what drops the unit.
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Ada', 0, -40);
+    const c = addAt(sim, 'mage', 'Cee', 10, -40);
+    const d = addAt(sim, 'rogue', 'Dee', 14, -40);
+    sim.arenaQueueJoin(a, 'yumi3');
+    const match = startBout(sim, c, d);
+    expect(sim.arenaQueueYumi3.some((u) => u.pids.includes(a))).toBe(true);
+    // Fill the rest of a yumi3 bout so matchmaking would otherwise seat `a`.
+    for (let i = 0; i < 5; i++) {
+      sim.arenaQueueJoin(addAt(sim, 'warrior', `P${i}`, 20 + i * 3, -40), 'yumi3');
+    }
+    match.teamA.push(a);
+    sim.tick();
+    expect(sim.arenaQueueYumi3.some((u) => u.pids.includes(a))).toBe(false);
+    expect(sim.arenaMatches.has(a)).toBe(false);
+  });
 });
 
 describe('Vale Cup: guild banners and the guild leaderboard', () => {
