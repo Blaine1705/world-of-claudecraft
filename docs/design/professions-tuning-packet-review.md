@@ -578,7 +578,12 @@ exactly once.
    deleted so keys re-pend; non-Latin fills for M16-wordy values in the
    same change), because the gate cannot see reword staleness.
 3. Re-size the release fill AFTER the sweep (the 21-key/315-row figure is
-   already stale) and record the new count here.
+   already stale, and it moved AGAIN with the v0.32.0 merge: release
+   commit 0f9d6c2d4 retired `guide.professions.harvestBody` for a new
+   `harvestBodyChoice` and ran the remove-and-refill protocol on it
+   itself, so that key is OFF this phase's reword list; do not re-reword
+   it without re-checking its post-release English first) and record the
+   new count here.
 4. The release-tier locale fill (`I18N_RELEASE_TIER=1` green) is this
    phase's closing act, via the i18n-locale-fill skill.
 

@@ -581,7 +581,11 @@ Its own phase because it is the only one that touches persistence and the wire.
   to this packet. The verified numbers: the parkour physics engine (#2527,
   commit `5eb1410bd`) re-recorded **13** goldens, and it is an ancestor of this
   branch's merge base, so it is release-owned and nothing to do with us. **19**
-  goldens moved across the whole v0.31.0 cycle for the same reason. This branch
+  goldens moved across the whole v0.31.0 cycle for the same reason. The
+  v0.32.0 merge brought a SECOND release-owned draw-order event beside it:
+  #2514 changed the corpse-harvest draw COUNT (an unmapped family no longer
+  burns a tier roll), which moves no golden only because nothing in the
+  parity suite drives `harvestCorpse`. This branch
   touched **6** golden files: four combat traces re-recorded in `69a6c9a99`
   (the world gained a solid body at every ore and wood node, so mob pathing
   differs, which is geometry moving the stream rather than draw order changing),
