@@ -64,6 +64,12 @@ export class LockpickController {
     this.window.repaintIfChanged();
   }
 
+  /** Re-localize the open lock board after an in-game language switch (the Hud's
+   *  woc:languagechange fan-out). Self-gated inside the window. */
+  relocalize(): void {
+    this.window.relocalize();
+  }
+
   end(outcome: 'success' | 'fail' | 'abandoned', tier?: LootTier): void {
     const summary =
       outcome === 'success'

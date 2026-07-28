@@ -170,6 +170,24 @@ export class LockpickWindow {
     this.syncTimer();
   }
 
+  /**
+   * Re-localize after an in-game language switch (the Hud's woc:languagechange
+   * fan-out). Self-gated on the panel being up with a live session, so the
+   * fan-out can call it unconditionally.
+   *
+   * lockpickRenderSig is rows, columns, tries and the pick position, all
+   * numbers, so a switch alone never moves it and the per-frame
+   * repaintIfChanged above would leave the board's labels in the old locale.
+   * Clearing forces exactly one renderBoard, which re-latches the signature in
+   * the same call.
+   */
+  relocalize(): void {
+    if (this.panel()?.style.display !== 'block') return;
+    if (!this.deps.getState()) return;
+    this.lastSig = '';
+    this.repaintIfChanged();
+  }
+
   /** Refill the per-page clock whenever the timed move changes (a new pin, try,
    * page, or session); stop it when the lock ends. State-driven so a correct move
    * ALWAYS rewinds the clock to full, regardless of how/when events were drained. */

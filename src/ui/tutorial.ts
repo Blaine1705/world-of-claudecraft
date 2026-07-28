@@ -151,6 +151,21 @@ export class TutorialOverlay {
     this.updateArrow(world, renderer);
   }
 
+  /**
+   * Re-localize after an in-game language switch (the Hud's woc:languagechange
+   * fan-out). Self-gated on there being a card on screen, so the fan-out can
+   * call it unconditionally.
+   *
+   * update() repaints only when the STEP changes or Interface Mode flips, so a
+   * card that is already up would keep its old-locale copy for the whole step.
+   * Takes the world and keybinds the same way update() does, since the card's
+   * copy interpolates the live keybind labels and the player's name.
+   */
+  relocalize(world: IWorld, keybinds: Keybinds): void {
+    if (this.completed || !this.engaged || this.step === null) return;
+    this.renderPanel(world, keybinds);
+  }
+
   // ---- internals --------------------------------------------------------
 
   private findEntity(world: IWorld, kind: string, templateId: string) {

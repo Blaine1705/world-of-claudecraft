@@ -50,6 +50,17 @@ export class MobileActionRingPainter {
    *  rebuild + write entirely on an unchanged page). The toggle's aria-label is
    *  the static "Switch action page" action name (its purpose never changes);
    *  the indicator span shows the dynamic "Page X of Y" text. */
+  /** Re-localize after an in-game language switch (the Hud's woc:languagechange
+   *  fan-out). Both elided writes above are keyed on the page/count pair, which
+   *  is two integers, so a switch alone never moves them and the ring would keep
+   *  the old locale's "Page X of Y" and toggle name. Dropping the latch makes the
+   *  NEXT paint rewrite both, the same in-place shape the party rows use (there
+   *  is no state to paint from here: the descriptor arrives per call). */
+  relocalize(): void {
+    this.lastPage = -1;
+    this.lastPageCount = -1;
+  }
+
   paint(
     state: ActionBarState,
     page: number,
