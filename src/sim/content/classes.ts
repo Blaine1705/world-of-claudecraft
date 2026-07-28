@@ -6188,7 +6188,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'next_attack_crit', value: 1, duration: 60 }],
     description:
-      'Focuses your killing intent so your next attack is a critical strike. (Assassination signature)',
+      'Focuses your killing intent so your next attack is a critical strike. (Knifework signature)',
   },
   blade_flurry: {
     id: 'blade_flurry',
@@ -6203,7 +6203,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'buff_haste', value: 1.2, duration: 12 }],
     description:
-      'Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)',
+      'Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)',
   },
   hemorrhage: {
     id: 'hemorrhage',

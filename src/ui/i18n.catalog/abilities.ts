@@ -1616,12 +1616,12 @@ const classAbilityNamesEn = {
       [
         'cold_blood',
         "Killer's Calm",
-        'Focuses your killing intent so your next attack is a critical strike. (Assassination signature)',
+        'Focuses your killing intent so your next attack is a critical strike. (Knifework signature)',
       ],
       [
         'blade_flurry',
         'Mirrored Blades',
-        'Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Combat signature)',
+        'Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)',
       ],
       [
         'hemorrhage',
