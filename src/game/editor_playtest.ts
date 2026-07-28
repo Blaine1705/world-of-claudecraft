@@ -1,3 +1,4 @@
+import { WORLD_SEED } from '../sim/world_seed';
 // Game-side reader for an editor play-test handoff. The map editor (its own
 // entry at /editor) serializes a custom world into sessionStorage and navigates
 // to the game page; this reads it back so the OFFLINE boot can run that world.
@@ -70,7 +71,7 @@ export function takeEditorPlaytestRequest(): EditorPlaytestRequest | null {
     const obj = JSON.parse(raw) as Record<string, unknown>;
     if (!obj || typeof obj !== 'object') return null;
     if (!looksLikeWorldContent(obj.content)) return null;
-    const seed = typeof obj.seed === 'number' && Number.isFinite(obj.seed) ? obj.seed : 20061;
+    const seed = typeof obj.seed === 'number' && Number.isFinite(obj.seed) ? obj.seed : WORLD_SEED;
     const pc =
       typeof obj.playerClass === 'string' && VALID_CLASSES.has(obj.playerClass)
         ? (obj.playerClass as PlayerClass)

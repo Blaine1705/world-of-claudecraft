@@ -14,13 +14,17 @@
 //
 // KNOWN-UNCOVERED stores, deliberately: the vendor buy-back list, the
 // expired-listing market collection (an expired listing is spliced OUT of
-// marketListings before the player claims it), and equipment slots. None is
-// reachable today, because every requiredItems item is quest-kind or carries
-// noVendorSell plus noMarketList, and the sweep in
-// tests/professions_starter_tools.test.ts keeps that true: a future quest
-// requiring a sellable, listable, or equippable item must widen this
-// predicate first. Today only the bags and bank arms can fire for live
-// content; mail and escrow are the defense in depth for that future.
+// marketListings before the player claims it), equipment slots, and the bag
+// sockets (equipBag parks the item id in meta.bags, recoverable through
+// unequipBag). None is reachable today, and each is fenced by its own gate:
+// buy-back and the collection by the quest-kind/noVendorSell/noMarketList
+// flags every requiredItems item carries, the equipment slots by equipItem's
+// slot-plus-kind gate, and the bag sockets by equipBag's bag-kind gate. The
+// sweep in tests/professions_starter_tools.test.ts pins ALL of those item
+// properties for every requiredItems quest, so a future quest requiring an
+// item any of the four stores could hold must widen this predicate first.
+// Today only the bags and bank arms can fire for live content; mail and
+// escrow are the defense in depth for that future.
 //
 // A traded-away copy is genuinely gone and DOES re-grant: direct trade stays
 // an open transfer route by ruling (R10). The quest cadence bounds only the

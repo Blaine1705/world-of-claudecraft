@@ -364,8 +364,19 @@ describe('persistence: absent stays absent, present round-trips', () => {
         confirmMode: 'always',
       },
     });
-    // Fixed point: a second save-load cycle changes nothing.
+    // Fixed point: a second save-load cycle changes nothing. The intermediate
+    // is pinned to the literal FIRST, so a serializer that stopped emitting
+    // the field entirely cannot satisfy the equality with undefined on both
+    // sides.
     const resaved = reloaded.serializeCharacter(pid) as CharacterState;
+    expect(resaved.toolEffectSlots).toEqual({
+      logging: {
+        effectId: 'gatherers_cache',
+        durability: 7,
+        maxDurability: 30,
+        confirmMode: 'always',
+      },
+    });
     const again = makeSim(17);
     const pid2 = again.addPlayer('warrior', 'Policy2', { state: resaved });
     expect(again.serializeCharacter(pid2)?.toolEffectSlots).toEqual(resaved.toolEffectSlots);

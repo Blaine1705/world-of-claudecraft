@@ -28,7 +28,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
-import { DUNGEON_X_THRESHOLD, GATHER_NODES, ZONES } from '../src/sim/data';
+import { DUNGEON_X_THRESHOLD, GATHER_NODES, MOBS, ZONES } from '../src/sim/data';
 import { MAX_AGGRO_RADIUS } from '../src/sim/mob/locomotion';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { GATHER_NODE_BODIES } from '../src/sim/prop_layout';
@@ -156,12 +156,10 @@ describe('the Copper Dig vein field stays walkable content (solid gather nodes)'
     //     straight through and reaches melee sooner).
     expect(isBlocked(WORLD_SEED, anchor.pos.x, anchor.pos.z, PLAYER_BODY_RADIUS)).toBe(true);
     expect(isBlocked(WORLD_SEED, neighbour.pos.x, neighbour.pos.z, PLAYER_BODY_RADIUS)).toBe(true);
-    // (e) Fixture dependency, named: the mob start must sit inside the
-    //     pursuer's EFFECTIVE aggro reach (template aggroRadius plus the
-    //     level-delta scaling in mob/locomotion.ts). If a content tune ever
-    //     shrinks that below this distance, the aggroTick assert below fails
-    //     as a FIXTURE limit, not a pathing regression: shorten APPROACH.
-    expect(dist(start, stand)).toBeLessThan(MAX_AGGRO_RADIUS);
+    // (e) Fixture dependency, named and computed below once the pursuer is
+    //     chosen: the mob start must sit inside its EFFECTIVE aggro reach,
+    //     not merely the hard ceiling, or the diagnostic fires only after
+    //     the ceiling itself moves.
 
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
     const player = sim.entities.get(sim.playerId)!;
@@ -186,6 +184,19 @@ describe('the Copper Dig vein field stays walkable content (solid gather nodes)'
     mob.wanderTarget = null;
     mob.aiState = 'idle';
     sim.rebucket(mob);
+    // The (e) fixture bound, against the pursuer's EFFECTIVE reach: the same
+    // expression the idle aggro scan evaluates (mob/locomotion.ts), so a
+    // content tune that shrinks tunnel_rat's reach below the start distance
+    // fails HERE with a fixture message (shorten APPROACH), not at the
+    // aggroTick assert below dressed up as a pathing regression.
+    const effectiveAggro = Math.max(
+      4,
+      Math.min(MAX_AGGRO_RADIUS, MOBS.tunnel_rat.aggroRadius + (mob.level - player.level) * 1.5),
+    );
+    expect(
+      dist(start, stand),
+      'fixture: start must sit inside the effective aggro reach',
+    ).toBeLessThan(effectiveAggro);
 
     // Everyone else stands down: park every other mob far south of the dig, so
     // the pull under test is exactly one pursuer and the damage asserted below
@@ -215,7 +226,9 @@ describe('the Copper Dig vein field stays walkable content (solid gather nodes)'
     let hitTick = -1;
     // Sampled EVERY tick, not just at the end: tunnelling is a mid-path
     // event, and a mob that stepped through a body and came out the other
-    // side would look legal in a final-position-only check.
+    // side would look legal in a final-position-only check. The per-tick
+    // step (moveSpeed times DT, about 0.35 yd) sits far below the body
+    // diameter, so the samples cannot skip the disc entirely.
     let minVeinClearance = Number.POSITIVE_INFINITY;
     for (let tick = 1; tick <= MAX_TICKS; tick++) {
       sim.tick();

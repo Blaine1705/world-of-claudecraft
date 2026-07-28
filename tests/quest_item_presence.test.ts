@@ -121,7 +121,9 @@ describe('playerHoldsQuestItem, one store at a time', () => {
         return false;
       },
     });
-    expect(playerHoldsQuestItem(ctx, fakeMeta([{ itemId: TOOL, count: 1 }]), TOOL)).toBe(true);
+    // Empty bank on purpose: with a bank copy too the arm would only prove
+    // "some local store short-circuits"; bags alone proves bags-first.
+    expect(playerHoldsQuestItem(ctx, fakeMeta(), TOOL)).toBe(true);
     expect(mailCalls).toBe(0);
     expect(marketCalls).toBe(0);
   });
@@ -198,5 +200,22 @@ describe('the real seams', () => {
     expect(sim.countItem(LISTABLE, pid)).toBe(0); // escrowed out of the bags
     expect(sim.marketListings.some((l) => l.itemId === LISTABLE)).toBe(true);
     expect(playerHoldsQuestItem(sim.ctx, meta, LISTABLE)).toBe(true);
+    // The false direction of the REAL ownership check, locally: a stranger's
+    // listing of the same item must not read as mine. Pushed directly into
+    // the book with a foreign seller key, the shape marketBuy already vets.
+    sim.marketCancel(sim.marketListings.find((l) => l.itemId === LISTABLE)!.id, pid);
+    sim.marketListings.push({
+      id: 424242,
+      sellerKey: 'someone-else-entirely',
+      sellerName: 'Stranger',
+      itemId: LISTABLE,
+      count: 1,
+      price: 10,
+      expiresAt: Number.POSITIVE_INFINITY,
+      house: false,
+    });
+    expect(sim.countItem(LISTABLE, pid)).toBe(1); // the cancel returned mine
+    sim.removeItem(LISTABLE, 1, pid);
+    expect(playerHoldsQuestItem(sim.ctx, meta, LISTABLE)).toBe(false);
   });
 });

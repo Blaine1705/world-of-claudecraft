@@ -54,6 +54,16 @@
 //   1 unit on a common roll and 2 to 4 on a rarer one, so a real climb needs
 //   fewer casts than this. Assuming the common row is the honest pessimistic
 //   arm and keeps the derivation draw-free (no Rng, no seed hunting).
+// - The rare-event yield multiplier is unmodeled: biases the hours UP. The
+//   harvest grant multiplies yield by GATHER_RARE_EVENT_YIELD_MULT at
+//   GATHER_RARE_EVENT_CHANCE, a flat ~1.04x on expected units per cast that
+//   applies at any proficiency.
+// - The proficiency YIELD growth is unmodeled: biases the hours UP by a
+//   lot. gatherNodeGainMultiplier fires on every harvest, and the climb to
+//   the later yield rungs completes well inside the casts the bill demands,
+//   so a real player's per-cast yield rises through the very grind this
+//   model prices at the floor rate. (Distinct from the access-climb bullet
+//   below, which is about a separate design target, not yields.)
 // - No self-signed reduction: biases the bill (and hours) UP. Every
 //   requiredReagentCountFor call passes hasSelfSigned false, so the #1145
 //   reduction a real crafter holding their own signed work would enjoy is
@@ -65,12 +75,13 @@
 //   gold cost and a kill count, not a harvest rate. They are still summed and
 //   asserted non-empty, because a bill that became all-gathered or all-vendor
 //   would be a different game and should redden here.
-// - No travel, no node contention, no cast time: biases DOWN. The respawn
-//   ceiling is the
-//   binding term (450 thorium casts over six nodes is five hours of respawn
-//   against roughly nineteen minutes of casting at GATHER_CAST_BASE_SEC), so
-//   folding cast time in would move the total by a few percent and hide the
-//   lever that matters.
+// - No travel, no node contention, no cast time: biases DOWN, though barely.
+//   The measured six-node circuits run well under the respawn timer, so the
+//   respawn ceiling is genuinely the binding term (450 thorium casts over
+//   six nodes is five hours of respawn against roughly nineteen minutes of
+//   casting at GATHER_CAST_BASE_SEC): folding circuit time in moves the
+//   total by nothing, and modeling it would only hide the lever that
+//   matters.
 // - The gathering-proficiency climb needed to work the later zones is not
 //   priced. The design record tracks that separately (gathering 100 in 8 to
 //   12 hours), and double-counting it here would conflate two targets.
@@ -89,10 +100,15 @@
 // The window asserted below is 5 to 10 hours. Wide enough that a legitimate
 // small tune does not redden it, and the bite arms measure both ends: tripling
 // the gathered half of every reagent list reaches 21.7 hours, trimming it to a
-// third reaches 1.7, and halving node density reaches 13.9. Note that 6.94
-// sits BELOW the prose target of 10 to 20 focused hours: the down-biased
-// bullets dominate, so the derived figure reads as an optimistic floor, and
-// the per-bullet directions above say which lever moves it which way.
+// third reaches 1.7, and halving node density reaches 13.9.
+//
+// READ THE 6.94 HONESTLY: it bounds the MODEL, not the player, and the UP
+// biases dominate (measured in the QA round: the unmodeled rare-event
+// multiplier alone brings it to ~6.66, the real proficiency climb to ~3.6,
+// and the self-signed reduction to ~2.8). A real focused climb therefore
+// lands nearer 3 to 5 hours against the design record's 10-to-20 prose
+// target: the shipped content is FASTER than the target, not slower, and a
+// tuner reaching for a lever should start from that reading.
 
 import { describe, expect, it } from 'vitest';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
@@ -552,14 +568,25 @@ describe('armorcrafting mastery derives from the live tables (R13)', () => {
     // mechanism teeth. A deliberate retune updates them consciously; a
     // silently deleted mechanic reddens them.
     //
-    // Discount ON: the specialized rungs charge the discounted thorium bill.
+    // Discount ON: the specialized rungs charge the discounted thorium bill,
+    // and the lower rungs' bills are pinned too, so the bottom half of the
+    // ladder (which consumes no thorium at all) cannot reshape silently
+    // under the window either.
     expect(RUN.bill.get('thorium_ore')).toBe(450);
-    // Gain curve ON: the top rung takes its full-then-reduced craft count.
-    const topRung = Math.max(...ARMORCRAFTING_RECIPES.map((r) => r.skillReq));
-    const topRungCrafts = [...RUN.recipeUse.entries()]
-      .filter(([id]) => ARMORCRAFTING_RECIPES.find((r) => r.id === id)?.skillReq === topRung)
-      .reduce((n, [, uses]) => n + uses, 0);
-    expect(topRungCrafts).toBe(75);
+    expect(RUN.bill.get('iron_ore')).toBe(100);
+    expect(RUN.bill.get('copper_ore')).toBe(75);
+    // Gain curve ON: the whole per-rung craft vector, not just the top rung.
+    const craftsPerRung = new Map<number, number>();
+    for (const [id, uses] of RUN.recipeUse) {
+      const rung = ARMORCRAFTING_RECIPES.find((r) => r.id === id)?.skillReq ?? -1;
+      craftsPerRung.set(rung, (craftsPerRung.get(rung) ?? 0) + uses);
+    }
+    expect([...craftsPerRung.entries()].sort(([a], [b]) => a - b)).toEqual([
+      [0, 25],
+      [25, 25],
+      [50, 25],
+      [75, 75],
+    ]);
     // And the dominant gathered line reaches the hour total through a real
     // per-material figure (the split assertion above only checks the model's
     // own internal consistency; this is the production-facing number).
@@ -580,5 +607,13 @@ describe('armorcrafting mastery derives from the live tables (R13)', () => {
     const withSigned = requiredReagentCountFor(true, reagent, skills, CRAFT).count;
     const without = requiredReagentCountFor(false, reagent, skills, CRAFT).count;
     expect(withSigned).toBe(without - 1);
+    // And the floor: a single-unit reagent never discounts below one.
+    const single = requiredReagentCountFor(
+      true,
+      { itemId: reagent.itemId, count: 1 },
+      skills,
+      CRAFT,
+    );
+    expect(single.count).toBe(1);
   });
 });

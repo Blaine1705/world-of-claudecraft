@@ -39,11 +39,16 @@ const PROFESSIONS_ZONE_ROLLOUT: Readonly<Record<string, 'complete' | 'none'>> = 
   thornpeak_heights: 'complete',
 };
 
-const ROLLED_OUT = new Set(
-  Object.entries(PROFESSIONS_ZONE_ROLLOUT)
-    .filter(([, state]) => state === 'complete')
-    .map(([zoneId]) => zoneId),
-);
+/** The zones the assert-complete arms sweep: every 'complete' ledger row. */
+function rolledOutFrom(ledger: Readonly<Record<string, 'complete' | 'none'>>): Set<string> {
+  return new Set(
+    Object.entries(ledger)
+      .filter(([, state]) => state === 'complete')
+      .map(([zoneId]) => zoneId),
+  );
+}
+
+const ROLLED_OUT = rolledOutFrom(PROFESSIONS_ZONE_ROLLOUT);
 
 /** Every professions implement in the item table (land tools and rods). */
 function professionToolIds(): Set<string> {
@@ -64,6 +69,11 @@ describe('the R37 professions zone-rollout guard', () => {
       [...Object.keys(PROFESSIONS_ZONE_ROLLOUT)].sort(),
     );
     expect(ZONES.length).toBe(3);
+    // The 'none' state is real, not decorative: no shipped row uses it yet,
+    // so without this arm the complete-filter could silently degrade to a
+    // bare key read and a future professions-free zone would sweep as
+    // rolled out, defeating the guard's whole purpose.
+    expect(rolledOutFrom({ ...PROFESSIONS_ZONE_ROLLOUT, zone_x: 'none' })).toEqual(ROLLED_OUT);
   });
 
   it('gather nodes exist in every rolled-out zone and ONLY in rolled-out zones', () => {
@@ -83,13 +93,23 @@ describe('the R37 professions zone-rollout guard', () => {
     }
   });
 
-  it('crafting stations sit only in rolled-out zones, and at least one exists', () => {
+  it('crafting stations sit only in rolled-out zones, and every rolled-out zone has one', () => {
     expect(STATIONS.length).toBeGreaterThan(0);
+    const byZone = new Map<string, number>();
     for (const station of STATIONS) {
+      byZone.set(station.zoneId, (byZone.get(station.zoneId) ?? 0) + 1);
       expect(
         ROLLED_OUT.has(station.zoneId),
         `${station.id} places a station in un-rolled-out zone ${station.zoneId}`,
       ).toBe(true);
+    }
+    // Assert-complete, not just assert-absent: a rolled-out zone with no
+    // station at all (the whole Thornpeak bench deleted, say) must redden
+    // here, not sweep as fine.
+    for (const zoneId of ROLLED_OUT) {
+      expect(byZone.get(zoneId) ?? 0, `${zoneId} is rolled out but has no station`).toBeGreaterThan(
+        0,
+      );
     }
   });
 
@@ -119,24 +139,34 @@ describe('the R37 professions zone-rollout guard', () => {
     // counters, so hubs deliberately never stock a future zone's rung).
     const tools = professionToolIds();
     expect(tools.size).toBeGreaterThanOrEqual(12);
-    const zoneNpcIds = new Set([
-      ...Object.keys(ZONE1_NPCS),
-      ...Object.keys(ZONE2_NPCS),
-      ...Object.keys(ZONE3_NPCS),
-    ]);
+    const zoneTables: [string, Set<string>][] = [
+      ['zone1', new Set(Object.keys(ZONE1_NPCS))],
+      ['zone2', new Set(Object.keys(ZONE2_NPCS))],
+      ['zone3', new Set(Object.keys(ZONE3_NPCS))],
+    ];
+    const zoneNpcIds = new Set(zoneTables.flatMap(([, ids]) => [...ids]));
     let toolRowsSeen = 0;
+    const rowsPerTable = new Map<string, number>();
     for (const [npcId, npc] of Object.entries(NPCS)) {
       for (const itemId of npc.vendorItems ?? []) {
         if (!tools.has(itemId)) continue;
         toolRowsSeen += 1;
+        for (const [table, ids] of zoneTables) {
+          if (ids.has(npcId)) rowsPerTable.set(table, (rowsPerTable.get(table) ?? 0) + 1);
+        }
         expect(
           zoneNpcIds.has(npcId),
           `${npcId} vendors professions tool ${itemId} from outside the zone tables`,
         ).toBe(true);
       }
     }
-    // Non-vacuity: the sweep really saw the shipped tool rows.
+    // Non-vacuity: the sweep really saw the shipped tool rows, and saw them
+    // in EVERY zone table (a global floor alone would stay green with a
+    // whole hub's counter deleted).
     expect(toolRowsSeen).toBeGreaterThan(10);
+    for (const [table] of zoneTables) {
+      expect(rowsPerTable.get(table) ?? 0, `${table} contributes no tool row`).toBeGreaterThan(0);
+    }
     // The two non-NPC counters are covered by their own sweeps
     // (tests/professions_tools.test.ts): pin here only that neither has
     // sprouted a row this guard would need to zone-resolve. Local non-vacuity

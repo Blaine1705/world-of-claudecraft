@@ -445,7 +445,13 @@ derived test; the cap-scaling design note) plus:
    harvest disc, with the R33 allowlist naming the deliberate t3 dangers;
    fix the two Grix tutorial veins' spacing.
 4. The zone-progression audit numbers that pass 2 could not reproduce are
-   re-derived, not trusted (the two it did re-run both broke).
+   re-derived, not trusted (the two it did re-run both broke). Include the
+   mastery-hours figure: the QA refuter measured the derived 6.94 h model
+   as an OVER-estimate (the unmodeled rare-event yield multiplier,
+   proficiency climb, and self-signed reduction bring a real focused climb
+   to roughly 3 to 5 hours against the design record's 10-to-20 prose
+   target), so the content pass should decide whether the target moves or
+   the curve does.
 5. The crafting-anchor record includes the documented mobile-station
    bypass; the later-zone work-order thinness (one order each in zones 2
    and 3) is filled or recorded as deliberate.

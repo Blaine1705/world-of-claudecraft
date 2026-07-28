@@ -84,9 +84,14 @@ describe('MATERIAL_GRADES table', () => {
     expect(Object.values(NPCS).flatMap((n) => n.vendorItems ?? []).length).toBeGreaterThan(0);
     expect(HEROIC_VENDOR_STOCK.length).toBeGreaterThan(0);
     expect(Object.values(DELVE_SHOPS).flat().length).toBeGreaterThan(0);
-    expect(stocked.has(HEROIC_VENDOR_STOCK[0].itemId), 'heroic fold tooth').toBe(true);
-    expect(stocked.has(Object.values(DELVE_SHOPS).flat()[0].itemId), 'delve fold tooth').toBe(true);
-    expect(stocked.has('arcanite_bar'), 'the refined reagent IS stocked').toBe(true);
+    // Literal ids, not table[0] reads: a renamed itemId field would poison
+    // the set with undefined and a table[0] tooth would then assert
+    // has(undefined) against itself. Each literal is a stable shipped row.
+    expect(stocked.has('seal_of_the_nine_oaths'), 'heroic fold tooth').toBe(true);
+    expect(stocked.has('reliquary_legs'), 'delve fold tooth').toBe(true);
+    expect(stocked.has('arcanite_bar'), 'the refined reagent IS stocked (NPCS fold tooth)').toBe(
+      true,
+    );
     for (const row of Object.values(MATERIAL_GRADES)) {
       expect(stocked.has(row.fineItemId), `${row.fineItemId} must not be on any counter`).toBe(
         false,

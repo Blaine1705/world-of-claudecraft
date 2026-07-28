@@ -16,8 +16,15 @@
 // it), and any silhouette change blows the MAX bound.
 //
 // Per-pixel delta: the largest channel difference, where alpha always
-// participates and RGB participates when either side is visible (RGB under
-// a fully transparent matte is encoder-arbitrary).
+// participates and RGB participates only where BOTH sides are visible (RGB
+// under a fully transparent matte is encoder-arbitrary, and reading it where
+// one side is transparent turned honest alpha-rounding at a matte edge into
+// a 200-unit false red). The accepted trade, stated plainly: an element that
+// exists on only one side registers at its OWN alpha, so a translucent
+// element at or under the max bound (about 12 percent opacity) sits inside
+// tolerance by design; a solid silhouette change still trips through the
+// alpha term at full strength. Two fully transparent images compare equal
+// whatever their hidden RGB.
 
 import sharp from 'sharp';
 
