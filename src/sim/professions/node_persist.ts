@@ -18,7 +18,8 @@
 // then the grace-expiry save each overwrite that snapshot with a smaller
 // remaining; a crash inside the grace window makes whichever save landed last
 // durable. For every timer RUNNING at a save, the frozen remaining is never
-// smaller than reality, so the error direction is a longer wait. The one
+// smaller than reality (modulo the two-decimal rounding below, which can
+// shave under 5 ms), so the error direction is a longer wait. The one
 // corner outside that guarantee: a gather cast still in flight at the drop
 // resolves during grace and writes its timer only to live memory, so a crash
 // before the next save loses that timer WITH the harvest's yield and

@@ -305,10 +305,11 @@ describe('gathering profession proficiency (#1119)', () => {
   });
 
   it('the fold applies every queued grant, not just the first', () => {
-    // The motivating scenario is a multi-grant tick (a completed harvest plus
-    // a reel-landed catch queue in the same drain window), so the fold's own
-    // loop needs a multi-grant arm: same profession accumulating into the
-    // clamp, plus a second profession that must not be dropped.
+    // A multi-grant queue is reachable (two /dev gather commands in one tick,
+    // or a harvest completion plus a /dev gather before the next drain), and
+    // the fold's contract covers ANY queue shape regardless, so its own loop
+    // needs a multi-grant arm: same profession accumulating into the clamp,
+    // plus a second profession that must not be dropped.
     const meta: any = {
       pendingGatherGrants: [],
       gatheringProficiency: { ...emptyGatheringProficiency(), mining: 98 },

@@ -72,9 +72,11 @@ describe('the pure remaining-delta round trip (no Sim)', () => {
     // ids, so a write-side copy of the load allowlist would only mask a
     // writer bug. This arm makes that a CONTRACT: adding a serialize-side
     // filter must consciously flip it.
-    expect(serializeNodeReadiness({ not_a_live_node: 50, [NODE.id]: 10 }, 0)).toEqual({
+    // The live-id value sits far above one respawn, pinning the no-CLAMP half
+    // of the contract in the same arm as the no-filter half.
+    expect(serializeNodeReadiness({ not_a_live_node: 50, [NODE.id]: 999999 }, 0)).toEqual({
       not_a_live_node: 50,
-      [NODE.id]: 10,
+      [NODE.id]: 999999,
     });
   });
 
@@ -123,13 +125,18 @@ describe('the write ceiling, the load clamp, and the record bound stay coupled',
         applyNodeReadiness({ [node.id]: 999999 }, 0)[node.id],
       );
     }
-    // The absolute worst-case record (every live node cooling at once):
-    // every entry serializes, and the JSON stays small enough to ride every
-    // characters.state row. Content growth that trips the byte literal is a
-    // deliberate blob-size decision, not an accident.
+    // The every-node record (all live nodes cooling at once): every entry
+    // serializes, and the JSON stays small enough to ride every
+    // characters.state row. Integer-valued here (each entry is the flat 240);
+    // real records carry two-decimal values and run roughly 13 percent
+    // larger, still inside the ceiling. Content growth that trips the byte
+    // literal is a deliberate blob-size decision, not an accident.
     const all = serializeNodeReadiness(meta.nodeHarvestReadyAt, 0);
     expect(all && Object.keys(all).length).toBe(GATHER_NODES.length);
     expect(JSON.stringify(all).length).toBeLessThanOrEqual(2048);
+    // The load side must survive the same scale: no cap, break, or dedupe may
+    // shrink a full record on the way back in.
+    expect(Object.keys(applyNodeReadiness(all, 0)).length).toBe(GATHER_NODES.length);
   });
 });
 

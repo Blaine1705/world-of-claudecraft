@@ -310,11 +310,11 @@ yield together, value-neutral).
    rule shared with the tick drain). The live queue is untouched, so the
    drain doctrine (tick path only) holds; covers every save, not only
    leave (autosave and linkdead grace-expiry included).
-4. DONE: `pruneTierMailToActiveMajors` runs on both transition entry
-   points (the quest attunement path and the legacy `switchArchetype`
-   command) and on load (healing stale pre-prune saves); a craft shared
-   by the old and new pair keeps its entry, so no live crossing is
-   swallowed.
+4. DONE: `pruneTierMailToActiveMajors` runs on every transition entry
+   point (the quest attunement path and both legacy wrappers, via the
+   shared `applyPairTransitionTierMail` rule) and on load (healing stale
+   pre-prune saves); a craft shared by the old and new pair keeps its
+   entry, so no live crossing is swallowed.
 5. DONE: the `craftThrottle` comment now cites `lastActiveTick` and
    records that its session-only status is deliberate, unlike the
    now-persisted `nodeHarvestReadyAt`.

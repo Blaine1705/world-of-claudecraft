@@ -70,9 +70,9 @@ function activeMajors(meta: PlayerMeta): [string, string] | null {
  *  switching away, and a RETURN to that pair skips the silent re-baseline arm:
  *  a tier crossed while the pair was dormant would mail a retroactive letter
  *  at the moment of return. Pruned, a return re-baselines at the current tier
- *  (baselineActivePairTierMail on the quest path, or updateTierMailFor's
- *  silent arm), so the first letter after a return is only for a tier crossed
- *  after it. A craft that stays a major across the transition (adjacent pairs
+ *  (baselineActivePairTierMail at every transition entry point, or
+ *  updateTierMailFor's silent arm), so the first letter after a return is
+ *  only for a tier crossed after it. A craft that stays a major across the transition (adjacent pairs
  *  share a craft) keeps its entry: its watch never lapsed, so no crossing is
  *  swallowed. */
 export function pruneTierMailToActiveMajors(meta: PlayerMeta): void {
@@ -86,10 +86,11 @@ export function pruneTierMailToActiveMajors(meta: PlayerMeta): void {
 
 /** Baseline-arm the active pair's two majors at their CURRENT tier without
  *  sending any mail: records tierMailSent[craft] = tier for any major not yet in
- *  the map. Called at attunement time (the quest-effect call path) so a newly-
- *  majored craft baselines at its attunement-time tier, closing the up-to-one-
- *  second window before the next sweep would otherwise swallow a tier crossed
- *  immediately after attunement. A no-op for an unattuned character. */
+ *  the map. Called at every transition entry point (via
+ *  applyPairTransitionTierMail below) so a newly-majored craft baselines at
+ *  its attunement-time tier, closing the up-to-one-second window before the
+ *  next sweep would otherwise swallow a tier crossed immediately after
+ *  attunement. A no-op for an unattuned character. */
 export function baselineActivePairTierMail(meta: PlayerMeta): void {
   const majors = activeMajors(meta);
   if (!majors) return;
@@ -105,10 +106,13 @@ export function baselineActivePairTierMail(meta: PlayerMeta): void {
  *  acknowledgements whose craft just stopped being a major, then baseline the
  *  new majors at their current tier so a crossing before the next 1 Hz sweep
  *  books its letter instead of being swallowed by the sweep's silent baseline
- *  arm. Prune first, baseline second: the baseline must see the post-prune
- *  record so a returning pair re-arms silently at its CURRENT tier. The load
- *  path deliberately calls only the prune (see the sim.ts load site for why
- *  no baseline is needed there). */
+ *  arm. The two halves commute (the prune deletes only non-majors, the
+ *  baseline writes only absent majors: disjoint key sets), so the prune-first
+ *  order is narrative, mirroring the load path, not a dependency. A returning
+ *  pair re-arms at its CURRENT tier because the EARLIER transition pruned its
+ *  entries, not because of any ordering inside this call. The load path
+ *  deliberately calls only the prune (see the sim.ts load site for why no
+ *  baseline is needed there). */
 export function applyPairTransitionTierMail(meta: PlayerMeta): void {
   pruneTierMailToActiveMajors(meta);
   baselineActivePairTierMail(meta);

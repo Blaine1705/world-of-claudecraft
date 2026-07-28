@@ -230,9 +230,12 @@ For off-box safety, sync the directory to S3 occasionally:
   back to a binary that predates a professions field erases that field on the first
   autosave. Across the professions persistence release specifically: node respawn
   timers (`nodeHarvestCooldowns`) are erased, which reopens the node relog exploit
-  for the rollback window (accepted trade, no player value lost); the tier-mail
-  acknowledgement prune is a one-way load heal whose only recovery is a database
-  backup; and any FUTURE proficiency or craft cap raise is rollback-destructive
+  for the rollback window (accepted trade, no player value lost); slotted tool
+  effects (`toolEffectSlots`) are erased the same way (harmless until an
+  acquisition craft with a material cost ships); the tier-mail acknowledgement
+  prune is a one-way heal that fires on the first UPGRADE load, so a rollback
+  cannot undo it and the only recovery is a database backup; and any FUTURE
+  proficiency or craft cap raise is rollback-destructive
   (the old binary clamps raised values on load and persists the loss), so a
   rollback across a cap change needs a restore-from-backup plan for professions
   counters. Details: "Rollback erases newer fields" in

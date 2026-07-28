@@ -120,7 +120,8 @@ expiry, so timers freeze across a logout and resume on load. Node readiness is
 the same shape. The freeze happens at the logout frame (the leave-time
 `serializeCharacter`). A linkdead drop's immediate safety-flush save freezes
 at drop time too, but the character stays in the world with timers counting
-in live sim time, so the 30 s autosave (which covers linkdead sessions) and
+in live sim time, so the ~30 s autosave (it covers linkdead sessions, and
+under load it stretches longer, never shorter) and
 then the grace-expiry save each overwrite that snapshot with a smaller
 remaining; a crash inside the grace window makes whichever save landed last
 durable. For every timer running at a save, the freeze errs toward a longer
