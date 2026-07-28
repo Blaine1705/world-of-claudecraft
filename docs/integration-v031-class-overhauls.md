@@ -253,6 +253,26 @@ Known red on the branch, attributed:
 | paladin_veilbound_march (2) | main's parkour kernel shifted the march end position and pull geometry; mechanic guards intact, tests need re-anchoring | @blaine1705 |
 | deploy_watchdog (2) | docker, red on release too | not ours |
 
+### 2026-07-28: #2568 (druid) landed
+
+`integration/v031-class-overhauls` now carries all FOUR class overhauls. #2568
+(@patrick261) merged with 68 conflicts: the recurring sim-core hunk sites composed
+druid engine hooks with the paladin block branch and rogue engine calls; the save
+migration recomposed into a STEPWISE per-revision model (revision 2 wave set +
+revision 3 druid with rows-wipe, universal scrub preserved: the druid rows kept
+their ids while changing meaning, so the repick must wipe surviving picks); the
+band tests stayed unwidened (the PR's widenings misattributed main-wave drift to
+the rogue layer and are asked to be dropped in review); the hud_update_drive
+registry deduped to the chrome-classified rows. Two fixes pushed to the owner
+branch (a864196a3): the engine-bank stacks wire gap (stacks now always sent for
+isPersistentEngineAura ids; decode cannot tell absent-because-1 from
+absent-because-0) and the marrowbreak_guard matcher entry. Latin-script fill of
+the 16 druid keys landed (pending=0). Full suite: 4 red, all known (2 docker
+watchdog, 2 veilbound march geometry for @blaine1705); NOTE the four upstream
+balance bands PASS again on the integrated tree, most likely via the druid
+commit's applyTalentMods-on-transforms change, flagged in review for a
+deliberate decision and pin.
+
 ### Next: #2428 (paladin)
 
 The merge was pre-flighted and aborted rather than rushed. 62 conflicts: 26 generated i18n
