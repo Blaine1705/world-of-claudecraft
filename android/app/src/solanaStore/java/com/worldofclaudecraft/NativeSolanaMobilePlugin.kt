@@ -24,6 +24,8 @@ import kotlinx.coroutines.launch
 class NativeSolanaMobilePlugin : Plugin() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private lateinit var activityResultSender: ActivityResultSender
+    private lateinit var tokenStore: MwaAuthorizationTokenStore
+    private var secureStorageReady = false
     private val walletAdapter = MobileWalletAdapter(
         connectionIdentity = ConnectionIdentity(
             identityUri = Uri.parse("https://worldofclaudecraft.com"),
@@ -35,7 +37,22 @@ class NativeSolanaMobilePlugin : Plugin() {
     override fun load() {
         super.load()
         activityResultSender = ActivityResultSender(activity)
-        walletAdapter.authToken = authPreferences().getString(AUTH_TOKEN_KEY, null)
+        tokenStore = MwaAuthorizationTokenStore(context)
+        val legacyTokenRemoved =
+            removeLegacyMwaAuthorizationToken {
+                walletPreferences().edit().remove(LEGACY_AUTH_TOKEN_KEY).commit()
+            }
+        if (!legacyTokenRemoved) {
+            walletAdapter.authToken = null
+            tokenStore.clear()
+            walletPreferences().edit().remove(WALLET_ADDRESS_KEY).commit()
+            return
+        }
+        secureStorageReady = true
+        walletAdapter.authToken = tokenStore.load()
+        if (walletAdapter.authToken == null) {
+            walletPreferences().edit().remove(WALLET_ADDRESS_KEY).commit()
+        }
     }
 
     override fun handleOnDestroy() {
@@ -55,7 +72,7 @@ class NativeSolanaMobilePlugin : Plugin() {
     @PluginMethod
     fun current(call: PluginCall) {
         val address = if (solanaMobileAllowed()) {
-            authPreferences().getString(WALLET_ADDRESS_KEY, null)
+            walletPreferences().getString(WALLET_ADDRESS_KEY, null)
         } else {
             null
         }
@@ -68,14 +85,20 @@ class NativeSolanaMobilePlugin : Plugin() {
         scope.launch {
             when (val result = walletAdapter.connect(activityResultSender)) {
                 is TransactionResult.Success -> {
-                    persistAuthToken()
                     val account = result.authResult.accounts.firstOrNull()
                     if (account == null) {
                         call.reject("Wallet returned no account", "MWA_NO_ACCOUNT")
                         return@launch
                     }
+                    if (!persistAuthToken()) {
+                        call.reject(
+                            "Wallet authorization could not be stored securely",
+                            "MWA_SECURE_STORAGE_FAILED",
+                        )
+                        return@launch
+                    }
                     val address = Base58.encodeToString(account.publicKey)
-                    authPreferences().edit().putString(WALLET_ADDRESS_KEY, address).apply()
+                    walletPreferences().edit().putString(WALLET_ADDRESS_KEY, address).commit()
                     call.resolve(JSObject().put("address", address))
                 }
                 is TransactionResult.NoWalletFound ->
@@ -93,12 +116,14 @@ class NativeSolanaMobilePlugin : Plugin() {
             when (val result = walletAdapter.disconnect(activityResultSender)) {
                 is TransactionResult.Success -> {
                     walletAdapter.authToken = null
-                    authPreferences().edit().remove(AUTH_TOKEN_KEY).remove(WALLET_ADDRESS_KEY).apply()
+                    tokenStore.clear()
+                    walletPreferences().edit().remove(WALLET_ADDRESS_KEY).commit()
                     call.resolve()
                 }
                 is TransactionResult.NoWalletFound -> {
                     walletAdapter.authToken = null
-                    authPreferences().edit().remove(AUTH_TOKEN_KEY).remove(WALLET_ADDRESS_KEY).apply()
+                    tokenStore.clear()
+                    walletPreferences().edit().remove(WALLET_ADDRESS_KEY).commit()
                     call.resolve()
                 }
                 is TransactionResult.Failure ->
@@ -180,16 +205,21 @@ class NativeSolanaMobilePlugin : Plugin() {
         }
     }
 
-    private fun persistAuthToken() {
+    private fun persistAuthToken(): Boolean {
         val token = walletAdapter.authToken
         if (token.isNullOrEmpty()) {
-            authPreferences().edit().remove(AUTH_TOKEN_KEY).apply()
+            tokenStore.clear()
+            walletPreferences().edit().remove(WALLET_ADDRESS_KEY).commit()
+            return false
         } else {
-            authPreferences().edit().putString(AUTH_TOKEN_KEY, token).apply()
+            if (tokenStore.save(token)) return true
+            walletAdapter.authToken = null
+            walletPreferences().edit().remove(WALLET_ADDRESS_KEY).commit()
+            return false
         }
     }
 
-    private fun authPreferences() =
+    private fun walletPreferences() =
         context.getSharedPreferences(AUTH_PREFERENCES_NAME, Context.MODE_PRIVATE)
 
     private fun requireSolanaMobile(call: PluginCall): Boolean {
@@ -199,7 +229,9 @@ class NativeSolanaMobilePlugin : Plugin() {
     }
 
     private fun solanaMobileAllowed(): Boolean =
-        BuildConfig.SOLANA_MOBILE_DISTRIBUTION == "solana-dapp-store" && isSeeker()
+        BuildConfig.SOLANA_MOBILE_DISTRIBUTION == "solana-dapp-store" &&
+            isSeeker() &&
+            secureStorageReady
 
     private fun isSeeker(): Boolean =
         Build.MODEL.equals("Seeker", ignoreCase = true) &&
@@ -208,7 +240,7 @@ class NativeSolanaMobilePlugin : Plugin() {
 
     companion object {
         private const val AUTH_PREFERENCES_NAME = "solana_mobile"
-        private const val AUTH_TOKEN_KEY = "solana_mobile_auth_token"
+        private const val LEGACY_AUTH_TOKEN_KEY = "solana_mobile_auth_token"
         private const val WALLET_ADDRESS_KEY = "solana_mobile_wallet_address"
     }
 }

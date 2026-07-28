@@ -19,6 +19,19 @@ const solanaStoreActivity = readFileSync(
   'android/app/src/solanaStore/java/com/worldofclaudecraft/MainActivity.java',
   'utf8',
 );
+const tokenStore = readFileSync(
+  'android/app/src/solanaStore/java/com/worldofclaudecraft/MwaAuthorizationTokenStore.kt',
+  'utf8',
+);
+const solanaStoreManifest = readFileSync('android/app/src/solanaStore/AndroidManifest.xml', 'utf8');
+const solanaBackupRules = readFileSync(
+  'android/app/src/solanaStore/res/xml/solana_mobile_backup_rules.xml',
+  'utf8',
+);
+const solanaDataExtractionRules = readFileSync(
+  'android/app/src/solanaStore/res/xml/solana_mobile_data_extraction_rules.xml',
+  'utf8',
+);
 const main = readFileSync('src/main.ts', 'utf8');
 const hudCss = readFileSync('src/styles/hud.css', 'utf8');
 const shellCss = readFileSync('src/styles/shell.css', 'utf8');
@@ -60,7 +73,9 @@ describe('Android Seeker distribution boundary', () => {
       'com.solanamobile:rpc-core:0.2.7',
       'io.github.funkatronics:multimult:0.2.3',
     ]) {
-      expect(appGradle).toContain(`solanaStoreImplementation "${dependency}"`);
+      expect(appGradle).toMatch(
+        new RegExp(`solanaStoreImplementation(?:\\(|\\s+)"${dependency.replace(/[.]/g, '\\.')}"`),
+      );
       expect(appGradle).not.toMatch(
         new RegExp(`^\\s*implementation\\s+"${dependency.replace(/[.]/g, '\\.')}"`, 'm'),
       );
@@ -87,15 +102,57 @@ describe('Android Seeker distribution boundary', () => {
     expect(solanaStoreActivity).toContain('registerPlugin(NativeSolanaMobilePlugin.class);');
   });
 
+  it('encrypts the reusable MWA token with a flavor-scoped Android Keystore store', () => {
+    expect(tokenStore).toContain('private const val ANDROID_KEYSTORE = "AndroidKeyStore"');
+    expect(tokenStore).toContain('KeyStore.getInstance(ANDROID_KEYSTORE)');
+    expect(tokenStore).toContain('KeyProperties.KEY_ALGORITHM_AES');
+    expect(tokenStore).toContain('KeyProperties.BLOCK_MODE_GCM');
+    expect(tokenStore).toContain('KeyProperties.ENCRYPTION_PADDING_NONE');
+    expect(tokenStore).toContain('setKeySize(256)');
+    expect(tokenStore).toContain('cipher.updateAAD');
+    expect(tokenStore).toContain('MAX_TOKEN_BYTES');
+    expect(plugin).toContain('tokenStore.load()');
+    expect(plugin).toContain('tokenStore.save(token)');
+    expect(plugin).toContain('tokenStore.clear()');
+    expect(plugin).toContain('remove(LEGACY_AUTH_TOKEN_KEY).commit()');
+    expect(plugin).toContain('if (!legacyTokenRemoved)');
+    expect(plugin).not.toContain('getString(LEGACY_AUTH_TOKEN_KEY');
+    expect(plugin).not.toContain('putString(LEGACY_AUTH_TOKEN_KEY');
+    const nonSolanaSources = [
+      sourceText('android/app/src/main/java'),
+      sourceText('android/app/src/play/java'),
+    ].join('\n');
+    expect(nonSolanaSources).not.toMatch(/MwaAuthorizationTokenStore|AndroidKeyStore/);
+  });
+
+  it('excludes the encrypted MWA token envelope from every Android backup path', () => {
+    expect(solanaStoreManifest).toContain(
+      'android:fullBackupContent="@xml/solana_mobile_backup_rules"',
+    );
+    expect(solanaStoreManifest).toContain(
+      'android:dataExtractionRules="@xml/solana_mobile_data_extraction_rules"',
+    );
+    expect(solanaBackupRules).toContain(
+      '<exclude domain="sharedpref" path="solana_mobile_auth.xml" />',
+    );
+    expect(solanaBackupRules).toContain('<exclude domain="sharedpref" path="solana_mobile.xml" />');
+    expect(solanaDataExtractionRules).toMatch(
+      /<cloud-backup>[\s\S]*?<exclude domain="sharedpref" path="solana_mobile_auth\.xml" \/>[\s\S]*?<exclude domain="sharedpref" path="solana_mobile\.xml" \/>[\s\S]*?<\/cloud-backup>/,
+    );
+    expect(solanaDataExtractionRules).toMatch(
+      /<device-transfer>[\s\S]*?<exclude domain="sharedpref" path="solana_mobile_auth\.xml" \/>[\s\S]*?<exclude domain="sharedpref" path="solana_mobile\.xml" \/>[\s\S]*?<\/device-transfer>/,
+    );
+  });
+
   it('fails closed unless dApp Store, exact Seeker identity, and MWA are all present', () => {
     expect(plugin).toContain('BuildConfig.SOLANA_MOBILE_DISTRIBUTION == "solana-dapp-store"');
     expect(plugin).toContain('Build.MODEL.equals("Seeker", ignoreCase = true)');
     expect(plugin).toContain('Build.BRAND.equals("solanamobile", ignoreCase = true)');
     expect(plugin).toContain('Build.MANUFACTURER.equals("Solana Mobile Inc.", ignoreCase = true)');
     expect(plugin).toContain('result.put("mwaAvailable", solanaMobileAllowed())');
-    expect(plugin).toContain(
-      'BuildConfig.SOLANA_MOBILE_DISTRIBUTION == "solana-dapp-store" && isSeeker()',
-    );
+    expect(plugin).toContain('BuildConfig.SOLANA_MOBILE_DISTRIBUTION == "solana-dapp-store" &&');
+    expect(plugin).toContain('isSeeker() &&');
+    expect(plugin).toContain('secureStorageReady');
     expect(solanaStoreActivity).toContain('registerPlugin(NativeSolanaMobilePlugin.class);');
   });
 
