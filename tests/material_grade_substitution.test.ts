@@ -351,3 +351,113 @@ describe('quest collect credit spans the grades', () => {
     expect(qp.state).toBe('active');
   });
 });
+
+describe('quest turn-in spends signed specimens last', () => {
+  // R24: turn-in consumption prefers plain stacks and takes instanced (signed)
+  // copies only when no plain copy remains, mirroring the vendor-sell
+  // preference (removePreferFungible). Without it, Sim.removeItem's
+  // highest-index-first walk actively PREFERRED the signed copy, because
+  // addItemInstance appends instanced slots at the end of the inventory.
+  const ORDER = 'q_prof_workorder_forge'; // collect copper_ore x8
+
+  function acceptOrder(sim: Sim, pid: number) {
+    const meta = (sim as any).players.get(pid);
+    placeAtQuestGiver(sim, pid, QUESTS[ORDER].giverNpcId);
+    sim.acceptQuest(ORDER, pid);
+    expect(meta.questLog.get(ORDER), 'quest was not accepted').toBeDefined();
+    return meta;
+  }
+
+  it('a signed specimen survives a turn-in that plain copies can pay', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = acceptOrder(sim, pid);
+
+    grantItem(sim, 'copper_ore', 8, pid);
+    // The signed copy lands at the highest inventory index, the exact slot the
+    // old instance-blind walk consumed first.
+    sim.addItemInstance('copper_ore', { signer: 'Prospector Wynn' }, pid);
+    expect(sim.countItem('copper_ore', pid)).toBe(9);
+
+    turnInQuestCore((sim as any).ctx, ORDER, QUESTS[ORDER], meta);
+
+    expect(meta.questsDone.has(ORDER)).toBe(true);
+    // The survivor is the signed copy, not a plain one.
+    expect(sim.countItem('copper_ore', pid)).toBe(1);
+    expect(sim.countFungibleItem('copper_ore', pid)).toBe(0);
+    const survivor = meta.inventory.find(
+      (s: { itemId: string; instance?: { signer?: string } }) => s.itemId === 'copper_ore',
+    );
+    expect(survivor?.instance?.signer).toBe('Prospector Wynn');
+  });
+
+  it('a signed copy is still consumed when the plain copies fall short', () => {
+    // The preference never waives the requirement: with 7 plain against a
+    // required 8, the eighth unit comes off the signed slot.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = acceptOrder(sim, pid);
+
+    grantItem(sim, 'copper_ore', 7, pid);
+    sim.addItemInstance('copper_ore', { signer: 'Prospector Wynn' }, pid);
+
+    turnInQuestCore((sim as any).ctx, ORDER, QUESTS[ORDER], meta);
+
+    expect(meta.questsDone.has(ORDER)).toBe(true);
+    expect(sim.countItem('copper_ore', pid)).toBe(0);
+  });
+
+  it('the reward-capacity gate models the prefer-plain walk (deny direction)', () => {
+    // Bags full, objective 8, a 10-unit plain stack and an 8-unit signed
+    // stack. The prefer-plain hand-in takes 8 off the plain stack and frees NO
+    // slot, so an item reward cannot fit and the turn-in must be refused. The
+    // old instance-blind scratch walk emptied the signed slot instead, saw a
+    // freed slot, approved, and the reward landed over capacity (#2139).
+    const TEST_ID = 'q_test_signed_reward';
+    const original = QUESTS[TEST_ID];
+    try {
+      QUESTS[TEST_ID] = {
+        id: TEST_ID,
+        name: 'Signed Reward Test',
+        giverNpcId: 'forgemistress_darva',
+        turnInNpcId: 'forgemistress_darva',
+        text: 'Test only.',
+        completionText: 'Test complete.',
+        objectives: [
+          { type: 'collect', itemId: 'copper_ore', count: 8, label: 'Copper Ore delivered' },
+        ],
+        xpReward: 0,
+        copperReward: 0,
+        itemRewards: {
+          warrior: 'greyjaw_pelt_cloak',
+          mage: 'greyjaw_pelt_cloak',
+          rogue: 'greyjaw_pelt_cloak',
+        },
+        retired: true,
+      } as QuestDef;
+
+      const sim = makeSim();
+      const pid = sim.playerId;
+      const meta = (sim as any).players.get(pid);
+      placeAtQuestGiver(sim, pid, 'forgemistress_darva');
+
+      grantItem(sim, 'copper_ore', 10, pid);
+      sim.addItemInstance('copper_ore', { signer: 'Prospector Wynn' }, pid, 8);
+      const capacity = bagCapacity(meta.bags);
+      const fillerStack = ITEMS.bone_fragments.stackSize ?? 20;
+      while (meta.inventory.length < capacity) sim.addItem('bone_fragments', fillerStack, pid);
+      expect(meta.inventory.length).toBe(capacity);
+
+      meta.questLog.set(TEST_ID, { questId: TEST_ID, counts: [8], state: 'ready' });
+      sim.turnInQuest(TEST_ID, pid);
+
+      expect(meta.questsDone.has(TEST_ID)).toBe(false);
+      expect(sim.countItem('copper_ore', pid)).toBe(18);
+      expect(sim.countItem('greyjaw_pelt_cloak', pid)).toBe(0);
+      expect(meta.inventory.length).toBeLessThanOrEqual(capacity);
+    } finally {
+      if (original) QUESTS[TEST_ID] = original;
+      else delete QUESTS[TEST_ID];
+    }
+  });
+});

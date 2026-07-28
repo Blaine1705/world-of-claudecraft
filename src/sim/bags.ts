@@ -253,8 +253,9 @@ export function countStacked(inventory: readonly InvSlot[], itemId: string): num
 
 /** Stack-aware removal mirroring the Sim hub's removeItem walk (from the end,
  *  instanced slots included, exactly like removeItem), for capacity simulations
- *  on a scratch copy (e.g. "after handing in the collect items, does the quest
- *  reward fit?"). */
+ *  on a scratch copy whose live path removes with removeItem (the trade swap,
+ *  craft/enchant reagents). The quest turn-in gate instead models its
+ *  prefer-plain hand-in with consumeOneScratch below. */
 export function removeStacked(inventory: InvSlot[], itemId: string, count: number): void {
   let remaining = count;
   for (let i = inventory.length - 1; i >= 0 && remaining > 0; i--) {

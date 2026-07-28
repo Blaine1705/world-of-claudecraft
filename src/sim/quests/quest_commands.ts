@@ -23,9 +23,10 @@
 // render/ui/game/net/DOM/Three, no Math.random/Date.now), so it runs unchanged in
 // Node, the browser, and the headless RL env.
 
-import { bagCapacity, bagsFullError, countFit, countStacked, removeStacked } from '../bags';
+import { bagCapacity, bagsFullError, consumeOneScratch, countFit, countStacked } from '../bags';
 import { QUESTS, questRewardItemId } from '../data';
 import { formatMoney } from '../format_money';
+import { removePreferFungible } from '../items';
 import type { ArchetypeState } from '../professions/archetype';
 import { armCadence, cadenceBlockedKeys } from '../professions/cadence';
 import { planGradeRemoval } from '../professions/material_grades';
@@ -295,12 +296,18 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
         const index = quest.objectives.indexOf(obj);
         // The same grade plan turnInQuestCore applies, against the scratch
         // copy, so the room this gate frees is the room the hand-in frees.
+        // Per unit through consumeOneScratch (no exclusion), the scratch
+        // mirror of removePreferFungible's plain-first walk below: a gate
+        // that models the removal differently from the remover it gates
+        // re-opens the overflow class (#2139).
         for (const take of planGradeRemoval(
           obj.itemId,
           questObjectiveRequired(quest, qp, index),
           (id) => countStacked(scratch, id),
         )) {
-          removeStacked(scratch, take.itemId, take.count);
+          for (let unit = 0; unit < take.count; unit++) {
+            consumeOneScratch(scratch, take.itemId);
+          }
         }
       }
     }
@@ -331,13 +338,16 @@ export function turnInQuestCore(
   for (const [index, obj] of quest.objectives.entries()) {
     if (obj.type === 'collect' && obj.itemId) {
       // Base grade first, then the fine grade, so a player holding both hands
-      // over the plain ore and keeps the premium copies.
+      // over the plain ore and keeps the premium copies. Within each grade
+      // line, plain stacks are spent before instanced copies (the vendor-sell
+      // preference): a signed specimen survives any turn-in that plain copies
+      // can pay, and is consumed only when nothing plain remains.
       for (const take of planGradeRemoval(
         obj.itemId,
         questObjectiveRequired(quest, qp, index),
         (id) => ctx.countItem(id, meta.entityId),
       )) {
-        ctx.removeItem(take.itemId, take.count, meta.entityId);
+        removePreferFungible(ctx, take.itemId, take.count, meta.entityId);
       }
     }
   }
