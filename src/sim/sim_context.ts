@@ -831,6 +831,12 @@ export interface SimContextCallbacks {
   // consumes it. Binding points at the PostOffice instance on Sim.
   mailAuthoredLetter(meta: PlayerMeta, letter: LetterDef): void;
 
+  // Ravenpost mail, read-only: does this player's mailbox (in-flight letters
+  // included) hold `itemId` as an attachment? The accept-time quest re-grant
+  // predicate (quests/quest_item_presence.ts) is the reader. Binding points at
+  // the PostOffice instance on Sim.
+  mailboxHoldsItem(meta: PlayerMeta, itemId: string): boolean;
+
   // Set proc firing is owned by combat/set_procs.ts.
   applySetProcs(source: Entity, target: Entity | null, trigger: SetProc['trigger']): void;
   // Book of Deeds (deeds.ts owns every body; append-only additions). The
@@ -1295,6 +1301,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     queueQuestLetter: host.queueQuestLetter,
     mailHeroicMarks: host.mailHeroicMarks,
     mailAuthoredLetter: host.mailAuthoredLetter,
+    mailboxHoldsItem: host.mailboxHoldsItem,
     applySetProcs: host.applySetProcs,
     // Book of Deeds seam (points at deeds.ts via the Sim-bound arrows).
     bumpDeedStat: host.bumpDeedStat,

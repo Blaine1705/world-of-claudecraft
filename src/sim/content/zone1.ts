@@ -1397,6 +1397,13 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     requiresQuest: 'q_prof_intro',
     repeatable: true,
     shareable: false,
+    // The same 30-minute window its four work-order siblings carry. The iron
+    // gate on the tool mint is the accept-time presence predicate
+    // (quests/quest_item_presence.ts, spanning bank/mail/escrow); the cadence
+    // bounds the TURN-IN loop, so the one transfer route left deliberately
+    // open (direct trade, R10) moves at most one sickle per window instead of
+    // one per accept-abandon cycle.
+    repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
     // Also a herb objective, so also the sickle. This is the repeatable one, so
     // it is the reason the tier-1 tools carry noVendorSell (items.ts): without
     // that flag, accept-sell-abandon would be an unbounded copper faucet.

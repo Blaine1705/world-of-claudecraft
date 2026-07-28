@@ -202,13 +202,14 @@ describe('the tier-1 starter tools have no route to value', () => {
     }
   });
 
-  it('the re-grant supply is unbounded, so the tools must have no value route at all', () => {
-    // The reason both flags exist, stated as a test rather than as prose. The
-    // re-grant predicate is questFallbackGrants -> ctx.countItem, and countItem
-    // scans ONLY meta.inventory: stash the tool anywhere else and the next
-    // accept hands over another. This pins that the SUPPLY is unbounded, which
-    // is what makes an open sell or listing route unacceptable rather than
-    // merely untidy.
+  it('a traded-away tool still re-grants (R10), so the tools must have no value route at all', () => {
+    // The reason both flags exist, stated as a test rather than as prose.
+    // removeItem here stands in for a DIRECT TRADE, the one transfer route
+    // left deliberately open by ruling (R10): the copy is genuinely gone from
+    // every store the accept-time predicate reads, so the fallback re-grants.
+    // A banked, mailed, or escrowed copy no longer does (the tests below);
+    // trade-away is the residual per-accept supply, which is why the value
+    // routes stay closed and the turn-in loop carries a cadence.
     const questId = 'q_prof_hobby_switch';
     const { sim, pid, meta } = simAtGiver(questId);
     const tool = ZONE1_QUESTS[questId].requiredItems![0];
@@ -226,21 +227,63 @@ describe('the tier-1 starter tools have no route to value', () => {
       // A fresh tool appeared from nothing, on a quest already completed before.
       expect(sim.countItem(tool, pid), `cycle ${cycle} grant`).toBe(1);
       minted += 1;
-      // Stand in for a bank deposit, a mail attachment, or a trade: the tool
-      // leaves the inventory countItem reads, and nothing else changes.
+      // The trade stand-in: the tool leaves every store the predicate reads.
       sim.removeItem(tool, 1, pid);
       sim.abandonQuest(questId, pid);
     }
-    // Three accepts, three tools minted, none of them still in a bag. The
-    // supply is bounded by nothing but how often the player re-accepts.
+    // Three accepts, three tools handed to (notional) trade partners. This
+    // residual supply is bounded by the turn-in cadence and worthless to mint:
+    // the def carries both flags, so neither the vendor nor the World Market
+    // will take a copy. If either flag is ever dropped, this loop becomes a
+    // live exploit.
     expect(minted).toBe(3);
     expect(sim.countItem(tool, pid)).toBe(0);
-
-    // Which is fine ONLY because a stashed copy converts to nothing: the def
-    // carries both flags, so neither the vendor nor the World Market will take
-    // it. If either flag is ever dropped, this loop becomes a live exploit.
     expect(ITEMS[tool].noVendorSell).toBe(true);
     expect(ITEMS[tool].noMarketList).toBe(true);
+  });
+
+  it('a BANKED tool does NOT re-grant: the predicate spans more than the bags', () => {
+    // The mint the old bags-only read allowed: bank the tool, abandon,
+    // re-accept, collect another, forever. The accept-time predicate
+    // (quests/quest_item_presence.ts) now sees the banked copy, so the accept
+    // succeeds WITHOUT a duplicate and the player fetches their tool back
+    // from the bank like anyone else.
+    const questId = 'q_prof_hobby_switch';
+    const { sim, pid, meta } = simAtGiver(questId);
+    const tool = ZONE1_QUESTS[questId].requiredItems![0];
+    meta.questsDone.add('q_prof_intro');
+    attuneArchetypePair(sim.ctx, pid, 'engineering+alchemy', 'new');
+    const hobby = hobbyCandidatesForPair(
+      meta.archetype.activeArchetype as string,
+      meta.archetype.pairedMajor as string,
+    ).find((candidate: string) => candidate !== meta.archetype.hobbyCraft) as string;
+
+    acceptQuest(sim.ctx, questId, hobby, pid);
+    expect(sim.countItem(tool, pid)).toBe(1);
+
+    // Deposit: the copy moves from the bags into the bank store the predicate
+    // reads (the container move itself is bank.ts's own tested concern).
+    sim.removeItem(tool, 1, pid);
+    meta.bank.inventory.push({ itemId: tool, count: 1 });
+    sim.abandonQuest(questId, pid);
+
+    acceptQuest(sim.ctx, questId, hobby, pid);
+    expect(meta.questLog.has(questId), 'the accept itself must still succeed').toBe(true);
+    // No duplicate: bags stay empty, the bank still holds exactly one.
+    expect(sim.countItem(tool, pid)).toBe(0);
+    expect(
+      meta.bank.inventory.filter((s: { itemId: string }) => s.itemId === tool),
+    ).toHaveLength(1);
+  });
+
+  it('the repeatable hobby switch carries the work-order cadence window', () => {
+    // The turn-in loop's bound (the accept loop is bounded by the predicate
+    // above). Same constant as its four work-order siblings; the arming
+    // machinery itself is pinned in professions_quest_cadence.test.ts.
+    expect(ZONE1_QUESTS.q_prof_hobby_switch.repeatCadenceTicks).toBe(
+      QUESTS.q_prof_workorder_forge.repeatCadenceTicks,
+    );
+    expect(ZONE1_QUESTS.q_prof_hobby_switch.repeatCadenceTicks).toBe(36000); // 30 min at 20 Hz
   });
 
   it('sellItem refuses a granted tool and pays nothing, but still pays for a tier-2 one', () => {

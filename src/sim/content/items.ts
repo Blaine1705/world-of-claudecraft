@@ -529,23 +529,23 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   //
   // The three TIER-1 tools carry BOTH noVendorSell and noMarketList, and only
   // those three. The gather quests hand a pick or a sickle over through
-  // requiredItems (zone1.ts), re-granting a missing one on every accept, and
+  // requiredItems (zone1.ts), re-granting a missing one on accept, and
   // q_prof_hobby_switch is repeatable, so the grant needs both flags:
   //
   // - noVendorSell closes the copper MINT. Without it, accept, sell for 4,
   //   abandon, repeat prints copper out of nothing.
-  // - noMarketList closes the value route left over once the mint is shut. The
-  //   re-grant predicate is questFallbackGrants -> ctx.countItem, and countItem
-  //   scans ONLY meta.inventory (sim.ts): bank a tool, or mail or trade it
-  //   away, and the next accept hands over another. That makes the SUPPLY
-  //   unbounded, and an unbounded free supply meeting a free listing
-  //   (MARKET_LISTING_DEPOSIT_COPPER is 0) is an indefinite drain on other
-  //   players' copper, and on the 20-copper vendor purchase it undercuts.
+  // - noMarketList closes the market route AND the mail route: the market
+  //   refuses the listing and the mail attach path refuses the flag too, so
+  //   a minted copy can neither be sold to players nor posted away.
   //
-  // Together the two flags leave a minted copy with no route to value at all.
-  // The unbounded MINT itself is not closed here: that needs the re-grant
-  // predicate to span the bank, mail, and market escrow, which is a change to
-  // shared quest logic rather than to this table.
+  // Where a minted copy CAN go, stated truthfully: the bank is open (it is
+  // the player's own storage), and direct trade is open BY RULING (R10, a
+  // deliberate transfer route). Vendor, market, and mail are closed. The
+  // MINT itself is bounded at the source: the accept-time re-grant predicate
+  // (quests/quest_item_presence.ts) spans bags, bank, mail, and market
+  // escrow, so banking a tool no longer conjures another on re-accept, and
+  // the quest's repeatCadenceTicks bounds the turn-in loop that trade could
+  // otherwise drain through.
   //
   // handaxe is flagged for SYMMETRY, not because it closes anything: no quest
   // has a wood objective, so no quest ever grants it. Three tier-1 tools that

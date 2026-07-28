@@ -30,6 +30,7 @@ import type { ArchetypeState } from '../professions/archetype';
 import { armCadence, cadenceBlockedKeys } from '../professions/cadence';
 import { planGradeRemoval } from '../professions/material_grades';
 import { questFallbackGrants } from '../quest_fallback';
+import { playerHoldsQuestItem } from './quest_item_presence';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -153,7 +154,11 @@ export function finalizeQuestAccept(
     ...(selection === undefined ? {} : { selection }),
     resolvedCounts: resolvedQuestObjectiveCounts(quest, meta),
   });
-  for (const itemId of questFallbackGrants(quest, (id) => ctx.countItem(id, meta.entityId) > 0)) {
+  // The re-grant predicate spans every store the player can recover the item
+  // from alone (bags, bank, market escrow, mailbox), not just the bags: a
+  // bags-only read was the unbounded starter-tool mint (bank it, abandon,
+  // re-accept, repeat). See quest_item_presence.ts for the full reasoning.
+  for (const itemId of questFallbackGrants(quest, (id) => playerHoldsQuestItem(ctx, meta, id))) {
     ctx.addItem(itemId, 1, meta.entityId);
   }
   ctx.emit({ type: 'questAccepted', questId, pid: meta.entityId });

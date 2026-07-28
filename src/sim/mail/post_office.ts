@@ -214,6 +214,18 @@ export class PostOffice {
     return String(meta.characterId ?? meta.entityId);
   }
 
+  // Whether any letter addressed to this player still carries `itemId` as an
+  // attachment, in-flight letters included (a raven on the wing lands in this
+  // mailbox and nowhere else). The quest re-grant predicate
+  // (quests/quest_item_presence.ts) reads this: an item waiting in the
+  // mailbox is recoverable through mailTake, so a re-accept must not mint a
+  // duplicate. Pure read, no rng, no mutation.
+  mailboxHoldsItem(meta: PlayerMeta, itemId: string): boolean {
+    return this.mail.some(
+      (m) => this.belongsTo(m, meta) && m.items.some((s) => s.itemId === itemId && s.count > 0),
+    );
+  }
+
   // Structured outcome (the lockpick convention: the sim emits data only, the
   // client renders every visible mail string from the code).
   private result(

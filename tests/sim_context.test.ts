@@ -226,6 +226,7 @@ const CALLBACK_KEYS = [
   'queueQuestLetter',
   'mailHeroicMarks',
   'mailAuthoredLetter',
+  'mailboxHoldsItem',
   // Set proc firing.
   'applySetProcs',
   // The Vale Cup sport-move arms (social/vale_cup.ts).
@@ -523,6 +524,7 @@ function makeFakeHost() {
     queueQuestLetter: vi.fn(),
     mailHeroicMarks: vi.fn(),
     mailAuthoredLetter: vi.fn(),
+    mailboxHoldsItem: vi.fn(() => false),
     applySetProcs: vi.fn(),
     // The Vale Cup sport-move arms.
     vcupBallKick: vi.fn(),
