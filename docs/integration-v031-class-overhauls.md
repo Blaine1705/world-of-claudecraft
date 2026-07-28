@@ -205,6 +205,37 @@ Verify it the way it is verified now, by running a real save through rather than
 code: `tests/talent_save_migration_v026.test.ts` puts a retired id on a revision-1 bar per
 class and asserts it is gone, and asserts an untouched class keeps its gaps.
 
+### 2026-07-28: the full-branch main catch-up
+
+`origin/main` (v0.31.0 final, the 225 release-final commits) pulled through the whole
+chain, owner branches first, then re-merged here in runbook order:
+
+- **#2218**: `origin/main` merged into `ryan-foo:integration/v029-owned-classes`
+  (d6b4f881c) and pushed. Their new balance commits (raid-target tunes, restored
+  v0.31 bands) came back with it. Known red left for the owner, posted on the PR:
+  3 owned_class_balance_harness band checks (Fieldcraft 187.8 over the 1.2x
+  Coldsight cap 182.6; Vespers 167.1 over the 1.15x Thundercall cap 165.3;
+  Warspirit/Vespers boss ratio 1.103 vs 1.10), caused by main's final combat wave
+  (shield block outcomes, parkour collision), 1 to 3 percent each.
+- **#2428**: `origin/main` merged into `Blaine1705:feature/paladin-sun-cleric-overhaul`
+  (66c883a52 + 2 reconciliation commits) and pushed. The block-contract collision
+  resolved in the overhaul's favor: paladin blocking stands (warriorMeleeDefense,
+  entity.ts eligibility), composed with main's block outcome kind; blocked swings
+  now report kind block everywhere. Main's legacy Hallowed Wall armor fix
+  (12393c4bb) is superseded by the redesigned holy_shield and its wire test was
+  removed with the legacy kit.
+- **#2328**: caught up by merging the UPDATED #2218 head (0a79ca399), NOT restacked:
+  f2fb3e378 is already merged here, so a rewrite would break the auto-close credit
+  chain. Only generated i18n conflicted.
+- **Here**: main merged (bd0ebc19e), then all three updated heads re-merged --no-ff.
+  Overlay locale conflicts resolved as entry-level unions (both fills survive,
+  same-key collisions took main's release fill). The #2218 rewording of chain_heal
+  and desperate_prayer invalidated 15 Latin-script fills; re-translated fresh
+  (d8c850c70), pending=0 again. Eastbrook polish provenance re-recorded per tree
+  (the pins differ per branch; each merge re-records on ITS merged tree). Parity
+  re-mints stayed confined to owned-class and paladin scenarios; the shared
+  leakage scenarios (fiesta, pet_ai, pet_commands, party_raid) did not move.
+
 ### Next: #2428 (paladin)
 
 The merge was pre-flighted and aborted rather than rushed. 62 conflicts: 26 generated i18n
