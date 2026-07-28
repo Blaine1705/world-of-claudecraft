@@ -345,6 +345,7 @@ import { updateProfNudges } from './professions/prof_nudges';
 import { healDisplayRoundedProficiency } from './professions/proficiency_display_heal';
 import { type SalvageResult, salvageItem as salvageItemImpl } from './professions/salvage';
 import {
+  baselineActivePairTierMail,
   normalizeTierMailOnLoad,
   pruneTierMailToActiveMajors,
   updateTierMail,
@@ -2399,9 +2400,12 @@ export class Sim {
       // Node respawn timers resume from their saved remaining deltas (D6),
       // re-anchored to THIS sim's clock and filtered to live node ids
       // (professions/node_persist.ts): the timers froze at the logout frame
-      // and pick up here, so a relog cannot reset them. Only the logout
-      // frame freezes: a linkdead drop keeps the character in the world with
-      // its timers counting in live sim time until the grace-expiry save.
+      // and pick up here, so a relog cannot reset them. A linkdead drop's
+      // immediate safety-flush save freezes at drop time too, but the
+      // character stays in the world with timers counting in live sim time,
+      // so the grace-expiry save overwrites it with the smaller remaining;
+      // only a crash inside the grace window leaves the drop-time freeze
+      // durable, and that freeze is never smaller than reality.
       meta.nodeHarvestReadyAt = applyNodeReadiness(s.nodeHarvestCooldowns, this.time);
       if (s.unlockedMilestones)
         for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
@@ -3067,6 +3071,12 @@ export class Sim {
     // character on the Sowfield). The stowed pet persists via serializePet's
     // delvePetStash fallback; known/sportRole are session-derived, not saved.
     const cupReturn = valeCupMod.vcupReturnFor(this.ctx, pid);
+    // One fold serves both persisted proficiency keys below: the live counters
+    // plus any still-queued grants (foldPendingGatherGrants), so a leave-time
+    // save landing between the tick that queued a grant and the tick that
+    // drains it cannot lose the grant. The live meta is untouched; the queue
+    // still drains only on the tick path.
+    const foldedProficiency = foldPendingGatherGrants(meta);
     const state: CharacterState = {
       contentRevision: CURRENT_CHARACTER_CONTENT_REVISION,
       level: restore ? restore.level : e.level,
@@ -3094,13 +3104,11 @@ export class Sim {
       // PlayerMeta.totalPlayedSeconds); /playtime reads the running total the
       // same way without waiting for a save.
       totalPlayedSeconds: meta.totalPlayedSeconds + Math.max(0, this.time - meta.joinedAt),
-      // Both keys carry the SAVE-time proficiency: the live counters plus any
-      // still-queued grants (foldPendingGatherGrants), so a leave-time save
-      // landing between the tick that queued a grant and the tick that drains
-      // it cannot lose the grant. The live meta is untouched; the queue still
-      // drains only on the tick path.
-      professions: foldPendingGatherGrants(meta),
-      gatheringProficiency: foldPendingGatherGrants(meta),
+      // Legacy dual-write plus the current key, both off the one fold above
+      // (separate objects on purpose, so no caller can alias one through the
+      // other).
+      professions: { ...foldedProficiency },
+      gatheringProficiency: foldedProficiency,
       // Spread ONLY when a slot exists, so the key is absent from the saved
       // JSONB for every character who has never slotted an effect rather than
       // writing `{}` into every row in the realm.
@@ -9711,7 +9719,17 @@ export class Sim {
   acceptArchetypeQuest(craftId: string, pid?: number): boolean {
     const r = this.resolve(pid);
     if (!r) return false;
-    return acceptArchetypeQuestImpl(this.ctx, r.meta.entityId, craftId);
+    const accepted = acceptArchetypeQuestImpl(this.ctx, r.meta.entityId, craftId);
+    // The full pair-transition rule, exactly as the quest attunement path runs
+    // it (quests/profession_quest_effects.ts): prune stale acknowledgements
+    // (belt and braces here: accept requires no prior pair), then baseline the
+    // new majors at their current tier so a tier crossed before the next 1 Hz
+    // sweep still books its letter instead of being swallowed silently.
+    if (accepted) {
+      pruneTierMailToActiveMajors(r.meta);
+      baselineActivePairTierMail(r.meta);
+    }
+    return accepted;
   }
 
   /** Stub entry point for one completion of the repeatable "make amends" quest
@@ -9730,11 +9748,15 @@ export class Sim {
     const r = this.resolve(pid);
     if (!r) return false;
     const switched = switchArchetypeImpl(this.ctx, r.meta.entityId, craftId);
-    // Same pair-transition rule as the quest attunement path
-    // (quests/profession_quest_effects.ts): retire the outgoing majors'
+    // The full pair-transition rule, exactly as the quest attunement path runs
+    // it (quests/profession_quest_effects.ts): retire the outgoing majors'
     // acknowledged tiers so a later return re-baselines silently instead of
-    // mailing retroactively. The new majors baseline on the next sweep.
-    if (switched) pruneTierMailToActiveMajors(r.meta);
+    // mailing retroactively, then baseline the new majors at their current
+    // tier so a crossing before the next 1 Hz sweep is not swallowed.
+    if (switched) {
+      pruneTierMailToActiveMajors(r.meta);
+      baselineActivePairTierMail(r.meta);
+    }
     return switched;
   }
 

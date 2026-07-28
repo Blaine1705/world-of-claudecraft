@@ -18,6 +18,11 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   VIEWER: two players can see the same node differently.
 - `gather_events.ts`: the per-node-type rare events (always signed, five
   times yield) and the zone soft-broadcast `emitToZonePlayers`.
+- `node_persist.ts`: pure leaf persisting per-player node readiness across
+  logout as remaining-time deltas (the `src/sim/cooldown_persist.ts` scheme;
+  D6). `serializeNodeReadiness` writes only still-running timers;
+  `applyNodeReadiness` re-anchors on load, filtered to live node ids and
+  clamped to one respawn (the anti-tamper arm is load-side on purpose).
 - `material_grades.ts`: the fine-material axis. Pure leaf owning the nine
   base/`fine_` grade pairs, the ZONE tier ladder the upgrade compares against
   (NOT `material_tier.ts`'s price band, which is a different ladder and puts
@@ -152,7 +157,9 @@ hosts, plus the pinned callback-name list in `tests/sim_context.test.ts`.
   `gatheringProficiency` is the current key (preferred on read, always
   written); `professions` is the legacy pre-rename key, still dual-written on
   every save for downgrade back-compat and read only as a fallback when
-  `gatheringProficiency` is absent. Craft-side state persists as separate optional `CharacterState`
+  `gatheringProficiency` is absent. `nodeHarvestCooldowns` is the per-player
+  node-readiness record (nodeId to remaining seconds, zero-default omission,
+  loaded through `node_persist.ts` `applyNodeReadiness`). Craft-side state persists as separate optional `CharacterState`
   fields (`craftSkills`, `knownRecipes`, `archetype`, `equipmentInstance` for
   enchanted copies); see the comments on `CharacterState` in `sim.ts`.
 - The facet's member list is pinned by `tests/world_api_parity.test.ts`

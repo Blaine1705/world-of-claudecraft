@@ -316,10 +316,10 @@ describe('tier-crossing master mail (Professions 2.0)', () => {
     expect(sweep.booked).toEqual([]);
   });
 
-  it('the legacy switchArchetype command prunes exactly like the quest path', () => {
+  it('the legacy switchArchetype command prunes and baselines exactly like the quest path', () => {
     // The second transition entry point (the sim.ts IWorld command): a
-    // regression that wired the prune onto only the quest path stays green
-    // there and must red here.
+    // regression that wired the prune or the baseline onto only the quest
+    // path stays green there and must red here.
     const sim = makeSim();
     const meta = attunedMeta(sim);
     meta.craftSkills[PRIMARY] = tierSkill(2);
@@ -327,9 +327,36 @@ describe('tier-crossing master mail (Professions 2.0)', () => {
     meta.archetype.amendsProgress = requiredAmendsProgress(meta.archetype.switchCount);
     expect(sim.switchArchetype('alchemy', sim.playerId)).toBe(true);
     // Neither outgoing major survives (alchemy pairs with engineering, so the
-    // Smith majors both left); the new majors baseline on the next sweep.
+    // Smith majors both left), and the incoming majors baseline IMMEDIATELY
+    // at their current tier, closing the window before the next 1 Hz sweep.
     expect(meta.archetype.activeArchetype).toBe('alchemy');
-    expect(meta.tierMailSent.size).toBe(0);
+    expect([...meta.tierMailSent.entries()].sort()).toEqual([
+      ['alchemy', 0],
+      ['engineering', 0],
+    ]);
+  });
+
+  it('the legacy acceptArchetypeQuest command baselines at accept time, so an immediate crossing mails', () => {
+    // The third transition entry point (null to a first pair). Without the
+    // accept-time baseline, a tier crossed between acceptance and the first
+    // 1 Hz sweep is swallowed by the sweep's silent baseline arm; with it,
+    // the crossing books its letter.
+    const sim = makeSim();
+    const meta = sim.players.get(sim.playerId)!;
+    meta.craftSkills[PRIMARY] = tierSkill(1);
+    expect(sim.acceptArchetypeQuest(PRIMARY, sim.playerId)).toBe(true);
+    // Accept derived the Smith pair (armorcrafting is weaponcrafting's combo
+    // partner) and baselined both majors at their current tiers, silently.
+    expect(meta.archetype.pairedMajor).toBe(SECONDARY);
+    expect(meta.tierMailSent.get(PRIMARY)).toBe(1);
+    expect(meta.tierMailSent.get(SECONDARY)).toBe(0);
+
+    // A tier crossed immediately after acceptance, before any sweep ran:
+    // the letter must be booked, not swallowed by a first-sweep baseline.
+    meta.craftSkills[PRIMARY] = tierSkill(2);
+    const sweep = recordingCtx();
+    expect(updateTierMailFor(meta, sweep.ctx)).toBe(true);
+    expect(sweep.booked).toEqual([MASTER_TIER_LETTERS[PAIR][2]]);
   });
 
   it('load prunes a stale acknowledgement for a craft that is not a current major', () => {

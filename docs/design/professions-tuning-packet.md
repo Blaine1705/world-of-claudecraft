@@ -118,8 +118,11 @@ freeze, and the retired-id drop.
 cooldowns, and states the pattern: persist remaining-time deltas, not wall-clock
 expiry, so timers freeze across a logout and resume on load. Node readiness is
 the same shape. The freeze happens at the logout frame (the leave-time
-`serializeCharacter`); a linkdead drop keeps the character in the world, so
-its timers keep counting in live sim time until the grace-expiry save.
+`serializeCharacter`). A linkdead drop's immediate safety-flush save freezes
+at drop time too, but the character stays in the world with timers counting
+in live sim time, so the grace-expiry save overwrites that snapshot with the
+smaller remaining; only a crash inside the grace window leaves the drop-time
+freeze durable, and it errs toward a longer wait, never a free reset.
 
 Shared depletion was considered and rejected for this packet. It would reverse a
 deliberate documented position (`src/sim/professions/gathering.ts` states the

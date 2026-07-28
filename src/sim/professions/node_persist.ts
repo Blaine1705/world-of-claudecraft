@@ -12,9 +12,12 @@
 // cooldown_persist.ts scheme (and the same shape the `ncd` wire field already
 // ships per tick, so persistence adds zero wire changes). The freeze happens at
 // the logout frame, where the character leaves the world through
-// serializeCharacter; a linkdead drop never freezes anything, because the
-// character stays in the world and its timers keep counting in live sim time
-// until the grace expires and the real leave-time save runs.
+// serializeCharacter. A linkdead drop's immediate safety-flush save freezes at
+// drop time too, but the character stays in the world with its timers counting
+// in live sim time, so the grace-expiry save overwrites that snapshot with the
+// smaller remaining; only a crash inside the grace window leaves the drop-time
+// freeze durable, and a stale freeze is never smaller than reality, so the
+// error direction is a longer wait, never a free reset.
 //
 // Readiness stays strictly per-player (one player's timer never touches
 // another's; see the D6 ruling in docs/design/professions-tuning-packet.md).
@@ -35,7 +38,10 @@ const positive = (n: number): boolean => Number.isFinite(n) && n > 0;
 /** Snapshot the live readiness map as remaining-time deltas. Returns undefined
  *  when no timer is still running (zero-default omission), so a character with
  *  every node ready serializes byte-identically to one saved before the field
- *  existed. */
+ *  existed. Deliberately does NOT clamp: the one live writer
+ *  (gathering.ts resolveHarvest) sets exactly now + respawnSeconds, and the
+ *  clamp is the LOAD side's anti-tamper arm (applyNodeReadiness below), so a
+ *  write-side clamp would only mask a writer bug. */
 export function serializeNodeReadiness(
   nodeHarvestReadyAt: Readonly<Record<string, number>>,
   now: number,

@@ -288,8 +288,9 @@ comment sites were corrected; `tests/professions_node_persist.test.ts`
 pins the round trip, the freeze across logout, the retired-id drop, and
 the field omission. Zero wire changes (`ncd` untouched) and no offline
 site (only the server persists characters). The freeze is the logout
-frame's; a linkdead drop keeps the character in the world, so its timers
-run in live sim time until the grace-expiry save.
+frame's; a linkdead drop safety-flushes a drop-time freeze that the
+grace-expiry save overwrites (durable only if the process crashes inside
+the grace window, and never smaller than reality).
 
 1. DONE: `tests/professions_blob_roundtrip.test.ts`, a presence-pinned
    literal field list, a byte-faithful one-cycle sweep per field, and a
