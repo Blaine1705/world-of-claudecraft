@@ -14,6 +14,7 @@
 // bailey sits at padH and the inner ward, the keep's raised terrace,
 // 2.6 above it behind a retaining edge with two stair cuts. Pure leaf:
 // deterministic, no rng, no SimContext.
+import type { BlockerDef } from './types';
 
 export const CASTLE = {
   // the graded grounds (terrain levels to the local pad target; the skirt
@@ -39,6 +40,12 @@ export const CASTLE = {
   /** mid-wall tower half-width */
   midTowerHw: 2.8,
 } as const;
+
+/** The ward's retaining edge blend: how far inside the ward rect the terrace
+ *  reaches full height. Sheer enough for the climb gate to refuse it, but not
+ *  a numeric wall. Anything that must MEET the edge (the alley flight's mass)
+ *  has to reach the far side of this band or it leaves a crack. */
+export const WARD_EDGE_BLEND = 0.7;
 
 // The three ways in. Every opening is a gap in the wall riser; spans are in
 // the wall's run coordinate (z for the west/east walls, x for north/south).
@@ -138,8 +145,19 @@ export const CASTLE_RAMPS: readonly CastleRamp[] = [
   // ...and its flat landing, bridging the flight top onto the SW bastion
   { axis: 'z', b0: 361.0, b1: 363.6, a0: 2058.6, a1: 2069, h0: CASTLE.walkAbs, h1: CASTLE.walkAbs },
   // the alley flight: squeezed between the north wall and the ward's
-  // retaining edge, climbing east to the NE walk
-  { axis: 'x', b0: 1989.0, b1: 1991.3, a0: 414, a1: 433.6, h0: 6, h1: CASTLE.walkAbs },
+  // retaining edge, climbing east to the NE walk. The band runs THROUGH the
+  // ward's retaining blend (the overlap rule above): stopping at the rect line
+  // left a sliver of bailey floor between the stair mass and the terrace that
+  // a walker fell up to 6.8yd into and could not climb out of.
+  {
+    axis: 'x',
+    b0: 1989.0,
+    b1: CASTLE.ward.z0 + WARD_EDGE_BLEND,
+    a0: 414,
+    a1: 433.6,
+    h0: 6,
+    h1: CASTLE.walkAbs,
+  },
   // the watch flight: the far wall-walk itself climbs to the SE chamber
   {
     axis: 'x',
@@ -193,6 +211,26 @@ export const CASTLE_BUILDINGS: readonly CastleBuilding[] = [
   { key: 'hexrBarracks', x: 400, z: 2063, rot: 0, scale: 7.5, r: 6, h: 12.5 },
   { key: 'hexrChurch', x: 413, z: 2060, rot: -Math.PI / 2, scale: 7.5, r: 5.5, h: 12.5 },
   { key: 'hexrTavern', x: 421, z: 2043, rot: Math.PI, scale: 7.5, r: 5.5, h: 10.5 },
+] as const;
+
+// The keep and the great hall stand 1.2yd apart on the ward terrace, closer
+// than a player body can use. Their collision circles are INSCRIBED in square
+// meshes, so that slot's floor sits inside both rendered buildings: a player
+// who squeezed in stood under the stonework (it reads as being underground)
+// with barely room to turn around. Two invisible blocker walls close the neck
+// at the point where the gap is still wide enough to stand in, so the slot can
+// never be entered from either end. The terrace east of the keep (2.4yd clear)
+// stays the way around to the ward's north yard.
+//
+// Same idiom as JAIL_BLOCKERS: fence-width, camera-ghost, never jumpable, and
+// pure static data (no rng, no tick-order effect). Merged into the built-in
+// world's blockers in data.ts, so all three hosts collide identically.
+export const CASTLE_BLOCKERS: readonly BlockerDef[] = [
+  // the slot's north mouth: from inside the great hall's circle to inside the
+  // keep's, so neither end can be walked around
+  { x1: 410.2, z1: 2003.9, x2: 412.6, z2: 2003.9 },
+  // the slot's south mouth
+  { x1: 410.2, z1: 2006.1, x2: 412.6, z2: 2006.1 },
 ] as const;
 
 // Ember crystals of varying sizes around the grounds and approach (drawn by
@@ -258,7 +296,7 @@ export function castlePadTarget(x: number, z: number): number {
     // the terrace proper; a narrow blend at the rect edge keeps the riser
     // sheer enough to refuse the climb gate but not a numeric wall
     const edge = Math.min(x - w.x0, w.x1 - x, z - w.z0);
-    return CASTLE.pad.h + rise * Math.min(1, edge / 0.7);
+    return CASTLE.pad.h + rise * Math.min(1, edge / WARD_EDGE_BLEND);
   }
   // south of the terrace edge: bailey, except inside a stair cut where the
   // surface ramps down over WARD_STEP_RUN
