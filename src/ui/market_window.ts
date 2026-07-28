@@ -198,6 +198,14 @@ export class MarketWindow {
     ]);
     if (sig === this.lastSig) return;
     this.lastSig = sig;
+    // The listings changed (a filter/search narrowed the result set, a listing sold, a
+    // page arrived), so renderContent() below is about to tear down and rebuild the
+    // `.mkt-row` nodes. A row detached this way fires no mouseleave, so a tooltip left
+    // open on a row that no longer matches the query would otherwise linger forever,
+    // still describing an item the list no longer shows (issue 2456). render()'s full rebuild
+    // already hides it for the tab/filter-click path; this is the same guard for the
+    // signature-driven refresh path (typing in search, an async listings update).
+    this.deps.hideTooltip();
     const collectTab = this.deps.root().querySelector('[data-tab="collect"]');
     if (collectTab) {
       const n = marketCollectBadgeCount(info);
