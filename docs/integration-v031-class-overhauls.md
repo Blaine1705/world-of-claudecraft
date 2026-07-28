@@ -236,6 +236,23 @@ chain, owner branches first, then re-merged here in runbook order:
   re-mints stayed confined to owned-class and paladin scenarios; the shared
   leakage scenarios (fiesta, pet_ai, pet_commands, party_raid) did not move.
 
+### 2026-07-28: full-suite state after the catch-up
+
+12 reds at the start of the pass, 8 after reconciliation. The 4 fixed here: the
+non-warrior parry test (block window zeroed, owner branch), the legacy
+holy_shield_armor suite (removed as superseded, owner branch), the hud_update_drive
+registry (both new per-frame calls registered, integration), the es_ES and fr_CA
+no-op dialect rows (removed, integration), and the retribution Ascension pacing pin
+(re-pinned 48.35 to 46.85, band intact, owner branch).
+
+Known red on the branch, attributed:
+
+| Tests | Cause | Owner |
+|---|---|---|
+| owned_class_balance_harness (3), owned_class_raid_balance_harness (1) | main's final combat wave moved Fieldcraft and Vespers 1 to 3 percent over their cross-spec bands | @ryan-foo, retune |
+| paladin_veilbound_march (2) | main's parkour kernel shifted the march end position and pull geometry; mechanic guards intact, tests need re-anchoring | @blaine1705 |
+| deploy_watchdog (2) | docker, red on release too | not ours |
+
 ### Next: #2428 (paladin)
 
 The merge was pre-flighted and aborted rather than rushed. 62 conflicts: 26 generated i18n
