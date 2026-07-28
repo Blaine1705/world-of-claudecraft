@@ -7,9 +7,9 @@
 // counter in one move, so a player who used to buy a stack of ore now has to go
 // and mine it. Both halves of that need watching. Copper flow answers whether
 // the faucet still covers what a player must buy (tools, training, fees) once
-// materials are no longer a copper sink; harvest counts by band answer whether
-// players actually reach the mid and premium nodes or stall on the starter
-// band. Neither reads back into gameplay: this is observability only.
+// materials are no longer a copper sink; harvest counts by zone band answer
+// whether players actually reach the later zones' nodes or stall in the
+// starter zone. Neither reads back into gameplay: this is observability only.
 //
 // COPPER FLOW IS A TREND, NOT A LEDGER. It is sampled as the acting player's
 // copper delta across one command dispatch, so it books nothing for a credit
@@ -121,6 +121,13 @@ export function copperFlowSourceForCommand(command: string): CopperFlowSource {
  * construction: a new ZoneDef extends the label set, and the exporter
  * pre-seeds every member to zero, so cardinality stays bounded at the zone
  * count.
+ *
+ * The bound is enforced at runtime, not by the type: ZoneDef.id is plain
+ * string, so HarvestBand below is string too, and the exporter's harvest()
+ * refuses any value outside this list rather than minting a series for it.
+ * The zone-count and membership pins live in tests/economy_telemetry.test.ts
+ * and tests/professions_zone_rollout.test.ts (which also keeps this list,
+ * and therefore the [0] fallback below, non-empty).
  */
 export const HARVEST_BANDS: readonly string[] = Object.freeze(ZONES.map((zone) => zone.id));
 

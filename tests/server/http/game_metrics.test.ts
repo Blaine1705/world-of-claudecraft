@@ -308,7 +308,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(() => counters.characterCreated()).not.toThrow();
     expect(() => counters.copperCredited('quest', 50)).not.toThrow();
     expect(() => counters.copperSpent('vendor', 20)).not.toThrow();
-    expect(() => counters.harvest('mid')).not.toThrow();
+    expect(() => counters.harvest('mirefen_marsh')).not.toThrow();
   });
 
   it('bounds the ws direction label to in/out and emits no per-player label anywhere', async () => {
@@ -444,5 +444,28 @@ describe('registerGameStateMetrics: economy telemetry counters', () => {
     expect([...bands].sort()).toEqual([...HARVEST_BANDS].sort());
     // No per-player dimension anywhere on these families.
     expect(text).not.toMatch(/woc_(copper|gather)[^\n]*\b(account|character|player|name|ip)=/);
+  });
+
+  it('drops an off-vocabulary harvest band instead of minting a series', async () => {
+    // HarvestBand is plain string (ZoneDef.id is not literal-typed), so the
+    // emitter's membership guard is the only cardinality bound. A retired
+    // material band and a player-shaped string must both vanish without a
+    // series and without moving any real zone's count.
+    const registry = new Registry();
+    const counters = registerGameStateMetrics(registry, stubSource());
+    counters.harvest('starter');
+    counters.harvest('account:12345');
+
+    const text = await registry.metrics();
+    expect(text).not.toMatch(/band="starter"/);
+    expect(text).not.toMatch(/band="account:12345"/);
+    for (const band of HARVEST_BANDS) {
+      expect(
+        sampleValue(
+          text,
+          new RegExp(`^woc_gather_harvests_total\\{band="${band}"\\} (\\d+)$`, 'm'),
+        ),
+      ).toBe('0');
+    }
   });
 });

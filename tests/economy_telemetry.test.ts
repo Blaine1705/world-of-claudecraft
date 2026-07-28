@@ -81,7 +81,8 @@ describe('harvest band classification (zone-keyed, R3)', () => {
     // construction (the V3 scaling R3 asked for), and the exporter pre-seeds
     // whatever this exports, so the two cannot drift apart.
     expect([...HARVEST_BANDS]).toEqual(ZONES.map((zone) => zone.id));
-    // Non-vacuity, and the concrete members the dashboards read today.
+    // Non-vacuity, and the concrete members external dashboards must
+    // re-point to at deploy: the old material-band series stop moving.
     expect(HARVEST_BANDS).toEqual(['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights']);
   });
 

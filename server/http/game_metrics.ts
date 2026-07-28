@@ -355,6 +355,11 @@ export function registerGameStateMetrics(
     },
     harvest(band: HarvestBand): void {
       try {
+        // HarvestBand is plain string (ZoneDef.id is not literal-typed), so
+        // this membership check is the cardinality bound: a caller handing us
+        // anything off the vocabulary drops the sample instead of minting an
+        // unbounded series.
+        if (!HARVEST_BANDS.includes(band)) return;
         harvests.inc({ band });
       } catch {
         // Drop the sample rather than propagate into the event-routing path.
