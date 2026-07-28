@@ -386,9 +386,9 @@ describe('registerGameStateMetrics: economy telemetry counters', () => {
     counters.copperCredited('quest', 50);
     counters.copperCredited('loot', 7);
     counters.copperSpent('vendor', 20);
-    counters.harvest('mid');
-    counters.harvest('mid');
-    counters.harvest('premium');
+    counters.harvest('mirefen_marsh');
+    counters.harvest('mirefen_marsh');
+    counters.harvest('thornpeak_heights');
 
     const text = await registry.metrics();
     expect(sampleValue(text, /^woc_copper_credited_total\{source="quest"\} (\d+)$/m)).toBe('200');
@@ -397,9 +397,15 @@ describe('registerGameStateMetrics: economy telemetry counters', () => {
     expect(sampleValue(text, /^woc_copper_credited_total\{source="vendor"\} (\d+)$/m)).toBe('0');
     expect(sampleValue(text, /^woc_copper_spent_total\{source="vendor"\} (\d+)$/m)).toBe('20');
     expect(sampleValue(text, /^woc_copper_spent_total\{source="quest"\} (\d+)$/m)).toBe('0');
-    expect(sampleValue(text, /^woc_gather_harvests_total\{band="mid"\} (\d+)$/m)).toBe('2');
-    expect(sampleValue(text, /^woc_gather_harvests_total\{band="premium"\} (\d+)$/m)).toBe('1');
-    expect(sampleValue(text, /^woc_gather_harvests_total\{band="starter"\} (\d+)$/m)).toBe('0');
+    expect(sampleValue(text, /^woc_gather_harvests_total\{band="mirefen_marsh"\} (\d+)$/m)).toBe(
+      '2',
+    );
+    expect(
+      sampleValue(text, /^woc_gather_harvests_total\{band="thornpeak_heights"\} (\d+)$/m),
+    ).toBe('1');
+    expect(sampleValue(text, /^woc_gather_harvests_total\{band="eastbrook_vale"\} (\d+)$/m)).toBe(
+      '0',
+    );
   });
 
   it('drops a non-positive or non-finite copper amount instead of corrupting the series', async () => {
@@ -423,7 +429,7 @@ describe('registerGameStateMetrics: economy telemetry counters', () => {
     const registry = new Registry();
     const counters = registerGameStateMetrics(registry, stubSource());
     counters.copperCredited('quest', 1);
-    counters.harvest('starter');
+    counters.harvest('eastbrook_vale');
 
     const text = await registry.metrics();
     const sources = new Set(

@@ -9,7 +9,6 @@ import {
   wireStreamerLinks,
 } from '../src/sim/account_flair';
 import { verifyChallenge } from '../src/sim/client_challenge';
-import { WORLD_SEED } from '../src/sim/world_seed';
 import { damageTakenWithin } from '../src/sim/combat/damage_history';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
@@ -80,6 +79,7 @@ import {
   type VcNationId,
 } from '../src/sim/types';
 import { isAtSowfield } from '../src/sim/vale_cup_layout';
+import { WORLD_SEED } from '../src/sim/world_seed';
 import {
   type BankBonusSource,
   COMMAND_NAMES,
@@ -152,7 +152,7 @@ import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueRelay } from './discord_relay';
 import { formatDuration } from './duration';
-import { copperFlowSourceForCommand, harvestBandForItem } from './economy_telemetry';
+import { copperFlowSourceForCommand, harvestBandForNode } from './economy_telemetry';
 import { shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, serializeEventFragments } from './event_frame';
 import { mergedPrsForLogin } from './github_contributors';
@@ -6338,11 +6338,12 @@ export class GameServer {
           if (ev.retro !== true) this.maybeBroadcastDeedUnlock(s, ev.deedId);
         }
       }
-      // Economy telemetry: one granted node harvest, counted under the band of
-      // what it yielded. Bots emit this too and are counted like anyone else,
-      // deliberately: the series exists to show what the world is harvesting.
+      // Economy telemetry: one granted node harvest, counted under the ZONE
+      // of the node that yielded it (R3). Bots emit this too and are counted
+      // like anyone else, deliberately: the series exists to show where the
+      // world is harvesting.
       if (ev.type === 'gatherResult') {
-        gameMetricsCounters().harvest(harvestBandForItem(ev.itemId));
+        gameMetricsCounters().harvest(harvestBandForNode(ev.nodeId));
       }
       if (ev.type === 'levelup' && ev.pid !== undefined) {
         const session = this.clients.get(ev.pid);

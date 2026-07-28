@@ -80,7 +80,7 @@ export interface GameMetricsCounters {
   copperCredited(source: CopperFlowSource, amount: number): void;
   /** `amount` copper (always positive) debited from the acting player, same sampling. */
   copperSpent(source: CopperFlowSource, amount: number): void;
-  /** One granted node harvest, counted under its material band. */
+  /** One granted node harvest, counted under its node's zone band (R3). */
   harvest(band: HarvestBand): void;
 }
 

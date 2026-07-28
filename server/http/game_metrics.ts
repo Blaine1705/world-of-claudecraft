@@ -77,7 +77,7 @@ export const WOC_COPPER_CREDITED_TOTAL = 'woc_copper_credited_total';
 /** Total copper debited from acting players, labeled by economic surface. */
 export const WOC_COPPER_SPENT_TOTAL = 'woc_copper_spent_total';
 
-/** Total granted node harvests, labeled by material band. */
+/** Total granted node harvests, labeled by the node's zone (R3). */
 export const WOC_GATHER_HARVESTS_TOTAL = 'woc_gather_harvests_total';
 
 /**
@@ -288,7 +288,7 @@ export function registerGameStateMetrics(
 
   const harvests = new Counter({
     name: WOC_GATHER_HARVESTS_TOTAL,
-    help: 'Total granted node harvests, by material band.',
+    help: 'Total granted node harvests, by the node zone.',
     labelNames: ['band'],
     registers: [registry],
   });

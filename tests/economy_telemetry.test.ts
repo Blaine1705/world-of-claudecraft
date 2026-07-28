@@ -11,11 +11,9 @@ import {
   type CopperFlowSource,
   copperFlowSourceForCommand,
   HARVEST_BANDS,
-  harvestBandForItem,
+  harvestBandForNode,
 } from '../server/economy_telemetry';
-import { ITEMS } from '../src/sim/data';
-import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
-import { MATERIAL_TIER_BY_ITEM } from '../src/sim/professions/material_tier';
+import { GATHER_NODES, ZONES } from '../src/sim/data';
 
 describe('copper flow source classification', () => {
   it('maps each economic surface to its own label', () => {
@@ -77,54 +75,38 @@ describe('copper flow source classification', () => {
   });
 });
 
-describe('harvest band classification', () => {
-  it('reads the sim material tier table rather than a second copy of the grouping', () => {
-    // Derived, not restated: every tier row must land in the band its tier
-    // implies, so a tier re-grouping in the sim moves this classifier with it.
-    for (const [itemId, tier] of Object.entries(MATERIAL_TIER_BY_ITEM)) {
-      const expected = tier >= 2 ? 'premium' : tier === 1 ? 'mid' : 'starter';
-      expect(harvestBandForItem(itemId), `${itemId} (tier ${tier})`).toBe(expected);
-    }
-    // Non-vacuity: the table must actually populate both non-starter bands, or
-    // the loop above proves nothing about the branch it is meant to cover.
-    const bands = new Set(Object.keys(MATERIAL_TIER_BY_ITEM).map(harvestBandForItem));
-    expect(bands).toEqual(new Set(['mid', 'premium']));
+describe('harvest band classification (zone-keyed, R3)', () => {
+  it('the band set IS the shipped zone list, in zone order', () => {
+    // Derived, not restated: a fourth zone extends the label set by
+    // construction (the V3 scaling R3 asked for), and the exporter pre-seeds
+    // whatever this exports, so the two cannot drift apart.
+    expect([...HARVEST_BANDS]).toEqual(ZONES.map((zone) => zone.id));
+    // Non-vacuity, and the concrete members the dashboards read today.
+    expect(HARVEST_BANDS).toEqual(['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights']);
   });
 
-  it('puts the starter-zone yields in starter and an unknown id there too', () => {
-    for (const itemId of ['copper_ore', 'ironbark_log', 'silverleaf_herb']) {
-      expect(ITEMS[itemId], itemId).toBeDefined();
-      expect(harvestBandForItem(itemId), itemId).toBe('starter');
-    }
-    // The safe direction for a counter: an id nobody has classified is counted,
-    // in the lowest band, rather than dropped or crashing the event pass.
-    expect(harvestBandForItem('not_a_real_item')).toBe('starter');
-    // Prototype keys degrade safely too. materialTierForItem indexes a plain
-    // object, so 'toString' resolves to an inherited FUNCTION rather than 0;
-    // both numeric comparisons are then false and the band falls through to
-    // 'starter'. Pinned because that safety is incidental, not designed, and a
-    // future band added above 'premium' could turn it into a wrong label.
-    for (const key of ['toString', 'constructor', 'valueOf', '__proto__']) {
-      expect(harvestBandForItem(key), key).toBe('starter');
-    }
-  });
-
-  it('classifies every live node yield into the exported band set', () => {
-    const yields = new Set<string>();
-    for (const byZone of Object.values(NODE_MATERIAL_TABLE)) {
-      for (const row of Object.values(byZone)) yields.add(row.itemId);
-    }
-    expect(yields.size).toBe(9);
-    const members = new Set<string>(HARVEST_BANDS);
+  it('classifies every live node into its own zone band', () => {
+    expect(GATHER_NODES.length).toBeGreaterThan(0);
     const seen = new Set<string>();
-    for (const itemId of yields) {
-      const band = harvestBandForItem(itemId);
-      expect(members.has(band), `${itemId} -> ${band}`).toBe(true);
-      seen.add(band);
+    for (const node of GATHER_NODES) {
+      expect(harvestBandForNode(node.id), node.id).toBe(node.zoneId);
+      seen.add(harvestBandForNode(node.id));
     }
-    // All three bands are actually reachable from live content, so no exported
-    // series is permanently dead.
+    // All three bands are reachable from live content, so no exported series
+    // is permanently dead. This is the arm the old material keying failed:
+    // Thornpeak's ore priced mid, so the premium band could not see it.
     expect(seen).toEqual(new Set(HARVEST_BANDS));
+  });
+
+  it('counts an unknown node id in the first zone rather than dropping it', () => {
+    // The safe direction for a counter: a retired node named by a stale event
+    // is counted, in the first band, never dropped and never a new series.
+    expect(harvestBandForNode('not_a_real_node')).toBe(HARVEST_BANDS[0]);
+    // Prototype keys degrade the same way: the map is a real Map, so
+    // 'constructor' and friends miss and take the fallback.
+    for (const key of ['toString', 'constructor', 'valueOf', '__proto__']) {
+      expect(harvestBandForNode(key), key).toBe(HARVEST_BANDS[0]);
+    }
   });
 });
 

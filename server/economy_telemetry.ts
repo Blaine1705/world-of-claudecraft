@@ -23,7 +23,7 @@
 // can never grow with the message vocabulary, and nothing per-player (account
 // id, character id, name, ip) is ever a label.
 
-import { materialTierForItem } from '../src/sim/professions/material_tier';
+import { GATHER_NODES, ZONES } from '../src/sim/data';
 
 /**
  * The fixed sources copper is attributed to. One label per economic surface,
@@ -111,23 +111,31 @@ export function copperFlowSourceForCommand(command: string): CopperFlowSource {
 }
 
 /**
- * The three material bands a harvest is counted under, named after what a
- * player experiences rather than after the tier integer: 'starter' is the first
- * zone's yields, 'mid' the second zone's plus thorium, 'premium' the top pair.
+ * The harvest bands, RE-KEYED BY ZONE (R3): one band per shipped zone, in
+ * zone order, derived from the live ZONES table. The old material-price
+ * keying (starter/mid/premium off materialTierForItem) answered the wrong
+ * question: a fine grade or a re-priced material moved bands with nobody
+ * standing anywhere new, and Thornpeak's premium ore was invisible because
+ * thorium prices mid. Zone keying answers what the series exists for (do
+ * players actually reach the later zones' ground) and scales with V3 by
+ * construction: a new ZoneDef extends the label set, and the exporter
+ * pre-seeds every member to zero, so cardinality stays bounded at the zone
+ * count.
  */
-export const HARVEST_BANDS = ['starter', 'mid', 'premium'] as const;
+export const HARVEST_BANDS: readonly string[] = Object.freeze(ZONES.map((zone) => zone.id));
 
 export type HarvestBand = (typeof HARVEST_BANDS)[number];
 
+/** O(1) node-to-zone resolution for the event pass; built once from content. */
+const NODE_ZONE_BY_ID: ReadonlyMap<string, string> = new Map(
+  GATHER_NODES.map((node) => [node.id, node.zoneId]),
+);
+
 /**
- * The band one harvested item id falls in, read off the sim's own material
- * tier table (materialTierForItem) rather than a second copy of the grouping,
- * so a tier re-grouping moves both together. An unknown id is tier 0, which is
- * 'starter': the safe direction for a counter.
+ * The band one granted harvest is counted under: the NODE's zone. An unknown
+ * node id (a retired node named by a stale event) falls to the first zone,
+ * the same counted-not-dropped direction the old unknown-item arm took.
  */
-export function harvestBandForItem(itemId: string): HarvestBand {
-  const tier = materialTierForItem(itemId);
-  if (tier >= 2) return 'premium';
-  if (tier === 1) return 'mid';
-  return 'starter';
+export function harvestBandForNode(nodeId: string): HarvestBand {
+  return NODE_ZONE_BY_ID.get(nodeId) ?? HARVEST_BANDS[0];
 }
