@@ -6141,6 +6141,7 @@ export const da_DK: EnTranslations = {
       "floatingDodge": "Undvigelse",
       "floatingParry": "Pareret",
       "floatingResist": "Modstået",
+      "floatingHealFull": "Fuld",
       "cannotMove": "Kan ikke bevæge dig!",
       "attack": "angreb",
       "damageDone": "Din {ability} rammer {target} for {amount}.",

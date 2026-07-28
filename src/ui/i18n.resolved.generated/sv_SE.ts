@@ -6141,6 +6141,7 @@ export const sv_SE: EnTranslations = {
       "floatingDodge": "Undvek",
       "floatingParry": "Parerade",
       "floatingResist": "Motstod",
+      "floatingHealFull": "Fullt",
       "cannotMove": "Kan inte röra dig!",
       "attack": "anfall",
       "damageDone": "Din {ability} träffar {target} för {amount}.",

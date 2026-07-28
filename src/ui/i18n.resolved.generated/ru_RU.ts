@@ -6141,6 +6141,7 @@ export const ru_RU: EnTranslations = {
       "floatingDodge": "Уклон",
       "floatingParry": "Парировано",
       "floatingResist": "Сопротивление",
+      "floatingHealFull": "Полное",
       "cannotMove": "Не двигается!",
       "attack": "атака",
       "damageDone": "Ваше {ability} поражает {target} на {amount}.",

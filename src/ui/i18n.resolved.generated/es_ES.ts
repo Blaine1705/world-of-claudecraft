@@ -6141,6 +6141,7 @@ export const es_ES: EnTranslations = {
       "floatingDodge": "Esquiva",
       "floatingParry": "Rechazo",
       "floatingResist": "Resistido",
+      "floatingHealFull": "Completo",
       "cannotMove": "¡No puedes moverte!",
       "attack": "ataque",
       "damageDone": "Tu {ability} golpea a {target} por {amount}.",

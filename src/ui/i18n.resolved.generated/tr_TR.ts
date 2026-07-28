@@ -6141,6 +6141,7 @@ export const tr_TR: EnTranslations = {
       "floatingDodge": "Savuşturma",
       "floatingParry": "Karşılama",
       "floatingResist": "Direnildi",
+      "floatingHealFull": "Dolu",
       "cannotMove": "Hareket edemezsin!",
       "attack": "saldırı",
       "damageDone": "{ability} yeteneğin {target} hedefine {amount} hasar vurdu.",

@@ -6141,6 +6141,7 @@ export const en_XA: EnTranslations = {
       "floatingDodge": "[Ðóðĝé]",
       "floatingParry": "[Þáŕŕý]",
       "floatingResist": "[Ŕéšíšţ]",
+      "floatingHealFull": "[Ƒúļļ]",
       "cannotMove": "[Çáñ'ţ ɱóʋé!]",
       "attack": "[áţţáçķ]",
       "damageDone": "[Ýóúŕ {ability} ĥíţš {target} ƒóŕ {amount}.]",

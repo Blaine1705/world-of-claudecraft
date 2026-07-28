@@ -7286,6 +7286,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Resistido',
+  'hud.combat.floatingHealFull': 'Completo',
   'hud.combat.resisted': '{target} resiste tu {ability}.',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   'hudChrome.itemArmorType.cloth': 'Tela',

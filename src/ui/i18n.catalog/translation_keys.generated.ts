@@ -4522,6 +4522,7 @@ export type TranslationKeyFlat =
   | 'hud.combat.death'
   | 'hud.combat.dodged'
   | 'hud.combat.floatingDodge'
+  | 'hud.combat.floatingHealFull'
   | 'hud.combat.floatingMiss'
   | 'hud.combat.floatingParry'
   | 'hud.combat.floatingResist'

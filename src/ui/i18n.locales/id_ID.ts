@@ -7323,6 +7323,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Ditahan',
+  'hud.combat.floatingHealFull': 'Penuh',
   'hud.combat.resisted': '{target} menahan {ability} milikmu.',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   'hudChrome.itemArmorType.cloth': 'Kain',

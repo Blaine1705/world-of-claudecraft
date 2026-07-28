@@ -1804,6 +1804,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': '未命中',
   'hud.combat.floatingDodge': '閃避',
   'hud.combat.floatingResist': '抵抗',
+  'hud.combat.floatingHealFull': '已滿',
   'hud.combat.attack': '攻擊',
   'hud.combat.damageDone': '你的{ability}擊中{target}，造成 {amount} 點傷害。',
   'hud.combat.damageDoneCrit': '你的{ability}對{target}造成致命一擊，造成 {amount} 點傷害。',

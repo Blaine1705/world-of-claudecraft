@@ -1874,6 +1874,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': '빗나감',
   'hud.combat.floatingDodge': '회피',
   'hud.combat.floatingResist': '저항',
+  'hud.combat.floatingHealFull': '가득 참',
   'hud.combat.attack': '공격',
   'hud.combat.damageDone': '{ability}이 {target}에게 {amount}의 피해를 입혔습니다.',
   'hud.combat.damageDoneCrit': '{ability}이 {target}에게 치명타로 {amount}의 피해를 입혔습니다.',

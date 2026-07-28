@@ -6141,6 +6141,7 @@ export const cs_CZ: EnTranslations = {
       "floatingDodge": "Vyhnutí",
       "floatingParry": "Odraženo",
       "floatingResist": "Odoláno",
+      "floatingHealFull": "Plné",
       "cannotMove": "Nemůžeš se hýbat!",
       "attack": "útok",
       "damageDone": "Tvoje {ability} zasahuje {target} za {amount}.",

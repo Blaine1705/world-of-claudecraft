@@ -6141,6 +6141,7 @@ export const zh_TW: EnTranslations = {
       "floatingDodge": "閃避",
       "floatingParry": "招架",
       "floatingResist": "抵抗",
+      "floatingHealFull": "已滿",
       "cannotMove": "無法移動！",
       "attack": "攻擊",
       "damageDone": "你的{ability}擊中{target}，造成 {amount} 點傷害。",

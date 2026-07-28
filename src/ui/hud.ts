@@ -248,6 +248,7 @@ import {
   harvestLineKey,
 } from './grant_line_view';
 import {
+  healLandingFloatTextKey,
   healLandingLogKey,
   shouldFloatHealLanding,
   shouldShowHealLanding,
@@ -9941,7 +9942,14 @@ export class Hud {
               });
               if (shape)
                 this.fctPainter.spawn(
-                  { ...shape, text: `+${ev.amount}${ev.crit ? '!' : ''}`, target: tgt },
+                  {
+                    ...shape,
+                    text:
+                      ev.amount > 0
+                        ? `+${ev.amount}${ev.crit ? '!' : ''}`
+                        : t(healLandingFloatTextKey(ev) ?? 'hud.combat.floatingHealFull'),
+                    target: tgt,
+                  },
                   now,
                 );
             }

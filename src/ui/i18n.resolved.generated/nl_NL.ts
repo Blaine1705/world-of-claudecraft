@@ -6141,6 +6141,7 @@ export const nl_NL: EnTranslations = {
       "floatingDodge": "Ontwijking",
       "floatingParry": "Parering",
       "floatingResist": "Weerstaan",
+      "floatingHealFull": "Vol",
       "cannotMove": "Kan niet bewegen!",
       "attack": "aanval",
       "damageDone": "Je {ability} raakt {target} voor {amount}.",

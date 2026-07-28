@@ -6141,6 +6141,7 @@ export const vi_VN: EnTranslations = {
       "floatingDodge": "Né",
       "floatingParry": "Gạt Đòn",
       "floatingResist": "Kháng",
+      "floatingHealFull": "Đầy",
       "cannotMove": "Không thể di chuyển!",
       "attack": "tấn công",
       "damageDone": "{ability} của bạn đánh trúng {target} gây {amount}.",

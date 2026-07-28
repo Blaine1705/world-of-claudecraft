@@ -1910,6 +1910,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': 'Промах',
   'hud.combat.floatingDodge': 'Уклон',
   'hud.combat.floatingResist': 'Сопротивление',
+  'hud.combat.floatingHealFull': 'Полное',
   'hud.combat.attack': 'атака',
   'hud.combat.damageDone': 'Ваше {ability} поражает {target} на {amount}.',
   'hud.combat.damageDoneCrit': 'Ваше {ability} критически поражает {target} на {amount}.',

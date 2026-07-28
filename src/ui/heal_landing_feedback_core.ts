@@ -10,14 +10,21 @@ export type HealLandingLogKey =
   | 'hud.combat.healSelfFull'
   | 'hud.combat.healOtherFull';
 
+export type HealLandingFloatTextKey = 'hud.combat.floatingHealFull';
+
 export function shouldShowHealLanding(ev: Heal2Event): boolean {
   if (ev.cueOnly) return false;
   if (ev.amount > 0) return true;
   return ev.hot !== true;
 }
 
+export function healLandingFloatTextKey(ev: Heal2Event): HealLandingFloatTextKey | null {
+  if (ev.cueOnly || ev.hot === true) return null;
+  return ev.amount === 0 ? 'hud.combat.floatingHealFull' : null;
+}
+
 export function shouldFloatHealLanding(ev: Heal2Event): boolean {
-  return ev.amount > 0 && shouldShowHealLanding(ev);
+  return (ev.amount > 0 && shouldShowHealLanding(ev)) || healLandingFloatTextKey(ev) !== null;
 }
 
 export function healLandingLogKey(ev: Heal2Event, selfTarget: boolean): HealLandingLogKey | null {

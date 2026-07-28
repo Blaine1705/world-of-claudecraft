@@ -6141,6 +6141,7 @@ export const ko_KR: EnTranslations = {
       "floatingDodge": "회피",
       "floatingParry": "무기 막기",
       "floatingResist": "저항",
+      "floatingHealFull": "가득 참",
       "cannotMove": "이동 불가!",
       "attack": "공격",
       "damageDone": "{ability}이 {target}에게 {amount}의 피해를 입혔습니다.",

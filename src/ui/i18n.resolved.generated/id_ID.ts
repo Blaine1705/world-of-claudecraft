@@ -6141,6 +6141,7 @@ export const id_ID: EnTranslations = {
       "floatingDodge": "Elak",
       "floatingParry": "Tangkis",
       "floatingResist": "Ditahan",
+      "floatingHealFull": "Penuh",
       "cannotMove": "Tidak bisa bergerak!",
       "attack": "serang",
       "damageDone": "{ability}-mu mengenai {target} sebesar {amount}.",

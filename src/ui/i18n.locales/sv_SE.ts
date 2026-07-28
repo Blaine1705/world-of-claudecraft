@@ -7153,6 +7153,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Motstod',
+  'hud.combat.floatingHealFull': 'Fullt',
   'hud.combat.resisted': '{target} motstår din {ability}.',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   'hudChrome.itemArmorType.cloth': 'Tyg',

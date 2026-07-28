@@ -7347,6 +7347,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Kháng',
+  'hud.combat.floatingHealFull': 'Đầy',
   'hud.combat.resisted': '{target} kháng lại {ability} của bạn.',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   'hudChrome.itemArmorType.cloth': 'Vải',

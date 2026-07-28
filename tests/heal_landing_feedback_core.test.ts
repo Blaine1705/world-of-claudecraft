@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import type { SimEvent } from '../src/sim/types';
 import {
+  healLandingFloatTextKey,
   healLandingLogKey,
   shouldFloatHealLanding,
   shouldShowHealLanding,
@@ -37,11 +38,12 @@ describe('heal landing feedback', () => {
     expect(healLandingLogKey(heal2({ amount: 25, crit: false }), true)).toBe('hud.combat.healSelf');
   });
 
-  it('logs direct zero-effective healing without a fake healing floater', () => {
+  it('floats direct zero-effective healing as a non-numeric full-health cue', () => {
     const ev = heal2({ sourceId: 1, targetId: 1, amount: 0 });
 
     expect(shouldShowHealLanding(ev)).toBe(true);
-    expect(shouldFloatHealLanding(ev)).toBe(false);
+    expect(shouldFloatHealLanding(ev)).toBe(true);
+    expect(healLandingFloatTextKey(ev)).toBe('hud.combat.floatingHealFull');
     expect(healLandingLogKey(ev, true)).toBe('hud.combat.healSelfFull');
   });
 
@@ -50,6 +52,7 @@ describe('heal landing feedback', () => {
 
     expect(shouldShowHealLanding(ev)).toBe(false);
     expect(shouldFloatHealLanding(ev)).toBe(false);
+    expect(healLandingFloatTextKey(ev)).toBe(null);
     expect(healLandingLogKey(ev, true)).toBe(null);
   });
 
@@ -58,6 +61,7 @@ describe('heal landing feedback', () => {
 
     expect(shouldShowHealLanding(ev)).toBe(false);
     expect(shouldFloatHealLanding(ev)).toBe(false);
+    expect(healLandingFloatTextKey(ev)).toBe(null);
     expect(healLandingLogKey(ev, true)).toBe(null);
   });
 
@@ -66,7 +70,8 @@ describe('heal landing feedback', () => {
 
     expect(ev).toMatchObject({ type: 'heal2', sourceId: 7, targetId: 7, amount: 0 });
     expect(shouldShowHealLanding(ev)).toBe(true);
-    expect(shouldFloatHealLanding(ev)).toBe(false);
+    expect(shouldFloatHealLanding(ev)).toBe(true);
+    expect(healLandingFloatTextKey(ev)).toBe('hud.combat.floatingHealFull');
     expect(healLandingLogKey(ev, true)).toBe('hud.combat.healSelfFull');
   });
 });

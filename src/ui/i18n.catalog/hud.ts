@@ -270,6 +270,7 @@ const hudStringsEn = {
       floatingDodge: 'Dodge',
       floatingParry: 'Parry',
       floatingResist: 'Resist',
+      floatingHealFull: 'Full',
       cannotMove: "Can't move!",
       attack: 'attack',
       damageDone: 'Your {ability} hits {target} for {amount}.',

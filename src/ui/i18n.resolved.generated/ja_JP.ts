@@ -6141,6 +6141,7 @@ export const ja_JP: EnTranslations = {
       "floatingDodge": "回避",
       "floatingParry": "受け流し",
       "floatingResist": "抵抗",
+      "floatingHealFull": "満タン",
       "cannotMove": "動けない！",
       "attack": "攻撃",
       "damageDone": "{ability}が{target}に命中し、{amount}のダメージ。",

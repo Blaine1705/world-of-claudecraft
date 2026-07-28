@@ -1889,6 +1889,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': 'ミス',
   'hud.combat.floatingDodge': '回避',
   'hud.combat.floatingResist': '抵抗',
+  'hud.combat.floatingHealFull': '満タン',
   'hud.combat.attack': '攻撃',
   'hud.combat.damageDone': '{ability}が{target}に命中し、{amount}のダメージ。',
   'hud.combat.damageDoneCrit': '{ability}が{target}にクリティカルし、{amount}のダメージ。',
