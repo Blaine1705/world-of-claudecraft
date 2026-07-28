@@ -2120,6 +2120,66 @@ function applyEastConeBreach(x: number, z: number, h: number): number {
   return h + (ramp - h) * wedge;
 }
 
+// The Glacier Tarn's shore ramp: the one authored way in and out of the tarn
+// bowl on foot. The tarn is the merged carve of two declared lakes (the tarn
+// and its northern finger, src/sim/content/frostveil.ts), and the frost
+// benches terrace the rim 10 to 25yd above the pond, so a player who jumped
+// in was stranded on the sandy floor with the Rime Elementals' beach camp for
+// company (the player report, world (42, 1642)). The tarn's WEST flank is the
+// shallowest and is already the designed approach: the Icemantle road comes
+// down to the "Glacier Tarn shore" waypoint at (42, 1626) and runs north past
+// the rim, so the terracing is suppressed there and the natural flank was
+// already close to walkable. It failed on a two-yard band at the waterline,
+// where the carve's organic shore wobble spiked the gradient past the climb
+// gate. This grades that flank into one straight slipway from the tarn's
+// shallows up onto the road bench: the target height is linear along the
+// segment (a constant rise/run well under the gate), it starts BELOW the
+// waterline so a swimmer meets it, and it cuts at most about 1.7yd into the
+// shoulder, so the terraced bowl keeps its shape and the elemental camp on
+// the far shore is untouched.
+//
+// It runs LAST, after applyLakeShoreGrading, so the heights below are the
+// FINISHED ones a player stands on (the shore grading rescales the waterline
+// band and drops everything above it by about 1.4yd, so a ramp authored
+// upstream of it would land well below the bench it is supposed to meet).
+// tests/frostveil_pit_escape.test.ts walks a real player out of the reported
+// stranding spot and back down again.
+export const GLACIER_TARN_RAMP = {
+  ax: 48.5, // the foot, out in the tarn's shallows...
+  az: 1640.5,
+  ah: -7, // ...below the waterline, on the natural bed height
+  bx: 34, // the top, on the road bench above the rim...
+  bz: 1640,
+  bh: 3, // ...at the bench's own height, so the tie-in has no seam
+  wIn: 3, // the walkable channel's half-width...
+  wOut: 8.5, // ...easing back to the untouched flank here
+} as const;
+// The capsule's bounding box, derived so it can never drift from the record:
+// this applier is on the hot path for EVERY height sample in the world.
+const TARN_RAMP_BOUNDS = {
+  x0: Math.min(GLACIER_TARN_RAMP.ax, GLACIER_TARN_RAMP.bx) - GLACIER_TARN_RAMP.wOut,
+  x1: Math.max(GLACIER_TARN_RAMP.ax, GLACIER_TARN_RAMP.bx) + GLACIER_TARN_RAMP.wOut,
+  z0: Math.min(GLACIER_TARN_RAMP.az, GLACIER_TARN_RAMP.bz) - GLACIER_TARN_RAMP.wOut,
+  z1: Math.max(GLACIER_TARN_RAMP.az, GLACIER_TARN_RAMP.bz) + GLACIER_TARN_RAMP.wOut,
+} as const;
+
+// The ramp itself: a capsule stamp (the cove-apron idiom used on the Hollow's
+// northeast shore walk). The target height runs linearly along the segment,
+// full strength inside the channel half-width and easing back to the natural
+// flank by wOut, so the cut has no lip at either end and no lateral step.
+function applyGlacierTarnRamp(x: number, z: number, h: number): number {
+  const b = TARN_RAMP_BOUNDS;
+  if (x < b.x0 || x > b.x1 || z < b.z0 || z > b.z1) return h;
+  const r = GLACIER_TARN_RAMP;
+  const dx = r.bx - r.ax;
+  const dz = r.bz - r.az;
+  const t = Math.max(0, Math.min(1, ((x - r.ax) * dx + (z - r.az) * dz) / (dx * dx + dz * dz)));
+  const d = Math.hypot(x - (r.ax + dx * t), z - (r.az + dz * t));
+  if (d >= r.wOut) return h;
+  const natural = smoothstep(r.wIn, r.wOut, d); // 0 on the channel floor, 1 off it
+  return h * natural + lerp(r.ah, r.bh, t) * (1 - natural);
+}
+
 // The modeled lava network's ground (render/ember_features.ts): the pool
 // records, link topology, and meander curves live in the shared leaf
 // src/sim/ember_lava_layout.ts, and this applier grades terrain to them:
@@ -3512,6 +3572,10 @@ function terrainHeightUnpadded(x: number, z: number, seed: number): number {
   // stand lift and the editor's stamps, so nothing above can re-steepen a
   // shore a player must wade out of.
   h = applyLakeShoreGrading(x, z, h);
+  // The Glacier Tarn's shore ramp, after that grading: the bowl's one authored
+  // way in and out, authored in FINISHED height space so its foot meets the
+  // pond and its top meets the road bench with no seam at either end.
+  h = applyGlacierTarnRamp(x, z, h);
   const sow = sowfieldFlattenWeight(x, z);
   if (sow > 0) h = lerp(h, SOWFIELD_FLAT.height, sow);
   // The Highwatch paddock is another authored level pull. It sits deep inside
