@@ -9570,7 +9570,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Golpeia com ameaça elevada e gera 1 de Devoção. Um golpe bem-sucedido tem 20% de chance de conceder Represália Solar por 8 s; cada bloqueio bem-sucedido tem 25%. A Represália Solar potencializa seu próximo Disco Solar, Martelo da Graça ou Luz Restauradora. A Ascensão também concede um pequeno escudo de absorção.',
   'entities.abilities.choir_of_deliverance.description':
-    'Canaliza por 6 s, curando membros próximos do grupo a cada 2 s.',
+    'Canaliza por 6 s, curando membros do grupo num raio de 30 metros em {damage} a cada 2 s. A cura aumenta com o poder mágico.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
@@ -9643,7 +9643,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     'Passiva: o Raio em Arco e o Relâmpago Bifurcado concedem Trovão, até 5. Com 5 de Trovão, o Abalo Terreno causa 125% mais dano ou o Terremoto causa 100% mais, e então consome todo o Trovão. (Chamado do Trovão)',
   'entities.abilities.tidecall.description':
-    'Cura um alvo aliado de 58 a 72. A cura aumenta com o poder mágico. Adiciona a mesma cura calculada antes do excesso à Corrente Restauradora, até 30% da vida máxima do alvo.',
+    'Cura um alvo aliado em {damage}. A cura aumenta com o poder mágico. Adiciona a cura completa antes do excesso à Corrente Restauradora, até 30% da vida máxima do alvo.',
   'entities.abilities.unleash_weapon.description':
     'Desencadeia o encantamento ativo da sua arma. A Marca Pírica causa de 54 a 64 de dano de Fogo, ganha 30% do poder mágico e concede 2 de Trovão. O Coração de Vendaval golpeia com sua arma, avança a Cadência do Espírito Guerreiro e concede 20% de velocidade de ataque por 6 s. O Vínculo de Pedra golpeia por 75% do dano de arma, obriga o alvo a atacar você e reduz o dano sofrido em 20% por 4 s. A Fonte da Vida consome sua Corrente Restauradora, cura por 125% da cura restante e reduz o próximo golpe em 8 s em 50% da vida restaurada.',
   'entities.abilities.warspirit_cadence.description':

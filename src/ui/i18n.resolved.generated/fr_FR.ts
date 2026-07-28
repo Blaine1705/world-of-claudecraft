@@ -7817,7 +7817,7 @@ export const fr_FR: EnTranslations = {
       },
       "tidecall": {
         "name": "Appel des marées",
-        "description": "Soigne une cible alliée de 58 à 72. Les soins augmentent avec la puissance des sorts. Ajoute les mêmes soins calculés avant surplus au Courant réparateur, jusqu'à 30% des points de vie maximum de la cible."
+        "description": "Soigne une cible alliée de {damage}. Le soin augmente avec la puissance des sorts. Ajoute le soin complet avant surguérison au Courant réparateur, jusqu'à 30% des points de vie maximum de la cible."
       },
       "metamorphosis": {
         "name": "Métamorphose",
@@ -8345,7 +8345,7 @@ export const fr_FR: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Chœur de délivrance",
-        "description": "Incante pendant 6 s et soigne les membres proches du groupe toutes les 2 s."
+        "description": "Canalise pendant 6 s et soigne les membres du groupe dans un rayon de 30 mètres de {damage} toutes les 2 s. Le soin augmente avec la puissance des sorts."
       },
       "bear_charge": {
         "name": "Ruée de Bruin",

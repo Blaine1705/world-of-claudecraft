@@ -7817,7 +7817,7 @@ export const de_DE: EnTranslations = {
       },
       "tidecall": {
         "name": "Gezeitenruf",
-        "description": "Heilt ein freundliches Ziel um 58 bis 72. Die Heilung steigt mit der Zaubermacht. Fügt der Flickströmung dieselbe vor Überheilung berechnete Heilung hinzu, bis zu 30% der maximalen Gesundheit des Ziels."
+        "description": "Heilt ein verbündetes Ziel um {damage}. Die Heilung steigt mit Zaubermacht. Fügt die volle Heilung vor Überheilung der Flickströmung hinzu, bis zu 30% der maximalen Gesundheit des Ziels."
       },
       "metamorphosis": {
         "name": "Metamorphose",
@@ -8345,7 +8345,7 @@ export const de_DE: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Chor der Erlösung",
-        "description": "Kanalisiert 6 Sek. lang und heilt alle 2 Sek. nahe Gruppenmitglieder."
+        "description": "Kanalisiert 6 Sek. lang und heilt Gruppenmitglieder im Umkreis von 30 Metern alle 2 Sek. um {damage}. Die Heilung steigt mit Zaubermacht."
       },
       "bear_charge": {
         "name": "Bruin-Ansturm",

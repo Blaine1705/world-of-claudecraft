@@ -7817,7 +7817,7 @@ export const pl_PL: EnTranslations = {
       },
       "tidecall": {
         "name": "Wezwanie Przypływu",
-        "description": "Leczy sojuszniczy cel za 58 do 72. Leczenie rośnie wraz z mocą zaklęć. Dodaje to samo leczenie obliczone przed nadleczeniem do Nurtu Cerowania, do 30% maksymalnego zdrowia celu."
+        "description": "Leczy przyjazny cel za {damage}. Leczenie rośnie wraz z mocą zaklęć. Dodaje pełne leczenie sprzed nadleczenia do Nurtu Cerowania, do 30% maksymalnego zdrowia celu."
       },
       "metamorphosis": {
         "name": "Metamorfoza",
@@ -8345,7 +8345,7 @@ export const pl_PL: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Chór Wybawienia",
-        "description": "Kanalizuje przez 6 s, lecząc pobliskich członków drużyny co 2 s."
+        "description": "Kanałuje przez 6 s, lecząc członków grupy w promieniu 30 metrów za {damage} co 2 s. Leczenie rośnie wraz z mocą zaklęć."
       },
       "bear_charge": {
         "name": "Szarża Bruina",

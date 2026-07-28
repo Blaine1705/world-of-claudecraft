@@ -7817,7 +7817,7 @@ export const tr_TR: EnTranslations = {
       },
       "tidecall": {
         "name": "Gelgit Çağrısı",
-        "description": "Dost bir hedefi 58 ila 72 iyileştirir. İyileştirme büyü gücüyle artar. Aşırı iyileştirmeden önce hesaplanan aynı iyileştirmeyi, hedefin azami canının 30% kadarına dek Onarım Akıntısına ekler."
+        "description": "Dost bir hedefi {damage} kadar iyileştirir. İyileştirme büyü gücüyle artar. Taşma öncesi tam iyileştirmeyi, hedefin azami canının 30% kadarına dek Onarım Akıntısına ekler."
       },
       "metamorphosis": {
         "name": "Metamorfoz",
@@ -8345,7 +8345,7 @@ export const tr_TR: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Kurtuluş Korosu",
-        "description": "6 sn kanalize ederek yakındaki grup üyelerini her 2 sn iyileştirir."
+        "description": "6 sn kanalize eder, 30 metre içindeki grup üyelerini her 2 saniyede {damage} kadar iyileştirir. İyileştirme büyü gücüyle artar."
       },
       "bear_charge": {
         "name": "Bruin Hücumu",

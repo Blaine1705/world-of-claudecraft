@@ -7817,7 +7817,7 @@ export const it_IT: EnTranslations = {
       },
       "tidecall": {
         "name": "Richiamo della Marea",
-        "description": "Cura un bersaglio alleato da 58 a 72. La cura aumenta con la potenza magica. Aggiunge la stessa cura calcolata prima dell'eccesso alla Corrente Risanatrice, fino al 30% della salute massima del bersaglio."
+        "description": "Cura un bersaglio alleato di {damage}. La cura aumenta con il potere magico. Aggiunge la cura completa prima delle cure in eccesso alla Corrente Risanatrice, fino al 30% della salute massima del bersaglio."
       },
       "metamorphosis": {
         "name": "Metamorfosi",
@@ -8345,7 +8345,7 @@ export const it_IT: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Coro della Liberazione",
-        "description": "Canalizza per 6 s curando i membri del gruppo vicini ogni 2 s."
+        "description": "Canalizza per 6 sec e cura i membri del gruppo entro 30 metri di {damage} ogni 2 sec. La cura aumenta con il potere magico."
       },
       "bear_charge": {
         "name": "Carica di Bruin",

@@ -9383,7 +9383,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Udeří s vysokou hrozbou a získá 1 Oddanost. Úspěšný úder má 20% šanci udělit Sluneční odplatu na 8 s; každý úspěšný blok 25%. Sluneční odplata posílí tvůj další Sluneční disk, Kladivo milosti nebo Léčivé světlo. Vzestup navíc udělí malý pohlcující štít.',
   'entities.abilities.choir_of_deliverance.description':
-    'Sesílá 6 s a léčí blízké členy skupiny každé 2 s.',
+    'Kanalizuje po dobu 6 s a každé 2 s léčí členy skupiny do 30 metrů za {damage}. Léčení roste se silou kouzel.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
@@ -9456,7 +9456,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     'Pasivní: Bleskový šíp a Rozvětvený blesk udělují Hrom, až do 5. Při 5 Hromech způsobí Zemní otřes o 125% větší poškození nebo Zemětřesení o 100% větší a poté spotřebuje veškerý Hrom. (Volání hromu)',
   'entities.abilities.tidecall.description':
-    'Vyléčí spřáteleného cíle za 58 až 72. Léčení roste se silou kouzel. Přidá stejné léčení spočítané před přeléčením do Léčivého proudu, až do 30% maximálního zdraví cíle.',
+    'Vyléčí přátelský cíl za {damage}. Léčení roste se silou kouzel. Přidá celé léčení před přeléčením do Léčivého proudu, až do 30% maximálního zdraví cíle.',
   'entities.abilities.unleash_weapon.description':
     'Vypustí aktivní očarování tvé zbraně. Ohnivé znamení způsobí 54 až 64 Ohnivého poškození, získá 30% síly kouzel a udělí 2 Hromy. Srdce vichru udeří tvou zbraní, posune Kadenci válečného ducha a udělí 20% rychlosti útoku na 6 s. Kamenné pouto udeří za 75% poškození zbraní, přinutí cíl zaútočit na tebe a sníží utrpěné poškození o 20% na 4 s. Pramen života spotřebuje tvůj Léčivý proud, vyléčí za 125% jeho zbývajícího léčení a sníží další zásah do 8 s o 50% obnoveného zdraví.',
   'entities.abilities.warspirit_cadence.description':

@@ -7817,7 +7817,7 @@ export const pt_BR: EnTranslations = {
       },
       "tidecall": {
         "name": "Chamado da Maré",
-        "description": "Cura um alvo aliado de 58 a 72. A cura aumenta com o poder mágico. Adiciona a mesma cura calculada antes do excesso à Corrente Restauradora, até 30% da vida máxima do alvo."
+        "description": "Cura um alvo aliado em {damage}. A cura aumenta com o poder mágico. Adiciona a cura completa antes do excesso à Corrente Restauradora, até 30% da vida máxima do alvo."
       },
       "metamorphosis": {
         "name": "Metamorfose",
@@ -8345,7 +8345,7 @@ export const pt_BR: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Coro da Libertação",
-        "description": "Canaliza por 6 s, curando membros próximos do grupo a cada 2 s."
+        "description": "Canaliza por 6 s, curando membros do grupo num raio de 30 metros em {damage} a cada 2 s. A cura aumenta com o poder mágico."
       },
       "bear_charge": {
         "name": "Investida de Bruin",

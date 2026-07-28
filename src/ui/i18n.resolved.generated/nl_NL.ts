@@ -7817,7 +7817,7 @@ export const nl_NL: EnTranslations = {
       },
       "tidecall": {
         "name": "Getijderoep",
-        "description": "Geneest een bevriend doelwit voor 58 tot 72. De genezing stijgt met spreukkracht. Voegt dezelfde vóór overgenezing berekende genezing toe aan de Herstelstroom, tot 30% van de maximale gezondheid van het doelwit."
+        "description": "Geneest een bevriend doelwit voor {damage}. De genezing neemt toe met spreukkracht. Voegt de volledige genezing vóór overgenezing toe aan de Herstelstroom, tot 30% van de maximale gezondheid van het doelwit."
       },
       "metamorphosis": {
         "name": "Metamorfose",
@@ -8345,7 +8345,7 @@ export const nl_NL: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Koor der Verlossing",
-        "description": "Bundelt 6 sec. en geneest elke 2 sec. nabije groepsleden."
+        "description": "Kanaliseer 6 sec en genees groepsleden binnen 30 meter voor {damage} elke 2 sec. De genezing neemt toe met spreukkracht."
       },
       "bear_charge": {
         "name": "Bruin-stormloop",

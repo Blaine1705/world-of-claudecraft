@@ -7817,7 +7817,7 @@ export const sv_SE: EnTranslations = {
       },
       "tidecall": {
         "name": "Tidvattenskallelse",
-        "description": "Läker ett vänligt mål för 58 till 72. Läkningen ökar med besvärjelsekraft. Lägger till samma läkning beräknad före överläkning till Lagningsströmmen, upp till 30% av målets maxhälsa."
+        "description": "Läker ett vänligt mål för {damage}. Läkningen ökar med besvärjelsekraft. Lägger hela läkningen före överläkning till Lagningsströmmen, upp till 30% av målets maximala hälsa."
       },
       "metamorphosis": {
         "name": "Metamorfos",
@@ -8345,7 +8345,7 @@ export const sv_SE: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Befrielsens kör",
-        "description": "Kanaliserar i 6 sek och läker närliggande gruppmedlemmar var 2:e sek."
+        "description": "Kanaliserar i 6 sek och läker gruppmedlemmar inom 30 meter för {damage} varannan sekund. Läkningen ökar med besvärjelsekraft."
       },
       "bear_charge": {
         "name": "Bruinrusning",

@@ -9450,7 +9450,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Slår med hög hotnivå och genererar 1 hängivenhet. Ett lyckat slag har 20% chans att ge Solvedergällning i 8 sek; varje lyckad block har 25%. Solvedergällning förstärker din nästa Solskiva, Nådens hammare eller Lagande ljus. Upphöjelse ger även en liten absorptionssköld.',
   'entities.abilities.choir_of_deliverance.description':
-    'Kanaliserar i 6 sek och läker närliggande gruppmedlemmar var 2:e sek.',
+    'Kanaliserar i 6 sek och läker gruppmedlemmar inom 30 meter för {damage} varannan sekund. Läkningen ökar med besvärjelsekraft.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
@@ -9523,7 +9523,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     'Passiv: Bågblixten och Gaffelblixten ger Åska, upp till 5. Vid 5 Åska gör Jordstöten 125% mer skada eller Jordbävningen 100% mer, och sedan förbrukas all Åska. (Åskkallelse)',
   'entities.abilities.tidecall.description':
-    'Läker ett vänligt mål för 58 till 72. Läkningen ökar med besvärjelsekraft. Lägger till samma läkning beräknad före överläkning till Lagningsströmmen, upp till 30% av målets maxhälsa.',
+    'Läker ett vänligt mål för {damage}. Läkningen ökar med besvärjelsekraft. Lägger hela läkningen före överläkning till Lagningsströmmen, upp till 30% av målets maximala hälsa.',
   'entities.abilities.unleash_weapon.description':
     'Släpper loss ditt vapens aktiva förtrollning. Eldmärket gör 54 till 64 eldskada, får 30% av besvärjelsekraften och ger 2 Åska. Stormhjärtat slår med ditt vapen, driver Krigsandens kadens framåt och ger 20% attackhastighet i 6 sek. Stenbundet slår för 75% vapenskada, tvingar målet att attackera dig och minskar skadan du tar med 20% i 4 sek. Livskällan förbrukar din Lagningsström, läker för 125% av dess återstående läkning och minskar nästa träff inom 8 sek med 50% av den återställda hälsan.',
   'entities.abilities.warspirit_cadence.description':

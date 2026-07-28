@@ -9462,7 +9462,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Yüksek tehditle vurur ve 1 Adanmışlık üretir. Başarılı bir vuruşun 8 sn boyunca Güneş Kısası verme ihtimali 20%; her başarılı blokun 25%. Güneş Kısası sonraki Güneş Diskini, Lütuf Çekicini veya Onaran Işığını güçlendirir. Yüceliş ayrıca küçük bir emici kalkan verir.',
   'entities.abilities.choir_of_deliverance.description':
-    '6 sn kanalize ederek yakındaki grup üyelerini her 2 sn iyileştirir.',
+    '6 sn kanalize eder, 30 metre içindeki grup üyelerini her 2 saniyede {damage} kadar iyileştirir. İyileştirme büyü gücüyle artar.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
@@ -9535,7 +9535,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     'Pasif: Ark Oku ve Çatallı Yıldırım Gök Gürültüsü verir, en fazla 5. 5 Gök Gürültüsünde Toprak Sarsıntısı 125% daha fazla hasar verir ya da Deprem 100% daha fazla verir, ardından tüm Gök Gürültüsünü tüketir. (Gök Gürültüsü Çağrısı)',
   'entities.abilities.tidecall.description':
-    'Dost bir hedefi 58 ila 72 iyileştirir. İyileştirme büyü gücüyle artar. Aşırı iyileştirmeden önce hesaplanan aynı iyileştirmeyi, hedefin azami canının 30% kadarına dek Onarım Akıntısına ekler.',
+    'Dost bir hedefi {damage} kadar iyileştirir. İyileştirme büyü gücüyle artar. Taşma öncesi tam iyileştirmeyi, hedefin azami canının 30% kadarına dek Onarım Akıntısına ekler.',
   'entities.abilities.unleash_weapon.description':
     'Silahının etkin büyüsünü salıverir. Ateş Damgası 54 ila 64 Ateş hasarı verir, büyü gücünün 30% kadarını kazanır ve 2 Gök Gürültüsü verir. Fırtına Yüreği silahınla vurur, Savaş Ruhu Ritmini ilerletir ve 6 sn boyunca 20% saldırı hızı verir. Taş Bağı silah hasarının 75% kadarıyla vurur, hedefi sana saldırmaya zorlar ve alınan hasarı 4 sn boyunca 20% azaltır. Yaşam Pınarı, Onarım Akıntını tüketir, kalan iyileştirmesinin 125% kadarını iyileştirir ve 8 sn içindeki sonraki vuruşu geri kazandırılan canın 50% kadarı azaltır.',
   'entities.abilities.warspirit_cadence.description':

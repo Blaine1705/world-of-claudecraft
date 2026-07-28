@@ -9440,7 +9440,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Slår med høj trussel og genererer 1 Hengivenhed. Et vellykket slag har 20% chance for at give Solgengældelse i 8 sek.; hver vellykket blokering har 25%. Solgengældelse styrker din næste Solskive, Nådens Hammer eller Lægende Lys. Ophøjelse giver også et lille absorptionsskjold.',
   'entities.abilities.choir_of_deliverance.description':
-    'Kanaliserer i 6 sek. og helbreder nærliggende gruppemedlemmer hvert 2. sek.',
+    'Kanaliserer i 6 sek. og helbreder gruppemedlemmer inden for 30 meter for {damage} hvert 2. sek. Helbredelsen øges med besværgelseskraft.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
@@ -9513,7 +9513,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     'Passiv: Lysbuelynet og Gaffellynet giver Torden, op til 5. Ved 5 Torden gør Jordstødet 125% mere skade eller Jordskælvet 100% mere, og derefter forbruges al Torden. (Tordenkald)',
   'entities.abilities.tidecall.description':
-    'Helbreder et venligt mål for 58 til 72. Helbredelsen stiger med besværgelseskraft. Tilføjer den samme helbredelse beregnet før overhelbredelse til Lapningsstrømmen, op til 30% af målets maksimale sundhed.',
+    'Helbreder et venligt mål for {damage}. Helbredelsen øges med besværgelseskraft. Tilføjer hele helbredelsen før overhelbredelse til Lapningsstrømmen, op til 30% af målets maksimale helbred.',
   'entities.abilities.unleash_weapon.description':
     'Slipper dit våbens aktive fortryllelse løs. Ildmærket gør 54 til 64 ildskade, får 30% af besværgelseskraften og giver 2 Torden. Stormhjertet slår med dit våben, driver Krigsåndens Kadence frem og giver 20% angrebshastighed i 6 sek. Stenbundet slår for 75% våbenskade, tvinger målet til at angribe dig og reducerer den skade, du tager, med 20% i 4 sek. Livskilden forbruger din Lapningsstrøm, helbreder for 125% af dens resterende helbredelse og reducerer det næste træf inden for 8 sek. med 50% af den genoprettede sundhed.',
   'entities.abilities.warspirit_cadence.description':

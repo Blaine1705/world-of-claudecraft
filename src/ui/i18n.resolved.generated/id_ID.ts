@@ -7817,7 +7817,7 @@ export const id_ID: EnTranslations = {
       },
       "tidecall": {
         "name": "Panggilan Pasang",
-        "description": "Menyembuhkan sasaran sekutu sebesar 58 sampai 72. Penyembuhan meningkat dengan kekuatan mantra. Menambahkan penyembuhan sama yang dihitung sebelum kelebihan ke Arus Pemulih, hingga 30% nyawa maksimum sasaran."
+        "description": "Menyembuhkan sasaran kawan sebesar {damage}. Penyembuhan meningkat dengan kekuatan mantra. Menambahkan penyembuhan penuh sebelum kelebihan ke Arus Pemulih, hingga 30% dari nyawa maksimum sasaran."
       },
       "metamorphosis": {
         "name": "Metamorfosis",
@@ -8345,7 +8345,7 @@ export const id_ID: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Paduan Suara Pembebasan",
-        "description": "Menyalurkan selama 6 dtk, menyembuhkan anggota kelompok di dekatnya tiap 2 dtk."
+        "description": "Merapal selama 6 dtk, menyembuhkan anggota grup dalam radius 30 meter sebesar {damage} setiap 2 dtk. Penyembuhan meningkat dengan kekuatan mantra."
       },
       "bear_charge": {
         "name": "Terjangan Bruin",

@@ -9505,7 +9505,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Uderza z wysokim zagrożeniem i generuje 1 Oddanie. Udany cios ma 20% szans na przyznanie Słonecznego Odwetu na 8 s; każdy udany blok ma 25%. Słoneczny Odwet wzmacnia twój następny Słoneczny Dysk, Młot Łaski lub Kojące Światło. Wzniesienie zapewnia także niewielką tarczę pochłaniającą.',
   'entities.abilities.choir_of_deliverance.description':
-    'Kanalizuje przez 6 s, lecząc pobliskich członków drużyny co 2 s.',
+    'Kanałuje przez 6 s, lecząc członków grupy w promieniu 30 metrów za {damage} co 2 s. Leczenie rośnie wraz z mocą zaklęć.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
@@ -9579,7 +9579,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     'Pasywna: Łukowy pocisk i Rozgałęziona Błyskawica przyznają Grom, do 5. Przy 5 Gromach Ziemny wstrząs zadaje o 125% więcej obrażeń albo Trzęsienie ziemi o 100% więcej, a następnie zużywa cały Grom. (Wezwanie Gromu)',
   'entities.abilities.tidecall.description':
-    'Leczy sojuszniczy cel za 58 do 72. Leczenie rośnie wraz z mocą zaklęć. Dodaje to samo leczenie obliczone przed nadleczeniem do Nurtu Cerowania, do 30% maksymalnego zdrowia celu.',
+    'Leczy przyjazny cel za {damage}. Leczenie rośnie wraz z mocą zaklęć. Dodaje pełne leczenie sprzed nadleczenia do Nurtu Cerowania, do 30% maksymalnego zdrowia celu.',
   'entities.abilities.unleash_weapon.description':
     'Uwalnia aktywne zaklęcie twojej broni. Piętno Ognia zadaje od 54 do 64 obrażeń od Ognia, zyskuje 30% mocy zaklęć i przyznaje 2 Gromy. Serce Wichru uderza twoją bronią, popycha Kadencję Ducha Wojny i przyznaje 20% prędkości ataku na 6 s. Kamienne Więzy uderzają za 75% obrażeń broni, zmuszają cel do zaatakowania ciebie i zmniejszają otrzymywane obrażenia o 20% na 4 s. Źródło Życia zużywa twój Nurt Cerowania, leczy za 125% jego pozostałego leczenia i zmniejsza następne trafienie w ciągu 8 s o 50% przywróconego zdrowia.',
   'entities.abilities.warspirit_cadence.description':

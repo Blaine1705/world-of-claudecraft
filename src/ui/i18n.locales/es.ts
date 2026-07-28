@@ -9621,7 +9621,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Golpea con amenaza elevada y genera 1 de Devoción. Un golpe certero tiene un 20% de probabilidad de otorgar Represalia Solar durante 8 s; cada bloqueo certero, un 25%. La Represalia Solar potencia tu próximo Disco Solar, Martillo de Gracia o Luz Reparadora. La Ascensión otorga además un pequeño escudo de absorción.',
   'entities.abilities.choir_of_deliverance.description':
-    'Canaliza durante 6 s y sana a los miembros cercanos del grupo cada 2 s.',
+    'Canaliza durante 6 s y sana a los miembros del grupo en un radio de 30 metros por {damage} cada 2 s. La sanación aumenta con el poder con hechizos.',
   'entities.abilities.bloodhook.name': 'Garfio Sangriento',
   'entities.abilities.bloodtrail_assault.name': 'Asalto del Rastro de Sangre',
   'entities.abilities.cold_focus.name': 'Concentración Gélida',
@@ -9691,7 +9691,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     'Pasiva: el Arco Eléctrico y el Relámpago Bifurcado otorgan Trueno, hasta 5. Con 5 de Trueno, la Sacudida Terrestre inflige un 125% más de daño o el Terremoto un 100% más, y luego consume todo el Trueno. (Llamatruenos)',
   'entities.abilities.tidecall.description':
-    'Sana a un objetivo amistoso de 58 a 72. La sanación aumenta con el poder con hechizos. Añade la misma sanación calculada antes del exceso a la Corriente Sanadora, hasta un 30% de la salud máxima del objetivo.',
+    'Sana a un objetivo amistoso por {damage}. La sanación aumenta con el poder con hechizos. Añade la sanación completa calculada antes del exceso a la Corriente Sanadora, hasta un 30% de la salud máxima del objetivo.',
   'entities.abilities.unleash_weapon.description':
     'Desata el encantamiento activo de tu arma. La Marca Pírica inflige de 54 a 64 de daño de Fuego, gana un 30% del poder con hechizos y otorga 2 de Trueno. El Corazón de Vendaval golpea con tu arma, avanza la Cadencia del Espíritu Guerrero y otorga un 20% de velocidad de ataque durante 6 s. El Ligado a la Piedra golpea por un 75% del daño de arma, obliga al objetivo a atacarte y reduce el daño recibido un 20% durante 4 s. El Manantial de Vida consume tu Corriente Sanadora, sana por un 125% de su sanación restante y reduce el siguiente golpe en 8 s un 50% de la salud restaurada.',
   'entities.abilities.warspirit_cadence.description':

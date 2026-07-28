@@ -9560,7 +9560,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Menyerang dengan ancaman tinggi dan menghasilkan 1 Pengabdian. Serangan yang berhasil berpeluang 20% memberi Pembalasan Surya selama 8 dtk; setiap tangkisan yang berhasil berpeluang 25%. Pembalasan Surya memperkuat Cakram Surya, Palu Karunia, atau Cahaya Pemulih berikutnya. Kenaikan juga memberi perisai penyerap kecil.',
   'entities.abilities.choir_of_deliverance.description':
-    'Menyalurkan selama 6 dtk, menyembuhkan anggota kelompok di dekatnya tiap 2 dtk.',
+    'Merapal selama 6 dtk, menyembuhkan anggota grup dalam radius 30 meter sebesar {damage} setiap 2 dtk. Penyembuhan meningkat dengan kekuatan mantra.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
@@ -9633,7 +9633,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     'Pasif: Sambaran Busur dan Petir Bercabang memberi Guruh, hingga 5. Pada 5 Guruh, Sentakan Bumi memberi 125% lebih banyak kerusakan atau Gempa Bumi 100% lebih banyak, lalu menghabiskan seluruh Guruh. (Panggilan Guruh)',
   'entities.abilities.tidecall.description':
-    'Menyembuhkan sasaran sekutu sebesar 58 sampai 72. Penyembuhan meningkat dengan kekuatan mantra. Menambahkan penyembuhan sama yang dihitung sebelum kelebihan ke Arus Pemulih, hingga 30% nyawa maksimum sasaran.',
+    'Menyembuhkan sasaran kawan sebesar {damage}. Penyembuhan meningkat dengan kekuatan mantra. Menambahkan penyembuhan penuh sebelum kelebihan ke Arus Pemulih, hingga 30% dari nyawa maksimum sasaran.',
   'entities.abilities.unleash_weapon.description':
     'Melepaskan sihir aktif senjatamu. Tanda Bara memberi 54 sampai 64 kerusakan Api, memperoleh 30% kekuatan mantra, dan memberi 2 Guruh. Hati Badai menyerang dengan senjatamu, memajukan Irama Roh Perang, dan memberi 20% kecepatan serang selama 6 dtk. Ikatan Batu menyerang sebesar 75% kerusakan senjata, memaksa sasaran menyerangmu, dan mengurangi kerusakan yang diterima 20% selama 4 dtk. Mata Air Kehidupan menghabiskan Arus Pemulihmu, menyembuhkan sebesar 125% sisa penyembuhannya, dan mengurangi benturan berikutnya dalam 8 dtk sebesar 50% nyawa yang dipulihkan.',
   'entities.abilities.warspirit_cadence.description':

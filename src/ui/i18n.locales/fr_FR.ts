@@ -9696,7 +9696,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     "Frappe avec une menace élevée et génère 1 Dévotion. Une frappe réussie a 20% de chances d'octroyer les Représailles solaires pendant 8 s ; chaque blocage réussi, 25%. Les Représailles solaires renforcent votre prochain Disque solaire, Marteau de grâce ou Lumière guérisseuse. L'Ascension octroie aussi un petit bouclier d'absorption.",
   'entities.abilities.choir_of_deliverance.description':
-    'Incante pendant 6 s et soigne les membres proches du groupe toutes les 2 s.',
+    'Canalise pendant 6 s et soigne les membres du groupe dans un rayon de 30 mètres de {damage} toutes les 2 s. Le soin augmente avec la puissance des sorts.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
@@ -9770,7 +9770,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     "Passif : le Éclair d'arc et l'Éclair fourchu octroient du Tonnerre, jusqu'à 5. À 5 Tonnerre, la Secousse tellurique inflige 125% de dégâts en plus ou le Tremblement de terre 100% de plus, puis consomme tout le Tonnerre. (Appel du tonnerre)",
   'entities.abilities.tidecall.description':
-    "Soigne une cible alliée de 58 à 72. Les soins augmentent avec la puissance des sorts. Ajoute les mêmes soins calculés avant surplus au Courant réparateur, jusqu'à 30% des points de vie maximum de la cible.",
+    "Soigne une cible alliée de {damage}. Le soin augmente avec la puissance des sorts. Ajoute le soin complet avant surguérison au Courant réparateur, jusqu'à 30% des points de vie maximum de la cible.",
   'entities.abilities.unleash_weapon.description':
     "Déchaîne l'enchantement actif de votre arme. La Marque de pyre inflige 54 à 64 points de dégâts de Feu, gagne 30% de la puissance des sorts et octroie 2 Tonnerre. Le Cœur-de-bourrasque frappe avec votre arme, avance la Cadence de l'esprit guerrier et octroie 20% de vitesse d'attaque pendant 6 s. Le Lié-à-la-pierre frappe pour 75% des dégâts d'arme, force la cible à vous attaquer et réduit les dégâts subis de 20% pendant 4 s. La Source-de-vie consomme votre Courant réparateur, soigne de 125% de ses soins restants et réduit le prochain coup dans les 8 s de 50% des points de vie restaurés.",
   'entities.abilities.warspirit_cadence.description':

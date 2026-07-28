@@ -7817,7 +7817,7 @@ export const da_DK: EnTranslations = {
       },
       "tidecall": {
         "name": "Tidevandskald",
-        "description": "Helbreder et venligt mål for 58 til 72. Helbredelsen stiger med besværgelseskraft. Tilføjer den samme helbredelse beregnet før overhelbredelse til Lapningsstrømmen, op til 30% af målets maksimale sundhed."
+        "description": "Helbreder et venligt mål for {damage}. Helbredelsen øges med besværgelseskraft. Tilføjer hele helbredelsen før overhelbredelse til Lapningsstrømmen, op til 30% af målets maksimale helbred."
       },
       "metamorphosis": {
         "name": "Metamorfose",
@@ -8345,7 +8345,7 @@ export const da_DK: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Befrielsens Kor",
-        "description": "Kanaliserer i 6 sek. og helbreder nærliggende gruppemedlemmer hvert 2. sek."
+        "description": "Kanaliserer i 6 sek. og helbreder gruppemedlemmer inden for 30 meter for {damage} hvert 2. sek. Helbredelsen øges med besværgelseskraft."
       },
       "bear_charge": {
         "name": "Bruin-storm",

@@ -9651,7 +9651,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Schlägt mit hoher Bedrohung zu und erzeugt 1 Hingabe. Ein erfolgreicher Schlag hat eine Chance von 20%, 8 Sek. lang Sonnenvergeltung zu gewähren; jeder erfolgreiche Block eine von 25%. Sonnenvergeltung verstärkt Eure nächste Sonnenscheibe, Euren nächsten Hammer der Gnade oder Euer nächstes Heilendes Licht. Der Aufstieg gewährt zusätzlich einen kleinen Absorptionsschild.',
   'entities.abilities.choir_of_deliverance.description':
-    'Kanalisiert 6 Sek. lang und heilt alle 2 Sek. nahe Gruppenmitglieder.',
+    'Kanalisiert 6 Sek. lang und heilt Gruppenmitglieder im Umkreis von 30 Metern alle 2 Sek. um {damage}. Die Heilung steigt mit Zaubermacht.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
@@ -9725,7 +9725,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     'Passiv: Der Lichtbogenblitz und der Gabelblitz gewähren Donner, bis zu 5. Bei 5 Donner verursacht der Erdstoß 125% mehr Schaden oder das Erdbeben 100% mehr, und dann wird aller Donner verbraucht. (Donnerruf)',
   'entities.abilities.tidecall.description':
-    'Heilt ein freundliches Ziel um 58 bis 72. Die Heilung steigt mit der Zaubermacht. Fügt der Flickströmung dieselbe vor Überheilung berechnete Heilung hinzu, bis zu 30% der maximalen Gesundheit des Ziels.',
+    'Heilt ein verbündetes Ziel um {damage}. Die Heilung steigt mit Zaubermacht. Fügt die volle Heilung vor Überheilung der Flickströmung hinzu, bis zu 30% der maximalen Gesundheit des Ziels.',
   'entities.abilities.unleash_weapon.description':
     'Entfesselt Eure aktive Waffenverzauberung. Das Flammenmal verursacht 54 bis 64 Feuerschaden, gewinnt 30% der Zaubermacht und gewährt 2 Donner. Das Sturmherz schlägt mit Eurer Waffe zu, treibt die Kriegsgeistkadenz voran und gewährt 6 Sek. lang 20% Angriffstempo. Das Steingebundene schlägt für 75% Waffenschaden zu, zwingt das Ziel, Euch anzugreifen, und verringert erlittenen Schaden 4 Sek. lang um 20%. Die Lebensquelle verbraucht Eure Flickströmung, heilt um 125% ihrer verbleibenden Heilung und verringert den nächsten Treffer innerhalb von 8 Sek. um 50% der wiederhergestellten Gesundheit.',
   'entities.abilities.warspirit_cadence.description':

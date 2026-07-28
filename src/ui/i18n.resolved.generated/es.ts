@@ -7817,7 +7817,7 @@ export const es: EnTranslations = {
       },
       "tidecall": {
         "name": "Llamada de la Marea",
-        "description": "Sana a un objetivo amistoso de 58 a 72. La sanación aumenta con el poder con hechizos. Añade la misma sanación calculada antes del exceso a la Corriente Sanadora, hasta un 30% de la salud máxima del objetivo."
+        "description": "Sana a un objetivo amistoso por {damage}. La sanación aumenta con el poder con hechizos. Añade la sanación completa calculada antes del exceso a la Corriente Sanadora, hasta un 30% de la salud máxima del objetivo."
       },
       "metamorphosis": {
         "name": "Metamorfosis",
@@ -8345,7 +8345,7 @@ export const es: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Coro de Liberación",
-        "description": "Canaliza durante 6 s y sana a los miembros cercanos del grupo cada 2 s."
+        "description": "Canaliza durante 6 s y sana a los miembros del grupo en un radio de 30 metros por {damage} cada 2 s. La sanación aumenta con el poder con hechizos."
       },
       "bear_charge": {
         "name": "Embestida de Bruin",

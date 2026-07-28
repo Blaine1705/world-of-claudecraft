@@ -9483,7 +9483,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Đánh với mức đe dọa cao và tạo 1 Sùng Tín. Một đòn thành công có 20% cơ hội ban Báo Thù Nhật Quang trong 8 giây; mỗi lần đỡ thành công có 25%. Báo Thù Nhật Quang tăng cường Đĩa Nhật Quang, Búa Ân Điển hoặc Thánh Quang Chữa Lành kế tiếp của bạn. Thăng Thiên còn ban một lá chắn hấp thụ nhỏ.',
   'entities.abilities.choir_of_deliverance.description':
-    'Niệm trong 6 giây, hồi máu cho các thành viên nhóm gần đó mỗi 2 giây.',
+    'Vận phép trong 6 giây, hồi máu cho các thành viên trong nhóm trong phạm vi 30 mét {damage} mỗi 2 giây. Lượng hồi tăng theo sức mạnh phép thuật.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
@@ -9556,7 +9556,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     'Bị động: Tia Hồ Quang và Sét Rẽ Nhánh ban Sấm, tối đa 5. Ở 5 Sấm, Địa Giật gây thêm 125% sát thương hoặc Động Đất gây thêm 100%, rồi tiêu hết Sấm. (Gọi Sấm)',
   'entities.abilities.tidecall.description':
-    'Hồi 58 đến 72 máu cho mục tiêu đồng minh. Lượng hồi tăng theo sức mạnh phép thuật. Thêm chính lượng hồi được tính trước khi dư vào Dòng Chữa Lành, tối đa 30% máu tối đa của mục tiêu.',
+    'Hồi máu cho một mục tiêu đồng minh {damage}. Lượng hồi tăng theo sức mạnh phép thuật. Cộng toàn bộ lượng hồi trước phần hồi thừa vào Dòng Chữa Lành, tối đa 30% lượng máu tối đa của mục tiêu.',
   'entities.abilities.unleash_weapon.description':
     'Giải phóng phù phép đang hoạt động trên vũ khí của bạn. Dấu Hỏa gây 54 đến 64 sát thương Lửa, nhận 30% sức mạnh phép thuật và ban 2 Sấm. Tâm Phong đánh bằng vũ khí của bạn, đẩy Nhịp Chiến Hồn tiến lên và ban 20% tốc đánh trong 6 giây. Thạch Phọc đánh gây 75% sát thương vũ khí, buộc mục tiêu tấn công bạn và giảm 20% sát thương phải chịu trong 4 giây. Suối Sinh tiêu Dòng Chữa Lành của bạn, hồi 125% lượng hồi còn lại và giảm đòn đánh kế tiếp trong 8 giây đi 50% lượng máu đã hồi.',
   'entities.abilities.warspirit_cadence.description':

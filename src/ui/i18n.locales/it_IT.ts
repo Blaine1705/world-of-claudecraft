@@ -9611,7 +9611,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     "Colpisce con minaccia elevata e genera 1 Devozione. Un colpo riuscito ha il 20% di probabilità di concedere Rappresaglia Solare per 8 s; ogni parata riuscita il 25%. La Rappresaglia Solare potenzia il tuo prossimo Disco Solare, Martello della Grazia o Luce Risanatrice. L'Ascensione concede anche un piccolo scudo di assorbimento.",
   'entities.abilities.choir_of_deliverance.description':
-    'Canalizza per 6 s curando i membri del gruppo vicini ogni 2 s.',
+    'Canalizza per 6 sec e cura i membri del gruppo entro 30 metri di {damage} ogni 2 sec. La cura aumenta con il potere magico.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
@@ -9685,7 +9685,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     'Passiva: il Dardo Folgorante e il Fulmine Biforcuto concedono Tuono, fino a 5. Con 5 Tuono, la Scossa Tellurica infligge il 125% di danni in più oppure il Terremoto il 100% in più, e poi consuma tutto il Tuono. (Richiamo del Tuono)',
   'entities.abilities.tidecall.description':
-    "Cura un bersaglio alleato da 58 a 72. La cura aumenta con la potenza magica. Aggiunge la stessa cura calcolata prima dell'eccesso alla Corrente Risanatrice, fino al 30% della salute massima del bersaglio.",
+    'Cura un bersaglio alleato di {damage}. La cura aumenta con il potere magico. Aggiunge la cura completa prima delle cure in eccesso alla Corrente Risanatrice, fino al 30% della salute massima del bersaglio.',
   'entities.abilities.unleash_weapon.description':
     "Scatena l'incantamento attivo della tua arma. Il Marchio Pirico infligge da 54 a 64 danni da Fuoco, guadagna il 30% della potenza magica e concede 2 Tuono. Il Cuore di Bufera colpisce con la tua arma, fa avanzare la Cadenza dello Spirito Guerriero e concede il 20% di velocità d'attacco per 6 s. Il Vincolo di Pietra colpisce per il 75% dei danni d'arma, costringe il bersaglio ad attaccarti e riduce i danni subiti del 20% per 4 s. La Fonte di Vita consuma la tua Corrente Risanatrice, cura per il 125% delle cure rimanenti e riduce il prossimo colpo entro 8 s del 50% della salute recuperata.",
   'entities.abilities.warspirit_cadence.description':

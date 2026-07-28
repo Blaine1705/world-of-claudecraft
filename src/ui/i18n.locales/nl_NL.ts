@@ -9568,7 +9568,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.vowkeeper_strike.description':
     'Slaat toe met hoge dreiging en genereert 1 Toewijding. Een geslaagde slag heeft 20% kans om 8 sec. lang Zonnevergelding te verlenen; elke geslaagde blokkering 25%. Zonnevergelding versterkt je volgende Zonneschijf, Hamer der Genade of Helend Licht. Verheffing verleent ook een klein absorptieschild.',
   'entities.abilities.choir_of_deliverance.description':
-    'Bundelt 6 sec. en geneest elke 2 sec. nabije groepsleden.',
+    'Kanaliseer 6 sec en genees groepsleden binnen 30 meter voor {damage} elke 2 sec. De genezing neemt toe met spreukkracht.',
 
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
@@ -9641,7 +9641,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     'Passief: de Boogbliksem en de Gevorkte bliksem verlenen Donder, tot 5. Bij 5 Donder richt de Aardse Schok 125% meer schade aan of de Aardbeving 100% meer, en dan wordt alle Donder verbruikt. (Donderroep)',
   'entities.abilities.tidecall.description':
-    'Geneest een bevriend doelwit voor 58 tot 72. De genezing stijgt met spreukkracht. Voegt dezelfde vóór overgenezing berekende genezing toe aan de Herstelstroom, tot 30% van de maximale gezondheid van het doelwit.',
+    'Geneest een bevriend doelwit voor {damage}. De genezing neemt toe met spreukkracht. Voegt de volledige genezing vóór overgenezing toe aan de Herstelstroom, tot 30% van de maximale gezondheid van het doelwit.',
   'entities.abilities.unleash_weapon.description':
     'Ontketent de actieve betovering van je wapen. Het Vuurmerk richt 54 tot 64 Vuurschade aan, wint 30% van de spreukkracht en verleent 2 Donder. Het Stormhart slaat toe met je wapen, brengt de Krijgsgeestcadans vooruit en verleent 6 sec. lang 20% aanvalssnelheid. De Steenband slaat toe voor 75% wapenschade, dwingt het doelwit jou aan te vallen en vermindert 4 sec. lang de opgelopen schade met 20%. De Levensbron verbruikt je Herstelstroom, geneest voor 125% van de resterende genezing en vermindert de volgende treffer binnen 8 sec. met 50% van de herstelde gezondheid.',
   'entities.abilities.warspirit_cadence.description':

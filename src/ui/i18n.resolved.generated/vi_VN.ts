@@ -7817,7 +7817,7 @@ export const vi_VN: EnTranslations = {
       },
       "tidecall": {
         "name": "Gọi Thủy Triều",
-        "description": "Hồi 58 đến 72 máu cho mục tiêu đồng minh. Lượng hồi tăng theo sức mạnh phép thuật. Thêm chính lượng hồi được tính trước khi dư vào Dòng Chữa Lành, tối đa 30% máu tối đa của mục tiêu."
+        "description": "Hồi máu cho một mục tiêu đồng minh {damage}. Lượng hồi tăng theo sức mạnh phép thuật. Cộng toàn bộ lượng hồi trước phần hồi thừa vào Dòng Chữa Lành, tối đa 30% lượng máu tối đa của mục tiêu."
       },
       "metamorphosis": {
         "name": "Biến Hình",
@@ -8345,7 +8345,7 @@ export const vi_VN: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Hợp Xướng Giải Thoát",
-        "description": "Niệm trong 6 giây, hồi máu cho các thành viên nhóm gần đó mỗi 2 giây."
+        "description": "Vận phép trong 6 giây, hồi máu cho các thành viên trong nhóm trong phạm vi 30 mét {damage} mỗi 2 giây. Lượng hồi tăng theo sức mạnh phép thuật."
       },
       "bear_charge": {
         "name": "Cú Lao Bruin",

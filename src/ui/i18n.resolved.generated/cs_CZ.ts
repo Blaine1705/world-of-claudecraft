@@ -7817,7 +7817,7 @@ export const cs_CZ: EnTranslations = {
       },
       "tidecall": {
         "name": "Volání přílivu",
-        "description": "Vyléčí spřáteleného cíle za 58 až 72. Léčení roste se silou kouzel. Přidá stejné léčení spočítané před přeléčením do Léčivého proudu, až do 30% maximálního zdraví cíle."
+        "description": "Vyléčí přátelský cíl za {damage}. Léčení roste se silou kouzel. Přidá celé léčení před přeléčením do Léčivého proudu, až do 30% maximálního zdraví cíle."
       },
       "metamorphosis": {
         "name": "Děsivý zjev",
@@ -8345,7 +8345,7 @@ export const cs_CZ: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Sbor vysvobození",
-        "description": "Sesílá 6 s a léčí blízké členy skupiny každé 2 s."
+        "description": "Kanalizuje po dobu 6 s a každé 2 s léčí členy skupiny do 30 metrů za {damage}. Léčení roste se silou kouzel."
       },
       "bear_charge": {
         "name": "Medvědí výpad",
