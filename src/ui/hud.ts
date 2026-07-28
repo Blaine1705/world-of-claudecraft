@@ -14707,6 +14707,14 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
   if (!secondary) return '';
   switch (secondary.type) {
     case 'dot':
+      if (secondary.perCombo !== undefined) {
+        return (
+          t('abilityUi.tooltip.finisherDamage', {
+            base: formatAbilityNumber(secondary.total),
+            perCombo: formatAbilityNumber(secondary.perCombo),
+          }) + suffix(secondary)
+        );
+      }
       return formatAbilityNumber(secondary.total) + suffix(secondary);
     case 'hot':
       return formatAbilityNumber(secondary.total) + suffix(secondary);
@@ -14728,6 +14736,14 @@ function abilityOverTimeText(res: ResolvedAbility, scaling?: AbilityScaling): st
   const b = scaling ? abilityDamageBonus(res, eff, scaling) : 0;
   const bonus =
     b > 0 ? ` ${t('hudChrome.abilityScaling.bonus', { value: formatAbilityNumber(b) })}` : '';
+  if (eff.type === 'dot' && eff.perCombo !== undefined) {
+    return (
+      t('abilityUi.tooltip.finisherDamage', {
+        base: formatAbilityNumber(eff.total),
+        perCombo: formatAbilityNumber(eff.perCombo),
+      }) + bonus
+    );
+  }
   return formatAbilityNumber(eff.total) + bonus;
 }
 
