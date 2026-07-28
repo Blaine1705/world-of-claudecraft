@@ -24,7 +24,9 @@ const SEED = 42;
 const START = { x: 0, z: -40 };
 const WEDGE_WALL_Z = START.z + 0.4;
 // A deep point inside Mirror Lake where the normal swim kernel can move.
-const WATER_TRAP = { x: -64.75, z: 88 };
+// The lake's southeast rim shallowed when the respaced wolf camp's flatten
+// apron reached it (PR #2584), so the point sits in the deep western core.
+const WATER_TRAP = { x: -90, z: 91 };
 
 function required<T>(value: T | null | undefined, label: string): T {
   if (value == null) throw new Error(`Expected ${label}`);
