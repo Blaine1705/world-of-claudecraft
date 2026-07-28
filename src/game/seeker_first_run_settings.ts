@@ -1,22 +1,32 @@
-export interface SeekerFirstRunSettings {
-  readonly graphicsPreset: 1;
-  readonly browserEffects: 3;
-  readonly weather: 0;
+export interface SeekerFirstRunState {
+  readonly seekerHost: boolean;
+  readonly graphicsUserSelected: boolean;
+  readonly browserEffectsDefaultApplied: boolean;
+  readonly browserEffectsUserSelected: boolean;
+  readonly weatherDefaultApplied: boolean;
+  readonly weatherUserSelected: boolean;
 }
 
-const SEEKER_FIRST_RUN_SETTINGS: SeekerFirstRunSettings = {
-  graphicsPreset: 1,
-  browserEffects: 3,
-  weather: 0,
-};
+export interface SeekerFirstRunSettings {
+  graphicsPreset?: 1;
+  browserEffects?: 3;
+  weather?: 0;
+}
 
 /**
- * Defaults for a verified Seeker host that has not applied any device default.
- * Returning null preserves every explicit or previously applied player choice.
+ * Selects only the Seeker defaults that remain eligible. An explicit player
+ * choice always wins, while an automatically selected graphics tier may be
+ * corrected once the native host is verified as a Seeker.
  */
-export function seekerFirstRunSettings(
-  defaultAlreadyApplied: boolean,
-  seekerHost: boolean,
-): SeekerFirstRunSettings | null {
-  return !defaultAlreadyApplied && seekerHost ? SEEKER_FIRST_RUN_SETTINGS : null;
+export function seekerFirstRunSettings(state: SeekerFirstRunState): SeekerFirstRunSettings | null {
+  if (!state.seekerHost) return null;
+
+  const selected: SeekerFirstRunSettings = {};
+  if (!state.graphicsUserSelected) selected.graphicsPreset = 1;
+  if (!state.browserEffectsUserSelected && !state.browserEffectsDefaultApplied) {
+    selected.browserEffects = 3;
+  }
+  if (!state.weatherUserSelected && !state.weatherDefaultApplied) selected.weather = 0;
+
+  return Object.keys(selected).length > 0 ? selected : null;
 }

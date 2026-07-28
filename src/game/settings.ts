@@ -323,6 +323,14 @@ export const BOOL_SETTINGS = {
   // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
   // it only removes the shortcut; rewards, eligibility, and the panel remain available.
   showDailyRewardsChest: { def: true },
+  // Internal source markers for Seeker first-run defaults. Automatic defaults never
+  // set the corresponding user-selected marker. This lets a later verified Seeker
+  // correction preserve choices made explicitly in the settings UI.
+  graphicsUserSelected: { def: false },
+  browserEffectsSeekerDefaultApplied: { def: false },
+  browserEffectsUserSelected: { def: false },
+  weatherSeekerDefaultApplied: { def: false },
+  weatherUserSelected: { def: false },
   // internal, never shown in the options UI: set true once main.ts has persisted a
   // device-appropriate graphicsPreset on a player's first run (a CONCLUSIVE detection).
   // It gates firstRunGraphicsPreset so a recognized device is classified at most once and
@@ -413,6 +421,16 @@ export class Settings {
     for (const key of BOOL_KEYS) {
       const v = raw[key];
       out[key] = typeof v === 'boolean' ? v : defaultBoolSetting(key, out);
+    }
+    // Older stores predate the source markers. Preserve their existing values
+    // conservatively instead of guessing whether each value was automatic or
+    // player-selected. A fresh store has no keys and remains eligible for Seeker defaults.
+    const legacySettings =
+      Object.keys(raw).length > 0 && typeof raw.graphicsUserSelected !== 'boolean';
+    if (legacySettings) {
+      out.graphicsUserSelected = true;
+      out.browserEffectsUserSelected = true;
+      out.weatherUserSelected = true;
     }
     return out;
   }
