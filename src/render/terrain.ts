@@ -497,6 +497,10 @@ function buildSplatMaterial(
                   + (rN.xy + fineHard * 0.55) * vSplat.z * 1.35 * (1.0 - wallW)
                   + (sN.xy + fineSoft * 0.55) * vSplat.w * 0.55;
         detN *= 1.0 - vExtra.y * 0.7; // snow softens the relief beneath it
+        // Planar-XZ UVs stretch on steep faces and the detail normals smear
+        // into vertical streaks there; fade them out by slope and let the
+        // wall projection below own the cliff relief.
+        detN *= smoothstep(0.35, 0.7, vWNorm.y);
         normal = normalize(normal + tbn * vec3(detN, 0.0));
         // cliffs: wall-projected rock normal so steep faces get real relief
         // (approximate world-space tangent frames per projection plane; the

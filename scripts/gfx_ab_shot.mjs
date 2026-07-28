@@ -44,8 +44,8 @@ const LOCATIONS = [
   { name: 'eastbrook_town', x: 13, z: 15, yaw: 2.45, pitch: -0.2 },
   // Player-style angles: high camera pitched down at the meadow, and a road
   // closeup, both of which exposed the double-sided card blackout.
-  { name: 'topdown_meadow', x: 20, z: 40, yaw: 0.6, pitch: -0.62 },
-  { name: 'road_closeup', x: 2, z: 52, yaw: 0.4, pitch: -0.75 },
+  { name: 'topdown_meadow', x: 20, z: 40, yaw: 0.6, pitch: 1.0 },
+  { name: 'road_closeup', x: 2, z: 52, yaw: 0.4, pitch: 1.2 },
   // New-map realms (center-ish open ground per src/sim/content/*.ts bounds).
   { name: 'willowfen', x: -360, z: 430, yaw: 0.6, pitch: -0.3 },
   { name: 'palmreach', x: -360, z: 980, yaw: 0.6, pitch: -0.3 },
@@ -94,12 +94,12 @@ await page.evaluateOnNewDocument(() => {
   localStorage.setItem('woc_perf_overlay', JSON.stringify({ metrics: { gpu: true } }));
 });
 
-await page.goto(URL, { waitUntil: 'networkidle0', timeout: 90000 });
+await page.goto(URL, { waitUntil: 'domcontentloaded', timeout: 90000 });
 await enterOfflineGame(page, { charClass: 'warrior', charName: 'Probe', settleMs: 2500 });
 
 // GM flag no-ops every damage path (sim/combat/damage.ts), so camp mobs never
 // interrupt a capture or skew the frame time with combat VFX.
-await page.waitForFunction(() => Boolean(window.__game?.sim?.player), { timeout: 60000 });
+await page.waitForFunction(() => Boolean(window.__game?.sim?.player), { timeout: 120000 });
 await page.evaluate(() => {
   window.__game.sim.player.gm = true;
 });
@@ -125,8 +125,11 @@ for (const loc of ACTIVE) {
   await sleep(2500);
   await page
     .waitForFunction(
-      () => !document.body.textContent?.includes('Loading world'),
-      { timeout: 60000 },
+      () => {
+        const el = document.querySelector('#loading-screen');
+        return !el || !el.classList.contains('visible');
+      },
+      { timeout: 90000 },
     )
     .catch(() => {});
   await sleep(6000);

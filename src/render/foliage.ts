@@ -1909,7 +1909,17 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         .rotateZ(0.12)
         .rotateY(Math.PI / 4)
     : null;
-  const geo = quad3 ? mergeGeometries([quad, quad2, quad3]) : mergeGeometries([quad, quad2]);
+  // A near-horizontal cap card: from a true top-down camera (positive pitch,
+  // the chase camera's common angle) every vertical card goes edge-on and
+  // the meadow read as bare ground with green fans. The cap keeps blade
+  // texture facing the sky for one more quad on the lush tier only.
+  const quadCap = lush
+    ? new THREE.PlaneGeometry(1.05, 1.05).rotateX(-Math.PI / 2 + 0.18).translate(0, 0.34, 0)
+    : null;
+  const parts = [quad, quad2];
+  if (quad3) parts.push(quad3);
+  if (quadCap) parts.push(quadCap);
+  const geo = mergeGeometries(parts);
 
   const tuftTex = grassTuftTexture(lush ? 30 : 18);
   let quality = 1;
