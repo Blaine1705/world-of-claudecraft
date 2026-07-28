@@ -46,6 +46,15 @@ const LOCATIONS = [
   // closeup, both of which exposed the double-sided card blackout.
   { name: 'topdown_meadow', x: 20, z: 40, yaw: 0.6, pitch: -0.62 },
   { name: 'road_closeup', x: 2, z: 52, yaw: 0.4, pitch: -0.75 },
+  // New-map realms (center-ish open ground per src/sim/content/*.ts bounds).
+  { name: 'willowfen', x: -360, z: 430, yaw: 0.6, pitch: -0.3 },
+  { name: 'palmreach', x: -360, z: 980, yaw: 0.6, pitch: -0.3 },
+  { name: 'nightbloom', x: -360, z: 1540, yaw: 0.6, pitch: -0.3 },
+  { name: 'amberfall', x: -360, z: 2100, yaw: 0.6, pitch: -0.3 },
+  { name: 'galecrest', x: 360, z: 440, yaw: 0.6, pitch: -0.3 },
+  { name: 'evergarden', x: 360, z: 980, yaw: 0.6, pitch: -0.3 },
+  { name: 'drakelands', x: 360, z: 2100, yaw: 0.6, pitch: -0.3 },
+  { name: 'frostveil', x: 0, z: 1700, yaw: 0.6, pitch: -0.3 },
 ];
 
 const ONLY = process.env.SHOT_ONLY ? process.env.SHOT_ONLY.split(',') : null;

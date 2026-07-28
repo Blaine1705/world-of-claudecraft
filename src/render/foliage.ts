@@ -1889,7 +1889,17 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
   );
   quad.translate(0, lush ? 0.4 : 0.35 * lowPlusGrassScale, 0);
   const quad2 = quad.clone().rotateY(Math.PI / 2);
-  const geo = mergeGeometries([quad, quad2]);
+  // Lush tier gets a third card at 45 degrees with a slight lean and a
+  // narrower/taller silhouette: two perpendicular cards read as a flat
+  // cross from above (the "4-way image"); the offset third card breaks the
+  // X in every direction for one extra quad per tuft. Low tier keeps two.
+  const quad3 = lush
+    ? new THREE.PlaneGeometry(1.15, 1.05)
+        .translate(0, 0.45, 0)
+        .rotateZ(0.12)
+        .rotateY(Math.PI / 4)
+    : null;
+  const geo = quad3 ? mergeGeometries([quad, quad2, quad3]) : mergeGeometries([quad, quad2]);
 
   const tuftTex = grassTuftTexture(lush ? 30 : 18);
   let quality = 1;
