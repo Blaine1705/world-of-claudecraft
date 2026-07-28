@@ -279,6 +279,51 @@ describe('PartyMachine: raid conversion + groups', () => {
     );
     expect(party.partyOf(leader)!.raid).toBe(true);
   });
+
+  it('a departure preserves every other member manually-assigned raid subgroup', () => {
+    const t = makeCtx();
+    const leader = t.addPlayer(1, 'L');
+    for (let i = 2; i <= 9; i++) t.addPlayer(i, `M${i}`);
+    const party = new PartyMachine(t.ctx);
+    // Fill a party of five, convert to raid (which lifts the cap to ten), then
+    // invite the rest so the raid ends up with 9 members total.
+    for (let i = 2; i <= 5; i++) {
+      party.partyInvite(i, leader);
+      party.partyAccept(i);
+    }
+    party.convertPartyToRaid(leader);
+    for (let i = 6; i <= 9; i++) {
+      party.partyInvite(i, leader);
+      party.partyAccept(i);
+    }
+    const p = party.partyOf(leader)!;
+    expect(p.members.length).toBe(9);
+    // Normalized on conversion: members 1-5 -> group 1 (full), 6-8 -> group 2.
+    expect(p.raidGroups.get(5)).toBe(1);
+    expect(p.raidGroups.get(6)).toBe(2);
+
+    // The leader manually swaps member 5 into group 2 and member 6 into group 1
+    // (e.g. to balance healers across subgroups for an upcoming raid mechanic).
+    party.moveRaidMember(5, 2, leader);
+    party.moveRaidMember(6, 1, leader);
+    expect(p.raidGroups.get(5)).toBe(2);
+    expect(p.raidGroups.get(6)).toBe(1);
+
+    // A totally unrelated member (9, untouched by the swap) leaves the raid.
+    party.partyLeave(9);
+
+    // Only the departing member's own slot is gone; the manual swap, and every
+    // other member's subgroup, must survive untouched.
+    expect(p.raidGroups.has(9)).toBe(false);
+    expect(p.raidGroups.get(5)).toBe(2);
+    expect(p.raidGroups.get(6)).toBe(1);
+    expect(p.raidGroups.get(1)).toBe(1);
+    expect(p.raidGroups.get(2)).toBe(1);
+    expect(p.raidGroups.get(3)).toBe(1);
+    expect(p.raidGroups.get(4)).toBe(1);
+    expect(p.raidGroups.get(7)).toBe(2);
+    expect(p.raidGroups.get(8)).toBe(2);
+  });
 });
 
 describe('PartyMachine: teardown', () => {
