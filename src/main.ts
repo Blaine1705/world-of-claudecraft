@@ -3288,7 +3288,7 @@ async function startGame(
         client: wocMarketClient,
         characterId: () => online.characterId,
         walletLinked: () => linkedWalletPubkey !== null,
-        signTransaction: async (transactionBase64) => {
+        signAndSendTransactionBase64: async (transactionBase64) => {
           const wallet = await loadWallet();
           return wallet.signAndSendTransactionBase64(transactionBase64);
         },

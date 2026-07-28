@@ -48,9 +48,12 @@ export interface WocMarketHooks {
   client: WocMarketClient;
   characterId(): number;
   walletLinked(): boolean;
-  /** Sign and broadcast a service-built transaction; resolves the signature.
-   *  Throws an Error whose message is already player-facing. */
-  signTransaction(transactionBase64: string): Promise<string>;
+  /** Sign and broadcast a service-built transaction through the reviewed
+   *  wallet bridge (the src/net/wallet.ts signAndSendTransactionBase64
+   *  vocabulary; the payload is always a server-authorized quote, never
+   *  client-assembled). Resolves the signature; throws an Error whose
+   *  message is already player-facing. */
+  signAndSendTransactionBase64(transactionBase64: string): Promise<string>;
 }
 
 export interface WocMarketWindowDeps {
@@ -271,13 +274,25 @@ export class WocMarketWindow {
   private countdown(seconds: number): string {
     const s = Math.max(0, Math.ceil(seconds));
     if (s >= 172_800) {
-      return formatNumber(Math.floor(s / 86_400), { style: 'unit', unit: 'day', unitDisplay: 'long' });
+      return formatNumber(Math.floor(s / 86_400), {
+        style: 'unit',
+        unit: 'day',
+        unitDisplay: 'long',
+      });
     }
     if (s >= 3_600) {
-      return formatNumber(Math.floor(s / 3_600), { style: 'unit', unit: 'hour', unitDisplay: 'long' });
+      return formatNumber(Math.floor(s / 3_600), {
+        style: 'unit',
+        unit: 'hour',
+        unitDisplay: 'long',
+      });
     }
     if (s >= 60) {
-      return formatNumber(Math.floor(s / 60), { style: 'unit', unit: 'minute', unitDisplay: 'long' });
+      return formatNumber(Math.floor(s / 60), {
+        style: 'unit',
+        unit: 'minute',
+        unitDisplay: 'long',
+      });
     }
     return formatDuration(s);
   }
@@ -1060,7 +1075,7 @@ export class WocMarketWindow {
     await this.withBusy('hudChrome.wocMarket.signing', async () => {
       let signature: string;
       try {
-        signature = await hooks.signTransaction(pending.quote.transactionBase64 ?? '');
+        signature = await hooks.signAndSendTransactionBase64(pending.quote.transactionBase64 ?? '');
       } catch (err) {
         this.notice = {
           text:
