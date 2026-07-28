@@ -104,12 +104,7 @@ import { ensureWarriorStance } from './combat/warrior_stances';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
-import {
-  GATHERING_PROFESSION_IDS,
-  type GatheringProfessionId,
-  TOOL_EFFECTS,
-  type ToolEffectId,
-} from './content/professions';
+import { GATHERING_PROFESSION_IDS, type GatheringProfessionId } from './content/professions';
 import { PTR_DEV_VENDOR_DEF } from './content/ptr_dev_vendor';
 import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
 import {
@@ -9759,13 +9754,19 @@ export class Sim {
   ): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;
-    // The whole decision (four refusals, the owned-tool scan, the rarity the
+    // The whole decision (five refusals, the owned-tool scan, the rarity the
     // charges are minted from) lives in professions/tools.ts, the resolveTrain
     // shape: this coordinator only applies what the resolver returned. Refusals
     // are SILENT and emit no event, which is safe only because nothing
     // player-reachable can call this today (see the dev gate on the wire
     // command in server/game.ts). An acquisition craft must add a result event
     // before this becomes reachable, or a refused slot is invisible.
+    //
+    // ACCEPTED, deliberately: the OFFLINE console handle (window.__game) can
+    // call this ungated. A player cheating their own offline world is
+    // /dev-equivalent (no server, no other players, nothing persists beyond
+    // their browser), so it gets no gate, the same stance every other Sim
+    // command takes offline.
     const resolved = resolveSlotToolEffect(
       r.meta.inventory,
       professionId,

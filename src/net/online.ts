@@ -3436,7 +3436,9 @@ export class ClientWorld implements IWorld {
   // re-validates the profession id, the effect id and that a real tool for that
   // profession is carried; the resulting slot mirrors back via the tslot delta,
   // so nothing is written here optimistically.
-  slotToolEffect(professionId: string, effectId: string, confirmMode?: 'always' | 'prompt'): void {
+  // The mode union matches the narrowed IWorld facet ('always' only): the
+  // server refuses 'prompt' silently today, so the seam does not offer it.
+  slotToolEffect(professionId: string, effectId: string, confirmMode?: 'always'): void {
     // The craftItem `commission` precedent: an omitted optional sends a wire
     // message byte-identical to the pre-feature form rather than an explicit
     // default the server would have applied anyway.

@@ -52,9 +52,14 @@ export const FISHING_ZONE_ROD_TIERS: Readonly<Record<string, number>> = Object.f
 });
 
 /** The rod tier a cast in this zone requires, or the tier-1 floor for a zone
- *  with no row. */
+ *  with no row. Object.hasOwn, not a bare index: `zoneId` can be a map-doc
+ *  authored string (the same door resolveVendorRowGate hardens against), and
+ *  a prototype name like 'constructor' must fall to the floor rather than
+ *  hand back a function. */
 export function rodTierRequiredForZone(zoneId: string): number {
-  return FISHING_ZONE_ROD_TIERS[zoneId] ?? DEFAULT_FISHING_ROD_TIER;
+  return Object.hasOwn(FISHING_ZONE_ROD_TIERS, zoneId)
+    ? FISHING_ZONE_ROD_TIERS[zoneId]
+    : DEFAULT_FISHING_ROD_TIER;
 }
 
 // WHY THE BAND SIDE OF THIS LADDER IS NOT EXPORTED. A zone's required BAND is

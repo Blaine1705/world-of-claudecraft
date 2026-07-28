@@ -315,6 +315,10 @@ export interface IWorldProfessions {
   // slot_tool_effect command and never decides the outcome.
   //
   // `confirmMode` defaults to 'always' (#1136's behaviour) when omitted, so the
-  // wire message for a caller that never touches it stays minimal.
-  slotToolEffect(professionId: string, effectId: string, confirmMode?: 'always' | 'prompt'): void;
+  // wire message for a caller that never touches it stays minimal. The type
+  // deliberately admits ONLY 'always': every host silently refuses 'prompt'
+  // today (resolveSlotToolEffect, no confirmation flow exists), so the seam
+  // must not advertise a mode no world honors. Phase 12's confirm flow
+  // re-widens this to 'always' | 'prompt' when the flow ships.
+  slotToolEffect(professionId: string, effectId: string, confirmMode?: 'always'): void;
 }

@@ -103,14 +103,37 @@ export interface VendorRowGate {
 //   assumed: tests/professions_tool_gate.test.ts pins that no fishing
 //   implement carries a gate and that every other priced land tool above tier 1
 //   does, so a new tool cannot ship ungated by omission.
-export const VENDOR_ROW_GATES: Readonly<Record<string, VendorRowGate>> = {
-  iron_mining_pick: { professionId: 'mining', proficiency: TIER2_TOOL_GATE_PROFICIENCY },
-  mithril_mining_pick: { professionId: 'mining', proficiency: TIER3_TOOL_GATE_PROFICIENCY },
-  felling_axe: { professionId: 'logging', proficiency: TIER2_TOOL_GATE_PROFICIENCY },
-  ironbark_axe: { professionId: 'logging', proficiency: TIER3_TOOL_GATE_PROFICIENCY },
-  bronze_sickle: { professionId: 'herbalism', proficiency: TIER2_TOOL_GATE_PROFICIENCY },
-  silverleaf_sickle: { professionId: 'herbalism', proficiency: TIER3_TOOL_GATE_PROFICIENCY },
-};
+// Frozen like its packet siblings (FISHING_ZONE_ROD_TIERS): the Readonly type
+// stops a TS caller, not a JS one, and both worlds resolve gates through this
+// one object, so a runtime mutation would desync buy denials silently. The
+// rows are frozen too: a gate is two numbers, and half-mutable is worse than
+// either.
+export const VENDOR_ROW_GATES: Readonly<Record<string, VendorRowGate>> = Object.freeze({
+  iron_mining_pick: Object.freeze({
+    professionId: 'mining',
+    proficiency: TIER2_TOOL_GATE_PROFICIENCY,
+  }),
+  mithril_mining_pick: Object.freeze({
+    professionId: 'mining',
+    proficiency: TIER3_TOOL_GATE_PROFICIENCY,
+  }),
+  felling_axe: Object.freeze({
+    professionId: 'logging',
+    proficiency: TIER2_TOOL_GATE_PROFICIENCY,
+  }),
+  ironbark_axe: Object.freeze({
+    professionId: 'logging',
+    proficiency: TIER3_TOOL_GATE_PROFICIENCY,
+  }),
+  bronze_sickle: Object.freeze({
+    professionId: 'herbalism',
+    proficiency: TIER2_TOOL_GATE_PROFICIENCY,
+  }),
+  silverleaf_sickle: Object.freeze({
+    professionId: 'herbalism',
+    proficiency: TIER3_TOOL_GATE_PROFICIENCY,
+  }),
+});
 
 /** A vendor row resolved against one player's gathering proficiency: whether it
  *  is open, and, when it is not, the requirement to name. `requirement` is
