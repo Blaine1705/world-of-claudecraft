@@ -1,6 +1,7 @@
 // Delve Marks vendor (Brother Halven's shop): gate unlock logic + the
 // server-authoritative buy path (gate + balance re-validated in the Sim).
 import { describe, expect, it } from 'vitest';
+import { bagCapacity } from '../src/sim/bags';
 import { DELVE_SHOPS, ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
@@ -65,6 +66,26 @@ describe('delve shop, buying', () => {
     sim.delveBuyShopItem('collapsed_reliquary', availableEntry.itemId);
     expect(countOf(sim, availableEntry.itemId)).toBe(before);
     expect(sim.delveMarks).toBe(availableEntry.marks - 1);
+  });
+
+  it('rejects a full-bag purchase BEFORE the spend: no Marks debit, no overflow grant', () => {
+    // The grant hub deliberately never capacity-caps (a mid-flight grant must
+    // not vanish), so the buy path itself has to gate, exactly like buyItem:
+    // without the gate the purchase landed past capacity and the counter was
+    // an overflow loophole.
+    const sim = makeSim();
+    const meta = metaOf(sim);
+    meta.delveMarks = 100;
+    const capacity = bagCapacity(meta.bags);
+    const fillerStack = ITEMS.bone_fragments.stackSize ?? 20;
+    while (meta.inventory.length < capacity) sim.addItem('bone_fragments', fillerStack, sim.playerId);
+    expect(meta.inventory.length).toBe(capacity);
+    expect(sim.ctx.canAddItem(availableEntry.itemId, 1, sim.playerId)).toBe(false);
+
+    sim.delveBuyShopItem('collapsed_reliquary', availableEntry.itemId);
+    expect(countOf(sim, availableEntry.itemId)).toBe(0);
+    expect(sim.delveMarks, 'the Marks must survive the refusal').toBe(100);
+    expect(meta.inventory.length).toBe(capacity);
   });
 
   it('rejects a locked clears:3 item until the clears requirement is met', () => {

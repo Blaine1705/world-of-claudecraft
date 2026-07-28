@@ -20,6 +20,7 @@
 // and the headless RL env (enforced by tests/architecture.test.ts).
 
 import type { DelveCompanionInfo } from '../../world_api';
+import { bagsFullError } from '../bags';
 import type { DelveShopGate, DelveShopOffer } from '../data';
 import {
   COMPANION_UPGRADE_COSTS,
@@ -1603,6 +1604,14 @@ export function delveBuyShopItem(
   }
   if (meta.delveMarks < entry.marks) {
     ctx.error(meta.entityId, `You need ${entry.marks} Delve Marks to buy ${def.name}.`);
+    return;
+  }
+  // Capacity BEFORE the spend, the buyItem shape: the grant hub deliberately
+  // never capacity-caps (a mid-flight grant must not vanish), so without this
+  // gate a full-bag purchase landed PAST capacity, making the one counter
+  // every other buy path gates an overflow loophole.
+  if (!ctx.canAddItem(itemId, 1, meta.entityId)) {
+    bagsFullError(ctx, meta.entityId);
     return;
   }
   meta.delveMarks -= entry.marks;
