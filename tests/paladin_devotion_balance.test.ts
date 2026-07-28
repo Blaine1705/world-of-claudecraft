@@ -15,7 +15,7 @@ const PRIORITY: Readonly<Record<PaladinSpec, readonly string[]>> = {
 const EXPECTED_SECONDS: Readonly<Record<PaladinSpec, number>> = {
   holy: 42.3,
   protection: 38.65,
-  retribution: 48.35,
+  retribution: 46.85,
 };
 
 function addDummy(sim: Sim): Entity {
