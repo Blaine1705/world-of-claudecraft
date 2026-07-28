@@ -6155,6 +6155,8 @@ export const sv_SE: EnTranslations = {
       "healSelfCrit": "Din {ability} läker dig kritiskt för {amount}.",
       "healOther": "Din {ability} läker {target} för {amount}.",
       "healOtherCrit": "Din {ability} läker {target} kritiskt för {amount}.",
+      "healSelfFull": "Din {ability} landar, men du har redan full hälsa.",
+      "healOtherFull": "Din {ability} landar på {target}, men målet har redan full hälsa.",
       "death": "{name} dör.",
       "auraGain": "Du får {name}.",
       "auraFade": "{name} bleknar bort från dig.",

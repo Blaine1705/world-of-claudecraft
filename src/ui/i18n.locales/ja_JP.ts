@@ -1901,6 +1901,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.combat.healSelfCrit': '{ability}が自分をクリティカルで{amount}回復しました。',
   'hud.combat.healOther': '{ability}が{target}を{amount}回復しました。',
   'hud.combat.healOtherCrit': '{ability}が{target}をクリティカルで{amount}回復しました。',
+  'hud.combat.healSelfFull': '{ability}は命中しましたが、すでに体力は満タンです。',
+  'hud.combat.healOtherFull': '{ability}は{target}に命中しましたが、対象はすでに体力満タンです。',
   'hud.combat.death': '{name}は死亡しました。',
   'hud.combat.auraGain': '{name}を得ました。',
   'hud.combat.auraFade': '{name}が自分から消えました。',

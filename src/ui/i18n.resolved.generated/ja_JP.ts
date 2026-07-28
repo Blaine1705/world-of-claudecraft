@@ -6155,6 +6155,8 @@ export const ja_JP: EnTranslations = {
       "healSelfCrit": "{ability}が自分をクリティカルで{amount}回復しました。",
       "healOther": "{ability}が{target}を{amount}回復しました。",
       "healOtherCrit": "{ability}が{target}をクリティカルで{amount}回復しました。",
+      "healSelfFull": "{ability}は命中しましたが、すでに体力は満タンです。",
+      "healOtherFull": "{ability}は{target}に命中しましたが、対象はすでに体力満タンです。",
       "death": "{name}は死亡しました。",
       "auraGain": "{name}を得ました。",
       "auraFade": "{name}が自分から消えました。",

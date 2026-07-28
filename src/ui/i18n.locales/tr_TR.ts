@@ -5545,6 +5545,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': 'Iskaladı',
   'hud.combat.healOther': '{ability} yeteneğin {target} hedefini {amount} iyileştirdi.',
   'hud.combat.healOtherCrit': '{ability} yeteneğin {target} hedefini kritik {amount} iyileştirdi.',
+  'hud.combat.healSelfFull': '{ability} yeteneğin isabet etti, ama sağlığın zaten tam.',
+  'hud.combat.healOtherFull':
+    '{ability} yeteneğin {target} hedefine isabet etti, ama hedefin sağlığı zaten tam.',
   'hud.combat.healSelf': '{ability} yeteneğin seni {amount} iyileştirdi.',
   'hud.combat.healSelfCrit': '{ability} yeteneğin seni kritik {amount} iyileştirdi.',
   'hud.combat.miss': '{ability} yeteneğin {target} hedefini ıskaladı.',

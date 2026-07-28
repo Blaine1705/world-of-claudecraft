@@ -6155,6 +6155,8 @@ export const vi_VN: EnTranslations = {
       "healSelfCrit": "{ability} của bạn chí mạng hồi {amount} máu cho bạn.",
       "healOther": "{ability} của bạn hồi {amount} máu cho {target}.",
       "healOtherCrit": "{ability} của bạn chí mạng hồi {amount} máu cho {target}.",
+      "healSelfFull": "{ability} của bạn đã trúng, nhưng bạn đã đầy máu.",
+      "healOtherFull": "{ability} của bạn đã trúng {target}, nhưng mục tiêu đã đầy máu.",
       "death": "{name} gục ngã.",
       "auraGain": "Bạn nhận được {name}.",
       "auraFade": "{name} tan biến khỏi bạn.",

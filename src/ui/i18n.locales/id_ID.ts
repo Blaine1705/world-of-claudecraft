@@ -5612,6 +5612,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': 'Meleset',
   'hud.combat.healOther': '{ability}-mu menyembuhkan {target} sebesar {amount}.',
   'hud.combat.healOtherCrit': '{ability}-mu menyembuhkan {target} secara kritis sebesar {amount}.',
+  'hud.combat.healSelfFull': '{ability}-mu mendarat, tetapi kesehatanmu sudah penuh.',
+  'hud.combat.healOtherFull':
+    '{ability}-mu mendarat pada {target}, tetapi kesehatannya sudah penuh.',
   'hud.combat.healSelf': '{ability}-mu menyembuhkanmu sebesar {amount}.',
   'hud.combat.healSelfCrit': '{ability}-mu menyembuhkanmu secara kritis sebesar {amount}.',
   'hud.combat.miss': '{ability}-mu meleset dari {target}.',

@@ -6155,6 +6155,8 @@ export const nl_NL: EnTranslations = {
       "healSelfCrit": "Je {ability} geneest je kritiek voor {amount}.",
       "healOther": "Je {ability} geneest {target} voor {amount}.",
       "healOtherCrit": "Je {ability} geneest {target} kritiek voor {amount}.",
+      "healSelfFull": "Je {ability} landt, maar je gezondheid is al vol.",
+      "healOtherFull": "Je {ability} landt op {target}, maar het doelwit heeft al volle gezondheid.",
       "death": "{name} sterft.",
       "auraGain": "Je krijgt {name}.",
       "auraFade": "{name} vervaagt van je.",

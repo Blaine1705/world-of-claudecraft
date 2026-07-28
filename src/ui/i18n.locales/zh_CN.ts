@@ -1814,6 +1814,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.combat.healSelfCrit': '你的{ability}对你造成暴击治疗，恢复 {amount} 点生命。',
   'hud.combat.healOther': '你的{ability}为{target}恢复 {amount} 点生命。',
   'hud.combat.healOtherCrit': '你的{ability}对{target}造成暴击治疗，恢复 {amount} 点生命。',
+  'hud.combat.healSelfFull': '你的{ability}生效了，但你的生命值已满。',
+  'hud.combat.healOtherFull': '你的{ability}在{target}身上生效了，但目标的生命值已满。',
   'hud.combat.death': '{name}死亡。',
   'hud.combat.auraGain': '你获得了 {name}。',
   'hud.combat.auraFade': '{name}从你身上消失。',

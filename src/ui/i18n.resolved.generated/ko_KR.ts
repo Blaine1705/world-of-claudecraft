@@ -6155,6 +6155,8 @@ export const ko_KR: EnTranslations = {
       "healSelfCrit": "{ability}이 자신을 치명타 치유로 {amount}만큼 회복했습니다.",
       "healOther": "{ability}이 {target}을 {amount}만큼 치유했습니다.",
       "healOtherCrit": "{ability}이 {target}을 치명타 치유로 {amount}만큼 회복했습니다.",
+      "healSelfFull": "{ability}이 적중했지만 이미 생명력이 가득합니다.",
+      "healOtherFull": "{ability}이 {target}에게 적중했지만 대상은 이미 생명력이 가득합니다.",
       "death": "{name} 사망.",
       "auraGain": "{name} 효과를 얻었습니다.",
       "auraFade": "{name} 효과가 사라졌습니다.",

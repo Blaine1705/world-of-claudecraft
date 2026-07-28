@@ -5674,6 +5674,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': 'Trượt',
   'hud.combat.healOther': '{ability} của bạn hồi {amount} máu cho {target}.',
   'hud.combat.healOtherCrit': '{ability} của bạn chí mạng hồi {amount} máu cho {target}.',
+  'hud.combat.healSelfFull': '{ability} của bạn đã trúng, nhưng bạn đã đầy máu.',
+  'hud.combat.healOtherFull': '{ability} của bạn đã trúng {target}, nhưng mục tiêu đã đầy máu.',
   'hud.combat.healSelf': '{ability} của bạn hồi {amount} máu cho bạn.',
   'hud.combat.healSelfCrit': '{ability} của bạn chí mạng hồi {amount} máu cho bạn.',
   'hud.combat.miss': '{ability} của bạn trượt {target}.',

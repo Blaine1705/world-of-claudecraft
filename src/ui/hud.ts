@@ -247,7 +247,11 @@ import {
   grantQtyText,
   harvestLineKey,
 } from './grant_line_view';
-import { shouldShowHealLanding } from './heal_landing_feedback_core';
+import {
+  healLandingLogKey,
+  shouldFloatHealLanding,
+  shouldShowHealLanding,
+} from './heal_landing_feedback_core';
 import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
 import {
   handleShiftClearContextMenu,
@@ -9927,37 +9931,33 @@ export class Hud {
           audio.coin();
           break;
         case 'heal2': {
-          const tgt = sim.entities.get(ev.targetId);
+          const tgt = ev.targetId === sim.playerId ? sim.player : sim.entities.get(ev.targetId);
           if (tgt && shouldShowHealLanding(ev)) {
-            const shape = fctSpawnShape({
-              type: 'heal',
-              crit: ev.crit,
-              isPlayerTarget: ev.targetId === sim.playerId,
-            });
-            if (shape)
-              this.fctPainter.spawn(
-                { ...shape, text: `+${ev.amount}${ev.crit ? '!' : ''}`, target: tgt },
-                now,
-              );
+            if (shouldFloatHealLanding(ev)) {
+              const shape = fctSpawnShape({
+                type: 'heal',
+                crit: ev.crit,
+                isPlayerTarget: ev.targetId === sim.playerId,
+              });
+              if (shape)
+                this.fctPainter.spawn(
+                  { ...shape, text: `+${ev.amount}${ev.crit ? '!' : ''}`, target: tgt },
+                  now,
+                );
+            }
             if (ev.sourceId === sim.playerId) {
               const selfTarget = ev.targetId === sim.playerId;
-              this.combatLog(
-                t(
-                  selfTarget
-                    ? ev.crit
-                      ? 'hud.combat.healSelfCrit'
-                      : 'hud.combat.healSelf'
-                    : ev.crit
-                      ? 'hud.combat.healOtherCrit'
-                      : 'hud.combat.healOther',
-                  {
+              const logKey = healLandingLogKey(ev, selfTarget);
+              if (logKey) {
+                this.combatLog(
+                  t(logKey, {
                     ability: abilityDisplayNameFromSource(ev.ability),
                     target: entityDisplayName(tgt),
                     amount: ev.amount,
-                  },
-                ),
-                '#7fdc4f',
-              );
+                  }),
+                  '#7fdc4f',
+                );
+              }
             }
           }
           break;

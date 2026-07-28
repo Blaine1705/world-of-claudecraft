@@ -5710,6 +5710,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': 'Mis',
   'hud.combat.healOther': 'Je {ability} geneest {target} voor {amount}.',
   'hud.combat.healOtherCrit': 'Je {ability} geneest {target} kritiek voor {amount}.',
+  'hud.combat.healSelfFull': 'Je {ability} landt, maar je gezondheid is al vol.',
+  'hud.combat.healOtherFull':
+    'Je {ability} landt op {target}, maar het doelwit heeft al volle gezondheid.',
   'hud.combat.healSelf': 'Je {ability} geneest je voor {amount}.',
   'hud.combat.healSelfCrit': 'Je {ability} geneest je kritiek voor {amount}.',
   'hud.combat.miss': 'Je {ability} mist {target}.',

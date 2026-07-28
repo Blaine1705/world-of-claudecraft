@@ -5472,6 +5472,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': 'Forbier',
   'hud.combat.healOther': 'Din {ability} helbreder {target} for {amount}.',
   'hud.combat.healOtherCrit': 'Din {ability} helbreder {target} kritisk for {amount}.',
+  'hud.combat.healSelfFull': 'Din {ability} rammer, men du har allerede fuldt helbred.',
+  'hud.combat.healOtherFull':
+    'Din {ability} rammer {target}, men målet har allerede fuldt helbred.',
   'hud.combat.healSelf': 'Din {ability} helbreder dig for {amount}.',
   'hud.combat.healSelfCrit': 'Din {ability} helbreder dig kritisk for {amount}.',
   'hud.combat.miss': 'Din {ability} forfejler {target}.',

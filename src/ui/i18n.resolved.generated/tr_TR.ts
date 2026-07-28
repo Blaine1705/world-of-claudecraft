@@ -6155,6 +6155,8 @@ export const tr_TR: EnTranslations = {
       "healSelfCrit": "{ability} yeteneğin seni kritik {amount} iyileştirdi.",
       "healOther": "{ability} yeteneğin {target} hedefini {amount} iyileştirdi.",
       "healOtherCrit": "{ability} yeteneğin {target} hedefini kritik {amount} iyileştirdi.",
+      "healSelfFull": "{ability} yeteneğin isabet etti, ama sağlığın zaten tam.",
+      "healOtherFull": "{ability} yeteneğin {target} hedefine isabet etti, ama hedefin sağlığı zaten tam.",
       "death": "{name} öldü.",
       "auraGain": "{name} kazandın.",
       "auraFade": "{name} üzerinden kayboluyor.",

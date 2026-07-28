@@ -5610,6 +5610,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': 'Pudło',
   'hud.combat.healOther': 'Twój {ability} leczy {target} o {amount}.',
   'hud.combat.healOtherCrit': 'Twój {ability} leczy krytycznie {target} o {amount}.',
+  'hud.combat.healSelfFull': 'Twój {ability} trafia, ale masz już pełne zdrowie.',
+  'hud.combat.healOtherFull': 'Twój {ability} trafia w {target}, ale cel ma już pełne zdrowie.',
   'hud.combat.healSelf': 'Twój {ability} leczy cię o {amount}.',
   'hud.combat.healSelfCrit': 'Twój {ability} leczy cię krytycznie o {amount}.',
   'hud.combat.miss': 'Twój {ability} chybia {target}.',

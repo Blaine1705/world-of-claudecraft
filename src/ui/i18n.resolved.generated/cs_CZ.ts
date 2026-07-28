@@ -6155,6 +6155,8 @@ export const cs_CZ: EnTranslations = {
       "healSelfCrit": "Tvoje {ability} tě kriticky léčí za {amount}.",
       "healOther": "Tvoje {ability} léčí {target} za {amount}.",
       "healOtherCrit": "Tvoje {ability} kriticky léčí {target} za {amount}.",
+      "healSelfFull": "Tvoje {ability} dopadlo, ale už máš plné zdraví.",
+      "healOtherFull": "Tvoje {ability} dopadlo na {target}, ale cíl už má plné zdraví.",
       "death": "{name} umírá.",
       "auraGain": "Získáváš {name}.",
       "auraFade": "{name} z tebe mizí.",

@@ -6155,6 +6155,8 @@ export const id_ID: EnTranslations = {
       "healSelfCrit": "{ability}-mu menyembuhkanmu secara kritis sebesar {amount}.",
       "healOther": "{ability}-mu menyembuhkan {target} sebesar {amount}.",
       "healOtherCrit": "{ability}-mu menyembuhkan {target} secara kritis sebesar {amount}.",
+      "healSelfFull": "{ability}-mu mendarat, tetapi kesehatanmu sudah penuh.",
+      "healOtherFull": "{ability}-mu mendarat pada {target}, tetapi kesehatannya sudah penuh.",
       "death": "{name} tewas.",
       "auraGain": "Kamu memperoleh {name}.",
       "auraFade": "{name} memudar darimu.",

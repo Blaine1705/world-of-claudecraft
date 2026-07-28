@@ -6155,6 +6155,8 @@ export const da_DK: EnTranslations = {
       "healSelfCrit": "Din {ability} helbreder dig kritisk for {amount}.",
       "healOther": "Din {ability} helbreder {target} for {amount}.",
       "healOtherCrit": "Din {ability} helbreder {target} kritisk for {amount}.",
+      "healSelfFull": "Din {ability} rammer, men du har allerede fuldt helbred.",
+      "healOtherFull": "Din {ability} rammer {target}, men målet har allerede fuldt helbred.",
       "death": "{name} dør.",
       "auraGain": "Du får {name}.",
       "auraFade": "{name} svinder bort fra dig.",

@@ -3330,6 +3330,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hud.combat.healSelfCrit': 'Euer {ability} heilt Euch kritisch um {amount}.',
   'hud.combat.healOther': 'Euer {ability} heilt {target} um {amount}.',
   'hud.combat.healOtherCrit': 'Euer {ability} heilt {target} kritisch um {amount}.',
+  'hud.combat.healSelfFull': 'Euer {ability} landet, aber Ihr habt bereits volle Gesundheit.',
+  'hud.combat.healOtherFull':
+    'Euer {ability} landet auf {target}, aber das Ziel hat bereits volle Gesundheit.',
   'hud.combat.death': '{name} stirbt.',
   'hud.combat.auraGain': 'Ihr erhaltet {name}.',
   'hud.combat.auraFade': '{name} schwindet von Euch.',

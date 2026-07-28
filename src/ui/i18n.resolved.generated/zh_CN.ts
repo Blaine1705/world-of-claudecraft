@@ -6155,6 +6155,8 @@ export const zh_CN: EnTranslations = {
       "healSelfCrit": "你的{ability}对你造成暴击治疗，恢复 {amount} 点生命。",
       "healOther": "你的{ability}为{target}恢复 {amount} 点生命。",
       "healOtherCrit": "你的{ability}对{target}造成暴击治疗，恢复 {amount} 点生命。",
+      "healSelfFull": "你的{ability}生效了，但你的生命值已满。",
+      "healOtherFull": "你的{ability}在{target}身上生效了，但目标的生命值已满。",
       "death": "{name}死亡。",
       "auraGain": "你获得了 {name}。",
       "auraFade": "{name}从你身上消失。",

@@ -6155,6 +6155,8 @@ export const fr_FR: EnTranslations = {
       "healSelfCrit": "Votre {ability} vous rend un soin critique de {amount}.",
       "healOther": "Votre {ability} soigne {target} pour {amount}.",
       "healOtherCrit": "Votre {ability} soigne {target} d'un coup critique pour {amount}.",
+      "healSelfFull": "Votre {ability} aboutit, mais vous avez déjà toute votre santé.",
+      "healOtherFull": "Votre {ability} aboutit sur {target}, mais la cible a déjà toute sa santé.",
       "death": "{name} meurt.",
       "auraGain": "Vous gagnez {name}.",
       "auraFade": "{name} se dissipe de vous.",

@@ -5477,6 +5477,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': 'Bom',
   'hud.combat.healOther': 'Din {ability} läker {target} för {amount}.',
   'hud.combat.healOtherCrit': 'Din {ability} läker {target} kritiskt för {amount}.',
+  'hud.combat.healSelfFull': 'Din {ability} landar, men du har redan full hälsa.',
+  'hud.combat.healOtherFull': 'Din {ability} landar på {target}, men målet har redan full hälsa.',
   'hud.combat.healSelf': 'Din {ability} läker dig för {amount}.',
   'hud.combat.healSelfCrit': 'Din {ability} läker dig kritiskt för {amount}.',
   'hud.combat.miss': 'Din {ability} missar {target}.',

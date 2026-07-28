@@ -6155,6 +6155,8 @@ export const en_XA: EnTranslations = {
       "healSelfCrit": "[Ýóúŕ {ability} çŕíţíçáļļý ĥéáļš ýóú ƒóŕ {amount}.]",
       "healOther": "[Ýóúŕ {ability} ĥéáļš {target} ƒóŕ {amount}.]",
       "healOtherCrit": "[Ýóúŕ {ability} çŕíţíçáļļý ĥéáļš {target} ƒóŕ {amount}.]",
+      "healSelfFull": "[Ýóúŕ {ability} ļáñðš, ƀúţ ýóú áŕé áļŕéáðý áţ ƒúļļ ĥéáļţĥ.]",
+      "healOtherFull": "[Ýóúŕ {ability} ļáñðš óñ {target}, ƀúţ ţĥéý áŕé áļŕéáðý áţ ƒúļļ ĥéáļţĥ.]",
       "death": "[{name} ðíéš.]",
       "auraGain": "[Ýóú ĝáíñ {name}.]",
       "auraFade": "[{name} ƒáðéš ƒŕóɱ ýóú.]",

@@ -2952,6 +2952,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingResist': 'Odoláno',
   'hud.combat.healOther': 'Tvoje {ability} léčí {target} za {amount}.',
   'hud.combat.healOtherCrit': 'Tvoje {ability} kriticky léčí {target} za {amount}.',
+  'hud.combat.healSelfFull': 'Tvoje {ability} dopadlo, ale už máš plné zdraví.',
+  'hud.combat.healOtherFull': 'Tvoje {ability} dopadlo na {target}, ale cíl už má plné zdraví.',
   'hud.combat.healSelf': 'Tvoje {ability} tě léčí za {amount}.',
   'hud.combat.healSelfCrit': 'Tvoje {ability} tě kriticky léčí za {amount}.',
   'hud.combat.miss': 'Tvoje {ability} míjí {target}.',
