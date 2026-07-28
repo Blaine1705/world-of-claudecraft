@@ -5957,7 +5957,9 @@ export class Renderer {
     // tonemapped to near white, so fully fogged distant trees and zones read
     // as white cutouts against the HDRI sky instead of far-off silhouettes).
     vale: { color: 0x7095bd, near: 55, far: MAX_OUTDOOR_FOG_FAR },
-    marsh: { color: 0xa3b294, near: 75, far: 165 },
+    // pale sage matched to the marsh horizon sky: the dome renders fog-free,
+    // so a darker murk left every fully fogged silhouette as a cutout band
+    marsh: { color: 0xc2cbb6, near: 75, far: 165 },
     peaks: { color: 0x8bb0d4, near: 55, far: MAX_OUTDOOR_FOG_FAR },
     beach: { color: 0x7ea6c9, near: 50, far: MAX_OUTDOOR_FOG_FAR },
     desert: { color: 0xd8c9a8, near: 50, far: MAX_OUTDOOR_FOG_FAR },
