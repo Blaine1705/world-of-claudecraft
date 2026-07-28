@@ -65,3 +65,23 @@ export function isZoneFeatureVisible(
   if (!footprint) return true;
   return featureEdgeDistance(footprint, camX, camZ) < drawDistance;
 }
+
+/**
+ * True when an InstancedMesh buffer still holds a factory all-zero matrix.
+ * Footprints are measured ONCE at attach, so one unseeded instance silently
+ * poisons the measurement: the realm-flora seabird flock (placed only by its
+ * per-frame update) parked its group's bounds at the world origin and
+ * stretched the cull footprint to 374x1442 exactly this way. An all-zero 4x4
+ * is never a legitimate placement, which makes it a precise tell.
+ */
+export function hasUnseededInstanceMatrix(array: ArrayLike<number>, count: number): boolean {
+  for (let i = 0; i < count; i++) {
+    const base = i * 16;
+    let allZero = true;
+    for (let k = 0; k < 16 && allZero; k++) {
+      if (array[base + k] !== 0) allZero = false;
+    }
+    if (allZero) return true;
+  }
+  return false;
+}

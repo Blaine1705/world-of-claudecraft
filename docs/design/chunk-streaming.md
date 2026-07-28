@@ -1,7 +1,8 @@
-# Handoff: rebuild overworld asset streaming (chunk-level residency)
+# Chunk-level streaming and the outdoor fog clamp
 
-Worktree `wt-streaming`, branch `feature/chunk-streaming`, cut from
-`ae62cb187` (the PR #1584 head, `feature/procedural-dungeons`).
+How the overworld streams terrain and why the fog clamp keys off chunks. The
+measurements below were taken during the original diagnosis and are the
+baseline any future streaming change should be compared against.
 
 ## Why this exists
 
@@ -125,9 +126,7 @@ entry points. Zone-keyed FEATURES (props, foliage, water via
 `ensureZoneFeatures`) stay zone-keyed behind their own gate; only terrain needs
 to go chunk-level for the fog to work.
 
-## Stage 0, already in this worktree (uncommitted)
-
-Four files. Commit as its own commit before starting stage 1.
+## Stage 0, as landed
 
 - `src/render/zone_streaming.ts`: new `ARRIVAL_NEIGHBOR_STREAM_RADIUS = 160`.
 - `src/main.ts`: all three blocking arrival paths now call `prepareZonesAround`,
@@ -284,13 +283,3 @@ before the lane even reached the 51 yd neighbour holding the view shut.
 
 Stage 3 dissolves this rather than patching it: with a chunk-sized unit and a
 re-sorted global queue there is no long-running in-flight item to preempt.
-
-## Hazard
-
-`wt-1584-integration` is being edited by another session. The collision surface
-is wider than a fog retune: as of 2026-07-27 that tree has `src/render/terrain.ts`
-and `src/render/terrain_region_core.ts` modified, plus a new
-`src/render/sea_mist_core.ts` and changes to `realm_flora.ts` and `water.ts`.
-`terrain.ts` is exactly where stage 2 landed (the residency bitmap in
-`attachChunk`, the grid, the `orderCellsForEntry` call), so check that file
-first at any base merge, then the `BIOME_FOG` retune against the sea mist work.

@@ -285,7 +285,11 @@ import { Weather } from './weather';
 import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './world_audio';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
-import { type FeatureFootprint, isZoneFeatureVisible } from './zone_feature_visibility_core';
+import {
+  type FeatureFootprint,
+  hasUnseededInstanceMatrix,
+  isZoneFeatureVisible,
+} from './zone_feature_visibility_core';
 import {
   INITIAL_SKY_PREWARM_RADIUS,
   MAX_OUTDOOR_FOG_FAR,
@@ -2680,6 +2684,22 @@ export class Renderer {
   ): void {
     setRenderCategory(view.group, 'props');
     this.scene.add(view.group);
+    // Point lights ride the fireLights budget, NEVER the cull-toggled group
+    // (the Sowfield brazier rule). A light left inside the group leaves the
+    // render light list whenever the distance cull hides its ancestor, so the
+    // pinned numPointLights changes and every lit material recompiles: the
+    // open-world travel freeze the budget exists to prevent. Reparent every
+    // PointLight descendant to the scene mechanically, so the NEXT feature
+    // builder that parents a glow into its group cannot reintroduce it.
+    const strandedLights: THREE.PointLight[] = [];
+    view.group.traverse((obj) => {
+      if ((obj as THREE.PointLight).isLight) strandedLights.push(obj as THREE.PointLight);
+    });
+    for (const light of strandedLights) {
+      light.getWorldPosition(this.tmpV);
+      this.scene.add(light); // add() detaches from the old parent
+      light.position.copy(this.tmpV);
+    }
     if (freeze) freezeStaticMatrices(view.group);
     for (const light of view.glowLights ?? []) this.fireLights.push(light);
     this.lightRankDirty = true;
@@ -2688,6 +2708,19 @@ export class Renderer {
     // cull instead of the whole group: one world-wide footprint can never be
     // culled (water-flora was 10.96M triangles submitted from every realm).
     for (const cullGroup of view.cullGroups ?? [view.group]) {
+      // Footprints are measured ONCE at attach, so an InstancedMesh whose
+      // matrices are still factory zeros poisons the measurement silently
+      // (the seabird flock parked a footprint at the world origin this way).
+      cullGroup.traverse((obj) => {
+        const inst = obj as THREE.InstancedMesh;
+        if (!inst.isInstancedMesh) return;
+        if (hasUnseededInstanceMatrix(inst.instanceMatrix.array, inst.count)) {
+          console.error(
+            `attachZoneFeature: "${cullGroup.name}" holds an InstancedMesh with unseeded ` +
+              'instance matrices; seed placements before attach or its cull footprint is wrong',
+          );
+        }
+      });
       this.zoneFeatureGroups.push({
         group: cullGroup,
         footprint: measureFeatureFootprint(cullGroup),
@@ -8307,6 +8340,16 @@ export class Renderer {
   /** The terrain chunk group, for the editor to raycast/rebuild. */
   get terrainGroup(): THREE.Group {
     return this.terrainView.group;
+  }
+
+  /**
+   * Stop terrain streaming and tear down its worker pool. rebuildTerrain does
+   * this for a replaced view; a host that discards the whole renderer (the
+   * editor viewport) must call it too, or every teardown leaks the pool's
+   * module workers.
+   */
+  cancelTerrainStreaming(): void {
+    this.terrainView.cancelStreaming();
   }
 
   /**

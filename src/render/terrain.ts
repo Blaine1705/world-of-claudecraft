@@ -626,11 +626,12 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     originZ: WORLD_MIN_Z,
   };
   // 1 = this cell is owed terrain geometry and has not attached it yet, which
-  // is the only state that may clamp the outdoor fog. Seeded from cell
-  // OWNERSHIP below, so cells no zone rectangle covers stay 0 from the start:
-  // the rects do not tile (96 of the 792 cells are unowned), those cells can
-  // never be built, and clamping the view against a hole that will never fill
-  // would be worse than the zone clamp this replaces.
+  // is the only state that may clamp the outdoor fog. Ownership is TOTAL
+  // since the gap-cell fill (cellOwnerId assigns every cell its containing
+  // zone, else the nearest rectangle), so ALL 792 cells seed pending and each
+  // one is genuinely buildable by its owner: pending-until-attach is the
+  // correct state everywhere, and the old carve-out for unowned cells (the
+  // rects do not tile; 96 cells used to be permanently unbuildable) is gone.
   const groundPending = new Uint8Array(chunksX * chunksZ);
   // x/z/half feed the per-frame fog cull; x0/z0/size/spacing are the exact
   // buildChunkGeometry inputs, kept so an editor rebuild re-runs the same build.
@@ -844,11 +845,7 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     const z = WORLD_MIN_Z + (cz + 0.5) * CHUNK_SIZE;
     return ZONES[owningRectIndex(x, z, zoneRects)].id;
   };
-  for (let cz = 0; cz < chunksZ; cz++) {
-    for (let cx = 0; cx < chunksX; cx++) {
-      if (cellOwnerId(cx, cz) !== null) groundPending[cz * chunksX + cx] = 1;
-    }
-  }
+  groundPending.fill(1);
   const residency = {
     grid,
     isPending: (cx: number, cz: number): boolean => groundPending[cz * chunksX + cx] === 1,

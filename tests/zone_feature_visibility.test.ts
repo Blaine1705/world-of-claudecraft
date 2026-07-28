@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   type FeatureFootprint,
   featureEdgeDistance,
+  hasUnseededInstanceMatrix,
   isZoneFeatureVisible,
 } from '../src/render/zone_feature_visibility_core';
 
@@ -65,5 +66,32 @@ describe('zone feature distance visibility', () => {
     for (const far of [45, 100, 165, 630]) {
       expect(isZoneFeatureVisible(FEN, FEN.centerX, FEN.centerZ, far)).toBe(true);
     }
+  });
+});
+
+describe('unseeded instance-matrix guard', () => {
+  // Simulates an InstancedMesh instanceMatrix buffer: 16 floats per instance.
+  const identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+  const placedAt = (x: number, z: number) => [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, x, 4, z, 1];
+
+  it('flags a factory all-zero matrix anywhere in the buffer', () => {
+    // The seabird-flock failure mode: instances placed only by a per-frame
+    // update leave fresh zeros at attach, parking the measured footprint at
+    // the world origin.
+    const oneUnseeded = [...placedAt(-30, 1330), ...new Array(16).fill(0), ...identity];
+    expect(hasUnseededInstanceMatrix(oneUnseeded, 3)).toBe(true);
+  });
+
+  it('accepts fully seeded buffers, identity placements included', () => {
+    const seeded = [...placedAt(-70, 1155), ...identity, ...placedAt(125, 1085)];
+    expect(hasUnseededInstanceMatrix(seeded, 3)).toBe(false);
+  });
+
+  it('ignores capacity beyond the live instance count', () => {
+    // An InstancedMesh allocated with headroom keeps zeros past count; only
+    // the live instances matter.
+    const withHeadroom = [...placedAt(10, 20), ...new Array(16).fill(0)];
+    expect(hasUnseededInstanceMatrix(withHeadroom, 1)).toBe(false);
+    expect(hasUnseededInstanceMatrix(withHeadroom, 2)).toBe(true);
   });
 });
