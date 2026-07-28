@@ -14,6 +14,17 @@ const { createHash } = require('node:crypto');
 // unit test can pin the contract against an accidental deletion.
 const ALLOWED_PERMISSIONS = new Set(['pointerLock', 'fullscreen']);
 
+// The desktop shell is the game client, not a general-purpose browser tab. Its
+// renderer boots from app:// and should start the same login/world music that
+// the web client starts after browser page activation.
+const DESKTOP_AUDIO_AUTOPLAY_POLICY = 'no-user-gesture-required';
+
+function installDesktopAudioPolicy(commandLine) {
+  if (!commandLine || typeof commandLine.appendSwitch !== 'function') return false;
+  commandLine.appendSwitch('autoplay-policy', DESKTOP_AUDIO_AUTOPLAY_POLICY);
+  return true;
+}
+
 // Derive a comparable origin from a URL string as `${protocol}//${host}`. This is
 // deliberately NOT `new URL(x).origin`: app:// is a non-standard scheme, so Node's
 // URL reports its origin as the literal string "null" and every app:// host
@@ -196,6 +207,7 @@ function buildContentSecurityPolicy({ apiOrigin, scriptHashes = [] } = {}) {
     imgSrc,
     `style-src 'self' 'unsafe-inline' ${CSP_ORIGINS.fontsStyle}`,
     `font-src 'self' ${CSP_ORIGINS.fontsFile} ${CSP_ORIGINS.reownFonts}`,
+    "media-src 'self'",
     "worker-src 'self' blob:",
     `frame-src ${CSP_ORIGINS.turnstile} ${CSP_ORIGINS.walletFrames.join(' ')}`,
     "object-src 'none'",
@@ -276,6 +288,8 @@ module.exports = {
   isDevToolsToggleShortcut,
   isSoftwareRenderer,
   ALLOWED_PERMISSIONS,
+  DESKTOP_AUDIO_AUTOPLAY_POLICY,
+  installDesktopAudioPolicy,
   EMBEDDED_SUBFRAME_ORIGINS,
   CSP_ORIGINS,
   extractInlineScriptHashes,

@@ -36,6 +36,15 @@ export function isSoftwareRenderer(
   status: { webgl?: unknown; webgl2?: unknown } | null | undefined,
 ): boolean;
 export const ALLOWED_PERMISSIONS: Set<string>;
+export const DESKTOP_AUDIO_AUTOPLAY_POLICY: 'no-user-gesture-required';
+export function installDesktopAudioPolicy(
+  commandLine:
+    | {
+        appendSwitch(name: string, value: string): void;
+      }
+    | null
+    | undefined,
+): boolean;
 export const EMBEDDED_SUBFRAME_ORIGINS: Set<string>;
 export const CSP_ORIGINS: {
   script: string[];
