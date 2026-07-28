@@ -190,7 +190,12 @@ Data only. No sim logic, no wire, no parity.
 - Replace the derived fully-vendor-fed set with a counterfactual assertion plus a
   non-vacuity floor.
 - Fix the stale `prog_tools_of_the_trade` comment.
-- Telemetry counters: copper source, per-band harvest counts.
+- Telemetry counters: copper source, per-band harvest counts. The harvest
+  bands were later re-keyed by ZONE (ruling R3): the label values on the
+  harvest series changed from the material price bands to the zone ids, the
+  old series stop moving at deploy, and any external dashboard or alert
+  filtering the old band values must re-point in the same change (the
+  exporter pre-seeds the zone series at zero from boot).
 
 ### Phase 2: placement validator and node fixes
 
@@ -631,14 +636,14 @@ Settled with the maintainer during planning. Do not re-litigate.
    to say so.
 6. The delist lands in one move rather than staged behind telemetry, with the
    telemetry counters shipping alongside in the same phase.
-7. Three review-blessed trades, recorded so nobody re-opens them as bugs
-   (review rulings R4, R17, R18): the koi's band-0 weight cut to 1 is
-   deliberate skill-scaling, not a nerf to walk back; the reel-window trim's
+7. Three review-blessed trades, recorded so nobody re-opens them as bugs,
+   each with its own ruling: the koi's band-0 weight cut to 1 is deliberate
+   skill-scaling, not a nerf to walk back (R4); the reel-window trim's
    roughly 17 percent cost to a tier-1 angler is the accepted price of mobile
-   latency headroom; and the Marks-to-copper conversion through delve-bought
-   tools (vendor sell 60/150) is a blessed, bounded, loss-making conversion,
-   because closing it would flag the shared item defs the crafted tools use
-   too.
+   latency headroom (R18); and the Marks-to-copper conversion through
+   delve-bought tools (vendor sell 60/150) is a blessed, bounded,
+   loss-making conversion, because closing it would flag the shared item
+   defs the crafted tools use too (R17).
 8. Map-document scope (review ruling R15): D2 governs SHIPPED content. A
    custom map document (an editor-only surface today) can stock any item id
    and sits outside the never-stocked guards; the R37 rollout guard is what

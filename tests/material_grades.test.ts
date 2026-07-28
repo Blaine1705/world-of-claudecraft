@@ -22,7 +22,8 @@ import { isGatherToolUse } from '../src/sim/professions/tools';
 
 // The fine-material axis (D8): a harvest whose tool outclasses the material
 // grants a fine grade of it instead of the plain one, and the crafted tool
-// recipes consume that grade, so the tool one rung down is the only route up.
+// recipes consume that grade, so the tool one rung down is the CRAFT route
+// up (the delve counters' Marks route is the deliberate alternative).
 // This file owns the pure module; the live harvest path is pinned in
 // tests/gather_node_harvest.test.ts and the consumption substitution in
 // tests/material_grade_substitution.test.ts.

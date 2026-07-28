@@ -100,7 +100,8 @@ per cast (`FISH_BITE_DELAY_MIN_SEC` to `FISH_BITE_DELAY_MAX_SEC`, rod tiers
 above the first shave the max by `FISH_BITE_DELAY_ROD_REDUCTION_SEC`), a
 text-free personal bite SimEvent, and a server-authoritative reel window
 (`FISH_REEL_WINDOW_SEC` plus `FISH_REEL_WINDOW_ROD_BONUS_SEC` per rod tier
-above the first); reel is re-pressing the pole. A miss costs only the cast.
+above the first plus `FISH_REEL_WINDOW_RARITY_BONUS_SEC` per rarity rung
+above common); reel is re-pressing the pole. A miss costs only the cast.
 The wire carries zero bite information (castRemaining decays uniformly), so a
 scripted client can react faster but can never learn the bite early or
 stretch the window: accepted by design, attention over reflexes. Catch
@@ -177,8 +178,12 @@ functions); at cap, actions still work, only gain stops. A one-time mastery
 reset ran at the curve's deploy behind the persisted `masteryResetApplied`
 flag (`src/sim/professions/mastery_reset.ts`); `normalizeArchetypeState` is
 the single load-time reader of PRE-reset skill values and must keep running
-before `applyMasteryReset`. Tool effects/charges/recharge stay PARKED as
-dormant pure modules in `tools.ts`: do not wire, do not delete.
+before `applyMasteryReset`. Tool effects/charges/recharge are WIRED: the
+slot command, the harvest bonuses, and deterministic depletion all run
+(`tools.ts`, `gathering.ts`), with the slot policy (R9,
+`slotToolEffectRefused`) refusing the parked respawn-speed effect and all
+fishing slots until each has real behavior; the acquisition craft is what
+gives the effects a live source.
 
 Character XP from crafting is LEARNING XP: the level-banded curve
 (`craftActionXp`, `src/sim/professions/profession_xp.ts`) scaled at the

@@ -8,7 +8,9 @@
 // material grants a `fine_` grade of that same material instead of the plain
 // one. Same unit count, same rarity roll, same two rng draws; only the item
 // id moves. The six crafted tool recipes then consume the fine grade, so the
-// only route to the next tool up runs through the tool below it.
+// CRAFT route to the next tool up runs through the tool below it (the delve
+// counters' Marks route is the deliberate non-craft alternative; see
+// content/vendor_row_gates.ts and the delve shop tables).
 //
 // Pure leaf module: no SimContext, no content-table import, no rng, explicit
 // arguments only, so a Vitest imports it directly (same contract as tools.ts

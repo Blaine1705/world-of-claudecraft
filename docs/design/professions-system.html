@@ -451,7 +451,7 @@
     <li><strong>Rarity-scaled consumption:</strong> the chance to spend a unit of effect durability depends on the tool's rarity versus the target's rarity. Against an equal-or-higher-rarity target the tool spends a charge every use; against lower-rarity targets it often spends nothing. Example: an epic Monster Scalpel with +3 quantity spends 1 durability on an epic-equivalent monster, roughly 60 percent on a rare-equivalent, roughly 10 percent on a common-equivalent.</li>
   </ul>
   <div class="callout">
-    Tuning guardrail: effect costs should be meaningful but never so high that they discourage use or cost more than the materials being gathered are worth. The rarity-scaled consumption is part of that, so a high-end tool sips charges on trivial targets and saves them for valuable ones.
+    Tuning guardrail: effect costs should be meaningful but never so high that they discourage use or cost more than the materials being gathered are worth. Depletion shipped deterministic (one charge per use), so the cost of a charge is legible and the tuning lever is the charge count itself.
   </div>
 
   <h1 id="part-contributors" class="part">Part II: For contributors</h1>
@@ -631,8 +631,8 @@
   <h4>Gathering, tools, and monster harvesting</h4>
   <ul>
     <li>Gathering focus: skill tree vs additive radar, focus granularity, and the re-spec cost curves.</li>
-    <li>Monster-tier to item-tier mapping: the shared rarity scale that the rarity-scaled effect consumption and tool gating read from.</li>
-    <li>Tool effects: the effect catalog, depletion rates, the rarity-scaled consumption curve, and recharge material costs.</li>
+    <li>Monster-tier to item-tier mapping: the shared rarity scale that tool gating reads from.</li>
+    <li>Tool effects: the effect catalog, deterministic depletion tuning, and recharge material costs.</li>
     <li>Signed materials: the size of the self-gathered craft bonus.</li>
     <li>Node density and dynamic / location-based respawn (explicitly future); persistence scope for respawn state across restarts.</li>
   </ul>
