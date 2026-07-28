@@ -21,8 +21,12 @@
 
 import sharp from 'sharp';
 
-// Double the measured cross-platform envelope (17 / 0.33), far below any
-// deliberate edit. Tighten only with a fresh measurement on both platforms.
+// Headroom over the measured cross-platform envelope (max 17, mean 0.33 on
+// linux-x64 vs darwin, 2026-07-28): the max bound is roughly twice the
+// measured max, the mean bound roughly three times the measured mean. Both
+// sit far below the deliberate-edit signal (a 0.03 brightness step alone
+// measures mean above 3). Tighten only with a fresh measurement on both
+// platforms, per constant, never by re-deriving from a single multiplier.
 export const MAX_CHANNEL_DELTA = 32;
 export const MAX_MEAN_DELTA = 1.0;
 
@@ -38,6 +42,13 @@ export async function derivedIconStale(committed, rendered) {
   const b = await rgba(rendered);
   if (a.info.width !== b.info.width || a.info.height !== b.info.height) {
     return `differs from its derivation (${a.info.width}x${a.info.height} vs ${b.info.width}x${b.info.height})`;
+  }
+  // The delta loop indexes stride 4: a non-RGBA decode (ensureAlpha on a
+  // grayscale source yields 2 channels) would read past the buffer as
+  // undefined and poison the sums with NaN, which compares false against
+  // both bounds. Refuse the shape instead of silently passing it.
+  if (a.info.channels !== 4 || b.info.channels !== 4) {
+    return `differs from its derivation (${a.info.channels} vs ${b.info.channels} channels; expected RGBA)`;
   }
   const px = a.info.width * a.info.height;
   let maxDelta = 0;
