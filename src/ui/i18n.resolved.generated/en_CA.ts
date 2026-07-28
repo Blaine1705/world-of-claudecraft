@@ -17055,7 +17055,7 @@ export const en_CA: EnTranslations = {
       "woc_market_sold": {
         "sender": "The Exchange Broker",
         "subject": "Your Exchange listing sold",
-        "body": "Your listing sold and the buyer settled in full. The proceeds, less the exchange fee, were sent to your linked wallet in the settlement transaction itself; the Exchange never held your coin.\n\nA record of the sale lives in the Exchange ledger.\n\n- The Exchange Broker"
+        "body": "Your listing sold and the buyer settled in full. The Exchange ledger carries the record of the sale, and your Exchange activity shows the settled amount and its breakdown.\n\n- The Exchange Broker"
       }
     },
     "itemSets": {

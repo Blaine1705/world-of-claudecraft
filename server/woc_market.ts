@@ -35,6 +35,7 @@ import {
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
   WOC_MARKET_RESTRICTED_POLICY,
   WOC_MARKET_SETTLEMENT_WINDOW_SECONDS,
+  WOC_MARKET_STRANDED_RECLAIM_SECONDS,
   type WocBidStatus,
   type WocEligibilityPolicy,
   type WocEligibilityRefusal,
@@ -123,6 +124,8 @@ export interface WocSettlementRow {
   quoteExpiresAtMs: number | null;
   txSignature: string | null;
   failReason: string | null;
+  /** Base-unit token amount from the confirmed quote, for sale provenance. */
+  settledAmountBase: string | null;
   deadlineAtMs: number;
   createdAtMs: number;
 }
@@ -193,10 +196,13 @@ export interface WocMarketDb {
     listing: NewWocListing,
   ): Promise<{ ok: true; id: number } | { ok: false; reason: 'lease_lost' | 'cap_reached' }>;
   listingById(realm: string, id: number): Promise<WocListingRow | null>;
+  /** A has-more PROBE, never a full count: the window count forced a read of
+   *  every live listing per page (measured as a parallel seq scan plus an
+   *  external merge sort at a realm's listing cap). */
   browseListings(
     realm: string,
     q: WocBrowseQuery,
-  ): Promise<{ rows: WocListingRow[]; total: number }>;
+  ): Promise<{ rows: WocListingRow[]; hasMore: boolean }>;
   listingsBySeller(realm: string, account: number): Promise<WocListingRow[]>;
   countActiveBySeller(realm: string, account: number): Promise<number>;
   /** Cancel iff still active with no pending/active bid. Returns the row for
@@ -214,7 +220,16 @@ export interface WocMarketDb {
   /** closed && !itemDisposed && resolution != 'sold': the return-flight
    *  reconciliation backlog. */
   undisposedClosedListings(realm: string, limit: number): Promise<WocListingRow[]>;
+  /** Listings stuck mid-resolution ('ending' / 'settling') past a grace. */
+  strandedListings(realm: string, olderThanMs: number, limit: number): Promise<WocListingRow[]>;
+  /** Re-open a stranded listing so the ordinary close arm resolves it. */
+  reopenListing(id: number): Promise<void>;
   markItemDisposed(id: number): Promise<void>;
+  /** Durable book-once claim: true only for the FIRST claim of this ref. */
+  claimCustodyRef(realm: string, custodyRef: string): Promise<boolean>;
+  markCustodyRefBooked(custodyRef: string): Promise<void>;
+  /** Release an unbooked claim so a failed booking can be retried. */
+  unclaimCustodyRef(custodyRef: string): Promise<void>;
   claimBuyNowLock(
     realm: string,
     id: number,
@@ -257,7 +272,7 @@ export interface WocMarketDb {
     nowMs: number,
   ): Promise<'activated' | 'superseded' | 'listing_closed' | 'not_pending'>;
   markBondHeld(bidId: number): Promise<void>;
-  lapsePendingBids(nowMs: number, limit: number): Promise<number>;
+  lapsePendingBids(realm: string, cutoffMs: number, limit: number): Promise<number>;
   bidsByAccount(realm: string, account: number, limit: number): Promise<WocBidRow[]>;
   bidsForListing(listingId: number): Promise<WocBidRow[]>;
   /** Cascade pick: the highest 'outbid' bid meeting `minCents` whose account
@@ -288,7 +303,12 @@ export interface WocMarketDb {
   settlementById(id: number): Promise<WocSettlementRow | null>;
   settlementsByAccount(realm: string, account: number, limit: number): Promise<WocSettlementRow[]>;
   liveSettlementForListing(listingId: number): Promise<WocSettlementRow | null>;
-  setSettlementQuote(id: number, reference: string, expiresAtMs: number): Promise<boolean>;
+  setSettlementQuote(
+    id: number,
+    reference: string,
+    expiresAtMs: number,
+    amountBase: string | null,
+  ): Promise<boolean>;
   /** offered -> confirming with the signature recorded (unique). */
   submitSettlementSignature(
     id: number,
@@ -423,6 +443,9 @@ export interface WocMarketDeps {
   totpVerify(account: number, code: string): Promise<boolean>;
   config: WocMarketConfig;
   now?: () => number;
+  /** Per-pass observability sink (main.ts logs it). `saturated` names every arm
+   *  that came back with a FULL batch, i.e. a backlog that is not draining. */
+  onSweepPass?(stats: WocSweepPassStats, saturated: readonly string[]): void;
 }
 
 // ---------------------------------------------------------------------------
@@ -467,6 +490,21 @@ const refuse = (reason: WocMarketRefusal): Refused => ({ ok: false, reason });
 // never starve the others; the next pass continues where this one stopped.
 const SWEEP_BATCH = 25;
 
+/** Per-arm counts for one sweep pass, so a wedged marketplace is visible: a
+ *  silent idle pass and a permanently starved backlog look identical without
+ *  it. An arm returning a FULL batch is the "backlog is not draining" signal. */
+export interface WocSweepPassStats {
+  lapsedBids: number;
+  reclaimed: number;
+  closed: number;
+  expired: number;
+  polled: number;
+  delivered: number;
+  reconciled: number;
+  returned: number;
+  bonds: number;
+}
+
 export class WocMarketService {
   constructor(private readonly deps: WocMarketDeps) {}
 
@@ -499,8 +537,8 @@ export class WocMarketService {
     };
   }
 
-  async browse(q: WocBrowseQuery): Promise<{ rows: WocListingRow[]; total: number }> {
-    if (!this.cfg.enabled) return { rows: [], total: 0 };
+  async browse(q: WocBrowseQuery): Promise<{ rows: WocListingRow[]; hasMore: boolean }> {
+    if (!this.cfg.enabled) return { rows: [], hasMore: false };
     return this.deps.db.browseListings(this.cfg.realm, q);
   }
 
@@ -612,7 +650,9 @@ export class WocMarketService {
     itemRef: ExtractRef;
     params: WocListingParams;
   }): Promise<{ ok: true; listing: WocListingRow } | Refused> {
-    const gate = await this.guardEnabledHealthy();
+    // A suspended defaulter cannot list either, not just bid: the suspension is
+    // a marketplace-wide hold (PRD "Integrity").
+    const gate = (await this.guardEnabledHealthy()) ?? (await this.guardSuspended(args.account));
     if (gate) return gate;
     const wallet = await this.deps.verifiedWallet(args.account);
     if (!wallet) return refuse('wallet_required');
@@ -638,6 +678,14 @@ export class WocMarketService {
           ? 'character_invalid'
           : extract.reason,
       );
+    }
+    // Re-decide eligibility against the AUTHORITATIVE extracted copy, not the
+    // payload the client claimed: a copy whose rolled quality sits below its
+    // def quality must not slip through on the def alone.
+    const eligibleReal = listingEligibility(def, extract.extracted.instance, this.cfg.policy);
+    if (!eligibleReal.ok) {
+      this.deps.custody.restoreCopy(args.characterId, extract.extracted);
+      return refuse(eligibleReal.reason);
     }
     const nowMs = this.now();
     const listing: NewWocListing = {
@@ -775,6 +823,11 @@ export class WocMarketService {
     if (bid.account !== account) return refuse('not_yours');
     if (bid.status !== 'pending_bond') return refuse('not_pending');
     if (bid.bondReference === null) return refuse('quote_unavailable');
+    // An expired quote is never accepted for confirmation (the PRD rule, with
+    // no carve-out for the bond leg): the bidder requests a fresh one.
+    if (bid.bondQuoteExpiresAtMs !== null && bid.bondQuoteExpiresAtMs <= this.now()) {
+      return refuse('quote_expired');
+    }
     const confirmed = await this.deps.economy.confirm(bid.bondReference, signature);
     if (confirmed.pending) return refuse('confirm_failed');
     if (!confirmed.settled) return refuse('confirm_failed');
@@ -797,11 +850,14 @@ export class WocMarketService {
     acceptTerms: boolean;
   }): Promise<{ ok: true; settlement: WocSettlementRow; quote: WocQuoteIntent } | Refused> {
     const nowMs = this.now();
+    // The flag/health gate runs BEFORE any database read: with the feature off
+    // or pricing unhealthy, this flow performs no query and no custody action.
+    const preGate = await this.guardEnabledHealthy();
+    if (preGate) return preGate;
     const listingPeek = await this.deps.db.listingById(this.cfg.realm, args.listingId);
     if (!listingPeek) return refuse('not_found');
     if (listingPeek.buyNowCents === null) return refuse('no_buy_now');
     const gate =
-      (await this.guardEnabledHealthy()) ??
       (await this.guardSuspended(args.account)) ??
       (await this.guardTotp(args.account, listingPeek.buyNowCents, args.totpCode)) ??
       (await this.guardTerms(args.account, args.acceptTerms));
@@ -875,6 +931,7 @@ export class WocMarketService {
         settlement.id,
         intent.reference,
         intent.expiresAtMs,
+        intent.amount?.base ?? null,
       );
       if (!stamped) return { ...intent, ok: false, reason: 'settlement_not_open' };
     }
@@ -1003,23 +1060,35 @@ export class WocMarketService {
   // The sweep pass (called by woc_market_sweep.ts on its own clock)
   // -------------------------------------------------------------------------
 
-  async sweepPass(): Promise<void> {
-    if (!this.cfg.enabled) return;
+  async sweepPass(): Promise<WocSweepPassStats | null> {
+    if (!this.cfg.enabled) return null;
     const nowMs = this.now();
-    await this.deps.db.lapsePendingBids(
-      nowMs - WOC_MARKET_BOND_PENDING_TTL_SECONDS * 1000,
-      SWEEP_BATCH,
-    );
-    await this.closeDueAuctions(nowMs);
-    await this.expireOverdueSettlements(nowMs);
-    await this.pollConfirmingSettlements();
-    await this.deliverConfirmedSettlements();
-    await this.reconcileDelivering();
-    await this.returnUndisposedItems();
-    await this.processDueBonds();
+    const stats: WocSweepPassStats = {
+      lapsedBids: await this.deps.db.lapsePendingBids(
+        this.cfg.realm,
+        nowMs - WOC_MARKET_BOND_PENDING_TTL_SECONDS * 1000,
+        SWEEP_BATCH,
+      ),
+      reclaimed: await this.reclaimStrandedListings(nowMs),
+      closed: await this.closeDueAuctions(nowMs),
+      expired: await this.expireOverdueSettlements(nowMs),
+      polled: await this.pollConfirmingSettlements(),
+      delivered: await this.deliverConfirmedSettlements(),
+      reconciled: await this.reconcileDelivering(),
+      returned: await this.returnUndisposedItems(),
+      bonds: await this.processDueBonds(),
+    };
+    // A FULL batch means the arm did not drain: that is the one signal that
+    // separates a healthy idle marketplace from a permanently starved backlog,
+    // so it is reported rather than left to look identical.
+    const saturated = Object.entries(stats)
+      .filter(([, n]) => n >= SWEEP_BATCH)
+      .map(([arm]) => arm);
+    this.deps.onSweepPass?.(stats, saturated);
+    return stats;
   }
 
-  private async closeDueAuctions(nowMs: number): Promise<void> {
+  private async closeDueAuctions(nowMs: number): Promise<number> {
     const due = await this.deps.db.claimDueListings(this.cfg.realm, nowMs, SWEEP_BATCH);
     for (const listing of due) {
       const bids = await this.deps.db.bidsForListing(listing.id);
@@ -1048,13 +1117,42 @@ export class WocMarketService {
         deadlineAtMs: nowMs + WOC_MARKET_SETTLEMENT_WINDOW_SECONDS * 1000,
         nowMs,
       });
-      if (settlement !== 'live_settlement_exists') {
-        await this.deps.db.markListingSettling(listing.id);
-      }
+      // Either way the listing leaves 'ending': a claimed row that stays there
+      // is unreachable forever (claimDueListings only selects 'active'), which
+      // would strand the escrowed copy and the winner's bond with no
+      // reconciliation path. A pre-existing live settlement (a buy-now already
+      // confirming) is the benign case and also becomes 'settling'.
+      await this.deps.db.markListingSettling(listing.id);
+      void settlement;
     }
+    return due.length;
   }
 
-  private async expireOverdueSettlements(nowMs: number): Promise<void> {
+  /**
+   * Reclaim listings stranded mid-resolution: a query failure or a crash
+   * between the claimDueListings UPDATE and the per-listing resolution leaves
+   * rows in 'ending' (or in 'settling' with no live settlement) that no other
+   * arm can reach. Both are re-opened to 'active' with their original end, so
+   * the next pass resolves them normally; the anti-snipe cap keeps the end
+   * from drifting.
+   */
+  private async reclaimStrandedListings(nowMs: number): Promise<number> {
+    const stranded = await this.deps.db.strandedListings(
+      this.cfg.realm,
+      nowMs - WOC_MARKET_STRANDED_RECLAIM_SECONDS * 1000,
+      SWEEP_BATCH,
+    );
+    let reopened = 0;
+    for (const listing of stranded) {
+      const live = await this.deps.db.liveSettlementForListing(listing.id);
+      if (live) continue; // genuinely settling; leave it alone
+      await this.deps.db.reopenListing(listing.id);
+      reopened++;
+    }
+    return reopened;
+  }
+
+  private async expireOverdueSettlements(nowMs: number): Promise<number> {
     const overdue = await this.deps.db.overdueSettlements(this.cfg.realm, nowMs, SWEEP_BATCH);
     for (const settlement of overdue) {
       const moved = await this.deps.db.transitionSettlement(
@@ -1093,6 +1191,13 @@ export class WocMarketService {
           priorWinners,
         );
         if (next) {
+          // The promoted bidder's bond was released when they were outbid, so
+          // re-arm it: a cascade winner with nothing at risk cannot be made to
+          // forfeit (PRD "A winner who fails to settle forfeits the bond").
+          // 'refunded' is terminal, so only a still-held or refund-pending bond
+          // is re-held; an already-refunded one is re-quoted by the client
+          // through the ordinary bond flow before the settlement can confirm.
+          await this.deps.db.setBondState(next.id, ['refund_due', 'held'], 'held');
           await this.deps.db.insertSettlement({
             listingId: listing.id,
             bidId: next.id,
@@ -1110,9 +1215,10 @@ export class WocMarketService {
       }
       await this.deps.db.closeListing(listing.id, 'unsettled');
     }
+    return overdue.length;
   }
 
-  private async pollConfirmingSettlements(): Promise<void> {
+  private async pollConfirmingSettlements(): Promise<number> {
     const confirming = await this.deps.db.confirmingSettlements(this.cfg.realm, SWEEP_BATCH);
     for (const settlement of confirming) {
       if (settlement.quoteReference === null || settlement.txSignature === null) continue;
@@ -1131,18 +1237,48 @@ export class WocMarketService {
         );
       }
     }
+    return confirming.length;
   }
 
-  private async deliverConfirmedSettlements(): Promise<void> {
+  private async deliverConfirmedSettlements(): Promise<number> {
     const claimed = await this.deps.db.claimDeliverableSettlements(this.cfg.realm, SWEEP_BATCH);
     for (const settlement of claimed) await this.deliverOne(settlement);
+    return claimed.length;
   }
 
   /** Crash recovery: rows stuck in 'delivering' resume here; the custody
    *  book-once dedupe makes re-running the whole arm safe. */
-  private async reconcileDelivering(): Promise<void> {
+  private async reconcileDelivering(): Promise<number> {
     const stuck = await this.deps.db.deliveringSettlements(this.cfg.realm, SWEEP_BATCH);
     for (const settlement of stuck) await this.deliverOne(settlement);
+    return stuck.length;
+  }
+
+  /**
+   * Book a custody parcel exactly once, with the claim in POSTGRES rather than
+   * in the mail blob: the blob's own marker is advisory (a player can delete an
+   * emptied letter, and an older binary's loader strips the field), so it can
+   * never be the authority. On a booking failure the claim is released so the
+   * next pass retries; a crash between claim and book leaves the claim unbooked,
+   * which holds the item and shows up in the unbooked-claims read rather than
+   * duplicating it.
+   */
+  private async bookCustodyOnce(
+    recipient: { key: string; name: string },
+    letter: 'delivery' | 'return' | 'sold_notice',
+    items: InvSlot[],
+    custodyRef: string,
+  ): Promise<boolean> {
+    const fresh = await this.deps.db.claimCustodyRef(this.cfg.realm, custodyRef);
+    if (!fresh) return true; // already booked (or being booked) by a prior pass
+    try {
+      await this.deps.custody.persistMailParcel(recipient, letter, items, custodyRef);
+    } catch (err) {
+      await this.deps.db.unclaimCustodyRef(custodyRef).catch(() => {});
+      throw err;
+    }
+    await this.deps.db.markCustodyRefBooked(custodyRef);
+    return true;
   }
 
   private async deliverOne(settlement: WocSettlementRow): Promise<void> {
@@ -1156,7 +1292,7 @@ export class WocMarketService {
     // No character to deliver to right now: hold in 'delivering'; a later
     // pass retries (the account may recreate a character; admins can act).
     if (!target) return;
-    await this.deps.custody.persistMailParcel(
+    await this.bookCustodyOnce(
       { key: String(target.characterId), name: target.name },
       'delivery',
       [listing.item],
@@ -1174,7 +1310,9 @@ export class WocMarketService {
       itemId: listing.itemId,
       item: listing.item,
       priceCents: settlement.amountCents,
-      amountBase: null,
+      // The settled base-unit amount when the quote leg is still on the row;
+      // provenance keeps the USD price as the authoritative figure either way.
+      amountBase: settlement.quoteReference === null ? null : settlement.settledAmountBase,
       sellerAccount: listing.sellerAccount,
       buyerAccount: settlement.buyerAccount,
       sellerName: listing.sellerName,
@@ -1201,14 +1339,12 @@ export class WocMarketService {
       listing.sellerCharacter,
     );
     if (seller) {
-      await this.deps.custody
-        .persistMailParcel(
-          { key: String(seller.characterId), name: seller.name },
-          'sold_notice',
-          [],
-          listingSoldNoticeCustodyRef(listing.id),
-        )
-        .catch(() => {});
+      await this.bookCustodyOnce(
+        { key: String(seller.characterId), name: seller.name },
+        'sold_notice',
+        [],
+        listingSoldNoticeCustodyRef(listing.id),
+      ).catch(() => {});
     }
   }
 
@@ -1219,7 +1355,7 @@ export class WocMarketService {
       listing.sellerCharacter,
     );
     if (!target) return;
-    await this.deps.custody.persistMailParcel(
+    await this.bookCustodyOnce(
       { key: String(target.characterId), name: target.name },
       'return',
       [listing.item],
@@ -1228,15 +1364,16 @@ export class WocMarketService {
     await this.deps.db.markItemDisposed(listing.id);
   }
 
-  private async returnUndisposedItems(): Promise<void> {
+  private async returnUndisposedItems(): Promise<number> {
     const backlog = await this.deps.db.undisposedClosedListings(this.cfg.realm, SWEEP_BATCH);
     for (const listing of backlog) {
       if (listing.resolution === 'sold') continue;
       await this.returnListingItem(listing).catch(() => {});
     }
+    return backlog.length;
   }
 
-  private async processDueBonds(): Promise<void> {
+  private async processDueBonds(): Promise<number> {
     const due = await this.deps.db.bondsDue(this.cfg.realm, SWEEP_BATCH);
     for (const bid of due) {
       if (bid.bondReference === null) {
@@ -1252,5 +1389,6 @@ export class WocMarketService {
         if (out?.done) await this.deps.db.setBondState(bid.id, ['forfeit_due'], 'forfeited');
       }
     }
+    return due.length;
   }
 }

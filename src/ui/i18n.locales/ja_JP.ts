@@ -8629,7 +8629,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.buyNowLockedBadge': '購入手続き中',
   'hudChrome.wocMarket.pagePrev': '前のページ',
   'hudChrome.wocMarket.pageNext': '次のページ',
-  'hudChrome.wocMarket.pageStatus': '{total} ページ中 {current} ページ',
+  'hudChrome.wocMarket.pageNumber': '{current} ページ',
   'hudChrome.wocMarket.sortLabel': '並べ替え',
   'hudChrome.wocMarket.sortEnding': '終了が近い順',
   'hudChrome.wocMarket.sortNewest': '新着順',
@@ -8678,6 +8678,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.quoteBondFor': '{usd} の入札に対する保証金',
   'hudChrome.wocMarket.quoteSettlementFor': '{item} の決済: {usd}',
   'hudChrome.wocMarket.signing': 'ウォレットの承認を待っています...',
+  'hudChrome.wocMarket.signFailed':
+    'ウォレットが支払いを完了できませんでした。ウォレットを確認して、もう一度お試しください。',
   'hudChrome.wocMarket.confirming': 'チェーン上で確認中...',
   'hudChrome.wocMarket.bidPlacedStanding': '入札が有効になりました。あなたが現在の最高入札者です。',
   'hudChrome.wocMarket.bidPlacedOutbid': '保証金は確認されましたが、先により高い入札が入りました。',

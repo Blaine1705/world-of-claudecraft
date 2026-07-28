@@ -58,6 +58,7 @@ export interface WocListingView {
   resolution: string | null;
   currentBidCents: number | null;
   minNextBidCents: number;
+  minNextBidBondCents: number;
   buyNowLocked: boolean;
   endsAtMs: number;
   createdAtMs: number;
@@ -218,7 +219,7 @@ export class WocMarketClient {
   async browse(
     req: WocBrowseRequest,
   ): Promise<
-    { ok: true; total: number; page: number; listings: WocListingView[] } | WocMarketFail
+    { ok: true; hasMore: boolean; page: number; listings: WocListingView[] } | WocMarketFail
   > {
     const params = new URLSearchParams();
     params.set('page', String(req.page));
@@ -226,7 +227,7 @@ export class WocMarketClient {
     if (req.quality) params.set('quality', req.quality);
     if (req.format) params.set('format', req.format);
     if (req.itemIds && req.itemIds.length > 0) params.set('itemIds', req.itemIds.join(','));
-    const out = await this.request<{ total: number; page: number; listings: WocListingView[] }>(
+    const out = await this.request<{ hasMore: boolean; page: number; listings: WocListingView[] }>(
       'GET',
       `/api/woc-market/listings?${params.toString()}`,
     );

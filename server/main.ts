@@ -2775,6 +2775,18 @@ const wocMarketService = new WocMarketService({
     );
   },
   config: wocMarketConfig(),
+  onSweepPass: (stats, saturated) => {
+    // One line per pass that did work, plus a loud arm-not-draining warning:
+    // an idle marketplace and a wedged one are otherwise indistinguishable.
+    const worked = Object.values(stats).some((n) => n > 0);
+    if (saturated.length > 0) {
+      console.warn(
+        `[woc_market] sweep backlog not draining: ${saturated.join(',')} ${JSON.stringify(stats)}`,
+      );
+    } else if (worked) {
+      console.log(`[woc_market] sweep ${JSON.stringify(stats)}`);
+    }
+  },
 });
 configureWocMarketRuntime({ service: wocMarketService });
 
@@ -3510,7 +3522,9 @@ export async function startServer(): Promise<http.Server> {
   const wocMarketSweep = createWocMarketSweep({
     realm: REALM,
     connect: () => pool.connect(),
-    pass: () => wocMarketService.sweepPass(),
+    pass: async () => {
+      await wocMarketService.sweepPass();
+    },
     onError: (err) => console.error('[woc_market] sweep pass failed:', err),
   });
   if (wocMarketConfig().enabled) wocMarketSweep.start();

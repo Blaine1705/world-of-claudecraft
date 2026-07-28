@@ -1069,6 +1069,54 @@ describe('server host-layer import invariants', () => {
   });
 });
 
+// The $WOC token firewall (docs/prd/woc/marketplace.md "Constraints"): no
+// wallet, token, or settlement code may live in src/sim. The PRD names this
+// scan as the mechanical enforcement, so it exists here rather than as prose.
+// The allowlist is the ONE pre-existing tenant: holder_tier.ts is the cosmetic
+// holder-tier ladder (a pure threshold function over a number), plus the
+// PlayerMeta holder fields it feeds.
+describe('the $WOC token firewall over src/sim', () => {
+  // The three PRE-EXISTING tenants, each a read-only projection of chain state
+  // rather than money logic: holder_tier.ts is the cosmetic holder ladder (a
+  // pure threshold function over a number), types.ts declares the holder fields
+  // and the daily-rewards readout shape it feeds, and sim.ts carries the
+  // offline daily-rewards stub for that readout (#1307). A NEW file wanting on
+  // this list is the signal the firewall is being breached, not extended.
+  const FIREWALL_ALLOWED = new Set([
+    'src/sim/holder_tier.ts',
+    'src/sim/types.ts',
+    'src/sim/sim.ts',
+  ]);
+  // Identifier-shaped money/chain vocabulary. Deliberately NOT matched inside
+  // comments (the escrow prose in market.ts and inventory_extract.ts is fine):
+  // the scan strips comments first, exactly like the sibling purity scans.
+  // No trailing \b on purpose: the leak shapes are COMPOUND identifiers
+  // (sellerWallet, walletForAccount, quoteUsdCents), which a closed word
+  // boundary would miss entirely.
+  const FIREWALL_RE =
+    /(?:wallet|pubkey|solana|usdcents|pricecents|amountbase|settlementquote|bondcents|treasury|custodyclaim)/i;
+
+  it('keeps wallet, token, and settlement identifiers out of every sim file', () => {
+    const offenders: string[] = [];
+    for (const file of simFiles) {
+      const rel = relative(repoRoot, file).replace(/\\/g, '/');
+      if (FIREWALL_ALLOWED.has(rel)) continue;
+      const stripped = stripComments(readFileSync(file, 'utf8'));
+      const hit = FIREWALL_RE.exec(stripped);
+      if (hit) offenders.push(`${rel}: ${hit[0]}`);
+    }
+    expect(offenders, offenders.join('\n')).toEqual([]);
+  });
+
+  it('is non-vacuous: the scan sees the sim tree and its own pattern bites', () => {
+    expect(simFiles.length).toBeGreaterThan(80);
+    // Both compound shapes must bite, and ordinary custody vocabulary must not.
+    expect(FIREWALL_RE.test('const w = walletForAccount(id);')).toBe(true);
+    expect(FIREWALL_RE.test('const k = row.sellerWallet;')).toBe(true);
+    expect(FIREWALL_RE.test('const escrowed = extractTradableCopy(inv, ref, def);')).toBe(false);
+  });
+});
+
 describe('src/ui pure-core invariants', () => {
   it('lists only files that exist (the curated pure cores)', () => {
     const missing = UI_PURE_CORES.filter((f) => !statSync(f).isFile());

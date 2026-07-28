@@ -8748,7 +8748,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.buyNowLockedBadge': 'Идёт покупка',
   'hudChrome.wocMarket.pagePrev': 'Предыдущая страница',
   'hudChrome.wocMarket.pageNext': 'Следующая страница',
-  'hudChrome.wocMarket.pageStatus': 'Страница {current} из {total}',
+  'hudChrome.wocMarket.pageNumber': 'Страница {current}',
   'hudChrome.wocMarket.sortLabel': 'Сортировка',
   'hudChrome.wocMarket.sortEnding': 'Скоро завершатся',
   'hudChrome.wocMarket.sortNewest': 'Новые',
@@ -8796,6 +8796,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.quoteBondFor': 'Залог для вашей ставки {usd}',
   'hudChrome.wocMarket.quoteSettlementFor': 'Расчёт за {item}: {usd}',
   'hudChrome.wocMarket.signing': 'Ожидание вашего кошелька...',
+  'hudChrome.wocMarket.signFailed':
+    'Ваш кошелёк не завершил оплату. Проверьте кошелёк и попробуйте снова.',
   'hudChrome.wocMarket.confirming': 'Подтверждение в сети...',
   'hudChrome.wocMarket.bidPlacedStanding': 'Ваша ставка принята. Вы лидируете в торгах.',
   'hudChrome.wocMarket.bidPlacedOutbid': 'Ваш залог подтверждён, но кто-то успел поставить больше.',

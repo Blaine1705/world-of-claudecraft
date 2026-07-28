@@ -57,6 +57,7 @@ import {
   WOC_MARKET_CONFIRM_MAX_PER_MINUTE,
   WOC_MARKET_LIST_MAX_PER_MINUTE,
   WOC_MARKET_QUOTE_MAX_PER_MINUTE,
+  WOC_MARKET_READ_MAX_PER_MINUTE,
   type WocMarketMutationAction,
   walletLinkRateLimited,
   wocBalanceRateLimited,
@@ -372,6 +373,13 @@ export const WOC_MARKET_CONFIRM_POLICY: RateLimitPolicy = wocMarketMutationPolic
   'woc_market_confirm',
   'confirm',
   WOC_MARKET_CONFIRM_MAX_PER_MINUTE,
+);
+// The reads are metered too: browse and the activity fan-out each cost several
+// database round trips, and /listings/:id can reach the economy service.
+export const WOC_MARKET_READ_POLICY: RateLimitPolicy = wocMarketMutationPolicy(
+  'woc_market_read',
+  'read',
+  WOC_MARKET_READ_MAX_PER_MINUTE,
 );
 
 // The character-mutation policies. Each is 'ip+account' (so it must be

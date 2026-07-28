@@ -121,11 +121,14 @@ export const WOC_MARKET_SOLD_LETTER: LetterDef = {
   letterId: 'woc_market_sold',
   senderName: 'The Exchange Broker',
   subject: 'Your Exchange listing sold',
+  // Payload-only, like the other two: this module is currency-blind, so the
+  // money language (the fee split, where proceeds land) belongs to the
+  // Exchange window, which can read the real figures. A letter that asserts a
+  // payment route it cannot see would also go stale the day that route changes.
   body:
-    'Your listing sold and the buyer settled in full. The proceeds, less the ' +
-    'exchange fee, were sent to your linked wallet in the settlement ' +
-    'transaction itself; the Exchange never held your coin.\n\n' +
-    'A record of the sale lives in the Exchange ledger.\n\n' +
+    'Your listing sold and the buyer settled in full. The Exchange ledger ' +
+    'carries the record of the sale, and your Exchange activity shows the ' +
+    'settled amount and its breakdown.\n\n' +
     '- The Exchange Broker',
   delaySeconds: 0,
 };

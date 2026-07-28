@@ -66,13 +66,17 @@ export interface WocMarketWindowDeps {
   restoreFocus(target: HTMLElement | null): void;
 }
 
+// usdCents is NULLABLE on purpose: it is only a display label sourced from the
+// cached activity row, and a missing row must render no amount rather than a
+// fabricated $0.00 next to a real charge. The quote's token legs are the
+// authoritative figures either way.
 type PendingQuote =
-  | { kind: 'bond'; bidId: number; usdCents: number; quote: WocQuoteView }
+  | { kind: 'bond'; bidId: number; usdCents: number | null; quote: WocQuoteView }
   | {
       kind: 'settlement';
       settlementId: number;
       itemId: string;
-      usdCents: number;
+      usdCents: number | null;
       quote: WocQuoteView;
     };
 
@@ -88,7 +92,7 @@ export class WocMarketWindow {
   private status: WocMarketStatus | null = null;
   private statusFailed = false;
   private listings: WocListingView[] = [];
-  private total = 0;
+  private hasMore = false;
   private page = 0;
   private sort: 'ending' | 'newest' | 'price_asc' | 'price_desc' = 'ending';
   private browseLoading = false;
@@ -99,6 +103,15 @@ export class WocMarketWindow {
   private sales: WocSaleView[] | null = null;
   private activity: WocActivityView | null = null;
   private sellIndex: number | null = null;
+  // Non-text form state lives HERE, not in the rebuilt DOM: form_draft.ts
+  // deliberately carries only text inputs, so a poll rebuild (which fires at
+  // least once a minute while any tab is open) would silently reset a select or
+  // checkbox and submit would then read the reset value. On a money surface
+  // that means listing with the wrong format, duration, or terms flag.
+  private sellFormat: 'auction' | 'buy_now' | 'auction_buy_now' = 'auction';
+  private sellDurationHours: number | null = null;
+  private sellOfferNext = false;
+  private acceptTerms = false;
   private pendingQuote: PendingQuote | null = null;
   private busy = false;
   private busyLabel: TranslationKey | null = null;
@@ -165,7 +178,7 @@ export class WocMarketWindow {
     }
     this.browseFailed = false;
     this.listings = out.listings;
-    this.total = out.total;
+    this.hasMore = out.hasMore;
   }
 
   private async loadActivity(seq: number): Promise<void> {
@@ -229,7 +242,7 @@ export class WocMarketWindow {
       nowMs: Date.now(),
       browse: {
         listings: this.listings,
-        total: this.total,
+        hasMore: this.hasMore,
         page: this.page,
         pageSize: PAGE_SIZE,
         loading: this.browseLoading,
@@ -260,7 +273,12 @@ export class WocMarketWindow {
     this.wire(root, model);
     restoreFormDraft(root, draft);
     if (focusKey) {
-      restoreFirstEnabled([root.querySelector<HTMLElement>(focusKey)]);
+      // captureFocusKey returns the ATTRIBUTE VALUE, so it must be wrapped in
+      // the attribute selector; passing it raw made this a type selector that
+      // matched nothing and silently dropped focus across every rebuild.
+      restoreFirstEnabled([
+        root.querySelector<HTMLElement>(`[data-focus-key="${focusKey.replace(/["\\]/g, '\\$&')}"]`),
+      ]);
     }
   }
 
@@ -412,8 +430,14 @@ export class WocMarketWindow {
           ? `<span class="wm-locked">${esc(t('hudChrome.wocMarket.buyNowLockedBadge'))}</span>`
           : '';
         return (
-          `<tr class="wm-row ${r.selected ? 'wm-row-selected' : ''}" data-listing="${r.id}">` +
-          `<td>${this.itemCellHtml(r.itemId, r.quality)}${mine}${locked}</td>` +
+          `<tr class="wm-row ${r.selected ? 'wm-row-selected' : ''}" data-listing="${r.id}" ` +
+          `role="row" aria-selected="${r.selected ? 'true' : 'false'}">` +
+          // The row is the only route to the detail pane, the bid form and
+          // buy-now, so its activator is a real button: keyboard and screen
+          // readers reach the purchase flow, not just the mouse.
+          `<td><button type="button" class="wm-row-open" data-listing="${r.id}" ` +
+          `data-focus-key="wm-row-${r.id}" aria-label="${esc(t('hudChrome.wocMarket.bidAria', { item: this.itemName(r.itemId) }))}">` +
+          `${this.itemCellHtml(r.itemId, r.quality)}</button>${mine}${locked}</td>` +
           `<td>${esc(r.sellerName)}</td>` +
           `<td>${r.currentCents === null ? esc(t('hudChrome.wocMarket.detailNoBids')) : esc(this.usd(r.currentCents))}${badge}</td>` +
           `<td>${r.buyNowCents === null ? '' : esc(this.usd(r.buyNowCents))}</td>` +
@@ -424,8 +448,8 @@ export class WocMarketWindow {
     const pager =
       `<div class="wm-pager">` +
       `<button type="button" data-action="page-prev" ${b.page <= 0 ? 'disabled' : ''} aria-label="${esc(t('hudChrome.wocMarket.pagePrev'))}">&#8249;</button>` +
-      `<span>${esc(t('hudChrome.wocMarket.pageStatus', { current: formatNumber(b.page + 1), total: formatNumber(b.pageCount) }))}</span>` +
-      `<button type="button" data-action="page-next" ${b.page + 1 >= b.pageCount ? 'disabled' : ''} aria-label="${esc(t('hudChrome.wocMarket.pageNext'))}">&#8250;</button>` +
+      `<span>${esc(t('hudChrome.wocMarket.pageNumber', { current: formatNumber(b.page + 1) }))}</span>` +
+      `<button type="button" data-action="page-next" ${b.hasMore ? '' : 'disabled'} aria-label="${esc(t('hudChrome.wocMarket.pageNext'))}">&#8250;</button>` +
       `<label class="wm-sort">${esc(t('hudChrome.wocMarket.sortLabel'))}` +
       `<select data-field="sort" data-focus-key="wm-sort">` +
       `<option value="ending" ${this.sort === 'ending' ? 'selected' : ''}>${esc(t('hudChrome.wocMarket.sortEnding'))}</option>` +
@@ -516,7 +540,7 @@ export class WocMarketWindow {
     const disabled = model.paused || !model.walletLinked || this.busy ? 'disabled' : '';
     const termsRow = model.activity?.termsAccepted
       ? ''
-      : `<label class="wm-terms"><input type="checkbox" data-field="accept-terms" data-focus-key="wm-terms" /> ${esc(
+      : `<label class="wm-terms"><input type="checkbox" data-field="accept-terms" data-focus-key="wm-terms" ${this.acceptTerms ? 'checked' : ''} /> ${esc(
           t('hudChrome.wocMarket.termsLabel'),
         )}</label>`;
     return (
@@ -532,6 +556,11 @@ export class WocMarketWindow {
       )}" /></label>` +
       `<p class="wm-note">${esc(t('hudChrome.wocMarket.totpNote', { usd: this.usd(model.totpThresholdCents) }))}</p>` +
       termsRow +
+      `<p class="wm-note">${esc(
+        // The bond figure is SERVER-computed and shipped on the listing view:
+        // the client computes no money (the PRD rule).
+        t('hudChrome.wocMarket.bidBondNote', { usd: this.usd(d.row.minNextBidBondCents) }),
+      )}</p>` +
       `<p class="wm-note">${esc(t('hudChrome.wocMarket.variableTokenWarning'))}</p>` +
       `<p class="wm-note">${esc(
         t('hudChrome.wocMarket.settlementDeadlineNote', {
@@ -558,10 +587,14 @@ export class WocMarketWindow {
       )
       .join('');
     const selected = model.sell.rows.find((r) => r.index === this.sellIndex) ?? null;
+    // Selected BY VALUE from painter state (never by index: a server-side
+    // reorder of the allowlist would otherwise silently change the default).
+    const chosenDuration =
+      this.sellDurationHours ?? model.durationsHours[1] ?? model.durationsHours[0] ?? null;
     const durations = model.durationsHours
       .map(
-        (h, i) =>
-          `<option value="${h}" ${i === 1 ? 'selected' : ''}>${esc(
+        (h) =>
+          `<option value="${h}" ${h === chosenDuration ? 'selected' : ''}>${esc(
             t('hudChrome.wocMarket.sellDurationHours', { hours: formatNumber(h) }),
           )}</option>`,
       )
@@ -570,16 +603,16 @@ export class WocMarketWindow {
       ? `<div class="wm-sell-form">` +
         `<label>${esc(t('hudChrome.wocMarket.sellFormat'))}` +
         `<select data-field="sell-format" data-focus-key="wm-sell-format">` +
-        `<option value="auction">${esc(t('hudChrome.wocMarket.sellFormatAuction'))}</option>` +
-        `<option value="buy_now">${esc(t('hudChrome.wocMarket.sellFormatBuyNow'))}</option>` +
-        `<option value="auction_buy_now">${esc(t('hudChrome.wocMarket.sellFormatAuctionBuyNow'))}</option>` +
+        `<option value="auction" ${this.sellFormat === 'auction' ? 'selected' : ''}>${esc(t('hudChrome.wocMarket.sellFormatAuction'))}</option>` +
+        `<option value="buy_now" ${this.sellFormat === 'buy_now' ? 'selected' : ''}>${esc(t('hudChrome.wocMarket.sellFormatBuyNow'))}</option>` +
+        `<option value="auction_buy_now" ${this.sellFormat === 'auction_buy_now' ? 'selected' : ''}>${esc(t('hudChrome.wocMarket.sellFormatAuctionBuyNow'))}</option>` +
         `</select></label>` +
         `<label>${esc(t('hudChrome.wocMarket.sellStart'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-start" data-focus-key="wm-sell-start" /></label>` +
         `<label>${esc(t('hudChrome.wocMarket.sellReserve'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-reserve" data-focus-key="wm-sell-reserve" /></label>` +
         `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellReserveNote'))}</p>` +
         `<label>${esc(t('hudChrome.wocMarket.sellBuyNowPrice'))}<input type="number" inputmode="decimal" min="0" step="0.25" data-field="sell-buy-now" data-focus-key="wm-sell-buy-now" /></label>` +
         `<label>${esc(t('hudChrome.wocMarket.sellDuration'))}<select data-field="sell-duration" data-focus-key="wm-sell-duration">${durations}</select></label>` +
-        `<label class="wm-offer-next"><input type="checkbox" data-field="sell-offer-next" data-focus-key="wm-sell-offer-next" /> ${esc(
+        `<label class="wm-offer-next"><input type="checkbox" data-field="sell-offer-next" data-focus-key="wm-sell-offer-next" ${this.sellOfferNext ? 'checked' : ''} /> ${esc(
           t('hudChrome.wocMarket.sellOfferNext'),
         )}</label>` +
         `<p class="wm-note">${esc(t('hudChrome.wocMarket.sellFeeNote'))}</p>` +
@@ -710,13 +743,17 @@ export class WocMarketWindow {
     const q = pending.quote;
     const remainingMs = q.expiresAtMs === null ? 0 : Math.max(0, q.expiresAtMs - Date.now());
     const expired = remainingMs <= 0;
+    // With no cached USD label, the token legs below carry the amount rather
+    // than a fabricated $0.00.
     const title =
-      pending.kind === 'bond'
-        ? t('hudChrome.wocMarket.quoteBondFor', { usd: this.usd(pending.usdCents) })
-        : t('hudChrome.wocMarket.quoteSettlementFor', {
-            item: this.itemName(pending.itemId),
-            usd: this.usd(pending.usdCents),
-          });
+      pending.usdCents === null
+        ? t('hudChrome.wocMarket.quoteTitle')
+        : pending.kind === 'bond'
+          ? t('hudChrome.wocMarket.quoteBondFor', { usd: this.usd(pending.usdCents) })
+          : t('hudChrome.wocMarket.quoteSettlementFor', {
+              item: this.itemName(pending.itemId),
+              usd: this.usd(pending.usdCents),
+            });
     const legs =
       (q.amount
         ? `<p>${esc(t('hudChrome.wocMarket.quoteTotal', { tokens: this.tokens(q.amount.tokens) }))}</p>`
@@ -782,6 +819,27 @@ export class WocMarketWindow {
     const target = e.target as HTMLElement | null;
     if (!target) return;
     const field = target.getAttribute('data-field');
+    if (field === 'sell-format') {
+      const value = (target as HTMLSelectElement).value;
+      if (value === 'auction' || value === 'buy_now' || value === 'auction_buy_now') {
+        this.sellFormat = value;
+        this.render();
+      }
+      return;
+    }
+    if (field === 'sell-duration') {
+      const value = Number((target as HTMLSelectElement).value);
+      if (Number.isFinite(value)) this.sellDurationHours = value;
+      return;
+    }
+    if (field === 'sell-offer-next') {
+      this.sellOfferNext = (target as HTMLInputElement).checked;
+      return;
+    }
+    if (field === 'accept-terms') {
+      this.acceptTerms = (target as HTMLInputElement).checked;
+      return;
+    }
     if (field === 'sort') {
       const value = (target as HTMLSelectElement).value;
       if (
@@ -805,14 +863,19 @@ export class WocMarketWindow {
   }
 
   private onClick(e: Event): void {
-    const target = (e.target as HTMLElement | null)?.closest<HTMLElement>('[data-action], .wm-row');
+    const target = (e.target as HTMLElement | null)?.closest<HTMLElement>(
+      '[data-action], .wm-row-open, .wm-row',
+    );
     if (!target) return;
     const action = target.getAttribute('data-action');
     if (action === 'close') {
       this.close();
       return;
     }
-    if (!action && target.classList.contains('wm-row')) {
+    if (
+      !action &&
+      (target.classList.contains('wm-row-open') || target.classList.contains('wm-row'))
+    ) {
       const id = Number(target.getAttribute('data-listing'));
       if (Number.isFinite(id)) void this.selectListing(id);
       return;
@@ -887,7 +950,7 @@ export class WocMarketWindow {
   }
 
   private acceptTermsChecked(): boolean {
-    return this.field<HTMLInputElement>('[data-field="accept-terms"]')?.checked === true;
+    return this.acceptTerms;
   }
 
   private totpValue(): string | null {
@@ -1026,7 +1089,14 @@ export class WocMarketWindow {
         this.fail(out.code);
         return;
       }
-      this.pendingQuote = { kind: 'bond', bidId, usdCents: bid?.bondCents ?? 0, quote: out.bond };
+      this.pendingQuote = {
+        kind: 'bond',
+        bidId,
+        // The quote's own amount is authoritative; the cached row is only a
+        // label hint, so never render a fabricated $0.00 for a real charge.
+        usdCents: bid?.bondCents ?? null,
+        quote: out.bond,
+      };
     });
   }
 
@@ -1045,7 +1115,7 @@ export class WocMarketWindow {
         kind: 'settlement',
         settlementId,
         itemId: listing?.itemId ?? '',
-        usdCents: settlement?.amountCents ?? 0,
+        usdCents: settlement?.amountCents ?? null,
         quote: out.quote,
       };
     });

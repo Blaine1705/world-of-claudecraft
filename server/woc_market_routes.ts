@@ -24,6 +24,7 @@ import {
   WOC_MARKET_CONFIRM_POLICY,
   WOC_MARKET_LIST_POLICY,
   WOC_MARKET_QUOTE_POLICY,
+  WOC_MARKET_READ_POLICY,
 } from './http/middleware/rate_limit';
 import type { AdminAuthDb } from './http/middleware/require_admin';
 import {
@@ -49,6 +50,7 @@ import type {
   WocStrikeRow,
 } from './woc_market';
 import {
+  bondCents,
   minNextBidCents,
   WOC_MARKET_DURATION_HOURS,
   WOC_MARKET_MAX_PRICE_CENTS,
@@ -63,6 +65,8 @@ import {
 // ---------------------------------------------------------------------------
 
 const DEFAULT_TOTP_THRESHOLD_CENTS = 10_000; // $100
+/** Deepest browse page a client may request (25 per page). */
+const MAX_BROWSE_PAGE = 400;
 
 export function wocMarketConfig(): WocMarketConfig {
   const excluded = (process.env.WOC_MARKET_EXCLUDED_ITEM_IDS ?? '')
@@ -242,6 +246,7 @@ function listingView(row: WocListingRow, viewerAccount: number | null): Record<s
     resolution: row.resolution,
     currentBidCents: row.currentBidCents,
     minNextBidCents: minNextBidCents(row.currentBidCents, row.startCents),
+    minNextBidBondCents: bondCents(minNextBidCents(row.currentBidCents, row.startCents)),
     buyNowLocked:
       row.buyNowLockAccount !== null &&
       row.buyNowLockExpiresMs !== null &&
@@ -360,8 +365,13 @@ async function browseHandler(ctx: Ctx): Promise<void> {
           .split(',')
           .map((s) => s.trim())
           .filter((s) => s !== '')
-          .slice(0, 50);
-  const page = Math.max(0, Math.floor(Number(one(ctx.query.page) ?? '0')) || 0);
+          .slice(0, 50)
+          .map((id) => stringField(id, 128));
+  // Validated like every other numeric on this surface: an unclamped page
+  // became the SQL OFFSET, so 1e400 reached Postgres as Infinity (a 500 on
+  // client input) and huge finite values forced a full index walk.
+  const pageRaw = one(ctx.query.page);
+  const page = pageRaw === null ? 0 : intField(Number(pageRaw), 0, MAX_BROWSE_PAGE);
   const q: WocBrowseQuery = {
     page,
     pageSize: 25,
@@ -371,9 +381,11 @@ async function browseHandler(ctx: Ctx): Promise<void> {
     sort: sortRaw as WocBrowseQuery['sort'],
   };
   const viewer = ctxAccountId(ctx);
-  const { rows, total } = await useService().browse(q);
+  // hasMore, not a total: the count query forced a full read of every live
+  // listing per page, and the pager only needs to know if a next page exists.
+  const { rows, hasMore } = await useService().browse(q);
   json(ctx.res, 200, {
-    total,
+    hasMore,
     page,
     pageSize: q.pageSize,
     listings: rows.map((row) => listingView(row, viewer)),

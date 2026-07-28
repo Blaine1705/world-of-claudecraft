@@ -22,7 +22,7 @@ export const WOC_MARKET_SWEEP_POLL_MS = 5_000;
 
 export interface WocMarketSweepLockClient {
   query(sql: string, params?: unknown[]): Promise<{ rows: Array<Record<string, unknown>> }>;
-  release(): void;
+  release(destroy?: boolean): void;
 }
 
 export interface WocMarketSweepDeps {
@@ -49,24 +49,41 @@ export function createWocMarketSweep(deps: WocMarketSweepDeps): WocMarketSweep {
 
   async function guardedPass(): Promise<void> {
     const client = await deps.connect();
+    // Poisoned-lock hazard (the retention_sweep.ts rationale, verbatim): a
+    // client whose lock or unlock query failed may still hold the SESSION
+    // advisory lock, and a pooled connection lives for hours. While it sits in
+    // the pool the lock stays taken and every future pass for this realm loses
+    // the try-lock, so the marketplace silently stops closing auctions and
+    // expiring settlements. Both arms destroy the connection instead of
+    // pooling it: ending the backend session drops its locks.
+    let destroyClient = false;
     try {
-      const res = await client.query('SELECT pg_try_advisory_lock($1, hashtext($2)) AS ok', [
-        WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY,
-        deps.realm,
-      ]);
-      if (res.rows[0]?.ok !== true) return; // a peer is sweeping this realm
+      let acquired = false;
+      try {
+        const res = await client.query('SELECT pg_try_advisory_lock($1, hashtext($2)) AS ok', [
+          WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY,
+          deps.realm,
+        ]);
+        acquired = res.rows[0]?.ok === true;
+      } catch (err) {
+        destroyClient = true;
+        throw err;
+      }
+      if (!acquired) return; // a peer is sweeping this realm
       try {
         await deps.pass();
       } finally {
-        await client
-          .query('SELECT pg_advisory_unlock($1, hashtext($2))', [
+        try {
+          await client.query('SELECT pg_advisory_unlock($1, hashtext($2))', [
             WOC_MARKET_SWEEP_ADVISORY_LOCK_KEY,
             deps.realm,
-          ])
-          .catch(() => {});
+          ]);
+        } catch {
+          destroyClient = true;
+        }
       }
     } finally {
-      client.release();
+      client.release(destroyClient || undefined);
     }
   }
 

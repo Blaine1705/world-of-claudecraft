@@ -75,7 +75,7 @@ export function createWocMarketCustody(host: WocCustodyGameHost): WocMarketCusto
       // narrow race): the leave flush already saved bags without the copy, so
       // hand it back by return parcel instead. Best-effort persist; the
       // parcel also rides the next ordinary mail save.
-      host.sim.postOffice.mailSystemParcel(
+      host.sim.mailSystemParcel(
         { key: String(characterId), name: String(characterId) },
         WOC_MARKET_RETURN_LETTER,
         [slot],
@@ -89,7 +89,7 @@ export function createWocMarketCustody(host: WocCustodyGameHost): WocMarketCusto
       items: InvSlot[],
       custodyRef: string,
     ): Promise<void> {
-      host.sim.postOffice.mailSystemParcel(recipient, LETTERS[letter], items, custodyRef);
+      host.sim.mailSystemParcel(recipient, LETTERS[letter], items, custodyRef);
       // Failure here PROPAGATES: the caller must not advance its settlement
       // or dispose flag until the blob holding the parcel is durable. The
       // in-memory letter stays booked; the custodyRef dedupe makes the retry

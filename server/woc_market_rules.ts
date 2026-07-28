@@ -34,8 +34,12 @@ export const WOC_MARKET_MAX_ACTIVE_LISTINGS = 12;
 /** Price floor and ceiling for every USD field. */
 export const WOC_MARKET_MIN_PRICE_CENTS = 25;
 export const WOC_MARKET_MAX_PRICE_CENTS = 5_000_000;
-/** The buy-now server lock: one pending buyer at a time, quote-lifetime long. */
-export const WOC_MARKET_BUY_NOW_LOCK_SECONDS = WOC_MARKET_QUOTE_TTL_SECONDS;
+/** The buy-now server lock: one pending buyer at a time. Longer than one quote
+ *  lifetime on purpose, so an honest buyer whose first quote expires still has
+ *  window left to request a fresh one. */
+export const WOC_MARKET_BUY_NOW_LOCK_SECONDS = WOC_MARKET_QUOTE_TTL_SECONDS * 3;
+/** How long a listing may sit mid-resolution before the sweep reclaims it. */
+export const WOC_MARKET_STRANDED_RECLAIM_SECONDS = 300;
 
 // ---------------------------------------------------------------------------
 // Bidding math
@@ -241,15 +245,6 @@ export function listingEligibility(
 // State machines (listing / bid / settlement)
 // ---------------------------------------------------------------------------
 
-export type WocListingStatus =
-  | 'active' // accepting bids / buy-now
-  | 'ending' // claimed by the sweep, winner resolution in progress
-  | 'settling' // a settlement is offered or confirming
-  | 'sold' // settled and delivered
-  | 'returned' // ended without a sale, item flown home
-  | 'cancelled' // withdrawn pre-bid (or by support)
-  | 'suspended'; // moderation hold
-
 export type WocBidStatus =
   | 'pending_bond' // placed, bond intent issued, unconfirmed
   | 'active' // bond confirmed, standing
@@ -257,7 +252,6 @@ export type WocBidStatus =
   | 'lapsed' // bond never confirmed in time
   | 'won' // selected at close
   | 'defaulted' // won and failed to settle (bond forfeited)
-  | 'lost' // auction closed below this bid (bond refund owed)
   | 'cancelled'; // listing cancelled/suspended (bond refund owed)
 
 export type WocSettlementState =

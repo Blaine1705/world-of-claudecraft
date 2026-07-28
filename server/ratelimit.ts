@@ -749,7 +749,9 @@ export const WOC_MARKET_BID_MAX_PER_MINUTE = 20;
 export const WOC_MARKET_QUOTE_MAX_PER_MINUTE = 30;
 export const WOC_MARKET_CONFIRM_MAX_PER_MINUTE = 60;
 
-export type WocMarketMutationAction = 'list' | 'bid' | 'quote' | 'confirm';
+export const WOC_MARKET_READ_MAX_PER_MINUTE = 120;
+
+export type WocMarketMutationAction = 'list' | 'bid' | 'quote' | 'confirm' | 'read';
 
 const wocMarketMutationIpAttempts = new Map<string, number[]>();
 const wocMarketMutationAccountAttempts = new Map<string, number[]>();
@@ -764,6 +766,8 @@ export function wocMarketMutationLimit(action: WocMarketMutationAction): number 
       return WOC_MARKET_QUOTE_MAX_PER_MINUTE;
     case 'confirm':
       return WOC_MARKET_CONFIRM_MAX_PER_MINUTE;
+    case 'read':
+      return WOC_MARKET_READ_MAX_PER_MINUTE;
   }
 }
 

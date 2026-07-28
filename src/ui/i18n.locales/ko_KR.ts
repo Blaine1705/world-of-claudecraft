@@ -8598,7 +8598,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.buyNowLockedBadge': '구매 진행 중',
   'hudChrome.wocMarket.pagePrev': '이전 페이지',
   'hudChrome.wocMarket.pageNext': '다음 페이지',
-  'hudChrome.wocMarket.pageStatus': '{total}페이지 중 {current}페이지',
+  'hudChrome.wocMarket.pageNumber': '{current}페이지',
   'hudChrome.wocMarket.sortLabel': '정렬',
   'hudChrome.wocMarket.sortEnding': '종료 임박순',
   'hudChrome.wocMarket.sortNewest': '최신순',
@@ -8646,6 +8646,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.quoteBondFor': '{usd} 입찰에 대한 보증금',
   'hudChrome.wocMarket.quoteSettlementFor': '{item} 정산: {usd}',
   'hudChrome.wocMarket.signing': '지갑 승인을 기다리는 중...',
+  'hudChrome.wocMarket.signFailed':
+    '지갑이 결제를 완료하지 못했습니다. 지갑을 확인한 뒤 다시 시도하세요.',
   'hudChrome.wocMarket.confirming': '체인에서 확인 중...',
   'hudChrome.wocMarket.bidPlacedStanding': '입찰이 확정되었습니다. 현재 최고 입찰자입니다.',
   'hudChrome.wocMarket.bidPlacedOutbid': '보증금은 확인되었지만 더 높은 입찰이 먼저 들어왔습니다.',

@@ -222,6 +222,33 @@ Eligibility is a per-server policy, not a hardcoded rule set
 - **Server authority**: every auction outcome, custody move, and delivery
   resolves server-side; the client is a renderer.
 
+## Rollback and mixed-fleet safety (forward-only once enabled)
+
+The schema itself is additive and idempotent, so a binary rollback needs no DDL
+change. Two pieces of persisted state are NOT downgrade-safe, so **once
+`WOC_MARKET_ENABLED=1` has run on a realm, that realm is forward-only** (the
+bank-rollout precedent in `server/CLAUDE.md`):
+
+- **Custody parcels carry instance payloads.** A pre-v0.32 mail loader mapped
+  attachments to `{ itemId, count }` only, so booting an older binary rewrites
+  the realm mail blob and strips the payload: an escrowed rolled epic returns
+  as a plain copy.
+- **The mail blob's `custodyRef` marker is advisory only.** An older loader
+  drops it, and a player can delete an emptied custody letter. That is exactly
+  why the authoritative book-once ledger is the `woc_market_custody_claims`
+  table, which a downgrade cannot erase: a worker CLAIMS a ref in Postgres
+  before booking the parcel, so a retry after any crash or rollback is a no-op
+  rather than a second copy.
+
+Before an intentional rollback of an enabled realm, drain custody: let the
+sweep finish every settlement in `delivering` and every `status='closed' AND
+item_disposed=false` listing (both are bounded backlogs the sweep retries),
+then confirm `SELECT count(*) FROM woc_market_custody_claims WHERE booked_at IS
+NULL` is zero. A non-zero count means an item is held with its parcel unbooked:
+that is the deliberate failure direction (visible and stuck, never duplicated),
+and it needs an operator to re-run the sweep or hand the item back before the
+downgrade.
+
 ## Launch gates (policy deltas this feature introduces)
 
 This feature deliberately supersedes two standing positions, and MUST NOT be
@@ -246,12 +273,14 @@ enabled on a production realm until they are reconciled:
 ## Implemented behavior (hook points)
 
 - Server domain: `server/woc_market_routes.ts` (RouteDef surface),
-  `server/woc_market_service.ts` (lifecycle behind injected deps),
+  `server/woc_market.ts` (lifecycle behind injected deps),
   `server/woc_market_rules.ts` (pure increments, anti-snipe, bond, eligibility,
   strike ladder), `server/woc_market_db.ts` (`WOC_MARKET_SCHEMA`, SQL),
-  `server/woc_market_proxy.ts` (economy-service client),
-  `server/woc_market_dev_service.ts` (dev-only in-memory service, refused in
-  production), sweep registration in `server/main.ts`.
+  `server/woc_market_proxy.ts` (economy-service client, plus the dev-only
+  in-memory arm `createDevWocMarketEconomy`, wired only when
+  `ALLOW_DEV_COMMANDS=1` and `WOC_MARKET_DEV_SERVICE=1`),
+  `server/woc_market_sweep.ts` (the per-realm advisory-locked sweep shell),
+  wiring and sweep registration in `server/main.ts`.
 - Sim custody: `src/sim/inventory_extract.ts` (exact-copy escrow extraction),
   system-mail delivery through the existing `PostOffice`.
 - Client: `src/net/woc_market_sdk.ts` (typed, never-throws),

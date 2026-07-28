@@ -3017,6 +3017,12 @@ export class Hud {
     $('#mm-cardduel').addEventListener('click', () => this.toggleCardDuel());
     $('#mm-leaderboard').addEventListener('click', () => this.toggleLeaderboard());
     $('#mm-wocmarket')?.addEventListener('click', () => this.toggleWocMarket());
+    // The mobile More tray is the ONLY reachable launcher under
+    // body.mobile-touch (#side-buttons is display:none there), and mobile web
+    // is in the PRD's scope, so both entry points are wired.
+    document
+      .getElementById('mobile-wocmarket')
+      ?.addEventListener('click', () => this.toggleWocMarket());
     $('#mm-discord')?.addEventListener('click', () => this.discordHook?.());
     const emoteBtn = $('#mm-emote');
     emoteBtn.addEventListener('click', (ev) => {
@@ -17548,8 +17554,9 @@ export class Hud {
    *  reveal its launcher; without this call the surface stays fully absent. */
   attachWocMarket(hooks: WocMarketHooks): void {
     this.wocMarketHooks = hooks;
-    const button = document.getElementById('mm-wocmarket');
-    if (button) button.hidden = false;
+    for (const id of ['mm-wocmarket', 'mobile-wocmarket']) {
+      document.getElementById(id)?.removeAttribute('hidden');
+    }
   }
 
   toggleWocMarket(): void {

@@ -63,11 +63,35 @@ CREATE TABLE IF NOT EXISTS woc_market_listings (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
--- The sweep's due-claim and the default browse sort both seek on this.
+-- The sweep's due-claim seeks on this (realm + status='active' + ends_at).
 CREATE INDEX IF NOT EXISTS woc_market_listings_realm_status_ends
   ON woc_market_listings(realm, status, ends_at);
-CREATE INDEX IF NOT EXISTS woc_market_listings_seller
-  ON woc_market_listings(seller_account, status);
+-- Browse sorts: a three-status IN() over the index above is not an ordered
+-- path, so each sort gets a partial index over the live set instead. Measured
+-- before these existed: a realm at its listing cap planned a parallel seq scan
+-- with a 3 MB external merge sort per page.
+CREATE INDEX IF NOT EXISTS woc_market_listings_live_ends
+  ON woc_market_listings(realm, ends_at, id)
+  WHERE status <> 'closed';
+CREATE INDEX IF NOT EXISTS woc_market_listings_live_created
+  ON woc_market_listings(realm, created_at DESC, id)
+  WHERE status <> 'closed';
+-- The price sorts order by this exact expression; the index text must match
+-- the query text verbatim for the planner to use it (the LIFETIME_XP_EXPR rule).
+CREATE INDEX IF NOT EXISTS woc_market_listings_live_price
+  ON woc_market_listings(realm, COALESCE(current_bid_cents, start_cents), id)
+  WHERE status <> 'closed';
+-- The item-id search filter.
+CREATE INDEX IF NOT EXISTS woc_market_listings_live_item
+  ON woc_market_listings(realm, item_id)
+  WHERE status <> 'closed';
+-- Seller reads: the activity tab pages newest-first, and the cap counts the
+-- live set. Both were previously filtering realm after seeking the account.
+CREATE INDEX IF NOT EXISTS woc_market_listings_seller_created
+  ON woc_market_listings(realm, seller_account, created_at DESC);
+CREATE INDEX IF NOT EXISTS woc_market_listings_seller_live
+  ON woc_market_listings(realm, seller_account)
+  WHERE status <> 'closed';
 -- The return-flight reconciliation backlog: closed rows still holding a copy.
 CREATE INDEX IF NOT EXISTS woc_market_listings_undisposed
   ON woc_market_listings(realm, updated_at)
@@ -101,9 +125,10 @@ CREATE INDEX IF NOT EXISTS woc_market_bids_account ON woc_market_bids(account, p
 CREATE INDEX IF NOT EXISTS woc_market_bids_bond_due
   ON woc_market_bids(realm, placed_at)
   WHERE bond_state IN ('refund_due', 'forfeit_due');
--- The lapse sweep (unconfirmed bonds past their TTL).
+-- The lapse sweep (unconfirmed bonds past their TTL), realm-scoped so one
+-- realm's pass cannot spend its batch budget on a peer realm's bids.
 CREATE INDEX IF NOT EXISTS woc_market_bids_pending
-  ON woc_market_bids(placed_at)
+  ON woc_market_bids(realm, placed_at)
   WHERE status = 'pending_bond';
 
 CREATE TABLE IF NOT EXISTS woc_market_settlements (
@@ -121,6 +146,8 @@ CREATE TABLE IF NOT EXISTS woc_market_settlements (
     CHECK (state IN ('offered', 'confirming', 'confirmed', 'delivering', 'delivered', 'expired', 'failed')),
   quote_reference TEXT,
   quote_expires TIMESTAMPTZ,
+  -- Base-unit token amount from the stamped quote, kept for sale provenance.
+  settled_amount_base TEXT,
   tx_signature TEXT UNIQUE,
   fail_reason TEXT,
   deadline_at TIMESTAMPTZ NOT NULL,
@@ -133,8 +160,20 @@ CREATE UNIQUE INDEX IF NOT EXISTS woc_market_settlements_live
   WHERE state IN ('offered', 'confirming', 'confirmed', 'delivering');
 CREATE INDEX IF NOT EXISTS woc_market_settlements_state
   ON woc_market_settlements(realm, state, deadline_at);
+-- The confirming/delivering backlog arms order by updated_at; without this
+-- they scanned the live-settlement index and sorted.
+CREATE INDEX IF NOT EXISTS woc_market_settlements_state_updated
+  ON woc_market_settlements(realm, state, updated_at);
 CREATE INDEX IF NOT EXISTS woc_market_settlements_buyer
   ON woc_market_settlements(buyer_account, created_at DESC);
+-- Postgres does not auto-index the referencing side of an FK. Without these,
+-- every listing the retention prune deletes runs one sequential scan of the
+-- settlements table per row (ON DELETE CASCADE), and every cascaded bid
+-- delete runs another (ON DELETE SET NULL on bid_id).
+CREATE INDEX IF NOT EXISTS woc_market_settlements_listing
+  ON woc_market_settlements(listing_id);
+CREATE INDEX IF NOT EXISTS woc_market_settlements_bid
+  ON woc_market_settlements(bid_id);
 
 -- Provenance and public price history. KEEP FOREVER by default: sales are the
 -- marketplace's provenance record (docs/prd/woc/marketplace.md "Integrity");
@@ -157,6 +196,25 @@ CREATE TABLE IF NOT EXISTS woc_market_sales (
 CREATE INDEX IF NOT EXISTS woc_market_sales_item
   ON woc_market_sales(realm, item_id, created_at DESC);
 
+-- The DURABLE book-once ledger for custody parcels. The mail book lives in a
+-- JSONB blob whose per-letter marker a player can delete (an emptied letter is
+-- deletable) and which an older binary's loader would strip, so the blob can
+-- never be the authority for "this parcel was already booked". A worker CLAIMS
+-- the ref here first and books the parcel only on a fresh claim: the unique
+-- constraint makes a retry a no-op. Failure direction is deliberate: a claim
+-- with no parcel leaves the item held and VISIBLE to the operator (the row's
+-- booked_at stays null), never silently duplicated.
+CREATE TABLE IF NOT EXISTS woc_market_custody_claims (
+  custody_ref TEXT PRIMARY KEY,
+  realm TEXT NOT NULL,
+  claimed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  booked_at TIMESTAMPTZ
+);
+-- The operator/diagnostic read: claims that never completed their booking.
+CREATE INDEX IF NOT EXISTS woc_market_custody_claims_unbooked
+  ON woc_market_custody_claims(realm, claimed_at)
+  WHERE booked_at IS NULL;
+
 -- Account-scoped (deliberately realm-free): defaults follow the account.
 CREATE TABLE IF NOT EXISTS woc_market_strikes (
   account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
@@ -173,6 +231,11 @@ CREATE TABLE IF NOT EXISTS woc_market_terms (
 );
 `;
 
+/** Lock-wait ceiling for the escrow transaction's accounts row. Short on
+ *  purpose: a blocked escrow holds a pooled client, and the pool is shared
+ *  with the game loop's autosave and the WS handshake. */
+const ESCROW_LOCK_TIMEOUT_MS = 2_000;
+
 const LISTING_COLS =
   'id, realm, seller_account, seller_character, seller_name, seller_wallet, item, item_id, ' +
   'quality, format, start_cents, reserve_cents, buy_now_cents, offer_next, status, resolution, ' +
@@ -185,7 +248,8 @@ const BID_COLS =
 
 const SETTLEMENT_COLS =
   'id, listing_id, bid_id, attempt, buyer_account, buyer_character, buyer_name, buyer_wallet, ' +
-  'amount_cents, state, quote_reference, quote_expires, tx_signature, fail_reason, deadline_at, created_at';
+  'amount_cents, state, quote_reference, quote_expires, settled_amount_base, tx_signature, ' +
+  'fail_reason, deadline_at, created_at';
 
 function ms(value: unknown): number {
   return value instanceof Date ? value.getTime() : new Date(String(value)).getTime();
@@ -261,6 +325,7 @@ function toSettlement(row: Row): WocSettlementRow {
     quoteExpiresAtMs: msOrNull(row.quote_expires),
     txSignature: row.tx_signature ?? null,
     failReason: row.fail_reason ?? null,
+    settledAmountBase: row.settled_amount_base ?? null,
     deadlineAtMs: ms(row.deadline_at),
     createdAtMs: ms(row.created_at),
   };
@@ -319,20 +384,17 @@ export class PgWocMarketDb implements WocMarketDb {
   ): Promise<{ ok: true; id: number } | { ok: false; reason: 'lease_lost' | 'cap_reached' }> {
     return this.withTx(async (client) => {
       // A logout-race save should wait out a slow database, not lose the
-      // escrow halves (the saveCharacterAndMarketState rationale).
+      // escrow halves (the saveCharacterAndMarketState rationale). The LOCK
+      // wait is bounded separately and tightly: without lock_timeout, ten
+      // rate-limit-compliant listings for one account can each block up to the
+      // heavy allowance on the same accounts row and pin the whole pool
+      // (DB_POOL_MAX_CLIENTS), starving the game loop's own saves.
       await client.query(`SET LOCAL statement_timeout = ${DB_HEAVY_STATEMENT_TIMEOUT_MS}`);
-      const saved = await saveCharacterStateOnClient(
-        client,
-        save.characterId,
-        save.level,
-        save.state,
-        save.leaseNonce,
-      );
-      if (!saved) {
-        throw new TxAbort({ ok: false as const, reason: 'lease_lost' as const });
-      }
-      // The createCharacterCapped shape: lock the account row so two
-      // concurrent listings cannot both slip under the cap.
+      await client.query(`SET LOCAL lock_timeout = ${ESCROW_LOCK_TIMEOUT_MS}`);
+      // Lock ORDER is accounts-then-characters, matching every established
+      // capped-insert path (db.ts createCharacterCapped, maps_db, user_assets_db),
+      // so no future accounts-first path can deadlock against this one. The cap
+      // is counted under the lock and NOT re-counted outside it.
       await client.query('SELECT 1 FROM accounts WHERE id = $1 FOR UPDATE', [
         listing.sellerAccount,
       ]);
@@ -342,8 +404,17 @@ export class PgWocMarketDb implements WocMarketDb {
         [listing.realm, listing.sellerAccount],
       );
       if ((count.rows[0]?.n ?? 0) >= WOC_MARKET_MAX_ACTIVE_LISTINGS) {
-        // The character UPDATE above must not survive a refused listing.
         throw new TxAbort({ ok: false as const, reason: 'cap_reached' as const });
+      }
+      const saved = await saveCharacterStateOnClient(
+        client,
+        save.characterId,
+        save.level,
+        save.state,
+        save.leaseNonce,
+      );
+      if (!saved) {
+        throw new TxAbort({ ok: false as const, reason: 'lease_lost' as const });
       }
       const inserted = await client.query(
         `INSERT INTO woc_market_listings (
@@ -385,7 +456,7 @@ export class PgWocMarketDb implements WocMarketDb {
   async browseListings(
     realm: string,
     q: WocBrowseQuery,
-  ): Promise<{ rows: WocListingRow[]; total: number }> {
+  ): Promise<{ rows: WocListingRow[]; hasMore: boolean }> {
     const where: string[] = ['realm = $1', "status IN ('active', 'settling', 'ending')"];
     const params: unknown[] = [realm];
     if (q.quality) {
@@ -410,20 +481,26 @@ export class PgWocMarketDb implements WocMarketDb {
             : 'ends_at ASC, id';
     const pageSize = Math.min(Math.max(1, q.pageSize), 50);
     const offset = Math.max(0, q.page) * pageSize;
-    params.push(pageSize, offset);
+    // A has-more PROBE, never COUNT(*) OVER(): the window count forces a read
+    // of every live listing on every page, which measured as a parallel seq
+    // scan plus an external merge sort at a realm's listing cap. The client
+    // pager only needs to know whether a next page exists.
+    params.push(pageSize + 1, offset);
     const res = await this.pool.query(
-      `SELECT ${LISTING_COLS}, COUNT(*) OVER() AS total
+      `SELECT ${LISTING_COLS}
          FROM woc_market_listings
         WHERE ${where.join(' AND ')}
         ORDER BY ${order}
         LIMIT $${params.length - 1} OFFSET $${params.length}`,
       params,
     );
-    const total = res.rows[0] ? Number(res.rows[0].total) : 0;
-    return { rows: res.rows.map(toListing), total };
+    const hasMore = res.rows.length > pageSize;
+    const rows = (hasMore ? res.rows.slice(0, pageSize) : res.rows).map(toListing);
+    return { rows, hasMore };
   }
 
   async listingsBySeller(realm: string, account: number): Promise<WocListingRow[]> {
+    // Ordered by the woc_market_listings_seller_created index.
     const res = await this.pool.query(
       `SELECT ${LISTING_COLS} FROM woc_market_listings
         WHERE realm = $1 AND seller_account = $2
@@ -515,6 +592,56 @@ export class PgWocMarketDb implements WocMarketDb {
       [realm, limit],
     );
     return res.rows.map(toListing);
+  }
+
+  async strandedListings(
+    realm: string,
+    olderThanMs: number,
+    limit: number,
+  ): Promise<WocListingRow[]> {
+    const res = await this.pool.query(
+      `SELECT ${LISTING_COLS} FROM woc_market_listings
+        WHERE realm = $1 AND status IN ('ending', 'settling')
+          AND updated_at <= to_timestamp($2 / 1000.0)
+        ORDER BY updated_at
+        LIMIT $3`,
+      [realm, olderThanMs, limit],
+    );
+    return res.rows.map(toListing);
+  }
+
+  async reopenListing(id: number): Promise<void> {
+    await this.pool.query(
+      `UPDATE woc_market_listings SET status = 'active', updated_at = now()
+        WHERE id = $1 AND status IN ('ending', 'settling')`,
+      [id],
+    );
+  }
+
+  async claimCustodyRef(realm: string, custodyRef: string): Promise<boolean> {
+    const res = await this.pool.query(
+      `INSERT INTO woc_market_custody_claims (custody_ref, realm)
+       VALUES ($2, $1)
+       ON CONFLICT (custody_ref) DO NOTHING`,
+      [realm, custodyRef],
+    );
+    return (res.rowCount ?? 0) > 0;
+  }
+
+  async markCustodyRefBooked(custodyRef: string): Promise<void> {
+    await this.pool.query(
+      `UPDATE woc_market_custody_claims SET booked_at = now()
+        WHERE custody_ref = $1 AND booked_at IS NULL`,
+      [custodyRef],
+    );
+  }
+
+  async unclaimCustodyRef(custodyRef: string): Promise<void> {
+    await this.pool.query(
+      `DELETE FROM woc_market_custody_claims
+        WHERE custody_ref = $1 AND booked_at IS NULL`,
+      [custodyRef],
+    );
   }
 
   async markItemDisposed(id: number): Promise<void> {
@@ -729,17 +856,18 @@ export class PgWocMarketDb implements WocMarketDb {
     );
   }
 
-  async lapsePendingBids(cutoffMs: number, limit: number): Promise<number> {
+  async lapsePendingBids(realm: string, cutoffMs: number, limit: number): Promise<number> {
     const res = await this.pool.query(
       `UPDATE woc_market_bids
           SET status = 'lapsed', bond_state = 'void'
         WHERE id IN (
           SELECT id FROM woc_market_bids
-           WHERE status = 'pending_bond' AND placed_at <= to_timestamp($1 / 1000.0)
+           WHERE realm = $1
+             AND status = 'pending_bond' AND placed_at <= to_timestamp($2 / 1000.0)
            ORDER BY placed_at
-           LIMIT $2
+           LIMIT $3
            FOR UPDATE SKIP LOCKED)`,
-      [cutoffMs, limit],
+      [realm, cutoffMs, limit],
     );
     return res.rowCount ?? 0;
   }
@@ -897,12 +1025,18 @@ export class PgWocMarketDb implements WocMarketDb {
     return res.rows[0] ? toSettlement(res.rows[0]) : null;
   }
 
-  async setSettlementQuote(id: number, reference: string, expiresAtMs: number): Promise<boolean> {
+  async setSettlementQuote(
+    id: number,
+    reference: string,
+    expiresAtMs: number,
+    amountBase: string | null,
+  ): Promise<boolean> {
     const res = await this.pool.query(
       `UPDATE woc_market_settlements
-          SET quote_reference = $2, quote_expires = to_timestamp($3 / 1000.0), updated_at = now()
+          SET quote_reference = $2, quote_expires = to_timestamp($3 / 1000.0),
+              settled_amount_base = $4, updated_at = now()
         WHERE id = $1 AND state = 'offered'`,
-      [id, reference, expiresAtMs],
+      [id, reference, expiresAtMs, amountBase],
     );
     return (res.rowCount ?? 0) > 0;
   }

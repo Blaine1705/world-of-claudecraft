@@ -11350,6 +11350,22 @@ export class Sim {
     return this.postOffice.mailRevFor(pid);
   }
 
+  // Custody mail (the server's $WOC Exchange escrow returns and deliveries):
+  // thin delegates so a foreign caller resolves these on the Sim facade like
+  // every other mail entry, instead of reaching into sim.postOffice directly.
+  mailSystemParcel(
+    recipient: { key: string; name: string },
+    letter: import('./content/letters').LetterDef,
+    items: InvSlot[],
+    custodyRef?: string,
+  ): boolean {
+    return this.postOffice.mailSystemParcel(recipient, letter, items, custodyRef);
+  }
+
+  hasCustodyParcel(custodyRef: string): boolean {
+    return this.postOffice.hasCustodyParcel(custodyRef);
+  }
+
   mailUnreadFor(pid: number): number {
     return this.postOffice.mailUnreadFor(pid);
   }

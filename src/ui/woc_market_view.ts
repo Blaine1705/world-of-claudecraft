@@ -61,6 +61,8 @@ export interface WocListingView {
   resolution: string | null;
   currentBidCents: number | null;
   minNextBidCents: number;
+  /** Server-computed bond for a bid at minNextBidCents (client computes none). */
+  minNextBidBondCents: number;
   buyNowLocked: boolean;
   endsAtMs: number;
   createdAtMs: number;
@@ -129,7 +131,7 @@ export interface WocMarketViewInput {
   nowMs: number;
   browse: {
     listings: readonly WocListingView[];
-    total: number;
+    hasMore: boolean;
     page: number;
     pageSize: number;
     loading: boolean;
@@ -156,6 +158,7 @@ export interface WocListingRowModel {
   currentCents: number | null;
   startCents: number;
   minNextBidCents: number;
+  minNextBidBondCents: number;
   buyNowCents: number | null;
   buyNowLocked: boolean;
   reserveBadge: 'met' | 'not_met' | null;
@@ -212,9 +215,8 @@ export type WocMarketViewModel =
       maxPriceCents: number;
       browse: {
         rows: WocListingRowModel[];
-        total: number;
+        hasMore: boolean;
         page: number;
-        pageCount: number;
         loading: boolean;
         failed: boolean;
         detail: WocDetailModel | null;
@@ -272,6 +274,7 @@ function listingRow(
     currentCents: listing.currentBidCents,
     startCents: listing.startCents,
     minNextBidCents: listing.minNextBidCents,
+    minNextBidBondCents: listing.minNextBidBondCents,
     buyNowCents: listing.buyNowCents,
     buyNowLocked: listing.buyNowLocked,
     reserveBadge: listing.hasReserve ? (listing.reserveMet ? 'met' : 'not_met') : null,
@@ -347,9 +350,10 @@ export function buildWocMarketView(input: WocMarketViewInput): WocMarketViewMode
     maxPriceCents: status.maxPriceCents,
     browse: {
       rows,
-      total: input.browse.total,
+      // hasMore, not a page count: the server ships a has-more probe rather
+      // than a total (the count query read every live listing per page).
+      hasMore: input.browse.hasMore,
       page: input.browse.page,
-      pageCount: Math.max(1, Math.ceil(input.browse.total / Math.max(1, input.browse.pageSize))),
       loading: input.browse.loading,
       failed: input.browse.failed,
       detail,
@@ -417,7 +421,7 @@ export function wocMarketViewSig(model: WocMarketViewModel): string {
     model.walletLinked ? 1 : 0,
     model.tokensPerUsd ?? '',
     model.browse.page,
-    model.browse.total,
+    model.browse.hasMore ? 1 : 0,
     model.browse.loading ? 1 : 0,
     model.browse.failed ? 1 : 0,
     rows,
