@@ -9,7 +9,7 @@ import {
   switchHobby,
 } from '../professions/archetype';
 import { announceAttunement } from '../professions/attunement_events';
-import { baselineActivePairTierMail, pruneTierMailToActiveMajors } from '../professions/tier_mail';
+import { applyPairTransitionTierMail } from '../professions/tier_mail';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { QuestDef, QuestProgress } from '../types';
@@ -73,15 +73,14 @@ export function applyProfessionQuestEffect(
   if (effect.type === 'attunePair') {
     const target = progress.selection as string;
     if (!attuneArchetypePair(ctx, meta.entityId, target, effect.mode)) return false;
-    // Retire the acknowledged tiers of any craft that just stopped being a
-    // major, THEN baseline the newly-active majors at their current tier,
-    // both BEFORE the next mail sweep: the prune is what makes a later RETURN
-    // re-baseline instead of mailing a retroactive letter for tiers crossed
-    // while the pair was dormant, and the baseline keeps the first letter for
-    // a tier crossed after this attunement only. A craft the old and new pair
-    // share is pruned by neither (still a major) and baselined already.
-    pruneTierMailToActiveMajors(meta);
-    baselineActivePairTierMail(meta);
+    // The shared pair-transition rule (prune stale acknowledgements, then
+    // baseline the new majors), BEFORE the next mail sweep: the prune is what
+    // makes a later RETURN re-baseline instead of mailing a retroactive
+    // letter for tiers crossed while the pair was dormant, and the baseline
+    // keeps the first letter for a tier crossed after this attunement only.
+    // A craft the old and new pair share is pruned by neither (still a
+    // major) and baselined already.
+    applyPairTransitionTierMail(meta);
     // Celebrate: a personal event plus the soft zone broadcast (both new and
     // return modes: returning to a held pair is a celebration too).
     announceAttunement(ctx, meta.entityId, target);

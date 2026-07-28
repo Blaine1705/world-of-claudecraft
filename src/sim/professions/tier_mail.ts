@@ -63,10 +63,10 @@ function activeMajors(meta: PlayerMeta): [string, string] | null {
 }
 
 /** Drop every acknowledged-tier entry that does not belong to the CURRENT
- *  active pair's majors (everything, for an unattuned character). Called on a
- *  pair transition (both the quest attunement path and the legacy
- *  switchArchetype command) and on load, so an entry only ever describes a
- *  craft that is a major RIGHT NOW. Without the prune, an entry survives
+ *  active pair's majors (everything, for an unattuned character). Called on
+ *  every pair transition (via applyPairTransitionTierMail below, all three
+ *  entry points) and on load, so an entry only ever describes a craft that
+ *  is a major RIGHT NOW. Without the prune, an entry survives
  *  switching away, and a RETURN to that pair skips the silent re-baseline arm:
  *  a tier crossed while the pair was dormant would mail a retroactive letter
  *  at the moment of return. Pruned, a return re-baselines at the current tier
@@ -98,6 +98,20 @@ export function baselineActivePairTierMail(meta: PlayerMeta): void {
       meta.tierMailSent.set(craft, tierForSkill(meta.craftSkills[craft] ?? 0));
     }
   }
+}
+
+/** The full pair-transition rule, the one home for every transition entry
+ *  point (the quest attunement path and both legacy sim.ts wrappers): retire
+ *  acknowledgements whose craft just stopped being a major, then baseline the
+ *  new majors at their current tier so a crossing before the next 1 Hz sweep
+ *  books its letter instead of being swallowed by the sweep's silent baseline
+ *  arm. Prune first, baseline second: the baseline must see the post-prune
+ *  record so a returning pair re-arms silently at its CURRENT tier. The load
+ *  path deliberately calls only the prune (see the sim.ts load site for why
+ *  no baseline is needed there). */
+export function applyPairTransitionTierMail(meta: PlayerMeta): void {
+  pruneTierMailToActiveMajors(meta);
+  baselineActivePairTierMail(meta);
 }
 
 /** Evaluate one character: for each of the active pair's two majors, baseline-arm

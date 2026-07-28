@@ -345,7 +345,7 @@ import { updateProfNudges } from './professions/prof_nudges';
 import { healDisplayRoundedProficiency } from './professions/proficiency_display_heal';
 import { type SalvageResult, salvageItem as salvageItemImpl } from './professions/salvage';
 import {
-  baselineActivePairTierMail,
+  applyPairTransitionTierMail,
   normalizeTierMailOnLoad,
   pruneTierMailToActiveMajors,
   updateTierMail,
@@ -9726,15 +9726,10 @@ export class Sim {
     const r = this.resolve(pid);
     if (!r) return false;
     const accepted = acceptArchetypeQuestImpl(this.ctx, r.meta.entityId, craftId);
-    // The full pair-transition rule, exactly as the quest attunement path runs
-    // it (quests/profession_quest_effects.ts): prune stale acknowledgements
-    // (belt and braces here: accept requires no prior pair), then baseline the
-    // new majors at their current tier so a tier crossed before the next 1 Hz
-    // sweep still books its letter instead of being swallowed silently.
-    if (accepted) {
-      pruneTierMailToActiveMajors(r.meta);
-      baselineActivePairTierMail(r.meta);
-    }
+    // The shared pair-transition rule, exactly as the quest attunement path
+    // runs it (the prune is belt and braces here: accept requires no prior
+    // pair, so it can only clear entries that predate attunement).
+    if (accepted) applyPairTransitionTierMail(r.meta);
     return accepted;
   }
 
@@ -9754,15 +9749,11 @@ export class Sim {
     const r = this.resolve(pid);
     if (!r) return false;
     const switched = switchArchetypeImpl(this.ctx, r.meta.entityId, craftId);
-    // The full pair-transition rule, exactly as the quest attunement path runs
-    // it (quests/profession_quest_effects.ts): retire the outgoing majors'
-    // acknowledged tiers so a later return re-baselines silently instead of
-    // mailing retroactively, then baseline the new majors at their current
-    // tier so a crossing before the next 1 Hz sweep is not swallowed.
-    if (switched) {
-      pruneTierMailToActiveMajors(r.meta);
-      baselineActivePairTierMail(r.meta);
-    }
+    // The shared pair-transition rule, exactly as the quest attunement path
+    // runs it: retire the outgoing majors' acknowledgements, then baseline
+    // the new majors so a crossing before the next 1 Hz sweep is not
+    // swallowed.
+    if (switched) applyPairTransitionTierMail(r.meta);
     return switched;
   }
 
