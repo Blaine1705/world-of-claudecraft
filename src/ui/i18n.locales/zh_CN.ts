@@ -9345,6 +9345,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.wildheart_basin.leaveText': '你从石牙之下穿回棕榈之境的阳光中。',
   'entities.dungeons.the_last_keep.name': '最后的堡垒',
   'entities.dungeons.the_last_keep.enterText': '你踏入最后的堡垒那冰冷而寂静的大厅。',
+  'entities.items.last_keep_signet.name': '最后的堡垒印戒',
   'entities.dungeons.the_last_keep.leaveText': '你带上堡门，重新走进龙裔荒原的寒风中。',
   'entities.items.wildheart_tuskblade.name': '荒野之心獠牙巨刃',
   'entities.items.wildheart_hexwood_staff.name': '盆地巫木法杖',

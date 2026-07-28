@@ -9790,6 +9790,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '돌송곳니 아래를 지나 팜리치의 햇살 속으로 돌아갑니다.',
   'entities.dungeons.the_last_keep.name': '마지막 요새',
   'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
+  'entities.items.last_keep_signet.name': '마지막 요새의 인장',
   'entities.dungeons.the_last_keep.leaveText':
     '요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다.',
   'entities.items.wildheart_tuskblade.name': '야생심장 엄니대검',

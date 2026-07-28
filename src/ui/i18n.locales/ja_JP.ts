@@ -9800,6 +9800,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.wildheart_basin.leaveText': '石の牙の下をくぐり、パームリーチの陽光へ戻った。',
   'entities.dungeons.the_last_keep.name': '最後の砦',
   'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
+  'entities.items.last_keep_signet.name': '最後の砦の印章',
   'entities.dungeons.the_last_keep.leaveText': '砦の扉を閉め、ドレイクランドの風の中へ戻った。',
   'entities.items.wildheart_tuskblade.name': 'ワイルドハートの牙大剣',
   'entities.items.wildheart_hexwood_staff.name': '盆地の呪木杖',
