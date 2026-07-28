@@ -251,8 +251,13 @@ export const PALMREACH_NPCS: Record<string, NpcDef> = {
     id: 'hermit_okku',
     name: 'Okku',
     title: 'The Man Who Went In',
-    pos: { x: -398, z: 1074 },
-    facing: -0.6,
+    // 8.7 yd out from the great banyan at (-400, 1080), beside the end of the
+    // Tangle road. The trunk COLLIDER is only r * 1.45 (4.6 yd), but the
+    // rendered banyan scales to t.r * (2.5..3.0), so anything nearer than
+    // about 8 yd disappears inside the bark (he used to stand at z 1074 and
+    // showed as a nameplate floating in the trunk). Keep him clear of it.
+    pos: { x: -398, z: 1071.5 },
+    facing: -0.23, // atan2(dx, dz) toward the banyan he went in to
     color: 0x6f8a5a,
     questIds: [
       'q_pr_the_man_who_went_in',
