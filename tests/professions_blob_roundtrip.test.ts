@@ -32,6 +32,7 @@ const PROFESSIONS_BLOB_FIELDS = [
   'nodeHarvestCooldowns',
   'craftSkills',
   'knownRecipes',
+  'equipmentInstance',
   'recipesGrandfathered',
   'masteryResetApplied',
   'proficiencyDisplayHealApplied',
@@ -46,11 +47,13 @@ const PROFESSIONS_BLOB_FIELDS = [
 const NODE = GATHER_NODES.find((n) => n.type === 'herb' && n.zoneId === 'eastbrook_vale');
 if (!NODE) throw new Error('no eastbrook herb node in content');
 
-/** A player exercising every professions field with a non-default value, so
- *  the sweep's equalities compare real content and never undefined against
- *  undefined. Direct meta writes, the established fixture idiom of the
- *  per-field suites; the producer paths have their own tests. (A const arrow
- *  rather than a hoisted declaration so the NODE narrowing above applies.) */
+/** A player exercising every professions field with a non-default value
+ *  (one exception: recipesGrandfathered rides at its born-true default, so
+ *  its column checks presence and stability only; the grandfather union
+ *  transform itself belongs to the training suite). Direct meta writes, the
+ *  established fixture idiom of the per-field suites; the producer paths
+ *  have their own tests. (A const arrow rather than a hoisted declaration so
+ *  the NODE narrowing above applies.) */
 const populatedSim = (): Sim => {
   const sim = makeSim();
   const meta = sim.players.get(sim.playerId) as PlayerMeta;
@@ -74,6 +77,15 @@ const populatedSim = (): Sim => {
   // is the one that should go red and force the contract update.
   meta.knownRecipes.add(PRE_TRAINING_RECIPE_IDS[0]);
   meta.knownRecipes.add('retired_recipe_id');
+  // An enchanted-copy payload: the craft-side persisted state
+  // professions/CLAUDE.md classifies with craftSkills/knownRecipes/archetype.
+  // The populated POLICY round trip (stat recalc, absent-field default) lives
+  // in tests/professions_enchanting.test.ts; here it is one column of the
+  // sweep so the field list's completeness claim stays true.
+  meta.equipmentInstance.mainhand = {
+    enchant: 'enchant_weapon_might',
+    rolled: { stats: { str: 2 } },
+  };
   meta.townFocus = { hide: 3, fang: 2 };
   meta.archetype = {
     activeArchetype: 'weaponcrafting',
@@ -112,6 +124,15 @@ describe('the professions blob round-trip sweep', () => {
       fishing: 150,
     });
     expect(s1.professions).toEqual(s1.gatheringProficiency); // legacy dual-write
+    // Separate objects, never one aliased through the other (the serializer
+    // spreads on purpose so no caller can mutate one key through the other);
+    // toEqual alone is identity-blind, so pin the identity too.
+    expect(s1.professions).not.toBe(s1.gatheringProficiency);
+    // Fractional craft skill pinned as a literal: a serializer that rounded
+    // would survive the relative drift pin below (it mangles s1 and s2
+    // identically), so the literal is what carries the no-rounding claim.
+    expect(s1.craftSkills).toMatchObject({ weaponcrafting: 55.5, cooking: 10 });
+    expect(s1.equipmentInstance?.mainhand?.rolled?.stats?.str).toBe(2);
     expect(s1.nodeHarvestCooldowns).toEqual({ [NODE.id]: 30 });
     expect(s1.tierMailSent).toEqual({ weaponcrafting: 2, armorcrafting: 1 });
     expect(s1.questCadence).toEqual({ q_prof_work_order_smith: 600 });
@@ -142,6 +163,9 @@ describe('the professions blob round-trip sweep', () => {
     const pid3 = third.addPlayer('warrior', 'Sweep2', { state: s2 });
     const s3 = third.serializeCharacter(pid3) as CharacterState;
     expect(s3).toEqual(s2);
+    // toEqual ignores a key that is present with an explicit undefined value,
+    // so pin the key SETS too: an absent key must stay absent.
+    expect(Object.keys(s3).sort()).toEqual(Object.keys(s2).sort());
   });
 
   it('over-cap values clamp DOWN through the documented load normalizers and persist clamped', () => {

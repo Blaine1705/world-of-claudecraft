@@ -294,11 +294,32 @@ describe('gathering profession proficiency (#1119)', () => {
     };
     queueGatheringGrant(meta, 'mining', 5);
     const folded = foldPendingGatherGrants(meta);
-    expect(folded.mining).toBe(GATHERING_PROFESSIONS.mining.maxSkill); // 98 + 5 clamps to 100
+    // The literal cap, not GATHERING_PROFESSIONS.mining.maxSkill: production
+    // reads that same constant, so a self-comparison would move with a cap
+    // edit instead of catching it.
+    expect(folded.mining).toBe(100); // 98 + 5 clamps to the mining content cap
     expect(folded.logging).toBe(0); // untouched professions stay put
     // Pure: the live record and queue are exactly as they were.
     expect(meta.gatheringProficiency.mining).toBe(98);
     expect(meta.pendingGatherGrants.length).toBe(1);
+  });
+
+  it('the fold applies every queued grant, not just the first', () => {
+    // The motivating scenario is a multi-grant tick (a completed harvest plus
+    // a reel-landed catch queue in the same drain window), so the fold's own
+    // loop needs a multi-grant arm: same profession accumulating into the
+    // clamp, plus a second profession that must not be dropped.
+    const meta: any = {
+      pendingGatherGrants: [],
+      gatheringProficiency: { ...emptyGatheringProficiency(), mining: 98 },
+    };
+    queueGatheringGrant(meta, 'mining', 1);
+    queueGatheringGrant(meta, 'logging', 2);
+    queueGatheringGrant(meta, 'mining', 1);
+    const folded = foldPendingGatherGrants(meta);
+    expect(folded.mining).toBe(100); // 98 + 1 + 1, exactly at the cap
+    expect(folded.logging).toBe(2);
+    expect(meta.pendingGatherGrants.length).toBe(3); // still pure
   });
 
   it('the /dev gather cheat is gated by devCommands (never a bypass path)', () => {

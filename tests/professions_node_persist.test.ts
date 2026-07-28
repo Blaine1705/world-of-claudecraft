@@ -6,7 +6,11 @@
 // every node ready serializes byte-identically to a pre-D6 save.
 import { describe, expect, it } from 'vitest';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
-import { isNodeHarvestableBy, resolveHarvest } from '../src/sim/professions/gathering';
+import {
+  isNodeHarvestableBy,
+  NODE_HARVEST_TABLE,
+  resolveHarvest,
+} from '../src/sim/professions/gathering';
 import { applyNodeReadiness, serializeNodeReadiness } from '../src/sim/professions/node_persist';
 import { Rng } from '../src/sim/rng';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
@@ -19,6 +23,11 @@ const metaOf = (sim: Sim): PlayerMeta => sim.meta(sim.playerId) as PlayerMeta;
 // (NODE_HARVEST_TABLE), pinned literally where the delta value matters.
 const NODE = GATHER_NODES.find((n) => n.type === 'ore' && n.zoneId === 'eastbrook_vale');
 if (!NODE) throw new Error('no eastbrook ore node in content');
+// A second live node for the multi-entry arms: truncation regressions
+// (first-entry-only, break-after-first-surviving-write) are invisible to
+// single-survivor fixtures in either direction.
+const NODE2 = GATHER_NODES.find((n) => n.type === 'wood' && n.zoneId === 'eastbrook_vale');
+if (!NODE2) throw new Error('no eastbrook wood node in content');
 const RESPAWN_SECONDS = 240;
 
 describe('the pure remaining-delta round trip (no Sim)', () => {
@@ -57,12 +66,70 @@ describe('the pure remaining-delta round trip (no Sim)', () => {
     expect(applyNodeReadiness({ legacy_node: 100, [NODE.id]: 50 }, 0)).toEqual({ [NODE.id]: 50 });
   });
 
+  it('an unknown id with a running timer serializes verbatim (anti-tamper is load-side)', () => {
+    // The serialize side deliberately neither clamps nor filters (see the
+    // serializeNodeReadiness doc): the one live writer only ever writes live
+    // ids, so a write-side copy of the load allowlist would only mask a
+    // writer bug. This arm makes that a CONTRACT: adding a serialize-side
+    // filter must consciously flip it.
+    expect(serializeNodeReadiness({ not_a_live_node: 50, [NODE.id]: 10 }, 0)).toEqual({
+      not_a_live_node: 50,
+      [NODE.id]: 10,
+    });
+  });
+
+  it('several running timers all survive both directions (no truncation)', () => {
+    // Serialize: two running entries, both written.
+    expect(serializeNodeReadiness({ [NODE.id]: 100, [NODE2.id]: 50 }, 0)).toEqual({
+      [NODE.id]: 100,
+      [NODE2.id]: 50,
+    });
+    // Load: a dropped id BETWEEN two survivors, so first-entry-only AND
+    // break-after-first-surviving-write both go red (a gatherer logs out
+    // with a whole circuit cooling down, not one node).
+    expect(applyNodeReadiness({ [NODE.id]: 50, legacy_node: 100, [NODE2.id]: 30 }, 7)).toEqual({
+      [NODE.id]: 57,
+      [NODE2.id]: 37,
+    });
+  });
+
   it('drops malformed values and clamps a tampered remaining to one respawn', () => {
     expect(applyNodeReadiness({ [NODE.id]: Number.NaN }, 0)).toEqual({});
     expect(applyNodeReadiness({ [NODE.id]: -5 }, 0)).toEqual({});
     expect(applyNodeReadiness({ [NODE.id]: Number.POSITIVE_INFINITY }, 0)).toEqual({});
     // A hand-edited save cannot lock a node for longer than one real respawn.
     expect(applyNodeReadiness({ [NODE.id]: 999999 }, 0)).toEqual({ [NODE.id]: RESPAWN_SECONDS });
+  });
+});
+
+describe('the write ceiling, the load clamp, and the record bound stay coupled', () => {
+  it('every live node writes exactly the ceiling the load clamp enforces', () => {
+    // Coincidence guard: ore, wood and herb all respawn in 240 seconds
+    // today, which is the only reason the clamp arms above can assert one
+    // literal. When a node type's respawn diverges, this pin goes red and
+    // the clamp arms must gain a per-type case.
+    expect(new Set(Object.values(NODE_HARVEST_TABLE).map((e) => e.respawnSeconds))).toEqual(
+      new Set([RESPAWN_SECONDS]),
+    );
+    // Write-versus-load coupling, per node: the readiness resolveHarvest
+    // actually writes equals the ceiling applyNodeReadiness clamps a
+    // tampered save to. If a future modifier (event, debuff, tool penalty)
+    // ever writes LONGER than the table, this sweep reds instead of the
+    // load clamp silently shortening the timer on the next relog.
+    const meta = metaOf(makeSim(16));
+    for (const node of GATHER_NODES) {
+      expect(resolveHarvest(meta, node, 0, new Rng(17)).granted, node.id).toBe(true);
+      expect(meta.nodeHarvestReadyAt[node.id], node.id).toBe(
+        applyNodeReadiness({ [node.id]: 999999 }, 0)[node.id],
+      );
+    }
+    // The absolute worst-case record (every live node cooling at once):
+    // every entry serializes, and the JSON stays small enough to ride every
+    // characters.state row. Content growth that trips the byte literal is a
+    // deliberate blob-size decision, not an accident.
+    const all = serializeNodeReadiness(meta.nodeHarvestReadyAt, 0);
+    expect(all && Object.keys(all).length).toBe(GATHER_NODES.length);
+    expect(JSON.stringify(all).length).toBeLessThanOrEqual(2048);
   });
 });
 
@@ -110,11 +177,29 @@ describe('the real save/load path closes the relog exploit', () => {
 
   it('a fresh character and an all-elapsed map both omit the field entirely', () => {
     const fresh = makeSim();
-    // Absence, not {}: the omission is what keeps a clean character
-    // byte-identical to a pre-D6 save.
-    expect(fresh.serializeCharacter(fresh.playerId)?.nodeHarvestCooldowns).toBeUndefined();
+    // KEY absence, not undefined: `in` distinguishes a missing key from one
+    // present with an explicit undefined value, and the omission is what
+    // keeps a clean character byte-identical to a pre-D6 save.
+    const clean = fresh.serializeCharacter(fresh.playerId);
+    expect(clean && 'nodeHarvestCooldowns' in clean).toBe(false);
     metaOf(fresh).nodeHarvestReadyAt[NODE.id] = fresh.time - 1;
-    expect(fresh.serializeCharacter(fresh.playerId)?.nodeHarvestCooldowns).toBeUndefined();
+    const elapsed = fresh.serializeCharacter(fresh.playerId);
+    expect(elapsed && 'nodeHarvestCooldowns' in elapsed).toBe(false);
+  });
+
+  it('a later save carries the smaller remaining, so the freshest save wins', () => {
+    // The sim-side half of the linkdead story: while a character stays in
+    // the world its timers keep counting in live sim time, so a LATER save
+    // (the grace-expiry one) records strictly less remaining than an earlier
+    // one (the drop-time safety flush), and whichever save lands last is
+    // what the next load honors.
+    const sim = makeSim();
+    expect(resolveHarvest(metaOf(sim), NODE, sim.time, new Rng(3)).granted).toBe(true);
+    const flush = sim.serializeCharacter(sim.playerId) as CharacterState;
+    expect(flush.nodeHarvestCooldowns).toEqual({ [NODE.id]: RESPAWN_SECONDS });
+    for (let i = 0; i < 20; i++) sim.tick(); // one second of live sim time
+    const later = sim.serializeCharacter(sim.playerId) as CharacterState;
+    expect(later.nodeHarvestCooldowns).toEqual({ [NODE.id]: RESPAWN_SECONDS - 1 });
   });
 
   it('a pre-D6 save (no field) loads with every node ready', () => {

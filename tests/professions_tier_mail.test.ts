@@ -431,6 +431,61 @@ describe('tier-crossing master mail (Professions 2.0)', () => {
     expect(recross.booked).toEqual([MASTER_TIER_LETTERS[PAIR][1]]);
   });
 
+  it('a pre-flag save (masteryResetApplied ABSENT) also drops acknowledgements', () => {
+    // The REAL pre-curve shape: old saves carry no masteryResetApplied key at
+    // all (serialize has written literal true since the flag shipped), so the
+    // absent arm is the one every genuine migration hits. Pinned separately
+    // from the false arm above: a drop guard rewritten as `=== false` keeps
+    // that arm green while silently keeping stale acknowledgements above the
+    // zeroed tiers for every real pre-curve character.
+    const sim = makeSim();
+    const meta = attunedMeta(sim);
+    meta.craftSkills[PRIMARY] = tierSkill(3);
+    baselineActivePairTierMail(meta);
+    const saved = sim.serializeCharacter(sim.playerId)!;
+    expect(saved.tierMailSent).toMatchObject({ [PRIMARY]: 3 });
+    delete saved.masteryResetApplied;
+
+    const reloaded = makeSim(5156);
+    const pid = reloaded.addPlayer('warrior', 'PreFlag', { state: saved });
+    const reloadedMeta = reloaded.players.get(pid)!;
+    expect(reloadedMeta.craftSkills[PRIMARY]).toBe(0); // the reset fired
+    expect(reloadedMeta.tierMailSent.size).toBe(0); // acknowledgements went with it
+  });
+
+  it('accept prunes a stale acknowledgement an unattuned character carries', () => {
+    // Belt and braces on the accept entry point: accept refuses when a pair
+    // is already active, so its prune can only ever clear entries that
+    // predate attunement (a hand-edited or pre-prune-era record). Deleting
+    // the transition rule's prune half must red here.
+    const sim = makeSim();
+    const meta = sim.players.get(sim.playerId)!;
+    meta.tierMailSent.set(DORMANT, 1);
+    expect(sim.acceptArchetypeQuest(PRIMARY, sim.playerId)).toBe(true);
+    expect(meta.tierMailSent.has(DORMANT)).toBe(false);
+    expect(meta.tierMailSent.get(PRIMARY)).toBe(0); // baseline still armed
+    expect(meta.tierMailSent.get(SECONDARY)).toBe(0);
+  });
+
+  it('a refused switch runs no part of the transition rule', () => {
+    // amendsProgress stays at zero, so the switch is refused; neither the
+    // prune nor the baseline may fire on a refusal. The DORMANT sentinel is
+    // what makes the guard observable: on a refused switch the majors are
+    // unchanged, so a guardless prune+baseline would be invisible without it.
+    const sim = makeSim();
+    const meta = attunedMeta(sim);
+    meta.craftSkills[PRIMARY] = tierSkill(2);
+    baselineActivePairTierMail(meta); // PRIMARY:2, SECONDARY:0
+    meta.tierMailSent.set(DORMANT, 1); // sentinel: only a real transition prunes
+    expect(sim.switchArchetype('alchemy', sim.playerId)).toBe(false);
+    expect(meta.archetype.activeArchetype).toBe(PRIMARY);
+    expect([...meta.tierMailSent.entries()].sort()).toEqual([
+      [SECONDARY, 0],
+      [DORMANT, 1],
+      [PRIMARY, 2],
+    ]);
+  });
+
   it('normalizeTierMailOnLoad keeps only KNOWN ring craft ids with valid tiers', () => {
     expect(normalizeTierMailOnLoad(undefined).size).toBe(0);
     expect([
