@@ -980,9 +980,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.venom_dart.name': 'Dardo venenoso',
   'entities.abilities.venom_dart.description':
     'Lanzas un dardo envenenado que inflige {damage} de daño de naturaleza. Otorga 1 punto de combo. Knifework: prolonga tu herida de Desgarro venenoso 6 s, hasta 20 s.',
-  'entities.abilities.cleansing_verdict.name': 'Veredicto Purificador',
-  'entities.abilities.cleansing_verdict.description':
-    'Purga un efecto mágico perjudicial de un objetivo amistoso y lo sana con {damage} de magia Sagrada.',
   'entities.abilities.smoke_screen.name': 'Cortina de Humo',
   'entities.abilities.smoke_screen.description':
     'Desapareces en una nube de humo, lo que aumenta tu probabilidad de esquivar un 30% durante 8 s.',

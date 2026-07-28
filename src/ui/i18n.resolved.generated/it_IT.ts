@@ -8394,10 +8394,6 @@ export const it_IT: EnTranslations = {
       "revive_pet": {
         "name": "Rattoppare",
         "description": "Rattoppa il tuo famiglio, ripristinando {overTime} salute in 12 sec con impulsi ogni 3 sec se è vivo. Se è morto, lo rianima con il 35% della salute."
-      },
-      "cleansing_verdict": {
-        "name": "Verdetto Purificante",
-        "description": "Dissipa un effetto magico dannoso da un bersaglio alleato e lo cura di {damage} con magia Sacra."
       }
     },
     "items": {

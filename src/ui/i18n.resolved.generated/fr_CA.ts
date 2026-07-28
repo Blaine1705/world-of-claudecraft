@@ -8394,10 +8394,6 @@ export const fr_CA: EnTranslations = {
       "revive_pet": {
         "name": "Rafistoler",
         "description": "Rafistole votre familier et lui rend {overTime} points de vie en 12 s, par pulsations toutes les 3 s, s'il est vivant. S'il est mort, le ranime avec 35 % de ses points de vie."
-      },
-      "cleansing_verdict": {
-        "name": "Verdict purificateur",
-        "description": "Dissipe un effet magique néfaste sur une cible alliée et lui rend {damage} points de vie par la magie du Sacré."
       }
     },
     "items": {

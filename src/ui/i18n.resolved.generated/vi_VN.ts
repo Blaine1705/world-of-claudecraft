@@ -8394,10 +8394,6 @@ export const vi_VN: EnTranslations = {
       "revive_pet": {
         "name": "Băng Bó",
         "description": "Băng bó cho thú cưng. Nếu còn sống, thú cưng hồi tổng cộng {overTime} máu trong 12 giây, mỗi 3 giây hồi một lần. Nếu đã chết, thú cưng được hồi sinh với 35% máu."
-      },
-      "cleansing_verdict": {
-        "name": "Phán Quyết Thanh Tẩy",
-        "description": "Xóa một hiệu ứng phép thuật có hại khỏi mục tiêu đồng minh và hồi cho họ {damage} máu bằng phép Thánh."
       }
     },
     "items": {

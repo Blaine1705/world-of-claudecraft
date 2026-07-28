@@ -1029,9 +1029,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.venom_dart.name': 'Giftpil',
   'entities.abilities.venom_dart.description':
     'Slungar en förgiftad pil för {damage} naturskada. Ger 1 combopoäng. Knifework: förlänger ditt Giftrivning-sår med 6 sek, upp till 20 sek.',
-  'entities.abilities.cleansing_verdict.name': 'Renande Domslut',
-  'entities.abilities.cleansing_verdict.description':
-    'Rensar bort en skadlig magisk effekt från ett vänligt mål och helar det med Helig magi för {damage}.',
   'entities.abilities.smoke_screen.name': 'Rökridå',
   'entities.abilities.smoke_screen.description':
     'Du försvinner i ett rökmoln, vilket ökar din chans att undvika med 30 % i 8 sek.',

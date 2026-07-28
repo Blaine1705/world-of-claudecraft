@@ -8394,10 +8394,6 @@ export const pl_PL: EnTranslations = {
       "revive_pet": {
         "name": "Opatrzenie",
         "description": "Opatruje twojego zwierzaka. Jeśli żyje, przywraca mu łącznie {overTime} pkt. zdrowia przez 12 sek., co 3 sek. Jeśli nie żyje, wskrzesza go z 35% zdrowia."
-      },
-      "cleansing_verdict": {
-        "name": "Oczyszczający Wyrok",
-        "description": "Usuwa szkodliwy efekt magiczny z przyjaznego celu i leczy go świętą magią za {damage}."
       }
     },
     "items": {

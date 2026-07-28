@@ -8394,10 +8394,6 @@ export const tr_TR: EnTranslations = {
       "revive_pet": {
         "name": "Yarasını Sar",
         "description": "Evcilinin yaralarını sarar. Yaşıyorsa 12 saniye boyunca her 3 saniyede bir iyileştirerek toplam {overTime} can yeniler. Ölüyse %35 canla diriltir."
-      },
-      "cleansing_verdict": {
-        "name": "Arındırıcı Hüküm",
-        "description": "Dost bir hedeften zararlı bir büyü etkisini kaldırır ve onu {damage} Kutsal iyileştirir."
       }
     },
     "items": {

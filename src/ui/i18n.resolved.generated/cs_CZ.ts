@@ -8394,10 +8394,6 @@ export const cs_CZ: EnTranslations = {
       "revive_pet": {
         "name": "Ošetření",
         "description": "Ošetří tvého mazlíčka. Pokud žije, obnoví mu celkem {overTime} zdraví během 12 s v intervalech po 3 s. Pokud je mrtvý, oživí ho s 35 % zdraví."
-      },
-      "cleansing_verdict": {
-        "name": "Očistný rozsudek",
-        "description": "Odstraní škodlivý magický účinek ze spojeneckého cíle a vyléčí jej svatou magií za {damage}."
       }
     },
     "items": {

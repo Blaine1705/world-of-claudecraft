@@ -172,8 +172,11 @@ export function migrateCharacterTalentsV2(cls: PlayerClass, state: CharacterStat
   const wipeRows = fullRepair && owed.some((step) => step.wipeRows);
 
   const level = migrationLevel(state.level);
-  const repairedTalents = fullRepair ? repairAllocation(cls, state.talents, level) : state.talents;
-  const talents = wipeRows ? { spec: repairedTalents.spec, rows: {} } : repairedTalents;
+  let talents = state.talents;
+  if (fullRepair) {
+    const repaired = repairAllocation(cls, state.talents, level);
+    talents = wipeRows ? { spec: repaired.spec, rows: {} } : repaired;
+  }
   const migratedLoadouts = migrateLoadouts(
     cls,
     level,

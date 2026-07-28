@@ -8394,10 +8394,6 @@ export const pt_BR: EnTranslations = {
       "revive_pet": {
         "name": "Remendar",
         "description": "Remenda seu mascote, restaurando {overTime} de vida ao longo de 12 s em pulsos a cada 3 s se ele estiver vivo. Se estiver morto, revive-o com 35% da vida."
-      },
-      "cleansing_verdict": {
-        "name": "Veredito Purificador",
-        "description": "Expurga um efeito mágico nocivo de um alvo aliado e o cura em {damage} com magia Sagrada."
       }
     },
     "items": {

@@ -8394,10 +8394,6 @@ export const da_DK: EnTranslations = {
       "revive_pet": {
         "name": "Lappe sammen",
         "description": "Lapper dit kæledyr sammen. Hvis det lever, genopretter det i alt {overTime} helbred over 12 sek. med helbredelse hvert 3. sek. Hvis det er dødt, genopliver det med 35 % helbred."
-      },
-      "cleansing_verdict": {
-        "name": "Rensende Dom",
-        "description": "Fjerner en skadelig magisk effekt fra et venligt mål og helbreder det med Hellig magi for {damage}."
       }
     },
     "items": {

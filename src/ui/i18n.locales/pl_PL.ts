@@ -1124,9 +1124,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.venom_dart.name': 'Jadowita strzałka',
   'entities.abilities.venom_dart.description':
     'Ciska zatrutą strzałką, zadając {damage} obrażeń natury. Przyznaje 1 punkt combo. Knifework: przedłuża ranę od Jadowitego rozdarcia o 6 sek., maksymalnie do 20 sek.',
-  'entities.abilities.cleansing_verdict.name': 'Oczyszczający Wyrok',
-  'entities.abilities.cleansing_verdict.description':
-    'Usuwa szkodliwy efekt magiczny z przyjaznego celu i leczy go świętą magią za {damage}.',
   'entities.abilities.smoke_screen.name': 'Zasłona Dymna',
   'entities.abilities.smoke_screen.description':
     'Znikasz w chmurze dymu, zwiększając szansę na unik o 30% na 8 sek.',

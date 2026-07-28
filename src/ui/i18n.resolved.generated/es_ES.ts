@@ -8394,10 +8394,6 @@ export const es_ES: EnTranslations = {
       "revive_pet": {
         "name": "Remendar",
         "description": "Remienda a tu mascota y restaura {overTime} de salud durante 12 s en pulsos cada 3 s mientras esté viva. Si está muerta, la revive con un 35% de salud."
-      },
-      "cleansing_verdict": {
-        "name": "Veredicto Purificador",
-        "description": "Purga un efecto mágico perjudicial de un objetivo amistoso y lo sana con {damage} de magia Sagrada."
       }
     },
     "items": {

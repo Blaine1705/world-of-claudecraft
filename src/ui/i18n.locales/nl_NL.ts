@@ -1122,9 +1122,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.venom_dart.name': 'Gifpijltje',
   'entities.abilities.venom_dart.description':
     'Schiet een vergiftigd pijltje voor {damage} natuurschade. Geeft 1 combopunt. Knifework: verlengt je Gifscheur-wond met 6 sec, tot 20 sec.',
-  'entities.abilities.cleansing_verdict.name': 'Zuiverend Vonnis',
-  'entities.abilities.cleansing_verdict.description':
-    'Verwijdert een schadelijk magisch effect van een bevriend doelwit en geneest het met Heilige magie voor {damage}.',
   'entities.abilities.smoke_screen.name': 'Rookgordijn',
   'entities.abilities.smoke_screen.description':
     'Je verdwijnt in een rookwolk, waardoor je ontwijkingskans 8 sec. lang met 30% toeneemt.',

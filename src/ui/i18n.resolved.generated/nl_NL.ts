@@ -8394,10 +8394,6 @@ export const nl_NL: EnTranslations = {
       "revive_pet": {
         "name": "Oplappen",
         "description": "Lapt je huisdier op. Als het leeft, herstelt het in totaal {overTime} gezondheid gedurende 12 sec., met elke 3 sec. een tik. Als het dood is, wordt het met 35% gezondheid tot leven gewekt."
-      },
-      "cleansing_verdict": {
-        "name": "Zuiverend Vonnis",
-        "description": "Verwijdert een schadelijk magisch effect van een bevriend doelwit en geneest het met Heilige magie voor {damage}."
       }
     },
     "items": {

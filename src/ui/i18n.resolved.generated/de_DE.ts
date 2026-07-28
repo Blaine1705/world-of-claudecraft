@@ -8394,10 +8394,6 @@ export const de_DE: EnTranslations = {
       "revive_pet": {
         "name": "Zusammenflicken",
         "description": "Flickt deinen Begleiter zusammen und stellt ihm, solange er lebt, im Verlauf von 12 Sek. alle 3 Sek. insgesamt {overTime} Gesundheit wieder her. Ist er tot, wird er mit 35 % Gesundheit wiederbelebt."
-      },
-      "cleansing_verdict": {
-        "name": "Läuterndes Urteil",
-        "description": "Entfernt einen schädlichen magischen Effekt von einem verbündeten Ziel und heilt es mit heiliger Magie um {damage}."
       }
     },
     "items": {

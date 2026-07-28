@@ -994,9 +994,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.venom_dart.name': 'Jedová šipka',
   'entities.abilities.venom_dart.description':
     'Vymrští otrávenou šipku za {damage} přírodního poškození. Uděluje 1 combo bod. Knifework: prodlužuje ránu vaší Jedové trhliny o 6 s, nejvýše na 20 s.',
-  'entities.abilities.cleansing_verdict.name': 'Očistný rozsudek',
-  'entities.abilities.cleansing_verdict.description':
-    'Odstraní škodlivý magický účinek ze spojeneckého cíle a vyléčí jej svatou magií za {damage}.',
   'entities.abilities.smoke_screen.name': 'Kouřová clona',
   'entities.abilities.smoke_screen.description':
     'Zmizíte v oblaku kouře a na 8 s zvýšíte svou šanci na úhyb o 30 %.',

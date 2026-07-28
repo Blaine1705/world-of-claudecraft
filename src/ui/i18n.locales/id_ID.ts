@@ -996,9 +996,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.venom_dart.name': 'Damak Bisa',
   'entities.abilities.venom_dart.description':
     'Melontarkan damak beracun sebesar {damage} kerusakan alam. Memberi 1 poin combo. Knifework: memperpanjang luka Koyak Bisa Anda 6 detik, hingga 20 detik.',
-  'entities.abilities.cleansing_verdict.name': 'Vonis Pemurnian',
-  'entities.abilities.cleansing_verdict.description':
-    'Menghapus efek sihir berbahaya dari target sekutu dan menyembuhkannya sebesar {damage} dengan sihir Suci.',
   'entities.abilities.smoke_screen.name': 'Tabir Asap',
   'entities.abilities.smoke_screen.description':
     'Kamu menghilang ke dalam kepulan asap, meningkatkan peluang menghindar sebesar 30% selama 8 dtk.',

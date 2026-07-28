@@ -8394,10 +8394,6 @@ export const sv_SE: EnTranslations = {
       "revive_pet": {
         "name": "Lappa ihop",
         "description": "Lappar ihop ditt husdjur. Om det lever återställer det totalt {overTime} hälsa under 12 sek. med läkning var 3:e sek. Om det är dött återupplivas det med 35 % hälsa."
-      },
-      "cleansing_verdict": {
-        "name": "Renande Domslut",
-        "description": "Rensar bort en skadlig magisk effekt från ett vänligt mål och helar det med Helig magi för {damage}."
       }
     },
     "items": {

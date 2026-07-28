@@ -984,9 +984,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.venom_dart.name': 'Zehirli Dart',
   'entities.abilities.venom_dart.description':
     'Zehirli bir dart fırlatarak {damage} doğa hasarı verir. 1 kombo puanı kazandırır. Knifework: Zehir Yarığı yaranızı 6 sn uzatır, en fazla 20 sn.',
-  'entities.abilities.cleansing_verdict.name': 'Arındırıcı Hüküm',
-  'entities.abilities.cleansing_verdict.description':
-    'Dost bir hedeften zararlı bir büyü etkisini kaldırır ve onu {damage} Kutsal iyileştirir.',
   'entities.abilities.smoke_screen.name': 'Duman Perdesi',
   'entities.abilities.smoke_screen.description':
     'Bir duman bulutunda kaybolur ve 8 sn. boyunca kaçınma şansını %30 artırırsın.',

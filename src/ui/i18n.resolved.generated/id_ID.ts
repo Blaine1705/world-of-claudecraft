@@ -8394,10 +8394,6 @@ export const id_ID: EnTranslations = {
       "revive_pet": {
         "name": "Obati",
         "description": "Mengobati peliharaanmu. Jika masih hidup, memulihkan total {overTime} kesehatan selama 12 detik dengan pemulihan setiap 3 detik. Jika mati, menghidupkannya kembali dengan 35% kesehatan."
-      },
-      "cleansing_verdict": {
-        "name": "Vonis Pemurnian",
-        "description": "Menghapus efek sihir berbahaya dari target sekutu dan menyembuhkannya sebesar {damage} dengan sihir Suci."
       }
     },
     "items": {
