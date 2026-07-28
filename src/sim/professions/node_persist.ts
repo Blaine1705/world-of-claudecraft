@@ -38,10 +38,13 @@ const positive = (n: number): boolean => Number.isFinite(n) && n > 0;
 /** Snapshot the live readiness map as remaining-time deltas. Returns undefined
  *  when no timer is still running (zero-default omission), so a character with
  *  every node ready serializes byte-identically to one saved before the field
- *  existed. Deliberately does NOT clamp: the one live writer
- *  (gathering.ts resolveHarvest) sets exactly now + respawnSeconds, and the
- *  clamp is the LOAD side's anti-tamper arm (applyNodeReadiness below), so a
- *  write-side clamp would only mask a writer bug. */
+ *  existed. Deliberately neither clamps nor filters keys: entries serialize
+ *  verbatim, because the one live writer (gathering.ts resolveHarvest) only
+ *  ever writes live node ids at exactly now + respawnSeconds, and BOTH
+ *  anti-tamper arms (the live-id allowlist and the one-respawn clamp) live on
+ *  the LOAD side (applyNodeReadiness below), where hand-edited rows enter.
+ *  Write-side copies would only mask a writer bug; the trade is that the
+ *  self-heal guarantee rests on resolveHarvest staying the only live writer. */
 export function serializeNodeReadiness(
   nodeHarvestReadyAt: Readonly<Record<string, number>>,
   now: number,
