@@ -54,6 +54,7 @@ import {
   WOC_MARKET_MAX_PRICE_CENTS,
   WOC_MARKET_MIN_PRICE_CENTS,
   WOC_MARKET_RESTRICTED_POLICY,
+  WOC_MARKET_SETTLEMENT_WINDOW_SECONDS,
   type WocListingFormat,
 } from './woc_market_rules';
 
@@ -322,6 +323,7 @@ function estimateView(estimate: WocEstimate): Record<string, unknown> {
 
 async function statusHandler(ctx: Ctx): Promise<void> {
   const status = await useService().status();
+  const policy = wocMarketConfig().policy;
   json(ctx.res, 200, {
     enabled: status.enabled,
     price: status.price,
@@ -330,6 +332,10 @@ async function statusHandler(ctx: Ctx): Promise<void> {
     durationsHours: WOC_MARKET_DURATION_HOURS,
     minPriceCents: WOC_MARKET_MIN_PRICE_CENTS,
     maxPriceCents: WOC_MARKET_MAX_PRICE_CENTS,
+    // The eligibility floor, so the client's sell-tab pre-filter follows this
+    // server's policy instead of hardcoding one (the server re-validates).
+    qualityFloor: policy.equipmentQualityFloor,
+    settlementWindowSeconds: WOC_MARKET_SETTLEMENT_WINDOW_SECONDS,
   });
 }
 

@@ -774,6 +774,7 @@ import {
 import { makeWindowFocus } from './window_focus';
 import { installWindowResize, markResizableWindow } from './window_resize';
 import { stackedWindowsVisible } from './window_stack_state_core';
+import { type WocMarketHooks, WocMarketWindow } from './woc_market_window';
 import { installWorldDropTarget } from './world_drop_target';
 import { formatXp, type XpBarView, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
@@ -3015,6 +3016,7 @@ export class Hud {
     $('#mm-valecup').addEventListener('click', () => this.toggleValeCup());
     $('#mm-cardduel').addEventListener('click', () => this.toggleCardDuel());
     $('#mm-leaderboard').addEventListener('click', () => this.toggleLeaderboard());
+    $('#mm-wocmarket')?.addEventListener('click', () => this.toggleWocMarket());
     $('#mm-discord')?.addEventListener('click', () => this.discordHook?.());
     const emoteBtn = $('#mm-emote');
     emoteBtn.addEventListener('click', (ev) => {
@@ -3481,6 +3483,10 @@ export class Hud {
         break;
       case 'market-window':
         this.closeMarket();
+        break;
+      case 'woc-market-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.wocMarketWindow.close();
         break;
       case 'mailbox-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
@@ -5155,6 +5161,19 @@ export class Hud {
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
     showDevBadges: () => this.optionsHooks?.settings.get('showDevBadges') ?? true,
   });
+  // The $WOC Exchange window (docs/prd/woc/marketplace.md): online, browser-web
+  // only. Openable only once main.ts attaches the hooks (attachWocMarket); the
+  // launcher button stays hidden until then, so Steam/Electron/Capacitor and
+  // offline play never see the surface.
+  private wocMarketHooks: WocMarketHooks | null = null;
+  private readonly wocMarketWindow = new WocMarketWindow({
+    root: () => $('#woc-market-window'),
+    world: () => this.sim,
+    hooks: () => this.wocMarketHooks,
+    closeOthers: () => this.closeOtherWindows('#woc-market-window'),
+    hideTooltip: () => this.hideTooltip(),
+    ...this.windowFocus('#woc-market-window'),
+  });
   // Daily rewards window painter. It owns the async rewards reads, spin action,
   // focus opener, and a low-rate refresh while open. All closures are lazy.
   private readonly dailyRewardsWindow = new DailyRewardsWindow({
@@ -6368,6 +6387,7 @@ export class Hud {
     this.lastPlayerFrameResource = Number.NaN;
     this.lastPlayerFrameMaxResource = Number.NaN;
     this.syncDailyRewardsSurfaceLabels();
+    this.wocMarketWindow.relocalize();
     this.storePromoCard?.relocalize({
       open: t('hudChrome.wocStore.title'),
       close: t('hudChrome.wocStore.close'),
@@ -9684,6 +9704,7 @@ export class Hud {
     }
     // The mailbox closes itself when the mail mirror goes null (walked away).
     if (slowHud && this.mailboxWindow.isOpen) this.mailboxWindow.refreshIfChanged();
+    if (slowHud && this.wocMarketWindow.isOpen) this.wocMarketWindow.refreshIfChanged();
     // The bank closes itself when the bank mirror goes null (left the banker).
     if (slowHud && this.bankWindow.isOpen) this.bankWindow.refreshIfChanged();
     // The bag money row is a cold painter, and several copper credits reach no bags
@@ -17521,6 +17542,23 @@ export class Hud {
     if (!this.dailyRewardsEnabled()) return;
     this.dailyRewardsWindow.openStore();
     this.refreshDailyRewardsLauncher(true);
+  }
+
+  /** Inject the $WOC Exchange hooks (main.ts, online + browser-web only) and
+   *  reveal its launcher; without this call the surface stays fully absent. */
+  attachWocMarket(hooks: WocMarketHooks): void {
+    this.wocMarketHooks = hooks;
+    const button = document.getElementById('mm-wocmarket');
+    if (button) button.hidden = false;
+  }
+
+  toggleWocMarket(): void {
+    if (this.wocMarketHooks === null) return;
+    this.wocMarketWindow.toggle();
+  }
+
+  closeWocMarket(): void {
+    this.wocMarketWindow.close();
   }
 
   /** Inject the online economy hooks that back the Claudium window (main.ts, online only). */

@@ -85,6 +85,7 @@ function stripComments(source: string): string {
 const FANOUT_ARMS: readonly string[] = [
   'this.bgScoreboard.relocalize|',
   'this.syncDailyRewardsSurfaceLabels|',
+  'this.wocMarketWindow.relocalize|',
   'this.storePromoCard.relocalize|',
   'this.refreshKeybindLabels|',
   'this.updateQuestTracker|',
@@ -314,6 +315,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastSig'],
     answer: 'this.marketWindow.render',
     why: 'the listing ids, prices and the active tab; render() carries no self-gate',
+  },
+  {
+    file: 'woc_market_window.ts',
+    memos: ['lastSig'],
+    answer: 'this.wocMarketWindow.relocalize',
+    why: 'the Exchange listing rows, statuses and countdowns digest into lastSig; relocalize() self-gates on isOpen, rebuilds once, and render() re-latches the signature',
   },
   {
     file: 'professions_window.ts',

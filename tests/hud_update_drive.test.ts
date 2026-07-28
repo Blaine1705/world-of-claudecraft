@@ -1211,6 +1211,14 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the market window',
   },
   {
+    call: 'this.wocMarketWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.wocMarketWindow.isOpen',
+    surface: 'window',
+    guard: { kind: 'module', module: 'woc_market_window.ts', proof: SIG_RETURN },
+    why: 'the $WOC Exchange window; its wocMarketViewSig digest folds second-resolution countdowns in, so open auctions tick on the poll without a self-armed driver',
+  },
+  {
     call: 'this.mailboxWindow.refreshIfChanged',
     band: 'slow',
     gate: 'this.mailboxWindow.isOpen',
@@ -1662,6 +1670,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         // per-frame allocation.
         'spellbook_window.ts: if (this.knownChanged(this.deps.world().known)) {',
         'target_auras_window.ts: if (this.cleared) return;',
+        'woc_market_window.ts: if (sig === this.lastSig) return;',
         'vale_cup_betting.ts: if (view.sig !== this.lastSig) {',
         'vale_cup_briefing.ts: if (view.sig !== this.lastSig) {',
         'vale_cup_window.ts: if (view.sig === this.lastSig) return;',
