@@ -278,28 +278,43 @@ Pass-1 items (unused imports, `Object.hasOwn`, narrow the
 
 Build: Fable xhigh. QA: ultracode, new session.
 
-D6 as scoped in pass 1 (remaining-deltas field, `addPlayer` re-anchor
-filtered to live ids, comment updates at the FOUR session-only sites,
-round-trip plus freeze-across-logout plus retired-id tests), WIDENED to
-the whole professions blob:
+BUILT 2026-07-28 (QA pending). What each item settled:
 
-1. A blob-wide round-trip sweep test: every professions field on
-   `CharacterState` survives save/load byte-faithfully or through its
-   documented normalizer.
-2. The proficiency clamp-on-load makes a future V3 cap raise
-   rollback-destructive (an old binary would clamp raised values on first
-   save). Record it beside the `toolEffectSlots` rollback caveat and give
-   both one shared "rollback erases newer fields" doc note; the mechanical
-   fix rides the first cap raise.
-3. A leave-time save can run before the tick that applies a reel-landed
-   proficiency grant (`pendingGatherGrants` shape), losing it. Flush or
-   apply pending grants before serialize-on-leave.
-4. `tierMailSent` survives an archetype pair switch, so the return
-   baseline never fires and a retroactive letter sends. Reset it on pair
-   transitions.
-5. The `craftThrottle` analogy comment beside the persistence sites gets
-   the same session-only correction (pass-2 duplicate of a pass-1 item;
-   folded here).
+D6 landed as scoped: `src/sim/professions/node_persist.ts` (remaining-time
+deltas, the `cooldown_persist.ts` scheme) plus the optional zero-default
+`CharacterState.nodeHarvestCooldowns` field; the `addPlayer` re-anchor is
+filtered to live node ids and clamped to one respawn; the session-only
+comment sites were corrected; `tests/professions_node_persist.test.ts`
+pins the round trip, the freeze across logout, the retired-id drop, and
+the field omission. Zero wire changes (`ncd` untouched) and no offline
+site (only the server persists characters). The freeze is the logout
+frame's; a linkdead drop keeps the character in the world, so its timers
+run in live sim time until the grace-expiry save.
+
+1. DONE: `tests/professions_blob_roundtrip.test.ts`, a presence-pinned
+   literal field list, a byte-faithful one-cycle sweep per field, and a
+   whole-blob fixed point (which also catches non-idempotent load
+   transforms for fields the list has not learned about yet), built on the
+   `toolEffectSlots` fixed-point contract rather than re-deriving it.
+2. DONE: one shared "rollback erases newer fields" note in the design
+   record covers `toolEffectSlots`, both clamp-on-load fields
+   (`normalizeGatheringProficiency` AND `normalizeCraftSkills`, each with
+   a cap-raise-caveat pointer at the clamp site), and the new
+   `nodeHarvestCooldowns` key; the mechanical fix rides the first cap
+   raise. The sweep's clamp arm pins the mechanism to the shipped caps.
+3. DONE: `serializeCharacter` folds still-queued grants into BOTH
+   persisted proficiency keys via `foldPendingGatherGrants` (one clamp
+   rule shared with the tick drain). The live queue is untouched, so the
+   drain doctrine (tick path only) holds; covers every save, not only
+   leave (autosave and linkdead grace-expiry included).
+4. DONE: `pruneTierMailToActiveMajors` runs on both transition entry
+   points (the quest attunement path and the legacy `switchArchetype`
+   command) and on load (healing stale pre-prune saves); a craft shared
+   by the old and new pair keeps its entry, so no live crossing is
+   swallowed.
+5. DONE: the `craftThrottle` comment now cites `lastActiveTick` and
+   records that its session-only status is deliberate, unlike the
+   now-persisted `nodeHarvestReadyAt`.
 
 ---
 
