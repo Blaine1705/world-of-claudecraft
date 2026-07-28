@@ -562,13 +562,29 @@ Its own phase because it is the only one that touches persistence and the wire.
   would persist an entity id, which restarts at 1 on every boot and therefore
   stops matching its owner and eventually matches whoever inherits it.
 
-- **Rollback caveat, recorded while it is still cheap.** `saveCharacterState`
-  writes the whole `characters.state` blob rather than merging, so a binary
-  that predates `toolEffectSlots` erases the key on its first autosave. Harmless
-  today (nothing can mint a slot on a production realm, and the field is absent
-  for everyone), but it becomes real player-value loss the moment an
-  acquisition craft with a material cost ships. Whoever lands that craft owns
-  this.
+- **Rollback erases newer fields (the shared caveat).** `saveCharacterState`
+  writes the whole `characters.state` blob rather than merging, and the load
+  path normalizes what it does not recognize, so rolling back to an older
+  binary erases anything only the newer binary writes, on the first autosave
+  after the rollback. One caveat, several instances, kept together here so a
+  rollback decision reads them as one class:
+  - `toolEffectSlots`: a binary that predates the field erases the key.
+    Harmless today (nothing can mint a slot on a production realm, and the
+    field is absent for everyone), but it becomes real player-value loss the
+    moment an acquisition craft with a material cost ships. Whoever lands
+    that craft owns this.
+  - The clamp-on-load fields make a future V3 cap raise ROLLBACK-DESTRUCTIVE:
+    `normalizeGatheringProficiency` and `normalizeCraftSkills` both clamp a
+    loaded value DOWN to the binary's own `maxSkill`, so after a cap raise
+    ships and players climb past the old caps, an old binary would clamp the
+    raised values on load and persist the loss on its first save. The
+    mechanical fix (preserve-over-cap on load, or a versioned clamp) rides
+    the first cap raise; until then any rollback across a cap change needs a
+    restore-from-backup plan for professions counters.
+  - `nodeHarvestCooldowns` (D6): a binary that predates the field erases the
+    key, which resets node respawn timers, so the relog exploit D6 closes
+    reopens for the duration of the rollback window. No player value is
+    lost; noted so the reopened exploit is a known trade, not a surprise.
 - **`guide.profPages.toolsNote` was already stale in all 18 locale overlays, and
   nothing could see it.** The English gained a whole paragraph earlier in this
   packet (`523acb0dd`) and the overlays were not refilled, so every localized

@@ -702,7 +702,11 @@ export function isGatheringProfessionId(id: string): id is GatheringProfessionId
 // value above the profession's enforced content cap (GATHERING_PROFESSIONS
 // maxSkill) clamps DOWN to it; the sim.ts call site feeds this both the
 // current gatheringProficiency key and the legacy pre-rename `professions`
-// key, so the clamp covers both save shapes.
+// key, so the clamp covers both save shapes. CAP-RAISE CAVEAT: this clamp
+// makes a cap raise rollback-destructive (an old binary clamps raised values
+// on load and persists the loss on its first save); whoever raises a cap
+// must ship the mechanical fix with it. See the shared "rollback erases
+// newer fields" note in docs/design/professions-tuning-packet.md.
 export function normalizeGatheringProficiency(
   saved: Partial<Record<string, number>> | undefined | null,
 ): GatheringProficiency {

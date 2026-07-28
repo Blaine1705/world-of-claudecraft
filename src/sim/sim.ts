@@ -1199,9 +1199,11 @@ export interface PlayerMeta {
   // grandfatherKnownRecipes), then persists true. Persisted in CharacterState.
   recipesGrandfathered: boolean;
   // Craft output throttle (#1301): a rolling window of successful crafts,
-  // any recipe. Session-only (like nodeHarvestReadyAt above), never
-  // persisted: a fresh login gets a fresh window rather than carrying a
-  // logout-time cooldown across sessions.
+  // any recipe. Session-only (like lastActiveTick above), never persisted,
+  // and deliberately so: a fresh login gets a fresh 60-second window rather
+  // than carrying a logout-time throttle across sessions. (This used to cite
+  // nodeHarvestReadyAt as its session-only exemplar; that field persists as
+  // remaining deltas now, while this one stays session-only on purpose.)
   craftThrottle: { windowStart: number; count: number };
   // One-time mastery reset notice pending (Professions 2.0): set by
   // the load-time masteryResetApplied branch, consumed by the tick mail phase
