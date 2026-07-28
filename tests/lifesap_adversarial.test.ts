@@ -28,7 +28,9 @@ type SimInternals = {
 function druidWithLifesap(): Sim {
   const sim = new Sim({ seed: 11, playerClass: 'druid', autoEquip: true });
   sim.setPlayerLevel(20);
-  expect(sim.applyTalents({ spec: null, rows: { 11: 'dru_r11_innervate' } })).toBe(true);
+  expect(sim.applyTalents({ spec: null, rows: { 17: 'dru_r17_survival_of_the_fittest' } })).toBe(
+    true,
+  );
   return sim;
 }
 

@@ -1718,12 +1718,12 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Lunar Tempest"
       },
       {
-        "id": "rejuvenation",
-        "name": "Wildbloom"
+        "id": "moonseed",
+        "name": "Moonseed"
       },
       {
-        "id": "thorns",
-        "name": "Briarguard"
+        "id": "rejuvenation",
+        "name": "Wildbloom"
       }
     ],
     "abilities": [
@@ -1742,6 +1742,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "moonfire",
         "name": "Lunar Tempest"
+      },
+      {
+        "id": "moonseed",
+        "name": "Moonseed"
       },
       {
         "id": "rejuvenation",
@@ -1789,7 +1793,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "claw",
-        "name": "Claw"
+        "name": "Rendclaw"
       },
       {
         "id": "regrowth",
@@ -1849,7 +1853,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "rip",
-        "name": "Rip"
+        "name": "Bloodrift"
       },
       {
         "id": "hurricane",

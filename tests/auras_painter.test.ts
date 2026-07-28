@@ -452,6 +452,15 @@ describe('AurasPainter: static-preset visible-count cap', () => {
     expect(nodes()).toHaveLength(AURA_VISIBLE_CAP_LOW + 2);
   });
 
+  it('low keeps every Druid engine bank beyond the ordinary buff cap', () => {
+    const slots = Array.from({ length: AURA_VISIBLE_CAP_LOW + 2 }, (_, i) =>
+      slot({ key: `buff${i}` }),
+    );
+    slots.push(slot({ key: 'moontide' }), slot({ key: 'old_blood' }), slot({ key: 'verdance' }));
+    tierPainter('low').paint(state(slots));
+    expect(nodes()).toHaveLength(AURA_VISIBLE_CAP_LOW + 3);
+  });
+
   it('FAIRNESS: low NEVER culls a debuff -- a debuff past the buff cap still renders', () => {
     // The player buff bar is mode 'all' (buffs + debuffs interleaved). A flat first-N cap
     // would hide a debuff applied after the front buffs; the debuff-priority cap renders it

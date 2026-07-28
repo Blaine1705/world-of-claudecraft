@@ -1014,6 +1014,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.venom_dart.name': 'Phi Tiêu Độc',
   'entities.abilities.venom_dart.description':
     'Búng một phi tiêu tẩm độc gây {damage} sát thương tự nhiên. Cho 1 điểm liên hoàn. Knifework: kéo dài vết thương Xé Độc của bạn thêm 6 giây, tối đa 20 giây.',
+  'entities.abilities.cleansing_verdict.name': 'Phán Quyết Thanh Tẩy',
+  'entities.abilities.cleansing_verdict.description':
+    'Xóa một hiệu ứng phép thuật có hại khỏi mục tiêu đồng minh và hồi cho họ {damage} máu bằng phép Thánh.',
   'entities.abilities.smoke_screen.name': 'Màn Khói',
   'entities.abilities.smoke_screen.description':
     'Bạn biến mất trong đám khói, tăng 30% khả năng né tránh trong 8 giây.',

@@ -289,6 +289,17 @@ export type AuraKind =
   | 'gloam'
   | 'redline'
   | 'veiled_edge'
+  // Druid spec engines (combat/druid_engines.ts): pure stage markers, one per
+  // engine. moontide is Moongrove's single bank: wrath, starfire, and
+  // moonseed casts fill it, and at full bank BOTH payoff buttons light up
+  // (Moonseed becomes Moonsurge, Skyfall becomes Sunwake); pressing either
+  // spends the bank. old_blood is Wildfang's shared bank: form strikes fill
+  // it in either form and the form worn at the spend decides the payoff
+  // (Redharvest in Wolf, Marrowbreak in Bruin). verdance is Groveheart's
+  // garden: completed HoT casts plant stages toward Overbloom.
+  | 'moontide'
+  | 'old_blood'
+  | 'verdance'
   // Cauterize lockout (fire mage, combat/fire_mage.ts): a pure debuff marking that
   // the lethal save already fired. While worn, Cauterize cannot save again. It
   // SURVIVES death (resurrection.ts aurasSurvivingDeath) and pauses while dead, so
@@ -2151,6 +2162,16 @@ export type AbilityEffect =
     }
   | { type: 'extendDot'; dot: string; seconds: number; maxBonus: number }
   | { type: 'consumeDot'; dot: string }
+  // Wildfang Marrowbreak (combat/druid_engines.ts): the bear cash-out's
+  // survival arm. Below the health fraction, the spent bank raises an absorb
+  // of absorbPctMaxHp and refunds rage instead of striking; above it the strike
+  // alone carries the payoff. Deterministic, druid-only.
+  | { type: 'druidMarrowbreakGuard'; belowFrac: number; absorbPctMaxHp: number; rage: number }
+  // Groveheart Overbloom (combat/druid_engines.ts): harvest every HoT the
+  // caster owns for harvestPct of its remaining healing, then replant a
+  // Wildbloom on the cast target (or on every harvested ally with the
+  // Seedspread row lean).
+  | { type: 'druidOverbloom'; harvestPct: number }
   | { type: 'slow'; mult: number; duration: number }
   | {
       type: 'pullTarget';
@@ -2403,6 +2424,7 @@ export interface ActionReplacementRule {
   abilityId: string;
   auraKind: AuraKind;
   minStacks?: number;
+  actorAuraKind?: AuraKind;
 }
 
 export interface AbilityDef {
@@ -2510,6 +2532,9 @@ export interface AbilityDef {
   offGcd?: boolean;
   awardsCombo?: number; // rogue builders
   spendsCombo?: boolean; // rogue finishers
+  /** A finisher that fires at zero points with its base damage; any points
+   *  held still strengthen it (Redharvest: the bank is the real payment). */
+  comboOptional?: boolean;
   fearDr?: boolean; // incapacitate effects that use fear diminishing returns
   requiresDodgeProc?: boolean; // overpower
   requiresTargetHpBelow?: number; // execute-style (fraction)
@@ -2543,6 +2568,9 @@ export interface AbilityDef {
   // full 5-stack Icicles buff). Absent means any presence of the aura suffices.
   // The whole aura is still consumed on cast (consumeAuraKind removes it).
   requiresAuraStacks?: number;
+  // Aura gates normally represent a bank that the successful cast consumes.
+  // Set false for persistent state requirements such as a shapeshift form.
+  consumesRequiredAura?: boolean;
   // A known action may resolve to another authored ability while a visible aura
   // state is active. The hotbar keeps the base id, so saved bindings survive the
   // transformation. The replacement itself is never learned as a second action.

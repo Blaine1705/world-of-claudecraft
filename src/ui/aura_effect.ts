@@ -16,6 +16,8 @@
 //   - tongues: value multiplies casting time (m = max(m, value)); > 1 = slower casts.
 //   - mortal_wound/cost_tax/critvuln/vulnerability/spellvuln/expose/buff_dodge:
 //     value is a 0..1 fraction shown as a percent.
+
+import { MOONTIDE_STAGES, OLD_BLOOD_STAGES, VERDANCE_STAGES } from '../sim/combat/druid_engines';
 import {
   GLOAM_STAGES,
   KNOCKOUT_PER_PIP,
@@ -125,6 +127,21 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
   }
   if (a.kind === 'dusk_economy') {
     return { key: `${KEY}.duskEconomy`, nums: { pct: pctFromFrac(a.value) } };
+  }
+  if (a.id === 'moontide' && a.kind === 'moontide') {
+    return { key: `${KEY}.moontide`, nums: { stacks: a.stacks ?? 0, max: MOONTIDE_STAGES } };
+  }
+  if (a.id === 'old_blood' && a.kind === 'old_blood') {
+    return {
+      key: `${KEY}.oldBlood`,
+      nums: { stacks: a.stacks ?? 0, max: OLD_BLOOD_STAGES },
+    };
+  }
+  if (a.id === 'verdance' && a.kind === 'verdance') {
+    return {
+      key: `${KEY}.verdance`,
+      nums: { stacks: a.stacks ?? 0, max: VERDANCE_STAGES },
+    };
   }
   switch (a.kind) {
     case 'dot':

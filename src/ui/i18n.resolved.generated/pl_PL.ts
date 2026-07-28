@@ -1638,6 +1638,9 @@ export const pl_PL: EnTranslations = {
       "veilstrikeWindow": "Zasłona Cieni: twoje otwarcia Zmierzchowej Zasłony można stosować na otwartej przestrzeni pod każdym kątem, a zadawane obrażenia rosną o {pct}%",
       "veiledEdge": "Twoje następne Uderzenie Czyhającego trafia podwójnie",
       "duskEconomy": "Umiejętności kosztują o {pct}% mniej energii",
+      "moontide": "Moontide: stage {stacks} of {max}. Wildbolt, Skyfall, and Moonseed casts build it in Moonwing Form; at {max}, Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and either spends it",
+      "oldBlood": "Old Blood: stage {stacks} of {max}. Landed Wolf and Bruin strikes share this bank; at {max}, Gorebite or Bonecrush transforms",
+      "verdance": "Verdance: stage {stacks} of {max}. Completed Wildbloom and Second Bloom casts build it; at {max}, Swiftmend becomes Overbloom",
       "increase": {
         "ap": "Erhöht Angriffskraft um {value}",
         "sp": "Zwiększa moc zaklęć o {value}",
@@ -3375,6 +3378,7 @@ export const pl_PL: EnTranslations = {
       "healing_touch": "Potężne leczenie pojedynczego celu o długim czasie rzucania, do uzupełnienia komuś zdrowia.",
       "mark_of_the_wild": "Trwałe błogosławieństwo, które nakładasz na siebie lub sojusznika przed walką.",
       "moonfire": "Trafia natychmiast i pozostawia płonący cel, dobre w ruchu.",
+      "moonseed": "Adds a Moontide stage and extends Lunar Tempest while you are in Moonwing Form.",
       "rejuvenation": "Rzucane natychmiast, leczy sojusznika z czasem, byś mógł działać dalej.",
       "thorns": "Chroni sojusznika tak, że atakujący wręcz ranią się przy uderzeniu."
     },
@@ -7659,6 +7663,10 @@ export const pl_PL: EnTranslations = {
         "name": "Księżycowa nawałnica",
         "description": "Spala wroga księżycowym ogniem, zadając {damage} obrażeń arkanicznych oraz obrażenia w czasie."
       },
+      "moonseed": {
+        "name": "Moonseed",
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds one Moontide stage, and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At full Moontide, Moonseed becomes Moonsurge."
+      },
       "rejuvenation": {
         "name": "Dziki rozkwit",
         "description": "Leczy cel o {damage} w ciągu 12 sek."
@@ -7902,6 +7910,26 @@ export const pl_PL: EnTranslations = {
       "swiftmend": {
         "name": "Szybkie uzdrowienie",
         "description": "Zużywa efekt leczenia w czasie na przyjaznym celu, aby uleczyć go za {damage}. (specjalizacja Odnowa)"
+      },
+      "moonlash": {
+        "name": "Moonsurge",
+        "description": "Consumes 3 Moontide for a heavy Arcane strike: the damage choice. Spends the same bank as Sunwake, so pick one."
+      },
+      "sunlance": {
+        "name": "Sunwake",
+        "description": "Consumes 3 Moontide for a Nature strike and burn and restores 35 mana: the economy choice. Spends the same bank as Moonsurge, so pick one."
+      },
+      "redharvest": {
+        "name": "Redharvest",
+        "description": "Consumes 3 Old Blood, detonates all remaining Flense and Bloodrift damage you own on the target, and restores 30 energy. Any combo points held strengthen the bite but are never required."
+      },
+      "marrowbreak": {
+        "name": "Marrowbreak",
+        "description": "Consumes 3 Old Blood for a heavy, high-threat strike. Below half health, instead absorbs 18% of maximum health for 8 sec and restores 15 rage."
+      },
+      "overbloom": {
+        "name": "Overbloom",
+        "description": "Consumes 5 Verdance. Harvests every heal over time you own on all allies for 60% of its remaining healing, removes those effects, and plants a fresh Wildbloom on the target."
       },
       "summon_imp": {
         "name": "Przywołanie Emberkina",
@@ -8366,6 +8394,10 @@ export const pl_PL: EnTranslations = {
       "revive_pet": {
         "name": "Opatrzenie",
         "description": "Opatruje twojego zwierzaka. Jeśli żyje, przywraca mu łącznie {overTime} pkt. zdrowia przez 12 sek., co 3 sek. Jeśli nie żyje, wskrzesza go z 35% zdrowia."
+      },
+      "cleansing_verdict": {
+        "name": "Oczyszczający Wyrok",
+        "description": "Usuwa szkodliwy efekt magiczny z przyjaznego celu i leczy go świętą magią za {damage}."
       }
     },
     "items": {

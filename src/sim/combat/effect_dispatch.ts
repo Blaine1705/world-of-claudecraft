@@ -83,6 +83,13 @@ import {
   selectCascadeTargets,
 } from './chronomancy';
 import { extendOwnedDot } from './dot_mutation';
+import {
+  druidApexPayoffMult,
+  druidEngineOnHotPlanted,
+  druidEngineOnLandedStrike,
+  druidMarrowbreakUsesGuard,
+  resolveDruidOverbloom,
+} from './druid_engines';
 import { consumeAuraKind, consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
 import { exclusiveAuraConflicts } from './exclusive_aura';
@@ -463,7 +470,9 @@ export function runEffects(
     }
   }
 
-  if (ability.requiresAuraKind) consumeAuraKind(ctx, p, ability.requiresAuraKind);
+  if (ability.requiresAuraKind && ability.consumesRequiredAura !== false) {
+    consumeAuraKind(ctx, p, ability.requiresAuraKind);
+  }
 
   let targetBuffIndex = 0;
   for (const eff of res.effects) {
@@ -506,6 +515,7 @@ export function runEffects(
         // inside the veil consumes the edge and strikes for double.
         weaponMult *= consumeVeiledEdge(ctx, p, ability.id);
         const hit = ctx.meleeSwing(p, target, bonus, ability.name, {
+          abilityId: ability.id,
           cannotBeDodged: eff.cannotBeDodged,
           weaponMult,
           threatFlat: res.threatFlat,
@@ -601,6 +611,16 @@ export function runEffects(
       case 'directDamage': {
         if (!target) break;
         if (!ctx.isHostileTo(p, target)) break;
+        const marrowbreakGuard = res.effects.find(
+          (effect) => effect.type === 'druidMarrowbreakGuard',
+        );
+        if (
+          ability.id === 'marrowbreak' &&
+          marrowbreakGuard?.type === 'druidMarrowbreakGuard' &&
+          druidMarrowbreakUsesGuard(p, marrowbreakGuard.belowFrac)
+        ) {
+          break;
+        }
         const rooted = isRootedOrChilled(target);
         const abilityMod = mods.abilities[ability.id];
         const critChance =
@@ -661,6 +681,7 @@ export function runEffects(
         // the caster's charge aura (combat/chronomancy.ts).
         if (ability.id === ARCANE_SURGE_ID) dmg *= aetherSurgeDamageMult(p);
         dmg *= thundercallDamageMultiplier(ctx, p, ability.id);
+        dmg *= druidApexPayoffMult(ctx, p, ability.id);
         const finalDamage = Math.round(dmg);
         lastDirectDamage = finalDamage;
         const targetHpBefore = target.hp;
@@ -800,7 +821,7 @@ export function runEffects(
         break;
       }
       case 'finisherDamage': {
-        if (!target || spentCombo <= 0) break;
+        if (!target || (spentCombo <= 0 && !ability.comboOptional)) break;
         let dmg =
           eff.base +
           eff.perCombo * spentCombo +
@@ -809,6 +830,7 @@ export function runEffects(
         // Knockout Blow (rogue combat engine): cash out the Redline window,
         // hitting harder per pip; consuming the window here ENDS the run.
         dmg *= knockoutRedlineMult(ctx, p, ability.id);
+        dmg *= druidApexPayoffMult(ctx, p, ability.id);
         const crit =
           ctx.rng.chance(consumeNextAttackCrit(ctx, p) ? 1 : p.critChance) ||
           sureCrit ||
@@ -831,6 +853,7 @@ export function runEffects(
           false,
           ability.id,
         );
+        druidEngineOnLandedStrike(ctx, p, ability.id);
         // Second Shadow (rogue capstone, docs/design/rogue-v029-class-design.md):
         // a full 5-combo finisher strikes again as a shadow echo at a fraction of
         // the resolved damage. No extra rng (never crits); the amount is already
@@ -1189,6 +1212,9 @@ export function runEffects(
       }
       case 'hot': {
         const hotTarget = target ?? p;
+        const plantsHot = !hotTarget.auras.some(
+          (aura) => aura.kind === 'hot' && aura.id === ability.id && aura.sourceId === p.id,
+        );
         // A HoT that RIDES a direct heal (Regrowth-style) does NOT also scale here:
         // the direct component already took the cast-time coefficient, so scaling the
         // rider too would double-dip. Only pure HoTs (Rejuvenation) take the rider.
@@ -1207,6 +1233,7 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
         });
+        if (plantsHot) druidEngineOnHotPlanted(ctx, p, ability.id);
         break;
       }
       case 'absorb': {
@@ -1607,7 +1634,12 @@ export function runEffects(
         if (eff.directPct !== undefined && lastDirectDamage <= 0) break;
         const dotTotal =
           eff.directPct === undefined ? eff.total : Math.round(lastDirectDamage * eff.directPct);
-        const dotBase = Math.max(1, Math.round(dotTotal / (eff.duration / eff.interval)));
+        const dotBase = Math.max(
+          1,
+          Math.round(
+            (dotTotal / (eff.duration / eff.interval)) * druidApexPayoffMult(ctx, p, ability.id),
+          ),
+        );
         // Physical bleeds (Rend, Rupture, Garrote, Rip) scale off melee Attack
         // Power here just like a spell DoT scales off Spell Power; `hybrid` still
         // suppresses the rider on a DoT that trails its own direct nuke.
@@ -1628,6 +1660,7 @@ export function runEffects(
           school: eff.school ?? ability.school,
           leechPct: eff.leechPct,
         });
+        if (ability.id === 'rip') druidEngineOnLandedStrike(ctx, p, ability.id);
         ctx.enterCombat(p, target);
         break;
       }
@@ -1649,7 +1682,9 @@ export function runEffects(
           untilNextTick <= dot.remaining
             ? 1 + Math.max(0, Math.floor((dot.remaining - untilNextTick) / interval))
             : 0;
-        const remainingDamage = Math.round(dot.value * ticksLeft);
+        const remainingDamage = Math.round(
+          dot.value * ticksLeft * druidApexPayoffMult(ctx, p, ability.id),
+        );
         target.auras.splice(dotIndex, 1);
         ctx.emit({ type: 'aura', targetId: target.id, name: dot.name, gained: false });
         ctx.emit({
@@ -1672,6 +1707,28 @@ export function runEffects(
             threatOpts,
           );
         }
+        break;
+      }
+      case 'druidMarrowbreakGuard': {
+        if (!druidMarrowbreakUsesGuard(p, eff.belowFrac)) break;
+        const mult = druidApexPayoffMult(ctx, p, ability.id);
+        ctx.applyAura(p, {
+          id: 'marrowbreak_guard',
+          name: ability.name,
+          kind: 'absorb',
+          remaining: 8,
+          duration: 8,
+          value: Math.round(p.maxHp * eff.absorbPctMaxHp * mult),
+          sourceId: p.id,
+          school: 'nature',
+        });
+        if (p.resourceType === 'rage') {
+          p.resource = Math.min(p.maxResource, p.resource + eff.rage);
+        }
+        break;
+      }
+      case 'druidOverbloom': {
+        resolveDruidOverbloom(ctx, p, target ?? p, eff.harvestPct);
         break;
       }
       case 'slow': {
@@ -2006,6 +2063,7 @@ export function runEffects(
           ctx.awardCombo(p, aoeTargets[0], ability.awardsCombo);
           comboAwarded = true;
         }
+        if (aoeTargets.length > 0) druidEngineOnLandedStrike(ctx, p, ability.id);
         break;
       }
       case 'chainDamage': {

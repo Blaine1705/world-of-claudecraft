@@ -200,6 +200,60 @@ describe('talent production save migrations', () => {
     expect(migrated.loadouts?.[0].bar).toContain('charge');
   });
 
+  it('gives revision-2 Druids a free repick and removes retired row grants', () => {
+    const legacy = cloneFixture();
+    legacy.contentRevision = 2;
+    legacy.level = 20;
+    legacy.talents = {
+      spec: 'feral',
+      rows: {
+        5: 'dru_r5_improved_wrath',
+        8: 'dru_r8_typhoon',
+        11: 'dru_r11_innervate',
+        14: 'dru_r14_savage_fury',
+        17: 'dru_r17_frenzied_regeneration',
+        20: 'dru_r20_berserk',
+      },
+    };
+    legacy.loadouts = [
+      {
+        name: 'Old Wildfang',
+        alloc: structuredClone(legacy.talents),
+        bar: ['feral_charge', 'innervate', 'frenzied_regeneration', 'berserk'],
+      },
+    ];
+    legacy.activeLoadout = 0;
+
+    const migrated = migrateCharacterTalentsV2('druid', legacy);
+
+    expect(migrated.contentRevision).toBe(CURRENT_CHARACTER_CONTENT_REVISION);
+    expect(migrated.contentRevision).toBeGreaterThan(2);
+    expect(migrated.talents).toEqual({ spec: 'feral', rows: {} });
+    expect(migrated.loadouts?.[0].alloc).toEqual({ spec: 'feral', rows: {} });
+    expect(migrated.loadouts?.[0].bar).toContain('feral_charge');
+    expect(migrated.loadouts?.[0].bar).not.toContain('innervate');
+    expect(migrated.loadouts?.[0].bar).not.toContain('frenzied_regeneration');
+    expect(migrated.loadouts?.[0].bar).not.toContain('berserk');
+  });
+
+  it('leaves revision-2 non-Druids alone: the druid reset must not spill over', () => {
+    const legacy = cloneFixture();
+    legacy.contentRevision = 2;
+    legacy.level = 20;
+    legacy.talents = {
+      spec: 'beast_mastery',
+      rows: { 5: 'hun_r5_tactical_retreat', 20: 'hun_r20_overdraw' },
+    };
+
+    const migrated = migrateCharacterTalentsV2('hunter', legacy);
+
+    expect(migrated.contentRevision).toBe(CURRENT_CHARACTER_CONTENT_REVISION);
+    expect(migrated.talents).toEqual({
+      spec: 'beast_mastery',
+      rows: { 5: 'hun_r5_tactical_retreat', 20: 'hun_r20_overdraw' },
+    });
+  });
+
   it('loads, saves, and reloads the migrated Warrior without duplicate learning or neutral-state loss', () => {
     const sim = new Sim({ seed: 17, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Migration Fixture', { state: cloneFixture() });

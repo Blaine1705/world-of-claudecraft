@@ -78,6 +78,7 @@ import {
   handleDeath as handleDeathImpl,
 } from './combat/damage';
 import { damageTakenWithin } from './combat/damage_history';
+import { druidEngineCombatState } from './combat/druid_engines';
 import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
@@ -133,6 +134,8 @@ import { ensureWarriorStance } from './combat/warrior_stances';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
+import { applyTalentMods } from './content/classes';
+import { MAILBOXES } from './content/mailboxes';
 import type { GatheringProfessionId } from './content/professions';
 import { PTR_DEV_VENDOR_DEF } from './content/ptr_dev_vendor';
 import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
@@ -946,6 +949,9 @@ export interface ResolvedAbility {
   cost: number;
   castTime: number;
   cooldown: number; // base def.cooldown, after talent cooldown modifiers
+  /** Cooldown map key when a cooldown-carrying transform shares the base
+   *  button's clock (one slot, one clock); absent for every other resolve. */
+  cooldownId?: string;
   effects: AbilityEffect[];
   threatFlat: number; // classic bonus threat on a successful use
   threatMult: number; // classic multiplier on this ability's damage-threat
@@ -4557,6 +4563,7 @@ export class Sim {
     // hunter resolvers land here, the one choke point the cast path, cost
     // checks, and the server all read).
     let found = resolveActionReplacement(known, r.e);
+    if (found !== known) applyTalentMods(found, this.playerMods(r.meta));
     found = resolveColdsightAbility(found, r.e, r.meta);
     found = resolveHunterSharedAbility(found, r.e, r.meta);
     found = resolveVespersAbility(found, r.meta);
@@ -4740,6 +4747,7 @@ export class Sim {
       if (p) {
         p.inCombat = this.engagedPids.has(p.id) || p.combatTimer < 5;
         updatePaladinDevotion(p, DT, this.playerMods(meta).global.paladinSacredReserve > 0);
+        druidEngineCombatState(this.ctx, p);
       }
     }
     lap?.('engaged');

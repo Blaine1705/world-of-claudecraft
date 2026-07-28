@@ -1153,6 +1153,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.venom_dart.name': 'Dard venimeux',
   'entities.abilities.venom_dart.description':
     'Projette un dard empoisonné infligeant {damage} points de dégâts de Nature. Confère 1 point de combo. Knifework : prolonge votre plaie de Déchirure venimeuse de 6 sec, jusqu’à 20 sec.',
+  'entities.abilities.cleansing_verdict.name': 'Verdict purificateur',
+  'entities.abilities.cleansing_verdict.description':
+    'Dissipe un effet magique néfaste sur une cible alliée et lui rend {damage} points de vie par la magie du Sacré.',
   'entities.abilities.smoke_screen.name': 'Écran de fumée',
   'entities.abilities.smoke_screen.description':
     'Vous disparaissez dans un nuage de fumée, ce qui augmente vos chances d’esquiver de 30 % pendant 8 s.',

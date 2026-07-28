@@ -1833,101 +1833,120 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
   rows: [
     {
       level: 5,
-      theme: 'opening_cycles',
-      decision: 'Wildbolt spell cycle vs Wolf Form opener vs Wildbloom healing payoff',
+      theme: 'movement',
+      decision: 'escape control, sprint after shifting, or cast while moving',
       options: [
         {
           id: 'dru_r5_improved_wrath',
-          name: 'Moonkindle',
-          description: 'Every 3rd Wildbolt makes your next Lunar Tempest within 8 sec free.',
-          icon: 'wrath',
-          effect: {
-            proc: {
-              id: 'dru_improved_wildbolt',
-              name: 'Moonkindle',
-              trigger: { on: 'castNth', n: 3, abilities: ['wrath'] },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_free',
-                  abilities: ['moonfire'],
-                  duration: 8,
-                },
-              ],
-            },
-          },
+          name: 'Wildshift',
+          description: 'Shapeshifting removes breakable roots and slows.',
+          icon: 'travel_form',
+          effect: { intrinsic: { mechanic: 'druid_wildshift', metrics: {} } },
         },
         {
           id: 'dru_r5_ferocity',
-          name: 'Redmaw',
+          name: 'Loping Stride',
           description:
-            'Shifting into Wolf Form makes your next Rendclaw or Flense within 8 sec cost 50% less.',
-          icon: 'claw',
+            'Shapeshifting grants 60% movement speed for 3 sec, at most once every 20 sec.',
+          icon: 'cat_form',
           effect: {
-            proc: {
-              id: 'dru_redmaw',
-              name: 'Redmaw',
-              trigger: { on: 'castNth', n: 1, abilities: ['cat_form'] },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_cheap',
-                  abilities: ['claw', 'rake'],
-                  duration: 8,
-                  costPct: 0.5,
-                },
-              ],
+            intrinsic: {
+              mechanic: 'druid_loping_stride',
+              metrics: { pct: 0.6, duration: 3, icd: 20 },
             },
           },
         },
         {
           id: 'dru_r5_natures_bounty',
-          name: "Bloom's End",
-          description:
-            'When Wildbloom runs its full duration, your next Wildmend within 8 sec is instant.',
-          icon: 'rejuvenation',
+          name: 'Skylark',
+          description: 'Wildbolt, Skyfall, Wildmend, and Second Bloom are castable while moving.',
+          icon: 'wrath',
           effect: {
-            proc: {
-              id: 'dru_natures_bounty',
-              name: "Bloom's End",
-              trigger: { on: 'hotExpired', ability: 'rejuvenation' },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_instant',
-                  abilities: ['healing_touch'],
-                  duration: 8,
-                },
-              ],
-            },
+            ability: [
+              { ability: 'wrath', castWhileMoving: true },
+              { ability: 'starfire', castWhileMoving: true },
+              { ability: 'healing_touch', castWhileMoving: true },
+              { ability: 'regrowth', castWhileMoving: true },
+            ],
           },
         },
       ],
     },
     {
       level: 8,
-      theme: 'disruption',
-      decision: 'area knockback vs root-to-spell setup vs Concuss rage and reset',
+      theme: 'defense',
+      decision: 'active armor, reactive absorption, or reactive self healing',
       options: [
         {
           id: 'dru_r8_typhoon',
+          name: 'Oakhide Reflex',
+          description: 'Oakhide gains 50% more armor and its cooldown is reduced by 20 sec.',
+          icon: 'barkskin',
+          effect: {
+            ability: [{ ability: 'barkskin', buffPct: 0.5, cooldownFlat: -20 }],
+          },
+        },
+        {
+          id: 'dru_r8_improved_roots',
+          name: 'Ironhide Reflex',
+          description:
+            'Taking a hit for at least 20% of maximum health shields you for 15% of maximum health for 6 sec. 20 sec internal cooldown.',
+          icon: 'bear_form',
+          effect: {
+            proc: {
+              id: 'dru_ironhide_reflex',
+              name: 'Ironhide Reflex',
+              trigger: { on: 'bigHitTaken', hpFrac: 0.2, icd: 20 },
+              responses: [
+                {
+                  kind: 'absorb',
+                  amountPctMaxHp: 0.15,
+                  duration: 6,
+                  name: 'Ironhide Reflex',
+                },
+              ],
+            },
+          },
+        },
+        {
+          id: 'dru_r8_brutal_bash',
+          name: 'Bear-Blood Mending',
+          description:
+            'Taking a hit for at least 20% of maximum health heals you for 12% of maximum health. 20 sec internal cooldown.',
+          icon: 'healing_touch',
+          effect: {
+            proc: {
+              id: 'dru_bear_blood_mending',
+              name: 'Bear-Blood Mending',
+              trigger: { on: 'bigHitTaken', hpFrac: 0.2, icd: 20 },
+              responses: [{ kind: 'heal', amountPctMaxHp: 0.12, target: 'self' }],
+            },
+          },
+        },
+      ],
+    },
+    {
+      level: 11,
+      theme: 'control',
+      decision: 'area displacement, root ambush, or Concuss economy',
+      options: [
+        {
+          id: 'dru_r11_innervate',
           name: 'Typhoon',
           description: 'Grants Typhoon: knock back and daze all enemies within 8 yd.',
           icon: 'typhoon',
           effect: { grant: { ability: 'typhoon' } },
         },
         {
-          // Balance pass: the root has no cooldown, so the instant Wildbolt
-          // now sits behind an internal cooldown instead of chaining forever.
-          id: 'dru_r8_improved_roots',
-          name: 'Briar Ambush',
+          id: 'dru_r11_furor',
+          name: 'Gripping Ambush',
           description:
             'Gripping Roots makes your next Wildbolt within 8 sec instant, at most once every 15 sec.',
           icon: 'entangling_roots',
           effect: {
             proc: {
-              id: 'dru_briar_ambush',
-              name: 'Briar Ambush',
+              id: 'dru_gripping_ambush',
+              name: 'Gripping Ambush',
               trigger: { on: 'castNth', n: 1, abilities: ['entangling_roots'], icd: 15 },
               responses: [
                 {
@@ -1941,15 +1960,14 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
           },
         },
         {
-          id: 'dru_r8_brutal_bash',
-          name: 'Bruin Rebound',
-          description:
-            'Concuss restores 15 rage, refunding its 10 rage cost plus 5 additional rage, and removes 20 sec from its cooldown.',
+          id: 'dru_r11_improved_mark',
+          name: 'Concussive Economy',
+          description: 'Concuss restores 15 rage and removes 20 sec from its cooldown.',
           icon: 'bash',
           effect: {
             proc: {
-              id: 'dru_brutal_bash',
-              name: 'Bruin Rebound',
+              id: 'dru_concussive_economy',
+              name: 'Concussive Economy',
               trigger: { on: 'castNth', n: 1, abilities: ['bash'] },
               responses: [
                 { kind: 'resource', amount: 15, resourceType: 'rage' },
@@ -1961,217 +1979,99 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
       ],
     },
     {
-      level: 11,
-      theme: 'renewal',
-      decision: 'cross-form resource waves vs shapeshift attack discount vs healing cadence ward',
-      options: [
-        {
-          id: 'dru_r11_innervate',
-          name: 'Lifesap',
-          description:
-            'Grants Lifesap: living sap restores your current resource in waves, in any form.',
-          icon: 'innervate',
-          effect: { grant: { ability: 'innervate' } },
-        },
-        {
-          id: 'dru_r11_furor',
-          name: 'Formrush',
-          description: 'Shapeshifting makes your next form attack within 8 sec cost 50% less.',
-          icon: 'bear_form',
-          effect: {
-            proc: {
-              id: 'dru_wildsurge',
-              name: 'Formrush',
-              trigger: {
-                on: 'castNth',
-                n: 1,
-                abilities: ['bear_form', 'cat_form', 'travel_form'],
-              },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_cheap',
-                  abilities: ['maul', 'swipe', 'claw', 'rake', 'ferocious_bite', 'rip'],
-                  duration: 8,
-                  costPct: 0.5,
-                },
-              ],
-            },
-          },
-        },
-        {
-          id: 'dru_r11_improved_mark',
-          name: 'Grove Covenant',
-          description: 'Every 3rd Wildmend shields its target, absorbing 90 damage for 10 sec.',
-          icon: 'mark_of_the_wild',
-          effect: {
-            proc: {
-              id: 'dru_grove_covenant',
-              name: 'Grove Covenant',
-              trigger: { on: 'castNth', n: 3, abilities: ['healing_touch'] },
-              responses: [{ kind: 'absorb', amount: 90, duration: 10, name: 'Grove Covenant' }],
-            },
-          },
-        },
-      ],
-    },
-    {
       level: 14,
-      theme: 'payoff_loops',
-      decision: 'feral finisher cycle vs lunar instant cast vs emergency heal echo',
+      theme: 'engine_economy',
+      decision: 'Moongrove refunds, bleed-fed Old Blood, or wider Overbloom replanting',
       options: [
         {
           id: 'dru_r14_savage_fury',
-          name: 'Redtooth Rhythm',
-          description:
-            'Each Gorebite or Bloodrift makes your next Rendclaw or Flense within 8 sec cost 50% less.',
-          icon: 'ferocious_bite',
-          effect: {
-            proc: {
-              id: 'dru_savage_fury',
-              name: 'Redtooth Rhythm',
-              trigger: { on: 'castNth', n: 1, abilities: ['ferocious_bite', 'rip'] },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_cheap',
-                  abilities: ['claw', 'rake'],
-                  duration: 8,
-                  costPct: 0.5,
-                },
-              ],
-            },
-          },
+          name: 'Blooddrunk',
+          description: 'Each tick of your Flense and Bloodrift advances Old Blood by one stage.',
+          icon: 'rip',
+          effect: { intrinsic: { mechanic: 'druid_blooddrunk', metrics: {} } },
         },
         {
-          // Balance pass: was n:1 off a no-cooldown instant, which made every
-          // Skyfall in the game instant forever. Now every 3rd, behind an icd.
           id: 'dru_r14_moonfury',
-          name: 'Moonspite',
-          description:
-            'Every 3rd Lunar Tempest makes your next Skyfall within 8 sec instant, at most once every 15 sec.',
-          icon: 'moonfire',
+          name: 'Highmoon Tithe',
+          description: 'Moonsurge and Sunwake each restore 15% of your maximum mana.',
+          icon: 'moonseed',
           effect: {
-            proc: {
-              id: 'dru_moonspite',
-              name: 'Moonspite',
-              trigger: { on: 'castNth', n: 3, abilities: ['moonfire'], icd: 15 },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_instant',
-                  abilities: ['starfire'],
-                  duration: 8,
-                },
-              ],
-            },
+            intrinsic: { mechanic: 'druid_highmoon_tithe', metrics: { pct: 0.15 } },
           },
         },
         {
           id: 'dru_r14_empowered_touch',
-          name: 'Mercy Seed',
+          name: 'Seedspread',
           description:
-            'Wildmend leaves a stored heal of 60 that triggers if the target falls below 35% health within 8 sec.',
-          icon: 'healing_touch',
+            'Overbloom replants a fresh Wildbloom on every ally whose healing it harvested.',
+          icon: 'rejuvenation',
           effect: {
-            proc: {
-              id: 'dru_empowered_touch',
-              name: 'Mercy Seed',
-              trigger: { on: 'castNth', n: 1, abilities: ['healing_touch'] },
-              responses: [
-                { kind: 'echo', belowFrac: 0.35, window: 8, heal: 60, name: 'Mercy Seed' },
-              ],
-            },
+            intrinsic: { mechanic: 'druid_seedspread', metrics: {} },
           },
         },
       ],
     },
     {
       level: 17,
-      theme: 'survival',
-      decision: 'Oakhide-fed instant spell vs active bear healing vs hit-fed rage shield',
+      theme: 'major_cooldown',
+      decision: 'feral burst, party healing, or resource restoration',
       options: [
         {
           id: 'dru_r17_improved_barkskin',
-          name: 'Oaken Reflex',
-          description:
-            'Oakhide makes your next Wildbolt, Skyfall, Wildmend, or Second Bloom within 8 sec instant.',
-          icon: 'barkskin',
-          effect: {
-            proc: {
-              id: 'dru_improved_barkskin',
-              name: 'Oaken Reflex',
-              trigger: { on: 'castNth', n: 1, abilities: ['barkskin'] },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_instant',
-                  abilities: ['wrath', 'starfire', 'healing_touch', 'regrowth'],
-                  duration: 8,
-                },
-              ],
-            },
-          },
-        },
-        {
-          id: 'dru_r17_frenzied_regeneration',
-          name: 'Savage Mending',
-          description: 'Grants Savage Mending.',
-          icon: 'frenzied_regeneration',
-          effect: { grant: { ability: 'frenzied_regeneration' } },
-        },
-        {
-          // Phase-2 defensive pass: the rage kick stays (the least-lazy of the
-          // old seven); the absorb scales with max health now.
-          id: 'dru_r17_survival_of_the_fittest',
-          name: 'Ironhide Reflex',
-          description:
-            'Taking a hit for at least 20% of your maximum health shields you, absorbing 15% of your maximum health for 6 sec. While in Bruin Form, it also restores 20 rage. 20 sec internal cooldown.',
-          icon: 'bear_form',
-          effect: {
-            proc: {
-              id: 'dru_survival_of_the_fittest',
-              name: 'Ironhide Reflex',
-              trigger: { on: 'bigHitTaken', hpFrac: 0.2, icd: 20 },
-              responses: [
-                { kind: 'resource', amount: 20, resourceType: 'rage' },
-                { kind: 'absorb', amountPctMaxHp: 0.15, duration: 6, name: 'Ironhide Reflex' },
-              ],
-            },
-          },
-        },
-      ],
-    },
-    {
-      level: 20,
-      theme: 'apex_harmony',
-      decision: 'moonwing party crit vs feral burst vs party healing channel',
-      options: [
-        {
-          // Balance pass round two (maintainer): Storm Refrain still read as a
-          // dud, so the capstone is the party buff instead: Moonwing druids
-          // radiate spell crit (combat/natures_fury.ts pulses it; the form
-          // requirement is the whole point).
-          id: 'dru_r20_improved_hurricane',
-          name: "Nature's Fury",
-          description:
-            'While in Moonwing Form, you and your party members within 30 yd gain 3% spell critical strike chance.',
-          icon: 'hurricane',
-          effect: { global: { moonwingPartyCritPct: 0.03 } },
-        },
-        {
-          id: 'dru_r20_berserk',
           name: 'Red Haze',
           description: 'Grants Red Haze.',
           icon: 'berserk',
           effect: { grant: { ability: 'berserk' } },
         },
         {
-          id: 'dru_r20_tranquility',
+          id: 'dru_r17_frenzied_regeneration',
           name: 'Gladesong',
           description: 'Grants Gladesong.',
           icon: 'tranquility',
           effect: { grant: { ability: 'tranquility' } },
+        },
+        {
+          id: 'dru_r17_survival_of_the_fittest',
+          name: 'Lifesap',
+          description:
+            'Grants Lifesap: living sap restores your current resource in waves, in any form.',
+          icon: 'innervate',
+          effect: { grant: { ability: 'innervate' } },
+        },
+      ],
+    },
+    {
+      level: 20,
+      theme: 'engine_capstone',
+      decision: 'echo the next cycle, amplify the payoff, or gain resource while banking',
+      options: [
+        {
+          id: 'dru_r20_improved_hurricane',
+          name: "Nature's Echo",
+          description: 'After an engine payoff, begin its next cycle with one banked stage.',
+          icon: 'moonseed',
+          effect: { intrinsic: { mechanic: 'druid_natures_echo', metrics: {} } },
+        },
+        {
+          id: 'dru_r20_berserk',
+          name: 'Wild Apex',
+          description:
+            'Moonsurge, Sunwake, Redharvest, Marrowbreak, and Overbloom are 25% stronger.',
+          icon: 'primal_reflexes',
+          effect: { intrinsic: { mechanic: 'druid_wild_apex', metrics: { pct: 0.25 } } },
+        },
+        {
+          id: 'dru_r20_tranquility',
+          name: 'Quickening',
+          description:
+            'Each engine stage banked restores 2% maximum mana, 5 energy, or 3 rage, matching your current resource.',
+          icon: 'innervate',
+          effect: {
+            intrinsic: {
+              mechanic: 'druid_quickening',
+              metrics: { manaPct: 0.02, energy: 5, rage: 3 },
+            },
+          },
         },
       ],
     },

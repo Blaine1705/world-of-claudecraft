@@ -1674,6 +1674,14 @@ export const hudChromeStrings = {
       'Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%',
     veiledEdge: "Your next Lurker's Strike strikes for double",
     duskEconomy: 'Abilities cost {pct}% less energy',
+    // Rogue spec-engine states; wordy (M16): filled in the five non-Latin
+    // locales in this change.
+    moontide:
+      'Moontide: stage {stacks} of {max}. Wildbolt, Skyfall, and Moonseed casts build it in Moonwing Form; at {max}, Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and either spends it',
+    oldBlood:
+      'Old Blood: stage {stacks} of {max}. Landed Wolf and Bruin strikes share this bank; at {max}, Gorebite or Bonecrush transforms',
+    verdance:
+      'Verdance: stage {stacks} of {max}. Completed Wildbloom and Second Bloom casts build it; at {max}, Swiftmend becomes Overbloom',
     increase: {
       ap: 'Increases attack power by {value}',
       sp: 'Increases spell power by {value}',

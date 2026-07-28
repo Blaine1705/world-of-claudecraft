@@ -2789,6 +2789,12 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   drain_life: r('shadow', 'blood', [{ p: 'droplet', pal: 'blood' }], ['motion', 'drips']),
   // druid
   wrath: r('nature', 'leafGreen', ['bolt', { p: 'leaf', ...BR }], ['glow']),
+  moonseed: r('arcane', 'leafGreen', ['moon', { p: 'leaf', ...BR }], ['sparkle']),
+  moonlash: r('arcane', 'silverWhite', ['moon', { p: 'lightning', ...BR }], ['arcs', 'glow']),
+  sunlance: r('nature', 'gold', ['sunburst', { p: 'bolt', ...BR }], ['glow']),
+  redharvest: r('blood', 'blood', ['fang', { p: 'droplet', ...BR }], ['drips']),
+  marrowbreak: r('earth', 'earthBrown', ['paw', { p: 'bone', ...BR }], ['crack']),
+  overbloom: r('nature', 'leafGreen', ['heart', { p: 'leaf', ...BR }], ['sparkle', 'glow']),
   healing_touch: r('nature', 'leafGreen', ['hand', { p: 'leaf', ...TL }], ['sparkle']),
   mark_of_the_wild: r('nature', 'leafGreen', ['paw'], ['sparkle']),
   moonfire: r('arcane', 'silverWhite', [{ p: 'moon', pal: 'silverWhite' }], ['glow', 'sparkle']),
@@ -3351,6 +3357,10 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   aura_cost_tax: r('shadow', 'shadowPurple', ['gem', { p: 'droplet', ...BR }], ['drips']),
   aura_heal_absorb: r('shadow', 'shadowPurple', ['heart'], ['drips']),
   aura_form_bear: r('earth', 'earthBrown', ['paw']),
+  aura_moontide: r('arcane', 'silverWhite', ['moon', { p: 'tendrils', ...BR }], ['glow']),
+  aura_sunwake: r('nature', 'gold', ['sunburst', { p: 'tendrils', ...BR }], ['glow']),
+  aura_old_blood: r('blood', 'blood', ['fang', { p: 'droplet', ...BR }], ['drips']),
+  aura_verdance: r('nature', 'leafGreen', ['leaf', { p: 'heart', ...BR }], ['sparkle']),
   // Inert rolling-window markers (kind 'internal_cd': Heating Up, the temporal
   // accumulator, the Water Jet counter). A single ember-on-gold "charging" look;
   // without it every marker warned to the console and fell back, once per frame.

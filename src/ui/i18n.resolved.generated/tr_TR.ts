@@ -1638,6 +1638,9 @@ export const tr_TR: EnTranslations = {
       "veilstrikeWindow": "Gölge Perdesi: Alacakaranlık Perdesi açılışların açık alanda her açıdan kullanılabilir ve verdiğin hasar {pct}% artar",
       "veiledEdge": "Sonraki Pusucu Vuruşun iki kat sert vurur",
       "duskEconomy": "Yetenekler {pct}% daha az enerji harcar",
+      "moontide": "Moontide: stage {stacks} of {max}. Wildbolt, Skyfall, and Moonseed casts build it in Moonwing Form; at {max}, Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and either spends it",
+      "oldBlood": "Old Blood: stage {stacks} of {max}. Landed Wolf and Bruin strikes share this bank; at {max}, Gorebite or Bonecrush transforms",
+      "verdance": "Verdance: stage {stacks} of {max}. Completed Wildbloom and Second Bloom casts build it; at {max}, Swiftmend becomes Overbloom",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "sp": "Büyü gücünü {value} artırır",
@@ -3375,6 +3378,7 @@ export const tr_TR: EnTranslations = {
       "healing_touch": "Uzun süreli, birini tam dolduran büyük tek hedefli bir iyileştirme.",
       "mark_of_the_wild": "Dövüşten önce kendine ya da bir dosta koyduğun kalıcı bir kutsama.",
       "moonfire": "Anında vurur ve hedefi yanar halde bırakır, hareket halindeyken iyidir.",
+      "moonseed": "Adds a Moontide stage and extends Lunar Tempest while you are in Moonwing Form.",
       "rejuvenation": "Anında okunur ve bir dostu zamanla iyileştirir, böylece harekete devam edebilirsin.",
       "thorns": "Bir dostu korur, böylece yakın dövüş saldırganları vurdukları için kendilerine zarar verir."
     },
@@ -7659,6 +7663,10 @@ export const tr_TR: EnTranslations = {
         "name": "Ay Fırtınası",
         "description": "Düşmanı ay ateşiyle {damage} Gizemli hasar ve zamana yayılı hasar ile yakar."
       },
+      "moonseed": {
+        "name": "Moonseed",
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds one Moontide stage, and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At full Moontide, Moonseed becomes Moonsurge."
+      },
       "rejuvenation": {
         "name": "Yaban Çiçeği",
         "description": "Hedefi 12 saniye boyunca {damage} iyileştirir."
@@ -7902,6 +7910,26 @@ export const tr_TR: EnTranslations = {
       "swiftmend": {
         "name": "Hızlı İyileştirme",
         "description": "Dost bir hedefteki zamanla iyileştirme etkisini tüketerek onu {damage} kadar iyileştirir. (Restorasyon imzası)"
+      },
+      "moonlash": {
+        "name": "Moonsurge",
+        "description": "Consumes 3 Moontide for a heavy Arcane strike: the damage choice. Spends the same bank as Sunwake, so pick one."
+      },
+      "sunlance": {
+        "name": "Sunwake",
+        "description": "Consumes 3 Moontide for a Nature strike and burn and restores 35 mana: the economy choice. Spends the same bank as Moonsurge, so pick one."
+      },
+      "redharvest": {
+        "name": "Redharvest",
+        "description": "Consumes 3 Old Blood, detonates all remaining Flense and Bloodrift damage you own on the target, and restores 30 energy. Any combo points held strengthen the bite but are never required."
+      },
+      "marrowbreak": {
+        "name": "Marrowbreak",
+        "description": "Consumes 3 Old Blood for a heavy, high-threat strike. Below half health, instead absorbs 18% of maximum health for 8 sec and restores 15 rage."
+      },
+      "overbloom": {
+        "name": "Overbloom",
+        "description": "Consumes 5 Verdance. Harvests every heal over time you own on all allies for 60% of its remaining healing, removes those effects, and plants a fresh Wildbloom on the target."
       },
       "summon_imp": {
         "name": "Emberkin Çağırma",
@@ -8366,6 +8394,10 @@ export const tr_TR: EnTranslations = {
       "revive_pet": {
         "name": "Yarasını Sar",
         "description": "Evcilinin yaralarını sarar. Yaşıyorsa 12 saniye boyunca her 3 saniyede bir iyileştirerek toplam {overTime} can yeniler. Ölüyse %35 canla diriltir."
+      },
+      "cleansing_verdict": {
+        "name": "Arındırıcı Hüküm",
+        "description": "Dost bir hedeften zararlı bir büyü etkisini kaldırır ve onu {damage} Kutsal iyileştirir."
       }
     },
     "items": {

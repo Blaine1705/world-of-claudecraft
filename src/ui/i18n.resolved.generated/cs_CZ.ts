@@ -1638,6 +1638,9 @@ export const cs_CZ: EnTranslations = {
       "veilstrikeWindow": "Stínový závoj: tvá zahájení Soumračného závoje lze použít na otevřeném prostranství z libovolného úhlu a způsobené poškození se zvyšuje o {pct}%",
       "veiledEdge": "Tvůj další Úder číhajícího zasáhne dvojnásobně",
       "duskEconomy": "Schopnosti stojí o {pct}% méně energie",
+      "moontide": "Moontide: stage {stacks} of {max}. Wildbolt, Skyfall, and Moonseed casts build it in Moonwing Form; at {max}, Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and either spends it",
+      "oldBlood": "Old Blood: stage {stacks} of {max}. Landed Wolf and Bruin strikes share this bank; at {max}, Gorebite or Bonecrush transforms",
+      "verdance": "Verdance: stage {stacks} of {max}. Completed Wildbloom and Second Bloom casts build it; at {max}, Swiftmend becomes Overbloom",
       "increase": {
         "ap": "Zvyšuje sílu útoku o {value}",
         "sp": "Zvyšuje sílu kouzel o {value}",
@@ -3375,6 +3378,7 @@ export const cs_CZ: EnTranslations = {
       "healing_touch": "Velké léčení jednoho cíle s dlouhým sesláním, pro úplné doléčení.",
       "mark_of_the_wild": "Trvalé požehnání, které dáváš sobě nebo spojenci před bojem.",
       "moonfire": "Zasáhne okamžitě a nechá cíl hořet, dobré během pohybu.",
+      "moonseed": "Adds a Moontide stage and extends Lunar Tempest while you are in Moonwing Form.",
       "rejuvenation": "Sesílá se okamžitě a léčí spojence v čase, takže můžeš dál jednat.",
       "thorns": "Ochrání spojence tak, že útočníci na blízko si sami ublíží za každý zásah."
     },
@@ -7659,6 +7663,10 @@ export const cs_CZ: EnTranslations = {
         "name": "Měsíční bouře",
         "description": "Spálí nepřítele měsíčním ohněm za {damage} arkánního poškození plus poškození v čase."
       },
+      "moonseed": {
+        "name": "Moonseed",
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds one Moontide stage, and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At full Moontide, Moonseed becomes Moonsurge."
+      },
       "rejuvenation": {
         "name": "Divoký květ",
         "description": "Vyléčí cíl za {damage} během 12 s."
@@ -7902,6 +7910,26 @@ export const cs_CZ: EnTranslations = {
       "swiftmend": {
         "name": "Rychlé zhojení",
         "description": "Spotřebuje průběžné léčení na spojeneckém cíli a vyléčí ho za {damage}. (klíčová schopnost Obnovy)"
+      },
+      "moonlash": {
+        "name": "Moonsurge",
+        "description": "Consumes 3 Moontide for a heavy Arcane strike: the damage choice. Spends the same bank as Sunwake, so pick one."
+      },
+      "sunlance": {
+        "name": "Sunwake",
+        "description": "Consumes 3 Moontide for a Nature strike and burn and restores 35 mana: the economy choice. Spends the same bank as Moonsurge, so pick one."
+      },
+      "redharvest": {
+        "name": "Redharvest",
+        "description": "Consumes 3 Old Blood, detonates all remaining Flense and Bloodrift damage you own on the target, and restores 30 energy. Any combo points held strengthen the bite but are never required."
+      },
+      "marrowbreak": {
+        "name": "Marrowbreak",
+        "description": "Consumes 3 Old Blood for a heavy, high-threat strike. Below half health, instead absorbs 18% of maximum health for 8 sec and restores 15 rage."
+      },
+      "overbloom": {
+        "name": "Overbloom",
+        "description": "Consumes 5 Verdance. Harvests every heal over time you own on all allies for 60% of its remaining healing, removes those effects, and plants a fresh Wildbloom on the target."
       },
       "summon_imp": {
         "name": "Vyvolat Žhavorozeného",
@@ -8366,6 +8394,10 @@ export const cs_CZ: EnTranslations = {
       "revive_pet": {
         "name": "Ošetření",
         "description": "Ošetří tvého mazlíčka. Pokud žije, obnoví mu celkem {overTime} zdraví během 12 s v intervalech po 3 s. Pokud je mrtvý, oživí ho s 35 % zdraví."
+      },
+      "cleansing_verdict": {
+        "name": "Očistný rozsudek",
+        "description": "Odstraní škodlivý magický účinek ze spojeneckého cíle a vyléčí jej svatou magií za {damage}."
       }
     },
     "items": {

@@ -1638,6 +1638,9 @@ export const da_DK: EnTranslations = {
       "veilstrikeWindow": "Skyggeslør: dine Tusmørkesløråbninger kan bruges i det åbne fra enhver vinkel, og den gjorte skade øges med {pct}%",
       "veiledEdge": "Dit næste Lurerslag rammer dobbelt så hårdt",
       "duskEconomy": "Evner koster {pct}% mindre energi",
+      "moontide": "Moontide: stage {stacks} of {max}. Wildbolt, Skyfall, and Moonseed casts build it in Moonwing Form; at {max}, Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and either spends it",
+      "oldBlood": "Old Blood: stage {stacks} of {max}. Landed Wolf and Bruin strikes share this bank; at {max}, Gorebite or Bonecrush transforms",
+      "verdance": "Verdance: stage {stacks} of {max}. Completed Wildbloom and Second Bloom casts build it; at {max}, Swiftmend becomes Overbloom",
       "increase": {
         "ap": "Erhöht Angriffskraft um {value}",
         "sp": "Øger trolddomsstyrke med {value}",
@@ -3375,6 +3378,7 @@ export const da_DK: EnTranslations = {
       "healing_touch": "En stor helbredelse på ét mål med lang besværgelsestid, til at fylde nogen op.",
       "mark_of_the_wild": "En vedvarende velsignelse du lægger på dig selv eller en allieret før en kamp.",
       "moonfire": "Rammer øjeblikkeligt og efterlader målet brændende, god mens du bevæger dig.",
+      "moonseed": "Adds a Moontide stage and extends Lunar Tempest while you are in Moonwing Form.",
       "rejuvenation": "Kastes øjeblikkeligt og helbreder en allieret over tid, så du kan blive ved med at handle.",
       "thorns": "Beskytter en allieret så nærkampsangribere skader sig selv når de slår."
     },
@@ -7659,6 +7663,10 @@ export const da_DK: EnTranslations = {
         "name": "Månestorm",
         "description": "Brænder fjenden med måneild for {damage} arkan skade plus skade over tid."
       },
+      "moonseed": {
+        "name": "Moonseed",
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds one Moontide stage, and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At full Moontide, Moonseed becomes Moonsurge."
+      },
       "rejuvenation": {
         "name": "Vildblomst",
         "description": "Helbreder målet for {damage} over 12 sek."
@@ -7902,6 +7910,26 @@ export const da_DK: EnTranslations = {
       "swiftmend": {
         "name": "Hurtig heling",
         "description": "Forbruger en helbredelse over tid-effekt på et venligt mål for at helbrede det for {damage}. (Genoprettelsessignatur)"
+      },
+      "moonlash": {
+        "name": "Moonsurge",
+        "description": "Consumes 3 Moontide for a heavy Arcane strike: the damage choice. Spends the same bank as Sunwake, so pick one."
+      },
+      "sunlance": {
+        "name": "Sunwake",
+        "description": "Consumes 3 Moontide for a Nature strike and burn and restores 35 mana: the economy choice. Spends the same bank as Moonsurge, so pick one."
+      },
+      "redharvest": {
+        "name": "Redharvest",
+        "description": "Consumes 3 Old Blood, detonates all remaining Flense and Bloodrift damage you own on the target, and restores 30 energy. Any combo points held strengthen the bite but are never required."
+      },
+      "marrowbreak": {
+        "name": "Marrowbreak",
+        "description": "Consumes 3 Old Blood for a heavy, high-threat strike. Below half health, instead absorbs 18% of maximum health for 8 sec and restores 15 rage."
+      },
+      "overbloom": {
+        "name": "Overbloom",
+        "description": "Consumes 5 Verdance. Harvests every heal over time you own on all allies for 60% of its remaining healing, removes those effects, and plants a fresh Wildbloom on the target."
       },
       "summon_imp": {
         "name": "Tilkald Emberkin",
@@ -8366,6 +8394,10 @@ export const da_DK: EnTranslations = {
       "revive_pet": {
         "name": "Lappe sammen",
         "description": "Lapper dit kæledyr sammen. Hvis det lever, genopretter det i alt {overTime} helbred over 12 sek. med helbredelse hvert 3. sek. Hvis det er dødt, genopliver det med 35 % helbred."
+      },
+      "cleansing_verdict": {
+        "name": "Rensende Dom",
+        "description": "Fjerner en skadelig magisk effekt fra et venligt mål og helbreder det med Hellig magi for {damage}."
       }
     },
     "items": {

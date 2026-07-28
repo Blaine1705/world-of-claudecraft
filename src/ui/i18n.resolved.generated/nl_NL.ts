@@ -1638,6 +1638,9 @@ export const nl_NL: EnTranslations = {
       "veilstrikeWindow": "Schaduwsluier: je Schemersluier-openingen zijn in het open veld vanuit elke hoek bruikbaar, en de aangerichte schade stijgt met {pct}%",
       "veiledEdge": "Je volgende Sluipersslag slaat dubbel zo hard toe",
       "duskEconomy": "Vaardigheden kosten {pct}% minder energie",
+      "moontide": "Moontide: stage {stacks} of {max}. Wildbolt, Skyfall, and Moonseed casts build it in Moonwing Form; at {max}, Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and either spends it",
+      "oldBlood": "Old Blood: stage {stacks} of {max}. Landed Wolf and Bruin strikes share this bank; at {max}, Gorebite or Bonecrush transforms",
+      "verdance": "Verdance: stage {stacks} of {max}. Completed Wildbloom and Second Bloom casts build it; at {max}, Swiftmend becomes Overbloom",
       "increase": {
         "ap": "Erhöht Angriffskraft um {value}",
         "sp": "Verhoogt spreukkracht met {value}",
@@ -3375,6 +3378,7 @@ export const nl_NL: EnTranslations = {
       "healing_touch": "Een grote enkeldoelsgenezing met een lange spreuktijd, om iemand aan te vullen.",
       "mark_of_the_wild": "Een blijvende zegening die je op jezelf of een bondgenoot legt voor een gevecht.",
       "moonfire": "Raakt direct en laat het doelwit branden, goed terwijl je beweegt.",
+      "moonseed": "Adds a Moontide stage and extends Lunar Tempest while you are in Moonwing Form.",
       "rejuvenation": "Wordt direct uitgesproken en geneest een bondgenoot na verloop van tijd, zodat je kunt blijven handelen.",
       "thorns": "Beschermt een bondgenoot zodat melee-aanvallers zichzelf bezeren bij het toeslaan."
     },
@@ -7659,6 +7663,10 @@ export const nl_NL: EnTranslations = {
         "name": "Maanstorm",
         "description": "Verbrandt de vijand met maanvuur voor {damage} Arcane schade plus schade over tijd."
       },
+      "moonseed": {
+        "name": "Moonseed",
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds one Moontide stage, and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At full Moontide, Moonseed becomes Moonsurge."
+      },
       "rejuvenation": {
         "name": "Wildbloei",
         "description": "Geneest het doelwit voor {damage} gedurende 12 sec."
@@ -7902,6 +7910,26 @@ export const nl_NL: EnTranslations = {
       "swiftmend": {
         "name": "Snelle genezing",
         "description": "Verbruikt een genezing-over-tijd-effect op een bevriend doelwit om het voor {damage} te genezen. (Herstel signatuur)"
+      },
+      "moonlash": {
+        "name": "Moonsurge",
+        "description": "Consumes 3 Moontide for a heavy Arcane strike: the damage choice. Spends the same bank as Sunwake, so pick one."
+      },
+      "sunlance": {
+        "name": "Sunwake",
+        "description": "Consumes 3 Moontide for a Nature strike and burn and restores 35 mana: the economy choice. Spends the same bank as Moonsurge, so pick one."
+      },
+      "redharvest": {
+        "name": "Redharvest",
+        "description": "Consumes 3 Old Blood, detonates all remaining Flense and Bloodrift damage you own on the target, and restores 30 energy. Any combo points held strengthen the bite but are never required."
+      },
+      "marrowbreak": {
+        "name": "Marrowbreak",
+        "description": "Consumes 3 Old Blood for a heavy, high-threat strike. Below half health, instead absorbs 18% of maximum health for 8 sec and restores 15 rage."
+      },
+      "overbloom": {
+        "name": "Overbloom",
+        "description": "Consumes 5 Verdance. Harvests every heal over time you own on all allies for 60% of its remaining healing, removes those effects, and plants a fresh Wildbloom on the target."
       },
       "summon_imp": {
         "name": "Emberkin Oproepen",
@@ -8366,6 +8394,10 @@ export const nl_NL: EnTranslations = {
       "revive_pet": {
         "name": "Oplappen",
         "description": "Lapt je huisdier op. Als het leeft, herstelt het in totaal {overTime} gezondheid gedurende 12 sec., met elke 3 sec. een tik. Als het dood is, wordt het met 35% gezondheid tot leven gewekt."
+      },
+      "cleansing_verdict": {
+        "name": "Zuiverend Vonnis",
+        "description": "Verwijdert een schadelijk magisch effect van een bevriend doelwit en geneest het met Heilige magie voor {damage}."
       }
     },
     "items": {

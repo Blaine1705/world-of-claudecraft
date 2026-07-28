@@ -17,32 +17,41 @@ const TALENTS_V2_CONTENT_REVISION = 1;
  * 2: the v0.31 class-overhaul wave (hunter, shaman, priest, paladin, rogue);
  * changed option ids get a free row repick, and the repair scrubs retired row
  * grants (for rogues: Contingency, Wraith Strike, Shadecloak) off saved bars.
+ * 3: the v0.29 Druid redesign; its rows kept their ids while changing meaning,
+ * so the druid repick also wipes surviving row picks.
  * Untouched classes keep their build and bar layout and only advance the marker,
  * but every class is still scrubbed of ability ids it cannot use (see below).
  */
-export const CURRENT_CHARACTER_CONTENT_REVISION = 2;
+export const CURRENT_CHARACTER_CONTENT_REVISION = 3;
 
 /**
- * The classes whose kit actually changed AT `CURRENT_CHARACTER_CONTENT_REVISION`.
- * These get the full repair: a free row repick, plus empty bar slots refilled with
- * their new baseline actives.
+ * Which classes were redesigned at each revision, applied STEPWISE: a save that
+ * skipped several revisions collects every repick it is owed on the way up, so a
+ * pre-wave hunter save still gets its revision-2 repick when it migrates to 3.
+ * `wipeRows` is for redesigns that kept row ids while changing what they mean
+ * (the druid re-theme): a plain repair would keep the stale picks, so the repick
+ * must clear them.
  *
- * WHEN YOU REDESIGN A CLASS: bump `CURRENT_CHARACTER_CONTENT_REVISION` and rewrite
- * this set to the classes redesigned at the NEW revision (it is per-revision, not
- * cumulative). This list was `cls !== 'hunter'` while the v0.29 hunter redesign was
- * the only one in flight; paladin (#2428) and rogue (#2328) landed later in the same
- * wave and were silently missed, which left retired ids like `judgement` sitting on
- * live bars. Forgetting the list is no longer that dangerous, because the scrub below
- * runs for every class, but a redesigned class left out of it still loses its free
- * repick and its refilled bar.
+ * WHEN YOU REDESIGN A CLASS: add a new revision entry (or join the newest entry
+ * if your redesign ships in the same wave) and bump
+ * `CURRENT_CHARACTER_CONTENT_REVISION` to match. The rev-2 wave originally used a
+ * single overwritten set; paladin (#2428) and rogue (#2328) were silently missed
+ * by an earlier `cls !== 'hunter'` guard, which left retired ids like `judgement`
+ * on live bars. The scrub below now runs for every class, so a missed entry can
+ * no longer strand dead ids, but the class still loses its free repick.
  */
-const REDESIGNED_AT_CURRENT_REVISION: ReadonlySet<PlayerClass> = new Set<PlayerClass>([
-  'hunter',
-  'shaman',
-  'priest',
-  'paladin',
-  'rogue',
-]);
+const REDESIGNED_BY_REVISION: ReadonlyArray<{
+  revision: number;
+  classes: ReadonlySet<PlayerClass>;
+  wipeRows: boolean;
+}> = [
+  {
+    revision: 2,
+    classes: new Set<PlayerClass>(['hunter', 'shaman', 'priest', 'paladin', 'rogue']),
+    wipeRows: false,
+  },
+  { revision: 3, classes: new Set<PlayerClass>(['druid']), wipeRows: true },
+];
 
 function migrationLevel(value: number): number {
   if (!Number.isFinite(value)) return 1;
@@ -124,15 +133,19 @@ function migrateLoadouts(
   value: unknown,
   activeValue: unknown,
   seed: boolean,
+  wipeRows: boolean,
 ): { loadouts: SavedLoadout[]; activeLoadout: number } {
   const repaired = repairTalentLoadouts(cls, level, value, activeValue);
   return {
     activeLoadout: repaired.activeLoadout,
-    loadouts: repaired.loadouts.map((loadout) => ({
-      name: loadout.name,
-      alloc: loadout.alloc,
-      bar: migrateLoadoutBar(cls, level, loadout.alloc, loadout.bar, seed),
-    })),
+    loadouts: repaired.loadouts.map((loadout) => {
+      const alloc = wipeRows ? { spec: loadout.alloc.spec, rows: {} } : loadout.alloc;
+      return {
+        name: loadout.name,
+        alloc,
+        bar: migrateLoadoutBar(cls, level, alloc, loadout.bar, seed),
+      };
+    }),
   };
 }
 
@@ -150,19 +163,24 @@ export function migrateCharacterTalentsV2(cls: PlayerClass, state: CharacterStat
     : 0;
   if (revision >= CURRENT_CHARACTER_CONTENT_REVISION) return state;
 
-  // A pre-v1 save always needs the full conversion; at v1 and up only a class this
-  // revision actually redesigned does.
-  const fullRepair =
-    revision < TALENTS_V2_CONTENT_REVISION || REDESIGNED_AT_CURRENT_REVISION.has(cls);
+  // A pre-v1 save always needs the full conversion; at v1 and up only a class
+  // some skipped revision actually redesigned does (stepwise, see the table).
+  const owed = REDESIGNED_BY_REVISION.filter(
+    (step) => revision < step.revision && step.classes.has(cls),
+  );
+  const fullRepair = revision < TALENTS_V2_CONTENT_REVISION || owed.length > 0;
+  const wipeRows = fullRepair && owed.some((step) => step.wipeRows);
 
   const level = migrationLevel(state.level);
-  const talents = fullRepair ? repairAllocation(cls, state.talents, level) : state.talents;
+  const repairedTalents = fullRepair ? repairAllocation(cls, state.talents, level) : state.talents;
+  const talents = wipeRows ? { spec: repairedTalents.spec, rows: {} } : repairedTalents;
   const migratedLoadouts = migrateLoadouts(
     cls,
     level,
     state.loadouts,
     state.activeLoadout,
     fullRepair,
+    wipeRows,
   );
   return {
     ...state,

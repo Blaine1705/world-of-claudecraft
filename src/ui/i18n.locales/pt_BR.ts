@@ -1091,6 +1091,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.venom_dart.name': 'Dardo Venenoso',
   'entities.abilities.venom_dart.description':
     'Arremessa um dardo envenenado que causa {damage} de dano de Natureza. Concede 1 ponto de combo. Knifework: prolonga sua ferida de Dilaceração Venenosa em 6 s, até 20 s.',
+  'entities.abilities.cleansing_verdict.name': 'Veredito Purificador',
+  'entities.abilities.cleansing_verdict.description':
+    'Expurga um efeito mágico nocivo de um alvo aliado e o cura em {damage} com magia Sagrada.',
   'entities.abilities.smoke_screen.name': 'Cortina de Fumaça',
   'entities.abilities.smoke_screen.description':
     'Você desaparece numa nuvem de fumaça, aumentando em 30% sua chance de esquiva por 8 s.',

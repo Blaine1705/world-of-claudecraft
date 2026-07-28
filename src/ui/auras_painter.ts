@@ -70,6 +70,9 @@ const ALWAYS_VISIBLE_AURA_IDS: ReadonlySet<string> = new Set([
   'divine_ascension',
   'shaman_thunder_charges',
   'shaman_warspirit_cadence',
+  'moontide',
+  'old_blood',
+  'verdance',
 ]);
 
 /** What the pool needs from the Hud: the icon-URL resolver, the tooltip renderer, and

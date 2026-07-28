@@ -1031,6 +1031,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.venom_dart.name': 'Giftpil',
   'entities.abilities.venom_dart.description':
     'Kaster en forgiftet pil for {damage} naturskade. Giver 1 combopoint. Knifework: forlænger dit Giftflænge-sår med 6 sek., op til 20 sek.',
+  'entities.abilities.cleansing_verdict.name': 'Rensende Dom',
+  'entities.abilities.cleansing_verdict.description':
+    'Fjerner en skadelig magisk effekt fra et venligt mål og helbreder det med Hellig magi for {damage}.',
   'entities.abilities.smoke_screen.name': 'Røgslør',
   'entities.abilities.smoke_screen.description':
     'Du forsvinder i en røgsky, hvilket øger din undvigelseschance med 30 % i 8 sek.',

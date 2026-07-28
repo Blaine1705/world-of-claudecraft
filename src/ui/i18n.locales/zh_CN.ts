@@ -2887,7 +2887,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowburn.name': '暮火',
   'entities.abilities.shadowburn.description': '立即以灼热暗影轰击目标，造成 {damage} 点暗影伤害。',
   'entities.abilities.wrath.name': '野性弹',
-  'entities.abilities.wrath.description': '投掷一道自然能量箭，造成 {damage} 点自然伤害。',
+  'entities.abilities.wrath.description':
+    '投掷一道自然能量箭，造成 {damage} 点自然伤害。在月翼形态下，完成施法会积累月潮。月潮满层时，将其消耗：月种变为月涌，天陨变为日醒。',
   'entities.abilities.healing_touch.name': '野性愈合',
   'entities.abilities.healing_touch.description': '为一个友方目标恢复 {damage} 点生命值。',
   'entities.abilities.mark_of_the_wild.name': '野性守护',
@@ -2895,9 +2896,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '为一个友方目标施加野性守护，使护甲提高 {buff}，持续 30 分钟。',
   'entities.abilities.moonfire.name': '月光风暴',
   'entities.abilities.moonfire.description':
-    '以月火灼烧敌人，造成 {damage} 点奥术伤害，并附加持续伤害。',
+    '以月火灼烧敌人，造成 {damage} 点奥术伤害，并附加持续伤害。月林：让它持续燃烧；月种可将其延长 6 秒。',
   'entities.abilities.rejuvenation.name': '野性绽放',
-  'entities.abilities.rejuvenation.description': '在 12 秒内为目标恢复 {damage} 点生命值。',
+  'entities.abilities.rejuvenation.description':
+    '在 12 秒内为目标恢复 {damage} 点生命值。林心：种下新的绽放会积累繁茂；繁茂达到 5 层时，迅捷治愈变为盛放。',
   'entities.abilities.thorns.name': '荆棘守护',
   'entities.abilities.thorns.description': '目标身上长出荆棘：近战攻击者受到 {buff} 点自然伤害。',
   'entities.abilities.entangling_roots.name': '缠握根须',
@@ -2907,24 +2909,25 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '变形为熊：护甲 +130%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。',
   'entities.abilities.maul.name': '碎骨击',
   'entities.abilities.maul.description':
-    '一次猛击攻击，使近战伤害提高 {damage}，并产生大量威胁值。在你的下一次挥击时触发。仅限巨熊形态。',
+    '一次猛击攻击，使近战伤害提高 {damage}，并产生大量威胁值。野牙：命中的攻击会储存古血；达到 3 层时，碎骨击变为碎髓。在你的下一次挥击时触发。仅限巨熊形态。',
   'entities.abilities.growl.name': '威吓',
   'entities.abilities.growl.description':
     '对目标低吼：你的威胁值提高到其最仇恨敌人的水平，并强迫其攻击你 3 秒。仅限巨熊形态。',
   'entities.abilities.cat_form.name': '狼形态',
   'entities.abilities.cat_form.description':
-    '变形为狼：攻击强度随等级提高，攻击使用能量和连击点，产生的威胁值降低 29%。再次施放可返回施法者形态。',
-  'entities.abilities.claw.name': '爪击',
+    '变形为狼：敏捷随等级提高，攻击强度提高8点并且每级再提高2点，攻击使用能量和连击点，产生的威胁值降低29%。再次施放可返回施法者形态。',
+  'entities.abilities.claw.name': '裂爪',
   'entities.abilities.claw.description':
-    '用利爪攻击敌人，造成武器伤害加 {damage}。奖励 1 个连击点。仅限狼形态。',
+    '用利爪攻击敌人，造成武器伤害加 {damage}。奖励 1 个连击点。野牙：命中的攻击会储存古血。仅限狼形态。',
   'entities.abilities.ferocious_bite.name': '血噬',
-  'entities.abilities.ferocious_bite.description': '终结技，造成 {damage}。仅限狼形态。',
+  'entities.abilities.ferocious_bite.description':
+    '终结技，造成 {damage}。野牙：命中的攻击会储存古血；达到 3 层时，血噬变为血收。仅限狼形态。',
   'entities.abilities.swipe.name': '横扫利爪',
   'entities.abilities.swipe.description':
-    '横扫附近敌人，造成 {damage} 点伤害。造成额外威胁值。仅限巨熊形态。',
+    '横扫附近敌人，造成 {damage} 点伤害。造成额外威胁值。野牙：命中的攻击会储存古血。仅限巨熊形态。',
   'entities.abilities.regrowth.name': '二度绽放',
   'entities.abilities.regrowth.description':
-    '为一个友方目标恢复 {damage} 点生命值，并在 21 秒内额外恢复一定生命值。',
+    '为一个友方目标恢复 {damage} 点生命值，并在 21 秒内额外恢复一定生命值。林心：种下新的绽放会积累繁茂。',
   'entities.abilities.barkskin.name': '橡树皮',
   'entities.abilities.barkskin.description': '你的皮肤硬化如树皮，使护甲提高 150，持续 15 秒。',
   'entities.abilities.sacred_bulwark.name': '神圣壁垒',
@@ -2934,7 +2937,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.primal_reflexes.description':
     '你的本能变得敏锐，使闪避几率提高 50%，持续 6 秒。',
   'entities.abilities.starfire.name': '天陨',
-  'entities.abilities.starfire.description': '召下一道星辰之火，造成 {damage} 点奥术伤害。',
+  'entities.abilities.starfire.description':
+    '召下一道星辰之火，造成 {damage} 点奥术伤害。在月翼形态下，完成施法会积累月潮。月潮满层时，天陨变为日醒。',
   'entities.abilities.travel_form.name': '迅捷形态',
   'entities.abilities.travel_form.description':
     '立刻化为轻捷的迅捷形态，使移动速度提高 40%。变形状态下你无法使用其他技能，但可以在战斗中或脱离战斗时变形，非常适合逃离。',
@@ -2959,9 +2963,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tigers_fury.name': '狼血',
   'entities.abilities.tigers_fury.description':
     '使攻击强度提高 {buff}，持续 {duration} 秒。仅限狼形态。',
-  'entities.abilities.rip.name': '割裂',
+  'entities.abilities.rip.name': '血裂',
   'entities.abilities.rip.description':
-    '终结技，在 12 秒内造成 {damage} 点流血伤害。消耗连击点。仅限狼形态。',
+    '终结技，造成持续24秒共{damage}的流血伤害。消耗连击点数。野牙：命中的这一击会储存古血。仅限狼形态。',
   'entities.abilities.mortal_strike.name': '致残打击',
   'entities.abilities.mortal_strike.description':
     '凶狠打击，造成武器伤害外加 {damage} 点伤害。（武器专精标志技能）',
@@ -3008,7 +3012,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '在狼形态下进入潜行状态，移动速度降低 50%。无法在战斗中使用。',
   'entities.abilities.rake.name': '剐削',
   'entities.abilities.rake.description':
-    '一记潜行起手技，以武器伤害外加{damage}撕抓敌人，并造成持续9秒的流血伤害。获得1点连击点数。仅限狼形态使用。',
+    '以武器伤害外加{damage}剐削敌人，并造成持续18秒的流血伤害。获得1点连击点数。野牙：命中的攻击会储存古血。仅限狼形态使用。',
   'entities.abilities.revive_pet.name': '修补',
   'entities.abilities.revive_pet.description':
     '修补你的宠物。若其存活，在12秒内每3秒恢复一次生命值，共恢复{overTime}点；若其死亡，则以35%生命值将其复活。',
@@ -3070,7 +3074,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '冲向敌人并使其定身1秒。8-25码距离。（野性专精招牌）',
   'entities.abilities.swiftmend.name': '迅捷治愈',
   'entities.abilities.swiftmend.description':
-    '吞噬友方目标身上的持续治疗效果，为其恢复{damage}点生命值。（恢复专精招牌）',
+    '吞噬友方目标身上的持续治疗效果，为其恢复{damage}点生命值。完成野性绽放与二度绽放的施法会积累繁茂；繁茂达到5层时，迅捷治愈变为盛放。（恢复专精招牌）',
   'entities.abilities.crusader_strike.name': '十字军打击',
   'entities.abilities.crusader_strike.description':
     '打击目标，造成武器伤害外加 {damage} 点神圣伤害。（圣骑士天赋）',
@@ -9012,4 +9016,29 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   // v0.31 class-overhaul wave: paladin (#2428), rogue (#2328), and the
   // hunter/shaman/priest redesigns (#2218). Filled by the maintainer.
   'hudChrome.auraEffect.dawnsWrath': '制裁之锤：无生命限制 · +1次 · 冷却0 · 伤害+{pct}%',
+  'hudChrome.auraEffect.moontide':
+    '月潮：第{stacks}/{max}层。月翼形态下，野性弹、天陨与月种的施法积累层数。达到{max}层时，月种变为月涌、天陨变为日醒，使用任意一个都会消耗月潮',
+  'hudChrome.auraEffect.oldBlood':
+    '古血：第{stacks}/{max}层。狼形态与巨熊形态的命中攻击共享储备；达到{max}层时，血噬或碎骨击变形',
+  'hudChrome.auraEffect.verdance':
+    '繁茂：第{stacks}/{max}层。完成野性绽放与二度绽放会积累层数；达到{max}层时，迅捷治愈变为盛放',
+  'entities.abilities.moonseed.name': '月种',
+  'entities.abilities.moonseed.description':
+    '仅限月翼形态。造成{damage}点奥术伤害，使月潮推进一层，并将你的月光风暴延长6秒；每次施加最多延长6秒。月潮满层时，月种变为月涌。',
+  'guide.abilityHook.moonseed': '在月翼形态下，推进一层月潮并延长月光风暴。',
+  'entities.abilities.moonlash.name': '月涌',
+  'entities.abilities.moonlash.description':
+    '消耗3层月潮，造成强力奥术打击：伤害之选。与日醒消耗同一份月潮，二者只能选其一。',
+  'entities.abilities.sunlance.name': '日醒',
+  'entities.abilities.sunlance.description':
+    '消耗3层月潮，造成自然打击与灼烧，并恢复35点法力：法力之选。与月涌消耗同一份月潮，二者只能选其一。',
+  'entities.abilities.redharvest.name': '血收',
+  'entities.abilities.redharvest.description':
+    '消耗3层古血，引爆目标身上由你施加的剐削与血裂剩余伤害，并恢复30点能量。持有的连击点数会强化撕咬，但并非必需。',
+  'entities.abilities.marrowbreak.name': '碎髓',
+  'entities.abilities.marrowbreak.description':
+    '消耗3层古血，造成高威胁的重击。生命值低于一半时，改为吸收相当于最大生命值18%的伤害，持续8秒，并恢复15点怒气。',
+  'entities.abilities.overbloom.name': '盛放',
+  'entities.abilities.overbloom.description':
+    '消耗5层繁茂。收割你在所有盟友身上的持续治疗，以其剩余治疗量的60%立即治疗，移除这些效果，并在目标身上种下一次新的野性绽放。',
 };

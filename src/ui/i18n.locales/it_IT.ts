@@ -1103,6 +1103,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.venom_dart.name': 'Dardo velenoso',
   'entities.abilities.venom_dart.description':
     'Scaglia un dardo avvelenato che infligge {damage} danni da Natura. Conferisce 1 punto combo. Knifework: prolunga la tua ferita di Squarcio velenoso di 6 sec, fino a 20 sec.',
+  'entities.abilities.cleansing_verdict.name': 'Verdetto Purificante',
+  'entities.abilities.cleansing_verdict.description':
+    'Dissipa un effetto magico dannoso da un bersaglio alleato e lo cura di {damage} con magia Sacra.',
   'entities.abilities.smoke_screen.name': 'Cortina Fumogena',
   'entities.abilities.smoke_screen.description':
     'Scompari in una nube di fumo, aumentando del 30% la probabilità di schivare per 8 s.',

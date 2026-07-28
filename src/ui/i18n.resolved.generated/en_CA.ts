@@ -1638,6 +1638,9 @@ export const en_CA: EnTranslations = {
       "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
       "veiledEdge": "Your next Lurker's Strike strikes for double",
       "duskEconomy": "Abilities cost {pct}% less energy",
+      "moontide": "Moontide: stage {stacks} of {max}. Wildbolt, Skyfall, and Moonseed casts build it in Moonwing Form; at {max}, Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and either spends it",
+      "oldBlood": "Old Blood: stage {stacks} of {max}. Landed Wolf and Bruin strikes share this bank; at {max}, Gorebite or Bonecrush transforms",
+      "verdance": "Verdance: stage {stacks} of {max}. Completed Wildbloom and Second Bloom casts build it; at {max}, Swiftmend becomes Overbloom",
       "increase": {
         "ap": "Increases attack power by {value}",
         "sp": "Increases spell power by {value}",
@@ -3375,6 +3378,7 @@ export const en_CA: EnTranslations = {
       "healing_touch": "A big single-target heal with a long cast, for topping someone off.",
       "mark_of_the_wild": "A lasting blessing you put on yourself or an ally before a fight.",
       "moonfire": "Hits instantly and leaves the target burning, good while moving.",
+      "moonseed": "Adds a Moontide stage and extends Lunar Tempest while you are in Moonwing Form.",
       "rejuvenation": "Casts instantly and heals an ally over time, so you can keep acting.",
       "thorns": "Wards an ally so melee attackers hurt themselves for striking."
     },
@@ -7645,7 +7649,7 @@ export const en_CA: EnTranslations = {
       },
       "wrath": {
         "name": "Wildbolt",
-        "description": "Hurls a bolt of nature energy for {damage} Nature damage."
+        "description": "Hurls a bolt of nature energy for {damage} Nature damage. In Moonwing Form, completed casts build Moontide. At full Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
       },
       "healing_touch": {
         "name": "Wildmend",
@@ -7657,11 +7661,15 @@ export const en_CA: EnTranslations = {
       },
       "moonfire": {
         "name": "Lunar Tempest",
-        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time."
+        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time. Moongrove: keep it burning; Moonseed extends it by 6 sec."
+      },
+      "moonseed": {
+        "name": "Moonseed",
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds one Moontide stage, and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At full Moontide, Moonseed becomes Moonsurge."
       },
       "rejuvenation": {
         "name": "Wildbloom",
-        "description": "Heals the target for {damage} over 12 sec."
+        "description": "Heals the target for {damage} over 12 sec. Groveheart: planting a NEW bloom adds Verdance; at 5, Swiftmend becomes Overbloom."
       },
       "thorns": {
         "name": "Briarguard",
@@ -7677,7 +7685,7 @@ export const en_CA: EnTranslations = {
       },
       "maul": {
         "name": "Bonecrush",
-        "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only."
+        "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Wildfang: landed hits bank Old Blood; at 3, Bonecrush becomes Marrowbreak. Activates on your next swing. Bruin Form only."
       },
       "growl": {
         "name": "Menace",
@@ -7685,23 +7693,23 @@ export const en_CA: EnTranslations = {
       },
       "cat_form": {
         "name": "Wolf Form",
-        "description": "Shapeshift into a wolf: attack power rises with your level, your attacks use energy and combo points, and you generate 29% less threat. Cast again to return to caster form."
+        "description": "Shapeshift into a wolf: agility rises with your level, attack power +8 plus 2 per level, your attacks use energy and combo points, and you generate 29% less threat. Cast again to return to caster form."
       },
       "claw": {
-        "name": "Claw",
-        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only."
+        "name": "Rendclaw",
+        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wildfang: landed hits bank Old Blood. Wolf Form only."
       },
       "ferocious_bite": {
         "name": "Gorebite",
-        "description": "Finishing move that causes {damage}. Wolf Form only."
+        "description": "Finishing move that causes {damage}. Wildfang: landed hits bank Old Blood; at 3, Gorebite becomes Redharvest. Wolf Form only."
       },
       "swipe": {
         "name": "Sweeping Claws",
-        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only."
+        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Wildfang: landed hits bank Old Blood. Bruin Form only."
       },
       "regrowth": {
         "name": "Second Bloom",
-        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec."
+        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec. Groveheart: planting a NEW bloom adds Verdance."
       },
       "barkskin": {
         "name": "Oakhide",
@@ -7717,7 +7725,7 @@ export const en_CA: EnTranslations = {
       },
       "starfire": {
         "name": "Skyfall",
-        "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage."
+        "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage. In Moonwing Form, completed casts build Moontide. At full Moontide, Skyfall becomes Sunwake."
       },
       "travel_form": {
         "name": "Fleet Form",
@@ -7756,8 +7764,8 @@ export const en_CA: EnTranslations = {
         "description": "Increases attack power by {buff} for {duration} sec. Wolf Form only."
       },
       "rip": {
-        "name": "Rip",
-        "description": "Finishing move that causes {damage} Bleed damage over 12 sec. Consumes combo points. Wolf Form only."
+        "name": "Bloodrift",
+        "description": "Finishing move that causes {damage} Bleed damage over 24 sec. Consumes combo points. Wildfang: the landed hit banks Old Blood. Wolf Form only."
       },
       "mortal_strike": {
         "name": "Maiming Strike",
@@ -7901,7 +7909,27 @@ export const en_CA: EnTranslations = {
       },
       "swiftmend": {
         "name": "Swiftmend",
-        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. (Restoration signature)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Completed Wildbloom and Second Bloom casts build Verdance; at 5 Verdance, Swiftmend becomes Overbloom. (Groveheart signature)"
+      },
+      "moonlash": {
+        "name": "Moonsurge",
+        "description": "Consumes 3 Moontide for a heavy Arcane strike: the damage choice. Spends the same bank as Sunwake, so pick one."
+      },
+      "sunlance": {
+        "name": "Sunwake",
+        "description": "Consumes 3 Moontide for a Nature strike and burn and restores 35 mana: the economy choice. Spends the same bank as Moonsurge, so pick one."
+      },
+      "redharvest": {
+        "name": "Redharvest",
+        "description": "Consumes 3 Old Blood, detonates all remaining Flense and Bloodrift damage you own on the target, and restores 30 energy. Any combo points held strengthen the bite but are never required."
+      },
+      "marrowbreak": {
+        "name": "Marrowbreak",
+        "description": "Consumes 3 Old Blood for a heavy, high-threat strike. Below half health, instead absorbs 18% of maximum health for 8 sec and restores 15 rage."
+      },
+      "overbloom": {
+        "name": "Overbloom",
+        "description": "Consumes 5 Verdance. Harvests every heal over time you own on all allies for 60% of its remaining healing, removes those effects, and plants a fresh Wildbloom on the target."
       },
       "summon_imp": {
         "name": "Summon Emberkin",
@@ -8361,7 +8389,7 @@ export const en_CA: EnTranslations = {
       },
       "rake": {
         "name": "Flense",
-        "description": "A stealth opener that rakes the enemy for weapon damage plus {damage} and causes bleeding damage over 9 sec. Awards 1 combo point. Wolf Form only."
+        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wildfang: landed hits bank Old Blood. Wolf Form only."
       },
       "revive_pet": {
         "name": "Patch Up",

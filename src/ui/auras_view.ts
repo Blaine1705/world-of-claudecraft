@@ -328,7 +328,7 @@ export function createAurasView(
             ? deps.formatStacks(a.poolPct)
             : a.charges !== undefined
               ? deps.formatStacks(a.charges)
-              : a.stacks && a.stacks > 1
+              : a.stacks !== undefined && (a.stacks > 1 || isPersistentEngineAura(a.id))
                 ? deps.formatStacks(a.stacks)
                 : '';
         slot.name = deps.auraName(a);

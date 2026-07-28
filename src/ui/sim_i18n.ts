@@ -389,6 +389,10 @@ const baseEnTable = {
   'aura.radiantResonance': 'Radiant Resonance',
   'aura.solarReprisal': 'Solar Reprisal',
   'aura.dawnsWrath': "Dawn's Wrath",
+  'aura.moontide': 'Moontide',
+  'aura.oldBlood': 'Old Blood',
+  'aura.verdance': 'Verdance',
+  'aura.lopingStride': 'Loping Stride',
   // Card Duel minigame (Card Master NPC, src/sim/social/card_duel.ts).
   'log.cardDuelQueued': 'You queue for a Card Duel.',
   'log.cardDuelLeftQueue': 'You leave the Card Duel queue.',
@@ -7028,6 +7032,10 @@ function locPetGrowlAutoState(state: string): string {
 // player (stun/incapacitate/absorb aura) and as the boss "unleashes" combat-log line, so
 // they share a single English source here.
 const AURA_NAME_KEY: Record<string, SimMessageKey> = {
+  Moontide: 'aura.moontide',
+  'Old Blood': 'aura.oldBlood',
+  Verdance: 'aura.verdance',
+  'Loping Stride': 'aura.lopingStride',
   // Bladed Gyre's armed echo buff (whirlwind's selfBuff auraName in
   // src/sim/content/classes.ts); shown on the buff bar and combat log.
   'Bladed Echo': 'aura.bladedEcho',

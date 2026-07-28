@@ -1088,6 +1088,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.venom_dart.name': 'Giftpfeil',
   'entities.abilities.venom_dart.description':
     'Schnippt einen vergifteten Pfeil für {damage} Naturschaden. Gewährt 1 Combopunkt. Knifework: verlängert eure Giftriss-Wunde um 6 Sek., bis zu 20 Sek.',
+  'entities.abilities.cleansing_verdict.name': 'Läuterndes Urteil',
+  'entities.abilities.cleansing_verdict.description':
+    'Entfernt einen schädlichen magischen Effekt von einem verbündeten Ziel und heilt es mit heiliger Magie um {damage}.',
   'entities.abilities.smoke_screen.name': 'Rauchvorhang',
   'entities.abilities.smoke_screen.description':
     'Ihr verschwindet in einer Rauchwolke, wodurch sich Eure Ausweichchance 8 Sek. lang um 30 % erhöht.',
