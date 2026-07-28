@@ -5270,10 +5270,19 @@ export class Hud {
     const action = this.actionForSlot(barSlot);
     if (action?.type !== 'ability') return null;
     const known = this.sim.known.find((entry) => entry.def.id === action.id) ?? null;
-    if (!known || this.sim.cfg.playerClass !== 'hunter') return known;
-    let resolved = resolveActionReplacement(known, this.sim.player);
-    resolved = resolveColdsightAbilityForSpec(resolved, this.sim.player, this.sim.talents.spec);
-    return resolveHunterSharedAbilityForTalents(resolved, this.sim.player, this.sim.talents);
+    if (!known) return null;
+    // Action-slot replacement: the saved binding keeps the base id while the
+    // painted button follows the aura state, the same pure resolution the sim
+    // cast path uses (rogue engine transforms for every class, plus the
+    // hunter-specific resolvers below).
+    const resolved = resolveActionReplacement(known, this.sim.player);
+    if (this.sim.cfg.playerClass !== 'hunter') return resolved;
+    const coldsight = resolveColdsightAbilityForSpec(
+      resolved,
+      this.sim.player,
+      this.sim.talents.spec,
+    );
+    return resolveHunterSharedAbilityForTalents(coldsight, this.sim.player, this.sim.talents);
   }
 
   private itemForSlot(barSlot: number): ItemDef | null {

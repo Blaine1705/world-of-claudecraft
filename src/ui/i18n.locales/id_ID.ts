@@ -980,6 +980,27 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleansing_verdict.name': 'Vonis Pemurnian',
   'entities.abilities.cleansing_verdict.description':
     'Menghapus efek sihir berbahaya dari target sekutu dan menyembuhkannya sebesar {damage} dengan sihir Suci.',
+  'entities.abilities.flurry_of_knives.name': 'Rentetan Pisau',
+  'entities.abilities.flurry_of_knives.description':
+    'Menyabet semua musuh dalam radius 6 m dengan pisau lempar, menimbulkan {damage} kerusakan fisik dan memberi 2 poin combo. (talenta Rogue)',
+  'entities.abilities.thieves_chorus.name': 'Paduan Suara Pencuri',
+  'entities.abilities.thieves_chorus.description':
+    'Sinyal siulan memacu kelompokmu: kecepatan serangan, rapalan, dan kanal meningkat 10% selama 10 detik. Sekutu yang baru saja terkena lonjakan percepatan kelompok terlalu lelah untuk mendapat manfaat. (talenta Rogue)',
+  'entities.abilities.venomrend.name': 'Koyak Bisa',
+  'entities.abilities.venomrend.description':
+    'Melahap Ritual Bisa: menghantam sebesar 22 tambah 26 per poin combo, meledakkan sisa kerusakan pendarahanmu, dan memulihkan 25 energi. (mesin Knifework)',
+  'entities.abilities.veilstrike.name': 'Hantaman Tabir',
+  'entities.abilities.veilstrike.description':
+    'Melahap simpanan Remang untuk menyelubungi dirimu dalam bayangan selama 6 detik: pembuka senyapmu bekerja di tempat terbuka dan kerusakanmu meningkat 25%. (mesin Skulduggery)',
+  'entities.abilities.body_blow.name': 'Pukulan Tubuh',
+  'entities.abilities.body_blow.description':
+    'Pukulan berat sebesar 130% kerusakan senjata plus 10 yang memberikan 2 poin combo dan memperdalam Redline satu tingkat. (mesin Thuggery)',
+  'entities.abilities.knockout_blow.name': 'Pukulan Nokaut',
+  'entities.abilities.knockout_blow.description':
+    'Akhiri Redline dengan nokaut: menghantam sebesar 45 plus 35 per poin combo, 25% lebih keras per tingkat Redline, dan memulihkan 25 energi. (mesin Thuggery)',
+  'entities.abilities.venom_dart.name': 'Damak Bisa',
+  'entities.abilities.venom_dart.description':
+    'Melontarkan damak beracun sebesar {damage} kerusakan alam. Memberi 1 poin combo. Knifework: memperpanjang luka Koyak Bisa Anda 6 detik, hingga 20 detik.',
   'entities.abilities.smoke_screen.name': 'Tabir Asap',
   'entities.abilities.smoke_screen.description':
     'Kamu menghilang ke dalam kepulan asap, meningkatkan peluang menghindar sebesar 30% selama 8 dtk.',

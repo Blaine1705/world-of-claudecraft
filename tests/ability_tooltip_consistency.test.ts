@@ -58,6 +58,15 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   sunder_armor: [30],
   // "Conjures 2 ...": the stack size hardcoded in casting_lifecycle.ts.
   conjure_water: [2],
+  // Rogue spec-engine interaction lines: the cited numbers are engine
+  // constants in combat/rogue_engines.ts (ritual stages, stage refund, the
+  // Redline window seconds and its 4+ combo opener, the shadow veil seconds,
+  // the Venom Dart wound extension), not per-rank effect fields.
+  eviscerate: [4, 8],
+  backstab: [15, 6],
+  garrote: [6],
+  ambush: [6],
+  venom_dart: [6],
   conjure_food: [2],
   // Patch Up's dead-pet revive fraction is owned by the pet lifecycle branch;
   // the living-pet HoT remains fully data-driven by the ability effect.

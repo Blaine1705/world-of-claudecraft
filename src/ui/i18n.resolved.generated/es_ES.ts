@@ -1621,6 +1621,12 @@ export const es_ES: EnTranslations = {
       "freeCast": "Tu siguiente lanzamiento no cuesta nada",
       "instantCast": "Tu siguiente hechizo con tiempo de lanzamiento es instantáneo",
       "cheapCast": "Tu siguiente hechizo cuesta un {pct}% menos",
+      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
+      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
+      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
+      "veiledEdge": "Your next Lurker's Strike strikes for double",
+      "duskEconomy": "Abilities cost {pct}% less energy",
       "increase": {
         "ap": "Incrementa el poder de ataque en {value}",
         "sp": "Aumenta el poder con hechizos en {value}",
@@ -7980,6 +7986,10 @@ export const es_ES: EnTranslations = {
         "name": "Pozo de Éter",
         "description": "Canaliza durante 6 s: cada segundo restaura 40 de maná y acumula 8 de poder con hechizos mientras canalizas. (talento de mago)"
       },
+      "flurry_of_knives": {
+        "name": "Ráfaga de cuchillos",
+        "description": "Azota a todos los enemigos en un radio de 6 m con cuchillos arrojadizos, causando {damage} de daño físico y otorgando 2 puntos de combo. (talento de Pícaro)"
+      },
       "frenzied_regeneration": {
         "name": "Remiendo Salvaje",
         "description": "Restaura 180 de salud durante 10 s. Solo en Forma de Oso. (talento de Druida)"
@@ -8144,9 +8154,33 @@ export const es_ES: EnTranslations = {
         "name": "Orden de silencio",
         "description": "Silencia al objetivo en pleno lanzamiento e impide lanzar hechizos de esa escuela durante 5 s."
       },
+      "thieves_chorus": {
+        "name": "Coro de ladrones",
+        "description": "Una señal silbada espolea a tu grupo: la velocidad de ataque, lanzamiento y canalización aumenta un 10% durante 10 s. Los aliados afectados hace poco por un impulso de celeridad de grupo están demasiado exhaustos para beneficiarse. (talento de Pícaro)"
+      },
       "tranquility": {
         "name": "Canto del Claro",
         "description": "Canaliza energía restauradora durante 4 s y sana cada segundo entre 42 y 52 a los aliados en un radio de 30 m. (talento de Druida)"
+      },
+      "venom_dart": {
+        "name": "Dardo venenoso",
+        "description": "Lanzas un dardo envenenado que inflige {damage} de daño de naturaleza. Otorga 1 punto de combo. Knifework: prolonga tu herida de Desgarro venenoso 6 s, hasta 20 s."
+      },
+      "body_blow": {
+        "name": "Golpe al cuerpo",
+        "description": "Un golpe contundente por el 130% del daño del arma más 10 que otorga 2 puntos de combo y profundiza la Redline un nivel. (motor de Thuggery)"
+      },
+      "knockout_blow": {
+        "name": "Golpe de nocaut",
+        "description": "Termina la Redline con un nocaut: golpea por 45 más 35 por punto de combo, un 25% más fuerte por cada nivel de la Redline, y recupera 25 de energía. (motor de Thuggery)"
+      },
+      "veilstrike": {
+        "name": "Golpe del velo",
+        "description": "Consume la reserva de Penumbra para envolverte en sombras durante 6 s: tus aperturas de sigilo funcionan al descubierto y causas un 25% más de daño. (motor de Skulduggery)"
+      },
+      "venomrend": {
+        "name": "Desgarro venenoso",
+        "description": "Consume el Ritual de Veneno: golpea por 22 más 26 por punto de combo, detona el daño restante de tus sangrados y restaura 25 de energía. (motor de Knifework)"
       },
       "typhoon": {
         "name": "Tifón",

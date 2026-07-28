@@ -1621,6 +1621,12 @@ export const fr_CA: EnTranslations = {
       "freeCast": "Votre prochaine incantation ne coûte rien",
       "instantCast": "Votre prochain sort avec un temps d'incantation est instantané",
       "cheapCast": "Votre prochain sort coûte {pct} % de mana en moins",
+      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
+      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
+      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
+      "veiledEdge": "Your next Lurker's Strike strikes for double",
+      "duskEconomy": "Abilities cost {pct}% less energy",
       "increase": {
         "ap": "Accroît la puissance d'attaque de {value}",
         "sp": "Augmente la puissance des sorts de {value}",
@@ -7980,6 +7986,10 @@ export const fr_CA: EnTranslations = {
         "name": "Puits d’éther",
         "description": "Restaura mana rápidamente. (talent de mage)"
       },
+      "flurry_of_knives": {
+        "name": "Rafale de couteaux",
+        "description": "Fouette tous les ennemis dans un rayon de 6 m avec des couteaux de lancer, infligeant {damage} points de dégâts physiques et octroyant 2 points de combo. (talent de Voleur)"
+      },
       "frenzied_regeneration": {
         "name": "Régénération sauvage",
         "description": "Rend 180 points de vie en 10 s. Forme d'ours uniquement. (talent de Druide)"
@@ -8144,9 +8154,33 @@ export const fr_CA: EnTranslations = {
         "name": "Ordre de silence",
         "description": "Réduit la cible au silence en pleine incantation et l’empêche de lancer des sorts de cette école de magie pendant 5 s."
       },
+      "thieves_chorus": {
+        "name": "Chœur des voleurs",
+        "description": "Un signal sifflé galvanise votre groupe : vitesse d’attaque, d’incantation et de canalisation augmentée de 10% pendant 10 s. Les alliés récemment touchés par une accélération de groupe sont trop épuisés pour en profiter. (talent de Voleur)"
+      },
       "tranquility": {
         "name": "Chant du bosquet",
         "description": "Canalise de l'énergie réparatrice pendant 4 s et rend de 42 à 52 points de vie chaque seconde aux alliés à moins de 30 m. (talent de Druide)"
+      },
+      "venom_dart": {
+        "name": "Dard venimeux",
+        "description": "Projette un dard empoisonné infligeant {damage} points de dégâts de Nature. Confère 1 point de combo. Knifework : prolonge votre plaie de Déchirure venimeuse de 6 sec, jusqu’à 20 sec."
+      },
+      "body_blow": {
+        "name": "Coup au corps",
+        "description": "Un coup puissant infligeant 130% des dégâts de l’arme plus 10, qui confère 2 points de combo et approfondit la Redline d’un cran. (moteur Thuggery)"
+      },
+      "knockout_blow": {
+        "name": "Coup de K.-O.",
+        "description": "Termine la Redline par un K.-O. : frappe pour 45 plus 35 par point de combo, 25% plus fort par cran de Redline, et rend 25 points d’énergie. (moteur Thuggery)"
+      },
+      "veilstrike": {
+        "name": "Frappe du voile",
+        "description": "Consume la réserve de Pénombre pour vous envelopper d’ombre pendant 6 s : vos ouvertures furtives fonctionnent à découvert et vous infligez 25% de dégâts supplémentaires. (moteur Skulduggery)"
+      },
+      "venomrend": {
+        "name": "Déchirure venimeuse",
+        "description": "Consume le Rituel du venin : frappe pour 22 plus 26 par point de combo, fait détoner les dégâts restants de vos saignements et rend 25 points d’énergie. (moteur Knifework)"
       },
       "typhoon": {
         "name": "Typhon",

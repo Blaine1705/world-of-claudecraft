@@ -1621,6 +1621,12 @@ export const pl_PL: EnTranslations = {
       "freeCast": "Twoje następne rzucenie czaru nic nie kosztuje",
       "instantCast": "Twój następny czar z czasem rzucania jest natychmiastowy",
       "cheapCast": "Twój następny czar kosztuje {pct}% many mniej",
+      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
+      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
+      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
+      "veiledEdge": "Your next Lurker's Strike strikes for double",
+      "duskEconomy": "Abilities cost {pct}% less energy",
       "increase": {
         "ap": "Erhöht Angriffskraft um {value}",
         "sp": "Zwiększa moc zaklęć o {value}",
@@ -7980,6 +7986,10 @@ export const pl_PL: EnTranslations = {
         "name": "Studnia Eteru",
         "description": "Restaura manę rápidamente. (talent maga)"
       },
+      "flurry_of_knives": {
+        "name": "Grad noży",
+        "description": "Chłoszcze wszystkich wrogów w promieniu 6 m rzucanymi nożami, zadając {damage} obrażeń fizycznych i przyznając 2 punkty combo. (talent Łotrzyka)"
+      },
       "frenzied_regeneration": {
         "name": "Dzikie Gojenie",
         "description": "Przywraca 180 zdrowia przez 10 sek. Tylko w Formie Niedźwiedzia. (talent Druida)"
@@ -8144,9 +8154,33 @@ export const pl_PL: EnTranslations = {
         "name": "Blokada Zaklęć",
         "description": "Wycisza cel w trakcie rzucania i zapobiega rzucaniu czaru z tej szkoły na 5 sekund."
       },
+      "thieves_chorus": {
+        "name": "Chór złodziei",
+        "description": "Gwizdnięty sygnał zagrzewa twoją grupę: szybkość ataku, rzucania zaklęć i kanałowania zwiększona o 10% na 10 sek. Sojusznicy niedawno objęci grupowym przyspieszeniem są zbyt wyczerpani, by skorzystać. (talent Łotrzyka)"
+      },
       "tranquility": {
         "name": "Pieśń Gaju",
         "description": "Kanalizuje uzdrawiającą energię przez 4 sek., lecząc sojuszników w promieniu 30 m o 42 do 52 co sekundę. (talent Druida)"
+      },
+      "venom_dart": {
+        "name": "Jadowita strzałka",
+        "description": "Ciska zatrutą strzałką, zadając {damage} obrażeń natury. Przyznaje 1 punkt combo. Knifework: przedłuża ranę od Jadowitego rozdarcia o 6 sek., maksymalnie do 20 sek."
+      },
+      "body_blow": {
+        "name": "Cios w korpus",
+        "description": "Potężny cios za 130% obrażeń broni plus 10, który przyznaje 2 punkty combo i pogłębia Redline o jedną kreskę. (silnik Thuggery)"
+      },
+      "knockout_blow": {
+        "name": "Cios nokautujący",
+        "description": "Zakończ Redline nokautem: uderza za 45 plus 35 za każdy punkt combo, o 25% mocniej za każdą kreskę Redline, i przywraca 25 energii. (silnik Thuggery)"
+      },
+      "veilstrike": {
+        "name": "Cios zasłony",
+        "description": "Pochłania zapas Pomroki, spowijając cię cieniem na 6 sek.: twoje otwarcia z ukrycia działają w odkrytym terenie, a ty zadajesz 25% więcej obrażeń. (silnik Skulduggery)"
+      },
+      "venomrend": {
+        "name": "Jadowite rozdarcie",
+        "description": "Pochłania Rytuał Jadu: uderza za 22 plus 26 za punkt combo, detonuje pozostałe obrażenia twoich krwawień i przywraca 25 energii. (silnik Knifework)"
       },
       "typhoon": {
         "name": "Tajfun",

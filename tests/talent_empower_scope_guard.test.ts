@@ -41,10 +41,11 @@ describe('talent empowerNext scoping', () => {
         scan(`${cls} spec ${spec.id} mastery`, procsInEffect(spec.mastery.effect));
       }
     }
-    // Pin the approved v0.29 proc surface exactly. A deliberate proc addition or
-    // removal must update this sentinel, while a refactor that drops rows from
-    // ROW_TREES cannot silently weaken the scoping audit.
-    expect(scanned).toBe(19);
+    // Pin the approved v0.29 proc surface exactly (hunter, shaman, priest,
+    // and the rogue row redesign together). A deliberate proc addition or
+    // removal must update this sentinel, while a refactor that drops rows
+    // from ROW_TREES cannot silently weaken the scoping audit.
+    expect(scanned).toBe(14);
     expect(offenders).toEqual([]);
   });
 });

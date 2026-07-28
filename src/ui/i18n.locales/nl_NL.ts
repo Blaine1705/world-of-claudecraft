@@ -1106,6 +1106,27 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleansing_verdict.name': 'Zuiverend Vonnis',
   'entities.abilities.cleansing_verdict.description':
     'Verwijdert een schadelijk magisch effect van een bevriend doelwit en geneest het met Heilige magie voor {damage}.',
+  'entities.abilities.flurry_of_knives.name': 'Messenregen',
+  'entities.abilities.flurry_of_knives.description':
+    'Geselt alle vijanden binnen 6 m met werpmessen, brengt {damage} fysieke schade toe en levert 2 combopunten op. (schurkentalent)',
+  'entities.abilities.thieves_chorus.name': 'Dievenkoor',
+  'entities.abilities.thieves_chorus.description':
+    'Een gefloten signaal vuurt je groep aan: aanvals-, wierp- en kanaliseersnelheid 10 sec. lang met 10% verhoogd. Bondgenoten die onlangs een groepsversnelling kregen, zijn te uitgeput om ervan te profiteren. (schurkentalent)',
+  'entities.abilities.venomrend.name': 'Gifscheur',
+  'entities.abilities.venomrend.description':
+    'Verteert het Gifritueel: raakt voor 22 plus 26 per combopunt, laat de resterende schade van je bloedingen ontploffen en herstelt 25 energie. (Knifework-motor)',
+  'entities.abilities.veilstrike.name': 'Sluierstoot',
+  'entities.abilities.veilstrike.description':
+    'Verteert de Schemervoorraad en hult je 6 sec. in schaduw: je sluipopeners werken in het open veld en je doet 25% meer schade. (Skulduggery-motor)',
+  'entities.abilities.body_blow.name': 'Lichaamsstoot',
+  'entities.abilities.body_blow.description':
+    'Een zware stoot voor 130% wapenschade plus 10 die 2 combopunten geeft en de Redline één streepje verdiept. (Thuggery-motor)',
+  'entities.abilities.knockout_blow.name': 'Knock-outslag',
+  'entities.abilities.knockout_blow.description':
+    'Beëindig de Redline met een knock-out: slaat voor 45 plus 35 per combopunt, 25% harder per Redline-streepje, en herstelt 25 energie. (Thuggery-motor)',
+  'entities.abilities.venom_dart.name': 'Gifpijltje',
+  'entities.abilities.venom_dart.description':
+    'Schiet een vergiftigd pijltje voor {damage} natuurschade. Geeft 1 combopunt. Knifework: verlengt je Gifscheur-wond met 6 sec, tot 20 sec.',
   'entities.abilities.smoke_screen.name': 'Rookgordijn',
   'entities.abilities.smoke_screen.description':
     'Je verdwijnt in een rookwolk, waardoor je ontwijkingskans 8 sec. lang met 30% toeneemt.',

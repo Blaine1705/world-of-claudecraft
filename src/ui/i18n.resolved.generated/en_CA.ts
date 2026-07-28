@@ -1621,6 +1621,12 @@ export const en_CA: EnTranslations = {
       "freeCast": "Your next cast costs nothing",
       "instantCast": "Your next spell with a cast time is instant",
       "cheapCast": "Your next spell costs {pct}% less",
+      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
+      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
+      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
+      "veiledEdge": "Your next Lurker's Strike strikes for double",
+      "duskEconomy": "Abilities cost {pct}% less energy",
       "increase": {
         "ap": "Increases attack power by {value}",
         "sp": "Increases spell power by {value}",
@@ -6503,7 +6509,7 @@ export const en_CA: EnTranslations = {
       "unavailable": "Unavailable",
       "requiresLevel": "Requires level {level}",
       "requiresForm": "Requires {form} Form",
-      "requiresStealth": "Requires stealth",
+      "requiresStealth": "Requires stealth (or a full Gloam bank, or the shadow veil)",
       "requiresCombo": "Consumes combo points",
       "requiresTargetHealthBelow": "Requires target below {percent}% health",
       "requiresDodge": "Only usable after the target dodges",
@@ -7162,15 +7168,15 @@ export const en_CA: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Wicked Slash",
-        "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point."
+        "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point. Knifework: builds the Venom Ritual like Craven Thrust. Thuggery: becomes Body Blow while the Redline window runs."
       },
       "eviscerate": {
         "name": "Dirt Nap",
-        "description": "Finishing move that causes {damage}."
+        "description": "Finishing move that causes {damage}. Knifework: becomes Venomrend at 6 Venom Ritual stages. Thuggery: landing this with 4 or more combo points opens the 8 sec Redline window, transforming your buttons."
       },
       "backstab": {
         "name": "Craven Thrust",
-        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point."
+        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point. Knifework: each strike adds a Venom Ritual stage and refunds 15 energy; at 6 stages Dirt Nap becomes Venomrend."
       },
       "gouge": {
         "name": "Eye Jab",
@@ -7194,11 +7200,11 @@ export const en_CA: EnTranslations = {
       },
       "ambush": {
         "name": "Lurker's Strike",
-        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point."
+        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point. Skulduggery: banks a Gloam stage when cast from Duskveil; with a full bank it is castable in the open from any angle FOR FREE, detonating the bank into a 6 sec shadow veil, and the first one of the veil strikes for double."
       },
       "stealth": {
         "name": "Duskveil",
-        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out."
+        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out. Skulduggery: openers cast from Duskveil bank Gloam stages."
       },
       "adrenaline_rush": {
         "name": "Quickened Blood",
@@ -7206,11 +7212,11 @@ export const en_CA: EnTranslations = {
       },
       "garrote": {
         "name": "Throat Wire",
-        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point."
+        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point. Skulduggery: banks a Gloam stage when cast from Duskveil; with a full bank it is castable in the open FOR FREE, detonating the bank into a 6 sec shadow veil."
       },
       "cheap_shot": {
         "name": "Gut Punch",
-        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points."
+        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points. Skulduggery: banks a Gloam stage when cast from Duskveil; with a full bank it is castable in the open FOR FREE, detonating the bank into a 6 sec shadow veil."
       },
       "sap": {
         "name": "Sap",
@@ -7714,7 +7720,7 @@ export const en_CA: EnTranslations = {
       },
       "hemorrhage": {
         "name": "Red Ribbon",
-        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. (Subtlety signature)"
+        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Skulduggery: every 2nd cast banks a Gloam stage. (Subtlety signature)"
       },
       "power_infusion": {
         "name": "Anointing",
@@ -7980,6 +7986,10 @@ export const en_CA: EnTranslations = {
         "name": "Aetherwell",
         "description": "Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel. (Mage talent)"
       },
+      "flurry_of_knives": {
+        "name": "Flurry of Knives",
+        "description": "Lash every enemy within 6 yd with thrown knives for {damage} Physical damage and gain 2 combo points. (Rogue talent)"
+      },
       "frenzied_regeneration": {
         "name": "Savage Mending",
         "description": "Restores 180 health over 10 sec. Bruin Form only. (Druid talent)"
@@ -8144,9 +8154,33 @@ export const en_CA: EnTranslations = {
         "name": "Gag Order",
         "description": "Silences the target mid-cast and prevents casting from that school for 5 sec."
       },
+      "thieves_chorus": {
+        "name": "Thieves' Chorus",
+        "description": "A whistled signal spurs your group on, increasing attack, casting, and channeling speed by 10% for 10 sec. Allies recently affected by a group haste burst are too exhausted to benefit. (Rogue talent)"
+      },
       "tranquility": {
         "name": "Gladesong",
         "description": "Channels restorative energy for 4 sec, healing allies within 30 yd for 42 to 52 each second. (Druid talent)"
+      },
+      "venom_dart": {
+        "name": "Venom Dart",
+        "description": "Flick a poisoned dart for {damage} Nature damage. Awards 1 combo point. Knifework: extends your Venomrend wound by 6 sec, up to 20 sec."
+      },
+      "body_blow": {
+        "name": "Body Blow",
+        "description": "A heavy blow for 130% weapon damage plus 10 that awards 2 combo points and deepens the Redline by one pip. (Thuggery engine)"
+      },
+      "knockout_blow": {
+        "name": "Knockout Blow",
+        "description": "End the Redline with a knockout: strike for 45 plus 35 per combo point, hitting 25% harder per Redline pip, and recover 25 energy. (Thuggery engine)"
+      },
+      "veilstrike": {
+        "name": "Shadow Veil",
+        "description": "The detonated Gloam bank: for 6 sec your Duskveil openers work in the open from any angle, you deal 10% more damage, and the first Lurker's Strike of the veil strikes for double. (Skulduggery engine)"
+      },
+      "venomrend": {
+        "name": "Venomrend",
+        "description": "Consume the Venom Ritual: strike for 100 plus 55 per combo point, reopen your venom wound (120 damage over 20 sec), and detonate the previous wound plus any other bleeds for their remaining damage. Restores 20 energy. (Knifework engine)"
       },
       "typhoon": {
         "name": "Typhoon",

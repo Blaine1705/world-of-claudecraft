@@ -1621,6 +1621,12 @@ export const da_DK: EnTranslations = {
       "freeCast": "Dit næste kast koster ingenting",
       "instantCast": "Din næste trolddom med en kastetid er øjeblikkelig",
       "cheapCast": "Din næste trolddom koster {pct}% mindre",
+      "venomRitual": "Venom Ritual: stage {stacks} of {max}. Builder strikes add stages; at {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam: stage {stacks} of {max}. At {max} your Duskveil openers unlock in the open, and the next one thrown is FREE and detonates the bank into the shadow veil",
+      "redline": "Redline: pip {stacks} of {max}. Body Blows add pips; Knockout Blow hits {pct}% harder per pip and ends the window. Expiring first forfeits it",
+      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
+      "veiledEdge": "Your next Lurker's Strike strikes for double",
+      "duskEconomy": "Abilities cost {pct}% less energy",
       "increase": {
         "ap": "Erhöht Angriffskraft um {value}",
         "sp": "Øger trolddomsstyrke med {value}",
@@ -7980,6 +7986,10 @@ export const da_DK: EnTranslations = {
         "name": "Æterbrønd",
         "description": "Restaura mana rápidamente. (magikertalent)"
       },
+      "flurry_of_knives": {
+        "name": "Knivbyge",
+        "description": "Pisker alle fjender inden for 6 m med kasteknive, påfører {damage} fysisk skade og giver 2 kombopoint. (slyngeltalent)"
+      },
       "frenzied_regeneration": {
         "name": "Vild heling",
         "description": "Genopretter 180 helbred over 10 sek. Kun i Bjørneform. (druidentalent)"
@@ -8144,9 +8154,33 @@ export const da_DK: EnTranslations = {
         "name": "Mundkurv",
         "description": "Gør målet tavst midt i en besværgelse og forhindrer det i at kaste besværgelser fra den pågældende magiskole i 5 sek."
       },
+      "thieves_chorus": {
+        "name": "Tyvenes Kor",
+        "description": "Et fløjtet signal ansporer din gruppe: angrebs-, besværgelses- og kanaliseringshastighed øget med 10% i 10 sek. Allierede, der for nylig fik et gruppehast-udbrud, er for udmattede til at få gavn. (slyngeltalent)"
+      },
       "tranquility": {
         "name": "Lundens sang",
         "description": "Kanaliserer helbredende energi i 4 sek. og helbreder allierede inden for 30 m for 42 til 52 hvert sekund. (druidentalent)"
+      },
+      "venom_dart": {
+        "name": "Giftpil",
+        "description": "Kaster en forgiftet pil for {damage} naturskade. Giver 1 combopoint. Knifework: forlænger dit Giftflænge-sår med 6 sek., op til 20 sek."
+      },
+      "body_blow": {
+        "name": "Kropsstød",
+        "description": "Et tungt stød for 130% våbenskade plus 10, der giver 2 combopoint og uddyber Redline med ét hak. (Thuggery-motoren)"
+      },
+      "knockout_blow": {
+        "name": "Knockoutstød",
+        "description": "Afslut Redline med en knockout: rammer for 45 plus 35 pr. combopoint, 25% hårdere pr. Redline-hak, og genvinder 25 energi. (Thuggery-motoren)"
+      },
+      "veilstrike": {
+        "name": "Slørstød",
+        "description": "Fortærer Skumringslageret og hyller dig i skygge i 6 sek.: dine snigåbnere virker i det åbne, og du gør 25% mere skade. (Skulduggery-motoren)"
+      },
+      "venomrend": {
+        "name": "Giftflænge",
+        "description": "Fortærer Giftritualet: rammer for 22 plus 26 pr. kombopoint, detonerer dine blødningers resterende skade og gendanner 25 energi. (Knifework-motoren)"
       },
       "typhoon": {
         "name": "Tyfon",

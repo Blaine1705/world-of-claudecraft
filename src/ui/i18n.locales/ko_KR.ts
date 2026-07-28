@@ -173,9 +173,30 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.name': '그림자걸음',
   'entities.abilities.silence.name': '침묵',
   'entities.abilities.silence.description': '대상을 4초 동안 침묵시킵니다. (사제 특성)',
+  'entities.abilities.venomrend.name': '맹독 찢기',
+  'entities.abilities.venomrend.description':
+    '맹독 의식을 삼킵니다: 22 더하기 연계 점수당 26의 피해를 입히고, 자신의 출혈 효과의 남은 피해를 폭발시키며 25의 기력을 회복합니다. (나이프워크 엔진)',
+  'entities.abilities.veilstrike.name': '장막 일격',
+  'entities.abilities.veilstrike.description':
+    '어스름 저장고를 삼켜 6초 동안 그림자를 두릅니다: 은신 선제 기술을 훤한 곳에서도 쓸 수 있고 피해가 25% 증가합니다. (스컬더거리 엔진)',
+  'entities.abilities.body_blow.name': '보디 블로',
+  'entities.abilities.body_blow.description':
+    '무기 공격력의 130%에 10을 더한 묵직한 일격으로, 연계 점수를 2 얻고 레드라인을 한 단계 깊게 만듭니다. (전투 엔진)',
+  'entities.abilities.knockout_blow.name': '녹아웃 블로',
+  'entities.abilities.knockout_blow.description':
+    '녹아웃으로 레드라인을 끝냅니다: 45 더하기 연계 점수당 35의 피해를 입히며, 레드라인 단계마다 25% 더 강해지고 25의 기력을 회복합니다. (전투 엔진)',
+  'entities.abilities.venom_dart.name': '맹독 다트',
+  'entities.abilities.venom_dart.description':
+    '독 묻은 다트를 튕겨 {damage}의 자연 피해를 입힙니다. 연계 점수를 1 얻습니다. 나이프워크: 맹독 찢기 상처를 6초 연장합니다(최대 20초).',
   'entities.abilities.smoke_screen.name': '연막',
   'entities.abilities.smoke_screen.description':
     '연기 속으로 몸을 숨겨 8초 동안 회피율을 30%만큼 증가시킵니다.',
+  'entities.abilities.flurry_of_knives.name': '칼날 난무',
+  'entities.abilities.flurry_of_knives.description':
+    '투척 단검으로 6야드 내 모든 적을 베어 {damage}의 물리 피해를 입히고 연계 점수 2점을 얻습니다. (도적 특성)',
+  'entities.abilities.thieves_chorus.name': '도적의 합창',
+  'entities.abilities.thieves_chorus.description':
+    '휘파람 신호가 파티를 고무시켜 10초 동안 공격, 시전, 정신 집중 속도를 10% 증가시킵니다. 최근 파티 가속 효과를 받은 아군은 너무 지쳐 효과를 받을 수 없습니다. (도적 특성)',
   'entities.abilities.spellsteal.name': '마법 훔치기',
   'entities.abilities.spellsteal.description':
     '적의 이로운 마법 효과 하나를 훔쳐 자신에게 옮깁니다.',
@@ -467,6 +488,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_hourglass.name': '정지의 모래시계',
   'entities.abilities.temporal_hourglass.description':
     '선택한 위치에 시간의 모래시계를 놓습니다. 적의 발밑에서는 PvE에서 {hostilePveDuration}초, PvP에서 {hostilePvpDuration}초 동안 정지시키며 피해를 받으면 해제됩니다. 자신이나 파티 아군의 발밑에서는 {duration}초 동안 정지 상태가 되어 피해에 면역이고 행동할 수 없으며, 최대 생명력의 {healing}%를 회복합니다. 자신의 재사용 대기시간은 {selfCooldownRecovery}%, 아군의 재사용 대기시간은 {allyCooldownRecovery}% 더 빠르게 회복됩니다. 빈 지면에 놓으면 {groundDuration}초 동안 유지되며 처음 밟은 유효한 대상에게 적용됩니다. 이로운 효과는 직접 해제할 수 있습니다.',
+  'hudChrome.auraEffect.venomRitual':
+    '맹독 의식: {stacks}/{max} 단계. 연계 점수 생성 기술이 단계를 쌓으며, {max} 단계가 되면 영면이 맹독 찢기로 바뀝니다',
+  'hudChrome.auraEffect.gloam':
+    '땅거미: {stacks}/{max} 단계. {max} 단계가 되면 황혼장막이 장막 일격으로 바뀝니다',
+  'hudChrome.auraEffect.redline':
+    '레드라인: 핍 {stacks}/{max}. 보디 블로가 핍을 쌓고, 녹아웃 블로는 핍마다 {pct}% 더 강해지며 적중 시 창을 끝냅니다. 시간이 다 되면 사라집니다',
+  'hudChrome.auraEffect.veilstrikeWindow':
+    '그림자에 휩싸임: 황혼장막 전용 선제 기술을 어느 각도에서든 사용할 수 있고, 주는 피해가 {pct}% 증가합니다',
+  'hudChrome.auraEffect.veiledEdge': '다음 잠복자의 일격이 두 배의 피해를 입힙니다',
+  'hudChrome.auraEffect.duskEconomy': '기술의 기력 소모가 {pct}% 감소합니다',
   'hudChrome.auraEffect.temporalHourglass':
     '피해에 면역이고 행동할 수 없습니다. 생명력을 회복하고 재사용 대기시간을 가속합니다. 우클릭으로 취소할 수 있습니다.',
   'hudChrome.auth.appleLoginCta': 'Apple로 계속하기',
