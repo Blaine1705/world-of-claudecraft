@@ -284,29 +284,49 @@ export function castleClear(x: number, z: number): boolean {
 const LAST_SPRING = { x: 456, z: 1988 } as const;
 
 /**
- * The local pad TARGET height: the inner ward terrace inside its rect
- * (with the two stair cuts ramping its south edge down), the bailey floor
- * everywhere else inside the pad.
+ * The inner ward terrace's rise above the bailey floor: the full 2.6 inside
+ * its rect, blended down over WARD_EDGE_BLEND at the retaining edge, and
+ * ramping back down over WARD_STEP_RUN inside the two stair cuts. Zero
+ * everywhere else.
+ *
+ * Split out because the RENDER has to subtract it. The retaining blend is
+ * 0.7yd, far narrower than the terrain mesh's vertex lattice (1.2yd at the
+ * densest LOD band, 3.0yd on the low tier), so a mesh built straight off
+ * terrainHeight smears this cliff into a ramp that climbs up to 1.7yd above
+ * the bailey floor the sim actually stands players on: they sink into the
+ * drawn ground along the ward's faces. The terrace is therefore drawn as a
+ * built mass instead (render/castle_features.ts) over a flat mesh, the same
+ * way the curtain walls, bastions and stair flights already are. See
+ * render/terrain_mesh_height.ts.
  */
-export function castlePadTarget(x: number, z: number): number {
+export function wardTerraceRise(x: number, z: number): number {
   const w = CASTLE.ward;
-  if (x < w.x0 || x > w.x1 || z < w.z0 || z > w.z1 + WARD_STEP_RUN) return CASTLE.pad.h;
+  if (x < w.x0 || x > w.x1 || z < w.z0 || z > w.z1 + WARD_STEP_RUN) return 0;
   const rise = CASTLE.ward.h - CASTLE.pad.h;
   if (z <= w.z1) {
     // the terrace proper; a narrow blend at the rect edge keeps the riser
     // sheer enough to refuse the climb gate but not a numeric wall
     const edge = Math.min(x - w.x0, w.x1 - x, z - w.z0);
-    return CASTLE.pad.h + rise * Math.min(1, edge / WARD_EDGE_BLEND);
+    return rise * Math.min(1, edge / WARD_EDGE_BLEND);
   }
   // south of the terrace edge: bailey, except inside a stair cut where the
   // surface ramps down over WARD_STEP_RUN
   for (const cut of WARD_STEPS) {
     if (x >= cut.x0 && x <= cut.x1) {
       const t = (z - w.z1) / WARD_STEP_RUN;
-      return CASTLE.pad.h + rise * (1 - Math.min(1, t));
+      return rise * (1 - Math.min(1, t));
     }
   }
-  return CASTLE.pad.h;
+  return 0;
+}
+
+/**
+ * The local pad TARGET height: the inner ward terrace inside its rect
+ * (with the two stair cuts ramping its south edge down), the bailey floor
+ * everywhere else inside the pad.
+ */
+export function castlePadTarget(x: number, z: number): number {
+  return CASTLE.pad.h + wardTerraceRise(x, z);
 }
 
 /** The graded pad weight: level grounds, gentle skirt back to the waste. */
