@@ -10,8 +10,16 @@
 // so the deck the player stands on is exactly the deck they see. The
 // tower's own column is an unwalkable core plug (a sheer terrain riser the
 // climb gate refuses), which is also what keeps players from walking
-// through the lighthouse at ground level. Pure leaf: deterministic, no
-// SimContext, tested directly by tests/beacon_spiral.test.ts.
+// through the lighthouse at ground level.
+//
+// Because the lift IS the ground (groundHeight is single-valued), every yard
+// of walkable deck also blocks the ground beneath it: the footprint is a
+// wall at ground level, not a canopy to walk under. So the walkable envelope
+// is kept to ONE radius, stairOut, matching the drawn treads, and the
+// balconies' wider deck slabs are a cosmetic overhang only. Keep it that
+// way: widening the lift past the drawn stair puts an invisible wall out on
+// the open lawn. Pure leaf: deterministic, no SimContext, tested directly by
+// tests/beacon_spiral.test.ts and tests/beacon_stair_base.test.ts.
 
 export const BEACON_SPIRAL = {
   x: 498,
@@ -20,7 +28,12 @@ export const BEACON_SPIRAL = {
   coreR: 2.9,
   /** the plug's sheer height (never stood on, only refused) */
   coreH: 45,
-  /** stair outer radius; the inner edge is the column itself (coreR) */
+  /** The WALKABLE outer radius of the whole climb, flights and balconies
+   * alike; the inner edge is the column itself (coreR). groundHeight is
+   * single-valued, so every yard of this radius also walls off the ground
+   * ring beneath it: keep the collision envelope on the drawn treads
+   * (render/gale_features.ts builds them out to exactly this radius) and the
+   * lawn outside stays open. */
   stairOut: 6.5,
   /** where the stair leaves the lawn (radians, atan2(dx, dz) convention) */
   a0: 2.4,
@@ -36,7 +49,11 @@ export const BEACON_SPIRAL = {
   balcony1End: Math.PI * 2 * 0.42,
   flight2End: Math.PI * 2 * 0.76,
   balcony2End: Math.PI * 2 * 0.94,
-  /** balcony outer radius (both balconies reach wider than the stair) */
+  /** RENDER ONLY. The balcony deck slabs are drawn out to here, overhanging
+   * the walkable stair by 0.7yd: a cosmetic lip under the handrail that
+   * nobody stands on. Widening the LIFT to this radius is what put an
+   * unwalkable ring around the tower under open sky (a player on the lawn
+   * at (505, 305) was stopped by the upper balcony's rim 19yd overhead). */
   balconyOut: 7.2,
 } as const;
 
@@ -71,7 +88,7 @@ export function beaconSpiralLift(x: number, z: number): number {
   const s = BEACON_SPIRAL;
   const dx = x - s.x;
   const dz = z - s.z;
-  const gate = s.balconyOut + 0.6;
+  const gate = s.stairOut + 0.6;
   const d2 = dx * dx + dz * dz;
   if (d2 >= gate * gate) return 0;
   const d = Math.sqrt(d2);
@@ -80,8 +97,9 @@ export function beaconSpiralLift(x: number, z: number): number {
   let a = Math.atan2(dx, dz) - s.a0;
   a = ((a % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
   if (a > s.balcony2End) return 0; // the mouth over the stair foot
-  const onBalcony =
-    (a > s.flight1End && a <= s.balcony1End) || (a > s.flight2End && a <= s.balcony2End);
-  if (d > (onBalcony ? s.balconyOut : s.stairOut)) return 0;
+  // ONE walkable radius for flights and balconies alike: the balconies are
+  // drawn wider (balconyOut) but that lip is cosmetic, so the ground ring
+  // around the tower is not walled off by a deck nobody can reach.
+  if (d > s.stairOut) return 0;
   return beaconDeckHeightAt(a);
 }
