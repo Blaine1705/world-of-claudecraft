@@ -44,7 +44,7 @@ import { terrainHeight } from '../sim/world';
 import type { CupInfo } from '../world_api/vale_cup';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
-import { GFX, sharedUniforms } from './gfx';
+import { EMISSIVE_LIGHT, GFX, sharedUniforms } from './gfx';
 import { groundSplatMaps } from './textures';
 import { flagTexture } from './vale_cup_flags';
 
@@ -1045,7 +1045,7 @@ export function buildValeCupStadium(seed: number): ValeCupStadiumView {
       new THREE.MeshLambertMaterial({
         color: 0xffaa33,
         emissive: 0xff6600,
-        emissiveIntensity: rich ? 2.2 : 1.4,
+        emissiveIntensity: rich ? EMISSIVE_LIGHT : 1.4,
         transparent: true,
         opacity: 0.92,
       }),

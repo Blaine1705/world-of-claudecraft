@@ -56,6 +56,7 @@ import {
   parterreFlowerTintAt,
 } from './garden_parterre_core';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
+import { groundGrassColorAt } from './terrain_chunk_build';
 import { type FlowerKind, flowerTuftTexture, grassTuftTexture } from './textures';
 
 // Vegetation: trees, rocks, ground dressing and the grass ring.
@@ -117,8 +118,11 @@ const FLOWERLESS_BIOMES: ReadonlySet<BiomeId> = new Set(['frost', 'haunt']);
 const FIELD_BIOMES: ReadonlySet<BiomeId> = new Set(['dusk', 'amber', 'night', 'garden', 'fen']);
 const GRASS_CHUNK_CACHE_LIMIT_LOW = 96;
 const GRASS_CHUNK_CACHE_LIMIT_HIGH = 128;
-const TREE_WIND_STRENGTH = 0.06;
-const GRASS_WIND_STRENGTH = 0.08;
+const TREE_WIND_STRENGTH = 0.08;
+const GRASS_WIND_STRENGTH = 0.16;
+// how far leaf normals bend toward world up (see addWind); 0 keeps the raw
+// canopy normals and their crushed-black backlit sides
+const LEAF_UP_NORMAL_BLEND = 0.55;
 // two x-halves x 240u z-bands: bucket count x variants-per-bucket is the
 // foliage draw budget — see the perBucket caps in the species specs
 const BUCKET_DEPTH = 240;
@@ -254,6 +258,11 @@ const TRUNK_TINT: Record<BiomeId, number> = {
   garden: 0xcfc4b0,
   gale: 0x9a8a74,
 };
+// Per-biome grass accents, normalized against the vale entry at build time:
+// the per-instance tuft tint starts from the ground colour under the tuft
+// (same palette zone blend and patch noise the terrain vertex colours use),
+// then multiplies in the biome accent so authored casts survive (night stays
+// orchid, jungle stays wet-bright) while the base still tracks the meadow.
 const GRASS_TINT: Record<BiomeId, number> = {
   vale: 0xdde4c0,
   marsh: 0xbfc492,
@@ -273,6 +282,25 @@ const GRASS_TINT: Record<BiomeId, number> = {
   garden: 0xd0eeb0, // mown lawn
   gale: 0xb8d09a, // wind-silvered grass
 };
+// The cards are lit with up normals (see applyGrassShader), so no N.L
+// compensation is needed; per-channel because the grass photo the ground
+// multiplies in is not neutral against the tuft map.
+const GRASS_TINT_GAIN: readonly [number, number, number] = [1.08, 1.0, 0.7];
+const tuftTintChannel = (ground: number, gain: number): number =>
+  Math.min(1, gain * (0.65 + 0.7 * ground));
+const GRASS_ACCENT: Partial<Record<BiomeId, [number, number, number]>> = (() => {
+  const vale = new THREE.Color(GRASS_TINT.vale);
+  const out: Partial<Record<BiomeId, [number, number, number]>> = {};
+  for (const [biome, hex] of Object.entries(GRASS_TINT) as [BiomeId, number][]) {
+    const c = new THREE.Color(hex);
+    out[biome] = [c.r / vale.r, c.g / vale.g, c.b / vale.b];
+  }
+  return out;
+})();
+// Bush/fern dressing tint gain over the ground grass colour (same curve as
+// GRASS_TINT_GAIN); above 1 because the kit albedo is much darker than the
+// meadow it stands in.
+const DRESS_GROUND_GAIN: readonly [number, number, number] = [1.7, 1.55, 1.15];
 const SWAMP_CANOPY_TINT = 0x7e8b58;
 // Flowering-bush bloom colorways for the dusk realm (picked per instance).
 const DUSK_BLOOM_TINTS = [0x9e94ba, 0xd88fb0, 0xe8d8a0, 0x8fb8d8, 0xc88fd8];
@@ -308,6 +336,21 @@ const DRESS_TINT: Record<BiomeId, number> = {
   garden: 0x8cc27a,
   gale: 0x84a878,
 };
+// how far the authored-tint dressing path collapses toward white
+const DRESS_TINT_SOFTEN = 0.65;
+const DRESS_TINT_SOFTEN_LOW = 0.56;
+// Same accent normalization as GRASS_ACCENT: dressing tints ride on the
+// ground colour so bushes stop reading as flat biome-constant clumps, while
+// authored casts (violet night shrubs, jungle greens) survive the ride.
+const DRESS_ACCENT: Partial<Record<BiomeId, [number, number, number]>> = (() => {
+  const vale = new THREE.Color(DRESS_TINT.vale);
+  const out: Partial<Record<BiomeId, [number, number, number]>> = {};
+  for (const [biome, hex] of Object.entries(DRESS_TINT) as [BiomeId, number][]) {
+    const c = new THREE.Color(hex);
+    out[biome] = [c.r / vale.r, c.g / vale.g, c.b / vale.b];
+  }
+  return out;
+})();
 // how far tints collapse toward white (1 = no tint at all)
 const LEAF_TINT_SOFTEN = 0.6;
 // The night realm's exception: soften(violet) x green albedo can only land
@@ -318,7 +361,6 @@ const leafSoften = (biome: BiomeId): number =>
   biome === 'night' ? LEAF_TINT_SOFTEN_NIGHT : LEAF_TINT_SOFTEN;
 const BARK_TINT_SOFTEN = 0.85;
 const ROCK_TINT_SOFTEN = 0.45;
-const DRESS_TINT_SOFTEN = 0.65;
 
 // rocks only pick up the snow-dust colorway above the terrain snowline —
 // low-altitude peaks-biome foothills stay mossy/bare (white rocks on green
@@ -468,31 +510,52 @@ function lodDists(): LodDists {
   return lodDistsFor(GFX.leanFoliage);
 }
 
+// Slow travelling gust, shared by the canopy and grass shaders: it scales the
+// sway amplitude (0.2 to 1) instead of adding displacement of its own, so the
+// vegetation swells and calms in coherent waves rather than every plant
+// flapping at one fixed strength. Same rate and world scale in both keeps the
+// canopy and the meadow in the same weather.
+const windGustGlsl = (x: string, z: string): string =>
+  `0.6 + 0.4 * sin(uTime * 0.6 + ${x} * 0.05 + ${z} * 0.04)`;
+
 // Wind sway injection for foliage materials (canopies, bushes, grass cards).
 // Phase comes from the instance's world origin so neighbouring trees
 // desynchronise; weight ramps by local height so bases stay planted.
-function addWind(mat: THREE.Material, strength: number): void {
-  if (!GFX.windSway) return;
+// upNormalBlend bends leaf normals toward world up (uniform-driven so every
+// material shares one shader program): dense canopies otherwise shade almost
+// entirely by sun facing, and their backlit sides crush to black clumps,
+// which is what small meadow pines read as from the east.
+function addWind(mat: THREE.Material, strength: number, upNormalBlend = 0): void {
+  if (!GFX.windSway && upNormalBlend === 0) return;
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = sharedUniforms.uTime;
-    sh.uniforms.uWindStrength = { value: strength };
+    sh.uniforms.uWindStrength = { value: GFX.windSway ? strength : 0 };
+    sh.uniforms.uUpNormalBlend = { value: upNormalBlend };
     sh.vertexShader = sh.vertexShader
       .replace(
         '#include <common>',
         `#include <common>
         uniform float uTime;
-        uniform float uWindStrength;`,
+        uniform float uWindStrength;
+        uniform float uUpNormalBlend;`,
+      )
+      .replace(
+        '#include <beginnormal_vertex>',
+        `#include <beginnormal_vertex>
+        objectNormal = normalize(mix(objectNormal, vec3(0.0, 1.0, 0.0), uUpNormalBlend));`,
       )
       .replace(
         '#include <begin_vertex>',
         `#include <begin_vertex>
         #ifdef USE_INSTANCING
-          float windPhase = instanceMatrix[3][0] * 0.15 + instanceMatrix[3][2] * 0.17;
+          vec2 windOrigin = vec2(instanceMatrix[3][0], instanceMatrix[3][2]);
         #else
-          float windPhase = 0.0;
+          vec2 windOrigin = vec2(0.0);
         #endif
+        float windPhase = windOrigin.x * 0.15 + windOrigin.y * 0.17;
+        float windGust = ${windGustGlsl('windOrigin.x', 'windOrigin.y')};
         float windAmt = (sin(uTime * 1.7 + windPhase) + 0.5 * sin(uTime * 3.1 + windPhase * 1.3))
-          * uWindStrength * smoothstep(0.0, 1.0, transformed.y);
+          * windGust * uWindStrength * smoothstep(0.0, 1.0, transformed.y);
         transformed.x += windAmt;
         transformed.z += windAmt * 0.6;`,
       );
@@ -561,7 +624,16 @@ function foliageMaterial(
         metalness: 0,
       })
     : new THREE.MeshLambertMaterial(common);
-  if (pol.windMul > 0) addWind(mat, TREE_WIND_STRENGTH * pol.windMul);
+  const upBlend = pol.leaf ? LEAF_UP_NORMAL_BLEND : 0;
+  if (pol.windMul > 0 || upBlend > 0) addWind(mat, TREE_WIND_STRENGTH * pol.windMul, upBlend);
+  if (pol.leaf && std.map) {
+    // Texture-shaped ambient floor: a dense canopy shadow-maps itself into
+    // darkness (worst on small meadow pines, which read as black clumps), and
+    // no diffuse-side tweak survives full shadow. Luma stays ~0.1, far under
+    // the 1.32 bloom threshold.
+    mat.emissiveMap = std.map;
+    mat.emissive.setRGB(0.32, 0.36, 0.28);
+  }
   applyInstanceCollapse(mat, role);
   materialCache.set(key, mat);
   return mat;
@@ -1096,8 +1168,19 @@ function buildTrees(
     proxyShape: 'pine',
     cullBarkFar: true, // pine canopies start ~2u up: no proxy needed in fog
   };
+  // The oak leaf atlas averages ~0.012 linear albedo (the pine atlas does
+  // not), so oaks rendered as near-black clumps at every scale; small vale
+  // oaks were the "black tufts" on the open meadow. Same material-level lift
+  // as the bush/fern dressing; oak materials are cached per url and used only
+  // by this species.
+  const oakSets = MODEL_URLS.oak.map(extractParts);
+  for (const parts of oakSets) {
+    for (const part of parts) {
+      if (part.isLeaf) (part.material as THREE.MeshStandardMaterial).color.setRGB(6.5, 5.5, 4.0);
+    }
+  }
   const oakSpec: SpeciesSpec = {
-    sets: MODEL_URLS.oak.map(extractParts),
+    sets: oakSets,
     perBucket: treeVariants,
     salt: 54,
     baseScale: 1.15,
@@ -1306,7 +1389,6 @@ const DRESS_DENSITY: Record<BiomeId, number> = {
 };
 const DRESS_DENSITY_LOW_SCALE = 1.24;
 const DRESS_LOW_SCALE_BOOST = 1.08;
-const DRESS_TINT_SOFTEN_LOW = 0.56;
 
 function dressStep(): number {
   return GFX.leanFoliage ? DRESS_STEP_LOW : DRESS_STEP_HIGH;
@@ -1474,6 +1556,24 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
     fern: extractParts(MODEL_URLS.fern[0]),
     mushroom: extractParts(MODEL_URLS.mushroom[0]),
   };
+  // The bush/fern kit textures average ~0.012-0.017 linear albedo, roughly a
+  // tenth of the meadow splat under them, so they rendered as near-black
+  // clumps no instance tint could recover. Lift the material itself (color is
+  // a linear multiplier over the map); the ground-keyed instance tint below
+  // then lands them in the meadow's own palette. Materials here are cached
+  // per GLB url and used only by dressing, so nothing else brightens.
+  const albedoLift: Partial<Record<DressKind, [number, number, number]>> = {
+    bush: [6.5, 5.5, 4.0],
+    bushFlowers: [6.5, 5.5, 4.0],
+    fern: [6.5, 5.5, 4.0],
+  };
+  for (const kind of ['bush', 'bushFlowers', 'fern'] as const) {
+    const lift = albedoLift[kind];
+    if (!lift) continue;
+    for (const part of kindParts[kind]) {
+      (part.material as THREE.MeshStandardMaterial).color.setRGB(lift[0], lift[1], lift[2]);
+    }
+  }
   const buckets = new Map<string, DressingSpot[]>();
   for (const spot of generateDressing(seed)) {
     const key = `${Math.floor((spot.z - WORLD_MIN_Z) / BUCKET_DEPTH)}:${spot.x < 0 ? 0 : 1}`;
@@ -1559,16 +1659,24 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
               ),
             );
           } else {
-            im.setColorAt(
-              i,
-              softTint(
-                s.x,
-                s.z,
-                DRESS_TINT[zoneBiomeAt(s.x, s.z)],
-                c,
-                GFX.leanFoliage ? DRESS_TINT_SOFTEN_LOW : DRESS_TINT_SOFTEN,
-              ),
+            // Bushes and ferns grow out of the same meadow as the grass
+            // tufts: key their tint to the ground colour, then ride the
+            // biome accent so authored casts survive. The kit albedo is
+            // dark, hence the lift gain; a flat biome constant left them
+            // reading as near-black clumps on the open field.
+            const dressAccent = DRESS_ACCENT[zoneBiomeAt(s.x, s.z)] ?? [1, 1, 1];
+            groundGrassColorAt(s.x, s.z, seed, c);
+            c.setRGB(
+              Math.min(1.5, DRESS_GROUND_GAIN[0] * dressAccent[0] * (0.65 + 0.7 * c.r)),
+              Math.min(1.5, DRESS_GROUND_GAIN[1] * dressAccent[1] * (0.65 + 0.7 * c.g)),
+              Math.min(1.5, DRESS_GROUND_GAIN[2] * dressAccent[2] * (0.65 + 0.7 * c.b)),
             );
+            c.offsetHSL(
+              (hashAt(s.x, s.z, 1) - 0.5) * 0.03,
+              (hashAt(s.x, s.z, 2) - 0.5) * 0.06,
+              (hashAt(s.x, s.z, 3) - 0.5) * 0.05,
+            );
+            im.setColorAt(i, c);
           }
         });
         im.receiveShadow = true; // dressing casts nothing: too small to matter
@@ -1625,8 +1733,9 @@ function applyGrassShader(
     const wind = GFX.windSway
       ? `
         float windPhase = tuftBase.x * 0.31 + tuftBase.y * 0.27;
+        float windGust = ${windGustGlsl('tuftBase.x', 'tuftBase.y')};
         float windAmt = (sin(uTime * 1.7 + windPhase) + 0.5 * sin(uTime * 3.1 + windPhase * 1.3))
-          * ${GRASS_WIND_STRENGTH.toFixed(3)} * smoothstep(0.0, 0.7, transformed.y);
+          * windGust * ${GRASS_WIND_STRENGTH.toFixed(3)} * smoothstep(0.0, 0.7, transformed.y);
         transformed.x += windAmt;
         transformed.z += windAmt * 0.6;`
       : '';
@@ -1636,6 +1745,14 @@ function applyGrassShader(
         `#include <common>
         uniform float uTime;
         varying vec2 vTuftWorld;`,
+      )
+      .replace(
+        '#include <beginnormal_vertex>',
+        `#include <beginnormal_vertex>
+        // Light the cards like the ground plane they grow from: a vertical
+        // double-sided card otherwise shades half its faces away from the sun
+        // and the whole tuft reads near-black at distance.
+        objectNormal = vec3(0.0, 1.0, 0.0);`,
       )
       .replace(
         '#include <begin_vertex>',
@@ -1741,7 +1858,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     lush ? 1.45 : 1.1 * lowPlusGrassScale,
     lush ? 0.9 : 0.7 * lowPlusGrassScale,
   );
-  quad.translate(0, lush ? 0.42 : 0.35 * lowPlusGrassScale, 0);
+  quad.translate(0, lush ? 0.4 : 0.35 * lowPlusGrassScale, 0);
   const quad2 = quad.clone().rotateY(Math.PI / 2);
   const geo = mergeGeometries([quad, quad2]);
 
@@ -2016,15 +2133,25 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         // anchors too, the frost/garden idiom, which is not what fen wants)
         const fenTuft = tuftBiome === 'fen';
         if (!fenTuft) {
-          const s = (lush ? 0.55 : 0.45) + r * (lush ? 1.1 : 1);
+          // r is the density hash, so it only ever reaches the density cap:
+          // the lush scale tops out near 0.95 rather than sprouting monsters
+          const s = (lush ? 0.55 : 0.45) + r * (lush ? 0.8 : 1);
           q.setFromAxisAngle(up, r * 12.4);
           m.compose(v.set(x, h, z), q, sv.set(s, s, s));
           im.setMatrixAt(n, m);
-          c.setHex(GRASS_TINT[tuftBiome]);
+          const accent = GRASS_ACCENT[tuftBiome] ?? [1, 1, 1];
+          groundGrassColorAt(x, z, seed, c);
+          c.setRGB(
+            tuftTintChannel(c.r, GRASS_TINT_GAIN[0] * accent[0]),
+            tuftTintChannel(c.g, GRASS_TINT_GAIN[1] * accent[1]),
+            tuftTintChannel(c.b, GRASS_TINT_GAIN[2] * accent[2]),
+          );
+          // small enough to read as patches (the ground noise already
+          // carries those) rather than per-tuft confetti
           c.offsetHSL(
-            (hashAt(i, j, 3) - 0.5) * 0.05,
-            (hashAt(i, j, 4) - 0.5) * 0.12,
-            (hashAt(i, j, 5) - 0.5) * 0.1,
+            (hashAt(i, j, 3) - 0.5) * 0.024,
+            (hashAt(i, j, 4) - 0.5) * 0.06,
+            (hashAt(i, j, 5) - 0.5) * 0.07,
           );
           im.setColorAt(n, c);
           n++;

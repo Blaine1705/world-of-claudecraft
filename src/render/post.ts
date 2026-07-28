@@ -4,26 +4,32 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
 import { N8AOPass } from 'n8ao';
 import { GFX, sharedUniforms } from './gfx';
 
 // Post chain: RenderPass -> N8AO (high: half-res Low, ultra: full-res Medium)
 // -> UnrealBloom -> OutputPass (ACES tonemap + sRGB, reads
 // renderer.toneMapping) -> GradePass (display space lift/gamma/gain,
-// saturation, vignette, faint animated grain).
+// saturation, vignette, faint animated grain) -> SMAA.
 //
 // N8AO replaced three's GTAOPass: better denoise at lower sample counts, and
 // cheap enough (half-res) to run on the high tier where GTAO was ultra-only.
 // It sits mid-chain so its autosetGamma leaves the buffer linear for bloom.
 //
 // AA: when N8AO is active it renders the scene into its own non-MSAA beauty
-// target, so geometry AA comes from bloom/grade softening + pixel ratio (the
-// composer target therefore skips MSAA storage — pure waste otherwise). The
-// no-AO fallback path keeps MSAA on the composer target.
+// target, so the composer target skips MSAA storage (pure waste otherwise)
+// and MSAA never sees the scene. SMAA at the tail of the chain is what
+// actually supplies edge AA on the composer tiers; the no-AO fallback path
+// keeps MSAA on the composer target and gets SMAA on top of it.
 
-const BLOOM_STRENGTH = 0.32; // subtle — fires/portals glow, sky must not blow out
-const BLOOM_RADIUS = 0.55;
-const BLOOM_THRESHOLD = 0.85;
+// Bloom is a high-pass in linear HDR, so the threshold has to clear the
+// brightest lit diffuse or the whole sunlit world glows. Sunlit high-albedo
+// plaster/snow peaks near 1.02 luma at the current rig; 1.32 leaves it dark
+// and reserves bloom for emissives, which gfx.ts EMISSIVE_* push above it.
+const BLOOM_STRENGTH = 0.4; // subtle: fires/lamps/windows glow, sky must not blow out
+const BLOOM_RADIUS = 0.6;
+const BLOOM_THRESHOLD = 1.32;
 
 const GradeShader = {
   name: 'GradeShader',
@@ -42,8 +48,8 @@ const GradeShader = {
     uniform sampler2D tDiffuse;
     uniform float uTime;
     varying vec2 vUv;
-    const vec3 LIFT = vec3(0.012, 0.010, 0.018);   // lifted cool shadows
-    const vec3 GAIN = vec3(1.05, 1.02, 0.98);      // warm highlights
+    const vec3 LIFT = vec3(0.010, 0.010, 0.020);   // lifted cool shadows
+    const vec3 GAIN = vec3(1.07, 1.02, 0.97);      // warm highlights
     const vec3 GAMMA = vec3(0.96);
     void main() {
       vec3 c = texture2D(tDiffuse, vUv).rgb;
@@ -96,7 +102,10 @@ export function buildComposer(
     // darkens building/rock crevices without dirtying open fields
     ao.configuration.aoRadius = 1.8;
     ao.configuration.distanceFalloff = 3.6;
-    ao.configuration.intensity = 2.4;
+    // 2.4 crushed every dense alphaTest card cluster (grass tufts, sapling
+    // canopies) to a black clump: overlapping cards read as deep cavities at
+    // this radius. 1.0 keeps contact grounding without voiding vegetation.
+    ao.configuration.intensity = 1.0;
     // mid-chain: the buffer must stay linear for bloom/OutputPass (autoset
     // guesses from renderToScreen, but be explicit — a gamma-lifted frame
     // here washes the whole image out)
@@ -127,6 +136,15 @@ export function buildComposer(
   const grade = new ShaderPass(GradeShader);
   grade.uniforms.uTime = sharedUniforms.uTime; // shared clock drives the grain
   composer.addPass(grade);
+
+  // Edge AA, last so it works on the final display-space image (SMAA's edge
+  // detector expects gamma-encoded color, which is what OutputPass produced).
+  // Construction size is provisional: composer.setSize below, and the
+  // setSize() member, resize every pass to the live drawing-buffer extent.
+  // High only: ultra's 2.5 pixelRatioCap already suppresses edge crawl and
+  // SMAA at that pixel count costs ~1.5ms; high runs a 1.75 cap where
+  // aliasing is visible and the pass is cheap.
+  if (GFX.composer && GFX.tier === 'high') composer.addPass(new SMAAPass(size.x, size.y));
 
   // EffectComposer defaults its logical size to drawing-buffer pixels and
   // then multiplies by pixelRatio again when sizing passes — N8AO/bloom would

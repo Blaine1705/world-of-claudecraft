@@ -308,6 +308,25 @@ function lerpSplat(w: [number, number, number, number], layer: 0 | 1 | 2 | 3, t:
 
 // One terrain sample: height, analytic normal, legacy tint color and splat
 // weights. Both tiers use the color; only the splat tier consumes weights.
+// The grass colour the terrain itself would paint at (x, z): the zone-blended
+// palette plus the same two fbm patch-noise layers the vertex tint uses.
+// Foliage keys tuft and dressing tints off this so ground cover reads as
+// growing out of the meadow instead of sitting on top of it (a flat biome
+// constant left grass arithmetically decoupled from the ground under it).
+export function groundGrassColorAt(
+  x: number,
+  z: number,
+  seed: number,
+  out: THREE.Color,
+): THREE.Color {
+  paletteAt(x, z);
+  const v = fbm2(x * 0.045, z * 0.045, seed + 53, 3);
+  out.copy(grassC).lerp(grassDarkC, v);
+  const v2 = fbm2(x * 0.16, z * 0.16, seed + 59, 2);
+  out.lerp(grassYellowC, v2 * 0.35);
+  return out;
+}
+
 function sampleVertex(x: number, z: number, seed: number, lowShade: boolean): VertexSample {
   const h = terrainHeight(x, z, seed);
   const hx = terrainHeight(x + SLOPE_EPS, z, seed) - terrainHeight(x - SLOPE_EPS, z, seed);

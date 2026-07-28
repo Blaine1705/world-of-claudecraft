@@ -27,7 +27,7 @@ import {
   eastbrookRoofVisibilityPlanInto,
   newEastbrookRoofVisibilityPlan,
 } from './eastbrook_town_visibility_core';
-import { GFX, surfaceMat } from './gfx';
+import { EMISSIVE_GLOW, GFX, surfaceMat } from './gfx';
 import { modulateEmissiveByVertexColor } from './vertex_color_emissive';
 
 const ROOT_NAME = 'eastbrookTownRebuild';
@@ -267,7 +267,11 @@ function materialOptions(emissive: boolean, atlas = eastbrookSurfaceAtlasTexture
     roughness: emissive ? 0.55 : 0.86,
     metalness: emissive ? 0.08 : 0,
     emissive: emissive ? 0xffffff : 0x000000,
-    emissiveIntensity: emissive ? (GFX.standardMaterials ? 1 : 0.72) : 1,
+    // White x vertex color (vertex_color_emissive.ts), so the amber/cyan pane
+    // tints carry the hue and their luma (0.47 amber) sets how far this has to
+    // climb to clear post.ts BLOOM_THRESHOLD. At the old intensity 1 no window
+    // in town glowed while sunlit plaster nearly did.
+    emissiveIntensity: emissive ? (GFX.standardMaterials ? EMISSIVE_GLOW : 0.72) : 1,
     flatShading: !GFX.standardMaterials,
   } as const;
 }

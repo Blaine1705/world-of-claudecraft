@@ -20,7 +20,7 @@ import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
 import { loadGltf, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
-import { addRimGlow, GFX } from '../gfx';
+import { addRimGlow, EMISSIVE_GLOW, GFX } from '../gfx';
 import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
@@ -931,6 +931,14 @@ export function tintedMaterial(
   if (GFX.standardMaterials) {
     mat = s.clone();
     addRimGlow(mat); // dungeon silhouette rim (uRimBoost contract)
+    // The skeletons and the necromancer share a `Glow` eye material authored
+    // at strength 1, whose two tints straddled the old bloom threshold on luma
+    // weights alone: the yellow pair (0.907) lit up, the cyan pair (0.842)
+    // never did. Pin both to the glow band so a skull reads the same way
+    // whatever color its eyes are. Case is load-bearing here: the weapons'
+    // `weapons_glow` ships at strength 1.5, already over the line, and
+    // weapon_vfx.ts animates its intensity per frame.
+    if (mat.name.includes('Glow')) mat.emissiveIntensity = EMISSIVE_GLOW;
   } else {
     if ((src as THREE.MeshBasicMaterial).isMeshBasicMaterial) {
       mat = (src as THREE.MeshBasicMaterial).clone();

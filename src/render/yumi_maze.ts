@@ -13,7 +13,7 @@ import { YUMI_MAZE_WALL_HEIGHT, yumiMazeLayout } from '../sim/yumi_maze_layout';
 import type { IWorld } from '../world_api';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
-import { surfaceMat } from './gfx';
+import { EMISSIVE_LIGHT, surfaceMat } from './gfx';
 import { stoneTexture } from './textures';
 
 // GLB-backed static bodies (Tripo-generated, see public/models/props), with a
@@ -71,7 +71,7 @@ const BRAZIER_LIGHT_INTENSITY = 46;
 const BRAZIER_LIGHT_DISTANCE = 36;
 const BRAZIER_LIGHT_Y = 5.4;
 const BRAZIER_FLAME_Y = 1.9;
-const BRAZIER_FLAME_EMISSIVE = 2.2;
+const BRAZIER_FLAME_EMISSIVE = EMISSIVE_LIGHT;
 const WARM_FLAME = 0xffb054;
 
 /** The renderer-owned pools the maze's braziers plug into. */

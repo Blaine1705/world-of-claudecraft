@@ -439,12 +439,17 @@ const CAMERA_MAX_COMP_FOV = 98;
 // Decay rate of the one-time offset captured when the self-motion predictor
 // takes over from the lead-smoothing path (gone in ~0.3 s, no camera step).
 const SELF_MOTION_HANDOFF_RATE = 15;
-// lighting rig (high/ultra) — IBL supplies ambient, sun carries the key
-const HEMI_INTENSITY = 0.42;
-// Held under its old 2.8 with a golden key color (see the rig below): full
-// strength white read as harsh midday glare against the sunless realm skies.
-const SUN_INTENSITY = 2.45;
-const ENV_INTENSITY = 0.5;
+// lighting rig (high/ultra): IBL supplies ambient, sun carries the key.
+// The key keeps its golden color (full-strength white read as harsh midday
+// glare against the sunless realm skies); key up / fill down buys the
+// directional contrast, while the sunlit diffuse ceiling stays under the
+// post.ts BLOOM_THRESHOLD so only emissives bloom. Intensities only:
+// water.ts and sky.ts read the sun direction and their own tint
+// independently, so retinting this light seams the shoreline against the
+// dome.
+const HEMI_INTENSITY = 0.36;
+const SUN_INTENSITY = 2.9;
+const ENV_INTENSITY = 0.45;
 // dungeon interiors: kill the daylight so torchlight carries the scene
 // (env at 0.15 still lit rigs sky-blue against the pitch-dark crypt)
 const DUNGEON_SUN_INTENSITY = 0.3;
@@ -1193,7 +1198,10 @@ export class Renderer {
   private drawStats: DrawStatsAccumulator | null = null;
   // Last completed frame's draw delta (what perfStats serves on composer tiers).
   private drawStatsFrame: DrawStatsCounters = { calls: 0, triangles: 0, points: 0, lines: 0 };
-  private baseExposure = 1.12; // tone-mapping exposure at brightness 1.0
+  // Tone-mapping exposure at brightness 1.0. Applied in OutputPass, i.e.
+  // AFTER bloom, so this trims the raised sun rig back to the old apparent
+  // brightness without moving anything across BLOOM_THRESHOLD.
+  private baseExposure = 1.06;
   private tmpV = new THREE.Vector3();
   private viewCandidates: ViewCandidate[] = [];
   // Persistent scratch for the sloppy-pick column build. pick() is also the

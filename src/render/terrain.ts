@@ -149,7 +149,9 @@ const WALL_LOD_RIM_MARGIN = 40;
 // second boot. At the current bounds this is roughly 3yd/texel.
 const NORMAL_TEX_W = 320;
 const NORMAL_TEX_H = 960;
-const NORMAL_TEX_STRENGTH = 1.35;
+// nudged up from 1.35: at 3yd/texel the macro relief was reading flat next
+// to the strengthened per-material detail normals
+const NORMAL_TEX_STRENGTH = 1.45;
 
 // Ground colors per biome; boundaries blend across the same window as the
 // heightfield's shape blend. This is the tint layer the splat albedo
@@ -437,8 +439,8 @@ function buildSplatMaterial(
                  + texture2D(uSand, tuv).rgb * vSplat.w;
         // snow cover on the peaks/rim, by baked per-vertex weight
         alb = mix(alb, texture2D(uSnow, tuv * 0.7).rgb, vExtra.y);
-        // gentle macro brightness swing breaks distant tiling
-        float macro = mix(0.92, 1.08, texture2D(uMacro, vWPos.xz * 0.012).r);
+        // macro brightness swing breaks distant tiling
+        float macro = mix(0.88, 1.12, texture2D(uMacro, vWPos.xz * 0.012).r);
         // Meteor impact terrain is authored by the same crater profile as the
         // heightfield. Apply it in albedo space so the PBR textures do not wash
         // the crater floor back toward marsh sand.
@@ -447,7 +449,7 @@ function buildSplatMaterial(
         // very-low-frequency hue drift (~100u wavelength) keeps distant
         // hills from flattening into one uniform lawn green
         float macro2 = texture2D(uMacro, vWPos.xz * 0.0045 + 0.37).r;
-        alb = mix(alb, alb * vec3(1.07, 1.03, 0.86), (macro2 - 0.5) * 0.5 * vSplat.x);
+        alb = mix(alb, alb * vec3(1.07, 1.03, 0.86), (macro2 - 0.5) * 0.75 * vSplat.x);
         // real albedo carries the hue now; vertex color only modulates gently
         // so the biome painting (roads, hub discs, snowline) still reads.
         // (vColor was authored as a full sRGB ground color, so re-centre it
@@ -464,22 +466,36 @@ function buildSplatMaterial(
       .replace(
         '#include <roughnessmap_fragment>',
         `
-        float roughnessFactor = roughness * mix(
+        // The macro swing doubles as a per-material surface break-up: loose
+        // layers (dirt, sand) take it strongly so they read as damp/dry
+        // patches, rock takes little so stone stays tight and specular.
+        float roughBreak = (macro - 1.0) * (vSplat.y * 1.4 + vSplat.z * 0.4 + vSplat.w * 0.9);
+        float roughnessFactor = roughness * clamp(mix(
           dot(vSplat, vec4(${ROUGH_GRASS}, mix(${ROUGH_DIRT}, ${ROUGH_MUD}, vExtra.x), ${ROUGH_ROCK}, ${ROUGH_SAND})),
-          ${ROUGH_SNOW}, vExtra.y);`,
+          ${ROUGH_SNOW}, vExtra.y) + roughBreak, 0.35, 1.0);`,
       )
       .replace(
         '#include <normal_fragment_maps>',
         `#include <normal_fragment_maps>
-        // per-layer detail normals (GL-convention), weighted by splat
+        // per-layer detail normals (GL-convention), weighted by splat: rock
+        // carries the hardest relief, then dirt, grass moderate, sand soft
         vec3 gN = texture2D(uGrassN, tuv).xyz * 2.0 - 1.0;
         vec3 dN = texture2D(uDirtN, tuv * 0.8).xyz * 2.0 - 1.0;
         vec3 rN = texture2D(uRockN, tuv * 0.6).xyz * 2.0 - 1.0;
         vec3 sN = texture2D(uSandN, tuv).xyz * 2.0 - 1.0;
-        vec2 detN = gN.xy * vSplat.x * 0.65
-                  + dN.xy * vSplat.y * 0.8
-                  + rN.xy * vSplat.z * 0.9 * (1.0 - wallW)
-                  + sN.xy * vSplat.w * 0.55;
+        // A second octave at 4x the base tiling: without it the ground is one
+        // blurred frequency underfoot and reads as plastic. Two taps rather
+        // than one per layer, since the octave only supplies grain and its
+        // source map is indistinguishable once summed into a layer's normal:
+        // the hard layers share the crisp tap, the soft layers the gentle one.
+        vec2 fineHard = texture2D(uRockN, tuv * 2.4).xy * 2.0 - 1.0;
+        vec2 fineSoft = texture2D(uGrassN, tuv * 4.0).xy * 2.0 - 1.0;
+        // wet mud lumps smoothly where dry dirt crumbles
+        float dirtDetail = 1.0 - vExtra.x * 0.35;
+        vec2 detN = (gN.xy + fineSoft * 0.4) * vSplat.x * 0.7
+                  + (dN.xy + fineHard * 0.4) * vSplat.y * 1.0 * dirtDetail
+                  + (rN.xy + fineHard * 0.4) * vSplat.z * 1.15 * (1.0 - wallW)
+                  + (sN.xy + fineSoft * 0.4) * vSplat.w * 0.45;
         detN *= 1.0 - vExtra.y * 0.7; // snow softens the relief beneath it
         normal = normalize(normal + tbn * vec3(detN, 0.0));
         // cliffs: wall-projected rock normal so steep faces get real relief

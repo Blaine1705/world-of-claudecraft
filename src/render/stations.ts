@@ -21,7 +21,7 @@ import type { StationDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
-import { GFX, surfaceMat } from './gfx';
+import { EMISSIVE_LIGHT, GFX, surfaceMat } from './gfx';
 import { type StationPropKind, stationPropPlacements } from './stations_core';
 
 // Half-step (yd) used to finite-difference the local ground slope under each
@@ -178,7 +178,7 @@ export function buildStationProps(seed: number, stations: readonly StationDef[])
         new THREE.MeshLambertMaterial({
           color: 0xffaa33,
           emissive: 0xff6600,
-          emissiveIntensity: usePbr ? 2.2 : 1.4,
+          emissiveIntensity: usePbr ? EMISSIVE_LIGHT : 1.4,
           transparent: true,
           opacity: 0.92,
         }),

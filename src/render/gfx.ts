@@ -1142,6 +1142,20 @@ export const sharedUniforms = {
 export const SUN_ANCHOR = new THREE.Vector3(90, 140, 50);
 export const SUN_DIR = SUN_ANCHOR.clone().normalize();
 
+// Emissive tiers. Bloom is a luma high-pass at post.ts BLOOM_THRESHOLD (1.32)
+// in linear HDR, so whether a surface glows is emissive-color luma x intensity
+// against that number, NOT the intensity alone. Pick the tier by intent and
+// the maths follows: a mid-luma warm (0xff6600, luma 0.55) reaches 2.2 at
+// EMISSIVE_LIGHT and a bright one (amber vColor, luma 0.47; cyan eyes, 0.84)
+// clears it at EMISSIVE_GLOW. Anything meant to read as painted-on colour
+// rather than a light source stays at EMISSIVE_TINT and never blooms.
+/** self-lit sources: flames, lanterns, projectile cores */
+export const EMISSIVE_LIGHT = 4.0;
+/** lit-from-within surfaces: windows, creature eyes, active runes */
+export const EMISSIVE_GLOW = 3.3;
+/** surface tint only, deliberately below the bloom threshold */
+export const EMISSIVE_TINT = 0.5;
+
 export interface SurfaceMatOpts {
   color?: number;
   map?: THREE.Texture;

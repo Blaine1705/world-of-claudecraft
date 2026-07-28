@@ -9,7 +9,7 @@ import { JAIL_CAGE_HALF, JAIL_CENTER, JAIL_GATE, JAIL_OUTER_HALF } from '../sim/
 import { groundHeight } from '../sim/world';
 import { registerPreload } from './assets/preload';
 import { buildDungeonPropMesh, ensureDungeonAssets, loadKitModules } from './dungeon';
-import { GFX } from './gfx';
+import { EMISSIVE_LIGHT, GFX } from './gfx';
 import { freezeStaticMatrices } from './static_matrix';
 import { radialGlowTexture } from './textures';
 
@@ -349,7 +349,7 @@ function placeTorches(group: THREE.Group, p: JailPlacements): void {
   const flameMat = new THREE.MeshLambertMaterial({
     color: FLAME_COLOR,
     emissive: FLAME_EMISSIVE,
-    emissiveIntensity: 2.2,
+    emissiveIntensity: EMISSIVE_LIGHT,
     transparent: true,
     opacity: 0.92,
   });

@@ -23,7 +23,7 @@ import {
   isEastbrookRebuildStall,
   isEastbrookRebuildWell,
 } from './eastbrook_town';
-import { GFX, sharedUniforms, surfaceMat } from './gfx';
+import { EMISSIVE_LIGHT, GFX, sharedUniforms, surfaceMat } from './gfx';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -965,7 +965,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   const lanternMat = surfaceMat({
     color: 0xffcc66,
     emissive: 0xff9933,
-    emissiveIntensity: usePbr ? 2 : 1.2,
+    emissiveIntensity: usePbr ? EMISSIVE_LIGHT : 1.2,
     roughness: 0.4,
   });
 
@@ -1296,7 +1296,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       new THREE.MeshLambertMaterial({
         color: 0xffaa33,
         emissive: 0xff6600,
-        emissiveIntensity: usePbr ? 2.2 : 1.4,
+        emissiveIntensity: usePbr ? EMISSIVE_LIGHT : 1.4,
         transparent: true,
         opacity: 0.92,
       }),
@@ -1767,7 +1767,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
         new THREE.MeshLambertMaterial({
           color: 0xffaa33,
           emissive: 0xff6a1e,
-          emissiveIntensity: usePbr ? 2.2 : 1.4,
+          emissiveIntensity: usePbr ? EMISSIVE_LIGHT : 1.4,
           transparent: true,
           opacity: 0.92,
         }),

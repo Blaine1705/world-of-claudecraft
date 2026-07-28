@@ -55,13 +55,13 @@ import {
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
-import { sharedUniforms } from './gfx';
+import { EMISSIVE_LIGHT, sharedUniforms } from './gfx';
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
 import { radialGlowTexture } from './textures';
 import { buildWildheartFieldInterior } from './wildheart_props';
 
-const FLAME_EMISSIVE_HIGH = 2.2;
+const FLAME_EMISSIVE_HIGH = EMISSIVE_LIGHT;
 // dungeon torch point lights: pumped + hung low so warm pools break up the
 // floor (the daylight rig is dropped underground; torches carry the scene)
 const DUNGEON_LIGHT_Y = 6.4;
