@@ -191,6 +191,20 @@ describe('form_draft: focus', () => {
     expect(document.activeElement).toBe(elsewhere);
   });
 
+  it('does not focus a control the rebuild came back disabled', () => {
+    // Inherited from focus_restore's restoreFirstEnabled (#2528): a disabled
+    // control cannot take focus, so focusing it anyway silently drops the player
+    // to <body>, which is the exact failure the whole idiom exists to prevent.
+    const root = mount('<button data-act="send">Send</button>');
+    (root.querySelector('button') as HTMLButtonElement).focus();
+    const draft = captureFormDraft(root);
+    expect(draft.focusKey).toBe('[data-act="send"]');
+
+    root.innerHTML = '<button data-act="send" disabled>Enviar</button>';
+    restoreFormDraft(root, draft);
+    expect(document.activeElement).toBe(document.body);
+  });
+
   it('leaves focus alone when the rebuild dropped the field that had it', () => {
     const root = mount('<input id="a" type="text">');
     const input = root.querySelector<HTMLInputElement>('#a') as HTMLInputElement;

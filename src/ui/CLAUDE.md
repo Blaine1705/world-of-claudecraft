@@ -51,6 +51,14 @@ mobile portrait *and* landscape before calling UI work done.
     `Hud` drives through `windowFocus(rootSel)`. The trap intercepts Tab ONLY when focus is
     already inside (Tab is the game's target-nearest key; an unconditional trap would hijack
     it). Esc stays with the single `closeAll` dispatcher, not the manager.
+  - **Focus across a REBUILD is the other half, and a different module:** a painter that wipes
+    its own subtree carries the focused control's identity across with `captureFocusKey` /
+    `restoreFirstEnabled` (`src/ui/focus_restore.ts`), never a hand-rolled `activeElement`
+    read. The helper owns the narrowing, the containment check (the `data-focus-key` namespace
+    is shared across windows, so an unguarded read steals focus from another one) and the
+    disabled skip; the caller owns only its own degradation ladder. A guard in
+    `tests/focus_restore.test.ts` refuses any `src/ui` module that touches the attribute
+    without importing it.
   - **Visible focus that never animates away:** every outline-based `:focus-visible` ring is
     steady and drawn from a token / system color, never a raw hex, never transitioned off.
   - **Skip links** ("Skip to Main HUD" / "Skip to Chat") are the first focusable elements;
@@ -377,7 +385,11 @@ which lands after any draft restore and undoes it. If the rebuild destroys live 
 `form_draft.ts` (`captureFormDraft` / `restoreFormDraft`). Two mistakes to avoid, both of which
 this repo has shipped: a `render()` whose signature check is INSIDE it is a silent no-op from
 the fan-out (`card_duel_window.ts`), and an arm that calls a method the callee's own signature
-swallows is present and inert (`delve_tracker_controller.ts`, #2529). Both halves are pinned by
+swallows is present and inert (`delve_tracker_controller.ts`, #2529). The FOCUS half of that
+rebuild is the `focus_restore.ts` seam above, not a second `activeElement` read: `form_draft`
+owns only the identity (one key that finds the field again to write its value back, which
+`data-focus-key` does not carry) and takes the narrowing, the containment check and the
+disabled skip from there. Both halves are pinned by
 `tests/language_fanout_registry.test.ts`, which enumerates the fan-out and sweeps `src/ui` for
 signature-gated modules, so a new one cannot land without the question being answered; the
 per-surface behavior lives in `tests/language_fanout_relocalize.test.ts`.

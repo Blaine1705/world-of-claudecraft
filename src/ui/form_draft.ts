@@ -19,6 +19,15 @@
 // half-typed guild name into the friend field the moment a tab was involved. A
 // field carrying neither key is skipped rather than guessed at.
 //
+// THE FOCUS HALF GOES THROUGH ./focus_restore.ts, the seam #2528 extracted for
+// carrying focus across a rebuild: `focusedWithin` owns the activeElement
+// narrowing and the containment check, and `restoreFirstEnabled` owns the
+// disabled skip (a control the rebuild came back DISABLED cannot take focus, and
+// focusing it anyway drops the player to <body> in exactly the case the idiom
+// exists for). What stays here is the identity, because this module needs one key
+// that finds the element again to write a captured VALUE back, which
+// `data-focus-key` does not provide.
+//
 // FOCUS IS RESTORED ONLY IF IT WAS ALREADY INSIDE THIS ROOT. The language picker
 // lives in the Options window, so at the moment of a switch the player is
 // normally focused there; re-focusing a mailbox field would yank the caret out
@@ -34,6 +43,8 @@
  *  radio carries its state in `.checked`, and a file/color/range input has no
  *  draft to lose, so none of them belong in a draft. */
 const TEXT_INPUT_TYPES = new Set(['text', 'search', 'email', 'tel', 'url', 'number']);
+
+import { focusedWithin, restoreFirstEnabled } from './focus_restore';
 
 type DraftField = HTMLInputElement | HTMLTextAreaElement;
 
@@ -151,7 +162,7 @@ export function restoreFormDraft(root: ParentNode, draft: FormDraft): void {
   if (draft.focusKey === null) return;
   const target = findByKey(root, draft.focusKey);
   if (!(target instanceof HTMLElement)) return;
-  target.focus();
+  restoreFirstEnabled([target]);
   if (draft.selection === null || !isDraftField(target)) return;
   try {
     target.setSelectionRange(draft.selection[0], draft.selection[1]);
