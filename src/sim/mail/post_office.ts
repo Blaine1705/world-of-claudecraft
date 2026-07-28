@@ -579,8 +579,12 @@ export class PostOffice {
     }
     // Parcels respect bag capacity (#1354, the market-collect rule): a stack that
     // does not fit stays ATTACHED to the letter for a later take, never destroyed
-    // and never force-added past the bag budget. canAddItem is checked per stack
-    // against the live inventory, so cumulative capacity is honoured.
+    // and never force-added past the bag budget. Capacity is checked per stack
+    // against the live inventory, so cumulative capacity is honoured. An
+    // instanced parcel (a marketplace custody delivery or return) grants
+    // through addItemInstance so the exact payload survives; the capacity
+    // pre-check models the identical-payload merge the grant applies
+    // (canGrantItemInstance, the #2139 rule), never the plain fungible model.
     const kept: InvSlot[] = [];
     for (const s of m.items) {
       // The shared payload-aware pair (bags.ts canGrantCopies + grantCopies):
@@ -689,6 +693,38 @@ export class PostOffice {
       copper: Math.max(0, Math.floor(letter.copper ?? 0)),
       items: (letter.items ?? []).map((s) => ({ ...s })),
       delaySeconds: letter.delaySeconds ?? MAIL_NPC_DELIVERY_SECONDS,
+    });
+  }
+
+  // Custody deliveries (the server's $WOC marketplace escrow returns and
+  // buyer deliveries): a system letter carrying EXACT item copies, instance
+  // payloads intact, unlike sendLetter's authored fungible parcels. Same
+  // service contract as sendLetter: no proximity, no postage, never refused,
+  // and the recipient may be offline (the book is keyed by stable character
+  // id). Each slot is deep-cloned (the save/load aliasing rule in types.ts)
+  // and its advisory bag cell dropped: the copy is entering the book, not a
+  // bag. System parcels hold Infinity expiry while attachments remain, so a
+  // returned or delivered copy is never destroyed by the sweep.
+  mailSystemParcel(
+    recipient: { key: string; name: string },
+    letter: LetterDef,
+    items: InvSlot[],
+  ): void {
+    this.book({
+      recipientKey: recipient.key,
+      recipientName: recipient.name,
+      senderName: letter.senderName,
+      kind: 'system',
+      letterId: letter.letterId,
+      subject: letter.subject,
+      body: letter.body,
+      copper: Math.max(0, Math.floor(letter.copper ?? 0)),
+      items: items.map((s) => {
+        const clone = cloneInvSlot(s);
+        delete clone.slot;
+        return clone;
+      }),
+      delaySeconds: letter.delaySeconds ?? 0,
     });
   }
 

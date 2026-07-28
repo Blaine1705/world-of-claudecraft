@@ -8545,6 +8545,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.letters.mastery_reset_notice.subject': '腕前に、偽りなし',
   'entities.letters.mastery_reset_notice.body':
     'ギルドの同志へ\n\nギルドは熟練の新しい尺度を定めました。誰もが登り直しです。あなたの製作スキルと採集熟練度はゼロに戻されました。\n\nそれ以外はすべて、手つかずのままあなたのものです。レシピ、道具と素材、銀行と所持金、調律と称号、功績と名声、クエストと郵便。\n\nこれからの登りにごまかしは利きません。安い仕事では上へは行けません。より難しいレシピを、より豊かな鉱脈を、より深い水を求めてください。\n\n敬意を込めて、\nギルド会館',
+  'entities.letters.woc_market_delivery.sender': '取引所仲買人',
+  'entities.letters.woc_market_delivery.subject': '取引所でのご購入品',
+  'entities.letters.woc_market_delivery.body':
+    '取引は決済され、品物はあなたのものです。同封の小包には、あなたが代金を支払ったまさにその品が入っています。出品の瞬間から支払いが確定するまで、取引所が責任を持って預かっていました。\n\nこの取引の記録は取引所の台帳に残ります。\n\n- 取引所仲買人',
+  'entities.letters.woc_market_return.sender': '取引所仲買人',
+  'entities.letters.woc_market_return.subject': '取引所への出品が終了しました',
+  'entities.letters.woc_market_return.body':
+    '出品は売買成立に至らず終了しました。買い手がつかなかったか、最低落札価格に届かなかったか、出品が取り下げられたか、あるいは落札者が支払いを済ませなかったのです。お預かりした品は、この手紙とともに預けられたときのままお返しします。\n\n- 取引所仲買人',
+  'entities.letters.woc_market_sold.sender': '取引所仲買人',
+  'entities.letters.woc_market_sold.subject': '取引所への出品が売れました',
+  'entities.letters.woc_market_sold.body':
+    '出品した品が売れ、買い手が全額を支払いました。取引所手数料を差し引いた売上金は、決済トランザクションの中で直接あなたの連携ウォレットへ送られました。取引所があなたのお金を預かることは一度もありません。\n\nこの取引の記録は取引所の台帳に残ります。\n\n- 取引所仲買人',
   'hudChrome.calendar.title': 'イベントカレンダー',
   'hudChrome.calendar.close': 'カレンダーを閉じる',
   'hudChrome.calendar.keybindLabel': 'イベントカレンダー',

@@ -16885,6 +16885,21 @@ export const nl_NL: EnTranslations = {
         "sender": "Knutselaar Gizzel",
         "subject": "MEESTERSCHAP, kaboom",
         "body": "Een van je hoofdvakken heeft meesterschap bereikt, de allerHOOGSTE, kaboom, de hele ladder, klaar. Ik deel geen lof uit, ik deel lonten uit, maar hier, neem allebei: je bent briljant en enigszins angstaanjagend. Ga de bergen zenuwachtig maken."
+      },
+      "woc_market_delivery": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange purchase",
+        "body": "The sale is settled and the goods are yours. The attached parcel carries the exact item you paid for, held in escrow from the moment it was listed until your payment cleared.\n\nA record of the sale lives in the Exchange ledger.\n\n- The Exchange Broker"
+      },
+      "woc_market_return": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange listing has ended",
+        "body": "Your listing ended without a completed sale: the auction found no buyer, the reserve was not met, the listing was withdrawn, or the winning bidder failed to settle. Your goods return to you unharmed with this letter, exactly as they were escrowed.\n\n- The Exchange Broker"
+      },
+      "woc_market_sold": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange listing sold",
+        "body": "Your listing sold and the buyer settled in full. The proceeds, less the exchange fee, were sent to your linked wallet in the settlement transaction itself; the Exchange never held your coin.\n\nA record of the sale lives in the Exchange ledger.\n\n- The Exchange Broker"
       }
     },
     "itemSets": {

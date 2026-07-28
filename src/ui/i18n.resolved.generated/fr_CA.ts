@@ -16885,6 +16885,21 @@ export const fr_CA: EnTranslations = {
         "sender": "Bricoleur Gizzel",
         "subject": "MAITRISE, kaboom",
         "body": "Une de vos majeures a atteint la maîtrise, tout en HAUT, kaboom, toute l'échelle, terminé. Je ne distribue pas d'éloges, je distribue des mèches, mais tenez, prenez les deux : vous êtes brillant et légèrement terrifiant. Allez rendre les montagnes nerveuses."
+      },
+      "woc_market_delivery": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange purchase",
+        "body": "The sale is settled and the goods are yours. The attached parcel carries the exact item you paid for, held in escrow from the moment it was listed until your payment cleared.\n\nA record of the sale lives in the Exchange ledger.\n\n- The Exchange Broker"
+      },
+      "woc_market_return": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange listing has ended",
+        "body": "Your listing ended without a completed sale: the auction found no buyer, the reserve was not met, the listing was withdrawn, or the winning bidder failed to settle. Your goods return to you unharmed with this letter, exactly as they were escrowed.\n\n- The Exchange Broker"
+      },
+      "woc_market_sold": {
+        "sender": "The Exchange Broker",
+        "subject": "Your Exchange listing sold",
+        "body": "Your listing sold and the buyer settled in full. The proceeds, less the exchange fee, were sent to your linked wallet in the settlement transaction itself; the Exchange never held your coin.\n\nA record of the sale lives in the Exchange ledger.\n\n- The Exchange Broker"
       }
     },
     "itemSets": {

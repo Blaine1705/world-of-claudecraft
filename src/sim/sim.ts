@@ -264,6 +264,7 @@ import { formatMoney } from './format_money';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
 import * as interaction from './interaction';
+import { type ExtractOutcome, type ExtractRef, extractTradableCopy } from './inventory_extract';
 import {
   boundCraftedRecipeIdOnLoad,
   sanitizeItemInstancePayloadOnLoad,
@@ -8941,6 +8942,20 @@ export class Sim {
       if (s.count <= 0) meta.inventory.splice(i, 1);
     }
     this.ctx.onInventoryChangedForQuests(meta);
+  }
+
+  // Exact-copy escrow extraction for a broker (the server's $WOC marketplace
+  // listing flow): one unit of the referenced slot leaves the bags, instance
+  // payload intact. The legality gates and the stale-reference checks live in
+  // the pure leaf (inventory_extract.ts); this is the thin facade delegate a
+  // foreign caller resolves, matching the inventory hub's shape. The sim stays
+  // currency-blind here: what the broker does with the copy is server business.
+  extractTradableCopy(pid: number | undefined, ref: ExtractRef): ExtractOutcome {
+    const r = this.resolve(pid);
+    if (!r) return { ok: false, reason: 'not_found' };
+    const out = extractTradableCopy(r.meta.inventory, ref, ITEMS[ref.itemId]);
+    if (out.ok) this.ctx.onInventoryChangedForQuests(r.meta);
+    return out;
   }
 
   // Enchanting-eligible count for `itemId` (#1712 review): a plain fungible

@@ -6,6 +6,9 @@ import {
   MASTERY_RESET_LETTER,
   QUEST_LETTERS,
   WELCOME_LETTER,
+  WOC_MARKET_DELIVERY_LETTER,
+  WOC_MARKET_RETURN_LETTER,
+  WOC_MARKET_SOLD_LETTER,
 } from '../sim/content/letters';
 import {
   ABILITIES,
@@ -204,6 +207,9 @@ const LETTERS_BY_ID: Record<string, LetterDef> = {
   [WELCOME_LETTER.letterId]: WELCOME_LETTER,
   [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
   [MASTERY_RESET_LETTER.letterId]: MASTERY_RESET_LETTER,
+  [WOC_MARKET_DELIVERY_LETTER.letterId]: WOC_MARKET_DELIVERY_LETTER,
+  [WOC_MARKET_RETURN_LETTER.letterId]: WOC_MARKET_RETURN_LETTER,
+  [WOC_MARKET_SOLD_LETTER.letterId]: WOC_MARKET_SOLD_LETTER,
 };
 for (const letter of Object.values(QUEST_LETTERS)) LETTERS_BY_ID[letter.letterId] = letter;
 for (const letter of Object.values(GUILD_TREND_LETTERS)) LETTERS_BY_ID[letter.letterId] = letter;

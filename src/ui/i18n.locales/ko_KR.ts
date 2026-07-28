@@ -8519,6 +8519,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.letters.mastery_reset_notice.subject': '정직해진 장인의 길',
   'entities.letters.mastery_reset_notice.body':
     '길드 동료에게,\n\n길드가 숙련을 새로이 헤아리기로 했습니다. 모두가 처음부터 다시 오릅니다. 그대의 제작 기술과 채집 숙련도는 0으로 되돌아갔습니다.\n\n그 밖의 모든 것은 손대지 않은 채 그대의 것입니다. 제조법, 도구와 재료, 은행과 골드, 조율과 칭호, 업적과 명성, 퀘스트와 우편까지.\n\n이제 오르는 길에 눈속임은 없습니다. 값싼 일은 그대를 올려 주지 못합니다. 더 어려운 제조법, 더 풍부한 광맥, 더 깊은 물을 찾으십시오.\n\n경의를 담아,\n길드 회관',
+  'entities.letters.woc_market_delivery.sender': '거래소 중개인',
+  'entities.letters.woc_market_delivery.subject': '거래소 구매 물품',
+  'entities.letters.woc_market_delivery.body':
+    '거래가 정산되어 물품은 이제 당신의 것입니다. 동봉된 소포에는 당신이 값을 치른 바로 그 물건이 들어 있습니다. 등록된 순간부터 대금이 정산될 때까지 거래소가 보관해 왔습니다.\n\n이 거래의 기록은 거래소 장부에 남습니다.\n\n- 거래소 중개인',
+  'entities.letters.woc_market_return.sender': '거래소 중개인',
+  'entities.letters.woc_market_return.subject': '거래소 등록이 종료되었습니다',
+  'entities.letters.woc_market_return.body':
+    '등록하신 물품이 판매 완료 없이 종료되었습니다. 경매에 구매자가 없었거나, 최저가에 도달하지 못했거나, 등록이 철회되었거나, 낙찰자가 대금을 치르지 못한 경우입니다. 물품은 맡기신 그대로 이 편지와 함께 돌려드립니다.\n\n- 거래소 중개인',
+  'entities.letters.woc_market_sold.sender': '거래소 중개인',
+  'entities.letters.woc_market_sold.subject': '거래소 등록 물품이 판매되었습니다',
+  'entities.letters.woc_market_sold.body':
+    '등록하신 물품이 판매되었고 구매자가 대금을 전액 치렀습니다. 거래소 수수료를 제한 판매 대금은 정산 트랜잭션 안에서 곧바로 연동된 지갑으로 전송되었습니다. 거래소는 당신의 돈을 결코 보관하지 않습니다.\n\n이 거래의 기록은 거래소 장부에 남습니다.\n\n- 거래소 중개인',
   'hudChrome.calendar.title': '이벤트 달력',
   'hudChrome.calendar.close': '달력 닫기',
   'hudChrome.calendar.keybindLabel': '이벤트 달력',

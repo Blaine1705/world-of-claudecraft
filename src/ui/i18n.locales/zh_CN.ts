@@ -8174,6 +8174,18 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.letters.mastery_reset_notice.subject': '你的手艺，从此作数',
   'entities.letters.mastery_reset_notice.body':
     '公会同仁：\n\n公会已启用全新的技艺衡量之法。人人从头攀登：你的制作技能与采集熟练度已归零。\n\n其余一切分毫未动，仍归你所有：你的配方、工具与材料、银行与金币、调谐与头衔、功绩与名望、任务与邮件。\n\n如今的攀登童叟无欺。廉价的活计再也带不动你。去寻求更难的配方、更富的矿脉、更深的水域吧。\n\n谨致敬意，\n公会会馆',
+  'entities.letters.woc_market_delivery.sender': '交易所经纪人',
+  'entities.letters.woc_market_delivery.subject': '你的交易所购得之物',
+  'entities.letters.woc_market_delivery.body':
+    '交易已结清，货物归你所有。随信的包裹装着你所购买的那一件物品：自挂单之时起，它便由交易所托管，直到你的付款结清为止。\n\n这笔交易的记录已存入交易所账册。\n\n- 交易所经纪人',
+  'entities.letters.woc_market_return.sender': '交易所经纪人',
+  'entities.letters.woc_market_return.subject': '你的交易所挂单已结束',
+  'entities.letters.woc_market_return.body':
+    '你的挂单结束，交易未能完成：拍卖无人问津、底价未达、挂单被撤回，或中标者未能付款。你的货物随信原样奉还，与托管之时分毫不差。\n\n- 交易所经纪人',
+  'entities.letters.woc_market_sold.sender': '交易所经纪人',
+  'entities.letters.woc_market_sold.subject': '你的交易所挂单已售出',
+  'entities.letters.woc_market_sold.body':
+    '你的挂单已售出，买家已足额付款。所得款项在结算交易中直接汇入你绑定的钱包（已扣除交易所费用）；交易所从未经手你的钱款。\n\n这笔交易的记录已存入交易所账册。\n\n- 交易所经纪人',
   'hudChrome.calendar.title': '活动日历',
   'hudChrome.calendar.close': '关闭日历',
   'hudChrome.calendar.keybindLabel': '活动日历',

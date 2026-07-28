@@ -1,0 +1,188 @@
+// $WOC Exchange custody mail (src/sim/mail/post_office.ts mailSystemParcel):
+// system letters that carry EXACT item copies, instance payloads intact, for
+// the server-side marketplace's escrow returns and buyer deliveries. Pins the
+// four load-bearing behaviors: booking preserves the payload without aliasing
+// the caller's slot, the take path grants through addItemInstance (never the
+// fungible arm), capacity refusal keeps the attachment instead of destroying
+// or flattening it, and the persistence round trip keeps the payload (the
+// loadMail sanitize used to drop `instance` wholesale).
+
+import { describe, expect, it } from 'vitest';
+import { bagCapacity } from '../src/sim/bags';
+import { WOC_MARKET_DELIVERY_LETTER, WOC_MARKET_RETURN_LETTER } from '../src/sim/content/letters';
+import { Sim } from '../src/sim/sim';
+import type { InvSlot, ItemInstancePayload } from '../src/sim/types';
+
+const makeWorld = () => new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+
+function moveToMailbox(sim: Sim, pid: number): void {
+  const box = sim.entities.get(sim.postOffice.mailboxIds[0]);
+  const p = sim.entities.get(pid);
+  if (!box || !p) throw new Error('missing mailbox or player');
+  p.pos = { ...box.pos };
+  p.prevPos = { ...p.pos };
+  sim.rebucket(p);
+}
+
+const PAYLOAD: ItemInstancePayload = {
+  signer: 'Aldric',
+  enchant: 'ench_test',
+  rolled: { quality: 'epic', stats: { str: 4 }, masterwork: true },
+};
+
+function parcelFor(sim: Sim, pid: number, itemId: string): InvSlot {
+  const meta = sim.players.get(pid)!;
+  sim.postOffice.mailSystemParcel(
+    { key: sim.postOffice.mailKeyFor(meta), name: meta.name },
+    WOC_MARKET_DELIVERY_LETTER,
+    [{ itemId, count: 1, instance: PAYLOAD, slot: 3 }],
+  );
+  const letter = sim.postOffice.mail.find(
+    (m) => m.letterId === WOC_MARKET_DELIVERY_LETTER.letterId,
+  );
+  if (!letter) throw new Error('parcel not booked');
+  return letter.items[0];
+}
+
+describe('mailSystemParcel', () => {
+  it('books an instant system letter with the exact payload, deep-cloned and cell-stripped', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Buyer');
+    const slot = parcelFor(sim, pid, 'rusty_hatchet');
+    expect(slot.itemId).toBe('rusty_hatchet');
+    expect(slot.count).toBe(1);
+    expect(slot.instance).toEqual(PAYLOAD);
+    expect(slot.instance).not.toBe(PAYLOAD);
+    expect(slot.instance?.rolled?.stats).not.toBe(PAYLOAD.rolled?.stats);
+    expect('slot' in slot).toBe(false);
+    const letter = sim.postOffice.mail.find(
+      (m) => m.letterId === WOC_MARKET_DELIVERY_LETTER.letterId,
+    )!;
+    expect(letter.kind).toBe('system');
+    expect(letter.copper).toBe(0);
+    // System parcels hold Infinity expiry while attachments remain: the sweep
+    // can never destroy an escrowed copy.
+    expect(letter.expiresAt).toBe(Infinity);
+    // Instant delivery: visible to the recipient without a raven flight.
+    expect(sim.mailUnreadFor(pid)).toBeGreaterThan(0);
+  });
+
+  it('reaches a fully offline recipient by stable character key', () => {
+    const sim = makeWorld();
+    sim.postOffice.mailSystemParcel({ key: '4242', name: 'Sleeper' }, WOC_MARKET_RETURN_LETTER, [
+      { itemId: 'rusty_hatchet', count: 1, instance: { signer: 'Sleeper' } },
+    ]);
+    const letter = sim.postOffice.mail.find(
+      (m) => m.letterId === WOC_MARKET_RETURN_LETTER.letterId,
+    );
+    expect(letter?.recipientKey).toBe('4242');
+    expect(letter?.items[0]?.instance).toEqual({ signer: 'Sleeper' });
+  });
+});
+
+describe('taking an instanced parcel', () => {
+  it('grants the exact copy into the bags (instance survives the take)', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Buyer');
+    const meta = sim.players.get(pid)!;
+    parcelFor(sim, pid, 'rusty_hatchet');
+    moveToMailbox(sim, pid);
+    const letter = sim.postOffice.mail.find(
+      (m) => m.letterId === WOC_MARKET_DELIVERY_LETTER.letterId,
+    )!;
+    sim.postOffice.mailTake(letter.id, pid);
+    expect(letter.items).toHaveLength(0);
+    const granted = meta.inventory.find((s) => s.itemId === 'rusty_hatchet' && s.instance);
+    expect(granted?.instance).toEqual(PAYLOAD);
+  });
+
+  it('keeps the attachment (payload intact) when the bags are full', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Buyer');
+    const meta = sim.players.get(pid)!;
+    parcelFor(sim, pid, 'rusty_hatchet');
+    // Stuff the pooled budget with distinct one-per-slot instanced copies so
+    // neither a merge nor a fresh slot can absorb the grant.
+    meta.inventory.length = 0;
+    const capacity = bagCapacity(meta.bags);
+    for (let i = 0; i < capacity; i++) {
+      meta.inventory.push({
+        itemId: 'rusty_hatchet',
+        count: 1,
+        instance: { charges: { c: i + 1 } },
+      });
+    }
+    moveToMailbox(sim, pid);
+    const letter = sim.postOffice.mail.find(
+      (m) => m.letterId === WOC_MARKET_DELIVERY_LETTER.letterId,
+    )!;
+    sim.postOffice.mailTake(letter.id, pid);
+    expect(letter.items).toHaveLength(1);
+    expect(letter.items[0].instance).toEqual(PAYLOAD);
+    // Still infinity-clocked: an undeliverable custody parcel is never swept.
+    expect(letter.expiresAt).toBe(Infinity);
+  });
+});
+
+describe('persistence round trip', () => {
+  it('keeps instance and craftedRecipeId through serializeMail/loadMail', () => {
+    const sim = makeWorld();
+    sim.postOffice.mailSystemParcel({ key: '77', name: 'Away' }, WOC_MARKET_DELIVERY_LETTER, [
+      { itemId: 'rusty_hatchet', count: 1, instance: PAYLOAD, craftedRecipeId: 'r_hatchet' },
+    ]);
+    const save = JSON.parse(JSON.stringify(sim.postOffice.serializeMail()));
+    const sim2 = makeWorld();
+    sim2.postOffice.loadMail(save);
+    const letter = sim2.postOffice.mail.find(
+      (m) => m.letterId === WOC_MARKET_DELIVERY_LETTER.letterId,
+    );
+    expect(letter?.items[0]?.instance).toEqual(PAYLOAD);
+    expect(letter?.items[0]?.craftedRecipeId).toBe('r_hatchet');
+    // Never-expires sentinel survives the round trip.
+    expect(letter?.expiresAt).toBe(Infinity);
+  });
+
+  it('never aliases the live payload into the save blob', () => {
+    const sim = makeWorld();
+    sim.postOffice.mailSystemParcel({ key: '77', name: 'Away' }, WOC_MARKET_DELIVERY_LETTER, [
+      { itemId: 'rusty_hatchet', count: 1, instance: { rolled: { stats: { str: 4 } } } },
+    ]);
+    const save = sim.postOffice.serializeMail();
+    const live = sim.postOffice.mail.find(
+      (m) => m.letterId === WOC_MARKET_DELIVERY_LETTER.letterId,
+    )!;
+    live.items[0].instance!.rolled!.stats!.str = 99;
+    expect(
+      save.mail.find((m) => m.letterId === WOC_MARKET_DELIVERY_LETTER.letterId)?.items[0]?.instance
+        ?.rolled?.stats?.str,
+    ).toBe(4);
+  });
+
+  it('never aliases the loaded payload back into the save object', () => {
+    const sim = makeWorld();
+    const save = {
+      mail: [
+        {
+          id: 1,
+          recipientKey: '77',
+          recipientName: 'Away',
+          senderName: 'The Exchange Broker',
+          kind: 'system' as const,
+          letterId: WOC_MARKET_DELIVERY_LETTER.letterId,
+          subject: 's',
+          body: 'b',
+          copper: 0,
+          items: [{ itemId: 'rusty_hatchet', count: 1, instance: { charges: { c: 2 } } }],
+          deliverIn: 0,
+          secondsLeft: -1,
+          read: false,
+        },
+      ],
+      nextMailId: 2,
+    };
+    sim.postOffice.loadMail(save);
+    const loaded = sim.postOffice.mail[sim.postOffice.mail.length - 1];
+    loaded.items[0].instance!.charges!.c = 999;
+    expect(save.mail[0].items[0].instance.charges.c).toBe(2);
+  });
+});
