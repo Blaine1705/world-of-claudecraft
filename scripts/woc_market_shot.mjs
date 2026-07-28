@@ -136,7 +136,10 @@ async function seedSellerListing() {
 // The exemplar flow from scripts/social_landscape_online_shot.mjs, verbatim
 // where it matters: goto retry, #btn-online, the toggling #login-panel form,
 // the realm picker, charcreate, Enter World, the mobile preflight.
-async function enterWorldInBrowser(page, { username, charName, cls, mobile = false, register = false }) {
+async function enterWorldInBrowser(
+  page,
+  { username, charName, cls, mobile = false, register = false },
+) {
   await suppressGpuNotice(page);
   let lastErr;
   for (let attempt = 0; attempt < 4; attempt++) {
@@ -207,9 +210,7 @@ async function enterWorldInBrowser(page, { username, charName, cls, mobile = fal
   await page.evaluate(
     (name, wantedClass) => {
       document.querySelector('#new-char-name').value = name;
-      document
-        .querySelector(`#charcreate-panel .mini-class[data-class="${wantedClass}"]`)
-        ?.click();
+      document.querySelector(`#charcreate-panel .mini-class[data-class="${wantedClass}"]`)?.click();
       document.querySelector('#btn-create-char').click();
     },
     charName,
@@ -264,7 +265,8 @@ async function openExchange(page) {
     document.querySelector('#intro-skip')?.click();
     document.querySelector('.camera-prompt-confirm')?.click();
     const ui = document.querySelector('#ui');
-    if (ui instanceof HTMLElement && ui.style.display === 'none') ui.style.removeProperty('display');
+    if (ui instanceof HTMLElement && ui.style.display === 'none')
+      ui.style.removeProperty('display');
     document.body.classList.remove('intro-active');
   });
   await sleep(400);

@@ -8606,12 +8606,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.tabSell': '出品する',
   'hudChrome.wocMarket.tabActivity': '取引履歴',
   'hudChrome.wocMarket.loading': '取引所を読み込み中...',
-  'hudChrome.wocMarket.loadFailed': '取引所に接続できませんでした。しばらくしてからもう一度お試しください。',
+  'hudChrome.wocMarket.loadFailed':
+    '取引所に接続できませんでした。しばらくしてからもう一度お試しください。',
   'hudChrome.wocMarket.disabledRealm': 'このレルムでは $WOC 取引所を利用できません。',
-  'hudChrome.wocMarket.pausedBanner': '$WOC の価格情報が回復するまで取引は一時停止中です。オークションのカウントダウンは続行され、価格が健全に戻るまで決済は行われません。',
-  'hudChrome.wocMarket.walletBanner': 'ウォレットを連携して認証すると、取引所で入札、購入、出品ができます。',
+  'hudChrome.wocMarket.pausedBanner':
+    '$WOC の価格情報が回復するまで取引は一時停止中です。オークションのカウントダウンは続行され、価格が健全に戻るまで決済は行われません。',
+  'hudChrome.wocMarket.walletBanner':
+    'ウォレットを連携して認証すると、取引所で入札、購入、出品ができます。',
   'hudChrome.wocMarket.rateNote': '現在のレート: 1 USD あたり約 {tokens} $WOC（{time} 時点）。',
-  'hudChrome.wocMarket.estimateNote': '現在のレートで約 {tokens} $WOC。最終的な数量は支払いを要求した時点で確定します。',
+  'hudChrome.wocMarket.estimateNote':
+    '現在のレートで約 {tokens} $WOC。最終的な数量は支払いを要求した時点で確定します。',
   'hudChrome.wocMarket.browseEmpty': '現在出品はありません。また後で確認してください。',
   'hudChrome.wocMarket.browseError': '出品一覧を読み込めませんでした。',
   'hudChrome.wocMarket.colItem': 'アイテム',
@@ -8650,9 +8654,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.buyNowAria': '{item} を {usd} で今すぐ購入',
   'hudChrome.wocMarket.cancelButton': '出品を取り下げる',
   'hudChrome.wocMarket.cancelAria': '{item} の出品を取り下げる',
-  'hudChrome.wocMarket.bidBondNote': '入札時に {usd} 相当の返還可能な保証金（$WOC 建て）を預けます。上回られた場合は返還され、落札したのに支払わなかった場合にのみ没収されます。',
-  'hudChrome.wocMarket.variableTokenWarning': 'あなたは USD 建ての金額を $WOC で支払うことを約束します。正確なトークン数は支払い要求時の新しい見積もりで確定し、概算と異なる場合があります。',
-  'hudChrome.wocMarket.settlementDeadlineNote': '落札した場合、オークション終了後 {duration} 以内に支払う必要があります。',
+  'hudChrome.wocMarket.bidBondNote':
+    '入札時に {usd} 相当の返還可能な保証金（$WOC 建て）を預けます。上回られた場合は返還され、落札したのに支払わなかった場合にのみ没収されます。',
+  'hudChrome.wocMarket.variableTokenWarning':
+    'あなたは USD 建ての金額を $WOC で支払うことを約束します。正確なトークン数は支払い要求時の新しい見積もりで確定し、概算と異なる場合があります。',
+  'hudChrome.wocMarket.settlementDeadlineNote':
+    '落札した場合、オークション終了後 {duration} 以内に支払う必要があります。',
   'hudChrome.wocMarket.termsLabel': '変動トークン決済の条件に同意します。',
   'hudChrome.wocMarket.totpLabel': '二要素認証コード',
   'hudChrome.wocMarket.totpPlaceholder': '6 桁のコード',
@@ -8663,7 +8670,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.quoteBurn': 'バーン: {tokens} $WOC',
   'hudChrome.wocMarket.quoteTreasury': 'トレジャリー: {tokens} $WOC',
   'hudChrome.wocMarket.quoteExpires': '見積もりの有効期限: あと {duration}',
-  'hudChrome.wocMarket.quoteExpired': '見積もりの期限が切れました。新しい見積もりを取得してください。',
+  'hudChrome.wocMarket.quoteExpired':
+    '見積もりの期限が切れました。新しい見積もりを取得してください。',
   'hudChrome.wocMarket.quoteSign': '署名して支払う',
   'hudChrome.wocMarket.quoteRefresh': '新しい見積もり',
   'hudChrome.wocMarket.quoteCancel': 'あとで',
@@ -8673,11 +8681,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.confirming': 'チェーン上で確認中...',
   'hudChrome.wocMarket.bidPlacedStanding': '入札が有効になりました。あなたが現在の最高入札者です。',
   'hudChrome.wocMarket.bidPlacedOutbid': '保証金は確認されましたが、先により高い入札が入りました。',
-  'hudChrome.wocMarket.purchaseComplete': '購入が完了しました。アイテムはレイヴンポスト便で届きます。',
+  'hudChrome.wocMarket.purchaseComplete':
+    '購入が完了しました。アイテムはレイヴンポスト便で届きます。',
   'hudChrome.wocMarket.listingCreated': '出品が公開されました。',
-  'hudChrome.wocMarket.listingCancelled': '出品を取り下げました。アイテムはレイヴンポスト便で戻ります。',
+  'hudChrome.wocMarket.listingCancelled':
+    '出品を取り下げました。アイテムはレイヴンポスト便で戻ります。',
   'hudChrome.wocMarket.sellTitle': '出品を作成',
-  'hudChrome.wocMarket.sellEmpty': 'バッグに出品できるアイテムがありません。取引所はソウルバウンドでないエピック以上の装備のみ扱います。',
+  'hudChrome.wocMarket.sellEmpty':
+    'バッグに出品できるアイテムがありません。取引所はソウルバウンドでないエピック以上の装備のみ扱います。',
   'hudChrome.wocMarket.sellSelectAria': '{item} を選択して出品する',
   'hudChrome.wocMarket.sellFormat': '形式',
   'hudChrome.wocMarket.sellFormatAuction': 'オークション',
@@ -8685,14 +8696,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.sellFormatAuctionBuyNow': 'オークション + 即決価格',
   'hudChrome.wocMarket.sellStart': '開始価格（USD）',
   'hudChrome.wocMarket.sellReserve': '最低落札価格（USD、任意）',
-  'hudChrome.wocMarket.sellReserveNote': '入札者には金額は非表示で、到達したかどうかだけが表示されます。',
+  'hudChrome.wocMarket.sellReserveNote':
+    '入札者には金額は非表示で、到達したかどうかだけが表示されます。',
   'hudChrome.wocMarket.sellBuyNowPrice': '即決価格（USD）',
   'hudChrome.wocMarket.sellDuration': '期間',
   'hudChrome.wocMarket.sellDurationHours': '{hours} 時間',
-  'hudChrome.wocMarket.sellOfferNext': '落札者が支払わなかった場合、次の入札者にアイテムを提示します。',
+  'hudChrome.wocMarket.sellOfferNext':
+    '落札者が支払わなかった場合、次の入札者にアイテムを提示します。',
   'hudChrome.wocMarket.sellSubmit': '出品する',
   'hudChrome.wocMarket.sellSubmitAria': '{item} を取引所に出品する',
-  'hudChrome.wocMarket.sellFeeNote': '売買成立時に 10% の手数料がかかります。90% はあなたへ、3% はバーン、7% はトレジャリーへ。売上は決済トランザクションで直接あなたの連携ウォレットに届きます。',
+  'hudChrome.wocMarket.sellFeeNote':
+    '売買成立時に 10% の手数料がかかります。90% はあなたへ、3% はバーン、7% はトレジャリーへ。売上は決済トランザクションで直接あなたの連携ウォレットに届きます。',
   'hudChrome.wocMarket.activityListings': '自分の出品',
   'hudChrome.wocMarket.activityBids': '自分の入札',
   'hudChrome.wocMarket.activitySettlements': '自分の決済',
@@ -8701,7 +8715,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.activityPayNowAria': '決済 {id} を今すぐ支払う',
   'hudChrome.wocMarket.activityDeadline': '支払い期限: あと {duration}',
   'hudChrome.wocMarket.activityStrikes': 'マーケット違反回数: {count}',
-  'hudChrome.wocMarket.activitySuspended': '未払いの決済があったため、入札が {duration} 停止されます。',
+  'hudChrome.wocMarket.activitySuspended':
+    '未払いの決済があったため、入札が {duration} 停止されます。',
   'hudChrome.wocMarket.bidStatusPending': '保証金待ち',
   'hudChrome.wocMarket.bidStatusActive': '最高入札者',
   'hudChrome.wocMarket.bidStatusOutbid': '上回られました',

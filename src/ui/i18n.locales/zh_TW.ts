@@ -8223,7 +8223,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.loading': '正在載入交易所...',
   'hudChrome.wocMarket.loadFailed': '無法連接交易所，請稍後再試。',
   'hudChrome.wocMarket.disabledRealm': '本伺服器未開放 $WOC 交易所。',
-  'hudChrome.wocMarket.pausedBanner': '$WOC 價格恢復期間交易暫停。拍賣倒數照常進行；價格恢復健康之前不會有任何成交。',
+  'hudChrome.wocMarket.pausedBanner':
+    '$WOC 價格恢復期間交易暫停。拍賣倒數照常進行；價格恢復健康之前不會有任何成交。',
   'hudChrome.wocMarket.walletBanner': '綁定並驗證錢包後即可在交易所出價、購買或出售。',
   'hudChrome.wocMarket.rateNote': '目前匯率：約每美元 {tokens} $WOC（{time} 更新）。',
   'hudChrome.wocMarket.estimateNote': '按目前匯率約 {tokens} $WOC。最終數額在請求付款時才會確定。',
@@ -8265,8 +8266,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.buyNowAria': '以 {usd} 立即購買 {item}',
   'hudChrome.wocMarket.cancelButton': '取消掛單',
   'hudChrome.wocMarket.cancelAria': '取消你的 {item} 掛單',
-  'hudChrome.wocMarket.bidBondNote': '出價時會凍結 {usd} 的可退還保證金（以 $WOC 支付）。被超越時退還；只有當你得標卻未付款時才會被沒收。',
-  'hudChrome.wocMarket.variableTokenWarning': '你承諾以 $WOC 支付一筆美元價值。具體代幣數量由請求付款時的最新報價確定，可能與估算不同。',
+  'hudChrome.wocMarket.bidBondNote':
+    '出價時會凍結 {usd} 的可退還保證金（以 $WOC 支付）。被超越時退還；只有當你得標卻未付款時才會被沒收。',
+  'hudChrome.wocMarket.variableTokenWarning':
+    '你承諾以 $WOC 支付一筆美元價值。具體代幣數量由請求付款時的最新報價確定，可能與估算不同。',
   'hudChrome.wocMarket.settlementDeadlineNote': '若你得標，須在拍賣結束後 {duration} 內付款。',
   'hudChrome.wocMarket.termsLabel': '我接受浮動代幣結算條款。',
   'hudChrome.wocMarket.totpLabel': '兩步驟驗證碼',
@@ -8292,7 +8295,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.listingCreated': '你的掛單已上架。',
   'hudChrome.wocMarket.listingCancelled': '掛單已取消。物品將經烏鴉郵局退回。',
   'hudChrome.wocMarket.sellTitle': '建立掛單',
-  'hudChrome.wocMarket.sellEmpty': '背包中沒有符合條件的物品。交易所只接受未綁定的史詩或更高品質裝備。',
+  'hudChrome.wocMarket.sellEmpty':
+    '背包中沒有符合條件的物品。交易所只接受未綁定的史詩或更高品質裝備。',
   'hudChrome.wocMarket.sellSelectAria': '選擇要掛單的 {item}',
   'hudChrome.wocMarket.sellFormat': '形式',
   'hudChrome.wocMarket.sellFormatAuction': '拍賣',
@@ -8307,7 +8311,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.sellOfferNext': '若得標者未付款，將物品轉售給下一位出價者。',
   'hudChrome.wocMarket.sellSubmit': '上架物品',
   'hudChrome.wocMarket.sellSubmitAria': '將 {item} 上架到交易所',
-  'hudChrome.wocMarket.sellFeeNote': '成交後收取 10% 手續費：90% 歸你，3% 銷毀，7% 進入國庫。收益隨結算交易直接進入你綁定的錢包。',
+  'hudChrome.wocMarket.sellFeeNote':
+    '成交後收取 10% 手續費：90% 歸你，3% 銷毀，7% 進入國庫。收益隨結算交易直接進入你綁定的錢包。',
   'hudChrome.wocMarket.activityListings': '我的掛單',
   'hudChrome.wocMarket.activityBids': '我的出價',
   'hudChrome.wocMarket.activitySettlements': '我的結算',

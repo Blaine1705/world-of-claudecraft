@@ -98,9 +98,7 @@ describe('custodyRef book-once dedupe', () => {
     );
     expect(first).toBe(true);
     expect(second).toBe(false);
-    expect(
-      sim.postOffice.mail.filter((m) => m.custodyRef === 'woc_settlement:41'),
-    ).toHaveLength(1);
+    expect(sim.postOffice.mail.filter((m) => m.custodyRef === 'woc_settlement:41')).toHaveLength(1);
     expect(sim.postOffice.hasCustodyParcel('woc_settlement:41')).toBe(true);
     expect(sim.postOffice.hasCustodyParcel('woc_settlement:42')).toBe(false);
   });

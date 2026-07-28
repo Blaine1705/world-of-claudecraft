@@ -8727,10 +8727,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.loading': 'Загрузка биржи...',
   'hudChrome.wocMarket.loadFailed': 'Не удалось связаться с биржей. Попробуйте чуть позже.',
   'hudChrome.wocMarket.disabledRealm': 'Биржа $WOC недоступна в этом мире.',
-  'hudChrome.wocMarket.pausedBanner': 'Торги приостановлены до восстановления цены $WOC. Отсчёт аукционов продолжается; ни одна сделка не совершится, пока цены не станут надёжными.',
-  'hudChrome.wocMarket.walletBanner': 'Привяжите и подтвердите кошелёк, чтобы делать ставки, покупать и продавать на бирже.',
-  'hudChrome.wocMarket.rateNote': 'Текущий курс: около {tokens} $WOC за доллар США, по состоянию на {time}.',
-  'hudChrome.wocMarket.estimateNote': 'Около {tokens} $WOC по текущему курсу. Точная сумма фиксируется только при запросе оплаты.',
+  'hudChrome.wocMarket.pausedBanner':
+    'Торги приостановлены до восстановления цены $WOC. Отсчёт аукционов продолжается; ни одна сделка не совершится, пока цены не станут надёжными.',
+  'hudChrome.wocMarket.walletBanner':
+    'Привяжите и подтвердите кошелёк, чтобы делать ставки, покупать и продавать на бирже.',
+  'hudChrome.wocMarket.rateNote':
+    'Текущий курс: около {tokens} $WOC за доллар США, по состоянию на {time}.',
+  'hudChrome.wocMarket.estimateNote':
+    'Около {tokens} $WOC по текущему курсу. Точная сумма фиксируется только при запросе оплаты.',
   'hudChrome.wocMarket.browseEmpty': 'Лотов пока нет. Загляните позже.',
   'hudChrome.wocMarket.browseError': 'Не удалось загрузить список лотов.',
   'hudChrome.wocMarket.colItem': 'Предмет',
@@ -8769,9 +8773,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.buyNowAria': 'Купить {item} сейчас за {usd}',
   'hudChrome.wocMarket.cancelButton': 'Отменить лот',
   'hudChrome.wocMarket.cancelAria': 'Отменить ваш лот {item}',
-  'hudChrome.wocMarket.bidBondNote': 'Ставка удерживает возвращаемый залог {usd}, оплачиваемый в $WOC. Он возвращается, если вас перебили, и удерживается лишь если вы выиграли и не заплатили.',
-  'hudChrome.wocMarket.variableTokenWarning': 'Вы обязуетесь оплатить сумму в USD токенами $WOC. Точное количество токенов фиксируется свежей котировкой при запросе оплаты и может отличаться от оценки.',
-  'hudChrome.wocMarket.settlementDeadlineNote': 'Если вы выиграете, оплата должна поступить в течение {duration} после закрытия аукциона.',
+  'hudChrome.wocMarket.bidBondNote':
+    'Ставка удерживает возвращаемый залог {usd}, оплачиваемый в $WOC. Он возвращается, если вас перебили, и удерживается лишь если вы выиграли и не заплатили.',
+  'hudChrome.wocMarket.variableTokenWarning':
+    'Вы обязуетесь оплатить сумму в USD токенами $WOC. Точное количество токенов фиксируется свежей котировкой при запросе оплаты и может отличаться от оценки.',
+  'hudChrome.wocMarket.settlementDeadlineNote':
+    'Если вы выиграете, оплата должна поступить в течение {duration} после закрытия аукциона.',
   'hudChrome.wocMarket.termsLabel': 'Я принимаю условия расчёта с плавающим количеством токенов.',
   'hudChrome.wocMarket.totpLabel': 'Код двухфакторной аутентификации',
   'hudChrome.wocMarket.totpPlaceholder': 'Шестизначный код',
@@ -8792,11 +8799,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.confirming': 'Подтверждение в сети...',
   'hudChrome.wocMarket.bidPlacedStanding': 'Ваша ставка принята. Вы лидируете в торгах.',
   'hudChrome.wocMarket.bidPlacedOutbid': 'Ваш залог подтверждён, но кто-то успел поставить больше.',
-  'hudChrome.wocMarket.purchaseComplete': 'Покупка завершена. Предмет прибудет почтой Вороньей службы.',
+  'hudChrome.wocMarket.purchaseComplete':
+    'Покупка завершена. Предмет прибудет почтой Вороньей службы.',
   'hudChrome.wocMarket.listingCreated': 'Ваш лот выставлен.',
   'hudChrome.wocMarket.listingCancelled': 'Лот отменён. Предмет вернётся почтой Вороньей службы.',
   'hudChrome.wocMarket.sellTitle': 'Создание лота',
-  'hudChrome.wocMarket.sellEmpty': 'В сумках нет подходящих предметов. Биржа принимает только неприсоединённую экипировку эпического качества и выше.',
+  'hudChrome.wocMarket.sellEmpty':
+    'В сумках нет подходящих предметов. Биржа принимает только неприсоединённую экипировку эпического качества и выше.',
   'hudChrome.wocMarket.sellSelectAria': 'Выбрать {item} для выставления',
   'hudChrome.wocMarket.sellFormat': 'Формат',
   'hudChrome.wocMarket.sellFormatAuction': 'Аукцион',
@@ -8804,14 +8813,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.sellFormatAuctionBuyNow': 'Аукцион с выкупом',
   'hudChrome.wocMarket.sellStart': 'Стартовая ставка (USD)',
   'hudChrome.wocMarket.sellReserve': 'Резервная цена (USD, необязательно)',
-  'hudChrome.wocMarket.sellReserveNote': 'Скрыта от участников; показывается только достигнута она или нет.',
+  'hudChrome.wocMarket.sellReserveNote':
+    'Скрыта от участников; показывается только достигнута она или нет.',
   'hudChrome.wocMarket.sellBuyNowPrice': 'Цена выкупа (USD)',
   'hudChrome.wocMarket.sellDuration': 'Длительность',
   'hudChrome.wocMarket.sellDurationHours': '{hours} ч.',
-  'hudChrome.wocMarket.sellOfferNext': 'Если победитель не заплатит, предложить предмет следующему участнику.',
+  'hudChrome.wocMarket.sellOfferNext':
+    'Если победитель не заплатит, предложить предмет следующему участнику.',
   'hudChrome.wocMarket.sellSubmit': 'Выставить предмет',
   'hudChrome.wocMarket.sellSubmitAria': 'Выставить {item} на биржу',
-  'hudChrome.wocMarket.sellFeeNote': 'Завершённые продажи облагаются сбором 10%: 90% вам, 3% сжигается, 7% в казну. Выручка приходит на ваш привязанный кошелёк прямо в расчётной транзакции.',
+  'hudChrome.wocMarket.sellFeeNote':
+    'Завершённые продажи облагаются сбором 10%: 90% вам, 3% сжигается, 7% в казну. Выручка приходит на ваш привязанный кошелёк прямо в расчётной транзакции.',
   'hudChrome.wocMarket.activityListings': 'Мои лоты',
   'hudChrome.wocMarket.activityBids': 'Мои ставки',
   'hudChrome.wocMarket.activitySettlements': 'Мои расчёты',
@@ -8820,7 +8832,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.activityPayNowAria': 'Оплатить расчёт {id} сейчас',
   'hudChrome.wocMarket.activityDeadline': 'Оплата в течение {duration}',
   'hudChrome.wocMarket.activityStrikes': 'Штрафы на бирже: {count}',
-  'hudChrome.wocMarket.activitySuspended': 'Ставки приостановлены на {duration} из-за неоплаченных расчётов.',
+  'hudChrome.wocMarket.activitySuspended':
+    'Ставки приостановлены на {duration} из-за неоплаченных расчётов.',
   'hudChrome.wocMarket.bidStatusPending': 'Ожидает залога',
   'hudChrome.wocMarket.bidStatusActive': 'Лидирующая ставка',
   'hudChrome.wocMarket.bidStatusOutbid': 'Перебита',

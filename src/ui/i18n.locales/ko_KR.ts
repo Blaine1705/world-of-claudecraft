@@ -8578,10 +8578,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.loading': '거래소를 불러오는 중...',
   'hudChrome.wocMarket.loadFailed': '거래소에 연결할 수 없습니다. 잠시 후 다시 시도하세요.',
   'hudChrome.wocMarket.disabledRealm': '이 서버에서는 $WOC 거래소를 이용할 수 없습니다.',
-  'hudChrome.wocMarket.pausedBanner': '$WOC 가격이 복구될 때까지 거래가 일시 중지됩니다. 경매 카운트다운은 계속되며, 가격이 정상화될 때까지 어떤 판매도 성사되지 않습니다.',
-  'hudChrome.wocMarket.walletBanner': '지갑을 연동하고 인증하면 거래소에서 입찰, 구매, 판매할 수 있습니다.',
+  'hudChrome.wocMarket.pausedBanner':
+    '$WOC 가격이 복구될 때까지 거래가 일시 중지됩니다. 경매 카운트다운은 계속되며, 가격이 정상화될 때까지 어떤 판매도 성사되지 않습니다.',
+  'hudChrome.wocMarket.walletBanner':
+    '지갑을 연동하고 인증하면 거래소에서 입찰, 구매, 판매할 수 있습니다.',
   'hudChrome.wocMarket.rateNote': '현재 환율: 1 USD당 약 {tokens} $WOC ({time} 기준).',
-  'hudChrome.wocMarket.estimateNote': '현재 환율로 약 {tokens} $WOC. 최종 수량은 결제를 요청할 때 확정됩니다.',
+  'hudChrome.wocMarket.estimateNote':
+    '현재 환율로 약 {tokens} $WOC. 최종 수량은 결제를 요청할 때 확정됩니다.',
   'hudChrome.wocMarket.browseEmpty': '지금은 등록된 물품이 없습니다. 나중에 다시 확인하세요.',
   'hudChrome.wocMarket.browseError': '등록 목록을 불러올 수 없습니다.',
   'hudChrome.wocMarket.colItem': '아이템',
@@ -8620,9 +8623,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.buyNowAria': '{item}을(를) {usd}에 즉시 구매',
   'hudChrome.wocMarket.cancelButton': '등록 취소',
   'hudChrome.wocMarket.cancelAria': '{item} 등록 취소',
-  'hudChrome.wocMarket.bidBondNote': '입찰 시 {usd} 상당의 환불 가능한 보증금($WOC)을 예치합니다. 상회 입찰이 나오면 반환되며, 낙찰 후 결제하지 않은 경우에만 몰수됩니다.',
-  'hudChrome.wocMarket.variableTokenWarning': '당신은 USD 가치를 $WOC로 지불하기로 약정합니다. 정확한 토큰 수량은 결제 요청 시의 새 견적으로 확정되며 추정치와 다를 수 있습니다.',
-  'hudChrome.wocMarket.settlementDeadlineNote': '낙찰되면 경매 종료 후 {duration} 안에 결제해야 합니다.',
+  'hudChrome.wocMarket.bidBondNote':
+    '입찰 시 {usd} 상당의 환불 가능한 보증금($WOC)을 예치합니다. 상회 입찰이 나오면 반환되며, 낙찰 후 결제하지 않은 경우에만 몰수됩니다.',
+  'hudChrome.wocMarket.variableTokenWarning':
+    '당신은 USD 가치를 $WOC로 지불하기로 약정합니다. 정확한 토큰 수량은 결제 요청 시의 새 견적으로 확정되며 추정치와 다를 수 있습니다.',
+  'hudChrome.wocMarket.settlementDeadlineNote':
+    '낙찰되면 경매 종료 후 {duration} 안에 결제해야 합니다.',
   'hudChrome.wocMarket.termsLabel': '가변 토큰 정산 약관에 동의합니다.',
   'hudChrome.wocMarket.totpLabel': '2단계 인증 코드',
   'hudChrome.wocMarket.totpPlaceholder': '6자리 코드',
@@ -8643,11 +8649,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.confirming': '체인에서 확인 중...',
   'hudChrome.wocMarket.bidPlacedStanding': '입찰이 확정되었습니다. 현재 최고 입찰자입니다.',
   'hudChrome.wocMarket.bidPlacedOutbid': '보증금은 확인되었지만 더 높은 입찰이 먼저 들어왔습니다.',
-  'hudChrome.wocMarket.purchaseComplete': '구매가 완료되었습니다. 아이템은 레이븐포스트 우편으로 도착합니다.',
+  'hudChrome.wocMarket.purchaseComplete':
+    '구매가 완료되었습니다. 아이템은 레이븐포스트 우편으로 도착합니다.',
   'hudChrome.wocMarket.listingCreated': '등록이 완료되었습니다.',
-  'hudChrome.wocMarket.listingCancelled': '등록이 취소되었습니다. 아이템은 레이븐포스트 우편으로 돌아옵니다.',
+  'hudChrome.wocMarket.listingCancelled':
+    '등록이 취소되었습니다. 아이템은 레이븐포스트 우편으로 돌아옵니다.',
   'hudChrome.wocMarket.sellTitle': '등록 만들기',
-  'hudChrome.wocMarket.sellEmpty': '가방에 등록 가능한 아이템이 없습니다. 거래소는 귀속되지 않은 영웅 등급 이상의 장비만 취급합니다.',
+  'hudChrome.wocMarket.sellEmpty':
+    '가방에 등록 가능한 아이템이 없습니다. 거래소는 귀속되지 않은 영웅 등급 이상의 장비만 취급합니다.',
   'hudChrome.wocMarket.sellSelectAria': '{item} 선택하여 등록',
   'hudChrome.wocMarket.sellFormat': '형식',
   'hudChrome.wocMarket.sellFormatAuction': '경매',
@@ -8659,10 +8668,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.sellBuyNowPrice': '즉시 구매가 (USD)',
   'hudChrome.wocMarket.sellDuration': '기간',
   'hudChrome.wocMarket.sellDurationHours': '{hours}시간',
-  'hudChrome.wocMarket.sellOfferNext': '낙찰자가 결제하지 않으면 다음 입찰자에게 아이템을 제안합니다.',
+  'hudChrome.wocMarket.sellOfferNext':
+    '낙찰자가 결제하지 않으면 다음 입찰자에게 아이템을 제안합니다.',
   'hudChrome.wocMarket.sellSubmit': '아이템 등록',
   'hudChrome.wocMarket.sellSubmitAria': '{item}을(를) 거래소에 등록',
-  'hudChrome.wocMarket.sellFeeNote': '판매 완료 시 10% 수수료가 부과됩니다. 90%는 판매자에게, 3%는 소각, 7%는 트레저리로 갑니다. 대금은 정산 트랜잭션으로 연동된 지갑에 바로 도착합니다.',
+  'hudChrome.wocMarket.sellFeeNote':
+    '판매 완료 시 10% 수수료가 부과됩니다. 90%는 판매자에게, 3%는 소각, 7%는 트레저리로 갑니다. 대금은 정산 트랜잭션으로 연동된 지갑에 바로 도착합니다.',
   'hudChrome.wocMarket.activityListings': '내 등록',
   'hudChrome.wocMarket.activityBids': '내 입찰',
   'hudChrome.wocMarket.activitySettlements': '내 정산',
@@ -8671,7 +8682,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.activityPayNowAria': '정산 {id} 지금 결제',
   'hudChrome.wocMarket.activityDeadline': '결제 기한: {duration} 남음',
   'hudChrome.wocMarket.activityStrikes': '거래소 경고 횟수: {count}',
-  'hudChrome.wocMarket.activitySuspended': '미결제 정산으로 인해 입찰이 {duration} 동안 정지됩니다.',
+  'hudChrome.wocMarket.activitySuspended':
+    '미결제 정산으로 인해 입찰이 {duration} 동안 정지됩니다.',
   'hudChrome.wocMarket.bidStatusPending': '보증금 대기',
   'hudChrome.wocMarket.bidStatusActive': '최고 입찰자',
   'hudChrome.wocMarket.bidStatusOutbid': '상회 입찰됨',
