@@ -108,12 +108,18 @@ guard keeps shipped zones and maps inside the ruling.
 BUILT IN PHASE 9 of the review worklist, not by the original seven phases:
 the pass-1 review found no phase had scheduled the persistence work while
 this section promised it, and phase 3's 240 s respawn had doubled what a
-relog erases. Until phase 9 lands, `nodeHarvestReadyAt` is session-only.
+relog erases. Landed as `src/sim/professions/node_persist.ts` plus the
+optional `CharacterState.nodeHarvestCooldowns` field (zero-default
+omission), with the load re-anchor in `addPlayer` filtered to live node
+ids; `tests/professions_node_persist.test.ts` pins the round trip, the
+freeze, and the retired-id drop.
 
 `src/sim/cooldown_persist.ts` already solved this exact bug class for ability
 cooldowns, and states the pattern: persist remaining-time deltas, not wall-clock
 expiry, so timers freeze across a logout and resume on load. Node readiness is
-the same shape.
+the same shape. The freeze happens at the logout frame (the leave-time
+`serializeCharacter`); a linkdead drop keeps the character in the world, so
+its timers keep counting in live sim time until the grace-expiry save.
 
 Shared depletion was considered and rejected for this packet. It would reverse a
 deliberate documented position (`src/sim/professions/gathering.ts` states the
@@ -145,7 +151,7 @@ parity goldens are untouched.
 
 | Bug | Detail |
 |---|---|
-| Relog resets every node timer | `nodeHarvestReadyAt` is session-only and reset on every `addPlayer`. Built in phase 9 of the review worklist (D6 below); OPEN until that phase lands |
+| Relog resets every node timer | `nodeHarvestReadyAt` was session-only and reset on every `addPlayer`. CLOSED by phase 9 of the review worklist (D6 below): readiness persists as remaining-time deltas and resumes on load |
 | Level-1 Thornpeak fishing faucet | Catch table is keyed on zone alone, no level or rod requirement |
 | Tier-3 rod is inert | Band 2 requires proficiency 200, which is fishing's cap, so tier-2 and tier-3 rods take an identical number of casts to cap |
 | Misplaced nodes | Several sit below the waterline, including all three Eastbrook herb patches on a lake floor; one sits on a near-vertical slope. No test validates a node coordinate |

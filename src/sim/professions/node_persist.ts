@@ -1,0 +1,74 @@
+// Persisting per-player gather-node readiness across save/load (D6).
+//
+// `PlayerMeta.nodeHarvestReadyAt` maps nodeId to the ABSOLUTE sim.time at or
+// after which that player may harvest that node again (absent means ready; see
+// gathering.ts isNodeHarvestableBy). It used to be session-only, so a logout
+// dropped the whole map and a relog reset every node timer, letting a player
+// bypass the 240-second respawn by reconnecting.
+//
+// The sim is clock-agnostic (no Date.now) and every host's sim.time starts at
+// zero, so we persist REMAINING-time deltas, not absolute readiness: timers
+// freeze for the duration of the logout and resume on load, the exact
+// cooldown_persist.ts scheme (and the same shape the `ncd` wire field already
+// ships per tick, so persistence adds zero wire changes). The freeze happens at
+// the logout frame, where the character leaves the world through
+// serializeCharacter; a linkdead drop never freezes anything, because the
+// character stays in the world and its timers keep counting in live sim time
+// until the grace expires and the real leave-time save runs.
+//
+// Readiness stays strictly per-player (one player's timer never touches
+// another's; see the D6 ruling in docs/design/professions-tuning-packet.md).
+// This is a pure leaf so a Vitest drives it without a live Sim.
+
+import { GATHER_NODES } from '../content/gather_nodes';
+import { NODE_HARVEST_TABLE } from './gathering';
+
+// Live node ids with their respawn ceiling: the load filter (a retired or
+// hand-edited id drops rather than persisting forever) and the clamp that
+// keeps a corrupt remaining from locking a node past one real respawn.
+const LIVE_NODE_RESPAWN: ReadonlyMap<string, number> = new Map(
+  GATHER_NODES.map((node) => [node.id, NODE_HARVEST_TABLE[node.type].respawnSeconds]),
+);
+
+const positive = (n: number): boolean => Number.isFinite(n) && n > 0;
+
+/** Snapshot the live readiness map as remaining-time deltas. Returns undefined
+ *  when no timer is still running (zero-default omission), so a character with
+ *  every node ready serializes byte-identically to one saved before the field
+ *  existed. */
+export function serializeNodeReadiness(
+  nodeHarvestReadyAt: Readonly<Record<string, number>>,
+  now: number,
+): Record<string, number> | undefined {
+  const out: Record<string, number> = {};
+  let any = false;
+  for (const [nodeId, readyAt] of Object.entries(nodeHarvestReadyAt)) {
+    const remaining = readyAt - now;
+    if (positive(remaining)) {
+      out[nodeId] = remaining;
+      any = true;
+    }
+  }
+  return any ? out : undefined;
+}
+
+/** Rebuild a saved remaining-deltas record into a fresh readiness map anchored
+ *  at the current clock. Only LIVE node ids survive (a retired id self-heals
+ *  out of the save on the next round trip), non-finite and non-positive
+ *  entries drop defensively, and each remaining clamps to its node's own
+ *  respawnSeconds so a tampered save can never lock a node for longer than
+ *  one real respawn. Always returns a fresh map (an absent field loads to the
+ *  everything-ready default). */
+export function applyNodeReadiness(
+  saved: Record<string, number> | undefined | null,
+  now: number,
+): Record<string, number> {
+  const out: Record<string, number> = {};
+  if (!saved) return out;
+  for (const [nodeId, remaining] of Object.entries(saved)) {
+    const respawn = LIVE_NODE_RESPAWN.get(nodeId);
+    if (respawn === undefined || !positive(remaining)) continue;
+    out[nodeId] = now + Math.min(remaining, respawn);
+  }
+  return out;
+}

@@ -251,10 +251,12 @@ function distToNode(pos: { x: number; z: number }, node: { x: number; z: number 
 
 // Per-player, per-node respawn readiness: `meta.nodeHarvestReadyAt[nodeId]` is the
 // sim.time (seconds) at or after which THAT player may harvest THAT node again.
-// Absent means never harvested (always ready). Session-only state (not
-// persisted), same as `lastActiveTick`: one player harvesting a node never
-// blocks, delays, or resets any other player's timer for the same node, so
-// there is no gather rush or node camping.
+// Absent means never harvested (always ready). Persisted across logout as
+// remaining-time deltas (D6, professions/node_persist.ts): the timers freeze
+// at the logout frame and resume on load, so a relog cannot reset them. Still
+// strictly per-player: one player harvesting a node never blocks, delays, or
+// resets any other player's timer for the same node, so there is no gather
+// rush or node camping.
 export function isNodeHarvestableBy(meta: PlayerMeta, nodeId: string, now: number): boolean {
   const readyAt = meta.nodeHarvestReadyAt[nodeId];
   return readyAt === undefined || now >= readyAt;

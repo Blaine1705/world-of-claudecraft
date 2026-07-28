@@ -339,6 +339,7 @@ import {
   type MobileCraftingStation,
   placeMobileStationForPlayer,
 } from './professions/mobile_station';
+import { applyNodeReadiness, serializeNodeReadiness } from './professions/node_persist';
 import { updateProfNudges } from './professions/prof_nudges';
 import { healDisplayRoundedProficiency } from './professions/proficiency_display_heal';
 import { type SalvageResult, salvageItem as salvageItemImpl } from './professions/salvage';
@@ -1053,9 +1054,12 @@ export interface PlayerMeta {
   toolEffectSlots?: Partial<Record<GatheringProfessionId, ToolEffectSlot>>;
   // Per-player, per-node gather-node respawn readiness (#1121): nodeId ->
   // sim.time (seconds) at or after which THIS player may harvest that node
-  // again. Absent means never harvested (always ready). Session-only, never
-  // persisted, and never shared across players: see
-  // src/sim/professions/gathering.ts (isNodeHarvestableBy/resolveHarvest).
+  // again. Absent means never harvested (always ready). Never shared across
+  // players (see src/sim/professions/gathering.ts isNodeHarvestableBy/
+  // resolveHarvest), and persisted as remaining-time deltas (D6, the
+  // CharacterState nodeHarvestCooldowns field via professions/node_persist.ts)
+  // so a relog can no longer reset the timers: they freeze at the logout
+  // frame and resume on load.
   nodeHarvestReadyAt: Record<string, number>;
   // Outcome of this player's most recent craftItem command (#1127). Session-only,
   // never persisted: the IWorld craft-result surface for the client to render a
@@ -1383,6 +1387,14 @@ export interface CharacterState {
   // saves load cleanly with no cooldowns). Persisted so logging out and back in no
   // longer wipes cooldowns and lets a player bypass them by relogging.
   cooldowns?: SavedCooldowns;
+  // Per-player gather-node respawn timers as remaining-time deltas (D6; JSONB,
+  // nodeId -> remaining seconds, the cooldowns scheme above applied to node
+  // readiness). Optional with zero-default omission: absent for pre-D6 saves
+  // and whenever every node is ready, so unchanged characters stay byte-equal.
+  // Loaded through applyNodeReadiness (professions/node_persist.ts): re-anchored
+  // to the loading sim's clock, filtered to live node ids, clamped to one
+  // respawn. Closes the relog exploit that used to reset every node timer.
+  nodeHarvestCooldowns?: Record<string, number>;
   pet?: PetState | null;
   // WoW-style ghost state (JSONB; optional so pre-ghost saves load alive). A player who
   // logs out as a released spirit resumes as a ghost at the graveyard with the corpse
@@ -2374,6 +2386,13 @@ export class Sim {
       // load a negative charge count.
       const savedSlots = normalizeToolEffectSlots(s.toolEffectSlots);
       if (savedSlots) meta.toolEffectSlots = savedSlots;
+      // Node respawn timers resume from their saved remaining deltas (D6),
+      // re-anchored to THIS sim's clock and filtered to live node ids
+      // (professions/node_persist.ts): the timers froze at the logout frame
+      // and pick up here, so a relog cannot reset them. Only the logout
+      // frame freezes: a linkdead drop keeps the character in the world with
+      // its timers counting in live sim time until the grace-expiry save.
+      meta.nodeHarvestReadyAt = applyNodeReadiness(s.nodeHarvestCooldowns, this.time);
       if (s.unlockedMilestones)
         for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
       meta.copper = s.copper;
@@ -3155,6 +3174,12 @@ export class Sim {
         this.time,
         e.abilityCharges,
       ),
+      // Node respawn timers as remaining deltas (D6), absent when every node
+      // is ready (zero-default omission; see the CharacterState field doc).
+      ...(() => {
+        const nodeCooldowns = serializeNodeReadiness(meta.nodeHarvestReadyAt, this.time);
+        return nodeCooldowns ? { nodeHarvestCooldowns: nodeCooldowns } : {};
+      })(),
       skin: meta.skin,
       skinCatalog: meta.skinCatalog,
       pendingSkinRank: meta.pendingSkinRank,

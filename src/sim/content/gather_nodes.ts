@@ -458,7 +458,9 @@ export const GATHER_NODES: GatherNodeDef[] = [
   // circuit is the arm that asks for the better tool, so a traveller working the
   // near half with a starter tool still has nodes, and the deep half rewards the
   // upgrade. (The `b` suffix just means the second node of that tier; node ids
-  // are session-only keys in meta.nodeHarvestReadyAt, never persisted.)
+  // key meta.nodeHarvestReadyAt and persist as remaining-time deltas in
+  // CharacterState.nodeHarvestCooldowns, where a RETIRED id is dropped on
+  // load, so renaming a node id costs at most one in-flight respawn timer.)
   {
     id: 'ore_mirefen_t2',
     zoneId: 'mirefen_marsh',
