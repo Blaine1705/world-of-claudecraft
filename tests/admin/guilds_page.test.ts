@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import './_setup';
 import { fireEvent, render, screen, within } from '@testing-library/svelte';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const detail = {
   guild: {
@@ -80,7 +80,7 @@ vi.mock('../../src/admin/api', () => ({
   clearSession: () => {},
 }));
 
-import { apiGet, apiPost } from '../../src/admin/api';
+import { ApiError, apiGet, apiPost } from '../../src/admin/api';
 import { t } from '../../src/admin/i18n';
 import Guilds from '../../src/admin/pages/Guilds.svelte';
 import { grantPermissions } from './_grant';
@@ -91,12 +91,18 @@ describe('Guilds page', () => {
     history.replaceState(null, '', '/admin?page=guilds&guildId=12');
   });
 
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('loads the realm guild directory and links each row to its URL-backed detail', async () => {
     grantPermissions(['accounts.read']);
     render(Guilds);
 
     const guildLink = await screen.findByRole('link', { name: 'Old Guild' });
-    expect(screen.getByRole('textbox', { name: t('guilds.searchLabel') })).toBeInTheDocument();
+    const search = screen.getByRole('textbox', { name: t('guilds.searchLabel') });
+    expect(search).toHaveAttribute('aria-label', 'Guild name starts with');
+    expect(search).toHaveAttribute('placeholder', 'Guild name starts with...');
     expect(guildLink).toHaveAttribute('href', expect.stringContaining('page=guilds&guildId=12'));
     expect(screen.getByText('Gandalf')).toBeInTheDocument();
     expect(vi.mocked(apiGet)).toHaveBeenCalledWith(
@@ -170,6 +176,130 @@ describe('Guilds page', () => {
       ),
     );
     expect(name.closest('th')).toHaveAttribute('aria-sort', 'descending');
+  });
+
+  it('keeps interior spaces while typing and trims only the directory request', async () => {
+    grantPermissions(['accounts.read']);
+    render(Guilds);
+    const search = await screen.findByRole('textbox', { name: t('guilds.searchLabel') });
+
+    await fireEvent.input(search, { target: { value: ' Silver ' } });
+    expect(search).toHaveValue(' Silver ');
+    await vi.waitFor(() =>
+      expect(vi.mocked(apiGet)).toHaveBeenCalledWith(
+        '/admin/api/guilds?page=1&search=Silver&sort=name&dir=asc',
+      ),
+    );
+
+    await fireEvent.input(search, { target: { value: 'Silver H' } });
+    expect(search).toHaveValue('Silver H');
+
+    await vi.waitFor(() =>
+      expect(vi.mocked(apiGet)).toHaveBeenCalledWith(
+        '/admin/api/guilds?page=1&search=Silver+H&sort=name&dir=asc',
+      ),
+    );
+  });
+
+  it('retries one busy directory response instead of leaving the view failed', async () => {
+    vi.useFakeTimers();
+    grantPermissions(['accounts.read']);
+    vi.mocked(apiGet).mockRejectedValueOnce(new ApiError(503, 'guild list busy, try again'));
+
+    render(Guilds);
+    await vi.waitFor(() => expect(vi.mocked(apiGet)).toHaveBeenCalledTimes(1));
+    await vi.advanceTimersByTimeAsync(500);
+
+    await vi.waitFor(() => expect(vi.mocked(apiGet)).toHaveBeenCalledTimes(2));
+    expect(await screen.findByRole('link', { name: 'Old Guild' })).toBeInTheDocument();
+    expect(screen.queryByText(t('guilds.loadFailed'))).not.toBeInTheDocument();
+  });
+
+  it('surfaces a repeated busy response after the one automatic retry', async () => {
+    vi.useFakeTimers();
+    grantPermissions(['accounts.read']);
+    vi.mocked(apiGet)
+      .mockRejectedValueOnce(new ApiError(503, 'guild list busy, try again'))
+      .mockRejectedValueOnce(new ApiError(503, 'guild list busy, try again'));
+
+    render(Guilds);
+    await vi.waitFor(() => expect(vi.mocked(apiGet)).toHaveBeenCalledTimes(1));
+    await vi.advanceTimersByTimeAsync(500);
+    await vi.waitFor(() => expect(vi.mocked(apiGet)).toHaveBeenCalledTimes(2));
+
+    expect(screen.getByText(t('guilds.loadFailed'))).toBeInTheDocument();
+    await vi.advanceTimersByTimeAsync(500);
+    expect(vi.mocked(apiGet)).toHaveBeenCalledTimes(2);
+  });
+
+  it('clears a previous failure while retrying a busy directory response', async () => {
+    vi.useFakeTimers();
+    grantPermissions(['accounts.read']);
+    vi.mocked(apiGet)
+      .mockRejectedValueOnce(new ApiError(500, 'database unavailable'))
+      .mockRejectedValueOnce(new ApiError(503, 'guild list busy, try again'));
+
+    const view = render(Guilds);
+    await vi.waitFor(() => expect(vi.mocked(apiGet)).toHaveBeenCalledTimes(1));
+    expect(await screen.findByText(t('guilds.loadFailed'))).toBeInTheDocument();
+
+    await fireEvent.input(screen.getByRole('textbox', { name: t('guilds.searchLabel') }), {
+      target: { value: 'Old' },
+    });
+    await vi.advanceTimersByTimeAsync(500);
+    await vi.waitFor(() => expect(vi.mocked(apiGet)).toHaveBeenCalledTimes(2));
+
+    expect(screen.queryByText(t('guilds.loadFailed'))).not.toBeInTheDocument();
+    view.unmount();
+  });
+
+  it('does not retry an error other than a busy response', async () => {
+    vi.useFakeTimers();
+    grantPermissions(['accounts.read']);
+    vi.mocked(apiGet).mockRejectedValueOnce(new ApiError(500, 'database unavailable'));
+
+    render(Guilds);
+    await vi.waitFor(() => expect(vi.mocked(apiGet)).toHaveBeenCalledTimes(1));
+    await vi.advanceTimersByTimeAsync(500);
+
+    expect(vi.mocked(apiGet)).toHaveBeenCalledOnce();
+    expect(screen.getByText(t('guilds.loadFailed'))).toBeInTheDocument();
+  });
+
+  it('does not retry an unexpected directory error', async () => {
+    vi.useFakeTimers();
+    grantPermissions(['accounts.read']);
+    vi.mocked(apiGet).mockRejectedValueOnce(
+      Object.assign(new Error('network unavailable'), { status: 503 }),
+    );
+
+    render(Guilds);
+    await vi.waitFor(() => expect(vi.mocked(apiGet)).toHaveBeenCalledTimes(1));
+    await vi.advanceTimersByTimeAsync(500);
+
+    expect(vi.mocked(apiGet)).toHaveBeenCalledOnce();
+    expect(screen.getByText(t('guilds.loadFailed'))).toBeInTheDocument();
+  });
+
+  it('does not schedule a busy retry when a request rejects after unmount', async () => {
+    vi.useFakeTimers();
+    grantPermissions(['accounts.read']);
+    let rejectRequest: (reason?: unknown) => void = () => {};
+    vi.mocked(apiGet).mockImplementationOnce(
+      () =>
+        new Promise((_, reject) => {
+          rejectRequest = reject;
+        }),
+    );
+
+    const view = render(Guilds);
+    await vi.waitFor(() => expect(vi.mocked(apiGet)).toHaveBeenCalledTimes(1));
+    view.unmount();
+    rejectRequest(new ApiError(503, 'guild list busy, try again'));
+    await Promise.resolve();
+    await vi.advanceTimersByTimeAsync(500);
+
+    expect(vi.mocked(apiGet)).toHaveBeenCalledOnce();
   });
 
   it('shows a lightweight roster without requesting moderation history for accounts readers', async () => {

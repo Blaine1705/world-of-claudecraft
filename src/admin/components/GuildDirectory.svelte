@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import type { GuildSummary, Paginated } from '../types';
-  import { apiGet } from '../api';
+  import { ApiError, apiGet } from '../api';
   import { auth } from '../state/auth.svelte';
   import { SEARCH_DEBOUNCE_MS } from '../state/poll';
   import { fmtDate, fmtNumber } from '../format';
@@ -11,6 +11,7 @@
   import Panel from './Panel.svelte';
 
   type GuildSort = 'name' | 'created_at' | 'member_count';
+  const GUILD_LIST_BUSY_RETRY_MS = 500;
 
   let guilds = $state<Paginated<GuildSummary> | null>(null);
   let failed = $state(false);
@@ -20,32 +21,52 @@
   let dir = $state<'asc' | 'desc'>('asc');
   let loading = $state(false);
   let searchTimer: ReturnType<typeof setTimeout> | null = null;
+  let busyRetryTimer: ReturnType<typeof setTimeout> | null = null;
   let requestEpoch = 0;
+  let disposed = false;
 
-  async function refresh(): Promise<void> {
+  function clearBusyRetry(): void {
+    if (!busyRetryTimer) return;
+    clearTimeout(busyRetryTimer);
+    busyRetryTimer = null;
+  }
+
+  async function refresh(busyRetryAttempt = 0): Promise<void> {
     const epoch = ++requestEpoch;
     loading = true;
     try {
-      const params = new URLSearchParams({ page: String(page), search, sort, dir });
+      const params = new URLSearchParams({ page: String(page), search: search.trim(), sort, dir });
       const next = await apiGet<Paginated<GuildSummary>>(`/admin/api/guilds?${params}`);
-      if (epoch !== requestEpoch) return;
+      if (disposed || epoch !== requestEpoch) return;
       guilds = next;
       failed = false;
     } catch (err) {
-      if (epoch === requestEpoch && !auth.handleAuthFailure(err)) failed = true;
+      if (disposed || epoch !== requestEpoch || auth.handleAuthFailure(err)) return;
+      if (err instanceof ApiError && err.status === 503 && busyRetryAttempt === 0) {
+        failed = false;
+        clearBusyRetry();
+        busyRetryTimer = setTimeout(() => {
+          busyRetryTimer = null;
+          if (!disposed && epoch === requestEpoch) void refresh(1);
+        }, GUILD_LIST_BUSY_RETRY_MS);
+        return;
+      }
+      failed = true;
     } finally {
-      if (epoch === requestEpoch) loading = false;
+      if (!disposed && epoch === requestEpoch) loading = false;
     }
   }
 
   function onSearchInput(event: Event): void {
-    search = (event.currentTarget as HTMLInputElement).value.trim();
+    search = (event.currentTarget as HTMLInputElement).value;
     page = 1;
+    clearBusyRetry();
     if (searchTimer) clearTimeout(searchTimer);
     searchTimer = setTimeout(() => void refresh(), SEARCH_DEBOUNCE_MS);
   }
 
   function changeSort(column: GuildSort): void {
+    clearBusyRetry();
     dir = sort === column ? (dir === 'desc' ? 'asc' : 'desc') : column === 'name' ? 'asc' : 'desc';
     sort = column;
     page = 1;
@@ -63,9 +84,12 @@
   }
 
   onMount(() => {
+    disposed = false;
     void refresh();
     return () => {
+      disposed = true;
       if (searchTimer) clearTimeout(searchTimer);
+      clearBusyRetry();
     };
   });
 </script>
@@ -88,6 +112,7 @@
           limit={guilds.limit}
           onPage={(nextPage) => {
             page = nextPage;
+            clearBusyRetry();
             void refresh();
           }}
         />
@@ -146,6 +171,7 @@
       layout="footer"
       onPage={(nextPage) => {
         page = nextPage;
+        clearBusyRetry();
         void refresh();
       }}
     />

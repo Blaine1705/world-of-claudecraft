@@ -1,5 +1,9 @@
 import type { AdminGuildSort, AdminGuildSortDirection } from './admin_guilds_sort';
 
+// This is deliberately a third cache shape beside cached_read.ts and deeds_board_warm.ts.
+// Search, sort, and page create bounded key cardinality, while member-count sorting can
+// aggregate every matched guild. Admit only two distinct cold reads from this endpoint so
+// one operator cannot fan out several expensive aggregations; identical requests share a flight.
 export const ADMIN_GUILD_LIST_MAX_CONCURRENT_READS = 2;
 export const ADMIN_GUILD_LIST_CACHE_MAX_ENTRIES = 64;
 export const ADMIN_GUILD_LIST_CACHE_TTL_MS = 2_000;
