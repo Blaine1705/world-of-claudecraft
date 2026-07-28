@@ -271,7 +271,10 @@ function materialOptions(emissive: boolean, atlas = eastbrookSurfaceAtlasTexture
     // tints carry the hue and their luma (0.47 amber) sets how far this has to
     // climb to clear post.ts BLOOM_THRESHOLD. At the old intensity 1 no window
     // in town glowed while sunlit plaster nearly did.
-    emissiveIntensity: emissive ? (GFX.standardMaterials ? EMISSIVE_GLOW : 0.72) : 1,
+    // EMISSIVE_GLOW is calibrated against the bloom threshold; without the
+    // composer the raise just desaturates the amber to a pasted-on cream,
+    // so non-bloom tiers keep the authored pane level.
+    emissiveIntensity: emissive ? (GFX.standardMaterials && GFX.composer ? EMISSIVE_GLOW : GFX.standardMaterials ? 1 : 0.72) : 1,
     flatShading: !GFX.standardMaterials,
   } as const;
 }

@@ -143,14 +143,14 @@ export function buildMotes(seed: number): MotesView {
   geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
   const mat = new THREE.PointsMaterial({
-    size: GFX.standardMaterials ? 0.5 : 0.7,
+    size: GFX.standardMaterials ? 0.38 : 0.55,
     map: moteSprite(),
     vertexColors: true,
     transparent: true,
     depthWrite: false, // glows shouldn't punch holes in what's behind them
     blending: THREE.AdditiveBlending,
     sizeAttenuation: true,
-    opacity: 0.85,
+    opacity: 0.62,
   });
 
   const points = new THREE.Points(geo, mat);

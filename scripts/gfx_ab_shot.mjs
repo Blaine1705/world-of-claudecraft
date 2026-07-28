@@ -118,9 +118,18 @@ for (const loc of ACTIVE) {
     g.input.camPitch = p.pitch;
   }, loc);
 
-  // Terrain streams in and precipitation cross-fades over ~2s; then reset the
-  // frame meter so the measured window contains no streaming hitches.
-  await sleep(5000);
+  // Terrain streams in and precipitation cross-fades over ~2s; far teleports
+  // on the continent map also ride a zone loading screen. Wait for it to
+  // clear, then settle, then reset the frame meter so the measured window
+  // contains no streaming hitches.
+  await sleep(2500);
+  await page
+    .waitForFunction(
+      () => !document.body.textContent?.includes('Loading world'),
+      { timeout: 60000 },
+    )
+    .catch(() => {});
+  await sleep(6000);
   await page.evaluate(() => window.__game.perf.reset());
   await sleep(6000);
 

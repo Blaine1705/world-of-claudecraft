@@ -447,7 +447,13 @@ const SELF_MOTION_HANDOFF_RATE = 15;
 // water.ts and sky.ts read the sun direction and their own tint
 // independently, so retinting this light seams the shoreline against the
 // dome.
-const HEMI_INTENSITY = 0.33;
+// composer tiers get the full key/fill contrast (the grade lifts their
+// shadows); without the composer the same fill crushes shaded timber to
+// near-black, so non-composer tiers ride a higher floor.
+const HEMI_INTENSITY_COMPOSER = 0.33;
+const HEMI_INTENSITY_FLAT = 0.42;
+const hemiOutdoorIntensity = (): number =>
+  GFX.composer ? HEMI_INTENSITY_COMPOSER : HEMI_INTENSITY_FLAT;
 const SUN_INTENSITY = 3.1;
 const ENV_INTENSITY = 0.45;
 // dungeon interiors: kill the daylight so torchlight carries the scene
@@ -1689,7 +1695,7 @@ export class Renderer {
       this.scene.environmentIntensity = this.envOutdoorIntensity;
     }
 
-    const hemi = new THREE.HemisphereLight(0xdcefff, 0x465f39, LOW_GFX ? 0.98 : HEMI_INTENSITY);
+    const hemi = new THREE.HemisphereLight(0xdcefff, 0x465f39, LOW_GFX ? 0.98 : hemiOutdoorIntensity());
     this.scene.add(hemi);
     this.hemi = hemi;
     // Golden key light: warmer than the old near-white cream so daylight reads
@@ -6439,7 +6445,7 @@ export class Renderer {
               ? LASTKEEP_HEMI_INTENSITY
               : underground
                 ? DUNGEON_HEMI_INTENSITY
-                : HEMI_INTENSITY * this.dnGrade.lightScale;
+                : hemiOutdoorIntensity() * this.dnGrade.lightScale;
         this.scene.environmentIntensity = mazeNight
           ? YUMI_MAZE_ENV_INTENSITY
           : wildheartSun
@@ -6538,7 +6544,7 @@ export class Renderer {
         .lerp(this.dnMoonScratch.setHex(MOON_HEMI_GROUND_COLOR), g.nightAmt * NIGHT_HEMI_COOL);
       this.hemi.groundColor.lerp(this.dnColorScratch, k);
       this.sun.intensity += (SUN_INTENSITY * g.lightScale - this.sun.intensity) * k;
-      this.hemi.intensity += (HEMI_INTENSITY * g.lightScale - this.hemi.intensity) * k;
+      this.hemi.intensity += (hemiOutdoorIntensity() * g.lightScale - this.hemi.intensity) * k;
     }
   }
 

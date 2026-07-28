@@ -295,6 +295,13 @@ const GRASS_ACCENT: Partial<Record<BiomeId, [number, number, number]>> = (() => 
     const c = new THREE.Color(hex);
     out[biome] = [c.r / vale.r, c.g / vale.g, c.b / vale.b];
   }
+  // Pale grounds (peaks scree, frost snowfields) land the ground-keyed tint
+  // exactly on the surface value and the blades dissolve into flat slabs;
+  // pull those tufts darker so the silhouette keeps definition.
+  for (const pale of ['peaks', 'frost'] as const) {
+    const a = out[pale];
+    if (a) out[pale] = [a[0] * 0.82, a[1] * 0.85, a[2] * 0.84];
+  }
   return out;
 })();
 // Bush/fern dressing tint gain over the ground grass colour (same curve as
@@ -1805,7 +1812,10 @@ function applyGrassShader(
       .replace(
         '#include <map_fragment>',
         `#include <map_fragment>
-        diffuseColor.a *= 1.0 - smoothstep(uFadeFar * 0.7, uFadeFar, distance(vTuftWorld, uPlayerPos));`,
+        diffuseColor.a *= 1.0 - smoothstep(uFadeFar * 0.7, uFadeFar, distance(vTuftWorld, uPlayerPos));
+        // near fade: an occlusion-pulled chase camera otherwise fills the
+        // frame with a single giant card
+        diffuseColor.a *= smoothstep(0.45, 1.35, length(vViewPosition));`,
       );
   };
 }
