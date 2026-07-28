@@ -82,6 +82,34 @@ Android has two distribution flavors with different packaged capabilities:
 | `playRelease` | Google Play | Excluded |
 | `solanaStoreRelease` | Solana dApp Store | Included |
 
+```mermaid
+flowchart TD
+  PLAY[Google Play APK<br/>No Solana or MWA implementation]
+  SOLANA[Solana Store APK<br/>Includes Solana and MWA implementation]
+
+  PLAY --> PLAY_UI[Seeker wallet UI unavailable]
+  SOLANA --> DEVICE{Seeker device and<br/>native plugin available}
+  DEVICE -->|No| PLAY_UI
+  DEVICE -->|Yes| WALLET[Seed Vault wallet connection available]
+
+  WALLET --> CLAIM[Seeker entitlement claim]
+  CLAIM --> APP{Play Integrity verifies package,<br/>certificate, nonce, action,<br/>and device verdict}
+  APP -->|Rejected| DENIED[403 solana_artifact_required]
+  APP -->|Accepted| SGT{Linked wallet owns an SGT}
+  SGT -->|No| NO_SGT[403 genesis_token_required]
+  SGT -->|Yes| ENTITLED[Seeker entitlement granted]
+
+  classDef allowed fill:#d9f2d9,stroke:#247a24,color:#111;
+  classDef rejected fill:#f7d7d7,stroke:#a22,color:#111;
+  class WALLET,ENTITLED allowed;
+  class DENIED,NO_SGT rejected;
+```
+
+The flavor and device checks control packaged capability and client UI. They
+do not authorize the server route. Seeker entitlement requires both the
+purpose-specific signed-artifact proof and the independent server-side SGT
+ownership check.
+
 `BuildConfig.SOLANA_MOBILE_DISTRIBUTION`, Seeker model checks, and native plugin
 availability control client UI and packaged code. They are not server
 authorization evidence. Seeker entitlement claim and native Daily Rewards spin
@@ -209,6 +237,32 @@ directly into the base64url allowlist.
 
 ### Android release checks
 
+Inspect both resolved runtime classpaths before building the final artifacts:
+
+```powershell
+cd android
+
+.\gradlew.bat :app:dependencies `
+  --configuration playDebugRuntimeClasspath |
+  Select-String 'com\.solanamobile|io\.github\.funkatronics'
+
+.\gradlew.bat :app:dependencies `
+  --configuration solanaStoreDebugRuntimeClasspath |
+  Select-String 'com\.solanamobile|io\.github\.funkatronics'
+```
+
+The Play command must produce no matching dependency. The Solana Store command
+must show the intended MWA implementation. This source-level check does not
+replace inspection of the final signed release APK. Use Android Studio's
+**Analyze APK** view to confirm that the Play DEX/class inventory does not
+contain `NativeSolanaMobilePlugin`, `com.solanamobile`, or
+`io.github.funkatronics`, and perform the inverse check on the Solana Store APK.
+In a running Play build, this browser-console probe must also return `false`:
+
+```js
+window.Capacitor?.isPluginAvailable?.('NativeSolanaMobile')
+```
+
 Before shipping:
 
 - Confirm the Play runtime dependency graph, DEX/class inventory, merged
@@ -227,6 +281,79 @@ Before shipping:
   package, and a mismatched certificate fail closed.
 - Confirm native Daily Rewards spin requires a fresh `seeker-spin` proof,
   existing entitlement, and current ownership of the claimed SGT mint.
+
+### Solana Store MWA credential storage
+
+Only the Solana Store flavor persists the reusable MWA authorization token. It
+encrypts the token with a non-exportable Android Keystore AES-GCM key and stores
+only the authenticated ciphertext envelope. The Play flavor contains neither
+the token-store implementation nor the MWA-specific backup resources.
+
+The historical plaintext preference is deleted and is never migrated into the
+encrypted store. Existing Solana Store users must therefore complete one new
+Seed Vault authorization after updating to the first build with encrypted
+storage. A missing or unusable Keystore key, malformed or modified ciphertext,
+or decryption failure clears the stored authorization and returns the user to
+the same safe reauthorization path. Credential values and cryptographic
+exception contents must never be logged.
+
+Both the encrypted preference and the historical plaintext preference are
+excluded from Android cloud backup and device-to-device transfer. Verify that
+the final Solana Store merged manifest references both the Android 12+
+data-extraction rules and the legacy full-backup rules. The Play merged manifest
+must not reference the Solana-specific backup resources.
+
+Run the Solana Store unit suite during release verification:
+
+```powershell
+cd android
+.\gradlew.bat :app:testSolanaStoreDebugUnitTest
+```
+
+With a Seeker connected and visible to `adb devices`, run the Android Keystore
+instrumentation suite:
+
+```powershell
+cd android
+.\gradlew.bat :app:connectedSolanaStoreDebugAndroidTest
+```
+
+The connected-device result must complete successfully. Compilation alone is
+not a substitute. Manually connect through Seed Vault, force stop and restart
+the app, confirm authorization restoration, disconnect, restart again, and
+confirm that the cleared authorization is not restored.
+
+### Seeker upgrade and device QA
+
+Run these checks on a physical Seeker before publishing the Solana Store build:
+
+- Start with a wallet that is already linked but has no Seeker entitlement.
+  Log in without reconnecting or signing the wallet-link message. Confirm that
+  the client reads entitlement status, creates a fresh `seeker-claim` proof only
+  when needed, and completes the claim.
+- With entitlement already present, restart and log in again. Confirm that the
+  client performs the status read without requesting a new claim attestation or
+  wallet-link signature.
+- Interrupt the network or test server during entitlement synchronization.
+  Confirm that the linked wallet remains displayed, requests do not loop, and a
+  later refresh, restart, or login retries successfully after recovery.
+- On a fresh Seeker settings store, confirm that Graphics starts at Low, Browser
+  Effects uses the Seeker default, and Weather is disabled. If generic device
+  detection selected High before Seeker verification completed, confirm that
+  the automatic value is corrected to Low.
+- Explicitly select High, change Browser Effects, and change Weather. Restart
+  the app and confirm that every explicit player choice is preserved. Also
+  update from a build that predates these source markers and confirm that its
+  existing values are preserved.
+- In portrait and compact landscape, set Action Button Size to its maximum 1.3
+  value. Confirm that the Daily Rewards chest remains at least 40x40 px, does
+  not overlap the target or party frames, and cannot intercept a touch intended
+  for the target frame.
+
+An entitlement synchronization timeout or temporary Solana RPC failure must
+fail closed without granting entitlement and must remain retryable. The bounded
+server executor and its detailed queue, deadline, and single-flight contracts
+belong to server tests rather than the Android release procedure.
 
 ## Native Discord Authentication
 
