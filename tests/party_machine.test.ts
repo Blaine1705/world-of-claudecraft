@@ -21,7 +21,6 @@ function makeCtx() {
   const tradeInvites = new Map<number, Invite>();
   const duelInvites = new Map<number, Invite>();
   const readyChecks = new Map();
-  const pendingLootRolls = new Map();
   const events: SimEvent[] = [];
   const errors: { pid: number; text: string }[] = [];
   const droppedMarkers: number[] = [];
@@ -42,9 +41,6 @@ function makeCtx() {
     },
     get readyChecks() {
       return readyChecks;
-    },
-    get pendingLootRolls() {
-      return pendingLootRolls;
     },
     resolve(pid?: number) {
       if (pid === undefined) return null;

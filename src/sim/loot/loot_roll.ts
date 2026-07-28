@@ -643,21 +643,6 @@ export function removePlayerFromLootRolls(ctx: SimContext, pid: number): void {
   }
 }
 
-// A kick or a voluntary leave does not disconnect the player (unlike
-// removePlayerFromLootRolls above), so an existing roll's candidacy is left
-// untouched, exactly as it already is when a candidate simply regroups into a
-// different party mid-roll: only curate-phase ASSIGN AUTHORITY is scoped to
-// current party membership. Revoke it immediately on departure so a kicked or
-// departed master looter can never resolve/assign a roll for a group they are
-// no longer in, converting the roll to a normal need/greed prompt for the same
-// candidates, exactly like the uncurated 5-minute timeout fallback in
-// resolveLootRoll above.
-export function revokeMasterLooterAuthority(ctx: SimContext, pid: number): void {
-  for (const roll of ctx.pendingLootRolls.values()) {
-    if (roll.masterLooter === pid) convertMasterRollToNeedGreed(ctx, roll, [...roll.candidates]);
-  }
-}
-
 // The master looter's curate-then-roll choice. `targetPids` is the set of
 // eligible players the looter checked: exactly one grants the item directly (the
 // classic assign), two or more open a need/greed roll for just that subset. Only
@@ -674,19 +659,6 @@ export function assignMasterLoot(
   const roll = ctx.pendingLootRolls.get(rollId);
   if (!roll || roll.masterLooter === undefined) return;
   if (r.meta.entityId !== roll.masterLooter) return; // only the master looter decides
-  // Defense in depth against the party-collapse exploit: a kick/leave that
-  // shrinks the party to just the master looter disbands it (see
-  // removeFromParty), which leaves `roll.masterLooter` still set with no other
-  // member left to stop a self-assign. Re-check live party membership here,
-  // not just the stale masterLooter field, so the same collapse is closed
-  // regardless of which membership-mutating path caused it (kick, leave, or
-  // disconnect). Treat a lost party the same as an explicit revoke: convert
-  // to need/greed rather than silently deny, so the corpse stays distributable.
-  const party = ctx.partyOf(roll.masterLooter);
-  if (!party || party.members.length <= 1) {
-    convertMasterRollToNeedGreed(ctx, roll, [...roll.candidates]);
-    return;
-  }
   // Keep only still-eligible targets, each counted once; ignore anyone no longer
   // a candidate. The pid list is client-supplied (the masterAssign wire case
   // checks that pids is a non-empty numeric array no longer than a full raid
