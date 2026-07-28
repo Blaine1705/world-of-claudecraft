@@ -80,7 +80,9 @@ describe('generated chunk geometry is stable', () => {
     await task;
 
     const meshes = terrain.group.children.filter((c) => (c as THREE.Mesh).isMesh) as THREE.Mesh[];
-    expect(meshes.length).toBe(36);
+    // 36 in-rect chunks plus the 12 merged super-chunk meshes over the 21 gap
+    // cells nearest-rect ownership hands the Vale (the rects do not tile).
+    expect(meshes.length).toBe(48);
 
     // Order the chunks by their own geometry bounds, so the pin does not depend
     // on build ORDER (which the worker move is expressly going to change).
@@ -89,26 +91,40 @@ describe('generated chunk geometry is stable', () => {
       geo.computeBoundingBox();
       const box = geo.boundingBox;
       if (!box) throw new Error('chunk geometry has no bounding box');
-      return { geo, key: `${Math.round(box.min.x)}:${Math.round(box.min.z)}` };
+      return { geo, box, key: `${Math.round(box.min.x)}:${Math.round(box.min.z)}` };
     });
     keyed.sort((a, b) => a.key.localeCompare(b.key));
 
-    const digest = createHash('sha256');
-    for (const { geo, key } of keyed) {
-      digest.update(key);
-      for (const name of ['position', 'normal', 'color', 'uv']) {
-        const attr = geo.getAttribute(name);
-        expect(attr, `${key} missing ${name}`).toBeTruthy();
-        digest.update(`${name}:${hashAttribute(attr.array as unknown as ArrayLike<number>)}`);
+    const digestOf = (chunks: typeof keyed): string => {
+      const digest = createHash('sha256');
+      for (const { geo, key } of chunks) {
+        digest.update(key);
+        for (const name of ['position', 'normal', 'color', 'uv']) {
+          const attr = geo.getAttribute(name);
+          expect(attr, `${key} missing ${name}`).toBeTruthy();
+          digest.update(`${name}:${hashAttribute(attr.array as unknown as ArrayLike<number>)}`);
+        }
+        const index = geo.getIndex();
+        expect(index, `${key} missing index`).toBeTruthy();
+        if (index)
+          digest.update(`index:${hashAttribute(index.array as unknown as ArrayLike<number>)}`);
       }
-      const index = geo.getIndex();
-      expect(index, `${key} missing index`).toBeTruthy();
-      if (index)
-        digest.update(`index:${hashAttribute(index.array as unknown as ArrayLike<number>)}`);
-    }
+      return digest.digest('hex').slice(0, 32);
+    };
 
-    // Re-mint ONLY for a deliberate, reviewed visual change.
-    expect(digest.digest('hex').slice(0, 32)).toBe('6f7fb63da247a5eb272dd9d7a42a5fcd');
+    // The in-rect chunks split from the gap fill by their bounds: every Vale
+    // rect chunk starts at x >= -180 (the skirt overhangs by under a yard).
+    const inRect = keyed.filter(({ box }) => box.min.x >= -181);
+    const gapFill = keyed.filter(({ box }) => box.min.x < -181);
+    expect(inRect.length).toBe(36);
+    expect(gapFill.length).toBe(12);
+
+    // The original 36-chunk pin, unchanged since before the worker move: the
+    // gap-cell fill must not perturb a single byte of the in-rect geometry.
+    expect(digestOf(inRect)).toBe('6f7fb63da247a5eb272dd9d7a42a5fcd');
+    // The gap super-chunks' own pin. Re-mint ONLY for a deliberate, reviewed
+    // visual change.
+    expect(digestOf(gapFill)).toBe('1da89b363fda0dcac73d4d5a24c1760d');
 
     terrain.cancelStreaming();
   });
