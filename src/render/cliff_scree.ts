@@ -31,9 +31,9 @@ import { applySurfaceDetail } from './worn_stone';
 const MODEL_DIR = 'models/foliage/';
 const MODEL_URLS = [1, 2, 3].map((i) => `${MODEL_DIR}rock_${i}.glb`);
 
-// Placement tunables and the placement itself live in sim/scree.ts — the
-// single source groundHeight also reads, so the visual rock and the solid
-// rock can never drift apart. Only the presentation grid stays here.
+// Placement tunables and the placement itself live in sim/scree.ts. Only the
+// presentation grid stays here; the tier-gated dressing is intentionally
+// non-solid so lower tiers never collide with invisible rocks.
 const CELL = SCREE_CELL; // yards between candidate spots
 const RADIUS = 65; // scatter radius (world units)
 const GRID_W = Math.ceil((RADIUS * 2) / CELL); // slots per axis
@@ -153,10 +153,7 @@ export function buildCliffScree(seed: number): CliffScreeView {
   // Form shadows are the whole point of the scatter, and it is one of the
   // graphics-overhaul detail layers: HIGH AND UP only (GFX.detailLayers).
   // Medium keeps its pre-overhaul look and frame budget (the round-10 medium
-  // regate). The sim's walkable dome (sim/scree.ts -> groundHeight) stays
-  // tier-independent, exactly as it already did on the low/lean tiers this
-  // gate previously skipped: every client agrees on the walkable surface,
-  // and the tiers below high simply do not draw the rubble dressing on it.
+  // regate). The omitted dressing does not alter the shared walkable surface.
   if (!GFX.cliffScree) {
     return { group, update: () => undefined };
   }
@@ -208,9 +205,8 @@ export function buildCliffScree(seed: number): CliffScreeView {
   function placeSlot(slot: number, ci: number, cj: number): void {
     // clear every variant's slot first; at most one gets a rock back below
     for (const im of meshes) im.setMatrixAt(slot, zero);
-    // Placement is the sim's: screeSpotAt is the shared single source that
-    // also feeds groundHeight's walkable dome, so the rock you see is
-    // exactly the rock that blocks you and that you can jump onto.
+    // Placement comes from the pure shared source; these tier-gated rocks are
+    // visual dressing and do not alter the simulation heightfield.
     const spot = screeSpotAt(seed, ci, cj);
     if (!spot) return;
     const vi = Math.min(meshes.length - 1, spot.variant);

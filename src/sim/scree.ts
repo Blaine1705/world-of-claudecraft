@@ -2,26 +2,10 @@ import { getActiveWorldContent, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './
 import type { WorldContent } from './types';
 import { roadDistance, terrainHeight, WATER_LEVEL } from './world';
 
-// Cliff-scree placement, sim-side and pure. This is the single source both
-// the renderer (src/render/cliff_scree.ts, visuals) and groundHeight
-// (solidity + standing) read, the same one-placement-source contract the
-// decoration field uses: a boulder you can see IS the boulder you collide
-// with, byte-for-byte deterministic in (seed, cell).
-//
-// Solidity is NOT a collider. Colliders here are strictly 2D and push
-// airborne movers out of their footprint, which would make landing on a
-// rock impossible. Instead each boulder contributes a dome to the walkable
-// height field (screeSurfaceHeight, folded into groundHeight via max, the
-// dock-deck idiom): the dome's sheer flanks exceed the climb-slope gate so
-// walkers are refused, while a jump whose apex clears the crown lands on
-// it. With the shipped jump (apex ~1.1yd, ~1.76 mounted) that makes the
-// small rubble hoppable, mid boulders mount-only, and the big band
-// boulders genuine walls — no special cases.
-//
-// Mob locomotion snaps to groundHeight, so a mob directly chasing across a
-// small dome briefly crests it (routed A* paths refuse the flanks like any
-// steep ground). Accepted: domes are 2-4yd wide and off-road by
-// construction, so it reads as scrambling over rubble.
+// Cliff-scree placement, pure and shared by the renderer's moving detail
+// grid. The rocks are tier-gated visual dressing, so they deliberately do
+// not alter groundHeight or deterministic simulation. Making them solid
+// would create invisible walls on tiers that omit this detail layer.
 
 // Placement tunables. These MUST stay identical to the renderer's read of
 // them (it imports from here); re-tuning them re-seats every boulder.
@@ -67,9 +51,9 @@ export interface ScreeSpot {
   gz: number;
   /** local relief at the spot, for the visual lean strength */
   slope: number;
-  /** absolute world y of the boulder crown (the walkable dome's apex) */
+  /** absolute world y of the rendered boulder crown */
   topY: number;
-  /** walkable dome footprint radius */
+  /** approximate rendered footprint radius */
   footR: number;
 }
 
@@ -185,12 +169,9 @@ export function screeSpotAt(seed: number, ci: number, cj: number): ScreeSpot | n
   return spot;
 }
 
-// The walkable surface a boulder contributes at (x, z): a dome from crown
-// height at the centre to the terrain at the footprint rim. The profile's
-// rim is near-vertical, so the climb gate refuses walkers from outside
-// (solidity), while everything inboard of ~60% radius is gentle enough to
-// stand and walk on. Returns -Infinity where no boulder reaches — callers
-// fold it in with Math.max like the dock decks.
+// Approximate visual envelope used by placement tests: a dome from the
+// rendered crown to the terrain at the footprint rim. It is not part of the
+// shared walkable heightfield because the detail layer is tier-gated.
 export function screeSurfaceHeight(x: number, z: number, seed: number): number {
   const ci0 = Math.round(x / SCREE_CELL);
   const cj0 = Math.round(z / SCREE_CELL);

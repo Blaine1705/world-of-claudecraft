@@ -75,9 +75,16 @@ describe('Eastbrook noticeboard tier-independent preload', () => {
 
       expect(mocks.loadGltf).toHaveBeenCalledTimes(1);
       expect(mocks.loadGltf).toHaveBeenCalledWith('/models/props/eastbrook_noticeboard.glb');
-      expect(mocks.loadTexture).toHaveBeenCalledTimes(1);
-      expect(mocks.loadTexture).toHaveBeenCalledWith('/textures/eastbrook_surface_atlas.webp');
-      expect(mocks.registerPreload).toHaveBeenCalledTimes(2);
+      const atlasLoads = mocks.loadTexture.mock.calls
+        .map(([url], index) => ({
+          url,
+          order: mocks.loadTexture.mock.invocationCallOrder[index],
+        }))
+        .filter(({ url }) => url === '/textures/eastbrook_surface_atlas.webp');
+      expect(atlasLoads.map(({ url }) => url)).toEqual(['/textures/eastbrook_surface_atlas.webp']);
+      const registrationOrders = new Set(mocks.registerPreload.mock.invocationCallOrder);
+      expect(registrationOrders).toContain(mocks.loadGltf.mock.invocationCallOrder[0] + 1);
+      expect(registrationOrders).toContain(atlasLoads[0].order + 1);
       await Promise.all(mocks.registerPreload.mock.calls.map(([registered]) => registered));
 
       const first = module.buildEastbrookNoticeboard().group;

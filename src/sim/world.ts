@@ -42,9 +42,6 @@ import {
 import { GALE_DECK_FREEBOARD, galeDeckSurface } from './gale_harbor';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
-// scree.ts imports terrainHeight/roadDistance back from this module; both
-// sides only touch the other inside function bodies, so the cycle is inert
-import { screeSurfaceHeight } from './scree';
 import type { BiomeId, HeightStamp, WorldContent, ZoneDef } from './types';
 import { isInSowfieldShell, SOWFIELD_FLAT, sowfieldStandLift } from './vale_cup_layout';
 import { wildheartFieldHeight } from './wildheart_field';
@@ -3299,10 +3296,7 @@ export function groundHeight(x: number, z: number, seed: number): number {
   // and its flat top is the wall-walk.
   const terrain =
     terrainHeight(x, z, seed) + sowfieldStandLift(x, z) + beaconSpiralLift(x, z) + castleLift(x, z);
-  // Scree boulders are walkable domes folded in like the dock decks: sheer
-  // flanks the climb gate refuses (solidity), crowns you can land a jump on.
-  // The renderer draws the same spots (sim/scree.ts is the single source).
-  return Math.max(terrain, dockSurfaceHeight(x, z, seed), screeSurfaceHeight(x, z, seed));
+  return Math.max(terrain, dockSurfaceHeight(x, z, seed));
 }
 
 export function terrainHeight(x: number, z: number, seed: number): number {

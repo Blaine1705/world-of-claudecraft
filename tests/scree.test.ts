@@ -3,9 +3,8 @@ import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { screeSpotAt, screeSpotsInBounds, screeSurfaceHeight } from '../src/sim/scree';
 import { groundHeight, roadDistance, terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
-// The scree module is the single placement source for both the renderer's
-// boulder meshes and groundHeight's walkable domes — these tests pin the
-// contract that makes "the rock you see is the rock that blocks you" true.
+// The scree module is the renderer's single pure placement source. The rocks
+// are tier-gated visual dressing and must not alter shared simulation ground.
 
 const SEED = 1337;
 // a broad sample rectangle over the original vale/marsh/peaks strip
@@ -39,53 +38,26 @@ describe('cliff scree placement', () => {
     }
   });
 
-  it('raises groundHeight to the crown at the spot centre and not outside the footprint', () => {
+  it('keeps tier-gated visual scree out of the shared walkable heightfield', () => {
     const spots = screeSpotsInBounds(SEED, BOUNDS);
-    const s = spots[0];
+    const s = spots.find((spot) => spot.topY - terrainHeight(spot.x, spot.z, SEED) > 1);
+    expect(s).toBeDefined();
+    if (!s) return;
     const atCrown = screeSurfaceHeight(s.x, s.z, SEED);
     expect(atCrown).toBeCloseTo(s.topY, 5);
-    expect(groundHeight(s.x, s.z, SEED)).toBeGreaterThanOrEqual(s.topY);
+    // Cliff scree only renders on tiers that enable the detail layer. Folding
+    // its crown into groundHeight would create invisible walls on lower tiers
+    // and perturb every deterministic sim consumer of the shared heightfield.
+    expect(groundHeight(s.x, s.z, SEED)).toBeCloseTo(terrainHeight(s.x, s.z, SEED), 5);
+    expect(groundHeight(s.x, s.z, SEED)).toBeLessThan(s.topY);
     // just past the rim the dome contributes nothing
     const out = screeSurfaceHeight(s.x + s.footR + 0.05, s.z, SEED);
     expect(out === Number.NEGATIVE_INFINITY || out < s.topY).toBe(true);
   });
 
-  it('has walk-refusing downhill flanks and some jump-height crowns', () => {
+  it('keeps a varied boulder scale distribution', () => {
     const spots = screeSpotsInBounds(SEED, BOUNDS);
-    let jumpable = 0;
-    for (const s of spots) {
-      // rim steepness on the DOWNHILL side: the uphill flank of a
-      // slope-embedded rock may sit nearly flush (steppable, like real
-      // rubble), but the downhill flank must always exceed the climb
-      // gate's 1.5 slope so walkers cannot mount it from below
-      const glen = Math.hypot(s.gx, s.gz);
-      const dx = glen > 1e-4 ? -s.gx / glen : 1;
-      const dz = glen > 1e-4 ? -s.gz / glen : 0;
-      const rIn = s.footR * 0.9;
-      const yIn = screeSurfaceHeight(s.x + dx * rIn, s.z + dz * rIn, SEED);
-      if (yIn !== Number.NEGATIVE_INFINITY) {
-        const drop = yIn - terrainHeight(s.x + dx * s.footR, s.z + dz * s.footR, SEED);
-        const run = s.footR * 0.1;
-        if (drop > 0.2) expect(drop / run).toBeGreaterThan(1.5);
-      }
-      if (s.topY - s.baseY <= 1.1) jumpable++;
-    }
-    // A real share of the rubble is hoppable from FLAT ground unmounted
-    // (jump apex ~1.125); mounted (~1.76) covers far more, and slope-embedded
-    // rocks are additionally steppable from their flush uphill side, so the
-    // in-play mountable share is well above this floor.
-    expect(jumpable).toBeGreaterThan(spots.length * 0.07);
-    const mountedJumpable = spots.filter((s) => s.topY - s.baseY <= 1.7).length;
-    expect(mountedJumpable).toBeGreaterThan(spots.length * 0.3);
-  });
-
-  it('keeps the crown standable: dome height varies gently inboard', () => {
-    const spots = screeSpotsInBounds(SEED, BOUNDS);
-    const s = spots.find((p) => !p.apron) ?? spots[0];
-    const centre = screeSurfaceHeight(s.x, s.z, SEED);
-    const half = screeSurfaceHeight(s.x + s.footR * 0.4, s.z, SEED);
-    // inboard of ~half radius the surface stays within walkable slope of the
-    // crown (0.4 * footR run, max climb 1.5)
-    expect(centre - half).toBeLessThan(s.footR * 0.4 * 1.5);
+    expect(spots.some((s) => s.scale < 0.8)).toBe(true);
+    expect(spots.some((s) => s.scale > 1.2)).toBe(true);
   });
 });

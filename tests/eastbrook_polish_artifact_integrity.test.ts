@@ -1414,9 +1414,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // all five Eastbrook seals, so every source fingerprint moved, the composite
     // polish provenance followed, and this seal follows the composite. Every
     // measured value (frame timings, draw stats, triangle and scenario numbers)
-    // is byte-identical, and no capture was retaken.
+    // is byte-identical, and no capture was retaken. The release merge's
+    // canonical formatting changed two source hashes, so this evidence-only
+    // seal was recomputed after repinning their composite provenance.
     expect(fingerprint.digest('hex')).toBe(
-      '008e65982c08975408b9c975368a59d7384c063196db22af8f8345658f73463e',
+      'c8a52b0a5c1ef7c55b2c2fea1999f5f7d507102c29b3b922705dd6e44333448a',
     );
   });
 

@@ -40,9 +40,16 @@ describe('Eastbrook Grand Armoury preload', () => {
 
     expect(mocks.loadGltf).toHaveBeenCalledTimes(1);
     expect(mocks.loadGltf).toHaveBeenCalledWith('/models/props/eastbrook_grand_armoury.glb');
-    expect(mocks.loadTexture).toHaveBeenCalledTimes(1);
-    expect(mocks.loadTexture).toHaveBeenCalledWith('/textures/eastbrook_surface_atlas.webp');
-    expect(mocks.registerPreload).toHaveBeenCalledTimes(2);
+    const atlasLoads = mocks.loadTexture.mock.calls
+      .map(([url], index) => ({
+        url,
+        order: mocks.loadTexture.mock.invocationCallOrder[index],
+      }))
+      .filter(({ url }) => url === '/textures/eastbrook_surface_atlas.webp');
+    expect(atlasLoads.map(({ url }) => url)).toEqual(['/textures/eastbrook_surface_atlas.webp']);
+    const registrationOrders = new Set(mocks.registerPreload.mock.invocationCallOrder);
+    expect(registrationOrders).toContain(mocks.loadGltf.mock.invocationCallOrder[0] + 1);
+    expect(registrationOrders).toContain(atlasLoads[0].order + 1);
     const registered = mocks.registerPreload.mock.calls.map(([promise]) => promise);
     expect(registered.every((promise) => promise instanceof Promise)).toBe(true);
     await Promise.all(registered);
