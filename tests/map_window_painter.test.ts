@@ -64,6 +64,9 @@ const MAP_COLOR_TOKENS = [
   '--color-map-building-chapel',
   '--color-map-building-inn',
   '--color-map-building-house',
+  '--color-map-castle-wall',
+  '--color-map-castle-tower',
+  '--color-map-castle-court',
   '--color-map-well',
   '--color-map-stall',
   '--color-map-tent',
@@ -196,6 +199,8 @@ function fakeMapContext(trace: PaintTrace): CanvasRenderingContext2D {
     // the painter floods the ocean before the zone bg blit; the fake context
     // must answer every call it makes, not only the path-building ones
     fillRect(): void {},
+    // the castle plan outlines its wall and tower rects
+    strokeRect(): void {},
     beginPath(): void {
       commands = [];
     },

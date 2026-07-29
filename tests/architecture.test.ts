@@ -319,6 +319,7 @@ const UI_PURE_CORES = [
   'src/ui/lastkeep_map_view.ts',
   'src/ui/map_pinch_zoom_core.ts',
   'src/ui/bg_field_relief_core.ts',
+  'src/ui/castle_plan_core.ts',
   'src/ui/map_gather_tip_memo.ts',
   'src/ui/map_window_view.ts',
   'src/ui/continent_land_mask_core.ts',

@@ -44,6 +44,7 @@ import { getActiveWorldContent, type ZoneDef } from '../sim/data';
 import type { GatherNodeType } from '../sim/types';
 import { type Decoration, generateDecorationsInBounds } from '../sim/world';
 import type { IWorld } from '../world_api';
+import type { CastlePlanMarker } from './castle_plan_core';
 import { dungeonDisplayName, riftFloorLabel, zoneDisplayName, zonePoiLabel } from './entity_i18n';
 import { formatNumber } from './i18n';
 import {
@@ -83,6 +84,10 @@ const PLAYER_ARROW_HALF_WIDTH = 5;
 const PLAYER_ARROW_BASE_Y = 6;
 // Building footprint outline width in the detail overlay.
 const BUILDING_LINE_WIDTH = 1;
+// A curtain wall is a few yards thick, which falls under a pixel once the
+// whole zone is framed; hold every plan rect to at least this so a castle
+// never thins out of existence at the default zoom.
+const CASTLE_PLAN_MIN_PX = 2;
 // Dungeon Finder "Show on Map" highlight: a steady double ring (no animation,
 // reduced-motion safe) around the pinged entrance.
 const PING_RADIUS_INNER = 9;
@@ -149,6 +154,9 @@ export const MAP_COLOR_TOKENS = {
   buildingChapel: '--color-map-building-chapel',
   buildingInn: '--color-map-building-inn',
   buildingHouse: '--color-map-building-house',
+  castleWall: '--color-map-castle-wall',
+  castleTower: '--color-map-castle-tower',
+  castleCourt: '--color-map-castle-court',
   well: '--color-map-well',
   stall: '--color-map-stall',
   tent: '--color-map-tent',
@@ -303,6 +311,9 @@ export class MapWindowPainter {
     }
 
     if (model.detail) this.drawDetail(ctx, model.detail, colors);
+
+    // The castle plans, over the terrain and under the quest / label layers.
+    if (model.castles.length > 0) this.drawCastlePlan(ctx, model.castles, colors);
 
     // Active-quest objective areas: translucent blue blobs (classic quest-POI
     // style) over where each objective's targets live, drawn under the title /
@@ -566,6 +577,38 @@ export class MapWindowPainter {
 
   // Buildings + vegetation overlay for the zoomed-in map, drawn in the same order
   // as the inline site (vegetation, then building footprints, then prop dots).
+  /**
+   * Both castles' curtain plans: courts washed in first, then wall runs and
+   * tower squares filled and outlined. A gate needs no drawing of its own,
+   * because a gate is where the plan has no run.
+   */
+  private drawCastlePlan(
+    ctx: CanvasRenderingContext2D,
+    markers: CastlePlanMarker[],
+    colors: MapColors,
+  ): void {
+    ctx.save();
+    // courts first, so a wall always reads on top of its own yard
+    ctx.fillStyle = colors.castleCourt;
+    for (const m of markers) {
+      if (m.part !== 'court') continue;
+      ctx.fillRect(m.mx, m.my, m.w, m.h);
+    }
+    ctx.strokeStyle = colors.buildingOutline;
+    ctx.lineWidth = BUILDING_LINE_WIDTH;
+    for (const m of markers) {
+      if (m.part === 'court') continue;
+      ctx.fillStyle = m.part === 'tower' ? colors.castleTower : colors.castleWall;
+      // a curtain is a few yards thick, which is sub-pixel when the whole
+      // zone is framed: floor the short side so a wall never vanishes
+      const w = Math.max(m.w, CASTLE_PLAN_MIN_PX);
+      const h = Math.max(m.h, CASTLE_PLAN_MIN_PX);
+      ctx.fillRect(m.mx, m.my, w, h);
+      ctx.strokeRect(m.mx, m.my, w, h);
+    }
+    ctx.restore();
+  }
+
   private drawDetail(ctx: CanvasRenderingContext2D, detail: MapDetail, colors: MapColors): void {
     for (const d of detail.decorations) {
       ctx.fillStyle =
