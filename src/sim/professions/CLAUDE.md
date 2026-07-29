@@ -30,8 +30,13 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   and quest consumption paths share. Upgrade needs the tool STRICTLY above the
   material AND a vein carrying that tier; substitution runs downward only.
 - `fishing.ts`: the fourth gathering row (bite delay, reel window,
-  `FISHING_TABLES_BY_BAND`); hidden per-cast state lives in three transient
-  Entity fields, never wired, never persisted.
+  `FISHING_TABLES_BY_BAND`); hidden per-cast state lives in four transient
+  Entity fields (`gatherCastNodeId`, `fishBiteAtTick`, `fishReelDeadlineTick`,
+  `fishCastZoneId`), never wired, never persisted.
+- `session_teardown.ts`: the ONE displacement cancel for a live gather or
+  fishing session (`cancelProfessionSessionOnDisplacement`), called from every
+  teleport path in sim and server plus the `/follow` zone-line crossing;
+  gated on `isNonSpellCast`, delegates to `ctx.cancelCast`.
 - `wheel.ts`: flat per-craft skills (`CraftSkills`, `gainCraftSkill`,
   `tierForSkill`/`tierCapability`, the four-state `tierProgressMultiplier`
   curve, perk-eligibility reads).

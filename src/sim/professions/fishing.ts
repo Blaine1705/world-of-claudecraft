@@ -265,7 +265,14 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // LANDED hit cancels the session outright (combat/damage.ts), which zeroes
   // fishReelDeadlineTick and makes this arm unsatisfiable. The condition
   // fully self-guards (only an armed fishing session passes), so hoisting it
-  // cannot swallow any other busy state. A re-press BEFORE the bite or AFTER
+  // cannot swallow any other busy state. The hoist also puts the reel above
+  // the SWIMMING denial, and that skip is deliberate too: no reachable path
+  // leaves an armed session on a swimming angler (movement cancels the cast,
+  // a landed hit cancels even fully absorbed, and every teleport or /follow
+  // tow cancels through the displacement helper), so re-checking here would
+  // guard a state that cannot occur; if a damage-free displacement ever
+  // ships, wire it into professions/session_teardown.ts rather than here.
+  // A re-press BEFORE the bite or AFTER
   // the deadline falls through to the busy error below.
   // Boundary contract (pinned): the reel is valid while ctx.tickCount <=
   // fishReelDeadlineTick; the miss fires at deadline + 1 in the tick phase.
@@ -280,6 +287,8 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
     p.fishReelDeadlineTick = 0;
     ctx.emit({ type: 'castStop', entityId: p.id, success: true });
     completeFishing(ctx, p, meta);
+    // Cleared AFTER completeFishing on purpose: the completion reads the
+    // pinned zone for the table and the deed credit.
     p.fishCastZoneId = '';
     return;
   }
@@ -422,7 +431,8 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   // via bestOwnedGatherToolTier's bare-hands floor. Effective band =
   // min(proficiency band, best band the owned rod tier covers). The cap is
   // SILENT by design: no event and no denial, the cast still lands a
-  // band-capped catch. All of this is pure
+  // band-capped catch (the effective band does ride the owner's own outcome
+  // events for the telemetry, so "silent" means no denial, not secret). All of this is pure
   // state resolved before the single rng draw below, so the one-draw-per-catch
   // contract and every existing seed's catch sequence are untouched.
   //

@@ -29,7 +29,6 @@ import {
   isDelvePos,
   isYumiMazePos,
   NPCS,
-  OVERWORLD_GRAVEYARDS,
   yumiMazeOriginAt,
 } from './data';
 import { ROCK_COLLIDER_MIN_SCALE, rockHeight, rockRadius } from './decoration_dims';

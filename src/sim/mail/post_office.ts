@@ -694,7 +694,11 @@ export class PostOffice {
   //    is the key being purged: the escrow was theirs alone and there is nowhere
   //    left to return it to.
   // The delete arm mirrors the expiry sweep's exactly, so unreadIndex and the
-  // in-flight set stay consistent. Returns whether anything changed.
+  // in-flight set stay consistent. One narrow legacy edge is accepted: a
+  // pre-senderKey letter whose senderName EQUALS the purged character's name
+  // reads as self-addressed and is deleted rather than returned; every
+  // modern letter carries a real senderKey, so only ancient blob rows can
+  // reach it. Returns whether anything changed.
   purgeMailOwner(characterId: number, name: string): boolean {
     if (!Number.isFinite(characterId)) return false;
     const key = String(characterId);

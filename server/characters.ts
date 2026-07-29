@@ -297,7 +297,9 @@ export function buildCharacterList(
  * the realm process serving this request is the one running the world, and it
  * re-persists the market and mail blobs from memory every autosave, so editing the
  * world_state rows alone (inside db.deleteCharacter, say) would be clobbered within
- * seconds. Each save is skipped when its purge reports no change.
+ * seconds. Each save is skipped when its purge reports no change. This assumes the
+ * current one-process-per-realm topology: a second process serving the same realm
+ * would re-persist its own un-purged copy.
  *
  * Exported so BOTH delete dispatch arms share one behavior: this module's
  * deleteHandler and the retained legacy ladder arm in main.ts (the API_DISPATCH=legacy

@@ -120,6 +120,7 @@ describe('Knockback on-hit affix (Crushing Sweep)', () => {
     p.castTotal = 15;
     p.castRemaining = 15;
     p.fishBiteAtTick = 100;
+    p.fishCastZoneId = 'eastbrook_vale';
     p.auras.push({
       id: 'test_absorb',
       name: 'Test Barrier',
@@ -146,6 +147,7 @@ describe('Knockback on-hit affix (Crushing Sweep)', () => {
       expect(p.hp).toBe(hpBefore);
       expect(p.castingAbility).toBeNull();
       expect(p.fishBiteAtTick).toBe(0);
+      expect(p.fishCastZoneId).toBe('');
     } finally {
       tmpl.knockback!.chance = saved;
     }

@@ -367,7 +367,10 @@ describe('hidden-state wire invariant', () => {
     expect(gatherer.gatherCastNodeId).toBe(NODE.id);
     (server as any).broadcastSnapshots();
     const payload = fcA.sent.join('\n') + fcB.sent.join('\n');
-    // Sanity: we are scanning real snapshot payloads with live cast fields.
+    // Sanity: we are scanning real snapshot payloads with live cast fields,
+    // and the hidden fields are provably NON-inert at scan time (an inert
+    // field would pass the absence checks vacuously).
+    expect(angler.fishCastZoneId).not.toBe('');
     expect(payload).toContain('castRem');
     expect(payload.includes('fishBiteAtTick')).toBe(false);
     expect(payload.includes('fishReelDeadlineTick')).toBe(false);
@@ -380,6 +383,7 @@ describe('hidden-state wire invariant', () => {
     const biteTick = angler.fishBiteAtTick;
     while (server.sim.tickCount <= biteTick) server.sim.tick();
     expect(angler.fishReelDeadlineTick).toBeGreaterThan(0);
+    expect(angler.fishCastZoneId).not.toBe('');
     fcA.sent.length = 0;
     fcB.sent.length = 0;
     (server as any).broadcastSnapshots();

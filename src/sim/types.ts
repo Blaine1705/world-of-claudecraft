@@ -4140,11 +4140,12 @@ export type SimEvent = { pid?: number } & (
   // Fishing miss (Professions 2.0): the reel window closed with no
   // re-press ("it got away"), a session defensively timed out, or a landed
   // catch found no bag room (that branch spent its table draw and lost the
-  // catch, so it IS a got-away; its player feedback stays the bags-full
-  // error line). Personal and text-free like fishingBite: the client
-  // renders its own localized got-away line off the type alone. Costs
-  // nothing but the ended cast; recast immediately. zoneId/band mirror
-  // fishingResult, for the telemetry.
+  // catch, so it IS a got-away). Personal and text-free like fishingBite:
+  // the client renders its own localized got-away line off the type alone,
+  // which on the bags-full branch means TWO lines on purpose: the transient
+  // bags-full error toast carries the reason and this event's durable log
+  // line records the loss. Costs nothing but the ended cast; recast
+  // immediately. zoneId/band mirror fishingResult, for the telemetry.
   | { type: 'fishingGotAway'; pid: number; zoneId: string; band: 0 | 1 | 2 }
   // Fishing empty hook (Professions 2.0): the single table draw resolved
   // the itemId: null row (nothing was biting). Telemetry-only sibling of

@@ -1269,10 +1269,19 @@ describe('legacy DELETE dispatch arm (main.ts)', () => {
     const purgeAt = arm.indexOf('purgeDeletedCharacterWorldState(');
     expect(deleteAt).toBeGreaterThan(-1);
     expect(purgeAt).toBeGreaterThan(deleteAt);
-    // Bound to the LIVE sim books, the same seam the injected runtime uses.
+    // INSIDE the ok-guard: a purge hoisted above `if (ok)` would run when the
+    // DB delete matched no row (a concurrent-delete race) and still satisfy
+    // the order check above, so the guard's position is locked too.
+    const okGuardAt = arm.indexOf('if (ok) {');
+    expect(okGuardAt).toBeGreaterThan(deleteAt);
+    expect(purgeAt).toBeGreaterThan(okGuardAt);
+    // Bound to the LIVE sim books, the same seam the injected runtime uses,
+    // and keyed by the SAME id the delete used plus the loaded row's name.
     expect(arm).toContain('liveGame().purgeMarketSeller(');
     expect(arm).toContain('liveGame().purgeMailOwner(');
-    expect(arm).toContain('character.name');
+    const purgeCall = arm.slice(purgeAt, arm.indexOf(');', purgeAt));
+    expect(purgeCall).toContain('characterId');
+    expect(purgeCall).toContain('character.name');
   });
 });
 

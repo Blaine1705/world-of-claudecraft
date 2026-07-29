@@ -177,7 +177,10 @@ export class Market {
   // uncollectable forever (expired listings would keep folding goods into an
   // orphan collection nobody can claim). Matches the SAME dual keys
   // rekeyMarketSeller does, the stable character-id key plus a legacy name-keyed
-  // row, and never touches house stock. Everything destroyed here is the deleted
+  // row, and never touches house stock. (marketSellerKey's entityId fallback
+  // for a meta with no characterId cannot key a production row: the server
+  // always passes the character id at join, and the only metas without one
+  // are dev-gated bots.) Everything destroyed here is the deleted
   // character's OWN escrow (marketList escrows out of the seller's own bags), so
   // no other player's property rides along. Returns whether anything changed, so
   // the caller only pays for a save when there was something to purge.
