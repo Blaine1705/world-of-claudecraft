@@ -48,6 +48,7 @@ import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { attachBankerChestToNpcView } from './banker_chest';
 import { type BirdsView, buildBirds } from './birds';
+import { type BladeGrassView, buildBladeGrass } from './blade_grass';
 import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import {
@@ -102,6 +103,7 @@ import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_poli
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
 import { fogFarForBuiltGround } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
+import { buildCliffScree, type CliffScreeView } from './cliff_scree';
 import { trackWebGLContext } from './context_release';
 import {
   animatesEveryFrame,
@@ -176,6 +178,7 @@ import {
   urlForcedTier,
 } from './gfx';
 import { GlacialFrontVisual } from './glacial_front_visual';
+import { buildGreatTreePrewarmGroup } from './great_tree_prewarm';
 import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
@@ -196,8 +199,6 @@ import {
 } from './mage_barrier_visual';
 import { MageGroundFx } from './mage_ground_fx';
 import { buildMailboxPillar } from './mailbox';
-import { type BladeGrassView, buildBladeGrass } from './blade_grass';
-import { buildCliffScree, type CliffScreeView } from './cliff_scree';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
 import { mountBobY, mountVisualSpec } from './mount_visuals';
@@ -4242,6 +4243,7 @@ export class Renderer {
     let objectPrewarmGroup: THREE.Group | null = null;
     let propMaterialPrewarmGroup: THREE.Group | null = null;
     let foliagePrewarmGroup: THREE.Group | null = null;
+    let greatTreePrewarmGroup: THREE.Group | null = null;
     let landmarkPrewarmGroup: THREE.Group | null = null;
     let weatherPrewarmActive = false;
 
@@ -4514,6 +4516,21 @@ export class Renderer {
         detail: () => `objects=${foliagePrewarmGroup?.children.length ?? 0}`,
       },
       {
+        // The great-tree landmark bark variant (worn_stone.ts
+        // GREAT_TREE_BARK_DETAIL on an unchained clone) streams in with zone
+        // features, so without this its program links synchronously the
+        // first time a giant enters the frustum mid-travel.
+        id: 'foliage.great-tree-materials',
+        category: 'props',
+        priority: 46,
+        required: false,
+        run: () => {
+          greatTreePrewarmGroup = buildGreatTreePrewarmGroup();
+          this.scene.add(greatTreePrewarmGroup);
+        },
+        detail: () => `objects=${greatTreePrewarmGroup?.children.length ?? 0}`,
+      },
+      {
         // Precipitation starts hidden in the dry spawn biome. Make one points
         // draw visible behind the loading screen and upload both sprite maps,
         // so entering rain/snow cannot link or upload on its first live frame.
@@ -4749,6 +4766,7 @@ export class Renderer {
       }
       if (propMaterialPrewarmGroup) this.scene.remove(propMaterialPrewarmGroup);
       if (foliagePrewarmGroup) this.scene.remove(foliagePrewarmGroup);
+      if (greatTreePrewarmGroup) this.scene.remove(greatTreePrewarmGroup);
       if (landmarkPrewarmGroup) this.scene.remove(landmarkPrewarmGroup);
       if (weatherPrewarmActive) this.weather.endPrewarm();
     }
