@@ -7610,7 +7610,7 @@ export const en: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Witchlight",
-        "description": "Decreases the target's armor by {damage}% for 40 sec. Only the strongest armor-reducing debuff counts, so it does not add to a warrior's Armor Shear or a rogue's Armor Breach."
+        "description": "Decreases the target's armor by {damage}% for 40 sec."
       },
       "hibernate": {
         "name": "Slumber",
@@ -7634,7 +7634,7 @@ export const en: EnTranslations = {
       },
       "rip": {
         "name": "Bloodrift",
-        "description": "Finishing move that causes {damage} Bleed damage over 24 sec. Consumes combo points. Wolf Form only.",
+        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Wolf Form only.",
         "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
       },
       "mortal_strike": {

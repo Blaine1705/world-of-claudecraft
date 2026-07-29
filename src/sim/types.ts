@@ -2077,6 +2077,11 @@ export type AbilityEffect =
        *  longer bleed and more total damage. */
       baseDuration?: number;
       perComboDuration?: number;
+      /** Classic finisher bleed (Rip): total = baseTotal + perComboTotal x
+       *  combo points spent at a FIXED duration, so points buy bigger ticks.
+       *  `total` stays the 5-point canonical for tooltips and balance pins. */
+      baseTotal?: number;
+      perComboTotal?: number;
     }
   | { type: 'extendDot'; dot: string; seconds: number; maxBonus: number }
   | { type: 'consumeDot'; dot: string }

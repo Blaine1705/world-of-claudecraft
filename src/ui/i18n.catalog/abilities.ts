@@ -1454,11 +1454,7 @@ const classAbilityNamesEn = {
       ],
       ['enrage', 'Stoke', 'Generates 20 rage instantly. Bruin Form only.'],
       ['bash', 'Concuss', 'Stuns the target for 2 sec. Bruin Form only.'],
-      [
-        'faerie_fire',
-        'Witchlight',
-        "Decreases the target's armor by {damage}% for 40 sec. Only the strongest armor-reducing debuff counts, so it does not add to a warrior's Armor Shear or a rogue's Armor Breach.",
-      ],
+      ['faerie_fire', 'Witchlight', "Decreases the target's armor by {damage}% for 40 sec."],
       [
         'hibernate',
         'Slumber',
@@ -1487,7 +1483,7 @@ const classAbilityNamesEn = {
       [
         'rip',
         'Bloodrift',
-        'Finishing move that causes {damage} Bleed damage over 24 sec. Consumes combo points. Wolf Form only.',
+        'Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Wolf Form only.',
         { feral: 'The landed hit adds 1 Old Blood (max 3).' },
       ],
       [

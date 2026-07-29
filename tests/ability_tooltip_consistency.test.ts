@@ -64,6 +64,7 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   slice_and_dice: [5, 32],
   rupture: [2, 6, 5, 16],
   expose_armor: [2, 5, 30],
+  rip: [5],
   // Druid spec-engine interaction lines: the cited numbers are engine
   // constants in combat/druid_engines.ts (the Moonseed extension seconds on
   // the Lunar Tempest line, the Verdance stage cap on the Wildbloom line),

@@ -1354,10 +1354,16 @@ export function runEffects(
         if (eff.directPct !== undefined && lastDirectDamage <= 0) break;
         const dotTotal =
           eff.directPct === undefined ? eff.total : Math.round(lastDirectDamage * eff.directPct);
+        // Combo-scaled finisher bleed (classic Rip): fixed duration, the points
+        // spent buy bigger ticks; a 5-point spend equals the canonical total.
+        const comboTotal =
+          eff.perComboTotal !== undefined
+            ? (eff.baseTotal ?? 0) + eff.perComboTotal * spentCombo
+            : dotTotal;
         const dotBase = Math.max(
           1,
           Math.round(
-            (dotTotal / (eff.duration / eff.interval)) * druidApexPayoffMult(ctx, p, ability.id),
+            (comboTotal / (eff.duration / eff.interval)) * druidApexPayoffMult(ctx, p, ability.id),
           ),
         );
         // Combo-scaled finisher bleed (classic Rupture): the tick value above

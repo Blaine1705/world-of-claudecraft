@@ -5481,8 +5481,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: true,
     effects: [{ type: 'faerieFire', duration: 40 }],
-    description:
-      "Decreases the target's armor by $d% for 40 sec. Only the strongest armor-reducing debuff counts, so it does not add to a warrior's Armor Shear or a rogue's Armor Breach.",
+    description: "Decreases the target's armor by $d% for 40 sec.",
   },
   hibernate: {
     id: 'hibernate',
@@ -5576,9 +5575,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     spendsCombo: true,
     requiresForm: 'cat',
-    effects: [{ type: 'dot', total: 156, duration: 24, interval: 2 }],
+    effects: [
+      { type: 'dot', total: 156, duration: 24, interval: 2, baseTotal: 36, perComboTotal: 24 },
+    ],
     description:
-      'Finishing move that causes $d Bleed damage over 24 sec. Consumes combo points. Wolf Form only.',
+      'Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: $d total). Wolf Form only.',
     specNotes: {
       feral: 'The landed hit adds 1 Old Blood (max 3).',
     },
