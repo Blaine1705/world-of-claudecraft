@@ -8,14 +8,17 @@
 // TERRAIN (sheer risers the climb gate refuses, flat tops as the walk);
 // gates are module-aligned gaps whose lift spans sit INSIDE the rendered
 // arch openings; the walk leaves a mouth open over every gate. Unlike the
-// Last Keep there is no terraced ward: one warm bailey full of parterre
-// beds, with the keep composed against its hall wing on the north side.
+// Last Keep there is no terraced ward: one paved garrison bailey with the
+// keep composed against its hall wing on the north side. The flowers live
+// in the walled flower court off the south wall (the garden postern opens
+// into it), parterre beds around a hedge wolf statue.
 // Pure leaf: deterministic, no rng, no SimContext.
 
 export const DAWNHOLD = {
   // the graded grounds (the skirt blends into the garden hills and yields
-  // to the coast lobes west of the walls)
-  pad: { x0: 232, x1: 300, z0: 854, z1: 936, h: 3.2 },
+  // to the coast lobes west of the walls; the south reach carries the
+  // walled flower court)
+  pad: { x0: 232, x1: 300, z0: 854, z1: 944, h: 3.2 },
   // the curtain wall square: wall centerlines
   wx0: 240,
   wx1: 292,
@@ -36,12 +39,40 @@ export const DAWNHOLD = {
 // The ways in. Spans are in the wall's run coordinate; every span is the
 // visual opening of the doorway module that renders there.
 export const DAWNHOLD_GATES = {
-  /** the main gate: east wall, facing the Hedgewick road (which ends at
-   *  288,887); the doorway module at scale 1.75 opens 3.4yd */
+  /** the main gate: east wall, facing the Hedgewick road (which runs down
+   *  the OUTSIDE of this curtain and ends at 294,887, square on the arch);
+   *  the doorway module at scale 1.75 opens 3.4yd */
   main: { a0: 885.3, a1: 888.7 },
-  /** the garden postern: a narrow south door toward the parterre lawn */
-  postern: { a0: 260.7, a1: 263.3 },
+  /** the garden postern: a narrow south door out of the bailey and straight
+   *  into the flower court (centered on the south wall's module at 281.5) */
+  postern: { a0: 280.2, a1: 282.8 },
 } as const;
+
+// The walled flower court off the castle's south wall: the curtain closes
+// its north side, three lower garden walls (sheer both faces, no walk)
+// close the rest, and a south doorway opens onto the parterre lawn. Inside:
+// two round flower fields either side of the hedge wolf statue.
+// The x span is three wall modules wide so the court's own centre (274.5)
+// lands on a module CENTRE: the south doorway renders as a real arch there
+// and the statue stands on that axis. The west wall stops at x 264, clear
+// of the maze forecourt bed group whose pad pulls the ground down west of
+// there (the court floor stays dead flat on the castle pad).
+export const DAWNHOLD_COURT = {
+  /** garden wall centerlines (north side is the castle wall itself) */
+  x0: 264,
+  x1: 285,
+  z1: 940,
+  /** garden wall thickness */
+  th: 1.6,
+  /** the garden walls' ABSOLUTE top height */
+  hAbs: 6.4,
+} as const;
+
+/** the court's south doorway span (x), on its wall's own module centre */
+export const DAWNHOLD_COURT_GATE = { a0: 273.2, a1: 275.8 } as const;
+
+/** the hedge wolf statue, on the court's centre and its doorway axis */
+export const DAWNHOLD_COURT_STATUE = { x: 274.5, z: 931 } as const;
 
 export interface DawnholdTower {
   x: number;
@@ -85,7 +116,8 @@ export const DAWNHOLD_RAMPS: readonly DawnholdRamp[] = [
 
 // The bailey buildings, all the GREEN colorway. The keep and its hall
 // wing compose one palace mass on the north side (door faces +z, south
-// into the courtyard); cottages and the chapel ring the parterre yard.
+// into the courtyard); the yard below is a garrison: a tower, a standalone
+// barracks, and a catapult tower ring the paved parade ground.
 export interface DawnholdBuilding {
   key: string;
   x: number;
@@ -108,16 +140,50 @@ export const DAWNHOLD_BUILDINGS: readonly DawnholdBuilding[] = [
     h: 11,
     keepComplex: true,
   },
-  { key: 'hexTavern', x: 246.5, z: 906, rot: Math.PI / 2, scale: 6.5, r: 4.8, h: 9 },
-  { key: 'hexChurch', x: 283, z: 908.5, rot: -Math.PI / 2, scale: 6.5, r: 4.8, h: 11 },
-  { key: 'hexHomeA', x: 268, z: 915, rot: Math.PI, scale: 5.5, r: 3.5, h: 5.5 },
+  { key: 'hexTower', x: 246.5, z: 906, rot: Math.PI / 2, scale: 8, r: 4, h: 17 },
+  { key: 'hexBarracks', x: 283, z: 908.5, rot: -Math.PI / 2, scale: 6.5, r: 5.2, h: 11 },
+  { key: 'hexTowerCatapult', x: 268, z: 915, rot: Math.PI, scale: 7, r: 3.8, h: 12 },
 ] as const;
 
-/** the courtyard parterre beds (feed GARDEN_BED_PADS and the bed decor) */
+/**
+ * The flower court's two planted fields, either side of the hedge wolf.
+ * These are procedural FIELDS (garden_parterre_core paints their ground),
+ * not modeled parterre beds: they carry no bed model, no collider, and no
+ * level pad, because the castle pad already holds this ground dead flat.
+ */
 export const DAWNHOLD_BEDS: readonly { x: number; z: number }[] = [
-  { x: 258, z: 899 },
-  { x: 273, z: 897 },
+  { x: 269.5, z: 931 },
+  { x: 279.5, z: 931 },
 ] as const;
+
+/** the planted radius of each court field (bench and light placement) */
+export const DAWNHOLD_FIELD_R = 4.4;
+
+/**
+ * True inside the curtain walls: the paved garrison bailey. The parade
+ * ground is flagstone from wall to wall, so no lawn flower, meadow drift,
+ * or clipped bush grows there; the castle's flowers live in the court.
+ */
+export function inDawnholdBailey(x: number, z: number, margin = 0): boolean {
+  const t = DAWNHOLD.wallTh / 2 + margin;
+  return (
+    x > DAWNHOLD.wx0 - t && x < DAWNHOLD.wx1 + t && z > DAWNHOLD.wz0 - t && z < DAWNHOLD.wz1 + t
+  );
+}
+
+/**
+ * True inside the flower court's walled interior. `inset` shrinks the
+ * region inward from the wall faces (0 is the exact swept floor).
+ */
+export function inDawnholdCourt(x: number, z: number, inset = 0): boolean {
+  const h = DAWNHOLD_COURT.th / 2;
+  return (
+    x > DAWNHOLD_COURT.x0 + h + inset &&
+    x < DAWNHOLD_COURT.x1 - h - inset &&
+    z > DAWNHOLD.wz1 + DAWNHOLD.wallTh / 2 + inset &&
+    z < DAWNHOLD_COURT.z1 - h - inset
+  );
+}
 
 const G = DAWNHOLD_GATES;
 const inSpan = (v: number, s: { a0: number; a1: number }): boolean => v >= s.a0 && v <= s.a1;
@@ -178,6 +244,19 @@ export function dawnholdLift(x: number, z: number): number {
       wallStripAbs(x, z, DAWNHOLD.wz0, null), // north (solid)
       wallStripAbs(x, z, DAWNHOLD.wz1, G.postern), // south, the garden door
     );
+  }
+  // the flower court's garden walls: the castle's south wall closes the
+  // court's north side, so only the east/west runs and the gated south
+  // wall are raised here (sheer both faces; too tall to step, no walk)
+  const C = DAWNHOLD_COURT;
+  const CHT = C.th / 2;
+  if (z >= DAWNHOLD.wz1 && z <= C.z1 + CHT) {
+    if (Math.abs(x - C.x0) <= CHT || Math.abs(x - C.x1) <= CHT) {
+      abs = Math.max(abs, C.hAbs);
+    }
+  }
+  if (Math.abs(z - C.z1) <= CHT && x >= C.x0 - CHT && x <= C.x1 + CHT) {
+    if (!inSpan(x, DAWNHOLD_COURT_GATE)) abs = Math.max(abs, C.hAbs);
   }
   for (const t of DAWNHOLD_TOWERS) {
     if (Math.abs(x - t.x) <= t.hw && Math.abs(z - t.z) <= t.hw) {

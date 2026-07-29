@@ -14,7 +14,7 @@
 // or fall to must sit in a corridor at least a body diameter plus margin wide,
 // counting static colliders and unclimbable risers as walls.
 import { describe, expect, it } from 'vitest';
-import { CASTLE, CASTLE_RAMPS } from '../src/sim/castle_layout';
+import { CASTLE, CASTLE_RAMPS, WARD_STEPS } from '../src/sim/castle_layout';
 import { isBlocked, resolveMovement } from '../src/sim/colliders';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { rideSteepnessAt } from '../src/sim/ride_height';
@@ -333,11 +333,13 @@ describe('the Last Keep flanks hold no wedge pockets', () => {
       expect(p.pos.x, 'climbs the flight').toBeGreaterThan(431);
       expect(p.pos.y, 'reaches the wall walk').toBeGreaterThan(CASTLE.walkAbs - 0.6);
     }
-    // the west ward step still climbs the terrace
+    // the grand ward stair still climbs the terrace (one broad processional
+    // cut on the keep's door axis now, not the pair of narrow west flights)
     {
-      const { sim, p, meta } = makeWalker({ x: 405.75, z: 2026 });
-      pushToward(sim, p, meta, { x: 405.75, z: 2014 }, 20 * 12);
-      expect(p.pos.z, 'on the terrace').toBeLessThan(2016);
+      const mid = (WARD_STEPS[0].x0 + WARD_STEPS[0].x1) / 2;
+      const { sim, p, meta } = makeWalker({ x: mid, z: 2026 });
+      pushToward(sim, p, meta, { x: mid, z: 2016 }, 20 * 12);
+      expect(p.pos.z, 'on the terrace').toBeLessThan(2018);
       expect(p.pos.y, 'at terrace height').toBeGreaterThan(CASTLE.ward.h - 0.4);
     }
     // the terrace east of the keep still carries traffic to the north yard

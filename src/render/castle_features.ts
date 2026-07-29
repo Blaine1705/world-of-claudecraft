@@ -22,8 +22,8 @@ import {
 } from '../sim/castle_layout';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import { GFX, surfaceMat } from './gfx';
-import { cloneMaterialWithHooks } from './material_clone_hooks';
+import { castleStoneMat } from './castle_stone';
+import { GFX } from './gfx';
 import { PROP_ASSET_DEFS } from './props';
 import { applyWornStone } from './worn_stone';
 
@@ -186,30 +186,18 @@ export function buildCastleFeatures(): CastleFeaturesView {
     list.push(p);
   };
 
-  // stone slab helper: the visible floor caps and stair masses. Both carry
-  // the shared worn-stone triplanar layer (one system with the kcas walls and
-  // the other stone structures) so the big flat caps read as laid masonry
-  // instead of painted plastic. The surfaceMat result is CLONED first:
-  // surfaceMat dedupes by (color|maps|flags) across modules, and the layer
-  // must not leak onto an unrelated consumer of the same key. The clone goes
-  // through material_clone_hooks so it keeps surfaceMat's zone-haze layer and
-  // its program-cache-key identity (a bare clone dropped both: un-hazed slabs
-  // plus a fresh program link on the first frame the castle streamed in).
-  const stoneSlab = (color: number, roughness: number): THREE.Material => {
-    if (!GFX.standardMaterials) return surfaceMat({ color, roughness });
-    const mat = cloneMaterialWithHooks(surfaceMat({ color, roughness }));
-    applyWornStone(mat as THREE.MeshStandardMaterial);
-    return mat;
-  };
-  const slabMat = stoneSlab(0x8a7568, 0.95);
-  // the solid wedge masses (the wall flights and the ward's stair cuts) are
-  // hand-wound triangle soups, so they draw both faces. The hook-preserving
-  // clone re-attaches haze and the worn layer itself (and never shares the
-  // lambert tier's deduped instance, which must not go DoubleSide for
-  // everyone).
-  const wedgeMat = cloneMaterialWithHooks(stoneSlab(0x8a7568, 0.95));
-  wedgeMat.side = THREE.DoubleSide;
-  const capMat = stoneSlab(0x97826f, 0.9);
+  // Every raw mass here is coursed stone tiled to its own footprint (the
+  // shared castle_stone surfacing, the same masonry Dawnhold wears): flat
+  // color read as grey cardboard beside the textured kit modules bolted
+  // onto it. The wedge masses (the wall flights and the ward's stair cuts)
+  // are hand-wound triangle soups, so theirs draws both faces.
+  const stone = (w: number, h: number): THREE.Material =>
+    castleStoneMat(w, h, { color: 0x8a7568, roughness: 0.95 });
+  const wedgeMat = castleStoneMat(16, 8, {
+    color: 0x8a7568,
+    roughness: 0.95,
+    side: THREE.DoubleSide,
+  });
   const slab = (
     cx: number,
     cz: number,
@@ -217,9 +205,12 @@ export function buildCastleFeatures(): CastleFeaturesView {
     sz: number,
     topY: number,
     thick = 0.36,
-    mat = capMat,
+    mat?: THREE.Material,
   ): void => {
-    const mesh = new THREE.Mesh(new THREE.BoxGeometry(sx, thick, sz), mat);
+    const mesh = new THREE.Mesh(
+      new THREE.BoxGeometry(sx, thick, sz),
+      mat ?? castleStoneMat(sx, sz, { color: 0x97826f, roughness: 0.9 }),
+    );
     mesh.position.set(cx, topY - thick / 2, cz);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
@@ -353,7 +344,7 @@ export function buildCastleFeatures(): CastleFeaturesView {
     {
       const core = new THREE.Mesh(
         new THREE.BoxGeometry(thw * 2 - 0.4, t.hAbs - padY, thw * 2 - 0.4),
-        slabMat,
+        stone(thw * 2 - 0.4, t.hAbs - padY),
       );
       core.position.set(t.x, padY + (t.hAbs - padY) / 2, t.z);
       core.castShadow = true;
@@ -411,7 +402,7 @@ export function buildCastleFeatures(): CastleFeaturesView {
       const inset = 0.05;
       const mesh = new THREE.Mesh(
         new THREE.BoxGeometry(w.x1 - w.x0 - inset * 2, rise + 0.4, w.z1 - w.z0 - inset * 2),
-        slabMat,
+        stone(w.x1 - w.x0, rise + 0.4),
       );
       mesh.position.set((w.x0 + w.x1) / 2, w.h - (rise + 0.4) / 2, (w.z0 + w.z1) / 2);
       mesh.castShadow = true;
@@ -447,33 +438,56 @@ export function buildCastleFeatures(): CastleFeaturesView {
         });
       }
     }
-    // the stair cuts: broad stepped treads built from exact slabs over the
-    // ramp (the kcas stairs module never fit the cut geometry: either its
-    // treads read backwards or it sank into the ramp mass). Each tread top
-    // meets the walk surface at its middle, so feet stay within a quarter
-    // yard of the visible stone.
+    // the stair cuts: broad stepped treads built from exact slabs riding
+    // the upstream solid wedge (the kcas stairs module never fit the cut:
+    // its treads read backwards one way and sank into the mass the other).
+    // Each tread top meets the walk surface at its back edge plus a hair,
+    // stepping down in eight fine treads, so feet stay within a third of a
+    // yard of the visible stone; the wedge beneath carries the cut's sides
+    // down to a buried base so the ramp reads solid from every angle.
     for (const cut of WARD_STEPS) {
       const cx = (cut.x0 + cut.x1) / 2;
       const width = cut.x1 - cut.x0;
-      // the cut ramp is REAL rendered terrain (castlePadTarget), so each
-      // tread rides proud of the slope: top flush with the ramp at its
-      // back edge plus a hair, stepping down in eight fine treads (feet
-      // sink at most a third of a yard at each lip)
       const treads = 8;
       const run = WARD_STEP_RUN / treads;
       const drop = (w.h - padY) / treads;
       for (let ti = 0; ti < treads; ti++) {
         const zBack = w.z1 + ti * run;
         const topY = w.h - ti * drop + 0.04;
-        slab(cx, zBack + run / 2, width, run + 0.06, topY, 0.42, capMat);
+        slab(cx, zBack + run / 2, width, run + 0.06, topY, 0.42);
       }
-      // sloped mass under the walk surface so the cut reads solid
-      const mesh = new THREE.Mesh(
-        new THREE.BoxGeometry(cut.x1 - cut.x0, 1.0, WARD_STEP_RUN + 0.8),
-        slabMat,
-      );
-      mesh.position.set(cx, padY + rise / 2 - 0.2, w.z1 + WARD_STEP_RUN / 2);
-      mesh.rotation.x = Math.atan2(rise, WARD_STEP_RUN);
+      const z0 = w.z1;
+      const z1 = w.z1 + WARD_STEP_RUN;
+      const base = padY - 0.4;
+      const v: number[] = [];
+      const quad = (
+        p0: [number, number, number],
+        p1: [number, number, number],
+        p2: [number, number, number],
+        p3: [number, number, number],
+      ): void => {
+        v.push(...p0, ...p1, ...p2, ...p0, ...p2, ...p3);
+      };
+      // top (the ramp: w.h at the terrace edge down to padY at the run's end)
+      quad([cut.x0, w.h, z0], [cut.x1, w.h, z0], [cut.x1, padY, z1], [cut.x0, padY, z1]);
+      for (const [sx, dir] of [
+        [cut.x0, -1],
+        [cut.x1, 1],
+      ] as const) {
+        const side: [number, number, number][] = [
+          [sx, w.h, z0],
+          [sx, base, z0],
+          [sx, base, z1],
+          [sx, padY, z1],
+        ];
+        if (dir < 0) quad(side[0], side[1], side[2], side[3]);
+        else quad(side[3], side[2], side[1], side[0]);
+      }
+      quad([cut.x0, w.h, z0], [cut.x0, base, z0], [cut.x1, base, z0], [cut.x1, w.h, z0]);
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(v), 3));
+      geo.computeVertexNormals();
+      const mesh = new THREE.Mesh(geo, wedgeMat);
       mesh.castShadow = true;
       mesh.receiveShadow = true;
       group.add(mesh);
@@ -500,8 +514,8 @@ export function buildCastleFeatures(): CastleFeaturesView {
     put('hexrTowerA', { x: kx - 3.4, y: wardY + 17.5, z: kz - 2.8, rot: 0.4, s: 4.6 });
     put('hexrTowerA', { x: kx + 3.4, y: wardY + 19.5, z: kz + 2.8, rot: 2.2, s: 4.6 });
     put('hexrTowerA', { x: kx, y: wardY + 26.5, z: kz, rot: 1.1, s: 5.4 });
-    slab(kx - 3.4, kz - 2.8, 3.6, 3.6, wardY + 18.2, 2.4, slabMat);
-    slab(kx + 3.4, kz + 2.8, 3.6, 3.6, wardY + 20.2, 2.4, slabMat);
+    slab(kx - 3.4, kz - 2.8, 3.6, 3.6, wardY + 18.2, 2.4, stone(3.6, 2.4));
+    slab(kx + 3.4, kz + 2.8, 3.6, 3.6, wardY + 20.2, 2.4, stone(3.6, 2.4));
     put('kcasBannerRedTriple', { x: kx, y: wardY + 38.5, z: kz + 1.2, rot: Math.PI, s: 1.6 });
   }
 

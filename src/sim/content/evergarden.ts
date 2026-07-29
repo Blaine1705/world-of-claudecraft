@@ -13,7 +13,7 @@
 // fountain live in render/garden_features.ts (the greatTrees records below
 // give the sim its solid trunk colliders).
 
-import { DAWNHOLD_BUILDINGS } from '../dawnhold_layout';
+import { DAWNHOLD_BUILDINGS, DAWNHOLD_COURT_STATUE } from '../dawnhold_layout';
 import type {
   CampDef,
   GroundObjectDef,
@@ -83,11 +83,16 @@ export const EVERGARDEN_ROADS: { x: number; z: number }[][] = [
     { x: 360, z: 936 },
   ], // Hedgewick -> the Parterre Walk -> dead-aligned with the entrance arch
   [
+    // Runs DOWN THE OUTSIDE of Dawnhold's east curtain to the main gate.
+    // The pre-castle line cut the wall at (292, 867), a solid stretch, and
+    // then ran on inside the bailey: the road reached the gate from behind
+    // instead of arriving at it.
     { x: 320, z: 810 },
     { x: 298, z: 852 },
-    { x: 290, z: 872 },
-    { x: 288, z: 887 },
-  ], // Hedgewick -> the Rose Wilds -> Dawnhold's gate
+    { x: 297, z: 872 },
+    { x: 296, z: 884 },
+    { x: 294, z: 887 },
+  ], // Hedgewick -> the Rose Wilds -> Dawnhold's main gate
   [
     // skirts SOUTH around the bluff dip by the pond inlet: the old straight
     // line ran down a steep bank; these waypoints hold the flat shelf
@@ -548,7 +553,9 @@ export const EVERGARDEN_CAMPS: CampDef[] = [
   { mobId: 'topiary_stag', center: { x: 364, z: 898 }, radius: 10, count: 3 },
   { mobId: 'topiary_stag', center: { x: 326, z: 1146 }, radius: 10, count: 3 },
   // the castle pack prowls the gate lawn outside Dawnhold's east wall
-  { mobId: 'topiary_wolf', center: { x: 294, z: 906 }, radius: 10, count: 3 },
+  // (center + radius keep every spawn clear of the wall face at x 293.5,
+  // so no wolf ever spawns inside the bailey)
+  { mobId: 'topiary_wolf', center: { x: 302, z: 898 }, radius: 6, count: 3 },
   { mobId: 'topiary_wolf', center: { x: 418, z: 1124 }, radius: 10, count: 3 },
   { mobId: 'hedge_gnome', center: { x: 268, z: 1002 }, radius: 10, count: 3 },
   { mobId: 'hedge_gnome', center: { x: 456, z: 942 }, radius: 10, count: 2 },
@@ -665,6 +672,17 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
     ...DAWNHOLD_BUILDINGS,
     { key: 'hexCannonballs', x: 276.5, z: 909, scale: 7 },
     { key: 'hexWeaponRack', x: 250, z: 884, rot: 1.2, scale: 9 },
+    // the hedge wolf statue at the centre of the walled flower court off
+    // the south wall (faces the court's south doorway)
+    {
+      key: 'hedgeWolfStatue',
+      x: DAWNHOLD_COURT_STATUE.x,
+      z: DAWNHOLD_COURT_STATUE.z,
+      rot: Math.PI,
+      scale: 3,
+      r: 1.6,
+      h: 3.5,
+    },
     { key: 'hexBarracks', x: 306, z: 860, rot: -0.9, scale: 8, r: 6, h: 13 },
     // Hedgewick's medieval quarter, spread for easy walking: chapel by the
     // churchyard, tavern on the pond road, smithy west, homes and the

@@ -1,11 +1,20 @@
 // Dawnhold Castle's grounds in the Evergarden: a real player enters by
-// the main gate off the Hedgewick road and by the garden postern, climbs
-// the one flight to the wall-walk, and can never walk through the curtain
-// or up the tall watch's sheer riser. The walls are dawnholdLift terrain
-// over the graded pad, so these are movement-kernel walks against the
-// live sim, not geometry assertions.
+// the main gate off the Hedgewick road, by the garden postern into the
+// walled flower court, and by the court's own south doorway; climbs the
+// one flight to the wall-walk; and can never walk through the curtain, the
+// court's garden walls, or up the tall watch's sheer riser. Every wall is
+// dawnholdLift terrain over the graded pad, so these are movement-kernel
+// walks against the live sim, not geometry assertions.
 import { describe, expect, it } from 'vitest';
-import { DAWNHOLD, DAWNHOLD_GATES, dawnholdLift } from '../src/sim/dawnhold_layout';
+import {
+  DAWNHOLD,
+  DAWNHOLD_BEDS,
+  DAWNHOLD_COURT,
+  DAWNHOLD_COURT_GATE,
+  DAWNHOLD_COURT_STATUE,
+  DAWNHOLD_GATES,
+  dawnholdLift,
+} from '../src/sim/dawnhold_layout';
 import { Sim } from '../src/sim/sim';
 import { groundHeight } from '../src/sim/world';
 
@@ -57,10 +66,19 @@ describe('Dawnhold Castle grounds', () => {
       const { sim, p, meta } = makeWalker({ x: 300, z: 887 });
       expect(walkTo(sim, p, meta, { x: 284, z: 887 }), 'main gate').toBe(true);
     }
-    // the garden postern: in from the south lawn
+    // the garden postern: in from the flower court, which the postern now
+    // opens straight into (the court's own south doorway is the way in
+    // from the lawn)
     {
-      const { sim, p, meta } = makeWalker({ x: 262, z: 930 });
-      expect(walkTo(sim, p, meta, { x: 262, z: 916 }), 'garden postern').toBe(true);
+      const pm = (DAWNHOLD_GATES.postern.a0 + DAWNHOLD_GATES.postern.a1) / 2;
+      const { sim, p, meta } = makeWalker({ x: pm, z: 930 });
+      expect(walkTo(sim, p, meta, { x: pm, z: 916 }), 'garden postern').toBe(true);
+    }
+    // and in off the south lawn through the flower court's own doorway
+    {
+      const cm = (DAWNHOLD_COURT_GATE.a0 + DAWNHOLD_COURT_GATE.a1) / 2;
+      const { sim, p, meta } = makeWalker({ x: cm, z: DAWNHOLD_COURT.z1 + 4 });
+      expect(walkTo(sim, p, meta, { x: cm, z: 934 }), 'court doorway').toBe(true);
     }
   });
 
@@ -96,16 +114,40 @@ describe('Dawnhold Castle grounds', () => {
     expect(dawnholdLift(pm, DAWNHOLD.wz1)).toBe(0);
   });
 
-  it('the bailey and both parterre beds sit dead level on the pad', () => {
+  it('the bailey and the flower court sit dead level on the pad', () => {
     for (const [x, z] of [
       [262, 900],
       [258, 899],
       [273, 897],
       [258, 886.6],
       [258, 889.8],
+      // the court floor: both flower fields and the statue's ground
+      [DAWNHOLD_BEDS[0].x, DAWNHOLD_BEDS[0].z],
+      [DAWNHOLD_BEDS[1].x, DAWNHOLD_BEDS[1].z],
+      [DAWNHOLD_COURT_STATUE.x, DAWNHOLD_COURT_STATUE.z],
+      [DAWNHOLD_COURT.x0 + 2, DAWNHOLD_COURT.z1 - 2],
+      [DAWNHOLD_COURT.x1 - 2, DAWNHOLD_COURT.z1 - 2],
     ] as const) {
-      expect(dawnholdLift(x, z)).toBe(0);
-      expect(Math.abs(groundHeight(x, z, SEED) - DAWNHOLD.pad.h)).toBeLessThan(0.05);
+      expect(dawnholdLift(x, z), `lift at (${x},${z})`).toBe(0);
+      expect(
+        Math.abs(groundHeight(x, z, SEED) - DAWNHOLD.pad.h),
+        `level at (${x},${z})`,
+      ).toBeLessThan(0.05);
     }
+  });
+
+  it('the flower court walls refuse a crossing but leave the doorway open', () => {
+    const cm = (DAWNHOLD_COURT_GATE.a0 + DAWNHOLD_COURT_GATE.a1) / 2;
+    // the south wall is sheer either side of its doorway
+    for (const x of [DAWNHOLD_COURT.x0 + 4, DAWNHOLD_COURT.x1 - 4]) {
+      const { sim, p, meta } = makeWalker({ x, z: DAWNHOLD_COURT.z1 + 4 });
+      walkTo(sim, p, meta, { x, z: DAWNHOLD_COURT.z1 - 4 }, 20 * 8);
+      expect(p.pos.z, `court south wall at x ${x}`).toBeGreaterThan(DAWNHOLD_COURT.z1 - 0.4);
+    }
+    // the doorway span itself carries no lift
+    expect(dawnholdLift(cm, DAWNHOLD_COURT.z1)).toBe(0);
+    // and the side walls stand
+    expect(dawnholdLift(DAWNHOLD_COURT.x0, 932)).toBeGreaterThan(0);
+    expect(dawnholdLift(DAWNHOLD_COURT.x1, 932)).toBeGreaterThan(0);
   });
 });

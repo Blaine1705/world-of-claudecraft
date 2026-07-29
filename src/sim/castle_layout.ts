@@ -178,12 +178,11 @@ export const CASTLE_RAMPS: readonly CastleRamp[] = [
   },
 ] as const;
 
-// The ward's two stair cuts through its south retaining edge: bands where
-// the terrace height ramps down to the bailey instead of dropping sheer.
-export const WARD_STEPS = [
-  { x0: 404, x1: 407.5 },
-  { x0: 421, x1: 424.5 },
-] as const;
+// The ward's grand stair: ONE broad cut through the south retaining edge,
+// four of the old flight widths flush side by side (14yd), centered on the
+// keep's door axis so the terrace approach reads as a single processional
+// ramp spanning the keep foundations instead of two narrow side stairs.
+export const WARD_STEPS = [{ x0: 414, x1: 428 }] as const;
 /** the step ramps run from the ward edge z1 down to bailey over this run */
 export const WARD_STEP_RUN = 4;
 

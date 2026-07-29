@@ -11,13 +11,17 @@ import * as THREE from 'three';
 import {
   DAWNHOLD,
   DAWNHOLD_BEDS,
+  DAWNHOLD_COURT,
+  DAWNHOLD_COURT_GATE,
+  DAWNHOLD_COURT_STATUE,
+  DAWNHOLD_FIELD_R,
   DAWNHOLD_GATES,
   DAWNHOLD_RAMPS,
   DAWNHOLD_TOWERS,
 } from '../sim/dawnhold_layout';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
-import { surfaceMat } from './gfx';
+import { castlePavingMat, castleStoneMat } from './castle_stone';
 import { PROP_ASSET_DEFS } from './props';
 
 const DAWNHOLD_KEYS = [
@@ -134,8 +138,9 @@ export function buildDawnholdFeatures(): DawnholdFeaturesView {
     list.push(p);
   };
 
-  const slabMat = surfaceMat({ color: 0x8d8272, roughness: 0.95 });
-  const capMat = surfaceMat({ color: 0x9a8f7c, roughness: 0.9 });
+  // Every raw mass below is coursed stone tiled to its own footprint (the
+  // shared castle_stone surfacing), so a cap slab, a tower core, and the
+  // stair wedge all read as the same masonry at the same course size.
   const slab = (
     cx: number,
     cz: number,
@@ -143,9 +148,12 @@ export function buildDawnholdFeatures(): DawnholdFeaturesView {
     sz: number,
     topY: number,
     thick = 0.36,
-    mat = capMat,
+    mat?: THREE.Material,
   ): void => {
-    const mesh = new THREE.Mesh(new THREE.BoxGeometry(sx, thick, sz), mat);
+    const mesh = new THREE.Mesh(
+      new THREE.BoxGeometry(sx, thick, sz),
+      mat ?? castleStoneMat(sx, sz, { color: 0x9a8f7c, roughness: 0.9 }),
+    );
     mesh.position.set(cx, topY - thick / 2, cz);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
@@ -262,7 +270,7 @@ export function buildDawnholdFeatures(): DawnholdFeaturesView {
     for (const f of faces) put('kcasWall', { x: f.x, y: padY, z: f.z, rot: f.rot, s: shellScale });
     const core = new THREE.Mesh(
       new THREE.BoxGeometry(thw * 2 - 0.4, t.hAbs - padY, thw * 2 - 0.4),
-      slabMat,
+      castleStoneMat(thw * 2 - 0.4, t.hAbs - padY, { color: 0x8d8272 }),
     );
     core.position.set(t.x, padY + (t.hAbs - padY) / 2, t.z);
     core.castShadow = true;
@@ -320,8 +328,7 @@ export function buildDawnholdFeatures(): DawnholdFeaturesView {
   group.add(gateLight);
 
   // ---- the stair flight: a solid wedge pier (lift terrain is invisible) ----
-  const wedgeMat = slabMat.clone();
-  wedgeMat.side = THREE.DoubleSide;
+  const wedgeMat = castleStoneMat(14, 6.5, { color: 0x8d8272, side: THREE.DoubleSide });
   for (const rmp of DAWNHOLD_RAMPS) {
     const baseY = padY - 0.4;
     const pxz = (a: number, b: number): [number, number] => (rmp.axis === 'x' ? [a, b] : [b, a]);
@@ -353,32 +360,99 @@ export function buildDawnholdFeatures(): DawnholdFeaturesView {
     group.add(mesh);
   }
 
-  // ---- the courtyard: a tiled path from the gate arch to the keep door,
-  // benches facing the parterre beds, torch light among the flowers ----
-  for (let px = 262; px <= 288; px += M) {
-    put('kcasFloorLarge', { x: px, y: padY + 0.02, z: gm, rot: 0 });
+  // ---- the bailey: paved wall to wall. This is a garrison parade ground
+  // now, not a lawn, so one flagstone floor spans the whole inner court
+  // (a single textured plane, not a field of kit tiles: the buildings sit
+  // on top of it and the paving reads continuous under them) ----
+  {
+    const fx0 = DAWNHOLD.wx0 + DAWNHOLD.wallTh / 2;
+    const fx1 = DAWNHOLD.wx1 - DAWNHOLD.wallTh / 2;
+    const fz0 = DAWNHOLD.wz0 + DAWNHOLD.wallTh / 2;
+    const fz1 = DAWNHOLD.wz1 - DAWNHOLD.wallTh / 2;
+    const fw = fx1 - fx0;
+    const fd = fz1 - fz0;
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(fw, fd),
+      castlePavingMat(fw, fd, { color: 0xb9b4ab }),
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.set((fx0 + fx1) / 2, padY + 0.03, (fz0 + fz1) / 2);
+    floor.receiveShadow = true;
+    group.add(floor);
+    // a dressed threshold apron inside each gate, where boots land
+    put('kcasFloorLarge', { x: fx1 - M / 2, y: padY + 0.06, z: gm, rot: 0 });
   }
-  for (let pz = 892; pz >= 888; pz -= M) {
-    put('kcasFloorLarge', { x: 258, y: padY + 0.02, z: pz, rot: 0 });
-  }
-  for (const [bi, bed] of DAWNHOLD_BEDS.entries()) {
-    for (const side of [-1, 1] as const) {
-      put('kcasBench', {
-        x: bed.x + side * 7,
-        y: padY,
-        z: bed.z + (bi === 0 ? 1.5 : -1.5),
-        rot: side === -1 ? Math.PI / 2 : -Math.PI / 2,
-        s: 1.3,
-      });
+
+  // ---- the walled flower court off the south wall: three low garden walls
+  // (solid masses matching the lift exactly, since lift terrain draws
+  // nothing itself), a coping course along every top, and a pillared
+  // doorway gap facing the lawn ----
+  {
+    const C = DAWNHOLD_COURT;
+    const cz0 = DAWNHOLD.wz1; // the curtain closes the court's north side
+    const wallTop = C.hAbs;
+    const wallH = wallTop - padY + 0.4; // sunk a little so no seam shows
+    const stoneCourt = castleStoneMat(C.x1 - C.x0, wallH, { color: 0x93917f });
+    const runWall = (cx: number, cz: number, sx: number, sz: number): void => {
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(sx, wallH, sz), stoneCourt);
+      mesh.position.set(cx, wallTop - wallH / 2, cz);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      group.add(mesh);
+    };
+    // the two side walls, running south off the curtain
+    for (const line of [C.x0, C.x1]) {
+      runWall(line, (cz0 + C.z1) / 2, C.th, C.z1 - cz0);
     }
-    const bedLight = new THREE.PointLight(0xffe2a8, 3, 12, 2);
-    bedLight.position.set(bed.x, padY + 2.4, bed.z);
-    bedLight.userData.baseIntensity = 3;
-    glowLights.push(bedLight);
-    group.add(bedLight);
+    // the south wall, parted at the doorway
+    for (const [a0, a1] of [
+      [C.x0, DAWNHOLD_COURT_GATE.a0],
+      [DAWNHOLD_COURT_GATE.a1, C.x1],
+    ] as const) {
+      runWall((a0 + a1) / 2, C.z1, a1 - a0, C.th);
+    }
+    // coping along every top, and pillars either side of the doorway
+    for (const line of [C.x0, C.x1]) {
+      slab(line, (cz0 + C.z1) / 2, C.th + 0.3, C.z1 - cz0, wallTop + 0.16, 0.22);
+    }
+    for (const [a0, a1] of [
+      [C.x0, DAWNHOLD_COURT_GATE.a0],
+      [DAWNHOLD_COURT_GATE.a1, C.x1],
+    ] as const) {
+      slab((a0 + a1) / 2, C.z1, a1 - a0, C.th + 0.3, wallTop + 0.16, 0.22);
+    }
+    for (const gx of [DAWNHOLD_COURT_GATE.a0, DAWNHOLD_COURT_GATE.a1]) {
+      put('kcasWallPillar', { x: gx, y: padY, z: C.z1, rot: 0, s: 0.9 });
+    }
+    // the court's own dressing: benches on the cross axis facing the wolf,
+    // a torch at each inner corner, and warm light over the two fields
+    for (const f of DAWNHOLD_BEDS) {
+      for (const side of [-1, 1] as const) {
+        put('kcasBench', {
+          x: f.x,
+          y: padY,
+          z: f.z + side * (DAWNHOLD_FIELD_R + 1.4),
+          rot: side === -1 ? 0 : Math.PI,
+          s: 1.3,
+        });
+      }
+      const fieldLight = new THREE.PointLight(0xffe2a8, 3, 12, 2);
+      fieldLight.position.set(f.x, padY + 2.4, f.z);
+      fieldLight.userData.baseIntensity = 3;
+      glowLights.push(fieldLight);
+      group.add(fieldLight);
+    }
+    for (const cx of [C.x0 + 2, C.x1 - 2]) {
+      for (const cz of [cz0 + 3, C.z1 - 2]) {
+        put('kcasTorch', { x: cx, y: padY, z: cz, rot: 0, s: 1.5 });
+      }
+    }
+    const wolfLight = new THREE.PointLight(0xd8f0b0, 2.6, 11, 2);
+    wolfLight.position.set(DAWNHOLD_COURT_STATUE.x, padY + 3, DAWNHOLD_COURT_STATUE.z);
+    wolfLight.userData.baseIntensity = 2.6;
+    glowLights.push(wolfLight);
+    group.add(wolfLight);
   }
-  put('kcasTorch', { x: 250, z: 894, y: padY, rot: 0, s: 1.5 });
-  put('kcasTorch', { x: 284, z: 902, y: padY, rot: 0, s: 1.5 });
 
   // ---- instance every placed piece ----
   const m4 = new THREE.Matrix4();

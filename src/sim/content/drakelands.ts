@@ -90,11 +90,21 @@ export const DRAKELANDS_ROADS: { x: number; z: number }[][] = [
     { x: 404, z: 1900 },
   ], // the Pale Causeway -> the Wyrmgate pass -> Wyrmwatch
   [
+    // Skirts the Last Keep instead of slicing through its north wall and
+    // barbican (the pre-castle line): around the northwest corner, down the
+    // west flank outside the outer work, and on south to the dunes.
     { x: 404, z: 1900 },
-    { x: 370, z: 1970 },
-    { x: 350, z: 2040 },
+    { x: 372, z: 1958 },
+    { x: 352, z: 1974 },
+    { x: 334, z: 1998 },
+    { x: 330, z: 2030 },
+    { x: 332, z: 2064 },
     { x: 330, z: 2100 },
-  ], // Wyrmwatch -> Cinder Dunes
+  ], // Wyrmwatch -> past the Last Keep's gate -> Cinder Dunes
+  [
+    { x: 330, z: 2030 },
+    { x: 342, z: 2029.9 },
+  ], // the keep spur: the road's fork straight into the barbican's outer gate
   [
     { x: 330, z: 2100 },
     { x: 380, z: 2180 },

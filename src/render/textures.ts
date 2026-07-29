@@ -199,6 +199,41 @@ export function stoneTexture(): THREE.CanvasTexture {
   });
 }
 
+/**
+ * Laid paving: regular courses of dressed flagstone with deep mortar
+ * joints, each slab shaded a little differently so a large paved floor
+ * (a castle bailey) reads as stonework rather than a flat grey plane.
+ * Courses are half-offset row to row, the way a mason lays a yard.
+ */
+export function flagstoneTexture(): THREE.CanvasTexture {
+  return makeCanvas(256, (ctx, s) => {
+    const rows = 4;
+    const cols = 4;
+    const h = s / rows;
+    const w = s / cols;
+    ctx.fillStyle = '#4c4a46'; // the mortar bed showing through the joints
+    ctx.fillRect(0, 0, s, s);
+    for (let r = 0; r < rows; r++) {
+      const off = (r % 2) * (w / 2);
+      for (let c = -1; c <= cols; c++) {
+        const x = c * w + off;
+        const y = r * h;
+        const v = 138 + Math.floor(rnd() * 34);
+        ctx.fillStyle = `rgb(${v},${v - 2},${v - 8})`;
+        ctx.fillRect(x + 1.5, y + 1.5, w - 3, h - 3);
+        // a worn highlight along each slab's top edge and grit in the face
+        ctx.fillStyle = `rgba(255,255,255,0.05)`;
+        ctx.fillRect(x + 1.5, y + 1.5, w - 3, 2);
+        for (let g = 0; g < 14; g++) {
+          const gv = v - 18 + Math.floor(rnd() * 36);
+          ctx.fillStyle = `rgba(${gv},${gv},${gv - 4},0.5)`;
+          ctx.fillRect(x + 2 + rnd() * (w - 5), y + 2 + rnd() * (h - 5), 2, 2);
+        }
+      }
+    }
+  });
+}
+
 export function waterNormalish(): THREE.CanvasTexture {
   const tex = makeCanvas(256, (ctx, s) => {
     ctx.fillStyle = '#7f7fff';

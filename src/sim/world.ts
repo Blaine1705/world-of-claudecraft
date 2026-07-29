@@ -34,12 +34,7 @@ import {
   ZONES,
   zoneAt,
 } from './data';
-import {
-  DAWNHOLD_BEDS,
-  dawnholdLift,
-  dawnholdPadTarget,
-  dawnholdPadWeight,
-} from './dawnhold_layout';
+import { dawnholdLift, dawnholdPadTarget, dawnholdPadWeight } from './dawnhold_layout';
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
 import { dungeonFloorLift } from './dungeon_floor';
 import { dawnholdKeepLiftAt, lastKeepLiftAt } from './dungeon_layout';
@@ -1269,9 +1264,10 @@ const bedGroup = (ax: number, az: number, r: number, sats: [number, number][]): 
   ...sats.map(([x, z]) => ({ x, z, r: 3.25, ax, az })),
 ];
 export const GARDEN_BED_PADS: readonly GardenBedPad[] = [
-  // Dawnhold Castle's courtyard parterres (anchors from the castle plan;
-  // the castle pad already levels this ground, so these pads sit flush)
-  ...DAWNHOLD_BEDS.map((b) => ({ x: b.x, z: b.z, r: 5.5, ax: b.x, az: b.z })),
+  // (Dawnhold's own planting is the flower court's procedural fields, which
+  // stand on the castle pad's dead-flat ground and need no pad of their own.
+  // Every entry below is a MODELED bed, mirrored one-to-one against
+  // PARTERRE_PLOTS and the content decorProps by tests/garden_parterre.)
   ...bedGroup(322, 878, 10, [
     [322, 892.8],
     [322, 863.2],

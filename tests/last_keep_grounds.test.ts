@@ -137,15 +137,19 @@ describe('the Last Keep castle grounds', () => {
     }
   });
 
-  it('the ward steps climb the terrace and its edge refuses shortcuts', () => {
-    {
-      const { sim, p, meta } = makeWalker({ x: 405.75, z: 2026 });
-      expect(walkTo(sim, p, meta, { x: 405.75, z: 2014 }), 'ward step').toBe(true);
+  it('the grand ward stair climbs the terrace and the edge refuses shortcuts', () => {
+    // up the processional stair on the keep's door axis, and at both of the
+    // wide cut's flanks (one broad ramp, not two narrow ones)
+    // (targets stop short of the keep door's 2yd walk-in trigger at 2012.3)
+    for (const x of [416, 421, 426]) {
+      const { sim, p, meta } = makeWalker({ x, z: 2026 });
+      expect(walkTo(sim, p, meta, { x, z: 2016 }), `grand stair at x ${x}`).toBe(true);
       expect(p.pos.y, 'on the terrace').toBeGreaterThan(CASTLE.ward.h - 0.4);
     }
+    // off the stair span, the retaining edge still refuses the shortcut
     {
-      const { sim, p, meta } = makeWalker({ x: 413.5, z: 2024 });
-      walkTo(sim, p, meta, { x: 413.5, z: 2012 }, 20 * 8);
+      const { sim, p, meta } = makeWalker({ x: 405, z: 2024 });
+      walkTo(sim, p, meta, { x: 405, z: 2012 }, 20 * 8);
       expect(p.pos.z, 'the retaining edge should stop the walker').toBeGreaterThan(
         CASTLE.ward.z1 + 0.4,
       );
