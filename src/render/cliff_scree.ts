@@ -1,10 +1,8 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
-import { getActiveWorldContent, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
-import { roadDistance, terrainHeight, WATER_LEVEL } from '../sim/world';
+import { SCREE_CELL, screeSinkY, screeSpotAt } from '../sim/scree';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
-import { insideGrassHubExclusion } from './foliage_core';
 import { GFX } from './gfx';
 
 // Cliff scree: boulders scattered over steep slopes and piled at their feet,
@@ -32,20 +30,14 @@ import { GFX } from './gfx';
 const MODEL_DIR = 'models/foliage/';
 const MODEL_URLS = [1, 2, 3].map((i) => `${MODEL_DIR}rock_${i}.glb`);
 
-const CELL = 6.5; // yards between candidate spots
+// Placement tunables and the placement itself live in sim/scree.ts — the
+// single source groundHeight also reads, so the visual rock and the solid
+// rock can never drift apart. Only the presentation grid stays here.
+const CELL = SCREE_CELL; // yards between candidate spots
 const RADIUS = 65; // scatter radius (world units)
 const GRID_W = Math.ceil((RADIUS * 2) / CELL); // slots per axis
 const POOL = GRID_W * GRID_W; // 400 candidate cells, mostly empty
 const PLACE_BUDGET = 60; // re-placements per frame while moving
-const PROBE = 1.5; // relief probe reach
-const SLOPE_MIN = 0.45; // height delta over PROBE where the cliff band starts
-const SLOPE_MAX = 1.6; // past this the face is a sheer smear: rocks would float
-const APRON_ELIGIBLE = 0.12; // minimum local incline for cliff-base rubble
-const APRON_PROBE = 3; // how far uphill the apron looks for its cliff
-const CLIFF_DENSITY = 0.65; // hash acceptance inside the band
-const APRON_DENSITY = 0.4; // sparser rubble below it
-const SINK = 0.15; // fraction of rock height buried in the ground
-const EDGE = 16; // keep-out margin from the world rectangle
 
 export interface CliffScreeView {
   group: THREE.Group;
@@ -106,7 +98,6 @@ function extractRock(gltf: GLTF): RockSource {
 
 interface RockVariant {
   geometry: THREE.BufferGeometry;
-  sinkY: number; // origin offset burying SINK of the rock's height at scale 1
 }
 
 interface BakedRocks {
@@ -136,11 +127,10 @@ function bakeRocks(): BakedRocks | null {
         metalness: 0,
       });
     }
-    rock.geometry.computeBoundingBox();
-    const bb = rock.geometry.boundingBox;
-    const minY = bb ? bb.min.y : 0;
-    const maxY = bb ? bb.max.y : 1;
-    variants.push({ geometry: rock.geometry, sinkY: minY + (maxY - minY) * SINK });
+    // origin sink comes from sim/scree.ts's baked dims (screeSinkY), not a
+    // live bounds measurement: the sim's walkable dome and this mesh must
+    // agree on where the rock sits to the millimetre
+    variants.push({ geometry: rock.geometry });
   }
   if (!material) return null; // unreachable: MODEL_URLS is non-empty
   // the baked float geometry + runtime material are the retained
@@ -163,7 +153,6 @@ export function buildCliffScree(seed: number): CliffScreeView {
   }
 
   const meshes: THREE.InstancedMesh[] = [];
-  const sinks: number[] = [];
   const zero = new THREE.Matrix4().makeScale(0, 0, 0);
   let ready = false;
 
@@ -181,7 +170,6 @@ export function buildCliffScree(seed: number): CliffScreeView {
       im.frustumCulled = false; // pool is centred on the player
       for (let s = 0; s < POOL; s++) im.setMatrixAt(s, zero);
       meshes.push(im);
-      sinks.push(variant.sinkY);
       group.add(im);
     }
     ready = true;
@@ -202,7 +190,7 @@ export function buildCliffScree(seed: number): CliffScreeView {
   const v = new THREE.Vector3();
   const sv = new THREE.Vector3();
 
-  const hash = (i: number, j: number, k: number): number => {
+  const tiltHash = (i: number, j: number, k: number): number => {
     let h = (i * 374761393 + j * 668265263 + k * 2246822519) | 0;
     h = Math.imul(h ^ (h >>> 13), 1274126177);
     return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
@@ -211,63 +199,30 @@ export function buildCliffScree(seed: number): CliffScreeView {
   function placeSlot(slot: number, ci: number, cj: number): void {
     // clear every variant's slot first; at most one gets a rock back below
     for (const im of meshes) im.setMatrixAt(slot, zero);
-    const r1 = hash(ci, cj, 1);
-    // density gate up front: the cheapest reject, and APRON_DENSITY sits
-    // under CLIFF_DENSITY so a cell that fails here can never place at all
-    if (r1 >= CLIFF_DENSITY) return;
-    const x = ci * CELL + (hash(ci, cj, 2) - 0.5) * CELL * 0.9;
-    const z = cj * CELL + (hash(ci, cj, 3) - 0.5) * CELL * 0.9;
-    if (Math.abs(x) > WORLD_MAX_X - EDGE || z < WORLD_MIN_Z + EDGE || z > WORLD_MAX_Z - EDGE) {
-      return;
-    }
-    const h = terrainHeight(x, z, seed);
-    if (h < WATER_LEVEL + 0.5) return; // shorelines keep their own dressing
-    // local relief: max height delta over four short probes, the same signal
-    // the terrain shader's slope treatment keys from
-    const hE = terrainHeight(x + PROBE, z, seed);
-    const hW = terrainHeight(x - PROBE, z, seed);
-    const hS = terrainHeight(x, z + PROBE, seed);
-    const hN = terrainHeight(x, z - PROBE, seed);
-    const slope = Math.max(Math.abs(hE - h), Math.abs(hW - h), Math.abs(hS - h), Math.abs(hN - h));
-    if (slope > SLOPE_MAX) return;
-    // uphill direction from the probe stencil; doubles as the lean direction
-    const gx = hE - hW;
-    const gz = hS - hN;
-    const glen = Math.hypot(gx, gz);
-    let apron = false;
-    if (slope < SLOPE_MIN) {
-      // Scree apron: a moderate incline directly below a cliff collects its
-      // fallen rock. Probe uphill and require a genuine band there; flats
-      // and gentle meadows (no meaningful gradient) never qualify.
-      if (slope < APRON_ELIGIBLE || glen < 1e-4 || r1 >= APRON_DENSITY) return;
-      const ux = x + (gx / glen) * APRON_PROBE;
-      const uz = z + (gz / glen) * APRON_PROBE;
-      const uh = terrainHeight(ux, uz, seed);
-      const uSlope = Math.max(
-        Math.abs(terrainHeight(ux + PROBE, uz, seed) - uh),
-        Math.abs(terrainHeight(ux - PROBE, uz, seed) - uh),
-        Math.abs(terrainHeight(ux, uz + PROBE, seed) - uh),
-        Math.abs(terrainHeight(ux, uz - PROBE, seed) - uh),
-      );
-      if (uSlope < SLOPE_MIN || uSlope > SLOPE_MAX) return;
-      apron = true;
-    }
-    if (roadDistance(x, z) < 3) return;
-    if (insideGrassHubExclusion(getActiveWorldContent().zones, x, z)) return;
-    const vi = Math.min(meshes.length - 1, Math.floor(hash(ci, cj, 4) * meshes.length));
-    // apron rubble runs smaller; the band itself holds the boulders
-    const s = 0.5 + hash(ci, cj, 5) * (apron ? 0.7 : 1.3);
-    qYaw.setFromAxisAngle(up, hash(ci, cj, 6) * Math.PI * 2);
+    // Placement is the sim's: screeSpotAt is the shared single source that
+    // also feeds groundHeight's walkable dome, so the rock you see is
+    // exactly the rock that blocks you and that you can jump onto.
+    const spot = screeSpotAt(seed, ci, cj);
+    if (!spot) return;
+    const vi = Math.min(meshes.length - 1, spot.variant);
+    const s = spot.scale;
+    qYaw.setFromAxisAngle(up, spot.yaw);
+    const glen = Math.hypot(spot.gx, spot.gz);
     if (glen > 1e-4) {
       // slight settle-lean downhill about the cross-slope axis, stronger on
-      // steeper ground; the sink hides the lifted edge
-      axis.set(-gz / glen, 0, gx / glen);
-      qTilt.setFromAxisAngle(axis, (0.06 + hash(ci, cj, 7) * 0.22) * Math.min(1, slope * 1.5));
+      // steeper ground; the sink hides the lifted edge. Presentation only:
+      // the walkable dome stays radially symmetric, and at these angles the
+      // visual crown moves less than the dome's flat-crown tolerance.
+      axis.set(-spot.gz / glen, 0, spot.gx / glen);
+      qTilt.setFromAxisAngle(
+        axis,
+        (0.06 + tiltHash(ci, cj, 7) * 0.22) * Math.min(1, spot.slope * 1.5),
+      );
       q.multiplyQuaternions(qTilt, qYaw);
     } else {
       q.copy(qYaw);
     }
-    m.compose(v.set(x, h - s * sinks[vi], z), q, sv.set(s, s, s));
+    m.compose(v.set(spot.x, spot.baseY - s * screeSinkY(vi), spot.z), q, sv.set(s, s, s));
     meshes[vi].setMatrixAt(slot, m);
   }
 

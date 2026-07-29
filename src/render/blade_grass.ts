@@ -23,12 +23,15 @@ import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 // budgeted per frame; a sprint briefly thins the leading edge and backfills
 // within a second.
 
-const CELL = 0.65; // yards between clusters
-const RADIUS = 24; // carpet radius (world units)
+// Denser and finer than the first cut (blades were reading as sparse
+// standalone clumps): tighter cells, smaller blades, and a wider ring so
+// the carpet blends into the card tufts instead of ending at your feet.
+const CELL = 0.52; // yards between clusters
+const RADIUS = 34; // carpet radius (world units)
 const GRID_W = Math.ceil((RADIUS * 2) / CELL); // slots per axis
 const POOL = GRID_W * GRID_W;
-const PLACE_BUDGET = 220; // re-placements per frame while moving
-const FADE_START = 0.78; // of RADIUS: outer ring shrinks blades to nothing
+const PLACE_BUDGET = 460; // re-placements per frame while moving
+const FADE_START = 0.8; // of RADIUS: outer ring shrinks blades to nothing
 
 export interface BladeGrassView {
   group: THREE.Group;
@@ -185,7 +188,9 @@ export function buildBladeGrass(seed: number): BladeGrassView {
       // bare between them (squared for hard patch edges)
       const lush = groundLushnessAt(x, z, seed);
       const biomeDensity = GRASS_BIOME_DENSITY[zoneBiomeAt(x, z)] ?? 1;
-      ok = r1 < (0.2 + 1.9 * lush * lush) * 0.9 * Math.min(biomeDensity, 1.2);
+      // higher floor + gain than the tufts: coverage is the carpet's job,
+      // the patch structure just modulates it
+      ok = r1 < (0.34 + 1.7 * lush * lush) * 1.05 * Math.min(biomeDensity, 1.2);
       if (ok) ok = roadDistance(x, z) > 2.4;
       if (ok) ok = !isInSowfieldShell(x, z);
       if (ok) ok = !insideGrassHubExclusion(getActiveWorldContent().zones, x, z);
@@ -196,8 +201,10 @@ export function buildBladeGrass(seed: number): BladeGrassView {
         // shader fades its relief (planar smear territory)
         if (ok) ok = Math.abs(terrainHeight(x + 0.9, z, seed) - h) < 0.55;
         if (ok) {
-          const lushHere = 0.55 + lush * 0.75;
-          const s = (0.42 + hash(ci, cj, 3) * 0.5) * lushHere;
+          // smaller blades at higher count: ground COVER, not standalone
+          // clumps — the meadow reads as one grown surface
+          const lushHere = 0.5 + lush * 0.6;
+          const s = (0.34 + hash(ci, cj, 3) * 0.4) * lushHere;
           q.setFromAxisAngle(up, r1 * 12.9);
           m.compose(v.set(x, h - 0.02, z), q, sv.set(s, s * (0.85 + lush * 0.5), s));
           im.setMatrixAt(slot, m);
