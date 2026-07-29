@@ -266,17 +266,31 @@ For off-box safety, sync the directory to S3 occasionally:
     This window exists only between a client release and the server deploy, so
     close it by deploying the server as soon as the clients are staged. (An old
     server answers a command it does not know by logging a protocol anomaly to
-    the bot detector and spending a rate-limit token; the professions tuning
-    release adds exactly one command, dev-gated with no shipped sender.)
+    the bot detector and spending a rate-limit token. The professions tuning
+    packet itself adds exactly one command, dev-gated with no shipped sender,
+    but the v0.32.0 expansion it merged with adds eleven more with real
+    shipped senders: the mount, rift forge, and unstuck families. On this leg
+    an ordinary player pressing the mount key or using unstuck spends
+    rate-limit tokens and logs anomalies until the server deploys, one more
+    reason to keep the binary-to-server gap short.)
   Release-specific caveat for the professions tuning deploy: the guards above
   describe bundles built from this release onward. The bundle DEPLOYED TODAY
   predates them, and its trade window throws while rendering an offer that
   stages one of this release's new item ids (the fine-grade materials and the
   new rods), freezing that trade panel for the stale session until the page
-  reloads; the sibling loot-window throw stays unreachable as long as those
-  new ids remain gathering, recipe, vendor, and delve-shop content only, out
-  of every mob and chest loot table, so keep them out until clients have
-  rolled. Two more deployed-bundle arms need no loot table at all, because the
+  reloads. The sibling loot-window throw is unreachable through the PACKET's
+  ids as long as they remain gathering, recipe, vendor, and delve-shop
+  content only, out of every mob and chest loot table, so keep them out
+  until clients have rolled; it is NOT unreachable for the merged release as
+  a whole, because the v0.32.0 expansion put four mount reins into the
+  heroic loot of four bosses the deployed bundle already knows (Morthen,
+  Vael, Ysolei, Korzul), so a solo or free-for-all heroic clear that drops
+  one freezes a stale session's corpse loot window the same way. The odds
+  are the mount drop rates (0.5 and 0.1 percent), the party need/greed path
+  is already guarded at the base, and the exception set is pinned to exactly
+  those four ids by the deploy-window test; this residual arm is one more
+  input to the surfaced forced-refresh-at-deploy question. Two more
+  deployed-bundle arms need no loot table at all, because the
   fine grades are minted by HARVESTING with an outclassing tool: a stale tab
   that gathers one sees it land in an INVISIBLE bag cell (and bank cell after
   a deposit) that still consumes capacity, and the profession chat line names

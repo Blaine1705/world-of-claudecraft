@@ -350,14 +350,31 @@ describe('bags_window: unknown-id stacks stay visible (stale-client guard, R34)'
     expect(body).toContain("t('itemUi.bags.unknownItemAria', {");
     expect(body).toContain('id: s.itemId');
     expect(body).toContain("t('itemUi.bags.unknownItem')");
-    // No CLICK action (use / sell / equip all need a def): aria-disabled and
-    // no click listener. The DRAG source stays live, because a move works on
-    // indices alone; both drag arms and the touch drop's bag-cell move are
-    // pinned so the capability cannot silently vanish.
-    expect(body).toContain("row.setAttribute('aria-disabled', 'true')");
-    expect(body).not.toContain("addEventListener('click'");
+    // Exactly ONE click action, the def-free bank deposit, and only while
+    // the bank is open (bankDeposit is index-based like the move, so the
+    // withdraw the guard kept live is not a one-way trip); outside the bank
+    // the cell stays a focusable no-op and aria-disabled stays honest. The
+    // def-requiring action ladder (runBagAction) is still never wired. The
+    // DRAG source stays live, because a move works on indices alone; both
+    // drag arms and the touch drop's bag-cell move are pinned so the
+    // capability cannot silently vanish.
+    expect(body).toContain('const canDeposit = this.bagMode().bankDeposit');
+    expect(body).toContain("if (!canDeposit) row.setAttribute('aria-disabled', 'true')");
+    expect(body).toContain('if (canDeposit) {');
+    expect(body).toContain('this.deps.world().bankDeposit(index)');
+    expect(body).toContain('this.showDepositQuantityPrompt(index, s,');
+    // The one listener sits INSIDE the canDeposit arm: no second click path.
+    const clickArms = body.split("addEventListener('click'").length - 1;
+    expect(clickArms).toBe(1);
+    expect(body.indexOf("addEventListener('click'")).toBeGreaterThan(
+      body.indexOf('if (canDeposit) {'),
+    );
     expect(body).not.toContain('runBagAction');
     expect(body).not.toContain('onclick');
+    // The def-free corner glyph and its aria flag survive the missing def: a
+    // bound or enchanted copy keeps its marker in both channels.
+    expect(body).toContain('bagInstanceGlyphKind(s.instance)');
+    expect(body).toContain('t(BAG_GLYPH_ARIA_KEYS[glyphKind], {');
     expect(body).toContain('row.draggable = !this.deps.tradeOpen() && !this.deps.vendorOpen()');
     expect(body).toContain("row.addEventListener('dragstart'");
     expect(body).toContain("row.addEventListener('dragend'");

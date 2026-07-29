@@ -111,6 +111,7 @@ export interface Config {
   // keep forever, and the read is deliberately UNTRIMMED, so a whitespace-only
   // value falls to 0, the SAFE side for a destructive delete (keep, never prune).
   readonly dailyRewardEventsRetentionDays: number;
+  readonly unstuckReportRetentionDays: number;
   readonly onlineSamplesRetentionDays: number;
   readonly sitePresenceRetentionDays: number;
   // Play sessions older than this fold into the lifetime rollups and are deleted;
@@ -343,6 +344,7 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     githubRepo: env.GITHUB_REPO ?? DEFAULT_GITHUB_REPO,
     githubToken: env.GITHUB_TOKEN ?? DEFAULT_GITHUB_TOKEN,
     chatLogRetentionDays: numberOr(env.CHAT_LOG_RETENTION_DAYS, DEFAULT_CHAT_LOG_RETENTION_DAYS),
+    unstuckReportRetentionDays: numberOr(env.UNSTUCK_REPORT_RETENTION_DAYS, 90),
     perfReportRetentionDays: numberOr(
       env.PERF_REPORT_RETENTION_DAYS,
       DEFAULT_PERF_REPORT_RETENTION_DAYS,

@@ -2,22 +2,35 @@
 // R34). The bundle deployed at the merge base (9d7a1a021) predates the
 // unknown-item guards and still THROWS in its corpse/chest loot popup on an
 // item id it cannot resolve. The runbook (DEPLOY.md, "Client/server deploy
-// order for content releases") therefore requires every item id this release
-// adds to stay out of every loot-container table until clients have rolled;
-// this file is what makes that instruction survive a parallel content PR
-// during the deploy window, instead of living only as a runbook sentence.
+// order for content releases") requires every item id THIS PACKET adds to
+// stay out of every loot-container table until clients have rolled; this
+// file is what makes that instruction survive a parallel content PR during
+// the deploy window, instead of living only as a runbook sentence.
+//
+// The v0.32.0 merge narrowed what this file can promise. The expansion
+// itself put four mount reins into HEROIC_BOSS_LOOT on bosses that exist at
+// the deployed base, so the loot-popup throw is NOT unreachable for the
+// merged branch as a whole: a solo or FFA heroic clear of those four bosses
+// can hand a stale bundle an id it cannot resolve. That residual arm is the
+// release's own, recorded in DEPLOY.md beside the surfaced forced-refresh
+// question; the exception arm below pins it to EXACTLY those four ids so a
+// fifth mount or any packet id entering heroic loot still reds here.
 //
 // The pin is deliberately RELEASE-SCOPED: once the deploy window closes (the
 // maintainer's call, after clients roll), the ids may enter loot tables and
 // this file can be deleted whole.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { DUNGEONS, ITEMS, MOBS } from '../src/sim/data';
 
-// Every item id new since the deployed release, measured by diffing the
-// content table keys against 9d7a1a021 (the fine-grade materials plus the
-// two new rods). A rename in content breaks the existence arm loudly rather
-// than letting the sweep go vacuous.
+// Every item id THIS PACKET adds relative to the deployed release, measured
+// by diffing the content table keys against 9d7a1a021 (the fine-grade
+// materials plus the two new rods). The v0.32.0 expansion's own ~50 new ids
+// are deliberately NOT in this list: they are the release's to manage, and
+// its four heroic reins are pinned as the named exception below. A rename in
+// content breaks the existence arm loudly rather than letting the sweep go
+// vacuous.
 const NEW_RELEASE_ITEM_IDS = [
   'fine_ashwood_log',
   'fine_copper_ore',
@@ -55,15 +68,39 @@ describe('new release item ids stay out of loot containers (deploy window)', () 
     }
   });
 
-  it('keeps every new id out of every mob and dungeon loot table', () => {
+  it('keeps every new id out of every mob, dungeon, and heroic loot table', () => {
     const mobLoot = collectItemIds(Object.values(MOBS), []);
     const dungeonLoot = collectItemIds(Object.values(DUNGEONS), []);
-    // Non-vacuity: the walk must actually be reading loot tables.
+    // HEROIC_BOSS_LOOT is NOT reachable from MOBS/DUNGEONS (loot_roll.ts
+    // reads it off the content module directly), which is exactly how the
+    // expansion's reins slipped past the first version of this sweep.
+    const heroicLoot = collectItemIds(Object.values(HEROIC_BOSS_LOOT), []);
+    // Non-vacuity: the walks must actually be reading loot tables.
     expect(mobLoot.length).toBeGreaterThan(50);
-    const all = new Set([...mobLoot, ...dungeonLoot]);
+    expect(heroicLoot.length).toBeGreaterThan(20);
+    const all = new Set([...mobLoot, ...dungeonLoot, ...heroicLoot]);
     for (const id of NEW_RELEASE_ITEM_IDS) {
       expect(all.has(id), `${id} must stay out of mob/dungeon loot until clients roll`).toBe(false);
     }
+  });
+
+  it('pins the release reins as the ONLY deploy-window ids in heroic loot', () => {
+    // The recorded residual arm (see the file banner): the expansion shipped
+    // exactly these four reins into heroic boss loot on deployed-base bosses.
+    // Pinning the exact set keeps the exception from growing silently: a
+    // fifth mount, a rift id, or a packet id landing in HEROIC_BOSS_LOOT
+    // during the window fails the set equality here or the sweep above.
+    const heroicMountIds = [
+      ...new Set(
+        collectItemIds(Object.values(HEROIC_BOSS_LOOT), []).filter((id) => id.startsWith('reins_')),
+      ),
+    ].sort();
+    expect(heroicMountIds).toEqual([
+      'reins_grag_bear',
+      'reins_shadowjump_toad',
+      'reins_stalkglider_snail',
+      'reins_stormfeather_griffin',
+    ]);
   });
 
   it('keeps every new id out of the delve chest feeders', () => {

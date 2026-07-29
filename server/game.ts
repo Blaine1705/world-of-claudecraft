@@ -5876,7 +5876,7 @@ export class GameServer {
           ents.push(auraChanged ? cache.liteAuraJson : cache.liteJson);
         }
         // forget entities that left interest, so a re-entry sends identity again
-        for (const [id] of session.sentEnts) {
+        for (const id of session.sentEnts.keys()) {
           if (!present.has(id)) session.sentEnts.delete(id);
         }
         const selfStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
@@ -6370,11 +6370,6 @@ export class GameServer {
     // charge counter moves only on a harvest that actually spends one, so this
     // is a cheap diff rather than a per-tick churn.
     maybe('tslot', this.sim.toolEffectSlotsFor(anchorSession.pid));
-    // The owned mount collection (IWorldMounts.ownedMounts): the horse plus
-    // every mount whose reins item sits in bags or bank. A handful of short
-    // strings whose serialized form only changes on a loot/bank move, so the
-    // per-tick diff is negligible. Wire key `mntOwn`.
-    maybe('mntOwn', this.sim.ownedMountsFor(anchorSession.pid));
     // Riding skill: persisted, so the client knows whether to show the riding
     // trainer UI without waiting on a mount/select command to fail. Wire key
     // `mntRtd`; delta-guarded, only changes once (false to true, never back).
@@ -6404,6 +6399,14 @@ export class GameServer {
       session.lastWireRev = meta.wireRev;
       maybe('inv', meta.inventory);
       maybe('bags', meta.bags);
+      // The owned mount collection (IWorldMounts.ownedMounts): the horse plus
+      // every mount whose reins item sits in bags or bank. It DERIVES from
+      // the two heavy-gated fields above (a full bag AND bank walk with an
+      // ITEMS lookup per slot plus two allocations, per viewer per pass), so
+      // it rides the same gate: every input change marks the session heavy
+      // dirty or bumps wireRev, and the staggered refresh covers the rest.
+      // Wire key `mntOwn`.
+      maybe('mntOwn', this.sim.ownedMountsFor(anchorSession.pid));
       maybe('buyback', meta.vendorBuyback);
       maybe('equip', meta.equipment);
       maybe('einst', meta.equipmentInstance);

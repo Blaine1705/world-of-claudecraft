@@ -307,7 +307,7 @@ import {
 import { readStaticSfxSnapshot, type StaticSfxSnapshot } from './static_sfx';
 import { stopSteamMirror } from './steam/mirror';
 import { passesTurnstile } from './turnstile';
-import { pruneUnstuckReports, UNSTUCK_REPORT_RETENTION_DAYS } from './unstuck_db';
+import { pruneUnstuckReportsBatch } from './unstuck_db';
 import { stopUnstuckRecords, UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS } from './unstuck_records';
 import { MAX_ASSET_BYTES } from './user_assets';
 import {
@@ -2908,11 +2908,6 @@ export async function startServer(): Promise<http.Server> {
   }
   const orphans = await closeOrphanSessions();
   if (orphans > 0) console.log(`closed ${orphans} orphaned play session(s) from a previous run`);
-  const prunedUnstuckReports = await pruneUnstuckReports(pool);
-  if (prunedUnstuckReports > 0)
-    console.log(
-      `pruned ${prunedUnstuckReports} unstuck report row(s) older than ${UNSTUCK_REPORT_RETENTION_DAYS} days`,
-    );
   await pruneApplePendingLogins(pool);
   await game.loadMarket();
   await game.loadMail();
@@ -2924,9 +2919,6 @@ export async function startServer(): Promise<http.Server> {
     .then((count) => recordSitePresenceSample(count))
     .catch((err) => console.error('site presence sample failed:', err));
   setInterval(() => {
-    void pruneUnstuckReports(pool).catch((err) =>
-      console.error('unstuck report prune failed:', err),
-    );
     void pruneExpiredOAuthGrants(pool).catch((err) =>
       console.error('oauth grant prune failed:', err),
     );
@@ -3127,6 +3119,13 @@ export async function startServer(): Promise<http.Server> {
         name: 'account_ip_associations',
         pruneBatch: (n) =>
           pruneAccountIpAssociationsBatch(pool, config.accountIpAssociationRetentionDays, n),
+      },
+      {
+        // The unstuck telemetry table (v0.32.0). It shipped as a boot-blocking
+        // one-shot plus a bare interval, the exact shape the sweep exists to
+        // retire; it rides the shared budget and batch size like every sibling.
+        name: 'unstuck_reports',
+        pruneBatch: (n) => pruneUnstuckReportsBatch(pool, config.unstuckReportRetentionDays, n),
       },
     ],
     // The fold precondition makes sample pruning lossless; skip the whole group

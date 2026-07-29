@@ -83,7 +83,16 @@ describe('UNSTUCK_SCHEMA', () => {
       /outcome IN \('cancelled', 'failed'\)[\s\S]*destination_raw_x IS NULL/,
     );
     expect(UNSTUCK_SCHEMA).toContain('unstuck_reports_created');
-    expect(UNSTUCK_SCHEMA.match(/CREATE INDEX IF NOT EXISTS/g)).toHaveLength(4);
+    // Six since the v0.32.0 merge: the release's four plus the two partial
+    // FK indexes (character_id, account_id) that keep every character or
+    // account delete's ON DELETE SET NULL off a whole-table seq scan
+    // (chat_logs_character is the precedent).
+    expect(UNSTUCK_SCHEMA).toContain('unstuck_reports_character');
+    expect(UNSTUCK_SCHEMA).toContain('unstuck_reports_account');
+    expect(UNSTUCK_SCHEMA).toMatch(
+      /unstuck_reports\(character_id\) WHERE character_id IS NOT NULL/,
+    );
+    expect(UNSTUCK_SCHEMA.match(/CREATE INDEX IF NOT EXISTS/g)).toHaveLength(6);
     expect(UNSTUCK_SCHEMA).not.toMatch(/(?:^|;)\s*(?:DROP|TRUNCATE|DELETE\s+FROM|UPDATE)\b/i);
   });
 

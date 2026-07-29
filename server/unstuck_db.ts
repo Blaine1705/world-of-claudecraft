@@ -85,6 +85,14 @@ CREATE INDEX IF NOT EXISTS unstuck_reports_realm_area_local
   );
 CREATE INDEX IF NOT EXISTS unstuck_reports_created
   ON unstuck_reports(created_at ASC, id ASC);
+-- The two nullable FK columns: every player-triggerable character delete
+-- (and account delete) applies ON DELETE SET NULL, which without these
+-- seq-scans the whole telemetry table per deletion. chat_logs_character is
+-- the in-repo precedent.
+CREATE INDEX IF NOT EXISTS unstuck_reports_character
+  ON unstuck_reports(character_id) WHERE character_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS unstuck_reports_account
+  ON unstuck_reports(account_id) WHERE account_id IS NOT NULL;
 `;
 
 export const UNSTUCK_REPORT_MAX_DAYS = 90;
@@ -459,6 +467,39 @@ export async function pruneUnstuckReports(pool: Pool): Promise<number> {
     }
     client.release(releaseError);
   }
+}
+
+/**
+ * One bounded retention delete, the shared-sweep primitive shape
+ * (pruneChatLogsBatch contract): 0 or negative days keeps forever, a
+ * fractional value clamps to at least one day, and the caller (the daily
+ * retention sweep in server/main.ts) owns cadence, budget, and batching, so
+ * this deliberately carries no advisory lock and no internal loop. The
+ * whole-backlog pruneUnstuckReports above stays for operator tooling; boot
+ * and the sweep call THIS.
+ */
+export async function pruneUnstuckReportsBatch(
+  pool: Pool,
+  retentionDays: number,
+  batchSize: number,
+): Promise<number> {
+  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
+  const days = Math.max(1, Math.floor(retentionDays));
+  const res = await pool.query(
+    `WITH expired AS (
+       SELECT id
+       FROM unstuck_reports
+       WHERE created_at < now() - ($1::int * INTERVAL '1 day')
+       ORDER BY created_at ASC, id ASC
+       LIMIT $2
+       FOR UPDATE SKIP LOCKED
+     )
+     DELETE FROM unstuck_reports AS r
+     USING expired
+     WHERE r.id = expired.id`,
+    [days, Math.max(1, Math.floor(batchSize))],
+  );
+  return res.rowCount ?? 0;
 }
 
 function reportFromRow(row: RawUnstuckReportRow): UnstuckReportRow {

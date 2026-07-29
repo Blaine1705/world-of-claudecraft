@@ -809,37 +809,86 @@ export class BagsWindow {
   // An occupied square whose def this bundle cannot resolve (stale-client
   // guard, R34): inventory is server truth, so an id minted by content this
   // bundle predates still holds a real, counted slot. The cell renders the
-  // fallback icon, its count badge, and the raw id as its label. It exposes
-  // no CLICK action (use / sell / equip all need a def, so aria-disabled is
-  // honest, the backpack socket's focusable no-op precedent), but it keeps
-  // the two def-free capabilities: it is a drop target in the pristine view,
-  // and it is a DRAG SOURCE, because moveInventoryItem acts on indices alone
-  // (the same argument that keeps the bank's withdraw live), so the player
-  // can still re-organize around and with the stack. Shift-click chat
-  // linking is not wired because it would be a silent no-op anyway: the
-  // send path (insertItemLink) refuses an id with no resolvable display
-  // name. (The "[?]" a stale client can see in chat is the RECEIVER's
-  // degradation of a link a current client sent; nothing here affects it.)
-  // Everything acts again once the client updates.
+  // fallback icon, its count badge, the raw id as its label, and the def-free
+  // corner glyph (the instance payload is wire truth, so a bound or enchanted
+  // copy keeps its marker and its aria flag). It keeps every DEF-FREE
+  // capability and only those: it is a drop target in the pristine view, a
+  // DRAG SOURCE (moveInventoryItem acts on indices alone, the same argument
+  // that keeps the bank's withdraw live), and with the bank open it DEPOSITS
+  // (bankDeposit is index-based too, so the withdraw the guard kept live is
+  // not a one-way trip). Use / sell / equip all need a def, so outside the
+  // bank the cell is a focusable no-op and aria-disabled is honest.
+  // Shift-click chat linking is not wired because it would be a silent no-op
+  // anyway: the send path (insertItemLink) refuses an id with no resolvable
+  // display name. (The "[?]" a stale client can see in chat is the
+  // RECEIVER's degradation of a link a current client sent; nothing here
+  // affects it.) Everything acts again once the client updates.
   private buildUnknownStackCell(s: InvSlot, cell: number | null): HTMLElement {
     const row = document.createElement('button');
     row.type = 'button';
     row.className = 'bag-item q-common';
     row.style.setProperty('--bag-slot-quality', QUALITY_DEFAULT_COLOR);
-    row.setAttribute('aria-disabled', 'true');
+    const canDeposit = this.bagMode().bankDeposit;
+    if (!canDeposit) row.setAttribute('aria-disabled', 'true');
     // The accessible name says UNKNOWN, not just the raw id: the hover
     // tooltip is mouse-only, and the two channels must agree (the glyph
-    // aria-key rule above).
+    // aria-key rule above). The def-free glyph kind rides the same aria keys
+    // the known cell uses, with the unknown label as the item token.
+    const glyphKind = bagInstanceGlyphKind(s.instance);
     row.setAttribute(
       'aria-label',
-      t('itemUi.bags.unknownItemAria', {
-        id: s.itemId,
-        count: formatNumber(s.count, { maximumFractionDigits: 0 }),
-      }),
+      glyphKind
+        ? // A glyphed unknown stack rides the same per-kind aria key the known
+          // cell uses, with the raw id standing in for the display name: the
+          // per-copy flag (bound is the one a player checks before trading)
+          // must not vanish from the aria channel just because the def did.
+          t(BAG_GLYPH_ARIA_KEYS[glyphKind], {
+            item: s.itemId,
+            count: formatNumber(s.count, { maximumFractionDigits: 0 }),
+          })
+        : t('itemUi.bags.unknownItemAria', {
+            id: s.itemId,
+            count: formatNumber(s.count, { maximumFractionDigits: 0 }),
+          }),
     );
     if (cell !== null) row.dataset.bagIndex = String(cell);
     this.bindBagCellDrop(row, cell);
-    row.innerHTML = `${unknownItemIconHtml(s.itemId)}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+    const instanceMark =
+      glyphKind === 'generic'
+        ? '<span class="bi-instance" aria-hidden="true"></span>'
+        : glyphKind === 'enchanted' || glyphKind === 'signed' || glyphKind === 'bound'
+          ? `<span class="bi-glyph bi-glyph-${glyphKind}" aria-hidden="true">${svgIcon(BAG_GLYPH_ICONS[glyphKind])}</span>`
+          : glyphKind === 'masterwork'
+            ? `<img class="bi-masterwork-seal" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false">`
+            : '';
+    row.innerHTML = `${unknownItemIconHtml(s.itemId)}${instanceMark}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+    if (canDeposit) {
+      row.addEventListener('click', (ev) => {
+        // The same peek and trailing-synthetic-click dance as the known cell:
+        // this cell has a drag source, so a completed touch drag must not
+        // also deposit on release.
+        if (this.deps.consumePeek()) {
+          this.deps.hideTooltip();
+          return;
+        }
+        if (this.suppressNextClick) {
+          this.suppressNextClick = false;
+          return;
+        }
+        // The known cell's bankDeposit arm, def-free by construction: resolve
+        // the exact clicked stack by reference and send the index. The prompt
+        // (shift, multi-count fungible stacks) is def-free too.
+        const index = bagStackIndex(this.deps.world().inventory, s);
+        if (index < 0) return;
+        if (ev.shiftKey && bankDepositOpensPrompt(s)) {
+          this.showDepositQuantityPrompt(index, s, Math.max(1, Math.floor(s.count)));
+        } else {
+          this.deps.world().bankDeposit(index);
+          this.deps.hideTooltip();
+          this.render();
+        }
+      });
+    }
     this.deps.attachTooltip(
       row,
       () =>

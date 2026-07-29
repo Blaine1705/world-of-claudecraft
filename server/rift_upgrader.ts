@@ -289,6 +289,13 @@ export class RiftUpgradeCoordinator {
         continue;
       }
       this.seen.add(event.eventId);
+      // Bounded queue (the no-unbounded-table rule): arrivals above the
+      // hourly request cap otherwise grow this forever on a fast-refill
+      // realm (a community realm refills every 60s against a default cap of
+      // 4/hr). The OLDEST waiting event drops; its upgradeStatus simply
+      // stays heuristic/fallback, which is the same outcome as never having
+      // been queued, and `seen` keeps it from re-queueing churn.
+      if (this.queued.length >= 32) this.queued.shift();
       this.queued.push(event);
       markRiftUpgradePending(ctx, event.eventId);
     }

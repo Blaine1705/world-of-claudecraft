@@ -4439,11 +4439,17 @@ export class ClientWorld implements IWorld {
   // tick dependency needed. Expired entries are lazily dropped by the reader.
   private applyRiftDeathZoneSpawnEvent(ev: SimEvent): void {
     if (ev.type !== 'riftDeathZoneSpawn') return;
+    const now = performance.now();
+    // Drop expired rings HERE, not just in the reader's return value: the
+    // reader filters its output but left the backing array to grow for the
+    // whole floor, a per-frame walk over dead entries on a long boss fight.
+    // Spawn cadence bounds the cost of the filter itself.
+    this.activeBossDeathZones = this.activeBossDeathZones.filter((z) => z.expiresAtMs > now);
     this.activeBossDeathZones.push({
       x: ev.x,
       z: ev.z,
       radius: ev.radius,
-      expiresAtMs: performance.now() + ev.durationSecs * 1000,
+      expiresAtMs: now + ev.durationSecs * 1000,
     });
   }
 

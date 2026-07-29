@@ -1095,6 +1095,16 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // Mounts: the toggleMount/selectMount guard refusals and the ridingTrained
     // error (RIDING_UNTRAINED_MSG) that the riding-skill gate emits.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mounts.ts'), 'utf8'),
+    // Mount race: the 'Too far away.' start refusal. It localizes today only
+    // because the literal is byte-identical to an already-scanned emit; being
+    // in the corpus makes a reword fail HERE instead of shipping English.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mount_race.ts'), 'utf8'),
+    // Unstuck and escorts: no free-text emit today (unstuck refusals are the
+    // structured blocked event; escort lines ride quest text), scanned so a
+    // first literal added to either lands inside the gate, per this file's
+    // new-sim-module convention.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/unstuck.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/escort.ts'), 'utf8'),
     // Heroic anti-kite mob charge: the "unleashes" announce line (the mechanic
     // name doubles as the mob_charge_stun debuff, localized via AURA_NAME_KEY's
     // 'Charge' row like the other boss mechanics).

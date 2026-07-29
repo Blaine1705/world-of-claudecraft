@@ -526,9 +526,15 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     expect(unstuckDbSrc).toContain('export const UNSTUCK_REPORT_PRUNE_MAX_BATCHES = 10;');
     expect(unstuckDbSrc).toContain('pg_try_advisory_lock($1::int)');
     expect(unstuckDbSrc).toContain('LIMIT $2');
-    expect(mainSrc).toContain('const prunedUnstuckReports = await pruneUnstuckReports(pool);');
-    expect(mainSrc).toContain('void pruneUnstuckReports(pool).catch((err) =>');
-    expect(count(mainSrc, 'pruneUnstuckReports(pool)')).toBe(2);
+    // Rewired at the v0.32.0 merge: the release shipped a boot-blocking
+    // one-shot plus a bare interval, and the retention sweep's guard
+    // (main_retention_wiring.test.ts) forbids both shapes. The prune now
+    // rides the shared sweep exactly once, off the config key.
+    expect(mainSrc).toContain(
+      'pruneBatch: (n) => pruneUnstuckReportsBatch(pool, config.unstuckReportRetentionDays, n)',
+    );
+    expect(count(mainSrc, 'pruneUnstuckReportsBatch(pool')).toBe(1);
+    expect(mainSrc).not.toContain('await pruneUnstuckReports(pool)');
   });
 
   it('bounds unstuck inserts and the shutdown drain with named timeouts', () => {
