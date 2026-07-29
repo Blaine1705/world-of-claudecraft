@@ -802,18 +802,24 @@ export function columnBlendAt(zone: ZoneDef, x: number, z: number): number {
 // East-west extent of the world at a given z: the union of the zone rects
 // in that row. One column today (the original strip everywhere); a column
 // added east or west widens its own rows and nothing else. Beyond the world
-// ends this clamps to the nearest band, like zoneAt.
+// ends this clamps to the nearest band, like zoneAt. Walks the same RESOLVED
+// zone list zoneAt walks (the active content, builtin fallback): the fallback
+// arm probes zoneAt, so a static-ZONES loop here would return
+// {Infinity, -Infinity} the moment a custom map's bands disagree with the
+// builtin, and that pair reaches the terrain height smoothstep as NaN.
 export function worldXBoundsAt(z: number): { min: number; max: number } {
+  const active = getActiveWorldContent().zones;
+  const zones = active.length > 0 ? active : BUILTIN_WORLD.zones;
   let min = Infinity;
   let max = -Infinity;
-  for (const zone of ZONES) {
+  for (const zone of zones) {
     if (z < zone.zMin || z >= zone.zMax) continue;
     min = Math.min(min, zone.xMin ?? STRIP_MIN_X);
     max = Math.max(max, zone.xMax ?? STRIP_MAX_X);
   }
   if (min > max) {
     const band = zoneAt(0, z);
-    for (const zone of ZONES) {
+    for (const zone of zones) {
       if (zone.zMin !== band.zMin || zone.zMax !== band.zMax) continue;
       min = Math.min(min, zone.xMin ?? STRIP_MIN_X);
       max = Math.max(max, zone.xMax ?? STRIP_MAX_X);

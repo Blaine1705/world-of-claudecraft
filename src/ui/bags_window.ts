@@ -189,8 +189,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   stageMailParcel(itemId: string): void;
   /** Shift-click: insert a readable item link into the chat input. */
   insertItemChatLink(itemId: string): void;
-  /** Open the character sheet's mount picker highlighting this mount (a click
-   *  on a collected kind:'mount' reins item). */
+  /** Surface a deps-owned error toast (reins-use denials and drag rejects). */
   showError(text: string): void;
   setPendingPetFeed(active: boolean): void;
   resetPetBarSig(): void;

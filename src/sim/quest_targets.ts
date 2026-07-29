@@ -55,14 +55,16 @@ const POINT_AREA_RADIUS = 6;
  * measured numbers belong here rather than a comfortable round one. Single
  * linkage is transitive, so a cluster can be much wider than the link distance:
  * the widest pair inside one cluster is wood_thornpeak_t2 to wood_thornpeak_t3
- * at 49.98 yards, chained through two intermediate stands. Going the other way,
- * the nearest pair in two DIFFERENT clusters is wood_mirefen_1 to wood_mirefen_3
- * at 33.54 yards; the v0.32.0 expansion zones then author their per-type
- * hub-outskirt pairs exactly (32,8) apart, putting the nearest cross-cluster
- * pair at 32.98 yards, under 3 yards of headroom above 30. The partition is
- * identical for every integer link from 26 to 32; nudge one of those pairs a
- * few yards and two blobs silently become one, which is why
- * tests/quest_targets.test.ts pins the grouping across that band.
+ * at 49.98 yards, chained through two intermediate stands. Going the other
+ * way, the nearest pair in two DIFFERENT clusters is a v0.32.0 expansion
+ * hub-outskirt pair (herb_veiled_hollow_1 to herb_veiled_hollow_2; every
+ * expansion zone authors its per-type pair exactly (32,8) apart) at 32.98
+ * yards, 2.98 yards of headroom above 30. Downward the tightest margin is
+ * 3.07 yards: the partition is identical for every integer link from 27 to
+ * 32, and at 26 a wood cluster already splits. Nudge one of those pairs a
+ * few yards and two blobs silently merge or split, which is why
+ * tests/quest_targets.test.ts pins the grouping across that whole band and
+ * asserts both edges are real.
  *
  * On scale, and on the objection this invites ("a blob that swallows the view at
  * high zoom is worse than the pile it replaced"): the closest precedent is not a

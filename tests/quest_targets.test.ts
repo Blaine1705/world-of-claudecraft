@@ -7,6 +7,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   CAMPS,
+  ESCORTS,
   GATHER_NODE_TYPES,
   GATHER_NODES,
   GROUND_OBJECTS,
@@ -127,6 +128,27 @@ describe('questObjectiveAreas', () => {
     expect(questObjectiveAreas(new Map())).toEqual([]);
   });
 
+  it("marks an escort objective at the idle escortee's start point", () => {
+    // The escort arm arrived with the v0.32.0 expansion and neither parent
+    // tested it: without this pin a future merge could drop the whole arm
+    // (or its ESCORTS lookup) and nothing would red. Derived over the live
+    // tables like every fixture here, with non-vacuity on both.
+    const quest = Object.values(QUESTS).find((q) => q.objectives.some((o) => o.type === 'escort'));
+    expect(quest, 'no shipped quest carries an escort objective').toBeTruthy();
+    if (!quest) return;
+    const objIndex = quest.objectives.findIndex((o) => o.type === 'escort');
+    const obj = quest.objectives[objIndex];
+    const escort = obj.type === 'escort' ? ESCORTS[obj.escortId] : undefined;
+    expect(escort, `escort def missing for ${quest.id}`).toBeTruthy();
+    if (!escort) return;
+    const areas = questObjectiveAreas(activeLog(quest));
+    const area = areas.find((a) => a.center.x === escort.start.x && a.center.z === escort.start.z);
+    expect(area, 'expected an area at the escortee start point').toBeTruthy();
+    expect(
+      area?.objectives.some((o) => o.questId === quest.id && o.objectiveIndex === objIndex),
+    ).toBe(true);
+  });
+
   it('covers every camp of a kill target, padded past the spawn radius', () => {
     const { quest, mobId, objIndex } = requireKillQuest();
     const areas = questObjectiveAreas(activeLog(quest));
@@ -181,13 +203,13 @@ describe('questObjectiveAreas', () => {
     // (chained, single linkage is transitive) and the nearest pair in two
     // different clusters is 32.98 yards (the v0.32.0 expansion zones author
     // their per-type hub-outskirt pairs exactly (32,8) apart), so the
-    // identical-partition band is 26 to 32 and the shipped 30 sits within 3
-    // yards of its upper edge.
+    // identical-partition band is 27 to 32: the shipped 30 sits 2.98 yards
+    // under its upper edge and 3.07 above its lower one.
     const key = (groups: { x: number; z: number }[][]) =>
       groups.map((g) => g.map((p) => `${p.x},${p.z}`).join(' ')).join(' | ');
     for (const type of GATHER_NODE_TYPES) {
       const at30 = key(gatherNodeClusters(type));
-      // Both edges, so a future bump in either direction reds. 25 and 33 are
+      // Both edges, so a future bump in either direction reds. 26 and 33 are
       // outside the band for at least one type, which is what makes this decisive
       // rather than a restatement of the default.
       expect(key(gatherNodeClusters(type, 27)), `${type} at 27yd`).toBe(at30);
@@ -201,9 +223,11 @@ describe('questObjectiveAreas', () => {
       );
       expect(gatherNodeClusters(type), `${type} must be call-stable`).toEqual(groups);
     }
-    // The band is not open-ended: 60 yards merges groups that 30 keeps apart, so
-    // raising the constant cannot pass unnoticed.
+    // The band is not open-ended in either direction: 60 yards merges groups
+    // that 30 keeps apart, and 26 splits a wood cluster that 30 chains, so
+    // moving the constant past either edge cannot pass unnoticed.
     expect(key(gatherNodeClusters('wood', 60))).not.toBe(key(gatherNodeClusters('wood')));
+    expect(key(gatherNodeClusters('wood', 26))).not.toBe(key(gatherNodeClusters('wood')));
   });
 
   it('keeps the derived cluster radius inside what authored clusters already draw', () => {

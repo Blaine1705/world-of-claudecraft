@@ -29,6 +29,7 @@ import {
   WORLD_MIN_Z,
   worldXBoundsAt,
   ZONES,
+  zoneAt,
 } from './data';
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
 import { dungeonFloorLift } from './dungeon_floor';
@@ -2816,8 +2817,11 @@ function baseHeight(x: number, z: number, seed: number): number {
   let h =
     (fbm2(x * HILL_SCALE + 100, z * HILL_SCALE + 100, seed, 4) - 0.5) * shape.hill + shape.base;
   h += (fbm2(x * DETAIL_SCALE, z * DETAIL_SCALE, seed + 7, 2) - 0.5) * 2.2;
-  // Flatten each zone's hub settlement into a plateau
-  for (const zone of ZONES) {
+  // Flatten each zone's hub settlement into a plateau. The ACTIVE content's
+  // zones (builtin fallback), matching the lake-carve loop below: one height
+  // function must not read two different worlds.
+  const activeZones = getActiveWorldContent().zones;
+  for (const zone of activeZones.length > 0 ? activeZones : ZONES) {
     const dx = x - zone.hub.x,
       dz = z - zone.hub.z;
     // Conservative squared-distance gate (one spare yard of margin) before
@@ -4100,19 +4104,11 @@ function isExcludedDecoration(x: number, z: number): boolean {
 }
 
 export function zoneBiomeAt(x: number, z: number): BiomeId {
-  let fallback: { biome: BiomeId; zMax: number } | null = null;
-  let northmost = ZONES[0];
-  for (const zone of ZONES) {
-    if (zone.zMax > northmost.zMax) northmost = zone;
-    if (z >= zone.zMax) continue;
-    if (fallback === null || zone.zMax < fallback.zMax) {
-      fallback = { biome: zone.biome, zMax: zone.zMax }; // southmost band containing z
-    }
-    const x0 = zone.xMin ?? STRIP_MIN_X;
-    const x1 = zone.xMax ?? STRIP_MAX_X;
-    if (z >= zone.zMin && x >= x0 && x < x1) return zone.biome;
-  }
-  return fallback ? fallback.biome : northmost.biome;
+  // Delegates to zoneAt rather than repeating its rect walk over the static
+  // ZONES const: zoneAt resolves the ACTIVE content's zones (builtin
+  // fallback), and a private copy here was the one place the biome could
+  // disagree with every other zone read on a custom map.
+  return zoneAt(x, z).biome;
 }
 
 // Paint grid id -> biome. APPEND-ONLY: the id is persisted in map documents.
