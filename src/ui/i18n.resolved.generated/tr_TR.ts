@@ -6928,7 +6928,11 @@ export const tr_TR: EnTranslations = {
       "destroyConfirm": "Yok Et",
       "destroyCancel": "İptal",
       "unknownItem": "Unknown item",
-      "unknownItemAria": "Unknown item {id}, quantity {count}"
+      "unknownItemAria": "Unknown item {id}, quantity {count}",
+      "unknownItemAriaMasterwork": "Unknown item {id}, quantity {count}, masterwork",
+      "unknownItemAriaEnchanted": "Unknown item {id}, quantity {count}, enchanted copy",
+      "unknownItemAriaBound": "Unknown item {id}, quantity {count}, bound copy",
+      "unknownItemAriaInstanced": "Unknown item {id}, quantity {count}, maker-marked copy"
     },
     "equipment": {
       "empty": "Boş",

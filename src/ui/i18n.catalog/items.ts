@@ -99,6 +99,15 @@ const itemStringsEn = {
       // The same stack's accessible name: the aria channel must carry the
       // UNKNOWN signal too, since the tooltip sub-line is hover-only.
       unknownItemAria: 'Unknown item {id}, quantity {count}',
+      // The per-copy flags for an unknown stack (stale-client guard): both
+      // aria facts must survive together, the UNKNOWN signal (the tooltip is
+      // mouse-only) and the instance flag the sighted glyph shows. Kind map
+      // mirrors hudChrome.bags.itemAria*: signed and generic share the
+      // maker-marked wording.
+      unknownItemAriaMasterwork: 'Unknown item {id}, quantity {count}, masterwork',
+      unknownItemAriaEnchanted: 'Unknown item {id}, quantity {count}, enchanted copy',
+      unknownItemAriaBound: 'Unknown item {id}, quantity {count}, bound copy',
+      unknownItemAriaInstanced: 'Unknown item {id}, quantity {count}, maker-marked copy',
     },
     equipment: {
       empty: 'Empty',

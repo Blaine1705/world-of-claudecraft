@@ -6928,7 +6928,11 @@ export const ko_KR: EnTranslations = {
       "destroyConfirm": "파괴",
       "destroyCancel": "취소",
       "unknownItem": "알 수 없는 아이템",
-      "unknownItemAria": "알 수 없는 아이템 {id}, 수량 {count}"
+      "unknownItemAria": "알 수 없는 아이템 {id}, 수량 {count}",
+      "unknownItemAriaMasterwork": "알 수 없는 아이템 {id}, 수량 {count}, 걸작",
+      "unknownItemAriaEnchanted": "알 수 없는 아이템 {id}, 수량 {count}, 마법부여된 사본",
+      "unknownItemAriaBound": "알 수 없는 아이템 {id}, 수량 {count}, 귀속된 사본",
+      "unknownItemAriaInstanced": "알 수 없는 아이템 {id}, 수량 {count}, 제작자 표식이 있는 사본"
     },
     "equipment": {
       "empty": "비어 있음",

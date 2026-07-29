@@ -6928,7 +6928,11 @@ export const ja_JP: EnTranslations = {
       "destroyConfirm": "破棄",
       "destroyCancel": "キャンセル",
       "unknownItem": "不明なアイテム",
-      "unknownItemAria": "不明なアイテム {id}、数量 {count}"
+      "unknownItemAria": "不明なアイテム {id}、数量 {count}",
+      "unknownItemAriaMasterwork": "不明なアイテム {id}、数量 {count}、傑作",
+      "unknownItemAriaEnchanted": "不明なアイテム {id}、数量 {count}、エンチャント済みの品",
+      "unknownItemAriaBound": "不明なアイテム {id}、数量 {count}、バインド済みの品",
+      "unknownItemAriaInstanced": "不明なアイテム {id}、数量 {count}、銘入りの品"
     },
     "equipment": {
       "empty": "空",

@@ -6928,7 +6928,11 @@ export const ru_RU: EnTranslations = {
       "destroyConfirm": "Уничтожить",
       "destroyCancel": "Отмена",
       "unknownItem": "Неизвестный предмет",
-      "unknownItemAria": "Неизвестный предмет {id}, количество {count}"
+      "unknownItemAria": "Неизвестный предмет {id}, количество {count}",
+      "unknownItemAriaMasterwork": "Неизвестный предмет {id}, количество {count}, шедевр",
+      "unknownItemAriaEnchanted": "Неизвестный предмет {id}, количество {count}, зачарованный экземпляр",
+      "unknownItemAriaBound": "Неизвестный предмет {id}, количество {count}, привязанный экземпляр",
+      "unknownItemAriaInstanced": "Неизвестный предмет {id}, количество {count}, копия с клеймом мастера"
     },
     "equipment": {
       "empty": "Пусто",

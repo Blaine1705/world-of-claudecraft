@@ -84,23 +84,23 @@ describe('new release item ids stay out of loot containers (deploy window)', () 
     }
   });
 
-  it('pins the release reins as the ONLY deploy-window ids in heroic loot', () => {
+  it('freezes the heroic loot id set for the deploy window (the reins are the exception)', () => {
     // The recorded residual arm (see the file banner): the expansion shipped
-    // exactly these four reins into heroic boss loot on deployed-base bosses.
-    // Pinning the exact set keeps the exception from growing silently: a
-    // fifth mount, a rift id, or a packet id landing in HEROIC_BOSS_LOOT
-    // during the window fails the set equality here or the sweep above.
-    const heroicMountIds = [
-      ...new Set(
-        collectItemIds(Object.values(HEROIC_BOSS_LOOT), []).filter((id) => id.startsWith('reins_')),
-      ),
-    ].sort();
-    expect(heroicMountIds).toEqual([
+    // exactly four reins into heroic boss loot on deployed-base encounters.
+    // The whole table's id set is frozen for the window, not just the
+    // reins_ slice: a fifth mount, a rift id, a packet id, or ANY new id
+    // entering HEROIC_BOSS_LOOT while stale bundles live is a new
+    // deployed-bundle throw arm and must be a deliberate decision recorded
+    // here. Release-scoped like the file: delete with it once clients roll.
+    const heroicIds = [...new Set(collectItemIds(Object.values(HEROIC_BOSS_LOOT), []))].sort();
+    const reins = heroicIds.filter((id) => id.startsWith('reins_'));
+    expect(reins).toEqual([
       'reins_grag_bear',
       'reins_shadowjump_toad',
       'reins_stalkglider_snail',
       'reins_stormfeather_griffin',
     ]);
+    expect(heroicIds).toMatchSnapshot('heroic-boss-loot-id-set-deploy-window');
   });
 
   it('keeps every new id out of the delve chest feeders', () => {

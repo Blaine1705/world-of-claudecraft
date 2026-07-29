@@ -6928,7 +6928,11 @@ export const zh_TW: EnTranslations = {
       "destroyConfirm": "摧毀",
       "destroyCancel": "取消",
       "unknownItem": "未知物品",
-      "unknownItemAria": "未知物品 {id}，數量 {count}"
+      "unknownItemAria": "未知物品 {id}，數量 {count}",
+      "unknownItemAriaMasterwork": "未知物品 {id}，數量 {count}，傑作",
+      "unknownItemAriaEnchanted": "未知物品 {id}，數量 {count}，已附魔的副本",
+      "unknownItemAriaBound": "未知物品 {id}，數量 {count}，已綁定的副本",
+      "unknownItemAriaInstanced": "未知物品 {id}，數量 {count}，帶工匠印記的物品"
     },
     "equipment": {
       "empty": "空",

@@ -6928,7 +6928,11 @@ export const en_XA: EnTranslations = {
       "destroyConfirm": "[Ðéšţŕóý]",
       "destroyCancel": "[Çáñçéļ]",
       "unknownItem": "[Úñķñóŵñ íţéɱ]",
-      "unknownItemAria": "[Úñķñóŵñ íţéɱ {id}, ɋúáñţíţý {count}]"
+      "unknownItemAria": "[Úñķñóŵñ íţéɱ {id}, ɋúáñţíţý {count}]",
+      "unknownItemAriaMasterwork": "[Úñķñóŵñ íţéɱ {id}, ɋúáñţíţý {count}, ɱášţéŕŵóŕķ]",
+      "unknownItemAriaEnchanted": "[Úñķñóŵñ íţéɱ {id}, ɋúáñţíţý {count}, éñçĥáñţéð çóþý]",
+      "unknownItemAriaBound": "[Úñķñóŵñ íţéɱ {id}, ɋúáñţíţý {count}, ƀóúñð çóþý]",
+      "unknownItemAriaInstanced": "[Úñķñóŵñ íţéɱ {id}, ɋúáñţíţý {count}, ɱáķéŕ-ɱáŕķéð çóþý]"
     },
     "equipment": {
       "empty": "[Éɱþţý]",

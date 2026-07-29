@@ -114,6 +114,19 @@ const BAG_GLYPH_ARIA_KEYS: Readonly<Record<NonNullable<BagInstanceGlyphKind>, Tr
   generic: 'hudChrome.bags.itemAriaInstanced',
 };
 
+// The unknown-cell siblings (stale-client guard): the SAME kind map, but
+// every sentence keeps the UNKNOWN signal beside the per-copy flag, because
+// for an unknown stack the tooltip is the only other channel and it is
+// mouse-only. One key per kind, whole sentences, never composed at runtime.
+const UNKNOWN_GLYPH_ARIA_KEYS: Readonly<Record<NonNullable<BagInstanceGlyphKind>, TranslationKey>> =
+  {
+    masterwork: 'itemUi.bags.unknownItemAriaMasterwork',
+    enchanted: 'itemUi.bags.unknownItemAriaEnchanted',
+    signed: 'itemUi.bags.unknownItemAriaInstanced',
+    bound: 'itemUi.bags.unknownItemAriaBound',
+    generic: 'itemUi.bags.unknownItemAriaInstanced',
+  };
+
 const BAG_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
   all: 'hudChrome.bags.filterAll',
   weapon: 'hudChrome.bags.filterWeapon',
@@ -838,12 +851,12 @@ export class BagsWindow {
     row.setAttribute(
       'aria-label',
       glyphKind
-        ? // A glyphed unknown stack rides the same per-kind aria key the known
-          // cell uses, with the raw id standing in for the display name: the
-          // per-copy flag (bound is the one a player checks before trading)
-          // must not vanish from the aria channel just because the def did.
-          t(BAG_GLYPH_ARIA_KEYS[glyphKind], {
-            item: s.itemId,
+        ? // A glyphed unknown stack carries BOTH aria facts: the UNKNOWN
+          // signal and the per-copy flag (bound is the one a player checks
+          // before trading). The per-kind unknown keys keep the pair as one
+          // localizable sentence.
+          t(UNKNOWN_GLYPH_ARIA_KEYS[glyphKind], {
+            id: s.itemId,
             count: formatNumber(s.count, { maximumFractionDigits: 0 }),
           })
         : t('itemUi.bags.unknownItemAria', {
@@ -940,6 +953,11 @@ export class BagsWindow {
         /* nothing to light beyond the shared drag ghost */
       },
       onDrop: (x, y) => {
+        // Suppress the synthetic click the release fires on the source row
+        // (touch_item_drag.ts contract): with the bank open this cell HAS a
+        // click action now, and without the flag a reorganize drag would
+        // also deposit the stack on release.
+        this.suppressNextClick = true;
         // Only the bag-cell move is live for a def-less stack: equip and the
         // world-destroy prompt both need the def, so releasing there is a
         // plain cancel rather than a half-working action.

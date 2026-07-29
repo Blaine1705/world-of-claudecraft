@@ -366,6 +366,15 @@ describe('bags_window: unknown-id stacks stay visible (stale-client guard, R34)'
     // The one listener sits INSIDE the canDeposit arm: no second click path.
     const clickArms = body.split("addEventListener('click'").length - 1;
     expect(clickArms).toBe(1);
+    // The touch drop SUPPRESSES the trailing synthetic click (the
+    // touch_item_drag contract): without this a reorganize drag with the
+    // bank open would also deposit on release. Pinned inside the unknown
+    // cell's own onDrop, before the target resolve.
+    const onDropAt = body.indexOf('onDrop: (x, y) => {');
+    expect(onDropAt).toBeGreaterThan(-1);
+    const suppressAt = body.indexOf('this.suppressNextClick = true', onDropAt);
+    expect(suppressAt).toBeGreaterThan(onDropAt);
+    expect(suppressAt).toBeLessThan(body.indexOf('resolveDropTargetAt', onDropAt));
     expect(body.indexOf("addEventListener('click'")).toBeGreaterThan(
       body.indexOf('if (canDeposit) {'),
     );
@@ -374,7 +383,9 @@ describe('bags_window: unknown-id stacks stay visible (stale-client guard, R34)'
     // The def-free corner glyph and its aria flag survive the missing def: a
     // bound or enchanted copy keeps its marker in both channels.
     expect(body).toContain('bagInstanceGlyphKind(s.instance)');
-    expect(body).toContain('t(BAG_GLYPH_ARIA_KEYS[glyphKind], {');
+    expect(body).toContain('t(UNKNOWN_GLYPH_ARIA_KEYS[glyphKind], {');
+    // Never the known cell's keys: those drop the UNKNOWN signal.
+    expect(body).not.toContain('BAG_GLYPH_ARIA_KEYS[glyphKind]');
     expect(body).toContain('row.draggable = !this.deps.tradeOpen() && !this.deps.vendorOpen()');
     expect(body).toContain("row.addEventListener('dragstart'");
     expect(body).toContain("row.addEventListener('dragend'");
