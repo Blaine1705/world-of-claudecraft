@@ -584,7 +584,6 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'change_skin',
   'unequip_mech_chroma',
   'claim_event_skin',
-  'mount_select',
   'mount_toggle',
   'change_weapon_skin',
   'prestige',
@@ -4571,9 +4570,6 @@ export class GameServer {
         break;
       // Rideable mounts: the Sim re-validates everything (catalog key, level
       // gate, combat gate); the entity mirror + self `mnt` field carry the result.
-      case 'mount_select':
-        if (typeof msg.mount === 'string') sim.selectMountFor(pid, msg.mount);
-        break;
       case 'mount_toggle':
         sim.toggleMountFor(pid);
         break;
@@ -6215,12 +6211,6 @@ export class GameServer {
     // shape used by the `/dev gather` chat cheat and existing consumers. Wire
     // key `gprof`; see TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
     maybe('gprof', this.sim.gatheringProficiencyFor(anchorSession.pid));
-    // The persisted mount pick (IWorldMounts.selectedMount; always a valid
-    // catalog key, the horse by default). Kept per-tick like the other small
-    // scalars: one short string, negligible diff. Wire key `mntSel`; `mnt`
-    // remains the separate active-mount identity field. See
-    // TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
-    maybe('mntSel', meta.selectedMount);
     // The owned mount collection (IWorldMounts.ownedMounts): the horse plus
     // every mount whose reins item sits in bags or bank. A handful of short
     // strings whose serialized form only changes on a loot/bank move, so the

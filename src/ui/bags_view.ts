@@ -68,7 +68,6 @@ export type BagAction =
   | 'petFeedBlocked'
   | 'discardQuest'
   | 'equipBag'
-  | 'openMountPicker'
   | 'use';
 
 /** The tooltip hint sub-line i18n key for a bag item (or '' for no hint). */
@@ -115,9 +114,9 @@ export function bagItemAction(item: BagItemInfo, mode: BagMode): BagAction {
   if (mode.petFeed) return item.kind === 'food' ? 'petFeed' : 'petFeedBlocked';
   if (item.kind === 'quest') return 'discardQuest';
   if (item.kind === 'bag') return 'equipBag';
-  // A collected reins item: the click opens the character sheet's mount picker
-  // on this mount (the pick itself happens there, and riding is the Z key).
-  if (item.kind === 'mount') return 'openMountPicker';
+  // A collected reins item falls through to 'use' like any other usable item:
+  // clicking it summons that mount (sim useItem -> summonMountItem). There is no
+  // picker to open any more.
   return 'use';
 }
 

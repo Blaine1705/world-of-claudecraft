@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 821,
-      "state": "1d9c4d78",
+      "state": "7a7e8317",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -75,7 +75,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -139,7 +138,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 822,
-      "state": "953cc48e",
+      "state": "6aeb8f85",
       "events": "851dc1b2",
       "rng": {
         "draws": 1,
@@ -150,7 +149,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 822,
-      "state": "0fb60dee",
+      "state": "7f65c4a5",
       "events": "f30a9298",
       "rng": {
         "draws": 2,
@@ -161,7 +160,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 822,
-      "state": "a96ca18d",
+      "state": "079b4af0",
       "events": "5e264a36",
       "rng": {
         "draws": 145,
@@ -172,7 +171,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 822,
-      "state": "ea97b8b3",
+      "state": "08fd02fe",
       "events": "0dbe71d8",
       "rng": {
         "draws": 301,
@@ -183,7 +182,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 822,
-      "state": "597bf35c",
+      "state": "72259843",
       "events": "be60b8ca",
       "rng": {
         "draws": 345,
@@ -281,7 +280,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 65,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {},
             "spec": "frost"
@@ -438,7 +436,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 822,
-      "state": "597bf35c",
+      "state": "72259843",
       "events": "741638a5",
       "rng": {
         "draws": 345,
@@ -536,7 +534,6 @@
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "renown": 65,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {},
             "spec": "frost"

@@ -686,9 +686,10 @@ export const hudChromeStrings = {
     riding: 'Riding',
     mount: 'Mount',
     dismount: 'Dismount',
-    requiresLevel: 'Requires level {level}',
-    pickFirst: 'Pick a mount to ride.',
-    keybindHint: 'Press the Mount / Dismount key to ride.',
+    // Reins are usable items: the bag tooltip tells the player to use them. There
+    // is no per-mount level gate and no picker, so the old requiresLevel /
+    // pickFirst / keybindHint lines went with them.
+    useToRide: 'Use to summon this mount.',
     // The empty state, shown when the player owns no mount yet: a heading plus
     // how to earn a first one (the stablemaster's riding lessons) and the rarer
     // boss-drop mounts.
@@ -727,7 +728,10 @@ export const hudChromeStrings = {
   // the current flow starts on the glowing race platform.
   mountTraining: {
     mountPrompt: 'Press {key} to mount the training Valorsteed.',
-    ownedMountPrompt: 'Press {key} to mount',
+    // Shown once the riding lesson is turned in and the reward reins land in the
+    // bags. It must teach the ITEM, not a keybind: summoning your own mount is a
+    // bag / action-bar click now.
+    ownedMountPrompt: 'Your reins are in your bags. Use them to ride.',
     ridePrompt: 'Follow the glowing marker to the start line, then press Start Race.',
     begin: 'Begin Lesson',
     success: 'You have tamed the Valorsteed.',

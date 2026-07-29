@@ -290,7 +290,6 @@ import {
 import {
   forceDismount as forceDismountImpl,
   ownedMounts as ownedMountsImpl,
-  selectMount as selectMountImpl,
   toggleMount as toggleMountImpl,
   updateMountTransition,
 } from './mounts';
@@ -1053,11 +1052,6 @@ export interface PlayerMeta {
   pendingSkinRank: SkinRank | null;
   pendingSkinCatalog: SkinCatalog | null;
   pendingSkinItemId: string | null;
-  // Rideable ground mount pick (always a valid catalog key; the horse by
-  // default, since every player owns it). Persisted; the live "riding right
-  // now" state is Entity.mountKey, which starts '' on login and clears on
-  // death. Collection + rules live in src/sim/mounts.ts.
-  selectedMount: MountKey;
   // The active riding-lesson attempt, or null. Session state, never persisted:
   // src/sim/mounts_training.ts owns the rules; this is the same
   // optional-plus-null shape as other transient session fields below (e.g.
@@ -1070,8 +1064,8 @@ export interface PlayerMeta {
   // One-time riding-lesson fee (100g), charged when the first lesson race starts
   // (or through the legacy mount_train_begin command). Optional so absent === false (pre-feature saves and a
   // fresh character stay byte-equal): never explicitly set to false, only ever
-  // flipped true, mirroring the selectedMount-omitted-while-default convention
-  // in serializeCharacter below.
+  // flipped true, mirroring the ridingTrained-omitted-while-false convention in
+  // serializeCharacter below.
   mountTrainingFeePaid?: boolean;
   // Riding skill purchased from Marla (80g). Optional and absent until bought,
   // so pre-feature saves load cleanly as un-trained. Grandfathered: any save
@@ -1486,8 +1480,10 @@ export interface CharacterState {
   pendingSkinRank?: SkinRank | null;
   pendingSkinCatalog?: SkinCatalog | null;
   pendingSkinItemId?: string | null;
-  // Rideable mount pick (JSONB; optional AND absent while on the default
-  // horse, so pre-mount saves stay byte-equal and load as the horse).
+  // LEGACY. The old "selected mount" pick, written by builds before reins became
+  // usable items. Still declared so an existing save deserializes without a type
+  // error, but nothing reads it and nothing writes it any more: the field simply
+  // ages out of saves as characters are re-saved. Do NOT reintroduce a reader.
   selectedMount?: string;
   // One-time riding-lesson training fee (100g), charged when the first lesson
   // race starts (or through legacy mount_train_begin). Optional and absent until
@@ -2421,7 +2417,6 @@ export class Sim {
       pendingSkinRank: savedState?.pendingSkinRank ?? null,
       pendingSkinCatalog: savedState?.pendingSkinCatalog ?? null,
       pendingSkinItemId: savedState?.pendingSkinItemId ?? null,
-      selectedMount: normalizeSelectedMount(savedState?.selectedMount),
       moveInput: emptyMoveInput(),
       wireRev: 0,
       inventory: [],
@@ -3378,9 +3373,6 @@ export class Sim {
       pendingSkinRank: meta.pendingSkinRank,
       pendingSkinCatalog: meta.pendingSkinCatalog,
       pendingSkinItemId: meta.pendingSkinItemId,
-      // Absent while on the default horse (back-compat: legacy no-pick saves
-      // and horse-pick saves load identically, as the horse).
-      ...(meta.selectedMount !== DEFAULT_MOUNT ? { selectedMount: meta.selectedMount } : {}),
       // Absent until the fee is actually charged (back-compat + parity-stable saves).
       ...(meta.mountTrainingFeePaid ? { mountTrainingFeePaid: true } : {}),
       // Absent until riding skill is purchased (back-compat).
@@ -3467,11 +3459,9 @@ export class Sim {
     this.setPlayerSkin(this.primaryId, skin, catalog);
   }
 
-  /** Per-pid mount selection + toggle (the server command path); the IWorld
-   *  members below ride primaryId. Rules live in src/sim/mounts.ts. */
-  selectMountFor(pid: number, key: string): boolean {
-    return selectMountImpl(this.ctx, pid, key);
-  }
+  /** Per-pid mount toggle (the server command path); the IWorld members below
+   *  ride primaryId. Rules live in src/sim/mounts.ts. Summoning a specific mount
+   *  is not here: it is an item use (useItem -> summonMountItem). */
   toggleMountFor(pid: number): boolean {
     return toggleMountImpl(this.ctx, pid);
   }
@@ -3483,17 +3473,11 @@ export class Sim {
   }
 
   // --- IWorldMounts ---
-  selectedMount(): MountKey {
-    return this.players.get(this.primaryId)?.selectedMount ?? DEFAULT_MOUNT;
-  }
   ownedMounts(): readonly MountKey[] {
     return this.ownedMountsFor(this.primaryId);
   }
   ridingTrained(): boolean {
     return this.players.get(this.primaryId)?.ridingTrained === true;
-  }
-  selectMount(key: MountKey): void {
-    this.selectMountFor(this.primaryId, key);
   }
   toggleMounted(): void {
     this.toggleMountFor(this.primaryId);

@@ -29,7 +29,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 822,
-      "state": "d90f9c9b",
+      "state": "9259ddf1",
       "events": "4cf3f611",
       "rng": {
         "draws": 38,
@@ -40,7 +40,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 822,
-      "state": "cebdf320",
+      "state": "62f4d796",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -51,7 +51,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 822,
-      "state": "40a1e2d6",
+      "state": "b718a3a4",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -62,7 +62,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 822,
-      "state": "285f55f3",
+      "state": "06e64c15",
       "events": "511e9b10",
       "rng": {
         "draws": 38,
@@ -73,7 +73,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 822,
-      "state": "9f3b9184",
+      "state": "00cb12fe",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -84,7 +84,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 822,
-      "state": "b177adad",
+      "state": "a7277807",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -95,7 +95,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 822,
-      "state": "59504a01",
+      "state": "3fb8f01b",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -106,7 +106,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 822,
-      "state": "30706788",
+      "state": "4c4f9b52",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -117,7 +117,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 822,
-      "state": "2c24b7a1",
+      "state": "8f53d03b",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -175,7 +175,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
@@ -234,7 +233,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "selectedMount": "valorsteed",
           "talents": {
             "rows": {}
           },
