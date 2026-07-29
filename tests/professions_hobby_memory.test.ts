@@ -181,11 +181,14 @@ describe('quested-hobby memory: restoring at a pair transition', () => {
     questHobby(sim, QUESTED_HOBBY);
     const meta = metaOf(sim);
     expect(meta.questedHobbies.get(PAIR)).toBe(QUESTED_HOBBY);
-    // The normalizer-reset shape: the archetype block is factory-fresh, the
-    // record survives (exactly what a failed-validation load produces).
+    // The normalizer-reset shape: the archetype block is factory-fresh
+    // (normalizeArchetypeState leaves attunedPairs empty too when the active
+    // craft fails validation), while the record survives its own
+    // independent normalization.
     meta.archetype.activeArchetype = null;
     meta.archetype.pairedMajor = null;
     meta.archetype.hobbyCraft = null;
+    meta.archetype.attunedPairs = [];
     expect(sim.acceptArchetypeQuest(PRIMARY, sim.playerId)).toBe(true);
     expect(meta.archetype.activeArchetype).toBe(PRIMARY);
     expect(sim.hobbyCraft).toBe(QUESTED_HOBBY);

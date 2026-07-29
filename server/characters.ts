@@ -328,7 +328,18 @@ export async function rekeyReclaimedCharacterWorldState(
     reclaimed.state &&
     rekeyInstanceSigner(reclaimed.state, reclaimed.freedName, reclaimed.archivedName)
   ) {
-    await charactersDb.saveCharacterState(reclaimed.id, reclaimed.level, reclaimed.state);
+    // Swallow-and-log like the market and mail save wrappers above: this is
+    // the helper's one await that can reject, and a throw here would skip
+    // the caller's create retry and 500 a reclaim that already committed.
+    // The cost of swallowing is bounded and accepted: a failed blob save
+    // leaves the orphan's signers on the freed name with nothing to
+    // re-trigger the sweep, the same unrecoverable-window class the purge
+    // and crash comments record.
+    try {
+      await charactersDb.saveCharacterState(reclaimed.id, reclaimed.level, reclaimed.state);
+    } catch (err) {
+      console.error('failed to save the reclaimed holder signer sweep:', err);
+    }
   }
 }
 
@@ -364,8 +375,17 @@ export async function purgeDeletedCharacterWorldState(
   characterId: number,
   name: string,
 ): Promise<void> {
-  if (rt.purgeMarketSeller(characterId, name)) await rt.saveMarket();
-  if (rt.purgeMailOwner(characterId, name)) await rt.saveMail();
+  // Never let a purge failure turn a COMMITTED delete into a 500: the row is
+  // gone and a client retry would 404 with the mail half never purged. The
+  // live-book mutations self-heal through the autosave (the save wrappers
+  // swallow their own write errors already); this catch covers the walks
+  // themselves, matching that posture.
+  try {
+    if (rt.purgeMarketSeller(characterId, name)) await rt.saveMarket();
+    if (rt.purgeMailOwner(characterId, name)) await rt.saveMail();
+  } catch (err) {
+    console.error('failed to purge deleted character world state:', err);
+  }
 }
 
 // ---------------------------------------------------------------------------

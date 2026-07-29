@@ -743,8 +743,12 @@ describe('purgeMailOwner - deleting a character', () => {
     const legacy = letterBy(sim, (m) => m.subject === 'LegacyDelivered', 'legacy parcel');
     legacy.recipientKey = 'Doomed'; // the legacy name-keyed shape, pre-stable-id
     // Deliver it: deliverDue books the unread count under the NAME bucket,
-    // exactly where a legacy blob's load would put it.
+    // exactly where a legacy blob's load would put it. Pin that precondition
+    // outright: if delivery ever starts normalizing legacy keys, this test's
+    // phantom-producing seed evaporates and the pin below turns vacuous.
     tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    // biome-ignore lint/suspicious/noExplicitAny: read the raw index directly.
+    expect((sim.postOffice as any).unreadIndex.get('Doomed')).toBe(1);
     expect(sim.purgeMailOwner(DOOMED_ID, 'Doomed')).toBe(true);
     // The parcel flew home to its live sender rather than being destroyed.
     const flown = letterBy(sim, (m) => m.subject === 'LegacyDelivered', 'returned parcel');

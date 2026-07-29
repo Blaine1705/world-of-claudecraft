@@ -478,6 +478,19 @@ planning cost; lastPlaytimeGrantAt unpruned growth; the concurrent
 same-name create 409-though-free wart; professionSurfaceRefreshSig
 omits questedHobbies (correct today, a trap when a new consumer lands);
 and the hud/terrain builtin-ZONES family zoneAt's unification widened.
+The fix round was itself re-reviewed by three fresh lenses (source
+correctness, pin quality, conventions and record accuracy), and their
+findings applied in a second wave: the purge and the signer-sweep save
+now swallow-and-log like the sibling save wrappers (a throw after the
+committed DELETE or reclaim used to 500 the request and, on the
+reclaim, skip the create retry), the duel-arm comment's zero-amount
+claim was corrected (a loser at exactly 1 hp clamps to an emitted 0),
+the phantom-unread test pins its name-bucket precondition, and the
+normalizer-reset fixture clears attunedPairs like the real normalizer.
+One conventions nit was recorded, not applied: one fix-round commit
+subject runs 79 columns, and a message-only history rewrite was
+declined earlier in this packet for the same class of change, so the
+note lives here instead.
 
 BUILT 2026-07-28 (ultracode). All twelve items landed with tests, every
 sim and server change mutation-checked one at a time. The build ran its

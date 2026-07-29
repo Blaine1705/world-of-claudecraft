@@ -504,8 +504,11 @@ export function dealDamage(
       // the loser fishing at 1 hp. Runs AFTER the damage emit so the event
       // order matches the tail (damage, then castStop). Unconditional on
       // kind and amount BY DESIGN: this arm only ever sees a landed 'hit' or
-      // 'block' with a real clamped amount (the dead-guard above makes a
-      // zero-amount clamp unreachable). The tail's self-hit exclusion is NOT
+      // 'block' whose INCOMING amount was real (entering the clamp requires
+      // amount >= hp >= 1 on a living target); the clamped EMITTED amount
+      // can still be 0 when the loser already stood at exactly 1 hp, and
+      // that blow landed too, so it cancels like any other. The tail's
+      // self-hit exclusion is NOT
       // implied, because a duelist's own damage (the Cauterize burn carries
       // the caster's own id) can land the clamped blow, so it is restated
       // here. Spell casts keep the classic no-cancel (the tail's pushback
