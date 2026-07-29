@@ -426,6 +426,59 @@ the channel pass 2 found missing.
 Build: ultracode (many interacting exit paths; fan out per path and
 adversarially verify). QA: ultracode, new session.
 
+QA COMPLETE 2026-07-28 (ultracode, new session), over the whole build
+range on a fresh release/v0.32.0 re-sync (merge audited clean by seven
+lenses; one nit applied: the phase 13 mastery-hours note gained the
+battlefield-credit caveat). The pass ran qa-checklist plus all seven
+domain reviewers including the never-before-dispatched
+frontend-seam-reviewer, plus eight fresh lenses (session exit paths,
+mail/name-reclaim attack sequences, telemetry, item-clause completeness,
+combat semantics vs the rulings, hobby integrity, turn-in gates, and the
+what-is-missing pass), with per-finding verification and thirteen
+mutation checks each killed by the pin built for it. Verdict: the build
+is sound (zero behavior defects on the enumerated items; the exit-path
+lens independently re-enumerated all 32 position-write sites and found
+every one wired, excluded by the stated scope, or arena-family-reset).
+Applied findings, most severe first: the name-reclaim rekey now uses the
+holder's STORED casing (the db returns freedName; both create arms pass
+it; a case-variant reclaim used to strand the orphan's name-keyed rows
+for a future exact-case holder, the same escrow class 58ab0a134 closed)
+and runs the rename path's THIRD rekey, the instance-signer sweep over
+the orphan's blob; the mail purge's return arm moves the unread count
+off the legacy name bucket before normalizing (a 58ab0a134 regression:
+the freed name's next holder read a permanent phantom unread badge);
+the duel-terminal cancel gained the tail's self-hit exclusion (the
+Cauterize self-burn can land the clamped blow) and now emits in tail
+order (damage, then castStop); zoneAt regained totality on a zero-zone
+content; the banker-chest collider walk joined the active-content read
+it had half-missed; the successful-reel clear-after-completion ordering
+got the cross-boundary pin that the whole suite was blind to (the one
+BLOCKING test gap); a new parity scenario drives the real
+startFishing-bite-reel path (3 draws pinned; no other scenario called
+startFishing); the legacy CREATE arm's reclaim rekey got the source pin
+its DELETE sibling had; the acceptArchetypeQuest restore proved LIVE
+(reachable after a normalizer reset) and is now pinned; plus the S3
+corpus rows for both new sim modules, the whiffed-swing kind negative,
+the zonesReadout swap test, the save-skip and armed-reel and
+approve-direction arms, the ClientWorld-to-preview composition test,
+and the comment/doc honesty fixes (band-drift edge, harvest-counter
+label migration note, rename-stamp consequence, reclaim crash window).
+The recorded gather_node_interact pre-verdict question is JUDGED: keep
+the round-trip; do not mirror the new deny arms into the client
+pre-verdict (the client has no own-inCombat truth online, a false
+client refusal is the fairness-shaped failure, the pattern's arms are
+durable facet-backed facts, and fishing has no pre-verdict at all);
+premise correction: three new deny arms, not four (stealth is a
+break-on-success side effect, not a denial). Recorded-only additions:
+system mail with attachments is immortal and the realm blob rewrite is
+linear (dev book already 1879 letters; separate issue with a
+woc_mail_letters gauge recommended); the release-inherited friendAdd
+blocker-detection oracle (#2437); the reclaim FOR UPDATE dedupe-probe
+planning cost; lastPlaytimeGrantAt unpruned growth; the concurrent
+same-name create 409-though-free wart; professionSurfaceRefreshSig
+omits questedHobbies (correct today, a trap when a new consumer lands);
+and the hud/terrain builtin-ZONES family zoneAt's unification widened.
+
 BUILT 2026-07-28 (ultracode). All twelve items landed with tests, every
 sim and server change mutation-checked one at a time. The build ran its
 own adversarial pass per the header: thirteen refuter lenses fanned over
@@ -494,7 +547,14 @@ session (the pinned zone bounds the harm today); (d) the daily-reward
 activity loop still accrues for linkdead sessions, R44's sibling
 surface; (e) turn-in consumes a boundTo instanced copy with no exemption
 (latent: no shipped path binds a collect item), where vendor sell and
-trade both spare bound copies.
+trade both spare bound copies; (f) (QA-surfaced) the reclaim refusal
+checks banned_at but not suspended_until, so a suspended player who
+self-deactivates can lose their name mid-suspension (pre-existing; the
+phase only widened the return type); (g) (QA-surfaced) the reclaim
+transaction locks only the character row, so an admin reactivation
+committing between the holder SELECT and the archive UPDATE loses the
+race and the returning player finds their name gone with a forced
+rename (pre-existing, rare, and the archive is irreversible for them).
 
 Recorded-only (pre-existing or operational, no packet change): the five
 unindexed FK columns that dominate the character-delete cost; the
@@ -788,6 +848,12 @@ exactly once.
      `materialsBody` still selling the Darva/Hesk shopping trip.
    - `gainBody` ("the one tier 3 node"; there are two per trade).
    - `faq.a7` ("bare hands count as tier 1"; every harvest needs a tool).
+   - The fishing where-you-stand prose (the "How much you pay depends on
+     where you are standing" family): phase 10 moved the rod gate, catch
+     table, deed credit, and telemetry to the WATER'S zone at the probe
+     point, so a cross-boundary cast (up to 24 yards) contradicts the
+     published wording (found by the phase 10 QA; the reword rides here
+     per the reword-staleness rule, not mid-packet).
    - Enchanting `identityBody` per the phase 12 decision.
    - The packet's own reword calling the Glyphsteel Bar Bree-only
      (Gizzel stocks it at the toolworks).
