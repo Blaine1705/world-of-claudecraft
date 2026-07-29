@@ -16,6 +16,7 @@ import {
   CASTLE_GATES,
   CASTLE_RAMPS,
   CASTLE_TOWERS,
+  CASTLE_WALL_LEDGES,
   GARDEN,
   WARD_STEP_RUN,
   WARD_STEPS,
@@ -753,6 +754,21 @@ export function buildCastleFeatures(): CastleFeaturesView {
   gateLight.userData.baseIntensity = 5;
   glowLights.push(gateLight);
   group.add(gateLight);
+
+  // ---- the outside climbing chain: each shelf is a real standable
+  // collider, so it must be drawn or a player vaults onto thin air ----
+  for (const l of CASTLE_WALL_LEDGES) {
+    const thick = 0.45;
+    slab(l.x, l.z, l.hw * 2, l.hd * 2, l.top, thick);
+    const corbel = new THREE.Mesh(
+      castleStoneBox(l.hw * 1.1, l.top - thick - padY, l.hd * 1.1),
+      capMat,
+    );
+    corbel.position.set(l.x, padY + (l.top - thick - padY) / 2, l.z);
+    corbel.castShadow = true;
+    corbel.receiveShadow = true;
+    group.add(corbel);
+  }
 
   // ---- instance every placed piece ----
   const m4 = new THREE.Matrix4();

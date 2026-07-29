@@ -8,12 +8,13 @@ import type { Collider } from './colliders';
 import {
   type AuthoredDecor,
   type AuthoredDoor,
+  type AuthoredLedge,
   type AuthoredRoom,
   authoredColliders,
   authoredLiftAt,
 } from './rift/authored';
 
-export type { AuthoredDecor, AuthoredDoor, AuthoredRoom };
+export type { AuthoredDecor, AuthoredDoor, AuthoredLedge, AuthoredRoom };
 
 /**
  * The per-slot dressing roll for a wall-side obstacle: the ONE draw both the
@@ -156,6 +157,8 @@ export interface DungeonLayout {
   rooms?: AuthoredRoom[];
   doors?: AuthoredDoor[];
   decor?: AuthoredDecor[];
+  /** Parkour shelves: standable tops the vault and the ledge climb read. */
+  ledges?: AuthoredLedge[];
 }
 
 // The four hand-authored KayKit interior "kits" a procedural rift can build on.
@@ -560,6 +563,22 @@ export const LASTKEEP_DECOR: readonly AuthoredDecor[] = [
   keepBrazier(24, 32),
 ];
 
+/**
+ * The Last Keep's parkour shelves: the same two-beat vault-then-climb chain
+ * as Dawnhold's, run along the great hall and the ballroom. See
+ * DAWNHOLD_LEDGES for the band arithmetic.
+ */
+export const LASTKEEP_LEDGES: readonly AuthoredLedge[] = [
+  // the great hall: up the east flank toward the throne end
+  { x: 12.2, z: 14, hw: 1.6, hd: 2.8, top: 1.3 },
+  { x: 12.2, z: 22, hw: 1.6, hd: 2.8, top: 3.3 },
+  { x: 12.2, z: 30, hw: 1.6, hd: 2.8, top: 3.3 },
+  // the ballroom: a musicians' shelf up the north wall
+  { x: -35.2, z: 21.4, hw: 2.6, hd: 1.4, top: 1.2 },
+  { x: -29, z: 21.4, hw: 2.6, hd: 1.4, top: 3.2 },
+  { x: -22, z: 21.4, hw: 2.6, hd: 1.4, top: 3.2 },
+] as const;
+
 export const LASTKEEP_LAYOUT: DungeonLayout = {
   zMin: -16,
   zMax: 100,
@@ -578,6 +597,7 @@ export const LASTKEEP_LAYOUT: DungeonLayout = {
   floorHalfX: 42,
   rooms: LASTKEEP_ROOMS.map((r) => ({ ...r })),
   doors: LASTKEEP_DOORS.map((d) => ({ ...d })),
+  ledges: LASTKEEP_LEDGES.map((l) => ({ ...l })),
   decor: LASTKEEP_DECOR.map((d) => ({ ...d })),
 };
 
@@ -721,6 +741,25 @@ export const DAWNHOLD_DECOR: readonly AuthoredDecor[] = [
   { key: 'infernal_statue', x: 25.5, z: 44.5, yaw: Math.PI, r: DAWNHOLD_R_STATUE },
 ];
 
+/**
+ * Dawnhold's parkour shelves. Two chains, each a VAULT onto a low shelf and
+ * then a ledge CLIMB from that shelf to a high one, so the room is climbed
+ * in two beats rather than one impossible hop. Heights are above the room
+ * floor: the vault ceiling is 1.68 and the climb band is 1.8 to 2.2, and a
+ * climb also measures 1.8 of overhead from the surface underfoot, which is
+ * why every high shelf sits 2.0 over the low one rather than over the floor.
+ */
+export const DAWNHOLD_LEDGES: readonly AuthoredLedge[] = [
+  // the great parlor: up the west flank, along, and out over the hearth
+  { x: -11.4, z: 6, hw: 1.4, hd: 2.6, top: 1.3 },
+  { x: -11.4, z: 13, hw: 1.4, hd: 2.6, top: 3.3 },
+  { x: -11.4, z: 20, hw: 1.4, hd: 2.6, top: 3.3 },
+  // the garden room: a planter shelf climbing toward the conservatory glass
+  { x: 31.2, z: 0, hw: 1.4, hd: 2.4, top: 1.2 },
+  { x: 31.2, z: 6.5, hw: 1.4, hd: 2.4, top: 3.2 },
+  { x: 31.2, z: 13, hw: 1.4, hd: 2.4, top: 3.2 },
+] as const;
+
 export const DAWNHOLD_LAYOUT: DungeonLayout = {
   zMin: -16,
   zMax: 56,
@@ -739,6 +778,7 @@ export const DAWNHOLD_LAYOUT: DungeonLayout = {
   rooms: DAWNHOLD_ROOMS.map((r) => ({ ...r })),
   doors: DAWNHOLD_DOORS.map((d) => ({ ...d })),
   decor: DAWNHOLD_DECOR.map((d) => ({ ...d })),
+  ledges: DAWNHOLD_LEDGES.map((l) => ({ ...l })),
 };
 
 /** Raised-floor height of Dawnhold Castle's interior at instance-local (x, z).
@@ -971,7 +1011,13 @@ export function layoutColliders(
   if (layout.rooms) {
     // Authored room-graph floor: its rooms + doors ARE the shell, and its decor
     // carries the measured prop radii. Nothing else on the layout applies.
-    return authoredColliders(layout.rooms, layout.doors ?? [], layout.decor ?? [], DUNGEON_WALL_HW);
+    return authoredColliders(
+      layout.rooms,
+      layout.doors ?? [],
+      layout.decor ?? [],
+      DUNGEON_WALL_HW,
+      layout.ledges ?? [],
+    );
   }
   if (layout.shellPolygon) {
     // Non-rectangular room: the polygon's own edges ARE the walls (front, back,

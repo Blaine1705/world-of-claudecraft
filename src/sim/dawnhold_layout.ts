@@ -145,6 +145,25 @@ export const DAWNHOLD_BUILDINGS: readonly DawnholdBuilding[] = [
   { key: 'hexTowerCatapult', x: 268, z: 915, rot: Math.PI, scale: 7, r: 3.8, h: 12 },
 ] as const;
 
+/**
+ * An OUTSIDE way up: corbelled shelves climbing the north curtain to the
+ * wall-walk. Tops are ABSOLUTE (the pad is 3.2, the walk 9.7): a 1.3 vault
+ * off the pad, two 2.0 ledge climbs, then a 1.2 vault onto the walk.
+ */
+export interface DawnholdWallLedge {
+  x: number;
+  z: number;
+  hw: number;
+  hd: number;
+  /** absolute shelf height */
+  top: number;
+}
+export const DAWNHOLD_WALL_LEDGES: readonly DawnholdWallLedge[] = [
+  { x: 255, z: 860.2, hw: 1.5, hd: 1.4, top: 4.5 },
+  { x: 259, z: 860.9, hw: 1.4, hd: 1.4, top: 6.5 },
+  { x: 263, z: 860.9, hw: 1.4, hd: 1.4, top: 8.5 },
+] as const;
+
 export interface DawnholdField {
   x: number;
   z: number;

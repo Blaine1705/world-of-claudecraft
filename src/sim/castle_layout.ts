@@ -183,6 +183,28 @@ export const CASTLE_RAMPS: readonly CastleRamp[] = [
 // keep's door axis so the terrace approach reads as a single processional
 // ramp spanning the keep foundations instead of two narrow side stairs.
 export const WARD_STEPS = [{ x0: 414, x1: 428 }] as const;
+
+/**
+ * An OUTSIDE way up: corbelled shelves climbing the east curtain, so the
+ * wall-walk is reachable by parkour as well as by the flights. Tops are
+ * ABSOLUTE (the pad here is 6.0, the walk 13.0) and each rise sits in a
+ * band the engine can actually cross: 1.3 vault off the pad, then 2.0 and
+ * 2.1 ledge climbs, then a 1.6 vault onto the walk. Pinned by
+ * tests/castle_ledges.
+ */
+export interface CastleWallLedge {
+  x: number;
+  z: number;
+  hw: number;
+  hd: number;
+  /** absolute shelf height */
+  top: number;
+}
+export const CASTLE_WALL_LEDGES: readonly CastleWallLedge[] = [
+  { x: 440.8, z: 2040, hw: 1.5, hd: 1.8, top: 7.3 },
+  { x: 439.9, z: 2036, hw: 1.4, hd: 1.8, top: 9.3 },
+  { x: 439.9, z: 2032, hw: 1.4, hd: 1.8, top: 11.4 },
+] as const;
 /** the step ramps run from the ward edge z1 down to bailey over this run */
 export const WARD_STEP_RUN = 4;
 

@@ -13,6 +13,7 @@ import {
   buildingTerrainEnvelope,
   isEastbrookGrandArmoury,
 } from './building_layout';
+import { CASTLE_WALL_LEDGES } from './castle_layout';
 import { MOUNT_RACE_JUMP_FIXTURES, raceGateSegment } from './content/mounts';
 import {
   arenaOriginAt,
@@ -42,6 +43,7 @@ import {
   STRIP_MIN_X,
   yumiMazeOriginAt,
 } from './data';
+import { DAWNHOLD_WALL_LEDGES } from './dawnhold_layout';
 import {
   ROCK_COLLIDER_MIN_SCALE,
   ROCK_RADIUS_PER_SCALE,
@@ -482,6 +484,37 @@ function staticWorldColliders(seed: number): Collider[] {
       r: w.r,
       cameraTopY: topY(seed, w.x, w.z, 6),
     });
+  // The castles' outside climbing chains: corbelled shelves up each curtain
+  // so the wall-walk is reachable by parkour as well as by the flights.
+  // These are the only STANDABLE tops either castle has outdoors, because
+  // the walls themselves are lift terrain rather than colliders and terrain
+  // grants no ledge to grab.
+  for (const l of CASTLE_WALL_LEDGES) {
+    out.push({
+      type: 'obb',
+      x: l.x,
+      z: l.z,
+      hw: l.hw,
+      hd: l.hd,
+      rot: 0,
+      moveTopY: l.top,
+      standable: true,
+      cameraTopY: l.top,
+    });
+  }
+  for (const l of DAWNHOLD_WALL_LEDGES) {
+    out.push({
+      type: 'obb',
+      x: l.x,
+      z: l.z,
+      hw: l.hw,
+      hd: l.hd,
+      rot: 0,
+      moveTopY: l.top,
+      standable: true,
+      cameraTopY: l.top,
+    });
+  }
   // ...and the Drakelands' giant ember lilies: the huge and giant tiers
   // carry a rocky-bed collider (r 0 skirt lilies stay walk-through
   // dressing), same one-list contract as the willows

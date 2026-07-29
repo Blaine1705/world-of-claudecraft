@@ -17,6 +17,7 @@ import {
   DAWNHOLD_GATES,
   DAWNHOLD_RAMPS,
   DAWNHOLD_TOWERS,
+  DAWNHOLD_WALL_LEDGES,
 } from '../sim/dawnhold_layout';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
@@ -465,6 +466,21 @@ export function buildDawnholdFeatures(): DawnholdFeaturesView {
     statueLight.userData.baseIntensity = 2.6;
     glowLights.push(statueLight);
     group.add(statueLight);
+  }
+
+  // ---- the outside climbing chain: each shelf is a real standable
+  // collider, so it must be drawn or a player vaults onto thin air ----
+  for (const l of DAWNHOLD_WALL_LEDGES) {
+    const thick = 0.45;
+    slab(l.x, l.z, l.hw * 2, l.hd * 2, l.top, thick);
+    const corbel = new THREE.Mesh(
+      castleStoneBox(l.hw * 1.1, l.top - thick - padY, l.hd * 1.1),
+      capMat,
+    );
+    corbel.position.set(l.x, padY + (l.top - thick - padY) / 2, l.z);
+    corbel.castShadow = true;
+    corbel.receiveShadow = true;
+    group.add(corbel);
   }
 
   // ---- instance every placed piece ----

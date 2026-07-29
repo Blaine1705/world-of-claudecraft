@@ -831,6 +831,7 @@ export class DungeonInteriors {
       this.placeAuthoredFloor(p, layout, variant);
       this.placeAuthoredWalls(p, layout, variant);
       this.placeAuthoredRelief(group, layout);
+      this.placeAuthoredLedges(group, layout);
       const liftAt = (x: number, z: number): number =>
         authoredLiftAt(layout.rooms ?? [], layout.doors ?? [], x, z);
       const light = (x: number, z: number, color: number, y?: number, scale?: number): void =>
@@ -1178,6 +1179,36 @@ export class DungeonInteriors {
    * door that joins rooms of different lift. Box tops follow the same linear
    * ramp authoredLiftAt gives the sim, so what you climb is what the sim
    * stands you on (the sub-step mismatch is the platform stairs' own). */
+  /**
+   * The parkour shelves. A ledge is a real standable collider in the sim, so
+   * it MUST be drawn: an invisible surface a player vaults onto is worse
+   * than no surface at all. Each is a plain stone slab whose TOP sits
+   * exactly on the collider's moveTopY, so what the eye reads and what the
+   * body stands on are the same plane.
+   */
+  private placeAuthoredLedges(group: THREE.Group, layout: DungeonLayout): void {
+    const ledges = layout.ledges ?? [];
+    if (ledges.length === 0) return;
+    const rooms = layout.rooms ?? [];
+    const doors = layout.doors ?? [];
+    const mat = new THREE.MeshLambertMaterial({ color: 0x6a6270, emissive: 0x0c0a10 });
+    const THICK = 0.5;
+    for (const l of ledges) {
+      const top = authoredLiftAt(rooms, doors, l.x, l.z) + l.top;
+      const slab = new THREE.Mesh(new THREE.BoxGeometry(l.hw * 2, THICK, l.hd * 2), mat);
+      slab.position.set(l.x, top - THICK / 2, l.z);
+      slab.castShadow = true;
+      slab.receiveShadow = true;
+      group.add(slab);
+      // the bracket under it, so the shelf reads as corbelled off the wall
+      // rather than floating in the room
+      const post = new THREE.Mesh(new THREE.BoxGeometry(l.hw * 0.7, top - THICK, l.hd * 0.7), mat);
+      post.position.set(l.x, (top - THICK) / 2, l.z);
+      post.receiveShadow = true;
+      group.add(post);
+    }
+  }
+
   private placeAuthoredRelief(group: THREE.Group, layout: DungeonLayout): void {
     const rooms = layout.rooms ?? [];
     const doors = layout.doors ?? [];
