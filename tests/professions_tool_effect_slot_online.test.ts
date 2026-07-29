@@ -10,7 +10,7 @@
 // refused (and charge-free, consumption-free) WITHOUT it.
 //
 // Harness copied from tests/professions_training_online.test.ts.
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the db layer so the live GameServer suite needs no Postgres (the
 // vi.mock hoisting caveat from #2088 applies: this block cannot reference
@@ -79,12 +79,17 @@ function toolEffectResultsOf(sent: { t: string; list?: SimEvent[] }[]): SimEvent
     .filter((ev) => ev.type === 'toolEffectResult');
 }
 
+// Production shape for EVERY arm in this file, the acceptance paths
+// included: the claim "a production realm accepts the charm-holding sender"
+// is only a claim while the dev env is provably unset.
+beforeEach(() => {
+  expect(process.env.ALLOW_DEV_COMMANDS).toBeUndefined();
+});
+
 describe('slot_tool_effect on a production realm: the charm is the gate now', () => {
   it('mints NOTHING for a charm-less sender, dev env unset, and says so', () => {
     // The free-grant incident's exact attack: a valid tool, a hand-built
-    // frame, no crafted charm. ALLOW_DEV_COMMANDS is deliberately NOT set
-    // anywhere in this suite: production shape.
-    expect(process.env.ALLOW_DEV_COMMANDS).toBeUndefined();
+    // frame, no crafted charm (the beforeEach pins the production shape).
     const server = new GameServer();
     const fc = fakeWs();
     const session = joinServer(server, fc, 1, 'Slotter');
@@ -135,6 +140,41 @@ describe('slot_tool_effect on a production realm: the charm is the gate now', ()
       professionId: 'mining',
       effectId: 'gatherers_cache',
     });
+  });
+
+  it('toolEffectResult is a HEAVY_SELF_EVENTS member: the actor self-mirror re-diffs', () => {
+    // The consumed charm never rides a loot event, so the self inventory
+    // mirror converges ONLY because routing this event to its actor sets the
+    // session's heavy-dirty flag (server/game.ts routeEvents). Dropping the
+    // membership leaves the client's bags stale until the staggered refresh,
+    // with every other assertion green: this flag IS the membership.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Mirror');
+    const pid = session.pid as number;
+    server.sim.addItem('copper_mining_pick', 1, pid);
+    server.sim.addItemInstance('gatherers_cache', { signer: 'Mirror' }, pid, 1);
+    cmd(server, session, {
+      cmd: 'slot_tool_effect',
+      profession: 'mining',
+      effect: 'gatherers_cache',
+    });
+    // slot_tool_effect is deliberately NOT in HEAVY_SELF_CMDS, so any dirty
+    // flag below is the EVENT's doing, not the command's.
+    (session as unknown as { selfHeavyDirty: boolean }).selfHeavyDirty = false;
+    routeTick(server);
+    expect(toolEffectResultsOf(fc.sent).at(-1)).toMatchObject({ action: 'slot', ok: true });
+    expect((session as unknown as { selfHeavyDirty: boolean }).selfHeavyDirty).toBe(true);
+    // The deny arms ride the same event, the family's standing shape.
+    (session as unknown as { selfHeavyDirty: boolean }).selfHeavyDirty = false;
+    cmd(server, session, {
+      cmd: 'slot_tool_effect',
+      profession: 'mining',
+      effect: 'gatherers_cache',
+    });
+    routeTick(server);
+    expect(toolEffectResultsOf(fc.sent).at(-1)).toMatchObject({ ok: false });
+    expect((session as unknown as { selfHeavyDirty: boolean }).selfHeavyDirty).toBe(true);
   });
 
   it('re-validates the payload sim-side rather than trusting the frame', () => {

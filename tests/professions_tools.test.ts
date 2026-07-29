@@ -26,6 +26,7 @@ import {
   RARITY_DURABILITY_BONUS,
   rarityLadderIndex,
   rarityRungForMaxDurability,
+  ratchetCeilingForUse,
   resolveRechargeToolEffect,
   slotEffect,
   startingDurabilityFor,
@@ -1152,6 +1153,33 @@ describe('effect recharge with original-crafter discount (#1137, priced by R39, 
     if (!floored.ok) throw new Error('should price');
     expect(floored.materialItemId).toBe('arcane_dust'); // floored at common
     expect(rarityRungForMaxDurability('gatherers_cache', Number.NaN)).toBe(0);
+  });
+
+  it('ratchetCeilingForUse, directly: raise, equal no-op, lesser no-op', () => {
+    // The R47 use-time arm's whole contract in one place: a better tool
+    // RAISES the ceiling, an equal or lesser one writes NOTHING. The
+    // command-path pins (gather_node_harvest.test.ts) prove the wiring; this
+    // pins the mutator itself, so an unconditional-assignment mutation dies
+    // here even if every fixture upstream happens to carry the bigger tool.
+    const slot = slotEffect('gatherers_cache', { toolRarity: 'common' });
+    expect(slot.maxDurability).toBe(startingDurabilityFor('gatherers_cache', 'common'));
+    ratchetCeilingForUse(slot, 'epic');
+    expect(slot.maxDurability).toBe(startingDurabilityFor('gatherers_cache', 'epic'));
+    ratchetCeilingForUse(slot, 'epic');
+    expect(slot.maxDurability).toBe(startingDurabilityFor('gatherers_cache', 'epic'));
+    ratchetCeilingForUse(slot, 'common');
+    expect(slot.maxDurability, 'a lesser tool never lowers the ceiling').toBe(
+      startingDurabilityFor('gatherers_cache', 'epic'),
+    );
+    // The quality-less rungs ('poor', undefined) floor at common: a no-op
+    // against any real ceiling.
+    ratchetCeilingForUse(slot, undefined);
+    expect(slot.maxDurability).toBe(startingDurabilityFor('gatherers_cache', 'epic'));
+    // And durability is never touched: the ratchet prices, it does not fill.
+    const partial = slotEffect('gatherers_cache', { toolRarity: 'common' });
+    partial.durability = 7;
+    ratchetCeilingForUse(partial, 'rare');
+    expect(partial.durability).toBe(7);
   });
 
   it('resolution never mutates the slot; the caller owns the fill', () => {
