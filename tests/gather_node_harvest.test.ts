@@ -1320,6 +1320,41 @@ describe('fine material grades on the live harvest path', () => {
     expect(meta.toolEffectSlots?.mining?.durability).toBe(chargesBefore);
   });
 
+  it('R47: gathering with the bonus latches the ceiling to the tool actually carried', () => {
+    // The mint-low arbitrage the fix review found: mint the slot with the
+    // epic pick stashed (ceiling 20, dust prices), then gather with the pick
+    // carried and refill at the dust rung forever. The use-time ratchet
+    // closes it: the effect firing while a better tool is OWNED is the
+    // pricing moment, and node access forces the tool to be carried, so the
+    // first bonus-bearing harvest re-prices the slot and the next refill
+    // bills shards whatever pick is in hand at the command.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('copper_mining_pick', 1, pid);
+    sim.addItem('gatherers_cache', 1, pid);
+    sim.slotToolEffect('mining', 'gatherers_cache', undefined, pid);
+    const meta = mustMeta(sim, pid);
+    const slot = meta.toolEffectSlots?.mining;
+    if (!slot) throw new Error('slot minted');
+    expect(slot.maxDurability).toBe(20); // minted low, pick stashed
+    sim.addItem('arcanite_mining_pick', 1, pid);
+    teleportOntoNode(sim, pid, 'ore_eastbrook_1');
+    expect(castAndComplete(sim, 'ore_eastbrook_1', pid)).toBe(true);
+    // One bonus-bearing harvest with the epic pick in bags: ceiling latched.
+    expect(slot.maxDurability).toBe(50);
+    // The refill now prices in shards even with the pick banked again.
+    sim.removeItem('arcanite_mining_pick', 1, pid);
+    slot.durability = 5;
+    sim.addItem('arcane_dust', 10, pid);
+    sim.addItem('arcane_shard', 10, pid);
+    sim.rechargeToolEffect('mining', pid);
+    sim.tick();
+    expect(sim.countItem('arcane_dust', pid)).toBe(10);
+    expect(sim.countItem('arcane_shard', pid)).toBe(8);
+    expect(slot.durability).toBe(20);
+    expect(slot.maxDurability).toBe(50);
+  });
+
   it('the quantity bonus is exactly plus one against the SAME seed without the effect', () => {
     // The floor above (>= before + 2) is satisfiable with the slotted effect
     // deleted: an uncommon-or-better rarity roll or a rare event pays 2+ on

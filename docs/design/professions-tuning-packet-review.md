@@ -257,11 +257,23 @@ veto-able by the maintainer, the R32 pattern):
   the toll, and it costs more than any recharge); a slot beyond what the
   carried tool can fill refuses as `tool_capped` rather than "already full",
   so the line can point at the tool; and R30's own guarantee is unchanged,
-  since a borrowed epic pick still buys exactly one inflated fill. SURFACED
-  for the maintainer: this makes the stored maximum a permanent price floor,
-  which is a stronger reading of "never a permanent ceiling" than R30 wrote;
-  the alternative (accept the arbitrage) was not taken because it guts the
-  ruling's stated sink.
+  since a borrowed epic pick still buys exactly one inflated fill. THE
+  USE-TIME ARM, added when the fix review found the residual: the ceiling
+  also RATCHETS at harvest time, to the rung of the best tool owned while
+  the effect actually fires, because minting low with the good pick stashed
+  otherwise kept dust prices forever (node access forces the pick to be
+  CARRIED, so taking the bonus and dodging the price cannot coexist; the
+  mint-low route dies on the first bonus-bearing harvest). The re-slot toll
+  stays the sanctioned way DOWN, including at exactly-full durability and
+  for provenance upgrades (the no_gain refusal compares the FULL minted
+  outcome: ceiling, charges, and craftedBy). ACCEPTED residual: a transient
+  better tool in bags during a recharge raises the ceiling for that fill
+  and latches it (couriering a friend's pick while topping up); no gain for
+  anyone, self-inflicted, escapable by the same re-slot toll, and a cost
+  preview is phase 14's surface. SURFACED for the maintainer: this makes
+  the earned maximum a permanent price floor, a stronger reading of "never
+  a permanent ceiling" than R30 wrote; the alternative (accept the
+  arbitrage) was not taken because it guts the ruling's stated sink.
 
 ---
 
@@ -1519,6 +1531,31 @@ discount (the settled name-as-identity ruling, now stated at
 `isOriginalCrafter`); a persisted 'prompt' row still loads as-is because
 phase 14 owns that mode; and the deny event forcing a heavy self re-diff,
 which is exactly what every sibling result event already does.
+
+THE FIX-ROUND RE-REVIEW (same sitting; fixes are unreviewed code until
+reviewed): five fresh lenses over the fix commit plus per-finding
+verification, 15 confirmed findings, ALL applied. The load-bearing one: R47
+as first shipped floored the price at the slot's stored maximum, but the
+maximum itself was a bag-state choice at MINT time, so minting with the good
+pick stashed kept dust prices forever; closed by the use-time ratchet now in
+R47's ledger text (the ceiling latches when the bonus fires alongside a
+better OWNED tool, settled at the same command boundary as the R42 spend and
+pinned end to end through the real harvest). Beside it: the no_gain refusal
+compared too little and blocked the two legitimate full-slot re-slots (the
+R47 ceiling downgrade and the craftedBy provenance upgrade), now a
+deep-equal compare over the minted outcome with both routes pinned; the
+rename sweep and the keyed focus restore each had ZERO coverage (a deleting
+mutation survived the suite; both now pinned, the focus family through real
+jsdom activeElement assertions including the same-row fallback rung); the
+new sim error string missed the de_DE dictionary block, invisible to every
+i18n gate because the English fallback registers as translated
+(FILLED, and flagged to phase 17: sim_i18n dictionary fills are
+gate-blind, sweep them by hand); render() re-latches from the one input it
+painted; the defensive rungs of the ceiling inverse and the high-water write
+gained their own pins; and the stale read-only window docs were corrected.
+Recorded ACCEPTED: the transient-courier ceiling latch (in R47's text) and
+the two-full-rebuilds-per-action cost now collapsing to one via the
+re-latch.
 
 Also in this phase: the professions window gained the minimal slot and
 recharge senders (the dev gate's removal would otherwise ship a command

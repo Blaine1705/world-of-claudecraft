@@ -3347,6 +3347,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.gatherNodeMissing': 'Dieses Ressourcenvorkommen existiert nicht.',
     'error.gatherNodeNotRespawned':
       'Dieses Ressourcenvorkommen ist für Euch noch nicht erneut erschienen.',
+    'error.toolEffectSlotFromWindow': 'Öffnet die Berufe, um das anzubringen.',
     'error.vcupDeserter': 'Der Platzwart vergisst nicht. Kommt später wieder.',
     'error.vcupPartyTooBig': 'Diese Klasse braucht eine kleinere Gruppe.',
     'error.vcupNoNation': 'Wählt zuerst eine Bannernation.',

@@ -15,6 +15,7 @@ import {
   battlefieldExperienceTrickle,
 } from '../src/sim/professions/battlefield_xp';
 import { requiredReagentCount } from '../src/sim/professions/crafting';
+import { isOriginalCrafter } from '../src/sim/professions/tools';
 import { emptyCraftSkills } from '../src/sim/professions/wheel';
 import type { CharacterState, PlayerMeta } from '../src/sim/sim';
 
@@ -127,6 +128,42 @@ describe('rekeyInstanceSigner (force-rename sweep)', () => {
     expect(canStackInstancePayloads(state.inventory[0].instance, state.inventory[1].instance)).toBe(
       true,
     );
+  });
+
+  it('rewrites slot.craftedBy so the original-crafter recharge discount survives a rename', () => {
+    // The fourth signer-derived identity (the acquisition craft): a slotted
+    // effect's craftedBy is stamped from the consumed charm's signer, and
+    // isOriginalCrafter compares it against the LIVE name, so a sweep that
+    // skipped it would retire the renamer's own discount forever.
+    const state = st({
+      inventory: [],
+      toolEffectSlots: {
+        mining: {
+          effectId: 'gatherers_cache',
+          durability: 7,
+          maxDurability: 20,
+          craftedBy: 'Oldname',
+          confirmMode: 'always',
+        },
+        logging: {
+          effectId: 'artisans_eye',
+          durability: 20,
+          maxDurability: 20,
+          craftedBy: 'SomeoneElse',
+          confirmMode: 'always',
+        },
+      },
+    });
+    expect(rekeyInstanceSigner(state, 'Oldname', 'Newname')).toBe(true);
+    expect(state.toolEffectSlots?.mining?.craftedBy).toBe('Newname');
+    // Foreign provenance passes through untouched: the sweep renames one
+    // person, never re-attributes another's work.
+    expect(state.toolEffectSlots?.logging?.craftedBy).toBe('SomeoneElse');
+    // And the real discount predicate agrees under the new name.
+    const slot = state.toolEffectSlots?.mining;
+    if (!slot) throw new Error('slot fixture');
+    expect(isOriginalCrafter(slot, 'Newname')).toBe(true);
+    expect(isOriginalCrafter(slot, 'Oldname')).toBe(false);
   });
 
   it('the #1145 self-signed discount follows the new name (the real crafting predicate)', () => {

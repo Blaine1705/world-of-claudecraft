@@ -246,6 +246,51 @@ describe('the mint consumes a crafted charm (the acquisition craft price)', () =
     );
   });
 
+  it('a LESSER tool re-slots a full slot: the R47 ceiling-downgrade escape must land', () => {
+    // The sanctioned toll off a high price rung. An epic-minted slot at FULL
+    // durability held by a common-pick owner is not a no-op re-slot: the
+    // mint moves maxDurability 50 to 20, which drops the R47 price floor,
+    // and blocking it at exactly-full would strand the documented escape
+    // behind "spend a charge first".
+    const sim = makeSim();
+    sim.addItem('arcanite_mining_pick', 1);
+    grantCharms(sim);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    const slot = metaOf(sim).toolEffectSlots?.mining;
+    if (!slot) throw new Error('slot minted');
+    expect(slot.maxDurability).toBe(startingDurabilityFor('gatherers_cache', 'epic'));
+    slot.durability = slot.maxDurability; // exactly full
+    sim.removeItem('arcanite_mining_pick', 1);
+    sim.addItem('copper_mining_pick', 1);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots?.mining?.maxDurability).toBe(
+      startingDurabilityFor('gatherers_cache', 'common'),
+    );
+    expect(sim.countItem('gatherers_cache')).toBe(3);
+  });
+
+  it('a provenance-upgrading re-slot lands: re-signing a bought slot is a real change', () => {
+    // craftedBy decides the original-crafter recharge discount, so replacing
+    // a foreign-crafted full slot with one's OWN signed charm is a permanent
+    // economic move the no_gain arm must not eat.
+    const sim = makeSim();
+    sim.addItem('copper_mining_pick', 1);
+    const own = metaOf(sim).name;
+    sim.addItemInstance('gatherers_cache', { signer: 'Elsewhere' }, sim.playerId, 1);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBe('Elsewhere');
+    sim.addItemInstance('gatherers_cache', { signer: own }, sim.playerId, 1);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBe(own);
+    expect(sim.countItem('gatherers_cache')).toBe(0);
+    // And the SAME-provenance full re-slot still refuses: with another
+    // self-signed copy in bags and nothing that would change, the charm is
+    // protected.
+    sim.addItemInstance('gatherers_cache', { signer: own }, sim.playerId, 1);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(sim.countItem('gatherers_cache')).toBe(1);
+  });
+
   it('a better tool re-slots a full slot, because the charge ceiling really moves', () => {
     const sim = simHolding('copper_mining_pick');
     sim.slotToolEffect('mining', 'gatherers_cache');

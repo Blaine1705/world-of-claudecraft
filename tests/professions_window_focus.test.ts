@@ -160,12 +160,12 @@ describe('ProfessionsWindow: focus and scroll survive rebuilds', () => {
     expect(document.activeElement).toBe(fresh);
   });
 
-  it('keeps Close the only focusable control, the whole refocus story', () => {
-    // The painter's documented premise: a read-only window whose single
-    // interactive control is the Close button, so the stable-identity refocus
-    // family collapses to the Close arm. If a future change adds an inner
-    // control, this pin fails and forces a real refocus-selector story (the
-    // deeds data-attribute family) plus a test for it.
+  it('keeps Close the only focusable control on the CHARM-LESS surface', () => {
+    // The pre-craft default: with no charms and no slot the window has no
+    // action buttons, so Close is the whole refocus story for that state.
+    // The acquisition craft's buttons are the inner controls the old version
+    // of this pin predicted; their own refocus behavior is the two arms
+    // below.
     const { el } = makeWindow(baseState());
     const focusables = [
       ...el.querySelectorAll<HTMLElement>(
@@ -174,6 +174,59 @@ describe('ProfessionsWindow: focus and scroll survive rebuilds', () => {
     ];
     expect(focusables).toHaveLength(1);
     expect(focusables[0].hasAttribute('data-close')).toBe(true);
+  });
+
+  it('carries focus across a rebuild to the SAME action button by its key', () => {
+    // The #2377 family's remedy: a repaint under a focused slot/recharge
+    // button restores that button, not Close, or the next Enter would shut
+    // the window instead of repeating the action. Deleting the keyed lookup
+    // in render() and falling straight to [data-close] must fail here.
+    const state = baseState();
+    state.inventory = [
+      { itemId: 'copper_mining_pick', count: 1 },
+      { itemId: 'gatherers_cache', count: 1 },
+      { itemId: 'artisans_eye', count: 1 },
+    ];
+    const { w, el } = makeWindow(state);
+    w.refreshIfChanged(); // settle the post-open catch-up repaint
+    const eye = el.querySelector<HTMLElement>('[data-slot-effect="artisans_eye"]');
+    if (!eye) throw new Error('slot button rendered');
+    eye.focus();
+    expect(document.activeElement).toBe(eye);
+    w.render();
+    const after = document.activeElement as HTMLElement | null;
+    expect(after?.getAttribute('data-slot-effect')).toBe('artisans_eye');
+    expect(after?.hasAttribute('data-close')).toBe(false);
+  });
+
+  it('falls back to another button in the SAME row when the focused one vanished', () => {
+    // A slot button consumed by its own success disappears from the rebuild;
+    // handing focus to the row's surviving action beats parking it on Close,
+    // where a quick second Enter closes the window mid-flow.
+    const state = baseState();
+    state.inventory = [
+      { itemId: 'copper_mining_pick', count: 1 },
+      { itemId: 'gatherers_cache', count: 1 },
+      { itemId: 'artisans_eye', count: 1 },
+    ];
+    const { w, el } = makeWindow(state);
+    w.refreshIfChanged();
+    const cache = el.querySelector<HTMLElement>('[data-slot-effect="gatherers_cache"]');
+    if (!cache) throw new Error('slot button rendered');
+    cache.focus();
+    // The charm leaves the bags between paints (its slot succeeded).
+    state.inventory = [
+      { itemId: 'copper_mining_pick', count: 1 },
+      { itemId: 'artisans_eye', count: 1 },
+    ];
+    w.render();
+    const after = document.activeElement as HTMLElement | null;
+    expect(after?.getAttribute('data-slot-effect')).toBe('artisans_eye');
+    // And with NOTHING left in the row, Close is the last rung.
+    state.inventory = [];
+    (document.activeElement as HTMLElement | null)?.focus();
+    w.render();
+    expect((document.activeElement as HTMLElement | null)?.hasAttribute('data-close')).toBe(true);
   });
 
   it('preserves the scroll offset across a data-driven rebuild', () => {

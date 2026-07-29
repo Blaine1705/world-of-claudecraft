@@ -23,7 +23,7 @@ import {
 
 /**
  * Slot `effectId` onto `professionId`, consuming one charm copy from bags.
- * The resolver owns all six refusals plus WHICH copy is consumed (self-signed
+ * The resolver owns all seven refusals plus WHICH copy is consumed (self-signed
  * first, unsigned second, first signed third), and the consumed copy's
  * `signer` becomes the slot's `craftedBy` (the original-crafter recharge
  * discount's identity). Re-slotting consumes another charm and resets to full

@@ -45,10 +45,12 @@ import { proficiencyBandFor } from './proficiency_bands';
 import {
   applyEffectBonus,
   applyToolEffectUse,
+  bestOwnedGatherToolFor,
   bestOwnedGatherToolTierOrNone,
   canGatherTier,
   depleteEffect,
   NO_TOOL_OWNED,
+  ratchetCeilingForUse,
   type ToolEffectSlot,
 } from './tools';
 import type { PlayerProfessionSkill } from './types';
@@ -796,9 +798,23 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
   // the base would not have). Draws nothing, so the two-draw contract holds;
   // the slot object is the same live reference the resolution applied, read
   // through the SAME suppression rule so a suppressed slot never spends.
+  //
+  // The R47 use-time ratchet settles here too, on EVERY applied use (mattered
+  // or not): taking the bonus alongside a better owned tool is what latches
+  // the slot's price ceiling, and node access forces the tool to be CARRIED,
+  // so a slot minted cheap with the good pick stashed re-prices itself on
+  // its first real harvest. One extra bag scan on the effect-bearing path
+  // only, draw-free.
   if (result.effectApplied) {
+    const usedSlot = usableToolEffectSlot(meta, professionId, node);
+    if (usedSlot) {
+      ratchetCeilingForUse(
+        usedSlot,
+        bestOwnedGatherToolFor(meta.inventory, professionId, ITEMS).rarity,
+      );
+    }
     const mattered = itemId !== result.baseItemId || grantedQty > (result.baseQty ?? qty);
-    if (mattered) depleteEffect(usableToolEffectSlot(meta, professionId, node));
+    if (mattered) depleteEffect(usedSlot);
   }
   ctx.onNodeGatheredForQuests(node, itemId, meta);
   // Zone gather mark: one entry per zone and node type ever harvested.

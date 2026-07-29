@@ -326,7 +326,8 @@ export type ResolvedSlotToolEffect =
  * answer to the same gates, so no path can mint what another path refuses (the
  * free-grant incident was exactly a second path with fewer gates).
  *
- * Six refusals, all before any mutation and all draw-free:
+ * Seven refusals, all before any mutation and all draw-free (the seventh,
+ * the deep-equal no_gain re-slot, is documented at its own check below):
  *   - a profession id that is not a gathering profession
  *   - an effect id absent from the live catalog
  *   - a pair the slot POLICY refuses (`slotToolEffectRefused` below: the
@@ -378,25 +379,34 @@ export function resolveSlotToolEffect(
   const profession = professionId as GatheringProfessionId;
   const best = bestOwnedGatherToolFor(inventory, profession, items);
   if (best.ownedTier === NO_TOOL_OWNED) return { ok: false, reason: 'no_tool' };
+  const consumeIndex = charmIndexToConsume(inventory, effectId, items, slotterName);
+  if (consumeIndex === -1) return { ok: false, reason: 'no_charm' };
   // The zero-benefit refusal, the R9 doctrine applied to the mint itself: a
-  // re-slot that would replace the live slot with a byte-equal one buys the
-  // player nothing and costs them a whole charm (four hundred copper of
-  // reagents). Only the exact no-change case refuses; every re-slot that
-  // moves something (a different effect, more charges after a tool upgrade,
-  // or topping a partially spent slot back up) still lands. This is what
-  // makes a double-click safe: the second command answers no_gain instead of
-  // eating a second charm.
+  // re-slot whose minted slot would DEEP-EQUAL the live one buys the player
+  // nothing and costs them a whole charm (four hundred copper of reagents).
+  // Checked AFTER the consume-copy choice, because the copy's signer is one
+  // of the fields that can change: every re-slot that moves something still
+  // lands, and each conjunct below names the something it protects: a
+  // different effect; a different confirm mode; a ceiling the new mint would
+  // MOVE in either direction (up on a better tool, and DOWN on a lesser one,
+  // which is R47's sanctioned escape off a high price rung, so an
+  // exactly-full downgrade re-slot must land); charges genuinely restored;
+  // and a craftedBy the consumed copy would rewrite (re-slotting one's own
+  // signed charm over a bought slot to claim the original-crafter discount
+  // is a real economic move, never a no-op). What remains refused is the
+  // true no-change case, which is what makes a double-click safe: the second
+  // command answers no_gain instead of eating a second charm.
+  const mintedMax = startingDurabilityFor(effectId as ToolEffectId, best.rarity);
   if (
     live !== undefined &&
     live.effectId === effectId &&
     live.confirmMode === confirmMode &&
-    live.durability >= startingDurabilityFor(effectId as ToolEffectId, best.rarity) &&
-    live.durability >= live.maxDurability
+    live.maxDurability === mintedMax &&
+    live.durability >= mintedMax &&
+    live.craftedBy === inventory[consumeIndex].instance?.signer
   ) {
     return { ok: false, reason: 'no_gain' };
   }
-  const consumeIndex = charmIndexToConsume(inventory, effectId, items, slotterName);
-  if (consumeIndex === -1) return { ok: false, reason: 'no_charm' };
   return {
     ok: true,
     professionId: profession,
@@ -743,17 +753,33 @@ export function rechargeDiscountFor(
  * carrying later.
  *
  * This exists for the PRICING half of R47: a stored max above the catalog
- * base is proof the slot has been maintained at that rung, and the price
- * must not fall below it just because a cheaper tool is in the bags for one
- * command. A stored max the ladder cannot explain (a legacy or hand-edited
- * row) floors at the common rung rather than throwing: pricing must never be
- * the thing that breaks a load.
+ * base is proof the slot has been used or maintained at that rung, and the
+ * price must not fall below it just because a cheaper tool is in the bags
+ * for one command. A stored max the ladder cannot explain (a legacy or
+ * hand-edited row) floors at the common rung rather than throwing: pricing
+ * must never be the thing that breaks a load.
  */
 export function rarityRungForMaxDurability(effectId: ToolEffectId, maxDurability: number): number {
   const base = TOOL_EFFECTS[effectId].startingDurability;
   const rungs = Math.floor((maxDurability - base) / RARITY_DURABILITY_BONUS);
   if (!Number.isFinite(rungs) || rungs < 0) return 0;
   return Math.min(rungs, RARITY_ORDER.length - 1);
+}
+
+/**
+ * The USE-TIME half of R47: raise the slot's ceiling to the rung of the best
+ * tool the owner holds while the effect actually fires. The harvest boundary
+ * calls this beside the charge settle, and it is what makes the price rung
+ * un-gameable: the moments a player takes the bonus alongside a better tool
+ * (which node access forces them to CARRY) are exactly the moments the
+ * ceiling latches, so minting low with the good pick stashed buys nothing
+ * past the first bonus-bearing harvest. Raise-only, draw-free, and a no-op
+ * for a tool at or below the recorded rung, so the common case writes
+ * nothing.
+ */
+export function ratchetCeilingForUse(slot: ToolEffectSlot, toolRarity: ItemDef['quality']): void {
+  const used = startingDurabilityFor(slot.effectId, toolRarity);
+  if (used > slot.maxDurability) slot.maxDurability = used;
 }
 
 /** Stable deny vocabulary for one recharge request. `no_tool` mirrors the

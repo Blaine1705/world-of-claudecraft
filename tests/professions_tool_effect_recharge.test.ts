@@ -205,6 +205,10 @@ describe('the recharge command: price, consume, refill', () => {
     expect(sim.countItem('arcane_dust')).toBe(50);
     expect(sim.countItem('arcane_essence')).toBe(50);
     expect(sim.countItem('arcane_shard')).toBe(48);
+    // The cheap fill must not have collapsed the high-water ceiling: this is
+    // the write the whole exploit needs, so it gets its own pin here in the
+    // arm named for it.
+    expect(slot.maxDurability).toBe(50);
     // Running the ladder to the top costs the SAME five shards the honest
     // single fill costs (2 + 3, every step billed at the ceiling rung), never
     // the 3 dust + 1 essence + 1 shard the bag-state pricing allowed. Ceil

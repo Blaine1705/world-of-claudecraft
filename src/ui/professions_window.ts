@@ -1,12 +1,16 @@
-// The Professions window painter (#professions-window): a cold, read-only
+// The Professions window painter (#professions-window): a cold
 // identity-and-progress browser over IWorldProfessions (craftingIdentity +
-// professionsState), the Book of Deeds shape exactly. Full innerHTML rebuild
-// on open, on a real data change (refreshIfChanged diffs the pure
-// professionsRefreshSig), and on language switch; the section scroller
-// survives rebuilds; nothing here runs on the per-frame hot path. The pure
-// model lives in professions_view.ts (which composes the PR 2039 identity
-// view); this module only paints and wires callbacks through injected deps
-// (it never imports Hud and never hardcodes the window id).
+// professionsState), the Book of Deeds shape, PLUS the acquisition craft's
+// two action senders (slotToolEffect / rechargeToolEffect on the gathering
+// rows: no longer read-only, and the outcome round-trips as the pid-scoped
+// toolEffectResult event rather than a local repaint). Full innerHTML
+// rebuild on open, on a real data change (refreshIfChanged diffs the pure
+// professionsRefreshSig), on the toolEffectResult event, and on language
+// switch; the section scroller and the focused control's identity survive
+// rebuilds; nothing here runs on the per-frame hot path. The pure model
+// lives in professions_view.ts (which composes the PR 2039 identity view);
+// this module only paints and wires callbacks through injected deps (it
+// never imports Hud and never hardcodes the window id).
 
 import { audio } from '../game/audio';
 import type { IWorld } from '../world_api';
@@ -58,7 +62,9 @@ const CEILING_LABEL_KEYS: Record<EmpowermentCeiling, TranslationKey> = {
 /**
  * Hud-supplied glue: the shared presentation bag plus the window surface (the
  * world reads, trapping focus capture/return, and close/teardown chrome).
- * Read-only window: no world commands, no watch-change nudge.
+ * The window SENDS two world commands (slotToolEffect / rechargeToolEffect,
+ * wired in wire()); everything else is read-only, and there is still no
+ * watch-change nudge.
  */
 export interface ProfessionsWindowDeps extends PainterHostPresentation {
   /** The #professions-window root (Hud owns the id). */
@@ -154,7 +160,13 @@ export class ProfessionsWindow {
     markDialogRoot(el, { label: t('hudChrome.professions.title') });
     const prevScrollTop = el.querySelector('.prof-scroll')?.scrollTop ?? 0;
 
-    const model = buildProfessionsView(this.buildInput());
+    // ONE input read feeds the paint AND the signature latch below: latching
+    // from a second read would record whatever the world says after the
+    // paint, and any listener that moved a signature input in between would
+    // leave the DOM stale behind a fresh signature the 500 ms band then
+    // trusts.
+    const input = this.buildInput();
+    const model = buildProfessionsView(input);
     const body = model.mode === 'simplified' ? this.simplifiedHtml(model) : this.fullHtml(model);
     el.innerHTML =
       `<div class="panel-title"><span>${esc(t('hudChrome.professions.title'))}</span>` +
@@ -164,25 +176,32 @@ export class ProfessionsWindow {
     this.wire(el);
     const scroll = el.querySelector('.prof-scroll');
     if (scroll) scroll.scrollTop = prevScrollTop;
+    // Re-latch BEFORE the refocus: restoreFirstEnabled's focus() dispatches
+    // focus listeners synchronously, and the latch must describe the paint,
+    // not whatever those listeners do next.
+    this.lastSig = professionsRefreshSig(input);
     if (hadFocus) {
       // Matched by SCANNING the keyed controls rather than building an
       // attribute selector out of the key: the key embeds wire-supplied ids,
       // and a selector string is the one place those could throw
       // (querySelector SyntaxError) or escape their quotes. A comparison
-      // cannot do either.
-      const keyed =
+      // cannot do either. Degradation rungs: the same control, then another
+      // action button in the SAME gathering row (both key shapes carry the
+      // professionId at index 1, so a slot button consumed by its own success
+      // hands focus to the row's recharge button rather than to Close, where
+      // the next Enter would shut the window), then Close as the last rung.
+      const keyed = [...el.querySelectorAll<HTMLElement>('[data-focus-key]')];
+      const exact =
         focusKey === null
           ? null
-          : ([...el.querySelectorAll<HTMLElement>('[data-focus-key]')].find(
-              (node) => node.dataset.focusKey === focusKey,
-            ) ?? null);
-      restoreFirstEnabled([keyed, el.querySelector<HTMLElement>('[data-close]')]);
+          : (keyed.find((node) => node.dataset.focusKey === focusKey) ?? null);
+      const rowId = focusKey?.split(':')[1];
+      const sameRow =
+        exact !== null || rowId === undefined
+          ? null
+          : (keyed.find((node) => node.dataset.focusKey?.split(':')[1] === rowId) ?? null);
+      restoreFirstEnabled([exact, sameRow, el.querySelector<HTMLElement>('[data-close]')]);
     }
-    // Re-latch the signature to what was just painted: a forced render (the
-    // toolEffectResult arm) that left it stale would buy a second identical
-    // rebuild on the next refreshIfChanged tick, which is exactly the
-    // relocalize contract's warning.
-    this.lastSig = professionsRefreshSig(this.buildInput());
   }
 
   private buildInput(): ProfessionsViewInput {

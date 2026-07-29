@@ -25,6 +25,7 @@ import {
   NO_TOOL_OWNED,
   RARITY_DURABILITY_BONUS,
   rarityLadderIndex,
+  rarityRungForMaxDurability,
   resolveRechargeToolEffect,
   slotEffect,
   startingDurabilityFor,
@@ -1116,6 +1117,41 @@ describe('effect recharge with original-crafter discount (#1137, priced by R39, 
         ITEMS,
       ),
     ).toEqual({ ok: false, reason: 'invalid_request' });
+  });
+
+  it('a ceiling the ladder cannot explain clamps into it instead of breaking the price', () => {
+    // rarityRungForMaxDurability's two defensive arms, pinned because
+    // pricing must never be the thing that breaks a load: a hand-edited or
+    // legacy maxDurability above the ladder prices at the TOP rung (an
+    // out-of-range index would resolve an undefined material id and strand
+    // the slot), and one below the catalog base floors at common.
+    const inflated = slotEffect('gatherers_cache');
+    inflated.maxDurability = 90; // rung 7 by the raw math; ladder tops at 4
+    inflated.durability = 0;
+    const top = resolveRechargeToolEffect(
+      holding('copper_mining_pick'),
+      'mining',
+      inflated,
+      'Anyone',
+      {},
+      ITEMS,
+    );
+    if (!top.ok) throw new Error('should price');
+    expect(top.materialItemId).toBe('arcane_shard'); // the ladder's top rung
+    const corrupt = slotEffect('gatherers_cache');
+    corrupt.maxDurability = 3; // below the catalog base: negative raw rung
+    corrupt.durability = 0;
+    const floored = resolveRechargeToolEffect(
+      holding('copper_mining_pick'),
+      'mining',
+      corrupt,
+      'Anyone',
+      {},
+      ITEMS,
+    );
+    if (!floored.ok) throw new Error('should price');
+    expect(floored.materialItemId).toBe('arcane_dust'); // floored at common
+    expect(rarityRungForMaxDurability('gatherers_cache', Number.NaN)).toBe(0);
   });
 
   it('resolution never mutates the slot; the caller owns the fill', () => {
