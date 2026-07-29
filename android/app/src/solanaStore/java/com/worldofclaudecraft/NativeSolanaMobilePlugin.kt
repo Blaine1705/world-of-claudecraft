@@ -89,6 +89,7 @@ class NativeSolanaMobilePlugin : Plugin() {
                 is TransactionResult.Success -> {
                     val account = result.authResult.accounts.firstOrNull()
                     if (account == null) {
+                        clearAuthorizationState()
                         call.reject("Wallet returned no account", "MWA_NO_ACCOUNT")
                         return@launch
                     }
@@ -169,6 +170,7 @@ class NativeSolanaMobilePlugin : Plugin() {
                     call.reject("No Mobile Wallet Adapter wallet found", "MWA_NO_WALLET")
                 is TransactionResult.Failure -> {
                     if (result.e is MissingAuthorizedAccountException) {
+                        clearAuthorizationState()
                         call.reject("Wallet returned no account", "MWA_NO_ACCOUNT")
                     } else {
                         call.reject("Message signing failed", "MWA_SIGN_FAILED", result.e)
@@ -212,6 +214,7 @@ class NativeSolanaMobilePlugin : Plugin() {
                     call.reject("No Mobile Wallet Adapter wallet found", "MWA_NO_WALLET")
                 is TransactionResult.Failure -> {
                     if (result.e is MissingAuthorizedAccountException) {
+                        clearAuthorizationState()
                         call.reject("Wallet returned no account", "MWA_NO_ACCOUNT")
                     } else {
                         call.reject(
@@ -223,6 +226,12 @@ class NativeSolanaMobilePlugin : Plugin() {
                 }
             }
         }
+    }
+
+    private fun clearAuthorizationState() {
+        walletAdapter.authToken = null
+        tokenStore.clear()
+        walletPreferences().edit().remove(WALLET_ADDRESS_KEY).commit()
     }
 
     private fun persistAuthToken(): Boolean {

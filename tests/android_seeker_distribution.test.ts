@@ -182,6 +182,17 @@ describe('Android Seeker distribution boundary', () => {
     expect(plugin).not.toContain('authResult.accounts.first()');
     expect(plugin.match(/MissingAuthorizedAccountException/g)?.length).toBeGreaterThanOrEqual(3);
     expect(plugin.match(/MWA_NO_ACCOUNT/g)?.length).toBeGreaterThanOrEqual(3);
+    expect(plugin).toMatch(
+      /private fun clearAuthorizationState\(\) \{\s+walletAdapter\.authToken = null\s+tokenStore\.clear\(\)\s+walletPreferences\(\)\.edit\(\)\.remove\(WALLET_ADDRESS_KEY\)\.commit\(\)\s+\}/,
+    );
+    expect(plugin).toMatch(
+      /if \(account == null\) \{\s+clearAuthorizationState\(\)\s+call\.reject\("Wallet returned no account", "MWA_NO_ACCOUNT"\)/,
+    );
+    expect(
+      plugin.match(
+        /if \(result\.e is MissingAuthorizedAccountException\) \{\s+clearAuthorizationState\(\)\s+call\.reject\("Wallet returned no account", "MWA_NO_ACCOUNT"\)/g,
+      ),
+    ).toHaveLength(2);
   });
 
   it('uses Seed Vault instructions in the native Seeker wallet picker', () => {

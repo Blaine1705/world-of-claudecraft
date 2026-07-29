@@ -18,6 +18,43 @@ function req(headers: Record<string, string> = {}): IncomingMessage {
   } as unknown as IncomingMessage;
 }
 
+interface SeekerArtifactPayload {
+  requestDetails: {
+    nonce: string;
+    requestPackageName: string;
+  };
+  appIntegrity: {
+    packageName: string;
+    appRecognitionVerdict: string;
+    certificateSha256Digest: string[];
+  };
+  deviceIntegrity: {
+    deviceRecognitionVerdict?: string[];
+  };
+}
+
+const seekerArtifactEnv = {
+  SEEKER_SOLANA_INTEGRITY_PACKAGE_NAME: 'com.worldofclaudecraft',
+  SEEKER_SOLANA_INTEGRITY_CERT_DIGESTS: 'solana-release-cert',
+};
+
+function validSeekerArtifactPayload(nonce: string): SeekerArtifactPayload {
+  return {
+    requestDetails: {
+      nonce,
+      requestPackageName: 'com.worldofclaudecraft',
+    },
+    appIntegrity: {
+      packageName: 'com.worldofclaudecraft',
+      appRecognitionVerdict: 'UNRECOGNIZED_VERSION',
+      certificateSha256Digest: ['solana-release-cert'],
+    },
+    deviceIntegrity: {
+      deviceRecognitionVerdict: ['MEETS_DEVICE_INTEGRITY'],
+    },
+  };
+}
+
 describe('native attestation', () => {
   afterEach(() => {
     process.env = { ...originalEnv };
@@ -157,6 +194,71 @@ describe('native attestation', () => {
         },
         'seeker-spin',
         { decodeIntegrityToken, env },
+      ),
+    ).resolves.toBeNull();
+  });
+
+  const invalidArtifactCases: Array<{
+    name: string;
+    mutate(payload: SeekerArtifactPayload): void;
+  }> = [
+    {
+      name: 'nonce mismatch',
+      mutate: (payload) => {
+        payload.requestDetails.nonce = 'different-nonce';
+      },
+    },
+    {
+      name: 'request package mismatch',
+      mutate: (payload) => {
+        payload.requestDetails.requestPackageName = 'com.example.attacker';
+      },
+    },
+    {
+      name: 'app package mismatch',
+      mutate: (payload) => {
+        payload.appIntegrity.packageName = 'com.example.attacker';
+      },
+    },
+    {
+      name: 'certificate digest mismatch',
+      mutate: (payload) => {
+        payload.appIntegrity.certificateSha256Digest = ['attacker-cert'];
+      },
+    },
+    {
+      name: 'missing device verdict',
+      mutate: (payload) => {
+        delete payload.deviceIntegrity.deviceRecognitionVerdict;
+      },
+    },
+    {
+      name: 'wrong device verdict',
+      mutate: (payload) => {
+        payload.deviceIntegrity.deviceRecognitionVerdict = ['MEETS_BASIC_INTEGRITY'];
+      },
+    },
+  ];
+
+  it.each(invalidArtifactCases)('rejects a Solana artifact with $name', async ({ mutate }) => {
+    const request = req({ origin: 'capacitor://localhost' });
+    const challenge = createNativeAttestationChallenge(request, 'seeker-claim');
+    const payload = validSeekerArtifactPayload(challenge.nonce);
+    mutate(payload);
+
+    await expect(
+      verifySeekerSolanaArtifactAttestation(
+        request,
+        {
+          platform: 'android',
+          challengeId: challenge.challengeId,
+          token: 'integrity-token',
+        },
+        'seeker-claim',
+        {
+          decodeIntegrityToken: async () => payload,
+          env: seekerArtifactEnv,
+        },
       ),
     ).resolves.toBeNull();
   });
