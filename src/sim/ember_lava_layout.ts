@@ -20,9 +20,11 @@ export interface EmberFlatPool {
   h: number;
 }
 
+// One pool per lava AREA. The twin at (344, 2233) came out: it sat 22yd
+// from its neighbour with a combined model reach of 14, so the two read as
+// one lumpy smear and every river between them overlapped both.
 export const EMBER_FLAT_POOLS: readonly EmberFlatPool[] = [
   { x: 330, z: 2250, r: 8, h: 3.4 },
-  { x: 344, z: 2233, r: 6, h: 3.4 },
   { x: 418, z: 2196, r: 7, h: 5.4 },
 ] as const;
 
@@ -66,67 +68,12 @@ export interface EmberLavaLink {
 // shaped basins). Mouth bed heights sit just above the receiving pool's melt
 // surface so the pour-in reads downhill, never uphill.
 export const EMBER_LAVA_LINKS: readonly EmberLavaLink[] = [
-  // the twin waste pools' own short link
-  // biome-ignore format: link rows read best as single lines
-  { x0: 330, z0: 2250, h0: 3.4, x1: 344, z1: 2233, h1: 3.4, w: 10, amp: 1.2, wavelength: 40, phase: 1.1, trim0: 8, trim1: 6, m0: 'pool', m1: 'pool' },
-  // the long run south from the twin pools into the waste basin (gentle
-  // sway: the short bendy river pieces add their own curl on top, so a
-  // tight authored meander made the chain read as loops)
-  {
-    x0: 330,
-    z0: 2250,
-    h0: 3.4,
-    x1: 302,
-    z1: 2328,
-    h1: 0.6,
-    w: 12,
-    amp: 1.8,
-    wavelength: 64,
-    phase: 4.2,
-    trim0: 8,
-    trim1: 11,
-    m0: 'pool',
-    m1: 'pool',
-  },
-  // the north pool down into the spring basin
-  {
-    x0: 418,
-    z0: 2196,
-    h0: 5.4,
-    x1: 446,
-    z1: 2220,
-    h1: 0.2,
-    w: 11,
-    amp: 1.6,
-    wavelength: 56,
-    phase: 2.6,
-    trim0: 7,
-    trim1: 11,
-    m0: 'pool',
-    m1: 'pool',
-  },
-  // the Moltenmaw pair: the lake field's two eyes joined across the saddle
-  {
-    x0: 423,
-    z0: 2347,
-    h0: -0.2,
-    x1: 438,
-    z1: 2326,
-    h1: -0.2,
-    w: 14,
-    amp: 1.4,
-    wavelength: 48,
-    phase: 5.3,
-    trim0: 15,
-    trim1: 10,
-    m0: 'pool',
-    m1: 'pool',
-  },
-  // The west spill: the twin pools' overflow running out onto open waste
-  // and thinning to nothing. APPENDED, never inserted: the grader, the
-  // scatter clearance and the boulder cull all read this array, so an
-  // insert would move every later run's ground. This is the one run that
-  // ends under a river END cap rather than in another pool.
+  // ONE run per lava area, and one river piece per run: a pool, the river
+  // that leaves it, and the end that spends it. The old network ran four
+  // pool-to-pool links whose chords needed 2, 11, 5 and 2 river pieces to
+  // span, so a single area could stack eleven overlapping models into one
+  // long smear. Each run below is sized so exactly one middle fits between
+  // the pool's edge and its end cap.
   {
     x0: 330,
     z0: 2250,
@@ -139,6 +86,22 @@ export const EMBER_LAVA_LINKS: readonly EmberLavaLink[] = [
     wavelength: 38,
     phase: 0.7,
     trim0: 8,
+    trim1: 0,
+    m0: 'pool',
+    m1: 'cap',
+  },
+  {
+    x0: 418,
+    z0: 2196,
+    h0: 5.4,
+    x1: 436,
+    z1: 2210,
+    h1: 1.9,
+    w: 8,
+    amp: 1.0,
+    wavelength: 34,
+    phase: 2.6,
+    trim0: 7,
     trim1: 0,
     m0: 'pool',
     m1: 'cap',

@@ -8,7 +8,7 @@
 import * as THREE from 'three';
 import { CASTLE_CRYSTALS } from '../sim/castle_layout';
 import { EMBER_FLAT_POOLS, EMBER_LAVA_LINKS, emberLinkPolyline } from '../sim/ember_lava_layout';
-import { emberLilySpots, emberScatterClear } from '../sim/ember_lilies';
+import { EMBER_DENS, emberLilySpots, emberScatterClear } from '../sim/ember_lilies';
 import { hash2 } from '../sim/rng';
 import { EMBER_LAVA_POOLS, terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
@@ -108,6 +108,8 @@ export interface EmberFeaturesView {
 // bare. Same class of bug as the bone fields below.
 const BLOODGLASS = { x: 270, z: 2270, r: 42 };
 const BLOODGLASS_TINTS = [0xd83a2c, 0xb82838, 0xe85838];
+/** a shard stands this far off a dragon den (the shared scatter ring is 13) */
+const BLOODGLASS_DEN_CLEAR = 24;
 
 function shardGeo(): THREE.BufferGeometry {
   // a stretched octahedron reads as a glassy spur in the flat-shaded style
@@ -343,6 +345,16 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
     const z = BLOODGLASS.z + Math.cos(ang) * dist;
     const y = terrainHeight(x, z, seed);
     if (y < 0) continue;
+    // The shard scatter never consulted the wild-scatter clearance, which
+    // did not show while the field sat outside the realm. On its real POI
+    // the 42yd radius reaches a dragon den, and red glass spurs growing
+    // through a drake's hoard is not the read: honour the same exclusion
+    // rings (pools, vents, roads, the keep) every other Drakelands scatter
+    // respects, and stand further off a den than the shared 13yd ring,
+    // because a shard is a tall spur and the Bloodglass POI happens to sit
+    // only 34yd from the west den.
+    if (!emberScatterClear(x, z)) continue;
+    if (EMBER_DENS.some((d) => Math.hypot(x - d.x, z - d.z) < BLOODGLASS_DEN_CLEAR)) continue;
     spots.push({
       x,
       z,

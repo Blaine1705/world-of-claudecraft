@@ -30,8 +30,9 @@ export interface EmberLily {
   r: number;
 }
 
-// the dragon dens keep their shelves clear (matches render/ember_features)
-const EMBER_DENS = [
+/** The dragon dens. Exported so the render layer dresses the same two
+ *  shelves this leaf clears, rather than re-typing the coordinates. */
+export const EMBER_DENS = [
   { x: 419, z: 2266 },
   { x: 302, z: 2258 },
 ] as const;

@@ -2,10 +2,12 @@
 // numbers. Three-free and DOM-free so a Vitest can pin the geometry without
 // a renderer (render/ember_features.ts is the thin consumer).
 //
-// The vocabulary is exactly THREE pieces: a POOL, a RIVER MIDDLE, and a
-// RIVER END. A run leaves a pool, tiles middles along the shared meander,
-// and either meets another pool or terminates in an end cap. The middle is
-// the piece that connects the other two.
+// A lava AREA is exactly THREE pieces: a POOL, one RIVER MIDDLE, and one
+// RIVER END. The middle is the piece that connects the other two, and there
+// is only ever one of it. Tiling a chain of middles down a long run is what
+// produced areas built from eleven overlapping models reading as a single
+// smear, so a run is sized to its one piece rather than a piece count being
+// derived from the run.
 //
 // Two rules do the work, and both were arithmetic bugs before:
 //
@@ -69,11 +71,6 @@ export function lavaPieceFp(kind: LavaPieceKind, w: number): number {
   return w / LAVA_PIECE_METRICS[kind].cross;
 }
 
-/** how far one middle may advance and still leave a full-width channel */
-export function lavaMidStep(w: number): number {
-  return lavaPieceFp('mid', w) * LAVA_PIECE_METRICS.mid.plateau;
-}
-
 /** how a run terminates at each mouth: into a pool, or on open ground */
 export type LavaMouth = 'pool' | 'cap';
 
@@ -122,14 +119,8 @@ export function lavaChainPlacements(
   const out: LavaPlacement[] = [];
   const midFp = lavaPieceFp('mid', link.w);
   const endFp = lavaPieceFp('end', link.w);
-  const step = lavaMidStep(link.w);
   const midSink = LAVA_PIECE_METRICS.mid.melt * midFp;
   const endSink = LAVA_PIECE_METRICS.end.melt * endFp;
-
-  // a capped mouth spends half an end piece on the cap itself
-  const d0 = link.trim0 + (mouths.m0 === 'cap' ? endFp * 0.5 : 0);
-  const d1 = len - link.trim1 - (mouths.m1 === 'cap' ? endFp * 0.5 : 0);
-  const usable = d1 - d0;
 
   const place = (kind: LavaPieceKind, d: number, yawExtra: number, fp: number, sink: number) => {
     const here = at(d);
@@ -145,13 +136,13 @@ export function lavaChainPlacements(
     });
   };
 
-  if (usable > 0) {
-    const n = Math.max(1, Math.ceil(usable / step));
-    for (let i = 0; i <= n; i++) {
-      // clamp the last centre onto the run's end rather than overshooting
-      place('mid', Math.min(d0 + i * step, d1), 0, midFp, midSink);
-    }
-  }
+  // The one middle sits between the pool's edge and the end cap, so its
+  // body covers the whole gap without either neighbour needing a second
+  // piece to reach it.
+  const d0 = link.trim0 + (mouths.m0 === 'cap' ? endFp * 0.5 : 0);
+  const d1 = len - link.trim1 - (mouths.m1 === 'cap' ? endFp * 0.5 : 0);
+  if (d1 > d0) place('mid', (d0 + d1) / 2, 0, midFp, midSink);
+
   // An end cap points UPflow: the model tapers toward local -x, so the far
   // half turn puts its thin tip at the terminus and its body back up the
   // channel, which is the way a flow actually thins out as it spends.

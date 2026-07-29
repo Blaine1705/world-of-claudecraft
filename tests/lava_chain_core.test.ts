@@ -13,7 +13,6 @@ import { describe, expect, it } from 'vitest';
 import {
   LAVA_PIECE_METRICS,
   lavaChainPlacements,
-  lavaMidStep,
   lavaPieceFp,
   MELT_LIFT,
 } from '../src/render/lava_chain_core';
@@ -52,15 +51,34 @@ describe('the lava chain', () => {
     }
   });
 
-  it('leaves no gap: consecutive middles advance no further than their plateau', () => {
+  it('spends exactly three assets on a lava area: a pool, a river, an end', () => {
     for (const link of EMBER_LAVA_LINKS) {
-      const mids = lavaChainPlacements(link, { m0: link.m0, m1: link.m1 }, flatGround).filter(
-        (p) => p.kind === 'mid',
-      );
-      const step = lavaMidStep(link.w);
-      for (let i = 1; i < mids.length; i++) {
-        const advance = Math.hypot(mids[i].x - mids[i - 1].x, mids[i].z - mids[i - 1].z);
-        expect(advance, `gap between middles ${i - 1} and ${i}`).toBeLessThanOrEqual(step + 1e-6);
+      const ps = lavaChainPlacements(link, { m0: link.m0, m1: link.m1 }, flatGround);
+      const mids = ps.filter((p) => p.kind === 'mid');
+      const ends = ps.filter((p) => p.kind === 'end');
+      const at = `the ${link.x0},${link.z0} area`;
+      // ONE river piece connects the pool to the end. A chain of middles is
+      // what turned a single area into eleven overlapping models.
+      expect(mids.length, `${at} river pieces`).toBe(1);
+      expect(ends.length, `${at} end caps`).toBe(1);
+      // the pool is the third asset, and it is the run's own mouth
+      expect(link.m0 === 'pool' || link.m1 === 'pool', `${at} starts at a pool`).toBe(true);
+    }
+  });
+
+  it('keeps every lava area clear of every other', () => {
+    // reach = the run's own extent plus its widest piece, so two areas that
+    // read as one smear fail here
+    const reach = EMBER_LAVA_LINKS.map((l) => {
+      const cx = (l.x0 + l.x1) / 2;
+      const cz = (l.z0 + l.z1) / 2;
+      const half = Math.hypot(l.x1 - l.x0, l.z1 - l.z0) / 2 + lavaPieceFp('mid', l.w) / 2;
+      return { cx, cz, half };
+    });
+    for (let i = 0; i < reach.length; i++) {
+      for (let j = i + 1; j < reach.length; j++) {
+        const d = Math.hypot(reach[i].cx - reach[j].cx, reach[i].cz - reach[j].cz);
+        expect(d, `areas ${i} and ${j} overlap`).toBeGreaterThan(reach[i].half + reach[j].half);
       }
     }
   });
@@ -106,10 +124,10 @@ describe('the lava chain', () => {
         readFileSync(new URL(`../public/models/props/${f}.glb`, import.meta.url)),
       ).toThrow();
     }
-    // and the derived spacing stays sane for every authored width
+    // and the derived scale stays sane for every authored width
     for (const link of EMBER_LAVA_LINKS) {
       expect(lavaPieceFp('mid', link.w)).toBeGreaterThan(link.w);
-      expect(lavaMidStep(link.w)).toBeGreaterThan(0);
+      expect(lavaPieceFp('end', link.w)).toBeGreaterThan(link.w);
     }
   });
 });
