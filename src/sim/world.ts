@@ -2819,9 +2819,13 @@ function baseHeight(x: number, z: number, seed: number): number {
   h += (fbm2(x * DETAIL_SCALE, z * DETAIL_SCALE, seed + 7, 2) - 0.5) * 2.2;
   // Flatten each zone's hub settlement into a plateau. The ACTIVE content's
   // zones read RAW, exactly like the lake-carve loop below (no empty-list
-  // fallback on either): one height function must not read two different
-  // worlds, and a hand-built zero-zone content flattens no builtin hubs
-  // just as it carves no builtin lakes.
+  // fallback on either): the hub and lake FEATURES follow the active content
+  // verbatim, so a hand-built zero-zone content flattens no builtin hubs
+  // just as it carves no builtin lakes. (The band-shape cascade in shapeAt
+  // above still reads the static STRIP_ZONES/COLUMN_ZONES, byte-identical on
+  // every shipped host and a known custom-map seam; zoneAt/worldXBoundsAt
+  // keep their builtin fallback because zone RESOLUTION must stay total.
+  // The policy split is pinned by tests/world_active_content.test.ts.)
   for (const zone of getActiveWorldContent().zones) {
     const dx = x - zone.hub.x,
       dz = z - zone.hub.z;

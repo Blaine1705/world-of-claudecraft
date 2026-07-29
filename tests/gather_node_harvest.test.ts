@@ -30,6 +30,7 @@ import { createMob } from '../src/sim/entity';
 import { PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { completeFishing } from '../src/sim/professions/fishing';
 import {
+  effectiveGradeToolTier,
   gatherNodeById,
   harvestYieldItemId,
   MATERIAL_RARITY_MAX_PROFICIENCY,
@@ -1247,6 +1248,43 @@ describe('fine material grades on the live harvest path', () => {
     expect(castAndComplete(sim, STARTER, pid)).toBe(true);
     expect(sim.countItem('thorium_ore', pid)).toBeGreaterThanOrEqual(before + 2);
     expect(meta.toolEffectSlots?.mining?.durability).toBe(chargesBefore - 1);
+  });
+
+  it('the quantity bonus is exactly plus one against the SAME seed without the effect', () => {
+    // The floor above (>= before + 2) is satisfiable with the slotted effect
+    // deleted: an uncommon-or-better rarity roll or a rare event pays 2+ on
+    // its own (MATERIAL_QTY_BY_RARITY climbs, GATHER_RARE_EVENT_YIELD_MULT
+    // multiplies). The seed PAIR is what makes the bonus decisive: same
+    // seed, same node, same draw stream either side (slotting draws
+    // nothing), so the two grants differ by exactly the Cache's +1.
+    const run = (slotted: boolean): number => {
+      const sim = makeWorld();
+      const pid = sim.addPlayer('warrior', 'Prospector');
+      sim.addItem('copper_mining_pick', 1, pid);
+      if (slotted) sim.slotToolEffect('mining', 'gatherers_cache', undefined, pid);
+      const STARTER = 'ore_veiled_hollow_1';
+      teleportOntoNode(sim, pid, STARTER);
+      expect(castAndComplete(sim, STARTER, pid)).toBe(true);
+      return sim.countItem('thorium_ore', pid);
+    };
+    expect(run(true)).toBe(run(false) + 1);
+  });
+
+  it('the grade PREVIEW suppresses a quality slot exactly where the grant does', () => {
+    // effectiveGradeToolTier and resolveHarvest both read
+    // usableToolEffectSlot: on a starter node the preview must not advertise
+    // the +1 the grant refuses (a tooltip promising a bonus the sim never
+    // pays), and on a fine-grade-reachable node it must keep it.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('copper_mining_pick', 1, pid);
+    sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
+    const meta = mustMeta(sim, pid);
+    const starter = gatherNodeById('ore_veiled_hollow_1');
+    const reachable = gatherNodeById('ore_mirefen_t2');
+    if (!starter || !reachable) throw new Error('missing fixture node');
+    expect(effectiveGradeToolTier(meta, 'mining', starter)).toBe(1);
+    expect(effectiveGradeToolTier(meta, 'mining', reachable)).toBe(2);
   });
 
   it('no skilling while dead: a dead player cannot start a harvest at all (R31)', () => {

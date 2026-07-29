@@ -24,6 +24,7 @@ import { FISHING_RARE_ID, FISHING_TABLES_BY_BAND } from '../content/items';
 import { DEEPFEN_SHALLOWS_LAKE } from '../content/zone2';
 import { ITEMS, zoneAt } from '../data';
 import { onFishCaughtForDeeds } from '../deeds';
+import { forceDismount } from '../mounts';
 import { PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -391,6 +392,15 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // AFTER every deny arm above: a refused attempt never reveals the player.
   ctx.breakStealth(p);
   if (p.sitting) ctx.standUp(p);
+  // Auto-dismount family (the castStart arm in combat/casting_lifecycle.ts):
+  // casting a line is a deliberate cast, so a mounted angler dismounts and an
+  // in-flight summon channel is dropped, exactly as any ability cast does.
+  // Draw-free, AFTER every deny arm, so a refused attempt never dismounts.
+  if (p.mountKey !== '') forceDismount(ctx, p);
+  if (p.mountCastKey !== '') {
+    p.mountCastRemaining = 0;
+    p.mountCastKey = '';
+  }
   p.castingAbility = FISHING_CAST_ID;
   p.castTotal = FISHING_SESSION_CAP_SEC;
   p.castRemaining = FISHING_SESSION_CAP_SEC;

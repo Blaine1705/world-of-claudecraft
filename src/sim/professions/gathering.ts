@@ -20,6 +20,7 @@ import {
   TOOL_EFFECTS,
 } from '../content/professions';
 import { ITEMS } from '../data';
+import { forceDismount } from '../mounts';
 import type { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -47,6 +48,7 @@ import {
   canGatherTier,
   NO_TOOL_OWNED,
   resolveToolEffectUse,
+  type ToolEffectSlot,
 } from './tools';
 import type { PlayerProfessionSkill } from './types';
 import { tierProgressMultiplier } from './wheel';
@@ -190,12 +192,38 @@ export function harvestYieldItemIdFor(node: GatherNodeDef, ownedToolTier: number
  *  agree or a pre-gate would clear room for an item the grant does not mint. */
 export function harvestYieldItemId(meta: PlayerMeta, node: GatherNodeDef): string {
   const professionId = NODE_HARVEST_TABLE[node.type].professionId;
-  return harvestYieldItemIdFor(node, effectiveGradeToolTier(meta, professionId));
+  return harvestYieldItemIdFor(node, effectiveGradeToolTier(meta, professionId, node));
 }
 
 /**
- * The tool tier the FINE-GRADE comparison should read for this player: their
- * best owned tool, plus whatever a slotted quality effect adds.
+ * The slot the grant will actually RUN for a harvest of this node: a QUALITY
+ * effect is suppressed outright (no charge spent, no bonus applied) where the
+ * fine grade is categorically unreachable (the R9 zero-benefit refusal;
+ * yieldsFineGrade demands node.tier at or above the material's rung, and the
+ * v0.32.0 expansion's starter nodes sit below every rung 2+ material they
+ * grant). Quantity effects always pay and pass through. Pure reads only.
+ * The preview (`effectiveGradeToolTier`) and the grant (`resolveHarvest`)
+ * both read THIS resolution: a second copy of the suppression rule is
+ * exactly how a tooltip would come to advertise a bonus the grant refuses.
+ */
+export function usableToolEffectSlot(
+  meta: PlayerMeta,
+  professionId: GatheringProfessionId,
+  node: GatherNodeDef,
+): ToolEffectSlot | undefined {
+  const slot = meta.toolEffectSlots?.[professionId];
+  const slotKind = slot ? TOOL_EFFECTS[slot.effectId]?.kind : undefined;
+  const materialItemId = nodeMaterialFor(node.type, node.zoneId).itemId;
+  return slotKind === 'quality' && !fineGradeReachable(materialItemId, node.tier)
+    ? undefined
+    : slot;
+}
+
+/**
+ * The tool tier the FINE-GRADE comparison should read for this player at this
+ * node: their best owned tool, plus whatever a USABLE slotted quality effect
+ * adds (`usableToolEffectSlot` above owns usability, so a suppressed slot
+ * previews no bonus either).
  *
  * Runs the bonus through `applyEffectBonus`, the same function the grant path
  * uses, rather than re-deriving "+1 if a quality effect is slotted" here. That
@@ -213,9 +241,10 @@ export function harvestYieldItemId(meta: PlayerMeta, node: GatherNodeDef): strin
 export function effectiveGradeToolTier(
   meta: PlayerMeta,
   professionId: GatheringProfessionId,
+  node: GatherNodeDef,
 ): number {
   const owned = bestOwnedGatherToolTierOrNone(meta.inventory, professionId, ITEMS);
-  return applyEffectBonus(meta.toolEffectSlots?.[professionId], {
+  return applyEffectBonus(usableToolEffectSlot(meta, professionId, node), {
     quantity: 0,
     gradeToolTier: owned,
   }).gradeToolTier;
@@ -381,20 +410,15 @@ export function resolveHarvest(
   // so an effect can improve what a vein yields and can never open one.
   // `confirmed` is true because no confirmation flow exists yet: every shipped
   // slot is 'always' mode, for which the flag is ignored outright.
-  // Use-time zero-benefit gate (the R9 refusal, at the only place that knows
-  // the node): a QUALITY effect can only ever pay off where the fine grade is
-  // reachable at all (yieldsFineGrade demands node.tier at or above the
-  // material's rung), and the v0.32.0 expansion's starter nodes sit below
-  // every rung 2+ material they grant, so without this gate a slotted
-  // Artisan's Eye would burn a charge per harvest there for a categorically
-  // impossible upgrade. Quantity effects always pay and pass through. Pure
-  // reads only, so the two-draw contract is untouched.
-  const slot = meta.toolEffectSlots?.[entry.professionId];
-  const slotKind = slot ? TOOL_EFFECTS[slot.effectId]?.kind : undefined;
-  const usableSlot =
-    slotKind === 'quality' && !fineGradeReachable(material.itemId, node.tier) ? undefined : slot;
+  // Use-time zero-benefit gate (the R9 refusal): `usableToolEffectSlot` owns
+  // the suppression rule, shared with the preview reader
+  // (`effectiveGradeToolTier`), so the tier a tooltip previews and the tier
+  // the grant runs can never diverge. Without the gate a slotted Artisan's
+  // Eye would burn a charge per harvest on the expansion's starter nodes for
+  // a categorically impossible upgrade. Pure reads only, so the two-draw
+  // contract is untouched.
   const effect = resolveToolEffectUse(
-    usableSlot,
+    usableToolEffectSlot(meta, entry.professionId, node),
     {
       quantity: material.qtyByRarity[rarity] * (rareEvent ? GATHER_RARE_EVENT_YIELD_MULT : 1),
       gradeToolTier: bestOwnedGatherToolTierOrNone(meta.inventory, entry.professionId, ITEMS),
@@ -555,6 +579,16 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
   // AFTER every deny arm: a refused attempt never reveals the player.
   ctx.breakStealth(p);
   if (p.sitting) ctx.standUp(p);
+  // Auto-dismount family (the castStart arm in combat/casting_lifecycle.ts):
+  // a gather cast is a deliberate cast, so a mounted player dismounts to
+  // gather and an in-flight summon channel is dropped, exactly as any
+  // ability cast does. Draw-free (forceDismount is field writes plus a stat
+  // recalc), so the two-draw contract is untouched.
+  if (p.mountKey !== '') forceDismount(ctx, p);
+  if (p.mountCastKey !== '') {
+    p.mountCastRemaining = 0;
+    p.mountCastKey = '';
+  }
   const duration = gatherCastDurationSec(
     node.tier,
     ownedToolTier,
