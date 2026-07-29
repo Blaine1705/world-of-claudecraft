@@ -10,14 +10,7 @@ import {
 } from '../sim/account_flair';
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
-import {
-  DEFAULT_MOUNT,
-  MOUNT_RACE_COURSE,
-  type MountKey,
-  mountDef,
-  normalizeMountKey,
-  normalizeSelectedMount,
-} from '../sim/content/mounts';
+import { MOUNT_RACE_COURSE, type MountKey, normalizeMountKey } from '../sim/content/mounts';
 import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
 import {
   computeTalentModifiers,

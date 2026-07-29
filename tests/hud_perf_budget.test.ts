@@ -1273,6 +1273,55 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
 
   // #2518: a granted driver allowance now costs something. The sweep above says a module
   // repaints on a cadence; this one says what it is allowed to DO on that cadence.
+  // The exception table above is hand-authored, so its three numbers could drift
+  // from the source they describe. `names` is already cross-checked by the cold
+  // driver sweep (it must equal driverAllow, which that sweep counts off real
+  // text). These two assertions computationally check the OTHER two claims, which
+  // are the ones a re-balancing edit could otherwise quietly falsify:
+  //   sweepResolvable - the call must NOT be reachable off the global, which is
+  //                     what makes the body sweep unable to walk it
+  //   repeating       - the call must not sit inside anything that re-arms
+  // Without this, someone could make the callback genuinely recurring, adjust the
+  // table to keep the arithmetic green, and lose the contract silently: exactly
+  // the quiet loosening this exception exists to avoid.
+  it('every DRIVER_NAME_ONLY claim is checked against the real source, not just the table', () => {
+    expect(DRIVER_NAME_ONLY.length, 'the exception table is non-empty').toBeGreaterThan(0);
+    for (const entry of DRIVER_NAME_ONLY) {
+      const src = stripComments(painterRawSource(entry.file));
+      const occurrences = src.split(entry.driver).length - 1;
+      expect(
+        occurrences,
+        `${entry.file}: DRIVER_NAME_ONLY.names says ${entry.names} but the source names ${entry.driver} ${occurrences}x`,
+      ).toBe(entry.names);
+
+      // sweepResolvable: a call the body sweep can walk is one made straight off
+      // the global. Reaching it through a widened local (the feature-detect shape)
+      // is what makes it unresolvable, and it is why the count is 0.
+      const globalCalls = (src.match(new RegExp(`(?<![.\\w])${entry.driver}\\s*\\(`, 'g')) ?? [])
+        .length;
+      expect(
+        globalCalls,
+        `${entry.file}: ${entry.driver} is called off the global ${globalCalls}x, so the body sweep CAN resolve it and sweepResolvable: ${entry.sweepResolvable} is wrong`,
+      ).toBe(entry.sweepResolvable);
+
+      // repeating: count real CALL expressions, not name mentions. A cadence needs
+      // the driver invoked more than once (or re-armed from inside its own
+      // callback, which would itself be a second call expression), so exactly one
+      // call is the shape of a one-shot deferral and cannot be a repeating driver.
+      // Counting calls rather than names is what keeps the feature-detect guard
+      // (`if (x.requestIdleCallback)`) and the type declaration out of the total.
+      const callExpressions = (src.match(new RegExp(`${entry.driver}\\s*\\(`, 'g')) ?? []).length;
+      if (entry.repeating === 0) {
+        expect(
+          callExpressions,
+          `${entry.file}: ${entry.driver} has ${callExpressions} call expressions, so repeating: 0 (a one-shot deferral) is wrong`,
+        ).toBe(1);
+      } else {
+        expect(callExpressions).toBeGreaterThanOrEqual(entry.repeating);
+      }
+    }
+  });
+
   it('a granted repeating driver does only its documented work on each tick', () => {
     const sweep = sweepDriverBodies(DRIVER_HOSTS, painterRawSource);
     expect(sweep.checked, 'the driver-body sweep skipped part of the vocabulary').toEqual([
