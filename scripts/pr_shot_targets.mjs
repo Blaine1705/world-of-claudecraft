@@ -26,6 +26,29 @@ async function pollForSize(page, selector, attempts = 20, intervalMs = 500) {
   return false;
 }
 
+// Teleport onto the Merchant's stall (zone1, {0, 11.5}) so marketOpen's proximity gate
+// passes, then open the Browse tab. Shared by the market filter-chrome targets below.
+//
+// Two deliberate display writes, mirroring the market-window target: #market-window is
+// forced hidden FIRST so pollForSize cannot pass on a window that was already up (only
+// openMarket's own display:flex clears it), and #bags is hidden because the market docks
+// its companion alongside and, on mobile, over the top of it.
+async function openMarketBrowse(page) {
+  await page.evaluate(() => {
+    const p = window.__game?.sim?.player;
+    if (p?.pos) {
+      p.pos.x = 0;
+      p.pos.z = 11.5;
+    }
+    const el = document.querySelector('#market-window');
+    if (el) el.style.display = 'none';
+    window.__game?.hud?.openMarket?.();
+    const bags = document.querySelector('#bags');
+    if (bags) bags.style.display = 'none';
+  });
+  return pollForSize(page, '#market-window');
+}
+
 export const TARGETS = [
   {
     key: 'player-tooltip',
@@ -251,6 +274,12 @@ export const TARGETS = [
       // legibility pass renamed the corpse arm's button and added the footer
       // hint, both of which render on mobile too).
       { key: 'picker-preselected-mobile', picker: true, mobile: true },
+      // A MIXED corpse (#2514). forest_wolf's tags both map to an item, so its
+      // picker can never show a marked row: the wild boar carries `tusk` beside
+      // hide and meat, which is the shape the whole issue is about. Same rig,
+      // one template swapped, rather than a bespoke script.
+      { key: 'picker-mixed', picker: true, templateId: 'wild_boar' },
+      { key: 'picker-mixed-mobile', picker: true, templateId: 'wild_boar', mobile: true },
     ],
     async capture(page, variant) {
       await page.evaluate(() => {
@@ -258,20 +287,21 @@ export const TARGETS = [
         document.querySelector('.tut-skip')?.click();
         document.querySelector('.gpu-notice-dismiss')?.click();
       });
-      await page.evaluate(() => {
+      await page.evaluate((templateId) => {
         const game = window.__game;
         const sim = game?.sim;
         const p = sim?.player;
         if (!sim || !p) return;
         // Town focus first, while the fresh spawn still stands in the Eastbrook
-        // hub circle (the setter is in-town-only); hide drives both variants.
+        // hub circle (the setter is in-town-only); hide drives every variant,
+        // and both templates below carry it.
         try {
           sim.setTownFocus?.({ hide: 5 });
         } catch {}
         let wolf = null;
         let best = Infinity;
         for (const e of sim.entities.values()) {
-          if (e.kind !== 'mob' || e.templateId !== 'forest_wolf' || e.dead) continue;
+          if (e.kind !== 'mob' || e.templateId !== templateId || e.dead) continue;
           const dx = e.pos.x - p.pos.x;
           const dz = e.pos.z - p.pos.z;
           const d2 = dx * dx + dz * dz;
@@ -289,7 +319,7 @@ export const TARGETS = [
         sim.targetEntity?.(wolf.id);
         sim.startAutoAttack?.();
         window.__p12dShotWolfId = wolf.id;
-      });
+      }, variant?.templateId ?? 'forest_wolf');
       // One auto-attack swing at 1 hp kills the wolf; the live 20 Hz loop needs
       // real time for the swing timer and the death resolution.
       await wait(3000);
@@ -316,6 +346,167 @@ export const TARGETS = [
     },
   },
   {
+    key: 'profession-grant-lines',
+    label: 'Chat log: one line per profession grant (#2430)',
+    when: ['ui/grant_line_view', 'ui/enchanting_view', 'sim/professions'],
+    // Runs four profession actions back to back through the REAL sim commands
+    // (craft, salvage, disenchant, apply enchant) and clips the chat log, so
+    // the before/after pair shows the same four actions producing eight grant
+    // lines versus four. The whole set runs TWICE: the first pass burns the
+    // once-ever deed unlocks and the profession nudge, which would otherwise
+    // push the oldest line out of the fixed-height log, and the shot is taken
+    // on the second pass with a cleared log so every line fits. Eight actions
+    // stay under the shared 10-per-60s action throttle. Deliberately not a
+    // harvest: a gather is a 2.5s cast needing a node underfoot and a matching
+    // tool, and these four already cover every line family the change touches.
+    // The mobile variant is the same chat log at the touch layout's width,
+    // where the longer yield-naming lines have the least room to sit.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+      });
+      const staged = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const pid = sim?.playerId;
+        if (!sim || pid === undefined) return { ok: false, reason: 'offline world is unavailable' };
+        if (!sim.players?.get(pid)) return { ok: false, reason: 'player meta is unavailable' };
+        // Two swords broken down per pass (one salvaged, one disenchanted)
+        // plus one enchanted per pass; apply-enchant prefers an UNENCHANTED
+        // copy, so the second pass takes a fresh one rather than tripping the
+        // same-enchant deny. Reagents cover both passes.
+        sim.addItem('eastbrook_arming_sword', 6, pid);
+        sim.addItem('arcane_dust', 40, pid);
+        sim.addItem('spider_leg', 8, pid);
+        return { ok: true };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      await wait(400);
+      const runPass = () =>
+        page.evaluate(() => {
+          const sim = window.__game?.sim;
+          const pid = sim?.playerId;
+          if (!sim || pid === undefined) return { ok: false, reason: 'world went away' };
+          sim.craftItem?.('recipe_tough_jerky', false, pid);
+          sim.salvageItem?.('eastbrook_arming_sword', pid);
+          sim.disenchantItem?.('eastbrook_arming_sword', pid);
+          sim.applyEnchant?.('eastbrook_arming_sword', 'enchant_weapon_might');
+          return { ok: true };
+        });
+      const warmup = await runPass();
+      if (!warmup.ok) throw new Error(warmup.reason);
+      // The commands resolve on the tick they arrive on, but the events reach
+      // the HUD through the live 20 Hz drain, so give the loop real time.
+      await wait(1500);
+      // Clear the log so the shot holds ONLY the second pass's four actions.
+      await page.evaluate(() => {
+        document.querySelector('#chatlog')?.replaceChildren();
+      });
+      const shot = await runPass();
+      if (!shot.ok) throw new Error(shot.reason);
+      await wait(1500);
+      if (variant?.mobile) {
+        // The touch layout parks the chat panel behind its own button; without
+        // this the clip target is not visible and the shot silently falls back
+        // to the whole HUD.
+        await page.evaluate(() => {
+          document
+            .getElementById('mobile-chat')
+            ?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
+        });
+        await wait(700);
+      }
+      return { clip: '#chatlog-wrap' };
+    },
+  },
+  {
+    key: 'corpse-harvest-lines',
+    label: 'Chat log: one line and one cue per corpse harvest (#2457)',
+    when: ['sim/interaction', 'professions/harvest_yields', 'ui/grant_line_view'],
+    // Corpse harvest is the sibling of the profession-grant-lines target above:
+    // it was the last flow still logging through the grant hub, so it printed a
+    // flat "You receive:" line and a generic ding PER COMPONENT. It is a
+    // separate entry rather than a variant of that one because the bring-up is
+    // completely different (a dead corpse underfoot, not four bag commands).
+    //
+    // Two forest_wolf corpses are harvested back to back: that template carries
+    // hide and fang, the two-component everyday case, so the pair shows four
+    // grant lines from two keypresses. The shared rng stream is pinned to a
+    // fixed value immediately before the harvests, so the before and after
+    // shots differ ONLY by this change; without it the tier and rarity rolls
+    // land differently in each run and the quantities would not line up.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+      });
+      const staged = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        const pid = sim?.playerId;
+        if (!sim || !player || pid === undefined) {
+          return { ok: false, reason: 'offline world is unavailable' };
+        }
+        const wolves = [...sim.entities.values()]
+          .filter((e) => e.kind === 'mob' && e.templateId === 'forest_wolf')
+          .slice(0, 2);
+        if (wolves.length < 2) return { ok: false, reason: 'fewer than two forest_wolf spawns' };
+        for (const wolf of wolves) {
+          wolf.pos.x = player.pos.x;
+          wolf.pos.y = player.pos.y;
+          wolf.pos.z = player.pos.z;
+          wolf.dead = true;
+          wolf.aiState = 'dead';
+          wolf.corpseTimer = 9999;
+          wolf.respawnTimer = 9999;
+          wolf.harvestClaimedBy = null;
+          // Harvest only: corpse LOOT is a different flow with its own lines,
+          // and leaving it on would put unrelated "You receive:" lines in the
+          // shot that look like the bug this change fixes.
+          wolf.lootable = false;
+          wolf.loot = null;
+        }
+        return { ok: true, ids: wolves.map((wolf) => wolf.id) };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      await wait(400);
+      const harvested = await page.evaluate((ids) => {
+        const sim = window.__game?.sim;
+        const pid = sim?.playerId;
+        if (!sim || pid === undefined) return { ok: false, reason: 'world went away' };
+        // Clear first so the shot holds only these two harvests.
+        document.querySelector('#chatlog')?.replaceChildren();
+        // Pin the shared stream. `s` is TypeScript-private, which is compile
+        // time only, and both harvests run inside this one evaluate so no tick
+        // draws between them: the two commands consume the same draws in the
+        // same order on either branch.
+        sim.rng.s = 20457;
+        for (const id of ids) sim.harvestCorpse(id, undefined, pid);
+        return { ok: true };
+      }, staged.ids);
+      if (!harvested.ok) throw new Error(harvested.reason);
+      // The commands resolve on arrival but the events reach the HUD through
+      // the live 20 Hz drain, so give the loop real time.
+      await wait(1500);
+      if (variant?.mobile) {
+        // The touch layout parks the chat panel behind its own button; without
+        // this the clip target is not visible and the shot silently falls back
+        // to the whole HUD.
+        await page.evaluate(() => {
+          document
+            .getElementById('mobile-chat')
+            ?.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
+        });
+        await wait(700);
+      }
+      return { clip: '#chatlog-wrap' };
+    },
+  },
+  {
     key: 'world-map',
     label: 'World map / zone',
     when: [
@@ -327,6 +518,11 @@ export const TARGETS = [
       'render/terrain',
       'render/world',
     ],
+    // Desktop and mobile variants: the touch layout downscales the fixed 560px
+    // map canvas (hud.mobile.css --mobile-map-size), so every on-canvas label is
+    // resampled on the way to the screen. Label legibility therefore has to be
+    // checked on both, not just at the desktop 1:1.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
     // Teleport to a known landmark (offline, no dev command), open the world-map window,
     // and clip to it; fall back to the full frame if the window did not open.
     async capture(page) {
@@ -804,6 +1000,108 @@ export const TARGETS = [
     },
   },
   {
+    key: 'market-armor-filters',
+    label: 'World Market armor filters (responsive search and filter grid)',
+    when: ['ui/market_window', 'ui/market_view', 'ui/market_filters'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page, shot) {
+      if (!(await openMarketBrowse(page))) return {};
+      const selected = await page.evaluate(() => {
+        const option = document.querySelector(
+          '[data-market-filter-menu="itemType"] [data-market-filter-option="armor"]',
+        );
+        if (!(option instanceof HTMLElement)) return false;
+        option.click();
+        document.activeElement instanceof HTMLElement && document.activeElement.blur();
+        return true;
+      });
+      if (!selected) return {};
+      await wait(250);
+      if (shot?.mobile) {
+        await page.evaluate(() => {
+          const market = document.querySelector('#market-window');
+          if (market) market.scrollTop = 150;
+        });
+      }
+      return { clip: '#market-window' };
+    },
+  },
+  // The market-window target above shoots the browse grid with every dropdown CLOSED, so
+  // it is blind to the filter vocabulary itself. These two open the menus. Keyed on the
+  // shared query module (which holds the option lists) plus the view core (which decides
+  // WHICH menus a type raises), and deliberately NOT on ui/market_window, so an unrelated
+  // painter layout change does not drag them along.
+  {
+    key: 'market-type-filter-list',
+    label: 'World Market item-type filter list (open)',
+    when: ['sim/market_query', 'ui/market_view'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      if (!(await openMarketBrowse(page))) return {};
+      const opened = await page.evaluate(() => {
+        const menu = document.querySelector('[data-market-filter-menu="itemType"]');
+        const btn = menu?.querySelector('.mkt-select-btn');
+        if (!btn) return false;
+        btn.click();
+        return true;
+      });
+      if (!opened) return {};
+      await wait(250);
+      return { clip: '#market-window' };
+    },
+  },
+  {
+    key: 'market-bag-size-filter',
+    label: 'World Market bag capacity filter (Bags selected, sizes open)',
+    when: ['sim/market_query', 'ui/market_view'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      // Skip rather than clip a selector that never appeared, matching the sibling
+      // market-window target: a shot of the whole page is worse than no shot.
+      if (!(await openMarketBrowse(page))) return {};
+      // On the BASE commit there is no 'bag' option, so this is a no-op and the shot
+      // is the plain browse tab: exactly the "before" this change is contrasted with.
+      await page.evaluate(() => {
+        document
+          .querySelector('[data-market-filter-menu="itemType"] [data-market-filter-option="bag"]')
+          ?.click();
+      });
+      await wait(250);
+      await page.evaluate(() => {
+        const menu = document.querySelector('[data-market-filter-menu="subtype"]');
+        menu?.querySelector('.mkt-select-btn')?.click();
+      });
+      await wait(250);
+      return { clip: '#market-window' };
+    },
+  },
+  {
+    key: 'market-collect-indicator',
+    label: 'World Market collect indicator (minimap rim badge)',
+    // Keyed on the feature's own test path (the tank-defensive-cds pattern), so a
+    // broad ui/hud.ts or styles diff does not drag this focused shot along.
+    when: ['tests/market_collect_indicator.test.ts'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    // Credit the primary player's market collection directly (TS-private fields
+    // are plain properties at runtime), so the always-on badge lights without
+    // staging a full sale; the slow HUD band repaints it within a beat. Desktop
+    // clips to the minimap cluster; mobile keeps the full frame because the
+    // badge row sits left of (outside) #minimap-wrap's box.
+    async capture(page, shot) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        if (!sim) return;
+        sim.market.marketCollections.set(String(sim.playerId), {
+          copper: 9500,
+          items: [{ itemId: 'wolf_fang', count: 1 }],
+        });
+      });
+      const lit = await pollForSize(page, '#market-indicator');
+      if (!lit) throw new Error('#market-indicator did not light');
+      return shot?.mobile ? {} : { clip: '#minimap-wrap' };
+    },
+  },
+  {
     key: 'card-duel',
     label: 'Card Duel window (Card Master)',
     when: [
@@ -832,9 +1130,108 @@ export const TARGETS = [
     },
   },
   {
+    key: 'meters',
+    label: 'Damage meters: bars plus the per-ability hover breakdown',
+    when: ['ui/meters', 'meters_breakdown'],
+    variants: [
+      { key: 'desktop', charClass: 'warlock', charName: 'Nyxaris' },
+      { key: 'mobile', charClass: 'warlock', charName: 'Nyxaris', mobile: true },
+    ],
+    // Summon a pet so the owner row folds pet output, feed a spread of combat
+    // events through the REAL Meters.onEvent path (the same call handleEvents
+    // makes, only the events are staged), then focus the top bar: attachTooltip's
+    // focusin arm paints the breakdown, a sturdier trigger than a synthetic
+    // mouseenter under headless. Full-frame shot: #tooltip sits beside the panel
+    // and a single-selector clip cannot union the two rects.
+    async capture(page) {
+      // The summon lands its own entity, so it gets its own evaluate + settle:
+      // scanning for the pet in the same turn raced it, and on the mobile page
+      // window.__game is sometimes not published yet on the first try, so this
+      // retries until a pet is actually in the world.
+      const hasPet = () =>
+        page.evaluate(() => {
+          const sim = window.__game?.sim;
+          if (!sim?.player) return false;
+          for (const e of sim.entities.values()) {
+            if (e.kind === 'mob' && e.ownerId === sim.player.id) return true;
+          }
+          return false;
+        });
+      for (let attempt = 0; attempt < 30 && !(await hasPet()); attempt++) {
+        await page.evaluate(() => {
+          const sim = window.__game?.sim;
+          document.querySelector('#gpu-notice')?.remove();
+          document.querySelector('.camera-prompt-confirm')?.click();
+          if (!sim?.player) return;
+          try {
+            sim.summonPet?.(sim.player, 'emberkin');
+          } catch {}
+        });
+        await wait(500);
+      }
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return;
+        let petId = null;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && e.ownerId === player.id) petId = e.id;
+        }
+        // A dummy target the party "fought", so the segment has a mob to name.
+        let mobId = null;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && e.ownerId == null && !e.dead) {
+            mobId = e.id;
+            break;
+          }
+        }
+        const meters = game?.hud?.meters;
+        if (meters === undefined || mobId === null) return;
+        const hit = (sourceId, amount, ability) =>
+          meters.onEvent({
+            type: 'damage',
+            sourceId,
+            targetId: mobId,
+            amount,
+            crit: false,
+            school: 'physical',
+            ability,
+            kind: 'hit',
+          });
+        hit(player.id, 1840, 'Shadow Bolt');
+        hit(player.id, 910, 'Corruption');
+        hit(player.id, 470, 'Immolate');
+        hit(player.id, 260, null);
+        if (petId !== null) {
+          hit(petId, 620, 'Firebolt');
+          hit(petId, 180, null);
+        }
+        const el = document.querySelector('#meters-window');
+        if (el) el.style.display = 'none';
+        game?.hud?.toggleMeters?.();
+      });
+      const open = await pollForSize(page, '#meters-window');
+      if (!open) return {};
+      // The segment's duration (and so its rate column) is still settling right
+      // after the events land, and the shared tooltip paints ONCE on focus: let
+      // the panel settle first, or the breakdown header disagrees with the bar.
+      await wait(2000);
+      await page.evaluate(() => {
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.opacity = '0';
+        const row = document.querySelector('#meters-window .mt-row');
+        if (row instanceof HTMLElement) row.focus();
+      });
+      await pollForSize(page, '#tooltip');
+      await wait(300);
+      return {};
+    },
+  },
+  {
     key: 'char-window',
     label: 'Character window',
-    when: ['ui/char_window', 'ui/char_view'],
+    when: ['ui/char_window', 'ui/char_view', 'ui/stat_tooltip_view'],
     // Desktop and mobile, each in two framings: the default top framing, plus
     // the gathering panel scrolled into view (it sits below the fold and is
     // per-player progression info a player reads on both form factors,
@@ -876,6 +1273,57 @@ export const TARGETS = [
         await wait(400);
       }
       return open ? { clip: '#char-window' } : {};
+    },
+  },
+  {
+    key: 'worn-enchant-tooltip',
+    label: 'Paperdoll tooltip after enchanting the WORN piece in place',
+    when: ['professions/enchanting', 'ui/enchant_apply_view'],
+    // Equip a plain sword, apply an enchant to it IN PLACE (the worn arm), then
+    // hover its paperdoll row: the enchanted marker and the green bonus stat line
+    // read off equippedInstances without the piece ever leaving the slot. Full
+    // frame, since the tooltip renders beside the window and one selector cannot
+    // union the two rects.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      const staged = await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const sim = window.__game?.sim;
+        if (!sim?.player) return { ok: false, reason: 'offline world unavailable' };
+        sim.addItem('eastbrook_arming_sword', 1);
+        sim.equipItemToSlot('eastbrook_arming_sword', 'mainhand');
+        sim.addItem('arcane_dust', 5);
+        // The command entry point, exactly what the picker's worn row dispatches
+        // (never a hand-written payload): item id, enchant id, worn slot.
+        sim.applyEnchant('eastbrook_arming_sword', 'enchant_weapon_might', 'mainhand');
+        return { ok: true };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      await page.evaluate(() => {
+        const el = document.querySelector('#char-window');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleChar?.();
+      });
+      if (!(await pollForSize(page, '#char-window')))
+        throw new Error('character window did not open');
+      const shown = await page.evaluate(() => {
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.opacity = '0';
+        // Real focus fires attachTooltip's focusin arm, the sturdier headless
+        // trigger (the masterwork-tooltip target's precedent).
+        const row = [...document.querySelectorAll('#char-window [data-equip-slot]')].find(
+          (r) => r.getAttribute('data-equip-slot') === 'mainhand',
+        );
+        if (!row) return false;
+        row.focus?.();
+        row.dispatchEvent(new MouseEvent('mouseenter', { bubbles: false }));
+        return true;
+      });
+      if (!shown) throw new Error('no mainhand paperdoll row to hover');
+      await wait(500);
+      return { clip: '#ui' };
     },
   },
   {
@@ -934,7 +1382,7 @@ export const TARGETS = [
     async capture(page, variant) {
       const staged = await page.evaluate(() => {
         const sim = window.__game?.sim;
-        if (!sim || !sim.player) return { ok: false, reason: 'offline world is unavailable' };
+        if (!sim?.player) return { ok: false, reason: 'offline world is unavailable' };
         const me = sim.player.name;
         const m = (over) => ({
           id: over.id,
@@ -1034,6 +1482,97 @@ export const TARGETS = [
         document.querySelector('.soc-tab[data-tab="guild"]')?.click();
         if (hide) document.querySelector('[data-act="toggle-hide-offline"]')?.click();
       }, variant?.hide === true);
+      await wait(400);
+      return { clip: '#social-window' };
+    },
+  },
+  {
+    key: 'guild-billboard',
+    label: 'Social window: Guild tab billboard (officer edit vs member read-only)',
+    // Match the SOURCE files (`.ts` suffix, same reason as guild-roster above).
+    when: ['ui/social_window.ts', 'ui/social_view.ts'],
+    // Same sanctioned offline-staging fallback as guild-roster: inject a guild
+    // fixture (now carrying motd/motdSetBy) through the debug hook and open the
+    // Guild tab. The officer variant shows the enabled edit input + save button;
+    // the member variant shows the disabled input with no save.
+    variants: [
+      { key: 'desktop-officer', charName: 'Rueweaver', charClass: 'paladin', rank: 'officer' },
+      { key: 'desktop-member', charName: 'Rueweaver', charClass: 'paladin', rank: 'member' },
+      { key: 'mobile', charName: 'Rueweaver', charClass: 'paladin', rank: 'officer', mobile: true },
+    ],
+    async capture(page, variant) {
+      const staged = await page.evaluate((rank) => {
+        const sim = window.__game?.sim;
+        if (!sim?.player) return { ok: false, reason: 'offline world is unavailable' };
+        const me = sim.player.name;
+        const m = (over) => ({
+          id: over.id,
+          name: over.name,
+          cls: over.cls,
+          level: over.level,
+          realm: 'Aurora',
+          online: over.online,
+          status: over.status,
+          zone: over.zone,
+          rank: over.rank ?? 'member',
+          lastLogin: over.lastLogin ?? null,
+          activeTitle: over.activeTitle ?? null,
+        });
+        sim.socialInfo = {
+          friends: [],
+          blocks: [],
+          ignores: [],
+          guild: {
+            id: 1,
+            name: 'The Loud Ones',
+            rank,
+            motd: 'Raid night Friday, 8pm server. Bring flasks. Discord: discord.gg/example',
+            motdSetBy: 'Gizzelda',
+            members: [
+              m({
+                id: 1,
+                name: me,
+                cls: 'paladin',
+                level: 60,
+                online: true,
+                status: 'online',
+                zone: 'zone:stormwind',
+                rank,
+              }),
+              m({
+                id: 2,
+                name: 'Gizzelda',
+                cls: 'mage',
+                level: 60,
+                online: true,
+                status: 'dungeon',
+                zone: 'zone:deadmines',
+                rank: 'leader',
+              }),
+              m({
+                id: 3,
+                name: 'Bramble',
+                cls: 'druid',
+                level: 41,
+                online: false,
+                rank: 'member',
+                lastLogin: '2026-07-15T09:30:00.000Z',
+              }),
+            ],
+            events: [],
+          },
+        };
+        const el = document.querySelector('#social-window');
+        if (el) el.classList.remove('open');
+        window.__game?.hud?.toggleSocial?.();
+        return { ok: true };
+      }, variant?.rank ?? 'officer');
+      if (!staged.ok) throw new Error(staged.reason);
+      const open = await pollForSize(page, '#social-window');
+      if (!open) return {};
+      await page.evaluate(() => {
+        document.querySelector('.soc-tab[data-tab="guild"]')?.click();
+      });
       await wait(400);
       return { clip: '#social-window' };
     },
@@ -1827,7 +2366,7 @@ export const TARGETS = [
     // command, because offline the sim answers synchronously and the very next
     // event drain would resolve the row back out of pending; online this state
     // is what the window shows for the whole round trip.
-    async capture(page, variant) {
+    async capture(page, _variant) {
       await page.evaluate(() => {
         document.querySelector('.camera-prompt-confirm')?.click();
         document.querySelector('.tut-skip')?.click();
@@ -2109,6 +2648,118 @@ export const TARGETS = [
           if (state === 'expanded' || state === 'no-chip') break;
           await wait(400);
         }
+      }
+      await wait(600);
+      return {};
+    },
+  },
+  {
+    key: 'target-of-target',
+    label: 'Target-of-target mini-frame beside the target frame, clear of the aura strip',
+    when: ['totarget', 'ui/target_of_target'],
+    variants: [
+      { key: 'desktop', charClass: 'warrior', charName: 'Marksman' },
+      // Slider maximum: the mini zoom compounds --target-frame-scale, so the
+      // 18px gap and the top-aligned anchor must hold at the largest frame.
+      { key: 'desktop-scale-max', charClass: 'warrior', charName: 'Marksman', frameScale: 1.15 },
+      // Move mode: the unlocked frame grows a dashed outline and the corner
+      // button lights gold; the mini must stay clear of both.
+      { key: 'desktop-unlocked', charClass: 'warrior', charName: 'Marksman', unlockFrame: true },
+      // Party pushed below the target: the painter measures frame + strip only,
+      // so the beside-the-frame mini must no longer interact with the pushed rows.
+      { key: 'desktop-party', charClass: 'paladin', charName: 'Marksman', party: true },
+      // Boss rank: the move button moves to right: -30px and the dragon emblem
+      // overhangs the portrait side, so the mini takes the widened boss gap.
+      { key: 'desktop-boss', charClass: 'warrior', charName: 'Marksman', boss: true },
+      { key: 'mobile', charClass: 'mage', charName: 'Marksman', mobile: true },
+    ],
+    async capture(page, variant) {
+      await page.evaluate(
+        ({ withParty, asBoss }) => {
+          const game = window.__game;
+          const sim = game.sim;
+          const me = sim.primaryId;
+          const p = sim.player;
+          if (withParty) {
+            // Party state lives on the PartyMachine (sim.party); assemble the
+            // struct directly (offline invites queue stale cards).
+            const pm = sim.party;
+            const roster = [
+              ['Brightoak', 'druid'],
+              ['Stormcaller', 'shaman'],
+              ['Nightblade', 'rogue'],
+              ['Emberlyn', 'mage'],
+            ];
+            const pids = roster.map(([name, cls], i) => {
+              const pid = sim.addPlayer(cls, name);
+              const e = sim.entities.get(pid);
+              if (e) {
+                e.pos = { x: p.pos.x + (i % 4) * 2 - 3, y: p.pos.y, z: p.pos.z + 2 };
+                e.prevPos = { ...e.pos };
+              }
+              return pid;
+            });
+            const party = {
+              id: pm.nextPartyId++,
+              leader: me,
+              members: [me, ...pids],
+              raid: false,
+              raidGroups: new Map(),
+              lootStrategies: {},
+            };
+            pm.parties.set(party.id, party);
+            pm.partyByPid.set(me, party.id);
+            for (const q of pids) pm.partyByPid.set(q, party.id);
+          }
+          // Target a nearby mob, make it target US (a mob's target-of-target is
+          // its aggro target), and load the strip so its first wrapped row
+          // reaches the frame's right edge, the old collision band.
+          let mob = null;
+          for (const e of sim.entities.values()) {
+            if (e.kind === 'mob' && e.ownerId === null && !e.dead) {
+              mob = e;
+              break;
+            }
+          }
+          if (!mob) return;
+          // Boss variant: re-template the mob to a boss record so the HUD's
+          // rank resolution (MOBS[templateId].boss) applies the .boss chrome.
+          if (asBoss) mob.templateId = 'mirefen_broodmother';
+          mob.pos = { x: p.pos.x + 2, y: p.pos.y, z: p.pos.z + 8 };
+          mob.prevPos = { ...mob.pos };
+          sim.rebucket(mob);
+          sim.targetEntity(mob.id);
+          mob.aggroTargetId = me;
+          // The same call the options row lands on (applySetting delegates here).
+          game.hud.setShowTargetOfTarget(true);
+          for (let i = 0; i < 9; i++) {
+            sim.applyAura(mob, {
+              id: `tot_probe_${i}`,
+              name: `Probe ${i}`,
+              kind: 'dot',
+              value: 1,
+              remaining: 600,
+              duration: 600,
+              sourceId: me,
+              school: 'shadow',
+            });
+          }
+        },
+        { withParty: !!variant.party, asBoss: !!variant.boss },
+      );
+      if (variant.frameScale) {
+        await page.evaluate((scale) => {
+          document.documentElement.style.setProperty('--target-frame-scale', String(scale));
+        }, variant.frameScale);
+      }
+      await wait(1200);
+      if (variant.party) {
+        // Becoming leader auto-opens Loot Settings on the frame the HUD notices
+        // the new party; close it AFTER that frame so the scene stays clean.
+        await page.evaluate(() => window.__game.hud.closeLootSettings?.());
+      }
+      if (variant.unlockFrame) {
+        await page.evaluate(() => document.querySelector('#target-frame > .tf-move-btn')?.click());
       }
       await wait(600);
       return {};
@@ -2588,7 +3239,12 @@ export const TARGETS = [
   {
     key: 'p13-bag-actions',
     label: 'Bag item action menu (disenchant / salvage / apply enchant)',
-    when: ['bag_item_context_menu', 'bag_item_action_menu', 'enchant_apply_view'],
+    when: [
+      'bag_item_context_menu',
+      'bag_item_action_menu',
+      'enchant_apply_view',
+      'item_slot_labels',
+    ],
     // Four states of the bag-action surface: the desktop right-click menu, the same
     // menu from a mobile tap (the mobile arm), the stronger
     // destruction warning (the only held copy is signed masterwork), and the
@@ -2601,6 +3257,44 @@ export const TARGETS = [
       { key: 'confirm-special', confirm: true },
       { key: 'picker', picker: true },
       { key: 'picker-mobile', picker: true, mobile: true },
+      // The TARGET step (step two of the picker): worn gear is enchanted in
+      // place, so an equipped copy lists there beside the bagged ones, tagged
+      // with its equipment slot. The dual-wield variant is a rogue with the SAME
+      // sword in both hands, the case the slot discriminator exists for: two
+      // identical item ids, two separate rows.
+      { key: 'targets', targets: true },
+      { key: 'targets-mobile', targets: true, mobile: true },
+      { key: 'targets-dualwield', targets: true, dualWield: true, charClass: 'rogue' },
+      // #2466: the two holdings that painted two rows with ONE accessible name.
+      // A heroic variant renders its BASE item's display name (classic
+      // behavior), so a plain base beside a plain heroic copy was two rows of
+      // identical text; and both fingers share the one "Finger" slot label, so
+      // identical rings worn on each hand read alike. Each is its own scene
+      // because they land in different families (bagged vs worn) and carry
+      // different discriminators.
+      { key: 'targets-heroic', targets: true, heroicPair: true },
+      { key: 'targets-heroic-mobile', targets: true, heroicPair: true, mobile: true },
+      { key: 'targets-rings', targets: true, rings: true, drill: 'Ring' },
+      { key: 'targets-rings-mobile', targets: true, rings: true, drill: 'Ring', mobile: true },
+      // The #2415 replace flow: already-enchanted copies list as FLAGGED
+      // replace rows (worn and bagged families both, the meta naming the
+      // enchant a confirm would destroy, the same-enchant row disabled), and
+      // accepting one runs the destroy-confirm dialog that names the doomed
+      // enchant, the no-refund ruling, and the reagent cost.
+      { key: 'targets-replace', targets: true, replace: true },
+      { key: 'targets-replace-mobile', targets: true, replace: true, mobile: true },
+      { key: 'replace-confirm', targets: true, replace: true, replaceConfirm: true },
+      // The confirm on touch: this dialog carries the most copy of any state
+      // here (what dies, the no-refund ruling, what survives, the price), so
+      // the narrow landscape viewport is where it is most likely to wrap or
+      // clip, and it needs its own capture rather than a desktop stand-in.
+      {
+        key: 'replace-confirm-mobile',
+        targets: true,
+        replace: true,
+        replaceConfirm: true,
+        mobile: true,
+      },
     ],
     async capture(page, variant) {
       await page.evaluate(() => {
@@ -2609,16 +3303,99 @@ export const TARGETS = [
         document.querySelector('.gpu-notice-dismiss')?.click();
       });
       const staged = await page.evaluate(
-        (wantsConfirm, wantsPicker) => {
+        (
+          wantsConfirm,
+          wantsPicker,
+          wantsTargets,
+          wantsDualWield,
+          wantsReplace,
+          wantsHeroicPair,
+          wantsRings,
+        ) => {
           const game = window.__game;
           const sim = game?.sim;
           if (!game || !sim?.player) return { ok: false, reason: 'offline world unavailable' };
-          if (wantsPicker) {
-            // Enough dust to afford the base weapon enchants, so the picker's
-            // affordability lines show a mix of ready and short rows.
+          if (wantsHeroicPair) {
+            // #2466: a base item and its HEROIC variant, two ids that resolve to
+            // ONE display name. Both copies stay PLAIN, which is the worst case:
+            // no state tag separates them either, so the heroic mark is the only
+            // thing between the two rows. Real content ids, never a hand-written
+            // name.
+            sim.addItem('gravewyrm_thornmaul', 1);
+            sim.addItem('heroic_gravewyrm_thornmaul', 1);
+            sim.addItem('arcane_dust', 6);
+            return { ok: true, itemName: 'Chime Dust' };
+          }
+          if (wantsRings) {
+            // #2466: one ring id worn on BOTH fingers. ring1 and ring2 share the
+            // single "Finger" label, so the two rows were identical down to the
+            // byte and both stayed activatable. The rings are epic and carry a
+            // level requirement, so the player is levelled first (the ladder
+            // target's own idiom) or equipItem refuses them.
+            const p = sim.entities.get(sim.playerId);
+            if (p) p.level = 60;
+            sim.addItem('iron_vow_band', 1);
+            sim.equipItemToSlot('iron_vow_band', 'ring1');
+            sim.addItem('iron_vow_band', 1);
+            sim.equipItemToSlot('iron_vow_band', 'ring2');
+            sim.addItem('arcane_dust', 6);
+            return { ok: true, itemName: 'Chime Dust' };
+          }
+          if (wantsReplace) {
+            // The #2415 scene: a WORN enchanted copy (the in-place replace
+            // target), a bagged copy carrying a DIFFERENT enchant (the flagged
+            // bagged replace row, signed so the swap's carry-through is the
+            // one on screen), and a plain bagged copy (the classic target), so
+            // the target step paints all three families at once. Real ids
+            // only, never hand-written display strings.
+            //
+            // The bagged victim carries ALL THREE surviving facts (#2421): the
+            // signature, a masterwork bake (str, distinct from the int the
+            // enchant contributes, so the confirm's kept line and the tooltip's
+            // own attribution split agree), and an armed bind-on-trade lock.
+            // That is what puts a full "Kept: ..." line on screen; the worn
+            // copy stays plain-enchanted, so the same shot also shows the arm
+            // that deliberately claims no bind state. The bagged plain copy of
+            // the SAME item id is the mixed holding whose twin now says so.
+            sim.addItemInstance('eastbrook_arming_sword', {
+              enchant: 'enchant_weapon_agility',
+              rolled: { stats: { agi: 2 } },
+            });
+            sim.equipItemToSlot('eastbrook_arming_sword', 'mainhand');
+            sim.addItemInstance('eastbrook_arming_sword', {
+              signer: 'Aldric',
+              enchant: 'enchant_weapon_intellect',
+              rolled: { masterwork: true, stats: { int: 2, str: 3 } },
+              bindOnTrade: true,
+            });
+            sim.addItem('eastbrook_arming_sword', 1);
+            sim.addItem('arcane_dust', 6);
+            return { ok: true, itemName: 'Chime Dust' };
+          }
+          if (wantsTargets) {
+            // One sword WORN (the in-place target) and one in the bags (the
+            // classic target), so the target step shows both families at once.
+            // The dual-wield scene aims BOTH hands explicitly.
+            sim.addItem('eastbrook_arming_sword', 1);
+            sim.equipItemToSlot('eastbrook_arming_sword', 'mainhand');
+            if (wantsDualWield) {
+              sim.addItem('eastbrook_arming_sword', 1);
+              sim.equipItemToSlot('eastbrook_arming_sword', 'offhand');
+            }
+            sim.addItem('eastbrook_arming_sword', 1);
             sim.addItem('arcane_dust', 6);
             sim.addItem('arcane_essence', 1);
             return { ok: true, itemName: 'Chime Dust' };
+          }
+          if (wantsPicker) {
+            // Chime Essence is the one reagent that reaches ALL THREE tiers, so
+            // the picker opened on it is the motivating case for the tier
+            // grouping. Held counts leave a mix of ready and short rows, so the
+            // affordability lines stay exercised too.
+            sim.addItem('arcane_essence', 4);
+            sim.addItem('arcane_dust', 6);
+            sim.addItem('resonant_steel', 1);
+            return { ok: true, itemName: 'Chime Essence' };
           }
           if (wantsConfirm) {
             // The ONLY held copy is a signed masterwork instance, so the confirm
@@ -2634,6 +3411,11 @@ export const TARGETS = [
         },
         Boolean(variant?.confirm),
         Boolean(variant?.picker),
+        Boolean(variant?.targets),
+        Boolean(variant?.dualWield),
+        Boolean(variant?.replace),
+        Boolean(variant?.heroicPair),
+        Boolean(variant?.rings),
       );
       if (!staged.ok) throw new Error(staged.reason);
       await page.evaluate(() => {
@@ -2678,7 +3460,7 @@ export const TARGETS = [
         await wait(300);
         return { clip: '#ui' };
       }
-      if (variant?.picker) {
+      if (variant?.picker || variant?.targets) {
         // Click the Apply Enchant row (the staged reagent's only action).
         await page.evaluate(() => {
           const rows = [...document.querySelectorAll('#ctx-menu .ctx-item')];
@@ -2686,6 +3468,40 @@ export const TARGETS = [
         });
         await wait(500);
         if (!(await pollForSize(page, '#ctx-menu'))) throw new Error('enchant picker did not open');
+        if (variant?.targets) {
+          // Drill one step further into the TARGET list by clicking the weapon
+          // enchant's own row (matched by its localized name, so a reordered
+          // enchant table cannot silently shoot the wrong step).
+          // Matched by the enchant's own localized name, so a reordered enchant
+          // table cannot silently shoot the wrong step. The ring scenes need a
+          // RING enchant rather than the weapon default.
+          const drilled = await page.evaluate((match) => {
+            const rows = [...document.querySelectorAll('#ctx-menu .ctx-item[data-act]')];
+            const row = rows.find((r) => (r.textContent ?? '').includes(match)) ?? rows[0];
+            if (!row) return false;
+            row.click();
+            return true;
+          }, variant?.drill ?? 'Might');
+          if (!drilled) throw new Error('no affordable enchant row to drill into');
+          await wait(500);
+          if (!(await pollForSize(page, '#ctx-menu')))
+            throw new Error('enchant target step did not open');
+          if (variant?.replaceConfirm) {
+            // Accept path of the #2415 flow: click the BAGGED replace row
+            // (its act token is the discriminator) and shoot the confirm
+            // dialog that names the doomed enchant, the no-refund ruling,
+            // and the reagent cost.
+            const clicked = await page.evaluate(() => {
+              const row = document.querySelector('#ctx-menu .ctx-item[data-act^="replace:"]');
+              if (!row) return false;
+              row.click();
+              return true;
+            });
+            if (!clicked) throw new Error('no bagged replace row to confirm');
+            if (!(await pollForSize(page, '#confirm-dialog')))
+              throw new Error('replace confirm did not open');
+          }
+        }
         await wait(300);
         return { clip: '#ui' };
       }
@@ -2693,7 +3509,169 @@ export const TARGETS = [
       return { clip: '#ui' };
     },
   },
+  {
+    key: 'chrome-icons',
+    label: 'HUD chrome icons (side rail, mobile bar, More tray)',
+    when: ['ui/ui_icons', 'ui/chrome_icon_art', 'public/ui/chrome'],
+    // The icons live on three surfaces, and each is its own clip: the desktop rail is a
+    // narrow column a full-HUD frame renders too small to judge, and the mobile set splits
+    // between the always-visible bottom bar and the More tray behind a toggle.
+    variants: [
+      { key: 'desktop-rail' },
+      { key: 'mobile-bar', mobile: true },
+      { key: 'mobile-more-tray', mobile: true, moreTray: true },
+    ],
+    async capture(page, variant) {
+      if (variant?.moreTray) {
+        await page.evaluate(() => {
+          document.querySelector('#mobile-more')?.click();
+        });
+        if (!(await pollForSize(page, '#mobile-extra-controls')))
+          throw new Error('mobile More tray did not open');
+        await wait(400);
+        return { clip: '#mobile-extra-controls' };
+      }
+      // Both remaining clips are persistent chrome, already on screen after entry; the wait
+      // only lets the launcher art decode so a shot never lands on a half-painted rail.
+      await wait(600);
+      const sel = variant?.mobile ? '#mobile-combat-controls' : '#side-buttons';
+      if (!(await pollForSize(page, sel))) throw new Error(`${sel} never laid out`);
+      return { clip: sel };
+    },
+  },
+  {
+    key: 'p14-instance-tooltip',
+    label: 'Bag tooltip: enchant attribution on the per-copy bonus stat lines',
+    when: ['item_instance_tooltip'],
+    // The two shapes the attribution has to get right: a plain enchanted copy
+    // (the whole bonus is the enchant's) and an enchanted MASTERWORK copy (the
+    // bonus splits between the enchant and the masterwork bake). Both stage one
+    // copy per page and read the tooltip through the real focus path.
+    variants: [
+      {
+        key: 'enchanted',
+        instance: { enchant: 'enchant_chest_stamina', rolled: { stats: { sta: 4 } } },
+      },
+      {
+        key: 'enchanted-masterwork',
+        instance: {
+          signer: 'Aldric',
+          enchant: 'enchant_chest_stamina',
+          rolled: { masterwork: true, stats: { sta: 7 } },
+        },
+      },
+    ],
+    async capture(page, variant) {
+      // The DEF name, not the id-shaped guess: militia_vest displays as
+      // "Militia Chainvest", and the cell lookup keys on the accessible name.
+      await openBagsWithInstance(page, 'militia_vest', variant.instance);
+      await focusBagCell(page, 'Militia Chainvest');
+      await pollForSize(page, '#tooltip');
+      await wait(300);
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'p14-material-hint',
+    label: 'Bag tooltip: purpose hint on an enchanting material',
+    when: ['material_hint_view'],
+    // One arcane tier and one typed resonant, so both hint wordings (quality
+    // band vs armor/weapon material) are visible.
+    variants: [
+      { key: 'dust', itemId: 'arcane_dust', name: 'Chime Dust' },
+      { key: 'timber', itemId: 'resonant_timber', name: 'Resonant Timber' },
+    ],
+    async capture(page, variant) {
+      await openBagsWithInstance(page, variant.itemId, null);
+      await focusBagCell(page, variant.name);
+      await pollForSize(page, '#tooltip');
+      await wait(300);
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'p14-bag-glyphs',
+    label: 'Bag grid: per-kind instance corner glyphs',
+    when: ['bag_instance_glyph_view'],
+    // One stack of every marker kind side by side, which is the only way to see
+    // whether the corner actually distinguishes them: signed, enchanted,
+    // bind-on-trade, masterwork, and a plain copy for the baseline.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+        const sim = window.__game?.sim;
+        if (!sim?.player) throw new Error('offline world unavailable');
+        sim.addItemInstance('copper_ore', { signer: 'Aldric' }, undefined, 4);
+        sim.addItemInstance('militia_vest', {
+          enchant: 'enchant_chest_stamina',
+          rolled: { stats: { sta: 4 } },
+        });
+        sim.addItemInstance('resonant_steel', { bindOnTrade: true }, undefined, 2);
+        sim.addItemInstance('worn_sword', {
+          signer: 'Aldric',
+          rolled: { masterwork: true, stats: { str: 2 } },
+        });
+        sim.addItem('arcane_dust', 7);
+        const game = window.__game;
+        if (!document.querySelector('#bags')?.checkVisibility?.()) game.hud.toggleBags();
+      });
+      if (!(await pollForSize(page, '#bags'))) throw new Error('bags window did not open');
+      await wait(500);
+      return { clip: '#bags' };
+    },
+  },
 ];
+
+// Grant one staged stack (a plain count, or a specific ItemInstancePayload) and
+// open the bags window on it. Shared by the tooltip targets above, which each
+// stage exactly ONE copy per page so the cell lookup by display name is
+// unambiguous.
+async function openBagsWithInstance(page, itemId, instance) {
+  await page.evaluate(
+    (id, payload) => {
+      document.querySelector('.camera-prompt-confirm')?.click();
+      document.querySelector('.tut-skip')?.click();
+      document.querySelector('.gpu-notice-dismiss')?.click();
+      document.querySelector('#gpu-notice')?.remove();
+      const sim = window.__game?.sim;
+      if (!sim?.player) throw new Error('offline world unavailable');
+      if (payload) sim.addItemInstance(id, payload);
+      else sim.addItem(id, 3);
+      const game = window.__game;
+      if (!document.querySelector('#bags')?.checkVisibility?.()) game.hud.toggleBags();
+    },
+    itemId,
+    instance,
+  );
+  if (!(await pollForSize(page, '#bags'))) throw new Error('bags window did not open');
+}
+
+// Focus the bag cell whose accessible name carries `name`. Real focus fires
+// attachTooltip's focusin arm (the keyboard-nav path), a sturdier tooltip
+// trigger under headless than a synthetic mouseenter.
+async function focusBagCell(page, name) {
+  const found = await page.evaluate((wanted) => {
+    document.querySelector('.camera-prompt-confirm')?.click();
+    const banner = document.querySelector('#banner');
+    if (banner) banner.style.opacity = '0';
+    const cells = [...document.querySelectorAll('#bags .bag-item:not(.empty)')];
+    // Match on the accessible name, but fall back to the LAST occupied square:
+    // the staged stack is the most recently granted one, so a display-name
+    // rename cannot silently turn this target into a no-shot.
+    const cell =
+      cells.find((b) => (b.getAttribute('aria-label') ?? '').includes(wanted)) ??
+      cells[cells.length - 1];
+    if (!cell) return false;
+    cell.scrollIntoView({ block: 'center' });
+    cell.focus();
+    return true;
+  }, name);
+  if (!found) throw new Error(`no occupied bag cell to focus (wanted ${name})`);
+}
 
 // Map a list of changed file paths to the targets they imply (deduped, registry order).
 export function resolveTargets(changedFiles) {

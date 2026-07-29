@@ -25,6 +25,7 @@ vi.mock('../server/db', () => ({
 
 import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
+import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
@@ -60,6 +61,8 @@ interface FakeClient {
   sent: any[];
   ws: any;
 }
+
+type SnapshotApplier = { applySnapshot(snapshot: unknown): void };
 
 function fakeWs(): FakeClient {
   const sent: any[] = [];
@@ -149,6 +152,34 @@ function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWo
 }
 
 describe('self stat wire round-trip', () => {
+  it('mirrors Warrior shield block stats from the live equip command path', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Cedric', 'warrior');
+    server.sim.addItem('eastbrook_buckler', 1, session.pid);
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'equip', item: 'eastbrook_buckler', slot: 'offhand' }),
+    );
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.equip.offhand).toBe('eastbrook_buckler');
+    expect(snap.self.stats.armor).toBeGreaterThan(0);
+    expect(snap.self.stats.sta).toBeGreaterThan(0);
+    expect(snap.self.blk).toBeGreaterThan(0);
+    expect(snap.self.bval).toBe(6);
+
+    const client = bareClient(session.pid, 'warrior');
+    const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
+    internals.applySnapshot(snap);
+    expect(client.player.offhandItemId).toBe('eastbrook_buckler');
+    expect(client.player.equippedItems.offhand).toBe('eastbrook_buckler');
+    expect(client.player.stats.armor).toBe(snap.self.stats.armor);
+    expect(client.player.stats.sta).toBe(snap.self.stats.sta);
+    expect(client.player.blockChance).toBe(snap.self.blk);
+    expect(client.player.blockValue).toBe(6);
+  });
+
   it('mirrors crit/haste rating from the self snapshot onto the paper-doll entity', () => {
     const client = bareClient(1);
     const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
@@ -580,6 +611,123 @@ describe('corpse harvest claim over the wire', () => {
   });
 });
 
+describe('ledge climb over the wire (cl progress)', () => {
+  function climbingPlayer(): { e: ReturnType<Sim['entities']['get']> & object } {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Scaler');
+    const e = sim.entities.get(pid)!;
+    return { e };
+  }
+
+  it('quantizes the pull progress out and mirrors it 0..1 on the client', () => {
+    const { e } = climbingPlayer();
+    expect(wireEntity(e)).not.toHaveProperty('cl');
+
+    e.climb = {
+      from: { x: e.pos.x, y: e.pos.y, z: e.pos.z },
+      to: { x: e.pos.x, y: e.pos.y + 2, z: e.pos.z + 0.5 },
+      elapsed: 0.25,
+      duration: 0.5,
+    };
+    expect(wireEntity(e).cl).toBe(50);
+    // Just armed: still non-zero, so any client reads it as climbing.
+    e.climb.elapsed = 0;
+    expect(wireEntity(e).cl).toBe(1);
+    // Nearly done: capped inside 99, never rounding to a falsy 0 or a lying 100.
+    e.climb.elapsed = 0.499;
+    expect(wireEntity(e).cl).toBe(99);
+
+    e.climb.elapsed = 0.25;
+    const client = bareClient(9);
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
+    const remote = client.entities.get(e.id)!;
+    expect(remote.climbing).toBe(true);
+    expect(remote.climbProgress).toBeCloseTo(0.5, 6);
+  });
+
+  it('clears the mirror when a later record arrives without cl', () => {
+    const { e } = climbingPlayer();
+    e.climb = {
+      from: { x: e.pos.x, y: e.pos.y, z: e.pos.z },
+      to: { x: e.pos.x, y: e.pos.y + 2, z: e.pos.z + 0.5 },
+      elapsed: 0.1,
+      duration: 0.5,
+    };
+    const client = bareClient(9);
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
+    expect(client.entities.get(e.id)!.climbing).toBe(true);
+
+    e.climb = null; // the pull completed server-side
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
+    expect(client.entities.get(e.id)!.climbing).toBe(false);
+    expect(client.entities.get(e.id)!.climbProgress).toBeUndefined();
+  });
+});
+
+// Loot owner-lock lapse (FFA) over the wire. The rights-aware corpse picker
+// (src/game/corpse_loot_availability.ts) reads mob.lootFfaTimer; offline the
+// Sim entity carries the real countdown, so online the LAPSE must ride the
+// sparse terse key `ffa` or a stranger's aged-out corpse stays unofferable
+// forever (the old hardcoded Infinity mirror). Same pin shape as the hcb suite
+// above: the REAL server emit into the REAL client mirror.
+describe('loot FFA lapse over the wire', () => {
+  const TAPPER = 42;
+
+  function strangerCorpse(id: number, lootFfaTimer: number): ReturnType<typeof createMob> {
+    const template = MOBS.forest_wolf;
+    const mob = createMob(id, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.tappedById = TAPPER;
+    // claimed: keeps the harvest arm closed so canOpen isolates loot rights
+    mob.harvestClaimedBy = TAPPER;
+    mob.lootFfaTimer = lootFfaTimer;
+    mob.loot = { copper: 10, items: [{ itemId: 'wolf_fang', count: 1 }] };
+    return mob;
+  }
+
+  it('a fresh owner-locked corpse stays sparse (no ffa key) and unofferable to a stranger', () => {
+    const w = wireEntity(strangerCorpse(9101, 60));
+    // Absent, not `ffa: 0`: a still-locked corpse's record must be byte-unchanged
+    // by this feature, so the per-entity delta cache keeps eliding it.
+    expect(w).not.toHaveProperty('ffa');
+
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', ents: [w] });
+    const mirrored = client.entities.get(9101)!;
+    expect(mirrored.lootFfaTimer).toBe(Infinity);
+    expect(corpseLootAvailability(mirrored, 1).canOpen).toBe(false);
+  });
+
+  it('the lapse rides ffa:1, mirrors as lapsed, and reopens the picker for a stranger', () => {
+    const w = wireEntity(strangerCorpse(9102, 0));
+    expect(w.ffa).toBe(1);
+
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', ents: [w] });
+    const mirrored = client.entities.get(9102)!;
+    expect(corpseLootAvailability(mirrored, 1).canOpen).toBe(true);
+    expect(corpseLootAvailability(mirrored, 1).hasLoot).toBe(true);
+  });
+
+  it('a record without the flag resets a stale mirrored lapse (respawn reuses the id)', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(strangerCorpse(9103, 0))] });
+    expect(corpseLootAvailability(client.entities.get(9103)!, 1).canOpen).toBe(true);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(strangerCorpse(9103, 60))] });
+    expect(client.entities.get(9103)!.lootFfaTimer).toBe(Infinity);
+    expect(corpseLootAvailability(client.entities.get(9103)!, 1).canOpen).toBe(false);
+  });
+
+  it('never emits ffa for a non-lootable entity even with a lapsed timer', () => {
+    const template = MOBS.forest_wolf;
+    const alive = createMob(9104, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    alive.lootFfaTimer = 0;
+    expect(wireEntity(alive)).not.toHaveProperty('ffa');
+  });
+});
+
 describe('combat ratings over the wire', () => {
   it('mirrors Ranged Attack Power so online hunter attack-spell tooltips can scale', () => {
     const sim = new Sim({ seed: 7, playerClass: 'hunter', autoEquip: true });
@@ -726,6 +874,53 @@ describe('delta snapshots', () => {
     const client = bareClient(session.pid);
     (client as any).applySnapshot(snap);
     expect(client.player.potionCdRemaining).toBeCloseTo(95.5, 1);
+  });
+
+  it('mirrors Hallowed Wall armor from the live Protection cast-slot path', () => {
+    const paladinServer = new GameServer();
+    const paladinFc = fakeWs();
+    const paladinSession = joinServer(paladinServer, paladinFc, 20, 'Holytest', 'paladin');
+    paladinServer.sim.setPlayerLevel(20, paladinSession.pid);
+    expect(paladinServer.sim.setSpec('protection', paladinSession.pid)).toBe(true);
+
+    const player = paladinServer.sim.entities.get(paladinSession.pid)!;
+    player.resource = player.maxResource;
+    player.hp = player.maxHp;
+    const baseArmor = player.stats.armor;
+    const target = createMob(9001, MOBS.deeprock_kobold, 20, {
+      x: player.pos.x,
+      y: player.pos.y,
+      z: player.pos.z + 12,
+    });
+    target.maxHp = target.hp = 1_000_000;
+    (paladinServer.sim as unknown as { addEntity(e: typeof target): void }).addEntity(target);
+    player.targetId = target.id;
+
+    const known = paladinServer.sim.meta(paladinSession.pid)!.known;
+    const slot = known.findIndex((entry) => entry.def.id === 'holy_shield');
+    expect(slot).toBeGreaterThanOrEqual(0);
+
+    paladinServer.handleMessage(
+      paladinSession,
+      JSON.stringify({ t: 'cmd', cmd: 'castSlot', slot }),
+    );
+    for (let i = 0; i < 200 && paladinServer.sim.ctx.pendingProjectiles.length > 0; i++) {
+      paladinServer.sim.tick();
+    }
+
+    broadcast(paladinServer);
+    const snap = lastSnap(paladinFc.sent);
+    expect(snap.self.auras).toContainEqual(
+      expect.objectContaining({ id: 'holy_shield', kind: 'buff_armor', value: 150 }),
+    );
+    expect(snap.self.stats.armor).toBe(baseArmor + 150);
+
+    const client = bareClient(paladinSession.pid, 'paladin');
+    (client as unknown as SnapshotApplier).applySnapshot(snap);
+    expect(client.player.auras).toContainEqual(
+      expect.objectContaining({ id: 'holy_shield', kind: 'buff_armor', value: 150 }),
+    );
+    expect(client.player.stats.armor).toBe(baseArmor + 150);
   });
 
   it('includes live aura and movement diagnostics in admin online rows', () => {
@@ -2951,6 +3146,8 @@ const ALL_DELTA_KEYS = [
   'market',
   'marks',
   'milestones',
+  'mktU',
+  'mloot',
   'mst',
   'ncd',
   'party',
@@ -2985,7 +3182,9 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   atitle: 'activeTitle',
   bags: 'bags',
   bank: 'bankInfo',
+  blk: 'blockChance',
   buyback: 'vendorBuyback',
+  bval: 'blockValue',
   cds: 'cooldowns',
   cosmetics: 'accountCosmetics',
   cprof: 'craftingIdentity',
@@ -3014,6 +3213,8 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   market: 'marketInfo',
   marks: 'markers',
   milestones: 'unlockedMilestones',
+  mktU: 'marketCollectPending',
+  mloot: 'masterLootPrompts',
   mres: 'maxResource',
   mst: 'activeMobileStationCraft',
   party: 'partyInfo',
@@ -3082,6 +3283,9 @@ function dirtyEveryDeltaField(): {
   (sim as any).targeting.partyMarkers.set(party.id, new Map([[mp, 3]]));
   const merchant = sim.entities.get(sim.market.merchantIds[0]);
   if (merchant) merchant.pos = { ...p.pos };
+  // `mktU`: credit a pending collection so the collect-indicator bit is 1 (the
+  // name key merges into the canonical seller key on first read).
+  (sim.market as any).marketCollections.set(meta.name, { copper: 95, items: [] });
   // `mail`: mailInfoFor is null unless near a mailbox, so relocate one onto the
   // player. `mailU` is already non-zero: every fresh character got the one-time
   // Ravenpost welcome letter (delay 0) at join.
@@ -3201,6 +3405,25 @@ function dirtyEveryDeltaField(): {
     candidates: [lp],
     partyMembers: [lp, mp],
     choices: new Map(),
+  });
+  // `mloot`: a SECOND roll, still in its master-loot curate phase with the leader
+  // as the master looter. Deliberately distinct from the need/greed roll above so
+  // the two surfaces cannot be confused: activeLootRolls/lootRollGroupStatus skip
+  // this one (masterLooter set) and activeMasterLootRolls skips that one.
+  (sim as any).pendingLootRolls.set(2, {
+    id: 2,
+    itemId: 'greyjaw_hide_boots',
+    itemName: 'Greyjaw Hide Boots',
+    quality: 'uncommon',
+    expiresAt: 9999,
+    candidates: [lp, mp],
+    candidateNames: new Map([
+      [lp, 'Alld'],
+      [mp, 'Memb'],
+    ]),
+    partyMembers: [lp, mp],
+    choices: new Map(),
+    masterLooter: lp,
   });
 
   // Enchanting-action outcomes (Professions 2.0): poke the exact
@@ -3398,9 +3621,26 @@ describe('full self-state snapshot delta fixture', () => {
     expect((client.duelInfo as any)?.state).toBe('countdown'); // duel -> duelInfo
     expect(client.arenaInfo).not.toBeNull(); // arena -> arenaInfo
     expect(client.marketInfo).not.toBeNull(); // market -> marketInfo
+    expect(client.marketCollectPending).toBe(true); // mktU -> marketCollectPending (truthy bit)
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
     expect(client.activeLootRolls().map((r) => r.rollId)).toEqual([1]); // lroll -> lootRollPrompts
+    // mloot -> masterLootPrompts, via the activeMasterLootRolls() accessor. Roll 2
+    // only: the curate-phase master roll is master-looter-only, and roll 1 (a plain
+    // need/greed roll) must never leak onto it.
+    expect(client.activeMasterLootRolls()).toEqual([
+      {
+        rollId: 2,
+        itemId: 'greyjaw_hide_boots',
+        itemName: 'Greyjaw Hide Boots',
+        quality: 'uncommon',
+        expiresAt: 9999,
+        candidates: [
+          { pid: leader.pid, name: 'Alld' },
+          { pid: memberPid, name: 'Memb' },
+        ],
+      },
+    ]);
     // lrollg -> lootRollGroup, via the lootRollGroupStatus() accessor
     expect(client.lootRollGroupStatus()).toEqual([
       {
@@ -3614,9 +3854,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 55 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(55);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(55);
+  it('ALL_DELTA_KEYS contains exactly 57 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(57);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(57);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -3635,7 +3875,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
     expect(scraped.has('vcupb')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
-    expect(scraped.size).toBe(55);
+    expect(scraped.size).toBe(57);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -3657,6 +3897,11 @@ describe('delta-key contract pins (anti-drift)', () => {
       atitle: 'activeTitle',
       deeds: 'deedsEarned',
       dstats: 'deedStats',
+      // Two loot-roll surfaces whose terse keys look interchangeable: mloot is the
+      // master-looter curate prompt, lroll the need/greed one, and swapping either
+      // right-hand side would pass every other check in this test.
+      lroll: 'lootRollPrompts',
+      mloot: 'masterLootPrompts',
     };
     for (const [terse, iworld] of Object.entries(required)) {
       expect(TERSE_TO_IWORLD[terse], `rename ${terse} -> ${iworld} drifted`).toBe(iworld);
@@ -3674,7 +3919,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     // reviewable change landing in alphabetical order
     expect(Object.keys(TERSE_TO_IWORLD)).toEqual([...Object.keys(TERSE_TO_IWORLD)].sort());
     // every entry is either a delta key or one of the always-present self scalars
-    const SELF_SCALARS = new Set(['res', 'mres', 'rtype', 'lxp', 'rxp', 'prk']);
+    const SELF_SCALARS = new Set(['blk', 'bval', 'res', 'mres', 'rtype', 'lxp', 'rxp', 'prk']);
     for (const terse of Object.keys(TERSE_TO_IWORLD)) {
       expect(
         (ALL_DELTA_KEYS as readonly string[]).includes(terse) || SELF_SCALARS.has(terse),

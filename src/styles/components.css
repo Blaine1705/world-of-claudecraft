@@ -556,6 +556,45 @@
     }
   }
 
+  /* ---------- resized-window fill ---------- */
+  /* A window the user has dragged to a size (.window-sized, stamped by
+     src/ui/window_resize.ts once a corner drag engages) owns an explicit
+     width/height. Its scrolling body has to follow that box, and a body authored
+     with a viewport-relative cap does not: .lb-body's 56vh keeps its old height
+     inside the taller window, so the board stays truncated behind its own
+     scrollbar while a dead band opens under it (issue: leaderboard resize).
+
+     So the ONE child marked .window-fill absorbs whatever height the drag left
+     over and scrolls inside it, while the chrome around it (the sticky header, a
+     tab strip) keeps its intrinsic size. Windows with no .window-fill child are
+     left entirely alone (the shell's own overflow-y still handles their
+     overflow), and an unsized window is unaffected, so this costs nothing until a
+     drag actually engages.
+
+     The host window must be a flex COLUMN, which per the window-frame family
+     (#mailbox-window, #social-window) means it opens with an inline display:flex:
+     `.window` is opened by an inline style.display and no stylesheet display can
+     override that. A window adopting .window-fill opts into that pattern too.
+
+     It lives here in @layer components rather than beside the other window-shell
+     rules in layout.css because it has to OUTRANK the per-window body caps, and
+     those are authored in this layer: layout sits below components, so a
+     max-height reset there would silently lose. */
+  .window.window-sized > .window-fill {
+    flex: 1 1 auto;
+    /* A floor, NOT the usual min-height:0. The item still shrinks far below its
+       content height (that is what makes it scroll inside the window instead of
+       pushing the window into its own scroll), but at WINDOW_MIN_HEIGHT the chrome
+       above it (a title that wraps at 220px wide, plus a tab strip) can already
+       exceed the content box; min-height:0 would then collapse the body to nothing
+       and hide it outright. Roughly two rows, so the window's own overflow-y takes
+       the remainder and the content stays reachable. */
+    min-height: 48px;
+    /* The window height is the budget now; a leftover vh cap would re-open the
+       dead band this rule exists to close. */
+    max-height: none;
+  }
+
   /* ---------- windows ---------- */
   #quest-dialog {
     width: 440px;
@@ -728,6 +767,25 @@
     opacity: 0.75;
     margin-bottom: 6px;
   }
+  /* #2514: the current selection earns a tier the widest pick on this corpse
+     would not, so the rule the hint states is live right now. Lifting it out of
+     the muted default is the whole cue: it adds information the player can act
+     on (keep the boxes as they are) and takes none away, and it is what makes
+     the view model's `concentrated` a rendered decision rather than a field
+     nothing reads.
+     Opacity ONLY, and that is load-bearing rather than timid. This hint sits
+     ABOVE the checkbox list and the Harvest button, and it re-renders on every
+     toggle, so any metric-changing emphasis (a heavier weight, a border, a
+     padding) can flip a long locale from two wrapped lines to three and shove
+     the controls down at the exact moment the player is reaching for them. That
+     is the hazard corpse_harvest_window.ts already argues for the reason line,
+     and it is worse here because this block precedes the controls. Opacity
+     changes no box. The cue is supplementary in any case: the rule it
+     emphasizes is the sentence itself, which is always present and always
+     legible. */
+  .corpse-harvest.is-concentrated .corpse-harvest-hint {
+    opacity: 1;
+  }
   .corpse-harvest-list {
     display: flex;
     flex-direction: column;
@@ -737,12 +795,58 @@
   .corpse-harvest-row {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 6px;
     font-size: 12px;
     cursor: pointer;
   }
+  /* The name and the mark wrap instead of widening the fixed-width popup: the
+     longest localized pair ("Venom Sac" beside id_ID "belum ada hasil") would
+     otherwise push the row past the 230px window and turn .window's
+     overflow-y:auto into a horizontal scrollbar. */
+  .corpse-harvest-row > span {
+    min-width: 0;
+  }
+  /* #2514: a component family with no harvest item behind it yet. The row is
+     still offered and still CHECKABLE (the sim ignores it either way), so the
+     mark is the muted name plus the .corpse-harvest-note text beside it, never
+     colour alone.
+     Scoped to the row's text, deliberately: dimming the whole label would dim
+     the checkbox too, and a greyed checkbox is this HUD's disabled idiom
+     (.btn:disabled above), so a live control would read as a dead one in the
+     one place this change exists to make honest.
+     A themed token rather than an opacity, and the reason is measurement, not
+     taste: a stacked opacity composited the mark to 2.97:1 on the parchment
+     preset, and tests/theme.test.ts structurally cannot see a loss that happens
+     in a stylesheet rather than in a token. --color-text-muted is the house
+     treatment for muted 10-11px chrome (78 sibling rules across this file,
+     hud.css and shell.css) and theme.ts repairs it to the 3:1 large-text tier
+     against the panel base, which is a floor the composite did not have; it is
+     an improvement on every preset and it moves with the theme. It is NOT a
+     4.5:1 guarantee, and on parchment it measures 4.92:1 at the panel top and
+     3.60:1 in the gradient's edge band. That gap is systemic to the token
+     rather than introduced here, and it is not what carries the row's meaning:
+     the mark is the .corpse-harvest-note TEXT, whose sentence is also in the
+     checkbox's accessible name, so nothing is conveyed by contrast alone. */
+  .corpse-harvest-row-no-yield > span {
+    color: var(--color-text-muted);
+  }
+  .corpse-harvest-note {
+    font-size: 10px;
+    font-style: italic;
+    color: var(--color-text-muted);
+  }
   .corpse-harvest-btn {
     width: 100%;
+  }
+  /* #2509: why Harvest is refused, stated in place. A disabled button takes no
+     pointer events and leaves the tab order, so its tooltip is unreachable.
+     Sits BELOW the button (see corpse_harvest_window.ts) so showing it never
+     moves the control the player is reaching for. */
+  .corpse-harvest-warning {
+    font-size: 11px;
+    color: var(--color-text-error);
+    margin-top: 6px;
   }
 
   /* ---------- town-focus ---------- */
@@ -1531,6 +1635,15 @@
   #leaderboard-window,
   #daily-rewards-window {
     width: 480px;
+  }
+  /* The leaderboard is a flex COLUMN window (the #mailbox-window / #social-window
+     family): the painter opens it with an inline display:flex, and .lb-body carries
+     .window-fill, so once the user drags the window to a size the board takes the
+     leftover height instead of staying pinned to its 56vh cap. flex-direction is
+     unconditional because the inline display:flex is; with the shell default (row)
+     the header, tabs and board would lay out side by side. */
+  #leaderboard-window {
+    flex-direction: column;
   }
   #daily-rewards-window {
     top: 24px;
@@ -2335,11 +2448,12 @@
     text-align: right;
     color: #ffe27a;
   }
-  /* Players / Guilds tab bar above the board. */
+  /* Players / Guilds tab bar above the board. No margin-top: the window is a flex
+     column, so this margin would ADD to .panel-title's 8px margin-bottom instead of
+     collapsing with it the way it did under block flow, doubling the gap. */
   .lb-tabs {
     display: flex;
     gap: 6px;
-    margin-top: 8px;
   }
   .lb-tab {
     flex: 1;
@@ -4342,6 +4456,11 @@
     line-height: 1.55;
     color: var(--color-text-light);
     margin: 10px 0;
+    /* The body is escaped plain text, so a multi-line body (the disenchant
+       confirm's expected-yield preview) needs its newlines honored; pre-line
+       still collapses runs of spaces, so every existing single-line body
+       renders byte-identically. */
+    white-space: pre-line;
   }
   #confirm-dialog .cd-actions {
     display: flex;
@@ -5643,10 +5762,10 @@
     pointer-events: none;
   }
   /* Instanced-copy marker (Professions 2.0): a static gold corner
-     tab on every per-copy (signed/enchanted/masterwork) stack, always visible
-     on the cell itself on desktop and touch (information-add, identical on
-     every graphics preset, so no --fx-* gate). Top-left, clear of the
-     bottom-right count badge. */
+     tab, now the FALLBACK for an instanced stack whose payload matches none of
+     the named kinds below. Always visible on the cell itself on desktop and
+     touch (information-add, identical on every graphics preset, so no --fx-*
+     gate). Top-left, clear of the bottom-right count badge. */
   .bag-item .bi-instance {
     position: absolute;
     top: 1px;
@@ -5656,6 +5775,36 @@
     clip-path: polygon(0 0, 100% 0, 0 100%);
     background: var(--color-accent);
     pointer-events: none;
+  }
+  /* Per-kind corner glyphs: the enchanted / signed / bound copies each get their
+     own procedural chrome glyph in the same top-left corner, so the marker says
+     WHICH kind of special copy this is instead of only that it is one. Same
+     always-on, preset-independent contract as .bi-instance above (no --fx-*
+     gate, no hover reveal); the tooltip carries the semantics, the glyph is
+     aria-hidden. Colors come from tokens, never a literal in the painter. */
+  .bag-item .bi-glyph {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 12px;
+    height: 12px;
+    display: block;
+    pointer-events: none;
+    filter: drop-shadow(0 1px 1px #000);
+  }
+  .bag-item .bi-glyph .ui-icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .bag-item .bi-glyph-enchanted {
+    color: var(--color-bag-glyph-enchanted);
+  }
+  .bag-item .bi-glyph-signed {
+    color: var(--color-bag-glyph-signed);
+  }
+  .bag-item .bi-glyph-bound {
+    color: var(--color-bag-glyph-bound);
   }
   .bag-item .bi-masterwork-seal {
     position: absolute;
@@ -7248,6 +7397,62 @@
   }
   .soc-guild-head .gm {
     color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  /* Guild billboard: the officer-set message pinned between the guild head and
+     the roster. Plain escaped text only (player-controlled, never linkified).
+     Raw hex matches the surrounding .soc-* palette; tokenizing that palette is
+     deferred (see the .soc-sugg-item note above). */
+  .soc-billboard {
+    grid-column: 1 / -1;
+    margin: 0 4px 6px;
+    padding: 7px 9px;
+    background: #1a1410;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+  }
+  .soc-billboard-label {
+    font-family: var(--title-font);
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin-bottom: 3px;
+  }
+  .soc-billboard-msg {
+    font-size: 12px;
+    color: #f0ead8;
+    overflow-wrap: anywhere;
+    user-select: text;
+    -webkit-user-select: text;
+  }
+  .soc-billboard-msg.empty {
+    color: #887c5c;
+  }
+  .soc-billboard-by {
+    margin-top: 3px;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .soc-billboard-edit {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .soc-billboard-edit input {
+    flex: 1;
+    min-width: 0;
+    background: #120f0c;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    color: #f0ead8;
+    padding: 5px 7px;
+    font-size: 12px;
+  }
+  .soc-billboard-edit input:disabled {
+    color: #887c5c;
+  }
+  .soc-billboard-edit .btn {
+    margin: 0;
+    padding: 5px 12px;
     font-size: 11px;
   }
   /* Guild roster: the persisted "hide offline" toggle (an aria-pressed button with a
@@ -9380,23 +9585,22 @@
     color: #9fdc7f;
     font-size: 10.5px;
   }
-  /* The search box and the type/subtype/rarity dropdowns are one control row: at 860px
-     wide, a full-width search box (or a filter row spanning the whole window) reads
-     oversized, so both are capped to a sensible max-width and sit side by side,
-     wrapping onto their own line only once the window narrows too much to fit them
-     (mobile, or a three-menu row once the subtype filter appears). */
+  /* Search and every visible filter participate in one grid. The previous nested flex
+     rows wrapped independently, so the search aligned against the bottom of the entire
+     filter block and jumped beside its last row as the window narrowed. A shared grid
+     keeps every control on the same columns and moves complete fields between rows. */
   .mkt-controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: flex-end;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    gap: 10px 8px;
+    align-items: end;
     margin: 2px 0 8px;
     position: relative;
     z-index: 3;
   }
   .mkt-search {
-    flex: 1 1 200px;
-    max-width: 260px;
+    width: 100%;
+    max-width: none;
     min-width: 0;
     box-sizing: border-box;
     margin: 0;
@@ -9418,18 +9622,13 @@
     border-color: var(--color-border-focus);
   }
   .mkt-filters {
-    display: flex;
-    flex-wrap: wrap;
-    flex: 2 1 auto;
-    gap: 8px;
-    margin: 0;
+    display: contents;
   }
   .mkt-filter {
     display: flex;
     flex-direction: column;
     gap: 3px;
-    flex: 1 1 140px;
-    max-width: 220px;
+    max-width: none;
     min-width: 0;
   }
   .mkt-filter span {
@@ -12134,6 +12333,107 @@
     padding: 5px 8px;
     color: var(--color-text);
     background: var(--panel-base);
+  }
+  /* Item picker combobox. Replaces a native <select> over all ~672 ITEMS, which
+     rendered taller than the viewport and covered its own window. Reuses the
+     .soc-suggest / .soc-sugg-item visual treatment from the social panel so no new
+     design-system surface is introduced. The wrapper anchors the absolutely
+     positioned listbox; max-height is what keeps the list from ever growing back
+     into the bug this replaced. */
+  .dev-item-pick {
+    position: relative;
+  }
+  .dev-item-suggest {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 3px);
+    display: none;
+    z-index: 30;
+    background: #14110d;
+    border: 1px solid #6f5a2a;
+    border-radius: 5px;
+    max-height: 210px;
+    overflow-y: auto;
+    box-shadow: 0 6px 18px #000a;
+  }
+  .dev-item-opt {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 9px;
+    cursor: var(--cursor-point);
+    font-size: 12px;
+  }
+  .dev-item-opt:hover,
+  .dev-item-opt.active {
+    background: #2f2740;
+  }
+  .dev-item-opt.active {
+    box-shadow: inset 2px 0 0 var(--gold);
+  }
+  .dev-item-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* Text-colour twins of the .q-* icon-border classes, same canonical quality hexes,
+     so a row is scannable by quality at a glance. */
+  .dev-item-name.qt-poor {
+    color: #9d9d9d;
+  }
+  .dev-item-name.qt-common {
+    color: #d8d8d8;
+  }
+  .dev-item-name.qt-uncommon {
+    color: #1eff00;
+  }
+  .dev-item-name.qt-rare {
+    color: #3d9bff;
+  }
+  .dev-item-name.qt-epic {
+    color: #c77dff;
+  }
+  .dev-item-name.qt-legendary {
+    color: #ff8000;
+  }
+  .dev-item-tag {
+    flex: 0 0 auto;
+    padding: 1px 5px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--color-text-muted);
+    font-size: 10px;
+    text-transform: uppercase;
+  }
+  /* The heroic tag is the ONLY thing separating the 57 duplicate display names (a
+     base piece and its generated heroic variant), so it gets real contrast rather
+     than the muted treatment the slot tag uses. */
+  .dev-item-tag.heroic {
+    border-color: var(--gold-dim);
+    color: var(--gold);
+  }
+  .dev-item-id {
+    flex: 0 0 auto;
+    color: var(--color-text-muted);
+    font-family: var(--mono-font, monospace);
+    font-size: 10px;
+  }
+  .dev-item-empty,
+  .dev-item-more {
+    padding: 7px 9px;
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  .dev-item-status {
+    min-height: 13px;
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  .dev-item-status.unknown {
+    color: var(--danger, #e06c6c);
   }
   .dev-command-grid {
     display: grid;

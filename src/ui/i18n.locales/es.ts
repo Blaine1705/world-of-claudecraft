@@ -18,8 +18,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Encantar arma - Sello Rúnico',
   'hudChrome.professions.ctaRaiseSpecialized':
     'Sigue subiendo {craft}: {points} puntos más para Especializado, y los costos de materiales bajan.',
-  'guide.professions.harvestBody':
-    'La recolección no se limita a los nodos. Muchas bestias abatidas pueden cosecharse una sola vez, el primero en llegar, para obtener pieles, colmillos, seda y carne directamente del cadáver junto a su botín ordinario; con una pulsación se abre todo a la vez. La elección también es tuya cada vez: extrae todo lo que ofrece el cadáver, o concéntrate en menos componentes y obtén una calidad notablemente superior de lo que sí tomas.\n\nUna tirada de cosecha rara o mejor en una familia portadora de ejemplares también otorga un ejemplar perfecto firmado (una Piel Prístina, Seda Prístina, Glándula de Veneno Prístina o Corte Primo) además del rendimiento ordinario, y registra Espécimen Perfecto en tu Libro de Gestas. Cualquier personaje puede cosechar, sin necesidad de entrenamiento, y cualquier herramienta de recolección que poseas cuenta para el tramo de calidad superior, sea del oficio que sea.',
+  'guide.professions.harvestBodyChoice':
+    'La recolección no se limita a los nodos. Muchas bestias abatidas pueden cosecharse una sola vez, el primero en llegar, para obtener pieles, colmillos, seda y carne directamente del cadáver junto a su botín ordinario; con una pulsación se abre todo a la vez. Cuando una bestia porta más de un componente aprovechable, la elección es tuya: toma todo lo que pueda dar, o concéntrate en menos componentes y obtén una calidad notablemente superior de lo que sí tomas.\n\nUna tirada de cosecha rara o mejor en una familia portadora de ejemplares también otorga un ejemplar perfecto firmado (una Piel Prístina, Seda Prístina, Glándula de Veneno Prístina o Corte Primo) además del rendimiento ordinario, y registra Espécimen Perfecto en tu Libro de Gestas. Cualquier personaje puede cosechar, sin necesidad de entrenamiento, y cualquier herramienta de recolección que poseas cuenta para el tramo de calidad superior, sea del oficio que sea.',
   'guide.professions.craftMasteryTitle': 'Cuánto tarda la maestría',
   'guide.professions.craftMasteryBody':
     'Expectativas honestas: el camino hasta el tope de 125 de un oficio requiere al menos 125 elaboraciones exitosas, ya que cada elaboración con ganancia completa avanza exactamente un punto, y en la práctica algo más a medida que las recetas pierden color entre un peldaño y otro del entrenador. La elaboración en sí es rápida; abastecerla es el viaje real, así que reserva varias tardes dedicadas a recolectar y elaborar por cada oficio.\n\nLos oficios de recolección alcanzan su tope de 100 a lo largo de un recorrido normal de subida de nivel si cosechas mientras viajas, aunque el tramo final pide los nodos de nivel superior del lejano norte. La Pesca es el camino largo por diseño: según su propio ritmo de ganancia, 200 de pericia equivale a más de tres mil capturas. El Pescador Maestro es un título que se gana durante una temporada de tardes tranquilas, no en un fin de semana.',
@@ -209,7 +209,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.enchanting.marketHeading':
     'Copias encantadas, procedencia y el mercado',
   'guide.profPages.craftProse.enchanting.marketBody':
-    'Aplicar un encantamiento consume una copia embolsada y sin equipar del objeto más los reactivos, y devuelve una copia encantada diferente; equípala y la bonificación acompaña a la pieza para siempre, a través de desequipamientos, viajes al banco y comercios. Un encantamiento por pieza: una copia encantada nunca puede encantarse de nuevo ni desencantarse, y vender, descartar y desencantar prefieren las copias simples primero, para que tu pieza terminada no se consuma por accidente. Las copias encantadas idénticamente incluso se apilan en tus bolsas.\n\nEl equipo de obra maestra y el encantamiento son amigos: una pieza de obra maestra sigue siendo completamente encantable, y el encantamiento se suma a la bonificación de obra maestra sin alterarla ni la firma del fabricante. Sumando todas las fuentes, una obra maestra firmada con un encantamiento Mayor es lo mejor que puede lograr una pieza artesanal, y aún así sigue por debajo del botín de banda por diseño.\n\nEn el mercado, el Mercado Mundial solo comercia con existencias simples y sin modificar, por lo que las piezas encantadas y firmadas cambian de manos cara a cara a través de la ventana de comercio. Los materiales son la mitad comerciable del oficio: el Polvo, la Esencia y los Fragmentos se listan libremente, publicar no cuesta nada y el Mercader toma solo el 5 por ciento de una venta completada. Eso hace que los dos ingresos clásicos del encantador sean vender materiales en el mercado y tomar la pieza de un cliente en comercio, encantarla y devolvérsela.',
+    'Aplicar un encantamiento consume los reactivos y marca una copia concreta del objeto. Si lo aplicas a una copia embolsada, recibes una copia encantada diferente; si lo aplicas a una pieza que ya llevas puesta, se encanta en el sitio, sin desequipar y volver a equipar. En cualquier caso la bonificación acompaña a la pieza para siempre, a través de desequipamientos, viajes al banco y comercios. Un encantamiento por pieza: aplicar un encantamiento distinto a una copia encantada pide confirmación primero y luego reemplaza el encantamiento antiguo directamente, destruyéndolo sin reembolsar sus materiales. Vender, descartar y desencantar prefieren las copias simples primero, para que tu pieza terminada no se consuma por accidente. Las copias encantadas idénticamente incluso se apilan en tus bolsas.\n\nEl equipo de obra maestra y el encantamiento son amigos: una pieza de obra maestra sigue siendo completamente encantable, y el encantamiento se suma a la bonificación de obra maestra sin alterarla ni la firma del fabricante. Sumando todas las fuentes, una obra maestra firmada con un encantamiento Mayor es lo mejor que puede lograr una pieza artesanal, y aún así sigue por debajo del botín de banda por diseño.\n\nEn el mercado, el Mercado Mundial solo comercia con existencias simples y sin modificar, por lo que las piezas encantadas y firmadas cambian de manos cara a cara a través de la ventana de comercio. Los materiales son la mitad comerciable del oficio: el Polvo, la Esencia y los Fragmentos se listan libremente, publicar no cuesta nada y el Mercader toma solo el 5 por ciento de una venta completada. Eso hace que los dos ingresos clásicos del encantador sean vender materiales en el mercado y tomar la pieza de un cliente en comercio, encantarla y devolvérsela.',
   'guide.profPages.howHeading': 'Cómo funciona la artesanía',
   'guide.profPages.howBody':
     'Abre la ventana de artesanía (tecla T por defecto) y cada receta que conoces aparece con lo que necesita y lo que tienes a mano. Las recetas de estación te piden estar a menos de 20 metros de la estación correcta en el pueblo, las recetas de campo se elaboran en cualquier lugar, y la Encantación nunca necesita estación. No hay dado de fallo: una elaboración con los materiales en mano siempre tiene éxito.\n\nDos pequeñas fricciones mantienen la economía honesta. Cada elaboración exitosa paga una tarifa de 2 cobres por punto del presupuesto de estadísticas del objeto, y las acciones de tipo artesanía comparten un ritmo: como máximo 10 elaboraciones, desencantamientos, encantamientos o salvamentos en cualquier periodo de 60 segundos. Ninguno de los dos molestará en una sesión normal; ambos evitan que un especialista al tope inunde el mercado.',
@@ -3654,6 +3654,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterTypeAll': 'Todos los tipos',
   'itemUi.market.filterTypeWeapon': 'Armas',
   'itemUi.market.filterTypeArmor': 'Armadura',
+  'itemUi.market.filterTypeBag': 'Bolsas',
   'itemUi.market.filterTypeConsumable': 'Consumibles',
   'itemUi.market.filterTypeMaterial': 'Materiales',
   'itemUi.market.filterTypeCosmetic': 'Cosméticos',
@@ -3662,6 +3663,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterArmorAll': 'Toda la armadura',
   'itemUi.market.filterWeaponType': 'Tipo de arma',
   'itemUi.market.filterWeaponAll': 'Todas las armas',
+  'itemUi.market.filterBagSize': 'Tamaño de bolsa',
+  'itemUi.market.filterBagAll': 'Todas las bolsas',
   'itemUi.market.filterRarity': 'Rareza',
   'itemUi.market.filterRarityAll': 'Todas las rarezas',
   'itemUi.market.weaponSword': 'Espadas',
@@ -7498,7 +7501,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.letters.letter_q_hollow.body':
     'Pocos sabrán jamás lo que estaba enterrado en esa hondonada, y menos aún lo creerían. Yo lo sé, y no lo olvidaré.\n\nQue tu camino siga iluminado.\n- Hermano Aldric',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Este cadáver ya ha sido recolectado.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Nada de lo que has seleccionado se puede recolectar de este cadáver.',
   'hudChrome.corpseHarvest.componentAria': 'Recolectar {component}',
+  'hudChrome.corpseHarvest.componentNoYield': 'aún nada',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Recolectar {component}: {note}',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Cuantos menos componentes extraiga una recolección, mayor será el nivel de recolección de cada uno.',
   'hudChrome.corpseHarvest.components.claw': 'Garra',
   'hudChrome.corpseHarvest.components.fang': 'Colmillo',
   'hudChrome.corpseHarvest.components.gills': 'Agallas',
@@ -7507,8 +7516,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Seda',
   'hudChrome.corpseHarvest.components.tusk': 'Colmillo',
   'hudChrome.corpseHarvest.components.venomSac': 'Saco de veneno',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Cuantos menos componentes elijas, mayor será la calidad de cada uno.',
   'hudChrome.corpseHarvest.harvestButton': 'Recolectar',
   'hudChrome.corpseHarvest.title': 'Recolectar',
   'hudChrome.gathering.herbalism': 'Herboristería',
@@ -8245,7 +8252,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Tarjeta',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20 % de descuento',
+  'hudChrome.claudium.railWocDiscount': '{percent} % de descuento',
   'hudChrome.claudium.railWocUnavailable':
     'Los precios en WOC no están disponibles en este momento.',
   'hudChrome.claudium.showAmounts': 'Mostrar todas las cantidades de Claudium',
@@ -9071,7 +9078,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyFull': 'Ganancia total de habilidad',
   'hudChrome.crafting.difficultyNone': 'Sin ganancia de habilidad',
   'hudChrome.crafting.difficultyReduced': 'Ganancia de habilidad reducida',
-  'hudChrome.crafting.enchantedLine': 'encantada',
   'hudChrome.crafting.makersMark': 'Elaborado por {name}',
   'hudChrome.crafting.masterworkSeal': 'obra maestra',
   'hudChrome.crafting.masterworkToast': '¡Obra maestra! {name}',
@@ -9094,6 +9100,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmTitle': '¿Aceptar el Tañido del Guardián?',
   'hudChrome.gathering.gatherLine': 'Reúnes: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Reúnes: {name} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Despiezas: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Despiezas: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'También recuperas {name}.',
   'hudChrome.mobile.professions': 'Profesiones',
   'hudChrome.options.showThirdActionBar': 'Mostrar tercera barra de acción',
   'hudChrome.playerMenu.streamerBadgeTitle': 'Streamer verificado',
@@ -9376,4 +9385,92 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'perfNudge.integratedGpu':
     'El juego se está ejecutando en la GPU integrada (de ahorro de energía). Si esta computadora también tiene una GPU para juegos, en Windows configura tu navegador como «Alto rendimiento» en Configuración > Sistema > Pantalla > Gráficos y luego reinicia el navegador. La aplicación de escritorio elige la GPU para juegos automáticamente.',
   'worldContent.noticeboardName': 'Tablón de anuncios',
+  'hud.arena.map.coliseum': 'Coliseo Cinéreo',
+  'hud.arena.map.drownedCourt': 'La Corte Ahogada',
+  'hud.arena.mapName': 'Mapa: {name}',
+  'hud.logs.arenaSandsDrowned': 'Pisas las piedras anegadas de la Corte Ahogada.',
+  'itemUi.market.armorCloth': 'Tela',
+  'itemUi.market.armorLeather': 'Cuero',
+  'itemUi.market.armorMail': 'Malla',
+  'itemUi.market.filterArmorClassAll': 'Todos los tipos de armadura',
+  'itemUi.market.filterArmorSlot': 'Ranura de armadura',
+  'itemUi.market.filterPrimaryStat': 'Estadística principal',
+  'itemUi.market.filterPrimaryStatAll': 'Cualquier estadística principal',
+  'itemUi.market.filterValueAria': '{label}: {value}',
+  'devCommand.actions.kit.description':
+    'Equipa el kit preestablecido de nivel 20 previo al Santuario para una especialización, primero las bolsas. Solo equipo.',
+  'devCommand.actions.kit.label': 'Equipar kit de nivel 20 nuevo',
+  'devCommand.fields.spec': 'Especialización',
+  'devCommand.itemChosen': 'Seleccionado: {name}',
+  'devCommand.itemHeroicTag': 'Heroico',
+  'devCommand.itemMore': 'Mostrando {shown} de {total}. Sigue escribiendo para acotar.',
+  'devCommand.itemNoMatches': 'No hay objetos coincidentes.',
+  'devCommand.itemResultsAria': 'Objetos coincidentes',
+  'devCommand.itemSearchPlaceholder': 'Buscar por nombre o id',
+  'devCommand.itemUnknown': 'Ningún objeto tiene ese id.',
+  'devCommand.kitCurrentSpec': 'Especialización actual',
+  'hudChrome.bags.itemAriaBound': '{item}, cantidad {count}, copia vinculada',
+  'hudChrome.bags.itemAriaEnchanted': '{item}, cantidad {count}, copia encantada',
+  'hudChrome.enchanting.tier.base': 'Encantamientos base',
+  'hudChrome.enchanting.tier.greater': 'Encantamientos Mayores',
+  'hudChrome.enchanting.tier.runed': 'Encantamientos Rúnicos',
+  'hudChrome.enchanting.wornTag': 'Equipado ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Equipado ({slot} {index})',
+  'hudChrome.enchanting.yieldHeader': 'Materiales esperados:',
+  'hudChrome.enchanting.yieldLineExact': '{count} {item}',
+  'hudChrome.enchanting.yieldLineRange': '{min} a {max} {item}',
+  'hudChrome.itemTooltip.enchantedFallback': 'Encantado',
+  'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Encantado)',
+  'hudChrome.marketIndicator.aria': 'Ganancias u objetos del Mercado Mundial en espera',
+  'hudChrome.marketIndicator.tip':
+    'Las ganancias de venta u objetos devueltos te esperan en el Mercader.',
+  'hudChrome.materialHint.arcaneDust':
+    'Reactivo de encantamiento. Se obtiene desencantando equipo común y poco común.',
+  'hudChrome.materialHint.arcaneEssence':
+    'Reactivo de encantamiento. Se obtiene desencantando equipo raro.',
+  'hudChrome.materialHint.arcaneShard':
+    'Reactivo de encantamiento. Se obtiene desencantando equipo épico y legendario.',
+  'hudChrome.materialHint.resonantHide':
+    'Reactivo de encantamiento. Se obtiene desencantando armadura de cuero rara o mejor.',
+  'hudChrome.materialHint.resonantLinks':
+    'Reactivo de encantamiento. Se obtiene desencantando armadura de malla rara o mejor.',
+  'hudChrome.materialHint.resonantSteel':
+    'Reactivo de encantamiento. Se obtiene desencantando armas de cuerpo a cuerpo raras o mejores.',
+  'hudChrome.materialHint.resonantThread':
+    'Reactivo de encantamiento. Se obtiene desencantando armadura de tela rara o mejor.',
+  'hudChrome.materialHint.resonantTimber':
+    'Reactivo de encantamiento. Se obtiene desencantando bastones, varitas, arcos y ballestas raros o mejores.',
+  'hudChrome.options.stickyTarget': 'Mantener objetivo al hacer clic en el suelo',
+  'hudChrome.social.billboard.empty': 'Aún no hay nada publicado en el tablón.',
+  'hudChrome.social.billboard.inputLabel': 'Mensaje del tablón de la hermandad',
+  'hudChrome.social.billboard.label': 'Tablón de la Hermandad',
+  'hudChrome.social.billboard.placeholder': 'Escribe un mensaje para la hermandad',
+  'hudChrome.social.billboard.result.notOfficer':
+    'Solo los oficiales y el maestro de hermandad pueden editar el tablón.',
+  'hudChrome.social.billboard.result.set': 'Tablón de la hermandad actualizado.',
+  'hudChrome.social.billboard.save': 'Guardar',
+  'hudChrome.social.billboard.setBy': 'Fijado por {name}',
+  'hudChrome.enchanting.alreadyEnchanted': 'Ese objeto ya está encantado.',
+  'hudChrome.enchanting.replaceConfirmAccept': 'Reemplazar',
+  'hudChrome.enchanting.replaceConfirmBody': 'Esto reemplaza {old} en {item} por {new}.',
+  'hudChrome.enchanting.replaceConfirmCost': 'Coste: {cost}',
+  'hudChrome.enchanting.replaceConfirmCostItem': '{name} x{count}',
+  'hudChrome.enchanting.replaceConfirmNoRefund':
+    'El encantamiento antiguo se destruye. Sus materiales no se reembolsan. No se puede deshacer.',
+  'hudChrome.enchanting.replaceConfirmTitle': '¿Reemplazar el encantamiento de {item}?',
+  'hudChrome.enchanting.replaceTag': 'Reemplaza {enchant}',
+  'hudChrome.enchanting.sameEnchant': 'Ese objeto ya tiene ese encantamiento.',
+  'hudChrome.enchanting.sameEnchantTag': 'Ya aplicado',
+  'hudChrome.crafting.craftedToastQty': 'Elaborado: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Desencantas {item} en {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Desencantas {item} en {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'También recuperas {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'También recuperas {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Desguazas {item} en {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Desguazas {item} en {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Sin encantar',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Conserva: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Marca del artesano',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Bonificación de obra maestra',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Vínculo de encargo',
 };

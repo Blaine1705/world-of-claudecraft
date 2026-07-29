@@ -495,6 +495,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // Geddon-style stationary channel: 8s rooted, no melee, four escalating
     // fire pulses (base x1/2/3/4 x the per-mob mechanic multiplier), 14yd.
     // Moving out at the windup eats the small first pulse or nothing.
+    // The 50% hp gate (2026-07-26) guarantees the channel fires once per kill
+    // on BOTH difficulties: a group out-pacing the 30s cadence used to skip
+    // the mechanic entirely. One gate only, and it lands before the 30% enrage
+    // so the burn phase never stacks on enraged melee.
     infernoChannel: {
       every: 30,
       duration: 8,
@@ -504,6 +508,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       radius: 14,
       name: 'Grave Inferno',
       school: 'fire',
+      atHpPct: [0.5],
     },
     enrage: { belowHpPct: 0.3, dmgMult: 1.5, hasteMult: 1.3 },
     loot: [
@@ -791,6 +796,7 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     exitOffset: { x: 0, z: -6 },
     spawns: CRYPT_SPAWN_LIST,
     interior: 'crypt',
+    tombDressing: 'coffins',
     suggestedPlayers: 5,
     enterText: 'You descend into the Hollow Crypt...',
     leaveText: 'You climb back into daylight.',
@@ -804,6 +810,7 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     exitOffset: { x: 0, z: -6 },
     spawns: BASTION_SPAWN_LIST,
     interior: 'crypt',
+    tombDressing: 'cargo',
     suggestedPlayers: 5,
     enterText: 'You wade down into the Sunken Bastion...',
     leaveText: 'You climb out of the drowning dark.',
@@ -853,6 +860,7 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
       },
     ],
     interior: 'crypt',
+    tombDressing: 'coffins',
     suggestedPlayers: 1,
     enterText: 'You cross the threshold of the Abandoned Crypt.',
     leaveText: 'You return to the cold air of Thornpeak.',
@@ -876,6 +884,7 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
       { itemId: 'bastion_ward_stone', name: 'Threshold Wardstone', x: 0, z: 63 },
     ],
     interior: 'nythraxis',
+    tombDressing: 'coffins',
     suggestedPlayers: 10,
     enterText: 'You pass through the sealed royal door.',
     leaveText: 'You return to the cold air of Thornpeak.',

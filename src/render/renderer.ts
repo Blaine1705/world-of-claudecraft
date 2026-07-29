@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
-import { cameraOcclusion } from '../sim/colliders';
+import { cameraOcclusion, supportHeightAt } from '../sim/colliders';
 import {
   ABILITIES,
   ARENA_SLOT_COUNT,
@@ -35,6 +35,7 @@ import type { BiomeId } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import { attachAvatarFallback } from '../ui/avatar_fallback';
+import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
 import { isVisuallyDead } from './anim_state';
@@ -69,6 +70,13 @@ import {
   createCharacterVisual,
   setWeaponVfxViewportHeight,
 } from './characters';
+import {
+  isSwimmingAtDepth,
+  SWIM_ENTER_FEET_DEPTH,
+  SWIM_EXIT_FEET_DEPTH,
+  shouldTriggerWaterImpact,
+  waterContactFrameMode,
+} from './characters/anim_state';
 import { logAssetMissOnce } from './characters/asset_miss_log';
 import {
   mechAssetsReady,
@@ -85,7 +93,12 @@ import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_poli
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
-import { animatesEveryFrame, crowdLodScaleSq, midAnimCadence } from './crowd_lod';
+import {
+  animatesEveryFrame,
+  animCadenceFrames,
+  characterLodBands,
+  showsStaticFarMesh,
+} from './crowd_lod';
 import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
@@ -129,6 +142,7 @@ import {
 } from './gfx';
 import { GlacialFrontVisual } from './glacial_front_visual';
 import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
+import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
@@ -185,6 +199,7 @@ import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { freezeStaticMatrices } from './static_matrix';
 import { buildStationProps } from './stations';
 import { shouldRenderStealthGhost } from './stealth';
+import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
 import {
   syncTemporalHourglassVisual,
@@ -296,6 +311,22 @@ const ENTITY_LOD_RANGE_SQ = 58 * 58;
 // it but a jump (apex ~1.1u) does. Needed because online snapshots don't carry
 // `onGround`, so the flag alone never fires the jump clip for the mirrored world.
 const AIRBORNE_EPS = 0.4;
+/**
+ * Terrain-lean gradient resample interval (seconds) and sample arm (yards).
+ * TIME based, not frame based: a frame-count cadence silently starves on a
+ * slow client (at 4 fps an "every 4th frame" gradient updates once a second,
+ * so the lean never arrives), while a time budget costs the same four terrain
+ * samples at 60 fps and self-corrects when frames are scarce. Per body, the
+ * phase is staggered by entity id so a crowd never resamples in lockstep.
+ */
+/**
+ * Landing speed (yd/s) below which a touchdown is a step, not an impact. A
+ * jump from flat ground lands near 6 yd/s, so this sits under that: catching
+ * a boulder part way up the arc, or settling off a kerb, stays a footfall.
+ */
+const SOFT_LANDING_SPEED = 4.5;
+const TILT_SAMPLE_INTERVAL = 0.06;
+const TILT_SAMPLE_SPAN = 0.55;
 // Beyond this (squared) an entity's footsteps/movement are inaudible, so we skip
 // the surface sample + dispatch entirely. Kept under the engine's own cutoff (46u).
 const SFX_MOVE_RANGE_SQ = 42 * 42;
@@ -709,10 +740,29 @@ export interface EntityView {
   // spatial-audio state: distance travelled since the last footfall, and edge
   // latches for jump/land/water-entry detection.
   stepAccum: number;
+  waterContactSeen: boolean;
+  waterContactActive: boolean;
+  waterContactX: number;
+  waterContactZ: number;
+  waterContactAccum: number;
   wasAirborne: boolean;
   wasSwimming: boolean;
   // consecutive frames the foot-height heuristic read airborne (debounce)
   airborneHeurFrames: number;
+  /** Display-only vertical smoothing (step-up/step-down presentation). */
+  stepSmooth: StepSmoothState;
+  /** Previous drawn height, for the display-derived fall speed. */
+  prevRenderY: number;
+  hasPrevY: boolean;
+  /** Peak downward display speed this flight, reset on landing. */
+  fallSpeed: number;
+  /** Damped terrain lean plus its cadence-sampled gradient. */
+  groundTilt: GroundTiltState;
+  tiltGradX: number;
+  tiltGradZ: number;
+  tiltOnProp: boolean;
+  /** Countdown to the next gradient resample (seconds). */
+  tiltSampleT: number;
 }
 
 function collectCasters(root: THREE.Object3D, into: THREE.Object3D[]): void {
@@ -996,6 +1046,11 @@ export class Renderer {
   private entityViewCreateRangeSq = ENTITY_VIEW_CREATE_RANGE_SQ;
   private entityViewDestroyRangeSq = ENTITY_VIEW_DESTROY_RANGE_SQ;
   private renderBudgetGovernor!: RenderBudgetGovernor;
+  // Last frame-budget pressure (render_budget.ts), fed to the character LOD plan
+  // so the animated far band is the first extra cost surrendered on a machine
+  // already at its budget. Cosmetic only: the fairness floor for an actionable
+  // pose lives in crowd_lod.ts and never reads this.
+  private lastBudgetPressure = 0;
   // Composer tiers only (packet 0 R1): with info.autoReset off, this turns the
   // monotonic WebGL counters into per-frame deltas; null on every other profile
   // (low/medium, native-iOS high/ultra, advanced with effects shed), which keep
@@ -1005,6 +1060,7 @@ export class Renderer {
   private drawStatsFrame: DrawStatsCounters = { calls: 0, triangles: 0, points: 0, lines: 0 };
   private baseExposure = 1.12; // tone-mapping exposure at brightness 1.0
   private tmpV = new THREE.Vector3();
+  private tmpPuff = new THREE.Vector3();
   private viewCandidates: ViewCandidate[] = [];
   // Persistent scratch for the sloppy-pick column build. pick() is also the
   // per-frame hover-cursor path (updateHoverCursor in main.ts), so a fresh array
@@ -1080,6 +1136,7 @@ export class Renderer {
   private sunAzimuth = new THREE.Vector3(SUN_DIR.x, 0, SUN_DIR.z).normalize();
   private clouds: THREE.Sprite[] = [];
   private waterView: WaterView;
+  private lastWaterSimulationPasses = 0;
   private terrainView: TerrainView;
   // Map-editor placed GLB assets; null when the world has none and the editor
   // never asked for the view (the shipped game with the built-in world).
@@ -1519,7 +1576,7 @@ export class Renderer {
     // Terrain chunks never move after build (the LOD update only toggles
     // visibility): stop their per-frame matrix recompose (static_matrix.ts).
     freezeStaticMatrices(this.terrainView.group);
-    this.waterView = buildWater(this.sim.cfg.seed);
+    this.waterView = buildWater(this.sim.cfg.seed, this.webgl);
     for (const mesh of this.waterView.meshes) {
       setRenderCategory(mesh, 'water');
       this.scene.add(mesh);
@@ -1529,7 +1586,13 @@ export class Renderer {
     this.foliage = buildFoliage(this.sim.cfg.seed);
     setRenderCategory(this.foliage.group, 'foliage');
     this.scene.add(this.foliage.group);
-    this.fish = buildFish(this.sim.cfg.seed);
+    this.fish = buildFish(this.sim.cfg.seed, (x, z, radius, strength) => {
+      this.waterView.addSplash(x, z, radius, strength);
+      const level = waterLevelAt(x, z);
+      if (Number.isFinite(level)) {
+        this.vfx.waterSplash(x, level, z, radius, strength);
+      }
+    });
     setRenderCategory(this.fish.group, 'fish');
     this.scene.add(this.fish.group);
     this.motes = buildMotes(this.sim.cfg.seed);
@@ -1754,7 +1817,13 @@ export class Renderer {
     );
     // Fishing bobbers: one float per fishing entity in view; the personal
     // fishingBite event flips the owner's into the bite state (handleEvent).
-    this.fishingBobbers = new FishingBobberVisual(this.scene);
+    this.fishingBobbers = new FishingBobberVisual(this.scene, (x, z, radius, strength) => {
+      this.waterView.addSplash(x, z, radius, strength);
+      const level = waterLevelAt(x, z);
+      if (Number.isFinite(level)) {
+        this.vfx.waterSplash(x, level, z, radius, strength);
+      }
+    });
     // Meteor falls + Rune of Power circles (see src/render/mage_ground_fx.ts);
     // a landing meteor detonates with the same burst an aimed blast uses.
     this.mageGroundFx = new MageGroundFx(
@@ -1888,6 +1957,28 @@ export class Renderer {
   }
 
   // Surface under (x,z) for footstep timbre. Sampled only at a footfall (cheap).
+  // Ground impact dust at a body's feet, coloured by the surface underfoot.
+  // Water is skipped: splashes are the water system's job, and dust on a lake
+  // reads as a bug. Power below the floor emits nothing at all.
+  private emitGroundPuff(x: number, y: number, z: number, power: number): void {
+    const p = Math.min(1, power);
+    if (p <= 0.02) return;
+    const surface = this.surfaceAt(x, z, y);
+    if (surface === 'water') return;
+    const color =
+      surface === 'stone'
+        ? 0x9b9a95
+        : surface === 'wood'
+          ? 0xa8895f
+          : surface === 'snow'
+            ? 0xe6eef5
+            : surface === 'dirt'
+              ? 0xa38257
+              : 0x8d9a63;
+    this.tmpPuff.set(x, y, z);
+    this.vfx.groundPuff(this.tmpPuff, p, color);
+  }
+
   private surfaceAt(x: number, z: number, y: number): Surface {
     return footstepSurfaceAt(this.sim.cfg.seed, x, y, z, this.weatherOn);
   }
@@ -1959,6 +2050,7 @@ export class Renderer {
       this.renderBudgetMaxScale(),
       Math.max(this.renderBudgetMinScale(), state.levels.resolution),
     );
+    this.lastBudgetPressure = state.pressure;
     this.foliage.setGrassQuality(state.levels.grass);
     this.foliage.setModelQuality(state.levels.foliage);
     this.vfx.setQuality(state.levels.vfx);
@@ -2060,10 +2152,17 @@ export class Renderer {
       pixelRatio: this.webgl.getPixelRatio(),
       width: this.viewport.width,
       height: this.viewport.height,
-      // Composer tiers serve the accumulated per-frame delta (the live counter
-      // is monotonic there); other profiles keep the live post-frame read.
-      calls: this.drawStats ? this.drawStatsFrame.calls : info.render.calls,
-      triangles: this.drawStats ? this.drawStatsFrame.triangles : info.render.triangles,
+      // Composer tiers serve the accumulated per-frame delta (the live counter is
+      // monotonic there, so it already includes the off-screen water-simulation
+      // passes); other profiles keep the live post-frame read, where three's
+      // per-render auto-reset drops those passes, so add them back at 1 draw call
+      // and 2 triangles each.
+      calls: this.drawStats
+        ? this.drawStatsFrame.calls
+        : info.render.calls + this.lastWaterSimulationPasses,
+      triangles: this.drawStats
+        ? this.drawStatsFrame.triangles
+        : info.render.triangles + this.lastWaterSimulationPasses * 2,
       geometries: info.memory.geometries,
       textures: info.memory.textures,
       programs: info.programs?.length ?? 0,
@@ -2309,8 +2408,13 @@ export class Renderer {
       frameMs,
       totalMs: previousTotalMs,
       submitMs: previousSubmitMs,
-      calls: drawSignal.calls,
-      triangles: drawSignal.triangles,
+      // Non-composer profiles read info.render live, where three's per-render
+      // auto-reset drops the off-screen water-simulation passes: add them back
+      // (1 draw call / 2 triangles per pass). Composer tiers pass drawSignal
+      // through untouched, so the frozen legacy constant stays exact and the
+      // water passes already inside drawStatsFrame are never counted twice.
+      calls: drawSignal.calls + (this.drawStats ? 0 : this.lastWaterSimulationPasses),
+      triangles: drawSignal.triangles + (this.drawStats ? 0 : this.lastWaterSimulationPasses * 2),
       grassVisibleTufts: this.lastFrameStats.foliage.grassVisibleTufts,
       grassVisibleChunks: this.lastFrameStats.foliage.grassVisibleChunks,
       activeViews: this.lastFrameStats.activeViews,
@@ -2499,8 +2603,13 @@ export class Renderer {
     this.updateCamera(this.tmpV, dt);
     this.updateAmbience(p.pos.x, this.camera.position.y, dt);
     this.budgetFireLights(p.pos.x, p.pos.z);
-    this.waterView.update(this.time);
     const fogFar = (this.scene.fog as THREE.Fog).far;
+    this.lastWaterSimulationPasses = this.waterView.update(
+      this.time,
+      this.camera.position.x,
+      this.camera.position.z,
+      fogFar,
+    );
     this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
     this.propsView.update(
       this.camera.position.x,
@@ -4475,9 +4584,24 @@ export class Renderer {
       liveScale: e.scale,
       loco: newLocoTrack(),
       stepAccum: 0,
+      waterContactSeen: false,
+      waterContactActive: false,
+      waterContactX: e.pos.x,
+      waterContactZ: e.pos.z,
+      waterContactAccum: 0,
       wasAirborne: false,
       wasSwimming: false,
       airborneHeurFrames: 0,
+      stepSmooth: createStepSmooth(),
+      groundTilt: createGroundTilt(),
+      prevRenderY: 0,
+      hasPrevY: false,
+      fallSpeed: 0,
+      // Stagger the first resample so a crowd spreads its terrain samples.
+      tiltSampleT: (e.id % 7) * (TILT_SAMPLE_INTERVAL / 7),
+      tiltGradX: 0,
+      tiltGradZ: 0,
+      tiltOnProp: false,
     });
     const view = this.views.get(e.id);
     // Never gate the player's OWN view: it must be on screen immediately, its
@@ -5181,10 +5305,16 @@ export class Renderer {
 
     // Crowd-adaptive LOD/shadow distances, derived from last frame's visible-rig
     // count (the one-frame lag is imperceptible); recount as we go this frame.
-    const crowdScaleSq = crowdLodScaleSq(this.lastVisibleRigCount);
-    const lodRangeSq = ENTITY_LOD_RANGE_SQ * crowdScaleSq;
-    const shadowRangeSq = ENTITY_SHADOW_RANGE_SQ * crowdScaleSq;
-    const midAnimCadenceFrames = midAnimCadence(this.lastVisibleRigCount);
+    // The plan also carries the animated far band (articulated rig at a low
+    // cadence between `lodRangeSq` and `staticRangeSq`) and its cadences.
+    const lodBands = characterLodBands(
+      this.lastVisibleRigCount,
+      ENTITY_SHADOW_RANGE_SQ,
+      ENTITY_LOD_RANGE_SQ,
+      GFX.farCharacterAnimScale,
+      this.lastBudgetPressure,
+    );
+    const shadowRangeSq = lodBands.shadowRangeSq;
     let visibleRigCount = 0;
 
     for (const [id, v] of this.views) {
@@ -5242,6 +5372,23 @@ export class Renderer {
         cdz = e.pos.z - p.pos.z;
       const d2 = cdx * cdx + cdz * cdz;
       const isSelf = id === p.id;
+      // Pose carries information the player acts on (own feedback, the read on
+      // the current target, pet combat, a cast windup telegraph) rather than
+      // mere cosmetic smoothness: such an entity is exempt from BOTH the cadence
+      // throttle and the crowd-pulled frozen-mesh swap below.
+      const combatTargetId = e.aggroTargetId ?? e.targetId;
+      const combatTarget =
+        e.inCombat && combatTargetId !== null ? sim.entities.get(combatTargetId) : undefined;
+      const actionablePose = animatesEveryFrame(
+        id,
+        p.id,
+        p.targetId,
+        e.castingAbility,
+        e.inCombat,
+        e.ownerId,
+        combatTargetId,
+        combatTarget?.ownerId ?? null,
+      );
       if (isSelf) {
         v.group.visible = true;
         v.isFar = false;
@@ -5279,7 +5426,7 @@ export class Renderer {
         if (v.visual) {
           visibleRigCount++; // crowd-density signal for next frame's adaptive LOD
           v.visual.setShadow(wantShadow);
-          v.isFar = d2 > lodRangeSq;
+          v.isFar = showsStaticFarMesh(d2, lodBands, actionablePose);
           // past the articulated gate the static-pose proxy carries the
           // shadow; an active form's own rig keeps casting instead
           v.visual.setProxyShadow(
@@ -5483,17 +5630,6 @@ export class Renderer {
         v.group.scale.setScalar(e.scale);
       }
 
-      // swimming pose: prone at the surface (derived here — the sim is unaware).
-      // waterLevelAt is -Infinity outside a declared lake, so the cheap feet-depth
-      // test also gates entities standing in a dry sunken feature: they can't be
-      // swimming there, and the vast majority (everyone on land) skip
-      // groundHeight() entirely each frame.
-      const wl = waterLevelAt(e.pos.x, e.pos.z);
-      const swimming =
-        !e.dead &&
-        e.pos.y <= wl - 0.5 &&
-        groundHeight(e.pos.x, e.pos.z, this.sim.cfg.seed) < wl - 0.8;
-
       // lazy form visuals, swapped by visibility like the old sheep/bear rigs
       // A null build leaves the field unset; the shared gate retries after its cooldown.
       if (polyed && !v.sheepVisual) {
@@ -5572,6 +5708,17 @@ export class Renderer {
       const ax = isSelf && !animFromDisplay ? e.prevPos.x + (e.pos.x - e.prevPos.x) * alpha : x;
       const ay = isSelf && !animFromDisplay ? e.prevPos.y + (e.pos.y - e.prevPos.y) * alpha : y;
       const az = isSelf && !animFromDisplay ? e.prevPos.z + (e.pos.z - e.prevPos.z) * alpha : z;
+      // Derive both the swim pose and surface contact from the same displayed
+      // coordinates. Network interpolation can lead or trail authoritative
+      // snapshots, so mixing the two timelines produces a visible pose pop.
+      const wl = waterLevelAt(ax, az);
+      const feetDepth = wl - ay;
+      const floorSampleDepth = v.wasSwimming ? SWIM_EXIT_FEET_DEPTH : SWIM_ENTER_FEET_DEPTH;
+      const floorDepth =
+        !e.dead && feetDepth >= floorSampleDepth
+          ? wl - groundHeight(ax, az, this.sim.cfg.seed)
+          : Number.NEGATIVE_INFINITY;
+      const swimming = isSwimmingAtDepth(v.wasSwimming, e.dead, feetDepth, floorDepth);
       const vx = ax - v.lastX,
         vz = az - v.lastZ;
       v.lastX = ax;
@@ -5600,13 +5747,17 @@ export class Renderer {
       // hitches transiently lift the sampled pose off the terrain, and a
       // single-frame false positive flips the base state to `jump` and back,
       // replaying the jump clip's crouch (the world-entry anim glitch).
-      if (
-        e.kind === 'player' &&
-        e.onGround &&
-        !swimming &&
-        ay - groundHeight(ax, az, this.sim.cfg.seed) > AIRBORNE_EPS
-      ) {
-        v.airborneHeurFrames++;
+      // The standing surface is the terrain OR a standable prop top under the
+      // feet (parkour: crates/rocks are walkable), else a player perched on a
+      // crate would read as permanently airborne and loop the jump pose.
+      if (e.kind === 'player' && e.onGround && !swimming) {
+        const heurSeed = this.sim.cfg.seed;
+        const standY = Math.max(
+          groundHeight(ax, az, heurSeed),
+          supportHeightAt(heurSeed, ax, az, 0.5, ay + 0.01),
+        );
+        if (ay - standY > AIRBORNE_EPS) v.airborneHeurFrames++;
+        else v.airborneHeurFrames = 0;
       } else {
         v.airborneHeurFrames = 0;
       }
@@ -5616,6 +5767,62 @@ export class Renderer {
         (animFromDisplay && this.selfMotionPredictor
           ? !this.selfMotionPredictor.onGround
           : !e.onGround || v.airborneHeurFrames >= 2);
+      // Grounded presentation polish, both display-only (see the cores).
+      // Vertical smoothing absorbs the step-up the solver performs inside a
+      // single tick, so the body strides onto a kerb instead of teleporting up
+      // it while the soft camera boom trails behind. Applied for every body,
+      // and fed back into the self pose so the camera follows what is drawn.
+      const settled = !airborne && !swimming && !visuallyDead;
+      // Display-derived fall speed: the wire carries no vy for remote bodies,
+      // so the drawn trajectory is the only honest source of landing weight.
+      const dyRaw = v.hasPrevY ? y - v.prevRenderY : 0;
+      v.prevRenderY = y;
+      v.hasPrevY = true;
+      if (airborne && dt > 1e-4) v.fallSpeed = Math.max(v.fallSpeed, -dyRaw / dt);
+      const smoothY = stepSmoothHeight(v.stepSmooth, y, settled, dt);
+      if (smoothY !== y) {
+        v.group.position.y = smoothY;
+        if (isSelf) selfPos.y = smoothY;
+      }
+      // Terrain lean: near bodies tip toward the surface they stand on. The
+      // gradient is resampled on a cadence (four terrain samples) and damped
+      // in between, so a crowd costs a handful of samples per frame, and a
+      // body standing on a flat prop top stays upright.
+      if (v.visual && !v.isFar) {
+        v.tiltSampleT -= dt;
+        if (v.tiltSampleT <= 0) {
+          v.tiltSampleT = TILT_SAMPLE_INTERVAL;
+          const ts = this.sim.cfg.seed;
+          const hx0 = groundHeight(ax - TILT_SAMPLE_SPAN, az, ts);
+          const hx1 = groundHeight(ax + TILT_SAMPLE_SPAN, az, ts);
+          const hz0 = groundHeight(ax, az - TILT_SAMPLE_SPAN, ts);
+          const hz1 = groundHeight(ax, az + TILT_SAMPLE_SPAN, ts);
+          v.tiltGradX = (hx1 - hx0) / (2 * TILT_SAMPLE_SPAN);
+          v.tiltGradZ = (hz1 - hz0) / (2 * TILT_SAMPLE_SPAN);
+          // Standing well above the local terrain means a prop top, which is
+          // flat whatever the ground below it does.
+          v.tiltOnProp = ay - (hx0 + hx1 + hz0 + hz1) / 4 > 0.2;
+        }
+        stepGroundTilt(
+          v.groundTilt,
+          v.tiltGradX,
+          v.tiltGradZ,
+          facing,
+          settled && !v.tiltOnProp,
+          dt,
+        );
+        v.visual.setGroundTilt(v.groundTilt.pitch, v.groundTilt.roll);
+      }
+      // Ledge climb: the sim owns the move (Entity.climb offline, the mirrored
+      // progress online); the visual poses it by hand, tracking the move's
+      // real phase so hands plant when the body reaches the lip whatever the
+      // climb's height-scaled duration is.
+      if (v.visual) {
+        v.visual.setClimbing(
+          !!e.climb || e.climbing === true,
+          e.climb ? e.climb.elapsed / e.climb.duration : e.climbProgress,
+        );
+      }
       const st = this.animScratch;
       st.speed = loco.speed;
       st.moving = moving;
@@ -5638,8 +5845,25 @@ export class Renderer {
       if (sink && d2 < SFX_MOVE_RANGE_SQ) {
         // jump / land / water-entry edges
         if (airborne && !v.wasAirborne && !visuallyDead) sink.movement('jump', ax, ay, az, isSelf);
-        else if (!airborne && v.wasAirborne && !visuallyDead)
-          sink.movement('land', ax, ay, az, isSelf);
+        else if (!airborne && v.wasAirborne && !visuallyDead) {
+          // A flight that ends by catching a ledge is not a fall, and the
+          // heavy landing thud on one reads as a bug: you hopped onto a rock
+          // mid-arc and the game played a crash. Anything softer than a plain
+          // jump's own landing speed gets a footfall instead.
+          if (v.fallSpeed >= SOFT_LANDING_SPEED) {
+            sink.movement('land', ax, ay, az, isSelf);
+          } else {
+            sink.footstep(ax, ay, az, this.surfaceAt(ax, az, ay), false, isSelf);
+          }
+          // Impact dust, scaled by how hard the body actually came down and
+          // tinted by what it came down on. This is the visual half of the
+          // landing the camera already thumps for.
+          this.emitGroundPuff(ax, ay, az, (v.fallSpeed - 5) / 14);
+        }
+        // Striding up onto a ledge scuffs the surface: a wisp, not a landing.
+        if (settled && dyRaw > 0.28 && !visuallyDead) {
+          this.emitGroundPuff(ax, ay, az, 0.08);
+        }
         if (swimming && !v.wasSwimming && !visuallyDead)
           sink.movement('splash', ax, ay, az, isSelf);
         // footfalls / swim strokes via a distance accumulator (no timers)
@@ -5671,21 +5895,156 @@ export class Renderer {
           v.stepAccum = FOOT_STRIDE_WALK * 0.6;
         }
       }
+      // Reset the flight's peak fall speed once grounded, so the next landing
+      // is measured from its own drop and not the last one.
+      if (!airborne) v.fallSpeed = 0;
+
+      // Feed rendered body motion into the persistent height field. This begins
+      // while wading, before the swim-pose latch, and uses old minus new surface
+      // capsule footprints to create a coherent wake instead of detached rings.
+      const contactLevel = wl;
+      const contactRadius = Math.min(1.25, Math.max(0.34, active.height * e.scale * 0.16));
+      const waterDepth = contactLevel - ay;
+      const contactImmersion = Number.isFinite(waterDepth)
+        ? Math.min(1, Math.max(0, (waterDepth + 0.04) / (contactRadius * 0.85)))
+        : 0;
+      const contactAxisX = Math.sin(facing);
+      const contactAxisZ = Math.cos(facing);
+      const contactHalfLength = swimming
+        ? Math.min(1.05, Math.max(contactRadius * 0.9, active.height * e.scale * 0.3))
+        : contactRadius * 0.22;
+      const touchesWater =
+        !visuallyDead &&
+        !st.sitting &&
+        Number.isFinite(contactLevel) &&
+        waterDepth >= -0.035 &&
+        ay + active.height * e.scale * 0.82 > contactLevel;
+      const contactMode = waterContactFrameMode(
+        Boolean(this.editorCam),
+        charOnScreen,
+        v.waterContactSeen,
+      );
+      if (contactMode === 'forget') {
+        // The editor's hidden entity and frustum-culled actors must not create
+        // phantom exits. Seed them silently if they become drawable again.
+        v.waterContactSeen = false;
+        v.waterContactActive = false;
+        v.waterContactAccum = 0;
+        v.waterContactX = ax;
+        v.waterContactZ = az;
+      } else if (contactMode === 'seed') {
+        // Interest entry can create a view already in water. Seed without a
+        // synthetic splash; subsequent entry, motion, and exit are physical.
+        v.waterContactSeen = true;
+        v.waterContactActive = touchesWater;
+        v.waterContactX = ax;
+        v.waterContactZ = az;
+        v.waterContactAccum = 0;
+      } else if (touchesWater) {
+        const waterImpact = shouldTriggerWaterImpact(
+          v.waterContactActive,
+          v.wasAirborne,
+          airborne,
+          v.wasSwimming,
+          swimming,
+        );
+        if (waterImpact) {
+          const splashStrength = Math.min(1.65, 0.82 + loco.speed * 0.08 + contactImmersion * 0.25);
+          this.waterView.enterContact(
+            ax,
+            az,
+            contactRadius,
+            contactHalfLength,
+            contactAxisX,
+            contactAxisZ,
+            splashStrength,
+          );
+          const entryDistance = Math.hypot(vx, vz);
+          const entryDirX = entryDistance > 0.001 ? vx / entryDistance : contactAxisX;
+          const entryDirZ = entryDistance > 0.001 ? vz / entryDistance : contactAxisZ;
+          this.vfx.characterWaterSplash(
+            ax,
+            contactLevel,
+            az,
+            entryDirX,
+            entryDirZ,
+            contactRadius * 1.45,
+            splashStrength,
+          );
+          v.waterContactActive = true;
+          v.waterContactX = ax;
+          v.waterContactZ = az;
+          v.waterContactAccum = 0;
+        } else {
+          const waterDx = ax - v.waterContactX;
+          const waterDz = az - v.waterContactZ;
+          const waterDistanceSq = waterDx * waterDx + waterDz * waterDz;
+          const teleportLimit = contactRadius * 8;
+          v.waterContactAccum += dt;
+          if (waterDistanceSq > teleportLimit * teleportLimit) {
+            this.waterView.addSplash(ax, az, contactRadius, 0.7);
+            v.waterContactX = ax;
+            v.waterContactZ = az;
+            v.waterContactAccum = 0;
+          } else if (waterDistanceSq > 0.0016 && v.waterContactAccum >= 1 / 24) {
+            const contactSpeed = Math.sqrt(waterDistanceSq) / Math.max(v.waterContactAccum, 0.001);
+            const wakeStrength = Math.min(
+              1.6,
+              Math.max(0.28, (0.34 + contactSpeed * 0.095) * (0.45 + contactImmersion * 0.75)),
+            );
+            this.waterView.moveContact(
+              v.waterContactX,
+              v.waterContactZ,
+              ax,
+              az,
+              contactRadius,
+              contactHalfLength,
+              contactAxisX,
+              contactAxisZ,
+              wakeStrength,
+            );
+            v.waterContactX = ax;
+            v.waterContactZ = az;
+            v.waterContactAccum = 0;
+          }
+        }
+      } else {
+        if (v.waterContactActive) {
+          const releaseHalfLength = v.wasSwimming
+            ? Math.min(1.05, Math.max(contactRadius * 0.9, active.height * e.scale * 0.3))
+            : contactRadius * 0.22;
+          this.waterView.releaseContact(
+            v.waterContactX,
+            v.waterContactZ,
+            contactRadius,
+            releaseHalfLength,
+            contactAxisX,
+            contactAxisZ,
+            0.68,
+          );
+        }
+        v.waterContactActive = false;
+        v.waterContactAccum = 0;
+        v.waterContactX = ax;
+        v.waterContactZ = az;
+      }
       v.wasAirborne = airborne;
       v.wasSwimming = swimming;
-      // Distance-tiered mixer updates: near = every frame, mid = every Nth,
-      // far (static LOD mesh visible) = every 6th; edges latch regardless.
-      // Both the near band and the mid cadence follow the same crowd-adaptive
-      // LOD the shadow bands use, because sampling clips + rebuilding bone
-      // matrices is the per-rig cost that actually scales with the crowd.
+      // Distance-tiered mixer updates: near = every frame, mid = every Nth, the
+      // animated far band = every 4th to 6th (the rig is still articulated, so
+      // this is visible motion, just at a lower pose rate), and the frozen band
+      // = every 6th to keep the pose warm for re-entry. Edges latch regardless.
+      // Every band follows the same crowd-adaptive plan the shadow bands use,
+      // because sampling clips + rebuilding bone matrices is the per-rig cost
+      // that actually scales with the crowd.
       //
       // Animation smoothness is cosmetic, but a cast windup is a telegraph the
       // player reacts to, so the local player, the current target, and anything
       // mid-cast always animate every frame no matter how dense the crowd.
       let animate = true;
-      if (!animatesEveryFrame(id, p.id, p.targetId, e.castingAbility)) {
-        if (v.isFar) animate = (this.frameIdx + e.id) % 6 === 0;
-        else if (d2 > shadowRangeSq) animate = (this.frameIdx + e.id) % midAnimCadenceFrames === 0;
+      if (!actionablePose) {
+        const cadence = animCadenceFrames(d2, lodBands);
+        animate = cadence <= 1 || (this.frameIdx + e.id) % cadence === 0;
       }
       active.update(dt, st, animate);
       // weapon-skin VFX ride the humanoid rig's held weapon; advancing them is a
@@ -5742,7 +6101,6 @@ export class Renderer {
       }
       // The graveyard angel: a soft, constant golden shimmer rising off the Spirit Healer.
       if (e.templateId === 'spirit_healer') this.vfx.castSparkle(e.id, 'holy', dt * 0.6);
-      if (swimming) this.vfx.swimRipple(v.group.position, moving ? dt * 3 : dt);
 
       // skip the draw for off-screen rigs (pose/audio above already ran)
       if (!charOnScreen) v.group.visible = false;
@@ -5779,7 +6137,10 @@ export class Renderer {
           this.selRingZ = cz;
           this.selRingScale = target.scale;
           const seed = this.sim.cfg.seed;
-          const gy = groundHeight(cx, cz, seed);
+          // A target standing on a prop top (crate/rock) gets the ring on that
+          // surface, not buried at terrain height under it.
+          const supportY = supportHeightAt(seed, cx, cz, 0.5, tv.group.position.y + 0.01);
+          const gy = Math.max(groundHeight(cx, cz, seed), supportY);
           this.selectionRing.position.set(cx, gy, cz);
           this.selectionRing.scale.setScalar(target.scale);
           const drape = drapeRingLocalY(
@@ -5789,7 +6150,7 @@ export class Renderer {
             gy,
             target.scale,
             0.08,
-            (sx, sz) => groundHeight(sx, sz, seed),
+            (sx, sz) => Math.max(groundHeight(sx, sz, seed), supportY),
             this.selectionRingDrapeY,
           );
           const ringPos = this.selectionRingMesh.geometry.getAttribute(
@@ -5922,7 +6283,12 @@ export class Renderer {
     worldStart = markWorldPhase('clouds', worldStart);
 
     // water shimmer (low-tier texture scroll; shader water rides uTime)
-    this.waterView.update(this.time);
+    this.lastWaterSimulationPasses = this.waterView.update(
+      this.time,
+      this.camera.position.x,
+      this.camera.position.z,
+      (this.scene.fog as THREE.Fog).far,
+    );
     worldStart = markWorldPhase('water', worldStart);
     this.vfx.update(dt);
     this.frozenOrbFx.update(dt);
@@ -6427,12 +6793,9 @@ export class Renderer {
   rebuildWaterBodies(): void {
     for (const mesh of this.waterView.meshes) {
       this.scene.remove(mesh);
-      mesh.geometry.dispose();
-      const mat = mesh.material as THREE.Material | THREE.Material[];
-      if (Array.isArray(mat)) for (const m of mat) m.dispose();
-      else mat.dispose();
     }
-    this.waterView = buildWater(this.sim.cfg.seed);
+    this.waterView.dispose();
+    this.waterView = buildWater(this.sim.cfg.seed, this.webgl);
     for (const mesh of this.waterView.meshes) {
       setRenderCategory(mesh, 'water');
       this.scene.add(mesh);
@@ -6671,7 +7034,10 @@ export class Renderer {
 
   // Hang a speech bubble over an entity's head; it follows the entity and
   // fades out after a few seconds (longer for longer messages).
-  showChatBubble(entityId: number, text: string, yell: boolean): void {
+  showChatBubble(entityId: number, text: string, style?: boolean | ChatBubbleStyle): void {
+    // Back-compat: the older 3-arg call passes a bare `yell` boolean; the chat
+    // gate passes a full descriptor (the party channel tint).
+    const s: ChatBubbleStyle = typeof style === 'boolean' ? { yell: style } : (style ?? {});
     let b = this.chatBubbles.get(entityId);
     if (!b) {
       const el = document.createElement('div');
@@ -6681,7 +7047,12 @@ export class Renderer {
       this.chatBubbles.set(entityId, b);
     }
     b.el.textContent = text; // textContent: chat is player input, never HTML
-    b.el.classList.toggle('yell', yell);
+    b.el.classList.toggle('yell', s.yell === true);
+    // Channel bubbles (party/guild/officer) tint the BORDER only; the near-white
+    // background and dark text stay for legibility. Clearing to '' restores the
+    // stylesheet default (and the `.yell` border) when a reused bubble switches
+    // channel, so say/yell/emote stay byte-identical.
+    b.el.style.borderColor = s.border ?? '';
     // wall-clock ttl: sim/render time can run slower than real time under
     // frame-delta clamping, which would keep bubbles up too long
     b.until = performance.now() + 1000 * Math.min(10, 3.5 + text.length * 0.045);
@@ -6694,9 +7065,13 @@ export class Renderer {
     for (const [id, b] of this.chatBubbles) {
       const e = this.sim.entities.get(id);
       const v = e ? this.views.get(id) : undefined;
-      if (!e || !v || now >= b.until) {
+      if (now >= b.until) {
         b.el.remove();
         this.chatBubbles.delete(id);
+        continue;
+      }
+      if (!e || !v) {
+        b.el.style.display = 'none';
         continue;
       }
       // culled rigs (beyond ENTITY_DRAW_RANGE) stop updating group.position,

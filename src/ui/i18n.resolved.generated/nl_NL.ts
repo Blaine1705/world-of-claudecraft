@@ -38,6 +38,14 @@ export const nl_NL: EnTranslations = {
     "filterLabel": "Opdrachten filteren",
     "filterPlaceholder": "Deze categorie doorzoeken",
     "noMatches": "Geen overeenkomende opdrachten.",
+    "itemSearchPlaceholder": "Zoeken op naam of id",
+    "itemResultsAria": "Overeenkomende voorwerpen",
+    "itemNoMatches": "Geen overeenkomende voorwerpen.",
+    "itemMore": "{shown} van {total} getoond. Blijf typen om te verfijnen.",
+    "itemChosen": "Geselecteerd: {name}",
+    "itemUnknown": "Geen voorwerp heeft dat id.",
+    "itemHeroicTag": "Heroïsch",
+    "kitCurrentSpec": "Huidige spec",
     "serverRequirement": "Servercheats vereisen nog steeds ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Kies geldige waarden voordat je deze opdracht uitvoert.",
     "sent": "Verzonden: {command}",
@@ -55,7 +63,8 @@ export const nl_NL: EnTranslations = {
       "z": "Z",
       "dungeon": "Kerker",
       "difficulty": "Moeilijkheidsgraad",
-      "name": "Naam"
+      "name": "Naam",
+      "spec": "Spec"
     },
     "difficulty": {
       "normal": "Normaal",
@@ -113,6 +122,10 @@ export const nl_NL: EnTranslations = {
       "give": {
         "label": "Voorwerp geven",
         "description": "Voeg een voorwerp toe aan de inventaris van de speler."
+      },
+      "kit": {
+        "label": "Kit voor vers niveau 20 uitrusten",
+        "description": "Rust de niveau-20-set van vóór het Heiligdom uit voor een spec, eerst de tassen. Alleen uitrusting."
       },
       "gold": {
         "label": "Goud toevoegen",
@@ -653,7 +666,7 @@ export const nl_NL: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% korting",
+      "railWocDiscount": "{percent}% korting",
       "railWocUnavailable": "WOC-prijzen zijn momenteel niet beschikbaar.",
       "railNativeUnavailable": "SOL/WOC staat uit.",
       "amountLabel": "Hoeveelheid",
@@ -859,7 +872,13 @@ export const nl_NL: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}m {s}s",
       "seconds": "{s}s",
-      "autoShowHint": "Rijen verschijnen automatisch zodra je groep schade aanricht of geneest, en dit segment sluit een paar seconden na het einde van het gevecht."
+      "autoShowHint": "Rijen verschijnen automatisch zodra je groep schade aanricht of geneest, en dit segment sluit een paar seconden na het einde van het gevecht.",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "Other ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "Melee"
     },
     "petFeed": {
       "disabledFullHp": "Huisdier heeft volledige gezondheid",
@@ -1049,6 +1068,7 @@ export const nl_NL: EnTranslations = {
       "walkByAutoloot": "Buit oprapen in het voorbijgaan",
       "groundReticle": "Grondrichtkruis",
       "mouseoverCast": "Mouseover-bezwering op groepsframes",
+      "stickyTarget": "Doel behouden bij klikken op de grond",
       "showItemLevel": "Itemniveau tonen",
       "itemLevelLine": "Itemniveau {level}",
       "itemScoreLine": "Score {score}",
@@ -1449,9 +1469,12 @@ export const nl_NL: EnTranslations = {
       "title": "Oogsten",
       "harvestButton": "Oogsten",
       "harvestTooltip": "Verzamelt de aangevinkte onderdelen. Elk lijk kan eenmaal worden geoogst, wie het eerst komt. Neemt de buit niet mee.",
-      "concentrateHint": "Hoe minder delen je kiest, hoe hoger de kwaliteit van elk deel.",
+      "yieldTierHint": "Hoe minder delen een oogst daadwerkelijk oplevert, hoe hoger het oogstniveau van elk deel.",
+      "nothingSelectedYields": "Van dit kadaver valt niets uit je selectie te oogsten.",
       "alreadyHarvested": "Dit kadaver is al geoogst.",
       "componentAria": "Oogst {component}",
+      "componentNoYield": "nog niets",
+      "componentAriaNoYield": "Oogst {component}: {note}",
       "components": {
         "hide": "Huid",
         "fang": "Tand",
@@ -1529,6 +1552,8 @@ export const nl_NL: EnTranslations = {
       "dragDestroyHint": "Sleep naar buiten in de wereld om te vernietigen",
       "reorderNeedsRecent": "Verwijder het filter en sorteer op Recent om je tassen opnieuw te rangschikken",
       "itemAriaInstanced": "{item}, aantal {count}, door maker gemerkt exemplaar",
+      "itemAriaEnchanted": "{item}, aantal {count}, betoverd exemplaar",
+      "itemAriaBound": "{item}, aantal {count}, gebonden exemplaar",
       "itemAriaMasterwork": "{item}, hoeveelheid {count}, meesterwerk",
       "filterGroupAria": "Tassen filteren op categorie",
       "filterAll": "Alle",
@@ -1753,7 +1778,19 @@ export const nl_NL: EnTranslations = {
       "label": "Frameposities herstellen"
     },
     "itemTooltip": {
-      "requiresLevel": "Vereist niveau {level}"
+      "requiresLevel": "Vereist niveau {level}",
+      "statEnchanted": "+{value} {stat} (Betoverd)",
+      "enchantedFallback": "Betoverd"
+    },
+    "materialHint": {
+      "arcaneDust": "Betoveringsreagens. Verkregen door het onbetoveren van gewone en ongewone uitrusting.",
+      "arcaneEssence": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame uitrusting.",
+      "arcaneShard": "Betoveringsreagens. Verkregen door het onbetoveren van epische en legendarische uitrusting.",
+      "resonantThread": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere stofwapenrusting.",
+      "resonantHide": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere leerwapenrusting.",
+      "resonantLinks": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere maliënwapenrusting.",
+      "resonantSteel": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere meleewapens.",
+      "resonantTimber": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere staven, stokken, bogen en kruisbogen."
     },
     "discord": {
       "title": "Discord",
@@ -1994,6 +2031,10 @@ export const nl_NL: EnTranslations = {
         "takeParcelsFirst": "Haal de pakketten eruit voordat je de brief weggooit."
       }
     },
+    "marketIndicator": {
+      "aria": "Wereldmarkt-opbrengst of voorwerpen wachten",
+      "tip": "Verkoopopbrengst of teruggekeerde voorwerpen wachten op je bij de Koopman."
+    },
     "noticeboard": {
       "empty": "Er lijkt niets opgehangen te zijn."
     },
@@ -2113,7 +2154,19 @@ export const nl_NL: EnTranslations = {
       "onlineHeader": "Online ({n})",
       "offlineHeader": "Offline ({n})",
       "hideOffline": "Offline verbergen",
-      "hideOfflineTitle": "Offline gildeleden verbergen"
+      "hideOfflineTitle": "Offline gildeleden verbergen",
+      "billboard": {
+        "label": "Gildeprikbord",
+        "empty": "Nog niets op het prikbord.",
+        "setBy": "Geplaatst door {name}",
+        "save": "Opslaan",
+        "placeholder": "Schrijf een bericht voor de gilde",
+        "inputLabel": "Bericht voor het gildeprikbord",
+        "result": {
+          "set": "Het gildeprikbord is bijgewerkt.",
+          "notOfficer": "Alleen officieren en de Gildemeester mogen het prikbord bewerken."
+        }
+      }
     },
     "gathering": {
       "title": "Verzamelen",
@@ -2124,6 +2177,9 @@ export const nl_NL: EnTranslations = {
       "notReady": "Dit grondstoffenpunt is voor jou nog niet teruggekeerd.",
       "gatherLine": "Jij verzamelt: {name}.",
       "gatherLineQty": "Je verzamelt: {name} x{qty}.",
+      "harvestLine": "Je oogst: {name}.",
+      "harvestLineQty": "Je oogst: {name} x{qty}.",
+      "harvestSpecimenLine": "Je krijgt ook {name}.",
       "catchLine": "Je trekt in: {name}",
       "biteLine": "Er hapt iets naar het aas!",
       "gotAwayLine": "Hij ontsnapte.",
@@ -2305,6 +2361,7 @@ export const nl_NL: EnTranslations = {
       "empty": "Nog geen recepten bekend.",
       "resultAria": "Ambacht {name}",
       "craftedToast": "Gemaakt: {name}",
+      "craftedToastQty": "Gemaakt: {name} x{qty}",
       "insufficientMaterials": "Daar heb je de materialen niet voor.",
       "unknownRecipe": "Dat recept bestaat niet.",
       "comboRequirementUnmet": "Je hebt niet beide vereiste ambachten op het vereiste niveau voor dat recept.",
@@ -2383,7 +2440,6 @@ export const nl_NL: EnTranslations = {
       "makersMark": "Gemaakt door {name}",
       "gatheredBy": "Verzameld door {name}",
       "masterworkSeal": "Meesterwerk",
-      "enchantedLine": "Betoverd",
       "commissionToggle": "Opdrachtsstuk",
       "commissionToggleHint": "Bindt aan het eerste personage dat het via een ruil ontvangt.",
       "commissionUnbound": "Opdrachtsstuk: bindt aan de eerste ontvanger",
@@ -2398,7 +2454,13 @@ export const nl_NL: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Je onbetoverd {item}.",
+      "disenchantedYield": "Je onbetoverd {item} tot {material}.",
+      "disenchantedYieldQty": "Je onbetoverd {item} tot {material} x{qty}.",
+      "disenchantedAlso": "Je krijgt ook {material} terug.",
+      "disenchantedAlsoQty": "Je krijgt ook {material} x{qty} terug.",
       "salvagedLine": "Je salvaged {item}.",
+      "salvagedYield": "Je salvaged {item} tot {material}.",
+      "salvagedYieldQty": "Je salvaged {item} tot {material} x{qty}.",
       "enchantAppliedLine": "Je betoverd {item} met {enchant}.",
       "notHeld": "Je hebt dat voorwerp niet.",
       "notDisenchantable": "Je kunt dat niet onbetoveren.",
@@ -2421,7 +2483,32 @@ export const nl_NL: EnTranslations = {
       "pickerTitle": "Betovering aanbrengen",
       "targetTitle": "Kies een voorwerp om te betoveren",
       "noEnchants": "Geen betovering gebruikt dit reagens.",
-      "noTargets": "Geen geschikt voorwerp om te betoveren."
+      "noTargets": "Geen geschikt voorwerp om te betoveren.",
+      "wornTag": "Gedragen ({slot})",
+      "wornTagIndexed": "Gedragen ({slot} {index})",
+      "tier": {
+        "base": "Basisbetoveringen",
+        "runed": "Gerunede betoveringen",
+        "greater": "Grotere betoveringen"
+      },
+      "yieldHeader": "Verwachte materialen:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} tot {max} {item}",
+      "alreadyEnchanted": "Dat voorwerp is al betoverd.",
+      "sameEnchant": "Dat voorwerp heeft die betovering al.",
+      "replaceTag": "Vervangt {enchant}",
+      "sameEnchantTag": "Al toegepast",
+      "plainTag": "Niet betoverd",
+      "replaceConfirmTitle": "Betovering op {item} vervangen?",
+      "replaceConfirmBody": "Dit vervangt {old} op {item} door {new}.",
+      "replaceConfirmNoRefund": "De oude betovering wordt vernietigd. De materialen worden niet teruggegeven. Dit kan niet ongedaan worden gemaakt.",
+      "replaceConfirmKeeps": "Behouden: {kept}",
+      "replaceConfirmKeepsSigner": "Makersmerk",
+      "replaceConfirmKeepsMasterwork": "Meesterwerkbonus",
+      "replaceConfirmKeepsBond": "Opdrachtbinding",
+      "replaceConfirmCost": "Kosten: {cost}",
+      "replaceConfirmCostItem": "{name} x{count}",
+      "replaceConfirmAccept": "Vervangen"
     },
     "training": {
       "title": "Opleiding: {name}",
@@ -3664,7 +3751,7 @@ export const nl_NL: EnTranslations = {
     "professions": {
       "intro": "Naast gevecht en quests beloont de wereld je voor het bewerken van het land en de smidse: grondstoffen verzamelen, ze in tien ambachtsvakken tot uitrusting en goederen maken, en een identiteit aannemen als een van de tien archetypen die deze vakken vertegenwoordigen.",
       "harvestTitle": "De jacht zelf oogsten",
-      "harvestBody": "Verzamelen stopt niet bij bronpunten. Veel gevelde beesten kunnen eenmalig worden geoogst, wie het eerst komt wie het eerst maalt, voor huid, tanden, zijde en vlees, rechtstreeks van het karkas naast de gewone buit; een druk opent beide. De keuze is ook elke keer aan jou: strip alles wat het karkas biedt, of concentreer je op minder componenten en neem een meetbaar betere kwaliteit van wat je wel neemt.\n\nEen zeldzame of betere oogstrol op een specimenfamilie geeft ook een gesigneerd perfect exemplaar (een Ongeschonden Huid, Ongeschonden Zijde, Ongeschonden Gifklier of Stuk Ossenhaas) bovenop de gewone opbrengst, en registreert Een Perfect Exemplaar in je Boek der Daden. Elk personage kan oogsten, geen training vereist, en elk gereedschap dat je bezit telt mee voor de premiumerkenning, tot welk beroep het ook behoort.",
+      "harvestBodyChoice": "Verzamelen stopt niet bij bronpunten. Veel gevelde beesten kunnen eenmalig worden geoogst, wie het eerst komt wie het eerst maalt, voor huid, tanden, zijde en vlees, rechtstreeks van het karkas naast de gewone buit; een druk opent beide. Waar een beest meer dan één bruikbare component draagt, is de keuze aan jou: neem alles wat het te bieden heeft, of concentreer je op minder componenten en neem een meetbaar betere kwaliteit van wat je wel neemt.\n\nEen zeldzame of betere oogstrol op een specimenfamilie geeft ook een gesigneerd perfect exemplaar (een Ongeschonden Huid, Ongeschonden Zijde, Ongeschonden Gifklier of Stuk Ossenhaas) bovenop de gewone opbrengst, en registreert Een Perfect Exemplaar in je Boek der Daden. Elk personage kan oogsten, geen training vereist, en elk gereedschap dat je bezit telt mee voor de premiumerkenning, tot welk beroep het ook behoort.",
       "focusTitle": "Stadsfocus",
       "focusBody": "Elke hoofdplaats heeft een Stadsfocus-paneel voor oogsters op bezoek: sta in de stad, open het naast de minimap, en richt een klein budget aan focuspunten op de componenttypen die je belangrijk vindt. Hoe meer focus je aan een component geeft, hoe fijner en rijker het van elk later lijk komt; je toewijzing volgt je personage waar het ook zwerft, en je kunt haar gratis herzien bij elk later bezoek aan de stad.",
       "craftHowTitle": "Het vervaardigingsvenster",
@@ -3819,7 +3906,7 @@ export const nl_NL: EnTranslations = {
           "levelingHeading": "Hoe Betovering omhoog gaat",
           "levelingBody": "Twee acties bewegen de vaardigheid: het ontbetoveren van een stuk, en het aanbrengen van een betovering. Elk succes is tot een punt waard, geschaald naar hoe serieus het werk is: de zeldzaamheid van het stuk dat je afbreekt, of de reagenstrang van de betovering die je aanbrengt. Gewone ontbetoveringen en alleen-stof-betoveringen scoren als gewoon werk; ongewone ontbetoveringen en essentiebetoveringen als ongewoon; zeldzame ontbetoveringen en elke Geruned of Grotere betovering als zeldzaam; epische en legendarische ontbetoveringen nog hoger.\n\nDe bekende meesterschapsvervaging geldt op 25-puntsintervallen, dus gewoon-gradige werk wordt grijs op vaardigheid 75, ongewoon werk op 100, en zeldzaam-gradige werk precies bij de limiet van 125. Betovering heeft ook een eigen vriendelijkheid: input boven je archetypenplafond wordt afgerond naar dat plafond in plaats van nul te worden, dus voor je afstemt scoort een epische ontbetovering gewoon als zeldzaam in plaats van niets te leren. Als Betovering slapend achter een andere identiteit eindigt, scoort alles als gewoon werk en stagneert de klim bij 75; houd het als hobby en zeldzaam-gradig werk levert nog op, alleen trager voorbij 75.",
           "marketHeading": "Betoverde exemplaren, herkomst en de markt",
-          "marketBody": "Het aanbrengen van een betovering verbruikt een ingepakt, niet-uitgerust exemplaar van het item plus de reagenten, en levert een apart betoverd exemplaar terug; draag het en de bonus volgt het stuk voor altijd, door uitkleedmomenten, bankbezoeken en ruilingen. Een betovering per stuk: een betoverd exemplaar kan nooit opnieuw worden betoverd of ontbetoverd, en verkopen, weggooien en ontbetoveren geven de voorkeur eerst aan gewone exemplaren, zodat je afgewerkte stuk niet per ongeluk wordt opgevreten. Identiek betoverde exemplaren stapelen zelfs samen in je tassen.\n\nMeesterwerkuitrusting en betovering zijn vrienden: een meesterwerkstuk blijft volledig betoverbaar, en de betovering telt op bij de meesterwerkbonus zonder hem of de signatuur van de maker te verstoren. Door elke bron te stapelen is een gesigneerd meesterwerk met een Grotere betovering het beste wat een gemaakt stuk kan bereiken, en het zit nog steeds onder de raidvloer.\n\nOp de markt brokeert de Wereld Markt alleen gewone, ongewijzigde voorraad, dus betoverde en gesigneerde stukken wisselen van hand via het ruilvenster. De materialen zijn de vermarktbare helft van het ambacht: Stof, Essentie en Scherven worden vrij genoteerd, notering kost niets, en de Koopman neemt slechts 5 procent van een voltooide verkoop. Dat maakt de twee klassieke betoverings-inkomens: materialen verkopen op de markt, en het stuk van een klant in ruil nemen, het betoveren en teruggeven."
+          "marketBody": "Het aanbrengen van een betovering verbruikt de reagenten en markeert een specifiek exemplaar van het item. Richt je op een exemplaar in de tas, dan krijg je een apart betoverd exemplaar terug; richt je op een stuk dat je al draagt, dan wordt het ter plekke betoverd, zonder af te doen en weer aan te trekken. Hoe dan ook volgt de bonus het stuk voor altijd, door uitkleedmomenten, bankbezoeken en ruilingen. Een betovering per stuk: een andere betovering aanbrengen op een betoverd exemplaar vraagt eerst om bevestiging en vervangt dan de oude betovering meteen; die wordt vernietigd zonder terugbetaling van de materialen. Verkopen, weggooien en ontbetoveren geven de voorkeur eerst aan gewone exemplaren, zodat je afgewerkte stuk niet per ongeluk wordt opgevreten. Identiek betoverde exemplaren stapelen zelfs samen in je tassen.\n\nMeesterwerkuitrusting en betovering zijn vrienden: een meesterwerkstuk blijft volledig betoverbaar, en de betovering telt op bij de meesterwerkbonus zonder hem of de signatuur van de maker te verstoren. Door elke bron te stapelen is een gesigneerd meesterwerk met een Grotere betovering het beste wat een gemaakt stuk kan bereiken, en het zit nog steeds onder de raidvloer.\n\nOp de markt brokeert de Wereld Markt alleen gewone, ongewijzigde voorraad, dus betoverde en gesigneerde stukken wisselen van hand via het ruilvenster. De materialen zijn de vermarktbare helft van het ambacht: Stof, Essentie en Scherven worden vrij genoteerd, notering kost niets, en de Koopman neemt slechts 5 procent van een voltooide verkoop. Dat maakt de twee klassieke betoverings-inkomens: materialen verkopen op de markt, en het stuk van een klant in ruil nemen, het betoveren en teruggeven."
         }
       },
       "howHeading": "Hoe vervaardiging werkt",
@@ -5438,6 +5525,7 @@ export const nl_NL: EnTranslations = {
     },
     "augment": {
       "choose": "Kies een Versterking",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Brutaliteit",
         "desc": "Je fysieke slagen treffen 15% harder."
@@ -6181,6 +6269,7 @@ export const nl_NL: EnTranslations = {
       "arenaJoin": "Je sluit je aan bij de wachtrij van het Ashen Coliseum. Wacht op een waardige tegenstander...",
       "arenaLeave": "Je verlaat de wachtrij van het Ashen Coliseum.",
       "arenaSands": "Je betreedt het zand van het Ashen Coliseum.",
+      "arenaSandsDrowned": "Je betreedt de overspoelde stenen van het Verdronken Hof.",
       "tradeRequestSent": "Je hebt verzocht om met {name} te ruilen.",
       "tradeOpened": "Ruilvenster geopend.",
       "tradeComplete": "Ruil voltooid.",
@@ -6349,6 +6438,11 @@ export const nl_NL: EnTranslations = {
       "playerLevelClassTitle": "{name} - Nv {level} {className}",
       "noChallengers": "Nog geen uitdagers gerangschikt - wees de eerste.",
       "matchInProgress": "Wedstrijd bezig tegen {name}.",
+      "mapName": "Kaart: {name}",
+      "map": {
+        "coliseum": "Asgrauwe Colosseum",
+        "drownedCourt": "Het Verdronken Hof"
+      },
       "leaveQueue": "Wachtrij Verlaten",
       "searching": "Op zoek naar een tegenstander... ({count} in wachtrij)",
       "enterQueue": "Sluit je aan in de Wachtrij",
@@ -6641,18 +6735,29 @@ export const nl_NL: EnTranslations = {
       "pageNextAria": "Volgende marktpagina",
       "pageStatus": "Pagina {current} van {total}",
       "filters": "Marktfilters",
+      "filterValueAria": "{label}: {value}",
       "filterType": "Type",
       "filterTypeAll": "Alle types",
       "filterTypeWeapon": "Wapens",
       "filterTypeArmor": "Pantser",
+      "filterTypeBag": "Tassen",
       "filterTypeConsumable": "Verbruiksartikelen",
       "filterTypeMaterial": "Materialen",
       "filterTypeCosmetic": "Cosmetica",
       "filterTypeOther": "Overig",
       "filterArmorType": "Pantsertype",
       "filterArmorAll": "Alle pantsers",
+      "filterArmorSlot": "Pantserslot",
+      "filterArmorClassAll": "Alle pantsertypes",
+      "armorCloth": "Stof",
+      "armorLeather": "Leer",
+      "armorMail": "Maliën",
       "filterWeaponType": "Wapentype",
       "filterWeaponAll": "Alle wapens",
+      "filterBagSize": "Tasgrootte",
+      "filterBagAll": "Alle tassen",
+      "filterPrimaryStat": "Primaire eigenschap",
+      "filterPrimaryStatAll": "Elke eigenschap",
       "filterRarity": "Zeldzaamheid",
       "filterRarityAll": "Alle zeldzaamheden",
       "weaponSword": "Zwaarden",
