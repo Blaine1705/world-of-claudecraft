@@ -86,6 +86,7 @@ describe('Seeker token-account RPC parsing', () => {
     expect(source).not.toContain('HELIUS_RPC_URL');
     expect(source).not.toContain('getTokenAccountsByOwnerV2');
     expect(source).not.toContain('@solana/');
+    expect(source).not.toContain('response.json()');
   });
 
   it('keeps unique positive Token-2022 balances only', () => {

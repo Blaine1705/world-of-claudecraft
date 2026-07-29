@@ -5,6 +5,7 @@ import {
   SEEKER_GENESIS_TOKEN_METADATA_ADDRESS,
   SEEKER_GENESIS_TOKEN_MINT_AUTHORITY,
 } from './seeker_genesis_token';
+import { seekerRpcResult } from './seeker_rpc_transport';
 
 const TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
 const MINT_BASE_SIZE = 82;
@@ -35,11 +36,6 @@ interface ParsedTokenAccount {
 interface RpcAccountInfo {
   data?: unknown;
   owner?: unknown;
-}
-
-interface RpcResponse {
-  error?: unknown;
-  result?: unknown;
 }
 
 interface TokenAccountsResult {
@@ -165,26 +161,6 @@ export function boundedPositiveTokenMintAddresses(accounts: unknown): string[] |
   return mints.length <= MAX_SEEKER_TOKEN_MINTS ? mints : null;
 }
 
-async function rpc(
-  rpcUrl: string,
-  method: 'getTokenAccountsByOwner' | 'getMultipleAccounts',
-  params: unknown[],
-  signal?: AbortSignal,
-): Promise<unknown> {
-  const response = await fetch(rpcUrl, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
-    signal,
-  });
-  if (!response.ok) throw new Error(`Solana RPC HTTP ${response.status}`);
-  const body = (await response.json()) as RpcResponse;
-  if (!body || typeof body !== 'object' || body.error !== undefined || !('result' in body)) {
-    throw new Error('Solana RPC returned an invalid response');
-  }
-  return body.result;
-}
-
 export async function findSeekerGenesisToken(
   walletAddress: string,
   rpcUrl = process.env.SOLANA_RPC_URL ?? '',
@@ -199,7 +175,7 @@ export async function findSeekerGenesisToken(
   let mints: string[];
   let slot: number | null;
   try {
-    const result = (await rpc(
+    const result = (await seekerRpcResult(
       rpcUrl,
       'getTokenAccountsByOwner',
       [
@@ -225,7 +201,7 @@ export async function findSeekerGenesisToken(
   for (let offset = 0; offset < mints.length; offset += MINT_BATCH_SIZE) {
     const batch = mints.slice(offset, offset + MINT_BATCH_SIZE);
     try {
-      const result = (await rpc(
+      const result = (await seekerRpcResult(
         rpcUrl,
         'getMultipleAccounts',
         [batch, { commitment: 'confirmed', encoding: 'base64' }],
