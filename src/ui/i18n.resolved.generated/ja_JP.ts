@@ -38,6 +38,14 @@ export const ja_JP: EnTranslations = {
     "filterLabel": "コマンドを絞り込む",
     "filterPlaceholder": "このカテゴリを検索",
     "noMatches": "一致するコマンドはありません。",
+    "itemSearchPlaceholder": "名前またはIDで検索",
+    "itemResultsAria": "一致するアイテム",
+    "itemNoMatches": "一致するアイテムはありません。",
+    "itemMore": "{total}件中{shown}件を表示。続けて入力すると絞り込まれます。",
+    "itemChosen": "選択中: {name}",
+    "itemUnknown": "そのIDのアイテムはありません。",
+    "itemHeroicTag": "ヒロイック",
+    "kitCurrentSpec": "現在のスペック",
     "serverRequirement": "サーバーのチート機能には引き続き ALLOW_DEV_COMMANDS=1 が必要です。",
     "invalidValues": "実行する前に有効な値を選択してください。",
     "sent": "送信済み：{command}",
@@ -55,7 +63,8 @@ export const ja_JP: EnTranslations = {
       "z": "Z",
       "dungeon": "ダンジョン",
       "difficulty": "難易度",
-      "name": "名前"
+      "name": "名前",
+      "spec": "スペック"
     },
     "difficulty": {
       "normal": "ノーマル",
@@ -113,6 +122,10 @@ export const ja_JP: EnTranslations = {
       "give": {
         "label": "アイテムを付与",
         "description": "プレイヤーのインベントリにアイテムを追加します。"
+      },
+      "kit": {
+        "label": "新規20キットを装備",
+        "description": "指定したスペック向けのSanctum以前レベル20プリセットを装備します (バッグを先に)。装備品のみです。"
       },
       "gold": {
         "label": "ゴールドを追加",
@@ -653,7 +666,7 @@ export const ja_JP: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20%オフ",
+      "railWocDiscount": "{percent}%オフ",
       "railWocUnavailable": "WOC価格は現在利用できません。",
       "railNativeUnavailable": "SOL/WOCは利用不可",
       "amountLabel": "数量",
@@ -1049,6 +1062,7 @@ export const ja_JP: EnTranslations = {
       "walkByAutoloot": "通りがかり自動ルート",
       "groundReticle": "地面ターゲットのレティクル",
       "mouseoverCast": "パーティフレームでマウスオーバーキャスト",
+      "stickyTarget": "地面クリックでターゲットを維持",
       "showItemLevel": "アイテムレベルを表示",
       "itemLevelLine": "アイテムレベル {level}",
       "itemScoreLine": "スコア {score}",
@@ -1453,9 +1467,12 @@ export const ja_JP: EnTranslations = {
       "title": "採取",
       "harvestButton": "採取",
       "harvestTooltip": "チェックした部位を採取します。各死体は早い者勝ちで一度だけ採取できます。戦利品は取りません。",
-      "concentrateHint": "選ぶ部位が少ないほど、各部位の品質が高くなります。",
+      "yieldTierHint": "一度の採取で実際に取れる部位が少ないほど、各部位の採取ティアが高くなります。",
+      "nothingSelectedYields": "選んだ部位はどれも、この死体から採取できません。",
       "alreadyHarvested": "この死体はすでに採取されています。",
       "componentAria": "{component}を採取",
+      "componentNoYield": "まだ産出なし",
+      "componentAriaNoYield": "{component}を採取：{note}",
       "components": {
         "hide": "毛皮",
         "fang": "牙",
@@ -1533,6 +1550,8 @@ export const ja_JP: EnTranslations = {
       "dragDestroyHint": "世界へドラッグして破壊",
       "reorderNeedsRecent": "絞り込みを解除し並び順を「最近」にすると持ち物を並べ替えられます",
       "itemAriaInstanced": "{item}、数量 {count}、銘入りの品",
+      "itemAriaEnchanted": "{item}、数量 {count}、エンチャント済みの品",
+      "itemAriaBound": "{item}、数量 {count}、バインド済みの品",
       "itemAriaMasterwork": "{item}、数量 {count}、傑作",
       "filterGroupAria": "バッグをカテゴリーで絞り込む",
       "filterAll": "すべて",
@@ -1757,7 +1776,19 @@ export const ja_JP: EnTranslations = {
       "label": "フレーム位置をリセット"
     },
     "itemTooltip": {
-      "requiresLevel": "必要レベル {level}"
+      "requiresLevel": "必要レベル {level}",
+      "statEnchanted": "+{value} {stat}（エンチャント）",
+      "enchantedFallback": "エンチャント済み"
+    },
+    "materialHint": {
+      "arcaneDust": "エンチャントの材料。一般と良質の装備を魔力分解して得られる。",
+      "arcaneEssence": "エンチャントの材料。レアの装備を魔力分解して得られる。",
+      "arcaneShard": "エンチャントの材料。エピックと伝説の装備を魔力分解して得られる。",
+      "resonantThread": "エンチャントの材料。レア以上の布防具を魔力分解して得られる。",
+      "resonantHide": "エンチャントの材料。レア以上の革防具を魔力分解して得られる。",
+      "resonantLinks": "エンチャントの材料。レア以上の鎖防具を魔力分解して得られる。",
+      "resonantSteel": "エンチャントの材料。レア以上の近接武器を魔力分解して得られる。",
+      "resonantTimber": "エンチャントの材料。レア以上の杖、ワンド、弓、クロスボウを魔力分解して得られる。"
     },
     "discord": {
       "title": "Discord",
@@ -1998,6 +2029,10 @@ export const ja_JP: EnTranslations = {
         "takeParcelsFirst": "手紙を捨てる前に小包を取り出してください。"
       }
     },
+    "marketIndicator": {
+      "aria": "世界市場の売上またはアイテムが受け取り待ち",
+      "tip": "売上金または返品アイテムが商人のもとで受け取りを待っています。"
+    },
     "noticeboard": {
       "empty": "何も貼られていないようだ。"
     },
@@ -2117,7 +2152,19 @@ export const ja_JP: EnTranslations = {
       "onlineHeader": "オンライン ({n})",
       "offlineHeader": "オフライン ({n})",
       "hideOffline": "オフラインを非表示",
-      "hideOfflineTitle": "オフラインのギルドメンバーを非表示"
+      "hideOfflineTitle": "オフラインのギルドメンバーを非表示",
+      "billboard": {
+        "label": "ギルド掲示板",
+        "empty": "掲示板にはまだ何もありません。",
+        "setBy": "{name}が設定",
+        "save": "保存",
+        "placeholder": "ギルドへのメッセージを書く",
+        "inputLabel": "ギルド掲示板メッセージ",
+        "result": {
+          "set": "ギルド掲示板を更新しました。",
+          "notOfficer": "掲示板を編集できるのは幹部とギルドマスターだけです。"
+        }
+      }
     },
     "gathering": {
       "title": "採集",
@@ -2128,6 +2175,9 @@ export const ja_JP: EnTranslations = {
       "notReady": "この資源ノードはまだあなたのために再生していません。",
       "gatherLine": "{name}を採集した。",
       "gatherLineQty": "{name}を{qty}個採集した。",
+      "harvestLine": "{name}を剥ぎ取った。",
+      "harvestLineQty": "{name}を{qty}個剥ぎ取った。",
+      "harvestSpecimenLine": "さらに{name}を得た。",
       "catchLine": "{name}を釣り上げた",
       "biteLine": "何かが食いついた！",
       "gotAwayLine": "逃げられてしまった。",
@@ -2309,6 +2359,7 @@ export const ja_JP: EnTranslations = {
       "empty": "既知のレシピはありません。",
       "resultAria": "{name}を製作",
       "craftedToast": "製作しました:{name}",
+      "craftedToastQty": "製作しました:{name} x{qty}",
       "insufficientMaterials": "材料が不足しています。",
       "unknownRecipe": "そのレシピは存在しません。",
       "comboRequirementUnmet": "その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。",
@@ -2387,7 +2438,6 @@ export const ja_JP: EnTranslations = {
       "makersMark": "製作者：{name}",
       "gatheredBy": "採集者：{name}",
       "masterworkSeal": "傑作",
-      "enchantedLine": "エンチャント済み",
       "commissionToggle": "受注品として制作",
       "commissionToggleHint": "取引で最初に受け取ったキャラクターにバインドされます。",
       "commissionUnbound": "受注品：最初の受取人にバインドされる",
@@ -2402,7 +2452,13 @@ export const ja_JP: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "{item}を魔力分解した。",
+      "disenchantedYield": "{item}を魔力分解して{material}にした。",
+      "disenchantedYieldQty": "{item}を魔力分解して{material}{qty}個にした。",
+      "disenchantedAlso": "さらに{material}を得た。",
+      "disenchantedAlsoQty": "さらに{material}を{qty}個得た。",
       "salvagedLine": "{item}を解体した。",
+      "salvagedYield": "{item}を解体して{material}にした。",
+      "salvagedYieldQty": "{item}を解体して{material}{qty}個にした。",
       "enchantAppliedLine": "{item}に{enchant}をエンチャントした。",
       "notHeld": "そのアイテムを所持していません。",
       "notDisenchantable": "それは魔力分解できません。",
@@ -2425,7 +2481,32 @@ export const ja_JP: EnTranslations = {
       "pickerTitle": "エンチャントを付与",
       "targetTitle": "エンチャントするアイテムを選択",
       "noEnchants": "この素材を使うエンチャントはありません。",
-      "noTargets": "エンチャントできるアイテムがありません。"
+      "noTargets": "エンチャントできるアイテムがありません。",
+      "wornTag": "装備中 ({slot})",
+      "wornTagIndexed": "装備中 ({slot}{index})",
+      "tier": {
+        "base": "基本エンチャント",
+        "runed": "ルーンエンチャント",
+        "greater": "上級エンチャント"
+      },
+      "yieldHeader": "獲得予定の材料:",
+      "yieldLineExact": "{item} {count}個",
+      "yieldLineRange": "{item} {min}から{max}個",
+      "alreadyEnchanted": "そのアイテムにはすでにエンチャントが付与されています。",
+      "sameEnchant": "そのアイテムにはすでに同じエンチャントが付与されています。",
+      "replaceTag": "{enchant}を置き換え",
+      "sameEnchantTag": "付与済み",
+      "plainTag": "エンチャントなし",
+      "replaceConfirmTitle": "{item}のエンチャントを置き換えますか？",
+      "replaceConfirmBody": "{item}の{old}を{new}に置き換えます。",
+      "replaceConfirmNoRefund": "古いエンチャントは破棄され、素材は返却されません。この操作は取り消せません。",
+      "replaceConfirmKeeps": "保持: {kept}",
+      "replaceConfirmKeepsSigner": "製作者の刻印",
+      "replaceConfirmKeepsMasterwork": "傑作ボーナス",
+      "replaceConfirmKeepsBond": "受注品のバインド",
+      "replaceConfirmCost": "費用: {cost}",
+      "replaceConfirmCostItem": "{name} {count}個",
+      "replaceConfirmAccept": "置き換える"
     },
     "training": {
       "title": "訓練：{name}",
@@ -3668,7 +3749,7 @@ export const ja_JP: EnTranslations = {
     "professions": {
       "intro": "戦闘やクエストだけでなく、この世界は大地を耕し鍛冶場に立つあなたにも報いてくれます。原材料を採集し、十の製作職を通じてそれを装備や品物へと変え、それらの職が体現する十のアーキタイプのひとつとして自らのアイデンティティを築いていきます。",
       "harvestTitle": "狩りそのものを採取する",
-      "harvestBody": "採集はノードで終わらない。倒した獣の中には、通常の戦利品と並んで、死体から直接素材を採取できるものがいる：毛皮、牙、絹糸、さらに奇妙なものまで。一体の獲物につき採り手は一人：最初に採取した者がすべてを手にする。そして選択は毎回あなたのものだ：死体が差し出すすべてを剥ぎ取るか、ひとつの素材に集中してより上のグレードを受け取るか。採取はどのキャラクターにもでき、職も訓練も要らない。とりわけ見事な素材には、採取した者の名まで刻まれる。",
+      "harvestBodyChoice": "採集はノードで終わらない。倒した獣の多くは、通常の戦利品と並んで、死体から直接素材を採取できる：毛皮、牙、絹糸、そして肉。各死体は早い者勝ちで一度だけ採取でき、ひと押しで戦利品と採取の両方が開く。加工できる素材をふたつ以上持つ獣なら、選択はあなたのものだ：その獣が差し出せるすべてを取るか、より少ない素材に集中して、実際に取る分だけはっきりと上のグレードで受け取るか。\n\n標本を宿す系統の獣でレア以上の採取を引き当てると、通常の産出に加えて署名入りの完璧な標本（極上の獣皮、極上の蜘蛛の糸、極上の毒腺、極上の肉のいずれか）も手に入り、功績の書に「申し分なき標本」が刻まれる。採取はどのキャラクターにもでき、訓練も要らない。手持ちの採集道具はどの職のものであれ、このレア以上の判定を後押しする。",
       "focusTitle": "町のフォーカス",
       "focusBody": "どの拠点の町にも、訪れる採り手のための「町のフォーカス」パネルがある。町の中に立ってミニマップの脇から開き、わずかなフォーカスポイントの持ち分を、気にかける素材の種類へ振り分けよう。フォーカスした素材は、以後どの死体からもワングレード上質に、そして少し多めに採れる。割り振りはどこを歩いてもキャラクターに付いてまわり、後で町を訪れれば、無料で何度でも組み直せる。",
       "craftHowTitle": "製作ウィンドウ",
@@ -3823,7 +3904,7 @@ export const ja_JP: EnTranslations = {
           "levelingHeading": "エンチャントの上げ方",
           "levelingBody": "スキルを動かす行動は二つ、分解とエンチャント付与です。成功ごとに最大1ポイント、仕事の重さで換算されます。コモンの分解と粉だけのエンチャントはコモンの仕事、良質の分解とエッセンスのエンチャントは良質、レアの分解とRunedやGreaterのエンチャントはレア、エピックと伝説の分解はさらに上です。お馴染みの熟達の薄れが25ポイント刻みで効き、コモンの仕事はスキル75で、良質は100で、レアの仕事はちょうど上限の125で灰色になります。エンチャントだけの情けもひとつ。天井を超える入力はゼロではなく天井へ丸められるため、誓う前でもエピックの分解はレアとして数えられ、無駄になりません。エンチャントが休眠に落ちればすべてコモン扱いで登りは75で止まり、趣味に据えればレアの仕事はまだ実り、75以降が遅くなるだけです。",
           "marketHeading": "付与済みの品と来歴と市場",
-          "marketBody": "付与は鞄の中の未装備の一品と素材を消費し、別個の付与済みの品を返します。装備すれば効果は永遠にその品に付き従います。一品にひとつ。付与済みの品は再付与も分解もできず、売却、破棄、分解はどれも無印の品を先に選ぶので、完成品がうっかり食われることはありません。同一の付与品同士は重ねられます。傑作とエンチャントは友人です。傑作は問題なく付与でき、効果は傑作ボーナスにも署名にも触れず上乗せされます。全部を積んだ署名入り傑作のGreater付与が工芸品の頂点で、それでも設計上レイド戦利品の下に座ります。世界市場は無印の品しか扱わないため、付与済みや署名入りは取引ウィンドウで直接手渡し。市場に出せる半分は素材の方です。粉、エッセンス、シャードは自由に出品でき、出品無料、手数料は成立時の5%だけです。"
+          "marketBody": "付与は素材を消費し、特定の一品に印を付けます。鞄の中の品に使えば別個の付与済みの品が返り、装備中の品に使えばその場で付与され、外して着け直す必要はありません。どちらでも効果は永遠にその品に付き従います。一品にひとつ。付与済みの品に別の付与を使うと確認のうえ古い付与をそのまま置き換え、古い付与は素材の返却なしに破棄されます。売却、破棄、分解はどれも無印の品を先に選ぶので、完成品がうっかり食われることはありません。同一の付与品同士は重ねられます。傑作とエンチャントは友人です。傑作は問題なく付与でき、効果は傑作ボーナスにも署名にも触れず上乗せされます。全部を積んだ署名入り傑作のGreater付与が工芸品の頂点で、それでも設計上レイド戦利品の下に座ります。世界市場は無印の品しか扱わないため、付与済みや署名入りは取引ウィンドウで直接手渡し。市場に出せる半分は素材の方です。粉、エッセンス、シャードは自由に出品でき、出品無料、手数料は成立時の5%だけです。"
         }
       },
       "howHeading": "製作の流れ",
@@ -5442,6 +5523,7 @@ export const ja_JP: EnTranslations = {
     },
     "augment": {
       "choose": "オーグメントを選択",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "蛮勇",
         "desc": "物理攻撃の威力が15%上昇する。"
@@ -6185,6 +6267,7 @@ export const ja_JP: EnTranslations = {
       "arenaJoin": "灰の闘技場のキューに入りました。ふさわしい相手を待ちます...",
       "arenaLeave": "灰の闘技場のキューを離れました。",
       "arenaSands": "灰の闘技場の砂地に足を踏み入れました。",
+      "arenaSandsDrowned": "水没の宮廷の水に沈んだ石畳に足を踏み入れた。",
       "tradeRequestSent": "{name}に取引を申し込みました。",
       "tradeOpened": "取引ウィンドウが開きました。",
       "tradeComplete": "取引完了。",
@@ -6353,6 +6436,11 @@ export const ja_JP: EnTranslations = {
       "playerLevelClassTitle": "{name} - レベル{level} {className}",
       "noChallengers": "まだランク入りした挑戦者はいません - 最初になりましょう。",
       "matchInProgress": "{name}との試合中。",
+      "mapName": "マップ: {name}",
+      "map": {
+        "coliseum": "灰の闘技場",
+        "drownedCourt": "水没の宮廷"
+      },
       "leaveQueue": "キューを離れる",
       "searching": "対戦相手を検索中...（キュー内 {count}）",
       "enterQueue": "キューに入る",
@@ -6645,18 +6733,29 @@ export const ja_JP: EnTranslations = {
       "pageNextAria": "マーケットの次のページ",
       "pageStatus": "{total} ページ中 {current} ページ",
       "filters": "市場フィルター",
+      "filterValueAria": "{label}: {value}",
       "filterType": "種類",
       "filterTypeAll": "すべての種類",
       "filterTypeWeapon": "武器",
       "filterTypeArmor": "防具",
+      "filterTypeBag": "バッグ",
       "filterTypeConsumable": "消耗品",
       "filterTypeMaterial": "素材",
       "filterTypeCosmetic": "外見",
       "filterTypeOther": "その他",
       "filterArmorType": "防具の種類",
       "filterArmorAll": "すべての防具",
+      "filterArmorSlot": "防具スロット",
+      "filterArmorClassAll": "すべての防具タイプ",
+      "armorCloth": "布防具",
+      "armorLeather": "革防具",
+      "armorMail": "鎖防具",
       "filterWeaponType": "武器の種類",
       "filterWeaponAll": "すべての武器",
+      "filterBagSize": "バッグの容量",
+      "filterBagAll": "すべてのバッグ",
+      "filterPrimaryStat": "メイン能力値",
+      "filterPrimaryStatAll": "すべてのメイン能力値",
       "filterRarity": "レア度",
       "filterRarityAll": "すべてのレア度",
       "weaponSword": "剣",

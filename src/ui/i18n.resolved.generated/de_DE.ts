@@ -38,6 +38,14 @@ export const de_DE: EnTranslations = {
     "filterLabel": "Befehle filtern",
     "filterPlaceholder": "Diese Kategorie durchsuchen",
     "noMatches": "Keine passenden Befehle.",
+    "itemSearchPlaceholder": "Nach Name oder ID durchsuchen",
+    "itemResultsAria": "Passende Gegenstände",
+    "itemNoMatches": "Keine passenden Gegenstände.",
+    "itemMore": "{shown} von {total} angezeigt. Tippe weiter, um einzugrenzen.",
+    "itemChosen": "Ausgewählt: {name}",
+    "itemUnknown": "Kein Gegenstand hat diese ID.",
+    "itemHeroicTag": "Heroisch",
+    "kitCurrentSpec": "Aktuelle Spezialisierung",
     "serverRequirement": "Server-Cheats erfordern weiterhin ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Wähle gültige Werte, bevor du diesen Befehl ausführst.",
     "sent": "Gesendet: {command}",
@@ -55,7 +63,8 @@ export const de_DE: EnTranslations = {
       "z": "Z",
       "dungeon": "Dungeon",
       "difficulty": "Schwierigkeitsgrad",
-      "name": "Name"
+      "name": "Name",
+      "spec": "Spezialisierung"
     },
     "difficulty": {
       "normal": "Normal",
@@ -113,6 +122,10 @@ export const de_DE: EnTranslations = {
       "give": {
         "label": "Gegenstand geben",
         "description": "Einen Gegenstand zum Inventar des Spielers hinzufügen."
+      },
+      "kit": {
+        "label": "Frisch-20-Set anlegen",
+        "description": "Die Vor-Heiligtum-Voreinstellung für Stufe 20 einer Spezialisierung anlegen, zuerst die Taschen. Nur Ausrüstung."
       },
       "gold": {
         "label": "Gold hinzufügen",
@@ -653,7 +666,7 @@ export const de_DE: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% Rabatt",
+      "railWocDiscount": "{percent}% Rabatt",
       "railWocUnavailable": "WOC-Preise sind derzeit nicht verfügbar.",
       "railNativeUnavailable": "SOL/WOC deaktiviert.",
       "amountLabel": "Menge",
@@ -1049,6 +1062,7 @@ export const de_DE: EnTranslations = {
       "walkByAutoloot": "Plündern im Vorbeigehen",
       "groundReticle": "Bodenziel-Fadenkreuz",
       "mouseoverCast": "Mouseover-Wirken auf Gruppenfenstern",
+      "stickyTarget": "Ziel bei Bodenklick behalten",
       "showItemLevel": "Gegenstandsstufe anzeigen",
       "itemLevelLine": "Gegenstandsstufe {level}",
       "itemScoreLine": "Wertung {score}",
@@ -1453,9 +1467,12 @@ export const de_DE: EnTranslations = {
       "title": "Verwerten",
       "harvestButton": "Verwerten",
       "harvestTooltip": "Verwirft die markierten Komponenten. Jeder Kadaver kann einmal verwertet werden, wer zuerst kommt. Nimmt nicht die Beute.",
-      "concentrateHint": "Je weniger Teile du wählst, desto höher ist die Qualitätsstufe jedes einzelnen Teils.",
+      "yieldTierHint": "Je weniger Teile eine Verwertung tatsächlich entnimmt, desto höher ist die Sammelstufe jedes einzelnen Teils.",
+      "nothingSelectedYields": "An diesem Kadaver gibt es nichts aus deiner Auswahl zu verwerten.",
       "alreadyHarvested": "Dieser Kadaver wurde bereits verwertet.",
       "componentAria": "{component} verwerten",
+      "componentNoYield": "noch nichts",
+      "componentAriaNoYield": "{component} verwerten: {note}",
       "components": {
         "hide": "Haut",
         "fang": "Fangzahn",
@@ -1533,6 +1550,8 @@ export const de_DE: EnTranslations = {
       "dragDestroyHint": "In die Welt ziehen, um zu vernichten",
       "reorderNeedsRecent": "Filter aufheben und nach Zuletzt sortieren, um deine Taschen neu anzuordnen",
       "itemAriaInstanced": "{item}, Menge {count}, herstellermarkierte Kopie",
+      "itemAriaEnchanted": "{item}, Menge {count}, verzauberte Kopie",
+      "itemAriaBound": "{item}, Menge {count}, gebundene Kopie",
       "itemAriaMasterwork": "{item}, Menge {count}, Meisterwerk",
       "filterGroupAria": "Taschen nach Kategorie filtern",
       "filterAll": "Alle",
@@ -1757,7 +1776,19 @@ export const de_DE: EnTranslations = {
       "label": "Fensterpositionen zurücksetzen"
     },
     "itemTooltip": {
-      "requiresLevel": "Benötigt Stufe {level}"
+      "requiresLevel": "Benötigt Stufe {level}",
+      "statEnchanted": "+{value} {stat} (Verzaubert)",
+      "enchantedFallback": "Verzaubert"
+    },
+    "materialHint": {
+      "arcaneDust": "Verzauberungsreagenz. Entzaubert aus gewöhnlicher und ungewöhnlicher Ausrüstung.",
+      "arcaneEssence": "Verzauberungsreagenz. Entzaubert aus seltener Ausrüstung.",
+      "arcaneShard": "Verzauberungsreagenz. Entzaubert aus epischer und legendärer Ausrüstung.",
+      "resonantThread": "Verzauberungsreagenz. Entzaubert aus seltener oder besserer Stoffrüstung.",
+      "resonantHide": "Verzauberungsreagenz. Entzaubert aus seltener oder besserer Lederrüstung.",
+      "resonantLinks": "Verzauberungsreagenz. Entzaubert aus seltener oder besserer Kettenrüstung.",
+      "resonantSteel": "Verzauberungsreagenz. Entzaubert aus seltenen oder besseren Nahkampfwaffen.",
+      "resonantTimber": "Verzauberungsreagenz. Entzaubert aus seltenen oder besseren Stäben, Zauberstäben, Bögen und Armbrüsten."
     },
     "discord": {
       "title": "Discord",
@@ -1998,6 +2029,10 @@ export const de_DE: EnTranslations = {
         "takeParcelsFirst": "Entnimm erst die Pakete, bevor du den Brief verwirfst."
       }
     },
+    "marketIndicator": {
+      "aria": "Weltmarkt-Erlöse oder Gegenstände warten",
+      "tip": "Verkaufserlöse oder zurückgegebene Gegenstände warten beim Händler auf dich."
+    },
     "noticeboard": {
       "empty": "Hier scheint nichts ausgehängt zu sein."
     },
@@ -2117,7 +2152,19 @@ export const de_DE: EnTranslations = {
       "onlineHeader": "Online ({n})",
       "offlineHeader": "Offline ({n})",
       "hideOffline": "Offline ausblenden",
-      "hideOfflineTitle": "Offline-Gildenmitglieder ausblenden"
+      "hideOfflineTitle": "Offline-Gildenmitglieder ausblenden",
+      "billboard": {
+        "label": "Gildenpinnwand",
+        "empty": "Noch nichts an der Pinnwand.",
+        "setBy": "Festgelegt von {name}",
+        "save": "Speichern",
+        "placeholder": "Schreib eine Nachricht für die Gilde...",
+        "inputLabel": "Nachricht für die Gildenpinnwand",
+        "result": {
+          "set": "Die Gildenpinnwand wurde aktualisiert.",
+          "notOfficer": "Nur Offiziere und der Gildenmeister dürfen die Pinnwand bearbeiten."
+        }
+      }
     },
     "gathering": {
       "title": "Sammeln",
@@ -2128,6 +2175,9 @@ export const de_DE: EnTranslations = {
       "notReady": "Dieser Ressourcenknoten ist fur dich noch nicht nachgewachsen.",
       "gatherLine": "Sie sammeln: {name}.",
       "gatherLineQty": "Sie sammeln: {name} x{qty}.",
+      "harvestLine": "Ihr häutet: {name}.",
+      "harvestLineQty": "Ihr häutet: {name} x{qty}.",
+      "harvestSpecimenLine": "Ihr erhaltet außerdem {name}.",
       "catchLine": "Du holst ein: {name}",
       "biteLine": "Etwas nimmt den Köder!",
       "gotAwayLine": "Es ist entkommen.",
@@ -2309,6 +2359,7 @@ export const de_DE: EnTranslations = {
       "empty": "Noch keine Rezepte bekannt.",
       "resultAria": "Basteln {name}",
       "craftedToast": "Hergestellt: {name}",
+      "craftedToastQty": "Hergestellt: {name} x{qty}",
       "insufficientMaterials": "Dafür fehlen Ihnen die Materialien.",
       "unknownRecipe": "Dieses Rezept existiert nicht.",
       "comboRequirementUnmet": "Ihr besitzt nicht beide erforderlichen Berufe auf der nötigen Stufe für dieses Rezept.",
@@ -2387,7 +2438,6 @@ export const de_DE: EnTranslations = {
       "makersMark": "Hergestellt von {name}",
       "gatheredBy": "Gesammelt von {name}",
       "masterworkSeal": "Meisterwerk",
-      "enchantedLine": "Verzaubert",
       "commissionToggle": "Auftragsarbeit",
       "commissionToggleHint": "Bindet sich an den ersten Charakter, der es im Handel erhält.",
       "commissionUnbound": "Auftragsarbeit: bindet sich an den ersten Empfänger",
@@ -2402,7 +2452,13 @@ export const de_DE: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Du entzauberst {item}.",
+      "disenchantedYield": "Du entzauberst {item} zu {material}.",
+      "disenchantedYieldQty": "Du entzauberst {item} zu {material} x{qty}.",
+      "disenchantedAlso": "Du gewinnst außerdem {material}.",
+      "disenchantedAlsoQty": "Du gewinnst außerdem {material} x{qty}.",
       "salvagedLine": "Du zerlegst {item}.",
+      "salvagedYield": "Du zerlegst {item} zu {material}.",
+      "salvagedYieldQty": "Du zerlegst {item} zu {material} x{qty}.",
       "enchantAppliedLine": "Du verzauberst {item} mit {enchant}.",
       "notHeld": "Du hast diesen Gegenstand nicht.",
       "notDisenchantable": "Du kannst das nicht entzaubern.",
@@ -2425,7 +2481,32 @@ export const de_DE: EnTranslations = {
       "pickerTitle": "Verzauberung anwenden",
       "targetTitle": "Wähle einen Gegenstand zum Verzaubern",
       "noEnchants": "Keine Verzauberung verwendet dieses Reagenz.",
-      "noTargets": "Kein geeigneter Gegenstand zum Verzaubern."
+      "noTargets": "Kein geeigneter Gegenstand zum Verzaubern.",
+      "wornTag": "Angelegt ({slot})",
+      "wornTagIndexed": "Angelegt ({slot} {index})",
+      "tier": {
+        "base": "Basisverzauberungen",
+        "runed": "Runen-Verzauberungen",
+        "greater": "Große Verzauberungen"
+      },
+      "yieldHeader": "Erwartete Materialien:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} bis {max} {item}",
+      "alreadyEnchanted": "Dieser Gegenstand ist bereits verzaubert.",
+      "sameEnchant": "Dieser Gegenstand hat diese Verzauberung bereits.",
+      "replaceTag": "Ersetzt {enchant}",
+      "sameEnchantTag": "Bereits angewendet",
+      "plainTag": "Nicht verzaubert",
+      "replaceConfirmTitle": "Verzauberung auf {item} ersetzen?",
+      "replaceConfirmBody": "Dies ersetzt {old} auf {item} durch {new}.",
+      "replaceConfirmNoRefund": "Die alte Verzauberung wird zerstört. Ihre Materialien werden nicht erstattet. Dies kann nicht rückgängig gemacht werden.",
+      "replaceConfirmKeeps": "Bleibt erhalten: {kept}",
+      "replaceConfirmKeepsSigner": "Zeichen des Herstellers",
+      "replaceConfirmKeepsMasterwork": "Meisterwerkbonus",
+      "replaceConfirmKeepsBond": "Auftragsbindung",
+      "replaceConfirmCost": "Kosten: {cost}",
+      "replaceConfirmCostItem": "{name} x{count}",
+      "replaceConfirmAccept": "Ersetzen"
     },
     "training": {
       "title": "Ausbildung: {name}",
@@ -3668,7 +3749,7 @@ export const de_DE: EnTranslations = {
     "professions": {
       "intro": "Jenseits von Kampf und Quests belohnt dich die Welt für die Arbeit an Land und Esse: Rohstoffe sammeln, sie über zehn Handwerksgewerbe hinweg zu Ausrüstung und Waren verarbeiten und in eine Identität als einer der zehn Archetypen hineinwachsen, für die diese Gewerbe stehen.",
       "harvestTitle": "Die Jagd selbst ernten",
-      "harvestBody": "Das Sammeln hört nicht bei Knoten auf. Viele erlegte Tiere können jeweils einmal geerntet werden, nach dem Prinzip Erster kommt, Erster mahlt, für Häute, Fangzähne, Seide und Fleisch, direkt von der Leiche neben der gewöhnlichen Beute; ein Tastendruck öffnet beides. Die Wahl liegt auch jedes Mal bei dir: Streife alles ab, was die Leiche bietet, oder konzentriere dich auf weniger Komponenten und nimm eine messbar feinere Güte dessen mit, was du nimmst.\n\nEin seltener oder besserer Erntewurf bei einer exemplartragenden Familie gewährt zudem ein signiertes makelloses Exemplar (eine Makellose Haut, Makellose Seide, eine Unberührte Giftdrüse oder ein Erstklassiges Filet) zusätzlich zum gewöhnlichen Ertrag und vermerkt Ein makelloses Exemplar in deinem Buch der Taten. Jeder Charakter kann ernten, ohne Ausbildung, und jedes Sammelwerkzeug, das du besitzt, zählt für den Gütegewinn, gleichgültig, zu welchem Beruf es gehört.",
+      "harvestBodyChoice": "Das Sammeln hört nicht bei Knoten auf. Viele erlegte Tiere können jeweils einmal geerntet werden, nach dem Prinzip Erster kommt, Erster mahlt, für Häute, Fangzähne, Seide und Fleisch, direkt von der Leiche neben der gewöhnlichen Beute; ein Tastendruck öffnet beides. Trägt ein Tier mehr als eine verwertbare Komponente, so liegt die Wahl bei dir: Nimm alles mit, was es hergeben kann, oder konzentriere dich auf weniger Komponenten und nimm eine messbar feinere Güte dessen mit, was du nimmst.\n\nEin seltener oder besserer Erntewurf bei einer exemplartragenden Familie gewährt zudem ein signiertes makelloses Exemplar (eine Makellose Haut, Makellose Seide, eine Unberührte Giftdrüse oder ein Erstklassiges Filet) zusätzlich zum gewöhnlichen Ertrag und vermerkt Ein makelloses Exemplar in deinem Buch der Taten. Jeder Charakter kann ernten, ohne Ausbildung, und jedes Sammelwerkzeug, das du besitzt, zählt für den Gütegewinn, gleichgültig, zu welchem Beruf es gehört.",
       "focusTitle": "Stadtfokus",
       "focusBody": "Jede größere Stadt hält ein Stadtfokus-Panel für vorbeikommende Sammler bereit: Stell dich in die Stadt, öffne es neben der Minikarte und richte ein kleines Budget an Fokuspunkten auf die Komponententypen, die dir wichtig sind. Je mehr Fokus du einer Komponente gibst, desto feiner und reicher fällt sie von jeder späteren Leiche ab; deine Verteilung folgt deinem Charakter, wohin er auch zieht, und du kannst sie bei jedem späteren Besuch in der Stadt kostenlos umarbeiten.",
       "craftHowTitle": "Das Handwerksfenster",
@@ -3823,7 +3904,7 @@ export const de_DE: EnTranslations = {
           "levelingHeading": "Wie Verzauberung sich steigert",
           "levelingBody": "Zwei Handlungen steigern das Gewerbe: das Entzaubern eines Stücks und das Anwenden einer Verzauberung. Jeder Erfolg ist bis zu einem Punkt wert, skaliert nach der Schwere der Arbeit: die Seltenheit des Stücks, das du zerbrichst, oder der Reagenzrang des Zaubers, den du anwendest. Gewöhnliche Entzauberungen und nur-Staub-Verzauberungen zählen als gewöhnliche Arbeit; ungewöhnliche Entzauberungen und Essenz-Verzauberungen als ungewöhnlich; seltene Entzauberungen und jede Runisch-Verzauberung oder Große Verzauberung als selten; epische und legendäre Entzauberungen noch höher.\n\nDas bekannte Meisterschafts-Abschwächen gilt auf 25-Punkt-Stufen, sodass gewöhnliche Arbeit bei Fertigkeit 75 grau wird, ungewöhnliche bei 100, und seltene Arbeit genau beim Deckel von 125. Verzauberung hat auch eine eigene Freundlichkeit: Input über deiner Archetyp-Grenze wird auf diese Grenze abgerundet statt auf null gesetzt, sodass eine epische Entzauberung vor der Abstimmung einfach als selten gewertet wird statt nichts zu lehren. Wenn Verzauberung hinter einer anderen Identität inaktiv wird, zählt alles als gewöhnliche Arbeit und der Aufstieg stockt bei 75; behalte es als Hobby und seltene Arbeit zahlt sich immer noch aus, wenn auch langsamer ab 75.",
           "marketHeading": "Verzauberte Kopien, Herkunft und der Markt",
-          "marketBody": "Das Anwenden einer Verzauberung verbraucht eine eingetütete, nicht angelegte Kopie des Gegenstands plus die Reagenzien und übergibt eine eigenständige verzauberte Kopie zurück; lege sie an und der Bonus folgt dem Stück für immer, durch Ablegen, Banktransporte und Handel. Eine Verzauberung pro Stück: Eine verzauberte Kopie kann nie erneut verzaubert oder entzaubert werden, und Verkaufen, Wegwerfen und Entzaubern bevorzugen zuerst einfache Kopien, sodass dein fertiges Stück nicht versehentlich aufgebraucht wird. Identisch verzauberte Kopien können sich sogar in deinen Taschen stapeln.\n\nMeisterwerk-Ausrüstung und Verzauberung sind Freunde: Ein Meisterwerk-Stück bleibt vollständig verzauberbar, und die Verzauberung kommt obendrauf auf den Meisterwerk-Bonus, ohne ihn oder die Hersteller-Signatur zu stören. Alle Quellen gestapelt ist ein signiertes Meisterwerk mit einer Großen Verzauberung das Beste, was ein hergestelltes Stück erreichen kann, und es bleibt by design unter Raidbeute.\n\nAuf dem Markt führt der Weltmarkt nur einfaches, unmodifiziertes Angebot, daher wechseln verzauberte und signierte Stücke von Angesicht zu Angesicht über das Handelsfenster. Die Materialien sind die vermarktbare Hälfte des Handwerks: Staub, Essenz und Scherben werden frei gelistet, das Einstellen kostet nichts, und der Händler nimmt 5 Prozent eines abgeschlossenen Verkaufs. Das macht die zwei klassischen Verzauberer-Einnahmen aus: Materialien auf dem Markt verkaufen und das Stück eines Kunden im Handel entgegennehmen, verzaubern und zurückgeben."
+          "marketBody": "Das Anwenden einer Verzauberung verbraucht die Reagenzien und markiert eine bestimmte Kopie des Gegenstands. Auf eine eingetütete Kopie angewandt erhältst du eine eigenständige verzauberte Kopie zurück; auf ein bereits angelegtes Stück angewandt wird es an Ort und Stelle verzaubert, ganz ohne Ablegen und Wiederanlegen. So oder so folgt der Bonus dem Stück für immer, durch Ablegen, Banktransporte und Handel. Eine Verzauberung pro Stück: Eine andere Verzauberung auf eine verzauberte Kopie anzuwenden fragt erst nach Bestätigung und ersetzt dann die alte Verzauberung direkt; sie wird zerstört, ohne dass ihre Materialien erstattet werden. Verkaufen, Wegwerfen und Entzaubern bevorzugen zuerst einfache Kopien, sodass dein fertiges Stück nicht versehentlich aufgebraucht wird. Identisch verzauberte Kopien können sich sogar in deinen Taschen stapeln.\n\nMeisterwerk-Ausrüstung und Verzauberung sind Freunde: Ein Meisterwerk-Stück bleibt vollständig verzauberbar, und die Verzauberung kommt obendrauf auf den Meisterwerk-Bonus, ohne ihn oder die Hersteller-Signatur zu stören. Alle Quellen gestapelt ist ein signiertes Meisterwerk mit einer Großen Verzauberung das Beste, was ein hergestelltes Stück erreichen kann, und es bleibt by design unter Raidbeute.\n\nAuf dem Markt führt der Weltmarkt nur einfaches, unmodifiziertes Angebot, daher wechseln verzauberte und signierte Stücke von Angesicht zu Angesicht über das Handelsfenster. Die Materialien sind die vermarktbare Hälfte des Handwerks: Staub, Essenz und Scherben werden frei gelistet, das Einstellen kostet nichts, und der Händler nimmt 5 Prozent eines abgeschlossenen Verkaufs. Das macht die zwei klassischen Verzauberer-Einnahmen aus: Materialien auf dem Markt verkaufen und das Stück eines Kunden im Handel entgegennehmen, verzaubern und zurückgeben."
         }
       },
       "howHeading": "Wie Handwerk funktioniert",
@@ -5442,6 +5523,7 @@ export const de_DE: EnTranslations = {
     },
     "augment": {
       "choose": "Wählt eine Augmentierung",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Brutalität",
         "desc": "Eure physischen Schläge treffen 15% härter."
@@ -6185,6 +6267,7 @@ export const de_DE: EnTranslations = {
       "arenaJoin": "Ihr tretet der Warteschlange des Aschenen Kolosseums bei. Wartet auf einen würdigen Gegner...",
       "arenaLeave": "Ihr verlasst die Warteschlange des Aschenen Kolosseums.",
       "arenaSands": "Ihr betretet den Sand des Aschenen Kolosseums.",
+      "arenaSandsDrowned": "Ihr betretet die überfluteten Steine des Ertränkten Hofs.",
       "tradeRequestSent": "Ihr habt {name} um Handel gebeten.",
       "tradeOpened": "Handelsfenster geöffnet.",
       "tradeComplete": "Handel abgeschlossen.",
@@ -6353,6 +6436,11 @@ export const de_DE: EnTranslations = {
       "playerLevelClassTitle": "{name} - St. {level} {className}",
       "noChallengers": "Noch keine Herausforderer gewertet - sei der Erste.",
       "matchInProgress": "Kampf läuft gegen {name}.",
+      "mapName": "Karte: {name}",
+      "map": {
+        "coliseum": "Aschenes Kolosseum",
+        "drownedCourt": "Der Ertränkte Hof"
+      },
       "leaveQueue": "Warteschlange verlassen",
       "searching": "Suche nach Gegner... ({count} in der Warteschlange)",
       "enterQueue": "In Warteschlange",
@@ -6645,18 +6733,29 @@ export const de_DE: EnTranslations = {
       "pageNextAria": "Nächste Marktseite",
       "pageStatus": "Seite {current} von {total}",
       "filters": "Marktfilter",
+      "filterValueAria": "{label}: {value}",
       "filterType": "Typ",
       "filterTypeAll": "Alle Typen",
       "filterTypeWeapon": "Waffen",
       "filterTypeArmor": "Rüstung",
+      "filterTypeBag": "Taschen",
       "filterTypeConsumable": "Verbrauchbares",
       "filterTypeMaterial": "Materialien",
       "filterTypeCosmetic": "Kosmetik",
       "filterTypeOther": "Sonstiges",
       "filterArmorType": "Rüstungstyp",
       "filterArmorAll": "Alle Rüstung",
+      "filterArmorSlot": "Rüstungsplatz",
+      "filterArmorClassAll": "Alle Rüstungstypen",
+      "armorCloth": "Stoff",
+      "armorLeather": "Leder",
+      "armorMail": "Kette",
       "filterWeaponType": "Waffentyp",
       "filterWeaponAll": "Alle Waffen",
+      "filterBagSize": "Taschengröße",
+      "filterBagAll": "Alle Taschen",
+      "filterPrimaryStat": "Primärattribut",
+      "filterPrimaryStatAll": "Beliebiges Primärattribut",
       "filterRarity": "Seltenheit",
       "filterRarityAll": "Alle Seltenheiten",
       "weaponSword": "Schwerter",

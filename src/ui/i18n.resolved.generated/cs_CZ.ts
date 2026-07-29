@@ -38,6 +38,14 @@ export const cs_CZ: EnTranslations = {
     "filterLabel": "Filtrovat příkazy",
     "filterPlaceholder": "Prohledat tuto kategorii",
     "noMatches": "Žádné odpovídající příkazy.",
+    "itemSearchPlaceholder": "Hledat podle jména nebo id",
+    "itemResultsAria": "Odpovídající předměty",
+    "itemNoMatches": "Žádné odpovídající předměty.",
+    "itemMore": "Zobrazeno {shown} z {total}. Pokračuj v psaní pro zúžení výběru.",
+    "itemChosen": "Vybráno: {name}",
+    "itemUnknown": "Žádný předmět nemá toto id.",
+    "itemHeroicTag": "Hrdinské",
+    "kitCurrentSpec": "Aktuální specializace",
     "serverRequirement": "Serverové cheaty stále vyžadují ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Před spuštěním tohoto příkazu vyber platné hodnoty.",
     "sent": "Odesláno: {command}",
@@ -55,7 +63,8 @@ export const cs_CZ: EnTranslations = {
       "z": "Z",
       "dungeon": "Dungeon",
       "difficulty": "Obtížnost",
-      "name": "Jméno"
+      "name": "Jméno",
+      "spec": "Specializace"
     },
     "difficulty": {
       "normal": "Normální",
@@ -113,6 +122,10 @@ export const cs_CZ: EnTranslations = {
       "give": {
         "label": "Dát předmět",
         "description": "Přidej předmět do hráčova inventáře."
+      },
+      "kit": {
+        "label": "Vybavit sadu na 20. úroveň",
+        "description": "Obleč přednastavenou sadu na 20. úroveň před Svatyní pro danou specializaci, nejprve batohy. Pouze výbava."
       },
       "gold": {
         "label": "Přidat zlato",
@@ -653,7 +666,7 @@ export const cs_CZ: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "Sleva 20 %",
+      "railWocDiscount": "Sleva {percent} %",
       "railWocUnavailable": "Cena ve WOC nyní není dostupná.",
       "railNativeUnavailable": "SOL/WOC nedostupné",
       "amountLabel": "Množství",
@@ -1049,6 +1062,7 @@ export const cs_CZ: EnTranslations = {
       "walkByAutoloot": "Automatická kořist při průchodu",
       "groundReticle": "Zaměřovací kruh na zemi",
       "mouseoverCast": "Sesílání najetím myší na rámech skupiny",
+      "stickyTarget": "Zachovat cíl při kliknutí na zem",
       "showItemLevel": "Zobrazit úroveň předmětu",
       "itemLevelLine": "Úroveň předmětu {level}",
       "itemScoreLine": "Skóre {score}",
@@ -1453,9 +1467,12 @@ export const cs_CZ: EnTranslations = {
       "title": "Sklizeň",
       "harvestButton": "Sklidit",
       "harvestTooltip": "Sbírá zaškrtnuté součásti. Každou mrtvolu lze sklidit pouze jednou, kdo dřív přijde. Nepobírá kořist.",
-      "concentrateHint": "Méně vybraných komponent dá každé vyšší stupeň.",
+      "yieldTierHint": "Čím méně komponent sklizeň skutečně odebere, tím vyšší úroveň sklizně má každá z nich.",
+      "nothingSelectedYields": "Z této mrtvoly nelze sklidit nic z vybraných komponent.",
       "alreadyHarvested": "Tato mrtvola už byla sklizena.",
       "componentAria": "Sklidit {component}",
+      "componentNoYield": "zatím nic",
+      "componentAriaNoYield": "Sklidit {component}: {note}",
       "components": {
         "hide": "Kůže",
         "fang": "Tesák",
@@ -1533,6 +1550,8 @@ export const cs_CZ: EnTranslations = {
       "dragDestroyHint": "Přetáhni do světa a předmět bude zničen",
       "reorderNeedsRecent": "Zruš filtr a seřaď podle Nedávných, chceš-li přeuspořádat batohy",
       "itemAriaInstanced": "{item}, množství {count}, kopie s výrobcovou značkou",
+      "itemAriaEnchanted": "{item}, množství {count}, okouzlená kopie",
+      "itemAriaBound": "{item}, množství {count}, vázaná kopie",
       "itemAriaMasterwork": "{item}, množství {count}, mistrovské dílo",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
@@ -1757,7 +1776,19 @@ export const cs_CZ: EnTranslations = {
       "label": "Resetovat pozice rámů"
     },
     "itemTooltip": {
-      "requiresLevel": "Vyžaduje úroveň {level}"
+      "requiresLevel": "Vyžaduje úroveň {level}",
+      "statEnchanted": "+{value} {stat} (okouzleno)",
+      "enchantedFallback": "Okouzlený"
+    },
+    "materialHint": {
+      "arcaneDust": "Reagencie k okouzlení. Získává se rozzačarováním běžné a neobvyklé výbavy.",
+      "arcaneEssence": "Reagencie k okouzlení. Získává se rozzačarováním vzácné výbavy.",
+      "arcaneShard": "Reagencie k okouzlení. Získává se rozzačarováním epické a legendární výbavy.",
+      "resonantThread": "Reagencie k okouzlení. Získává se rozzačarováním látkového brnění vzácné kvality a lepšího.",
+      "resonantHide": "Reagencie k okouzlení. Získává se rozzačarováním koženého brnění vzácné kvality a lepšího.",
+      "resonantLinks": "Reagencie k okouzlení. Získává se rozzačarováním kroužkového brnění vzácné kvality a lepšího.",
+      "resonantSteel": "Reagencie k okouzlení. Získává se rozzačarováním zbraní na blízko vzácné kvality a lepších.",
+      "resonantTimber": "Reagencie k okouzlení. Získává se rozzačarováním holí, hůlek, luků a kuší vzácné kvality a lepších."
     },
     "discord": {
       "title": "Discord",
@@ -1998,6 +2029,10 @@ export const cs_CZ: EnTranslations = {
         "takeParcelsFirst": "Před zahozením dopisu nejdřív vyzvedni balíky."
       }
     },
+    "marketIndicator": {
+      "aria": "Čekají výnosy nebo předměty ze Světového trhu",
+      "tip": "U Obchodníka na tebe čekají výnosy z prodeje nebo vrácené předměty."
+    },
     "noticeboard": {
       "empty": "Zdá se, že tu nic nevisí."
     },
@@ -2117,7 +2152,19 @@ export const cs_CZ: EnTranslations = {
       "onlineHeader": "Online ({n})",
       "offlineHeader": "Offline ({n})",
       "hideOffline": "Skrýt offline",
-      "hideOfflineTitle": "Skrýt offline hráče"
+      "hideOfflineTitle": "Skrýt offline hráče",
+      "billboard": {
+        "label": "Cechovní nástěnka",
+        "empty": "Na nástěnce zatím nic není.",
+        "setBy": "Nastaveno {name}",
+        "save": "Uložit",
+        "placeholder": "Napiš zprávu pro cech",
+        "inputLabel": "Zpráva na cechovní nástěnku",
+        "result": {
+          "set": "Cechovní nástěnka byla aktualizována.",
+          "notOfficer": "Nástěnku mohou upravovat pouze důstojníci a mistr cechu."
+        }
+      }
     },
     "gathering": {
       "title": "Sběr",
@@ -2128,6 +2175,9 @@ export const cs_CZ: EnTranslations = {
       "notReady": "Tento zdroj pro tebe ještě neobnovil zásoby.",
       "gatherLine": "Shromažďujete: {name}.",
       "gatherLineQty": "Shromažďujete: {name} x{qty}.",
+      "harvestLine": "Sklízíte: {name}.",
+      "harvestLineQty": "Sklízíte: {name} x{qty}.",
+      "harvestSpecimenLine": "Také získáváte {name}.",
       "catchLine": "Vytahuješ: {name}",
       "biteLine": "Něco zabralo!",
       "gotAwayLine": "Ta ti unikla.",
@@ -2309,6 +2359,7 @@ export const cs_CZ: EnTranslations = {
       "empty": "Zatím nejsou známy žádné recepty.",
       "resultAria": "Vyrobit {name}",
       "craftedToast": "Vyrobeno: {name}",
+      "craftedToastQty": "Vyrobeno: {name} x{qty}",
       "insufficientMaterials": "Na to nemáš materiály.",
       "unknownRecipe": "Tento recept neexistuje.",
       "comboRequirementUnmet": "Nemáš obě požadovaná řemesla na potřebné úrovni pro tento recept.",
@@ -2387,7 +2438,6 @@ export const cs_CZ: EnTranslations = {
       "makersMark": "Vytvořil {name}",
       "gatheredBy": "Sesbíráno {name}",
       "masterworkSeal": "Mistrovské dílo",
-      "enchantedLine": "Okouzlený",
       "commissionToggle": "Zakázkový předmět",
       "commissionToggleHint": "Váže se na první postavu, která ho přijme v obchodu.",
       "commissionUnbound": "Zakázkový předmět: váže se na prvního příjemce",
@@ -2402,7 +2452,13 @@ export const cs_CZ: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Rozzačaruješ {item}.",
+      "disenchantedYield": "Rozzačaruješ {item} na {material}.",
+      "disenchantedYieldQty": "Rozzačaruješ {item} na {material} x{qty}.",
+      "disenchantedAlso": "Získáš také {material}.",
+      "disenchantedAlsoQty": "Získáš také {material} x{qty}.",
       "salvagedLine": "Rozebereš {item}.",
+      "salvagedYield": "Rozebereš {item} na {material}.",
+      "salvagedYieldQty": "Rozebereš {item} na {material} x{qty}.",
       "enchantAppliedLine": "Okouzlíš {item} pomocí {enchant}.",
       "notHeld": "Tento předmět nemáš.",
       "notDisenchantable": "Toto nelze rozzačarovat.",
@@ -2425,7 +2481,32 @@ export const cs_CZ: EnTranslations = {
       "pickerTitle": "Aplikovat okouzlení",
       "targetTitle": "Vybrat předmět",
       "noEnchants": "Žádné okouzlení nepoužívá tuto reagencii.",
-      "noTargets": "Žádný způsobilý předmět k okouzlení."
+      "noTargets": "Žádný způsobilý předmět k okouzlení.",
+      "wornTag": "Vybaveno ({slot})",
+      "wornTagIndexed": "Vybaveno ({slot} {index})",
+      "tier": {
+        "base": "Základní okouzlení",
+        "runed": "Runové okouzlení",
+        "greater": "Velké okouzlení"
+      },
+      "yieldHeader": "Očekávané materiály:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} až {max} {item}",
+      "alreadyEnchanted": "Tento předmět je již okouzlený.",
+      "sameEnchant": "Tento předmět už má toto okouzlení.",
+      "replaceTag": "Nahradí {enchant}",
+      "sameEnchantTag": "Již aplikováno",
+      "plainTag": "Bez okouzlení",
+      "replaceConfirmTitle": "Nahradit okouzlení na {item}?",
+      "replaceConfirmBody": "Tímto nahradíš {old} na {item} za {new}.",
+      "replaceConfirmNoRefund": "Staré okouzlení bude zničeno. Materiály se nevrací. Tuto akci nelze vrátit.",
+      "replaceConfirmKeeps": "Zůstane: {kept}",
+      "replaceConfirmKeepsSigner": "Značka výrobce",
+      "replaceConfirmKeepsMasterwork": "Bonus mistrovského díla",
+      "replaceConfirmKeepsBond": "Vazba zakázky",
+      "replaceConfirmCost": "Cena: {cost}",
+      "replaceConfirmCostItem": "{name} x{count}",
+      "replaceConfirmAccept": "Nahradit"
     },
     "training": {
       "title": "Školení: {name}",
@@ -3668,7 +3749,7 @@ export const cs_CZ: EnTranslations = {
     "professions": {
       "intro": "Kromě boje a úkolů tě svět odměňuje i za práci na poli a u výhně: za sběr surovin, jejich proměnu ve výbavu a zboží napříč deseti výrobními řemesly a za přijetí identity jednoho z deseti archetypů, které tato řemesla představují.",
       "harvestTitle": "Sklizeň ze samotného lovu",
-      "harvestBody": "Sklizeň se nezastaví u nalezišť. Z mnoha poražených bestií lze jednou sklízet každou, kdo první, ten bere, za kůže, kly, hedvábí a maso přímo z těla vedle běžné kořisti; jedno stisknutí otevře oboje. Volba je pokaždé i tvoje: strip vše, co tělo nabízí, nebo se soustřeď na méně složek a vezmi prokazatelně lepší jakost toho, co bereš.\n\nVzácný nebo lepší hod na sklizeň z rodiny nesoucí exempláře také přinese podepsaný dokonalý exemplář (Prvotřídní kůži, Prvotřídní hedvábí, Prvotřídní jedový vak nebo Prvotřídní kus) navíc k běžnému výnosu a do Knihy skutků zapíše Dokonalý exemplář. Sklízet může každá postava bez jakéhokoli výcviku a jakýkoli sběratelský nástroj, který vlastníš, se počítá k prémiové složce, bez ohledu na to, ke které profesi patří.",
+      "harvestBodyChoice": "Sklizeň se nezastaví u nalezišť. Z mnoha poražených bestií lze jednou sklízet každou, kdo první, ten bere, za kůže, kly, hedvábí a maso přímo z těla vedle běžné kořisti; jedno stisknutí otevře oboje. Pokud bestie nese více než jednu zpracovatelnou složku, volba je na tobě: vezmi si vše, co může dát, nebo se soustřeď na méně složek a vezmi prokazatelně lepší jakost toho, co bereš.\n\nVzácný nebo lepší hod na sklizeň z rodiny nesoucí exempláře také přinese podepsaný dokonalý exemplář (Prvotřídní kůži, Prvotřídní hedvábí, Prvotřídní jedový vak nebo Prvotřídní kus) navíc k běžnému výnosu a do Knihy skutků zapíše Dokonalý exemplář. Sklízet může každá postava bez jakéhokoli výcviku a jakýkoli sběratelský nástroj, který vlastníš, se počítá k prémiové složce, bez ohledu na to, ke které profesi patří.",
       "focusTitle": "Zaměření města",
       "focusBody": "Každé větší město drží panel Zaměření města pro přicházející sběrače: postav se ve městě, otevři ho vedle minimapy a namiř malý rozpočet bodů zaměření na typy komponent, na kterých ti záleží. Čím víc zaměření dáš dané komponentě, tím jemnější a bohatší padá z každého dalšího těla; tvé rozdělení následuje postavu, ať se toulá kamkoli, a můžeš ho zdarma přepracovat při každé pozdější návštěvě města.",
       "craftHowTitle": "Okno výroby",
@@ -3823,7 +3904,7 @@ export const cs_CZ: EnTranslations = {
           "levelingHeading": "Jak se úroveň Okouzlování zvyšuje",
           "levelingBody": "Dovednost posouvají dvě akce: rozzačarování kusu a aplikace okouzlení. Každý úspěch má hodnotu až jednoho bodu, škálovaného podle závažnosti práce: vzácnost kusu, který rozbíješ, nebo úroveň reagentu okouzlení, které aplikuješ. Běžná rozzačarování a okouzlení pouze prachem se hodnotí jako běžná práce; neobvyklá rozzačarování a okouzlení s esencí jako neobvyklá; vzácná rozzačarování a každé Runové nebo Velké okouzlení jako vzácná; epická a legendární rozzačarování ještě výše.\n\nZnámé blednutí mistrovství se uplatňuje po 25bodových úrovních, takže běžná práce šedne na dovednosti 75, neobvyklá na 100 a práce vzácné úrovně přesně na stropu 125. Okouzlování má také jednu vlastní laskavost: vstup nad tvůj strop archetypu je zaokrouhlen dolů na tento strop místo vymazání, takže před laděním epické rozzačarování jednoduše skóruje jako vzácné místo toho, aby nic nenaučilo. Pokud Okouzlování skončí nečinné za jinou identitou, vše se hodnotí jako běžná práce a výstup se zastaví na 75; ponech ho jako koníček a práce vzácné úrovně stále přináší výsledky, jen pomaleji za 75.",
           "marketHeading": "Okouzlené kopie, původ a tržiště",
-          "marketBody": "Aplikace okouzlení spotřebuje sáčkovou, nevybavenou kopii předmětu a reagenty a vrátí odlišnou okouzlenou kopii; vybavy ji a bonus následuje kus navždy, přes odepnutí, bankovní výlety i obchody. Jedno okouzlení na kus: okouzlená kopie již nikdy nemůže být znovu okouzlena nebo rozzačarována, a prodej, vyhazování a rozzačarování dávají přednost prostým kopiím, takže tvůj hotový kus nebude omylem sežrán. Identicky okouzlené kopie se dokonce skládají dohromady v brašnách.\n\nMistrovská výbava a okouzlování jsou přátelé: mistrovský kus zůstává plně okouzlitelný a okouzlení se přidá na vrchol bonusu mistrovského díla, aniž by ho nebo výrobcův podpis narušilo. Při kombinaci všech zdrojů je podepsaný mistrovský kus nesoucí Velké okouzlení nejlepší, co řemeslný kus může získat, a přesto záměrně zaostává za lootovou výbavou z raidu.\n\nNa tržišti World Market zprostředkovává pouze prostý, nemodifikovaný zásobník, takže okouzlené a podepsané kusy mění majitele tváří v tvář přes obchodní okno. Materiály jsou obchodovatelnou polovinou řemesla: Prach, Esence a Střepy jsou volně vypisovatelné, výpis nic nestojí a Obchodník bere 5 procent pouze z dokončeného prodeje. To dělá ze dvou klasických příjmů okouzlovače prodej materiálů na tržišti a převzetí zákazníkova kusu v obchodě, jeho okouzlení a vrácení zpět."
+          "marketBody": "Aplikace okouzlení spotřebuje reagenty a označí jednu konkrétní kopii předmětu. Namíříš-li ji na kopii v brašně, dostaneš zpět odlišnou okouzlenou kopii; namíříš-li ji na kus, který už máš nasazený, je okouzlen na místě, bez sundávání a opětovného nasazování. Tak či tak bonus následuje kus navždy, přes odepnutí, bankovní výlety i obchody. Jedno okouzlení na kus: použití jiného okouzlení na okouzlenou kopii si nejprve vyžádá potvrzení a pak staré okouzlení rovnou nahradí; staré okouzlení je zničeno bez náhrady materiálů. Prodej, vyhazování a rozzačarování dávají přednost prostým kopiím, takže tvůj hotový kus nebude omylem sežrán. Identicky okouzlené kopie se dokonce skládají dohromady v brašnách.\n\nMistrovská výbava a okouzlování jsou přátelé: mistrovský kus zůstává plně okouzlitelný a okouzlení se přidá na vrchol bonusu mistrovského díla, aniž by ho nebo výrobcův podpis narušilo. Při kombinaci všech zdrojů je podepsaný mistrovský kus nesoucí Velké okouzlení nejlepší, co řemeslný kus může získat, a přesto záměrně zaostává za lootovou výbavou z raidu.\n\nNa tržišti World Market zprostředkovává pouze prostý, nemodifikovaný zásobník, takže okouzlené a podepsané kusy mění majitele tváří v tvář přes obchodní okno. Materiály jsou obchodovatelnou polovinou řemesla: Prach, Esence a Střepy jsou volně vypisovatelné, výpis nic nestojí a Obchodník bere 5 procent pouze z dokončeného prodeje. To dělá ze dvou klasických příjmů okouzlovače prodej materiálů na tržišti a převzetí zákazníkova kusu v obchodě, jeho okouzlení a vrácení zpět."
         }
       },
       "howHeading": "Jak výroba funguje",
@@ -5442,6 +5523,7 @@ export const cs_CZ: EnTranslations = {
     },
     "augment": {
       "choose": "Vyber vylepšení",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Brutalita",
         "desc": "Tvoje fyzické údery zasahují o 15 % tvrději."
@@ -6185,6 +6267,7 @@ export const cs_CZ: EnTranslations = {
       "arenaJoin": "Připojuješ se do fronty Popelavého kolosea. Vyčkej na důstojného protivníka...",
       "arenaLeave": "Opouštíš frontu Popelavého kolosea.",
       "arenaSands": "Vstupuješ do písku Popelavého kolosea.",
+      "arenaSandsDrowned": "Vstupuješ na zatopené kameny Utopeného dvora.",
       "tradeRequestSent": "Požádal(a) jsi {name} o obchod.",
       "tradeOpened": "Obchodní okno otevřeno.",
       "tradeComplete": "Obchod dokončen.",
@@ -6353,6 +6436,11 @@ export const cs_CZ: EnTranslations = {
       "playerLevelClassTitle": "{name} - úr. {level} {className}",
       "noChallengers": "Zatím není v žebříčku žádný vyzyvatel - buď první.",
       "matchInProgress": "Probíhá zápas proti {name}.",
+      "mapName": "Mapa: {name}",
+      "map": {
+        "coliseum": "Popelavé koloseum",
+        "drownedCourt": "Utopený dvůr"
+      },
       "leaveQueue": "Opustit frontu",
       "searching": "Hledá se protivník... ({count} ve frontě)",
       "enterQueue": "Vstoupit do fronty",
@@ -6645,18 +6733,29 @@ export const cs_CZ: EnTranslations = {
       "pageNextAria": "Další stránka trhu",
       "pageStatus": "Stránka {current} z {total}",
       "filters": "Filtry trhu",
+      "filterValueAria": "{label}: {value}",
       "filterType": "Typ",
       "filterTypeAll": "Všechny typy",
       "filterTypeWeapon": "Zbraně",
       "filterTypeArmor": "Brnění",
+      "filterTypeBag": "Batohy",
       "filterTypeConsumable": "Spotřební předměty",
       "filterTypeMaterial": "Materiály",
       "filterTypeCosmetic": "Kosmetika",
       "filterTypeOther": "Ostatní",
       "filterArmorType": "Typ brnění",
       "filterArmorAll": "Všechno brnění",
+      "filterArmorSlot": "Slot brnění",
+      "filterArmorClassAll": "Všechny typy brnění",
+      "armorCloth": "Látka",
+      "armorLeather": "Kůže",
+      "armorMail": "Kroužková zbroj",
       "filterWeaponType": "Typ zbraně",
       "filterWeaponAll": "Všechny zbraně",
+      "filterBagSize": "Velikost batohu",
+      "filterBagAll": "Všechny batohy",
+      "filterPrimaryStat": "Hlavní atribut",
+      "filterPrimaryStatAll": "Libovolný hlavní atribut",
       "filterRarity": "Vzácnost",
       "filterRarityAll": "Všechny vzácnosti",
       "weaponSword": "Meče",
@@ -8052,7 +8151,7 @@ export const cs_CZ: EnTranslations = {
         "name": "Eastbrookská kroužková vesta"
       },
       "valespun_robe": {
-        "name": "Údolně tkané roucho"
+        "name": "Údolně předené roucho"
       },
       "tanned_leather_jerkin": {
         "name": "Kazajka z vydělané kůže"

@@ -18,8 +18,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Incanta Arma - Concentrazione Runica',
   'hudChrome.professions.ctaRaiseSpecialized':
     'Continua ad aumentare {craft}: altri {points} punti fino a Specializzato, e i costi dei materiali calano.',
-  'guide.professions.harvestBody':
-    'La raccolta non si ferma ai nodi. Molte bestie uccise possono essere raccolte una volta ciascuna, primo arrivato primo servito, per pelli, zanne, seta e carne, direttamente dalla carcassa insieme al bottino ordinario; una pressione apre entrambi. La scelta e tua ogni volta: prendi tutto quello che la carcassa offre, oppure concentrati su meno componenti e ottieni una qualita misurabilmente superiore di cio che scegli di prendere.\n\nUn tiro di raccolto raro o superiore su una famiglia che porta esemplari concede anche un esemplare puro firmato (una Pelle Pura, Seta Pura, Ghiandola di Veleno Pura o Taglio Pregiato) in aggiunta alla resa ordinaria, e registra Un Esemplare Perfetto nel tuo Libro delle Imprese. Qualunque personaggio puo raccogliere, senza alcun addestramento richiesto, e qualsiasi strumento di raccolta che possiedi conta verso il bonus avanzato, indipendentemente dal mestiere a cui appartiene.',
+  'guide.professions.harvestBodyChoice':
+    'La raccolta non si ferma ai nodi. Molte bestie uccise possono essere raccolte una volta ciascuna, primo arrivato primo servito, per pelli, zanne, seta e carne, direttamente dalla carcassa insieme al bottino ordinario; una pressione apre entrambi. Quando una bestia porta piu di un componente lavorabile, la scelta e tua: prendi tutto quello che puo dare, oppure concentrati su meno componenti e ottieni una qualita misurabilmente superiore di cio che scegli di prendere.\n\nUn tiro di raccolto raro o superiore su una famiglia che porta esemplari concede anche un esemplare puro firmato (una Pelle Pura, Seta Pura, Ghiandola di Veleno Pura o Taglio Pregiato) in aggiunta alla resa ordinaria, e registra Un Esemplare Perfetto nel tuo Libro delle Imprese. Qualunque personaggio puo raccogliere, senza alcun addestramento richiesto, e qualsiasi strumento di raccolta che possiedi conta verso il bonus avanzato, indipendentemente dal mestiere a cui appartiene.',
   'guide.professions.craftMasteryTitle': 'Quanto tempo richiede la maestria',
   'guide.professions.craftMasteryBody':
     "Aspettative oneste: la scalata fino al limite di 125 di un mestiere richiede almeno 125 lavorazioni riuscite, poiche ogni lavorazione a pieno guadagno ti fa avanzare esattamente di un punto, e in pratica qualcosa in piu mentre le ricette scemano tra un gradino e l'altro dell'addestratore. La lavorazione in se e rapida; rifornirla e il vero viaggio, quindi metti in preventivo qualche serata dedicata alla raccolta e alla lavorazione per ogni mestiere.\n\nI mestieri di raccolta raggiungono il loro limite di 100 nel corso di un normale percorso di livellamento se raccogli mentre viaggi, anche se l'ultimo tratto vuole i nodi di alto livello del nord lontano. La Pesca e la lunga strada per progettazione: secondo la propria progressione, 200 di competenza equivale a piu di tremila catture. Il titolo di Maestro Pescatore si guadagna nel corso di una stagione di tranquille serate, non in un fine settimana.",
@@ -214,7 +214,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.enchanting.marketHeading':
     'Copie incantate, provenienza e il mercato',
   'guide.profPages.craftProse.enchanting.marketBody':
-    "Applicare un incantamento consuma una copia insacchettata e non equipaggiata dell'oggetto piu i reagenti, e restituisce una copia distinta incantata; equipaggiarla e il bonus segue il pezzo per sempre, attraverso rimozioni, viaggi in banca e scambi. Un incantamento per pezzo: una copia incantata non puo mai essere incantata di nuovo o disincantata, e vendere, scartare e disincantare preferiscono sempre prima le copie semplici, cosi il tuo pezzo finito non viene consumato per errore. Le copie incantate in modo identico si accumulano persino insieme nelle borse.\n\nL'equipaggiamento capolavoro e l'incantamento vanno d'accordo: un pezzo capolavoro rimane completamente incantabile, e l'incantamento si aggiunge in cima al bonus del capolavoro senza disturbarlo o la firma del produttore. Sommando ogni fonte, un capolavoro firmato con un incantamento Superiore e il meglio che un pezzo artigianale possa ottenere, e rimane comunque al di sotto del bottino delle incursioni per scelta di design.\n\nSul mercato, il Mercato Mondiale intermedia solo merce semplice e non modificata, quindi i pezzi incantati e firmati cambiano mano faccia a faccia attraverso la finestra di scambio. I materiali sono la meta commerciabile del mestiere: Polvere, Essenza e Frammenti si elencano liberamente, l'inserzione non costa nulla, e il Mercante prende il 5 percento solo di una vendita completata. Questo rende i due classici guadagni dell'incantatore: vendere materiali sul mercato, e prendere il pezzo di un cliente in scambio, incantarlo e restituirglielo.",
+    "Applicare un incantamento consuma i reagenti e contrassegna una copia specifica dell'oggetto. Puntalo su una copia nelle borse e ricevi una copia incantata distinta; puntalo su un pezzo che indossi gia e viene incantato sul posto, senza toglierlo e rimetterlo. In ogni caso il bonus segue il pezzo per sempre, attraverso rimozioni, viaggi in banca e scambi. Un incantamento per pezzo: applicare un incantamento diverso a una copia incantata chiede prima conferma e poi sostituisce direttamente il vecchio incantamento, che viene distrutto senza rimborso dei materiali. Vendere, scartare e disincantare preferiscono sempre prima le copie semplici, cosi il tuo pezzo finito non viene consumato per errore. Le copie incantate in modo identico si accumulano persino insieme nelle borse.\n\nL'equipaggiamento capolavoro e l'incantamento vanno d'accordo: un pezzo capolavoro rimane completamente incantabile, e l'incantamento si aggiunge in cima al bonus del capolavoro senza disturbarlo o la firma del produttore. Sommando ogni fonte, un capolavoro firmato con un incantamento Superiore e il meglio che un pezzo artigianale possa ottenere, e rimane comunque al di sotto del bottino delle incursioni per scelta di design.\n\nSul mercato, il Mercato Mondiale intermedia solo merce semplice e non modificata, quindi i pezzi incantati e firmati cambiano mano faccia a faccia attraverso la finestra di scambio. I materiali sono la meta commerciabile del mestiere: Polvere, Essenza e Frammenti si elencano liberamente, l'inserzione non costa nulla, e il Mercante prende il 5 percento solo di una vendita completata. Questo rende i due classici guadagni dell'incantatore: vendere materiali sul mercato, e prendere il pezzo di un cliente in scambio, incantarlo e restituirglielo.",
   'guide.profPages.howHeading': 'Come funziona la fabbricazione',
   'guide.profPages.howBody':
     "Apri la finestra di fabbricazione (tasto predefinito T) e ogni ricetta che conosci e elencata con i materiali necessari e quelli che hai a disposizione. Le ricette legate alla stazione richiedono di trovarsi entro 20 yard dalla stazione giusta in citta, le ricette da campo si lavorano ovunque, e l'Incantamento non ha mai bisogno di una stazione. Non c'e tiro di fallimento: una fabbricazione con i materiali in mano riesce sempre.\n\nDue piccoli attriti mantengono l'economia onesta. Ogni fabbricazione riuscita paga una commissione di 2 rame per punto del budget di statistiche dell'oggetto, e le azioni di tipo fabbricazione condividono un ritmo: al massimo 10 fabbricazioni, disincanti, incantamenti o smantellaggi in qualsiasi 60 secondi. Nessuno dei due disturba una sessione normale; entrambi impediscono a uno specialista al massimo di inondare il mercato.",
@@ -3778,6 +3778,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterTypeAll': 'Tutti i tipi',
   'itemUi.market.filterTypeWeapon': 'Armi',
   'itemUi.market.filterTypeArmor': 'Armatura',
+  'itemUi.market.filterTypeBag': 'Borse',
   'itemUi.market.filterTypeConsumable': 'Consumabili',
   'itemUi.market.filterTypeMaterial': 'Materiali',
   'itemUi.market.filterTypeCosmetic': 'Cosmetici',
@@ -3786,6 +3787,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterArmorAll': 'Tutte le armature',
   'itemUi.market.filterWeaponType': 'Tipo arma',
   'itemUi.market.filterWeaponAll': 'Tutte le armi',
+  'itemUi.market.filterBagSize': 'Dimensione borsa',
+  'itemUi.market.filterBagAll': 'Tutte le borse',
   'itemUi.market.filterRarity': 'Rarità',
   'itemUi.market.filterRarityAll': 'Tutte le rarità',
   'itemUi.market.weaponSword': 'Spade',
@@ -5647,7 +5650,13 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.compass.SW': 'SO',
   'hudChrome.compass.W': 'O',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Questo cadavere è già stato raccolto.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Questo cadavere non ha nulla da raccogliere tra i componenti selezionati.',
   'hudChrome.corpseHarvest.componentAria': 'Raccogli {component}',
+  'hudChrome.corpseHarvest.componentNoYield': 'ancora nulla',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Raccogli {component}: {note}',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Meno componenti prende una raccolta, più alto sarà il livello di raccolta di ciascuno.',
   'hudChrome.corpseHarvest.components.claw': 'Artiglio',
   'hudChrome.corpseHarvest.components.fang': 'Zanna',
   'hudChrome.corpseHarvest.components.gills': 'Branchie',
@@ -5656,8 +5665,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Seta',
   'hudChrome.corpseHarvest.components.tusk': 'Zanna',
   'hudChrome.corpseHarvest.components.venomSac': 'Sacca di veleno',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Meno componenti scegli, più alta sarà la qualità di ciascuno.',
   'hudChrome.corpseHarvest.harvestButton': 'Raccogli',
   'hudChrome.corpseHarvest.harvestTooltip':
     'Raccoglie i componenti selezionati. Ogni carcassa puo essere raccolta una volta, chi prima arriva. Non prende il bottino.',
@@ -8377,7 +8384,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Carta',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20% di sconto',
+  'hudChrome.claudium.railWocDiscount': '{percent}% di sconto',
   'hudChrome.claudium.railWocUnavailable': 'I prezzi WOC non sono disponibili al momento.',
   'hudChrome.claudium.showAmounts': 'Mostra tutti gli importi di Claudium',
   'hudChrome.claudium.skuRow': '{usd} per {claudium} Claudium',
@@ -9180,7 +9187,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyFull': 'Guadagno completo di abilità',
   'hudChrome.crafting.difficultyNone': 'Nessun guadagno di abilità',
   'hudChrome.crafting.difficultyReduced': 'Guadagno di abilità ridotto',
-  'hudChrome.crafting.enchantedLine': 'Incantato',
   'hudChrome.crafting.makersMark': 'Realizzato da {name}',
   'hudChrome.crafting.masterworkSeal': 'Capolavoro',
   'hudChrome.crafting.masterworkToast': 'Capolavoro! {name}',
@@ -9228,6 +9234,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmTitle': 'Accettare il Mal di resurrezione?',
   'hudChrome.gathering.gatherLine': 'Raccogli: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Raccogli: {name} x {qty}.',
+  'hudChrome.gathering.harvestLine': 'Scuoi: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Scuoi: {name} x {qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Recuperi anche {name}.',
   'hudChrome.mobile.professions': 'Professioni',
   'hudChrome.options.showThirdActionBar': 'Mostra la terza barra delle azioni',
   'hudChrome.playerMenu.streamerBadgeTitle': 'Streamer verificato',
@@ -9364,4 +9373,93 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'perfNudge.integratedGpu':
     "Il gioco sta girando sulla GPU integrata (a basso consumo). Se questo computer ha anche una GPU da gioco, su Windows imposta il browser su Prestazioni elevate in Impostazioni > Sistema > Schermo > Grafica, poi riavvia il browser. L'app desktop sceglie automaticamente la GPU da gioco.",
   'worldContent.noticeboardName': 'Bacheca degli annunci',
+  'hud.arena.map.coliseum': 'Colosseo Cinereo',
+  'hud.arena.map.drownedCourt': 'La Corte Annegata',
+  'hud.arena.mapName': 'Mappa: {name}',
+  'hud.logs.arenaSandsDrowned': 'Metti piede sulle pietre allagate della Corte Annegata.',
+  'itemUi.market.armorCloth': 'Stoffa',
+  'itemUi.market.armorLeather': 'Cuoio',
+  'itemUi.market.armorMail': 'Maglia',
+  'itemUi.market.filterArmorClassAll': 'Tutti i tipi di armatura',
+  'itemUi.market.filterArmorSlot': 'Slot armatura',
+  'itemUi.market.filterPrimaryStat': 'Statistica principale',
+  'itemUi.market.filterPrimaryStatAll': 'Qualsiasi statistica principale',
+  'itemUi.market.filterValueAria': '{label}: {value}',
+  'devCommand.actions.kit.description':
+    'Equipaggia il preset di livello 20 pre-Santuario per una specializzazione, prima le borse. Solo equipaggiamento.',
+  'devCommand.actions.kit.label': 'Equipaggia kit livello 20',
+  'devCommand.fields.spec': 'Specializzazione',
+  'devCommand.itemChosen': 'Selezionato: {name}',
+  'devCommand.itemHeroicTag': 'Eroico',
+  'devCommand.itemMore':
+    'Mostrati {shown} di {total}. Continua a digitare per restringere la ricerca.',
+  'devCommand.itemNoMatches': 'Nessun oggetto corrispondente.',
+  'devCommand.itemResultsAria': 'Oggetti corrispondenti',
+  'devCommand.itemSearchPlaceholder': 'Cerca per nome o ID',
+  'devCommand.itemUnknown': "Nessun oggetto ha quell'ID.",
+  'devCommand.kitCurrentSpec': 'Specializzazione attuale',
+  'hudChrome.bags.itemAriaBound': '{item}, quantita {count}, copia vincolata',
+  'hudChrome.bags.itemAriaEnchanted': '{item}, quantita {count}, copia incantata',
+  'hudChrome.enchanting.tier.base': 'Incanti Base',
+  'hudChrome.enchanting.tier.greater': 'Incanti Superiori',
+  'hudChrome.enchanting.tier.runed': 'Incanti Runici',
+  'hudChrome.enchanting.wornTag': 'Indossato ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Indossato ({slot} {index})',
+  'hudChrome.enchanting.yieldHeader': 'Materiali previsti:',
+  'hudChrome.enchanting.yieldLineExact': '{count} {item}',
+  'hudChrome.enchanting.yieldLineRange': 'Da {min} a {max} {item}',
+  'hudChrome.itemTooltip.enchantedFallback': 'Incantato',
+  'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Incantato)',
+  'hudChrome.marketIndicator.aria': 'Ricavi o oggetti del Mercato Mondiale in attesa',
+  'hudChrome.marketIndicator.tip':
+    'Ricavi di vendita o oggetti restituiti ti aspettano dal Mercante.',
+  'hudChrome.materialHint.arcaneDust':
+    "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento comune e non comune.",
+  'hudChrome.materialHint.arcaneEssence':
+    "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento raro.",
+  'hudChrome.materialHint.arcaneShard':
+    "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento epico e leggendario.",
+  'hudChrome.materialHint.resonantHide':
+    "Reagente dell'incantamento. Si ottiene disincantando armatura di cuoio rara o superiore.",
+  'hudChrome.materialHint.resonantLinks':
+    "Reagente dell'incantamento. Si ottiene disincantando armatura di maglia rara o superiore.",
+  'hudChrome.materialHint.resonantSteel':
+    "Reagente dell'incantamento. Si ottiene disincantando armi da mischia rare o superiori.",
+  'hudChrome.materialHint.resonantThread':
+    "Reagente dell'incantamento. Si ottiene disincantando armatura di stoffa rara o superiore.",
+  'hudChrome.materialHint.resonantTimber':
+    "Reagente dell'incantamento. Si ottiene disincantando bastoni, bacchette, archi e balestre rari o superiori.",
+  'hudChrome.options.stickyTarget': 'Mantieni il bersaglio al clic a terra',
+  'hudChrome.social.billboard.empty': "Non c'è ancora nulla sulla bacheca.",
+  'hudChrome.social.billboard.inputLabel': 'Messaggio della bacheca della gilda',
+  'hudChrome.social.billboard.label': 'Bacheca della Gilda',
+  'hudChrome.social.billboard.placeholder': 'Scrivi un messaggio per la gilda',
+  'hudChrome.social.billboard.result.notOfficer':
+    'Solo gli ufficiali e il capo gilda possono modificare la bacheca.',
+  'hudChrome.social.billboard.result.set': 'La bacheca della gilda è stata aggiornata.',
+  'hudChrome.social.billboard.save': 'Salva',
+  'hudChrome.social.billboard.setBy': 'Impostato da {name}',
+  'hudChrome.enchanting.alreadyEnchanted': "Quell'oggetto è già incantato.",
+  'hudChrome.enchanting.replaceConfirmAccept': 'Sostituisci',
+  'hudChrome.enchanting.replaceConfirmBody': 'Questo sostituisce {old} su {item} con {new}.',
+  'hudChrome.enchanting.replaceConfirmCost': 'Costo: {cost}',
+  'hudChrome.enchanting.replaceConfirmCostItem': '{name} x{count}',
+  'hudChrome.enchanting.replaceConfirmNoRefund':
+    "Il vecchio incantesimo viene distrutto. I suoi materiali non vengono rimborsati. L'azione non può essere annullata.",
+  'hudChrome.enchanting.replaceConfirmTitle': "Sostituisci l'incantesimo su {item}?",
+  'hudChrome.enchanting.replaceTag': 'Sostituisce {enchant}',
+  'hudChrome.enchanting.sameEnchant': "Quell'oggetto ha già quell'incantesimo.",
+  'hudChrome.enchanting.sameEnchantTag': 'Già applicato',
+  'hudChrome.crafting.craftedToastQty': 'Realizzato: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Disincanti {item} in {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Disincanti {item} in {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Recuperi anche {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Recuperi anche {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Smantelli {item} in {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Smantelli {item} in {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Non incantato',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Conserva: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Marchio del creatore',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Bonus capolavoro',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Vincolo di commissione',
 };

@@ -7,8 +7,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Mantrai Senjata - Segel Bersura',
   'hudChrome.professions.ctaRaiseSpecialized':
     'Tingkatkan terus {craft}: {points} poin lagi menuju Spesialisasi, dan biaya material pun turun.',
-  'guide.professions.harvestBody':
-    'Pengumpulan tidak berhenti di simpul. Banyak binatang yang dibunuh bisa dipanen sekali masing-masing, siapa cepat dia dapat, untuk kulit, taring, sutra, dan daging, langsung dari bangkai bersama jarahan biasanya; satu kali tekan membuka keduanya. Pilihannya juga ada di tanganmu setiap kali: ambil semua yang ditawarkan bangkai itu, atau fokus pada lebih sedikit komponen dan dapatkan kualitas yang jauh lebih baik dari apa yang kamu ambil.\n\nHasil panen langka atau lebih baik pada keluarga berisi spesimen juga memberikan spesimen sempurna bertanda tangan (Kulit Murni, Sutra Murni, Kelenjar Bisa Murni, atau Potongan Istimewa) di atas hasil biasa, dan mencatat Spesimen Sempurna di Kitab Jasamu. Karakter mana pun bisa memanen, tanpa pelatihan, dan alat pengumpul mana pun yang kamu miliki dihitung untuk bagian premium, dari perdagangan mana pun alat itu berasal.',
+  'guide.professions.harvestBodyChoice':
+    'Pengumpulan tidak berhenti di simpul. Banyak binatang yang dibunuh bisa dipanen sekali masing-masing, siapa cepat dia dapat, untuk kulit, taring, sutra, dan daging, langsung dari bangkai bersama jarahan biasanya; satu kali tekan membuka keduanya. Bila seekor binatang membawa lebih dari satu komponen yang bisa diolah, pilihannya ada di tanganmu: ambil semua yang bisa diberikannya, atau fokus pada lebih sedikit komponen dan dapatkan kualitas yang jauh lebih baik dari apa yang kamu ambil.\n\nHasil panen langka atau lebih baik pada keluarga berisi spesimen juga memberikan spesimen sempurna bertanda tangan (Kulit Murni, Sutra Murni, Kelenjar Bisa Murni, atau Potongan Istimewa) di atas hasil biasa, dan mencatat Spesimen Sempurna di Kitab Jasamu. Karakter mana pun bisa memanen, tanpa pelatihan, dan alat pengumpul mana pun yang kamu miliki dihitung untuk bagian premium, dari perdagangan mana pun alat itu berasal.',
   'guide.professions.craftMasteryTitle': 'Berapa lama penguasaan membutuhkan waktu',
   'guide.professions.craftMasteryBody':
     'Harapan yang jujur: pendakian menuju batas 125 suatu kerajinan membutuhkan setidaknya 125 kerajinan yang berhasil, karena setiap kerajinan dengan perolehan penuh memajukanmu tepat satu poin, dan dalam praktiknya agak lebih banyak karena resep memudar di antara anak tangga pelatih. Proses pembuatannya sendiri cepat; memasok bahannya adalah perjalanan sesungguhnya, jadi siapkan beberapa malam tersendiri untuk mengumpulkan dan membuat per perdagangan.\n\nPerdagangan pengumpulan mencapai batas 100 selama perjalanan naik level yang normal jika kamu memanen saat bepergian, meski rentang terakhir menginginkan simpul tingkat tinggi di utara yang jauh. Memancing adalah jalan panjang sesuai rancangan: berdasarkan jadwal perolehannya sendiri, kemahiran 200 membutuhkan lebih dari tiga ribu tangkapan. Pemancing Mahir adalah gelar yang diraih selama satu musim malam-malam yang tenang, bukan akhir pekan.',
@@ -199,7 +199,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.enchanting.marketHeading':
     'Salinan yang dipesona, asal-usul, dan pasar',
   'guide.profPages.craftProse.enchanting.marketBody':
-    'Menerapkan pesona mengonsumsi salinan barang yang dikemas dan tidak dikenakan ditambah reagen, dan mengembalikan salinan yang dipesona tersendiri; kenakan dan bonusnya mengikuti potongan selamanya, melalui pelepasan, perjalanan bank, dan perdagangan. Satu pesona per potongan: salinan yang dipesona tidak bisa dipesona lagi atau dibongkar, dan menjual, membuang, dan membongkar lebih memilih salinan polos terlebih dahulu, sehingga potongan jadimu tidak termakan secara tidak sengaja. Salinan yang dipesona dengan identik bahkan bertumpuk bersama dalam tasmu.\n\nPerlengkapan karya besar dan mempesona adalah teman: potongan karya besar tetap sepenuhnya bisa dipesona, dan pesona ditambahkan di atas bonus karya besar tanpa mengganggunya atau tanda tangan pembuat. Menumpuk setiap sumber, karya besar bertanda tangan yang membawa pesona Lebih Besar adalah yang terbaik yang bisa diperoleh potongan buatan, dan ia masih berada di bawah jarahan raid sesuai desain.\n\nDi pasar, World Market hanya memerantarai stok polos dan tidak dimodifikasi, sehingga potongan yang dipesona dan ditandatangani berpindah tangan langsung melalui jendela perdagangan. Materialnya adalah setengah kerajinan yang bisa dipasarkan: Debu, Esensi, dan Serpihan terdaftar bebas, biaya pendaftaran nol, dan Pedagang mengambil 5 persen dari penjualan yang selesai saja. Itu membuat dua pendapatan klasik penyihir pesona adalah menjual material di pasar, dan mengambil potongan pelanggan dalam perdagangan, mempesonanya, dan mengembalikannya.',
+    'Menerapkan pesona mengonsumsi reagen dan menandai satu salinan barang tertentu. Arahkan ke salinan di tas dan kamu mendapat salinan terpesona tersendiri; arahkan ke potongan yang sedang dikenakan dan potongan itu dipesona di tempat, tanpa melepas dan memakai ulang. Bagaimanapun bonusnya mengikuti potongan selamanya, melalui pelepasan, perjalanan bank, dan perdagangan. Satu pesona per potongan: menerapkan pesona berbeda pada salinan yang dipesona meminta konfirmasi dulu, lalu langsung menggantikan pesona lama; pesona lama dihancurkan tanpa pengembalian materialnya. Menjual, membuang, dan membongkar lebih memilih salinan polos terlebih dahulu, sehingga potongan jadimu tidak termakan secara tidak sengaja. Salinan yang dipesona dengan identik bahkan bertumpuk bersama dalam tasmu.\n\nPerlengkapan karya besar dan mempesona adalah teman: potongan karya besar tetap sepenuhnya bisa dipesona, dan pesona ditambahkan di atas bonus karya besar tanpa mengganggunya atau tanda tangan pembuat. Menumpuk setiap sumber, karya besar bertanda tangan yang membawa pesona Lebih Besar adalah yang terbaik yang bisa diperoleh potongan buatan, dan ia masih berada di bawah jarahan raid sesuai desain.\n\nDi pasar, World Market hanya memerantarai stok polos dan tidak dimodifikasi, sehingga potongan yang dipesona dan ditandatangani berpindah tangan langsung melalui jendela perdagangan. Materialnya adalah setengah kerajinan yang bisa dipasarkan: Debu, Esensi, dan Serpihan terdaftar bebas, biaya pendaftaran nol, dan Pedagang mengambil 5 persen dari penjualan yang selesai saja. Itu membuat dua pendapatan klasik penyihir pesona adalah menjual material di pasar, dan mengambil potongan pelanggan dalam perdagangan, mempesonanya, dan mengembalikannya.',
   'guide.profPages.howHeading': 'Cara kerja kerajinan',
   'guide.profPages.howBody':
     'Buka jendela kerajinan (tombol default T) dan setiap resep yang kamu ketahui terdaftar beserta apa yang dibutuhkan dan apa yang ada di tanganmu. Resep terikat stasiun mengharuskanmu berdiri dalam 20 yard dari stasiun yang tepat di kota, resep lapangan bisa dibuat di mana saja, dan Pemantraan tidak pernah membutuhkan stasiun sama sekali. Tidak ada lemparan gagal: membuat dengan bahan di tangan selalu berhasil.\n\nDua gesekan kecil menjaga ekonomi tetap jujur. Setiap pembuatan yang berhasil membayar biaya 2 tembaga per poin anggaran stat barang, dan tindakan jenis pembuatan berbagi satu tempo: paling banyak 10 pembuatan, penghancuran pemantraan, pemantraan, atau salvasi dalam 60 detik mana pun. Keduanya tidak akan mengganggu sesi normal; keduanya menghentikan spesialis maksimum dari membanjiri pasar.',
@@ -2062,7 +2062,13 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.title': 'Kalender Acara',
   'hudChrome.calendar.titlePlaceholder': 'Judul acara',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Bangkai ini sudah dipanen.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Tidak ada pilihanmu yang bisa dipanen dari bangkai ini.',
   'hudChrome.corpseHarvest.componentAria': 'Panen {component}',
+  'hudChrome.corpseHarvest.componentNoYield': 'belum ada hasil',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Panen {component}: {note}',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Semakin sedikit bagian yang benar-benar diambil dalam satu panen, semakin tinggi tingkat panen tiap bagian.',
   'hudChrome.corpseHarvest.components.claw': 'Cakar',
   'hudChrome.corpseHarvest.components.fang': 'Taring',
   'hudChrome.corpseHarvest.components.gills': 'Insang',
@@ -2071,8 +2077,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Sutra',
   'hudChrome.corpseHarvest.components.tusk': 'Gading',
   'hudChrome.corpseHarvest.components.venomSac': 'Kantung Bisa',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Semakin sedikit bagian yang dipilih, semakin tinggi tingkat mutu tiap bagian.',
   'hudChrome.corpseHarvest.harvestButton': 'Panen',
   'hudChrome.corpseHarvest.harvestTooltip':
     'Mengumpulkan komponen yang dicentang. Setiap bangkai hanya bisa dipanen sekali, siapa cepat dia dapat. Tidak mengambil jarahan.',
@@ -5562,7 +5566,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hud.arena.statusFight': 'Bertarung sampai menyerah!',
   'hud.arena.statusReturning': 'Kembali ke dunia... {seconds}',
   'hud.arena.subtitle': 'Berperingkat 1v1',
-  'hud.arena.title': 'Ashen Coliseum',
+  'hud.arena.title': 'Koloseum Berabu',
   'hud.arena.vsLine': 'VS {name}',
   'hud.chat.context.addFriend': 'Tambah Teman',
   'hud.chat.context.cancel': 'Batal',
@@ -6576,12 +6580,15 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterType': 'Jenis',
   'itemUi.market.filterTypeAll': 'Semua jenis',
   'itemUi.market.filterTypeArmor': 'Zirah',
+  'itemUi.market.filterTypeBag': 'Tas',
   'itemUi.market.filterTypeConsumable': 'Konsumabel',
   'itemUi.market.filterTypeCosmetic': 'Kosmetik',
   'itemUi.market.filterTypeMaterial': 'Bahan',
   'itemUi.market.filterTypeOther': 'Lainnya',
   'itemUi.market.filterTypeWeapon': 'Senjata',
   'itemUi.market.filterWeaponAll': 'Semua senjata',
+  'itemUi.market.filterBagSize': 'Ukuran tas',
+  'itemUi.market.filterBagAll': 'Semua tas',
   'itemUi.market.filterWeaponType': 'Jenis senjata',
   'itemUi.market.filters': 'Saringan pasar',
   'itemUi.market.listButton': 'Pajang di Pasar Dunia',
@@ -8273,7 +8280,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Kartu',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': 'Diskon 20%.',
+  'hudChrome.claudium.railWocDiscount': 'Diskon {percent}%.',
   'hudChrome.claudium.railWocUnavailable': 'Harga WOC tidak tersedia saat ini.',
   'hudChrome.claudium.showAmounts': 'Tampilkan semua jumlah Claudium',
   'hudChrome.claudium.skuRow': '{usd} untuk {claudium} Claudium',
@@ -9117,7 +9124,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyMinimal': 'Perolehan keterampilan minimal',
   'hudChrome.crafting.difficultyNone': 'Tidak ada perolehan keterampilan',
   'hudChrome.crafting.difficultyReduced': 'Mengurangi perolehan keterampilan',
-  'hudChrome.crafting.enchantedLine': 'Terpesona',
   'hudChrome.crafting.gatheredBy': 'Dikumpulkan oleh {name}',
   'hudChrome.crafting.learnMoreAtStation':
     '{master} di {station} dapat mengajarkan lebih banyak resep {craft} padamu.',
@@ -9160,6 +9166,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.fishing': 'Memancing',
   'hudChrome.gathering.gatherLine': 'Anda mengumpulkan: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Anda mengumpulkan: {name} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Anda memanen: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Anda memanen: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Anda juga mendapatkan {name}.',
   'hudChrome.gathering.gotAwayLine': 'Ikannya kabur.',
   'hudChrome.gathering.nodeName.herb': 'Petak Herba',
   'hudChrome.gathering.nodeName.ore': 'Urat Bijih',
@@ -9315,4 +9324,94 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'perfNudge.integratedGpu':
     'Permainan berjalan pada GPU terintegrasi (hemat daya). Jika komputer ini juga memiliki GPU gaming, atur browsermu ke Performa tinggi di Pengaturan > Sistem > Tampilan > Grafis pada Windows, lalu nyalakan ulang browsermu. Aplikasi desktop memilih GPU gaming secara otomatis.',
   'worldContent.noticeboardName': 'Papan Pengumuman',
+  'hud.arena.map.coliseum': 'Koloseum Berabu',
+  'hud.arena.map.drownedCourt': 'Istana Tenggelam',
+  'hud.arena.mapName': 'Peta: {name}',
+  'hud.logs.arenaSandsDrowned': 'Kamu melangkah ke atas bebatuan tergenang di Istana Tenggelam.',
+  'itemUi.market.armorCloth': 'Kain',
+  'itemUi.market.armorLeather': 'Kulit',
+  'itemUi.market.armorMail': 'Rantai',
+  'itemUi.market.filterArmorClassAll': 'Semua jenis zirah',
+  'itemUi.market.filterArmorSlot': 'Slot zirah',
+  'itemUi.market.filterPrimaryStat': 'Stat utama',
+  'itemUi.market.filterPrimaryStatAll': 'Stat utama apa pun',
+  'itemUi.market.filterValueAria': '{label}: {value}',
+  'devCommand.actions.kit.description':
+    'Kenakan preset level 20 pra-Sanktum untuk sebuah spesialisasi, tas dahulu. Hanya perlengkapan.',
+  'devCommand.actions.kit.label': 'Kenakan kit level 20 baru',
+  'devCommand.fields.spec': 'Spesialisasi',
+  'devCommand.itemChosen': 'Dipilih: {name}',
+  'devCommand.itemHeroicTag': 'Heroik',
+  'devCommand.itemMore': 'Menampilkan {shown} dari {total}. Terus mengetik untuk mempersempit.',
+  'devCommand.itemNoMatches': 'Tidak ada barang yang cocok.',
+  'devCommand.itemResultsAria': 'Barang yang cocok',
+  'devCommand.itemSearchPlaceholder': 'Cari berdasarkan nama atau id',
+  'devCommand.itemUnknown': 'Tidak ada barang dengan id itu.',
+  'devCommand.kitCurrentSpec': 'Spesialisasi saat ini',
+  'hudChrome.bags.itemAriaBound': '{item}, jumlah {count}, salinan terikat',
+  'hudChrome.bags.itemAriaEnchanted': '{item}, jumlah {count}, salinan dimantrai',
+  'hudChrome.enchanting.tier.base': 'Mantra Dasar',
+  'hudChrome.enchanting.tier.greater': 'Mantra Unggul',
+  'hudChrome.enchanting.tier.runed': 'Mantra Bersura',
+  'hudChrome.enchanting.wornTag': 'Dipakai ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Dipakai ({slot} {index})',
+  'hudChrome.enchanting.yieldHeader': 'Bahan yang diharapkan:',
+  'hudChrome.enchanting.yieldLineExact': '{count} {item}',
+  'hudChrome.enchanting.yieldLineRange': '{min} hingga {max} {item}',
+  'hudChrome.itemTooltip.enchantedFallback': 'Dimantrai',
+  'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Dimantrai)',
+  'hudChrome.marketIndicator.aria': 'Hasil atau barang Pasar Dunia menanti',
+  'hudChrome.marketIndicator.tip':
+    'Hasil penjualan atau barang yang dikembalikan menantimu di Sang Pedagang.',
+  'hudChrome.materialHint.arcaneDust':
+    'Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan umum dan tak biasa.',
+  'hudChrome.materialHint.arcaneEssence':
+    'Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan langka.',
+  'hudChrome.materialHint.arcaneShard':
+    'Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan epik dan legendaris.',
+  'hudChrome.materialHint.resonantHide':
+    'Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan zirah kulit langka atau lebih baik.',
+  'hudChrome.materialHint.resonantLinks':
+    'Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan zirah rantai langka atau lebih baik.',
+  'hudChrome.materialHint.resonantSteel':
+    'Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan senjata jarak dekat langka atau lebih baik.',
+  'hudChrome.materialHint.resonantThread':
+    'Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan zirah kain langka atau lebih baik.',
+  'hudChrome.materialHint.resonantTimber':
+    'Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan staf, tongkat sihir, busur, dan busur silang langka atau lebih baik.',
+  'hudChrome.options.stickyTarget': 'Pertahankan Sasaran Saat Klik Tanah',
+  'hudChrome.social.billboard.empty': 'Belum ada apa pun di papan pengumuman.',
+  'hudChrome.social.billboard.inputLabel': 'Pesan papan pengumuman serikat',
+  'hudChrome.social.billboard.label': 'Papan Pengumuman Serikat',
+  'hudChrome.social.billboard.placeholder': 'Tulis pesan untuk serikat',
+  'hudChrome.social.billboard.result.notOfficer':
+    'Hanya perwira dan Pemimpin Serikat yang boleh mengedit papan pengumuman.',
+  'hudChrome.social.billboard.result.set': 'Papan pengumuman serikat telah diperbarui.',
+  'hudChrome.social.billboard.save': 'Simpan',
+  'hudChrome.social.billboard.setBy': 'Ditetapkan oleh {name}',
+  'hudChrome.enchanting.alreadyEnchanted': 'Barang itu sudah dimantrai.',
+  'hudChrome.enchanting.replaceConfirmAccept': 'Ganti',
+  'hudChrome.enchanting.replaceConfirmBody': 'Ini mengganti {old} pada {item} dengan {new}.',
+  'hudChrome.enchanting.replaceConfirmCost': 'Biaya: {cost}',
+  'hudChrome.enchanting.replaceConfirmCostItem': '{name} x{count}',
+  'hudChrome.enchanting.replaceConfirmNoRefund':
+    'Mantra lama dihancurkan. Bahannya tidak dikembalikan. Tindakan ini tidak dapat dibatalkan.',
+  'hudChrome.enchanting.replaceConfirmTitle': 'Ganti mantra pada {item}?',
+  'hudChrome.enchanting.replaceTag': 'Menggantikan {enchant}',
+  'hudChrome.enchanting.sameEnchant': 'Barang itu sudah memiliki mantra itu.',
+  'hudChrome.enchanting.sameEnchantTag': 'Sudah diterapkan',
+  'hudChrome.crafting.craftedToastQty': 'Dibuat: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield':
+    'Kamu menghancurkan pemantraan {item} menjadi {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty':
+    'Kamu menghancurkan pemantraan {item} menjadi {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Kamu juga memulihkan {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Kamu juga memulihkan {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Kamu menyalvasi {item} menjadi {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Kamu menyalvasi {item} menjadi {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Belum dimantrai',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Dipertahankan: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Tanda pembuat',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Bonus mahakarya',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Ikatan komisi',
 };

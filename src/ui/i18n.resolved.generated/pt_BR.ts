@@ -38,6 +38,14 @@ export const pt_BR: EnTranslations = {
     "filterLabel": "Filtrar comandos",
     "filterPlaceholder": "Pesquisar nesta categoria",
     "noMatches": "Nenhum comando correspondente.",
+    "itemSearchPlaceholder": "Pesquisar por nome ou id",
+    "itemResultsAria": "Itens correspondentes",
+    "itemNoMatches": "Nenhum item correspondente.",
+    "itemMore": "Mostrando {shown} de {total}. Continue digitando para refinar.",
+    "itemChosen": "Selecionado: {name}",
+    "itemUnknown": "Nenhum item tem esse id.",
+    "itemHeroicTag": "Heroico",
+    "kitCurrentSpec": "Especialização atual",
     "serverRequirement": "Os comandos de trapaça do servidor ainda exigem ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Escolha valores válidos antes de executar este comando.",
     "sent": "Enviado: {command}",
@@ -55,7 +63,8 @@ export const pt_BR: EnTranslations = {
       "z": "Z",
       "dungeon": "Masmorra",
       "difficulty": "Dificuldade",
-      "name": "Nome"
+      "name": "Nome",
+      "spec": "Especialização"
     },
     "difficulty": {
       "normal": "Normal",
@@ -113,6 +122,10 @@ export const pt_BR: EnTranslations = {
       "give": {
         "label": "Dar item",
         "description": "Adiciona um item ao inventário do jogador."
+      },
+      "kit": {
+        "label": "Equipar kit de nível 20",
+        "description": "Veste o predefinido de nível 20 pré-Santuário de uma especialização, começando pelas bolsas. Somente equipamento."
       },
       "gold": {
         "label": "Adicionar ouro",
@@ -653,7 +666,7 @@ export const pt_BR: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% de desconto",
+      "railWocDiscount": "{percent}% de desconto",
       "railWocUnavailable": "O preço do WOC não está disponível no momento.",
       "railNativeUnavailable": "SOL/WOC indisponível.",
       "amountLabel": "Quantia",
@@ -1049,6 +1062,7 @@ export const pt_BR: EnTranslations = {
       "walkByAutoloot": "Saque Automático ao Passar",
       "groundReticle": "Retícula de mira no chão",
       "mouseoverCast": "Conjuração ao Apontar nos Quadros do Grupo",
+      "stickyTarget": "Manter alvo ao clicar no chão",
       "showItemLevel": "Mostrar nível do item",
       "itemLevelLine": "Nível do item {level}",
       "itemScoreLine": "Pontuação {score}",
@@ -1453,9 +1467,12 @@ export const pt_BR: EnTranslations = {
       "title": "Coleta",
       "harvestButton": "Coletar",
       "harvestTooltip": "Coleta os componentes selecionados. Cada cadáver pode ser coletado uma vez, quem chegar primeiro. Não pega o saque.",
-      "concentrateHint": "Quanto menos componentes você escolher, maior a qualidade de cada um.",
+      "yieldTierHint": "Quanto menos componentes uma coleta retirar, maior o nível de coleta de cada um.",
+      "nothingSelectedYields": "Nada do que você selecionou pode ser coletado deste cadáver.",
       "alreadyHarvested": "Este cadáver já foi coletado.",
       "componentAria": "Coletar {component}",
+      "componentNoYield": "nada ainda",
+      "componentAriaNoYield": "Coletar {component}: {note}",
       "components": {
         "hide": "Pele",
         "fang": "Presa",
@@ -1533,6 +1550,8 @@ export const pt_BR: EnTranslations = {
       "dragDestroyHint": "Arraste para fora do inventário para destruir",
       "reorderNeedsRecent": "Limpe o filtro e ordene por Recentes para reorganizar suas bolsas",
       "itemAriaInstanced": "{item}, quantidade {count}, cópia marcada pelo criador",
+      "itemAriaEnchanted": "{item}, quantidade {count}, cópia encantada",
+      "itemAriaBound": "{item}, quantidade {count}, cópia vinculada",
       "itemAriaMasterwork": "{item}, quantidade {count}, obra-prima",
       "filterGroupAria": "Filtrar bolsas por categoria",
       "filterAll": "Todos",
@@ -1757,7 +1776,19 @@ export const pt_BR: EnTranslations = {
       "label": "Redefinir Posições dos Quadros"
     },
     "itemTooltip": {
-      "requiresLevel": "Requer Nível {level}"
+      "requiresLevel": "Requer Nível {level}",
+      "statEnchanted": "+{value} {stat} (Encantado)",
+      "enchantedFallback": "Encantado"
+    },
+    "materialHint": {
+      "arcaneDust": "Reagente de encantamento. Desencantado de equipamento comum e incomum.",
+      "arcaneEssence": "Reagente de encantamento. Desencantado de equipamento raro.",
+      "arcaneShard": "Reagente de encantamento. Desencantado de equipamento épico e lendário.",
+      "resonantThread": "Reagente de encantamento. Desencantado de armadura de pano rara ou melhor.",
+      "resonantHide": "Reagente de encantamento. Desencantado de armadura de couro rara ou melhor.",
+      "resonantLinks": "Reagente de encantamento. Desencantado de armadura de malha rara ou melhor.",
+      "resonantSteel": "Reagente de encantamento. Desencantado de armas corpo a corpo raras ou melhores.",
+      "resonantTimber": "Reagente de encantamento. Desencantado de cajados, varinhas, arcos e bestas raros ou melhores."
     },
     "discord": {
       "title": "Discord",
@@ -1998,6 +2029,10 @@ export const pt_BR: EnTranslations = {
         "takeParcelsFirst": "Retire as encomendas antes de descartar a carta."
       }
     },
+    "marketIndicator": {
+      "aria": "Receita ou itens do Mercado Mundial aguardam",
+      "tip": "Receita de vendas ou itens devolvidos estão esperando por você com o Mercador."
+    },
     "noticeboard": {
       "empty": "Parece que não há nada afixado."
     },
@@ -2117,7 +2152,19 @@ export const pt_BR: EnTranslations = {
       "onlineHeader": "Online ({n})",
       "offlineHeader": "Offline ({n})",
       "hideOffline": "Ocultar offline",
-      "hideOfflineTitle": "Ocultar membros da guilda offline"
+      "hideOfflineTitle": "Ocultar membros da guilda offline",
+      "billboard": {
+        "label": "Mural da Guilda",
+        "empty": "Ainda não há nada no mural.",
+        "setBy": "Definido por {name}",
+        "save": "Salvar",
+        "placeholder": "Escreva uma mensagem para a guilda",
+        "inputLabel": "Mensagem do mural da guilda",
+        "result": {
+          "set": "O mural da guilda foi atualizado.",
+          "notOfficer": "Apenas oficiais e o Mestre da Guilda podem editar o mural."
+        }
+      }
     },
     "gathering": {
       "title": "Coleta",
@@ -2128,6 +2175,9 @@ export const pt_BR: EnTranslations = {
       "notReady": "Este nó de recursos ainda não se regenerou para você.",
       "gatherLine": "Você coleta: {name}.",
       "gatherLineQty": "Você coleta: {name} x{qty}.",
+      "harvestLine": "Você esfolou: {name}.",
+      "harvestLineQty": "Você esfolou: {name} x{qty}.",
+      "harvestSpecimenLine": "Você também recupera {name}.",
       "catchLine": "Você recolhe: {name}",
       "biteLine": "Algo morde a isca!",
       "gotAwayLine": "Ele escapou.",
@@ -2309,6 +2359,7 @@ export const pt_BR: EnTranslations = {
       "empty": "Nenhuma receita conhecida ainda.",
       "resultAria": "Artesanato {name}",
       "craftedToast": "Feito: {name}",
+      "craftedToastQty": "Feito: {name} x{qty}",
       "insufficientMaterials": "Você não tem os materiais para isso.",
       "unknownRecipe": "Essa receita não existe.",
       "comboRequirementUnmet": "Você não possui os dois ofícios exigidos no nível necessário para essa receita.",
@@ -2387,7 +2438,6 @@ export const pt_BR: EnTranslations = {
       "makersMark": "Feito por {name}",
       "gatheredBy": "Coletado por {name}",
       "masterworkSeal": "Obra-prima",
-      "enchantedLine": "Encantado",
       "commissionToggle": "Peça por encomenda",
       "commissionToggleHint": "Vincula ao primeiro personagem que a receber em uma negociação.",
       "commissionUnbound": "Peça por encomenda: vincula ao primeiro destinatário",
@@ -2402,7 +2452,13 @@ export const pt_BR: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "Você desencanta {item}.",
+      "disenchantedYield": "Você desencanta {item} em {material}.",
+      "disenchantedYieldQty": "Você desencanta {item} em {material} x{qty}.",
+      "disenchantedAlso": "Você também recupera {material}.",
+      "disenchantedAlsoQty": "Você também recupera {material} x{qty}.",
       "salvagedLine": "Você recupera {item}.",
+      "salvagedYield": "Você recupera {item} em {material}.",
+      "salvagedYieldQty": "Você recupera {item} em {material} x{qty}.",
       "enchantAppliedLine": "Você encanta {item} com {enchant}.",
       "notHeld": "Você não tem esse item.",
       "notDisenchantable": "Você não pode desencantar isso.",
@@ -2425,7 +2481,32 @@ export const pt_BR: EnTranslations = {
       "pickerTitle": "Aplicar Encantamento",
       "targetTitle": "Escolha um item para encantar",
       "noEnchants": "Nenhum encantamento usa esse reagente.",
-      "noTargets": "Nenhum item elegível para encantar."
+      "noTargets": "Nenhum item elegível para encantar.",
+      "wornTag": "Equipado ({slot})",
+      "wornTagIndexed": "Equipado ({slot} {index})",
+      "tier": {
+        "base": "Encantamentos Base",
+        "runed": "Encantamentos Rúnicos",
+        "greater": "Encantamentos Superiores"
+      },
+      "yieldHeader": "Materiais esperados:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} a {max} {item}",
+      "alreadyEnchanted": "Esse item já está encantado.",
+      "sameEnchant": "Esse item já tem esse encantamento.",
+      "replaceTag": "Substitui {enchant}",
+      "sameEnchantTag": "Já aplicado",
+      "plainTag": "Sem encantamento",
+      "replaceConfirmTitle": "Substituir o encantamento de {item}?",
+      "replaceConfirmBody": "Isso substitui {old} em {item} por {new}.",
+      "replaceConfirmNoRefund": "O encantamento antigo é destruído. Os materiais dele não são reembolsados. Não pode ser desfeito.",
+      "replaceConfirmKeeps": "Mantém: {kept}",
+      "replaceConfirmKeepsSigner": "Marca do criador",
+      "replaceConfirmKeepsMasterwork": "Bônus de obra-prima",
+      "replaceConfirmKeepsBond": "Vínculo da encomenda",
+      "replaceConfirmCost": "Custo: {cost}",
+      "replaceConfirmCostItem": "{name} x{count}",
+      "replaceConfirmAccept": "Substituir"
     },
     "training": {
       "title": "Treinamento: {name}",
@@ -3668,7 +3749,7 @@ export const pt_BR: EnTranslations = {
     "professions": {
       "intro": "Além do combate e das missões, o mundo recompensa quem trabalha a terra e a forja: coletando matérias-primas, transformando-as em equipamento e bens ao longo de dez ofícios de criação e assumindo uma identidade como um dos dez arquétipos que esses ofícios representam.",
       "harvestTitle": "Colhendo a própria caçada",
-      "harvestBody": "A coleta não para nos nós. Muitas criaturas abatidas podem ser colhidas uma vez cada, por ordem de chegada, por couros, presas, seda e carne, direto do cadáver junto com o saque comum; um único toque abre os dois. A escolha é sua a cada vez: recolha tudo que o cadáver oferece, ou concentre-se em menos componentes e leve uma qualidade visivelmente superior do que você escolher.\n\nUm resultado de coleta raro ou melhor em uma família de espécimes também concede um espécime perfeito assinado (um Couro Imaculado, Seda Imaculada, Glândula de Veneno Imaculada ou Corte Nobre) além do rendimento comum, e registra Um Espécime Perfeito no seu Livro dos Feitos. Qualquer personagem pode colher, sem necessidade de treinamento, e qualquer ferramenta de coleta que você possua conta para o bônus de qualidade superior, independentemente do ofício ao qual ela pertence.",
+      "harvestBodyChoice": "A coleta não para nos nós. Muitas criaturas abatidas podem ser colhidas uma vez cada, por ordem de chegada, por couros, presas, seda e carne, direto do cadáver junto com o saque comum; um único toque abre os dois. Quando uma criatura carrega mais de um componente aproveitável, a escolha é sua: recolha tudo que ela puder dar, ou concentre-se em menos componentes e leve uma qualidade visivelmente superior do que você escolher.\n\nUm resultado de coleta raro ou melhor em uma família de espécimes também concede um espécime perfeito assinado (um Couro Imaculado, Seda Imaculada, Glândula de Veneno Imaculada ou Corte Nobre) além do rendimento comum, e registra Um Espécime Perfeito no seu Livro dos Feitos. Qualquer personagem pode colher, sem necessidade de treinamento, e qualquer ferramenta de coleta que você possua conta para o bônus de qualidade superior, independentemente do ofício ao qual ela pertence.",
       "focusTitle": "Foco da Cidade",
       "focusBody": "Toda cidade principal mantém um painel de Foco da Cidade para os coletores de passagem: fique na cidade, abra-o ao lado do minimapa e direcione um pequeno orçamento de pontos de foco aos tipos de componente que lhe interessam. Quanto mais foco você dá a um componente, mais fino e rico ele sai de cada corpo dali em diante; sua distribuição acompanha seu personagem por onde ele andar, e você pode reajustá-la, de graça, em qualquer visita posterior à cidade.",
       "craftHowTitle": "A janela de criação",
@@ -3823,7 +3904,7 @@ export const pt_BR: EnTranslations = {
           "levelingHeading": "Como o encantamento sobe de nível",
           "levelingBody": "Duas ações movem a habilidade: desencantear uma peça e aplicar um encantamento. Cada sucesso vale até um ponto, escalado pela seriedade do trabalho: a raridade da peça que você quebra, ou o nível de reagente do encantamento que você aplica. Desencantar comuns e encantamentos só com pó pontuam como trabalho comum; desencantar incomuns e encantamentos com essência como incomum; desencantar raros e todo encantamento Rúnico ou Superior como raro; desencantar épicos e lendários ainda mais alto.\n\nO desvanecer de maestria familiar se aplica em faixas de 25 pontos, então trabalho de nível comum fica cinza na habilidade 75, trabalho incomum em 100, e trabalho de nível raro exatamente no limite de 125. O Encantamento também tem uma gentileza própria: insumos acima do teto do seu arquétipo são arredondados para esse teto em vez de zerarem, então antes de se sintonizar, um desencantar épico simplesmente pontua como raro em vez de não ensinar nada. Se o Encantamento acabar inativo por trás de outra identidade, tudo pontua como trabalho comum e a escalada estagna em 75; mantenha-o como passatempo e o trabalho de nível raro ainda paga, só mais devagar após o 75.",
           "marketHeading": "Cópias encantadas, proveniência e o mercado",
-          "marketBody": "Aplicar um encantamento consome uma cópia ensacada e desequipada do item mais os reagentes, e entrega de volta uma cópia encantada distinta; equipe-a e o bônus segue a peça para sempre, através de desequipamentos, viagens ao banco e trocas. Um encantamento por peça: uma cópia encantada nunca pode ser encantada novamente ou desencantada, e vender, descartar e desencantar preferem sempre cópias simples primeiro, então sua peça finalizada não é consumida por acidente. Cópias idênticas encantadas até se empilham juntas nas suas bolsas.\n\nEquipamento com obra-prima e encantamento são amigos: uma peça de obra-prima permanece totalmente encantável, e o encantamento se soma ao bônus da obra-prima sem perturbá-lo nem a assinatura do criador. Somando todas as fontes, uma obra-prima assinada com um encantamento Superior é o melhor que uma peça artesanal pode ter, e ainda fica abaixo do saque de incursão por design.\n\nNo mercado, o Mercado Mundial negocia apenas estoque simples e não modificado, então peças encantadas e assinadas mudam de mãos cara a cara pela janela de troca. Os materiais são a metade comercializável do ofício: Pó, Essência e Fragmentos são listados livremente, listar não custa nada, e o Mercador fica com 5% de uma venda concluída apenas. Isso faz com que as duas fontes clássicas de renda de um encantador sejam vender materiais no mercado e pegar a peça de um cliente na troca, encantá-la e devolvê-la."
+          "marketBody": "Aplicar um encantamento consome os reagentes e marca uma cópia específica do item. Aponte para uma cópia na bolsa e você recebe de volta uma cópia encantada distinta; aponte para uma peça que você já veste e ela é encantada no lugar, sem desequipar e reequipar. De qualquer forma o bônus segue a peça para sempre, através de desequipamentos, viagens ao banco e trocas. Um encantamento por peça: aplicar um encantamento diferente a uma cópia encantada pede confirmação primeiro e então substitui o encantamento antigo de vez, destruindo-o sem reembolso dos materiais. Vender, descartar e desencantar preferem sempre cópias simples primeiro, então sua peça finalizada não é consumida por acidente. Cópias idênticas encantadas até se empilham juntas nas suas bolsas.\n\nEquipamento com obra-prima e encantamento são amigos: uma peça de obra-prima permanece totalmente encantável, e o encantamento se soma ao bônus da obra-prima sem perturbá-lo nem a assinatura do criador. Somando todas as fontes, uma obra-prima assinada com um encantamento Superior é o melhor que uma peça artesanal pode ter, e ainda fica abaixo do saque de incursão por design.\n\nNo mercado, o Mercado Mundial negocia apenas estoque simples e não modificado, então peças encantadas e assinadas mudam de mãos cara a cara pela janela de troca. Os materiais são a metade comercializável do ofício: Pó, Essência e Fragmentos são listados livremente, listar não custa nada, e o Mercador fica com 5% de uma venda concluída apenas. Isso faz com que as duas fontes clássicas de renda de um encantador sejam vender materiais no mercado e pegar a peça de um cliente na troca, encantá-la e devolvê-la."
         }
       },
       "howHeading": "Como funciona a criação",
@@ -5442,6 +5523,7 @@ export const pt_BR: EnTranslations = {
     },
     "augment": {
       "choose": "Escolha um Aprimoramento",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Brutalidade",
         "desc": "Seus golpes físicos batem 15% mais forte."
@@ -6185,6 +6267,7 @@ export const pt_BR: EnTranslations = {
       "arenaJoin": "Você entra na fila do Coliseu Cinzento. Aguarde um oponente digno...",
       "arenaLeave": "Você sai da fila do Coliseu Cinzento.",
       "arenaSands": "Você pisa nas areias do Coliseu Cinzento.",
+      "arenaSandsDrowned": "Você pisa nas pedras inundadas da Corte Afogada.",
       "tradeRequestSent": "Você solicitou uma troca com {name}.",
       "tradeOpened": "Janela de troca aberta.",
       "tradeComplete": "Troca concluída.",
@@ -6353,6 +6436,11 @@ export const pt_BR: EnTranslations = {
       "playerLevelClassTitle": "{name} - Nv {level} {className}",
       "noChallengers": "Nenhum desafiante ranqueado ainda - seja o primeiro.",
       "matchInProgress": "Partida em andamento contra {name}.",
+      "mapName": "Mapa: {name}",
+      "map": {
+        "coliseum": "Coliseu Cinzento",
+        "drownedCourt": "A Corte Afogada"
+      },
       "leaveQueue": "Sair da fila",
       "searching": "Procurando oponente... ({count} na fila)",
       "enterQueue": "Entrar na fila",
@@ -6645,18 +6733,29 @@ export const pt_BR: EnTranslations = {
       "pageNextAria": "Próxima página do mercado",
       "pageStatus": "Página {current} de {total}",
       "filters": "Filtros do mercado",
+      "filterValueAria": "{label}: {value}",
       "filterType": "Tipo",
       "filterTypeAll": "Todos os tipos",
       "filterTypeWeapon": "Armas",
       "filterTypeArmor": "Armadura",
+      "filterTypeBag": "Bolsas",
       "filterTypeConsumable": "Consumíveis",
       "filterTypeMaterial": "Materiais",
       "filterTypeCosmetic": "Cosméticos",
       "filterTypeOther": "Outros",
       "filterArmorType": "Tipo de armadura",
       "filterArmorAll": "Toda armadura",
+      "filterArmorSlot": "Encaixe de armadura",
+      "filterArmorClassAll": "Todos os tipos de armadura",
+      "armorCloth": "Pano",
+      "armorLeather": "Couro",
+      "armorMail": "Malha",
       "filterWeaponType": "Tipo de arma",
       "filterWeaponAll": "Todas as armas",
+      "filterBagSize": "Tamanho de bolsa",
+      "filterBagAll": "Todas as bolsas",
+      "filterPrimaryStat": "Atributo primário",
+      "filterPrimaryStatAll": "Qualquer atributo primário",
       "filterRarity": "Raridade",
       "filterRarityAll": "Todas as raridades",
       "weaponSword": "Espadas",

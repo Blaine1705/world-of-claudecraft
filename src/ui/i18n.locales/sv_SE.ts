@@ -7,8 +7,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Förtrollning Vapen - Runat Sigill',
   'hudChrome.professions.ctaRaiseSpecialized':
     'Fortsätt höja {craft}: {points} poäng till Specialiserad, och materialkostnaderna sjunker.',
-  'guide.professions.harvestBody':
-    'Insamling stannar inte vid noder. Många slagna bestar kan skördas en gång var, först till kvarn, för hudar, huggtänder, silke och kött, direkt från kroppen vid sidan av det vanliga bytet; ett tryck öppnar båda. Valet är ditt varje gång: ta allt kroppen erbjuder, eller koncentrera dig på färre komponenter och ta en mätbart finare kvalitet av det du tar.\n\nEtt sällsynt eller bättre skördeslag på en exemplarbärande familj ger också ett signerat perfekt exemplar (ett Orört skinn, Orörd siden, Orörd giftkörtel eller Primärsnitt) utöver det vanliga utbytet, och registrerar Ett perfekt exemplar i din Bedrifternas bok. Vilken karaktär som helst kan skörda, ingen träning krävs, och vilket insamlingsverktyg du äger räknas mot premiumarmen, oavsett vilket yrke det tillhör.',
+  'guide.professions.harvestBodyChoice':
+    'Insamling stannar inte vid noder. Många slagna bestar kan skördas en gång var, först till kvarn, för hudar, huggtänder, silke och kött, direkt från kroppen vid sidan av det vanliga bytet; ett tryck öppnar båda. När en best bär mer än en användbar komponent är valet ditt: ta allt den kan ge, eller koncentrera dig på färre komponenter och ta en mätbart finare kvalitet av det du tar.\n\nEtt sällsynt eller bättre skördeslag på en exemplarbärande familj ger också ett signerat perfekt exemplar (ett Orört skinn, Orörd siden, Orörd giftkörtel eller Primärsnitt) utöver det vanliga utbytet, och registrerar Ett perfekt exemplar i din Bedrifternas bok. Vilken karaktär som helst kan skörda, ingen träning krävs, och vilket insamlingsverktyg du äger räknas mot premiumarmen, oavsett vilket yrke det tillhör.',
   'guide.professions.craftMasteryTitle': 'Hur lång tid mästerskap tar',
   'guide.professions.craftMasteryBody':
     'Ärlighet om förväntningarna: klättringen till ett hantverks tak på 125 är minst 125 lyckade hantverk, eftersom varje hantverk med full vinst rör skickligheten exakt ett poäng, och i praktiken lite fler allteftersom recepten bleknar mellan tränarens steg. Själva hantverkandet är snabbt; att förse det med material är den verkliga resan, så budgetera ett par dedikerade kvällar av insamling och hantverkande per yrke.\n\nInsamlingsyrkena når sitt tak på 100 under en normal levlarresa om du skördar medan du reser, men den sista sträckan vill ha de högre noderna i det avlägsna norr. Fiske är den långa vägen av design: med sitt eget vinstschema kräver 200 skicklighet mer än tre tusen fångster. Mästarfiskaren är en titel förtjänad över en säsong av stilla kvällar, inte en helg.',
@@ -197,7 +197,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.enchanting.marketHeading':
     'Förtrollade kopior, ursprung och marknaden',
   'guide.profPages.craftProse.enchanting.marketBody':
-    'Att applicera en förtrollning förbrukar en inpackad, oikhopjämd kopia av föremålet plus reagenserna och överlämnar tillbaka en distinkt förtrollad kopia; utrusta den och bonusen följer pjäsen för evigt, genom avutrustning, bankturer och handlar. En förtrollning per pjäs: en förtrollad kopia kan aldrig förtrollas igen eller sönderförtrollas, och att sälja, kassera och sönderförtolla föredrar alla vanliga kopior först, så din färdiga pjäs råkar inte bli äten av misstag. Identiskt förtrollade kopior kan till och med staplas ihop i dina väskor.\n\nMästverksutrusting och förtrollning är vänner: en mästerverkspjäs förblir fullt förtrollningsbar och förtrollningen adderas ovanpå mästverksbonus utan att störa den eller tillverkarens signatur. Staplar man varje källa är ett signerat mästerverk med en Stor förtrollning det bästa en tillverkad pjäs kan bli, och den sitter ändå under raidloot av design.\n\nPå marknaden hanterar Världsmarknadens mäklare bara omodifierat standardlager, så förtrollade och signerade pjäser byter ägare öga mot öga genom handelsfönstret i stället. Materialen är den marknadsmässiga halvan av hantverket: Stoft, Essens och Skärvor listas fritt, listning kostar ingenting och Köpmannen tar 5 procent av en fullföljd försäljning. Det ger de två klassiska förtrollareinkomsterna: att sälja material på marknaden och att ta en kunds pjäs i handel, förtjana den och lämna tillbaka den.',
+    'Att applicera en förtrollning förbrukar reagenserna och markerar en specifik kopia av föremålet. Riktar du den mot en kopia i väskan får du tillbaka en distinkt förtrollad kopia; riktar du den mot en pjäs du redan bär förtrollas den på plats, utan att ta av och sätta på igen. Hur som helst följer bonusen pjäsen för evigt, genom avutrustning, bankturer och handlar. En förtrollning per pjäs: att lägga en annan förtrollning på en förtrollad kopia ber först om bekräftelse och ersätter sedan den gamla förtrollningen direkt; den förstörs utan att materialen återbetalas. Att sälja, kassera och sönderförtolla föredrar alla vanliga kopior först, så din färdiga pjäs råkar inte bli äten av misstag. Identiskt förtrollade kopior kan till och med staplas ihop i dina väskor.\n\nMästverksutrusting och förtrollning är vänner: en mästerverkspjäs förblir fullt förtrollningsbar och förtrollningen adderas ovanpå mästverksbonus utan att störa den eller tillverkarens signatur. Staplar man varje källa är ett signerat mästerverk med en Stor förtrollning det bästa en tillverkad pjäs kan bli, och den sitter ändå under raidloot av design.\n\nPå marknaden hanterar Världsmarknadens mäklare bara omodifierat standardlager, så förtrollade och signerade pjäser byter ägare öga mot öga genom handelsfönstret i stället. Materialen är den marknadsmässiga halvan av hantverket: Stoft, Essens och Skärvor listas fritt, listning kostar ingenting och Köpmannen tar 5 procent av en fullföljd försäljning. Det ger de två klassiska förtrollareinkomsterna: att sälja material på marknaden och att ta en kunds pjäs i handel, förtjana den och lämna tillbaka den.',
   'guide.profPages.howHeading': 'Hur hantverkande fungerar',
   'guide.profPages.howBody':
     'Öppna hantverksfönstret (standardtangent T) och alla recept du kan listas med vad de kräver och vad du har till hands. Stationsbundna recept kräver att du står inom 20 yard från rätt station i staden, fältrecept hantveras var som helst, och Förtrollning behöver aldrig en station alls. Det finns inget misslyckandekast: ett hantverk med materialen till hands lyckas alltid.\n\nTvå små friktioner håller ekonomin ärlig. Varje lyckat hantverk betalar en avgift på 2 koppar per poäng av föremålets statistikbudget, och hantverkstypsåtgärder delar ett tempo: högst 10 hantverk, avförtrollningar, förtrollningar eller demonteringar under valfria 60 sekunder. Inget av detta stör en normal session; båda stoppar en maximerad specialist från att översvämma marknaden.',
@@ -6423,12 +6423,15 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.filterType': 'Typ',
   'itemUi.market.filterTypeAll': 'Alla typer',
   'itemUi.market.filterTypeArmor': 'Rustning',
+  'itemUi.market.filterTypeBag': 'Väskor',
   'itemUi.market.filterTypeConsumable': 'Förbrukningsvaror',
   'itemUi.market.filterTypeCosmetic': 'Kosmetika',
   'itemUi.market.filterTypeMaterial': 'Material',
   'itemUi.market.filterTypeOther': 'Övrigt',
   'itemUi.market.filterTypeWeapon': 'Vapen',
   'itemUi.market.filterWeaponAll': 'Alla vapen',
+  'itemUi.market.filterBagSize': 'Väskstorlek',
+  'itemUi.market.filterBagAll': 'Alla väskor',
   'itemUi.market.filterWeaponType': 'Vapentyp',
   'itemUi.market.filters': 'Marknadsfilter',
   'itemUi.market.listButton': 'Lägg upp på Världsmarknaden',
@@ -7368,7 +7371,13 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.mining': 'Gruvdrift',
   'hudChrome.gathering.title': 'Insamling',
   'hudChrome.corpseHarvest.alreadyHarvested': 'Det här kadavret har redan skördats.',
+  'hudChrome.corpseHarvest.nothingSelectedYields':
+    'Inget du valt kan skördas från det här kadavret.',
   'hudChrome.corpseHarvest.componentAria': 'Skörda {component}',
+  'hudChrome.corpseHarvest.componentNoYield': 'inget ännu',
+  'hudChrome.corpseHarvest.componentAriaNoYield': 'Skörda {component}: {note}',
+  'hudChrome.corpseHarvest.yieldTierHint':
+    'Ju färre komponenter en skörd faktiskt tar, desto högre skördnivå får var och en.',
   'hudChrome.corpseHarvest.components.claw': 'Klo',
   'hudChrome.corpseHarvest.components.fang': 'Huggtand',
   'hudChrome.corpseHarvest.components.gills': 'Gälar',
@@ -7377,8 +7386,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.silk': 'Silke',
   'hudChrome.corpseHarvest.components.tusk': 'Bete',
   'hudChrome.corpseHarvest.components.venomSac': 'Giftsäck',
-  'hudChrome.corpseHarvest.concentrateHint':
-    'Ju färre delar du väljer, desto högre kvalitetsnivå får var och en.',
   'hudChrome.corpseHarvest.harvestButton': 'Skörda',
   'hudChrome.corpseHarvest.harvestTooltip':
     'Samlar de markerade komponenterna. Varje kadaver kan skördas en gång, den som är först. Tar inte bytet.',
@@ -8131,7 +8138,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.railSol': 'SOL',
   'hudChrome.claudium.railStripe': 'Kort',
   'hudChrome.claudium.railWoc': 'WOC',
-  'hudChrome.claudium.railWocDiscount': '20% rabatt',
+  'hudChrome.claudium.railWocDiscount': '{percent}% rabatt',
   'hudChrome.claudium.railWocUnavailable': 'WOC-priser är inte tillgängliga just nu.',
   'hudChrome.claudium.showAmounts': 'Visa alla Claudium-belopp',
   'hudChrome.claudium.skuRow': '{usd} för {claudium} Claudium',
@@ -8922,7 +8929,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyMinimal': 'Minimal skicklighetsvinst',
   'hudChrome.crafting.difficultyNone': 'Ingen färdighetsvinst',
   'hudChrome.crafting.difficultyReduced': 'Minskad färdighetsvinst',
-  'hudChrome.crafting.enchantedLine': 'Förtrollad',
   'hudChrome.crafting.gatheredBy': 'Samlat av {name}',
   'hudChrome.crafting.learnMoreAtStation':
     '{master} vid {station} kan lära dig fler {craft}-recept.',
@@ -8960,6 +8966,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmTitle': 'Acceptera Väktartullen?',
   'hudChrome.gathering.gatherLine': 'Du samlar: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Du samlar in: {name} x{qty}.',
+  'hudChrome.gathering.harvestLine': 'Du skördar: {name}.',
+  'hudChrome.gathering.harvestLineQty': 'Du skördar: {name} x{qty}.',
+  'hudChrome.gathering.harvestSpecimenLine': 'Du får också {name}.',
   'hudChrome.mobile.professions': 'Yrken',
   'hudChrome.options.showThirdActionBar': 'Visa tredje åtgärdsfältet',
   'hudChrome.playerMenu.streamerBadgeTitle': 'Verifierad streamer',
@@ -9206,4 +9215,92 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'perfNudge.integratedGpu':
     'Spelet körs på den integrerade (strömsnåla) grafikprocessorn. Om datorn även har ett grafikkort för spel anger du webbläsaren till Hög prestanda under Inställningar > System > Skärm > Grafik i Windows och startar sedan om webbläsaren. Skrivbordsappen väljer spelgrafikkortet automatiskt.',
   'worldContent.noticeboardName': 'Anslagstavla',
+  'hud.arena.map.coliseum': 'Askgrå kolosseum',
+  'hud.arena.map.drownedCourt': 'Det dränkta hovet',
+  'hud.arena.mapName': 'Karta: {name}',
+  'hud.logs.arenaSandsDrowned': 'Du kliver ut på de översvämmade stenarna i Det dränkta hovet.',
+  'itemUi.market.armorCloth': 'Tyg',
+  'itemUi.market.armorLeather': 'Läder',
+  'itemUi.market.armorMail': 'Ringbrynja',
+  'itemUi.market.filterArmorClassAll': 'Alla rustningstyper',
+  'itemUi.market.filterArmorSlot': 'Rustningsplats',
+  'itemUi.market.filterPrimaryStat': 'Primärt attribut',
+  'itemUi.market.filterPrimaryStatAll': 'Alla primära attribut',
+  'itemUi.market.filterValueAria': '{label}: {value}',
+  'devCommand.actions.kit.description':
+    'Ta på nivå 20-förvalet före Sanctum för en specialisering, väskor först. Endast utrustning.',
+  'devCommand.actions.kit.label': 'Utrusta nivå 20-kit',
+  'devCommand.fields.spec': 'Specialisering',
+  'devCommand.itemChosen': 'Vald: {name}',
+  'devCommand.itemHeroicTag': 'Heroisk',
+  'devCommand.itemMore': 'Visar {shown} av {total}. Fortsätt skriva för att smalna av urvalet.',
+  'devCommand.itemNoMatches': 'Inga föremål matchar.',
+  'devCommand.itemResultsAria': 'Matchande föremål',
+  'devCommand.itemSearchPlaceholder': 'Sök efter namn eller id',
+  'devCommand.itemUnknown': 'Inget föremål har detta id.',
+  'devCommand.kitCurrentSpec': 'Aktuell specialisering',
+  'hudChrome.bags.itemAriaBound': '{item}, antal {count}, bunden kopia',
+  'hudChrome.bags.itemAriaEnchanted': '{item}, antal {count}, förtrollad kopia',
+  'hudChrome.enchanting.tier.base': 'Basförtrollningar',
+  'hudChrome.enchanting.tier.greater': 'Högre förtrollningar',
+  'hudChrome.enchanting.tier.runed': 'Runristade förtrollningar',
+  'hudChrome.enchanting.wornTag': 'Buren ({slot})',
+  'hudChrome.enchanting.wornTagIndexed': 'Buren ({slot} {index})',
+  'hudChrome.enchanting.yieldHeader': 'Förväntade material:',
+  'hudChrome.enchanting.yieldLineExact': '{count} {item}',
+  'hudChrome.enchanting.yieldLineRange': '{min} till {max} {item}',
+  'hudChrome.itemTooltip.enchantedFallback': 'Förtrollad',
+  'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (Förtrollad)',
+  'hudChrome.marketIndicator.aria': 'Världsmarknadsintäkter eller föremål väntar',
+  'hudChrome.marketIndicator.tip':
+    'Försäljningsintäkter eller returnerade föremål väntar på dig hos Köpmannen.',
+  'hudChrome.materialHint.arcaneDust':
+    'Förtrollningsreagens. Fås genom avförtrollning av vanlig och ovanlig utrustning.',
+  'hudChrome.materialHint.arcaneEssence':
+    'Förtrollningsreagens. Fås genom avförtrollning av sällsynt utrustning.',
+  'hudChrome.materialHint.arcaneShard':
+    'Förtrollningsreagens. Fås genom avförtrollning av episk och legendarisk utrustning.',
+  'hudChrome.materialHint.resonantHide':
+    'Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre läderrustning.',
+  'hudChrome.materialHint.resonantLinks':
+    'Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre ringbrynja.',
+  'hudChrome.materialHint.resonantSteel':
+    'Förtrollningsreagens. Fås genom avförtrollning av sällsynta eller bättre närstridsvapen.',
+  'hudChrome.materialHint.resonantThread':
+    'Förtrollningsreagens. Fås genom avförtrollning av sällsynt eller bättre tygrustning.',
+  'hudChrome.materialHint.resonantTimber':
+    'Förtrollningsreagens. Fås genom avförtrollning av sällsynta eller bättre stavar, trollstavar, bågar och armborst.',
+  'hudChrome.options.stickyTarget': 'Behåll mål vid markklick',
+  'hudChrome.social.billboard.empty': 'Inget på anslagstavlan än.',
+  'hudChrome.social.billboard.inputLabel': 'Meddelande på gillets anslagstavla',
+  'hudChrome.social.billboard.label': 'Gillets anslagstavla',
+  'hudChrome.social.billboard.placeholder': 'Skriv ett meddelande till gillet',
+  'hudChrome.social.billboard.result.notOfficer':
+    'Endast officerare och Gillesmästaren får redigera anslagstavlan.',
+  'hudChrome.social.billboard.result.set': 'Gillets anslagstavla har uppdaterats.',
+  'hudChrome.social.billboard.save': 'Spara',
+  'hudChrome.social.billboard.setBy': 'Skriven av {name}',
+  'hudChrome.enchanting.alreadyEnchanted': 'Det föremålet är redan förtrollat.',
+  'hudChrome.enchanting.replaceConfirmAccept': 'Ersätt',
+  'hudChrome.enchanting.replaceConfirmBody': 'Detta ersätter {old} på {item} med {new}.',
+  'hudChrome.enchanting.replaceConfirmCost': 'Kostnad: {cost}',
+  'hudChrome.enchanting.replaceConfirmCostItem': '{name} x{count}',
+  'hudChrome.enchanting.replaceConfirmNoRefund':
+    'Den gamla förtrollningen förstörs. Dess material återbetalas inte. Det kan inte ångras.',
+  'hudChrome.enchanting.replaceConfirmTitle': 'Ersätt förtrollningen på {item}?',
+  'hudChrome.enchanting.replaceTag': 'Ersätter {enchant}',
+  'hudChrome.enchanting.sameEnchant': 'Det föremålet har redan den förtrollningen.',
+  'hudChrome.enchanting.sameEnchantTag': 'Redan applicerad',
+  'hudChrome.crafting.craftedToastQty': 'Tillverkad: {name} x{qty}',
+  'hudChrome.enchanting.disenchantedYield': 'Du avförtrollar {item} till {material}.',
+  'hudChrome.enchanting.disenchantedYieldQty': 'Du avförtrollar {item} till {material} x{qty}.',
+  'hudChrome.enchanting.disenchantedAlso': 'Du återvinner också {material}.',
+  'hudChrome.enchanting.disenchantedAlsoQty': 'Du återvinner också {material} x{qty}.',
+  'hudChrome.enchanting.salvagedYield': 'Du bärgar {item} till {material}.',
+  'hudChrome.enchanting.salvagedYieldQty': 'Du bärgar {item} till {material} x{qty}.',
+  'hudChrome.enchanting.plainTag': 'Inte förtrollad',
+  'hudChrome.enchanting.replaceConfirmKeeps': 'Behålls: {kept}',
+  'hudChrome.enchanting.replaceConfirmKeepsSigner': 'Tillverkarens märke',
+  'hudChrome.enchanting.replaceConfirmKeepsMasterwork': 'Mästerverksbonus',
+  'hudChrome.enchanting.replaceConfirmKeepsBond': 'Uppdragsbindning',
 };

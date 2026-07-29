@@ -38,6 +38,14 @@ export const en: EnTranslations = {
     "filterLabel": "Filter commands",
     "filterPlaceholder": "Search this category",
     "noMatches": "No matching commands.",
+    "itemSearchPlaceholder": "Search by name or id",
+    "itemResultsAria": "Matching items",
+    "itemNoMatches": "No items match.",
+    "itemMore": "Showing {shown} of {total}. Keep typing to narrow.",
+    "itemChosen": "Selected: {name}",
+    "itemUnknown": "No item has that id.",
+    "itemHeroicTag": "Heroic",
+    "kitCurrentSpec": "Current spec",
     "serverRequirement": "Server cheats still require ALLOW_DEV_COMMANDS=1.",
     "invalidValues": "Choose valid values before running this command.",
     "sent": "Sent: {command}",
@@ -55,7 +63,8 @@ export const en: EnTranslations = {
       "z": "Z",
       "dungeon": "Dungeon",
       "difficulty": "Difficulty",
-      "name": "Name"
+      "name": "Name",
+      "spec": "Spec"
     },
     "difficulty": {
       "normal": "Normal",
@@ -113,6 +122,10 @@ export const en: EnTranslations = {
       "give": {
         "label": "Give item",
         "description": "Add an item to the player inventory."
+      },
+      "kit": {
+        "label": "Equip fresh-20 kit",
+        "description": "Wear the pre-Sanctum level-20 preset for a spec, bags first. Gear only."
       },
       "gold": {
         "label": "Add gold",
@@ -653,7 +666,7 @@ export const en: EnTranslations = {
       "railSol": "SOL",
       "railUsdc": "USDC",
       "railWoc": "WOC",
-      "railWocDiscount": "20% off",
+      "railWocDiscount": "{percent}% off",
       "railWocUnavailable": "WOC pricing is unavailable right now.",
       "railNativeUnavailable": "Crypto off.",
       "amountLabel": "Amount",
@@ -1049,6 +1062,7 @@ export const en: EnTranslations = {
       "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Ground-Targeting Reticle",
       "mouseoverCast": "Mouseover Cast on Party Frames",
+      "stickyTarget": "Keep Target on Ground Click",
       "showItemLevel": "Show Item Level",
       "itemLevelLine": "Item Level {level}",
       "itemScoreLine": "Score {score}",
@@ -1286,10 +1300,10 @@ export const en: EnTranslations = {
     },
     "plurals": {
       "guildMembers": {
-        "one": "you are {rank}, {count} member",
-        "few": "you are {rank}, {count} members",
-        "many": "you are {rank}, {count} members",
-        "other": "you are {rank}, {count} members"
+        "one": "your guild rank is {rank}; {count} member",
+        "few": "your guild rank is {rank}; {count} members",
+        "many": "your guild rank is {rank}; {count} members",
+        "other": "your guild rank is {rank}; {count} members"
       },
       "finderPartySize": {
         "one": "{count} player",
@@ -1453,9 +1467,12 @@ export const en: EnTranslations = {
       "title": "Harvest",
       "harvestButton": "Harvest",
       "harvestTooltip": "Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.",
-      "concentrateHint": "Fewer chosen components yield a higher tier each.",
+      "yieldTierHint": "The fewer components a harvest takes, the higher the tier of each.",
+      "nothingSelectedYields": "Nothing you selected can be harvested from this corpse.",
       "alreadyHarvested": "This corpse has already been harvested.",
       "componentAria": "Harvest {component}",
+      "componentNoYield": "nothing yet",
+      "componentAriaNoYield": "Harvest {component}: {note}",
       "components": {
         "hide": "Hide",
         "fang": "Fang",
@@ -1533,6 +1550,8 @@ export const en: EnTranslations = {
       "dragDestroyHint": "Drag out into the world to destroy",
       "reorderNeedsRecent": "Clear the filter and sort by Recent to rearrange your bags",
       "itemAriaInstanced": "{item}, quantity {count}, maker-marked copy",
+      "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
+      "itemAriaBound": "{item}, quantity {count}, bound copy",
       "itemAriaMasterwork": "{item}, quantity {count}, masterwork",
       "filterGroupAria": "Filter bags by category",
       "filterAll": "All",
@@ -1757,7 +1776,19 @@ export const en: EnTranslations = {
       "label": "Reset Frame Positions"
     },
     "itemTooltip": {
-      "requiresLevel": "Requires Level {level}"
+      "requiresLevel": "Requires Level {level}",
+      "statEnchanted": "+{value} {stat} (Enchanted)",
+      "enchantedFallback": "Enchanted"
+    },
+    "materialHint": {
+      "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
+      "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
+      "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
+      "resonantThread": "Enchanting reagent. Disenchanted from rare and better cloth armor.",
+      "resonantHide": "Enchanting reagent. Disenchanted from rare and better leather armor.",
+      "resonantLinks": "Enchanting reagent. Disenchanted from rare and better mail armor.",
+      "resonantSteel": "Enchanting reagent. Disenchanted from rare and better melee weapons.",
+      "resonantTimber": "Enchanting reagent. Disenchanted from rare and better staves, wands, bows, and crossbows."
     },
     "discord": {
       "title": "Discord",
@@ -1998,6 +2029,10 @@ export const en: EnTranslations = {
         "takeParcelsFirst": "Take the parcels out before discarding the letter."
       }
     },
+    "marketIndicator": {
+      "aria": "World Market proceeds or items waiting",
+      "tip": "Sale proceeds or returned items are waiting for you at the Merchant."
+    },
     "noticeboard": {
       "empty": "Nothing seems posted."
     },
@@ -2117,7 +2152,19 @@ export const en: EnTranslations = {
       "onlineHeader": "Online ({n})",
       "offlineHeader": "Offline ({n})",
       "hideOffline": "Hide offline",
-      "hideOfflineTitle": "Hide offline guild members"
+      "hideOfflineTitle": "Hide offline guild members",
+      "billboard": {
+        "label": "Guild Billboard",
+        "empty": "Nothing on the billboard yet.",
+        "setBy": "Set by {name}",
+        "save": "Save",
+        "placeholder": "Write a message for the guild",
+        "inputLabel": "Guild billboard message",
+        "result": {
+          "set": "The guild billboard was updated.",
+          "notOfficer": "Only officers and the Guild Master may edit the billboard."
+        }
+      }
     },
     "gathering": {
       "title": "Gathering",
@@ -2128,6 +2175,9 @@ export const en: EnTranslations = {
       "notReady": "This resource node has not respawned for you yet.",
       "gatherLine": "You gather: {name}.",
       "gatherLineQty": "You gather: {name} x{qty}.",
+      "harvestLine": "You harvest: {name}.",
+      "harvestLineQty": "You harvest: {name} x{qty}.",
+      "harvestSpecimenLine": "You also recover {name}.",
       "catchLine": "You reel in: {name}",
       "biteLine": "Something takes the bait!",
       "gotAwayLine": "It got away.",
@@ -2309,6 +2359,7 @@ export const en: EnTranslations = {
       "empty": "No recipes known yet.",
       "resultAria": "Craft {name}",
       "craftedToast": "Crafted: {name}",
+      "craftedToastQty": "Crafted: {name} x{qty}",
       "insufficientMaterials": "You do not have the materials for that.",
       "unknownRecipe": "That recipe does not exist.",
       "comboRequirementUnmet": "You do not have both required crafts at the required tier for that recipe.",
@@ -2387,7 +2438,6 @@ export const en: EnTranslations = {
       "makersMark": "Crafted by {name}",
       "gatheredBy": "Gathered by {name}",
       "masterworkSeal": "Masterwork",
-      "enchantedLine": "Enchanted",
       "commissionToggle": "Commission piece",
       "commissionToggleHint": "Binds to the first character to receive it in a trade.",
       "commissionUnbound": "Commission piece: binds to the first recipient",
@@ -2402,7 +2452,13 @@ export const en: EnTranslations = {
     },
     "enchanting": {
       "disenchantedLine": "You disenchant {item}.",
+      "disenchantedYield": "You disenchant {item} into {material}.",
+      "disenchantedYieldQty": "You disenchant {item} into {material} x{qty}.",
+      "disenchantedAlso": "You also recover {material}.",
+      "disenchantedAlsoQty": "You also recover {material} x{qty}.",
       "salvagedLine": "You salvage {item}.",
+      "salvagedYield": "You salvage {item} into {material}.",
+      "salvagedYieldQty": "You salvage {item} into {material} x{qty}.",
       "enchantAppliedLine": "You enchant {item} with {enchant}.",
       "notHeld": "You do not have that item.",
       "notDisenchantable": "You cannot disenchant that.",
@@ -2425,7 +2481,32 @@ export const en: EnTranslations = {
       "pickerTitle": "Apply Enchant",
       "targetTitle": "Choose an item to enchant",
       "noEnchants": "No enchant uses this reagent.",
-      "noTargets": "No eligible item to enchant."
+      "noTargets": "No eligible item to enchant.",
+      "wornTag": "Worn ({slot})",
+      "wornTagIndexed": "Worn ({slot} {index})",
+      "tier": {
+        "base": "Base Enchants",
+        "runed": "Runed Enchants",
+        "greater": "Greater Enchants"
+      },
+      "yieldHeader": "Expected materials:",
+      "yieldLineExact": "{count} {item}",
+      "yieldLineRange": "{min} to {max} {item}",
+      "alreadyEnchanted": "That item is already enchanted.",
+      "sameEnchant": "That item already has that enchant.",
+      "replaceTag": "Replaces {enchant}",
+      "sameEnchantTag": "Already applied",
+      "plainTag": "Not enchanted",
+      "replaceConfirmTitle": "Replace the enchant on {item}?",
+      "replaceConfirmBody": "This replaces {old} on {item} with {new}.",
+      "replaceConfirmNoRefund": "The old enchant is destroyed. Its materials are not refunded. This cannot be undone.",
+      "replaceConfirmKeeps": "Kept: {kept}",
+      "replaceConfirmKeepsSigner": "Maker's mark",
+      "replaceConfirmKeepsMasterwork": "Masterwork bonus",
+      "replaceConfirmKeepsBond": "Commission bond",
+      "replaceConfirmCost": "Cost: {cost}",
+      "replaceConfirmCostItem": "{name} x{count}",
+      "replaceConfirmAccept": "Replace"
     },
     "training": {
       "title": "Training: {name}",
@@ -3668,7 +3749,7 @@ export const en: EnTranslations = {
     "professions": {
       "intro": "Beyond combat and quests, the world rewards you for working the land and the forge: gathering raw materials, turning them into gear and goods across ten crafting trades, and settling into an identity as one of the ten archetypes those trades represent.",
       "harvestTitle": "Harvesting the hunt itself",
-      "harvestBody": "Gathering does not stop at nodes. Many slain beasts can be harvested once each, first come first served, for hides, fangs, silk, and meat, straight from the corpse alongside its ordinary loot; one press opens both. The choice is yours each time, too: strip everything the corpse offers, or concentrate on fewer components and take a measurably finer grade of what you do take.\n\nA rare or better harvest roll on a specimen-bearing family also grants a signed perfect specimen (a Pristine Hide, Pristine Silk, Pristine Venom Gland, or Prime Cut) on top of the ordinary yield, and records A Perfect Specimen in your Book of Deeds. Any character can harvest, no training required, and any gathering tool you own counts toward the premium arm, whichever trade it belongs to.",
+      "harvestBodyChoice": "Gathering does not stop at nodes. Many slain beasts can be harvested once each, first come first served, for hides, fangs, silk, and meat, straight from the corpse alongside its ordinary loot; one press opens both. Where a beast carries more than one workable component, the choice is yours: take everything it can give, or concentrate on fewer components and take a measurably finer grade of what you do take.\n\nA rare or better harvest roll on a specimen-bearing family also grants a signed perfect specimen (a Pristine Hide, Pristine Silk, Pristine Venom Gland, or Prime Cut) on top of the ordinary yield, and records A Perfect Specimen in your Book of Deeds. Any character can harvest, no training required, and any gathering tool you own counts toward the premium arm, whichever trade it belongs to.",
       "focusTitle": "Town Focus",
       "focusBody": "Every hub town keeps a Town Focus panel for visiting harvesters: stand in town, open it from beside the minimap, and spread a budget of 10 focus points across the component types you care about. Every 5 points on a component raises its harvest grade one step (two steps at most), and each point adds 10 percent to its yield; unfocused components are never made worse. Your allocation follows your character everywhere and can be reworked, free, on any later visit to town.",
       "craftHowTitle": "The crafting window",
@@ -3823,7 +3904,7 @@ export const en: EnTranslations = {
           "levelingHeading": "How enchanting levels",
           "levelingBody": "Two actions move the skill: disenchanting a piece, and applying an enchant. Each success is worth up to one point, scaled by how serious the work is: the rarity of the piece you break, or the reagent tier of the enchant you apply. Common disenchants and dust-only enchants score as common work; uncommon disenchants and essence enchants as uncommon; rare disenchants and every Runed or Greater enchant as rare; epic and legendary disenchants higher still.\n\nThe familiar mastery fade applies on 25-point tiers, so common-grade work goes gray at skill 75, uncommon work at 100, and rare-tier work exactly at the 125 cap. Enchanting also has one kindness of its own: input above your archetype ceiling is rounded down to that ceiling instead of zeroed, so before you attune, an epic disenchant simply scores as rare rather than teaching nothing. If Enchanting ends up dormant behind another identity, everything scores as common work and the climb stalls at 75; keep it as your hobby and rare-tier work still pays, just slower past 75.",
           "marketHeading": "Enchanted copies, provenance, and the market",
-          "marketBody": "Applying an enchant consumes a bagged, unequipped copy of the item plus the reagents, and hands back a distinct enchanted copy; equip it and the bonus follows the piece forever, through unequips, bank trips, and trades. One enchant per piece: an enchanted copy can never be enchanted again or disenchanted, and selling, discarding, and disenchanting all prefer plain copies first, so your finished piece does not get eaten by accident. Identically enchanted copies even stack together in your bags.\n\nMasterwork gear and enchanting are friends: a masterwork piece stays fully enchantable, and the enchant adds on top of the masterwork bonus without disturbing it or the maker's signature. Stacking every source, a signed masterwork carrying a Greater enchant is the best a crafted piece gets, and it still sits below raid loot by design.\n\nOn the market, the World Market brokers only plain, unmodified stock, so enchanted and signed pieces change hands face to face through the trade window instead. The materials are the marketable half of the craft: Dust, Essence, and Shards list freely, listing costs nothing, and the Merchant takes 5 percent of a completed sale only. That makes the two classic enchanter incomes selling materials on the market, and taking a customer's piece in trade, enchanting it, and handing it back."
+          "marketBody": "Applying an enchant spends the reagents and marks one specific copy of the item. Point it at a bagged copy and you get back a distinct enchanted copy; point it at a piece you are already wearing and it is enchanted in place, right where it sits, with no unequip and re-equip dance. Either way the bonus follows that piece forever, through unequips, bank trips, and trades. One enchant per piece: applying a different enchant to an enchanted copy asks for confirmation, then replaces the old enchant outright, destroying it with no refund of its materials. Selling, discarding, and disenchanting all prefer plain copies first, so your finished piece does not get eaten by accident. Identically enchanted copies even stack together in your bags.\n\nMasterwork gear and enchanting are friends: a masterwork piece stays fully enchantable, and the enchant adds on top of the masterwork bonus without disturbing it or the maker's signature. Stacking every source, a signed masterwork carrying a Greater enchant is the best a crafted piece gets, and it still sits below raid loot by design.\n\nOn the market, the World Market brokers only plain, unmodified stock, so enchanted and signed pieces change hands face to face through the trade window instead. The materials are the marketable half of the craft: Dust, Essence, and Shards list freely, listing costs nothing, and the Merchant takes 5 percent of a completed sale only. That makes the two classic enchanter incomes selling materials on the market, and taking a customer's piece in trade, enchanting it, and handing it back."
         }
       },
       "howHeading": "How crafting works",
@@ -5442,6 +5523,7 @@ export const en: EnTranslations = {
     },
     "augment": {
       "choose": "Choose an Augment",
+      "cardAria": "{name} ({category}) - {description}",
       "aug_brutality": {
         "name": "Brutality",
         "desc": "Your physical strikes hit 15% harder."
@@ -6185,6 +6267,7 @@ export const en: EnTranslations = {
       "arenaJoin": "You join the Ashen Coliseum queue. Stand by for a worthy opponent...",
       "arenaLeave": "You leave the Ashen Coliseum queue.",
       "arenaSands": "You step onto the sands of the Ashen Coliseum.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "You have requested to trade with {name}.",
       "tradeOpened": "Trade window opened.",
       "tradeComplete": "Trade complete.",
@@ -6353,6 +6436,11 @@ export const en: EnTranslations = {
       "playerLevelClassTitle": "{name} - Lv {level} {className}",
       "noChallengers": "No challengers ranked yet - be the first.",
       "matchInProgress": "Match in progress vs {name}.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Leave Queue",
       "searching": "Searching for an opponent... ({count} in queue)",
       "enterQueue": "Enter the Queue",
@@ -6645,18 +6733,29 @@ export const en: EnTranslations = {
       "pageNextAria": "Next market page",
       "pageStatus": "Page {current} of {total}",
       "filters": "Market filters",
+      "filterValueAria": "{label}: {value}",
       "filterType": "Type",
       "filterTypeAll": "All types",
       "filterTypeWeapon": "Weapons",
       "filterTypeArmor": "Armor",
+      "filterTypeBag": "Bags",
       "filterTypeConsumable": "Consumables",
       "filterTypeMaterial": "Materials",
       "filterTypeCosmetic": "Cosmetics",
       "filterTypeOther": "Other",
       "filterArmorType": "Armor type",
       "filterArmorAll": "All armor",
+      "filterArmorSlot": "Armor slot",
+      "filterArmorClassAll": "All armor types",
+      "armorCloth": "Cloth",
+      "armorLeather": "Leather",
+      "armorMail": "Mail",
       "filterWeaponType": "Weapon type",
       "filterWeaponAll": "All weapons",
+      "filterBagSize": "Bag size",
+      "filterBagAll": "All bags",
+      "filterPrimaryStat": "Primary stat",
+      "filterPrimaryStatAll": "Any primary stat",
       "filterRarity": "Rarity",
       "filterRarityAll": "All rarities",
       "weaponSword": "Swords",

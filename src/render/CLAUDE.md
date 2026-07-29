@@ -18,22 +18,37 @@ Everything else is a sibling module in one of these families:
 - **World subsystems** export a `build*()` returning a `*View` the renderer
   owns: `terrain.ts` (chunked LOD + PBR splat), `props.ts`/`foliage.ts`/
   `dungeon.ts` (instanced/merged GLBs), `water.ts` (terrain-aware water bodies;
-  shore-depth core in `water_core.ts`), `sky.ts`. Event/minigame scenes follow
+  shore-depth and tier core in `water_core.ts`, sleeping GPU height field and
+  facing-aligned character volume wakes in `water_simulation.ts`), `sky.ts`. Event/minigame scenes follow
   the same pattern: `jail_scene.ts`, `vale_cup_*.ts`, `yumi_*.ts`.
 - **Per-frame overlay/FX modules** ticked from `sync()`: `vfx.ts` (pooled
   particles), `weather.ts`, `character_effects.ts`.
 - **The nameplate suite** (below) owns all overhead text and badges.
 - **Pure logic cores** (below) hold Node-tested per-frame decisions.
 - **Perf governors:** `render_budget.ts` (adaptive frame budget, see
-  Performance) and `crowd_lod.ts` (pure crowd policy: pulls character
-  shadow/anim cadence in as rig counts climb; cosmetic-only, exempts what a
-  player reacts to).
+  Performance) and `crowd_lod.ts` (pure character LOD policy: the band plan
+  `characterLodBands` returns, which pulls shadow/anim cadence in as rig counts
+  climb and holds an animated far band, articulated rig at a low cadence, before
+  the frozen single-draw far mesh takes over. Its extension eases out on the
+  crowd knee, the per-tier `GFX.farCharacterAnimScale` ceiling, and live budget
+  pressure; cosmetic-only, and `showsStaticFarMesh` keeps anything a player
+  reacts to out of the frozen mesh inside the uncrowded base range).
 - `view_create_retry.ts`: bounded cooldown state for fail-soft character builds
   in per-frame paths, including required targets, form swaps, and visual-key
   swaps (`tests/view_create_retry.test.ts`).
 - `self_motion.ts`/`facing_smooth.ts`: pure display-only self layers (bounded
   online pose extrapolation + rate-limited self yaw; never touch world state,
   see `src/net/CLAUDE.md`).
+- `step_smooth_core.ts`/`ground_tilt_core.ts`: the grounded-presentation pair
+  the entity loop drives per body. The first eases the vertical step the
+  physics solver takes inside one tick (leashed to a step, exact while
+  airborne so jumps and landings keep their impact); the second leans a body
+  toward the surface under it, in the body's own frame, partial and clamped
+  and damped. Both display-only: collision keeps using the physical pose.
+  Terrain gradients resample on a per-body TIME budget, never a frame count
+  (a frame cadence starves on a slow client). Landing dust rides the same
+  loop through `Vfx.groundPuff`, scaled by the display-derived fall speed
+  because the wire carries no vy for remote bodies.
 - `camera_boom_core.ts`/`camera_feel_core.ts`/`camera_director_core.ts`: the
   AAA chase-camera feel stack `updateCamera` composes (spring-arm pivot lag,
   look-ahead + FOV kicks + landing thump, directed zone-vista/death-drift
