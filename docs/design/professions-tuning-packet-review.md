@@ -691,11 +691,21 @@ What each item settled:
      selection at HEAD already covers unexpected shapes (pinned in
      `tests/gathering_view.test.ts`), but a bundle that predates the
      fishing tier split renders its generic implement wording for the
-     zone gate; unfixable from HEAD.
+     zone gate; unfixable from HEAD. Precise mechanism (wire sweep): the
+     base resolver returns the tierless fishing key unconditionally, and
+     the packet widened `gatherDenied.requiredTier`'s emitted range on
+     that surface from the literal 1 to the zone ladder, so the old copy
+     tells a rod-carrying player they have no tackle. Misleading, never
+     a throw.
    - Market browse and collect drop unknown-id rows (deliberate and
-     commented in `market_view.ts`): a stale client can neither name nor
-     price them, and collect-all still collects invisibly held items into
-     the bags, where the new unknown cell makes them visible.
+     commented in `market_view.ts`), and the browse pager under-counts by
+     the dropped rows: a stale client can neither name nor price them,
+     and collect-all still collects invisibly held items into the bags,
+     where the new unknown cell makes them visible.
+   - The vendor buyback arm drops an unknown-id row the same way
+     (`vendor_view.ts`), so an item sold on a current client cannot be
+     repurchased from a stale one; reachable only cross-device inside
+     the deploy window, and the sale price is already banked.
    - The character sheet and the inspect window render an unknown
      equipped id as an empty slot (their guarded ternaries treat no-def
      as empty), and an unknown equipped BAG renders as an empty socket
@@ -709,18 +719,40 @@ What each item settled:
    releases" (Operational notes): server first, clients after; the iOS
    binary is approved and released BEFORE the server moves (R34) and the
    binary-to-server gap stays short. Verified against the real merge-base
-   bundle (git show 9d7a1a021:...): the packet's whole wire delta since
-   the deployed release is ONE new SimEvent type (`fishingEmptyHook`; an
-   old client ignores unknown event types, every event switch is per-type
-   with no throwing default), ONE new self-delta wire key (`tslot`, read
-   behind an explicit undefined guard so a new client on an old server
-   defaults to empty), ONE new command (`slot_tool_effect`; the old
-   server's exhaustiveness default logs a protocol anomaly and drops it),
-   ZERO removed or reshaped wire keys, ZERO REST registry changes, and
-   the world-seed dedup pins the same shipped value
+   bundle (git show 9d7a1a021:...), independently by this session and by
+   a five-category wire sweep, agreeing on every point: the packet's
+   whole wire delta since the deployed release is ONE new SimEvent type
+   (`fishingEmptyHook`; an old client ignores unknown event types, both
+   base HUD event switches have no default arm), additive fields on two
+   existing events (`fishingResult`/`fishingGotAway` gained zoneId and
+   band; old arms read only fields they knew), ONE new self-delta wire
+   key (`tslot`, read behind an explicit undefined guard so a new client
+   on an old server defaults to empty) plus one additive nested field
+   (`cprof.questedHobbies`, conditional-spread guarded, and semantically
+   right against an old server: no hobby memory means the skill default,
+   which is what the preview then promises), ONE new command
+   (`slot_tool_effect`, dev-gated with NO shipped sender; an old server
+   would log a protocol anomaly to the bot detector and spend a
+   rate-limit token), ZERO removed or reshaped wire keys (ALL_DELTA_KEYS
+   57 to 58, purely additive), ZERO REST registry changes, four new
+   sim error literals ALL already carried by the base bundle's matcher
+   rows, and the world-seed dedup pins the same shipped value
    (`src/sim/world_seed.ts`). Server-first therefore suffices for every
    packet surface; the one surface no order can cover on its own is the
    node-position skew below.
+
+   THE DEPLOYED-BUNDLE CONSEQUENCE (wire sweep, recorded here and in the
+   runbook): the guards in items 1 and 2 protect bundles built from this
+   release onward; the bundle already live predates them, so for THIS
+   deploy the old client's two TypeError arms are real once the new
+   server mints the nine fine-grade item ids. The trade arm fires when a
+   stale session's trade partner stages a fine item (the throw freezes
+   that trade panel behind the base bundle's early-set signature); the
+   loot-window arm is unreachable by construction because the fine ids
+   are gathering and recipe content only, in no mob or chest loot table,
+   and the runbook now says to keep them out until clients roll. A stale
+   session keeps its bundle across the restart countdown and reconnect;
+   only a page reload updates it.
 4. RECORDED, both directions accepted (they resolve once both sides are
    current; the runbook note names them and the deploy order bounds the
    window). Direction detail from the collider table: ore and wood nodes
@@ -734,7 +766,29 @@ What each item settled:
    herbalism, whose three tier-1 herb nodes all moved, leaving that
    client zone-dead for the profession until the server deploys. The
    relocation set grows again in phase 13, so the runbook names the
-   mechanism and the worst case, never a count.
+   mechanism and the worst case, never a count. Node ADDITIONS carry no
+   server-message hazard in either direction: placements are client-side
+   static content, `ncd` keys are copied verbatim and only
+   membership-tested, and the base HUD has no consumer of a result
+   event's nodeId at all.
+
+Also fixed while verifying: the operator comment in
+`server/http/game_metrics.ts` claimed the harvest counter gained its
+tier label "in this release" and told operators to migrate live panels;
+the metric's whole history is this branch (absent at 9d7a1a021 and on
+release/v0.32.0), so there is no live panel to migrate and the note now
+states the label as a fact of the metric's first shipped release. The
+two-meanings-of-band warning beside it was independently verified
+correct and stands.
+
+SURFACED FOR THE RULINGS LEDGER (deploy decision, not decided here):
+whether this deploy should force stale web sessions onto the new bundle
+(a version prompt or forced reload at reconnect) or accept the
+stale-tab window the runbook now describes. R34 ruled out a hard
+version floor for CLIENTS DEGRADING GRACEFULLY; the deployed bundle's
+trade-throw arm is the one place the old bundle does not degrade
+gracefully, and only the maintainer can weigh a forced refresh against
+that ruling's intent.
 
 1. Guard the trade-window unknown-item path at HEAD (the old client
    throws in `itemIcon` on any unknown id and the early-set signature
