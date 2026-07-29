@@ -1079,11 +1079,22 @@ describe('purgeMarketSeller - deleting a character', () => {
     collections.set('88', { copper: 10, items: [] });
     const houseBefore = sim.marketListings.filter((l) => l.house).length;
     expect(houseBefore).toBeGreaterThan(0);
+    // Make the house guard the OPERATIVE cause for one row: a house listing
+    // hand-keyed to the deleted seller's id could only survive through the
+    // `listing.house` skip (real house stock carries sellerKey '', which the
+    // ownership check already refuses, leaving the guard otherwise inert).
+    sim.marketListings.push({
+      ...sim.marketListings.find((l) => l.house)!,
+      id: 990077,
+      sellerKey: '77',
+    });
 
     expect(sim.purgeMarketSeller(77, 'Seller')).toBe(true);
 
-    expect(sim.marketListings.some((l) => l.sellerKey === '77')).toBe(false);
-    expect(sim.marketListings.some((l) => l.sellerKey === 'Seller')).toBe(false);
+    // No NON-house row remains under either key (the hand-keyed house probe
+    // above survives by the house guard, checked below).
+    expect(sim.marketListings.some((l) => !l.house && l.sellerKey === '77')).toBe(false);
+    expect(sim.marketListings.some((l) => !l.house && l.sellerKey === 'Seller')).toBe(false);
     expect(collections.has('77')).toBe(false);
     expect(collections.has('Seller')).toBe(false);
     // The other seller and the Merchant's own stock are untouched.
@@ -1091,7 +1102,10 @@ describe('purgeMarketSeller - deleting a character', () => {
       1,
     );
     expect(collections.get('88')?.copper).toBe(10);
-    expect(sim.marketListings.filter((l) => l.house)).toHaveLength(houseBefore);
+    // houseBefore + the hand-keyed probe: the guard spared it despite the
+    // matching sellerKey.
+    expect(sim.marketListings.filter((l) => l.house)).toHaveLength(houseBefore + 1);
+    expect(sim.marketListings.some((l) => l.house && l.sellerKey === '77')).toBe(true);
   });
 
   it('reports no change when the deleted character had nothing on the market', () => {

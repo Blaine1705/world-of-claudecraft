@@ -694,11 +694,19 @@ export class PostOffice {
   //    is the key being purged: the escrow was theirs alone and there is nowhere
   //    left to return it to.
   // The delete arm mirrors the expiry sweep's exactly, so unreadIndex and the
-  // in-flight set stay consistent. One narrow legacy edge is accepted: a
-  // pre-senderKey letter whose senderName EQUALS the purged character's name
-  // reads as self-addressed and is deleted rather than returned; every
-  // modern letter carries a real senderKey, so only ancient blob rows can
-  // reach it. Returns whether anything changed.
+  // in-flight set stay consistent. The senderName fallback is NOT a rare
+  // edge at ship time: senderKey landed in this same release (#2450), so
+  // every production letter written before it takes the name path until
+  // those letters age out of the book (the attachment expiry windows). Its
+  // accepted consequences are #2450's own: a sender who renamed since
+  // sending is matched by their stale name, and a pre-senderKey letter TO
+  // this character whose senderName equals this character's name reads as
+  // self-addressed and is deleted (under unique names that sender is the
+  // deleted character or a prior holder of the reclaimed name). While the
+  // walk is here anyway, the deleted character's own pre-senderKey OUTGOING
+  // letters get their stable id stamped, so an eventual return flight lands
+  // on the dead id and self-destructs instead of reaching whoever reclaims
+  // the freed display name. Returns whether anything changed.
   purgeMailOwner(characterId: number, name: string): boolean {
     if (!Number.isFinite(characterId)) return false;
     const key = String(characterId);
@@ -707,6 +715,12 @@ export class PostOffice {
     let changed = false;
     for (let i = this.mail.length - 1; i >= 0; i--) {
       const m = this.mail[i];
+      // The outgoing stamp (see the header): pre-senderKey mail this
+      // character SENT gets the stable id while the book is being walked.
+      if (m.senderKey === undefined && name !== '' && m.senderName === name) {
+        m.senderKey = key;
+        changed = true;
+      }
       if (!owns(m.recipientKey)) continue;
       changed = true;
       const escrowed = m.copper > 0 || m.items.length > 0;

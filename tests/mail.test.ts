@@ -640,6 +640,16 @@ describe('purgeMailOwner - deleting a character', () => {
       alice,
     );
     sim.mailSendResolved({ key: DOOMED_KEY, name: 'Doomed' }, 'Note', 'Just words.', 0, [], alice);
+    // A goods-only parcel (items, zero copper): the items arm of the escrow
+    // predicate must fly it home on its own.
+    sim.mailSendResolved(
+      { key: DOOMED_KEY, name: 'Doomed' },
+      'Goods',
+      'Take these.',
+      0,
+      [{ itemId: 'roasted_boar', count: 3 }],
+      alice,
+    );
     sim.mailSendResolved(
       { key: 'Doomed', name: 'Doomed' },
       'Legacy',
@@ -679,6 +689,11 @@ describe('purgeMailOwner - deleting a character', () => {
     expect(legacy.recipientKey).toBe(aliceKey);
     expect(legacy.copper).toBe(250);
     expect(legacy.returned).toBe(true);
+    const goods = letterBy(sim, (m) => m.subject === 'Goods', 'goods-only parcel');
+    expect(goods.recipientKey).toBe(aliceKey);
+    expect(goods.copper).toBe(0);
+    expect(goods.items).toEqual([{ itemId: 'roasted_boar', count: 3 }]);
+    expect(goods.returned).toBe(true);
 
     // The bare note and the authored parcel are gone; the bystander keeps his.
     expect(bookOf(sim).some((m) => m.subject === 'Note')).toBe(false);
@@ -700,6 +715,74 @@ describe('purgeMailOwner - deleting a character', () => {
     const inbox = sim.mailInfoFor(alice)?.messages ?? [];
     expect(inbox.find((m) => m.subject === 'Parcel')?.copper).toBe(500);
     expect(inbox.find((m) => m.subject === 'Legacy')?.copper).toBe(250);
+  });
+
+  it('a pre-senderKey letter decides its fate by sender NAME, and the purge stamps outgoing mail', () => {
+    // At ship time EVERY letter written before #2450 lacks senderKey, so the
+    // name fallback is the live path, not an ancient edge. Three arms:
+    // (a) a stranger's pre-senderKey parcel still flies home, keyed by their
+    //     display name (the dual-key read lets them claim it);
+    // (b) a pre-senderKey parcel whose senderName EQUALS the purged name
+    //     reads as self-addressed and is deleted (the documented edge);
+    // (c) the purge stamps the deleted character's own pre-senderKey
+    //     OUTGOING letters with the stable id, so a later return flight
+    //     lands on the dead id instead of a future holder of the name.
+    const sim = makeWorld();
+    sim.addPlayer('warrior', 'Doomed', { characterId: DOOMED_ID });
+    const alice = sim.addPlayer('mage', 'Alice', { characterId: 501 });
+    const bob = sim.addPlayer('rogue', 'Bob', { characterId: 502 });
+    const bobMeta = sim.meta(bob);
+    const aliceMeta = sim.meta(alice);
+    if (!bobMeta || !aliceMeta) throw new Error('no meta');
+    aliceMeta.copper = 10_000; // coin for the escrow and postage
+
+    sim.mailSendResolved(
+      { key: DOOMED_KEY, name: 'Doomed' },
+      'OldParcel',
+      'From before the ids.',
+      120,
+      [],
+      alice,
+    );
+    sim.mailSendResolved(
+      { key: DOOMED_KEY, name: 'Doomed' },
+      'OldSelf',
+      'Mine to mine.',
+      80,
+      [],
+      alice,
+    );
+    sim.mailSendResolved(
+      { key: sim.postOffice.mailKeyFor(bobMeta), name: 'Bob' },
+      'OldOutgoing',
+      'From Doomed to Bob.',
+      60,
+      [],
+      alice,
+    );
+    // Rewind all three to the pre-#2450 shape: no senderKey; the self and
+    // outgoing arms carry the deleted character's display name as sender.
+    for (const m of bookOf(sim)) {
+      if (m.subject === 'OldParcel') m.senderKey = undefined;
+      if (m.subject === 'OldSelf' || m.subject === 'OldOutgoing') {
+        m.senderKey = undefined;
+        m.senderName = 'Doomed';
+      }
+    }
+
+    expect(sim.purgeMailOwner(DOOMED_ID, 'Doomed')).toBe(true);
+
+    // (a) the stranger's parcel flew home by NAME, claimable via dual keys.
+    const returned = letterBy(sim, (m) => m.subject === 'OldParcel', 'returned old parcel');
+    expect(returned.recipientKey).toBe('Alice');
+    expect(returned.returned).toBe(true);
+    expect(returned.copper).toBe(120);
+    // (b) the name-matched letter read as self-addressed and is gone.
+    expect(bookOf(sim).some((m) => m.subject === 'OldSelf')).toBe(false);
+    // (c) the outgoing letter survives (it belongs to Bob) with the stable
+    // id stamped in place of the reclaimable name.
+    const outgoing = letterBy(sim, (m) => m.subject === 'OldOutgoing', 'outgoing letter');
+    expect(outgoing.senderKey).toBe(DOOMED_KEY);
   });
 
   it('deletes a parcel whose return flight already ran rather than sending it round again', () => {

@@ -182,3 +182,29 @@ describe('duel: PvP combat affordances', () => {
     expect(warlock.hp).toBeGreaterThan(warlockHpBeforeDrain);
   });
 });
+
+describe('duel end and live profession sessions', () => {
+  it('the duel-ending clamped blow still ends the loser fishing session', () => {
+    // The 1 hp duel clamp early-returns before the shared damage tail, which
+    // is where the landed-hit session cancel lives: without its own cancel a
+    // duel loser kept fishing at 1 hp through the blow that ended the duel.
+    const { sim, a, b } = startedDuel();
+    const loser = sim.entities.get(b);
+    if (!loser) throw new Error('missing loser');
+    loser.castingAbility = 'fishing';
+    loser.castTotal = 15;
+    loser.castRemaining = 15;
+    loser.fishBiteAtTick = (sim as any).tickCount + 100;
+    loser.fishCastZoneId = 'eastbrook_vale';
+    const winner = sim.entities.get(a);
+    if (!winner) throw new Error('missing winner');
+
+    sim.dealDamage(winner, loser, loser.hp + 500, false, 'physical', null, 'hit');
+
+    expect(loser.hp).toBe(1);
+    expect((sim as any).duels.get(a)?.state ?? 'gone').not.toBe('active');
+    expect(loser.castingAbility).toBeNull();
+    expect(loser.fishBiteAtTick).toBe(0);
+    expect(loser.fishCastZoneId).toBe('');
+  });
+});

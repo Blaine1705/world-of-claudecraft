@@ -30,7 +30,11 @@ function ordinaryNpcId(): string {
   return entry.id;
 }
 
-function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
+function harness(
+  entity = npc(10, ordinaryNpcId()),
+  questState = 'available',
+  identityExtra: Record<string, unknown> = {},
+) {
   document.body.innerHTML = '';
   const element = document.createElement('div');
   element.id = 'quest-dialog';
@@ -60,6 +64,7 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
       switchCount: 0,
       amendsProgress: 0,
       amendsRequired: 5,
+      ...identityExtra,
     },
     questState: vi.fn(() => questState),
     targetEntity,
@@ -239,6 +244,26 @@ describe('QuestDialogController', () => {
 
     expect(ready.turnInQuest).toHaveBeenCalledWith('q_wolves');
     expect(ready.reportTelemetry).toHaveBeenCalledWith('quest_turnin', { timeMs: 0 });
+  });
+
+  it('the preview promises the REMEMBERED hobby when the identity carries one', () => {
+    // The controller must pass identity.questedHobbies through to the view:
+    // with the pass-through dropped, the preview silently reverts to the
+    // skill default, the exact defect the mirror exists to fix.
+    const darva = npc(33, 'forgemistress_darva');
+    darva.questIds = ['q_prof_attune_smith'];
+    const test = harness(darva, 'available', {
+      questedHobbies: { 'weaponcrafting+armorcrafting': 'tailoring' },
+    });
+    test.controller.open(darva.id);
+    test.element.querySelector<HTMLButtonElement>('[data-quest="q_prof_attune_smith"]')?.click();
+    const select = test.element.querySelector<HTMLSelectElement>('[data-profession-selection]');
+    const preview = test.element.querySelector<HTMLElement>('[data-profession-preview]');
+    if (!select) throw new Error('profession selector missing');
+    select.value = 'weaponcrafting+armorcrafting';
+    select.dispatchEvent(new Event('change'));
+    expect(preview?.textContent).toContain('Tailoring');
+    expect(preview?.textContent).not.toContain('Leatherworking');
   });
 
   it('previews and dispatches the selected profession attunement target', () => {

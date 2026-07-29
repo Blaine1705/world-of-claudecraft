@@ -213,10 +213,12 @@ export function fishingCatchGain(proficiency: number, isJunk: boolean): number {
 }
 
 /** The first facing-forward ring sample with fishable-depth water, or null.
- *  THE one walk: startFishing's water check and its rod-zone read consume
- *  the returned point, and the bobber visual (src/render/fishing_bobber_core.ts)
- *  anchors on the same call, so the bobber always floats exactly where the
- *  gate looked. Pure and draw-free. */
+ *  THE one walk for the sim: startFishing's water check and its rod-zone
+ *  read consume the returned point. The bobber visual
+ *  (src/render/fishing_bobber_core.ts) deliberately mirrors the same ring
+ *  and depth rule with its own allocation-free walk (render per-frame
+ *  discipline); tests/fishing_bobber_core.test.ts pins the two walks in
+ *  lockstep so they cannot drift. Pure and draw-free. */
 export function firstFishableSampleAhead(
   x: number,
   z: number,
@@ -354,10 +356,15 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // against another zone's table. Mid-session displacement cannot un-pin
   // it: movement cancels a fishing cast (sim/player_motion.ts), a landed
   // hit cancels it even when a shield absorbs all of it (combat/damage.ts),
-  // and every teleport plus a /follow tow across a zone line cancels it
-  // through the shared displacement helper
-  // (professions/session_teardown.ts). Turning in place moves the probe but
-  // never the pinned zone, which is exactly why the pin exists.
+  // teleports and a /follow tow across a zone line cancel it through the
+  // shared displacement helper (professions/session_teardown.ts), and the
+  // arena family clears sessions in its own placement resets. What does
+  // NOT cancel is a displacement with no hit and no teleport (a hostile
+  // damage-free knockback, a leap or charge already in flight): the PIN is
+  // what makes those harmless, because the table, deed credit, and
+  // telemetry stay on the zone the gate validated no matter where the body
+  // ends up. Turning in place moves the probe but never the pinned zone,
+  // which is exactly why the pin exists.
   //
   // zoneAt SATURATES at the world edges (any z past the last zone resolves to
   // thornpeak_heights), and instanced spaces are laid out along z, so a

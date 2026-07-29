@@ -37,6 +37,7 @@ import { abilitiesKnownAt, DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { createMob, createNpc, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
+import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { ArenaReturnPools, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -1860,6 +1861,10 @@ function policePitch(ctx: SimContext, match: VcMatch): void {
     else if (nearest === dS) nlz = PITCH.zMin - VC_PITCH_EJECT_MARGIN;
     else if (nearest === dE) nlx = PITCH.xMax + VC_PITCH_EJECT_MARGIN;
     else nlx = PITCH.xMin - VC_PITCH_EJECT_MARGIN;
+    // A bystander swept off the pitch is displaced like any other teleport:
+    // a live gather/fishing session (a herb node sits inside the Sowfield
+    // bounds) must not travel with them.
+    cancelProfessionSessionOnDisplacement(ctx, e);
     e.pos = ctx.groundPos(nlx + ox, nlz + oz);
     e.prevPos = { ...e.pos }; // hard teleport: no interpolated streak across the boards
     ctx.rebucket(e);

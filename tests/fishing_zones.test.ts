@@ -845,6 +845,49 @@ describe('the rod gate reads the WATER zone at the probe point', () => {
     expect(sim.player.castingAbility).toBeNull();
   });
 
+  it('a missed reel and the session cap both book the got-away under the pinned zone and band', () => {
+    // The two casting_lifecycle emissions are the only consumers of the
+    // pinned zone and the effective band on the got-away path; every other
+    // fixture sits on the vale shore at band 0, where a position read and a
+    // literal 0 are indistinguishable from the real reads. This one is not:
+    // the pin is mirefen while the caster stands in eastbrook, and the band
+    // is 1 (tier-2 rod, proficiency past the band-1 threshold).
+    setActiveWorldContent(borderLakeContent());
+    const sim = makeSim();
+    const meta = sim.meta(sim.playerId) as PlayerMeta;
+    sim.addItem('ironreel_fishing_rod', 1);
+    meta.gatheringProficiency.fishing = 200; // prof band 2; rod band 1 caps it
+    placeAtBorderShore(sim);
+    const p = sim.player;
+    startFishing(sim.ctx, p, meta);
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    expect(p.fishCastZoneId).toBe('mirefen_marsh');
+    // The miss arm: one past the reel deadline.
+    sim.tickCount = p.fishBiteAtTick;
+    updateCasting(sim.ctx, p, meta);
+    sim.tickCount = p.fishReelDeadlineTick + 1;
+    sim.events = [];
+    updateCasting(sim.ctx, p, meta);
+    expect(sim.events).toContainEqual({
+      type: 'fishingGotAway',
+      pid: sim.playerId,
+      zoneId: 'mirefen_marsh',
+      band: 1,
+    });
+    // The defensive session-cap arm, same pins.
+    startFishing(sim.ctx, p, meta);
+    p.castRemaining = DT;
+    p.fishBiteAtTick = sim.tickCount + 999;
+    sim.events = [];
+    updateCasting(sim.ctx, p, meta);
+    expect(sim.events).toContainEqual({
+      type: 'fishingGotAway',
+      pid: sim.playerId,
+      zoneId: 'mirefen_marsh',
+      band: 1,
+    });
+  });
+
   it('with the water zone tier satisfied, the session pins and fishes the WATER zone', () => {
     setActiveWorldContent(borderLakeContent());
     const sim = makeSim();

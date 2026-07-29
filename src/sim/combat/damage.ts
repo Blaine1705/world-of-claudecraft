@@ -487,6 +487,11 @@ export function dealDamage(
     if (target.hp - amount < 1) {
       amount = Math.max(0, target.hp - 1);
       target.hp = 1;
+      // The duel-terminal early return skips the shared tail below, including
+      // the landed-hit session cancel: without this a duel-ending blow left
+      // the loser fishing at 1 hp. Spell casts keep the classic no-cancel
+      // (the tail's pushback never applied to this terminal hit either).
+      if (isNonSpellCast(target.castingAbility)) ctx.cancelCast(target);
       ctx.emit({
         type: 'damage',
         sourceId: source?.id ?? -1,

@@ -4,11 +4,15 @@
 // advance, revive, the server-side jail/spectate/dev moves) and a /follow
 // tow across a zone line calls this ONE helper instead of growing its own
 // copy of the cancel. The scope is the ruling's, exactly: every teleport,
-// plus the follow tow ON A ZONE CROSSING. A same-zone tow deliberately does
-// NOT cancel: the gather half is safe anyway (completion re-checks node
-// range), and a fishing reel after a same-zone tow off the water is an
-// accepted classic-era oddity, not a rod-tier dodge (the pinned session
-// zone cannot change without a crossing).
+// plus the follow tow ON A ZONE CROSSING. The arena family (arena, fiesta,
+// Vale Cup, Yumi placements) clears sessions in its own resets instead of
+// through this helper. A same-zone tow deliberately does NOT cancel (the
+// gather half re-checks node range at completion, and a reel off the water
+// is an accepted classic-era oddity, not a rod-tier dodge), and neither
+// does a displacement with no hit and no teleport (a hostile damage-free
+// knockback, a leap or charge already in flight): the pinned session zone
+// bounds those, keeping the table, deed credit, and telemetry on the zone
+// the gate validated.
 // Gated on isNonSpellCast so SPELL casts gain no new cancel path here
 // (teleports that should break a spell keep their own rules), and delegated
 // to the one cancelCast on the seam, which already clears the queued-spell

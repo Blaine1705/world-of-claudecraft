@@ -1275,6 +1275,10 @@ describe('legacy DELETE dispatch arm (main.ts)', () => {
     const okGuardAt = arm.indexOf('if (ok) {');
     expect(okGuardAt).toBeGreaterThan(deleteAt);
     expect(purgeAt).toBeGreaterThan(okGuardAt);
+    // INSIDE the braces, awaited: the ok-block holds no nested braces before
+    // the call, so a single-level scan is exact. A purge hoisted past the
+    // closing brace, or fired without await (racing the response), reds here.
+    expect(arm).toMatch(/if \(ok\) \{[^{}]*await purgeDeletedCharacterWorldState\(/);
     // Bound to the LIVE sim books, the same seam the injected runtime uses,
     // and keyed by the SAME id the delete used plus the loaded row's name.
     expect(arm).toContain('liveGame().purgeMarketSeller(');

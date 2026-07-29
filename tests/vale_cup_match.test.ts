@@ -1046,3 +1046,38 @@ describe('Vale Cup: the pitch is closed during a match', () => {
     }
   });
 });
+
+describe('the pitch police and live profession sessions', () => {
+  it('sweeping a bystander off the live pitch ends their gather session', () => {
+    // herb_eastbrook_4 sits at (23, -99), INSIDE the Sowfield bounds: a
+    // harvest can legally start on the open pitch, and the next match tick's
+    // policePitch eject is a hard teleport that must not carry the session.
+    const sim = makeWorld();
+    const a = addAt(sim, 'warrior', 'Kicker');
+    const b = addAt(sim, 'mage', 'Keeper');
+    startBout(sim, a, b);
+    for (const e of sim.entities.values()) {
+      if (e.kind !== 'mob') continue; // mob damage would cancel for the wrong reason
+      e.dead = true;
+      e.hp = 0;
+      e.aiState = 'dead';
+      e.respawnTimer = 9999;
+      e.corpseTimer = 9999;
+      e.inCombat = false;
+    }
+    const c = sim.addPlayer('warrior', 'Herbalist');
+    sim.addItem('gathering_sickle', 1, c);
+    teleport(sim, c, 23, -99);
+    expect(sim.harvestNode('herb_eastbrook_4', c)).toBe(true);
+    const e = sim.entities.get(c);
+    if (!e) throw new Error('missing herbalist');
+    expect(e.castingAbility).not.toBeNull();
+
+    sim.tick();
+
+    // Ejected past the boards, and the session ended with the teleport.
+    expect(isOnPitch(e.pos.x, e.pos.z)).toBe(false);
+    expect(e.castingAbility).toBeNull();
+    expect(e.gatherCastNodeId).toBe('');
+  });
+});

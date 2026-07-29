@@ -1302,7 +1302,8 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
   // Repeatable craft work orders (Professions 2.0): a master takes a
   // stack of their craft's staple material off your hands for coin, a light
   // economy sink on a fixed cadence (repeatCadenceTicks WORK_ORDER_CADENCE_TICKS).
-  // The collect turn-in consumes the materials (turnInQuestCore removeItem).
+  // The collect turn-in consumes the materials (turnInQuestCore via
+  // removePreferFungible: plain stacks first, signed copies last).
   // copperReward is floor(0.5 * summed vendor sell value of the requested
   // materials); xpReward matches the only repeatable-quest precedent in the game,
   // the make-amends band (100), since no zone-2/3 repeatable exists to scale to.

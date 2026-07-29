@@ -6396,8 +6396,9 @@ export class GameServer {
       // than from the event. It is the denominator for every rate below.
       // Observed post-tick: a cast cancelled in the SAME tick it started has
       // already cleared the pin, so that cast falls back to the position
-      // zone and the band reads post-tick state. A one-tick mis-attribution
-      // on a cancelled cast is accepted over a dedicated wire event.
+      // zone and the band reads post-tick state, and a caster who left the
+      // world that same tick is not counted at all. Both are accepted over
+      // a dedicated wire event.
       if (ev.type === 'castStart' && ev.ability === FISHING_CAST_ID) {
         const caster = this.sim.entities.get(ev.entityId);
         const casterMeta = this.sim.players.get(ev.entityId);

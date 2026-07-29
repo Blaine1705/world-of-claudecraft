@@ -3301,7 +3301,13 @@ export class Sim {
         ? { tierMailSent: Object.fromEntries(meta.tierMailSent) }
         : {}),
       ...(meta.questedHobbies.size > 0
-        ? { questedHobbies: Object.fromEntries(meta.questedHobbies) }
+        ? {
+            // KEY-SORTED like the cprof view arm, so persisted blob diffs
+            // stay readable for the same reason the wire signature is stable.
+            questedHobbies: Object.fromEntries(
+              [...meta.questedHobbies.entries()].sort(([a], [b]) => (a < b ? -1 : 1)),
+            ),
+          }
         : {}),
       ...(meta.profTierTutorialSent ? { profTierTutorialSent: true } : {}),
       townFocus: { ...meta.townFocus },

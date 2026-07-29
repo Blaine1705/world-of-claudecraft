@@ -24,9 +24,9 @@ import {
   abilitiesKnownAt,
   CLASSES,
   DUNGEON_LIST,
+  getActiveWorldContent,
   ITEMS,
   QUESTS,
-  ZONES,
   zoneAt,
 } from '../data';
 import { formatMoney } from '../format_money';
@@ -107,16 +107,20 @@ export function partyReadout(ctx: SimContext, pid: number): string {
 // Self-only readout for "/zones": lists every overworld zone in travel order
 // (south -> north) with its level range, tagging the zone the player is in.
 // `currentZ` is the player's world Z (use zoneAt(currentZ) to find their zone).
-// ZONES is the ordered ZoneDef[] from ./data; each has .name and
-// .levelRange = [min, max].
+// The zone list is the ACTIVE content's ordered ZoneDef[]; each has .name
+// and .levelRange = [min, max].
 export function zonesReadout(currentZ: number): string {
-  if (ZONES.length === 0) return 'No zones are defined.';
+  // The ACTIVE zone list, so the roster and the "you are here" tag (zoneAt
+  // walks the active zones too) resolve the same world on a custom map;
+  // byte-identical on shipped hosts.
+  const zones = getActiveWorldContent().zones;
+  if (zones.length === 0) return 'No zones are defined.';
   const here = zoneAt(currentZ);
-  const parts = ZONES.map((z) => {
+  const parts = zones.map((z) => {
     const line = `${z.name} (Lvl ${z.levelRange[0]}-${z.levelRange[1]})`;
     return z.id === here.id ? `${line} [you are here]` : line;
   });
-  return `Zones (${ZONES.length}): ${parts.join(', ')}.`;
+  return `Zones (${zones.length}): ${parts.join(', ')}.`;
 }
 // Self-only readout of a character's Ashen Coliseum standing. Reads only the
 // persisted PlayerMeta arena fields (no new state). Draws count as neither a

@@ -101,14 +101,16 @@ describe('placement collideRadius override', () => {
 });
 
 describe('station furniture colliders follow the active bundle', () => {
-  const circlesNear = (x: number, z: number, r: number): number =>
+  const furnitureNear = (x: number, z: number, r: number): { x: number; z: number }[] =>
     colliderInternalsForTest
       .staticWorldColliders(SEED)
       .filter(
         (c) =>
           c.type === 'circle' &&
           Math.hypot((c as { x: number }).x - x, (c as { z: number }).z - z) < r,
-      ).length;
+      )
+      .map((c) => ({ x: (c as { x: number }).x, z: (c as { z: number }).z }));
+  const circlesNear = (x: number, z: number, r: number): number => furnitureNear(x, z, r).length;
 
   it('a bundle without services gets NO builtin station furniture', () => {
     const anchor = BUILTIN_WORLD.services?.stations?.[0]?.pos;
@@ -120,6 +122,60 @@ describe('station furniture colliders follow the active bundle', () => {
     // old builtin read left invisible anvils on every custom map).
     setActiveWorldContent(world({ services: undefined }));
     expect(circlesNear(anchor.x, anchor.z, 8)).toBeLessThan(withStations);
+  });
+
+  it('the furniture veto reads the ACTIVE npcs: an npc on the anchor suppresses furniture', () => {
+    const builtin = BUILTIN_WORLD.services;
+    if (!builtin?.stations?.length) throw new Error('builtin stations missing');
+    const custom = {
+      id: 's_veto_test',
+      type: builtin.stations[0].type,
+      zoneId: 'eastbrook_vale',
+      pos: { x: 0, z: -960 },
+      masterNpcId: builtin.stations[0].masterNpcId,
+    };
+    setActiveWorldContent(world({ services: { ...builtin, stations: [custom] } }));
+    const before = furnitureNear(0, -960, 10);
+    expect(before.length).toBeGreaterThan(0);
+    // The SAME bundle plus a custom npc standing ON one of the furniture
+    // spots: the never-wall-off-an-npc veto must read the active npcs and
+    // suppress that piece. A builtin-NPCS read cannot see this npc and
+    // changes nothing.
+    setActiveWorldContent(
+      world({
+        services: { ...builtin, stations: [custom] },
+        npcs: {
+          ...BUILTIN_WORLD.npcs,
+          npc_veto_probe: { pos: { x: before[0].x, z: before[0].z } },
+        } as unknown as WorldContent['npcs'],
+      }),
+    );
+    expect(furnitureNear(0, -960, 10).length).toBeLessThan(before.length);
+  });
+
+  it('the furniture veto reads the ACTIVE graveyards the same way', () => {
+    const builtin = BUILTIN_WORLD.services;
+    if (!builtin?.stations?.length) throw new Error('builtin stations missing');
+    const custom = {
+      id: 's_grave_test',
+      type: builtin.stations[0].type,
+      zoneId: 'eastbrook_vale',
+      pos: { x: 0, z: -960 },
+      masterNpcId: builtin.stations[0].masterNpcId,
+    };
+    setActiveWorldContent(world({ services: { ...builtin, stations: [custom] } }));
+    const before = furnitureNear(0, -960, 10);
+    expect(before.length).toBeGreaterThan(0);
+    setActiveWorldContent(
+      world({
+        services: {
+          ...builtin,
+          stations: [custom],
+          graveyards: [...(builtin.graveyards ?? []), { x: before[0].x, z: before[0].z }],
+        } as typeof builtin,
+      }),
+    );
+    expect(furnitureNear(0, -960, 10).length).toBeLessThan(before.length);
   });
 
   it('a custom station collides at ITS anchor', () => {

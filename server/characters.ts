@@ -299,7 +299,11 @@ export function buildCharacterList(
  * world_state rows alone (inside db.deleteCharacter, say) would be clobbered within
  * seconds. Each save is skipped when its purge reports no change. This assumes the
  * current one-process-per-realm topology: a second process serving the same realm
- * would re-persist its own un-purged copy.
+ * would re-persist its own un-purged copy. The two saves are deliberately NOT one
+ * transaction (unlike the leave path, whose atomicity guards an item duplicating
+ * between a bag and its escrow): a market listing and a mail parcel are independent
+ * escrows, each half is idempotent, and the autosave re-persists both, so a crash
+ * between them costs at most half a purge for thirty seconds.
  *
  * Exported so BOTH delete dispatch arms share one behavior: this module's
  * deleteHandler and the retained legacy ladder arm in main.ts (the API_DISPATCH=legacy
@@ -616,10 +620,12 @@ async function deleteHandler(ctx: Ctx): Promise<void> {
   const ok = await charactersDb.deleteCharacter(accountId, character.id);
   // The row is gone; take its shared world state with it (R43). Read freshness
   // comes from the SYNCHRONOUS in-memory purge (both reads serve from the live
-  // sim in this process); what the AWAITED saves buy is durability before the
-  // 200: a crash after the committed DELETE but before the next autosave would
-  // otherwise reload listings and mail keyed to a character that no longer
-  // exists, with no way to re-trigger the purge. Do not drop the await.
+  // sim in this process). The AWAITED saves NARROW the crash window before the
+  // 200: a death after the committed DELETE but before the blobs persist would
+  // reload listings and mail keyed to a character that no longer exists, with
+  // no way to re-trigger the purge. They cannot close it outright (the game
+  // save wrappers swallow their own errors and answer anyway; the 30 s
+  // autosave is the failure-path backstop), but do not drop the await.
   if (ok) await purgeDeletedCharacterWorldState(rt, character.id, character.name);
   json(ctx.res, ok ? 200 : 404, ok ? { ok: true } : NOT_FOUND);
 }
