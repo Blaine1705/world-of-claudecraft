@@ -307,6 +307,7 @@ export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | nu
   e.gatherCastNodeId = '';
   e.fishBiteAtTick = 0;
   e.fishReelDeadlineTick = 0;
+  e.fishCastZoneId = '';
   e.autoAttack = false;
   e.queuedOnSwing = null;
   delete e.queuedOnSwingFree;

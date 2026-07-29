@@ -21,6 +21,7 @@
 
 import type { DelveCompanionInfo } from '../../world_api';
 import { bagsFullError } from '../bags';
+import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { DelveShopGate, DelveShopOffer } from '../data';
 import {
   COMPANION_UPGRADE_COSTS,
@@ -395,6 +396,8 @@ export function enterDelve(ctx: SimContext, delveId: string, tierId: string, pid
   const slotIndex = ctx.partyMembersForKey(key).length;
   const pos = delveMemberSpawnPos(ctx, entry, slotIndex);
   const p = r.e;
+  // A live gather/fishing session never survives a delve teleport.
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.pos = pos;
   p.prevPos = { ...pos };
   ctx.rebucket(p);
@@ -429,6 +432,7 @@ export function leaveDelve(ctx: SimContext, pid?: number): void {
   if (run?.companion) ctx.despawnDelveCompanion(run);
   restorePetFromDelveStash(ctx, r.meta.entityId);
   const p = r.e;
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.pos = ctx.groundPos(delve.doorPos.x, delveExitDropZ(delve.doorPos.z, delve.id));
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
@@ -636,6 +640,8 @@ export function ejectToDelveDoor(
   const r = ctx.resolve(pid);
   if (!r) return;
   const p = r.e;
+  // A live free eject (nobody died) still displaces: end any session first.
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.dead = false;
   const door = ctx.groundPos(delve.doorPos.x, delveExitDropZ(delve.doorPos.z, delve.id));
   p.pos = delveMemberSpawnPos(ctx, door, slotIndex);
@@ -1000,6 +1006,7 @@ export function advanceDelveModule(ctx: SimContext, run: DelveRun): void {
   members.forEach((pid, i) => {
     const p = ctx.entities.get(pid);
     if (!p || p.dead) return;
+    cancelProfessionSessionOnDisplacement(ctx, p);
     const pos = delveMemberSpawnPos(ctx, entry, i);
     p.pos = pos;
     p.prevPos = { ...pos };

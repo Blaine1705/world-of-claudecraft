@@ -107,6 +107,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     gatherCastNodeId: '',
     fishBiteAtTick: 0,
     fishReelDeadlineTick: 0,
+    fishCastZoneId: '',
     channeling: false,
     channelTickTimer: 0,
     channelTickEvery: 0,

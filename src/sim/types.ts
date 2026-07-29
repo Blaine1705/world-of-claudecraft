@@ -2945,8 +2945,8 @@ export interface Entity extends ClientMirroredEntityFields {
   // aimed at, captured (server-clamped to range) when the cast begins and read by
   // its area effects when it resolves. null for normal entity/self casts.
   castAim: Vec3 | null;
-  // Hidden per-cast state (Professions 2.0). All three are
-  // transient: initialized inert ('' / 0) at entity creation, nonzero ONLY
+  // Hidden per-cast state (Professions 2.0). All four are
+  // transient: initialized inert ('' / 0) at entity creation, non-inert ONLY
   // between a real cast start and its end, and cleared on EVERY end path
   // (completion, reel, miss, cancelCast). Parity contract: while inert they
   // canonicalize away (omitDefaults), so existing goldens stay byte-identical;
@@ -2959,6 +2959,10 @@ export interface Entity extends ClientMirroredEntityFields {
   fishBiteAtTick: number;
   /** Sim-tick deadline for the fishing reel re-press (0 = window not armed). */
   fishReelDeadlineTick: number;
+  /** Zone id of the water the fishing cast was validated against (the probe
+   *  point's zone, pinned at cast start; '' = no live fishing session).
+   *  completeFishing resolves the catch table and deed credit from it. */
+  fishCastZoneId: string;
   channeling: boolean;
   channelTickTimer: number;
   channelTickEvery: number;

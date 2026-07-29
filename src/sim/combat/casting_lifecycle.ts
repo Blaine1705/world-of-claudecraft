@@ -318,6 +318,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       p.castRemaining = 0;
       p.fishBiteAtTick = 0;
       p.fishReelDeadlineTick = 0;
+      p.fishCastZoneId = '';
       ctx.emit({ type: 'castStop', entityId: p.id, success: false });
       return;
     }
@@ -382,6 +383,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       ctx.emit({ type: 'fishingGotAway', pid: p.id });
       p.fishBiteAtTick = 0;
       p.fishReelDeadlineTick = 0;
+      p.fishCastZoneId = '';
       ctx.emit({ type: 'castStop', entityId: p.id, success: false });
       return;
     }
@@ -489,13 +491,15 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   // an interrupted cast never completed, so its queued follow-up is dropped too
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
-  // Hidden per-cast fishing/gather state: unconditional inert writes (all three
+  // Hidden per-cast fishing/gather state: unconditional inert writes (all four
   // are already '' / 0 on every non-fishing/gather cancel path), so every
   // existing cancel stays byte-identical while a cancelled gather or fishing
-  // cast can never leak a stale node id or bite deadline into a later cast.
+  // cast can never leak a stale node id, bite deadline, or pinned zone into
+  // a later cast.
   p.gatherCastNodeId = '';
   p.fishBiteAtTick = 0;
   p.fishReelDeadlineTick = 0;
+  p.fishCastZoneId = '';
   ctx.emit({ type: 'castStop', entityId: p.id, success: false });
 }
 

@@ -1040,6 +1040,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   e.gatherCastNodeId = '';
   e.fishBiteAtTick = 0;
   e.fishReelDeadlineTick = 0;
+  e.fishCastZoneId = '';
   ctx.emit({ type: 'death', entityId: e.id, killerId: killer?.id ?? -1 });
 
   // a dead mob keeps no raid marker — respawnMob reuses the same entity id,

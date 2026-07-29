@@ -6,13 +6,21 @@
 // tests/material_grades.test.ts derives its own gather-tier column, so
 // re-tiering a zone's ground and leaving its water behind fails loudly
 // instead of quietly moving who can fish where.
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { updateCasting } from '../src/sim/combat/casting_lifecycle';
 import { DEEDS } from '../src/sim/content/deeds';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
-import { DEEPFEN_SHALLOWS_LAKE, ITEMS, LAKE, ZONES, zoneAt } from '../src/sim/data';
+import {
+  BUILTIN_WORLD,
+  DEEPFEN_SHALLOWS_LAKE,
+  ITEMS,
+  LAKE,
+  setActiveWorldContent,
+  ZONES,
+  zoneAt,
+} from '../src/sim/data';
 import {
   completeFishing,
   FISH_BITE_DELAY_MAX_SEC,
@@ -791,3 +799,81 @@ function ZONE_THORNPEAK_LAKE(): { x: number; z: number; radius: number } {
   expect(lake, 'thornpeak_heights must ship fishable water').toBeDefined();
   return lake as { x: number; z: number; radius: number };
 }
+
+describe('the rod gate reads the WATER zone at the probe point', () => {
+  // A cross-boundary cast (caster on one side of a zone line, fishable water
+  // up to 24 yd ahead on the other) must answer to the WATER'S zone: the rod
+  // gate, the pinned session zone, and the catch table all resolve the probe
+  // point's zone, so standing on the cheap side cannot dodge the far side's
+  // tier. Builtin lakes sit well clear of every line, so the fixture authors
+  // a lake straddling z=180 (the eastbrook/mirefen border) via the active
+  // content registry; terrain carves the basin for declared lakes, so the
+  // water is genuinely fishable.
+  afterEach(() => setActiveWorldContent(null));
+
+  function borderLakeContent() {
+    const [vale, marsh, peaks] = ZONES;
+    return {
+      ...BUILTIN_WORLD,
+      zones: [vale, { ...marsh, lakes: [...marsh.lakes, { x: 0, z: 190, radius: 12 }] }, peaks],
+    };
+  }
+
+  function placeAtBorderShore(sim: Sim) {
+    const p = sim.player;
+    p.pos.x = 0;
+    p.pos.z = 176; // eastbrook side of the z=180 line
+    p.pos.y = terrainHeight(0, 176, sim.cfg.seed);
+    p.prevPos = { ...p.pos };
+    p.facing = 0; // due north: the probe ring walks into mirefen water
+  }
+
+  it('denies an eastbrook-side cast into mirefen water at mirefen tier', () => {
+    setActiveWorldContent(borderLakeContent());
+    const sim = makeSim();
+    const meta = sim.meta(sim.playerId) as PlayerMeta;
+    sim.addItem('simple_fishing_pole', 1);
+    placeAtBorderShore(sim);
+    expect(zoneAt(sim.player.pos.z).id).toBe('eastbrook_vale'); // the caster stands cheap-side
+    sim.events = [];
+    startFishing(sim.ctx, sim.player, meta);
+    const denies = deniedEvents(sim.events);
+    expect(denies).toHaveLength(1);
+    expect((denies[0] as { requiredTier: number }).requiredTier).toBe(
+      FISHING_ZONE_ROD_TIERS.mirefen_marsh,
+    );
+    expect(sim.player.castingAbility).toBeNull();
+  });
+
+  it('with the water zone tier satisfied, the session pins and fishes the WATER zone', () => {
+    setActiveWorldContent(borderLakeContent());
+    const sim = makeSim();
+    const meta = sim.meta(sim.playerId) as PlayerMeta;
+    sim.addItem('ironreel_fishing_rod', 1); // tier 2: mirefen's requirement
+    placeAtBorderShore(sim);
+    startFishing(sim.ctx, sim.player, meta);
+    expect(sim.player.castingAbility).toBe(FISHING_CAST_ID);
+    expect(sim.player.fishCastZoneId).toBe('mirefen_marsh');
+    // Every catch resolves mirefen rows, not the caster-side eastbrook rows.
+    const mirefenIds = new Set(
+      FISHING_TABLES_BY_BAND.flatMap((byZone) => byZone.mirefen_marsh.map((r) => r.itemId)),
+    );
+    const allIds = new Set(
+      FISHING_TABLES_BY_BAND.flatMap((byZone) =>
+        Object.values(byZone).flatMap((rows) => rows.map((r) => r.itemId)),
+      ),
+    );
+    const before = new Map(
+      [...allIds].filter((id): id is string => id !== null).map((id) => [id, sim.countItem(id)]),
+    );
+    sim.player.fishBiteAtTick = 0;
+    sim.player.fishReelDeadlineTick = 0;
+    sim.player.castingAbility = null;
+    for (let i = 0; i < 10; i++) completeFishing(sim.ctx, sim.player, meta);
+    const gained = [...before.keys()].filter((id) => sim.countItem(id) > (before.get(id) ?? 0));
+    expect(gained.length).toBeGreaterThan(0);
+    for (const id of gained) {
+      expect(mirefenIds.has(id), `${id} is not on mirefen_marsh's table`).toBe(true);
+    }
+  });
+});

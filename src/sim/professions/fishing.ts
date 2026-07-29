@@ -200,14 +200,26 @@ export function fishingCatchGain(proficiency: number, isJunk: boolean): number {
   return 0;
 }
 
-function hasFishableWaterAhead(ctx: SimContext, p: Entity): boolean {
-  const sin = Math.sin(p.facing);
-  const cos = Math.cos(p.facing);
-  return FISHING_SAMPLE_DISTANCES.some((d) => {
-    const x = p.pos.x + sin * d;
-    const z = p.pos.z + cos * d;
-    return groundHeight(x, z, ctx.cfg.seed) < waterLevelAt(x, z) - SWIM_DEPTH;
-  });
+/** The first facing-forward ring sample with fishable-depth water, or null.
+ *  THE one walk: startFishing's water check and its rod-zone read consume
+ *  the returned point, and the bobber visual (src/render/fishing_bobber_core.ts)
+ *  anchors on the same call, so the bobber always floats exactly where the
+ *  gate looked. Pure and draw-free. */
+export function firstFishableSampleAhead(
+  x: number,
+  z: number,
+  facing: number,
+  seed: number,
+): { x: number; z: number; water: number } | null {
+  const sin = Math.sin(facing);
+  const cos = Math.cos(facing);
+  for (const d of FISHING_SAMPLE_DISTANCES) {
+    const sx = x + sin * d;
+    const sz = z + cos * d;
+    const water = waterLevelAt(sx, sz);
+    if (groundHeight(sx, sz, seed) < water - SWIM_DEPTH) return { x: sx, z: sz, water };
+  }
+  return null;
 }
 
 function isAtDeepfenShallowsFishingSpot(p: Entity): boolean {
@@ -256,6 +268,7 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
     p.fishReelDeadlineTick = 0;
     ctx.emit({ type: 'castStop', entityId: p.id, success: true });
     completeFishing(ctx, p, meta);
+    p.fishCastZoneId = '';
     return;
   }
   if (p.inCombat) {
@@ -297,7 +310,8 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
     });
     return;
   }
-  if (!hasFishableWaterAhead(ctx, p)) {
+  const probe = firstFishableSampleAhead(p.pos.x, p.pos.z, p.facing, ctx.cfg.seed);
+  if (!probe) {
     ctx.error(meta.entityId, 'You need to face fishable water.');
     return;
   }
@@ -309,14 +323,20 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // of it a player facing dry ground in the peaks would be told to go and buy
   // a better rod when the thing actually missing is the water.
   //
-  // The zone comes from the SAME expression completeFishing resolves its
-  // catch table with (zoneAt(p.pos.z)), so a player is never denied for one
-  // zone's requirement and then fished against another zone's table. What
-  // makes that hold across the session, rather than just at this instant, is
-  // that movement cancels a fishing cast (sim/player_motion.ts) and so does a
-  // hit: there is no way to be carried into another zone mid-cast. A future
-  // move that does NOT cancel (a taxi, a knockback with no damage) would
-  // break it, and the fix then is to re-resolve the tier at the reel.
+  // The gate reads the WATER'S zone at the probe point (the first accepted
+  // ring sample, up to 24 yd out), never the caster's: a cross-boundary
+  // cast answers to the zone the fish actually come from, so standing on
+  // the cheap side of a line cannot dodge the far side's rod tier.
+  // completeFishing resolves its catch table and the deed credit from the
+  // SAME zone, pinned on the session at cast start (fishCastZoneId), so a
+  // player is never gated for one zone's requirement and then fished
+  // against another zone's table. Mid-session displacement cannot un-pin
+  // it: movement cancels a fishing cast (sim/player_motion.ts), a landed
+  // hit cancels it even when a shield absorbs all of it (combat/damage.ts),
+  // and every teleport plus a /follow tow across a zone line cancels it
+  // through the shared displacement helper
+  // (professions/session_teardown.ts). Turning in place moves the probe but
+  // never the pinned zone, which is exactly why the pin exists.
   //
   // zoneAt SATURATES at the world edges (any z past the last zone resolves to
   // thornpeak_heights), and instanced spaces are laid out along z, so a
@@ -324,7 +344,8 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // today because waterLevelAt returns -Infinity outside a declared lake and
   // every lake is in the overworld, so the water check above refuses first.
   // Author fishable water inside an instance and this needs a real answer.
-  const requiredRodTier = rodTierRequiredForZone(zoneAt(p.pos.z).id);
+  const probeZoneId = zoneAt(probe.z).id;
+  const requiredRodTier = rodTierRequiredForZone(probeZoneId);
   const ownedRodTier = bestOwnedGatherToolTier(meta.inventory, 'fishing', ITEMS);
   if (!canGatherTier(ownedRodTier, requiredRodTier)) {
     ctx.emit({
@@ -351,6 +372,7 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // session would fire unprompted one tick after it ends.
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
+  p.fishCastZoneId = probeZoneId;
   ctx.emit({
     type: 'castStart',
     entityId: p.id,
@@ -410,7 +432,10 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   const allowedBand = fishingRodBandFor(rodTier);
   const profBand = fishingBandFor(meta.gatheringProficiency.fishing ?? 0);
   const bandTables = FISHING_TABLES_BY_BAND[Math.min(profBand, allowedBand) as 0 | 1 | 2];
-  const table = bandTables[zoneAt(p.pos.z).id] ?? bandTables.eastbrook_vale;
+  // The zone the rod gate validated, pinned at cast start; the position
+  // fallback keeps direct test/parity drives (no startFishing) working.
+  const zoneId = p.fishCastZoneId || zoneAt(p.pos.z).id;
+  const table = bandTables[zoneId] ?? bandTables.eastbrook_vale;
   const total = table.reduce((sum, e) => sum + e.weight, 0);
   let roll = ctx.rng.next() * total;
   let caught: string | null = null;
@@ -462,7 +487,7 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   });
   // Book of Deeds: a real fish (never weeds or boots) from this zone's
   // waters feeds the per-zone first-cast mark.
-  onFishCaughtForDeeds(ctx, meta, zoneAt(p.pos.z).id, caught);
+  onFishCaughtForDeeds(ctx, meta, zoneId, caught);
   // Character XP: fishing deliberately grants NONE, on every branch above and
   // below. It is the only UNCAPPED gathering faucet (a catch needs no node and
   // no per-player respawn timer), so at the per-action XP a world-node harvest

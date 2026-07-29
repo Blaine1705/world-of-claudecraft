@@ -50,6 +50,7 @@ import {
   partyFrameIncomingHeals,
   partyFrameRole,
 } from '../src/sim/party_frame_info';
+import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/session_teardown';
 import type { ToolEffectConfirmMode } from '../src/sim/professions/tools';
 import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
@@ -1611,6 +1612,7 @@ export class GameServer {
       const priorGm = !!moderatorEntity.gm;
       const stowedPet = this.sim.stowPetForSpectate(moderator.pid);
       const limbo = this.sim.groundPos(SPECTATE_LIMBO_X, SPECTATE_LIMBO_Z);
+      cancelProfessionSessionOnDisplacement(this.sim.ctx, moderatorEntity);
       moderatorEntity.pos = limbo;
       moderatorEntity.prevPos = { ...limbo };
       this.sim.grid.update(moderatorEntity);
@@ -1648,6 +1650,7 @@ export class GameServer {
     }
     const moderatorEntity = this.sim.entities.get(moderator.pid);
     if (moderatorEntity) {
+      cancelProfessionSessionOnDisplacement(this.sim.ctx, moderatorEntity);
       moderatorEntity.pos = { ...state.savedPos };
       moderatorEntity.prevPos = { ...state.savedPos };
       this.sim.grid.update(moderatorEntity);
@@ -1671,6 +1674,10 @@ export class GameServer {
   private teleportSessionEntity(session: ClientSession, pos: { x: number; z: number }): void {
     const entity = this.sim.entities.get(session.pid);
     if (!entity) return;
+    // Server-side teleports bypass the sim's own paths, so the shared
+    // displacement teardown runs here too: a jailed or moderated angler's
+    // live session never travels with them.
+    cancelProfessionSessionOnDisplacement(this.sim.ctx, entity);
     const ground = this.sim.groundPos(pos.x, pos.z);
     entity.pos = ground;
     entity.prevPos = { ...ground };
@@ -2184,6 +2191,14 @@ export class GameServer {
   private async grantPlaytimePoints(): Promise<void> {
     const windowSecs = PLAYTIME_GRANT_MS / 1000;
     for (const session of this.clients.values()) {
+      // A linkdead session is held in this.clients for the whole disconnect grace,
+      // and the activity window (windowSecs) equals LINKDEAD_GRACE_MS exactly (both
+      // 5 minutes), so without this guard a player who gave input any time in the 5
+      // minutes before the socket dropped keeps passing the idle check for the
+      // entire grace and banks a durable grant while offline. Guarding here rather
+      // than rewinding lastInputAt on drop: resumeSession resets it to sim.time on
+      // resume, and other consumers (idle sweep, daily activity) read it too.
+      if (session.linkdead) continue; // disconnected: no playtime credit during grace
       if (this.sim.time - session.lastInputAt > windowSecs) continue; // idle: skip
       const last = this.lastPlaytimeGrantAt.get(session.accountId);
       if (last !== undefined && this.sim.time - last < windowSecs) continue;
@@ -3383,6 +3398,19 @@ export class GameServer {
 
   rekeyMailOwner(characterId: number, oldName: string, newName: string): boolean {
     return this.sim.rekeyMailOwner(characterId, oldName, newName);
+  }
+
+  // Character deletion (R43): the purge runs against the LIVE books, never the
+  // persisted blobs alone. flushPeriodicSaves re-persists this in-memory market
+  // and mail every AUTOSAVE_SECONDS, so a blob-only edit would be clobbered
+  // within half a minute; the caller follows these with saveMarket/saveMail so
+  // the purge reaches Postgres through the same serial writer.
+  purgeMarketSeller(characterId: number, name: string): boolean {
+    return this.sim.purgeMarketSeller(characterId, name);
+  }
+
+  purgeMailOwner(characterId: number, name: string): boolean {
+    return this.sim.purgeMailOwner(characterId, name);
   }
 
   // Close every open play_sessions row; called on graceful shutdown so the
@@ -5267,6 +5295,7 @@ export class GameServer {
         ) {
           const e = sim.entities.get(pid);
           if (e) {
+            cancelProfessionSessionOnDisplacement(sim.ctx, e);
             const p = sim.groundPos(msg.x, msg.z);
             e.pos = p;
             e.prevPos = { ...p };

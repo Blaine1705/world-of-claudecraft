@@ -963,6 +963,7 @@ export function readyArenaFighter(
   e.gatherCastNodeId = '';
   e.fishBiteAtTick = 0;
   e.fishReelDeadlineTick = 0;
+  e.fishCastZoneId = '';
   e.comboPoints = 0;
   e.comboUntil = -1;
   e.gcdRemaining = 0;

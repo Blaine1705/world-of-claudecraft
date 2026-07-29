@@ -33,6 +33,7 @@ import {
   RESURRECTION_SICKNESS_ID,
   resSicknessDuration,
 } from './resurrection';
+import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { dist2d, type Entity, emptyMoveInput, type Vec3 } from './types';
@@ -225,6 +226,9 @@ function reviveAt(
   p.ghost = false;
   p.corpsePos = null;
   p.corpseInstanceId = null;
+  // revivePlayerAt teleports even a LIVE target (wasDead only gates the
+  // respawn event), so a running gather/fishing session must end here too.
+  cancelProfessionSessionOnDisplacement(ctx, p);
   p.pos = ctx.groundPos(pos.x, pos.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);

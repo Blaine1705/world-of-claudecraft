@@ -827,3 +827,34 @@ describe('moderator spectate integration', () => {
     expect(restoredSnap.self.tal?.alloc).toEqual(moderatorMeta.talents);
   });
 });
+
+describe('jail teleports end a live profession session', () => {
+  it('/jail cancels a running fishing session at the teleport', async () => {
+    const server = new GameServer();
+    const moderatorWs = fakeWs();
+    const targetWs = fakeWs();
+    const moderator = joined(
+      server.join(moderatorWs, 70, 170, 'Moderator', 'warrior', null, false, {
+        isAdmin: true,
+        adminPermissions: MOD_PERMS,
+      }),
+    );
+    const target = joined(server.join(targetWs, 71, 171, 'Angler', 'rogue', null));
+    // A live session by direct assignment (the parity-drive precedent): the
+    // point under test is the jail teleport's teardown, not the cast start.
+    const angler = entity(server, target.pid);
+    angler.castingAbility = 'fishing';
+    angler.castTotal = 15;
+    angler.castRemaining = 15;
+    angler.fishBiteAtTick = server.sim.tickCount + 100;
+    angler.fishCastZoneId = 'eastbrook_vale';
+
+    command(server, moderator, '/jail "Angler" 5 fishing in court');
+
+    await vi.waitFor(() => expect(isInJailCage(entity(server, target.pid).pos)).toBe(true));
+    expect(angler.castingAbility).toBeNull();
+    expect(angler.fishBiteAtTick).toBe(0);
+    expect(angler.fishReelDeadlineTick).toBe(0);
+    expect(angler.fishCastZoneId).toBe('');
+  });
+});

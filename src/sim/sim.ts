@@ -333,6 +333,10 @@ import {
   normalizeGatheringProficiency,
 } from './professions/gathering';
 import { updateGuildTrendLetters } from './professions/guild_letter';
+import {
+  applyPairTransitionHobbyMemory,
+  normalizeHobbyMemoryOnLoad,
+} from './professions/hobby_memory';
 import type { MasterworkProc } from './professions/masterwork';
 import { applyMasteryReset, updateMasteryResetNotices } from './professions/mastery_reset';
 import {
@@ -344,6 +348,7 @@ import { applyNodeReadiness, serializeNodeReadiness } from './professions/node_p
 import { updateProfNudges } from './professions/prof_nudges';
 import { healDisplayRoundedProficiency } from './professions/proficiency_display_heal';
 import { type SalvageResult, salvageItem as salvageItemImpl } from './professions/salvage';
+import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import {
   applyPairTransitionTierMail,
   normalizeTierMailOnLoad,
@@ -1243,6 +1248,13 @@ export interface PlayerMeta {
   // ever recorded; baseline arming keeps deploy migration and fresh attunement
   // silent.
   tierMailSent: Map<string, number>;
+  // Per-pair quested hobby (Professions 2.0): canonical pair id -> the hobby
+  // craft this character explicitly chose through the hobby-switch quest while
+  // that pair was active (professions/hobby_memory.ts). A Map (empty -> inert
+  // `[]`, no golden churn), persisted with zero-default omission. Read at every
+  // pair transition so a make-amends return restores the quested choice instead
+  // of re-deriving the skill default; never written by a default.
+  questedHobbies: Map<string, string>;
   // One-time first-tier tutorial sent (Professions 2.0): flipped when a
   // character's first craft skill crosses tier 1 (professions/prof_nudges.ts).
   // Persisted in CharacterState so no later load can re-fire it (the
@@ -1451,6 +1463,10 @@ export interface CharacterState {
   // -> tier). Written only when non-empty (zero-default omission), so
   // older and unattuned saves stay byte-equal.
   tierMailSent?: Record<string, number>;
+  // Per-pair quested hobby (Professions 2.0; JSONB, canonical pair id ->
+  // craft id). Written only when non-empty (zero-default omission), so older
+  // saves and characters that never quested a hobby stay byte-equal.
+  questedHobbies?: Record<string, string>;
   // First-tier tutorial already sent (Professions 2.0; JSONB, optional
   // so older saves load cleanly and fire it once when they first qualify).
   // Written only when true (zero-default omission).
@@ -2337,6 +2353,7 @@ export class Sim {
       guildLetterSent: false,
       questCadence: new Map(),
       tierMailSent: new Map(),
+      questedHobbies: new Map(),
       profTierTutorialSent: false,
       profNudgeCadence: new Map(),
       archetype: emptyArchetypeState(),
@@ -2557,6 +2574,12 @@ export class Sim {
       // land inside the sub-second window the transition-time baseline exists
       // to close.
       pruneTierMailToActiveMajors(meta);
+      // Quested hobbies: pair ids the shipped ring still recognizes, holding a
+      // craft that is still one of that pair's hobby candidates. No prune here
+      // and none at the transitions either, deliberately: the record has to
+      // outlive the dormant period, since restoring a hobby quested BEFORE the
+      // character left the pair is the entire point (professions/hobby_memory.ts).
+      meta.questedHobbies = normalizeHobbyMemoryOnLoad(s.questedHobbies);
       meta.profTierTutorialSent = s.profTierTutorialSent === true;
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
@@ -3272,6 +3295,9 @@ export class Sim {
       })(),
       ...(meta.tierMailSent.size > 0
         ? { tierMailSent: Object.fromEntries(meta.tierMailSent) }
+        : {}),
+      ...(meta.questedHobbies.size > 0
+        ? { questedHobbies: Object.fromEntries(meta.questedHobbies) }
         : {}),
       ...(meta.profTierTutorialSent ? { profTierTutorialSent: true } : {}),
       townFocus: { ...meta.townFocus },
@@ -5168,6 +5194,7 @@ export class Sim {
     ) {
       return true; // wall/cliff
     }
+    const fromZ = p.pos.z;
     const resolved = this.resolveMove(p.pos.x, p.pos.z, nx, nz, BODY_RADIUS, p);
     p.pos.x = resolved.x;
     p.pos.z = resolved.z;
@@ -5175,6 +5202,14 @@ export class Sim {
     p.vy = 0;
     p.onGround = true;
     p.fallStartY = p.pos.y;
+    // A tow across a zone line ends a live gather/fishing session: the
+    // follow walk skips stepPlayerMotion (whose move-input cancel guards
+    // every self-propelled crossing), so without this a leader could carry
+    // an angler into another zone mid-session and fish it against the
+    // wrong zone's rules.
+    if (zoneAt(fromZ).id !== zoneAt(p.pos.z).id) {
+      cancelProfessionSessionOnDisplacement(this.ctx, p);
+    }
     return true;
   }
 
@@ -8828,6 +8863,11 @@ export class Sim {
     return this.market.rekeyMarketSeller(characterId, oldName, newName);
   }
 
+  /** Character deletion: drop the deleted seller's listings + collection (R43). */
+  purgeMarketSeller(characterId: number, name: string): boolean {
+    return this.market.purgeMarketSeller(characterId, name);
+  }
+
   marketSearch(query: MarketQuery, pid?: number): void {
     this.market.marketSearch(query, pid);
   }
@@ -8920,6 +8960,11 @@ export class Sim {
 
   rekeyMailOwner(characterId: number, oldName: string, newName: string): boolean {
     return this.postOffice.rekeyMailOwner(characterId, oldName, newName);
+  }
+
+  /** Character deletion: clear the deleted character's mailbox (R43). */
+  purgeMailOwner(characterId: number, name: string): boolean {
+    return this.postOffice.purgeMailOwner(characterId, name);
   }
 
   serializeMail(): MailSave {
@@ -9738,10 +9783,15 @@ export class Sim {
     const r = this.resolve(pid);
     if (!r) return false;
     const accepted = acceptArchetypeQuestImpl(this.ctx, r.meta.entityId, craftId);
-    // The shared pair-transition rule, exactly as the quest attunement path
-    // runs it (the prune is belt and braces here: accept requires no prior
-    // pair, so it can only clear entries that predate attunement).
-    if (accepted) applyPairTransitionTierMail(r.meta);
+    // The shared pair-transition rules, exactly as the quest attunement path
+    // runs them (both are belt and braces here: accept requires no prior pair,
+    // so the tier-mail prune can only clear entries that predate attunement,
+    // and a quested hobby can only have been recorded while some pair was
+    // already active, which this path refuses outright).
+    if (accepted) {
+      applyPairTransitionHobbyMemory(r.meta);
+      applyPairTransitionTierMail(r.meta);
+    }
     return accepted;
   }
 
@@ -9761,11 +9811,15 @@ export class Sim {
     const r = this.resolve(pid);
     if (!r) return false;
     const switched = switchArchetypeImpl(this.ctx, r.meta.entityId, craftId);
-    // The shared pair-transition rule, exactly as the quest attunement path
-    // runs it: retire the outgoing majors' acknowledgements, then baseline
-    // the new majors so a crossing before the next 1 Hz sweep is not
-    // swallowed.
-    if (switched) applyPairTransitionTierMail(r.meta);
+    // The shared pair-transition rules, exactly as the quest attunement path
+    // runs them: restore a hobby quested for the pair being switched INTO (a
+    // legacy wrapper still runs the full transition rule), then retire the
+    // outgoing majors' acknowledgements and baseline the new majors so a
+    // crossing before the next 1 Hz sweep is not swallowed.
+    if (switched) {
+      applyPairTransitionHobbyMemory(r.meta);
+      applyPairTransitionTierMail(r.meta);
+    }
     return switched;
   }
 
