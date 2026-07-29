@@ -1,11 +1,13 @@
-// The slot_tool_effect dispatch case over the live GameServer wire.
+// The slot_tool_effect and recharge_tool_effect dispatch cases over the live
+// GameServer wire.
 //
-// This exists because the case is DEV-GATED, and a gate nothing drives is a
-// gate nothing protects. Slotting mints a permanent live harvest bonus for
-// free (no item, no copper, no recipe, no cooldown, and re-sending refills the
-// charges), and there is no acquisition craft yet, so an ungated case would BE
-// the acquisition path for anyone able to send a frame. Both arms below are
-// load-bearing: refused with the env unset, accepted with it set.
+// The dev gate that used to sit on slot_tool_effect is GONE, and these arms
+// are its replacement: the command's price is now enforced by the resolver
+// itself (the mint consumes a crafted charm from the sender's own bags), so
+// a production realm accepts the command and the free-grant incident's
+// attack, a bare hand-built frame, mints nothing because the attacker holds
+// no charm. Both directions stay load-bearing: accepted WITH the charm,
+// refused (and charge-free, consumption-free) WITHOUT it.
 //
 // Harness copied from tests/professions_training_online.test.ts.
 import { describe, expect, it, vi } from 'vitest';
@@ -36,13 +38,6 @@ import { type ClientSession, GameServer } from '../server/game';
 import type { PlayerMeta } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 
-// alchemy -> the Highwatch apothecary (station_highwatch_apothecary).
-const RECIPE_ID = 'recipe_volatile_flux_elixir';
-const APOTHECARY_POS = { x: 7, z: 660 };
-
-// A field spot far outside every station circle and clear of camp pulls.
-const FIELD_POS = { x: 0, z: 150 };
-
 function fakeWs(): { sent: { t: string; list?: SimEvent[]; [k: string]: unknown }[]; ws: unknown } {
   const sent: { t: string; list?: SimEvent[] }[] = [];
   return {
@@ -63,19 +58,6 @@ function joinServer(
   return session;
 }
 
-function placeAt(server: GameServer, pid: number, pos: { x: number; z: number }): void {
-  const entities = (
-    server.sim as unknown as {
-      entities: Map<number, { pos: { x: number; z: number }; prevPos?: { x: number; z: number } }>;
-    }
-  ).entities;
-  const entity = entities.get(pid);
-  if (!entity) throw new Error(`no entity for pid ${pid}`);
-  entity.pos.x = pos.x;
-  entity.pos.z = pos.z;
-  entity.prevPos = { x: pos.x, z: pos.z };
-}
-
 function metaOf(server: GameServer, pid: number): PlayerMeta {
   const meta = (server.sim as unknown as { players: Map<number, PlayerMeta> }).players.get(pid);
   if (!meta) throw new Error(`no meta for pid ${pid}`);
@@ -90,60 +72,69 @@ function cmd(server: GameServer, session: ClientSession, body: Record<string, un
   server.handleMessage(session, JSON.stringify({ t: 'cmd', ...body }));
 }
 
-function trainResultsOf(sent: { t: string; list?: SimEvent[] }[]): SimEvent[] {
+function toolEffectResultsOf(sent: { t: string; list?: SimEvent[] }[]): SimEvent[] {
   return sent
     .filter((m) => m.t === 'events')
     .flatMap((m) => m.list ?? [])
-    .filter((ev) => ev.type === 'trainResult');
+    .filter((ev) => ev.type === 'toolEffectResult');
 }
 
-describe('slot_tool_effect is refused on the wire unless dev commands are enabled', () => {
-  const withDevCommands = (value: string | undefined, run: () => void): void => {
-    const prior = process.env.ALLOW_DEV_COMMANDS;
-    if (value === undefined) delete process.env.ALLOW_DEV_COMMANDS;
-    else process.env.ALLOW_DEV_COMMANDS = value;
-    try {
-      run();
-    } finally {
-      if (prior === undefined) delete process.env.ALLOW_DEV_COMMANDS;
-      else process.env.ALLOW_DEV_COMMANDS = prior;
-    }
-  };
-
-  it('mints NOTHING on a production realm, even with a valid tool carried', () => {
+describe('slot_tool_effect on a production realm: the charm is the gate now', () => {
+  it('mints NOTHING for a charm-less sender, dev env unset, and says so', () => {
+    // The free-grant incident's exact attack: a valid tool, a hand-built
+    // frame, no crafted charm. ALLOW_DEV_COMMANDS is deliberately NOT set
+    // anywhere in this suite: production shape.
+    expect(process.env.ALLOW_DEV_COMMANDS).toBeUndefined();
     const server = new GameServer();
     const fc = fakeWs();
     const session = joinServer(server, fc, 1, 'Slotter');
     const pid = session.pid as number;
     server.sim.addItem('copper_mining_pick', 1, pid);
-    withDevCommands(undefined, () => {
-      cmd(server, session, {
-        cmd: 'slot_tool_effect',
-        profession: 'mining',
-        effect: 'gatherers_cache',
-      });
+    cmd(server, session, {
+      cmd: 'slot_tool_effect',
+      profession: 'mining',
+      effect: 'gatherers_cache',
     });
-    // Absent, not empty: the whole absent-by-default contract rides on the
-    // command never reaching the sim.
+    // Absent, not empty: the whole absent-by-default contract rides on every
+    // deny arm returning before the lazy init.
     expect(metaOf(server, pid).toolEffectSlots).toBeUndefined();
+    // And the refusal is not silent: the pid-scoped result event names it.
+    routeTick(server);
+    const results = toolEffectResultsOf(fc.sent);
+    expect(results).toHaveLength(1);
+    expect(results[0]).toMatchObject({
+      action: 'slot',
+      ok: false,
+      reason: 'no_charm',
+      professionId: 'mining',
+    });
   });
 
-  it('mints the slot on a dev realm, so the gate is the ONLY thing refusing it', () => {
-    // Without this arm the test above would pass just as well if the command
-    // were broken outright, and the gate would be proving nothing.
+  it('mints the slot for a sender holding the charm, consuming it', () => {
     const server = new GameServer();
     const fc = fakeWs();
-    const session = joinServer(server, fc, 1, 'DevSlotter');
+    const session = joinServer(server, fc, 1, 'Crafter');
     const pid = session.pid as number;
     server.sim.addItem('copper_mining_pick', 1, pid);
-    withDevCommands('1', () => {
-      cmd(server, session, {
-        cmd: 'slot_tool_effect',
-        profession: 'mining',
-        effect: 'gatherers_cache',
-      });
+    server.sim.addItemInstance('gatherers_cache', { signer: 'Crafter' }, pid, 1);
+    cmd(server, session, {
+      cmd: 'slot_tool_effect',
+      profession: 'mining',
+      effect: 'gatherers_cache',
     });
-    expect(metaOf(server, pid).toolEffectSlots?.mining?.effectId).toBe('gatherers_cache');
+    const meta = metaOf(server, pid);
+    expect(meta.toolEffectSlots?.mining?.effectId).toBe('gatherers_cache');
+    // The consumed charm's signer became the slot's craftedBy, and the copy
+    // is gone: the mint is never free.
+    expect(meta.toolEffectSlots?.mining?.craftedBy).toBe('Crafter');
+    expect(server.sim.countItem('gatherers_cache', pid)).toBe(0);
+    routeTick(server);
+    expect(toolEffectResultsOf(fc.sent).at(-1)).toMatchObject({
+      action: 'slot',
+      ok: true,
+      professionId: 'mining',
+      effectId: 'gatherers_cache',
+    });
   });
 
   it('re-validates the payload sim-side rather than trusting the frame', () => {
@@ -152,39 +143,93 @@ describe('slot_tool_effect is refused on the wire unless dev commands are enable
     const session = joinServer(server, fc, 1, 'Malformed');
     const pid = session.pid as number;
     server.sim.addItem('copper_mining_pick', 1, pid);
-    withDevCommands('1', () => {
-      // Non-string fields fall out at the shape guard.
-      cmd(server, session, { cmd: 'slot_tool_effect', profession: 42, effect: 'gatherers_cache' });
-      cmd(server, session, { cmd: 'slot_tool_effect', profession: 'mining', effect: 7 });
-      // Unknown ids fall out sim-side.
-      cmd(server, session, {
-        cmd: 'slot_tool_effect',
-        profession: 'skinning',
-        effect: 'gatherers_cache',
-      });
-      cmd(server, session, {
-        cmd: 'slot_tool_effect',
-        profession: 'mining',
-        effect: 'no_such_effect',
-      });
-      expect(metaOf(server, pid).toolEffectSlots).toBeUndefined();
-      // A mode outside the union is passed THROUGH and refused by the sim, so
-      // the two hosts agree; laundering it to undefined here would have hit the
-      // sim default and turned a refusal into a success.
-      cmd(server, session, {
-        cmd: 'slot_tool_effect',
-        profession: 'mining',
-        effect: 'gatherers_cache',
-        mode: 'sometimes',
-      });
-      expect(metaOf(server, pid).toolEffectSlots).toBeUndefined();
-      // The control: the same frame minus the bad mode does land.
-      cmd(server, session, {
-        cmd: 'slot_tool_effect',
-        profession: 'mining',
-        effect: 'gatherers_cache',
-      });
-      expect(metaOf(server, pid).toolEffectSlots?.mining?.confirmMode).toBe('always');
+    server.sim.addItemInstance('gatherers_cache', { signer: 'Malformed' }, pid, 1);
+    // Non-string fields fall out at the shape guard.
+    cmd(server, session, { cmd: 'slot_tool_effect', profession: 42, effect: 'gatherers_cache' });
+    cmd(server, session, { cmd: 'slot_tool_effect', profession: 'mining', effect: 7 });
+    // Unknown ids fall out sim-side.
+    cmd(server, session, {
+      cmd: 'slot_tool_effect',
+      profession: 'skinning',
+      effect: 'gatherers_cache',
     });
+    cmd(server, session, {
+      cmd: 'slot_tool_effect',
+      profession: 'mining',
+      effect: 'no_such_effect',
+    });
+    expect(metaOf(server, pid).toolEffectSlots).toBeUndefined();
+    // A mode outside the union is passed THROUGH and refused by the sim, so
+    // the two hosts agree; laundering it to undefined here would have hit the
+    // sim default and turned a refusal into a success.
+    cmd(server, session, {
+      cmd: 'slot_tool_effect',
+      profession: 'mining',
+      effect: 'gatherers_cache',
+      mode: 'sometimes',
+    });
+    expect(metaOf(server, pid).toolEffectSlots).toBeUndefined();
+    // Every refusal above left the charm unconsumed.
+    expect(server.sim.countItem('gatherers_cache', pid)).toBe(1);
+    // The control: the same frame minus the bad mode does land.
+    cmd(server, session, {
+      cmd: 'slot_tool_effect',
+      profession: 'mining',
+      effect: 'gatherers_cache',
+    });
+    expect(metaOf(server, pid).toolEffectSlots?.mining?.confirmMode).toBe('always');
+    expect(server.sim.countItem('gatherers_cache', pid)).toBe(0);
+  });
+});
+
+describe('recharge_tool_effect over the wire', () => {
+  it('prices, consumes, and refills server-side; the event carries the price paid', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Recharger');
+    const pid = session.pid as number;
+    server.sim.addItem('copper_mining_pick', 1, pid);
+    server.sim.addItemInstance('gatherers_cache', { signer: 'Recharger' }, pid, 1);
+    cmd(server, session, {
+      cmd: 'slot_tool_effect',
+      profession: 'mining',
+      effect: 'gatherers_cache',
+    });
+    const meta = metaOf(server, pid);
+    const slot = meta.toolEffectSlots?.mining;
+    if (!slot) throw new Error('slot minted');
+    slot.durability = 0;
+    server.sim.addItem('arcane_dust', 10, pid);
+    cmd(server, session, { cmd: 'recharge_tool_effect', profession: 'mining' });
+    // Common pick, 20-charge fill, original crafter: ceil((20/10) * 0.5) = 1.
+    expect(slot.durability).toBe(20);
+    expect(slot.maxDurability).toBe(20);
+    expect(server.sim.countItem('arcane_dust', pid)).toBe(9);
+    routeTick(server);
+    expect(toolEffectResultsOf(fc.sent).at(-1)).toMatchObject({
+      action: 'recharge',
+      ok: true,
+      professionId: 'mining',
+      effectId: 'gatherers_cache',
+      materialItemId: 'arcane_dust',
+      count: 1,
+    });
+  });
+
+  it('refuses a slotless profession and a non-string frame without touching anything', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'NoSlot');
+    const pid = session.pid as number;
+    server.sim.addItem('copper_mining_pick', 1, pid);
+    server.sim.addItem('arcane_dust', 10, pid);
+    cmd(server, session, { cmd: 'recharge_tool_effect', profession: 42 });
+    cmd(server, session, { cmd: 'recharge_tool_effect', profession: 'mining' });
+    expect(server.sim.countItem('arcane_dust', pid)).toBe(10);
+    routeTick(server);
+    const results = toolEffectResultsOf(fc.sent);
+    // Only the well-formed frame reached the sim; it answered no_slot.
+    expect(results).toHaveLength(1);
+    expect(results[0]).toMatchObject({ action: 'recharge', ok: false, reason: 'no_slot' });
   });
 });

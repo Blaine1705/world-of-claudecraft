@@ -248,6 +248,7 @@ describe('a slotted tool effect changes the yield and never the draw stream', ()
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Access');
     sim.addItem('copper_mining_pick', 1, pid);
+    sim.addItem('artisans_eye', 1, pid); // the charm the slot consumes
     sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
     const slotted = (sim.players.get(pid) as PlayerMeta).toolEffectSlots?.mining;
     expect(slotted?.effectId, 'the effect really is slotted').toBe('artisans_eye');

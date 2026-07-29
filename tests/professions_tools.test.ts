@@ -24,8 +24,7 @@ import {
   NO_TOOL_OWNED,
   RARITY_DURABILITY_BONUS,
   rarityLadderIndex,
-  rechargeCost,
-  rechargeEffect,
+  resolveRechargeToolEffect,
   resolveToolEffectUse,
   slotEffect,
   startingDurabilityFor,
@@ -978,67 +977,155 @@ describe('tool effect slotting, on the axes the live harvest path has', () => {
   });
 });
 
-describe('effect recharge with original-crafter discount (#1137)', () => {
+describe('effect recharge with original-crafter discount (#1137, priced by R39, refilled by R30)', () => {
+  // A hand-built one-tool inventory: the R30 re-derive reads the best owned
+  // tool AT RECHARGE TIME, so every arm states its tool explicitly.
+  const holding = (...itemIds: string[]): InvSlot[] =>
+    itemIds.map((itemId) => ({ itemId, count: 1 }));
+
   it('isOriginalCrafter is true only when craftedBy matches the recharger', () => {
-    const slot = slotEffect('gatherers_cache', { craftedBy: 'player_alice' });
-    expect(isOriginalCrafter(slot, 'player_alice')).toBe(true);
-    expect(isOriginalCrafter(slot, 'player_bob')).toBe(false);
+    const slot = slotEffect('gatherers_cache', { craftedBy: 'Alice' });
+    expect(isOriginalCrafter(slot, 'Alice')).toBe(true);
+    expect(isOriginalCrafter(slot, 'Bob')).toBe(false);
     const noIdentity = slotEffect('gatherers_cache');
-    expect(isOriginalCrafter(noIdentity, 'player_alice')).toBe(false);
+    expect(isOriginalCrafter(noIdentity, 'Alice')).toBe(false);
   });
 
-  it('recharging via the original crafter costs strictly less than a generic recharge, in materials and time', () => {
-    const original = slotEffect('gatherers_cache', { craftedBy: 'player_alice' });
-    const generic = slotEffect('gatherers_cache', { craftedBy: 'player_alice' });
-    const costOriginal = rechargeCost(original, 'player_alice');
-    const costGeneric = rechargeCost(generic, 'player_bob');
-    expect(costOriginal.materials).toBeLessThan(costGeneric.materials);
-    expect(costOriginal.ticks).toBeLessThan(costGeneric.ticks);
+  it('the original crafter pays strictly fewer materials than a generic recharge of the same fill', () => {
+    const slot = slotEffect('gatherers_cache', { craftedBy: 'Alice', toolRarity: 'epic' });
+    slot.durability = 0;
+    const inventory = holding('arcanite_mining_pick');
+    const original = resolveRechargeToolEffect(inventory, 'mining', slot, 'Alice', {}, ITEMS);
+    const generic = resolveRechargeToolEffect(inventory, 'mining', slot, 'Bob', {}, ITEMS);
+    if (!original.ok || !generic.ok) throw new Error('both resolutions should price');
+    expect(original.count).toBeLessThan(generic.count);
+    // Same fill, same material: only the count moves with the discount.
+    expect(original.materialItemId).toBe(generic.materialItemId);
+    expect(original.newMax).toBe(generic.newMax);
   });
 
-  it('an effect slotted with no recorded crafter always pays the generic (higher) rate', () => {
-    const slot = slotEffect('artisans_eye');
-    const cost = rechargeCost(slot, 'player_anyone');
-    const genericFromKnownCrafter = rechargeCost(
-      slotEffect('artisans_eye', { craftedBy: 'player_alice' }),
-      'player_bob',
+  it('a slot with no recorded crafter always prices at the generic rate', () => {
+    const slot = slotEffect('artisans_eye', { toolRarity: 'epic' });
+    slot.durability = 0;
+    const inventory = holding('arcanite_mining_pick');
+    const anonymous = resolveRechargeToolEffect(inventory, 'mining', slot, 'Anyone', {}, ITEMS);
+    const knownCrafter = { ...slot, craftedBy: 'Alice' };
+    const generic = resolveRechargeToolEffect(inventory, 'mining', knownCrafter, 'Bob', {}, ITEMS);
+    expect(anonymous).toEqual(generic);
+  });
+
+  it('R39: the material identity is the disenchant ladder at the recharge-time tool rarity rung', () => {
+    const slot = slotEffect('gatherers_cache', { toolRarity: 'common' });
+    slot.durability = 0;
+    // Shipped rungs: common pick -> dust, rare tier-4 -> essence, epic tier-5
+    // -> shard. The SAME slot prices differently as the owned tool changes,
+    // which is exactly the R30-resolves-the-rung contract.
+    const atCommon = resolveRechargeToolEffect(
+      holding('copper_mining_pick'),
+      'mining',
+      slot,
+      'Anyone',
+      {},
+      ITEMS,
     );
-    expect(cost).toEqual(genericFromKnownCrafter);
+    const atRare = resolveRechargeToolEffect(
+      holding('thorium_mining_pick'),
+      'mining',
+      slot,
+      'Anyone',
+      {},
+      ITEMS,
+    );
+    const atEpic = resolveRechargeToolEffect(
+      holding('arcanite_mining_pick'),
+      'mining',
+      slot,
+      'Anyone',
+      {},
+      ITEMS,
+    );
+    if (!atCommon.ok || !atRare.ok || !atEpic.ok) throw new Error('all three should price');
+    expect(atCommon.materialItemId).toBe('arcane_dust');
+    expect(atRare.materialItemId).toBe('arcane_essence');
+    expect(atEpic.materialItemId).toBe('arcane_shard');
+    // The count scales with the fill: a full fill runs restored / 10
+    // materials, so the shipped rungs land on the R39 band's 2..5.
+    expect(atCommon.count).toBe(2);
+    expect(atRare.count).toBe(4);
+    expect(atEpic.count).toBe(5);
   });
 
-  it('a successful recharge restores durability to full and the bonus resumes applying', () => {
-    const slot = slotEffect('gatherers_cache', { craftedBy: 'player_alice' });
-    for (let i = 0; i < 200; i++) depleteEffect(slot);
-    expect(slot.durability).toBe(0);
-    const baseOutcome: HarvestOutcome = { quantity: 2, gradeToolTier: 3 };
-    expect(applyEffectBonus(slot, baseOutcome)).toEqual(baseOutcome);
-
-    const cost = rechargeCost(slot, 'player_alice');
-    const result = rechargeEffect(slot, 'player_alice', cost.materials);
-    expect(result.success).toBe(true);
-    expect(slot.durability).toBe(20);
-    // craftedBy is left untouched by a recharge.
-    expect(slot.craftedBy).toBe('player_alice');
-    const bonused = applyEffectBonus(slot, baseOutcome);
-    expect(bonused.quantity).toBe(baseOutcome.quantity + 1);
+  it('R39: a partial fill prices only the charges actually restored', () => {
+    const slot = slotEffect('gatherers_cache', { toolRarity: 'common' });
+    slot.durability = 15; // 5 restored of the 20 max at the common rung
+    const resolved = resolveRechargeToolEffect(
+      holding('copper_mining_pick'),
+      'mining',
+      slot,
+      'Anyone',
+      {},
+      ITEMS,
+    );
+    if (!resolved.ok) throw new Error('should price');
+    expect(resolved.restored).toBe(5);
+    expect(resolved.count).toBe(1); // ceil(5/10), floored at 1
   });
 
-  it('a recharge fails, and does not mutate the slot, when insufficient materials are provided', () => {
-    const slot = slotEffect('gatherers_cache', { craftedBy: 'player_alice' });
+  it('R30: the maximum re-derives from the CURRENT best tool, so an inflated mint is one fill at most', () => {
+    // Minted on a borrowed epic pick: 50 charges. The owner now holds only a
+    // common pick, so the re-derived max is 20: while charges sit above it,
+    // the recharge refuses outright (already_full), and once they spend to 12
+    // a recharge restores to 20, never back to 50.
+    const slot = slotEffect('gatherers_cache', { toolRarity: 'epic' });
+    expect(slot.maxDurability).toBe(50);
+    slot.durability = 30;
+    const inventory = holding('copper_mining_pick');
+    const refused = resolveRechargeToolEffect(inventory, 'mining', slot, 'Anyone', {}, ITEMS);
+    expect(refused).toEqual({ ok: false, reason: 'already_full' });
+    slot.durability = 12;
+    const resolved = resolveRechargeToolEffect(inventory, 'mining', slot, 'Anyone', {}, ITEMS);
+    if (!resolved.ok) throw new Error('should price');
+    expect(resolved.newMax).toBe(20);
+    expect(resolved.restored).toBe(8);
+  });
+
+  it('refuses with no real tool owned, and at-or-above the re-derived maximum', () => {
+    const slot = slotEffect('gatherers_cache', { toolRarity: 'common' });
     slot.durability = 0;
-    const cost = rechargeCost(slot, 'player_alice');
-    const result = rechargeEffect(slot, 'player_alice', cost.materials - 1);
-    expect(result.success).toBe(false);
-    expect(slot.durability).toBe(0);
+    expect(resolveRechargeToolEffect([], 'mining', slot, 'Anyone', {}, ITEMS)).toEqual({
+      ok: false,
+      reason: 'no_tool',
+    });
+    const full = slotEffect('gatherers_cache', { toolRarity: 'common' });
+    expect(
+      resolveRechargeToolEffect(holding('copper_mining_pick'), 'mining', full, 'Anyone', {}, ITEMS),
+    ).toEqual({ ok: false, reason: 'already_full' });
+    expect(
+      resolveRechargeToolEffect(
+        holding('copper_mining_pick'),
+        'skinning',
+        slot,
+        'Anyone',
+        {},
+        ITEMS,
+      ),
+    ).toEqual({ ok: false, reason: 'invalid_request' });
   });
 
-  it('the generic recharger still succeeds when providing the (higher) generic cost', () => {
-    const slot = slotEffect('quickening_charm', { craftedBy: 'player_alice' });
-    slot.durability = 0;
-    const cost = rechargeCost(slot, 'player_bob');
-    const result = rechargeEffect(slot, 'player_bob', cost.materials);
-    expect(result.success).toBe(true);
-    expect(slot.durability).toBe(20);
+  it('resolution never mutates the slot; the caller owns the fill', () => {
+    const slot = slotEffect('gatherers_cache', { craftedBy: 'Alice', toolRarity: 'common' });
+    slot.durability = 3;
+    const before = { ...slot };
+    const resolved = resolveRechargeToolEffect(
+      holding('copper_mining_pick'),
+      'mining',
+      slot,
+      'Alice',
+      {},
+      ITEMS,
+    );
+    if (!resolved.ok) throw new Error('should price');
+    expect(slot).toEqual(before);
   });
 });
 

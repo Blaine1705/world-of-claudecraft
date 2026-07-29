@@ -2764,6 +2764,18 @@ export const hudChromeStrings = {
       artisansEye: "Artisan's Eye",
       quickeningCharm: 'Springback Charm',
     },
+    // The toolEffectResult event's chat lines (the acquisition craft): one
+    // line per outcome, rendered off ids only (the event is text-free).
+    // {effect} and {profession} splice localized names; {material} splices a
+    // clickable item link, the craftedToast idiom.
+    toolEffectSlotted: '{effect} slotted on {profession}.',
+    toolEffectSlotInvalid: '{effect} cannot be slotted there.',
+    toolEffectNoTool: 'You need a real {profession} tool first.',
+    toolEffectNoCharm: 'You need a crafted {effect} charm in your bags.',
+    toolEffectRecharged: '{effect} recharged: {material} x{count} consumed.',
+    toolEffectRechargeNoSlot: 'No effect is slotted on {profession}.',
+    toolEffectRechargeFull: '{effect} is already fully charged.',
+    toolEffectRechargeMaterials: 'Recharging {effect} needs {material} x{count}.',
     tierPipAria: 'Tier {tier}',
     nextUnlockTier: '{points} points to the next tier: masterwork odds improve',
     nextUnlockSpecialized: '{points} points to Specialized: material costs drop',

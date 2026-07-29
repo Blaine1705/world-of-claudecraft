@@ -317,9 +317,11 @@ export const IWORLD_MEMBERS = [
   // Maker's Bond unbind service (Professions 2.0).
   { name: 'unbindItem', kind: 'method' },
   // Tool effect slotting: one read row per gathering profession that has a
-  // slotted effect, plus the command that installs one.
+  // slotted effect, the command that installs one (consuming a crafted charm
+  // copy), and the recharge command (the R39/R30 refill).
   { name: 'toolEffectSlots', kind: 'data' },
   { name: 'slotToolEffect', kind: 'method' },
+  { name: 'rechargeToolEffect', kind: 'method' },
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
   { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
@@ -497,10 +499,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // members on top of the branch's 272; making reins usable items then removed
     // two (selectedMount + selectMount) for 273; the v0.32.0 base merge adds
     // activeMasterLootRolls, leaving 274; the packet's slotted tool effects add
-    // toolEffectSlots (data) and slotToolEffect (method) for 276.
-    expect(IWORLD_MEMBERS.length).toBe(276);
+    // toolEffectSlots (data) and slotToolEffect (method) for 276, and the
+    // acquisition craft's recharge command (rechargeToolEffect) makes 277.
+    expect(IWORLD_MEMBERS.length).toBe(277);
     expect(DATA_MEMBERS.length).toBe(73);
-    expect(METHOD_MEMBERS.length).toBe(203);
+    expect(METHOD_MEMBERS.length).toBe(204);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -710,6 +713,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'raidLockouts',
       'readyCheckRespond',
       'realm',
+      'rechargeToolEffect',
       'recipeList',
       'releaseEmpoweredAbility',
       'releaseSpirit',
@@ -1012,6 +1016,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'questState',
       'raidLockouts',
       'readyCheckRespond',
+      'rechargeToolEffect',
       'releaseEmpoweredAbility',
       'releaseSpirit',
       'renamePet',
@@ -1525,6 +1530,7 @@ const FACET_PROFESSIONS = [
   'unbindItem',
   'toolEffectSlots',
   'slotToolEffect',
+  'rechargeToolEffect',
 ] as const satisfies readonly (keyof IWorldProfessions)[];
 type _ExhaustProfessions = AssertNever<
   Exclude<keyof IWorldProfessions, (typeof FACET_PROFESSIONS)[number]>
@@ -1613,8 +1619,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(276);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(276);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(277);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(277);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

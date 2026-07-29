@@ -4426,6 +4426,33 @@ export type SimEvent = { pid?: number } & (
       count?: number;
       reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled' | 'no_bag_space';
     }
+  // Tool-effect action outcome (the acquisition craft): the one result event
+  // for the slot_tool_effect and recharge_tool_effect commands, mirroring
+  // professions/tools.ts resolveSlotToolEffect / resolveRechargeToolEffect so
+  // the client renders the outcome without deciding it (the
+  // disenchant/salvage template above). Personal (pid = the actor). Text-free
+  // on purpose: ids only, localized client-side, so no sim/server i18n
+  // matcher rule is needed. On a recharge, `materialItemId`/`count` carry the
+  // R39 price actually paid (ok) or required (insufficient_materials), so the
+  // client can show the cost without a preview surface. `reason` is absent on
+  // success.
+  | {
+      type: 'toolEffectResult';
+      action: 'slot' | 'recharge';
+      ok: boolean;
+      professionId: string;
+      effectId?: string;
+      materialItemId?: string;
+      count?: number;
+      reason?:
+        | 'invalid_request'
+        | 'no_tool'
+        | 'no_charm'
+        | 'no_slot'
+        | 'already_full'
+        | 'insufficient_materials'
+        | 'throttled';
+    }
   // Recipe-training outcome (Professions 2.0): mirrors
   // professions/training.ts TrainResult so the online client can reflect the
   // local result of a train_recipe command without deciding it itself.

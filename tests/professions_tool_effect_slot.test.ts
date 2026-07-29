@@ -22,10 +22,22 @@ import { TOOL_EFFECT_NAME_KEYS } from '../src/ui/tool_effect_name';
 const makeSim = (seed = 11) => new Sim({ seed, playerClass: 'warrior', autoEquip: false });
 const metaOf = (sim: Sim): PlayerMeta => sim.meta(sim.playerId) as PlayerMeta;
 
-/** A sim whose player carries `itemId`, ready to slot. */
+/** Self-signed charm copies for both live effects (the acquisition craft's
+ *  own output shape: the craft signs every rare-def copy with the crafter's
+ *  name). A stack of each so multi-slot fixtures never run dry; Springback
+ *  has no item at all (the policy-derived craftable set). */
+function grantCharms(sim: Sim, count = 5): void {
+  const signer = metaOf(sim).name;
+  sim.addItemInstance('gatherers_cache', { signer }, sim.playerId, count);
+  sim.addItemInstance('artisans_eye', { signer }, sim.playerId, count);
+}
+
+/** A sim whose player carries `itemId` plus self-crafted charm copies of
+ *  both live effects, ready to slot. */
 function simHolding(itemId: string): Sim {
   const sim = makeSim();
   sim.addItem(itemId, 1);
+  grantCharms(sim);
   return sim;
 }
 
@@ -186,6 +198,74 @@ describe('slotting mints charges from the best owned tool rarity', () => {
   });
 });
 
+describe('the mint consumes a crafted charm (the acquisition craft price)', () => {
+  it('a successful slot consumes exactly one charm copy; a refusal consumes nothing', () => {
+    const sim = simHolding('copper_mining_pick'); // 5 self-signed copies each
+    expect(sim.countItem('gatherers_cache')).toBe(5);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(sim.countItem('gatherers_cache')).toBe(4);
+    // Refusals consume nothing, whatever the deny arm: unknown profession,
+    // policy-refused pair, no-tool profession, bad mode.
+    sim.slotToolEffect('not_a_profession', 'gatherers_cache');
+    sim.slotToolEffect('fishing', 'gatherers_cache');
+    sim.slotToolEffect('logging', 'gatherers_cache'); // pick is not an axe
+    sim.slotToolEffect('mining', 'gatherers_cache', 'prompt');
+    expect(sim.countItem('gatherers_cache')).toBe(4);
+    expect(sim.countItem('artisans_eye')).toBe(5);
+  });
+
+  it('refuses outright without a charm in bags, tool or no tool', () => {
+    const sim = makeSim();
+    sim.addItem('copper_mining_pick', 1);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    // Absent, not empty: the no-charm deny returns before the lazy init too.
+    expect(metaOf(sim).toolEffectSlots).toBeUndefined();
+  });
+
+  it('re-slotting consumes another charm: the reset-to-full is never free', () => {
+    // This is the R39 bypass math made concrete: a fresh mint resets charges
+    // to full, so it must always cost a whole charm (whose reagents exceed
+    // any recharge), never ride the first copy.
+    const sim = simHolding('copper_mining_pick');
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    const slot = metaOf(sim).toolEffectSlots?.mining;
+    if (!slot) throw new Error('slot minted');
+    slot.durability = 1;
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots?.mining?.durability).toBe(
+      startingDurabilityFor('gatherers_cache', 'common'),
+    );
+    expect(sim.countItem('gatherers_cache')).toBe(3);
+  });
+
+  it('prefers a self-signed copy, then an unsigned one, then the first foreign signature', () => {
+    const sim = makeSim();
+    sim.addItem('copper_mining_pick', 1);
+    const own = metaOf(sim).name;
+    // Bag order: foreign, unsigned, self-signed. Preference must override it.
+    sim.addItemInstance('gatherers_cache', { signer: 'Elsewhere' }, sim.playerId, 1);
+    sim.addItem('gatherers_cache', 1);
+    sim.addItemInstance('gatherers_cache', { signer: own }, sim.playerId, 1);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBe(own);
+    // The self-signed copy is gone; the other two survive.
+    const held = metaOf(sim)
+      .inventory.filter((entry) => entry.itemId === 'gatherers_cache')
+      .map((entry) => entry.instance?.signer);
+    expect(held.sort()).toEqual(['Elsewhere', undefined]);
+    // Next slot takes the unsigned copy (no provenance) over the foreign one.
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBeUndefined();
+    // Last copy standing: the foreign signature, faithfully recorded.
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBe('Elsewhere');
+    expect(sim.countItem('gatherers_cache')).toBe(0);
+    // And with the bags dry, the mint refuses.
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBe('Elsewhere');
+  });
+});
+
 describe('the read surface is one row per profession, sorted, and identity-free', () => {
   it('projects one row per slotted profession, sorted by profession id', () => {
     // THREE real tools, one per land gathering profession (fishing is refused
@@ -215,11 +295,11 @@ describe('the read surface is one row per profession, sorted, and identity-free'
   it('never projects craftedBy, so no other player identity reaches the client', () => {
     const sim = simHolding('copper_mining_pick');
     sim.slotToolEffect('mining', 'gatherers_cache');
-    // Left UNSET at slot time: its documented meaning is whoever produced the
-    // effect through a production craft, and no such craft exists, so recording
-    // the slotter would be both a lie and a permanent recharge discount.
-    expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBeUndefined();
-    // And the projection drops it regardless.
+    // The consumed self-signed charm's signer IS the slot's craftedBy (the
+    // acquisition craft's provenance chain): recorded server-side for the
+    // original-crafter recharge discount and NOTHING else.
+    expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBe(metaOf(sim).name);
+    // The projection drops it: identity stays sim-side.
     expect(Object.keys(sim.toolEffectSlots[0]).sort()).toEqual([
       'charges',
       'confirmMode',
@@ -274,6 +354,9 @@ describe('persistence: absent stays absent, present round-trips', () => {
       effectId: 'artisans_eye',
       durability: startingDurabilityFor('artisans_eye', 'epic'),
       maxDurability: startingDurabilityFor('artisans_eye', 'epic'),
+      // The crafter identity survives the round trip: the discount must still
+      // resolve after a relog, or provenance would be a session-only perk.
+      craftedBy: 'Adventurer',
       confirmMode: 'always',
     });
   });

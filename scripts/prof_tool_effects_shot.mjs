@@ -2,12 +2,10 @@
 // to the crafted top tools, the slotted tool-effect row in the Professions
 // window, and the rod tooltip's rarity-widened reel number.
 //
-// Offline client only. That matters for the middle frame: the slot_tool_effect
-// WIRE command is gated on ALLOW_DEV_COMMANDS (there is no acquisition craft
-// yet, so an ungated case would be a free unlimited grant), but the gate lives
-// in server/game.ts, so the offline Sim's own slotToolEffect is still callable
-// and paints a genuine row from real state. The frame therefore shows a state
-// no LIVE player can currently reach, which the PR body says outright.
+// Offline client only. The middle frame's state is live-reachable now: the
+// acquisition craft ships crafted charms and the slot command consumes one
+// (resolveSlotToolEffect), so this script grants the charm before slotting,
+// exactly the price a live player pays.
 //
 // Every capture verifies its own frame before writing: a shot that photographs
 // an empty window, a refusal or a banner is worse than none, so each step
@@ -185,6 +183,9 @@ async function toolEffectRow(page, label) {
     // A real tool is required by the resolver, and its RARITY decides the
     // charge count, so an epic pick is what makes the number worth showing.
     sim.addItem('arcanite_mining_pick', 1);
+    // The charm the slot consumes: the acquisition craft's price, paid here
+    // exactly as a live player pays it.
+    sim.addItem('gatherers_cache', 1);
     sim.slotToolEffect('mining', 'gatherers_cache');
     const meta = sim.meta(sim.playerId);
     const slot = meta.toolEffectSlots?.mining;

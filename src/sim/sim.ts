@@ -388,9 +388,9 @@ import {
   pruneTierMailToActiveMajors,
   updateTierMail,
 } from './professions/tier_mail';
+import { rechargeToolEffectAction, slotToolEffectAction } from './professions/tool_effect_actions';
 import {
   normalizeToolEffectSlots,
-  resolveSlotToolEffect,
   structuredCloneToolEffectSlots,
   type ToolEffectConfirmMode,
   type ToolEffectSlot,
@@ -10586,51 +10586,34 @@ export class Sim {
     return this.toolEffectSlotsFor(this.primaryId);
   }
 
-  // Slot an effect onto one gathering profession's tool. Server-authoritative
-  // and draw-free: every arm below is a validation or a plain assignment, so
-  // this can never move the rng stream a harvest walks.
+  // Slot an effect onto one gathering profession's tool, consuming one charm
+  // copy from bags. Thin delegate: the whole decision (six refusals, the
+  // owned-tool scan, WHICH charm copy is consumed and the craftedBy it
+  // stamps) lives in professions/tools.ts resolveSlotToolEffect, and the
+  // command body (consumption, the lazy slot write, the personal text-free
+  // toolEffectResult event every refusal now emits) lives in
+  // professions/tool_effect_actions.ts. Draw-free in every arm, so this can
+  // never move the rng stream a harvest walks.
   //
-  // The refusals are all silent, matching the deny-before-mutate shape
-  // resolveTrain uses; the full set (five today) lives in
-  // resolveSlotToolEffect (professions/tools.ts), not here. The owned-tool
-  // arm is the one that matters for balance: it reads the SAME owned-tool
-  // scan the node gate reads (bestOwnedGatherToolTierOrNone, which returns
-  // NO_TOOL_OWNED rather than the bare-hands floor), so an effect can never
-  // be slotted onto a profession the player has no tool for.
+  // The OFFLINE console handle (window.__game) can call this directly, but
+  // the resolver holds it to the same price: without a crafted charm in bags
+  // nothing mints, offline included (a determined offline self-cheater can
+  // addItem the charm first, which is /dev-equivalent and stays accepted).
   slotToolEffect(
     professionId: string,
     effectId: string,
     confirmMode: ToolEffectConfirmMode = 'always',
     pid?: number,
   ): void {
-    const r = this.ctx.resolve(pid);
-    if (!r) return;
-    // The whole decision (five refusals, the owned-tool scan, the rarity the
-    // charges are minted from) lives in professions/tools.ts, the resolveTrain
-    // shape: this coordinator only applies what the resolver returned. Refusals
-    // are SILENT and emit no event, which is safe only because nothing
-    // player-reachable can call this today (see the dev gate on the wire
-    // command in server/game.ts). An acquisition craft must add a result event
-    // before this becomes reachable, or a refused slot is invisible.
-    //
-    // ACCEPTED, deliberately: the OFFLINE console handle (window.__game) can
-    // call this ungated. A player cheating their own offline world is
-    // /dev-equivalent (no server, no other players, nothing persists beyond
-    // their browser), so it gets no gate, the same stance every other Sim
-    // command takes offline.
-    const resolved = resolveSlotToolEffect(
-      r.meta.inventory,
-      professionId,
-      effectId,
-      confirmMode,
-      ITEMS,
-    );
-    if (!resolved) return;
-    // Created lazily HERE, never in makeMeta: the absent-by-default field is
-    // what keeps a player who has never slotted an effect byte-identical in
-    // the parity digest.
-    r.meta.toolEffectSlots ??= {};
-    r.meta.toolEffectSlots[resolved.professionId] = resolved.slot;
+    slotToolEffectAction(this.ctx, professionId, effectId, confirmMode, pid);
+  }
+
+  // Recharge one gathering profession's slotted effect for its owner: the
+  // R39 arcane-material price at the R30 re-derived fill. Thin delegate into
+  // professions/tool_effect_actions.ts (the resolver half is
+  // professions/tools.ts resolveRechargeToolEffect); draw-free in every arm.
+  rechargeToolEffect(professionId: string, pid?: number): void {
+    rechargeToolEffectAction(this.ctx, professionId, pid);
   }
 
   delveShopOffers(delveId: string): DelveShopOffer[] {

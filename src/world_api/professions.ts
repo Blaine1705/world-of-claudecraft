@@ -309,19 +309,22 @@ export interface IWorldProfessions {
   // The viewer's slotted tool effects, one row per gathering profession that
   // has one, SORTED by professionId so the JSON form is a stable delta
   // signature (the knownRecipes precedent). EMPTY for a player who has never
-  // slotted an effect, which is every player until an acquisition craft ships:
-  // the backing PlayerMeta field is left ABSENT rather than initialized,
-  // because an empty object still serializes and initializing it moved every
-  // parity golden. Offline this reads the live PlayerMeta slot; online it
-  // mirrors the server's `tslot` self-delta.
+  // slotted an effect: the backing PlayerMeta field is left ABSENT rather
+  // than initialized, because an empty object still serializes and
+  // initializing it moved every parity golden. Offline this reads the live
+  // PlayerMeta slot; online it mirrors the server's `tslot` self-delta.
   toolEffectSlots: readonly ToolEffectSlotView[];
   // Slot `effectId` onto the viewer's `professionId` tool, at the charges that
   // profession's BEST OWNED tool's rarity mints (professions/tools.ts
-  // startingDurabilityFor). Re-slotting resets to full, same as a fresh
-  // install. Server-authoritative: the Sim re-validates the profession id, the
-  // effect id and that a real tool for that profession is actually carried, and
-  // nothing is trusted from the client; ClientWorld sends the
-  // slot_tool_effect command and never decides the outcome.
+  // startingDurabilityFor), CONSUMING one crafted charm copy of the effect
+  // from the viewer's bags (the acquisition craft: the consumed copy's signer
+  // becomes the slot's server-side craftedBy). Re-slotting consumes another
+  // charm and resets to full, same as a fresh install. Server-authoritative:
+  // the Sim re-validates the profession id, the effect id, that a real tool
+  // for that profession is actually carried, and that a charm copy is held,
+  // and nothing is trusted from the client; ClientWorld sends the
+  // slot_tool_effect command and never decides the outcome (the pid-scoped
+  // text-free toolEffectResult event reports it).
   //
   // `confirmMode` defaults to 'always' (#1136's behaviour) when omitted, so the
   // wire message for a caller that never touches it stays minimal. The type
@@ -330,4 +333,14 @@ export interface IWorldProfessions {
   // must not advertise a mode no world honors. The acquisition craft's
   // confirm flow re-widens this to 'always' | 'prompt' when it ships.
   slotToolEffect(professionId: string, effectId: string, confirmMode?: 'always'): void;
+  // Recharge the viewer's slotted effect on `professionId`, for the arcane
+  // material of the recharge-time best tool's rarity rung at a count scaled
+  // to the charges restored (R39), refilling to the maximum re-derived from
+  // that same tool (R30). Owner-performed. Server-authoritative: the Sim
+  // resolves price, fill, and every refusal off ITS OWN copy of the viewer's
+  // bags and slot; ClientWorld sends the recharge_tool_effect command and
+  // never decides the outcome (the same toolEffectResult event carries the
+  // price paid, or the price required on an insufficient-materials refusal,
+  // so the HUD can state the cost without a preview surface).
+  rechargeToolEffect(professionId: string): void;
 }

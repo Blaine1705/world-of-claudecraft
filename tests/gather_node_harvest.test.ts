@@ -1092,6 +1092,7 @@ describe('fine material grades on the live harvest path', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Prospector');
     sim.addItem('iron_mining_pick', 1, pid); // tier 2, AT the material tier
+    sim.addItem('artisans_eye', 1, pid); // the charm the slot consumes
     sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
     const meta = mustMeta(sim, pid);
     expect(meta.toolEffectSlots?.mining?.effectId).toBe('artisans_eye');
@@ -1135,6 +1136,7 @@ describe('fine material grades on the live harvest path', () => {
       const sim = makeWorld();
       const pid = sim.addPlayer('warrior', 'Prospector');
       sim.addItem('iron_mining_pick', 1, pid);
+      sim.addItem('artisans_eye', 1, pid); // the charm the slot consumes
       sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
       const meta = mustMeta(sim, pid);
       const slot = meta.toolEffectSlots?.mining;
@@ -1158,6 +1160,7 @@ describe('fine material grades on the live harvest path', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Prospector');
     sim.addItem('iron_mining_pick', 1, pid); // tier 2, AT the material tier
+    sim.addItem('artisans_eye', 1, pid); // the charm the slot consumes
     sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
     const meta = mustMeta(sim, pid);
     const capacity = bagCapacity(meta.bags);
@@ -1184,6 +1187,7 @@ describe('fine material grades on the live harvest path', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Prospector');
     sim.addItem('iron_mining_pick', 1, pid);
+    sim.addItem('artisans_eye', 1, pid); // the charm the slot consumes
     sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
     const meta = mustMeta(sim, pid);
     const chargesBefore = meta.toolEffectSlots?.mining?.durability ?? 0;
@@ -1210,6 +1214,7 @@ describe('fine material grades on the live harvest path', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Prospector');
     sim.addItem('copper_mining_pick', 1, pid); // tier 1: opens the tier-1 vein
+    sim.addItem('artisans_eye', 1, pid); // the charm the slot consumes
     sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
     const meta = mustMeta(sim, pid);
     const chargesBefore = meta.toolEffectSlots?.mining?.durability ?? 0;
@@ -1238,6 +1243,7 @@ describe('fine material grades on the live harvest path', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Prospector');
     sim.addItem('copper_mining_pick', 1, pid);
+    sim.addItem('gatherers_cache', 1, pid); // the charm the slot consumes
     sim.slotToolEffect('mining', 'gatherers_cache', undefined, pid);
     const meta = mustMeta(sim, pid);
     const chargesBefore = meta.toolEffectSlots?.mining?.durability ?? 0;
@@ -1261,7 +1267,12 @@ describe('fine material grades on the live harvest path', () => {
       const sim = makeWorld();
       const pid = sim.addPlayer('warrior', 'Prospector');
       sim.addItem('copper_mining_pick', 1, pid);
-      if (slotted) sim.slotToolEffect('mining', 'gatherers_cache', undefined, pid);
+      // The charm the slot consumes, granted only on the slotted side so the
+      // two runs end the fixture with IDENTICAL bags (slotting eats it).
+      if (slotted) {
+        sim.addItem('gatherers_cache', 1, pid);
+        sim.slotToolEffect('mining', 'gatherers_cache', undefined, pid);
+      }
       const STARTER = 'ore_veiled_hollow_1';
       teleportOntoNode(sim, pid, STARTER);
       expect(castAndComplete(sim, STARTER, pid)).toBe(true);
@@ -1278,6 +1289,7 @@ describe('fine material grades on the live harvest path', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Prospector');
     sim.addItem('copper_mining_pick', 1, pid);
+    sim.addItem('artisans_eye', 1, pid); // the charm the slot consumes
     sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
     const meta = mustMeta(sim, pid);
     const starter = gatherNodeById('ore_veiled_hollow_1');

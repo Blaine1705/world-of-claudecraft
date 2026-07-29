@@ -636,6 +636,11 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   'summonPet',
   'dismissPet',
   'summonDemon',
+  // The acquisition craft's slot/recharge outcome: a successful slot consumes
+  // a charm copy and a successful recharge consumes arcane materials, neither
+  // through a loot-event path, so the self inv mirror re-diffs off this event
+  // (deny arms ride along harmlessly: the diff finds nothing changed).
+  'toolEffectResult',
   // Maker's Bond unbind (Professions 2.0): a successful unbind can
   // clear boundTo IN PLACE (the single-copy arm emits no loot event), so the
   // result event itself must re-diff the heavy self keys or the holder's inv
@@ -4646,15 +4651,14 @@ export class GameServer {
         if (typeof msg.recipe === 'string') sim.trainRecipe(msg.recipe, pid);
         break;
       case 'slot_tool_effect':
-        // DEV-GATED, and this gate is the whole reason the command is safe to
-        // ship ahead of its content. Slotting mints a permanent, live harvest
-        // bonus (+1 unit, or +1 to the grade tier that decides fine yields) and
-        // costs nothing: no item, no copper, no recipe, no station, no
-        // cooldown, and re-sending refills the charges. There is no acquisition
-        // craft yet, so an ungated case would BE the acquisition path, free and
-        // unlimited, for any client that can send a frame. The sim-side command
-        // stays fully wired and tested; only the wire door is shut. Remove this
-        // gate in the same change that gives the effects a real source.
+        // UNGATED since the acquisition craft shipped: slotting now consumes
+        // a crafted charm from the sender's own bags through
+        // resolveSlotToolEffect (the one mint authority), so the command is
+        // no longer its own acquisition path (the dev gate that closed the
+        // free-grant incident retired with the free grant itself). Every
+        // refusal answers with the pid-scoped text-free toolEffectResult
+        // event, a HEAVY_SELF_EVENTS member, so the consumed charm re-diffs
+        // the self inventory mirror on the next snapshot.
         //
         // `mode` is passed THROUGH unchanged rather than normalized here: the
         // sim's guard is the single definition of what a legal mode is, and
@@ -4663,12 +4667,16 @@ export class GameServer {
         // disagree about the same message). The cast names the sim's own
         // union rather than `never` so the compiler keeps tracking the
         // parameter type; the runtime pass-through is identical.
-        if (
-          process.env.ALLOW_DEV_COMMANDS === '1' &&
-          typeof msg.profession === 'string' &&
-          typeof msg.effect === 'string'
-        ) {
+        if (typeof msg.profession === 'string' && typeof msg.effect === 'string') {
           sim.slotToolEffect(msg.profession, msg.effect, msg.mode as ToolEffectConfirmMode, pid);
+        }
+        break;
+      case 'recharge_tool_effect':
+        // The R39/R30 recharge: owner-performed, priced sim-side off the
+        // sender's own bags and slot (nothing trusted from the frame), the
+        // outcome carried by the same toolEffectResult event as the slot.
+        if (typeof msg.profession === 'string') {
+          sim.rechargeToolEffect(msg.profession, pid);
         }
         break;
       case 'sell_all_junk':

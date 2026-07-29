@@ -3484,8 +3484,10 @@ function dirtyEveryDeltaField(): {
   // tslot: a REAL slotted effect, not the empty default. Without this the key
   // rides the first snapshot as `[]`, which is not null, so it passes the
   // "dirtied to a non-default value" loop below vacuously and nothing anywhere
-  // proves a slot reaches a client. Written straight onto meta (the command is
-  // dev-gated on the wire) at the charges a common tier-1 pick mints.
+  // proves a slot reaches a client. Written straight onto meta (this fixture
+  // predates the acquisition craft's charm-consuming command and stays a
+  // direct write on purpose: the wire shape under test is the DELTA, not the
+  // mint) at the charges a common tier-1 pick mints.
   meta.toolEffectSlots = {
     mining: {
       effectId: 'gatherers_cache',

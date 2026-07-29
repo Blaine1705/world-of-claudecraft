@@ -3553,9 +3553,11 @@ export class ClientWorld implements IWorld {
     this.cmd({ cmd: 'train_recipe', recipe: recipeId });
   }
   // Tool effect slotting: command only, never predicted. The server
-  // re-validates the profession id, the effect id and that a real tool for that
-  // profession is carried; the resulting slot mirrors back via the tslot delta,
-  // so nothing is written here optimistically.
+  // re-validates the profession id, the effect id, that a real tool for that
+  // profession is carried, and that a crafted charm copy is held (the
+  // acquisition craft: the slot consumes it server-side); the resulting slot
+  // mirrors back via the tslot delta and the outcome via the pid-scoped
+  // toolEffectResult event, so nothing is written here optimistically.
   // The mode union matches the narrowed IWorld facet ('always' only): the
   // server refuses 'prompt' silently today, so the seam does not offer it.
   slotToolEffect(professionId: string, effectId: string, confirmMode?: 'always'): void {
@@ -3572,6 +3574,14 @@ export class ClientWorld implements IWorld {
       effect: effectId,
       mode: confirmMode,
     });
+  }
+  // Tool effect recharge: command only, never predicted. The server prices
+  // the R39 material count and the R30 fill off ITS copy of the viewer's bags
+  // and slot; the refreshed charges mirror back via the tslot delta and the
+  // outcome (price paid, or required on the insufficient-materials deny) via
+  // the same toolEffectResult event the slot uses.
+  rechargeToolEffect(professionId: string): void {
+    this.cmd({ cmd: 'recharge_tool_effect', profession: professionId });
   }
   // Enchanting profession commands (Professions 2.0): command only,
   // never predicted. The server re-validates ownership/eligibility/throttle in

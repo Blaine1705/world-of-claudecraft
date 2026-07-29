@@ -243,6 +243,7 @@ import {
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
 import { gatherToolTooltipLines } from './gather_tool_tooltip';
+import { GATHERING_PROFESSION_NAME_KEYS } from './gathering_profession_name';
 import {
   buildGatheringProficiencyRows,
   gatherDeniedLineKey,
@@ -534,6 +535,7 @@ import { targetOfTargetId } from './target_of_target';
 import { targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
+import { TOOL_EFFECT_NAME_KEYS } from './tool_effect_name';
 import { SharedTooltipOwner } from './tooltip_owner';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
@@ -10020,6 +10022,67 @@ export class Hud {
           if (this.openTrainNpcId !== null && $('#train-window').style.display === 'block')
             this.renderTrain();
           if ($('#crafting-window').style.display === 'flex') this.renderCrafting();
+          break;
+        }
+        case 'toolEffectResult': {
+          // Slot/recharge outcome for the acquisition craft. The event is
+          // text-free: the effect and profession names derive from their ids
+          // (TOOL_EFFECT_NAME_KEYS / GATHERING_PROFESSION_NAME_KEYS) and the
+          // recharge material splices as a clickable item link, identical in
+          // both worlds. ONE chat line either way (the trainResult
+          // single-surface rule: no toast, no extra sound cue). Unknown ids
+          // render raw rather than crash, the stale-content doctrine: a
+          // yet-unknown effect id still names itself legibly.
+          const effectKey = ev.effectId ? TOOL_EFFECT_NAME_KEYS[ev.effectId] : undefined;
+          const effectName = effectKey ? t(effectKey) : (ev.effectId ?? '');
+          const professionKey = GATHERING_PROFESSION_NAME_KEYS[ev.professionId];
+          const professionName = professionKey ? t(professionKey) : ev.professionId;
+          const materialToken = ev.materialItemId ? grantItemToken(ev.materialItemId) : '';
+          const countText = formatNumber(ev.count ?? 0, { maximumFractionDigits: 0 });
+          if (ev.ok) {
+            this.log(
+              ev.action === 'slot'
+                ? t('hudChrome.professions.toolEffectSlotted', {
+                    effect: effectName,
+                    profession: professionName,
+                  })
+                : t('hudChrome.professions.toolEffectRecharged', {
+                    effect: effectName,
+                    material: materialToken,
+                    count: countText,
+                  }),
+              '#7fdc4f',
+            );
+          } else {
+            this.log(
+              ev.reason === 'no_tool'
+                ? t('hudChrome.professions.toolEffectNoTool', { profession: professionName })
+                : ev.reason === 'no_charm'
+                  ? t('hudChrome.professions.toolEffectNoCharm', { effect: effectName })
+                  : ev.reason === 'no_slot'
+                    ? t('hudChrome.professions.toolEffectRechargeNoSlot', {
+                        profession: professionName,
+                      })
+                    : ev.reason === 'already_full'
+                      ? t('hudChrome.professions.toolEffectRechargeFull', { effect: effectName })
+                      : ev.reason === 'insufficient_materials'
+                        ? t('hudChrome.professions.toolEffectRechargeMaterials', {
+                            effect: effectName,
+                            material: materialToken,
+                            count: countText,
+                          })
+                        : ev.reason === 'throttled'
+                          ? t('hudChrome.crafting.throttled')
+                          : t('hudChrome.professions.toolEffectSlotInvalid', {
+                              effect: effectName,
+                            }),
+              '#ff6b6b',
+            );
+          }
+          // The slot rows live in the professions window; repaint an open one
+          // so charges/effects flip without a manual reopen (the trainResult
+          // idiom above).
+          if (this.professionsWindow.isOpen) this.professionsWindow.render();
           break;
         }
         case 'unbindResult': {

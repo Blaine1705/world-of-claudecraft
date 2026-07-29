@@ -4,7 +4,8 @@ import type { MaterialRarity } from '../src/sim/professions/gathering';
 import {
   depleteEffect,
   RARITY_DURABILITY_BONUS,
-  rechargeEffect,
+  RECHARGE_CHARGES_PER_MATERIAL,
+  rechargeDiscountFor,
   resolveToolEffectUse,
   slotEffect,
   startingDurabilityFor,
@@ -111,25 +112,18 @@ describe('rarity buys charges, and spending one draws nothing', () => {
     expect(slot.durability).toBe(before - 1);
   });
 
-  it('a recharge restores the charges THIS slot was minted with, not the catalog base', () => {
-    // The trap this pins: restoring to TOOL_EFFECTS[id].startingDurability
-    // would silently demote an epic tool's slot to a common one's count on its
-    // first recharge, and every assertion about "full again" would still pass.
-    const slot = slotEffect('gatherers_cache', { toolRarity: 'epic', craftedBy: 'p1' });
-    const minted = slot.durability;
-    expect(minted).toBeGreaterThan(TOOL_EFFECTS.gatherers_cache.startingDurability);
-    slot.durability = 0;
-    const result = rechargeEffect(slot, 'p1', 99);
-    expect(result.success).toBe(true);
-    expect(slot.durability).toBe(minted);
-    expect(slot.durability).not.toBe(TOOL_EFFECTS.gatherers_cache.startingDurability);
-  });
-
-  it('a failed recharge leaves the slot untouched', () => {
-    const slot = slotEffect('gatherers_cache', { toolRarity: 'rare', craftedBy: 'p1' });
-    slot.durability = 3;
-    const result = rechargeEffect(slot, 'p1', 0);
-    expect(result.success).toBe(false);
-    expect(slot.durability).toBe(3);
+  it('the recharge scale and discount ladder hold the R39 shape at the leaf', () => {
+    // The scale factor is what turns a fill size into a material count; the
+    // shipped rungs (20..50 charges) divide into the ruling's stated 2..5
+    // band exactly when it is 10. The full behavioral pricing pins (material
+    // identity per rung, partial fills, the R30 re-derive) live in
+    // tests/professions_tools.test.ts and the command suite; this leaf pin is
+    // the constant itself, so a both-sides retune cannot drift silently.
+    expect(RECHARGE_CHARGES_PER_MATERIAL).toBe(10);
+    const original = slotEffect('gatherers_cache', { craftedBy: 'p1' });
+    expect(rechargeDiscountFor(original, 'p1')).toBe(0.5);
+    expect(rechargeDiscountFor(original, 'p2')).toBe(1);
+    const anonymous = slotEffect('gatherers_cache');
+    expect(rechargeDiscountFor(anonymous, 'p1')).toBe(1);
   });
 });

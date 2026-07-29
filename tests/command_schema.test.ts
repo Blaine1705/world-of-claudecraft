@@ -35,8 +35,8 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // (attach a catalog effect to one gathering profession's tool, keyed per
 // profession rather than per tool item because the live harvest path
 // resolves a tier and never a tool).
-const EXPECTED_SEND_COUNT = 174; // mount_select left the wire (reins are items)
-const EXPECTED_DISPATCH_COUNT = 185; // mount_select left the wire (reins are items)
+const EXPECTED_SEND_COUNT = 175; // recharge_tool_effect joined (the acquisition craft)
+const EXPECTED_DISPATCH_COUNT = 186; // recharge_tool_effect joined (the acquisition craft)
 const EXPECTED_DISPATCH_ONLY_COUNT = 11;
 
 // The chat sub-channel routing switch (server/game.ts `switch

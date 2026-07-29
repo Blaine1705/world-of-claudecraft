@@ -17,6 +17,7 @@ import {
   type ToolEffectId,
 } from '../content/professions';
 import type { InvSlot, ItemDef, ItemUse } from '../types';
+import { DISENCHANT_MATERIAL_BY_QUALITY } from './disenchant_reagents';
 import type { MaterialRarity } from './gathering';
 import { type CraftSkillState, rechargeDiscountMultiplier } from './wheel';
 
@@ -251,11 +252,14 @@ export interface ToolEffectSlot {
    */
   maxDurability: number;
   /**
-   * Player id of whoever produced this effect via the production craft that
-   * made it (#1137). Additive and optional: undefined means either no
-   * identity was recorded, or the slot predates this field. Recharging
-   * (below) reads this only to decide the original-crafter discount; it
-   * never gates the base tool or the bonus itself.
+   * Character NAME of whoever produced this effect via the production craft
+   * that made it (#1137): the consumed charm copy's `instance.signer`, the
+   * identity the craft signing rule stamps on every rare-output copy and the
+   * one the whole signer ecosystem compares (never an entity id, which
+   * restarts at 1 every boot). Additive and optional: undefined means the
+   * consumed copy carried no signer, or the slot predates the acquisition
+   * craft. Recharging reads this only to decide the original-crafter
+   * discount; it never gates the base tool or the bonus itself.
    */
   craftedBy?: string;
   /** How this slot's effect fires. Defaults to 'always' (see slotEffect). */
@@ -290,16 +294,38 @@ export function slotEffect(
   };
 }
 
+/** Stable deny vocabulary for one slot request (the trainResult idiom: ids,
+ *  not prose; the client renders localized copy). `invalid_request` covers the
+ *  shapes an honest client never sends (unknown profession/effect, a
+ *  policy-refused pair, a mode outside the union); `no_tool` and `no_charm`
+ *  are the two an honest player can hit. */
+export type SlotToolEffectDenyReason = 'invalid_request' | 'no_tool' | 'no_charm';
+
+export type ResolvedSlotToolEffect =
+  | {
+      ok: true;
+      professionId: GatheringProfessionId;
+      slot: ToolEffectSlot;
+      /** Inventory index of the charm copy the mint consumes (one unit). */
+      consumeIndex: number;
+    }
+  | { ok: false; reason: SlotToolEffectDenyReason };
+
 /**
- * Resolve one slot request into the slot it should mint, or null to refuse.
+ * Resolve one slot request into the slot it should mint plus the charm copy
+ * it consumes, or a typed refusal.
  *
  * The whole decision lives here rather than on the Sim coordinator, matching
  * what `resolveTrain` does for `Sim.trainRecipe`: none of these gates need the
  * coordinator's private mutable state, they need an inventory and an item
  * table, and this module already takes both as parameters. That also makes
- * every refusal arm unit-testable without constructing a Sim.
+ * every refusal arm unit-testable without constructing a Sim. THIS RESOLVER IS
+ * THE ONE MINT AUTHORITY: the wire command, the offline console handle, and
+ * the load-time normalizer (via the shared `slotToolEffectRefused` policy) all
+ * answer to the same gates, so no path can mint what another path refuses (the
+ * free-grant incident was exactly a second path with fewer gates).
  *
- * Five refusals, all before any mutation and all draw-free:
+ * Six refusals, all before any mutation and all draw-free:
  *   - a profession id that is not a gathering profession
  *   - an effect id absent from the live catalog
  *   - a pair the slot POLICY refuses (`slotToolEffectRefused` below: the
@@ -314,19 +340,22 @@ export function slotEffect(
  *   - no REAL tool carried for that profession. Reads
  *     `bestOwnedGatherToolTierOrNone`, which returns NO_TOOL_OWNED rather than
  *     the bare-hands floor, so carrying nothing is not carrying a tier-1 tool.
+ *   - no charm ITEM for the effect carried (the acquisition craft's whole
+ *     point: minting a slot consumes one crafted copy, so the slot is never
+ *     free). Which copy matters, because a copy's `instance.signer` becomes
+ *     the slot's `craftedBy`: the scan prefers (1) a copy the slotter signed
+ *     themselves, which is the only provenance that can ever earn THEM the
+ *     original-crafter recharge discount, then (2) an unsigned copy, so a
+ *     bought signed charm is preserved over a provenance-free one, then (3)
+ *     the first signed copy in bag order.
  *
- * The owned-tool scan runs ONCE and answers both the refusal and the rarity the
- * charges are minted from, so a player with no tool is refused before any work
- * that only a success needs.
- *
- * `craftedBy` is deliberately LEFT UNSET. Its documented meaning is whoever
- * produced the effect through the production craft that made it, and no such
- * craft exists yet; recording the slotter instead would be both a lie and a
- * permanent 50 percent recharge discount for every self-slotted effect
- * (`isOriginalCrafter`). It would also persist a value that cannot survive:
- * entity ids restart at 1 every boot, so a stored one stops matching its owner
- * and eventually matches whoever inherits the id. The un-discounted generic
- * rate is the documented default for a slot with no recorded crafter.
+ * `craftedBy` is the consumed copy's `signer`: the character NAME the craft
+ * signing rule stamps on every rare-output copy (crafting.ts, #1149). That is
+ * the identity the whole signer ecosystem already compares (the self-signed
+ * craft discount, Battlefield Experience attribution), and it survives
+ * restarts, which an entity id never could. An unsigned copy (nothing mints
+ * one today; dev grants and pre-craft saves can) slots with `craftedBy`
+ * unset and pays the generic recharge rate forever.
  */
 export function resolveSlotToolEffect(
   inventory: readonly InvSlot[],
@@ -334,21 +363,59 @@ export function resolveSlotToolEffect(
   effectId: string,
   confirmMode: ToolEffectConfirmMode,
   items: Readonly<Record<string, ItemDef>>,
-): { professionId: GatheringProfessionId; slot: ToolEffectSlot } | null {
-  if (!(GATHERING_PROFESSION_IDS as readonly string[]).includes(professionId)) return null;
-  if (!Object.hasOwn(TOOL_EFFECTS, effectId)) return null;
-  if (slotToolEffectRefused(professionId, effectId)) return null;
-  if (confirmMode !== 'always') return null;
+  slotterName?: string,
+): ResolvedSlotToolEffect {
+  if (!(GATHERING_PROFESSION_IDS as readonly string[]).includes(professionId)) {
+    return { ok: false, reason: 'invalid_request' };
+  }
+  if (!Object.hasOwn(TOOL_EFFECTS, effectId)) return { ok: false, reason: 'invalid_request' };
+  if (slotToolEffectRefused(professionId, effectId)) {
+    return { ok: false, reason: 'invalid_request' };
+  }
+  if (confirmMode !== 'always') return { ok: false, reason: 'invalid_request' };
   const profession = professionId as GatheringProfessionId;
   const best = bestOwnedGatherToolFor(inventory, profession, items);
-  if (best.ownedTier === NO_TOOL_OWNED) return null;
+  if (best.ownedTier === NO_TOOL_OWNED) return { ok: false, reason: 'no_tool' };
+  const consumeIndex = charmIndexToConsume(inventory, effectId, items, slotterName);
+  if (consumeIndex === -1) return { ok: false, reason: 'no_charm' };
   return {
+    ok: true,
     professionId: profession,
+    consumeIndex,
     slot: slotEffect(effectId as ToolEffectId, {
       confirmMode,
       toolRarity: best.rarity,
+      craftedBy: inventory[consumeIndex].instance?.signer,
     }),
   };
+}
+
+/** The charm copy a successful slot consumes, by the preference order the
+ *  resolver doc states (self-signed, then unsigned, then first signed), or -1
+ *  when no copy of the effect's charm is carried. Bag order breaks ties
+ *  inside a preference class, which is player-visible state, not a hidden
+ *  coin flip. Pure scan, no rng. */
+function charmIndexToConsume(
+  inventory: readonly InvSlot[],
+  effectId: string,
+  items: Readonly<Record<string, ItemDef>>,
+  slotterName?: string,
+): number {
+  let unsigned = -1;
+  let signed = -1;
+  for (let index = 0; index < inventory.length; index++) {
+    const entry = inventory[index];
+    const use = items[entry.itemId]?.use;
+    if (!use || use.type !== 'toolEffect' || use.effectId !== effectId) continue;
+    const signer = entry.instance?.signer;
+    if (signer !== undefined && slotterName !== undefined && signer === slotterName) return index;
+    if (signer === undefined) {
+      if (unsigned === -1) unsigned = index;
+    } else if (signed === -1) {
+      signed = index;
+    }
+  }
+  return unsigned !== -1 ? unsigned : signed;
 }
 
 /**
@@ -581,101 +648,117 @@ export function depleteEffect(slot: ToolEffectSlot | undefined): boolean {
   return true;
 }
 
-// Effect recharge (#1137). A depleted (or partially depleted) effect can be
-// restored to full durability by recharging it through the production craft
-// that made it, or through a generic Enchanter/Scribe. Recharging through the
-// effect's ORIGINAL crafter (the `craftedBy` recorded on the slot at
-// `slotEffect` time) is cheaper and faster than a generic recharge: this is
-// the whole point of recording `craftedBy` on the slot. Both costs are fixed
-// multiples of the same base cost, so the discount can never invert.
-export interface RechargeCost {
-  /** Crafting materials consumed by the recharge. */
-  materials: number;
-  /** Ticks (20 Hz) the recharge takes to complete. */
-  ticks: number;
-}
+// Effect recharge (#1137, priced by R39 and refilled by R30). A depleted (or
+// partially depleted) effect is restored by its owner for arcane materials:
+// the material IDENTITY is the disenchant ladder keyed on the rarity of the
+// best tool the owner holds AT RECHARGE TIME (dust for a common or uncommon
+// tool, essence for rare, shard for epic; the same table a disenchant yields
+// from, so the two ladders can never drift), and the COUNT scales with the
+// charges the fill restores. Recharging an effect whose slot records the
+// recharger as its original crafter (`craftedBy`, stamped from the consumed
+// charm's signer at slot time) is cheaper, deeper still when that crafter is
+// also specialized in the effect's craft: both discounts compose into the
+// count and never touch the material identity.
 
-// Base cost for a generic Enchanter/Scribe recharge, before the
-// original-crafter discount is considered.
-const RECHARGE_BASE_MATERIALS = 4;
-const RECHARGE_BASE_TICKS = 20 * 30; // 30 seconds
+/** Charges one arcane material restores: the R39 scale factor. A full fill
+ *  runs 2 to 5 materials across the shipped rarity rungs (20 to 50 charges),
+ *  which is the ruling's stated band; retuning it moves the
+ *  mint-exceeds-recharge inequality, so the craft reagent lists and the
+ *  economics pin in tests/professions_tool_effect_recharge.test.ts move with
+ *  it. */
+export const RECHARGE_CHARGES_PER_MATERIAL = 10;
 
-// The original crafter pays half the materials and half the time of a
-// generic recharge. Kept as one named fraction so both halves of the
-// discount can never drift apart.
+// The original crafter pays half the material count of a generic recharge.
+// One named fraction so every consumer prices the same discount.
 const ORIGINAL_CRAFTER_DISCOUNT = 0.5;
 
 // True only when the slot recorded who crafted the effect AND that identity
-// matches the player attempting the recharge. A slot with no recorded
-// `craftedBy` (an effect slotted before #1137, or with no known crafter) is
-// never eligible for the discount, so it always costs the generic rate.
+// matches the player attempting the recharge. `craftedBy` is the character
+// NAME the production craft signed the consumed charm with; a slot with no
+// recorded crafter (an unsigned charm copy) is never eligible for the
+// discount, so it always costs the generic rate.
 export function isOriginalCrafter(slot: ToolEffectSlot, rechargerId: string): boolean {
   return slot.craftedBy !== undefined && slot.craftedBy === rechargerId;
 }
 
-// Pure: the materials/time a recharge of this slot would cost `rechargerId`.
-// Strictly less for the original crafter than for anyone else (a generic
-// Enchanter/Scribe), on both dimensions.
-//
-// Specialization recharge discount (#1134): when `rechargerId` is also the
-// original crafter AND `rechargerSkills` shows them specialized in the
-// effect's craft (`TOOL_EFFECTS[slot.effectId].craftId`, per
-// ../content/professions.ts), an ADDITIONAL discount from
-// `rechargeDiscountMultiplier` (wheel.ts) composes with (multiplies into,
-// never replaces) the existing original-crafter discount. A non-original
-// recharger never sees this discount even if `rechargerSkills` shows them
-// specialized: the perk is specifically for recharging one's OWN work.
-// `rechargerSkills` is optional and defaults to empty (no specialization),
-// so existing #1137 call sites that don't yet pass it behave unchanged.
-export function rechargeCost(
+/** The composed R39 discount multiplier for one recharge: the
+ *  original-crafter half, times the specialization multiplier
+ *  (`rechargeDiscountMultiplier`, wheel.ts) when the original crafter is ALSO
+ *  specialized in the effect's craft. A non-original recharger never sees the
+ *  specialization arm even when specialized: the perk is for recharging
+ *  one's OWN work. Generic rate is exactly 1. */
+export function rechargeDiscountFor(
   slot: ToolEffectSlot,
   rechargerId: string,
   rechargerSkills: CraftSkillState = {},
-): RechargeCost {
-  const isOriginal = isOriginalCrafter(slot, rechargerId);
-  let discount = isOriginal ? ORIGINAL_CRAFTER_DISCOUNT : 1;
-  if (isOriginal) {
-    const craftId = TOOL_EFFECTS[slot.effectId].craftId;
-    discount *= rechargeDiscountMultiplier(rechargerSkills, craftId);
-  }
-  return {
-    materials: Math.ceil(RECHARGE_BASE_MATERIALS * discount),
-    ticks: Math.ceil(RECHARGE_BASE_TICKS * discount),
-  };
+): number {
+  if (!isOriginalCrafter(slot, rechargerId)) return 1;
+  return (
+    ORIGINAL_CRAFTER_DISCOUNT *
+    rechargeDiscountMultiplier(rechargerSkills, TOOL_EFFECTS[slot.effectId].craftId)
+  );
 }
 
-export interface RechargeResult {
-  /** False when `materialsProvided` did not cover the computed cost. */
-  success: boolean;
-  cost: RechargeCost;
-}
+/** Stable deny vocabulary for one recharge request. `no_tool` mirrors the
+ *  slot gate (a profession the owner holds no real tool for cannot resolve
+ *  the R30 rarity, so it cannot price or size the fill); `already_full`
+ *  covers durability at or ABOVE the re-derived maximum, which is how a
+ *  borrowed epic pick's inflated mint stays one fill at most: the inflated
+ *  charges keep spending, but no recharge renews them. */
+export type RechargeToolEffectDenyReason = 'invalid_request' | 'no_tool' | 'already_full';
 
-// Attempts to recharge `slot` for `rechargerId`, consuming
-// `materialsProvided`. On success, durability is restored to the effect's
-// full starting value (same as a fresh `slotEffect`) so `applyEffectBonus`
-// resumes applying its bonus immediately; `craftedBy` is left untouched, so a
-// recharge never changes who the slot's original crafter is. On failure
-// (insufficient materials) the slot is not mutated at all. The caller is
-// responsible for actually deducting `cost.materials` from the recharger's
-// inventory and for gating `cost.ticks` as craft-time, same as any other
-// production craft; this module only computes the cost and applies the
-// durability restore.
-export function rechargeEffect(
+export type ResolvedRechargeToolEffect =
+  | {
+      ok: true;
+      /** The R30 re-derived maximum: what this fill restores BOTH counters to. */
+      newMax: number;
+      /** Charges this fill actually restores (newMax minus current). */
+      restored: number;
+      /** The R39 material identity for the resolved rarity rung. */
+      materialItemId: string;
+      /** Materials consumed: ceil((restored / RECHARGE_CHARGES_PER_MATERIAL)
+       *  times the composed discount), floored at 1. */
+      count: number;
+    }
+  | { ok: false; reason: RechargeToolEffectDenyReason };
+
+/**
+ * Resolve one recharge request against the owner's live bags: pure, draw-free
+ * and mutation-free, the `resolveSlotToolEffect` shape. The caller (the
+ * command body in tool_effect_actions.ts) owns consuming `count` of
+ * `materialItemId` and writing `newMax` onto the slot's two counters.
+ *
+ * R30 is the load-bearing arm: the maximum is re-derived from the best tool
+ * owned NOW (`bestOwnedGatherToolFor`), never read back from the slot's
+ * minted value, so the slot-time mint stands as-is and a borrowed epic pick
+ * buys one inflated fill at most, never a permanent ceiling. The same
+ * resolved rarity picks the R39 material rung, so the price and the fill can
+ * never name different tools.
+ */
+export function resolveRechargeToolEffect(
+  inventory: readonly InvSlot[],
+  professionId: string,
   slot: ToolEffectSlot,
   rechargerId: string,
-  materialsProvided: number,
   rechargerSkills: CraftSkillState = {},
-): RechargeResult {
-  const cost = rechargeCost(slot, rechargerId, rechargerSkills);
-  if (materialsProvided < cost.materials) {
-    return { success: false, cost };
+  items: Readonly<Record<string, ItemDef>>,
+): ResolvedRechargeToolEffect {
+  if (!(GATHERING_PROFESSION_IDS as readonly string[]).includes(professionId)) {
+    return { ok: false, reason: 'invalid_request' };
   }
-  // Back to what THIS slot was minted with, not to the catalog's base: the
-  // rarity of the tool it was slotted onto is already priced into
-  // `maxDurability`, and a recharge must not quietly demote an epic tool's
-  // slot to a common one's charge count.
-  slot.durability = slot.maxDurability;
-  return { success: true, cost };
+  const best = bestOwnedGatherToolFor(inventory, professionId as GatheringProfessionId, items);
+  if (best.ownedTier === NO_TOOL_OWNED) return { ok: false, reason: 'no_tool' };
+  const newMax = startingDurabilityFor(slot.effectId, best.rarity);
+  const restored = newMax - slot.durability;
+  if (restored <= 0) return { ok: false, reason: 'already_full' };
+  // The rarity that sized the fill also names the material: normalize the
+  // def-quality union through the ladder index so 'poor'/undefined price at
+  // the common rung, exactly as they mint there.
+  const rung = RARITY_ORDER[rarityLadderIndex(best.rarity)];
+  const materialItemId = DISENCHANT_MATERIAL_BY_QUALITY[rung];
+  const discount = rechargeDiscountFor(slot, rechargerId, rechargerSkills);
+  const count = Math.max(1, Math.ceil((restored / RECHARGE_CHARGES_PER_MATERIAL) * discount));
+  return { ok: true, newMax, restored, materialItemId, count };
 }
 
 // The outcome of attempting to use a slotted effect for one harvest/craft
@@ -724,6 +807,6 @@ export function resolveToolEffectUse(
 // it is applied AFTER both draws so neither the rarity roll nor the rare-event
 // roll can move because a player owns a slot.
 //
-// `rechargeEffect` (#1137) still has no live call site. Once a production or
-// recharge action exists it should deduct `cost.materials` from the
-// recharger's inventory and gate `cost.ticks` as craft time before calling it.
+// `resolveRechargeToolEffect` is wired too: the recharge_tool_effect command
+// body (tool_effect_actions.ts rechargeToolEffectAction) resolves through it,
+// consumes the priced materials, and writes the R30 fill onto the slot.

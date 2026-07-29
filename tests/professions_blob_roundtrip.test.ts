@@ -66,6 +66,9 @@ const populatedSim = (): Sim => {
       effectId: 'gatherers_cache',
       durability: 7,
       maxDurability: 30,
+      // The crafter identity must ride the blob byte-faithfully: the
+      // original-crafter recharge discount resolves against it after a relog.
+      craftedBy: 'Loggerholm',
       confirmMode: 'always',
     },
   };
