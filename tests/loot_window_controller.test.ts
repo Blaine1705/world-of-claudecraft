@@ -171,7 +171,13 @@ describe('LootWindowController', () => {
       templateId: harvestMobId,
       loot: {
         copper: 0,
-        items: [{ itemId: 'future_expansion_drop_x', count: 2, personalFor: [7] }],
+        items: [
+          { itemId: 'future_expansion_drop_x', count: 2, personalFor: [7] },
+          // The prototype-key arm is what discriminates knownItemDef from a
+          // bare ITEMS read: 'constructor' resolves truthy on the bare read
+          // and the known arm derefs a Function.
+          { itemId: 'constructor', count: 1, personalFor: [7] },
+        ],
       },
     });
     const test = harness([mob]);
@@ -179,7 +185,11 @@ describe('LootWindowController', () => {
     expect(test.element.style.display).toBe('block');
     expect(test.element.innerHTML).toContain('data-item="future_expansion_drop_x"');
     expect(test.element.innerHTML).toContain('future_expansion_drop_x');
-    // The unknown row rides the same tooltip idiom as a known one.
+    // The prototype key renders as its RAW ID (the unknown arm), never a
+    // Function's display name.
+    expect(test.element.innerHTML).toContain('data-item="constructor"');
+    expect(test.element.innerHTML).not.toContain('Object');
+    // The unknown rows ride the same tooltip idiom as a known one.
     expect(test.attachTooltip).toHaveBeenCalled();
   });
 

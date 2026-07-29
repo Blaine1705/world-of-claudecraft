@@ -102,6 +102,9 @@ describe('QuestTrackerController', () => {
     test.controller.update();
 
     expect(test.html()).toContain('q_ghost_of_v33');
+    // The title SAYS unknown (the questUi.tracker.unknownQuest sentence
+    // carrying the raw id), never a bare content slug on its own.
+    expect(test.html()).toContain('Unknown quest (q_ghost_of_v33)');
     expect(test.html().indexOf('title:q_wolves')).toBeLessThan(
       test.html().indexOf('q_ghost_of_v33'),
     );
