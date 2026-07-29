@@ -21,9 +21,10 @@
 // mobSwing, spawnDelveModule), never reaching into not-yet-extracted internals
 // in a way the sim itself does not already expose.
 
-import { arenaOrigin, DELVES, instanceOrigin, MOBS, PROPS, QUESTS } from '../../src/sim/data';
+import { arenaOrigin, DELVES, instanceOrigin, LAKE, MOBS, PROPS, QUESTS } from '../../src/sim/data';
 import { createMob } from '../../src/sim/entity';
 import { solveLockActions } from '../../src/sim/lockpick';
+import { startFishing } from '../../src/sim/professions/fishing';
 import { gatherCastDurationSec } from '../../src/sim/professions/gathering';
 import { Sim } from '../../src/sim/sim';
 import { addThreat } from '../../src/sim/threat';
@@ -4550,6 +4551,67 @@ function professionsCraft(seed = 21): Scenario {
 // sequence, not committed) so the herb window's rare-event draw hits inside
 // the recorded run with all 102 casts resolving: no bags-full denial and no
 // cast-cancelling interference; only the found literal is pinned here.
+// The fishing SESSION path end to end through the real entry points: cast
+// start (bite-delay rng draw), the tick-path bite arming the reel window,
+// and the reel re-press whose completeFishing spends the one table draw.
+// Exists because the reel arm was hoisted above the in-combat and swim
+// denials in phase 10 (a guard reorder that changes WHICH state reaches the
+// table draw), and no other scenario calls startFishing at all: the two
+// casting-lifecycle scenarios assign castingAbility directly and pin only
+// the cancel arm.
+function professionsFishingSession(seed = 1): Scenario {
+  return {
+    name: 'professions_fishing_session',
+    coverage: [
+      'class:warrior (angler)',
+      'startFishing cast start: water probe + bite-delay rng draw',
+      'tick-path bite: updateCasting arms the reel window (fishingBite)',
+      'reel re-press: the hoisted reel arm accepts inside the window',
+      'completeFishing: one table draw, outcome event (catch or empty hook)',
+      'post-completion re-press: a fresh cast begins (no stale session state)',
+    ],
+    sampleEvery: 100,
+    build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const pid = sim.playerId as number;
+      const meta = sim.players.get(pid) as any;
+      const p = sim.player as AnyEntity;
+
+      // No mob interference: a landed hit cancels the session mid-drive
+      // (the professionsGather despawn idiom).
+      for (const e of (sim.entities as Map<number, AnyEntity>).values()) {
+        if (e.kind !== 'mob') continue;
+        e.dead = true;
+        e.hp = 0;
+        e.aiState = 'dead';
+        e.respawnTimer = 9999;
+        e.corpseTimer = 9999;
+        e.inCombat = false;
+      }
+
+      sim.addItem('simple_fishing_pole', 1, pid);
+      const pz = LAKE.z - LAKE.radius - 2;
+      teleport(sim, p, LAKE.x, pz);
+      p.facing = Math.atan2(0, LAKE.z - pz); // due north, into the vale lake
+
+      // Cast: the bite delay is the session's first rng draw.
+      startFishing(sim.ctx, p, meta);
+      rec.snapshot('cast-start');
+      // Ride the tick path to the bite (bounded by the max bite delay).
+      for (let i = 0; i < 400 && !p.fishReelDeadlineTick; i++) rec.tick(1);
+      rec.snapshot('bite-armed');
+      // The reel re-press inside the live window: completeFishing spends
+      // the one catch-table draw and ends the session.
+      startFishing(sim.ctx, p, meta);
+      rec.snapshot('reel-landed');
+      // A fresh cast right after: no stale hidden field blocks a new session.
+      startFishing(sim.ctx, p, meta);
+      rec.tick(8);
+    },
+  };
+}
+
 function professionsGather(seed = 1): Scenario {
   // Worst-case gather cast: tier-1 node, tier-1 tool, band 0 (#2343: every
   // harvest needs the matching tool; a tier-1 tool at a tier-1 node keeps
@@ -4793,4 +4855,5 @@ export const SCENARIOS: Scenario[] = [
   professionsCraft(),
   professionsGather(),
   professionsGatherFine(),
+  professionsFishingSession(),
 ];
