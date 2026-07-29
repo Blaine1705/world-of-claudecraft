@@ -7510,7 +7510,7 @@ export const id_ID: EnTranslations = {
       "wrath": {
         "name": "Panah Liar",
         "description": "Melontarkan panah energi alam sebesar {damage} kerusakan Alam.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge (a heavy Arcane strike) and Skyfall becomes Sunwake (a Nature strike that restores 35 mana)."
       },
       "healing_touch": {
         "name": "Penyembuhan Liar",
@@ -7527,7 +7527,7 @@ export const id_ID: EnTranslations = {
       },
       "moonseed": {
         "name": "Moonseed",
-        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge."
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant heavy Arcane strike that spends all 3."
       },
       "rejuvenation": {
         "name": "Mekar Liar",
@@ -7549,7 +7549,7 @@ export const id_ID: EnTranslations = {
       "maul": {
         "name": "Remuk Tulang",
         "description": "Serangan mencabik yang meningkatkan kerusakan jarak dekat sebesar {damage} dan menimbulkan ancaman tinggi. Aktif pada ayunan berikutnya. Hanya dalam Wujud Bruin.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a heavy, high-threat strike that instead shields you when below half health."
       },
       "growl": {
         "name": "Gertakan",
@@ -7567,7 +7567,7 @@ export const id_ID: EnTranslations = {
       "ferocious_bite": {
         "name": "Gigitan Berdarah",
         "description": "Gerakan penutup yang menyebabkan {damage}. Hanya dalam Wujud Serigala.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: it instantly deals all the damage your bleeds would still have dealt and restores 30 energy."
       },
       "swipe": {
         "name": "Cakar Menyapu",
@@ -7594,7 +7594,7 @@ export const id_ID: EnTranslations = {
       "starfire": {
         "name": "Langit Runtuh",
         "description": "Memanggil turun panah api bintang, menyebabkan {damage} kerusakan Arkana.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant Nature strike and burn that restores 35 mana and spends all 3."
       },
       "travel_form": {
         "name": "Wujud Fleet",

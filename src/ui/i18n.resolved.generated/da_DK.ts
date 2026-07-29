@@ -7510,7 +7510,7 @@ export const da_DK: EnTranslations = {
       "wrath": {
         "name": "Vildlyn",
         "description": "Slynger et lyn af naturenergi for {damage} Natur skade.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge (a heavy Arcane strike) and Skyfall becomes Sunwake (a Nature strike that restores 35 mana)."
       },
       "healing_touch": {
         "name": "Vildlægning",
@@ -7527,7 +7527,7 @@ export const da_DK: EnTranslations = {
       },
       "moonseed": {
         "name": "Moonseed",
-        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge."
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant heavy Arcane strike that spends all 3."
       },
       "rejuvenation": {
         "name": "Vildblomst",
@@ -7549,7 +7549,7 @@ export const da_DK: EnTranslations = {
       "maul": {
         "name": "Knogleknus",
         "description": "Et lemlæstende angreb, der øger nærkampsskaden med {damage} og skaber en stor mængde trussel. Aktiveres ved dit næste hug. Kun i Bruin-form.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a heavy, high-threat strike that instead shields you when below half health."
       },
       "growl": {
         "name": "Trussel",
@@ -7567,7 +7567,7 @@ export const da_DK: EnTranslations = {
       "ferocious_bite": {
         "name": "Blodbid",
         "description": "Afslutningstræk der volder {damage}. Kun i Ulveform.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: it instantly deals all the damage your bleeds would still have dealt and restores 30 energy."
       },
       "swipe": {
         "name": "Fejende Kløer",
@@ -7594,7 +7594,7 @@ export const da_DK: EnTranslations = {
       "starfire": {
         "name": "Himmelfald",
         "description": "Nedkalder et lyn af stjerneild og forårsager {damage} Arkan skade.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant Nature strike and burn that restores 35 mana and spends all 3."
       },
       "travel_form": {
         "name": "Fleet-form",

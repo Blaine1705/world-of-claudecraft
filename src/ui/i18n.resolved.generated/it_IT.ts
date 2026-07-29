@@ -7510,7 +7510,7 @@ export const it_IT: EnTranslations = {
       "wrath": {
         "name": "Dardo Silvano",
         "description": "Scaglia un dardo di energia naturale per {damage} danni da Natura.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge (a heavy Arcane strike) and Skyfall becomes Sunwake (a Nature strike that restores 35 mana)."
       },
       "healing_touch": {
         "name": "Rammendo Selvaggio",
@@ -7527,7 +7527,7 @@ export const it_IT: EnTranslations = {
       },
       "moonseed": {
         "name": "Moonseed",
-        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge."
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant heavy Arcane strike that spends all 3."
       },
       "rejuvenation": {
         "name": "Fioritura Selvaggia",
@@ -7549,7 +7549,7 @@ export const it_IT: EnTranslations = {
       "maul": {
         "name": "Frantumaossa",
         "description": "Attacco brutale che aumenta i danni in mischia di {damage} e causa molta minaccia. Si attiva al tuo prossimo colpo. Solo in Forma di Bruin.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a heavy, high-threat strike that instead shields you when below half health."
       },
       "growl": {
         "name": "Intimidazione",
@@ -7567,7 +7567,7 @@ export const it_IT: EnTranslations = {
       "ferocious_bite": {
         "name": "Morso Cruento",
         "description": "Mossa finale che infligge {damage}. Solo Forma del Lupo.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: it instantly deals all the damage your bleeds would still have dealt and restores 30 energy."
       },
       "swipe": {
         "name": "Artigli Falcianti",
@@ -7594,7 +7594,7 @@ export const it_IT: EnTranslations = {
       "starfire": {
         "name": "Caduta Celeste",
         "description": "Richiama un dardo di fuoco stellare, infliggendo {damage} danni Arcani.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant Nature strike and burn that restores 35 mana and spends all 3."
       },
       "travel_form": {
         "name": "Forma di Fleet",

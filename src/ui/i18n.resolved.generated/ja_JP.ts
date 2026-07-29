@@ -7510,7 +7510,7 @@ export const ja_JP: EnTranslations = {
       "wrath": {
         "name": "野生の稲妻",
         "description": "自然エネルギーの矢を放ち、{damage} の自然ダメージを与えます。月翼形態では、詠唱の完了で月潮が溜まります。月潮が最大のときはそれを消費します：月の種はムーンサージに、天墜は陽醒に変化します。",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge (a heavy Arcane strike) and Skyfall becomes Sunwake (a Nature strike that restores 35 mana)."
       },
       "healing_touch": {
         "name": "野生の癒し",
@@ -7549,7 +7549,7 @@ export const ja_JP: EnTranslations = {
       "maul": {
         "name": "骨砕き",
         "description": "近接ダメージを {damage} 増加させ、大量の脅威を発生させる猛攻です。ワイルドファング:命中した攻撃が古き血を蓄え、3になると骨砕きが骨髄砕きに変化します。次のスイングで発動します。ブルーインフォーム専用。",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a heavy, high-threat strike that instead shields you when below half health."
       },
       "growl": {
         "name": "威嚇",
@@ -7567,7 +7567,7 @@ export const ja_JP: EnTranslations = {
       "ferocious_bite": {
         "name": "血噛み",
         "description": "{damage}を与えるフィニッシュムーブです。ワイルドファング:命中した攻撃が古き血を蓄え、3になると血噛みが血の収穫に変化します。ウルフフォーム専用。",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: it instantly deals all the damage your bleeds would still have dealt and restores 30 energy."
       },
       "swipe": {
         "name": "薙ぎ払う爪",
@@ -7594,7 +7594,7 @@ export const ja_JP: EnTranslations = {
       "starfire": {
         "name": "天墜",
         "description": "星の炎を呼び下ろし、{damage} の秘術ダメージを与えます。月翼形態では、詠唱の完了で月潮が溜まります。月潮が最大のとき、天墜は陽醒に変化します。",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant Nature strike and burn that restores 35 mana and spends all 3."
       },
       "travel_form": {
         "name": "フリートフォーム",

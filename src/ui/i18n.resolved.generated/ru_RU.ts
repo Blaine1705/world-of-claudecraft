@@ -7510,7 +7510,7 @@ export const ru_RU: EnTranslations = {
       "wrath": {
         "name": "Дикая стрела",
         "description": "Метает сгусток природной энергии, нанося {damage} ед. урона от сил природы. В облике Лунного крыла завершённые применения копят Лунный прилив. При полном Лунном приливе потратьте его: Лунное семя становится Лунным всплеском, а Падение небес Пробуждением солнца.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge (a heavy Arcane strike) and Skyfall becomes Sunwake (a Nature strike that restores 35 mana)."
       },
       "healing_touch": {
         "name": "Дикое заживление",
@@ -7549,7 +7549,7 @@ export const ru_RU: EnTranslations = {
       "maul": {
         "name": "Костолом",
         "description": "Свирепая атака, увеличивающая урон в ближнем бою на {damage} и создающая много угрозы. Попавшие удары копят Старую кровь; при 3 стадиях Костолом становится Дроблением костей. Срабатывает при следующем взмахе. Только в облике бурого.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a heavy, high-threat strike that instead shields you when below half health."
       },
       "growl": {
         "name": "Устрашение",
@@ -7567,7 +7567,7 @@ export const ru_RU: EnTranslations = {
       "ferocious_bite": {
         "name": "Кровавый укус",
         "description": "Завершающий прием, наносящий {damage}. Попавшие удары копят Старую кровь; при 3 стадиях Кровавый укус становится Кровавой жатвой. Только в облике волка.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: it instantly deals all the damage your bleeds would still have dealt and restores 30 energy."
       },
       "swipe": {
         "name": "Разящие когти",
@@ -7594,7 +7594,7 @@ export const ru_RU: EnTranslations = {
       "starfire": {
         "name": "Падение небес",
         "description": "Обрушивает вспышку звездного огня, нанося {damage} ед. урона от тайной магии. В облике Лунного крыла завершённые применения копят Лунный прилив. При полном Лунном приливе Падение небес становится Пробуждением солнца.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant Nature strike and burn that restores 35 mana and spends all 3."
       },
       "travel_form": {
         "name": "Форма скорохода",

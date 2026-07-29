@@ -7510,7 +7510,7 @@ export const zh_TW: EnTranslations = {
       "wrath": {
         "name": "狂野奔雷",
         "description": "投擲一道自然能量箭，造成 {damage} 點自然傷害。月翼形態下，完成施法會累積月潮。月潮滿層時將其消耗：月種變為月湧、隕天術變為日醒。",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge (a heavy Arcane strike) and Skyfall becomes Sunwake (a Nature strike that restores 35 mana)."
       },
       "healing_touch": {
         "name": "荒野癒合",
@@ -7549,7 +7549,7 @@ export const zh_TW: EnTranslations = {
       "maul": {
         "name": "碎骨擊",
         "description": "一次猛擊攻擊，使近戰傷害提高 {damage}，並產生大量威脅值。野牙：命中的攻擊會儲存古血；古血達到 3 層時，碎骨擊變為碎髓。在你的下一次揮擊時觸發。僅限巨熊形態。",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a heavy, high-threat strike that instead shields you when below half health."
       },
       "growl": {
         "name": "威嚇",
@@ -7567,7 +7567,7 @@ export const zh_TW: EnTranslations = {
       "ferocious_bite": {
         "name": "血噬",
         "description": "終結技，造成 {damage}。野牙：命中的攻擊會儲存古血；古血達到 3 層時，血噬變為血收。僅限狼形態。",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: it instantly deals all the damage your bleeds would still have dealt and restores 30 energy."
       },
       "swipe": {
         "name": "橫掃利爪",
@@ -7594,7 +7594,7 @@ export const zh_TW: EnTranslations = {
       "starfire": {
         "name": "隕天術",
         "description": "召下一道星辰之火，造成 {damage} 點秘法傷害。月翼形態下，完成施法會累積月潮。月潮滿層時，隕天術變為日醒。",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant Nature strike and burn that restores 35 mana and spends all 3."
       },
       "travel_form": {
         "name": "迅捷形態",

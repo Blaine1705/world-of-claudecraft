@@ -7510,7 +7510,7 @@ export const vi_VN: EnTranslations = {
       "wrath": {
         "name": "Tia Hoang Dã",
         "description": "Phóng một tia năng lượng tự nhiên gây {damage} sát thương Tự Nhiên.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge (a heavy Arcane strike) and Skyfall becomes Sunwake (a Nature strike that restores 35 mana)."
       },
       "healing_touch": {
         "name": "Hàn Gắn Hoang Dã",
@@ -7527,7 +7527,7 @@ export const vi_VN: EnTranslations = {
       },
       "moonseed": {
         "name": "Moonseed",
-        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge."
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant heavy Arcane strike that spends all 3."
       },
       "rejuvenation": {
         "name": "Hoa Nở Hoang Dã",
@@ -7549,7 +7549,7 @@ export const vi_VN: EnTranslations = {
       "maul": {
         "name": "Nghiền Xương",
         "description": "Một đòn vồ tăng sát thương cận chiến thêm {damage} và gây ra lượng đe dọa lớn. Kích hoạt ở đòn đánh tiếp theo của bạn. Chỉ dùng được ở Bruin Form.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a heavy, high-threat strike that instead shields you when below half health."
       },
       "growl": {
         "name": "Hăm Dọa",
@@ -7567,7 +7567,7 @@ export const vi_VN: EnTranslations = {
       "ferocious_bite": {
         "name": "Cắn Xé Máu",
         "description": "Đòn kết liễu gây {damage}. Chỉ dùng được ở Hình Sói.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: it instantly deals all the damage your bleeds would still have dealt and restores 30 energy."
       },
       "swipe": {
         "name": "Vuốt Quét Ngang",
@@ -7594,7 +7594,7 @@ export const vi_VN: EnTranslations = {
       "starfire": {
         "name": "Thiên Giáng",
         "description": "Gọi xuống một tia lửa tinh tú, gây {damage} sát thương Bí Thuật.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant Nature strike and burn that restores 35 mana and spends all 3."
       },
       "travel_form": {
         "name": "Hình Thần Tốc",

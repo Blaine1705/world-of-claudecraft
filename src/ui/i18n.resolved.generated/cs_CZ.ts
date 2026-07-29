@@ -7510,7 +7510,7 @@ export const cs_CZ: EnTranslations = {
       "wrath": {
         "name": "Šíp divočiny",
         "description": "Vrhe šíp přírodní energie za {damage} přírodního poškození.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge (a heavy Arcane strike) and Skyfall becomes Sunwake (a Nature strike that restores 35 mana)."
       },
       "healing_touch": {
         "name": "Divoké zhojení",
@@ -7527,7 +7527,7 @@ export const cs_CZ: EnTranslations = {
       },
       "moonseed": {
         "name": "Moonseed",
-        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge."
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant heavy Arcane strike that spends all 3."
       },
       "rejuvenation": {
         "name": "Divoký květ",
@@ -7549,7 +7549,7 @@ export const cs_CZ: EnTranslations = {
       "maul": {
         "name": "Drcení kostí",
         "description": "Drtivý útok, který zvýší poškození na blízko o {damage} a způsobí velké množství hrozby. Aktivuje se při tvém dalším úderu. Pouze v medvědí podobě.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a heavy, high-threat strike that instead shields you when below half health."
       },
       "growl": {
         "name": "Hrozba",
@@ -7567,7 +7567,7 @@ export const cs_CZ: EnTranslations = {
       "ferocious_bite": {
         "name": "Krvavý skus",
         "description": "Dokončovací útok, který způsobí {damage}. Pouze ve vlčí podobě.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: it instantly deals all the damage your bleeds would still have dealt and restores 30 energy."
       },
       "swipe": {
         "name": "Rozmáchlé drápy",
@@ -7594,7 +7594,7 @@ export const cs_CZ: EnTranslations = {
       "starfire": {
         "name": "Pád nebes",
         "description": "Přivolá šíp hvězdného ohně a způsobí {damage} arkánního poškození.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant Nature strike and burn that restores 35 mana and spends all 3."
       },
       "travel_form": {
         "name": "Svižná podoba",

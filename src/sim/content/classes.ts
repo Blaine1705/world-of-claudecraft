@@ -4889,7 +4889,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Hurls a bolt of nature energy for $d Nature damage.',
     specNotes: {
       balance:
-        'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake.',
+        'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge (a heavy Arcane strike) and Skyfall becomes Sunwake (a Nature strike that restores 35 mana).',
     },
   },
   healing_touch: {
@@ -4995,7 +4995,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'extendDot', dot: 'moonfire', seconds: 6, maxBonus: 6 },
     ],
     description:
-      'Moonwing Form only. Strikes for $d Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge.',
+      'Moonwing Form only. Strikes for $d Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant heavy Arcane strike that spends all 3.',
   },
   rejuvenation: {
     id: 'rejuvenation',
@@ -5154,7 +5154,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       'A mauling attack that increases melee damage by $d and causes a high amount of threat. Activates on your next swing. Bruin Form only.',
     specNotes: {
       feral:
-        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak.',
+        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a heavy, high-threat strike that instead shields you when below half health.',
     },
   },
   growl: {
@@ -5302,7 +5302,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     actionReplacement: { abilityId: 'redharvest', auraKind: 'old_blood', minStacks: 3 },
     description: 'Finishing move that causes $d. Wolf Form only.',
     specNotes: {
-      feral: 'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest.',
+      feral:
+        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: it instantly deals all the damage your bleeds would still have dealt and restores 30 energy.',
     },
   },
   swipe: {
@@ -5416,7 +5417,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Calls down a bolt of stellar fire, causing $d Arcane damage.',
     specNotes: {
       balance:
-        'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake.',
+        'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant Nature strike and burn that restores 35 mana and spends all 3.',
     },
   },
   travel_form: {
@@ -6402,7 +6403,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'consumeAura', auraKind: 'hot', heal: { min: 105, max: 125 } }],
     actionReplacement: { abilityId: 'overbloom', auraKind: 'verdance', minStacks: 5 },
     description:
-      'Consumes a heal-over-time effect on a friendly target to heal them for $d. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom. (Groveheart signature)',
+      'Consumes a heal-over-time effect on a friendly target to heal them for $d. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)',
   },
   moonlash: {
     id: 'moonlash',

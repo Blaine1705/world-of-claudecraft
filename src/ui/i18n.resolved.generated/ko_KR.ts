@@ -7510,7 +7510,7 @@ export const ko_KR: EnTranslations = {
       "wrath": {
         "name": "야생 벼락",
         "description": "자연 에너지의 화살을 던져 {damage}의 자연 피해를 입힙니다. 달날개 형상에서 시전을 완료하면 달물결이 쌓입니다. 달물결 최대 단계에서 이를 소모합니다: 달씨앗이 달의 격동으로, 창공 낙하가 해돋움으로 변합니다.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge (a heavy Arcane strike) and Skyfall becomes Sunwake (a Nature strike that restores 35 mana)."
       },
       "healing_touch": {
         "name": "야생 치유",
@@ -7549,7 +7549,7 @@ export const ko_KR: EnTranslations = {
       "maul": {
         "name": "뼈 분쇄",
         "description": "근접 피해를 {damage}만큼 증가시키고 많은 위협 수준을 생성하는 난폭한 공격입니다. 야성: 적중한 공격이 오랜 피를 쌓으며, 3단계에서 뼈 분쇄가 골수분쇄로 변합니다. 다음 무기 공격 시 발동됩니다. 큰곰 변신 전용.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a heavy, high-threat strike that instead shields you when below half health."
       },
       "growl": {
         "name": "위협",
@@ -7567,7 +7567,7 @@ export const ko_KR: EnTranslations = {
       "ferocious_bite": {
         "name": "유혈 물어뜯기",
         "description": "결정타로 {damage}의 피해를 입힙니다. 야성: 적중한 공격이 오랜 피를 쌓으며, 3단계에서 유혈 물어뜯기가 피의 수확으로 변합니다. 늑대 변신 전용.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: it instantly deals all the damage your bleeds would still have dealt and restores 30 energy."
       },
       "swipe": {
         "name": "휩쓰는 발톱",
@@ -7594,7 +7594,7 @@ export const ko_KR: EnTranslations = {
       "starfire": {
         "name": "창공 낙하",
         "description": "별의 불꽃을 불러 내려 {damage}의 비전 피해를 입힙니다. 달날개 형상에서 시전을 완료하면 달물결이 쌓입니다. 달물결 최대 단계에서 창공 낙하가 해돋움으로 변합니다.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant Nature strike and burn that restores 35 mana and spends all 3."
       },
       "travel_form": {
         "name": "쾌속 형태",
