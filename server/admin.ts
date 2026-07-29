@@ -45,7 +45,6 @@ import {
   getFilterConfig,
   listFilterWords,
   removeFilterWord,
-  resetChatStrikes,
   updateFilterConfig,
   type WordTier,
 } from './chat_filter_db';
@@ -61,7 +60,6 @@ import {
   pool,
   revokeTokensExcept,
   saveToken,
-  setAccountDeactivated,
   touchLogin,
   updatePasswordHash,
 } from './db';
@@ -92,7 +90,9 @@ import {
   moderationQueue,
   moderationReportsForAccount,
   muteAccountChat,
+  reactivateAccountAudited,
   recordPasswordReset,
+  resetChatStrikesAudited,
   setAccountAiFlag,
   setAccountStreamerFlair,
   setDailyRewardsBan,
@@ -514,8 +514,13 @@ export async function handleAdminApi(
     const reactivateMatch = /^\/admin\/api\/moderation\/accounts\/(\d+)\/reactivate$/.exec(path);
     if (req.method === 'POST' && reactivateMatch) {
       const targetAccountId = Number(reactivateMatch[1]);
+      const body = await readBody(req);
       try {
-        await setAccountDeactivated(targetAccountId, false);
+        await reactivateAccountAudited({
+          accountId: targetAccountId,
+          adminAccountId: accountId,
+          reason: body.reason,
+        });
         return ok(res, { ok: true });
       } catch (err) {
         return fail(res, 400, err instanceof Error ? err.message : 'reactivation failed');
@@ -649,9 +654,18 @@ export async function handleAdminApi(
     );
     if (req.method === 'POST' && resetStrikesMatch) {
       const id = Number(resetStrikesMatch[1]);
-      const reset = await resetChatStrikes(id);
-      if (reset) game.resetChatStrikesLive(id);
-      return reset ? ok(res, { ok: true }) : fail(res, 404, 'account not found');
+      const body = await readBody(req);
+      try {
+        const reset = await resetChatStrikesAudited({
+          accountId: id,
+          adminAccountId: accountId,
+          reason: body.reason,
+        });
+        if (reset) game.resetChatStrikesLive(id);
+        return reset ? ok(res, { ok: true }) : fail(res, 404, 'account not found');
+      } catch (err) {
+        return fail(res, 400, err instanceof Error ? err.message : 'chat strikes reset failed');
+      }
     }
 
     // Set a new password on any account (admin-initiated credential reset). The
@@ -1234,7 +1248,7 @@ function makeRealAdminDb() {
     updateFilterConfig,
     chatModerationForAccount,
     chatModeratedAccounts,
-    resetChatStrikes,
+    resetChatStrikesAudited,
     cleanIp,
     listBlockedIps,
     addBlockedIp,
@@ -1254,7 +1268,7 @@ function makeRealAdminDb() {
     // chat muted" guards); the CALLER gate resolves roles via adminRolesForAccount.
     isAdminAccount,
     saveToken,
-    setAccountDeactivated,
+    reactivateAccountAudited,
     touchLogin,
     newToken,
     verifyPassword,
@@ -1718,8 +1732,14 @@ async function moderateActionHandler(ctx: Ctx): Promise<void> {
 
 /** POST /admin/api/moderation/accounts/:id/reactivate: reverse a self-deactivation. */
 async function reactivateHandler(ctx: Ctx): Promise<void> {
+  const id = adminTargetId(ctx);
+  const body = await readBody(ctx.req);
   try {
-    await adminDb().setAccountDeactivated(adminTargetId(ctx), false);
+    await adminDb().reactivateAccountAudited({
+      accountId: id,
+      adminAccountId: ctxAccountId(ctx),
+      reason: body.reason,
+    });
     return ok(ctx.res, { ok: true });
   } catch (err) {
     return fail(ctx.res, 400, err instanceof Error ? err.message : 'reactivation failed');
@@ -1856,9 +1876,18 @@ async function noteHandler(ctx: Ctx): Promise<void> {
 async function resetStrikesHandler(ctx: Ctx): Promise<void> {
   const rt = useAdminRuntime();
   const id = adminTargetId(ctx);
-  const reset = await adminDb().resetChatStrikes(id);
-  if (reset) rt.resetChatStrikesLive(id);
-  return reset ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'account not found');
+  const body = await readBody(ctx.req);
+  try {
+    const reset = await adminDb().resetChatStrikesAudited({
+      accountId: id,
+      adminAccountId: ctxAccountId(ctx),
+      reason: body.reason,
+    });
+    if (reset) rt.resetChatStrikesLive(id);
+    return reset ? ok(ctx.res, { ok: true }) : fail(ctx.res, 404, 'account not found');
+  } catch (err) {
+    return fail(ctx.res, 400, err instanceof Error ? err.message : 'chat strikes reset failed');
+  }
 }
 
 /** GET /admin/api/moderation/queue: accounts with open reports. */
