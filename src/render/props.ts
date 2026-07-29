@@ -35,6 +35,8 @@ import {
 } from './eastbrook_town';
 import { EMISSIVE_LIGHT, GFX, sharedUniforms, surfaceMat } from './gfx';
 import { applySurfaceDetail, reapplySurfaceDetailToClone, wornFamilyFor } from './worn_stone';
+import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
+import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -60,8 +62,9 @@ export interface PropsResult {
   fireLights: THREE.PointLight[];
   /**
    * Hides merged/instanced prop bands that sit entirely past the fog far plane,
-   * and hides any camera-ghost prop crossing the current eye-to-camera segment
-   * so the chase cam can pass through props without a wall in view.
+   * and fades any camera-ghost prop crossing the current eye-to-camera segment
+   * toward 20% opacity (animated) so the chase cam sees through props instead
+   * of zooming in or blanking them.
    */
   update(
     camX: number,
@@ -71,6 +74,7 @@ export interface PropsResult {
     eyeY: number,
     eyeZ: number,
     fogFar: number,
+    dt: number,
   ): void;
 }
 
@@ -997,18 +1001,18 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   const ground = (x: number, z: number) => terrainHeight(x, z, seed);
 
   // Camera-ghost props (see colliders.ts `camGhost`) stay individual and
-  // un-merged so they can be hidden while the camera ray passes through their
-  // footprint. Footprints mirror the colliders so what hides is exactly what
+  // un-merged so they can be faded while the camera ray passes through their
+  // footprint. Footprints mirror the colliders so what fades is exactly what
   // the camera passes through.
   const hideables: Hideable[] = [];
   const keepFromMerge = new Set<THREE.Object3D>();
   /**
-   * Mark `g` un-mergeable and register it as hide-when-camera-crossed. Each
-   * mesh's material is cloned so flipping colour/depth writes hides only this
-   * structure (and leaves the shadow pass untouched).
+   * Mark `g` un-mergeable and register it as fade-when-camera-crossed. Each
+   * mesh's material is cloned so the opacity fade touches only this structure
+   * (and leaves the shadow pass untouched).
    */
   function registerHideable(g: THREE.Group, fp: Footprint): void {
-    const matMap = new Map<THREE.Material, ToggleMat>();
+    const matMap = new Map<THREE.Material, OccluderFadeMat>();
     g.traverse((o) => {
       const mesh = o as THREE.Mesh;
       if (!mesh.isMesh) return;
@@ -1017,16 +1021,16 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       const src = mesh.material as THREE.Material;
       let tm = matMap.get(src);
       if (!tm) {
-        const mat = src.clone();
+        const ghostSrc = src.clone();
         // Material.clone drops onBeforeCompile: re-attach the recorded
         // surface-detail layer so ghostable buildings keep their texture.
-        reapplySurfaceDetailToClone(mat);
-        tm = { mat, depthWrite: mat.depthWrite };
+        reapplySurfaceDetailToClone(ghostSrc);
+        tm = occluderFadeMat(ghostSrc);
         matMap.set(src, tm);
       }
       mesh.material = tm.mat;
     });
-    hideables.push({ group: g, mats: [...matMap.values()], hidden: false, ...fp });
+    hideables.push({ group: g, mats: [...matMap.values()], hidden: false, alpha: 1, ...fp });
   }
 
   // live small materials (decals / glow) — shared, never per-instance
@@ -2110,7 +2114,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     }
   }
 
-  // animated flames + camera-ghost props (hidden individually) stay un-merged
+  // animated flames + camera-ghost props (faded individually) stay un-merged
   const keep = new Set<THREE.Object3D>(flames);
   for (const m of keepFromMerge) keep.add(m);
   for (const p of delvePortals) keep.add(p); // shader-driven void: keep its transparency/renderOrder
@@ -2133,6 +2137,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       eyeY: number,
       eyeZ: number,
       fogFar: number,
+      dt: number,
     ): void {
       const fogFarSq = fogFar * fogFar;
       for (let i = 0; i < cullables.length; i++) {
@@ -2148,8 +2153,9 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
           h.group.visible = false; // fully fogged: drop it (shadow is out of range too)
           continue;
         }
-        // Hide from the camera while still casting a shadow: disable colour +
-        // depth writes, not the object.
+        // Fade toward 20% opacity while the structure blocks the view, keeping
+        // its shadow; the low tier has no per-structure material clones, so it
+        // keeps the instant show/hide toggle instead.
         const hide = cameraSegmentHitsFootprint(h, eyeX, eyeY, eyeZ, camX, camY, camZ);
         if (h.mats.length === 0) {
           h.hidden = hide;
@@ -2157,37 +2163,28 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
           continue;
         }
         h.group.visible = true;
-        if (hide !== h.hidden) {
-          h.hidden = hide;
-          for (let j = 0; j < h.mats.length; j++) {
-            const m = h.mats[j];
-            m.mat.colorWrite = !hide;
-            m.mat.depthWrite = hide ? false : m.depthWrite;
-          }
-        }
+        h.hidden = hide;
+        if (occluderFadeSettled(h.alpha, hide)) continue;
+        h.alpha = stepOccluderFade(h.alpha, hide, dt);
+        applyOccluderFade(h.mats, h.alpha);
       }
     },
   };
 }
 
-/** One material we flip on/off, remembering its original depth-write state. */
-interface ToggleMat {
-  mat: THREE.Material;
-  depthWrite: boolean;
-}
-
-// A prop that the camera ghosts through and the renderer hides whenever the
-// eye-to-camera segment crosses its footprint (below `topY`). Either a circle
-// (`r`) or an OBB (`hw`/`hd`/`rot`), matching the collider it mirrors. "Hidden"
-// disables colour/depth writes rather than `visible = false`, so the structure
-// stays in the shadow pass and keeps casting its shadow.
+// A prop that the camera ghosts through and the renderer fades toward 20%
+// opacity whenever the eye-to-camera segment crosses its footprint (below
+// `topY`). Either a circle (`r`) or an OBB (`hw`/`hd`/`rot`), matching the
+// collider it mirrors. The fade animates via occluder_fade_core and leaves
+// `visible`/shadow casting alone, so the structure keeps casting its shadow.
 interface Hideable {
   group: THREE.Group;
-  mats: ToggleMat[]; // cloned per-structure so the toggle is local
-  hidden: boolean;
+  mats: OccluderFadeMat[]; // cloned per-structure so the fade is local
+  hidden: boolean; // whether the structure occludes the view this frame
+  alpha: number; // animated fade level (1 = opaque, 0.2 = occluding)
   x: number; // footprint centre (world XZ)
   z: number;
-  topY: number; // roof height; a camera above this never hides the structure
+  topY: number; // roof height; a camera above this never fades the structure
   cull: number; // bounding radius for the fog-far cull
   r?: number; // circle footprint
   hw?: number; // OBB half-extents + yaw
@@ -2195,7 +2192,7 @@ interface Hideable {
   rot?: number;
 }
 
-type Footprint = Omit<Hideable, 'group' | 'mats' | 'hidden'>;
+type Footprint = Omit<Hideable, 'group' | 'mats' | 'hidden' | 'alpha'>;
 
 function circleFootprint(x: number, z: number, r: number, topY: number, cull = r): Footprint {
   return { x, z, r, topY, cull };

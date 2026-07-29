@@ -32,6 +32,8 @@ import {
   newEastbrookRoofVisibilityPlan,
 } from './eastbrook_town_visibility_core';
 import { EMISSIVE_GLOW, GFX, surfaceMat } from './gfx';
+import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
+import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import { modulateEmissiveByVertexColor } from './vertex_color_emissive';
 
 const ROOT_NAME = 'eastbrookTownRebuild';
@@ -89,8 +91,9 @@ interface TownAssetTemplate {
 
 interface RoofHideTarget extends EastbrookRoofVisibilityTarget {
   group: THREE.Group;
-  materials: THREE.Material[];
+  mats: OccluderFadeMat[];
   hidden: boolean;
+  alpha: number;
 }
 
 export interface EastbrookTownView {
@@ -103,6 +106,7 @@ export interface EastbrookTownView {
     eyeY: number,
     eyeZ: number,
     fogFar: number,
+    dt: number,
     reducedMotion?: boolean,
   ): void;
 }
@@ -440,8 +444,9 @@ function buildBuilding(
     group,
     hideTarget: {
       group,
-      materials,
+      mats: materials.map(occluderFadeMat),
       hidden: false,
+      alpha: 1,
       x: building.position.x,
       z: building.position.z,
       halfWidth: dimensions.width / 2,
@@ -898,6 +903,7 @@ function buildFromTemplates(
       eyeY: number,
       eyeZ: number,
       fogFar: number,
+      dt: number,
       reducedMotion = false,
     ): void {
       updateEastbrookCivicBeaconMotion(microBuild.civicBeaconState, reducedMotion);
@@ -920,13 +926,11 @@ function buildFromTemplates(
           fogFar,
         );
         target.group.visible = roofVisibilityPlan.visible;
-        if (!roofVisibilityPlan.visible || !roofVisibilityPlan.hiddenChanged) continue;
+        if (!roofVisibilityPlan.visible) continue;
         target.hidden = roofVisibilityPlan.hidden;
-        for (let materialIndex = 0; materialIndex < target.materials.length; materialIndex++) {
-          const material = target.materials[materialIndex];
-          material.colorWrite = !roofVisibilityPlan.hidden;
-          material.depthWrite = !roofVisibilityPlan.hidden;
-        }
+        if (occluderFadeSettled(target.alpha, target.hidden)) continue;
+        target.alpha = stepOccluderFade(target.alpha, target.hidden, dt);
+        applyOccluderFade(target.mats, target.alpha);
       }
     },
   };

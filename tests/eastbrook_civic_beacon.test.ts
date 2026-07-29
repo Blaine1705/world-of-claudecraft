@@ -237,10 +237,10 @@ describe('Eastbrook civic beacon shader animation', () => {
     });
     expect(eastbrookTownDrawStats(view.group)).toMatchObject({ colorDraws: 18, shadowDraws: 9 });
 
-    view.update(0, 5, 0, 0, 0, 0, 100, true);
+    view.update(0, 5, 0, 0, 0, 0, 100, 1, true);
     const shader = compileMaterial(micro.material as THREE.Material);
     expect(shader.uniforms.uEastbrookCivicReducedMotion.value).toBe(1);
-    view.update(0, 5, 0, 0, 0, 0, 100, false);
+    view.update(0, 5, 0, 0, 0, 0, 100, 1, false);
     expect(shader.uniforms.uEastbrookCivicReducedMotion.value).toBe(0);
     expect(view.update.toString()).not.toMatch(/\bnew\s+/);
   });

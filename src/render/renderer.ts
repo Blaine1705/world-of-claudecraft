@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { NumberSampleRing } from '../game/sample_ring';
 import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
-import { cameraOcclusion, supportHeightAt } from '../sim/colliders';
+import { supportHeightAt } from '../sim/colliders';
 import {
   ABILITIES,
   ARENA_SLOT_COUNT,
@@ -50,7 +50,6 @@ import { attachBankerChestToNpcView } from './banker_chest';
 import { type BirdsView, buildBirds } from './birds';
 import { type BladeGrassView, buildBladeGrass } from './blade_grass';
 import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
-import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
 import {
   cancelCameraDirective,
   createCameraDirector,
@@ -145,6 +144,16 @@ import { buildEastbrookTownView, type EastbrookTownView } from './eastbrook_town
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
 import { objectDisplayName } from './entity_labels';
 import { resolveEnvironmentPrefilterPlan } from './env_prefilter_core';
+import {
+  createEnvironmentMapTransition,
+  dampedValue,
+  easedFogFar,
+  easedFogNear,
+  type EnvironmentMapTransition,
+  stepEnvironmentMapTransition,
+  transitionAlpha,
+  ZONE_ENVIRONMENT_RESPONSE,
+} from './environment_transition_core';
 import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
 import { buildFarshoreFeatures } from './farshore_features';
 import { buildFenFeatures, type FenFeaturesView } from './fen_features';
@@ -448,17 +457,11 @@ for (const set of Object.values(ITEM_SETS)) {
 }
 const CLICK_MARKER_POOL = 4; // concurrent click-feedback markers before reuse
 const SPARKLE_BOOST = 1.5;
-// Third-person camera collision (see updateCamera). Prop colliders marked
-// camGhost are hidden by props.ts/foliage.ts instead; this path is for
-// non-hideable blockers such as large rocks and interior walls.
-const CAMERA_COLLIDER_PAD = 0.35;
-const CAMERA_SOFT_COLLIDER_PAD = 1.65;
-const CAMERA_MIN_DIST = 1.2;
-const CAMERA_PULL_IN_RATE = 10;
-const CAMERA_PULL_OUT_RATE = 6;
-const CAMERA_SOFT_PULL_WEIGHT = 0.45;
+// Third-person camera: the chase cam never pulls in for occluders. Anything
+// crossing the eye-to-camera segment fades to 20% opacity instead, handled by
+// the per-subsystem occluder fades (props.ts, foliage.ts, dungeon.ts,
+// eastbrook_town.ts) around the shared occluder_fade_core policy.
 const CAMERA_BASE_FOV = 60;
-const CAMERA_MAX_COMP_FOV = 98;
 // Decay rate of the one-time offset captured when the self-motion predictor
 // takes over from the lead-smoothing path (gone in ~0.3 s, no camera step).
 const SELF_MOTION_HANDOFF_RATE = 15;
@@ -475,31 +478,31 @@ const SELF_MOTION_HANDOFF_RATE = 15;
 // near-black, so non-composer tiers ride a higher floor. The grade-only
 // medium tier sits between: its grade supplies the shadow lift but it has
 // no AO/bloom softening the extremes.
-// Shadow DARKNESS is the other half of felt sunlight: at hemi 0.33 +
-// env 0.45 the fill lifted building and hill shadows until they read as
+// Shadow DARKNESS is the other half of felt sunlight: a stronger hemisphere
+// plus IBL fill lifted building and hill shadows until they read as
 // dirt-colour variation, not shade (BSL-class looks run visibly darker,
 // cooler shadow regions). Key up / both fills down buys the contrast.
-const HEMI_INTENSITY_COMPOSER = 0.3;
-const HEMI_INTENSITY_GRADE = 0.35;
-const HEMI_INTENSITY_FLAT = 0.42;
+const HEMI_INTENSITY_COMPOSER = 0.27;
+const HEMI_INTENSITY_GRADE = 0.32;
+const HEMI_INTENSITY_FLAT = 0.4;
 const hemiOutdoorIntensity = (): number =>
   GFX.composer
     ? HEMI_INTENSITY_COMPOSER
     : GFX.gradePass
       ? HEMI_INTENSITY_GRADE
       : HEMI_INTENSITY_FLAT;
-const SUN_INTENSITY = 3.35;
-const ENV_INTENSITY = 0.4;
+const SUN_INTENSITY = 3.5;
+const ENV_INTENSITY = 0.37;
 // dungeon interiors: kill the daylight so torchlight carries the scene
 // (env at 0.15 still lit rigs sky-blue against the pitch-dark crypt)
-const DUNGEON_SUN_INTENSITY = 0.3;
+const DUNGEON_SUN_INTENSITY = 0.34;
 const DUNGEON_ENV_INTENSITY = 0.05;
 // The authored Infernal Citadel is larger than a procedural floor and carries
 // real budgeted brazier lights. A stronger ambient floor preserves the black-red
 // infernal grade while keeping its loops, bosses, and doors readable between pools.
-const INFERNAL_SUN_INTENSITY = 0.48;
-const INFERNAL_HEMI_INTENSITY = 0.36;
-const INFERNAL_ENV_INTENSITY = 0.12;
+const INFERNAL_SUN_INTENSITY = 0.54;
+const INFERNAL_HEMI_INTENSITY = 0.32;
+const INFERNAL_ENV_INTENSITY = 0.1;
 const INFERNAL_RIM_BOOST = 2.15;
 // raw HDRI PMREMs integrate the real sun the dome shader clamps away —
 // rescale so ambient matches the dome-capture look (see lookdev-hookup.md)
@@ -514,6 +517,13 @@ const NIGHT_SUN_COOL = 0.55; // how far the sun hue shifts to moonlight at full 
 const NIGHT_HEMI_COOL = 0.5; // how far the sky-bounce hue shifts at full night
 // golden tone the sun light warms toward, strongest as the sun nears the horizon
 const WARM_SUN_COLOR = 0xff8a3a;
+// A shared warm daylight bias applied after each biome picks its authored hue.
+// Keeping this below 0.2 preserves Frostveil, Wraithwood, and Galecrest as cool
+// realms while stopping their HDRI/hemisphere fill from cooling the whole frame.
+const WARM_HEMI_SKY_COLOR = 0xffdfbd;
+const WARM_HEMI_GROUND_COLOR = 0x725038;
+const DAY_HEMI_SKY_WARMTH = 0.18;
+const DAY_HEMI_GROUND_WARMTH = 0.13;
 // the moving sun/moon key light rides at the same distance the fixed anchor did
 const SUN_TRAVEL_DISTANCE = SUN_ANCHOR.length();
 // character rim glow scales up underground so silhouettes split from the murk
@@ -521,22 +531,22 @@ const DUNGEON_RIM_BOOST = 2.4;
 // The Protect Yumi maze is a torch-lit NIGHT ARENA, not a crypt: a moon-key
 // plus a healthy hemisphere keep the whole competitive space readable, with
 // the braziers/torches adding warmth rather than carrying the scene alone.
-const YUMI_MAZE_SUN_INTENSITY = 1.2;
-const YUMI_MAZE_HEMI_INTENSITY = 0.42;
-const YUMI_MAZE_ENV_INTENSITY = 0.28;
+const YUMI_MAZE_SUN_INTENSITY = 1.32;
+const YUMI_MAZE_HEMI_INTENSITY = 0.38;
+const YUMI_MAZE_ENV_INTENSITY = 0.25;
 const YUMI_MAZE_RIM_BOOST = 1.7;
-const WILDHEART_SUN_INTENSITY = 1.55;
-const WILDHEART_HEMI_INTENSITY = 0.68;
-const WILDHEART_ENV_INTENSITY = 0.32;
+const WILDHEART_SUN_INTENSITY = 1.75;
+const WILDHEART_HEMI_INTENSITY = 0.59;
+const WILDHEART_ENV_INTENSITY = 0.28;
 const WILDHEART_RIM_BOOST = 1.5;
 // The Last Keep is a LIVED-IN castle interior, not a crypt: a higher, warmed
 // ambient floor (over the candle-orange torch lights the interior itself
 // carries) so its halls read golden and inhabited while staying indoors-dim.
 // Scoped to interior 'lastkeep' only; every other underground interior keeps
 // the DUNGEON_* rig.
-const LASTKEEP_SUN_INTENSITY = 0.55;
-const LASTKEEP_HEMI_INTENSITY = 0.52;
-const LASTKEEP_ENV_INTENSITY = 0.16;
+const LASTKEEP_SUN_INTENSITY = 0.66;
+const LASTKEEP_HEMI_INTENSITY = 0.46;
+const LASTKEEP_ENV_INTENSITY = 0.14;
 const LASTKEEP_RIM_BOOST = 1.9;
 const LASTKEEP_SUN_COLOR = 0xffd9a8;
 const LASTKEEP_HEMI_SKY_COLOR = 0xffe4c4;
@@ -1188,12 +1198,6 @@ export class Renderer {
   // chasing the player (updateCamera honors it and returns early). Editor-only;
   // always null in the shipped game.
   editorCam: { pos: THREE.Vector3; target: THREE.Vector3 } | null = null;
-  // Smoothed chase-cam occlusion (1 = no pull-in); see updateCamera.
-  private camOcclusion: CameraOcclusionState = {
-    pullT: 1,
-    lensT: 1,
-    fov: CAMERA_BASE_FOV,
-  };
   // AAA camera-feel layers (all display-only; see the three *_core modules):
   // spring-arm pivot lag, look-ahead + FOV kicks + landing thump, and the
   // directed moves (zone vista, death drift). Gated by reducedMotion().
@@ -1255,7 +1259,7 @@ export class Renderer {
   // Tone-mapping exposure at brightness 1.0. Applied in OutputPass, i.e.
   // AFTER bloom, so this trims the raised sun rig back to the old apparent
   // brightness without moving anything across BLOOM_THRESHOLD.
-  private baseExposure = 1.03;
+  private baseExposure = 1;
   private tmpV = new THREE.Vector3();
   private tmpPuff = new THREE.Vector3();
   private viewCandidates: ViewCandidate[] = [];
@@ -1408,6 +1412,7 @@ export class Renderer {
       eyeY: number,
       eyeZ: number,
       fogFar: number,
+      dt: number,
     ): void;
   };
   private eastbrookTownView!: EastbrookTownView;
@@ -1422,6 +1427,8 @@ export class Renderer {
   private pmremGenerator: THREE.PMREMGenerator | null = null;
   private envBiome: SkyKey = 'vale';
   private envOutdoorIntensity = ENV_INTENSITY;
+  private envTransition: EnvironmentMapTransition<SkyKey> =
+    createEnvironmentMapTransition('vale', 0);
   private preparedZones = new Set<string>();
   private pendingZonePrepares = new Map<string, Promise<void>>();
   // A walked boundary can ask for the same shader warmup in the frame where
@@ -1654,8 +1661,9 @@ export class Renderer {
     this.webgl.shadowMap.enabled = GFX.dynamicShadows;
     // PCF (not PCFSoft): in three 0.165 shadow.radius is only honoured by the
     // plain PCF kernel — PCFSoft ignores it and uses a fixed texel-sized
-    // kernel, so the sun's radius=3 softening was silently a no-op and every
-    // shadow edge rendered near-hard regardless of tuning.
+    // kernel, so the old softening was silently a no-op and every shadow edge
+    // rendered near-hard regardless of tuning. The live radius is deliberately
+    // crisp without dropping all the way to a razor edge.
     this.webgl.shadowMap.type = THREE.PCFShadowMap;
     this.webgl.toneMapping = THREE.ACESFilmicToneMapping; // OutputPass reads this on the composer path
     this.webgl.toneMappingExposure = this.baseExposure;
@@ -1748,20 +1756,22 @@ export class Renderer {
         this.scene.environment = envRT.texture;
       }
       this.scene.environmentIntensity = this.envOutdoorIntensity;
+      this.envTransition.current = this.envBiome;
+      this.envTransition.intensity = this.scene.environmentIntensity;
     }
 
     const hemi = new THREE.HemisphereLight(
       0xdcefff,
       0x465f39,
-      LOW_GFX ? 0.98 : hemiOutdoorIntensity(),
+      LOW_GFX ? 0.9 : hemiOutdoorIntensity(),
     );
     this.scene.add(hemi);
     this.hemi = hemi;
     // Golden key light: warmer than the old near-white cream so daylight reads
     // as soft sun, not white glare; the hemisphere stays cool for contrast.
     const sun = new THREE.DirectionalLight(
-      LOW_GFX ? 0xffe6b8 : 0xffe3ae,
-      LOW_GFX ? 2.5 : SUN_INTENSITY,
+      LOW_GFX ? 0xffdfaa : 0xffd99a,
+      LOW_GFX ? 2.65 : SUN_INTENSITY,
     );
     sun.position.copy(SUN_ANCHOR);
     sun.castShadow = GFX.dynamicShadows;
@@ -1782,7 +1792,7 @@ export class Renderer {
     // 0.05 pushed contact shadows clean off clod/prop-scale relief; 0.035
     // still clears acne on the low-poly facets
     sun.shadow.normalBias = LOW_GFX ? 0.02 : 0.035;
-    sun.shadow.radius = 3;
+    sun.shadow.radius = 2.25;
     this.scene.add(sun);
     this.scene.add(sun.target);
     this.sun = sun;
@@ -3582,6 +3592,7 @@ export class Renderer {
       this.cameraLookAt.y,
       this.cameraLookAt.z,
       fogFar,
+      dt,
     );
     this.eastbrookTownView.update(
       this.camera.position.x,
@@ -3591,6 +3602,7 @@ export class Renderer {
       this.cameraLookAt.y,
       this.cameraLookAt.z,
       fogFar,
+      dt,
       this.reducedMotion(),
     );
     this.foliage.update(
@@ -3606,6 +3618,7 @@ export class Renderer {
       fogFar,
       this.lastRequestedFogNear,
       this.lastRequestedFogFar,
+      dt,
     );
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.vfx.update(dt);
@@ -6117,6 +6130,7 @@ export class Renderer {
     for (let i = this.flames.length - 1; i >= 0; i--) {
       if (doomed.has(this.flames[i])) this.flames.splice(i, 1);
     }
+    this.dungeons?.retireHideables(doomed);
   }
 
   private buildInterior(
@@ -6675,7 +6689,7 @@ export class Renderer {
     if (desired === 'outdoor') {
       const g = this.dnGrade;
       const preset = this.outdoorFogPreset();
-      const k = 1 - Math.exp(-dt * 1.5);
+      const k = transitionAlpha(dt, ZONE_ENVIRONMENT_RESPONSE);
       const requestedFar = preset.far * (this.lowGfx ? 1 : g.farScale);
       this.lastRequestedFogFar = requestedFar;
       this.lastRequestedFogNear = preset.near;
@@ -6685,17 +6699,21 @@ export class Renderer {
       // its HDRI) finished: 198 s of 45-yard wall after a Drakelands portal.
       // Read live rather than cached: an editor rebuildTerrain swaps the view.
       const ground = this.terrainView.groundResidency();
-      const targetFar = fogFarForBuiltGround(
+      const atmosphericFar = dampedValue(
+        fog.far,
+        requestedFar,
+        dt,
+        ZONE_ENVIRONMENT_RESPONSE,
+      );
+      const residencyFar = fogFarForBuiltGround(
         ground.grid,
         ground.isPending,
         this.camera.position.x,
         this.camera.position.z,
-        requestedFar,
+        atmosphericFar,
       );
-      const targetNear = Math.min(preset.near, targetFar * 0.55);
-      fog.near += (targetNear - fog.near) * k;
-      if (fog.far > targetFar) fog.far = targetFar;
-      else fog.far += (targetFar - fog.far) * k;
+      fog.far = easedFogFar(fog.far, requestedFar, residencyFar, dt);
+      fog.near = easedFogNear(fog.near, preset.near, fog.far, dt);
       if (this.lowGfx) return;
       // fog color: the biome hue multiplied by the day/night color (a dark
       // dusk-blue by night)
@@ -6719,7 +6737,7 @@ export class Renderer {
       // 0.42 base: with the key pinned at 31° the warm never ramps through
       // the old near-horizon band, so the standing gold has to come from the
       // base term — this is the golden-hour read at the permanent day angle
-      const warmAmt = aboveHorizon(sunElev) * (0.42 + lowness * 0.45);
+      const warmAmt = aboveHorizon(sunElev) * (0.52 + lowness * 0.4);
       this.dnColorScratch.setHex(light.sun);
       this.dnColorScratch.lerp(this.dnMoonScratch.setHex(WARM_SUN_COLOR), warmAmt);
       this.dnColorScratch.lerp(
@@ -6729,12 +6747,20 @@ export class Renderer {
       this.sun.color.lerp(this.dnColorScratch, k);
       this.dnColorScratch
         .setHex(light.hemiSky)
+        .lerp(
+          this.dnMoonScratch.setHex(WARM_HEMI_SKY_COLOR),
+          DAY_HEMI_SKY_WARMTH * (1 - g.nightAmt),
+        )
         .lerp(this.dnMoonScratch.setHex(MOON_HEMI_SKY_COLOR), g.nightAmt * NIGHT_HEMI_COOL);
       this.hemi.color.lerp(this.dnColorScratch, k);
       // the ground bounce cools with the sky side so night shading does not keep
       // a warm daytime tint (its brightness still rides the hemi intensity above)
       this.dnColorScratch
         .setHex(light.hemiGround)
+        .lerp(
+          this.dnMoonScratch.setHex(WARM_HEMI_GROUND_COLOR),
+          DAY_HEMI_GROUND_WARMTH * (1 - g.nightAmt),
+        )
         .lerp(this.dnMoonScratch.setHex(MOON_HEMI_GROUND_COLOR), g.nightAmt * NIGHT_HEMI_COOL);
       this.hemi.groundColor.lerp(this.dnColorScratch, k);
       this.sun.intensity +=
@@ -6744,12 +6770,13 @@ export class Renderer {
     }
   }
 
-  // Swap the prefiltered environment map to the dominant biome's HDRI as the
-  // camera crosses zone bands (the dome cross-fades the same textures); a
-  // brief intensity dip masks the hard texture swap, then eases back like fog.
+  // Hand the prefiltered environment map to the dominant eased sky biome.
+  // PMREMs cannot cross-fade, so their shared core fades the current IBL to a
+  // low contribution, authorizes the texture/rotation swap, then restores the
+  // new biome on the same long response as fog and light tint.
   private updateEnvBiome(dt: number): void {
-    if (this.lowGfx || this.envRTs.size < 2) return;
-    const blend = this.skyView.biomeAt(this.camera.position.x, this.camera.position.z);
+    if (this.lowGfx || this.envRTs.size < 2 || this.fogState !== 'outdoor') return;
+    const blend = this.skyView.currentBiomeBlend();
     const dominant = blend.t < 0.5 ? blend.from : blend.to;
     // the biome's light-level scale applies to the IBL too, or a dimmed realm
     // (Nightbloom twilight) would keep full-daylight ambient from its HDRI.
@@ -6759,18 +6786,25 @@ export class Renderer {
       dominant in Renderer.BIOME_LIGHT
         ? (Renderer.BIOME_LIGHT[dominant as BiomeId].envScale ?? 1)
         : 1;
-    if (dominant !== this.envBiome && this.envRTs.has(dominant)) {
-      this.envBiome = dominant;
-      this.scene.environment = this.envRTs.get(dominant)?.texture ?? null;
-      this.scene.environmentRotation.y = this.skyView.envRotationY(dominant);
-      this.scene.environmentIntensity =
-        this.envOutdoorIntensity * 0.4 * this.dnGrade.lightScale * envScale;
+    const target = this.envRTs.has(dominant) ? dominant : this.envTransition.current;
+    const settledIntensity =
+      this.envOutdoorIntensity * this.dnGrade.lightScale * envScale;
+    // Interior presets write the scene intensity directly. Re-seed from that
+    // live value on the first outdoor frame so returning outside never jumps
+    // back to a stale transition scalar.
+    this.envTransition.intensity = this.scene.environmentIntensity;
+    const swapTo = stepEnvironmentMapTransition(
+      this.envTransition,
+      target,
+      settledIntensity,
+      dt,
+    );
+    if (swapTo !== null) {
+      this.envBiome = swapTo;
+      this.scene.environment = this.envRTs.get(swapTo)?.texture ?? null;
+      this.scene.environmentRotation.y = this.skyView.envRotationY(swapTo);
     }
-    const k = 1 - Math.exp(-dt * 1.5);
-    this.scene.environmentIntensity +=
-      (this.envOutdoorIntensity * this.dnGrade.lightScale * envScale -
-        this.scene.environmentIntensity) *
-      k;
+    this.scene.environmentIntensity = this.envTransition.intensity;
   }
 
   // Aim the key light (sun by day, moon by night) at the player. On the low tier
@@ -8234,7 +8268,17 @@ export class Renderer {
     this.updateFiestaRing(dt);
     this.updateFiestaPowerups(dt);
     this.tickFiestaGlows(dt);
-    for (const view of this.yumiMazeViews.values()) view.update(this.sim);
+    for (const view of this.yumiMazeViews.values())
+      view.update(
+        this.sim,
+        this.camera.position.x,
+        this.camera.position.y,
+        this.camera.position.z,
+        this.cameraLookAt.x,
+        this.cameraLookAt.y,
+        this.cameraLookAt.z,
+        dt,
+      );
     this.yumiTeamMarkers.update(this.sim, this.views);
     this.tickValeCupFx(dt);
     worldStart = markWorldPhase('vfx', worldStart);
@@ -8242,7 +8286,7 @@ export class Renderer {
     this.updateCamera(selfPos, dt);
     worldStart = markWorldPhase('camera', worldStart);
     // Fully-fogged terrain chunks / tree buckets are dropped before the
-    // frustum; camera-ghost props hide against the current eye-to-camera ray.
+    // frustum; camera-ghost props fade against the current eye-to-camera ray.
     const fogFar = (this.scene.fog as THREE.Fog).far;
     // The foliage LOD swaps real trees for impostors relative to the fog, not at
     // a fixed distance, so it needs both planes (src/render/foliage_lod.ts).
@@ -8259,6 +8303,7 @@ export class Renderer {
       this.cameraLookAt.y,
       this.cameraLookAt.z,
       fogFar,
+      dt,
     );
     this.eastbrookTownView.update(
       this.camera.position.x,
@@ -8268,6 +8313,7 @@ export class Renderer {
       this.cameraLookAt.y,
       this.cameraLookAt.z,
       fogFar,
+      dt,
       this.reducedMotion(),
     );
     this.dungeons?.update(
@@ -8277,6 +8323,7 @@ export class Renderer {
       this.cameraLookAt.x,
       this.cameraLookAt.y,
       this.cameraLookAt.z,
+      dt,
     );
     worldStart = markWorldPhase('props', worldStart);
     this.foliage.update(
@@ -8292,6 +8339,7 @@ export class Renderer {
       fogFar,
       this.lastRequestedFogNear,
       this.lastRequestedFogFar,
+      dt,
     );
     worldStart = markWorldPhase('foliage', worldStart);
     this.fish.update(p.pos.x, p.pos.z, dt);
@@ -8903,82 +8951,17 @@ export class Renderer {
     mirror.pitch = this.camPitch;
     mirror.dist = this.camDist;
 
-    // The camera ORBITS the lagged/led pivot, but the occlusion ray and the
-    // pull-in anchor stay on the AVATAR's eye: the avatar is collision
-    // resolved so the ray origin can never sit inside a collider's pad
-    // (which would blind the sweep and let the camera see through the wall),
-    // and the min-distance clamp stays avatar-relative.
+    // The camera ORBITS the lagged/led pivot at the player's requested zoom.
+    // There is no occlusion pull-in: anything crossing the eye-to-camera
+    // segment fades to 20% opacity instead (the occluder-fade passes in
+    // props.ts, foliage.ts, dungeon.ts, and eastbrook_town.ts).
     const px = this.camBoom.x + this.camFeel.leadX;
     const py = this.camBoom.y;
     const pz = this.camBoom.z + this.camFeel.leadZ;
     const eyeY = py + 2.0;
-    const ax = selfPos.x;
-    const ay = selfPos.y + 2.0;
-    const az = selfPos.z;
-    let cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
-    let cy = eyeY + Math.sin(pose.pitch) * pose.dist;
-    let cz = pz - Math.cos(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
-    if (isArenaPos(p.pos.x)) {
-      // Arena walls hide from the camera like buildings, so the chase camera
-      // stays at the player's requested zoom instead of clamping inside the pit.
-      this.camOcclusion.pullT = 1;
-      this.camOcclusion.lensT = 1;
-      this.camOcclusion.fov = CAMERA_BASE_FOV;
-    } else {
-      // Camera collision for non-hideable blockers. Camera-ghost props are left
-      // at the requested zoom and hidden in props.ts while keeping their shadows.
-      // Thread the active run's module chain so camera collision matches the
-      // delve's actual (possibly Heroic/varied) layout, not just the default.
-      const delveMods = this.sim.delveRun?.modules;
-      const riftToken = this.sim.riftCollisionToken;
-      let hardT = cameraOcclusion(
-        seed,
-        ax,
-        ay,
-        az,
-        cx,
-        cy,
-        cz,
-        CAMERA_COLLIDER_PAD,
-        delveMods,
-        riftToken,
-      );
-      let softT = cameraOcclusion(
-        seed,
-        ax,
-        ay,
-        az,
-        cx,
-        cy,
-        cz,
-        CAMERA_SOFT_COLLIDER_PAD,
-        delveMods,
-        riftToken,
-      );
-      const segLen = Math.hypot(cx - ax, cy - ay, cz - az);
-      if (segLen > 1e-3) {
-        const minT = CAMERA_MIN_DIST / segLen;
-        hardT = Math.min(1, Math.max(hardT, minT));
-        softT = Math.min(1, Math.max(softT, minT));
-      }
-      stepCameraOcclusion(
-        this.camOcclusion,
-        hardT,
-        softT,
-        dt,
-        CAMERA_PULL_IN_RATE,
-        CAMERA_PULL_OUT_RATE,
-        CAMERA_SOFT_PULL_WEIGHT,
-        CAMERA_BASE_FOV,
-        CAMERA_MAX_COMP_FOV,
-      );
-    }
-    // Pull-in slides along the swept avatar-eye ray, so the resolved point is
-    // exactly what the occlusion pass certified clear.
-    const ct = this.camOcclusion.pullT;
-    cx = ax + (cx - ax) * ct;
-    cy = ay + (cy - ay) * ct;
-    cz = az + (cz - az) * ct;
+    const cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
+    const cy = eyeY + Math.sin(pose.pitch) * pose.dist;
+    const cz = pz - Math.cos(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
     let groundY = groundHeight(cx, cz, seed) + 0.6;
     // On a raised rift tier the flat ground clamp would let the camera sink
     // into the riser: add the same lift the sim stands entities on.
@@ -8992,12 +8975,9 @@ export class Renderer {
     // way the old terrain walls lifted it.
     groundY += gardenMazeCameraLift(cx, cz);
     this.camera.position.set(cx, Math.max(cy, groundY), cz);
-    // Occlusion-compensated FOV plus the feel kicks (speed widen, landing
-    // dip, level-up punch); the offset is 0 under reduced motion.
-    const fovTarget = Math.min(
-      100,
-      Math.max(50, this.camOcclusion.fov + cameraFovOffset(this.camFeel)),
-    );
+    // Base FOV plus the feel kicks (speed widen, landing dip, level-up
+    // punch); the offset is 0 under reduced motion.
+    const fovTarget = Math.min(100, Math.max(50, CAMERA_BASE_FOV + cameraFovOffset(this.camFeel)));
     if (Math.abs(this.camera.fov - fovTarget) > 0.01) {
       this.camera.fov = fovTarget;
       this.camera.updateProjectionMatrix();

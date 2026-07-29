@@ -14,6 +14,12 @@ import type { IWorld } from '../world_api';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { EMISSIVE_LIGHT, surfaceMat } from './gfx';
+import { type InstancedGhostHandle, InstancedOccluderGhosts } from './instanced_occluder_ghosts';
+import {
+  occluderFadeSettled,
+  occluderSegmentHitsBox,
+  stepOccluderFade,
+} from './occluder_fade_core';
 import { stoneTexture } from './textures';
 
 // GLB-backed static bodies (Tripo-generated, see public/models/props), with a
@@ -81,10 +87,37 @@ export interface YumiMazeLightHooks {
   lowGfx: boolean;
 }
 
+/** One maze wall stub the camera fade can ghost through. */
+interface MazeWallHideable {
+  x: number; // stub centre, maze-local XZ
+  z: number;
+  hw: number;
+  hd: number;
+  index: number;
+  visibleMatrix: THREE.Matrix4;
+  hiddenMatrix: THREE.Matrix4;
+  hidden: boolean;
+  alpha: number;
+  ghost: InstancedGhostHandle | null;
+}
+
 export interface YumiMazeView {
   group: THREE.Group;
-  /** Per-frame: anchors the two team beacons to the live cat positions. */
-  update(world: IWorld): void;
+  /**
+   * Per-frame: anchors the two team beacons to the live cat positions and
+   * fades any wall stub crossing the eye-to-camera segment to 20% opacity
+   * (the global occluder-fade behavior; the chase cam never zooms in).
+   */
+  update(
+    world: IWorld,
+    camX: number,
+    camY: number,
+    camZ: number,
+    eyeX: number,
+    eyeY: number,
+    eyeZ: number,
+    dt: number,
+  ): void;
   /**
    * Fold a yumiTeleport event's landing spot into the beacon immediately.
    * Online, arenaInfo rides the 10s arena wire cadence, so without this the
@@ -115,17 +148,75 @@ export function buildYumiMaze(
   const q = new THREE.Quaternion();
   const pos = new THREE.Vector3();
   const scl = new THREE.Vector3();
+  const zeroScale = new THREE.Vector3(0, 0, 0);
+  const wallHideables: MazeWallHideable[] = [];
   for (let i = 0; i < stubs.length; i++) {
     const s = stubs[i];
     pos.set(s.x, YUMI_MAZE_WALL_HEIGHT / 2, s.z);
     scl.set(s.hw * 2, YUMI_MAZE_WALL_HEIGHT, s.hd * 2);
     m.compose(pos, q, scl);
     walls.setMatrixAt(i, m);
+    wallHideables.push({
+      x: s.x,
+      z: s.z,
+      hw: s.hw,
+      hd: s.hd,
+      index: i,
+      visibleMatrix: m.clone(),
+      hiddenMatrix: m.clone().scale(zeroScale),
+      hidden: false,
+      alpha: 1,
+      ghost: null,
+    });
   }
   walls.instanceMatrix.needsUpdate = true;
   walls.castShadow = false;
   walls.receiveShadow = true;
   group.add(walls);
+  const wallGhosts = new InstancedOccluderGhosts();
+
+  // Occluder fade over the shared wall batch: an occluding stub swaps its
+  // instance for a pooled ghost mesh at the fade alpha (the tree pattern).
+  // Stub footprints are maze-local, so world XZ shifts by the group origin;
+  // heights compare in world space against the walls' world top.
+  const updateWallFades = (
+    camX: number,
+    camY: number,
+    camZ: number,
+    eyeX: number,
+    eyeY: number,
+    eyeZ: number,
+    dt: number,
+  ): void => {
+    const topY = floorY + YUMI_MAZE_WALL_HEIGHT;
+    const ex = eyeX - origin.x;
+    const ez = eyeZ - origin.z;
+    const cx = camX - origin.x;
+    const cz = camZ - origin.z;
+    for (let i = 0; i < wallHideables.length; i++) {
+      const h = wallHideables[i];
+      const hide = occluderSegmentHitsBox(h.x, h.z, h.hw, h.hd, topY, ex, eyeY, ez, cx, camY, cz);
+      if (!hide && h.ghost === null) {
+        h.hidden = false;
+        h.alpha = 1;
+        continue;
+      }
+      h.hidden = hide;
+      if (h.ghost === null) {
+        walls.setMatrixAt(h.index, h.hiddenMatrix);
+        walls.instanceMatrix.needsUpdate = true;
+        h.ghost = wallGhosts.acquire(walls, h.index, h.visibleMatrix);
+      }
+      h.alpha = stepOccluderFade(h.alpha, hide, dt);
+      wallGhosts.setAlpha(h.ghost, h.alpha);
+      if (!hide && occluderFadeSettled(h.alpha, false)) {
+        walls.setMatrixAt(h.index, h.visibleMatrix);
+        walls.instanceMatrix.needsUpdate = true;
+        wallGhosts.release(h.ghost);
+        h.ghost = null;
+      }
+    }
+  };
 
   // Floor: one plane over the whole footprint.
   const floorTex = stoneTexture().clone();
@@ -330,11 +421,21 @@ export function buildYumiMaze(
 
   return {
     group,
-    update(world: IWorld): void {
+    update(
+      world: IWorld,
+      camX: number,
+      camY: number,
+      camZ: number,
+      eyeX: number,
+      eyeY: number,
+      eyeZ: number,
+      dt: number,
+    ): void {
       const yumi = world.arenaInfo?.match?.yumi;
       if (!yumi && teleported.size > 0) teleported.clear();
       place(beaconA, lastA, yumi?.yumiA);
       place(beaconB, lastB, yumi?.yumiB);
+      updateWallFades(camX, camY, camZ, eyeX, eyeY, eyeZ, dt);
     },
     noteTeleport(catId: number, x: number, z: number): void {
       teleported.set(catId, { x, z });

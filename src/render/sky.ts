@@ -3,6 +3,11 @@ import { COLUMN_ZONES, columnBlendAt, STRIP_ZONES } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { SOWFIELD_CENTER } from '../sim/vale_cup_layout';
 import { loadHdr, loadTexture } from './assets/loader';
+import {
+  createEnvironmentBlend,
+  SKY_ENVIRONMENT_RESPONSE,
+  stepEnvironmentBlend,
+} from './environment_transition_core';
 import { GFX } from './gfx';
 import { skyTexture } from './textures';
 
@@ -450,6 +455,8 @@ export interface SkyView {
   envRotationY(biome: SkyKey): number;
   /** biome cross-fade state at a given camera z (from -> to by t in [0,1]) */
   biomeAt(x: number, z: number): BiomeBlend;
+  /** temporally eased blend currently painted by the dome */
+  currentBiomeBlend(): Readonly<BiomeBlend>;
 }
 
 export interface BiomeBlend {
@@ -669,6 +676,7 @@ export function buildSky(
   const start = biomeBlendAt(initialX, initialZ);
   const startBiomes = start.from === start.to ? [start.from] : [start.from, start.to];
   if (lowGfx || !hasSkyHdriAssets(startBiomes)) {
+    let current = start;
     const dome = new THREE.Mesh(
       new THREE.SphereGeometry(DOME_RADIUS, 24, 16),
       new THREE.MeshBasicMaterial({
@@ -681,7 +689,9 @@ export function buildSky(
     dome.renderOrder = -10;
     return {
       dome,
-      setCameraPos: () => {},
+      setCameraPos: (x, z) => {
+        current = biomeBlendAt(x, z);
+      },
       setDayNight: () => {},
       setFog: () => {},
       setStars: () => {},
@@ -689,6 +699,7 @@ export function buildSky(
       domeTexture: () => null,
       envRotationY: () => 0,
       biomeAt: biomeBlendAt,
+      currentBiomeBlend: () => current,
     };
   }
 
@@ -734,38 +745,36 @@ export function buildSky(
   const dome = new THREE.Mesh(new THREE.SphereGeometry(DOME_RADIUS, 32, 20), material);
   dome.renderOrder = -10;
 
-  let cur = start;
+  const current = createEnvironmentBlend(start);
+  let boundFrom = start.from;
+  let boundTo = start.to;
   return {
     dome,
     setCameraPos(x: number, z: number, dt: number): void {
-      const next = biomeBlendAt(x, z);
-      if (!hasSkyHdriAssets([next.from, next.to])) return;
-      if (next.from !== cur.from || next.to !== cur.to) {
-        uniforms.uSkyA.value = hdriStore[next.from] as THREE.Texture;
-        uniforms.uSkyB.value = hdriStore[next.to] as THREE.Texture;
-        uniforms.uOffA.value = sunOffsetU(next.from, sun);
-        uniforms.uOffB.value = sunOffsetU(next.to, sun);
-        uniforms.uTuneA.value.copy(tuneVec(next.from));
-        uniforms.uTuneB.value.copy(tuneVec(next.to));
-        uniforms.uBackdropA.value = backdropTex(next.from);
-        uniforms.uBackdropB.value = backdropTex(next.to);
-        uniforms.uBackdropBiasA.value = BACKDROP_Y_BIAS[next.from];
-        uniforms.uBackdropBiasB.value = BACKDROP_Y_BIAS[next.to];
-        uniforms.uBackdropAmtA.value = BIOME_BACKDROP_STRENGTH[next.from];
-        uniforms.uBackdropAmtB.value = BIOME_BACKDROP_STRENGTH[next.to];
-        uniforms.uTintA.value.copy(tintVec(next.from));
-        uniforms.uTintB.value.copy(tintVec(next.to));
-        uniforms.uLiftA.value = BIOME_HORIZON_LIFT[next.from];
-        uniforms.uLiftB.value = BIOME_HORIZON_LIFT[next.to];
-        uniforms.uMix.value = next.t;
-        cur = next;
-        return;
+      const target = biomeBlendAt(x, z);
+      if (!hasSkyHdriAssets([target.from, target.to])) return;
+      stepEnvironmentBlend(current, target, dt, SKY_ENVIRONMENT_RESPONSE);
+      if (current.from !== boundFrom || current.to !== boundTo) {
+        uniforms.uSkyA.value = hdriStore[current.from] as THREE.Texture;
+        uniforms.uSkyB.value = hdriStore[current.to] as THREE.Texture;
+        uniforms.uOffA.value = sunOffsetU(current.from, sun);
+        uniforms.uOffB.value = sunOffsetU(current.to, sun);
+        uniforms.uTuneA.value.copy(tuneVec(current.from));
+        uniforms.uTuneB.value.copy(tuneVec(current.to));
+        uniforms.uBackdropA.value = backdropTex(current.from);
+        uniforms.uBackdropB.value = backdropTex(current.to);
+        uniforms.uBackdropBiasA.value = BACKDROP_Y_BIAS[current.from];
+        uniforms.uBackdropBiasB.value = BACKDROP_Y_BIAS[current.to];
+        uniforms.uBackdropAmtA.value = BIOME_BACKDROP_STRENGTH[current.from];
+        uniforms.uBackdropAmtB.value = BIOME_BACKDROP_STRENGTH[current.to];
+        uniforms.uTintA.value.copy(tintVec(current.from));
+        uniforms.uTintB.value.copy(tintVec(current.to));
+        uniforms.uLiftA.value = BIOME_HORIZON_LIFT[current.from];
+        uniforms.uLiftB.value = BIOME_HORIZON_LIFT[current.to];
+        boundFrom = current.from;
+        boundTo = current.to;
       }
-      // same pair: chase the spatial mix gently so fast travel/teleports
-      // still ease over ~a second instead of popping
-      const k = 1 - Math.exp(-dt * 3);
-      uniforms.uMix.value += (next.t - uniforms.uMix.value) * k;
-      cur = next;
+      uniforms.uMix.value = current.t;
     },
     setDayNight(mul: readonly [number, number, number]): void {
       uniforms.uDayNight.value.set(mul[0], mul[1], mul[2]);
@@ -777,13 +786,13 @@ export function buildSky(
       uniforms.uStarAmt.value = starAmt;
       uniforms.uTime.value = time;
     },
-    envTexture(biome: BiomeId): THREE.DataTexture | null {
+    envTexture(biome: SkyKey): THREE.DataTexture | null {
       return envHdriStore[biome] ?? hdriStore[biome] ?? null;
     },
-    domeTexture(biome: BiomeId): THREE.Texture | null {
+    domeTexture(biome: SkyKey): THREE.Texture | null {
       return hdriStore[biome] ?? null;
     },
-    envRotationY(biome: BiomeId): number {
+    envRotationY(biome: SkyKey): number {
       // dome samples at u + off. three r165 negates environmentRotation
       // before building the PMREM lookup matrix ("accommodate left-handed
       // frame", WebGLMaterials.js), so the effective lookup azimuth is
@@ -792,5 +801,6 @@ export function buildSky(
       return sunOffsetU(biome, sun) * 2 * Math.PI;
     },
     biomeAt: biomeBlendAt,
+    currentBiomeBlend: () => current,
   };
 }

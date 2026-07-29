@@ -121,9 +121,10 @@ export interface CircleCollider {
   /** Absolute world-space top used by camera occlusion; movement ignores it. */
   cameraTopY?: number;
   /**
-   * When true the chase cam ray passes straight through this collider (no
-   * pull-in). Movement still collides. Used for props that the renderer hides
-   * when they cross the eye-to-camera segment instead of zooming in.
+   * When true the chase cam passes straight through this collider. Movement
+   * still collides. Used for props that the renderer fades to 20% opacity
+   * when they cross the eye-to-camera segment; the camera itself never zooms
+   * in for occluders anymore.
    */
   camGhost?: boolean;
   /**
@@ -345,9 +346,9 @@ function staticWorldColliders(seed: number): Collider[] {
   const content = getActiveWorldContent();
   const PROPS = content.props;
 
-  // Hideable render props are `camGhost`: they keep blocking movement but the
-  // chase cam no longer pulls in for them; the renderer hides whichever one
-  // crosses the eye-to-camera segment instead.
+  // Hideable render props are `camGhost`: they keep blocking movement while
+  // the renderer fades whichever one crosses the eye-to-camera segment to 20%
+  // opacity (the camera never zooms in for occluders).
   for (const b of PROPS.buildings) {
     if (b.kind === 'chapel' && b.assetId === undefined) {
       // The legacy procedural chapel is COMPOSED (render/props.ts): full-height
@@ -2102,17 +2103,15 @@ export function pathCrossesFence(
 }
 
 // ---------------------------------------------------------------------------
-// Camera occlusion — third-person chase-cam pull-in
+// Camera occlusion sweep (test-only since the chase-cam pull-in was removed)
 // ---------------------------------------------------------------------------
-// The renderer sweeps a ray from the player's head (`a`) toward the desired
-// camera position (`b`) and pulls the camera in to the surface of the first
-// static obstacle in between, so the chase cam never sits inside a wall.
-// Pure XZ math against the SAME colliders movement uses (what you see is what
-// you collide with). Returns the fraction of the a->b segment the camera may
-// travel before the first occluder (1 = unobstructed). Open-world colliders
-// carry precomputed `cameraTopY` values, so large rocks still pull the camera
-// in only when the ray passes below their visual top. Hideable props are
-// flagged `camGhost` and skipped entirely (the renderer hides them instead).
+// Sweeps a ray from the player's head (`a`) toward a camera position (`b`)
+// against the SAME colliders movement uses, returning the fraction of the
+// a->b segment clear of the first non-camGhost occluder (1 = unobstructed),
+// honoring each collider's `cameraTopY`. The renderer no longer calls this:
+// occluding structures fade to 20% opacity instead of pulling the camera in
+// (src/render/occluder_fade_core.ts). Collider-layout tests still probe
+// geometry through it.
 
 // First entry param t along a->b for a circle (radius already padded).
 // Infinity = no hit; we also bail when `a` is already inside (never slam the

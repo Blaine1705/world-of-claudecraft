@@ -59,6 +59,8 @@ import {
 } from './garden_parterre_core';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
 import { applySurfaceDetail, foliageWornFamilyFor } from './worn_stone';
+import { type InstancedGhostHandle, InstancedOccluderGhosts } from './instanced_occluder_ghosts';
+import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 import { type FlowerKind, flowerTuftTexture, grassTuftTexture } from './textures';
 
@@ -410,6 +412,7 @@ export interface FoliageView {
     fogFar: number,
     atmosFogNear: number,
     atmosFogFar: number,
+    dt: number,
   ): void;
   setGrassQuality(level: number): void;
   setModelQuality(level: number): void;
@@ -529,6 +532,10 @@ interface TreeHideable {
   r: number;
   topY: number;
   hidden: boolean;
+  /** Animated fade level (1 = opaque instance, 0.2 = occluding ghost). */
+  alpha: number;
+  /** Live ghost stand-ins while the fade is active (empty = instanced). */
+  ghosts: InstancedGhostHandle[];
   parts: TreeHidePart[];
 }
 
@@ -1099,6 +1106,8 @@ function placeSpecies(
         r: 0.55 * d.scale,
         topY: terrainHeight(d.x, d.z, seed) + 7.5 * d.scale,
         hidden: false,
+        alpha: 1,
+        ghosts: [],
         parts: [],
       }));
       hideRegistry.push(...handles);
@@ -1932,7 +1941,7 @@ function applyGrassShader(
         '#include <map_fragment>',
         `#include <map_fragment>
         diffuseColor.a *= 1.0 - smoothstep(uFadeFar * 0.7, uFadeFar, distance(vTuftWorld, uPlayerPos));
-        // near fade: an occlusion-pulled chase camera otherwise fills the
+        // near fade: a camera brushing the grass otherwise fills the
         // frame with a single giant card
         diffuseColor.a *= smoothstep(0.45, 1.35, length(vViewPosition));`,
       );
@@ -2656,24 +2665,48 @@ function cameraSegmentHitsTree(
 
 function updateTreeHides(
   trees: TreeHideable[],
+  ghosts: InstancedOccluderGhosts,
   eyeX: number,
   eyeY: number,
   eyeZ: number,
   camX: number,
   camY: number,
   camZ: number,
+  dt: number,
 ): void {
   // This scans every world tree each frame (3k+ in the shipped field). An
   // indexed loop avoids one iterator result allocation per tree per frame.
+  // A tree crossing the eye-to-camera segment swaps its instances for pooled
+  // ghost meshes and fades toward 20% opacity; once clear and fully opaque the
+  // ghosts return to the pool and the instances come back. The build-time
+  // shadow clones are untouched either way, so faded trees keep their shadows.
   for (let i = 0; i < trees.length; i++) {
     const t = trees[i];
     const hide = cameraSegmentHitsTree(t, eyeX, eyeY, eyeZ, camX, camY, camZ);
-    if (hide === t.hidden) continue;
+    if (!hide && t.ghosts.length === 0) {
+      t.hidden = false;
+      t.alpha = 1;
+      continue;
+    }
     t.hidden = hide;
-    for (let j = 0; j < t.parts.length; j++) {
-      const part = t.parts[j];
-      part.mesh.setMatrixAt(part.index, hide ? part.hiddenMatrix : part.visibleMatrix);
-      part.mesh.instanceMatrix.needsUpdate = true;
+    if (t.ghosts.length === 0) {
+      for (let j = 0; j < t.parts.length; j++) {
+        const part = t.parts[j];
+        part.mesh.setMatrixAt(part.index, part.hiddenMatrix);
+        part.mesh.instanceMatrix.needsUpdate = true;
+        t.ghosts.push(ghosts.acquire(part.mesh, part.index, part.visibleMatrix));
+      }
+    }
+    t.alpha = stepOccluderFade(t.alpha, hide, dt);
+    for (let j = 0; j < t.ghosts.length; j++) ghosts.setAlpha(t.ghosts[j], t.alpha);
+    if (!hide && occluderFadeSettled(t.alpha, false)) {
+      for (let j = 0; j < t.parts.length; j++) {
+        const part = t.parts[j];
+        part.mesh.setMatrixAt(part.index, part.visibleMatrix);
+        part.mesh.instanceMatrix.needsUpdate = true;
+      }
+      for (let j = 0; j < t.ghosts.length; j++) ghosts.release(t.ghosts[j]);
+      t.ghosts.length = 0;
     }
   }
 }
@@ -2683,6 +2716,7 @@ export function buildFoliage(seed: number): FoliageView {
   group.name = 'foliage';
   const bucketMeshes: BucketMesh[] = [];
   const treeHideables: TreeHideable[] = [];
+  const treeGhosts = new InstancedOccluderGhosts();
   let modelQuality = GFX.bucketBaselines.foliage;
   let modelVisibleBuckets = 0;
   let modelVisibleDraws = 0;
@@ -2751,9 +2785,10 @@ export function buildFoliage(seed: number): FoliageView {
       fogFar: number,
       atmosFogNear: number,
       atmosFogFar: number,
+      dt: number,
     ): void {
       grass.update(px, pz);
-      updateTreeHides(treeHideables, eyeX, eyeY, eyeZ, camX, camY, camZ);
+      updateTreeHides(treeHideables, treeGhosts, eyeX, eyeY, eyeZ, camX, camY, camZ, dt);
       // Buckets fully behind the fog wall are pure overdraw. The windows
       // themselves, including the real-model -> impostor swap (which follows the
       // zone's fog rather than a build-time constant, so a cone is never caught

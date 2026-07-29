@@ -50,43 +50,54 @@ function mulberry32(seed: number): () => number {
   };
 }
 
-// One cluster: three tapered two-segment blades fanned around the origin.
-// Vertex colors carry a base->tip brighten so blades read rooted without a
-// texture; instanceColor multiplies in the per-spot ground tint.
+// One cluster: a handful of tapered three-segment blades scattered around the
+// origin. Every blade rolls its own yaw, root offset, base tilt, bow, length,
+// and width, and the bow eases in quadratically toward the tip, so the tuft
+// reads as grown grass arcing over rather than a symmetric fan of straight
+// spikes. Vertex colors carry a base->tip brighten so blades read rooted
+// without a texture; instanceColor multiplies in the per-spot ground tint.
 function clusterGeometry(rng: () => number): THREE.BufferGeometry {
   const positions: number[] = [];
   const colors: number[] = [];
   const normals: number[] = [];
   const indices: number[] = [];
-  const BLADES = 3;
+  const BLADES = 5;
   for (let b = 0; b < BLADES; b++) {
-    const yaw = (b / BLADES) * Math.PI * 2 + rng() * 0.9;
+    // even fan for coverage, heavy jitter so no two blades pair up
+    const yaw = (b / BLADES) * Math.PI * 2 + (rng() - 0.5) * 2.4;
     const cos = Math.cos(yaw);
     const sin = Math.sin(yaw);
-    const ox = (rng() - 0.5) * 0.34;
-    const oz = (rng() - 0.5) * 0.34;
-    // lean direction and amount: tips bow away from vertical
-    const leanX = cos * (0.16 + rng() * 0.2);
-    const leanZ = sin * (0.16 + rng() * 0.2);
-    const w0 = 0.055;
-    const w1 = 0.034;
+    const ox = (rng() - 0.5) * 0.4;
+    const oz = (rng() - 0.5) * 0.4;
+    // each blade leaves the ground at its own angle: a straight base tilt
+    // (some near-vertical, some well leant) plus a bow the tip eases into
+    const tilt = rng() * 0.38;
+    const bow = 0.1 + rng() * 0.45;
+    const len = 0.55 + rng() * 0.55;
+    const w0 = 0.042 + rng() * 0.022;
+    const w1 = w0 * 0.62;
+    const w2 = w0 * 0.34;
     const base = positions.length / 3;
     // widths run perpendicular to the lean so the silhouette shows the bow
     const px = -sin;
     const pz = cos;
-    const put = (wx: number, y: number, bend: number, shade: number): void => {
-      positions.push(ox + px * wx + leanX * bend, y, oz + pz * wx + leanZ * bend);
+    const put = (wx: number, t: number, shade: number): void => {
+      // quadratic bend: roots stay planted, tips arc over like real grass
+      const lean = (tilt * t + bow * t * t) * len;
+      positions.push(ox + px * wx + cos * lean, len * t, oz + pz * wx + sin * lean);
       // all-up normals: blades take the terrain's lighting response, the
       // same trick the card tufts use, so the carpet never shades apart
       // from the ground it grows in
       normals.push(0, 1, 0);
       colors.push(shade, shade, shade);
     };
-    put(-w0, 0, 0, 0.62);
-    put(w0, 0, 0, 0.62);
-    put(-w1, 0.55, 0.3, 0.94);
-    put(w1, 0.55, 0.3, 0.94);
-    put(0, 1.0, 1.0, 1.18);
+    put(-w0, 0, 0.62);
+    put(w0, 0, 0.62);
+    put(-w1, 0.45, 0.86);
+    put(w1, 0.45, 0.86);
+    put(-w2, 0.76, 1.04);
+    put(w2, 0.76, 1.04);
+    put(0, 1.0, 1.18);
     indices.push(
       base,
       base + 1,
@@ -97,6 +108,12 @@ function clusterGeometry(rng: () => number): THREE.BufferGeometry {
       base + 2,
       base + 3,
       base + 4,
+      base + 3,
+      base + 5,
+      base + 4,
+      base + 4,
+      base + 5,
+      base + 6,
     );
   }
   const geo = new THREE.BufferGeometry();
@@ -129,6 +146,9 @@ export function buildBladeGrass(seed: number): BladeGrassView {
     vertexColors: true,
     roughness: 0.92,
     metalness: 0,
+    // flat strips with all-up normals light the same from either face, and
+    // culling the back faces read as half the blades missing per cluster
+    side: THREE.DoubleSide,
   });
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = sharedUniforms.uTime;
@@ -176,7 +196,9 @@ export function buildBladeGrass(seed: number): BladeGrassView {
   const slotCell = new Int32Array(POOL).fill(0x7fffffff);
   const m = new THREE.Matrix4();
   const q = new THREE.Quaternion();
+  const qLean = new THREE.Quaternion();
   const up = new THREE.Vector3(0, 1, 0);
+  const leanAxis = new THREE.Vector3();
   const v = new THREE.Vector3();
   const sv = new THREE.Vector3();
   const c = new THREE.Color();
@@ -219,7 +241,15 @@ export function buildBladeGrass(seed: number): BladeGrassView {
           const rTuft = hash(ci, cj, 4);
           if (rTuft < 0.1) s *= 1.5 + rTuft * 3.0;
           q.setFromAxisAngle(up, r1 * 12.9);
-          m.compose(v.set(x, h - 0.02, z), q, sv.set(s, s * (0.85 + lush * 0.5), s));
+          // whole-cluster lean, a hashed direction and up to ~12 degrees:
+          // neighbouring tufts tip different ways instead of standing in a
+          // uniform vertical crop
+          const rLean = hash(ci, cj, 5);
+          leanAxis.set(Math.sin(rLean * 41.3), 0, Math.cos(rLean * 41.3));
+          q.premultiply(qLean.setFromAxisAngle(leanAxis, rLean * 0.21));
+          // per-cluster height jitter on top of the blade-level length spread
+          const hJit = 0.82 + hash(ci, cj, 6) * 0.36;
+          m.compose(v.set(x, h - 0.02, z), q, sv.set(s, s * (0.85 + lush * 0.5) * hJit, s));
           im.setMatrixAt(slot, m);
           groundGrassColorAt(x, z, seed, c);
           // slight lift over the raw ground tint: blades catch more sky
