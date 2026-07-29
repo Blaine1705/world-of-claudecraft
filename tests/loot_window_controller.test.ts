@@ -435,8 +435,8 @@ describe('LootWindowController', () => {
     // siblings render (raw id + unknown sub-line), never the def-derived
     // body (the injected itemTooltip dep would throw on undefined).
     const ghostAttach = h.attachTooltip.mock.calls.find((call) => call[0] === ghost);
-    expect(ghostAttach).toBeTruthy();
-    const tooltipHtml = (ghostAttach?.[1] as () => string)();
+    if (!ghostAttach) throw new Error('the ghost row must have a tooltip attached');
+    const tooltipHtml = (ghostAttach[1] as () => string)();
     expect(tooltipHtml).toContain('ghost_future_item');
     expect(tooltipHtml).not.toContain('tooltip:');
   });
