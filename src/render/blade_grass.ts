@@ -224,6 +224,17 @@ export function buildBladeGrass(seed: number): BladeGrassView {
     im.setMatrixAt(slot, zero);
   }
 
+  // Scan bookkeeping: the toroidal scan only has work when the target block
+  // moved (the player crossed a cell boundary) or a previous scan ran out of
+  // budget mid-pass, so idle and within-cell frames skip the whole loop.
+  // colCi hoists the per-column congruence out of the inner loop: the owned
+  // world column depends only on (gi, baseI), so a scan computes it GRID_W
+  // times instead of GRID_W * GRID_W times.
+  const colCi = new Int32Array(GRID_W);
+  let lastBaseI = 0x7fffffff;
+  let lastBaseJ = 0x7fffffff;
+  let pending = true;
+
   return {
     group,
     update(px: number, pz: number): void {
@@ -231,26 +242,46 @@ export function buildBladeGrass(seed: number): BladeGrassView {
       // target cell block: the GRID_W x GRID_W square centred on the player
       const baseI = Math.floor(px / CELL) - (GRID_W >> 1);
       const baseJ = Math.floor(pz / CELL) - (GRID_W >> 1);
+      if (baseI === lastBaseI && baseJ === lastBaseJ && !pending) return;
+      lastBaseI = baseI;
+      lastBaseJ = baseJ;
+      for (let gi = 0; gi < GRID_W; gi++) {
+        // world cell owned by slot (gi, gj): the unique cell in the target
+        // block congruent to (gi, gj) mod GRID_W
+        colCi[gi] = baseI + ((((gi - baseI) % GRID_W) + GRID_W) % GRID_W);
+      }
       let budget = PLACE_BUDGET;
-      let dirty = false;
+      // dirty slot span: re-placed slots this frame, so the GPU upload can
+      // cover just that range of the instance buffers instead of the pool
+      let dirtyLo = POOL;
+      let dirtyHi = -1;
       for (let gj = 0; gj < GRID_W && budget > 0; gj++) {
+        const cjj = baseJ + ((((gj - baseJ) % GRID_W) + GRID_W) % GRID_W);
+        const packedLo = cjj & 0xffff;
+        const rowBase = gj * GRID_W;
         for (let gi = 0; gi < GRID_W && budget > 0; gi++) {
-          // world cell owned by slot (gi, gj): the unique cell in the target
-          // block congruent to (gi, gj) mod GRID_W
-          const ci = baseI + ((((gi - baseI) % GRID_W) + GRID_W) % GRID_W);
-          const cjj = baseJ + ((((gj - baseJ) % GRID_W) + GRID_W) % GRID_W);
-          const slot = gj * GRID_W + gi;
-          const packed = ((ci & 0xffff) << 16) | (cjj & 0xffff);
+          const packed = ((colCi[gi] & 0xffff) << 16) | packedLo;
+          const slot = rowBase + gi;
           if (slotCell[slot] === packed) continue;
           slotCell[slot] = packed;
-          placeSlot(slot, ci, cjj);
-          dirty = true;
+          placeSlot(slot, colCi[gi], cjj);
+          if (slot < dirtyLo) dirtyLo = slot;
+          if (slot > dirtyHi) dirtyHi = slot;
           budget--;
         }
       }
-      if (dirty) {
+      pending = budget <= 0;
+      if (dirtyHi >= 0) {
+        // partial upload: only the touched slot span goes to the GPU. Ranges
+        // are queued, never cleared here: the renderer clears them after it
+        // actually uploads, so a skipped frame keeps its pending span alive.
+        const count = dirtyHi - dirtyLo + 1;
+        im.instanceMatrix.addUpdateRange(dirtyLo * 16, count * 16);
         im.instanceMatrix.needsUpdate = true;
-        if (im.instanceColor) im.instanceColor.needsUpdate = true;
+        if (im.instanceColor) {
+          im.instanceColor.addUpdateRange(dirtyLo * 3, count * 3);
+          im.instanceColor.needsUpdate = true;
+        }
       }
     },
   };
