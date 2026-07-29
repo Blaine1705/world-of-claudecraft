@@ -575,3 +575,235 @@ describe('persistence and rename', () => {
     expect(row?.recipientName).toBe('Newname');
   });
 });
+
+// Character deletion (R43): the deleted character's mailbox leaves the book, but
+// never at the cost of another player's property. Letters addressed to them can
+// carry someone else's escrowed coin and goods, so an unclaimed player parcel
+// flies home through the ordinary return flight and only letters with nothing at
+// stake are deleted.
+describe('purgeMailOwner - deleting a character', () => {
+  const DOOMED_ID = 555;
+  const DOOMED_KEY = String(DOOMED_ID);
+
+  // biome-ignore lint/suspicious/noExplicitAny: read and seed the raw book directly.
+  const bookOf = (sim: Sim): any[] => (sim.postOffice as any).mail;
+
+  function letterBy(sim: Sim, match: (m: { subject: string }) => boolean, label: string) {
+    const m = bookOf(sim).find(match);
+    if (!m) throw new Error(`missing letter: ${label}`);
+    return m;
+  }
+
+  // A live sender standing at a mailbox with coin and goods to post.
+  function makeSender(sim: Sim): number {
+    const pid = sim.addPlayer('warrior', 'Alice');
+    const meta = sim.meta(pid);
+    if (!meta) throw new Error('no meta');
+    meta.copper = 100_000;
+    sim.addItem('roasted_boar', 6, pid);
+    moveToMailbox(sim, pid);
+    return pid;
+  }
+
+  // The former linear scan, the oracle the maintained unread index must match.
+  function unreadOracle(sim: Sim, pid: number): number {
+    const meta = sim.meta(pid);
+    if (!meta) return 0;
+    const now = sim.time;
+    const key = String(meta.characterId ?? meta.entityId);
+    let n = 0;
+    for (const m of bookOf(sim)) {
+      if (!m.read && now >= m.deliverAt && (m.recipientKey === key || m.recipientKey === meta.name))
+        n++;
+    }
+    return n;
+  }
+
+  it('flies live senders their escrow home and deletes the rest, under BOTH keys', () => {
+    const sim = makeWorld();
+    const alice = makeSender(sim);
+    const aliceMeta = sim.meta(alice);
+    if (!aliceMeta) throw new Error('no meta');
+    const aliceKey = sim.postOffice.mailKeyFor(aliceMeta);
+    const bystander = sim.addPlayer('mage', 'Bystander');
+    const bystanderMeta = sim.meta(bystander);
+    if (!bystanderMeta) throw new Error('no meta');
+
+    // Id-keyed parcel (coin + goods), id-keyed bare note, and a LEGACY name-keyed
+    // parcel: all three addressed to the character about to be deleted.
+    sim.mailSendResolved(
+      { key: DOOMED_KEY, name: 'Doomed' },
+      'Parcel',
+      'Hold this.',
+      500,
+      [{ itemId: 'roasted_boar', count: 2 }],
+      alice,
+    );
+    sim.mailSendResolved({ key: DOOMED_KEY, name: 'Doomed' }, 'Note', 'Just words.', 0, [], alice);
+    sim.mailSendResolved(
+      { key: 'Doomed', name: 'Doomed' },
+      'Legacy',
+      'Older post.',
+      250,
+      [],
+      alice,
+    );
+    // An authored parcel: minted by the world, with no live sender to fly home to.
+    sim.postOffice.sendLetter(
+      DOOMED_KEY,
+      'Doomed',
+      { ...QUEST_LETTERS.q_wolves, items: [{ itemId: 'roasted_boar', count: 1 }] },
+      'npc',
+    );
+    // A letter to someone else entirely: out of scope for this purge.
+    sim.mailSendResolved(
+      { key: sim.postOffice.mailKeyFor(bystanderMeta), name: 'Bystander' },
+      'Untouched',
+      'Hello.',
+      10,
+      [],
+      alice,
+    );
+
+    expect(sim.purgeMailOwner(DOOMED_ID, 'Doomed')).toBe(true);
+
+    // The two player parcels flew home to Alice with their escrow intact.
+    const parcel = letterBy(sim, (m) => m.subject === 'Parcel', 'parcel');
+    expect(parcel.recipientKey).toBe(aliceKey);
+    expect(parcel.recipientName).toBe('Alice');
+    expect(parcel.senderName).toBe('Doomed');
+    expect(parcel.returned).toBe(true);
+    expect(parcel.copper).toBe(500);
+    expect(parcel.items).toEqual([{ itemId: 'roasted_boar', count: 2 }]);
+    const legacy = letterBy(sim, (m) => m.subject === 'Legacy', 'legacy parcel');
+    expect(legacy.recipientKey).toBe(aliceKey);
+    expect(legacy.copper).toBe(250);
+    expect(legacy.returned).toBe(true);
+
+    // The bare note and the authored parcel are gone; the bystander keeps his.
+    expect(bookOf(sim).some((m) => m.subject === 'Note')).toBe(false);
+    expect(bookOf(sim).some((m) => m.letterId === QUEST_LETTERS.q_wolves.letterId)).toBe(false);
+    expect(letterBy(sim, (m) => m.subject === 'Untouched', 'bystander letter').recipientKey).toBe(
+      sim.postOffice.mailKeyFor(bystanderMeta),
+    );
+    // Nothing is left addressed to the deleted character under either key.
+    expect(
+      bookOf(sim).some((m) => m.recipientKey === DOOMED_KEY || m.recipientKey === 'Doomed'),
+    ).toBe(false);
+
+    // The index still matches the scan, and the returns really land: the normal
+    // delivery path announces both parcels into Alice's mailbox.
+    expect(sim.mailUnreadFor(alice)).toBe(unreadOracle(sim, alice));
+    expect(sim.mailUnreadFor(bystander)).toBe(unreadOracle(sim, bystander));
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    expect(sim.mailUnreadFor(alice)).toBe(unreadOracle(sim, alice));
+    const inbox = sim.mailInfoFor(alice)?.messages ?? [];
+    expect(inbox.find((m) => m.subject === 'Parcel')?.copper).toBe(500);
+    expect(inbox.find((m) => m.subject === 'Legacy')?.copper).toBe(250);
+  });
+
+  it('deletes a parcel whose return flight already ran rather than sending it round again', () => {
+    const sim = makeWorld();
+    const doomed = sim.addPlayer('warrior', 'Doomed', { characterId: DOOMED_ID });
+    sim.addPlayer('mage', 'Bob');
+    const doomedMeta = sim.meta(doomed);
+    if (!doomedMeta) throw new Error('no meta');
+    doomedMeta.copper = 10_000;
+    sim.addItem('roasted_boar', 2, doomed);
+    moveToMailbox(sim, doomed);
+    // The doomed character's own unclaimed parcel expires and flies home to them.
+    sim.mailSend(
+      'Bob',
+      'Parcel',
+      'Hold this.',
+      500,
+      [{ itemId: 'roasted_boar', count: 2 }],
+      doomed,
+    );
+    letterBy(sim, (m) => m.subject === 'Parcel', 'parcel').expiresAt = sim.time;
+    tickFor(sim, 2);
+    const returned = letterBy(sim, (m) => m.subject === 'Parcel', 'returned parcel');
+    expect(returned.returned).toBe(true);
+    expect(returned.recipientKey).toBe(DOOMED_KEY);
+
+    // Deleting them now destroys it: the escrow was theirs and the one sanctioned
+    // destruction (the return flight has run) applies exactly as in the sweep.
+    expect(sim.purgeMailOwner(DOOMED_ID, 'Doomed')).toBe(true);
+    expect(bookOf(sim).some((m) => m.subject === 'Parcel')).toBe(false);
+    expect(sim.mailUnreadFor(doomed)).toBe(unreadOracle(sim, doomed));
+  });
+
+  it('deletes a self-addressed parcel instead of returning it to the same dead key', () => {
+    const sim = makeWorld();
+    const doomed = sim.addPlayer('warrior', 'Doomed', { characterId: DOOMED_ID });
+    const doomedMeta = sim.meta(doomed);
+    if (!doomedMeta) throw new Error('no meta');
+    doomedMeta.copper = 10_000;
+    sim.addItem('roasted_boar', 2, doomed);
+    moveToMailbox(sim, doomed);
+    sim.mailSend(
+      'Doomed',
+      'Selfpost',
+      'Mine.',
+      500,
+      [{ itemId: 'roasted_boar', count: 2 }],
+      doomed,
+    );
+    expect(letterBy(sim, (m) => m.subject === 'Selfpost', 'self parcel').senderKey).toBe(
+      DOOMED_KEY,
+    );
+
+    expect(sim.purgeMailOwner(DOOMED_ID, 'Doomed')).toBe(true);
+    expect(bookOf(sim).some((m) => m.subject === 'Selfpost')).toBe(false);
+    expect(sim.mailUnreadFor(doomed)).toBe(unreadOracle(sim, doomed));
+  });
+
+  it('drops delivered unread letters out of the unread index', () => {
+    const sim = makeWorld();
+    // The mailbox owner is live here only so the maintained index is observable;
+    // the real delete flow is gated on the character being offline.
+    const doomed = sim.addPlayer('warrior', 'Doomed', { characterId: DOOMED_ID });
+    const alice = makeSender(sim);
+    sim.mailSendResolved({ key: DOOMED_KEY, name: 'Doomed' }, 'Note', 'Just words.', 0, [], alice);
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    // The welcome letter plus the note: both delivered, both unread.
+    expect(sim.mailUnreadFor(doomed)).toBe(2);
+
+    expect(sim.purgeMailOwner(DOOMED_ID, 'Doomed')).toBe(true);
+    expect(bookOf(sim).some((m) => m.recipientKey === DOOMED_KEY)).toBe(false);
+    expect(sim.mailUnreadFor(doomed)).toBe(0);
+    expect(unreadOracle(sim, doomed)).toBe(0);
+  });
+
+  it('drops an in-flight letter from the in-flight set when it is deleted', () => {
+    const sim = makeWorld();
+    const alice = makeSender(sim);
+    sim.mailSendResolved({ key: DOOMED_KEY, name: 'Doomed' }, 'Note', 'Just words.', 0, [], alice);
+    const note = letterBy(sim, (m) => m.subject === 'Note', 'in-flight note');
+    expect(sim.time).toBeLessThan(note.deliverAt); // still on the wing
+
+    expect(sim.purgeMailOwner(DOOMED_ID, 'Doomed')).toBe(true);
+    // biome-ignore lint/suspicious/noExplicitAny: the in-flight set is module-private.
+    const undelivered = (sim.postOffice as any).undelivered as Set<unknown>;
+    expect(undelivered.has(note)).toBe(false);
+    // Flying past the old delivery time must not resurrect it in the unread index.
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
+    expect(bookOf(sim).some((m) => m.subject === 'Note')).toBe(false);
+    expect(sim.mailUnreadFor(alice)).toBe(unreadOracle(sim, alice));
+  });
+
+  it('reports no change for a character with no mail, and refuses a non-finite id', () => {
+    const sim = makeWorld();
+    const alice = makeSender(sim);
+    sim.mailSendResolved({ key: 'Doomed', name: 'Doomed' }, 'Legacy', 'Older post.', 0, [], alice);
+
+    expect(sim.purgeMailOwner(999, 'Nobody')).toBe(false);
+    expect(bookOf(sim).some((m) => m.subject === 'Legacy')).toBe(true);
+    // The guard mirrors rekeyMailOwner: without a real id, the name alone is not
+    // enough to purge by.
+    expect(sim.purgeMailOwner(Number.NaN, 'Doomed')).toBe(false);
+    expect(letterBy(sim, (m) => m.subject === 'Legacy', 'legacy letter').recipientKey).toBe(
+      'Doomed',
+    );
+  });
+});

@@ -157,10 +157,14 @@ export interface CharactersRuntime {
   rekeyMarketSeller(characterId: number, oldName: string, newName: string): boolean;
   /** game.saveMarket: persist the World Market after a rekey. */
   saveMarket(): Promise<void>;
+  /** game.purgeMarketSeller: drop a deleted character's listings + collection. */
+  purgeMarketSeller(characterId: number, name: string): boolean;
   /** game.rekeyMailOwner: re-key the character's Ravenpost mailbox after a rename. */
   rekeyMailOwner(characterId: number, oldName: string, newName: string): boolean;
   /** game.saveMail: persist the Ravenpost mail book after a rekey. */
   saveMail(): Promise<void>;
+  /** game.purgeMailOwner: clear a deleted character's Ravenpost mailbox. */
+  purgeMailOwner(characterId: number, name: string): boolean;
   /** main.ts initialCharacterState: the serialized fresh-character state for create. */
   initialCharacterState(cls: PlayerClass, name: string, skin: number): CharacterState;
   /** main.ts publicOrigin: canonical share origin for the owner-sheet URLs. */
@@ -281,6 +285,33 @@ export function buildCharacterList(
       ),
     })),
   };
+}
+
+/**
+ * The world-state purge that follows a successful character delete (R43). A deleted
+ * character can never collect again, so its World Market listings, its Merchant
+ * collection, and its Ravenpost mailbox leave the realm's shared books here instead
+ * of sitting uncollectable forever.
+ *
+ * The purge mutates the LIVE sim through the injected runtime and only then persists:
+ * the realm process serving this request is the one running the world, and it
+ * re-persists the market and mail blobs from memory every autosave, so editing the
+ * world_state rows alone (inside db.deleteCharacter, say) would be clobbered within
+ * seconds. Each save is skipped when its purge reports no change.
+ *
+ * Exported so BOTH delete dispatch arms share one behavior: this module's
+ * deleteHandler and the retained legacy ladder arm in main.ts (the API_DISPATCH=legacy
+ * rollback path), the buildCharacterList delegation precedent. Call it only AFTER the
+ * DB delete reports success, mirroring renameHandler: a delete that matched no row
+ * must never purge a live character's escrow.
+ */
+export async function purgeDeletedCharacterWorldState(
+  rt: Pick<CharactersRuntime, 'purgeMarketSeller' | 'saveMarket' | 'purgeMailOwner' | 'saveMail'>,
+  characterId: number,
+  name: string,
+): Promise<void> {
+  if (rt.purgeMarketSeller(characterId, name)) await rt.saveMarket();
+  if (rt.purgeMailOwner(characterId, name)) await rt.saveMail();
 }
 
 // ---------------------------------------------------------------------------
@@ -581,6 +612,9 @@ async function deleteHandler(ctx: Ctx): Promise<void> {
     return;
   }
   const ok = await charactersDb.deleteCharacter(accountId, character.id);
+  // The row is gone; take its shared world state with it (R43), before the response
+  // so a client that immediately re-reads the market or a mailbox sees the purge.
+  if (ok) await purgeDeletedCharacterWorldState(rt, character.id, character.name);
   json(ctx.res, ok ? 200 : 404, ok ? { ok: true } : NOT_FOUND);
 }
 

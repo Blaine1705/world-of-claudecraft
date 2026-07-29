@@ -1041,3 +1041,84 @@ describe('marketCollectPendingFor - the collect-indicator bit', () => {
     expect(sim.marketCollectPending).toBe(true);
   });
 });
+
+// Character deletion (R43): a deleted character can never stand at the Merchant
+// again, so its listings and collection leave the book rather than sitting
+// uncollectable forever. Dual-key by the rekeyMarketSeller rule: the stable
+// character-id key AND a legacy name-keyed row.
+describe('purgeMarketSeller - deleting a character', () => {
+  function collectionsOf(sim: Sim): Map<string, { copper: number; items: { count: number }[] }> {
+    return (
+      sim.market as unknown as {
+        marketCollections: Map<string, { copper: number; items: { count: number }[] }>;
+      }
+    ).marketCollections;
+  }
+
+  it('removes the deleted seller under BOTH keys, sparing house stock and other sellers', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller', { characterId: 77 });
+    const other = sim.addPlayer('mage', 'Other', { characterId: 88 });
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, other);
+    sim.addItem('wolf_fang', 2, seller);
+    sim.addItem('wolf_fang', 1, other);
+
+    // One id-keyed listing, one legacy name-keyed listing, both the deleted seller's.
+    sim.marketList('wolf_fang', 1, 200, seller);
+    sim.marketList('wolf_fang', 1, 300, seller);
+    const legacy = listingBy(sim, (l) => !l.house && l.price === 300, 'legacy listing');
+    legacy.sellerKey = 'Seller';
+    legacy.sellerName = 'Seller';
+    sim.marketList('wolf_fang', 1, 400, other);
+
+    // A collection under EACH of the seller's keys, plus the other seller's.
+    const collections = collectionsOf(sim);
+    collections.set('77', { copper: 95, items: [] });
+    collections.set('Seller', { copper: 40, items: [] });
+    collections.set('88', { copper: 10, items: [] });
+    const houseBefore = sim.marketListings.filter((l) => l.house).length;
+    expect(houseBefore).toBeGreaterThan(0);
+
+    expect(sim.purgeMarketSeller(77, 'Seller')).toBe(true);
+
+    expect(sim.marketListings.some((l) => l.sellerKey === '77')).toBe(false);
+    expect(sim.marketListings.some((l) => l.sellerKey === 'Seller')).toBe(false);
+    expect(collections.has('77')).toBe(false);
+    expect(collections.has('Seller')).toBe(false);
+    // The other seller and the Merchant's own stock are untouched.
+    expect(sim.marketListings.filter((l) => l.sellerKey === '88' && l.price === 400)).toHaveLength(
+      1,
+    );
+    expect(collections.get('88')?.copper).toBe(10);
+    expect(sim.marketListings.filter((l) => l.house)).toHaveLength(houseBefore);
+  });
+
+  it('reports no change when the deleted character had nothing on the market', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller', { characterId: 77 });
+    standAtMerchant(sim, seller);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.marketList('wolf_fang', 1, 200, seller);
+    const before = sim.marketListings.length;
+
+    expect(sim.purgeMarketSeller(99, 'Nobody')).toBe(false);
+    expect(sim.marketListings).toHaveLength(before);
+    expect(sim.marketListings.some((l) => l.sellerKey === '77')).toBe(true);
+  });
+
+  it('refuses a non-finite character id rather than purging by name alone', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller', { characterId: 77 });
+    standAtMerchant(sim, seller);
+    sim.addItem('wolf_fang', 1, seller);
+    sim.marketList('wolf_fang', 1, 200, seller);
+    const legacy = listingBy(sim, (l) => !l.house && l.price === 200, 'legacy listing');
+    legacy.sellerKey = 'Seller';
+    collectionsOf(sim).set('Seller', { copper: 40, items: [] });
+
+    expect(sim.purgeMarketSeller(Number.NaN, 'Seller')).toBe(false);
+    expect(sim.marketListings.some((l) => l.sellerKey === 'Seller')).toBe(true);
+    expect(collectionsOf(sim).has('Seller')).toBe(true);
+  });
+});

@@ -80,7 +80,11 @@ import { bankLedgerIdle } from './bank_ledger';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
 import { createCachedRead } from './cached_read';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
-import { buildCharacterList, configureCharactersRuntime } from './characters';
+import {
+  buildCharacterList,
+  configureCharactersRuntime,
+  purgeDeletedCharacterWorldState,
+} from './characters';
 import {
   claudiumPreAuthMutationRateLimited,
   configureClaudiumRuntime,
@@ -1728,6 +1732,20 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         });
       }
       const ok = await deleteCharacter(accountId, characterId);
+      if (ok) {
+        // The SAME world-state purge the migrated deleteHandler runs (R43), through
+        // the one shared helper, so an API_DISPATCH=legacy rollback keeps it.
+        await purgeDeletedCharacterWorldState(
+          {
+            purgeMarketSeller: (id, name) => liveGame().purgeMarketSeller(id, name),
+            saveMarket: () => liveGame().saveMarket(),
+            purgeMailOwner: (id, name) => liveGame().purgeMailOwner(id, name),
+            saveMail: () => liveGame().saveMail(),
+          },
+          characterId,
+          character.name,
+        );
+      }
       return json(
         res,
         ok ? 200 : 404,
@@ -2512,9 +2530,11 @@ configureCharactersRuntime({
   rekeyMarketSeller: (characterId, oldName, newName) =>
     liveGame().rekeyMarketSeller(characterId, oldName, newName),
   saveMarket: () => liveGame().saveMarket(),
+  purgeMarketSeller: (characterId, name) => liveGame().purgeMarketSeller(characterId, name),
   rekeyMailOwner: (characterId, oldName, newName) =>
     liveGame().rekeyMailOwner(characterId, oldName, newName),
   saveMail: () => liveGame().saveMail(),
+  purgeMailOwner: (characterId, name) => liveGame().purgeMailOwner(characterId, name),
   initialCharacterState,
   publicOrigin,
 });

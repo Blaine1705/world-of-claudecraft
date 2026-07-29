@@ -679,6 +679,47 @@ export class PostOffice {
     return changed;
   }
 
+  // Character deletion (R43): the deleted character's mailbox leaves the book,
+  // matching the SAME dual keys rekeyMailOwner does (stable character-id key plus
+  // a legacy name-keyed letter). Letters addressed here can hold OTHER players'
+  // escrowed coin and goods, so the book's standing invariant still rules: an
+  // unclaimed player parcel flies home through the ordinary return flight rather
+  // than being destroyed, and only letters with nothing at stake are deleted:
+  //  - a bare note (no coin, no items), read or not;
+  //  - a system/npc parcel, whose attachments were minted by the world and have
+  //    no live sender to fly home to (their senderKey is absent by construction);
+  //  - a player parcel whose return flight has ALREADY run (the sweep's one
+  //    sanctioned destruction, the `returned` flag);
+  //  - a player parcel the deleted character sent to themselves, whose home key
+  //    is the key being purged: the escrow was theirs alone and there is nowhere
+  //    left to return it to.
+  // The delete arm mirrors the expiry sweep's exactly, so unreadIndex and the
+  // in-flight set stay consistent. Returns whether anything changed.
+  purgeMailOwner(characterId: number, name: string): boolean {
+    if (!Number.isFinite(characterId)) return false;
+    const key = String(characterId);
+    const now = this.ctx.time;
+    const owns = (k: string): boolean => k === key || (name !== '' && k === name);
+    let changed = false;
+    for (let i = this.mail.length - 1; i >= 0; i--) {
+      const m = this.mail[i];
+      if (!owns(m.recipientKey)) continue;
+      changed = true;
+      const escrowed = m.copper > 0 || m.items.length > 0;
+      // returnToSender's own fallback: the stable sender id, or the display name
+      // for a letter persisted before senderKey existed.
+      const homeKey = m.senderKey ?? m.senderName;
+      if (m.kind === 'player' && escrowed && !m.returned && !owns(homeKey)) {
+        this.returnToSender(m, now);
+        continue;
+      }
+      if (!m.read && now >= m.deliverAt) this.indexDec(m.recipientKey);
+      this.undelivered.delete(m);
+      this.mail.splice(i, 1);
+    }
+    return changed;
+  }
+
   // Persist every letter; durations survive the boot-time clock reset as
   // seconds-left (the market pattern).
   serializeMail(): MailSave {

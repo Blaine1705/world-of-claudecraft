@@ -172,6 +172,32 @@ export class Market {
     return changed;
   }
 
+  // Character deletion (R43): a deleted character can never stand at the Merchant
+  // again, so its listings and its collection leave the book instead of sitting
+  // uncollectable forever (expired listings would keep folding goods into an
+  // orphan collection nobody can claim). Matches the SAME dual keys
+  // rekeyMarketSeller does, the stable character-id key plus a legacy name-keyed
+  // row, and never touches house stock. Everything destroyed here is the deleted
+  // character's OWN escrow (marketList escrows out of the seller's own bags), so
+  // no other player's property rides along. Returns whether anything changed, so
+  // the caller only pays for a save when there was something to purge.
+  purgeMarketSeller(characterId: number, name: string): boolean {
+    if (!Number.isFinite(characterId)) return false;
+    const key = String(characterId);
+    const owns = (k: string): boolean => k === key || (name !== '' && k === name);
+    let changed = false;
+    for (let i = this.marketListings.length - 1; i >= 0; i--) {
+      const listing = this.marketListings[i];
+      if (listing.house) continue;
+      if (!owns(listing.sellerKey)) continue;
+      this.marketListings.splice(i, 1);
+      changed = true;
+    }
+    if (this.marketCollections.delete(key)) changed = true;
+    if (name !== '' && name !== key && this.marketCollections.delete(name)) changed = true;
+    return changed;
+  }
+
   // The Merchant always keeps a little stock so the market is never empty —
   // standing consignments that never expire, never deplete, and pay no one.
   private seedHouseListings(): void {

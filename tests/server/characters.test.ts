@@ -16,11 +16,13 @@
 // are fakes injected via configureCharactersRuntime.
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase12_units';
 
+import { readFileSync } from 'node:fs';
 import type * as http from 'node:http';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   type CharactersRuntime,
   configureCharactersRuntime,
+  purgeDeletedCharacterWorldState,
   resetCharactersDbForTests,
   resetCharactersRuntimeForTests,
   routes,
@@ -102,8 +104,10 @@ function fakeRuntime(overrides: Partial<CharactersRuntime> = {}): CharactersRunt
     takeOverCharacter: async () => 'not-online',
     rekeyMarketSeller: () => false,
     saveMarket: async () => {},
+    purgeMarketSeller: () => false,
     rekeyMailOwner: () => false,
     saveMail: async () => {},
+    purgeMailOwner: () => false,
     initialCharacterState: () => st(),
     publicOrigin: () => 'https://worldofclaudecraft.com',
     ...overrides,
@@ -1092,9 +1096,69 @@ describe('delete handler', () => {
     expect(res.body).toEqual({ ok: true });
   });
 
+  // R43: the deleted character's shared world state (its World Market listings +
+  // collection, its Ravenpost mailbox) goes with it, through the LIVE sim books so
+  // the next autosave cannot clobber the purge. Each save is skipped when its book
+  // reports nothing changed.
+  /** The four purge/save runtime members, as spies. */
+  function purgeSpies(changed: { market?: boolean; mail?: boolean } = {}) {
+    return {
+      purgeMarketSeller: vi.fn(() => changed.market ?? true),
+      saveMarket: vi.fn(async () => {}),
+      purgeMailOwner: vi.fn(() => changed.mail ?? true),
+      saveMail: vi.fn(async () => {}),
+    };
+  }
+
+  it('purges the deleted character world state and persists both books on success', async () => {
+    const spies = purgeSpies();
+    setCharactersDbForTests({ deleteCharacter: async () => true });
+    installRuntime({ isCharacterOnline: () => false, ...spies });
+    const res = await callHandler('DELETE', '/api/characters/:id', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(charRow({ id: 9, name: 'Deleteme' })),
+      body: { name: 'Deleteme' },
+    });
+    expect(res.status).toBe(200);
+    // Both keys the sim matches on: the character id and its name at delete time.
+    expect(spies.purgeMarketSeller).toHaveBeenCalledWith(9, 'Deleteme');
+    expect(spies.purgeMailOwner).toHaveBeenCalledWith(9, 'Deleteme');
+    expect(spies.saveMarket).toHaveBeenCalledTimes(1);
+    expect(spies.saveMail).toHaveBeenCalledTimes(1);
+  });
+
+  it('skips the market save when only the mailbox had something to purge', async () => {
+    const spies = purgeSpies({ market: false, mail: true });
+    setCharactersDbForTests({ deleteCharacter: async () => true });
+    installRuntime({ isCharacterOnline: () => false, ...spies });
+    const res = await callHandler('DELETE', '/api/characters/:id', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(charRow({ id: 9, name: 'Deleteme' })),
+      body: { name: 'Deleteme' },
+    });
+    expect(res.status).toBe(200);
+    expect(spies.saveMarket).not.toHaveBeenCalled();
+    expect(spies.saveMail).toHaveBeenCalledTimes(1);
+  });
+
+  it('skips the mail save when only the market had something to purge', async () => {
+    const spies = purgeSpies({ market: true, mail: false });
+    setCharactersDbForTests({ deleteCharacter: async () => true });
+    installRuntime({ isCharacterOnline: () => false, ...spies });
+    const res = await callHandler('DELETE', '/api/characters/:id', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(charRow({ id: 9, name: 'Deleteme' })),
+      body: { name: 'Deleteme' },
+    });
+    expect(res.status).toBe(200);
+    expect(spies.saveMarket).toHaveBeenCalledTimes(1);
+    expect(spies.saveMail).not.toHaveBeenCalled();
+  });
+
   it('404s not-found when the delete matched no row', async () => {
+    const spies = purgeSpies();
     setCharactersDbForTests({ deleteCharacter: async () => false });
-    installRuntime({ isCharacterOnline: () => false });
+    installRuntime({ isCharacterOnline: () => false, ...spies });
     const res = await callHandler('DELETE', '/api/characters/:id', {
       account: { accountId: 7, scope: 'full' },
       state: stateWith(charRow({ id: 9, name: 'Deleteme' })),
@@ -1102,12 +1166,18 @@ describe('delete handler', () => {
     });
     expect(res.status).toBe(404);
     expect(res.body).toEqual({ error: 'not found', code: 'character.not_found' });
+    // A delete that matched no row must never touch a live character's escrow.
+    expect(spies.purgeMarketSeller).not.toHaveBeenCalled();
+    expect(spies.purgeMailOwner).not.toHaveBeenCalled();
+    expect(spies.saveMarket).not.toHaveBeenCalled();
+    expect(spies.saveMail).not.toHaveBeenCalled();
   });
 
   it('400s when the character is currently online', async () => {
     const deleteCharacter = vi.fn(async () => true);
+    const spies = purgeSpies();
     setCharactersDbForTests({ deleteCharacter });
-    installRuntime({ isCharacterOnline: () => true });
+    installRuntime({ isCharacterOnline: () => true, ...spies });
     const res = await callHandler('DELETE', '/api/characters/:id', {
       account: { accountId: 7, scope: 'full' },
       state: stateWith(charRow({ id: 9, name: 'Deleteme' })),
@@ -1116,12 +1186,17 @@ describe('delete handler', () => {
     expect(res.status).toBe(400);
     expect(res.body).toEqual({ error: 'character is currently online', code: 'character.online' });
     expect(deleteCharacter).not.toHaveBeenCalled();
+    expect(spies.purgeMarketSeller).not.toHaveBeenCalled();
+    expect(spies.purgeMailOwner).not.toHaveBeenCalled();
+    expect(spies.saveMarket).not.toHaveBeenCalled();
+    expect(spies.saveMail).not.toHaveBeenCalled();
   });
 
   it('400s when the typed confirmation name does not match', async () => {
     const deleteCharacter = vi.fn(async () => true);
+    const spies = purgeSpies();
     setCharactersDbForTests({ deleteCharacter });
-    installRuntime({ isCharacterOnline: () => false });
+    installRuntime({ isCharacterOnline: () => false, ...spies });
     const res = await callHandler('DELETE', '/api/characters/:id', {
       account: { accountId: 7, scope: 'full' },
       state: stateWith(charRow({ id: 9, name: 'Deleteme' })),
@@ -1133,6 +1208,71 @@ describe('delete handler', () => {
       code: 'character.delete_confirm',
     });
     expect(deleteCharacter).not.toHaveBeenCalled();
+    expect(spies.purgeMarketSeller).not.toHaveBeenCalled();
+    expect(spies.purgeMailOwner).not.toHaveBeenCalled();
+    expect(spies.saveMarket).not.toHaveBeenCalled();
+    expect(spies.saveMail).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The post-delete world-state purge core, shared by BOTH delete dispatch arms:
+// the migrated deleteHandler above (through the injected runtime) and the retained
+// legacy ladder arm in main.ts (with the same members bound off the live
+// GameServer). Unit it directly, plus a wiring pin on the legacy arm, so an
+// API_DISPATCH=legacy rollback cannot quietly lose the purge.
+// ---------------------------------------------------------------------------
+
+describe('purgeDeletedCharacterWorldState', () => {
+  it('purges both books and persists each one that changed', async () => {
+    const rt = {
+      purgeMarketSeller: vi.fn(() => true),
+      saveMarket: vi.fn(async () => {}),
+      purgeMailOwner: vi.fn(() => true),
+      saveMail: vi.fn(async () => {}),
+    };
+    await purgeDeletedCharacterWorldState(rt, 42, 'Gone');
+    expect(rt.purgeMarketSeller).toHaveBeenCalledWith(42, 'Gone');
+    expect(rt.purgeMailOwner).toHaveBeenCalledWith(42, 'Gone');
+    expect(rt.saveMarket).toHaveBeenCalledTimes(1);
+    expect(rt.saveMail).toHaveBeenCalledTimes(1);
+  });
+
+  it('writes neither book when the character held nothing in either', async () => {
+    const rt = {
+      purgeMarketSeller: vi.fn(() => false),
+      saveMarket: vi.fn(async () => {}),
+      purgeMailOwner: vi.fn(() => false),
+      saveMail: vi.fn(async () => {}),
+    };
+    await purgeDeletedCharacterWorldState(rt, 42, 'Gone');
+    expect(rt.purgeMarketSeller).toHaveBeenCalledTimes(1);
+    expect(rt.purgeMailOwner).toHaveBeenCalledTimes(1);
+    expect(rt.saveMarket).not.toHaveBeenCalled();
+    expect(rt.saveMail).not.toHaveBeenCalled();
+  });
+});
+
+describe('legacy DELETE dispatch arm (main.ts)', () => {
+  it('runs the same shared purge, after the db delete', () => {
+    const src = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8');
+    // Strip `//` line comments (keeping `://` protocol slashes) before the substring
+    // checks: without this, commenting the purge out leaves its text alive in the
+    // comment and the pin stays falsely green (the comment-gameable trap).
+    const stripComments = (s: string): string => s.replace(/(^|[^:])\/\/.*$/gm, '$1');
+    const start = src.indexOf("if (req.method === 'DELETE' && delMatch) {");
+    expect(start).toBeGreaterThan(-1);
+    const end = src.indexOf("url === '/api/realms'", start);
+    expect(end).toBeGreaterThan(start);
+    const arm = stripComments(src.slice(start, end));
+    const deleteAt = arm.indexOf('await deleteCharacter(accountId, characterId)');
+    const purgeAt = arm.indexOf('purgeDeletedCharacterWorldState(');
+    expect(deleteAt).toBeGreaterThan(-1);
+    expect(purgeAt).toBeGreaterThan(deleteAt);
+    // Bound to the LIVE sim books, the same seam the injected runtime uses.
+    expect(arm).toContain('liveGame().purgeMarketSeller(');
+    expect(arm).toContain('liveGame().purgeMailOwner(');
+    expect(arm).toContain('character.name');
   });
 });
 
