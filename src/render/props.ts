@@ -24,7 +24,7 @@ import {
   isEastbrookRebuildWell,
 } from './eastbrook_town';
 import { EMISSIVE_LIGHT, GFX, sharedUniforms, surfaceMat } from './gfx';
-import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
+import { applySurfaceDetail, reapplySurfaceDetailToClone, wornFamilyFor } from './worn_stone';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -993,6 +993,9 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       let tm = matMap.get(src);
       if (!tm) {
         const mat = src.clone();
+        // Material.clone drops onBeforeCompile: re-attach the recorded
+        // surface-detail layer so ghostable buildings keep their texture.
+        reapplySurfaceDetailToClone(mat);
         tm = { mat, depthWrite: mat.depthWrite };
         matMap.set(src, tm);
       }

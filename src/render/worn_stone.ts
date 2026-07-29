@@ -483,6 +483,16 @@ export function applySurfaceDetail(
   applied.add(mat);
   mat.userData.surfaceDetail = family;
   if (family === 'stone') mat.userData.wornStone = true; // legacy marker
+  // JSON-safe reapplication record: Material.clone() deep-copies userData but
+  // DROPS onBeforeCompile, so clone sites (the camera-ghost material clones in
+  // props.ts registerHideable) re-attach the layer from this spec.
+  mat.userData.surfaceDetailSpec = {
+    family,
+    strength: opts?.strength,
+    tileScale: opts?.tileScale,
+    objectSpace: opts?.objectSpace,
+    cellMask: opts?.cellMask ? [...opts.cellMask] : undefined,
+  };
   const fam = FAMILIES[family];
   // Reflectivity floor (metal): raise, never lower, so the props/weapon env
   // boosts that already sit higher keep their tuned values.
@@ -700,6 +710,25 @@ export function applySurfaceDetail(
  */
 export function applyWornStone(mat: THREE.MeshStandardMaterial, opts?: WornStoneOpts): void {
   applySurfaceDetail(mat, 'stone', opts);
+}
+
+/**
+ * Re-attach the surface-detail layer to a Material.clone() of a detailed
+ * material: clone copies userData (including the JSON spec recorded at apply
+ * time) but silently DROPS the onBeforeCompile hook, which is how the
+ * camera-ghost buildings (props.ts registerHideable clones every mesh
+ * material so hiding one structure cannot blank a shared material) shipped
+ * bare walls while merged siblings kept their texture. No-op for clones of
+ * undetailed materials.
+ */
+export function reapplySurfaceDetailToClone(clone: THREE.Material): void {
+  const std = clone as THREE.MeshStandardMaterial;
+  if (!std.isMeshStandardMaterial) return;
+  const spec = std.userData?.surfaceDetailSpec as
+    | (SurfaceDetailOpts & { family: SurfaceFamily })
+    | undefined;
+  if (!spec || !FAMILIES[spec.family]) return;
+  applySurfaceDetail(std, spec.family, spec);
 }
 
 // ---------------------------------------------------------------------------
