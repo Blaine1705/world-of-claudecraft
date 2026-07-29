@@ -7,6 +7,7 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { GFX, sharedUniforms } from './gfx';
+import { renderLayerDisabled } from './render_dev_flags';
 
 // Post chain: RenderPass -> N8AO (high: half-res Low, ultra: full-res Medium)
 // -> UnrealBloom -> OutputPass (ACES tonemap + sRGB, reads
@@ -102,7 +103,9 @@ export function buildComposer(
   const composer = new EffectComposer(webgl, target);
 
   let ao: N8AOPass | null = null;
-  if (GFX.ao && !gradeOnly) {
+  // ?n8ao=off is the dev-only perf-attribution kill switch (render_dev_flags):
+  // the chain falls back to the plain RenderPass branch below.
+  if (GFX.ao && !gradeOnly && !renderLayerDisabled('n8ao')) {
     // N8AOPass REPLACES RenderPass: it renders the scene into its own
     // HalfFloat beauty+depth target (a separate RenderPass would be a
     // discarded full scene draw). Trade-off: the composer's MSAA target
@@ -129,7 +132,8 @@ export function buildComposer(
     // ~5 full-scene traversals per frame. AO multiplying over transparent
     // surfaces showed no visible difference in A/B shots.
     ao.configuration.transparencyAware = false;
-    if (GFX.tier === 'ultra') {
+    if (GFX.aoFullRes) {
+      // ultra and insane (and the Advanced Effects dial's top level)
       ao.setQualityMode('Medium');
     } else {
       // high tier: half-res + depth-aware upsample keeps it ~1ms-class on
@@ -144,7 +148,7 @@ export function buildComposer(
   }
 
   let bloom: UnrealBloomPass | null = null;
-  if (!gradeOnly) {
+  if (!gradeOnly && GFX.bloom) {
     bloom = new UnrealBloomPass(size.clone(), BLOOM_STRENGTH, BLOOM_RADIUS, BLOOM_THRESHOLD);
     composer.addPass(bloom);
   }
@@ -158,10 +162,10 @@ export function buildComposer(
   // detector expects gamma-encoded color, which is what OutputPass produced).
   // Construction size is provisional: composer.setSize below, and the
   // setSize() member, resize every pass to the live drawing-buffer extent.
-  // High only: ultra's 2.5 pixelRatioCap already suppresses edge crawl and
-  // SMAA at that pixel count costs ~1.5ms; high runs a 1.75 cap where
-  // aliasing is visible and the pass is cheap.
-  if (GFX.composer && GFX.tier === 'high') composer.addPass(new SMAAPass(size.x, size.y));
+  // GFX.smaa is high-tier only: ultra's 2.5 pixelRatioCap already suppresses
+  // edge crawl and SMAA at that pixel count costs ~1.5ms; high runs a 1.75
+  // cap where aliasing is visible and the pass is cheap.
+  if (GFX.composer && GFX.smaa) composer.addPass(new SMAAPass(size.x, size.y));
 
   // EffectComposer defaults its logical size to drawing-buffer pixels and
   // then multiplies by pixelRatio again when sizing passes — N8AO/bloom would

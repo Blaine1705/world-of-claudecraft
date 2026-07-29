@@ -150,10 +150,14 @@ function bakeRocks(): BakedRocks | null {
 export function buildCliffScree(seed: number): CliffScreeView {
   const group = new THREE.Group();
   group.name = 'cliffScree';
-  // form shadows are the whole point of the scatter; the lambert tier has no
-  // shadow map to catch them, so it skips the system entirely (and lean
-  // foliage machines skip it with the rest of the ground cover)
-  if (!GFX.standardMaterials || GFX.leanFoliage) {
+  // Form shadows are the whole point of the scatter, and it is one of the
+  // graphics-overhaul detail layers: HIGH AND UP only (GFX.detailLayers).
+  // Medium keeps its pre-overhaul look and frame budget (the round-10 medium
+  // regate). The sim's walkable dome (sim/scree.ts -> groundHeight) stays
+  // tier-independent, exactly as it already did on the low/lean tiers this
+  // gate previously skipped: every client agrees on the walkable surface,
+  // and the tiers below high simply do not draw the rubble dressing on it.
+  if (!GFX.cliffScree) {
     return { group, update: () => undefined };
   }
 

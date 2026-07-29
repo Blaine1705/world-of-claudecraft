@@ -34,6 +34,7 @@ import type * as THREE from 'three';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX, type SurfaceMatOpts, surfaceMat } from './gfx';
+import { renderLayerDisabled } from './render_dev_flags';
 
 export type SurfaceFamily = 'stone' | 'rock' | 'wood' | 'plaster' | 'bark' | 'fabric' | 'metal';
 
@@ -247,25 +248,25 @@ const FAMILIES: Record<SurfaceFamily, FamilyDef> = {
   },
 };
 
-/** View-ray refinement taps per fragment: ultra takes 4, high 3. The
- *  normalized amplitudes walk real depth now, and the deeper clamps need the
- *  extra refinement to stay swim-free; the high tier additionally shrinks its
- *  clamp (PARALLAX_HIGH_CLAMP_K) so three taps never step-band at grazing
- *  angles. Ultra shipped at 6 taps; the round-9 screenshot A/B (grazing keep
- *  wall, boulder close/graze, town street) measured 4 taps at FULL clamp
- *  indistinguishable from 6 at the shipped amplitudes (diff at the capture
- *  noise floor), so the two extra dependent-fetch iterations were pure cost. */
-const PARALLAX_TAPS_ULTRA = 4;
-const PARALLAX_TAPS_HIGH = 3;
-const PARALLAX_HIGH_CLAMP_K = 0.65;
+/** View-ray refinement taps and offset-clamp share come from the derived
+ *  gfx.ts knobs (GFX.surfaceDetailTaps / GFX.surfaceDetailClampK, one source
+ *  for the tier ladder AND the Advanced Surface Detail dial): insane takes 4
+ *  taps at the full clamp (the pre-round-10 ultra execution, kept exactly),
+ *  ultra 3 at 0.85, high 3 at 0.65. The normalized amplitudes walk real
+ *  depth, and the deeper clamps need the extra refinement to stay swim-free,
+ *  which is why the 3-tap executions shrink their clamp (the round-10
+ *  screenshot A/B on the keep wall / boulder / town street reads the 3-tap
+ *  0.85-clamp walk as the same relief while dropping the fourth dependent
+ *  fetch). Ultra shipped at 6 taps originally; round 9 measured 4 at full
+ *  clamp indistinguishable from 6, round 10 moved that execution to the
+ *  opt-in insane tier. */
+const parallaxTierTaps = (): number => GFX.surfaceDetailTaps;
+const parallaxTierClampK = (): number => GFX.surfaceDetailClampK;
 /** Offset clamp as a multiple of the family's target depth (2.2 sd of height
  *  is where the tails start breaking the low-poly silhouette). */
 const PARALLAX_CLAMP_K = 2.2;
 /** Height-shade clamp in sd units: recess darkening saturates at 1.5 sd. */
 const HEIGHT_SHADE_CLAMP_SD = 1.5;
-
-const parallaxTierTaps = (): number =>
-  GFX.tier === 'ultra' ? PARALLAX_TAPS_ULTRA : GFX.tier === 'high' ? PARALLAX_TAPS_HIGH : 0;
 
 // ---------------------------------------------------------------------------
 // Distance fades (perf): the layer costs up to 27 texture taps per fragment on
@@ -373,16 +374,18 @@ const scaledFadeBands = (parallaxDepth: number, tileScale: number): SurfaceDetai
   };
 };
 
-// Low tier never compiles the layer, so skip the fetches there (the
-// detail_normals.ts pattern). Loader cache results are immutable: we own
+// Tiers below high never compile the layer (GFX.surfaceDetail: the round-10
+// medium regate measured the residual detail taps as the whole medium-town
+// gap, so medium keeps its pre-overhaul surfaces), so skip the fetches there
+// (the detail_normals.ts pattern). Loader cache results are immutable: we own
 // CLONES (shared decoded image, one extra GPU texture each), so the
 // anisotropy tweak cannot leak into another consumer of the same URL. All
-// maps are non-color data and stay in linear space. Displacement fetches key
-// off the IMPORT-TIME high/ultra guess: if the live tier lands lower the
-// texture merely idles, and if a lower guess later runs high/ultra the
-// parallax branch fails soft to the plain layer (the detail_normals null
-// contract).
-if (GFX.standardMaterials) {
+// maps are non-color data and stay in linear space. Every fetch keys off the
+// IMPORT-TIME tier guess: if the live tier lands lower the textures merely
+// idle, and if a lower guess later runs high+ the layer fails soft to the
+// undetailed material (the detail_normals null contract, the canopy_detail
+// precedent).
+if (GFX.surfaceDetail) {
   const wantDisp = parallaxTierTaps() > 0;
   for (const fam of Object.values(FAMILIES)) {
     const prep = (name: string): Promise<THREE.Texture> =>
@@ -616,7 +619,15 @@ export function applySurfaceDetail(
   family: SurfaceFamily,
   opts?: SurfaceDetailOpts,
 ): void {
-  if (!GFX.standardMaterials || !mat.isMeshStandardMaterial) return;
+  // HIGH AND UP (GFX.surfaceDetail; the Advanced Surface Detail dial maps
+  // onto the same knob): the round-10 ladder bench measured the layer's
+  // residual detail taps (normal/AO/rough, post-fade) as the whole
+  // medium-town regression (-18..-33% orbit/run), so medium keeps its
+  // pre-overhaul surfaces and its pre-overhaul frame budget.
+  if (!GFX.surfaceDetail || !mat.isMeshStandardMaterial) return;
+  // Dev-only perf-attribution kill switch (?worndetail=off): the whole layer
+  // stays un-applied, so an A/B bench run isolates its cost.
+  if (renderLayerDisabled('worndetail')) return;
   if (applied.has(mat)) return;
   applied.add(mat);
   mat.userData.surfaceDetail = family;
@@ -669,12 +680,9 @@ export function applySurfaceDetail(
     // family's target depth, whatever the map's dynamic range (the shipped
     // sds span 10x, so a global amplitude can never read evenly).
     const parallaxAmp = fam.parallaxDepth / fam.dispSd;
-    // The high tier walks fewer taps, so it takes a shallower clamp: depth it
-    // cannot refine would otherwise swim at grazing angles.
-    const parallaxClamp =
-      PARALLAX_CLAMP_K *
-      fam.parallaxDepth *
-      (taps >= PARALLAX_TAPS_ULTRA ? 1 : PARALLAX_HIGH_CLAMP_K);
+    // The 3-tap tiers take a shallower clamp: depth they cannot refine would
+    // otherwise swim at grazing angles (insane's 4 taps keep the full clamp).
+    const parallaxClamp = PARALLAX_CLAMP_K * fam.parallaxDepth * parallaxTierClampK();
     // Distance-fade bands from the EFFECTIVE tile scale (opts override
     // included). Object-space projections have no world position to measure
     // a camera distance from, and their consumers (held weapons) live at
@@ -894,7 +902,10 @@ export function applySurfaceDetail(
   mat.customProgramCacheKey = () => {
     const ready =
       fam.tex.normal && fam.tex.rough && (fam.aoSpan === 0 || fam.tex.ao) ? 'on' : 'off';
-    const par = !objectSpace && fam.tex.disp !== null ? `p${parallaxTierTaps()}` : '-';
+    const par =
+      !objectSpace && fam.tex.disp !== null
+        ? `p${parallaxTierTaps()}c${parallaxTierClampK()}`
+        : '-';
     const mask = cellMask ? `m${cellMask.join(',')}` : '-';
     const met = metalMix > 0 && fam.tex.metal !== null ? 'met' : '-';
     // The distance-fade bands are baked as compile-time constants and vary
@@ -932,6 +943,27 @@ export function reapplySurfaceDetailToClone(clone: THREE.Material): void {
   applySurfaceDetail(std, spec.family, spec);
 }
 
+/**
+ * Every resolved family detail texture (normal/AO/rough/disp/metal clones),
+ * for the renderer's boot-prewarm window. These textures are shader UNIFORMS
+ * attached in onBeforeCompile, not material properties, so the scene texture
+ * sweep (renderer.ts collectObjectTextures reads map/normalMap/... keys) can
+ * never find them: without an explicit prewarm they upload on the first live
+ * draw that binds them. The Displacement fields are the heavy case: they only
+ * load on the parallax tiers (high+), and their first-draw decode+upload was
+ * measured as 1fps 1%-low windows mid-travel on the high-tier meadow bench.
+ * Empty before the preload gate resolves (call after assetsReady()).
+ */
+export function surfaceDetailPrewarmTextures(): THREE.Texture[] {
+  const out: THREE.Texture[] = [];
+  for (const fam of Object.values(FAMILIES)) {
+    for (const tex of [fam.tex.normal, fam.tex.ao, fam.tex.rough, fam.tex.disp, fam.tex.metal]) {
+      if (tex) out.push(tex);
+    }
+  }
+  return out;
+}
+
 // ---------------------------------------------------------------------------
 // surfaceMat + family, for the procedural feature modules.
 // ---------------------------------------------------------------------------
@@ -951,7 +983,9 @@ export function detailedSurfaceMat(
   detail?: SurfaceDetailOpts,
 ): THREE.Material {
   const base = surfaceMat(opts);
-  if (!GFX.standardMaterials || !(base as THREE.MeshStandardMaterial).isMeshStandardMaterial)
+  // GFX.surfaceDetail (high+): below it applySurfaceDetail would no-op, so
+  // skip the clone and hand back the shared base material untouched.
+  if (!GFX.surfaceDetail || !(base as THREE.MeshStandardMaterial).isMeshStandardMaterial)
     return base;
   const key = `${base.uuid}|${family}|${detail?.strength ?? ''}|${detail?.tileScale ?? ''}|${detail?.objectSpace ? 'o' : 'w'}|${detail?.cellMask?.join(',') ?? ''}`;
   let mat = detailedMats.get(key);

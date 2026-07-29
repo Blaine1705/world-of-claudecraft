@@ -30,7 +30,10 @@ import { applySurfaceDetail, GREAT_TREE_BARK_DETAIL, isBarkMaterialName } from '
 const GREAT_TREE_URL = '/models/foliage/twisted_1.glb';
 
 let greatTreeScene: THREE.Group | null = null;
-if (GFX.standardMaterials) {
+// GFX.surfaceDetail (high+): below it applySurfaceDetail no-ops, so the
+// decorated clone would compile the same plain programs the foliage prewarm
+// already covers (the round-10 medium regate).
+if (GFX.surfaceDetail) {
   registerPreload(
     loadGltf(GREAT_TREE_URL).then((gltf) => {
       greatTreeScene = gltf.scene;
@@ -52,7 +55,7 @@ export function buildGreatTreePrewarmGroup(): THREE.Group {
   const group = new THREE.Group();
   group.name = 'great-tree-material-prewarm';
   group.position.set(0, -1000, 0); // off-screen; compile ignores position
-  if (!GFX.standardMaterials || !greatTreeScene) return group;
+  if (!GFX.surfaceDetail || !greatTreeScene) return group;
   const tree = greatTreeScene.clone(true);
   const barked = new Map<string, THREE.Material>();
   const barkify = (source: THREE.Material): THREE.Material => {

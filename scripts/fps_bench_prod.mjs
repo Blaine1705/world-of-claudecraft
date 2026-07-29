@@ -12,12 +12,38 @@ import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
 import { enterOfflineGame } from './enter_offline_game.mjs';
 
-const TARGETS = (process.env.BENCH_TARGETS ?? 'baseline=http://localhost:5190,branch=http://localhost:5191')
+// Targets: "label=url,label=url". Split on the FIRST '=' only, so a URL may
+// carry its own query (dev layer kill switches like ?worndetail=off, the
+// render_dev_flags.ts attribution surface); the tier param is appended with
+// '&' when the URL already has one.
+const TARGETS = (
+  process.env.BENCH_TARGETS ?? 'baseline=http://localhost:5190,branch=http://localhost:5191'
+)
   .split(',')
   .map((s) => {
-    const [label, url] = s.split('=');
-    return { label, url };
+    const eq = s.indexOf('=');
+    return { label: s.slice(0, eq), url: s.slice(eq + 1) };
   });
+
+// Graphics preset under test (the whole point of a tier ladder is that lower
+// tiers skip the expensive layers - measure each, don't assume). Mirrors
+// perf_tour.mjs PRESET_VALUES (5 is the Advanced custom profile, never a
+// bench target; 6 is Insane, the everything-on showcase preset).
+const PRESET = process.env.BENCH_PRESET ?? 'ultra';
+const PRESET_VALUES = { low: 1, medium: 2, high: 3, ultra: 4, insane: 6, advanced: 5 };
+if (!(PRESET in PRESET_VALUES)) throw new Error(`unknown BENCH_PRESET ${PRESET}`);
+// BENCH_PRESET=advanced needs no ?gfx= force (there is none); the persisted
+// preset value drives the tier resolution alone.
+const GFX_QUERY = PRESET === 'advanced' ? '' : `gfx=${PRESET}`;
+// BENCH_SETTINGS='{"terrainDetail":0.5}' merges extra woc_settings keys into
+// the seeded object: the advanced sub-setting rows are benchable per level.
+// A per-target BENCH_SETTINGS_<LABEL> (label uppercased) wins over the shared
+// value, so one run can A/B two levels of the same dial against one build.
+const EXTRA_SETTINGS = process.env.BENCH_SETTINGS ? JSON.parse(process.env.BENCH_SETTINGS) : {};
+const extraSettingsFor = (label) => {
+  const perTarget = process.env[`BENCH_SETTINGS_${label.toUpperCase()}`];
+  return perTarget ? JSON.parse(perTarget) : EXTRA_SETTINGS;
+};
 
 const SETTLE_MS = 8000;
 const PHASES = [
@@ -25,12 +51,19 @@ const PHASES = [
   { name: 'orbit', ms: 6000, orbit: 0.9, run: false },
   { name: 'run', ms: 6000, orbit: 0.25, run: true },
 ];
-const WAYPOINTS = [
+const ALL_WAYPOINTS = [
   { name: 'meadow', x: 15, z: 45, yaw: 1.0, pitch: 0.35, dist: 9 },
   { name: 'path', x: 40, z: 9.5, yaw: 1.41, pitch: 0.4, dist: 8 },
   { name: 'town', x: 13, z: 15, yaw: 2.45, pitch: -0.2, dist: 12 },
   { name: 'peaks', x: 30, z: 700, yaw: 0.5, pitch: 0.3, dist: 8 },
 ];
+// BENCH_WAYPOINTS="town" (comma list) narrows an attribution run to the
+// waypoints under test, so a per-layer bisect costs minutes, not an hour.
+const WAYPOINTS = process.env.BENCH_WAYPOINTS
+  ? ALL_WAYPOINTS.filter((w) => process.env.BENCH_WAYPOINTS.split(',').includes(w.name))
+  : ALL_WAYPOINTS;
+if (!WAYPOINTS.length)
+  throw new Error(`BENCH_WAYPOINTS matched nothing: ${process.env.BENCH_WAYPOINTS}`);
 const LAUNCH_ARGS = [
   '--window-size=1600,900',
   '--ignore-gpu-blocklist',
@@ -124,7 +157,9 @@ async function teleport(page, wp, label) {
       )
       .then(() => true)
       .catch(() => false);
-    console.log(`${label}: chat teleport unconfirmed at ${wp.name}, pos-write fallback ${arrived ? 'ok' : 'FAILED'}`);
+    console.log(
+      `${label}: chat teleport unconfirmed at ${wp.name}, pos-write fallback ${arrived ? 'ok' : 'FAILED'}`,
+    );
   }
   return arrived;
 }
@@ -140,7 +175,9 @@ function samplePhase(page, phase) {
         const step = (t) => {
           deltas.push(t - last);
           last = t;
-          if (g?.input && orbitRate) g.input.camYaw += ((t - t0) / 1000) * 0 + orbitRate * (deltas[deltas.length - 1] / 1000);
+          if (g?.input && orbitRate)
+            g.input.camYaw +=
+              ((t - t0) / 1000) * 0 + orbitRate * (deltas[deltas.length - 1] / 1000);
           if (t - t0 < ms) requestAnimationFrame(step);
           else resolve(deltas);
         };
@@ -179,21 +216,28 @@ for (const t of TARGETS) {
     defaultViewport: { width: 1600, height: 900 },
   });
   const page = await browser.newPage();
-  await page.evaluateOnNewDocument(() => {
-    localStorage.setItem(
-      'woc_settings',
-      JSON.stringify({
-        graphicsPreset: 5,
-        terrainDetail: 1,
-        foliageDensity: 1,
-        effectsQuality: 1,
-        shadowQuality: 1,
-        renderScale: 1,
-        browserEffects: 1,
-      }),
-    );
-  });
-  await page.goto(`${t.url}/?gfx=ultra`, { waitUntil: 'domcontentloaded', timeout: 120000 });
+  await page.evaluateOnNewDocument(
+    (presetValue, extra) => {
+      localStorage.setItem(
+        'woc_settings',
+        JSON.stringify({
+          graphicsPreset: presetValue,
+          terrainDetail: 1,
+          foliageDensity: 1,
+          effectsQuality: 1,
+          shadowQuality: 1,
+          renderScale: 1,
+          browserEffects: 1,
+          ...extra,
+        }),
+      );
+    },
+    PRESET_VALUES[PRESET],
+    extraSettingsFor(t.label),
+  );
+  const sep = t.url.includes('?') ? '&' : '/?';
+  const gfxSuffix = GFX_QUERY ? `${sep}${GFX_QUERY}` : t.url.includes('?') ? '' : '/';
+  await page.goto(`${t.url}${gfxSuffix}`, { waitUntil: 'domcontentloaded', timeout: 120000 });
   const hasEntry = await page
     .waitForSelector('#btn-offline', { timeout: 8000 })
     .then(() => true)

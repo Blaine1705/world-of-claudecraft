@@ -65,6 +65,7 @@ import {
   stepCameraFeel,
   stepLandingDetector,
 } from './camera_feel_core';
+import { canopyDetailPrewarmTextures } from './canopy_detail';
 import { buildCastleFeatures, type CastleFeaturesView } from './castle_features';
 import {
   characterRecklessnessActive,
@@ -288,6 +289,7 @@ import { buildWater, type WaterView } from './water';
 import { buildWaterFlora } from './water_flora';
 import { Weather } from './weather';
 import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './world_audio';
+import { surfaceDetailPrewarmTextures } from './worn_stone';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
 import {
@@ -2968,7 +2970,12 @@ export class Renderer {
 
   private initialEffectiveRenderScale(scale: number): number {
     const forcedTier = urlForcedTier();
-    if (this.isMobileRuntime() && forcedTier !== 'high' && forcedTier !== 'ultra')
+    if (
+      this.isMobileRuntime() &&
+      forcedTier !== 'high' &&
+      forcedTier !== 'ultra' &&
+      forcedTier !== 'insane'
+    )
       return Math.min(scale, 0.85);
     return scale;
   }
@@ -4246,6 +4253,7 @@ export class Renderer {
     let greatTreePrewarmGroup: THREE.Group | null = null;
     let landmarkPrewarmGroup: THREE.Group | null = null;
     let weatherPrewarmActive = false;
+    let surfaceDetailTexturesWarmed = 0;
 
     let renderPasses = 0;
     let playerPrewarmVisuals = 0;
@@ -4529,6 +4537,25 @@ export class Renderer {
           this.scene.add(greatTreePrewarmGroup);
         },
         detail: () => `objects=${greatTreePrewarmGroup?.children.length ?? 0}`,
+      },
+      {
+        // The worn-stone family maps (normal/AO/rough/displacement/metal) and
+        // the canopy clump maps are onBeforeCompile UNIFORMS, so the scene
+        // texture sweep below never finds them and they otherwise decode +
+        // upload on the first live draw that binds them. The Displacement
+        // fields only exist on the parallax tiers (high+), where that first
+        // draw was measured as 1fps 1%-low windows mid-travel (the round-10
+        // high-meadow stall). Upload them all inside the boot window instead.
+        id: 'surface-detail.textures',
+        category: 'props',
+        priority: 47,
+        required: false,
+        run: () => {
+          const textures = [...surfaceDetailPrewarmTextures(), ...canopyDetailPrewarmTextures()];
+          for (const texture of textures) this.prewarmTexture(texture);
+          surfaceDetailTexturesWarmed = textures.length;
+        },
+        detail: () => `textures=${surfaceDetailTexturesWarmed}`,
       },
       {
         // Precipitation starts hidden in the dry spawn biome. Make one points

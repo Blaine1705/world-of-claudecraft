@@ -5,6 +5,7 @@ import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/wo
 import { GRASS_BIOME_DENSITY } from './foliage';
 import { insideGrassHubExclusion } from './foliage_core';
 import { GFX, sharedUniforms } from './gfx';
+import { renderLayerDisabled } from './render_dev_flags';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 
 // Near-field blade carpet: a single InstancedMesh of low-poly SOLID grass
@@ -26,10 +27,10 @@ import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 // Denser and finer than the first cut (blades were reading as sparse
 // standalone clumps): tighter cells, smaller blades, and a wider ring so
 // the carpet blends into the card tufts instead of ending at your feet.
+// The RADIUS comes from GFX.bladeCarpetRadius (34 on the high+ tiers; the
+// Advanced Foliage Density dial trims or extends it; 0 disables the carpet),
+// so the grid dimensions derive per build inside buildBladeGrass.
 const CELL = 0.46; // yards between clusters
-const RADIUS = 34; // carpet radius (world units)
-const GRID_W = Math.ceil((RADIUS * 2) / CELL); // slots per axis
-const POOL = GRID_W * GRID_W;
 const PLACE_BUDGET = 560; // re-placements per frame while moving
 const FADE_START = 0.8; // of RADIUS: outer ring shrinks blades to nothing
 
@@ -109,10 +110,18 @@ function clusterGeometry(rng: () => number): THREE.BufferGeometry {
 export function buildBladeGrass(seed: number): BladeGrassView {
   const group = new THREE.Group();
   group.name = 'bladeGrass';
-  // the carpet is a close-camera read; the lean tiers keep the card tufts only
-  if (!GFX.standardMaterials || GFX.leanFoliage) {
+  // The carpet is a close-camera read and one of the graphics-overhaul detail
+  // layers: HIGH AND UP only (GFX.bladeCarpetRadius, 0 below high). Medium
+  // compiled it originally and paid -25..-34% at the meadow bench for it;
+  // medium keeps the card-tuft field and its pre-overhaul frame cost instead.
+  // ?bladegrass=off is the dev-only perf-attribution kill switch
+  // (render_dev_flags.ts).
+  const RADIUS = GFX.bladeCarpetRadius;
+  if (RADIUS <= 0 || renderLayerDisabled('bladegrass')) {
     return { group, update: () => undefined };
   }
+  const GRID_W = Math.ceil((RADIUS * 2) / CELL); // slots per axis
+  const POOL = GRID_W * GRID_W;
 
   const rng = mulberry32(seed ^ 0x6b1a);
   const geo = clusterGeometry(rng);

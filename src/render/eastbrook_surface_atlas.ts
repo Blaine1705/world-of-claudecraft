@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
+import { renderLayerDisabled } from './render_dev_flags';
 import { applySurfaceDetail, type SurfaceFamily } from './worn_stone';
 
 export const EASTBROOK_SURFACE_ATLAS_URL = '/textures/eastbrook_surface_atlas.webp';
@@ -333,6 +334,9 @@ const TOWN_CELL_MASK: readonly number[] = Object.freeze(
 export function applyEastbrookTownSurfaceDetail(material: THREE.Material): THREE.Material {
   const standard = material as THREE.MeshStandardMaterial;
   if (!GFX.standardMaterials || !standard.isMeshStandardMaterial) return material;
+  // Dev-only perf-attribution kill switch (?ebdetail=off): isolates the
+  // Eastbrook triplanar-over-atlas cost from the rest of the worn layer.
+  if (renderLayerDisabled('ebdetail')) return material;
   if (standard.emissive.getHex() !== 0 || !standard.map) return material;
   applySurfaceDetail(standard, 'stone', {
     strength: EASTBROOK_TRIPLANAR_STRENGTH,
@@ -410,7 +414,12 @@ export function eastbrookSurfaceMaterial(
     // Single-semantic materials (the Grand Armoury kit) take the properly
     // routed triplanar family over the baked atlas; crystal stays clean.
     const triplanar = TRIPLANAR_BY_SEMANTIC[semantic];
-    if (triplanar && GFX.standardMaterials && converted instanceof THREE.MeshStandardMaterial) {
+    if (
+      triplanar &&
+      GFX.standardMaterials &&
+      !renderLayerDisabled('ebdetail') &&
+      converted instanceof THREE.MeshStandardMaterial
+    ) {
       applySurfaceDetail(converted, triplanar.family, { strength: triplanar.strength });
     }
   }

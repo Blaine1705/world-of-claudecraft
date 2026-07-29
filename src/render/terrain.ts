@@ -17,6 +17,15 @@ import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { type ChunkGrid, type GroundPendingAt, orderCellsForEntry } from './chunk_residency_core';
 import { GFX, SUN_DIR } from './gfx';
+import { renderLayerDisabled } from './render_dev_flags';
+
+// The terrain relief ladder (GFX.terrainRelief, one source for the tier
+// ladder and the Advanced Terrain Detail dial): 0 none (medium and below),
+// 1 cavity shading only, 2 adds the parallax walk (high), 3 adds the micro
+// sun-shadow (ultra/insane). ?trelief=off is the dev perf-attribution kill
+// switch (render_dev_flags.ts).
+const terrainReliefLevel = (): number => (renderLayerDisabled('trelief') ? 0 : GFX.terrainRelief);
+
 import { idleSlot } from './idle_queue';
 import { impactCraterTerrainBlend } from './impact_terrain';
 import {
@@ -600,9 +609,23 @@ function buildSplatMaterial(
         // rock second octaves, the grass coarse/mid/comb taps) all transform
         // the post-offset tuv, which preserves the same WORLD-space shift per
         // tap: the octaves move together and cannot ghost against each other.
-        vec3 pRay = cameraPosition - vWPos;
-        float pDist = length(pRay);
-        float upW = normalize(vWNorm).y;
+        // Camera distance, UNCONDITIONAL: the snow-sparkle fade in the
+        // roughness chunk reads it on every relief level (level 0 used to
+        // leave it undeclared, which broke the whole terrain program).
+        float wocCamDist = length(cameraPosition - vWPos);
+        ${
+          // upW feeds both the parallax fade and the cavity slope fade; emit
+          // it once whenever any relief level is active.
+          terrainReliefLevel() >= 1 ? 'float upW = normalize(vWNorm).y;' : ''
+        }
+        ${
+          // The parallax walk is relief level 2+ (high and up): medium
+          // compiles the splat pipeline but has the least frame budget of the
+          // PBR tiers (the round-10 medium regate), so it keeps flat-lit
+          // ground.
+          terrainReliefLevel() >= 2
+            ? `vec3 pRay = cameraPosition - vWPos;
+        float pDist = wocCamDist;
         // Grazing fade: at low N dot V the view-ray offset grows past what a
         // 1-2 tap parallax can refine and the texture smears into a liquid
         // blur, exactly where the depth cue is weakest anyway. Fade the whole
@@ -627,21 +650,25 @@ function buildSplatMaterial(
           vec4 pAmp = vSplatR * WOC_PARALLAX_AMP;
           vec2 pOff = pDir * wocGroundHeightSmooth(tuv, pAmp) * pFade;
           pOff /= max(1.0, length(pOff) / WOC_PARALLAX_CLAMP);
-          ${
-            // refine on high as well as ultra: the second wocGroundHeight read
-            // is three taps of the 512^2 packed AO texture, far under the high
-            // tier's frame budget, and it is what keeps clod edges from
-            // overshooting and swimming at grazing view angles
-            GFX.tier === 'ultra' || GFX.tier === 'high'
-              ? `// second iteration: re-read the height where the first offset
-          // landed, which keeps steep clod edges from overshooting
+          // second iteration: re-read the height where the first offset
+          // landed, which keeps steep clod edges from overshooting and
+          // swimming at grazing view angles (three more taps of the 512^2
+          // packed AO texture; every relief tier affords it now that the
+          // stack starts at high)
           pOff = pDir * wocGroundHeightSmooth(tuv + pOff, pAmp) * pFade;
-          pOff /= max(1.0, length(pOff) / WOC_PARALLAX_CLAMP);`
-              : ''
-          }
+          pOff /= max(1.0, length(pOff) / WOC_PARALLAX_CLAMP);
           tuv += pOff;
+        }`
+            : ''
         }
-        // Cavity shading: the same zero-mean AO signal, applied to the diffuse
+        ${
+          // Cavity/turf-lip shading is relief level 1+. The fallback keeps
+          // the names later stages read (cavH seeds the sparkle speckle hash,
+          // groundShade takes the cliff-cavity multiply), at compile-time
+          // constants the GLSL compiler folds so every relief tap disappears
+          // from the no-relief tiers.
+          terrainReliefLevel() >= 1
+            ? `// Cavity shading: the same zero-mean AO signal, applied to the diffuse
         // directly. Unlike the parallax it is view-independent, so the clods
         // and stones still read from the high pitched-down chase camera where
         // a grazing-angle offset does nothing. Mip averaging pulls the signal
@@ -682,7 +709,9 @@ function buildSplatMaterial(
         // rare safety rail for stacked fine cavity, not the patch shaper
         float groundShade = mix(1.0, clamp(1.0 + relief, 0.52, 1.28) * (1.0 - rim * 0.17), cavW);
         ${
-          GFX.tier === 'ultra'
+          // relief level 3 (ultra/insane); ?tmicroshadow=off is the dev
+          // perf-attribution kill switch (render_dev_flags.ts)
+          terrainReliefLevel() >= 3 && !renderLayerDisabled('tmicroshadow')
             ? `// micro sun-shadow: terrain never casts real shadows at any
         // scale, so march the height proxy two steps toward the sun and shade
         // texels whose sunward neighbourhood sits higher — clod-scale
@@ -695,6 +724,10 @@ function buildSplatMaterial(
           groundShade *= 1.0 - min(max(occl, 0.0) * 4.5, 0.42) * cavW;
         }`
             : ''
+        }`
+            : `float cavH = 0.0;
+        float cavW = 0.0;
+        float groundShade = 1.0;`
         }
         // hill-scale macro noise, hoisted above the grass blend so the grass
         // octave balance, the rock wall blend, and the hue drift below all
@@ -962,7 +995,7 @@ function buildSplatMaterial(
           vec2(127.1, 311.7)) + cavH * 41.0) * 43758.5453);
         float snowSpark = step(0.94, sparkCell)
           * smoothstep(0.45, 0.85, vExtra.y)
-          * (1.0 - smoothstep(18.0, 55.0, pDist));
+          * (1.0 - smoothstep(18.0, 55.0, wocCamDist));
         roughnessFactor = mix(roughnessFactor, 0.55, snowSpark * 0.8);`,
       )
       .replace(
@@ -1265,7 +1298,9 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     // rig is tuned — form shadows are the difference between painted dunes
     // and lit ones. Chunks outside the 105u shadow frustum are culled from
     // the depth pass, so the cost is a dozen static meshes re-drawn there.
-    mesh.castShadow = GFX.dynamicShadows;
+    // GFX.terrainCastShadows follows dynamicShadows on the tier ladder; the
+    // Advanced Shadow Quality dial sheds it below its High level.
+    mesh.castShadow = GFX.terrainCastShadows;
     group.add(mesh);
     // A chunk's transform never changes after this point (its shape lives in
     // the geometry, not the mesh matrix), so it can freeze immediately rather

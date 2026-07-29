@@ -22,14 +22,15 @@
 // the shipped 1K maps: AO mean 0.474, sd 0.117, row/col isotropy 0.73;
 // NormalGL x/y sd 0.104/0.103 (isotropy 1.00).
 // Cost: 6 texture taps per fragment inside CANOPY_FADE_END, zero past it
-// (distance fade below), zero per-frame CPU work. Gated to the
-// standard-material tiers (medium and up) and skipped with leanFoliage, the
-// worn_stone precedent; there is intentionally no parallax here, a cutout
-// canopy has no coherent view-ray height field to walk.
+// (distance fade below), zero per-frame CPU work. Gated to HIGH AND UP
+// (GFX.detailLayers, the round-10 medium regate: medium keeps its
+// pre-overhaul canopy look and cost); there is intentionally no parallax
+// here, a cutout canopy has no coherent view-ray height field to walk.
 import type * as THREE from 'three';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
+import { renderLayerDisabled } from './render_dev_flags';
 
 const CANOPY_TEXTURE_DIR = '/textures/foliage/';
 const CANOPY_TEXTURE_PREFIX = 'Moss002';
@@ -116,10 +117,13 @@ interface CanopyTextures {
 }
 const TEX: CanopyTextures = { normal: null, ao: null };
 
-// Lambert/lean tiers never compile the layer, so skip the fetches there. The
-// loader cache is immutable: clone before the anisotropy tweak (the
+// Tiers below high never compile the layer (GFX.canopyDetail, the round-10
+// medium regate), so skip the fetches there. The import-time tier is only a
+// guess; a lower live tier leaves the textures idle, and a higher live tier
+// fails soft to the plain leaf materials (the detail_normals null contract).
+// The loader cache is immutable: clone before the anisotropy tweak (the
 // worn_stone.ts pattern). Both maps are non-color data in linear space.
-if (GFX.standardMaterials && !GFX.leanFoliage) {
+if (GFX.canopyDetail) {
   const prep = (name: string): Promise<THREE.Texture> =>
     loadTexture(`${CANOPY_TEXTURE_DIR}${CANOPY_TEXTURE_PREFIX}_${name}.jpg`, {
       repeat: true,
@@ -137,6 +141,19 @@ if (GFX.standardMaterials && !GFX.leanFoliage) {
   );
 }
 
+/**
+ * The resolved clump textures for the renderer's boot-prewarm window: like the
+ * worn_stone family maps these are onBeforeCompile UNIFORMS, invisible to the
+ * scene texture sweep, so without an explicit prewarm they upload on the first
+ * live canopy draw. Empty before the preload gate resolves.
+ */
+export function canopyDetailPrewarmTextures(): THREE.Texture[] {
+  const out: THREE.Texture[] = [];
+  if (TEX.normal) out.push(TEX.normal);
+  if (TEX.ao) out.push(TEX.ao);
+  return out;
+}
+
 // Identity-based once-per-instance guard (clone() copies userData, so a
 // userData marker alone would falsely mark clones as applied).
 const applied = new WeakSet<THREE.Material>();
@@ -152,7 +169,10 @@ const applied = new WeakSet<THREE.Material>();
 export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void {
   const spec = CANOPY_DETAIL_SPECS[sourceName];
   if (!spec) return;
-  if (!GFX.standardMaterials || GFX.leanFoliage) return;
+  // High and up only (GFX.canopyDetail, the round-10 medium regate; the
+  // Advanced Foliage Density dial maps onto the same knob); ?canopy=off is
+  // the dev-only perf-attribution kill switch (render_dev_flags.ts).
+  if (!GFX.canopyDetail || renderLayerDisabled('canopy')) return;
   const std = mat as THREE.MeshStandardMaterial;
   if (!std.isMeshStandardMaterial) return;
   if (applied.has(mat)) return;

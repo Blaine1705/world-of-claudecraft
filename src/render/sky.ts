@@ -137,7 +137,7 @@ function shouldUseLiteHdri(): boolean {
     const params = new URLSearchParams(location.search);
     const forced = params.get('gfx');
     if (params.has('lowgfx') || forced === 'low') return true;
-    if (forced === 'high' || forced === 'ultra') return false;
+    if (forced === 'high' || forced === 'ultra' || forced === 'insane') return false;
   }
   if (typeof navigator !== 'undefined') {
     const nav = navigator as Navigator & { deviceMemory?: number };
