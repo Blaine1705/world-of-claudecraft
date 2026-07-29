@@ -2708,6 +2708,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   evasion: {
     id: 'evasion',
+    tooltipOmitEffectLines: true,
     name: 'Ghostfoot',
     class: 'rogue',
     learnLevel: 8,
@@ -2738,10 +2739,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // (32 sec at 5) keeps upkeep to roughly one refresh per engine payoff.
     effects: [{ type: 'finisherHaste', mult: 1.3, basedur: 12, perCombo: 4 }],
     description:
-      'Finishing move that increases melee attack speed by 30%. Lasts longer per combo point.',
+      'Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec per combo point (5 combo points: 32 sec).',
   },
   sprint: {
     id: 'sprint',
+    tooltipOmitEffectLines: true,
     name: 'Swift Heels',
     class: 'rogue',
     learnLevel: 10,
@@ -2768,7 +2770,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     spendsCombo: true,
     effects: [{ type: 'finisherStun', base: 1, perCombo: 1 }],
-    description: 'Finishing move that stuns the target. Lasts 1 sec longer per combo point.',
+    description:
+      'Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec).',
   },
   ambush: {
     id: 'ambush',
@@ -2793,6 +2796,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   stealth: {
     id: 'stealth',
+    tooltipOmitEffectLines: true,
     name: 'Duskveil',
     class: 'rogue',
     learnLevel: 2,
@@ -2934,7 +2938,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     spendsCombo: true,
     // Finisher: lands the full Sunder cap (5 stacks = 10% armor) in one cast.
     effects: [{ type: 'sunder', armor: 170, maxStacks: 5, full: true }],
-    description: 'Finishing move that exposes the target, reducing its armor by $d% for 30 sec.',
+    description:
+      'Finishing move that exposes the target, reducing its armor by $d% for 30 sec. The reduction is the same however many combo points you spend.',
   },
   rupture: {
     id: 'rupture',
@@ -2949,10 +2954,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     spendsCombo: true,
     effects: [{ type: 'dot', total: 96, duration: 16, interval: 2 }],
-    description: 'Finishing move that wounds the target, causing it to bleed for $d over 16 sec.',
+    description:
+      'Finishing move that wounds the target, causing it to bleed for $d over 16 sec. The bleed is the same however many combo points you spend.',
   },
   vanish: {
     id: 'vanish',
+    tooltipOmitEffectLines: true,
     name: 'Smokestep',
     class: 'rogue',
     learnLevel: 18,

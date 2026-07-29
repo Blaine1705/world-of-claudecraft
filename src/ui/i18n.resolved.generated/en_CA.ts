@@ -7197,7 +7197,7 @@ export const en_CA: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Cutthroat Tempo",
-        "description": "Finishing move that increases melee attack speed by 30%. Lasts longer per combo point."
+        "description": "Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec per combo point (5 combo points: 32 sec)."
       },
       "sprint": {
         "name": "Swift Heels",
@@ -7205,7 +7205,7 @@ export const en_CA: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Low Blow",
-        "description": "Finishing move that stuns the target. Lasts 1 sec longer per combo point."
+        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec)."
       },
       "ambush": {
         "name": "Lurker's Strike",
@@ -7241,11 +7241,11 @@ export const en_CA: EnTranslations = {
       },
       "expose_armor": {
         "name": "Armor Breach",
-        "description": "Finishing move that exposes the target, reducing its armor by {damage}% for 30 sec."
+        "description": "Finishing move that exposes the target, reducing its armor by {damage}% for 30 sec. The reduction is the same however many combo points you spend."
       },
       "rupture": {
         "name": "Bleed Out",
-        "description": "Finishing move that wounds the target, causing it to bleed for {damage} over 16 sec."
+        "description": "Finishing move that wounds the target, causing it to bleed for {damage} over 16 sec. The bleed is the same however many combo points you spend."
       },
       "vanish": {
         "name": "Smokestep",

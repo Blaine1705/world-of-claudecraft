@@ -58,6 +58,11 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   sunder_armor: [30],
   // "Conjures 2 ...": the stack size hardcoded in casting_lifecycle.ts.
   conjure_water: [2],
+  // Worked per-combo examples (owner feedback: every finisher must spell out
+  // its combo scaling): "5 combo points: N sec" is derived from base+perCombo,
+  // not a raw effect field.
+  kidney_shot: [5, 6],
+  slice_and_dice: [5, 32],
   // Druid spec-engine interaction lines: the cited numbers are engine
   // constants in combat/druid_engines.ts (the Moonseed extension seconds on
   // the Lunar Tempest line, the Verdance stage cap on the Wildbloom line),

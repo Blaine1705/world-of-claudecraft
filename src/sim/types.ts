@@ -2459,6 +2459,10 @@ export interface AbilityDef {
   effects: AbilityEffect[];
   ranks?: AbilityRank[]; // later ranks (sorted by level)
   description: string; // tooltip text, $d = damage placeholder
+  /** The description already states this buff's numbers in prose; skip the
+   *  derived aura-effect line so the tooltip never says the same thing twice
+   *  (owner feedback: Ghostfoot showed its dodge buff two ways). */
+  tooltipOmitEffectLines?: boolean;
   /** Per-spec tooltip sentences (internal spec id -> English), rendered ONLY
    *  for the player's current spec so a shared button never carries another
    *  spec's teaching text. Localized as

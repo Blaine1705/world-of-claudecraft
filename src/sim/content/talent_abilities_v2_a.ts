@@ -215,6 +215,7 @@ export const TALENT_ABILITIES_V2_A = {
 
   smoke_screen: {
     id: 'smoke_screen',
+    tooltipOmitEffectLines: true,
     name: 'Smoke Screen',
     class: 'rogue',
     learnLevel: 8,

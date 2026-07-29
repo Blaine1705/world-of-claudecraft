@@ -965,13 +965,13 @@ const classAbilityNamesEn = {
       [
         'slice_and_dice',
         'Cutthroat Tempo',
-        'Finishing move that increases melee attack speed by 30%. Lasts longer per combo point.',
+        'Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec per combo point (5 combo points: 32 sec).',
       ],
       ['sprint', 'Swift Heels', 'Increases your movement speed by 70% for 15 sec.'],
       [
         'kidney_shot',
         'Low Blow',
-        'Finishing move that stuns the target. Lasts 1 sec longer per combo point.',
+        'Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec).',
       ],
       [
         'ambush',
@@ -1020,12 +1020,12 @@ const classAbilityNamesEn = {
       [
         'expose_armor',
         'Armor Breach',
-        'Finishing move that exposes the target, reducing its armor by {damage}% for 30 sec.',
+        'Finishing move that exposes the target, reducing its armor by {damage}% for 30 sec. The reduction is the same however many combo points you spend.',
       ],
       [
         'rupture',
         'Bleed Out',
-        'Finishing move that wounds the target, causing it to bleed for {damage} over 16 sec.',
+        'Finishing move that wounds the target, causing it to bleed for {damage} over 16 sec. The bleed is the same however many combo points you spend.',
       ],
       [
         'vanish',
