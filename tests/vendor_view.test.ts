@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { InvSlot, ItemDef } from '../src/sim/types';
-import { buildVendorView } from '../src/ui/hud/vendor/vendor_view';
+import { buildVendorView, sellJunkButtonState } from '../src/ui/hud/vendor/vendor_view';
 
 // Minimal ItemDef fixtures: buildVendorView only reads id / buyValue / sellValue.
 function item(
@@ -170,5 +170,46 @@ describe('buildVendorView is a pure projection', () => {
     expect(buildVendorView(goodsIds, buyback, items, RICH)).toEqual(
       buildVendorView(goodsIds, buyback, items, RICH),
     );
+  });
+});
+
+describe('sellJunkButtonState', () => {
+  const gray = {
+    ...item('rat_tail', { sellValue: 3 }),
+    quality: 'poor',
+  } as unknown as ItemDef;
+  const keeper = item('iron_sword', { sellValue: 50 });
+
+  it('enables on pricable junk and quotes exactly what this bundle can price', () => {
+    const inv: InvSlot[] = [
+      { itemId: 'rat_tail', count: 2 },
+      { itemId: 'iron_sword', count: 1 },
+    ];
+    expect(sellJunkButtonState(inv, table(gray, keeper))).toEqual({
+      enabled: true,
+      proceeds: 6,
+    });
+  });
+
+  it('stays live on an unknown-only bag, quoting zero (the R34 arm)', () => {
+    // The server resolves sell_all_junk against ITS OWN table, so grays this
+    // bundle cannot classify still sell: the button must not strand them,
+    // and the quote stays honest at what this bundle can price.
+    const inv: InvSlot[] = [{ itemId: 'future_gray_x', count: 4 }];
+    expect(sellJunkButtonState(inv, table(keeper))).toEqual({ enabled: true, proceeds: 0 });
+    // A prototype key is an UNKNOWN slot too, never a def (the known_item
+    // predicate), so it keeps the button live rather than throwing.
+    expect(sellJunkButtonState([{ itemId: 'constructor', count: 1 }], table(keeper))).toEqual({
+      enabled: true,
+      proceeds: 0,
+    });
+  });
+
+  it('disables with nothing to sweep and nothing unknown', () => {
+    expect(sellJunkButtonState([{ itemId: 'iron_sword', count: 1 }], table(keeper))).toEqual({
+      enabled: false,
+      proceeds: 0,
+    });
+    expect(sellJunkButtonState([], table(keeper))).toEqual({ enabled: false, proceeds: 0 });
   });
 });
