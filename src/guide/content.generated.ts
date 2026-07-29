@@ -6749,15 +6749,15 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "materials": [
           {
             "name": "Chime Shard",
-            "count": 4
+            "count": 5
           },
           {
             "name": "Chime Essence",
-            "count": 3
+            "count": 4
           },
           {
             "name": "Chime Dust",
-            "count": 5
+            "count": 6
           }
         ],
         "output": {
@@ -6783,15 +6783,15 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "materials": [
           {
             "name": "Chime Shard",
-            "count": 4
+            "count": 5
           },
           {
             "name": "Chime Essence",
-            "count": 3
+            "count": 4
           },
           {
             "name": "Chime Dust",
-            "count": 5
+            "count": 6
           }
         ],
         "output": {
