@@ -166,6 +166,24 @@ describe('online unstuck command wiring', () => {
     expect(unstuck).not.toHaveBeenCalled();
   });
 
+  it('a drained CHAT lane still permits the alias (the muted-recovery claim, token half)', () => {
+    // The mute half is pinned above; this is the token-bucket half of "a
+    // muted or chat-flooded player can still recover": the alias sits ahead
+    // of the chat lane and the chat ladder, drawing only the command lane,
+    // so drying chat must not strand a stuck player.
+    const server = new GameServer();
+    const { session } = join(server);
+    const unstuck = vi.spyOn(server.sim, 'unstuck').mockReturnValue(true);
+    const lanes = session.msgLanes as unknown as {
+      chatTokens: number;
+      lastRefillSec: number;
+    };
+    lanes.chatTokens = 0;
+    lanes.lastRefillSec = Date.now() / 1000 + 3600;
+    send(server, session, { cmd: 'chat', text: '/unstuck' });
+    expect(unstuck).toHaveBeenCalledWith(session.pid);
+  });
+
   it('returns structured localized blockers for spectating and jailed Settings use', () => {
     const server = new GameServer();
     const spectator = join(server, 1);

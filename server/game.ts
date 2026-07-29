@@ -190,6 +190,7 @@ import {
   createMobScanTickStats,
   resetMobScanCaptureAccumulators,
 } from './mob_scan_tick_stats';
+import { parseModerationChatCommand } from './moderation_commands';
 import {
   forceCharacterRename,
   moderateAccount,
@@ -4284,8 +4285,16 @@ export class GameServer {
       }
       if (msg.cmd !== 'chat' || typeof msg.text !== 'string') return;
       const text = msg.text.trim();
-      if (canAttemptModerationCommands(session) && this.moderation.handleChatCommand(session, text))
+      // Staff moderation rides the chat case but is COMMAND work (target
+      // resolution plus an audited DB write per action), so a claimed
+      // moderation text pays the command lane exactly like /unstuck below
+      // it; a lane-refused frame is dropped whole and tallies toward the
+      // flood-kick verdict (the /unstuck audit finding's sibling).
+      if (canAttemptModerationCommands(session) && parseModerationChatCommand(text)) {
+        if (!this.consumeLane(session, 'command', receivedAtMs / 1000)) return;
+        this.moderation.handleChatCommand(session, text);
         return;
+      }
       if (/^\/unstuck\s*$/i.test(text)) {
         this.sendUnstuckBlocked(session, 'spectating');
         return;
@@ -4783,11 +4792,18 @@ export class GameServer {
       case 'chat': {
         if (typeof msg.text !== 'string') break;
         const text = msg.text.trim();
-        if (
-          canAttemptModerationCommands(session) &&
-          this.moderation.handleChatCommand(session, text)
-        )
+        // Staff moderation is COMMAND work riding the chat case (target
+        // resolution plus an audited DB write per action): a claimed
+        // moderation text pays the command lane exactly like /unstuck
+        // below, so a compromised staff account cannot flood /kick or
+        // /ban at wire rate with zero tokens drawn on any lane. The parse
+        // predicate claims the SAME texts handleChatCommand claims, so
+        // ordinary chat (and /who, /unstuck) never pays this draw.
+        if (canAttemptModerationCommands(session) && parseModerationChatCommand(text)) {
+          if (!this.consumeLane(session, 'command', receivedAtMs / 1000)) break;
+          this.moderation.handleChatCommand(session, text);
           break;
+        }
         // Recovery is a gameplay command, not broadcast chat. Keep it usable
         // while muted and outside the chat token bucket, then route through the
         // same authoritative system as the dedicated Settings action. It still

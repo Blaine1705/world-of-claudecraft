@@ -4151,9 +4151,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The owned-mounts walk (full inventory AND bank scan with an ITEMS
     // lookup per slot, per viewer per pass) rode outside the gate at the
     // v0.32.0 merge; a straight revert to the ungated position stays green
-    // on every behavioral sweep (an unchanged value elides either way), so
-    // the placement itself is pinned: the call sits between the heavyDue
-    // branch and a known heavy-block sibling.
+    // on every wire-observing sweep (an unchanged value elides either way),
+    // so the placement itself is pinned two ways: the source order here, and
+    // the call-elision spy below, which observes the WORK the gate exists to
+    // skip rather than the bytes it cannot change.
     const raw = readFileSync(resolve(process.cwd(), 'server/game.ts'), 'utf8');
     const gateAt = raw.indexOf('if (heavyDue) {');
     const mntOwnAt = raw.indexOf("maybe('mntOwn'");
@@ -4161,6 +4162,30 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(gateAt).toBeGreaterThan(-1);
     expect(mntOwnAt).toBeGreaterThan(gateAt);
     expect(mntOwnAt).toBeLessThan(siblingAt);
+  });
+
+  it('a non-heavy pass never runs the owned-mounts walk; a heavy-dirty one does', () => {
+    // The behavioral half of the placement pin above: the gate's whole point
+    // is skipping the walk, so spy on the CALL. A quiet pass (not dirty,
+    // same wireRev, off the staggered refresh slot) must not invoke
+    // ownedMountsFor; flipping selfHeavyDirty must.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 61, 'Rider');
+    broadcast(server); // the join's own heavy pass, so the gate state settles
+    const meta = server.sim.meta(session.pid);
+    if (!meta) throw new Error('missing meta');
+    session.selfHeavyDirty = false;
+    session.lastWireRev = meta.wireRev;
+    // Step off the staggered refresh slot so heavyDue is false for certain.
+    while ((server.sim.tickCount + session.pid) % 40 === 0) server.sim.tick();
+    const walk = vi.spyOn(server.sim, 'ownedMountsFor');
+    broadcast(server);
+    expect(walk).not.toHaveBeenCalled();
+    session.selfHeavyDirty = true;
+    broadcast(server);
+    expect(walk).toHaveBeenCalledWith(session.pid);
+    walk.mockRestore();
   });
 
   it('TERSE_TO_IWORLD pins the terse-key to IWorld-name renames in sorted membership', () => {

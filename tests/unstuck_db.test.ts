@@ -280,6 +280,20 @@ describe('pruneUnstuckReportsBatch (the retention-sweep primitive)', () => {
     await pruneUnstuckReportsBatch(pool, 90, 0);
     expect(query.mock.calls[0][1]).toEqual([90, 1]);
   });
+
+  it('floors fractional and negative batch sizes the same way', async () => {
+    query.mockResolvedValueOnce({ rows: [], rowCount: 0 });
+    await pruneUnstuckReportsBatch(pool, 90, 0.4);
+    expect(query.mock.calls[0][1]).toEqual([90, 1]);
+    query.mockResolvedValueOnce({ rows: [], rowCount: 0 });
+    await pruneUnstuckReportsBatch(pool, 90, -25);
+    expect(query.mock.calls[1][1]).toEqual([90, 1]);
+  });
+
+  it('a driver null rowCount reads as zero deleted, not a crash or NaN', async () => {
+    query.mockResolvedValueOnce({ rows: [], rowCount: null });
+    await expect(pruneUnstuckReportsBatch(pool, 90, 1000)).resolves.toBe(0);
+  });
 });
 
 describe('listUnstuckReports', () => {

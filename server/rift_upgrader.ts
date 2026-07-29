@@ -337,7 +337,10 @@ export class RiftUpgradeCoordinator {
       .upgrade(draft)
       .then((value) => this.results.push({ eventId: event.eventId, value }))
       .catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : 'unknown failure';
+        // Bounded: a JSON.parse failure quotes the response body's first
+        // bytes in its message, and an upstream that echoes request detail
+        // must not get a free channel into the server log.
+        const message = (error instanceof Error ? error.message : 'unknown failure').slice(0, 200);
         console.warn(`[rift-upgrader] ${event.eventId} fell back: ${message}`);
         this.results.push({ eventId: event.eventId, value: null });
       })
