@@ -9,6 +9,7 @@ import {
   switchHobby,
 } from '../professions/archetype';
 import { announceAttunement } from '../professions/attunement_events';
+import { applyPairTransitionHobbyMemory, recordQuestedHobby } from '../professions/hobby_memory';
 import { applyPairTransitionTierMail } from '../professions/tier_mail';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -73,6 +74,13 @@ export function applyProfessionQuestEffect(
   if (effect.type === 'attunePair') {
     const target = progress.selection as string;
     if (!attuneArchetypePair(ctx, meta.entityId, target, effect.mode)) return false;
+    // The transition just re-derived the pair's DEFAULT hobby. If this
+    // character once quested a hobby for the pair they are moving into, that
+    // explicit choice wins instead: a make-amends return restores the identity
+    // they chose, rather than silently discarding it (professions/hobby_memory.ts).
+    // A 'new' attunement is a guaranteed miss (the pair was never held, so
+    // nothing was ever recorded for it) and keeps the skill-derived default.
+    applyPairTransitionHobbyMemory(meta);
     // The shared pair-transition rule (prune stale acknowledgements, then
     // baseline the new majors), BEFORE the next mail sweep: the prune is what
     // makes a later RETURN re-baseline instead of mailing a retroactive
@@ -86,5 +94,22 @@ export function applyProfessionQuestEffect(
     announceAttunement(ctx, meta.entityId, target);
     return true;
   }
-  return switchHobby(ctx, meta.entityId, progress.selection as string);
+  if (!switchHobby(ctx, meta.entityId, progress.selection as string)) return false;
+  // Remember the choice against the CURRENT pair, after the write, so a later
+  // return to this pair restores it instead of re-deriving the skill default.
+  // Only this quested path records: a default the engine derived is never an
+  // explicit choice.
+  recordQuestedHobby(meta);
+  return true;
+}
+
+/** Whether a quest's completion effect rewrites profession IDENTITY (the active
+ *  pair of majors, or the explicit hobby). The `completionEffect` union
+ *  (types.ts) is exactly `attunePair | switchHobby` and BOTH are identity
+ *  transitions, so "carries a completion effect" and "is an identity
+ *  transition" are the same predicate today; the shipped vocabulary is pinned
+ *  in tests/profession_attunement_quests.test.ts so a future third effect type
+ *  has to come back here and decide rather than silently joining the gate. */
+export function isIdentityTransitionQuest(quest: QuestDef | undefined): boolean {
+  return quest?.completionEffect !== undefined;
 }

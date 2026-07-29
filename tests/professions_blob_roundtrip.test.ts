@@ -40,6 +40,7 @@ const PROFESSIONS_BLOB_FIELDS = [
   'archetype',
   'questCadence',
   'tierMailSent',
+  'questedHobbies',
   'profTierTutorialSent',
   'guildLetterSent',
 ] as const;
@@ -101,6 +102,11 @@ const populatedSim = (): Sim => {
   // DESIGN (pinned in tests/professions_tier_mail.test.ts, not re-pinned here).
   meta.tierMailSent.set('weaponcrafting', 2);
   meta.tierMailSent.set('armorcrafting', 1);
+  // A quested hobby for the ACTIVE pair plus one for a pair this character is
+  // not on: unlike tierMailSent, the record is never pruned to the current pair
+  // (surviving the dormant period is the whole point), so both round-trip.
+  meta.questedHobbies.set('weaponcrafting+armorcrafting', 'tailoring');
+  meta.questedHobbies.set('alchemy+cooking', 'enchanting');
   meta.profTierTutorialSent = true;
   meta.guildLetterSent = true;
   return sim;

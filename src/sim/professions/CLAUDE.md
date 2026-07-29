@@ -46,6 +46,12 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   `archetypeCeilingFor`/`craftCeiling`, `getHobbyCraft`, amends-gated
   switching via `requiredAmendsProgress`). The sim-side ceiling arm is
   `archetypeCeilingFor` ALONE, never `craftCeiling`.
+- `hobby_memory.ts`: the per-pair record of hobbies chosen through the
+  hobby-switch quest (`normalizeHobbyMemoryOnLoad`, `recordQuestedHobby`,
+  `applyPairTransitionHobbyMemory`), so a make-amends RETURN restores the
+  quested hobby instead of re-deriving the skill default. Applied at all three
+  pair-transition entry points beside `applyPairTransitionTierMail`; it reads
+  `archetype.ts`'s pair vocabulary, so `archetype.ts` must never read it back.
 - `combo_eligibility.ts`: the shared attunement gate combo recipes consult in
   both hosts (deny not_attuned / wrong_pair / tier_unmet).
 - `enchanting.ts` / `disenchant_reagents.ts` / `salvage.ts`: disenchant

@@ -45,6 +45,7 @@ import {
 } from '../types';
 import {
   applyProfessionQuestEffect,
+  isIdentityTransitionQuest,
   professionQuestSelectionTargets,
   resolvedQuestObjectiveCounts,
   validateProfessionQuestSelection,
@@ -81,16 +82,23 @@ export function computeQuestState(
   ) {
     return 'unavailable';
   }
-  // One pending identity transition at a time: while any attunePair-effect
-  // quest is active, every OTHER attunePair-effect quest is unavailable.
-  // resolvedCounts is stamped at accept and turn-in never re-resolves it, so a
-  // banked second amends would complete at a stale cost after the first return
-  // raised switchCount, dodging the 5 + 3 * switchCount escalation. The gate
-  // lives here so both hosts and the server accept path share it (the quest
-  // already in the log returned 'active' above, so it never gates itself).
-  if (quest.completionEffect?.type === 'attunePair') {
+  // One pending identity transition at a time: while ANY identity-transition
+  // quest is active (attunePair or switchHobby, see isIdentityTransitionQuest),
+  // every OTHER identity-transition quest is unavailable. Two distinct stale-bank
+  // failures share this one gate, which is why its scope is both effect types
+  // rather than the attunePair-only scope it originally shipped with:
+  //   - resolvedCounts is stamped at accept and turn-in never re-resolves it, so
+  //     a banked second amends would complete at a stale cost after the first
+  //     return raised switchCount, dodging the 5 + 3 * switchCount escalation.
+  //   - the hobby quest banks its chosen craft on QuestProgress at accept, but a
+  //     pair transition rewrites both the candidate set and the hobby, so a bank
+  //     that straddles a transition either turns in against the wrong pair or
+  //     sticks unturnable-in on the revalidation below.
+  // The gate lives here so both hosts and the server accept path share it (the
+  // quest already in the log returned 'active' above, so it never gates itself).
+  if (isIdentityTransitionQuest(quest)) {
     for (const activeId of questLog.keys()) {
-      if (QUESTS[activeId]?.completionEffect?.type === 'attunePair') return 'unavailable';
+      if (isIdentityTransitionQuest(QUESTS[activeId])) return 'unavailable';
     }
   }
   // A repeatable work order inside its cooldown window is unavailable until it
