@@ -6524,6 +6524,11 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Neemt de munten en gevallen voorwerpen. Verbruikt de oogst niet.',
   'hudChrome.loot.unifiedPressHint':
     'De interactietoets berooft en oogst in een keer, op basis van je stadsfocus.',
+  'hudChrome.meters.move': 'Sleep om deze meter te verplaatsen',
+  'hudChrome.meters.resize': 'Sleep om deze meter te vergroten of verkleinen',
+  'hudChrome.meters.dock': 'Deze meter terugzetten in het metervenster',
+  'hudChrome.meters.separate': '{meter} loskoppelen',
+  'hudChrome.meters.regroup': '{meter} weer samenvoegen',
   'hudChrome.meters.minutesSeconds': '{m}m {s}s',
   'hudChrome.meters.perSecond': '{value}/s',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
@@ -8337,7 +8342,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Kijk eens aan: schone beten, elk ervan, maar er is genoeg touw over om te splitsen. Je hebt me een maand aan geld bespaard en de netvissers een maand aan gemopper, {playerName}.',
   'entities.quests.q_wf_rope_chewers.title': 'De Touwknagers',
   'entities.quests.q_wf_rope_chewers.text':
-    'Moeraspadden, {playerName}. Ze klimmen \'s nachts uit de gracht en knagen door mijn meertouwen alsof het rietstelen zijn. Drie bootjes dreven vorige week weg, en een ervan had mijn goede lier aan boord. Dun ze uit, tien van die dikke dingen, en de boten blijven waar we ze vastbinden.',
+    "Moeraspadden, {playerName}. Ze klimmen 's nachts uit de gracht en knagen door mijn meertouwen alsof het rietstelen zijn. Drie bootjes dreven vorige week weg, en een ervan had mijn goede lier aan boord. Dun ze uit, tien van die dikke dingen, en de boten blijven waar we ze vastbinden.",
   'entities.quests.q_wf_rope_chewers.objectives.0.label': 'Moeraspad gedood',
   'entities.quests.q_wf_rope_chewers.completion':
     'Tien minder sets tanden in mijn gracht. De bootjes bleven de hele nacht aan hun meertouwen liggen, voor het eerst in een maand, {playerName}. Je hebt de dank van elke netvisser in het stadje.',
@@ -8371,7 +8376,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Kijk omhoog, {playerName}. Elk bladerdak van hier tot het afgodsbeeld is bespannen als een visnet, en de wevers worden elk seizoen brutaler. Ik span hun eigen zijde over de paden, struikelbellen, zodat de jungle niet ongemerkt op me af kan sluipen. Zes goede strengen van de bladerdakwevers zullen mijn lijnen opnieuw bespannen.',
   'entities.quests.q_pr_canopy_silk.objectives.0.label': 'Bladerdak-Zijdenstreng',
   'entities.quests.q_pr_canopy_silk.completion':
-    'Goede, sterke zijde. Mijn bellen zullen nog een tijdje zingen, en niets loopt deze paden \'s nachts zonder dat ik het weet, {playerName}. De laatste tijd loopt er iets vaak.',
+    "Goede, sterke zijde. Mijn bellen zullen nog een tijdje zingen, en niets loopt deze paden 's nachts zonder dat ik het weet, {playerName}. De laatste tijd loopt er iets vaak.",
   'entities.quests.q_pr_down_to_drifthaven.title': 'Naar Beneden naar Drijfhaven',
   'entities.quests.q_pr_down_to_drifthaven.text':
     'Uit de zwarte bomen en de zon in, {playerName}. Volg de kustweg noordwaarts en je zult Drijfhaven bereiken voordat het getij keert. Vraag naar Berger-Baas Ryna, ze heeft werk voor elk paar handen sinds de storm, en vertel haar dat de Warmond-weg nog open is.',
@@ -8380,7 +8385,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Pell stuurde je? Dan heb je de hele Warmond-weg alleen belopen, en dat is voor mij referentie genoeg. Welkom in Drijfhaven, {playerName}. Pak een touw, we hebben handen tekort.',
   'entities.quests.q_pr_idol_guardian.title': 'De Afgodswachter',
   'entities.quests.q_pr_idol_guardian.text':
-    'Het afgodsbeeld is ouder dan het eiland, {playerName}. Ouder dan de trommels, ouder dan de naam Palmreik. Zijn Wachter heeft in die verzonken ring gestaan sinds voordat de palmen groeiden, en nu ontwaakt hij en loopt hij \'s nachts langs de zuilen. Wat de offergaven ook voeden, de Wachter is de poortwacht ervan. Neem een vriend mee, en breek hem.',
+    "Het afgodsbeeld is ouder dan het eiland, {playerName}. Ouder dan de trommels, ouder dan de naam Palmreik. Zijn Wachter heeft in die verzonken ring gestaan sinds voordat de palmen groeiden, en nu ontwaakt hij en loopt hij 's nachts langs de zuilen. Wat de offergaven ook voeden, de Wachter is de poortwacht ervan. Neem een vriend mee, en breek hem.",
   'entities.quests.q_pr_idol_guardian.objectives.0.label': 'De Afgodswachter gebroken',
   'entities.quests.q_pr_idol_guardian.completion':
     'Je hebt iets geveld waar de jungle zelf niet aan durfde te komen. Kijk daar, achter het afgodsbeeld: de Wachter bewaakte nooit de zuilen, {playerName}, hij bewaakte de trappen eronder. De trommels zijn vanavond stil geworden. Wat er ook slaapt onder het Wildhartbekken, het kent nu jouw naam.',
@@ -8559,7 +8564,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_waking_warden.objectives.0.label': 'De Ontwakende Wachter verslagen',
   'entities.quests.q_waking_warden.completion':
     'De klok van zijn stem is stil. Ik voelde het van hieruit, als een last die van de hele vallei werd getild.',
-  'entities.quests.q_wardens_echoes.title': 'Echo\'s van de Wachter',
+  'entities.quests.q_wardens_echoes.title': "Echo's van de Wachter",
   'entities.quests.q_wardens_echoes.text':
     'Zelfs nu hun meester tot zwijgen is gebracht, herhalen de hofwachters zijn laatste bevel als een echo die niet wil vervagen. Totdat het zegel is teruggeplaatst, zullen ze blijven ontwaken, {playerName}. Breng nog tien van hen tot stilte zodat de metselaars de zegelsteen kunnen bereiken.',
   'entities.quests.q_wardens_echoes.objectives.0.label': 'Oude Wachter tot stilte gebracht',
@@ -8608,7 +8613,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Vanuit deze lampkamer kan ik de hele kust zien, {playerName}, en wat ik in het noorden zie, bevalt me niet. Groene lichten die bij eb over de Wrakvelden lopen, romp na romp. Een vrouw werkt die kust alleen: Edda, de berger. Volg de klifweg noordwaarts voorbij de Scheur tot de wrakken beginnen, en zie of ze nog ademt.',
   'entities.quests.q_gc_the_far_shore.objectives.0.label': 'Zoek Berger Edda',
   'entities.quests.q_gc_the_far_shore.completion':
-    'Bram houdt mijn kust nu vanuit zijn toren in de gaten, is het niet? De oude man heeft gelijk om zich zorgen te maken, {playerName}. De doden lopen \'s nachts over hun eigen wrakken, en de laatste tijd kan het ze niet meer schelen of de zon op is.',
+    "Bram houdt mijn kust nu vanuit zijn toren in de gaten, is het niet? De oude man heeft gelijk om zich zorgen te maken, {playerName}. De doden lopen 's nachts over hun eigen wrakken, en de laatste tijd kan het ze niet meer schelen of de zon op is.",
   'entities.quests.q_gc_the_wreck_warden.title': 'De Wrakwachter',
   'entities.quests.q_gc_the_wreck_warden.text':
     'Nu weet je waarom de matrozen oprijzen, {playerName}. Iets draagt de met zeepokken bedekte plaat van het eerste wrak dat ooit op deze kust brak, en het bewaakt elke romp op het strand als een kerkhof dat het is aangesteld te bewaken. Het bewaart een schat waar ik al tien jaar naar hunker en een bemanning die ik liever ter ruste zie. Maak een einde aan de Wrakwachter. Neem een vriend mee, de doden houden goede wacht.',
@@ -8665,7 +8670,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'De nacht voelt al ijler aan. Wat hen ook wekt, is nog niet klaar, maar je hebt de Trappen wat rust gekocht.',
   'entities.quests.q_fv_seeing_wren_home.title': 'Wren Veilig Thuisbrengen',
   'entities.quests.q_fv_seeing_wren_home.text':
-    'Mijn leerling Wren ging twee dagen geleden de Goudsmelt-lijn lopen en is nooit teruggekomen. Ik vond haar sporen, ze schuilt onder de wegmarkeringen ten zuidwesten van de Aurora-Trappen, te bang voor de wolven om te bewegen. Ik kan het veen niet verlaten, {playerName}. Breng haar naar Veyla\'s kamp op de Trappen. Daar is ze veilig onder de lichten.',
+    "Mijn leerling Wren ging twee dagen geleden de Goudsmelt-lijn lopen en is nooit teruggekomen. Ik vond haar sporen, ze schuilt onder de wegmarkeringen ten zuidwesten van de Aurora-Trappen, te bang voor de wolven om te bewegen. Ik kan het veen niet verlaten, {playerName}. Breng haar naar Veyla's kamp op de Trappen. Daar is ze veilig onder de lichten.",
   'entities.quests.q_fv_seeing_wren_home.objectives.0.label':
     'Leerling Wren veilig naar de Aurora-Trappen gebracht',
   'entities.quests.q_fv_seeing_wren_home.completion':
@@ -9620,7 +9625,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.rift_boss_frost.name': 'Rijpvorst-Wachter',
   'entities.mobs.rift_boss_necro.name': 'Beenheer Xarreth',
   'entities.mobs.rift_boss_pitlord.name': 'Azgorath, Heer van de Kuil',
-  'entities.mobs.rift_boss_ritualist.name': 'Magier Vel\'Kor de Verbondene',
+  'entities.mobs.rift_boss_ritualist.name': "Magier Vel'Kor de Verbondene",
   'entities.mobs.rift_boss_storm.name': 'Storm Vharok',
   'entities.mobs.rift_boss_tide.name': 'Afgrondmuil',
   'entities.mobs.rift_boss_venom.name': 'Broedmoeder Vysska',

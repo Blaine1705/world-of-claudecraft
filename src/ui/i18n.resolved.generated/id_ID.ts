@@ -906,7 +906,12 @@ export const id_ID: EnTranslations = {
       "breakdownOther": "Lainnya ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "Jarak Dekat"
+      "melee": "Jarak Dekat",
+      "move": "Seret untuk memindahkan pengukur ini",
+      "resize": "Seret untuk mengubah ukuran pengukur ini",
+      "dock": "Kembalikan pengukur ini ke jendela pengukur",
+      "separate": "Pisahkan {meter}",
+      "regroup": "Gabungkan kembali {meter}"
     },
     "petFeed": {
       "disabledFullHp": "Peliharaan sudah dalam kondisi darah penuh",

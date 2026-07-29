@@ -6380,6 +6380,11 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.takeLootTooltip': 'Tager mønterne og droppede genstande. Bruger ikke høsten op.',
   'hudChrome.loot.unifiedPressHint':
     'Interaktionstast plyndrer og høster i ét tryk ved hjælp af dit byfokus.',
+  'hudChrome.meters.move': 'Træk for at flytte denne måler',
+  'hudChrome.meters.resize': 'Træk for at ændre størrelse på denne måler',
+  'hudChrome.meters.dock': 'Sæt denne måler tilbage i målervinduet',
+  'hudChrome.meters.separate': 'Adskil {meter}',
+  'hudChrome.meters.regroup': 'Saml {meter} igen',
   'hudChrome.meters.minutesSeconds': '{m}m {s}s',
   'hudChrome.meters.perSecond': '{value}/s',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
@@ -9546,7 +9551,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.rift_boss_frost.name': 'Rimfrost-Vogter',
   'entities.mobs.rift_boss_necro.name': 'Benherre Xarreth',
   'entities.mobs.rift_boss_pitlord.name': 'Azgorath, Kulens Herre',
-  'entities.mobs.rift_boss_ritualist.name': 'Magiker Vel\'Kor den Paktbundne',
+  'entities.mobs.rift_boss_ritualist.name': "Magiker Vel'Kor den Paktbundne",
   'entities.mobs.rift_boss_storm.name': 'Storm Vharok',
   'entities.mobs.rift_boss_tide.name': 'Afgrundens Gab',
   'entities.mobs.rift_boss_venom.name': 'Yngelmoder Vysska',
@@ -10102,7 +10107,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.provisioner_fenna.greeting':
     'Brød stadig varmt, vand stadig sødt. Hulen forsyner, og det gør jeg også.',
   'entities.npcs.provisioner_fenna.name': 'Proviantmester Fenna',
-  'entities.npcs.provisioner_fenna.title': 'Ældreglans\' Proviantmester',
+  'entities.npcs.provisioner_fenna.title': "Ældreglans' Proviantmester",
   'entities.npcs.quartermaster_edda.greeting':
     'Stål og salt, {className}, det er alt, hvad jeg har tilbage at give ud. Tag det og få bruddene til at fortryde, at de åbnede sig, hvor jeg kunne nå dem.',
   'entities.npcs.quartermaster_edda.name': 'Kvartermester Edda',

@@ -906,7 +906,12 @@ export const nl_NL: EnTranslations = {
       "breakdownOther": "Overig ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "Nabijgevecht"
+      "melee": "Nabijgevecht",
+      "move": "Sleep om deze meter te verplaatsen",
+      "resize": "Sleep om deze meter te vergroten of verkleinen",
+      "dock": "Deze meter terugzetten in het metervenster",
+      "separate": "{meter} loskoppelen",
+      "regroup": "{meter} weer samenvoegen"
     },
     "petFeed": {
       "disabledFullHp": "Huisdier heeft volledige gezondheid",

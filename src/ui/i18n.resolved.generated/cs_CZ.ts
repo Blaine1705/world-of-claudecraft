@@ -906,7 +906,12 @@ export const cs_CZ: EnTranslations = {
       "breakdownOther": "Ostatní ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "Boj zblízka"
+      "melee": "Boj zblízka",
+      "move": "Tažením přesuneš tento měřič",
+      "resize": "Tažením změníš velikost tohoto měřiče",
+      "dock": "Vrátit tento měřič zpět do okna měřičů",
+      "separate": "Oddělit {meter}",
+      "regroup": "Znovu seskupit {meter}"
     },
     "petFeed": {
       "disabledFullHp": "Mazlíček má plné zdraví",

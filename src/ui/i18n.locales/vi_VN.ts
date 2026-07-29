@@ -7188,6 +7188,11 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Nhặt tiền vàng và vật phẩm rơi ra. Không dùng hết lần thu hoạch.',
   'hudChrome.loot.unifiedPressHint':
     'Phím tương tác nhặt đồ và thu hoạch trong một lần nhấn, sử dụng trọng tâm thị trấn của bạn.',
+  'hudChrome.meters.move': 'Kéo để di chuyển thước đo này',
+  'hudChrome.meters.resize': 'Kéo để thay đổi kích thước thước đo này',
+  'hudChrome.meters.dock': 'Đưa thước đo này trở lại cửa sổ thước đo',
+  'hudChrome.meters.separate': 'Tách {meter}',
+  'hudChrome.meters.regroup': 'Ghép lại {meter}',
   'hudChrome.meters.minutesSeconds': '{m}p {s}g',
   'hudChrome.meters.perSecond': '{value}/g',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',

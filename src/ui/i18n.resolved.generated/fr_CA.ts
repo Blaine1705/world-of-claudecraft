@@ -906,7 +906,12 @@ export const fr_CA: EnTranslations = {
       "breakdownOther": "Autres ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "Mêlée"
+      "melee": "Mêlée",
+      "move": "Faites glisser pour déplacer ce compteur",
+      "resize": "Faites glisser pour redimensionner ce compteur",
+      "dock": "Ramener ce compteur dans la fenêtre des compteurs",
+      "separate": "Séparer {meter}",
+      "regroup": "Regrouper {meter}"
     },
     "petFeed": {
       "disabledFullHp": "Le familier est à pleine santé",

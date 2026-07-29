@@ -7056,6 +7056,11 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.takeLootTooltip': 'Altınları ve düşen eşyaları alır. Toplama hakkını kullanmaz.',
   'hudChrome.loot.unifiedPressHint':
     'Etkileşim tuşu, kasaba odağınızı kullanarak tek tuşla yağmalar ve toplar.',
+  'hudChrome.meters.move': 'Bu ölçeri taşımak için sürükleyin',
+  'hudChrome.meters.resize': 'Bu ölçeri yeniden boyutlandırmak için sürükleyin',
+  'hudChrome.meters.dock': 'Bu ölçeri ölçerler penceresine geri yerleştirin',
+  'hudChrome.meters.separate': 'Ayır: {meter}',
+  'hudChrome.meters.regroup': 'Yeniden grupla: {meter}',
   'hudChrome.meters.minutesSeconds': '{m}dk {s}sn',
   'hudChrome.meters.perSecond': '{value}/sn',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',

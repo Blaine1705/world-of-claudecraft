@@ -906,7 +906,12 @@ export const da_DK: EnTranslations = {
       "breakdownOther": "Andet ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "Nærkamp"
+      "melee": "Nærkamp",
+      "move": "Træk for at flytte denne måler",
+      "resize": "Træk for at ændre størrelse på denne måler",
+      "dock": "Sæt denne måler tilbage i målervinduet",
+      "separate": "Adskil {meter}",
+      "regroup": "Saml {meter} igen"
     },
     "petFeed": {
       "disabledFullHp": "Kæledyret har fuldt helbred",

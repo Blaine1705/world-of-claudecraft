@@ -906,7 +906,12 @@ export const vi_VN: EnTranslations = {
       "breakdownOther": "Khác ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "Cận Chiến"
+      "melee": "Cận Chiến",
+      "move": "Kéo để di chuyển thước đo này",
+      "resize": "Kéo để thay đổi kích thước thước đo này",
+      "dock": "Đưa thước đo này trở lại cửa sổ thước đo",
+      "separate": "Tách {meter}",
+      "regroup": "Ghép lại {meter}"
     },
     "petFeed": {
       "disabledFullHp": "Thú cưng đang đầy máu",

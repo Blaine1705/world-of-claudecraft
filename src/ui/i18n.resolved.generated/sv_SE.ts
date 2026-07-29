@@ -906,7 +906,12 @@ export const sv_SE: EnTranslations = {
       "breakdownOther": "Övrigt ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "Närstrid"
+      "melee": "Närstrid",
+      "move": "Dra för att flytta den här mätaren",
+      "resize": "Dra för att ändra storlek på den här mätaren",
+      "dock": "Docka tillbaka den här mätaren i mätarfönstret",
+      "separate": "Separera {meter}",
+      "regroup": "Gruppera {meter} igen"
     },
     "petFeed": {
       "disabledFullHp": "Husdjuret har fulla livspunkter",

@@ -906,7 +906,12 @@ export const de_DE: EnTranslations = {
       "breakdownOther": "Andere ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "Nahkampf"
+      "melee": "Nahkampf",
+      "move": "Ziehen, um diese Anzeige zu verschieben",
+      "resize": "Ziehen, um die Größe dieser Anzeige zu ändern",
+      "dock": "Diese Anzeige wieder in das Anzeigenfenster andocken",
+      "separate": "{meter} trennen",
+      "regroup": "{meter} wieder eingliedern"
     },
     "petFeed": {
       "disabledFullHp": "Begleiter hat volle Gesundheit",

@@ -906,7 +906,12 @@ export const es: EnTranslations = {
       "breakdownOther": "Otros ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "Cuerpo a cuerpo"
+      "melee": "Cuerpo a cuerpo",
+      "move": "Arrastra para mover este medidor",
+      "resize": "Arrastra para cambiar el tamaño de este medidor",
+      "dock": "Devuelve este medidor a la ventana de medidores",
+      "separate": "Separar {meter}",
+      "regroup": "Reagrupar {meter}"
     },
     "petFeed": {
       "disabledFullHp": "La mascota tiene la salud al maximo",

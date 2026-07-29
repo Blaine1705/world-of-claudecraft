@@ -906,7 +906,12 @@ export const pl_PL: EnTranslations = {
       "breakdownOther": "Inne ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "Walka wręcz"
+      "melee": "Walka wręcz",
+      "move": "Przeciągnij, aby przesunąć ten licznik",
+      "resize": "Przeciągnij, aby zmienić rozmiar tego licznika",
+      "dock": "Zadokuj ten licznik z powrotem w oknie liczników",
+      "separate": "Odłącz {meter}",
+      "regroup": "Zgrupuj {meter} ponownie"
     },
     "petFeed": {
       "disabledFullHp": "Zwierzę ma pełne zdrowie",

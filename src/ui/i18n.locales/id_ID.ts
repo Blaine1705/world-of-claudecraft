@@ -7143,6 +7143,11 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Mengambil koin dan barang yang jatuh. Tidak menggunakan kesempatan panen.',
   'hudChrome.loot.unifiedPressHint':
     'Tombol interaksi menjarah dan memanen dalam satu tekanan, menggunakan fokus kotamu.',
+  'hudChrome.meters.move': 'Seret untuk memindahkan pengukur ini',
+  'hudChrome.meters.resize': 'Seret untuk mengubah ukuran pengukur ini',
+  'hudChrome.meters.dock': 'Kembalikan pengukur ini ke jendela pengukur',
+  'hudChrome.meters.separate': 'Pisahkan {meter}',
+  'hudChrome.meters.regroup': 'Gabungkan kembali {meter}',
   'hudChrome.meters.minutesSeconds': '{m}m {s}d',
   'hudChrome.meters.perSecond': '{value}/d',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',

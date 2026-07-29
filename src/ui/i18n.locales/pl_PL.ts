@@ -6551,6 +6551,11 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Bierze monety i wypadłe przedmioty. Nie zużywa zebranych zasobów.',
   'hudChrome.loot.unifiedPressHint':
     'Klawisz interakcji bierze łup i zbiera zasoby jednym naciśnięciem, korzystając z priorytetów miasta.',
+  'hudChrome.meters.move': 'Przeciągnij, aby przesunąć ten licznik',
+  'hudChrome.meters.resize': 'Przeciągnij, aby zmienić rozmiar tego licznika',
+  'hudChrome.meters.dock': 'Zadokuj ten licznik z powrotem w oknie liczników',
+  'hudChrome.meters.separate': 'Odłącz {meter}',
+  'hudChrome.meters.regroup': 'Zgrupuj {meter} ponownie',
   'hudChrome.meters.minutesSeconds': '{m}m {s}s',
   'hudChrome.meters.perSecond': '{value}/s',
   'hudChrome.meters.perSecondRow': '{total} ({rate})',

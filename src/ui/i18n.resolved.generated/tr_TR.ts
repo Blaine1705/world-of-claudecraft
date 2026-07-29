@@ -906,7 +906,12 @@ export const tr_TR: EnTranslations = {
       "breakdownOther": "Diğer ({count})",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
-      "melee": "Yakın dövüş"
+      "melee": "Yakın dövüş",
+      "move": "Bu ölçeri taşımak için sürükleyin",
+      "resize": "Bu ölçeri yeniden boyutlandırmak için sürükleyin",
+      "dock": "Bu ölçeri ölçerler penceresine geri yerleştirin",
+      "separate": "Ayır: {meter}",
+      "regroup": "Yeniden grupla: {meter}"
     },
     "petFeed": {
       "disabledFullHp": "Evcil hayvanın canı dolu",
