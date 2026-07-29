@@ -374,7 +374,7 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // today because waterLevelAt returns -Infinity outside a declared lake and
   // every lake is in the overworld, so the water check above refuses first.
   // Author fishable water inside an instance and this needs a real answer.
-  const probeZoneId = zoneAt(probe.z).id;
+  const probeZoneId = zoneAt(probe.x, probe.z).id;
   const requiredRodTier = rodTierRequiredForZone(probeZoneId);
   const ownedRodTier = bestOwnedGatherToolTier(meta.inventory, 'fishing', ITEMS);
   if (!canGatherTier(ownedRodTier, requiredRodTier)) {
@@ -464,7 +464,7 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   const bandTables = FISHING_TABLES_BY_BAND[band];
   // The zone the rod gate validated, pinned at cast start; the position
   // fallback keeps direct test/parity drives (no startFishing) working.
-  const zoneId = p.fishCastZoneId || zoneAt(p.pos.z).id;
+  const zoneId = p.fishCastZoneId || zoneAt(p.pos.x, p.pos.z).id;
   const table = bandTables[zoneId] ?? bandTables.eastbrook_vale;
   const total = table.reduce((sum, e) => sum + e.weight, 0);
   let roll = ctx.rng.next() * total;

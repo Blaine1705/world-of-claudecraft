@@ -50,6 +50,23 @@ import {
 import { terrainHeight } from '../src/sim/world';
 
 const ZONE_IDS = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'];
+// The v0.32.0 expansion zones: authored at tier 1 (matching their all-tier-1
+// hub-outskirt nodes) until phase 13 re-tiers them onto the ladder. Their
+// catch tables fall back to the Vale rows, so the weight arms below stay
+// scoped to ZONE_IDS, the three zones whose cells are authored.
+const EXPANSION_ZONE_IDS = [
+  'veiled_hollow',
+  'drakelands',
+  'frostveil',
+  'amberfall',
+  'willowfen',
+  'nightbloom',
+  'wraithwood',
+  'palmreach',
+  'evergarden',
+  'galecrest',
+  'farshore_isle',
+];
 const KOI = 'glimmerfin_koi';
 const JUNK_ROWS: Record<string, string[]> = {
   eastbrook_vale: ['tangled_weed'],
@@ -151,11 +168,11 @@ describe('the rod a zone takes', () => {
     const highestNodeTierIn = (zoneId: string) =>
       Math.max(...GATHER_NODES.filter((n) => n.zoneId === zoneId).map((n) => n.tier));
     let checked = 0;
-    for (const zoneId of ZONE_IDS) {
+    for (const zoneId of [...ZONE_IDS, ...EXPANSION_ZONE_IDS]) {
       expect(rodTierRequiredForZone(zoneId), zoneId).toBe(highestNodeTierIn(zoneId));
       checked += 1;
     }
-    expect(checked).toBe(3);
+    expect(checked).toBe(14);
     // And the ladder really is a ladder, so the loop above is not three copies
     // of one number.
     expect(rodTierRequiredForZone('eastbrook_vale')).toBe(1);
@@ -167,7 +184,9 @@ describe('the rod a zone takes', () => {
     for (const zone of ZONES) {
       expect(FISHING_ZONE_ROD_TIERS[zone.id], zone.id).toBeDefined();
     }
-    expect(Object.keys(FISHING_ZONE_ROD_TIERS).sort()).toEqual([...ZONE_IDS].sort());
+    expect(Object.keys(FISHING_ZONE_ROD_TIERS).sort()).toEqual(
+      [...ZONE_IDS, ...EXPANSION_ZONE_IDS].sort(),
+    );
     // The floor is what keeps a zone that ever ships without a row castable,
     // matching the catch table's own fall back to the Vale rows.
     expect(rodTierRequiredForZone('no_such_zone')).toBe(DEFAULT_FISHING_ROD_TIER);
@@ -188,7 +207,7 @@ describe('the rod a zone takes', () => {
     const rodTiers = Object.values(ITEMS)
       .filter((def) => isGatherToolUse(def.use) && def.use.professionId === 'fishing')
       .map((def) => (isGatherToolUse(def.use) ? def.use.tier : 0));
-    for (const zoneId of ZONE_IDS) {
+    for (const zoneId of [...ZONE_IDS, ...EXPANSION_ZONE_IDS]) {
       const need = rodTierRequiredForZone(zoneId);
       // Tier 1 is the bare-hands floor and needs no rod at all; anything above
       // it must be satisfiable by a shipped rod.
@@ -197,7 +216,7 @@ describe('the rod a zone takes', () => {
   });
 
   it('the required BAND is the rod tier minus one, the shipped band gate', () => {
-    for (const zoneId of ZONE_IDS) {
+    for (const zoneId of [...ZONE_IDS, ...EXPANSION_ZONE_IDS]) {
       expect(requiredBandFor(zoneId), zoneId).toBe(rodTierRequiredForZone(zoneId) - 1);
     }
     expect(requiredBandFor('eastbrook_vale')).toBe(0);
@@ -379,7 +398,7 @@ describe('the zone rod gate at the cast', () => {
     const meta = sim.meta(sim.playerId) as PlayerMeta;
     sim.addItem('ironreel_fishing_rod', 1);
     placeAt(sim, spot);
-    expect(zoneAt(sim.player.pos.z).id).toBe('thornpeak_heights');
+    expect(zoneAt(sim.player.pos.x, sim.player.pos.z).id).toBe('thornpeak_heights');
     let draws = 0;
     sim.rng.setObserver(() => draws++);
     const evStart = sim.events.length;
@@ -416,7 +435,7 @@ describe('the zone rod gate at the cast', () => {
     const meta = sim.meta(sim.playerId) as PlayerMeta;
     sim.addItem('simple_fishing_pole', 1);
     faceLake(sim, LAKE);
-    expect(zoneAt(sim.player.pos.z).id).toBe('eastbrook_vale');
+    expect(zoneAt(sim.player.pos.x, sim.player.pos.z).id).toBe('eastbrook_vale');
     startFishing(sim.ctx, sim.player, meta);
     expect(sim.player.castingAbility).toBe(FISHING_CAST_ID);
     expect(deniedEvents(sim.events)).toEqual([]);
@@ -436,7 +455,7 @@ describe('the zone rod gate at the cast', () => {
     // Well clear of the water, facing away from it.
     teleportTo(sim, lake.x + lake.radius + 120, lake.z + lake.radius + 120);
     sim.player.facing = Math.atan2(1, 0);
-    expect(zoneAt(sim.player.pos.z).id).toBe('thornpeak_heights');
+    expect(zoneAt(sim.player.pos.x, sim.player.pos.z).id).toBe('thornpeak_heights');
     const evStart = sim.events.length;
     startFishing(sim.ctx, sim.player, meta);
     expect(sim.player.castingAbility).toBeNull();
@@ -461,7 +480,7 @@ describe('the zone rod gate at the cast', () => {
     const meta = sim.meta(sim.playerId) as PlayerMeta;
     sim.addItem('simple_fishing_pole', 1);
     placeAt(sim, spot);
-    expect(zoneAt(sim.player.pos.z).id).toBe('mirefen_marsh');
+    expect(zoneAt(sim.player.pos.x, sim.player.pos.z).id).toBe('mirefen_marsh');
     let draws = 0;
     sim.rng.setObserver(() => draws++);
     startFishing(sim.ctx, sim.player, meta);
@@ -553,7 +572,7 @@ describe('the zone rod gate at the cast', () => {
     expect(rodOfNamedTier, `no rod of the tier the gate named (${namedTier})`).toBeDefined();
     allowed.addItem((rodOfNamedTier as { id: string }).id, 1);
     placeAt(allowed, spot);
-    const zoneId = zoneAt(allowed.player.pos.z).id;
+    const zoneId = zoneAt(allowed.player.pos.x, allowed.player.pos.z).id;
     startFishing(allowed.ctx, allowed.player, allowedMeta);
     expect(allowed.player.castingAbility).toBe(FISHING_CAST_ID);
     // Resolve a catch and prove it belongs to the SAME zone's rows.
@@ -835,7 +854,7 @@ describe('the rod gate reads the WATER zone at the probe point', () => {
     const meta = sim.meta(sim.playerId) as PlayerMeta;
     sim.addItem('simple_fishing_pole', 1);
     placeAtBorderShore(sim);
-    expect(zoneAt(sim.player.pos.z).id).toBe('eastbrook_vale'); // the caster stands cheap-side
+    expect(zoneAt(sim.player.pos.x, sim.player.pos.z).id).toBe('eastbrook_vale'); // the caster stands cheap-side
     sim.events = [];
     startFishing(sim.ctx, sim.player, meta);
     const denies = deniedEvents(sim.events);
@@ -1007,7 +1026,7 @@ describe('zoneAt resolves the ACTIVE zones (the swappable-content read)', () => 
         { ...marsh, id: 'custom_north', name: 'Custom North', zMax: 900 },
       ],
     });
-    const line = zonesReadout(150); // past custom_south's zMax: the north zone
+    const line = zonesReadout(0, 150); // past custom_south's zMax: the north zone
     expect(line).toContain('Zones (2):');
     expect(line).toContain('Custom South');
     expect(line).toContain('Custom North');
@@ -1021,9 +1040,10 @@ describe('zoneAt resolves the ACTIVE zones (the swappable-content read)', () => 
     // but tests in this repo already ship the shape); the declared non-null
     // ZoneDef return must hold rather than throwing at every .id caller.
     setActiveWorldContent({ ...BUILTIN_WORLD, zones: [] });
-    const zone = zoneAt(0);
+    const zone = zoneAt(0, 0);
     expect(zone).toBeDefined();
     expect(zone.id).toBe(ZONES[0].id);
-    expect(zoneAt(1e9).id).toBe(ZONES[ZONES.length - 1].id);
+    const northmost = ZONES.reduce((a, b) => (b.zMax > a.zMax ? b : a));
+    expect(zoneAt(0, 1e9).id).toBe(northmost.id);
   });
 });

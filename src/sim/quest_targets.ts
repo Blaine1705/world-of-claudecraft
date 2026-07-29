@@ -8,7 +8,7 @@
 // mirror produce identical output, and (unlike world.entities) none of it is
 // interest-radius limited: a camp far across the zone still resolves.
 
-import { CAMPS, GATHER_NODES, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from './data';
+import { CAMPS, ESCORTS, GATHER_NODES, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from './data';
 import {
   type GatherNodeType,
   type QuestObjective,
@@ -57,9 +57,11 @@ const POINT_AREA_RADIUS = 6;
  * the widest pair inside one cluster is wood_thornpeak_t2 to wood_thornpeak_t3
  * at 49.98 yards, chained through two intermediate stands. Going the other way,
  * the nearest pair in two DIFFERENT clusters is wood_mirefen_1 to wood_mirefen_3
- * at 33.54 yards, so there are 3.5 yards of headroom above 30, not tens. The
- * partition is identical for every integer link from 26 to 33; nudge one of
- * those two stands 4 yards and two blobs silently become one, which is why
+ * at 33.54 yards; the v0.32.0 expansion zones then author their per-type
+ * hub-outskirt pairs exactly (32,8) apart, putting the nearest cross-cluster
+ * pair at 32.98 yards, under 3 yards of headroom above 30. The partition is
+ * identical for every integer link from 26 to 32; nudge one of those pairs a
+ * few yards and two blobs silently become one, which is why
  * tests/quest_targets.test.ts pins the grouping across that band.
  *
  * On scale, and on the objection this invites ("a blob that swallows the view at
@@ -296,7 +298,13 @@ export function questObjectiveAreas(
       const npc = obj.targetNpcId ? NPCS[obj.targetNpcId] : undefined;
       // fresh {x,z}: never alias the shared NPCS content the sim places from
       if (npc) push(ref, { x: npc.pos.x, z: npc.pos.z }, POINT_AREA_RADIUS);
-    } else if (obj.type === 'gather' && obj.nodeType) pushNodeCluster(ref, obj.nodeType);
+    } else if (obj.type === 'gather' && obj.nodeType) {
+      pushNodeCluster(ref, obj.nodeType);
+    } else if (obj.type === 'escort') {
+      // The escort begins where the idle escortee stands (its def start point).
+      const escort = ESCORTS[obj.escortId];
+      if (escort) push(ref, { x: escort.start.x, z: escort.start.z }, POINT_AREA_RADIUS);
+    }
   }
   return out;
 }

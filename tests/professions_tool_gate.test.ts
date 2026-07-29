@@ -620,7 +620,7 @@ describe('the gated tools are stocked somewhere a gated row can be seen', () => 
         // node-ceiling rule this arm derives is a land-tool rule; the rod
         // hub rows have their own pins in professions_tools.test.ts.
         if (use?.type !== 'gatherTool' || use.professionId === 'fishing') continue;
-        const zone = zoneAt(npc.pos.z);
+        const zone = zoneAt(npc.pos.x, npc.pos.z);
         // zoneAt SATURATES: it walks bands by zMax and falls back to the last
         // zone, so an NPC past the final band (or at a NaN z) silently resolves
         // to the highest-ceilinged zone in the world and would be judged against

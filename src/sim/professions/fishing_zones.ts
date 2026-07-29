@@ -45,6 +45,24 @@ const FISHING_ZONE_ROD_TIER_ROWS: Record<string, number> = {
   eastbrook_vale: 1,
   mirefen_marsh: 2,
   thornpeak_heights: 3,
+  // The v0.32.0 expansion zones: tier 1, matching their hub-outskirt gather
+  // nodes (gather_nodes.ts authors every expansion node at tier 1, so the
+  // water asks no more than the ground does). Explicit rows rather than the
+  // DEFAULT_FISHING_ROD_TIER floor so the every-zone-covered pin in
+  // tests/fishing_zones.test.ts keeps meaning "someone decided", not "nobody
+  // looked"; re-tiering them onto the ladder is phase 13 work
+  // (docs/design/professions-tuning-packet-review.md).
+  veiled_hollow: 1,
+  drakelands: 1,
+  frostveil: 1,
+  amberfall: 1,
+  willowfen: 1,
+  nightbloom: 1,
+  wraithwood: 1,
+  palmreach: 1,
+  evergarden: 1,
+  galecrest: 1,
+  farshore_isle: 1,
 };
 
 export const FISHING_ZONE_ROD_TIERS: Readonly<Record<string, number>> = Object.freeze({

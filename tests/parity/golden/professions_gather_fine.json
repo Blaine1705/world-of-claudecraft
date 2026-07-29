@@ -11,14 +11,14 @@
     "fine grant costs no extra rng draw (two per granted harvest, unchanged)",
     "gatherResult itemId carries the resolved grade"
   ],
-  "draws": 6,
-  "drawDigest": "65626155",
+  "draws": 4,
+  "drawDigest": "313f85da",
   "frames": [
     {
       "tick": 0,
       "time": 0,
-      "nextId": 416,
-      "state": "28f12f87",
+      "nextId": 821,
+      "state": "f8e65244",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -56,7 +56,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 415,
+          "entityId": 816,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -92,7 +92,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 415
+              "sourceId": 816
             }
           ],
           "blockChance": 0.05,
@@ -105,7 +105,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 415,
+          "id": 816,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -149,12 +149,12 @@
     {
       "tick": 51,
       "time": 2.55,
-      "nextId": 416,
-      "state": "dad6c84b",
-      "events": "04f16aae",
+      "nextId": 821,
+      "state": "1a22b543",
+      "events": "778e7220",
       "rng": {
-        "draws": 2,
-        "digest": "6334bd24"
+        "draws": 0,
+        "digest": "811c9dc5"
       },
       "label": "fine-grade-at-full-tier-vein",
       "players": [
@@ -173,9 +173,7 @@
           "bank": {},
           "cls": "warrior",
           "companionUpgrades": {},
-          "counters": {
-            "xpGained": 36
-          },
+          "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
@@ -185,37 +183,21 @@
               "baked_bread",
               "bronze_sickle",
               "eastbrook_buckler",
-              "fine_iron_ore",
               "mithril_mining_pick",
               "recruit_tunic",
               "worn_sword"
-            ],
-            "visited": [
-              "gather:mirefen_marsh:ore"
             ]
           },
-          "deedsEarned": [
-            [
-              "exp_first_ore",
-              ""
-            ],
-            [
-              "prog_first_harvest",
-              ""
-            ]
-          ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 415,
+          "entityId": 816,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
-          "gatheringProficiency": {
-            "mining": 1
-          },
+          "gatheringProficiency": {},
           "heroicDaily": {},
           "inventory": [
             {
@@ -229,24 +211,15 @@
             {
               "count": 1,
               "itemId": "bronze_sickle"
-            },
-            {
-              "count": 1,
-              "itemId": "fine_iron_ore"
             }
           ],
-          "lifetimeXp": 36,
           "mailWelcomed": true,
-          "nodeHarvestReadyAt": {
-            "ore_mirefen_t2": 242.1
-          },
+          "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "renown": 10,
           "talents": {
             "rows": {}
           },
-          "townFocus": {},
-          "xp": 36
+          "townFocus": {}
         }
       ],
       "entities": [
@@ -261,21 +234,20 @@
               "name": "Battle Stance",
               "remaining": 3597.45,
               "school": "physical",
-              "sourceId": 415
+              "sourceId": 816
             }
           ],
           "blockChance": 0.05,
           "blockValue": 6,
-          "castTotal": 2.1,
           "combatTimer": 101.55,
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2.838539,
+          "fallStartY": -4.084635,
           "fiveSecondRule": 101.55,
           "hp": 100,
-          "id": 415,
+          "id": 816,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -288,7 +260,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 48,
-            "y": -2.838539,
+            "y": -4.084635,
             "z": 352
           },
           "potionCooldownUntil": -1,
@@ -319,12 +291,12 @@
     {
       "tick": 104,
       "time": 5.2,
-      "nextId": 416,
-      "state": "d597f45b",
-      "events": "096f5d6d",
+      "nextId": 821,
+      "state": "cb7c098e",
+      "events": "21b78d24",
       "rng": {
-        "draws": 4,
-        "digest": "04171508"
+        "draws": 2,
+        "digest": "ad89c14b"
       },
       "label": "plain-grade-at-lower-tier-vein",
       "players": [
@@ -344,7 +316,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "xpGained": 72
+            "xpGained": 36
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -355,7 +327,6 @@
               "baked_bread",
               "bronze_sickle",
               "eastbrook_buckler",
-              "fine_iron_ore",
               "iron_ore",
               "mithril_mining_pick",
               "recruit_tunic",
@@ -377,7 +348,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 415,
+          "entityId": 816,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -385,7 +356,7 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {
-            "mining": 2
+            "mining": 1
           },
           "heroicDaily": {},
           "inventory": [
@@ -403,18 +374,13 @@
             },
             {
               "count": 1,
-              "itemId": "fine_iron_ore"
-            },
-            {
-              "count": 1,
               "itemId": "iron_ore"
             }
           ],
-          "lifetimeXp": 72,
+          "lifetimeXp": 36,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {
-            "ore_mirefen_1": 244.35,
-            "ore_mirefen_t2": 242.1
+            "ore_mirefen_1": 244.35
           },
           "recipesGrandfathered": true,
           "renown": 10,
@@ -422,7 +388,7 @@
             "rows": {}
           },
           "townFocus": {},
-          "xp": 72
+          "xp": 36
         }
       ],
       "entities": [
@@ -437,7 +403,7 @@
               "name": "Battle Stance",
               "remaining": 3594.8,
               "school": "physical",
-              "sourceId": 415
+              "sourceId": 816
             }
           ],
           "blockChance": 0.05,
@@ -448,10 +414,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -0.889273,
+          "fallStartY": -2.314273,
           "fiveSecondRule": 104.2,
           "hp": 100,
-          "id": 415,
+          "id": 816,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -464,7 +430,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 40,
-            "y": -0.889273,
+            "y": -2.314273,
             "z": 340
           },
           "potionCooldownUntil": -1,
@@ -495,12 +461,12 @@
     {
       "tick": 157,
       "time": 7.85,
-      "nextId": 416,
-      "state": "8bba9c75",
-      "events": "c3a29a7e",
+      "nextId": 821,
+      "state": "b499638a",
+      "events": "61f1be16",
       "rng": {
-        "draws": 6,
-        "digest": "65626155"
+        "draws": 4,
+        "digest": "313f85da"
       },
       "label": "wrong-profession-tool-does-not-upgrade",
       "players": [
@@ -520,7 +486,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "xpGained": 108
+            "xpGained": 72
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -531,7 +497,6 @@
               "baked_bread",
               "bronze_sickle",
               "eastbrook_buckler",
-              "fine_iron_ore",
               "goldleaf_herb",
               "iron_ore",
               "mithril_mining_pick",
@@ -559,7 +524,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 415,
+          "entityId": 816,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -568,7 +533,7 @@
           "equipmentInstance": {},
           "gatheringProficiency": {
             "herbalism": 1,
-            "mining": 2
+            "mining": 1
           },
           "heroicDaily": {},
           "inventory": [
@@ -586,10 +551,6 @@
             },
             {
               "count": 1,
-              "itemId": "fine_iron_ore"
-            },
-            {
-              "count": 1,
               "itemId": "iron_ore"
             },
             {
@@ -597,12 +558,11 @@
               "itemId": "goldleaf_herb"
             }
           ],
-          "lifetimeXp": 108,
+          "lifetimeXp": 72,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {
             "herb_mirefen_t2": 247.8,
-            "ore_mirefen_1": 244.35,
-            "ore_mirefen_t2": 242.1
+            "ore_mirefen_1": 244.35
           },
           "recipesGrandfathered": true,
           "renown": 15,
@@ -610,7 +570,7 @@
             "rows": {}
           },
           "townFocus": {},
-          "xp": 108
+          "xp": 72
         }
       ],
       "entities": [
@@ -625,7 +585,7 @@
               "name": "Battle Stance",
               "remaining": 3592.15,
               "school": "physical",
-              "sourceId": 415
+              "sourceId": 816
             }
           ],
           "blockChance": 0.05,
@@ -636,10 +596,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -1.537996,
+          "fallStartY": -2.962996,
           "fiveSecondRule": 106.85,
           "hp": 100,
-          "id": 415,
+          "id": 816,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -652,7 +612,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 34,
-            "y": -1.537996,
+            "y": -2.962996,
             "z": 406
           },
           "potionCooldownUntil": -1,
@@ -683,12 +643,12 @@
     {
       "tick": 159,
       "time": 7.95,
-      "nextId": 416,
-      "state": "c07532ae",
+      "nextId": 821,
+      "state": "d02465df",
       "events": "741638a5",
       "rng": {
-        "draws": 6,
-        "digest": "65626155"
+        "draws": 4,
+        "digest": "313f85da"
       },
       "label": "final",
       "players": [
@@ -708,7 +668,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "xpGained": 108
+            "xpGained": 72
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -719,7 +679,6 @@
               "baked_bread",
               "bronze_sickle",
               "eastbrook_buckler",
-              "fine_iron_ore",
               "goldleaf_herb",
               "iron_ore",
               "mithril_mining_pick",
@@ -747,7 +706,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 415,
+          "entityId": 816,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -756,7 +715,7 @@
           "equipmentInstance": {},
           "gatheringProficiency": {
             "herbalism": 1,
-            "mining": 2
+            "mining": 1
           },
           "heroicDaily": {},
           "inventory": [
@@ -774,10 +733,6 @@
             },
             {
               "count": 1,
-              "itemId": "fine_iron_ore"
-            },
-            {
-              "count": 1,
               "itemId": "iron_ore"
             },
             {
@@ -785,12 +740,11 @@
               "itemId": "goldleaf_herb"
             }
           ],
-          "lifetimeXp": 108,
+          "lifetimeXp": 72,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {
             "herb_mirefen_t2": 247.8,
-            "ore_mirefen_1": 244.35,
-            "ore_mirefen_t2": 242.1
+            "ore_mirefen_1": 244.35
           },
           "recipesGrandfathered": true,
           "renown": 15,
@@ -798,7 +752,7 @@
             "rows": {}
           },
           "townFocus": {},
-          "xp": 108
+          "xp": 72
         }
       ],
       "entities": [
@@ -813,7 +767,7 @@
               "name": "Battle Stance",
               "remaining": 3592.05,
               "school": "physical",
-              "sourceId": 415
+              "sourceId": 816
             }
           ],
           "blockChance": 0.05,
@@ -824,10 +778,10 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -1.537996,
+          "fallStartY": -2.962996,
           "fiveSecondRule": 106.95,
           "hp": 100,
-          "id": 415,
+          "id": 816,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -840,7 +794,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 34,
-            "y": -1.537996,
+            "y": -2.962996,
             "z": 406
           },
           "potionCooldownUntil": -1,

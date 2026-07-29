@@ -179,17 +179,19 @@ describe('questObjectiveAreas', () => {
     // content nudge silently merges two blobs into one and nothing reds. The
     // tightest real margins: the widest pair inside one cluster is 49.98 yards
     // (chained, single linkage is transitive) and the nearest pair in two
-    // different clusters is 33.54 yards, so the identical-partition band is 26 to
-    // 33 and the shipped 30 sits 3.5 yards below its upper edge.
+    // different clusters is 32.98 yards (the v0.32.0 expansion zones author
+    // their per-type hub-outskirt pairs exactly (32,8) apart), so the
+    // identical-partition band is 26 to 32 and the shipped 30 sits within 3
+    // yards of its upper edge.
     const key = (groups: { x: number; z: number }[][]) =>
       groups.map((g) => g.map((p) => `${p.x},${p.z}`).join(' ')).join(' | ');
     for (const type of GATHER_NODE_TYPES) {
       const at30 = key(gatherNodeClusters(type));
-      // Both edges, so a future bump in either direction reds. 25 and 34 are
+      // Both edges, so a future bump in either direction reds. 25 and 33 are
       // outside the band for at least one type, which is what makes this decisive
       // rather than a restatement of the default.
       expect(key(gatherNodeClusters(type, 27)), `${type} at 27yd`).toBe(at30);
-      expect(key(gatherNodeClusters(type, 33)), `${type} at 33yd`).toBe(at30);
+      expect(key(gatherNodeClusters(type, 32)), `${type} at 32yd`).toBe(at30);
       // Every node lands in exactly one group, and groups come back ordered by
       // their first member so the badge numbering a player sees is stable.
       const groups = gatherNodeClusters(type);
@@ -313,8 +315,8 @@ describe('questObjectiveAreas', () => {
         const area = areaFor.get(node.id);
         if (!area) continue;
         expect(
-          zoneAt(area.center.z).id,
-          `the ${type} circle holding ${node.id} is centred in ${zoneAt(area.center.z).id}, not ${node.zoneId}`,
+          zoneAt(area.center.x, area.center.z).id,
+          `the ${type} circle holding ${node.id} is centred in ${zoneAt(area.center.x, area.center.z).id}, not ${node.zoneId}`,
         ).toBe(node.zoneId);
       }
 
@@ -359,8 +361,9 @@ describe('questObjectiveAreas', () => {
           ),
         );
         expect(zones.size, `a ${type} cluster spans ${[...zones].join(' and ')}`).toBe(1);
+        const cx = group.reduce((s, p) => s + p.x, 0) / group.length;
         const cz = group.reduce((s, p) => s + p.z, 0) / group.length;
-        expect(zoneAt(cz).id, `a ${type} cluster centroid lands outside its zone`).toBe(
+        expect(zoneAt(cx, cz).id, `a ${type} cluster centroid lands outside its zone`).toBe(
           [...zones][0],
         );
       }

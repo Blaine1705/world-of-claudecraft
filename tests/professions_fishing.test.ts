@@ -55,7 +55,7 @@ import {
 } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
-function makeSim(seed = 4242): Sim {
+function makeSim(seed = 467): Sim {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: true });
 }
 
@@ -149,112 +149,131 @@ function catchSequenceLive(sim: Sim, meta: PlayerMeta, n: number): (string | nul
   return out;
 }
 
-// The literal band-0 catch sequence at seed 4242 under the LIVE loop: each
-// session consumes TWO draws, draw 2i the hidden bite delay and draw 2i+1 the
-// table walk against the band-0 Vale rows (trout 46 / perch 31 / weed 12 /
-// koi 1 / null 10). Any accidental extra draw, band-boundary change, or
-// band-0 table drift breaks this pin.
-const B0_SEQ_4242: (string | null)[] = [
-  PERCH,
-  TROUT,
-  PERCH,
-  PERCH,
-  TROUT,
-  TROUT,
-  TROUT,
-  TROUT,
-  PERCH,
-  TROUT,
-  WEED,
+// The literal band-0 catch sequence at seed 467 under the LIVE loop,
+// re-recorded on the v0.32.0 release merge (the rift, mounts, and new-zone
+// world-gen all move construction-time draws, so neither parent's recording
+// holds): each session consumes TWO draws, draw 2i the hidden bite delay and
+// draw 2i+1 the table walk against the band-0 Vale rows (trout 46 / perch 31
+// / weed 12 / koi 1 / null 10). Any accidental extra draw, band-boundary
+// change, or band-0 table drift breaks this pin.
+const B0_SEQ_467: (string | null)[] = [
   TROUT,
   TROUT,
   TROUT,
   TROUT,
   null,
-  PERCH,
-  TROUT,
-  PERCH,
-  TROUT,
+  WEED,
   TROUT,
   TROUT,
   null,
   PERCH,
+  WEED,
   TROUT,
-  WEED,
-  WEED,
+  TROUT,
+  null,
+  PERCH,
+  PERCH,
+  PERCH,
+  TROUT,
+  KOI,
+  PERCH,
+  PERCH,
+  TROUT,
+  TROUT,
+  TROUT,
+  TROUT,
+  TROUT,
   PERCH,
   TROUT,
   PERCH,
+  TROUT,
 ];
 
 // The literal band-1 live-loop sequence for the SAME seed with fishing
 // proficiency 150 (band-1 Vale weights trout 49 / perch 32 / weed 8 / koi 3 /
-// null 8). It diverges from B0_SEQ_4242 at index 0 (trout, not perch), so
-// matching it proves the live path actually switched tables; index 10 is the
-// hunted band DISCRIMINATOR against band 2 (tangled weed here, the koi
-// there, because the koi row rises 3 to 6 across that band step). The
-// divergence is asserted rather than described: see the discriminator pin
-// below, which fails if the two walks ever collapse onto each other.
-const B1_SEQ_4242: (string | null)[] = [
-  TROUT,
-  TROUT,
-  PERCH,
-  PERCH,
-  TROUT,
-  TROUT,
-  TROUT,
-  TROUT,
-  PERCH,
-  TROUT,
-  WEED,
+// null 8). It first diverges from B0_SEQ_467 at index 8 (the koi where band 0
+// pulls an empty hook: the koi row rises 1 to 3 and the empty falls 10 to 8
+// across that band step), again at 10 (perch, not band 0's tangled weed: the
+// junk de-weighting) and at 13, so matching the full 30-cast walk proves the
+// live path actually switched tables; indices 4 and 5 are the hunted band
+// DISCRIMINATORS against band 2 (the empty hook and the weed here, the koi
+// there both times). The divergence is asserted rather than described: see
+// the discriminator pin below, which fails if the walks ever collapse onto
+// each other. Re-recorded on the v0.32.0 release merge.
+const B1_SEQ_467: (string | null)[] = [
   TROUT,
   TROUT,
   TROUT,
   TROUT,
   null,
-  PERCH,
-  TROUT,
-  PERCH,
-  TROUT,
+  WEED,
   TROUT,
   TROUT,
   KOI,
   PERCH,
+  PERCH,
+  TROUT,
+  TROUT,
+  KOI,
+  PERCH,
+  PERCH,
+  PERCH,
+  TROUT,
+  KOI,
+  PERCH,
+  PERCH,
+  TROUT,
+  TROUT,
+  TROUT,
+  TROUT,
+  TROUT,
+  PERCH,
+  TROUT,
+  PERCH,
+  TROUT,
 ];
 
 // The literal band-2 live-loop sequence for the SAME seed with fishing
 // proficiency 200 (band-2 Vale weights trout 50 / perch 34 / weed 4 / koi 6 /
-// null 6) against the same interleaved stream. It diverges from the band-0
-// walk at index 0 and, decisively, from the BAND-1 walk at index 10: that
-// table draw lands where band 1 yields tangled weed but band 2 yields the
-// koi, so matching this sequence proves the live path resolved
+// null 6) against the same interleaved stream. It diverges, decisively, from
+// BOTH the band-0 and band-1 walks at indices 4 and 5: those table draws land
+// where the lower bands yield the empty hook (4) and tangled weed (5) but
+// band 2 yields the koi both times (the hunted divergence window under the
+// two-draw stream), so matching this sequence proves the live path resolved
 // FISHING_TABLES_BY_BAND[2], not a band-1 collapse (the top-band wiring was
-// previously unpinned on the live path).
-const B2_SEQ_4242: (string | null)[] = [
+// previously unpinned on the live path). Re-recorded on the v0.32.0 release
+// merge.
+const B2_SEQ_467: (string | null)[] = [
   TROUT,
-  TROUT,
-  PERCH,
-  PERCH,
-  TROUT,
-  TROUT,
-  TROUT,
-  TROUT,
-  PERCH,
-  TROUT,
-  KOI,
-  TROUT,
-  TROUT,
-  TROUT,
-  TROUT,
-  null,
-  PERCH,
-  TROUT,
-  PERCH,
   TROUT,
   TROUT,
   TROUT,
   KOI,
+  KOI,
+  TROUT,
+  TROUT,
+  KOI,
   PERCH,
+  PERCH,
+  TROUT,
+  TROUT,
+  KOI,
+  PERCH,
+  PERCH,
+  PERCH,
+  TROUT,
+  KOI,
+  PERCH,
+  PERCH,
+  TROUT,
+  TROUT,
+  TROUT,
+  TROUT,
+  TROUT,
+  PERCH,
+  TROUT,
+  PERCH,
+  TROUT,
 ];
 
 // Probe candidate shore spots around the Deepfen Shallows lake with the REAL
@@ -324,19 +343,19 @@ describe('fishing determinism (pin 1)', () => {
     expect(seqA.some((c) => c !== null)).toBe(true);
   });
 
-  it('band 0 reproduces the shipped Vale table: literal live-loop sequence at seed 4242', () => {
-    const sim = makeSim(4242);
+  it('band 0 reproduces the shipped Vale table: literal live-loop sequence at seed 467', () => {
+    const sim = makeSim(467);
     // The pole satisfies the implement gate (#2343) and is mechanically
     // identical to bare hands, so the recorded literals hold byte-identical.
     sim.addItem('simple_fishing_pole', 1);
     teleportToValeShore(sim);
-    expect(catchSequenceLive(sim, sim.meta(sim.playerId)!, 30)).toEqual(B0_SEQ_4242);
+    expect(catchSequenceLive(sim, sim.meta(sim.playerId)!, 30)).toEqual(B0_SEQ_467);
   });
 });
 
 describe('fishing draw contract (pin 2, the bite-and-reel shape)', () => {
   it('a full session draws exactly two rng values: the bite delay at the cast, the table at the reel', () => {
-    const sim = makeSim(4242);
+    const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     teleportToValeShore(sim);
     // The implement gate (#2343): the pole is a draw-free bag scan hit and
@@ -407,7 +426,7 @@ describe('fishing draw contract (pin 2, the bite-and-reel shape)', () => {
   });
 
   it('a missed reel window draws nothing more: one draw total, and only the cast is lost', () => {
-    const sim = makeSim(4242);
+    const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     teleportToValeShore(sim);
     sim.addItem('simple_fishing_pole', 1); // the implement gate (#2343); draw-free, tier stays 1
@@ -445,7 +464,7 @@ describe('fishing draw contract (pin 2, the bite-and-reel shape)', () => {
   });
 
   it('bags full at the reel: both draws still spend, nothing lands, no grant, no fishingResult', () => {
-    const sim = makeSim(4242);
+    const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     teleportToValeShore(sim);
     // Fill every slot with an unstackable tool so no catch can land.
@@ -466,8 +485,8 @@ describe('fishing draw contract (pin 2, the bite-and-reel shape)', () => {
       sim.rng.setObserver(null);
     }
     // The capacity gate sits AFTER the table roll, so the session still spent
-    // both draws (bite delay plus table); at seed 4242 the first table draw
-    // resolves a perch (B0_SEQ_4242[0]) that simply gets away.
+    // both draws (bite delay plus table); at seed 467 the first table draw
+    // resolves a perch (B0_SEQ_467[0]) that simply gets away.
     expect(draws).toBe(2);
     expect(sim.events).toContainEqual(
       expect.objectContaining({ type: 'error', text: 'Your bags are full.' }),
@@ -525,7 +544,7 @@ describe('fishing draw contract (pin 2, the bite-and-reel shape)', () => {
 
 describe('fishing proficiency accrual (pin 3)', () => {
   it('accrues +1 per landed catch (fish AND junk), 0 on no-bite, through the tick drain', () => {
-    const sim = makeSim(4242);
+    const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     let landed = 0;
     const kinds = new Set<string>();
@@ -544,7 +563,7 @@ describe('fishing proficiency accrual (pin 3)', () => {
         });
       }
     }
-    // Junk accrues exactly like fish: the seed 4242 run lands tangled_weed.
+    // Junk accrues exactly like fish: the seed 467 run lands tangled_weed.
     expect(kinds.has(WEED)).toBe(true);
     expect(landed).toBeGreaterThan(0);
     // Grants ride the gathering queue: nothing lands before the tick drain.
@@ -641,7 +660,7 @@ describe('fishing catch gain schedule (Professions 2.0)', () => {
   });
 
   it('live completeFishing queues the schedule amount: 0.5 per landed catch at proficiency 50', () => {
-    const sim = makeSim(4242);
+    const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     teleportToValeShore(sim);
     meta.gatheringProficiency.fishing = 50;
@@ -656,7 +675,7 @@ describe('fishing catch gain schedule (Professions 2.0)', () => {
     // No rod, so the band-1 proficiency silently caps to the band-0 table,
     // which still carries the weed row: junk-ness comes from the caught
     // item's def kind (ItemDef kind 'junk'), never from the band.
-    const sim = makeSim(4242);
+    const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     teleportToValeShore(sim);
     meta.gatheringProficiency.fishing = 150;
@@ -679,7 +698,7 @@ describe('fishing catch gain schedule (Professions 2.0)', () => {
         });
       }
     }
-    // Decisive only if the drive really saw both kinds (seed 4242's band-0
+    // Decisive only if the drive really saw both kinds (seed 467's band-0
     // walk lands both well inside 60 casts).
     expect(sawJunk).toBe(true);
     expect(sawFish).toBe(true);
@@ -817,17 +836,21 @@ describe('fishing table structure (pin 5)', () => {
     // Asserting WHERE they differ turns that from a comment into a test: a
     // reweight that collapsed band 1 onto band 2 would leave every toEqual
     // above green on identical arrays and prove nothing about band selection.
-    expect(B0_SEQ_4242.slice(0, 24)).not.toEqual(B1_SEQ_4242);
-    expect(B1_SEQ_4242).not.toEqual(B2_SEQ_4242);
-    expect(B0_SEQ_4242[0]).not.toBe(B1_SEQ_4242[0]);
-    expect(B1_SEQ_4242[10]).not.toBe(B2_SEQ_4242[10]);
-    // And index 10 is the ONLY cell where the two upper bands part, which is
-    // why every comment naming a different index is a defect rather than a
-    // harmless nit.
-    const differing = B1_SEQ_4242.map((v, i) => (v === B2_SEQ_4242[i] ? -1 : i)).filter(
+    expect(B0_SEQ_467).not.toEqual(B1_SEQ_467);
+    expect(B1_SEQ_467).not.toEqual(B2_SEQ_467);
+    expect(B0_SEQ_467[8]).not.toBe(B1_SEQ_467[8]);
+    expect(B1_SEQ_467[4]).not.toBe(B2_SEQ_467[4]);
+    // The EXACT divergence sets, so every comment naming an index is held to
+    // the recording rather than trusted: bands 0 and 1 part at 8, 10, and 13
+    // only; the two upper bands part at 4 and 5 only.
+    const differing01 = B0_SEQ_467.map((v, i) => (v === B1_SEQ_467[i] ? -1 : i)).filter(
       (i) => i >= 0,
     );
-    expect(differing).toEqual([10]);
+    expect(differing01).toEqual([8, 10, 13]);
+    const differing = B1_SEQ_467.map((v, i) => (v === B2_SEQ_467[i] ? -1 : i)).filter(
+      (i) => i >= 0,
+    );
+    expect(differing).toEqual([4, 5]);
   });
 
   it('FISHING_TABLES is the identical band-0 object (alias identity, not a copy)', () => {
@@ -847,8 +870,8 @@ describe('fishing table structure (pin 5)', () => {
 });
 
 describe('fishing band selection liveness (pin 6)', () => {
-  it('proficiency 150 resolves the band-1 Vale table: literal live-loop sequence at seed 4242', () => {
-    const sim = makeSim(4242);
+  it('proficiency 150 resolves the band-1 Vale table: literal live-loop sequence at seed 467', () => {
+    const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.fishing = 150;
     // Band 1 also needs the tier-2 rod in bags (the silent tool
@@ -857,23 +880,24 @@ describe('fishing band selection liveness (pin 6)', () => {
     // rod-independent given the band.
     sim.addItem('ironreel_fishing_rod', 1);
     teleportToValeShore(sim);
-    // B1_SEQ_4242 diverges from B0_SEQ_4242 at index 0 for the same rng
-    // stream, so this match proves the live path actually switched tables.
-    expect(catchSequenceLive(sim, meta, 24)).toEqual(B1_SEQ_4242);
+    // B1_SEQ_467 first diverges from B0_SEQ_467 at index 8 for the same rng
+    // stream, so this full-walk match proves the live path actually switched
+    // tables.
+    expect(catchSequenceLive(sim, meta, 30)).toEqual(B1_SEQ_467);
   });
 
-  it('proficiency 200 resolves the band-2 Vale table: literal live-loop sequence at seed 4242', () => {
-    const sim = makeSim(4242);
+  it('proficiency 200 resolves the band-2 Vale table: literal live-loop sequence at seed 467', () => {
+    const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.fishing = 200;
     // Band 2 needs the tier-3 rod (band b requires tool tier b + 1).
     sim.addItem('silverstream_fishing_rod', 1);
     teleportToValeShore(sim);
-    // Index 10 is the hunted band-discriminating cell (the koi here, where
-    // the band-1 table yields tangled weed; see the B2_SEQ_4242 derivation
-    // comment), so this match proves the live path resolved the TOP band,
-    // not a band-1 collapse.
-    expect(catchSequenceLive(sim, meta, 24)).toEqual(B2_SEQ_4242);
+    // Indices 4 and 5 are the hunted band-discriminating cells (the koi here,
+    // where the band-1 table yields the empty hook and tangled weed; see the
+    // B2_SEQ_467 derivation comment), so this match proves the live path
+    // resolved the TOP band, not a band-1 collapse.
+    expect(catchSequenceLive(sim, meta, 30)).toEqual(B2_SEQ_467);
   });
 });
 
@@ -886,7 +910,7 @@ describe('fishing band selection liveness (pin 6)', () => {
 // the denial pin below).
 describe('fishing band tool cap (Professions 2.0)', () => {
   it('proficiency 150 with only the pole (no rod) silently caps to the band-0 table (literal sequence)', () => {
-    const sim = makeSim(4242);
+    const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.fishing = 150;
     // The pole satisfies the implement gate (#2343) but is NOT a gatherTool,
@@ -894,51 +918,53 @@ describe('fishing band tool cap (Professions 2.0)', () => {
     // arm's intent, unchanged.
     sim.addItem('simple_fishing_pole', 1);
     teleportToValeShore(sim);
-    // B0 and B1 diverge at index 0 (perch vs trout) on this stream, so 12
-    // sessions are decisive: band-1 proficiency without a rod still walks
-    // the SHIPPED band-0 table, and nothing else changes (no error, no event).
-    expect(catchSequenceLive(sim, meta, 12)).toEqual(B0_SEQ_4242.slice(0, 12));
+    // B0 and B1 diverge at indices 8, 10, and 13 on this stream, so the
+    // full 30-session walk is decisive: band-1 proficiency without a rod
+    // still walks the SHIPPED band-0 table, and nothing else changes (no
+    // error, no event).
+    expect(catchSequenceLive(sim, meta, 30)).toEqual(B0_SEQ_467);
   });
 
   it('proficiency 250 with the tier-2 rod stays band 1: the discriminator cell yields weed', () => {
-    const sim = makeSim(4242);
+    const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.fishing = 250;
     sim.addItem('ironreel_fishing_rod', 1);
     teleportToValeShore(sim);
-    // Index 0 (trout, not band 0's perch) proves the walk left band 0; index
-    // 10 is the hunted band DISCRIMINATOR: that table draw lands where band 1
-    // yields tangled weed but band 2 yields the koi (the B2_SEQ_4242
-    // derivation comment), so the weed there proves the tier-2 rod held the
-    // walk at band 1 despite band-2 proficiency.
-    expect(catchSequenceLive(sim, meta, 24)).toEqual(B1_SEQ_4242);
+    // Index 8 (the koi, not band 0's empty hook) proves the walk left band 0;
+    // indices 4 and 5 are the hunted band DISCRIMINATORS: those table draws
+    // land where band 2 yields the koi but band 1 yields the empty hook and
+    // tangled weed (the B2_SEQ_467 derivation comment), so those cells prove
+    // the tier-2 rod held the walk at band 1 despite band-2 proficiency.
+    expect(catchSequenceLive(sim, meta, 30)).toEqual(B1_SEQ_467);
   });
 
   it('proficiency 250 with the tier-3 rod reaches band 2 (the full B2 literal)', () => {
-    const sim = makeSim(4242);
+    const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.fishing = 250;
     sim.addItem('silverstream_fishing_rod', 1);
     teleportToValeShore(sim);
-    expect(catchSequenceLive(sim, meta, 24)).toEqual(B2_SEQ_4242);
+    expect(catchSequenceLive(sim, meta, 30)).toEqual(B2_SEQ_467);
   });
 
   it('a high rod never buys bands: proficiency band 0 with the tier-3 rod stays band 0', () => {
-    const sim = makeSim(4242);
+    const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     // Proficiency 0 resolves band 0 while the silverstream rod allows band 2,
     // so the effective band must take the PROFICIENCY arm of min(profBand,
     // allowedBand): a fresh buyer of the 150c rod cannot fish the band-2
     // table. Every other cap test binds the rod arm or the equal case, so
     // this is the only guard against the min() collapsing to allowedBand
-    // alone. B0 diverges from B1/B2 at index 0, so 12 sessions are decisive.
+    // alone. B0 diverges from B2 at index 4 (the empty hook vs the koi), so
+    // 12 sessions are decisive.
     sim.addItem('silverstream_fishing_rod', 1);
     teleportToValeShore(sim);
-    expect(catchSequenceLive(sim, meta, 12)).toEqual(B0_SEQ_4242.slice(0, 12));
+    expect(catchSequenceLive(sim, meta, 12)).toEqual(B0_SEQ_467.slice(0, 12));
   });
 
   it('a pole-only proficiency-0 angler still reproduces the B0 literal walk exactly', () => {
-    const sim = makeSim(4242);
+    const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     // The pole keeps use: { type: 'fishing' }: it satisfies the implement
     // gate (#2343) but is not a gatherTool, so the bag scan floors to tier 1:
@@ -946,7 +972,7 @@ describe('fishing band tool cap (Professions 2.0)', () => {
     // match the B0 recording (made bare-handed, pre-gate) byte for byte.
     sim.addItem('simple_fishing_pole', 1);
     teleportToValeShore(sim);
-    expect(catchSequenceLive(sim, meta, 30)).toEqual(B0_SEQ_4242);
+    expect(catchSequenceLive(sim, meta, 30)).toEqual(B0_SEQ_467);
   });
 
   it('bare hands are denied at the cast: exactly one gatherDenied, zero draws, no session (#2343)', () => {
@@ -1018,7 +1044,7 @@ describe('fishing band tool cap (Professions 2.0)', () => {
     // interact range, so the click resolves to the text-free gatherToolNoNode
     // event (never a silent no-op), draws nothing, casts nothing, and keeps
     // the tool.
-    const sim = makeSim(4242);
+    const sim = makeSim(467);
     sim.addItem('copper_mining_pick', 1);
     sim.events = [];
     let draws = 0;
@@ -1059,11 +1085,11 @@ describe('fishing band tool cap (Professions 2.0)', () => {
 
 describe('fishingResult event (pin 7)', () => {
   it('a landed catch emits the text-free fishingResult alongside the item grant', () => {
-    const sim = makeSim(4242);
+    const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     sim.events = [];
     const { caught, events } = castOnce(sim, meta);
-    expect(caught).toBe(PERCH); // B0_SEQ_4242[0]
+    expect(caught).toBe(PERCH); // the first shared-stream table draw at seed 467
     const results = fishingResultsIn(events);
     expect(results).toHaveLength(1);
     // Exact shape: ids plus values only (the gatherResult precedent), so a
@@ -1107,8 +1133,8 @@ describe('fishingResult event (pin 7)', () => {
         if (caught === KOI) koiEvent = results[0];
       }
     }
-    // The seed 4242 band-2 run covers all three arms: koi at 16, weed at 22,
-    // empty hook at 31.
+    // The seed 4242 band-2 run covers all three arms (re-recorded on the
+    // v0.32.0 release merge): the empty hook at 1, weed at 3, the koi at 25.
     expect(sawNoBite).toBe(true);
     expect(weedEvent?.quality).toBe('poor');
     expect(koiEvent?.quality).toBe('uncommon');
@@ -1134,7 +1160,11 @@ describe('landed-catch grant flags (pin 11)', () => {
     const meta = sim.meta(sim.playerId)!;
     sim.events = [];
     const { caught, events } = castOnce(sim, meta);
-    expect(caught).toBe(PERCH); // B0_SEQ_4242[0], so this is never a no-bite
+    // Seed 4242's first band-0 cast, re-recorded at the origin/main base merge
+    // (the merged content moves the shared rng before the cast). Pinned to the
+    // fish rather than "not null" so the case still proves a real catch landed,
+    // which is what makes the grant flags below meaningful.
+    expect(caught).toBe(TROUT);
     const loot = lootIn(events);
     expect(loot).toHaveLength(1);
     expect(loot[0].silent).toBe(true);
@@ -1183,7 +1213,7 @@ describe('landed-catch grant flags (pin 11)', () => {
 
 describe('fishing deeds through the extracted module path (pin 9)', () => {
   it('a landed real fish via completeFishing still marks fish:<zone>', () => {
-    const sim = makeSim(4242);
+    const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     expect(meta.deedStats.visited.has('fish:eastbrook_vale')).toBe(false);
     const { caught } = castOnce(sim, meta);
@@ -1199,7 +1229,7 @@ describe('fishing deeds through the extracted module path (pin 9)', () => {
     // gathering amount 1) is now also satisfied by a first landed fishing
     // catch, without ever touching a world node: fishing is a full gathering
     // proficiency, and the deed trigger counts any profession at 1 or more.
-    const sim = makeSim(4242);
+    const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     sim.ctx.markDeedsDirty(meta.entityId);
     sim.tick();
@@ -1215,7 +1245,7 @@ describe('fishing deeds through the extracted module path (pin 9)', () => {
   it('ACCEPTED DRIFT (documented semantic): prog_master_gatherer counts fishing', () => {
     // The three-at-100 trigger counts EVERY gathering profession, so
     // mining + logging + fishing at 100 completes it without herbalism.
-    const sim = makeSim(4242);
+    const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.mining = 100;
     meta.gatheringProficiency.logging = 100;
@@ -1239,10 +1269,10 @@ describe('fishing deeds through the extracted module path (pin 9)', () => {
     meta.gatheringProficiency.fishing = 200;
     sim.addItem('silverstream_fishing_rod', 1);
     let koiAt = -1;
-    for (let i = 0; i < 17; i++) {
+    for (let i = 0; i < 26; i++) {
       if (castOnce(sim, meta).caught === KOI) koiAt = i;
     }
-    expect(koiAt).toBe(16);
+    expect(koiAt).toBe(25);
     expect(sim.events).toContainEqual(
       expect.objectContaining({
         type: 'log',
@@ -1262,7 +1292,7 @@ describe('startFishing arms through the extracted module path (pin 10)', () => {
     // the #2343 implement gate (which would otherwise emit gatherDenied).
     // The implement arm itself is text-free and pinned in the band tool cap
     // suite's bare-hands denial test.
-    const sim = makeSim(4242);
+    const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     const denyCase = (mutate: () => void, restore: () => void, text: string) => {
       mutate();
@@ -1336,7 +1366,7 @@ describe('startFishing arms through the extracted module path (pin 10)', () => {
   });
 
   it('facing the vale lake starts the capped session and draws exactly the one bite delay', () => {
-    const sim = makeSim(4242);
+    const sim = makeSim(467);
     const meta = sim.meta(sim.playerId)!;
     teleportToValeShore(sim);
     sim.addItem('simple_fishing_pole', 1); // the implement gate (#2343); draw-free, tier stays 1

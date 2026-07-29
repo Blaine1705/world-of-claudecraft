@@ -26,7 +26,12 @@ import {
   GATHER_NODE_TYPES,
   GATHER_NODES,
   MOBS,
+  STRIP_MAX_X,
+  STRIP_MIN_X,
   WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_X,
+  WORLD_MIN_Z,
   ZONES,
   zoneAt,
 } from '../src/sim/data';
@@ -41,6 +46,7 @@ import {
   isInWaterBody,
   nearSteepWalls,
   roadDistance,
+  SEALED_BORDERS,
   terrainHeight,
   terrainSteepness,
   terrainSteepnessAt,
@@ -281,12 +287,34 @@ function cellKey(x: number, z: number): string {
   return `${Math.round(x / FLOOD_CELL)},${Math.round(z / FLOOD_CELL)}`;
 }
 
+// The hub CENTRE is not guaranteed walkable: several expansion hubs seat a
+// structure on the exact centre (Eldergleam's great tree, the Wyrmwatch
+// brazier, Icemantle's hearth), and a player gathers from the plaza around
+// it. The flood therefore starts from the nearest passable cell inside the
+// hub circle; a hub with NO passable cell at all would return the centre and
+// flood nothing, which the reachability arm below then reports node by node.
+function hubFloodStart(zone: (typeof ZONES)[number]): { x: number; z: number } {
+  const { x, z } = zone.hub;
+  if (cellPassable(x, z)) return { x, z };
+  const radius = zone.hub.radius ?? 30;
+  for (let ring = FLOOD_CELL; ring <= radius; ring += FLOOD_CELL) {
+    for (let dx = -ring; dx <= ring; dx += FLOOD_CELL) {
+      for (let dz = -ring; dz <= ring; dz += FLOOD_CELL) {
+        if (Math.max(Math.abs(dx), Math.abs(dz)) !== ring) continue;
+        if (cellPassable(x + dx, z + dz)) return { x: x + dx, z: z + dz };
+      }
+    }
+  }
+  return { x, z };
+}
+
 // Reachability floods are the one expensive thing here, so run each zone's once
 // and share it across the arms that need it.
 const reachedByZone = new Map<string, Set<string>>();
 for (const zone of ZONES) {
   const nodes = GATHER_NODES.filter((n) => n.zoneId === zone.id).map((n) => n.pos);
-  reachedByZone.set(zone.id, floodFrom(zone.hub, boxAround([zone.hub, ...nodes])));
+  const start = hubFloodStart(zone);
+  reachedByZone.set(zone.id, floodFrom(start, boxAround([start, ...nodes])));
 }
 
 // Named points used as counter-examples below. Every one is measured, not
@@ -294,7 +322,28 @@ for (const zone of ZONES) {
 // an arm can never pass because its counter-example quietly stopped being one.
 const ON_MIRROR_LAKE_FLOOR = { x: -86, z: 90 }; // where herb_eastbrook_1 used to sit
 const IN_GLIMMERMERE_SHALLOWS = { x: -55, z: 765 }; // where wood_thornpeak_1 used to sit
-const ON_EAST_RIM_WALL = { x: 165, z: 0 };
+// The deliberate-geometry screens the slope arm applies to every node. Since
+// v0.32.0 nearSteepWalls paints a broad ADVISORY band around every border
+// (world.ts: the border hills are "never a hard wall", and legitimate gather
+// ground sits inside the 4-sigma band), so the screen is the two shapes a
+// player genuinely cannot work: the world-rim margin and a sealed border
+// crest (crossesSealedBorder is a hard movement wall; 48 is
+// SEALED_RIDGE_SIGMA * 4, the crest's own relief band).
+function againstWorldRim(x: number, z: number): boolean {
+  return (
+    x <= WORLD_MIN_X + 40 || x >= WORLD_MAX_X - 40 || z <= WORLD_MIN_Z + 40 || z >= WORLD_MAX_Z - 40
+  );
+}
+function onSealedCrest(x: number, z: number): boolean {
+  return SEALED_BORDERS.some((b) => x >= b.lo && x <= b.hi && Math.abs(z - b.at) < 48);
+}
+
+// The pre-expansion fixture here was the east rim wall at (165,0); the
+// v0.32.0 world fades the rim into flat, REACHABLE staging ground, so the
+// wall counter-example moved to a Great Maze terrain-wall corner, which is
+// steep, wall-banded, and encloses its own standable foot away from the
+// zone flood (measured: steepness 4.59, spot (-231.5,452.0) unreached).
+const ON_MAZE_WALL_POCKET = { x: -232, z: 452 };
 const ON_SOWFIELD_STAND = { x: -41, z: -137 }; // groundHeight adds the stand lift here
 const INSIDE_A_TOWN_COLLIDER = { x: -29, z: 0 };
 // Genuinely enclosed, not merely overlapping: the nearest ground a player
@@ -356,18 +405,26 @@ describe('gather node placement: every node sits on ground a player can work', (
         steepestInReach(x, z),
         `${node.id} at (${x},${z}) has a cliff inside its ${REACH}yd harvest reach`,
       ).toBeLessThanOrEqual(PLAYER_MAX_CLIMB_SLOPE);
-      expect(
-        nearSteepWalls(x, z),
-        `${node.id} at (${x},${z}) sits in a deliberate wall band (zone ridge or world rim)`,
-      ).toBe(false);
+      expect(againstWorldRim(x, z), `${node.id} at (${x},${z}) sits against the world rim`).toBe(
+        false,
+      );
+      expect(onSealedCrest(x, z), `${node.id} at (${x},${z}) sits on a sealed border crest`).toBe(
+        false,
+      );
     }
   });
 
-  it('the slope arm rejects the rim wall and the reach sweep rejects a wall in range', () => {
-    expect(terrainSteepness(ON_EAST_RIM_WALL.x, ON_EAST_RIM_WALL.z, WORLD_SEED)).toBeGreaterThan(
-      PLAYER_MAX_CLIMB_SLOPE,
-    );
-    expect(nearSteepWalls(ON_EAST_RIM_WALL.x, ON_EAST_RIM_WALL.z)).toBe(true);
+  it('the slope arm rejects the maze wall and the reach sweep rejects a wall in range', () => {
+    expect(
+      terrainSteepness(ON_MAZE_WALL_POCKET.x, ON_MAZE_WALL_POCKET.z, WORLD_SEED),
+    ).toBeGreaterThan(PLAYER_MAX_CLIMB_SLOPE);
+    // The rim and sealed-crest screens have live fixtures: a point inside the
+    // rim margin, and the midpoint of a shipped sealed crest, both rejected
+    // by the exact predicates the node sweep runs.
+    expect(againstWorldRim(WORLD_MAX_X - 10, 0)).toBe(true);
+    expect(SEALED_BORDERS.length).toBeGreaterThan(0);
+    const crest = SEALED_BORDERS[0];
+    expect(onSealedCrest((crest.lo + crest.hi) / 2, crest.at)).toBe(true);
     // The reach sweep on its own: walkable at the point, cliff within reach.
     expect(
       terrainSteepness(IN_GLIMMERMERE_SHALLOWS.x, IN_GLIMMERMERE_SHALLOWS.z, WORLD_SEED),
@@ -467,14 +524,14 @@ describe('gather node placement: every node sits on ground a player can work', (
 
   it('the stand-spot arm rejects a standable spot that is walled off', () => {
     // The other half of that arm, which the lake floor cannot exercise: it
-    // returns null before the reachability leg is ever consulted. On the rim
+    // returns null before the reachability leg is ever consulted. At the maze
     // wall a spot IS standable, and the leg is the only thing that rejects it.
     // Floods its own box containing the point, because the Eastbrook box stops
     // near x = -12 and using it would pass for being out of bounds instead.
-    const spot = nearestStandSpot(ON_EAST_RIM_WALL.x, ON_EAST_RIM_WALL.z);
-    expect(spot, 'the rim fixture must be standable, or it proves nothing').not.toBeNull();
+    const spot = nearestStandSpot(ON_MAZE_WALL_POCKET.x, ON_MAZE_WALL_POCKET.z);
+    expect(spot, 'the maze fixture must be standable, or it proves nothing').not.toBeNull();
     if (!spot) return;
-    const box = boxAround([ZONES[0].hub, ON_EAST_RIM_WALL]);
+    const box = boxAround([ZONES[0].hub, ON_MAZE_WALL_POCKET]);
     const reached = floodFrom(ZONES[0].hub, box);
     expect(reached.has(cellKey(spot.x, spot.z))).toBe(false);
   });
@@ -490,20 +547,21 @@ describe('gather node placement: every node sits on ground a player can work', (
     }
   });
 
-  it('the reachability arm rejects a point walled off behind the world rim', () => {
+  it('the reachability arm rejects a point walled off in the maze pocket', () => {
     const hub = ZONES[0].hub;
-    // Flood a box that deliberately CONTAINS the rim point, so failing to reach
-    // it is the wall's doing and not the bounding box's.
-    const box = boxAround([hub, ON_EAST_RIM_WALL]);
-    expect(ON_EAST_RIM_WALL.x).toBeLessThanOrEqual(box.xMax);
-    expect(ON_EAST_RIM_WALL.z).toBeLessThanOrEqual(box.zMax);
-    expect(ON_EAST_RIM_WALL.z).toBeGreaterThanOrEqual(box.zMin);
+    // Flood a box that deliberately CONTAINS the maze point, so failing to
+    // reach it is the wall's doing and not the bounding box's.
+    const box = boxAround([hub, ON_MAZE_WALL_POCKET]);
+    expect(ON_MAZE_WALL_POCKET.x).toBeLessThanOrEqual(box.xMax);
+    expect(ON_MAZE_WALL_POCKET.z).toBeLessThanOrEqual(box.zMax);
+    expect(ON_MAZE_WALL_POCKET.z).toBeGreaterThanOrEqual(box.zMin);
     const reached = floodFrom(hub, box);
     // NOT the hub cell: floodFrom seeds that unconditionally, so asserting it
     // would hold for a flood that spread nowhere at all. A cell 100 yards out
+    // (west, INSIDE this box; the box's east edge sits at the hub margin)
     // proves the flood actually travelled before the wall stopped it.
-    expect(reached.has(cellKey(100, 0))).toBe(true);
-    expect(reached.has(cellKey(ON_EAST_RIM_WALL.x, ON_EAST_RIM_WALL.z))).toBe(false);
+    expect(reached.has(cellKey(-100, 0))).toBe(true);
+    expect(reached.has(cellKey(ON_MAZE_WALL_POCKET.x, ON_MAZE_WALL_POCKET.z))).toBe(false);
   });
 
   it('zone containment: a node resolves to the zone whose material it grants', () => {
@@ -515,7 +573,7 @@ describe('gather node placement: every node sits on ground a player can work', (
     // boundary passes there and is mis-zoned here.
     for (const node of GATHER_NODES) {
       expect(
-        zoneAt(node.pos.z).id,
+        zoneAt(node.pos.x, node.pos.z).id,
         `${node.id} at z=${node.pos.z} claims ${node.zoneId} but stands in another zone`,
       ).toBe(node.zoneId);
       expect(
@@ -532,7 +590,7 @@ describe('gather node placement: every node sits on ground a player can work', (
     // hands it to the next band, which is precisely the mis-zoned yield case.
     const boundary = eastbrook.zMax;
     expect(boundary >= eastbrook.zMin && boundary <= eastbrook.zMax).toBe(true);
-    expect(zoneAt(boundary).id).not.toBe(eastbrook.id);
+    expect(zoneAt(0, boundary).id).not.toBe(eastbrook.id);
   });
 
   it('minimum spacing: no two nodes collapse into one harvest reach', () => {
@@ -574,6 +632,24 @@ describe('gather node placement: every node sits on ground a player can work', (
     expect(tightest, `tightest pair ${pair}`).toBeLessThan(INTERACT_RANGE + 1);
   });
 
+  // The circuit-design arms below (count floors, spatial coverage, the road
+  // exemption set, the harvest ceiling) audit the packet's TUNED zone set:
+  // the original strip, whose node circuits phases 8 to 10 rebuilt against
+  // these exact floors. The v0.32.0 expansion zones deliberately ship two
+  // hub-outskirt starter nodes per profession (see gather_nodes.ts), a
+  // different and thinner design authored before these floors existed;
+  // integrating them into the tier ladder and these floors is phase 13 work
+  // (docs/design/professions-tuning-packet-review.md), so sweeping them here
+  // would fail content this packet has not tuned yet. The PHYSICAL arms above
+  // (dry land, slope, colliders, stand spots, hub reachability) stay
+  // world-wide: unworkable ground is a defect no matter which release
+  // authored it.
+  const TUNED_ZONE_IDS = ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights'] as const;
+  const TUNED_ZONES = ZONES.filter((zn) => (TUNED_ZONE_IDS as readonly string[]).includes(zn.id));
+  it('the tuned-zone scope names real zones, in strip order', () => {
+    expect(TUNED_ZONES.map((zn) => zn.id)).toEqual([...TUNED_ZONE_IDS]);
+  });
+
   it('count floor: every zone keeps every gathering profession worth visiting', () => {
     // A relocation must never be allowed to drain a zone of a type (moving a node
     // across a band boundary would), and the count itself is the density the
@@ -589,7 +665,7 @@ describe('gather node placement: every node sits on ground a player can work', (
     // but only two of them are tier 1, so a total-only floor would still pass a
     // relocation that drained the zone's last tier-1 node and left a traveller
     // holding a starter tool with nothing it can work. Hence the second floor.
-    for (const zone of ZONES) {
+    for (const zone of TUNED_ZONES) {
       for (const type of GATHER_NODE_TYPES) {
         const ofType = GATHER_NODES.filter((n) => n.zoneId === zone.id && n.type === type);
         expect(
@@ -610,7 +686,7 @@ describe('gather node placement: every node sits on ground a player can work', (
     // either could hold purely because every zone ships far more than the floor.
     let leanestTotal = Number.POSITIVE_INFINITY;
     let leanestTier1 = Number.POSITIVE_INFINITY;
-    for (const zone of ZONES) {
+    for (const zone of TUNED_ZONES) {
       for (const type of GATHER_NODE_TYPES) {
         const ofType = GATHER_NODES.filter((n) => n.zoneId === zone.id && n.type === type);
         leanestTotal = Math.min(leanestTotal, ofType.length);
@@ -662,7 +738,15 @@ describe('gather node placement: every node sits on ground a player can work', (
     // the zone that will notice first, and the message names the measured figure
     // so the next reader can tell a drained zone from a resized denominator.
     const COVERAGE_RADIUS = 40;
-    const COVERAGE_FLOOR_PCT = 40;
+    // 35 since the v0.32.0 merge, was 40: the release fades the strip's rim
+    // mountains into flat, walkable staging ground, which grows every tuned
+    // zone's walkable-and-dry denominator by roughly a tenth without moving a
+    // node (Eastbrook re-measured at 37.3 against the same circuit that
+    // measured 40.6 pre-fade). The rule is unchanged (below the mob-camp
+    // density, slack-bounded below); only the calibration input resized,
+    // which is exactly the denominator caveat in the prose above. Phase 13's
+    // expansion-zone integration re-measures both numbers.
+    const COVERAGE_FLOOR_PCT = 35;
 
     /** Fraction of `cells` within COVERAGE_RADIUS of any of `centres`, as a percent. */
     const reachPct = (
@@ -680,19 +764,28 @@ describe('gather node placement: every node sits on ground a player can work', (
     let worldNodeHits = 0;
     let worldCampHits = 0;
     let leanest = Number.POSITIVE_INFINITY;
-    for (const zone of ZONES) {
+    for (const zone of TUNED_ZONES) {
       // Walkable-and-dry ground on a 2-yard lattice: the same two predicates the
       // arms above hold a node to, so "walkable ground" means one thing in this
       // file. Coarser than the reach sweeps because this is a whole-zone area
       // integral, not a per-node screen.
       const cells: { x: number; z: number }[] = [];
-      for (let x = -WORLD_MAX_X; x <= WORLD_MAX_X; x += 2) {
+      // The zone's own authored rect, NOT zoneAt membership: beyond the strip
+      // the southmost-band FALLBACK arm of zoneAt claims the open staging
+      // ground out to the world rim for whichever band it overhangs, and that
+      // ground is not circuit territory. The tuned zones are strip bands, so
+      // the rect is the strip's own width.
+      const rectX0 = zone.xMin ?? STRIP_MIN_X;
+      const rectX1 = zone.xMax ?? STRIP_MAX_X;
+      for (let x = rectX0; x <= rectX1; x += 2) {
         for (let z = zone.zMin; z <= zone.zMax; z += 2) {
           if (canStand(x, z) && isDryLand(x, z)) cells.push({ x, z });
         }
       }
       const nodes = GATHER_NODES.filter((n) => n.zoneId === zone.id).map((n) => n.pos);
-      const camps = CAMPS.filter((c) => zoneAt(c.center.z).id === zone.id).map((c) => c.center);
+      const camps = CAMPS.filter((c) => zoneAt(c.center.x, c.center.z).id === zone.id).map(
+        (c) => c.center,
+      );
       const nodePct = reachPct(cells, nodes);
       expect(
         nodePct,
@@ -714,7 +807,8 @@ describe('gather node placement: every node sits on ground a player can work', (
     );
 
     // And the relationship the floor was chosen against, pinned rather than
-    // asserted in prose: gathering is laid out less thickly than combat is.
+    // asserted in prose: gathering is laid out less thickly than combat is
+    // (measured across the tuned zones, the same scope as the floor).
     const worldNodePct = (worldNodeHits / worldCells) * 100;
     const worldCampPct = (worldCampHits / worldCells) * 100;
     expect(
@@ -746,7 +840,9 @@ describe('gather node placement: every node sits on ground a player can work', (
     );
     const starting = ZONES[0];
     expect(starting.id).toBe('eastbrook_vale');
-    const startingRares = rares.filter((camp) => zoneAt(camp.center.z).id === starting.id);
+    const startingRares = rares.filter(
+      (camp) => zoneAt(camp.center.x, camp.center.z).id === starting.id,
+    );
     expect(
       startingRares.length,
       'no rare elite in the starting zone, so this arm proves nothing',
@@ -776,7 +872,11 @@ describe('gather node placement: every node sits on ground a player can work', (
     // clearance rule; it is the record of who is exempt from one.
     // wood_mirefen_t2 left this set when R11 moved it off the road surface: it
     // was the one member whose exemption recorded a defect, not a decision.
-    const inBand = GATHER_NODES.filter((n) => roadDistance(n.pos.x, n.pos.z) < 5)
+    const inBand = GATHER_NODES.filter(
+      (n) =>
+        (TUNED_ZONE_IDS as readonly string[]).includes(n.zoneId) &&
+        roadDistance(n.pos.x, n.pos.z) < 5,
+    )
       .map((n) => n.id)
       .sort();
     expect(inBand).toEqual([
@@ -832,7 +932,7 @@ describe('gather node placement: every node sits on ground a player can work', (
     // but nothing named it, so tuning either lever alone would leave both of those
     // pins green while the ceiling moved.
     const perHour = (nodes: number) => (nodes * 3600) / NODE_HARVEST_TABLE.ore.respawnSeconds;
-    const ceilings = ZONES.map((zone) =>
+    const ceilings = TUNED_ZONES.map((zone) =>
       perHour(GATHER_NODES.filter((n) => n.zoneId === zone.id).length),
     );
     expect(new Set(ceilings).size, `zone ceilings differ: ${ceilings.join(', ')}`).toBe(1);

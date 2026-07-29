@@ -33,6 +33,8 @@ import { formatMoney } from './format_money';
 import { moveStackToCell } from './inventory_order';
 import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
+import { mountOwned, summonMountItem } from './mounts';
+import { learnRiding } from './mounts_training';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import { useGatherToolItem } from './professions/gathering';
 import type { ItemUseResult, PlayerMeta } from './sim';
@@ -620,6 +622,12 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     equipItem(ctx, itemId, meta.entityId);
   } else if (def.kind === 'bag') {
     equipBagCmd(ctx, itemId, undefined, meta.entityId);
+  } else if (def.kind === 'mount') {
+    // Reins work like any other usable item: clicking them (bags or an action-bar
+    // slot) summons THAT mount. summonMountItem owns every gate, riding skill
+    // first. Reins are never consumed: mountOwned() derives ownership from holding
+    // the item, so removing it here would delete the mount.
+    summonMountItem(ctx, meta.entityId, def.mount);
   }
 }
 
@@ -663,6 +671,31 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
   if (dist2d(p.pos, npc.pos) > INTERACT_RANGE + 2) {
     ctx.error(meta.entityId, 'Too far away.');
     return;
+  }
+  // Riding Training (the stablemaster's service entry): buying it delegates to
+  // learnRiding, which owns every gate (already trained, level 20, the 80g fee,
+  // trainer identity, range) and never puts an item in the bags.
+  if (def.teachesRiding) {
+    learnRiding(ctx, npcId, pid);
+    return;
+  }
+  // Mount purchase gates (the stablemaster's reins): a riding-skill requirement
+  // (ridingTrained, purchased from Marla for 80g), a hard level-20 gate, and a
+  // one-per-account ownership check (owning the reins item IS owning the mount).
+  // Placed after the vendor stock/price checks, before payment.
+  if (def.kind === 'mount') {
+    if (!meta.ridingTrained) {
+      ctx.error(meta.entityId, 'You must learn to ride first. Find a riding trainer.');
+      return;
+    }
+    if (p.level < 20) {
+      ctx.error(meta.entityId, 'You must be level 20 to buy a mount.');
+      return;
+    }
+    if (mountOwned(meta, def.mount)) {
+      ctx.error(meta.entityId, 'You already own that mount.');
+      return;
+    }
   }
   // Vendor row gates (content/vendor_row_gates.ts): the authoritative half of
   // the same resolver the vendor window renders its locked rows from, so the
