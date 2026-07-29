@@ -2239,6 +2239,27 @@ export const DEEDS: Record<string, DeedDef> = {
       count: 1,
     },
   },
+  // The zone-3 rung of the per-zone gatherer chronicle line (R21): the
+  // gather:thornpeak_heights:* marks have been written by completeGatherCast
+  // since the t3 veins shipped, with no consumer until this deed. Unlike its
+  // vale and marsh siblings it is NOT a chapter prerequisite: the peaks
+  // chapter deedIds were already shipped, and shipped triggers are frozen
+  // (authoring rule 9), so this deed stands alone.
+  chr_peaks_gatherer: {
+    id: 'chr_peaks_gatherer',
+    name: 'Harvest of the Heights',
+    desc: 'Harvest an ore vein, a wood stand, and an herb patch in Thornpeak Heights.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: [
+        'gather:thornpeak_heights:ore',
+        'gather:thornpeak_heights:wood',
+        'gather:thornpeak_heights:herb',
+      ],
+    },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

@@ -4684,6 +4684,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "dungeon",
     "renown": 10,
     "feat": false
+  },
+  {
+    "id": "chr_peaks_gatherer",
+    "name": "Harvest of the Heights",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
   }
 ];
 

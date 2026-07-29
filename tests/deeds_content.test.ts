@@ -56,9 +56,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 221 deeds worth 2730 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(221);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2730);
+  it('ships exactly 222 deeds worth 2735 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(222);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2735);
   });
 
   it('ships the audited per-category counts', () => {
@@ -69,7 +69,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       combat: 10,
       dungeon: 29,
       delve: 13,
-      chronicle: 24,
+      chronicle: 25,
       collection: 28,
       pvp: 28,
       social: 18,
@@ -122,6 +122,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // Professions 2.0 tail (the release base merge put that tail first).
       'dgn_wildheart_basin',
       'dgn_wildheart_basin_heroic',
+      // The zone-3 gatherer chronicle (R21) closes the per-zone gatherer
+      // line; its marks had been written unconsumed since the t3 veins.
+      'chr_peaks_gatherer',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -329,7 +332,9 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Re-baselined at the release/v0.30.0 base merge: the catalog appends the
   // Wildheart Basin dungeon deed pair (2 new deeds); no shipped
   // trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = '7e6b910bfc0b7a9a4635d7df67ee6c22691edb583a8bb59355d8a5063568ee75';
+  // Re-baselined for the zone-3 gatherer chronicle (chr_peaks_gatherer, R21):
+  // one appended deed; no shipped trigger or renown changed.
+  const FROZEN_CATALOG_SHA256 = '145c69e8b0ac107defe1fdfd8e0797129a1524d1d4c7ff0030b77af9d11ef495';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -471,7 +476,7 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_wildheart_basin_heroic');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('chr_peaks_gatherer');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
