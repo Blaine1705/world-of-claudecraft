@@ -503,12 +503,13 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   // an interrupted cast never completed, so its queued follow-up is dropped too
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
-  // Hidden per-cast fishing/gather state: unconditional inert writes (all four
+  // Hidden per-cast fishing/gather state: unconditional inert writes (all five
   // are already '' / 0 on every non-fishing/gather cancel path), so every
   // existing cancel stays byte-identical while a cancelled gather or fishing
-  // cast can never leak a stale node id, bite deadline, or pinned zone into
-  // a later cast.
+  // cast can never leak a stale node id, start-time tool rarity, bite
+  // deadline, or pinned zone into a later cast.
   p.gatherCastNodeId = '';
+  p.gatherCastToolRarity = '';
   p.fishBiteAtTick = 0;
   p.fishReelDeadlineTick = 0;
   p.fishCastZoneId = '';

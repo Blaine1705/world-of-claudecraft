@@ -1205,6 +1205,7 @@ function blankEntity(id: number): Entity {
     castTargetId: null,
     castAim: null,
     gatherCastNodeId: '',
+    gatherCastToolRarity: '',
     fishBiteAtTick: 0,
     fishReelDeadlineTick: 0,
     fishCastZoneId: '',

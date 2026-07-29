@@ -31,9 +31,10 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   material AND a vein carrying that tier; substitution runs downward only.
 - `fishing.ts`: the fourth gathering row (bite delay, reel window,
   `FISHING_TABLES_BY_BAND`); the TWO sessions' hidden per-cast state lives in
-  four transient Entity fields (`gatherCastNodeId` for the gather cast;
-  `fishBiteAtTick`, `fishReelDeadlineTick`, `fishCastZoneId` for fishing),
-  never wired, never persisted.
+  five transient Entity fields (`gatherCastNodeId` and `gatherCastToolRarity`
+  for the gather cast; `fishBiteAtTick`, `fishReelDeadlineTick`,
+  `fishCastZoneId` for fishing), never wired, never persisted, all cleared
+  together on every cast exit path.
 - `session_teardown.ts`: the ONE displacement cancel for a live gather or
   fishing session (`cancelProfessionSessionOnDisplacement`), called from every
   hard-displacement site: the sim and server teleport paths, the Vale Cup

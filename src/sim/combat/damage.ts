@@ -1064,6 +1064,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   // being 0/'' at every sampled frame outside a live cast; cancelCast owns the
   // ordinary cancel paths, but a lethal non-hit tick reaches death directly).
   e.gatherCastNodeId = '';
+  e.gatherCastToolRarity = '';
   e.fishBiteAtTick = 0;
   e.fishReelDeadlineTick = 0;
   e.fishCastZoneId = '';

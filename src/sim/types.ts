@@ -3238,6 +3238,17 @@ export interface Entity extends ClientMirroredEntityFields {
   // fields only), so the bite timing stays server-hidden.
   /** Node id a running gather cast resolves against at completion ('' = none). */
   gatherCastNodeId: string;
+  /**
+   * Rarity of the best matching-profession tool owned when the running
+   * gather cast STARTED, captured only when the profession had a tool-effect
+   * slot ('' otherwise, and between casts). The R47 use-time ratchet latches
+   * the slot's price ceiling off BOTH ends of the cast (this capture and the
+   * completion-time bag scan), so handing the good tool away mid-cast cannot
+   * take the bonus while dodging the price rung. Cleared wherever
+   * `gatherCastNodeId` clears; inert ('') at rest so it stays out of every
+   * at-rest parity sample.
+   */
+  gatherCastToolRarity: ItemDef['quality'] | '';
   /** Hidden seeded sim tick the fishing bite fires on (0 = no pending bite). */
   fishBiteAtTick: number;
   /** Sim-tick deadline for the fishing reel re-press (0 = window not armed). */

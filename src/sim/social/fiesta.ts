@@ -305,6 +305,7 @@ export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | nu
   // Hidden per-cast state ends with the cast it belongs to (the
   // parity samplers rely on inert values outside a live cast).
   e.gatherCastNodeId = '';
+  e.gatherCastToolRarity = '';
   e.fishBiteAtTick = 0;
   e.fishReelDeadlineTick = 0;
   e.fishCastZoneId = '';

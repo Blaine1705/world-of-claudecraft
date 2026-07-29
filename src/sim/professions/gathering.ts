@@ -621,6 +621,16 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
   p.castTargetId = null;
   p.channeling = false;
   p.gatherCastNodeId = node.id;
+  // The R47 use-time capture: remember the best matching-profession tool
+  // rarity at CAST START when this profession carries a tool-effect slot, so
+  // the completion-time ratchet latches off BOTH ends of the cast. Trade has
+  // no casting gate (deliberately), so without this a mid-cast handoff could
+  // take the bonus while dodging the price rung. '' when no slot exists,
+  // which keeps the field inert for every slot-less gather cast (and every
+  // existing parity frame byte-identical). Pure bag scan, draw-free.
+  p.gatherCastToolRarity = meta.toolEffectSlots?.[professionId]
+    ? (bestOwnedGatherToolFor(meta.inventory, professionId, ITEMS).rarity ?? '')
+    : '';
   // Drop any GCD-held queued spell press: a session's end paths never call
   // fireQueuedCast, so a slot that survived into the session would fire
   // unprompted one tick after it ends (updateCasting's retry arm).
@@ -701,6 +711,10 @@ export function useGatherToolItem(
 export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   const nodeId = p.gatherCastNodeId;
   p.gatherCastNodeId = '';
+  // The R47 cast-start rarity capture (harvestNode): read and reset beside
+  // the node id, so the field is inert again whatever arm returns below.
+  const startToolRarity = p.gatherCastToolRarity;
+  p.gatherCastToolRarity = '';
   const node = gatherNodeById(nodeId);
   // Defensive: the id was validated at cast start and content is static.
   if (!node) return;
@@ -801,10 +815,15 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
   //
   // The R47 use-time ratchet settles here too, on EVERY applied use (mattered
   // or not): taking the bonus alongside a better owned tool is what latches
-  // the slot's price ceiling, and node access forces the tool to be CARRIED,
-  // so a slot minted cheap with the good pick stashed re-prices itself on
-  // its first real harvest. One extra bag scan on the effect-bearing path
-  // only, draw-free.
+  // the slot's price ceiling. It reads BOTH ends of the cast, the completion
+  // bags and the cast-start capture (harvestNode), because trade has no
+  // casting gate: a mid-cast handoff could otherwise fire the bonus with the
+  // good pick already gone and dodge the latch (the completion-only read
+  // once claimed "node access forces the tool to be CARRIED", which is true
+  // only at cast start). So a slot minted cheap with the good pick stashed
+  // re-prices itself on its first bonus-bearing harvest, handoff or not.
+  // Raise-only and idempotent, so the pair is exactly max(start, completion).
+  // One extra bag scan on the effect-bearing path only, draw-free.
   if (result.effectApplied) {
     const usedSlot = usableToolEffectSlot(meta, professionId, node);
     if (usedSlot) {
@@ -812,6 +831,7 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
         usedSlot,
         bestOwnedGatherToolFor(meta.inventory, professionId, ITEMS).rarity,
       );
+      if (startToolRarity !== '') ratchetCeilingForUse(usedSlot, startToolRarity);
     }
     const mattered = itemId !== result.baseItemId || grantedQty > (result.baseQty ?? qty);
     if (mattered) depleteEffect(usedSlot);

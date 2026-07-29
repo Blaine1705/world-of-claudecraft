@@ -1251,7 +1251,15 @@ describe('fine material grades on the live harvest path', () => {
     const STARTER = 'ore_veiled_hollow_1';
     teleportOntoNode(sim, pid, STARTER);
     const before = sim.countItem('thorium_ore', pid);
+    // The two-draw contract holds on the quantity-mattered arm too, so the
+    // R42 settle family is draw-count-pinned in every direction.
+    let draws = 0;
+    (sim as any).rng.setObserver(() => {
+      draws++;
+    });
     expect(castAndComplete(sim, STARTER, pid)).toBe(true);
+    (sim as any).rng.setObserver(null);
+    expect(draws).toBe(2);
     expect(sim.countItem('thorium_ore', pid)).toBeGreaterThanOrEqual(before + 2);
     expect(meta.toolEffectSlots?.mining?.durability).toBe(chargesBefore - 1);
   });
@@ -1325,9 +1333,9 @@ describe('fine material grades on the live harvest path', () => {
     // epic pick stashed (ceiling 20, dust prices), then gather with the pick
     // carried and refill at the dust rung forever. The use-time ratchet
     // closes it: the effect firing while a better tool is OWNED is the
-    // pricing moment, and node access forces the tool to be carried, so the
-    // first bonus-bearing harvest re-prices the slot and the next refill
-    // bills shards whatever pick is in hand at the command.
+    // pricing moment (read at BOTH ends of the cast, see the mid-cast arm
+    // below), so the first bonus-bearing harvest re-prices the slot and the
+    // next refill bills shards whatever pick is in hand at the command.
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Prospector');
     sim.addItem('copper_mining_pick', 1, pid);
@@ -1353,6 +1361,87 @@ describe('fine material grades on the live harvest path', () => {
     expect(sim.countItem('arcane_shard', pid)).toBe(8);
     expect(slot.durability).toBe(20);
     expect(slot.maxDurability).toBe(50);
+  });
+
+  it('R47: the ceiling ratchet is raise-only: a later lesser-tool harvest cannot lower it', () => {
+    // The arbitrage's comeback route: if one cheap-pick harvest could RESET
+    // the ceiling, the shard rung would be escapable without the re-slot
+    // toll. Mutating ratchetCeilingForUse into an unconditional assignment
+    // must fail here.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('copper_mining_pick', 1, pid);
+    sim.addItem('gatherers_cache', 1, pid);
+    sim.slotToolEffect('mining', 'gatherers_cache', undefined, pid);
+    const slot = mustMeta(sim, pid).toolEffectSlots?.mining;
+    if (!slot) throw new Error('slot minted');
+    sim.addItem('arcanite_mining_pick', 1, pid);
+    teleportOntoNode(sim, pid, 'ore_eastbrook_1');
+    expect(castAndComplete(sim, 'ore_eastbrook_1', pid)).toBe(true);
+    expect(slot.maxDurability).toBe(50);
+    // Epic pick gone, common pick carried: the next applied use (a FRESH
+    // node; the first one is on its per-player respawn timer) must be a
+    // no-op raise, never a write-down.
+    sim.removeItem('arcanite_mining_pick', 1, pid);
+    teleportOntoNode(sim, pid, 'ore_eastbrook_2');
+    expect(castAndComplete(sim, 'ore_eastbrook_2', pid)).toBe(true);
+    expect(slot.maxDurability).toBe(50);
+  });
+
+  it('R42 x R47: a DEPLETED slot neither applies nor latches, whatever tool is carried', () => {
+    // effectApplied gates the ratchet: a slot with no charges gives no bonus,
+    // so it must not re-price itself either (a spent slot in the bags of an
+    // epic-pick owner stays at its minted rung until a real use).
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('copper_mining_pick', 1, pid);
+    sim.addItem('gatherers_cache', 1, pid);
+    sim.slotToolEffect('mining', 'gatherers_cache', undefined, pid);
+    const slot = mustMeta(sim, pid).toolEffectSlots?.mining;
+    if (!slot) throw new Error('slot minted');
+    slot.durability = 0;
+    sim.addItem('arcanite_mining_pick', 1, pid);
+    teleportOntoNode(sim, pid, 'ore_eastbrook_1');
+    expect(castAndComplete(sim, 'ore_eastbrook_1', pid)).toBe(true);
+    expect(slot.maxDurability).toBe(20);
+    expect(slot.durability).toBe(0);
+  });
+
+  it('R47: handing the good pick away MID-CAST still latches: the cast-start capture', () => {
+    // Trade has no casting gate (deliberately), so the completion-time bag
+    // scan alone was dodgeable: start the cast with the epic pick carried,
+    // move the pick away during the 2 s cast, and the quantity bonus still
+    // fires with only the common pick in bags. The harvestNode capture plus
+    // the max(start, completion) ratchet close the whole handoff class
+    // (trade, bank, mail, solo or two-client) without gating trade itself.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('copper_mining_pick', 1, pid);
+    sim.addItem('gatherers_cache', 1, pid);
+    sim.slotToolEffect('mining', 'gatherers_cache', undefined, pid);
+    const slot = mustMeta(sim, pid).toolEffectSlots?.mining;
+    if (!slot) throw new Error('slot minted');
+    expect(slot.maxDurability).toBe(20);
+    sim.addItem('arcanite_mining_pick', 1, pid);
+    teleportOntoNode(sim, pid, 'ore_eastbrook_1');
+    despawnMobs(sim);
+    expect(sim.harvestNode('ore_eastbrook_1', pid)).toBe(true);
+    const p = mustEntity(sim, pid);
+    expect(p.castingAbility).not.toBeNull();
+    // Two ticks into the cast, the pick leaves the bags (the trade shape).
+    sim.tick();
+    sim.tick();
+    sim.removeItem('arcanite_mining_pick', 1, pid);
+    for (let i = 0; i < 80 && p.castingAbility; i++) sim.tick();
+    if (p.castingAbility) throw new Error('gather cast never completed');
+    sim.tick();
+    // The bonus fired (a charge state moved or the grant landed) and the
+    // ceiling latched off the CAST-START capture despite common-only
+    // completion bags.
+    expect(slot.maxDurability).toBe(50);
+    // And the transient capture field is inert again after completion, so
+    // it can never leak into a later cast or an at-rest parity sample.
+    expect(p.gatherCastToolRarity).toBe('');
   });
 
   it('the quantity bonus is exactly plus one against the SAME seed without the effect', () => {
