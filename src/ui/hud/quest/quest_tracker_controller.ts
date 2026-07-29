@@ -3,6 +3,7 @@ import { questObjectiveRequired } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
+import { ownEntry } from '../../known_item';
 import { type QuestTrackerView, questTrackerView, type TrackedQuest } from './quest_tracker';
 
 export interface QuestTrackerSettingsPort {
@@ -36,7 +37,7 @@ export class QuestTrackerController {
       // id as its title, no objectives): the tracker numbers must match the
       // world map's badges, and the map numbers every log entry, so a skip
       // here would silently desync every number after it.
-      const quest = Object.hasOwn(QUESTS, progress.questId) ? QUESTS[progress.questId] : undefined;
+      const quest = ownEntry(QUESTS, progress.questId);
       quests.push({
         id: progress.questId,
         number: quests.length + 1,

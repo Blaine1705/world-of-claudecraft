@@ -141,7 +141,8 @@ describe('bank_window: modal prompt a11y contract', () => {
     // The one bare ITEMS read the stale-client conversion missed: the prompt
     // title falls back to the raw id for an unknown or prototype-key slot id
     // instead of dereferencing a Function's fields.
-    const promptBody = painter.slice(painter.indexOf('private showWithdrawQuantityPrompt('));
+    const stripped = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    const promptBody = stripped.slice(stripped.indexOf('private showWithdrawQuantityPrompt('));
     expect(promptBody.slice(0, 400)).toContain('knownItemDef(ITEMS, slot.itemId)');
     expect(promptBody.slice(0, 400)).not.toContain('? ITEMS[slot.itemId]');
   });

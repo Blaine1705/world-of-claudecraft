@@ -6779,7 +6779,7 @@ export const ko_KR: EnTranslations = {
       "complete": "완료",
       "showOnMap": "{name} 지도에 표시",
       "hideFromMap": "{name} 지도에서 숨기기",
-      "unknownQuest": "Unknown quest ({id})"
+      "unknownQuest": "알 수 없는 퀘스트 ({id})"
     },
     "log": {
       "title": "퀘스트 기록",

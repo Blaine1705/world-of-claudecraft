@@ -187,8 +187,12 @@ describe('LootWindowController', () => {
     expect(test.element.innerHTML).toContain('future_expansion_drop_x');
     // The prototype key renders as its RAW ID (the unknown arm), never a
     // Function's display name.
-    expect(test.element.innerHTML).toContain('data-item="constructor"');
-    expect(test.element.innerHTML).not.toContain('Object');
+    const constructorRow = /data-item="constructor"[^>]*>([\s\S]*?)<\/div>/.exec(
+      test.element.innerHTML,
+    );
+    expect(constructorRow).toBeTruthy();
+    expect(constructorRow?.[1] ?? '').toContain('constructor');
+    expect(constructorRow?.[1] ?? '').not.toContain('Object');
     // The unknown rows ride the same tooltip idiom as a known one.
     expect(test.attachTooltip).toHaveBeenCalled();
   });

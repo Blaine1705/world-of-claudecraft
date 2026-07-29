@@ -2255,6 +2255,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.tracker.complete': 'Готово',
   'questUi.tracker.showOnMap': 'Показать {name} на карте',
   'questUi.tracker.hideFromMap': 'Скрыть {name} с карты',
+  'questUi.tracker.unknownQuest': 'Неизвестное задание ({id})',
   'questUi.log.title': 'Журнал заданий',
   'questUi.log.close': 'Закрыть журнал заданий',
   'questUi.log.summary': 'Активно: {active} / Завершено: {completed}',

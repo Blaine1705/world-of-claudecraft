@@ -5,8 +5,9 @@
 // tow across a zone line calls this ONE helper instead of growing its own
 // copy of the cancel. The scope is the ruling's, exactly: every teleport,
 // plus the follow tow ON A ZONE CROSSING. Of the arena family, arena,
-// fiesta, and the Yumi placements clear sessions inline in their own resets;
-// Vale Cup calls this helper directly at its two placement moves. A same-zone tow deliberately does NOT cancel (the
+// fiesta, and the Yumi placements clear sessions inline in their own
+// resets; Vale Cup calls this helper directly at its two placement moves.
+// A same-zone tow deliberately does NOT cancel (the
 // gather half re-checks node range at completion, and a reel off the water
 // is an accepted classic-era oddity, not a rod-tier dodge), and neither
 // does a displacement with no hit and no teleport (a hostile damage-free

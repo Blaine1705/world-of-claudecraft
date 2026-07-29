@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { LAKE } from '../src/sim/data';
 import { summonMountItem } from '../src/sim/mounts';
+import { prepareRidingLessonRace, RIDING_LESSONS_QUEST_ID } from '../src/sim/mounts_training';
 import { startFishing } from '../src/sim/professions/fishing';
 import { Sim } from '../src/sim/sim';
 import { type Entity, FISHING_CAST_ID, GATHER_CAST_ID } from '../src/sim/types';
@@ -132,6 +133,63 @@ describe('starting a profession cast dismounts, like every other cast', () => {
 });
 
 describe('the other direction is the busy guard, not a dismount', () => {
+  it('the lesson summon toggle during a live gather cast is refused as busy', () => {
+    // The one mount path that skips useItem (no reins exist for the training
+    // steed): the Z-toggle's lesson arm sets a summon channel directly, so it
+    // carries its own busy refusal.
+    const sim = makeSim(12);
+    despawnMobs(sim);
+    const pid = sim.playerId;
+    const meta = sim.meta(pid);
+    if (!meta) throw new Error('no meta');
+    meta.mountTraining = {
+      sessionId: 'mt_test',
+      ownerId: pid,
+      anchor: { x: 0, z: 0 },
+      state: 'IN_PROGRESS',
+      phase: 'ride',
+    };
+    sim.addItem('copper_mining_pick', 1, pid);
+    teleportTo(sim, pid, NODE!.pos.x + 1.2, NODE!.pos.z + 1.2);
+    expect(sim.harvestNode(NODE!.id, pid)).toBe(true);
+    const p = sim.entities.get(pid) as Entity;
+    sim.drainEvents();
+    expect(sim.toggleMountFor(pid)).toBe(false);
+    expect(p.castingAbility).toBe(GATHER_CAST_ID);
+    expect(p.mountCastKey).toBe('');
+    expect(sim.drainEvents().some((e) => e.type === 'error' && e.text === 'You are busy.')).toBe(
+      true,
+    );
+  });
+
+  it('the race-start lesson mount during a live gather cast is refused as busy', () => {
+    // The race start mounts the lesson steed INSTANTLY (forceTrainingMount),
+    // with no channel to interrupt: the deny must land before any session
+    // state is written.
+    const sim = makeSim(13);
+    despawnMobs(sim);
+    const pid = sim.playerId;
+    const meta = sim.meta(pid);
+    if (!meta) throw new Error('no meta');
+    sim.setPlayerLevel(20, pid);
+    sim.addItem('copper_mining_pick', 1, pid);
+    teleportTo(sim, pid, NODE!.pos.x + 1.2, NODE!.pos.z + 1.2);
+    expect(sim.harvestNode(NODE!.id, pid)).toBe(true);
+    // Set AFTER the item adds: the entry only needs to exist for the
+    // needsRidingLessonRace gate, and a hand-built entry must not ride the
+    // quest-credit inventory walk.
+    meta.questLog.set(RIDING_LESSONS_QUEST_ID, { state: 'active', counts: [0] } as never);
+    const p = sim.entities.get(pid) as Entity;
+    sim.drainEvents();
+    expect(prepareRidingLessonRace(sim.ctx, meta, p)).toBe(false);
+    expect(p.castingAbility).toBe(GATHER_CAST_ID);
+    expect(p.mountKey).toBe('');
+    expect(meta.mountTraining?.state ?? 'none').not.toBe('IN_PROGRESS');
+    expect(sim.drainEvents().some((e) => e.type === 'error' && e.text === 'You are busy.')).toBe(
+      true,
+    );
+  });
+
   it('clicking the reins during a live gather cast is refused as busy', () => {
     const sim = makeSim(11);
     despawnMobs(sim);

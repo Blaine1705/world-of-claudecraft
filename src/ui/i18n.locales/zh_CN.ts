@@ -2132,6 +2132,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.tracker.complete': '完成',
   'questUi.tracker.showOnMap': '在地图上显示{name}',
   'questUi.tracker.hideFromMap': '在地图上隐藏{name}',
+  'questUi.tracker.unknownQuest': '未知任务（{id}）',
   'questUi.log.title': '任务日志',
   'questUi.log.close': '关闭任务日志',
   'questUi.log.summary': '进行中：{active} / 已完成：{completed}',

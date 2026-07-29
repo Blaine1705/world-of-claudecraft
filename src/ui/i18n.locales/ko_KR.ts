@@ -2214,6 +2214,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.tracker.complete': '완료',
   'questUi.tracker.showOnMap': '{name} 지도에 표시',
   'questUi.tracker.hideFromMap': '{name} 지도에서 숨기기',
+  'questUi.tracker.unknownQuest': '알 수 없는 퀘스트 ({id})',
   'questUi.log.title': '퀘스트 기록',
   'questUi.log.close': '퀘스트 기록 닫기',
   'questUi.log.summary': '진행 중: {active} / 완료: {completed}',

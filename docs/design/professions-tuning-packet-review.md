@@ -1216,6 +1216,99 @@ the fixes re-reviewed, every new pin mutation-checked decisive on a
 committed tree, gate green before done. Record the outcome here and in
 a professions-tuning-packet-merge-settlement memory.
 
+RUN 2026-07-29 (Fable xhigh, new session). Preamble: release/v0.32.0
+had moved 77 commits to a802b4be2 (the release locale fill, detachable
+combat meters, the pet taunt gate, heal-landing feedback with the
+additive heal2 `absorbed` field, heal2 interest scoping); merged as
+a625fe099 with ONE conflict, the generated i18n pending set, resolved
+by regenerating from the merged sources (the aggregate baseline is
+retired, so regeneration IS the reconciliation). The release-merge
+audit came back clean: every branch-owned overlap read against both
+parents, the changed delivery helper has exactly one call site on the
+branch's routeEvents path, zero new routes, commands, or event types,
+the maintainer levers (heroic reins, ONLINE_WORLD_LAYOUT_VERSION)
+untouched by the delta, and the release-authored db-mock trap checked
+and green. Gate PASS at the merge before checkpoint work.
+
+Scope A, the six calls. (1) CONFIRMED: the R37 'starter' state is a
+faithful two-sided widening (the release itself shipped the kits; both
+alternatives red wrongly), pinning the shipped shape per zone AND per
+profession type; the only zone-keyed professions tables are the swept
+ones (work orders are quest records on zone NPCs, outside R37's
+scope). (2) CONFIRMED, both halves: the cap bounds the queue array,
+one slot refills per dispatch by construction, and the marked-pending
+population is transitively bounded (queue cap + one in flight +
+undrained results under the hourly cap); a persisted 'pending' maps to
+'fallback' at load so restarts cannot strand, and the release-owned
+spawn-time strand (a null heuristic build) self-heals the same way,
+noted, not fixed. (3) CONFIRMED: the asserted floor sits at 1.2 just
+under the measured 1.207 as anti-flake headroom, the test restates the
+owner's 22 percent target, and the recorded-only flag survives. (4)
+REOPENED, twice: the unknown cell set suppressNextClick with no
+fresh-press clear (the round's one blocking fix: a drag whose
+synthetic click misses the row latches the flag and eats the next real
+deposit tap) and its comment still claimed the cell had no click
+handler; the deposit ladder, the four per-kind aria keys, and both
+input paths held. (5) DECIDED: the placement pin suffices AND gains a
+call-elision spy arm (tests/snapshots.test.ts): the wire-observing arm
+the spec sketched stays rejected because delta elision makes placement
+wire-invisible and every real input writer is a heavy command, but
+spying the ownedMountsFor CALL on a quiet pass observes the work the
+gate exists to skip, which is the claim itself. (6) CONFIRMED on all
+four sampled centers: the zoneAt union keeps the release's 2D walk
+over the branch's active content with the northmost clamp correctly
+generalized, every showBanner caller shifted past the variant slot
+(type-guarded by the literal union), exactly six goldens differ from
+the RELEASE side (the packet-diverging surfaces; the other 53 taken
+byte-identical), and the re-recorded fishing walks keep their
+divergence discriminators.
+
+Scope B, driven. All 33 starter-zone harvests complete and grant the
+zone-table material with no fine-grade leak; live casts in ten of the
+eleven zones land catches from the Vale fallback rows; farshore_isle
+has NO fishable water anywhere in its rect (probe sweep, zero hits),
+so the fishing-town themed zone ships a decorative rod row: a PHASE 13
+input, content authoring owns it. The rift descend and /dev mountquest
+teardowns are now driven live (descentOpen forced, dev sim) beside
+their source pins. Heroic reins refuse market listing and vendor sale
+cleanly (no NaN, no item loss); expansion vendor rows all resolve to
+real items with finite prices and no tools; zoneAt resolves every live
+node to its authored zone (the 2D column labels). THE seam finding:
+mounts and profession casts had no interlock (harvest and fishing
+start while mounted, a summon channel racing a gather cast), fixed to
+the release's own castStart auto-dismount family in both session
+starts, with the reins-click-mid-cast direction already owned by
+useItem's busy guard and now pinned with it
+(tests/professions_mount_interlock.test.ts).
+
+Fix round: four read-only reviewers (architecture, frontend seam,
+test-coverage, privacy-security) over the QA range plus my own pass;
+every finding applied across six commits (a625fe099..8b7ff1305) except
+the recorded-only re-raises (mailbox attachment arms stay accepted
+cosmetics, the unknown-quest log detail pane stays recorded). Notable
+beyond the calls above: staff moderation chat commands now pay the
+command lane (the /unstuck audit finding's exact sibling, WARNING
+severity); the zoneBiomeAt equivalence pin had become a tautology when
+the delegation landed and is now literal 2D-ladder probes; the
+active-content empty-zone policy is settled and pinned (resolution
+stays total via the builtin fallback, terrain features follow the
+active zones verbatim, tests/world_active_content.test.ts); the R9
+quality-slot suppression is one definition with two readers
+(usableToolEffectSlot); tEntity's Record arms read through ownEntry so
+peer-typed prototype keys render as raw ids everywhere (the itemSet
+arm used to throw); the tracker labels an unknown quest with a
+localizable sentence. Mutation pass: 24 mutations on the committed
+tree, all killed; three initially survivable pins were hardened first
+(the tracker sentence, a prototype-key loot drop, the pristine bags
+branch).
+
+Deferred, recorded: a rift entry/exit leg for a parity scenario (the
+draw-order gate is blind at the five new teleport arms; a scenario
+plus golden mint, phase 16's neighbor); farshore water authoring
+(phase 13); the maintainer's three levers stay surfaced and untouched.
+Final gate: FILL-AFTER-GATE (result, steps, code tip; docs and memory
+close-out follow it).
+
 ---
 
 ## Phase 12: the acquisition craft

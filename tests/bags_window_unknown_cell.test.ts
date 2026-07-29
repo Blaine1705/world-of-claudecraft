@@ -135,6 +135,20 @@ describe('the unknown bag cell deposit click, behaviorally', () => {
   });
 });
 
+describe('the pristine grid branch, behaviorally', () => {
+  it('renders a prototype-key slot as unknown (never a Function deref)', () => {
+    // The one shape that distinguishes knownItemDef from a bare ITEMS read:
+    // 'constructor' resolves truthy on a bare read and the known cell would
+    // deref the Object function. The unknown arm's aria sentence is the
+    // observable difference.
+    const { root } = harness([{ itemId: 'constructor', count: 1 }]);
+    const cell = unknownCell(root);
+    expect(cell.getAttribute('aria-label') ?? '').toContain('Unknown item');
+    expect(cell.getAttribute('aria-label') ?? '').toContain('constructor');
+    expect(root.innerHTML).not.toContain('Object');
+  });
+});
+
 describe('bagUnknownAction mirrors the bagItemAction ladder', () => {
   const MODES = {
     none: {

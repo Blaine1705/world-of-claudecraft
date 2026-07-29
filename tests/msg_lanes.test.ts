@@ -445,6 +445,40 @@ describe('dispatchMessage lane wiring at the R5 placements', () => {
     expect(session.msgRate.dropsThisSecond).toBe(dropsBefore + 1);
   });
 
+  it('the SPECTATING dispatch site pays the same command lane (its own drop arm)', () => {
+    // The moderation lane draw landed at BOTH dispatch sites; this is the
+    // spectating copy's own observation, so the two-site change cannot
+    // half-revert silently.
+    const server = new GameServer();
+    const session = join(server, { adminPermissions: ['moderation.act'] });
+    sinkDetector(server);
+    session.spectating = {
+      characterId: 2,
+      name: 'Target',
+      savedPos: { x: 0, y: 0, z: 0 },
+      priorGm: false,
+      stowedPet: null,
+    } as ClientSession['spectating'];
+    const host = server as unknown as {
+      moderation: { handleChatCommand: (session: unknown, text: string) => boolean };
+    };
+    const moderationSpy = vi.spyOn(host.moderation, 'handleChatCommand').mockReturnValue(true);
+    const lanes = session.msgLanes as unknown as {
+      commandTokens: number;
+      lastRefillSec: number;
+    };
+    // A full lane first: the spectating router runs and pays.
+    sendChat(server, session, '/kick Somebody');
+    expect(moderationSpy).toHaveBeenCalledTimes(1);
+    // A drained lane drops the frame whole and tallies.
+    lanes.commandTokens = 0;
+    lanes.lastRefillSec = Date.now() / 1000 + 3600;
+    const dropsBefore = session.msgRate.dropsThisSecond;
+    sendChat(server, session, '/kick Somebody');
+    expect(moderationSpy).toHaveBeenCalledTimes(1);
+    expect(session.msgRate.dropsThisSecond).toBe(dropsBefore + 1);
+  });
+
   it('still fires the chat ladder cooldown messaging on what the lane passes', () => {
     const server = new GameServer();
     const session = join(server);

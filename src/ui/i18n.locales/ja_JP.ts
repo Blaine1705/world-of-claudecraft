@@ -2230,6 +2230,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.tracker.complete': '完了',
   'questUi.tracker.showOnMap': '{name}をマップに表示',
   'questUi.tracker.hideFromMap': '{name}をマップから隠す',
+  'questUi.tracker.unknownQuest': '不明なクエスト（{id}）',
   'questUi.log.title': 'クエストログ',
   'questUi.log.close': 'クエストログを閉じる',
   'questUi.log.summary': '進行中: {active} / 完了: {completed}',

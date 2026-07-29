@@ -6779,7 +6779,7 @@ export const ru_RU: EnTranslations = {
       "complete": "Готово",
       "showOnMap": "Показать {name} на карте",
       "hideFromMap": "Скрыть {name} с карты",
-      "unknownQuest": "Unknown quest ({id})"
+      "unknownQuest": "Неизвестное задание ({id})"
     },
     "log": {
       "title": "Журнал заданий",

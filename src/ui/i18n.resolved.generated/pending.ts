@@ -190,18 +190,10 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaMasterwork",
     "questUi.tracker.unknownQuest"
   ],
-  "zh_CN": [
-    "questUi.tracker.unknownQuest"
-  ],
-  "zh_TW": [
-    "questUi.tracker.unknownQuest"
-  ],
-  "ko_KR": [
-    "questUi.tracker.unknownQuest"
-  ],
-  "ja_JP": [
-    "questUi.tracker.unknownQuest"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
@@ -232,9 +224,7 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.bags.unknownItemAriaMasterwork",
     "questUi.tracker.unknownQuest"
   ],
-  "ru_RU": [
-    "questUi.tracker.unknownQuest"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "entities.items.fine_ashwood_log.name",
     "entities.items.fine_copper_ore.name",
