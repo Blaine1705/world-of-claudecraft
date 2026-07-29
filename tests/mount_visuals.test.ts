@@ -1,5 +1,8 @@
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { tintedMaterial } from '../src/render/characters/assets';
 import { VISUALS } from '../src/render/characters/manifest';
+import { GFX } from '../src/render/gfx';
 import {
   MOUNT_VISUAL_SPECS,
   mountBobY,
@@ -43,6 +46,24 @@ describe('mount visual specs cover the sim catalog', () => {
     expect(mountSeatLift('grag_bear')).toBeGreaterThan(0);
     expect(mountSeatLift('')).toBe(0);
   });
+
+  it('preserves authored vertex colors when Low converts mount materials to Lambert', () => {
+    const mutableGfx = GFX as unknown as { standardMaterials: boolean };
+    const original = mutableGfx.standardMaterials;
+    mutableGfx.standardMaterials = false;
+    try {
+      const source = new THREE.MeshStandardMaterial({
+        color: 0x8c65a7,
+        vertexColors: true,
+      });
+      const converted = tintedMaterial(source, null, 0);
+      expect(converted).toBeInstanceOf(THREE.MeshLambertMaterial);
+      expect((converted as THREE.MeshLambertMaterial).vertexColors).toBe(true);
+      expect((converted as THREE.MeshLambertMaterial).color.getHex()).not.toBe(0xffffff);
+    } finally {
+      mutableGfx.standardMaterials = original;
+    }
+  });
 });
 
 describe('procedural bob math', () => {
@@ -76,6 +97,27 @@ describe('procedural bob math', () => {
     expect(mountBobY(spec, 0.7, true)).toBe(0);
   });
 
+  it('the tank is gait-rigged with a stable rear saddle and no procedural effect', () => {
+    const spec = MOUNT_VISUAL_SPECS.tank;
+    const def = VISUALS.mount_tank;
+    expect(spec).toMatchObject({
+      visualKey: 'mount_tank',
+      seat: 2.38,
+      seatFwd: -0.3,
+      rigged: true,
+      bobAmp: 0,
+      fx: null,
+    });
+    expect(def).toMatchObject({
+      url: 'models/mounts/tank.glb',
+      height: 2.8,
+      walkRef: 3,
+      runRef: 4.4,
+      lazyPreload: true,
+    });
+    expect(mountBobY(spec, 0.7, true)).toBe(0);
+  });
+
   it('the snail glides flat (no bob at all)', () => {
     const spec = MOUNT_VISUAL_SPECS.stalkglider_snail;
     expect(mountBobY(spec, 0.5, true)).toBe(0);
@@ -86,5 +128,6 @@ describe('procedural bob math', () => {
     expect(MOUNT_VISUAL_SPECS.aether_hover_cycle.fx).toBe('exhaust');
     expect(MOUNT_VISUAL_SPECS.valorsteed.fx).toBeNull();
     expect(MOUNT_VISUAL_SPECS.stormfeather_griffin.fx).toBeNull();
+    expect(MOUNT_VISUAL_SPECS.tank.fx).toBeNull();
   });
 });

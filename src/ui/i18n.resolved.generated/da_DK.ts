@@ -966,13 +966,15 @@ export const da_DK: EnTranslations = {
       "name_shadowjump_toad": "Kama-Kage Skyggehop-Tudsen",
       "name_stormfeather_griffin": "Himmelrækkende Stormfjer",
       "name_thunderstrut_gobbler": "Tordenspanker den Store Kalkun",
+      "name_tank": "Tank",
       "desc_valorsteed": "En hårdfør, sikker ganger, der giver øget rejsehastighed.",
       "desc_grag_bear": "En hårdfør, sikker bjørn, der giver øget rejsehastighed.",
       "desc_stalkglider_snail": "En robust, langsomt forbrændende snegl, der giver øget rejsehastighed.",
       "desc_aether_hover_cycle": "En kraftfuld magitek-cykel designet til hurtig, lavtsvævende forflytning i kamp.",
       "desc_shadowjump_toad": "En enorm, sikker kæmpetudse, trænet i lynhurtige skyggehop, der dækker ethvert terræn.",
       "desc_stormfeather_griffin": "En kongelig stormgrif, der bevæger sig hen over jorden på runebeslåede kløer, med sammenfoldede vinger.",
-      "desc_thunderstrut_gobbler": "En kolossal, stormudklækket kalkun, der spankulerer ned fra Den Opvågnende Tinde, med halen udfoldet som en tordensky."
+      "desc_thunderstrut_gobbler": "En kolossal, stormudklækket kalkun, der spankulerer ned fra Den Opvågnende Tinde, med halen udfoldet som en tordensky.",
+      "desc_tank": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
     },
     "mountTraining": {
       "mountPrompt": "Tryk på {key} for at stige op på trænings-Modgangeren.",
@@ -9735,6 +9737,9 @@ export const da_DK: EnTranslations = {
       },
       "last_keep_signet": {
         "name": "Segl fra Den Sidste Borg"
+      },
+      "reins_tank": {
+        "name": "Ignition Key: Tank"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"

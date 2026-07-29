@@ -847,6 +847,16 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 4.5,
     lazyPreload: true,
   },
+  // Compact fantasy tank. One wheel revolution per locomotion clip matches
+  // its authored tread cadence at the reference ground speeds below.
+  mount_tank: {
+    url: `${MOUNTS_DIR}/tank.glb`,
+    height: 2.8,
+    clips: MOUNT_RIGGED,
+    walkRef: 3,
+    runRef: 4.4,
+    lazyPreload: true,
+  },
 
   // Ambient Highwatch stable horse (sim mob 'stable_horse', MOB_KEYS below). Reuses
   // the Valorsteed GLB + its authored gait clips so it renders and ambles as a real

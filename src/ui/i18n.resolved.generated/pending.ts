@@ -9,25 +9,85 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.items.reins_tank.name",
+    "hudChrome.mounts.desc_tank",
+    "hudChrome.mounts.name_tank"
+  ],
+  "es_ES": [
+    "entities.items.reins_tank.name",
+    "hudChrome.mounts.desc_tank",
+    "hudChrome.mounts.name_tank"
+  ],
+  "fr_FR": [
+    "entities.items.reins_tank.name",
+    "hudChrome.mounts.desc_tank",
+    "hudChrome.mounts.name_tank"
+  ],
+  "fr_CA": [
+    "entities.items.reins_tank.name",
+    "hudChrome.mounts.desc_tank",
+    "hudChrome.mounts.name_tank"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.items.reins_tank.name",
+    "hudChrome.mounts.desc_tank",
+    "hudChrome.mounts.name_tank"
+  ],
+  "de_DE": [
+    "entities.items.reins_tank.name",
+    "hudChrome.mounts.desc_tank",
+    "hudChrome.mounts.name_tank"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.items.reins_tank.name",
+    "hudChrome.mounts.desc_tank",
+    "hudChrome.mounts.name_tank"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.items.reins_tank.name",
+    "hudChrome.mounts.desc_tank",
+    "hudChrome.mounts.name_tank"
+  ],
+  "nl_NL": [
+    "entities.items.reins_tank.name",
+    "hudChrome.mounts.desc_tank",
+    "hudChrome.mounts.name_tank"
+  ],
+  "pl_PL": [
+    "entities.items.reins_tank.name",
+    "hudChrome.mounts.desc_tank",
+    "hudChrome.mounts.name_tank"
+  ],
+  "id_ID": [
+    "entities.items.reins_tank.name",
+    "hudChrome.mounts.desc_tank",
+    "hudChrome.mounts.name_tank"
+  ],
+  "tr_TR": [
+    "entities.items.reins_tank.name",
+    "hudChrome.mounts.desc_tank",
+    "hudChrome.mounts.name_tank"
+  ],
+  "sv_SE": [
+    "entities.items.reins_tank.name",
+    "hudChrome.mounts.desc_tank",
+    "hudChrome.mounts.name_tank"
+  ],
+  "vi_VN": [
+    "entities.items.reins_tank.name",
+    "hudChrome.mounts.desc_tank",
+    "hudChrome.mounts.name_tank"
+  ],
+  "da_DK": [
+    "entities.items.reins_tank.name",
+    "hudChrome.mounts.desc_tank",
+    "hudChrome.mounts.name_tank"
+  ]
 };

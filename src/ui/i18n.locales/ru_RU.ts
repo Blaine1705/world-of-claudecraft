@@ -9217,6 +9217,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': 'Кама-Кагэ, жаба теневых прыжков',
   'hudChrome.mounts.name_stormfeather_griffin': 'Штормокрыл Поднебесный',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',
+  'hudChrome.mounts.name_tank': 'Танк',
   'hudChrome.mounts.desc_valorsteed':
     'Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.',
   'hudChrome.mounts.desc_grag_bear':
@@ -9231,6 +9232,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Величавый штормовой грифон, ступающий по земле на рунных когтях со сложенными крыльями.',
   'hudChrome.mounts.desc_thunderstrut_gobbler':
     'Исполинский индюк, рожденный бурей: он важно спускается с Пробуждающегося пика, распустив хвост, словно грозовой фронт.',
+  'hudChrome.mounts.desc_tank':
+    'Компактная бронированная машина с тяжёлыми гусеницами, крупнокалиберной пушкой и седлом для бесстрашных пилотов.',
   'hudChrome.mounts.emptyTitle': 'Скакунов пока нет',
   'hudChrome.mounts.emptyStableHint':
     'Достигните 20 уровня и возьмите урок верховой езды у старшей конюшей Марлы в конюшнях к западу от Хайвотча.',
@@ -10027,6 +10030,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': 'Последний оплот',
   'entities.dungeons.the_last_keep.enterText': 'Вы входите в холодные безмолвные залы Последнего оплота.',
   'entities.items.last_keep_signet.name': 'Печатка Последнего оплота',
+  'entities.items.reins_tank.name': 'Ключ зажигания танка',
   'entities.dungeons.the_last_keep.leaveText': 'Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов.',
   'entities.items.wildheart_tuskblade.name': 'Клыкастый клинок Дикого Сердца',
   'entities.items.wildheart_hexwood_staff.name': 'Посох колдовского дерева из Котловины',

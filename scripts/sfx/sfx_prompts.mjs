@@ -120,6 +120,10 @@ export const SFX = [
     custom: true,
   },
   {
+    key: 'mount_run_tank',
+    custom: true,
+  },
+  {
     key: 'move_jump',
     custom: true,
     duration: 0.5,
