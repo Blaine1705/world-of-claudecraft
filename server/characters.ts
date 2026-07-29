@@ -614,8 +614,12 @@ async function deleteHandler(ctx: Ctx): Promise<void> {
     return;
   }
   const ok = await charactersDb.deleteCharacter(accountId, character.id);
-  // The row is gone; take its shared world state with it (R43), before the response
-  // so a client that immediately re-reads the market or a mailbox sees the purge.
+  // The row is gone; take its shared world state with it (R43). Read freshness
+  // comes from the SYNCHRONOUS in-memory purge (both reads serve from the live
+  // sim in this process); what the AWAITED saves buy is durability before the
+  // 200: a crash after the committed DELETE but before the next autosave would
+  // otherwise reload listings and mail keyed to a character that no longer
+  // exists, with no way to re-trigger the purge. Do not drop the await.
   if (ok) await purgeDeletedCharacterWorldState(rt, character.id, character.name);
   json(ctx.res, ok ? 200 : 404, ok ? { ok: true } : NOT_FOUND);
 }
