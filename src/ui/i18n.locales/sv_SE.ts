@@ -1020,20 +1020,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thieves_chorus.description':
     'En visslad signal sporrar din grupp: attack-, besvärjelse- och kanaliseringstakt ökad med 10% i 10 sek. Allierade som nyligen fått en grupphastighetsvåg är för utmattade för att gynnas. (skurktalang)',
   'entities.abilities.venomrend.name': 'Giftrivning',
-  'entities.abilities.venomrend.description':
-    'Förtär Giftritualen: slår för 22 plus 26 per kombopoäng, detonerar dina blödningars återstående skada och återställer 25 energi. (Knifework-motorn)',
   'entities.abilities.veilstrike.name': 'Slöjhugg',
-  'entities.abilities.veilstrike.description':
-    'Förtär Skymningsförrådet och sveper dig i skugga i 6 sek: dina smygöppnare fungerar i det öppna och du gör 25% mer skada. (Skulduggery-motorn)',
   'entities.abilities.body_blow.name': 'Kroppsslag',
-  'entities.abilities.body_blow.description':
-    'Ett tungt slag för 130% vapenskada plus 10 som ger 2 combopoäng och fördjupar Redline med ett steg. (Thuggery-motorn)',
   'entities.abilities.knockout_blow.name': 'Knockoutslag',
-  'entities.abilities.knockout_blow.description':
-    'Avsluta Redline med en knockout: slår för 45 plus 35 per combopoäng, 25% hårdare per Redline-steg, och återställer 25 energi. (Thuggery-motorn)',
   'entities.abilities.venom_dart.name': 'Giftpil',
-  'entities.abilities.venom_dart.description':
-    'Slungar en förgiftad pil för {damage} naturskada. Ger 1 combopoäng. Knifework: förlänger ditt Giftrivning-sår med 6 sek, upp till 20 sek.',
   'entities.abilities.smoke_screen.name': 'Rökridå',
   'entities.abilities.smoke_screen.description':
     'Du försvinner i ett rökmoln, vilket ökar din chans att undvika med 30 % i 8 sek.',
@@ -2241,7 +2231,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.requiresForm': 'Kräver {form}form',
   'abilityUi.tooltip.requiresLevel': 'Kräver nivå {level}',
   'abilityUi.tooltip.requiresOutOfCombat': 'Kräver att du är utanför strid',
-  'abilityUi.tooltip.requiresStealth': 'Kräver smygande',
   'abilityUi.tooltip.requiresTargetHealthBelow': 'Kräver att målet är under {percent}% hälsa',
   'abilityUi.tooltip.unavailable': 'Otillgänglig',
   'auth.appearance': 'Utseende',
@@ -2527,8 +2516,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aimed_shot.description':
     'Ett omsorgsfullt draget skott som vållar {damage} skada.',
   'entities.abilities.aimed_shot.name': 'Långt drag',
-  'entities.abilities.ambush.description':
-    'Lägg bakhåll för målet för 250 % vapenskada plus {damage}. Måste vara smygande och bakom målet. Kräver en dolk. Ger 1 kombopoäng.',
   'entities.abilities.ambush.name': 'Smygarens hugg',
   'entities.abilities.arcane_explosion.description':
     'Ett utbrott av arkanenergi träffar alla närliggande fiender för {damage} arkanskada.',
@@ -2550,8 +2537,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.description':
     'Anta mårdens skepnad och öka din chans att väja med 8 % i 30 min.',
   'entities.abilities.aspect_of_the_monkey.name': 'Mårdens skepnad',
-  'entities.abilities.backstab.description':
-    'Ryggdolka målet för 150 % vapenskada plus {damage}. Måste vara bakom målet. Kräver en dolk. Ger 1 kombopoäng.',
   'entities.abilities.backstab.name': 'Feg stöt',
   'entities.abilities.barkskin.description':
     'Din hud hårdnar som bark och ökar rustning med 150 i 15 sek.',
@@ -2587,11 +2572,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.charge.description':
     'Stormar en fiende, genererar 9 raseri och bedövar den i 1 sek. 8-25 m räckvidd.',
   'entities.abilities.charge.name': 'Anstormning',
-  'entities.abilities.cheap_shot.description':
-    'Slå målet för {damage} skada och bedöva det i 4 sek. Måste vara smygande. Ger 2 kombopoäng.',
   'entities.abilities.cheap_shot.name': 'Magslag',
-  'entities.abilities.claw.description':
-    'Klö fienden för vapenskada plus {damage}. Ger 1 kombopoäng. Endast i vargform.',
   'entities.abilities.claw.name': 'Klo',
   'entities.abilities.cleave.description':
     'Ett svepande hugg som träffar alla fiender framför dig för {damage} skada.',
@@ -2655,7 +2636,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.name': 'Gripande rötter',
   'entities.abilities.evasion.description': 'Ökar din chans att väja undan med 50 % i 15 sek.',
   'entities.abilities.evasion.name': 'Spökfot',
-  'entities.abilities.eviscerate.description': 'Avslutande manöver som vållar {damage}.',
   'entities.abilities.eviscerate.name': 'Sista vilan',
   'entities.abilities.execute.description':
     'Försöker göra slut på en sårad fiende och vållar {damage} skada. Endast användbar på fiender under 20 % hälsa.',
@@ -2663,17 +2643,11 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.exorcism.description':
     'Förvisar de ondskefulla med helig vrede och vållar {damage} helig skada.',
   'entities.abilities.exorcism.name': 'Utdrivningens rit',
-  'entities.abilities.expose_armor.description':
-    'Avslutande manöver som blottar målet och sänker dess rustning med {damage} i 30 sek.',
   'entities.abilities.expose_armor.name': 'Rustningsbräsch',
-  'entities.abilities.faerie_fire.description':
-    'Sänker målets rustning med {damage}% i 40 sek. Stackas inte med Rustningsklipp.',
   'entities.abilities.faerie_fire.name': 'Häxljus',
   'entities.abilities.fear.description':
     'Slår skräck i fienden och får den att huka sig i upp till 8 sek. All skada bryter effekten.',
   'entities.abilities.fear.name': 'Plåga',
-  'entities.abilities.ferocious_bite.description':
-    'Avslutande manöver som vållar {damage}. Endast i vargform.',
   'entities.abilities.ferocious_bite.name': 'Blodsbett',
   'entities.abilities.fire_blast.description': 'Spränger fienden för {damage} eldskada. Omedelbar.',
   'entities.abilities.fire_blast.name': 'Glödfall',
@@ -2722,8 +2696,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbrand_weapon.description':
     'Förlänar ditt vapen bitande frost: varje hugg vållar {damage} extra skada i 5 min.',
   'entities.abilities.frostbrand_weapon.name': 'Rimbundet vapen',
-  'entities.abilities.garrote.description':
-    'Stryper fienden, vållar {damage} skada nu och får den att blöda för {overTime} över 18 sek. Måste vara i smyg. Ger 1 kombopoäng.',
   'entities.abilities.garrote.name': 'Strupvajer',
   'entities.abilities.ghost_wolf.description':
     'Förvandlar dig till en Shadewolf och ökar förflyttningshastigheten med 40 % i 10 min.',
@@ -2769,8 +2741,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.judgement.description':
     'Släpper lös ditt aktiva sigill mot fienden och förbrukar det för att vålla dess lagrade heliga skada.',
   'entities.abilities.judgement.name': 'Utslag',
-  'entities.abilities.kidney_shot.description':
-    'Avslutande manöver som bedövar målet. Varar 1 sek längre per kombopoäng.',
   'entities.abilities.kidney_shot.name': 'Lågt slag',
   'entities.abilities.lay_on_hands.description':
     'En massiv våg av läkning: återställer {damage} hälsa. 10 min nedkylning.',
@@ -2787,8 +2757,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mark_of_the_wild.description':
     'Placerar Wildward på ett vänligt mål och ökar rustningen med {buff} i 30 min.',
   'entities.abilities.mark_of_the_wild.name': 'Vildvärn',
-  'entities.abilities.maul.description':
-    'Ett mörbultande anfall som ökar närstridsskadan med {damage} och vållar en stor mängd hot. Aktiveras vid ditt nästa hugg. Endast i Bruinform.',
   'entities.abilities.maul.name': 'Benkross',
   'entities.abilities.mind_blast.description': 'Spränger målets sinne för {damage} skuggskada.',
   'entities.abilities.mind_blast.name': 'Sinnessplittring',
@@ -2798,8 +2766,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mongoose_bite.description':
     'Motanfall efter att målet väjt undan för vapenskada plus {damage}. Kan inte väjas undan.',
   'entities.abilities.mongoose_bite.name': 'Mothugg',
-  'entities.abilities.moonfire.description':
-    'Bränner fienden med måneld för {damage} arkanskada plus skada över tid.',
   'entities.abilities.moonfire.name': 'Månstorm',
   'entities.abilities.mortal_strike.description':
     'Ett illvilligt hugg som vållar vapenskada plus {damage}. (Vapensignatur)',
@@ -2825,8 +2791,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.pyroblast.description':
     'Slungar ett väldigt brinnande stenblock som vållar {damage} eldskada plus ytterligare skada över tid.',
   'entities.abilities.pyroblast.name': 'Pyrolans',
-  'entities.abilities.rake.description':
-    'En smygöppnare som krafsar fienden för vapenskada plus {damage} och vållar blödningsskada över 9 sek. Ger 1 kombopoäng. Endast i vargform.',
   'entities.abilities.rake.name': 'Flå',
   'entities.abilities.rapid_fire.description':
     'Kanalisera sex snabba skott under 2,4 sek. medan du rör dig. Varje skott orsakar {damage} fysisk skada.',
@@ -2834,10 +2798,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.raptor_strike.description':
     'Ett kraftfullt närstridsanfall som ökar skadan med {damage}. Aktiveras vid ditt nästa hugg.',
   'entities.abilities.raptor_strike.name': 'Uppsprättande hugg',
-  'entities.abilities.regrowth.description':
-    'Läker ett vänligt mål för {damage} och en ytterligare mängd över 21 sek.',
   'entities.abilities.regrowth.name': 'Andra blomningen',
-  'entities.abilities.rejuvenation.description': 'Läker målet för {damage} över 12 sek.',
   'entities.abilities.rejuvenation.name': 'Vildblomning',
   'entities.abilities.renew.description': 'Läker målet för {damage} under 15 sek.',
   'entities.abilities.renew.name': 'Dröjande nåd',
@@ -2850,14 +2811,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.righteous_fury.description':
     'Ökar hotet som din heliga skada genererar med 60 % i 30 min. Hörnstenen för paladinen som tankar.',
   'entities.abilities.righteous_fury.name': 'Brinnande ed',
-  'entities.abilities.rip.description':
-    'Avslutande manöver som tillfogar {damage} blödningsskada över 12 sek. Förbrukar kombopoäng. Endast vargform.',
   'entities.abilities.rip.name': 'Riv upp',
   'entities.abilities.rockbiter_weapon.description':
     'Genomsyrar ditt vapen med stenens raseri: varje slag gör {damage} extra skada i 5 min.',
   'entities.abilities.rockbiter_weapon.name': 'Stenbundet vapen',
-  'entities.abilities.rupture.description':
-    'Avslutande manöver som sårar målet och får det att blöda för {damage} under 16 sek.',
   'entities.abilities.rupture.name': 'Förblöda',
   'entities.abilities.sap.description':
     'Slår målet medvetslöst i 8 sek. Du måste vara smygande och utanför strid. All skada bryter effekten.',
@@ -2886,23 +2843,15 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shield_slam.description':
     'Slå målet med din sköld för 50 % vapenskada plus {damage} och enormt hot. (Skyddssignatur)',
   'entities.abilities.shield_slam.name': 'Sköldkross',
-  'entities.abilities.sinister_strike.description':
-    'Ett omedelbart hugg för vapenskada plus {damage}. Ger 1 kombopoäng.',
   'entities.abilities.sinister_strike.name': 'Ondsint hugg',
   'entities.abilities.slam.description': 'Smäller till motståndaren för vapenskada plus {damage}.',
   'entities.abilities.slam.name': 'Brutalt sving',
-  'entities.abilities.slice_and_dice.description':
-    'Avslutande manöver som ökar attackhastigheten i närstrid med 30 %. Varar längre per kombopoäng.',
   'entities.abilities.slice_and_dice.name': 'Skoningslöst tempo',
   'entities.abilities.smite.description': 'Tuktar fienden för {damage} helig skada.',
   'entities.abilities.smite.name': 'Tukta',
   'entities.abilities.sprint.description': 'Ökar din förflyttningshastighet med 70 % i 15 sek.',
   'entities.abilities.sprint.name': 'Snabba hälar',
-  'entities.abilities.starfire.description':
-    'Kallar ner en pil av stjärneld och tillfogar {damage} arkan skada.',
   'entities.abilities.starfire.name': 'Himlafall',
-  'entities.abilities.stealth.description':
-    'Döljer dig i skuggorna: fiender lägger knappt märke till dig, men du rör dig 50 % långsammare. Att anfalla eller ta skada bryter Duskveil. Kasta igen för att kliva fram.',
   'entities.abilities.stealth.name': 'Skymningsslöja',
   'entities.abilities.stormstrike.description':
     'Kanaliserar stormen genom ditt vapen och hugger omedelbart för vapenskada plus {damage}.',
@@ -2929,8 +2878,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Frammanar en Gloomshade under häxmästarens befäl. Gloomshade är en robust demon som hånar dina fiender och suger upp stryk. Att frammana en ny demon avfärdar din nuvarande. Du kan ha en demon åt gången.',
   'entities.abilities.summon_voidwalker.name': 'Frammana Gloomshade',
   'entities.abilities.sunder_armor.name': 'Rustningsklipp',
-  'entities.abilities.swipe.description':
-    'Svep mot närliggande fiender för {damage} skada. Orsakar extra hot. Endast i Bruinform.',
   'entities.abilities.swipe.name': 'Svepande klor',
   'entities.abilities.tame_beast.description':
     'Börjar tämja en best till din följeslagare. Den måste vara på din nivå eller lägre och inte en elit. Ditt djur följer dig, anfaller dina fiender och håller eget hot. Du kan ha ett djur åt gången.',
@@ -2959,7 +2906,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.wing_clip.description':
     'Tillfogar ett sår för {damage} skada och saktar ner fienden med 40 % i 10 sek.',
   'entities.abilities.wing_clip.name': 'Fjättrande hugg',
-  'entities.abilities.wrath.description': 'Slungar en pil av naturenergi för {damage} naturskada.',
   'entities.abilities.wrath.name': 'Vildbult',
   'entities.abilities.holy_shock.name': 'Helig chock',
   'entities.abilities.holy_shock.description':
@@ -2986,14 +2932,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.icy_veins.description':
     'Ökar besvärjelsehastighet med 30% och förhindrar avbrott och pushback i 10 sek. (Frostsignatur)',
   'entities.abilities.cold_blood.name': 'Kallt blod',
-  'entities.abilities.cold_blood.description':
-    'Fokuserar din dödsavsikt så att din nästa attack blir en kritisk träff. (Lönnmordssignatur)',
   'entities.abilities.blade_flurry.name': 'Klingflod',
-  'entities.abilities.blade_flurry.description':
-    'Släpper lös en flod av klingor och ökar attackhastighet med 20% i 12 sek. (Stridssignatur)',
   'entities.abilities.hemorrhage.name': 'Blödning',
-  'entities.abilities.hemorrhage.description':
-    'Slår fienden för vapenskada plus {damage} och orsakar blödningsskada under 12 sek. Ger 1 kombopoäng. (Finesssignatur)',
   'entities.abilities.power_infusion.name': 'Kraftinfusion',
   'entities.abilities.power_infusion.description':
     'Infuserar ett vänligt mål med kraft och ökar besvärjelsekraft med 28 i 15 sek. (Disciplin signatur)',
@@ -3019,8 +2959,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.description':
     'Rusa mot en fiende och rota den i 1 sek. 8-25 m räckvidd. (Vildhetssignatur)',
   'entities.abilities.swiftmend.name': 'Snabb läkning',
-  'entities.abilities.swiftmend.description':
-    'Förbrukar en läkning över tid-effekt på ett vänligt mål för att läka det för {damage}. (Återställningssignatur)',
   'entities.abilities.crusader_strike.name': 'Korsfararslag',
   'entities.abilities.crusader_strike.description':
     'Träffar målet med vapenskada plus {damage} Helig skada. (paladintalang)',
@@ -8453,8 +8391,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Återställer 180 hälsa under 10 sek. Endast i Björngestalt. (druidtalang)',
   'entities.abilities.frost_trap.description':
     'Fryser fiender i målområdet i 3 sek. så att de varken kan röra sig eller agera. (jägartalang)',
-  'entities.abilities.ghostly_strike.description':
-    'Träffar fienden för vapenskada plus {damage}, ökar undvikandet kortvarigt och ger 1 kombinationspoäng. (skurktalang)',
   'entities.abilities.hammer_of_wrath.description':
     'Slungar en helig hammare mot en sårad fiende och ger {damage} Helig skada. Kan bara användas under 20 % hälsa. (paladintalang)',
   'entities.abilities.healing_stream.description':

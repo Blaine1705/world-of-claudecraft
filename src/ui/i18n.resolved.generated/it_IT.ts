@@ -1628,7 +1628,7 @@ export const it_IT: EnTranslations = {
       "veiledEdge": "Your next Lurker's Strike strikes for double",
       "duskEconomy": "Abilities cost {pct}% less energy",
       "moontide": "Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3",
-      "oldBlood": "Old Blood {stacks}/{max}. Wolf and Bruin attacks that land each add 1. At {max}: Gorebite becomes Redharvest in Wolf Form, Bonecrush becomes Marrowbreak in Bruin Form",
+      "oldBlood": "Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Wolf Form, Bonecrush becomes Marrowbreak in Bruin Form",
       "verdance": "Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Swiftmend becomes Overbloom",
       "increase": {
         "ap": "Aumenta la potenza di attacco di {value}",
@@ -6513,7 +6513,7 @@ export const it_IT: EnTranslations = {
       "unavailable": "Non disponibile",
       "requiresLevel": "Richiede livello {level}",
       "requiresForm": "Richiede Forma di {form}",
-      "requiresStealth": "Richiede furtività",
+      "requiresStealth": "Requires stealth",
       "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "Consuma punti combo",
       "requiresTargetHealthBelow": "Richiede il bersaglio sotto il {percent}% di salute",
@@ -7173,19 +7173,19 @@ export const it_IT: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Fendente Malvagio",
-        "description": "Colpo istantaneo per danni dell'arma più {damage}. Conferisce 1 punto combo.",
+        "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point.",
         "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
         "specNote_combat": "While Redline is active, this button becomes Body Blow: a heavier strike that awards 2 combo points and builds Redline."
       },
       "eviscerate": {
         "name": "Sonno Eterno",
-        "description": "Mossa finale che infligge {damage}.",
+        "description": "Finishing move that causes {damage}.",
         "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
         "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: your strike becomes Body Blow and this button becomes Knockout Blow (spend it before Redline ends)."
       },
       "backstab": {
         "name": "Affondo Codardo",
-        "description": "Pugnala il bersaglio per il 150% dei danni dell'arma più {damage}. Devi essere dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo.",
+        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
         "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
       },
       "gouge": {
@@ -7198,7 +7198,7 @@ export const it_IT: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Ritmo Sanguinario",
-        "description": "Mossa finale che aumenta la velocità d'attacco in mischia del 30%. Dura più a lungo per ogni punto combo."
+        "description": "Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec per combo point (5 combo points: 32 sec)."
       },
       "sprint": {
         "name": "Calcagni Veloci",
@@ -7206,16 +7206,16 @@ export const it_IT: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Colpo Basso",
-        "description": "Mossa finale che stordisce il bersaglio. Dura 1 s in più per punto combo."
+        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec)."
       },
       "ambush": {
         "name": "Colpo dell'Agguato",
-        "description": "Tende un agguato al bersaglio per il 250% dei danni dell'arma più {damage}. Devi essere furtivo e dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo.",
+        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.",
         "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
       },
       "stealth": {
         "name": "Velo Crepuscolare",
-        "description": "Ti nasconde nelle ombre: i nemici ti notano appena, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe Duskveil. Lanciala di nuovo per uscire.",
+        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.",
         "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
       },
       "adrenaline_rush": {
@@ -7224,12 +7224,12 @@ export const it_IT: EnTranslations = {
       },
       "garrote": {
         "name": "Filo alla Gola",
-        "description": "Garrota il nemico, infliggendo {damage} danni immediati e provocando sanguinamento per {overTime} in 18 sec. Devi essere furtivo. Conferisce 1 punto combo.",
+        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point.",
         "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "cheap_shot": {
         "name": "Pugno allo Stomaco",
-        "description": "Colpisce il bersaglio per {damage} danni, stordendolo per 4 sec. Devi essere furtivo. Conferisce 2 punti combo.",
+        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.",
         "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "sap": {
@@ -7242,11 +7242,11 @@ export const it_IT: EnTranslations = {
       },
       "expose_armor": {
         "name": "Breccia nell'Armatura",
-        "description": "Mossa finale che espone il bersaglio, riducendone la corazza di {damage} per 30 sec."
+        "description": "Finishing move that exposes the target for 30 sec: each combo point spent reduces its armor by 2% (5 combo points: {damage}%)."
       },
       "rupture": {
         "name": "Dissanguamento",
-        "description": "Mossa finale che ferisce il bersaglio, provocando sanguinamento per {damage} in 16 sec."
+        "description": "Finishing move that wounds the target: it bleeds every 2 sec, for 6 sec plus 2 sec per combo point (5 combo points: 16 sec and {damage} total damage)."
       },
       "vanish": {
         "name": "Passo di Fumo",
@@ -7510,7 +7510,7 @@ export const it_IT: EnTranslations = {
       },
       "wrath": {
         "name": "Dardo Silvano",
-        "description": "Scaglia un dardo di energia naturale per {damage} danni da Natura.",
+        "description": "Hurls a bolt of nature energy for {damage} Nature damage.",
         "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge (a heavy Arcane strike) and Skyfall becomes Sunwake (a Nature strike that restores 35 mana)."
       },
       "healing_touch": {
@@ -7523,7 +7523,7 @@ export const it_IT: EnTranslations = {
       },
       "moonfire": {
         "name": "Tempesta Lunare",
-        "description": "Brucia il nemico con fuoco lunare per {damage} danni Arcani più danni nel tempo.",
+        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time.",
         "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
       },
       "moonseed": {
@@ -7532,7 +7532,7 @@ export const it_IT: EnTranslations = {
       },
       "rejuvenation": {
         "name": "Fioritura Selvaggia",
-        "description": "Cura il bersaglio di {damage} in 12 s.",
+        "description": "Heals the target for {damage} over 12 sec.",
         "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
       },
       "thorns": {
@@ -7549,7 +7549,7 @@ export const it_IT: EnTranslations = {
       },
       "maul": {
         "name": "Frantumaossa",
-        "description": "Attacco brutale che aumenta i danni in mischia di {damage} e causa molta minaccia. Si attiva al tuo prossimo colpo. Solo in Forma di Bruin.",
+        "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a heavy, high-threat strike that instead shields you when below half health."
       },
       "growl": {
@@ -7562,22 +7562,22 @@ export const it_IT: EnTranslations = {
       },
       "claw": {
         "name": "Artigliata",
-        "description": "Artiglia il nemico per danni dell'arma più {damage}. Conferisce 1 punto combo. Solo Forma del Lupo.",
+        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "ferocious_bite": {
         "name": "Morso Cruento",
-        "description": "Mossa finale che infligge {damage}. Solo Forma del Lupo.",
+        "description": "Finishing move that causes {damage}. Wolf Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: it instantly deals all the damage your bleeds would still have dealt and restores 30 energy."
       },
       "swipe": {
         "name": "Artigli Falcianti",
-        "description": "Falcia i nemici vicini per {damage} danni. Genera minaccia extra. Solo in Forma di Bruin.",
+        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "regrowth": {
         "name": "Seconda Fioritura",
-        "description": "Cura un bersaglio alleato di {damage} e di una quantità aggiuntiva in 21 s.",
+        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec.",
         "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
       },
       "barkskin": {
@@ -7594,7 +7594,7 @@ export const it_IT: EnTranslations = {
       },
       "starfire": {
         "name": "Caduta Celeste",
-        "description": "Richiama un dardo di fuoco stellare, infliggendo {damage} danni Arcani.",
+        "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage.",
         "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant Nature strike and burn that restores 35 mana and spends all 3."
       },
       "travel_form": {
@@ -7611,7 +7611,7 @@ export const it_IT: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Luce Stregata",
-        "description": "Riduce l'armatura del bersaglio del {damage}% per 40 sec. Non si somma con Trancia Armatura."
+        "description": "Decreases the target's armor by {damage}% for 40 sec."
       },
       "hibernate": {
         "name": "Sopore",
@@ -7635,7 +7635,7 @@ export const it_IT: EnTranslations = {
       },
       "rip": {
         "name": "Squartare",
-        "description": "Mossa finale che infligge {damage} danni da sanguinamento in 12 sec. Consuma i punti combo. Solo Forma del Lupo.",
+        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Wolf Form only.",
         "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
       },
       "mortal_strike": {
@@ -7740,15 +7740,15 @@ export const it_IT: EnTranslations = {
       },
       "cold_blood": {
         "name": "Sangue Freddo",
-        "description": "Concentra il tuo intento omicida, così il tuo prossimo attacco è un colpo critico. (firma Assassinio)"
+        "description": "Focuses your killing intent so your next attack is a critical strike. (Knifework signature)"
       },
       "blade_flurry": {
         "name": "Vortice di Lame",
-        "description": "Scatena un turbine di lame, aumentando la velocità d’attacco del 20% per 12 s. (firma Combattimento)"
+        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)"
       },
       "hemorrhage": {
         "name": "Emorragia",
-        "description": "Colpisce il nemico per danni dell’arma più {damage} e causa danni da sanguinamento per 12 s. Conferisce 1 punto combo. (firma Scaltrezza)"
+        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)"
       },
       "power_infusion": {
         "name": "Infusione di Potere",
@@ -7784,23 +7784,23 @@ export const it_IT: EnTranslations = {
       },
       "swiftmend": {
         "name": "Rapidità di Guarigione",
-        "description": "Consuma un effetto di cura periodica su un bersaglio alleato per curarlo di {damage}. (firma Guarigione)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "Moonsurge",
-        "description": "Spends your 3 Moontide for a heavy Arcane strike: the damage choice. Sunwake spends the same 3 Moontide, so pick one."
+        "description": "Spends your 3 Moontide for a heavy strike of {damage} Arcane damage: the damage choice. Sunwake spends the same 3 Moontide, so pick one."
       },
       "sunlance": {
         "name": "Sunwake",
-        "description": "Spends your 3 Moontide for a Nature strike and burn and restores 35 mana: the mana choice. Moonsurge spends the same 3 Moontide, so pick one."
+        "description": "Spends your 3 Moontide for a strike of {damage} Nature damage plus a {overTime} burn over 9 sec, and restores 35 mana: the mana choice. Moonsurge spends the same 3 Moontide, so pick one."
       },
       "redharvest": {
         "name": "Redharvest",
-        "description": "Spends your 3 Old Blood: instantly deals all the damage your Flense and Bloodrift would still have dealt, removes both bleeds, and restores 30 energy. Works with zero combo points; any you have make the bite hit harder."
+        "description": "Spends your 3 Old Blood: strike for {damage}, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore 30 energy. Works with zero combo points."
       },
       "marrowbreak": {
         "name": "Marrowbreak",
-        "description": "Spends your 3 Old Blood for a heavy, high-threat strike. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage."
+        "description": "Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage."
       },
       "overbloom": {
         "name": "Overbloom",
@@ -8048,7 +8048,7 @@ export const it_IT: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "Colpo Spettrale",
-        "description": "Colpisce il nemico infliggendo i danni dell’arma più {damage}, aumenta brevemente la schivata e assegna 1 punto combo. (talento del Ladro)"
+        "description": "Strikes the enemy for weapon damage plus {damage} and increases your dodge chance by 15% for 7 sec. Awards 1 combo point. (Rogue talent)"
       },
       "hammer_of_wrath": {
         "name": "Martello Rintoccante",
@@ -8212,24 +8212,24 @@ export const it_IT: EnTranslations = {
       },
       "venom_dart": {
         "name": "Dardo velenoso",
-        "description": "Scaglia un dardo avvelenato che infligge {damage} danni da Natura. Conferisce 1 punto combo. Knifework: prolunga la tua ferita di Squarcio velenoso di 6 sec, fino a 20 sec.",
+        "description": "Flick a poisoned dart for {damage} Nature damage. Awards 1 combo point.",
         "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
       },
       "body_blow": {
         "name": "Colpo al corpo",
-        "description": "Un colpo pesante per il 130% del danno dell’arma più 10 che conferisce 2 punti combo e approfondisce la Redline di una tacca. (motore Thuggery)"
+        "description": "A heavy blow for 130% weapon damage plus 10. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)"
       },
       "knockout_blow": {
         "name": "Colpo da knockout",
-        "description": "Concludi la Redline con un knockout: colpisce per 45 più 35 per punto combo, il 25% più forte per ogni tacca della Redline, e recupera 25 energia. (motore Thuggery)"
+        "description": "Ends Redline with a knockout: strike for 45 plus 35 per combo point, hitting 25% harder for each Redline you built, and recover 25 energy. Use it before Redline runs out or the knockout is lost. (Thuggery)"
       },
       "veilstrike": {
         "name": "Colpo del velo",
-        "description": "Consuma la riserva di Brumora per avvolgerti nell’ombra per 6 s: le tue aperture furtive funzionano allo scoperto e infliggi il 25% di danni in più. (motore Skulduggery)"
+        "description": "For 6 sec: your Duskveil openers work without stealth and from any angle, you deal 10% more damage, and your first Lurker's Strike inside it hits for double. (Skulduggery)"
       },
       "venomrend": {
         "name": "Squarcio velenoso",
-        "description": "Consuma il Rituale del veleno: colpisce per 22 più 26 per punto combo, fa detonare i danni residui dei tuoi sanguinamenti e ripristina 25 energia. (motore Knifework)"
+        "description": "Spends your 6 Venom Ritual: strike for 100 plus 55 per combo point, instantly deal all the damage your bleeds would still have dealt, then apply a fresh venom wound (120 damage over 20 sec). Restores 20 energy. (Knifework)"
       },
       "typhoon": {
         "name": "Tifone",
@@ -8277,7 +8277,7 @@ export const it_IT: EnTranslations = {
       },
       "rake": {
         "name": "Scarnificare",
-        "description": "Un'apertura furtiva che dilania il nemico infliggendo danno dell'arma più {damage} e provoca danno da sanguinamento per 9 sec. Conferisce 1 punto combo. Solo in Forma del Lupo.",
+        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "revive_pet": {

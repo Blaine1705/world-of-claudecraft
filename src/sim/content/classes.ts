@@ -4916,6 +4916,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   mark_of_the_wild: {
     id: 'mark_of_the_wild',
+    tooltipOmitEffectLines: true,
     name: 'Wildward',
     class: 'druid',
     learnLevel: 1,
@@ -5040,6 +5041,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   thorns: {
     id: 'thorns',
+    tooltipOmitEffectLines: true,
     name: 'Briarguard',
     class: 'druid',
     learnLevel: 6,
@@ -5362,6 +5364,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   barkskin: {
     id: 'barkskin',
+    tooltipOmitEffectLines: true,
     name: 'Oakhide',
     class: 'druid',
     learnLevel: 16,
@@ -6199,6 +6202,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   cold_blood: {
     id: 'cold_blood',
+    tooltipOmitEffectLines: true,
     name: "Killer's Calm",
     class: 'rogue',
     learnLevel: 10,
@@ -6214,6 +6218,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   blade_flurry: {
     id: 'blade_flurry',
+    tooltipOmitEffectLines: true,
     name: 'Mirrored Blades',
     class: 'rogue',
     learnLevel: 10,
@@ -6427,7 +6432,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     consumesRequiredAura: false,
     effects: [{ type: 'directDamage', min: 240, max: 285 }],
     description:
-      'Spends your 3 Moontide for a heavy Arcane strike: the damage choice. Sunwake spends the same 3 Moontide, so pick one.',
+      'Spends your 3 Moontide for a heavy strike of $d Arcane damage: the damage choice. Sunwake spends the same 3 Moontide, so pick one.',
   },
   sunlance: {
     id: 'sunlance',
@@ -6451,7 +6456,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'gainResource', amount: 35 },
     ],
     description:
-      'Spends your 3 Moontide for a Nature strike and burn and restores 35 mana: the mana choice. Moonsurge spends the same 3 Moontide, so pick one.',
+      'Spends your 3 Moontide for a strike of $d Nature damage plus a $o burn over 9 sec, and restores 35 mana: the mana choice. Moonsurge spends the same 3 Moontide, so pick one.',
   },
   redharvest: {
     id: 'redharvest',
@@ -6477,7 +6482,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'gainResource', amount: 30 },
     ],
     description:
-      'Spends your 3 Old Blood: instantly deals all the damage your Flense and Bloodrift would still have dealt, removes both bleeds, and restores 30 energy. Works with zero combo points; any you have make the bite hit harder.',
+      'Spends your 3 Old Blood: strike for $d, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore 30 energy. Works with zero combo points.',
   },
   marrowbreak: {
     id: 'marrowbreak',
@@ -6500,7 +6505,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'druidMarrowbreakGuard', belowFrac: 0.5, absorbPctMaxHp: 0.18, rage: 15 },
     ],
     description:
-      'Spends your 3 Old Blood for a heavy, high-threat strike. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage.',
+      'Spends your 3 Old Blood for a heavy, high-threat strike of $d damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage.',
   },
   overbloom: {
     id: 'overbloom',

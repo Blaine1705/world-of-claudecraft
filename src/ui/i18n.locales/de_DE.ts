@@ -1079,20 +1079,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thieves_chorus.description':
     'Ein gepfiffenes Signal spornt eure Gruppe an: Angriffs-, Zauber- und Kanalisierungstempo für 10 Sek. um 10% erhöht. Verbündete, die kürzlich einen Gruppentempo-Schub erhielten, sind zu erschöpft, um zu profitieren. (Schurkentalent)',
   'entities.abilities.venomrend.name': 'Giftriss',
-  'entities.abilities.venomrend.description':
-    'Verzehrt das Giftritual: trifft für 22 plus 26 pro Combopunkt, bringt den Restschaden eurer Blutungen zur Detonation und stellt 25 Energie wieder her. (Knifework-Engine)',
   'entities.abilities.veilstrike.name': 'Schleierstoß',
-  'entities.abilities.veilstrike.description':
-    'Verzehrt den Düstervorrat und hüllt euch 6 Sek. lang in Schatten: eure Schleichangriffe funktionieren im Offenen und ihr verursacht 25% mehr Schaden. (Skulduggery-Engine)',
   'entities.abilities.body_blow.name': 'Körpertreffer',
-  'entities.abilities.body_blow.description':
-    'Ein wuchtiger Treffer für 130% Waffenschaden plus 10, der 2 Combopunkte gewährt und die Redline um eine Stufe vertieft. (Thuggery-Engine)',
   'entities.abilities.knockout_blow.name': 'K.o.-Schlag',
-  'entities.abilities.knockout_blow.description':
-    'Beendet die Redline mit einem K.o.: trifft für 45 plus 35 pro Combopunkt, pro Redline-Stufe 25% härter, und stellt 25 Energie wieder her. (Thuggery-Engine)',
   'entities.abilities.venom_dart.name': 'Giftpfeil',
-  'entities.abilities.venom_dart.description':
-    'Schnippt einen vergifteten Pfeil für {damage} Naturschaden. Gewährt 1 Combopunkt. Knifework: verlängert eure Giftriss-Wunde um 6 Sek., bis zu 20 Sek.',
   'entities.abilities.smoke_screen.name': 'Rauchvorhang',
   'entities.abilities.smoke_screen.description':
     'Ihr verschwindet in einer Rauchwolke, wodurch sich Eure Ausweichchance 8 Sek. lang um 30 % erhöht.',
@@ -3628,7 +3618,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.unavailable': 'Nicht verfügbar',
   'abilityUi.tooltip.requiresLevel': 'Benötigt Stufe {level}',
   'abilityUi.tooltip.requiresForm': 'Benötigt {form}form',
-  'abilityUi.tooltip.requiresStealth': 'Benötigt Verstohlenheit',
   'abilityUi.tooltip.requiresCombo': 'Verbraucht Combopunkte',
   'abilityUi.tooltip.requiresTargetHealthBelow': 'Benötigt ein Ziel unter {percent}% Gesundheit',
   'abilityUi.tooltip.requiresDodge': 'Nur nutzbar, nachdem das Ziel ausgewichen ist',
@@ -4042,41 +4031,24 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_barrier.description':
     'Schützt euch mit Eis und absorbiert 60 Sek. lang {damage} Schaden.',
   'entities.abilities.sinister_strike.name': 'Boshafter Hieb',
-  'entities.abilities.sinister_strike.description':
-    'Sofortiger Hieb für Waffenschaden plus {damage}. Gewährt 1 Combopunkt.',
   'entities.abilities.eviscerate.name': 'Grabesschlaf',
-  'entities.abilities.eviscerate.description': 'Finishing-Move, der {damage} verursacht.',
   'entities.abilities.backstab.name': 'Feiger Stoß',
-  'entities.abilities.backstab.description':
-    'Meuchelt das Ziel für 150% Waffenschaden plus {damage}. Ihr müsst hinter dem Ziel stehen. Erfordert einen Dolch. Gewährt 1 Combopunkt.',
   'entities.abilities.gouge.name': 'Augenstich',
   'entities.abilities.gouge.description':
     'Trifft das Ziel für {damage} Schaden und macht es 4 Sek. lang handlungsunfähig. Jeder Schaden bricht den Effekt. Gewährt 1 Combopunkt.',
   'entities.abilities.evasion.name': 'Geisterfuß',
   'entities.abilities.evasion.description': 'Erhöht eure Ausweichchance 15 Sek. lang um 50%.',
   'entities.abilities.slice_and_dice.name': 'Mörderisches Tempo',
-  'entities.abilities.slice_and_dice.description':
-    'Finishing-Move, der das Nahkampfangriffstempo um 30% erhöht. Hält pro Combopunkt länger an.',
   'entities.abilities.sprint.name': 'Flinke Fersen',
   'entities.abilities.sprint.description': 'Erhöht euer Bewegungstempo 15 Sek. lang um 70%.',
   'entities.abilities.kidney_shot.name': 'Tiefschlag',
-  'entities.abilities.kidney_shot.description':
-    'Finishing-Move, der das Ziel betäubt. Hält pro Combopunkt 1 Sek. länger an.',
   'entities.abilities.ambush.name': 'Lauererstoß',
-  'entities.abilities.ambush.description':
-    'Überfällt das Ziel für 250% Waffenschaden plus {damage}. Ihr müsst verstohlen und hinter dem Ziel sein. Erfordert einen Dolch. Gewährt 1 Combopunkt.',
   'entities.abilities.stealth.name': 'Dämmerschleier',
-  'entities.abilities.stealth.description':
-    'Verbirgt euch in den Schatten: Gegner bemerken euch kaum, aber ihr bewegt euch 50% langsamer. Angreifen oder Schaden erleiden bricht Duskveil. Erneut wirken, um hervorzutreten.',
   'entities.abilities.adrenaline_rush.name': 'Beschleunigtes Blut',
   'entities.abilities.adrenaline_rush.description':
     'Euer Blut kocht und stellt sofort 60 Energie wieder her.',
   'entities.abilities.garrote.name': 'Kehldraht',
-  'entities.abilities.garrote.description':
-    'Erwürgt den Gegner, verursacht sofort {damage} Schaden und lässt ihn über 18 Sek. für {overTime} bluten. Erfordert Verstohlenheit. Gewährt 1 Combopunkt.',
   'entities.abilities.cheap_shot.name': 'Magenhieb',
-  'entities.abilities.cheap_shot.description':
-    'Trifft das Ziel für {damage} Schaden und betäubt es 4 Sek. lang. Erfordert Verstohlenheit. Gewährt 2 Combopunkte.',
   'entities.abilities.sap.name': 'Kopfnuss',
   'entities.abilities.sap.description':
     'Macht das Ziel 8 Sek. lang handlungsunfähig. Erfordert Verstohlenheit und außerhalb des Kampfes zu sein. Jeder Schaden bricht den Effekt.',
@@ -4084,11 +4056,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.description':
     'Trifft das Ziel mit einem bleiernen Gift, verursacht {damage} Naturschaden und verlangsamt sein Bewegungstempo 12 Sek. lang um 50%.',
   'entities.abilities.expose_armor.name': 'Rüstungsbruch',
-  'entities.abilities.expose_armor.description':
-    'Finishing-Move, der das Ziel entblößt und seine Rüstung 30 Sek. lang um {damage} verringert.',
   'entities.abilities.rupture.name': 'Ausbluten',
-  'entities.abilities.rupture.description':
-    'Finishing-Move, der das Ziel verwundet und es 16 Sek. lang um {damage} bluten lässt.',
   'entities.abilities.vanish.name': 'Rauchschritt',
   'entities.abilities.vanish.description':
     'Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Duskveil. Ihr bewegt euch 50% langsamer, solange ihr verborgen seid. Hält bis zu 10 Sek. an.',
@@ -4264,18 +4232,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowburn.description':
     'Trifft das Ziel sofort mit sengendem Schatten für {damage} Schattenschaden.',
   'entities.abilities.wrath.name': 'Wildblitz',
-  'entities.abilities.wrath.description':
-    'Schleudert einen Blitz Naturenergie für {damage} Naturschaden.',
   'entities.abilities.healing_touch.name': 'Wildheilung',
   'entities.abilities.healing_touch.description': 'Heilt ein freundliches Ziel um {damage}.',
   'entities.abilities.mark_of_the_wild.name': 'Wildwacht',
   'entities.abilities.mark_of_the_wild.description':
     'Belegt ein freundliches Ziel mit Wildward und erhöht seine Rüstung 30 Min. lang um {buff}.',
   'entities.abilities.moonfire.name': 'Mondsturm',
-  'entities.abilities.moonfire.description':
-    'Verbrennt den Gegner mit Mondfeuer für {damage} Arkanschaden plus Schaden über Zeit.',
   'entities.abilities.rejuvenation.name': 'Wildblüte',
-  'entities.abilities.rejuvenation.description': 'Heilt das Ziel über 12 Sek. um {damage}.',
   'entities.abilities.thorns.name': 'Dornenwacht',
   'entities.abilities.thorns.description':
     'Dornen sprießen aus dem Ziel: Nahkampfangreifer erleiden {buff} Naturschaden.',
@@ -4286,8 +4249,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bear_form.description':
     'Verwandelt euch in einen Bären: Rüstung +130%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
   'entities.abilities.maul.name': 'Knochenmalmer',
-  'entities.abilities.maul.description':
-    'Ein zerfleischender Angriff, der den Nahkampfschaden um {damage} erhöht und viel Bedrohung verursacht. Wird bei eurem nächsten Schwung ausgelöst. Nur in Bruin Form.',
   'entities.abilities.growl.name': 'Bedrohen',
   'entities.abilities.growl.description':
     'Knurrt das Ziel an: Eure Bedrohung steigt auf die seines meistgehassten Gegners und es wird 3 Sek. lang gezwungen, euch anzugreifen. Nur in Bruin Form.',
@@ -4295,23 +4256,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cat_form.description':
     'Verwandelt euch in einen Wolf: Angriffskraft steigt mit eurer Stufe, eure Angriffe nutzen Energie und Combopunkte, und ihr erzeugt 29% weniger Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
   'entities.abilities.claw.name': 'Klaue',
-  'entities.abilities.claw.description':
-    'Kratzt den Gegner für Waffenschaden plus {damage}. Gewährt 1 Combopunkt. Nur in Wolfsgestalt.',
   'entities.abilities.ferocious_bite.name': 'Blutbiss',
-  'entities.abilities.ferocious_bite.description':
-    'Finishing-Move, der {damage} verursacht. Nur in Wolfsgestalt.',
   'entities.abilities.swipe.name': 'Fegende Klauen',
-  'entities.abilities.swipe.description':
-    'Fegt nahe Gegner für {damage} Schaden. Verursacht zusätzliche Bedrohung. Nur in Bruin Form.',
   'entities.abilities.regrowth.name': 'Zweite Blüte',
-  'entities.abilities.regrowth.description':
-    'Heilt ein freundliches Ziel um {damage} und zusätzlich über 21 Sek.',
   'entities.abilities.barkskin.name': 'Eichenhaut',
   'entities.abilities.barkskin.description':
     'Eure Haut härtet wie Rinde und erhöht die Rüstung 15 Sek. lang um 150.',
   'entities.abilities.starfire.name': 'Himmelssturz',
-  'entities.abilities.starfire.description':
-    'Ruft einen Bolzen aus Sternenfeuer herab, der {damage} Arkanschaden verursacht.',
   'entities.abilities.travel_form.name': 'Fleet-Gestalt',
   'entities.abilities.travel_form.description':
     'Nehmt augenblicklich eine flinke Fleet Form an, was das Lauftempo um 40% erhöht. In dieser Gestalt könnt ihr keine anderen Fähigkeiten einsetzen, aber ihr könnt im Kampf hinein- und herauswechseln. Ideal zur Flucht.',
@@ -4320,8 +4271,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': 'Erschüttern',
   'entities.abilities.bash.description': 'Betäubt das Ziel 2 Sek. lang. Nur in Bruin Form.',
   'entities.abilities.faerie_fire.name': 'Hexenlicht',
-  'entities.abilities.faerie_fire.description':
-    'Verringert die Rüstung des Ziels 40 Sek. lang um {damage}%. Nicht mit Rüstungsspalter kumulierbar.',
   'entities.abilities.hibernate.name': 'Schlummer',
   'entities.abilities.hibernate.description':
     'Versetzt das Ziel bis zu 8 Sek. in tiefen Schlaf. Jeglicher Schaden weckt es auf.',
@@ -4338,8 +4287,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tigers_fury.description':
     'Erhöht die Angriffskraft {duration} Sek. lang um {buff}. Nur in Wolfsgestalt.',
   'entities.abilities.rip.name': 'Zerfetzen',
-  'entities.abilities.rip.description':
-    'Finishing-Move, der über 12 Sek. {damage} Blutungsschaden verursacht. Verbraucht Combopunkte. Nur in Wolfsgestalt.',
   'entities.abilities.mortal_strike.name': 'Verstümmelnder Hieb',
   'entities.abilities.mortal_strike.description':
     'Ein bösartiger Schlag, der Waffenschaden plus {damage} verursacht. (Waffen-Signatur)',
@@ -4386,8 +4333,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prowl.description':
     'Geht in Wolfsgestalt in den Schleichmodus über und bewegt Euch 50% langsamer. Im Kampf nicht einsetzbar.',
   'entities.abilities.rake.name': 'Schinden',
-  'entities.abilities.rake.description':
-    'Ein Schleicheröffner, der den Gegner für Waffenschaden plus {damage} aufreißt und über 9 Sek. Blutungsschaden verursacht. Gewährt 1 Combopunkt. Nur in Wolfsgestalt.',
   'entities.abilities.revive_pet.name': 'Zusammenflicken',
   'entities.abilities.revive_pet.description':
     'Flickt deinen Begleiter zusammen und stellt ihm, solange er lebt, im Verlauf von 12 Sek. alle 3 Sek. insgesamt {overTime} Gesundheit wieder her. Ist er tot, wird er mit 35 % Gesundheit wiederbelebt.',
@@ -4416,14 +4361,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.icy_veins.description':
     'Erhöht das Zaubertempo 10 Sek. lang um 30% und verhindert Unterbrechung sowie Zauberzeitverlust. (Frost-Signatur)',
   'entities.abilities.cold_blood.name': 'Kaltblütigkeit',
-  'entities.abilities.cold_blood.description':
-    'Bündelt Eure Mordlust, sodass Euer nächster Angriff ein kritischer Treffer ist. (Meucheln-Signatur)',
   'entities.abilities.blade_flurry.name': 'Klingenwirbel',
-  'entities.abilities.blade_flurry.description':
-    'Entfesselt einen Klingenwirbel und erhöht das Angriffstempo 12 Sek. lang um 20%. (Kampf-Signatur)',
   'entities.abilities.hemorrhage.name': 'Blutsturz',
-  'entities.abilities.hemorrhage.description':
-    'Trifft den Gegner für Waffenschaden plus {damage} und verursacht 12 Sek. lang Blutungsschaden. Gewährt 1 Combopunkt. (Täuschungs-Signatur)',
   'entities.abilities.power_infusion.name': 'Machtinfusion',
   'entities.abilities.power_infusion.description':
     'Erfüllt ein freundliches Ziel mit Macht und erhöht seine Zaubermacht 15 Sek. lang um 28. (Disziplin-Signatur)',
@@ -4449,8 +4388,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.description':
     'Stürmt einen Gegner an und wurzelt ihn 1 Sek. lang. 8-25 m Reichweite. (Wildheits-Signatur)',
   'entities.abilities.swiftmend.name': 'Rasche Heilung',
-  'entities.abilities.swiftmend.description':
-    'Verbraucht einen Heilung-über-Zeit-Effekt auf einem freundlichen Ziel, um es um {damage} zu heilen. (Wiederherstellungs-Signatur)',
   'entities.abilities.crusader_strike.name': 'Kreuzfahrerstoß',
   'entities.abilities.crusader_strike.description':
     'Trifft das Ziel für Waffenschaden plus {damage} Heiligschaden. (Paladin-Talent)',
@@ -8662,8 +8599,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Stellt im Verlauf von 10 Sek. 180 Gesundheit wieder her. Nur in Bärengestalt. (Druidentalent)',
   'entities.abilities.frost_trap.description':
     'Friert Gegner im Zielgebiet 3 Sek. lang ein, sodass sie sich weder bewegen noch handeln können. (Jägertalent)',
-  'entities.abilities.ghostly_strike.description':
-    'Trifft den Gegner für Waffenschaden plus {damage}, erhöht kurzzeitig die Ausweichchance und gewährt 1 Combopunkt. (Schurkentalent)',
   'entities.abilities.hammer_of_wrath.description':
     'Schleudert einen heiligen Hammer auf einen verwundeten Gegner und verursacht {damage} Heiligschaden. Nur unter 20 % Gesundheit einsetzbar. (Paladintalent)',
   'entities.abilities.healing_stream.description':

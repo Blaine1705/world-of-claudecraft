@@ -350,6 +350,7 @@ export const TALENT_ABILITIES_V2_A = {
   },
   veilstrike: {
     id: 'veilstrike',
+    tooltipOmitEffectLines: true,
     name: 'Shadow Veil',
     class: 'rogue',
     learnLevel: 10,
@@ -385,6 +386,7 @@ export const TALENT_ABILITIES_V2_A = {
   },
   ghostly_strike: {
     id: 'ghostly_strike',
+    tooltipOmitEffectLines: true,
     name: 'Wraith Strike',
     class: 'rogue',
     learnLevel: 10,
@@ -400,7 +402,7 @@ export const TALENT_ABILITIES_V2_A = {
       { type: 'selfBuff', kind: 'buff_dodge', value: 0.15, duration: 7 },
     ],
     description:
-      'Strikes the enemy for weapon damage plus $d and briefly increases dodge. Awards 1 combo point. (Rogue talent)',
+      'Strikes the enemy for weapon damage plus $d and increases your dodge chance by 15% for 7 sec. Awards 1 combo point. (Rogue talent)',
   },
   cloak_of_shadows: {
     id: 'cloak_of_shadows',

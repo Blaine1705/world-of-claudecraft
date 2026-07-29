@@ -1621,15 +1621,15 @@ export const ko_KR: EnTranslations = {
       "freeCast": "다음 시전에 자원이 들지 않습니다",
       "instantCast": "시전 시간이 있는 다음 주문이 즉시 시전됩니다",
       "cheapCast": "다음 주문의 소모량이 {pct}% 감소합니다",
-      "venomRitual": "맹독 의식: {stacks}/{max} 단계. 연계 점수 생성 기술이 단계를 쌓으며, {max} 단계가 되면 영면이 맹독 찢기로 바뀝니다",
-      "gloam": "땅거미: {stacks}/{max} 단계. {max} 단계가 되면 황혼장막이 장막 일격으로 바뀝니다",
-      "redline": "레드라인: 핍 {stacks}/{max}. 보디 블로가 핍을 쌓고, 녹아웃 블로는 핍마다 {pct}% 더 강해지며 적중 시 창을 끝냅니다. 시간이 다 되면 사라집니다",
+      "venomRitual": "Venom Ritual {stacks}/{max}. Craven Thrust, Wicked Slash, and Venom Dart each add 1. At {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam {stacks}/{max}. Openers used from Duskveil each add 1. At {max}, your openers work without stealth, and the next one is free, spends all 3, and starts the Shadow Veil",
+      "redline": "Redline {stacks}/{max}. Each Body Blow adds 1. Knockout Blow hits {pct}% harder for each one and ends Redline. If the timer runs out first, the knockout is lost",
       "veilstrikeWindow": "그림자에 휩싸임: 황혼장막 전용 선제 기술을 어느 각도에서든 사용할 수 있고, 주는 피해가 {pct}% 증가합니다",
       "veiledEdge": "다음 잠복자의 일격이 두 배의 피해를 입힙니다",
       "duskEconomy": "기술의 기력 소모가 {pct}% 감소합니다",
-      "moontide": "달물결: {stacks}/{max}단계. 달날개 형상에서 야생 벼락, 창공 낙하, 달씨앗 시전이 단계를 쌓습니다. {max}단계에서 달씨앗이 달의 격동으로, 창공 낙하가 해돋움으로 변하며, 어느 쪽을 써도 소모됩니다",
-      "oldBlood": "오랜 피: {stacks}/{max}단계. 늑대와 곰의 적중 공격이 이 저장량을 공유하며, {max}단계에서 유혈 물어뜯기 또는 뼈 분쇄가 변합니다",
-      "verdance": "푸른 생장: {stacks}/{max}단계. 야생 개화와 두 번째 개화 시전 완료로 쌓이며, {max}단계에서 신속한 치유가 만개로 변합니다",
+      "moontide": "Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3",
+      "oldBlood": "Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Wolf Form, Bonecrush becomes Marrowbreak in Bruin Form",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Swiftmend becomes Overbloom",
       "increase": {
         "ap": "공격력을 {value} 증가시킵니다",
         "sp": "주문력을 {value} 증가시킵니다",
@@ -6513,7 +6513,7 @@ export const ko_KR: EnTranslations = {
       "unavailable": "사용 불가",
       "requiresLevel": "{level}레벨 필요",
       "requiresForm": "{form} 변신 필요",
-      "requiresStealth": "은신 필요",
+      "requiresStealth": "Requires stealth",
       "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "연계 점수 소비",
       "requiresTargetHealthBelow": "대상 생명력이 {percent}% 미만이어야 함",
@@ -7173,19 +7173,19 @@ export const ko_KR: EnTranslations = {
       },
       "sinister_strike": {
         "name": "사악한 베기",
-        "description": "즉시 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다.",
+        "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point.",
         "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
         "specNote_combat": "While Redline is active, this button becomes Body Blow: a heavier strike that awards 2 combo points and builds Redline."
       },
       "eviscerate": {
         "name": "영면",
-        "description": "결정타로 {damage}의 피해를 입힙니다.",
+        "description": "Finishing move that causes {damage}.",
         "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
         "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: your strike becomes Body Blow and this button becomes Knockout Blow (spend it before Redline ends)."
       },
       "backstab": {
         "name": "비겁한 찌르기",
-        "description": "대상을 등 뒤에서 찔러 무기 피해의 150%에 {damage}를 더한 피해를 입힙니다. 대상 뒤에 있어야 합니다. 단검이 필요합니다. 연계 점수 1점을 얻습니다.",
+        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
         "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
       },
       "gouge": {
@@ -7198,7 +7198,7 @@ export const ko_KR: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "살수의 박자",
-        "description": "근접 공격 속도를 30%만큼 증가시키는 결정타입니다. 연계 점수당 지속시간이 길어집니다."
+        "description": "Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec per combo point (5 combo points: 32 sec)."
       },
       "sprint": {
         "name": "날쌘 발",
@@ -7206,16 +7206,16 @@ export const ko_KR: EnTranslations = {
       },
       "kidney_shot": {
         "name": "반칙 가격",
-        "description": "대상을 기절시키는 결정타입니다. 연계 점수당 1초 더 지속됩니다."
+        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec)."
       },
       "ambush": {
         "name": "잠복자의 일격",
-        "description": "은신 상태에서 대상 뒤를 기습해 무기 피해의 250%에 {damage}를 더한 피해를 입힙니다. 단검이 필요합니다. 연계 점수 1점을 얻습니다.",
+        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.",
         "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
       },
       "stealth": {
         "name": "황혼장막",
-        "description": "그림자 속에 몸을 숨깁니다. 적이 거의 알아차리지 못하지만 이동 속도가 50% 감소합니다. 공격하거나 피해를 받으면 황혼장막이 해제됩니다. 다시 시전하면 모습을 드러냅니다.",
+        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.",
         "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
       },
       "adrenaline_rush": {
@@ -7224,12 +7224,12 @@ export const ko_KR: EnTranslations = {
       },
       "garrote": {
         "name": "철사 목조르기",
-        "description": "적의 목을 졸라 즉시 {damage}의 피해를 입히고 18초에 걸쳐 {overTime}의 출혈 피해를 입힙니다. 은신 상태여야 합니다. 연계 점수 1점을 얻습니다.",
+        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point.",
         "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "cheap_shot": {
         "name": "명치 가격",
-        "description": "대상을 가격해 {damage}의 피해를 입히고 4초 동안 기절시킵니다. 은신 상태여야 합니다. 연계 점수 2점을 얻습니다.",
+        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.",
         "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "sap": {
@@ -7242,11 +7242,11 @@ export const ko_KR: EnTranslations = {
       },
       "expose_armor": {
         "name": "방어구 돌파",
-        "description": "대상의 약점을 드러내 30초 동안 방어도를 {damage}만큼 감소시키는 결정타입니다."
+        "description": "Finishing move that exposes the target for 30 sec: each combo point spent reduces its armor by 2% (5 combo points: {damage}%)."
       },
       "rupture": {
         "name": "과다출혈",
-        "description": "대상에게 상처를 입혀 16초에 걸쳐 {damage}의 출혈 피해를 입히는 결정타입니다."
+        "description": "Finishing move that wounds the target: it bleeds every 2 sec, for 6 sec plus 2 sec per combo point (5 combo points: 16 sec and {damage} total damage)."
       },
       "vanish": {
         "name": "연막 걸음",
@@ -7510,7 +7510,7 @@ export const ko_KR: EnTranslations = {
       },
       "wrath": {
         "name": "야생 벼락",
-        "description": "자연 에너지의 화살을 던져 {damage}의 자연 피해를 입힙니다. 달날개 형상에서 시전을 완료하면 달물결이 쌓입니다. 달물결 최대 단계에서 이를 소모합니다: 달씨앗이 달의 격동으로, 창공 낙하가 해돋움으로 변합니다.",
+        "description": "Hurls a bolt of nature energy for {damage} Nature damage.",
         "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge (a heavy Arcane strike) and Skyfall becomes Sunwake (a Nature strike that restores 35 mana)."
       },
       "healing_touch": {
@@ -7523,16 +7523,16 @@ export const ko_KR: EnTranslations = {
       },
       "moonfire": {
         "name": "달빛 폭풍",
-        "description": "달빛불로 적을 태워 {damage}의 비전 피해와 지속 피해를 입힙니다. 조화: 계속 타오르게 유지합니다. 달씨앗이 지속시간을 6초 연장합니다.",
+        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time.",
         "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
       },
       "moonseed": {
         "name": "달씨앗",
-        "description": "달날개 형상 전용입니다. {damage}의 비전 피해를 주고 달물결을 1단계 올리며 달빛 폭풍을 6초 연장합니다. 적용 한 번당 최대 6초입니다. 달물결 최대 단계에서 달씨앗이 달의 격동으로 변합니다."
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant heavy Arcane strike that spends all 3."
       },
       "rejuvenation": {
         "name": "야생 개화",
-        "description": "12초에 걸쳐 대상의 생명력을 {damage}만큼 회복시킵니다. 회복: 새로 심는 개화가 푸른 생장을 쌓으며, 5단계에서 신속한 치유가 만개로 변합니다.",
+        "description": "Heals the target for {damage} over 12 sec.",
         "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
       },
       "thorns": {
@@ -7549,7 +7549,7 @@ export const ko_KR: EnTranslations = {
       },
       "maul": {
         "name": "뼈 분쇄",
-        "description": "근접 피해를 {damage}만큼 증가시키고 많은 위협 수준을 생성하는 난폭한 공격입니다. 야성: 적중한 공격이 오랜 피를 쌓으며, 3단계에서 뼈 분쇄가 골수분쇄로 변합니다. 다음 무기 공격 시 발동됩니다. 큰곰 변신 전용.",
+        "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a heavy, high-threat strike that instead shields you when below half health."
       },
       "growl": {
@@ -7562,22 +7562,22 @@ export const ko_KR: EnTranslations = {
       },
       "claw": {
         "name": "가르는 발톱",
-        "description": "적을 할퀴어 무기 피해에 {damage}를 더한 피해를 입힙니다. 연계 점수 1점을 얻습니다. 야성: 적중한 공격이 오랜 피를 쌓습니다. 늑대 변신 전용.",
+        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "ferocious_bite": {
         "name": "유혈 물어뜯기",
-        "description": "결정타로 {damage}의 피해를 입힙니다. 야성: 적중한 공격이 오랜 피를 쌓으며, 3단계에서 유혈 물어뜯기가 피의 수확으로 변합니다. 늑대 변신 전용.",
+        "description": "Finishing move that causes {damage}. Wolf Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: it instantly deals all the damage your bleeds would still have dealt and restores 30 energy."
       },
       "swipe": {
         "name": "휩쓰는 발톱",
-        "description": "주위 적을 휘둘러 {damage}의 피해를 입힙니다. 추가 위협 수준을 생성합니다. 야성: 적중한 공격이 오랜 피를 쌓습니다. 큰곰 변신 전용.",
+        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "regrowth": {
         "name": "두 번째 개화",
-        "description": "아군 대상의 생명력을 {damage}만큼 회복시키고 21초에 걸쳐 추가로 회복시킵니다. 회복: 새로 심는 개화가 푸른 생장을 쌓습니다.",
+        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec.",
         "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
       },
       "barkskin": {
@@ -7594,7 +7594,7 @@ export const ko_KR: EnTranslations = {
       },
       "starfire": {
         "name": "창공 낙하",
-        "description": "별의 불꽃을 불러 내려 {damage}의 비전 피해를 입힙니다. 달날개 형상에서 시전을 완료하면 달물결이 쌓입니다. 달물결 최대 단계에서 창공 낙하가 해돋움으로 변합니다.",
+        "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage.",
         "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant Nature strike and burn that restores 35 mana and spends all 3."
       },
       "travel_form": {
@@ -7611,7 +7611,7 @@ export const ko_KR: EnTranslations = {
       },
       "faerie_fire": {
         "name": "마녀불빛",
-        "description": "대상의 방어도를 40초 동안 {damage}%만큼 감소시킵니다. 방어구 절단과 중첩되지 않습니다."
+        "description": "Decreases the target's armor by {damage}% for 40 sec."
       },
       "hibernate": {
         "name": "깊은 잠",
@@ -7635,7 +7635,7 @@ export const ko_KR: EnTranslations = {
       },
       "rip": {
         "name": "피의 균열",
-        "description": "24초에 걸쳐 {damage}의 출혈 피해를 입히는 결정타입니다. 연계 점수를 소모합니다. 야성: 적중한 공격이 오랜 피를 쌓습니다. 늑대 변신 전용.",
+        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Wolf Form only.",
         "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
       },
       "mortal_strike": {
@@ -7740,15 +7740,15 @@ export const ko_KR: EnTranslations = {
       },
       "cold_blood": {
         "name": "냉혈",
-        "description": "살의를 집중하여 다음 공격이 치명타로 적중하게 합니다. (암살 전문화 상징)"
+        "description": "Focuses your killing intent so your next attack is a critical strike. (Knifework signature)"
       },
       "blade_flurry": {
         "name": "폭풍의 칼날",
-        "description": "칼날의 폭풍을 일으켜 12초 동안 공격 속도를 20% 증가시킵니다. (전투 전문화 상징)"
+        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)"
       },
       "hemorrhage": {
         "name": "과다출혈",
-        "description": "적을 공격하여 무기 피해에 더해 {damage}의 피해를 주고 12초 동안 출혈 피해를 줍니다. 연계 점수 1점을 얻습니다. (잠행 전문화 상징)"
+        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)"
       },
       "power_infusion": {
         "name": "마력 주입",
@@ -7784,27 +7784,27 @@ export const ko_KR: EnTranslations = {
       },
       "swiftmend": {
         "name": "신속한 치유",
-        "description": "아군 대상의 지속 치유 효과를 소모하여 생명력을 {damage}만큼 회복시킵니다. 야생 개화와 두 번째 개화 시전을 완료하면 푸른 생장이 쌓이며, 푸른 생장 5단계에서 신속한 치유가 만개로 변합니다. (회복 전문화 상징)"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "달의 격동",
-        "description": "달물결 3단계를 소모해 강력한 비전 공격을 하는 피해 특화 선택지입니다. 해돋움과 같은 달물결을 소모하므로 하나만 선택할 수 있습니다."
+        "description": "Spends your 3 Moontide for a heavy strike of {damage} Arcane damage: the damage choice. Sunwake spends the same 3 Moontide, so pick one."
       },
       "sunlance": {
         "name": "해돋움",
-        "description": "달물결 3단계를 소모해 자연 공격과 화상을 입히고 마나를 35 회복하는 마나 특화 선택지입니다. 달의 격동과 같은 달물결을 소모하므로 하나만 선택할 수 있습니다."
+        "description": "Spends your 3 Moontide for a strike of {damage} Nature damage plus a {overTime} burn over 9 sec, and restores 35 mana: the mana choice. Moonsurge spends the same 3 Moontide, so pick one."
       },
       "redharvest": {
         "name": "피의 수확",
-        "description": "오랜 피 3단계를 소모해 대상에게 남은 자신의 저미기와 피의 균열 피해를 폭발시키고 기력 30을 회복합니다. 보유한 연계 점수는 물어뜯기를 강화하지만 필수는 아닙니다."
+        "description": "Spends your 3 Old Blood: strike for {damage}, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore 30 energy. Works with zero combo points."
       },
       "marrowbreak": {
         "name": "골수분쇄",
-        "description": "오랜 피 3단계를 소모해 위협 수준이 높은 강타를 가합니다. 생명력이 절반 미만이면 대신 8초 동안 최대 생명력의 18%를 흡수하고 분노 15를 회복합니다."
+        "description": "Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage."
       },
       "overbloom": {
         "name": "만개",
-        "description": "푸른 생장 5단계를 소모합니다. 모든 아군에게 남은 자신의 지속 치유량 중 60%를 즉시 회복시키고 해당 효과를 제거한 뒤 대상에게 새로운 야생 개화를 심습니다."
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for 60% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom."
       },
       "summon_imp": {
         "name": "불씨족 소환",
@@ -8048,7 +8048,7 @@ export const ko_KR: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "망령의 일격",
-        "description": "적에게 무기 피해에 {damage}를 더한 피해를 입히고, 잠시 회피를 증가시키며 연계 점수 1점을 얻습니다. (도적 특성)"
+        "description": "Strikes the enemy for weapon damage plus {damage} and increases your dodge chance by 15% for 7 sec. Awards 1 combo point. (Rogue talent)"
       },
       "hammer_of_wrath": {
         "name": "울림 망치",
@@ -8212,24 +8212,24 @@ export const ko_KR: EnTranslations = {
       },
       "venom_dart": {
         "name": "맹독 다트",
-        "description": "독 묻은 다트를 튕겨 {damage}의 자연 피해를 입힙니다. 연계 점수를 1 얻습니다. 나이프워크: 맹독 찢기 상처를 6초 연장합니다(최대 20초).",
+        "description": "Flick a poisoned dart for {damage} Nature damage. Awards 1 combo point.",
         "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
       },
       "body_blow": {
         "name": "보디 블로",
-        "description": "무기 공격력의 130%에 10을 더한 묵직한 일격으로, 연계 점수를 2 얻고 레드라인을 한 단계 깊게 만듭니다. (전투 엔진)"
+        "description": "A heavy blow for 130% weapon damage plus 10. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)"
       },
       "knockout_blow": {
         "name": "녹아웃 블로",
-        "description": "녹아웃으로 레드라인을 끝냅니다: 45 더하기 연계 점수당 35의 피해를 입히며, 레드라인 단계마다 25% 더 강해지고 25의 기력을 회복합니다. (전투 엔진)"
+        "description": "Ends Redline with a knockout: strike for 45 plus 35 per combo point, hitting 25% harder for each Redline you built, and recover 25 energy. Use it before Redline runs out or the knockout is lost. (Thuggery)"
       },
       "veilstrike": {
         "name": "장막 일격",
-        "description": "어스름 저장고를 삼켜 6초 동안 그림자를 두릅니다: 은신 선제 기술을 훤한 곳에서도 쓸 수 있고 피해가 25% 증가합니다. (스컬더거리 엔진)"
+        "description": "For 6 sec: your Duskveil openers work without stealth and from any angle, you deal 10% more damage, and your first Lurker's Strike inside it hits for double. (Skulduggery)"
       },
       "venomrend": {
         "name": "맹독 찢기",
-        "description": "맹독 의식을 삼킵니다: 22 더하기 연계 점수당 26의 피해를 입히고, 자신의 출혈 효과의 남은 피해를 폭발시키며 25의 기력을 회복합니다. (나이프워크 엔진)"
+        "description": "Spends your 6 Venom Ritual: strike for 100 plus 55 per combo point, instantly deal all the damage your bleeds would still have dealt, then apply a fresh venom wound (120 damage over 20 sec). Restores 20 energy. (Knifework)"
       },
       "typhoon": {
         "name": "태풍",
@@ -8277,7 +8277,7 @@ export const ko_KR: EnTranslations = {
       },
       "rake": {
         "name": "저미기",
-        "description": "적을 저며 무기 피해에 더해 {damage}의 피해를 입히고 18초에 걸쳐 출혈 피해를 줍니다. 연계 점수 1을 부여합니다. 야성: 적중한 공격이 오랜 피를 쌓습니다. 늑대 변신 상태에서만 사용 가능.",
+        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "revive_pet": {

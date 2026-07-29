@@ -171,20 +171,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowstep.name': '影すべり',
   'entities.abilities.silence.name': '沈黙',
   'entities.abilities.venomrend.name': '毒裂き',
-  'entities.abilities.venomrend.description':
-    '毒の儀式を喰らい尽くす：22+コンボポイントごとに26のダメージを与え、自らの出血効果の残りダメージを起爆し、エナジーを25回復する。（ナイフワーク・エンジン）',
   'entities.abilities.veilstrike.name': 'ヴェールストライク',
-  'entities.abilities.veilstrike.description':
-    '宵闇の蓄えを喰らい尽くし、6秒間影を纏う：隠密の先制技が白昼でも使用でき、与ダメージが25%上昇する。（スカルダガリー・エンジン）',
   'entities.abilities.body_blow.name': 'ボディブロー',
-  'entities.abilities.body_blow.description':
-    '武器ダメージの130%に10を加えた重い一撃。コンボポイントを2獲得し、レッドラインを1段階深める。（コンバット・エンジン）',
   'entities.abilities.knockout_blow.name': 'ノックアウトブロー',
-  'entities.abilities.knockout_blow.description':
-    'ノックアウトでレッドラインを締めくくる：45にコンボポイントごとに35を加えたダメージを与え、レッドラインの段階ごとに25%強化され、エナジーを25回復する。（コンバット・エンジン）',
   'entities.abilities.venom_dart.name': '毒針',
-  'entities.abilities.venom_dart.description':
-    '毒針を弾き飛ばし、{damage}の自然ダメージを与える。コンボポイントを1獲得する。ナイフワーク:毒裂きの傷を6秒延長する(最大20秒)。',
   'entities.abilities.smoke_screen.name': 'スモークスクリーン',
   'entities.abilities.smoke_screen.description': '煙幕に紛れ、8秒間、回避率を30%上昇させる。',
   'entities.abilities.flurry_of_knives.name': '短剣乱舞',
@@ -484,12 +474,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_hourglass.name': '停止の砂時計',
   'entities.abilities.temporal_hourglass.description':
     '選択地点に時の砂時計を置きます。敵の足元では PvE で {hostilePveDuration} 秒、PvP で {hostilePvpDuration} 秒間停止させ、ダメージを受けると解除されます。自分またはパーティの味方の足元では {duration} 秒間の停滞となり、ダメージを受けず行動不能になり、最大体力の {healing}% を回復します。自分のクールダウンは {selfCooldownRecovery}%、味方は {allyCooldownRecovery}% 速く回復します。空の地面に置くと {groundDuration} 秒間待機し、最初に踏んだ有効な対象へ効果を与えます。強化効果は手動で解除できます。',
-  'hudChrome.auraEffect.venomRitual':
-    '毒の儀式:{stacks}/{max}段階。ビルダー攻撃で段階が進み、{max}段階で「永の眠り」が「毒裂き」に変化する',
-  'hudChrome.auraEffect.gloam':
-    '薄闇の蓄え:{stacks}/{max}段階。{max}段階で「ダスクヴェール」が「ヴェールストライク」に変化する',
-  'hudChrome.auraEffect.redline':
-    'レッドライン:{stacks}/{max}ピップ。「ボディブロー」でピップが増え、「ノックアウトブロー」はピップごとに{pct}%強化され、命中でウィンドウが終了する。時間切れで失われる',
   'hudChrome.auraEffect.veilstrikeWindow':
     '影に包まれている:ダスクヴェール専用の先制技をどの角度からでも使用でき、与ダメージが{pct}%増加する',
   'hudChrome.auraEffect.veiledEdge': '次に放つ「潜伏者の一撃」は2倍のダメージを与える',
@@ -2213,7 +2197,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.unavailable': '使用不可',
   'abilityUi.tooltip.requiresLevel': 'レベル{level}が必要',
   'abilityUi.tooltip.requiresForm': '{form}フォームが必要',
-  'abilityUi.tooltip.requiresStealth': 'ステルスが必要',
   'abilityUi.tooltip.requiresCombo': 'コンボポイントを消費',
   'abilityUi.tooltip.requiresTargetHealthBelow': '対象の体力が{percent}%未満である必要があります',
   'abilityUi.tooltip.requiresDodge': '対象が回避した後にのみ使用可能',
@@ -2652,41 +2635,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_barrier.description':
     '氷で身を守り、60秒間{damage}ダメージを吸収します。',
   'entities.abilities.sinister_strike.name': '邪悪な斬撃',
-  'entities.abilities.sinister_strike.description':
-    '武器ダメージに {damage} を加えた即時攻撃です。コンボポイントを1獲得します。',
   'entities.abilities.eviscerate.name': '永の眠り',
-  'entities.abilities.eviscerate.description': '{damage}を与えるフィニッシュムーブです。',
   'entities.abilities.backstab.name': '卑劣な突き',
-  'entities.abilities.backstab.description':
-    '対象を背後から刺し、武器ダメージの150%に {damage} を加えたダメージを与えます。対象の背後にいる必要があります。ダガーが必要です。コンボポイントを1獲得します。',
   'entities.abilities.gouge.name': '目潰し',
   'entities.abilities.gouge.description':
     '対象を打って{damage}ダメージを与え、4秒間行動不能にします。ダメージを受けると効果が切れます。コンボポイントを1獲得します。',
   'entities.abilities.evasion.name': '幻足',
   'entities.abilities.evasion.description': '15秒間、回避率が50%増加します。',
   'entities.abilities.slice_and_dice.name': '残忍な速攻',
-  'entities.abilities.slice_and_dice.description':
-    '近接攻撃速度を30%増加させるフィニッシュムーブです。コンボポイントごとに持続時間が延びます。',
   'entities.abilities.sprint.name': '駿足',
   'entities.abilities.sprint.description': '15秒間、移動速度が70%増加します。',
   'entities.abilities.kidney_shot.name': '急所打ち',
-  'entities.abilities.kidney_shot.description':
-    '対象をスタンさせるフィニッシュムーブです。コンボポイントごとに1秒長く続きます。',
   'entities.abilities.ambush.name': '潜伏者の一撃',
-  'entities.abilities.ambush.description':
-    'ステルス中に対象の背後から奇襲し、武器ダメージの250%に {damage} を加えたダメージを与えます。ダガーが必要です。コンボポイントを1獲得します。',
   'entities.abilities.stealth.name': 'ダスクヴェール',
-  'entities.abilities.stealth.description':
-    '影に身を隠します。敵にほとんど気づかれませんが、移動速度が50%低下します。攻撃するかダメージを受けるとダスクヴェールが解除されます。再度使用すると姿を現します。',
   'entities.abilities.adrenaline_rush.name': '滾る血潮',
   'entities.abilities.adrenaline_rush.description':
     '血が熱くなり、即座にエネルギーを60回復します。',
   'entities.abilities.garrote.name': '喉絞めの弦',
-  'entities.abilities.garrote.description':
-    '敵を絞め、即座に{damage}ダメージを与えるとともに、18秒かけて{overTime}の出血ダメージを与えます。ステルス状態でなければなりません。コンボポイントを1獲得します。',
   'entities.abilities.cheap_shot.name': 'みぞおち強打',
-  'entities.abilities.cheap_shot.description':
-    '対象を打って{damage}ダメージを与え、4秒間スタンさせます。ステルス状態でなければなりません。コンボポイントを2獲得します。',
   'entities.abilities.sap.name': 'サップ',
   'entities.abilities.sap.description':
     '対象を8秒間行動不能にします。ステルス状態かつ戦闘外でなければなりません。ダメージを受けると効果が切れます。',
@@ -2694,11 +2660,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.crippling_poison.description':
     '対象を鉛の毒で攻撃し、{damage}の自然ダメージを与えるとともに、12秒間、移動速度を50%低下させます。',
   'entities.abilities.expose_armor.name': '装甲破り',
-  'entities.abilities.expose_armor.description':
-    '対象の防御を崩し、30秒間アーマーを{damage}低下させるフィニッシュムーブです。',
   'entities.abilities.rupture.name': '止まらぬ出血',
-  'entities.abilities.rupture.description':
-    '対象に傷を負わせ、16秒かけて{damage}の出血ダメージを与えるフィニッシュムーブです。',
   'entities.abilities.vanish.name': '煙隠れ',
   'entities.abilities.vanish.description':
     '視界から消え、戦闘中でもダスクヴェール状態に入ります。隠れている間は移動速度が50%低下します。最大10秒間持続します。',
@@ -2893,19 +2855,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowburn.description':
     '対象に灼ける影を即座に叩き込み、{damage} の暗黒ダメージを与えます。',
   'entities.abilities.wrath.name': '野生の稲妻',
-  'entities.abilities.wrath.description':
-    '自然エネルギーの矢を放ち、{damage} の自然ダメージを与えます。月翼形態では、詠唱の完了で月潮が溜まります。月潮が最大のときはそれを消費します：月の種はムーンサージに、天墜は陽醒に変化します。',
   'entities.abilities.healing_touch.name': '野生の癒し',
   'entities.abilities.healing_touch.description': '味方対象の体力を {damage} 回復します。',
   'entities.abilities.mark_of_the_wild.name': 'ワイルドワード',
   'entities.abilities.mark_of_the_wild.description':
     '味方対象にワイルドワードを付与し、30分間アーマーを{buff}増加させます。',
   'entities.abilities.moonfire.name': '月の嵐',
-  'entities.abilities.moonfire.description':
-    '月の炎で敵を焼き、{damage} の秘術ダメージと継続ダメージを与えます。ムーングローヴ:燃やし続けること。月の種が効果を6秒延長します。',
   'entities.abilities.rejuvenation.name': '野生の芽吹き',
-  'entities.abilities.rejuvenation.description':
-    '12秒間で対象の体力を {damage} 回復します。グローヴハート:新しい花を植えると翠成が溜まり、5になるとスウィフトメンドが満開に変化します。',
   'entities.abilities.thorns.name': '茨の守り',
   'entities.abilities.thorns.description':
     '対象から棘が生えます。近接攻撃者は{buff}の自然ダメージを受けます。',
@@ -2915,8 +2871,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bear_form.description':
     '熊に変身します。アーマー +130%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。再度使用すると術者形態に戻ります。',
   'entities.abilities.maul.name': '骨砕き',
-  'entities.abilities.maul.description':
-    '近接ダメージを {damage} 増加させ、大量の脅威を発生させる猛攻です。ワイルドファング:命中した攻撃が古き血を蓄え、3になると骨砕きが骨髄砕きに変化します。次のスイングで発動します。ブルーインフォーム専用。',
   'entities.abilities.growl.name': '威嚇',
   'entities.abilities.growl.description':
     '対象に唸ります。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。ブルーインフォーム専用。',
@@ -2924,17 +2878,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cat_form.description':
     '狼に変身します。敏捷性はレベルに応じて上昇し、攻撃力は8にレベルごとに2を加えた分だけ増加します。攻撃はエネルギーとコンボポイントを使い、脅威生成が29%低下します。再度使用すると術者形態に戻ります。',
   'entities.abilities.claw.name': '裂き爪',
-  'entities.abilities.claw.description':
-    '敵を引っかき、武器ダメージに {damage} を加えたダメージを与えます。コンボポイントを1獲得します。ワイルドファング:命中した攻撃が古き血を蓄えます。ウルフフォーム専用。',
   'entities.abilities.ferocious_bite.name': '血噛み',
-  'entities.abilities.ferocious_bite.description':
-    '{damage}を与えるフィニッシュムーブです。ワイルドファング:命中した攻撃が古き血を蓄え、3になると血噛みが血の収穫に変化します。ウルフフォーム専用。',
   'entities.abilities.swipe.name': '薙ぎ払う爪',
-  'entities.abilities.swipe.description':
-    '周囲の敵を薙ぎ払い、{damage} のダメージを与えます。追加の脅威を発生させます。ワイルドファング:命中した攻撃が古き血を蓄えます。ブルーインフォーム専用。',
   'entities.abilities.regrowth.name': '二度目の開花',
-  'entities.abilities.regrowth.description':
-    '味方対象の体力を {damage} 回復し、さらに21秒間追加で回復します。グローヴハート:新しい花を植えると翠成が溜まります。',
   'entities.abilities.barkskin.name': '樫の肌',
   'entities.abilities.barkskin.description':
     '肌が樹皮のように硬くなり、15秒間アーマーが150増加します。',
@@ -2945,8 +2891,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.primal_reflexes.description':
     '本能が研ぎ澄まされ、6秒間、回避率が50%上昇します。',
   'entities.abilities.starfire.name': '天墜',
-  'entities.abilities.starfire.description':
-    '星の炎を呼び下ろし、{damage} の秘術ダメージを与えます。月翼形態では、詠唱の完了で月潮が溜まります。月潮が最大のとき、天墜は陽醒に変化します。',
   'entities.abilities.travel_form.name': 'フリートフォーム',
   'entities.abilities.travel_form.description':
     '素早いフリートフォームに即座に変身し、移動速度を40%上昇させます。変身中は他のアビリティを使用できませんが、戦闘中でも戦闘外でも変身を切り替えられるため、逃走に最適です。',
@@ -2955,8 +2899,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': '脳震盪',
   'entities.abilities.bash.description': '対象を2秒間スタンさせます。ブルーインフォーム専用。',
   'entities.abilities.faerie_fire.name': '魔女火',
-  'entities.abilities.faerie_fire.description':
-    '対象のアーマーを40秒間{damage}%低下させます。装甲切断とは重複しません。',
   'entities.abilities.hibernate.name': '微睡み',
   'entities.abilities.hibernate.description':
     '対象を最大8秒間深い眠りに落とします。ダメージを受けると目を覚まします。',
@@ -2973,8 +2915,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tigers_fury.description':
     '攻撃力を{duration}秒間{buff}上昇させます。ウルフフォーム専用。',
   'entities.abilities.rip.name': '血の亀裂',
-  'entities.abilities.rip.description':
-    '24秒かけて{damage}の出血ダメージを与えるフィニッシュムーブです。コンボポイントを消費します。ワイルドファング:命中した一撃が古き血を蓄えます。ウルフフォーム専用。',
   'entities.abilities.mortal_strike.name': '重傷の一撃',
   'entities.abilities.mortal_strike.description':
     '凶悪な一撃で武器ダメージに加えて {damage} のダメージを与えます。（武器シグネチャー）',
@@ -3021,8 +2961,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prowl.description':
     'ウルフフォーム中にステルス状態に入り、移動速度が50%低下する。戦闘中は使用できない。',
   'entities.abilities.rake.name': '皮剥ぎ',
-  'entities.abilities.rake.description':
-    '敵の皮を剥ぎ、武器ダメージに加えて{damage}のダメージを与え、18秒かけて出血ダメージを与える。コンボポイントを1獲得する。ワイルドファング:命中した攻撃が古き血を蓄える。ウルフフォーム時のみ使用可能。',
   'entities.abilities.revive_pet.name': '応急処置',
   'entities.abilities.revive_pet.description':
     'ペットを応急処置する。生存している場合は12秒間、3秒ごとに回復し、合計{overTime}の体力を回復する。死亡している場合は体力35%で蘇生する。',
@@ -3051,14 +2989,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.icy_veins.description':
     '10秒間、呪文ヘイストが30%上がり、詠唱の中断と遅延を防ぎます。（フロスト特性のシグネチャ）',
   'entities.abilities.cold_blood.name': 'コールドブラッド',
-  'entities.abilities.cold_blood.description':
-    '殺意を集中し、次の攻撃をクリティカルにします。（アサシネーション特性のシグネチャ）',
   'entities.abilities.blade_flurry.name': 'ブレードフラリー',
-  'entities.abilities.blade_flurry.description':
-    '刃の連撃を放ち、12秒間攻撃速度を20%上げます。（コンバット特性のシグネチャ）',
   'entities.abilities.hemorrhage.name': 'ヘモリッジ',
-  'entities.abilities.hemorrhage.description':
-    '敵を攻撃して武器ダメージに加え{damage}を与え、12秒間出血ダメージを与えます。コンボポイントを1得ます。（サブテリティ特性のシグネチャ）',
   'entities.abilities.power_infusion.name': 'パワーインフュージョン',
   'entities.abilities.power_infusion.description':
     '味方に力を注ぎ、15秒間呪文力を28上げます。（ディシプリン特性のシグネチャ）',
@@ -3084,8 +3016,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.feral_charge.description':
     '敵に突撃し、1秒間足止めします。射程8-25ヤード。（フェラル特性のシグネチャ）',
   'entities.abilities.swiftmend.name': 'スウィフトメンド',
-  'entities.abilities.swiftmend.description':
-    '味方にかかった継続回復効果を消費し、体力を{damage}回復します。野生の芽吹きと二度目の開花の詠唱を完了すると翠成が溜まり、翠成が5のとき、スウィフトメンドは満開に変化します。（回復特性のシグネチャ）',
   'entities.abilities.crusader_strike.name': 'クルセイダー ストライク',
   'entities.abilities.crusader_strike.description':
     '対象を攻撃し、武器ダメージに加えて {damage} の聖なるダメージを与えます。（パラディンのタレント）',
@@ -8141,8 +8071,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '10秒かけて体力を180回復する。熊形態でのみ使用可能。（ドルイドのタレント）',
   'entities.abilities.frost_trap.description':
     '対象地点の敵を3秒間凍結させ、移動と行動を封じる。（ハンターのタレント）',
-  'entities.abilities.ghostly_strike.description':
-    '敵に武器ダメージと{damage}の追加ダメージを与え、短時間、回避率を上昇させる。コンボポイントを1獲得する。（ローグのタレント）',
   'entities.abilities.hammer_of_wrath.description':
     '傷ついた敵に聖なるハンマーを投げ、{damage}の聖属性ダメージを与える。体力が20%未満の対象にのみ使用可能。（パラディンのタレント）',
   'entities.abilities.healing_stream.description':
@@ -9332,29 +9260,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.unleash_weapon.name': '武器解放',
   'entities.abilities.unleash_weapon.description':
     '有効な武器付与を解放する。火焔烙印は54から64の火炎ダメージを与え、魔力の30%が加算され、雷鳴を2得る。疾風は武器で攻撃し、戦霊の律動を進め、6秒間攻撃速度を20%上昇させる。石縛は武器ダメージの75%を与え、対象を強制的に自分へ攻撃させ、4秒間受けるダメージを20%軽減する。命泉は癒しの水流を消費し、残りの回復量の125%を即時に回復し、8秒以内の次の一撃を実際の回復量の50%分軽減する。',
-  'hudChrome.auraEffect.moontide':
-    '月潮：{stacks}/{max}段階。月翼形態で野生の稲妻・天墜・月の種の詠唱が段階を進めます。{max}で月の種がムーンサージに、天墜が陽醒に変化し、どちらを使っても消費されます',
-  'hudChrome.auraEffect.oldBlood':
-    '古き血：{stacks}/{max}段階。狼と熊の命中攻撃で共有され、{max}で血噛みまたは骨砕きが変化します',
-  'hudChrome.auraEffect.verdance':
-    '翠成：{stacks}/{max}段階。野生の芽吹きと二度目の開花の完了で進み、{max}でスウィフトメンドが満開に変化します',
   'entities.abilities.moonseed.name': '月の種',
-  'entities.abilities.moonseed.description':
-    '月翼形態専用。{damage}の秘術ダメージを与え、月潮を1段階進め、月の嵐を6秒延長します。1回の付与につき最大6秒です。月潮が最大のとき、月の種はムーンサージに変化します。',
   'guide.abilityHook.moonseed': '月翼形態中、月潮を1段階進め、月の嵐の効果時間を延長します。',
   'entities.abilities.moonlash.name': 'ムーンサージ',
-  'entities.abilities.moonlash.description':
-    '月潮を3消費して強力な秘術攻撃を放つ、ダメージ重視の選択肢です。陽醒と同じ月潮を消費するため、どちらか一方だけ使えます。',
   'entities.abilities.sunlance.name': '陽醒',
-  'entities.abilities.sunlance.description':
-    '月潮を3消費して自然攻撃と炎上を与え、マナを35回復する、マナ重視の選択肢です。ムーンサージと同じ月潮を消費するため、どちらか一方だけ使えます。',
   'entities.abilities.redharvest.name': '血の収穫',
-  'entities.abilities.redharvest.description':
-    '古き血を3消費し、対象に残る自身の皮剥ぎと血の亀裂のダメージを爆発させ、エネルギーを30回復します。保持しているコンボポイントは噛みつきを強化しますが、必須ではありません。',
   'entities.abilities.marrowbreak.name': '骨髄砕き',
-  'entities.abilities.marrowbreak.description':
-    '古き血を3消費して高脅威の重撃を与えます。体力が半分未満なら、代わりに最大体力の18%を吸収する盾を8秒得て、怒りを15回復します。',
   'entities.abilities.overbloom.name': '満開',
-  'entities.abilities.overbloom.description':
-    '翠成を5消費します。全味方にある自身の継続回復を収穫し、残り回復量の60%を即時回復して効果を除去し、対象に新しい野生の芽吹きを植えます。',
 };

@@ -1621,15 +1621,15 @@ export const ja_JP: EnTranslations = {
       "freeCast": "次の詠唱のコストがゼロになる",
       "instantCast": "次の詠唱時間のある呪文が即時発動になる",
       "cheapCast": "次の呪文のコストが{pct}%減少する",
-      "venomRitual": "毒の儀式:{stacks}/{max}段階。ビルダー攻撃で段階が進み、{max}段階で「永の眠り」が「毒裂き」に変化する",
-      "gloam": "薄闇の蓄え:{stacks}/{max}段階。{max}段階で「ダスクヴェール」が「ヴェールストライク」に変化する",
-      "redline": "レッドライン:{stacks}/{max}ピップ。「ボディブロー」でピップが増え、「ノックアウトブロー」はピップごとに{pct}%強化され、命中でウィンドウが終了する。時間切れで失われる",
+      "venomRitual": "Venom Ritual {stacks}/{max}. Craven Thrust, Wicked Slash, and Venom Dart each add 1. At {max}, Dirt Nap becomes Venomrend",
+      "gloam": "Gloam {stacks}/{max}. Openers used from Duskveil each add 1. At {max}, your openers work without stealth, and the next one is free, spends all 3, and starts the Shadow Veil",
+      "redline": "Redline {stacks}/{max}. Each Body Blow adds 1. Knockout Blow hits {pct}% harder for each one and ends Redline. If the timer runs out first, the knockout is lost",
       "veilstrikeWindow": "影に包まれている:ダスクヴェール専用の先制技をどの角度からでも使用でき、与ダメージが{pct}%増加する",
       "veiledEdge": "次に放つ「潜伏者の一撃」は2倍のダメージを与える",
       "duskEconomy": "アビリティの消費エナジーが{pct}%減少する",
-      "moontide": "月潮：{stacks}/{max}段階。月翼形態で野生の稲妻・天墜・月の種の詠唱が段階を進めます。{max}で月の種がムーンサージに、天墜が陽醒に変化し、どちらを使っても消費されます",
-      "oldBlood": "古き血：{stacks}/{max}段階。狼と熊の命中攻撃で共有され、{max}で血噛みまたは骨砕きが変化します",
-      "verdance": "翠成：{stacks}/{max}段階。野生の芽吹きと二度目の開花の完了で進み、{max}でスウィフトメンドが満開に変化します",
+      "moontide": "Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3",
+      "oldBlood": "Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Wolf Form, Bonecrush becomes Marrowbreak in Bruin Form",
+      "verdance": "Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Swiftmend becomes Overbloom",
       "increase": {
         "ap": "攻撃力を{value}上昇させる",
         "sp": "呪文の威力を{value}上昇させる",
@@ -6513,7 +6513,7 @@ export const ja_JP: EnTranslations = {
       "unavailable": "使用不可",
       "requiresLevel": "レベル{level}が必要",
       "requiresForm": "{form}フォームが必要",
-      "requiresStealth": "ステルスが必要",
+      "requiresStealth": "Requires stealth",
       "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
       "requiresCombo": "コンボポイントを消費",
       "requiresTargetHealthBelow": "対象の体力が{percent}%未満である必要があります",
@@ -7173,19 +7173,19 @@ export const ja_JP: EnTranslations = {
       },
       "sinister_strike": {
         "name": "邪悪な斬撃",
-        "description": "武器ダメージに {damage} を加えた即時攻撃です。コンボポイントを1獲得します。",
+        "description": "An instant strike for weapon damage plus {damage}. Awards 1 combo point.",
         "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
         "specNote_combat": "While Redline is active, this button becomes Body Blow: a heavier strike that awards 2 combo points and builds Redline."
       },
       "eviscerate": {
         "name": "永の眠り",
-        "description": "{damage}を与えるフィニッシュムーブです。",
+        "description": "Finishing move that causes {damage}.",
         "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
         "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: your strike becomes Body Blow and this button becomes Knockout Blow (spend it before Redline ends)."
       },
       "backstab": {
         "name": "卑劣な突き",
-        "description": "対象を背後から刺し、武器ダメージの150%に {damage} を加えたダメージを与えます。対象の背後にいる必要があります。ダガーが必要です。コンボポイントを1獲得します。",
+        "description": "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
         "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
       },
       "gouge": {
@@ -7198,7 +7198,7 @@ export const ja_JP: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "残忍な速攻",
-        "description": "近接攻撃速度を30%増加させるフィニッシュムーブです。コンボポイントごとに持続時間が延びます。"
+        "description": "Finishing move that increases melee attack speed by 30% for 12 sec plus 4 sec per combo point (5 combo points: 32 sec)."
       },
       "sprint": {
         "name": "駿足",
@@ -7206,16 +7206,16 @@ export const ja_JP: EnTranslations = {
       },
       "kidney_shot": {
         "name": "急所打ち",
-        "description": "対象をスタンさせるフィニッシュムーブです。コンボポイントごとに1秒長く続きます。"
+        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec)."
       },
       "ambush": {
         "name": "潜伏者の一撃",
-        "description": "ステルス中に対象の背後から奇襲し、武器ダメージの250%に {damage} を加えたダメージを与えます。ダガーが必要です。コンボポイントを1獲得します。",
+        "description": "Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.",
         "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
       },
       "stealth": {
         "name": "ダスクヴェール",
-        "description": "影に身を隠します。敵にほとんど気づかれませんが、移動速度が50%低下します。攻撃するかダメージを受けるとダスクヴェールが解除されます。再度使用すると姿を現します。",
+        "description": "Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.",
         "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
       },
       "adrenaline_rush": {
@@ -7224,12 +7224,12 @@ export const ja_JP: EnTranslations = {
       },
       "garrote": {
         "name": "喉絞めの弦",
-        "description": "敵を絞め、即座に{damage}ダメージを与えるとともに、18秒かけて{overTime}の出血ダメージを与えます。ステルス状態でなければなりません。コンボポイントを1獲得します。",
+        "description": "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point.",
         "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "cheap_shot": {
         "name": "みぞおち強打",
-        "description": "対象を打って{damage}ダメージを与え、4秒間スタンさせます。ステルス状態でなければなりません。コンボポイントを2獲得します。",
+        "description": "Strike the target for {damage} damage, stunning it for 4 sec. Must be stealthed. Awards 2 combo points.",
         "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
       },
       "sap": {
@@ -7242,11 +7242,11 @@ export const ja_JP: EnTranslations = {
       },
       "expose_armor": {
         "name": "装甲破り",
-        "description": "対象の防御を崩し、30秒間アーマーを{damage}低下させるフィニッシュムーブです。"
+        "description": "Finishing move that exposes the target for 30 sec: each combo point spent reduces its armor by 2% (5 combo points: {damage}%)."
       },
       "rupture": {
         "name": "止まらぬ出血",
-        "description": "対象に傷を負わせ、16秒かけて{damage}の出血ダメージを与えるフィニッシュムーブです。"
+        "description": "Finishing move that wounds the target: it bleeds every 2 sec, for 6 sec plus 2 sec per combo point (5 combo points: 16 sec and {damage} total damage)."
       },
       "vanish": {
         "name": "煙隠れ",
@@ -7510,7 +7510,7 @@ export const ja_JP: EnTranslations = {
       },
       "wrath": {
         "name": "野生の稲妻",
-        "description": "自然エネルギーの矢を放ち、{damage} の自然ダメージを与えます。月翼形態では、詠唱の完了で月潮が溜まります。月潮が最大のときはそれを消費します：月の種はムーンサージに、天墜は陽醒に変化します。",
+        "description": "Hurls a bolt of nature energy for {damage} Nature damage.",
         "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge (a heavy Arcane strike) and Skyfall becomes Sunwake (a Nature strike that restores 35 mana)."
       },
       "healing_touch": {
@@ -7523,16 +7523,16 @@ export const ja_JP: EnTranslations = {
       },
       "moonfire": {
         "name": "月の嵐",
-        "description": "月の炎で敵を焼き、{damage} の秘術ダメージと継続ダメージを与えます。ムーングローヴ:燃やし続けること。月の種が効果を6秒延長します。",
+        "description": "Burns the enemy with moonfire for {damage} Arcane damage plus damage over time.",
         "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
       },
       "moonseed": {
         "name": "月の種",
-        "description": "月翼形態専用。{damage}の秘術ダメージを与え、月潮を1段階進め、月の嵐を6秒延長します。1回の付与につき最大6秒です。月潮が最大のとき、月の種はムーンサージに変化します。"
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant heavy Arcane strike that spends all 3."
       },
       "rejuvenation": {
         "name": "野生の芽吹き",
-        "description": "12秒間で対象の体力を {damage} 回復します。グローヴハート:新しい花を植えると翠成が溜まり、5になるとスウィフトメンドが満開に変化します。",
+        "description": "Heals the target for {damage} over 12 sec.",
         "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
       },
       "thorns": {
@@ -7549,7 +7549,7 @@ export const ja_JP: EnTranslations = {
       },
       "maul": {
         "name": "骨砕き",
-        "description": "近接ダメージを {damage} 増加させ、大量の脅威を発生させる猛攻です。ワイルドファング:命中した攻撃が古き血を蓄え、3になると骨砕きが骨髄砕きに変化します。次のスイングで発動します。ブルーインフォーム専用。",
+        "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a heavy, high-threat strike that instead shields you when below half health."
       },
       "growl": {
@@ -7562,22 +7562,22 @@ export const ja_JP: EnTranslations = {
       },
       "claw": {
         "name": "裂き爪",
-        "description": "敵を引っかき、武器ダメージに {damage} を加えたダメージを与えます。コンボポイントを1獲得します。ワイルドファング:命中した攻撃が古き血を蓄えます。ウルフフォーム専用。",
+        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "ferocious_bite": {
         "name": "血噛み",
-        "description": "{damage}を与えるフィニッシュムーブです。ワイルドファング:命中した攻撃が古き血を蓄え、3になると血噛みが血の収穫に変化します。ウルフフォーム専用。",
+        "description": "Finishing move that causes {damage}. Wolf Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: it instantly deals all the damage your bleeds would still have dealt and restores 30 energy."
       },
       "swipe": {
         "name": "薙ぎ払う爪",
-        "description": "周囲の敵を薙ぎ払い、{damage} のダメージを与えます。追加の脅威を発生させます。ワイルドファング:命中した攻撃が古き血を蓄えます。ブルーインフォーム専用。",
+        "description": "Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "regrowth": {
         "name": "二度目の開花",
-        "description": "味方対象の体力を {damage} 回復し、さらに21秒間追加で回復します。グローヴハート:新しい花を植えると翠成が溜まります。",
+        "description": "Heals a friendly target for {damage} and an additional amount over 21 sec.",
         "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
       },
       "barkskin": {
@@ -7594,7 +7594,7 @@ export const ja_JP: EnTranslations = {
       },
       "starfire": {
         "name": "天墜",
-        "description": "星の炎を呼び下ろし、{damage} の秘術ダメージを与えます。月翼形態では、詠唱の完了で月潮が溜まります。月潮が最大のとき、天墜は陽醒に変化します。",
+        "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage.",
         "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant Nature strike and burn that restores 35 mana and spends all 3."
       },
       "travel_form": {
@@ -7611,7 +7611,7 @@ export const ja_JP: EnTranslations = {
       },
       "faerie_fire": {
         "name": "魔女火",
-        "description": "対象のアーマーを40秒間{damage}%低下させます。装甲切断とは重複しません。"
+        "description": "Decreases the target's armor by {damage}% for 40 sec."
       },
       "hibernate": {
         "name": "微睡み",
@@ -7635,7 +7635,7 @@ export const ja_JP: EnTranslations = {
       },
       "rip": {
         "name": "血の亀裂",
-        "description": "24秒かけて{damage}の出血ダメージを与えるフィニッシュムーブです。コンボポイントを消費します。ワイルドファング:命中した一撃が古き血を蓄えます。ウルフフォーム専用。",
+        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Wolf Form only.",
         "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
       },
       "mortal_strike": {
@@ -7740,15 +7740,15 @@ export const ja_JP: EnTranslations = {
       },
       "cold_blood": {
         "name": "コールドブラッド",
-        "description": "殺意を集中し、次の攻撃をクリティカルにします。（アサシネーション特性のシグネチャ）"
+        "description": "Focuses your killing intent so your next attack is a critical strike. (Knifework signature)"
       },
       "blade_flurry": {
         "name": "ブレードフラリー",
-        "description": "刃の連撃を放ち、12秒間攻撃速度を20%上げます。（コンバット特性のシグネチャ）"
+        "description": "Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)"
       },
       "hemorrhage": {
         "name": "ヘモリッジ",
-        "description": "敵を攻撃して武器ダメージに加え{damage}を与え、12秒間出血ダメージを与えます。コンボポイントを1得ます。（サブテリティ特性のシグネチャ）"
+        "description": "Strikes the enemy for weapon damage plus {damage}, causes bleeding damage over 12 sec, and increases bleed damage taken by 40%. Awards 1 combo point. Every 2nd use adds 1 Gloam (max 3). (Skulduggery signature)"
       },
       "power_infusion": {
         "name": "パワーインフュージョン",
@@ -7784,27 +7784,27 @@ export const ja_JP: EnTranslations = {
       },
       "swiftmend": {
         "name": "スウィフトメンド",
-        "description": "味方にかかった継続回復効果を消費し、体力を{damage}回復します。野生の芽吹きと二度目の開花の詠唱を完了すると翠成が溜まり、翠成が5のとき、スウィフトメンドは満開に変化します。（回復特性のシグネチャ）"
+        "description": "Consumes a heal-over-time effect on a friendly target to heal them for {damage}. Wildbloom and Second Bloom plantings add Verdance; at 5 Verdance this button becomes Overbloom, which instantly heals every ally carrying your heal-over-time effects for 60% of what those effects had left. (Groveheart signature)"
       },
       "moonlash": {
         "name": "ムーンサージ",
-        "description": "月潮を3消費して強力な秘術攻撃を放つ、ダメージ重視の選択肢です。陽醒と同じ月潮を消費するため、どちらか一方だけ使えます。"
+        "description": "Spends your 3 Moontide for a heavy strike of {damage} Arcane damage: the damage choice. Sunwake spends the same 3 Moontide, so pick one."
       },
       "sunlance": {
         "name": "陽醒",
-        "description": "月潮を3消費して自然攻撃と炎上を与え、マナを35回復する、マナ重視の選択肢です。ムーンサージと同じ月潮を消費するため、どちらか一方だけ使えます。"
+        "description": "Spends your 3 Moontide for a strike of {damage} Nature damage plus a {overTime} burn over 9 sec, and restores 35 mana: the mana choice. Moonsurge spends the same 3 Moontide, so pick one."
       },
       "redharvest": {
         "name": "血の収穫",
-        "description": "古き血を3消費し、対象に残る自身の皮剥ぎと血の亀裂のダメージを爆発させ、エネルギーを30回復します。保持しているコンボポイントは噛みつきを強化しますが、必須ではありません。"
+        "description": "Spends your 3 Old Blood: strike for {damage}, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore 30 energy. Works with zero combo points."
       },
       "marrowbreak": {
         "name": "骨髄砕き",
-        "description": "古き血を3消費して高脅威の重撃を与えます。体力が半分未満なら、代わりに最大体力の18%を吸収する盾を8秒得て、怒りを15回復します。"
+        "description": "Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage."
       },
       "overbloom": {
         "name": "満開",
-        "description": "翠成を5消費します。全味方にある自身の継続回復を収穫し、残り回復量の60%を即時回復して効果を除去し、対象に新しい野生の芽吹きを植えます。"
+        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for 60% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom."
       },
       "summon_imp": {
         "name": "エンバーキンの召喚",
@@ -8048,7 +8048,7 @@ export const ja_JP: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "亡霊の一撃",
-        "description": "敵に武器ダメージと{damage}の追加ダメージを与え、短時間、回避率を上昇させる。コンボポイントを1獲得する。（ローグのタレント）"
+        "description": "Strikes the enemy for weapon damage plus {damage} and increases your dodge chance by 15% for 7 sec. Awards 1 combo point. (Rogue talent)"
       },
       "hammer_of_wrath": {
         "name": "鐘鳴りの槌",
@@ -8212,24 +8212,24 @@ export const ja_JP: EnTranslations = {
       },
       "venom_dart": {
         "name": "毒針",
-        "description": "毒針を弾き飛ばし、{damage}の自然ダメージを与える。コンボポイントを1獲得する。ナイフワーク:毒裂きの傷を6秒延長する(最大20秒)。",
+        "description": "Flick a poisoned dart for {damage} Nature damage. Awards 1 combo point.",
         "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
       },
       "body_blow": {
         "name": "ボディブロー",
-        "description": "武器ダメージの130%に10を加えた重い一撃。コンボポイントを2獲得し、レッドラインを1段階深める。（コンバット・エンジン）"
+        "description": "A heavy blow for 130% weapon damage plus 10. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)"
       },
       "knockout_blow": {
         "name": "ノックアウトブロー",
-        "description": "ノックアウトでレッドラインを締めくくる：45にコンボポイントごとに35を加えたダメージを与え、レッドラインの段階ごとに25%強化され、エナジーを25回復する。（コンバット・エンジン）"
+        "description": "Ends Redline with a knockout: strike for 45 plus 35 per combo point, hitting 25% harder for each Redline you built, and recover 25 energy. Use it before Redline runs out or the knockout is lost. (Thuggery)"
       },
       "veilstrike": {
         "name": "ヴェールストライク",
-        "description": "宵闇の蓄えを喰らい尽くし、6秒間影を纏う：隠密の先制技が白昼でも使用でき、与ダメージが25%上昇する。（スカルダガリー・エンジン）"
+        "description": "For 6 sec: your Duskveil openers work without stealth and from any angle, you deal 10% more damage, and your first Lurker's Strike inside it hits for double. (Skulduggery)"
       },
       "venomrend": {
         "name": "毒裂き",
-        "description": "毒の儀式を喰らい尽くす：22+コンボポイントごとに26のダメージを与え、自らの出血効果の残りダメージを起爆し、エナジーを25回復する。（ナイフワーク・エンジン）"
+        "description": "Spends your 6 Venom Ritual: strike for 100 plus 55 per combo point, instantly deal all the damage your bleeds would still have dealt, then apply a fresh venom wound (120 damage over 20 sec). Restores 20 energy. (Knifework)"
       },
       "typhoon": {
         "name": "タイフーン",
@@ -8277,7 +8277,7 @@ export const ja_JP: EnTranslations = {
       },
       "rake": {
         "name": "皮剥ぎ",
-        "description": "敵の皮を剥ぎ、武器ダメージに加えて{damage}のダメージを与え、18秒かけて出血ダメージを与える。コンボポイントを1獲得する。ワイルドファング:命中した攻撃が古き血を蓄える。ウルフフォーム時のみ使用可能。",
+        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "revive_pet": {
