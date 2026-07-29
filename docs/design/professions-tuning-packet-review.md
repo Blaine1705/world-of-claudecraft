@@ -641,6 +641,101 @@ merge-base bundle via git show, the way pass 2 did).
 
 R34 scope: guards, not a floor.
 
+BUILT 2026-07-28 (Fable xhigh). Preamble: origin fetched, release/v0.32.0
+still the latest release branch with its tip 9d7a1a021 already merged (no
+re-sync, nothing for the release-merge audit), gate green at the entry tip
+4e4201051. The code half is two commits (the trade guard and the bags/bank
+visibility work); the rest of the phase lands as this record plus the
+deploy-order note in DEPLOY.md. No screenshots: every guarded state needs a
+version-skewed client against a newer server, which matched local builds
+cannot produce.
+
+What each item settled:
+
+1. DONE: the offer row resolves through a new pure core
+   (`buildTradeItemRow` in `src/ui/trade_view.ts`): an unknown id keeps its
+   raw id as the label and the painter swaps in the shared fallback icon
+   (`src/ui/unknown_item_icon.ts`, extracted from the loot roll
+   controller's three identical inline copies), never a throw; the repaint
+   signature now commits only AFTER a complete paint, so no future
+   mid-render throw can freeze a stale offer again. The fallback img src is
+   safe against a hostile id by construction: the static icon URLs are
+   set-gated to bundle-known ids, so an unknown id only ever reaches the
+   canvas data-URL arm. Pinned in `tests/trade_view.test.ts` (model arms
+   driven with unknown ids, both count variants, plus comment-stripped
+   painter pins including the signature-after-render ordering), each pin
+   mutation-checked.
+2. DONE where a client-side fallback exists: bag cells (both grid views;
+   `applyBagFilter` keeps unknown-id slots visible in the everything view,
+   ranks them below poor in the quality sort, name-sorts them by raw id;
+   the pristine cell stays a drop target and exposes no action, the
+   backpack-socket precedent) and bank cells (the same family via
+   `filterBankSlots`; withdraw stays live because it resolves server-side
+   by slot index). Grant lines were ALREADY guarded (`grantItemToken`
+   returns the raw id for an id absent from ITEMS, pinned with an
+   unknown-id arm in `tests/grant_line_view.test.ts`); verified, no
+   change. A new `itemUi.bags.unknownItem` tooltip sub-line ships with its
+   non-Latin fills (the completeness gate enforces those in-change; Latin
+   locales pend to the release fill as usual).
+
+   ACCEPTED STALE-CLIENT COSMETICS (no graceful client-side fallback
+   exists; every arm self-heals when the client updates, and the runbook
+   deploy order bounds the window):
+   - Vendor rows and prices are bundle truth end to end (the online
+     mirror resolves `vendorItems` from the local NPCS table), so an old
+     bundle shows its own stock and its own prices while the
+     authoritative buy path charges the server's; a repriced item renders
+     the old price until the client updates, and a newly stocked item
+     does not render at all.
+   - The rod-zone denial copy: the event is text-free and the key
+     selection at HEAD already covers unexpected shapes (pinned in
+     `tests/gathering_view.test.ts`), but a bundle that predates the
+     fishing tier split renders its generic implement wording for the
+     zone gate; unfixable from HEAD.
+   - Market browse and collect drop unknown-id rows (deliberate and
+     commented in `market_view.ts`): a stale client can neither name nor
+     price them, and collect-all still collects invisibly held items into
+     the bags, where the new unknown cell makes them visible.
+   - The character sheet and the inspect window render an unknown
+     equipped id as an empty slot (their guarded ternaries treat no-def
+     as empty), and an unknown equipped BAG renders as an empty socket
+     the same way: a cosmetic lie, but throw-free, and correcting it
+     would touch every paperdoll consumer for a state the deploy order
+     already bounds.
+   - The opened-mail attachment chip already degrades to raw-id text (no
+     icon); the compose-parcel picker skips unknown ids, unreachable
+     while unknown bag cells expose no attach action.
+3. DONE: DEPLOY.md gains "Client/server deploy order for content
+   releases" (Operational notes): server first, clients after; the iOS
+   binary is approved and released BEFORE the server moves (R34) and the
+   binary-to-server gap stays short. Verified against the real merge-base
+   bundle (git show 9d7a1a021:...): the packet's whole wire delta since
+   the deployed release is ONE new SimEvent type (`fishingEmptyHook`; an
+   old client ignores unknown event types, every event switch is per-type
+   with no throwing default), ONE new self-delta wire key (`tslot`, read
+   behind an explicit undefined guard so a new client on an old server
+   defaults to empty), ONE new command (`slot_tool_effect`; the old
+   server's exhaustiveness default logs a protocol anomaly and drops it),
+   ZERO removed or reshaped wire keys, ZERO REST registry changes, and
+   the world-seed dedup pins the same shipped value
+   (`src/sim/world_seed.ts`). Server-first therefore suffices for every
+   packet surface; the one surface no order can cover on its own is the
+   node-position skew below.
+4. RECORDED, both directions accepted (they resolve once both sides are
+   current; the runbook note names them and the deploy order bounds the
+   window). Direction detail from the collider table: ore and wood nodes
+   are solid bodies while herb clusters are deliberately soft
+   (`src/sim/colliders.ts`), so a stale client walks through relocated
+   herb props and hits invisible collision only where ore or wood
+   actually moved or was added; phantom props at old spots are the herb
+   arm's whole failure. A new client against an old server advertises
+   nodes, items, and minimap markers the server denies, and every
+   relocated node is unusable there; the measured worst case is Eastbrook
+   herbalism, whose three tier-1 herb nodes all moved, leaving that
+   client zone-dead for the profession until the server deploys. The
+   relocation set grows again in phase 13, so the runbook names the
+   mechanism and the worst case, never a count.
+
 1. Guard the trade-window unknown-item path at HEAD (the old client
    throws in `itemIcon` on any unknown id and the early-set signature
    freezes the offer display; the same unguarded pattern exists at HEAD,
