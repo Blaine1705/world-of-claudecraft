@@ -16,9 +16,12 @@ import {
 } from './eastbrook_civic_beacon';
 import {
   EASTBROOK_SURFACE_ATLAS_URL,
+  EASTBROOK_SURFACE_NORMAL_SCALE,
   eastbrookSurfaceAtlasMetadata,
   eastbrookSurfaceAtlasTexture,
   eastbrookSurfaceGeometry,
+  eastbrookSurfaceNormalTexture,
+  eastbrookSurfaceRoughnessTexture,
   eastbrookTownSemanticForColor,
 } from './eastbrook_surface_atlas';
 import {
@@ -260,11 +263,21 @@ function prepareTemplates(
 }
 
 function materialOptions(emissive: boolean, atlas = eastbrookSurfaceAtlasTexture()) {
+  // Baked PBR companions ride the color atlas's cell UVs (Standard tier only;
+  // Lambert tiers skip the bind outright, surfaceMat would drop the maps).
+  // Emissive windows keep their authored flat look.
+  const detail = !emissive && GFX.standardMaterials;
+  const normalMap = detail ? eastbrookSurfaceNormalTexture() : undefined;
+  const roughnessMap = detail ? eastbrookSurfaceRoughnessTexture() : undefined;
   return {
     color: 0xffffff,
     map: emissive ? undefined : atlas,
     vertexColors: true,
-    roughness: emissive ? 0.55 : 0.86,
+    normalMap,
+    roughnessMap,
+    // The rough atlas bakes per-cell base roughness, so it is the authority
+    // when bound; the flat 0.86 stays the fallback while it has not loaded.
+    roughness: emissive ? 0.55 : roughnessMap ? 1 : 0.86,
     metalness: emissive ? 0.08 : 0,
     emissive: emissive ? 0xffffff : 0x000000,
     // White x vertex color (vertex_color_emissive.ts), so the amber/cyan pane
@@ -274,7 +287,13 @@ function materialOptions(emissive: boolean, atlas = eastbrookSurfaceAtlasTexture
     // EMISSIVE_GLOW is calibrated against the bloom threshold; without the
     // composer the raise just desaturates the amber to a pasted-on cream,
     // so non-bloom tiers keep the authored pane level.
-    emissiveIntensity: emissive ? (GFX.standardMaterials && GFX.composer ? EMISSIVE_GLOW : GFX.standardMaterials ? 1 : 0.72) : 1,
+    emissiveIntensity: emissive
+      ? GFX.standardMaterials && GFX.composer
+        ? EMISSIVE_GLOW
+        : GFX.standardMaterials
+          ? 1
+          : 0.72
+      : 1,
     flatShading: !GFX.standardMaterials,
   } as const;
 }
@@ -285,6 +304,11 @@ function townMaterial(
   independent = false,
 ): THREE.Material {
   const shared = surfaceMat(materialOptions(emissive, atlas));
+  if (shared instanceof THREE.MeshStandardMaterial && shared.normalMap) {
+    // Idempotent on the shared cached material; the key includes the map, so
+    // only the town's atlas-normal material ever carries this scale.
+    shared.normalScale.setScalar(EASTBROOK_SURFACE_NORMAL_SCALE);
+  }
   const material = independent ? shared.clone() : shared;
   return emissive ? modulateEmissiveByVertexColor(material) : material;
 }

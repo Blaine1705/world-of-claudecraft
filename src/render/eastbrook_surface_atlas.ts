@@ -4,6 +4,13 @@ import { registerPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
 
 export const EASTBROOK_SURFACE_ATLAS_URL = '/textures/eastbrook_surface_atlas.webp';
+// Baked PBR companions to the color atlas (scripts/assets/eastbrook_town/
+// build_surface_pbr.mjs): same 4x4 cell layout, so the synthesized cell UVs
+// address all three textures at once. Both are non-color data.
+export const EASTBROOK_SURFACE_NORMAL_URL = '/textures/eastbrook_surface_normal.webp';
+export const EASTBROOK_SURFACE_ROUGH_URL = '/textures/eastbrook_surface_rough.webp';
+// Subtle relief for the cozy low-poly art style, not photoreal depth.
+export const EASTBROOK_SURFACE_NORMAL_SCALE = 0.6;
 export const EASTBROOK_SURFACE_ATLAS_SIZE = 512;
 export const EASTBROOK_SURFACE_ATLAS_COLUMNS = 4;
 export const EASTBROOK_SURFACE_ATLAS_ROWS = 4;
@@ -35,6 +42,8 @@ const CELL_SIZE_UV = 1 / EASTBROOK_SURFACE_ATLAS_COLUMNS;
 const CELL_PADDING_UV = CELL_PADDING_PIXELS / EASTBROOK_SURFACE_ATLAS_SIZE;
 
 let loadedAtlas: THREE.Texture | null = null;
+let loadedNormal: THREE.Texture | null = null;
+let loadedRough: THREE.Texture | null = null;
 
 if (typeof window !== 'undefined') {
   registerPreload(
@@ -44,10 +53,31 @@ if (typeof window !== 'undefined') {
       loadedAtlas = texture;
     }),
   );
+  // Non-srgb loads keep loadTexture's default NoColorSpace, which is what
+  // normal/roughness data needs. Preload sets stay tier-independent (the
+  // import-time tier is only a guess); Lambert tiers simply never bind these.
+  registerPreload(
+    loadTexture(EASTBROOK_SURFACE_NORMAL_URL).then((texture) => {
+      loadedNormal = texture;
+    }),
+  );
+  registerPreload(
+    loadTexture(EASTBROOK_SURFACE_ROUGH_URL).then((texture) => {
+      loadedRough = texture;
+    }),
+  );
 }
 
 export function eastbrookSurfaceAtlasTexture(): THREE.Texture | undefined {
   return loadedAtlas ?? undefined;
+}
+
+export function eastbrookSurfaceNormalTexture(): THREE.Texture | undefined {
+  return loadedNormal ?? undefined;
+}
+
+export function eastbrookSurfaceRoughnessTexture(): THREE.Texture | undefined {
+  return loadedRough ?? undefined;
 }
 
 export interface EastbrookSurfaceAtlasMetadata {
@@ -241,6 +271,13 @@ export function eastbrookSurfaceMaterial(
   const standard = source as THREE.MeshStandardMaterial;
   if (!standard.isMeshStandardMaterial) return source;
   const atlasMap = eastbrookMaterialUsesAtlas(source, atlas) ? atlas : undefined;
+  // The baked PBR companions share the color atlas's cell layout, so they are
+  // only valid on atlas-bound materials (whose UVs were synthesized into
+  // cells). Lambert tiers skip them outright; surfaceMat would drop them.
+  const atlasNormal =
+    atlasMap && GFX.standardMaterials ? eastbrookSurfaceNormalTexture() : undefined;
+  const atlasRough =
+    atlasMap && GFX.standardMaterials ? eastbrookSurfaceRoughnessTexture() : undefined;
   const key = `${GFX.standardMaterials ? 'standard' : 'lambert'}|${atlasMap?.uuid ?? 'none'}`;
   let cache = convertedMaterials.get(source);
   if (!cache) {
@@ -250,14 +287,18 @@ export function eastbrookSurfaceMaterial(
   const cached = cache.get(key);
   if (cached) return cached;
 
+  const injectedRough = !standard.roughnessMap && atlasRough !== undefined;
   const converted = surfaceMat({
     color: standard.color.getHex(),
     map: standard.map ?? atlasMap,
     vertexColors: standard.vertexColors,
-    normalMap: standard.normalMap ?? undefined,
-    roughnessMap: standard.roughnessMap ?? undefined,
+    normalMap: standard.normalMap ?? atlasNormal,
+    roughnessMap: standard.roughnessMap ?? atlasRough,
     aoMap: standard.aoMap ?? undefined,
-    roughness: standard.roughness,
+    // The rough atlas bakes per-cell base roughness, so it becomes the
+    // authority when injected; source-authored factors keep their meaning
+    // whenever the source ships its own roughness data.
+    roughness: injectedRough ? 1 : standard.roughness,
     metalness: standard.metalness,
     flatShading: !GFX.standardMaterials || standard.flatShading,
     emissive: standard.emissive.getHex(),
@@ -266,6 +307,9 @@ export function eastbrookSurfaceMaterial(
   }).clone();
   converted.name = standard.name;
   converted.userData = { ...standard.userData };
+  if (atlasNormal && !standard.normalMap && converted instanceof THREE.MeshStandardMaterial) {
+    converted.normalScale.setScalar(EASTBROOK_SURFACE_NORMAL_SCALE);
+  }
   if (atlasMap) {
     converted.userData.eastbrookSurfaceAtlas = EASTBROOK_SURFACE_ATLAS_URL;
     converted.userData.eastbrookSurfaceSemantic = eastbrookSemanticForMaterial(standard.name);
