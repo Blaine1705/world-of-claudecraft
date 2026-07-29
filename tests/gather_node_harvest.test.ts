@@ -39,6 +39,7 @@ import {
 import { Sim } from '../src/sim/sim';
 import { type Entity, xpForLevel } from '../src/sim/types';
 import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
+import { placeAtHarvestSpot } from './helpers/harvest_spot';
 
 function mustMeta(sim: Sim, pid: number) {
   const meta = sim.players.get(pid);
@@ -62,36 +63,11 @@ function mustNode(nodeId: string) {
   return node;
 }
 
-// Teleports a player entity onto a node's exact (x, z) so the distance check
-// always passes; matches the teleportTo helper convention in sim.test.ts.
-// Waterline nodes (herb_eastbrook_1 sits in swim-deep lake water) are
-// harvested WADING beside the node, the way a real player must since the
-// swimming denial landed: when the node's own spot is swim-deep, walk a
-// deterministic ring inside INTERACT_RANGE for the nearest standable point.
+// Teleports a player entity onto a node (or, for a swim-deep waterline node,
+// the nearest wading spot inside interact range): the shared helper, also
+// consumed by tests/gather_rare_events.test.ts.
 function teleportOntoNode(sim: Sim, pid: number, nodeId: string) {
-  const node = GATHER_NODES.find((n) => n.id === nodeId);
-  if (!node) throw new Error(`missing node ${nodeId}`);
-  const p = mustEntity(sim, pid);
-  const seed = sim.cfg.seed;
-  const swimDeep = (x: number, z: number) =>
-    groundHeight(x, z, seed) < waterLevelAt(x, z) - PLAYER_SWIM_DEPTH;
-  let spot = { x: node.pos.x, z: node.pos.z };
-  if (swimDeep(spot.x, spot.z)) {
-    outer: for (let d = 0.5; d <= 4.5; d += 0.5) {
-      for (let a = 0; a < 16; a++) {
-        const x = node.pos.x + Math.cos((a * Math.PI) / 8) * d;
-        const z = node.pos.z + Math.sin((a * Math.PI) / 8) * d;
-        if (!swimDeep(x, z)) {
-          spot = { x, z };
-          break outer;
-        }
-      }
-    }
-  }
-  p.pos.x = spot.x;
-  p.pos.z = spot.z;
-  p.pos.y = terrainHeight(spot.x, spot.z, seed);
-  p.prevPos = { ...p.pos };
+  placeAtHarvestSpot(sim, pid, nodeId);
 }
 
 // A harvest is a short cast, not an instant grant. These helpers

@@ -16,6 +16,7 @@ import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { GatherNodeType, GatherRareEventFlavor, SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { placeAtHarvestSpot } from './helpers/harvest_spot';
 
 const FLAVOR_BY_TYPE: Record<GatherNodeType, GatherRareEventFlavor> = {
   ore: 'pristine_vein',
@@ -261,10 +262,7 @@ describe('rare events through Sim.harvestNode (all three flavors)', () => {
     const node = mustNode(nodeId);
     const p = sim.entities.get(pid);
     if (!p) throw new Error('missing player entity');
-    p.pos.x = node.pos.x;
-    p.pos.z = node.pos.z;
-    p.pos.y = terrainHeight(node.pos.x, node.pos.z, sim.cfg.seed);
-    p.prevPos = { ...p.pos };
+    placeAtHarvestSpot(sim, pid, nodeId);
     const meta = sim.players.get(pid);
     if (!meta) throw new Error('missing player meta');
     for (let i = 0; i < 2000; i++) {
@@ -386,10 +384,7 @@ describe('rarity-floor signing through Sim.harvestNode', () => {
     const node = mustNode(nodeId);
     const p = sim.entities.get(pid);
     if (!p) throw new Error('missing player entity');
-    p.pos.x = node.pos.x;
-    p.pos.z = node.pos.z;
-    p.pos.y = terrainHeight(node.pos.x, node.pos.z, sim.cfg.seed);
-    p.prevPos = { ...p.pos };
+    placeAtHarvestSpot(sim, pid, nodeId);
     const meta = sim.players.get(pid);
     if (!meta) throw new Error('missing player meta');
     // Max proficiency: zero common weight, so rare-or-better shows up fast.
@@ -457,10 +452,7 @@ describe('grant truncation at the command boundary (full bags)', () => {
     const node = mustNode(nodeId);
     const p = sim.entities.get(pid);
     if (!p) throw new Error('missing player entity');
-    p.pos.x = node.pos.x;
-    p.pos.z = node.pos.z;
-    p.pos.y = terrainHeight(node.pos.x, node.pos.z, sim.cfg.seed);
-    p.prevPos = { ...p.pos };
+    placeAtHarvestSpot(sim, pid, nodeId);
     const meta = sim.players.get(pid);
     if (!meta) throw new Error('missing player meta');
     return { sim, pid, nodeId, meta };
