@@ -5,6 +5,7 @@ import {
   FINGERS_OF_FROST_DURATION,
   FINGERS_OF_FROST_MAX_STACKS,
   frostProcGlowActive,
+  resolveFrozenCast,
   SHATTER_CRIT_BONUS,
   WINTERS_CHILL_CHARGES,
   WINTERS_CHILL_SPENDERS,
@@ -25,7 +26,7 @@ import type { Aura, Entity, SimEvent } from '../src/sim/types';
 // Frost mage proc engine (owner design 2026-07-11, combat/frost_mage.ts):
 // Rimelance (frostbolt) impacts roll Fingers of Frost (15%, 2 stacks) and
 // Brain Freeze (20%, single); Flurry plants Winter's Chill (2 charges); Ice
-// Lance spends them, in the owner's order (really-frozen consumes nothing >
+// Lance spends them, in the owner's order (mage-frozen consumes nothing >
 // Fingers > Winter's Chill), for Shatter crits and its 3x frozen damage.
 
 type TestSim = Sim & {
@@ -262,7 +263,7 @@ describe('frostbolt proc generation', () => {
 });
 
 describe('Ice Lance frozen resolution', () => {
-  it('deals roughly triple damage against a really frozen (rooted) target', () => {
+  it('deals roughly triple damage against a mage-rooted target', () => {
     const { sim, p } = makeSim();
     const mob = spawnTarget(sim, p);
     sim.drainEvents();
@@ -275,14 +276,86 @@ describe('Ice Lance frozen resolution', () => {
     }
     expect(normalMax).toBeGreaterThan(0);
     // Frozen: a live root on the target, consuming nothing.
-    pushAura(mob, { id: 'test_root', name: 'Test Root', kind: 'root' });
+    pushAura(mob, {
+      id: 'test_mage_root',
+      name: 'Test Mage Root',
+      kind: 'root',
+      sourceId: p.id,
+    });
     const hits = damageEvents(castAndResolve(sim, p, 'ice_lance', 'Ice Lance'), 'Ice Lance');
     expect(hits).toHaveLength(1);
     const frozenHit = hits[0];
     const floor = frozenHit.crit ? normalMax * 2 : normalMax * 2.4;
     expect(frozenHit.amount).toBeGreaterThan(floor);
-    // Really-frozen consumes no proc state (there was none to consume).
+    // A mage root consumes no proc state (there was none to consume).
     expect(p.auras.some((a) => a.kind === 'fingers_of_frost')).toBe(false);
+  });
+
+  it('does not treat a root from a druid as frozen for Ice Lance or Shatter', () => {
+    const { sim, p } = makeSim();
+    const mob = spawnTarget(sim, p);
+    const druidId = sim.addPlayer('druid', 'Rooter');
+    pushAura(mob, {
+      id: 'gripping_roots',
+      name: 'Gripping Roots',
+      kind: 'root',
+      sourceId: druidId,
+      school: 'nature',
+    });
+
+    const iceLanceFrozen = resolveFrozenCast(
+      sim.ctx,
+      p,
+      sim.players.get(p.id)!,
+      ABILITIES.ice_lance,
+      mob,
+    );
+    const shatterFrozen = resolveFrozenCast(
+      sim.ctx,
+      p,
+      sim.players.get(p.id)!,
+      ABILITIES.frostbolt,
+      mob,
+    );
+
+    expect(iceLanceFrozen).toEqual({ treatAsFrozen: false, damageMult: 1 });
+    expect(shatterFrozen).toEqual({ treatAsFrozen: false, damageMult: 1 });
+  });
+
+  it('lets Fingers of Frost freeze a root-immune target', () => {
+    const { sim, p } = makeSim();
+    const mob = spawnTarget(sim, p);
+    mob.ccImmune = true;
+    pushAura(p, {
+      id: 'fingers_of_frost',
+      name: 'Fingers of Frost',
+      kind: 'fingers_of_frost',
+      stacks: 1,
+      sourceId: p.id,
+    });
+
+    const frozen = resolveFrozenCast(sim.ctx, p, sim.players.get(p.id)!, ABILITIES.ice_lance, mob);
+
+    expect(frozen).toEqual({ treatAsFrozen: true, damageMult: 3 });
+    expect(p.auras.some((a) => a.kind === 'fingers_of_frost')).toBe(false);
+  });
+
+  it("lets Winter's Chill freeze a root-immune target", () => {
+    const { sim, p } = makeSim();
+    const mob = spawnTarget(sim, p);
+    mob.ccImmune = true;
+    pushAura(mob, {
+      id: 'winters_chill',
+      name: "Winter's Chill",
+      kind: 'winters_chill',
+      charges: 1,
+      sourceId: p.id,
+    });
+
+    const frozen = resolveFrozenCast(sim.ctx, p, sim.players.get(p.id)!, ABILITIES.ice_lance, mob);
+
+    expect(frozen).toEqual({ treatAsFrozen: true, damageMult: 3 });
+    expect(mob.auras.some((a) => a.kind === 'winters_chill')).toBe(false);
   });
 
   it("spends Fingers of Frost before Winter's Chill (the owner's order)", () => {
@@ -367,7 +440,14 @@ describe('Ice Lance frozen resolution', () => {
         kind: 'buff_spellcrit',
         value: 5,
       });
-      if (rooted) pushAura(mob, { id: 'test_root', name: 'Test Root', kind: 'root' });
+      if (rooted) {
+        pushAura(mob, {
+          id: 'test_mage_root',
+          name: 'Test Mage Root',
+          kind: 'root',
+          sourceId: p.id,
+        });
+      }
       sim.drainEvents();
       const hits = damageEvents(castAndResolve(sim, p, 'frostbolt', 'Rimelance'), 'Rimelance');
       expect(hits).toHaveLength(1);
