@@ -1384,6 +1384,12 @@ export class Hud {
     startRace: () => this.sim.mountRaceStart(),
     cancelRace: () => this.sim.mountRaceCancel(),
   });
+  // Non-trapping focus capture/return for the shared #vendor-window container
+  // (the bank companion shape, NOT windowFocus's Tab trap: vendor is a bags
+  // companion, not modal). One field covers both tenants (the copper vendor
+  // and the Heroic Quartermaster), since they share the container and are
+  // mutually exclusive.
+  private vendorOpenerFocus: HTMLElement | null = null;
   private openTrainNpcId: number | null = null;
   // Learn flights + confirmed-grant overlay for the train window (issue
   // #2342): begin on click (the double-submit guard), resolve on the
@@ -12703,6 +12709,10 @@ export class Hud {
     // vendor pairing takes over.
     if (this.bankWindowOpen) this.closeBank();
     this.openHeroicVendorNpcId = null; // the marks shop shares the container
+    // Non-trapping focus capture/return (WCAG 2.4.3), matching the bank
+    // companion: NOT windowFocus, which would install a Tab trap and break
+    // the vendor + bags cluster.
+    this.vendorOpenerFocus = this.focusManager.activeFocusable();
     this.openVendorNpcId = npcId;
     document.body.classList.add('vendor-open');
     this.renderVendor();
@@ -12761,6 +12771,10 @@ export class Hud {
     // marks shop takes the container.
     if (this.bankWindowOpen) this.closeBank();
     this.openVendorNpcId = null; // shares the container with the copper vendor
+    // Non-trapping focus capture/return (WCAG 2.4.3), matching the bank
+    // companion: NOT windowFocus, which would install a Tab trap and break
+    // the vendor + bags cluster.
+    this.vendorOpenerFocus = this.focusManager.activeFocusable();
     this.openHeroicVendorNpcId = npcId;
     this.renderHeroicVendor();
   }
@@ -12790,6 +12804,9 @@ export class Hud {
     $('#vendor-window').style.display = 'none';
     this.openHeroicVendorNpcId = null;
     this.hideTooltip();
+    // Return focus to the opener (WCAG 2.4.3); mirrors closeVendor below.
+    this.focusManager.restore(this.vendorOpenerFocus);
+    this.vendorOpenerFocus = null;
   }
 
   closeVendor(): void {
@@ -12799,6 +12816,10 @@ export class Hud {
     this.openVendorNpcId = null;
     document.body.classList.remove('vendor-open'); // bags (if still open) re-centres
     this.hideTooltip();
+    // Return focus to the opener (WCAG 2.4.3); non-trapping, matching the bank
+    // companion (no Tab trap was ever installed for vendor).
+    this.focusManager.restore(this.vendorOpenerFocus);
+    this.vendorOpenerFocus = null;
     if (closeMobileBags) {
       // Mirror BagsWindow.close()'s teardown backstop: a discard/sell prompt may hold
       // #bags inert (installPromptDialog) and this mobile path hides the grid without

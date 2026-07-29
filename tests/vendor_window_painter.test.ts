@@ -20,6 +20,8 @@ import type {
 } from '../src/ui/hud/vendor/vendor_view';
 import { renderVendorWindow, type VendorWindowDeps } from '../src/ui/hud/vendor/vendor_window';
 
+const hud = readFileSync(join(__dirname, '../src/ui/hud.ts'), 'utf8');
+
 function item(id: string): ItemDef {
   return {
     id,
@@ -188,5 +190,50 @@ describe('#vendor-window desktop width cap: divides by --window-scale and clears
         }
       }
     }
+  });
+});
+
+describe('vendor window family: hud.ts focus-management wiring (WCAG 2.4.3)', () => {
+  // Unlike vendor_view.ts/vendor_window.ts (pure core + thin painter), the
+  // open/close/focus lifecycle for #vendor-window lives directly on the Hud
+  // coordinator (openVendor/closeVendor/openHeroicVendor/closeHeroicVendor),
+  // the same shape openBank/closeBank use for the bank companion. So this
+  // suite pins the SOURCE wiring the bank_window.test.ts "hud.ts wiring"
+  // section pins for bank: the non-trapping capture/return pair, matching
+  // bankWindow (NOT windowFocus, which would install a Tab trap and break the
+  // vendor + bags cluster, which is documented as a companion, not modal).
+  const openVendorBody = hud.slice(
+    hud.indexOf('openVendor(npcId: number): void {'),
+    hud.indexOf('private renderVendor(): void {'),
+  );
+  const openHeroicVendorBody = hud.slice(
+    hud.indexOf('openHeroicVendor(npcId: number): void {'),
+    hud.indexOf('private renderHeroicVendor(): void {'),
+  );
+  const closeHeroicVendorBody = hud.slice(
+    hud.indexOf('closeHeroicVendor(): void {'),
+    hud.indexOf('closeVendor(): void {'),
+  );
+  const closeVendorBody = hud.slice(
+    hud.indexOf('closeVendor(): void {'),
+    hud.indexOf('get vendorOpen(): boolean {'),
+  );
+
+  it('captures the opener on openVendor and openHeroicVendor via the shared FocusManager', () => {
+    expect(openVendorBody).toContain(
+      'this.vendorOpenerFocus = this.focusManager.activeFocusable();',
+    );
+    expect(openHeroicVendorBody).toContain(
+      'this.vendorOpenerFocus = this.focusManager.activeFocusable();',
+    );
+  });
+
+  it('returns focus to the opener on closeVendor and closeHeroicVendor', () => {
+    expect(closeVendorBody).toContain('this.focusManager.restore(this.vendorOpenerFocus);');
+    expect(closeHeroicVendorBody).toContain('this.focusManager.restore(this.vendorOpenerFocus);');
+  });
+
+  it('never installs a Tab trap for #vendor-window (non-modal bags companion)', () => {
+    expect(hud).not.toMatch(/this\.windowFocus\('#vendor-window'\)/);
   });
 });
