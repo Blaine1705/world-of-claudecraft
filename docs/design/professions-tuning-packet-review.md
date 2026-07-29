@@ -658,7 +658,12 @@ derived test; the cap-scaling design note) plus:
    proficiency climb, and self-signed reduction bring a real focused climb
    to roughly 3 to 5 hours against the design record's 10-to-20 prose
    target), so the content pass should decide whether the target moves or
-   the curve does.
+   the curve does. The re-derivation must also account for release fix
+   #2387 (merged at the phase 10 QA re-sync): the refuter measured the
+   self-signed reduction while recipeForResultItem searched common recipes
+   only, so Battlefield Experience credited nothing for the rare ladder
+   potions; with the credit working, the real climb sits further below the
+   recorded figure.
 5. The crafting-anchor record includes the documented mobile-station
    bypass; the later-zone work-order thinness (one order each in zones 2
    and 3) is filled or recorded as deliberate.
