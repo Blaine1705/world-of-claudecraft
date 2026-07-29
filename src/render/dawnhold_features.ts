@@ -21,7 +21,13 @@ import {
 } from '../sim/dawnhold_layout';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
-import { castlePavingMat, castleStoneMat } from './castle_stone';
+import {
+  castlePavingMat,
+  castleStoneBox,
+  castleStoneMat,
+  FLAGSTONE_TILE_YD,
+  tileCastleUv,
+} from './castle_stone';
 import { PROP_ASSET_DEFS } from './props';
 
 const DAWNHOLD_KEYS = [
@@ -141,6 +147,8 @@ export function buildDawnholdFeatures(): DawnholdFeaturesView {
   // Every raw mass below is coursed stone tiled to its own footprint (the
   // shared castle_stone surfacing), so a cap slab, a tower core, and the
   // stair wedge all read as the same masonry at the same course size.
+  const capMat = castleStoneMat({ color: 0x9a8f7c, roughness: 0.9 });
+  const coreMat = castleStoneMat({ color: 0x8d8272 });
   const slab = (
     cx: number,
     cz: number,
@@ -151,8 +159,8 @@ export function buildDawnholdFeatures(): DawnholdFeaturesView {
     mat?: THREE.Material,
   ): void => {
     const mesh = new THREE.Mesh(
-      new THREE.BoxGeometry(sx, thick, sz),
-      mat ?? castleStoneMat(sx, sz, { color: 0x9a8f7c, roughness: 0.9 }),
+      castleStoneBox(sx, thick, sz),
+      mat ?? capMat,
     );
     mesh.position.set(cx, topY - thick / 2, cz);
     mesh.castShadow = true;
@@ -269,8 +277,8 @@ export function buildDawnholdFeatures(): DawnholdFeaturesView {
     const shellScale = (thw * 2) / 4;
     for (const f of faces) put('kcasWall', { x: f.x, y: padY, z: f.z, rot: f.rot, s: shellScale });
     const core = new THREE.Mesh(
-      new THREE.BoxGeometry(thw * 2 - 0.4, t.hAbs - padY, thw * 2 - 0.4),
-      castleStoneMat(thw * 2 - 0.4, t.hAbs - padY, { color: 0x8d8272 }),
+      castleStoneBox(thw * 2 - 0.4, t.hAbs - padY, thw * 2 - 0.4),
+      coreMat,
     );
     core.position.set(t.x, padY + (t.hAbs - padY) / 2, t.z);
     core.castShadow = true;
@@ -328,7 +336,7 @@ export function buildDawnholdFeatures(): DawnholdFeaturesView {
   group.add(gateLight);
 
   // ---- the stair flight: a solid wedge pier (lift terrain is invisible) ----
-  const wedgeMat = castleStoneMat(14, 6.5, { color: 0x8d8272, side: THREE.DoubleSide });
+  const wedgeMat = castleStoneMat({ color: 0x8d8272, side: THREE.DoubleSide });
   for (const rmp of DAWNHOLD_RAMPS) {
     const baseY = padY - 0.4;
     const pxz = (a: number, b: number): [number, number] => (rmp.axis === 'x' ? [a, b] : [b, a]);
@@ -371,10 +379,9 @@ export function buildDawnholdFeatures(): DawnholdFeaturesView {
     const fz1 = DAWNHOLD.wz1 - DAWNHOLD.wallTh / 2;
     const fw = fx1 - fx0;
     const fd = fz1 - fz0;
-    const floor = new THREE.Mesh(
-      new THREE.PlaneGeometry(fw, fd),
-      castlePavingMat(fw, fd, { color: 0xb9b4ab }),
-    );
+    const floorGeo = new THREE.PlaneGeometry(fw, fd);
+    tileCastleUv(floorGeo, fw, fd, FLAGSTONE_TILE_YD);
+    const floor = new THREE.Mesh(floorGeo, castlePavingMat({ color: 0xb9b4ab }));
     floor.rotation.x = -Math.PI / 2;
     floor.position.set((fx0 + fx1) / 2, padY + 0.03, (fz0 + fz1) / 2);
     floor.receiveShadow = true;
@@ -392,9 +399,9 @@ export function buildDawnholdFeatures(): DawnholdFeaturesView {
     const cz0 = DAWNHOLD.wz1; // the curtain closes the court's north side
     const wallTop = C.hAbs;
     const wallH = wallTop - padY + 0.4; // sunk a little so no seam shows
-    const stoneCourt = castleStoneMat(C.x1 - C.x0, wallH, { color: 0x93917f });
+    const stoneCourt = castleStoneMat({ color: 0x93917f });
     const runWall = (cx: number, cz: number, sx: number, sz: number): void => {
-      const mesh = new THREE.Mesh(new THREE.BoxGeometry(sx, wallH, sz), stoneCourt);
+      const mesh = new THREE.Mesh(castleStoneBox(sx, wallH, sz), stoneCourt);
       mesh.position.set(cx, wallTop - wallH / 2, cz);
       mesh.castShadow = true;
       mesh.receiveShadow = true;

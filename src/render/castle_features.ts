@@ -22,7 +22,7 @@ import {
 } from '../sim/castle_layout';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import { castleStoneMat } from './castle_stone';
+import { castleStoneBox, castleStoneMat } from './castle_stone';
 import { GFX } from './gfx';
 import { PROP_ASSET_DEFS } from './props';
 import { applyWornStone } from './worn_stone';
@@ -191,9 +191,9 @@ export function buildCastleFeatures(): CastleFeaturesView {
   // color read as grey cardboard beside the textured kit modules bolted
   // onto it. The wedge masses (the wall flights and the ward's stair cuts)
   // are hand-wound triangle soups, so theirs draws both faces.
-  const stone = (w: number, h: number): THREE.Material =>
-    castleStoneMat(w, h, { color: 0x8a7568, roughness: 0.95 });
-  const wedgeMat = castleStoneMat(16, 8, {
+  const stoneMat = castleStoneMat({ color: 0x8a7568, roughness: 0.95 });
+  const capMat = castleStoneMat({ color: 0x97826f, roughness: 0.9 });
+  const wedgeMat = castleStoneMat({
     color: 0x8a7568,
     roughness: 0.95,
     side: THREE.DoubleSide,
@@ -207,10 +207,7 @@ export function buildCastleFeatures(): CastleFeaturesView {
     thick = 0.36,
     mat?: THREE.Material,
   ): void => {
-    const mesh = new THREE.Mesh(
-      new THREE.BoxGeometry(sx, thick, sz),
-      mat ?? castleStoneMat(sx, sz, { color: 0x97826f, roughness: 0.9 }),
-    );
+    const mesh = new THREE.Mesh(castleStoneBox(sx, thick, sz), mat ?? capMat);
     mesh.position.set(cx, topY - thick / 2, cz);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
@@ -343,8 +340,8 @@ export function buildCastleFeatures(): CastleFeaturesView {
     // the shell tops and the cap slab reads as open air from outside
     {
       const core = new THREE.Mesh(
-        new THREE.BoxGeometry(thw * 2 - 0.4, t.hAbs - padY, thw * 2 - 0.4),
-        stone(thw * 2 - 0.4, t.hAbs - padY),
+        castleStoneBox(thw * 2 - 0.4, t.hAbs - padY, thw * 2 - 0.4),
+        stoneMat,
       );
       core.position.set(t.x, padY + (t.hAbs - padY) / 2, t.z);
       core.castShadow = true;
@@ -401,8 +398,8 @@ export function buildCastleFeatures(): CastleFeaturesView {
     {
       const inset = 0.05;
       const mesh = new THREE.Mesh(
-        new THREE.BoxGeometry(w.x1 - w.x0 - inset * 2, rise + 0.4, w.z1 - w.z0 - inset * 2),
-        stone(w.x1 - w.x0, rise + 0.4),
+        castleStoneBox(w.x1 - w.x0 - inset * 2, rise + 0.4, w.z1 - w.z0 - inset * 2),
+        stoneMat,
       );
       mesh.position.set((w.x0 + w.x1) / 2, w.h - (rise + 0.4) / 2, (w.z0 + w.z1) / 2);
       mesh.castShadow = true;
@@ -514,8 +511,8 @@ export function buildCastleFeatures(): CastleFeaturesView {
     put('hexrTowerA', { x: kx - 3.4, y: wardY + 17.5, z: kz - 2.8, rot: 0.4, s: 4.6 });
     put('hexrTowerA', { x: kx + 3.4, y: wardY + 19.5, z: kz + 2.8, rot: 2.2, s: 4.6 });
     put('hexrTowerA', { x: kx, y: wardY + 26.5, z: kz, rot: 1.1, s: 5.4 });
-    slab(kx - 3.4, kz - 2.8, 3.6, 3.6, wardY + 18.2, 2.4, stone(3.6, 2.4));
-    slab(kx + 3.4, kz + 2.8, 3.6, 3.6, wardY + 20.2, 2.4, stone(3.6, 2.4));
+    slab(kx - 3.4, kz - 2.8, 3.6, 3.6, wardY + 18.2, 2.4, stoneMat);
+    slab(kx + 3.4, kz + 2.8, 3.6, 3.6, wardY + 20.2, 2.4, stoneMat);
     put('kcasBannerRedTriple', { x: kx, y: wardY + 38.5, z: kz + 1.2, rot: Math.PI, s: 1.6 });
   }
 

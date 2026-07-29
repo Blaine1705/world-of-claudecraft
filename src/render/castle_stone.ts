@@ -4,25 +4,23 @@
 // footings, and paved yards. Those were flat untextured colors, which read
 // as grey cardboard beside the textured KayKit modules bolted onto them.
 //
-// This module is the one place a castle mass asks for its surface. Textures
-// come from the procedural canvas set (textures.ts, no image files) and are
-// cached PER REPEAT: a THREE texture carries its own repeat, and surfaceMat
-// dedupes materials by texture uuid, so two masses wanting the same stone at
-// the same tiling share one texture AND one material, while a 50yd bailey
-// floor and a 3yd coping each get tiling that suits their size.
+// Course size must stay constant across a castle however big the piece is,
+// and the obvious way to get that (one texture per mass size, each carrying
+// its own repeat) is a trap: a castle builds hundreds of differently sized
+// slabs, so it mints hundreds of 256px canvases at world entry and hangs the
+// load. The tiling therefore lives on the GEOMETRY (tileCastleUv scales a
+// mesh's uv attribute by its real world size) while the texture stays a
+// single shared instance at repeat 1, so the whole castle shares one
+// material per stone tone.
 //
 // Pure presentation: no sim imports, no world state.
 import * as THREE from 'three';
 import { surfaceMat } from './gfx';
-import { flagstoneTexture, stoneTexture } from './textures';
+import { castleAshlarTexture, flagstoneTexture } from './textures';
 
 /** world yards covered by one repeat of each texture */
-const STONE_TILE_YD = 4;
-const FLAGSTONE_TILE_YD = 7;
-
-type Maker = () => THREE.CanvasTexture;
-
-const cache = new Map<string, THREE.Texture>();
+export const STONE_TILE_YD = 4;
+export const FLAGSTONE_TILE_YD = 7;
 
 /**
  * The canvas texture set needs a DOM. The castle masses are also built
@@ -32,73 +30,86 @@ const cache = new Map<string, THREE.Texture>();
  */
 const hasCanvas = typeof document !== 'undefined';
 
-function tiled(kind: string, make: Maker, rx: number, ry: number): THREE.Texture | null {
+let ashlar: THREE.Texture | null | undefined;
+let paving: THREE.Texture | null | undefined;
+
+function shared(make: () => THREE.CanvasTexture): THREE.Texture | null {
   if (!hasCanvas) return null;
-  // quantize the repeat so near-identical requests still share one texture
-  const qx = Math.max(0.25, Math.round(rx * 4) / 4);
-  const qy = Math.max(0.25, Math.round(ry * 4) / 4);
-  const key = `${kind}:${qx}:${qy}`;
-  const hit = cache.get(key);
-  if (hit) return hit;
   const tex = make();
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(qx, qy);
-  cache.set(key, tex);
   return tex;
 }
 
-/**
- * Coursed castle stone sized for a mass spanning `wYd` by `hYd` world yards
- * on the face being surfaced (a cap slab's footprint, a wedge's flank).
- */
-export function castleStoneTexture(wYd: number, hYd: number): THREE.Texture | null {
-  return tiled('stone', stoneTexture, wYd / STONE_TILE_YD, hYd / STONE_TILE_YD);
+/** the one coursed-ashlar albedo every castle mass shares */
+export function castleStoneTexture(): THREE.Texture | null {
+  if (ashlar === undefined) ashlar = shared(castleAshlarTexture);
+  return ashlar;
 }
 
-/** Laid paving sized for a yard spanning `wYd` by `dYd` world yards. */
-export function castlePavingTexture(wYd: number, dYd: number): THREE.Texture | null {
-  return tiled('flag', flagstoneTexture, wYd / FLAGSTONE_TILE_YD, dYd / FLAGSTONE_TILE_YD);
+/** the one laid-paving albedo every castle yard shares */
+export function castlePavingTexture(): THREE.Texture | null {
+  if (paving === undefined) paving = shared(flagstoneTexture);
+  return paving;
 }
 
 /**
- * The material for a rectangular castle mass: coursed stone tiled to the
- * mass's own footprint so the course size stays constant across the castle
- * however big or small the piece is.
+ * Tile a mass's own uv attribute to its real world size, so one shared
+ * texture yields a constant course size on a 3yd coping and a 50yd floor
+ * alike. Box faces each map 0..1, so this repeats every face the same
+ * number of times: correct on the broad faces that read, and harmless on a
+ * slab's thin edges.
  */
+export function tileCastleUv(
+  geo: THREE.BufferGeometry,
+  uYd: number,
+  vYd: number,
+  tileYd = STONE_TILE_YD,
+): void {
+  const uv = geo.getAttribute('uv');
+  if (!uv) return;
+  const su = Math.max(0.25, uYd / tileYd);
+  const sv = Math.max(0.25, vYd / tileYd);
+  for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * su, uv.getY(i) * sv);
+  uv.needsUpdate = true;
+}
+
+/** Coursed castle stone in the given tone (a mass's masonry). */
 export function castleStoneMat(
-  wYd: number,
-  hYd: number,
   opts: { color?: number; roughness?: number; side?: THREE.Side } = {},
 ): THREE.Material {
-  const map = castleStoneTexture(wYd, hYd);
+  // both castle textures are authored HIGH KEY to be tinted, so the mass's
+  // own stone tone goes straight through whether or not a map exists
   return surfaceMat({
-    // without a texture the mass keeps its own stone tone rather than the
-    // white the map would have been multiplied against
-    color: map ? (opts.color ?? 0xffffff) : (opts.color ?? 0x8a7568),
-    map: map ?? undefined,
+    color: opts.color ?? 0x8a7568,
+    map: castleStoneTexture() ?? undefined,
     roughness: opts.roughness ?? 0.94,
     side: opts.side,
   });
 }
 
-/** The material for a paved yard of the given world size. */
-export function castlePavingMat(
-  wYd: number,
-  dYd: number,
-  opts: { color?: number; roughness?: number } = {},
-): THREE.Material {
-  const map = castlePavingTexture(wYd, dYd);
+/** Laid paving in the given tone (a castle yard). */
+export function castlePavingMat(opts: { color?: number; roughness?: number } = {}): THREE.Material {
   return surfaceMat({
-    color: map ? (opts.color ?? 0xffffff) : (opts.color ?? 0x9a958c),
-    map: map ?? undefined,
+    color: opts.color ?? 0x9a958c,
+    map: castlePavingTexture() ?? undefined,
     roughness: opts.roughness ?? 0.96,
   });
 }
 
-/** Test-only window into the tiling constants and the shared cache. */
+/**
+ * A box mass wearing castle stone: the geometry comes back uv-tiled to its
+ * own size so its courses match the rest of the castle.
+ */
+export function castleStoneBox(w: number, h: number, d: number): THREE.BufferGeometry {
+  const geo = new THREE.BoxGeometry(w, h, d);
+  tileCastleUv(geo, Math.max(w, d), Math.max(h, Math.min(w, d)));
+  return geo;
+}
+
+/** Test-only window into the tiling constants and the DOM gate. */
 export const castleStoneInternalsForTest = {
   STONE_TILE_YD,
   FLAGSTONE_TILE_YD,
-  cacheSize: (): number => cache.size,
+  hasCanvas,
 };
