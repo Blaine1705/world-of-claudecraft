@@ -26,8 +26,13 @@ export const EMBER_FLAT_POOLS: readonly EmberFlatPool[] = [
   { x: 418, z: 2196, r: 7, h: 5.4 },
 ] as const;
 
-/** One river run joining exactly two pools (a flat pool or a shaped basin
- *  mouth). The network is a TREE: one link per pool pair, no orphan runs. */
+/** How a run terminates at one of its mouths: pouring into a pool, or
+ *  spending itself on open ground under a river END cap. */
+export type EmberLavaMouth = 'pool' | 'cap';
+
+/** One river run. Most join two pools (a flat pool or a shaped basin
+ *  mouth); a run may also spill onto open waste, which is where the END
+ *  piece of the three-asset vocabulary belongs. */
 export interface EmberLavaLink {
   x0: number;
   z0: number;
@@ -50,6 +55,11 @@ export interface EmberLavaLink {
   trim0: number;
   /** ...and stop this far short of (x1, z1) */
   trim1: number;
+  /** how the (x0, z0) mouth ends (render-only; the grader beds the whole
+   *  polyline either way) */
+  m0: EmberLavaMouth;
+  /** how the (x1, z1) mouth ends */
+  m1: EmberLavaMouth;
 }
 
 // Endpoints reference EMBER_FLAT_POOLS and world.ts EMBER_LAVA_POOLS (the
@@ -58,7 +68,7 @@ export interface EmberLavaLink {
 export const EMBER_LAVA_LINKS: readonly EmberLavaLink[] = [
   // the twin waste pools' own short link
   // biome-ignore format: link rows read best as single lines
-  { x0: 330, z0: 2250, h0: 3.4, x1: 344, z1: 2233, h1: 3.4, w: 10, amp: 1.2, wavelength: 40, phase: 1.1, trim0: 8, trim1: 6 },
+  { x0: 330, z0: 2250, h0: 3.4, x1: 344, z1: 2233, h1: 3.4, w: 10, amp: 1.2, wavelength: 40, phase: 1.1, trim0: 8, trim1: 6, m0: 'pool', m1: 'pool' },
   // the long run south from the twin pools into the waste basin (gentle
   // sway: the short bendy river pieces add their own curl on top, so a
   // tight authored meander made the chain read as loops)
@@ -75,6 +85,8 @@ export const EMBER_LAVA_LINKS: readonly EmberLavaLink[] = [
     phase: 4.2,
     trim0: 8,
     trim1: 11,
+    m0: 'pool',
+    m1: 'pool',
   },
   // the north pool down into the spring basin
   {
@@ -90,6 +102,8 @@ export const EMBER_LAVA_LINKS: readonly EmberLavaLink[] = [
     phase: 2.6,
     trim0: 7,
     trim1: 11,
+    m0: 'pool',
+    m1: 'pool',
   },
   // the Moltenmaw pair: the lake field's two eyes joined across the saddle
   {
@@ -105,6 +119,29 @@ export const EMBER_LAVA_LINKS: readonly EmberLavaLink[] = [
     phase: 5.3,
     trim0: 15,
     trim1: 10,
+    m0: 'pool',
+    m1: 'pool',
+  },
+  // The west spill: the twin pools' overflow running out onto open waste
+  // and thinning to nothing. APPENDED, never inserted: the grader, the
+  // scatter clearance and the boulder cull all read this array, so an
+  // insert would move every later run's ground. This is the one run that
+  // ends under a river END cap rather than in another pool.
+  {
+    x0: 330,
+    z0: 2250,
+    h0: 3.4,
+    x1: 309,
+    z1: 2237,
+    h1: 1.0,
+    w: 9,
+    amp: 1.1,
+    wavelength: 38,
+    phase: 0.7,
+    trim0: 8,
+    trim1: 0,
+    m0: 'pool',
+    m1: 'cap',
   },
 ] as const;
 

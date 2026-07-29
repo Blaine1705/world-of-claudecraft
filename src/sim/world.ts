@@ -2440,7 +2440,10 @@ function applyEmberLavaNetwork(x: number, z: number, h: number): number {
   }
   for (const link of EMBER_LAVA_LINKS) {
     const s = emberNearestOnLink(link, x, z);
-    const half = link.w * 0.62; // the channel model overhangs its melt line
+    // the river model now spans exactly link.w across the flow (the
+    // render scales it by its cross extent), so the bed only needs a
+    // shoulder either side rather than the old generous overhang
+    const half = link.w * 0.55;
     if (s.dist < half + 6.5) {
       const w = 1 - smoothstep(half, half + 3.5, s.dist);
       // low banks shouldering the channel, parted at every pool mouth
