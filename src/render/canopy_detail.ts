@@ -52,6 +52,13 @@ export interface CanopyDetailSpec {
   aoDepth: number;
   /** extra darkening on down-facing geometry (tier undersides, lobe bellies) */
   creviceShade: number;
+  /**
+   * Luma mix pulling the leaf albedo toward neutral (0 = off). The kit's
+   * bush sheet is (0, 0.139, 0.025) linear — pure green with NO red — so
+   * the foliage.ts albedo-lift multiplier can brighten it but can never
+   * desaturate it; only a mix toward luminance can.
+   */
+  desat: number;
 }
 
 /**
@@ -62,10 +69,11 @@ export interface CanopyDetailSpec {
  * ferns tile finer because they are small and viewed close.
  */
 export const CANOPY_DETAIL_SPECS: Record<string, CanopyDetailSpec> = {
-  Leaves_Pine: { strength: 0.6, tileScale: 1 / 10, aoDepth: 1.2, creviceShade: 0.4 },
-  Leaves_NormalTree: { strength: 0.5, tileScale: 1 / 10, aoDepth: 1, creviceShade: 0.26 },
-  Leaves_TwistedTree: { strength: 0.5, tileScale: 1 / 10, aoDepth: 1, creviceShade: 0.26 },
-  Leaves: { strength: 0.4, tileScale: 1 / 5, aoDepth: 0.7, creviceShade: 0.15 },
+  Leaves_Pine: { strength: 0.6, tileScale: 1 / 10, aoDepth: 1.2, creviceShade: 0.4, desat: 0.06 },
+  Leaves_NormalTree: { strength: 0.5, tileScale: 1 / 10, aoDepth: 1, creviceShade: 0.26, desat: 0.08 },
+  Leaves_TwistedTree: { strength: 0.5, tileScale: 1 / 10, aoDepth: 1, creviceShade: 0.26, desat: 0.08 },
+  // dressing bushes read closest and greenest: the strongest desat lives here
+  Leaves: { strength: 0.4, tileScale: 1 / 5, aoDepth: 0.7, creviceShade: 0.15, desat: 0.18 },
 };
 
 interface CanopyTextures {
@@ -134,6 +142,7 @@ export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void
     shader.uniforms.uCanopyAoLo = { value: aoLo };
     shader.uniforms.uCanopyAoSpan = { value: aoSpan };
     shader.uniforms.uCanopyCrevice = { value: spec.creviceShade };
+    shader.uniforms.uCanopyDesat = { value: spec.desat };
     shader.vertexShader = shader.vertexShader
       .replace(
         '#include <common>',
@@ -173,7 +182,8 @@ export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void
         uniform float uCanopyTile;
         uniform float uCanopyAoLo;
         uniform float uCanopyAoSpan;
-        uniform float uCanopyCrevice;`,
+        uniform float uCanopyCrevice;
+        uniform float uCanopyDesat;`,
       )
       .replace(
         // color_fragment runs before the normal chunks, so the projection
@@ -189,7 +199,9 @@ export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void
           + texture2D( uCanopyAoTex, canopyP.xy ).r * canopyW.z;
         float canopyShade = ( uCanopyAoLo + canopyAo * uCanopyAoSpan )
           * ( 1.0 - uCanopyCrevice * smoothstep( ${CANOPY_CREVICE_DOWN_START.toFixed(2)}, ${CANOPY_CREVICE_DOWN_FULL.toFixed(2)}, vCanopyDown ) );
-        diffuseColor.rgb *= canopyShade;`,
+        diffuseColor.rgb *= canopyShade;
+        diffuseColor.rgb = mix( diffuseColor.rgb,
+          vec3( dot( diffuseColor.rgb, vec3( 0.299, 0.587, 0.114 ) ) ), uCanopyDesat );`,
       )
       .replace(
         // The leaf materials carry their albedo as an emissive ambient floor

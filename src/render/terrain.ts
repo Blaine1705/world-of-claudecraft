@@ -407,11 +407,28 @@ const vec4 WOC_PARALLAX_AMP = vec4(0.129, 0.188, 0.229, 0.107);
 const float WOC_PARALLAX_CLAMP = 0.04;   // UV units, ~0.18 world (radial, see pOff)
 float wocGroundHeight(vec2 uv, vec4 sw) {
   vec4 aoBase = texture2D(uGroundAO, uv);      // grass + sand share the base tiling
-  float aoDirt = texture2D(uGroundAO, uv * 0.8).g;
+  float aoDirt = texture2D(uGroundAO, uv * 0.55).g;
   float aoRock = texture2D(uGroundAO, uv * 0.6).b;
   // means measured by scripts/assets/pack_ground_ao.mjs; B (rock) is the
   // Rock026/Rock060 displacement blend, centred like the AO channels so the
   // signal stays zero-mean and mips fade it out with distance
+  return (aoBase.r - 0.812) * sw.x
+       + (aoDirt - 0.897) * sw.y
+       + (aoRock - 0.623) * sw.z
+       + (aoBase.a - 0.883) * sw.w;
+}
+// The PARALLAX height field, distinct from the shading field above: sampled
+// at a forced-coarse mip so the offset varies smoothly across neighbouring
+// fragments. Full-resolution height made each pixel walk its UVs by a
+// different amount, and that incoherent warp is exactly the "melted /
+// blurry ground" artifact: the eye needs nearby offsets to agree before it
+// reads them as one clod standing up. ~lod 2.5 of the 512px field keeps
+// clod-scale lumps (~14px features) and discards the per-texel jitter.
+const float WOC_PARALLAX_LOD = 2.5;
+float wocGroundHeightSmooth(vec2 uv, vec4 sw) {
+  vec4 aoBase = textureLod(uGroundAO, uv, WOC_PARALLAX_LOD);
+  float aoDirt = textureLod(uGroundAO, uv * 0.55, WOC_PARALLAX_LOD).g;
+  float aoRock = textureLod(uGroundAO, uv * 0.6, WOC_PARALLAX_LOD).b;
   return (aoBase.r - 0.812) * sw.x
        + (aoDirt - 0.897) * sw.y
        + (aoRock - 0.623) * sw.z
@@ -607,7 +624,7 @@ function buildSplatMaterial(
           // grazing angles where it engaged most.
           vec2 pDir = pRay.xz / max(pRay.y, pDist * 0.45);
           vec4 pAmp = vSplatR * WOC_PARALLAX_AMP;
-          vec2 pOff = pDir * wocGroundHeight(tuv, pAmp) * pFade;
+          vec2 pOff = pDir * wocGroundHeightSmooth(tuv, pAmp) * pFade;
           pOff /= max(1.0, length(pOff) / WOC_PARALLAX_CLAMP);
           ${
             // refine on high as well as ultra: the second wocGroundHeight read
@@ -617,7 +634,7 @@ function buildSplatMaterial(
             GFX.tier === 'ultra' || GFX.tier === 'high'
               ? `// second iteration: re-read the height where the first offset
           // landed, which keeps steep clod edges from overshooting
-          pOff = pDir * wocGroundHeight(tuv + pOff, pAmp) * pFade;
+          pOff = pDir * wocGroundHeightSmooth(tuv + pOff, pAmp) * pFade;
           pOff /= max(1.0, length(pOff) / WOC_PARALLAX_CLAMP);`
               : ''
           }
@@ -633,7 +650,7 @@ function buildSplatMaterial(
         // height-shade on grassAlb below carries the tussock shading with
         // directional grain instead. The ultra micro-shadow taps reuse
         // swShade so their height differences stay DC-free.
-        vec4 swShade = vSplatR * vec4(0.35, 1.0, 1.0, 1.0);
+        vec4 swShade = vSplatR * vec4(0.35, 0.8, 1.0, 1.0);
         float cavH = wocGroundHeight(tuv, swShade);
         // tighter slope fade than before: the AO/relief signal lives in the
         // planar-XZ projection, which stretches on banks — full-strength
@@ -760,12 +777,17 @@ function buildSplatMaterial(
         // ~9yd macro mask: the two scales can never phase-align into one
         // repeat, and patches of coarse and fine soil mottle into each other
         // instead of averaging to mush (same idiom as the grass octave pair).
-        vec2 dirtUv2 = vec2(tuv.x * 0.403 - tuv.y * 0.303, tuv.x * 0.303 + tuv.y * 0.403);
+        vec2 dirtUv2 = vec2(tuv.x * 0.277 - tuv.y * 0.208, tuv.x * 0.208 + tuv.y * 0.277);
         float dirtOctMask = texture2D(uMacro, vWPos.xz * 0.11 + 0.29).r;
         vec3 dirtFlat = mix(
-          texture2D(uDirt, tuv * 0.8).rgb,
+          texture2D(uDirt, tuv * 0.55).rgb,
           texture2D(uDirt, dirtUv2).rgb,
           0.22 + dirtOctMask * 0.5);
+        // Micro-soften: pull the pebble-scale speckle toward its own local
+        // mean (a forced-coarse mip of the same tap) so the path reads as
+        // packed earth with embedded stones, not carpet pile. The macro
+        // octaves below run on the softened base, so patch structure stays.
+        dirtFlat = mix(dirtFlat, textureLod(uDirt, tuv * 0.55, 2.0).rgb, 0.30);
         // Two macro octaves hand the soil the low-frequency structure a photo
         // tile cannot carry: ~6yd value mottling (footworn patches) and ~20yd
         // value plus grey-brown hue drift (damp hollows). Both reuse uMacro;
@@ -775,7 +797,7 @@ function buildSplatMaterial(
         float dirtMac20 = texture2D(uMacro, vWPos.xz * 0.052 + 0.13).r - 0.5;
         dirtFlat *= 1.0 + dirtMac6 * 0.11 + dirtMac20 * 0.15;
         vec3 dirtGrey = vec3(dot(dirtFlat, vec3(0.35, 0.45, 0.2))) * vec3(1.0, 0.97, 0.9);
-        dirtFlat = mix(dirtFlat, dirtGrey, clamp(0.18 + dirtMac20 * 0.4, 0.0, 0.6));
+        dirtFlat = mix(dirtFlat, dirtGrey, clamp(0.24 + dirtMac20 * 0.4, 0.0, 0.65));
         // Path wear across the trail: the vertex dirt weight sits near 0.85
         // at a trail's core and feathers out over ~1.4yd at the margin, so it
         // doubles as a smooth cross-path coordinate. The core reads compacted
@@ -794,8 +816,8 @@ function buildSplatMaterial(
         // swap so wet mud keeps its smooth sheen. 0.10 (was 0.16): with the
         // macro soil structure above, the old weight let single-scale
         // micro-grain dominate the read again, the exact carpet failure.
-        float gravelW = 0.10 * (1.0 - vExtra.x);
-        dirtFlat = mix(dirtFlat, texture2D(uRock, tuv * 2.8).rgb, gravelW);
+        float gravelW = 0.07 * (1.0 - vExtra.x);
+        dirtFlat = mix(dirtFlat, texture2D(uRock, tuv * 1.8).rgb, gravelW);
         vec3 dirtWall = mix(
           texture2D(uDirt, vWPos.xy * 0.176).rgb,
           texture2D(uDirt, vWPos.zy * 0.176).rgb,
@@ -954,7 +976,7 @@ function buildSplatMaterial(
         // direction, ridged across it.
         vec3 gN = texture2D(uGrassN, combT + grassJitter).xyz * 2.0 - 1.0;
         vec2 gNxy = gN.x * WOC_COMB_COMPRESS * combDir + gN.y * combPerp;
-        vec3 dN = texture2D(uDirtN, tuv * 0.8).xyz * 2.0 - 1.0;
+        vec3 dN = texture2D(uDirtN, tuv * 0.55).xyz * 2.0 - 1.0;
         vec3 rN = texture2D(uRockN, tuv * 0.6).xyz * 2.0 - 1.0;
         vec3 sN = texture2D(uSandN, tuv).xyz * 2.0 - 1.0;
         // A second octave at 4x the base tiling: without it the ground is one
@@ -971,7 +993,7 @@ function buildSplatMaterial(
         // gravel grain at the trail albedo's own tap scale, so the grit a
         // path shows is lit rather than painted (gravelW already fades it
         // with the marsh mud swap)
-        vec2 gvN = texture2D(uRockN, tuv * 2.8).xy * 2.0 - 1.0;
+        vec2 gvN = texture2D(uRockN, tuv * 1.8).xy * 2.0 - 1.0;
         // wet mud lumps smoothly where dry dirt crumbles; footworn trail
         // cores are packed smoother than their kicked-up margins (pathCore
         // from the albedo chunk)

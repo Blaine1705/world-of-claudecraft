@@ -1643,8 +1643,11 @@ function buildDressing(parent: THREE.Group, seed: number, registry: BucketMesh[]
   // most blown-out surface in the world. Leaves get a gentle lift; Flowers
   // get none (their authored albedo is correct).
   const albedoLift: Partial<Record<DressKind, [number, number, number]>> = {
-    bush: [1.6, 1.5, 1.35],
-    bushFlowers: [1.6, 1.5, 1.35],
+    // 1.6/1.5 read as neon against the calmer round-8 ground: the bush sheet
+    // is pure green (red 0), so brightness is the only lever here — the
+    // saturation itself is tamed by canopy_detail's desat luma mix.
+    bush: [1.35, 1.22, 1.08],
+    bushFlowers: [1.35, 1.22, 1.08],
     fern: [1.15, 1.15, 1.15],
   };
   for (const kind of ['bush', 'bushFlowers', 'fern'] as const) {
