@@ -1,6 +1,15 @@
 // @vitest-environment jsdom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+// The unknown-id row renders the shared fallback icon, whose real
+// iconDataUrl needs a canvas; stub ONLY that export so the ghost-id test
+// below runs under jsdom without one.
+vi.mock('../src/ui/icons', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/ui/icons')>()),
+  iconDataUrl: (kind: string, id: string) => `stub:${kind}:${id}`,
+}));
+
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { isHarvestableCorpse } from '../src/sim/professions/gathering';
@@ -391,5 +400,37 @@ describe('LootWindowController', () => {
 
     expect(test.centerPopup).toHaveBeenCalledWith(test.element);
     expect(test.placePopup).not.toHaveBeenCalled();
+  });
+
+  it('renders an unknown-id loot stack with the fallback icon and raw id, never a throw (R34)', () => {
+    // Corpse loot is server truth: a stale bundle can be handed an id it
+    // predates. The unguarded shape threw before innerHTML was assigned,
+    // leaving the corpse un-lootable with the player's windows already
+    // closed; the guarded row must render beside a known stack, carry the
+    // raw id as its label, and attach no def-derived tooltip.
+    const mob = entity(10, {
+      kind: 'mob',
+      templateId: harvestMobId,
+      loot: {
+        copper: 0,
+        items: [
+          { itemId: itemIds[0], count: 1, personalFor: [7] },
+          { itemId: 'ghost_future_item', count: 3, personalFor: [7] },
+        ],
+      },
+    });
+    const h = harness([mob]);
+    expect(() => h.controller.openCorpse(10, 0, 0)).not.toThrow();
+    const rows = [...h.element.querySelectorAll<HTMLElement>('[data-item]')];
+    const ghost = rows.find((row) => row.dataset.item === 'ghost_future_item');
+    expect(ghost).toBeTruthy();
+    expect(ghost?.textContent).toContain('ghost_future_item');
+    expect(ghost?.textContent).toContain('x3');
+    expect(ghost?.querySelector('img.item-icon')).toBeTruthy();
+    // The known sibling still renders through the injected itemIcon dep.
+    expect(rows.some((row) => row.dataset.item === itemIds[0])).toBe(true);
+    // The tooltip attach skips the def-less row instead of dereferencing.
+    const attachedRows = h.attachTooltip.mock.calls.map((call) => call[0]);
+    expect(attachedRows).not.toContain(ghost);
   });
 });

@@ -26,6 +26,15 @@ describe('unknownItemIconHtml', () => {
     expect(unknownItemIconHtml('future_item_id', 'mythic')).toContain('class="item-icon q-mythic"');
   });
 
+  it('escapes a hostile quality string out of the class attribute', () => {
+    // Defense in depth per the unconditional esc() rule: today's wire quality
+    // is a sim union member, but the parameter is deliberately a plain string
+    // and this helper is where a wider future caller would land.
+    const html = unknownItemIconHtml('future_item_id', 'x" onerror="alert(1)');
+    expect(html).not.toContain('" onerror');
+    expect(html).toContain('&quot;');
+  });
+
   it('asks the icon pipeline for the ITEM kind under the raw id', () => {
     // The procedural pipeline resolves any unknown item id to its fallback
     // recipe, keyed by the id so distinct unknowns stay distinct.

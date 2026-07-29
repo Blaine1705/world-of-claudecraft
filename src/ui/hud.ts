@@ -14245,80 +14245,90 @@ export class Hud {
     ]);
     if (sig === this.lastTradeSig) return;
 
-    const itemRow = (s: InvSlot, mine: boolean) => {
-      // Stale-client guard (R34): the other side's offer is server truth and
-      // can carry an id this bundle predates; buildTradeItemRow keeps the raw
-      // id as the label and the icon falls back instead of dereferencing the
-      // missing def (the shipped failure shape threw here and froze the offer
-      // display behind the already-set repaint signature).
-      const { item, label } = buildTradeItemRow(s, ITEMS);
-      const inner = `${item ? this.itemIcon(item) : unknownItemIconHtml(s.itemId)}<span>${esc(label)}</span>`;
-      return mine
-        ? `<button type="button" class="trade-item mine" data-item="${esc(s.itemId)}">${inner}</button>`
-        : `<div class="trade-item">${inner}</div>`;
-    };
-    el.innerHTML = `
-      <div class="panel-title"><span>${esc(t('hud.trade.title', { name: info.otherName }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.trade.cancel'))}">${svgIcon('close')}</button></div>
-      <div class="trade-cols">
-        <div class="trade-col ${info.myAccepted ? 'accepted' : ''}">
-          <h4>${esc(t('hud.trade.yourOffer'))}</h4>
-          <div class="trade-items">${info.myOffer.items.map((s) => itemRow(s, true)).join('') || `<div class="trade-empty">${esc(t('hud.trade.emptyMine'))}</div>`}</div>
-          <div class="trade-money"><span class="trade-money-label">${esc(t('hud.trade.money'))}:</span>
-            <span class="trade-coins">
-              <input class="coininput" id="trade-g" type="number" min="0" value="${Math.floor(this.stagedTrade.copper / 10000)}" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>
-              <input class="coininput" id="trade-s" type="number" min="0" max="99" value="${Math.floor((this.stagedTrade.copper % 10000) / 100)}" aria-label="${esc(t('itemUi.money.silver'))}"><span class="coin s" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.silverShort'))}</span>
-              <input class="coininput" id="trade-c" type="number" min="0" max="99" value="${this.stagedTrade.copper % 100}" aria-label="${esc(t('itemUi.money.copper'))}"><span class="coin c" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.copperShort'))}</span>
-            </span>
+    // The whole render sits in one try: it is throw-free by construction
+    // (buildTradeItemRow resolves unknown ids), so the catch is the blast
+    // radius bound for an UNKNOWN future throw, which would otherwise abort
+    // every update() call banded after this one (arena, fiesta, the Vale
+    // Cup surfaces). The finally commits the repaint signature only after
+    // the paint (the shipped failure set it BEFORE, so a mid-render throw
+    // froze the stale offer: every later frame compared equal and returned
+    // early); committing it even on the throw path means a failed render
+    // logs once per DATA change instead of retrying every band tick.
+    try {
+      const itemRow = (s: InvSlot, mine: boolean) => {
+        // Stale-client guard (R34): the other side's offer is server truth and
+        // can carry an id this bundle predates; buildTradeItemRow keeps the raw
+        // id as the label and the icon falls back instead of dereferencing the
+        // missing def (the shipped failure shape threw here and froze the offer
+        // display behind the already-set repaint signature).
+        const { item, label } = buildTradeItemRow(s, ITEMS);
+        const inner = `${item ? this.itemIcon(item) : unknownItemIconHtml(s.itemId)}<span>${esc(label)}</span>`;
+        return mine
+          ? `<button type="button" class="trade-item mine" data-item="${esc(s.itemId)}">${inner}</button>`
+          : `<div class="trade-item">${inner}</div>`;
+      };
+      el.innerHTML = `
+        <div class="panel-title"><span>${esc(t('hud.trade.title', { name: info.otherName }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.trade.cancel'))}">${svgIcon('close')}</button></div>
+        <div class="trade-cols">
+          <div class="trade-col ${info.myAccepted ? 'accepted' : ''}">
+            <h4>${esc(t('hud.trade.yourOffer'))}</h4>
+            <div class="trade-items">${info.myOffer.items.map((s) => itemRow(s, true)).join('') || `<div class="trade-empty">${esc(t('hud.trade.emptyMine'))}</div>`}</div>
+            <div class="trade-money"><span class="trade-money-label">${esc(t('hud.trade.money'))}:</span>
+              <span class="trade-coins">
+                <input class="coininput" id="trade-g" type="number" min="0" value="${Math.floor(this.stagedTrade.copper / 10000)}" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>
+                <input class="coininput" id="trade-s" type="number" min="0" max="99" value="${Math.floor((this.stagedTrade.copper % 10000) / 100)}" aria-label="${esc(t('itemUi.money.silver'))}"><span class="coin s" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.silverShort'))}</span>
+                <input class="coininput" id="trade-c" type="number" min="0" max="99" value="${this.stagedTrade.copper % 100}" aria-label="${esc(t('itemUi.money.copper'))}"><span class="coin c" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.copperShort'))}</span>
+              </span>
+            </div>
+          </div>
+          <div class="trade-col ${info.theirAccepted ? 'accepted' : ''}">
+            <h4>${esc(t('hud.trade.theirOffer', { name: info.otherName }))}</h4>
+            <div class="trade-items">${info.theirOffer.items.map((s) => itemRow(s, false)).join('') || `<div class="trade-empty">${esc(t('hud.trade.emptyTheirs'))}</div>`}</div>
+            <div class="trade-money">${esc(t('hud.trade.money'))}: <span class="gold">${formatLocalizedMoney(info.theirOffer.copper)}</span></div>
           </div>
         </div>
-        <div class="trade-col ${info.theirAccepted ? 'accepted' : ''}">
-          <h4>${esc(t('hud.trade.theirOffer', { name: info.otherName }))}</h4>
-          <div class="trade-items">${info.theirOffer.items.map((s) => itemRow(s, false)).join('') || `<div class="trade-empty">${esc(t('hud.trade.emptyTheirs'))}</div>`}</div>
-          <div class="trade-money">${esc(t('hud.trade.money'))}: <span class="gold">${formatLocalizedMoney(info.theirOffer.copper)}</span></div>
-        </div>
-      </div>
-      <div class="trade-hint">${esc(t('hud.trade.hint'))}</div>`;
-    const acceptBtn = document.createElement('button');
-    acceptBtn.className = 'btn';
-    acceptBtn.textContent = info.myAccepted ? t('hud.trade.waiting') : t('hud.trade.accept');
-    acceptBtn.disabled = info.myAccepted;
-    acceptBtn.addEventListener('click', () => this.sim.tradeConfirm());
-    const cancelBtn = document.createElement('button');
-    cancelBtn.className = 'btn';
-    cancelBtn.textContent = t('hud.trade.cancel');
-    cancelBtn.addEventListener('click', () => this.sim.tradeCancel());
-    el.append(acceptBtn, cancelBtn);
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.sim.tradeCancel());
-    el.querySelectorAll('.trade-item.mine').forEach((row) => {
-      row.addEventListener('click', () => {
-        const itemId = (row as HTMLElement).dataset.item ?? '';
-        const idx = this.stagedTrade.items.findIndex((s) => s.itemId === itemId);
-        if (idx >= 0) {
-          this.stagedTrade.items[idx].count--;
-          if (this.stagedTrade.items[idx].count <= 0) this.stagedTrade.items.splice(idx, 1);
-          this.pushTradeOffer();
-        }
+        <div class="trade-hint">${esc(t('hud.trade.hint'))}</div>`;
+      const acceptBtn = document.createElement('button');
+      acceptBtn.className = 'btn';
+      acceptBtn.textContent = info.myAccepted ? t('hud.trade.waiting') : t('hud.trade.accept');
+      acceptBtn.disabled = info.myAccepted;
+      acceptBtn.addEventListener('click', () => this.sim.tradeConfirm());
+      const cancelBtn = document.createElement('button');
+      cancelBtn.className = 'btn';
+      cancelBtn.textContent = t('hud.trade.cancel');
+      cancelBtn.addEventListener('click', () => this.sim.tradeCancel());
+      el.append(acceptBtn, cancelBtn);
+      el.querySelector('[data-close]')?.addEventListener('click', () => this.sim.tradeCancel());
+      el.querySelectorAll('.trade-item.mine').forEach((row) => {
+        row.addEventListener('click', () => {
+          const itemId = (row as HTMLElement).dataset.item ?? '';
+          const idx = this.stagedTrade.items.findIndex((s) => s.itemId === itemId);
+          if (idx >= 0) {
+            this.stagedTrade.items[idx].count--;
+            if (this.stagedTrade.items[idx].count <= 0) this.stagedTrade.items.splice(idx, 1);
+            this.pushTradeOffer();
+          }
+        });
       });
-    });
-    const goldInput = el.querySelector('#trade-g') as HTMLInputElement;
-    const silverInput = el.querySelector('#trade-s') as HTMLInputElement;
-    const copperInput = el.querySelector('#trade-c') as HTMLInputElement;
-    const syncTradeMoney = () => {
-      const gg = Math.max(0, Math.floor(Number(goldInput?.value) || 0));
-      const ss = Math.max(0, Math.floor(Number(silverInput?.value) || 0));
-      const cc = Math.max(0, Math.floor(Number(copperInput?.value) || 0));
-      this.stagedTrade.copper = gg * 10000 + ss * 100 + cc;
-      this.pushTradeOffer();
-    };
-    [goldInput, silverInput, copperInput].forEach((input) => {
-      input?.addEventListener('change', syncTradeMoney);
-    });
-    el.style.display = 'block';
-    // The repaint signature commits only after a complete paint: setting it
-    // before the render (the old order) meant a throw mid-render froze the
-    // stale offer on screen for the rest of the trade, because every later
-    // frame compared equal and returned early.
-    this.lastTradeSig = sig;
+      const goldInput = el.querySelector('#trade-g') as HTMLInputElement;
+      const silverInput = el.querySelector('#trade-s') as HTMLInputElement;
+      const copperInput = el.querySelector('#trade-c') as HTMLInputElement;
+      const syncTradeMoney = () => {
+        const gg = Math.max(0, Math.floor(Number(goldInput?.value) || 0));
+        const ss = Math.max(0, Math.floor(Number(silverInput?.value) || 0));
+        const cc = Math.max(0, Math.floor(Number(copperInput?.value) || 0));
+        this.stagedTrade.copper = gg * 10000 + ss * 100 + cc;
+        this.pushTradeOffer();
+      };
+      [goldInput, silverInput, copperInput].forEach((input) => {
+        input?.addEventListener('change', syncTradeMoney);
+      });
+      el.style.display = 'block';
+    } catch (err) {
+      console.error('[hud] trade window render failed', err);
+    } finally {
+      this.lastTradeSig = sig;
+    }
   }
 
   // -------------------------------------------------------------------------

@@ -96,6 +96,9 @@ const itemStringsEn = {
       // Tooltip sub-line for a stack whose item id this bundle cannot resolve
       // (a client one deploy behind the server, R34); the title is the raw id.
       unknownItem: 'Unknown item',
+      // The same stack's accessible name: the aria channel must carry the
+      // UNKNOWN signal too, since the tooltip sub-line is hover-only.
+      unknownItemAria: 'Unknown item {id}, quantity {count}',
     },
     equipment: {
       empty: 'Empty',

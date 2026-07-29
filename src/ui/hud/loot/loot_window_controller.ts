@@ -6,6 +6,7 @@ import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
 import { svgIcon } from '../../ui_icons';
+import { unknownItemIconHtml } from '../../unknown_item_icon';
 import { corpseHarvestView } from './corpse_harvest_view';
 import { renderCorpseHarvestPicker } from './corpse_harvest_window';
 
@@ -168,18 +169,25 @@ export class LootWindowController {
   }
 
   private itemRowHtml(stack: LootWindowItemStack): string {
-    const item = ITEMS[stack.itemId];
+    // Stale-client guard (R34): corpse and chest loot lists are server truth,
+    // so a bundle one deploy behind can be handed an id with no local def. An
+    // unguarded deref here used to throw before this popup's innerHTML was
+    // assigned, leaving the corpse un-lootable (and, on the chest arm, the
+    // throw aborted the rest of that frame's event batch).
+    const item: ItemDef | undefined = ITEMS[stack.itemId];
     const count =
       stack.count > 1
         ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(stack.count, { maximumFractionDigits: 0 }) }))}`
         : '';
-    return `<div class="loot-item" data-item="${stack.itemId}">${this.deps.itemIcon(item)}<span style="font-size:12px">${esc(itemDisplayName(item))}${count}</span></div>`;
+    return `<div class="loot-item" data-item="${esc(stack.itemId)}">${item ? this.deps.itemIcon(item) : unknownItemIconHtml(stack.itemId)}<span style="font-size:12px">${esc(item ? itemDisplayName(item) : stack.itemId)}${count}</span></div>`;
   }
 
   private attachItemTooltips(): void {
     this.deps.element.querySelectorAll<HTMLElement>('[data-item]').forEach((row) => {
       const itemId = row.dataset.item ?? '';
-      this.deps.attachTooltip(row, () => this.deps.itemTooltip(ITEMS[itemId]));
+      const item: ItemDef | undefined = ITEMS[itemId];
+      if (!item) return;
+      this.deps.attachTooltip(row, () => this.deps.itemTooltip(item));
     });
   }
 

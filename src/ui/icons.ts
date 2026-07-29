@@ -3441,8 +3441,17 @@ function trinketPrimitive(name: string): { p: PrimitiveName; pal: PaletteName } 
 }
 
 function itemFallback(id: string): IconRecipe | null {
-  const it = ITEMS[id];
-  if (!it) return null;
+  // Own-property gate plus shape check: ITEMS is a prototype-bearing Record,
+  // so a raw server id like '__proto__' resolves a truthy non-def whose
+  // missing `name` would throw right here, and 'constructor' resolves a
+  // FUNCTION whose `.name` is a real string, which a shape check alone would
+  // wave through to a garbage derived recipe. This is the unknown-id path
+  // every stale-client fallback surface funnels through; today the
+  // weapon-art arm in iconDataUrl happens to short-circuit prototype keys
+  // first, and this guard makes the fallback's throw-freedom a property of
+  // this function rather than of that coincidence surviving refactors.
+  const it = Object.hasOwn(ITEMS, id) ? ITEMS[id] : undefined;
+  if (!it || typeof it.name !== 'string') return null;
   const name = it.name.toLowerCase();
   const fx = qualityFx(it.quality);
   if (it.kind === 'weapon') {
@@ -4342,7 +4351,11 @@ function resolveRecipe(kind: IconKind, id: string): IconRecipe {
   if (kind === 'ability') {
     recipe = ABILITY_RECIPES[id] ?? abilityFallback(id);
   } else if (kind === 'item') {
-    recipe = ITEM_RECIPES[id] ?? itemFallback(id);
+    // Own-property gate: item ids are the one kind fed raw server strings
+    // (the stale-client fallback surfaces), and a prototype key like
+    // '__proto__' would otherwise resolve Object.prototype as a truthy
+    // "recipe". The other kinds take bundle-content ids only.
+    recipe = (Object.hasOwn(ITEM_RECIPES, id) ? ITEM_RECIPES[id] : null) ?? itemFallback(id);
   } else if (kind === 'crest') {
     recipe = CREST_RECIPES[id] ?? null;
   } else {
@@ -4363,6 +4376,16 @@ function resolveRecipe(kind: IconKind, id: string): IconRecipe {
 // to assert every ability has a deliberate, distinct icon recipe.
 export function abilityIconRecipe(id: string): IconRecipe {
   return resolveRecipe('ability', id);
+}
+// The item-side sibling, added so tests/item_icons.test.ts can pin the premise
+// every stale-client fallback rests on WITHOUT a canvas: any unresolvable item
+// id (including prototype-chain keys) lands on the shared fallback recipe
+// instead of throwing.
+export function itemIconRecipe(id: string): IconRecipe {
+  return resolveRecipe('item', id);
+}
+export function isUnknownIconRecipe(recipe: IconRecipe): boolean {
+  return recipe === UNKNOWN_RECIPE;
 }
 export function hasExplicitAbilityIcon(id: string): boolean {
   return id in ABILITY_RECIPES;

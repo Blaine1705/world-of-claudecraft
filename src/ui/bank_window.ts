@@ -418,10 +418,11 @@ export class BankWindow {
       // label) instead of vanishing. The withdraw click stays live because the
       // server resolves it by slotIndex, no def needed; only the def-derived
       // tooltip body is replaced.
-      const itemName = item ? itemDisplayName(item) : slot.itemId;
       cell.setAttribute(
         'aria-label',
-        t('itemUi.bags.itemAria', { item: itemName, count: this.fmt(slot.count) }),
+        item
+          ? t('itemUi.bags.itemAria', { item: itemDisplayName(item), count: this.fmt(slot.count) })
+          : t('itemUi.bags.unknownItemAria', { id: slot.itemId, count: this.fmt(slot.count) }),
       );
       cell.innerHTML = `${item ? this.deps.itemIcon(item) : unknownItemIconHtml(slot.itemId)}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: this.fmt(slot.count) })) : ''}</span>`;
       cell.addEventListener('click', (ev) => {

@@ -12,11 +12,16 @@
 // one. `quality` accepts a plain string because its one non-default source is
 // the wire (a loot-roll event's server-sent quality), which a stale bundle
 // must render even for a rung it has never heard of; an unranked class simply
-// takes the default styling.
+// takes the default styling. Both interpolations are esc()'d per the repo's
+// unconditional HTML-interpolation rule: today's values cannot carry a quote
+// (the quality is a sim union member and iconDataUrl emits only manifest URLs
+// for bundle-known ids or base64 data URLs), but this helper is exactly where
+// a future caller would hand a wider wire string.
+import { esc } from './esc';
 import { iconDataUrl } from './icons';
 
 /** The `<img>` for an item id with no local ItemDef: the procedural fallback
  *  icon, quality-classed, never a throw. */
 export function unknownItemIconHtml(itemId: string, quality: string = 'common'): string {
-  return `<img class="item-icon q-${quality}" src="${iconDataUrl('item', itemId)}" alt="" draggable="false">`;
+  return `<img class="item-icon q-${esc(quality)}" src="${esc(iconDataUrl('item', itemId))}" alt="" draggable="false">`;
 }

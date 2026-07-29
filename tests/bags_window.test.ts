@@ -333,23 +333,46 @@ describe('bags_window: unknown-id stacks stay visible (stale-client guard, R34)'
     expect(code).not.toContain('if (!item) continue');
   });
 
-  it('renders the fallback icon and the raw id, with no action wiring', () => {
+  it('renders the fallback icon, the raw id, and an UNKNOWN accessible name', () => {
     const start = code.indexOf('private buildUnknownStackCell(');
     const end = code.indexOf('private bindBagCellDrop(');
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
     const body = code.slice(start, end);
     expect(body).toContain('unknownItemIconHtml(s.itemId)');
-    // The raw id is the accessible label and the tooltip title.
-    expect(body).toContain("t('itemUi.bags.itemAria', {");
-    expect(body).toContain('item: s.itemId,');
+    // The cell keeps the shared bag-cell styling at the default rung and its
+    // count badge, so an unknown stack reads like a stack, not a hole.
+    expect(body).toContain("row.className = 'bag-item q-common'");
+    expect(body).toContain('bi-count');
+    // The aria channel carries the UNKNOWN signal (the tooltip is hover-only),
+    // plus the raw id; the tooltip title is the raw id with the unknown
+    // sub-line.
+    expect(body).toContain("t('itemUi.bags.unknownItemAria', {");
+    expect(body).toContain('id: s.itemId');
     expect(body).toContain("t('itemUi.bags.unknownItem')");
-    // Focusable no-op (the backpack-socket precedent): with no def there is
-    // no action to run, so the cell wires no click listener.
+    // No CLICK action (use / sell / equip all need a def): aria-disabled and
+    // no click listener. The DRAG source stays live, because a move works on
+    // indices alone; both drag arms and the touch drop's bag-cell move are
+    // pinned so the capability cannot silently vanish.
     expect(body).toContain("row.setAttribute('aria-disabled', 'true')");
-    expect(body).not.toContain('addEventListener');
+    expect(body).not.toContain("addEventListener('click'");
+    expect(body).toContain("row.addEventListener('dragstart'");
+    expect(body).toContain("row.addEventListener('dragend'");
+    expect(body).toContain('bindTouchItemDrag(row, {');
+    expect(body).toContain('this.dropOnBagCell(index >= 0 ? index : null, target.index)');
     // Still a drop target in the pristine view, so re-parking other stacks
     // around the unknown one keeps working.
     expect(body).toContain('this.bindBagCellDrop(row, cell)');
+  });
+
+  it('never skips a slot in the grid fill (no continue of any wording)', () => {
+    // The shipped defect was `if (!item) continue`; a re-worded equivalent
+    // (`item == null`, a braced body) would evade a literal pin, so the whole
+    // fillGrid slice is held to zero continue statements.
+    const start = code.indexOf('private fillGrid(');
+    const end = code.indexOf('private buildStackCell(');
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    expect(code.slice(start, end)).not.toContain('continue');
   });
 });

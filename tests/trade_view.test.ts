@@ -75,6 +75,18 @@ describe('buildTradeItemRow (stale-client guard, R34)', () => {
     expect(row.item).toBeUndefined();
     expect(row.label).toBe('no_such_item_id x5');
   });
+
+  it('resolves the label through itemDisplayName, never the raw item.name', () => {
+    // A def with a REAL id but a sentinel raw name: itemDisplayName resolves
+    // the localized name by id, so the two paths disagree here and a
+    // regression to `item.name` fails on the sentinel arm. (The known-id
+    // tests above compare against itemDisplayName itself, which a raw-name
+    // swap would satisfy whenever the two strings coincide in English.)
+    const items = { sentinel_slot: { ...ITEMS[KNOWN_ID], name: 'RAW_NAME_SENTINEL' } };
+    const row = buildTradeItemRow({ itemId: 'sentinel_slot', count: 1 }, items);
+    expect(row.label).toBe(itemDisplayName(ITEMS[KNOWN_ID]));
+    expect(row.label).not.toBe('RAW_NAME_SENTINEL');
+  });
 });
 
 describe('trade window painter wiring (source pins, hud.ts updateTradeWindow)', () => {
@@ -109,5 +121,11 @@ describe('trade window painter wiring (source pins, hud.ts updateTradeWindow)', 
     expect(compare).toBeGreaterThan(-1);
     expect(render).toBeGreaterThan(compare);
     expect(commit).toBeGreaterThan(render);
+    // The commit sits in a finally behind the render's try: the bound that
+    // keeps an unknown future throw from aborting the update() calls banded
+    // after the trade window, while still committing once per data change.
+    const fin = body.indexOf('} finally {');
+    expect(fin).toBeGreaterThan(render);
+    expect(commit).toBeGreaterThan(fin);
   });
 });

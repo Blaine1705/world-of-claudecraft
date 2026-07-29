@@ -6702,7 +6702,8 @@ export const en_XA: EnTranslations = {
       "destroyTitle": "[Ðéšţŕóý {item}]",
       "destroyConfirm": "[Ðéšţŕóý]",
       "destroyCancel": "[Çáñçéļ]",
-      "unknownItem": "[Úñķñóŵñ íţéɱ]"
+      "unknownItem": "[Úñķñóŵñ íţéɱ]",
+      "unknownItemAria": "[Úñķñóŵñ íţéɱ {id}, ɋúáñţíţý {count}]"
     },
     "equipment": {
       "empty": "[Éɱþţý]",

@@ -6702,7 +6702,8 @@ export const cs_CZ: EnTranslations = {
       "destroyTitle": "Zničit {item}",
       "destroyConfirm": "Zničit",
       "destroyCancel": "Zrušit",
-      "unknownItem": "Unknown item"
+      "unknownItem": "Unknown item",
+      "unknownItemAria": "Unknown item {id}, quantity {count}"
     },
     "equipment": {
       "empty": "Prázdné",

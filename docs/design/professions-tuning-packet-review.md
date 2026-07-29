@@ -659,9 +659,13 @@ What each item settled:
    controller's three identical inline copies), never a throw; the repaint
    signature now commits only AFTER a complete paint, so no future
    mid-render throw can freeze a stale offer again. The fallback img src is
-   safe against a hostile id by construction: the static icon URLs are
-   set-gated to bundle-known ids, so an unknown id only ever reaches the
-   canvas data-URL arm. Pinned in `tests/trade_view.test.ts` (model arms
+   safe against a hostile id by construction, with the mechanism stated
+   exactly (the review corrected an overstatement here): the id-interpolating
+   static-URL arm is Set-gated to bundle-known ids, the weapon-art arm is a
+   prototype-reachable Record lookup but interpolates only its model-name
+   VALUE (quote-free for every prototype key), and every other id lands on
+   the canvas data-URL arm; the src is esc()-wrapped anyway. Pinned in
+   `tests/trade_view.test.ts` (model arms
    driven with unknown ids, both count variants, plus comment-stripped
    painter pins including the signature-after-render ordering), each pin
    mutation-checked.
@@ -745,14 +749,15 @@ What each item settled:
    runbook): the guards in items 1 and 2 protect bundles built from this
    release onward; the bundle already live predates them, so for THIS
    deploy the old client's two TypeError arms are real once the new
-   server mints the nine fine-grade item ids. The trade arm fires when a
-   stale session's trade partner stages a fine item (the throw freezes
-   that trade panel behind the base bundle's early-set signature); the
-   loot-window arm is unreachable by construction because the fine ids
-   are gathering and recipe content only, in no mob or chest loot table,
-   and the runbook now says to keep them out until clients roll. A stale
-   session keeps its bundle across the restart countdown and reconnect;
-   only a page reload updates it.
+   server mints the release's new item ids (the fine-grade materials and
+   the new rods; the mechanism is the failure, so no count is recorded).
+   The trade arm fires when a stale session's trade partner stages one
+   (the throw freezes that trade panel behind the base bundle's early-set
+   signature); the loot-window arm is unreachable by construction because
+   every new id is gathering, recipe, vendor, or delve-shop content, in
+   no mob or chest loot table, and the runbook now says to keep them out
+   until clients roll. A stale session keeps its bundle across the
+   restart countdown and reconnect; only a page reload updates it.
 4. RECORDED, both directions accepted (they resolve once both sides are
    current; the runbook note names them and the deploy order bounds the
    window). Direction detail from the collider table: ore and wood nodes
@@ -789,6 +794,67 @@ version floor for CLIENTS DEGRADING GRACEFULLY; the deployed bundle's
 trade-throw arm is the one place the old bundle does not degrade
 gracefully, and only the maintainer can weigh a forced refresh against
 that ruling's intent.
+
+REVIEW ROUND (same sitting): five fresh lenses over the build diff
+(qa-checklist, frontend-seam, test-coverage, privacy-security, and an
+independent claims verifier over the doc and runbook text) beside the
+five-category wire sweep, every finding applied:
+- The one real coverage gap: the corpse and delve-chest LOOT WINDOW
+  still dereferenced an unknown id (`loot_window_controller.ts`
+  itemRowHtml and the tooltip attach), the same throw with a worse
+  blast radius (the corpse became un-lootable with the player's windows
+  already closed; the chest arm aborted the rest of that frame's event
+  batch). Guarded like the trade row, with a real jsdom behavioral test
+  driving a ghost id through openCorpse (the harness already ran under
+  jsdom, so no new infra).
+- Hardening: `unknownItemIconHtml` esc()-wraps both interpolations per
+  the unconditional rule (with a hostile-quality escaping test); the
+  icon recipe layer got own-property gates (`ITEM_RECIPES` and `ITEMS`
+  both resolve prototype keys as truthy non-defs, and 'constructor' is
+  a function whose `.name` IS a string, so a shape check alone waved it
+  into a garbage derived recipe), plus a canvas-free introspection
+  export (`itemIconRecipe`/`isUnknownIconRecipe`) that finally pins the
+  premise every fallback surface rests on.
+- Capability and a11y: the unknown bag cell is now a DRAG SOURCE
+  (moveInventoryItem acts on indices alone, the same argument that kept
+  bank withdraw live), with the touch drop honoring only the bag-cell
+  move; shift-click chat linking stays withheld (the link renderer
+  degrades an unknown id to a bare "[?]"); a new
+  `itemUi.bags.unknownItemAria` key carries the UNKNOWN signal on the
+  aria channel for bags and bank (the tooltip is hover-only), filled in
+  the five non-Latin overlays; and `.bag-item[aria-disabled='true']`
+  drops the click cursor and hover lift it was falsely wearing.
+- The trade render now sits in try/catch/finally: throw-free by
+  construction, and an unknown future throw logs once per data change
+  instead of aborting the update() calls banded after it.
+- Test debt closed: the loot-roll re-point gained call-site pins with
+  the wire-quality argument (dropping it type-checks and silently
+  renders epic fallbacks at common); the trade label gained a
+  sentinel-name test (the previous oracle compared itemDisplayName to
+  itself, so a raw `.name` regression passed); the skip-a-slot negative
+  pins are now slice-scoped zero-continue pins (the literal wording pin
+  was evadable); the bank chip exclusion loops every category like the
+  bags sibling; the builder's q-common class and count badge are
+  pinned.
+- Adjudications: `unknown_item_icon.ts` stays UNREGISTERED (two
+  reviewers split; the canvas-backed icons import means it is not
+  Node-executable unmocked, so pure-core registration would claim what
+  the module cannot honor); the bags/bank grids keep source pins per
+  those suites' established style with the loot window carrying the
+  round's behavioral pin; `src/ui/CLAUDE.md`'s pure-core prose dropped
+  its stale "i18n-free" claim (several registered cores import i18n and
+  the guard never enforced it).
+- Recorded-only (pre-existing, follow-ups not filed): the `delve_buy`
+  handler reaches a caught, rate-limited server TypeError on a
+  prototype-key delveId (`DELVES[msg.delveId]` truthiness; the fix is
+  the same own-property gate); the mailbox windows still concatenate a
+  hardcoded ` x{n}` stack suffix outside t(); the six-site
+  `item ? itemIcon(item) : unknownItemIconHtml(...)` branch is one
+  helper away from folding (rule of three met, deferred to keep this
+  diff scoped); an unknown cell's visible raw-id label is deliberately
+  not name-searchable (search matches display names); and the catalog
+  spread idiom means future English-only adds under `itemUi.bags`
+  compile without locale edits, the same trade the market block made.
 
 1. Guard the trade-window unknown-item path at HEAD (the old client
    throws in `itemIcon` on any unknown id and the early-set signature

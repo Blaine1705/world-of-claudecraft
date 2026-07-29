@@ -726,7 +726,20 @@ describe('bank_window: unknown-id slots stay visible (stale-client guard, R34)',
     // which is how a counted bank slot turned invisible.
     expect(code).not.toContain('if (!item) continue');
     expect(code).toContain('item ? this.deps.itemIcon(item) : unknownItemIconHtml(slot.itemId)');
-    expect(code).toContain('const itemName = item ? itemDisplayName(item) : slot.itemId;');
+    expect(code).toContain(
+      "t('itemUi.bags.unknownItemAria', { id: slot.itemId, count: this.fmt(slot.count) })",
+    );
+  });
+
+  it('never skips a slot in the grid fill (no continue of any wording)', () => {
+    // The shipped defect was `if (!item) continue`; a re-worded equivalent
+    // would evade a literal pin, so the grid loop slice is held to zero
+    // continue statements.
+    const start = code.indexOf('for (const slot of visible)');
+    const end = code.indexOf('private appendEmptyCells(');
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    expect(code.slice(start, end)).not.toContain('continue');
   });
 
   it('keeps the withdraw click def-free and swaps only the tooltip body', () => {

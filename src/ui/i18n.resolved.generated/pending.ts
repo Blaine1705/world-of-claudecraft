@@ -38,7 +38,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
     "hudChrome.professions.toolEffectSpent",
-    "itemUi.bags.unknownItem"
+    "itemUi.bags.unknownItem",
+    "itemUi.bags.unknownItemAria"
   ],
   "es_ES": [
     "entities.items.fine_ashwood_log.name",
@@ -69,7 +70,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
     "hudChrome.professions.toolEffectSpent",
-    "itemUi.bags.unknownItem"
+    "itemUi.bags.unknownItem",
+    "itemUi.bags.unknownItemAria"
   ],
   "fr_FR": [
     "entities.items.fine_ashwood_log.name",
@@ -100,7 +102,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
     "hudChrome.professions.toolEffectSpent",
-    "itemUi.bags.unknownItem"
+    "itemUi.bags.unknownItem",
+    "itemUi.bags.unknownItemAria"
   ],
   "fr_CA": [
     "entities.items.fine_ashwood_log.name",
@@ -131,7 +134,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
     "hudChrome.professions.toolEffectSpent",
-    "itemUi.bags.unknownItem"
+    "itemUi.bags.unknownItem",
+    "itemUi.bags.unknownItemAria"
   ],
   "en_CA": [],
   "it_IT": [
@@ -163,7 +167,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
     "hudChrome.professions.toolEffectSpent",
-    "itemUi.bags.unknownItem"
+    "itemUi.bags.unknownItem",
+    "itemUi.bags.unknownItemAria"
   ],
   "de_DE": [
     "entities.items.fine_ashwood_log.name",
@@ -194,7 +199,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
     "hudChrome.professions.toolEffectSpent",
-    "itemUi.bags.unknownItem"
+    "itemUi.bags.unknownItem",
+    "itemUi.bags.unknownItemAria"
   ],
   "zh_CN": [
     "fiesta.augment.cardAria",
@@ -253,7 +259,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
     "hudChrome.professions.toolEffectSpent",
-    "itemUi.bags.unknownItem"
+    "itemUi.bags.unknownItem",
+    "itemUi.bags.unknownItemAria"
   ],
   "ru_RU": [
     "fiesta.augment.cardAria",
@@ -291,7 +298,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
     "hudChrome.professions.toolEffectSpent",
-    "itemUi.bags.unknownItem"
+    "itemUi.bags.unknownItem",
+    "itemUi.bags.unknownItemAria"
   ],
   "nl_NL": [
     "entities.items.fine_ashwood_log.name",
@@ -322,7 +330,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
     "hudChrome.professions.toolEffectSpent",
-    "itemUi.bags.unknownItem"
+    "itemUi.bags.unknownItem",
+    "itemUi.bags.unknownItemAria"
   ],
   "pl_PL": [
     "entities.items.fine_ashwood_log.name",
@@ -353,7 +362,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
     "hudChrome.professions.toolEffectSpent",
-    "itemUi.bags.unknownItem"
+    "itemUi.bags.unknownItem",
+    "itemUi.bags.unknownItemAria"
   ],
   "id_ID": [
     "entities.items.fine_ashwood_log.name",
@@ -384,7 +394,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
     "hudChrome.professions.toolEffectSpent",
-    "itemUi.bags.unknownItem"
+    "itemUi.bags.unknownItem",
+    "itemUi.bags.unknownItemAria"
   ],
   "tr_TR": [
     "entities.items.fine_ashwood_log.name",
@@ -415,7 +426,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
     "hudChrome.professions.toolEffectSpent",
-    "itemUi.bags.unknownItem"
+    "itemUi.bags.unknownItem",
+    "itemUi.bags.unknownItemAria"
   ],
   "sv_SE": [
     "entities.items.fine_ashwood_log.name",
@@ -446,7 +458,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
     "hudChrome.professions.toolEffectSpent",
-    "itemUi.bags.unknownItem"
+    "itemUi.bags.unknownItem",
+    "itemUi.bags.unknownItemAria"
   ],
   "vi_VN": [
     "entities.items.fine_ashwood_log.name",
@@ -477,7 +490,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
     "hudChrome.professions.toolEffectSpent",
-    "itemUi.bags.unknownItem"
+    "itemUi.bags.unknownItem",
+    "itemUi.bags.unknownItemAria"
   ],
   "da_DK": [
     "entities.items.fine_ashwood_log.name",
@@ -508,6 +522,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectName.gatherersCache",
     "hudChrome.professions.toolEffectName.quickeningCharm",
     "hudChrome.professions.toolEffectSpent",
-    "itemUi.bags.unknownItem"
+    "itemUi.bags.unknownItem",
+    "itemUi.bags.unknownItemAria"
   ]
 };

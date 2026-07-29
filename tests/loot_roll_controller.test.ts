@@ -533,3 +533,22 @@ describe('LootRollController', () => {
     expect(test.writerCounts).toEqual({ writes: 2, skips: 2 });
   });
 });
+
+describe('stale-client fallback wiring (source pins)', () => {
+  // The suite's fixtures use real content ids, so the unknown-id fallback
+  // arms never execute behaviorally here; these pins keep all three call
+  // sites on the shared helper WITH the wire quality argument. Dropping the
+  // second argument type-checks (the parameter defaults to 'common') and
+  // would silently render an epic drop's fallback icon at common quality.
+  it('routes all three fallback icons through unknownItemIconHtml with the wire quality', async () => {
+    const { readFileSync } = await import('node:fs');
+    const source = readFileSync(
+      new URL('../src/ui/hud/loot/loot_roll_controller.ts', import.meta.url),
+      'utf8',
+    );
+    const eventArms = source.split('unknownItemIconHtml(event.itemId, quality)').length - 1;
+    const statusArms = source.split('unknownItemIconHtml(status.itemId, quality)').length - 1;
+    expect(eventArms).toBe(2);
+    expect(statusArms).toBe(1);
+  });
+});

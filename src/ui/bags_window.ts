@@ -807,21 +807,29 @@ export class BagsWindow {
   // An occupied square whose def this bundle cannot resolve (stale-client
   // guard, R34): inventory is server truth, so an id minted by content this
   // bundle predates still holds a real, counted slot. The cell renders the
-  // fallback icon, its count badge, and the raw id as its label, following
-  // the backpack socket's focusable no-op precedent: with no def there is no
-  // action to run (use / sell / equip all need one), so it exposes none, and
-  // it stays a drop target in the pristine view so re-parking other stacks
-  // around it keeps working. Everything acts again once the client updates.
+  // fallback icon, its count badge, and the raw id as its label. It exposes
+  // no CLICK action (use / sell / equip all need a def, so aria-disabled is
+  // honest, the backpack socket's focusable no-op precedent), but it keeps
+  // the two def-free capabilities: it is a drop target in the pristine view,
+  // and it is a DRAG SOURCE, because moveInventoryItem acts on indices alone
+  // (the same argument that keeps the bank's withdraw live), so the player
+  // can still re-organize around and with the stack. Shift-click chat
+  // linking is deliberately withheld: the link renderer degrades an unknown
+  // id to a bare "[?]", the exact regression grantItemToken's raw-id
+  // fallback exists to avoid. Everything acts again once the client updates.
   private buildUnknownStackCell(s: InvSlot, cell: number | null): HTMLElement {
     const row = document.createElement('button');
     row.type = 'button';
     row.className = 'bag-item q-common';
     row.style.setProperty('--bag-slot-quality', QUALITY_DEFAULT_COLOR);
     row.setAttribute('aria-disabled', 'true');
+    // The accessible name says UNKNOWN, not just the raw id: the hover
+    // tooltip is mouse-only, and the two channels must agree (the glyph
+    // aria-key rule above).
     row.setAttribute(
       'aria-label',
-      t('itemUi.bags.itemAria', {
-        item: s.itemId,
+      t('itemUi.bags.unknownItemAria', {
+        id: s.itemId,
         count: formatNumber(s.count, { maximumFractionDigits: 0 }),
       }),
     );
@@ -833,6 +841,62 @@ export class BagsWindow {
       () =>
         `<div class="tt-title">${esc(s.itemId)}</div><div class="tt-sub">${esc(t('itemUi.bags.unknownItem'))}</div>`,
     );
+    // The drag source, trimmed from buildStackCell's wiring: no hotbar
+    // payload (a hotbar action needs a def) and no click-suppression dance
+    // (this cell has no click handler for a trailing synthetic click to
+    // trigger). markEquipDropTargets is def-gated and lights nothing for an
+    // unknown id; the world/paperdoll drop arms no-op the same way, leaving
+    // the bag-cell move as the one live target, which is the point.
+    const index = bagStackIndex(this.deps.world().inventory, s);
+    row.draggable = !this.deps.tradeOpen() && !this.deps.vendorOpen();
+    row.addEventListener('dragstart', (e) => {
+      this.deps.dragState.begin({
+        itemId: s.itemId,
+        count: Math.max(1, Math.floor(s.count)),
+        index: index >= 0 ? index : null,
+      });
+      if (e.dataTransfer) {
+        e.dataTransfer.setData('text/plain', s.itemId);
+        e.dataTransfer.effectAllowed = 'copyMove';
+      }
+      this.deps.markEquipDropTargets(s.itemId);
+      this.deps.hideTooltip();
+    });
+    row.addEventListener('dragend', () => {
+      this.deps.dragState.end();
+      this.deps.clearActionDropTargets();
+      this.deps.markEquipDropTargets(null);
+    });
+    bindTouchItemDrag(row, {
+      state: this.deps.dragState,
+      isTouchHud: () => this.deps.isTouchHud(),
+      payload: () =>
+        this.deps.tradeOpen() || this.deps.vendorOpen()
+          ? null
+          : {
+              itemId: s.itemId,
+              count: Math.max(1, Math.floor(s.count)),
+              index: index >= 0 ? index : null,
+            },
+      ghostHtml: () => unknownItemIconHtml(s.itemId),
+      onStart: () => {
+        this.deps.hideTooltip();
+        this.deps.markEquipDropTargets(s.itemId);
+      },
+      onMove: () => {
+        /* nothing to light beyond the shared drag ghost */
+      },
+      onDrop: (x, y) => {
+        // Only the bag-cell move is live for a def-less stack: equip and the
+        // world-destroy prompt both need the def, so releasing there is a
+        // plain cancel rather than a half-working action.
+        const target = resolveDropTargetAt(x, y);
+        if (target.kind === 'bagCell') this.dropOnBagCell(index >= 0 ? index : null, target.index);
+      },
+      onEnd: () => {
+        this.deps.markEquipDropTargets(null);
+      },
+    });
     return row;
   }
 

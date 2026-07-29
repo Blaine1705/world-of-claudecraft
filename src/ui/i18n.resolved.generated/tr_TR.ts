@@ -6702,7 +6702,8 @@ export const tr_TR: EnTranslations = {
       "destroyTitle": "{item} yok et",
       "destroyConfirm": "Yok Et",
       "destroyCancel": "İptal",
-      "unknownItem": "Unknown item"
+      "unknownItem": "Unknown item",
+      "unknownItemAria": "Unknown item {id}, quantity {count}"
     },
     "equipment": {
       "empty": "Boş",

@@ -2243,6 +2243,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.bags.itemAria': '{item}，數量 {count}',
   'itemUi.bags.stackCount': 'x{count}',
   'itemUi.bags.unknownItem': '未知物品',
+  'itemUi.bags.unknownItemAria': '未知物品 {id}，數量 {count}',
   'itemUi.bags.destroyTitle': '摧毀 {item}',
   'itemUi.bags.destroyConfirm': '摧毀',
   'itemUi.bags.destroyCancel': '取消',

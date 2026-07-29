@@ -6702,7 +6702,8 @@ export const ru_RU: EnTranslations = {
       "destroyTitle": "Уничтожить {item}",
       "destroyConfirm": "Уничтожить",
       "destroyCancel": "Отмена",
-      "unknownItem": "Неизвестный предмет"
+      "unknownItem": "Неизвестный предмет",
+      "unknownItemAria": "Неизвестный предмет {id}, количество {count}"
     },
     "equipment": {
       "empty": "Пусто",

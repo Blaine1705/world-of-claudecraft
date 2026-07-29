@@ -5,7 +5,14 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import { ITEM_IMAGE_IDS, iconDataUrl, itemImageUrl, UI_ITEM_IMAGE_IDS } from '../src/ui/icons';
+import {
+  ITEM_IMAGE_IDS,
+  iconDataUrl,
+  isUnknownIconRecipe,
+  itemIconRecipe,
+  itemImageUrl,
+  UI_ITEM_IMAGE_IDS,
+} from '../src/ui/icons';
 import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 
 // Gate for the committed WebP item icons (mirror of tests/skill_icons.test.ts). Art under
@@ -409,5 +416,28 @@ describe('item webp icons', () => {
         `/ui/weapons/${ITEM_WEAPON_VARIANTS[id]}.jpg`,
       );
     }
+  });
+});
+
+describe('unknown item ids resolve to the shared fallback recipe (stale-client premise)', () => {
+  it('lands every unresolvable id on the fallback, prototype keys included, never a throw', () => {
+    // Every stale-client fallback surface funnels unknown server ids into
+    // iconDataUrl; this is the canvas-free pin that the recipe layer under it
+    // tolerates ANY string. ITEMS is a prototype-bearing Record, so keys like
+    // __proto__ resolve to truthy non-defs; the shape guard in itemFallback
+    // must send them to the fallback recipe rather than throwing on a missing
+    // name.
+    const unknown = itemIconRecipe('no_such_item_id_v1');
+    expect(isUnknownIconRecipe(unknown)).toBe(true);
+    expect(isUnknownIconRecipe(itemIconRecipe('no_such_item_id_v2'))).toBe(true);
+    for (const hostile of ['__proto__', 'constructor', 'toString', 'hasOwnProperty']) {
+      expect(isUnknownIconRecipe(itemIconRecipe(hostile)), hostile).toBe(true);
+    }
+    // A real def without committed art takes its DERIVED recipe, not the
+    // fallback, so this pin cannot pass by everything falling through.
+    const derived = Object.values(ITEMS).find(
+      (item) => !ITEM_WEAPON_VARIANTS[item.id] && itemIconRecipe(item.id) !== unknown,
+    );
+    expect(derived).toBeTruthy();
   });
 });

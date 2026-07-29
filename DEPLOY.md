@@ -269,13 +269,14 @@ For off-box safety, sync the directory to S3 occasionally:
   Release-specific caveat for the professions tuning deploy: the guards above
   describe bundles built from this release onward. The bundle DEPLOYED TODAY
   predates them, and its trade window throws while rendering an offer that
-  stages one of this release's new fine-grade item ids, freezing that trade
-  panel for the stale session until the page reloads; the sibling loot-window
-  throw stays unreachable as long as the fine-grade ids remain gathering and
-  recipe content only, out of every mob and chest loot table, so keep them out
-  until clients have rolled. Stale sessions are ended by the pre-deploy restart
-  countdown, but a reconnect rides the same stale page: only a page reload
-  picks up the new bundle.
+  stages one of this release's new item ids (the fine-grade materials and the
+  new rods), freezing that trade panel for the stale session until the page
+  reloads; the sibling loot-window throw stays unreachable as long as those
+  new ids remain gathering, recipe, vendor, and delve-shop content only, out
+  of every mob and chest loot table, so keep them out until clients have
+  rolled. Stale sessions are ended by the pre-deploy restart countdown, but a
+  reconnect rides the same stale page: only a page reload picks up the new
+  bundle.
   Per-surface analysis for the professions tuning release: the stale-client
   compatibility phase of `docs/design/professions-tuning-packet-review.md`.
 - **Bank ledger audit**: `node scripts/bank_audit.mjs` (reads `DATABASE_URL` from the

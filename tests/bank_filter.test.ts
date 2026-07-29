@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { ItemDef } from '../src/sim/types';
-import type { BagFilterState } from '../src/ui/bag_filter';
+import { BAG_CATEGORIES, type BagFilterState } from '../src/ui/bag_filter';
 import { filterBankSlots } from '../src/ui/bank_filter';
 import type { BankSlotModel } from '../src/ui/bank_view';
 
@@ -197,10 +197,14 @@ describe('filterBankSlots: unknown ids', () => {
     expect(indices(out)[0]).toBe(9);
   });
 
-  it('excludes an unknown-id slot from category chips and from search', () => {
-    expect(
-      ids(filterBankSlots(withGhost, lookup, state({ category: 'material' }), nameOf)),
-    ).not.toContain('ghost');
+  it('excludes an unknown-id slot from every category chip and from search', () => {
+    for (const category of BAG_CATEGORIES) {
+      if (category === 'all') continue;
+      expect(
+        ids(filterBankSlots(withGhost, lookup, state({ category }), nameOf)),
+        category,
+      ).not.toContain('ghost');
+    }
     // The injected resolver falls back to the raw id, but search is a NAME
     // match: a query equal to the id must not surface the slot.
     expect(filterBankSlots(withGhost, lookup, state({ search: 'ghost' }), nameOf)).toEqual([]);

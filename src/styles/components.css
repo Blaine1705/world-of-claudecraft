@@ -5734,6 +5734,16 @@
   .bag-item:hover {
     filter: brightness(1.25);
   }
+  /* An unknown-id stack (stale-client fallback cell) exposes no click action,
+     so it must not wear the click affordance: default cursor, no hover lift
+     (the .bag-socket.backpack focusable no-op precedent). It stays a drag
+     source, and the native drag cursor covers that affordance on its own. */
+  .bag-item[aria-disabled="true"] {
+    cursor: default;
+  }
+  .bag-item[aria-disabled="true"]:hover {
+    filter: none;
+  }
   .bag-item .item-icon {
     /* a replaced element keeps its intrinsic size under width:auto even when
        inset-pinned, so size it explicitly to fill the slot */

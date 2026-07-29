@@ -6702,7 +6702,8 @@ export const id_ID: EnTranslations = {
       "destroyTitle": "Hancurkan {item}",
       "destroyConfirm": "Hancurkan",
       "destroyCancel": "Batal",
-      "unknownItem": "Unknown item"
+      "unknownItem": "Unknown item",
+      "unknownItemAria": "Unknown item {id}, quantity {count}"
     },
     "equipment": {
       "empty": "Kosong",

@@ -6702,7 +6702,8 @@ export const nl_NL: EnTranslations = {
       "destroyTitle": "{item} vernietigen",
       "destroyConfirm": "Vernietigen",
       "destroyCancel": "Annuleren",
-      "unknownItem": "Unknown item"
+      "unknownItem": "Unknown item",
+      "unknownItemAria": "Unknown item {id}, quantity {count}"
     },
     "equipment": {
       "empty": "Leeg",

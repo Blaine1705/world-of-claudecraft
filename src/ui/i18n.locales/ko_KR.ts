@@ -2327,6 +2327,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.bags.itemAria': '{item}, 수량 {count}',
   'itemUi.bags.stackCount': 'x{count}',
   'itemUi.bags.unknownItem': '알 수 없는 아이템',
+  'itemUi.bags.unknownItemAria': '알 수 없는 아이템 {id}, 수량 {count}',
   'itemUi.bags.destroyTitle': '{item} 파괴',
   'itemUi.bags.destroyConfirm': '파괴',
   'itemUi.bags.destroyCancel': '취소',

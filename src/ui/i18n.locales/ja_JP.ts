@@ -2344,6 +2344,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.bags.itemAria': '{item}、数量 {count}',
   'itemUi.bags.stackCount': 'x{count}',
   'itemUi.bags.unknownItem': '不明なアイテム',
+  'itemUi.bags.unknownItemAria': '不明なアイテム {id}、数量 {count}',
   'itemUi.bags.destroyTitle': '{item}を破棄',
   'itemUi.bags.destroyConfirm': '破棄',
   'itemUi.bags.destroyCancel': 'キャンセル',

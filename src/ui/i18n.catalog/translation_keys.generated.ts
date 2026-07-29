@@ -6977,6 +6977,7 @@ export type TranslationKeyFlat =
   | 'itemUi.bags.stackCount'
   | 'itemUi.bags.title'
   | 'itemUi.bags.unknownItem'
+  | 'itemUi.bags.unknownItemAria'
   | 'itemUi.equipment.empty'
   | 'itemUi.equipment.levelClass'
   | 'itemUi.errors.bringGoods'

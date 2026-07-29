@@ -6702,7 +6702,8 @@ export const zh_CN: EnTranslations = {
       "destroyTitle": "摧毁 {item}",
       "destroyConfirm": "摧毁",
       "destroyCancel": "取消",
-      "unknownItem": "未知物品"
+      "unknownItem": "未知物品",
+      "unknownItemAria": "未知物品 {id}，数量 {count}"
     },
     "equipment": {
       "empty": "空",
