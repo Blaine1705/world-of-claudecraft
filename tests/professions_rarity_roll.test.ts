@@ -215,7 +215,7 @@ describe('a slotted tool effect changes the yield and never the draw stream', ()
     expect(meta.toolEffectSlots?.mining?.durability).toBe(slotEffect('gatherers_cache').durability);
   });
 
-  it('a quantity effect adds units and spends exactly one charge per granted harvest', () => {
+  it('a quantity effect adds units at the resolver and spends NOTHING there (R42)', () => {
     if (!ORE_NODE) throw new Error('no eastbrook ore node');
     const plain = resolveHarvest(metaWith(), ORE_NODE, 0, new Rng(4242));
     const slot = slotEffect('gatherers_cache', { toolRarity: 'rare' });
@@ -223,7 +223,15 @@ describe('a slotted tool effect changes the yield and never the draw stream', ()
     const meta = metaWith(slot);
     const bonused = resolveHarvest(meta, ORE_NODE, 0, new Rng(4242));
     expect(bonused.qty).toBe((plain.qty ?? 0) + 1);
-    expect(slot.durability).toBe(before - 1);
+    // The charge settle moved to the command boundary, which alone can see
+    // whether the extra unit survived capacity truncation (R42): the bare
+    // resolver never spends, and it hands the boundary the same-draw
+    // counterfactual instead. The boundary-side spend and keep arms live in
+    // tests/gather_node_harvest.test.ts.
+    expect(slot.durability).toBe(before);
+    expect(bonused.effectApplied).toBe(true);
+    expect(bonused.baseQty).toBe(plain.qty);
+    expect(bonused.baseItemId).toBe(plain.itemId);
   });
 
   it('a quality effect yields the fine grade, and still opens no node the tool cannot', () => {

@@ -8,6 +8,7 @@ import { rodTierRequiredForZone } from '../src/sim/professions/fishing_zones';
 import { MATERIAL_GRADES, yieldsFineGrade } from '../src/sim/professions/material_grades';
 import {
   applyEffectBonus,
+  applyToolEffectUse,
   BARE_HANDS_TOOL_TIER,
   bestOwnedAnyGatherToolTier,
   bestOwnedGatherToolFor,
@@ -25,7 +26,6 @@ import {
   RARITY_DURABILITY_BONUS,
   rarityLadderIndex,
   resolveRechargeToolEffect,
-  resolveToolEffectUse,
   slotEffect,
   startingDurabilityFor,
 } from '../src/sim/professions/tools';
@@ -1129,75 +1129,67 @@ describe('effect recharge with original-crafter discount (#1137, priced by R39, 
   });
 });
 
-describe('always/prompt-on-use confirmation gate (#1138)', () => {
+describe('always/prompt-on-use confirmation gate (#1138), the R42 apply-only half', () => {
   const baseOutcome: HarvestOutcome = { quantity: 2, gradeToolTier: 3 };
 
-  it("'always' mode matches calling the two halves directly, confirmed or not", () => {
-    const runOld = () => {
-      const slot = slotEffect('gatherers_cache');
-      const history: { outcome: HarvestOutcome; depleted: boolean }[] = [];
-      for (let i = 0; i < 30; i++) {
-        const outcome = applyEffectBonus(slot, baseOutcome);
-        const depleted = depleteEffect(slot);
-        history.push({ outcome, depleted });
-      }
-      return { history, finalDurability: slot.durability };
-    };
-    const runNew = (confirmed: boolean) => {
-      const slot = slotEffect('gatherers_cache', { confirmMode: 'always' });
-      const history: { outcome: HarvestOutcome; depleted: boolean }[] = [];
-      for (let i = 0; i < 30; i++) {
-        const result = resolveToolEffectUse(slot, baseOutcome, confirmed);
-        expect(result.applied).toBe(true);
-        history.push({ outcome: result.outcome, depleted: result.depleted });
-      }
-      return { history, finalDurability: slot.durability };
-    };
-    const direct = runOld();
-    expect(runNew(true)).toEqual(direct);
-    // confirmed is ignored entirely in 'always' mode: false behaves the same.
-    expect(runNew(false)).toEqual(direct);
-    // The runs really do spend charges, so agreeing is not two no-ops
-    // agreeing: 30 fires off a common slot's 20 charges bottoms it out.
-    expect(direct.finalDurability).toBe(0);
+  it("'always' mode applies the bonus and NEVER spends: the settle belongs to the boundary", () => {
+    // R42 split the old apply-and-deplete: this function is the pure apply
+    // half, and the command boundary (completeGatherCast) spends the charge
+    // only when the granted outcome differs from the same-draw base. A
+    // hundred applications must therefore leave the counter untouched, or a
+    // second spender has crept in beside the boundary's.
+    const slot = slotEffect('gatherers_cache', { confirmMode: 'always' });
+    const minted = slot.durability;
+    for (let i = 0; i < 100; i++) {
+      const result = applyToolEffectUse(slot, baseOutcome, i % 2 === 0);
+      expect(result.applied).toBe(true);
+      expect(result.outcome).toEqual(applyEffectBonus(slot, baseOutcome));
+    }
+    expect(slot.durability).toBe(minted);
   });
 
-  it('prompt mode without confirmation applies no bonus and consumes no charge', () => {
+  it('a spent slot no longer applies: the boundary reads applied=false and never settles it', () => {
+    const slot = slotEffect('gatherers_cache');
+    slot.durability = 0;
+    const result = applyToolEffectUse(slot, baseOutcome, true);
+    expect(result.applied).toBe(false);
+    expect(result.outcome).toEqual(baseOutcome);
+  });
+
+  it('prompt mode without confirmation applies no bonus', () => {
     const slot = slotEffect('gatherers_cache', { confirmMode: 'prompt' });
     const startingDurability = slot.durability;
-    const result = resolveToolEffectUse(slot, baseOutcome, false);
+    const result = applyToolEffectUse(slot, baseOutcome, false);
     expect(result.applied).toBe(false);
-    expect(result.depleted).toBe(false);
     expect(result.outcome).toEqual(baseOutcome);
     expect(slot.durability).toBe(startingDurability);
   });
 
   it('prompt mode with confirmed=true behaves like always mode for that one use', () => {
     const promptSlot = slotEffect('gatherers_cache', { confirmMode: 'prompt' });
-    const promptResult = resolveToolEffectUse(promptSlot, baseOutcome, true);
+    const promptResult = applyToolEffectUse(promptSlot, baseOutcome, true);
 
     const alwaysSlot = slotEffect('gatherers_cache', { confirmMode: 'always' });
-    const alwaysResult = resolveToolEffectUse(alwaysSlot, baseOutcome, true);
+    const alwaysResult = applyToolEffectUse(alwaysSlot, baseOutcome, true);
 
     expect(promptResult.applied).toBe(true);
     expect(promptResult).toEqual(alwaysResult);
     expect(promptSlot.durability).toBe(alwaysSlot.durability);
   });
 
-  it('repeated unconfirmed prompt uses never deplete the slot', () => {
+  it('repeated unconfirmed prompt uses never change the slot', () => {
     const slot = slotEffect('artisans_eye', { confirmMode: 'prompt' });
     for (let i = 0; i < 100; i++) {
-      const result = resolveToolEffectUse(slot, baseOutcome, false);
+      const result = applyToolEffectUse(slot, baseOutcome, false);
       expect(result.applied).toBe(false);
       expect(result.outcome).toEqual(baseOutcome);
     }
     expect(slot.durability).toBe(TOOL_EFFECTS.artisans_eye.startingDurability);
   });
 
-  it('resolveToolEffectUse returns an unapplied no-op when there is no slot at all', () => {
-    expect(resolveToolEffectUse(undefined, baseOutcome, true)).toEqual({
+  it('applyToolEffectUse returns an unapplied no-op when there is no slot at all', () => {
+    expect(applyToolEffectUse(undefined, baseOutcome, true)).toEqual({
       outcome: baseOutcome,
-      depleted: false,
       applied: false,
     });
   });

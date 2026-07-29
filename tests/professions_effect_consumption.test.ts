@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { TOOL_EFFECT_IDS, TOOL_EFFECTS } from '../src/sim/content/professions';
 import type { MaterialRarity } from '../src/sim/professions/gathering';
 import {
+  applyToolEffectUse,
   depleteEffect,
   RARITY_DURABILITY_BONUS,
   RECHARGE_CHARGES_PER_MATERIAL,
   rechargeDiscountFor,
-  resolveToolEffectUse,
   slotEffect,
   startingDurabilityFor,
 } from '../src/sim/professions/tools';
@@ -95,21 +95,22 @@ describe('rarity buys charges, and spending one draws nothing', () => {
     expect(depleteEffect(undefined)).toBe(false);
   });
 
-  it('an unconfirmed prompt slot spends nothing and changes nothing', () => {
+  it('an unconfirmed prompt slot applies nothing and changes nothing', () => {
     const slot = slotEffect('gatherers_cache', { confirmMode: 'prompt', toolRarity: 'epic' });
     const before = slot.durability;
     const outcome = { quantity: 2, gradeToolTier: 3 };
-    const result = resolveToolEffectUse(slot, outcome, false);
+    const result = applyToolEffectUse(slot, outcome, false);
     expect(result.applied).toBe(false);
-    expect(result.depleted).toBe(false);
     expect(result.outcome).toEqual(outcome);
     expect(slot.durability).toBe(before);
-    // Confirming it fires and spends, so the arm above is a refusal rather
-    // than a slot that never worked at all.
-    const confirmed = resolveToolEffectUse(slot, outcome, true);
+    // Confirming it fires, so the arm above is a refusal rather than a slot
+    // that never worked at all. The apply half never spends (R42): the
+    // charge settle lives at the command boundary, against the granted
+    // outcome, and is pinned in tests/gather_node_harvest.test.ts.
+    const confirmed = applyToolEffectUse(slot, outcome, true);
     expect(confirmed.applied).toBe(true);
-    expect(confirmed.depleted).toBe(true);
-    expect(slot.durability).toBe(before - 1);
+    expect(confirmed.outcome.quantity).toBe(outcome.quantity + 1);
+    expect(slot.durability).toBe(before);
   });
 
   it('the recharge scale and discount ladder hold the R39 shape at the leaf', () => {

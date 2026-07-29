@@ -44,10 +44,11 @@ import { gatherActionXp } from './profession_xp';
 import { proficiencyBandFor } from './proficiency_bands';
 import {
   applyEffectBonus,
+  applyToolEffectUse,
   bestOwnedGatherToolTierOrNone,
   canGatherTier,
+  depleteEffect,
   NO_TOOL_OWNED,
-  resolveToolEffectUse,
   type ToolEffectSlot,
 } from './tools';
 import type { PlayerProfessionSkill } from './types';
@@ -367,6 +368,16 @@ export interface HarvestResolution {
   signed?: boolean;
   // Non-null when draw #2 hit the zone-broadcast rare event.
   rareEvent?: GatherRareEventFlavor | null;
+  // The R42 counterfactual, carried so the command boundary can settle the
+  // charge spend against what the player ACTUALLY received. `effectApplied`
+  // is true when a usable slotted effect fired on this resolution;
+  // `baseItemId`/`baseQty` are the same-draw outcome WITHOUT the bonus (same
+  // rarity, same rare-event roll, zero extra draws). The boundary spends the
+  // charge only when the granted outcome differs from this base: the fine
+  // grade really minted, or the extra unit really landed past truncation.
+  effectApplied?: boolean;
+  baseItemId?: string;
+  baseQty?: number;
 }
 
 // Resolves one player's harvest attempt against one node: if that player's own
@@ -417,12 +428,17 @@ export function resolveHarvest(
   // Eye would burn a charge per harvest on the expansion's starter nodes for
   // a categorically impossible upgrade. Pure reads only, so the two-draw
   // contract is untouched.
-  const effect = resolveToolEffectUse(
+  //
+  // THE CHARGE IS NOT SPENT HERE (R42): `applyToolEffectUse` only applies
+  // the bonus. The command boundary (completeGatherCast) settles the spend
+  // against the granted outcome, because only it can see capacity
+  // truncation; the base fields returned below are its same-draw
+  // counterfactual.
+  const ownedTier = bestOwnedGatherToolTierOrNone(meta.inventory, entry.professionId, ITEMS);
+  const baseQty = material.qtyByRarity[rarity] * (rareEvent ? GATHER_RARE_EVENT_YIELD_MULT : 1);
+  const effect = applyToolEffectUse(
     usableToolEffectSlot(meta, entry.professionId, node),
-    {
-      quantity: material.qtyByRarity[rarity] * (rareEvent ? GATHER_RARE_EVENT_YIELD_MULT : 1),
-      gradeToolTier: bestOwnedGatherToolTierOrNone(meta.inventory, entry.professionId, ITEMS),
-    },
+    { quantity: baseQty, gradeToolTier: ownedTier },
     true,
   );
   const itemId = harvestYieldItemIdFor(node, effect.outcome.gradeToolTier);
@@ -444,6 +460,9 @@ export function resolveHarvest(
     qty,
     signed,
     rareEvent,
+    effectApplied: effect.applied,
+    baseItemId: effect.applied ? harvestYieldItemIdFor(node, ownedTier) : itemId,
+    baseQty,
   };
 }
 
@@ -766,6 +785,20 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
     }
   } else {
     grantedQty = grantFungibleFit();
+  }
+  // The R42 charge settle, AFTER the grant so truncation is visible: the
+  // charge is spent only when the bonus actually changed what the player
+  // received. The two kinds reduce to one predicate over the counterfactual
+  // the resolution carried: a quality effect mattered iff the granted id
+  // differs from the no-bonus id (draw-free grade compare), a quantity
+  // effect mattered iff the granted count exceeds the no-bonus count (the
+  // same-draw base; a grant clipped to or below it gave the player nothing
+  // the base would not have). Draws nothing, so the two-draw contract holds;
+  // the slot object is the same live reference the resolution applied, read
+  // through the SAME suppression rule so a suppressed slot never spends.
+  if (result.effectApplied) {
+    const mattered = itemId !== result.baseItemId || grantedQty > (result.baseQty ?? qty);
+    if (mattered) depleteEffect(usableToolEffectSlot(meta, professionId, node));
   }
   ctx.onNodeGatheredForQuests(node, itemId, meta);
   // Zone gather mark: one entry per zone and node type ever harvested.

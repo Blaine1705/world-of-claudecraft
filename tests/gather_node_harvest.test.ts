@@ -1256,6 +1256,70 @@ describe('fine material grades on the live harvest path', () => {
     expect(meta.toolEffectSlots?.mining?.durability).toBe(chargesBefore - 1);
   });
 
+  it('R42: a quality charge is KEPT when the raw tool already earns the fine grade', () => {
+    // The redundancy case the ruling exists for: a mithril pick (tier 3) at a
+    // Mirefen t2 iron vein sits STRICTLY above the material rung, so the fine
+    // grade mints with or without the Eye and the +1 changed nothing. The
+    // boundary settle must compare the granted id against the same-draw base
+    // and keep the charge, still at exactly two draws, with the fine grade
+    // granted as ever.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('mithril_mining_pick', 1, pid);
+    sim.addItem('artisans_eye', 1, pid); // the charm the slot consumes
+    sim.slotToolEffect('mining', 'artisans_eye', undefined, pid);
+    const meta = mustMeta(sim, pid);
+    const chargesBefore = meta.toolEffectSlots?.mining?.durability ?? 0;
+    expect(chargesBefore).toBeGreaterThan(0);
+    teleportOntoNode(sim, pid, MIREFEN_T2);
+    let draws = 0;
+    (sim as any).rng.setObserver(() => {
+      draws++;
+    });
+    expect(castAndComplete(sim, MIREFEN_T2, pid)).toBe(true);
+    (sim as any).rng.setObserver(null);
+    expect(draws).toBe(2);
+    expect(sim.countItem('fine_iron_ore', pid)).toBeGreaterThanOrEqual(1);
+    expect(meta.toolEffectSlots?.mining?.durability).toBe(chargesBefore);
+  });
+
+  it('R42: a quantity charge is KEPT when capacity clips the grant to the base count', () => {
+    // The truncation case: bags hold room for exactly ONE more copper ore, so
+    // whatever the Cache added, the player walks away with what the plain
+    // harvest would have granted. The boundary settle compares the GRANTED
+    // count against the same-draw base and keeps the charge. Proficiency 0
+    // rolls common (base 1) deterministically; a rare-event draw only raises
+    // the base, so the clipped grant stays at or below it either way.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('copper_mining_pick', 1, pid);
+    sim.addItem('gatherers_cache', 1, pid); // the charm the slot consumes
+    sim.slotToolEffect('mining', 'gatherers_cache', undefined, pid);
+    const meta = mustMeta(sim, pid);
+    const chargesBefore = meta.toolEffectSlots?.mining?.durability ?? 0;
+    expect(chargesBefore).toBeGreaterThan(0);
+    const capacity = bagCapacity(meta.bags);
+    const fillerStack = ITEMS.bone_fragments.stackSize ?? 20;
+    while (meta.inventory.length < capacity - 1) sim.addItem('bone_fragments', fillerStack, pid);
+    const oreStack = (ITEMS.copper_ore.stackSize ?? 20) - 1;
+    sim.addItem('copper_ore', oreStack, pid); // room for exactly one more
+    expect(meta.inventory.length).toBe(capacity);
+    expect(sim.ctx.canAddItem('copper_ore', 1, pid)).toBe(true);
+    expect(sim.ctx.canAddItem('copper_ore', 2, pid)).toBe(false);
+    const NODE = 'ore_eastbrook_1';
+    teleportOntoNode(sim, pid, NODE);
+    let draws = 0;
+    (sim as any).rng.setObserver(() => {
+      draws++;
+    });
+    expect(castAndComplete(sim, NODE, pid)).toBe(true);
+    (sim as any).rng.setObserver(null);
+    expect(draws).toBe(2);
+    // Exactly the one unit landed (the base grant), and the charge survived.
+    expect(sim.countItem('copper_ore', pid)).toBe(oreStack + 1);
+    expect(meta.toolEffectSlots?.mining?.durability).toBe(chargesBefore);
+  });
+
   it('the quantity bonus is exactly plus one against the SAME seed without the effect', () => {
     // The floor above (>= before + 2) is satisfiable with the slotted effect
     // deleted: an uncommon-or-better rarity roll or a rare event pays 2+ on

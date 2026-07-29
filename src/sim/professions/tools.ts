@@ -336,7 +336,7 @@ export type ResolvedSlotToolEffect =
  *     confirmation flow exists, so a 'prompt' slot would fire and spend a
  *     charge on every harvest while telling its owner it asks first. Accepting
  *     it here is what would make that comment in gathering.ts false. The
- *     'prompt' machinery in `resolveToolEffectUse` stays, ready for the flow.
+ *     'prompt' machinery in `applyToolEffectUse` stays, ready for the flow.
  *   - no REAL tool carried for that profession. Reads
  *     `bestOwnedGatherToolTierOrNone`, which returns NO_TOOL_OWNED rather than
  *     the bare-hands floor, so carrying nothing is not carrying a tier-1 tool.
@@ -761,50 +761,58 @@ export function resolveRechargeToolEffect(
   return { ok: true, newMax, restored, materialItemId, count };
 }
 
-// The outcome of attempting to use a slotted effect for one harvest/craft
-// action, after the always/prompt-on-use gate (#1138) has been applied.
+// The outcome of applying a slotted effect to one harvest/craft action,
+// after the always/prompt-on-use gate (#1138).
 export interface ToolEffectUseResult {
   outcome: HarvestOutcome;
-  /** True if depleteEffect actually decremented durability this call. */
-  depleted: boolean;
-  /** False only when a 'prompt' slot was not confirmed, so nothing fired. */
+  /** False when a 'prompt' slot was not confirmed, when there is no slot, or
+   *  when its durability is spent: nothing fired, the base outcome passed
+   *  through unchanged. */
   applied: boolean;
 }
 
 // The always/prompt-on-use confirmation gate (#1138). This is the ONE call
 // site a harvest outcome path should use to apply a slotted effect: it wraps
-// `applyEffectBonus` + `depleteEffect` behind the slot's `confirmMode`, so
-// callers never need to hand-roll the gate.
+// `applyEffectBonus` behind the slot's `confirmMode`, so callers never need
+// to hand-roll the gate.
+//
+// APPLIES ONLY, NEVER SPENDS (R42). Depletion used to live here,
+// unconditionally on every applied use; R42 made the spend conditional on
+// the bonus actually changing the granted outcome, and only the command
+// boundary can see that (capacity truncation happens at the grant,
+// completeGatherCast). So the boundary settles the charge with
+// `depleteEffect` under the R42 predicate, and this function stays the pure
+// apply half.
 //
 // - `confirmMode: 'always'` (the default from `slotEffect`): `confirmed` is
-//   ignored; the bonus applies and one charge is spent.
+//   ignored; the bonus applies.
 // - `confirmMode: 'prompt'`: the caller must pass `confirmed: true`
 //   (representing the player's explicit confirmation for this one use) or
-//   nothing happens at all. No charge is spent AND no bonus is applied: the
-//   base outcome passes through unchanged, and the base harvest action itself
-//   is unaffected either way (this function never touches it).
+//   nothing happens at all: the base outcome passes through unchanged, and
+//   the base harvest action itself is unaffected either way (this function
+//   never touches it).
 //
-// Draw-free in every arm, which is what lets a harvest path pinned at exactly
-// two draws call it unconditionally.
-export function resolveToolEffectUse(
+// Draw-free and mutation-free in every arm, which is what lets a harvest
+// path pinned at exactly two draws call it unconditionally.
+export function applyToolEffectUse(
   slot: ToolEffectSlot | undefined,
   outcome: HarvestOutcome,
   confirmed: boolean,
 ): ToolEffectUseResult {
-  if (!slot) return { outcome, depleted: false, applied: false };
+  if (!slot || slot.durability <= 0) return { outcome, applied: false };
   if (slot.confirmMode === 'prompt' && !confirmed) {
-    return { outcome, depleted: false, applied: false };
+    return { outcome, applied: false };
   }
-  const bonused = applyEffectBonus(slot, outcome);
-  const depleted = depleteEffect(slot);
-  return { outcome: bonused, depleted, applied: true };
+  return { outcome: applyEffectBonus(slot, outcome), applied: true };
 }
 
-// INTEGRATION NOTE. `resolveToolEffectUse` is wired: the node-harvest outcome
+// INTEGRATION NOTE. `applyToolEffectUse` is wired: the node-harvest outcome
 // path calls it (professions/gathering.ts resolveHarvest), reading the slot
-// from its owner's PlayerMeta. It draws nothing in any arm, so it sits inside
-// the pinned two-draws-per-granted-harvest contract without widening it, and
-// it is applied AFTER both draws so neither the rarity roll nor the rare-event
+// from its owner's PlayerMeta, and the command boundary
+// (completeGatherCast) settles the R42 charge spend against the granted
+// outcome. Both halves draw nothing, so they sit inside the pinned
+// two-draws-per-granted-harvest contract without widening it, and the bonus
+// is applied AFTER both draws so neither the rarity roll nor the rare-event
 // roll can move because a player owns a slot.
 //
 // `resolveRechargeToolEffect` is wired too: the recharge_tool_effect command
