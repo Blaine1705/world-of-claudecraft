@@ -920,6 +920,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.finderPartySize.many': '{count} jogadores',
   'hudChrome.plurals.finderPartySize.one': '{count} jogador',
   'hudChrome.plurals.finderPartySize.other': '{count} jogadores',
+  'hudChrome.statInfo.effects.manaRegenCombat': 'Cerca de {value} de mana a cada 5 s em combate',
   'hudChrome.statInfo.desc.hitRating':
     'Classificação de acerto proveniente de seu equipamento e bônus de conjuntos, reduzindo a frequência com que seus ataques erram e suas magias são resistidas, especialmente contra inimigos de nível superior. Cerca de 10 pontos de classificação concedem 1% de acerto.',
   'hudChrome.statInfo.names.hitRating': 'Classificação de Acerto',

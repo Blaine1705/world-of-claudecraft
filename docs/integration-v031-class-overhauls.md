@@ -261,8 +261,9 @@ druid engine hooks with the paladin block branch and rogue engine calls; the sav
 migration recomposed into a STEPWISE per-revision model (revision 2 wave set +
 revision 3 druid with rows-wipe, universal scrub preserved: the druid rows kept
 their ids while changing meaning, so the repick must wipe surviving picks); the
-band tests stayed unwidened (the PR's widenings misattributed main-wave drift to
-the rogue layer and are asked to be dropped in review); the hud_update_drive
+band-test widenings from the PR landed via a SILENT auto-merge (the file was not
+in the conflict list; the earlier claim that the bands stayed unwidened was
+wrong), and the review still asks for them to be re-authored; the hud_update_drive
 registry deduped to the chrome-classified rows. Two fixes pushed to the owner
 branch (a864196a3): the engine-bank stacks wire gap (stacks now always sent for
 isPersistentEngineAura ids; decode cannot tell absent-because-1 from
@@ -272,6 +273,19 @@ watchdog, 2 veilbound march geometry for @blaine1705); NOTE the four upstream
 balance bands PASS again on the integrated tree, most likely via the druid
 commit's applyTalentMods-on-transforms change, flagged in review for a
 deliberate decision and pin.
+
+### 2026-07-29: release/v0.31.0 post-ship catch-up (in-combat Spirit mp5)
+
+The landing target moved: release/v0.31.0 gained two post-ship commits main does
+not have (67937a9ac profiler harness fix, e343eae7d in-combat Spirit mana regen,
+the mp5 community port). Merged here (9149058ea): the release's mp5-aware
+difference-based innervate test rewrites composed with the druid re-theme's row
+id (dru_r17_survival_of_the_fittest grants Lifesap now), caster goldens
+re-minted, the manaRegenCombat key filled (pending=0). NEW KNOWN RED, ryan's
+contract, mp5-caused: warspiritBoss/vespersBoss 1.182 vs the (widened) 1.15 cap,
+and raid warspirit 176.0 vs the 173.7 cap (1.08x vespers). All four owner
+branches went CONFLICTING against the base from these two commits; each gets the
+same catch-up merge.
 
 ### Next: #2428 (paladin)
 

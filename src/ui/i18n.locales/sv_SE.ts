@@ -858,6 +858,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.finderPartySize.many': '{count} spelare',
   'hudChrome.plurals.finderPartySize.one': '{count} spelare',
   'hudChrome.plurals.finderPartySize.other': '{count} spelare',
+  'hudChrome.statInfo.effects.manaRegenCombat': 'Ungefär {value} mana var 5:e sekund i strid',
   'hudChrome.statInfo.desc.hitRating':
     'Träffvärde från din utrustning och setbonusar, som minskar hur ofta dina attacker missar och dina besvärjelser motarbetas, framfor allt mot fiender av högre nivå. Ungefär 10 i värde ger 1% träff.',
   'hudChrome.statInfo.names.hitRating': 'Träffvärde',

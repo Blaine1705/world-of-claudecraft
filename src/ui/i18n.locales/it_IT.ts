@@ -932,6 +932,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.finderPartySize.many': '{count} giocatori',
   'hudChrome.plurals.finderPartySize.one': '{count} giocatore',
   'hudChrome.plurals.finderPartySize.other': '{count} giocatori',
+  'hudChrome.statInfo.effects.manaRegenCombat': 'Circa {value} mana ogni 5 sec in combattimento',
   'hudChrome.statInfo.desc.hitRating':
     "Valutazione colpo dall'equipaggiamento e dai bonus di set, che riduce la frequenza con cui i tuoi attacchi mancano e i tuoi incantesimi vengono resistiti, specialmente contro nemici di livello superiore. Circa 10 punti di valutazione concedono l'1% di colpo.",
   'hudChrome.statInfo.names.hitRating': 'Valutazione Colpo',

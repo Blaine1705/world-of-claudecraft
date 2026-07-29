@@ -808,6 +808,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.finderPartySize.many': '{count} jugadores',
   'hudChrome.plurals.finderPartySize.one': '{count} jugador',
   'hudChrome.plurals.finderPartySize.other': '{count} jugadores',
+  'hudChrome.statInfo.effects.manaRegenCombat':
+    'Aproximadamente {value} de maná cada 5 s en combate',
   'hudChrome.statInfo.desc.hitRating':
     'Puntuacion de impacto proveniente de tu equipo y bonificaciones de conjunto, que reduce la frecuencia con que tus ataques fallan y tus hechizos son resistidos, especialmente contra enemigos de nivel superior. Aproximadamente 10 puntos de puntuacion otorgan un 1% de impacto.',
   'hudChrome.statInfo.names.hitRating': 'Puntuacion de impacto',

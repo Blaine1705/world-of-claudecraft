@@ -823,6 +823,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.finderPartySize.many': '{count} hráčů',
   'hudChrome.plurals.finderPartySize.one': '{count} hráč',
   'hudChrome.plurals.finderPartySize.other': '{count} hráčů',
+  'hudChrome.statInfo.effects.manaRegenCombat': 'Přibližně {value} many každých 5 s v boji',
   'hudChrome.statInfo.desc.hitRating':
     'Hodnocení zásahu z vybavení a bonusů sady, snižující četnost mašení tvých útoků a odolávání tvým kouzlům, zejména proti nepřátelům vyšší úrovně. Přibližně 10 bodů hodnocení přidá 1 % zásahu.',
   'hudChrome.statInfo.names.hitRating': 'Hodnocení zásahu',

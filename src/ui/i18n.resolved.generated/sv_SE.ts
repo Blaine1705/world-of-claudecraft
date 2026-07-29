@@ -1257,7 +1257,7 @@ export const sv_SE: EnTranslations = {
         "spellCritPct": "+{value} % Kritisk besvärjelseträff",
         "healthRegen": "Cirka {value} hälsa var 5:e sek under vila",
         "manaRegen": "Cirka {value} mana var 5:e sek under vila",
-        "manaRegenCombat": "About {value} mana every 5 sec in combat",
+        "manaRegenCombat": "Ungefär {value} mana var 5:e sekund i strid",
         "damageReduction": "Skademinskning mot en anfallare på nivå {level}: {value} %",
         "dpsFromAp": "Lägger till {value} skada per sekund till dina attacker"
       },

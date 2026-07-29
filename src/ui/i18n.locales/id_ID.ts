@@ -825,6 +825,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.finderPartySize.many': '{count} pemain',
   'hudChrome.plurals.finderPartySize.one': '{count} pemain',
   'hudChrome.plurals.finderPartySize.other': '{count} pemain',
+  'hudChrome.statInfo.effects.manaRegenCombat': 'Sekitar {value} mana setiap 5 dtk saat bertarung',
   'hudChrome.statInfo.desc.hitRating':
     'Rating pukulan dari perlengkapan dan bonus setelanmu, mengurangi seberapa sering seranganmu meleset dan mantramu ditangkal, terutama melawan musuh level lebih tinggi. Sekitar 10 rating memberikan 1% hit.',
   'hudChrome.statInfo.names.hitRating': 'Rating Pukulan',

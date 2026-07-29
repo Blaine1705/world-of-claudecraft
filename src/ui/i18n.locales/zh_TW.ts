@@ -8993,8 +8993,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.kit.description':
     '為指定專精穿上聖所前的20級預設裝備，優先裝備背包。僅限裝備。',
   'devCommand.actions.biskit.label': '裝備20級最佳套裝',
-  'devCommand.actions.biskit.description':
-    '為指定專精在所有欄位穿上最佳史詩裝備。僅限裝備。',
+  'devCommand.actions.biskit.description': '為指定專精在所有欄位穿上最佳史詩裝備。僅限裝備。',
   'devCommand.actions.kit.label': '裝備新手20級套裝',
   'devCommand.fields.spec': '專精',
   'devCommand.itemChosen': '已選擇：{name}',

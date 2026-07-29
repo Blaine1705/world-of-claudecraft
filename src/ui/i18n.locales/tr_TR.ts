@@ -813,6 +813,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.finderPartySize.many': '{count} oyuncu',
   'hudChrome.plurals.finderPartySize.one': '{count} oyuncu',
   'hudChrome.plurals.finderPartySize.other': '{count} oyuncu',
+  'hudChrome.statInfo.effects.manaRegenCombat': 'Savaşta her 5 saniyede yaklaşık {value} mana',
   'hudChrome.statInfo.desc.hitRating':
     'Ekipmanından ve set bonuslarından gelen isabetlilik puanı; özellikle daha yüksek seviyeli düşmanlara karşı saldırılarının ıskalanma ve büyülerinin dirençle engelleme olasılığını azaltır. Her yaklaşık 10 puan, isabetliliği %1 artırır.',
   'hudChrome.statInfo.names.hitRating': 'İsabetlilik Puanı',

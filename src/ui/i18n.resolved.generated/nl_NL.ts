@@ -1257,7 +1257,7 @@ export const nl_NL: EnTranslations = {
         "spellCritPct": "+{value}% Kritieke Spreuktreffer",
         "healthRegen": "Ongeveer {value} levenskracht elke 5 sec tijdens het rusten",
         "manaRegen": "Ongeveer {value} mana elke 5 sec tijdens het rusten",
-        "manaRegenCombat": "About {value} mana every 5 sec in combat",
+        "manaRegenCombat": "Ongeveer {value} mana elke 5 sec in gevecht",
         "damageReduction": "Schadevermindering tegen een aanvaller van niveau {level}: {value}%",
         "dpsFromAp": "Voegt {value} schade per seconde toe aan je aanvallen"
       },

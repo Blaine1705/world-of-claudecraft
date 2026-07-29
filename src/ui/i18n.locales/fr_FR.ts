@@ -981,6 +981,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.finderPartySize.many': '{count} joueurs',
   'hudChrome.plurals.finderPartySize.one': '{count} joueur',
   'hudChrome.plurals.finderPartySize.other': '{count} joueurs',
+  'hudChrome.statInfo.effects.manaRegenCombat':
+    'Environ {value} points de mana toutes les 5 s en combat',
   'hudChrome.statInfo.desc.hitRating':
     "La précision provenant de votre équipement et de vos bonus d'ensemble, réduisant la fréquence à laquelle vos attaques ratent et vos sorts sont résistés, notamment contre les ennemis de niveau supérieur. Environ 10 points de précision accordent 1 % de toucher.",
   'hudChrome.statInfo.names.hitRating': 'Précision',
@@ -9492,7 +9494,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Enfile le kit de spécialisation niveau 20 pré-Sanctuaire, sacs d'abord. Équipement seul.",
   'devCommand.actions.biskit.label': 'Équiper un kit BIS niveau 20',
   'devCommand.actions.biskit.description':
-    'Enfile l\'ensemble épique optimal d\'une spécialisation, dans chaque emplacement. Équipement seul.',
+    "Enfile l'ensemble épique optimal d'une spécialisation, dans chaque emplacement. Équipement seul.",
   'devCommand.actions.kit.label': 'Équiper un kit de niveau 20 fraîchement atteint',
   'devCommand.fields.spec': 'Spécialisation',
   'devCommand.itemChosen': 'Sélectionné : {name}',

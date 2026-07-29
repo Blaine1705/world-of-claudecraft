@@ -860,6 +860,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.finderPartySize.many': '{count} spillere',
   'hudChrome.plurals.finderPartySize.one': '{count} spiller',
   'hudChrome.plurals.finderPartySize.other': '{count} spillere',
+  'hudChrome.statInfo.effects.manaRegenCombat': 'Cirka {value} mana hvert 5. sekund i kamp',
   'hudChrome.statInfo.desc.hitRating':
     'Rammevurdering fra dit udstyr og sætbonusser, der reducerer, hvor ofte dine angreb misser og dine trylleformularer modstås, navnlig mod fjender af højere niveau. Cirka 10 vurdering giver 1% ramme.',
   'hudChrome.statInfo.names.hitRating': 'Rammevurdering',

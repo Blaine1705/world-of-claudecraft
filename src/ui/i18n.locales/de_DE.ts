@@ -917,6 +917,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.finderPartySize.many': '{count} Spieler',
   'hudChrome.plurals.finderPartySize.one': '{count} Spieler',
   'hudChrome.plurals.finderPartySize.other': '{count} Spieler',
+  'hudChrome.statInfo.effects.manaRegenCombat': 'Etwa {value} Mana alle 5 Sek. im Kampf',
   'hudChrome.statInfo.desc.hitRating':
     'Trefferwertung aus deiner Ausrustung und Setboni, die verringert, wie oft deine Angriffe verfehlen und deine Zauber widerstanden werden, besonders gegen hoher stufige Feinde. Etwa 10 Wertung verleihen 1% Treffer.',
   'hudChrome.statInfo.names.hitRating': 'Trefferwertung',

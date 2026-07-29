@@ -844,6 +844,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.finderPartySize.many': '{count} người chơi',
   'hudChrome.plurals.finderPartySize.one': '{count} người chơi',
   'hudChrome.plurals.finderPartySize.other': '{count} người chơi',
+  'hudChrome.statInfo.effects.manaRegenCombat': 'Khoảng {value} mana mỗi 5 giây trong chiến đấu',
   'hudChrome.statInfo.desc.hitRating':
     'Chỉ số trúng đòn từ trang bị và các chỉ số bộ của bạn, giảm tần suất tấn công bị hụt và phép thuật bị kháng, đặc biệt khi đối mặt với kẻ địch cấp cao hơn. Khoảng 10 chỉ số cho 1% trúng đòn.',
   'hudChrome.statInfo.names.hitRating': 'Chỉ Số Trúng Đòn',

@@ -953,6 +953,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.finderPartySize.many': '{count} graczy',
   'hudChrome.plurals.finderPartySize.one': '{count} gracz',
   'hudChrome.plurals.finderPartySize.other': '{count} graczy',
+  'hudChrome.statInfo.effects.manaRegenCombat': 'Około {value} many co 5 s w walce',
   'hudChrome.statInfo.desc.hitRating':
     'Ocena trafienia z wyposażenia i bonusów zestawów, zmniejszająca częstotliwość chybień ataków i oparcia zaklęć, szczególnie przeciwko wrogom wyższego poziomu. Około 10 oceny daje 1% trafienia.',
   'hudChrome.statInfo.names.hitRating': 'Ocena Trafienia',

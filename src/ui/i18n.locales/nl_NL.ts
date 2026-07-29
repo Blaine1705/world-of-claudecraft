@@ -950,6 +950,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.finderPartySize.many': '{count} spelers',
   'hudChrome.plurals.finderPartySize.one': '{count} speler',
   'hudChrome.plurals.finderPartySize.other': '{count} spelers',
+  'hudChrome.statInfo.effects.manaRegenCombat': 'Ongeveer {value} mana elke 5 sec in gevecht',
   'hudChrome.statInfo.desc.hitRating':
     'Raakwaarde van je uitrusting en setbonussen, waardoor je aanvallen minder vaak missen en je spreuken minder weerstand ondervinden, vooral tegen vijanden van een hoger niveau. Ongeveer 10 raakwaarde geeft 1% raakkans.',
   'hudChrome.statInfo.names.hitRating': 'Raakwaarde',

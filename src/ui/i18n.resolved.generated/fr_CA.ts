@@ -1257,7 +1257,7 @@ export const fr_CA: EnTranslations = {
         "spellCritPct": "+{value} % de chances de coup critique des sorts",
         "healthRegen": "Environ {value} points de vie toutes les 5 sec au repos",
         "manaRegen": "Environ {value} mana toutes les 5 sec au repos",
-        "manaRegenCombat": "About {value} mana every 5 sec in combat",
+        "manaRegenCombat": "Environ {value} points de mana toutes les 5 s en combat",
         "damageReduction": "Réduction des dégâts contre un attaquant de niveau {level} : {value} %",
         "dpsFromAp": "Ajoute {value} dégâts par seconde à vos attaques"
       },
