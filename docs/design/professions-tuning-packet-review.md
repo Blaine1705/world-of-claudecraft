@@ -644,7 +644,13 @@ R34 scope: guards, not a floor.
 BUILT 2026-07-28 (Fable xhigh). Preamble: origin fetched, release/v0.32.0
 still the latest release branch with its tip 9d7a1a021 already merged (no
 re-sync, nothing for the release-merge audit), gate green at the entry tip
-4e4201051. The code half is two commits (the trade guard and the bags/bank
+4e4201051. RE-SYNCED 2026-07-29 (the phase 11 QA preamble): release/v0.32.0
+had moved 685 commits to 0b427afca (the procedural dungeons expansion);
+merged as d15ecf338 (56 conflicts), release-merge audit run, gate green on
+the merged tree. Every "since the deployed release" claim below was
+measured against 9d7a1a021, which remains the deployed commit; the QA
+record at the end of this section re-scopes the claims the merge
+overtook. The code half is two commits (the trade guard and the bags/bank
 visibility work); the rest of the phase lands as this record plus the
 deploy-order note in DEPLOY.md. No screenshots: every guarded state needs a
 version-skewed client against a newer server, which matched local builds
@@ -739,8 +745,8 @@ What each item settled:
    binary is approved and released BEFORE the server moves (R34) and the
    binary-to-server gap stays short. Verified against the real merge-base
    bundle (git show 9d7a1a021:...), independently by this session and by
-   a five-category wire sweep, agreeing on every point: the packet's
-   whole wire delta since the deployed release is ONE new SimEvent type
+   a five-category wire sweep, agreeing on every point: the
+   PACKET-AUTHORED wire delta since the deployed release is ONE new SimEvent type
    (`fishingEmptyHook`; an old client ignores unknown event types, both
    base HUD event switches have no default arm), additive fields on two
    existing events (`fishingResult`/`fishingGotAway` gained zoneId and
@@ -762,18 +768,39 @@ What each item settled:
    packet surface; the one surface no order can cover on its own is the
    node-position skew below.
 
+   MERGED-BRANCH delta versus the deployed bundle (the v0.32.0 re-sync,
+   measured by the phase 11 QA): delta keys 57 to 63 (the packet's tslot
+   plus the release's einst, mntOwn, mntRtd, mntLesson, mntRace; mloot
+   already existed at the base), sendable commands 164 to 174 and
+   dispatched 173 to 185 (the release's eleven, nine with shipped senders,
+   none dev-gated), SimEvents 118 to 131 (twelve release additions, two of
+   them pid-less), REST routes 184 to 185 (one admin-only unstuck-reports
+   route; the registry file itself is byte-identical). Still true and
+   verified at the base: every addition is purely additive, no key was
+   removed or reshaped, and the base client ignores unknown event types
+   (no default arm on any of its three event switches, no wire allowlist).
+
    THE DEPLOYED-BUNDLE CONSEQUENCE (wire sweep, recorded here and in the
    runbook): the guards in items 1 and 2 protect bundles built from this
    release onward; the bundle already live predates them, so for THIS
    deploy the old client's two TypeError arms are real once the new
-   server mints the release's new item ids (the fine-grade materials and
-   the new rods; the mechanism is the failure, so no count is recorded).
+   server mints ANY item id the bundle predates (the packet's fine-grade
+   materials and rods, and after the re-sync the expansion's whole
+   catalog; the mechanism is the failure, so no count is recorded).
    The trade arm fires when a stale session's trade partner stages one
    (the throw freezes that trade panel behind the base bundle's early-set
-   signature); the loot-window arm is unreachable by construction because
-   every new id is gathering, recipe, vendor, or delve-shop content, in
-   no mob or chest loot table, and the runbook now says to keep them out
-   until clients roll. A stale session keeps its bundle across the
+   signature); the loot-window arm is unreachable through the PACKET'S ids
+   (gathering, recipe, vendor, or delve-shop content only, swept out of
+   every loot feeder by the deploy-window pin) but NOT for the merged
+   release as a whole: the v0.32.0 expansion put its four mount reins into
+   the heroic loot of five deployed-base encounters (the four heroic
+   finales plus the Nythraxis raid), and its rift runs push the rift
+   catalog onto boss corpses at runtime, so solo and free-for-all clears
+   can hand a stale bundle an id it cannot resolve (the QA extended the
+   pin to the heroic table and pinned the reins as the exact exception
+   set; DEPLOY.md carries the operator-facing statement). The trade arm
+   likewise now spans the expansion's whole tradeable catalog, not just
+   the packet's ids. A stale session keeps its bundle across the
    restart countdown and reconnect; only a page reload updates it.
 4. RECORDED, both directions accepted (they resolve once both sides are
    current; the runbook note names them and the deploy order bounds the
@@ -788,10 +815,13 @@ What each item settled:
    corrections); herb skew is phantom-prop cosmetics only, with no
    collider on either side. A new client against an old server advertises
    nodes, items, and minimap markers the server denies, and every
-   relocated node is unusable there; the measured worst case is Eastbrook
-   herbalism, whose three tier-1 herb nodes all moved, leaving that
-   client zone-dead for the profession until the server deploys. The
-   relocation set grows again in phase 13, so the runbook names the
+   relocated node is unusable there; among the zones the deployed server
+   HAS, the worst cases are Eastbrook tier-1 herbalism (the whole group
+   moved or new) and Mirefen's tier-2 band, which the QA's own
+   ore_mirefen_t2 relocation completed as a fully dead group; the eleven
+   expansion zones are a different class (their ground does not exist on
+   the old server at all). The relocation set already grew in the
+   v0.32.0 re-sync and grows again in phase 13, so the runbook names the
    mechanism and the worst case, never a count. Node ADDITIONS carry no
    server-message hazard in either direction: placements are client-side
    static content, `ncd` keys are copied verbatim and only
@@ -814,10 +844,18 @@ whether this deploy should force stale web sessions onto the new bundle
 (a version prompt or forced reload at reconnect) or accept the
 stale-tab window the runbook now describes. R34 DEFERRED a hard
 version floor as a separate later decision on the premise that clients
-degrade gracefully; the deployed bundle's trade-throw arm is the one
-place the old bundle does not, so the forced-refresh question sits
-beside that open decision rather than against a settled prohibition,
-and it is the maintainer's to make.
+degrade gracefully; that premise is materially weaker after the
+v0.32.0 re-sync. The old bundle now fails to degrade in FOUR places:
+the trade-throw arm, the heroic-reins loot-window arm, the void world
+past the old terrain rectangle (the server rim moved outward, so a
+stale tab can walk onto ground its renderer has no mesh for), and the
+rebased instance plane (INSTANCE_X_BASE moved every dungeon, delve,
+and arena interior to coordinates a stale renderer draws as a
+collider-less void until relog). The release left the fail-closed gate
+at ONLINE_WORLD_LAYOUT_VERSION 3 through both layout changes, so
+bumping it to 4 is the one-line mechanical lever if the answer is to
+refuse stale sessions; the question, now with that lever named, stays
+the maintainer's to make.
 
 REVIEW ROUND (same sitting): five fresh lenses over the build diff
 (qa-checklist, frontend-seam, test-coverage, privacy-security, and an
