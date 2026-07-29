@@ -460,4 +460,64 @@ describe('quest turn-in spends signed specimens last', () => {
       else delete QUESTS[TEST_ID];
     }
   });
+
+  it('the reward-capacity gate approves when the prefer-plain walk frees a slot', () => {
+    // The approve direction of the deny test above, closing the pair: the
+    // plain stack is EXACTLY the objective, so the hand-in empties that slot,
+    // the reward fits in it, and the signed copy survives untouched. An
+    // over-strict scratch gate (modeling the signed slot as spent, or
+    // refusing whenever an instanced stack is present) reds here.
+    const TEST_ID = 'q_test_signed_reward_approve';
+    const original = QUESTS[TEST_ID];
+    try {
+      QUESTS[TEST_ID] = {
+        id: TEST_ID,
+        name: 'Signed Reward Approve Test',
+        giverNpcId: 'forgemistress_darva',
+        turnInNpcId: 'forgemistress_darva',
+        text: 'Test only.',
+        completionText: 'Test complete.',
+        objectives: [
+          { type: 'collect', itemId: 'copper_ore', count: 8, label: 'Copper Ore delivered' },
+        ],
+        xpReward: 0,
+        copperReward: 0,
+        itemRewards: {
+          warrior: 'greyjaw_pelt_cloak',
+          mage: 'greyjaw_pelt_cloak',
+          rogue: 'greyjaw_pelt_cloak',
+        },
+        retired: true,
+      } as QuestDef;
+
+      const sim = makeSim();
+      const pid = sim.playerId;
+      const meta = (sim as any).players.get(pid);
+      placeAtQuestGiver(sim, pid, 'forgemistress_darva');
+
+      grantItem(sim, 'copper_ore', 8, pid);
+      sim.addItemInstance('copper_ore', { signer: 'Prospector Wynn' }, pid, 8);
+      const capacity = bagCapacity(meta.bags);
+      const fillerStack = ITEMS.bone_fragments.stackSize ?? 20;
+      while (meta.inventory.length < capacity) sim.addItem('bone_fragments', fillerStack, pid);
+      expect(meta.inventory.length).toBe(capacity);
+
+      meta.questLog.set(TEST_ID, { questId: TEST_ID, counts: [8], state: 'ready' });
+      sim.turnInQuest(TEST_ID, pid);
+
+      expect(meta.questsDone.has(TEST_ID)).toBe(true);
+      expect(sim.countItem('greyjaw_pelt_cloak', pid)).toBe(1);
+      // The signed 8 survived; only the plain stack paid.
+      expect(sim.countItem('copper_ore', pid)).toBe(8);
+      const signedSlot = meta.inventory.find(
+        (s: { itemId: string; instance?: { signer?: string } }) =>
+          s.itemId === 'copper_ore' && s.instance?.signer === 'Prospector Wynn',
+      );
+      expect(signedSlot).toBeDefined();
+      expect(meta.inventory.length).toBeLessThanOrEqual(capacity);
+    } finally {
+      if (original) QUESTS[TEST_ID] = original;
+      else delete QUESTS[TEST_ID];
+    }
+  });
 });

@@ -168,6 +168,28 @@ describe('quested-hobby memory: restoring at a pair transition', () => {
     expect(meta.archetype.pairedMajor).toBe(SECONDARY); // the combo-aware default pair
     expect(sim.hobbyCraft).toBe(QUESTED_HOBBY);
   });
+
+  it('acceptArchetypeQuest restores a surviving record after a normalizer reset', () => {
+    // The third transition entry point is NOT inert: normalizeArchetypeState
+    // resets an invalid archetype block on load (a retired craft id, a
+    // malformed save) while the quested-hobby record normalizes
+    // independently and survives. The re-acceptance quest is then a REAL
+    // pair transition, and it must restore the quested choice like the
+    // other two entry points.
+    const sim = makeSim();
+    questAttune(sim, PAIR, 'new');
+    questHobby(sim, QUESTED_HOBBY);
+    const meta = metaOf(sim);
+    expect(meta.questedHobbies.get(PAIR)).toBe(QUESTED_HOBBY);
+    // The normalizer-reset shape: the archetype block is factory-fresh, the
+    // record survives (exactly what a failed-validation load produces).
+    meta.archetype.activeArchetype = null;
+    meta.archetype.pairedMajor = null;
+    meta.archetype.hobbyCraft = null;
+    expect(sim.acceptArchetypeQuest(PRIMARY, sim.playerId)).toBe(true);
+    expect(meta.archetype.activeArchetype).toBe(PRIMARY);
+    expect(sim.hobbyCraft).toBe(QUESTED_HOBBY);
+  });
 });
 
 describe('quested-hobby memory: persistence', () => {

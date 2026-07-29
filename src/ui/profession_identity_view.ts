@@ -171,8 +171,9 @@ export function buildAttunementPreview(
   // the pair's candidates exactly like the restore itself, so the pre-commit
   // sentence and the outcome cannot disagree.
   const remembered = questedHobbies?.[target];
+  const candidates = hobbyCandidatesForPair(pair[0], pair[1]);
   const hobbyCraft =
-    remembered !== undefined && hobbyCandidatesForPair(pair[0], pair[1]).includes(remembered)
+    remembered !== undefined && candidates.includes(remembered)
       ? remembered
       : defaultHobbyForPair(pair[0], pair[1], { ...craftSkills });
   return {

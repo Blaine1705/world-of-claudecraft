@@ -80,6 +80,9 @@ function assignFishingSession(sim: Sim, pid: number): Entity {
   p.castTotal = 15;
   p.castRemaining = 15;
   p.fishBiteAtTick = sim.tickCount + 100;
+  // An ARMED reel window, so expectSessionEnded's fishReelDeadlineTick check
+  // asserts a real clear rather than a field that was already zero.
+  p.fishReelDeadlineTick = sim.tickCount + 120;
   p.fishCastZoneId = 'eastbrook_vale';
   return p;
 }

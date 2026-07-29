@@ -41,6 +41,7 @@ import { announceAttunement } from '../src/sim/professions/attunement_events';
 import { WORK_ORDER_CADENCE_TICKS } from '../src/sim/professions/cadence';
 import type { PlayerMeta } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { buildAttunementPreview } from '../src/ui/profession_identity_view';
 import type { CraftingIdentityView } from '../src/world_api/professions';
 
 const SMITH_PAIR = 'weaponcrafting+armorcrafting';
@@ -470,7 +471,28 @@ describe('the quested-hobby record rides the cprof mirror', () => {
     expect(client.craftingIdentity.questedHobbies).toEqual({
       'weaponcrafting+armorcrafting': 'tailoring',
     });
+    // Close the composition: the wire-mirrored identity drives the REAL
+    // preview core (the quest dialog's thin pass-through is pinned in its
+    // own suite), so the JSON-shaped record and the view's lookup cannot
+    // drift apart without a test moving.
+    const mirrored = client.craftingIdentity;
+    const preview = buildAttunementPreview(
+      'weaponcrafting+armorcrafting',
+      mirrored.craftSkills,
+      mirrored.switchCount,
+      mirrored.questedHobbies,
+    );
+    expect(preview?.hobbyCraft).toBe('tailoring');
     (client as any).applySnapshot(lastSnapWith(fcOwner.sent, false));
     expect('questedHobbies' in client.craftingIdentity).toBe(false);
+    // And absent-record parity: the same call off the featureless mirror
+    // falls back to the skill default, never a stale remembered hobby.
+    const fallback = buildAttunementPreview(
+      'weaponcrafting+armorcrafting',
+      client.craftingIdentity.craftSkills,
+      client.craftingIdentity.switchCount,
+      client.craftingIdentity.questedHobbies,
+    );
+    expect(fallback?.hobbyCraft).toBe('leatherworking');
   });
 });
