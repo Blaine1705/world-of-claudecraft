@@ -61,23 +61,23 @@
    "type": "copy"
   },
   {
-   "src": "tmp/asset_src/ambientcg/Ground048/Ground048_1K-JPG_Color.jpg",
-   "out": "textures/terrain/Ground048_Color.jpg",
+   "src": "tmp/asset_src/ambientcg/Ground023/Ground023_1K-JPG_Color.jpg",
+   "out": "textures/terrain/Ground023_Color.jpg",
    "type": "copy"
   },
   {
-   "src": "tmp/asset_src/ambientcg/Ground048/Ground048_1K-JPG_NormalGL.jpg",
-   "out": "textures/terrain/Ground048_NormalGL.jpg",
+   "src": "tmp/asset_src/ambientcg/Ground023/Ground023_1K-JPG_NormalGL.jpg",
+   "out": "textures/terrain/Ground023_NormalGL.jpg",
    "type": "copy"
   },
   {
-   "src": "tmp/asset_src/ambientcg/Ground048/Ground048_1K-JPG_Roughness.jpg",
-   "out": "textures/terrain/Ground048_Roughness.jpg",
+   "src": "tmp/asset_src/ambientcg/Ground023/Ground023_1K-JPG_Roughness.jpg",
+   "out": "textures/terrain/Ground023_Roughness.jpg",
    "type": "copy"
   },
   {
-   "src": "tmp/asset_src/ambientcg/Ground048/Ground048_1K-JPG_AmbientOcclusion.jpg",
-   "out": "textures/terrain/Ground048_AmbientOcclusion.jpg",
+   "src": "tmp/asset_src/ambientcg/Ground023/Ground023_1K-JPG_AmbientOcclusion.jpg",
+   "out": "textures/terrain/Ground023_AmbientOcclusion.jpg",
    "type": "copy"
   },
   {

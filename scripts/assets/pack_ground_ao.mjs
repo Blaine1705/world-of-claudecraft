@@ -3,7 +3,7 @@
 // Packs the splat ground layers' relief channels into one RGBA texture
 // (public/textures/terrain/GroundAO_Packed.png, 512x512 lossless PNG):
 //
-//   R  Grass001_AmbientOcclusion   G  Ground048_AmbientOcclusion (dirt)
+//   R  Grass001_AmbientOcclusion   G  Ground023_AmbientOcclusion (dirt)
 //   B  rock height blend           A  Ground080_AmbientOcclusion (sand)
 //
 // One sampler instead of four keeps buildSplatMaterial (src/render/terrain.ts)
@@ -35,7 +35,7 @@ const SIZE = 512;
 
 const AO_SOURCES = {
   r: 'Grass001_AmbientOcclusion.jpg',
-  g: 'Ground048_AmbientOcclusion.jpg',
+  g: 'Ground023_AmbientOcclusion.jpg',
   a: 'Ground080_AmbientOcclusion.jpg',
 };
 const ROCK_DISPLACEMENT_SOURCES = ['Rock026_Displacement.jpg', 'Rock060_Displacement.jpg'];
