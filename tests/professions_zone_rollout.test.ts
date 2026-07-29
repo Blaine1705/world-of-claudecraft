@@ -1,19 +1,21 @@
 // The R37 rollout guard: professions content exists ONLY where a rollout row
-// says it does. The editor's new maps and every zone past the built-in three
-// ship with NO professions content at all until the zone-4 design pass gives
-// a future zone its content-sourced tool ladder (R23), and the new-zone
-// checklist (docs/design/professions-tuning-packet-review.md) is what flips
-// a zone here from none to complete.
-//
-// The ledger below is the flip point, and EVERY shipped ZoneDef must carry a
-// row (the coverage arm enforces it): 'complete' maps to assert-COMPLETE arms
-// (the zone must carry nodes, a rod-tier row, a catch table in every band,
-// and hub vendor rows); 'none' maps to assert-ABSENT (no swept table may
-// reference the zone). Adding professions content to a new zone without
-// flipping its row to complete fails loudly, and so does flipping the row
-// without the content, which is exactly the two-sided guard R37 asks for.
-// Every sweep is DERIVED from the live tables with per-table non-vacuity,
-// never a hand-kept list of what exists.
+// says it does, and the row says exactly how much. The v0.32.0 expansion
+// changed the world this guard was written for: its eleven zones ship the
+// release's own hub-outskirt STARTER kit (two tier-1 nodes per profession
+// and tier-1 water), so "every zone past the built-in three is
+// professions-free" stopped being true at that merge. The ledger now carries
+// three states. 'complete' maps to assert-COMPLETE arms (the zone must carry
+// nodes, a rod-tier row, a catch table in every band, and hub vendor rows).
+// 'starter' pins the expansion shape exactly: nodes exist and every one is
+// tier 1, the rod-tier row exists and is 1, and the zone has NO catch
+// tables (Vale-row fallback), NO stations, and NO tool vendor rows; the
+// phase 13 design pass (docs/design/professions-tuning-packet-review.md) is
+// what flips a starter zone to complete alongside its full kit. 'none' maps
+// to assert-ABSENT (no swept table may reference the zone) and stays the
+// default for any future zone. Adding content without flipping a row fails
+// loudly, and so does flipping a row without the content, which is exactly
+// the two-sided guard R37 asks for. Every sweep is DERIVED from the live
+// tables with per-table non-vacuity, never a hand-kept list of what exists.
 import { describe, expect, it } from 'vitest';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
@@ -28,19 +30,32 @@ import { FISHING_ZONE_ROD_TIERS } from '../src/sim/professions/fishing_zones';
 /**
  * The R37 ledger, and deliberately the ONLY hand-kept table in this file.
  * A future zone ships with an explicit 'none' row (professions-free until its
- * design pass, the R37 default) and the new-zone checklist later flips that
- * row to 'complete', which turns every assert-absent arm below into
- * assert-complete for it. Shipping a ZoneDef with no row at all is refused by
- * the coverage arm: the decision must be recorded here either way.
+ * design pass, the R37 default). The v0.32.0 expansion zones carry 'starter'
+ * (the release's shipped hub-outskirt kit, pinned to exactly that shape by
+ * the arms below); their phase 13 design pass flips each to 'complete'.
+ * Shipping a ZoneDef with no row at all is refused by the coverage arm: the
+ * decision must be recorded here either way.
  */
-const PROFESSIONS_ZONE_ROLLOUT: Readonly<Record<string, 'complete' | 'none'>> = {
+type RolloutState = 'complete' | 'starter' | 'none';
+const PROFESSIONS_ZONE_ROLLOUT: Readonly<Record<string, RolloutState>> = {
   eastbrook_vale: 'complete',
   mirefen_marsh: 'complete',
   thornpeak_heights: 'complete',
+  veiled_hollow: 'starter',
+  drakelands: 'starter',
+  frostveil: 'starter',
+  amberfall: 'starter',
+  willowfen: 'starter',
+  nightbloom: 'starter',
+  wraithwood: 'starter',
+  palmreach: 'starter',
+  evergarden: 'starter',
+  galecrest: 'starter',
+  farshore_isle: 'starter',
 };
 
 /** The zones the assert-complete arms sweep: every 'complete' ledger row. */
-function rolledOutFrom(ledger: Readonly<Record<string, 'complete' | 'none'>>): Set<string> {
+function rolledOutFrom(ledger: Readonly<Record<string, RolloutState>>): Set<string> {
   return new Set(
     Object.entries(ledger)
       .filter(([, state]) => state === 'complete')
@@ -48,7 +63,17 @@ function rolledOutFrom(ledger: Readonly<Record<string, 'complete' | 'none'>>): S
   );
 }
 
+/** The zones a given state's arms sweep. */
+function zonesInState(state: RolloutState): Set<string> {
+  return new Set(
+    Object.entries(PROFESSIONS_ZONE_ROLLOUT)
+      .filter(([, s]) => s === state)
+      .map(([zoneId]) => zoneId),
+  );
+}
+
 const ROLLED_OUT = rolledOutFrom(PROFESSIONS_ZONE_ROLLOUT);
+const STARTER_ZONES = zonesInState('starter');
 
 /** Every professions implement in the item table (land tools and rods). */
 function professionToolIds(): Set<string> {
@@ -68,7 +93,9 @@ describe('the R37 professions zone-rollout guard', () => {
     expect([...ZONES.map((z) => z.id)].sort()).toEqual(
       [...Object.keys(PROFESSIONS_ZONE_ROLLOUT)].sort(),
     );
-    expect(ZONES.length).toBe(3);
+    expect(ZONES.length).toBe(14);
+    expect(ROLLED_OUT.size).toBe(3);
+    expect(STARTER_ZONES.size).toBe(11);
     // The 'none' state is real, not decorative: no shipped row uses it yet,
     // so without this arm the complete-filter could silently degrade to a
     // bare key read and a future professions-free zone would sweep as
@@ -76,20 +103,27 @@ describe('the R37 professions zone-rollout guard', () => {
     expect(rolledOutFrom({ ...PROFESSIONS_ZONE_ROLLOUT, zone_x: 'none' })).toEqual(ROLLED_OUT);
   });
 
-  it('gather nodes exist in every rolled-out zone and ONLY in rolled-out zones', () => {
+  it('gather nodes exist in every complete and starter zone, and ONLY there', () => {
     expect(GATHER_NODES.length).toBeGreaterThan(0);
     const byZone = new Map<string, number>();
     for (const node of GATHER_NODES) {
       byZone.set(node.zoneId, (byZone.get(node.zoneId) ?? 0) + 1);
       expect(
-        ROLLED_OUT.has(node.zoneId),
+        ROLLED_OUT.has(node.zoneId) || STARTER_ZONES.has(node.zoneId),
         `${node.id} places a professions node in un-rolled-out zone ${node.zoneId}`,
       ).toBe(true);
+      // The starter shape's teeth: every expansion node is tier 1 until the
+      // zone's phase 13 pass flips the row (a tier-2 vein appearing in a
+      // starter zone means content landed without the ledger decision).
+      if (STARTER_ZONES.has(node.zoneId)) {
+        expect(node.tier, `${node.id} outruns its starter zone's tier-1 kit`).toBe(1);
+      }
     }
-    for (const zoneId of ROLLED_OUT) {
-      expect(byZone.get(zoneId) ?? 0, `${zoneId} is rolled out but has no nodes`).toBeGreaterThan(
-        0,
-      );
+    for (const zoneId of [...ROLLED_OUT, ...STARTER_ZONES]) {
+      expect(
+        byZone.get(zoneId) ?? 0,
+        `${zoneId} ships nodes by its row but has none`,
+      ).toBeGreaterThan(0);
     }
   });
 
@@ -120,7 +154,15 @@ describe('the R37 professions zone-rollout guard', () => {
     // any zone without its own table (fishing.ts), so absence here means
     // DEFAULT water, and the zone's own tables are part of what its
     // 'complete' flip must author.
-    expect([...Object.keys(FISHING_ZONE_ROD_TIERS)].sort()).toEqual([...ROLLED_OUT].sort());
+    // Rod rows exist for complete AND starter zones (a starter row is the
+    // explicit tier-1 decision fishing_zones.ts records); catch tables stay
+    // complete-only, the Vale fallback covering starter water.
+    expect([...Object.keys(FISHING_ZONE_ROD_TIERS)].sort()).toEqual(
+      [...ROLLED_OUT, ...STARTER_ZONES].sort(),
+    );
+    for (const zoneId of STARTER_ZONES) {
+      expect(FISHING_ZONE_ROD_TIERS[zoneId], `${zoneId} starter water is not tier 1`).toBe(1);
+    }
     expect(FISHING_TABLES_BY_BAND.length).toBeGreaterThan(0);
     for (const [band, byZone] of FISHING_TABLES_BY_BAND.entries()) {
       const zones = Object.keys(byZone);

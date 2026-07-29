@@ -422,20 +422,21 @@ describe('minimap corpse marker (ghost run)', () => {
 
 // The gather-node marker's locked dimension. The viewer stands ON
 // the new tier-2 mirefen vein (ore_mirefen_t2), where the rim covers exactly
-// four nodes in GATHER_NODES order: ore_mirefen_1, ore_mirefen_3,
-// herb_mirefen_3 (all tier 1) and the tier-2 vein itself at the map centre.
-// Actionable info on every preset: locked resolves from the bags, never a
-// graphics knob.
+// five nodes in GATHER_NODES order: ore_mirefen_1, ore_mirefen_3,
+// wood_mirefen_1, herb_mirefen_3 (all tier 1) and the tier-2 vein itself at
+// the map centre. Actionable info on every preset: locked resolves from the
+// bags, never a graphics knob.
 //
-// This used to read five, with herb_mirefen_1 inside the rim at 35.1 yards.
-// That patch sat in the dead centre of the (60, 380) pool, roughly 4 yards
-// under the water, and moving it onto dry shore put it 47.0 yards out, past
-// the 43.53-yard rim. The counts and the expected arrays below were re-minted
-// for that move, not loosened: herb_mirefen_3 is still in range, so the arms
-// that matter here (an ore vein a pick unlocks beside a herb patch it does
-// not) are both still covered.
+// The count has moved twice with content, re-minted each time rather than
+// loosened. It read five, then four when herb_mirefen_1 (4 yards under the
+// (60, 380) pool) moved onto dry shore 47.0 yards out, past the 43.53-yard
+// rim; the v0.32.0 merge then moved the anchor vein itself off (48,352)
+// (an expansion collider took the spot), and from (36,350) wood_mirefen_1
+// sits back inside the rim at 32.8 yards. That widens the coverage the arms
+// below care about: an ore vein a pick unlocks beside a herb patch AND a
+// wood stand it does not.
 describe('gather-node markers: the locked dimension', () => {
-  const T2 = { x: 48, z: 352 }; // ore_mirefen_t2, pinned literally
+  const T2 = { x: 36, z: 350 }; // ore_mirefen_t2, pinned literally (moved at the v0.32.0 merge)
 
   function makeGatherWorld(
     shape: 'sim' | 'client',
@@ -482,7 +483,7 @@ describe('gather-node markers: the locked dimension', () => {
 
   it('a toolless viewer sees EVERY node locked (#2343: bare hands never gather)', () => {
     const markers = gatherMarkers(makeGatherWorld('sim'));
-    expect(markers.map((m) => m.locked)).toEqual([true, true, true, true]);
+    expect(markers.map((m) => m.locked)).toEqual([true, true, true, true, true]);
     // The centre marker is the tier-2 vein under the viewer, still ready:
     // locked is the tool dimension, never the respawn one.
     const centre = markers.find((m) => m.mx === S / 2 && m.my === S / 2);
@@ -493,8 +494,10 @@ describe('gather-node markers: the locked dimension', () => {
     const tooled = gatherMarkers(
       makeGatherWorld('sim', { inventory: [{ itemId: 'iron_mining_pick', count: 1 }] }),
     );
-    // GATHER_NODES rim order: ore t1, ore t1, herb t1, ore t2 (centre).
-    expect(tooled.map((m) => m.locked)).toEqual([false, false, true, false]);
+    // GATHER_NODES rim order: ore t1, ore t1, wood t1, herb t1, ore t2
+    // (centre): the pick unlocks the ores alone; the wood stand and the herb
+    // patch both stay locked without their own implements.
+    expect(tooled.map((m) => m.locked)).toEqual([false, false, true, true, false]);
     // Locked composes WITH the respawn dimension, never replaces it: a
     // cooling locked vein keeps ready=false (the silhouette the painter keeps
     // readable under the locked tint).

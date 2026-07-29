@@ -174,11 +174,22 @@ interface GatheredSource {
 /** Every material a node can grant, with the zone and node type that grants
  *  it and the units one COMMON-rarity harvest yields. Inverted from the live
  *  NODE_MATERIAL_TABLE, so a material that stops being node-granted (or a
- *  new one that starts) changes what this file prices as time. */
+ *  new one that starts) changes what this file prices as time.
+ *
+ *  Scoped to the TUNED zones (the R37 'complete' set): the v0.32.0 expansion
+ *  zones re-grant the same materials from their starter nodes, so the
+ *  one-zone-per-material premise now holds only inside the tuned circuits
+ *  this derivation prices. That keeps every hour figure the figure the
+ *  packet's mastery pass authored against; the expansion's extra supply is
+ *  the phase 13 economy integration's problem and would only LOWER real
+ *  hours, so the floors below stay the conservative reading. Inside the
+ *  tuned set the ambiguity refusal keeps its old teeth. */
+const MASTERY_TUNED_ZONE_IDS = new Set(['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights']);
 function gatheredSources(): Map<string, GatheredSource> {
   const sources = new Map<string, GatheredSource>();
   for (const [type, byZone] of Object.entries(NODE_MATERIAL_TABLE)) {
     for (const [zoneId, row] of Object.entries(byZone)) {
+      if (!MASTERY_TUNED_ZONE_IDS.has(zoneId)) continue;
       // Keying by itemId assumes one granting zone per material. Refuse the
       // day that stops being true instead of silently keeping whichever zone
       // the iteration visits last (the cheapest zone might be the dropped

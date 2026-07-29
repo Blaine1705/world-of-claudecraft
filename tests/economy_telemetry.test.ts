@@ -84,8 +84,25 @@ describe('harvest band classification (zone-keyed, R3)', () => {
     // whatever this exports, so the two cannot drift apart.
     expect([...HARVEST_BANDS]).toEqual(ZONES.map((zone) => zone.id));
     // Non-vacuity, and the concrete members external dashboards must
-    // re-point to at deploy: the old material-band series stop moving.
-    expect(HARVEST_BANDS).toEqual(['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights']);
+    // re-point to at deploy: the old material-band series stop moving, and
+    // the v0.32.0 expansion zones each mint their own series the moment the
+    // release deploys.
+    expect(HARVEST_BANDS).toEqual([
+      'eastbrook_vale',
+      'mirefen_marsh',
+      'thornpeak_heights',
+      'veiled_hollow',
+      'drakelands',
+      'frostveil',
+      'amberfall',
+      'willowfen',
+      'nightbloom',
+      'wraithwood',
+      'palmreach',
+      'evergarden',
+      'galecrest',
+      'farshore_isle',
+    ]);
   });
 
   it('classifies every live node into its own zone band', () => {

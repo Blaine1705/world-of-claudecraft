@@ -368,8 +368,8 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // ends up. Turning in place moves the probe but never the pinned zone,
   // which is exactly why the pin exists.
   //
-  // zoneAt SATURATES at the world edges (any z past the last zone resolves to
-  // thornpeak_heights), and instanced spaces are laid out along z, so a
+  // zoneAt SATURATES at the world edges (any z past the north end resolves
+  // to the northmost zone), and instanced spaces are laid out along z, so a
   // dungeon slot would inherit whatever zone its origin lands in. Harmless
   // today because waterLevelAt returns -Infinity outside a declared lake and
   // every lake is in the overworld, so the water check above refuses first.

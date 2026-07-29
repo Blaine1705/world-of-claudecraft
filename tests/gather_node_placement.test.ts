@@ -44,7 +44,6 @@ import {
   DECORATION_MAX_SLOPE,
   groundHeight,
   isInWaterBody,
-  nearSteepWalls,
   roadDistance,
   SEALED_BORDERS,
   terrainHeight,

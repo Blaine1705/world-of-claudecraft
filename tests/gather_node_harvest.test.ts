@@ -37,7 +37,7 @@ import {
   nodeMaterialFor,
 } from '../src/sim/professions/gathering';
 import { Sim } from '../src/sim/sim';
-import { type Entity, xpForLevel } from '../src/sim/types';
+import { type Entity, INTERACT_RANGE, xpForLevel } from '../src/sim/types';
 import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
 import { placeAtHarvestSpot } from './helpers/harvest_spot';
 
@@ -1289,24 +1289,31 @@ describe('harvest denies in combat and while swimming (the startFishing pair)', 
     expect(sim.harvestNode(NODE_ID, pid)).toBe(true);
   });
 
-  it('a waterline herb denies from its swim-deep center and grants from the wading spot', () => {
-    // herb_eastbrook_1 sits in swim-deep lake water: standing exactly on it
-    // is swimming (denied), wading beside it inside INTERACT_RANGE is not.
-    // This is the shipped-content acceptance shape of the swimming denial:
-    // the node stays farmable, the swim route does not.
-    const WATERLINE = 'herb_eastbrook_1';
+  it('a waterline stand denies from a swim-deep cast spot and grants from its dry footing', () => {
+    // The pre-v0.32.0 shape of this fixture stood the player ON a node that
+    // sat in swim-deep water (herb_eastbrook_1 at seed 42); the merged world
+    // reshaped every shore this suite hunted, and no shipped node sits over
+    // swim depth at any nearby seed now. The acceptance shape survives
+    // inverted: wood_thornpeak_1 keeps a swim-deep pocket INSIDE
+    // INTERACT_RANGE at seed 1, so casting from the water is denied while
+    // the node's own dry footing grants. The node stays farmable, the swim
+    // route does not.
+    const WATERLINE = 'wood_thornpeak_1';
+    const DEEP = { x: -61.3, z: 766.8 };
     const node = mustNode(WATERLINE);
+    const sim = makeWorld(1);
     expect(
-      groundHeight(node.pos.x, node.pos.z, 42) <
-        waterLevelAt(node.pos.x, node.pos.z) - PLAYER_SWIM_DEPTH,
+      groundHeight(DEEP.x, DEEP.z, sim.cfg.seed) < waterLevelAt(DEEP.x, DEEP.z) - PLAYER_SWIM_DEPTH,
     ).toBe(true);
-    const sim = makeWorld();
+    expect(Math.hypot(DEEP.x - node.pos.x, DEEP.z - node.pos.z)).toBeLessThanOrEqual(
+      INTERACT_RANGE,
+    );
     const pid = sim.addPlayer('warrior', 'Wader');
-    sim.addItem('gathering_sickle', 1, pid);
+    sim.addItem('handaxe', 1, pid);
     const p = mustEntity(sim, pid);
-    p.pos.x = node.pos.x;
-    p.pos.z = node.pos.z;
-    p.pos.y = terrainHeight(node.pos.x, node.pos.z, sim.cfg.seed);
+    p.pos.x = DEEP.x;
+    p.pos.z = DEEP.z;
+    p.pos.y = terrainHeight(DEEP.x, DEEP.z, sim.cfg.seed);
     p.prevPos = { ...p.pos };
     expect(sim.ctx.isSwimming(p)).toBe(true);
     sim.drainEvents();
@@ -1316,7 +1323,7 @@ describe('harvest denies in combat and while swimming (the startFishing pair)', 
         .drainEvents()
         .some((e) => e.type === 'error' && e.text === "You can't do that while swimming."),
     ).toBe(true);
-    // The wading spot (teleportOntoNode's ring walk) grants the same node.
+    // The node's own dry footing (teleportOntoNode) grants the same node.
     teleportOntoNode(sim, pid, WATERLINE);
     expect(sim.ctx.isSwimming(p)).toBe(false);
     expect(sim.harvestNode(WATERLINE, pid)).toBe(true);

@@ -130,10 +130,14 @@ describe('the write ceiling, the load clamp, and the record bound stay coupled',
     // characters.state row. Integer-valued here (each entry is the flat 240);
     // real records carry two-decimal values and run roughly 13 percent
     // larger, still inside the ceiling. Content growth that trips the byte
-    // literal is a deliberate blob-size decision, not an accident.
+    // literal is a deliberate blob-size decision, not an accident: the
+    // ceiling moved 2048 to 4096 at the v0.32.0 merge, when the expansion's
+    // eleven starter zones took the live node count 54 to 120 (integer
+    // record measured 2784, so the two-decimal worst case sits near 3150
+    // and the new ceiling keeps the same order of headroom the old one had).
     const all = serializeNodeReadiness(meta.nodeHarvestReadyAt, 0);
     expect(all && Object.keys(all).length).toBe(GATHER_NODES.length);
-    expect(JSON.stringify(all).length).toBeLessThanOrEqual(2048);
+    expect(JSON.stringify(all).length).toBeLessThanOrEqual(4096);
     // The load side must survive the same scale: no cap, break, or dedupe may
     // shrink a full record on the way back in.
     expect(Object.keys(applyNodeReadiness(all, 0)).length).toBe(GATHER_NODES.length);

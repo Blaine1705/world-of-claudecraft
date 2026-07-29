@@ -582,10 +582,12 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
     // grades that player silently loses MASTERWORK_SIGNED_CHANCE for having
     // used the better tool.
     //
-    // Seed 69 again, hunted on this recipe: the single proc draw lands where
-    // the 2 percent signed-reagent term alone decides the outcome. Spares on
-    // record: 117, 185, 319, 322.
-    const SEED = 69;
+    // Seed 67, re-hunted on this recipe at the v0.32.0 merge (the expansion
+    // moved the construction-time draws, so the old 69 window and its spares
+    // all collapsed): the single proc draw lands where the 2 percent
+    // signed-reagent term alone decides the outcome. Spares on record: 127,
+    // 133, 337 (50 also works but is the count-1 test's own window below).
+    const SEED = 67;
     const craftLongsword = (setup: (sim: Sim, pid: number) => void) => {
       const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: false });
       const pid = sim.playerId;
