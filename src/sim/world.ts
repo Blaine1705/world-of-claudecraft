@@ -1,6 +1,7 @@
 import { bgFieldHeightLocal } from './battleground_field';
 import { beaconSpiralLift } from './beacon_spiral';
 import { BORDER_EDGES } from './border_edges';
+import { bulwarkLift, bulwarkPadTarget, bulwarkPadWeight } from './bulwark_layout';
 import {
   castleLift,
   castlePadTarget,
@@ -2522,6 +2523,15 @@ function applyCastlePad(x: number, z: number, h: number): number {
   return h + (castlePadTarget(x, z) - h) * w;
 }
 
+// The Ashen Bulwark's graded grounds on the Drakelands west headland (the
+// castle pad idiom at barracks scale; the plan lives in bulwark_layout.ts).
+function applyBulwarkPad(x: number, z: number, h: number): number {
+  const w = bulwarkPadWeight(x, z);
+  if (w <= 0) return h;
+  return h + (bulwarkPadTarget() - h) * w;
+}
+
+
 // The pad's northeast apron meets the Last Spring pool, and the pad yields to
 // the pool over castlePadWeight's own ring: the bailey's level floor ends on an
 // arc about 16yd out from the pool center and the ground then falls to the pool
@@ -3965,7 +3975,8 @@ export function groundHeight(x: number, z: number, seed: number): number {
     sowfieldStandLift(x, z) +
     beaconSpiralLift(x, z) +
     castleLift(x, z) +
-    dawnholdLift(x, z);
+    dawnholdLift(x, z) +
+    bulwarkLift(x, z);
   return Math.max(terrain, dockSurfaceHeight(x, z, seed));
 }
 
@@ -4004,6 +4015,8 @@ function applyTerrainPads(x: number, z: number, seed: number, h0: number): numbe
   h = applyReachPoolWalkwayBed(x, z, h);
   // Dawnhold Castle's garden pad, same late application.
   h = applyDawnholdPad(x, z, h);
+  // the Drakelands' headland barracks, graded the same way
+  h = applyBulwarkPad(x, z, h);
   // Level pads under the Evergarden's modeled flower beds, applied over the
   // FINISHED height (the garden seam reshapes the lawn per position, so an
   // early flatten would drift apart again): each bed ensemble sits flush on
@@ -5083,6 +5096,9 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     if (gz > 2160 && gz < 2360 && emberLinkDistanceNorm(gx, gz) < 1.1) return null;
     // the Last Keep's graded grounds carry no wild scatter
     if (castlePadWeight(gx, gz) > 0) return null;
+    // ...nor the Ashen Bulwark's headland pad (a boulder in the drill yard
+    // is also a stray collider standing in the muster lane)
+    if (bulwarkPadWeight(gx, gz) > 0) return null;
     for (const pool of EMBER_FLAT_POOLS) {
       if (Math.hypot(gx - pool.x, gz - pool.z) < pool.r * 1.6 + 4) return null;
     }
