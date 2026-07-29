@@ -6,7 +6,7 @@
 // finality confirmation, and bond escrow refunds/forfeits. The game passes
 // USD cents in and renders what comes back, verbatim.
 //
-// GRACEFUL DEGRADATION IS THE CONTRACT. If WOC_ECONOMY_SERVICE_URL or
+// GRACEFUL DEGRADATION IS THE CONTRACT. If WOC_MARKET_SERVICE_URL or
 // WOC_ECONOMY_INTERNAL_SECRET is unset, OR the service is unreachable /
 // errors / times out, every method returns a typed unavailable result and
 // NEVER throws up into request handling. An unavailable or unhealthy price
@@ -34,8 +34,18 @@ const PRICE_CACHE_TTL_MS = 15_000;
 const ESTIMATE_CACHE_TTL_MS = 15_000;
 const ESTIMATE_CACHE_MAX_ENTRIES = 256;
 
+/**
+ * The exchange's own base URL, NOT the shared WOC_ECONOMY_SERVICE_URL.
+ *
+ * That variable points at `.../v1/claudium/` (see .env.example), because
+ * claudium_proxy.ts sends relative paths beneath it. Reusing it here resolved
+ * every marketplace call to `/v1/claudium/internal/market/...`, which is inside
+ * the claudium prefix and is not where the service serves the exchange. The
+ * exchange lives at `/v1/market/`, so it gets its own base, exactly the way
+ * claudium has one.
+ */
 function serviceUrl(): string {
-  return (process.env.WOC_ECONOMY_SERVICE_URL ?? '').trim();
+  return (process.env.WOC_MARKET_SERVICE_URL ?? '').trim();
 }
 
 function serviceSecret(): string {
@@ -174,7 +184,7 @@ export function createWocMarketEconomyProxy(): WocMarketEconomy {
     async price(): Promise<WocPriceInfo> {
       const now = Date.now();
       if (priceCache && now - priceCache.at < PRICE_CACHE_TTL_MS) return priceCache.value;
-      const wire = await callService<WirePrice>({ method: 'GET', path: '/internal/market/price' });
+      const wire = await callService<WirePrice>({ method: 'GET', path: 'price' });
       const value: WocPriceInfo = wire
         ? {
             available: true,
@@ -194,7 +204,7 @@ export function createWocMarketEconomyProxy(): WocMarketEconomy {
       if (hit && now - hit.at < ESTIMATE_CACHE_TTL_MS) return hit.value;
       const wire = await callService<WireEstimate>({
         method: 'POST',
-        path: '/internal/market/estimate',
+        path: 'estimate',
         body: { usdCents },
       });
       const value: WocEstimate =
@@ -212,7 +222,7 @@ export function createWocMarketEconomyProxy(): WocMarketEconomy {
     async bondQuote(args): Promise<WocQuoteIntent> {
       const wire = await callService<WireQuote>({
         method: 'POST',
-        path: '/internal/market/bond-quote',
+        path: 'bond-quote',
         body: args,
       });
       return toQuote(wire);
@@ -221,7 +231,7 @@ export function createWocMarketEconomyProxy(): WocMarketEconomy {
     async settlementQuote(args): Promise<WocQuoteIntent> {
       const wire = await callService<WireQuote>({
         method: 'POST',
-        path: '/internal/market/settlement-quote',
+        path: 'settlement-quote',
         body: args,
       });
       return toQuote(wire);
@@ -230,7 +240,7 @@ export function createWocMarketEconomyProxy(): WocMarketEconomy {
     async confirm(reference, signature) {
       const wire = await callService<WireConfirm>({
         method: 'POST',
-        path: '/internal/market/confirm',
+        path: 'confirm',
         body: { reference, signature },
         timeoutMs: CONFIRM_TIMEOUT_MS,
       });
@@ -245,7 +255,7 @@ export function createWocMarketEconomyProxy(): WocMarketEconomy {
     async refundBond(reference) {
       const wire = await callService<WireBondAction>({
         method: 'POST',
-        path: '/internal/market/bond-refund',
+        path: 'bond-refund',
         body: { reference },
       });
       return { done: wire?.done === true, reason: wire?.reason ?? null };
@@ -254,7 +264,7 @@ export function createWocMarketEconomyProxy(): WocMarketEconomy {
     async forfeitBond(reference) {
       const wire = await callService<WireBondAction>({
         method: 'POST',
-        path: '/internal/market/bond-forfeit',
+        path: 'bond-forfeit',
         body: { reference },
       });
       return { done: wire?.done === true, reason: wire?.reason ?? null };

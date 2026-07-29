@@ -1,0 +1,250 @@
+// The economy-service client for the exchange (server/woc_market_proxy.ts). This
+// file exists because the OTHER side of this contract lives in a different repo
+// (woc-daily-payout-service, service/src/market/routes.ts), so nothing in this
+// repository can catch a drift by compiling. The paths, the header and the request
+// bodies are pinned here as literals against the service's documented surface.
+//
+// The bug this was written after: these calls used absolute '/internal/market/*'
+// paths resolved against WOC_ECONOMY_SERVICE_URL, which already points inside
+// '/v1/claudium/'. Every marketplace request therefore addressed
+// '/v1/claudium/internal/market/...', a path the service does not serve, and the
+// only symptom was the exchange quietly reporting itself unavailable forever.
+
+process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_woc_market_proxy';
+
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { createWocMarketEconomyProxy } from '../../server/woc_market_proxy';
+
+const BASE = 'http://economy.test/v1/market/';
+const SECRET = 'internal-secret';
+const BUYER = '4Nd1mYQ3rTFAMFsQmM1qEBQrPYcJUyJK1XdxAxLwEjqL';
+const SELLER = '9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM';
+
+interface Seen {
+  url: string;
+  method: string;
+  headers: Record<string, string>;
+  body: unknown;
+}
+
+let seen: Seen[] = [];
+let respond: (url: string) => { status: number; body: unknown };
+
+beforeEach(() => {
+  seen = [];
+  respond = () => ({ status: 200, body: {} });
+  process.env.WOC_MARKET_SERVICE_URL = BASE;
+  process.env.WOC_ECONOMY_INTERNAL_SECRET = SECRET;
+  vi.stubGlobal('fetch', async (input: URL | string, init?: RequestInit) => {
+    const url = String(input);
+    const headers = Object.fromEntries(
+      Object.entries((init?.headers ?? {}) as Record<string, string>),
+    );
+    seen.push({
+      url,
+      method: init?.method ?? 'GET',
+      headers,
+      body: init?.body === undefined ? undefined : JSON.parse(String(init.body)),
+    });
+    const { status, body } = respond(url);
+    return {
+      ok: status >= 200 && status < 300,
+      status,
+      json: async () => body,
+    } as Response;
+  });
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+  delete process.env.WOC_MARKET_SERVICE_URL;
+  delete process.env.WOC_ECONOMY_INTERNAL_SECRET;
+});
+
+describe('the exchange base URL is its own, not the claudium one', () => {
+  it('resolves every call beneath WOC_MARKET_SERVICE_URL', async () => {
+    respond = () => ({ status: 200, body: { healthy: true, tokensPerUsd: 1000, asOfMs: 1 } });
+    await createWocMarketEconomyProxy().price();
+    expect(seen).toHaveLength(1);
+    expect(seen[0].url).toBe('http://economy.test/v1/market/price');
+  });
+
+  it('reads WOC_MARKET_SERVICE_URL, never WOC_ECONOMY_SERVICE_URL', async () => {
+    // The claudium base ends in /v1/claudium/. If this client ever falls back to
+    // it, every request lands inside the wrong prefix and the exchange silently
+    // reports unavailable, which is indistinguishable from "not deployed yet".
+    delete process.env.WOC_MARKET_SERVICE_URL;
+    process.env.WOC_ECONOMY_SERVICE_URL = 'http://economy.test/v1/claudium/';
+    const price = await createWocMarketEconomyProxy().price();
+    expect(seen, 'no request may be made without the exchange base').toHaveLength(0);
+    expect(price.available).toBe(false);
+    expect(price.reason).toBe('service_unavailable');
+    delete process.env.WOC_ECONOMY_SERVICE_URL;
+  });
+
+  it('tolerates a base with no trailing slash without eating the last segment', async () => {
+    // new URL('price', '.../v1/market') would resolve to '.../v1/price'.
+    process.env.WOC_MARKET_SERVICE_URL = 'http://economy.test/v1/market';
+    respond = () => ({ status: 200, body: { healthy: true, tokensPerUsd: 1000, asOfMs: 1 } });
+    await createWocMarketEconomyProxy().price();
+    expect(seen[0].url).toBe('http://economy.test/v1/market/price');
+  });
+});
+
+describe('the wire contract with the service', () => {
+  it('sends the shared internal secret as x-woc-economy-secret on every call', async () => {
+    respond = () => ({ status: 200, body: { ok: true, amount: { base: '1', tokens: 1 } } });
+    await createWocMarketEconomyProxy().estimate(100);
+    expect(seen[0].headers['x-woc-economy-secret']).toBe(SECRET);
+    // And never the ADMIN secret: the game must not be able to reach ops paths.
+    expect(Object.keys(seen[0].headers)).not.toContain('x-woc-economy-admin-secret');
+  });
+
+  it.each([
+    ['price', 'GET', 'price'],
+    ['estimate', 'POST', 'estimate'],
+    ['bondQuote', 'POST', 'bond-quote'],
+    ['settlementQuote', 'POST', 'settlement-quote'],
+    ['confirm', 'POST', 'confirm'],
+    ['refundBond', 'POST', 'bond-refund'],
+    ['forfeitBond', 'POST', 'bond-forfeit'],
+  ])('%s calls %s %s, the path the service registers', async (method, verb, path) => {
+    respond = () => ({ status: 200, body: { ok: true, healthy: true, settled: true, done: true } });
+    const economy = createWocMarketEconomyProxy();
+    switch (method) {
+      case 'price':
+        await economy.price();
+        break;
+      case 'estimate':
+        await economy.estimate(1234);
+        break;
+      case 'bondQuote':
+        await economy.bondQuote({ memoRef: 'woc_bond:1', usdCents: 125, buyerWallet: BUYER });
+        break;
+      case 'settlementQuote':
+        await economy.settlementQuote({
+          memoRef: 'woc_settle:1',
+          usdCents: 10_000,
+          buyerWallet: BUYER,
+          sellerWallet: SELLER,
+        });
+        break;
+      case 'confirm':
+        await economy.confirm('WMB_ref', 'sig');
+        break;
+      case 'refundBond':
+        await economy.refundBond('WMB_ref');
+        break;
+      default:
+        await economy.forfeitBond('WMB_ref');
+    }
+    expect(seen).toHaveLength(1);
+    expect(seen[0].method).toBe(verb);
+    expect(seen[0].url).toBe(`${BASE}${path}`);
+  });
+
+  it('sends the exact body fields the service reads', async () => {
+    respond = () => ({ status: 200, body: { ok: true } });
+    const economy = createWocMarketEconomyProxy();
+    await economy.bondQuote({ memoRef: 'woc_bond:7', usdCents: 125, buyerWallet: BUYER });
+    expect(seen[0].body).toEqual({ memoRef: 'woc_bond:7', usdCents: 125, buyerWallet: BUYER });
+
+    seen = [];
+    await economy.settlementQuote({
+      memoRef: 'woc_settle:7',
+      usdCents: 10_000,
+      buyerWallet: BUYER,
+      sellerWallet: SELLER,
+    });
+    expect(seen[0].body).toEqual({
+      memoRef: 'woc_settle:7',
+      usdCents: 10_000,
+      buyerWallet: BUYER,
+      sellerWallet: SELLER,
+    });
+
+    seen = [];
+    await economy.confirm('WMB_ref', 'sig');
+    expect(seen[0].body).toEqual({ reference: 'WMB_ref', signature: 'sig' });
+
+    seen = [];
+    await economy.refundBond('WMB_ref');
+    expect(seen[0].body).toEqual({ reference: 'WMB_ref' });
+  });
+
+  it('parses the service quote shape into the game view verbatim', async () => {
+    respond = () => ({
+      status: 200,
+      body: {
+        ok: true,
+        reference: 'WMS_abc',
+        transactionBase64: 'TX',
+        amount: { base: '100', tokens: 1 },
+        seller: { base: '90', tokens: 0.9 },
+        burn: { base: '3', tokens: 0.03 },
+        treasury: { base: '7', tokens: 0.07 },
+        expiresAtMs: 42,
+      },
+    });
+    const quote = await createWocMarketEconomyProxy().settlementQuote({
+      memoRef: 'woc_settle:1',
+      usdCents: 10_000,
+      buyerWallet: BUYER,
+      sellerWallet: SELLER,
+    });
+    expect(quote.ok).toBe(true);
+    expect(quote.reference).toBe('WMS_abc');
+    expect(quote.transactionBase64).toBe('TX');
+    expect(quote.seller).toEqual({ base: '90', tokens: 0.9 });
+    expect(quote.burn).toEqual({ base: '3', tokens: 0.03 });
+    expect(quote.treasury).toEqual({ base: '7', tokens: 0.07 });
+    expect(quote.expiresAtMs).toBe(42);
+  });
+});
+
+describe('graceful degradation is the contract', () => {
+  it('a refusal from the service carries its reason through, never throws', async () => {
+    respond = () => ({ status: 200, body: { ok: false, reason: 'operator_paused' } });
+    const quote = await createWocMarketEconomyProxy().bondQuote({
+      memoRef: 'woc_bond:1',
+      usdCents: 125,
+      buyerWallet: BUYER,
+    });
+    expect(quote.ok).toBe(false);
+    expect(quote.reason).toBe('operator_paused');
+  });
+
+  it('an HTTP error becomes an unavailable result, never an exception', async () => {
+    // The game pauses trading on unavailable. A throw here would surface inside
+    // request handling instead.
+    respond = () => ({ status: 500, body: { error: 'internal' } });
+    const economy = createWocMarketEconomyProxy();
+    await expect(economy.price()).resolves.toMatchObject({ available: false, healthy: false });
+    await expect(economy.estimate(100)).resolves.toMatchObject({ available: false });
+    await expect(
+      economy.bondQuote({ memoRef: 'woc_bond:1', usdCents: 125, buyerWallet: BUYER }),
+    ).resolves.toMatchObject({ ok: false, reason: 'service_unavailable' });
+    await expect(economy.refundBond('WMB_x')).resolves.toEqual({
+      done: false,
+      reason: null,
+    });
+  });
+
+  it('an unreachable service leaves confirm PENDING, never terminally failed', async () => {
+    // The single most consequential degradation: the game holds the buyer's item
+    // while a confirm is pending. Reporting a terminal failure because the service
+    // was briefly unreachable would strand a buyer who already paid.
+    vi.stubGlobal('fetch', async () => {
+      throw new Error('ECONNREFUSED');
+    });
+    const result = await createWocMarketEconomyProxy().confirm('WMS_ref', 'sig');
+    expect(result).toEqual({ settled: false, pending: true, reason: 'service_unavailable' });
+  });
+
+  it('an unset secret makes no request at all', async () => {
+    delete process.env.WOC_ECONOMY_INTERNAL_SECRET;
+    const price = await createWocMarketEconomyProxy().price();
+    expect(seen).toHaveLength(0);
+    expect(price.available).toBe(false);
+  });
+});
