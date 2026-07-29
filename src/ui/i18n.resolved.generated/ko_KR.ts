@@ -900,7 +900,18 @@ export const ko_KR: EnTranslations = {
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}분 {s}초",
       "seconds": "{s}초",
-      "autoShowHint": "파티가 피해를 주거나 치유를 하면 행이 자동으로 나타나며, 전투가 끝난 후 몇 초 뒤에 이 구역이 닫힙니다."
+      "autoShowHint": "파티가 피해를 주거나 치유를 하면 행이 자동으로 나타나며, 전투가 끝난 후 몇 초 뒤에 이 구역이 닫힙니다.",
+      "breakdownSummary": "{tab}: {value}",
+      "breakdownRow": "{value} ({percent})",
+      "breakdownOther": "기타 ({count})",
+      "percent": "{value}%",
+      "petAbility": "{pet}: {ability}",
+      "melee": "근접 공격",
+      "move": "드래그하여 이 미터를 이동",
+      "resize": "드래그하여 이 미터의 크기 조절",
+      "dock": "이 미터를 미터 창으로 되돌리기",
+      "separate": "{meter} 분리",
+      "regroup": "{meter} 통합"
     },
     "petFeed": {
       "disabledFullHp": "펫의 체력이 가득 찼습니다",
@@ -964,13 +975,13 @@ export const ko_KR: EnTranslations = {
     "mountRace": {
       "startButton": "레이스 시작",
       "cancelButton": "경기 취소",
-      "go": "GO!",
+      "go": "출발!",
       "start": "출발! 모든 장애물을 뛰어넘고 아치로 돌아가 통과하라.",
       "toFinish": "아치로 돌아가 통과하라!",
       "finished": "{seconds}초 만에 완주!",
       "timeout": "레이스 실패",
       "progress": "장애물 {n} / {total}",
-      "timeLeft": "{seconds}s"
+      "timeLeft": "{seconds}초"
     },
     "vcup": {
       "title": "베일 컵",
@@ -1502,6 +1513,10 @@ export const ko_KR: EnTranslations = {
       "twoFactorRecoveryTitle": "복구 코드를 저장하세요",
       "twoFactorRecoveryHint": "각 코드는 한 번만 사용할 수 있습니다. 안전한 곳에 보관하세요. 인증 앱을 잃어버렸을 때 다시 로그인할 수 있는 유일한 방법입니다.",
       "twoFactorDownloadCodes": "코드 다운로드",
+      "recoveryCodesFileHeader": "{brand} 복구 코드",
+      "recoveryCodesFileAccount": "계정: {username}",
+      "recoveryCodesFileHint": "인증 앱에 접근할 수 없게 되면 각 코드는 한 번만 사용할 수 있습니다.",
+      "recoveryCodesFileWarn": "이 파일은 안전하고 개인적인 곳에 보관하세요.",
       "twoFactorDone": "완료",
       "twoFactorDisableHint": "2단계 인증을 끄려면 비밀번호를 입력하세요. 복구 코드는 폐기됩니다.",
       "twoFactorDisableBtn": "2단계 인증 끄기",
@@ -1543,10 +1558,12 @@ export const ko_KR: EnTranslations = {
       "title": "채집",
       "harvestButton": "채집",
       "harvestTooltip": "선택한 부위를 채집합니다. 각 시체는 선착순으로 한 번만 채집할 수 있습니다. 전리품은 가져가지 않습니다.",
-      "concentrateHint": "선택한 부위가 적을수록 부위당 등급이 더 높아집니다.",
+      "yieldTierHint": "채집에서 실제로 얻는 부위가 적을수록 각 부위의 등급이 더 높아집니다.",
       "nothingSelectedYields": "선택한 부위는 이 시체에서 채집할 수 없습니다.",
       "alreadyHarvested": "이 시체는 이미 채집되었습니다.",
       "componentAria": "{component} 채집",
+      "componentNoYield": "아직 없음",
+      "componentAriaNoYield": "{component} 채집: {note}",
       "components": {
         "hide": "가죽",
         "fang": "송곳니",
@@ -2561,6 +2578,7 @@ export const ko_KR: EnTranslations = {
       "noEnchants": "이 재료를 사용하는 마법부여가 없습니다.",
       "noTargets": "마법부여할 수 있는 아이템이 없습니다.",
       "wornTag": "착용 중 ({slot})",
+      "wornTagIndexed": "착용 중 ({slot} {index})",
       "tier": {
         "base": "기본 마법부여",
         "runed": "룬 마법부여",
@@ -2796,7 +2814,7 @@ export const ko_KR: EnTranslations = {
       "title": "세계 지도",
       "summary": "세계 지도. 지역을 선택하면 해당 지도가 열립니다.",
       "toWorld": "세계 지도",
-      "toZone": "Zone map",
+      "toZone": "지역 지도",
       "toggleAria": "세계 지도와 지역 지도 전환",
       "levels": "레벨 {min}부터 {max}까지"
     }
@@ -3897,7 +3915,7 @@ export const ko_KR: EnTranslations = {
     "professions": {
       "intro": "전투와 퀘스트를 넘어, 이 세계는 땅을 일구고 대장간에서 일하는 여러분에게도 보상을 준다. 원재료를 채집하고, 열 가지 제작 전문직에 걸쳐 이를 장비와 물품으로 바꾸며, 그 전문직들이 상징하는 열 가지 원형 중 하나로서 정체성을 다지는 것이다.",
       "harvestTitle": "사냥감 그 자체를 채집하기",
-      "harvestBody": "채집은 노드에서 끝나지 않는다. 쓰러뜨린 짐승 일부는 시체에서 곧바로 부위를 채집할 수 있어, 가죽과 송곳니, 비단실, 그리고 더 낯선 것들이 평범한 전리품과 나란히 나온다. 처치 하나에 채집자는 한 명뿐이다: 먼저 채집한 사람이 전부 가져간다. 그리고 선택은 매번 당신 몫이다: 시체가 내주는 것을 전부 벗겨 내거나, 한 가지 부위에 집중해 더 좋은 등급으로 얻거나. 채집에는 전문직도 훈련도 필요 없어 어떤 캐릭터든 할 수 있으며, 유난히 좋은 부위에는 채집한 사람의 이름까지 새겨진다.",
+      "harvestBodyChoice": "채집은 노드에서 끝나지 않는다. 쓰러뜨린 짐승 상당수는 시체에서 곧바로 한 번씩 채집할 수 있어, 가죽과 송곳니, 비단실, 고기가 평범한 전리품과 나란히 나온다. 시체 하나에 채집자는 선착순 한 명뿐이며, 한 번 누르면 전리품과 채집이 함께 열린다. 짐승이 쓸 만한 부위를 둘 이상 지녔다면 선택은 당신 몫이다. 그 시체가 내줄 수 있는 것을 전부 가져가거나, 더 적은 부위에 집중해 실제로 얻는 것을 눈에 띄게 더 좋은 등급으로 가져가거나.\n\n표본이 나오는 계열에서 희귀 이상 판정이 뜨면 평범한 산출물 위에 서명된 완벽한 표본(Pristine Hide, Pristine Silk, Pristine Venom Gland, Prime Cut)이 하나 더 주어지고, 업적의 서에 A Perfect Specimen이 기록된다. 채집에는 훈련이 필요 없어 어떤 캐릭터든 할 수 있으며, 가지고 있는 채집 도구는 어느 전문직의 것이든 최상급 재료 판정에 반영된다.",
       "focusTitle": "마을 집중",
       "focusBody": "모든 거점 마을은 찾아오는 채집자를 위해 마을 집중 게시판을 갖추고 있다. 마을에 선 채 미니맵 옆에서 이를 열고, 관심 있는 부위 종류에 약간의 집중 포인트를 겨누라. 집중한 부위는 이후의 모든 시체에서 한 등급 더 좋게, 조금 더 넉넉하게 나온다. 배분은 캐릭터가 어디를 떠돌든 따라다니며, 이후 마을에 들를 때마다 무료로 다시 짤 수 있다.",
       "craftHowTitle": "제작 창",
@@ -5722,6 +5740,7 @@ export const ko_KR: EnTranslations = {
     },
     "augment": {
       "choose": "증강 선택",
+      "cardAria": "{name} ({category}): {description}",
       "aug_brutality": {
         "name": "잔혹함",
         "desc": "당신의 물리 공격이 15% 더 강하게 적중합니다."
@@ -6350,6 +6369,8 @@ export const ko_KR: EnTranslations = {
       "floatingDodge": "회피",
       "floatingParry": "무기 막기",
       "floatingResist": "저항",
+      "floatingHealFull": "가득 참",
+      "floatingHealAbsorbed": "흡수됨",
       "cannotMove": "이동 불가!",
       "attack": "공격",
       "damageDone": "{ability}이 {target}에게 {amount}의 피해를 입혔습니다.",
@@ -6364,6 +6385,10 @@ export const ko_KR: EnTranslations = {
       "healSelfCrit": "{ability}이 자신을 치명타 치유로 {amount}만큼 회복했습니다.",
       "healOther": "{ability}이 {target}을 {amount}만큼 치유했습니다.",
       "healOtherCrit": "{ability}이 {target}을 치명타 치유로 {amount}만큼 회복했습니다.",
+      "healSelfFull": "{ability}이 적중했지만 이미 생명력이 가득합니다.",
+      "healOtherFull": "{ability}이 {target}에게 적중했지만 대상은 이미 생명력이 가득합니다.",
+      "healSelfAbsorbed": "당신의 {ability}이(가) 당신에게 걸린 부패에 삼켜졌습니다.",
+      "healOtherAbsorbed": "당신의 {ability}이(가) {target}에게 걸린 부패에 삼켜졌습니다.",
       "death": "{name} 사망.",
       "auraGain": "{name} 효과를 얻었습니다.",
       "auraFade": "{name} 효과가 사라졌습니다.",
@@ -6723,22 +6748,22 @@ export const ko_KR: EnTranslations = {
       "gathering": "채집",
       "demonHeal": "악마 치유",
       "thunzharrStormcall": "폭풍의 부름",
-      "rift_frost_execution": "Glacial Grave",
-      "rift_frost_strike": "Absolute Zero",
-      "rift_ember_execution": "Magma Well",
-      "rift_ember_strike": "Core Meltdown",
-      "rift_venom_execution": "Venom Pool",
-      "rift_venom_strike": "Broodmother's Mark",
-      "rift_necro_execution": "Soul Grave",
-      "rift_necro_strike": "Death Sentence",
-      "rift_brute_execution": "Earthshatter",
-      "rift_brute_strike": "Final Judgment",
-      "rift_arcane_execution": "Void Rift",
-      "rift_arcane_strike": "Arcane Annihilation",
-      "rift_storm_execution": "Lightning Rod",
-      "rift_storm_strike": "Stormcaller's Wrath",
-      "rift_tide_execution": "Abyssal Maw",
-      "rift_tide_strike": "Crushing Depth"
+      "rift_frost_execution": "빙하의 무덤",
+      "rift_frost_strike": "절대 영도",
+      "rift_ember_execution": "마그마 우물",
+      "rift_ember_strike": "핵심 용해",
+      "rift_venom_execution": "독액 웅덩이",
+      "rift_venom_strike": "여왕 거미의 낙인",
+      "rift_necro_execution": "영혼의 무덤",
+      "rift_necro_strike": "사망 선고",
+      "rift_brute_execution": "대지 분쇄",
+      "rift_brute_strike": "최후의 심판",
+      "rift_arcane_execution": "공허 균열",
+      "rift_arcane_strike": "비전 소멸",
+      "rift_storm_execution": "피뢰침",
+      "rift_storm_strike": "폭풍 소환사의 분노",
+      "rift_tide_execution": "심연의 아가리",
+      "rift_tide_strike": "분쇄의 심연"
     }
   },
   "questUi": {

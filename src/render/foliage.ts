@@ -58,11 +58,11 @@ import {
   parterreFlowerTintAt,
 } from './garden_parterre_core';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
-import { applySurfaceDetail, foliageWornFamilyFor } from './worn_stone';
 import { type InstancedGhostHandle, InstancedOccluderGhosts } from './instanced_occluder_ghosts';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 import { type FlowerKind, flowerTuftTexture, grassTuftTexture } from './textures';
+import { applySurfaceDetail, foliageWornFamilyFor } from './worn_stone';
 
 // Vegetation: trees, rocks, ground dressing and the grass ring.
 //

@@ -56,7 +56,6 @@ import {
   placeMarshTombs,
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
-import { applySurfaceDetail } from './worn_stone';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
 import { EMISSIVE_LIGHT, GFX, sharedUniforms } from './gfx';
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
@@ -65,6 +64,7 @@ import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
 import { radialGlowTexture } from './textures';
 import { buildWildheartFieldInterior } from './wildheart_props';
+import { applySurfaceDetail } from './worn_stone';
 
 const FLAME_EMISSIVE_HIGH = EMISSIVE_LIGHT;
 // dungeon torch point lights: pumped + hung low so warm pools break up the

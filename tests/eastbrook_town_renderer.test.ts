@@ -273,7 +273,7 @@ describe('Eastbrook town renderer', () => {
       bankMaterials.every(
         (material, i) =>
           material.transparent &&
-          !material.depthWrite &&
+          material.depthWrite &&
           material.opacity < authored[i].opacity &&
           material.opacity > authored[i].opacity * 0.2,
       ),

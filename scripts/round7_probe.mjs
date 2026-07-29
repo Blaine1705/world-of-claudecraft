@@ -27,7 +27,7 @@ const out = await page.evaluate(
   (px, pz, radius) => {
     const g = window.__game;
     const seen = new Map();
-    const v = new (g.renderer.camera.position.constructor)();
+    const v = new g.renderer.camera.position.constructor();
     g.renderer.scene.traverse((o) => {
       if (!o.isMesh) return;
       o.getWorldPosition(v);
@@ -51,7 +51,8 @@ const out = await page.evaluate(
           surfaceDetail: m.userData?.surfaceDetail ?? null,
           eastbrookSemantic: m.userData?.eastbrookSurfaceSemantic ?? null,
           hasMap: Boolean(m.map),
-          hasHook: typeof m.onBeforeCompile === 'function' && m.onBeforeCompile.name !== 'onBeforeCompile',
+          hasHook:
+            typeof m.onBeforeCompile === 'function' && m.onBeforeCompile.name !== 'onBeforeCompile',
           cacheKey: cacheKey ? cacheKey.slice(0, 90) : '(default)',
         });
       }

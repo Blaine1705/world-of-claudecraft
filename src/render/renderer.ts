@@ -147,9 +147,9 @@ import { resolveEnvironmentPrefilterPlan } from './env_prefilter_core';
 import {
   createEnvironmentMapTransition,
   dampedValue,
+  type EnvironmentMapTransition,
   easedFogFar,
   easedFogNear,
-  type EnvironmentMapTransition,
   stepEnvironmentMapTransition,
   transitionAlpha,
   ZONE_ENVIRONMENT_RESPONSE,
@@ -1427,8 +1427,10 @@ export class Renderer {
   private pmremGenerator: THREE.PMREMGenerator | null = null;
   private envBiome: SkyKey = 'vale';
   private envOutdoorIntensity = ENV_INTENSITY;
-  private envTransition: EnvironmentMapTransition<SkyKey> =
-    createEnvironmentMapTransition('vale', 0);
+  private envTransition: EnvironmentMapTransition<SkyKey> = createEnvironmentMapTransition(
+    'vale',
+    0,
+  );
   private preparedZones = new Set<string>();
   private pendingZonePrepares = new Map<string, Promise<void>>();
   // A walked boundary can ask for the same shader warmup in the frame where
@@ -6699,12 +6701,7 @@ export class Renderer {
       // its HDRI) finished: 198 s of 45-yard wall after a Drakelands portal.
       // Read live rather than cached: an editor rebuildTerrain swaps the view.
       const ground = this.terrainView.groundResidency();
-      const atmosphericFar = dampedValue(
-        fog.far,
-        requestedFar,
-        dt,
-        ZONE_ENVIRONMENT_RESPONSE,
-      );
+      const atmosphericFar = dampedValue(fog.far, requestedFar, dt, ZONE_ENVIRONMENT_RESPONSE);
       const residencyFar = fogFarForBuiltGround(
         ground.grid,
         ground.isPending,
@@ -6787,18 +6784,12 @@ export class Renderer {
         ? (Renderer.BIOME_LIGHT[dominant as BiomeId].envScale ?? 1)
         : 1;
     const target = this.envRTs.has(dominant) ? dominant : this.envTransition.current;
-    const settledIntensity =
-      this.envOutdoorIntensity * this.dnGrade.lightScale * envScale;
+    const settledIntensity = this.envOutdoorIntensity * this.dnGrade.lightScale * envScale;
     // Interior presets write the scene intensity directly. Re-seed from that
     // live value on the first outdoor frame so returning outside never jumps
     // back to a stale transition scalar.
     this.envTransition.intensity = this.scene.environmentIntensity;
-    const swapTo = stepEnvironmentMapTransition(
-      this.envTransition,
-      target,
-      settledIntensity,
-      dt,
-    );
+    const swapTo = stepEnvironmentMapTransition(this.envTransition, target, settledIntensity, dt);
     if (swapTo !== null) {
       this.envBiome = swapTo;
       this.scene.environment = this.envRTs.get(swapTo)?.texture ?? null;

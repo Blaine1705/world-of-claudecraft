@@ -900,7 +900,18 @@ export const zh_TW: EnTranslations = {
       "perSecondRow": "{total}（{rate}）",
       "minutesSeconds": "{m}分{s}秒",
       "seconds": "{s}秒",
-      "autoShowHint": "一旦你的小隊造成傷害或治療，行數就會自動出現，此區段會在戰鬥結束幾秒後關閉。"
+      "autoShowHint": "一旦你的小隊造成傷害或治療，行數就會自動出現，此區段會在戰鬥結束幾秒後關閉。",
+      "breakdownSummary": "{tab}：{value}",
+      "breakdownRow": "{value}（{percent}）",
+      "breakdownOther": "其他（{count}）",
+      "percent": "{value}%",
+      "petAbility": "{pet}：{ability}",
+      "melee": "近戰",
+      "move": "拖曳以移動此統計面板",
+      "resize": "拖曳以調整此統計面板大小",
+      "dock": "將此統計停靠回統計視窗",
+      "separate": "分離{meter}",
+      "regroup": "合併{meter}"
     },
     "petFeed": {
       "disabledFullHp": "寵物生命值已滿",
@@ -964,13 +975,13 @@ export const zh_TW: EnTranslations = {
     "mountRace": {
       "startButton": "開始比賽",
       "cancelButton": "取消比賽",
-      "go": "GO!",
+      "go": "出發！",
       "start": "出發！跳過每一道障礙，再騎回拱門衝線。",
       "toFinish": "騎回拱門衝線！",
       "finished": "完成！用時 {seconds} 秒！",
       "timeout": "比賽失敗",
       "progress": "障礙 {n} / {total}",
-      "timeLeft": "{seconds}s"
+      "timeLeft": "{seconds}秒"
     },
     "vcup": {
       "title": "溪谷盃",
@@ -1502,6 +1513,10 @@ export const zh_TW: EnTranslations = {
       "twoFactorRecoveryTitle": "儲存你的復原碼",
       "twoFactorRecoveryHint": "每組代碼僅能使用一次。請將它們存放在安全的地方：如果你遺失了驗證器應用程式，這是唯一能重新登入的方式。",
       "twoFactorDownloadCodes": "下載代碼",
+      "recoveryCodesFileHeader": "{brand} 復原碼",
+      "recoveryCodesFileAccount": "帳號：{username}",
+      "recoveryCodesFileHint": "如果你無法存取驗證器應用程式，每組代碼僅能使用一次。",
+      "recoveryCodesFileWarn": "請將此檔案存放在安全且私密的地方。",
       "twoFactorDone": "完成",
       "twoFactorDisableHint": "請輸入密碼以關閉雙重驗證。你的復原碼將會作廢。",
       "twoFactorDisableBtn": "關閉雙重驗證",
@@ -1543,10 +1558,12 @@ export const zh_TW: EnTranslations = {
       "title": "採集",
       "harvestButton": "採集",
       "harvestTooltip": "採集勾選的部位。每具屍體只能被採集一次，先到先得。不會拾取戰利品。",
-      "concentrateHint": "選擇的部位越少，每個部位的品質越高。",
+      "yieldTierHint": "一次採集實際取得的部位越少，每個部位的品階就越高。",
       "nothingSelectedYields": "你選擇的部位都無法從這具屍體上採集。",
       "alreadyHarvested": "這具屍體已經被採集過了。",
       "componentAria": "採集{component}",
+      "componentNoYield": "尚無產出",
+      "componentAriaNoYield": "採集{component}：{note}",
       "components": {
         "hide": "獸皮",
         "fang": "尖牙",
@@ -2561,6 +2578,7 @@ export const zh_TW: EnTranslations = {
       "noEnchants": "沒有附魔會用到此材料。",
       "noTargets": "沒有可附魔的合適物品。",
       "wornTag": "已裝備（{slot}）",
+      "wornTagIndexed": "已裝備（{slot}{index}）",
       "tier": {
         "base": "基礎附魔",
         "runed": "符文附魔",
@@ -2796,7 +2814,7 @@ export const zh_TW: EnTranslations = {
       "title": "世界地圖",
       "summary": "世界地圖。選擇一個地區以開啟其地圖。",
       "toWorld": "世界地圖",
-      "toZone": "Zone map",
+      "toZone": "地區地圖",
       "toggleAria": "在世界地圖與地區地圖之間切換",
       "levels": "等級 {min} 至 {max}"
     }
@@ -3897,7 +3915,7 @@ export const zh_TW: EnTranslations = {
     "professions": {
       "intro": "除了戰鬥與任務之外，這個世界還會獎勵你耕耘土地與鍛造：採集原材料，透過十種製作行業將其打造成裝備與物品，並在這些行業所代表的十種命途之一中確立自己的身分。",
       "harvestTitle": "從狩獵本身採收",
-      "harvestBody": "採集並不止於節點。有些被擊倒的野獸可以採收出部件：獸皮、獠牙、絲線，以及更稀奇的東西，直接從屍體上取得，與它的普通戰利品並存。每次擊殺只容一位採收者：誰先動手，就全歸誰所有。每一次也都由你選擇：把屍體能給的一切盡數剝下，或專注於單一部件，換取更精細的品級。任何角色都能採收，無需入行也無需訓練，而一件特別精良的部件甚至會冠上採收者的名字。",
+      "harvestBodyChoice": "採集並不止於節點。許多被擊倒的野獸都可以各被採收一次，先到先得，取得獸皮、尖牙、絲線與獸肉，直接從屍體上與它的普通戰利品一併取得；按下同一個鍵，兩者一同開啟。當一頭野獸身上帶有不只一種可用部件時，選擇便由你決定：把它能給的一切盡數取走，或專注於較少的部件，換取你確實取得之物明顯更精細的品級。\n\n在會產出標本的野獸族類身上擲出精良或更高的採收品質，除了普通產出之外，還會額外給予一件署名的完美標本（完美的獸皮、完美的蜘蛛絲、完美的毒液腺或上等肉塊），並在你的功績之書中記下「完美標本」。任何角色都能採收，無需訓練，而你持有的任何採集工具都會計入最上等產出的判定，無論它屬於哪一門行業。",
       "focusTitle": "城鎮專注",
       "focusBody": "每座主據點城鎮都為到訪的採收者備有一面城鎮專注面板：站在鎮上，從小地圖旁打開它，把一小筆專注點數投向你在意的部件類型。此後每具屍體上的專注部件都會精細一個品級、也略微豐厚一些；你的分配會跟著角色走遍天涯，而且日後任何一次回到鎮上，都能免費重新調整。",
       "craftHowTitle": "製作視窗",
@@ -5722,6 +5740,7 @@ export const zh_TW: EnTranslations = {
     },
     "augment": {
       "choose": "選擇一項強化",
+      "cardAria": "{name}（{category}）：{description}",
       "aug_brutality": {
         "name": "殘暴",
         "desc": "你的物理打擊造成的傷害提高15%。"
@@ -6350,6 +6369,8 @@ export const zh_TW: EnTranslations = {
       "floatingDodge": "閃避",
       "floatingParry": "招架",
       "floatingResist": "抵抗",
+      "floatingHealFull": "已滿",
+      "floatingHealAbsorbed": "被吸收",
       "cannotMove": "無法移動！",
       "attack": "攻擊",
       "damageDone": "你的{ability}擊中{target}，造成 {amount} 點傷害。",
@@ -6364,6 +6385,10 @@ export const zh_TW: EnTranslations = {
       "healSelfCrit": "你的{ability}對你造成暴擊治療，恢復 {amount} 點生命。",
       "healOther": "你的{ability}為{target}恢復 {amount} 點生命。",
       "healOtherCrit": "你的{ability}對{target}造成暴擊治療，恢復 {amount} 點生命。",
+      "healSelfFull": "你的{ability}生效了，但你的生命值已滿。",
+      "healOtherFull": "你的{ability}在{target}身上生效了，但目標的生命值已滿。",
+      "healSelfAbsorbed": "你的{ability}被你身上的枯萎吞噬了。",
+      "healOtherAbsorbed": "你的{ability}被{target}身上的枯萎吞噬了。",
       "death": "{name}死亡。",
       "auraGain": "你獲得了 {name}。",
       "auraFade": "{name}從你身上消失。",
@@ -6723,22 +6748,22 @@ export const zh_TW: EnTranslations = {
       "gathering": "採集",
       "demonHeal": "惡魔治療",
       "thunzharrStormcall": "風暴召喚",
-      "rift_frost_execution": "Glacial Grave",
-      "rift_frost_strike": "Absolute Zero",
-      "rift_ember_execution": "Magma Well",
-      "rift_ember_strike": "Core Meltdown",
-      "rift_venom_execution": "Venom Pool",
-      "rift_venom_strike": "Broodmother's Mark",
-      "rift_necro_execution": "Soul Grave",
-      "rift_necro_strike": "Death Sentence",
-      "rift_brute_execution": "Earthshatter",
-      "rift_brute_strike": "Final Judgment",
-      "rift_arcane_execution": "Void Rift",
-      "rift_arcane_strike": "Arcane Annihilation",
-      "rift_storm_execution": "Lightning Rod",
-      "rift_storm_strike": "Stormcaller's Wrath",
-      "rift_tide_execution": "Abyssal Maw",
-      "rift_tide_strike": "Crushing Depth"
+      "rift_frost_execution": "冰川之墓",
+      "rift_frost_strike": "絕對零度",
+      "rift_ember_execution": "岩漿泉",
+      "rift_ember_strike": "核心熔毀",
+      "rift_venom_execution": "毒液池",
+      "rift_venom_strike": "蜘蛛母后之印",
+      "rift_necro_execution": "靈魂之墓",
+      "rift_necro_strike": "死亡判決",
+      "rift_brute_execution": "碎地之力",
+      "rift_brute_strike": "終極審判",
+      "rift_arcane_execution": "虛空裂隙",
+      "rift_arcane_strike": "奧術湮滅",
+      "rift_storm_execution": "避雷針",
+      "rift_storm_strike": "風暴召喚者之怒",
+      "rift_tide_execution": "深淵之口",
+      "rift_tide_strike": "粉碎深淵"
     }
   },
   "questUi": {

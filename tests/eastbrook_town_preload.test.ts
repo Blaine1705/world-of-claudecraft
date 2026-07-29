@@ -48,10 +48,27 @@ describe('Eastbrook town preload', () => {
       expect(new Set(newUrls).size).toBe(9);
       expect(allUrls).toHaveLength(11);
       expect(mocks.loadGltf.mock.calls.map(([url]) => url)).toEqual(allUrls);
-      expect(mocks.loadTexture).toHaveBeenCalledWith('/textures/eastbrook_surface_atlas.webp');
-      // GLBs + the color atlas + the baked normal/roughness atlases
-      expect(mocks.registerPreload).toHaveBeenCalledTimes(allUrls.length + 3);
-      await Promise.all(mocks.registerPreload.mock.calls.map(([registered]) => registered));
+      const eastbrookTextureUrls = [
+        '/textures/eastbrook_surface_atlas.webp',
+        '/textures/eastbrook_surface_normal.webp',
+        '/textures/eastbrook_surface_rough.webp',
+      ];
+      const registrationOrders = new Set(mocks.registerPreload.mock.invocationCallOrder);
+      for (const order of mocks.loadGltf.mock.invocationCallOrder) {
+        expect(registrationOrders).toContain(order + 1);
+      }
+      const eastbrookTextureLoads = mocks.loadTexture.mock.calls
+        .map(([url], index) => ({
+          url,
+          order: mocks.loadTexture.mock.invocationCallOrder[index],
+        }))
+        .filter(({ url }) => eastbrookTextureUrls.includes(url));
+      expect(eastbrookTextureLoads.map(({ url }) => url)).toEqual(eastbrookTextureUrls);
+      for (const { order } of eastbrookTextureLoads) {
+        expect(registrationOrders).toContain(order + 1);
+      }
+      const registered = mocks.registerPreload.mock.calls.map(([promise]) => promise);
+      await Promise.all(registered);
 
       const data = await import('../src/sim/data');
       data.setActiveWorldContent({ ...data.BUILTIN_WORLD, zones: [] });

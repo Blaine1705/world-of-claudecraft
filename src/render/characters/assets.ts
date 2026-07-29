@@ -964,8 +964,7 @@ export function tintedMaterial(
     // animate; a world projection swims). Class-body/skin atlases and 'Glow'
     // materials never match (riggedWornFamilyFor's allowlist has no fallback).
     const worn = riggedWornFamilyFor(mat.name);
-    if (worn)
-      applySurfaceDetail(mat, worn.family, { strength: worn.strength, objectSpace: true });
+    if (worn) applySurfaceDetail(mat, worn.family, { strength: worn.strength, objectSpace: true });
   } else {
     if ((src as THREE.MeshBasicMaterial).isMeshBasicMaterial) {
       mat = (src as THREE.MeshBasicMaterial).clone();

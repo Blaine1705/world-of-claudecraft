@@ -31,11 +31,22 @@ describe('Eastbrook surface atlas preload', () => {
     mocks.loadTexture.mockResolvedValue(atlas);
 
     const module = await import('../src/render/eastbrook_surface_atlas');
-    // color atlas + baked normal atlas + baked roughness atlas
-    expect(mocks.loadTexture).toHaveBeenCalledTimes(3);
-    expect(mocks.loadTexture).toHaveBeenCalledWith(module.EASTBROOK_SURFACE_ATLAS_URL);
-    expect(mocks.registerPreload).toHaveBeenCalledTimes(3);
-    await mocks.registerPreload.mock.calls[0][0];
+    const eastbrookUrls = [
+      module.EASTBROOK_SURFACE_ATLAS_URL,
+      module.EASTBROOK_SURFACE_NORMAL_URL,
+      module.EASTBROOK_SURFACE_ROUGH_URL,
+    ];
+    const eastbrookLoads = mocks.loadTexture.mock.calls
+      .map(([url], index) => ({
+        url,
+        order: mocks.loadTexture.mock.invocationCallOrder[index],
+      }))
+      .filter(({ url }) => eastbrookUrls.includes(url));
+    expect(eastbrookLoads.map(({ url }) => url)).toEqual(eastbrookUrls);
+    const registrationOrders = new Set(mocks.registerPreload.mock.invocationCallOrder);
+    for (const { order } of eastbrookLoads) expect(registrationOrders).toContain(order + 1);
+    const registered = mocks.registerPreload.mock.calls.map(([promise]) => promise);
+    await Promise.all(registered);
     expect(module.eastbrookSurfaceAtlasTexture()).toBe(atlas);
     expect(atlas.colorSpace).toBe(THREE.NoColorSpace);
     expect(atlas.name).toBe('');

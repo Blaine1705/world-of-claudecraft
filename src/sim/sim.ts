@@ -107,7 +107,7 @@ import { ensureWarriorStance } from './combat/warrior_stances';
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
 import { MAILBOXES } from './content/mailboxes';
-import { DEFAULT_MOUNT, type MountKey, normalizeSelectedMount } from './content/mounts';
+import { DEFAULT_MOUNT, type MountKey } from './content/mounts';
 import type { GatheringProfessionId } from './content/professions';
 import { PTR_DEV_VENDOR_DEF } from './content/ptr_dev_vendor';
 import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
@@ -247,6 +247,7 @@ import type { Ante, PickAction } from './lockpick';
 // Sim keeps thin same-named delegates that call these.
 import {
   activeLootRolls as activeLootRollsImpl,
+  activeMasterLootRolls as activeMasterLootRollsImpl,
   assignMasterLoot as assignMasterLootImpl,
   lootRollGroupStatus as lootRollGroupStatusImpl,
   type PendingLootRoll,
@@ -599,6 +600,7 @@ import {
   type LootRollPrompt,
   type LootStrategies,
   MAX_LEVEL,
+  type MasterLootPrompt,
   type MasterLootThreshold,
   MELEE_RANGE,
   type MobFamily,
@@ -692,7 +694,8 @@ const DEFAULT_RAID_LOCKOUT_MS = 24 * 60 * 60 * 1000;
 // party-interact + vision delays) moved to encounters/nythraxis.ts (N1), the only
 // code that reads them. NYTHRAXIS_BOSS_ID / NYTHRAXIS_ADD_ID stay in types.ts.
 // PARTY_MAX / RAID_MIN / RAID_MAX / RAID_GROUP_MAX moved to social/party.ts (A1),
-// the only code that reads them.
+// the only code that reads them, except RAID_MAX, which server/game.ts now imports
+// as the upper length bound on the masterAssign wire case (#2524).
 // RAID_ALLOWED_DUNGEON_IDS / RAID_REQUIRED_DUNGEON_IDS moved to instances/dungeons.ts
 // (I1: read only by enterDungeon's raid gate).
 // DAMAGE_IDLE_DESPAWN_SECONDS / DAMAGE_IDLE_DESPAWN_MOB_IDS moved to entity_roster.ts
@@ -2210,6 +2213,8 @@ export class Sim {
       this.addEntity(board);
     }
 
+    if (cfg.noPlayer && this.devCommands) this.spawnHealerPracticeDummy();
+
     if (!cfg.noPlayer) {
       this.addPlayer(this.cfg.playerClass, this.cfg.playerName, { autoEquip: this.cfg.autoEquip });
     }
@@ -2218,6 +2223,18 @@ export class Sim {
     // no rng and only consume trailing entity ids, so every id and rng draw
     // above stays byte-identical to a world without escorts.
     initEscortsImpl(this.ctx);
+  }
+
+  private spawnHealerPracticeDummy(): void {
+    const pos = this.groundPos(-34, 648);
+    const dummy = createMob(this.nextId++, MOBS.training_dummy, 20, pos);
+    dummy.name = 'Healing Dummy';
+    dummy.color = 0x74c476;
+    dummy.hostile = false;
+    dummy.friendlyPracticeTarget = true;
+    dummy.facing = 0;
+    dummy.prevFacing = 0;
+    this.addEntity(dummy);
   }
 
   private lockoutNowMs(): number {
@@ -4698,6 +4715,9 @@ export class Sim {
       markVisited: (meta, markId) => deedsMod.markVisited(sim.ctx, meta, markId),
       markDeedsDirty: (pid) => deedsMod.markDeedsDirty(sim.ctx, pid),
       grantDeed: (meta, deedId, opts) => deedsMod.grantDeed(sim.ctx, meta, deedId, opts),
+      // Vale Cup <-> Arena queue exclusion (owned by social/vale_cup.ts).
+      // Late-bound arrow so sim.ctx resolves at call time (the Q1 pattern).
+      vcupSeatedOrQueued: (pid) => valeCupMod.vcupSeatedOrQueued(sim.ctx, pid),
       // The Vale Cup sport-move arms (owned by social/vale_cup.ts). Late-bound
       // arrows so sim.ctx resolves at call time (the Q1 pattern).
       vcupBallKick: (caster, power, loft, range) =>
@@ -6414,6 +6434,10 @@ export class Sim {
 
   lootRollGroupStatus(pid = this.playerId): LootRollGroupStatus[] {
     return lootRollGroupStatusImpl(this.ctx, pid);
+  }
+
+  activeMasterLootRolls(pid = this.playerId): MasterLootPrompt[] {
+    return activeMasterLootRollsImpl(this.ctx, pid);
   }
 
   submitLootRoll(rollId: number, choice: LootRollChoice, pid?: number): void {
@@ -8327,6 +8351,9 @@ export class Sim {
     // A Protect Yumi cat is heal/shield-targetable only by its own team.
     if (target.kind === 'mob' && yumiMod.isYumiCat(target))
       return yumiMod.yumiCatFriendlyTo(this.ctx, caster, target);
+    // The dev-gated healer practice dummy is friendly to everyone (no controller
+    // check: it exists so a solo healer has something to heal).
+    if (target.kind === 'mob' && target.friendlyPracticeTarget) return true;
     // An escortee with a live run is heal/shield-targetable by any player or
     // player-owned pet (pvpController resolves a pet to its owner; escort.ts
     // owns the predicate). Players can never attack it because isHostileTo

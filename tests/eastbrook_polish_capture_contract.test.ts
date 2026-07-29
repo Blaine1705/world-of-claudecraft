@@ -359,12 +359,10 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Repinned on the graphics-overhaul x chunk-streaming merge: BOTH
-      // hashed inputs moved — eastbrook_town.ts (conservative triplanar layer
-      // in townMaterial) and renderer.ts (streaming/zone-cull coordinator).
-      // Composite recomputed on the merged tree; accepted evidence unchanged
-      // (every Eastbrook line is byte-identical across the renderer delta).
-      fingerprint: 'c95ee00aa621cc33062463592ad740e1b2af0d4379081c5196c339535d2de576',
+      // Repinned after merging release/v0.32.0 into the graphics overhaul.
+      // The composite was recomputed from the merged provenance inputs; the
+      // accepted Eastbrook evidence and its baseline revision are unchanged.
+      fingerprint: 'd21dd47ff9ae4a3d16ca42323a542ea459d4ae7a7f5036bd68190a476d97a006',
       components: {
         captureContract: {
           id: 'polish-v2',

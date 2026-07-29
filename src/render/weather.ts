@@ -1,9 +1,6 @@
 import * as THREE from 'three';
 import type { BiomeId } from '../sim/types';
-import {
-  transitionAlpha,
-  WEATHER_ENVIRONMENT_RESPONSE,
-} from './environment_transition_core';
+import { transitionAlpha, WEATHER_ENVIRONMENT_RESPONSE } from './environment_transition_core';
 
 // Ambient precipitation. One pooled THREE.Points cloud rides inside a box that
 // follows the camera (the same "ride along" trick the sky dome uses), so a

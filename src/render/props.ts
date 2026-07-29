@@ -34,9 +34,9 @@ import {
   isEastbrookRebuildWell,
 } from './eastbrook_town';
 import { EMISSIVE_LIGHT, GFX, sharedUniforms, surfaceMat } from './gfx';
-import { applySurfaceDetail, reapplySurfaceDetailToClone, wornFamilyFor } from './worn_stone';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
+import { applySurfaceDetail, reapplySurfaceDetailToClone, wornFamilyFor } from './worn_stone';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -569,9 +569,7 @@ function convertMaterial(
       // supplies the real per-texel metalness on top.
       metalness:
         ov?.metalness ??
-        (s.isMeshStandardMaterial && METAL_MAT_NAME.test(s.name)
-          ? Math.min(s.metalness, 0.85)
-          : 0),
+        (s.isMeshStandardMaterial && METAL_MAT_NAME.test(s.name) ? Math.min(s.metalness, 0.85) : 0),
       emissive: new THREE.Color(hollowEmissive ? 0xffffff : (ov?.emissive ?? 0x000000)),
       emissiveMap: hollowEmissive ? map : null,
       emissiveIntensity: hollowEmissive ? 0.3 : (ov?.emissiveIntensity ?? 1),

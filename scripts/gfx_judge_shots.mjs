@@ -71,14 +71,41 @@ const SHOTS = [
 
   // --- ultra: emissive close-ups (staged off spawn / live fire lights) -----
   { name: 'ultra_town_windows', tier: 'ultra', at: 'fire', dist: 5, pitch: 0.05 },
-  { name: 'ultra_town_square', tier: 'ultra', at: 'spawn', x: 0, z: 10, yaw: 3.1416, pitch: -0.18, dist: 14 },
+  {
+    name: 'ultra_town_square',
+    tier: 'ultra',
+    at: 'spawn',
+    x: 0,
+    z: 10,
+    yaw: 3.1416,
+    pitch: -0.18,
+    dist: 14,
+  },
   { name: 'ultra_town_wide', tier: 'ultra', at: 'fire', dist: 11, pitch: -0.15, back: 6 },
 
   // --- ultra: grass close work, including the two top-down player angles ---
   { name: 'ultra_grass_top', tier: 'ultra', x: 22, z: 44, yaw: 0.9, pitch: 1.0, dist: 4 },
-  { name: 'ultra_grass_top_b', tier: 'ultra', x: 22, z: 44, yaw: 0.9, pitch: 1.0, dist: 4, reuse: true },
+  {
+    name: 'ultra_grass_top_b',
+    tier: 'ultra',
+    x: 22,
+    z: 44,
+    yaw: 0.9,
+    pitch: 1.0,
+    dist: 4,
+    reuse: true,
+  },
   { name: 'ultra_grass_low', tier: 'ultra', x: 22, z: 44, yaw: 0.9, pitch: 0.1, dist: 5 },
-  { name: 'ultra_ground_road', tier: 'ultra', at: 'spawn', x: 16, z: 1.6, yaw: 1.446, pitch: 0.22, dist: 5 },
+  {
+    name: 'ultra_ground_road',
+    tier: 'ultra',
+    at: 'spawn',
+    x: 16,
+    z: 1.6,
+    yaw: 1.446,
+    pitch: 0.22,
+    dist: 5,
+  },
   { name: 'ultra_ground_rock', tier: 'ultra', x: 30, z: 700, yaw: 0.5, pitch: 0.3, dist: 6 },
 
   // --- high: SMAA + bloom path ---------------------------------------------
@@ -190,9 +217,7 @@ for (const tier of TIERS) {
     await page.waitForFunction(() => Boolean(window.__game?.sim?.player), { timeout: 120000 });
   };
   const ensureGame = async () => {
-    const alive = await page
-      .evaluate(() => Boolean(window.__game?.sim?.player))
-      .catch(() => false);
+    const alive = await page.evaluate(() => Boolean(window.__game?.sim?.player)).catch(() => false);
     if (alive) return false;
     reloads++;
     await enter();

@@ -41,12 +41,7 @@ export function transitionAlpha(dt: number, response: number): number {
   return 1 - Math.exp(-dt * response);
 }
 
-export function dampedValue(
-  current: number,
-  target: number,
-  dt: number,
-  response: number,
-): number {
+export function dampedValue(current: number, target: number, dt: number, response: number): number {
   return current + (target - current) * transitionAlpha(dt, response);
 }
 
@@ -59,10 +54,7 @@ export function easedFogFar(
 ): number {
   return Math.max(
     0,
-    Math.min(
-      dampedValue(current, atmosphericTarget, dt, ZONE_ENVIRONMENT_RESPONSE),
-      residencyFar,
-    ),
+    Math.min(dampedValue(current, atmosphericTarget, dt, ZONE_ENVIRONMENT_RESPONSE), residencyFar),
   );
 }
 
@@ -177,23 +169,13 @@ export function stepEnvironmentMapTransition<K extends string>(
   const full = Math.max(0, settledIntensity);
   if (target === state.current) {
     state.pending = null;
-    state.intensity = dampedValue(
-      state.intensity,
-      full,
-      dt,
-      ENVIRONMENT_MAP_RECOVER_RESPONSE,
-    );
+    state.intensity = dampedValue(state.intensity, full, dt, ENVIRONMENT_MAP_RECOVER_RESPONSE);
     return null;
   }
 
   state.pending = target;
   const floor = full * ENVIRONMENT_MAP_FADE_FLOOR;
-  state.intensity = dampedValue(
-    state.intensity,
-    floor,
-    dt,
-    ENVIRONMENT_MAP_FADE_RESPONSE,
-  );
+  state.intensity = dampedValue(state.intensity, floor, dt, ENVIRONMENT_MAP_FADE_RESPONSE);
   const swapAt = Math.max(0.001, full * ENVIRONMENT_MAP_SWAP_THRESHOLD);
   if (state.intensity > swapAt) return null;
 

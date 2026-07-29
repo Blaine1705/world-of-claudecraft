@@ -13,11 +13,7 @@ import {
 
 type Realm = 'vale' | 'marsh' | 'peaks';
 
-function stepFor(
-  seconds: number,
-  fps: number,
-  step: (dt: number) => void,
-): void {
+function stepFor(seconds: number, fps: number, step: (dt: number) => void): void {
   const frames = Math.round(seconds * fps);
   for (let i = 0; i < frames; i++) step(1 / fps);
 }
