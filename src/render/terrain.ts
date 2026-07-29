@@ -550,7 +550,7 @@ function buildSplatMaterial(
         // out past the distance where mips flatten the fine one, and grass
         // (whose own AO sheet is near-uniform) takes it at full weight so
         // meadows undulate instead of rendering as one green wash
-        float relief = cavH * 5.0 + wocGroundMacroRelief(tuv) * (0.5 + vSplatR.x * 0.5) * 4.2;
+        float relief = cavH * 3.8 + wocGroundMacroRelief(tuv) * (0.5 + vSplatR.x * 0.5) * 4.2;
         // turf lip: where grass feathers into bare soil (roads, patches),
         // shade the transition band so paths sit INTO the meadow as worn
         // hollows instead of lying on it as paint. Broken up by the fine AO
@@ -591,7 +591,7 @@ function buildSplatMaterial(
         // high-frequency rock tap into the dry dirt (no new sampler, the
         // material sits at 15 of 16). The weight fades with the marsh mud
         // swap so wet mud keeps its smooth sheen.
-        float gravelW = 0.4 * (1.0 - vExtra.x);
+        float gravelW = 0.16 * (1.0 - vExtra.x);
         dirtFlat = mix(dirtFlat, texture2D(uRock, tuv * 2.8).rgb, gravelW);
         vec3 dirtWall = mix(
           texture2D(uDirt, vWPos.xy * 0.176).rgb,
@@ -613,7 +613,7 @@ function buildSplatMaterial(
         // two wall planes can never share stripe alignment even where they
         // meet at a corner. The octave ratio wanders with the hill-scale
         // macro noise so plate zones read as geology, not wallpaper.
-        float plateMix = 0.4 + (macro2 - 0.5) * 0.5;
+        float plateMix = 0.58 + (macro2 - 0.5) * 0.55;
         vec3 rockWall = mix(
           mix(texture2D(uRock, vWPos.xy * 0.132).rgb,
               texture2D(uRock, vWPos.xy * 0.043).rgb, plateMix),
@@ -635,7 +635,7 @@ function buildSplatMaterial(
           texture2D(uGroundAO, vWPos.yz * 0.043).b,
           axisW) - 0.623;
         groundShade *= mix(
-          1.0, clamp(1.0 + wallCav * 4.5, 0.45, 1.22),
+          1.0, clamp(1.0 + wallCav * 2.6, 0.58, 1.18),
           vSplatR.z * wallW * (1.0 - vExtra.y));
         vec3 alb = grassAlb * vSplatR.x
                  + dirtAlb * vSplatR.y
@@ -711,7 +711,7 @@ function buildSplatMaterial(
         // wet mud lumps smoothly where dry dirt crumbles
         float dirtDetail = 1.0 - vExtra.x * 0.35;
         vec2 detN = (gN.xy + fineSoft * 0.9) * vSplatR.x * 1.5
-                  + (dN.xy + fineHard * 0.9 + gvN * gravelW * 1.4) * vSplatR.y * 1.8 * dirtDetail
+                  + (dN.xy + fineHard * 0.9 + gvN * gravelW * 0.7) * vSplatR.y * 1.8 * dirtDetail
                   + (rN.xy + fineHard * 0.9) * vSplatR.z * 1.5 * (1.0 - wallW)
                   + (sN.xy + fineSoft * 0.9) * vSplatR.w * 1.1;
         detN *= 1.0 - vExtra.y * 0.7; // snow softens the relief beneath it
