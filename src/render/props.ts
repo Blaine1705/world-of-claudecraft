@@ -541,7 +541,16 @@ function convertMaterial(
       metalnessMap: s.metalnessMap ?? null,
       aoMap: s.aoMap ?? null,
       roughness: ov?.roughness ?? (hollow ? 0.85 : s.isMeshStandardMaterial ? s.roughness : 0.9),
-      metalness: ov?.metalness ?? (s.isMeshStandardMaterial ? Math.min(s.metalness, 0.85) : 0),
+      // The kit exporter ships an accidental metallicFactor 0.4 on hundreds
+      // of dielectric palette materials (wood carts outshone actual anvils),
+      // so only metal-NAMED materials keep their authored metalness; every
+      // other family is dielectric, and the metal surface-detail layer below
+      // supplies the real per-texel metalness on top.
+      metalness:
+        ov?.metalness ??
+        (s.isMeshStandardMaterial && METAL_MAT_NAME.test(s.name)
+          ? Math.min(s.metalness, 0.85)
+          : 0),
       emissive: new THREE.Color(hollowEmissive ? 0xffffff : (ov?.emissive ?? 0x000000)),
       emissiveMap: hollowEmissive ? map : null,
       emissiveIntensity: hollowEmissive ? 0.3 : (ov?.emissiveIntensity ?? 1),

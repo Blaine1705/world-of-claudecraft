@@ -10,21 +10,28 @@
 //   settles in mortar lines / plank seams while raised faces lighten a touch,
 //   so the surface reads worn rather than just dirty),
 // - roughness lerps partway toward the set's roughness map,
-// - on the HIGH and ULTRA tiers, a cheap multi-tap parallax (2 taps on high,
-//   4 on ultra) walks the projection along the view ray using the family's
-//   Displacement map (clamped to 0.02 in projection space) so surfaces gain
-//   real height response against both the light AND the camera.
-// Six families (stone: Bricks076A, wood: MedievalWood, plaster: Plaster007,
-// bark: Bark012, fabric: Fabric030, metal: RustCoarse01), four shared
-// textures each, loaded once; zero per-frame work; the Lambert (low) tier is
-// skipped entirely. The layer must stay SUBTLE: the game's look is cozy
-// low-poly, the detail suggests material, never photoreal.
+// - on the HIGH and ULTRA tiers, a multi-tap parallax (3 taps on high, 6 on
+//   ultra) walks the projection along the view ray using the family's
+//   Displacement map (per-family amplitude and clamp: deep on stone/rock/
+//   bark, shallow on plaster/fabric) so surfaces gain clearly per-pixel
+//   height response against both the light AND the camera, and the sampled
+//   height also shades the diffuse (recesses darken, crests lighten) so the
+//   relief reads even head-on.
+// Seven families (stone: Bricks076A dressed masonry, rock: Rock026 natural
+// geological fracture, wood: MedievalWood, plaster: Plaster007, bark: Bark012,
+// fabric: Fabric030, metal: Metal013 with a real Metalness map), shared
+// textures loaded once; zero per-frame work; the Lambert (low) tier is
+// skipped entirely. The
+// stone/rock split matters: masonry carries running-bond mortar lines that
+// look absurd on a boulder, so anything geological routes to rock. The layer
+// must stay SUBTLE: the game's look is cozy low-poly, the detail suggests
+// material, never photoreal.
 import type * as THREE from 'three';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX, type SurfaceMatOpts, surfaceMat } from './gfx';
 
-export type SurfaceFamily = 'stone' | 'wood' | 'plaster' | 'bark' | 'fabric' | 'metal';
+export type SurfaceFamily = 'stone' | 'rock' | 'wood' | 'plaster' | 'bark' | 'fabric' | 'metal';
 
 interface FamilyTextures {
   normal: THREE.Texture | null;
@@ -32,11 +39,16 @@ interface FamilyTextures {
   rough: THREE.Texture | null;
   /** ultra-only parallax height field; stays null on lower import-time tiers */
   disp: THREE.Texture | null;
+  /** per-texel metalness (the metal family only): rust patches stay
+   *  dielectric while bare metal actually reflects the IBL */
+  metal: THREE.Texture | null;
 }
 
 interface FamilyDef {
-  /** texture basename under /textures/structures/ */
+  /** texture basename under /textures/structures/ (or `dir` when set) */
   prefix: string;
+  /** texture directory override (rock reuses the shipped terrain set) */
+  dir?: string;
   /** default shading-normal blend toward the family detail normal */
   strength: number;
   /** projection tiles per world unit */
@@ -50,10 +62,37 @@ interface FamilyDef {
   /** floor for envMapIntensity, so the family catches the sky/interior IBL
    *  (metal only today; raised, never lowered, at apply time) */
   envMapMin?: number;
+  /** how far metalnessFactor lerps toward the family Metalness map (metal
+   *  only; the map is fetched exactly when this is set) */
+  metalMix?: number;
+  /** MEASURED mean of the family Displacement map: the height signal centers
+   *  on this so a biased map (Rock026 mean 0.76) cannot push a constant
+   *  parallax drift or a constant brightness lift */
+  dispCenter: number;
+  /** MEASURED standard deviation of the family Displacement map. The maps
+   *  span a 10x spread (Bricks 0.219 to Plaster 0.054), so one global
+   *  amplitude can never work: the walk amplitude derives as
+   *  parallaxDepth / dispSd, normalizing every family to its target depth. */
+  dispSd: number;
+  /** TARGET typical parallax depth in projection space (one sd of height
+   *  moves the projection this far; world depth = this / tileScale). Deep for
+   *  stone/rock/bark, shallow for plaster/fabric. The offset clamp derives as
+   *  2.2x this value, so tails cannot break the low-poly silhouette. */
+  parallaxDepth: number;
+  /** diffuse modulation per ONE SD of sampled height (clamped at 1.5 sd):
+   *  recesses darken, crests lighten, so height reads even head-on where the
+   *  parallax walk is subtle */
+  heightShade: number;
   tex: FamilyTextures;
 }
 
-const emptyTex = (): FamilyTextures => ({ normal: null, ao: null, rough: null, disp: null });
+const emptyTex = (): FamilyTextures => ({
+  normal: null,
+  ao: null,
+  rough: null,
+  disp: null,
+  metal: null,
+});
 
 // Per-family defaults. Stone keeps the original worn-stone numbers exactly
 // (one ashlar course reads ~2.6 units); wood and plaster are progressively
@@ -66,6 +105,29 @@ const FAMILIES: Record<SurfaceFamily, FamilyDef> = {
     aoLo: 0.72,
     aoSpan: 0.32,
     roughMix: 0.5,
+    dispCenter: 0.456,
+    dispSd: 0.219,
+    parallaxDepth: 0.06,
+    heightShade: 0.15,
+    tex: emptyTex(),
+  },
+  // NATURAL geological stone: chaotic fracture, no mortar lines. Boulders,
+  // scree, cliffs, cave mouths, and meteor rock route here so they never grow
+  // the ashlar running-bond pattern that belongs to MASONRY (the 'stone'
+  // family above). Reuses the shipped terrain Rock026 set; tiled coarser than
+  // stone because natural fracture reads better at boulder scale.
+  rock: {
+    prefix: 'Rock026',
+    dir: '/textures/terrain/',
+    strength: 0.5,
+    tileScale: 1 / 3.4,
+    aoLo: 0.72,
+    aoSpan: 0.3,
+    roughMix: 0.5,
+    dispCenter: 0.76,
+    dispSd: 0.077,
+    parallaxDepth: 0.06,
+    heightShade: 0.19,
     tex: emptyTex(),
   },
   wood: {
@@ -75,6 +137,10 @@ const FAMILIES: Record<SurfaceFamily, FamilyDef> = {
     aoLo: 0.78,
     aoSpan: 0.26,
     roughMix: 0.4,
+    dispCenter: 0.468,
+    dispSd: 0.118,
+    parallaxDepth: 0.045,
+    heightShade: 0.11,
     tex: emptyTex(),
   },
   plaster: {
@@ -84,6 +150,12 @@ const FAMILIES: Record<SurfaceFamily, FamilyDef> = {
     aoLo: 0.82,
     aoSpan: 0.2,
     roughMix: 0.35,
+    // capped low: the plaster height map has little signal to give (sd
+    // 0.054), and amplifying it further just amplifies compression noise
+    dispCenter: 0.459,
+    dispSd: 0.054,
+    parallaxDepth: 0.02,
+    heightShade: 0.07,
     tex: emptyTex(),
   },
   // Vertical oak ridges; the triplanar side planes map texture Y to world Y,
@@ -96,6 +168,10 @@ const FAMILIES: Record<SurfaceFamily, FamilyDef> = {
     aoLo: 0.7,
     aoSpan: 0.34,
     roughMix: 0.45,
+    dispCenter: 0.5,
+    dispSd: 0.125,
+    parallaxDepth: 0.07,
+    heightShade: 0.21,
     tex: emptyTex(),
   },
   // Plain isotropic weave (row/col variance ratio 0.77 to 1.15 at 1K): reads
@@ -108,29 +184,51 @@ const FAMILIES: Record<SurfaceFamily, FamilyDef> = {
     aoLo: 0.86,
     aoSpan: 0.15,
     roughMix: 0.35,
+    dispCenter: 0.432,
+    dispSd: 0.11,
+    parallaxDepth: 0.015,
+    heightShade: 0.04,
     tex: emptyTex(),
   },
-  // Fine pitted worn steel (Poly Haven rust_coarse_01), dull rather than
-  // chrome. The strong roughMix is the point: highlights and env reflections
-  // follow the scuff map, and envMapMin makes anvils/fittings catch the IBL.
+  // Patina-worn metal (ambientCG Metal013): rust patches over bare steel WITH
+  // a real per-texel Metalness map (mean 0.787, sd 0.232), so rust reads
+  // dielectric while bare metal actually reflects the IBL. The old
+  // RustCoarse01 set physically could not gleam: rough mean 0.777, disp sd
+  // 0.020, no metalness anywhere, and its envMapMin 1.55 was boosting an IBL
+  // term the BRDF discarded at metalness 0. With real metalness the floor
+  // drops to a cozy 1.2. No AmbientOcclusion map ships with the set (aoSpan
+  // 0 skips both the fetch and the grime term); the roughness + metalness
+  // mixes carry the patch variation instead.
   metal: {
-    prefix: 'RustCoarse01',
+    prefix: 'Metal013',
     strength: 0.35,
     tileScale: 1 / 1.4,
-    aoLo: 0.8,
-    aoSpan: 0.22,
+    aoLo: 1,
+    aoSpan: 0,
     roughMix: 0.75,
-    envMapMin: 1.55,
+    envMapMin: 1.2,
+    metalMix: 0.9,
+    dispCenter: 0.271,
+    dispSd: 0.122,
+    parallaxDepth: 0.045,
+    heightShade: 0.08,
     tex: emptyTex(),
   },
 };
 
-/** Parallax amplitude in projection space; the walked offset clamps to 0.02. */
-const PARALLAX_AMPLITUDE = 0.035;
-const PARALLAX_CLAMP = 0.02;
-/** View-ray refinement taps per fragment: ultra takes 4, high the cheap 2. */
-const PARALLAX_TAPS_ULTRA = 4;
-const PARALLAX_TAPS_HIGH = 2;
+/** View-ray refinement taps per fragment: ultra takes 6, high 3. The
+ *  normalized amplitudes walk real depth now, and the deeper clamps need the
+ *  extra refinement to stay swim-free; the high tier additionally shrinks its
+ *  clamp (PARALLAX_HIGH_CLAMP_K) so three taps never step-band at grazing
+ *  angles. */
+const PARALLAX_TAPS_ULTRA = 6;
+const PARALLAX_TAPS_HIGH = 3;
+const PARALLAX_HIGH_CLAMP_K = 0.65;
+/** Offset clamp as a multiple of the family's target depth (2.2 sd of height
+ *  is where the tails start breaking the low-poly silhouette). */
+const PARALLAX_CLAMP_K = 2.2;
+/** Height-shade clamp in sd units: recess darkening saturates at 1.5 sd. */
+const HEIGHT_SHADE_CLAMP_SD = 1.5;
 
 const parallaxTierTaps = (): number =>
   GFX.tier === 'ultra' ? PARALLAX_TAPS_ULTRA : GFX.tier === 'high' ? PARALLAX_TAPS_HIGH : 0;
@@ -148,7 +246,9 @@ if (GFX.standardMaterials) {
   const wantDisp = parallaxTierTaps() > 0;
   for (const fam of Object.values(FAMILIES)) {
     const prep = (name: string): Promise<THREE.Texture> =>
-      loadTexture(`/textures/structures/${fam.prefix}_${name}.jpg`, { repeat: true }).then(
+      loadTexture(`${fam.dir ?? '/textures/structures/'}${fam.prefix}_${name}.jpg`, {
+        repeat: true,
+      }).then(
         (tex) => {
           const t = tex.clone();
           t.anisotropy = 4;
@@ -159,14 +259,17 @@ if (GFX.standardMaterials) {
     registerPreload(
       Promise.all([
         prep('NormalGL'),
-        prep('AmbientOcclusion'),
+        // aoSpan 0 also means the set ships no AmbientOcclusion (Metal013)
+        fam.aoSpan > 0 ? prep('AmbientOcclusion') : Promise.resolve(null),
         prep('Roughness'),
         wantDisp ? prep('Displacement') : Promise.resolve(null),
-      ]).then(([n, a, r, d]) => {
+        fam.metalMix !== undefined ? prep('Metalness') : Promise.resolve(null),
+      ]).then(([n, a, r, d, m]) => {
         fam.tex.normal = n;
         fam.tex.ao = a;
         fam.tex.rough = r;
         fam.tex.disp = d;
+        fam.tex.metal = m;
       }),
     );
   }
@@ -194,6 +297,15 @@ export interface SurfaceDetailOpts {
    * (the view ray is only known in world space).
    */
   objectSpace?: boolean;
+  /**
+   * 4x4 atlas-cell strength mask (16 entries, row-major from the top-left
+   * cell, the EASTBROOK_SURFACE_CELLS numbering): scales the whole layer per
+   * fragment by the cell the material's own `map` UV lands in, so one merged
+   * vertex-colored batch can carry full detail on stone cells and taper it on
+   * canvas/crystal cells. Requires a bound `map` whose UVs were synthesized
+   * into the 4x4 cell layout; ignored otherwise. Compile-time constant.
+   */
+  cellMask?: readonly number[];
 }
 
 /** Back-compat option alias (the layer began stone-only). */
@@ -207,12 +319,12 @@ export type WornStoneOpts = SurfaceDetailOpts;
 // ---------------------------------------------------------------------------
 
 /** Kit-wide stone members (hex curtain walls, the Evergarden gate arch sample
- *  palette gradient strips; minerock boulders are untextured override colors
- *  and carry a slightly stronger normal). */
-const STONE_KITS: Record<string, number> = {
-  khex: 0.45,
-  kiron: 0.45,
-  minerock: 0.6,
+ *  palette gradient strips are dressed MASONRY; minerock boulders are
+ *  geological and take the natural rock family instead). */
+const STONE_KITS: Record<string, WornFamilyPick> = {
+  khex: { family: 'stone', strength: 0.45 },
+  kiron: { family: 'stone', strength: 0.45 },
+  minerock: { family: 'rock', strength: 0.55 },
 };
 
 /** Names that must NEVER take the layer: canopies and ground cover stay clean
@@ -224,7 +336,14 @@ const BARK_NAME = /bark|trunk/i;
 const FABRIC_NAME = /cloth|fabric|banner|flag|tent|sail|awning|carpet|rug|bag|leather|strap|rope/i;
 const METAL_NAME_ROUTE = /metal|iron|steel|gold|silver|anvil|chain|blade|bell/i;
 const WOOD_NAME = /wood|plank|log|stump|timber|crate|barrel|fence|furniture|walnut/i;
-const STONE_NAME = /stone|rock|brick|pillar|column|grave|ruin|marble|statue|boulder|canyon|mine/i;
+/** Clay/slate roof tiles (RoofTiles, RoofTiles_Red across the palette kits):
+ *  course-lined like masonry but softer, so low-strength stone. */
+const ROOF_NAME = /roof|shingle|tile/i;
+/** NATURAL geological surfaces: never the ashlar masonry pattern. Checked
+ *  before STONE_NAME so 'boulder'/'cliff' names cannot land on brick. */
+const ROCK_NAME = /rock|boulder|canyon|cliff|crag|scree|cave/i;
+/** Player-built / dressed architectural stone (masonry courses). */
+const STONE_NAME = /stone|brick|pillar|column|grave|ruin|marble|statue|mine/i;
 const PLASTER_NAME = /plaster|wall/i;
 
 export interface WornFamilyPick {
@@ -243,13 +362,16 @@ const KIT_FALLBACK: Record<string, WornFamilyPick | null> = {
   pirate: { family: 'wood', strength: 0.35 }, // colormap docks/rowboats
   town: { family: 'wood', strength: 0.35 }, // colormap timber pillar
   grave: { family: 'stone', strength: 0.45 }, // colormap gravestones
-  dungeon: { family: 'stone', strength: 0.4 }, // 'texture' atlas delve mouths
+  dungeon: { family: 'rock', strength: 0.45 }, // 'texture' atlas delve cave mouths
   kcas: { family: 'stone', strength: 0.4 }, // 'texture' atlas castle pieces
   tools: { family: 'wood', strength: 0.3 }, // 'tools' atlas crafting stations
 };
 
 /** Bare-coverage default: nothing in the kit pipeline ships without a family,
- *  but unmatched palette cells stay at a whisper of stone. */
+ *  but unmatched palette cells stay at a whisper of stone. This is the
+ *  EXPLICIT landing spot for the say-nothing names measured across the kits
+ *  (_defaultMat, Main, Top, Bottom, Beige, Black, Material.00N, ...): they
+ *  route here deliberately, after the kit fallbacks have had their say. */
 const FALLBACK_STONE_STRENGTH = 0.22;
 
 /**
@@ -263,6 +385,8 @@ export function wornFamilyForName(materialName: string): WornFamilyPick | null |
   if (FABRIC_NAME.test(materialName)) return { family: 'fabric', strength: 0.3 };
   if (METAL_NAME_ROUTE.test(materialName)) return { family: 'metal', strength: 0.35 };
   if (WOOD_NAME.test(materialName)) return { family: 'wood', strength: 0.35 };
+  if (ROOF_NAME.test(materialName)) return { family: 'stone', strength: 0.3 };
+  if (ROCK_NAME.test(materialName)) return { family: 'rock', strength: 0.5 };
   if (STONE_NAME.test(materialName)) return { family: 'stone', strength: 0.4 };
   if (PLASTER_NAME.test(materialName)) return { family: 'plaster', strength: 0.35 };
   return undefined;
@@ -292,7 +416,7 @@ export function wornFamilyFor(
 ): WornFamilyPick | null {
   if (ctx?.emissive || ctx?.transparent) return null;
   const kitWide = STONE_KITS[kit];
-  if (kitWide !== undefined) return { family: 'stone', strength: kitWide };
+  if (kitWide !== undefined) return kitWide;
   const named = wornFamilyForName(materialName);
   if (named !== undefined) return named;
   const kitFallback = KIT_FALLBACK[kit];
@@ -308,8 +432,24 @@ export function wornFamilyFor(
  */
 export function foliageWornFamilyFor(materialName: string): WornFamilyPick | null {
   if (BARK_NAME.test(materialName)) return { family: 'bark', strength: 0.55 };
-  if (/rock/i.test(materialName)) return { family: 'stone', strength: 0.5 };
+  if (/rock/i.test(materialName)) return { family: 'rock', strength: 0.5 };
   return null;
+}
+
+/**
+ * Coarse, strong bark for the GIANT landmark trees (the greatTrees clones in
+ * realm_flora / garden / haunt / jungle features): the default 1/1.6 bark
+ * tiling reads as noise on a trunk yards wide, so giants take ridges nearly
+ * 3x larger and a stronger normal so the grain survives at vista distance.
+ */
+export const GREAT_TREE_BARK_DETAIL: SurfaceDetailOpts = Object.freeze({
+  strength: 0.65,
+  tileScale: 1 / 4.5,
+});
+
+/** Shared trunk matcher for the great-tree decorators (Bark_TwistedTree). */
+export function isBarkMaterialName(name: string): boolean {
+  return BARK_NAME.test(name);
 }
 
 /**
@@ -351,31 +491,52 @@ export function applySurfaceDetail(
   const strength = opts?.strength ?? fam.strength;
   const tileScale = opts?.tileScale ?? fam.tileScale;
   const objectSpace = opts?.objectSpace === true;
+  // The cell mask reads the material's own map UV (vMapUv only exists with a
+  // bound map) and is baked as a compile-time constant array.
+  const cellMask = opts?.cellMask && opts.cellMask.length === 16 && mat.map ? opts.cellMask : null;
   // In object mode strength cannot act on the (skipped) normal blend, so it
   // scales the scalar terms relative to the family default instead.
   const scalarK = objectSpace ? Math.min(strength / fam.strength, 1) : 1;
   const aoLo = 1 - (1 - fam.aoLo) * scalarK;
   const aoSpan = fam.aoSpan * scalarK;
   const roughMix = fam.roughMix * scalarK;
+  const metalMix = (fam.metalMix ?? 0) * scalarK;
   const prev = mat.onBeforeCompile;
   const prevSrc = typeof prev === 'function' ? prev.toString() : '';
   mat.onBeforeCompile = (shader, renderer) => {
     prev?.call(mat, shader, renderer);
     // Fail soft before the preload gate resolves: the material simply ships
-    // without the layer (the detail_normals null contract).
-    if (!fam.tex.normal || !fam.tex.ao || !fam.tex.rough) return;
-    // Parallax gates on the LIVE tier at compile time (2 taps on high, 4 on
+    // without the layer (the detail_normals null contract). AO is required
+    // only for families that actually run the grime term (Metal013 ships no
+    // AmbientOcclusion and sets aoSpan 0).
+    if (!fam.tex.normal || !fam.tex.rough) return;
+    const hasAo = fam.aoSpan > 0 && fam.tex.ao !== null;
+    if (fam.aoSpan > 0 && !hasAo) return;
+    const hasMetal = metalMix > 0 && fam.tex.metal !== null;
+    // Parallax gates on the LIVE tier at compile time (3 taps on high, 6 on
     // ultra) plus a resolved height field, and needs the world-space view ray.
     const taps = !objectSpace && fam.tex.disp !== null ? parallaxTierTaps() : 0;
     const parallax = taps > 0;
+    // Normalized amplitude: one sd of height walks the projection by the
+    // family's target depth, whatever the map's dynamic range (the shipped
+    // sds span 10x, so a global amplitude can never read evenly).
+    const parallaxAmp = fam.parallaxDepth / fam.dispSd;
+    // The high tier walks fewer taps, so it takes a shallower clamp: depth it
+    // cannot refine would otherwise swim at grazing angles.
+    const parallaxClamp =
+      PARALLAX_CLAMP_K *
+      fam.parallaxDepth *
+      (taps >= PARALLAX_TAPS_ULTRA ? 1 : PARALLAX_HIGH_CLAMP_K);
     shader.uniforms.uWornNormal = { value: fam.tex.normal };
-    shader.uniforms.uWornAo = { value: fam.tex.ao };
+    if (hasAo) shader.uniforms.uWornAo = { value: fam.tex.ao };
     shader.uniforms.uWornRough = { value: fam.tex.rough };
     shader.uniforms.uWornStrength = { value: strength };
     shader.uniforms.uWornTile = { value: tileScale };
-    shader.uniforms.uWornAoLo = { value: aoLo };
-    shader.uniforms.uWornAoSpan = { value: aoSpan };
+    if (hasAo) shader.uniforms.uWornAoLo = { value: aoLo };
+    if (hasAo) shader.uniforms.uWornAoSpan = { value: aoSpan };
     shader.uniforms.uWornRoughMix = { value: roughMix };
+    if (hasMetal) shader.uniforms.uWornMetal = { value: fam.tex.metal };
+    if (hasMetal) shader.uniforms.uWornMetalMix = { value: metalMix };
     if (parallax) shader.uniforms.uWornDisp = { value: fam.tex.disp };
     shader.vertexShader = shader.vertexShader
       .replace(
@@ -409,13 +570,12 @@ export function applySurfaceDetail(
         varying vec3 vWornWorldPos;
         varying vec3 vWornWorldNormal;
         uniform sampler2D uWornNormal;
-        uniform sampler2D uWornAo;
         uniform sampler2D uWornRough;
         uniform float uWornStrength;
         uniform float uWornTile;
-        uniform float uWornAoLo;
-        uniform float uWornAoSpan;
         uniform float uWornRoughMix;
+        ${hasAo ? 'uniform sampler2D uWornAo; uniform float uWornAoLo; uniform float uWornAoSpan;' : ''}
+        ${hasMetal ? 'uniform sampler2D uWornMetal; uniform float uWornMetalMix;' : ''}
         ${parallax ? 'uniform sampler2D uWornDisp;' : ''}
         float wornTriR( sampler2D tex, const in vec3 p, const in vec3 w ) {
           return texture2D( tex, p.zy ).r * w.x + texture2D( tex, p.xz ).r * w.y
@@ -430,35 +590,72 @@ export function applySurfaceDetail(
         vec3 wornP = vWornWorldPos * uWornTile;
         vec3 wornW = pow( abs( normalize( vWornWorldNormal ) ), vec3( 4.0 ) );
         wornW /= ( wornW.x + wornW.y + wornW.z );
+        float wornCellK = 1.0;
+        ${
+          cellMask
+            ? `{
+          const float wornCellMask[16] = float[16]( ${cellMask
+            .map((k) => k.toFixed(3))
+            .join(', ')} );
+          int wornCol = clamp( int( floor( vMapUv.x * 4.0 ) ), 0, 3 );
+          int wornRow = clamp( int( floor( ( 1.0 - vMapUv.y ) * 4.0 ) ), 0, 3 );
+          wornCellK = wornCellMask[ wornRow * 4 + wornCol ];
+        }`
+            : ''
+        }
         ${
           parallax
-            ? `{
-          // Multi-tap parallax (2 on high, 4 on ultra): estimate height, then
+            ? `float wornHShade = 0.0;
+        {
+          // Multi-tap parallax (3 on high, 6 on ultra): estimate height, then
           // refine along the view ray, walking the projection by the averaged
-          // offset, clamped so the layer never breaks the low-poly silhouette.
+          // offset. The amplitude is sd-normalized (one sd of height = the
+          // family's target depth) and the offset clamps at 2.2 sd so tails
+          // never break the low-poly silhouette.
           vec3 wornV = normalize( vWornWorldPos - cameraPosition );
-          float wornH = wornTriR( uWornDisp, wornP, wornW ) - 0.5;
+          float wornH = wornTriR( uWornDisp, wornP, wornW ) - ${fam.dispCenter.toFixed(3)};
           float wornHAcc = wornH;
           ${Array.from(
             { length: taps - 1 },
             () => `wornH = wornTriR( uWornDisp,
-            wornP + wornV * ( wornH * ${PARALLAX_AMPLITUDE.toFixed(3)} ), wornW ) - 0.5;
+            wornP + wornV * ( wornH * ${parallaxAmp.toFixed(3)} ), wornW ) - ${fam.dispCenter.toFixed(3)};
           wornHAcc += wornH;`,
           ).join('\n          ')}
           wornP += clamp(
-            wornV * ( wornHAcc * ${(PARALLAX_AMPLITUDE / taps).toFixed(4)} ),
-            vec3( -${PARALLAX_CLAMP.toFixed(3)} ), vec3( ${PARALLAX_CLAMP.toFixed(3)} ) );
+            wornV * ( wornHAcc * ${(parallaxAmp / taps).toFixed(4)} ),
+            vec3( -${parallaxClamp.toFixed(3)} ), vec3( ${parallaxClamp.toFixed(3)} ) );
+          wornHShade = clamp( wornH * ${(1 / fam.dispSd).toFixed(3)},
+            -${HEIGHT_SHADE_CLAMP_SD.toFixed(1)}, ${HEIGHT_SHADE_CLAMP_SD.toFixed(1)} );
         }`
             : ''
         }
-        float wornAoV = wornTriR( uWornAo, wornP, wornW );
-        diffuseColor.rgb *= uWornAoLo + wornAoV * uWornAoSpan;`,
+        ${
+          parallax
+            ? `diffuseColor.rgb *= 1.0 + wornHShade * ${fam.heightShade.toFixed(2)} * wornCellK;`
+            : ''
+        }
+        ${
+          hasAo
+            ? `float wornAoV = wornTriR( uWornAo, wornP, wornW );
+        diffuseColor.rgb *= mix( 1.0, uWornAoLo + wornAoV * uWornAoSpan, wornCellK );`
+            : ''
+        }`,
       )
       .replace(
         '#include <roughnessmap_fragment>',
         `#include <roughnessmap_fragment>
-        roughnessFactor = mix( roughnessFactor, wornTriR( uWornRough, wornP, wornW ), uWornRoughMix );`,
+        roughnessFactor = mix( roughnessFactor, wornTriR( uWornRough, wornP, wornW ), uWornRoughMix * wornCellK );`,
       );
+    if (hasMetal) {
+      // metalnessmap_fragment unconditionally declares `float metalnessFactor
+      // = metalness;`, so the per-texel patina composes cleanly after it: rust
+      // patches stay dielectric, bare metal reflects the IBL per fragment.
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <metalnessmap_fragment>',
+        `#include <metalnessmap_fragment>
+        metalnessFactor = mix( metalnessFactor, wornTriR( uWornMetal, wornP, wornW ), uWornMetalMix * wornCellK );`,
+      );
+    }
     if (!objectSpace) {
       shader.fragmentShader = shader.fragmentShader.replace(
         // Whiteout-blend triplanar normal (Golus), mixed into the shading
@@ -488,9 +685,12 @@ export function applySurfaceDetail(
   // (before the preload resolves the hook compiles to a plain pass-through),
   // as do the projection mode and the tier's parallax tap count.
   mat.customProgramCacheKey = () => {
-    const ready = fam.tex.normal && fam.tex.ao && fam.tex.rough ? 'on' : 'off';
+    const ready =
+      fam.tex.normal && fam.tex.rough && (fam.aoSpan === 0 || fam.tex.ao) ? 'on' : 'off';
     const par = !objectSpace && fam.tex.disp !== null ? `p${parallaxTierTaps()}` : '-';
-    return `surface-detail|${family}|${ready}|${par}|${objectSpace ? 'o' : 'w'}|${prevSrc}`;
+    const mask = cellMask ? `m${cellMask.join(',')}` : '-';
+    const met = metalMix > 0 && fam.tex.metal !== null ? 'met' : '-';
+    return `surface-detail|${family}|${ready}|${par}|${mask}|${met}|${objectSpace ? 'o' : 'w'}|${prevSrc}`;
   };
 }
 
@@ -523,7 +723,7 @@ export function detailedSurfaceMat(
   const base = surfaceMat(opts);
   if (!GFX.standardMaterials || !(base as THREE.MeshStandardMaterial).isMeshStandardMaterial)
     return base;
-  const key = `${base.uuid}|${family}|${detail?.strength ?? ''}|${detail?.tileScale ?? ''}|${detail?.objectSpace ? 'o' : 'w'}`;
+  const key = `${base.uuid}|${family}|${detail?.strength ?? ''}|${detail?.tileScale ?? ''}|${detail?.objectSpace ? 'o' : 'w'}|${detail?.cellMask?.join(',') ?? ''}`;
   let mat = detailedMats.get(key);
   if (!mat) {
     mat = base.clone();

@@ -127,9 +127,10 @@ function bakeRocks(): BakedRocks | null {
         roughness: 0.95,
         metalness: 0,
       });
-      // Same triplanar stone strength as foliage.ts gives the shared kit
-      // boulder fields, so a scree rock and a dressing rock read identically.
-      applySurfaceDetail(material, 'stone', { strength: 0.5 });
+      // Same triplanar rock strength as foliage.ts gives the shared kit
+      // boulder fields, so a scree rock and a dressing rock read identically:
+      // natural geological fracture, never the ashlar masonry pattern.
+      applySurfaceDetail(material, 'rock', { strength: 0.5 });
     }
     // origin sink comes from sim/scree.ts's baked dims (screeSinkY), not a
     // live bounds measurement: the sim's walkable dome and this mesh must

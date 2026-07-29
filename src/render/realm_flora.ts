@@ -35,7 +35,13 @@ import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
 import { MIST_DRIFT_AMPLITUDE, SEA_LIGHT_RAYS, SEA_MIST_BANKS } from './sea_mist_core';
-import { applyWornStone, detailedSurfaceMat } from './worn_stone';
+import {
+  applySurfaceDetail,
+  applyWornStone,
+  detailedSurfaceMat,
+  GREAT_TREE_BARK_DETAIL,
+  isBarkMaterialName,
+} from './worn_stone';
 
 const MUSHROOM_URLS = ['/models/props/mushroom_red.glb', '/models/props/mushroom_tan.glb'];
 const BOULDER_URL = '/models/props/rock_large_d.glb';
@@ -1088,11 +1094,27 @@ export function buildRealmFlora(seed: number): RealmFloraView {
     tree.position.set(tx, terrainHeight(tx, tz, seed) - 0.2, tz);
     tree.scale.setScalar(6.5);
     tree.rotation.y = 0.8;
+    // The loader cache is immutable: clone the trunk material before giving
+    // the giant its coarse landmark bark grain (leaves keep the clean sheet).
+    const barked = new Map<string, THREE.Material>();
+    const barkify = (source: THREE.Material): THREE.Material => {
+      if (!isBarkMaterialName(source.name)) return source;
+      let m = barked.get(source.uuid);
+      if (!m) {
+        m = source.clone();
+        applySurfaceDetail(m as THREE.MeshStandardMaterial, 'bark', GREAT_TREE_BARK_DETAIL);
+        barked.set(source.uuid, m);
+      }
+      return m;
+    };
     tree.traverse((obj) => {
       const mesh = obj as THREE.Mesh;
       if (mesh.isMesh) {
         mesh.castShadow = true;
         mesh.receiveShadow = true;
+        mesh.material = Array.isArray(mesh.material)
+          ? mesh.material.map(barkify)
+          : barkify(mesh.material);
       }
     });
     group.add(tree);

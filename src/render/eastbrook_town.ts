@@ -15,6 +15,7 @@ import {
   updateEastbrookCivicBeaconMotion,
 } from './eastbrook_civic_beacon';
 import {
+  applyEastbrookTownSurfaceDetail,
   EASTBROOK_SURFACE_ATLAS_URL,
   EASTBROOK_SURFACE_NORMAL_SCALE,
   eastbrookSurfaceAtlasMetadata,
@@ -310,7 +311,12 @@ function townMaterial(
     shared.normalScale.setScalar(EASTBROOK_SURFACE_NORMAL_SCALE);
   }
   const material = independent ? shared.clone() : shared;
-  return emissive ? modulateEmissiveByVertexColor(material) : material;
+  // Conservative triplanar detail OVER the baked atlas (the baked cells are
+  // stretched per-face and judged too flat alone); applied after the clone
+  // decision because Material.clone drops onBeforeCompile hooks.
+  return emissive
+    ? modulateEmissiveByVertexColor(material)
+    : applyEastbrookTownSurfaceDetail(material);
 }
 
 function scaledGeometry(

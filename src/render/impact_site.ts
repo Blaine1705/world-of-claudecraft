@@ -170,7 +170,7 @@ function rimMaterial(): THREE.Material {
     metalness: 0,
     flatShading: true,
   });
-  applySurfaceDetail(mat, 'stone', { strength: 0.5 });
+  applySurfaceDetail(mat, 'rock', { strength: 0.5 });
   return mat;
 }
 
@@ -230,7 +230,7 @@ function meteorMaterial(): THREE.Material {
   });
   // The 0.04 ember tint is a surface grade, not a light source, so the stone
   // layer still reads (the emissive-skip policy is for actually glowing mats).
-  applySurfaceDetail(mat, 'stone', { strength: 0.5 });
+  applySurfaceDetail(mat, 'rock', { strength: 0.5 });
   return mat;
 }
 
@@ -296,7 +296,7 @@ function pebbleMaterial(): THREE.Material {
     metalness: 0.05,
     flatShading: true,
   });
-  applySurfaceDetail(mat, 'stone', { strength: 0.5 });
+  applySurfaceDetail(mat, 'rock', { strength: 0.5 });
   return mat;
 }
 
