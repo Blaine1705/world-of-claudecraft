@@ -821,6 +821,28 @@ describe('a BLOCKED swing still ends a session (and still pushes no spell back)'
     );
   });
 
+  it('a non-landing kind never cancels, independent of the amount conjunct', () => {
+    // The kind list is now enumerable ('hit' | 'block') and the comment
+    // beside the widened arm promises miss/dodge/parry never cancel. A real
+    // miss carries amount 0, which the amount conjunct also excludes, so
+    // this pin feeds a SYNTHETIC amount through kind 'miss' to isolate the
+    // kind axis: widening the kind list reds here and nowhere else.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Whiffed');
+    sim.addItem('copper_mining_pick', 1, pid);
+    teleportOntoNode(sim, pid, NODE.id);
+    expect(sim.harvestNode(NODE.id, pid)).toBe(true);
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error('missing entity');
+    const template = MOBS.forest_wolf;
+    const wolf = createMob(999908, template, template.maxLevel, { ...p.pos });
+    sim.entities.set(wolf.id, wolf);
+    sim.drainEvents();
+    sim.dealDamage(wolf, p, 5, false, 'physical', null, 'miss', true);
+    expect(p.castingAbility).not.toBe(null);
+    expect(p.gatherCastNodeId).not.toBe('');
+  });
+
   it('a blocked hit cancels a fishing session, absorbed or not', () => {
     const sim = makeSim();
     const meta = mustMeta(sim, sim.playerId);

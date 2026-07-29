@@ -199,6 +199,7 @@ describe('duel end and live profession sessions', () => {
     const winner = sim.entities.get(a);
     if (!winner) throw new Error('missing winner');
 
+    sim.events = [];
     sim.dealDamage(winner, loser, loser.hp + 500, false, 'physical', null, 'hit');
 
     expect(loser.hp).toBe(1);
@@ -206,5 +207,52 @@ describe('duel end and live profession sessions', () => {
     expect(loser.castingAbility).toBeNull();
     expect(loser.fishBiteAtTick).toBe(0);
     expect(loser.fishCastZoneId).toBe('');
+    // Event order matches the shared tail: damage first, then castStop, so
+    // clients and parity goldens see one order for a landed-blow cancel.
+    const types = sim.events.map((e) => e.type);
+    const damageAt = types.indexOf('damage');
+    const stopAt = types.indexOf('castStop');
+    expect(damageAt).toBeGreaterThan(-1);
+    expect(stopAt).toBeGreaterThan(damageAt);
+  });
+
+  it('the duel-ending blow leaves a SPELL cast alone (classic no-cancel)', () => {
+    // Dropping the isNonSpellCast gate for an unconditional cancel must red
+    // here: the clamp arm never grew a spell-cancel path.
+    const { sim, a, b } = startedDuel();
+    const loser = sim.entities.get(b);
+    if (!loser) throw new Error('missing loser');
+    loser.castingAbility = 'frostbolt';
+    loser.castTotal = 15;
+    loser.castRemaining = 15;
+    const winner = sim.entities.get(a);
+    if (!winner) throw new Error('missing winner');
+
+    sim.dealDamage(winner, loser, loser.hp + 500, false, 'physical', null, 'hit');
+
+    expect(loser.hp).toBe(1);
+    expect((sim as any).duels.get(a)?.state ?? 'gone').not.toBe('active');
+    expect(loser.castingAbility).toBe('frostbolt');
+  });
+
+  it('a duelist SELF-sourced clamped tick does not end their own session', () => {
+    // The tail's self-hit exclusion, restated on the clamp arm: a duelist's
+    // own damage (the Cauterize burn carries the caster's own id) can land
+    // the clamped blow, and classic rules say your own damage never
+    // interrupts a gather or fishing session.
+    const { sim, a, b } = startedDuel();
+    const duelist = sim.entities.get(b);
+    if (!duelist) throw new Error('missing duelist');
+    duelist.castingAbility = 'fishing';
+    duelist.castTotal = 15;
+    duelist.castRemaining = 15;
+    duelist.fishCastZoneId = 'eastbrook_vale';
+
+    sim.dealDamage(duelist, duelist, duelist.hp + 500, false, 'fire', null, 'hit');
+
+    expect(duelist.hp).toBe(1);
+    expect(duelist.castingAbility).toBe('fishing');
+    expect(duelist.fishCastZoneId).toBe('eastbrook_vale');
+    void a;
   });
 });

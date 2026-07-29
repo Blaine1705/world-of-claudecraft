@@ -487,14 +487,6 @@ export function dealDamage(
     if (target.hp - amount < 1) {
       amount = Math.max(0, target.hp - 1);
       target.hp = 1;
-      // The duel-terminal early return skips the shared tail below, including
-      // the landed-hit session cancel: without this a duel-ending blow left
-      // the loser fishing at 1 hp. Unconditional on kind/amount BY DESIGN: a
-      // duel ends only on the opponent's landed clamped blow (blocked or
-      // not), so the tail's gates are implied here. Spell casts keep the
-      // classic no-cancel (the tail's pushback never applied to this
-      // terminal hit either).
-      if (isNonSpellCast(target.castingAbility)) ctx.cancelCast(target);
       ctx.emit({
         type: 'damage',
         sourceId: source?.id ?? -1,
@@ -507,6 +499,20 @@ export function dealDamage(
         absorbed: totalAbsorbed || undefined,
         ...attackAnimation,
       });
+      // The duel-terminal early return skips the shared tail below, including
+      // the landed-hit session cancel: without this a duel-ending blow left
+      // the loser fishing at 1 hp. Runs AFTER the damage emit so the event
+      // order matches the tail (damage, then castStop). Unconditional on
+      // kind and amount BY DESIGN: this arm only ever sees a landed 'hit' or
+      // 'block' with a real clamped amount (the dead-guard above makes a
+      // zero-amount clamp unreachable). The tail's self-hit exclusion is NOT
+      // implied, because a duelist's own damage (the Cauterize burn carries
+      // the caster's own id) can land the clamped blow, so it is restated
+      // here. Spell casts keep the classic no-cancel (the tail's pushback
+      // never applied to this terminal hit either).
+      if (sourcePlayer.id !== target.id && isNonSpellCast(target.castingAbility)) {
+        ctx.cancelCast(target);
+      }
       // Book of Deeds: the clamped terminal hit counts (zero rng; the early
       // return skips the shared deed site and the session RewardCounters).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
