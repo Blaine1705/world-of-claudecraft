@@ -1227,6 +1227,28 @@ describe('fine material grades on the live harvest path', () => {
     expect(meta.toolEffectSlots?.mining?.durability).toBe(chargesBefore);
   });
 
+  it('a QUANTITY effect still spends and pays in a starter zone (the gate is quality-only)', () => {
+    // The use-time charge gate is a conjunction on the effect KIND: deleting
+    // its quality-only conjunct would silently stop quantity effects from
+    // spending (and paying) in all eleven starter zones with every other
+    // arm green. Gatherer's Cache adds +1 unit regardless of grade
+    // reachability, so on the same starter vein it must spend the charge
+    // AND grant base quantity plus one.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    sim.addItem('copper_mining_pick', 1, pid);
+    sim.slotToolEffect('mining', 'gatherers_cache', undefined, pid);
+    const meta = mustMeta(sim, pid);
+    const chargesBefore = meta.toolEffectSlots?.mining?.durability ?? 0;
+    expect(chargesBefore).toBeGreaterThan(0);
+    const STARTER = 'ore_veiled_hollow_1';
+    teleportOntoNode(sim, pid, STARTER);
+    const before = sim.countItem('thorium_ore', pid);
+    expect(castAndComplete(sim, STARTER, pid)).toBe(true);
+    expect(sim.countItem('thorium_ore', pid)).toBeGreaterThanOrEqual(before + 2);
+    expect(meta.toolEffectSlots?.mining?.durability).toBe(chargesBefore - 1);
+  });
+
   it('no skilling while dead: a dead player cannot start a harvest at all (R31)', () => {
     // Already enforced (the vendor-family dead gate at the top of
     // harvestNode); pinned here so it cannot rot, because R31 records the

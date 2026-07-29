@@ -131,13 +131,6 @@ export function yieldsFineGrade(
 }
 
 /**
- * The item id one harvest of `baseItemId` actually grants: the fine grade
- * when the tool outclasses the material at a full-grade vein, else the base
- * id unchanged. An id with no fine grade always returns itself, so a future
- * zone whose material row lands before its grade row degrades to the plain
- * yield rather than throwing.
- */
-/**
  * Whether the fine grade of `baseItemId` is REACHABLE at a node of
  * `nodeTier` at any tool tier at all: yieldsFineGrade demands the node match
  * the material's own rung (nodeTier >= gatherTier), so on the v0.32.0
@@ -152,6 +145,13 @@ export function fineGradeReachable(baseItemId: string, nodeTier: number): boolea
   return row !== undefined && nodeTier >= row.gatherTier;
 }
 
+/**
+ * The item id one harvest of `baseItemId` actually grants: the fine grade
+ * when the tool outclasses the material at a full-grade vein, else the base
+ * id unchanged. An id with no fine grade always returns itself, so a future
+ * zone whose material row lands before its grade row degrades to the plain
+ * yield rather than throwing.
+ */
 export function harvestGradeItemId(
   baseItemId: string,
   nodeTier: number,

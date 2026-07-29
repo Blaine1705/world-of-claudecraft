@@ -5,12 +5,14 @@
 // do NOT cancel (pinned in gathering_rhythm.test.ts), which is also what
 // lets these fixtures place a live session where a path needs it.
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
-import { DELVES, LAKE } from '../src/sim/data';
+import { DELVES, LAKE, PORTALS } from '../src/sim/data';
 import { advanceDelveModule, ejectToDelveDoor, failDelveRun } from '../src/sim/delves/runs';
 import { handleDevChat } from '../src/sim/dev_commands';
 import { enterDungeon, leaveDungeon } from '../src/sim/instances/dungeons';
+import { updatePortalTriggers } from '../src/sim/portals';
 import { startFishing } from '../src/sim/professions/fishing';
 import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/session_teardown';
 import { Sim } from '../src/sim/sim';
@@ -231,6 +233,45 @@ describe('teleports cancel a live session', () => {
     sim.drainEvents();
     sim.leaveRift(pid);
     expectSessionEnded(sim, p2);
+  });
+
+  it('an overworld portal pair cancels a session (proximity teleport)', () => {
+    // One of the three remaining sites of the teardown wave: reverting its
+    // call left the suite green before this case existed.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const portal = PORTALS[0];
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error('missing entity');
+    p.pos.x = portal.a.x;
+    p.pos.z = portal.a.z;
+    p.prevPos = { ...p.pos };
+    const live = assignFishingSession(sim, pid);
+    sim.drainEvents();
+    updatePortalTriggers(sim.ctx, p);
+    expectSessionEnded(sim, live);
+  });
+
+  it('the rift descend and /dev mountquest sites carry the teardown call (source pins)', () => {
+    // The descend loop needs a cleared floor and the mountquest hop a dev
+    // flag, so these two sites are pinned at the source beside their
+    // displacement writes rather than driven; the entry/exit and portal
+    // cases above prove the helper itself live.
+    const riftSrc = readFileSync(new URL('../src/sim/rift/runs.ts', import.meta.url), 'utf8');
+    const descendAt = riftSrc.indexOf('for (const id of descenders)');
+    expect(descendAt).toBeGreaterThan(-1);
+    const cancelAt = riftSrc.indexOf('cancelProfessionSessionOnDisplacement(ctx, e)', descendAt);
+    expect(cancelAt).toBeGreaterThan(descendAt);
+    expect(cancelAt).toBeLessThan(riftSrc.indexOf('e.pos = ctx.groundPos', descendAt));
+    const devSrc = readFileSync(new URL('../src/sim/dev_commands.ts', import.meta.url), 'utf8');
+    const hopAt = devSrc.indexOf('groundPos(marla.pos.x + 2');
+    expect(hopAt).toBeGreaterThan(-1);
+    const devCancelAt = devSrc.lastIndexOf(
+      'cancelProfessionSessionOnDisplacement(ctx, entity)',
+      hopAt,
+    );
+    expect(devCancelAt).toBeGreaterThan(-1);
+    expect(hopAt - devCancelAt).toBeLessThan(400);
   });
 
   it('/dev tp cancels a session', () => {

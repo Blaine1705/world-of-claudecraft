@@ -24,7 +24,7 @@ import { STATIONS } from '../src/sim/content/professions';
 import { ZONE1_NPCS } from '../src/sim/content/zone1';
 import { ZONE2_NPCS } from '../src/sim/content/zone2';
 import { ZONE3_NPCS } from '../src/sim/content/zone3';
-import { GATHER_NODES, ITEMS, NPCS, ZONES } from '../src/sim/data';
+import { GATHER_NODE_TYPES, GATHER_NODES, ITEMS, NPCS, ZONES } from '../src/sim/data';
 import { FISHING_ZONE_ROD_TIERS } from '../src/sim/professions/fishing_zones';
 
 /**
@@ -124,6 +124,15 @@ describe('the R37 professions zone-rollout guard', () => {
         byZone.get(zoneId) ?? 0,
         `${zoneId} ships nodes by its row but has none`,
       ).toBeGreaterThan(0);
+    }
+    // The starter shape EXACTLY, per type: two hub-outskirt nodes of each
+    // profession (the release's authored kit). A starter zone silently
+    // losing its herbs while keeping ore must red here, not sweep as fine.
+    for (const zoneId of STARTER_ZONES) {
+      for (const type of GATHER_NODE_TYPES) {
+        const ofType = GATHER_NODES.filter((n) => n.zoneId === zoneId && n.type === type);
+        expect(ofType.length, `${zoneId} ${type} starter pair`).toBe(2);
+      }
     }
   });
 

@@ -524,6 +524,14 @@ describe('armorcrafting mastery derives from the live tables (R13)', () => {
         .map(([id, n]) => `${id} x${n}`)
         .join(', ')}`,
     ).toBeGreaterThanOrEqual(MIN_GATHER_HOURS);
+    // KNOWINGLY BLIND on the low side since the v0.32.0 merge: the model
+    // prices supply from the tuned zones only (MASTERY_TUNED_ZONE_IDS
+    // above), while ten expansion zones now grant thorium_ore and one
+    // grants iron_ore from starter nodes, so REAL gather hours sit well
+    // under the modeled figure and this floor cannot see the grind turning
+    // trivially short. The MAX arm stays honest (real supply only lowers
+    // hours). Re-deriving the model over every granting zone is the phase
+    // 13 economy integration's call, recorded in the phase 11 QA record.
     expect(RUN.gatherHours).toBeLessThanOrEqual(MAX_GATHER_HOURS);
   });
 

@@ -10,6 +10,7 @@ import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import {
   baseMaterialFor,
   countAcrossGrades,
+  fineGradeReachable,
   fineMaterialFor,
   gatherMaterialTier,
   harvestGradeItemId,
@@ -36,6 +37,16 @@ const highestTierIn = (zoneId: string, type: string) =>
   );
 
 describe('MATERIAL_GRADES table', () => {
+  it('fineGradeReachable pins the node-at-or-above-rung boundary directly', () => {
+    // Load-bearing for the use-time charge gate (gathering.ts): reachable
+    // exactly when the node matches the material's own rung, and never for
+    // an ungraded id.
+    expect(fineGradeReachable('thorium_ore', 3)).toBe(true);
+    expect(fineGradeReachable('thorium_ore', 2)).toBe(false);
+    expect(fineGradeReachable('copper_ore', 1)).toBe(true);
+    expect(fineGradeReachable('not_a_material', 9)).toBe(false);
+  });
+
   it('covers exactly the nine node yields, one grade pair each', () => {
     const liveYields = new Set<string>();
     for (const byZone of Object.values(NODE_MATERIAL_TABLE)) {
@@ -141,6 +152,11 @@ describe('MATERIAL_GRADES table', () => {
       for (const [zoneId, row] of Object.entries(NODE_MATERIAL_TABLE[type])) {
         if ((ZONES as readonly string[]).includes(zoneId)) continue;
         const highest = highestTierIn(zoneId, type);
+        // Non-vacuity per arm: Math.max over an empty node list is
+        // -Infinity, which would pass the below-rung check AND count toward
+        // the 33, hiding a zone that shipped its material row before any
+        // node of the type.
+        expect(Number.isFinite(highest), `${type}/${zoneId} has no nodes`).toBe(true);
         const rung = gatherMaterialTier(row.itemId);
         expect(rung, `${type}/${zoneId} grants ungraded ${row.itemId}`).toBeDefined();
         if (rung === undefined) continue;
