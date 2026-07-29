@@ -2818,10 +2818,11 @@ function baseHeight(x: number, z: number, seed: number): number {
     (fbm2(x * HILL_SCALE + 100, z * HILL_SCALE + 100, seed, 4) - 0.5) * shape.hill + shape.base;
   h += (fbm2(x * DETAIL_SCALE, z * DETAIL_SCALE, seed + 7, 2) - 0.5) * 2.2;
   // Flatten each zone's hub settlement into a plateau. The ACTIVE content's
-  // zones (builtin fallback), matching the lake-carve loop below: one height
-  // function must not read two different worlds.
-  const activeZones = getActiveWorldContent().zones;
-  for (const zone of activeZones.length > 0 ? activeZones : ZONES) {
+  // zones read RAW, exactly like the lake-carve loop below (no empty-list
+  // fallback on either): one height function must not read two different
+  // worlds, and a hand-built zero-zone content flattens no builtin hubs
+  // just as it carves no builtin lakes.
+  for (const zone of getActiveWorldContent().zones) {
     const dx = x - zone.hub.x,
       dz = z - zone.hub.z;
     // Conservative squared-distance gate (one spare yard of margin) before

@@ -228,6 +228,10 @@ describe('questObjectiveAreas', () => {
     // moving the constant past either edge cannot pass unnoticed.
     expect(key(gatherNodeClusters('wood', 60))).not.toBe(key(gatherNodeClusters('wood')));
     expect(key(gatherNodeClusters('wood', 26))).not.toBe(key(gatherNodeClusters('wood')));
+    // The UPPER edge belongs to HERB (the expansion's (32,8) pairs merge at
+    // 33); wood does not flip again until 60, so without this arm the band's
+    // stated ceiling was unpinned.
+    expect(key(gatherNodeClusters('herb', 33))).not.toBe(key(gatherNodeClusters('herb')));
   });
 
   it('keeps the derived cluster radius inside what authored clusters already draw', () => {

@@ -459,6 +459,14 @@ For off-box safety, sync the directory to S3 occasionally:
   block below is in place. `/livez` and `/readyz` need no token, but they are for
   the container healthcheck and the host watchdog, which read them locally and
   never through Caddy; nothing on the public internet needs them.
+  Series-cardinality note for the v0.32.0 deploy: the zone label vocabulary
+  behind the harvest and fishing counter families grew from 3 zones to 14,
+  so every zone-labeled counter now pre-registers 42 series (zone x tier or
+  zone x band) instead of 9, about 4.7x per family, and dashboards or alerts
+  that enumerate zone label values need re-pointing at the new ids. The
+  full cross product is still pre-registered at boot by design (a Prometheus
+  counter cannot backfill a scrape), and no per-request cardinality bound
+  changed: the vocabularies stay content-derived and bounded.
 - **Game watchdog (wedge recovery)**: `deploy/game_watchdog.sh`, installed as
   `/usr/local/bin/eastbrook-watchdog` and fired every minute from
   `/etc/cron.d/eastbrook-watchdog`. Docker's `restart: unless-stopped` only acts when

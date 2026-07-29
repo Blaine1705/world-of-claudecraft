@@ -776,8 +776,9 @@ What each item settled:
    FOUR are reachable from the shipped client's own surfaces: the mount
    key, the two race controls, and the Settings unstuck; the rift forge
    and riding-training senders exist on ClientWorld but nothing shipped
-   calls them yet), SimEvents 118 to 131 (twelve release additions, two of
-   them pid-less), registered RouteDefs 180 to 181 and surface-inventory
+   calls them yet), SimEvents 118 to 131 (thirteen new: twelve release
+   additions, two of them pid-less, plus the packet's own
+   fishingEmptyHook), registered RouteDefs 180 to 181 and surface-inventory
    rows 195 to 196 (one admin-only unstuck-reports route; the registry
    file itself is byte-identical). Still true and
    verified at the base: every addition is purely additive, no key was

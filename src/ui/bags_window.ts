@@ -847,7 +847,17 @@ export class BagsWindow {
     row.type = 'button';
     row.className = 'bag-item q-common';
     row.style.setProperty('--bag-slot-quality', QUALITY_DEFAULT_COLOR);
-    const canDeposit = this.bagMode().bankDeposit;
+    // The known cell's ladder gives trade, mail-attach, market-sell, and
+    // vendor precedence over the deposit; those four all need a def, so on
+    // the unknown cell an active higher mode means NO action (the honest
+    // aria-disabled no-op), never a deposit that jumps the ladder.
+    const mode = this.bagMode();
+    const canDeposit =
+      mode.bankDeposit &&
+      !mode.tradeOpen &&
+      !mode.mailAttach &&
+      !mode.marketSell &&
+      !mode.vendorOpen;
     if (!canDeposit) row.setAttribute('aria-disabled', 'true');
     // The accessible name says UNKNOWN, not just the raw id: the hover
     // tooltip is mouse-only, and the two channels must agree (the glyph

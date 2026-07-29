@@ -4716,7 +4716,8 @@ export class GameServer {
       // Riding skill purchase: player buys Riding from Marla for 80g. The Sim
       // re-validates NPC identity, range, level, and funds.
       case 'learn_riding':
-        if (Number.isInteger(msg.npc)) sim.learnRidingFor(msg.npc as number, pid);
+        if (typeof msg.npc === 'number' && Number.isInteger(msg.npc))
+          sim.learnRidingFor(msg.npc, pid);
         break;
       // Show-jumping race: the Sim re-validates the glowing platform, lesson or
       // mount eligibility, and liveness before arming the countdown.
@@ -6400,12 +6401,17 @@ export class GameServer {
       maybe('inv', meta.inventory);
       maybe('bags', meta.bags);
       // The owned mount collection (IWorldMounts.ownedMounts): the horse plus
-      // every mount whose reins item sits in bags or bank. It DERIVES from
-      // the two heavy-gated fields above (a full bag AND bank walk with an
-      // ITEMS lookup per slot plus two allocations, per viewer per pass), so
-      // it rides the same gate: every input change marks the session heavy
-      // dirty or bumps wireRev, and the staggered refresh covers the rest.
-      // Wire key `mntOwn`.
+      // every mount whose reins item sits in bags or bank. Its inputs are
+      // meta.inventory (heavy-gated above) and meta.bank.inventory, which is
+      // NOT itself behind this gate; the gating is safe anyway because the
+      // only writers of the bank inventory are the deposit and withdraw
+      // commands, and both are in HEAVY_SELF_CMDS, so every input change
+      // marks this session heavy dirty. The staggered modulo refresh is the
+      // backstop, with the known family caveat that broadcastSnapshots runs
+      // outside the catch-up loop, so under sustained catch-up the stride
+      // can skip a pid's modulo slot and the backstop stretches; the dirty
+      // flag, not the modulo, is what carries correctness here. Wire key
+      // `mntOwn`.
       maybe('mntOwn', this.sim.ownedMountsFor(anchorSession.pid));
       maybe('buyback', meta.vendorBuyback);
       maybe('equip', meta.equipment);

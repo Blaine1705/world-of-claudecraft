@@ -4147,6 +4147,22 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
+  it('mntOwn is encoded INSIDE the heavy self gate (its inputs sit behind it)', () => {
+    // The owned-mounts walk (full inventory AND bank scan with an ITEMS
+    // lookup per slot, per viewer per pass) rode outside the gate at the
+    // v0.32.0 merge; a straight revert to the ungated position stays green
+    // on every behavioral sweep (an unchanged value elides either way), so
+    // the placement itself is pinned: the call sits between the heavyDue
+    // branch and a known heavy-block sibling.
+    const raw = readFileSync(resolve(process.cwd(), 'server/game.ts'), 'utf8');
+    const gateAt = raw.indexOf('if (heavyDue) {');
+    const mntOwnAt = raw.indexOf("maybe('mntOwn'");
+    const siblingAt = raw.indexOf("maybe('qdone'");
+    expect(gateAt).toBeGreaterThan(-1);
+    expect(mntOwnAt).toBeGreaterThan(gateAt);
+    expect(mntOwnAt).toBeLessThan(siblingAt);
+  });
+
   it('TERSE_TO_IWORLD pins the terse-key to IWorld-name renames in sorted membership', () => {
     // the non-obvious renames the brief calls out as where drift hides
     const required: Record<string, string> = {

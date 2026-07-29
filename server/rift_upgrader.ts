@@ -263,6 +263,8 @@ interface PendingResult {
 
 /** One in-flight request at a time plus a rolling hourly cap. Promise callbacks
  * only enqueue host data; all sim mutation occurs in drain() at a tick boundary. */
+const RIFT_UPGRADE_QUEUE_CAP = 32;
+
 export class RiftUpgradeCoordinator {
   private readonly client: RiftUpgraderClient | null;
   private readonly maxRequestsPerHour: number;
@@ -288,14 +290,20 @@ export class RiftUpgradeCoordinator {
       ) {
         continue;
       }
-      this.seen.add(event.eventId);
       // Bounded queue (the no-unbounded-table rule): arrivals above the
       // hourly request cap otherwise grow this forever on a fast-refill
       // realm (a community realm refills every 60s against a default cap of
-      // 4/hr). The OLDEST waiting event drops; its upgradeStatus simply
-      // stays heuristic/fallback, which is the same outcome as never having
-      // been queued, and `seen` keeps it from re-queueing churn.
-      if (this.queued.length >= 32) this.queued.shift();
+      // 4/hr). The check runs BEFORE seen/markPending, refusing the NEWEST
+      // arrival outright: shifting an already-queued event would strand it
+      // in 'pending' forever (the intake filter admits only
+      // heuristic/fallback, `seen` blocks a re-queue, and rift_assets
+      // refuses generation while pending). A refused arrival keeps its
+      // heuristic status and simply retries on a later observe pass. The
+      // dedupe set clears with the queue's own bound so a long-lived
+      // process cannot grow it without limit either.
+      if (this.queued.length >= RIFT_UPGRADE_QUEUE_CAP) continue;
+      if (this.seen.size > 4096) this.seen.clear();
+      this.seen.add(event.eventId);
       this.queued.push(event);
       markRiftUpgradePending(ctx, event.eventId);
     }
