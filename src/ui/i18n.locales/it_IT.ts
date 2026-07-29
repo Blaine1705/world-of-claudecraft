@@ -3305,6 +3305,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hud.combat.healSelfCrit': 'Il tuo {ability} ti cura criticamente di {amount}.',
   'hud.combat.healOther': 'Il tuo {ability} cura {target} di {amount}.',
   'hud.combat.healOtherCrit': 'Il tuo {ability} cura criticamente {target} di {amount}.',
+  'hud.combat.healSelfFull': 'Il tuo {ability} va a segno, ma hai già la salute piena.',
+  'hud.combat.healOtherFull':
+    'Il tuo {ability} va a segno su {target}, ma il bersaglio ha già la salute piena.',
   'hud.combat.death': '{name} muore.',
   'hud.combat.auraGain': 'Ottieni {name}.',
   'hud.combat.auraFade': '{name} svanisce da te.',
@@ -7034,6 +7037,11 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorRecoveryHint':
     "Ogni codice funziona una sola volta. Conservali in un luogo sicuro: sono l'unico modo per rientrare se perdi la tua app di autenticazione.",
   'hudChrome.account.twoFactorDownloadCodes': 'Scarica i codici',
+  'hudChrome.account.recoveryCodesFileHeader': 'Codici di recupero {brand}',
+  'hudChrome.account.recoveryCodesFileAccount': 'Account: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    "Ogni codice può essere usato una sola volta se perdi l'accesso alla tua app di autenticazione.",
+  'hudChrome.account.recoveryCodesFileWarn': 'Conserva questo file in un luogo sicuro e privato.',
   'hudChrome.account.twoFactorDone': 'Fatto',
   'hudChrome.account.twoFactorDisableHint':
     "Inserisci la tua password per disattivare l'autenticazione a due fattori. I tuoi codici di recupero verranno eliminati.",
@@ -7440,6 +7448,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Resistito',
+  'hud.combat.floatingHealFull': 'Pieno',
   'hud.combat.resisted': '{target} resiste al tuo {ability}.',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   'hudChrome.itemArmorType.cloth': 'Stoffa',

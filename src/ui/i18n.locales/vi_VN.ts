@@ -5712,6 +5712,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': 'Trượt',
   'hud.combat.healOther': '{ability} của bạn hồi {amount} máu cho {target}.',
   'hud.combat.healOtherCrit': '{ability} của bạn chí mạng hồi {amount} máu cho {target}.',
+  'hud.combat.healSelfFull': '{ability} của bạn đã trúng, nhưng bạn đã đầy máu.',
+  'hud.combat.healOtherFull': '{ability} của bạn đã trúng {target}, nhưng mục tiêu đã đầy máu.',
   'hud.combat.healSelf': '{ability} của bạn hồi {amount} máu cho bạn.',
   'hud.combat.healSelfCrit': '{ability} của bạn chí mạng hồi {amount} máu cho bạn.',
   'hud.combat.miss': '{ability} của bạn trượt {target}.',
@@ -6241,6 +6243,11 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorDisabledMsg': 'Xác thực hai lớp đang tắt.',
   'hudChrome.account.twoFactorDone': 'Xong',
   'hudChrome.account.twoFactorDownloadCodes': 'Tải Mã Xuống',
+  'hudChrome.account.recoveryCodesFileHeader': 'Mã khôi phục {brand}',
+  'hudChrome.account.recoveryCodesFileAccount': 'Tài khoản: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    'Mỗi mã có thể dùng một lần nếu bạn mất quyền truy cập vào ứng dụng xác thực của mình.',
+  'hudChrome.account.recoveryCodesFileWarn': 'Cất giữ tệp này ở nơi an toàn và riêng tư.',
   'hudChrome.account.twoFactorEnabledMsg': 'Xác thực hai lớp giờ đã bật.',
   'hudChrome.account.twoFactorOpenApp': 'Mở trong ứng dụng xác thực',
   'hudChrome.account.twoFactorRecoveryHint':
@@ -7384,6 +7391,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Kháng',
+  'hud.combat.floatingHealFull': 'Đầy',
   'hud.combat.resisted': '{target} kháng lại {ability} của bạn.',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   'hudChrome.itemArmorType.cloth': 'Vải',

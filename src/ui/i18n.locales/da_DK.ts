@@ -5503,6 +5503,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': 'Forbier',
   'hud.combat.healOther': 'Din {ability} helbreder {target} for {amount}.',
   'hud.combat.healOtherCrit': 'Din {ability} helbreder {target} kritisk for {amount}.',
+  'hud.combat.healSelfFull': 'Din {ability} rammer, men du har allerede fuldt helbred.',
+  'hud.combat.healOtherFull':
+    'Din {ability} rammer {target}, men målet har allerede fuldt helbred.',
   'hud.combat.healSelf': 'Din {ability} helbreder dig for {amount}.',
   'hud.combat.healSelfCrit': 'Din {ability} helbreder dig kritisk for {amount}.',
   'hud.combat.miss': 'Din {ability} forfejler {target}.',
@@ -6034,6 +6037,11 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorDisabledMsg': 'To-faktor-godkendelse er slået fra.',
   'hudChrome.account.twoFactorDone': 'Færdig',
   'hudChrome.account.twoFactorDownloadCodes': 'Download koder',
+  'hudChrome.account.recoveryCodesFileHeader': '{brand} gendannelseskoder',
+  'hudChrome.account.recoveryCodesFileAccount': 'Konto: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    'Hver kode kan bruges én gang, hvis du mister adgangen til din godkendelses-app.',
+  'hudChrome.account.recoveryCodesFileWarn': 'Opbevar denne fil et sikkert og privat sted.',
   'hudChrome.account.twoFactorEnabledMsg': 'To-faktor-godkendelse er nu slået til.',
   'hudChrome.account.twoFactorOpenApp': 'Åbn i godkendelses-app',
   'hudChrome.account.twoFactorRecoveryHint':
@@ -7276,6 +7284,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Modstået',
+  'hud.combat.floatingHealFull': 'Fuld',
   'hud.combat.resisted': '{target} modstår din {ability}.',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   'hudChrome.itemArmorType.cloth': 'Stof',

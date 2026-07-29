@@ -5641,6 +5641,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': 'Pudło',
   'hud.combat.healOther': 'Twój {ability} leczy {target} o {amount}.',
   'hud.combat.healOtherCrit': 'Twój {ability} leczy krytycznie {target} o {amount}.',
+  'hud.combat.healSelfFull': 'Twój {ability} trafia, ale masz już pełne zdrowie.',
+  'hud.combat.healOtherFull': 'Twój {ability} trafia w {target}, ale cel ma już pełne zdrowie.',
   'hud.combat.healSelf': 'Twój {ability} leczy cię o {amount}.',
   'hud.combat.healSelfCrit': 'Twój {ability} leczy cię krytycznie o {amount}.',
   'hud.combat.miss': 'Twój {ability} chybia {target}.',
@@ -6171,6 +6173,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorDisabledMsg': 'Uwierzytelnianie dwuskładnikowe jest wyłączone.',
   'hudChrome.account.twoFactorDone': 'Gotowe',
   'hudChrome.account.twoFactorDownloadCodes': 'Pobierz kody',
+  'hudChrome.account.recoveryCodesFileHeader': 'Kody odzyskiwania {brand}',
+  'hudChrome.account.recoveryCodesFileAccount': 'Konto: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    'Każdego kodu można użyć raz, jeśli stracisz dostęp do aplikacji uwierzytelniającej.',
+  'hudChrome.account.recoveryCodesFileWarn':
+    'Przechowuj ten plik w bezpiecznym i prywatnym miejscu.',
   'hudChrome.account.twoFactorEnabledMsg': 'Uwierzytelnianie dwuskładnikowe jest teraz włączone.',
   'hudChrome.account.twoFactorOpenApp': 'Otwórz w aplikacji uwierzytelniającej',
   'hudChrome.account.twoFactorRecoveryHint':
@@ -7425,6 +7433,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Odparto',
+  'hud.combat.floatingHealFull': 'Pełne',
   'hud.combat.resisted': '{target} odpiera twoje {ability}.',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   'hudChrome.itemArmorType.cloth': 'Tkanina',

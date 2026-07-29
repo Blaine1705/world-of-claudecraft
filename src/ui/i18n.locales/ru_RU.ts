@@ -1910,6 +1910,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': 'Промах',
   'hud.combat.floatingDodge': 'Уклон',
   'hud.combat.floatingResist': 'Сопротивление',
+  'hud.combat.floatingHealFull': 'Полное',
   'hud.combat.attack': 'атака',
   'hud.combat.damageDone': 'Ваше {ability} поражает {target} на {amount}.',
   'hud.combat.damageDoneCrit': 'Ваше {ability} критически поражает {target} на {amount}.',
@@ -1922,6 +1923,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.combat.healSelfCrit': 'Ваше {ability} критически исцеляет вас на {amount}.',
   'hud.combat.healOther': 'Ваше {ability} исцеляет {target} на {amount}.',
   'hud.combat.healOtherCrit': 'Ваше {ability} критически исцеляет {target} на {amount}.',
+  'hud.combat.healSelfFull': 'Ваше {ability} срабатывает, но у вас уже полное здоровье.',
+  'hud.combat.floatingHealAbsorbed': 'Поглощено',
+  'hud.combat.healSelfAbsorbed': 'Ваше «{ability}» поглощено порчей на вас.',
+  'hud.combat.healOtherAbsorbed': 'Ваше «{ability}» поглощено порчей на цели {target}.',
+  'hud.combat.healOtherFull':
+    'Ваше {ability} срабатывает на {target}, но у цели уже полное здоровье.',
   'hud.combat.death': '{name} умирает.',
   'hud.combat.auraGain': 'Вы получаете {name}.',
   'hud.combat.auraFade': '{name} спадает с вас.',
@@ -5558,6 +5565,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorRecoveryHint':
     'Каждый код работает один раз. Храните их в надёжном месте: это единственный способ войти, если вы потеряете приложение-аутентификатор.',
   'hudChrome.account.twoFactorDownloadCodes': 'Скачать коды',
+  'hudChrome.account.recoveryCodesFileHeader': 'Коды восстановления {brand}',
+  'hudChrome.account.recoveryCodesFileAccount': 'Аккаунт: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    'Каждый код можно использовать один раз, если вы потеряете доступ к приложению-аутентификатору.',
+  'hudChrome.account.recoveryCodesFileWarn': 'Храните этот файл в надёжном и защищённом месте.',
   'hudChrome.account.twoFactorDone': 'Готово',
   'hudChrome.account.twoFactorDisableHint':
     'Введите пароль, чтобы отключить двухфакторную аутентификацию. Ваши коды восстановления будут удалены.',

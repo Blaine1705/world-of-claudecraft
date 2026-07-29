@@ -1889,6 +1889,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': 'ミス',
   'hud.combat.floatingDodge': '回避',
   'hud.combat.floatingResist': '抵抗',
+  'hud.combat.floatingHealFull': '満タン',
   'hud.combat.attack': '攻撃',
   'hud.combat.damageDone': '{ability}が{target}に命中し、{amount}のダメージ。',
   'hud.combat.damageDoneCrit': '{ability}が{target}にクリティカルし、{amount}のダメージ。',
@@ -1901,6 +1902,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.combat.healSelfCrit': '{ability}が自分をクリティカルで{amount}回復しました。',
   'hud.combat.healOther': '{ability}が{target}を{amount}回復しました。',
   'hud.combat.healOtherCrit': '{ability}が{target}をクリティカルで{amount}回復しました。',
+  'hud.combat.healSelfFull': '{ability}は命中しましたが、すでに体力は満タンです。',
+  'hud.combat.floatingHealAbsorbed': '吸収',
+  'hud.combat.healSelfAbsorbed': '{ability}は自分に付いた腐敗に飲み込まれた。',
+  'hud.combat.healOtherAbsorbed': '{ability}は{target}に付いた腐敗に飲み込まれた。',
+  'hud.combat.healOtherFull': '{ability}は{target}に命中しましたが、対象はすでに体力満タンです。',
   'hud.combat.death': '{name}は死亡しました。',
   'hud.combat.auraGain': '{name}を得ました。',
   'hud.combat.auraFade': '{name}が自分から消えました。',
@@ -5505,6 +5511,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorRecoveryHint':
     '各コードは一度だけ使用できます。安全な場所に保管してください。認証アプリを紛失した場合、これらが唯一の復旧手段です。',
   'hudChrome.account.twoFactorDownloadCodes': 'コードをダウンロード',
+  'hudChrome.account.recoveryCodesFileHeader': '{brand} リカバリーコード',
+  'hudChrome.account.recoveryCodesFileAccount': 'アカウント：{username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    '認証アプリにアクセスできなくなった場合、各コードは一度だけ使用できます。',
+  'hudChrome.account.recoveryCodesFileWarn':
+    'このファイルは安全でプライベートな場所に保管してください。',
   'hudChrome.account.twoFactorDone': '完了',
   'hudChrome.account.twoFactorDisableHint':
     '二段階認証を無効にするにはパスワードを入力してください。リカバリーコードは破棄されます。',

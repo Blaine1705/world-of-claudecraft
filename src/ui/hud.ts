@@ -67,6 +67,7 @@ import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import { junkSellableSlot } from '../sim/items';
 import type { Ante, PickAction } from '../sim/lockpick';
+import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
 import { FOCUS_POINT_BUDGET, isInTownZone } from '../sim/professions/focus';
 import { inRangeStationTypes, stationTypesSignature } from '../sim/professions/stations';
 import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
@@ -256,6 +257,12 @@ import {
   grantQtyText,
   harvestLineKey,
 } from './grant_line_view';
+import {
+  healLandingFloatTextKey,
+  healLandingLogKey,
+  shouldFloatHealLanding,
+  shouldShowHealLanding,
+} from './heal_landing_feedback_core';
 import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
 import {
   handleShiftClearContextMenu,
@@ -6925,7 +6932,7 @@ export class Hud {
     const cd = Math.ceil(Math.max(0, pet.petTauntTimer));
     const autoTaunt = pet.petAutoTaunt === true;
     const autoWaterJet = pet.petAutoWaterJet === true;
-    const canTaunt = MOBS[pet.templateId]?.petCanTaunt !== false;
+    const canTaunt = petCanForceTaunt(pet.templateId);
     const ownerClass = this.sim.cfg.playerClass;
     const actionCooldownSig =
       pet.templateId === 'water_elemental'
@@ -10590,37 +10597,40 @@ export class Hud {
           audio.coin();
           break;
         case 'heal2': {
-          const tgt = sim.entities.get(ev.targetId);
-          if (tgt && ev.amount > 0) {
-            const shape = fctSpawnShape({
-              type: 'heal',
-              crit: ev.crit,
-              isPlayerTarget: ev.targetId === sim.playerId,
-            });
-            if (shape)
-              this.fctPainter.spawn(
-                { ...shape, text: `+${ev.amount}${ev.crit ? '!' : ''}`, target: tgt },
-                now,
-              );
+          const tgt = ev.targetId === sim.playerId ? sim.player : sim.entities.get(ev.targetId);
+          if (tgt && shouldShowHealLanding(ev)) {
+            if (shouldFloatHealLanding(ev)) {
+              const shape = fctSpawnShape({
+                type: 'heal',
+                crit: ev.crit,
+                isPlayerTarget: ev.targetId === sim.playerId,
+              });
+              if (shape)
+                this.fctPainter.spawn(
+                  {
+                    ...shape,
+                    text:
+                      ev.amount > 0
+                        ? `+${ev.amount}${ev.crit ? '!' : ''}`
+                        : t(healLandingFloatTextKey(ev) ?? 'hud.combat.floatingHealFull'),
+                    target: tgt,
+                  },
+                  now,
+                );
+            }
             if (ev.sourceId === sim.playerId) {
               const selfTarget = ev.targetId === sim.playerId;
-              this.combatLog(
-                t(
-                  selfTarget
-                    ? ev.crit
-                      ? 'hud.combat.healSelfCrit'
-                      : 'hud.combat.healSelf'
-                    : ev.crit
-                      ? 'hud.combat.healOtherCrit'
-                      : 'hud.combat.healOther',
-                  {
+              const logKey = healLandingLogKey(ev, selfTarget);
+              if (logKey) {
+                this.combatLog(
+                  t(logKey, {
                     ability: abilityDisplayNameFromSource(ev.ability),
                     target: entityDisplayName(tgt),
                     amount: ev.amount,
-                  },
-                ),
-                '#7fdc4f',
-              );
+                  }),
+                  '#7fdc4f',
+                );
+              }
             }
           }
           break;

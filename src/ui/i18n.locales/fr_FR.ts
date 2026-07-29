@@ -3739,6 +3739,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hud.combat.healSelfCrit': 'Votre {ability} vous rend un soin critique de {amount}.',
   'hud.combat.healOther': 'Votre {ability} soigne {target} pour {amount}.',
   'hud.combat.healOtherCrit': "Votre {ability} soigne {target} d'un coup critique pour {amount}.",
+  'hud.combat.healSelfFull': 'Votre {ability} aboutit, mais vous avez déjà toute votre santé.',
+  'hud.combat.healOtherFull':
+    'Votre {ability} aboutit sur {target}, mais la cible a déjà toute sa santé.',
   'hud.combat.death': '{name} meurt.',
   'hud.combat.auraGain': 'Vous gagnez {name}.',
   'hud.combat.auraFade': '{name} se dissipe de vous.',
@@ -7500,6 +7503,11 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorRecoveryHint':
     "Chaque code fonctionne une seule fois. Conservez-les en lieu sûr : ils sont le seul moyen de revenir si vous perdez votre application d'authentification.",
   'hudChrome.account.twoFactorDownloadCodes': 'Télécharger les codes',
+  'hudChrome.account.recoveryCodesFileHeader': 'Codes de récupération {brand}',
+  'hudChrome.account.recoveryCodesFileAccount': 'Compte : {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    "Chaque code ne peut être utilisé qu'une seule fois si vous perdez l'accès à votre application d'authentification.",
+  'hudChrome.account.recoveryCodesFileWarn': 'Conservez ce fichier dans un endroit sûr et privé.',
   'hudChrome.account.twoFactorDone': 'Terminé',
   'hudChrome.account.twoFactorDisableHint':
     "Saisissez votre mot de passe pour désactiver l'authentification à deux facteurs. Vos codes de récupération seront supprimés.",
@@ -7912,6 +7920,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Résisté',
+  'hud.combat.floatingHealFull': 'Plein',
   'hud.combat.resisted': '{target} résiste à votre {ability}.',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   'hudChrome.itemArmorType.cloth': 'Tissu',

@@ -5741,6 +5741,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': 'Mis',
   'hud.combat.healOther': 'Je {ability} geneest {target} voor {amount}.',
   'hud.combat.healOtherCrit': 'Je {ability} geneest {target} kritiek voor {amount}.',
+  'hud.combat.healSelfFull': 'Je {ability} landt, maar je gezondheid is al vol.',
+  'hud.combat.healOtherFull':
+    'Je {ability} landt op {target}, maar het doelwit heeft al volle gezondheid.',
   'hud.combat.healSelf': 'Je {ability} geneest je voor {amount}.',
   'hud.combat.healSelfCrit': 'Je {ability} geneest je kritiek voor {amount}.',
   'hud.combat.miss': 'Je {ability} mist {target}.',
@@ -6276,6 +6279,11 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorDisabledMsg': 'Tweestapsverificatie staat uit.',
   'hudChrome.account.twoFactorDone': 'Klaar',
   'hudChrome.account.twoFactorDownloadCodes': 'Codes Downloaden',
+  'hudChrome.account.recoveryCodesFileHeader': '{brand}-herstelcodes',
+  'hudChrome.account.recoveryCodesFileAccount': 'Account: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    'Elke code kan één keer worden gebruikt als je geen toegang meer hebt tot je authenticator-app.',
+  'hudChrome.account.recoveryCodesFileWarn': 'Bewaar dit bestand ergens veilig en privé.',
   'hudChrome.account.twoFactorEnabledMsg': 'Tweestapsverificatie staat nu aan.',
   'hudChrome.account.twoFactorOpenApp': 'Openen in authenticator-app',
   'hudChrome.account.twoFactorRecoveryHint':
@@ -7436,6 +7444,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Weerstaan',
+  'hud.combat.floatingHealFull': 'Vol',
   'hud.combat.resisted': '{target} weerstaat je {ability}.',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   'hudChrome.itemArmorType.cloth': 'Stof',

@@ -1874,6 +1874,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingMiss': '빗나감',
   'hud.combat.floatingDodge': '회피',
   'hud.combat.floatingResist': '저항',
+  'hud.combat.floatingHealFull': '가득 참',
   'hud.combat.attack': '공격',
   'hud.combat.damageDone': '{ability}이 {target}에게 {amount}의 피해를 입혔습니다.',
   'hud.combat.damageDoneCrit': '{ability}이 {target}에게 치명타로 {amount}의 피해를 입혔습니다.',
@@ -1886,6 +1887,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.combat.healSelfCrit': '{ability}이 자신을 치명타 치유로 {amount}만큼 회복했습니다.',
   'hud.combat.healOther': '{ability}이 {target}을 {amount}만큼 치유했습니다.',
   'hud.combat.healOtherCrit': '{ability}이 {target}을 치명타 치유로 {amount}만큼 회복했습니다.',
+  'hud.combat.healSelfFull': '{ability}이 적중했지만 이미 생명력이 가득합니다.',
+  'hud.combat.floatingHealAbsorbed': '흡수됨',
+  'hud.combat.healSelfAbsorbed': '당신의 {ability}이(가) 당신에게 걸린 부패에 삼켜졌습니다.',
+  'hud.combat.healOtherAbsorbed': '당신의 {ability}이(가) {target}에게 걸린 부패에 삼켜졌습니다.',
+  'hud.combat.healOtherFull':
+    '{ability}이 {target}에게 적중했지만 대상은 이미 생명력이 가득합니다.',
   'hud.combat.death': '{name} 사망.',
   'hud.combat.auraGain': '{name} 효과를 얻었습니다.',
   'hud.combat.auraFade': '{name} 효과가 사라졌습니다.',
@@ -5494,6 +5501,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorRecoveryHint':
     '각 코드는 한 번만 사용할 수 있습니다. 안전한 곳에 보관하세요. 인증 앱을 잃어버렸을 때 다시 로그인할 수 있는 유일한 방법입니다.',
   'hudChrome.account.twoFactorDownloadCodes': '코드 다운로드',
+  'hudChrome.account.recoveryCodesFileHeader': '{brand} 복구 코드',
+  'hudChrome.account.recoveryCodesFileAccount': '계정: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    '인증 앱에 접근할 수 없게 되면 각 코드는 한 번만 사용할 수 있습니다.',
+  'hudChrome.account.recoveryCodesFileWarn': '이 파일은 안전하고 개인적인 곳에 보관하세요.',
   'hudChrome.account.twoFactorDone': '완료',
   'hudChrome.account.twoFactorDisableHint':
     '2단계 인증을 끄려면 비밀번호를 입력하세요. 복구 코드는 폐기됩니다.',

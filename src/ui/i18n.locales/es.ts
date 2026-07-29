@@ -3172,6 +3172,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hud.combat.healSelfCrit': 'Tu {ability} te sana críticamente {amount}.',
   'hud.combat.healOther': 'Tu {ability} sana a {target} por {amount}.',
   'hud.combat.healOtherCrit': 'Tu {ability} sana críticamente a {target} por {amount}.',
+  'hud.combat.healSelfFull': 'Tu {ability} llega, pero ya tienes la salud completa.',
+  'hud.combat.healOtherFull': 'Tu {ability} llega a {target}, pero ya tiene la salud completa.',
   'hud.combat.death': '{name} muere.',
   'hud.combat.auraGain': 'Obtienes {name}.',
   'hud.combat.auraFade': '{name} se desvanece de ti.',
@@ -6909,6 +6911,11 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorRecoveryHint':
     'Cada código funciona una sola vez. Guárdalos en un lugar seguro: son la única forma de volver a entrar si pierdes tu app de autenticación.',
   'hudChrome.account.twoFactorDownloadCodes': 'Descargar Códigos',
+  'hudChrome.account.recoveryCodesFileHeader': 'Códigos de recuperación de {brand}',
+  'hudChrome.account.recoveryCodesFileAccount': 'Cuenta: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    'Cada código se puede usar una sola vez si pierdes el acceso a tu app de autenticación.',
+  'hudChrome.account.recoveryCodesFileWarn': 'Guarda este archivo en un lugar seguro y privado.',
   'hudChrome.account.twoFactorDone': 'Listo',
   'hudChrome.account.twoFactorDisableHint':
     'Introduce tu contraseña para desactivar los dos pasos. Tus códigos de recuperación se descartarán.',
@@ -7317,6 +7324,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Resistido',
+  'hud.combat.floatingHealFull': 'Completo',
   'hud.combat.resisted': '{target} resiste tu {ability}.',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   'hudChrome.itemArmorType.cloth': 'Tela',

@@ -3267,6 +3267,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hud.combat.healSelfCrit': 'Seu {ability} cura você criticamente em {amount}.',
   'hud.combat.healOther': 'Seu {ability} cura {target} em {amount}.',
   'hud.combat.healOtherCrit': 'Seu {ability} cura {target} criticamente em {amount}.',
+  'hud.combat.healSelfFull': 'Seu {ability} acerta, mas você já está com a vida cheia.',
+  'hud.combat.healOtherFull': 'Seu {ability} acerta {target}, mas o alvo já está com a vida cheia.',
   'hud.combat.death': '{name} morre.',
   'hud.combat.auraGain': 'Você ganha {name}.',
   'hud.combat.auraFade': '{name} se dissipa de você.',
@@ -6916,6 +6918,11 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorRecoveryHint':
     'Cada código funciona uma vez. Guarde-os em um lugar seguro: são a única forma de voltar a entrar se você perder seu app autenticador.',
   'hudChrome.account.twoFactorDownloadCodes': 'Baixar códigos',
+  'hudChrome.account.recoveryCodesFileHeader': 'Códigos de recuperação {brand}',
+  'hudChrome.account.recoveryCodesFileAccount': 'Conta: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    'Cada código pode ser usado uma vez se você perder o acesso ao seu app autenticador.',
+  'hudChrome.account.recoveryCodesFileWarn': 'Guarde este arquivo em um lugar seguro e privado.',
   'hudChrome.account.twoFactorDone': 'Concluído',
   'hudChrome.account.twoFactorDisableHint':
     'Digite sua senha para desativar a autenticação em duas etapas. Seus códigos de recuperação serão descartados.',
@@ -7322,6 +7329,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Resistiu',
+  'hud.combat.floatingHealFull': 'Cheio',
   'hud.combat.resisted': '{target} resiste a seu {ability}.',
   'hudChrome.abilityScaling.bonus': '(+{value})',
   'hudChrome.itemArmorType.cloth': 'Tecido',
