@@ -54,7 +54,6 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   cat_form: [8, 2],
   // "for 30 sec": the sunder aura duration hardcoded in effect_dispatch.ts.
   faerie_fire: [30],
-  expose_armor: [30],
   sunder_armor: [30],
   // "Conjures 2 ...": the stack size hardcoded in casting_lifecycle.ts.
   conjure_water: [2],
@@ -63,6 +62,8 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // not a raw effect field.
   kidney_shot: [5, 6],
   slice_and_dice: [5, 32],
+  rupture: [2, 6, 5, 16],
+  expose_armor: [2, 5, 30],
   // Druid spec-engine interaction lines: the cited numbers are engine
   // constants in combat/druid_engines.ts (the Moonseed extension seconds on
   // the Lunar Tempest line, the Verdance stage cap on the Wildbloom line),

@@ -2936,10 +2936,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     spendsCombo: true,
-    // Finisher: lands the full Sunder cap (5 stacks = 10% armor) in one cast.
-    effects: [{ type: 'sunder', armor: 170, maxStacks: 5, full: true }],
+    // Finisher: each combo point spent lands one Sunder stack (5 points = the
+    // full 5-stack cap, 10% armor), classic Expose Armor style.
+    effects: [{ type: 'sunder', armor: 170, maxStacks: 5, perCombo: true }],
     description:
-      'Finishing move that exposes the target, reducing its armor by $d% for 30 sec. The reduction is the same however many combo points you spend.',
+      'Finishing move that exposes the target for 30 sec: each combo point spent reduces its armor by 2% (5 combo points: $d%).',
   },
   rupture: {
     id: 'rupture',
@@ -2953,9 +2954,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     spendsCombo: true,
-    effects: [{ type: 'dot', total: 96, duration: 16, interval: 2 }],
+    effects: [
+      { type: 'dot', total: 96, duration: 16, interval: 2, baseDuration: 6, perComboDuration: 2 },
+    ],
     description:
-      'Finishing move that wounds the target, causing it to bleed for $d over 16 sec. The bleed is the same however many combo points you spend.',
+      'Finishing move that wounds the target: it bleeds every 2 sec, for 6 sec plus 2 sec per combo point (5 combo points: 16 sec and $d total damage).',
   },
   vanish: {
     id: 'vanish',

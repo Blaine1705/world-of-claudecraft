@@ -14699,7 +14699,9 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
         return formatAbilityNumber(primary.bonus);
       case 'sunder':
         return formatAbilityNumber(
-          SUNDER_ARMOR_PCT_PER_STACK * (primary.full ? primary.maxStacks : 1) * 100,
+          SUNDER_ARMOR_PCT_PER_STACK *
+            (primary.full || primary.perCombo ? primary.maxStacks : 1) *
+            100,
         );
       case 'faerieFire':
         return formatAbilityNumber(FAERIE_FIRE_ARMOR_PCT * 100);

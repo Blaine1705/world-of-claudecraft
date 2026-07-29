@@ -1020,12 +1020,12 @@ const classAbilityNamesEn = {
       [
         'expose_armor',
         'Armor Breach',
-        'Finishing move that exposes the target, reducing its armor by {damage}% for 30 sec. The reduction is the same however many combo points you spend.',
+        'Finishing move that exposes the target for 30 sec: each combo point spent reduces its armor by 2% (5 combo points: {damage}%).',
       ],
       [
         'rupture',
         'Bleed Out',
-        'Finishing move that wounds the target, causing it to bleed for {damage} over 16 sec. The bleed is the same however many combo points you spend.',
+        'Finishing move that wounds the target: it bleeds every 2 sec, for 6 sec plus 2 sec per combo point (5 combo points: 16 sec and {damage} total damage).',
       ],
       [
         'vanish',
