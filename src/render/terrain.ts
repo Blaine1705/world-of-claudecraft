@@ -88,16 +88,23 @@ if (GFX.terrainSplat) {
   kickTerrainTex('grassN', 'Grass001_NormalGL.jpg', false);
   kickTerrainTex('dirtC', 'Ground048_Color.jpg', true);
   kickTerrainTex('dirtN', 'Ground048_NormalGL.jpg', false);
-  kickTerrainTex('rockC', 'Rock051_Color.jpg', true);
-  kickTerrainTex('rockN', 'Rock051_NormalGL.jpg', false);
+  // Rock026 (fractured cliff plates), not Rock051: Rock051's striations are
+  // directional (anisotropy 2.57), and wall-projecting them at one scale is
+  // what gave mountainsides the vertical corduroy. Rock051 stays on disk for
+  // voxel_terrain.
+  kickTerrainTex('rockC', 'Rock026_Color.jpg', true);
+  kickTerrainTex('rockN', 'Rock026_NormalGL.jpg', false);
   kickTerrainTex('sandC', 'Ground080_Color.jpg', true);
   kickTerrainTex('sandN', 'Ground080_NormalGL.jpg', false);
   kickTerrainTex('mudC', 'Ground071_Color.jpg', true); // marsh wet mud (dirt variant)
   kickTerrainTex('snowC', 'Snow010A_Color.jpg', true);
-  // The packs' authored AO maps, packed offline into one RGBA texture
-  // (R grass, G dirt, B rock, A sand) by scripts — one sampler instead of
-  // four keeps the splat material under the 16-sampler fragment limit.
-  // Linear cavity data: cavity = dark, open surface = bright.
+  // The packs' relief channels, packed offline into one RGBA texture by
+  // scripts/assets/pack_ground_ao.mjs (R grass AO, G dirt AO, B rock height,
+  // A sand AO): one sampler instead of four keeps the splat material under
+  // the 16-sampler fragment limit. B is a Rock026+Rock060 displacement blend,
+  // not an AO map: Rock026's authored AO is near-white, and displacement is
+  // the honest cavity signal for the new rocks. Linear data: cavity = dark,
+  // open surface = bright.
   kickTerrainTex('groundAO', 'GroundAO_Packed.png', false);
 }
 
@@ -386,9 +393,12 @@ float wocGroundHeight(vec2 uv, vec4 sw) {
   vec4 aoBase = texture2D(uGroundAO, uv);      // grass + sand share the base tiling
   float aoDirt = texture2D(uGroundAO, uv * 0.8).g;
   float aoRock = texture2D(uGroundAO, uv * 0.6).b;
+  // means measured by scripts/assets/pack_ground_ao.mjs; B (rock) is the
+  // Rock026/Rock060 displacement blend, centred like the AO channels so the
+  // signal stays zero-mean and mips fade it out with distance
   return (aoBase.r - 0.812) * sw.x
        + (aoDirt - 0.814) * sw.y
-       + (aoRock - 0.892) * sw.z
+       + (aoRock - 0.623) * sw.z
        + (aoBase.a - 0.883) * sw.w;
 }
 // Coarse soil-clump octave, one repeat per ~28 yards. The fine cavity above
@@ -590,22 +600,40 @@ function buildSplatMaterial(
         // marsh swaps packed dirt for wet mud (roads, hub discs included)
         vec3 dirtAlb = mix(dirtFlat, dirtWall, dirtWallW);
         vec3 rockFlat = texture2D(uRock, tuv * 0.6).rgb;
+        // hoisted from the hue-drift mix below: the wall blend reuses this
+        // hill-scale noise so plate zones vary across a mountainside without
+        // spending a second uMacro tap on cliff fragments
+        float macro2 = texture2D(uMacro, vWPos.xz * 0.0045 + 0.37).r;
+        // Anti-corduroy wall projection. A single-scale planar projection
+        // hands every cliff the same tiling period, and any directional bias
+        // in the source repeats in lockstep down the whole face, and that is
+        // the corduroy. Two breaks: each plane folds a ~3x coarser octave over the
+        // base scale (no single period survives at mountain distance), and the
+        // ZY plane samples with its axes swapped, a 90-degree rotation, so the
+        // two wall planes can never share stripe alignment even where they
+        // meet at a corner. The octave ratio wanders with the hill-scale
+        // macro noise so plate zones read as geology, not wallpaper.
+        float plateMix = 0.4 + (macro2 - 0.5) * 0.5;
         vec3 rockWall = mix(
-          texture2D(uRock, vWPos.xy * 0.132).rgb,
-          texture2D(uRock, vWPos.zy * 0.132).rgb,
+          mix(texture2D(uRock, vWPos.xy * 0.132).rgb,
+              texture2D(uRock, vWPos.xy * 0.043).rgb, plateMix),
+          mix(texture2D(uRock, vWPos.yz * 0.132).rgb,
+              texture2D(uRock, vWPos.yz * 0.043).rgb, plateMix),
           axisW);
         vec3 rockAlb = mix(rockFlat, rockWall, wallW);
         // Cliff cavity: groundShade's planar AO fades out by slope on purpose
         // (its XZ projection streaks on banks), which left steep faces
-        // shadeless. Re-sample the rock AO channel through the same
-        // wall-planar frame as the projected rock albedo, so cracks and
-        // ledges darken exactly where the rock says they are. Centred on the
-        // channel's measured mean like wocGroundHeight, so mip averaging
-        // fades it out with distance for free.
+        // shadeless. Re-sample the packed B channel (the Rock026/Rock060
+        // displacement blend) through the same wall-planar frames as the
+        // projected rock albedo, at the coarse octave only, so it shades
+        // whole fracture plates rather than re-tracing the fine tiling the
+        // albedo mix just broke up. Centred on the channel's measured mean
+        // like wocGroundHeight, so mip averaging fades it out with distance
+        // for free.
         float wallCav = mix(
-          texture2D(uGroundAO, vWPos.xy * 0.132).b,
-          texture2D(uGroundAO, vWPos.zy * 0.132).b,
-          axisW) - 0.892;
+          texture2D(uGroundAO, vWPos.xy * 0.043).b,
+          texture2D(uGroundAO, vWPos.yz * 0.043).b,
+          axisW) - 0.623;
         groundShade *= mix(
           1.0, clamp(1.0 + wallCav * 4.5, 0.45, 1.22),
           vSplatR.z * wallW * (1.0 - vExtra.y));
@@ -623,8 +651,8 @@ function buildSplatMaterial(
         vec3 impactAlb = mix(vec3(0.20, 0.08, 0.035), vec3(0.055, 0.040, 0.032), vExtra.w);
         alb = mix(alb, impactAlb, clamp(vExtra.z * 0.86 + vExtra.w * 0.18, 0.0, 0.96));
         // very-low-frequency hue drift (~100u wavelength) keeps distant
-        // hills from flattening into one uniform lawn green
-        float macro2 = texture2D(uMacro, vWPos.xz * 0.0045 + 0.37).r;
+        // hills from flattening into one uniform lawn green (macro2 itself is
+        // sampled up by the rock wall blend, which shares it)
         alb = mix(alb, alb * vec3(1.07, 1.03, 0.86), (macro2 - 0.5) * 0.75 * vSplat.x);
         // real albedo carries the hue now; vertex color only modulates gently
         // so the biome painting (roads, hub discs, snowline) still reads.
@@ -651,8 +679,14 @@ function buildSplatMaterial(
           ${ROUGH_SNOW}, vExtra.y) + roughBreak, 0.35, 1.0);
         // Cliff faces at ROUGH_ROCK read sheeny under the low sun: weathered
         // stone scatters, so steepness pushes rock toward full matte (snow
-        // keeps its own response via the vExtra.y damp).
-        roughnessFactor = mix(roughnessFactor, 0.95, vSplatR.z * wallW * (1.0 - vExtra.y));`,
+        // keeps its own response via the vExtra.y damp). A uniform 0.95 made
+        // big faces read as one flat sheet, though: raised plate centres
+        // (positive wallCav, the coarse displacement blend already sampled for
+        // cavity) ease back toward 0.8 so a mountainside reads faceted, each
+        // plate catching the light a little differently.
+        float plateHi = smoothstep(0.02, 0.14, wallCav);
+        roughnessFactor = mix(roughnessFactor, mix(0.95, 0.8, plateHi),
+          vSplatR.z * wallW * (1.0 - vExtra.y));`,
       )
       .replace(
         '#include <normal_fragment_maps>',
@@ -688,11 +722,17 @@ function buildSplatMaterial(
         normal = normalize(normal + tbn * vec3(detN, 0.0));
         // cliffs: wall-projected rock normal so steep faces get real relief
         // (approximate world-space tangent frames per projection plane; the
-        // handedness flip on back faces is invisible on noisy rock)
+        // handedness flip on back faces is invisible on noisy rock). The
+        // +-x plane samples axes-swapped (yz, the same 90-degree rotation as
+        // the albedo/cavity taps above) so whatever directional bias survives
+        // in the normal map can never line up across the two wall planes
+        // (matching stripe phase on adjacent planes is what read as corduroy).
         if (vSplat.z * wallW > 0.01) {
-          vec3 rNx = texture2D(uRockN, vWPos.zy * 0.132).xyz * 2.0 - 1.0; // +-x faces
+          vec3 rNx = texture2D(uRockN, vWPos.yz * 0.132).xyz * 2.0 - 1.0; // +-x faces, rotated
           vec3 rNz = texture2D(uRockN, vWPos.xy * 0.132).xyz * 2.0 - 1.0; // +-z faces
-          vec3 wallPerturb = mix(vec3(rNz.x, rNz.y, 0.0), vec3(0.0, rNx.y, rNx.x), axisW);
+          // rotated frame: the yz sample's tangent u runs along world y and
+          // v along world z, so its xy perturbation lands on (0, n.x, n.y)
+          vec3 wallPerturb = mix(vec3(rNz.x, rNz.y, 0.0), vec3(0.0, rNx.x, rNx.y), axisW);
           // 1.1 (was 0.8): the projected relief flattened against the
           // strengthened planar detail normals and cliffs read smooth
           normal = normalize(normal + mat3(viewMatrix) * wallPerturb * (vSplat.z * wallW * 1.1));

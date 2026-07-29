@@ -1294,7 +1294,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "textures/terrain/Ground093A_NormalGL.jpg": "/media/textures/terrain/Ground093A_NormalGL.21e2b5c25ca4.jpg",
   "textures/terrain/Ground095A_Color.jpg": "/media/textures/terrain/Ground095A_Color.1190f48670ae.jpg",
   "textures/terrain/Ground095A_NormalGL.jpg": "/media/textures/terrain/Ground095A_NormalGL.8364c043491d.jpg",
-  "textures/terrain/GroundAO_Packed.png": "/media/textures/terrain/GroundAO_Packed.b1980e1d6268.png",
+  "textures/terrain/GroundAO_Packed.png": "/media/textures/terrain/GroundAO_Packed.faf73b3bcf4e.png",
   "textures/terrain/Lava004_Color.jpg": "/media/textures/terrain/Lava004_Color.01eaee3da724.jpg",
   "textures/terrain/Lava004_NormalGL.jpg": "/media/textures/terrain/Lava004_NormalGL.9e931b8cee12.jpg",
   "textures/terrain/PavingStones046_AmbientOcclusion.jpg": "/media/textures/terrain/PavingStones046_AmbientOcclusion.da98bdc437d8.jpg",
