@@ -1342,7 +1342,7 @@ const classAbilityNamesEn = {
         'Hurls a bolt of nature energy for {damage} Nature damage.',
         {
           balance:
-            'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge (a heavy Arcane strike) and Skyfall becomes Sunwake (a Nature strike that restores 35 mana).',
+            'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge (240 to 285 Arcane damage) or Skyfall becomes Sunwake (160 to 190 Nature damage plus a 75 burn over 9 sec, and restores 35 mana).',
         },
       ],
       ['healing_touch', 'Wildmend', 'Heals a friendly target for {damage}.'],
@@ -1360,7 +1360,7 @@ const classAbilityNamesEn = {
       [
         'moonseed',
         'Moonseed',
-        'Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant heavy Arcane strike that spends all 3.',
+        'Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 240 to 285 Arcane damage that spends all 3.',
       ],
       [
         'rejuvenation',
@@ -1388,7 +1388,7 @@ const classAbilityNamesEn = {
         'A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.',
         {
           feral:
-            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a heavy, high-threat strike that instead shields you when below half health.',
+            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage.',
         },
       ],
       [
@@ -1413,7 +1413,7 @@ const classAbilityNamesEn = {
         'Finishing move that causes {damage}. Wolf Form only.',
         {
           feral:
-            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: it instantly deals all the damage your bleeds would still have dealt and restores 30 energy.',
+            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 91 plus 55 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy.',
         },
       ],
       [
@@ -1446,7 +1446,7 @@ const classAbilityNamesEn = {
         'Calls down a bolt of stellar fire, causing {damage} Arcane damage.',
         {
           balance:
-            'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant Nature strike and burn that restores 35 mana and spends all 3.',
+            'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 160 to 190 Nature damage plus a 75 burn over 9 sec, restoring 35 mana and spending all 3.',
         },
       ],
       [

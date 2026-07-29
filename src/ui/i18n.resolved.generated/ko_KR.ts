@@ -7511,7 +7511,7 @@ export const ko_KR: EnTranslations = {
       "wrath": {
         "name": "야생 벼락",
         "description": "Hurls a bolt of nature energy for {damage} Nature damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge (a heavy Arcane strike) and Skyfall becomes Sunwake (a Nature strike that restores 35 mana)."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, spend it: Moonseed becomes Moonsurge (240 to 285 Arcane damage) or Skyfall becomes Sunwake (160 to 190 Nature damage plus a 75 burn over 9 sec, and restores 35 mana)."
       },
       "healing_touch": {
         "name": "야생 치유",
@@ -7528,7 +7528,7 @@ export const ko_KR: EnTranslations = {
       },
       "moonseed": {
         "name": "달씨앗",
-        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant heavy Arcane strike that spends all 3."
+        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 240 to 285 Arcane damage that spends all 3."
       },
       "rejuvenation": {
         "name": "야생 개화",
@@ -7550,7 +7550,7 @@ export const ko_KR: EnTranslations = {
       "maul": {
         "name": "뼈 분쇄",
         "description": "A mauling attack that increases melee damage by {damage} and causes a high amount of threat. Activates on your next swing. Bruin Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a heavy, high-threat strike that instead shields you when below half health."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage."
       },
       "growl": {
         "name": "위협",
@@ -7568,7 +7568,7 @@ export const ko_KR: EnTranslations = {
       "ferocious_bite": {
         "name": "유혈 물어뜯기",
         "description": "Finishing move that causes {damage}. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: it instantly deals all the damage your bleeds would still have dealt and restores 30 energy."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 91 plus 55 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy."
       },
       "swipe": {
         "name": "휩쓰는 발톱",
@@ -7595,7 +7595,7 @@ export const ko_KR: EnTranslations = {
       "starfire": {
         "name": "창공 낙하",
         "description": "Calls down a bolt of stellar fire, causing {damage} Arcane damage.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant Nature strike and burn that restores 35 mana and spends all 3."
+        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 160 to 190 Nature damage plus a 75 burn over 9 sec, restoring 35 mana and spending all 3."
       },
       "travel_form": {
         "name": "쾌속 형태",
