@@ -2021,7 +2021,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
           name: 'Blooddrunk',
           description: 'Each tick of your Flense and Bloodrift bleeds also adds 1 Old Blood.',
           icon: 'rip',
-          effect: { intrinsic: { mechanic: 'druid_blooddrunk', metrics: {} } },
+          effect: { intrinsic: { mechanic: 'druid_blooddrunk', metrics: { oldBloodPerTick: 1 } } },
         },
         {
           id: 'dru_r14_moonfury',
@@ -2084,7 +2084,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
           description:
             'After you spend Moontide, Old Blood, or Verdance, it starts refilling with 1 already gained.',
           icon: 'moonseed',
-          effect: { intrinsic: { mechanic: 'druid_natures_echo', metrics: {} } },
+          effect: { intrinsic: { mechanic: 'druid_natures_echo', metrics: { headStart: 1 } } },
         },
         {
           id: 'dru_r20_berserk',
@@ -2103,7 +2103,7 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
           effect: {
             intrinsic: {
               mechanic: 'druid_quickening',
-              metrics: { manaPct: 0.02, energy: 5, rage: 3 },
+              metrics: { perStageGained: 1, manaPct: 0.02, energy: 5, rage: 3 },
             },
           },
         },
