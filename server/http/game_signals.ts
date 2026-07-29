@@ -17,10 +17,14 @@
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
 // only label values here are the ws-message direction (a fixed two), the
 // inbound drop cause (the fixed six-value WS_DROP_CAUSES set), the copper-flow
-// source and the harvest band (the two fixed sets in server/economy_telemetry.ts).
-// Nothing per-player (account id, character id, name, ip) is ever a label.
+// source, the harvest band and node tier (the fixed sets in
+// server/economy_telemetry.ts), and the fishing band and rod recipe id (the
+// fixed sets in server/fishing_telemetry.ts, whose zone label reuses the same
+// harvest band vocabulary). Nothing per-player (account id, character id, name,
+// ip) is ever a label.
 
-import type { CopperFlowSource, HarvestBand } from '../economy_telemetry';
+import type { CopperFlowSource, HarvestBand, HarvestTier } from '../economy_telemetry';
+import type { FishingBandLabel } from '../fishing_telemetry';
 
 /** The two directions a ws frame is counted under: client-to-server or server-to-client. */
 export type WsMessageDirection = 'in' | 'out';
@@ -80,8 +84,38 @@ export interface GameMetricsCounters {
   copperCredited(source: CopperFlowSource, amount: number): void;
   /** `amount` copper (always positive) debited from the acting player, same sampling. */
   copperSpent(source: CopperFlowSource, amount: number): void;
-  /** One granted node harvest, counted under its node's zone band (R3). */
-  harvest(band: HarvestBand): void;
+  /** One granted node harvest, counted under its node's zone band (R3) and the
+   *  node's own tool tier (R31: a zone's tier-1 faucet and its tool-gated
+   *  tiers are opposite sides of the same question). */
+  harvest(band: HarvestBand, tier: HarvestTier): void;
+  /**
+   * One fishing cast started, counted under the water's zone and the effective
+   * band the sim resolved for it. The denominator every other fishing rate is
+   * read against, so it counts the CAST, not the session: a recast after a
+   * got-away is a second cast.
+   */
+  fishingCast(zone: HarvestBand, band: FishingBandLabel): void;
+  /**
+   * One landed catch. `koi` additionally books the rare-koi counter, so the koi
+   * series is a strict subset of the catch series and the R4 odds question is
+   * one division, never a subtraction across two independently sampled totals.
+   */
+  fishingCatch(zone: HarvestBand, band: FishingBandLabel, koi: boolean): void;
+  /**
+   * One catch that got away: the reel window closed unpressed, the session
+   * defensively timed out, or the landed catch found no bag room. All three
+   * spent the cast and yielded nothing, which is what the series measures.
+   */
+  fishingGotAway(zone: HarvestBand, band: FishingBandLabel): void;
+  /** One cast whose single table draw resolved the empty (itemId: null) row. */
+  fishingEmptyHook(zone: HarvestBand, band: FishingBandLabel): void;
+  /**
+   * One rod recipe successfully trained, and therefore one training fee paid.
+   * A COUNT, not an amount: the fee is static content per recipe
+   * (rodFeeForRecipe), published beside the counter, so the copper is one
+   * multiplication and cannot drift from what the trainer actually charges.
+   */
+  rodFeePaid(recipeId: string): void;
 }
 
 /** A sink that drops every signal; the slot default until boot wires the real one. */
@@ -95,6 +129,11 @@ export const noopGameMetricsCounters: GameMetricsCounters = {
   copperCredited() {},
   copperSpent() {},
   harvest() {},
+  fishingCast() {},
+  fishingCatch() {},
+  fishingGotAway() {},
+  fishingEmptyHook() {},
+  rodFeePaid() {},
 };
 
 let activeCounters: GameMetricsCounters = noopGameMetricsCounters;

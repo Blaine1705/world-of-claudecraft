@@ -50,6 +50,7 @@ import {
   partyFrameIncomingHeals,
   partyFrameRole,
 } from '../src/sim/party_frame_info';
+import { effectiveFishingBand } from '../src/sim/professions/fishing';
 import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/session_teardown';
 import type { ToolEffectConfirmMode } from '../src/sim/professions/tools';
 import type { PetState, PlayerMeta } from '../src/sim/sim';
@@ -71,6 +72,7 @@ import {
   type Entity,
   type EquipSlot,
   emptyMoveInput,
+  FISHING_CAST_ID,
   isDungeonDifficulty,
   MAX_LEVEL,
   type MobFamily,
@@ -154,9 +156,14 @@ import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueRelay } from './discord_relay';
 import { formatDuration } from './duration';
-import { copperFlowSourceForCommand, harvestBandForNode } from './economy_telemetry';
+import {
+  copperFlowSourceForCommand,
+  harvestBandForNode,
+  harvestTierForNode,
+} from './economy_telemetry';
 import { shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, serializeEventFragments } from './event_frame';
+import { fishingBandLabel, isKoi, isRodFeeRecipe } from './fishing_telemetry';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
@@ -6371,11 +6378,47 @@ export class GameServer {
         }
       }
       // Economy telemetry: one granted node harvest, counted under the ZONE
-      // of the node that yielded it (R3). Bots emit this too and are counted
-      // like anyone else, deliberately: the series exists to show where the
-      // world is harvesting.
+      // of the node that yielded it (R3) and the node's own tool TIER (R31, so
+      // a starter-zone bare-hands faucet reads apart from the tool-gated veins
+      // beside it). Bots emit this too and are counted like anyone else,
+      // deliberately: the series exists to show where the world is harvesting.
       if (ev.type === 'gatherResult') {
-        gameMetricsCounters().harvest(harvestBandForNode(ev.nodeId));
+        gameMetricsCounters().harvest(harvestBandForNode(ev.nodeId), harvestTierForNode(ev.nodeId));
+      }
+      // Fishing telemetry: the three outcome events the sim emits (catch,
+      // got-away, empty hook), each carrying the session's pinned water zone
+      // and the effective band, plus the cast itself and the rod training fee.
+      // Same no-session-filter reasoning as the harvest arm above.
+      //
+      // A cast has no dedicated event: it is the generic castStart with the
+      // fishing ability, and the zone lives on the CASTER (the rod gate pinned
+      // it at cast start), so this arm resolves both from the entity rather
+      // than from the event. It is the denominator for every rate below.
+      if (ev.type === 'castStart' && ev.ability === FISHING_CAST_ID) {
+        const caster = this.sim.entities.get(ev.entityId);
+        const casterMeta = this.sim.players.get(ev.entityId);
+        if (caster && casterMeta) {
+          gameMetricsCounters().fishingCast(
+            caster.fishCastZoneId || zoneAt(caster.pos.z).id,
+            fishingBandLabel(effectiveFishingBand(casterMeta)),
+          );
+        }
+      }
+      if (ev.type === 'fishingResult') {
+        gameMetricsCounters().fishingCatch(ev.zoneId, fishingBandLabel(ev.band), isKoi(ev.itemId));
+      }
+      if (ev.type === 'fishingGotAway') {
+        gameMetricsCounters().fishingGotAway(ev.zoneId, fishingBandLabel(ev.band));
+      }
+      if (ev.type === 'fishingEmptyHook') {
+        gameMetricsCounters().fishingEmptyHook(ev.zoneId, fishingBandLabel(ev.band));
+      }
+      // One rod training fee paid. Only the ok arm charges (Sim.trainRecipe
+      // debits exactly once and a duplicate resolves train_already_known), so
+      // the ok check is what makes this a payment count and not an attempt
+      // count. The fee amount is static content, published as woc_rod_fee_copper.
+      if (ev.type === 'trainResult' && ev.ok && isRodFeeRecipe(ev.recipeId)) {
+        gameMetricsCounters().rodFeePaid(ev.recipeId);
       }
       if (ev.type === 'levelup' && ev.pid !== undefined) {
         const session = this.clients.get(ev.pid);

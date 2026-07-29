@@ -16,10 +16,19 @@
 //
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
 // only label values are the fixed tick-phase names, the two per-phase stats
-// (p95, max), the two ws directions (in, out), and the fixed six inbound drop
-// causes (WS_DROP_CAUSES). Nothing per-player (account id,
+// (p95, max), the two ws directions (in, out), the fixed six inbound drop
+// causes (WS_DROP_CAUSES), and the content-derived economy and fishing
+// vocabularies (COPPER_FLOW_SOURCES, HARVEST_BANDS, NODE_TIERS, FISHING_BANDS,
+// ROD_FEE_RECIPE_IDS). Nothing per-player (account id,
 // character id, name, ip) is ever a label. The tick-phase series count is fixed at
 // WOC_TICK_PHASES.length * 2, independent of the profiler's internal phase set.
+//
+// THE `band` LABEL MEANS TWO DIFFERENT THINGS, and deliberately so: on
+// woc_gather_harvests_total it is the node's ZONE (R3 re-keyed it there and
+// external dashboards already point at those values), while on the woc_fishing_*
+// family the zone rides its own `zone` label and `band` is the fishing
+// proficiency rung 0/1/2. Renaming either would break a live dashboard for a
+// cosmetic win; read the label against its metric, never across families.
 
 import { Counter, Gauge, type Registry } from 'prom-client';
 import {
@@ -27,7 +36,16 @@ import {
   type CopperFlowSource,
   HARVEST_BANDS,
   type HarvestBand,
+  type HarvestTier,
+  NODE_TIERS,
 } from '../economy_telemetry';
+import {
+  FISHING_BANDS,
+  type FishingBandLabel,
+  isRodFeeRecipe,
+  ROD_FEE_RECIPE_IDS,
+  rodFeeForRecipe,
+} from '../fishing_telemetry';
 import {
   type GameMetricsCounters,
   WS_DROP_CAUSES,
@@ -77,8 +95,32 @@ export const WOC_COPPER_CREDITED_TOTAL = 'woc_copper_credited_total';
 /** Total copper debited from acting players, labeled by economic surface. */
 export const WOC_COPPER_SPENT_TOTAL = 'woc_copper_spent_total';
 
-/** Total granted node harvests, labeled by the node's zone (R3). */
+/** Total granted node harvests, labeled by the node's zone (R3) and tool tier (R31). */
 export const WOC_GATHER_HARVESTS_TOTAL = 'woc_gather_harvests_total';
+
+/** Total fishing casts started, labeled by water zone and effective band. */
+export const WOC_FISHING_CASTS_TOTAL = 'woc_fishing_casts_total';
+
+/** Total landed catches (the koi included), labeled by water zone and effective band. */
+export const WOC_FISHING_CATCHES_TOTAL = 'woc_fishing_catches_total';
+
+/** Total landed rare koi, a strict subset of the catches counter, same labels. */
+export const WOC_FISHING_KOI_TOTAL = 'woc_fishing_koi_total';
+
+/** Total fishing got-aways (missed reel, timed-out session, or no bag room), same labels. */
+export const WOC_FISHING_GOT_AWAYS_TOTAL = 'woc_fishing_got_aways_total';
+
+/** Total casts whose table draw resolved the empty row (nothing biting), same labels. */
+export const WOC_FISHING_EMPTY_HOOKS_TOTAL = 'woc_fishing_empty_hooks_total';
+
+/** Total rod recipes successfully trained, labeled by recipe id (one fee paid each). */
+export const WOC_ROD_FEE_PAYMENTS_TOTAL = 'woc_rod_fee_payments_total';
+
+/** The STATIC training fee in copper for each rod recipe, published so the copper
+ *  the rod fees took is woc_rod_fee_payments_total times this, with no hardcoded
+ *  gold amount in any dashboard. Content-derived and constant for the process's
+ *  life, which is why it carries no collect(). */
+export const WOC_ROD_FEE_COPPER = 'woc_rod_fee_copper';
 
 /**
  * The FIXED set of loop phases surfaced on woc_sim_tick_phase_seconds. These are
@@ -288,11 +330,75 @@ export function registerGameStateMetrics(
 
   const harvests = new Counter({
     name: WOC_GATHER_HARVESTS_TOTAL,
-    help: 'Total granted node harvests, by the node zone.',
-    labelNames: ['band'],
+    help: 'Total granted node harvests, by the node zone and the node tool tier.',
+    labelNames: ['band', 'tier'],
     registers: [registry],
   });
-  for (const band of HARVEST_BANDS) harvests.inc({ band }, 0);
+  // The full zone x tier cross product, not just the combos live content fills:
+  // Eastbrook has no tier-3 ground, and that permanent zero is the honest
+  // answer to "is anyone working thornpeak-grade nodes in the starter zone".
+  for (const band of HARVEST_BANDS) {
+    for (const tier of NODE_TIERS) harvests.inc({ band, tier }, 0);
+  }
+
+  // The fishing family: one counter per outcome, all sharing the zone x band
+  // label pair so a rate is a division of two series with identical labels
+  // (koi per catch, empty hooks per cast) rather than a join across shapes.
+  const fishingCounter = (name: string, help: string): Counter<'zone' | 'band'> => {
+    const counter = new Counter({
+      name,
+      help,
+      labelNames: ['zone', 'band'] as const,
+      registers: [registry],
+    });
+    // Prom counters cannot backfill a scrape: every zone x band series is
+    // visible from boot, so an empty band reads as a real zero rather than as
+    // a gap a dashboard has to guess at.
+    for (const zone of HARVEST_BANDS) {
+      for (const band of FISHING_BANDS) counter.inc({ zone, band }, 0);
+    }
+    return counter;
+  };
+
+  const fishingCasts = fishingCounter(
+    WOC_FISHING_CASTS_TOTAL,
+    'Total fishing casts started, by water zone and effective band.',
+  );
+  const fishingCatches = fishingCounter(
+    WOC_FISHING_CATCHES_TOTAL,
+    'Total landed catches (the rare koi included), by water zone and effective band.',
+  );
+  const fishingKoi = fishingCounter(
+    WOC_FISHING_KOI_TOTAL,
+    'Total landed rare koi, a subset of the catches counter, by water zone and effective band.',
+  );
+  const fishingGotAways = fishingCounter(
+    WOC_FISHING_GOT_AWAYS_TOTAL,
+    'Total fishing got-aways (missed reel, timed-out session, or no bag room), by zone and band.',
+  );
+  const fishingEmptyHooks = fishingCounter(
+    WOC_FISHING_EMPTY_HOOKS_TOTAL,
+    'Total fishing casts whose table draw resolved the empty row, by water zone and effective band.',
+  );
+
+  const rodFeePayments = new Counter({
+    name: WOC_ROD_FEE_PAYMENTS_TOTAL,
+    help: 'Total rod recipes successfully trained, by recipe id (one training fee paid each).',
+    labelNames: ['recipe'],
+    registers: [registry],
+  });
+  const rodFeeCopper = new Gauge({
+    name: WOC_ROD_FEE_COPPER,
+    help: 'The static training fee in copper for each rod recipe (multiply by the payments counter).',
+    labelNames: ['recipe'],
+    registers: [registry],
+  });
+  for (const recipe of ROD_FEE_RECIPE_IDS) {
+    rodFeePayments.inc({ recipe }, 0);
+    // Static content, set once at registration: the fee is a pure tier lookup
+    // over a frozen recipe record, so there is nothing to re-read at scrape.
+    rodFeeCopper.set({ recipe }, rodFeeForRecipe(recipe));
+  }
 
   return {
     wsMessage(direction: WsMessageDirection): void {
@@ -353,17 +459,74 @@ export function registerGameStateMetrics(
         // Drop the sample rather than propagate into the command path.
       }
     },
-    harvest(band: HarvestBand): void {
+    harvest(band: HarvestBand, tier: HarvestTier): void {
       try {
         // HarvestBand is plain string (ZoneDef.id is not literal-typed), so
         // this membership check is the cardinality bound: a caller handing us
         // anything off the vocabulary drops the sample instead of minting an
-        // unbounded series.
+        // unbounded series. The tier is checked the same way even though its
+        // type IS literal, because the value crosses the same untyped seam.
         if (!HARVEST_BANDS.includes(band)) return;
-        harvests.inc({ band });
+        if (!(NODE_TIERS as readonly string[]).includes(tier)) return;
+        harvests.inc({ band, tier });
+      } catch {
+        // Drop the sample rather than propagate into the event-routing path.
+      }
+    },
+    fishingCast(zone: HarvestBand, band: FishingBandLabel): void {
+      try {
+        if (!fishingLabelsInVocabulary(zone, band)) return;
+        fishingCasts.inc({ zone, band });
+      } catch {
+        // Drop the sample rather than propagate into the event-routing path.
+      }
+    },
+    fishingCatch(zone: HarvestBand, band: FishingBandLabel, koi: boolean): void {
+      try {
+        if (!fishingLabelsInVocabulary(zone, band)) return;
+        fishingCatches.inc({ zone, band });
+        // The koi counter is a SUBSET of catches, never an alternative to it:
+        // a koi increments both, so koi/catches is the R4 odds read directly.
+        if (koi) fishingKoi.inc({ zone, band });
+      } catch {
+        // Drop the sample rather than propagate into the event-routing path.
+      }
+    },
+    fishingGotAway(zone: HarvestBand, band: FishingBandLabel): void {
+      try {
+        if (!fishingLabelsInVocabulary(zone, band)) return;
+        fishingGotAways.inc({ zone, band });
+      } catch {
+        // Drop the sample rather than propagate into the event-routing path.
+      }
+    },
+    fishingEmptyHook(zone: HarvestBand, band: FishingBandLabel): void {
+      try {
+        if (!fishingLabelsInVocabulary(zone, band)) return;
+        fishingEmptyHooks.inc({ zone, band });
+      } catch {
+        // Drop the sample rather than propagate into the event-routing path.
+      }
+    },
+    rodFeePaid(recipeId: string): void {
+      try {
+        // The recipe id reaches here from a client-driven train command, so the
+        // membership check is doing real work: only the two content-derived rod
+        // recipes may ever become a series.
+        if (!isRodFeeRecipe(recipeId)) return;
+        rodFeePayments.inc({ recipe: recipeId });
       } catch {
         // Drop the sample rather than propagate into the event-routing path.
       }
     },
   };
+}
+
+/** Both fishing labels are plain strings at this seam (the zone comes from a
+ *  ZoneDef id), so this membership pair IS the fishing family's cardinality
+ *  bound: an off-vocabulary zone or band drops the whole sample rather than
+ *  minting a series, and a malformed band is never re-banded into a real one
+ *  (that would corrupt the very distribution the counters exist to measure). */
+function fishingLabelsInVocabulary(zone: string, band: string): boolean {
+  return HARVEST_BANDS.includes(zone) && (FISHING_BANDS as readonly string[]).includes(band);
 }

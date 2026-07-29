@@ -7,9 +7,10 @@
 // counter in one move, so a player who used to buy a stack of ore now has to go
 // and mine it. Both halves of that need watching. Copper flow answers whether
 // the faucet still covers what a player must buy (tools, training, fees) once
-// materials are no longer a copper sink; harvest counts by zone band answer
-// whether players actually reach the later zones' nodes or stall in the
-// starter zone. Neither reads back into gameplay: this is observability only.
+// materials are no longer a copper sink; harvest counts by zone band and node
+// tier answer whether players actually reach the later zones' nodes and the
+// tool-gated tiers within them, or stall on the starter zone's bare-hands
+// faucet. Neither reads back into gameplay: this is observability only.
 //
 // COPPER FLOW IS A TREND, NOT A LEDGER. It is sampled as the acting player's
 // copper delta across one command dispatch, so it books nothing for a credit
@@ -147,4 +148,42 @@ const NODE_ZONE_BY_ID: ReadonlyMap<string, string> = new Map(
  */
 export function harvestBandForNode(nodeId: string): HarvestBand {
   return NODE_ZONE_BY_ID.get(nodeId) ?? HARVEST_BANDS[0];
+}
+
+/**
+ * The node tiers, as label values. Fixed at three by GatherNodeDef.tier (tier 1
+ * is bare-hands, 2 and 3 need the matching tool rung), NOT derived from the
+ * node table: a tier is a rung of the tool ladder, not a record, so a fourth
+ * one is a design change that should redden this pin rather than silently widen
+ * the harvest series.
+ *
+ * Why the harvest counter needs it (R31): the zone band alone cannot separate a
+ * level-1 traveler standing on Eastbrook's tier-1 faucet from a capped player
+ * working the tier-2 and tier-3 veins in the same zone, and those two are the
+ * opposite sides of the question the series exists to answer. Zones x tiers is
+ * nine series, and the combinations no live node fills (Eastbrook has no tier-3
+ * ground) sit at a permanent, honest zero.
+ */
+export const NODE_TIERS = ['1', '2', '3'] as const;
+
+/** One of the three node tiers, as a label value. */
+export type HarvestTier = (typeof NODE_TIERS)[number];
+
+/** O(1) node-to-tier resolution for the event pass; built once from content,
+ *  sibling of NODE_ZONE_BY_ID above and a real Map for the same reason. */
+const NODE_TIER_BY_ID: ReadonlyMap<string, string> = new Map(
+  GATHER_NODES.map((node) => [node.id, String(node.tier)]),
+);
+
+/**
+ * The tier one granted harvest is counted under: the NODE's own tier. An
+ * unknown node id (a retired node named by a stale event) falls to tier 1, the
+ * same counted-not-dropped direction harvestBandForNode takes, and a tier the
+ * vocabulary does not carry falls there too rather than minting a series.
+ */
+export function harvestTierForNode(nodeId: string): HarvestTier {
+  const tier = NODE_TIER_BY_ID.get(nodeId);
+  return tier !== undefined && (NODE_TIERS as readonly string[]).includes(tier)
+    ? (tier as HarvestTier)
+    : NODE_TIERS[0];
 }

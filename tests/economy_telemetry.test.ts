@@ -12,6 +12,8 @@ import {
   copperFlowSourceForCommand,
   HARVEST_BANDS,
   harvestBandForNode,
+  harvestTierForNode,
+  NODE_TIERS,
 } from '../server/economy_telemetry';
 import { GATHER_NODES, ZONES } from '../src/sim/data';
 
@@ -110,6 +112,64 @@ describe('harvest band classification (zone-keyed, R3)', () => {
     for (const key of ['toString', 'constructor', 'valueOf', '__proto__']) {
       expect(harvestBandForNode(key), key).toBe('eastbrook_vale');
     }
+  });
+});
+
+describe('harvest tier classification (R31)', () => {
+  it('is a closed three-value set, one per node tool rung', () => {
+    // Literal pin: these are the label values a dashboard groups by, and a
+    // fourth tier is a tool-ladder design change that must redden this rather
+    // than silently widen the harvest series.
+    expect([...NODE_TIERS]).toEqual(['1', '2', '3']);
+  });
+
+  it('classifies every live node under its own tier', () => {
+    expect(GATHER_NODES.length).toBeGreaterThan(0);
+    const seen = new Set<string>();
+    for (const node of GATHER_NODES) {
+      expect(harvestTierForNode(node.id), node.id).toBe(String(node.tier));
+      seen.add(harvestTierForNode(node.id));
+    }
+    // All three tiers are reachable from live content, so no exported tier
+    // series is permanently dead across the whole world (a given ZONE may
+    // still have empty tiers, which is exactly the R31 signal).
+    expect(seen).toEqual(new Set(NODE_TIERS));
+  });
+
+  it('produces only vocabulary members, for every node in content', () => {
+    // The exporter pre-touches exactly NODE_TIERS, and its sink drops anything
+    // outside it, so a node whose tier fell off the vocabulary would vanish
+    // from the counter rather than merely land oddly.
+    const members = new Set<string>(NODE_TIERS);
+    for (const node of GATHER_NODES) {
+      expect(members.has(harvestTierForNode(node.id)), node.id).toBe(true);
+    }
+  });
+
+  it('counts an unknown node id at tier 1 rather than dropping it', () => {
+    // Same counted-not-dropped direction as harvestBandForNode: a retired node
+    // named by a stale event is counted, never dropped, never a new series.
+    // Literal, not NODE_TIERS[0], so a reorder cannot silently move it.
+    expect(harvestTierForNode('not_a_real_node')).toBe('1');
+    // Prototype keys degrade the same way: the backing map is a real Map, so
+    // 'constructor' and friends miss and take the fallback instead of
+    // stringifying an inherited function into a label value.
+    for (const key of ['toString', 'constructor', 'valueOf', '__proto__']) {
+      expect(harvestTierForNode(key), key).toBe('1');
+    }
+  });
+
+  it('is an independent axis from the zone band, not a re-spelling of it', () => {
+    // The whole point of R31's tier label: one zone must carry more than one
+    // tier, or the label adds no information the band did not already have.
+    const tiersByZone = new Map<string, Set<string>>();
+    for (const node of GATHER_NODES) {
+      const zone = harvestBandForNode(node.id);
+      const tiers = tiersByZone.get(zone) ?? new Set<string>();
+      tiers.add(harvestTierForNode(node.id));
+      tiersByZone.set(zone, tiers);
+    }
+    expect([...tiersByZone.values()].some((tiers) => tiers.size > 1)).toBe(true);
   });
 });
 

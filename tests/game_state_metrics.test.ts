@@ -39,7 +39,7 @@ vi.mock('../server/db', () => ({
   releaseAllCharacterLeases: vi.fn(async () => {}),
 }));
 
-import type { CopperFlowSource, HarvestBand } from '../server/economy_telemetry';
+import type { CopperFlowSource, HarvestBand, HarvestTier } from '../server/economy_telemetry';
 import { type ClientSession, GameServer } from '../server/game';
 import { type GameStateSource, registerGameStateMetrics } from '../server/http/game_metrics';
 import {
@@ -394,7 +394,12 @@ function recordingSink() {
   const seqGaps: number[] = [];
   const credited: Array<[CopperFlowSource, number]> = [];
   const spent: Array<[CopperFlowSource, number]> = [];
-  const harvests: HarvestBand[] = [];
+  const harvests: Array<[HarvestBand, HarvestTier]> = [];
+  const fishingCasts: Array<[string, string]> = [];
+  const fishingCatches: Array<[string, string, boolean]> = [];
+  const fishingGotAways: Array<[string, string]> = [];
+  const fishingEmptyHooks: Array<[string, string]> = [];
+  const rodFees: string[] = [];
   const sink: GameMetricsCounters = {
     wsMessage(direction) {
       if (direction === 'in') wsIn++;
@@ -418,8 +423,23 @@ function recordingSink() {
     copperSpent(source, amount) {
       spent.push([source, amount]);
     },
-    harvest(band) {
-      harvests.push(band);
+    harvest(band, tier) {
+      harvests.push([band, tier]);
+    },
+    fishingCast(zone, band) {
+      fishingCasts.push([zone, band]);
+    },
+    fishingCatch(zone, band, koi) {
+      fishingCatches.push([zone, band, koi]);
+    },
+    fishingGotAway(zone, band) {
+      fishingGotAways.push([zone, band]);
+    },
+    fishingEmptyHook(zone, band) {
+      fishingEmptyHooks.push([zone, band]);
+    },
+    rodFeePaid(recipeId) {
+      rodFees.push(recipeId);
     },
   };
   return {
@@ -429,6 +449,11 @@ function recordingSink() {
     credited,
     spent,
     harvests,
+    fishingCasts,
+    fishingCatches,
+    fishingGotAways,
+    fishingEmptyHooks,
+    rodFees,
     wsIn: () => wsIn,
     rateKicks: () => rateKicks,
     chats: () => chats,
@@ -860,14 +885,16 @@ describe('economy telemetry counters at their emission sites', () => {
     server.stop();
   });
 
-  it('counts each granted harvest under its own ZONE band (R3)', () => {
+  it('counts each granted harvest under its own ZONE band and node TIER (R3, R31)', () => {
     const server = new GameServer();
     const rec = recordingSink();
     setGameMetricsCounters(rec.sink);
 
     // The real observer pass over a tick's events, fed one harvest per zone.
     // Bands are the node's zone since the R3 re-key: what it yields no longer
-    // decides anything, where it stands does.
+    // decides anything, where it stands does. The tier rides beside it (R31),
+    // so a starter-zone bare-hands node and a tool-gated vein in the same
+    // zone land on different series.
     (server as unknown as Record<string, any>).detectActivity([
       harvestEvent('ore_eastbrook_1'),
       harvestEvent('ore_mirefen_t2'),
@@ -876,10 +903,30 @@ describe('economy telemetry counters at their emission sites', () => {
     ]);
 
     expect(rec.harvests).toEqual([
-      'eastbrook_vale',
-      'mirefen_marsh',
-      'thornpeak_heights',
-      'eastbrook_vale',
+      ['eastbrook_vale', '1'],
+      ['mirefen_marsh', '2'],
+      ['thornpeak_heights', '3'],
+      ['eastbrook_vale', '1'],
+    ]);
+    server.stop();
+  });
+
+  it('reads the tier off the same node the band came from, not off the band', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+
+    // The arm that would break if the tier were derived from the zone (or
+    // hardcoded): ONE zone carrying two different tiers must produce two
+    // different label pairs, which is the whole R31 traveler-versus-capped read.
+    (server as unknown as Record<string, any>).detectActivity([
+      harvestEvent('ore_mirefen_1'),
+      harvestEvent('ore_mirefen_t2'),
+    ]);
+
+    expect(rec.harvests).toEqual([
+      ['mirefen_marsh', '1'],
+      ['mirefen_marsh', '2'],
     ]);
     server.stop();
   });
@@ -894,7 +941,292 @@ describe('economy telemetry counters at their emission sites', () => {
     // harvest counter deliberately does not, because it measures the world.
     (server as unknown as Record<string, any>).detectActivity([harvestEvent('ore_thornpeak_t3')]);
 
-    expect(rec.harvests).toEqual(['thornpeak_heights']);
+    expect(rec.harvests).toEqual([['thornpeak_heights', '3']]);
+    server.stop();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Fishing telemetry: the five outcome arms plus the rod-fee arm on the same
+// single observer pass. Every event below is built through Extract rather than
+// `as SimEvent` for the reason spelled out at harvestEvent: a blanket cast
+// would swallow a rename of the very field the counter reads (zoneId, band,
+// itemId, recipeId) and leave the server booking the wrong label with these
+// tests still green.
+// ---------------------------------------------------------------------------
+
+/** Drive the tick's ONE observer pass directly. Typed through the method shape
+ *  rather than an `any` cast (the broadcastSnapshots precedent above), so the
+ *  event literals below stay checked against the real SimEvent union. */
+function observe(server: GameServer, events: SimEvent[]): void {
+  (server as unknown as { detectActivity(events: SimEvent[]): void }).detectActivity(events);
+}
+
+type CastStartEvent = Extract<SimEvent, { type: 'castStart' }>;
+function castStartEvent(entityId: number, ability: string): SimEvent {
+  const event: CastStartEvent = { type: 'castStart', entityId, ability, time: 0 };
+  return event;
+}
+
+type FishingResultEvent = Extract<SimEvent, { type: 'fishingResult' }>;
+function fishingResultEvent(zoneId: string, band: 0 | 1 | 2, itemId: string): SimEvent {
+  const event: FishingResultEvent = {
+    type: 'fishingResult',
+    pid: 999,
+    itemId,
+    quality: 'common',
+    zoneId,
+    band,
+  };
+  return event;
+}
+
+type FishingGotAwayEvent = Extract<SimEvent, { type: 'fishingGotAway' }>;
+function fishingGotAwayEvent(zoneId: string, band: 0 | 1 | 2): SimEvent {
+  const event: FishingGotAwayEvent = { type: 'fishingGotAway', pid: 999, zoneId, band };
+  return event;
+}
+
+type FishingEmptyHookEvent = Extract<SimEvent, { type: 'fishingEmptyHook' }>;
+function fishingEmptyHookEvent(zoneId: string, band: 0 | 1 | 2): SimEvent {
+  const event: FishingEmptyHookEvent = { type: 'fishingEmptyHook', pid: 999, zoneId, band };
+  return event;
+}
+
+type TrainResultEvent = Extract<SimEvent, { type: 'trainResult' }>;
+function trainResultEvent(recipeId: string, ok: boolean): SimEvent {
+  const event: TrainResultEvent = ok
+    ? { type: 'trainResult', pid: 999, ok: true, recipeId }
+    : { type: 'trainResult', pid: 999, ok: false, recipeId, reason: 'train_cannot_afford' };
+  return event;
+}
+
+describe('fishing telemetry counters at their emission sites', () => {
+  it('counts a fishing cast under the water zone pinned on the caster', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+    const session = join(server, fakeWs(), 100, 1, 'Ayla');
+    const entity = server.sim.entities.get(session.pid);
+    if (!entity) throw new Error('no entity for the joined session');
+    // The zone the rod gate pinned at cast start. A cast has no dedicated
+    // event, so this arm reads BOTH labels off the caster; the event itself
+    // carries only the entity id and the ability.
+    entity.fishCastZoneId = 'thornpeak_heights';
+
+    observe(server, [castStartEvent(session.pid, 'fishing')]);
+
+    // A fresh character has no rod and no proficiency, so the effective band
+    // is 0 even though the water is Thornpeak's.
+    expect(rec.fishingCasts).toEqual([['thornpeak_heights', '0']]);
+    server.stop();
+  });
+
+  it('reads the cast band off the caster, not a constant', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+    const session = join(server, fakeWs(), 100, 1, 'Ayla');
+    const entity = server.sim.entities.get(session.pid);
+    if (!entity) throw new Error('no entity for the joined session');
+    const meta = server.sim.meta(session.pid) as unknown as Record<string, any>;
+    entity.fishCastZoneId = 'mirefen_marsh';
+    // Band 2 needs BOTH halves of effectiveFishingBand: the proficiency rung
+    // and a rod whose tier covers it. Raise one at a time so a counter that
+    // read only one of them still fails here.
+    meta.gatheringProficiency.fishing = 200;
+    observe(server, [castStartEvent(session.pid, 'fishing')]);
+    // Proficiency alone is capped by the missing rod: still band 0.
+    expect(rec.fishingCasts).toEqual([['mirefen_marsh', '0']]);
+
+    server.sim.addItem('tidewrought_fishing_rod', 1, session.pid);
+    observe(server, [castStartEvent(session.pid, 'fishing')]);
+    expect(rec.fishingCasts).toEqual([
+      ['mirefen_marsh', '0'],
+      ['mirefen_marsh', '2'],
+    ]);
+    server.stop();
+  });
+
+  it('falls back to the caster position when no cast zone is pinned', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+    const session = join(server, fakeWs(), 100, 1, 'Ayla');
+    const entity = server.sim.entities.get(session.pid);
+    if (!entity) throw new Error('no entity for the joined session');
+    // A direct drive with no startFishing behind it leaves the pinned zone
+    // empty; the arm resolves the zone from where the caster stands instead of
+    // booking an empty label the sink would then drop.
+    entity.fishCastZoneId = '';
+    const spawnZone = 'eastbrook_vale';
+    entity.pos.z = 300; // inside mirefen_marsh (zMin 180, zMax 540)
+
+    observe(server, [castStartEvent(session.pid, 'fishing')]);
+
+    expect(rec.fishingCasts).toEqual([['mirefen_marsh', '0']]);
+    // Non-vacuity: the fallback moved the label off where the player spawned,
+    // so this is a real position read and not a coincidence.
+    expect(rec.fishingCasts[0][0]).not.toBe(spawnZone);
+    server.stop();
+  });
+
+  it('ignores every cast that is not a fishing cast', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+    const session = join(server, fakeWs(), 100, 1, 'Ayla');
+    const entity = server.sim.entities.get(session.pid);
+    if (!entity) throw new Error('no entity for the joined session');
+    entity.fishCastZoneId = 'mirefen_marsh';
+
+    // castStart is the world's GENERIC cast event: every ability and the
+    // gathering cast share it. Only the fishing ability may book a cast, or
+    // the denominator silently becomes "casts of anything".
+    observe(server, [
+      castStartEvent(session.pid, 'gather'),
+      castStartEvent(session.pid, 'fireball'),
+      castStartEvent(session.pid, ''),
+    ]);
+
+    expect(rec.fishingCasts).toEqual([]);
+    server.stop();
+  });
+
+  it('books nothing for a fishing cast by an entity that is not a player', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+
+    // An entity id with no entity (a caster who left mid-tick) and a live mob
+    // with no PlayerMeta: neither can resolve a band, and guessing one would
+    // put a fabricated rung into the distribution R4 reads.
+    const mob = [...server.sim.entities.values()].find((e) => e.kind === 'mob');
+    if (!mob) throw new Error('no mob in the world');
+    observe(server, [castStartEvent(4242, 'fishing'), castStartEvent(mob.id, 'fishing')]);
+
+    expect(rec.fishingCasts).toEqual([]);
+    server.stop();
+  });
+
+  it('counts a landed catch under the zone and band the sim resolved', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+
+    // The labels come off the EVENT, not off a server re-derivation: the sim
+    // pinned the water zone at cast start and capped the band by the rod, and
+    // re-deriving either here would drift from what actually rolled.
+    observe(server, [
+      fishingResultEvent('mirefen_marsh', 1, 'raw_marsh_pike'),
+      fishingResultEvent('thornpeak_heights', 2, 'raw_stonescale_carp'),
+    ]);
+
+    expect(rec.fishingCatches).toEqual([
+      ['mirefen_marsh', '1', false],
+      ['thornpeak_heights', '2', false],
+    ]);
+    // A catch is not a got-away and not an empty hook.
+    expect(rec.fishingGotAways).toEqual([]);
+    expect(rec.fishingEmptyHooks).toEqual([]);
+    server.stop();
+  });
+
+  it('flags the rare koi on the catch it rode in on, and only that one', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+
+    observe(server, [
+      fishingResultEvent('eastbrook_vale', 0, 'raw_mirror_trout'),
+      fishingResultEvent('eastbrook_vale', 0, 'glimmerfin_koi'),
+      fishingResultEvent('eastbrook_vale', 0, 'tangled_weed'),
+    ]);
+
+    // The koi flag is a per-catch split, not a per-band or per-tick one: the
+    // catch either was the koi or was not.
+    expect(rec.fishingCatches).toEqual([
+      ['eastbrook_vale', '0', false],
+      ['eastbrook_vale', '0', true],
+      ['eastbrook_vale', '0', false],
+    ]);
+    server.stop();
+  });
+
+  it('counts a got-away and an empty hook on their own counters', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+
+    observe(server, [
+      fishingGotAwayEvent('eastbrook_vale', 0),
+      fishingEmptyHookEvent('mirefen_marsh', 1),
+      fishingGotAwayEvent('thornpeak_heights', 2),
+    ]);
+
+    expect(rec.fishingGotAways).toEqual([
+      ['eastbrook_vale', '0'],
+      ['thornpeak_heights', '2'],
+    ]);
+    expect(rec.fishingEmptyHooks).toEqual([['mirefen_marsh', '1']]);
+    // Neither one is a catch: an empty hook counted as a catch would put the
+    // koi odds denominator far above what actually landed.
+    expect(rec.fishingCatches).toEqual([]);
+    server.stop();
+  });
+
+  it('counts fishing outcomes without needing a live session for the angler', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+
+    // pid 999 has no ClientSession, same as the harvest arm: bots fish too and
+    // the series measures the world, not the logged-in subset.
+    observe(server, [
+      fishingResultEvent('mirefen_marsh', 1, 'glimmerfin_koi'),
+      fishingGotAwayEvent('mirefen_marsh', 1),
+      fishingEmptyHookEvent('mirefen_marsh', 1),
+    ]);
+
+    expect(rec.fishingCatches).toEqual([['mirefen_marsh', '1', true]]);
+    expect(rec.fishingGotAways).toEqual([['mirefen_marsh', '1']]);
+    expect(rec.fishingEmptyHooks).toEqual([['mirefen_marsh', '1']]);
+    server.stop();
+  });
+
+  it('counts one rod fee payment per SUCCESSFUL rod training', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+
+    observe(server, [
+      trainResultEvent('recipe_stormreel_fishing_rod', true),
+      trainResultEvent('recipe_tidewrought_fishing_rod', true),
+    ]);
+
+    expect(rec.rodFees).toEqual(['recipe_stormreel_fishing_rod', 'recipe_tidewrought_fishing_rod']);
+    server.stop();
+  });
+
+  it('books no rod fee for a refused training or for a non-rod recipe', () => {
+    const server = new GameServer();
+    const rec = recordingSink();
+    setGameMetricsCounters(rec.sink);
+
+    // Both controls matter and for different reasons. A refused training
+    // charges nothing (Sim.trainRecipe debits only on ok), so counting it
+    // would overstate the copper the fees took. A non-rod recipe trains
+    // successfully and charges a fee, but it is not a ROD fee, and letting it
+    // through would put an unbounded recipe vocabulary on the label.
+    observe(server, [
+      trainResultEvent('recipe_stormreel_fishing_rod', false),
+      trainResultEvent('recipe_tidewrought_fishing_rod', false),
+      trainResultEvent('recipe_bronze_sickle', true),
+      trainResultEvent('', true),
+      trainResultEvent('toString', true),
+    ]);
+
+    expect(rec.rodFees).toEqual([]);
     server.stop();
   });
 });
