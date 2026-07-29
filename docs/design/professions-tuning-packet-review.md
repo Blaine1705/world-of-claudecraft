@@ -1134,6 +1134,84 @@ deploy window.
 
 ---
 
+## Merge-settlement checkpoint (before phase 12)
+
+Run: Fable xhigh, NEW session (fresh context is the point of this
+checkpoint; do not run it in a continued session). No build items of its
+own: it is a review pass over work that already shipped, and it lands
+fixes only where a finding demands one.
+
+Why it exists: the phase 11 QA session merged 685 release commits
+(d15ecf338, 56 conflicts) AND applied roughly 60 findings over nine fix
+waves in a single session that ran past its context budget and was
+compacted. The later the wave, the less fresh-eyed review it got (the
+closing wave was mutation-checked but never independently reviewed), and
+several calls late in that session were design judgments, not
+verifications. Fresh context re-checks all of that cheaply before phase
+12 builds on it.
+
+Scope A, the QA session's own output (commit range d15ecf338..db1e860b5;
+1257a8e18 is docs-only past it). Review the diffs fresh, and re-judge
+these named late-session calls explicitly, each ending CONFIRMED or
+reopened as a finding:
+1. The R37 rollout ledger's 'starter' state (three-state
+   complete/starter/none) was DESIGNED mid-session to absorb the
+   guard-vs-expansion collisions; re-derive it from R37's text and the
+   expansion zones' actual kit.
+2. The rift upgrader intake cap ruling: one freed slot refills per
+   in-flight dispatch was judged correct behavior, and the cap bounds
+   the queue, not the marked-pending population; re-judge both halves
+   (tests/server/rift_upgrader.test.ts pins the current semantics).
+3. The chronomancy min-over-seeds floor sits at the measured minimum
+   (1.2 vs the 1.22 owner target): confirm it reads as a regression
+   floor, not as an endorsement of the shortfall, and that the owner
+   flag survives in the doc.
+4. The unknown bag cell end to end: deposit precedence ladder,
+   suppressNextClick ordering, and the four per-kind unknownItemAria
+   keys, on both mouse and touch paths.
+5. mntOwn behind the heavy self gate is pinned by SOURCE ORDER only
+   (tests/snapshots.test.ts); decide whether a behavioral arm (an
+   ownedMounts input change with no heavy-dirty command) earns its cost
+   or the placement pin suffices, and record the decision.
+6. Spot-verify a sample of the merge's semantic-center resolutions
+   independently (zoneAt going 2D over the active-content walk, the
+   showBanner position-4 collision, the re-recorded fishing seeds and
+   re-minted parity goldens): they were resolved and reviewed inside
+   one session.
+
+Scope B, packet-x-expansion interaction seams. The release-merge audit
+is structural by design and phase 11's lens was wire/rollout by design;
+neither systematically drove packet behavior INSIDE expansion content.
+Exercise, at minimum:
+- Gathering and fishing across the eleven expansion zones beyond the
+  starter-ledger pins: fine-grade reachability from tier-1 nodes, the
+  4096 node-persist ceiling, waterline classification in new waters.
+- Mounts crossed with profession sessions: mounting mid-session,
+  gathering while mounted, and displacement teardown on every
+  mount-adjacent teleport path.
+- Rift and dungeon interiors crossed with session teardown, driven end
+  to end at least once per site class (the five wired teleport sites).
+- The expansion economy (rift essence and gems, new vendors, heroic
+  reins) against the packet's vendor rows, fees, and market gates.
+- The 2D column world against packet node placement: colliders and the
+  zoneAt-derived telemetry labels.
+
+Non-goals, stated so the checkpoint stays half a phase: no re-audit of
+the release's own 685 commits (QA'd on its branch); R1 to R44 and every
+recorded-only item stay settled; the phase 13, 16, and 17 inheritances
+(starter zones, the merged-tree perf baseline, expansion locale sizing)
+stay scheduled where they are; the maintainer's ledger items (forced
+refresh at deploy, pulling the heroic reins, the
+ONLINE_WORLD_LAYOUT_VERSION bump) stay surfaced, not decided.
+
+Process: the how-to-run preamble applies unchanged (sync, audit any new
+merge, gate green before checkpoint work). Findings are ALL applied,
+the fixes re-reviewed, every new pin mutation-checked decisive on a
+committed tree, gate green before done. Record the outcome here and in
+a professions-tuning-packet-merge-settlement memory.
+
+---
+
 ## Phase 12: the acquisition craft
 
 Build: ultracode (the free-grant incident lived exactly here; adversarial
