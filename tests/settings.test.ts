@@ -96,28 +96,6 @@ describe('Settings', () => {
     expect(s.get('graphicsDefaultApplied')).toBe(false);
   });
 
-  it('keeps a fresh store eligible for Seeker defaults after unrelated saves', () => {
-    const s = new Settings();
-    s.set('showFps', true);
-
-    const reloaded = new Settings();
-    expect(reloaded.get('graphicsUserSelected')).toBe(false);
-    expect(reloaded.get('browserEffectsUserSelected')).toBe(false);
-    expect(reloaded.get('weatherUserSelected')).toBe(false);
-  });
-
-  it('preserves values from stores created before Seeker source markers existed', () => {
-    localStorage.setItem(
-      'woc_settings',
-      JSON.stringify({ graphicsPreset: 3, browserEffects: 1, weather: 1 }),
-    );
-
-    const migrated = new Settings();
-    expect(migrated.get('graphicsUserSelected')).toBe(true);
-    expect(migrated.get('browserEffectsUserSelected')).toBe(true);
-    expect(migrated.get('weatherUserSelected')).toBe(true);
-  });
-
   it('starts at the documented defaults (camera calmer than the old 1.0)', () => {
     const s = new Settings();
     expect(s.get('cameraSpeed')).toBe(SETTING_RANGES.cameraSpeed.def);

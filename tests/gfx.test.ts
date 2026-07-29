@@ -935,16 +935,6 @@ describe('graphics tier resolution', () => {
       stubGpu('Apple GPU'); // masked -> unknown -> medium fallback -> null (not persisted, re-probed next boot)
       expect(firstRunGraphicsPreset(false)).toBeNull();
     });
-
-    it('uses a host-provided low preset on first run', () => {
-      stubGpu('ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)');
-      expect(firstRunGraphicsPreset(false, 1)).toBe(1);
-    });
-
-    it('never reapplies a host preset after the first-run marker is set', () => {
-      stubGpu('ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)');
-      expect(firstRunGraphicsPreset(true, 1)).toBeNull();
-    });
   });
 
   describe('probeGpuRenderer: one cached probe, context released (PR901 exhaustion guard)', () => {

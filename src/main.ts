@@ -101,7 +101,6 @@ import { isOfflineModeAvailable } from './game/offline_mode_gate';
 import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
-import { seekerFirstRunSettings } from './game/seeker_first_run_settings';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import { SelfMotionFrameBuffer } from './game/self_motion_frame_buffer';
 import {
@@ -1063,32 +1062,10 @@ async function startGame(
   // all agree. A static one-shot probe (resolveDefaultGraphicsPreset), never the FPS governor.
   // A masked/inconclusive device resolves to medium and returns null, so it stays on
   // the medium default and re-detects next boot; only a CONCLUSIVE result is persisted + marked.
-  // Explicit player choices are tracked separately from automatic defaults. A verified Seeker
-  // may therefore replace an earlier automatic device tier with Low, but never a player-selected
-  // tier. Legacy stores are migrated conservatively by Settings and keep their existing values.
-  const deviceDefaultAlreadyApplied = settings.get('graphicsDefaultApplied');
-  const seekerDefaults = seekerFirstRunSettings({
-    seekerHost: NATIVE_APP && (await walletCapabilityReady),
-    graphicsUserSelected: settings.get('graphicsUserSelected'),
-    browserEffectsDefaultApplied: settings.get('browserEffectsSeekerDefaultApplied'),
-    browserEffectsUserSelected: settings.get('browserEffectsUserSelected'),
-    weatherDefaultApplied: settings.get('weatherSeekerDefaultApplied'),
-    weatherUserSelected: settings.get('weatherUserSelected'),
-  });
-  if (seekerDefaults?.browserEffects !== undefined) {
-    settings.set('browserEffects', seekerDefaults.browserEffects);
-    settings.set('browserEffectsSeekerDefaultApplied', true);
-  }
-  if (seekerDefaults?.weather !== undefined) {
-    settings.set('weather', seekerDefaults.weather);
-    settings.set('weatherSeekerDefaultApplied', true);
-  }
-  const autoPreset =
-    seekerDefaults?.graphicsPreset ??
-    firstRunGraphicsPreset(
-      deviceDefaultAlreadyApplied || settings.get('graphicsUserSelected'),
-      null,
-    );
+  // An explicit player choice is never overridden: a recognized device is marked applied on its
+  // first boot so it never re-detects, and an inconclusive device returns null so it never
+  // overwrites a stored preset.
+  const autoPreset = firstRunGraphicsPreset(settings.get('graphicsDefaultApplied'));
   if (autoPreset !== null) {
     settings.set('graphicsPreset', autoPreset);
     settings.set('graphicsDefaultApplied', true);
@@ -2074,11 +2051,7 @@ async function startGame(
   // snapshots the live WebGL canvas) out of an already memory-tight scene.
   applyBrowserEffects(settings.get('browserEffects'));
 
-  function applySetting(
-    key: keyof GameSettings,
-    value: number | boolean,
-    userInitiated = false,
-  ): void {
+  function applySetting(key: keyof GameSettings, value: number | boolean): void {
     if (key === 'mouseCamera') {
       const v = settings.set('mouseCamera', !!value);
       input.setMouseCameraEnabled(v);
@@ -2195,7 +2168,6 @@ async function startGame(
       return;
     }
     if (key === 'browserEffects') {
-      if (userInitiated) settings.set('browserEffectsUserSelected', true);
       applyBrowserEffects(settings.set('browserEffects', value as number));
       return;
     }
@@ -2257,8 +2229,6 @@ async function startGame(
       applyLandingBackdrop(settings.set('landingHighContrast', !!value));
       return;
     }
-    if (userInitiated && key === 'graphicsPreset') settings.set('graphicsUserSelected', true);
-    if (userInitiated && key === 'weather') settings.set('weatherUserSelected', true);
     const v = settings.set(key as keyof typeof SETTING_RANGES, value as number);
     switch (key) {
       case 'cameraSpeed':
@@ -2417,7 +2387,7 @@ async function startGame(
     },
     captureKey: (cb) => input.captureNextKey(cb),
     settings,
-    onSettingChange: (key, value) => applySetting(key, value, true),
+    onSettingChange: (key, value) => applySetting(key, value),
     theme: {
       get: () => themeStore.get(),
       setPreset: (id: PresetId) => {
@@ -9973,12 +9943,10 @@ function wireStartScreens(): void {
     if (choice === LANDING_GRAPHICS_AUTO) {
       landingSettings.set('graphicsPreset', SETTING_RANGES.graphicsPreset.def);
       landingSettings.set('graphicsDefaultApplied', false);
-      landingSettings.set('graphicsUserSelected', false);
       return;
     }
     landingSettings.set('graphicsPreset', Number(choice));
     landingSettings.set('graphicsDefaultApplied', true);
-    landingSettings.set('graphicsUserSelected', true);
   };
   const syncLandingGraphicsSelect = (): void => {
     if (!graphicsSelect) return;
