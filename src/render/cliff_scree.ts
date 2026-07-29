@@ -156,8 +156,9 @@ export function buildCliffScree(seed: number): CliffScreeView {
   const group = new THREE.Group();
   group.name = 'cliffScree';
   // form shadows are the whole point of the scatter; the lambert tier has no
-  // shadow map to catch them, so it skips the system entirely
-  if (!GFX.standardMaterials) {
+  // shadow map to catch them, so it skips the system entirely (and lean
+  // foliage machines skip it with the rest of the ground cover)
+  if (!GFX.standardMaterials || GFX.leanFoliage) {
     return { group, update: () => undefined };
   }
 
