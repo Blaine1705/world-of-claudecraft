@@ -5932,6 +5932,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   cs_CZ: {
     'error.sellBound': 'Tento předmět je vázaný a nelze ho prodat.',
     ...BASE_NEW.cs_CZ,
+    'error.toolEffectSlotFromWindow': 'Zasaď to v okně Profese.',
     'error.mountTrainInProgress': 'Jezdecká lekce už probíhá.',
     'error.mountTrainDismountFirst': 'Nejdřív sesedni.',
     'error.mountAlreadyOwned': 'Toto jízdní zvíře už vlastníš.',
@@ -6048,6 +6049,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   nl_NL: {
     'error.sellBound': 'Dat voorwerp is gebonden en kan niet worden verkocht.',
     ...BASE_NEW.nl_NL,
+    'error.toolEffectSlotFromWindow': 'Open Beroepen om dit aan te brengen.',
     'error.mountTrainInProgress': 'Er is al een rijles bezig.',
     'error.mountTrainDismountFirst': 'Stijg eerst af.',
     'error.mountAlreadyOwned': 'Je hebt dat rijdier al.',
@@ -6163,6 +6165,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   pl_PL: {
     'error.sellBound': 'Ten przedmiot jest przywiązany i nie można go sprzedać.',
     ...BASE_NEW.pl_PL,
+    'error.toolEffectSlotFromWindow': 'Otwórz Zawody, aby to osadzić.',
     'error.mountTrainInProgress': 'Lekcja jazdy konnej już trwa.',
     'error.mountTrainDismountFirst': 'Najpierw zsiądź.',
     'error.mountAlreadyOwned': 'Masz już tego wierzchowca.',
@@ -6281,6 +6284,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   id_ID: {
     'error.sellBound': 'Barang itu terikat dan tidak dapat dijual.',
     ...BASE_NEW.id_ID,
+    'error.toolEffectSlotFromWindow': 'Buka Profesi untuk memasangnya.',
     'error.mountTrainInProgress': 'Sudah ada pelajaran menunggang yang sedang berlangsung.',
     'error.mountTrainDismountFirst': 'Turun dulu.',
     'error.mountAlreadyOwned': 'Kamu sudah punya tunggangan itu.',
@@ -6397,6 +6401,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   tr_TR: {
     'error.sellBound': 'O eşya bağlı ve satılamaz.',
     ...BASE_NEW.tr_TR,
+    'error.toolEffectSlotFromWindow': 'Bunu takmak için Meslekler penceresini aç.',
     'error.mountTrainInProgress': 'Zaten devam eden bir binicilik dersi var.',
     'error.mountTrainDismountFirst': 'Önce in.',
     'error.mountAlreadyOwned': 'O bineğe zaten sahipsin.',
@@ -6513,6 +6518,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   sv_SE: {
     'error.sellBound': 'Det föremålet är bundet och kan inte säljas.',
     ...BASE_NEW.sv_SE,
+    'error.toolEffectSlotFromWindow': 'Öppna Yrken för att sätta in den.',
     'error.mountTrainInProgress': 'En ridlektion pågår redan.',
     'error.mountTrainDismountFirst': 'Stig av först.',
     'error.mountAlreadyOwned': 'Du har redan det riddjuret.',
@@ -6628,6 +6634,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   vi_VN: {
     'error.sellBound': 'Vật phẩm đó đã bị ràng buộc và không thể bán.',
     ...BASE_NEW.vi_VN,
+    'error.toolEffectSlotFromWindow': 'Mở Nghề nghiệp để khảm nó.',
     'error.mountTrainInProgress': 'Đã có một bài học cưỡi ngựa đang diễn ra.',
     'error.mountTrainDismountFirst': 'Xuống thú cưỡi trước đã.',
     'error.mountAlreadyOwned': 'Bạn đã sở hữu thú cưỡi đó rồi.',
@@ -6742,6 +6749,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
   da_DK: {
     'error.sellBound': 'Den genstand er bundet og kan ikke sælges.',
     ...BASE_NEW.da_DK,
+    'error.toolEffectSlotFromWindow': 'Åbn Erhverv for at sætte den i.',
     'error.mountTrainInProgress': 'Der er allerede en ridelektion i gang.',
     'error.mountTrainDismountFirst': 'Stig af først.',
     'error.mountAlreadyOwned': 'Du har allerede det ridedyr.',
