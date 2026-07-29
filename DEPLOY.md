@@ -240,6 +240,31 @@ For off-box safety, sync the directory to S3 occasionally:
   rollback across a cap change needs a restore-from-backup plan for professions
   counters. Details: "Rollback erases newer fields" in
   `docs/design/professions-tuning-packet.md`.
+- **Client/server deploy order for content releases**: deploy the SERVER first, then
+  let clients update. Web and desktop bundles refresh on their next load. The iOS
+  binary rides App Store review and cannot pick up a same-day bundle (LiveUpdates
+  is off), so submit it early, hold its release until it is approved, release the
+  binary, and deploy the server right behind it: the binary must be out before the
+  server moves, and the gap between the two must stay short. The two mid-window
+  mixes degrade differently, and the order above keeps both windows short:
+  - OLD client on NEW server (the guarded direction): item ids the bundle predates
+    render with the fallback icon and their raw id in the trade window, bags, and
+    bank; profession grant lines name the raw id; vendor rows show the old
+    bundle's stock and prices while the purchase path charges the server's own
+    truth (a mismatch is display-only); denial toasts fall back to their generic
+    wording. Gather nodes the server moved keep rendering at their old spots
+    (walk-through props) while their real positions collide invisibly, and nodes
+    the server added are invisible but still collide. All of it is cosmetic and
+    self-heals when the client updates.
+  - NEW client on OLD server (the bounded direction): every gather node the
+    release relocated is unusable, because the client shows it where the old
+    server does not have it (the worst case on the professions tuning release is
+    Eastbrook herbalism, whose tier-1 herb nodes all moved), and new client
+    surfaces advertise nodes, items, and minimap markers the old server denies.
+    This window exists only between a client release and the server deploy, so
+    close it by deploying the server as soon as the clients are staged.
+  Per-surface analysis for the professions tuning release: the stale-client
+  compatibility phase of `docs/design/professions-tuning-packet-review.md`.
 - **Bank ledger audit**: `node scripts/bank_audit.mjs` (reads `DATABASE_URL` from the
   environment) replays the append-only `bank_ledger` against live character bank state
   and exits non-zero on any discrepancy. Run it after an economy incident or a restore.
