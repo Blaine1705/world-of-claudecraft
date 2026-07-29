@@ -257,39 +257,64 @@ For off-box safety, sync the directory to S3 occasionally:
     collide invisibly at their server spots and stand as solid stale props at
     their old client spots (both read as rubber-band corrections), while HERB
     skew is walk-through phantom props only (herb clusters carry no collider).
-    All of it is cosmetic and self-heals when the client updates.
+    All of THAT is cosmetic and self-heals when the client updates. Two
+    v0.32.0 surfaces on this leg are NOT cosmetic: the world grew far past
+    the old bundle's terrain rectangle, so a stale tab can walk east or
+    north into ground its renderer has no mesh for (a void with the wrong
+    zone name and music, walkable because the server's rim moved outward);
+    and the instance plane REBASED (INSTANCE_X_BASE), so a stale tab that
+    enters any dungeon, delve, or arena after the deploy is teleported to
+    coordinates its renderer draws as a black, collider-less void, with the
+    exit object invisible, until relog (login is protected: a saved
+    inside-instance position ejects to the door). The release left the
+    fail-closed layout gate at ONLINE_WORLD_LAYOUT_VERSION 3 through both
+    changes, so stale bundles are still admitted at reconnect; bumping it
+    is the one-line mechanical answer if the maintainer resolves the
+    surfaced forced-refresh question toward refusing stale sessions.
   - NEW client on OLD server (the bounded direction): every gather node the
     release relocated is unusable, because the client shows it where the old
-    server does not have it (the worst case on the professions tuning release is
-    Eastbrook herbalism, whose tier-1 herb nodes all moved), and new client
-    surfaces advertise nodes, items, and minimap markers the old server denies.
+    server does not have it. Among the zones the deployed server HAS, the
+    worst cases are Eastbrook tier-1 herbalism and Mirefen's tier-2 band,
+    each a fully moved-or-new group; the eleven expansion zones are a
+    different class entirely (their ground does not exist on the old server,
+    so everything there is dead until the server deploys), and new client
+    surfaces advertise nodes, items, and minimap markers the old server
+    denies.
     This window exists only between a client release and the server deploy, so
     close it by deploying the server as soon as the clients are staged. (An old
     server answers a command it does not know by logging a protocol anomaly to
     the bot detector and spending a rate-limit token. The professions tuning
     packet itself adds exactly one command, dev-gated with no shipped sender,
-    but the v0.32.0 expansion it merged with adds eleven more with real
-    shipped senders: the mount, rift forge, and unstuck families. On this leg
+    but the v0.32.0 expansion it merged with adds eleven more (the mount,
+    rift forge, and unstuck families), nine with real shipped senders and
+    none dev-gated. On this leg
     an ordinary player pressing the mount key or using unstuck spends
     rate-limit tokens and logs anomalies until the server deploys, one more
     reason to keep the binary-to-server gap short.)
   Release-specific caveat for the professions tuning deploy: the guards above
   describe bundles built from this release onward. The bundle DEPLOYED TODAY
   predates them, and its trade window throws while rendering an offer that
-  stages one of this release's new item ids (the fine-grade materials and the
-  new rods), freezing that trade panel for the stale session until the page
-  reloads. The sibling loot-window throw is unreachable through the PACKET's
+  stages ANY item id the bundle predates (the packet's fine-grade materials
+  and rods, and equally the expansion's whole tradeable catalog: rift
+  essence and gems, the new-zone gear, none of it soulbound), freezing that
+  trade panel for the stale session until the page reloads. The sibling loot-window throw is unreachable through the PACKET's
   ids as long as they remain gathering, recipe, vendor, and delve-shop
   content only, out of every mob and chest loot table, so keep them out
   until clients have rolled; it is NOT unreachable for the merged release as
   a whole, because the v0.32.0 expansion put four mount reins into the
-  heroic loot of four bosses the deployed bundle already knows (Morthen,
-  Vael, Ysolei, Korzul), so a solo or free-for-all heroic clear that drops
-  one freezes a stale session's corpse loot window the same way. The odds
-  are the mount drop rates (0.5 and 0.1 percent), the party need/greed path
-  is already guarded at the base, and the exception set is pinned to exactly
-  those four ids by the deploy-window test; this residual arm is one more
-  input to the surfaced forced-refresh-at-deploy question. Two more
+  heroic loot of five encounters the deployed bundle already knows (the
+  Morthen, Vael, Ysolei, and Korzul heroic finales plus the Nythraxis raid),
+  so a solo or free-for-all heroic clear that drops one freezes a stale
+  session's corpse loot window the same way. The odds are the mount drop
+  rates (0.5 and 0.1 percent), the party need/greed path is already guarded
+  at the base, and the exception set is pinned to exactly those four ids by
+  the deploy-window test. Rift-run loot is a second release-content arm on
+  the same window (the run builders push the rift catalog onto boss corpse
+  lists at runtime, outside every content-table sweep); it requires the
+  stale tab to get inside a rift at all, and whether the old bundle's
+  generic object interaction reaches a rift portal has not been verified
+  either way. Both arms are inputs to the surfaced
+  forced-refresh-at-deploy question. Two more
   deployed-bundle arms need no loot table at all, because the
   fine grades are minted by HARVESTING with an outclassing tool: a stale tab
   that gathers one sees it land in an INVISIBLE bag cell (and bank cell after
@@ -299,8 +324,10 @@ For off-box safety, sync the directory to S3 occasionally:
   live. Stale sessions are ended by the pre-deploy restart countdown, but a
   reconnect rides the same stale page: only a page reload picks up the new
   bundle.
-  The caveats above assume production runs the release/v0.32.0 tip this
-  branch measured its wire delta against; if the live server is older,
+  The caveats above were measured against 9d7a1a021, the commit deployed
+  today; the branch has since merged the true v0.32.0 tip (0b427afca, 685
+  commits past the measured base), which is what the merged-branch numbers
+  above describe. If the live server moves before this branch deploys,
   re-run the compatibility diff against the commit actually deployed before
   trusting any "one new X" claim. The loot-table exclusion is enforced by
   `tests/stale_client_rollout.test.ts` for the deploy window (delete that
