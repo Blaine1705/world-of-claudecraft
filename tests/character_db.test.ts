@@ -126,7 +126,12 @@ describe('reclaimDeactivatedName', () => {
       .mockResolvedValueOnce({ rows: [], rowCount: 1 } as any) // UPDATE
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // COMMIT
 
-    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBe(true);
+    // The archived identity comes back so the caller can rekey the freed
+    // name's world state (market, mail) exactly like a rename.
+    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toEqual({
+      id: 99,
+      archivedName: 'SturdyStubsa',
+    });
 
     const calls = client.query.mock.calls;
     expect(calls[0][0]).toBe('BEGIN');
@@ -153,7 +158,7 @@ describe('reclaimDeactivatedName', () => {
       } as any)
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // ROLLBACK
 
-    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBe(false);
+    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBeNull();
     const verbs = client.query.mock.calls.map((c) => c[0]);
     expect(verbs).not.toContain('COMMIT');
     expect(verbs).toContain('ROLLBACK');
@@ -168,7 +173,7 @@ describe('reclaimDeactivatedName', () => {
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any) // no holder
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // ROLLBACK
 
-    await expect(reclaimDeactivatedName('Nobody')).resolves.toBe(false);
+    await expect(reclaimDeactivatedName('Nobody')).resolves.toBeNull();
     expect(client.query.mock.calls.map((c) => c[0])).not.toContain('COMMIT');
   });
 
@@ -190,7 +195,7 @@ describe('reclaimDeactivatedName', () => {
       } as any)
       .mockResolvedValueOnce({ rows: [], rowCount: 0 } as any); // ROLLBACK
 
-    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBe(false);
+    await expect(reclaimDeactivatedName('SturdyStubs')).resolves.toBeNull();
     expect(client.query.mock.calls.map((c) => c[0]).some((s) => /UPDATE characters/i.test(s))).toBe(
       false,
     );
