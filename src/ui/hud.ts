@@ -14658,6 +14658,7 @@ export function abilityRequirementLines(def: AbilityDef, spec?: string | null): 
       case 'enemyTarget':
         return t('abilityUi.tooltip.enemyTarget');
       case 'selfOnly':
+      default:
         return t('abilityUi.tooltip.selfOnly');
     }
   });
