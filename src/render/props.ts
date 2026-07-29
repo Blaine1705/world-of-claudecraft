@@ -548,8 +548,8 @@ function convertMaterial(
       // Metal-named kit materials (MI_Trim_Metal, WornIron, ...) get a mild
       // per-material env boost so anvils/fittings catch the sky IBL; the name
       // is already part of the cache key above. Everything else keeps the
-      // default 1, and the colorful palette props deliberately get NO detail
-      // normals: grain would read as noise on the toy-like style.
+      // default 1 (the metal surface-detail family below raises its own floor
+      // via envMapMin, taking the max of the two).
       envMapIntensity: METAL_MAT_NAME.test(s.name) ? 1.3 : 1,
     });
   } else {
@@ -563,11 +563,17 @@ function convertMaterial(
       emissiveIntensity: hollowEmissive ? 0.2 : (ov?.emissiveIntensity ?? 1) * 0.6,
     });
   }
-  // Triplanar surface-detail layer for the allowlisted kits, applied before
-  // caching so every consumer of the shared per-key material carries it (the
-  // helper self-gates to standard materials, so the Lambert branch is a no-op).
-  // Routing matches on the SOURCE material name (s.name), which keys the cache.
-  const worn = wornFamilyFor(kit, s.name);
+  // Triplanar surface-detail layer, applied before caching so every consumer
+  // of the shared per-key material carries it (the helper self-gates to
+  // standard materials, so the Lambert branch is a no-op). Routing matches on
+  // the SOURCE material name (s.name), which keys the cache; the context
+  // flags keep emissive/transparent surfaces clean and let Tripo props that
+  // ship their own PBR maps skip the bare-coverage fallback.
+  const worn = wornFamilyFor(kit, s.name, {
+    emissive: !!hollowEmissive || (ov?.emissive ?? 0) !== 0,
+    transparent: s.transparent === true,
+    hasOwnMaps: !!(s.normalMap || s.roughnessMap),
+  });
   if (worn) {
     applySurfaceDetail(mat as THREE.MeshStandardMaterial, worn.family, {
       strength: worn.strength,

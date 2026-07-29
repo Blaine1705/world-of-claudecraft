@@ -54,7 +54,7 @@ import {
   placeMarshTombs,
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
-import { STONE_DETAIL_NORMAL_SCALE, stoneDetailNormal } from './detail_normals';
+import { applySurfaceDetail } from './worn_stone';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
 import { EMISSIVE_LIGHT, GFX, sharedUniforms } from './gfx';
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
@@ -1311,18 +1311,12 @@ export class DungeonInteriors {
       mat = new THREE.MeshStandardMaterial({ color: 0x777788, roughness: 0.95 });
     }
     // The dungeon packs are flat-palette GLBs (solid-color swatch textures),
-    // so the walls read as untextured plastic under the interior lights. One
-    // gently tiling rock detail normal, shared by every pack material (and by
-    // the delve/castle stone families), gives them a faint stone grain while
-    // roughness stays matte. The tinted marsh/drowned clones inherit it.
-    if (GFX.standardMaterials && (mat as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
-      const std = mat as THREE.MeshStandardMaterial;
-      const detail = stoneDetailNormal();
-      if (detail && !std.normalMap) {
-        std.normalMap = detail;
-        std.normalScale.set(STONE_DETAIL_NORMAL_SCALE, STONE_DETAIL_NORMAL_SCALE);
-      }
-    }
+    // so the walls read as untextured plastic under the interior lights. The
+    // shared triplanar stone family (which replaced the old UV-space rock
+    // detail normal here) gives every pack material grain, AO-band grime, and
+    // the high/ultra parallax height response.
+    if ((mat as THREE.MeshStandardMaterial).isMeshStandardMaterial)
+      applySurfaceDetail(mat as THREE.MeshStandardMaterial, 'stone');
     this.packMats.set(pack, mat);
     return mat;
   }
@@ -1354,6 +1348,10 @@ export class DungeonInteriors {
       | THREE.MeshLambertMaterial
       | THREE.MeshStandardMaterial;
     base.color.multiply(new THREE.Color(tint));
+    // Material.clone() drops the onBeforeCompile hook, so the tinted clone
+    // re-applies the stone layer (identity-keyed guard: clones are fresh).
+    if ((base as THREE.MeshStandardMaterial).isMeshStandardMaterial)
+      applySurfaceDetail(base as THREE.MeshStandardMaterial, 'stone');
     mat = base;
     this.tintedMats.set(key, mat);
     return mat;

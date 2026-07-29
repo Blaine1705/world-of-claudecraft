@@ -4,6 +4,7 @@ import { SCREE_CELL, screeSinkY, screeSpotAt } from '../sim/scree';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
+import { applySurfaceDetail } from './worn_stone';
 
 // Cliff scree: boulders scattered over steep slopes and piled at their feet,
 // so cliff faces stop reading as bare smooth wedges. One InstancedMesh per
@@ -126,6 +127,9 @@ function bakeRocks(): BakedRocks | null {
         roughness: 0.95,
         metalness: 0,
       });
+      // Same triplanar stone strength as foliage.ts gives the shared kit
+      // boulder fields, so a scree rock and a dressing rock read identically.
+      applySurfaceDetail(material, 'stone', { strength: 0.5 });
     }
     // origin sink comes from sim/scree.ts's baked dims (screeSinkY), not a
     // live bounds measurement: the sim's walkable dome and this mesh must

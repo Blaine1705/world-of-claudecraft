@@ -12,6 +12,7 @@ import { buildDungeonPropMesh, ensureDungeonAssets, loadKitModules } from './dun
 import { EMISSIVE_LIGHT, GFX } from './gfx';
 import { freezeStaticMatrices } from './static_matrix';
 import { radialGlowTexture } from './textures';
+import { applySurfaceDetail } from './worn_stone';
 
 // Kit modules the dungeon interiors do not load; fetched on demand alongside
 // ensureDungeonAssets() and served through the same registry.
@@ -412,6 +413,9 @@ function displayMaterial(src: THREE.Material): THREE.Material {
     std.vertexColors = false;
     std.metalness = 0;
     std.roughness = Math.max(0.85, std.roughness);
+    // Same triplanar stone layer the dungeon interiors give the shared pack
+    // materials, so the jail's kit stone matches the crypt next door.
+    applySurfaceDetail(std, 'stone');
     mat = std;
   }
   displayMats.set(src, mat);

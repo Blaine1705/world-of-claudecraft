@@ -35,7 +35,7 @@ import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX, surfaceMat } from './gfx';
 import { MIST_DRIFT_AMPLITUDE, SEA_LIGHT_RAYS, SEA_MIST_BANKS } from './sea_mist_core';
-import { applyWornStone } from './worn_stone';
+import { applyWornStone, detailedSurfaceMat } from './worn_stone';
 
 const MUSHROOM_URLS = ['/models/props/mushroom_red.glb', '/models/props/mushroom_tan.glb'];
 const BOULDER_URL = '/models/props/rock_large_d.glb';
@@ -827,9 +827,12 @@ export function buildRealmFlora(seed: number): RealmFloraView {
 
   // --- weeping willows on the lakeshores ---
   const willow = willowGeo();
-  instance(willow.trunk, surfaceMat({ color: WILLOW_BARK, roughness: 0.9 }), spots.willows, {
-    castShadow: true,
-  });
+  instance(
+    willow.trunk,
+    detailedSurfaceMat({ color: WILLOW_BARK, roughness: 0.9 }, 'bark'),
+    spots.willows,
+    { castShadow: true },
+  );
   instance(
     perFaceShade(willow.canopy, 0.12, seed + 621),
     floraMat({ color: WILLOW_LEAF, roughness: 0.85, flatShading: true, vertexColors: true }),
@@ -839,9 +842,12 @@ export function buildRealmFlora(seed: number): RealmFloraView {
 
   // --- blossom trees, two pinks ---
   const blossom = blossomGeo();
-  instance(blossom.trunk, surfaceMat({ color: BLOSSOM_BARK, roughness: 0.9 }), spots.blossoms, {
-    castShadow: true,
-  });
+  instance(
+    blossom.trunk,
+    detailedSurfaceMat({ color: BLOSSOM_BARK, roughness: 0.9 }, 'bark'),
+    spots.blossoms,
+    { castShadow: true },
+  );
   const blossomShaded = perFaceShade(blossom.canopy, 0.15, seed + 631, 0.12);
   for (const variant of [0, 1]) {
     instance(

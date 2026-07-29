@@ -21,7 +21,7 @@ import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
 import { loadGltf, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { addRimGlow, EMISSIVE_GLOW, GFX } from '../gfx';
-import { applySurfaceDetail } from '../worn_stone';
+import { applySurfaceDetail, riggedWornFamilyFor } from '../worn_stone';
 import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
@@ -959,6 +959,13 @@ export function tintedMaterial(
     // `weapons_glow` ships at strength 1.5, already over the line, and
     // weapon_vfx.ts animates its intensity per frame.
     if (mat.name.includes('Glow')) mat.emissiveIntensity = EMISSIVE_GLOW;
+    // Cloth-named and armor-metal-named rig materials (paladin_metallic) take
+    // the shared surface-detail layer at LOW strength in OBJECT space (rigs
+    // animate; a world projection swims). Class-body/skin atlases and 'Glow'
+    // materials never match (riggedWornFamilyFor's allowlist has no fallback).
+    const worn = riggedWornFamilyFor(mat.name);
+    if (worn)
+      applySurfaceDetail(mat, worn.family, { strength: worn.strength, objectSpace: true });
   } else {
     if ((src as THREE.MeshBasicMaterial).isMeshBasicMaterial) {
       mat = (src as THREE.MeshBasicMaterial).clone();

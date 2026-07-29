@@ -23,6 +23,7 @@ import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { EMISSIVE_LIGHT, GFX, surfaceMat } from './gfx';
 import { type StationPropKind, stationPropPlacements } from './stations_core';
+import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
 
 // Half-step (yd) used to finite-difference the local ground slope under each
 // prop so furniture-scale props tilt with the terrain (artisan_row idiom).
@@ -104,6 +105,27 @@ function buildFallbackMesh(kind: StationPropKind): THREE.Object3D {
   return mesh;
 }
 
+// Loader cache scenes are IMMUTABLE and Object3D.clone shares materials, so
+// the surface-detail layer goes on a one-time CLONE cached per source
+// material (glass stays clean via the shared skip list; everything else on
+// the 'tools' palette atlas reads as workbench wood).
+const stationMatCache = new Map<string, THREE.Material>();
+
+function stationMaterial(src: THREE.Material): THREE.Material {
+  const cached = stationMatCache.get(src.uuid);
+  if (cached) return cached;
+  let out = src;
+  const worn = wornFamilyFor('tools', src.name, { transparent: src.transparent === true });
+  if (worn && (src as THREE.MeshStandardMaterial).isMeshStandardMaterial) {
+    out = src.clone();
+    applySurfaceDetail(out as THREE.MeshStandardMaterial, worn.family, {
+      strength: worn.strength,
+    });
+  }
+  stationMatCache.set(src.uuid, out);
+  return out;
+}
+
 function buildStationMesh(kind: StationPropKind): THREE.Object3D {
   const loaded = loadedStationGltf.get(kind);
   if (!loaded) return buildFallbackMesh(kind);
@@ -120,6 +142,9 @@ function buildStationMesh(kind: StationPropKind): THREE.Object3D {
     if (child instanceof THREE.Mesh) {
       child.castShadow = true;
       child.receiveShadow = true;
+      child.material = Array.isArray(child.material)
+        ? child.material.map(stationMaterial)
+        : stationMaterial(child.material);
     }
   });
   return inst;

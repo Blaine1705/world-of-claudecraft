@@ -56,6 +56,7 @@ import {
   parterreFlowerTintAt,
 } from './garden_parterre_core';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
+import { applySurfaceDetail, foliageWornFamilyFor } from './worn_stone';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 import { type FlowerKind, flowerTuftTexture, grassTuftTexture } from './textures';
 
@@ -687,6 +688,12 @@ function foliageMaterial(
     mat.emissive.setRGB(0.155, 0.175, 0.135);
   }
   applyInstanceCollapse(mat, role);
+  // Trunks take the bark family, the shared boulder fields a stronger stone;
+  // leaf/flower/mushroom names return null so canopies stay clean. Applied
+  // LAST so the worn hook chains the collapse (and any wind) hook.
+  const worn = foliageWornFamilyFor(src.name);
+  if (worn)
+    applySurfaceDetail(mat as THREE.MeshStandardMaterial, worn.family, { strength: worn.strength });
   materialCache.set(key, mat);
   return mat;
 }
