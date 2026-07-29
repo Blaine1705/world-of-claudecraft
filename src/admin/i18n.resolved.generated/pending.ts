@@ -13,6 +13,7 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
@@ -57,6 +58,7 @@ export const pending: Record<string, readonly string[]> = {
   "es_ES": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
@@ -101,6 +103,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_FR": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
@@ -145,6 +148,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_CA": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
@@ -190,6 +194,7 @@ export const pending: Record<string, readonly string[]> = {
   "it_IT": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
@@ -234,6 +239,7 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
@@ -278,6 +284,7 @@ export const pending: Record<string, readonly string[]> = {
   "zh_CN": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
@@ -322,6 +329,7 @@ export const pending: Record<string, readonly string[]> = {
   "zh_TW": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
@@ -366,6 +374,7 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
@@ -410,6 +419,7 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
@@ -454,6 +464,7 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
@@ -498,6 +509,7 @@ export const pending: Record<string, readonly string[]> = {
   "ru_RU": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
@@ -542,6 +554,7 @@ export const pending: Record<string, readonly string[]> = {
   "cs_CZ": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
@@ -586,6 +599,7 @@ export const pending: Record<string, readonly string[]> = {
   "nl_NL": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
@@ -630,6 +644,7 @@ export const pending: Record<string, readonly string[]> = {
   "pl_PL": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
@@ -674,6 +689,7 @@ export const pending: Record<string, readonly string[]> = {
   "id_ID": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
@@ -718,6 +734,7 @@ export const pending: Record<string, readonly string[]> = {
   "tr_TR": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
@@ -762,6 +779,7 @@ export const pending: Record<string, readonly string[]> = {
   "sv_SE": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
@@ -806,6 +824,7 @@ export const pending: Record<string, readonly string[]> = {
   "vi_VN": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
@@ -850,6 +869,7 @@ export const pending: Record<string, readonly string[]> = {
   "da_DK": [
     "dialog.actionResetChatStrikes",
     "dialog.confirmResetChatStrikes",
+    "error.tooManyFailedAttempts",
     "location.kind.rift",
     "moderationHistory.actionReactivate",
     "moderationHistory.actionResetChatStrikes",
