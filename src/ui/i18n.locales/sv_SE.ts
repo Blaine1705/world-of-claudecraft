@@ -6008,6 +6008,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorDisabledMsg': 'Tvåfaktorsautentisering är av.',
   'hudChrome.account.twoFactorDone': 'Klart',
   'hudChrome.account.twoFactorDownloadCodes': 'Ladda ner koder',
+  'hudChrome.account.recoveryCodesFileHeader': '{brand}-återställningskoder',
+  'hudChrome.account.recoveryCodesFileAccount': 'Konto: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    'Varje kod kan användas en gång om du förlorar åtkomsten till din autentiseringsapp.',
+  'hudChrome.account.recoveryCodesFileWarn':
+    'Förvara den här filen på ett säkert och privat ställe.',
   'hudChrome.account.twoFactorEnabledMsg': 'Tvåfaktorsautentisering är nu på.',
   'hudChrome.account.twoFactorOpenApp': 'Öppna i autentiseringsapp',
   'hudChrome.account.twoFactorRecoveryHint':

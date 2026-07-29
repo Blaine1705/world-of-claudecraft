@@ -6245,6 +6245,11 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorDisabledMsg': 'Tweestapsverificatie staat uit.',
   'hudChrome.account.twoFactorDone': 'Klaar',
   'hudChrome.account.twoFactorDownloadCodes': 'Codes Downloaden',
+  'hudChrome.account.recoveryCodesFileHeader': '{brand}-herstelcodes',
+  'hudChrome.account.recoveryCodesFileAccount': 'Account: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    'Elke code kan één keer worden gebruikt als je geen toegang meer hebt tot je authenticator-app.',
+  'hudChrome.account.recoveryCodesFileWarn': 'Bewaar dit bestand ergens veilig en privé.',
   'hudChrome.account.twoFactorEnabledMsg': 'Tweestapsverificatie staat nu aan.',
   'hudChrome.account.twoFactorOpenApp': 'Openen in authenticator-app',
   'hudChrome.account.twoFactorRecoveryHint':

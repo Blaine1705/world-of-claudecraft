@@ -6203,6 +6203,11 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorDisabledMsg': 'Xác thực hai lớp đang tắt.',
   'hudChrome.account.twoFactorDone': 'Xong',
   'hudChrome.account.twoFactorDownloadCodes': 'Tải Mã Xuống',
+  'hudChrome.account.recoveryCodesFileHeader': 'Mã khôi phục {brand}',
+  'hudChrome.account.recoveryCodesFileAccount': 'Tài khoản: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    'Mỗi mã có thể dùng một lần nếu bạn mất quyền truy cập vào ứng dụng xác thực của mình.',
+  'hudChrome.account.recoveryCodesFileWarn': 'Cất giữ tệp này ở nơi an toàn và riêng tư.',
   'hudChrome.account.twoFactorEnabledMsg': 'Xác thực hai lớp giờ đã bật.',
   'hudChrome.account.twoFactorOpenApp': 'Mở trong ứng dụng xác thực',
   'hudChrome.account.twoFactorRecoveryHint':

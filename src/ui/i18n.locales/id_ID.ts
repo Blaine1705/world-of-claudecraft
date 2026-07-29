@@ -6146,6 +6146,11 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorDisabledMsg': 'Autentikasi dua-faktor mati.',
   'hudChrome.account.twoFactorDone': 'Selesai',
   'hudChrome.account.twoFactorDownloadCodes': 'Unduh Kode',
+  'hudChrome.account.recoveryCodesFileHeader': 'Kode pemulihan {brand}',
+  'hudChrome.account.recoveryCodesFileAccount': 'Akun: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    'Setiap kode dapat digunakan sekali jika kamu kehilangan akses ke aplikasi autentikatormu.',
+  'hudChrome.account.recoveryCodesFileWarn': 'Simpan file ini di tempat yang aman dan pribadi.',
   'hudChrome.account.twoFactorEnabledMsg': 'Autentikasi dua-faktor kini aktif.',
   'hudChrome.account.twoFactorOpenApp': 'Buka di aplikasi autentikator',
   'hudChrome.account.twoFactorRecoveryHint':

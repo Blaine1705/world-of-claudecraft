@@ -3478,6 +3478,12 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorDisabledMsg': 'Dvoufaktorové ověření je vypnuté.',
   'hudChrome.account.twoFactorDone': 'Hotovo',
   'hudChrome.account.twoFactorDownloadCodes': 'Stáhnout kódy',
+  'hudChrome.account.recoveryCodesFileHeader': 'Obnovovací kódy {brand}',
+  'hudChrome.account.recoveryCodesFileAccount': 'Účet: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    'Každý kód lze použít jednou, pokud ztratíte přístup ke své autentizační aplikaci.',
+  'hudChrome.account.recoveryCodesFileWarn':
+    'Uchovávejte tento soubor na bezpečném a soukromém místě.',
   'hudChrome.account.twoFactorEnabledMsg': 'Dvoufaktorové ověření je teď zapnuté.',
   'hudChrome.account.twoFactorOpenApp': 'Otevřít v autentizační aplikaci',
   'hudChrome.account.twoFactorRecoveryHint':

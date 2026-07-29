@@ -10,99 +10,64 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hudChrome.account.recoveryCodesFileAccount",
-    "hudChrome.account.recoveryCodesFileHeader",
-    "hudChrome.account.recoveryCodesFileHint",
-    "hudChrome.account.recoveryCodesFileWarn"
+    "fiesta.augment.cardAria"
   ],
   "es_ES": [
-    "hudChrome.account.recoveryCodesFileAccount",
-    "hudChrome.account.recoveryCodesFileHeader",
-    "hudChrome.account.recoveryCodesFileHint",
-    "hudChrome.account.recoveryCodesFileWarn"
+    "fiesta.augment.cardAria"
   ],
   "fr_FR": [
-    "hudChrome.account.recoveryCodesFileAccount",
-    "hudChrome.account.recoveryCodesFileHeader",
-    "hudChrome.account.recoveryCodesFileHint",
-    "hudChrome.account.recoveryCodesFileWarn"
+    "fiesta.augment.cardAria"
   ],
   "fr_CA": [
-    "hudChrome.account.recoveryCodesFileAccount",
-    "hudChrome.account.recoveryCodesFileHeader",
-    "hudChrome.account.recoveryCodesFileHint",
-    "hudChrome.account.recoveryCodesFileWarn"
+    "fiesta.augment.cardAria"
   ],
   "en_CA": [],
   "it_IT": [
-    "hudChrome.account.recoveryCodesFileAccount",
-    "hudChrome.account.recoveryCodesFileHeader",
-    "hudChrome.account.recoveryCodesFileHint",
-    "hudChrome.account.recoveryCodesFileWarn"
+    "fiesta.augment.cardAria"
   ],
   "de_DE": [
-    "hudChrome.account.recoveryCodesFileAccount",
-    "hudChrome.account.recoveryCodesFileHeader",
-    "hudChrome.account.recoveryCodesFileHint",
-    "hudChrome.account.recoveryCodesFileWarn"
+    "fiesta.augment.cardAria"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "fiesta.augment.cardAria"
+  ],
+  "zh_TW": [
+    "fiesta.augment.cardAria"
+  ],
+  "ko_KR": [
+    "fiesta.augment.cardAria"
+  ],
+  "ja_JP": [
+    "fiesta.augment.cardAria"
+  ],
   "pt_BR": [
-    "hudChrome.account.recoveryCodesFileAccount",
-    "hudChrome.account.recoveryCodesFileHeader",
-    "hudChrome.account.recoveryCodesFileHint",
-    "hudChrome.account.recoveryCodesFileWarn"
+    "fiesta.augment.cardAria"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "fiesta.augment.cardAria"
+  ],
   "cs_CZ": [
-    "hudChrome.account.recoveryCodesFileAccount",
-    "hudChrome.account.recoveryCodesFileHeader",
-    "hudChrome.account.recoveryCodesFileHint",
-    "hudChrome.account.recoveryCodesFileWarn"
+    "fiesta.augment.cardAria"
   ],
   "nl_NL": [
-    "hudChrome.account.recoveryCodesFileAccount",
-    "hudChrome.account.recoveryCodesFileHeader",
-    "hudChrome.account.recoveryCodesFileHint",
-    "hudChrome.account.recoveryCodesFileWarn"
+    "fiesta.augment.cardAria"
   ],
   "pl_PL": [
-    "hudChrome.account.recoveryCodesFileAccount",
-    "hudChrome.account.recoveryCodesFileHeader",
-    "hudChrome.account.recoveryCodesFileHint",
-    "hudChrome.account.recoveryCodesFileWarn"
+    "fiesta.augment.cardAria"
   ],
   "id_ID": [
-    "hudChrome.account.recoveryCodesFileAccount",
-    "hudChrome.account.recoveryCodesFileHeader",
-    "hudChrome.account.recoveryCodesFileHint",
-    "hudChrome.account.recoveryCodesFileWarn"
+    "fiesta.augment.cardAria"
   ],
   "tr_TR": [
-    "hudChrome.account.recoveryCodesFileAccount",
-    "hudChrome.account.recoveryCodesFileHeader",
-    "hudChrome.account.recoveryCodesFileHint",
-    "hudChrome.account.recoveryCodesFileWarn"
+    "fiesta.augment.cardAria"
   ],
   "sv_SE": [
-    "hudChrome.account.recoveryCodesFileAccount",
-    "hudChrome.account.recoveryCodesFileHeader",
-    "hudChrome.account.recoveryCodesFileHint",
-    "hudChrome.account.recoveryCodesFileWarn"
+    "fiesta.augment.cardAria"
   ],
   "vi_VN": [
-    "hudChrome.account.recoveryCodesFileAccount",
-    "hudChrome.account.recoveryCodesFileHeader",
-    "hudChrome.account.recoveryCodesFileHint",
-    "hudChrome.account.recoveryCodesFileWarn"
+    "fiesta.augment.cardAria"
   ],
   "da_DK": [
-    "hudChrome.account.recoveryCodesFileAccount",
-    "hudChrome.account.recoveryCodesFileHeader",
-    "hudChrome.account.recoveryCodesFileHint",
-    "hudChrome.account.recoveryCodesFileWarn"
+    "fiesta.augment.cardAria"
   ]
 };

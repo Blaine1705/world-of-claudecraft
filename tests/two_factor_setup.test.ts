@@ -57,11 +57,25 @@ describe('formatRecoveryCodesFile', () => {
 
   it('builds the header, account line, and hint/warn prose from t(), not raw literals', () => {
     const blob = formatRecoveryCodesFile(['aaaa-bbbb'], 'Aelwyn');
-    expect(blob).toContain(
+    const lines = blob.split('\n');
+    // Pinned to the literal expected English (the default `en` locale in tests) so
+    // swapping the Hint/Warn keys, or resolving the wrong key on the header line,
+    // fails this test even though both strings would still be present in the blob.
+    expect(lines[0]).toBe('World of ClaudeCraft recovery codes');
+    expect(lines[1]).toBe('Account: Aelwyn');
+    expect(lines[2]).toBe('');
+    expect(lines[3]).toBe(
+      'Each code can be used once if you lose access to your authenticator app.',
+    );
+    expect(lines[4]).toBe('Keep this file somewhere safe and private.');
+    expect(lines[5]).toBe('');
+    expect(lines[6]).toBe('01. aaaa-bbbb');
+    // Independently confirm the lines are t()-resolved (not decoupled literals that
+    // happen to match), so a future catalog wording change still updates this pin.
+    expect(lines[0]).toBe(
       t('hudChrome.account.recoveryCodesFileHeader', { brand: 'World of ClaudeCraft' }),
     );
-    expect(blob).toContain(t('hudChrome.account.recoveryCodesFileAccount', { username: 'Aelwyn' }));
-    expect(blob).toContain(t('hudChrome.account.recoveryCodesFileHint'));
-    expect(blob).toContain(t('hudChrome.account.recoveryCodesFileWarn'));
+    expect(lines[3]).toBe(t('hudChrome.account.recoveryCodesFileHint'));
+    expect(lines[4]).toBe(t('hudChrome.account.recoveryCodesFileWarn'));
   });
 });
