@@ -1,9 +1,25 @@
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import { bestEpicGearFor, equipBestInSlotForDev } from '../src/sim/dev/bis_gear';
-import { canEquipItemInSlot } from '../src/sim/equipment_rules';
+import { canEquipItemInSlot, isShieldItem } from '../src/sim/equipment_rules';
 import { Sim } from '../src/sim/sim';
-import type { EquipSlot } from '../src/sim/types';
+import type { EquipSlot, ItemDef } from '../src/sim/types';
+
+// Identity-stat totals across a pick set, for asserting a spec dresses in ITS
+// gear (the elemental-in-enhancement-mail bug: a spec-blind scorer summed all
+// stats equally, so casters "won" with melee stat sticks).
+function statTotals(picks: Partial<Record<EquipSlot, string>>) {
+  let int = 0;
+  let physical = 0;
+  let spellPower = 0;
+  for (const id of Object.values(picks)) {
+    const item = ITEMS[id] as ItemDef | undefined;
+    int += item?.stats?.int ?? 0;
+    physical += (item?.stats?.str ?? 0) + (item?.stats?.agi ?? 0);
+    spellPower += item?.spellPower ?? 0;
+  }
+  return { int, physical, spellPower };
+}
 
 // /dev bis: the one-shot best-in-slot outfit for level-cap playtesting.
 
@@ -51,6 +67,32 @@ describe('dev bis gear', () => {
     expect(equipped).toBeGreaterThanOrEqual(8);
     expect(sim.player.stats.agi + sim.player.stats.sta).toBeGreaterThan(before);
     expect(sim.player.hp).toBe(sim.player.maxHp);
+  });
+
+  it('dresses a caster spec in caster gear, not the melee set', () => {
+    const elemental = bestEpicGearFor('shaman', 'elemental');
+    const enhancement = bestEpicGearFor('shaman', 'enhancement');
+
+    // The reported bug: picking elemental produced mostly the enhancement set.
+    // A caster's identity stat across the set is intellect (plus spell power),
+    // never the strength/agility budget the melee scorer was maximizing.
+    const caster = statTotals(elemental);
+    expect(caster.int + caster.spellPower).toBeGreaterThan(caster.physical);
+    const melee = statTotals(enhancement);
+    expect(melee.physical).toBeGreaterThan(melee.int);
+
+    // And the two spec sets genuinely diverge (not just at the weapon).
+    const enhancementIds = new Set(Object.values(enhancement));
+    const shared = Object.values(elemental).filter((id) => enhancementIds.has(id));
+    expect(shared.length).toBeLessThan(Object.values(elemental).length / 2);
+  });
+
+  it('gives a shield-role spec a one-hander plus a shield', () => {
+    const resto = bestEpicGearFor('shaman', 'restoration');
+    const offhand = ITEMS[resto.offhand ?? ''];
+    expect(offhand !== undefined && isShieldItem(offhand)).toBe(true);
+    const mainhand = ITEMS[resto.mainhand ?? ''];
+    expect(mainhand?.kind === 'weapon' && mainhand.hand !== 'twohand').toBe(true);
   });
 
   it('dresses for an explicit spec override without respeccing (the BIS-20 kit path)', () => {
