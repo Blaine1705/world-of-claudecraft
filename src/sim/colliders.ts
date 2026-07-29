@@ -12,7 +12,6 @@ import {
   buildingTerrainEnvelope,
   isEastbrookGrandArmoury,
 } from './building_layout';
-import { STATIONS } from './content/professions';
 import {
   arenaOriginAt,
   DUNGEON_FLOOR_Y,
@@ -306,14 +305,17 @@ export function mineMoundFootprint(m: {
 
 // Positions no prop may stand on: authored NPCs, plus every overworld
 // graveyard anchor, where a Spirit Healer is spawned at runtime rather than
-// being an authored NPC record.
+// being an authored NPC record. Reads the ACTIVE content (byte-identical on
+// shipped hosts) so a custom map's furniture is vetoed against ITS npcs and
+// graveyards, never the builtin layout's.
 function townNpcPositions(): { x: number; z: number }[] {
+  const content = getActiveWorldContent();
   const out: { x: number; z: number }[] = [];
-  for (const npc of Object.values(NPCS)) {
+  for (const npc of Object.values(content.npcs)) {
     const pos = (npc as { pos?: { x: number; z: number } }).pos;
     if (pos) out.push({ x: pos.x, z: pos.z });
   }
-  for (const g of OVERWORLD_GRAVEYARDS) out.push({ x: g.x, z: g.z });
+  for (const g of content.services?.graveyards ?? []) out.push({ x: g.x, z: g.z });
   return out;
 }
 
@@ -912,9 +914,11 @@ function staticWorldColliders(seed: number): Collider[] {
 
   // Profession-station clusters and Artisan Row: the town's furniture. Both
   // layouts are sim-owned data the renderer reads back (`town_props.ts`), so
-  // an anvil you can see is an anvil you can climb on.
+  // an anvil you can see is an anvil you can climb on. The ACTIVE bundle's
+  // stations, matching the gate and visuals: a custom map without services
+  // gets no invisible builtin furniture, and its own stations do collide.
   for (const tp of townPropPlacements(
-    STATIONS.map((st) => ({ type: st.type, x: st.pos.x, z: st.pos.z })),
+    (content.services?.stations ?? []).map((st) => ({ type: st.type, x: st.pos.x, z: st.pos.z })),
     townNpcPositions(),
   )) {
     const top = topY(seed, tp.x, tp.z, tp.size.height);

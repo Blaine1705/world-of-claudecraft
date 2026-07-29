@@ -877,3 +877,38 @@ describe('the rod gate reads the WATER zone at the probe point', () => {
     }
   });
 });
+
+describe('zoneAt resolves the ACTIVE zones (the swappable-content read)', () => {
+  afterEach(() => setActiveWorldContent(null));
+
+  it('a custom band layout regates the vale water at the custom tier', () => {
+    // The vale zone's exact geometry (terrain, lake, everything) wearing the
+    // thornpeak IDENTITY: the same shore that is tier 1 on builtin content
+    // must now gate at thornpeak's tier, because the gate resolves the zone
+    // through the ACTIVE walk. A builtin-ZONES read would keep answering
+    // eastbrook and let the pole cast.
+    const vale = ZONES[0];
+    setActiveWorldContent({
+      ...BUILTIN_WORLD,
+      zones: [{ ...vale, id: 'thornpeak_heights', zMax: 900 }],
+    });
+    const sim = makeSim();
+    const meta = sim.meta(sim.playerId) as PlayerMeta;
+    sim.addItem('simple_fishing_pole', 1);
+    const pz = LAKE.z - LAKE.radius - 2;
+    const p = sim.player;
+    p.pos.x = LAKE.x;
+    p.pos.z = pz;
+    p.pos.y = terrainHeight(LAKE.x, pz, sim.cfg.seed);
+    p.prevPos = { ...p.pos };
+    p.facing = Math.atan2(0, LAKE.z - pz);
+    sim.events = [];
+    startFishing(sim.ctx, p, meta);
+    const denies = deniedEvents(sim.events);
+    expect(denies).toHaveLength(1);
+    expect((denies[0] as { requiredTier: number }).requiredTier).toBe(
+      FISHING_ZONE_ROD_TIERS.thornpeak_heights,
+    );
+    expect(p.castingAbility).toBeNull();
+  });
+});

@@ -392,11 +392,16 @@ export function setActiveWorldContent(world: WorldContent | null): void {
 }
 
 // Zone containing a world position (overworld only; clamps to the strip ends).
+// Walks the ACTIVE content's zones, not the builtin const, so every consumer
+// (the fishing rod gate, catch tables, deed credit, chat readouts) resolves
+// the same world the water and terrain reads resolve. Byte-identical on
+// every shipped host: BUILTIN_WORLD.zones IS the ZONES reference.
 export function zoneAt(z: number): ZoneDef {
-  for (const zone of ZONES) {
+  const zones = getActiveWorldContent().zones;
+  for (const zone of zones) {
     if (z < zone.zMax) return zone;
   }
-  return ZONES[ZONES.length - 1];
+  return zones[zones.length - 1];
 }
 
 export function zoneWelcomeText(

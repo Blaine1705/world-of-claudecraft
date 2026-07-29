@@ -29,9 +29,9 @@ import {
   ALL_RECIPES,
   abilitiesKnownAt,
   CLASSES,
+  getActiveWorldContent,
   NPCS,
   resolveDelveShopOffers,
-  STATIONS,
 } from '../sim/data';
 import { deadTargetSelectable } from '../sim/dead_target';
 import { freshDeedStats } from '../sim/deeds';
@@ -1477,9 +1477,13 @@ export class ClientWorld implements IWorld {
   // tier plus combo recipes) ships with the client bundle like every other
   // content table, so this needs no wire round-trip. See src/world_api/professions.ts.
   recipeList: readonly RecipeDef[] = ALL_RECIPES;
-  // Online realms always use the version-pinned built-in static layout; no
-  // snapshot field is needed for authored station markers.
-  readonly stationPlacements = STATIONS;
+  // Station anchors resolve the ACTIVE content bundle, exactly like the
+  // offline Sim's stationPlacements (byte-identical on shipped hosts, where
+  // the active bundle wraps the builtin STATIONS reference); no snapshot
+  // field is needed for authored station markers.
+  get stationPlacements() {
+    return getActiveWorldContent().services?.stations ?? [];
+  }
   // Craft-result surface (#1127), mirrored from the server's `craftResult`
   // event (applyEvent below). Null until this session's first craft attempt.
   lastCraftResult: CraftResultView | null = null;

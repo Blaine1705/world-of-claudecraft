@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { isBlocked, resolveMovement, resolvePosition } from '../src/sim/colliders';
+import { colliderInternalsForTest, isBlocked, resolveMovement, resolvePosition } from '../src/sim/colliders';
 import { BUILTIN_WORLD, PLAYER_START, setActiveWorldContent } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { BlockerDef, PlacedAsset, WorldContent } from '../src/sim/types';
@@ -92,5 +92,40 @@ describe('placement collideRadius override', () => {
     const res = resolvePosition(SEED, 3, 60, 0.5);
     const d = Math.hypot(res.x, res.z - 60);
     expect(d).toBeGreaterThanOrEqual(5.5 - 1e-6); // pushed to override + body radius
+  });
+});
+
+describe('station furniture colliders follow the active bundle', () => {
+  const circlesNear = (x: number, z: number, r: number): number =>
+    colliderInternalsForTest
+      .staticWorldColliders(SEED)
+      .filter(
+        (c) =>
+          c.type === 'circle' &&
+          Math.hypot((c as { x: number }).x - x, (c as { z: number }).z - z) < r,
+      ).length;
+
+  it('a bundle without services gets NO builtin station furniture', () => {
+    const anchor = BUILTIN_WORLD.services!.stations[0].pos;
+    setActiveWorldContent(world({}));
+    const withStations = circlesNear(anchor.x, anchor.z, 8);
+    expect(withStations).toBeGreaterThan(0);
+    // Same map, services stripped: the furniture must vanish with them (the
+    // old builtin read left invisible anvils on every custom map).
+    setActiveWorldContent(world({ services: undefined }));
+    expect(circlesNear(anchor.x, anchor.z, 8)).toBeLessThan(withStations);
+  });
+
+  it('a custom station collides at ITS anchor', () => {
+    const builtin = BUILTIN_WORLD.services!;
+    const custom = {
+      id: 's_custom_test',
+      type: builtin.stations[0].type,
+      zoneId: 'eastbrook_vale',
+      pos: { x: 0, z: -960 }, // the open simulation lane: nothing else here
+      masterNpcId: builtin.stations[0].masterNpcId,
+    };
+    setActiveWorldContent(world({ services: { ...builtin, stations: [custom] } }));
+    expect(circlesNear(0, -960, 10)).toBeGreaterThan(0);
   });
 });

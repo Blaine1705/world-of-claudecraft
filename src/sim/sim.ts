@@ -1847,7 +1847,10 @@ export class Sim {
     // (getActiveWorldContent), never cfg.world. A caller that passes cfg.world
     // MUST also setActiveWorldContent() with content whose terrain-relevant
     // fields (zones, camps, roads, terrainEdits, biomePaint, waterLevel) are
-    // identical, or spawns and geometry silently fork. Placements MAY differ
+    // identical, AND whose services.stations, npcs, and services.graveyards
+    // match (the collider builder's station furniture and its NPC veto read
+    // the module global, while this Sim's station gate reads the construction
+    // copy), or spawns and geometry silently fork. Placements MAY differ
     // (render-only ownership; the editor viewport strips them from cfg.world).
     const worldContent = this.worldContent;
 
