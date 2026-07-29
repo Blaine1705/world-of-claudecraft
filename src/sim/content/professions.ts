@@ -174,8 +174,8 @@ export const HARVEST_COMPONENT_SPECIMENS: Readonly<Record<string, string>> = {
 // own starting durability, separate from the base tool's tier gating. A use
 // spends exactly one charge, deterministically (depleteEffect, rng-free) and
 // only when the bonus changed the granted outcome (R42); tool rarity buys
-// extra STARTING charges rather than cheaper spends. `kind` selects which harvest/craft outcome field the
-// bonus adjusts.
+// extra STARTING charges rather than cheaper spends. `kind` selects which
+// harvest/craft outcome field the bonus adjusts.
 export type ToolEffectId = 'gatherers_cache' | 'artisans_eye' | 'quickening_charm';
 
 export interface ToolEffectDef {

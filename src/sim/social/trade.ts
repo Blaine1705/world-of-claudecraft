@@ -184,9 +184,9 @@ export function tradeSetOffer(
 // addItemInstance rather than discarding them, the same way discardItem never
 // needed to because a discarded item's payload does not need to reappear
 // anywhere. sellItem is NOT the same case: it records vendor buyback (items.ts
-// sellItem), and buyback re-grants a plain copy today, so a sold instanced item
-// still loses its payload there; that is a pre-existing sibling of this bug,
-// not fixed by this change.
+// recordVendorBuyback), which stores each consumed slot's payload as its own
+// deep-cloned buyback row, so a sold instanced item round-trips its payload
+// through buyback the same way a trade does here.
 // BOTH removals must run before EITHER grant: when the two offers share an
 // itemId, granting first inflates the counter-party's stock, so their removal
 // consumes just-received copies (removeItem scans highest-index-first, exactly
