@@ -185,9 +185,8 @@ describe('Android Seeker distribution boundary', () => {
     expect(main).toContain(
       "document.getElementById('mobile-combat-controls')?.appendChild(dailyRewardsButton)",
     );
-    expect(mobileHudCss).toContain(
-      'body.mobile-touch.seeker-wallet-enabled #mobile-combat-controls #mobile-daily-rewards',
-    );
+    expect(mobileHudCss).toContain('#mobile-daily-rewards:not([hidden])');
+    expect(mobileHudCss).not.toContain('display: flex !important;');
     expect(mobileHudCss).toContain('url("/ui/daily-rewards/treasure_chest.webp")');
     expect(mobileHudCss).toContain('grid-column: 1;');
     expect(mobileHudCss).toContain('grid-row: 2;');

@@ -7492,6 +7492,10 @@ export class Hud {
     return this.optionsHooks?.settings.get('showDailyRewardsChest') ?? true;
   }
 
+  private mobileDailyRewardsButtonPromoted(): boolean {
+    return this.mobileDailyRewardsButtonEl?.parentElement?.id === 'mobile-combat-controls';
+  }
+
   private applyDailyRewardsChestButtonVisibility(show = this.showDailyRewardsChestButton()): void {
     const button = this.dailyRewardsButtonEl;
     if (!button) return;
@@ -7500,9 +7504,13 @@ export class Hud {
     if (!visible) button.classList.remove('spin-ready');
     // The mobile More-tray entry is a menu row, not floating chrome: it stays
     // reachable whenever the feature itself is on, regardless of the
-    // showDailyRewardsChestButton preference (which only declutters the rail).
-    if (!this.dailyRewardsEnabled())
-      this.mobileDailyRewardsButtonEl?.classList.remove('spin-ready');
+    // showDailyRewardsChestButton preference. Once promoted into the Seeker
+    // shortcut grid, it becomes floating chrome and honors the same preference.
+    const mobileButton = this.mobileDailyRewardsButtonEl;
+    const mobileVisible =
+      this.dailyRewardsEnabled() && (!this.mobileDailyRewardsButtonPromoted() || show);
+    mobileButton?.toggleAttribute('hidden', !mobileVisible);
+    if (!mobileVisible) mobileButton?.classList.remove('spin-ready');
   }
 
   setDailyRewardsChestButtonVisible(show: boolean): void {
@@ -7520,7 +7528,9 @@ export class Hud {
     const button = this.dailyRewardsButtonEl;
     const spinReady =
       status.enabled !== false && (!status.eligibility.eligible || !status.spin.claimed);
-    this.mobileDailyRewardsButtonEl?.classList.toggle('spin-ready', spinReady);
+    const mobileVisible =
+      !this.mobileDailyRewardsButtonPromoted() || this.showDailyRewardsChestButton();
+    this.mobileDailyRewardsButtonEl?.classList.toggle('spin-ready', mobileVisible && spinReady);
     if (!button) return;
     if (!this.showDailyRewardsChestButton()) {
       button.hidden = true;

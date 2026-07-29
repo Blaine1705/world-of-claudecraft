@@ -88,5 +88,8 @@ describe('Seeker Daily Rewards mobile placement', () => {
       hit === target || target.contains(hit),
       `expected target center to remain actionable, but hit ${hit?.id || hit?.tagName || 'nothing'}; chest=${JSON.stringify(chestRect.toJSON())}; target=${JSON.stringify(targetRect.toJSON())}`,
     ).toBe(true);
+
+    chest.hidden = true;
+    expect(getComputedStyle(chest).display).toBe('none');
   });
 });

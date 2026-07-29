@@ -1411,11 +1411,13 @@
     column-gap: 12px;
     row-gap: 8px;
   }
-  body.mobile-touch.seeker-wallet-enabled #mobile-combat-controls #mobile-daily-rewards {
+  body.mobile-touch.seeker-wallet-enabled
+    #mobile-combat-controls
+    #mobile-daily-rewards:not([hidden]) {
     grid-column: 1;
     grid-row: 2;
     position: static;
-    display: flex !important;
+    display: flex;
     width: 58px;
     height: 54px;
     min-width: 58px;
@@ -1428,8 +1430,6 @@
     box-shadow: none;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-    opacity: 1;
-    visibility: visible;
     pointer-events: auto;
   }
   body.mobile-touch.seeker-wallet-enabled
