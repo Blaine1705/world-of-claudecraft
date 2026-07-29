@@ -575,8 +575,20 @@ function buildSplatMaterial(
         }`
             : ''
         }
-        // grass blends two scales so the 1K photo source never reads as tile
-        vec3 grassAlb = mix(texture2D(uGrass, tuv).rgb, texture2D(uGrass, tuv * 0.31).rgb, 0.42);
+        // hill-scale macro noise, hoisted above the grass blend so the grass
+        // octave balance, the rock wall blend, and the hue drift below all
+        // share one tap
+        float macro2 = texture2D(uMacro, vWPos.xz * 0.0045 + 0.37).r;
+        // grass blends two scales so the 1K photo source never reads as tile.
+        // The second octave samples with swapped/negated components (a 90
+        // degree rotation), so the two scales can never phase-align into a
+        // shared repeat; the blend weight wanders with the hill-scale macro
+        // noise so different hills favor different octaves instead of every
+        // meadow sharing one fixed balance.
+        vec3 grassAlb = mix(
+          texture2D(uGrass, tuv).rgb,
+          texture2D(uGrass, vec2(-tuv.y, tuv.x) * 0.31).rgb,
+          0.42 + (macro2 - 0.5) * 0.3);
         // rock: top-down projection smears into vertical streaks on cliffs,
         // so steep faces blend toward wall-planar (world XY/ZY) samples
         vec3 an = abs(normalize(vWNorm));
@@ -600,10 +612,9 @@ function buildSplatMaterial(
         // marsh swaps packed dirt for wet mud (roads, hub discs included)
         vec3 dirtAlb = mix(dirtFlat, dirtWall, dirtWallW);
         vec3 rockFlat = texture2D(uRock, tuv * 0.6).rgb;
-        // hoisted from the hue-drift mix below: the wall blend reuses this
-        // hill-scale noise so plate zones vary across a mountainside without
-        // spending a second uMacro tap on cliff fragments
-        float macro2 = texture2D(uMacro, vWPos.xz * 0.0045 + 0.37).r;
+        // macro2 (hoisted above the grass blend) also drives the wall plate
+        // mix, so plate zones vary across a mountainside without spending a
+        // second uMacro tap on cliff fragments
         // Anti-corduroy wall projection. A single-scale planar projection
         // hands every cliff the same tiling period, and any directional bias
         // in the source repeats in lockstep down the whole face, and that is
@@ -643,6 +654,23 @@ function buildSplatMaterial(
                  + texture2D(uSand, tuv).rgb * vSplatR.w;
         // snow cover on the peaks/rim, by baked per-vertex weight
         alb = mix(alb, texture2D(uSnow, tuv * 0.7).rgb, vExtra.y);
+        // Wet shoreline: within ~1.6u above the waterline (WATER_LEVEL is
+        // inlined from src/sim/world.ts at material build), sand and dirt
+        // darken and tighten as if soaked, so every shore carries a wet
+        // margin instead of dry ground meeting water at a hard line. Pure
+        // math on values already sampled: no extra tap. The roughness chunk
+        // below reuses wetW for the damp sheen.
+        float shoreWet = (1.0 - smoothstep(${(WATER_LEVEL + 0.1).toFixed(2)},
+          ${(WATER_LEVEL + 1.6).toFixed(2)}, vWPos.y)) * (1.0 - vExtra.y);
+        float wetW = shoreWet * clamp(vSplatR.w + vSplatR.y * 0.85, 0.0, 1.0);
+        alb *= 1.0 - wetW * 0.22;
+        // Third, very-low-frequency ground variety (~300u wavelength): a
+        // subtle warm/cool hue swing so far-apart regions stop sharing one
+        // identical tone. Applied before the impact mix so authored crater
+        // colours stay exact; damped under snow so peaks stay clean.
+        float macro3 = texture2D(uMacro, vWPos.xz * 0.003 + 0.71).r;
+        vec3 hue3 = mix(vec3(1.04, 1.005, 0.96), vec3(0.96, 0.995, 1.04), macro3);
+        alb *= mix(vec3(1.0), hue3, 1.0 - vExtra.y * 0.5);
         // macro brightness swing breaks distant tiling
         float macro = mix(0.88, 1.12, texture2D(uMacro, vWPos.xz * 0.012).r);
         // Meteor impact terrain is authored by the same crater profile as the
@@ -686,7 +714,21 @@ function buildSplatMaterial(
         // plate catching the light a little differently.
         float plateHi = smoothstep(0.02, 0.14, wallCav);
         roughnessFactor = mix(roughnessFactor, mix(0.95, 0.8, plateHi),
-          vSplatR.z * wallW * (1.0 - vExtra.y));`,
+          vSplatR.z * wallW * (1.0 - vExtra.y));
+        // wet shoreline (wetW from the albedo chunk): soaked sand and dirt
+        // tighten toward a damp sheen instead of staying bone-dry matte
+        roughnessFactor = mix(roughnessFactor, min(roughnessFactor, 0.55), wetW);
+        // Snow sparkle: tiny speckle cells pull toward glossy so sun-facing
+        // snow glints. The hash folds in the fine AO height already sampled
+        // (cavH), so speckles sit on the texture grain rather than a bare
+        // grid: no new texture tap. Distance-faded so far snow stays matte
+        // and never shimmers; overall snow keeps its matte ROUGH_SNOW base.
+        float sparkCell = fract(sin(dot(floor(vWPos.xz * 12.0),
+          vec2(127.1, 311.7)) + cavH * 41.0) * 43758.5453);
+        float snowSpark = step(0.94, sparkCell)
+          * smoothstep(0.45, 0.85, vExtra.y)
+          * (1.0 - smoothstep(18.0, 55.0, pDist));
+        roughnessFactor = mix(roughnessFactor, 0.55, snowSpark * 0.8);`,
       )
       .replace(
         '#include <normal_fragment_maps>',
