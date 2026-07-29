@@ -9524,6 +9524,9 @@ export const en_XA: EnTranslations = {
       "heart_of_the_rift": {
         "name": "[Ĥéáŕţ óƒ ţĥé Ŕíƒţ]"
       },
+      "voidsong_dirk": {
+        "name": "[Ʋóíðšóñĝ, Ðíŕķ óƒ ţĥé Šúñðéŕéð Ʋéíļ]"
+      },
       "wildheart_tuskblade": {
         "name": "[Ŵíļðĥéáŕţ Ţúšķƀļáðé]"
       },

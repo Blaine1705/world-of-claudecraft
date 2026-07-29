@@ -9524,6 +9524,9 @@ export const sv_SE: EnTranslations = {
       "heart_of_the_rift": {
         "name": "Heart of the Rift"
       },
+      "voidsong_dirk": {
+        "name": "Voidsong, Dirk of the Sundered Veil"
+      },
       "wildheart_tuskblade": {
         "name": "Wildheart Tuskblade"
       },
