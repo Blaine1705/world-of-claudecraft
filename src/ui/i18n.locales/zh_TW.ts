@@ -9524,7 +9524,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectSlotButton': '鑲嵌{effect}',
   'hudChrome.professions.toolEffectRechargeButton': '充能',
   'hudChrome.professions.toolEffectNoGain': '{effect}已鑲嵌且能量充盈。',
-  'hudChrome.professions.toolEffectRechargeToolCapped': '攜帶更好的{profession}工具才能繼續為{effect}充能。',
+  'hudChrome.professions.toolEffectRechargeToolCapped':
+    '攜帶更好的{profession}工具才能繼續為{effect}充能。',
   'hudChrome.professions.toolEffectSlotted': '{effect}已鑲嵌到{profession}。',
   'hudChrome.professions.toolEffectSlotInvalid': '{effect}無法鑲嵌在那裡。',
   'hudChrome.professions.toolEffectNoTool': '你需要先擁有真正的{profession}工具。',

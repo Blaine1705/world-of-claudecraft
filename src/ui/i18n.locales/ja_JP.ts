@@ -9980,7 +9980,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectSlotButton': '{effect}を装着',
   'hudChrome.professions.toolEffectRechargeButton': '再充填',
   'hudChrome.professions.toolEffectNoGain': '{effect}はすでに装着され、充填も満タンだ。',
-  'hudChrome.professions.toolEffectRechargeToolCapped': '{effect}をさらに充填するには、より上質な{profession}用ツールが必要だ。',
+  'hudChrome.professions.toolEffectRechargeToolCapped':
+    '{effect}をさらに充填するには、より上質な{profession}用ツールが必要だ。',
   'hudChrome.professions.toolEffectSlotted': '{effect}を{profession}に装着した。',
   'hudChrome.professions.toolEffectSlotInvalid': '{effect}はそこには装着できない。',
   'hudChrome.professions.toolEffectNoTool': 'まず本物の{profession}用ツールが必要だ。',
@@ -9988,7 +9989,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRecharged': '{effect}を再充填した：{material}x{count}を消費。',
   'hudChrome.professions.toolEffectRechargeNoSlot': '{profession}には効果が装着されていない。',
   'hudChrome.professions.toolEffectRechargeFull': '{effect}はすでに完全に充填されている。',
-  'hudChrome.professions.toolEffectRechargeMaterials': '{effect}の再充填には{material}x{count}が必要だ。',
+  'hudChrome.professions.toolEffectRechargeMaterials':
+    '{effect}の再充填には{material}x{count}が必要だ。',
   'hudChrome.professions.toolEffectSpent': '使い切りました。再充填が必要です',
   'hudChrome.professions.toolEffectCharges': '残り {charges} / {max} 回',
   'entities.items.resonant_thread.name': '共鳴の糸',

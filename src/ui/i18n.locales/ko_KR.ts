@@ -9973,7 +9973,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectSlotButton': '{effect} 장착',
   'hudChrome.professions.toolEffectRechargeButton': '재충전',
   'hudChrome.professions.toolEffectNoGain': '{effect}은(는) 이미 장착되어 있고 충전도 가득합니다.',
-  'hudChrome.professions.toolEffectRechargeToolCapped': '{effect}을(를) 더 충전하려면 더 좋은 {profession} 도구가 필요합니다.',
+  'hudChrome.professions.toolEffectRechargeToolCapped':
+    '{effect}을(를) 더 충전하려면 더 좋은 {profession} 도구가 필요합니다.',
   'hudChrome.professions.toolEffectSlotted': '{effect}이(가) {profession}에 장착되었습니다.',
   'hudChrome.professions.toolEffectSlotInvalid': '{effect}은(는) 거기에 장착할 수 없습니다.',
   'hudChrome.professions.toolEffectNoTool': '먼저 진짜 {profession} 도구가 필요합니다.',
@@ -9981,7 +9982,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectRecharged': '{effect} 재충전 완료: {material} x{count} 소모.',
   'hudChrome.professions.toolEffectRechargeNoSlot': '{profession}에 장착된 효과가 없습니다.',
   'hudChrome.professions.toolEffectRechargeFull': '{effect}은(는) 이미 완전히 충전되어 있습니다.',
-  'hudChrome.professions.toolEffectRechargeMaterials': '{effect} 재충전에는 {material} x{count}이(가) 필요합니다.',
+  'hudChrome.professions.toolEffectRechargeMaterials':
+    '{effect} 재충전에는 {material} x{count}이(가) 필요합니다.',
   'hudChrome.professions.toolEffectSpent': '모두 소모됨, 재충전 필요',
   'hudChrome.professions.toolEffectCharges': '{charges} / {max}회 남음',
   'entities.items.resonant_thread.name': '공명의 실',
