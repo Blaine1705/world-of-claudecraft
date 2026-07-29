@@ -571,6 +571,39 @@ describe('delve interactables and affixes', () => {
     expect(after).toBe(before);
   });
 
+  it('entering evade (leash break) cancels the in-flight Raise Dead channel before the boss walks home', () => {
+    const sim = makeSim();
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    run.modules = ['reliquary_finale'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    const boss = [...sim.entities.values()].find((e) => e.templateId === 'deacon_varric')!;
+    boss.inCombat = true;
+    boss.hp = Math.ceil(boss.maxHp * 0.55);
+    (sim as any).updateBossMechanics(boss);
+    expect(run.raiseDeadChannel).not.toBeNull();
+
+    // Mirror the real leash path: updateMobCombatProfile flips aiState to
+    // 'evade' the instant the boss crosses the leash, well before it finishes
+    // walking home to resetEvadingMob's arrival check. The channel must be
+    // dropped at that point, not left ticking down in the background where it
+    // could still fire spawnBossAdds while the boss is mid-walk.
+    boss.aiState = 'evade';
+    expect(run.raiseDeadChannel).not.toBeNull(); // not yet ticked
+    sim.tick();
+    expect(run.raiseDeadChannel).toBeNull();
+
+    const before = [...sim.entities.values()].filter(
+      (e) => e.templateId === 'reliquary_funeral_ringer',
+    ).length;
+    for (let i = 0; i < 20 * 6; i++) sim.tick();
+    const after = [...sim.entities.values()].filter(
+      (e) => e.templateId === 'reliquary_funeral_ringer',
+    ).length;
+    expect(after).toBe(before);
+  });
+
   it('clears trash and opens exit portal at module far end', () => {
     const sim = makeSim();
     enterReliquary(sim);
