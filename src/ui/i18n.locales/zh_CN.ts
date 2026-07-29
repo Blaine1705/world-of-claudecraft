@@ -4437,6 +4437,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorRecoveryHint':
     '每个恢复码只能使用一次。请妥善保管：如果你丢失了身份验证器应用，它们是你唯一的找回方式。',
   'hudChrome.account.twoFactorDownloadCodes': '下载恢复码',
+  'hudChrome.account.recoveryCodesFileHeader': '{brand} 恢复码',
+  'hudChrome.account.recoveryCodesFileAccount': '账户：{username}',
+  'hudChrome.account.recoveryCodesFileHint': '如果你无法访问身份验证器应用，每个代码只能使用一次。',
+  'hudChrome.account.recoveryCodesFileWarn': '请将此文件保存在安全且私密的地方。',
   'hudChrome.account.twoFactorDone': '完成',
   'hudChrome.account.twoFactorDisableHint': '请输入你的密码以关闭双重验证。你的恢复码将被作废。',
   'hudChrome.account.twoFactorDisableBtn': '关闭双重验证',

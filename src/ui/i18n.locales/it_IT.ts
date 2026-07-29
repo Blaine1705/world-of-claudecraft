@@ -7024,6 +7024,11 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorRecoveryHint':
     "Ogni codice funziona una sola volta. Conservali in un luogo sicuro: sono l'unico modo per rientrare se perdi la tua app di autenticazione.",
   'hudChrome.account.twoFactorDownloadCodes': 'Scarica i codici',
+  'hudChrome.account.recoveryCodesFileHeader': 'Codici di recupero {brand}',
+  'hudChrome.account.recoveryCodesFileAccount': 'Account: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    "Ogni codice può essere usato una sola volta se perdi l'accesso alla tua app di autenticazione.",
+  'hudChrome.account.recoveryCodesFileWarn': 'Conserva questo file in un luogo sicuro e privato.',
   'hudChrome.account.twoFactorDone': 'Fatto',
   'hudChrome.account.twoFactorDisableHint':
     "Inserisci la tua password per disattivare l'autenticazione a due fattori. I tuoi codici di recupero verranno eliminati.",

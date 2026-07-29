@@ -6079,6 +6079,11 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorDisabledMsg': 'İki adımlı kimlik doğrulama kapalı.',
   'hudChrome.account.twoFactorDone': 'Bitti',
   'hudChrome.account.twoFactorDownloadCodes': 'Kodları İndir',
+  'hudChrome.account.recoveryCodesFileHeader': '{brand} kurtarma kodları',
+  'hudChrome.account.recoveryCodesFileAccount': 'Hesap: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    'Kimlik doğrulama uygulamanıza erişimi kaybederseniz her kod bir kez kullanılabilir.',
+  'hudChrome.account.recoveryCodesFileWarn': 'Bu dosyayı güvenli ve özel bir yerde saklayın.',
   'hudChrome.account.twoFactorEnabledMsg': 'İki adımlı kimlik doğrulama artık açık.',
   'hudChrome.account.twoFactorOpenApp': 'Kimlik doğrulama uygulamasında aç',
   'hudChrome.account.twoFactorRecoveryHint':

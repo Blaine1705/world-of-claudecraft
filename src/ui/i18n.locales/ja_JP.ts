@@ -4623,6 +4623,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorRecoveryHint':
     '各コードは一度だけ使用できます。安全な場所に保管してください。認証アプリを紛失した場合、これらが唯一の復旧手段です。',
   'hudChrome.account.twoFactorDownloadCodes': 'コードをダウンロード',
+  'hudChrome.account.recoveryCodesFileHeader': '{brand} リカバリーコード',
+  'hudChrome.account.recoveryCodesFileAccount': 'アカウント：{username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    '認証アプリにアクセスできなくなった場合、各コードは一度だけ使用できます。',
+  'hudChrome.account.recoveryCodesFileWarn':
+    'このファイルは安全でプライベートな場所に保管してください。',
   'hudChrome.account.twoFactorDone': '完了',
   'hudChrome.account.twoFactorDisableHint':
     '二段階認証を無効にするにはパスワードを入力してください。リカバリーコードは破棄されます。',

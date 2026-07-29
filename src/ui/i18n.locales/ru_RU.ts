@@ -4671,6 +4671,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorRecoveryHint':
     'Каждый код работает один раз. Храните их в надёжном месте: это единственный способ войти, если вы потеряете приложение-аутентификатор.',
   'hudChrome.account.twoFactorDownloadCodes': 'Скачать коды',
+  'hudChrome.account.recoveryCodesFileHeader': 'Коды восстановления {brand}',
+  'hudChrome.account.recoveryCodesFileAccount': 'Аккаунт: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    'Каждый код можно использовать один раз, если вы потеряете доступ к приложению-аутентификатору.',
+  'hudChrome.account.recoveryCodesFileWarn': 'Храните этот файл в надёжном и защищённом месте.',
   'hudChrome.account.twoFactorDone': 'Готово',
   'hudChrome.account.twoFactorDisableHint':
     'Введите пароль, чтобы отключить двухфакторную аутентификацию. Ваши коды восстановления будут удалены.',

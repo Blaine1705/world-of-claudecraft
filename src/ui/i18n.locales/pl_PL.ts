@@ -6142,6 +6142,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.account.twoFactorDisabledMsg': 'Uwierzytelnianie dwuskładnikowe jest wyłączone.',
   'hudChrome.account.twoFactorDone': 'Gotowe',
   'hudChrome.account.twoFactorDownloadCodes': 'Pobierz kody',
+  'hudChrome.account.recoveryCodesFileHeader': 'Kody odzyskiwania {brand}',
+  'hudChrome.account.recoveryCodesFileAccount': 'Konto: {username}',
+  'hudChrome.account.recoveryCodesFileHint':
+    'Każdego kodu można użyć raz, jeśli stracisz dostęp do aplikacji uwierzytelniającej.',
+  'hudChrome.account.recoveryCodesFileWarn':
+    'Przechowuj ten plik w bezpiecznym i prywatnym miejscu.',
   'hudChrome.account.twoFactorEnabledMsg': 'Uwierzytelnianie dwuskładnikowe jest teraz włączone.',
   'hudChrome.account.twoFactorOpenApp': 'Otwórz w aplikacji uwierzytelniającej',
   'hudChrome.account.twoFactorRecoveryHint':
