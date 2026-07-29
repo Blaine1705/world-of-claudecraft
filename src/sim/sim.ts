@@ -83,6 +83,7 @@ import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
 import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
+import { applyGreaterInvisibilityAftereffect } from './combat/greater_invisibility';
 import {
   applyHeal as applyHealImpl,
   consumeHealAbsorb as consumeHealAbsorbImpl,
@@ -5786,6 +5787,10 @@ export class Sim {
     const removed = removeCancelableAura(e.auras, auraId);
     if (!removed) return;
     this.emit({ type: 'aura', targetId: e.id, name: removed.name, gained: false });
+    if (removed.kind === 'stealth') {
+      e.stealthed = e.auras.some((a) => a.kind === 'stealth');
+    }
+    applyGreaterInvisibilityAftereffect(this.ctx, e, removed);
     if (auraAffectsStats(removed)) {
       recalcPlayerStats(e, meta.cls, meta.equipment, this.playerMods(meta), meta.equipmentInstance);
     }
@@ -6110,10 +6115,11 @@ export class Sim {
   private breakStealth(e: Entity): void {
     const idx = e.auras.findIndex((a) => a.kind === 'stealth');
     if (idx < 0) return;
-    const name = e.auras[idx].name;
+    const removed = e.auras[idx];
     e.auras.splice(idx, 1);
     e.stealthed = false; // keep the cache live without waiting for updateAuras
-    this.emit({ type: 'aura', targetId: e.id, name, gained: false });
+    this.emit({ type: 'aura', targetId: e.id, name: removed.name, gained: false });
+    applyGreaterInvisibilityAftereffect(this.ctx, e, removed);
   }
 
   private breakGhostWolf(e: Entity): void {

@@ -898,7 +898,8 @@ interface WireAura {
   // into -0 -> 0 and flip a stat-sap's isAuraDebuff classification. Omitted only when exactly 0,
   // which decodes back to 0, so value-less auras and an old server are unchanged.
   value?: number;
-  // imbue judgement min/max bonus-damage range (aura_effect imbueRange); only imbue sets these.
+  // Optional secondary aura values: imbue judgement's min/max damage range and
+  // Greater Invisibility's reduction/aftereffect duration.
   value2?: number;
   value3?: number;
   // dot/hot tick cadence in seconds, so the tooltip's "every N sec" is right online.
@@ -1049,8 +1050,9 @@ function wireAura(a: Aura): WireAura {
   // an old server are unchanged. A hover tooltip magnitude is non-actionable cosmetic text,
   // so sending it cannot let a graphics preset hide anything (graphics-settings fairness).
   if (a.value !== 0) w.value = a.value;
-  // imbue judgement min/max range; dot/hot tick cadence; non-physical school. Each rides
-  // only when it carries meaning, so ordinary auras stay lean and decode to their defaults.
+  // Optional secondary aura values (imbue range or Greater Invisibility aftereffect);
+  // dot/hot cadence; non-physical school. Each rides only when it carries meaning, so
+  // ordinary auras stay lean and decode to their defaults.
   if (a.value2 !== undefined) w.value2 = a.value2;
   if (a.value3 !== undefined) w.value3 = a.value3;
   if (a.tickInterval !== undefined) w.tickInterval = a.tickInterval;
