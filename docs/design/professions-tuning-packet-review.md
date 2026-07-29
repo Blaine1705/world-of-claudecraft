@@ -1023,6 +1023,103 @@ five-category wire sweep, every finding applied:
    sides are current), with the runbook note naming them and the deploy
    order bounding the window.
 
+QA 2026-07-29 (Fable xhigh, new session). Preamble: release/v0.32.0 had
+moved 685 commits to 0b427afca (the procedural dungeons expansion, 11
+zones, mounts, rifts, a 2D column world); merged as d15ecf338 with 56
+conflicts, the semantic centers being zoneAt going 2D over the active
+content list, both sides extending showBanner at the same position, the
+seed-467 fishing walks and the deeds hunted literals re-recorded on the
+merged stream, and six parity goldens re-minted (every other golden
+byte-identical). The release-merge audit ran as four lenses plus the
+main session; the full gate then surfaced nine suites where the packet's
+guards met the expansion's starter-zone reality, absorbed by giving the
+R37 ledger a 'starter' state (nodes tier-1-only, explicit tier-1 rod
+rows, Vale-fallback catch tables) with the telemetry vocabularies and
+node-persist ceiling re-derived, six nodes nudged onto workable ground,
+and the placement suite's dead rim fixtures re-anchored (the release
+fades the rim into open staging, so steep and cut-off are separate
+fixtures now).
+
+The audits' load-bearing findings, all applied and mutation-checked:
+the release's rift teleport family, /dev mountquest, and the overworld
+portal pairs bypassed the one-helper session teardown (five sites
+wired, a rift entry-and-exit case pinned); a quality tool effect burned
+charges in starter zones where the fine grade is categorically
+unreachable (use-time gate via fineGradeReachable, starter sweep pinned
+in material_grades); the /unstuck chat alias paid no rate-limit lane
+(now draws the command lane, drained-lane pin); the release's
+unstuck-reports prune shipped as the exact boot-blocking one-shot the
+retention sweep exists to retire (now a sweep table off a real config
+key, behavioral suite on the db_retention_prune template, dead prune
+deleted); mntOwn moved behind the heavy self gate its inputs sit
+behind; and the merge-fused worldXBoundsAt static-ZONES walk (NaN
+terrain on custom maps) plus the release's zoneBiomeAt and hub-plateau
+static reads went back to the active-content list.
+
+The phase's own guards were then re-verified and extended. Every claim
+in the BUILT record was independently re-checked against git show
+9d7a1a021 and held; five of the build's mutation-checked pins were
+re-mutated independently and all killed. The qa-checklist lens found
+the release had falsified the loot-window unreachability claim (the
+heroic reins, corrected above); the deploy-window pin now sweeps
+HEROIC_BOSS_LOOT and freezes its whole id set for the window with the
+four reins as the named exception. The adversarial what-is-missing lens
+then proved the phase's item-id axis was only one of four: an unknown
+QUEST id killed the whole HUD every frame through the quest tracker
+(now renders at its log position, raw id, no objectives, prototype arm
+pinned); a peer-typed [[i:constructor]] chat link threw inside the
+event batch because every guarded surface branched on bare table
+truthiness one layer above the icon gate (a shared own-property
+predicate, src/ui/known_item.ts, now branches the chat links, the trade
+core, loot window and roll, bags and bank windows, and the injected
+filter lookups); the stored hotbar layout silently destroyed unknown-id
+bindings server-side on every ordinary save (the stored-layout parse
+now preserves them as inert slots, round-trip pinned); and the four
+wire-enum key tables indexed into t() with no fallback. Same wave: the
+loot roll window carried the exact pre-fix trade bug (fingerprint
+committed before an unprotected render; now finally-committed around a
+catch), Hud.itemIcon gained the canvas swallow its unknown sibling had,
+the trade panel turns visible before its render body, authored letters
+a bundle predates render their wire-shipped text, sell-junk stays live
+on unknown-only grays, the unknown cell gained its two def-free
+omissions (bank deposit and the instance glyph with per-kind aria keys,
+five-locale fills composed from existing translations), and the fix
+round's own touch-drop suppression regression was caught by the
+reviewing lens and pinned.
+
+RECORDED-ONLY from this QA (fix shapes in the review reports, none
+silently dropped): the rift forge's seven failure reasons produce no
+player feedback and its commands have no shipped UI; the rift floor
+name is English prose in a snapshot field with themeName doubling as an
+identity key (needs a themeId wire field; music and the upgrader draft
+key off the display string); the forge addresses items by base id, not
+instance; the unknown-quest log detail pane renders nothing and the
+slot-keyed abandon is unreachable there; the own-paperdoll withholds
+the def-free unequip capability (the accepted empty-slot visual covers
+inspect, not the capability); the unbind window's def-less fallback
+arms are dead code; the loot-roll fallback arms are pinned by
+occurrence count only; a stale client cannot reclaim its own market
+listing (the accepted browse drop's one functional consequence, for the
+ledger); the HUD event switch has no union-coverage pin; /metrics
+zone-labeled series grew ~4.7x with no cardinality bound; the base
+bundle's idle Sim.tick measured 2.34ms on the merged tree against a
+reported ~0.3ms at the branch parent (unmemoized groundHeight vs its
+memoized steepness sibling), a phase 16 input; and fishingEmptyHook's
+telemetry-only asymmetry is by design, its online routing arm now
+pinned. Later-phase premises shifted by the merge: phase 13 inherits
+eleven concrete starter zones plus the scoped-down circuit floors,
+phase 16 baselines on a 14-zone 120-node world with 58 new solid
+colliders and renderer chunk streaming, phase 17's release fill now
+sizes expansion content, phase 15 is unaffected (bot/ byte-identical).
+
+Cadence: six review lenses plus three fix-round sub-reviews over the QA
+commits; roughly 60 findings applied across seven fix waves, every new
+pin mutation-checked decisive, gate green at 427829018 mid-stream and
+re-run at the final tip. The forced-refresh ledger entry now carries
+the four verified non-degrading surfaces and the layout-version lever;
+it remains the maintainer's, as does pulling the heroic reins for the
+deploy window.
+
 ---
 
 ## Phase 12: the acquisition craft
