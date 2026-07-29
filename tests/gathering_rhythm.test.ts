@@ -307,7 +307,7 @@ describe('hidden-state wire invariant', () => {
     expect(a.stream[114][0]).toBe(15);
   });
 
-  it('no wire snapshot carries fishBiteAtTick, fishReelDeadlineTick, or gatherCastNodeId', () => {
+  it('no wire snapshot carries fishBiteAtTick, fishReelDeadlineTick, fishCastZoneId, or gatherCastNodeId', () => {
     interface FakeClient {
       sent: any[];
       ws: any;
@@ -371,6 +371,7 @@ describe('hidden-state wire invariant', () => {
     expect(payload).toContain('castRem');
     expect(payload.includes('fishBiteAtTick')).toBe(false);
     expect(payload.includes('fishReelDeadlineTick')).toBe(false);
+    expect(payload.includes('fishCastZoneId')).toBe(false);
     expect(payload.includes('gatherCastNodeId')).toBe(false);
     // Second scan AFTER the bite fires, so the reel deadline is provably
     // NONZERO at snapshot time too (the review coverage pass: a value-gated
@@ -386,6 +387,7 @@ describe('hidden-state wire invariant', () => {
     expect(biterPayload).toContain('castRem');
     expect(biterPayload.includes('fishBiteAtTick')).toBe(false);
     expect(biterPayload.includes('fishReelDeadlineTick')).toBe(false);
+    expect(biterPayload.includes('fishCastZoneId')).toBe(false);
     expect(biterPayload.includes('gatherCastNodeId')).toBe(false);
   });
 });
@@ -943,6 +945,7 @@ describe('death clears the hidden cast state (review fix)', () => {
     expect(sim.player.castingAbility).toBe(null);
     expect(sim.player.fishBiteAtTick).toBe(0);
     expect(sim.player.fishReelDeadlineTick).toBe(0);
+    expect(sim.player.fishCastZoneId).toBe('');
     expect(sim.player.gatherCastNodeId).toBe('');
   });
 
@@ -961,6 +964,7 @@ describe('death clears the hidden cast state (review fix)', () => {
     expect(p.gatherCastNodeId).toBe('');
     expect(p.fishBiteAtTick).toBe(0);
     expect(p.fishReelDeadlineTick).toBe(0);
+    expect(p.fishCastZoneId).toBe('');
   });
 });
 
@@ -969,11 +973,12 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
   // storage decision names (cancelCast, arena reset, fiesta down, the
   // defensive session-cap end), each mutation-decisive: deleting the clear
   // under test reds exactly its arm.
-  it('a fresh entity starts with all three hidden fields inert', () => {
+  it('a fresh entity starts with all four hidden fields inert', () => {
     const sim = makeSim(4242);
     expect(sim.player.gatherCastNodeId).toBe('');
     expect(sim.player.fishBiteAtTick).toBe(0);
     expect(sim.player.fishReelDeadlineTick).toBe(0);
+    expect(sim.player.fishCastZoneId).toBe('');
   });
 
   it('cancelCast inside the armed reel window clears both fishing fields, so the next session cannot instant-reel off a stale deadline', () => {
@@ -986,10 +991,12 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
     sim.tickCount = p.fishBiteAtTick;
     updateCasting(sim.ctx, p, meta); // the bite arms the window
     expect(p.fishReelDeadlineTick).toBeGreaterThan(sim.tickCount);
+    expect(p.fishCastZoneId).toBe('eastbrook_vale');
     cancelCast(sim.ctx, p);
     expect(p.castingAbility).toBe(null);
     expect(p.fishBiteAtTick).toBe(0);
     expect(p.fishReelDeadlineTick).toBe(0);
+    expect(p.fishCastZoneId).toBe('');
     // Without the cancelCast clears, this recast would still see the OLD
     // deadline armed and the immediate re-press would land a catch with no
     // bite: the re-press must stay the busy error instead.
@@ -1017,11 +1024,13 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
     teleportToValeShore(sim);
     startFishing(sim.ctx, sim.player, meta);
     expect(sim.player.fishBiteAtTick).toBeGreaterThan(0);
-    sim.player.gatherCastNodeId = NODE.id; // belt-and-braces: all three clear
+    sim.player.gatherCastNodeId = NODE.id; // belt-and-braces: all four clear
+    expect(sim.player.fishCastZoneId).toBe('eastbrook_vale');
     readyArenaFighter(sim.ctx, sim.player, { clearPrep: false });
     expect(sim.player.gatherCastNodeId).toBe('');
     expect(sim.player.fishBiteAtTick).toBe(0);
     expect(sim.player.fishReelDeadlineTick).toBe(0);
+    expect(sim.player.fishCastZoneId).toBe('');
   });
 
   it('the fiesta down path clears the hidden fields', () => {
@@ -1032,10 +1041,12 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
     startFishing(sim.ctx, sim.player, meta);
     expect(sim.player.fishBiteAtTick).toBeGreaterThan(0);
     sim.player.gatherCastNodeId = NODE.id;
+    expect(sim.player.fishCastZoneId).toBe('eastbrook_vale');
     fiestaDownEntity(sim.ctx, sim.player, null);
     expect(sim.player.gatherCastNodeId).toBe('');
     expect(sim.player.fishBiteAtTick).toBe(0);
     expect(sim.player.fishReelDeadlineTick).toBe(0);
+    expect(sim.player.fishCastZoneId).toBe('');
   });
 
   it('the defensive session-cap end gets away with zero draws and clears the hidden fields', () => {
@@ -1072,6 +1083,7 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
     expect(p.castingAbility).toBe(null);
     expect(p.fishBiteAtTick).toBe(0);
     expect(p.fishReelDeadlineTick).toBe(0);
+    expect(p.fishCastZoneId).toBe('');
   });
 });
 
