@@ -109,8 +109,9 @@ export function pruneYumiQueue(ctx: SimContext, fmt: YumiFormat): void {
       // queued: the bout would return them inside fully restored (issue #1600).
       // Same x-band test the sibling 1v1/2v2/fiesta arena prune paths use.
       // Also drop the unit if a member slipped into a Vale Cup match/queue
-      // after joining here; this mirrors the other queue prunes as defense in
-      // depth.
+      // after joining here (arenaQueueJoin blocks this at entry, and so does
+      // startValeCupPractice in the other direction; this mirrors the
+      // 1v1/2v2/fiesta prunes as defense in depth).
       return (
         !!e &&
         !e.dead &&
