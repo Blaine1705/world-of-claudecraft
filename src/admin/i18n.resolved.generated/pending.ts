@@ -11,7 +11,11 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
@@ -51,7 +55,11 @@ export const pending: Record<string, readonly string[]> = {
     "unstuckReports.worldCoordinates"
   ],
   "es_ES": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
@@ -91,7 +99,11 @@ export const pending: Record<string, readonly string[]> = {
     "unstuckReports.worldCoordinates"
   ],
   "fr_FR": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
@@ -131,7 +143,11 @@ export const pending: Record<string, readonly string[]> = {
     "unstuckReports.worldCoordinates"
   ],
   "fr_CA": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
@@ -172,7 +188,11 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
@@ -212,7 +232,11 @@ export const pending: Record<string, readonly string[]> = {
     "unstuckReports.worldCoordinates"
   ],
   "de_DE": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
@@ -252,7 +276,11 @@ export const pending: Record<string, readonly string[]> = {
     "unstuckReports.worldCoordinates"
   ],
   "zh_CN": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
@@ -292,7 +320,11 @@ export const pending: Record<string, readonly string[]> = {
     "unstuckReports.worldCoordinates"
   ],
   "zh_TW": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
@@ -332,7 +364,11 @@ export const pending: Record<string, readonly string[]> = {
     "unstuckReports.worldCoordinates"
   ],
   "ko_KR": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
@@ -372,7 +408,11 @@ export const pending: Record<string, readonly string[]> = {
     "unstuckReports.worldCoordinates"
   ],
   "ja_JP": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
@@ -412,7 +452,11 @@ export const pending: Record<string, readonly string[]> = {
     "unstuckReports.worldCoordinates"
   ],
   "pt_BR": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
@@ -452,7 +496,11 @@ export const pending: Record<string, readonly string[]> = {
     "unstuckReports.worldCoordinates"
   ],
   "ru_RU": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
@@ -492,7 +540,11 @@ export const pending: Record<string, readonly string[]> = {
     "unstuckReports.worldCoordinates"
   ],
   "cs_CZ": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
@@ -532,7 +584,11 @@ export const pending: Record<string, readonly string[]> = {
     "unstuckReports.worldCoordinates"
   ],
   "nl_NL": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
@@ -572,7 +628,11 @@ export const pending: Record<string, readonly string[]> = {
     "unstuckReports.worldCoordinates"
   ],
   "pl_PL": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
@@ -612,7 +672,11 @@ export const pending: Record<string, readonly string[]> = {
     "unstuckReports.worldCoordinates"
   ],
   "id_ID": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
@@ -652,7 +716,11 @@ export const pending: Record<string, readonly string[]> = {
     "unstuckReports.worldCoordinates"
   ],
   "tr_TR": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
@@ -692,7 +760,11 @@ export const pending: Record<string, readonly string[]> = {
     "unstuckReports.worldCoordinates"
   ],
   "sv_SE": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
@@ -732,7 +804,11 @@ export const pending: Record<string, readonly string[]> = {
     "unstuckReports.worldCoordinates"
   ],
   "vi_VN": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",
@@ -772,7 +848,11 @@ export const pending: Record<string, readonly string[]> = {
     "unstuckReports.worldCoordinates"
   ],
   "da_DK": [
+    "dialog.actionResetChatStrikes",
+    "dialog.confirmResetChatStrikes",
     "location.kind.rift",
+    "moderationHistory.actionReactivate",
+    "moderationHistory.actionResetChatStrikes",
     "nav.unstuckReports",
     "unstuckReports.areaId",
     "unstuckReports.characterId",

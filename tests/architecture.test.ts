@@ -153,6 +153,7 @@ const UI_PURE_CORES = [
   'src/ui/stat_tooltip_view.ts',
   'src/ui/target_portrait_view.ts',
   'src/ui/target_rank_view.ts',
+  'src/ui/meters_breakdown_view.ts',
   'src/ui/mob_tooltip_view.ts',
   'src/ui/player_tooltip_view.ts',
   'src/ui/talents_view.ts',
@@ -165,6 +166,7 @@ const UI_PURE_CORES = [
   'src/ui/disenchant_yield_view.ts',
   'src/ui/material_hint_view.ts',
   'src/ui/bag_instance_glyph_view.ts',
+  'src/ui/item_slot_labels.ts',
   'src/ui/bank_view.ts',
   'src/ui/item_set_tooltip_view.ts',
   'src/ui/weapon_proc_view.ts',
@@ -253,6 +255,7 @@ const UI_PURE_CORES = [
   'src/ui/chat_bubble_style.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
+  'src/ui/trade_view.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Pure logic cores that live in src/render (the painter half is Three-side):
@@ -328,6 +331,7 @@ const BARE_NAMED = [
   'src/ui/compass.ts',
   'src/ui/coords.ts',
   'src/ui/bag_item_context_menu.ts',
+  'src/ui/item_slot_labels.ts',
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/swing_timer.ts',
@@ -1057,6 +1061,8 @@ const UI_DOM_MODULES = [
   'src/ui/discord_widget.ts',
   'src/ui/entry_guard_banner.ts',
   'src/ui/focus_manager.ts',
+  'src/ui/focus_restore.ts',
+  'src/ui/form_draft.ts',
   'src/ui/gather_node_tooltip.ts',
   'src/ui/gpu_notice_toast.ts',
   'src/ui/hud.ts',

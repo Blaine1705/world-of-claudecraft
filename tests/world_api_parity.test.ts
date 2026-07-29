@@ -131,6 +131,7 @@ export const IWORLD_MEMBERS = [
   { name: 'submitLootRoll', kind: 'method' },
   { name: 'activeLootRolls', kind: 'method' }, // read-returning (2/6)
   { name: 'lootRollGroupStatus', kind: 'method' }, // read-returning
+  { name: 'activeMasterLootRolls', kind: 'method' }, // read-returning
   { name: 'pickUpObject', kind: 'method' },
   { name: 'townFocus', kind: 'data' },
   { name: 'setTownFocus', kind: 'method' },
@@ -488,12 +489,13 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // plus the release's Card Duel facet, the Professions 2.0 identity
     // surface, the mobile-station pair (placeMobileStation +
     // activeMobileStationCraft), the commissions unbindItem command, and the
-    // Rift + mounts surface. The v0.31.0 base merge adds the release's three
-    // new members on top of the branch's 272; making reins usable items then
-    // removed two (selectedMount + selectMount), leaving 273.
-    expect(IWORLD_MEMBERS.length).toBe(273);
+    // Rift + mounts surface. The v0.31.0 base merge added the release's three new
+    // members on top of the branch's 272; making reins usable items then removed
+    // two (selectedMount + selectMount) for 273; the v0.32.0 base merge adds
+    // activeMasterLootRolls, leaving 274.
+    expect(IWORLD_MEMBERS.length).toBe(274);
     expect(DATA_MEMBERS.length).toBe(72);
-    expect(METHOD_MEMBERS.length).toBe(201);
+    expect(METHOD_MEMBERS.length).toBe(202);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -513,6 +515,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeFrostRings',
       'activeLoadout',
       'activeLootRolls',
+      'activeMasterLootRolls',
       'activeMobileStationCraft',
       'activeTemporalHourglasses',
       'activeTitle',
@@ -865,6 +868,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'acceptQuest',
       'accountFlair',
       'activeLootRolls',
+      'activeMasterLootRolls',
       'applyEnchant',
       'applyTalents',
       'arenaAugmentPick',
@@ -1177,6 +1181,7 @@ const FACET_LOOT = [
   'submitLootRoll',
   'activeLootRolls',
   'lootRollGroupStatus',
+  'activeMasterLootRolls',
 ] as const satisfies readonly (keyof IWorldLoot)[];
 type _ExhaustLoot = AssertNever<Exclude<keyof IWorldLoot, (typeof FACET_LOOT)[number]>>;
 
@@ -1597,8 +1602,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(273);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(273);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(274);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(274);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);
