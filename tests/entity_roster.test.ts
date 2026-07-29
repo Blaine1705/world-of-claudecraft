@@ -361,6 +361,8 @@ function makeCtx() {
     mailAuthoredLetter: vi.fn(),
     mailboxHoldsItem: vi.fn(() => false),
     applySetProcs: vi.fn(),
+    // Vale Cup <-> Arena queue exclusion.
+    vcupSeatedOrQueued: vi.fn(() => false),
     // The Vale Cup sport-move arms.
     vcupBallKick: vi.fn(),
     vcupBallPass: vi.fn(),
