@@ -99,6 +99,7 @@ function makeWindow(
         ),
         toolEffectSlots: state.toolEffects ?? [],
         inventory: state.inventory ?? [],
+        player: { name: 'Testchar' },
       }) as never,
     closeOthers: () => {},
     hideTooltip: () => {},
@@ -199,10 +200,15 @@ describe('ProfessionsWindow: focus and scroll survive rebuilds', () => {
     expect(after?.hasAttribute('data-close')).toBe(false);
   });
 
-  it('falls back to another button in the SAME row when the focused one vanished', () => {
-    // A slot button consumed by its own success disappears from the rebuild;
-    // handing focus to the row's surviving action beats parking it on Close,
-    // where a quick second Enter closes the window mid-flow.
+  it('falls back to CLOSE, never a different action button, when the focused one vanished', () => {
+    // The adversarial round's held-Enter finding: every action button in a
+    // gathering row SPENDS (a slot burns a charm, a recharge consumes
+    // materials), and input.ts leaves a focused button's Enter default
+    // alone, so re-parking focus on a DIFFERENT action button hands an
+    // Enter key-repeat stream to an action the player never aimed at (a
+    // recharge success repaint used to feed the stream into a charm-burning
+    // re-slot). Close is the one control whose accidental activation costs
+    // nothing, so it is the ONLY fallback rung.
     const state = baseState();
     state.inventory = [
       { itemId: 'copper_mining_pick', count: 1 },
@@ -214,19 +220,16 @@ describe('ProfessionsWindow: focus and scroll survive rebuilds', () => {
     const cache = el.querySelector<HTMLElement>('[data-slot-effect="gatherers_cache"]');
     if (!cache) throw new Error('slot button rendered');
     cache.focus();
-    // The charm leaves the bags between paints (its slot succeeded).
+    // The charm leaves the bags between paints (its slot succeeded); the
+    // sibling action button survives the rebuild and must NOT inherit focus.
     state.inventory = [
       { itemId: 'copper_mining_pick', count: 1 },
       { itemId: 'artisans_eye', count: 1 },
     ];
     w.render();
     const after = document.activeElement as HTMLElement | null;
-    expect(after?.getAttribute('data-slot-effect')).toBe('artisans_eye');
-    // And with NOTHING left in the row, Close is the last rung.
-    state.inventory = [];
-    (document.activeElement as HTMLElement | null)?.focus();
-    w.render();
-    expect((document.activeElement as HTMLElement | null)?.hasAttribute('data-close')).toBe(true);
+    expect(after?.hasAttribute('data-close')).toBe(true);
+    expect(after?.getAttribute('data-slot-effect')).toBeNull();
   });
 
   it('preserves the scroll offset across a data-driven rebuild', () => {

@@ -7,10 +7,14 @@
 //
 // String-keyed rather than keyed on ToolEffectId, matching the gathering table:
 // every caller looks the id up off wire-mirrored data, and an id with no entry
-// here has no honest name to print, so a caller treats `undefined` as "render
-// no row" rather than inventing one or printing the raw id at a player. That
-// matters more than usual here, because a persisted slot can name an effect a
-// later content change retired.
+// here has no honest name to print. What `undefined` means is the SURFACE's
+// call: a browse surface (a window row, a list) renders no row rather than
+// inventing a name, because a persisted slot can name an effect a later
+// content change retired and a phantom row would advertise nothing actionable.
+// A RESULT line answering the player's own command (the hud toolEffectResult
+// arm) renders the raw id instead, the stale-content doctrine: the player just
+// acted on that id, and "no line at all" hides an outcome they caused, which
+// is worse than an unlocalized identifier.
 
 import type { TranslationKey } from './i18n';
 

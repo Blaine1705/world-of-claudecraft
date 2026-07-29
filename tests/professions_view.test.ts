@@ -73,7 +73,13 @@ const attunedIdentity = identity({
 });
 
 function view(id: CraftingIdentityView, gathering: ProfessionsViewInput['gathering'] = []) {
-  return buildProfessionsView({ identity: id, gathering, toolEffects: [], inventory: [] });
+  return buildProfessionsView({
+    viewerName: 'Testchar',
+    identity: id,
+    gathering,
+    toolEffects: [],
+    inventory: [],
+  });
 }
 
 function craftRow(model: ReturnType<typeof buildProfessionsView>, craftId: string) {
@@ -111,11 +117,13 @@ describe('buildProfessionsView: model construction', () => {
       charges: 12,
       maxCharges: 30,
       confirmMode: 'always' as const,
+      selfCrafted: false,
       ...over,
     });
 
     it('attaches to the matching profession and leaves the others null', () => {
       const model = buildProfessionsView({
+        viewerName: 'Testchar',
         identity: attunedIdentity,
         gathering,
         toolEffects: [slot()],
@@ -138,6 +146,7 @@ describe('buildProfessionsView: model construction', () => {
 
     it('marks a zero-charge slot spent, and only a zero-charge one', () => {
       const spent = buildProfessionsView({
+        viewerName: 'Testchar',
         identity: attunedIdentity,
         gathering,
         toolEffects: [slot({ charges: 0 })],
@@ -145,6 +154,7 @@ describe('buildProfessionsView: model construction', () => {
       });
       expect(spent.gathering[0].effect?.spent).toBe(true);
       const oneLeft = buildProfessionsView({
+        viewerName: 'Testchar',
         identity: attunedIdentity,
         gathering,
         toolEffects: [slot({ charges: 1 })],
@@ -155,6 +165,7 @@ describe('buildProfessionsView: model construction', () => {
 
     it('DROPS an effect naming a profession with no row, rather than painting an orphan', () => {
       const model = buildProfessionsView({
+        viewerName: 'Testchar',
         identity: attunedIdentity,
         gathering,
         toolEffects: [slot({ professionId: 'fishing' })],
@@ -170,6 +181,7 @@ describe('buildProfessionsView: model construction', () => {
       // itself, so this arm is really pinning that the view asks the one
       // authority instead of re-deriving the gates.
       const model = buildProfessionsView({
+        viewerName: 'Testchar',
         identity: attunedIdentity,
         gathering,
         toolEffects: [],
@@ -189,6 +201,7 @@ describe('buildProfessionsView: model construction', () => {
       // does (the resolver refuses no_tool).
       const withPick = (charges: number, inventory: { itemId: string; count: number }[]) =>
         buildProfessionsView({
+          viewerName: 'Testchar',
           identity: attunedIdentity,
           gathering,
           toolEffects: [slot({ charges, maxCharges: 20 })],
@@ -200,8 +213,113 @@ describe('buildProfessionsView: model construction', () => {
       expect(withPick(12, [])).toBe(false);
     });
 
+    it('affordance parity with SIGNED copies: the view reproduces no_gain exactly (R48)', () => {
+      // The adversarial round's phantom button: before R48 the view could
+      // never compute no_gain (it had neither the slot's provenance nor the
+      // slotter's name), so the primary crafter flow rendered a button the
+      // server refused on every click. With selfCrafted and viewerName
+      // threaded, the view runs the resolver on the SAME inputs.
+      const fullSelfSlot = {
+        professionId: 'mining',
+        effectId: 'gatherers_cache',
+        charges: 20,
+        maxCharges: 20,
+        confirmMode: 'always' as const,
+        selfCrafted: true,
+      };
+      // Full self-crafted slot + a spare SELF-signed copy: the server answers
+      // no_gain, so the view must render NO button.
+      const phantom = buildProfessionsView({
+        viewerName: 'Testchar',
+        identity: attunedIdentity,
+        gathering,
+        toolEffects: [fullSelfSlot],
+        inventory: [
+          { itemId: 'copper_mining_pick', count: 1 },
+          { itemId: 'gatherers_cache', count: 1, instance: { signer: 'Testchar' } },
+        ],
+      });
+      expect(phantom.gathering[0].slottable).toEqual([]);
+      // Full self-crafted slot + only a FOREIGN copy: the R48 downgrade
+      // refusal, so still no button.
+      const downgrade = buildProfessionsView({
+        viewerName: 'Testchar',
+        identity: attunedIdentity,
+        gathering,
+        toolEffects: [fullSelfSlot],
+        inventory: [
+          { itemId: 'copper_mining_pick', count: 1 },
+          { itemId: 'gatherers_cache', count: 1, instance: { signer: 'Elsewhere' } },
+        ],
+      });
+      expect(downgrade.gathering[0].slottable).toEqual([]);
+      // Full FOREIGN-crafted slot + the viewer's own signed copy: the
+      // provenance upgrade the server accepts, so the button must render.
+      const upgrade = buildProfessionsView({
+        viewerName: 'Testchar',
+        identity: attunedIdentity,
+        gathering,
+        toolEffects: [{ ...fullSelfSlot, selfCrafted: false }],
+        inventory: [
+          { itemId: 'copper_mining_pick', count: 1 },
+          { itemId: 'gatherers_cache', count: 1, instance: { signer: 'Testchar' } },
+        ],
+      });
+      expect(upgrade.gathering[0].slottable).toEqual(['gatherers_cache']);
+    });
+
+    it('slottable lists held charms in CATALOG order, not bag order', () => {
+      // Catalog order keeps the buttons from reshuffling when the player
+      // moves items around; a regression to bag order flips this pair.
+      const model = buildProfessionsView({
+        viewerName: 'Testchar',
+        identity: attunedIdentity,
+        gathering,
+        toolEffects: [],
+        inventory: [
+          { itemId: 'copper_mining_pick', count: 1 },
+          { itemId: 'artisans_eye', count: 1 },
+          { itemId: 'gatherers_cache', count: 1 },
+        ],
+      });
+      expect(model.gathering[0].slottable).toEqual(['gatherers_cache', 'artisans_eye']);
+    });
+
+    it('the refresh signature moves on a signer swap, a provenance flip, and a rename', () => {
+      // The consume-copy preference and the R48 arm read all three, so a
+      // same-id same-count change in any of them must repaint the buttons.
+      const base = {
+        viewerName: 'Testchar' as const,
+        identity: attunedIdentity,
+        gathering,
+        toolEffects: [slot({ selfCrafted: true })],
+      };
+      const own = professionsRefreshSig({
+        ...base,
+        inventory: [{ itemId: 'gatherers_cache', count: 1, instance: { signer: 'Testchar' } }],
+      });
+      const swapped = professionsRefreshSig({
+        ...base,
+        inventory: [{ itemId: 'gatherers_cache', count: 1, instance: { signer: 'Elsewhere' } }],
+      });
+      expect(swapped).not.toBe(own);
+      const provenanceFlip = professionsRefreshSig({
+        ...base,
+        toolEffects: [slot({ selfCrafted: false })],
+        inventory: [{ itemId: 'gatherers_cache', count: 1, instance: { signer: 'Testchar' } }],
+      });
+      expect(provenanceFlip).not.toBe(own);
+      const renamed = professionsRefreshSig({
+        ...base,
+        viewerName: 'Freshname',
+        inventory: [{ itemId: 'gatherers_cache', count: 1, instance: { signer: 'Testchar' } }],
+      });
+      expect(renamed).not.toBe(own);
+    });
+
     it('the refresh signature moves when a charm or tool enters the bags', () => {
       const base = {
+        viewerName: 'Testchar' as const,
         identity: attunedIdentity,
         gathering,
         toolEffects: [slot()],
@@ -228,12 +346,14 @@ describe('buildProfessionsView: model construction', () => {
       // Without the slot rows in the signature the count would freeze at
       // whatever it read when some OTHER field last moved it.
       const before = professionsRefreshSig({
+        viewerName: 'Testchar',
         identity: attunedIdentity,
         gathering,
         toolEffects: [slot()],
         inventory: [],
       });
       const after = professionsRefreshSig({
+        viewerName: 'Testchar',
         identity: attunedIdentity,
         gathering,
         toolEffects: [slot({ charges: 11 })],
@@ -244,6 +364,7 @@ describe('buildProfessionsView: model construction', () => {
       // repainting every frame.
       expect(
         professionsRefreshSig({
+          viewerName: 'Testchar',
           identity: attunedIdentity,
           gathering,
           toolEffects: [slot()],
@@ -644,6 +765,7 @@ describe('professionsRefreshSig', () => {
   const gathering = [{ professionId: 'mining', skill: 12, maxSkill: 100 }];
   function input(over: Partial<CraftingIdentityView> = {}): ProfessionsViewInput {
     return {
+      viewerName: 'Testchar',
       identity: identity({ craftSkills: { ...ZERO_SKILLS, cooking: 30 }, ...over }),
       gathering,
       toolEffects: [],
@@ -668,6 +790,7 @@ describe('professionsRefreshSig', () => {
     // CRAFT_RING enumeration with ?? 0 must make {} and explicit zeros equal.
     expect(
       professionsRefreshSig({
+        viewerName: 'Testchar',
         identity: identity({ craftSkills: { cooking: 30 } }),
         gathering,
         toolEffects: [],

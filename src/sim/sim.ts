@@ -10558,8 +10558,9 @@ export class Sim {
   // initialising the map would move every golden for a feature no scenario
   // uses. Sorted by professionId so the JSON form is a stable delta signature.
   toolEffectSlotsFor(pid: number): ToolEffectSlotView[] {
-    const slots = this.players.get(pid)?.toolEffectSlots;
-    if (!slots) return [];
+    const meta = this.players.get(pid);
+    const slots = meta?.toolEffectSlots;
+    if (!meta || !slots) return [];
     const rows: ToolEffectSlotView[] = [];
     for (const professionId of GATHERING_PROFESSION_IDS) {
       const slot = slots[professionId];
@@ -10570,6 +10571,9 @@ export class Sim {
         charges: slot.durability,
         maxCharges: slot.maxDurability,
         confirmMode: slot.confirmMode,
+        // The R48 privacy-preserving provenance projection: a boolean, never
+        // the name (a foreign crafter's identity stays server-side).
+        selfCrafted: slot.craftedBy !== undefined && slot.craftedBy === meta.name,
       });
     }
     // GATHERING_PROFESSION_IDS is already a stable content order, but the sort

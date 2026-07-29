@@ -361,6 +361,124 @@ describe('the mint consumes a crafted charm (the acquisition craft price)', () =
   });
 });
 
+describe('the R48 directional provenance arm and the deny-event reasons', () => {
+  it('REFUSES the provenance downgrade: a double-click cannot rewrite a self-crafted slot to a foreign name', () => {
+    // The adversarial round's double-click burn: the first click consumed
+    // the last self-signed copy, so the second falls to a foreign copy;
+    // before R48 the craftedBy difference counted as "a change", and the
+    // second click burned the foreign charm AND silently retired the
+    // owner's original-crafter recharge discount. Now only a rewrite TOWARD
+    // the slotter's own signature justifies the mint.
+    const sim = makeSim();
+    sim.addItem('copper_mining_pick', 1);
+    const own = metaOf(sim).name;
+    sim.addItemInstance('gatherers_cache', { signer: own }, sim.playerId, 1);
+    sim.addItemInstance('gatherers_cache', { signer: 'Elsewhere' }, sim.playerId, 1);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBe(own);
+    sim.drainEvents();
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBe(own);
+    expect(sim.countItem('gatherers_cache'), 'the foreign copy is protected').toBe(1);
+    expect(sim.drainEvents().find((e) => e.type === 'toolEffectResult')).toMatchObject({
+      action: 'slot',
+      ok: false,
+      reason: 'no_gain',
+    });
+  });
+
+  it('REFUSES the lateral rewrite: foreign to different-foreign buys the owner nothing', () => {
+    // Recharging is owner-performed (R46), so any craftedBy other than the
+    // owner's own name prices at the generic rate: swapping which foreign
+    // name is recorded changes nothing the owner can ever use.
+    const sim = makeSim();
+    sim.addItem('copper_mining_pick', 1);
+    sim.addItemInstance('gatherers_cache', { signer: 'Aldous' }, sim.playerId, 1);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBe('Aldous');
+    sim.addItemInstance('gatherers_cache', { signer: 'Belinda' }, sim.playerId, 1);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBe('Aldous');
+    expect(sim.countItem('gatherers_cache')).toBe(1);
+  });
+
+  it('REFUSES clearing provenance: an unsigned copy over a foreign-crafted full slot is no gain', () => {
+    // Foreign and absent provenance price identically at the recharge, so
+    // burning a charm to blank the field is protected like any other no-op
+    // (this arm ACCEPTED before R48; the directional compare closed it).
+    const sim = makeSim();
+    sim.addItem('copper_mining_pick', 1);
+    sim.addItemInstance('gatherers_cache', { signer: 'Elsewhere' }, sim.playerId, 1);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    sim.addItem('gatherers_cache', 1);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBe('Elsewhere');
+    expect(sim.countItem('gatherers_cache')).toBe(1);
+  });
+
+  it('names invalid_request and no_tool on the personal event, not only in the resolver', () => {
+    // The HUD switches its deny line off `reason`, so a mis-mapped reason
+    // renders the wrong copy with every state assertion still green.
+    const sim = makeSim();
+    sim.drainEvents();
+    sim.slotToolEffect('mining', 'nope');
+    sim.slotToolEffect('skinning', 'gatherers_cache');
+    const invalid = sim
+      .drainEvents()
+      .filter((e) => e.type === 'toolEffectResult')
+      .map((e) => ('reason' in e ? e.reason : undefined));
+    expect(invalid).toEqual(['invalid_request', 'invalid_request']);
+    sim.addItem('gatherers_cache', 1);
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(sim.drainEvents().find((e) => e.type === 'toolEffectResult')).toMatchObject({
+      ok: false,
+      reason: 'no_tool',
+    });
+  });
+
+  it("refuses prototype-key ids ('constructor') as invalid_request with no state change", () => {
+    // toolEffectSlots and the catalog tables are plain object literals; a
+    // wire string like 'constructor' must hit the includes/hasOwn guards
+    // before any index, on BOTH commands.
+    const sim = simHolding('copper_mining_pick');
+    sim.drainEvents();
+    sim.slotToolEffect('constructor', 'gatherers_cache');
+    sim.slotToolEffect('mining', 'constructor');
+    sim.rechargeToolEffect('constructor');
+    const reasons = sim
+      .drainEvents()
+      .filter((e) => e.type === 'toolEffectResult')
+      .map((e) => ('reason' in e ? e.reason : undefined));
+    expect(reasons).toEqual(['invalid_request', 'invalid_request', 'invalid_request']);
+    expect(metaOf(sim).toolEffectSlots).toBeUndefined();
+  });
+
+  it('a successful slot bumps wireRev: the targeted splice owes the hub post-removal duty', () => {
+    // The charm consume bypasses removeItem, so the action calls
+    // ctx.onInventoryChangedForQuests itself; deleting that call would leave
+    // the self inventory mirror stale until an unrelated change.
+    const sim = simHolding('copper_mining_pick');
+    const before = metaOf(sim).wireRev;
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).wireRev).toBeGreaterThan(before);
+  });
+
+  it('a persisted prompt row re-slots to always: the confirmMode conjunct is live', () => {
+    // normalizeToolEffectSlots preserves a dev-era 'prompt' row on purpose;
+    // re-slotting it is a REAL change (the mode moves back to the one mode
+    // the mint accepts), so it must land and cost its charm.
+    const sim = simHolding('copper_mining_pick');
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    const slot = metaOf(sim).toolEffectSlots?.mining;
+    if (!slot) throw new Error('slot minted');
+    slot.confirmMode = 'prompt';
+    const held = sim.countItem('gatherers_cache');
+    sim.slotToolEffect('mining', 'gatherers_cache');
+    expect(metaOf(sim).toolEffectSlots?.mining?.confirmMode).toBe('always');
+    expect(sim.countItem('gatherers_cache')).toBe(held - 1);
+  });
+});
+
 describe('the read surface is one row per profession, sorted, and identity-free', () => {
   it('projects one row per slotted profession, sorted by profession id', () => {
     // THREE real tools, one per land gathering profession (fishing is refused
@@ -392,16 +510,29 @@ describe('the read surface is one row per profession, sorted, and identity-free'
     sim.slotToolEffect('mining', 'gatherers_cache');
     // The consumed self-signed charm's signer IS the slot's craftedBy (the
     // acquisition craft's provenance chain): recorded server-side for the
-    // original-crafter recharge discount and NOTHING else.
+    // original-crafter recharge discount and the R48 provenance arm.
     expect(metaOf(sim).toolEffectSlots?.mining?.craftedBy).toBe(metaOf(sim).name);
-    // The projection drops it: identity stays sim-side.
+    // The projection drops the NAME: identity stays sim-side. What crosses
+    // instead is the R48 `selfCrafted` boolean (whether the crafter is the
+    // viewer), which carries no identity at all and is exactly what the
+    // window's affordance resolver needs for server parity.
     expect(Object.keys(sim.toolEffectSlots[0]).sort()).toEqual([
       'charges',
       'confirmMode',
       'effectId',
       'maxCharges',
       'professionId',
+      'selfCrafted',
     ]);
+    // The boolean's two arms: the slotter's own signed charm projects true...
+    expect(sim.toolEffectSlots[0].selfCrafted).toBe(true);
+    // ...and rewriting the recorded crafter to a foreign name projects false
+    // without the name itself appearing anywhere in the row.
+    const slot = metaOf(sim).toolEffectSlots?.mining;
+    if (!slot) throw new Error('slot must exist');
+    slot.craftedBy = 'Somebody Else';
+    expect(sim.toolEffectSlots[0].selfCrafted).toBe(false);
+    expect(JSON.stringify(sim.toolEffectSlots)).not.toContain('Somebody Else');
   });
 
   it('draws no rng, so a player who slots walks the same stream as one who does not', () => {
@@ -656,6 +787,61 @@ describe('the id tables and the load normalizer, directly', () => {
     } as never);
     expect(mixed?.mining?.effectId).toBe('gatherers_cache');
     expect(mixed && 'fishing' in mixed).toBe(false);
+  });
+
+  it('normalizes the five safe-by-construction garbage shapes, pinned so the guards cannot rot', () => {
+    // Each arm names the guard that catches it: Number.isFinite for
+    // Infinity, Math.max(0, ...) for a negative durability, Math.floor for a
+    // fractional max, typeof for an object craftedBy, and the !row skip for
+    // a null row. All traced safe by review; these pins keep them safe.
+    const inf = normalizeToolEffectSlots({
+      mining: {
+        effectId: 'gatherers_cache',
+        durability: 5,
+        maxDurability: Number.POSITIVE_INFINITY,
+        confirmMode: 'always',
+      },
+    } as never);
+    expect(inf?.mining?.maxDurability).toBe(TOOL_EFFECTS.gatherers_cache.startingDurability);
+    const negative = normalizeToolEffectSlots({
+      mining: {
+        effectId: 'gatherers_cache',
+        durability: -7,
+        maxDurability: 20,
+        confirmMode: 'always',
+      },
+    } as never);
+    expect(negative?.mining?.durability).toBe(0);
+    const fractional = normalizeToolEffectSlots({
+      mining: {
+        effectId: 'gatherers_cache',
+        durability: 5,
+        maxDurability: 20.9,
+        confirmMode: 'always',
+      },
+    } as never);
+    expect(fractional?.mining?.maxDurability).toBe(20);
+    const objectCrafter = normalizeToolEffectSlots({
+      mining: {
+        effectId: 'gatherers_cache',
+        durability: 5,
+        maxDurability: 20,
+        craftedBy: { name: 'Elsewhere' },
+        confirmMode: 'always',
+      },
+    } as never);
+    expect(objectCrafter?.mining?.craftedBy).toBeUndefined();
+    const nullRow = normalizeToolEffectSlots({
+      mining: null,
+      logging: {
+        effectId: 'gatherers_cache',
+        durability: 5,
+        maxDurability: 20,
+        confirmMode: 'always',
+      },
+    } as never);
+    expect(nullRow?.logging?.effectId).toBe('gatherers_cache');
+    expect(nullRow && 'mining' in nullRow).toBe(false);
   });
 
   it('drops a saved row whose PROFESSION no longer exists, not just a retired effect', () => {

@@ -115,6 +115,7 @@ function makeWindow(
         ),
         toolEffectSlots: state.toolEffects ?? [],
         inventory: state.inventory ?? [],
+        player: { name: 'Testchar' },
       }) as never,
     closeOthers: () => {},
     hideTooltip: () => {},
@@ -372,6 +373,7 @@ describe('ProfessionsWindow: the slotted tool effect row', () => {
           professionsState: { skills: state.gathering },
           toolEffectSlots: [],
           inventory: state.inventory,
+          player: { name: 'Testchar' },
           slotToolEffect: (professionId: string, effectId: string) => {
             sent.push([professionId, effectId]);
           },
@@ -381,6 +383,14 @@ describe('ProfessionsWindow: the slotted tool effect row', () => {
     expect(button?.getAttribute('data-slot-profession')).toBe('mining');
     expect(button?.getAttribute('data-slot-effect')).toBe('artisans_eye');
     expect(button?.textContent).toBe("Slot Artisan's Eye");
+    button?.click();
+    expect(sent).toEqual([['mining', 'artisans_eye']]);
+    // The sent-guard: a double-click (or a held Enter's key repeats) on the
+    // SAME painted button sends nothing more; the repaint that answers the
+    // command replaces the node, which is what re-arms the button. Guarding
+    // beats disabling, because disabling the focused button drops keyboard
+    // focus to <body>.
+    button?.click();
     button?.click();
     expect(sent).toEqual([['mining', 'artisans_eye']]);
   });
@@ -396,6 +406,7 @@ describe('ProfessionsWindow: the slotted tool effect row', () => {
           professionsState: { skills: rechargeState.gathering },
           toolEffectSlots: rechargeState.toolEffects,
           inventory: rechargeState.inventory,
+          player: { name: 'Testchar' },
           rechargeToolEffect: (professionId: string) => {
             sent.push(professionId);
           },

@@ -168,7 +168,9 @@ export interface ApplyEnchantResultView {
 // name lives in the i18n catalog, keyed by `effectId`. `craftedBy` is
 // deliberately NOT projected here; it exists on the sim-side slot only to
 // decide the original-crafter recharge discount, and the HUD has no use for
-// another player's identity.
+// another player's identity. What the slot affordance DOES need (R48) is
+// whether the crafter is the viewer, which crosses as the `selfCrafted`
+// boolean below, carrying no identity at all.
 export interface ToolEffectSlotView {
   /** A GatheringProfessionId. An identifier, never localized text. */
   professionId: string;
@@ -177,11 +179,18 @@ export interface ToolEffectSlotView {
   /** Charges left. 0 means slotted but spent: the bonus stops, the base tool
    *  is untouched, and a recharge can restore it. */
   charges: number;
-  /** What a recharge restores to. Minted from the rarity of the tool the
-   *  effect was slotted onto, so it is stored rather than re-derived. */
+  /** The slot's high-water ceiling and price-rung floor (R47): raised at
+   *  mint, by a bigger recharge fill, and by the use-time ratchet; a
+   *  recharge fills to the R30 re-derived maximum, bounded by this. */
   maxCharges: number;
   /** 'prompt' spends a charge only on an explicit per-use confirmation. */
   confirmMode: 'always' | 'prompt';
+  /** Whether the slot's recorded crafter is the VIEWER, as a boolean (R48):
+   *  the name itself is deliberately never projected (no other player's
+   *  identity reaches the client), and the boolean is sufficient for exact
+   *  affordance parity because the R48 directional no_gain arm only ever
+   *  compares `craftedBy` against the slotter's own name. */
+  selfCrafted: boolean;
 }
 
 // The professions read-surface facet (#1164, extended by #1121/#1127/#1129). `Sim`

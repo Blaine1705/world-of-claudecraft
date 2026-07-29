@@ -137,14 +137,16 @@ export class ProfessionsWindow {
    *  dimension stays unit-pinned. */
   refreshIfChanged(): void {
     if (!this.opened) return;
-    if (professionsRefreshSig(this.buildInput()) === this.lastSig) return;
+    const input = this.buildInput();
+    if (professionsRefreshSig(input) === this.lastSig) return;
     // render() re-latches the signature itself, so a forced repaint from
     // anywhere (the toolEffectResult arm) cannot leave a stale one behind for
-    // this band to act on a second time.
-    this.render();
+    // this band to act on a second time. Handing the compared input over
+    // keeps the paint and the compare one read.
+    this.render(input);
   }
 
-  render(): void {
+  render(prebuilt?: ProfessionsViewInput): void {
     const el = this.deps.root();
     if (!this.opened) return;
     // The focused control's own identity, carried across the rebuild through
@@ -164,8 +166,11 @@ export class ProfessionsWindow {
     // from a second read would record whatever the world says after the
     // paint, and any listener that moved a signature input in between would
     // leave the DOM stale behind a fresh signature the 500 ms band then
-    // trusts.
-    const input = this.buildInput();
+    // trusts. `prebuilt` lets refreshIfChanged hand over the input it just
+    // signature-compared (a synchronous same-tick call, so the world cannot
+    // have moved between the compare and this paint), sparing the second
+    // full bag walk per changed repaint.
+    const input = prebuilt ?? this.buildInput();
     const model = buildProfessionsView(input);
     const body = model.mode === 'simplified' ? this.simplifiedHtml(model) : this.fullHtml(model);
     el.innerHTML =
@@ -185,22 +190,23 @@ export class ProfessionsWindow {
       // attribute selector out of the key: the key embeds wire-supplied ids,
       // and a selector string is the one place those could throw
       // (querySelector SyntaxError) or escape their quotes. A comparison
-      // cannot do either. Degradation rungs: the same control, then another
-      // action button in the SAME gathering row (both key shapes carry the
-      // professionId at index 1, so a slot button consumed by its own success
-      // hands focus to the row's recharge button rather than to Close, where
-      // the next Enter would shut the window), then Close as the last rung.
+      // cannot do either. Degradation rungs: the same control, then Close,
+      // and deliberately NOTHING in between. Every action button this window
+      // paints SPENDS (a slot burns a crafted charm, a recharge consumes
+      // materials), and input.ts leaves a focused button's Enter default
+      // alone, so a rung that re-parks focus on a DIFFERENT action button
+      // hands a held Enter's key repeats to an action the player never
+      // aimed at (the adversarial round reproduced exactly that: a recharge
+      // success repaint dropping its button and the old same-row rung
+      // feeding the Enter stream into a charm-burning re-slot). Close is the
+      // one control whose accidental activation costs nothing. A future
+      // non-spending row control may earn a middle rung, deliberately.
       const keyed = [...el.querySelectorAll<HTMLElement>('[data-focus-key]')];
       const exact =
         focusKey === null
           ? null
           : (keyed.find((node) => node.dataset.focusKey === focusKey) ?? null);
-      const rowId = focusKey?.split(':')[1];
-      const sameRow =
-        exact !== null || rowId === undefined
-          ? null
-          : (keyed.find((node) => node.dataset.focusKey?.split(':')[1] === rowId) ?? null);
-      restoreFirstEnabled([exact, sameRow, el.querySelector<HTMLElement>('[data-close]')]);
+      restoreFirstEnabled([exact, el.querySelector<HTMLElement>('[data-close]')]);
     }
   }
 
@@ -219,8 +225,10 @@ export class ProfessionsWindow {
         charges: row.charges,
         maxCharges: row.maxCharges,
         confirmMode: row.confirmMode,
+        selfCrafted: row.selfCrafted,
       })),
       inventory: world.inventory,
+      viewerName: world.player.name,
     };
   }
 
@@ -498,7 +506,13 @@ export class ProfessionsWindow {
     const effect = row.effect;
     let html = '';
     if (effect) {
-      const nameKey = TOOL_EFFECT_NAME_KEYS[effect.effectId];
+      // hasOwn, not a bare index: the row's effectId is a wire-mirrored
+      // string, and a prototype key ('constructor') would otherwise resolve
+      // a function that passes the undefined check and reaches t(). Matches
+      // the hud event arm's guard on the same table.
+      const nameKey = Object.hasOwn(TOOL_EFFECT_NAME_KEYS, effect.effectId)
+        ? TOOL_EFFECT_NAME_KEYS[effect.effectId]
+        : undefined;
       if (nameKey !== undefined) {
         // Spent says so in words rather than showing "0 / 30", which reads
         // like a broken tool rather than a rechargeable one that has done its
@@ -522,7 +536,9 @@ export class ProfessionsWindow {
     }
     const slotButtons = row.slottable
       .map((effectId) => {
-        const nameKey = TOOL_EFFECT_NAME_KEYS[effectId];
+        const nameKey = Object.hasOwn(TOOL_EFFECT_NAME_KEYS, effectId)
+          ? TOOL_EFFECT_NAME_KEYS[effectId]
+          : undefined;
         if (nameKey === undefined) return '';
         return `<button type="button" class="btn prof-effect-btn" data-slot-profession="${esc(row.professionId)}" data-slot-effect="${esc(effectId)}" data-focus-key="slot:${esc(row.professionId)}:${esc(effectId)}">${esc(
           t('hudChrome.professions.toolEffectSlotButton', { effect: t(nameKey) }),
@@ -546,23 +562,40 @@ export class ProfessionsWindow {
     // handler from rebuilding the subtree mid-click and walking into the
     // refocus double-fire family (the #2377 ruling); the 500 ms
     // refreshIfChanged band backstops it either way, since the signature
-    // hashes the charm and charge state these buttons derive from. The
-    // button set itself was derived through the sim's own resolvers, so a
-    // click is an action the server accepts barring a race the event then
-    // reports.
+    // hashes the charm and charge state these buttons derive from.
+    //
+    // What each button promises, exactly: the SLOT set is exact (the view
+    // threads the same live slot, provenance boolean, and slotter name the
+    // server resolver reads, so a rendered slot button is an action the
+    // server accepts barring a race the event then reports). RECHARGEABLE
+    // means the resolver accepts; affordability and the shared throttle live
+    // in the command body, and per R46 the deny line carrying the priced
+    // material and count IS the cost surface, so the button renders for a
+    // player who cannot afford it on purpose.
+    //
+    // The sent-guard: one command per painted button. The repaint that
+    // answers the command replaces the node (fresh dataset), so the guard
+    // never sticks; until it arrives, a double-click or a held Enter's key
+    // repeats on the SAME button send nothing more. Guarding beats
+    // disabling, because disabling the focused button drops keyboard focus
+    // to <body> before the repaint can restore it.
     for (const button of el.querySelectorAll<HTMLElement>('[data-slot-effect]')) {
       button.addEventListener('click', () => {
+        if (button.dataset.sent !== undefined) return;
         const professionId = button.getAttribute('data-slot-profession');
         const effectId = button.getAttribute('data-slot-effect');
         if (professionId === null || effectId === null) return;
+        button.dataset.sent = '1';
         this.deps.world().slotToolEffect(professionId, effectId);
         audio.click();
       });
     }
     for (const button of el.querySelectorAll<HTMLElement>('[data-recharge-profession]')) {
       button.addEventListener('click', () => {
+        if (button.dataset.sent !== undefined) return;
         const professionId = button.getAttribute('data-recharge-profession');
         if (professionId === null) return;
+        button.dataset.sent = '1';
         this.deps.world().rechargeToolEffect(professionId);
         audio.click();
       });

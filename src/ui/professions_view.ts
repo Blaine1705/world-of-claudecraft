@@ -265,6 +265,12 @@ export interface ProfessionsViewInput {
     charges: number;
     maxCharges: number;
     confirmMode: 'always' | 'prompt';
+    /** Whether the slot's recorded crafter is the VIEWER (the tslot
+     *  projection's privacy-preserving boolean; the name itself never
+     *  crosses). Sufficient for exact resolver parity because the R48
+     *  directional no_gain arm only ever compares `craftedBy` against the
+     *  slotter's own name. */
+    selfCrafted: boolean;
   }[];
   /** The viewer's bags (IWorld `inventory`): the slot and recharge
    *  affordances derive from the SAME resolvers the sim's commands run
@@ -272,6 +278,10 @@ export interface ProfessionsViewInput {
    *  a button this window shows is exactly an action the server accepts.
    *  REQUIRED for the same compile-time-proof reason as `toolEffects`. */
   inventory: readonly InvSlot[];
+  /** The viewer's own character name (IWorld `player.name`): threaded into
+   *  resolveSlotToolEffect as the slotter, so the consume-copy preference
+   *  and the R48 provenance arm evaluate exactly as the server will. */
+  viewerName: string;
 }
 
 export interface ProfessionsCraftRow {
@@ -397,15 +407,24 @@ function heldCharmEffectIds(inventory: readonly InvSlot[]): string[] {
 /** A wire slot row as the sim-side `ToolEffectSlot` the resolvers read.
  *  Undefined for an absent row or one naming an effect this build's catalog
  *  retired (the unknown-id doctrine: the resolvers index TOOL_EFFECTS, so a
- *  stale id must never reach them from a projection). */
+ *  stale id must never reach them from a projection).
+ *
+ *  `craftedBy` is synthesized from the projection's privacy-preserving
+ *  `selfCrafted` boolean: the viewer's own name when self-crafted, undefined
+ *  otherwise. That is EXACT for every resolver decision, because the R48
+ *  directional no_gain arm only ever compares `craftedBy` against the
+ *  slotter's own name (a foreign name and no name behave identically), and
+ *  the discount half never gates ok/deny. */
 function liveSlotFor(
   row: ProfessionsViewInput['toolEffects'][number] | undefined,
+  viewerName: string,
 ): ToolEffectSlot | undefined {
   if (!row || !Object.hasOwn(TOOL_EFFECTS, row.effectId)) return undefined;
   return {
     effectId: row.effectId as ToolEffectId,
     durability: row.charges,
     maxDurability: row.maxCharges,
+    ...(row.selfCrafted ? { craftedBy: viewerName } : {}),
     confirmMode: row.confirmMode,
   };
 }
@@ -451,7 +470,7 @@ export function buildProfessionsView(input: ProfessionsViewInput): ProfessionsVi
             // instead of throwing mid-paint (the resolver's charge math
             // indexes the catalog).
             rechargeable: (() => {
-              const live = liveSlotFor(slot);
+              const live = liveSlotFor(slot, input.viewerName);
               return (
                 live !== undefined &&
                 resolveRechargeToolEffect(input.inventory, row.professionId, live, '', {}, ITEMS).ok
@@ -460,9 +479,13 @@ export function buildProfessionsView(input: ProfessionsViewInput): ProfessionsVi
           }
         : null,
       // The slot affordance asks the SAME resolver the command runs, per held
-      // charm effect, INCLUDING the live slot: one authority, so the button
-      // set can never drift from what the server accepts, and a re-slot the
-      // resolver would refuse as no-gain never renders a button at all.
+      // charm effect, with the SAME inputs: the live slot (craftedBy
+      // synthesized from the selfCrafted projection) and the viewer's own
+      // name as the slotter, so the consume-copy preference and the R48
+      // provenance arm evaluate exactly as the server will. One authority
+      // with its inputs threaded whole is what makes the contract real: the
+      // button set cannot drift from what the server accepts, and a re-slot
+      // the resolver would refuse as no-gain never renders a button at all.
       slottable: heldEffectIds.filter(
         (effectId) =>
           resolveSlotToolEffect(
@@ -471,8 +494,8 @@ export function buildProfessionsView(input: ProfessionsViewInput): ProfessionsVi
             effectId,
             'always',
             ITEMS,
-            undefined,
-            liveSlotFor(slot),
+            input.viewerName,
+            liveSlotFor(slot, input.viewerName),
           ).ok,
       ),
     };
@@ -540,19 +563,27 @@ export function professionsRefreshSig(
       row.charges,
       row.maxCharges,
       row.confirmMode,
+      // The R48 provenance projection feeds the slot affordance, so a
+      // provenance change (an upgrade re-slot landing) repaints the buttons.
+      row.selfCrafted,
     ]),
     // The slot/recharge affordances derive from the charms and gathering
     // tools in bags (plus the charge counts above), so those inventory rows
     // ride the signature: buying a charm, crafting a better pick, or spending
     // the last copy repaints the buttons. Filtered to the two use kinds the
     // resolvers actually read, so ordinary loot churn does not thrash the
-    // rebuild.
+    // rebuild. The signer rides each tuple because the consume-copy
+    // preference reads it: trading a self-signed copy for a foreign-signed
+    // one at the same id and count must move the affordance.
     input.inventory
       .filter((entry) => {
         const use = ITEMS[entry.itemId]?.use;
         return use !== undefined && (use.type === 'toolEffect' || use.type === 'gatherTool');
       })
-      .map((entry) => [entry.itemId, entry.count]),
+      .map((entry) => [entry.itemId, entry.count, entry.instance?.signer ?? '']),
+    // The slotter identity itself: a rename moves every name-derived
+    // affordance in one repaint.
+    input.viewerName,
     [...local],
   ]);
 }

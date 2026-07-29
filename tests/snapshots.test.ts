@@ -3881,7 +3881,9 @@ describe('full self-state snapshot delta fixture', () => {
     }); // gprof -> gatheringProficiency
     // tslot -> toolEffectSlots: the projected row shape, so a decode onto the
     // wrong field or a renamed wire key reddens here rather than silently
-    // leaving the HUD empty. craftedBy is deliberately not projected.
+    // leaving the HUD empty. craftedBy is deliberately not projected; what
+    // crosses instead is the R48 selfCrafted boolean (false here: the
+    // fixture's direct meta write recorded no crafter).
     expect(client.toolEffectSlots).toEqual([
       {
         professionId: 'mining',
@@ -3889,6 +3891,7 @@ describe('full self-state snapshot delta fixture', () => {
         charges: 12,
         maxCharges: 20,
         confirmMode: 'always',
+        selfCrafted: false,
       },
     ]);
     // ncd -> nodeHarvestableByMe: the cooling-down node reads not-ready, an
