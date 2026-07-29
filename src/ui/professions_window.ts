@@ -66,8 +66,10 @@ export interface ProfessionsWindowDeps extends PainterHostPresentation {
   world(): IWorld;
   closeOthers(): void;
   hideTooltip(): void;
-  /** The shared Hud TouchPeekGuard (the deeds/bank contract); this window has
-   *  no activating card actions today, so it is wired but never consumed. */
+  /** The shared Hud TouchPeekGuard (the deeds/bank contract); wired but never
+   *  consumed: the slot/recharge controls are plain labeled buttons with no
+   *  tooltip peek state, outside the card-action family the guard exists
+   *  for, and the window has no peeking cards. */
   consumePeek(): boolean;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
@@ -174,6 +176,7 @@ export class ProfessionsWindow {
         maxCharges: row.maxCharges,
         confirmMode: row.confirmMode,
       })),
+      inventory: world.inventory,
     };
   }
 
@@ -441,29 +444,51 @@ export class ProfessionsWindow {
     return `<section class="prof-gathering"><h3 class="prof-section-header">${esc(t('hudChrome.professions.gatheringHeader'))}</h3><ul class="prof-list" role="list">${rows}</ul></section>`;
   }
 
-  // The slotted tool effect, under its profession's skill bar. Renders NOTHING
-  // when the profession has no slot, which is every profession for every player
-  // until an acquisition source ships: an always-present "no effect" line would
-  // be three permanent rows of absence in a window that is otherwise all
-  // progress.
+  // The slotted tool effect, under its profession's skill bar, plus the
+  // slot/recharge affordances the acquisition craft opened. The effect line
+  // renders NOTHING when the profession has no slot (an always-present "no
+  // effect" line would be permanent rows of absence in a window that is
+  // otherwise all progress); the action buttons render exactly when the
+  // model's resolver-derived flags say the command would accept.
   private gatherEffectHtml(row: ProfessionsGatheringRow): string {
     const effect = row.effect;
-    if (!effect) return '';
-    const nameKey = TOOL_EFFECT_NAME_KEYS[effect.effectId];
-    if (nameKey === undefined) return '';
-    // Spent says so in words rather than showing "0 / 30", which reads like a
-    // broken tool rather than a rechargeable one that has done its work.
-    const charges = effect.spent
-      ? t('hudChrome.professions.toolEffectSpent')
-      : t('hudChrome.professions.toolEffectCharges', {
-          charges: this.fmt(effect.charges),
-          max: this.fmt(effect.maxCharges),
-        });
-    return (
-      `<div class="prof-effect${effect.spent ? ' prof-effect-spent' : ''}">` +
-      `<span class="prof-effect-name">${esc(t(nameKey))}</span>` +
-      `<span class="prof-effect-charges">${esc(charges)}</span></div>`
-    );
+    let html = '';
+    if (effect) {
+      const nameKey = TOOL_EFFECT_NAME_KEYS[effect.effectId];
+      if (nameKey !== undefined) {
+        // Spent says so in words rather than showing "0 / 30", which reads
+        // like a broken tool rather than a rechargeable one that has done its
+        // work.
+        const charges = effect.spent
+          ? t('hudChrome.professions.toolEffectSpent')
+          : t('hudChrome.professions.toolEffectCharges', {
+              charges: this.fmt(effect.charges),
+              max: this.fmt(effect.maxCharges),
+            });
+        const recharge = effect.rechargeable
+          ? `<button type="button" class="btn prof-effect-btn" data-recharge-profession="${esc(row.professionId)}">${esc(
+              t('hudChrome.professions.toolEffectRechargeButton'),
+            )}</button>`
+          : '';
+        html +=
+          `<div class="prof-effect${effect.spent ? ' prof-effect-spent' : ''}">` +
+          `<span class="prof-effect-name">${esc(t(nameKey))}</span>` +
+          `<span class="prof-effect-charges">${esc(charges)}</span>${recharge}</div>`;
+      }
+    }
+    const slotButtons = row.slottable
+      .map((effectId) => {
+        const nameKey = TOOL_EFFECT_NAME_KEYS[effectId];
+        if (nameKey === undefined) return '';
+        return `<button type="button" class="btn prof-effect-btn" data-slot-profession="${esc(row.professionId)}" data-slot-effect="${esc(effectId)}">${esc(
+          t('hudChrome.professions.toolEffectSlotButton', { effect: t(nameKey) }),
+        )}</button>`;
+      })
+      .join('');
+    if (slotButtons !== '') {
+      html += `<div class="prof-effect-actions">${slotButtons}</div>`;
+    }
+    return html;
   }
 
   private wire(el: HTMLElement): void {
@@ -471,6 +496,33 @@ export class ProfessionsWindow {
       this.close();
       audio.click();
     });
+    // Slot/recharge senders: command only, never predicted, and NO repaint
+    // here. The pid-scoped toolEffectResult event is the one repaint path
+    // (Hud's arm re-renders an open professions window), which keeps this
+    // handler from rebuilding the subtree mid-click and walking into the
+    // refocus double-fire family (the #2377 ruling); the 500 ms
+    // refreshIfChanged band backstops it either way, since the signature
+    // hashes the charm and charge state these buttons derive from. The
+    // button set itself was derived through the sim's own resolvers, so a
+    // click is an action the server accepts barring a race the event then
+    // reports.
+    for (const button of el.querySelectorAll<HTMLElement>('[data-slot-effect]')) {
+      button.addEventListener('click', () => {
+        const professionId = button.getAttribute('data-slot-profession');
+        const effectId = button.getAttribute('data-slot-effect');
+        if (professionId === null || effectId === null) return;
+        this.deps.world().slotToolEffect(professionId, effectId);
+        audio.click();
+      });
+    }
+    for (const button of el.querySelectorAll<HTMLElement>('[data-recharge-profession]')) {
+      button.addEventListener('click', () => {
+        const professionId = button.getAttribute('data-recharge-profession');
+        if (professionId === null) return;
+        this.deps.world().rechargeToolEffect(professionId);
+        audio.click();
+      });
+    }
   }
 
   private fmt(n: number): string {

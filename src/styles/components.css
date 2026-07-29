@@ -7197,6 +7197,28 @@
   .prof-effect-charges {
     font-variant-numeric: tabular-nums;
   }
+  /* The slot/recharge affordances the acquisition craft opened: compact
+     .btn variants on the effect line and in their own wrapping action row.
+     Padding narrows on fine pointers; coarse pointers get the explicit
+     40px target floor the sibling window buttons set (the delve board
+     idiom), since .btn itself carries no floor. */
+  .prof-effect-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin-top: 4px;
+  }
+  .prof-effect-btn {
+    margin-top: 0;
+    margin-right: 0;
+    padding: 2px 10px;
+    font-size: 11px;
+  }
+  @media (pointer: coarse) {
+    .prof-effect-btn {
+      min-height: 40px;
+    }
+  }
   .prof-pips {
     display: inline-flex;
     flex: none;

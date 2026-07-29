@@ -2434,6 +2434,8 @@ export const ko_KR: EnTranslations = {
         "artisansEye": "장인의 눈",
         "quickeningCharm": "회복의 부적"
       },
+      "toolEffectSlotButton": "{effect} 장착",
+      "toolEffectRechargeButton": "재충전",
       "toolEffectSlotted": "{effect}이(가) {profession}에 장착되었습니다.",
       "toolEffectSlotInvalid": "{effect}은(는) 거기에 장착할 수 없습니다.",
       "toolEffectNoTool": "먼저 진짜 {profession} 도구가 필요합니다.",

@@ -184,8 +184,10 @@ async function toolEffectRow(page, label) {
     // charge count, so an epic pick is what makes the number worth showing.
     sim.addItem('arcanite_mining_pick', 1);
     // The charm the slot consumes: the acquisition craft's price, paid here
-    // exactly as a live player pays it.
+    // exactly as a live player pays it. A second charm stays in the bags so
+    // the frame also shows the slot affordance beside the recharge one.
     sim.addItem('gatherers_cache', 1);
+    sim.addItem('artisans_eye', 1);
     sim.slotToolEffect('mining', 'gatherers_cache');
     const meta = sim.meta(sim.playerId);
     const slot = meta.toolEffectSlots?.mining;
@@ -226,6 +228,16 @@ async function toolEffectRow(page, label) {
   if (!row.charges.includes(String(setup.charges))) {
     throw new Error(`row shows "${row.charges}", expected the live count ${setup.charges}`);
   }
+  // The acquisition-craft affordances must be IN the frame: the partial
+  // charge count makes the recharge button render, and the spare charm in
+  // bags makes the slot button render. A frame without them photographs the
+  // pre-craft window and lies about what shipped.
+  const affordances = await page.evaluate(() => ({
+    recharge: !!document.querySelector('#professions-window [data-recharge-profession]'),
+    slot: !!document.querySelector('#professions-window [data-slot-effect]'),
+  }));
+  if (!affordances.recharge) throw new Error('recharge button did not paint');
+  if (!affordances.slot) throw new Error('slot button did not paint');
   // The subject must actually be VISIBLE, not merely in the DOM: assert the
   // row has a real box and that nothing is painted on top of its centre.
   const visible = await page.evaluate(() => {
@@ -286,6 +298,13 @@ async function rodTooltip(page, label) {
   await shoot(page, '#tooltip', label);
 }
 
+// Optional section filter (SHOT_ONLY=tool-effect-row|delve-shop|rod-tooltip):
+// re-shooting one subject must not require the others to be drivable, or a
+// drift in an unrelated frame blocks every refresh (each section still throws
+// on ITS OWN staged-frame failures when it runs).
+const ONLY = process.env.SHOT_ONLY ?? '';
+const wants = (section) => ONLY === '' || ONLY === section;
+
 async function run(viewport, suffix) {
   const page = await browser.newPage();
   page.on('pageerror', (e) => console.log('PAGEERROR: ' + e.message));
@@ -293,12 +312,14 @@ async function run(viewport, suffix) {
   await page.goto(URL, { waitUntil: 'networkidle0', timeout: 45000 });
   await enterOfflineGame(page, { charName: 'Toolwright' });
   await page.evaluate(() => document.querySelector('.gpu-notice-dismiss')?.click());
-  console.log(`[${suffix}] delve shop`);
-  await delveShop(page, `delve-shop-tools-${suffix}`);
+  if (wants('delve-shop')) {
+    console.log(`[${suffix}] delve shop`);
+    await delveShop(page, `delve-shop-tools-${suffix}`);
+  }
   // DESKTOP ONLY. The item tooltip is a hover affordance; touch uses the
   // tap-to-peek gate instead, so a mobile pointer move never raises it and a
   // "mobile tooltip" frame would be a staged fiction rather than a real one.
-  if (suffix === 'desktop') {
+  if (suffix === 'desktop' && wants('rod-tooltip')) {
     console.log(`[${suffix}] rod tooltip`);
     await rodTooltip(page, `rod-reel-tooltip-${suffix}`);
   }
@@ -306,8 +327,10 @@ async function run(viewport, suffix) {
   await page.evaluate(() => {
     document.querySelector('#delve-board')?.style?.setProperty('display', 'none');
   });
-  console.log(`[${suffix}] tool effect row`);
-  await toolEffectRow(page, `tool-effect-row-${suffix}`);
+  if (wants('tool-effect-row')) {
+    console.log(`[${suffix}] tool effect row`);
+    await toolEffectRow(page, `tool-effect-row-${suffix}`);
+  }
   await page.close();
 }
 

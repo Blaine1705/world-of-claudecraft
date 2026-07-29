@@ -2434,6 +2434,8 @@ export const ja_JP: EnTranslations = {
         "artisansEye": "職人の眼",
         "quickeningCharm": "早戻りの護符"
       },
+      "toolEffectSlotButton": "{effect}を装着",
+      "toolEffectRechargeButton": "再充填",
       "toolEffectSlotted": "{effect}を{profession}に装着した。",
       "toolEffectSlotInvalid": "{effect}はそこには装着できない。",
       "toolEffectNoTool": "まず本物の{profession}用ツールが必要だ。",

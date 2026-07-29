@@ -2434,6 +2434,8 @@ export const ru_RU: EnTranslations = {
         "artisansEye": "Глаз ремесленника",
         "quickeningCharm": "Оберег возрождения"
       },
+      "toolEffectSlotButton": "Установить {effect}",
+      "toolEffectRechargeButton": "Перезарядить",
       "toolEffectSlotted": "{effect} установлен: {profession}.",
       "toolEffectSlotInvalid": "{effect} нельзя установить сюда.",
       "toolEffectNoTool": "Сначала нужен настоящий инструмент ({profession}).",

@@ -2434,6 +2434,8 @@ export const zh_TW: EnTranslations = {
         "artisansEye": "匠人之眼",
         "quickeningCharm": "回春符"
       },
+      "toolEffectSlotButton": "鑲嵌{effect}",
+      "toolEffectRechargeButton": "充能",
       "toolEffectSlotted": "{effect}已鑲嵌到{profession}。",
       "toolEffectSlotInvalid": "{effect}無法鑲嵌在那裡。",
       "toolEffectNoTool": "你需要先擁有真正的{profession}工具。",

@@ -34,6 +34,7 @@ describe('professions wheel: enchanting is reachable', () => {
   it('renders an enchanting craft row whose bar reflects craftSkills.enchanting', () => {
     const model = buildProfessionsView({
       toolEffects: [],
+      inventory: [],
       identity: identity({ enchanting: 40, weaponcrafting: 10 }),
       gathering: [],
     });
@@ -49,11 +50,13 @@ describe('professions wheel: enchanting is reachable', () => {
       identity: identity({ enchanting: 0 }),
       gathering: [],
       toolEffects: [],
+      inventory: [],
     });
     const high = buildProfessionsView({
       identity: identity({ enchanting: 100 }),
       gathering: [],
       toolEffects: [],
+      inventory: [],
     });
     const skillOf = (m: ReturnType<typeof buildProfessionsView>) =>
       m.crafts.find((c) => c.identity.craftId === 'enchanting')?.bar.skill;

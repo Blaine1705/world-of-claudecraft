@@ -9977,6 +9977,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectName.quickeningCharm': '早戻りの護符',
   'hudChrome.professions.toolEffectName.artisansEye': '職人の眼',
   'hudChrome.professions.toolEffectName.gatherersCache': '採集者の貯蔵袋',
+  'hudChrome.professions.toolEffectSlotButton': '{effect}を装着',
+  'hudChrome.professions.toolEffectRechargeButton': '再充填',
   'hudChrome.professions.toolEffectSlotted': '{effect}を{profession}に装着した。',
   'hudChrome.professions.toolEffectSlotInvalid': '{effect}はそこには装着できない。',
   'hudChrome.professions.toolEffectNoTool': 'まず本物の{profession}用ツールが必要だ。',

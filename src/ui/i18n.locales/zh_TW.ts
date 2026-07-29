@@ -9521,6 +9521,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectName.quickeningCharm': '回春符',
   'hudChrome.professions.toolEffectName.artisansEye': '匠人之眼',
   'hudChrome.professions.toolEffectName.gatherersCache': '採集者儲囊',
+  'hudChrome.professions.toolEffectSlotButton': '鑲嵌{effect}',
+  'hudChrome.professions.toolEffectRechargeButton': '充能',
   'hudChrome.professions.toolEffectSlotted': '{effect}已鑲嵌到{profession}。',
   'hudChrome.professions.toolEffectSlotInvalid': '{effect}無法鑲嵌在那裡。',
   'hudChrome.professions.toolEffectNoTool': '你需要先擁有真正的{profession}工具。',

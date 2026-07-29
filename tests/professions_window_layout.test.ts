@@ -49,6 +49,10 @@ interface WorldState {
     maxCharges: number;
     confirmMode: 'always' | 'prompt';
   }[];
+  // The viewer's bags (IWorld `inventory`), the slot/recharge affordance
+  // input. Defaults to empty: no charms, no buttons, so the existing cases
+  // keep asserting the button-free surface.
+  inventory?: { itemId: string; count: number }[];
 }
 
 // An attuned, tiered identity so the window opens in full mode (hero band,
@@ -110,6 +114,7 @@ function makeWindow(
           state.gathering.map((row) => [row.professionId, row.skill]),
         ),
         toolEffectSlots: state.toolEffects ?? [],
+        inventory: state.inventory ?? [],
       }) as never,
     closeOthers: () => {},
     hideTooltip: () => {},
@@ -351,6 +356,64 @@ describe('ProfessionsWindow: the slotted tool effect row', () => {
     const { el } = makeWindow(slotted({ effectId: 'retired_effect' }));
     expect(el.querySelectorAll('.prof-effect')).toHaveLength(0);
     expect(el.innerHTML).not.toContain('retired_effect');
+  });
+
+  it('a held charm paints a slot button whose click sends the command, exactly once', () => {
+    const state = baseState();
+    state.inventory = [
+      { itemId: 'copper_mining_pick', count: 1 },
+      { itemId: 'artisans_eye', count: 1 },
+    ];
+    const sent: [string, string][] = [];
+    const { el } = makeWindow(state, {
+      world: () =>
+        ({
+          craftingIdentity: state.identity,
+          professionsState: { skills: state.gathering },
+          toolEffectSlots: [],
+          inventory: state.inventory,
+          slotToolEffect: (professionId: string, effectId: string) => {
+            sent.push([professionId, effectId]);
+          },
+        }) as never,
+    });
+    const button = el.querySelector<HTMLElement>('[data-slot-effect]');
+    expect(button?.getAttribute('data-slot-profession')).toBe('mining');
+    expect(button?.getAttribute('data-slot-effect')).toBe('artisans_eye');
+    expect(button?.textContent).toBe("Slot Artisan's Eye");
+    button?.click();
+    expect(sent).toEqual([['mining', 'artisans_eye']]);
+  });
+
+  it('a rechargeable slot paints the recharge button; a full or tool-less one does not', () => {
+    const rechargeState = slotted({ charges: 3, maxCharges: 20 });
+    rechargeState.inventory = [{ itemId: 'copper_mining_pick', count: 1 }];
+    const sent: string[] = [];
+    const { el } = makeWindow(rechargeState, {
+      world: () =>
+        ({
+          craftingIdentity: rechargeState.identity,
+          professionsState: { skills: rechargeState.gathering },
+          toolEffectSlots: rechargeState.toolEffects,
+          inventory: rechargeState.inventory,
+          rechargeToolEffect: (professionId: string) => {
+            sent.push(professionId);
+          },
+        }) as never,
+    });
+    const button = el.querySelector<HTMLElement>('[data-recharge-profession]');
+    expect(button?.textContent).toBe('Recharge');
+    button?.click();
+    expect(sent).toEqual(['mining']);
+    // Full slot at the re-derived max: no button.
+    const fullState = slotted({ charges: 20, maxCharges: 20 });
+    fullState.inventory = [{ itemId: 'copper_mining_pick', count: 1 }];
+    const { el: fullEl } = makeWindow(fullState);
+    expect(fullEl.querySelector('[data-recharge-profession]')).toBeNull();
+    // Tool gone: the resolver refuses, so the affordance stays off.
+    const toollessState = slotted({ charges: 3, maxCharges: 20 });
+    const { el: toollessEl } = makeWindow(toollessState);
+    expect(toollessEl.querySelector('[data-recharge-profession]')).toBeNull();
   });
 });
 

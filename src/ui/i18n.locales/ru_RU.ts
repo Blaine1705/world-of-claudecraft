@@ -10151,6 +10151,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectName.quickeningCharm': 'Оберег возрождения',
   'hudChrome.professions.toolEffectName.artisansEye': 'Глаз ремесленника',
   'hudChrome.professions.toolEffectName.gatherersCache': 'Сумка собирателя',
+  'hudChrome.professions.toolEffectSlotButton': 'Установить {effect}',
+  'hudChrome.professions.toolEffectRechargeButton': 'Перезарядить',
   'hudChrome.professions.toolEffectSlotted': '{effect} установлен: {profession}.',
   'hudChrome.professions.toolEffectSlotInvalid': '{effect} нельзя установить сюда.',
   'hudChrome.professions.toolEffectNoTool': 'Сначала нужен настоящий инструмент ({profession}).',

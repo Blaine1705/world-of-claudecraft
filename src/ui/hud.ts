@@ -4045,8 +4045,9 @@ export class Hud {
   });
   // Professions window painter (professions_view.ts core + the composed
   // profession_identity_view model + professions_window.ts painter): the
-  // read-only craft-wheel identity browser over IWorldProfessions. A
-  // standalone trapping window (windowFocus), the deeds shape exactly.
+  // craft-wheel identity browser over IWorldProfessions, plus the tool-effect
+  // slot/recharge senders the acquisition craft opened. A standalone
+  // trapping window (windowFocus), the deeds shape exactly.
   private readonly professionsWindow = new ProfessionsWindow({
     ...this.presentationBag,
     root: () => $('#professions-window'),

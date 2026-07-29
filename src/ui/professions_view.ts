@@ -13,8 +13,12 @@ import {
   craftMaxSkillFor,
   oppositeCraft,
   PERK_THRESHOLDS,
+  TOOL_EFFECTS,
+  type ToolEffectId,
 } from '../sim/content/professions';
+import { ITEMS } from '../sim/data';
 import { requiredAmendsProgress } from '../sim/professions/archetype';
+import { resolveRechargeToolEffect, resolveSlotToolEffect } from '../sim/professions/tools';
 import {
   type CraftSkills,
   isSpecialized,
@@ -22,6 +26,7 @@ import {
   TIER_SKILL_STEP,
   tierForSkill,
 } from '../sim/professions/wheel';
+import type { InvSlot } from '../sim/types';
 import type { CraftingIdentityView } from '../world_api/professions';
 import {
   buildProfessionIdentityView,
@@ -256,6 +261,12 @@ export interface ProfessionsViewInput {
     maxCharges: number;
     confirmMode: 'always' | 'prompt';
   }[];
+  /** The viewer's bags (IWorld `inventory`): the slot and recharge
+   *  affordances derive from the SAME resolvers the sim's commands run
+   *  (resolveSlotToolEffect / resolveRechargeToolEffect over this list), so
+   *  a button this window shows is exactly an action the server accepts.
+   *  REQUIRED for the same compile-time-proof reason as `toolEffects`. */
+  inventory: readonly InvSlot[];
 }
 
 export interface ProfessionsCraftRow {
@@ -267,8 +278,7 @@ export interface ProfessionsCraftRow {
 }
 
 /** The slotted tool effect a gathering row shows, already reduced to what the
- *  row paints. `null` on a profession with no slot, which is every profession
- *  for every player until an acquisition source ships. */
+ *  row paints. `null` on a profession with no slot. */
 export interface GatheringToolEffectModel {
   /** A ToolEffectId; the row resolves its display name from the catalog. */
   effectId: string;
@@ -278,6 +288,12 @@ export interface GatheringToolEffectModel {
    *  untouched, and a recharge can restore it. The row says "spent" rather
    *  than showing a bare 0, because 0 of 30 reads like a broken tool. */
   spent: boolean;
+  /** True when the recharge command would accept right now, derived through
+   *  the sim's own resolveRechargeToolEffect over the viewer's mirrored bags
+   *  (a real tool owned, charges below the R30 re-derived maximum). The
+   *  button never second-guesses the resolver, so it cannot offer an action
+   *  the server refuses. */
+  rechargeable: boolean;
 }
 
 export interface ProfessionsGatheringRow {
@@ -287,6 +303,12 @@ export interface ProfessionsGatheringRow {
    *  profession rather than per tool, so a player owning two picks shares one
    *  mining slot. */
   effect: GatheringToolEffectModel | null;
+  /** Effect ids of crafted charms in bags this row can slot RIGHT NOW,
+   *  derived through the sim's own resolveSlotToolEffect (charm held, real
+   *  tool owned, policy accepts the pair), in TOOL_EFFECT catalog order.
+   *  Empty for a charm-less or tool-less row; re-slotting an already-slotted
+   *  effect stays offered (it consumes another charm and resets to full). */
+  slottable: readonly string[];
 }
 
 export interface SwitchCostModel {
@@ -353,6 +375,19 @@ function buildSimplifiedCallToAction(identity: ProfessionIdentityModel): Simplif
   };
 }
 
+/** Distinct effect ids of tool-effect charms in bags, in catalog (ITEMS
+ *  declaration) order: the candidate set the per-row slot affordance filters
+ *  through the resolver. Pure bag scan. */
+function heldCharmEffectIds(inventory: readonly InvSlot[]): string[] {
+  const held: string[] = [];
+  for (const entry of inventory) {
+    const use = ITEMS[entry.itemId]?.use;
+    if (!use || use.type !== 'toolEffect') continue;
+    if (!held.includes(use.effectId)) held.push(use.effectId);
+  }
+  return held;
+}
+
 export function buildProfessionsView(input: ProfessionsViewInput): ProfessionsViewModel {
   const identity = buildProfessionIdentityView(input.identity);
   // One mutable copy for the wheel.ts perk reads (their param type is the live
@@ -373,6 +408,7 @@ export function buildProfessionsView(input: ProfessionsViewInput): ProfessionsVi
   const effectByProfession = new Map(
     (input.toolEffects ?? []).map((row) => [row.professionId, row]),
   );
+  const heldEffectIds = heldCharmEffectIds(input.inventory);
   const gathering = input.gathering.map((row): ProfessionsGatheringRow => {
     const slot = effectByProfession.get(row.professionId);
     return {
@@ -384,8 +420,38 @@ export function buildProfessionsView(input: ProfessionsViewInput): ProfessionsVi
             charges: slot.charges,
             maxCharges: slot.maxCharges,
             spent: slot.charges <= 0,
+            // The recharge affordance asks the sim's own resolver over the
+            // mirrored bags: a slot-shaped view row carries everything the
+            // ok/deny half of the resolution reads (the recharger identity
+            // and skills only move the COUNT, so placeholders are honest).
+            // The hasOwn guard is the unknown-id doctrine: a row naming an
+            // effect this build's catalog lacks renders un-rechargeable
+            // instead of throwing mid-paint (the resolver's charge math
+            // indexes the catalog).
+            rechargeable:
+              Object.hasOwn(TOOL_EFFECTS, slot.effectId) &&
+              resolveRechargeToolEffect(
+                input.inventory,
+                row.professionId,
+                {
+                  effectId: slot.effectId as ToolEffectId,
+                  durability: slot.charges,
+                  maxDurability: slot.maxCharges,
+                  confirmMode: slot.confirmMode,
+                },
+                '',
+                {},
+                ITEMS,
+              ).ok,
           }
         : null,
+      // The slot affordance asks the SAME resolver the command runs, per held
+      // charm effect: one authority, so the button set can never drift from
+      // what the server accepts.
+      slottable: heldEffectIds.filter(
+        (effectId) =>
+          resolveSlotToolEffect(input.inventory, row.professionId, effectId, 'always', ITEMS).ok,
+      ),
     };
   });
   const anyTier = identity.skills.some((row) => row.tier >= 1);
@@ -452,6 +518,18 @@ export function professionsRefreshSig(
       row.maxCharges,
       row.confirmMode,
     ]),
+    // The slot/recharge affordances derive from the charms and gathering
+    // tools in bags (plus the charge counts above), so those inventory rows
+    // ride the signature: buying a charm, crafting a better pick, or spending
+    // the last copy repaints the buttons. Filtered to the two use kinds the
+    // resolvers actually read, so ordinary loot churn does not thrash the
+    // rebuild.
+    input.inventory
+      .filter((entry) => {
+        const use = ITEMS[entry.itemId]?.use;
+        return use !== undefined && (use.type === 'toolEffect' || use.type === 'gatherTool');
+      })
+      .map((entry) => [entry.itemId, entry.count]),
     [...local],
   ]);
 }

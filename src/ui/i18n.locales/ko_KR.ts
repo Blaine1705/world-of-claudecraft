@@ -9970,6 +9970,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectName.quickeningCharm': '회복의 부적',
   'hudChrome.professions.toolEffectName.artisansEye': '장인의 눈',
   'hudChrome.professions.toolEffectName.gatherersCache': '채집가의 주머니',
+  'hudChrome.professions.toolEffectSlotButton': '{effect} 장착',
+  'hudChrome.professions.toolEffectRechargeButton': '재충전',
   'hudChrome.professions.toolEffectSlotted': '{effect}이(가) {profession}에 장착되었습니다.',
   'hudChrome.professions.toolEffectSlotInvalid': '{effect}은(는) 거기에 장착할 수 없습니다.',
   'hudChrome.professions.toolEffectNoTool': '먼저 진짜 {profession} 도구가 필요합니다.',

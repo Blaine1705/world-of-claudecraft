@@ -2434,6 +2434,8 @@ export const cs_CZ: EnTranslations = {
         "artisansEye": "Artisan's Eye",
         "quickeningCharm": "Springback Charm"
       },
+      "toolEffectSlotButton": "Slot {effect}",
+      "toolEffectRechargeButton": "Recharge",
       "toolEffectSlotted": "{effect} slotted on {profession}.",
       "toolEffectSlotInvalid": "{effect} cannot be slotted there.",
       "toolEffectNoTool": "You need a real {profession} tool first.",

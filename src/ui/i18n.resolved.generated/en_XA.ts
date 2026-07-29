@@ -2434,6 +2434,8 @@ export const en_XA: EnTranslations = {
         "artisansEye": "[Áŕţíšáñ'š Éýé]",
         "quickeningCharm": "[Šþŕíñĝƀáçķ Çĥáŕɱ]"
       },
+      "toolEffectSlotButton": "[Šļóţ {effect}]",
+      "toolEffectRechargeButton": "[Ŕéçĥáŕĝé]",
       "toolEffectSlotted": "[{effect} šļóţţéð óñ {profession}.]",
       "toolEffectSlotInvalid": "[{effect} çáññóţ ƀé šļóţţéð ţĥéŕé.]",
       "toolEffectNoTool": "[Ýóú ñééð á ŕéáļ {profession} ţóóļ ƒíŕšţ.]",

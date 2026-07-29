@@ -44,6 +44,10 @@ interface WorldState {
     maxCharges: number;
     confirmMode: 'always' | 'prompt';
   }[];
+  // The viewer's bags (IWorld `inventory`), the slot/recharge affordance
+  // input. Defaults to empty: no charms, no buttons, so the existing cases
+  // keep asserting the button-free surface.
+  inventory?: { itemId: string; count: number }[];
 }
 
 // An attuned, tiered identity so the window opens in full mode (ring, ten
@@ -94,6 +98,7 @@ function makeWindow(
           state.gathering.map((row) => [row.professionId, row.skill]),
         ),
         toolEffectSlots: state.toolEffects ?? [],
+        inventory: state.inventory ?? [],
       }) as never,
     closeOthers: () => {},
     hideTooltip: () => {},

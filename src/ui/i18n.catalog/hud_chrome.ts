@@ -2768,6 +2768,11 @@ export const hudChromeStrings = {
     // line per outcome, rendered off ids only (the event is text-free).
     // {effect} and {profession} splice localized names; {material} splices a
     // clickable item link, the craftedToast idiom.
+    // The slot/recharge buttons on a gathering row. The slot label names the
+    // charm it consumes; the recharge label stays bare because it sits on the
+    // effect's own line.
+    toolEffectSlotButton: 'Slot {effect}',
+    toolEffectRechargeButton: 'Recharge',
     toolEffectSlotted: '{effect} slotted on {profession}.',
     toolEffectSlotInvalid: '{effect} cannot be slotted there.',
     toolEffectNoTool: 'You need a real {profession} tool first.',
