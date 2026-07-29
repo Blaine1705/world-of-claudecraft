@@ -359,7 +359,9 @@ export function createDemonPet(
   pet.ownerId = owner.id;
   pet.petMode = 'defensive';
   pet.petTauntTimer = 0;
-  pet.petAutoTaunt = false;
+  // A melee_tank demon (Gloomshade) is built to hold threat, so it comes up with
+  // auto-taunt already on; every other demon keeps the old opt-in default.
+  pet.petAutoTaunt = template.petRole === 'melee_tank';
   pet.petAutoWaterJet = false;
   pet.petManualTauntPending = false;
   pet.hostile = false;

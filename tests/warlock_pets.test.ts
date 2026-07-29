@@ -102,6 +102,33 @@ describe('warlock demon pets', () => {
     expect(sim.entities.has(imp.id)).toBe(false);
   });
 
+  it('gloomshade, the tank demon, auto-taunts by default on summon', () => {
+    // Bug #1356: createDemonPet unconditionally set petAutoTaunt=false for every
+    // demon, so Gloomshade (a "sturdy melee tank that taunts to hold threat", per
+    // this file's header comment) never held aggro unless the owner manually
+    // toggled auto-taunt every session. A melee_tank demon should come up with
+    // auto-taunt already on.
+    const sim = makeSim();
+    sim.setPlayerLevel(12);
+    castAndFinish(sim, 'summon_voidwalker');
+    const pet = sim.petOf(sim.playerId);
+    expect(pet).not.toBeNull();
+    expect(pet!.templateId).toBe('gloomshade');
+    expect(pet!.petAutoTaunt).toBe(true);
+  });
+
+  it('emberkin, the ranged damage demon, does not auto-taunt by default', () => {
+    // Non-tank demons keep the prior default: no free auto-taunt for a demon
+    // that was never described as a threat-holder.
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    castAndFinish(sim, 'summon_imp');
+    const pet = sim.petOf(sim.playerId);
+    expect(pet).not.toBeNull();
+    expect(pet!.templateId).toBe('emberkin');
+    expect(pet!.petAutoTaunt).toBe(false);
+  });
+
   it('a slain demon unravels instead of respawning into the wild', () => {
     const sim = makeSim();
     sim.setPlayerLevel(12);
