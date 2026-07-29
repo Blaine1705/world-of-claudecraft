@@ -11,9 +11,15 @@ import {
   strikeSuspensionMs,
   validListingParams,
   validSettlementTransition,
+  WOC_MARKET_BOND_PENDING_TTL_SECONDS,
+  WOC_MARKET_BUY_NOW_LOCK_SECONDS,
+  WOC_MARKET_MAX_ACTIVE_LISTINGS,
   WOC_MARKET_MAX_PRICE_CENTS,
   WOC_MARKET_MIN_PRICE_CENTS,
+  WOC_MARKET_QUOTE_TTL_SECONDS,
   WOC_MARKET_RESTRICTED_POLICY,
+  WOC_MARKET_SETTLEMENT_WINDOW_SECONDS,
+  WOC_MARKET_STRANDED_RECLAIM_SECONDS,
   type WocEligibilityPolicy,
   type WocListingParams,
   type WocSettlementState,
@@ -24,6 +30,33 @@ import type { ItemDef, ItemInstancePayload } from '../src/sim/types';
 // no clocks, no DB, no fetch (the module takes injected timestamps).
 
 const DAY_MS = 24 * 3600 * 1000;
+
+describe('tunables: literal pins', () => {
+  // A constant compared against itself proves nothing (the retention-sweep
+  // pin rationale), so every tunable is pinned to its literal: changing one
+  // must be a deliberate edit that reddens this block.
+  it('pins the quote TTL to 90 s, inside the PRD 60 to 120 second band', () => {
+    expect(WOC_MARKET_QUOTE_TTL_SECONDS).toBe(90);
+    expect(WOC_MARKET_QUOTE_TTL_SECONDS).toBeGreaterThanOrEqual(60);
+    expect(WOC_MARKET_QUOTE_TTL_SECONDS).toBeLessThanOrEqual(120);
+  });
+
+  it('pins the settlement window, bond TTL, listing cap, price rails, and reclaim grace', () => {
+    expect(WOC_MARKET_SETTLEMENT_WINDOW_SECONDS).toBe(600);
+    expect(WOC_MARKET_BOND_PENDING_TTL_SECONDS).toBe(300);
+    expect(WOC_MARKET_MAX_ACTIVE_LISTINGS).toBe(12);
+    expect(WOC_MARKET_MIN_PRICE_CENTS).toBe(25);
+    expect(WOC_MARKET_MAX_PRICE_CENTS).toBe(5_000_000);
+    expect(WOC_MARKET_STRANDED_RECLAIM_SECONDS).toBe(300);
+  });
+
+  it('keeps the buy-now lock STRICTLY longer than one quote lifetime', () => {
+    // An honest buyer whose first quote expires must still have lock window
+    // left to request a fresh one; an equal or shorter lock silently strands
+    // every first-quote-expired buy-now.
+    expect(WOC_MARKET_BUY_NOW_LOCK_SECONDS).toBeGreaterThan(WOC_MARKET_QUOTE_TTL_SECONDS);
+  });
+});
 
 describe('minIncrementCents: the increment ladder band edges', () => {
   // Band edges belong to the HIGHER band (the doc comment's contract), so both

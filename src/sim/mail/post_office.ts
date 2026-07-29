@@ -589,9 +589,12 @@ export class PostOffice {
     // and never force-added past the bag budget. Capacity is checked per stack
     // against the live inventory, so cumulative capacity is honoured. An
     // instanced parcel (a marketplace custody delivery or return) grants
-    // through addItemInstance so the exact payload survives; the capacity
-    // pre-check models the identical-payload merge the grant applies
-    // (canGrantItemInstance, the #2139 rule), never the plain fungible model.
+    // through addItemInstance so the exact payload survives. Every grant
+    // carries the slot's craftedRecipeId through, and every capacity
+    // pre-check models the identical-payload AND same-craftedRecipeId merge
+    // the grant applies (countFit, the #2139 rule: a pre-check that disagrees
+    // with the grant's merge model re-opens the overflow class), never the
+    // plain fungible model.
     const kept: InvSlot[] = [];
     for (const s of m.items) {
       // The shared payload-aware pair (bags.ts canGrantCopies + grantCopies):
@@ -721,6 +724,25 @@ export class PostOffice {
     custodyRef?: string,
   ): boolean {
     if (custodyRef !== undefined && this.hasCustodyParcel(custodyRef)) return false;
+    // Book-boundary validation, the mailSendResolved gate applied per slot: a
+    // slot with an unknown item def or a floored count below 1 never enters
+    // the book. Without it a zero-count or content-stale slot books a parcel
+    // whose take grants nothing and then drops the slot, silently destroying
+    // the escrowed record.
+    const booked: InvSlot[] = [];
+    for (const s of items) {
+      const count = Math.floor(s.count);
+      if (!ITEMS[s.itemId] || !Number.isFinite(count) || count < 1) continue;
+      const clone = cloneInvSlot(s);
+      clone.count = count;
+      delete clone.slot;
+      booked.push(clone);
+    }
+    // Asked to carry goods but NONE survived validation: refuse rather than
+    // book an empty letter. The custodian treats a refusal as "not booked" and
+    // releases its claim, so the item stays held and visible instead of being
+    // marked delivered against a parcel that carries nothing.
+    if (items.length > 0 && booked.length === 0) return false;
     this.book({
       custodyRef,
       recipientKey: recipient.key,
@@ -731,11 +753,7 @@ export class PostOffice {
       subject: letter.subject,
       body: letter.body,
       copper: Math.max(0, Math.floor(letter.copper ?? 0)),
-      items: items.map((s) => {
-        const clone = cloneInvSlot(s);
-        delete clone.slot;
-        return clone;
-      }),
+      items: booked,
       delaySeconds: letter.delaySeconds ?? 0,
     });
     return true;

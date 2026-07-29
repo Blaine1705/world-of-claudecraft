@@ -3038,6 +3038,61 @@
     max-height: none;
     overflow: hidden;
   }
+  /* $WOC Exchange browse tab on touch: one column, detail pane stacked under
+     the table. The desktop template reserves a 240px-min side column, which on
+     a 915px landscape phone spent a third of the width on a pane that is empty
+     until a listing is picked, squeezing the five money columns. */
+  body.mobile-touch #woc-market-window .wm-browse {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+  }
+  body.mobile-touch #woc-market-window .wm-detail {
+    max-height: none;
+  }
+  /* The touch-target floor for the controls the desktop sheet sizes by padding
+     alone. The tab strip came out about 30px tall (7px padding on a 13px line),
+     under the 40x40 floor in src/ui/CLAUDE.md; the pager, form and row-open
+     buttons already carry their own min-height, and the close button inherits
+     the shared .x-btn floor. */
+  /* The shell stops scrolling so the inner .wm-body pane owns the touch scroll
+     (the shared window block above sets overflow-y: auto, and .wm-body is a
+     scroller too: two nested ones fight and let the header scroll away on iOS).
+     Same shape as #crafting-window below. */
+  body.mobile-touch #woc-market-window {
+    height: auto;
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
+    overflow: hidden;
+  }
+  /* 16px and no-wrap follow .opt-tab: at 13px in a verbose locale the three
+     labels wrapped inside their own tabs, and flex:1 alone cannot grow the
+     strip, so it scrolls instead of squeezing. */
+  body.mobile-touch #woc-market-window button.wm-tab {
+    min-height: 40px;
+    font-size: 16px;
+    flex: 1 0 auto;
+    white-space: nowrap;
+  }
+  body.mobile-touch #woc-market-window .wm-tabs {
+    /* BOTH axes named. Per the overflow spec a `visible` axis computes to `auto`
+       when its partner is not visible, so `overflow-x: auto` alone silently made
+       the strip a vertical scroller too and clipped the taller 16px labels. */
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  body.mobile-touch #woc-market-window .wm-sort select {
+    min-height: 40px;
+  }
+  /* A checkbox cannot be 40px without looking broken, so the LABEL is the tap
+     target (clicking it toggles the box) and the label is what gets the floor. */
+  body.mobile-touch #woc-market-window label.wm-terms,
+  body.mobile-touch #woc-market-window label.wm-offer-next {
+    min-height: 40px;
+  }
+  body.mobile-touch #woc-market-window label.wm-terms input,
+  body.mobile-touch #woc-market-window label.wm-offer-next input {
+    width: 24px;
+    height: 24px;
+  }
   /* Crafting window on touch: the mailbox "tall list window" shape. The sheet
      shell stops scrolling (overflow hidden) so the inner .crafting-body pane
      keeps the touch scroll without the two fighting; the identity card

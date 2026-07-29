@@ -118,7 +118,11 @@ function useService(): WocMarketService {
 // Refusal -> stable code (the server emits the CODE, never English)
 // ---------------------------------------------------------------------------
 
-const REFUSAL_ERRORS: Record<WocMarketRefusal, { status: number; code: ErrorCode }> = {
+/** The refusal-to-wire mapping. EXPORTED so tests can pin it exhaustively:
+ *  several of these status choices are security decisions (not_yours is a 404
+ *  for anti-enumeration, never a 403), and a hand-copied table in the test
+ *  would drift the moment a row changed. */
+export const REFUSAL_ERRORS: Record<WocMarketRefusal, { status: number; code: ErrorCode }> = {
   disabled: { status: 403, code: 'woc_market.disabled' },
   market_paused: { status: 503, code: 'woc_market.paused' },
   wallet_required: { status: 403, code: 'woc_market.wallet_required' },

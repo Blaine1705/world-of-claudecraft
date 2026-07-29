@@ -3,6 +3,7 @@ import { ITEMS } from '../src/sim/data';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import {
   buildWocMarketView,
+  countdownSigBucket,
   sellableRows,
   type WocActivityView,
   type WocBidView,
@@ -99,6 +100,7 @@ const makeListing = (over: Partial<WocListingView> = {}): WocListingView => ({
   resolution: null,
   currentBidCents: null,
   minNextBidCents: 1000,
+  minNextBidBondCents: 100,
   buyNowLocked: false,
   endsAtMs: NOW + 90_500,
   createdAtMs: NOW - 3_600_000,
@@ -109,7 +111,7 @@ const makeBrowse = (
   over: Partial<WocMarketViewInput['browse']> = {},
 ): WocMarketViewInput['browse'] => ({
   listings: [],
-  total: 0,
+  hasMore: false,
   page: 0,
   pageSize: 25,
   loading: false,
@@ -440,15 +442,37 @@ describe('activity mapping', () => {
   });
 });
 
-describe('pageCount', () => {
+describe('hasMore passthrough', () => {
+  // The server ships a has-more probe rather than a total, so the model
+  // carries the boolean verbatim (no client-side page math to derive).
+  it.each([[true], [false]])('passes hasMore %s through to the browse model', (hasMore) => {
+    expect(ready(makeInput({ browse: makeBrowse({ hasMore }) })).browse.hasMore).toBe(hasMore);
+  });
+
+  it('moves the repaint signature when hasMore flips', () => {
+    const closed = wocMarketViewSig(
+      buildWocMarketView(makeInput({ browse: makeBrowse({ hasMore: false }) })),
+    );
+    const open = wocMarketViewSig(
+      buildWocMarketView(makeInput({ browse: makeBrowse({ hasMore: true }) })),
+    );
+    expect(open).not.toBe(closed);
+  });
+});
+
+describe('countdownSigBucket', () => {
+  // Second resolution inside the final two minutes (the anti-snipe window),
+  // minute resolution beyond it; the 120_000 edge belongs to the minute band.
   it.each([
-    [0, 1],
-    [1, 1],
-    [25, 1],
-    [26, 2],
-    [51, 3],
-  ])('total %i over pageSize 25 gives %i pages', (total, pages) => {
-    expect(ready(makeInput({ browse: makeBrowse({ total }) })).browse.pageCount).toBe(pages);
+    [0, 0],
+    [999, 0],
+    [1000, 1],
+    [119_999, 119],
+    [120_000, 122],
+    [179_999, 122],
+    [180_000, 123],
+  ])('buckets %i ms into signature bucket %i', (remainingMs, bucket) => {
+    expect(countdownSigBucket(remainingMs)).toBe(bucket);
   });
 });
 
@@ -459,7 +483,7 @@ describe('wocMarketViewSig', () => {
     makeInput({
       browse: makeBrowse({
         listings: [makeListing({ id: 1, endsAtMs: NOW + 10_500, currentBidCents: 100 })],
-        total: 1,
+        hasMore: false,
       }),
       ...over,
     });
@@ -477,7 +501,7 @@ describe('wocMarketViewSig', () => {
         makeInput({
           browse: makeBrowse({
             listings: [makeListing({ id: 1, endsAtMs: NOW + 10_500, currentBidCents: 125 })],
-            total: 1,
+            hasMore: false,
           }),
         }),
       ),
@@ -521,7 +545,7 @@ describe('determinism', () => {
           makeListing({ id: 1, hasReserve: true, reserveMet: false, currentBidCents: 200 }),
           makeListing({ id: 2, endsAtMs: NOW - 1 }),
         ],
-        total: 2,
+        hasMore: true,
         selectedId: 1,
         detail: makeListing({ id: 1 }),
         estimate: { available: true, usdCents: 1500, amount: { base: '1', tokens: 15 }, asOfMs: 1 },

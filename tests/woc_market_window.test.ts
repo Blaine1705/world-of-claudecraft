@@ -56,7 +56,22 @@ describe('woc_market_window: cold-window contract', () => {
   it('performs no forced-reflow layout read', () => {
     // The layout-thrash killers the perf gate scans painters for; a cold
     // window holds this contract whatever its poll cadence.
-    for (const token of ['getBoundingClientRect', 'offsetWidth', 'offsetHeight', 'scrollTop']) {
+    for (const token of [
+      'getBoundingClientRect',
+      'getClientRects',
+      'offsetWidth',
+      'offsetHeight',
+      'offsetTop',
+      'offsetLeft',
+      'offsetParent',
+      'clientWidth',
+      'clientHeight',
+      'scrollTop',
+      'scrollLeft',
+      'scrollWidth',
+      'scrollHeight',
+      'scrollIntoView',
+    ]) {
       expect(painter.includes(token), `forced-reflow read: ${token}`).toBe(false);
     }
     // getComputedStyle is called BARE in this tree, never as a member, so the
@@ -68,6 +83,10 @@ describe('woc_market_window: cold-window contract', () => {
     // refreshIfChanged() must bail on an unmoved digest, or the slow-band poll
     // rebuilds the whole subtree every 500 ms.
     expect(painter).toContain('if (sig === this.lastSig) return;');
+    // BOTH halves. Pinning only the comparison let the assignment be deleted,
+    // which leaves lastSig at '' forever so every slow-band poll rebuilds the
+    // whole subtree while this guard still reported the signature present.
+    expect(painter).toContain('this.lastSig = ');
   });
 });
 
@@ -128,9 +147,22 @@ describe('woc_market_window: i18n and escaping discipline', () => {
     // must pass through esc(); a bare English aria-label would also dodge the
     // i18n catalog entirely.
     const segments = painter.split('aria-label="').slice(1);
-    expect(segments.length).toBeGreaterThan(0);
+    // AT the real count (11), not "> 0", which one surviving attribute
+    // satisfied. A floor rather than an exact count so adding a labelled
+    // control does not red the suite, while deleting ten still does.
+    expect(segments.length).toBeGreaterThanOrEqual(11);
     for (const segment of segments) {
       expect(segment.startsWith('${esc(')).toBe(true);
+      // And the WHOLE value, not just its prefix: `${esc(a)} ${raw}` passed a
+      // starts-with check while interpolating an unescaped tail.
+      const value = segment.slice(0, segment.indexOf('"'));
+      for (const hole of value.matchAll(/\$\{/g)) {
+        expect(
+          value.slice(hole.index).startsWith('${esc(') ||
+            value.slice(hole.index).startsWith('${this.'),
+          `unescaped interpolation in aria-label: ${value}`,
+        ).toBe(true);
+      }
     }
   });
 
@@ -151,5 +183,147 @@ describe('woc_market_window: language fan-out', () => {
     const relocalize = between('relocalize(): void {', 'buildModel');
     expect(relocalize).toContain('if (!this.isOpen) return;');
     expect(relocalize).toContain('this.render();');
+  });
+});
+
+describe('woc_market_window: every class it emits is actually styled', () => {
+  // The bug this pins shipped and was caught only by looking at a screenshot:
+  // 19 of the 42 classes the painter emitted matched no rule in any sheet, so
+  // the tab strip, the primary buttons and the window header rendered as raw
+  // white browser chrome on the dark panel. Nothing failed, because a missing
+  // CSS rule is silent; only a human eye or this guard sees it. It also catches
+  // the reverse drift (a class renamed in TS, its rule left behind).
+  // Comments are STRIPPED before harvesting selectors: these sheets name plenty
+  // of classes in prose, and crediting a class as styled because a comment
+  // mentions it would let a rename be "verified" by documentation.
+  const sheets = ['components.css', 'hud.css', 'base.css', 'layout.css', 'hud.mobile.css']
+    .map((f) => readFileSync(new URL(`../src/styles/${f}`, import.meta.url), 'utf8'))
+    .join('\n')
+    .replace(/\/\*[\s\S]*?\*\//g, ' ');
+
+  /**
+   * Classes the painter emits: literal `class="..."` attributes, the three it
+   * hands the shared tab-strip family, and the quoted class fragments inside an
+   * INTERPOLATED attribute. That last source is the one this guard originally
+   * missed. The first version excluded any attribute containing `${`, which
+   * quietly dropped 10 of 52 classes, and two of those (the reserve badge's
+   * met/not_met states) were genuinely unstyled: the guard's blind spot was
+   * exactly the shape of the defect it was written to catch.
+   */
+  const emitted = (): string[] => {
+    const found = new Set<string>();
+    const add = (value: string): void => {
+      for (const cls of value.split(/\s+/)) {
+        // A name left dangling on a hyphen is the static PREFIX of an
+        // interpolated class (`wm-reserve-${...}`), not a class anyone styles.
+        // The full spellings are added by the suffix-family branch below.
+        if (cls !== '' && !cls.endsWith('-')) found.add(cls);
+      }
+    };
+    for (const m of painter.matchAll(/class="([^"]*)"/g)) {
+      const raw = m[1];
+      // The static half of the attribute, with every ${...} hole removed.
+      add(raw.replace(/\$\{[\s\S]*?\}/g, ' '));
+      // The dynamic half: a class only ever reachable inside an interpolation,
+      // e.g. `wm-reserve-${r.reserveBadge}` or a ternary picking two literals.
+      for (const hole of raw.matchAll(/\$\{([\s\S]*?)\}/g)) {
+        for (const lit of hole[1].matchAll(/'([A-Za-z][\w-]*)'/g)) add(lit[1]);
+      }
+    }
+    for (const key of ['stripClass', 'tabClass', 'selectedClass']) {
+      for (const m of painter.matchAll(new RegExp(`${key}: '([^']+)'`, 'g'))) found.add(m[1]);
+    }
+    // The badge states are built by concatenating a view-model enum onto a
+    // prefix, so no literal for either spelling exists in this file at all.
+    // Named here because a suffix family is unreachable by any regex over the
+    // painter alone, and both spellings shipped unstyled.
+    if (painter.includes('wm-reserve-')) {
+      add('wm-reserve-met wm-reserve-not_met');
+    }
+    return [...found].sort();
+  };
+
+  it('emits a substantial class set (the floor keeps this from going vacuous)', () => {
+    // Near the real count (52 at the time of writing), not far under it: a floor
+    // sitting well below is what let the truncated 42-class harvest look fine.
+    expect(emitted().length).toBeGreaterThanOrEqual(50);
+  });
+
+  it('keeps the stateful tab and primary rules above the window-wide button rule', () => {
+    // A specificity trap that already bit once. The window-wide chrome rule is
+    // `#woc-market-window button:not(.x-btn)`, and :not() carries its argument's
+    // specificity, making it (1,1,1). A plain `#woc-market-window .wm-tab-selected`
+    // is (1,1,0), so it LOSES however late it sits, and the selected tab silently
+    // stopped reading as selected: state a player navigates by, erased by a rule
+    // added to fix something else. Writing them as `button.<class>` ties the
+    // specificity so source order decides, and they come later.
+    const css = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
+    for (const cls of ['wm-tab', 'wm-tab-selected', 'wm-primary']) {
+      expect(css, `${cls} must be scoped as button.${cls}`).toContain(
+        `#woc-market-window button.${cls}`,
+      );
+      // And never as the bare class, which is the losing form.
+      expect(css.includes(`#woc-market-window .${cls} {`), `bare .${cls} rule loses`).toBe(false);
+    }
+    // Order still has to hold: the generic rule must come FIRST.
+    expect(css.indexOf('#woc-market-window button:not(.x-btn) {')).toBeLessThan(
+      css.indexOf('#woc-market-window button.wm-tab-selected'),
+    );
+  });
+
+  it('harvests the classes that exist ONLY inside an interpolated attribute', () => {
+    // Pins the hole itself closed. Each of these is reachable only through a
+    // `${...}` hole, so all four were invisible to the original regex.
+    expect(emitted()).toEqual(
+      expect.arrayContaining([
+        'wm-reserve-met',
+        'wm-reserve-not_met',
+        'wm-row-selected',
+        'wm-sell-selected',
+      ]),
+    );
+  });
+
+  it('has a rule in a shipped sheet for every emitted class', () => {
+    // Selector position only: the name must be followed by something that can
+    // continue a selector, so a bare word in a url() or a filename cannot count.
+    const styled = new Set(
+      Array.from(sheets.matchAll(/\.([A-Za-z][\w-]*)(?=[\s,:.#{>+~[)]|$)/g), (m) => m[1]),
+    );
+    const missing = emitted().filter((cls) => !styled.has(cls));
+    expect(missing, `emitted but never styled: ${missing.join(', ')}`).toEqual([]);
+  });
+
+  it('builds the header from the shared window-chrome family, not a bespoke one', () => {
+    // .panel-title + .x-btn + the close glyph are what every other window uses
+    // and the only close markup base.css styles; the invented .window-header /
+    // .window-close pair is what produced the unstyled header.
+    expect(painter).toContain('<div class="panel-title">');
+    expect(painter).toContain('class="x-btn" data-close');
+    expect(painter).toContain("svgIcon('close')");
+    // Matched as MARKUP, not as bare text: the painter's own comment names both
+    // retired classes to explain why they went away.
+    expect(painter).not.toContain('class="window-close"');
+    expect(painter).not.toContain('class="window-header"');
+  });
+
+  it('closes on the family data-close marker, not only its own data-action', () => {
+    // Switching the markup to the family without widening the delegated click
+    // selector would leave a close button that renders correctly and does
+    // nothing when clicked.
+    expect(painter).toContain('[data-action], [data-close], .wm-row-open, .wm-row');
+    expect(painter).toContain("target.hasAttribute('data-close')");
+  });
+});
+
+describe('woc_market_window: both game entries carry its root element', () => {
+  it('declares #woc-market-window in index.html AND play.html', () => {
+    // index.html and play.html both boot src/main.ts (src/CLAUDE.md), and the
+    // HUD resolves this window by id. play.html shipped without the element,
+    // so the whole exchange was unreachable on /play while looking fine on /.
+    for (const entry of ['index.html', 'play.html']) {
+      const html = readFileSync(new URL(`../${entry}`, import.meta.url), 'utf8');
+      expect(html, `${entry} is missing the window root`).toContain('id="woc-market-window"');
+    }
   });
 });

@@ -53,6 +53,12 @@ export class FakeWocMarketDb implements WocMarketDb {
   failNextEscrow: 'lease_lost' | 'cap_reached' | null = null;
   /** Every character save escrowInsertListing received, in order. */
   readonly escrowSaves: CharacterSaveArgs[] = [];
+  /** The durable book-once ledger (woc_market_custody_claims), exposed so
+   *  tests can assert claim/book/unclaim lifecycles directly. */
+  readonly custodyClaims = new Map<
+    string,
+    { realm: string; claimedAtMs: number; bookedAtMs: number | null }
+  >();
 
   private readonly characters: FakeWocMarketCharacter[];
   private readonly now: () => number;
@@ -181,7 +187,7 @@ export class FakeWocMarketDb implements WocMarketDb {
   async browseListings(
     realm: string,
     q: WocBrowseQuery,
-  ): Promise<{ rows: WocListingRow[]; total: number }> {
+  ): Promise<{ rows: WocListingRow[]; hasMore: boolean }> {
     const itemIds = q.itemIds && q.itemIds.length > 0 ? q.itemIds.slice(0, 50) : null;
     const matched = [...this.listings.values()].filter(
       (row) =>
@@ -200,13 +206,12 @@ export class FakeWocMarketDb implements WocMarketDb {
     });
     const pageSize = Math.min(Math.max(1, q.pageSize), 50);
     const offset = Math.max(0, q.page) * pageSize;
-    const rows = matched.slice(offset, offset + pageSize);
-    // Pg quirk mirrored: total comes from COUNT(*) OVER() on the returned
-    // page, so an empty page reports total 0 even when earlier pages exist.
-    return {
-      rows: rows.map((r) => this.listingOut(r)),
-      total: rows.length > 0 ? matched.length : 0,
-    };
+    // The Pg has-more PROBE mirrored: select one row past the page, report
+    // hasMore when it existed, and slice the page back to pageSize.
+    const probe = matched.slice(offset, offset + pageSize + 1);
+    const hasMore = probe.length > pageSize;
+    const rows = hasMore ? probe.slice(0, pageSize) : probe;
+    return { rows: rows.map((r) => this.listingOut(r)), hasMore };
   }
 
   async listingsBySeller(realm: string, account: number): Promise<WocListingRow[]> {
@@ -280,6 +285,53 @@ export class FakeWocMarketDb implements WocMarketDb {
       .sort(this.byTouch(this.listingTouchMs))
       .slice(0, limit)
       .map((r) => this.listingOut(r));
+  }
+
+  async strandedListings(
+    realm: string,
+    olderThanMs: number,
+    limit: number,
+  ): Promise<WocListingRow[]> {
+    // updated_at mirror: listingTouchMs is stamped by touchListing on every
+    // mutation, exactly where the Pg UPDATEs set updated_at = now().
+    return [...this.listings.values()]
+      .filter(
+        (row) =>
+          row.realm === realm &&
+          (row.status === 'ending' || row.status === 'settling') &&
+          (this.listingTouchMs.get(row.id) ?? 0) <= olderThanMs,
+      )
+      .sort(this.byTouch(this.listingTouchMs))
+      .slice(0, limit)
+      .map((r) => this.listingOut(r));
+  }
+
+  async reopenListing(id: number): Promise<void> {
+    const row = this.listings.get(id);
+    if (!row) return;
+    if (row.status === 'ending' || row.status === 'settling') {
+      row.status = 'active';
+      this.touchListing(id);
+    }
+  }
+
+  async claimCustodyRef(realm: string, custodyRef: string): Promise<boolean> {
+    // ON CONFLICT (custody_ref) DO NOTHING: only the FIRST claim inserts.
+    if (this.custodyClaims.has(custodyRef)) return false;
+    this.custodyClaims.set(custodyRef, { realm, claimedAtMs: this.now(), bookedAtMs: null });
+    return true;
+  }
+
+  async markCustodyRefBooked(custodyRef: string): Promise<void> {
+    const claim = this.custodyClaims.get(custodyRef);
+    if (claim && claim.bookedAtMs === null) claim.bookedAtMs = this.now();
+  }
+
+  async unclaimCustodyRef(custodyRef: string): Promise<void> {
+    // The Pg DELETE is guarded on booked_at IS NULL: a booked claim is the
+    // durable record of a delivered parcel and is never released.
+    const claim = this.custodyClaims.get(custodyRef);
+    if (claim && claim.bookedAtMs === null) this.custodyClaims.delete(custodyRef);
   }
 
   async markItemDisposed(id: number): Promise<void> {
@@ -455,9 +507,11 @@ export class FakeWocMarketDb implements WocMarketDb {
     if (bid && bid.bondState === 'pending') bid.bondState = 'held';
   }
 
-  async lapsePendingBids(cutoffMs: number, limit: number): Promise<number> {
+  async lapsePendingBids(realm: string, cutoffMs: number, limit: number): Promise<number> {
     const due = [...this.bids.values()]
-      .filter((bid) => bid.status === 'pending_bond' && bid.placedAtMs <= cutoffMs)
+      .filter(
+        (bid) => bid.realm === realm && bid.status === 'pending_bond' && bid.placedAtMs <= cutoffMs,
+      )
       .sort((a, b) => a.placedAtMs - b.placedAtMs || a.id - b.id)
       .slice(0, limit);
     for (const bid of due) {
@@ -582,6 +636,7 @@ export class FakeWocMarketDb implements WocMarketDb {
       quoteExpiresAtMs: null,
       txSignature: null,
       failReason: null,
+      settledAmountBase: null,
       deadlineAtMs: args.deadlineAtMs,
       createdAtMs: args.nowMs,
     };
@@ -616,11 +671,17 @@ export class FakeWocMarketDb implements WocMarketDb {
     return null;
   }
 
-  async setSettlementQuote(id: number, reference: string, expiresAtMs: number): Promise<boolean> {
+  async setSettlementQuote(
+    id: number,
+    reference: string,
+    expiresAtMs: number,
+    amountBase: string | null,
+  ): Promise<boolean> {
     const rec = this.settlements.get(id);
     if (!rec || rec.state !== 'offered') return false;
     rec.quoteReference = reference;
     rec.quoteExpiresAtMs = expiresAtMs;
+    rec.settledAmountBase = amountBase;
     this.touchSettlement(id);
     return true;
   }

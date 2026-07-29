@@ -34,6 +34,7 @@ import { formatDateTime, formatDuration, formatNumber, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
+import { svgIcon } from './ui_icons';
 import {
   buildWocMarketView,
   type WocMarketTab,
@@ -336,12 +337,16 @@ export class WocMarketWindow {
   }
 
   private html(model: WocMarketViewModel): string {
+    // The shared window-chrome family (.panel-title + .x-btn + the close glyph,
+    // the social/bank/report markup), not a bespoke header: the invented
+    // .window-header / .window-close classes matched no rule in any sheet, so
+    // the title and close button rendered as raw browser chrome.
     const header =
-      `<div class="window-header">` +
-      `<h2 id="woc-market-title">${esc(t('hudChrome.wocMarket.title'))}</h2>` +
-      `<button type="button" class="window-close" data-action="close" aria-label="${esc(
+      `<div class="panel-title">` +
+      `<span id="woc-market-title">${esc(t('hudChrome.wocMarket.title'))}</span>` +
+      `<button type="button" class="x-btn" data-close aria-label="${esc(
         t('hudChrome.wocMarket.close'),
-      )}">&times;</button></div>`;
+      )}" title="${esc(t('hudChrome.wocMarket.close'))}">${svgIcon('close')}</button></div>`;
     if (model.kind === 'unavailable') return header;
     if (model.kind === 'loading') {
       return `${header}<div class="wm-status">${esc(t('hudChrome.wocMarket.loading'))}</div>`;
@@ -864,11 +869,13 @@ export class WocMarketWindow {
 
   private onClick(e: Event): void {
     const target = (e.target as HTMLElement | null)?.closest<HTMLElement>(
-      '[data-action], .wm-row-open, .wm-row',
+      '[data-action], [data-close], .wm-row-open, .wm-row',
     );
     if (!target) return;
     const action = target.getAttribute('data-action');
-    if (action === 'close') {
+    // data-close is the family's close marker (social/bank/report all use it);
+    // the action arm stays for any future explicitly-actioned close.
+    if (action === 'close' || target.hasAttribute('data-close')) {
       this.close();
       return;
     }

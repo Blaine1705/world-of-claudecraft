@@ -34,6 +34,10 @@ const uniq = Date.now().toString(36).slice(-6);
 // Character names are letters only (2 to 16), so the name suffix maps digits
 // onto letters; usernames may keep the raw base36.
 const alpha = uniq.replace(/[0-9]/g, (d) => 'abcdefghij'[Number(d)]);
+// The TAIL of the base36 stamp, not the head: the leading digits are the coarse
+// ones (the 4th from the end only rolls over about once a minute), so slicing
+// from the front reused a name across reruns and the register returned 409.
+const nameSuffix = alpha.slice(-4);
 
 async function api(path, body, token, method = 'POST') {
   const res = await fetch(SERVER_URL + path, {
@@ -86,7 +90,7 @@ async function seedSellerListing() {
   await linkThrowawayWallet(token);
   const char = await api(
     '/api/characters',
-    { name: `Aurelia${alpha.slice(0, 4)}`, class: 'warrior' },
+    { name: `Aurelia${nameSuffix}`, class: 'warrior' },
     token,
   );
   if (char.status !== 200) throw new Error(`seller character failed: ${char.status}`);
@@ -278,12 +282,22 @@ async function openExchange(page) {
     { timeout: 15000, polling: 250 },
   );
   await sleep(1200);
-  const state = await page.evaluate(() => ({
-    win: document.querySelector('#woc-market-window')?.getAttribute('style') ?? 'missing',
-    body: (document.querySelector('#woc-market-window .wm-body')?.textContent ?? '').slice(0, 80),
-    uiStyle: document.querySelector('#ui')?.getAttribute('style') ?? 'none-attr',
-    uiHidden: document.querySelector('#ui')?.hasAttribute('hidden') ?? 'no-el',
-  }));
+  const state = await page.evaluate(() => {
+    const win = document.querySelector('#woc-market-window');
+    const rect = win?.getBoundingClientRect();
+    return {
+      win: win?.getAttribute('style') ?? 'missing',
+      body: (document.querySelector('#woc-market-window .wm-body')?.textContent ?? '').slice(0, 80),
+      uiStyle: document.querySelector('#ui')?.getAttribute('style') ?? 'none-attr',
+      uiHidden: document.querySelector('#ui')?.hasAttribute('hidden') ?? 'no-el',
+      // The layout facts a screenshot cannot tell apart: a window wider than the
+      // viewport looks identical to a correctly-sized one that the capture clipped.
+      rect: rect ? `${Math.round(rect.left)},${Math.round(rect.width)}` : 'no-rect',
+      viewport: `${window.innerWidth}x${window.innerHeight}`,
+      uiScale: getComputedStyle(document.documentElement).getPropertyValue('--ui-scale').trim(),
+      mobileTouch: document.body.classList.contains('mobile-touch'),
+    };
+  });
   console.log('exchange state:', JSON.stringify(state));
 }
 
@@ -295,6 +309,11 @@ async function shoot(page, file, clip) {
     const confirm = document.querySelector('.camera-prompt-confirm');
     if (confirm instanceof HTMLElement) confirm.click();
     document.querySelector('button.tut-skip')?.click();
+    // The index-only Discord CTA banner floats over the top of the viewport and
+    // sat across the window header in the first captures. It ships on / but not
+    // on /play, so hiding it is the honest framing of the window itself.
+    const cta = document.getElementById('discord-cta-banner');
+    if (cta !== null) cta.hidden = true;
     return confirm !== null;
   });
   if (dismissed) await sleep(500);
@@ -320,7 +339,7 @@ async function main() {
   await page.setViewport({ width: 1600, height: 1000 });
   await enterWorldInBrowser(page, {
     username: buyer.username,
-    charName: `Bramble${alpha.slice(0, 4)}`,
+    charName: `Bramble${nameSuffix}`,
     cls: 'rogue',
   });
   // An epic in the buyer's own bags gives the Sell tab a real row.
@@ -361,16 +380,21 @@ async function main() {
   await mobile.setViewport({ width: 1280, height: 800 });
   await enterWorldInBrowser(mobile, {
     username: mob.username,
-    charName: `Wren${alpha.slice(0, 4)}`,
+    charName: `Wren${nameSuffix}`,
     cls: 'mage',
   });
+  // Puppeteer's OWN setViewport, not a raw Emulation.setDeviceMetricsOverride.
+  // A raw CDP override is invisible to puppeteer, and page.screenshot re-asserts
+  // the metrics it believes in before capturing: the layout snapped back to
+  // 1280 wide and the clip then cropped the top-left of a desktop-width window,
+  // which looks exactly like a window overflowing its viewport. The logged rect
+  // vs viewport pair below is what caught it.
+  // No isMobile/hasTouch here: flipping either makes puppeteer RELOAD the page,
+  // which throws away the entered world (window.__game) this flow then drives.
+  // The mobile sheet keys on the body.mobile-touch class, set below, so the
+  // metrics alone are what the viewport has to supply.
+  await mobile.setViewport({ width: 915, height: 412, deviceScaleFactor: 2 });
   const client = await mobile.createCDPSession();
-  await client.send('Emulation.setDeviceMetricsOverride', {
-    width: 915,
-    height: 412,
-    deviceScaleFactor: 2,
-    mobile: true,
-  });
   await client.send('Emulation.setTouchEmulationEnabled', { enabled: true });
   await mobile.evaluate(() => {
     document.body.classList.add('mobile-touch');
@@ -378,8 +402,8 @@ async function main() {
   });
   await sleep(1500);
   await openExchange(mobile);
-  // CDP screenshots shoot the WINDOW, not the emulated viewport: clip.
-  await shoot(mobile, 'after-mobile-browse.png', { x: 0, y: 0, width: 915, height: 412 });
+  // No clip: the viewport IS the frame now that puppeteer owns the metrics.
+  await shoot(mobile, 'after-mobile-browse.png', null);
   await mobile.close();
 
   await browser.close();

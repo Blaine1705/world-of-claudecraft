@@ -80,6 +80,73 @@ describe('mailSystemParcel', () => {
   });
 });
 
+describe('mailSystemParcel refuses rather than booking an empty letter', () => {
+  // The escrowed copy is GONE from the seller's bags by the time a parcel is
+  // booked, so a letter that silently carries nothing is a destroyed item. The
+  // boolean is the only signal the custodian has: it releases its claim on
+  // false so the item stays visibly held and a later sweep retries.
+  it('returns false and books NOTHING when no offered slot survives validation', () => {
+    const sim = makeWorld();
+    const booked = sim.postOffice.mailSystemParcel(
+      { key: '77', name: 'Buyer' },
+      WOC_MARKET_DELIVERY_LETTER,
+      [{ itemId: 'no_such_item_id', count: 1 }],
+    );
+    expect(booked).toBe(false);
+    // Not merely "no attachment": no letter at all. A booked-but-empty letter
+    // is what marks a settlement delivered against nothing.
+    expect(sim.postOffice.mail).toHaveLength(0);
+  });
+
+  it.each([
+    ['a count of zero', 0],
+    ['a fractional count', 0.5],
+    ['a negative count', -1],
+  ])('refuses %s, which cannot describe a real item', (_label, count) => {
+    const sim = makeWorld();
+    const booked = sim.postOffice.mailSystemParcel(
+      { key: '77', name: 'Buyer' },
+      WOC_MARKET_DELIVERY_LETTER,
+      [{ itemId: 'rusty_hatchet', count }],
+    );
+    expect(booked).toBe(false);
+    expect(sim.postOffice.mail).toHaveLength(0);
+  });
+
+  it('books the surviving slots and drops only the invalid one', () => {
+    const sim = makeWorld();
+    const booked = sim.postOffice.mailSystemParcel(
+      { key: '77', name: 'Buyer' },
+      WOC_MARKET_DELIVERY_LETTER,
+      [
+        { itemId: 'no_such_item_id', count: 1 },
+        { itemId: 'rusty_hatchet', count: 1 },
+      ],
+    );
+    // A partial survivor still books: the alternative would strand a real item
+    // because an unrelated slot was malformed.
+    expect(booked).toBe(true);
+    const letter = sim.postOffice.mail.find(
+      (m) => m.letterId === WOC_MARKET_DELIVERY_LETTER.letterId,
+    );
+    expect(letter?.items.map((s) => s.itemId)).toEqual(['rusty_hatchet']);
+  });
+
+  it('still books a goods-free notice, which legitimately carries no items', () => {
+    // The sold_notice arm passes an empty list on purpose, so "nothing booked"
+    // must NOT be read as a refusal when nothing was offered.
+    const sim = makeWorld();
+    const booked = sim.postOffice.mailSystemParcel(
+      { key: '77', name: 'Seller' },
+      WOC_MARKET_RETURN_LETTER,
+      [],
+    );
+    expect(booked).toBe(true);
+    expect(sim.postOffice.mail).toHaveLength(1);
+    expect(sim.postOffice.mail[0].items).toEqual([]);
+  });
+});
+
 describe('custodyRef book-once dedupe', () => {
   it('books a referenced parcel once and refuses the duplicate', () => {
     const sim = makeWorld();

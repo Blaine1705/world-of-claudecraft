@@ -9,8 +9,13 @@
 // extension and its cap, the sweep's close / settle / expire / cascade /
 // return arms, buy-now locking over a standing auction, crash-safe delivery
 // reconciliation (book-once by custodyRef), and the admin suspension
-// teardown. Every scenario asserts BOTH the returned values and the resulting
-// fake-db/custody state.
+// teardown. Also the fail-closed and recovery arms either side of those: quote
+// expiry and signature replay on both the bond and the settlement leg, the
+// seller cancel ladder, the abandoned buy-now lock, the guard ALLOW arms
+// (lapsed suspension, unreadable balance), stranded-listing reclaim, the
+// durable custody claim ledger, and the account-scoped owned loaders behind
+// the requireOwned 404. Every scenario asserts BOTH the returned values and
+// the resulting fake-db/custody state.
 
 import { describe, expect, it } from 'vitest';
 import type {
@@ -39,6 +44,7 @@ import {
   WOC_MARKET_QUOTE_TTL_SECONDS,
   WOC_MARKET_RESTRICTED_POLICY,
   WOC_MARKET_SETTLEMENT_WINDOW_SECONDS,
+  WOC_MARKET_STRANDED_RECLAIM_SECONDS,
 } from '../../server/woc_market_rules';
 import { ITEMS } from '../../src/sim/data';
 import type { ExtractRef } from '../../src/sim/inventory_extract';
@@ -85,6 +91,10 @@ class FakeCustody implements WocMarketCustody {
   readonly owners = new Map<number, number>();
   readonly names = new Map<number, string>();
   readonly parcels: BookedParcel[] = [];
+  /** Every persistMailParcel ATTEMPT's custodyRef, failures included: the
+   *  durable-claim tests assert on call counts, because the fake's own
+   *  book-once dedupe below would mask a second booking in `parcels`. */
+  readonly persistCalls: string[] = [];
   /** Throw ONCE on the next persistMailParcel (the crash-retry scenario). */
   failNextPersist = false;
 
@@ -118,6 +128,7 @@ class FakeCustody implements WocMarketCustody {
     items: InvSlot[],
     custodyRef: string,
   ): Promise<void> {
+    this.persistCalls.push(custodyRef);
     if (this.failNextPersist) {
       this.failNextPersist = false;
       throw new Error('persist failed');
@@ -471,6 +482,74 @@ describe('createListing', () => {
   });
 });
 
+describe('cancelListing', () => {
+  it('closes an unbid listing as cancelled and mails the escrowed copy home', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const res = await h.service.cancelListing(SELLER, listing.id);
+    expect(res).toEqual({ ok: true });
+    const row = await getListing(h, listing.id);
+    expect(row.status).toBe('closed');
+    expect(row.resolution).toBe('cancelled');
+    expect(row.itemDisposed).toBe(true);
+    // Escrow-by-removal: the copy comes back as a durable mail parcel, never
+    // straight into the live bags (the seller may be offline or elsewhere).
+    expect(bagsOf(h, SELLER_CHAR).map((s) => s.itemId)).toEqual([RARE_ITEM]);
+    expect(h.custody.parcels).toEqual([
+      {
+        recipientKey: String(SELLER_CHAR),
+        letter: 'return',
+        items: [expect.objectContaining({ itemId: EPIC_ITEM })],
+        custodyRef: listingReturnCustodyRef(listing.id),
+      },
+    ]);
+    expect(h.db.custodyClaims.get(listingReturnCustodyRef(listing.id))?.bookedAtMs).toBe(BASE_MS);
+  });
+
+  it('refuses has_bids once a bond has been confirmed against the listing', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const standing = await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    // Cancelling under a standing bid would let a seller walk away from a price
+    // they no longer like while the bidder's bond sits held.
+    const res = await h.service.cancelListing(SELLER, listing.id);
+    expect(res).toEqual({ ok: false, reason: 'has_bids' });
+    const row = await getListing(h, listing.id);
+    expect(row.status).toBe('active');
+    expect(row.resolution).toBeNull();
+    expect(row.itemDisposed).toBe(false);
+    expect(row.currentBidId).toBe(standing.bidId);
+    expect(h.custody.parcels).toHaveLength(0);
+  });
+
+  it('refuses not_yours for an account that does not own the listing', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    // Cancel is the one seller verb that disposes of custody, so a foreign
+    // account reaching it would be an item-theft primitive.
+    const res = await h.service.cancelListing(BUYER_A, listing.id);
+    expect(res).toEqual({ ok: false, reason: 'not_yours' });
+    const row = await getListing(h, listing.id);
+    expect(row.status).toBe('active');
+    expect(row.resolution).toBeNull();
+    expect(row.itemDisposed).toBe(false);
+    expect(h.custody.parcels).toHaveLength(0);
+  });
+
+  it('refuses not_active on a second cancel and books no second return', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    expect(await h.service.cancelListing(SELLER, listing.id)).toEqual({ ok: true });
+    // A retried cancel (double click, replayed request) must not mint a second
+    // return flight: that is one escrowed copy delivered twice.
+    const again = await h.service.cancelListing(SELLER, listing.id);
+    expect(again).toEqual({ ok: false, reason: 'not_active' });
+    expect((await getListing(h, listing.id)).resolution).toBe('cancelled');
+    expect(h.custody.persistCalls).toEqual([listingReturnCustodyRef(listing.id)]);
+    expect(h.custody.parcels).toHaveLength(1);
+  });
+});
+
 describe('placeBid', () => {
   it('returns the pending bid plus a dev bond intent and stores the bond reference', async () => {
     const h = makeHarness();
@@ -579,6 +658,44 @@ describe('placeBid', () => {
     expect(await h.db.termsAcceptedAt(BUYER_A)).toBe(BASE_MS);
   });
 
+  it('refuses already_pending for a second bid from one account, per account not per listing', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const first = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    // One unconfirmed bond per account per listing. Stacking pending bids would
+    // issue a second bond quote for a seat the account already holds, so a
+    // bidder could hold two bonds against one auction.
+    const stacked = await placeBid(h, {
+      account: BUYER_A,
+      characterId: CHAR_A,
+      listingId: listing.id,
+      amountCents: 7000,
+    });
+    expect(stacked).toEqual({ ok: false, reason: 'already_pending' });
+    const mine = (await h.db.bidsForListing(listing.id)).filter((b) => b.account === BUYER_A);
+    expect(mine.map((b) => b.amountCents)).toEqual([5000]);
+    expect((await getBid(h, first.bid.id)).status).toBe('pending_bond');
+    // The block is scoped to the account: a rival still gets their own seat.
+    const rival = await placeBid(h, {
+      account: BUYER_B,
+      characterId: CHAR_B,
+      listingId: listing.id,
+      amountCents: 5500,
+    });
+    expect(rival.ok).toBe(true);
+    expect(await h.db.bidsForListing(listing.id)).toHaveLength(2);
+    // Neither bond is confirmed, so nothing stands on the listing yet.
+    expect((await getListing(h, listing.id)).currentBidId).toBeNull();
+  });
+
   it('enforces TOTP at the threshold: missing code, unenrolled account, bad code, good code', async () => {
     const h = makeHarness();
     const listing = await listEpic(h);
@@ -637,6 +754,73 @@ describe('placeBid', () => {
     expect(exact.ok).toBe(true);
   });
 
+  it('refuses insufficient_balance when the wallet balance read is unavailable', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    // The chain read degrades to null instead of throwing (the graceful
+    // degradation contract), and the gate must read that as "cannot tell", never
+    // as "rich enough": otherwise every RPC outage opens bidding to empty
+    // wallets, and the bond is the only thing left holding the auction honest.
+    h.balances.delete('wallet-a');
+    const res = await placeBid(h, {
+      account: BUYER_A,
+      characterId: CHAR_A,
+      listingId: listing.id,
+      amountCents: 5000,
+    });
+    expect(res).toEqual({ ok: false, reason: 'insufficient_balance' });
+    expect(await h.db.bidsForListing(listing.id)).toHaveLength(0);
+    expect((await getListing(h, listing.id)).currentBidCents).toBeNull();
+  });
+
+  it('refuses market_paused when the token estimate is unavailable under a healthy price', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    // Price healthy but the estimate leg unreadable: the gate has no required
+    // token figure to compare the balance against, so it pauses rather than
+    // skipping the comparison and admitting the bid unchecked.
+    const noEstimate: WocMarketEconomy = {
+      ...h.economy,
+      estimate: async (usdCents) => ({
+        available: false,
+        usdCents,
+        amount: null,
+        asOfMs: null,
+      }),
+    };
+    const paused = new WocMarketService({ ...h.deps, economy: noEstimate });
+    // The premise, so this pins the BALANCE gate and not the pre-gate that
+    // shares the reason: the oracle itself is healthy here.
+    expect((await paused.status()).price).toMatchObject({ available: true, healthy: true });
+    const res = await paused.placeBid({
+      account: BUYER_A,
+      characterId: CHAR_A,
+      listingId: listing.id,
+      amountCents: 5000,
+      totpCode: null,
+      acceptTerms: true,
+    });
+    expect(res).toEqual({ ok: false, reason: 'market_paused' });
+    expect(await h.db.bidsForListing(listing.id)).toHaveLength(0);
+  });
+
+  it('refuses insufficient_balance when the wallet covers the bid but not its bond', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    // The gate prices bid PLUS bond (5000 + 250 cents = 52,500 dev tokens); a
+    // wallet holding only the 50,000 for the bid itself could never post the
+    // bond that backs the seat.
+    h.balances.set('wallet-a', 50_000);
+    const res = await placeBid(h, {
+      account: BUYER_A,
+      characterId: CHAR_A,
+      listingId: listing.id,
+      amountCents: 5000,
+    });
+    expect(res).toEqual({ ok: false, reason: 'insufficient_balance' });
+    expect(await h.db.bidsForListing(listing.id)).toHaveLength(0);
+  });
+
   it('refuses account_suspended while a strike suspension is in force', async () => {
     const h = makeHarness();
     const listing = await listEpic(h);
@@ -648,6 +832,66 @@ describe('placeBid', () => {
       amountCents: 5000,
     });
     expect(res).toEqual({ ok: false, reason: 'account_suspended' });
+  });
+
+  it('allows a bid once the strike suspension has run out, keeping the strike row', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    await h.db.addStrike(BUYER_A, BASE_MS + HOUR_MS);
+    // The hold ends AT its own timestamp. A suspension that outlived it would be
+    // a permanent bidding ban the progressive strike ladder never intended.
+    h.setNow(BASE_MS + HOUR_MS);
+    const res = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    expect(res.bid.status).toBe('pending_bond');
+    expect(res.bid.bondState).toBe('pending');
+    // Serving the bid does not forgive the ladder: the next default escalates
+    // from strike 1, not from zero.
+    expect(await h.db.strikeInfo(BUYER_A)).toEqual({
+      accountId: BUYER_A,
+      strikes: 1,
+      suspendedUntilMs: BASE_MS + HOUR_MS,
+    });
+  });
+
+  it('allows bidders with no strike row and with a strike carrying no suspension', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    // The absent-row shape: a clean account has no strikes row at all, and
+    // reading that as a suspension would close the marketplace to everyone.
+    expect(await h.db.strikeInfo(BUYER_A)).toBeNull();
+    const clean = await placeBid(h, {
+      account: BUYER_A,
+      characterId: CHAR_A,
+      listingId: listing.id,
+      amountCents: 5000,
+    });
+    expect(clean.ok).toBe(true);
+    // A first default records a strike with a NULL suspension
+    // (strikeSuspensionMs(1) is 0), so the null must read as "no hold in force"
+    // rather than as an open-ended one.
+    await h.db.addStrike(BUYER_C, null);
+    expect(await h.db.strikeInfo(BUYER_C)).toEqual({
+      accountId: BUYER_C,
+      strikes: 1,
+      suspendedUntilMs: null,
+    });
+    const struck = await placeBid(h, {
+      account: BUYER_C,
+      characterId: CHAR_C,
+      listingId: listing.id,
+      amountCents: 5000,
+    });
+    expect(struck.ok).toBe(true);
+    const accounts = (await h.db.bidsForListing(listing.id)).map((b) => b.account);
+    expect([...accounts].sort((a, b) => a - b)).toEqual([BUYER_A, BUYER_C]);
   });
 
   it('refuses disabled when the feature flag is off', async () => {
@@ -782,6 +1026,104 @@ describe('confirmBond', () => {
     const row = await getListing(h, listing.id);
     expect(row.currentBidCents).toBe(7000);
     expect(row.currentBidId).toBe(higher.bid.id);
+  });
+
+  it('refuses quote_expired past the bond quote TTL, then stands the bid on a refreshed quote', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    // A signature against a dead quote is unpriceable: the token amount the
+    // bidder authorized is no longer what the bond is worth, so accepting it
+    // would hold the wrong amount against the seat.
+    h.setNow(BASE_MS + WOC_MARKET_QUOTE_TTL_SECONDS * 1000);
+    const stale = await h.service.confirmBond(BUYER_A, placed.bid.id, 'sig-stale-bond');
+    expect(stale).toEqual({ ok: false, reason: 'quote_expired' });
+    const pending = await getBid(h, placed.bid.id);
+    expect(pending.status).toBe('pending_bond');
+    expect(pending.bondState).toBe('pending');
+    const untouched = await getListing(h, listing.id);
+    expect(untouched.currentBidId).toBeNull();
+    expect(untouched.currentBidCents).toBeNull();
+    // The refusal is recoverable, not terminal: the seat survives inside the
+    // bond TTL and a fresh quote confirms it.
+    const refreshed = unwrap(
+      await h.service.refreshBondQuote(BUYER_A, placed.bid.id),
+      'refreshBondQuote',
+    );
+    expect(refreshed.bond.reference).not.toBe(placed.bond.reference);
+    const confirmed = unwrap(
+      await h.service.confirmBond(BUYER_A, placed.bid.id, 'sig-fresh-bond'),
+      'confirmBond',
+    );
+    expect(confirmed.standing).toBe(true);
+    expect((await getBid(h, placed.bid.id)).bondState).toBe('held');
+    expect((await getListing(h, listing.id)).currentBidId).toBe(placed.bid.id);
+  });
+
+  it('refuses not_pending when the same bond signature is presented a second time', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const first = unwrap(
+      await h.service.confirmBond(BUYER_A, placed.bid.id, 'sig-one-bond'),
+      'confirmBond',
+    );
+    expect(first.standing).toBe(true);
+    // One signed transfer is one hold. A retried request or a double-clicked
+    // wallet replays the same signature, and the pending-state check is what
+    // stops it re-running hold-and-activate (the transfer's own uniqueness is
+    // the memo reference, which the economy service owns).
+    const replay = await h.service.confirmBond(BUYER_A, placed.bid.id, 'sig-one-bond');
+    expect(replay).toEqual({ ok: false, reason: 'not_pending' });
+    const bid = await getBid(h, placed.bid.id);
+    expect(bid.status).toBe('active');
+    expect(bid.bondState).toBe('held');
+    const row = await getListing(h, listing.id);
+    expect(row.currentBidId).toBe(placed.bid.id);
+    expect(row.currentBidCents).toBe(5000);
+    // No bond churn either: the replay owes neither a refund nor a forfeit.
+    expect(await h.db.bondsDue(REALM, 10)).toHaveLength(0);
+  });
+
+  it('refuses not_pending for a bid whose bond lapsed before the signature arrived', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    h.setNow(BASE_MS + WOC_MARKET_BOND_PENDING_TTL_SECONDS * 1000);
+    await h.service.sweepPass();
+    expect((await getBid(h, placed.bid.id)).status).toBe('lapsed');
+    // A lapsed seat is gone for good: re-animating it on a late signature would
+    // insert a stale amount ahead of bidders who placed after the lapse.
+    const late = await h.service.confirmBond(BUYER_A, placed.bid.id, 'sig-late-bond');
+    expect(late).toEqual({ ok: false, reason: 'not_pending' });
+    const bid = await getBid(h, placed.bid.id);
+    expect(bid.status).toBe('lapsed');
+    expect(bid.bondState).toBe('void');
+    expect((await getListing(h, listing.id)).currentBidId).toBeNull();
   });
 });
 
@@ -977,6 +1319,87 @@ describe('settlement happy path', () => {
   });
 });
 
+describe('settlement quote expiry and signature reuse', () => {
+  it('refuses quote_expired when the settlement quote died inside a still-live window', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const standing = await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    const sweepAt = listing.endsAtMs + 1;
+    h.setNow(sweepAt);
+    await h.service.sweepPass();
+    const settlement = await liveSettlement(h, listing.id);
+    unwrap(await h.service.settlementQuote(BUYER_A, settlement.id), 'settlementQuote');
+    // The quote (90s) dies long before the settlement window (600s), so the
+    // winner still has time to re-quote. Honouring the stale signature would
+    // settle at a token amount the oracle no longer stands behind, which is a
+    // direct transfer of the price move onto the seller.
+    h.setNow(sweepAt + WOC_MARKET_QUOTE_TTL_SECONDS * 1000);
+    const res = await h.service.confirmSettlement(BUYER_A, settlement.id, 'sig-stale-settle');
+    expect(res).toEqual({ ok: false, reason: 'quote_expired' });
+    const after = await getSettlement(h, settlement.id);
+    expect(after.state).toBe('offered');
+    expect(after.txSignature).toBeNull();
+    expect(await h.db.salesForItem(REALM, EPIC_ITEM, 10)).toHaveLength(0);
+    const row = await getListing(h, listing.id);
+    expect(row.status).toBe('settling');
+    expect(row.itemDisposed).toBe(false);
+    expect(h.custody.parcels).toHaveLength(0);
+    // The winner keeps their seat: the bond stays held against the live offer,
+    // neither forfeited nor refunded by a refused confirmation.
+    const bid = await getBid(h, standing.bidId);
+    expect(bid.status).toBe('won');
+    expect(bid.bondState).toBe('held');
+  });
+
+  it('refuses signature_reused when one transfer is replayed on a second settlement', async () => {
+    const h = makeHarness();
+    // Two escrowed copies, because the replay only matters ACROSS settlements:
+    // the tx_signature uniqueness is what stops one paid transfer from claiming
+    // two items.
+    h.custody.bags.set(SELLER_CHAR, [
+      { itemId: EPIC_ITEM, count: 1 },
+      { itemId: EPIC_ITEM, count: 1 },
+    ]);
+    const paidListing = await listEpic(h);
+    const replayListing = await listEpic(h);
+    await confirmedBid(h, BUYER_A, CHAR_A, paidListing.id, 5000);
+    const replayBid = await confirmedBid(h, BUYER_A, CHAR_A, replayListing.id, 5000);
+    h.setNow(paidListing.endsAtMs + 1);
+    await h.service.sweepPass();
+    const paid = await liveSettlement(h, paidListing.id);
+    const replay = await liveSettlement(h, replayListing.id);
+
+    unwrap(await h.service.settlementQuote(BUYER_A, paid.id), 'settlementQuote');
+    const settled = unwrap(
+      await h.service.confirmSettlement(BUYER_A, paid.id, 'sig-one-transfer'),
+      'confirmSettlement',
+    );
+    expect(settled.state).toBe('delivered');
+
+    unwrap(await h.service.settlementQuote(BUYER_A, replay.id), 'settlementQuote');
+    const res = await h.service.confirmSettlement(BUYER_A, replay.id, 'sig-one-transfer');
+    expect(res).toEqual({ ok: false, reason: 'signature_reused' });
+    const stillOffered = await getSettlement(h, replay.id);
+    expect(stillOffered.state).toBe('offered');
+    expect(stillOffered.txSignature).toBeNull();
+    // The stamped quote survives the refusal, so the buyer can retry with a real
+    // transfer inside the same window.
+    expect(stillOffered.quoteReference).not.toBeNull();
+    // Exactly one sale, for the settlement that actually paid.
+    const sales = await h.db.salesForItem(REALM, EPIC_ITEM, 10);
+    expect(sales.map((s) => s.listingId)).toEqual([paidListing.id]);
+    const row = await getListing(h, replayListing.id);
+    expect(row.status).toBe('settling');
+    expect(row.itemDisposed).toBe(false);
+    // One delivery only: the second copy is still in escrow.
+    const deliveries = h.custody.parcels.filter((p) => p.letter === 'delivery');
+    expect(deliveries.map((p) => p.custodyRef)).toEqual([settlementCustodyRef(paid.id)]);
+    const bid = await getBid(h, replayBid.bidId);
+    expect(bid.status).toBe('won');
+    expect(bid.bondState).toBe('held');
+  });
+});
+
 describe('settlement expiry', () => {
   it('expires an unpaid settlement: defaulted winner, forfeited bond, one strike, unsettled return', async () => {
     const h = makeHarness();
@@ -1112,6 +1535,60 @@ describe('buy now', () => {
       custodyRef: settlementCustodyRef(buy.settlement.id),
     });
   });
+
+  it('lapses an abandoned buy-now lock on the sweep and leaves the auction live', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h, { format: 'auction_buy_now', buyNowCents: 8000 });
+    const buy = unwrap(
+      await h.service.buyNow({
+        account: BUYER_B,
+        characterId: CHAR_B,
+        listingId: listing.id,
+        totpCode: null,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    // The holder walked away without ever signing. A lock that outlives its
+    // deadline takes the listing off the market for good while the auction clock
+    // keeps running down, so the item resolves with nobody able to buy it.
+    h.setNow(BASE_MS + WOC_MARKET_BUY_NOW_LOCK_SECONDS * 1000);
+    await h.service.sweepPass();
+    const lapsed = await getSettlement(h, buy.settlement.id);
+    expect(lapsed.state).toBe('expired');
+    expect(lapsed.failReason).toBe('window_elapsed');
+    const row = await getListing(h, listing.id);
+    expect(row.status).toBe('active');
+    expect(row.buyNowLockAccount).toBeNull();
+    expect(row.buyNowLockExpiresMs).toBeNull();
+    expect(row.itemDisposed).toBe(false);
+    // No bid and no bond was ever at risk, so an abandoned buy-now earns no
+    // strike: the strike ladder punishes defaulting WINNERS.
+    expect(await h.db.strikeInfo(BUYER_B)).toBeNull();
+    expect(await h.db.salesForItem(REALM, EPIC_ITEM, 10)).toHaveLength(0);
+    expect(h.custody.parcels).toHaveLength(0);
+    // Still biddable AND still buyable: the next buyer takes a fresh lock.
+    const bid = await placeBid(h, {
+      account: BUYER_A,
+      characterId: CHAR_A,
+      listingId: listing.id,
+      amountCents: 5000,
+    });
+    expect(bid.ok).toBe(true);
+    const next = unwrap(
+      await h.service.buyNow({
+        account: BUYER_C,
+        characterId: CHAR_C,
+        listingId: listing.id,
+        totpCode: null,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    expect(next.settlement.buyerAccount).toBe(BUYER_C);
+    expect(next.settlement.amountCents).toBe(8000);
+    expect((await getListing(h, listing.id)).buyNowLockAccount).toBe(BUYER_C);
+  });
 });
 
 describe('crash reconciliation', () => {
@@ -1140,6 +1617,100 @@ describe('crash reconciliation', () => {
     const row = await getListing(h, listing.id);
     expect(row.resolution).toBe('sold');
     expect(row.itemDisposed).toBe(true);
+  });
+});
+
+describe('stranded listing reclaim', () => {
+  it('reopens a listing stuck in ending past the grace so the close arm resolves it', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    h.setNow(listing.endsAtMs + 1);
+    // A worker claimed the due listing and died before resolving it. Nothing
+    // else can reach an 'ending' row (claimDueListings only selects 'active'),
+    // so without the reclaim the escrowed copy is stranded forever.
+    const claimed = await h.db.claimDueListings(REALM, h.now(), 10);
+    expect(claimed.map((r) => r.id)).toEqual([listing.id]);
+    expect((await getListing(h, listing.id)).status).toBe('ending');
+
+    h.setNow(listing.endsAtMs + 1 + WOC_MARKET_STRANDED_RECLAIM_SECONDS * 1000);
+    const stats = await h.service.sweepPass();
+    expect(stats?.reclaimed).toBe(1);
+    expect(stats?.closed).toBe(1);
+    const row = await getListing(h, listing.id);
+    expect(row.status).toBe('closed');
+    expect(row.resolution).toBe('no_bids');
+    expect(row.itemDisposed).toBe(true);
+    expect(h.custody.parcels.map((p) => p.custodyRef)).toEqual([
+      listingReturnCustodyRef(listing.id),
+    ]);
+  });
+
+  it('leaves a mid-resolution listing alone one millisecond inside the grace', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    h.setNow(listing.endsAtMs + 1);
+    await h.db.claimDueListings(REALM, h.now(), 10);
+    // One millisecond short of the grace. Reclaiming early would race a worker
+    // that is still resolving the row and resolve the same auction twice.
+    h.setNow(listing.endsAtMs + WOC_MARKET_STRANDED_RECLAIM_SECONDS * 1000);
+    const stats = await h.service.sweepPass();
+    expect(stats?.reclaimed).toBe(0);
+    const row = await getListing(h, listing.id);
+    expect(row.status).toBe('ending');
+    expect(row.resolution).toBeNull();
+    expect(row.itemDisposed).toBe(false);
+    expect(h.custody.parcels).toHaveLength(0);
+  });
+});
+
+describe('custody book-once claims', () => {
+  it('releases the claim when a booking fails and books exactly once on the retry', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    expect(await h.service.adminSuspendListing(listing.id)).toEqual({ ok: true });
+    const ref = listingReturnCustodyRef(listing.id);
+    // The mail persist fails after the claim landed. If the claim survived, the
+    // ref would look booked forever and the escrowed copy would never fly home.
+    h.custody.failNextPersist = true;
+    await h.service.sweepPass();
+    expect(h.custody.persistCalls).toEqual([ref]);
+    expect(h.custody.parcels).toHaveLength(0);
+    expect(h.db.custodyClaims.has(ref)).toBe(false);
+    expect((await getListing(h, listing.id)).itemDisposed).toBe(false);
+
+    await h.service.sweepPass();
+    // Two ATTEMPTS, one booking: the ledger is what makes the retry safe.
+    expect(h.custody.persistCalls).toEqual([ref, ref]);
+    expect(h.custody.parcels).toEqual([
+      {
+        recipientKey: String(SELLER_CHAR),
+        letter: 'return',
+        items: [expect.objectContaining({ itemId: EPIC_ITEM })],
+        custodyRef: ref,
+      },
+    ]);
+    expect(h.db.custodyClaims.get(ref)?.bookedAtMs).toBe(BASE_MS);
+    expect((await getListing(h, listing.id)).itemDisposed).toBe(true);
+  });
+
+  it('never re-mails a custody ref a previous pass already booked', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    await h.service.adminSuspendListing(listing.id);
+    const ref = listingReturnCustodyRef(listing.id);
+    // A previous pass booked and persisted the parcel but died before marking
+    // the item disposed, so the backlog still holds this listing. The Postgres
+    // claim (not the mail blob, which a player can delete) is the authority that
+    // keeps the reconciliation from mailing the copy a second time.
+    expect(await h.db.claimCustodyRef(REALM, ref)).toBe(true);
+    await h.db.markCustodyRefBooked(ref);
+    h.setNow(BASE_MS + 60_000);
+    await h.service.sweepPass();
+    expect(h.custody.persistCalls).toEqual([]);
+    expect(h.custody.parcels).toHaveLength(0);
+    expect(h.db.custodyClaims.get(ref)?.bookedAtMs).toBe(BASE_MS);
+    // The flight still settles: the listing leaves the backlog.
+    expect((await getListing(h, listing.id)).itemDisposed).toBe(true);
   });
 });
 
@@ -1207,5 +1778,61 @@ describe('adminSuspendListing', () => {
       }),
     ]);
     expect((await getBid(h, standing.bidId)).bondState).toBe('refunded');
+  });
+});
+
+describe('owned loaders (the requireOwned 404 seam)', () => {
+  it('ownedListing resolves for the seller and returns null for a foreign or absent id', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const mine = await h.service.ownedListing(SELLER, listing.id);
+    expect(mine).not.toBeNull();
+    expect(mine?.id).toBe(listing.id);
+    expect(mine?.sellerAccount).toBe(SELLER);
+    // Both misses return the SAME null, which is what lets the middleware answer
+    // 404 either way: a distinguishable "exists but not yours" would turn the
+    // seller endpoints into a listing-id enumeration oracle.
+    expect(await h.service.ownedListing(BUYER_A, listing.id)).toBeNull();
+    expect(await h.service.ownedListing(SELLER, listing.id + 999)).toBeNull();
+  });
+
+  it('ownedBid resolves for the bidder and returns null for a foreign or absent id', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    const mine = await h.service.ownedBid(BUYER_A, placed.bid.id);
+    expect(mine).not.toBeNull();
+    expect(mine?.id).toBe(placed.bid.id);
+    expect(mine?.account).toBe(BUYER_A);
+    expect(mine?.amountCents).toBe(5000);
+    // A rival must not be able to read (or confirm against) someone else's bond.
+    expect(await h.service.ownedBid(BUYER_B, placed.bid.id)).toBeNull();
+    expect(await h.service.ownedBid(BUYER_A, placed.bid.id + 999)).toBeNull();
+  });
+
+  it('ownedSettlement resolves for the buyer and returns null for a foreign or absent id', async () => {
+    const h = makeHarness();
+    const listing = await listEpic(h);
+    await confirmedBid(h, BUYER_A, CHAR_A, listing.id, 5000);
+    h.setNow(listing.endsAtMs + 1);
+    await h.service.sweepPass();
+    const settlement = await liveSettlement(h, listing.id);
+    const mine = await h.service.ownedSettlement(BUYER_A, settlement.id);
+    expect(mine).not.toBeNull();
+    expect(mine?.id).toBe(settlement.id);
+    expect(mine?.buyerAccount).toBe(BUYER_A);
+    expect(mine?.amountCents).toBe(5000);
+    // The settlement carries the buyer's wallet and the signed quote, so a
+    // foreign read is the one that matters most here.
+    expect(await h.service.ownedSettlement(BUYER_C, settlement.id)).toBeNull();
+    expect(await h.service.ownedSettlement(BUYER_A, settlement.id + 999)).toBeNull();
   });
 });

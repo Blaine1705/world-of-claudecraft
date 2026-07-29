@@ -89,8 +89,28 @@ export function createWocMarketCustody(host: WocCustodyGameHost): WocMarketCusto
       items: InvSlot[],
       custodyRef: string,
     ): Promise<void> {
-      host.sim.mailSystemParcel(recipient, LETTERS[letter], items, custodyRef);
-      // Failure here PROPAGATES: the caller must not advance its settlement
+      // The BOOLEAN matters and must not be dropped. Discarding it let
+      // bookCustodyOnce mark the ref booked and the settlement advance to
+      // 'delivered' against a letter carrying nothing, which is the silent item
+      // loss the refusal exists to prevent.
+      //
+      // But false has TWO causes and only one is a failure: goods were offered
+      // and none survived validation (a real refusal), OR this custodyRef is
+      // already booked in the blob (a retry, which is success). Treating both as
+      // fatal would wedge the recovery path forever: a pass that booked the
+      // parcel but died before markCustodyRefBooked would throw on every
+      // retry, so the settlement could never advance. hasCustodyParcel is what
+      // tells them apart.
+      if (
+        !host.sim.mailSystemParcel(recipient, LETTERS[letter], items, custodyRef) &&
+        !host.sim.postOffice.hasCustodyParcel(custodyRef)
+      ) {
+        // Genuine refusal: nothing is booked under this ref. Throwing lands in
+        // the caller's failure path (release the claim, retry on a later sweep
+        // pass), so the item stays visibly held instead of vanishing.
+        throw new Error(`woc_market: mail parcel refused for custodyRef ${custodyRef}`);
+      }
+      // Failure here PROPAGATES too: the caller must not advance its settlement
       // or dispose flag until the blob holding the parcel is durable. The
       // in-memory letter stays booked; the custodyRef dedupe makes the retry
       // (this process) or the re-book (after a restart) exactly-once.
