@@ -1,4 +1,5 @@
 import { pool } from './db';
+import { MAX_SEEKER_TOKEN_MINTS } from './seeker_entitlement_limits';
 
 export const SEEKER_ENTITLEMENT_SCHEMA = `
 -- Keep forever. A claimed SGT mint must never become reusable after a wallet
@@ -14,78 +15,85 @@ CREATE TABLE IF NOT EXISTS seeker_entitlement_claims (
 );
 `;
 
-export interface SeekerEntitlementClaim {
+export interface SeekerEntitlementCandidate {
   mint: string;
-  accountId: number;
-  claimantWallet: string;
-  proofVersion: string;
   verificationSlot: number | null;
 }
 
-export type SeekerEntitlementClaimResult = 'claimed' | 'existing_same' | 'conflict';
+export interface AvailableSeekerEntitlementClaim {
+  candidates: readonly SeekerEntitlementCandidate[];
+  accountId: number;
+  claimantWallet: string;
+  proofVersion: string;
+}
+
+export type SeekerEntitlementClaimResult =
+  | { status: 'claimed' | 'existing_same'; mint: string }
+  | { status: 'conflict'; mint: null };
 
 interface QueryResultLike {
   rows: Record<string, unknown>[];
 }
 
-interface QueryClient {
-  query(sql: string, params?: readonly unknown[]): Promise<QueryResultLike>;
-  release(): void;
-}
-
 interface QueryPool {
-  connect(): Promise<QueryClient>;
   query(sql: string, params?: readonly unknown[]): Promise<QueryResultLike>;
 }
 
-function sameClaim(row: Record<string, unknown>, claim: SeekerEntitlementClaim): boolean {
-  return Number(row.account_id) === claim.accountId && row.mint === claim.mint;
+function validCandidates(candidates: readonly SeekerEntitlementCandidate[]): boolean {
+  if (candidates.length === 0 || candidates.length > MAX_SEEKER_TOKEN_MINTS) return false;
+  let previous = '';
+  for (const candidate of candidates) {
+    const slot = candidate.verificationSlot;
+    if (
+      !candidate.mint ||
+      candidate.mint !== candidate.mint.trim() ||
+      candidate.mint <= previous ||
+      (slot !== null && (!Number.isSafeInteger(slot) || slot < 0))
+    ) {
+      return false;
+    }
+    previous = candidate.mint;
+  }
+  return true;
 }
 
 /**
- * Claim one SGT mint and one account atomically across every realm process.
- * Chain verification must finish before this function starts its short DB transaction.
+ * Claim the first available verified SGT candidate across every realm process.
+ * Chain verification and deterministic sorting finish before this bounded DB call.
  */
-export async function claimSeekerEntitlement(
-  claim: SeekerEntitlementClaim,
+export async function claimAvailableSeekerEntitlement(
+  claim: AvailableSeekerEntitlementClaim,
   db: QueryPool = pool,
 ): Promise<SeekerEntitlementClaimResult> {
-  const client = await db.connect();
-  try {
-    await client.query('BEGIN');
-    const inserted = await client.query(
-      `INSERT INTO seeker_entitlement_claims
-         (mint, account_id, claimant_wallet, proof_version, verification_slot)
-       VALUES ($1, $2, $3, $4, $5)
-       ON CONFLICT DO NOTHING
-       RETURNING mint`,
-      [
-        claim.mint,
-        claim.accountId,
-        claim.claimantWallet,
-        claim.proofVersion,
-        claim.verificationSlot,
-      ],
-    );
-    if (inserted.rows.length > 0) {
-      await client.query('COMMIT');
-      return 'claimed';
-    }
-    const existing = await client.query(
-      `SELECT mint, account_id, claimant_wallet
-         FROM seeker_entitlement_claims
-        WHERE mint = $1 OR account_id = $2
-        FOR UPDATE`,
-      [claim.mint, claim.accountId],
-    );
-    await client.query('COMMIT');
-    return existing.rows.some((row) => sameClaim(row, claim)) ? 'existing_same' : 'conflict';
-  } catch (error) {
-    await client.query('ROLLBACK');
-    throw error;
-  } finally {
-    client.release();
+  if (!validCandidates(claim.candidates)) return { status: 'conflict', mint: null };
+  const mints = claim.candidates.map((candidate) => candidate.mint);
+  const slots = claim.candidates.map((candidate) => candidate.verificationSlot);
+  const inserted = await db.query(
+    `INSERT INTO seeker_entitlement_claims
+       (mint, account_id, claimant_wallet, proof_version, verification_slot)
+     SELECT candidate.mint, $3, $4, $5, candidate.verification_slot
+       FROM unnest($1::text[], $2::bigint[]) WITH ORDINALITY
+         AS candidate(mint, verification_slot, ordinality)
+      ORDER BY candidate.ordinality
+     ON CONFLICT DO NOTHING
+     RETURNING mint`,
+    [mints, slots, claim.accountId, claim.claimantWallet, claim.proofVersion],
+  );
+  const insertedMint = inserted.rows[0]?.mint;
+  if (typeof insertedMint === 'string') return { status: 'claimed', mint: insertedMint };
+
+  const existing = await db.query(
+    `SELECT mint
+       FROM seeker_entitlement_claims
+      WHERE account_id = $1
+      LIMIT 1`,
+    [claim.accountId],
+  );
+  const existingMint = existing.rows[0]?.mint;
+  if (typeof existingMint === 'string' && mints.includes(existingMint)) {
+    return { status: 'existing_same', mint: existingMint };
   }
+  return { status: 'conflict', mint: null };
 }
 
 export async function hasSeekerEntitlement(

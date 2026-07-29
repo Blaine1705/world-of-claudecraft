@@ -1,4 +1,5 @@
 import bs58 from 'bs58';
+import { MAX_SEEKER_TOKEN_ACCOUNTS, MAX_SEEKER_TOKEN_MINTS } from './seeker_entitlement_limits';
 import {
   isSeekerGenesisToken,
   SEEKER_GENESIS_TOKEN_GROUP_ADDRESS,
@@ -17,8 +18,8 @@ const METADATA_POINTER_SIZE = 64;
 const TOKEN_GROUP_MEMBER_SIZE = 72;
 const MAX_MINT_ACCOUNT_BYTES = 16 * 1024;
 const MINT_BATCH_SIZE = 100;
-export const MAX_SEEKER_TOKEN_ACCOUNTS = 500;
-export const MAX_SEEKER_TOKEN_MINTS = 200;
+
+export { MAX_SEEKER_TOKEN_ACCOUNTS, MAX_SEEKER_TOKEN_MINTS } from './seeker_entitlement_limits';
 
 interface ParsedTokenAccount {
   account?: {
@@ -161,12 +162,12 @@ export function boundedPositiveTokenMintAddresses(accounts: unknown): string[] |
   return mints.length <= MAX_SEEKER_TOKEN_MINTS ? mints : null;
 }
 
-export async function findSeekerGenesisToken(
+export async function findSeekerGenesisTokens(
   walletAddress: string,
   rpcUrl = process.env.SOLANA_RPC_URL ?? '',
   signal?: AbortSignal,
   requiredMint?: string,
-): Promise<VerifiedSeekerGenesisToken | null> {
+): Promise<VerifiedSeekerGenesisToken[] | null> {
   const owner = canonicalPublicKey(walletAddress);
   const canonicalRequiredMint =
     requiredMint === undefined ? undefined : canonicalPublicKey(requiredMint);
@@ -198,6 +199,7 @@ export async function findSeekerGenesisToken(
     return null;
   }
 
+  const verified: VerifiedSeekerGenesisToken[] = [];
   for (let offset = 0; offset < mints.length; offset += MINT_BATCH_SIZE) {
     const batch = mints.slice(offset, offset + MINT_BATCH_SIZE);
     try {
@@ -210,13 +212,23 @@ export async function findSeekerGenesisToken(
       if (!Array.isArray(result?.value) || result.value.length !== batch.length) return null;
       for (let i = 0; i < batch.length; i++) {
         const mint = batch[i];
-        if (mint && decodeSeekerGenesisMint(mint, result.value[i])) return { mint, slot };
+        if (mint && decodeSeekerGenesisMint(mint, result.value[i])) verified.push({ mint, slot });
       }
     } catch {
       return null;
     }
   }
-  return null;
+  return verified;
+}
+
+export async function findSeekerGenesisToken(
+  walletAddress: string,
+  rpcUrl = process.env.SOLANA_RPC_URL ?? '',
+  signal?: AbortSignal,
+  requiredMint?: string,
+): Promise<VerifiedSeekerGenesisToken | null> {
+  const tokens = await findSeekerGenesisTokens(walletAddress, rpcUrl, signal, requiredMint);
+  return tokens?.[0] ?? null;
 }
 
 export const seekerGenesisTokenIdentity = {

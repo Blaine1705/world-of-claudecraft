@@ -177,6 +177,13 @@ describe('Android Seeker distribution boundary', () => {
     expect(plugin).toContain('walletAdapter.transact(activityResultSender)');
   });
 
+  it('rejects empty MWA authorization accounts before either signing operation', () => {
+    expect(plugin.match(/authResult\.accounts\.firstOrNull\(\)/g)).toHaveLength(3);
+    expect(plugin).not.toContain('authResult.accounts.first()');
+    expect(plugin.match(/MissingAuthorizedAccountException/g)?.length).toBeGreaterThanOrEqual(3);
+    expect(plugin.match(/MWA_NO_ACCOUNT/g)?.length).toBeGreaterThanOrEqual(3);
+  });
+
   it('uses Seed Vault instructions in the native Seeker wallet picker', () => {
     expect(main).toContain("? t('wallet.seekerAppHelp')");
   });

@@ -7,11 +7,10 @@ import type { Ctx, Middleware, RouteDef } from './http/types';
 import { json, readBody } from './http_util';
 import { verifySeekerSolanaArtifactAttestation } from './native_attestation';
 import {
-  claimSeekerEntitlement,
-  hasSeekerEntitlement,
+  claimAvailableSeekerEntitlement,
   seekerEntitlementForAccount,
 } from './seeker_entitlement_db';
-import { findSeekerGenesisToken } from './seeker_genesis_token_rpc';
+import { findSeekerGenesisToken, findSeekerGenesisTokens } from './seeker_genesis_token_rpc';
 import {
   createSeekerOwnershipVerifier,
   type SeekerOwnershipVerifier,
@@ -22,8 +21,8 @@ import { isNativeAppRequest } from './web_login_guard';
 interface SeekerEntitlementRuntime {
   walletForAccount: typeof walletForAccount;
   findSeekerGenesisToken: typeof findSeekerGenesisToken;
-  claimSeekerEntitlement: typeof claimSeekerEntitlement;
-  hasSeekerEntitlement: typeof hasSeekerEntitlement;
+  findSeekerGenesisTokens: typeof findSeekerGenesisTokens;
+  claimAvailableSeekerEntitlement: typeof claimAvailableSeekerEntitlement;
   seekerEntitlementForAccount: typeof seekerEntitlementForAccount;
   verifySeekerSolanaArtifactAttestation: typeof verifySeekerSolanaArtifactAttestation;
 }
@@ -31,8 +30,8 @@ interface SeekerEntitlementRuntime {
 const REAL_RUNTIME: SeekerEntitlementRuntime = {
   walletForAccount,
   findSeekerGenesisToken,
-  claimSeekerEntitlement,
-  hasSeekerEntitlement,
+  findSeekerGenesisTokens,
+  claimAvailableSeekerEntitlement,
   seekerEntitlementForAccount,
   verifySeekerSolanaArtifactAttestation,
 };
@@ -96,8 +95,8 @@ export async function handleSeekerEntitlementStatus(
   res: http.ServerResponse,
   accountId: number,
 ): Promise<void> {
-  const entitled = await runtime.hasSeekerEntitlement(accountId);
-  json(res, 200, { entitled });
+  const claim = await runtime.seekerEntitlementForAccount(accountId);
+  json(res, 200, { entitled: claim !== null, mint: claim?.mint ?? null });
 }
 
 export async function verifyCurrentSeekerEntitlement(accountId: number): Promise<boolean> {
@@ -131,51 +130,58 @@ export async function handleSeekerEntitlementClaim(
     });
     return;
   }
-  const verification = await seekerRpcExecutor
-    .run(`claim:${accountId}`, async (signal) => {
-      const wallet = await runtime.walletForAccount(accountId);
-      if (!wallet || signal.aborted) return { wallet, token: null };
-      const token = await runtime.findSeekerGenesisToken(wallet.pubkey, undefined, signal);
-      return { wallet, token };
-    })
-    .catch(() => null);
-  if (!verification) {
-    json(res, 403, {
-      error: 'verified Seeker Genesis Token required',
-      code: 'seeker.genesis_token_required',
-    });
-    return;
-  }
-  if (!verification.wallet) {
+  const wallet = await runtime.walletForAccount(accountId);
+  if (!wallet) {
     json(res, 409, {
       error: 'link and verify a wallet first',
       code: 'seeker.wallet_required',
     });
     return;
   }
-  const { token, wallet } = verification;
-  if (!token) {
+  const existingClaim = await runtime.seekerEntitlementForAccount(accountId);
+  const verification = await seekerRpcExecutor
+    .run(`claim:${accountId}:${wallet.pubkey}`, (signal) =>
+      runtime.findSeekerGenesisTokens(wallet.pubkey, undefined, signal, existingClaim?.mint),
+    )
+    .catch(() => null);
+  const fixedMintVerified =
+    !existingClaim || verification?.some((token) => token.mint === existingClaim.mint) === true;
+  if (!verification || verification.length === 0 || !fixedMintVerified) {
     json(res, 403, {
       error: 'verified Seeker Genesis Token required',
       code: 'seeker.genesis_token_required',
     });
     return;
   }
-  const result = await runtime.claimSeekerEntitlement({
-    mint: token.mint,
+  const currentWallet = await runtime.walletForAccount(accountId);
+  if (!currentWallet || currentWallet.pubkey !== wallet.pubkey) {
+    json(res, 409, {
+      error: 'link and verify a wallet first',
+      code: 'seeker.wallet_required',
+    });
+    return;
+  }
+  if (existingClaim) {
+    json(res, 200, { entitled: true, mint: existingClaim.mint });
+    return;
+  }
+  const result = await runtime.claimAvailableSeekerEntitlement({
+    candidates: verification.map((token) => ({
+      mint: token.mint,
+      verificationSlot: token.slot,
+    })),
     accountId,
     claimantWallet: wallet.pubkey,
     proofVersion: 'sgt-v1',
-    verificationSlot: token.slot,
   });
-  if (result === 'conflict') {
+  if (result.status === 'conflict') {
     json(res, 409, {
       error: 'Seeker Genesis Token was already claimed',
       code: 'seeker.genesis_token_claimed',
     });
     return;
   }
-  json(res, 200, { entitled: true });
+  json(res, 200, { entitled: true, mint: result.mint });
 }
 
 export const routes: RouteDef[] = [

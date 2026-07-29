@@ -4344,9 +4344,9 @@ async function startOffline(
 
 const api = new Api();
 const seekerEntitlementSync = createSeekerEntitlementSync({
-  entitlement: () => api.seekerEntitlement(),
+  entitlement: async () => (await api.seekerEntitlement()).entitled,
   createClaimProof: () => createNativeAttestationProof(api.base, 'seeker-claim'),
-  claim: (proof) => api.claimSeekerEntitlement(proof),
+  claim: async (proof) => (await api.claimSeekerEntitlement(proof)).entitled,
   onPermanentFailure: (error) => {
     console.error('[wallet] Seeker entitlement sync was rejected', error);
     flashWalletError(userFacingApiError(error));
@@ -7981,7 +7981,7 @@ async function completeWalletVerifyFlow(address: string): Promise<void> {
     linkedWalletPubkey = result.pubkey;
     if (NATIVE_APP) {
       const attestation = await createNativeAttestationProof(api.base, 'seeker-claim');
-      if (!attestation || !(await api.claimSeekerEntitlement(attestation))) {
+      if (!attestation || !(await api.claimSeekerEntitlement(attestation)).entitled) {
         throw new Error('Seeker entitlement verification failed');
       }
     }

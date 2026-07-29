@@ -5,6 +5,7 @@ import {
   boundedPositiveTokenMintAddresses,
   decodeSeekerGenesisMint,
   findSeekerGenesisToken,
+  findSeekerGenesisTokens,
   MAX_SEEKER_TOKEN_ACCOUNTS,
   MAX_SEEKER_TOKEN_MINTS,
   positiveTokenMintAddresses,
@@ -189,10 +190,10 @@ describe('Seeker token-account RPC parsing', () => {
     ]);
   });
 
-  it('selects the same deterministic SGT when RPC token-account order changes', async () => {
+  it('returns every verified SGT in deterministic order when RPC order changes', async () => {
     const firstMint = mintAddress(7);
     const secondMint = mintAddress(8);
-    const expectedMint = [firstMint, secondMint].sort()[0];
+    const expectedMints = [firstMint, secondMint].sort();
 
     async function findFrom(accounts: unknown[]) {
       const fetchMock = vi
@@ -219,17 +220,16 @@ describe('Seeker token-account RPC parsing', () => {
           );
         });
       vi.stubGlobal('fetch', fetchMock);
-      return findSeekerGenesisToken(mint, 'https://rpc.invalid');
+      return findSeekerGenesisTokens(mint, 'https://rpc.invalid');
     }
 
-    await expect(findFrom([account(firstMint, '1'), account(secondMint, '1')])).resolves.toEqual({
-      mint: expectedMint,
-      slot: 42,
-    });
-    await expect(findFrom([account(secondMint, '1'), account(firstMint, '1')])).resolves.toEqual({
-      mint: expectedMint,
-      slot: 42,
-    });
+    const expected = expectedMints.map((address) => ({ mint: address, slot: 42 }));
+    await expect(findFrom([account(firstMint, '1'), account(secondMint, '1')])).resolves.toEqual(
+      expected,
+    );
+    await expect(findFrom([account(secondMint, '1'), account(firstMint, '1')])).resolves.toEqual(
+      expected,
+    );
   });
 
   it('verifies only the required persisted SGT when a wallet owns multiple SGTs', async () => {

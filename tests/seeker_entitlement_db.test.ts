@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  claimSeekerEntitlement,
+  claimAvailableSeekerEntitlement,
   hasSeekerEntitlement,
   SEEKER_ENTITLEMENT_SCHEMA,
   seekerEntitlementForAccount,
@@ -18,20 +18,19 @@ function fakePool(results: Record<string, unknown>[][]) {
   return {
     calls,
     pool: {
-      async connect() {
-        return client;
-      },
       query: client.query,
     },
   };
 }
 
 const claim = {
-  mint: 'sgt-mint',
+  candidates: [
+    { mint: 'sgt-mint-a', verificationSlot: 123 },
+    { mint: 'sgt-mint-b', verificationSlot: 124 },
+  ],
   accountId: 42,
   claimantWallet: 'seeker-wallet',
   proofVersion: 'sgt-v1',
-  verificationSlot: 123,
 };
 
 describe('Seeker entitlement persistence', () => {
@@ -42,52 +41,66 @@ describe('Seeker entitlement persistence', () => {
     expect(SEEKER_ENTITLEMENT_SCHEMA).not.toContain('ON DELETE CASCADE');
   });
 
-  it('claims with parameterized SQL and commits the unique insert', async () => {
-    const db = fakePool([[], [{ mint: claim.mint }], []]);
-    await expect(claimSeekerEntitlement(claim, db.pool)).resolves.toBe('claimed');
-    expect(db.calls[1]?.params).toEqual([
-      claim.mint,
+  it('claims the first available candidate with one ordered parameterized insert', async () => {
+    const db = fakePool([[{ mint: 'sgt-mint-a' }]]);
+    await expect(claimAvailableSeekerEntitlement(claim, db.pool)).resolves.toEqual({
+      status: 'claimed',
+      mint: 'sgt-mint-a',
+    });
+    expect(db.calls[0]?.params).toEqual([
+      ['sgt-mint-a', 'sgt-mint-b'],
+      [123, 124],
       claim.accountId,
       claim.claimantWallet,
       claim.proofVersion,
-      claim.verificationSlot,
     ]);
-    expect(db.calls.map((call) => call.sql.trim())).toEqual([
-      'BEGIN',
-      expect.stringContaining('INSERT INTO seeker_entitlement_claims'),
-      'COMMIT',
-    ]);
+    expect(db.calls[0]?.sql).toContain('WITH ORDINALITY');
+    expect(db.calls[0]?.sql).toContain('ORDER BY candidate.ordinality');
+    expect(db.calls[0]?.sql).toContain('ON CONFLICT DO NOTHING');
   });
 
-  it('classifies an idempotent replay separately from a conflicting claim', async () => {
-    const same = fakePool([
-      [],
-      [],
-      [{ mint: claim.mint, account_id: claim.accountId, claimant_wallet: claim.claimantWallet }],
-      [],
-    ]);
-    await expect(claimSeekerEntitlement(claim, same.pool)).resolves.toBe('existing_same');
+  it('classifies a same-account race only when its fixed mint was verified', async () => {
+    const same = fakePool([[], [{ mint: 'sgt-mint-b' }]]);
+    await expect(claimAvailableSeekerEntitlement(claim, same.pool)).resolves.toEqual({
+      status: 'existing_same',
+      mint: 'sgt-mint-b',
+    });
+    expect(same.calls).toHaveLength(2);
 
-    const transferredWithinAccount = fakePool([
-      [],
-      [],
-      [{ mint: claim.mint, account_id: claim.accountId, claimant_wallet: 'prior-wallet' }],
-      [],
-    ]);
-    await expect(
-      claimSeekerEntitlement(
-        { ...claim, claimantWallet: 'new-primary-wallet' },
-        transferredWithinAccount.pool,
-      ),
-    ).resolves.toBe('existing_same');
+    const unverifiedExisting = fakePool([[], [{ mint: 'another-mint' }]]);
+    await expect(claimAvailableSeekerEntitlement(claim, unverifiedExisting.pool)).resolves.toEqual({
+      status: 'conflict',
+      mint: null,
+    });
 
-    const conflict = fakePool([
+    const consumed = fakePool([[], []]);
+    await expect(claimAvailableSeekerEntitlement(claim, consumed.pool)).resolves.toEqual({
+      status: 'conflict',
+      mint: null,
+    });
+  });
+
+  it('rejects invalid candidate bounds and ordering before querying', async () => {
+    for (const candidates of [
       [],
-      [],
-      [{ mint: claim.mint, account_id: 99, claimant_wallet: 'other' }],
-      [],
-    ]);
-    await expect(claimSeekerEntitlement(claim, conflict.pool)).resolves.toBe('conflict');
+      [
+        { mint: 'b', verificationSlot: 1 },
+        { mint: 'a', verificationSlot: 2 },
+      ],
+      Array.from({ length: 201 }, (_, index) => ({
+        mint: `mint-${String(index).padStart(3, '0')}`,
+        verificationSlot: index,
+      })),
+    ]) {
+      const db = fakePool([]);
+      await expect(
+        claimAvailableSeekerEntitlement({ ...claim, candidates }, db.pool),
+      ).resolves.toEqual({
+        status: 'conflict',
+        mint: null,
+      });
+      expect(db.calls).toHaveLength(0);
+    }
   });
 
   it('reads account entitlement without joining mutable wallet links', async () => {

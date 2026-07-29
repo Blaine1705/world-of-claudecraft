@@ -313,6 +313,11 @@ export class ApiError extends Error {
   }
 }
 
+export interface SeekerEntitlementStatus {
+  entitled: boolean;
+  mint: string | null;
+}
+
 // Builds the ApiError for a non-ok JSON response, capturing the stable `code` and
 // the body params when the server sent them (both problem+json and the migrated
 // legacy `{ error, code, ... }` bodies carry a top-level `code`).
@@ -860,14 +865,20 @@ export class Api {
     await this.delete('/api/wallet/link', {});
   }
 
-  async seekerEntitlement(): Promise<boolean> {
+  async seekerEntitlement(): Promise<SeekerEntitlementStatus> {
     const data = await this.get('/api/seeker/entitlement');
-    return data.entitled === true;
+    return {
+      entitled: data.entitled === true,
+      mint: typeof data.mint === 'string' ? data.mint : null,
+    };
   }
 
-  async claimSeekerEntitlement(nativeAttestation: unknown): Promise<boolean> {
+  async claimSeekerEntitlement(nativeAttestation: unknown): Promise<SeekerEntitlementStatus> {
     const data = await this.post('/api/seeker/entitlement', { nativeAttestation });
-    return data.entitled === true;
+    return {
+      entitled: data.entitled === true,
+      mint: typeof data.mint === 'string' ? data.mint : null,
+    };
   }
 
   // ── Discord link/login + status ────────────────────────────────────────────

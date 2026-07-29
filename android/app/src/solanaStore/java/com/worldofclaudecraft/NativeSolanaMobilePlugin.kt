@@ -22,6 +22,8 @@ import kotlinx.coroutines.launch
 
 @CapacitorPlugin(name = "NativeSolanaMobile")
 class NativeSolanaMobilePlugin : Plugin() {
+    private class MissingAuthorizedAccountException : IllegalStateException()
+
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private lateinit var activityResultSender: ActivityResultSender
     private lateinit var tokenStore: MwaAuthorizationTokenStore
@@ -142,9 +144,11 @@ class NativeSolanaMobilePlugin : Plugin() {
         }
         scope.launch {
             val result = walletAdapter.transact(activityResultSender) { authResult ->
+                val account = authResult.accounts.firstOrNull()
+                    ?: throw MissingAuthorizedAccountException()
                 signMessagesDetached(
                     arrayOf(message.toByteArray(Charsets.UTF_8)),
-                    arrayOf(authResult.accounts.first().publicKey),
+                    arrayOf(account.publicKey),
                 )
             }
             when (result) {
@@ -163,8 +167,13 @@ class NativeSolanaMobilePlugin : Plugin() {
                 }
                 is TransactionResult.NoWalletFound ->
                     call.reject("No Mobile Wallet Adapter wallet found", "MWA_NO_WALLET")
-                is TransactionResult.Failure ->
-                    call.reject("Message signing failed", "MWA_SIGN_FAILED", result.e)
+                is TransactionResult.Failure -> {
+                    if (result.e is MissingAuthorizedAccountException) {
+                        call.reject("Wallet returned no account", "MWA_NO_ACCOUNT")
+                    } else {
+                        call.reject("Message signing failed", "MWA_SIGN_FAILED", result.e)
+                    }
+                }
             }
         }
     }
@@ -184,7 +193,9 @@ class NativeSolanaMobilePlugin : Plugin() {
             return
         }
         scope.launch {
-            val result = walletAdapter.transact(activityResultSender) {
+            val result = walletAdapter.transact(activityResultSender) { authResult ->
+                authResult.accounts.firstOrNull()
+                    ?: throw MissingAuthorizedAccountException()
                 signAndSendTransactions(arrayOf(transaction))
             }
             when (result) {
@@ -199,8 +210,17 @@ class NativeSolanaMobilePlugin : Plugin() {
                 }
                 is TransactionResult.NoWalletFound ->
                     call.reject("No Mobile Wallet Adapter wallet found", "MWA_NO_WALLET")
-                is TransactionResult.Failure ->
-                    call.reject("Transaction signing failed", "MWA_TRANSACTION_FAILED", result.e)
+                is TransactionResult.Failure -> {
+                    if (result.e is MissingAuthorizedAccountException) {
+                        call.reject("Wallet returned no account", "MWA_NO_ACCOUNT")
+                    } else {
+                        call.reject(
+                            "Transaction signing failed",
+                            "MWA_TRANSACTION_FAILED",
+                            result.e,
+                        )
+                    }
+                }
             }
         }
     }
